@@ -12,3 +12,4 @@
 | [05_mindstudio_tools](./05_mindstudio_tools) | 本样例基于MindStudio工具，包含msProf和msSanitizer两个调测工具的使用样例 |
 | [06_clock](./06_clock) | 本样例通过Ascend C编程语言实现了Gather算子，同时在算子中添加clock调测，给出了对应的端到端实现 |
 | [07_utility_function](./07_utility_function) | 本样例介绍了Ascend C的工具函数API，包括GetRuntimeUBSize和GetUBSizeInBytes等 |
+| [08_asc_dump](./08_asc_dump) | 本样例通过Ascend C编程语言实现了Mmad算子，同时展示开发算子过程中添加asc_dump调测接口，并给出了对应的端到端实现 |
