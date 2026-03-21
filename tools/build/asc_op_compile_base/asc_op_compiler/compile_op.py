@@ -1493,7 +1493,7 @@ def handle_dump_options(compile_info: CompileInfo, compile_option_tuple):
         global_var_storage.set_variable("ascendc_dump_assert_only", True)
 
     # handle dump macro
-    if CommonUtility.is_c310():
+    if CommonUtility.is_c310() or CommonUtility.is_v220():
         if "assert" not in compile_info.dump_info["dump_type"] and "printf" not in compile_info.dump_info["dump_type"]:
             compile_option_tuple.compile_options.append('-DASCENDC_DUMP=0')
             length_before = len(compile_option_tuple.compile_options)
