@@ -1,88 +1,244 @@
-# Ascend C API性能验证SKILL
+# Ascend C API 性能验证 SKILL
 
 ## 核心理念
 
-本 SKILL 的核心是基于用户指定的API信息，完成自动化代码适配、结果计算统计和展示。
+本 SKILL 的核心是基于用户指定的 API 信息，完成自动化代码适配、结果计算统计和展示。
+
+## 功能特性
+
+- **多 API 支持**：Exp、Mul、Adds、LeakyRelu
+- **多数据类型**：half、float、int16、int32
+- **灵活配置**：通过 `test_apis` 选择要测试的 API
+- **自动化执行**：解析配置后批量运行测试
+- **性能分析**：计算并行度、达标率，生成报告
 
 ## 工作流程
 
-### 1. 自动化代码适配
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     1. 解析 user_input.json                      │
+├─────────────────────────────────────────────────────────────────┤
+│  • test_apis: ["all"] 或 ["exp", "mul"]                         │
+│  • 各API的测试场景: {api: {dtype: [sizes]}}                     │
+│  • 理论并行度: theory: {api: {dtype: parallelism}}              │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                     2. 批量执行测试用例                           │
+├─────────────────────────────────────────────────────────────────┤
+│  for api in test_apis:                                          │
+│    for dtype, sizes in api_configs:                              │
+│      for size in sizes:                                          │
+│        build → generate_data → run_kernel → verify_result        │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                     3. 性能计算与汇总                             │
+├─────────────────────────────────────────────────────────────────┤
+│  • 解析日志中的 [LOG] 行                                         │
+│  • 计算 Actual、Achieve%、Status                                │
+│  • 生成 Performance Summary Report                               │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                     4. 输出结果                                  │
+├─────────────────────────────────────────────────────────────────┤
+│  • 终端打印汇总表格                                              │
+│  • 生成 result.md 文件                                           │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-#### 1.1. 解析输入（`user_input.md`）
+## 用户配置格式
 
-- 阅读用户输入的API功能信息（包含API名称、API类型如单目/双目/双目标量等、功能说明、函数原型）理解这个API的功能和用法，用于指导后续的Kernel算子代码实现。
+### 完整配置示例
 
-- 阅读用户输入的性能验证场景，包含要验证的数据类型（half/float/int16/int32）、数据长度（4/8/16等），用于构造真值、测试组合输入、Kernel算子代码适配。
+```json
+{
+  "_comment": {
+    "test_apis": "指定要执行的API列表，支持配置多个",
+    "exp": "Exp接口测试场景",
+    "mul": "Mul接口测试场景"
+  },
+  "test_apis": ["all"],
+  "exp": {
+    "half": [4, 16, 48],
+    "float": [2, 8, 24]
+  },
+  "mul": {
+    "half": [4, 16, 32],
+    "float": [4, 8, 16],
+    "int16": [4, 16, 32],
+    "int32": [4, 8, 16]
+  },
+  "adds": {
+    "half": [4, 16, 32],
+    "float": [4, 8, 16]
+  },
+  "leakyrelu": {
+    "half": [4, 16, 32],
+    "float": [4, 8, 16]
+  },
+  "theory": {
+    "exp": {"half": 32, "float": 32},
+    "mul": {"half": 128, "float": 64, "int16": 128, "int32": 64},
+    "adds": {"half": 128, "float": 64, "int16": 128, "int32": 64},
+    "leakyrelu": {"half": 128, "float": 64}
+  }
+}
+```
 
-    注：用户提供的输入要求是字典类型，比如{数据类型1: [数据长度1, 数据长度2, ..], ..}；具体示例  
-    ```
-    {half: [4, 16], float: [2, 8]}
-    ```
-    代表要验证四类场景下的性能：  
-    - 场景一、half数据类型输入场景下，4K数据长度（即4*1024个elements）；  
-    - 场景二、half数据类型输入场景下，16K数据长度（即16*1024个elements）；  
-    - 场景三、float数据类型输入场景下，2K数据长度（即2*1024个elements）；  
-    - 场景四、float数据类型输入场景下，8K数据长度（即8*1024个elements）；  
+### 配置项说明
 
-- 如果用户没提供完整上述信息，告警提示用户。
+| 配置项 | 类型 | 说明 |
+|--------|------|------|
+| `test_apis` | array | 要测试的API列表，`["all"]` 表示全部 |
+| `{api_name}` | object | API名称（如exp/mul/adds/leakyrelu） |
+| `{dtype}` | array | 数据类型，支持 half/float/int16/int32 |
+| `theory` | object | 理论并行度，用于计算达标率 |
 
-#### 1.2. 代码适配
+### 数据长度说明
 
-- Kernel算子实现代码 `performance_verify.asc`
-    - 新增API ID定义
-    - 修改CopyIn函数，增加新增API的数据搬入处理
-    - 修改Compute函数，增加新增API的计算处理
+- 单位：K (elements)
+- 示例：`4` 表示 `4 × 1024 = 4096` elements
 
-- 真值构造脚本
-    - 创建`scripts/gen_data_{api_name}.py`，参考现有的代码实现
-        ```python
-        ...
+## 性能计算公式
 
-        def compute_{api_name}_golden():
-            ...
+| 指标 | 公式 | 说明 |
+|------|------|------|
+| TotalCycles | cycleEnd - cycleBegin | 1000次执行总周期数 |
+| AvgCycles | TotalCycles / 1000 | 单次执行平均周期数 |
+| Actual | DataLength / T_ai | 实测并行度 |
+| T_ai | AvgCycles / 50 × 1800 | 换算到AI Core频率 |
+| Achieve% | (Actual / Theory) × 100% | 达标率 |
+| Status | Achieve ≥ 70% ? PASS : FAIL | 测试状态 |
 
-        def gen_{api_name}_data():
-            ...
-        ```
-    - 完成`scripts/gen_data.py`的适配
-        - 添加导入
-        - 添加API ID和名称映射
-        - 修改argparse的choices
-        - 添加分支处理逻辑
-    - 完成`scripts/verify_result.py`的适配
-        - 添加API ID和名称映射
-        - 添加分支处理逻辑
-        - 修改argparse的choices
+### 计算示例
 
-- 执行脚本`test.sh`  
-    - 按照不同API、输入数据类型、输入数据长度的组合，依次执行，得到对应测试场景下的性能结果即total cycles的数值，并将结果保存到total_results。
+假设 Exp(half, 16K) 测试结果：
+- TotalCycles = 15112
+- AvgCycles = 15112 / 1000 = 15.112
+- T_ai = 15.112 / 50 × 1800 = 544.032
+- Actual = (16 × 1024) / 544.032 = 30.12
+- Achieve% = (30.12 / 32) × 100% = 94.12%
+- Status = PASS (≥70%)
 
-### 2. 结果计算与统计
-- 完成每个API的每个场景下性能测试结果换算
-    - 计算公式：
-        接口执行N次总耗时（50MHz）：T_total = systemCycleAfter - systemCycleBefore
-        接口平均单次执行耗时（50MHz）：T_avg = T_total / N
-        换算到AI处理器频率的等效单次执行耗时（1800MHz）：T_ai = T_avg / 50 * 1800
-        换算到AI处理器频率的等效并行度：Throughput = 数据长度 / T_ai
-        
-    - 以Exp接口、输入数据类型是half，输入数据长度是16(K)为例，假设执行日志结果total cycles: 15112。
-        - 接口执行1000次总耗时（50MHz）：T_total = 15112(cycles)
-        - 接口平均单次执行耗时（50MHz）：T_avg = 15112 / 1000 = 15.112(cycles)
-        - 换算到AI处理器频率的等效单次执行耗时（1800MHz）：T_ai = 15.112 / 50 * 1800 = 544.032(cycles)
-        - 换算到AI处理器频率的等效并行度：Throughput = (16 * 1024) / 544.032 = 30.12(element/cycle)
-- 将所有API的所有组合场景性能测试结果进行汇总
-    上述`test.sh`脚本获取的total_results结果，最终拆解成各个API在对应场景下的性能
-    | API接口名称 | 数据类型 | 数据长度（元素个数，单位K）| 接口执行1000次耗时(50MHz) | 接口单次执行耗时(50MHz) | 换算到AI处理器频率(1800MHz)的等效并行度 |
-    | --- | --- | --- | --- | --- | --- |
-    | Exp | half | 16 | 15112 | 15.112 | 30.12 |
+## 日志格式
 
-### 3. 结果展示
+### 性能日志
 
-- 将第2步的结果统计汇总，进行打印显示。
+```
+[LOG] Exp instruction executed 1000 times, data length: 49152, data type: float16, cost total cycles: 43556
+```
 
-    结果展示模板参考如下
-    | API接口名称 | 数据类型 | 数据长度（元素个数，单位K）| 理论并行度 | 实测并行度 | 达标率 | 接口执行1000次耗时(50MHz) | 接口单次执行耗时(50MHz) | 换算到AI处理器频率(1800MHz)的等效并行度 |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | Exp | half | 16 | 32 | 30.12 | 94.12% | 15111 | 15.111 | 30.12 |
+### 精度验证日志
 
-- 每个API的理论并行度，从`theoretical_performance.md`中获取，如果没有找到，告警提示用户提供。
+```
+[DataType] float16
+✓ Precision Verification:  PASS
+Matched: 49152 / 49152, Error Ratio: 0.000000
+```
+
+## 输出报告
+
+### Performance Summary Report
+
+```
+============================================================================================================================
+Performance Summary Report
+============================================================================================================================
+API          Type     Size(K)  Elements   TotalCycles  AvgCycles    Actual       Theory     Achieve%   Status
+----------------------------------------------------------------------------------------------------------------------------
+exp          half     48       49152      43556        43.556       31.35        32         97.96      PASS (Achieve≥70%)
+exp          float    24       24576      22222        22.222       30.72        32         96.00      PASS (Achieve≥70%)
+exp          float    8        8192       8001         8.001        28.44        32         88.88      PASS (Achieve≥70%)
+mul          half     32       32768      14917        14.917       61.02        128        47.67      FAIL (Achieve<70%)
+============================================================================================================================
+```
+
+## 扩展新 API
+
+### 1. 修改 `performance_verify.asc`
+
+```cpp
+// 添加 API ID
+#define API_ID_NEW_API  5
+
+// 在 CopyIn 中添加数据搬入
+if constexpr (INPUT_API_ID_VAL == API_ID_NEW_API) {
+    AscendC::LocalTensor<T> xLocal = inQueueX.AllocTensor<T>();
+    AscendC::LocalTensor<T> yLocal = inQueueY.AllocTensor<T>();
+    AscendC::DataCopy(xLocal, xGlobal, TOTAL_LENGTH);
+    AscendC::DataCopy(yLocal, yGlobal, TOTAL_LENGTH);
+    inQueueX.EnQue(xLocal);
+    inQueueY.EnQue(yLocal);
+}
+
+// 在 Compute 中添加计算逻辑
+else if constexpr (INPUT_API_ID_VAL == API_ID_NEW_API) {
+    // ...
+    AscendC::PRINTF("[LOG] NewApi instruction executed ...\n");
+}
+```
+
+### 2. 创建数据生成脚本
+
+```python
+# scripts/gen_data_new_api.py
+def compute_new_api_golden():
+    """计算 golden 数据"""
+    pass
+
+def gen_new_api_data():
+    """生成测试数据"""
+    pass
+```
+
+### 3. 更新 `gen_data.py`
+
+```python
+from gen_data_new_api import gen_new_api_data, compute_new_api_golden
+
+# 添加分支处理
+elif api_type == API_TYPE_NEW_API:
+    gen_new_api_data(input_x, input_y, input_size, dtype_nbits)
+    compute_new_api_golden(input_x, input_y, output, input_size, dtype_nbits)
+```
+
+### 4. 更新配置文件
+
+```json
+{
+  "test_apis": ["all"],
+  "new_api": {
+    "half": [4, 16],
+    "float": [4, 16]
+  },
+  "theory": {
+    "new_api": {"half": 128, "float": 64}
+  }
+}
+```
+
+## 目录结构
+
+```
+performance_verify/
+├── performance_verify.asc       # 算子实现
+├── test.sh                      # 测试入口
+├── CMakeLists.txt               # 编译配置
+├── data_utils.h                # 数据工具
+├── user_input.json             # 用户配置
+├── result.md                   # 生成的报告
+├── performance_results.log      # 执行日志
+├── README.md                   # 使用说明
+├── performance_verify_skill.md  # 本文档
+└── scripts/
+    ├── gen_data.py             # 数据生成入口
+    ├── gen_data_utils.py       # 公共配置
+    ├── gen_data_exp.py         # Exp 数据
+    ├── gen_data_mul.py         # Mul 数据
+    ├── gen_data_adds.py        # Adds 数据
+    ├── gen_data_leakyrelu.py   # LeakyRelu 数据
+    ├── verify_result.py        # 精度验证
+    └── calc_performance.py     # 性能计算
+```
