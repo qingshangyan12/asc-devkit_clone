@@ -22,10 +22,10 @@ namespace Te {
 
 class Fixpipe2OutNz2Nd3510 {
 public:
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
-    __aicore__ inline static void Run(const T& dst, const U& src, const Params& params) {
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename... Params>
+    __aicore__ inline static void Run(const T& dst, const U& src, const Params&... params) {
         SetRegisterImpl<trait, T, U>(dst, src);
-        DataCopyImpl<trait, quantPre, T, U, Params>(dst, src, params);
+        DataCopyImpl<trait, quantPre, T, U>(dst, src, params...);
     }
 
 private:
@@ -50,8 +50,8 @@ private:
         SetRegister3510::SetRegister(ndNum, dstNdStride, srcNdStride);
     }
 
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
-    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const Params& params)
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U>
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const FixpipeParams& params)
     {
         CheckTemplate<trait, quantPre, T, U>();
         auto dstLayout = dst.Layout();
