@@ -135,16 +135,17 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_fill_l0a](cube_datamove/asc_fill_l0a.md)                           | 将L0A Buffer的Local Memory初始化为某一具体数值。 |
 | [asc_fill_l0b](cube_datamove/asc_fill_l0b.md)                           | 将L0B Buffer的Local Memory初始化为某一具体数值。 |
 | [asc_fill_l1](cube_datamove/asc_fill_l1.md)                             | 将L1 Buffer的Local Memory初始化为某一具体数值。 |
-| [asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md)                 | 设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)的3D格式搬运接口在L1 Buffer的边界值。 |
+| [asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md)                 | 设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。 |
 | [asc_load_image_to_cbuf](cube_datamove/asc_load_image_to_cbuf.md)       | 将图像数据从Global Memory搬运到L1 Buffer。 |
 | [asc_copy_l12bt](cube_datamove/asc_copy_l12bt.md)                       | 将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias。 |
 | [asc_copy_l12fb](cube_datamove/asc_copy_l12fb.md)                       | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
-| [asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
-| [asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到l0b Buffer里。 |
+| [asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
+| [asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到l0b Buffer里。 |
 | [asc_copy_l12l0c](cube_datamove/asc_copy_l12l0c.md)                     | 将矩阵由L1 Buffer搬运到L0C Buffer中。 |
 | [asc_copy_l12l0b_sparse](cube_datamove/asc_copy_l12l0b_sparse.md)       | 用于搬运存放在L1 Buffer里的512B大小的稠密权重矩阵到L0B Buffer里，同时读取128B大小的索引矩阵用于稠密矩阵的稀疏化。 |
 | [asc_copy_l12l0b_trans](cube_datamove/asc_copy_l12l0b_trans.md)         | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |
 | [asc_copy_l12l0a_trans](cube_datamove/asc_copy_l12l0a_trans.md)         | 该接口实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载。 |
+| [asc_copy_l12l0b_trans](cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md)         | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |
 | [asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md)     | DataCopy（CO1->GM、CO1->A1）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。 |
 | [asc_set_l0c_copy_prequant](cube_datamove/asc_set_l0c_copy_prequant.md) | 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。 |
 | [copy_gm2l1](cube_datamove/copy_gm2l1.md)                               | 将数据从Global Memory搬运到 Level 1 cache。 |
