@@ -46,6 +46,7 @@ private:
 
         auto srcRowShape = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
         uint32_t srcColShape = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+        auto srcRowStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
         uint16_t dstBRowStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
 
         uint16_t dnNum = 1;
@@ -53,7 +54,7 @@ private:
         uint16_t dValue = srcRowShape;
         uint16_t dstNzNStride = 1;
 
-        uint64_t loop1SrcStride = srcColShape * sizeof(type);
+        uint64_t loop1SrcStride = srcRowStride * sizeof(type);
 
         uint16_t loop2DstStride = dstNzNStride;                             // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3DstStride = dstBRowStride * sizeof(type) / C0_SIZE<>; // loop3_dst_stride = dst_nz_c0_Stride
