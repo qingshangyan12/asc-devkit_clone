@@ -55,7 +55,7 @@ __aicore__ inline void InsertSync()
 class CopyDeqTensorToFbuf3510 {
 public:
     template <typename T>
-    __aicore__ inline void CopyDeqTensorToFbufImpl(const T& src, uint16_t calNSize, uint16_t nIterIndex)
+    __aicore__ inline static void CopyDeqTensorToFbufImpl(const T& src, uint16_t calNSize, uint16_t nIterIndex)
     {
         auto dstAddr = reinterpret_cast<__fbuf__ uint64_t*>(AllocTempBuf(calNSize));
         auto dst = MakeTensor(MakeFixbufmemPtr(dstAddr), src.Layout());
@@ -65,9 +65,9 @@ public:
     }
 private:
     template <typename T>
-    __aicore__ inline decltype(auto) TileSrcTensor(const T& src, uint16_t calNSize, uint16_t nIterIndex) {
-        auto coord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterIndex * MAIN_LOOP_N_SIZE_3510));
-        auto shape = MakeShape(MakeShape(Std::Int<1>{}, 1), MakeShape(Std::Int<1>{}, calNSize));
+    __aicore__ inline static decltype(auto) TileSrcTensor(const T& src, uint16_t calNSize, uint16_t nIterIndex) {
+        auto coord = MakeCoord(MakeCoord(Std::Int<0>{}, Std::Int<0>{}), MakeCoord(Std::Int<0>{}, nIterIndex * MAIN_LOOP_N_SIZE_3510));
+        auto shape = MakeShape(MakeShape(Std::Int<1>{}, Std::Int<1>{}), MakeShape(Std::Int<1>{}, calNSize));
         return src(coord, shape);
     }
 };
@@ -197,10 +197,8 @@ __aicore__ inline constexpr QuantMode3510 GetQuantMode()
 
 class FormatRegistorIgnore3510 {
 public:
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord) {}
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
-    __aicore__ inline void Run(const T& dst, const U& src, const V& quant) {}
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename... Params>
+    __aicore__ inline void Run(const T& dst, const U& src, const Params&... parms) {}
 };
 
 } // namespace Te
