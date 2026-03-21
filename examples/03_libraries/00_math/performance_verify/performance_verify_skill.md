@@ -16,7 +16,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     1. 解析 user_input.json                      │
+│                     1. 解析 testcases.json                      │
 ├─────────────────────────────────────────────────────────────────┤
 │  • test_apis: ["all"] 或 ["exp", "mul"]                         │
 │  • 各API的测试场景: {api: {dtype: [sizes]}}                     │
@@ -227,7 +227,7 @@ performance_verify/
 ├── test.sh                      # 测试入口
 ├── CMakeLists.txt               # 编译配置
 ├── data_utils.h                # 数据工具
-├── user_input.json             # 用户配置
+├── testcases.json             # 用户配置
 ├── result.md                   # 生成的报告
 ├── performance_results.log      # 执行日志
 ├── README.md                   # 使用说明

@@ -14,7 +14,7 @@ import os
 from gen_data_utils import API_NAME_MAP, THEORETICAL_PERFORMANCE, REPEAT_TIMES
 
 
-def load_theory_from_config(config_file='user_input.json'):
+def load_theory_from_config(config_file='testcases.json'):
     """从配置文件加载理论性能数据"""
     if not os.path.exists(config_file):
         return {}
@@ -196,7 +196,7 @@ def main():
     # 加载理论性能配置
     theory_config = load_theory_from_config()
     if theory_config:
-        print("[INFO] Loaded theory performance from user_input.json")
+        print("[INFO] Loaded theory performance from testcases.json")
     
     # 解析日志文件
     results = parse_log_file(args.log_file)

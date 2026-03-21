@@ -9,16 +9,20 @@
   },
   "test_apis": ["all"],
   "exp": {
-    "half": [48],
-    "float": [8, 24]
+    "half": [4, 16, 48],
+    "float": [2, 8, 24]
+  },
+  "mul": {
+    "half": [2, 8, 24],
+    "float": [2, 4, 12]
   },
   "adds": {
-    "half": [4],
-    "float": [8]
+    "half": [8, 32],
+    "float": [4, 16]
   },
   "leakyrelu": {
-    "half": [32],
-    "float": [16]
+    "half": [8, 32],
+    "float": [4, 16]
   },
   "theory": {
     "exp": {"half": 32, "float": 32},

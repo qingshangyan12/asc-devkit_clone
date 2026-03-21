@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG_FILE="./user_input.json"
+CONFIG_FILE="./testcases.json"
 BUILD_DIR="build"
 LOG_FILE="./performance_results.log"
 RESULT_FILE="./result.md"

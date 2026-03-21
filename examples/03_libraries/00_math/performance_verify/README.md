@@ -13,7 +13,7 @@
 
 ## 用户配置
 
-通过 `user_input.json` 配置测试场景和理论性能：
+通过 `testcases.json` 配置测试场景和理论性能：
 
 ```json
 {
@@ -133,7 +133,7 @@ performance_verify/
 ├── test.sh                     # 测试入口（自动解析配置、批量执行）
 ├── CMakeLists.txt              # 编译配置
 ├── data_utils.h               # 数据读写工具
-├── user_input.json             # 用户配置（API列表、测试场景、理论性能）
+├── testcases.json             # 用户配置（API列表、测试场景、理论性能）
 ├── result.md                   # 生成的性能报告（Markdown格式）
 ├── performance_results.log      # 测试执行日志
 ├── README.md                   # 本文档
@@ -167,4 +167,4 @@ performance_verify/
 
 ### 3. 更新配置文件
 
-- 在 `user_input.json` 中添加 API 配置和理论性能
+- 在 `testcases.json` 中添加 API 配置和理论性能
