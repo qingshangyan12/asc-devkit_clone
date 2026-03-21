@@ -1,6 +1,29 @@
 {
+  "_comment": {
+    "test_apis": "指定要执行的API列表，支持配置多个，如: [\"exp\", \"mul\"]；配置为 [\"all\"] 或不配置则执行所有API",
+    "exp": "Exp接口测试场景, 格式为数据类型: [数据长度1, 数据长度2, ..]",
+    "mul": "Mul接口测试场景, 格式为数据类型: [数据长度1, 数据长度2, ..]",
+    "adds": "Adds接口测试场景, 格式为数据类型: [数据长度1, 数据长度2, ..]",
+    "leakyrelu": "LeakyRelu接口测试场景, 格式为数据类型: [数据长度1, 数据长度2, ..]",
+    "theory": "各类API接口的理论并行度(理论性能)"
+  },
+  "test_apis": ["all"],
   "exp": {
-    "half": [4, 16],
-    "float": [2, 8]
+    "half": [48],
+    "float": [8, 24]
+  },
+  "adds": {
+    "half": [4],
+    "float": [8]
+  },
+  "leakyrelu": {
+    "half": [32],
+    "float": [16]
+  },
+  "theory": {
+    "exp": {"half": 32, "float": 32},
+    "mul": {"half": 128, "float": 64, "int16": 128, "int32": 64},
+    "adds": {"half": 128, "float": 64, "int16": 128, "int32": 64},
+    "leakyrelu": {"half": 128, "float": 64}
   }
 }

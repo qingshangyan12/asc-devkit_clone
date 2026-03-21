@@ -13,19 +13,23 @@
 
 ## 用户配置
 
-通过 `user_input.json` 文件配置要测试的 API、数据类型和数据长度组合：
+通过 `user_input.json` 配置测试场景和理论性能：
 
 ```json
 {
   "exp": {
     "half": [4, 16],
     "float": [2, 8]
+  },
+  "theory": {
+    "exp": {"half": 32, "float": 32},
+    "mul": {"half": 128, "float": 64}
   }
 }
 ```
 
-**配置说明**：
-- 数据长度单位：K (elements)，如 `4` 表示 `4 × 1024 = 4096` elements
+- `数据长度单位`: K (elements)，如 `4` 表示 `4096` elements
+- `theory`: 各API的理论并行度 (element/cycle)
 
 ## 快速开始
 
@@ -33,8 +37,31 @@
 bash test.sh
 ```
 
-## 输出结果
+## 输出示例
 
+**测试进度**:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▶ API: 1 | Type: half | Size: 4K (4096 elements)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Step 1/3] Build ...
+[OK] Build completed
+[Step 2/3] Generate test data ...
+[OK] Data generated
+[Step 3/3] Run kernel & Verify ...
+```
+
+**验证结果** (通过时抽样显示前10个):
+```
+[Sample] First 10 results:
+idx      input_x         input_y         expected        actual         
+--------------------------------------------------------------------
+0        699.01          N/A             0.11            0.11           
+1        0.00            N/A             65.38           65.38          
+Test PASSED!
+```
+
+**性能汇总**:
 ```
 ========================================================================================================================
 Performance Summary Report
@@ -42,9 +69,20 @@ Performance Summary Report
 API          Type     Size(K)  Elements   TotalCycles  AvgCycles    Throughput   Theory     Achieve%   Status  
 ------------------------------------------------------------------------------------------------------------------------
 exp          half     4        4096       4445         4.445        25.60        32         79.99      PASS    
-exp          half     16       16384      15111        15.111       30.12        32         94.12      PASS    
 ========================================================================================================================
 ```
+
+## 数据范围配置
+
+各 API 的 `gen_data_*.py` 支持独立配置数据范围，避免出现 `0` 或 `inf`：
+
+| API | 数据类型 | 默认范围 |
+|-----|----------|----------|
+| Exp | half/float | [-10, 10] |
+| Mul | half/float | [-10, 10] |
+| Mul | int16/int32 | [-100, 100] |
+| Adds/LeakyRelu | half/float | [-100, 100] |
+| Adds/LeakyRelu | int16/int32 | [-1000, 1000] |
 
 ## 性能计算公式
 
@@ -65,9 +103,10 @@ performance_verify/
 ├── CMakeLists.txt              # 编译配置
 ├── data_utils.h               # 数据工具
 ├── scripts/
-│   ├── gen_data.py            # 数据生成
+│   ├── gen_data.py            # 数据生成入口
+│   ├── gen_data_utils.py      # 公共配置和工具
 │   ├── gen_data_*.py          # 各API数据生成
-│   ├── verify_result.py        # 结果验证
-│   └── calc_performance.py     # 性能计算
+│   ├── verify_result.py       # 结果验证
+│   └── calc_performance.py    # 性能计算
 └── README.md
 ```
