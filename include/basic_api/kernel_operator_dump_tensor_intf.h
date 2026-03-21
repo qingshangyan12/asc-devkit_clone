@@ -56,7 +56,7 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
 
 // assert define
 #undef assert
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2201)
 #ifdef ASCENDC_DUMP
 #if defined(__NPU_DEVICE__) || defined(__NPU_HOST__) || defined(__ASCC_DEVICE__) || defined(__ASCC_HOST__)
 #define assert(expr) ASCENDC_NPU_DEBUG_ASSERT_IMPL(expr)
