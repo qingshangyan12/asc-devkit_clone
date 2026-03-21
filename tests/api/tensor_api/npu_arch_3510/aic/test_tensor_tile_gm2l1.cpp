@@ -138,8 +138,14 @@ void PrintTensor(const T& src)
     uint32_t N0 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout);
     uint32_t M1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
     uint32_t N1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
-    if constexpr (IsScaleANDFormat<T>::value) {
+    if constexpr (Std::is_same_v<srcType, fp8_e8m0_t> && IsScaleANDFormat<T>::value) {
         std::cout << "ScaleAND";
+    } else if constexpr (Std::is_same_v<srcType, fp8_e8m0_t> && IsScaleADNFormat<T>::value) {
+        std::cout << "ScaleADN";
+    } else if constexpr (Std::is_same_v<srcType, fp8_e8m0_t> && IsScaleANDFormat<T>::value) {
+        std::cout << "ScaleAND";
+    } else if constexpr (Std::is_same_v<srcType, fp8_e8m0_t> && IsScaleBDNFormat<T>::value) {
+        std::cout << "ScaleBDN";
     } else if constexpr (IsNDFormat<T>::value) {
         std::cout << "ND";
     } else if constexpr (IsDNFormat<T>::value) {
@@ -150,6 +156,8 @@ void PrintTensor(const T& src)
         std::cout << "ZN";
     } else if constexpr (IsZZFormat<T>::value) {
         std::cout << "ZZ";
+    } else if constexpr (IsNNFormat<T>::value) {
+        std::cout << "NN";
     } else {
         std::cout << "UnknownLayout";
     }
@@ -508,6 +516,220 @@ void SimScaleADN2Zz(const T& dst, const U& src)
             }
         }
     }
+}
+
+template <typename T, typename U>
+void SimScaleAZz2Zz(const T& dst, const U& src)
+{
+    static_assert(IsZZFormat<U>::value && IsZZFormat<T>::value);
+    using srcType = typename U::elementType;
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto dstLayout = dst.Layout();
+    auto srcLayout = src.Layout();
+    auto srcM1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+    auto srcN1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+    auto srcSM1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
+    auto srcSN1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
+    auto srcSM0 = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 0>(srcLayout);
+
+    uint32_t M0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout);
+    uint32_t N0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout);
+    uint32_t M1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+    uint32_t N1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+
+    for (uint32_t m1 = 0; m1 < M1; m1++) {
+        for (uint32_t n1 = 0; n1 < N1; n1++) {
+            for (uint32_t m0 = 0; m0 < M0; m0++) {
+                for (uint32_t n0 = 0; n0 < N0; n0++) {
+                    uint32_t srcIndex = ((m1 * (srcSM1 / srcSN1) + n1) * (srcSN1 / srcSM0) + m0) * srcSM0 + n0;
+                    uint32_t dstIndex = ((m1 * N1 + n1) * M0 + m0) * N0 + n0;
+                    if (m1 < srcM1 && n1 < srcN1) {
+                        dst.Data()[dstIndex] = src.Data()[srcIndex];
+                    }
+                    // no pad
+                }
+            }
+        }
+    }
+}
+
+template <typename T, typename U, typename Coord>
+void SimScaleAZz2Zz(const T& dst, const U& src, const Coord& coord)
+{
+    static_assert(IsZZFormat<U>::value && IsZZFormat<T>::value);
+    using srcType = typename U::elementType;
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto sliceTensor = src(coord, dst);
+    SimScaleAZz2Zz(dst, sliceTensor);
+}
+
+template <typename T, typename U>
+void SimScaleBND2Nn(const T& dst, const U& src)
+{
+    static_assert(IsScaleBNDFormat<U>::value && IsNNFormat<T>::value);
+    using srcType = typename U::elementType;
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto dstLayout = dst.Layout();
+    auto srcLayout = src.Layout();
+    auto SM = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout);
+    auto BM = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+    auto SN = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout);
+    auto BN = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+    auto srcSM1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
+    auto srcSN1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
+    auto srcSM0 = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 0>(srcLayout);
+
+    auto srcBColStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    uint32_t M0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout);
+    uint32_t N0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout);
+    uint32_t M1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+    uint32_t N1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+
+    uint32_t c0Elements = C0_ELEMENT<srcType>;
+    uint32_t srcColNAlignC0 = ((SN * BN + c0Elements - 1) / c0Elements) * c0Elements;
+    for (uint32_t n1 = 0; n1 < N1; n1++) {
+        for (uint32_t m1 = 0; m1 < M1; m1++) {
+            for (uint32_t n0 = 0; n0 < N0; n0++) {
+                for (uint32_t m0 = 0; m0 < M0; m0++) {
+                    uint32_t srcRow = m1 * M0 + m0;
+                    uint32_t srcCol = n1 * N0 + n0;
+                    // M1 N1 N0 M0
+                    uint32_t srcIndex = (m1 * (srcSM1 / srcSN1) + srcCol) * srcSN1 + m0;
+                    // N1 M1 N0 M0
+                    uint32_t dstIndex = ((n1 * M1 + m1) * N0 + n0) * M0 + m0;
+                    if (srcRow < SM * BM && srcCol < SN * BN) {
+                        dst.Data()[dstIndex] = src.Data()[srcIndex];
+                    } else if (srcRow < SM * BM && srcCol >= SN * BN && srcCol < srcColNAlignC0) {
+                        // right padding and bottom not padding, right pad to the next B*N boundary
+                        dst.Data()[dstIndex] = static_cast<srcType>(0);
+                    }
+                }
+            }
+        }
+    }
+}
+
+template <typename T, typename U, typename Coord>
+void SimScaleBND2Nn(const T& dst, const U& src, const Coord& coord)
+{
+    static_assert(IsScaleBNDFormat<U>::value && IsNNFormat<T>::value);
+    using srcType = typename U::elementType;
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto sliceTensor = src(coord, dst);
+    SimScaleBND2Nn(dst, sliceTensor);
+}
+
+template <typename T, typename U>
+void SimScaleBDN2Nn(const T& dst, const U& src)
+{
+    static_assert(IsScaleBDNFormat<U>::value && IsNNFormat<T>::value);
+    using srcType = typename U::elementType;
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto dstLayout = dst.Layout();
+    auto srcLayout = src.Layout();
+    uint32_t SM = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout);
+    uint32_t BM = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+    uint32_t SN = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout);
+    uint32_t BN = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+    uint32_t srcSM1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
+    uint32_t srcSN1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    uint32_t srcBColStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    uint32_t M0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout);
+    uint32_t N0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout);
+    uint32_t M1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+    uint32_t N1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+
+    uint32_t c0Elements = C0_ELEMENT<srcType>;
+    uint32_t srcColNAlignC0 = ((SN * BN + c0Elements - 1) / c0Elements) * c0Elements;
+    for (uint32_t n1 = 0; n1 < N1; n1++) {
+        for (uint32_t m1 = 0; m1 < M1; m1++) {
+            for (uint32_t m0 = 0; m0 < M0; m0++) {
+                for (uint32_t n0 = 0; n0 < N0; n0++) {
+                    uint32_t srcRow = m1 * M0 + m0;
+                    uint32_t srcCol = n1 * N0 + n0;
+                    // M1 N1 M0 N0
+                    uint32_t srcIndex = srcCol * srcSN1 + srcRow;
+                    // N1 M1 N0 M0
+                    uint32_t dstIndex = ((n1 * M1 + m1) * N0 + n0) * M0 + m0;
+                    if (srcRow < SM * BM && srcCol < SN * BN) {
+                        dst.Data()[dstIndex] = src.Data()[srcIndex];
+                    } else if (srcRow < SM * BM && srcCol >= SN * BN && srcCol < srcColNAlignC0) {
+                        // right padding and bottom not padding, right pad to the next B*N boundary
+                        dst.Data()[dstIndex] = static_cast<srcType>(0);
+                    }
+                }
+            }
+        }
+    }
+}
+
+template <typename T, typename U, typename Coord>
+void SimScaleBDN2Nn(const T& dst, const U& src, const Coord& coord)
+{
+    static_assert(IsScaleBDNFormat<U>::value && IsNNFormat<T>::value);
+    using srcType = typename U::elementType;
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto sliceTensor = src(coord, dst);
+    SimScaleBDN2Nn(dst, sliceTensor);
+}
+
+template <typename T, typename U>
+void SimScaleBNn2Nn(const T& dst, const U& src)
+{
+    static_assert(IsNNFormat<U>::value && IsNNFormat<T>::value);
+    using srcType = typename U::elementType;
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto dstLayout = dst.Layout();
+    auto srcLayout = src.Layout();
+    uint32_t SM = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout);
+    uint32_t BM = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+    uint32_t SN = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout);
+    uint32_t BN = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+    uint32_t srcSM = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 0>(srcLayout);
+    uint32_t srcSN = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 0>(srcLayout);
+    uint32_t srcBM = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
+    uint32_t srcBN = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    uint32_t srcBColStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    uint32_t M0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout);
+    uint32_t N0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout);
+    uint32_t M1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+    uint32_t N1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+
+    uint32_t c0Elements = C0_ELEMENT<half>; // sim by b16
+    uint32_t srcColNAlignC0 = ((SN * BN + c0Elements - 1) / c0Elements) * c0Elements;
+
+    for (uint32_t n1 = 0; n1 < N1; n1++) {
+        for (uint32_t m1 = 0; m1 < M1; m1++) {
+            for (uint32_t m0 = 0; m0 < M0; m0++) {
+                for (uint32_t n0 = 0; n0 < N0; n0++) {
+                    uint32_t srcRow = m1 * M0 + m0;
+                    uint32_t srcCol = n1 * N0 + n0;
+                    // N1 M1 N0 M0
+                    uint32_t srcIndex = ((n1 * (srcBN / srcBM) + m1) * (srcBM / srcSN) + n0) * (srcSN / srcSM) + m0;
+                    // N1 M1 N0 M0
+                    uint32_t dstIndex = ((n1 * M1 + m1) * N0 + n0) * M0 + m0;
+                    if (srcRow < SM * BM && srcCol < SN * BN) {
+                        dst.Data()[dstIndex] = src.Data()[srcIndex];
+                    } else if (srcRow < SM * BM && srcCol >= SN * BN && srcCol < srcColNAlignC0) {
+                        // right padding and bottom not padding, right pad to the next B*N boundary
+                        dst.Data()[dstIndex] = static_cast<srcType>(0);
+                    }
+                }
+            }
+        }
+    }
+}
+
+template <typename T, typename U, typename Coord>
+void SimScaleBNn2Nn(const T& dst, const U& src, const Coord& coord)
+{
+    auto sliceTensor = src(coord, dst);
+    SimScaleBNn2Nn(dst, sliceTensor);
 }
 
 extern void copy_gm_to_cbuf_multi_nd2nz(half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride,
@@ -1317,9 +1539,9 @@ TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleAND2Zz)
         auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
 
         InitializeData<T>();
-        // atomCopy.Call(l1ATensor, gmA);
-        // SimScaleAND2Zz(l1ATensorGolden, gmA);
-        // EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleAND2Zz(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
     }
     {
         constexpr uint32_t singleM = 32;
@@ -1338,9 +1560,9 @@ TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleAND2Zz)
         auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
 
         InitializeData<T>();
-        // atomCopy.Call(l1ATensor, gmA);
-        // SimScaleAND2Zz(l1ATensorGolden, gmA);
-        // EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleAND2Zz(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
     }
 }
 
@@ -1387,6 +1609,433 @@ TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleADN2Zz)
         InitializeData<T>();
         atomCopy.Call(l1ATensor, gmA);
         SimScaleADN2Zz(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleAZz2Zz)
+{
+    using T = fp8_e8m0_t;
+    {
+        constexpr uint32_t singleM = 18;
+        constexpr uint32_t singleK = 34;
+
+        constexpr uint32_t baseM = 19;
+        constexpr uint32_t baseK = 36;
+
+        auto gmALayout = MakeZzLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZzLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleAZz2Zz(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 32;
+        constexpr uint32_t singleK = 32;
+
+        constexpr uint32_t baseM = 32;
+        constexpr uint32_t baseK = 32;
+
+        auto gmALayout = MakeZzLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZzLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleAZz2Zz(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 2;
+        constexpr uint32_t singleK = 8;
+
+        constexpr uint32_t baseM = 4;
+        constexpr uint32_t baseK = 12;
+
+        auto gmALayout = MakeZzLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZzLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleAZz2Zz(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleAZz2ZzWithCoord)
+{
+    using T = fp8_e8m0_t;
+    {
+        constexpr uint32_t singleM = 18;
+        constexpr uint32_t singleK = 34;
+
+        constexpr uint32_t baseM = 19;
+        constexpr uint32_t baseK = 36;
+
+        auto gmALayout = MakeZzLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZzLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        auto coord = MakeCoord(10, 10);
+        atomCopy.Call(l1ATensor, gmA, coord);
+        SimScaleAZz2Zz(l1ATensorGolden, gmA, coord);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 32;
+        constexpr uint32_t singleK = 32;
+
+        constexpr uint32_t baseM = 32;
+        constexpr uint32_t baseK = 32;
+
+        auto gmALayout = MakeZzLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZzLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        auto coord = MakeCoord(10, 10);
+        atomCopy.Call(l1ATensor, gmA, coord);
+        SimScaleAZz2Zz(l1ATensorGolden, gmA, coord);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 2;
+        constexpr uint32_t singleK = 8;
+
+        constexpr uint32_t baseM = 4;
+        constexpr uint32_t baseK = 12;
+
+        auto gmALayout = MakeZzLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZzLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        auto coord = MakeCoord(10, 10);
+        atomCopy.Call(l1ATensor, gmA, coord);
+        SimScaleAZz2Zz(l1ATensorGolden, gmA, coord);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleBND2Nn)
+{
+    using T = fp8_e8m0_t;
+    {
+        constexpr uint32_t singleM = 36;
+        constexpr uint32_t singleK = 33;
+
+        constexpr uint32_t baseM = 40;
+        constexpr uint32_t baseK = 35;
+
+        auto gmALayout = MakeScaleBNDLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleBND2Nn(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 32;
+        constexpr uint32_t singleK = 32;
+
+        constexpr uint32_t baseM = 32;
+        constexpr uint32_t baseK = 32;
+
+        auto gmALayout = MakeScaleBNDLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleBND2Nn(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleBND2NnWithCoord)
+{
+    using T = fp8_e8m0_t;
+    {
+        constexpr uint32_t singleM = 36;
+        constexpr uint32_t singleK = 33;
+
+        constexpr uint32_t baseM = 40;
+        constexpr uint32_t baseK = 35;
+
+        auto gmALayout = MakeScaleBNDLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        auto coord = MakeCoord(10, 10);
+        atomCopy.Call(l1ATensor, gmA, coord);
+        SimScaleBND2Nn(l1ATensorGolden, gmA, coord);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 32;
+        constexpr uint32_t singleK = 32;
+
+        constexpr uint32_t baseM = 32;
+        constexpr uint32_t baseK = 32;
+
+        auto gmALayout = MakeScaleBNDLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        auto coord = MakeCoord(10, 10);
+        atomCopy.Call(l1ATensor, gmA, coord);
+        SimScaleBND2Nn(l1ATensorGolden, gmA, coord);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleBDN2Nn)
+{
+    using T = fp8_e8m0_t;
+    {
+        constexpr uint32_t singleM = 36;
+        constexpr uint32_t singleK = 33;
+
+        constexpr uint32_t baseM = 40;
+        constexpr uint32_t baseK = 35;
+
+        auto gmALayout = MakeScaleBDNLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleBDN2Nn(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 32;
+        constexpr uint32_t singleK = 32;
+
+        constexpr uint32_t baseM = 32;
+        constexpr uint32_t baseK = 32;
+
+        auto gmALayout = MakeScaleBDNLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleBDN2Nn(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleBDN2NnWithCoord)
+{
+    using T = fp8_e8m0_t;
+    {
+        constexpr uint32_t singleM = 36;
+        constexpr uint32_t singleK = 33;
+
+        constexpr uint32_t baseM = 40;
+        constexpr uint32_t baseK = 35;
+
+        auto gmALayout = MakeScaleBDNLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        auto coord = MakeCoord(10, 10);
+        atomCopy.Call(l1ATensor, gmA, coord);
+        SimScaleBDN2Nn(l1ATensorGolden, gmA, coord);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 32;
+        constexpr uint32_t singleK = 32;
+
+        constexpr uint32_t baseM = 32;
+        constexpr uint32_t baseK = 32;
+
+        auto gmALayout = MakeScaleBDNLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        auto coord = MakeCoord(10, 10);
+        atomCopy.Call(l1ATensor, gmA, coord);
+        SimScaleBDN2Nn(l1ATensorGolden, gmA, coord);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleBNnNn)
+{
+    using T = fp8_e8m0_t;
+    {
+        constexpr uint32_t singleM = 36;
+        constexpr uint32_t singleK = 33;
+
+        constexpr uint32_t baseM = 40;
+        constexpr uint32_t baseK = 35;
+
+        auto gmALayout = MakeNnLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleBNn2Nn(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 32;
+        constexpr uint32_t singleK = 32;
+
+        constexpr uint32_t baseM = 32;
+        constexpr uint32_t baseK = 32;
+
+        auto gmALayout = MakeNnLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleBNn2Nn(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleBNnNnWithCoord)
+{
+    using T = fp8_e8m0_t;
+    {
+        constexpr uint32_t singleM = 36;
+        constexpr uint32_t singleK = 33;
+
+        constexpr uint32_t baseM = 40;
+        constexpr uint32_t baseK = 35;
+
+        auto gmALayout = MakeNnLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        auto coord = MakeCoord(2, 16);
+        atomCopy.Call(l1ATensor, gmA, coord);
+        SimScaleBNn2Nn(l1ATensorGolden, gmA, coord);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 32;
+        constexpr uint32_t singleK = 32;
+
+        constexpr uint32_t baseM = 32;
+        constexpr uint32_t baseK = 32;
+
+        auto gmALayout = MakeNnLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeNnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        auto coord = MakeCoord(2, 16);
+        atomCopy.Call(l1ATensor, gmA, coord);
+        SimScaleBNn2Nn(l1ATensorGolden, gmA, coord);
         EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
     }
 }
