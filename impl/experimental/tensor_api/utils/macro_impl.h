@@ -17,6 +17,7 @@
 
 #include "impl/utils/sys_constants.h"
 #include "impl/utils/sys_macros.h"
+#include "impl/utils/std/cmath/ceil_division.h"
 
 #if !defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -55,5 +56,17 @@
         #define ASCENDC_HOST_AICORE
     #endif
 #endif
+
+namespace AscendC {
+namespace Std {
+
+template <typename T, typename U>
+ASCENDC_HOST_AICORE inline constexpr decltype(auto) ceil_align(T num1, U num2)
+{
+    return ceil_division(num1, num2) * num2;
+}
+
+}
+}
 
 #endif //IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
