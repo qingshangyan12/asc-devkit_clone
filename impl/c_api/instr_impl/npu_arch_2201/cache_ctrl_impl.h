@@ -73,6 +73,56 @@ __aicore__ inline void asc_dcci_entire_atomic(__gm__ void* dst)
     asc_dcci_entire_atomic_impl(dst);
 }
 
+__aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
+{
+    asc_ub_dcci_single_impl(dst);
+}
+
+__aicore__ inline void asc_ub_dcci_entire(__ubuf__ void* dst)
+{
+    asc_ub_dcci_entire_impl(dst);
+}
+
+__aicore__ inline void asc_ub_dcci_single_all(__ubuf__ void* dst)
+{
+    asc_ub_dcci_single_all_impl(dst);
+}
+
+__aicore__ inline void asc_ub_dcci_single_ub(__ubuf__ void* dst)
+{
+    asc_ub_dcci_single_ub_impl(dst);
+}
+
+__aicore__ inline void asc_ub_dcci_single_out(__ubuf__ void* dst)
+{
+    asc_ub_dcci_single_out_impl(dst);
+}
+
+__aicore__ inline void asc_ub_dcci_single_atomic(__ubuf__ void* dst)
+{
+    asc_ub_dcci_single_atomic_impl(dst);
+}
+
+__aicore__ inline void asc_ub_dcci_entire_all(__ubuf__ void* dst)
+{
+    asc_ub_dcci_entire_all_impl(dst);
+}
+
+__aicore__ inline void asc_ub_dcci_entire_ub(__ubuf__ void* dst)
+{
+    asc_ub_dcci_entire_ub_impl(dst);
+}
+
+__aicore__ inline void asc_ub_dcci_entire_out(__ubuf__ void* dst)
+{
+    asc_ub_dcci_entire_out_impl(dst);
+}
+
+__aicore__ inline void asc_ub_dcci_entire_atomic(__ubuf__ void* dst)
+{
+    asc_ub_dcci_entire_atomic_impl(dst);
+}
+
 __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset)
 {
     asc_datacache_preload_impl(address, offset);
