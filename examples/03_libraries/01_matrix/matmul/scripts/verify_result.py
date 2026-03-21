@@ -23,8 +23,8 @@ ERROR_TOL = 1e-3
 
 
 def verify_result(output, golden):
-    output = np.fromfile(output, dtype=bfloat16).reshape(-1)
-    golden = np.fromfile(golden, dtype=bfloat16).reshape(-1)
+    output = np.fromfile(output, dtype=np.float16).reshape(-1)
+    golden = np.fromfile(golden, dtype=np.float16).reshape(-1)
     
     # Get total number of elements compared
     total_elements = golden.size
