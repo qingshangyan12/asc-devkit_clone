@@ -12,9 +12,9 @@
 import re
 
 
-def get_dump_info_by_source(data: str, is_c310: bool):
+def get_dump_info_by_source(data: str, is_c310_c220: bool):
     dump_info = {"dump_type" : "", "dump_size" : 1048576}
-    if is_c310:
+    if is_c310_c220:
         match_printf = re.search(r"__enable_feature_for_compile_printf = 1", data)
         match_assert = re.search(r"__enable_feature_for_compile_assert = 1;", data)
         if match_printf and match_assert:

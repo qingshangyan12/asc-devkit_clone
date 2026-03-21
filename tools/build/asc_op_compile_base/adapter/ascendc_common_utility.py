@@ -390,6 +390,19 @@ class CommonUtility:
 
 
     @staticmethod
+    def is_c220():
+        """return if current soc version is dav_c220
+
+        Returns:
+            res: True means dav_c220
+        """
+        short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+        if short_soc_version in ["Ascend910B"]:
+            return True
+        return False
+
+
+    @staticmethod
     def is_support_super_kernel():
         """return if current soc version support super kernel
 
