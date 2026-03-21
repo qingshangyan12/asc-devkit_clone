@@ -31,8 +31,10 @@ KernelRunContextHolder::KernelRunContextHolder(
 
 KernelRunContextHolder::KernelRunContextHolder(gert::ContextHolder<gert::TilingContext> &&ctxHolder,
     std::vector<std::unique_ptr<uint8_t[]>> &&inputTensorHolder, std::vector<std::unique_ptr<uint8_t[]>> &&outputTensorHolder,
+    std::unique_ptr<fe::PlatFormInfos> platformInfoHolder,
     gert::KernelContext *kernelContextPtr)
-    : valueHolder(std::make_unique<ValueHolderImpl>(std::move(ctxHolder), std::move(inputTensorHolder), std::move(outputTensorHolder))),
+    : valueHolder(std::make_unique<ValueHolderImpl>(std::move(ctxHolder), std::move(inputTensorHolder), 
+                                                     std::move(outputTensorHolder), std::move(platformInfoHolder))),
       kernelContext(kernelContextPtr)
 {}
 namespace {
@@ -137,7 +139,8 @@ std::shared_ptr<KernelRunContextHolder> ContextBuilderImpl::BuildTilingContext()
     KernelRunContext *kernelRunCtx = reinterpret_cast<gert::KernelContext *>(tilingCtx)->GetContext();
     gert::KernelContext *kernelCtx = reinterpret_cast<gert::KernelContext *>(kernelRunCtx);
     return std::shared_ptr<KernelRunContextHolder>(
-        new KernelRunContextHolder(std::move(ctxHolder), std::move(tensorValueVec), std::move(tensorValueVecOut), kernelCtx));
+        new KernelRunContextHolder(std::move(ctxHolder), std::move(tensorValueVec), std::move(tensorValueVecOut),
+                                    std::move(platformInfoHolder_), kernelCtx));
 }
 
 void ContextBuilderImpl::AddInputTd(int32_t index, ge::DataType dtype, ge::Format originFormat,
