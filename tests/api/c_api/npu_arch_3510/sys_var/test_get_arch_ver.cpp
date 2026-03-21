@@ -10,7 +10,7 @@
 
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
-#include "tests/api/c_api/stub/cce_stub.h"
+#include "c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
 class TestSysVarGetArchVer : public testing::Test {
