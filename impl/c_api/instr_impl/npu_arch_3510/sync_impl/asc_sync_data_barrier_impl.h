@@ -25,7 +25,7 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-#define asc_sync_data_barrier_impl(arg) dsb(arg)
+#define asc_sync_data_barrier_impl(arg) dsb((arg))
 
 #endif
 

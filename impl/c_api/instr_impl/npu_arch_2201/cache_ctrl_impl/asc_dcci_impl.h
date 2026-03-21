@@ -76,7 +76,6 @@ __aicore__ inline void asc_dcci_entire_atomic_impl(__gm__ void* dst)
 }
 
 // asc_dcci(__ubuf__)
-
 __aicore__ inline void asc_ub_dcci_single_impl(__ubuf__ void* dst)
 {
     dcci(dst, cache_line_t::SINGLE_CACHE_LINE);

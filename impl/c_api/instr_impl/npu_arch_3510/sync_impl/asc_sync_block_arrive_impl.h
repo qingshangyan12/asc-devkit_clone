@@ -34,7 +34,7 @@ __aicore__ inline uint16_t GetfftsConfig(uint16_t flag_id)
     return (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));
 }
 
-#define asc_sync_block_arrive_impl(pipe, flag_id) ffts_cross_core_sync(pipe, GetfftsConfig(flag_id))
+#define asc_sync_block_arrive_impl(pipe, flag_id) ffts_cross_core_sync((pipe), (GetfftsConfig(flag_id)))
 
 #endif
 
