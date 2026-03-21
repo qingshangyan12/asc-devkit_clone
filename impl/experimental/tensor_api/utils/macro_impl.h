@@ -62,7 +62,7 @@ namespace Std {
 template <typename T, typename U>
 ASCENDC_HOST_AICORE inline constexpr auto ceil_align(const T& num1, const U& num2)
 {
-    return AscendC::Std::ceil_division(num1, num2) * num2;
+    return (num1 + num2 - Int<1>{}) / num2 * num2;
 }
 }
 }
