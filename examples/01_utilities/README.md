@@ -12,3 +12,4 @@
 | [04_clock](./04_clock) | 本样例通过Ascend C编程语言实现了Gather算子，同时在算子中添加clock调测，给出了对应的端到端实现 |
 | [05_msProf](./05_msProf) | 本样例基于Ascend C编程语言实现了MatmulLeakyRelu算子, 同时使用msProf工具调试，给出了对应的端到端实现 |
 | [06_msSanitizer](./06_msSanitizer) | 本样例通过Ascend C编程语言实现了Add算子，同时展示开发算子过程中，msSanitizer工具可以检测到哪些异常场景提前拦截 |
+| [07_asc_dump](./07_asc_dump) | 本样例通过Ascend C编程语言实现了Mmad算子，同时展示开发算子过程中添加asc_dump调测接口，并给出了对应的端到端实现 |
