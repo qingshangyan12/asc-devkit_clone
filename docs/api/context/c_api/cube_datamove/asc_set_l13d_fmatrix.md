@@ -10,7 +10,7 @@
 
 ## 功能说明
 
-设置Feature map属性描述，用于在调用[asc_copy_l12l0a](./asc_copy_l12l0a.md)/[asc_copy_l12l0b](./asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。
+设置Feature map属性描述，用于在调用[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口时配置填充数值。
 
 ## 函数原型
 

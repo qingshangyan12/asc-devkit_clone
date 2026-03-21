@@ -124,17 +124,17 @@ PIPE_MTE1
 
 - 对应的feature map格式如下图：
 
-![ ](../figures/load3d_01.png)
+![ ](../../figures/load3d_01.png)
 
 - 对应的 filter 的格式如下图：
 
-![ ](../figures/load3d_02.png)
+![ ](../../figures/load3d_02.png)
 
 其中 n 为 filter 的个数，可以看出维度排布为 (Hk,Wk,Ci,n)，但是需要注意的是下图的格式还需要根据Mmad中B矩阵的格式转换。
 
 实际操作中，由于存储空间或者计算能力限制，我们通常会将整个卷积计算分块，一次只搬运并计算一小块数据。
 
-![ ](../figures/load3d_03.png)
+![ ](../../figures/load3d_03.png)
 
 对于 A2 的 feature map 来说有两种方案，水平分块和垂直分块。分别对应参数中 repeatMode 的 0 和 1。
 
@@ -142,11 +142,11 @@ PIPE_MTE1
 
 repeatMode =0 时，每次 repeat 会改变在 filter 窗口中读取数据点的位置，然后跳到下一个 C0 的位置。
 
-![ ](../figures/load3d_04.png)
+![ ](../../figures/load3d_04.png)
 
 repeatMode =1 的时候 filter 窗口中读取数据的位置保持不变，每个 repeat 在 feature map 中前进 C0 个元素。
 
-![ ](../figures/load3d_05.png)
+![ ](../../figures/load3d_05.png)
 
 
 
