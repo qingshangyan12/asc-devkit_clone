@@ -39,8 +39,10 @@ class ValueHolderImpl {
 public:
     ValueHolderImpl(gert::ContextHolder<gert::TilingContext> &&ctxHolder,
         std::vector<std::unique_ptr<uint8_t[]>> &&inputTensorHolder,
-        std::vector<std::unique_ptr<uint8_t[]>> &&outputTensorHolder)
+        std::vector<std::unique_ptr<uint8_t[]>> &&outputTensorHolder,
+        std::unique_ptr<fe::PlatFormInfos> platformInfoHolder)
         : type_(HolderType::TILING_CTX), inputTensorHolder_(std::move(inputTensorHolder)), outputTensorHolder_(std::move(outputTensorHolder)),
+          platformInfoHolder_(std::move(platformInfoHolder)),
           ctxTilingHolder_(std::move(ctxHolder)), ctxRunHolder_(gert::ContextHolder<gert::KernelContext>())
     {}
     ValueHolderImpl(gert::ContextHolder<gert::KernelContext> &&ctxHolder)
@@ -65,6 +67,7 @@ private:
     HolderType type_;
     std::vector<std::unique_ptr<uint8_t[]>> inputTensorHolder_;
     std::vector<std::unique_ptr<uint8_t[]>> outputTensorHolder_;
+    std::unique_ptr<fe::PlatFormInfos> platformInfoHolder_;
     gert::ContextHolder<gert::TilingContext> ctxTilingHolder_;
     gert::ContextHolder<gert::KernelContext> ctxRunHolder_;    
 };
@@ -107,6 +110,7 @@ public:
     std::shared_ptr<KernelRunContextHolder> BuildTilingContext();
 
     bool errFlag_ { false };
+    std::unique_ptr<fe::PlatFormInfos> platformInfoHolder_;
 
 private:
     std::unique_ptr<gert::OpKernelContextBuilder> kernelCtxBuilder_;
