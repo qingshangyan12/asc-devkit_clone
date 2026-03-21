@@ -148,7 +148,7 @@ private:
     {
         auto gmIterator = MakeGMmemPtr(gmC_);
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
-            auto gmMatrixLayout = MakeNzLayout<DstT>(mLength_, nLength_);
+            auto gmMatrixLayout = MakeNzLayout<half>(mLength_, nLength_);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         } else if constexpr (C_TYPE::format == CubeFormat::DN) {
