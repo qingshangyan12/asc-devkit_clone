@@ -10,7 +10,7 @@ import argparse
 import numpy as np
 
 from gen_data_utils import (
-    API_NAME_MAP, DATA_TYPE_NP_MAP, THEORETICAL_PERFORMANCE, REPEAT_TIMES
+    API_NAME_MAP, DATA_TYPE_NP_MAP, REPEAT_TIMES
 )
 
 RELATIVE_TOL = 1e-4      # 相对误差容限

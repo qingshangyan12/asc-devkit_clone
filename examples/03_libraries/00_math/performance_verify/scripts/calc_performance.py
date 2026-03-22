@@ -11,7 +11,7 @@ import json
 import argparse
 import os
 
-from gen_data_utils import API_NAME_MAP, THEORETICAL_PERFORMANCE, REPEAT_TIMES
+from gen_data_utils import API_NAME_MAP, REPEAT_TIMES
 
 
 def load_theory_from_config(config_file='testcases.json'):
@@ -119,7 +119,7 @@ def calculate_performance(result, dtype="half", theory_config=None):
     
     # 获取理论并行度
     key = (api_name, dtype)
-    theory = theory_config.get(key) or THEORETICAL_PERFORMANCE.get(key, 0)
+    theory = theory_config.get(key, 0)
     achievement = (throughput / theory * 100) if theory > 0 else 0
     
     return {
