@@ -4,7 +4,11 @@
 
 本 SKILL 的核心是基于用户指定扩展的 API 信息，自动化完成输入信息解析、代码适配、测试用例执行与结果展示。
 
-本 SKILL 根据[具体场景分类](#场景分类)，执行对应的工作流程
+⭐ 重要：每次执行本 SKILL，都需要按下面的流程从头到尾执行一遍  
+    ✅ Step1. 通用流程：解析 API 信息  
+    ✅ Step2. 代码自动适配，注意区分场景  
+    ✅ Step3. 通用流程：测试执行与结果展示  
+    以确保new_api.md的更新能生效
 
 ## 场景分类
 
@@ -20,9 +24,9 @@
 
 ---
 
-## 通用流程：解析 API 信息
+## Step1. 通用流程：解析 API 信息
 
-无论哪种场景，都需要从 `new_api.md` 中获取以下信息：
+无论哪种场景，都需要从当前路径下的 `new_api.md` 中获取以下信息：
 
 ```
 1、API 名称（如 `Exp`, `Mul`, `Adds`）
@@ -37,14 +41,16 @@
 
 ---
 
-## 场景一：已支持的 API
+## Step2. 代码自动适配
 
-### 适用条件
+### 场景一：已支持的 API
+
+#### 适用条件
 - API 已在 `performance_verify.asc` 中实现
 - 已在 `scripts/gen_data_*.py` 中添加数据生成脚本
 - 已在 `testcases.json` 中配置
 
-### 操作步骤
+#### 操作步骤
 
 只需更新配置文件即可：
 
@@ -70,16 +76,16 @@ bash test.sh
 
 ---
 
-## 场景二：暂未支持的单目 API（Unary）
+### 场景二：暂未支持的单目 API（Unary）
 
-### 适用条件
+#### 适用条件
 - API 类型为单目（Unary）
 - `API_TYPE_UNARY = 1`
 - 函数签名：`dst = Op(src)`
 
-### 操作步骤
+#### 操作步骤
 
-#### 2.1 更新 `testcases.json`
+##### 2.1 更新 `testcases.json`
 
 ```json
 {
@@ -94,7 +100,7 @@ bash test.sh
 }
 ```
 
-#### 2.2 添加 API ID
+##### 2.2 添加 API ID
 
 在 `performance_verify.asc` 中添加：
 
@@ -102,7 +108,7 @@ bash test.sh
 #define API_ID_{NEW_API}  5  // 下一个可用 ID
 ```
 
-#### 2.3 修改 CopyIn
+##### 2.3 修改 CopyIn
 
 CopyIn 方法只需一个输入队列（`inQueueX`）：
 
@@ -114,7 +120,7 @@ else if constexpr (INPUT_API_ID_VAL == API_ID_{NEW_API}) {
 }
 ```
 
-#### 2.4 修改 Compute
+##### 2.4 修改 Compute
 
 ```cpp
 else if constexpr (INPUT_API_ID_VAL == API_ID_{NEW_API}) {
@@ -137,7 +143,7 @@ else if constexpr (INPUT_API_ID_VAL == API_ID_{NEW_API}) {
 }
 ```
 
-#### 2.5 修改 Kernel Launch
+##### 2.5 修改 Kernel Launch
 
 在 kernel 函数中，使用两个参数的 Init 和 Process：
 
@@ -152,7 +158,7 @@ if constexpr (INPUT_API_TYPE_VAL == API_TYPE_UNARY) {
 }
 ```
 
-#### 2.6 修改 main 函数
+##### 2.6 修改 main 函数
 
 ```cpp
 if constexpr (INPUT_API_TYPE_VAL == API_TYPE_UNARY) {
@@ -160,7 +166,7 @@ if constexpr (INPUT_API_TYPE_VAL == API_TYPE_UNARY) {
 }
 ```
 
-#### 2.7 创建数据生成脚本
+##### 2.7 创建数据生成脚本
 
 创建 `scripts/gen_data_{new_api}.py`：
 
@@ -193,7 +199,7 @@ def gen_{new_api}_data(input_type, input_size):
     save_bin(golden, f"./output/golden.bin")
 ```
 
-#### 2.8 更新 `gen_data_utils.py`
+##### 2.8 更新 `gen_data_utils.py`
 
 添加 API ID 和名称映射：
 
@@ -214,7 +220,7 @@ THEORETICAL_PERFORMANCE = {
 }
 ```
 
-#### 2.9 更新 `gen_data.py`
+##### 2.9 更新 `gen_data.py`
 
 ```python
 from gen_data_{new_api} import gen_{new_api}_data
@@ -229,18 +235,18 @@ parser.add_argument('-apiId', type=int, default=1, choices=[1, 2, 3, 4, 5])
 
 ---
 
-## 场景三：暂未支持的双目 API（Binary）
+### 场景三：暂未支持的双目 API（Binary）
 
-### 适用条件
+#### 适用条件
 - API 类型为双目（Binary）
 - `API_TYPE_BINARY = 2`
 - 函数签名：`dst = Op(src0, src1)`
 
-### 操作步骤
+#### 操作步骤
 
-#### 3.1 ~ 3.2 同场景二
+##### 3.1 ~ 3.2 同场景二
 
-#### 3.3 修改 CopyIn
+##### 3.3 修改 CopyIn
 
 CopyIn 方法需要两个输入队列（`inQueueX` 和 `inQueueY`）：
 
@@ -255,7 +261,7 @@ else if constexpr (INPUT_API_ID_VAL == API_ID_{NEW_API}) {
 }
 ```
 
-#### 3.4 修改 Compute
+##### 3.4 修改 Compute
 
 ```cpp
 else if constexpr (INPUT_API_ID_VAL == API_ID_{NEW_API}) {
@@ -280,7 +286,7 @@ else if constexpr (INPUT_API_ID_VAL == API_ID_{NEW_API}) {
 }
 ```
 
-#### 3.5 修改 Kernel Launch
+##### 3.5 修改 Kernel Launch
 
 在 kernel 函数中，使用三个参数的 Init 和 Process：
 
@@ -294,7 +300,7 @@ if constexpr (INPUT_API_TYPE_VAL == API_TYPE_BINARY) {
 }
 ```
 
-#### 3.6 修改 main 函数
+##### 3.6 修改 main 函数
 
 ```cpp
 uint8_t* yHost = nullptr;
@@ -310,7 +316,7 @@ if constexpr (INPUT_API_TYPE_VAL == API_TYPE_BINARY) {
 performance_verify_kernel<<<1, nullptr, stream>>>(xDevice, yDevice, zDevice);
 ```
 
-#### 3.7 创建数据生成脚本
+##### 3.7 创建数据生成脚本
 
 创建 `scripts/gen_data_{new_api}.py`（双目版本）：
 
@@ -334,18 +340,18 @@ def gen_{new_api}_data(input_type, input_size):
 
 ---
 
-## 场景四：暂未支持的双目标量 API（BinaryScalar）
+### 场景四：暂未支持的双目标量 API（BinaryScalar）
 
-### 适用条件
+#### 适用条件
 - API 类型为双目标量（BinaryScalar）
 - `API_TYPE_BINARY_SCALAR = 3`
 - 函数签名：`dst = Op(src, scalar)`
 
-### 操作步骤
+#### 操作步骤
 
-#### 4.1 ~ 4.3 同场景三（CopyIn 需要两个输入）
+##### 4.1 ~ 4.3 同场景三（CopyIn 需要两个输入）
 
-#### 4.4 修改 Compute
+##### 4.4 修改 Compute
 
 需要从输入中获取标量值：
 
@@ -374,20 +380,20 @@ else if constexpr (INPUT_API_ID_VAL == API_ID_{NEW_API}) {
 }
 ```
 
-#### 4.5 ~ 4.7 同场景三
+##### 4.5 ~ 4.7 同场景三
 
 ---
 
-## 场景五：暂未支持的其他类型 API
+### 场景五：暂未支持的其他类型 API
 
-### 适用条件
+#### 适用条件
 - API 类型不属于 Unary/Binary/BinaryScalar
 - 需要定义新的 API TYPE 值
 - 例如：三目运算、多输入、多输出等特殊 API
 
-### 操作步骤
+#### 操作步骤
 
-#### 5.1 添加新的 API TYPE
+##### 5.1 添加新的 API TYPE
 
 在 `performance_verify.asc` 中定义新的 API TYPE：
 
@@ -398,7 +404,7 @@ else if constexpr (INPUT_API_ID_VAL == API_ID_{NEW_API}) {
 #define API_TYPE_{NEW_TYPE}  4  // 新增类型
 ```
 
-#### 5.2 修改 Kernel 类 Init 方法
+##### 5.2 修改 Kernel 类 Init 方法
 
 添加新的初始化接口：
 
@@ -423,11 +429,11 @@ __aicore__ inline void Init(GM_ADDR xGm, GM_ADDR yGm, GM_ADDR zGm, GM_ADDR wGm, 
 }
 ```
 
-#### 5.3 修改 CopyIn/Compute/CopyOut
+##### 5.3 修改 CopyIn/Compute/CopyOut
 
 根据新 API 的特点实现相应的数据搬移和计算逻辑。
 
-#### 5.4 修改 Kernel Launch
+##### 5.4 修改 Kernel Launch
 
 ```cpp
 if constexpr (INPUT_API_TYPE_VAL == API_TYPE_{NEW_TYPE}) {
@@ -439,13 +445,13 @@ if constexpr (INPUT_API_TYPE_VAL == API_TYPE_{NEW_TYPE}) {
 }
 ```
 
-#### 5.5 修改 main 函数
+##### 5.5 修改 main 函数
 
 根据需要分配额外的内存和进行数据拷贝。
 
 ---
 
-## 通用流程：测试执行与结果展示
+## Step3. 通用流程：测试执行与结果展示
 
 ### 1. 更新 testcases.json
 

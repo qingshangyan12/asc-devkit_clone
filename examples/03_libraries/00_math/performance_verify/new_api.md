@@ -46,7 +46,7 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 
 **4. 支持的数据类型**
 
-> 可选：`half`(1) / `float`(2) / `int16`(3) / `int32`(4)
+> 可选：half/float/int16/int32
 
 请在下面填写：
 ```
