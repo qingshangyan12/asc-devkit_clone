@@ -69,6 +69,11 @@ __aicore__ inline void asc_get_arch_ver(uint32_t& coreVersion);
 
 __aicore__ inline int64_t asc_get_core_id();
 
+__aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
+
+__aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
+
+
 #endif
 
 #endif
