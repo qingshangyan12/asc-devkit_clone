@@ -19,14 +19,14 @@ Ascend C高阶API的开发流程主要包括如下步骤：
   - 单算子测试
 ---
 ## 自定义开发全新API
-下面以高阶API `Axpy`为例，介绍如何从零开始，开发一个高阶API。本案例删除了部分非必要代码，您可以在代码仓的[axpy.h](../include/adv_api/math/axpy.h)、[axpy_tiling.h](../include/adv_api/math/axpy_tiling.h)、[axpy_tiling_intf.h](../include/adv_api/math/axpy_tiling_intf.h)、[axpy_common_impl.h](../impl/adv_api/detail/math/axpy/axpy_common_impl.h)、[axpy_tiling_impl.cpp](../impl/adv_api/tiling/math/axpy_tiling_impl.cpp)文件中查看全部代码。
+下面以高阶API `Axpy`为例，介绍如何从零开始，开发一个高阶API。本案例删除了部分非必要代码，您可以在代码仓的[axpy.h](../include/adv_api/math/axpy.h)、[axpy_tiling.h](../include/adv_api/math/axpy_tiling.h)、[axpy_tiling_intf.h](../include/adv_api/ math/axpy_tiling_intf.h)、[axpy_common_impl.h](../impl/adv_api/detail/math/axpy/axpy_common_impl.h)、[axpy_tiling_impl.cpp](../impl/adv_api/tiling/math/axpy_tiling_impl.cpp)文件中查看全部代码。
 ### 设计API
 axpy的功能为源操作数`srcTensor`中每个元素与标量求积后，与目的操作数`dstTensor`中的对应元素相加，计算公式如下。
 $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 
 - Kernel侧
 
-    考虑算子执行过程中的数据流向，Host侧申请GlobalMemory空间并向其中写入数据，Kernel侧从GlobalMemory搬运数据到LocalMemory，计算单元从LocalMemory中获取数据进行计算，将结果写回LocalMemory中，最后LocalMemory中的计算结果搬出到GlobalMemory。高阶API用于完成其中的计算，因此高阶API的源操作数与目的操作数均位于LocalMemory内存中，即高阶API的接口参数包括已搬入数据的LocalTensor以及其它参数。
+    考虑算子执行过程中的数据流向，Host侧申请GlobalMemory空间并向其中写入数据，Kernel侧从GlobalMemory搬运数据到LocalMemory，计算单元从LocalMemory中获取数据进行计算，将结果写回LocalMemory中，最后LocalMemory中的计算结果搬出到GlobalMemory。高阶API用于完成其中的计算，因此高阶API的源操作数与目的操作数均位于LocalMesssmory内存中，即高阶API的接口参数包括已搬入数据的LocalTensor以及其它参数。
 
     从`Axpy`的公式可知，接口需要输入参数`srcTensor`和`scalarValue`，输出参数`dstTensor`，还需要一个输入参数`calCount`表示参与计算的元素个数。由于该计算中产生了乘积的中间结果，因此需要额外分配LocalMemory的空间，用于存储中间计算结果。为在接口中传入该临时缓存空间，增加一个`shardTmpBuffer`输入参数。为了扩展API支持的数据类型，定义两个模版参数，分别作为源操作数和目的操作数的数据类型。模板参数中的`isReuseSource`为预留参数，在开发时可以不添加该参数。根据API的算法功能或公式，分析得出接口的所有参数后，得到如下Kernel侧函数原型。
 
@@ -34,7 +34,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 
     ```c++
     template <typename T, typename U, bool isReuseSource = false>
-    __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+    __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue, ssconst LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
     模板参数说明
     | 参数名      | 描述 |
@@ -134,7 +134,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     $$round = calCount/stackSize$$
     $$tail = calCount%stackSize$$
     如果tail不为0，即存在尾块，则需要额外处理尾块数据。在尾块数据计算前，通过setMaskCount接口设置计算单元的工作方式为Count模式。
-    ```c++
+    ````c++
     template <typename T, typename U, bool isReuseSource = false>
     __aicore__ inline void AxpySub(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U& scalarValue,
         const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
