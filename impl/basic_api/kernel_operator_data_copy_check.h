@@ -393,8 +393,8 @@ __aicore__ inline void CheckDataCopyTensor(const GlobalTensor<T>& dst, const Loc
         "supported src TPositions are %s, current src TPosition is %s.\n", apiName, supportedPos,
         GetTPositionName(srcPos)));
     ASCENDC_DEBUG_ASSERT((intriParams.dValue % BLOCK_CUBE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
-        "check dValue value in %s, dValue must be divisible by %u, current value is %u.\n", apiName, BLOCK_CUBE,
-        intriParams.dValue));
+        "check dValue value in %s, dValue must be divisible by %u, current value is %u.\n", apiName,
+        static_cast<uint32_t>(BLOCK_CUBE), intriParams.dValue));
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckRequiredBytes(srcRequiredBytes, srcTensorSizeBytes, "srcLocal", apiName);
 }

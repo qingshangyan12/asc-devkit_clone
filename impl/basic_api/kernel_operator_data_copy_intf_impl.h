@@ -33,6 +33,76 @@ namespace AscendC {
 /* **************************************************************************************************
  * DataCopy                                             *
  * ************************************************************************************************* */
+template <typename T>
+__aicore__ inline constexpr bool IsBasicDataCopySupportedType()
+{
+    using PrimType = PrimT<T>;
+    return Std::is_same<PrimType, int8_t>::value || Std::is_same<PrimType, uint8_t>::value ||
+        Std::is_same<PrimType, int16_t>::value || Std::is_same<PrimType, uint16_t>::value ||
+        Std::is_same<PrimType, int32_t>::value || Std::is_same<PrimType, uint32_t>::value ||
+        Std::is_same<PrimType, int64_t>::value || Std::is_same<PrimType, uint64_t>::value ||
+        Std::is_same<PrimType, half>::value || Std::is_same<PrimType, float>::value ||
+        Std::is_same<PrimType, double>::value
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        || Std::is_same<PrimType, bfloat16_t>::value
+#endif
+        ;
+}
+
+template <typename T>
+__aicore__ inline constexpr bool IsNd2NzSupportedType()
+{
+    using PrimType = PrimT<T>;
+    return Std::is_same<PrimType, int8_t>::value || Std::is_same<PrimType, uint8_t>::value ||
+        Std::is_same<PrimType, int16_t>::value || Std::is_same<PrimType, uint16_t>::value ||
+        Std::is_same<PrimType, int32_t>::value || Std::is_same<PrimType, uint32_t>::value ||
+        Std::is_same<PrimType, half>::value || Std::is_same<PrimType, float>::value
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        || Std::is_same<PrimType, bfloat16_t>::value
+#endif
+        ;
+}
+
+template <typename T>
+__aicore__ inline constexpr bool IsDataCopyPadSupportedType()
+{
+    return IsBasicDataCopySupportedType<T>();
+}
+
+template <typename T>
+__aicore__ inline void CheckBasicDataCopyTypeSupport(const __gm__ char* apiName)
+{
+    ASCENDC_DEBUG_ASSERT((IsBasicDataCopySupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype support in %s, supported dtypes are int8_t/uint8_t/int16_t/uint16_t/int32_t/"
+        "uint32_t/int64_t/uint64_t/half/bfloat16_t/float/double.\n", apiName));
+}
+
+template <typename T>
+__aicore__ inline void CheckNd2NzTypeSupport(const __gm__ char* apiName)
+{
+    ASCENDC_DEBUG_ASSERT((IsNd2NzSupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype support in %s, supported dtypes are int8_t/uint8_t/int16_t/uint16_t/int32_t/"
+        "uint32_t/half/bfloat16_t/float.\n", apiName));
+}
+
+template <typename T>
+__aicore__ inline void CheckDataCopyPadTypeSupport(const __gm__ char* apiName)
+{
+    ASCENDC_DEBUG_ASSERT((IsDataCopyPadSupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype support in %s, supported dtypes are half/bfloat16_t/int16_t/uint16_t/float/"
+        "int32_t/uint32_t/int8_t/uint8_t/int64_t/uint64_t/double.\n", apiName));
+}
+
+template <typename T, typename U>
+__aicore__ inline void CheckBasicDataCopyMixedTypeSupport(const __gm__ char* apiName)
+{
+    const bool isSupportedSameType = Std::is_same<PrimT<T>, PrimT<U>>::value;
+    const bool isSupportedHalfToFloat = Std::is_same<PrimT<T>, float>::value && Std::is_same<PrimT<U>, half>::value;
+    ASCENDC_DEBUG_ASSERT((isSupportedSameType || isSupportedHalfToFloat), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype support in %s, supported dtype combinations are same primitive dtype or half -> "
+        "float.\n", apiName));
+}
+
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from src to dst, applicable to vector data
@@ -54,6 +124,7 @@ __aicore__ inline void __inout_pipe__(MTE2) DataCopy(const LocalTensor<T>& dst, 
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckBasicDataCopyTypeSupport<T>("DataCopy from GlobalTensor to LocalTensor with DataCopyParams");
     CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from GlobalTensor to LocalTensor with DataCopyParams");
 #endif
 #endif
@@ -167,6 +238,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, 
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckNd2NzTypeSupport<T>("DataCopy from GlobalTensor to LocalTensor with Nd2NzParams");
     CheckDataCopyTensor(dst, src, intriParams, "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams");
 #endif
 #endif
@@ -238,6 +310,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckNd2NzTypeSupport<T>("DataCopy from LocalTensor to LocalTensor with Nd2NzParams");
     CheckDataCopyTensor(dst, src, intriParams, "DataCopy from LocalTensor to LocalTensor with Nd2NzParams");
 #endif
 #endif
@@ -267,6 +340,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst,
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckBasicDataCopyTypeSupport<T>("DataCopy from LocalTensor to GlobalTensor with DataCopyParams");
     CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from LocalTensor to GlobalTensor with DataCopyParams");
 #endif
 #endif
@@ -342,6 +416,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckBasicDataCopyTypeSupport<T>("DataCopy from LocalTensor to LocalTensor with DataCopyParams");
     CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from LocalTensor to LocalTensor with DataCopyParams");
 #endif
 #endif
@@ -423,6 +498,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<U> 
     using PrimSrcType = PrimT<U>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckBasicDataCopyMixedTypeSupport<T, U>("DataCopy from LocalTensor to LocalTensor with T / U");
     CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from LocalTensor to LocalTensor with T / U");
 #endif
 #endif
@@ -1246,6 +1322,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams");
     CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams,
         "DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams");
 #endif
@@ -1283,6 +1360,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T> &d
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams");
     CheckDataCopyPadTensor(dst, src, dataCopyParams,
         "DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams");
 #endif
@@ -1318,6 +1396,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
     }
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams");
     CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams,
         "DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams");
 #endif
@@ -1368,6 +1447,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T> &d
     }
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams");
     CheckDataCopyPadTensor(dst, src, dataCopyParams,
         "DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams");
 #endif
@@ -1408,6 +1488,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T> &dst,
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad with Nd2NzParams");
     CheckDataCopyPadTensor(dst, src, dataCopyParams, nd2nzParams, "DataCopyPad with Nd2NzParams");
 #endif
 #endif
@@ -1461,6 +1542,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
     }
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from GM to VECIN/VECOUT");
     CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT");
 #endif
 #endif
@@ -1514,6 +1596,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
     }
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from GM to VECIN / VECOUT");
     CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN / VECOUT");
 #endif
 #endif
@@ -1568,6 +1651,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T> &d
     }
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams");
     CheckDataCopyPadTensor(dst, src, dataCopyParams,
         "DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams");
 #endif
@@ -1608,6 +1692,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T> &dst, const LocalTensor<
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad with Nd2NzParams");
     CheckDataCopyPadTensor(dst, src, dataCopyParams, nd2nzParams, "DataCopyPad with Nd2NzParams");
 #endif
 #endif

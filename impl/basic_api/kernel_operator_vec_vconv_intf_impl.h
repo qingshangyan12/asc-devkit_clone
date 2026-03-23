@@ -73,6 +73,9 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<uint8_t>(repeatTime, 0, UINT8_MAX, "repeatTime", "Cast");
+    CheckValueRange<uint8_t>(repeatParams.dstRepStride, 0, UINT8_MAX, "dstRepStride", "Cast");
+    CheckValueRange<uint8_t>(repeatParams.srcRepStride, 0, UINT8_MAX, "srcRepStride", "Cast");
     CheckMaskArray<T>(mask, "Cast");
 #endif
 #ifdef __MSTX_DFX_REPORT__
@@ -106,6 +109,9 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<uint8_t>(repeatTime, 0, UINT8_MAX, "repeatTime", "Cast");
+    CheckValueRange<uint8_t>(repeatParams.dstRepStride, 0, UINT8_MAX, "dstRepStride", "Cast");
+    CheckValueRange<uint8_t>(repeatParams.srcRepStride, 0, UINT8_MAX, "srcRepStride", "Cast");
     CheckMaskValue<T>(mask, "Cast");
 #endif
 #ifdef __MSTX_DFX_REPORT__
