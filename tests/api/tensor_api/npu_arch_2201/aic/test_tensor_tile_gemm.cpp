@@ -9,7 +9,9 @@
 */
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
-#include "impl/experimental/tensor_api/tensor_api_impl.h"
+#include "include/experimental/tensor_api/tensor.h"
+
+#define GM_ADDR __gm__ uint8_t*
 
 class Tensor_Api_GEMM : public testing::Test {
 protected:
@@ -22,8 +24,6 @@ protected:
         AscendC::SetGCoreType(0);
     }
 };
-
-using namespace AscendC;
 
 enum class CubeFormat {
     ND = 0,
@@ -73,157 +73,167 @@ public:
 
     __aicore__ inline void CopyGmToA1()
     {
+        using namespace AscendC::Std;
+        using namespace AscendC::Te;
+
         auto gmIterator = MakeGMmemPtr(gmA);
-        auto gmMatrixLayout = MakeRowMajorLayout<SrcT>(mLength, kLength);
+        auto gmMatrixLayout = MakeNDLayout<SrcT>(mLength, kLength);
         auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
         auto aIterator = MakeL1memPtr(a1Addr);
-        auto aMatrixLayout = MakeNZLayout<SrcT>(mLength, kLength);
+        auto aMatrixLayout = MakeNzLayout<SrcT>(mLength, kLength);
         auto aTensor = MakeTensor(aIterator, aMatrixLayout);
 
-        auto coord = MakeCoord(
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(aTensor, gmTensor, coord);
     }
 
     __aicore__ inline void CopyGmToB1()
     {
+        using namespace AscendC::Std;
+        using namespace AscendC::Te;
+
         auto gmIterator = MakeGMmemPtr(gmB);
-        auto gmMatrixLayout = MakeRowMajorLayout<Src1T>(kLength, nLength);
+        auto gmMatrixLayout = MakeNDLayout<Src1T>(kLength, nLength);
         auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
         auto bIterator = MakeL1memPtr(b1Addr);
-        auto bMatrixLayout = MakeNZLayout<Src1T>(kLength, nLength);
+        auto bMatrixLayout = MakeNzLayout<Src1T>(kLength, nLength);
         auto bTensor = MakeTensor(bIterator, bMatrixLayout);
 
-        auto coord = MakeCoord(
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(bTensor, gmTensor, coord);
     }
 
     __aicore__ inline void CopyA1ToFB()
     {
+        using namespace AscendC::Std;
+        using namespace AscendC::Te;
+
         auto a1Iterator = MakeL1memPtr(a1Addr);
-        auto a1MatrixLayout = MakeRowMajorLayout<SrcT>(mLength, kLength);
+        auto a1MatrixLayout = MakeNDLayout<SrcT>(mLength, kLength);
         auto a1Tensor = MakeTensor(a1Iterator, a1MatrixLayout);
 
         auto fbIterator = MakeFixbufmemPtr(fbAddr);
-        auto fbMatrixLayout = MakeRowMajorLayout<SrcT>(mLength, kLength);
+        auto fbMatrixLayout = MakeNDLayout<SrcT>(mLength, kLength);
         auto fbTensor = MakeTensor(fbIterator, fbMatrixLayout); 
 
-        auto coord = MakeCoord(
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(fbTensor, a1Tensor, coord);
     }
 
     __aicore__ inline void CopyA1ToBT()
     {
+        using namespace AscendC::Std;
+        using namespace AscendC::Te;
+
         auto l1Iterator = MakeL1memPtr(l1Addr);
-        auto l1MatrixLayout = MakeRowMajorLayout<DstT>(mLength, kLength);
+        auto l1MatrixLayout = MakeNDLayout<DstT>(mLength, kLength);
         auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout);
 
         auto btIterator = MakeBiasmemPtr(btAddr);
-        auto btMatrixLayout = MakeRowMajorLayout<DstT>(mLength, kLength);
+        auto btMatrixLayout = MakeNDLayout<DstT>(mLength, kLength);
         auto btTensor = MakeTensor(btIterator, btMatrixLayout); 
 
-        auto coord = MakeCoord(
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(btTensor, l1Tensor, coord);
     }
 
     __aicore__ inline void Load2DA1ToL0A()
     {
+        using namespace AscendC::Std;
+        using namespace AscendC::Te;
+
         auto a1Iterator = MakeL1memPtr(a1Addr);
-        auto a1MatrixLayout = MakeNZLayout<SrcT>(mLength, kLength);
+        auto a1MatrixLayout = MakeNzLayout<SrcT>(mLength, kLength);
         auto a1Tensor = MakeTensor(a1Iterator, a1MatrixLayout);
 
         auto l0aIterator = MakeL0AmemPtr(l0aAddr);
-        auto l0aMatrixLayout = MakeZZLayout<SrcT>(mLength, kLength);
+        auto l0aMatrixLayout = MakeZzLayout<SrcT>(mLength, kLength);
         auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout); 
 
-        auto coord = MakeCoord(
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0aTensor, a1Tensor, coord);
     }
 
     __aicore__ inline void Load2DA1ToL0B()
     {
+        using namespace AscendC::Std;
+        using namespace AscendC::Te;
+
         auto b1Iterator = MakeL1memPtr(b1Addr);
-        auto b1MatrixLayout = MakeNZLayout<Src1T>(kLength, nLength);
+        auto b1MatrixLayout = MakeNzLayout<Src1T>(kLength, nLength);
         auto b1Tensor = MakeTensor(b1Iterator, b1MatrixLayout);
 
         auto l0bIterator = MakeL0BmemPtr(l0bAddr);
-        auto l0bMatrixLayout = MakeZNLayout<Src1T>(kLength, nLength);
+        auto l0bMatrixLayout = MakeZnLayout<Src1T>(kLength, nLength);
         auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
 
-        auto coord = MakeCoord(
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
-            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-        LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0bTensor, b1Tensor, coord);
+        static constexpr LoadDataTrait triat = {true};
+
+        LoadData<triat>(l0bTensor, b1Tensor, coord);
     }
         
     __aicore__ inline void ComputeBt()
     {
+        using namespace AscendC::Std;
+        using namespace AscendC::Te;
+
         auto l0aIterator = MakeL0AmemPtr(l0aAddr);
-        auto l0aMatrixLayout = MakeZZLayout<SrcT>(mLength, kLength);
+        auto l0aMatrixLayout = MakeZzLayout<SrcT>(mLength, kLength);
         auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout); 
 
         auto l0bIterator = MakeL0BmemPtr(l0bAddr);
-        auto l0bMatrixLayout = MakeZNLayout<Src1T>(kLength, nLength);
+        auto l0bMatrixLayout = MakeZnLayout<Src1T>(kLength, nLength);
         auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
 
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNzLayout<ignore_t>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
 
         auto biasIterator = MakeL0CmemPtr(btAddr);
-        auto biasMatrixLayout = MakeRowMajorLayout<BiasT>(1, nLength);
+        auto biasMatrixLayout = MakeNDLayout<BiasT>(1, nLength);
         auto biasTensor = MakeTensor(biasIterator, biasMatrixLayout); 
 
-        Mmad(l0cTensor, l0aTensor, l0bTensor, biasTensor);
+        Mmad(l0cTensor, l0aTensor, l0bTensor, biasTensor, defaultMmadWithBiasParams);
     }
         
     __aicore__ inline void Compute()
     {
+        using namespace AscendC::Std;
+        using namespace AscendC::Te;
+
         auto l0aIterator = MakeL0AmemPtr(l0aAddr);
-        auto l0aMatrixLayout = MakeZZLayout<SrcT>(mLength, kLength);
+        auto l0aMatrixLayout = MakeZzLayout<SrcT>(mLength, kLength);
         auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout); 
 
         auto l0bIterator = MakeL0BmemPtr(l0bAddr);
-        auto l0bMatrixLayout = MakeZNLayout<Src1T>(kLength, nLength);
+        auto l0bMatrixLayout = MakeZnLayout<Src1T>(kLength, nLength);
         auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
 
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNzLayout<ignore_t>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
-        Mmad(l0cTensor, l0aTensor, l0bTensor);
+        Mmad(l0cTensor, l0aTensor, l0bTensor, defaultMmadParams);
     }
 
     __aicore__ inline void CopyL0CToGm()
     {
+        using namespace AscendC::Te;
+        
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNZLayout<DstT>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNzLayout<DstT>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
 
         auto gmIterator = MakeGMmemPtr(gmC);
-        auto gmMatrixLayout = MakeNZLayout<DstT>(mLength, kLength);
+        auto gmMatrixLayout = MakeNzLayout<DstT>(mLength, kLength);
         auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
     }
 
@@ -280,7 +290,7 @@ __aicore__ inline void E2eKernel(GM_ADDR aGM, GM_ADDR bGM, GM_ADDR cGM, GM_ADDR 
     int32_t usedCoreNum, int hasBias)
 {
     // cube core cases, ignore vector core
-    if (g_coreType == AIV) {
+    if (g_coreType == AscendC::AIV) {
         return;
     }
 
@@ -298,11 +308,11 @@ __aicore__ inline void E2eKernel(GM_ADDR aGM, GM_ADDR bGM, GM_ADDR cGM, GM_ADDR 
     auto gmB = reinterpret_cast<__gm__ B_T *>(bGM);
     auto gmC = reinterpret_cast<__gm__ C_T *>(cGM);
 
-    set_atomic_none();
+    bisheng::cce::set_atomic_none();
     E2eCase<A_TYPE, B_TYPE, L0CType, C_TYPE, BIAS_TYPE, HAS_BIAS> ins;
     ins.Init(m, n, k, hasBias, gmA, gmB, gmC);
     ins.IterateAll();
-    set_atomic_none();
+    bisheng::cce::set_atomic_none();
 }
 
 #define KERNEL_TENSOR_TILE_GEMM_E2E(coreNum, M, N, K, A_Format, B_Format, C_Format, BIAS_Format, A_DType, B_DType, C_DType, BIAS_DType, HAS_BIAS) \
