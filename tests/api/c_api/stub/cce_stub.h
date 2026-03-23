@@ -384,6 +384,7 @@ inline void img2colv2_cbuf_to_cb(__cb__ uint16_t* dst, __cbuf__ uint16_t* src, u
 inline void wait_flag_dev(pipe_t pipe, uint8_t flag_id) {}
 inline void wait_intra_block(pipe_t pipe, uint8_t flag_id) {}
 inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {}
+inline void rls_buf(pipe_t pipe, uint64_t buf_id, bool mode) {}
 
 inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
 
