@@ -11,7 +11,7 @@
 madd（multiply-add），对源操作数执行逐元素乘法和加法。计算公式如下：
 
 $$
-dst_i = src0_i \times src1_i + dst_i
+dst_i = src0_i \times dst_i + src1_i
 $$
 
 ## 函数原型
