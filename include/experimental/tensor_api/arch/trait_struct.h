@@ -58,6 +58,13 @@ struct DataCopyTrait {};
 
 enum class RoundMode : uint8_t {DEFAULT = 0, HYBRID};
 
+
+enum DualDstMode : uint8_t {
+    DUAL_DST_DISABLE = 0,
+    DUAL_DST_SPLIT_M,
+    DUAL_DST_SPLIT_N
+};
+
 struct FixpipeTrait {
     __aicore__ constexpr FixpipeTrait() {}
 
@@ -67,7 +74,7 @@ struct FixpipeTrait {
     RoundMode roundMode = RoundMode::DEFAULT;
     bool enableRelu = false;
     bool enableChannelSplit = false;
-    uint8_t dualDstCtl = false;
+    DualDstMode dualDstCtl = DUAL_DST_DISABLE;
 };
 
 struct FixpipeParams {
