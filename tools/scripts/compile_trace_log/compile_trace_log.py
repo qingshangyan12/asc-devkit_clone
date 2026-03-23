@@ -16,9 +16,25 @@ from pathlib import Path
 import inspect
 import sys
 import os
+from typing import List, Dict, Any, Optional
 
 
-def extract_info_lines(filename):
+def extract_info_lines(filename: str) -> List[str]:
+    """
+    Extract lines containing the specific ASC info tag from the log file.
+
+    Args:
+        filename (str): The path to the log file to be read.
+
+    Returns:
+        List[str]: A list of stripped strings containing '[INFO] ASC('.
+
+    Raises:
+        FileNotFoundError: If the specified log file does not exist.
+        PermissionError: If the script lacks read permissions for the file.
+        UnicodeDecodeError: If the file cannot be decoded using UTF-8.
+        RuntimeError: If no matching log lines are found in the file.
+    """
     matching_lines = []
 
     try:
@@ -58,7 +74,20 @@ def extract_info_lines(filename):
     return matching_lines
 
 
-def save_info_lines(trace_events, output_file):
+def save_info_lines(trace_events: List[Dict[str, Any]], output_file: str) -> None:
+    """
+    Save the extracted trace events into a JSON file format compatible with trace viewers.
+
+    Args:
+        trace_events (List[Dict[str, Any]]): A list of dictionaries representing Chrome trace events.
+        output_file (str): The destination file path for the JSON output.
+
+    Raises:
+        PermissionError: If the script lacks write permissions for the file.
+        FileNotFoundError: If the specified output path does not exist.
+        IsADirectoryError: If the output path is a directory instead of a file.
+        Exception: For any other unknown file I/O errors.
+    """
     # 构建最终 JSON 结构
     data = {
         "traceEvents": trace_events
@@ -100,7 +129,25 @@ def save_info_lines(trace_events, output_file):
     return
 
 
-def build_traceEvents(len_pid, optype, trace_events, timestamp, pid, tid, tilingtype, compile_stage):
+def build_traceEvents(len_pid: int, optype: List[str], trace_events: List[Dict[str, Any]], 
+                      timestamp: List[float], pid: List[int], tid: List[int], 
+                      tilingtype: List[str], compile_stage: List[str]) -> List[Dict[str, Any]]:
+    """
+    Construct Chrome Trace Event dictionaries from raw parsed arrays.
+
+    Args:
+        len_pid (int): Number of process IDs.
+        optype (List[str]): List of operator types.
+        trace_events (List[Dict[str, Any]]): The master list of trace events to append to.
+        timestamp (List[float]): List of timestamps for each event.
+        pid (List[int]): List of process IDs.
+        tid (List[int]): List of thread IDs.
+        tilingtype (List[str]): List of tiling keys/types.
+        compile_stage (List[str]): Definitions of various compilation stages.
+
+    Returns:
+        List[Dict[str, Any]]: The updated list of trace events.
+    """
     for i in range(len_pid):
         num = int(i / 12) * 7# 除12是因为，打12个时间点，只有7个tiling信息
         idx = i % 12
@@ -144,7 +191,23 @@ def build_traceEvents(len_pid, optype, trace_events, timestamp, pid, tid, tiling
     return trace_events
 
 
-def common_trace_event(trace_events, compile_stage, optype, timestamp, pid, tid, tilingtype):
+def common_trace_event(trace_events: List[Dict[str, Any]], compile_stage: str, optype: str, 
+                       timestamp: float, pid: int, tid: int, tilingtype: str) -> List[Dict[str, Any]]:
+    """
+    Append a basic Start ('B') or End ('E') trace event based on the compile stage.
+
+    Args:
+        trace_events (List[Dict[str, Any]]): The current list of trace events.
+        compile_stage (str): The specific compile stage (e.g., 'preprocess start').
+        optype (str): The operator type.
+        timestamp (float): Event timestamp.
+        pid (int): Process ID.
+        tid (int): Thread ID.
+        tilingtype (str): Tiling information for the arguments.
+
+    Returns:
+        List[Dict[str, Any]]: Updated trace events list.
+    """
     name, stage = compile_stage.rsplit(' ', 1)
     if (stage == "start"):
         trace_events.append({
@@ -173,7 +236,16 @@ def common_trace_event(trace_events, compile_stage, optype, timestamp, pid, tid,
     return trace_events
 
 
-def group_lines_by_first_number_flat(lines):
+def group_lines_by_first_number_flat(lines: List[str]) -> List[str]:
+    """
+    Group and sort log lines based on the first process ID found in the ASC tag.
+
+    Args:
+        lines (List[str]): The raw extracted log lines.
+
+    Returns:
+        List[str]: A flattened, sorted list of log lines.
+    """
     grouped = {}
     pattern = re.compile(r'\bASC\(\s*(\d+)\s*,', re.IGNORECASE)
 
@@ -201,13 +273,23 @@ def group_lines_by_first_number_flat(lines):
             f.write(f"{item}\n")
 
     # 调用函数
-    txtlist = []
+    txtlist: List[str] = []
     extract_lines_with_condition(txtlist, result)
 
     return txtlist
 
 
-def extract_lines_with_condition(txtlist, result):
+def extract_lines_with_condition(txtlist: List[str], result: List[str]) -> List[str]:
+    """
+    Validate the distance between 'compile op start' events and extract valid blocks.
+
+    Args:
+        txtlist (List[str]): The list to append valid lines into.
+        result (List[str]): The flattened, grouped raw lines to check.
+
+    Returns:
+        List[str]: The updated list containing verified compilation blocks.
+    """
     if os.path.exists("check_info.txt"):
         with open("check_info.txt", 'w', encoding='utf-8') as f:
             f.write("")
@@ -237,11 +319,17 @@ def extract_lines_with_condition(txtlist, result):
             "by referring to the operator names and original log files."
         )
 
-
     return txtlist
 
 
-def compile_trace(input_file, output_file):
+def compile_trace(input_file: str, output_file: str) -> None:
+    """
+    Main orchestration function to parse Ascend compile logs into trace JSON format.
+
+    Args:
+        input_file (str): Path to the input trace log.
+        output_file (str): Path to save the output JSON.
+    """
     matching_lines_old = extract_info_lines(input_file)
     matching_lines = group_lines_by_first_number_flat(matching_lines_old)
     pid = []
