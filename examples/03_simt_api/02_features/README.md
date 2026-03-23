@@ -2,15 +2,13 @@
 
 ## 概述
 
-基于Ascend C特性样例，介绍了Aclnn（ge入图）工程、LocalMemoryAllocator、Barrier单独内存申请分配等特性。
+基于Ascend C SIMT特性样例，展示SIMT编程的各类特性。
 
 ## 算子开发样例
 
 | 目录名称  | 功能描述 |
 | --------- | --------- |
-| [00_compilation](./00_compilation/) | 本样例介绍了自定义算子编译工程和静态Aclnn调用的实现方法 |
-| [01_invocation](./01_invocation/) | 本样例介绍了Aclnn和Aclop算子调用的实现方法 |
-| [02_framework](./02_framework/) | 本样例介绍了PyTorch、TensorFlow和ONNX框架的自定义算子实现方法 |
-| [03_basic_api](./03_basic_api/) | 本样例介绍了Ascend C Basic API的使用方法，包括数据搬运、矩阵计算、内存向量计算、资源管理、同步控制、系统访问、原子操作和标量计算等 |
-| [04_aicpu](./04_aicpu/) | 本样例介绍了使用AI CPU算子进行Tiling下沉计算的实现方法 |
-| [06_template_selector](./06_template_selector/) | 本样例介绍了Tiling策略和Tiling模板编程的实现方法 |
+| [00_resource_management](./00_resource_management/) | 展示SIMT资源管理相关的特性样例。 |
+| [01_sync_instruction](./01_sync_instruction/) | 展示SIMT线程同步、内存屏障相关特性样例。 |
+| [02_atomic_operations](./02_atomic_operations/) | 展示SIMT atomic原子操作相关特性样例。 |
+| [03_warp_instruction](./03_warp_instruction/) |  展示SIMT warp间通信等操作的样例。 |
