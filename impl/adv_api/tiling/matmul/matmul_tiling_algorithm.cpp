@@ -2654,8 +2654,10 @@ void MatmulTilingAlgorithm::AdjustFloatL1Factor(const SingleCoreStatus& singleCo
 
 void MatmulTilingAlgorithm::SetBaseMNK(const SingleCoreStatus& singleCoreStatus) const
 {
+    TILING_LOG_WARNING("SetBaseMNK l0Status.mL0: %d.", singleCoreStatus.l0Status.mL0);
     int32_t baseM = singleCoreStatus.l0Status.mL0 * C0_SIZE;
     if (tilingIns_->madType_ == MatrixMadType::MXMODE) {
+        TILING_LOG_WARNING("MatrixMadType::MXMODE.");
         bool isAUbNdTrans = tilingIns_->aType_.pos == TPosition::VECOUT && 
             tilingIns_->aType_.type == CubeFormat::ND && tilingIns_->aType_.isTrans;
         int32_t widthAlignSize = INT8_ALIGN_SIZE;
@@ -2675,6 +2677,7 @@ void MatmulTilingAlgorithm::SetBaseMNK(const SingleCoreStatus& singleCoreStatus)
 
 int64_t MatmulTilingAlgorithm::UpdateTiling(const MatmulRunParas& param, const CoreStatusPack &coreStatus, SingleCoreStatus& singleCoreStatus) const
 {
+    TILING_LOG_WARNING("UpdateTiling 2680 l0Status.mL0: %d.", singleCoreStatus.l0Status.mL0);
     int32_t coreUse = enableSingleShape_ ? tilingIns_->blockDim : coreStatus.batchDim * coreStatus.mDim * coreStatus.kDim * coreStatus.nDim;
     int32_t singleCoreM;
     int32_t singleCoreN;
@@ -2683,12 +2686,18 @@ int64_t MatmulTilingAlgorithm::UpdateTiling(const MatmulRunParas& param, const C
     if (!CheckSingleShape(singleCoreM, singleCoreN, singleCoreK)) {
         return -1L;
     }
+    TILING_LOG_WARNING("UpdateTiling 2689 l0Status.mL0: %d.", singleCoreStatus.l0Status.mL0);
     tilingIns_->tiling_.set_usedCoreNum(coreUse);
     tilingIns_->tiling_.set_singleCoreM(singleCoreM);
     tilingIns_->tiling_.set_singleCoreN(singleCoreN);
     tilingIns_->tiling_.set_singleCoreK(singleCoreK);
     UpdateShapeAndLayout();
+    TILING_LOG_WARNING("UpdateTiling 2695 l0Status.mL0: %d.", singleCoreStatus.l0Status.mL0);
+    TILING_LOG_WARNING("UpdateTiling 2696, baseM: %d, get_baseK: %d.", 
+                tilingIns_->tiling_.get_baseM(), tilingIns_->tiling_.get_baseK());  // 256
     SetBaseMNK(singleCoreStatus);
+    TILING_LOG_WARNING("UpdateTiling 2699, baseM: %d, get_baseK: %d.", 
+                tilingIns_->tiling_.get_baseM(), tilingIns_->tiling_.get_baseK());  // 256
     tilingIns_->tiling_.set_iterateOrder(GetIteratorOrder(singleCoreStatus, singleCoreM, singleCoreN, singleCoreK));
     // check whether OUTER_PRODUCT is supported
     if (AdjustOuterProductL0Factor(singleCoreStatus) != 0) {
@@ -3890,22 +3899,36 @@ int32_t MatmulTilingAlgorithm::GetNBuffer33L1Size(const SingleCoreStatus &single
     int32_t curAL1Size = 0;
     int32_t depthA1 = MathUtil::CeilDivision(singleCoreStatus.l1Status.kAL1, singleCoreStatus.l0Status.kL0) *
         singleCoreStatus.l1Status.mAL1 * singleCoreStatus.l1Status.dbAL1;
+    TILING_LOG_WARNING("l1Status.kAL1: %d, l0Status.kL0: %d, l1Status.mAL1: %d, l1Status.dbAL1: %d, depthA1: %d.", 
+                singleCoreStatus.l1Status.kAL1, singleCoreStatus.l0Status.kL0, singleCoreStatus.l1Status.mAL1,
+                singleCoreStatus.l1Status.dbAL1, depthA1);
+    // kAL1: 24, kL0: 8, mAL1: 2, dbAL1: 1, depthA1: 6
     if (!MathUtil::CheckMulOverflow(tilingIns_->tiling_.get_baseM(), tilingIns_->tiling_.get_baseK(), curAL1Size) ||
         !MathUtil::CheckMulOverflow(curAL1Size, depthA1, curAL1Size) ||
         !MathUtil::CheckMulOverflow(curAL1Size, DTYPE_BIT_TAB.at(tilingIns_->aType_.dataType) / BITS_PER_BYTE,
         curAL1Size)) {
         return 0;
-    }
+    }   // baseM * baseK * depthA1 * 4
+    // baseM: 256, baseK: 64, curAL1Size: 393216
+    TILING_LOG_WARNING("baseM: %d, get_baseK: %d, curAL1Size: %d.", 
+                tilingIns_->tiling_.get_baseM(), tilingIns_->tiling_.get_baseK(), curAL1Size);
 
     int32_t curBL1Size = 0;
     int32_t depthB1 = MathUtil::CeilDivision(singleCoreStatus.l1Status.kBL1, singleCoreStatus.l0Status.kL0) *
         singleCoreStatus.l1Status.nBL1 * singleCoreStatus.l1Status.dbBL1;
+    TILING_LOG_WARNING("l1Status.kBL1: %d, l0Status.kL0: %d, l1Status.nBL1: %d, l1Status.dbBL1: %d, depthB1: %d.", 
+                singleCoreStatus.l1Status.kAL1, singleCoreStatus.l0Status.kL0, singleCoreStatus.l1Status.nBL1,
+                singleCoreStatus.l1Status.dbBL1, depthB1);
+    // kBL1: 24, kL0: 8, nBL1: 1, dbBL1: 1, depthB1: 3
     if (!MathUtil::CheckMulOverflow(tilingIns_->tiling_.get_baseN(), tilingIns_->tiling_.get_baseK(), curBL1Size) ||
         !MathUtil::CheckMulOverflow(curBL1Size, depthB1, curBL1Size) ||
         !MathUtil::CheckMulOverflow(curBL1Size, DTYPE_BIT_TAB.at(tilingIns_->bType_.dataType) / BITS_PER_BYTE,
         curBL1Size)) {
         return 0;
-    }
+    }   // baseN * baseK * depthB1 * 4
+    // baseN: 256, baseK: 64, curBL1Size: 196608
+    TILING_LOG_WARNING("baseN: %d, get_baseK: %d, curBL1Size: %d.", 
+                tilingIns_->tiling_.get_baseN(), tilingIns_->tiling_.get_baseK(), curBL1Size);
 
     int32_t biasL1Size = !tilingIns_->isBias ? 0 :
         tilingIns_->tiling_.get_baseN() * DTYPE_BIT_TAB.at(tilingIns_->biasType_.dataType) / BITS_PER_BYTE;
@@ -3913,12 +3936,15 @@ int32_t MatmulTilingAlgorithm::GetNBuffer33L1Size(const SingleCoreStatus &single
     if (tilingIns_->deqType == DequantType::TENSOR) {
         dequantSize = singleCoreStatus.l1Status.nBL1 * tilingIns_->tiling_.get_baseN() * UINT64_TYPES;
     }
+    TILING_LOG_WARNING("biasL1Size: %d, dequantSize: %d.", biasL1Size, dequantSize);
     return (curAL1Size + curBL1Size + biasL1Size + dequantSize);
 }
 
 bool MatmulTilingAlgorithm::AdjustNBuffer33L1Factors(const CoreStatusPack &coreStatus,
     SingleCoreStatus &singleCoreStatus) const
 {
+    TILING_LOG_WARNING("AdjustNBuffer33L1Factors, baseM: %d, get_baseK: %d.", 
+                tilingIns_->tiling_.get_baseM(), tilingIns_->tiling_.get_baseK());
     if (tilingIns_->scheduleType != ScheduleType::N_BUFFER_33) {
         TILING_LOG_DEBUG("No need to adjust L1Factors for non-nbuffer33 scanario.");
         return true;
@@ -3942,11 +3968,13 @@ bool MatmulTilingAlgorithm::AdjustNBuffer33L1Factors(const CoreStatusPack &coreS
     singleCoreStatus.l1Status.dbAL1 = DB_OFF;
     singleCoreStatus.l1Status.dbBL1 = DB_OFF;
     int32_t curL1Size = GetNBuffer33L1Size(singleCoreStatus);
+    TILING_LOG_WARNING("0  curL1Size: %d.", curL1Size);
     if (curL1Size > tilingIns_->bufferPool_.l1Size) {
         bool succFlag = false;
         while (singleCoreStatus.l1Status.nBL1 > 1) {
             singleCoreStatus.l1Status.nBL1--;
             curL1Size = GetNBuffer33L1Size(singleCoreStatus);
+            TILING_LOG_WARNING("l1Status.nBL1: %d, curL1Size: %d.", singleCoreStatus.l1Status.nBL1, curL1Size);
             if (curL1Size <= tilingIns_->bufferPool_.l1Size) {
                 succFlag = true;
                 break;
@@ -4019,19 +4047,22 @@ int64_t MatmulTilingAlgorithm::Process()
             return 1;
         }
     }
-    // single-core logic
+    // single-core log
+    TILING_LOG_WARNING("Process 4049 l0Status.mL0: %d.", singleCoreStatus.l0Status.mL0);
     GetL0Factors(opType, param, coreStatus, singleCoreStatus);
     AdjustSparseL0Factors(singleCoreStatus);
     AdjustMxL0Factors(singleCoreStatus);
     if (!AdjustNBuffer33L0Factors(param, coreStatus, singleCoreStatus)) {
         return -1;
     }
+    TILING_LOG_WARNING("Process 4056 l0Status.mL0: %d.", singleCoreStatus.l0Status.mL0);
     if (singleCoreStatus.l0Status.mL0 == 0 || singleCoreStatus.l0Status.nL0 == 0 ||
         singleCoreStatus.l0Status.kL0 == 0) {
         TILING_LOG_WARNING("MatmulApi Tiling : ml0/nl0/kl0 is zero.");
         return -1;
     }
     GetL1Factors(opType, param, coreStatus, singleCoreStatus.l0Status, singleCoreStatus.l1Status);
+    TILING_LOG_WARNING("UpdateTiling 4063 l0Status.mL0: %d.", singleCoreStatus.l0Status.mL0);
     if (UpdateTiling(param, coreStatus, singleCoreStatus) == -1L) {
         return -1L;
     }
