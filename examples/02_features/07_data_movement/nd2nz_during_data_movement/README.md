@@ -21,7 +21,7 @@
 ## 算子描述
 - 算子功能：  
 
-  支持在数据搬运时进行NZ到ND格式的转换。
+  支持在数据搬运时进行ND到NZ格式的转换。
 - 算子规格：  
   <table>
  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">DataCopyND2NZ</td></tr> 
