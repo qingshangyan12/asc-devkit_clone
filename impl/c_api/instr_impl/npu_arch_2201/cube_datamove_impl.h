@@ -1047,6 +1047,30 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, bfloat16_t val
 {
     asc_fill_l1_sync_impl(dst, value, config);
 }
+
+__aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, half value,
+                                         const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, half value,
+                                              const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, uint32_t value,
+                                         const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, uint32_t value,
+                                              const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
 // ==========asc_copy_l12l0b_trans=========
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat,
                                              uint16_t src_stride, uint16_t dst_stride, bool addrmode,
