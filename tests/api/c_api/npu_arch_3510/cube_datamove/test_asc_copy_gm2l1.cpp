@@ -8,10 +8,87 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
+
+class TestCubeDatamoveCopyGM2L1 : public testing::Test {
+    protected:
+        void SetUp() {
+            g_coreType = C_API_AIC_TYPE;
+        }
+        void TearDown() {
+            g_coreType = C_API_AIV_TYPE;
+        }
+    };
+
+template<typename DTYPE>
+void load_gm_to_cbuf_2dv2_Stub(__cbuf__ DTYPE* dst_in, __gm__ DTYPE* src_in, uint32_t m_start_position_in,
+                                 uint32_t k_start_position_in, uint16_t dst_stride_in, uint16_t m_step_in,
+                                 uint16_t k_step_in, uint8_t sid_in, uint8_t decomp_mode_in, uint8_t l2_cache_ctl_in)
+{
+    __cbuf__ DTYPE* dst = reinterpret_cast<__cbuf__ DTYPE*>(1);
+    __gm__ DTYPE* src = reinterpret_cast<__gm__ DTYPE*>(2);
+    uint32_t m_start_position = 3;
+    uint32_t k_start_position = 4;
+    uint16_t dst_stride = 5;
+    uint16_t m_step = 6;
+    uint16_t k_step = 7;
+    uint8_t sid = 0;
+    uint8_t decomp_mode = 8;
+    uint8_t l2_cache_ctl = 9;
+
+    EXPECT_EQ(dst, dst_in);
+    EXPECT_EQ(src, src_in);
+    EXPECT_EQ(m_start_position, m_start_position_in);
+    EXPECT_EQ(k_start_position, k_start_position_in);
+    EXPECT_EQ(dst_stride, dst_stride_in);
+    EXPECT_EQ(m_step, m_step_in);
+    EXPECT_EQ(k_step, k_step_in);
+    EXPECT_EQ(sid, sid_in);
+    EXPECT_EQ(decomp_mode, decomp_mode_in);
+    EXPECT_EQ(l2_cache_ctl, l2_cache_ctl_in);
+}
+
+#define TEST_CUBE_DATAMOVE_GM2L1(class_name, c_api_name, cce_name, data_type) \
+TEST_F(TestCubeDatamoveCopyGM2L1, c_api_name##_##data_type##_Succ) \
+{ \
+    __cbuf__ data_type * dst = reinterpret_cast<__cbuf__ data_type *>(1); \
+    __gm__ data_type * src = reinterpret_cast<__gm__ data_type *>(2); \
+    uint32_t m_start_position = 3; \
+    uint32_t k_start_position = 4; \
+    uint16_t dst_stride = 5; \
+    uint16_t m_step = 6; \
+    uint16_t k_step = 7; \
+    uint8_t decomp_mode = 8; \
+    uint8_t l2_cache_ctl = 9; \
+    MOCKER(cce_name, void(__cbuf__ data_type*, __gm__ data_type*, uint32_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t, uint8_t, uint8_t)) \
+        .times(1) \
+        .will(invoke(&load_gm_to_cbuf_2dv2_Stub<data_type>)); \
+    c_api_name(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, decomp_mode, l2_cache_ctl); \
+    GlobalMockObject::verify(); \
+}
+
+// asc_copy_gm2l1 tests
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, bfloat16_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, float);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, float8_e4m3_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, float8_e5m2_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, half);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, hifloat8_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, int16_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, int32_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, int8_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, uint16_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, uint32_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2, uint8_t);
+
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2_s4, float4_e1m2x2_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2_s4, float4_e2m1x2_t);
+TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2_s4, void);
+
 
 __aicore__ inline void copy_gm_to_cbuf_v2_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
                                             uint64_t src_stride, uint32_t dst_stride) {
