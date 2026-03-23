@@ -157,7 +157,7 @@ install(CODE "file(CREATE_LINK ../../../../asc/impl/simt_api ${CMAKE_INSTALL_PRE
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/common_types.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/common_types.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_c100 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_c100 SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_c220 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_c220 SYMBOLIC)")
-install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_c310 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_c310 SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_3510 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_3510 SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_l300 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_l300 SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_l311 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_l311 SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_m200 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_m200 SYMBOLIC)")

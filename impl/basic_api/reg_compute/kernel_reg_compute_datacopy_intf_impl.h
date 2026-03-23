@@ -31,9 +31,9 @@
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_datacopy_load_impl.h"
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_datacopy_store_impl.h"
 #else
-#include "../../basic_api/reg_compute/dav_c310/kernel_reg_compute_datacopy_impl.h"
-#include "../../basic_api/reg_compute/dav_c310/kernel_reg_compute_datacopy_load_impl.h"
-#include "../../basic_api/reg_compute/dav_c310/kernel_reg_compute_datacopy_store_impl.h"
+#include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_datacopy_impl.h"
+#include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_datacopy_load_impl.h"
+#include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_datacopy_store_impl.h"
 #endif
 
 namespace AscendC {
