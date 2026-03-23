@@ -12,13 +12,16 @@
  * \file kernel_operator_data_copy_intf.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_INTERFACE_H
 
 #include "kernel_macros.h"
 #include "common_types.h"
 #include "kernel_struct_data_copy.h"
-#include "tile_api/kernel_tensor_tile_intf_utils.h"
 #include "utils/kernel_utils_macros.h"
 #include "utils/kernel_utils_struct_confusion_pad.h"
 #include "kernel_tensor.h"
@@ -62,7 +65,7 @@ __aicore__ inline void __inout_pipe__(MTE2)
  * @param [in] intriParams.dstNzNStride stride of n between 2 C0 in L1
  * @param [in] intriParams.dstNzMatrixStride DST_nz_matrix_stride in L1 in unit of element
  */
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
                                                      const Nd2NzParams& intriParams);
@@ -90,7 +93,7 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src,
                                      const Nd2NzParams& intriParams);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /*
  * @ingroup DataCopy Level 0
  * @brief format transform(such as dn2nz) during data load from OUT to L1
@@ -176,7 +179,7 @@ __aicore__ inline __inout_pipe__(V) void Copy(const LocalTensor<T>& dst, const L
                                               const uint64_t mask, const uint8_t repeatTime,
                                               const CopyRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // Copy::Level 2 - count mode
 template <typename T, bool isSetMask = true>
 __aicore__ inline __inout_pipe__(V) void Copy(const LocalTensor<T> &dst, const LocalTensor<T> &src,
@@ -351,7 +354,7 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(const LocalTensor<T>& dst, con
                                                   const DataCopyParams& intriParams,
                                                   const DataCopyEnhancedParams& enhancedParams);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T>& dst,
                                                         const GlobalTensor<T>& src,
@@ -380,7 +383,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const LocalTensor<
                                         const DataCopyParams& dataCopyParams, const Nd2NzParams& nd2nzParams);
 
 // override DataCopyPad, use new param DataCopyExtParams
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T>& dst,
                                                         const GlobalTensor<T>& src,
@@ -403,7 +406,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T>& ds
                                                         const DataCopyExtParams& dataCopyParams,
                                                         const DataCopyPadExtParams<U>& padParams);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T>& dst,
                                                         const LocalTensor<T>& src,
@@ -422,7 +425,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const LocalTensor<
 template <typename T, TPosition pos = TPosition::MAX>
 __aicore__ inline void SetPadValue(T paddingValue);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, uint8_t dim, const NdDmaConfig &config = kDefaultNdDmaConfig>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const GlobalTensor<T> &src,
     const MultiCopyParams<T, dim> &params);
@@ -435,39 +438,9 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
 #endif
 }  // namespace AscendC
 
-/* **************************************************************************************************
- * DataCopy(Layout) API Level2                                              *
- * ************************************************************************************************* */
-namespace AscendC {
-template <typename T, size_t row, size_t column>
-using NZLayout = typename NZLayoutFormat<T, row, column>::type;
-
-template <typename T, size_t row, size_t column>
-using RowMajorLayout = NDLayoutFormat<T, row, column>;
-
-template <typename T, size_t row, size_t column>
-using ColumnMajorLayout = DNLayoutFormat<T, row, column>;
-
-template <typename T, size_t row, size_t column>
-using ZNLayout = ZNLayoutFormat<T, row, column>;
-
-template <typename T>
-__aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column);
-
-template <typename T>
-__aicore__ inline decltype(auto) MakeRowMajorLayout(size_t row, size_t column);
-
-template <typename T>
-__aicore__ inline decltype(auto) MakeColumnMajorLayout(size_t row, size_t column);
-
-template <typename T>
-__aicore__ inline decltype(auto) MakeZNLayout(size_t row, size_t column);
-
-template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U>
-__aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplate<T, U>, void>::type
-DataCopy(const T& dst, const U& src);
-
-}  // namespace AscendC
-
 #include "../../impl/basic_api/kernel_operator_data_copy_intf_impl.h"
 #endif  // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__
+#endif

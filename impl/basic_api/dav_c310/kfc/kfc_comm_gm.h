@@ -12,6 +12,11 @@
  * \file kfc_comm_gm.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kfc/kfc_comm_gm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H__
+#endif
 #ifndef KFC_COMM_GM_H
 #define KFC_COMM_GM_H
  
@@ -21,6 +26,10 @@
 #include "dav_c310/kernel_tpipe_impl_c310.h"
 #include "kfc_log.h"
 #include "kernel_tpipe.h"
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
+#endif
 #include "kernel_operator_block_sync_intf.h"
  
 namespace AscendC {
@@ -95,7 +104,16 @@ constexpr int32_t QUIT_CNT = 4;
 constexpr int32_t MAX_SYNC_COUNT = 100000000;
 constexpr int32_t MMCNT_L1_RESERVERD_SIZE = 64; // Reserved L1 64B for MMCNT Query
 constexpr uint16_t KFC_SYNC_ID = 15;
- 
+
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+// the max cnt of matmul object in superkernel mode
+constexpr int MAX_MATMUL_OBJ_CNT = 4;
+struct SuperKernelWaitEventCnt {
+    uint32_t eventId[MAX_MATMUL_OBJ_CNT] = {0};
+    int32_t eventCnt[MAX_MATMUL_OBJ_CNT] = {0};
+};
+#endif
+
 struct TilingInfo {
     GM_ADDR tilingAddr;  // the GM address of the tiling.
 };
@@ -540,3 +558,7 @@ __aicore__ inline void RollBackMsgImpl(__gm__ KfcMsg *&msgRcvHead, uint8_t &msgR
  
 }  // namespace AscendC
 #endif  // __KFC_COMM_GM_H__
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H__
+#endif

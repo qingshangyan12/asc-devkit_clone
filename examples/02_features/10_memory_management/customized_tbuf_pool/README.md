@@ -1,6 +1,6 @@
 # 用户自定义TBufPool样例
 ## 概述
-本样例基于EXTERN_IMPL_BUFPOOL宏来辅助用户自定义TBufPool，适用于以下场景：开发者有自定义的内存块分配需求，比如不连续内存块、内存块在不同TQue之间共享等。
+本样例基于EXTERN_IMPL_BUFPOOL宏来辅助用户自定义TBufPool，适用于以下场景：开发者有自定义的内存块分配需求，比如非连续内存块、内存块在不同TQue之间共享等。
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -12,6 +12,7 @@
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
+│   ├── data_utils.h            // 数据读入写出函数
 │   └── customized_tbuf_pool.asc      // Ascend C算子实现 & 调用样例
 ```
 

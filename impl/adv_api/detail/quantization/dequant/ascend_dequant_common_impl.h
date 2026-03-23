@@ -12,6 +12,13 @@
  * \file ascend_dequant_common_impl.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/quantization/dequant/ascend_dequant_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/quantization/ascend_dequant.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZATION_DEQUANT_ASCEND_DEQUANT_COMMON_IMPL_H__
+#endif
+
 #ifndef IMPL_QUANTIZATION_DEQUANT_ASCEND_DEQUANT_COMMON_IMPL_H
 #define IMPL_QUANTIZATION_DEQUANT_ASCEND_DEQUANT_COMMON_IMPL_H
 
@@ -23,7 +30,7 @@
 #include "../../api_check/kernel_check/quantization/dequant/dequant_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "ascend_dequant_c310_impl.h"
 #endif
 
@@ -402,7 +409,7 @@ __aicore__ inline void AscendDequantImpl(const LocalTensor<dstT>& dstTensor, con
         "current combination of deqScale dtype and dstTensor dtype is not supported, please check the document");
     UpdateDequantParams<dstT, mode>(params);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     DequantPerchannelImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale, params);
     return;
 #endif
@@ -489,7 +496,7 @@ __aicore__ inline void AscendDequantScalarImpl(const LocalTensor<dstT>& dstTenso
 
     UpdateDequantParams<dstT, mode>(params);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     DequantPertensorImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale, params);
     return;
 #endif
@@ -519,7 +526,7 @@ __aicore__ inline void AscendDequantScalarImpl(const LocalTensor<dstT>& dstTenso
     AscendDequantScalarImpl<dstT, scaleT, true, mode>(dstTensor, srcTensor, deqScale, sharedTmpBuffer, params);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 template <typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config, const AscendDeQuantPolicy& policy>
 __aicore__ inline void AscendDequantImpl(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
                                          const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor,
@@ -533,3 +540,8 @@ __aicore__ inline void AscendDequantImpl(const LocalTensor<dstT>& dstTensor, con
 #endif
 } // namespace AscendC
 #endif // IMPL_QUANTIZATION_DEQUANT_ASCEND_DEQUANT_COMMON_IMPL_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZATION_DEQUANT_ASCEND_DEQUANT_COMMON_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZATION_DEQUANT_ASCEND_DEQUANT_COMMON_IMPL_H__
+#endif

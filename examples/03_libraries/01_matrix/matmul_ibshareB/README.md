@@ -6,6 +6,8 @@
 
 ## 支持的产品
 
+- Ascend 950PR/Ascend 950DT
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
@@ -67,9 +69,9 @@
           using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
           AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_IBSHARE_NORM> matmulObj;
           ```
-        - 方式二：使能纯Cube模式实现，在定义Matmul对象的代码中，设置ASCEND_CUBE_ONLY宏，且必须在#include "lib/matmul_intf.h"之前设置。
+        - 方式二：使能纯Cube模式实现，在定义Matmul对象的代码中，设置ASCENDC_CUBE_ONLY宏，且必须在#include "lib/matmul_intf.h"之前设置。
           ```
-          #define ASCNEND_CUBE_ONLY // 设置ASCEND_CUBE_ONLY宏
+          #define ASCENDC_CUBE_ONLY // 设置ASCENDC_CUBE_ONLY宏
           #include "lib/matmul_intf.h"
 
           using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
@@ -91,12 +93,8 @@
         - 调用GetTiling接口，获取Tiling信息。
 
   - 核函数  
-    使用纯Cube模式时，在核函数实现的入口处，指定KERNEL_TYPE_AIC_ONLY。
-    ```
-    #ifdef ENABLE_CUBE_ONLY
-    KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIC_ONLY);
-    #endif
-    ```
+    使用纯Cube模式时，在核函数实现的入口处，指定__cube__。
+
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
     ```

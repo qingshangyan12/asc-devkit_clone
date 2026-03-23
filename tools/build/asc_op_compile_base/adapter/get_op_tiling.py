@@ -869,6 +869,53 @@ def is_static_input_base_value_depend(input_ele, idx, value_depends: dict, param
     return True
 
 
+def _check_negative_shape(shapes):
+    for shape in shapes:
+        if shape < 0:
+            return True
+    return False
+
+
+def _check_single_element_shape(ele, idx, enable_vd, value_depends, param_types):
+    if _check_negative_shape(ele["shape"]):
+        return True
+    if enable_vd:
+        if not is_static_input_base_value_depend(ele, idx, value_depends, param_types):
+            return True
+    return False
+
+
+def _check_input_list_shape(input_list, idx, enable_vd, value_depends, param_types):
+    for single in input_list:
+        if _check_single_element_shape(single, idx, enable_vd, value_depends, param_types):
+            return True
+    return False
+
+
+def _check_inputs_shape(inputs, enable_vd, value_depends, param_types):
+    for idx, input_ele in enumerate(inputs):
+        if input_ele is None:
+            continue
+        if isinstance(input_ele, (list, tuple)):
+            if _check_input_list_shape(input_ele, idx, enable_vd, value_depends, param_types):
+                return True
+        else:
+            if _check_single_element_shape(input_ele, idx, enable_vd, value_depends, param_types):
+                return True
+    return False
+
+
+def _check_outputs_shape(outputs):
+    if outputs is None:
+        return False
+    for output_ele in outputs:
+        if output_ele is None:
+            continue
+        if _check_negative_shape(output_ele["shape"]):
+            return True
+    return False
+
+
 def is_static_shape(inputs: list, outputs: list, value_depends: dict = None, param_types: list = None, enable_vd=False):
     """check if static shape, find dynamic shape if shape<0 in inputs
 
@@ -881,33 +928,11 @@ def is_static_shape(inputs: list, outputs: list, value_depends: dict = None, par
     """
     if not inputs and not outputs:
         mode = op_context.get_op_mode()
-        return False if mode == "dynamic" else True
-    for idx, input_ele in enumerate(inputs):
-        if input_ele is None:
-            continue
-        if isinstance(input_ele, (list, tuple)):
-            for single in input_ele:
-                for shape in single["shape"]:
-                    if shape < 0:
-                        return False
-                if enable_vd:
-                    if is_static_input_base_value_depend(single, idx, value_depends, param_types) == False:
-                        return False
-        else:
-            for shape in input_ele["shape"]:
-                if shape < 0:
-                    return False
-            if enable_vd:
-                if is_static_input_base_value_depend(input_ele, idx, value_depends, param_types) == False:
-                    return False
-
-    if outputs is not None:
-        for output_ele in outputs:
-            if output_ele is None:
-                continue
-            for shape in output_ele["shape"]:
-                if shape < 0:
-                    return False
+        return mode != "dynamic"
+    if _check_inputs_shape(inputs, enable_vd, value_depends, param_types):
+        return False
+    if _check_outputs_shape(outputs):
+        return False
     return True
 
 
@@ -1116,7 +1141,7 @@ def get_tiling_data_func():
     class_body = "{\n"
     class_body += "    constexpr uint64_t all_bytes = sizeof(T);\n"
     class_body += "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201) || (defined \
-    (__DAV_CUBE__) && __NPU_ARCH__ == 3101) || defined(__GET_CODE_CHANNEL__)\n"
+    (__DAV_CUBE__) && __NPU_ARCH__ == 3510) || defined(__GET_CODE_CHANNEL__)\n"
     class_body += "#if defined(__DAV_C100__) || defined(ASCENDC_CPU_DEBUG)\n"
     class_body += get_dynamic_assign_tiling_data_by_size("all_bytes", "const __gm__", "(const __gm__ uint8_t *)\
 p_tilingdata")
@@ -1124,12 +1149,12 @@ p_tilingdata")
     class_body += "    copy_data_align64((uint8_t*)tilingdata, (__gm__ uint8_t *)p_tilingdata, all_bytes);\n"
     class_body += "#endif\n"
     class_body += "#else\n"
-    class_body += "#if __NPU_ARCH__ == 3101 && defined(__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__) \n"
+    class_body += "#if __NPU_ARCH__ == 3510 && defined(__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__) \n"
     class_body += _gen_tiling_copy_through_reserved_ub()
     class_body += "#else \n"
     class_body += "    __ubuf__ uint8_t *tilingdata_in_ub = (__ubuf__ uint8_t *)get_imm(0);\n"
     class_body += "    constexpr uint32_t len_burst = (all_bytes + 31) / 32;\n"
-    class_body += "#if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102\n"
+    class_body += "#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102\n"
     class_body += "    copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t *)tilingdata_in_ub, \
 (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, 0, 0, 0);\n"
     class_body += get_tilingdata_preload()

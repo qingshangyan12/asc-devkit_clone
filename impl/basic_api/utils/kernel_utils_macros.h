@@ -12,14 +12,18 @@
  * \file kernel_utils_macros.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/utils/kernel_utils_macros.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H__
+#endif
 #ifndef ASCENDC_MODULE_UTILS_MACROS_H
 #define ASCENDC_MODULE_UTILS_MACROS_H
 #define USE_ISA_INS 1
 #define GM_ADDR __gm__ uint8_t*
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+
 #define UB_ADDR __ubuf__ uint8_t*
 #define SSBUF_ADDR __ssbuf__ uint32_t*
-#endif
 
 #ifndef likely
 #define likely(x) __builtin_expect(!!(x), 1)
@@ -66,7 +70,7 @@ enum QuantCfgBit {
     PRERELU_SCALE_SCALAR_CFGBIT,
     POSTREELU_SCALE_SCALAR_CFGBIT,
     ELTWISEANTIQ_SCALE_SCALAR_CFGBIT,
-    SCALE_PERGROUP_CFGBIT = 32, // pergroupæŒ‡ç¤º
+    SCALE_PERGROUP_CFGBIT = 32, // pergroupÖ¸Ê¾
 };
 
 enum SidOutSMMU {
@@ -104,44 +108,45 @@ enum KernelType {
     K_TYPE_AIV = 3,                 // v220-vec
     K_TYPE_MIX_AIC_MAIN = 4,        // v220 mix cube/vector 1:2
     K_TYPE_MIX_AIV_MAIN = 5,        // v220 mix vector/cube 1:2
-    K_TYPE_AIC_ROLLBACK = 6,        // v220-cubeï¼Œaic rollback
-    K_TYPE_AIV_ROLLBACK = 7,        // v220-vecï¼Œaiv rollback
+    K_TYPE_AIC_ROLLBACK = 6,        // v220-cube£¬aic rollback
+    K_TYPE_AIV_ROLLBACK = 7,        // v220-vec£¬aiv rollback
     K_TYPE_MAX
 };
 
-enum BinaryMetaType { // å‡½æ•°çº§TLVç±»å‹
+enum BinaryMetaType { // º¯Êı¼¶TLVÀàĞÍ
     B_TYPE_BIN_VERSION_INFO = 0,
     B_TYPE_DEBUG_INFO = 1,
     B_TYPE_DYNAMIC_PARAM = 2,
-    B_TYPE_OPTIONAL_PARAM = 3
+    B_TYPE_OPTIONAL_PARAM = 3,
+    B_TYPE_SK_INFO = 5
 };
 
-struct BaseTlv {  // TLVå¤´éƒ¨å®šä¹‰
+struct BaseTlv {  // TLVÍ·²¿¶¨Òå
     unsigned short type;
     unsigned short len;
 };
 
 struct BinaryMetaVersion {
     BaseTlv head;     // B_TYPE_BIN_VERSION = 0
-    uint32_t version;  // ç‰ˆæœ¬ä¿¡æ¯'
+    uint32_t version;  // °æ±¾ĞÅÏ¢'
 };
 
 struct BinaryMetaDebug {
     BaseTlv head;     // B_TYPE_DEBUG_INFO = 1
-    uint32_t debugBufSize;  // è°ƒè¯•éœ€è¦çš„å†…å­˜ç©ºé—´
-    uint32_t debugOptions; // è°ƒè¯•å¼€å…³å¼€å¯
+    uint32_t debugBufSize;  // µ÷ÊÔĞèÒªµÄÄÚ´æ¿Õ¼ä
+    uint32_t debugOptions; // µ÷ÊÔ¿ª¹Ø¿ªÆô
 };
 
 struct BinaryMetaDynamicParam {
     BaseTlv head;
     uint16_t reserve;
-    uint16_t dynamicParamMode;  // åŠ¨æ€å‚æ•°ï¼Œæ”¯æŒäºŒçº§æŒ‡é’ˆæ–¹å¼ä¼ å‚ç»™kernel
+    uint16_t dynamicParamMode;  // ¶¯Ì¬²ÎÊı£¬Ö§³Ö¶ş¼¶Ö¸Õë·½Ê½´«²Î¸økernel
 };
 
 struct BinaryMetaOptionalParam {
     BaseTlv head;
-    uint16_t optionalInputMode; // å¯¹äºå¯é€‰è¾“å…¥éœ€è¦å ä½å‘å¸ƒ
-    uint16_t optionalOutputMode; // å¯¹äºå¯é€‰è¾“å…¥éœ€è¦å ä½å‘å¸ƒ
+    uint16_t optionalInputMode; // ¶ÔÓÚ¿ÉÑ¡ÊäÈëĞèÒªÕ¼Î»·¢²¼
+    uint16_t optionalOutputMode; // ¶ÔÓÚ¿ÉÑ¡ÊäÈëĞèÒªÕ¼Î»·¢²¼
 };
 
 struct BinaryMetaAscFeature {
@@ -149,7 +154,7 @@ struct BinaryMetaAscFeature {
     uint32_t feature; // PRINT = 1, FFTS = 2, L2CACHE = 3
 };
 
-enum FuncMetaType { // å‡½æ•°çº§TLVç±»å‹
+enum FuncMetaType { // º¯Êı¼¶TLVÀàĞÍ
     F_TYPE_KTYPE = 1, // kernel type tlv
     F_TYPE_CROSS_CORE_SYNC = 2, // cross core sync
     F_TYPE_MIX_TASK_RATION = 3, // MIX CORE TYPE
@@ -164,7 +169,7 @@ enum FuncMetaType { // å‡½æ•°çº§TLVç±»å‹
 
 struct FuncMetaDeterministic {
     BaseTlv head;
-    uint32_t deterministic; // ç¡®å®šæ€§è®¡ç®—
+    uint32_t deterministic; // È·¶¨ĞÔ¼ÆËã
 };
 
 struct FuncMetaFunctionEntry {
@@ -178,7 +183,7 @@ struct FuncMetaNumBlocks {
     uint32_t numBlocks; // numBlocks
 };
 
-enum CrossCoreSyncType { // å‡½æ•°çº§TLVç±»å‹
+enum CrossCoreSyncType { // º¯Êı¼¶TLVÀàĞÍ
     C_TYPE_USE_SYNC = 1, // use cross core sync
     C_TYPE_MAX
 };
@@ -239,7 +244,7 @@ enum class CacheRwMode {
     RW = 3
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 constexpr uint64_t L2_CACHE_OFFSET = 60;
 constexpr uint64_t L2_CACHE_OFFSET_MASK = (1ul << L2_CACHE_OFFSET) - 1;
 template <class T, CacheRwMode rwMode = CacheRwMode::RW>
@@ -328,6 +333,31 @@ struct FunLevelMixCoreType {
     struct FunMetaMixCoreType mixCoreType;
 };
 
+struct SknlMapInfo {
+    uint64_t cap;
+    void* globalFunc;
+    void* sknlFunc[4];
+};
+
+struct FuncMetaSknlMap {
+    BaseTlv head;
+    uint32_t reserved;
+    SknlMapInfo sknlMeta;
+};
+
+template <auto GF, uint64_t cap, auto SK0, auto SK1 = SK0, auto SK2 = SK0, auto SK3 = SK0>
+struct SknlKernelMap {
+    static constexpr SknlMapInfo value = {cap, (void*)GF, {(void*)SK0, (void*)SK1, (void*)SK2, (void*)SK3}};
+};
+
+#define SK_BIND_NAME_CONCAT_IMPL(a, b) a##b
+#define SK_BIND_NAME_CONCAT(a, b) SK_BIND_NAME_CONCAT_IMPL(a, b)
+
+#define SK_BIND(...)                                                                    \
+__attribute__((used, __section__(".ascend.meta")))                                      \
+static const FuncMetaSknlMap SK_BIND_NAME_CONCAT(g_sknl_map_, __COUNTER__) =            \
+{{B_TYPE_SK_INFO, sizeof(uint32_t) + sizeof(SknlMapInfo)}, 0, SknlKernelMap<__VA_ARGS__>::value}
+
 // In order to pass __COUNTER__ to variable name, need 3 times of MACRO to pass argument
 #define TILING_STRUCT_SECTION_INIT_BASE(counter, val)                                                                \
     static const uint64_t __ascendc_tiling_struct_##counter __attribute__((used, section(".ascendc_tiling."#val))) = \
@@ -392,7 +422,7 @@ struct int4x2_t {
 #endif
 
 #if !defined(ASCENDC_CPU_DEBUG)
-    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)
+    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
         using fp4x2_e2m1_t = float4_e2m1x2_t;
         using fp4x2_e1m2_t = float4_e1m2x2_t;
         using fp8_e5m2_t = float8_e5m2_t;
@@ -451,7 +481,6 @@ extern uint64_t g_tilingKey;
 #define TILING_KEY_LIST(...) (TILING_KEY_LIST_INOUT(__VA_ARGS__))
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 namespace impl_mode {
 #ifdef SUPPORT_OUT_OF_BOUND_INDEX_
 const uint64_t SUPPORT_OUT_OF_BOUND_INDEX = 1;
@@ -479,7 +508,6 @@ const uint64_t KEEP_FP16 = 0;
 }
 
 #define IMPL_MODE_IS(x) constexpr((impl_mode::x) == 1)
-#endif
 
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
 constexpr bool g_gm_overflow_check = true;
@@ -496,3 +524,7 @@ constexpr bool g_gm_overflow_check = false;
 #endif
 
 #endif // ASCENDC_MODULE_UTILS_MACROS_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H__
+#endif

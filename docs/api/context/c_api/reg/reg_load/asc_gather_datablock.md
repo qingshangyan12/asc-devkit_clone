@@ -30,6 +30,7 @@
     __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index, vector_bool mask)
     __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index, vector_bool mask)
     __simd_callee__ inline void asc_gather_datablock(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask)
+    __simd_callee__ inline void asc_gather_datablock(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index, vector_bool mask)
     ```
 - 无掩码控制，默认收集所有索引对应的数据块
     ```cpp
@@ -48,6 +49,7 @@
     __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index)
     __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index)
     __simd_callee__ inline void asc_gather_datablock(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index)
+    __simd_callee__ inline void asc_gather_datablock(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index)
     ```
 
 ## 参数说明
@@ -82,7 +84,7 @@ PIPE_V
     vector_int8_t dst;
     __ubuf__ int8_t src = (__ubuf__ int8_t*)asc_get_phy_buf_addr(0);
     vector_uint32_t index;
-    vector_bool mask = asc_create_mask_b8(Pat::ALL);
+    vector_bool mask = asc_create_mask_b8(PAT_ALL);
     asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
     asc_gather_datablock(dst, src, index, mask);
     ```

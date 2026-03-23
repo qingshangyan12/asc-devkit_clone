@@ -12,6 +12,10 @@
  * \file kernel_operator_fixpipe_intf.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_H
 
@@ -19,7 +23,6 @@
 #include "kernel_struct_fixpipe.h"
 #include "kernel_tensor.h"
 #include "utils/kernel_utils_macros.h"
-#include "tile_api/kernel_tensor_tile_intf_utils.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -52,7 +55,7 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &reluPre, const Loc
 template <typename T, bool setRelu = false>
 __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &preData, bool isUnitFlag = false);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride);
 #else
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride);
@@ -67,7 +70,7 @@ __aicore__ inline void SetFixPipeAddr(const LocalTensor<T> &eleWiseData, uint16_
 
 #if defined(__NPU_ARCH__) &&                                                                            \
     (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 ||    \
-     __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+     __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 // L0C->L1
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
@@ -135,7 +138,7 @@ template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, t
     typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM310& intriParams);
-#elif (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // L0C->L1
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
@@ -158,17 +161,9 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>&
 #endif
 } // namespace AscendC
 
-namespace AscendC {
-
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U>
-__aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplate<T, U>, void>::type 
-Fixpipe(const T& dst, const U& src);
-
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename V>
-__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplate<T, U, V>, void>::type 
-Fixpipe(const T& dst, const U& src, const V& quant);
-
-} // namespace AscendC
-
 #include "../../impl/basic_api/kernel_operator_fixpipe_intf_impl.h"
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_H__
+#endif

@@ -12,6 +12,12 @@
  * \file dropout_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/filter/dropout/dropout_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/filter/dropout.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DROPOUT_IMPL_H__
+#endif
+
 #ifndef IMPL_FILTER_DROPOUT_DROPOUT_IMPL_H
 #define IMPL_FILTER_DROPOUT_DROPOUT_IMPL_H
 
@@ -21,7 +27,7 @@
 #include "dropout_c220_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
 #include "dropout_m300_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "dropout_c310_impl.h"
 #endif
@@ -42,7 +48,7 @@ __aicore__ inline void DropOutOpt(const LocalTensor<T>& dstLocal, const LocalTen
 
     const uint32_t dataSize = info.firstAxis * info.srcLastAxis;
     T actualVal;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     if constexpr (IsSameType<T, bfloat16_t>::value) {
         actualVal = ToBfloat16(divValue);
     } else {
@@ -71,14 +77,14 @@ __aicore__ inline void DropOutImpl(const LocalTensor<T>& dstLocal, const LocalTe
 {
     CHECK_FUNC_HIGHLEVEL_API(DropOut, (T, isInitBitMode, dropOutMode),
         (dstLocal, srcLocal, maskLocal, sharedTmpBuffer, keepProb, info));
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CheckTensorPos<T>(dstLocal, Hardware::UB, "dstLocal", "VECIN / VECCALC / VECOUT", "DropOut");
     CheckTensorPos<T>(srcLocal, Hardware::UB, "srcLocal", "VECIN / VECCALC / VECOUT", "DropOut");
     CheckTensorPos<uint8_t>(maskLocal, Hardware::UB, "maskLocal", "VECIN / VECCALC / VECOUT", "DropOut");
     CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN / VECCALC / VECOUT", "DropOut");
 #endif
     TRACE_START(TraceId::DropOut);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     static_assert((dropOutMode == 0 || dropOutMode == 1 || dropOutMode == 2 || dropOutMode == 3 || dropOutMode == 4),
         "dropOutMode should be 0 / 1 / 2 / 3 / 4");
     ASCENDC_ASSERT((info.firstAxis > 0), { KERNEL_LOG(KERNEL_ERROR, "info.firstAxis must > 0!"); });
@@ -131,3 +137,8 @@ __aicore__ inline void DropOutImpl(const LocalTensor<T>& dstLocal, const LocalTe
 #pragma end_pipe
 } // namespace AscendC
 #endif // IMPL_FILTER_DROPOUT_DROPOUT_IMPL_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DROPOUT_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DROPOUT_IMPL_H__
+#endif

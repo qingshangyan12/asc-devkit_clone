@@ -12,10 +12,17 @@
  * \file kernel_macros.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_macros.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_MACROS_H__
+#endif
 #ifndef ASCENDC_KERNEL_MACROS_H
 #define ASCENDC_KERNEL_MACROS_H
 
-#include <cstdint>
+#include "impl/utils/sys_macros.h"
+#include "impl/utils/sys_constants.h"
+
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #define ASSERT(x) assert(x)
 #define DEBUG_CODE(T) T
@@ -26,27 +33,6 @@
 #define ASSERT(x)
 #endif
 #define DEBUG_CODE(T)
-
-// For ascc preprocess: __global__ should not be replaced
-#ifdef __ASCC_PRE__
-#ifdef __global__
-#undef __global__
-#endif
-#else
-
-#ifndef __aicore__
-#define __aicore__ [aicore]
-#endif // __aicore__
-
-#ifndef __host_aicore__
-#define __host_aicore__ [host, aicore]
-#endif // __host_aicore__
-
-#ifndef __disable_kernel_type_autoinfer__
-#define __disable_kernel_type_autoinfer__
-#endif // __disable_kernel_type_autoinfer__
-
-#endif
 
 #if (__CCE__)
 #define _ASCENDC_HAS_BISHENG_COMPILER 1
@@ -77,10 +63,6 @@
 #endif // __BLOCK_LOCAL__
 #endif // ASCENDC_CPU_DEBUG
 
-#ifndef K_MAX_SHAPE_DIM
-#define K_MAX_SHAPE_DIM 8
-#endif
-
 #ifndef QBUF_MAX_LEN
 #define QBUF_MAX_LEN 64
 #endif
@@ -108,34 +90,23 @@
 #define TPIPE_MAX_TYPE 4
 #endif
 
-#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
-#define SPLIT_CORE_CUBE
-#endif
-
-#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
-#define SPLIT_CORE_VEC
-#endif
-
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #define ASCENDC_MATMUL_AICORE
 #endif
 
-#if (defined(__NPU_ARCH__) &&                                               \
-     ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) ||                   \
-      (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                   \
-      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)))
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
 #ifndef ASCENDC_DUMP
 #define ASCENDC_DUMP 1
-#endif
 #endif
 
 #if defined(ASCENDC_DUMP) && (ASCENDC_DUMP == 0)
     #undef ASCENDC_DUMP
 #endif
+#endif
 
 namespace AscendC {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||           \
-    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) ||           \
+    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) ||           \
     (__NPU_ARCH__ == 5102)) // Available for V200 and V210
 constexpr int32_t QUE_MAX_EVENT = 8;
 #else
@@ -147,30 +118,25 @@ constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
 constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
 constexpr int32_t CAST_MODE_BIT = 59;
 
-constexpr int32_t MIX = 0;
-constexpr int32_t AIC = 1;
-constexpr int32_t AIV = 2;
 } // namespace AscendC
 
 #if defined(ASCENDC_CPU_DEBUG)
 extern int32_t g_matmulCount;
-extern int32_t g_coreType;
-#define ASCEND_IS_AIV (g_coreType == AscendC::AIV)
-#define ASCEND_IS_AIC (g_coreType == AscendC::AIC)
-#define ASCEND_IS_NOT_AIV (g_coreType != AscendC::AIV)
-#define ASCEND_IS_NOT_AIC (g_coreType != AscendC::AIC)
-#else
-#if defined(SPLIT_CORE_CUBE)
-constexpr int32_t g_coreType = AscendC::AIC;
-#elif defined(SPLIT_CORE_VEC)
-constexpr int32_t g_coreType = AscendC::AIV;
-#else
-constexpr int32_t g_coreType = AscendC::MIX;
-#endif
-#define ASCEND_IS_AIV constexpr(g_coreType == AscendC::AIV)
-#define ASCEND_IS_AIC constexpr(g_coreType == AscendC::AIC)
-#define ASCEND_IS_NOT_AIV constexpr(g_coreType != AscendC::AIV)
-#define ASCEND_IS_NOT_AIC constexpr(g_coreType != AscendC::AIC)
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3102)
+#define ASCEND_IS_AICORE constexpr(true)
+#else
+#define ASCEND_IS_AICORE constexpr(false)
+#endif
+
+namespace AscendC {
+namespace Reg {
+} // namespace Reg
+namespace MicroAPI = Reg;
+} // namespace AscendC
 #endif // ASCENDC_KERNEL_MACROS_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_MACROS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_MACROS_H__
+#endif

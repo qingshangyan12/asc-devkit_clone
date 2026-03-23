@@ -17,7 +17,7 @@
 
 #if __NPU_ARCH__ == 2201
 #include "platform_v220/hccl_aicpu.h"
-#elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "platform_v220/hccl_aicpu.h"
 #include "platform_v310/hccl_ccu_v0.h"
 #endif
@@ -207,12 +207,6 @@ __aicore__ inline uint16_t Hccl<serverType, config>::GetQueueNum()
     return impl_.GetQueueNum();
 }
 
-template <HcclServerType serverType, const auto &config>
-__aicore__ inline bool Hccl<serverType, config>::SetReduceDataTypeAbility(HcclReduceOp op,
-    HcclDataType dstDataType, HcclDataType srcDataType)
-{
-    return impl_.SetReduceDataTypeAbility(op, dstDataType, srcDataType);
-}
 }  // namespace AscendC
 
 #endif  // IMPL_HCCL_HCCL_IMPL_H

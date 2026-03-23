@@ -41,14 +41,14 @@ PIPE_V
 
 ## 约束说明
 
-无
+对于归约求最大值，当所有元素均不参与计算时，将该数据类型的最小值写入dst, 当存在多个最大值时，会将第一个最大值的索引保存在dst中。
 
 ## 调用示例
 
 ```cpp
 vector_half dst;
 vector_half src;
-vector_bool mask = asc_create_mask_b16(Pat::ALL);
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_reduce_max(dst, src, mask);
 ```

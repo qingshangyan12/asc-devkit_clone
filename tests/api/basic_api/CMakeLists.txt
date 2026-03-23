@@ -104,6 +104,14 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_BASIC_CASE_SRC_FILES
     ascendc_case_ascend950pr_9599/ascendc_case_ascend950pr_9599_aiv_basic/*.cpp
 )
 
+set(ASCENDC_TEST_ascend950pr_9599_AIV_BASIC_PRINTF_CASE_FILE
+    ascendc_case_ascend950pr_9599/ascendc_case_ascend950pr_9599_aiv_basic/test_operator_printf.cpp
+)
+# Keep target-level ASCENDC_DUMP=0; enable it only for this source file.
+set_source_files_properties(${ASCENDC_TEST_ascend950pr_9599_AIV_BASIC_PRINTF_CASE_FILE} PROPERTIES
+    COMPILE_OPTIONS "-UASCENDC_DUMP;-DASCENDC_DUMP=1"
+)
+
 # ascend950pr_9599 framework test cases
 file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_FRAMEWORK_CASE_SRC_FILES
     ascendc_case_common/test_kernel_pop_stack_buffer.cpp
@@ -181,9 +189,9 @@ foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIV_MSTX>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_VEC__;__DAV_VEC__>
         $<$<STREQUAL:${product_type},ascend310B1>:__NPU_ARCH__=3002;__DAV_M300__>
         $<$<STREQUAL:${product_type},ascend610Lite>:__NPU_ARCH__=3102;__DAV_M310__>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_CUBE__>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_BASIC>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_FRAMEWORK>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_CUBE__>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_BASIC>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_VEC__>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_FRAMEWORK>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_VEC__>
         $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:__NPU_ARCH__=5102>
         $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:__NPU_ARCH__=5102>
         $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:__NPU_ARCH__=5102>

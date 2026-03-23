@@ -12,6 +12,13 @@
  * \file #include "broadcast_common_utils.h"
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/pad/broadcast/broadcast_common_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/pad/broadcast.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H__
+#endif
+
 #ifndef IMPL_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H
 #define IMPL_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H
 
@@ -19,8 +26,7 @@
 #include "kernel_tensor.h"
 
 namespace AscendC {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+
 namespace BroadcastInternal {
 constexpr uint32_t U16_MAX = 65536;
 
@@ -106,7 +112,6 @@ __aicore__ inline void ShapeCheck(uint32_t *tillingShape, const uint32_t *shape,
     }
 }
 }
-#endif
 
 constexpr uint32_t ONE_VOR_BLOCK_DIM = 8;
 constexpr uint32_t ELEMENT_NUM_FOR_UINT16 = 16;
@@ -180,3 +185,8 @@ __aicore__ inline void LoopBroadCast(const LocalTensor<T> &dstLocal, const Local
 }  // namespace AscendC
 
 #endif  // IMPL_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H__
+#endif

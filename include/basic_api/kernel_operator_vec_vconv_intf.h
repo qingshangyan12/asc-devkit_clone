@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_vconv_intf.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_VCONV_INTF_H__
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_H
 
@@ -203,7 +208,7 @@ __aicore__ inline void SetDeqScale(float scale, int16_t offset, bool signMode);
 template <typename T>
 __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& vdeqInfo);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /*
  * @ingroup Truncate Level 2
  * @brief dst[i] = Precision conversion
@@ -219,3 +224,8 @@ __aicore__ inline void Truncate(const LocalTensor<T> &dst, const LocalTensor<T> 
 
 #include "../../impl/basic_api/kernel_operator_vec_vconv_intf_impl.h"
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_VCONV_INTF_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_VCONV_INTF_H__
+#endif

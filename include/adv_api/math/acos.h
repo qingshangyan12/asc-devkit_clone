@@ -15,20 +15,26 @@
  * The Asin function does not have an elementary function expression, and there is calculating by
  * function approximation.
  * The approximate calculation formula is as follows:
- * when x belongs to (-2^(-0.5), 2^(-0.5)), Asin(x) = x +1/6*x^3 +3/40*x^5 +5!!/(6!!*7)*x^7  + â€¦ +13!!/(14!!*15)*x^15
+ * when x belongs to (-2^(-0.5), 2^(-0.5)), Asin(x) = x +1/6*x^3 +3/40*x^5 +5!!/(6!!*7)*x^7  + â€?+13!!/(14!!*15)*x^15
  * when x x belongs to (-1, -2^(-0.5)), Asin(x) = arcsin(sqrt(1-x^2)) - PI*0.5
  * when x belongs to (2^(-0.5), 1), Asin(x) = PI*0.5 - arcsin(sqrt(1-x^2))
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ACOS_H__
+#endif
+
 #ifndef LIB_MATH_ACOS_H
 #define LIB_MATH_ACOS_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || \
     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "kernel_tensor.h"
 
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/acos/acos_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/math/acos/acos_c310_impl.h"
 #endif
@@ -118,3 +124,8 @@ __aicore__ inline void Acos(const LocalTensor<T>& dstTensor, const LocalTensor<T
 } // namespace AscendC
 #endif
 #endif // LIB_MATH_ACOS_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ACOS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ACOS_H__
+#endif

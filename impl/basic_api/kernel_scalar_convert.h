@@ -12,15 +12,21 @@
  * \file kernel_scalar_convert.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_scalar_convert.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_scalar_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_SCALAR_CONVERT_H__
+#endif
 #ifndef ASCENDC_SCALAR_CONVERT_H
 #define ASCENDC_SCALAR_CONVERT_H
 #include "kernel_type_conversion_utils.h"
+#include "utils/std/type_traits/is_same.h"
+#include "utils/std/type_traits/enable_if.h"
 
 namespace AscendC {
 #if defined(__NPU_ARCH__) &&                                    \
         ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||    \
-         (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+         (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline bfloat16_t Cast(const float& fVal)
 {
     constexpr uint32_t fp32SignIdx = 31;
@@ -78,11 +84,18 @@ __aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
     return Cast(fVal);
 }
 
-template <typename T>
-__aicore__ constexpr inline float Cast(const T& bVal)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+template <typename T, typename U = float,
+          typename = Std::enable_if_t<
+          (Std::is_same<T, bfloat16_t>::value || Std::is_same<T, hifloat8_t>::value ||
+           Std::is_same<T, fp8_e5m2_t>::value || Std::is_same<T, fp8_e4m3fn_t>::value ||
+           Std::is_same<T, fp4x2_e1m2_t>::value || Std::is_same<T, fp4x2_e2m1_t>::value), 
+          void>>
+__aicore__ constexpr inline U Cast(T bVal)
 {
     static_assert(SupportType<T, bfloat16_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, fp4x2_e1m2_t, fp4x2_e2m1_t>(),
-        "ToFloat only support bfloat16_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/fp4x2_e1m2_t/fp4x2_e2m1_t data type on current device!");
+        "Cast to float only support bfloat16_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/fp4x2_e1m2_t/fp4x2_e2m1_t data type on current device!");
+    static_assert(SupportType<U, float>(), "Cast to float only support return float");
     uint8_t uiNum = 0;
     uint32_t result = 0;
     float fNum = 0;
@@ -118,34 +131,11 @@ template <typename T>
 __aicore__ constexpr inline float ToFloat(const T& bVal)
 {
     static_assert(SupportType<T, bfloat16_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, fp4x2_e1m2_t, fp4x2_e2m1_t>(),
-        "Cast to float only support bfloat16_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/fp4x2_e1m2_t/fp4x2_e2m1_t data type on current device!");
-    return Cast<T>(bVal);
+        "ToFloat only support bfloat16_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/fp4x2_e1m2_t/fp4x2_e2m1_t data type on current device!");
+    return Cast<T, float>(bVal);
 }
+
 #else
-__aicore__ inline bfloat16_t Cast(const float& fVal)
-{
-    float fNum = fVal;
-    union ToBfloat16Union {
-        __aicore__ ToBfloat16Union() {}
-        uint16_t val;
-        bfloat16_t bNum;
-    } bf16Union;
-    union FloattoInt32Union {
-        __aicore__ FloattoInt32Union() {}
-        float ftmp;
-        uint32_t uret;
-    } int32Union;
-    int32Union.ftmp = fNum;
-    bf16Union.val = int32Union.uret >> BF16_TO_FP32_MAN_LEN;
-    return bf16Union.bNum;
-}
-
-// ToBfloat16 has been updated, please use Cast instead.
-__aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
-{
-    return Cast(fVal);
-}
-
 __aicore__ inline float Cast(const bfloat16_t& bVal)
 {
     bfloat16_t bNum = bVal;
@@ -204,3 +194,7 @@ __aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
 #endif
 } // namespace AscendC
 #endif // ASCENDC_SCALAR_CONVERT_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_SCALAR_CONVERT_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_SCALAR_CONVERT_H__
+#endif

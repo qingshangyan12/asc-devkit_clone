@@ -92,7 +92,7 @@ struct HcclCombineOpParam {
     uint32_t rankId;                            // id of this rank
     uint32_t rankNum;                           // num of ranks in this comm group
     uint64_t winSize;                           // size of each windows memory
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     uint64_t windowsIn[HCCL_MAX_RANK_NUM_V310];
     uint64_t windowsOut[HCCL_MAX_RANK_NUM_V310];
     GM_ADDR xnOffset;
@@ -144,7 +144,7 @@ constexpr uint16_t CCU_USED_XN_NUM = 15;  // Currently xn are used
 constexpr uint16_t CCU_MAX_MSG_NUM = 64;  // The message queue length sent to CCU 
 constexpr uint16_t CCU_MSG_XN_NUM = 64;  // Maximum xn number, each CCU message body occupies 8 registers
                                          // the message body length is 64*8B=512B
-constexpr uint64_t CCU_LOOP_COUNT = 64;  // CCU cycle number, MC2 is not aware of it
+constexpr uint64_t CCU_LOOP_COUNT = 128;  // CCU cycle number, MC2 is not aware of it
 constexpr uint64_t CCU_LOOP_COUNT_M2M_RE = 16; // AllReduce ReduceScatter
 constexpr uint64_t CCU_LOOP_COUNT_M2M_AG = 8; // AllGather
 constexpr uint64_t CCU_LOOP_COUNT_ATAVW = 8; // CCU cycle number, only for AlltoAllvWrite
@@ -153,26 +153,11 @@ constexpr uint64_t CCU_MEMSLICE_SIZE = 4096; // CCU MS size, MC2 is not aware of
 constexpr uint8_t CCU_MSG_CKE_INIT_VALUE = 0;
 constexpr uint8_t CCU_MSG_CKE_SET_VALUE = 1;
 
-struct CCUConfig { // HCCL instance of AIC, corresponding message content of communication domain
-    GM_ADDR xnAddr; // The address of the Xn register mapped by the CCU requires the address to be continuous and
-                    // 8B aligned; the total message body length is 864B, and the valid range is [xnAddr, xnAddr+864B]
-    GM_ADDR ckeAddr; // The address of the CKE register mapped by the CCU requires the address to be continuous and
-                     // 8B aligned; the total message body length is 816b, and the valid range is [CKEAddr, ckeAddr+8*16b]
-    // ckeAddr: [15:0] is valid, other bits are invalid and cannot be written! 
-    // commitCKEAddr AIC writes 1 CCU reads clear; waitCKEAddr CCU writes 1, AIC reads
-};
-
 struct CCUMsg {
     GM_ADDR xnData; // Msg is converted to CCU register value
     GM_ADDR xnAddr;
     GM_ADDR commitCKEAddr; // The commit address corresponding to each msg
     GM_ADDR waitCKEAddr;   // The wait address corresponding to each Msg
-};
-
-struct ReduceDataTypeAbility {
-    HcclReduceOp op;
-    HcclDataType dstDataType;
-    HcclDataType srcDataType;
 };
 
 struct CCUMsgExt { // AllToAllv HcclMsgExt trans for ccu

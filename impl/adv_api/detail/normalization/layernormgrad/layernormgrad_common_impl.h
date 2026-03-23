@@ -12,6 +12,12 @@
  * \file layernormgrad_common_impl.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/normalization/layernormgrad/layernormgrad_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/normalization/layernorm.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZATION_LAYERNORMGRAD_LAYERNORMGRAD_COMMON_IMPL_H__
+#endif
 #ifndef IMPL_NORMALIZATION_LAYERNORMGRAD_LAYERNORMGRAD_COMMON_IMPL_H
 #define IMPL_NORMALIZATION_LAYERNORMGRAD_LAYERNORMGRAD_COMMON_IMPL_H
 
@@ -120,7 +126,7 @@ __aicore__ inline void DuplicateLastDimImpl(const LocalTensor<float>& dst, const
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 __aicore__ inline void BrcbLastDimImpl(const LocalTensor<float>& dst, const LocalTensor<float>& src,
     const uint32_t bsLength, const uint32_t hLength)
 {
@@ -162,7 +168,7 @@ __aicore__ inline void BrcbLastDimImpl(const LocalTensor<float>& dst, const Loca
 __aicore__ inline void BroadcastLastDimImpl(const LocalTensor<float>& dst, const LocalTensor<float>& src,
     const uint32_t dstSize, const uint32_t srcSize)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     BrcbLastDimImpl(dst, src, srcSize, dstSize / srcSize);
 #else
     DuplicateLastDimImpl(dst, src, srcSize, dstSize / srcSize);
@@ -519,3 +525,8 @@ __aicore__ inline void LayerNormGradImpl(const LocalTensor<T> &outputPdX, const 
 }
 } // namespace AscendC
 #endif // IMPL_NORMALIZATION_LAYERNORMGRAD_LAYERNORMGRAD_COMMON_IMPL_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZATION_LAYERNORMGRAD_LAYERNORMGRAD_COMMON_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZATION_LAYERNORMGRAD_LAYERNORMGRAD_COMMON_IMPL_H__
+#endif

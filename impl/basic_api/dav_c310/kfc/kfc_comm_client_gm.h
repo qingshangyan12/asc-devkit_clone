@@ -12,6 +12,11 @@
  * \file kfc_comm_client_gm.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kfc/kfc_comm_client_gm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_GM_H__
+#endif
 #ifndef KFC_COMM_CLIENT_GM_H
 #define KFC_COMM_CLIENT_GM_H
 
@@ -112,6 +117,26 @@ public:
 #endif
 
             dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+            // only executed in 1:2 mode
+            if (GetTaskRationImpl() == 2) {
+                CrossCoreWaitFlag(KFC_SYNC_ID);
+                dcci(reinterpret_cast<__gm__ int64_t *>(this->msgRcvStart), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+                // Traverse all matmul objects to compensate for waiting events
+                for(int i = 0; i < MAX_MATMUL_OBJ_CNT; i++) {
+                    uint32_t eventId = reinterpret_cast<__gm__ SuperKernelWaitEventCnt *>(this->msgRcvStart)->eventId[i];
+                    int32_t eventCnt = reinterpret_cast<__gm__ SuperKernelWaitEventCnt *>(this->msgRcvStart)->eventCnt[i];
+                    if (eventCnt > 0) {
+                        // After dividing the count value by 16 and taking the modulus, compensate for the waiting event
+                        int32_t waitCnt = eventCnt % 16;
+                        for (int i = 0; i < waitCnt; i++) {
+                            CrossCoreWaitFlag(eventId);
+                        }
+                    }
+                }
+            }
+#endif
         }
     }
 
@@ -204,14 +229,14 @@ public:
     }
 };
 
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101 && !defined(__DAV_CUBE__))
+#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && !defined(__DAV_CUBE__))
 __BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient;
 #endif
 
 __aicore__ inline AscendC::KfcCommClient* GetKfcClient()
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
-#if !defined(__DAV_CUBE__) || __NPU_ARCH__ != 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if !defined(__DAV_CUBE__) || __NPU_ARCH__ != 3510
     return reinterpret_cast<AscendC::KfcCommClient*>(g_kfcClient);
 #else
     return nullptr;
@@ -223,3 +248,7 @@ __aicore__ inline AscendC::KfcCommClient* GetKfcClient()
 }
 }  // namespace AscendC
 #endif  // KFC_COMM_CLIENT_GM_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_GM_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_GM_H__
+#endif

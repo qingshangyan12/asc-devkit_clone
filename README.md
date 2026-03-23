@@ -61,20 +61,22 @@ Ascend C 的设计目标可概括为 **“高性能、完备性、易编程、�
 ├── cmake                               # Ascend C 构建源代码
 ├── docs                                # 项目文档介绍
 ├── examples                            # Ascend C API样例工程
-├── include                             # Ascend C API 对外接口定义 (开发者可直接包含引用的接口)
-│   ├── adv_api                         # Ascend C 高阶API对外接口
-│   ├── aicpu_api                       # Ascend C AI CPU API对外接口定义
-│   ├── basic_api                       # Ascend C 基础API对外接口定义
-│   ├── c_api                           # Ascend C 语言扩展层C API对外接口定义
-│   ├── simt_api                        # Ascend C 语言扩展层SIMT API对外接口定义
-│   └── utils                           # Ascend C 工具类API对外接口定义
-├── impl                                # Ascend C API接口内部实现（开发者不能直接引用，不做兼容性保障）
-│   ├── adv_api                         # Ascend C 高阶API内部实现 (不可直接引用，内部实现可能会变更)
-│   ├── aicpu_api                       # Ascend C AI CPU API内部实现 (不可直接引用，内部实现可能会变更)
-│   ├── basic_api                       # Ascend C 基础API内部实现 (不可直接引用，内部实现可能会变更)
-│   ├── c_api                           # Ascend C 语言扩展层C API内部实现 (不可直接引用，内部实现可能会变更)
-│   ├── simt_api                        # Ascend C 语言扩展层SIMT API内部实现 (不可直接引用，内部实现可能会变更)
-│   └── utils                           # Ascend C 工具类API内部实现 (不可直接引用，内部实现可能会变更)
+├── impl                                # Ascend C API接口实现源代码
+│   ├── adv_api                         # Ascend C 高阶API实现源代码
+│   ├── aicpu_api                       # Ascend C AI CPU API实现源代码
+│   ├── basic_api                       # Ascend C 基础API实现源代码
+│   ├── c_api                           # Ascend C 语言扩展层C API实现源代码
+│   ├── experimental                    # Ascend C TENSOR API实现源代码
+│   ├── simt_api                        # Ascend C SIMT API实现源代码
+│   └── utils                           # Ascend C 工具类实现源代码
+├── include                             # Ascend C API接口声明源代码
+│   ├── adv_api                         # Ascend C 高阶API声明源代码
+│   ├── aicpu_api                       # Ascend C AI CPU API声明源代码
+│   ├── basic_api                       # Ascend C 基础API声明源代码
+│   ├── c_api                           # Ascend C 语言扩展层C API声明源代码
+│   ├── experimental                    # Ascend C TENSOR API声明源代码
+│   ├── simt_api                        # Ascend C SIMT API声明源代码
+│   └── utils                           # Ascend C 工具类声明源代码
 ├── scripts                             # 打包相关脚本
 ├── tests                               # Ascend C API的UT用例
 └── tools                               # Ascend C 工具源代码
@@ -87,6 +89,61 @@ Ascend C 的设计目标可概括为 **“高性能、完备性、易编程、�
 - [编译构建](docs/quick_start.md)：介绍搭建环境、编译执行、本地验证等操作。
 - [样例执行](examples/README.md)：提供算子开发样例，介绍端到端执行样例的方式。
 
+## 🧰clangd/IDE 支持
+
+- 安装 clangd（推荐 15+，以Ubuntu操作系统为例）以及VSCode插件clangd
+
+  ```bash
+  sudo apt install -y clangd-15
+  ```
+
+- 配置本地VSCode的`settings.json`（示例）
+
+  ```json
+  {
+    "clangd.path": "/usr/bin/clangd-15",
+    "clangd.arguments": [
+        "--background-index=0",
+        "--clang-tidy=0"
+    ],
+    "files.associations": {
+        "*.asc": "cpp"
+    }
+  }
+  ```
+
+- 在项目根目录下配置 `.clangd`（示例）完整 `.clangd`文件在本目录下给出.
+
+  ```yaml
+  CompileFlags:
+    Add:
+      - "-std=c++17"
+      - "-DASCENDC_CPU_DEBUG=1"
+      - "-D__NPU_ARCH__=2201"
+      ...
+
+  ---
+  If:
+    PathMatch: ".*\\.asc$"
+  CompileFlags:
+    Add:
+      - "-x"
+      - "c++"
+  Diagnostics:
+    Suppress:
+      - "attributes_not_allowed"
+      - "decomp_decl_template"
+      - "ignored_attributes"
+      - "unknown_type_name"
+      - "undeclared_var_use"
+      - "invalid_token_after_toplevel_declarator"
+      - "missing_type_specifier"
+      - "typename_nested_not_found"
+  ```
+
+- 重启clangd（VSCode: Command Palette -> "Clangd: Restart language server"）
+
+- 💡 关于 ASC 语言语法高亮、代码跳转的支持，如有任何建议或改进意见，欢迎社区开发者积极反馈！
 
 ## 📖相关文档
 

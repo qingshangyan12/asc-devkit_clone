@@ -12,12 +12,21 @@
  * \file kfc_comm_client.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c220/kfc/kfc_comm_client.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_H__
+#endif
 #ifndef __KERNEL_KFC_COMM_CLIENT_H__
 #define __KERNEL_KFC_COMM_CLIENT_H__
 
 #include "kernel_macros.h"
 #include "kfc_comm.h"
 #include "kernel_tpipe.h"
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
+#endif
 
 namespace AscendC {
 class KfcCommClient {
@@ -55,6 +64,8 @@ public:
                            { KERNEL_LOG(KERNEL_ERROR, "vecin base addr can not be nullptr"); });
             // Note that the addresses of aic and aiv are exchanged.
             this->msgSendStart = (__gm__ KfcMsg *)GetMsgHead(workspace, subBlockID);
+
+            // The leader of KFC's second queue serves as the matmul count in the superkernel mode
             this->msgRcvStart = this->msgSendStart + MAX_MSG_COUNT;
 
             this->msgSendHead = this->msgSendStart;
@@ -113,6 +124,26 @@ public:
 #endif
 
             dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+            // only executed in 1:2 mode
+            if (GetTaskRationImpl() == 2) {
+                CrossCoreWaitFlag(KFC_SYNC_ID);
+                dcci(reinterpret_cast<__gm__ int64_t *>(this->msgRcvStart), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+                // Traverse all matmul objects to compensate for waiting events
+                for(int i = 0; i < MAX_MATMUL_OBJ_CNT; i++) {
+                    uint32_t eventId = reinterpret_cast<__gm__ SuperKernelWaitEventCnt *>(this->msgRcvStart)->eventId[i];
+                    int32_t eventCnt = reinterpret_cast<__gm__ SuperKernelWaitEventCnt *>(this->msgRcvStart)->eventCnt[i];
+                    if (eventCnt > 0) {
+                        // After dividing the count value by 16 and taking the modulus, compensate for the waiting event
+                        int32_t waitCnt = eventCnt % 16;
+                        for (int i = 0; i < waitCnt; i++) {
+                            CrossCoreWaitFlag(eventId);
+                        }
+                    }
+                }
+            }
+#endif
         }
     }
 
@@ -231,3 +262,7 @@ __aicore__ inline AscendC::KfcCommClient* GetKfcClient()
 }
 }  // namespace AscendC
 #endif  // __KERNEL_KFC_COMM_CLIENT_H__
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_H__
+#endif
