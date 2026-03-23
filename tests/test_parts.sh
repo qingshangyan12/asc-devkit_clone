@@ -19,6 +19,24 @@ adv_test_targets=(
     ascendc_ut_adv_api_kernel_ascend910B1_AIV
     ascendc_ut_adv_api_kernel_ascend950pr_9599_AIC
     ascendc_ut_adv_api_kernel_ascend950pr_9599_AIV
+)
+
+basic_test_one_targets=(
+    ascendc_ut_basic_api_ascend910
+    ascendc_ut_basic_api_ascend310p
+    ascendc_ut_basic_api_ascend610
+    ascendc_ut_basic_api_ascend310B1
+    # ascendc_ut_basic_api_ascend610Lite
+    ascendc_ut_basic_api_ascend910B1_AIC
+    ascendc_ut_basic_api_ascend910B1_AIV
+    ascendc_ut_basic_api_ascend910B1_AIV_MSTX
+    ascendc_ut_basic_api_ascend950pr_9599_AIC
+    ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC
+    ascendc_ut_basic_api_ascend950pr_9599_AIV_FRAMEWORK
+
+)
+
+basic_test_two_targets=(
     ascendc_ut_adv_api_tiling_ascend310p
     ascendc_ut_adv_api_tiling_ascend610
     ascendc_ut_adv_api_tiling_ascend310B1
@@ -26,9 +44,6 @@ adv_test_targets=(
     ascendc_ut_adv_api_tiling_ascend910B1_AIV
     ascendc_ut_adv_api_tiling_ascend950pr_9599_AIC
     ascendc_ut_adv_api_tiling_ascend950pr_9599_AIV
-)
-
-basic_test_one_targets=(
     ascendc_ut_tiling_utils_ascend910
     ascendc_ut_tiling_utils_ascend310p
     ascendc_ut_tiling_utils_ascend610
@@ -46,17 +61,7 @@ basic_test_one_targets=(
     ascendc_ut_tiling_utils_mc62cm12aa_FRAMEWORK
     ascendc_ut_tiling_utils_mc62cm12aa_MICRO
     ascendc_ut_tiling_utils_mc62cm12aa_SIMT
-    ascendc_ut_basic_api_ascend910
-    ascendc_ut_basic_api_ascend310p
-    ascendc_ut_basic_api_ascend610
-    ascendc_ut_basic_api_ascend310B1
-    # ascendc_ut_basic_api_ascend610Lite
-    ascendc_ut_basic_api_ascend910B1_AIC
-    ascendc_ut_basic_api_ascend910B1_AIV
-    ascendc_ut_basic_api_ascend910B1_AIV_MSTX
-)
 
-basic_test_two_targets=(
     ascendc_ut_aclrtc
     ascendc_ut_asc_compile_base
     ascendc_ut_asc_runtime
@@ -87,9 +92,7 @@ basic_test_three_targets=(
     ascendc_ut_c_api_ascend950pr_9599_AIV
     ascendc_ut_tensor_api_NPU_ARCH_2201_AIC
     ascendc_ut_tensor_api_NPU_ARCH_2201_AIV
-    ascendc_ut_basic_api_ascend950pr_9599_AIC
-    ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC
-    ascendc_ut_basic_api_ascend950pr_9599_AIV_FRAMEWORK
+
     ascendc_ut_reg_compute_ascend950pr_9599
     ascendc_ut_simt_api_ascend950pr_9599
 )
