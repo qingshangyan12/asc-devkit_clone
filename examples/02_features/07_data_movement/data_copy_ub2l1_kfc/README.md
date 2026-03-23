@@ -1,8 +1,8 @@
-# ub2l1样例
+# DataCopy ub2l1 kfc样例
 
 ## 概述
 
-ub->l1通路搬运样例
+本样例基于DataCopy实现Unified Buffer->L1 Buffer的数据搬运，在[CMakeLists.txt](./CMakeLists.txt)中配置DENABLE_CV_COMM_VIA_SSBUF为false，使数据通过Unified Buffer->L1 Buffer进行搬运时使用KFC进行通信。
 
 ## 支持的产品
 
@@ -22,26 +22,29 @@ ub->l1通路搬运样例
 ## 算子描述
 
 - 算子功能：  
-  通过Matmul高阶API注册KFC，将数据从UB搬运到L1 Buffer，然后进行mmad计算，不使用UB->L1 Buffer的硬件通道能力，底层是UB->GM->L1 Buffer的搬运，对比硬通道搬运性能较差。
+  通过Matmul高阶API注册KFC，将数据从Unified Buffer搬运到L1 Buffer，然后进行Mmad计算，不使用Unified Buffer->L1 Buffer的硬件通道能力，底层是Unified Buffer->Global Memory->L1 Buffer的搬运，对比[硬通道搬运](../data_copy_ub2l1/README.md)性能较差。
 - 算子规格：
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">MIX算子</td></tr>
   </tr>
   <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">32 * 32</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">32 * 32</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">x</td><td align="center">[32, 32]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">[32, 32]</td><td align="center">half</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">32 * 32</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">[32, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">data_copy_ub2l1_kfc</td></tr>
   </table>
 - 算子实现：  
-    1. 关闭ENABLE_CV_COMM_VIA_SSBUF编译选项，使用KFC进行通信
-    1. 使用Matmul高阶API注册KFC组件
-    2. 基于基础API mmad进行矩阵乘计算。
-  - 调用实现  
-    使用内核调用符<<<>>>调用核函数。
+  - 使用Matmul高阶API注册KFC组件。
+  - 将数据从Global Memory搬运到Unified Buffer。
+  - 将数据从Unified Buffer搬运到L1 Buffer，使用KFC进行通信。
+  - 调用基础API LoadData将数据从L1 Buffer搬运到L0A Buffer与L0B Buffer。
+  - 调用基础API Mmad进行矩阵计算。
+  - 调用基础API Fixpipe将数据从L0C Buffer搬运到Global Memory。
+- 调用实现  
+  使用内核调用符<<<>>>调用核函数。
     
 ## 编译运行
 
