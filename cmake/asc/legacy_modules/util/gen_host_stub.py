@@ -13,7 +13,7 @@
 import io
 
 
-def generate_host_stub_set_exception_dump_source(is_c310: bool) -> str:
+def generate_host_stub_set_exception_dump_source(is_c310_c220: bool) -> str:
     exception_dump_source = r'''
 static void ascendc_set_exception_dump_info(uint32_t dumpSize)
 {
@@ -45,14 +45,14 @@ static void ascendc_set_exception_dump_info(uint32_t dumpSize)
 }
 #endif
 '''
-    if is_c310:
+    if is_c310_c220:
         exception_dump_source = "#ifdef ASCENDC_DUMP\n" + exception_dump_source
     else:
         exception_dump_source = "#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)\n" + exception_dump_source
     return exception_dump_source
 
 
-def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool, dump_assert: bool, is_c310: bool) -> str:
+def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool, dump_assert: bool, is_c310_c220: bool) -> str:
     """Generate host_stub.cpp head code."""
 
     type_nums = 0
@@ -70,7 +70,7 @@ def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool, du
 #include <dlfcn.h>
 #include <securec.h>
 ''')
-    if is_c310:
+    if is_c310_c220:
         buff.write('\n')
 
         buff.write(r'''#ifndef ASCENDC_DUMP
@@ -83,7 +83,7 @@ def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool, du
     ''')
 
     if dump_assert:
-        if is_c310:
+        if is_c310_c220:
             buff.write(r'''
 #ifdef ASCENDC_DUMP
 #define ASCENDC_EXCEPTION_DUMP_HEAD 2U
@@ -310,6 +310,6 @@ void __register_kernels(void)
 ''')
 
     if dump_assert:
-        buff.write(generate_host_stub_set_exception_dump_source(is_c310))
+        buff.write(generate_host_stub_set_exception_dump_source(is_c310_c220))
 
     return buff.getvalue()
