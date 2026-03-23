@@ -3890,22 +3890,32 @@ int32_t MatmulTilingAlgorithm::GetNBuffer33L1Size(const SingleCoreStatus &single
     int32_t curAL1Size = 0;
     int32_t depthA1 = MathUtil::CeilDivision(singleCoreStatus.l1Status.kAL1, singleCoreStatus.l0Status.kL0) *
         singleCoreStatus.l1Status.mAL1 * singleCoreStatus.l1Status.dbAL1;
+    TILING_LOG_WARNING("l1Status.kAL1: %d, l0Status.kL0: %d, l1Status.mAL1: %d, l1Status.dbAL1: %d, depthA1: %d.", 
+                singleCoreStatus.l1Status.kAL1, singleCoreStatus.l0Status.kL0, singleCoreStatus.l1Status.mAL1,
+                singleCoreStatus.l1Status.dbAL1, depthA1);
     if (!MathUtil::CheckMulOverflow(tilingIns_->tiling_.get_baseM(), tilingIns_->tiling_.get_baseK(), curAL1Size) ||
         !MathUtil::CheckMulOverflow(curAL1Size, depthA1, curAL1Size) ||
         !MathUtil::CheckMulOverflow(curAL1Size, DTYPE_BIT_TAB.at(tilingIns_->aType_.dataType) / BITS_PER_BYTE,
         curAL1Size)) {
         return 0;
     }
+    TILING_LOG_WARNING("baseM: %d, get_baseK: %d, curAL1Size: %d.", 
+                tilingIns_->tiling_.get_baseM(), tilingIns_->tiling_.get_baseK(), curAL1Size);
 
     int32_t curBL1Size = 0;
     int32_t depthB1 = MathUtil::CeilDivision(singleCoreStatus.l1Status.kBL1, singleCoreStatus.l0Status.kL0) *
         singleCoreStatus.l1Status.nBL1 * singleCoreStatus.l1Status.dbBL1;
+    TILING_LOG_WARNING("l1Status.kBL1: %d, l0Status.kL0: %d, l1Status.nBL1: %d, l1Status.dbBL1: %d, depthB1: %d.", 
+                singleCoreStatus.l1Status.kAL1, singleCoreStatus.l0Status.kL0, singleCoreStatus.l1Status.nBL1,
+                singleCoreStatus.l1Status.dbBL1, depthB1);
     if (!MathUtil::CheckMulOverflow(tilingIns_->tiling_.get_baseN(), tilingIns_->tiling_.get_baseK(), curBL1Size) ||
         !MathUtil::CheckMulOverflow(curBL1Size, depthB1, curBL1Size) ||
         !MathUtil::CheckMulOverflow(curBL1Size, DTYPE_BIT_TAB.at(tilingIns_->bType_.dataType) / BITS_PER_BYTE,
         curBL1Size)) {
         return 0;
     }
+    TILING_LOG_WARNING("baseN: %d, get_baseK: %d, curBL1Size: %d.", 
+                tilingIns_->tiling_.get_baseN(), tilingIns_->tiling_.get_baseK(), curBL1Size);
 
     int32_t biasL1Size = !tilingIns_->isBias ? 0 :
         tilingIns_->tiling_.get_baseN() * DTYPE_BIT_TAB.at(tilingIns_->biasType_.dataType) / BITS_PER_BYTE;
@@ -3913,6 +3923,7 @@ int32_t MatmulTilingAlgorithm::GetNBuffer33L1Size(const SingleCoreStatus &single
     if (tilingIns_->deqType == DequantType::TENSOR) {
         dequantSize = singleCoreStatus.l1Status.nBL1 * tilingIns_->tiling_.get_baseN() * UINT64_TYPES;
     }
+    TILING_LOG_WARNING("biasL1Size: %d, dequantSize: %d.", biasL1Size, dequantSize);
     return (curAL1Size + curBL1Size + biasL1Size + dequantSize);
 }
 
@@ -3942,11 +3953,13 @@ bool MatmulTilingAlgorithm::AdjustNBuffer33L1Factors(const CoreStatusPack &coreS
     singleCoreStatus.l1Status.dbAL1 = DB_OFF;
     singleCoreStatus.l1Status.dbBL1 = DB_OFF;
     int32_t curL1Size = GetNBuffer33L1Size(singleCoreStatus);
+    TILING_LOG_WARNING("0  curL1Size: %d.", curL1Size);
     if (curL1Size > tilingIns_->bufferPool_.l1Size) {
         bool succFlag = false;
         while (singleCoreStatus.l1Status.nBL1 > 1) {
             singleCoreStatus.l1Status.nBL1--;
             curL1Size = GetNBuffer33L1Size(singleCoreStatus);
+            TILING_LOG_WARNING("l1Status.nBL1: %d, curL1Size: %d.", singleCoreStatus.l1Status.nBL1, curL1Size);
             if (curL1Size <= tilingIns_->bufferPool_.l1Size) {
                 succFlag = true;
                 break;
