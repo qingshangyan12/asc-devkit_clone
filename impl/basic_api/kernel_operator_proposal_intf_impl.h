@@ -40,8 +40,8 @@
 #include "dav_m310/kernel_operator_proposal_impl.h"
 #include "dav_m310/kernel_operator_vec_gather_mask_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_c310/kernel_operator_proposal_impl.h"
-#include "dav_c310/kernel_operator_vec_gather_mask_impl.h"
+#include "dav_3510/kernel_operator_proposal_impl.h"
+#include "dav_3510/kernel_operator_vec_gather_mask_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_proposal_impl.h"
 #include "dav_m510/kernel_operator_vec_gather_mask_impl.h"

@@ -11,8 +11,8 @@
 #ifndef IMPL_SIMT_API_CPP_KERNEL_SIMT_CAST_INTERFACE_IMPL_H
 #define IMPL_SIMT_API_CPP_KERNEL_SIMT_CAST_INTERFACE_IMPL_H
 
-#include "impl/simt_api/cpp/dav_c310/kernel_simt_cast_impl.h"
-#include "impl/simt_api/cpp/dav_c310/kernel_simt_cast_sat_impl.h"
+#include "impl/simt_api/cpp/dav_3510/kernel_simt_cast_impl.h"
+#include "impl/simt_api/cpp/dav_3510/kernel_simt_cast_sat_impl.h"
 
 namespace AscendC {
 namespace Simt {
