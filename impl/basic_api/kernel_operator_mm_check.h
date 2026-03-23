@@ -84,10 +84,10 @@ __aicore__ inline void CheckMmadTensorCommon(const LocalTensor<T>& dst, const Lo
     CheckTensorAlignment(filter, VALUE_512, "filter", apiName);
     ASCENDC_DEBUG_ASSERT((needElementL0c <= TOTAL_L0C_SIZE), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
         "L0C capacity in %s, required size is %llu bytes, current L0C size is %u bytes.\n", apiName,
-        static_cast<unsigned long long>(needElementL0c), TOTAL_L0C_SIZE));
+        static_cast<unsigned long long>(needElementL0c), static_cast<uint32_t>(TOTAL_L0C_SIZE)));
     ASCENDC_DEBUG_ASSERT(((needElementL0a + needElementL0b) <= TOTAL_L1_SIZE), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
         "Failed to check L1 capacity in %s, required size is %llu bytes, current L1 size is %u bytes.\n", apiName,
-        static_cast<unsigned long long>(needElementL0a + needElementL0b), TOTAL_L1_SIZE));
+        static_cast<unsigned long long>(needElementL0a + needElementL0b), static_cast<uint32_t>(TOTAL_L1_SIZE)));
 }
 
 template <typename T, typename U, typename S, typename V>
