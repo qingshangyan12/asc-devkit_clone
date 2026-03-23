@@ -124,7 +124,7 @@
   
  - 样例执行
    ```bash
-   SCENARIONUM=1                    # 场景编号，取值范围0-6。
+   SCENARIONUM=0                    # 场景编号，取值范围0-6。
    mkdir -p build && cd build;      # 创建并进入build目录
    cmake .. -DSCENARIO_NUM=$SCENARIONUM;make -j;  # 编译工程
    ./demo                           # 执行编译生成的可执行程序
