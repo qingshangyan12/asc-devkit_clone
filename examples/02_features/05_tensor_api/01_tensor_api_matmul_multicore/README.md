@@ -6,12 +6,12 @@
 
 ## 支持的产品
 
-- Atlas A5 训练系列产品/Atlas A5 推理系列产品
+- Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
 
 ```
-├── 03_tensor_api_matmul_multicore
+├── 01_tensor_api_matmul_multicore
 │   └── scripts
 │       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │       └── verify_result.py    // 真值对比文件

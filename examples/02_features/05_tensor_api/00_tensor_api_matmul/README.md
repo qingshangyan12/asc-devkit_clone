@@ -11,7 +11,7 @@
 ## 目录结构介绍
 
 ```
-├── 00_tensor_api_matmul_usage1
+├── 00_tensor_api_matmul
 │   └── scripts
 │       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │       └── verify_result.py    // 真值对比文件
