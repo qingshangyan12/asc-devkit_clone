@@ -231,7 +231,7 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
 }
 
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG,
     typename U = PrimT<T>, typename std::enable_if<IsSameType<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LoadDataWithStrideImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
@@ -248,7 +248,6 @@ __aicore__ inline void LoadDataWithStrideImpl(const LocalTensor<T>& dst, const L
     }
 
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
-#if __NPU_ARCH__ == 3510
     ASCENDC_ASSERT(loadDataParams.kExtension * sizeof(T) % ONE_BLK_SIZE == 0, {
         KERNEL_LOG(KERNEL_ERROR, "kExtension * sizeof(T) must be a multiple of 32");});
     ASCENDC_ASSERT(loadDataParams.mExtension % 16 == 0, {
@@ -257,7 +256,6 @@ __aicore__ inline void LoadDataWithStrideImpl(const LocalTensor<T>& dst, const L
         KERNEL_LOG(KERNEL_ERROR, "kStartPt * sizeof(T) must be a multiple of 32");});
     ASCENDC_ASSERT(loadDataParams.mStartPt % 16 == 0, {
         KERNEL_LOG(KERNEL_ERROR, "mStartPt should be a multiple of 16");});
-#endif
 
     CheckTensorPos<T>(src, Hardware::L1, "src", "A1 / B1", "LoadDataWithStride with LoadData3DParamsV2");
     if (dstScope == Hardware::L0A) {
@@ -720,7 +718,7 @@ __aicore__ inline void SetLoadDataRepeatImpl(const LoadDataRepeatParam& repeatPa
     SetLoadDataRepeatCal(repeatParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 __aicore__ inline void SetLoadDataRepeatWithStrideImpl(const LoadDataRepeatParamWithStride& repeatParams)
 {
     SetLoadDataRepeatWithStrideCal(repeatParams);
