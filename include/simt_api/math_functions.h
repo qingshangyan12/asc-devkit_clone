@@ -253,6 +253,36 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int signbit(float x);
 
+__attribute__ ((overloadable, always_inline)) int __mulhi(int x, int y);
+
+__attribute__ ((overloadable, always_inline)) unsigned int __umulhi(unsigned int x, unsigned int y);
+
+__attribute__ ((overloadable, always_inline)) long long __mul64hi(long long x, long long y);
+
+__attribute__ ((overloadable, always_inline)) unsigned long long __umul64hi(unsigned long long x, unsigned long long y);
+
+__attribute__ ((overloadable, always_inline)) long long __mul_i32toi64(int x, int y);
+
+__attribute__ ((overloadable, always_inline)) unsigned long long __mul_i32toi64(unsigned int x, unsigned int y);
+
+__attribute__ ((overloadable, always_inline)) unsigned int __brev(unsigned int x);
+__attribute__ ((overloadable, always_inline)) unsigned long long __brev(unsigned long long x);
+__attribute__ ((overloadable, always_inline)) unsigned long __brev(unsigned long x);
+
+__attribute__ ((overloadable, always_inline)) int __clz(int x);
+__attribute__ ((overloadable, always_inline)) int __clz(long long x);
+__attribute__ ((overloadable, always_inline)) int __clz(long x);
+
+__attribute__ ((overloadable, always_inline)) int __ffs(int x);
+__attribute__ ((overloadable, always_inline)) int __ffs(long long x);
+__attribute__ ((overloadable, always_inline)) int __ffs(long x);
+
+__attribute__ ((overloadable, always_inline)) int __popc(unsigned int x);
+__attribute__ ((overloadable, always_inline)) int __popc(unsigned long long x);
+__attribute__ ((overloadable, always_inline)) int __popc(unsigned long x);
+
+__attribute__ ((overloadable, always_inline)) unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s);
+
 #include "impl/simt_api/math_functions_impl.h"
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FUNCTIONS_H__)
