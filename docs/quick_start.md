@@ -1,6 +1,6 @@
 # 编译构建
 
-## 环境准备
+## 环境准备<a name="prepare&install"></a>
 本项目支持源码编译，在源码编译前，需要确保已经安装驱动、固件和CANN软件（Ascend-cann-toolkit和Ascend-cann-ops）。
 
   软件安装方式请根据如下描述进行选择：
@@ -70,13 +70,9 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
 ### 场景三：手动安装软件包
 
-**场景1：已发布版本**
+**场景1：体验master版本能力或基于master版本进行开发**
 
-如果您想体验**官网正式发布的CANN包**能力，请访问[CANN官网下载中心](https://www.hiascend.com/cann/download)，选择对应版本CANN软件包（仅支持CANN 8.5.0及后续版本）进行安装。
-
-**场景2：master版本**
-
-如果您想体验**master分支最新能力**，单击[下载链接](https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master)获取最新时间戳的软件包，按照如下步骤进行安装。更多安装指导请参考[CANN软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
+如果您想体验**master分支最新能力**，单击[下载链接](https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master)获取软件包，按照如下步骤进行安装。更多安装指导请参考[CANN软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
 
 1. 安装固件和驱动。
 
@@ -105,6 +101,11 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
     - \$\{arch\}：表示CPU架构，如aarch64、x86_64。
     - \$\{soc\_name\}：表示NPU型号名称。
     - \$\{install\_path\}：表示指定安装路径，需要与toolkit包安装在相同路径，root用户默认安装在`/usr/local/Ascend`目录，非root用户默认安装在`$HOME/Ascend`目录。
+
+**场景2：体验已发布版本能力或基于已发布版本进行开发**
+
+如果您想体验**官网正式发布的CANN包**能力，请访问[CANN官网下载中心](https://www.hiascend.com/cann/download)，选择对应版本CANN软件包（仅支持CANN 8.5.0及后续版本）进行安装。
+
 
 ## 环境验证
 
