@@ -118,21 +118,6 @@ __aicore__ inline uint64_t TransUBAddr(uint64_t addr);
         }                                                                                              \
     } while (0)
 
-// Report error when failed cpu check
-#define ASCENDC_REPORT_CHECK_ERROR(apiMsg, funcType)                                        \
-    do {                                                                                    \
-        if (funcType == KernelFuncType::MASK_COUNT_MODE) {                                  \
-            KERNEL_LOG(KERNEL_ERROR, "Failed to pass %s mask count mode check.", apiMsg);   \
-        } else if (funcType == KernelFuncType::MASK_BIT_MODE) {                             \
-            KERNEL_LOG(KERNEL_ERROR, "Failed to pass %s mask bit mode check.", apiMsg);     \
-        } else if (funcType == KernelFuncType::CALCOUNT_MODE) {                             \
-            KERNEL_LOG(KERNEL_ERROR, "Failed to pass %s calcount mode check.", apiMsg);     \
-        } else {                                                                            \
-            KERNEL_LOG(KERNEL_ERROR, "Failed to pass %s check.", apiMsg);                   \
-        }                                                                                   \
-        raise(SIGABRT);                                                                     \
-    } while (0)
-
 enum KernelFuncType : uint8_t {
     NONE_MODE,
     MASK_COUNT_MODE,    // mask
@@ -146,6 +131,23 @@ enum class LogLevel : uint8_t {
     KERNEL_WARN = 2,
     KERNEL_ERROR = 3,
 };
+
+__aicore__ inline void ReportCheckErrorImpl(const char* apiMsg, KernelFuncType funcType) {
+    if (funcType == KernelFuncType::MASK_COUNT_MODE) {
+        KERNEL_LOG(LogLevel::KERNEL_ERROR, "Failed to pass %s mask count mode check.", apiMsg);
+    } else if (funcType == KernelFuncType::MASK_BIT_MODE) {
+        KERNEL_LOG(LogLevel::KERNEL_ERROR, "Failed to pass %s mask bit mode check.", apiMsg);
+    } else if (funcType == KernelFuncType::CALCOUNT_MODE) {
+        KERNEL_LOG(KERNEL_ERROR, "Failed to pass %s calcount mode check.", apiMsg);
+    } else {
+        KERNEL_LOG(KERNEL_ERROR, "Failed to pass %s check.", apiMsg);
+    }
+    raise(SIGABRT);
+}
+
+// Report error when failed cpu check
+#define ASCENDC_REPORT_CHECK_ERROR(apiMsg, funcType) ReportCheckErrorImpl(apiMsg, funcType)
+
 }  // namespace AscendC
 
 #define KERNEL_LOG(level, format, ...) KERNEL_LOG_##level(format, ##__VA_ARGS__)
