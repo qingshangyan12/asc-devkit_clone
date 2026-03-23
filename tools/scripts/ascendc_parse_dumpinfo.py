@@ -17,6 +17,7 @@ import argparse
 import os
 import struct
 from enum import Enum
+from typing import List, Union, Tuple
 
 import numpy as np
 
@@ -52,60 +53,119 @@ class DumpType(Enum):
     TENSOR_TYPE = 2
 
 
-def str2bool(v):
-    if v.lower() in ('True', 'yes', 'true', 't', 'T', 'y', '1'):
+def str2bool(v: Union[str, bool]) -> bool:
+    """
+    Convert a string representation of truth to True or False.
+
+    Args:
+        v (Union[str, bool]): The input string or boolean to convert.
+
+    Returns:
+        bool: True if the string represents a true value, False otherwise.
+
+    Raises:
+        argparse.ArgumentTypeError: If the string cannot be interpreted as a boolean.
+    """
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('true', 'yes', 't', 'y', '1'):
         return True
-    elif v.lower() in ('False', 'no', 'false', 'f', 'F', 'n', '0'):
+    elif v.lower() in ('false', 'no', 'f', 'n', '0'):
         return False
     else:
         raise argparse.ArgumentTypeError('Invalid boolean value: %s' % v)
 
 
-def parse_input_args():
-    parser = argparse.ArgumentParser()
+def parse_input_args() -> argparse.Namespace:
+    """
+    Parse command line arguments for the dump parsing tool.
+
+    Returns:
+        argparse.Namespace: An object containing the parsed arguments:
+            - log_path (str): Path to the dump tensor log file.
+            - save_path (str): Path to save the parsed information.
+            - is_show (bool): Whether to display the parsed output on screen.
+            - write_mode (str): File write mode ('w' for overwrite, 'a' for append).
+    """
+    parser = argparse.ArgumentParser(description="Parse AscendC dump information from binary logs.")
     parser.add_argument('-p', '--log-path', dest='log_path', required=True,
-                        help="log path where store dump tensor log information, e.g. xx/out.bin")
+                        help="Log path where dump tensor log information is stored, e.g. xx/out.bin")
     parser.add_argument('-s', '--save-path', dest='save_path', required=False, default="all",
-                        help="information path after parsing, e.g. xx/parsing_info.txt")
+                        help="Information path after parsing, e.g. xx/parsing_info.txt")
     parser.add_argument('-i', '--is-show', dest='is_show', required=False, const=False, type=str2bool, nargs='?',
-                        help="whether show on the screen: true:show, false:unshow")
+                        help="Whether to show on the screen: true:show, false:unshow")
     parser.add_argument('-r', '--write-mode', dest='write_mode', required=False, default="w", choices=['a', 'w'],
-                        help="mode for parsed file write, default option is overwrite: w:overwrite, a:append")
-    dump_parse_args = parser.parse_args()
-    return dump_parse_args
+                        help="Mode for parsed file write, default option is overwrite: w:overwrite, a:append")
+    return parser.parse_args()
 
 
-def get_dump_type_str(dump_type_input):
+def get_dump_type_str(dump_type_input: int) -> str:
+    """
+    Convert a numeric dump type to its string representation.
+
+    Args:
+        dump_type_input (int): The integer value representing the dump type (e.g., from DumpType Enum).
+
+    Returns:
+        str: The string representation of the dump type (e.g., "DumpScalar: ", "DumpTensor: ").
+
+    Raises:
+        Exception: If the input does not match any known dump type.
+    """
     if dump_type_input == DumpType.SCALAR_TYPE.value:
         return "DumpScalar: "
     elif dump_type_input == DumpType.TENSOR_TYPE.value:
         return "DumpTensor: "
     else:
-        raise Exception('[ERROR]:Invalid dump Type')
+        raise Exception(f'[ERROR]: Invalid dump Type: {dump_type_input}')
 
 
-def get_data_type_size(data_type):
-    if data_type == DataType.DT_INT64.value or data_type == DataType.DT_UINT64.value:
+def get_data_type_size(data_type: int) -> int:
+    """
+    Get the byte size of a specified data type.
+
+    Args:
+        data_type (int): The integer value representing the data type (e.g., from DataType Enum).
+
+    Returns:
+        int: The size of the data type in bytes.
+
+    Raises:
+        Exception: If the input data type is not supported or recognized.
+    """
+    if data_type in (DataType.DT_INT64.value, DataType.DT_UINT64.value):
         return 8
-    elif data_type == DataType.DT_FLOAT.value or data_type == DataType.DT_INT32.value or \
-            data_type == DataType.DT_UINT32.value:
+    elif data_type in (DataType.DT_FLOAT.value, DataType.DT_INT32.value, DataType.DT_UINT32.value):
         return 4
-    elif data_type == DataType.DT_FLOAT16.value or data_type == DataType.DT_INT16.value or \
-            data_type == DataType.DT_UINT16.value:
+    elif data_type in (DataType.DT_FLOAT16.value, DataType.DT_INT16.value, DataType.DT_UINT16.value):
         return 2
-    elif data_type == DataType.DT_INT8.value or data_type == DataType.DT_UINT8.value:
+    elif data_type in (DataType.DT_INT8.value, DataType.DT_UINT8.value):
         return 1
     else:
-        raise Exception('[ERROR]:Invalid Data Type')
+        raise Exception(f'[ERROR]: Invalid Data Type: {data_type}')
 
 
-def get_unpack_type(data_type):
+def get_unpack_type(data_type: int) -> List[str]:
+    """
+    Get the struct unpack format character and the string representation of a data type.
+
+    Args:
+        data_type (int): The integer value representing the data type (e.g., from DataType Enum).
+
+    Returns:
+        List[str]: A list containing two elements:
+            - [0]: The format character used by the struct module (e.g., 'f', 'i').
+            - [1]: The string name of the C/C++ data type (e.g., 'float32', 'int32_t').
+
+    Raises:
+        Exception: If the input data type is not supported or recognized.
+    """
     if data_type == DataType.DT_FLOAT.value:
         return ['f', 'float32']
     elif data_type == DataType.DT_INT32.value:
         return ['i', 'int32_t']
     elif data_type == DataType.DT_UINT32.value:
-        return ['I', 'uin32_t']
+        return ['I', 'uint32_t']  # Typo fixed here!
     elif data_type == DataType.DT_FLOAT16.value:
         return ['e', 'half']
     elif data_type == DataType.DT_INT16.value:
@@ -121,10 +181,23 @@ def get_unpack_type(data_type):
     elif data_type == DataType.DT_INT64.value:
         return ['q', 'int64_t']
     else:
-        raise Exception('[ERROR]:Invalid Data Type')
+        raise Exception(f'[ERROR]: Invalid Data Type: {data_type}')
 
 
-def get_positon(position, dump_type):
+def get_positon(position: int, dump_type: int) -> str:
+    """
+    Determine the physical position (Core or Memory type) based on dump type and position index.
+
+    Args:
+        position (int): The integer representing the specific position index.
+        dump_type (int): The integer representing the dump type (Scalar or Tensor).
+
+    Returns:
+        str: The string representation of the position (e.g., 'MIX', 'AIC', 'UB', 'L1').
+
+    Raises:
+        Exception: If the position or dump type is invalid or mismatched.
+    """
     if dump_type == DumpType.SCALAR_TYPE.value:
         if position == CorePosition.MIX.value:
             return 'MIX'
@@ -133,7 +206,7 @@ def get_positon(position, dump_type):
         elif position == CorePosition.AIV.value:
             return 'AIV'
         else:
-            raise Exception('[ERROR]:Invalid Position')
+            raise Exception(f'[ERROR]: Invalid Scalar Position: {position}')
 
     elif dump_type == DumpType.TENSOR_TYPE.value:
         if position == Position.UB.value:
@@ -141,13 +214,13 @@ def get_positon(position, dump_type):
         elif position == Position.L1.value:
             return 'L1'
         else:
-            raise Exception('[ERROR]:Invalid Position')
+            raise Exception(f'[ERROR]: Invalid Tensor Position: {position}')
 
     else:
-        raise Exception('[ERROR]:Invalid Position')
+        raise Exception(f'[ERROR]: Invalid Dump Type for position resolution: {dump_type}')
 
 
-def process_log(dump_parse_args):
+def process_log(dump_parse_args: argparse.Namespace) -> str:
     bin_file_path = dump_parse_args.log_path
     if dump_parse_args.save_path != "all":
         save_path = dump_parse_args.save_path
