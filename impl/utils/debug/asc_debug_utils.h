@@ -37,7 +37,7 @@ __aicore__ inline void enable_asc_diagnostics()
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #if defined(__ENABLE_ASCENDC_PRINTF__)
-#if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     static const struct AscTlv __asc_debug_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 1};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
