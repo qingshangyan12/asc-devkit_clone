@@ -125,11 +125,18 @@ enum KernelFuncType : uint8_t {
     CALCOUNT_MODE       // calcount
 };
 
+enum class LogLevel : uint8_t {
+    KERNEL_DEBUG = 0,
+    KERNEL_INFO = 1,
+    KERNEL_WARN = 2,
+    KERNEL_ERROR = 3,
+};
+
 __aicore__ inline void ReportCheckErrorImpl(const char* apiMsg, KernelFuncType funcType) {
     if (funcType == KernelFuncType::MASK_COUNT_MODE) {
-        KERNEL_LOG(KERNEL_ERROR, "Failed to pass %s mask count mode check.", apiMsg);
+        KERNEL_LOG(LogLevel::KERNEL_ERROR, "Failed to pass %s mask count mode check.", apiMsg);
     } else if (funcType == KernelFuncType::MASK_BIT_MODE) {
-        KERNEL_LOG(KERNEL_ERROR, "Failed to pass %s mask bit mode check.", apiMsg);
+        KERNEL_LOG(LogLevel::KERNEL_ERROR, "Failed to pass %s mask bit mode check.", apiMsg);
     } else if (funcType == KernelFuncType::CALCOUNT_MODE) {
         KERNEL_LOG(KERNEL_ERROR, "Failed to pass %s calcount mode check.", apiMsg);
     } else {
@@ -141,12 +148,6 @@ __aicore__ inline void ReportCheckErrorImpl(const char* apiMsg, KernelFuncType f
 // Report error when failed cpu check
 #define ASCENDC_REPORT_CHECK_ERROR(apiMsg, funcType) ReportCheckErrorImpl(apiMsg, funcType)
 
-enum class LogLevel : uint8_t {
-    KERNEL_DEBUG = 0,
-    KERNEL_INFO = 1,
-    KERNEL_WARN = 2,
-    KERNEL_ERROR = 3,
-};
 }  // namespace AscendC
 
 #define KERNEL_LOG(level, format, ...) KERNEL_LOG_##level(format, ##__VA_ARGS__)
