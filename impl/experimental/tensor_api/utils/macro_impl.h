@@ -17,7 +17,6 @@
 
 #include "impl/utils/sys_constants.h"
 #include "impl/utils/sys_macros.h"
-#include "impl/utils/std/cmath/ceil_division.h"
 
 #if !defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
