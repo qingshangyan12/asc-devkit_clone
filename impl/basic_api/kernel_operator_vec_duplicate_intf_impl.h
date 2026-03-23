@@ -35,7 +35,7 @@
 #include "dav_m310/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "reg_compute/kernel_reg_compute_intf.h"
-#include "dav_c310/kernel_operator_vec_duplicate_impl.h"
+#include "dav_3510/kernel_operator_vec_duplicate_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "reg_compute/kernel_reg_compute_intf.h"
 #include "dav_m510/kernel_operator_vec_duplicate_impl.h"

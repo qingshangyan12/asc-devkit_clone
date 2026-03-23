@@ -29,7 +29,7 @@
 #elif __NPU_ARCH__ == 5102
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_vec_fused_impl.h"
 #else
-#include "../../basic_api/reg_compute/dav_c310/kernel_reg_compute_vec_fused_impl.h"
+#include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_fused_impl.h"
 #endif
 
 namespace AscendC {

@@ -25,7 +25,7 @@
 #if __NPU_ARCH__ == 2201
 #include "dav_c220/core_mng/roc/kernel_operator_cube_group_info.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_c310/core_mng/roc/kernel_operator_cube_group_info.h"
+#include "dav_3510/core_mng/roc/kernel_operator_cube_group_info.h"
 #endif
 namespace AscendC {
 template <PipeMode pipeMode>
