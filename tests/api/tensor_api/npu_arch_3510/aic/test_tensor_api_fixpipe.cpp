@@ -73,19 +73,19 @@ public:
                 m_size_global = m;
             }
             dst_stride_global = n;
-            src_stride_global = C0_SIZE<> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
+            src_stride_global = C0_SIZE<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
             NZ2ND_en_global = true;
             NZ2DN_en_global = false;
         } else if constexpr (C_TYPE::format == CubeFormat::NZ) {
             if constexpr (HAS_COORD) {
                 n_size_global = AscendC::Std::ceil_align(n - base, FRACTAL_FIXED);
-                m_size_global =  AscendC::Std::ceil_align(m - base, C0_SIZE<> / sizeof(uint16_t));
+                m_size_global =  AscendC::Std::ceil_align(m - base, C0_SIZE<uint16_t> / sizeof(uint16_t));
             } else {
                 n_size_global = AscendC::Std::ceil_align(n, FRACTAL_FIXED);
-                m_size_global =  AscendC::Std::ceil_align(m, C0_SIZE<> / sizeof(uint16_t));
+                m_size_global =  AscendC::Std::ceil_align(m, C0_SIZE<uint16_t> / sizeof(uint16_t));
             }
-            dst_stride_global = C0_SIZE<> / sizeof(DstT) * AscendC::Std::ceil_align(m, FRACTAL_FIXED);
-            src_stride_global = C0_SIZE<> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
+            dst_stride_global = C0_SIZE<DstT> / sizeof(DstT) * AscendC::Std::ceil_align(m, FRACTAL_FIXED);
+            src_stride_global = C0_SIZE<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
             NZ2ND_en_global = false;
             NZ2DN_en_global = false;
         } else {
@@ -97,7 +97,7 @@ public:
                 m_size_global = m;
             }
             dst_stride_global = m;
-            src_stride_global = C0_SIZE<> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
+            src_stride_global = C0_SIZE<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
             NZ2ND_en_global = false;
             NZ2DN_en_global = true;
         }
