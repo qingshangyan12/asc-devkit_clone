@@ -1,12 +1,12 @@
 # Ascend C
 
-## 🔥Latest News
+### 🔥Latest News
 - [2026/01] 优化样例、融合编译性能等；
-  - 迁移高阶API样例[ascendc-api-adv](https://gitee.com/ascend/ascendc-api-adv)到本仓，并使用[<<<>>>调用方式](./examples/03_libraries)；
+  - 迁移高阶API样例[ascendc-api-adv](https://gitee.com/asc end/ascendc-api-adv)到本仓，并使用[<<<>>>调用方式](./examples/03_libraries)；
   - 联合毕昇编译器，优化融合编译性能；
 - [2025/12] Ascend C项目新增对Kirin X90和Kirin 9030处理器的支持。鸿蒙开发者基于Ascend C的实践案例可参考：[cann-recipes-harmony-infer](https://gitcode.com/cann/cann-recipes-harmony-infer)。
 - [2025/11] Ascend C项目基于Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品全面开源开放，包含以下新特性：
-  - 实现分仓分包，支持分包独立安装部署，包括Ascend C算子开发所需的核心仓asc-devkit、调试工具仓[asc-tools](https://gitcode.com/cann/asc-tools)、Vector算子模板库仓[atvc](https://gitcode.com/cann/atvc)和[atvoss](https://gitcode.com/cann/atvoss)、Python前端仓[pyasc](https://gitcode.com/cann/pyasc)。
+  - 实现分仓分包，支持分包独立安装部署，包括Ascend C算子开发所需的核心仓asc-devkit、调试工具仓[asc-tools](https://gitcode.com/cann/asc-tools)、Vector算子模板库仓[atvc](https://gitcode.com/cann/atvc)和[atvoss](https://gitcode.com /cann/atvoss)、Python前端仓[pyasc](https://gitcode.com/cann/pyasc)。
   - 编程API能力扩展
     - 新增语言扩展层C API，提供与业界相似的编程体验。
     - 基础API新增LocalMemAllocator内存分配接口。
@@ -20,13 +20,13 @@
 
 Ascend C是[CANN](https://hiascend.com/software/cann) （Compute Architecture for Neural Networks）推出的昇腾AI处理器专用的算子程序开发语言，原生支持C和C++标准规范。Ascend C主要由类库和语言扩展层构成，提供多层级API，满足多维场景算子开发诉求；总体逻辑架构图如下所示：
 
-<img src="docs/figures/architecture.png" alt="架构图"  width="850px" height="580px">
+<img src="docss/figures/architecture.png" alt="架构图"  width="850px" height="580px">
 
 - 语言扩展层C API：纯C接口，支持数组分配内存、基于指针的计算接口，提供与业界一致的C语言编程体验，并开放芯片完备编程能力。Atlas A2/A3支持SIMD的纯C接口；Ascend 950PR/Ascend 950DT将支持与业界类似的纯SIMT编程能力、SIMD/SIMT混合编程能力；
 - 基础API：单指令抽象的C++类库API，一般基于Tensor编程；逐步基于Layout完善Tensor编程能力；
 - 高阶API：基于单核对常见算法进行抽象和封装，提供公共算法的实现；
 - 算子模板库：基于模板提供算子的完整实现参考，简化Tiling开发，支持用户自定义扩展；
-- Python前端：PyAsc基于Python前端，提供芯片底层完备编程能力，并将逐步基于Layout完善Tensor编程能力，新增SIMT编程等能力，实现基于Python接口开发高性能算子；
+- Python前端：PyAsc基于Python前端，提供芯片底层完备编程能力，并将逐步基于Layout完善Tensor编程能力，新增SIMT编程等能力，实现基于Pythsson接口开发高性能算子；
 
 本仓主要包含Ascend C编程API和必要的cmake编译脚本，是算子开发所需的核心模块。
 
