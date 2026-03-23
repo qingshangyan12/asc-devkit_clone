@@ -22,6 +22,14 @@ ERROR_TOL = 1e-4
 
 
 def verify_result(output, golden):
+    """
+    验证PairReduceSum样算结果与golden数据是否一致
+    Args:
+        output: 输出数据文件路径
+        golden: golden数据文件路径
+    Returns:
+        bool: 误差比例是否在容忍范围内
+    """
     output_type = np.float16
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
