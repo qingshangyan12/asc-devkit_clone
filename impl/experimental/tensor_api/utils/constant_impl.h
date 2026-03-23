@@ -149,7 +149,7 @@ ASCENDC_HOST_AICORE inline constexpr decltype(auto) ceil_division(T num1, U num2
     if (num2 == 0) {
         return 0;
     } else {
-        return (num1 + num2 - Std::Int<1>{}) / num2;
+        return (num1 + num2 - Int<1>{}) / num2;
     }
 }
 
