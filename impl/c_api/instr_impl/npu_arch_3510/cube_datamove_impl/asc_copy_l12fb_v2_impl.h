@@ -34,7 +34,7 @@ __aicore__ inline void asc_copy_l12fb_v2_impl(__fbuf__ void* dst, __cbuf__ void*
 
 __aicore__ inline void asc_copy_l12fb_v2_sync_impl(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
 {
-    asc_copy_l12fb_impl(dst, src, size);
+    asc_copy_l12fb_v2_impl(dst, src, size);
     asc_sync_post_process();
 }
 
