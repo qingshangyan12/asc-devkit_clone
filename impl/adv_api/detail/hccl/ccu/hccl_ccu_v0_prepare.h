@@ -64,15 +64,12 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllToAllVWr
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
  
-    uint64_t tmpCount = commParam->count / ccuParam_.rankNum;
-    uint64_t loopCount = CCU_LOOP_COUNT;
+    uint64_t loopCount = CCU_LOOP_COUNT_ATAVW;
  
     xnData_[1] = reinterpret_cast<uint64_t>(commParam->sendBuf); // 1 is index of xnData
     xnData_[2] = commParam->wParamExt.sendSizes; // 2 is index of xnData
     xnData_[8] = commParam->wParamExt.remoteWinOffset; // 8 is index of xnData
     uint64_t sliceSize = commParam->count;
-    loopCount = CCU_LOOP_COUNT_ATAVW;
- 
  
     uint64_t loopSize = loopCount * CCU_MEMSLICE_SIZE;
     uint64_t m = sliceSize / loopSize;
@@ -161,7 +158,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
  
     uint64_t loopCount = CCU_LOOP_COUNT_M2M_RE;
-    uint64_t tmpCount = commParam->count / ccuParam_.rankNum;
+    uint64_t tmpCount = (commParam->count + ccuParam_.rankNum - 1) / ccuParam_.rankNum;
     uint64_t sliceCount = (ccuParam_.rankId == ccuParam_.rankNum - 1) ?
                      (commParam->count - (ccuParam_.rankNum - 1) * tmpCount) : tmpCount;
     uint64_t sliceSize = sliceCount * DATA_TYPE_MAP[commParam->dataType];
@@ -174,13 +171,20 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2
     xnData_[4] = rankSliceOffset;
     xnData_[5] = rankSliceOffset;
 
-    uint64_t normalSliceSize = ((commParam->count + ccuParam_.rankNum - 1) / ccuParam_.rankNum) * dataSize; // count/rankNum 向上取整
-    int64_t lastSliceSize = (commParam->count * dataSize) - ((ccuParam_.rankNum - 1) * normalSliceSize);
-    lastSliceSize = lastSliceSize > 0 ? lastSliceSize : 0;
+    uint64_t normalSliceCount = (commParam->count + ccuParam_.rankNum - 1) / ccuParam_.rankNum; // count/rankNum 向上取整
+    uint64_t normalSliceSize = normalSliceCount * dataSize;
+    uint64_t normalRankCount = commParam->count / normalSliceCount;
+    uint64_t lastSliceSize = 0;
+    if (normalRankCount == ccuParam_.rankNum) {
+        lastSliceSize = (commParam->count * dataSize) - ((normalRankCount - 1) * normalSliceSize);
+    } else {
+        lastSliceSize = (commParam->count * dataSize) - (normalRankCount * normalSliceSize);
+    }
     KERNEL_LOG(KERNEL_INFO, "ApiClient CcuPrepareForAllReduceM2M normalSliceSize:%d, lastSliceSize:%d", normalSliceSize, lastSliceSize);
+    
     xnData_[6] = normalSliceSize;
     xnData_[7] = lastSliceSize;
-    xnData_[8] = ccuParam_.rankId < (commParam->count / normalSliceSize) ? normalSliceSize : lastSliceSize;
+    xnData_[8] = ccuParam_.rankId < normalRankCount ? normalSliceSize : lastSliceSize;
     xnData_[9] = ccuParam_.rankId * normalSliceSize;
     xnData_[10] = 0; // input output not equals
     if (ccuParam_.rankId == ccuParam_.rankNum - 1) {

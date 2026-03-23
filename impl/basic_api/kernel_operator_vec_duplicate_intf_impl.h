@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_duplicate_intf_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_operator_vec_duplicate_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_duplicate_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_DUPLICATE_INTF_IMPL_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_DUPLICATE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_DUPLICATE_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
@@ -28,11 +33,11 @@
 #include "dav_m300/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_duplicate_impl.h"
-#elif __NPU_ARCH__ == 3101
-#include "micro_api/kernel_micro_intf.h"
+#elif __NPU_ARCH__ == 3510
+#include "reg_compute/kernel_reg_compute_intf.h"
 #include "dav_c310/kernel_operator_vec_duplicate_impl.h"
 #elif (__NPU_ARCH__ == 5102)
-#include "micro_api/kernel_micro_intf.h"
+#include "reg_compute/kernel_reg_compute_intf.h"
 #include "dav_m510/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_duplicate_impl.h"
@@ -113,7 +118,7 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue
     DuplicateImpl<T>((__ubuf__ T*)dst.GetPhyAddr(), scalarValue, count);
 }
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 /*
  * @ingroup Duplicate lowest position of src
  * @brief dst = dst[i] = src[0]
@@ -208,3 +213,7 @@ __aicore__ inline void DeInterleave(const LocalTensor<T> &dst0, const LocalTenso
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_DUPLICATE_INTERFACE_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_DUPLICATE_INTF_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_DUPLICATE_INTF_IMPL_H__
+#endif

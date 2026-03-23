@@ -32,12 +32,12 @@ enableKdimReorderLoad用于配置是否使能K轴错峰加载数据。基于相�
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">(512, 256*24)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">a</td><td align="center">(768, 256*24)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">b</td><td align="center">(256*24, 2048)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">bias</td><td align="center">(2048, )</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">(512, 2048)</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">(768, 2048)</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_k_reorder_load_custom</td></tr>
   </table>
@@ -95,7 +95,7 @@ enableKdimReorderLoad用于配置是否使能K轴错峰加载数据。基于相�
 - 修改编译选项（Ascend 950PR/Ascend 950DT）  
   对于Ascend 950PR/Ascend 950DT，执行前需要修改CMakeLists.txt中编译选项--npu-arch，具体修改如下：  
   ```
-  --npu-arch=dav-3101
+  --npu-arch=dav-3510
   ```
 
 - 样例执行  

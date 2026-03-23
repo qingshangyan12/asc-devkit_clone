@@ -12,6 +12,10 @@
  * \file kernel_struct_data_copy.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_DATA_COPY_H__
+#endif
 #ifndef ASCENDC_MODULE_STRUCT_DATA_COPY_H
 #define ASCENDC_MODULE_STRUCT_DATA_COPY_H
 
@@ -73,7 +77,6 @@ enum class DataCopyMVType : uint8_t {
     OUT_TO_UB = 1,
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 struct NdDmaConfig {
     static constexpr uint16_t unsetPad = 0xffff;
     bool isNearestValueMode = false;
@@ -86,7 +89,6 @@ constexpr NdDmaConfig kDefaultNdDmaConfig = { false, NdDmaConfig::unsetPad, NdDm
     false };
 constexpr NdDmaConfig kDefaultMultiCopyConfig = { false, NdDmaConfig::unsetPad, NdDmaConfig::unsetPad,
     false };  // reserve old name
-#endif
 
 template <uint8_t dim>
 struct MultiCopyLoopInfo  {
@@ -183,12 +185,16 @@ struct DataCopyPadParams {
     uint64_t paddingValue = 0;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 struct DataCopyExtParams {
     __aicore__ DataCopyExtParams() {}
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     __aicore__ DataCopyExtParams(const uint16_t count, const uint32_t len, const int64_t srcStrideIn,
         const int64_t dstStrideIn, const uint32_t rsvIn)
+#else
+    __aicore__ DataCopyExtParams(const uint16_t count, const uint32_t len, const uint32_t srcStrideIn,
+    const uint32_t dstStrideIn, const uint32_t rsvIn)
+#endif
         : blockCount(count),
           blockLen(len),
           srcStride(srcStrideIn),
@@ -198,33 +204,18 @@ struct DataCopyExtParams {
 
     uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
     uint32_t blockLen = 0;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     int64_t srcStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);
     int64_t dstStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);
-    uint32_t rsv = 0; // reserved information
-};
 #else
-struct DataCopyExtParams {
-    __aicore__ DataCopyExtParams() {}
-
-    __aicore__ DataCopyExtParams(const uint16_t count, const uint32_t len, const uint32_t srcStrideIn,
-        const uint32_t dstStrideIn, const uint32_t rsvIn)
-        : blockCount(count),
-          blockLen(len),
-          srcStride(srcStrideIn),
-          dstStride(dstStrideIn),
-          rsv(rsvIn)
-    {}
-
-    uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
-    uint32_t blockLen = 0;
     uint32_t srcStride = DEFAULT_DATA_COPY_STRIDE;
     uint32_t dstStride = DEFAULT_DATA_COPY_STRIDE;
+#endif
     uint32_t rsv = 0; // reserved information
 };
-#endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 template <typename T> struct DataCopyPadExtParams {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     using TYPE = typename GetPadValueType<T>::Type;
     __aicore__ DataCopyPadExtParams()
     {
@@ -245,10 +236,7 @@ template <typename T> struct DataCopyPadExtParams {
     uint8_t leftPadding = 0;
     uint8_t rightPadding = 0;
     TYPE paddingValue = 0;
-};
 #else
-template <typename T>
-struct DataCopyPadExtParams {
     __aicore__ DataCopyPadExtParams() {}
 
     __aicore__ DataCopyPadExtParams(const bool isPadValue, const uint8_t leftPadValue, const uint8_t rightPadValue,
@@ -263,13 +251,13 @@ struct DataCopyPadExtParams {
     uint8_t leftPadding = 0;
     uint8_t rightPadding = 0;
     T paddingValue = 0;
-};
 #endif
+};
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 struct Nd2NzParams {
     __aicore__ Nd2NzParams() {}
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     __aicore__ Nd2NzParams(const uint16_t ndNumIn, const uint16_t nValueIn, const uint32_t dValueIn,
         const uint64_t srcNdMatrixStrideIn, const uint64_t srcDValueIn, const uint16_t dstNzC0StrideIn,
         const uint16_t dstNzNStrideIn, const uint32_t dstNzMatrixStrideIn)
@@ -291,11 +279,7 @@ struct Nd2NzParams {
     uint16_t dstNzC0Stride = 0;
     uint16_t dstNzNStride = 0;
     uint32_t dstNzMatrixStride = 0;
-};
 #else
-struct Nd2NzParams {
-    __aicore__ Nd2NzParams() {}
-
     __aicore__ Nd2NzParams(const uint16_t ndNumIn, const uint16_t nValueIn, const uint16_t dValueIn,
         const uint16_t srcNdMatrixStrideIn, const uint16_t srcDValueIn, const uint16_t dstNzC0StrideIn,
         const uint16_t dstNzNStrideIn, const uint16_t dstNzMatrixStrideIn)
@@ -317,8 +301,9 @@ struct Nd2NzParams {
     uint16_t dstNzC0Stride = 0;
     uint16_t dstNzNStride = 0;
     uint16_t dstNzMatrixStride = 0;
-};
 #endif
+};
+
 
 struct Nz2NdParamsFull {
     __aicore__ Nz2NdParamsFull() {}
@@ -344,7 +329,6 @@ struct Nz2NdParamsFull {
     uint16_t dstNdMatrixStride = 1;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 struct Dn2NzParams {
     __aicore__ Dn2NzParams() {}
 
@@ -371,7 +355,6 @@ struct Dn2NzParams {
     uint16_t dstNzNStride = 0;
     uint32_t dstNzMatrixStride = 0;
 };
-#endif
 
 struct LoopModeParams {
     __aicore__ LoopModeParams()
@@ -442,3 +425,7 @@ struct CopyRepeatParams {
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_STRUCT_DATA_COPY_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_DATA_COPY_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_DATA_COPY_H__
+#endif

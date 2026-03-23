@@ -50,3 +50,8 @@ private:
 };
 } // namespace AscendC
 #endif
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_TILING_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_TILING_H__
+#endif

@@ -12,6 +12,12 @@
  * \file kernel_operator_fixpipe_intf_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_operator_fixpipe_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_fixpipe_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_IMPL_H__
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
@@ -31,7 +37,7 @@
 #include "dav_m300/kernel_operator_fixpipe_v2_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_fixpipe_impl.h"
-#elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "dav_c310/kernel_operator_fixpipe_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_fixpipe_impl.h"
@@ -73,7 +79,7 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &preData, bool isUn
     SetFixPipeConfigImpl<T, setRelu>(preData, isUnitFlag);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
 {
     SetFixpipeNz2ndFlagImpl(ndNum, srcNdStride, dstNdStride);
@@ -182,7 +188,7 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> 
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 // L0C->L1/UB
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
@@ -240,7 +246,7 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>&
     }
 #endif // ASCENDC_CPU_DEBUG
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     const uint8_t cacheMode = ExtractCacheMode(dst);
     FixpipeL0C2GMImpl<DstPrimType, SrcPrimType, config>((__gm__ DstPrimType *)dst.GetPhyAddr(),
         (__cc__ SrcPrimType *)src.GetPhyAddr(), intriParams, cacheMode);
@@ -265,7 +271,7 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> 
     using SrcPrimType = PrimT<U>;
     CheckTensorPos(src, Hardware::L0C, "src", "CO1", "Fixpipe");
     CheckTensorPos(cbufWorkspace, Hardware::L1, "cbufWorkspace", "A1", "Fixpipe");
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     const uint8_t cacheMode = ExtractCacheMode(dst);
     FixpipeL0C2GMImpl<DstPrimType, SrcPrimType, config>((__gm__ DstPrimType *)dst.GetPhyAddr(), 
         (__cc__ SrcPrimType *)src.GetPhyAddr(), (__cbuf__ uint64_t *)cbufWorkspace.GetPhyAddr(), intriParams,
@@ -278,3 +284,7 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> 
 #endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_IMPL_H__
+#endif
