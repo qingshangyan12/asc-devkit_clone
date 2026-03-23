@@ -62,6 +62,11 @@ asc-devkit:
       - impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v0_def.h
       - impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v0.h
       - impl/adv_api/detail/hccl/impl/hccl_impl.h
+      - impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_sync_data_barrier_impl.h
+      - impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_sync_data_barrier_impl.h
+      - impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_get_buf_impl.h
+      - impl/c_api/instr_impl/npu_arch_2201/sync_impl.h
+      - impl/c_api/instr_impl/npu_arch_3510/sync_impl.h
   llt:
     ut_check: true
     st_check: false
