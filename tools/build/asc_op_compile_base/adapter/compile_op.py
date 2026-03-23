@@ -671,7 +671,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
 
     # init dump and system workspace
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is False:
-        source += gen_init_dump_code(is_mix, dump_size)
+        source += gen_init_dump_code(is_mix, dump_size, dump_info)
         # set mc2 context
         source += _gen_set_mc2_ctx_param(opinfo)
         source += add_time_stamp_codes('TIME_STAMP_WRAP_MC2_CTX')
@@ -1514,18 +1514,9 @@ def handle_dump_options(compile_info: CompileInfo, compile_option_tuple):
     if compile_info.dump_info["dump_type"] == "assert":
         compile_option_tuple.compile_options.append('-DASCENDC_DUMP_ASSERT_ONLY')
         global_var_storage.set_variable("ascendc_dump_assert_only", True)
-
-    # handle dump macro
-    if CommonUtility.is_c310():
-        if "assert" not in compile_info.dump_info["dump_type"] and "printf" not in compile_info.dump_info["dump_type"]:
-            compile_option_tuple.compile_options.append('-DASCENDC_DUMP=0')
-            length_before = len(compile_option_tuple.compile_options)
+        if '-DASCENDC_DUMP=0' not in compile_option_tuple.compile_options:
             CommonUtility.remove_options(compile_option_tuple.compile_options, ['-DASCENDC_DUMP', '-DASCENDC_DUMP=1'])
-            length_after = len(compile_option_tuple.compile_options)
-            if length_before != length_after:
-                CommonUtility.print_compile_log(compile_info.kernel_name, \
-                    "-DASCENDC_DUMP=1 is deleted because the feature is not used internally in src file", \
-                    AscendCLogLevel.LOG_WARNING)
+            compile_option_tuple.compile_options.append('-DASCENDC_DUMP=1')
 
     # dump or acc or timestamp or recognize_simtvf will need extra workspace
     ascendc_enable_dump_workspace = ("-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options) or \
