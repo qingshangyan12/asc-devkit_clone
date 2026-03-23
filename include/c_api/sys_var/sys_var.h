@@ -59,6 +59,13 @@ __aicore__ inline int64_t asc_get_ffts_base_addr();
 
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
 
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+__aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
+
+__aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
+
+
 #endif
 
 #endif
