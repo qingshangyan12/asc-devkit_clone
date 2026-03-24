@@ -9,5 +9,4 @@
 |  目录名称                                                   |  功能描述                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | [matmul_leakyrelu](./matmul_leakyrelu) | 本样例基于Ascend与其他演示MatmulLeakyRelu算子的核函数直调实现。通过将矩阵乘加（Matmul）与LeakyRelu激活函数计算融合，降低内存访问开销 |
-| [simt_gather](./simt_gather) | 本样例以Gather算子为示例，展示了在SIMD与SIMT混合编程模式下通过SIMT VF函数实现离散访问的算子功能。|
 | [simt_gather_and_simd_adds](./simt_gather_and_simd_adds) | 本样例基于Ascend C演示SimtGatherAndSimdAdds算子的核函数直调实现。通过将SIMT Gather与SIMD Adds计算融合，降低内存访问开销 |
