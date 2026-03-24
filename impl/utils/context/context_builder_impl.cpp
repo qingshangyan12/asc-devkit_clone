@@ -107,6 +107,8 @@ std::shared_ptr<KernelRunContextHolder> ContextBuilderImpl::BuildTilingContext()
     std::vector<std::unique_ptr<uint8_t[]>> tensorValueVec(inputNum_ + outputNum_);
     std::vector<std::unique_ptr<uint8_t[]>> tensorValueVecOut(outputNum_);
     std::vector<gert::Tensor *> tensorVec(inputNum_ + outputNum_, nullptr);
+    CXT_ASCENDC_LOGE("zyk inputNum is %zu", inputNum_);
+    CXT_ASCENDC_LOGE("zyk outputNum is %zu", outputNum_);
     for (size_t i = 0; i < inputNum_; ++i) {
         auto iter = dependTensorsData_.find(static_cast<int32_t>(i));
         if (iter != dependTensorsData_.end()) {
@@ -128,6 +130,16 @@ std::shared_ptr<KernelRunContextHolder> ContextBuilderImpl::BuildTilingContext()
             tensorValueVecOut[i] = std::move(iter->second);
         }
     }
+
+    size_t validTensorCount = 0;
+    for (size_t i = 0; i < tensorValueVec; ++i) {
+        if (tensorValueVec[i] != nullptr) {
+            validTensorCount++;
+        } else {
+            CXT_ASCENDC_LOGE("zyk tensor idx:%zu is nullptr.", i);
+        }
+    }
+    CXT_ASCENDC_LOGE("zyk validTensorCount is %zu.", validTensorCount);
     tilingCtxBuilder_->InputTensors(tensorVec);
     gert::ContextHolder<gert::TilingContext> ctxHolder = tilingCtxBuilder_->Build();
     if (ctxHolder.GetContext() == nullptr) {
