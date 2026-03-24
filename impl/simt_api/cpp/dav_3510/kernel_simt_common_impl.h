@@ -90,7 +90,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetBlockIdxImpl()
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return block_idx;
 #else
-    return bisheng::cce::simt::get_block_idx();
+    return get_block_idx();
 #endif
 }
 
@@ -99,7 +99,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetBlockNumImpl()
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return block_num;
 #else
-    return bisheng::cce::simt::get_block_num();
+    return get_block_num();
 #endif
 }
 
@@ -375,7 +375,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T FloorIntrinsicsImpl(T x)
     if constexpr (SupportType<T, int32_t, int64_t>()) {
         return x;
     } else if constexpr (SupportType<T, half, float, bfloat16_t>()) {
-        return bisheng::cce::simt::__floorf(x);
+        return __floorf(x);
     }
 }
 
@@ -443,7 +443,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T RoundIntrinsicsImpl(T x)
     if constexpr (SupportType<T, int32_t, int64_t>()) {
         return x;
     } else if constexpr (SupportType<T, half, float, bfloat16_t, hifloat8_t>()) {
-        return bisheng::cce::simt::__roundf(x);
+        return __roundf(x);
     }
 }
 
@@ -530,7 +530,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T RintIntrinsicsImpl(T x)
     if constexpr (SupportType<T, int32_t, int64_t>()) {
         return x;
     } else if constexpr (SupportType<T, half, float, bfloat16_t>()) {
-        return bisheng::cce::simt::__rintf(x);
+        return __rintf(x);
     }
 }
 
@@ -618,7 +618,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T CeilIntrinsicsImpl(T x)
     if constexpr (SupportType<T, int32_t, int64_t>()) {
         return x;
     } else if constexpr (SupportType<T, half, float, bfloat16_t>()) {
-        return bisheng::cce::simt::__ceilf(x);
+        return __ceilf(x);
     }
 }
 
