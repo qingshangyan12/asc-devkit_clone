@@ -16,7 +16,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    batch_matmul_tscm.asc
+    batch_matmul_bias_reuse.asc
 )
 
 target_link_libraries(demo PRIVATE

@@ -1,7 +1,7 @@
-# Matmul算子NZ格式直调样例
+# Matmul NZ格式直调样例
 
 ## 概述
-本样例介绍Matmul API输入矩阵内轴非256B对齐的场景下，在AIV核上使用DataCopyPad实现ND转换NZ格式的单算子。能够避免随路非对齐搬移时效率较低，从而提升算子性能。
+本样例介绍Matmul API输入矩阵内轴非256B对齐的场景下，在AIV核上使用DataCopyPad实现ND转换NZ格式的样例。能够避免随路非对齐搬移时效率较低，从而提升样例性能。
 
 ## 支持的产品
 
@@ -18,38 +18,34 @@
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── nd2nz_utils.h           // 数据ND to NZ格式转换函数
-│   └── matmul_nz.asc              // Ascend C算子实现 & 调用样例
+│   └── matmul_nz.asc           // Ascend C样例实现 & 调用样例
 ```
 
-## 算子描述
+## 样例描述
 
-- 算子功能： 
+- 样例功能： 
 
-  Matmul算子对输入的A、B矩阵做矩阵乘和加bias偏置。如果A矩阵或者B矩阵的内轴非256B对齐（后文简称非对齐），可以在AIV核上使用DataCopyPad等指令，实现ND格式到NZ格式的转换（后文简称ND2NZ），解决随路非对齐搬移效率降低的问题。通常非对齐的矩阵数据量较大时，使用这种转换方式后，再将对齐的NZ数据搬入L1 Buffer的算子有较大的性能提升。
+  Matmul样例对输入的A、B矩阵做矩阵乘和加bias偏置。如果A矩阵或者B矩阵的内轴非256B对齐（后文简称非对齐），可以在AIV核上使用DataCopyPad等指令，实现ND格式到NZ格式的转换（后文简称ND2NZ），解决随路非对齐搬移效率降低的问题。通常非对齐的矩阵数据量较大时，使用这种转换方式后，再将对齐的NZ数据搬入L1 Buffer的样例有较大的性能提升。
   
-- 算子规格： 
+- 样例规格： 
 
-  本样例默认执行的算子shape为：M = 1024, N = 4095, K = 1024。
+  本样例中：M = 1024, N = 4095, K = 1024。
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>
-  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_nz_custom</td></tr>
   </table>
 
-- 算子实现： 
+- 样例实现： 
   - Kernel实现
-    - 计算逻辑：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
     - 具体步骤：
       - 创建Matmul对象。  
         创建Matmul对象时，定义内轴非256B对齐的B矩阵的Format为NZ格式。
@@ -105,7 +101,7 @@
 
 ## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
