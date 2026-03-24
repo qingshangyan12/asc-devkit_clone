@@ -251,7 +251,6 @@ __aicore__ inline void TPipeBase::AuxShareBufStart(uint32_t mode, uint32_t* shar
 #endif
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113));
 namespace Impl {
 namespace Detail {
 template <typename IMPL, typename A, typename B, typename L0cT, class C, const auto &MM_CFG, typename>
@@ -291,7 +290,6 @@ private:
     template <TPosition bufPos> friend class TBuf;
     static constexpr bool isTbufPool = true;
 };
-#endif
 }  // namespace AscendC
 #endif  // ASCENDC_MODULE_TPIPE_BASE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_BASE_H__)
