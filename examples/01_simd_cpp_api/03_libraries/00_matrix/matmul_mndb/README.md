@@ -1,6 +1,6 @@
-# Matmul M/N轴方向的流水并行算子样例
+# Matmul M/N轴方向的流水并行样例样例
 ## 概述
-本样例介绍了调用Matmul高阶API实现Matmul支持M/N轴方向的流水并行单算子。该功能的应用场景为输入矩阵的K很小，但M或N很大的场景，即singleCoreK<=baseK，但singleCoreM远大于baseM或singleCoreN远大于baseN。使能M/N方向流水并行功能可能会带来性能收益。
+本样例介绍了调用Matmul高阶API实现Matmul支持M/N轴方向的流水并行样例。该功能的应用场景为输入矩阵的K很小，但M或N很大的场景，即singleCoreK<=baseK，但singleCoreM远大于baseM或singleCoreN远大于baseN。使能M/N方向流水并行功能可能会带来性能收益。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -15,35 +15,31 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_mndb.asc              // Ascend C算子实现 & 调用样例
+│   └── matmul_mndb.asc         // Ascend C样例实现 & 调用样例
 ```
-## 算子描述
-- 算子功能： 
+## 样例描述
+- 样例功能： 
 
-  MatmulMNDBCustom单算子调用Matmul高阶API对输入的A，B矩阵做矩阵乘和加bias偏置。在定义Matmul对象时，将配置scheduleType等参数的MatmulConfig作为模板参数传入，使能M/N轴方向的流水并行功能。本样例以MDL模板且N方向流水并行为例，对于Norm模板或M方向流水并行功能也可以参考该样例的实现。
+  MatmulMNDBCustom样例调用Matmul高阶API对输入的A，B矩阵做矩阵乘和加bias偏置。在定义Matmul对象时，将配置scheduleType等参数的MatmulConfig作为模板参数传入，使能M/N轴方向的流水并行功能。本样例以MDL模板且N方向流水并行为例，对于Norm模板或M方向流水并行功能也可以参考该样例的实现。
 
-- 算子规格： 
+- 样例规格： 
 
-  本样默认执行的算子shape为：M = 128, N = 7680, K = 16
+  本样例中：M = 128, N = 7680, K = 16
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
-  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">1 * N</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_mndb_custom</td></tr>
   </table>
-- 算子实现
+- 样例实现
   - Kernel实现
-    - 计算逻辑：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该Bias进行偏置。
     - 具体步骤：
       - 创建Matmul对象。  
         创建Matmul对象时，自定义MatmulConfig参数，将其中的MatmulConfigMode设置成CONFIG_MDL，scheduleType参数设置为ScheduleType::OUTER_PRODUCT，iterateOrder参数设置为IterateOrder::ORDER_M，使能MDL模板的N方向流水并行功能，获得自定义地使用MDL模板的Matmul对象。
@@ -80,7 +76,7 @@
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包

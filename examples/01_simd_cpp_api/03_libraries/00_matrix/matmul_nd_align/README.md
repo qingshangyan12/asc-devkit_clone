@@ -1,4 +1,4 @@
-# Matmul算子ND_ALIGN格式输出场景直调样例
+# Matmul ND_ALIGN格式输出场景直调样例
 ## 概述
 本样例介绍调用Matmul API在输入矩阵的N方向非对齐场景下，矩阵乘输出时使能N方向对齐的实现方式。通过设置矩阵乘结果C矩阵为ND_ALIGN格式输出，Matmul API将按照N方向32字节对齐的补齐规则输出C矩阵。
 
@@ -14,36 +14,32 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_nd_align.asc              // Ascend C算子实现 & 调用样例
+│   └── matmul_nd_align.asc              // Ascend C样例实现 & 调用样例
 ```
-## 算子描述
-- 算子功能： 
+## 样例描述
+- 样例功能： 
 
-  Matmul算子调用Matmul API计算时，通过设置C矩阵的Format参数为CubeFormat::ND_ALIGN，使能矩阵乘输出的N方向32字节对齐功能，对输入的A、B矩阵做矩阵乘和加bias偏置。
+  Matmul样例调用Matmul API计算时，通过设置C矩阵的Format参数为CubeFormat::ND_ALIGN，使能矩阵乘输出的N方向32字节对齐功能，对输入的A、B矩阵做矩阵乘和加bias偏置。
 
-- 算子规格： 
+- 样例规格： 
 
-  本样例默认执行的算子shape为：M = 128, N = 7679, K = 128。
+  本样例中：M = 128, N = 7679, K = 128。
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>
-  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_custom</td></tr>
   </table>
 
-- 算子实现： 
+- 样例实现： 
   - Kernel实现
-    - 计算逻辑：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, PAD_N]。PAD_N是N进行向上32字节取整后的值。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
     - 具体步骤：
       - 创建Matmul对象：C矩阵使能ND_ALIGN。
           ```
@@ -73,7 +69,7 @@
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包

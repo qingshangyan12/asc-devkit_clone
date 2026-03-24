@@ -2,7 +2,9 @@
 
 ## 概述
 
-本样例介绍了在Mx数据格式下，左量化系数矩阵GM载入L1时，scaleA的K方向上开启多倍缓存，从而实现带有量化系数的矩阵乘法，即MxMatmul计算场景。
+本样例介绍了在微缩放（Microscaling, MX）数据格式下的量化系数的矩阵乘法使能scale多倍缓存特性的使用方式。
+
+以左量化系数矩阵scaleA为例，scale多倍缓存指在数据从GM搬运到A1（L1 Buffer）的MTE2搬运过程，当GM中数据搬运到A1后，该缓存的数据保持在A1中，同时缓存数据依次与A矩阵中不同的数据完成广播乘法运算。使能scale缓存可以减少MTE2重复搬运，从而提升性能。
 
 ## 支持的产品
 
@@ -16,39 +18,35 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_mx_typepara.asc              // Ascend C算子实现 & 调用样例
+│   └── matmul_mx_typepara.asc  // Ascend C样例实现 & 调用样例
 ```
 
-## 算子描述
+## 样例描述
 
-- 算子功能： 
+- 样例功能： 
 
-  MatmulMxTypeParaCustom算子调用Matmul API计算，scaleA载入L1时在K方向上开启多倍缓存，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。
+  MatmulMxTypeParaCustom样例调用Matmul API计算，scaleA载入L1时在K方向上开启多倍缓存，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。
 
-- 算子规格： 
+- 样例规格： 
 
-  本样例中，算子实现支持的shape为：M = 32，N = 128，K = 128，scaleK为K整除32的结果4。
+  本样例中：M = 32，N = 128，K = 128，scaleK = 4。其中scaleK为K整除32的结果4。
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">MatmulMxTypeParaCustom</td></tr>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulMxTypeParaCustom</td></tr>
   </tr>
-  <tr><td rowspan="6" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">M*K</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">scaleA</td><td align="center">M*scaleK</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">K*N</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">scaleB</td><td align="center">scaleK*N</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">true</td></tr>
-  <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="6" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">scaleA</td><td align="center">[M, scaleK]</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">scaleB</td><td align="center">[scaleK, N]</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">true</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M*N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_mx_typepara_custom</td></tr>
   </table>
-- 算子实现： 
+- 样例实现： 
   - Kernel实现
-    - 计算逻辑：C = (scaleA ⊗ A) * (scaleB ⊗ B) + Bias。“⊗”表示广播乘法。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]，数据类型为fp8_e5m2_t；scaleA为左量化系数矩阵，形状为[M, Ceil(K/64), 2]，数据类型为fp8_e8m0_t；B为右矩阵，形状为[K, N]，数据类型为fp8_e5m2_t；scaleB为右量化系数矩阵，形状为[N, Ceil(K/64), 2]，数据类型为fp8_e8m0_t。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对(scaleA ⊗ A) * (scaleB ⊗ B)结果矩阵的每一行都采用该bias进行偏置。
     - 具体步骤：
       - 创建Matmul对象：使用MatmulTypeWithScale定义A、scaleA、B、scaleB的参数类型信息，包括：内存逻辑位置、数据格式、数据类型、转置信息。
           ```
@@ -97,7 +95,7 @@
 
 ## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
