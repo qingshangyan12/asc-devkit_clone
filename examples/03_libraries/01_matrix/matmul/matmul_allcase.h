@@ -63,11 +63,11 @@ struct MatmulProblemShape {
 enum MatmulMode {
     SINGLE_CORE_BASIC = 0,
     SINGLE_CORE_TILING_UNNORM = 1,
-    SINGLE_CORE_TILING_NORM = 2,
-    MULTI_CORE_BASIC = 3,
-    MULTI_CORE_DOUBLEBUFFER = 4,
-    MULTI_CORE_NORM = 5,
-    MULTI_CORE_MDL = 6,
+    MULTI_CORE_SPLIT_2_12 = 2,
+    MULTI_CORE_SPLIT_4_6 = 3,
+    MULTI_CORE_NORM = 4,
+    MULTI_CORE_MDL = 5,
+    MULTI_CORE_MDL_L1CACHE = 6,
     MULTI_CORE_MDL_CONSTANTS_TILING = 7,
     MULTI_CORE_MDL_CONSTANTS_TILING_UNITFLAG = 8,
     MULTI_CORE_MDL_CONSTANTS_TILING_UNITFLAG_L2CACHE = 9
@@ -406,16 +406,12 @@ inline void SetTilingTypes(TilingType& tilingApi, optiling::TCubeTiling& tilingD
     } else {
         tilingApi.SetFixSplit(64, 64, 64);
     }
-    if constexpr (std::is_same_v<TilingType, matmul_tiling::MultiCoreMatmulTiling>) {
-        tilingApi.SetSingleShape(SINGLE_M, SINGLE_N, K);
-    }
     int64_t res = tilingApi.GetTiling(tilingData);
     if (res == -1) {
         std::cout << "gen tiling failed" << std::endl;
     }
 }
 
-template <int32_t dbL0A = 1, int32_t dbL0B = 1>
 void SetTilingL1(optiling::TCubeTiling& tilingData)
 {
     tilingData.set_depthA1(1);
@@ -424,21 +420,14 @@ void SetTilingL1(optiling::TCubeTiling& tilingData)
     tilingData.set_stepN(1);
     tilingData.set_stepKa(1);
     tilingData.set_stepKb(1);
-    tilingData.set_dbL0A(dbL0A);
-    tilingData.set_dbL0B(dbL0B);
+    tilingData.set_dbL0A(1);
+    tilingData.set_dbL0B(1);
     tilingData.set_dbL0C(1);
 }
+template <bool isTiling = false>
+void GenerateTiling_SingleCore(platform_ascendc::PlatformAscendC* ascendcPlatform, uint8_t* tilingBuf);
 
-void GenerateTiling_SingleCoreBasic(platform_ascendc::PlatformAscendC* ascendcPlatform, uint8_t* tilingBuf);
-
-void GenerateTiling_SingleCoreTilingUnNorm(platform_ascendc::PlatformAscendC* ascendcPlatform, uint8_t* tilingBuf);
-
-void GenerateTiling_SingleCoreTilingNorm(platform_ascendc::PlatformAscendC* ascendcPlatform, uint8_t* tilingBuf);
-
-void GenerateTiling_MultiCoreBasic(platform_ascendc::PlatformAscendC* ascendcPlatform, uint8_t* tilingBuf);
-
-void GenerateTiling_MultiCoreDoubleBuffer(platform_ascendc::PlatformAscendC* ascendcPlatform, uint8_t* tilingBuf);
-
-void GenerateTiling_MultiCore(platform_ascendc::PlatformAscendC* ascendcPlatform, uint8_t* tilingBuf);
+template <bool isSplit = false, bool isTemplate = false, bool isL1Cache = false>
+void GenerateTiling_MultiCore(platform_ascendc::PlatformAscendC *ascendcPlatform, uint8_t *tilingBuf);
 
 #endif
