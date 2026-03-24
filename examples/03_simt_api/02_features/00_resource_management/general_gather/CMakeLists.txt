@@ -16,23 +16,15 @@ project(kernel_samples)
 find_package(ASC REQUIRED)
 enable_language(ASC CXX)
 
-set(EXECUTABLES
-    "gather;gather.asc"
-    "gatherv2;gather_v2.asc"
-)
-
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
-foreach(EXEC_INFO IN LISTS EXECUTABLES)
-    list(GET EXEC_INFO 0 TARGET_NAME)
-    list(GET EXEC_INFO 1 SOURCE_FILE)
-    
+function(add_asc_executable TARGET_NAME SOURCE_FILE)
     add_executable(${TARGET_NAME} ${SOURCE_FILE})
     
+    # ======================================================================================
+    # NPU 编译选项配置
+    #
+    # 说明：
+    #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+    # ======================================================================================
     target_compile_options(${TARGET_NAME} PRIVATE
         $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
         $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:-g -O0>>
@@ -48,7 +40,11 @@ foreach(EXEC_INFO IN LISTS EXECUTABLES)
         --enable-simt
         $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:runtime_camodel>>
         $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:npu_drv>>
-        $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},cpu>:cpudebug_acl_stub>>
-        $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},cpu>:tikicpulib::ascend950pr_9599>>
     )
-endforeach()
+endfunction()
+
+# ======================================================================================
+# 创建可执行文件
+# ======================================================================================
+add_asc_executable(gather gather.asc)
+add_asc_executable(gatherv2 gather_v2.asc)
