@@ -34,12 +34,12 @@
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
   </tr>
   <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">(32, 1024) / (8, 1023) / (32, 1023) / (17, 1023)
+  <tr><td align="center">x</td><td align="center">axis = 0: (8, 1024) / (8, 1022) / (17, 1024) / (17, 1022) axis = 1: (16, 1) / (16, 1) / (20, 1) / (20, 1)
   </td><td align="center">bfloat16_t/int8_t/float/half/int16_t/int32_t</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">(32, 1024) / (8, 1023) / (32, 1023) / (17, 1023)</td><td align="center">bfloat16_t/int8_t/float/half/int16_t/int32_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">axis = 0: (1, 1024) / (1, 1022) / (1, 1024) / (1, 1022) axis = 1: (16, 256) / (16, 255) / (20, 256) / (20, 255)</td><td align="center">bfloat16_t/int8_t/float/half/int16_t/int32_t</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">(32, 1024) / (8, 1023) / (32, 1023) / (17, 1023)</td><td align="center">bfloat16_t/int8_t/float/half/int16_t/int32_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">axis = 0: (8, 1024) / (8, 1022) / (17, 1024) / (17, 1022) axis = 1: (16, 256) / (16, 255) / (20, 256) / (20, 255)</td><td align="center">bfloat16_t/int8_t/float/half/int16_t/int32_t</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_broadcast_custom</td></tr>
   </table>
