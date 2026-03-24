@@ -30,11 +30,11 @@ namespace AscendC {
 __aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::HcommImpl()
 {
     TBuf<TPosition::VECOUT> rdmaInBuf;
-    pipe_.InitBuffer(rdmaInBuf, 32);
+    pipe_.InitBuffer(rdmaInBuf, HCOMM_MEM_BLOCK_SIZE);
     ubLocal_ = rdmaInBuf.Get<uint64_t>();
 
     TBuf<TPosition::VECOUT> rdmaInBuf2;
-    pipe_.InitBuffer(rdmaInBuf2, 32);
+    pipe_.InitBuffer(rdmaInBuf2, HCOMM_MEM_BLOCK_SIZE);
     ubLocalHead_ = rdmaInBuf2.Get<uint32_t>();
 }
 
@@ -129,7 +129,8 @@ __aicore__ inline void HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::PostSend(
     *(__gm__ uint32_t*)(wqeAddr + 20) = channelPtr->remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey;
     *(__gm__ uint64_t*)(wqeAddr + 24) = (uint64_t)dst; // destination VA
 
-    __gm__ uint8_t* sgeAddr = wqeAddr + 32;
+    constexpr uint32_t sgeAddrOffset = 32;
+    __gm__ uint8_t* sgeAddr = wqeAddr + sgeAddrOffset;
     KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend sgeAddr:%p", sgeAddr);
     *(__gm__ uint32_t*)(sgeAddr) = len;
     *(__gm__ uint32_t*)(sgeAddr + sizeof(uint32_t)) = channelPtr->localBufferAddr->pti.rdmaMemProtectionInfo.lkey;
