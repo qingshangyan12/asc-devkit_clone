@@ -1,10 +1,10 @@
-# asc_get_ffts_base_addr
+# asc_get_vf_len
 
 ## 产品支持情况
 
 | 产品 | 是否支持 |
 | :-----------| :------: |
-| Ascend 950PR/Ascend 950DT | √ |
+| <term>Ascend 950PR/Ascend 950DT</term> | √ |
 
 ## 功能说明
 
