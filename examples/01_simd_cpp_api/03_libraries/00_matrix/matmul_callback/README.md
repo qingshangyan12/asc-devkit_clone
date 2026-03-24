@@ -1,6 +1,6 @@
 # Matmul算子模板参数MatmulCallbackFunc直调样例
 ## 概述
-本样例介绍Matmul API模板参数MatmulCallbackFunc的自定义使用方式。MatmulCallbackFunc用于配置左矩阵从Global Memory拷贝到A1、右矩阵从Global Memory拷贝到B1、计算结果从CO1拷贝到Global Memory的自定义函数，本样例以Global Memory自定义搬运到A1的回调函数为例，介绍该模板参数如何使用。
+本样例介绍Matmul API模板参数MatmulCallbackFunc的自定义使用方式。MatmulCallbackFunc用于配置左矩阵从Global Memory拷贝到A1(L1 Buffer)、右矩阵从Global Memory拷贝到B1(L1 Buffer)、计算结果从CO1（L0C Buffer）拷贝到Global Memory的自定义函数，本样例以Global Memory自定义搬运到A1(L1 Buffer)的回调函数为例，介绍该模板参数如何使用。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -19,20 +19,20 @@
 ## 算子描述
 - 算子功能： 
 
-  Matmul算子对输入的A、B矩阵做矩阵乘和加bias偏置。将自定义的左矩阵搬运函数CustomDataCopyInA作为参数传递给Matmul的模板参数MatmulCallbackFunc，实现左矩阵从Global Memory到A1的自定义搬运，本样例以输入A矩阵为例，实现callback回调功能，对于输入B矩阵、输出C矩阵的callback回调功能也可以参考该样例的实现。
+  Matmul算子对输入的A、B矩阵做矩阵乘和加bias偏置。将自定义的左矩阵搬运函数CustomDataCopyInA作为参数传递给Matmul的模板参数MatmulCallbackFunc，实现左矩阵从Global Memory到A1(L1 Buffer)的自定义搬运，本样例以输入A矩阵为例，实现callback回调功能，对于输入B矩阵、输出C矩阵的callback回调功能也可以参考该样例的实现。
 
 - 算子规格： 
-
+  本样例中：M = 2560, N = 128, K = 512。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">(2560, 512)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">(512, 128)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">(128, )</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">(2560, 128)</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_callback_custom</td></tr>
   </table>
@@ -44,7 +44,7 @@
       - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
       - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
     - 具体步骤：
-      - 自定义左矩阵搬运函数CustomDataCopyInA，通过矩阵起始地址、偏移地址等，实现对左矩阵基本块baseM * baseK从Global Memory到逻辑位置A1的搬运。
+      - 自定义左矩阵搬运函数CustomDataCopyInA，通过矩阵起始地址、偏移地址等，实现对左矩阵基本块baseM * baseK从Global Memory到逻辑位置A1(L1 Buffer)的搬运。
       - 将自定义的CustomDataCopyInA传递给模板参数MatmulCallBackFunc，创建Matmul对象。
         ```
         AscendC::Matmul<

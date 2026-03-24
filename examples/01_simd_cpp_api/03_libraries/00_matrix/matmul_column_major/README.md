@@ -27,27 +27,23 @@
 
 - 算子规格：  
 
-    本样例中，算子实现支持的shape为：M = 428, N = 479, K = 528。
+    本样例中：M = 428, N = 479, K = 528。
     <table>
     <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">MatmulColumnMajor</td></tr>
     </tr>
     <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-    <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">COLUMN_MAJOR</td><td align="center">false</td></tr>
-    <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">COLUMN_MAJOR</td><td align="center">false</td></tr>
-    <tr><td align="center">bias</td><td align="center">1 * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+    <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">COLUMN_MAJOR</td><td align="center">false</td></tr>
+    <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">COLUMN_MAJOR</td><td align="center">false</td></tr>
+    <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
     </tr>
     </tr>
-    <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">COLUMN_MAJOR</td><td align="center">-</td></tr>
+    <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">COLUMN_MAJOR</td><td align="center">-</td></tr>
     </tr>
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmulColumnMajorCustom</td></tr>
     </table>
 
 - 算子实现： 
   - Kernel实现
-    - 计算逻辑：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[K, M]；B为右矩阵，形状为[N, K]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[N, M]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一列都采用该bias进行偏置。
     - 具体步骤：
       - 创建Matmul对象：C矩阵的Format设置为COLUMN_MAJOR。
           ```

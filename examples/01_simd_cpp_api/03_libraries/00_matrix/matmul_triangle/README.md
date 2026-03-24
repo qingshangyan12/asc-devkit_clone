@@ -26,7 +26,7 @@
 
 - 算子规格： 
 
-  本样例中，算子实现支持的shape为：M = 2558, N = 2045, K = 128。
+  本样例中：M = 2558, N = 2045, K = 128。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>

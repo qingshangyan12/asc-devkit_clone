@@ -23,29 +23,26 @@
   Matmul算子实现调用IterateAll输出到GM的异步场景矩阵乘计算。
 
 - 算子规格： 
-
+  
+  本样例中：M = 640, N = 1024, K = 512。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">(640, 512)</td><td align="center">half</td><td align="center">ND</td><td align="center">flase</td></tr>
-  <tr><td align="center">b</td><td align="center">(512, 1024)</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">(1024, )</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td><td align="center">flase</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td>
-  <td align="center">(640, 1024)</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_async_iterate_all_custom</td></tr>
   </table>
 
 - 算子实现： 
   - Kernel实现
-    - 计算逻辑：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该Bias进行偏置。
-    - 具体步骤：
+    - 具体步骤如下：
       - 创建Matmul对象，输出C矩阵的TPosition为GM。
         ```
         AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,

@@ -21,34 +21,31 @@
 ## 算子描述
 - 算子功能： 
 
-  Matmul算子调用Matmul API对输入的A B矩阵做矩阵乘和加bias偏置的计算。
+  Matmul算子调用Matmul API对输入的A、B矩阵做矩阵乘和加bias偏置的计算，计算公式为：C = A * B + Bias。
 
 - 算子规格： 
 
+  本样例中：M = 128, N = 2048, K = 1024。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">MatmulCustom</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">(128, 1024)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">(1024, 2048)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">(2048, )</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">(128, 2048)</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_custom</td></tr>
   </table>
 
 - 算子实现： 
   - Kernel实现
-    - 计算逻辑是：Ascend C提供一组Matmul高阶API，方便用户快速实现Matmul矩阵乘法的运算操作。MatMul的计算公式为：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
-    - 实现MatMul矩阵乘运算的具体步骤如下：
+    - 具体步骤如下：
       - 创建Matmul对象。
       - 初始化操作。
-      - 设置左矩阵A、右矩阵B、Bias。
+      - 设置左矩阵A、右矩阵B、偏置矩阵Bias。
       - 完成矩阵乘操作。
       - 结束矩阵乘操作。
 

@@ -19,7 +19,7 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_ibshareB.asc              // Ascend C算子实现 & 调用样例
+│   └── matmul_ibshareB.asc     // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
@@ -30,17 +30,17 @@
 
 - 算子规格： 
 
-  本样例默认执行的算子shape为：M = 64, N = 256, K = 384。
+  本样例中：M = 64, N = 256, K = 384。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">MatmulIBShareBCustom</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_ibshareb_custom</td></tr>
   </table>
@@ -53,10 +53,7 @@
     - A矩阵或B矩阵单独使能IBShare的场景，要求复用的矩阵必须在L1 Buffer上全载。
 
   - Kernel实现
-    - 计算逻辑：Ascend C提供一组Matmul高阶API，方便用户快速实现Matmul矩阵乘法的运算操作。MatMul的计算公式为：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
+
     - 具体步骤：
       - 创建Matmul对象，设置B矩阵的IBShare参数为true。
         - 方式一：默认实现，使用默认的IBShare模板CFG_IBSHARE_NORM创建Matmul对象。

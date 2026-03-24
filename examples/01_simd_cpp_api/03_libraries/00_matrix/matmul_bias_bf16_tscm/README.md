@@ -18,33 +18,39 @@
 - 算子功能： 
 
   本样例中实现的是Bias为bfloat16类型、TSCM输入的Matmul算子。     
-  Matmul算子的数学表达式为：
-  $$
-  C = A * B + Bias
-  $$
-  其中A的形状为[M, K], B的形状为[K, N], C的形状为[M, N], Bias的形状为[1, N]。
 
 - 算子规格： 
 
-  本样例默认执行的算子shape为：M = 3, N = 5, K = 7。
+  本样例中：M = 3, N = 5, K = 7。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">N</td><td align="center">bfloat16</td><td align="center">ND</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">bfloat16</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_bias_bf16_tscm_custom</td></tr>
   </table>
 - 算子实现： 
  
   - Kernel实现  
-    关键步骤：  
-    声明Matmul对象时，指定Bias的TPosition为GM，数据类型为bfloat16。   
+    - 具体步骤如下：
+      - 创建Matmul对象。
+      - 初始化操作。
+      - 设置左矩阵A、右矩阵B、Bias。
+      - 完成矩阵乘操作。
+      - 结束矩阵乘操作。 
+
+  - Tiling实现
+      - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
+      - 获取Tiling参数的流程如下：
+        - 创建一个Tiling对象。
+        - 设置A、B、C、Bias的参数类型信息；M、N、Ka、Kb形状信息等。
+        - 调用GetTiling接口，获取Tiling信息。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

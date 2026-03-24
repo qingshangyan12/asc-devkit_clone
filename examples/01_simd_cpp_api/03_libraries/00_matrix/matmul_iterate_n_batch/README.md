@@ -1,6 +1,6 @@
 # Matmul实现NBatchMatmul单算子直调样例
 ## 概述
-本样例介绍了调用Matmul高阶API实现NBatchMatmul单算子，算子实现nNum次批量处理Matmul计算。
+本样例介绍了调用Matmul高阶API实现NBatchMatmul单算子，算子实现多次批量处理Matmul计算。
 
 ## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -23,17 +23,17 @@
 
 - 算子规格：  
 
-    本样例中，算子实现支持的shape为：M = 32, N = 256, K = 64。
+    本样例中：M = 32, N = 256, K = 64。
     <table>
     <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="6" align="center">BatchMatmulCustom</td></tr>
     </tr>
     <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td><td align="center">layout</td></tr>
-    <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td><td align="center">true</td><td align="center">BSNGD</td></tr>
-    <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td><td align="center">BSNGD</td></tr>
-    <tr><td align="center">bias</td><td align="center">1 * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td><td align="center">-</td></tr>
+    <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">true</td><td align="center">BSNGD</td></tr>
+    <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td><td align="center">BSNGD</td></tr>
+    <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td><td align="center">-</td></tr>
     </tr>
     </tr>
-    <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td><td align="center">BSNGD</td></tr>
+    <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td><td align="center">BSNGD</td></tr>
     </tr>
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="6" align="center">matmul_iterate_n_batch_custom</td></tr>
     </table>
@@ -43,10 +43,6 @@
     - 单Batch Matmul内计算遵循IterateBatch的约束条件；
     - 对于BSNGD、SBNGD、BNGS1S2 Layout格式，输入A、B矩阵多Batch数据总和应该小于L1 Buffer的大小；
   - Kernel实现
-    - 计算逻辑：一次完成nNum * BatchNum个Matmul矩阵乘法的运算，单次Matmul的计算公式为：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
     - 具体步骤：以异步IterateNbatch计算结果直接输出到GM为例。
       - 创建Matmul对象。
         创建Matmul对象时，自定义MatmulConfig参数，将其中的isNBatch参数设置为true，使能多Batch输入和多Batch输出；将其中的isBiasBatch参数设置为false，使能BatchMatmul的Bias复用功能，获得自定义的使用NORM模板的Matmul对象。

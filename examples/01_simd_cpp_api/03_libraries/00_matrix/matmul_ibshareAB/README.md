@@ -19,7 +19,7 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_ibshareAB.asc            // Ascend C算子实现 & 调用样例
+│   └── matmul_ibshareAB.asc    // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
@@ -28,6 +28,10 @@
 
   算子名中ABshare的含义为，Matmul计算的A矩阵与B矩阵同时使能类型信息MatmulType的参数IBShare；当A矩阵和B矩阵同时使能IBShare时，表示L1 Buffer上的A矩阵和B矩阵同时复用。  
   matmul_ibshareAB算子的A矩阵与B矩阵均使能IBShare，不对k列进行切分计算，实现了算子性能提升。结合样例[matmul_no_ibshareAB](../matmul_no_ibshareAB)，对比两个算子的运行时间，计算matmul_ibshareAB算子的性能提升百分比。
+  
+  matmul_ibshareAB算子代码数据处理说明图示(A矩阵和B矩阵不切分处理)：  
+  ![alt text](./pictures/matmul_ABshare.png)  
+
 
 - 算子规格： 
 
@@ -46,19 +50,20 @@
 
 - 算子实现： 
 
-  本样例中实现的是[m, n, k]固定为[128, 256, 384]的matmul_ibshareAB算子。
-
   - Kernel实现  
-    matmul_ibshareAB算子的数学表达式为：
-    ```
-    C = A * B
-    ```
-    - A、B为源操作数，A为左矩阵，形状为\[M, K]；B为右矩阵，形状为\[K, N]。
-    - C为目的操作数，存放矩阵乘结果的矩阵，形状为\[M, N]。
-    其中A的形状为[128, 384]，B的形状为[384, 256]，C的形状为[128, 256]。
-
-    matmul_ibshareAB算子代码数据处理说明图示(A矩阵和B矩阵不切分处理)：  
-    ![alt text](./pictures/matmul_ABshare.png)  
+    - 具体步骤：
+      - 创建Matmul对象：A、B矩阵IBSHARE参数为true。
+          ```
+          constexpr bool isABshare = true;
+          Matmul<
+              MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, false, LayoutMode::NONE, isABshare>,
+              MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, isABshare>,
+              MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, CType>> matmulObj;
+          ```
+      - 初始化操作。
+      - 设置左矩阵A、右矩阵B、Bias。
+      - 完成矩阵乘操作。
+      - 结束矩阵乘操作。
 
 
   - 调用实现  

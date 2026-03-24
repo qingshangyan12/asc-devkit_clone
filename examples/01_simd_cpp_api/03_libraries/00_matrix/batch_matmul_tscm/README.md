@@ -1,6 +1,6 @@
 # Batch Matmul算子多batch L1输入场景样例
 ## 概述
-本样例介绍了调用Matmul高阶API实现左矩阵为L1输入的BatchMatmul单算子，即算子中自定义TSCM输入。
+本样例介绍了调用Matmul高阶API实现左矩阵位置为L1 Buffer的BatchMatmul单算子，即算子中自定义TSCM输入。
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -14,39 +14,35 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── batch_matmul_tscm.asc              // Ascend C算子实现 & 调用样例
+│   └── batch_matmul_tscm.asc   // Ascend C算子实现 & 调用样例
 ```
 ## 算子描述
 - 算子功能： 
 
-     BatchMatmul单算子，批量处理Matmul计算，每次Matmul计算对输入的A、B矩阵做矩阵乘和加bias偏置。该算子中A矩阵使用TSCM输入。
+     BatchMatmul单算子，批量处理3组Matmul计算，每次Matmul计算对输入的A、B矩阵做矩阵乘和加bias偏置。本算子中A矩阵使用TSCM输入。
 
 - 算子规格： 
 
-  本样默认执行的算子shape为：M = 32, N = 256, K = 64, BatchNum = 3。
+  本样例中：BatchNum = 3, M = 32, N = 256, K = 64。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K * BatchNum</td><td align="center">float16</td><td align="center">NZ</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N * BatchNum</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">a</td><td align="center">[BatchNum, M, K]</td><td align="center">float16</td><td align="center">NZ</td></tr>
+  <tr><td align="center">b</td><td align="center">[BatchNum, K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
   </tr>
   <tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N * BatchNum</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">[BatchNum, M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">batch_matmul_tscm_custom</td></tr>
   </table>
 - 算子实现
   - 约束条件
-    - 在BatchMatmul的输入矩阵位置为L1时，输入输出的Layout只支持NORMAL。
+    - 在BatchMatmul的输入矩阵位置为L1 Buffer时，输入输出的Layout只支持NORMAL。
     - TSCM输入的矩阵必须能在L1 Buffer上全载，且L1 Buffer上的数据应当为NZ格式。
 
   - Kernel实现
-    - 一次完成BatchNum个Matmul矩阵乘法的运算。单次MatMul的计算公式为：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
-    - 具体步骤：
+    - 具体步骤如下：
       - 创建Matmul对象。
         创建Matmul对象时，将A矩阵MatmulType的Position设为TSCM，Format设为NZ。
           ```
@@ -59,7 +55,7 @@
           constexpr MatmulConfig CFG_MM = GetMMConfig<configMode>(batchParams);
           AscendC::Matmul<A_TYPE， B_TYPE，C_TYPE， BIAS_TYPE， CFG_MM> matmulObj;
           ```
-      - 多batch矩阵A从GM到L1的搬运，矩阵A为TSCM输入, 矩阵B和bias（如果有）从GM搬入。
+      - 多batch矩阵A从GM到L1 Buffer的搬运，矩阵A为TSCM输入, 矩阵B和bias（如果有）从GM搬入。
           ```
           uint32_t BatchNum = 3;
           AscendC::TSCM<AscendC::TPosition::GM, 1> scm;

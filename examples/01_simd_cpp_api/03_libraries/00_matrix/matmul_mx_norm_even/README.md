@@ -2,7 +2,8 @@
 
 ## 概述
 
-本样例介绍了在Mx数据格式下，Scale的K方向为偶数的带有量化系数的矩阵乘法，即MxMatmul计算场景。
+本样例介绍了在微缩放（Microscaling, MX）数据格式下的带有量化系数的矩阵乘法，即MxMatmul计算场景。
+计算公式为：C = (scaleA ⊗ A) * (scaleB ⊗ B) + Bias。“⊗”表示广播乘法，具体描述参考[MxMatmul场景]()
 
 ## 支持的产品
 
@@ -24,23 +25,23 @@
 
 - 算子功能： 
 
-  MatmulMxNormEvenCustom算子调用Matmul API计算时，Scale的K方向为偶数，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。
+  MatmulMxNormEvenCustom算子调用Matmul API计算时，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。本样例仅支持Ceil(K, 32)的值为偶数的场景，奇数的场景请参考[matmul_mx_norm_odd](../matmul_mx_norm_odd/)。
 
 - 算子规格： 
 
-  本样例中，算子实现支持的shape为：M = 32，N = 128，K = 128，scaleK为K整除32的结果4。
+  本样例中：M = 32，N = 128，K = 128，scaleK = 4。其中scaleK为K整除32的结果4。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">MatmulMxNormEvenCustom</td></tr>
   </tr>
   <tr><td rowspan="6" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">M*K</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">scaleA</td><td align="center">M*scaleK</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">K*N</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">scaleB</td><td align="center">scaleK*N</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">scaleA</td><td align="center">[M, scaleK]</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">scaleB</td><td align="center">[scaleK, N]</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M*N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_mx_norm_even_custom</td></tr>
   </table>

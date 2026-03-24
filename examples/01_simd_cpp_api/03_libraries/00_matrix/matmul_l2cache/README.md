@@ -2,6 +2,8 @@
 ## 概述
 本样例介绍调用Matmul API实现L2 Cache切分的功能的Matmul单算子。
 
+Matmul算子M方向或者N方向切分输入的矩阵，将矩阵切分成多块数据，整体按数据切分的块数，分多次进行计算。每次计算前，第一个核第一次访问Global Memory上的矩阵时，会将切分后的一块矩阵数据加载到L2 Cache，其它核或第一个核后续数据访问都可以命中L2 Cache，以提高算子性能。
+
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -16,38 +18,32 @@
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 |   ├── l2_cache_optimizer.h    // L2Cache切分算法实现函数
-│   └── matmul_l2cache.asc              // Ascend C算子实现 & 调用样例
+│   └── matmul_l2cache.asc      // Ascend C算子实现 & 调用样例
 ```
 ## 算子描述
 - 算子功能： 
-
-  Matmul算子M方向或者N方向切分输入的矩阵，将矩阵切分成多块数据，整体按数据切分的块数，分多次进行计算。每次计算前，第一个核第一次访问Global Memory上的矩阵时，会将切分后的一块矩阵数据加载到L2 Cache，其它核或第一个核后续数据访问都可以命中L2 Cache，以提高算子性能。   
 
   本样例以AI处理器的L2 Cache大小192M为例，根据算子的输入、输出shape，计算算子输入和输出的总数据量为((30720 * 4096) + (4096 * 1024) + (1024) + (30720 * 1024)) * 2 = 322963456字节（约308M），大于L2 Cache（192M），无法保证计算前读取的数据能够命中L2 Cache，而Global Memory带宽低于L2 Cache，且两者之间差距较大，搬运数据成为算子运行的性能瓶颈。因此需要将输入数据切分成多块，使得每个数据块的计算数据量（包含输入和输出），能够命中L2 Cache。本样例提供了L2CacheOptimizer类，其中GetTileNum接口用于自动根据左右矩阵的Shape获取左右矩阵总L2切分份数，GetBlockShape接口获取L2切分后M、N、K轴的长度，GetBlockCoord接口返回对应切块的位置坐标，即M、N、K方向相对矩阵起始位置的偏移。
 
 - 算子规格： 
 
-  本样例中，算子实现支持的shape为：M = 30720, N = 1024, K = 4096。
+  本样例中：M = 30720, N = 1024, K = 4096。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">(30720, 4096)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">(4096, 1024)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">(1024, )</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td>
-  <td align="center">(30720, 1024)</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_l2cache_custom</td></tr>
   </table>
 - 算子实现： 
   - Kernel实现
-    - 计算逻辑：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该Bias进行偏置。
     - 具体步骤：
       - 创建Matmul对象。
       - 初始化操作。

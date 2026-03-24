@@ -15,7 +15,7 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_constant.asc              // Ascend C算子实现 & 调用样例
+│   └── matmul_constant.asc     // Ascend C算子实现 & 调用样例
 ```
 ## 算子描述
 - 算子功能： 
@@ -24,27 +24,23 @@
 
 - 算子规格： 
 
-  本样默认执行的算子shape为：M = 128, N = 30720, K = 64。
+  本样例中：M = 128, N = 30720, K = 64。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">1 * N</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_constant_custom</td></tr>
   </table>
 - 算子实现
 
   - Kernel实现
-    - 计算逻辑：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
     - 具体步骤：
       - 配置常量化的MatmulShapeParams，获取自定义MatmulConfig。
         ```

@@ -4,7 +4,7 @@
 
 本样例介绍了使用Matmul高阶API中basicBlock模版实现矩阵乘算子。
 
-> BasicBlock模板的特点：适用于无尾块的特定场景(矩阵的shape可以被base块整除)，可以固定base块大小（baseM/baseN/baseK），减少矩阵搬运和计算过程中的Scalar开销。
+> 适用于无尾块的特定场景(矩阵的shape可以被base块整除)，可以固定base块大小（baseM/baseN/baseK），减少矩阵搬运和计算过程中的Scalar开销。
 
 ## 支持的产品
 
@@ -26,37 +26,38 @@
 
 - 算子功能： 
 
-  basicBlockMatmul单算子，对输入的A B矩阵做矩阵乘。
+  basicBlockMatmul单算子，调用Matmul API对输入的A、B矩阵做矩阵乘。
 
 - 算子规格： 
 
-  在核函数直调样例中，算子实现支持的shape为：M = 512, N = 1024, K = 512。
+  本样例中：M = 512, N = 1024, K = 512。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">basicBlockMatmul</td></tr>
   </tr>
   <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td><td align="center">true</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">true</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">basic_block_matmul_custom</td></tr>
   </table>
 
 - 算子实现： 
- 
-  - Kernel实现
-    - 计算逻辑是：Ascend C提供一组Matmul高阶API，方便用户快速实现Matmul矩阵乘法的运算操作。Matmul的计算公式为：C = A * B。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-    - 实现MatMul矩阵乘运算的具体步骤如下：
-      - 调用GetBasicConfig接口，创建MatmulConfig对象MM_CFG。
-      - 调用Matmul接口创建Matmul对象，传入MM_CFG。
-      - 调用REGIST_MATMUL_OBJ接口，完成初始化操作。
-      - 调用SetTensorA、SetTensorB、SetBias接口，设置左矩阵A、右矩阵B、Bias。
-      - 调用Iterate/IterateAll接口，完成矩阵乘操作。
-      - 调用End接口，结束矩阵乘操作。
+    - 创建Matmul对象。  
+      创建MatmulConfig对象，调用GetBasicConfig接口配置BasicBlock模板，创建Matmul对象。
+      ```
+      constexpr MatmulConfig MM_CFG = GetBasicConfig(128, 256, 64); // baseM, baseN, baseK
+      AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType, true>,
+                      AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>,
+                      AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
+                      AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, MM_CFG>;
+          matmulObj;
+      ```
+    - 初始化操作。
+    - 完成矩阵乘操作。
+    - 结束矩阵乘操作。
 
   - Tiling实现
       - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
