@@ -16,6 +16,7 @@
 #include <mutex>
 #include <dlfcn.h>
 #include <csignal>
+#include <algorithm>
 #include "securec.h"
 #include "platform/platform_info.h"
 #include "platform_ascendc_log.h"
@@ -40,32 +41,33 @@ const static std::string LABEL_CORE_CNT_VEC = "vector_core_cnt";
 const static std::string LABEL_CORE_CNT_AICORE = "ai_core_cnt";
 const static std::string NPU_ARCH = "NpuArch";
 
+static const std::map<std::string, SocVersion> convertMap {
+    {"Ascend310P", SocVersion::ASCEND310P},
+    {"Ascend910", SocVersion::ASCEND910},
+    {"Ascend910B", SocVersion::ASCEND910B},
+    {"Ascend910_93", SocVersion::ASCEND910B},
+    {"Ascend310B", SocVersion::ASCEND310B},
+    {"Ascend950", SocVersion::ASCEND950},
+    {"AS31XM1", SocVersion::AS31XM1},
+    {"Ascend031", SocVersion::ASCEND031},
+    {"Ascend035", SocVersion::ASCEND035},
+    {"Ascend310", SocVersion::ASCEND310},
+    {"Ascend610", SocVersion::ASCEND610},
+    {"Ascend610Lite", SocVersion::ASCEND610Lite},
+    {"BS9SX1A", SocVersion::BS9SX1A},
+    {"BS9SX2A", SocVersion::BS9SX2A},
+    {"Hi3796CV300CS", SocVersion::HI3796CV300CS},
+    {"Hi3796CV300ES", SocVersion::HI3796CV300ES},
+    {"MC61AM21A", SocVersion::MC61AM21A},
+    {"MC62CM12A", SocVersion::MC62CM12A},
+    {"SD3403", SocVersion::SD3403},
+    {"KirinX90", SocVersion::KIRINX90},
+    {"Kirin9030", SocVersion::KIRIN9030},
+    {"MC32DM11A", SocVersion::MC32DM11A},
+};
 
 static inline SocVersion SocVersionStrMap(const char *socVersionStr)
 {
-    static std::map<std::string, SocVersion> convertMap = {
-        {"Ascend310P", SocVersion::ASCEND310P},
-        {"Ascend910", SocVersion::ASCEND910},
-        {"Ascend910B", SocVersion::ASCEND910B},
-        {"Ascend910_93", SocVersion::ASCEND910B},
-        {"Ascend310B", SocVersion::ASCEND310B},
-        {"Ascend950", SocVersion::ASCEND950},
-        {"AS31XM1", SocVersion::AS31XM1},
-        {"Ascend031", SocVersion::ASCEND031},
-        {"Ascend035", SocVersion::ASCEND035},
-        {"Ascend310", SocVersion::ASCEND310},
-        {"Ascend610", SocVersion::ASCEND610},
-        {"Ascend610Lite", SocVersion::ASCEND610Lite},
-        {"BS9SX1A", SocVersion::BS9SX1A},
-        {"BS9SX2A", SocVersion::BS9SX2A},
-        {"Hi3796CV300CS", SocVersion::HI3796CV300CS},
-        {"Hi3796CV300ES", SocVersion::HI3796CV300ES},
-        {"MC61AM21A", SocVersion::MC61AM21A},
-        {"MC62CM12A", SocVersion::MC62CM12A},
-        {"SD3403", SocVersion::SD3403},
-        {"KirinX90", SocVersion::KIRINX90},
-        {"Kirin9030", SocVersion::KIRIN9030}
-    };
     const auto &iter = convertMap.find(socVersionStr);
     if (iter != convertMap.end()) {
         return iter->second;
@@ -74,11 +76,35 @@ static inline SocVersion SocVersionStrMap(const char *socVersionStr)
     return SocVersion::RESERVED_VERSION;
 }
 
+uint32_t PlatformAscendC::GetVecRegLen(void) const 
+{
+    std::string sizeStr; 
+    bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "vector_reg_width", sizeStr);
+    if(!ret){
+        PF_LOGE("platform do not support get vector_reg_width size !");
+        return 0u;
+    }
+    bool isDecimalNumber = !sizeStr.empty() && std::all_of(sizeStr.begin(), sizeStr.end(), [](unsigned char ch){ return std::isdigit(ch); });
+    if(isDecimalNumber){
+        uint64_t size = std::stoull(sizeStr);
+        if(size > UINT32_MAX){
+            PF_LOGE("The bit width exceeds the maximum value of uint32!");
+            return 0u;
+        }
+        if(size == 0){
+            PF_LOGE("The bit width equals zero!");
+        }
+        return static_cast<uint32_t>(size);
+    }else{
+        PF_LOGE("The sizeStr is invalid.");
+        return 0u;
+    }
+}
+
 static inline uint32_t GetCoreNumByType(fe::PlatFormInfos *platformInfo, bool isAiv)
 {
     std::string key;
     std::string val;
-    PF_LOGE("GetCoreNumByType: calling GetPlatformResWithLock for LABEL_SPLIT_KEY");
     bool ret = platformInfo->GetPlatformResWithLock(LABEL_SOC_INFO, LABEL_SPLIT_KEY, val);
     if (!ret) {
         PF_LOGE("get platform failed, val is %s", val.c_str());
@@ -101,7 +127,6 @@ uint32_t PlatformAscendC::GetCoreNumVector(void) const
 {
     if (GetSocVersion() == SocVersion::ASCEND310P) {
         std::string val;
-        PF_LOGE("======= is GetCoreNumVector");
         bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock(LABEL_SOC_INFO, LABEL_CORE_CNT_VEC, val);
         if (!ret) {
             PF_LOGE("get platform vector num failed, val is %s", val.c_str());
@@ -142,7 +167,6 @@ void PlatformAscendC::GetCoreMemSize(const CoreMemType &memType, uint64_t &size)
 
     if (memType == CoreMemType::FB) {
         std::string sizeStr;
-        PF_LOGE("======= is GetCoreMemSize");
         bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "fb0_size", sizeStr);
         if (!ret) {
             PF_LOGE("platform do not support get CoreMemType::FB size !");
@@ -153,7 +177,6 @@ void PlatformAscendC::GetCoreMemSize(const CoreMemType &memType, uint64_t &size)
  
     if (memType == CoreMemType::BT) {
         std::string sizeStr;
-        PF_LOGE("======= is GetCoreMemSize & memType == CoreMemType::BT");
         bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "bt_size", sizeStr);
         if (!ret) {
             PF_LOGE("platform do not support get CoreMemType::BT size !");
@@ -181,7 +204,6 @@ void PlatformAscendC::ReserveLocalMemory(ReservedSize size)
 SocVersion PlatformAscendC::GetSocVersion(void) const
 {
     std::string socVerStr;
-    PF_LOGE("======= is GetSocVersion");
     bool ret = GetPlatFormInfo()->GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVerStr);
     if (!ret) {
         PF_LOGE("platform do not support get socVersion!");
@@ -193,7 +215,6 @@ SocVersion PlatformAscendC::GetSocVersion(void) const
 NpuArch PlatformAscendC::GetCurNpuArch(void) const
 {
     std::string npuArchStr;
-    PF_LOGE("======= is GetCurNpuArch");
     bool ret = GetPlatFormInfo()->GetPlatformResWithLock(LABEL_VERSION, NPU_ARCH, npuArchStr);
     if (!ret) {
         PF_LOGE("platform do not support get npu arch!");
@@ -225,7 +246,7 @@ fe::PlatFormInfos* PlatformAscendC::GetPlatFormInfo(void) const
     return this->platformInfo_;
 }
 
-uint32_t PlatformAscendC::CalcTschBlockDim(uint32_t sliceNum, uint32_t aicCoreNum, uint32_t aivCoreNum) const
+uint32_t PlatformAscendC::CalcTschNumBlocks(uint32_t sliceNum, uint32_t aicCoreNum, uint32_t aivCoreNum) const
 {
     if (aicCoreNum == 0 || aivCoreNum == 0 || aicCoreNum > aivCoreNum) {
         return sliceNum;
@@ -234,11 +255,18 @@ uint32_t PlatformAscendC::CalcTschBlockDim(uint32_t sliceNum, uint32_t aicCoreNu
     uint32_t numBlocks = (sliceNum + (ration - 1)) / ration;
     // in mix case: 910B1(ration = 2), numBlocks should not be greater than physical aic core num
     if ((ration == MIX_AIC_AIV_RATION_910B1) && (numBlocks > aicCoreNum)) {
-        PF_LOGE("CalcTschBlockDim failed, calc numBlocks %u should not be greater than aicCoreNum %u", numBlocks,
+        PF_LOGE("CalcTschNumBlocks failed, calc numBlocks %u should not be greater than aicCoreNum %u", numBlocks,
             aicCoreNum);
         return 0;
     }
     return numBlocks;
+}
+
+uint32_t PlatformAscendC::CalcTschBlockDim(uint32_t sliceNum, uint32_t aicCoreNum, uint32_t aivCoreNum) const
+{
+    PF_LOGW("CalcTschBlockDim has been deprecated and will be removed in the next version. "
+             "Please do not use it!");
+    return this->CalcTschNumBlocks(sliceNum, aicCoreNum, aivCoreNum);
 }
 
 uint32_t PlatformAscendC::GetLibApiWorkSpaceSize(void) const
@@ -345,7 +373,10 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Ascend950DT_9578", "Ascend950"}, // ascend950_list
     {"MC62CM12AA", "MC62CM12A"},
     {"KirinX90", "KirinX90"},
-    {"Kirin9030", "Kirin9030"}
+    {"Kirin9030", "Kirin9030"},
+    {"MC32DM11AA", "MC32DM11A"},
+    {"MC32DM11AB", "MC32DM11A"},
+    {"MC32DM11AC", "MC32DM11A"},
 };
 
 const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = {
@@ -356,7 +387,8 @@ const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = 
     {"Ascend950", "3510"},
     {"MC62CM12A", "5102"},
     {"KirinX90", "3003"},
-    {"Kirin9030", "3113"}
+    {"Kirin9030", "3113"},
+    {"MC32DM11A", "5102"},
 };
 
 bool SwitchIntoShortSocVersion(const char *socVersionStr, std::string &shortSocVersion)

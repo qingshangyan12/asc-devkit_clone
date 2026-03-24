@@ -12,6 +12,11 @@
  * \file kernel_utils.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_utils_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_H__
+#endif
 #ifndef ASCENDC_MODULE_UTILS_H
 #define ASCENDC_MODULE_UTILS_H
 #include "utils/kernel_utils_macros.h"
@@ -35,12 +40,12 @@
 
 inline __gm__ void* g_sysFftsAddr = nullptr;
 namespace AscendC {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 namespace Internal {
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
 }
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 namespace Internal {
 // global variables g_cmpMaskLow and g_cmpMaskHigh are used to simulate the register CMPMASK in 1971
 // both of them are 64 bits and they are used to store the result of API Compare
@@ -254,3 +259,7 @@ enum class TimeStampId : uint32_t {
 };
 } // namespace AscendC
 #endif // ASCENDC_MODULE_UTILS_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_H__
+#endif

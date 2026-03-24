@@ -12,19 +12,25 @@
  * \file kernel_operator_round_intf.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ROUND_H__
+#endif
+
 #ifndef LIB_MATH_ROUND_H
 #define LIB_MATH_ROUND_H
 #include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 #include "../../../impl/adv_api/detail/math/round/round_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/round/round_c310_impl.h"
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 namespace AscendC {
 #pragma begin_pipe(V)
 /*!
- * \brief This function implements the “round half to even” to break ties when a number is equidistant from two integers
+ * \brief This function implements the “round half to even�?to break ties when a number is equidistant from two integers
  * (e.g. round(2.5) is 2). For details about the interface description, see
  * https://pytorch.org/docs/stable/generated/torch.round.html.
  *
@@ -66,3 +72,8 @@ __aicore__ inline void Round(const LocalTensor<T>& dstTensor, const LocalTensor<
 } // namespace AscendC
 #endif
 #endif // LIB_MATH_ROUND_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ROUND_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ROUND_H__
+#endif

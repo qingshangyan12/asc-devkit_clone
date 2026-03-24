@@ -12,6 +12,13 @@
  * \file confusion_transpose_common_impl.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/transpose/confusion_transpose/confusion_transpose_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/transpose/transdata.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_COMMON_IMPL_H__
+#endif
+
 #ifndef IMPL_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_COMMON_IMPL_H
 #define IMPL_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_COMMON_IMPL_H
 
@@ -23,13 +30,13 @@
 #include "confusion_transpose_v200_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "confusion_transpose_v220_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "confusion_transpose_v220_impl.h"
 #include "confusion_transpose_c310_impl.h"
 #endif
 
 namespace AscendC {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 template <typename T>
 __aicore__ inline void CheckCompatibleTransposeTypeDataType() {
     ASCENDC_ASSERT(
@@ -72,7 +79,7 @@ __aicore__ inline void ConfusionTransposeImpl(const LocalTensor<T>& dstTensor, c
     } else if (transposeType == TransposeType::TRANSPOSE_ND2ND_ONLY) {
         CheckCompatibleTransposeTypeDataType<T>();
         ConfusionTransposeOnly(dstTensor, srcTensor, reinterpret_cast<ConfusionTransposeOnlyTiling &>(tiling));
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     } else if (transposeType == TransposeType::TRANSPOSE_ND2ND_021) {
         ConfusionTranspose021(dstTensor, srcTensor, reinterpret_cast<ConfusionTranspose021Tiling &>(tiling));
     } else if (transposeType == TransposeType::TRANSPOSE_ND2ND_102) {
@@ -95,7 +102,7 @@ __aicore__ inline void ConfusionTransposeImpl(const LocalTensor<T>& dstTensor, c
     CHECK_FUNC_HIGHLEVEL_API(ConfusionTranspose, (T), (dstTensor, srcTensor, sharedTmpBuffer, transposeType, tiling));
     /*
     scene 1:{ shape:[B, A1, A3 / 16, A2 / 16, 16, 16], format:"NZ"} -->{ shape:[B, A2, A1, A3], ori_shape:[B, A2, A1,
-    A3], format:"ND"} scene 2： { shape:[B, A1, A3 / 16, A2 / 16, 16, 16], format:"NZ"}-->{ shape:[B, A2, A3 / 16, A1 /
+    A3], format:"ND"} scene 2：{ shape:[B, A1, A3 / 16, A2 / 16, 16, 16], format:"NZ"}-->{ shape:[B, A2, A3 / 16, A1 /
     16, 16, 16], origin_shape:[B, A2, A1, A3], format:"NZ"}
     */
     if (transposeType == TransposeType::TRANSPOSE_NZ2ND_0213 || transposeType == TransposeType::TRANSPOSE_NZ2NZ_0213) {
@@ -156,3 +163,8 @@ __aicore__ inline void ConfusionTranspose(const LocalTensor<T>& dstTensor, const
 }
 } // namespace AscendC
 #endif // IMPL_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_COMMON_IMPL_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_COMMON_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_COMMON_IMPL_H__
+#endif

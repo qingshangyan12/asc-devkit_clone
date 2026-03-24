@@ -12,16 +12,21 @@
  * \file kernel_operator_cube_group_intf.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CUBE_GROUP_INTF_H__
+#endif
+
 
 #ifndef ASCENDC_MODULE_OPERATOR_CUBE_GROUP_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_CUBE_GROUP_INTERFACE_H
 
 #include "kernel_macros.h"
 #include "utils/kernel_utils_macros.h"
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
 #if __NPU_ARCH__ == 2201
 #include "dav_c220/core_mng/roc/kernel_operator_cube_group_info.h"
-#elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "dav_c310/core_mng/roc/kernel_operator_cube_group_info.h"
 #endif
 
@@ -158,4 +163,9 @@ __aicore__ inline CubeResGroupHandle<CubeMsgType> CreateCubeResGroup(
 }  // namespace AscendC
 #endif
 
+#endif
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CUBE_GROUP_INTF_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CUBE_GROUP_INTF_H__
 #endif

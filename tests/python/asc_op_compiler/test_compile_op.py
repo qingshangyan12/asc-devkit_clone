@@ -32,6 +32,7 @@ from asc_op_compile_base.common.platform import set_current_compile_soc_info, ge
 from asc_op_compile_base.common import register
 from asc_op_compile_base.common import buildcfg
 from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storage
+from asc_op_compile_base.common.context import get_context
 
 def SetCurrentSocInfo(soc: str):
     set_current_compile_soc_info(soc)
@@ -148,8 +149,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -196,8 +197,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -234,11 +235,8 @@ class TestCompileOp(unittest.TestCase):
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
                 with mock.patch.object(ascendc_common_utilityop_module, 'is_enable_ascendc_cov', return_value=True):
-                    with mock.patch.object(compile_op_module, 'set_dump_assert_flag') as mock_compile:
-                        compile_op_with_customized_config(cce_file, origin_func_name, op_info, compile_options, code_channel,
-                                    op_compile_option, extend_options, customized_config)
-                        args, kwargs = mock_compile.call_args
-                        self.assertEqual(args[0].tiling_key_list, ['1'])
+                    compile_op_with_customized_config(cce_file, origin_func_name, op_info, compile_options, code_channel,
+                                op_compile_option, extend_options, customized_config)
 
         binary_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.o')
         json_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.json')
@@ -271,8 +269,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -320,8 +318,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -380,8 +378,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -465,8 +463,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -938,8 +936,8 @@ class TestCompileOp(unittest.TestCase):
                     '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                     '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                     '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                    '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                    '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                    '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                    '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                     '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                     '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                     '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1083,8 +1081,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1150,12 +1148,8 @@ class TestCompileOp(unittest.TestCase):
         compile_info.dump_info["dump_type"]= "assert"
         set_dump_assert_flag(compile_info)
         assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
-        handle_dump_options(compile_info, compile_option_tuple)
         assert '-DASCENDC_DUMP=0' not in compile_option_tuple.compile_options
-        assert '-DASCENDC_DUMP_ASSERT_ONLY' in compile_option_tuple.compile_options
-        global_var_storage.set_variable("ascendc_dump_assert_only", True)
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple(compile_options, []))
-        global_var_storage.set_variable("ascendc_dump_assert_only", False)
         assert os.path.exists(
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
@@ -1329,8 +1323,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1465,8 +1459,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1581,8 +1575,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1694,8 +1688,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1801,8 +1795,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1922,8 +1916,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -2062,8 +2056,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -2140,8 +2134,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -2349,8 +2343,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -2527,8 +2521,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -2868,8 +2862,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -3154,8 +3148,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -3785,8 +3779,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -3844,8 +3838,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -3854,6 +3848,7 @@ Contents of section
                            '-DHIGH_PERFORMANCE=1', '-DDETERMINISTIC_MODE=1']
         op_compile_option = '{}'
 
+        
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
                 compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
@@ -3922,8 +3917,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -4304,9 +4299,11 @@ void add_custom();
             file.write(context)
 
         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-            kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
-            self.assertEqual(kernel_info.tiling_key_kernel_type["17435146"], KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2)
-            self.assertEqual(kernel_info.no_set_kernel_type, False)
+            with asc_op_compile_base.common.context.op_context.OpContext():
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = ''):
+                    kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+                    self.assertEqual(kernel_info.tiling_key_kernel_type["17435146"], KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2)
+                    self.assertEqual(kernel_info.no_set_kernel_type, False)
         
         with open(src_file, "w") as file:
             context = """
@@ -4317,8 +4314,10 @@ void add_custom();
             file.write(context)
 
         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-            kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
-            self.assertEqual(kernel_info.no_set_kernel_type, True)
+            with asc_op_compile_base.common.context.op_context.OpContext():
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = ''):
+                    kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+                    self.assertEqual(kernel_info.no_set_kernel_type, True)
         
         with open(src_file, "w") as file:
             context = """
@@ -4329,10 +4328,12 @@ void add_custom();
             file.write(context)
 
         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-            try:
-                KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
-            except Exception as e:
-                assert str(e) == "must provide default kernel type", f"msg is :{e}"
+            with asc_op_compile_base.common.context.op_context.OpContext():
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = ''):
+                    try:
+                        KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+                    except Exception as e:
+                        assert str(e) == "must provide default kernel type", f"msg is :{e}"
 
 
     def test_infer_info_from_ifile_key_none_type_exists(self):
@@ -4371,76 +4372,6 @@ void add_custom();
             kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
             ascendc_tiling_no_register = global_var_storage.get_variable("ascendc_tiling_no_register")
             self.assertEqual(ascendc_tiling_no_register, True)
-
-
-    def test_get_dump_info_from_i_file_null(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR >= 1";
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        compile_op_module.global_var_storage.set_variable("ascendc_time_stamp_compile_options", True)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_type"],"timestamp")
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
-    def test_get_dump_info_from_i_file(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_feature_for_compile_printf = 1";
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        compile_op_module.global_var_storage.set_variable("ascendc_time_stamp_compile_options", True)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_type"],"printf,timestamp")
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
-    def test_get_dump_info_from_i_file_1(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_feature_for_compile_printf = 1;
-auto __enable_feature_for_compile_assert = 1;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        compile_op_module.global_var_storage.set_variable("ascendc_time_stamp_compile_options", True)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_type"],"printf,assert,timestamp")
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
-    def test_get_dump_info_from_i_file_2(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_feature_for_compile_assert = 1;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        compile_op_module.global_var_storage.set_variable("ascendc_time_stamp_compile_options", True)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_type"],"assert,timestamp")
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
 
     def test_get_hard_sync_instr_from_i_file(self):
         dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
@@ -4514,56 +4445,6 @@ WaitPreTaskEnd();
         res1, res2 = KernelInfoInfer.get_sync_task_start_end_instr_from_i_file(context)
         self.assertEqual(res1, False)
         self.assertEqual(res2, False)
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
-    def test_get_dump_info_with_simt_from_i_file(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-__attribute__((cce_simt_entry)) [aicore] __inline__ void SimtCompute(__attribute__((cce_global)) uint8_t *dumpWorkspaceAddr){}
-auto __enable_feature_for_compile_printf = 1";
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        with mock.patch.object(CommonUtility, 'is_c310', return_value=True):
-            dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-            self.assertEqual(dump_info["dump_size"], 1048576)
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
-    def test_get_dump_info_from_i_file_stamp_off(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_feature_for_compile_assertBufSize = 1";
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_size"],1)
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
-    def test_get_dump_info_from_i_file_stamp(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_feature_for_compile_printfBufSize = 1";
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_size"],1)
         os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
 
     def test_get_tiling_struct_size(self):
@@ -4822,8 +4703,8 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -4895,7 +4776,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
             lines = file.readlines()  # 读取所有行，返回列表
             lines = " ".join(lines)
             self.assertNotEqual(lines.find(" __attribute__((aligned(512))) "), -1)
-            self.assertNotEqual(lines.find(" __attribute__((need_auto_sync)) "), -1)
+            self.assertNotEqual(lines.find(" __sk__"), -1)
         os.remove(compile_info.gen_kernel_func_file)
         global_var_storage.global_storage_reset()
 
@@ -4936,6 +4817,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
 
 
     def test_gen_kernel_function_c310_dcci_false(self):
+        global_var_storage.global_storage_reset()
         SetCurrentSocInfo("Ascend950PR_9599")
         cce_file = os.path.join(
             TOP_PATH, "tests/python/asc_op_compiler/stub_kernels/add_custom_unalign.cpp")
@@ -4965,8 +4847,8 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -5029,6 +4911,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         compile_option_tuple.mllvm_options.append('-mllvm')
         compile_option_tuple.mllvm_options.append('-cce-aicore-dcci-before-kernel-end=')
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, compile_option_tuple)
+        global_var_storage.global_storage_reset()
     
 
     def test_delete_tiling_section(self):

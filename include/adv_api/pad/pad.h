@@ -12,6 +12,12 @@
  * \file pad.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_H__
+#endif
+
 #ifndef LIB_PAD_PAD_H
 #define LIB_PAD_PAD_H
 
@@ -20,7 +26,7 @@
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../../impl/adv_api/detail/pad/pad/pad_common_impl.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 namespace AscendC {
 /* **************************************************************************************************
  * Pad                                             *
@@ -112,3 +118,8 @@ __aicore__ inline void UnPad(
 } // namespace AscendC
 #endif
 #endif // LIB_PAD_PAD_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_H__
+#endif

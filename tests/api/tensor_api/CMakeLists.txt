@@ -56,7 +56,7 @@ file(GLOB ASCENDC_UT_NPU_ARCH_3510_AIV_CASE_SRC
 
 foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_tensor_api_${product_type}
-        ${ASCENDC_DIR}/tests/main_global.cpp
+        ${ASCENDC_DIR}/tests/main.cpp
         ${ASCENDC_UT_COMMON_SRC}
         ${ASCENDC_UT_STRUCT_CASE_SRC}
         ${ASCENDC_UT_${product_type}_CASE_SRC}
@@ -68,8 +68,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         ASCENDC_DUMP=0
         $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:__NPU_ARCH__=2201>
         $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:__NPU_ARCH__=2201>
-        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIC>:__NPU_ARCH__=3101>
-        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIV>:__NPU_ARCH__=3101>
+        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIC>:__NPU_ARCH__=3510>
+        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIV>:__NPU_ARCH__=3510>
         __disable_kernel_type_autoinfer__=
     )
 

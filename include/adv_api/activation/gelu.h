@@ -12,10 +12,16 @@
  * \file gelu.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GELU_H__
+#endif
+
 #ifndef LIB_GELU_GELU_H
 #define LIB_GELU_GELU_H
 #include "kernel_tensor.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/activation/gelu/gelu_c310_impl.h"
 #else
@@ -76,7 +82,7 @@ __aicore__ inline void FasterGelu(const LocalTensor<T>& dstLocal, const LocalTen
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
     ASCENDC_ASSERT((IsSameType<T, half>::value || IsSameType<T, float>::value),
         { KERNEL_LOG(KERNEL_ERROR, "FasterGelu only support data type: float/half"); });
@@ -100,7 +106,7 @@ __aicore__ inline void FasterGelu(const LocalTensor<T>& dstLocal, const LocalTen
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
     ASCENDC_ASSERT((IsSameType<T, half>::value || IsSameType<T, float>::value),
         { KERNEL_LOG(KERNEL_ERROR, "FasterGelu only support data type: float/half"); });
@@ -153,3 +159,8 @@ __aicore__ inline void FasterGeluV2(const LocalTensor<T>& dstLocal, const LocalT
 #pragma end_pipe
 } // namespace AscendC
 #endif // LIB_GELU_GELU_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GELU_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GELU_H__
+#endif
