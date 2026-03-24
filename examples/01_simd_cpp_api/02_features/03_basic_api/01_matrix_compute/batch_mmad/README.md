@@ -7,6 +7,7 @@
 
 ## 支持的产品
 
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -23,7 +24,9 @@
 ```
 
 ## 算子描述
+
 ### 1.batch mmad定义
+
 批量矩阵乘法（batch mmad）是普通矩阵乘法在批次维度（Batch Dimension） 上的扩展，核心逻辑是：对一个包含多个矩阵的批次数据，逐一对批次内的矩阵执行标准矩阵乘法，最终输出同批次数量的结果矩阵。
 
 简单来说，若有两个批量矩阵 A 和 B，它们的形状分别为 (B, M, K) 和 (B, K, N)（其中 B 是批次大小，M/K/N 是矩阵维度），批量矩阵乘法会为每一个批次索引 i（i ∈ [0, B-1]），取 A[i]（形状 (M,K)）和 B[i]（形状 (K,N)）执行普通矩阵乘法，最终得到形状为 (B, M, N) 的批量结果矩阵 C。对任意批次 i（0 ≤ i < B），C 的第 i 个矩阵满足：
@@ -74,6 +77,7 @@ for循环内部将每次计算得到的C[i]进行偏移后存储到输出tensor�
         if (batchIndex == B - 1) {
             outQueueCO1.EnQue<float>(c1Local);
         } 
+
 ### 4.矩阵批量搬出
 
 数据从L0C-->GM通路时，如下所示调用fixpipe搬运接口时，通过配置fixpipeParams.ndNum = B，实现一次性搬出B对C矩阵。注意的是L0C中的C矩阵是对齐后的，而搬出到GM的C矩阵是原始非对齐的shape。
@@ -92,32 +96,38 @@ for循环内部将每次计算得到的C[i]进行偏移后存储到输出tensor�
         fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])) 
                                     / (cubeShape[0] * cubeShape[0]);
         // 目的相邻ND矩阵起始地址之间的偏移，单位：element
+
 ### 5.避免数据占用总内存超过存储空间限制
 
 用户应该保证batch mmad整个过程中的数据所占总的内存不超过存储空间限制。
 用户可以通过PlatformAscendC类成员函数[GetCoreMemSize](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850alpha002/API/ascendcopapi/atlasascendc_api_07_1034.html)，获取获取硬件平台中L1、L0A、L0B、L0C存储空间的内存大小。
 
-
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
+
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
+
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
   - 默认路径，非root用户安装CANN软件包
+
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
   - 指定路径install_path，安装CANN软件包
+
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
+
 - 样例执行
+
   ```bash
   B=4 M=30 K=40 N=70
   mkdir -p build && cd build;      # 创建并进入build目录
@@ -126,7 +136,9 @@ for循环内部将每次计算得到的C[i]进行偏移后存储到输出tensor�
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
+
   执行结果如下，说明精度对比成功。
+
   ```bash
   test pass
   ```
