@@ -1,6 +1,6 @@
-# Matmul算子使用NBuffer33模板策略直调样例
+# Matmul 使用NBuffer33模板策略直调样例
 ## 概述
-本样例介绍Matmul API实现NBuffer33算法的单算子，以及介绍模板参数MatmulPolicy中NBuffer33MatmulPolicy的使用方式。NBuffer33的功能是通过NBuffer33MatmulPolicy实现搬入搬出带宽平衡从而提升效率。
+本样例介绍Matmul API实现NBuffer33算法的样例，以及介绍模板参数MatmulPolicy中NBuffer33MatmulPolicy的使用方式。NBuffer33的功能是通过NBuffer33MatmulPolicy实现搬入搬出带宽平衡从而提升效率。
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -13,30 +13,30 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_nbuffer33.asc              // Ascend C算子实现 & 调用样例
+│   └── matmul_nbuffer33.asc    // Ascend C样例实现 & 调用样例
 ```
-## 算子描述
-- 算子功能： 
+## 样例描述
+- 样例功能： 
 
-  Matmul算子算子使用模板参数MatmulPolicy，调用Matmul高阶API对输入的A，B矩阵做矩阵乘和加Bias偏置。单核计算的A矩阵切分为3x3个基本块，该3x3个A矩阵的基本块全载和保持在L1 Buffer中，每次与3x1个B矩阵的基本块计算矩阵乘，同时DoubleBuffer并行搬入下次计算所需的3x1个B矩阵基本块，直到singleCoreN方向的矩阵乘计算完成。
+  Matmul样例使用模板参数MatmulPolicy，调用Matmul高阶API对输入的A，B矩阵做矩阵乘和加Bias偏置。单核计算的A矩阵切分为3x3个基本块，该3x3个A矩阵的基本块全载和保持在L1 Buffer中，每次与3x1个B矩阵的基本块计算矩阵乘，同时DoubleBuffer并行搬入下次计算所需的3x1个B矩阵基本块，直到singleCoreN方向的矩阵乘计算完成。
 
-- 算子规格： 
+- 样例规格： 
 
-  本样例默认执行的算子shape为：M = 256, N = 512, K = 192。
+  本样例中：M = 256, N = 512, K = 192。
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>
-  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_nbuffer33_custom</td></tr>
   </table>
-- 算子实现： 
+- 样例实现： 
   - 约束条件
     - 仅支持MDL模板。
     - 仅支持纯Cube模式（只有矩阵计算），暂不支持MIX模式（包含矩阵计算和矢量计算）。
@@ -45,10 +45,6 @@
     - 用户需要确保A矩阵全载的基本块大小与B矩阵载入的基本块大小之和不超过L1 Buffer大小。
 
   - Kernel实现
-    - 计算逻辑：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该Bias进行偏置。
     - 具体步骤：
       - 创建Matmul对象，配置MDL模板和NBuffer33MatmulPolicy。
           ```
@@ -81,7 +77,7 @@
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
