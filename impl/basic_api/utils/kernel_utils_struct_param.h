@@ -158,7 +158,7 @@ struct DumpShapeMessageHead {
     uint32_t rsv = 0;      // reserved information
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ 1= 3003) || (__NPU_ARCH__ != 3113));
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113));
 // dump TLV for L1 to UB
 struct L12UBDumpCtrlMessage {
     volatile uint32_t enDumpFlag = 0;

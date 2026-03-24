@@ -201,7 +201,7 @@ struct DataCopyExtParams {
           dstStride(dstStrideIn),
           rsv(rsvIn)
     {}
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ 1= 3003) || (__NPU_ARCH__ != 3113));
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113));
     uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
     uint32_t blockLen = 0;
 #endif
@@ -251,7 +251,7 @@ template <typename T> struct DataCopyPadExtParams {
     bool isPad = false;
     uint8_t leftPadding = 0;
     uint8_t rightPadding = 0;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ 1= 3003) || (__NPU_ARCH__ != 3113));
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113));
     T paddingValue = 0;
 #endif
 #endif
@@ -301,7 +301,7 @@ struct Nd2NzParams {
     uint16_t dValue = 0;
     uint16_t srcNdMatrixStride = 0;
     uint16_t srcDValue = 0;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ 1= 3003) || (__NPU_ARCH__ != 3113));
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113));
     uint16_t dstNzC0Stride = 0;
     uint16_t dstNzNStride = 0;
     uint16_t dstNzMatrixStride = 0;
@@ -334,7 +334,7 @@ struct Nz2NdParamsFull {
     uint16_t dstNdMatrixStride = 1;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ 1= 3003) || (__NPU_ARCH__ != 3113));
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113));
 struct Dn2NzParams {
     __aicore__ Dn2NzParams() {}
 
