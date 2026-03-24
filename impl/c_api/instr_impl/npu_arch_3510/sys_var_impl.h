@@ -17,6 +17,13 @@
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_block_num_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_system_cycle_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ctrl_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ffts_base_addr_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_phy_buf_addr_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_vf_len_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_arch_ver_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_core_id_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_channel_para_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l3d_rpt_b_impl.h"
 
 __aicore__ inline int64_t asc_get_ar_spr()
 {
@@ -47,4 +54,41 @@ __aicore__ inline int64_t asc_get_ctrl()
 {
     return asc_get_ctrl_impl();
 }
+
+__aicore__ inline int64_t asc_get_vf_len()
+{
+    return asc_get_vf_len_impl();
+}
+
+__aicore__ inline int64_t asc_get_ffts_base_addr()
+{
+    return asc_get_ffts_base_addr_impl();
+}
+
+__aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset)
+{
+    return asc_get_phy_buf_addr_impl(offset);
+}
+
+
+__aicore__ inline void asc_get_arch_ver(uint32_t& core_version)
+{
+    asc_get_arch_ver_impl(core_version);
+}
+
+__aicore__ inline int64_t asc_get_core_id()
+{
+    return asc_get_core_id_impl();
+}
+
+__aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config)
+{
+    asc_set_l0c2gm_channel_para_impl(config);
+}
+
+__aicore__ inline void asc_set_l3d_rpt_b(uint64_t config)
+{
+    asc_set_l3d_rpt_b_impl(config);
+}
+
 #endif

@@ -33,6 +33,7 @@ asc-devkit:
       - impl/utils/**/*.h
       - impl/experimental/tensor_api/utils/*.h
       - impl/c_api/instr_impl/npu_arch_2201/utils_impl/**/*.h
+      - impl/c_api/instr_impl/npu_arch_3510/utils_impl/**/*.h
       - impl/basic_api/reg_compute/kernel_reg_compute_struct_intf_impl.h
       - impl/basic_api/reg_compute/kernel_reg_compute_common_intf_impl.h
       - impl/basic_api/reg_compute/kernel_reg_compute_intf_impl.h
@@ -55,6 +56,17 @@ asc-devkit:
       - impl/basic_api/dav_c220/kernel_operator_dump_tensor_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl/printf_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl.h
+      - impl/basic_api/common_types.h
+      - impl/adv_api/detail/hccl/common/hccl_inner_def.h
+      - impl/adv_api/detail/hccl/common/hccl_base.h
+      - impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v0_def.h
+      - impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v0.h
+      - impl/adv_api/detail/hccl/impl/hccl_impl.h
+      - impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_sync_data_barrier_impl.h
+      - impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_sync_data_barrier_impl.h
+      - impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_get_buf_impl.h
+      - impl/c_api/instr_impl/npu_arch_2201/sync_impl.h
+      - impl/c_api/instr_impl/npu_arch_3510/sync_impl.h
   llt:
     ut_check: true
     st_check: false
