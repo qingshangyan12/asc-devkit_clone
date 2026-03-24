@@ -32,4 +32,4 @@ __aicore__ inline auto MakeCopy(const Args& ...traits);
 }
 }
 
-#endif // EXPERIMENTAL_TENSOR_API_ALGORITHM_CPOY_H
+#endif // INCLUDE_TENSOR_API_ALGORITHM_COPY_H

@@ -15,13 +15,13 @@
 #ifndef INCLUDE_TENSOR_API_TENSOR_H
 #define INCLUDE_TENSOR_API_TENSOR_H
 
-#include "include/experimental/tensor_api/algorithm/algorithm.h"
-#include "include/experimental/tensor_api/arch/arch.h"
-#include "include/experimental/tensor_api/atom/atom.h"
-#include "include/experimental/tensor_api/tensor/layout.h"
-#include "include/experimental/tensor_api/tensor/local_tensor.h"
-#include "include/experimental/tensor_api/tensor/pointer.h"
-#include "include/experimental/tensor_api/tensor/layout_struct.h"
-#include "include/experimental/tensor_api/utils/utils.h"
+#include "experimental/tensor_api/algorithm/algorithm.h"
+#include "experimental/tensor_api/arch/arch.h"
+#include "experimental/tensor_api/atom/atom.h"
+#include "experimental/tensor_api/tensor/layout.h"
+#include "experimental/tensor_api/tensor/local_tensor.h"
+#include "experimental/tensor_api/tensor/pointer.h"
+#include "experimental/tensor_api/tensor/layout_struct.h"
+#include "experimental/tensor_api/utils/utils.h"
 
 #endif // INCLUDE_TENSOR_API_TENSOR_H
