@@ -10,5 +10,3 @@
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | [basic_api_memory_allocator_add](./basic_api_memory_allocator_add) | 样例基于静态Tensor方式编程实现Add样例，展示了LocalMemAllocator进行线性内存分配 |
 | [basic_api_tque_add](./basic_api_tque_add) | 样例以Add算子为例，采用TQue内存管理机制实现数据搬运与计算任务的协同调度 |
-| [vector_add](./vector_add) | 本样例介绍Add算子的核函数直调方法，算子支持单核运行 |
-| [add_broadcast](./add_broadcast) | 本样例介绍Add算子的核函数直调方法，多核&tiling场景下增加输入Broadcast |
