@@ -51,10 +51,12 @@
 - 调用实现：  
   使用内核调用符<<<>>>调用核函数。
 
-### 2. gatherv2算子
+### 2. gather_v2算子
 - 算子功能：  
-  gatherv2算子实现了从多维输入张量input中按照指定维度axis收集数据的功能，indices张量指定了要收集的索引位置。支持batch_dims批量处理模式， 让不同的 batch 使用不同的索引集合。
-  例如输入张量 input 的 shape 为 (2, 2, 3, 2) 和索引张量 indices 的 shape 为 (2, 2)：
+  gather_v2算子实现了从多维输入张量input中按照指定维度axis收集数据的功能，indices张量指定了要收集的索引位置。支持batch_dims批量处理模式， 让不同的 batch 使用不同的索引集合。
+- 计算流程：
+  例如输入张量input的shape为(2, 2, 3, 2)和索引张量indices的shape为 (2, 2)：
+  
   ```
   input:
     [[[[ 1,  2],
@@ -78,7 +80,9 @@
     [[1, 2],
     [0, 1]]
   ```
-  axis=2, batch_dims=1 的结果：
+  axis=2, batch_dims=1表明收集维度为2，并且每个batch下使用不同的索引：
+  - batch=0 使用 indices[0]=[1, 2]，从input[0]中在维度2上收集第1、2行
+  - batch=1 使用 indices[0]=[0, 1]，从input[1]中在维度2上收集第0、1行
   ```
   output:
     [[[[ 3,  4],
@@ -92,10 +96,9 @@
 
       [[19, 20],
       [21, 22]]]]
-  ```
-- 算子规格：    
+  ``` 
   <table>
-  <tr><td rowspan="1" align="center">算子类型</td><td colspan="4" align="center">gatherv2</td></tr>
+  <tr><td rowspan="1" align="center">算子类型</td><td colspan="4" align="center">gather_v2</td></tr>
   </tr>
   <tr><td rowspan="5" align="center">算子输入</td><td align="center">name</td><td align="center">data type</td><td align="center">format</td><td align="center">约束/说明</td></tr>
   <tr><td align="center">input</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
@@ -107,7 +110,6 @@
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_custom_v2</td></tr>
   </table>
-
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
