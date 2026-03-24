@@ -1,12 +1,12 @@
-# Ascend C 多层级编程接口选择参考
+# Ascend C多层级编程接口选择参考
 
-欢迎使用 [Ascend C](https://www.hiascend.com/cann/ascend-c) 进行昇腾AI处理器算子开发。作为面向多场景的编程语言，Ascend C 一方面致力于**开放芯片完备编程能力以支撑极致性能**，另一方面通过多层级编程API设计，让您能够根据项目需求、团队技能与性能目标，灵活选择合适的API，在开发效率与运行性能之间取得最佳平衡。
+欢迎使用 [Ascend C](https://www.hiascend.com/cann/ascend-c) 进行昇腾AI处理器算子开发。Ascend C不仅致力于**开放芯片完备编程能力支撑实现极致性能**，同时通过多层级编程API设计，让您能够根据项目需求、团队技能与性能目标，灵活选择最合适的API，在开发效率与运行性能之间取得最佳平衡。
 
 ---
 
 ## 设计目标
 
-Ascend C 的设计目标可概括为 **“高性能、完备性、易编程、可调试和兼容性”**。其通过对 C/C++ 语言标准进行最小化扩展，既支持基于指针的 C 语言开发习惯，也支持基于 Tensor 的 C++ 编程范式，在支撑昇腾算子高效开发的同时，实现与现有生态的无缝衔接，保障开发体验的一致性。
+Ascend C的设计目标可概括为 **“高性能、完备性、易编程、可调试和兼容性”**。其通过对C/C++语言标准进行最小化扩展，既支持基于指针的C语言开发习惯，也支持基于Tensor的C++编程范式，在支撑昇腾算子高效开发的同时，实现与现有生态的无缝衔接，保障开发体验的一致性。
 
 我们秉持以下核心理念：
 - **没有银弹**：不同场景对性能与开发效率的要求各异，单一接口无法在所有场景下实现最优适配；
@@ -14,7 +14,7 @@ Ascend C 的设计目标可概括为 **“高性能、完备性、易编程、�
 
 ## API层级
 
-Ascend C 提供三类接口，均支持底层完备编程能力：
+Ascend C提供三类接口，均支持底层完备编程能力：
 
 | API层级 | 语言 | 特点 | 目标用户 | 主要用途 |
 |---------|------|------|----------|----------|
@@ -22,7 +22,7 @@ Ascend C 提供三类接口，均支持底层完备编程能力：
 | **基础API** | C++ | 基于 **Tensor** 编程，提供 **C++ 基础完备编程能力**<br>通过 MakeTensor / LocalMemoryAllocator 分配 Tensor，自主管理同步 | 算子库开发者 | 自主管理同步与内存，<br>匹配 C++ Tensor 开发习惯，支撑极致性能 |
 | **语言扩展层<br>SIMD & SIMT API** | C | 基于 **指针** 编程，提供 **C 基础完备编程能力**<br>通过数组 `[]` 分配内存，自主管理同步 | 算子库开发者 | 自主管理同步与内存，<br>匹配 C 语言开发习惯，支撑极致性能 |
 
-此外，Ascend C 提供高阶 API 和算子模板库以进一步提升算子开发效率。
+此外，Ascend C提供高阶 API 和算子模板库以进一步提升算子开发效率。
 
 | API层级 | 目标用户 | 主要用途 |
 |---------|----------|----------|
@@ -35,7 +35,7 @@ Ascend C 提供三类接口，均支持底层完备编程能力：
 
 以下决策流程图可帮助您快速定位最适合的 API 层级：
 
-> 建议所有的算子均基于 **<<<>>>调用和Host/Device混合编译** 方式开发。当前商用算子通过aclnn开发方式
+> 建议所有的算子均基于 **<<<>>>调用和Host/Device混合编译** 方式开发
 
 ```mermaid
 graph TD
@@ -44,7 +44,7 @@ graph TD
     A --> D[**3、兼顾性能与易用性**]
     B -->|其他类型算子| E[**SIMD C API**<br>（带sync后缀计算接口）]
     B -->|熟悉SIMT，离散类矢量算子| F[**SIMT API**]
-    C -->|离散类纯矢量算子| F
+    C -->|离散类矢量算子| F
     C -->|偏好**指针编程**| P[**SIMD C API**]
     C -->|偏好**C++Tensor编程&自主管理同步/内存**| I[**基础API**]
     C -->|偏好**C++Tensor编程&自动管理同步/内存**| J[**Tpipe/Tque框架编程API**]
@@ -82,8 +82,8 @@ graph TD
 - 希望借助带 `sync` 后缀的计算接口快速进行算法验证的开发者。
 
 **示例**
-- [SIMD Add 算子示例（带同步计算接口）](https://gitcode.com/cann/asc-devkit/blob/master/examples/00_introduction/01_add/c_api_sync_add/c_api_add.asc)
-- [SIMT Add 算子示例（匹配业界习惯）](https://gitcode.com/cann/asc-devkit/blob/master/examples/00_introduction/01_add/simt_add/add.asc)
+- [SIMD Add 算子示例（带同步计算接口）](../examples/00_introduction/01_add/c_api_sync_add/c_api_add.asc)
+- [SIMT Add 算子示例（匹配业界习惯）](../examples/00_introduction/01_add/simt_add/add.asc)
 - 更多样例请参考 [examples 目录](https://gitcode.com/cann/asc-devkit/tree/master/examples)
 
 ---
@@ -101,8 +101,8 @@ graph TD
 - 需要在生产环境中开发极致性能算子，同时希望保持代码可维护性与可扩展性的场景。
 
 **示例**
-- [基于 Tque / Tpipe 自动管理内存与同步的 SIMD Add 算子示例](https://gitcode.com/cann/asc-devkit/blob/master/examples/00_introduction/01_add/basic_api_tque_add/add.asc)
-- [基于 LocalMemoryAllocator 自主管理内存与同步的 SIMD Add 算子示例](https://gitcode.com/cann/asc-devkit/blob/master/examples/00_introduction/01_add/basic_api_memory_allocator_add/add.asc)
+- [基于 Tque / Tpipe 自动管理内存与同步的 SIMD Add 算子示例](../examples/00_introduction/01_add/basic_api_tque_add/add.asc)
+- [基于 LocalMemoryAllocator 自主管理内存与同步的 SIMD Add 算子示例](../examples/00_introduction/01_add/basic_api_memory_allocator_add/add.asc)
 - 基于 Layout 的 Tensor API 示例（待补充）
 
 ---
@@ -118,7 +118,7 @@ graph TD
 - 希望复用成熟算法实现、缩短开发周期的场景。
 
 **示例**
-- [Softmax API 示例](https://gitcode.com/cann/asc-devkit/blob/master/examples/03_libraries/02_activation/softmax/softmax.asc)
+- [Softmax API 示例](../examples/03_libraries/02_activation/softmax/softmax.asc)
 - [Matmul API 示例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_libraries/01_matrix)
 
 ---
@@ -140,6 +140,6 @@ graph TD
 
 ## 总结
 
-Ascend C 多层级接口设计的核心理念是：让您**始终使用最合适的编程范式，而非被动适应单一抽象**。无论您是追求极致性能的底层专家，还是希望快速验证算法的原型开发者，都能在 Ascend C 的层级化 API 生态中找到得心应手的工具。
+Ascend C多层级接口设计的核心理念是：让您**始终使用最合适的编程范式，而非被动适应单一抽象**。无论您是追求极致性能的底层专家，还是希望快速验证算法的原型开发者，都能在Ascend C的层级化 API 生态中找到得心应手的工具。
 
-立即开始您的算子编程之旅！如有疑问，欢迎参考 Ascend C 详细文档或社区示例，我们将持续致力于让 NPU 的强大算力对您触手可及、高效易用。
+立即开始您的算子编程之旅！如有疑问，欢迎参考Ascend C详细文档或社区示例，我们将持续致力于让 NPU 的强大算力对您触手可及、高效易用。
