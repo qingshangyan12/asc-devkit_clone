@@ -35,10 +35,10 @@ int32_t get_block_num()
 
 int32_t asc_get_block_idx()
 {
-    return bisheng::cce::simt::get_block_idx();
+    return get_block_idx();
 }
 
 int32_t asc_get_block_num()
 {
-    return bisheng::cce::simt::get_block_num();
+    return get_block_num();
 }
