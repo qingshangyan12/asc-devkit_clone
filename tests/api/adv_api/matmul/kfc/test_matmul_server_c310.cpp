@@ -13,7 +13,7 @@
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
 #include "impl/adv_api/detail/matmul/kfc/matmul_server_impl.h"
-#include "impl/adv_api/detail/matmul/kfc/matmul_server_impl_c310.h"
+#include "impl/adv_api/detail/matmul/kfc/matmul_server_impl_3510.h"
 #include "kfc_fake_modules.h"
 #include "../copy_cube_in/base_tiling_struct.h"
 
@@ -76,6 +76,8 @@ private:
     using C_TYPE_BNGS1S2 = MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float, false, LayoutMode::BNGS1S2>;
 };
 
+using TestMatmulServerArch3510 = TestMatmulServerC310; 
+
 __aicore__ constexpr MatmulConfig GetBmmNBatchConfig()
 {
     MatmulBatchParams bmmParams = {true, BatchMode::BATCH_LESS_THAN_L1, true};
@@ -132,7 +134,7 @@ __aicore__ constexpr MatmulConfig GetDEFAULT_Config()
     return mmCfg;
 }
 
-TEST_F(TestMatmulServerC310, GetOffsetSizeDefault) {
+TEST_F(TestMatmulServerArch3510, GetOffsetSizeDefault) {
     static constexpr MatmulConfig davidConfig = GetDEFAULT_Config();
     MatmulService<A_TYPE, B_TYPE, C_TYPE_UB, BIAS_TYPE, davidConfig, MatmulCallBackFunc<nullptr, nullptr, nullptr>, CustomMatmulPolicy> mmServer;
 
@@ -152,7 +154,7 @@ TEST_F(TestMatmulServerC310, GetOffsetSizeDefault) {
     mmServer.GetOffsetSize(&body, funID, sync, offsetSize, enSequentialWrite, hasSetWorkspace);
 }
 
-TEST_F(TestMatmulServerC310, IterateSetMessage) {
+TEST_F(TestMatmulServerArch3510, IterateSetMessage) {
     using A_TYPE_NORMAL_SCALAR_t = MatmulType<AscendC::TPosition::GM, CubeFormat::SCALAR, half, true, LayoutMode::NORMAL>;
     static constexpr MatmulConfig IterateCFG = GetN_BATCH_Config();
     MatmulService<A_TYPE_NORMAL_SCALAR_t, B_TYPE_NORMAL_SCALAR, C_TYPE, BIAS_TYPE, IterateCFG, MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmIteServer;
@@ -185,7 +187,7 @@ TEST_F(TestMatmulServerC310, IterateSetMessage) {
     mmIteServer.IterateSetMessage(&kfcMsg, &bodyI);
 }
 
-TEST_F(TestMatmulServerC310, GetLocalTensor) {
+TEST_F(TestMatmulServerArch3510, GetLocalTensor) {
     MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> mmServer;
     uint64_t ubAddr = 0x1111;
     uint64_t ubSize = 512U;
@@ -199,7 +201,7 @@ TEST_F(TestMatmulServerC310, GetLocalTensor) {
                 (uint64_t)(GetTPipePtr()->GetBaseAddr((uint8_t)(TPosition::TSCM))) + tscmAddr);
 }
 
-TEST_F(TestMatmulServerC310, GetTensorC) {
+TEST_F(TestMatmulServerArch3510, GetTensorC) {
     MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM,
         MatmulCallBackFunc<nullptr, nullptr, nullptr>, CustomMatmulPolicy> mmServer;
     KfcMsg kfcInitMsg;
@@ -211,7 +213,7 @@ TEST_F(TestMatmulServerC310, GetTensorC) {
     ASSERT_TRUE(!mmServer.GetTensorC(&kfcMsg));
 }
 
-TEST_F(TestMatmulServerC310, GetMsgFromSSbuf) {
+TEST_F(TestMatmulServerArch3510, GetMsgFromSSbuf) {
     MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM,
         MatmulCallBackFunc<nullptr, nullptr, nullptr>, CustomMatmulPolicy> mmServer;
     KfcMsg kfcInitMsg;
@@ -224,7 +226,7 @@ TEST_F(TestMatmulServerC310, GetMsgFromSSbuf) {
     mmServer.GetMsgFromSSbuf(&kfcMsg, body);
 }
 
-TEST_F(TestMatmulServerC310, SetQuantVector_quantmode1) {
+TEST_F(TestMatmulServerArch3510, SetQuantVector_quantmode1) {
     MatmulService<A_TYPE_NORMAL_SCALAR, B_TYPE_NORMAL_SCALAR, C_TYPE_NORMAL_SCALAR, BIAS_TYPE, CFG_NORM,
         MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmServer;
     KfcMsg kfcInitMsg;
@@ -239,7 +241,7 @@ TEST_F(TestMatmulServerC310, SetQuantVector_quantmode1) {
     mmServer.SetQuantVector(&body);
 }
 
-TEST_F(TestMatmulServerC310, SetQuantVector_quantmode2) {
+TEST_F(TestMatmulServerArch3510, SetQuantVector_quantmode2) {
     MatmulService<A_TYPE_NORMAL_SCALAR, B_TYPE_NORMAL_SCALAR, C_TYPE_NORMAL_SCALAR,
         BIAS_TYPE, CFG_NORM, MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmServer;
     KfcMsg kfcInitMsg;
@@ -254,7 +256,7 @@ TEST_F(TestMatmulServerC310, SetQuantVector_quantmode2) {
     mmServer.SetQuantVector(&body);
 }
 
-TEST_F(TestMatmulServerC310, SetUserDefInfo) {
+TEST_F(TestMatmulServerArch3510, SetUserDefInfo) {
     MatmulService<A_TYPE_NORMAL_SCALAR, B_TYPE_NORMAL_SCALAR, C_TYPE_NORMAL_SCALAR, BIAS_TYPE, CFG_NORM,
         MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmServer;
     KfcMsg kfcInitMsg;
@@ -266,7 +268,7 @@ TEST_F(TestMatmulServerC310, SetUserDefInfo) {
     mmServer.SetUserDefInfo(&kfcMsg);
 }
 
-TEST_F(TestMatmulServerC310, SetSelfDefineData) {
+TEST_F(TestMatmulServerArch3510, SetSelfDefineData) {
     MatmulService<A_TYPE_NORMAL_SCALAR, B_TYPE_NORMAL_SCALAR, C_TYPE_NORMAL_SCALAR,
         BIAS_TYPE, CFG_NORM, MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmServer;
     KfcMsg kfcInitMsg;
@@ -280,7 +282,7 @@ TEST_F(TestMatmulServerC310, SetSelfDefineData) {
     mmServer.SetSelfDefineData(&kfcMsg, &body);
 }
 
-TEST_F(TestMatmulServerC310, SetSelfDefineData_failed) {
+TEST_F(TestMatmulServerArch3510, SetSelfDefineData_failed) {
     MatmulService<A_TYPE_NORMAL_SCALAR, B_TYPE_NORMAL_SCALAR, C_TYPE_NORMAL_SCALAR,
         BIAS_TYPE, CFG_NORM, MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmServer;
     KfcMsg kfcMsg;
@@ -291,7 +293,7 @@ TEST_F(TestMatmulServerC310, SetSelfDefineData_failed) {
     mmServer.SetSelfDefineData(&kfcMsg, &body);
 }
 
-TEST_F(TestMatmulServerC310, SkipMsg) {
+TEST_F(TestMatmulServerArch3510, SkipMsg) {
     MatmulService<A_TYPE_IBSHARE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_IBSHARE_NORM,
         MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmServer;
     auto funID = KFC_Enum::MMFUN_ITERATE_ALL;
@@ -301,7 +303,7 @@ TEST_F(TestMatmulServerC310, SkipMsg) {
     mmServer.SkipMsg(funID, freeMsg, lastMsgId, subBlockID);
 }
 
-TEST_F(TestMatmulServerC310, SkipMsg_dIBshare) {
+TEST_F(TestMatmulServerArch3510, SkipMsg_dIBshare) {
     MatmulService<A_TYPE_IBSHARE, B_TYPE_IBSHARE, C_TYPE, BIAS_TYPE,
         CFG_IBSHARE_NORM, MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmServer;
     auto funID = KFC_Enum::MMFUN_ITERATE_ALL;
@@ -311,7 +313,7 @@ TEST_F(TestMatmulServerC310, SkipMsg_dIBshare) {
     mmServer.SkipMsg(funID, freeMsg, lastMsgId, subBlockID);
 }
 
-TEST_F(TestMatmulServerC310, SetTensorScaleA) {
+TEST_F(TestMatmulServerArch3510, SetTensorScaleA) {
     MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL,
         MatmulCallBackFunc<nullptr, nullptr, nullptr>, CustomMatmulPolicy> mmServerA;
     KfcMsg kfcInitMsg;
@@ -327,7 +329,7 @@ TEST_F(TestMatmulServerC310, SetTensorScaleA) {
     mmServerA.SetTensorScaleA(body);
 }
 
-TEST_F(TestMatmulServerC310, SetTensorScaleB) {
+TEST_F(TestMatmulServerArch3510, SetTensorScaleB) {
     MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL,
         MatmulCallBackFunc<nullptr, nullptr, nullptr>, CustomMatmulPolicy> mmServer;
     KfcMsg kfcInitMsg;
@@ -343,7 +345,7 @@ TEST_F(TestMatmulServerC310, SetTensorScaleB) {
     mmServer.SetTensorScaleB(body);
 }
 
-TEST_F(TestMatmulServerC310, ProcessEnd) {
+TEST_F(TestMatmulServerArch3510, ProcessEnd) {
     MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM,
         MatmulCallBackFunc<nullptr, nullptr, nullptr>, CustomMatmulPolicy> mmServer;
     KfcMsg kfcMsg;
@@ -353,7 +355,7 @@ TEST_F(TestMatmulServerC310, ProcessEnd) {
     mmServer.Process(&kfcMsg, funID);
 }
 
-TEST_F(TestMatmulServerC310, TscmInputSetAllTensor) {
+TEST_F(TestMatmulServerArch3510, TscmInputSetAllTensor) {
     MatmulService<A_MX_TSCM_TYPE, B_MX_TSCM_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM,
         MatmulCallBackFunc<nullptr, nullptr, nullptr>, CustomMatmulWithScalePolicy> mmServer;
     KfcMsg kfcInitMsg;
@@ -381,7 +383,7 @@ TEST_F(TestMatmulServerC310, TscmInputSetAllTensor) {
     mmServer.SetTensorScaleB(*body);
 }
 
-TEST_F(TestMatmulServerC310, IterateNBatchBSNGD) {
+TEST_F(TestMatmulServerArch3510, IterateNBatchBSNGD) {
     static constexpr MatmulConfig nBatchCFG = GetBmmNBatchConfig();
     MatmulService<A_TYPE_BSNGD, B_TYPE_BSNGD, C_TYPE_BSNGD, BIAS_TYPE, nBatchCFG, MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmServer;
 
@@ -410,7 +412,7 @@ TEST_F(TestMatmulServerC310, IterateNBatchBSNGD) {
     EXPECT_EQ(cntIterator, 2);
 }
 
-TEST_F(TestMatmulServerC310, IterateNBatchBNS1S2) {
+TEST_F(TestMatmulServerArch3510, IterateNBatchBNS1S2) {
     static constexpr MatmulConfig nBatchCFG = GetBmmNBatchConfig();
     MatmulService<A_TYPE_BNGS1S2, B_TYPE_BNGS1S2, C_TYPE_BNGS1S2, BIAS_TYPE, nBatchCFG, MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmServer;
 
