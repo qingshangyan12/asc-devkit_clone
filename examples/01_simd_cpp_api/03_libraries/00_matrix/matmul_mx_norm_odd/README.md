@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍了在Mx数据格式下，Scale的K方向为奇数的带有量化系数的矩阵乘法，即MxMatmul计算场景。
+本样例介绍了在微缩放（Microscaling, MX）数据格式下的带有量化系数的矩阵乘法，即MxMatmul计算场景。当K整除32向上取整的值为奇数时，scaleK的取值需要在该值的基础上向上对齐为偶数，scaleA和scaleB矩阵也要做对应的扩展。
 
 ## 支持的产品
 
@@ -17,39 +17,35 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_mx_norm_odd.asc              // Ascend C算子实现 & 调用样例
+│   └── matmul_mx_norm_odd.asc              // Ascend C样例实现 & 调用样例
 ```
 
-## 算子描述
+## 样例描述
 
-- 算子功能： 
+- 样例功能： 
 
-  MatmulMxNormOddCustom算子调用Matmul API计算时，Scale的K方向为奇数，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。
+  MatmulMxNormOddCustom样例调用Matmul API计算时，Scale的K方向为奇数，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。
 
-- 算子规格： 
+- 样例规格： 
 
-  本样例中，算子实现支持的shape为：M = 32，N = 128，K = 30，scaleK = 2，30整除32向上取整的scaleK是奇数1，内部适配为偶数2。
+  本样例中：M = 32，N = 128，K = 30，scaleK = 2。其中K整除32向上取整的值是奇数1，scaleK需要对齐为偶数2。
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">MatmulMxNormOddCustom</td></tr>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulMxNormOddCustom</td></tr>
   </tr>
-  <tr><td rowspan="6" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">M*K</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">scaleA</td><td align="center">M*scaleK</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">K*N</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">scaleB</td><td align="center">scaleK*N</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="6" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">scaleA</td><td align="center">[M, scaleK]</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">scaleB</td><td align="center">[scaleK, N]</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M*N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_mx_norm_odd_custom</td></tr>
   </table>
-- 算子实现： 
+- 样例实现： 
   - Kernel实现
-    - 计算逻辑：C = (scaleA ⊗ A) * (scaleB ⊗ B) + Bias。“⊗”表示广播乘法。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]，数据类型为fp8_e5m2_t；scaleA为左量化系数矩阵，形状为[M, scaleK]，数据类型为fp8_e8m0_t；B为右矩阵，形状为[K, N]，数据类型为fp8_e5m2_t；scaleB为右量化系数矩阵，形状为[scaleK, N]，数据类型为fp8_e8m0_t。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对(scaleA ⊗ A) * (scaleB ⊗ B)结果矩阵的每一行都采用该bias进行偏置。
     - 具体步骤：
       - 创建一个Tiling对象：使用SetMadType设置Matmul模式，使能MxMatmul场景，使用SetScaleAType设置scaleA的信息、使用SetScaleBType设置scaleB的信息。
           ```
@@ -92,7 +88,7 @@
 
 ## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
