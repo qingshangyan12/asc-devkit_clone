@@ -994,7 +994,6 @@ function(npu_op_package_add target_package_name)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
         add_library(${target_package_name}_ascendc_${_ascendc_tiling_target} SHARED)
         set_target_properties(${target_package_name}_ascendc_${_ascendc_tiling_target} PROPERTIES OUTPUT_NAME cust_opmaster_rt2.0)
-        target_compile_options(${target_package_name}_ascendc_${_ascendc_tiling_target} PRIVATE -g)
         add_custom_target(optiling_compat ALL
           COMMAND ln -sf lib/linux/${CMAKE_SYSTEM_PROCESSOR}/$<TARGET_FILE_NAME:${target_package_name}_ascendc_${_ascendc_tiling_target}>
           ${CMAKE_CURRENT_BINARY_DIR}/liboptiling.so
