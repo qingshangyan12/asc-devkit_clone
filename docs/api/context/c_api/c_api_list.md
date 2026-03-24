@@ -125,10 +125,10 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |-------------------------------------------------------------------------|-----------|
 | [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md)                     | 将GM中的数据搬运到L0B中。 | 
 | <cann-filter npu_type = "950"> [asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)                     | 将GM中的数据padding后搬运到L1中。</cann-filter> |
-| <cann-filter npu_type = "950"> [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1.md)                     | 将GM中的数据搬运到L1中。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1)                     | 将GM中的数据搬运到L1中。</cann-filter> |
 | <cann-filter npu_type = "950"> [asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz.md)                     | 将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。 </cann-filter> |
 | <cann-filter npu_type = "950"> [asc_copy_gm2l1_nd2nz](cube_datamove/asc_copy_gm2l1_nd2nz.md)                     | 将GM中的数据搬运到L1中，在此过程中执行ND->NZ/NHWC->NC1HWC0/NHWC->C1HWNC0操作。</cann-filter> |
-| [asc_copy_l12gm](cube_datamove/asc_copy_l12gm)                     | 将数据从L1搬运到GM。 |
+| [asc_copy_l12gm](cube_datamove/asc_copy_l12gm.md)                     | 将数据从L1搬运到GM。 |
 | [asc_copy_l0c2gm](cube_datamove/asc_copy_l0c2gm)                     | 将L0C中的数据搬运到GM中。 |
 | [asc_copy_l0c2gm](cube_datamove/asc_copy_l0c2ub.md)                     | 将L0C中的数据搬运到UB中。 |
 | [asc_copy_l0c2l1](cube_datamove/asc_copy_l0c2l1)                        | 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到GM中。 |
