@@ -204,7 +204,6 @@ struct DataCopyExtParams {
 
     uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
     uint32_t blockLen = 0;
-
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     int64_t srcStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);
     int64_t dstStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);

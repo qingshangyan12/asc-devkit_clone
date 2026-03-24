@@ -290,6 +290,7 @@ private:
     template <TPosition bufPos> friend class TBuf;
     static constexpr bool isTbufPool = true;
 };
+
 }  // namespace AscendC
 #endif  // ASCENDC_MODULE_TPIPE_BASE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_BASE_H__)
