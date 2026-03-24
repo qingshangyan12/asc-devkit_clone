@@ -27,6 +27,8 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
+message(STATUS "[INFO] ENABLE_IBSHARE_AB is ${ENABLE_IBSHARE_AB}")
+
 # ======================================================================================
 # NPU 编译选项配置
 #

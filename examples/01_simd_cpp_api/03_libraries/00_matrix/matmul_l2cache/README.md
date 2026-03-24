@@ -1,6 +1,8 @@
-# Matmul算子L2 Cache切分功能直调样例
+# Matmul L2 Cache切分功能直调样例
 ## 概述
-本样例介绍调用Matmul API实现L2 Cache切分的功能的Matmul单算子。
+本样例介绍L2 Cache切分的功能的Matmul样例。
+
+Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块数据，整体按数据切分的块数，分多次进行计算。每次计算前，第一个核第一次访问Global Memory上的矩阵时，会将切分后的一块矩阵数据加载到L2 Cache，其它核或第一个核后续数据访问都可以命中L2 Cache，以提高样例性能。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -16,38 +18,32 @@
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 |   ├── l2_cache_optimizer.h    // L2Cache切分算法实现函数
-│   └── matmul_l2cache.asc              // Ascend C算子实现 & 调用样例
+│   └── matmul_l2cache.asc      // Ascend C样例实现 & 调用样例
 ```
-## 算子描述
-- 算子功能： 
+## 样例描述
+- 样例功能： 
 
-  Matmul算子M方向或者N方向切分输入的矩阵，将矩阵切分成多块数据，整体按数据切分的块数，分多次进行计算。每次计算前，第一个核第一次访问Global Memory上的矩阵时，会将切分后的一块矩阵数据加载到L2 Cache，其它核或第一个核后续数据访问都可以命中L2 Cache，以提高算子性能。   
+  本样例以AI处理器的L2 Cache大小192M为例，根据样例的输入、输出shape，计算样例输入和输出的总数据量为((30720 * 4096) + (4096 * 1024) + (1024) + (30720 * 1024)) * 2 = 322963456字节（约308M），大于L2 Cache（192M），无法保证计算前读取的数据能够命中L2 Cache，而Global Memory带宽低于L2 Cache，且两者之间差距较大，搬运数据成为样例运行的性能瓶颈。因此需要将输入数据切分成多块，使得每个数据块的计算数据量（包含输入和输出），能够命中L2 Cache。本样例提供了L2CacheOptimizer类，其中GetTileNum接口用于自动根据左右矩阵的Shape获取左右矩阵总L2切分份数，GetBlockShape接口获取L2切分后M、N、K轴的长度，GetBlockCoord接口返回对应切块的位置坐标，即M、N、K方向相对矩阵起始位置的偏移。
 
-  本样例以AI处理器的L2 Cache大小192M为例，根据算子的输入、输出shape，计算算子输入和输出的总数据量为((30720 * 4096) + (4096 * 1024) + (1024) + (30720 * 1024)) * 2 = 322963456字节（约308M），大于L2 Cache（192M），无法保证计算前读取的数据能够命中L2 Cache，而Global Memory带宽低于L2 Cache，且两者之间差距较大，搬运数据成为算子运行的性能瓶颈。因此需要将输入数据切分成多块，使得每个数据块的计算数据量（包含输入和输出），能够命中L2 Cache。本样例提供了L2CacheOptimizer类，其中GetTileNum接口用于自动根据左右矩阵的Shape获取左右矩阵总L2切分份数，GetBlockShape接口获取L2切分后M、N、K轴的长度，GetBlockCoord接口返回对应切块的位置坐标，即M、N、K方向相对矩阵起始位置的偏移。
+- 样例规格： 
 
-- 算子规格： 
-
-  本样例中，算子实现支持的shape为：M = 30720, N = 1024, K = 4096。
+  本样例中：M = 30720, N = 1024, K = 4096。
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>
-  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">(30720, 4096)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">(4096, 1024)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">(1024, )</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td>
-  <td align="center">(30720, 1024)</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td>
+  <td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_l2cache_custom</td></tr>
   </table>
-- 算子实现： 
-  - Kernel实现
-    - 计算逻辑：C = A * B + Bias。
-      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
-      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
-      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该Bias进行偏置。
+- 样例实现： 
+  - Kernel关键步骤
     - 具体步骤：
       - 创建Matmul对象。
       - 初始化操作。
@@ -78,7 +74,7 @@
       - 完成矩阵乘操作。
       - 结束矩阵乘操作。
 
-  - Tiling实现
+  - Tiling关键步骤
       - 本样例采取了常量化Tiling计算，在Kernel侧通过设置一组固定的基本块信息，其他Tiling信息在Kernel侧通过常量化推导，Kernel侧不再需要运行时Tiling信息。基于这组最优的基本块信息，能够适用输入Shape中M，N较大的场景。样例中提供了一种L2Cache切分算法（参考样例L2CacheOptimizer类）。该算法当前在Kernel侧完成计算L2切块份数，也可以自行迁移代码至Host侧计算。
       - L2CacheOptimizer具体计算步骤：
         - 判断是否需要进行L2分块
@@ -118,7 +114,7 @@
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
