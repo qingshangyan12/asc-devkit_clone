@@ -21,7 +21,7 @@ __simd_callee__ inline void asc_lt(vector_bool& dst, vector_int16_t src0, vector
 __simd_callee__ inline void asc_lt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 __simd_callee__ inline void asc_lt(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
 __simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int32 src0, vector_int32 src1, vector_bool mask)
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 ```
 
 ## 参数说明
@@ -53,7 +53,7 @@ PIPE_V
 vector_bool dst;
 vector_half src0;
 vector_half src1;
-vector_bool mask = asc_create_mask_b16(Pat::ALL);
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址。
 asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址。
 asc_lt(dst, src0, src1, mask);

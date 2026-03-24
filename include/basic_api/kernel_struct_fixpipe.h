@@ -12,6 +12,11 @@
  * \file kernel_struct_fixpipe.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H__
+#endif
+
 #ifndef ASCENDC_MODULE_STRUCT_FIXPIPE_H
 #define ASCENDC_MODULE_STRUCT_FIXPIPE_H
 
@@ -33,7 +38,7 @@ enum class CO2Layout : uint8_t {
 
 struct FixpipeConfig {
     CO2Layout format;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     bool isToUB;
 #endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
@@ -41,7 +46,7 @@ struct FixpipeConfig {
 #endif
 
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_) : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     , isToUB(false)
 #endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
@@ -49,7 +54,7 @@ struct FixpipeConfig {
 #endif
     {}
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_, bool isToUB_) : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     , isToUB(isToUB_)
 #endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
@@ -57,7 +62,7 @@ struct FixpipeConfig {
 #endif
     {}
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_, bool isToUB_, bool enableFixVal_) : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     , isToUB(isToUB_)
 #endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
@@ -66,7 +71,7 @@ struct FixpipeConfig {
     {}
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #if (__NPU_ARCH__ == 5102)
 constexpr FixpipeConfig CFG_NZ_FIX = {CO2Layout::NZ, false, true};
 #endif
@@ -142,7 +147,7 @@ struct FixpipeParamsV220 {
     bool isChannelSplit = false;
 };
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // 根据模板参数选结构体
 template <CO2Layout format>
 struct TransformParams {};
@@ -181,6 +186,7 @@ struct FixpipeParamsC310 {
     ReluMode preReluMode = ReluMode::NO_RELU;
     ClipReluMode preClipReluMode = ClipReluMode::NOCLIP_RELU;
     uint64_t reluScalar;
+    uint64_t vectorRelu;
 #endif
     uint16_t nSize = 0;
     uint16_t mSize = 0;  // M-DirectionSize
@@ -204,3 +210,8 @@ using FixpipeParamsM310 = FixpipeParamsV220;
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_STRUCT_FIXPIPE_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H__
+#endif

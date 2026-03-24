@@ -21,7 +21,7 @@
 
 #include "instr_impl/npu_arch_2201/sys_var_impl.h"
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 #include "instr_impl/npu_arch_3510/sys_var_impl.h"
 
@@ -34,6 +34,8 @@ __aicore__ inline int64_t asc_get_block_num();
 __aicore__ inline int64_t asc_get_system_cycle();
 
 __aicore__ inline void asc_set_ctrl(uint64_t config);
+
+__aicore__ inline int64_t asc_get_ffts_base_addr();
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
@@ -53,11 +55,41 @@ __aicore__ inline int64_t asc_get_program_counter();
 
 __aicore__ inline void asc_get_arch_ver(uint32_t& coreVersion);
 
-__simd_callee__ inline int64_t asc_get_ar_spr();
-
-__aicore__ inline int64_t asc_get_ffts_base_addr();
+__aicore__ inline int64_t asc_get_ar_spr();
 
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
+
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+__aicore__ inline int64_t asc_get_vf_len();
+
+__aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
+
+__aicore__ inline void asc_get_arch_ver(uint32_t& coreVersion);
+
+__aicore__ inline int64_t asc_get_core_id();
+
+__aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
+
+__aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
+
+__aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
+
+__aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config);
+
+__aicore__ inline void asc_set_l13d_padding(uint64_t config);
+
+__aicore__ inline void asc_set_l13d_padding(half config);
+
+__aicore__ inline void asc_set_l13d_padding(int16_t config);
+
+__aicore__ inline void asc_set_l13d_padding(uint16_t config);
+
+__aicore__ inline void asc_set_l12l0_padding_val(uint64_t config);
+
+__aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
+
+__aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 
 #endif
 

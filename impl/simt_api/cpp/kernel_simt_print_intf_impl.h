@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef ASCENDC_MODULE_SIMT_PRINT_INTERFACE_IMPL_H
-#define ASCENDC_MODULE_SIMT_PRINT_INTERFACE_IMPL_H
+#ifndef IMPL_SIMT_API_CPP_KERNEL_SIMT_PRINT_INTERFACE_IMPL_H
+#define IMPL_SIMT_API_CPP_KERNEL_SIMT_PRINT_INTERFACE_IMPL_H
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
@@ -35,10 +35,18 @@ using ::printf;
 template <typename... Args>
 inline auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)...))
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #ifdef ASCENDC_DUMP
     return printf(std::forward<Args>(args)...);
 #else
     return 0;
+#endif
+#else
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    return printf(std::forward<Args>(args)...);
+#else
+    return 0;
+#endif
 #endif
 }
 #else
@@ -48,16 +56,28 @@ inline auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)..
 template <class... Args>
 __aicore__ inline void PRINTF(const __gm__ char* fmt, Args&&... args)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #ifdef ASCENDC_DUMP
     __asc_simt_vf::simt_printf_impl(__asc_simt_vf::DumpType::DUMP_SIMT_PRINTF, fmt, args...);
+#endif
+#else
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_simt_vf::simt_printf_impl(__asc_simt_vf::DumpType::DUMP_SIMT_PRINTF, fmt, args...);
+#endif
 #endif
 }
 
 template <class... Args>
 __aicore__ inline void printf(const __gm__ char* fmt, Args&&... args)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #ifdef ASCENDC_DUMP
     __asc_simt_vf::simt_printf_impl(__asc_simt_vf::DumpType::DUMP_SIMT_PRINTF, fmt, args...);
+#endif
+#else
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_simt_vf::simt_printf_impl(__asc_simt_vf::DumpType::DUMP_SIMT_PRINTF, fmt, args...);
+#endif
 #endif
 }
 
@@ -68,4 +88,4 @@ __aicore__ inline void printf(const __gm__ char* fmt, Args&&... args)
 }  // namespace Simt
 }  // namespace AscendC
 
-#endif  // ASCENDC_MODULE_SIMT_PRINT_INTERFACE_IMPL_H
+#endif  // IMPL_SIMT_API_CPP_KERNEL_SIMT_PRINT_INTERFACE_IMPL_H

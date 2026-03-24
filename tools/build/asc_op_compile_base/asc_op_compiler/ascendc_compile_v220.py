@@ -138,15 +138,14 @@ def _gen_compile_cmd_m510(src_file: str, dst_file: str, compile_option_tuple, ti
 
     for option in compile_option_tuple.compile_options:
         compile_cmd += [option]
-    compile_cmd += [src_file, "--cce-aicore-arch=dav-510r2", "-D__NPU_ARCH__=5102",
+    compile_cmd += [src_file, "--cce-aicore-arch=dav-510r2",
                     "--cce-aicore-only", "-o", dst_file,
                     "-mllvm", "-cce-aicore-stack-size=0x8000",
                     "-mllvm", "-cce-aicore-function-stack-size=0x8000",
                     "-mllvm", "-cce-aicore-record-overflow=false",
                     "-mllvm", "-cce-aicore-addr-transform",
                     "-mllvm", "--cce-aicore-jump-expand=true",
-                    "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
-                    "-mllvm", "-cce-aicore-dcci-before-kernel-end=false"
+                    "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false"
                     ]
     if global_var_storage.get_variable("ascendc_enable_sanitizer"):
         compile_cmd += ["--cce-enable-sanitizer", "-g"]
@@ -316,7 +315,7 @@ def gen_current_kernel_name(compile_info: CompileInfo, sub_arch: str, code_chann
 
 
 def get_compile_cmd_for_kernel_name(compile_info: CompileInfo, current_kernel_name: str, code_channel: int, \
-                                    tiling_info: TilingInfo):    
+                                    tiling_info: TilingInfo):
     compile_cmd = [f"-Dauto_gen_{compile_info.origin_func_name}_kernel={current_kernel_name}"]
     if code_channel == CORE_TYPE_MIX:
         compile_cmd += [f"-D{MIX_CORE_MACRO}={1}"]
@@ -346,6 +345,8 @@ def call_bisheng_v220(compile_info: CompileInfo, compile_option_tuple, tiling_in
             compile_option_tuple, sub_arch, tiling_info.tiling_data_file_path)
         # tbe-pass add "__kernel0" in tbe-codegen and json, we use -D to change function name
         current_kernel_name = gen_current_kernel_name(compile_info, sub_arch, code_channel)
+        if global_var_storage.get_variable("ascendc_sk_double_compile") is True:
+            compile_info.global_kernel_symbols.append(current_kernel_name)
         compile_cmd += get_compile_cmd_for_kernel_name(compile_info, current_kernel_name, code_channel, tiling_info)
         new_sources += DFXSectionGenerator().generate_dfx_section(str(tiling_info.tiling_key),\
                                             tiling_info, current_kernel_name, compile_info, True)
@@ -395,12 +396,12 @@ def get_ktype_section_head(variable_name: str):
         if CommonUtility.is_v220():
             section_var_head += f"#if (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201)\n"
         elif CommonUtility.is_c310():
-            section_var_head += f"#if (defined(__DAV_CUBE__) && __NPU_ARCH__ == 3101)\n"
+            section_var_head += f"#if (defined(__DAV_CUBE__) && __NPU_ARCH__ == 3510)\n"
     elif "mix_aiv" in variable_name:
         if CommonUtility.is_v220():
             section_var_head += f"#if (defined(__DAV_VEC__) && __NPU_ARCH__ == 2201)\n"
         elif CommonUtility.is_c310():
-            section_var_head += f"#if (defined(__DAV_VEC__) && __NPU_ARCH__ == 3101)\n"
+            section_var_head += f"#if (defined(__DAV_VEC__) && __NPU_ARCH__ == 3510)\n"
     return section_var_head
 
 
@@ -519,10 +520,10 @@ def v310_mode_vec_ofile(little_endian, binary_32) -> int:
     vec_high_mid_map = {
         '011100001': '0100', # MOV_UB_TO_L1
     }
-    high_9 = binary_32[:9] 
-    high_10 = binary_32[:10] 
-    mid_36 = binary_32[25:29] 
-    low_1 = binary_32[31] 
+    high_9 = binary_32[:9]
+    high_10 = binary_32[:10]
+    mid_36 = binary_32[25:29]
+    low_1 = binary_32[31]
 
     conditions = [
         # PIPE_V: exclude movemask
@@ -538,7 +539,7 @@ def v310_mode_vec_ofile(little_endian, binary_32) -> int:
         # DMA
         (high_10 in vec_high_low_map and low_1 == vec_high_low_map[high_10]),
         (high_10 in vec_high_map),
-        (high_9 in vec_high_mid_map and mid_36 == vec_high_mid_map[high_9]),        
+        (high_9 in vec_high_mid_map and mid_36 == vec_high_mid_map[high_9]),
     ]
 
     if any(conditions):
@@ -572,7 +573,7 @@ def v310_mode_cube_ofile(little_endian, binary_32) -> int:
         '0110010100',
         '0110010101',
     }
-    high_10 = binary_32[:10] 
+    high_10 = binary_32[:10]
 
     conditions = [
         # Fixpipe

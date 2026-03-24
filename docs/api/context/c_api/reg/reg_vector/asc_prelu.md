@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-源操作数src大于0的情况下直接将src0写入目的操作数dst，否则将src * src1的结果写入dst。计算公式如下：
+源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将src0 * src1的结果写入dst。计算公式如下：
 
 $$
 dst = (src0 >= 0) ? src0 : src0 * src1
@@ -50,7 +50,7 @@ PIPE_V
 vector_half dst;
 vector_half src0;
 vector_half src1;
-vector_bool mask = asc_create_mask_b16(Pat::ALL);
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址。
 asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址。
 asc_prelu(dst, src0, src1, mask);

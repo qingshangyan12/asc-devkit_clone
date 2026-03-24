@@ -74,7 +74,58 @@ __aicore__ inline void asc_dcci_entire_atomic_impl(__gm__ void* dst)
 {
     dcci(dst, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_ATOMIC);
 }
- 
+
+// asc_dcci(__ubuf__)
+__aicore__ inline void asc_ub_dcci_single_impl(__ubuf__ void* dst)
+{
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE);
+}
+
+__aicore__ inline void asc_ub_dcci_entire_impl(__ubuf__ void* dst)
+{
+    dcci(dst, cache_line_t::ENTIRE_DATA_CACHE);
+}
+
+__aicore__ inline void asc_ub_dcci_single_all_impl(__ubuf__ void* dst)
+{
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_ALL);
+}
+
+__aicore__ inline void asc_ub_dcci_single_ub_impl(__ubuf__ void* dst)
+{
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_UB);
+}
+
+__aicore__ inline void asc_ub_dcci_single_out_impl(__ubuf__ void* dst)
+{
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+}
+
+__aicore__ inline void asc_ub_dcci_single_atomic_impl(__ubuf__ void* dst)
+{
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_ATOMIC);
+}
+
+__aicore__ inline void asc_ub_dcci_entire_all_impl(__ubuf__ void* dst)
+{
+    dcci(dst, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_ALL);
+}
+
+__aicore__ inline void asc_ub_dcci_entire_ub_impl(__ubuf__ void* dst)
+{
+    dcci(dst, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_UB);
+}
+
+__aicore__ inline void asc_ub_dcci_entire_out_impl(__ubuf__ void* dst)
+{
+    dcci(dst, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+}
+
+__aicore__ inline void asc_ub_dcci_entire_atomic_impl(__ubuf__ void* dst)
+{
+    dcci(dst, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_ATOMIC);
+}
+  
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)  

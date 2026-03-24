@@ -7,9 +7,15 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_H__
+#endif
+
 #ifndef LIB_REDUCE_REDUCE_H
 #define LIB_REDUCE_REDUCE_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "reduce_common.h"
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
@@ -22,7 +28,7 @@
 #include "../../../impl/adv_api/detail/reduce/reduce_mean/reduce_mean_v220_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_any/reduce_any_v220_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_all/reduce_all_v220_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/reduce/reduce_max/reduce_max_c310_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_min/reduce_min_c310_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_sum/reduce_sum_c310_impl.h"
@@ -400,3 +406,8 @@ __aicore__ inline void ReduceAll(
 } // namespace AscendC
 #endif
 #endif // LIB_REDUCE_REDUCE_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_H__
+#endif

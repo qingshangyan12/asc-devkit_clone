@@ -27,6 +27,7 @@ __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e
 __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
+__simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 __simd_callee__ inline void asc_loadalign(vector_half& dst, __ubuf__ half* src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 __simd_callee__ inline void asc_loadalign(vector_float& dst, __ubuf__ float* src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 // repeat stride模式搬出，同时开启硬件自动Post Update模式
@@ -43,6 +44,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_fp8_e5m2_t& dst, __u
 __simd_callee__ inline void asc_loadalign_postupdate(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
+__simd_callee__ inline void asc_loadalign_postupdate(vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_half& dst, __ubuf__ half*& src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_float& dst, __ubuf__ float*& src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 ```
@@ -79,7 +81,7 @@ __ubuf__ int8_t src_align32b;
 vector_int8_t dst;
 uint16_t block_stride;
 uint16_t repeat_stride;
-vector_bool mask = asc_create_mask_b8(Pat::ALL);
+vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(dst, src_align32b, block_stride, repeat_stride, mask);
 
 // asc_loadalign_postupdate
@@ -87,6 +89,6 @@ __ubuf__ int8_t src_align32b;
 vector_int8_t dst;
 uint16_t block_stride;
 uint16_t repeat_stride;
-vector_bool mask = asc_create_mask_b8(Pat::ALL);
+vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign_postupdate(dst, src_align32b, block_stride, repeat_stride, mask);
 ```

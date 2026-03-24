@@ -12,6 +12,7 @@
  * \file bitwise_xor_tiling.h
  * \brief
  */
+
 #ifndef LIB_MATH_BITWISE_XOR_TILING_H
 #define LIB_MATH_BITWISE_XOR_TILING_H
 

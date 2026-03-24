@@ -18,10 +18,10 @@
 class TestCubeDmamove##class_name##data_type##val_type : public testing::Test {                 \
 protected:                                                                                      \
     void SetUp() {                                                                              \
-        g_c_api_core_type = C_API_AIC_TYPE;                                                     \
+        g_coreType = C_API_AIC_TYPE;                                                     \
     }                                                                                           \
     void TearDown() {                                                                           \
-        g_c_api_core_type = C_API_AIV_TYPE;                                                     \
+        g_coreType = C_API_AIV_TYPE;                                                     \
     }                                                                                           \
 };                                                                                              \
                                                                                                 \
@@ -90,3 +90,5 @@ TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, ui
 TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, uint32_t, half);
 TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, uint32_t, uint32_t);
 TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix_bf16, bfloat16_t, bfloat16_t);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix_h, bfloat16_t, half);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix_ui, bfloat16_t, uint32_t);

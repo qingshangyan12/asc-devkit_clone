@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@
 #include "simt_api/common_functions.h"
 #include "simt_api/math_functions.h"
 #include "simt_api/device_functions.h"
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #include "simt_api/vector_functions.h"
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_SIMT_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

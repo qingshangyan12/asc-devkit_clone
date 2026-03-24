@@ -94,6 +94,22 @@ class SubOperatorInfos:
         self.call_dcci_before_kernel_start: bool = False
         self.call_dcci_after_kernel_end: bool = False
         self.call_dcci_disable_on_kernel: bool = False
+        # For dynamic operators, decide whether to add DCCI options during the final superkernel compilation
+        self.dcci_before_kernel_start_op_list = [
+            part_op.strip()
+            for part_op in op_options.get('dcci-before-kernel-start', "").split(',')
+            if part_op.strip()
+        ]
+        self.dcci_after_kernel_end_op_list = [
+            part_op.strip()
+            for part_op in op_options.get('dcci-after-kernel-end', "").split(',')
+            if part_op.strip()
+        ]
+        self.dcci_disable_on_kernel_op_list = [
+            part_op.strip()
+            for part_op in op_options.get('dcci-disable-on-kernel', "").split(',')
+            if part_op.strip()
+        ]
         # code_gen of dynamic op
         self._gen_code_for_dynamic_op()
 
@@ -155,56 +171,60 @@ class SubOperatorInfos:
         return code
 
 
+    def _is_aic_kernel_type(self):
+        return self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, \
+            SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0]
+
+
+    def _gen_notify_block_for_core(self, inner_event_id_set, is_aic):
+        notify_block = "if ASCEND_IS_AIC {\n" if is_aic else "if ASCEND_IS_AIV {\n"
+        found = False
+        index = 0
+        for send_index in self.send_event_list:
+            if send_index not in inner_event_id_set:
+                CommonUtility.dump_compile_log(['###Notify:', self.kernel_name, self.send_event_list[index]], \
+                    CompileStage.SPLIT_SUB_OBJS, self.compile_log_path)
+                notify_block += f"    // kernel={self.kernel_name}, ev={self.send_event_list[index]}, \
+param_offset={self.notify_param_offset + index}\n"
+                notify_block += self.gen_profiling_for_notify(send_index, False)
+                notify_block += f"    NotifyFunc<{str(is_aic).lower()}>("
+                notify_block += f"param_base[{self.notify_param_offset + index}]);\n"
+                notify_block += self.gen_profiling_for_notify(send_index, True)
+                found = True
+            index += 1
+        notify_block += "}\n"
+        return notify_block, found
+
+
+    def _set_notify_block_single_stream(self, notify_block_aic, notify_block_aiv, found_aic, found_aiv):
+        if self._is_aic_kernel_type():
+            self.notify_block = notify_block_aic if found_aic else ''
+        else:
+            self.notify_block = notify_block_aiv if found_aiv else ''
+
+
+    def _set_notify_block_double_stream(self, notify_block_aic, notify_block_aiv, found_aic, found_aiv):
+        if self._is_aic_kernel_type():
+            self.notify_block['aic'] = notify_block_aic if found_aic else ''
+            self.notify_block['aiv'] = ''
+        else:
+            self.notify_block['aiv'] = notify_block_aiv if found_aiv else ''
+            self.notify_block['aic'] = ''
+            self.tmp_notify_block['aiv'] = ''
+            self.tmp_notify_block['aic'] = notify_block_aic if found_aic else '' 
+
+
     def gen_notify_from_outside(self, inner_event_id_set, enable_double_stream):
-        if len(self.send_event_list) != 0:
-            found_aic = False
-            found_aiv = False
-            notify_block_aic = "if ASCEND_IS_AIC {\n"
-            index = 0
-            for send_index in self.send_event_list:
-                if send_index not in inner_event_id_set:
-                    CommonUtility.dump_compile_log(['###Notify:', self.kernel_name, self.send_event_list[index]], \
-                        CompileStage.SPLIT_SUB_OBJS, self.compile_log_path)
-                    notify_block_aic += f"    // kernel={self.kernel_name}, ev={self.send_event_list[index]}, \
-param_offset={self.notify_param_offset + index}\n"
-                    notify_block_aic += self.gen_profiling_for_notify(send_index, False)
-                    notify_block_aic += f"    NotifyFunc<true>(param_base[{self.notify_param_offset + index}]);\n"
-                    notify_block_aic += self.gen_profiling_for_notify(send_index, True)
-                    found_aic = True
-                index += 1
-            notify_block_aic += "}\n"
+        if len(self.send_event_list) == 0:
+            return
 
-            notify_block_aiv = "if ASCEND_IS_AIV {\n"
-            index = 0
-            for send_index in self.send_event_list:
-                if send_index not in inner_event_id_set:
-                    CommonUtility.dump_compile_log(['###Notify:', self.kernel_name, self.send_event_list[index]], \
-                        CompileStage.SPLIT_SUB_OBJS, self.compile_log_path)
-                    notify_block_aiv += f"    // kernel={self.kernel_name}, ev={self.send_event_list[index]}, \
-param_offset={self.notify_param_offset + index}\n"
-                    notify_block_aiv += self.gen_profiling_for_notify(send_index, False)
-                    notify_block_aiv += f"    NotifyFunc<false>(param_base[{self.notify_param_offset + index}]);\n"
-                    notify_block_aiv += self.gen_profiling_for_notify(send_index, True)
-                    found_aiv = True
-                index += 1
-            notify_block_aiv += "}\n"
+        notify_block_aic, found_aic = self._gen_notify_block_for_core(inner_event_id_set, True)
+        notify_block_aiv, found_aiv = self._gen_notify_block_for_core(inner_event_id_set, False)
 
-            if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, \
-                    SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0]:
-                if enable_double_stream:
-                    self.notify_block['aic'] = notify_block_aic if found_aic else ''
-                    self.notify_block['aiv'] = ''
-                else:
-                    self.notify_block = notify_block_aic if found_aic else ''
-            else:
-                if enable_double_stream:
-                    self.notify_block['aiv'] = notify_block_aiv if found_aiv else ''
-                    self.notify_block['aic'] = ''
-
-                    self.tmp_notify_block['aiv'] = ''
-                    self.tmp_notify_block['aic'] = notify_block_aic if found_aic else '' 
-                else:
-                    self.notify_block = notify_block_aiv if found_aiv else ''
+        if enable_double_stream:
+            self._set_notify_block_double_stream(notify_block_aic, notify_block_aiv, found_aic, found_aiv)
+        else:
+            self._set_notify_block_single_stream(notify_block_aic, notify_block_aiv, found_aic, found_aiv)
 
 
     def gen_wait_from_outside(self, inner_event_id_set, enable_double_stream):
@@ -272,6 +292,19 @@ param_offset={self.wait_param_offset + index}\n"
                 "__placehoder__spk_block_num__", f"{spk_block_num}")
 
 
+    def update_dynamic_op_dcci_options(self):
+        if self.sub_op_task_type.value != SubOperatorType.DYNAMIC_OP.value:
+            return
+
+        if self.sub_operator_op_type in self.dcci_disable_on_kernel_op_list:
+            self.call_dcci_before_kernel_start = False
+            self.call_dcci_after_kernel_end = False
+            self.call_dcci_disable_on_kernel = True
+        else:
+            self.call_dcci_before_kernel_start = self.sub_operator_op_type in self.dcci_before_kernel_start_op_list
+            self.call_dcci_after_kernel_end = self.sub_operator_op_type in self.dcci_after_kernel_end_op_list
+
+
     def init_of_sub_operator_info(self):
         try:
             with open(self.json_path, 'r') as fd:
@@ -291,6 +324,7 @@ param_offset={self.wait_param_offset + index}\n"
                 if self.timestamp_option == True:
                     self.debug_option: str = sub_operater_infos["debugOptions"]
                     self.debug_size: int = sub_operater_infos["debugBufSize"]
+                self.sub_operator_op_type = sub_operater_infos.get('sub_operator_op_type', "")
                 self.kernel_params : list = \
                     [param + f"_{self.index}" for param in sub_operater_infos["sub_operator_params"]]
                 self.early_start_set_flag = sub_operater_infos['sub_operator_early_start_set_flag']
@@ -301,6 +335,7 @@ param_offset={self.wait_param_offset + index}\n"
                     sub_operater_infos.get('sub_operator_call_dcci_after_kernel_end', False)
                 self.call_dcci_disable_on_kernel = \
                     sub_operater_infos.get('sub_operator_call_dcci_disable_on_kernel', False)
+                self.update_dynamic_op_dcci_options()
                 if self.early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartDisable.value \
                     and (self.early_start_set_flag or self.early_start_wait_flag):
                     CommonUtility().ascendc_raise_python_err(ERR_CODE, \
