@@ -33,19 +33,22 @@ constexpr bool IS_TRANS_B = true;
 constexpr bool IS_BIAS = false;
 
 constexpr uint32_t SINGLE_M = 2048;
+constexpr uint32_t SINGLE_M_SPLIT = 4096;
+constexpr uint32_t SINGLE_M_L2CACHE = 1024;
 constexpr uint32_t SINGLE_N = 1536;
+constexpr uint32_t SINGLE_N_SPLIT = 683;
 constexpr uint32_t SINGLE_K = 8192;
 constexpr uint32_t BASE_M = 128;
 constexpr uint32_t BASE_N = 256;
 constexpr uint32_t BASE_K = 64;
-constexpr uint32_t TILING_DEPTHA1_PARAM = 4;
+constexpr uint32_t TILING_DEPTHA1_PARAM = 16;
 constexpr uint32_t TILING_DEPTHB1_PARAM = 8;
-constexpr uint32_t TILING_STEPKA_PARAM = 2;
+constexpr uint32_t TILING_STEPKA_PARAM = 8;
 constexpr uint32_t TILING_STEPKB_PARAM = 4;
 constexpr uint32_t TILING_STEPMN_PARAM = 1;
 
 constexpr MatmulShapeParams shapeParams = {SINGLE_M, SINGLE_N, SINGLE_K, BASE_M, BASE_N, BASE_K};
-
+constexpr MatmulShapeParams shapeParamsL2Cache = {SINGLE_M_L2CACHE, SINGLE_N, SINGLE_K, BASE_M, BASE_N, BASE_K};
 struct MatmulProblemShape {
     uint32_t usedCoreNum;
     uint32_t m;
@@ -66,8 +69,8 @@ enum MatmulMode {
     MULTI_CORE_NORM = 5,
     MULTI_CORE_MDL = 6,
     MULTI_CORE_MDL_CONSTANTS_TILING = 7,
-    MULTI_CORE_MDL_CONSTANTS_TILING_UINTFLAG = 8,
-    MULTI_CORE_MDL_CONSTANTS_TILING_UINTFLAG_L2CACHE = 9
+    MULTI_CORE_MDL_CONSTANTS_TILING_UNITFLAG = 8,
+    MULTI_CORE_MDL_CONSTANTS_TILING_UNITFLAG_L2CACHE = 9
 };
 
 template <typename TilingType>
@@ -169,10 +172,12 @@ MatmulKernel<AType, BType, CType, BiasType, isMDL>::CalcOffset(int32_t blockIdx,
     }
 }
 
-template <typename AType, typename BType, typename CType, typename BiasType, bool useUnitflag = false>
+template <typename AType, typename BType, typename CType, typename BiasType, bool useUnitflag = false, bool l2cache = false>
 __aicore__ inline constexpr MatmulApiStaticTiling GetCustomConstantCFG()
 {
-    MatmulConfig mmCFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
+    MatmulConfig mmCFG = l2cache ?
+        GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParamsL2Cache) :
+        GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
     mmCFG.enUnitFlag = useUnitflag;
     auto constantCFG = AscendC::GetMatmulApiTiling<AType, BType, CType, BiasType>(mmCFG);
     constantCFG.depthA1 = TILING_DEPTHA1_PARAM;
@@ -196,7 +201,7 @@ public:
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
     using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
 
-    constexpr static auto CONSTANT_CFG = GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>();
+    constexpr static auto CONSTANT_CFG = GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, useUnitflag>();
     AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
     MatmulProblemShape shapes;
 
@@ -295,7 +300,7 @@ public:
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
     using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
 
-    constexpr static auto CONSTANT_CFG = GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, true>();
+    constexpr static auto CONSTANT_CFG = GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, true, true>();
     AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
     MatmulProblemShape shapes;
 
