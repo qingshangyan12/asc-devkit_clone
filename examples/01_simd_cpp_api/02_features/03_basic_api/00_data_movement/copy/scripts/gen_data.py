@@ -11,35 +11,75 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-
 import os
+import argparse
 import numpy as np
+np.random.seed(9)
 
 
-def get_range_by_dtype(input_type):
-    try:
-        if input_type == np.float16 or input_type == np.float32 or input_type == np.float64:
-            return np.finfo(input_type).min, np.finfo(input_type).max
-        else:
-            return np.iinfo(input_type).min, np.iinfo(input_type).max
-    except ValueError:
-        print(f"Unsupported data type:{input_type}")
+def gen_golden_data(scenarioNum=1):
+    """
+    根据场景编号生成输入数据和Golden数据
+    场景1：[1, 512]数据搬运，mask连续模式
+    场景2：从[18, 64]搬运[18, 8]数据，mask连续模式，源和目的空间不同
+    场景3：[1, 1024]数据搬运，counter模式
+    场景4：从[18, 64]搬运[18, 8]数据，counter模式，源和目的空间不同
+    """
+    if scenarioNum == 1:
+        # 场景1：[1, 512]数据搬运，mask连续模式
+        src_shape = [1, 512]
+        dst_shape = [1, 512]
+        src_length = 512
+        dst_length = 512
+    elif scenarioNum == 2:
+        # 场景2：从[18, 64]搬运[18, 8]数据，mask连续模式
+        src_shape = [18, 64]
+        dst_shape = [18, 8]
+        src_length = 18 * 64
+        dst_length = 18 * 8
+    elif scenarioNum == 3:
+        # 场景3：[1, 1024]数据搬运，counter模式
+        src_shape = [1, 1024]
+        dst_shape = [1, 1024]
+        src_length = 1024
+        dst_length = 1024
+    elif scenarioNum == 4:
+        # 场景4：从[18, 64]搬运[18, 8]数据，counter模式
+        src_shape = [18, 64]
+        dst_shape = [18, 8]
+        src_length = 18 * 64
+        dst_length = 18 * 8
+    else:
+        # 默认场景1
+        src_shape = [1, 512]
+        dst_shape = [1, 512]
+        src_length = 512
+        dst_length = 512
 
-def gen_golden_data_simple():
-    input_type = np.int32
-    output_type = input_type
-    block_length = 512
+    # 生成输入数据 (int32类型)
+    input_data = np.random.randint(-1000, 1000, size=src_length).astype(np.int32)
 
-    min_val, max_val = get_range_by_dtype(input_type)
-    input_shape = [block_length]
-    output_shape = [block_length] 
-    input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
-    golden = input_x
-    os.makedirs("input", exist_ok=True)
-    os.makedirs("output", exist_ok=True)
-    input_x.tofile("./input/input_x.bin")
+    # 生成Golden数据
+    if src_length != dst_length:
+        # 源和目的空间不同：从每行取前dst_cols个元素
+        src_rows = src_shape[0]
+        src_cols = src_shape[1]
+        dst_cols = dst_shape[1]
+        input_2d = input_data.reshape(src_rows, src_cols)
+        golden = input_2d[:, :dst_cols].flatten()
+    else:
+        # 源和目的空间相同：完整拷贝
+        golden = input_data.copy()
+
+    # 创建目录并保存数据
+    os.system("mkdir -p input")
+    os.system("mkdir -p output")
+    input_data.tofile("./input/input_x.bin")
     golden.tofile("./output/golden.bin")
 
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 5))
+    args = parser.parse_args()
+    gen_golden_data(args.scenarioNum)
