@@ -15,6 +15,6 @@
 #ifndef include_TENSOR_API_ARCH_ARCH_H
 #define include_TENSOR_API_ARCH_ARCH_H
 
-#include "include/experimental/tensor_api/arch/trait_struct.h"
+#include "experimental/tensor_api/arch/trait_struct.h"
 
 #endif // include_TENSOR_API_ARCH_ARCH_H

@@ -27,7 +27,7 @@ public:
     __aicore__ inline void Run(const Args&... args) {}
 };
 
-template <Hardware dstPos, Hardware srcPos, Hardware quantPos, uint32_t Version>
+template <Hardware dstPos, Hardware srcpos, Hardware quantpos, uint32_t Version>
 struct FixpipeTensor2Tensor {
     using type = FixpipeIgnore;
 };

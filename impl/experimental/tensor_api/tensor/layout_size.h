@@ -72,13 +72,13 @@ private:
         using rowStrideType = typename Std::tuple_element<0, U>::type;
         using colStrideType = typename Std::tuple_element<1, U>::type;
 
-        using outerRowNumType = typename Std::tuple_element<1, rowShapeType>::type;
-        using outerRowStrideType = typename Std::tuple_element<1, rowStrideType>::type;
-        using outerColNumType = typename Std::tuple_element<1, colShapeType>::type;
-        using outerColStrideType = typename Std::tuple_element<1, colStrideType>::type;
+        using outterRowNumType = typename Std::tuple_element<1, rowShapeType>::type;
+        using outterRowStrideType = typename Std::tuple_element<1, rowStrideType>::type;
+        using outterColNumType = typename Std::tuple_element<1, colShapeType>::type;
+        using outterColStrideType = typename Std::tuple_element<1, colStrideType>::type;
 
-        return (outerRowNumType {} * outerRowStrideType {}) > (outerColNumType {} * outerColStrideType {}) ? 
-            (outerRowNumType {} * outerRowStrideType {}) : (outerColNumType {} * outerColStrideType {});
+        return (outterRowNumType {} * outterRowStrideType {}) > (outterColNumType {} * outterColStrideType {}) ? 
+            (outterRowNumType {} * outterRowStrideType {}) : (outterColNumType {} * outterColStrideType {});
     }
 
     __aicore__ inline static constexpr auto GetTwoDimStaticLayoutSize() 

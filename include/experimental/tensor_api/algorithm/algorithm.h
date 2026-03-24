@@ -15,8 +15,8 @@
 #ifndef INCLUDE_TENSOR_API_ALGORITHM_ALGORITHM_H
 #define INCLUDE_TENSOR_API_ALGORITHM_ALGORITHM_H
 
-#include "include/experimental/tensor_api/algorithm/copy.h"
-#include "include/experimental/tensor_api/algorithm/gemm.h"
-#include "include/experimental/tensor_api/algorithm/mad.h"
+#include "experimental/tensor_api/algorithm/copy.h"
+#include "experimental/tensor_api/algorithm/gemm.h"
+#include "experimental/tensor_api/algorithm/mad.h"
 
 #endif // INCLUDE_TENSOR_API_ALGORITHM_ALGORITHM_H

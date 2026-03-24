@@ -15,7 +15,7 @@
 #ifndef INCLUDE_TENSOR_API_UTILS_UTILS_H
 #define INCLUDE_TENSOR_API_UTILS_UTILS_H
 
-#include "include/experimental/tensor_api/arch/trait_struct.h"
-#include "include/utils/common_types.h"
+#include "experimental/tensor_api/arch/trait_struct.h"
+#include "utils/common_types.h"
 
 #endif // INCLUDE_TENSOR_API_UTILS_UTILS_H
