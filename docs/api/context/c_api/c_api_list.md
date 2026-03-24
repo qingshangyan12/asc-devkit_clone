@@ -386,7 +386,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_madd](reg/reg_vector/asc_madd.md) | madd（multiply-add），对源操作数执行逐元素乘法和加法。 |
 | [asc_max](reg/reg_vector/asc_max.md) | 根据mask对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。 |
 | [asc_max_scalar](reg/reg_vector/asc_max_scalar.md) | 矢量src的逐个元素与标量value比较大小，按照对应的比特位将最大值存入dst中。 |
-| [asc_mem_bar](reg/reg_vector/reg_compute_mem_bar.md) | Reg计算宏函数内不同流水线之间的同步指令。 |
+| [asc_mem_bar](reg/reg_vector/asc_mem_bar.md) | Reg计算宏函数内不同流水线之间的同步指令。 |
 | [asc_min](reg/reg_vector/asc_min.md) | 根据mask对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 |
 | [asc_min_scalar](reg/reg_vector/asc_min_scalar.md) | 源操作数矢量内每个元素与标量比较，取较小值。 |
 | [asc_mul](reg/reg_vector/asc_mul.md) | 对源操作数src0和src1进行乘法运算，将结果写入目的操作数dst。 |
