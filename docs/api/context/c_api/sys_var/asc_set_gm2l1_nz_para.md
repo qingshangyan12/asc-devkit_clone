@@ -8,7 +8,16 @@
 
 ## 功能说明
 
-对MTE2_NZ_PARA寄存器中的值进行设置。
+对MTE2_NZ_PARA寄存器中的值进行设置，在调用asc_copy_gm2l1_dn2nz和asc_copy_gm2l1_nd2nz前设置相关参数。
+
+MTE2_NZ_PARA是一个64bit宽度的寄存器，其中各bit含义如下：
+
+| bit范围 |        含义         |
+|:------|:-----------------:|
+| 15:0  |  需要搬运的ND/DN矩阵数量。  | 
+| 31:16 | N维度上相邻两个block块之间的间隔。 |
+| 47:32 | 同一个NZ矩阵中2个C0列之间的间隔。 |
+| 63:48 | 两个ND/DN矩阵中两个NZ矩阵之间的间隔。 |
 
 ## 函数原型
 
@@ -36,6 +45,6 @@ PIPE_S
 
 ## 调用示例
 ```cpp
-uint64_t config = 123456789;
+uint64_t config;
 asc_set_gm2l1_nz_para(config);
 ```

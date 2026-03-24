@@ -8,7 +8,18 @@
 
 ## 功能说明
 
-对QUANT_POST寄存器中的值进行设置。
+对QUANT_POST寄存器中的值进行设置, QUANT_POST是一个64bit的寄存器，存储Fixpipe后阶段量化信息。
+其中各bit含义如下：
+
+| bit范围 |                                                           含义                                                           |
+| :-----------|:----------------------------------------------------------------------------------------------------------------------:|
+| 4:0 |                                在QS162S4_POST，QF162S4_POST和SHIFT2S4_POST量化模式中表示为s5中的偏移量。                                |
+| 8:0 | 在QS162B8_POST，QF162B8_POST和SHIFT2B8_POST量化模式中表示s9中的偏移量，或在QS162S16_POST，QF162S16_POST和SHIFT2S16_POST量化模式中表示s17偏移量中的低9位。 |
+| 9 |                             在QS162B8_POST，QF162B8_POST和SHIFT2B8_POST量化模式中用于表示量化结果是否为有符号的。                              |
+| 31:13 |         在QS162B8_POST，QF162B8_POST，QS162S4_POST，QF162S4_POST，QS162S16_POST，QF162S16_POST量化模式中表示M3。不能为INF/NAN。          |
+| 39:32 |                           在QS162S16_POST，QF162S16_POST，SHIFT2S16_POST和SHIFT2S32_POST量化模式中表示s17偏移量中的高8位. |
+| 44:40 | 在SHIFT2S4_POST，SHIFT2B8_POST，SHIFT2S16_POST和SHIFT2S32_POST量化模式中表示位移值。 |
+
 
 ## 函数原型
 
@@ -36,6 +47,6 @@ PIPE_S
 
 ## 调用示例
 ```cpp
-uint64_t config = 123456789;
+uint64_t config;
 asc_set_l0c2gm_quant_post(config);
 ```
