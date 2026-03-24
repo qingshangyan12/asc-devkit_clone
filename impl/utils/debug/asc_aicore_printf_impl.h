@@ -193,11 +193,6 @@ __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 #else
 #include <cstdio>
 namespace __asc_aicore {
-enum class DumpType : uint8_t {
-    DUMP_DEFAULT = 0,
-    DUMP_SCALAR,
-};
-
 template <class... Args>
 __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 {
