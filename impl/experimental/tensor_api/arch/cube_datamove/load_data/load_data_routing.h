@@ -15,6 +15,9 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_LOAD_DATA_ROUTING_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_LOAD_DATA_ROUTING_H
 
+#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_2201/load_data_l12l0a.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_2201/load_data_l12l0b.h"
+
 #include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0a.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0b.h"
 
@@ -35,6 +38,18 @@ struct LoadDataTensor2Tensor {
 template <Hardware dstPos, Hardware srcPos, uint32_t Version>
 struct LoadDataTensor2TensorNoCoord {
     using type = LoadDataIgnore;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V2201>
+{
+    using type = LoadDataL12L0A2201;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V2201>
+{
+    using type = LoadDataL12L0B2201;
 };
 
 template <>

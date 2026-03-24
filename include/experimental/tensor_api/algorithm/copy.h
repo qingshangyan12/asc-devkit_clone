@@ -12,8 +12,8 @@
 * \file copy.h
 * \brief
 */
-#ifndef INCLUDE_TENSOR_API_ALGORITHM_COPY_H
-#define INCLUDE_TENSOR_API_ALGORITHM_COPY_H
+#ifndef INCLUDE_TENSOR_API_ALGORITHM_CPOY_H
+#define INCLUDE_TENSOR_API_ALGORITHM_CPOY_H
 
 #include "impl/experimental/tensor_api/algorithm/copy_impl.h"
 

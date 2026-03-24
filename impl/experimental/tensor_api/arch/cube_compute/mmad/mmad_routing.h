@@ -15,6 +15,9 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_MMAD_ROUTING_H
 #define IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_MMAD_ROUTING_H
 
+#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_2201/mmad_details.h"
+#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_2201/mmad_with_bias_details.h"
+
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad.h"
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad_with_bias.h"
 
@@ -32,6 +35,24 @@ template<Hardware dstPos, Hardware fmPos, Hardware filterPos, Hardware biasPos, 
 struct MmadTensor2Tensor
 {
     using type = MmadIgnore;
+};
+
+template<>
+struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::MAX, ArchVersion::V2201>
+{
+    using type = Mmad2201;
+};
+
+template<>
+struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::L0C, ArchVersion::V2201>
+{
+    using type = MmadWithBias2201;
+};
+
+template<>
+struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::BIAS, ArchVersion::V2201>
+{
+    using type = MmadWithBias2201;
 };
 
 template<>

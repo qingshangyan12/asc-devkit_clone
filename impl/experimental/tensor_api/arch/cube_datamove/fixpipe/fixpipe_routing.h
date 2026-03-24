@@ -15,6 +15,9 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_FIXPIPE_ROUTING_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_FIXPIPE_ROUTING_H
 
+#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_l0c2gm.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_quant_l0c2gm.h"
+
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_l0c2out.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_l0c2out.h"
 
@@ -27,9 +30,19 @@ public:
     __aicore__ inline void Run(const Args&... args) {}
 };
 
-template <Hardware dstPos, Hardware srcPos, Hardware quantPos, uint32_t Version>
+template <Hardware dstPos, Hardware srcpos, Hardware quantpos, uint32_t Version>
 struct FixpipeTensor2Tensor {
     using type = FixpipeIgnore;
+};
+
+template <>
+struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::MAX, ArchVersion::V2201> {
+    using type = FixpipeL0C2GM2201;
+};
+
+template <>
+struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::L1, ArchVersion::V2201> {
+    using type = FixpipeQuantL0C2GM2201;
 };
 
 template <>

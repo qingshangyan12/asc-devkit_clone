@@ -15,6 +15,10 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_DATA_COPY_ROUTING_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_DATA_COPY_ROUTING_H
 
+#include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_2201/data_copy_gm2l1.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_2201/data_copy_l12bt.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_2201/data_copy_l12fb.h"
+
 #include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_gm2l1.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_l12bt.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_l12fb.h"
@@ -31,6 +35,21 @@ public:
 template <Hardware dstTPos, Hardware srcTpos, uint32_t Version>
 struct DataCopyTensor2Tensor {
     using type = DataCopyIgnore;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::L1, Hardware::GM, ArchVersion::V2201> {
+    using type = DataCopyGM2L12201;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::BIAS, Hardware::L1, ArchVersion::V2201> {
+    using type = CopyCbufToBT2201;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::FIXBUF, Hardware::L1, ArchVersion::V2201> {
+    using type = CopyCbufToFB2201;
 };
 
 template <>
