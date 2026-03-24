@@ -35,22 +35,37 @@ struct ZzLayoutFormat {
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-|--------|------|------|
-| row | 输入 | 内层矩阵的行数，固定为1。 |
-| column | 输入 | 内层矩阵的列数，固定为1。 |
+|--------|-----------|------|
+| `T` | 输入 | 数据类型模板参数。<br>AscendC 950PR/AscendC 950DT 支持的数据类型为：fp8_e8m0_t、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t |
+| `row` | 输入 | 矩阵的总行数 |
+| `column` | 输入 | 矩阵的总列数 |
+
+## 返回值
+
+- 输入为编译时常量时，返回Zz格式的Layout类型。
+- 输入为整型变量时，返回Zz格式的Layout对象。
+- 对于T数据类型为fp8_e8m0_t时，NzLayout的小分形行数为16，列数为2。
+- **自动对齐**: 如果输入的行数不是16的倍数，返回的Layout会向上取整。例如：
+  - 对于T为half类型，输入 `row = 17` 会自动对齐为 `row = 32`
+- 对于T数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t时，ZzLayout的小分形行数为16 ，列数为32B/sizeof(T)。
+- **自动对齐**: 如果输入的行数不是16的倍数，列数不是32B/sizeof(T)的倍数，返回的Layout会向上取整。例如：
+  - 对于T为half类型，输入 `row = 17, column = 33` 会自动对齐为 `row = 32, column = 48`
 
 ## 约束说明
 
-- T必须是有效的数据类型，如half、float、int32_t等。
-- 内层矩阵的大小固定为(32 / sizeof(T)) * 16 。
+- 参数row和column需为整型。
+- 对于T数据类型为fp8_e8m0_t时，column需为2的倍数。
 
 ## 调用示例
 
 ```cpp
 // 创建Zz格式Layout
-using T = half;
-size_t mLength = 128;
-size_t kLength = 64;
+// 编译时常量
+using MyZZLayout = ZzLayoutFormat<half>::type<Std::Int<32>, Std::Int<32>>;
+constexpr MyZZLayout staticLayout1;
+auto staticLayout2 = MyZZLayout{};
 
-auto layout = AscendC::MakeZzLayout<T>(mLength, kLength);
+// 运行时值
+ZzLayoutFormat<half> zzFormat;
+auto layout = zzFormat(32, 32);
 ```
