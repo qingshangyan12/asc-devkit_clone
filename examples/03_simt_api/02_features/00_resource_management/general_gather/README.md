@@ -52,64 +52,65 @@
   使用内核调用符<<<>>>调用核函数。
 
 ### 2. gather_v2算子
- 	 - 算子功能：  
- 	   gather_v2算子实现了从多维输入张量input中按照指定维度axis收集数据的功能，indices张量指定了要收集的索引位置。支持batch_dims批量处理模式， 让不同的 batch 使用不同的索引集合。
- 	 - 计算流程：
- 	   例如输入张量input的shape为(2, 2, 3, 2)和索引张量indices的shape为 (2, 2)：
- 	   
- 	   ```
- 	   input:
- 	     [[[[ 1,  2],
- 	       [ 3,  4],
- 	       [ 5,  6]],
- 	 
- 	       [[ 7,  8],
- 	         [ 9, 10],
- 	         [11, 12]]],
- 	 
- 	 
- 	     [[[13, 14],
- 	       [15, 16],
- 	       [17, 18]],
- 	 
- 	       [[19, 20],
- 	         [21, 22],
- 	         [23, 24]]]]
- 	   
- 	   indices:
- 	     [[1, 2],
- 	     [0, 1]]
- 	   ```
- 	   axis=2, batch_dims=1表明收集维度为2，并且每个batch下使用不同的索引：
- 	   - batch=0 使用 indices[0]=[1, 2]，从input[0]中在维度2上收集第1、2行
- 	   - batch=1 使用 indices[0]=[0, 1]，从input[1]中在维度2上收集第0、1行
- 	   ```
- 	   output:
- 	     [[[[ 3,  4],
- 	       [ 5,  6]],
- 	 
- 	       [[ 9, 10],
- 	       [11, 12]]],
- 	 
- 	     [[[13, 14],
- 	       [15, 16]],
- 	 
- 	       [[19, 20],
- 	       [21, 22]]]]
- 	   ``` 
- 	   <table>
- 	   <tr><td rowspan="1" align="center">算子类型</td><td colspan="4" align="center">gather_v2</td></tr>
- 	   </tr>
- 	   <tr><td rowspan="5" align="center">算子输入</td><td align="center">name</td><td align="center">data type</td><td align="center">format</td><td align="center">约束/说明</td></tr>
- 	   <tr><td align="center">input</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
- 	   <tr><td align="center">indices</td><td align="center">uint32_t / int32_t</td><td align="center">ND</td><td align="center">indices.shape[0:batch_dims] = input.shape[0:batch_dims]</td></tr>
- 	   <tr><td align="center">axis</td><td align="center">int32_t</td><td align="center">-</td><td align="center">batch_dims <= axis < input.rank</td></tr>
- 	   <tr><td align="center">batch_dims</td><td align="center">int32_t</td><td align="center">-</td><td align="center">0 <= batch_dims <= min(input.rank, indices.rank)</td></tr>
- 	   </tr>
- 	   <tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">float</td><td align="center">ND</td><td align="center">output.shape = input.shape[0:batch_dims] + indices.shape[batch_dims:] + input.shape[axis+1:]</td></tr>
- 	   </tr>
- 	   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_custom_v2</td></tr>
- 	   </table>
+- 算子功能：  
+ gather_v2算子实现了从多维输入张量input中按照指定维度axis收集数据的功能，indices张量指定了要收集的索引位置。支持batch_dims批量处理模式， 让不同的 batch 使用不同的索引集合。
+- 计算流程：
+ 例如输入张量input的shape为(2, 2, 3, 2)和索引张量indices的shape为 (2, 2)：
+ 
+ ```
+ input:
+   [[[[ 1,  2],
+     [ 3,  4],
+     [ 5,  6]],
+
+     [[ 7,  8],
+       [ 9, 10],
+       [11, 12]]],
+
+
+   [[[13, 14],
+     [15, 16],
+     [17, 18]],
+
+     [[19, 20],
+       [21, 22],
+       [23, 24]]]]
+ 
+ indices:
+   [[1, 2],
+   [0, 1]]
+ ```
+ axis=2, batch_dims=1表明收集维度为2，并且每个batch下使用不同的索引：
+ - batch=0 使用 indices[0]=[1, 2]，从input[0]中在维度2上收集第1、2行
+ - batch=1 使用 indices[0]=[0, 1]，从input[1]中在维度2上收集第0、1行
+ ```
+ output:
+   [[[[ 3,  4],
+     [ 5,  6]],
+
+     [[ 9, 10],
+     [11, 12]]],
+
+   [[[13, 14],
+     [15, 16]],
+
+     [[19, 20],
+     [21, 22]]]]
+ ``` 
+ <table>
+ <tr><td rowspan="1" align="center">算子类型</td><td colspan="4" align="center">gather_v2</td></tr>
+ </tr>
+ <tr><td rowspan="5" align="center">算子输入</td><td align="center">name</td><td align="center">data type</td><td align="center">format</td><td align="center">约束/说明</td></tr>
+ <tr><td align="center">input</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+ <tr><td align="center">indices</td><td align="center">uint32_t / int32_t</td><td align="center">ND</td><td align="center">indices.shape[0:batch_dims] = input.shape[0:batch_dims]</td></tr>
+ <tr><td align="center">axis</td><td align="center">int32_t</td><td align="center">-</td><td align="center">batch_dims <= axis < input.rank</td></tr>
+ <tr><td align="center">batch_dims</td><td align="center">int32_t</td><td align="center">-</td><td align="center">0 <= batch_dims <= min(input.rank, indices.rank)</td></tr>
+ </tr>
+ <tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">float</td><td align="center">ND</td><td align="center">output.shape = input.shape[0:batch_dims] + indices.shape[batch_dims:] + input.shape[axis+1:]</td></tr>
+ </tr>
+ <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_custom_v2</td></tr>
+ </table>
+
 - 数据切分：  
   * gridDim：根据具体输入shape和设备AIV核数动态分配，最大不超过65535
   * blockDim：根据具体输入shape动态分配，最大不超过2048
