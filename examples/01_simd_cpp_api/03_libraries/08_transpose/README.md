@@ -8,6 +8,7 @@
 
 |  目录名称                                                   |  功能描述                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
+| [add_broadcast](./add_broadcast) | 本样例介绍Add算子的核函数直调方法，多核&tiling场景下增加输入Broadcast |
 | [broadcast](./broadcast) | 本样例基于Kernel直调算子工程，介绍了调用BroadCast高阶API实现broadcast单算子，主要演示BroadCast高阶API在Kernel直调工程中的调用 |
 | [fill](./fill) | 本样例基于Kernel直调算子工程，介绍了调用Fill高阶API实现fill单算子，主要演示Fill高阶API在Kernel直调工程中的调用 |
 | [pad](./pad) | 本样例基于Kernel直调算子工程，介绍了调用Pad高阶API实现pad单算子，对height * width的二维Tensor在width方向上pad到32B对齐，如果Tensor的width已32B对齐，且全部为有效数据，则不支持调用本接口对齐 |
