@@ -402,7 +402,7 @@ inline void SetTilingTypes(TilingType& tilingApi, optiling::TCubeTiling& tilingD
     tilingApi.EnableBias(IS_BIAS);
     tilingApi.SetBufferSpace(-1, -1, -1);
     if constexpr (isTiling) {
-        tilingApi.SetFixSplit(128, 256, 64);
+        tilingApi.SetFixSplit(BASE_M, BASE_N, BASE_K);
     } else {
         tilingApi.SetFixSplit(64, 64, 64);
     }
