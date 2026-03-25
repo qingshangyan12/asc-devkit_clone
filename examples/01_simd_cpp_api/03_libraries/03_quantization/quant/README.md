@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Kernel直调算子工程，介绍了调用Quant高阶API实现QuantCustom单算子，按元素做量化计算，比如将half/float数据类型量化为int8_t数据类型。
+本样例在模型量化推理场景下，基于Quant高阶API实现量化计算，用于将高精度数据转换为低精度数据以减少存储和计算开销。样例展示了将float类型输入数据通过scale缩放和offset偏移，量化为int8_t类型输出的过程。
 
 ## 支持的产品
 
@@ -18,49 +18,70 @@
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── quant.asc        // Ascend C算子实现 & 调用样例
+│   └── quant.asc        // Ascend C样例实现 & 调用样例
 ```
 
-## 算子描述
+## 样例功能描述
 
-- 算子功能：  
-  QuantCustom单算子，对输入tensor按元素做量化计算，将half/float数据类型量化为int8_t数据类型。
-- 算子规格：  
+- 样例功能：  
+  QuantCustom样例，对输入Tensor按元素做量化计算，将float数据类型量化为int8_t数据类型。更多API详细信息请参考[AscendQuant API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0818.html)。
+
+  计算公式如下：
+  - PER_TENSOR场景（按张量量化）  
+    dst = round(src * scale + offset)  
+    其中round表示四舍六入五成双取整
+
+  - PER_CHANNEL场景（按通道量化）
+    - 不使能输入转置  
+      groupSize = src.shape[0] / scale.shape[0]  
+      dst[i][j] = round(src[i][j] * scale[i / groupSize][j] + offset[i / groupSize][j])
+
+    - 使能输入转置  
+      groupSize = src.shape[1] / scale.shape[1]  
+      dst[i][j] = round(src[i][j] * scale[i][j / groupSize] + offset[i][j / groupSize])
+
+- 术语说明：
+  - **scale**：缩放因子，用于调整输入数据的比例，类型为float
+  - **offset**：偏移量，用于调整输入数据的偏移，类型为float
+  - **round**：四舍六入五成双取整，即当小数部分为0.5时向最近的偶数取整
+
+- 样例规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> quant </td></tr>
+  <caption>表1：样例输入输出规格</caption>
+  <tr><td rowspan="1" align="center">样例类型(SampleType)</td><td colspan="4" align="center"> quant </td></tr>
 
-  <tr><td rowspan="3" align="center">算子输入</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">inputGm</td><td align="center">1024</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">inputGm</td><td align="center">[1024]</td><td align="center">float</td><td align="center">ND</td></tr>
 
 
 
-  <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">outputGm</td><td align="center">1024</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td></tr>
+  <tr><td align="center">outputGm</td><td align="center">[1024]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
 
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">quant_custom</td></tr>
   </table>
 
-- 算子实现：  
-  本样例实现了QuantCustom算子，其中输入inputGm为固定shape[1024]。
+- 样例实现：  
+  本样例实现了QuantCustom样例，其中固定shape输入为inputGm[1024]，量化参数scale=2.0、offset=0.9。本样例为PER_TENSOR场景（按张量量化），将float数据类型量化为int8_t数据类型。
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用AscendQuant高阶API接口完成量化计算，得到最终结果，再搬出到外部存储上。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储。然后使用AscendQuant高阶API接口完成量化计算，得到最终结果，再搬出到外部存储上。
 
-    QuantCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor inputGm存储在srcLocal中，Compute任务负责对srcLocal执行量化计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor outputGm。
+    QuantCustom样例的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor inputGm存储在srcLocal中，Compute任务负责对srcLocal执行量化计算，计算公式为dst=round(src * scale + offset)，其中scale=2.0、offset=0.9，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor outputGm。
 
   - Tiling实现
 
-    QuantCustom算子的tiling实现流程如下：首先获取AscendQuant接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据输入长度dataLength确定所需tiling参数。
+    QuantCustom样例的tiling实现流程如下：首先获取AscendQuant接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据输入长度dataLength确定所需tiling参数。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行  
 
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
