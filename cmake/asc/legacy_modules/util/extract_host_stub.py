@@ -2043,7 +2043,7 @@ def _generate_origin_func_call(func_sign: FuncSign, param_names: tuple,
 def _generate_overflow_status_check() -> str:
     if RUN_MODE == "cpu":
         return ""
-    return ("#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && defined(ASCENDC_DEBUG)\n"
+    return ("#if defined(ASCENDC_DUMP) && defined(ASCENDC_DEBUG)\n"
             "    AscendC::WriteBackOverflow(overflow_status);\n#endif\n")
 
 
