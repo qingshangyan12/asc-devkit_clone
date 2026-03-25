@@ -6,6 +6,7 @@
 | :------------ | :------------: |
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √ |
 | <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √ |
+| Ascend 950PR/Ascend 950DT | √    |
 
 ## 功能说明
 
@@ -32,6 +33,14 @@ __aicore__ inline void asc_transto5hd_b16(ub_addr8_t dst, ub_addr8_t src, uint8_
     uint16_t dst_stride, uint16_t src_stride)
 __aicore__ inline void asc_transto5hd_b8(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
+<cann-filter npu_type = "950">
+__aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
+    uint16_t dst_stride, uint16_t src_stride)
+__aicore__ inline void asc_transto5hd_b16_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
+    uint16_t dst_stride, uint16_t src_stride)
+__aicore__ inline void asc_transto5hd_b8_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
+    uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
+</cann-filter>
 ```
 
 ## 参数说明
