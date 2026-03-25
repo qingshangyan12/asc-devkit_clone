@@ -1,5 +1,5 @@
 # Ascend C
-
+ 
 ## 🔥Latest News
 - [2026/01] 优化样例、融合编译性能等；
   - 迁移高阶API样例[ascendc-api-adv](https://gitee.com/ascend/ascendc-api-adv)到本仓，并使用[<<<>>>调用方式](./examples/03_libraries)；
