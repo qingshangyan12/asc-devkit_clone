@@ -196,8 +196,8 @@ function(simple_kernel_compile)
     set(BINCMP_OPS_INFO ${auto_gen_path}/aic-${BINCMP_COMPUTE_UNIT}-ops-info.ini)
   endif()
   get_property(bincmp_enable_binary_package GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_ENABLE_BINARY_PACKAGE)
-  set(BINCMP_ERROR_LOG "${BINCMP_OUT_DIR}/${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}_error.log")
-  set(BINCMP_COMPILE_LOG "${BINCMP_OUT_DIR}/${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}_compile.log")
+  set(BINCMP_ERROR_LOG "${BINCMP_OUT_DIR}/compile_error.log")
+  set(BINCMP_COMPILE_LOG "${BINCMP_OUT_DIR}/compile.log")
 
   if (NOT ${ENABLE_CROSS_COMPILE})
     if (${ENABLE_SOURCE_PACKAGE})
@@ -221,9 +221,9 @@ function(simple_kernel_compile)
           > ${BINCMP_COMPILE_LOG} 2>&1 || true"
         COMMAND ${CMAKE_COMMAND} -E env bash -c "
           if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \\
-              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_FAIL_LOG}; \\
-              cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_FAIL_LOG}; \\
-              echo '' >> ${BINCMP_FAIL_LOG}; \\
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_ERROR_LOG}; \\
+              cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_ERROR_LOG}; \\
+              echo '' >> ${BINCMP_ERROR_LOG}; \\
           fi"
         VERBATIM
       )
@@ -271,9 +271,9 @@ function(simple_kernel_compile)
           > ${BINCMP_COMPILE_LOG} 2>&1 || true"
         COMMAND ${CMAKE_COMMAND} -E env bash -c "
           if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \\
-              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_FAIL_LOG}; \\
-              cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_FAIL_LOG}; \\
-              echo '' >> ${BINCMP_FAIL_LOG}; \\
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_ERROR_LOG}; \\
+              cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_ERROR_LOG}; \\
+              echo '' >> ${BINCMP_ERROR_LOG}; \\
           fi"
         VERBATIM
       )
@@ -446,6 +446,10 @@ function(npu_op_package target_package_name)
 
   set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_TYPE "${_upper_target_type}")
   get_property(target_vendor_name GLOBAL PROPERTY _ASC_PKG_${target_package_name}_VENDOR_NAME)
+  get_property(KERNEL_BINARY_PATH GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_BINARY_DIR)
+  if (NOT DEFINED KERNEL_BINARY_PATH)
+    set(KERNEL_BINARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/binary)
+  endif()
   if ("${_upper_target_type}" STREQUAL "RUN")
     add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/scripts/install.sh ${CMAKE_BINARY_DIR}/scripts/upgrade.sh ${CMAKE_BINARY_DIR}/scripts/uninstall.sh
       COMMAND mkdir -p ${CMAKE_BINARY_DIR}/scripts
@@ -482,6 +486,15 @@ function(npu_op_package target_package_name)
 
     get_property(enable_cpack GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_CPACK)
     if (${enable_cpack})
+      file(WRITE "${CPACK_POST_BUILD_SCRIPTS}" "
+        set(ERROR_LOG_FILE \"\${KERNEL_BINARY_PATH}/compile_error.log\")
+
+        if(EXISTS \"\${ERROR_LOG_FILE}\")
+          file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
+          message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
+        endif()
+      ")
+
       # CPack config
       set(CPACK_PACKAGE_NAME ${CMAKE_PROJECT_NAME})
       set(CPACK_PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
@@ -499,6 +512,7 @@ function(npu_op_package target_package_name)
       set(CPACK_EXTERNAL_ENABLE_STAGING TRUE)
       set(CPACK_EXTERNAL_PACKAGE_SCRIPT ${ASCENDC_CMAKE_SCRIPTS_PATH}/makeself.cmake)
       set(CPACK_EXTERNAL_BUILT_PACKAGES ${CPACK_PACKAGE_DIRECTORY}/_CPack_Packages/Linux/External/${CPACK_PACKAGE_FILE_NAME}/${CPACK_PACKAGE_FILE_NAME})
+      set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_BINARY_DIR}/post_pack_script.cmake")
       include(CPack)
     endif()
   elseif("${_upper_target_type}" STREQUAL "STATIC")
@@ -565,6 +579,10 @@ function(npu_op_package target_package_name)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
 
+    install(CODE "
+      file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
+      message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
+    ")
   elseif("${_upper_target_type}" STREQUAL "SHARED")
     add_library(${target_package_name} SHARED)
     set_target_properties(
@@ -615,6 +633,10 @@ function(npu_op_package target_package_name)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
 
+    install(CODE "
+      file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
+      message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
+    ")
   endif()
 endfunction()
 
