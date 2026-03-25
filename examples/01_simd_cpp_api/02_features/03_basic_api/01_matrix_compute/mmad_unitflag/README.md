@@ -19,17 +19,17 @@
 │   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── data_utils.h                // 数据读入写出函数
-│   └── mmad_unitflag_disable.asc                    // 不使能unitFlag
-│   └── mmad_unitflag_enable.asc                    // 使能unitFlag
+│   └── mmad_unitflag_disable.asc   // 不使能unitFlag
+│   └── mmad_unitflag_enable.asc    // 使能unitFlag
 ```
 
 ## 算子描述
 
-unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。取值说明如下：
+unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：
 0：保留值；
 2：使能unitFlag，硬件执行完指令之后，不会关闭unitFlag功能；
 3：使能unitFlag，硬件执行完指令之后，会将unitFlag功能关闭。
-使能该功能时，Mmad指令的unitFlag在最后1个分形设置为3、其余分形计算设置为2即可。
+使能该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。
 
 下面以一个示例说明使能unitFlag前后。假设有A矩阵shape为[128, 512],B矩阵shape为[512, 256],执行A、B矩阵乘法时，需要沿着K轴进行迭代循环，假设每次迭代K长度为64，则需要迭代8次，此时8次Mmad对应1次Fixpipe操作。此时，前7次Mmad的unitFlag都设置为2，保证后续Mmad可以写入L0C；最后1次Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；当Mmad使能unitFlag时，Fixpipe也必须使能unitFlag，Fixpipe的unitFlag设置为3，保证后续Mmad可以顺利写入L0C。
 
