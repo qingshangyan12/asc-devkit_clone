@@ -196,8 +196,43 @@ function(simple_kernel_compile)
     set(BINCMP_OPS_INFO ${auto_gen_path}/aic-${BINCMP_COMPUTE_UNIT}-ops-info.ini)
   endif()
   get_property(bincmp_enable_binary_package GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_ENABLE_BINARY_PACKAGE)
+  set(BINCMP_ERROR_LOG "${BINCMP_OUT_DIR}/compile_error.log")
+  set(BINCMP_COMPILE_LOG "${BINCMP_OUT_DIR}/compile.log")
+
   if (NOT ${ENABLE_CROSS_COMPILE})
-    add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
+    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
+      set(COMPILE_CMD 
+        "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \
+            --op-type=${BINCMP_OP_TYPE} \
+            --src-file=${BINCMP_SRC} \
+            --compute-unit=${BINCMP_COMPUTE_UNIT} \
+            --compile-options='${BINCMP_OPTIONS}' \
+            --debug-config='${BINCMP_CONFIGS}' \
+            --config-ini=${BINCMP_OPS_INFO} \
+            --tiling-lib=${BINCMP_TILING_LIB} \
+            --output-path=${BINCMP_OUT_DIR} \
+            --dynamic-dir=${BINCMP_DYNAMIC_PATH} \
+            --enable-binary='${bincmp_enable_binary_package}' \
+            --json-file=${BINCMP_JSON_FILE} \
+            --target-name=${BINCMP_TARGET_NAME} \
+            --auto-gen-path=${auto_gen_path} \
+            --build-tool=$(MAKE) > ${BINCMP_COMPILE_LOG} 2>&1 || true"
+      )
+
+      set(CHECK_ERROR_CMD
+          "if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
+              echo '' >> ${BINCMP_ERROR_LOG}; \
+          fi"
+      )
+
+      add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
+          COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} bash -c "${COMPILE_CMD}"
+          COMMAND ${CMAKE_COMMAND} -E env bash -c "${CHECK_ERROR_CMD}"
+          VERBATIM
+      )
+    else()
+      add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
                       COMMAND ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
                       --op-type=${BINCMP_OP_TYPE}
                       --src-file=${BINCMP_SRC}
@@ -213,12 +248,45 @@ function(simple_kernel_compile)
                       --target-name=${BINCMP_TARGET_NAME}
                       --auto-gen-path=${auto_gen_path}
                       --build-tool=$(MAKE))
+    endif()
     add_dependencies(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT} ${BINCMP_PACKAGE_NAME}_ascendc_${BINCMP_TILING_LIB_TMP})
   else()
     if (${bincmp_enable_binary_package} AND NOT DEFINED HOST_NATIVE_TILING_LIB)
       message(FATAL_ERROR "Native host libs was not set for cross compile!")
     endif()
-    add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
+    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
+      set(COMPILE_CMD 
+        "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \
+            --op-type=${BINCMP_OP_TYPE} \
+            --src-file=${BINCMP_SRC} \
+            --compute-unit=${BINCMP_COMPUTE_UNIT} \
+            --compile-options='${BINCMP_OPTIONS}' \
+            --debug-config='${BINCMP_CONFIGS}' \
+            --config-ini=${BINCMP_OPS_INFO} \
+            --tiling-lib=${HOST_NATIVE_TILING_LIB} \
+            --output-path=${BINCMP_OUT_DIR} \
+            --dynamic-dir=${BINCMP_DYNAMIC_PATH} \
+            --enable-binary='${bincmp_enable_binary_package}' \
+            --json-file=${BINCMP_JSON_FILE} \
+            --target-name=${BINCMP_TARGET_NAME} \
+            --auto-gen-path=${auto_gen_path} \
+            --build-tool=$(MAKE) > ${BINCMP_COMPILE_LOG} 2>&1 || true"
+      )
+
+      set(CHECK_ERROR_CMD
+          "if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
+              echo '' >> ${BINCMP_ERROR_LOG}; \
+          fi"
+      )
+
+      add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
+          COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} bash -c "${COMPILE_CMD}"
+          COMMAND ${CMAKE_COMMAND} -E env bash -c "${CHECK_ERROR_CMD}"
+          VERBATIM
+      )
+    else()
+      add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
                       COMMAND ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
                       --op-type=${BINCMP_OP_TYPE}
                       --src-file=${BINCMP_SRC}
@@ -234,6 +302,7 @@ function(simple_kernel_compile)
                       --target-name=${BINCMP_TARGET_NAME}
                       --auto-gen-path=${auto_gen_path}
                       --build-tool=$(MAKE))
+    endif()
   endif()
   add_dependencies(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT} ${BINCMP_TARGET_NAME}_ops_info_gen_${BINCMP_COMPUTE_UNIT})
 
@@ -385,6 +454,7 @@ function(npu_op_package target_package_name)
 
   set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_TYPE "${_upper_target_type}")
   get_property(target_vendor_name GLOBAL PROPERTY _ASC_PKG_${target_package_name}_VENDOR_NAME)
+  get_property(KERNEL_BINARY_PATH GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_BINARY_DIR)
   if ("${_upper_target_type}" STREQUAL "RUN")
     add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/scripts/install.sh ${CMAKE_BINARY_DIR}/scripts/upgrade.sh ${CMAKE_BINARY_DIR}/scripts/uninstall.sh
       COMMAND mkdir -p ${CMAKE_BINARY_DIR}/scripts
@@ -438,6 +508,16 @@ function(npu_op_package target_package_name)
       set(CPACK_EXTERNAL_ENABLE_STAGING TRUE)
       set(CPACK_EXTERNAL_PACKAGE_SCRIPT ${ASCENDC_CMAKE_SCRIPTS_PATH}/makeself.cmake)
       set(CPACK_EXTERNAL_BUILT_PACKAGES ${CPACK_PACKAGE_DIRECTORY}/_CPack_Packages/Linux/External/${CPACK_PACKAGE_FILE_NAME}/${CPACK_PACKAGE_FILE_NAME})
+      if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
+        set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_BINARY_DIR}/post_pack_script.cmake")
+        file(WRITE "${CPACK_POST_BUILD_SCRIPTS}" "
+          set(ERROR_LOG_FILE \"\${KERNEL_BINARY_PATH}/compile_error.log\")
+          if(EXISTS \"\${ERROR_LOG_FILE}\")
+            file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
+            message(STATUS \"List of failure operators:\n ${LOG_CONTENT}\")
+          endif()
+        ")
+      endif()
       include(CPack)
     endif()
   elseif("${_upper_target_type}" STREQUAL "STATIC")
@@ -504,6 +584,13 @@ function(npu_op_package target_package_name)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
 
+    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
+      install(CODE "
+        file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
+        message(STATUS \"List of failure operators:\n ${LOG_CONTENT}\")
+      ")
+    endif()
+
   elseif("${_upper_target_type}" STREQUAL "SHARED")
     add_library(${target_package_name} SHARED)
     set_target_properties(
@@ -554,6 +641,12 @@ function(npu_op_package target_package_name)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
 
+    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
+      install(CODE "
+        file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
+        message(STATUS \"List of failure operators:\n \${LOG_CONTENT}\")
+      ")
+    endif()
   endif()
 endfunction()
 
@@ -844,6 +937,26 @@ function(get_current_pack_target sub_target output_var)
   endif()
 endfunction()
 
+function(get_is_all_op_fail BINCMP_OUT_DIR TYPE_NAME_LIST target_name)
+  execute_process(
+      COMMAND grep -c "fail op-type:" "${BINCMP_OUT_DIR}/compile_error.log"
+      OUTPUT_VARIABLE FAILED_COUNT
+      ERROR_QUIET
+  )
+
+  list(LENGTH TYPE_NAME_LIST TOTAL_COUNT)
+
+  if(NOT FAILED_COUNT)
+      set(FAILED_COUNT 0)
+  endif()
+
+  set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_name}_ALL_FAIL False)
+  if(${FAILED_COUNT} EQUAL ${TOTAL_COUNT})
+      set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_name}_ALL_FAIL True)
+      message(STATUS "All ${FAILED_COUNT} operators failed out of ${TOTAL_COUNT} total")
+  endif()
+endfunction()
+
 function(npu_op_package_add target_package_name)
   cmake_parse_arguments(ADD_TARGET "" "PACKAGE_PATH" "TYPE;LIBRARY;FILES" ${ARGN})
   if(DEFINED ADD_TARGET_LIBRARY AND DEFINED ADD_TARGET_FILES)
@@ -960,6 +1073,10 @@ function(npu_op_package_add target_package_name)
     get_property(KERNEL_SRC_BASE GLOBAL PROPERTY _ASC_TGT_KERNEL_${_ascendc_kernel_target}_SRC_BASE)
     get_property(KERNEL_TILING_LIBRARY GLOBAL PROPERTY _ASC_TGT_KERNEL_${_ascendc_kernel_target}_TILING_LIBRARY)
     set(KERNEL_DYNAMIC_PATH ${KERNEL_BINARY_PATH}/binary/dynamic/)
+
+    set(KERNEL_COMPILE_TARGETS "")
+    set(KERNEL_COMPILE_TARGET_COUNT 0)
+
     foreach(compute_unit ${ASCEND_COMPUTE_UNIT})
       # generate aic-${compute_unit}-ops-info.json
       add_ops_info_target(TARGET ${_ascendc_kernel_target}_ops_info_gen_${compute_unit}
@@ -994,12 +1111,37 @@ function(npu_op_package_add target_package_name)
                                 TARGET_NAME ${_ascendc_kernel_target}
                                 PACKAGE_NAME ${target_package_name}
                                 OUT_DIR ${KERNEL_BINARY_PATH}/binary/)
+
+          list(APPEND KERNEL_COMPILE_TARGETS ${op_type}_${compute_unit})
+          math(EXPR KERNEL_COMPILE_TARGET_COUNT "${KERNEL_COMPILE_TARGET_COUNT} + 1")
         endif()
       endforeach()
     endforeach()
+
+    add_custom_target(${_ascendc_kernel_target}_check_all_fail
+      COMMAND ${CMAKE_COMMAND} -E echo "Checking all operators compilation status."
+    )
+
+    if(DEFINED KERNEL_COMPILE_TARGETS)
+      add_dependencies(${_ascendc_kernel_target}_check_all_fail ${KERNEL_COMPILE_TARGETS})
+    endif()
+
+    add_custom_command(TARGET ${_ascendc_kernel_target}_check_all_fail
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/check_all_fail.cmake
+              -DOUT_DIR=${KERNEL_BINARY_PATH}/binary
+              -DTYPE_COUNT=${KERNEL_COMPILE_TARGET_COUNT}
+              -DTARGET_NAME=${target_package_name}
+              -DPROPERTY_NAME=_ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL
+    )
   endif()
 
-  if("${output_type}" STREQUAL "RUN")
+  # get_property(all_op_fail GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL)
+  # if(NOT DEFINED all_op_fail)
+  #   set(all_op_fail FALSE)
+  # endif()
+  # message("All operators compile failed: ${all_op_fail}")
+  if("${output_type}" STREQUAL "RUN")# AND NOT all_op_fail)
     if(_ascendc_tiling_target)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
         add_library(${target_package_name}_ascendc_${_ascendc_tiling_target} SHARED)
@@ -1180,7 +1322,7 @@ function(npu_op_package_add target_package_name)
         )
       endif()
     endif()
-  elseif("${output_type}" STREQUAL "STATIC")
+  elseif("${output_type}" STREQUAL "STATIC")# AND NOT all_op_fail)
     if(_ascendc_tiling_target)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
         add_library(${target_package_name}_ascendc_${_ascendc_tiling_target} SHARED)
@@ -1220,7 +1362,7 @@ function(npu_op_package_add target_package_name)
         PACKAGE_NAME ${target_package_name}
         TARGETS ${_ascendc_kernel_target} ${_ascendc_kernel_target}_opregistry)
     endif()
-  elseif("${output_type}" STREQUAL "SHARED")
+  elseif("${output_type}" STREQUAL "SHARED")# AND NOT all_op_fail)
     if(_ascendc_tiling_target)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
         add_library(${target_package_name}_ascendc_${_ascendc_tiling_target} SHARED)
