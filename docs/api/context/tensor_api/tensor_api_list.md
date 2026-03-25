@@ -10,7 +10,7 @@ Tensor API文档目录，整体使用时可以引入tensor.h，Tensor API列表�
 | [Stride](./tensor/Stride.md) | 定义Stride |
 | [Coord](./tensor/Coord.md) | 定义Coord |
 | [Layout](./tensor/Layout简介.md) | 定义Layout |
-| [Tensor](./tensor/Tensor.md) | 定义Tensor |
+| [LocalTensor](./struct/tensor/LocalTensor.md) | 定义LocalTensor |
 | [Pointer](./tensor/Pointer.md) | 定义迭代器 |
 | [Pointer](./tensor/Tile.md) | 张量分块 |
 
@@ -40,7 +40,7 @@ Tensor API文档目录，整体使用时可以引入tensor.h，Tensor API列表�
 | [Coshape] | 返回实际Shape空间 |
 | [Cosize] | 返回实际占用的内存 |
 | [Crd2Idx](./tensor/Crd2Idx.md) | Coordinate转Index |
-| [MakeTensor] | 构造Tensor |
+| [MakeTensor](./struct/tensor/MakeTensor.md) | 构造LocalTensor |
 | [ZippedDivided] | 通过Tile切分Tensor，返回Tensor |
 | [InnerPartition] | 通过Tile切分Tensor，返回Tensor |
 | [LocalTile] | 通过Tile切分Tensor，返回Tensor |
