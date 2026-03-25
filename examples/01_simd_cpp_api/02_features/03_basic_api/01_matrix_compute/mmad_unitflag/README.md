@@ -39,7 +39,7 @@ unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能�
 A矩阵shape为[128, 512]，B矩阵shape为[512, 256]，执行矩阵乘法时，需要沿着K轴进行迭代循环，假设每次迭代K长度为64，则需要迭代8次，此时8次Mmad对应1次Fixpipe操作。  
 前7次Mmad的unitFlag都设置为2，保证后续Mmad可以写入L0C；  
 最后1次Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；  
-当Mmad使能unitFlag时，Fixpipe也必须使能unitFlag，Fixpipe的unitFlag设置为3，保证后续Mmad可以顺利写入L0C。
+Fixpipe的unitFlag设置为3，保证后续Mmad可以顺利写入L0C。
 
 - 沿N轴切分样例：  
 A矩阵shape为[128, 128]，B矩阵shape为[128, 256]，执行矩阵搬出时，沿着N轴分2次搬出，此时1次Mmad对应2次Fixpipe操作。  
