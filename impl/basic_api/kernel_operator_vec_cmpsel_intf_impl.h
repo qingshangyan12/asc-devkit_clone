@@ -24,6 +24,7 @@
 #include "kernel_struct_binary.h"
 #include "kernel_struct_unary.h"
 #include "mstx_local_tensor_info.h"
+#include "kernel_npu_debug.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_cmpsel_impl.h"
@@ -68,24 +69,17 @@ namespace AscendC {
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
 template <typename T, typename U, bool isSetMask>
-__aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Compare", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryCmpInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask, "Compare");
 #endif
     using SrcPrimType = PrimT<T>;
     using DstPrimType = PrimT<U>;
-#if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float, dst: int8_t / uint8_t.");});
-#elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float, int32_t>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float / int32_t, dst: int8_t / uint8_t.");});
-#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinaryCmp(dst, src0, src1, mask, repeatTime, repeatParams, "Compare")) {
@@ -97,24 +91,17 @@ __aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& 
 }
 
 template <typename T, typename U, bool isSetMask>
-__aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Compare", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryCmpInfo(dst, src0, src1, mask, repeatTime, repeatParams, isSetMask, "Compare");
 #endif
     using SrcPrimType = PrimT<T>;
     using DstPrimType = PrimT<U>;
-#if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float, dst: int8_t / uint8_t.");});
-#elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float, int32_t>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float / int32_t, dst: int8_t / uint8_t.");});
-#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinaryCmp(dst, src0, src1, mask, repeatTime, repeatParams, "Compare")) {
@@ -130,9 +117,9 @@ __aicore__ inline void Compare(const LocalTensor<T>& src0, const LocalTensor<T>&
     const uint64_t mask[], const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#if __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, "
-        "current api support dtype combination is src: half / float.");});
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Compare", NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskArray<PrimType, isSetMask>(mask, "Compare");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -140,8 +127,8 @@ __aicore__ inline void Compare(const LocalTensor<T>& src0, const LocalTensor<T>&
         ASCENDC_REPORT_CHECK_ERROR("Compare", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
-    VcmpImpl<PrimType, isSetMask>((__ubuf__ PrimType*)src0.GetPhyAddr(),
-        (__ubuf__ PrimType*)src1.GetPhyAddr(), cmpMode, mask, repeatParams);
+    VcmpImpl<PrimType, isSetMask>((__ubuf__ PrimType*)src0.GetPhyAddr(), (__ubuf__ PrimType*)src1.GetPhyAddr(), cmpMode,
+        mask, repeatParams);
 }
 
 template <typename T, bool isSetMask>
@@ -149,9 +136,9 @@ __aicore__ inline void Compare(const LocalTensor<T>& src0, const LocalTensor<T>&
     const uint64_t mask, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#if __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, "
-        "current api support dtype combination is src: half / float.");});
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Compare", NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskValue<PrimType, isSetMask>(mask, "Compare");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -173,23 +160,19 @@ __aicore__ inline void Compare(const LocalTensor<T>& src0, const LocalTensor<T>&
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
-__aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, CMPMODE cmpMode, uint32_t count)
+__aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    CMPMODE cmpMode, uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Compare", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    ASCENDC_DEBUG_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed "
+        "to check count in Compare, count * sizeof(T) must be divisible by 256, current count value is %u.\n", count));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryCmpInfo(dst, src0, src1, "Compare", count);
 #endif
     using SrcPrimType = PrimT<T>;
     using DstPrimType = PrimT<U>;
-#if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float, dst: int8_t / uint8_t.");});
-#elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float, int32_t>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float / int32_t, dst: int8_t / uint8_t.");});
-#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryCmp(dst, src0, src1, count, "Compare")) {
         ASCENDC_REPORT_CHECK_ERROR("Compare", KernelFuncType::CALCOUNT_MODE);
@@ -286,21 +269,14 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
  * @param [in] intriParams.srcRepStride src0 repeat stride
  */
 template <typename T, typename U, bool isSetMask>
-__aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
-    const T src1Scalar, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
-    const UnaryRepeatParams& repeatParams)
+__aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const T src1Scalar,
+    CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Compares", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCmpsInfo<U, T, isSetMask>(dst, src0, mask[0], mask[1], repeatTime, repeatParams, "Compares");
-#endif
-#if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compares, current api support dtype combination is "
-        "src0: half / float, dst: uint8_t.");});
-#elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compares, current api support dtype combination is "
-        "src0: half / float / int32_t, dst: uint8_t.");});
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryScalarCmp(dst, src0, src1Scalar, ONE_REPEAT_BYTE_SIZE / sizeof(T), repeatTime,
@@ -313,21 +289,14 @@ __aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>&
 }
 
 template <typename T, typename U, bool isSetMask>
-__aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
-    const T src1Scalar, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
-    const UnaryRepeatParams& repeatParams)
+__aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const T src1Scalar,
+    CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Compares", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCmpsInfo<U, T, isSetMask>(dst, src0, mask, repeatTime, repeatParams, "Compares");
-#endif
-#if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compares, current api support dtype combination is "
-        "src0: half / float, dst: uint8_t.");});
-#elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compares, current api support dtype combination is "
-        "src0: half / float / int32_t, dst: uint8_t.");});
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryScalarCmp(dst, src0, src1Scalar, ONE_REPEAT_BYTE_SIZE / sizeof(T), repeatTime,
@@ -341,21 +310,14 @@ __aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>&
 
 // CompareScalar has been updated, please use Compares instead.
 template <typename T, typename U, bool isSetMask>
-__aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
-    const T src1Scalar, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
-    const UnaryRepeatParams& repeatParams)
+__aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const T src1Scalar,
+    CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("CompareScalar", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCmpsInfo<U, T, isSetMask>(dst, src0, mask[0], mask[1], repeatTime, repeatParams, "CompareScalar");
-#endif
-#if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float, dst: uint8_t.");});
-#elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float / int32_t, dst: uint8_t.");});
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryScalarCmp(dst, src0, src1Scalar, ONE_REPEAT_BYTE_SIZE / sizeof(T), repeatTime,
@@ -369,21 +331,14 @@ __aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTenso
 
 // CompareScalar has been updated, please use Compares instead.
 template <typename T, typename U, bool isSetMask>
-__aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
-    const T src1Scalar, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
-    const UnaryRepeatParams& repeatParams)
+__aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const T src1Scalar,
+    CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("CompareScalar", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCmpsInfo<U, T, isSetMask>(dst, src0, mask, repeatTime, repeatParams, "CompareScalar");
-#endif
-#if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float, dst: uint8_t.");});
-#elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float / int32_t, dst: uint8_t.");});
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryScalarCmp(dst, src0, src1Scalar, ONE_REPEAT_BYTE_SIZE / sizeof(T), repeatTime,
@@ -405,24 +360,17 @@ __aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTenso
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
-__aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
-    const T src1Scalar, CMPMODE cmpMode, uint32_t count)
+__aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const T src1Scalar,
+    CMPMODE cmpMode, uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Compares", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"));
+    ASCENDC_DEBUG_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed "
+        "to check count in Compares, count * sizeof(T) must be divisible by 256, current count value is %u.\n", count));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCmpsInfo<U, T, true>(dst, src0, "Compares", count);
 #endif
-#if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compares, current api support dtype combination is "
-        "src0: half / float, dst: uint8_t.");});
-#elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compares, current api support dtype combination is "
-        "src0: half / float / int32_t, dst: uint8_t.");});
-#endif
-    ASCENDC_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check count elements size in Compares, current size "
-        "is %u, should be an integer multiple of 256.", count * sizeof(T));});
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryScalarCmp(dst, src0, src1Scalar, count, "Compares")) {
         ASCENDC_REPORT_CHECK_ERROR("Compares", KernelFuncType::CALCOUNT_MODE);
@@ -433,24 +381,18 @@ __aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>&
 
 // CompareScalar has been updated, please use Compares instead.
 template <typename T, typename U>
-__aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
-    const T src1Scalar, CMPMODE cmpMode, uint32_t count)
+__aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const T src1Scalar,
+    CMPMODE cmpMode, uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("CompareScalar", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"));
+    ASCENDC_DEBUG_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed "
+        "to check count in CompareScalar, count * sizeof(T) must be divisible by 256, current count value is %u.\n",
+        count));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCmpsInfo<U, T, true>(dst, src0, "CompareScalar", count);
 #endif
-#if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float, dst: uint8_t.");});
-#elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float / int32_t, dst: uint8_t.");});
-#endif
-    ASCENDC_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check count elements size in CompareScalar, current size "
-        "is %u, should be an integer multiple of 256.", count * sizeof(T));});
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryScalarCmp(dst, src0, src1Scalar, count, "CompareScalar")) {
         ASCENDC_REPORT_CHECK_ERROR("CompareScalar", KernelFuncType::CALCOUNT_MODE);
@@ -659,7 +601,7 @@ __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& s
 {
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinarySelInfo(dst, selMask, src0, count, true, selMode, "Select");
-#endif    
+#endif
     using DataPrimType = PrimT<T>;
     using MaskPrimType = PrimT<U>;
 #if ASCENDC_CPU_DEBUG

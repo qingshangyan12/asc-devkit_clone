@@ -135,12 +135,15 @@ void main_vec_compare_demo(__gm__ uint8_t* __restrict__ selMaskGm, __gm__ uint8_
         uint8_t repeatTime = dataSize * sizeof(PrimT<T>) / ONE_REPEAT_BYTE_SIZE;
         uint64_t mask[2];
         uint64_t counterMask[2] = {144, 0};
+        uint64_t normMask[2] = {0, 0};
         if (sizeof(PrimT<T>) == 2) {
             mask[0] = UINT64_MAX;
             mask[1] = UINT64_MAX;
+            normMask[0] = 127;  // max is 128
         } else if (sizeof(PrimT<T>) == 4) {
             mask[0] = UINT64_MAX;
             mask[1] = 0;
+            normMask[0] = 60;  // max is 64
         }
         Compare(input0Local, input1Local, cmpMode, mask, { 0, 1, 1, 0, 8, 8 });
         GetCmpMask(selMaskLocal);
@@ -153,7 +156,7 @@ void main_vec_compare_demo(__gm__ uint8_t* __restrict__ selMaskGm, __gm__ uint8_
         GetCmpMask(selMaskLocal);
         AscendC::SetMaskNorm();
 
-        Compare(input0Local, input1Local, cmpMode, counterMask[0], { 0, 1, 1, 0, 8, 8 });
+        Compare(input0Local, input1Local, cmpMode, normMask[0], { 0, 1, 1, 0, 8, 8 });
         GetCmpMask(selMaskLocal);
         AscendC::SetMaskCount();
         AscendC::SetVectorMask<PrimT<T>, MaskMode::COUNTER>(0, 144);
