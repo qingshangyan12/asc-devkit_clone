@@ -1,4 +1,4 @@
-# SIMT与SIMD新同构编程实现gather & adds算子样例
+# SIMT与SIMD混合编程实现gather & adds算子样例
 
 ## 概述
 本样例以实现gather和adds功能的算子为例，展示了SIMT和SIMD混合编程的算子开发方式。算子中使用SIMT编程方式实现离散内存访问操作gather，使用SIMD编程方式实现连续内存访问操作adds。
@@ -83,7 +83,7 @@
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量   
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
