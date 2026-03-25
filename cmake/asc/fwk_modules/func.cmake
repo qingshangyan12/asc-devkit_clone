@@ -196,8 +196,39 @@ function(simple_kernel_compile)
     set(BINCMP_OPS_INFO ${auto_gen_path}/aic-${BINCMP_COMPUTE_UNIT}-ops-info.ini)
   endif()
   get_property(bincmp_enable_binary_package GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_ENABLE_BINARY_PACKAGE)
+  set(BINCMP_ERROR_LOG "${BINCMP_OUT_DIR}/${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}_error.log")
+  set(BINCMP_COMPILE_LOG "${BINCMP_OUT_DIR}/${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}_compile.log")
+
   if (NOT ${ENABLE_CROSS_COMPILE})
-    add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
+    if (${ENABLE_SOURCE_PACKAGE})
+      add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
+        COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} bash -c "
+          ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \\
+            --op-type=${BINCMP_OP_TYPE} \\
+            --src-file=${BINCMP_SRC} \\
+            --compute-unit=${BINCMP_COMPUTE_UNIT} \\
+            --compile-options='${BINCMP_OPTIONS}' \\
+            --debug-config='${BINCMP_CONFIGS}' \\
+            --config-ini=${BINCMP_OPS_INFO} \\
+            --tiling-lib=${BINCMP_TILING_LIB} \\
+            --output-path=${BINCMP_OUT_DIR} \\
+            --dynamic-dir=${BINCMP_DYNAMIC_PATH} \\
+            --enable-binary='${bincmp_enable_binary_package}' \\
+            --json-file=${BINCMP_JSON_FILE} \\
+            --target-name=${BINCMP_TARGET_NAME} \\
+            --auto-gen-path=${auto_gen_path} \\
+            --build-tool=$(MAKE) \\
+          > ${BINCMP_COMPILE_LOG} 2>&1 || true"
+        COMMAND ${CMAKE_COMMAND} -E env bash -c "
+          if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \\
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_FAIL_LOG}; \\
+              cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_FAIL_LOG}; \\
+              echo '' >> ${BINCMP_FAIL_LOG}; \\
+          fi"
+        VERBATIM
+      )
+    else()
+      add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
                       COMMAND ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
                       --op-type=${BINCMP_OP_TYPE}
                       --src-file=${BINCMP_SRC}
@@ -213,12 +244,41 @@ function(simple_kernel_compile)
                       --target-name=${BINCMP_TARGET_NAME}
                       --auto-gen-path=${auto_gen_path}
                       --build-tool=$(MAKE))
+    endif()
     add_dependencies(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT} ${BINCMP_PACKAGE_NAME}_ascendc_${BINCMP_TILING_LIB_TMP})
   else()
     if (${bincmp_enable_binary_package} AND NOT DEFINED HOST_NATIVE_TILING_LIB)
       message(FATAL_ERROR "Native host libs was not set for cross compile!")
     endif()
-    add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
+    if (${ENABLE_SOURCE_PACKAGE})
+      add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
+        COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} bash -c "
+          ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \\
+            --op-type=${BINCMP_OP_TYPE} \\
+            --src-file=${BINCMP_SRC} \\
+            --compute-unit=${BINCMP_COMPUTE_UNIT} \\
+            --compile-options='${BINCMP_OPTIONS}' \\
+            --debug-config='${BINCMP_CONFIGS}' \\
+            --config-ini=${BINCMP_OPS_INFO} \\
+            --tiling-lib=${HOST_NATIVE_TILING_LIB} \\
+            --output-path=${BINCMP_OUT_DIR} \\
+            --dynamic-dir=${BINCMP_DYNAMIC_PATH} \\
+            --enable-binary='${bincmp_enable_binary_package}' \\
+            --json-file=${BINCMP_JSON_FILE} \\
+            --target-name=${BINCMP_TARGET_NAME} \\
+            --auto-gen-path=${auto_gen_path} \\
+            --build-tool=$(MAKE) \\
+          > ${BINCMP_COMPILE_LOG} 2>&1 || true"
+        COMMAND ${CMAKE_COMMAND} -E env bash -c "
+          if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \\
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_FAIL_LOG}; \\
+              cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_FAIL_LOG}; \\
+              echo '' >> ${BINCMP_FAIL_LOG}; \\
+          fi"
+        VERBATIM
+      )
+    else()
+      add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
                       COMMAND ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
                       --op-type=${BINCMP_OP_TYPE}
                       --src-file=${BINCMP_SRC}
@@ -234,6 +294,7 @@ function(simple_kernel_compile)
                       --target-name=${BINCMP_TARGET_NAME}
                       --auto-gen-path=${auto_gen_path}
                       --build-tool=$(MAKE))
+    endif()
   endif()
   add_dependencies(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT} ${BINCMP_TARGET_NAME}_ops_info_gen_${BINCMP_COMPUTE_UNIT})
 
