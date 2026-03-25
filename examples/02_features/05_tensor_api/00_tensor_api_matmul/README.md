@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例采用Tensor_API接口编写Mmad算子样例。
+本样例采用Tensor_API接口编写Mmad多核场景算子样例。
 
 ## 支持的产品
 
@@ -24,15 +24,15 @@
 
 - 算子功能：  
 
-  本样例中实现的是[M, K, N]固定为[128, 128, 128]的Matmul算子。 
+  本样例中实现的是[M, K, N]固定为[128, 128, 96]的Matmul算子。 
   Matmul算子的数学表达式为：
   $$
   C = A * B
   $$
-  其中A的形状为[128, 128]，B的形状为[128, 128]，C的形状为[128, 128]。
+  其中A的形状为[128, 96]，B的形状为[96, 128]，C的形状为[128, 128]。
 - 算子规格：  
 
-  在核函数直调样例中，算子实现支持的shape为：M = 128, N = 128, K = 128。
+  在核函数直调样例中，算子实现支持的shape为：M = 128, N = 128, K = 96。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
@@ -46,7 +46,24 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">tensor_api_matmul_custom</td></tr>
   </table>
 - 算子实现：  
-  本样例中实现的是[M, K, N]固定为[128, 128, 128]的Matmul算子。Matmul的计算公式为：C = A * B。  
+  本样例中以32核为例，实现的是[M, K, N]固定为[128, 128, 96]的多核Matmul算子，tiling参数如下：
+| 参数          | 值     |
+| ------------- | ----- |
+| `m`           | 128   |
+| `k`           | 96    |
+| `n`           | 128   |
+| `singleCoreM` | 16    |
+| `singleCoreK` | 96    |
+| `singleCoreN` | 32    |
+| `baseM`       | 16    |
+| `baseK`       | 16    |
+| `baseN`       | 32    |
+| `stepM`       | 1     |
+| `stepKa`      | 6     |
+| `stepKb`      | 6     |
+| `stepN`       | 1     |
+  
+  Matmul的计算公式为：C = A * B。  
   A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。  
   C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。  
 
