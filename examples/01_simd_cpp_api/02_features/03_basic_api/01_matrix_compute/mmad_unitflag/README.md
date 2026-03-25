@@ -46,7 +46,6 @@ A矩阵shape为[128, 128]，B矩阵shape为[128, 256]，执行矩阵搬出时，
 Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；  
 每次Fixpipe的unitFlag都设置为3，保证后续其他Mmad在复用这块L0C地址时可以顺利写入。  
 
-
 另外，需要注意当使能unitFlag时，L0C上的LocalTensor不能用[TQue](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0137.html)获取，需要改用[TBuf](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0161.html)。
 
 ## 性能调优
@@ -65,6 +64,7 @@ Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；
 ```bash
 msprof op ./demo
 ```
+
 **2.查看性能数据**
 
 在当前目录下会生成OPPPROF_为前缀的文件夹，目录结构及文件说明如下：
@@ -95,17 +95,20 @@ cmake -DRUN_MODE=sim -DSOC_VERSION=${SOC_VERSION} ..
 # 多线程编译
 make -j$(nproc)     
 ```
+
 **2.配置运行时依赖**
 
 添加运行时依赖库路径（需替换{SOC_VERSION}为实际NPU型号）：
 ```bash
 export LD_LIBRARY_PATH=${ASCEND_HOME_PATH}/tools/simulator/${SOC_VERSION}/lib/:$LD_LIBRARY_PATH  
 ```
+
 **3.执行仿真调优命令**
 
 ```bash
 msprof op simulator ./demo
 ```
+
 **4.查看仿真性能数据**
 
 当前目录下会生成OPPROF_前缀的文件夹，目录结构如下：
@@ -121,7 +124,9 @@ OPPROF_2025xxxx_XXXXXX
     ├── visualize_data.bin                  # 算子可视化文件（可通过MindStudio Insight加载，直观查看算子性能）
     └── trace.json                          # 算子所有核的流水图
 ```
+
 **补充说明**
+
 更多性能指标的详细说明及调优方案，可参考《算子开发工具》手册。
 
 ## 编译运行
@@ -145,9 +150,11 @@ OPPROF_2025xxxx_XXXXXX
     ```
 - 样例执行
   ```bash
+  ROUNDMODE=1
+  # ROUNDMODE  1:沿K轴切分  2：沿N轴切分
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake ..;make -j;                # 编译工程，注意CMakeLists中根据是否要使能unitflag在以下两个.asc文件中切换
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  python3 ../scripts/gen_data.py   -round_mode=$ROUNDMODE  # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```

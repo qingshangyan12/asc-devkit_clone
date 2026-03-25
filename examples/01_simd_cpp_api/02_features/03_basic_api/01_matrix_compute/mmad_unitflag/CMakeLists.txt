@@ -15,9 +15,11 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    #根据是否要使能unitflag在以下两个.asc文件中切换
-    #mmad_unitflag_disable.asc
-    mmad_unitflag_enable.asc
+    #根据测试场景在以下.asc文件中切换
+    # mmad_unitflag_disable_n_round.asc    #沿N轴切分，不使能unitFlag
+    # mmad_unitflag_enable_n_round.asc     #沿N轴切分，使能unitFlag
+    # mmad_unitflag_disable_k_round.asc    #沿K轴切分，不使能unitFlag
+    mmad_unitflag_enable_k_round.asc     #沿K轴切分，使能unitFlag
 )
 
 target_link_libraries(demo PRIVATE

@@ -16,11 +16,22 @@ import argparse
 import numpy as np
 np.random.seed(9)
 
-def gen_golden_data():
-    M = 128
-    K = 512
-    N = 256
-    kRound = 8 #K轴切分8次
+def gen_golden_data(round_mode):
+    M = 0
+    K = 0
+    N = 0
+    kRound = 0
+
+    if round_mode == 1:
+        M = 128
+        K = 512
+        N = 256
+        kRound = 8 #K轴切分8次
+    elif round_mode == 2:
+        M = 128
+        K = 128
+        N = 256
+
     input_type = np.dtype("float16")
     x1_gm = np.random.uniform(1, 10, [M, K]).astype(input_type)
     x2_gm = np.random.uniform(1, 10, [K, N]).astype(input_type)
@@ -28,12 +39,16 @@ def gen_golden_data():
     golden = golden.astype(np.float32)
     os.system("mkdir -p input")
     os.system("mkdir -p output")
-    if kRound > 1:
-        # 将K轴外移
-        x1_gm = x1_gm.reshape(M, kRound, K//kRound).transpose(1, 0, 2)
+    if round_mode == 1:
+        if kRound > 1:
+            # 将K轴外移
+            x1_gm = x1_gm.reshape(M, kRound, K//kRound).transpose(1, 0, 2)
     x1_gm.tofile("./input/x1_gm.bin")
     x2_gm.tofile("./input/x2_gm.bin")
     golden.tofile("./output/golden.bin")
     
 if __name__ == "__main__":
-    gen_golden_data()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-round_mode', type=int, default=1, choices=range(1, 3))
+    args = parser.parse_args()
+    gen_golden_data(args.round_mode)
