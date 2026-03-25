@@ -12,14 +12,15 @@
  * \file asc_printf_simt_impl.h
  * \brief
  */
-#ifndef IMPL_UTILS_DEBUG_ASC_PRINTF_SIMT_IMPL_H
-#define IMPL_UTILS_DEBUG_ASC_PRINTF_SIMT_IMPL_H
 
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+ #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_SIMT_IMPL__
 #warning "impl/utils/debug/asc_printf_simt_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "utils/debug/asc_printf.h" and use public functions or variables defined in interface header files."
 #endif
+
+#ifndef IMPL_UTILS_DEBUG_ASC_PRINTF_SIMT_IMPL_H
+#define IMPL_UTILS_DEBUG_ASC_PRINTF_SIMT_IMPL_H
 
 #include "impl/utils/sys_macros.h"
 
