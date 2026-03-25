@@ -28,66 +28,69 @@
     };                                                                                                                 \
                                                                                                                        \
     namespace {                                                                                                        \
-    void mad_##type_prefix##_params_Stub(__cc__ c_type* c, __ca__ a_type* a, __cb__ b_type* b, uint16_t m, uint16_t k, \
-                                         uint16_t n, uint8_t unit_flag_ctrl, bool gemv_ctrl, bool btbuf_ctrl,          \
-                                         bool zero_cmatrix_ctrl)                                                       \
+    void mad_##type_prefix##_params_Stub(__cc__ c_type* c_matrix, __ca__ a_type* a_matrix, __cb__ b_type* b_matrix,    \
+                                         uint16_t left_height, uint16_t n_dim, uint16_t right_width,                   \
+                                         uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,                   \
+                                         bool c_matrix_init_val)                                                       \
     {                                                                                                                  \
-        EXPECT_EQ(c, reinterpret_cast<__cc__ c_type*>(1));                                                             \
-        EXPECT_EQ(a, reinterpret_cast<__ca__ a_type*>(2));                                                             \
-        EXPECT_EQ(b, reinterpret_cast<__cb__ b_type*>(3));                                                             \
-        EXPECT_EQ(m, static_cast<uint16_t>(4));                                                                        \
-        EXPECT_EQ(k, static_cast<uint16_t>(5));                                                                        \
-        EXPECT_EQ(n, static_cast<uint16_t>(6));                                                                        \
-        EXPECT_EQ(unit_flag_ctrl, static_cast<uint8_t>(1));                                                            \
-        EXPECT_EQ(gemv_ctrl, true);                                                                                    \
-        EXPECT_EQ(btbuf_ctrl, false);                                                                                  \
-        EXPECT_EQ(zero_cmatrix_ctrl, true);                                                                            \
+        EXPECT_EQ(c_matrix, reinterpret_cast<__cc__ c_type*>(1));                                                      \
+        EXPECT_EQ(a_matrix, reinterpret_cast<__ca__ a_type*>(2));                                                      \
+        EXPECT_EQ(b_matrix, reinterpret_cast<__cb__ b_type*>(3));                                                      \
+        EXPECT_EQ(left_height, static_cast<uint16_t>(4));                                                              \
+        EXPECT_EQ(n_dim, static_cast<uint16_t>(5));                                                                    \
+        EXPECT_EQ(right_width, static_cast<uint16_t>(6));                                                              \
+        EXPECT_EQ(unit_flag, static_cast<uint8_t>(1));                                                                 \
+        EXPECT_EQ(disable_gemv, true);                                                                                 \
+        EXPECT_EQ(c_matrix_source, false);                                                                             \
+        EXPECT_EQ(c_matrix_init_val, true);                                                                            \
     }                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
     TEST_F(TestMmad##type_prefix##CAPI, mmad_##type_prefix##_params_Succ)                                              \
     {                                                                                                                  \
-        __cc__ c_type* c = reinterpret_cast<__cc__ c_type*>(1);                                                        \
-        __ca__ a_type* a = reinterpret_cast<__ca__ a_type*>(2);                                                        \
-        __cb__ b_type* b = reinterpret_cast<__cb__ b_type*>(3);                                                        \
-        uint16_t m = 4;                                                                                                \
-        uint16_t k = 5;                                                                                                \
-        uint16_t n = 6;                                                                                                \
-        uint8_t unit_flag_ctrl = 1;                                                                                    \
-        bool gemv_ctrl = true;                                                                                         \
-        bool btbuf_ctrl = false;                                                                                       \
-        bool zero_cmatrix_ctrl = true;                                                                                 \
+        __cc__ c_type* c_matrix = reinterpret_cast<__cc__ c_type*>(1);                                                 \
+        __ca__ a_type* a_matrix = reinterpret_cast<__ca__ a_type*>(2);                                                 \
+        __cb__ b_type* b_matrix = reinterpret_cast<__cb__ b_type*>(3);                                                 \
+        uint16_t left_height = 4;                                                                                      \
+        uint16_t n_dim = 5;                                                                                            \
+        uint16_t right_width = 6;                                                                                      \
+        uint8_t unit_flag = 1;                                                                                         \
+        bool disable_gemv = true;                                                                                      \
+        bool c_matrix_source = false;                                                                                  \
+        bool c_matrix_init_val = true;                                                                                 \
                                                                                                                        \
-        MOCKER_CPP(mad, void(__cc__ c_type * c_matrix, __ca__ a_type * a_matrix, __cb__ b_type * b_matrix, uint16_t m, \
-                             uint16_t k, uint16_t n, uint8_t unit_flag_ctrl, bool gemv_ctrl, bool btbuf_ctrl,          \
-                             bool zero_cmatrix_ctrl))                                                                  \
+        MOCKER_CPP(mad, void(__cc__ c_type * c_matrix, __ca__ a_type * a_matrix, __cb__ b_type * b_matrix,             \
+                             uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,            \
+                             bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val))                         \
             .times(1)                                                                                                  \
             .will(invoke(mad_##type_prefix##_params_Stub));                                                            \
                                                                                                                        \
-        asc_mmad(c, a, b, m, k, n, unit_flag_ctrl, gemv_ctrl, btbuf_ctrl, zero_cmatrix_ctrl);                          \
+        asc_mmad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv,               \
+                 c_matrix_source, c_matrix_init_val);                                                                  \
         GlobalMockObject::verify();                                                                                    \
     }                                                                                                                  \
                                                                                                                        \
     TEST_F(TestMmad##type_prefix##CAPI, mmad_sync_##type_prefix##_params_Succ)                                         \
     {                                                                                                                  \
-        __cc__ c_type* c = reinterpret_cast<__cc__ c_type*>(1);                                                        \
-        __ca__ a_type* a = reinterpret_cast<__ca__ a_type*>(2);                                                        \
-        __cb__ b_type* b = reinterpret_cast<__cb__ b_type*>(3);                                                        \
-        uint16_t m = 4;                                                                                                \
-        uint16_t k = 5;                                                                                                \
-        uint16_t n = 6;                                                                                                \
-        uint8_t unit_flag_ctrl = 1;                                                                                    \
-        bool gemv_ctrl = true;                                                                                         \
-        bool btbuf_ctrl = false;                                                                                       \
-        bool zero_cmatrix_ctrl = true;                                                                                 \
+        __cc__ c_type* c_matrix = reinterpret_cast<__cc__ c_type*>(1);                                                 \
+        __ca__ a_type* a_matrix = reinterpret_cast<__ca__ a_type*>(2);                                                 \
+        __cb__ b_type* b_matrix = reinterpret_cast<__cb__ b_type*>(3);                                                 \
+        uint16_t left_height = 4;                                                                                      \
+        uint16_t n_dim = 5;                                                                                            \
+        uint16_t right_width = 6;                                                                                      \
+        uint8_t unit_flag = 1;                                                                                         \
+        bool disable_gemv = true;                                                                                      \
+        bool c_matrix_source = false;                                                                                  \
+        bool c_matrix_init_val = true;                                                                                 \
                                                                                                                        \
-        MOCKER_CPP(mad, void(__cc__ c_type * c_matrix, __ca__ a_type * a_matrix, __cb__ b_type * b_matrix, uint16_t m, \
-                             uint16_t k, uint16_t n, uint8_t unit_flag_ctrl, bool gemv_ctrl, bool btbuf_ctrl,          \
-                             bool zero_cmatrix_ctrl))                                                                  \
+        MOCKER_CPP(mad, void(__cc__ c_type * c_matrix, __ca__ a_type * a_matrix, __cb__ b_type * b_matrix,             \
+                             uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,            \
+                             bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val))                         \
             .times(1)                                                                                                  \
             .will(invoke(mad_##type_prefix##_params_Stub));                                                            \
                                                                                                                        \
-        asc_mmad_sync(c, a, b, m, k, n, unit_flag_ctrl, gemv_ctrl, btbuf_ctrl, zero_cmatrix_ctrl);                     \
+        asc_mmad_sync(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv,          \
+                      c_matrix_source, c_matrix_init_val);                                                             \
         GlobalMockObject::verify();                                                                                    \
     }
 

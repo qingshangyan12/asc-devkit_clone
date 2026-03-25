@@ -10,8 +10,8 @@
 
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
-#include "tests/api/c_api/stub/cce_stub.h"
-#include "include/c_api/asc_simd.h"
+#include "c_api/stub/cce_stub.h"
+#include "c_api/asc_simd.h"
 
 class TestMrgsort4CAPI : public testing::Test {
 protected:
@@ -22,19 +22,19 @@ protected:
 #define TEST_MRGSORT4_PARAMS(type)                                                                                     \
     namespace {                                                                                                        \
     void vmrgsort4_##type##_params_Stub(__ubuf__ type* dst, __ubuf__ type* src, uint8_t repeat,                        \
-                                        uint16_t region_proposal_li0, uint16_t region_proposal_li1,                    \
-                                        uint16_t region_proposal_li2, uint16_t region_proposal_li3,                    \
-                                        bool is_all_stored, uint8_t mask_signal)                                       \
+                                        uint16_t element_length_0, uint16_t element_length_1,                          \
+                                        uint16_t element_length_2, uint16_t element_length_3,                          \
+                                        bool if_exhausted_suspension, uint8_t valid_bit)                               \
     {                                                                                                                  \
         EXPECT_EQ(dst, reinterpret_cast<__ubuf__ type*>(1));                                                           \
         EXPECT_EQ(src, reinterpret_cast<__ubuf__ type*>(2));                                                           \
         EXPECT_EQ(repeat, static_cast<uint8_t>(3));                                                                    \
-        EXPECT_EQ(region_proposal_li0, static_cast<uint16_t>(4));                                                      \
-        EXPECT_EQ(region_proposal_li1, static_cast<uint16_t>(5));                                                      \
-        EXPECT_EQ(region_proposal_li2, static_cast<uint16_t>(6));                                                      \
-        EXPECT_EQ(region_proposal_li3, static_cast<uint16_t>(7));                                                      \
-        EXPECT_EQ(is_all_stored, true);                                                                                \
-        EXPECT_EQ(mask_signal, static_cast<uint8_t>(8));                                                               \
+        EXPECT_EQ(element_length_0, static_cast<uint16_t>(4));                                                         \
+        EXPECT_EQ(element_length_1, static_cast<uint16_t>(5));                                                         \
+        EXPECT_EQ(element_length_2, static_cast<uint16_t>(6));                                                         \
+        EXPECT_EQ(element_length_3, static_cast<uint16_t>(7));                                                         \
+        EXPECT_EQ(if_exhausted_suspension, true);                                                                      \
+        EXPECT_EQ(valid_bit, static_cast<uint8_t>(8));                                                                 \
     }                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -43,20 +43,20 @@ protected:
         __ubuf__ type* dst = reinterpret_cast<__ubuf__ type*>(1);                                                      \
         __ubuf__ type* src = reinterpret_cast<__ubuf__ type*>(2);                                                      \
         uint8_t repeat = 3;                                                                                            \
-        uint16_t region_proposal_li0 = 4;                                                                              \
-        uint16_t region_proposal_li1 = 5;                                                                              \
-        uint16_t region_proposal_li2 = 6;                                                                              \
-        uint16_t region_proposal_li3 = 7;                                                                              \
-        bool is_all_stored = true;                                                                                     \
-        uint8_t mask_signal = 8;                                                                                       \
+        uint16_t element_length_0 = 4;                                                                                 \
+        uint16_t element_length_1 = 5;                                                                                 \
+        uint16_t element_length_2 = 6;                                                                                 \
+        uint16_t element_length_3 = 7;                                                                                 \
+        bool if_exhausted_suspension = true;                                                                           \
+        uint8_t valid_bit = 8;                                                                                         \
                                                                                                                        \
         MOCKER_CPP(vmrgsort4, void(__ubuf__ type*, __ubuf__ type*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t,    \
                                    bool, uint8_t))                                                                     \
             .times(1)                                                                                                  \
             .will(invoke(vmrgsort4_##type##_params_Stub));                                                             \
                                                                                                                        \
-        asc_mrgsort4(dst, src, repeat, region_proposal_li0, region_proposal_li1, region_proposal_li2,                  \
-                     region_proposal_li3, is_all_stored, mask_signal);                                                 \
+        asc_mrgsort4(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,         \
+                     if_exhausted_suspension, valid_bit);                                                              \
         GlobalMockObject::verify();                                                                                    \
     }                                                                                                                  \
                                                                                                                        \
@@ -65,20 +65,20 @@ protected:
         __ubuf__ type* dst = reinterpret_cast<__ubuf__ type*>(1);                                                      \
         __ubuf__ type* src = reinterpret_cast<__ubuf__ type*>(2);                                                      \
         uint8_t repeat = 3;                                                                                            \
-        uint16_t region_proposal_li0 = 4;                                                                              \
-        uint16_t region_proposal_li1 = 5;                                                                              \
-        uint16_t region_proposal_li2 = 6;                                                                              \
-        uint16_t region_proposal_li3 = 7;                                                                              \
-        bool is_all_stored = true;                                                                                     \
-        uint8_t mask_signal = 8;                                                                                       \
+        uint16_t element_length_0 = 4;                                                                                 \
+        uint16_t element_length_1 = 5;                                                                                 \
+        uint16_t element_length_2 = 6;                                                                                 \
+        uint16_t element_length_3 = 7;                                                                                 \
+        bool if_exhausted_suspension = true;                                                                           \
+        uint8_t valid_bit = 8;                                                                                         \
                                                                                                                        \
         MOCKER_CPP(vmrgsort4, void(__ubuf__ type*, __ubuf__ type*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t,    \
                                    bool, uint8_t))                                                                     \
             .times(1)                                                                                                  \
             .will(invoke(vmrgsort4_##type##_params_Stub));                                                             \
                                                                                                                        \
-        asc_mrgsort4_sync(dst, src, repeat, region_proposal_li0, region_proposal_li1, region_proposal_li2,             \
-                          region_proposal_li3, is_all_stored, mask_signal);                                            \
+        asc_mrgsort4_sync(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,    \
+                          if_exhausted_suspension, valid_bit);                                                         \
         GlobalMockObject::verify();                                                                                    \
     }
 
