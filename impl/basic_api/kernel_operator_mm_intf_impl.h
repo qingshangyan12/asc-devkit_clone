@@ -47,6 +47,10 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     const LoadData2DParams& loadDataParams)
 {
     CheckLoadData2dDatatype<T>();
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadData2dLocal2Local(dst, src, "LoadData with LoadData2DParams");
+    CheckLoadData2dParams<T>(loadDataParams, true);
+#endif
     LoadDataImpl(dst, src, loadDataParams);
 }
 
@@ -55,6 +59,10 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(const LocalTensor<T>& dst, 
     const LoadData2DParams& loadDataParams)
 {
     CheckLoadData2dDatatype<T>();
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadData2dGlobal2Local(dst, "LoadData with LoadData2DParams");
+    CheckLoadData2dParams<T>(loadDataParams, false);
+#endif
     LoadDataImpl(dst, src, loadDataParams);
 }
 
@@ -89,6 +97,9 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     const LoadData2DParamsV2& loadDataParams)
 {
     CheckLoadData2dDatatype<T>();
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadData2dLocal2Local(dst, src, "LoadData with LoadData2DParamsV2");
+#endif
     LoadDataImpl(dst, src, loadDataParams);
 }
 
@@ -107,6 +118,9 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(const LocalTensor<T>& dst, 
     const LoadData2DParamsV2& loadDataParams)
 {
     CheckLoadData2dDatatype<T>();
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadData2dGlobal2Local(dst, "LoadData with LoadData2DParamsV2");
+#endif
     LoadDataImpl(dst, src, loadDataParams);
 }
 
@@ -289,6 +303,9 @@ template <typename T>
 __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData2dTransposeParams& loadDataParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadDataWithTranspose(dst, src, "LoadDataWithTranspose with LoadData2dTransposeParams");
+#endif
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
 }
 
@@ -309,6 +326,9 @@ template <typename T>
 __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData2dTransposeParamsV2& loadDataParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadDataWithTranspose(dst, src, "LoadDataWithTranspose with LoadData2dTransposeParamsV2");
+#endif
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
 }
 
@@ -383,7 +403,7 @@ __aicore__ inline void LoadDataWithSparse(const LocalTensor<T> &dst, const Local
 #endif
 
 #if __NPU_ARCH__ == 2002
-template <typename T, typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type> 
+template <typename T, typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type>
 __aicore__ inline void LoadUnzipIndex(const GlobalTensor<T>& src, uint32_t numOfIndexTabEntry)
 {
     LoadUnzipIndexImpl(src, numOfIndexTabEntry);
@@ -401,57 +421,57 @@ __aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(const LocalTensor<T> &
     BroadCastVecToMMImpl(dst, src, blockCount, blockLen, srcGap, dstGap);
 }
 
-/* ************************************************************************************************** 
- * Fill                                             * 
- * ************************************************************************************************* */ 
-/* 
- * @ingroup Fill 
- * @brief L0A/L0B/L1 value initializing 
- * @param [out] dst output LocalTensor 
- * @param [in] initConstValueParams.repeatTimes repeat times 
- * @param [in] initConstValueParams.repeatTimes blockNum block number 
- * @param [in] initConstValueParams.dstGap interval between the previous tail and the next block head 
- * @param [in] initConstValueParams.initValue initialize Value 
- */ 
-template <typename T, typename U> 
-__aicore__ inline void CheckInitParams(const LocalTensor<T> &dst, 
-    const InitConstValueParams<U>& initConstValueParams, const char* intriName) 
-{ 
-#if ASCENDC_CPU_DEBUG 
-    uint16_t repeatTime = initConstValueParams.repeatTimes; 
-#if __NPU_ARCH__ == 2201 
-    uint16_t blockNum = initConstValueParams.blockNum; 
-    uint16_t dstGap = initConstValueParams.dstGap; 
-#else 
-    uint16_t blockNum = 1; 
-    uint16_t dstGap = 0; 
-#endif 
-    if (!CheckFuncInitConstValue(dst, repeatTime, blockNum, dstGap, intriName)) { 
-        ASCENDC_REPORT_CHECK_ERROR(intriName, KernelFuncType::NONE_MODE); 
-    } 
-#endif 
+/* **************************************************************************************************
+ * Fill                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup Fill
+ * @brief L0A/L0B/L1 value initializing
+ * @param [out] dst output LocalTensor
+ * @param [in] initConstValueParams.repeatTimes repeat times
+ * @param [in] initConstValueParams.repeatTimes blockNum block number
+ * @param [in] initConstValueParams.dstGap interval between the previous tail and the next block head
+ * @param [in] initConstValueParams.initValue initialize Value
+ */
+template <typename T, typename U>
+__aicore__ inline void CheckInitParams(const LocalTensor<T> &dst,
+    const InitConstValueParams<U>& initConstValueParams, const char* intriName)
+{
+#if ASCENDC_CPU_DEBUG
+    uint16_t repeatTime = initConstValueParams.repeatTimes;
+#if __NPU_ARCH__ == 2201
+    uint16_t blockNum = initConstValueParams.blockNum;
+    uint16_t dstGap = initConstValueParams.dstGap;
+#else
+    uint16_t blockNum = 1;
+    uint16_t dstGap = 0;
+#endif
+    if (!CheckFuncInitConstValue(dst, repeatTime, blockNum, dstGap, intriName)) {
+        ASCENDC_REPORT_CHECK_ERROR(intriName, KernelFuncType::NONE_MODE);
+    }
+#endif
 }
 
 namespace Impl {
-constexpr const char* FILL_INTRINSIC_NAME = "Fill"; 
+constexpr const char* FILL_INTRINSIC_NAME = "Fill";
 constexpr const char* INITCONSTVALUE_INTRINSIC_NAME = "InitConstValue";
 }  // namespace Impl
 
-template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type> 
-__aicore__ inline void Fill(const LocalTensor<T> &dst, 
-    const InitConstValueParams<U>& initConstValueParams) 
-{ 
-    CheckInitParams(dst, initConstValueParams, Impl::FILL_INTRINSIC_NAME); 
-    FillImpl(dst, initConstValueParams); 
+template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void Fill(const LocalTensor<T> &dst,
+    const InitConstValueParams<U>& initConstValueParams)
+{
+    CheckInitParams(dst, initConstValueParams, Impl::FILL_INTRINSIC_NAME);
+    FillImpl(dst, initConstValueParams);
 }
 
 // InitConstValue has been updated, please use Fill instead.
-template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type> 
-__aicore__ inline void InitConstValue(const LocalTensor<T> &dst, 
-    const InitConstValueParams<U>& initConstValueParams) 
-{ 
-    CheckInitParams(dst, initConstValueParams, Impl::INITCONSTVALUE_INTRINSIC_NAME); 
-    InitConstValueImpl(dst, initConstValueParams); 
+template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void InitConstValue(const LocalTensor<T> &dst,
+    const InitConstValueParams<U>& initConstValueParams)
+{
+    CheckInitParams(dst, initConstValueParams, Impl::INITCONSTVALUE_INTRINSIC_NAME);
+    InitConstValueImpl(dst, initConstValueParams);
 }
 
 /* **************************************************************************************************
@@ -653,8 +673,8 @@ __aicore__ inline void SetMMColumnMajor()
  * through M direction then N direction
  */
 // SetMMLayoutTransform has been updated, please use SetMMRowMajor/SetMMColumnMajor instead.
-__aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode)	 
-{	 
+__aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode)
+{
     SetMMLayoutTransformImpl(mmLayoutMode);
 }
 
