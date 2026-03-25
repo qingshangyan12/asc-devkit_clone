@@ -1865,7 +1865,7 @@ def generate_extra_param(func_group: FuncSignGroupWithModeBase,
 
 
 def _generate_dump_source(func_group: FuncSignGroupWithModeBase, is_mix: bool) -> str:
-    if not RUN_MODE == "cpu" and IS_C310_MODE and func_group.dump_info["dump_type"] != "":
+    if IS_C310_MODE and func_group.dump_info["dump_type"] != "":
         source = "#if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON\n"
         if func_group.dump_info["dump_type"] == "assert":
             if is_mix:
@@ -1956,9 +1956,10 @@ def _generate_matmul_clear_source(is_mix: bool) -> str:
 
 def _generate_sub_source(func_group: FuncSignGroupWithModeBase, is_mix: bool, param_names):
     source = ""
-    source += _generate_dump_source(func_group, is_mix)
-    source += _generate_ffts_source(is_mix)
-    source += _generate_printf_source(func_group)
+    if not RUN_MODE == "cpu":
+        source += _generate_dump_source(func_group, is_mix)
+        source += _generate_ffts_source(is_mix)
+        source += _generate_printf_source(func_group)
 
     if len(param_names) > 0:
         source += "#if defined(HAVE_WORKSPACE)\n"
