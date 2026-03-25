@@ -1,5 +1,9 @@
 # CrossCoreSetFlag和CrossCoreWaitFlag，纯Vector计算场景样例
+        // 8个AI Core，每一个AI Core内AIC:AIV配比为1:2
+        // 16个aiv，GetBlockIdx取值为0-15
+        // GetBlockIdx取值为2和3，同属于第2个AI Core（下标从1开始）
 
+        if ((AscendC::GetBlockIdx() == 2)||(AscendC::GetBlockIdx() == 3)) {
 ## 概述
 
 本样例详细说明：在仅包含 Vector 计算的应用场景下，如何使用 [CrossCoreSetFlag和CrossCoreWaitFlag](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0273.html)的模式 0、模式 1 实现 AIV 间的同步。
@@ -27,7 +31,7 @@
 
 本算子用到的GM分为2块，一块用于存储输入数据(initialDataGm)，一块用于存储所有AIV的累加结果(atomicResultGm)。
 
-本样例中模式0和模式1计算逻辑几乎相同，区别仅在于参与矢量计算的AIV数目：
+本样例中模式0和模式1计算逻辑几乎相同，区别仅在于参与同步的AIV数目：
 模式0时，全部的16个AIV参与计算；模式1时，仅有2个AIV（BlockIdx=2和3）参与计算。因此，下面以模式0为例介绍样例完整的计算逻辑：
 
 (1) 每个AIV均从initialDataGm上搬运全为1的数据到UB上，即为PIPE\_MTE2的流水操作。
@@ -71,7 +75,9 @@ if ASCEND_IS_AIV {
         op.Process();
 }
 ```
- (2) 样例采用[静态tensor编程范式](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850/opdevg/Ascendcopdevg/atlas_ascendc_10_00019.html)需要手动插入核内同步。
+ (2) 模式 1 要求参与同步的 AIV 必须属于同一 AI Core，否则程序会卡死。本样例中，参与同步的两个AIV的 GetBlockIdx=2、3 同属第 2 个 AI Core（下标从 1 开始）；若将GetBlockIdx改为 3 和 4（），程序将卡死。
+
+ (3) 样例采用[静态tensor编程范式](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850/opdevg/Ascendcopdevg/atlas_ascendc_10_00019.html)需要手动插入核内同步。
 
 ## 编译运行
 
