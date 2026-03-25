@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 3.16.0)
 project(asc-devkit)
 
 option(BUILD_OPEN_PROJECT "Build open asc-devkit lib project" ON)
-
+ 
 set(CMAKE_C_FLAGS_RELEASE "")
 set(CMAKE_CXX_FLAGS_RELEASE "")
 
