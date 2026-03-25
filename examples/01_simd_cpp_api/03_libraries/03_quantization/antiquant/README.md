@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示了基于AntiQuant高阶API实现antiquant算子。样例按元素做伪量化计算。
+本样例在模型量化推理场景下，基于AntiQuant高阶API实现反量化计算，用于将量化后的低精度数据恢复为高精度数据。样例展示了PER_CHANNEL场景（按通道量化）下，将int8_t类型输入数据与offset偏移量相加后，乘以scale缩放因子，转换为half类型输出结果的过程。
 
 ## 支持的产品
 
@@ -18,13 +18,13 @@
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── antiquant.asc           // Ascend C算子实现 & 调用样例
+│   └── antiquant.asc           // Ascend C样例实现 & 调用样例
 ```
 
-## 算子描述
+## 样例功能描述
 
-- 算子功能：  
-  按元素做伪量化计算，比如将int8_t数据类型伪量化为half数据类型。
+- 样例功能：  
+  按元素做反量化计算，将int8_t类型数据转换为half类型数据。更多API详细信息请参考[AscendAntiQuant API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0822.html)。
 
   计算公式如下：
   - PER_CHANNEL场景（按通道量化）
@@ -39,36 +39,41 @@
   - PER_TENSOR场景 （按张量量化）  
     dst[i][j] = scale * (src[i][j] + offset)
 
-- 算子规格：  
-  <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> antiquant </td></tr>
+- 术语说明：
+  - **groupSize**：分组大小，计算公式为 groupSize = src.shape[0] / offset.shape[0]，表示每组输入数据对应的offset和scale参数数量
+  - **k**：API参数，当isTranspose为false时，src的shape为[k, N]，参数k对应src的第一维长度
 
-  <tr><td rowspan="5" align="center">算子输入</td></tr>
+- 样例规格：  
+  <table>
+  <caption>表1：样例输入输出规格</caption>
+  <tr><td rowspan="1" align="center">样例类型(SampleType)</td><td colspan="4" align="center"> antiquant </td></tr>
+
+  <tr><td rowspan="5" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">src</td><td align="center">8*128</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">offset</td><td align="center">1*128</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">scale</td><td align="center">1*128</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">dst</td><td align="center">8*128</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">src</td><td align="center">[8, 128]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">offset</td><td align="center">[1, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">scale</td><td align="center">[1, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td></tr>
+  <tr><td align="center">dst</td><td align="center">[8, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">antiquant_custom</td></tr>
   </table>
 
-- 算子实现：  
-  本样例中实现的是固定shape为输入src[8, 128]、offset[1, 128]、scale[1, 128]，输出dst[8, 128]的antiquant_custom算子。本样例为PER_CHANNEL场景（按通道量化），将int8_t数据类型伪量化为half数据类型。
+- 样例实现：  
+  本样例中实现的是固定shape为输入src[8, 128]、offset[1, 128]、scale[1, 128]，输出dst[8, 128]的antiquant_custom样例。本样例为PER_CHANNEL场景（按通道量化），将int8_t数据类型反量化为half数据类型。
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用AntiQuant高阶API接口完成reducemean计算，得到最终结果，再搬出到外部存储上。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用AntiQuant高阶API接口完成反量化计算，得到最终结果，再搬出到外部存储上。
 
-    AntiQuantCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm、offsetGm、scaleGm存储在srcLocal、offsetLocal、scaleGm中，Compute任务负责对srcLocal、offsetLocal、scaleGm执行antiquant计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    AntiQuantCustom样例的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm、offsetGm、scaleGm存储在srcLocal、offsetLocal、scaleLocal中，Compute任务负责对srcLocal、offsetLocal、scaleLocal执行antiquant计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行  
 
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
