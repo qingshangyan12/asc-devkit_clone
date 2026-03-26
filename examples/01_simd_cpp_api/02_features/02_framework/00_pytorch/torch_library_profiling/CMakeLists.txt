@@ -42,6 +42,7 @@ set(TORCH_NPU_INCLUDE_DIRS
     ${ASCEND_PATH}/include
     ${TORCH_NPU_PATH}/include
     ${TORCH_NPU_PATH}/include/aclnn
+    ${TORCH_NPU_PATH}/include/third_party/op-plugin
 )
 set(TORCH_NPU_LIBRARIES ${TORCH_NPU_PATH}/lib)
 
