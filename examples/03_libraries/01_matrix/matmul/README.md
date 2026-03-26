@@ -26,7 +26,6 @@
 - 样例规格：
 
   <table border="2" align="center">
-  <caption>表1：样例规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulCustom</td></tr>
   </tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
@@ -62,19 +61,7 @@
 | aic_mte2_ratio | MTE2的时间占比，反映GM到L1的数据加载压力 |
 | aic_fixpipe_time(μs) | FixPipe（L0C到GM搬运）的执行时间 |
 | aic_fixpipe_ratio | FixPipe的时间占比，反映结果写回的访存压力 |
-| Task Duration(μs) | 整个任务执行的总时间，包括所有核的执行时间 |
-| Block Num | 使用的核数（Block数量） |
-| aicore_time(μs) | AI Core的总执行时间 |
-| aic_mac_time(μs) | Cube计算单元的执行时间 |
-| aic_mac_ratio | Cube计算单元的时间占比，反映计算单元利用率 |
-| aic_scalar_time(μs) | Scalar标量计算单元的执行时间 |
-| aic_scalar_ratio | Scalar标量计算单元的时间占比 |
-| aic_mte1_time(μs) | MTE1（L1到L0A/L0B搬运）的执行时间 |
-| aic_mte1_ratio | MTE1的时间占比，反映L1到L0的数据搬运压力 |
-| aic_mte2_time(μs) | MTE2（GM到L1搬运）的执行时间 |
-| aic_mte2_ratio | MTE2的时间占比，反映GM到L1的数据加载压力 |
-| aic_fixpipe_time(μs) | FixPipe（L0C到GM搬运）的执行时间 |
-| aic_fixpipe_ratio | FixPipe的时间占比，反映结果写回的访存压力 |
+
 
 ### Case 0: 单核基础版本 (SINGLE_CORE_BASIC)
 
@@ -93,12 +80,9 @@ tilingData.set_baseK(64);
 ```
 
 **性能数据**：
-
-<table border="2" align="center">
-<caption>表2：Case 0性能数据</caption>
-<tr><td>Task Duration(μs)</td><td>Block Num</td><td>aicore_time(μs)</td><td>aic_mac_time(μs)</td><td>aic_mac_ratio</td><td>aic_scalar_time(μs)</td><td>aic_scalar_ratio</td><td>aic_mte1_time(μs)</td><td>aic_mte1_ratio</td><td>aic_mte2_time(μs)</td><td>aic_mte2_ratio</td><td>aic_fixpipe_time(μs)</td><td>aic_fixpipe_ratio</td></tr>
-<tr><td>760379.06</td><td>1</td><td>760378.5</td><td>141699.459</td><td>0.186</td><td>508995.9</td><td>0.669</td><td>162104.2</td><td>0.213</td><td>583530.4</td><td>0.767</td><td>34210.83</td><td>0.045</td></tr>
-</table>
+| Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| 760379.06 | 1 | 760378.5 | 141699.459 | 0.186 | 508995.9 | 0.669 | 162104.2 | 0.213 | 583530.4 | 0.767 | 34210.83 | 0.045 |
 
 **分析**：
 - 单核运算时间很长(760379.06us)
@@ -129,12 +113,9 @@ tilingApi.SetFixSplit(128, 256, 64);
   - 相比Case 0的配置（64×64×64），计算访存比从16.7提升到36.6，大幅提升了数据重用率
 
 **性能数据**：
-
-<table border="2" align="center">
-<caption>表3：Case 1性能数据</caption>
-<tr><td>Task Duration(μs)</td><td>Block Num</td><td>aicore_time(μs)</td><td>aic_mac_time(μs)</td><td>aic_mac_ratio</td><td>aic_scalar_time(μs)</td><td>aic_scalar_ratio</td><td>aic_mte1_time(μs)</td><td>aic_mte1_ratio</td><td>aic_mte2_time(μs)</td><td>aic_mte2_ratio</td><td>aic_fixpipe_time(μs)</td><td>aic_fixpipe_ratio</td></tr>
-<tr><td>249703.8</td><td>1</td><td>249703.24</td><td>81477.188</td><td>0.326</td><td>63635.758</td><td>0.255</td><td>52003.704</td><td>0.208</td><td>195849.889</td><td>0.784</td><td>11309.081</td><td>0.045</td></tr>
-</table>
+| Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| 249703.8 | 1 | 249703.24 | 81477.188 | 0.326 | 63635.758 | 0.255 | 52003.704 | 0.208 | 195849.889 | 0.784 | 11309.081 | 0.045 |
 
 **分析**：
 - 相比Case 0，Task Duration从760379.06us降低到249703.8us，性能提升约3.05倍
@@ -168,12 +149,9 @@ SetUnnorm(tilingData);  // 关闭L0 DoubleBuffer和L1多块缓存
 - 均衡负载分配，尽量让每个核的计算量相近
 
 **性能数据**：
-
-<table border="2" align="center">
-<caption>表4：Case 2性能数据</caption>
-<tr><td>Task Duration(μs)</td><td>Block Num</td><td>aicore_time(μs)</td><td>aic_mac_time(μs)</td><td>aic_mac_ratio</td><td>aic_scalar_time(μs)</td><td>aic_scalar_ratio</td><td>aic_mte1_time(μs)</td><td>aic_mte1_ratio</td><td>aic_mte2_time(μs)</td><td>aic_mte2_ratio</td><td>aic_fixpipe_time(μs)</td><td>aic_fixpipe_ratio</td></tr>
-<tr><td>12709.62</td><td>24</td><td>12706.94</td><td>3465.529</td><td>0.273</td><td>2988.996</td><td>0.235</td><td>2260.553</td><td>0.178</td><td>10294.421</td><td>0.81</td><td>866.736</td><td>0.068</td></tr>
-</table>
+| Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| 12709.62 | 24 | 12706.94 | 3465.529 | 0.273 | 2988.996 | 0.235 | 2260.553 | 0.178 | 10294.421 | 0.81 | 866.736 | 0.068 |
 
 **分析**：
 - 相比Case 1，Task Duration从249703.8us降低到12709.62us，多核并行计算显著提升了整体吞吐量
@@ -207,12 +185,9 @@ SetUnnorm(tilingData);  // 关闭L0 DoubleBuffer和L1多块缓存
 - 地址对齐优化：512对齐可以提升访存效率，减少内存访问开销，相比Case 2的683不对齐，512对齐的访存效率更高
 
 **性能数据**：
-
-<table border="2" align="center">
-<caption>表5：Case 3性能数据</caption>
-<tr><td>Task Duration(μs)</td><td>Block Num</td><td>aicore_time(μs)</td><td>aic_mac_time(μs)</td><td>aic_mac_ratio</td><td>aic_scalar_time(μs)</td><td>aic_scalar_ratio</td><td>aic_mte1_time(μs)</td><td>aic_mte1_ratio</td><td>aic_mte2_time(μs)</td><td>aic_mte2_ratio</td><td>aic_fixpipe_time(μs)</td><td>aic_fixpipe_ratio</td></tr>
-<tr><td>12311.96</td><td>24</td><td>10853.87</td><td>3394.884</td><td>0.313</td><td>2657</td><td>0.245</td><td>2166.824</td><td>0.2</td><td>8599.433</td><td>0.792</td><td>489.819</td><td>0.045</td></tr>
-</table>
+| Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| 12311.96 | 24 | 10853.87 | 3394.884 | 0.313 | 2657 | 0.245 | 2166.824 | 0.2 | 8599.433 | 0.792 | 4899.819 | 0.045 |
 
 **分析**：
 - 相比Case 2，Task Duration从12709.62us降低到12311.96us，性能提升约3.2%
@@ -258,12 +233,9 @@ AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATyp
   - depthB1/(stepN*stepKb)=2
 
 **性能数据**：
-
-<table border="2" align="center">
-<caption>表6：Case 4性能数据</caption>
-<tr><td>Task Duration(μs)</td><td>Block Num</td><td>aicore_time(μs)</td><td>aic_mac_time(μs)</td><td>aic_mac_ratio</td><td>aic_scalar_time(μs)</td><td>aic_scalar_ratio</td><td>aic_mte1_time(μs)</td><td>aic_mte1_ratio</td><td>aic_mte2_time(μs)</td><td>aic_mte2_ratio</td><td>aic_fixpipe_time(μs)</td><td>aic_fixpipe_ratio</td></tr>
-<tr><td>9149.06</td><td>24</td><td>8145.94</td><td>3383.213</td><td>0.415</td><td>2623.722</td><td>0.322</td><td>2219.853</td><td>0.273</td><td>8115.658</td><td>0.996</td><td>389.662</td><td>0.048</td></tr>
-</table>
+| Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| 9149.06 | 24 | 8145.94 | 3383.213 | 0.415 | 2623.722 | 0.322 | 2219.853 | 0.273 | 8115.658 | 0.996 | 389.662 | 0.048 |
 
 **分析**：
 - 相比Case 3，Task Duration从12311.96us降低到9149.06us，性能提升约34.6%
@@ -297,12 +269,9 @@ AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATyp
 - 大包搬运：MTE2从GM到L1的搬运不再是每次只搬运一个基本块，而是一次性搬运多个基本块到L1缓存，本例中depthA1=4，代表一次性搬入4份A矩阵基本块到L1，MTE1进行1次搬运，显著减少GM到L1的搬运次数
 
 **性能数据**：
-
-<table border="2" align="center">
-<caption>表7：Case 5性能数据</caption>
-<tr><td>Task Duration(μs)</td><td>Block Num</td><td>aicore_time(μs)</td><td>aic_mac_time(μs)</td><td>aic_mac_ratio</td><td>aic_scalar_time(μs)</td><td>aic_scalar_ratio</td><td>aic_mte1_time(μs)</td><td>aic_mte1_ratio</td><td>aic_mte2_time(μs)</td><td>aic_mte2_ratio</td><td>aic_fixpipe_time(μs)</td><td>aic_fixpipe_ratio</td></tr>
-<tr><td>5067.58</td><td>24</td><td>4505.94</td><td>3116.627</td><td>0.692</td><td>2077.537</td><td>0.461</td><td>2335.761</td><td>0.518</td><td>4083.578</td><td>0.906</td><td>45.689</td><td>0.01</td></tr>
-</table>
+| Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| 5067.58 | 24 | 4505.94 | 3116.627 | 0.692 | 2077.537 | 0.461 | 2335.761 | 0.518 | 4083.578 | 0.906 | 45.689 | 0.01 |
 
 **分析**：
 - 相比Case 4，Task Duration从9149.06us降低到5067.58us，性能提升约80.5%
@@ -339,12 +308,9 @@ tilingData.set_stepKa(8);
   - L1缓存占用计算：depthA1 × baseM × baseK × sizeof(half) + depthB1 × baseN × baseK × sizeof(half) = 16 × 128 × 64 × 2 + 8 × 256 × 64 × 2 = 262,144 + 262,144 = 524,288 bytes = 512 KB
 
 **性能数据**：
-
-<table border="2" align="center">
-<caption>表8：Case 6性能数据</caption>
-<tr><td>Task Duration(μs)</td><td>Block Num</td><td>aicore_time(μs)</td><td>aic_mac_time(μs)</td><td>aic_mac_ratio</td><td>aic_scalar_time(μs)</td><td>aic_scalar_ratio</td><td>aic_mte1_time(μs)</td><td>aic_mte1_ratio</td><td>aic_mte2_time(μs)</td><td>aic_mte2_ratio</td><td>aic_fixpipe_time(μs)</td><td>aic_fixpipe_ratio</td></tr>
-<tr><td>4151.66</td><td>24</td><td>3756.78</td><td>3163.693</td><td>0.842</td><td>1386.015</td><td>0.369</td><td>2573.438</td><td>0.685</td><td>3674.569</td><td>0.978</td><td>47.084</td><td>0.013</td></tr>
-</table>
+| Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| 4151.66 | 24 | 3756.78 | 3163.693 | 0.842 | 1386.015 | 0.369 | 2573.438 | 0.685 | 3674.569 | 0.978 | 47.084 | 0.013 |
 
 **分析**：
 - 相比Case 5，Task Duration从5067.58us降低到4151.66us，性能提升约22.0%
@@ -379,12 +345,9 @@ AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
   - 提升流水线效率：减少Scalar运行时的计算开销，可以避免流水线停顿，让Cube计算单元持续工作
 
 **性能数据**：
-
-<table border="2" align="center">
-<caption>表9：Case 7性能数据</caption>
-<tr><td>Task Duration(μs)</td><td>Block Num</td><td>aicore_time(μs)</td><td>aic_mac_time(μs)</td><td>aic_mac_ratio</td><td>aic_scalar_time(μs)</td><td>aic_scalar_ratio</td><td>aic_mte1_time(μs)</td><td>aic_mte1_ratio</td><td>aic_mte2_time(μs)</td><td>aic_mte2_ratio</td><td>aic_fixpipe_time(μs)</td><td>aic_fixpipe_ratio</td></tr>
-<tr><td>4114.4</td><td>24</td><td>3721.04</td><td>3163.843</td><td>0.85</td><td>984.525</td><td>0.265</td><td>2580.314</td><td>0.693</td><td>3635.407</td><td>0.977</td><td>45.873</td><td>0.012</td></tr>
-</table>
+| Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| 4114.4 | 24 | 3721.04 | 3163.843 | 0.85 | 984.525 | 0.265 | 2580.314 | 0.693 | 3635.407 | 0.977 | 45.873 | 0.012 |
 
 **分析**：
 - 相比Case 6，Task Duration从4151.66us降低到4114.4us，性能提升约0.9%
@@ -414,6 +377,10 @@ mmCFG.enUnitFlag = true;
 **优化手段**：
 - 启用UnitFlag优化：
   - 优化计算与搬运的并行度：未开启UnitFlag功能时，AIC核的MMAD计算指令和FIXPIPE数据搬运指令是指令级别的同步，FIXPIPE指令需要等MMAD指令执行完才进行结果搬出，MMAD和FIXPIPE之间流水串行；开启UnitFlag功能后，MMAD和FIXPIPE是512B大小的细粒度同步，在一条MMAD指令执行过程中，每当完成一个512B数据结果的计算，FIXPIPE立即搬出该512B的数据，从而实现Cube计算单元和FIXPIPE搬运单元流水并行
+
+UnitFlag功能示意图：
+<img src="image/unitfalg_close.png">
+<img src="image/unitfalg_open.png">
 
 
 
@@ -460,10 +427,11 @@ for (int i = 0; i < 2; i++) {
   - 缓存命中优化：若数据无法命中L2Cache，导致需要访问GM进行读写，带宽利用效率较低，导致MTE2可能成为样例整个运行过程中的性能瓶颈
   - 分块计算适配L2Cache：当前L2Cache大小为192MB，A、B矩阵大小均为8192×8192×2=128MB，因此可以将A矩阵在M轴切分成2份，其中区域1与B矩阵完成完整运算，区域2再与B矩阵完成完整运算，B矩阵会始终驻留在L2Cache中
 
-```
 分块计算适配L2Cache示意图：
 
-xxxx
+<img src="image/L2Cache.png">
+
+```
 计算过程：
 Step 1: C1 = A1 × B  (A1从GM加载到L2Cache，B从GM加载到L2Cache并驻留)
 Step 2: C2 = A2 × B  (A2从GM加载到L2Cache，B已在L2Cache中，无需重新加载)
@@ -486,20 +454,18 @@ L2Cache利用：
 
 ## 性能对比总结
 
-<table border="2" align="center">
-<caption>表12：性能对比总结</caption>
-<tr><td>Case</td><td>Task Duration(μs)</td><td>Block Num</td><td>aicore_time(μs)</td><td>aic_mac_time(μs)</td><td>aic_mac_ratio</td><td>aic_scalar_time(μs)</td><td>aic_scalar_ratio</td><td>aic_mte1_time(μs)</td><td>aic_mte1_ratio</td><td>aic_mte2_time(μs)</td><td>aic_mte2_ratio</td><td>aic_fixpipe_time(μs)</td><td>aic_fixpipe_ratio</td></tr>
-<tr><td>Case 0</td><td>760379.06</td><td>1</td><td>760378.5</td><td>141699.459</td><td>0.186</td><td>508995.9</td><td>0.669</td><td>162104.2</td><td>0.213</td><td>583530.4</td><td>0.767</td><td>34210.83</td><td>0.045</td></tr>
-<tr><td>Case 1</td><td>249703.8</td><td>1</td><td>249703.24</td><td>81477.188</td><td>0.326</td><td>63635.758</td><td>0.255</td><td>52003.704</td><td>0.208</td><td>195849.889</td><td>0.784</td><td>11309.081</td><td>0.045</td></tr>
-<tr><td>Case 2</td><td>12709.62</td><td>24</td><td>12706.94</td><td>3465.529</td><td>0.273</td><td>2988.996</td><td>0.235</td><td>2260.553</td><td>0.178</td><td>10294.421</td><td>0.81</td><td>866.736</td><td>0.068</td></tr>
-<tr><td>Case 3</td><td>12311.96</td><td>24</td><td>10853.87</td><td>3394.884</td><td>0.313</td><td>2657</td><td>0.245</td><td>2166.824</td><td>0.2</td><td>8599.433</td><td>0.792</td><td>489.819</td><td>0.045</td></tr>
-<tr><td>Case 4</td><td>9149.06</td><td>24</td><td>8145.94</td><td>3383.213</td><td>0.415</td><td>2623.722</td><td>0.322</td><td>2219.853</td><td>0.273</td><td>8115.658</td><td>0.996</td><td>389.662</td><td>0.048</td></tr>
-<tr><td>Case 5</td><td>5067.58</td><td>24</td><td>4505.94</td><td>3116.627</td><td>0.692</td><td>2077.537</td><td>0.461</td><td>2335.761</td><td>0.518</td><td>4083.578</td><td>0.906</td><td>45.689</td><td>0.01</td与其他>
-<tr><td>Case 6</td><td>4151.66</td><td>24</td><td>3756.78</td><td>3163.693</td><td>0.842</td><td>1386.015</td><td>0.369</td><td>2573.438</td><td>0.685</td><td>3674.569</td><td>0.978</td><td>47.084</td><td>0.013</td></tr>
-<tr><td>Case 7</td><td>4114.4</td><td>24</td><td>3721.04</td><td>3163.843</td><td>0.85</td><td>984.525</td><td>0.265</td><td>2580.314</td><td>0.693</td><td>3635.407</td><td>0.977</td><td>45.873</td><td>0.012</td></tr>
-<tr><td>Case 8</td><td>4051.78</td><td>24</td><td>3775.56</td><td>3253.61</td><td>0.862</td><td>1082.696</td><td>0.287</td><td>2662.844</td><td>0.705</td><td>3680.253</td><td>0.975</td><td>286.867</td><td>0.076</td></tr>
-<tr><td>Case 9</td><td>4033.06</td><td>24</td><td>3669.19</td><td>3162.239</td><td>0.862</td><td>1058.095</td><td>0.288</td><td>2601.479</td><td>0.709</td><td>3536.342</td><td>0.964</td><td>281.184</td><td>0.077</td></tr>
-</table>
+| Case | Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| Case 0 | 760379.06 | 1 | 760378.5 | 141699.459 | 0.186 | 508995.9 | 0.669 | 162104.2 | 0.213 | 583530.4 | 0.767 | 34210.83 | 0.045 |
+| Case 1 | 249703.8 | 1 | 249703.24 | 81477.188 | 0.326 | 63635.758 | 0.255 | 52003.704 | 0.208 | 195849.889 | 0.784 | 11309.081 | 0.045 |
+| Case 2 | 12709.62 | 24 | 12706.94 | 3465.529 | 0.273 | 2988.996 | 0.235 | 2260.553 | 0.178 | 10294.421 | 0.81 | 866.736 | 0.068 |
+| Case 3 | 12311.96 | 24 | 10853.87 | 3394.884 | 0.313 | 2657 | 0.245 | 2166.824 | 0.2 | 8599.433 | 0.792 | 489.819 | 0.045 |
+| Case 4 | 9149.06 | 24 | 8145.94 | 3383.213 | 0.415 | 2623.722 | 0.322 | 2219.853 | 0.273 | 8115.658 | 0.996 | 389.662 | 0.048 |
+| Case 5 | 5067.58 | 24 | 4505.94 | 3116.627 | 0.692 | 2077.537 | 0.461 | 2335.761 | 0.518 | 4083.578 | 0.906 | 45.689 | 0.01 |
+| Case 6 | 4151.66 | 24 | 3756.78 | 3163.693 | 0.842 | 1386.015 | 0.369 | 2573.438 | 0.685 | 3674.569 | 0.978 | 47.084 | 0.013 |
+| Case 7 | 4114.4 | 24 | 3721.04 | 3163.843 | 0.85 | 984.525 | 0.265 | 2580.314 | 0.693 | 3635.407 | 0.977 | 45.873 | 0.012 |
+| Case 8 | 4051.78 | 24 | 3775.56 | 3253.61 | 0.862 | 1082.696 | 0.287 | 2662.844 | 0.705 | 3680.253 | 0.975 | 286.867 | 0.076 |
+| Case 9 | 4033.06 | 24 | 3669.19 | 3162.239 | 0.862 | 1058.095 | 0.288 | 2601.479 | 0.709 | 3536.342 | 0.964 | 281.184 | 0.077 |
 
 ## 调优建议
 
