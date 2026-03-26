@@ -62,15 +62,15 @@ struct MatmulProblemShape {
 
 enum MatmulMode {
     SINGLE_CORE_BASIC = 0,
-    SINGLE_CORE_TILING_UNNORM = 1,
+    SINGLE_CORE_TILING = 1,
     MULTI_CORE_SPLIT_2_12 = 2,
     MULTI_CORE_SPLIT_4_6 = 3,
     MULTI_CORE_NORM = 4,
     MULTI_CORE_MDL = 5,
     MULTI_CORE_MDL_L1CACHE = 6,
-    MULTI_CORE_MDL_CONSTANTS_TILING = 7,
-    MULTI_CORE_MDL_CONSTANTS_TILING_UNITFLAG = 8,
-    MULTI_CORE_MDL_CONSTANTS_TILING_UNITFLAG_L2CACHE = 9
+    MULTI_CORE_MDL_L1CACHE_CONSTANTS = 7,
+    MULTI_CORE_MDL_L1CACHE_CONSTANTS_UNITFLAG = 8,
+    MULTI_CORE_MDL_L1CACHE_CONSTANTS_UNITFLAG_L2CACHE = 9
 };
 
 template <typename TilingType>
@@ -412,7 +412,7 @@ inline void SetTilingTypes(TilingType& tilingApi, optiling::TCubeTiling& tilingD
     }
 }
 
-void SetTilingL1(optiling::TCubeTiling& tilingData)
+void SetUnnorm(optiling::TCubeTiling& tilingData)
 {
     tilingData.set_depthA1(1);
     tilingData.set_depthB1(1);
