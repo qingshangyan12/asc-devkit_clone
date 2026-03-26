@@ -5,17 +5,10 @@
 | 产品     | 是否支持 |
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|x|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|x|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
 
 ## 功能说明
 
-L0CLayoutFormat用于描述矩阵计算的结果在物理位置为L0C Buffer的布局格式，L0CLayout是Nz分形的一种，Shape的大小固定为16x16。
+L0CLayoutFormat用于描述矩阵计算的结果在物理位置为L0C Buffer的布局格式，L0CLayout是Nz分形的一种。
 
 ## 结构体定义
 
@@ -36,30 +29,36 @@ struct L0CLayoutFormat {
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| `T`` | 输入 | 数据类型模板参数。<br>AscendC 950PR/AscendC 950DT 支持的数据类型为：int32_t、float。 |
-| `row` | 输入 | 矩阵的总行数 |
-| `column` | 输入 | 矩阵的总列数 |
+| T | 输入 | 数据类型模板参数。<br>AscendC 950PR/AscendC 950DT 支持的数据类型为：int32_t、float。 |
+| row | 输入 | 矩阵的总行数 |
+| column | 输入 | 矩阵的总列数 |
 
 ## 返回值
 
 - 输入为编译时常量时，返回DN格式的Layout类型。
 - 输入为整型变量时，返回DN格式的Layout对象。
-- L0CLayout的小分形的行数为16，列数为16。
-- **自动对齐**: 如果输入的行数不是 16 的倍数，列数不是16的倍数，返回的Layout会向上取整。例如：
-  - 输入 `row = 17, column = 33` 会自动对齐为 `row = 32, column = 48`
 
 ## 约束说明
 
-- 参数row和column需为整型。
+- 参数row和column需为size_t类型或Int整型常量。
 
 ## 调用示例
 
 ```cpp
-// 编译时常量
-using MyL0CLayout = L0CLayoutFormat<uint16_t>::type<Std::Int<32>, Std::Int<32>>;
-auto staticL0CLayout = MyL0CLayout{};
+// 创建L0C格式Layout
+using namespace AscendC::Te;
+// 根据flag的值，选择DN格式或L0C的类型
+constexpr bool flag = true;
+using MakeLayoutGM = conditional_t<flag, DNLayoutFormat<half>, L0CLayoutFormat<half>>;
+size_t m = 128;
+size_t n = 128;
+auto layoutAL1 = MakeLayoutGM{}(m, n);
 
-// 运行时值
+// 编译时常量传参构造Layout
+using MyL0CLayout = L0CLayoutFormat<uint16_t>::type<Std::Int<32>, Std::Int<32>>;
+auto staticLayout = MyL0CLayout{};
+
+// 运行时变量传参构造Layout
 L0CLayoutFormat<uint16_t> l0cFormat;
 auto layout = l0cFormat(32, 32);
 ```

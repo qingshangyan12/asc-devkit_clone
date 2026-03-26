@@ -36,9 +36,9 @@ struct ScaleBNDLayoutFormat {
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| `T` | 输入 | 数据类型模板参数。<br>AscendC 950PR/AscendC 950DT 支持的数据类型为：fp8_e8m0_t。 |
-| `row` | 输入 | 矩阵的总行数 |
-| `column` | 输入 | 矩阵的总列数 |
+| T | 输入 | 数据类型模板参数。<br>AscendC 950PR/AscendC 950DT 支持的数据类型为：fp8_e8m0_t。 |
+| row | 输入 | 矩阵的总行数 |
+| column | 输入 | 矩阵的总列数 |
 
 ## 返回值
 
@@ -55,6 +55,13 @@ struct ScaleBNDLayoutFormat {
 
 ```cpp
 // 创建ScaleBND格式Layout
+// 根据flag的值，选择Nn格式或Zz分形的类型
+constexpr bool flag = true;
+using MyLayoutType = conditional_t<flag, ScaleBNDFormatLayout<fp8_e8m0_t>, ScaleBDNFormatLayout<fp8_e8m0_t>>;
+size_t m = 128;
+size_t n = 128;
+auto layoutAL1 = MyLayoutType{}(m, n);
+
 // 编译时常量
 using MyScaleBNDLayout = ScaleBNDLayoutFormat<half>::type<Std::Int<64>, Std::Int<32>>;
 constexpr MyScaleBNDLayout staticLayout1;

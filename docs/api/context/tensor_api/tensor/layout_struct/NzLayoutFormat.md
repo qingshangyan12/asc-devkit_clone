@@ -5,13 +5,6 @@
 | 产品     | 是否支持 |
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|x|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|x|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
 
 ## 功能说明
 
@@ -36,9 +29,9 @@ struct NzLayoutFormat {
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| `T` | 输入 | 数据类型模板参数。<br>AscendC 950PR/AscendC 950DT 支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t |
-| `row` | 输入 | 矩阵的总行数 |
-| `column` | 输入 | 矩阵的总列数 |
+| T | 输入 | 数据类型模板参数。<br>AscendC 950PR/AscendC 950DT 支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t |
+| row | 输入 | 矩阵的总行数 |
+| column | 输入 | 矩阵的总列数 |
 
 ## 返回值
 
@@ -50,19 +43,25 @@ struct NzLayoutFormat {
 
 ## 约束说明
 
-- 参数row和column需为整型。
+- 参数row和column需为size_t类型或Int整型常量。
 
 ## 调用示例
 
 ```cpp
 // 创建NZ格式Layout
-// 使用类型别名（编译时常量）
-using MyNzLayout = NzLayoutFormat<half>::type<Std::Int<32>, Std::Int<32>;
-constexpr MyNzLayout staticLayout1;
-auto staticLayout2 = MyNzLayout{};
+using namespace AscendC::Te;
+// 根据flag的值，选择Nn格式或Zz分形的类型
+constexpr bool flag = true;
+using MyLayoutType = conditional_t<flag, NzFormatLayout<half>, ZnFormatLayout<half>>;
+size_t m = 128;
+size_t n = 128;
+auto layoutAL1 = MyLayoutType{}(m, n);
 
-// 使用函数调用（运行时值）
+// 编译时常量传参构造Layout
+using MyNzLayout = NzLayoutFormat<half>::type<Std::Int<32>, Std::Int<32>>;
+auto staticLayout = MyNzLayout{};
+
+// 运行时变量传参构造Layout
 NzLayoutFormat<half> nzFormat;
-auto runtimeLayout = nzFormat(32, 32);
-
+auto layout = nzFormat(32, 32);
 ```
