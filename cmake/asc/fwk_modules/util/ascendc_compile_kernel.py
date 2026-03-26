@@ -282,7 +282,7 @@ def args_parse():
         "-a", "--auto-gen-path", nargs="?", default=None, help="auto gen file path."
     )
     parser.add_argument(
-        "-s", "--skip-error", nargs="?", default=None, help="skip compile error."
+        "-s", "--skip-error", nargs="?", const=True, default=False, help="skip compile error."
     )
     return parser.parse_args()
 
@@ -290,7 +290,7 @@ def args_parse():
 if __name__ == "__main__":
     args = args_parse()
     kernel_builder = CompileKernel(args)
-    if kernel_bulder.fail_constructor:
+    if kernel_builder.fail_constructor:
         sys.exit()
     kernel_builder.clean()
     if args.enable_binary == "False":
