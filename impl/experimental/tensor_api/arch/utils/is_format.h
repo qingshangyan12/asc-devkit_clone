@@ -7,6 +7,14 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning                                                                                                               \
+    "impl/tensor_api/arch/utils/is_format.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 /*!
  * \file is_format.h
  * \brief
@@ -79,6 +87,7 @@ template <typename T>
 struct CheckArrangement {
     using type = typename T::elementType;
     using ShapeRow0Type = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+    using ShapeRow1Type = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 1>::type;
     using ShapeColumn0Type = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
     using StrideRow0Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
     using StrideRow1Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
@@ -90,6 +99,7 @@ struct CheckArrangement {
  	}
 
     static constexpr ShapeRow0Type ShapeRow0{};
+    static constexpr ShapeRow1Type ShapeRow1{};
     static constexpr ShapeColumn0Type ShapeColumn0{};
     static constexpr StrideRow0Type StrideRow0{};
     static constexpr StrideRow1Type StrideRow1{};
@@ -230,6 +240,10 @@ private:
         return (isShapeRight && isStrideRight);
     }
 
+    __aicore__ inline static constexpr bool IsFractalNDFormatOneDim() {
+        return CheckPairs(Std::Int<1>{}, arg.ShapeRow1);
+    }
+
     __aicore__ inline static constexpr bool IsFractalNDFormat() {
         using ResultType = Std::conditional_t<arg.IsScaleType(),
                            Std::bool_constant<IsFractalScaleNDFormat()>,
@@ -239,6 +253,7 @@ private:
 public:
     static constexpr bool value = IsFractalNDFormat();
     static constexpr bool normalValue = IsFractalNDFormatNormal();
+    static constexpr bool oneDimValue = IsFractalNDFormatOneDim();
 };
 
 template <typename T>
@@ -297,3 +312,8 @@ struct IsScaleBDNFormat { // shape = ((1, row),(1,col)) stride = ((0, 1),(0, row
 } // namespace AscendC
 
 #endif // IMPL_TENSOR_API_ARCH_UTILS_IS_FORMAT_H
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
