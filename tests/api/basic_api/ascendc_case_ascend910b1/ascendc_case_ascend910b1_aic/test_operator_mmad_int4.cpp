@@ -62,6 +62,12 @@ private:
         DataCopy(a1Local, aGM, { 1, static_cast<uint16_t>(16*64 * sizeof(int4b_t) / 2 / 32), 0, 0 });
         DataCopy(b1Local, bGM, { 1, static_cast<uint16_t>(64*64 * sizeof(int4b_t) / 2 / 32), 0, 0 });
 
+        // Test when AIC, npu debug will not check mask[] or mask
+        BinaryRepeatParams params;
+        uint64_t mask[2] = {3, 3};
+        Add(a1Local, a1Lobal, b1Local, 30, 1, params);
+        Add(a1Local, a1Lobal, b1Local, mask, 1, params);
+
         inQueueA1.EnQue(a1Local);
         inQueueB1.EnQue(b1Local);
     }
@@ -232,7 +238,7 @@ TEST_F(TEST_MMAD_INT4, MMAD_Case_int4_load3dv2)
     AscendC::KernelMatmulInt4 op;
     op.Init(a, b, c, false);
     op.Process();
-    
+
     for (int32_t i = 0; i < m * n * sizeof(int32_t) / 2; i++) {
         EXPECT_EQ(c[i], 0x00);
     }
@@ -253,7 +259,7 @@ TEST_F(TEST_MMAD_INT4, MMAD_Case_int4_load2d)
     AscendC::KernelMatmulInt4 op;
     op.Init(a, b, c, true);
     op.Process();
-    
+
     for (int32_t i = 0; i < m * n * sizeof(int32_t) / 2; i++) {
         EXPECT_EQ(c[i], 0x00);
     }
