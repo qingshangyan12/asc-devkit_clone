@@ -90,7 +90,7 @@ asc-devkit:
       - impl/basic_api/dav_m510/kfc/kfc_comm_client.h
       - impl/basic_api/dav_m510/kfc/kfc_comm_server.h
       - impl/basic_api/dav_c310/kfc/kfc_comm_client.h
-
+      - impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_reduce_sum_datablock.h
   llt:
     ut_check: true
     st_check: false
