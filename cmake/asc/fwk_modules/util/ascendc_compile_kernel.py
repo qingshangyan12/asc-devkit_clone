@@ -291,21 +291,21 @@ if __name__ == "__main__":
     args = args_parse()
     kernel_builder = CompileKernel(args)
     if kernel_bulder.fail_constructor:
-        return
+        sys.exit()
     kernel_builder.clean()
     if args.enable_binary == "False":
         if not kernel_builder.ascendc_gen_impl():
-            return
+            sys.exit()
         kernel_builder.clean()
     else:
         if not kernel_builder.ascendc_gen_impl():
-            return
+            sys.exit()
         if not kernel_builder.ascendc_gen_param():
-            return
+            sys.exit()
         if not kernel_builder.ascendc_put_json():
-            return
+            sys.exit()
         if not kernel_builder.ascendc_put_tiling():
-            return
+            sys.exit()
         if not kernel_builder.ascendc_build():
-            return
+            sys.exit()
         kernel_builder.clean()
