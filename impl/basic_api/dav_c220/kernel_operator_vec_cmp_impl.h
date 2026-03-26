@@ -166,7 +166,6 @@ __aicore__ inline void CheckVcmpvDtype(CMPMODE cmpMode)
             "T in Compare when cmpMode is not CMPMODE::EQ, current api support dtype combination is half / float.\n"));
     }
 #endif
-
 }
 
 template <typename T>
