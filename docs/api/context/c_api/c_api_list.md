@@ -116,6 +116,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_transto5hd](vector_compute/asc_transto5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
 | [asc_pair_reduce_sum](vector_compute/asc_pair_reduce_sum.md) | 对输入数据做归约操作，得到数据总和。 |
 | [asc_copy](vector_compute/asc_copy.md) | 将数据从Unified Buffer搬运到Unified Buffer。支持高维切分。 |
+| [asc_squeeze](vector_compute/asc_squeeze.md) | 通过比较掩码src1，将src0中的向量压缩成更短的向量，存储到dst中。 |
 
 ## 数据搬运
 
@@ -124,8 +125,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | API名称                                                                   |   说明   |
 |-------------------------------------------------------------------------|-----------|
 | [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md)                     | 将GM中的数据搬运到L0B中。 | 
+| [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1)                     | 将GM中的数据搬运到L1中。|
 | <cann-filter npu_type = "950"> [asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)                     | 将GM中的数据padding后搬运到L1中。</cann-filter> |
-| <cann-filter npu_type = "950"> [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1.md)                     | 将GM中的数据搬运到L1中。</cann-filter> |
 | <cann-filter npu_type = "950"> [asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz.md)                     | 将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。 </cann-filter> |
 | <cann-filter npu_type = "950"> [asc_copy_gm2l1_nd2nz](cube_datamove/asc_copy_gm2l1_nd2nz.md)                     | 将GM中的数据搬运到L1中，在此过程中执行ND->NZ/NHWC->NC1HWC0/NHWC->C1HWNC0操作。</cann-filter> |
 | [asc_copy_l12gm](cube_datamove/asc_copy_l12gm.md)                     | 将数据从L1搬运到GM。 |
@@ -159,6 +160,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_copy_ub2gm](vector_datamove/asc_copy_ub2gm.md)                     | 将数据从Unified Buffer搬运到 Global Memory。 |
 | [asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align)         | 将数据从Unified Buffer搬运到 Global Memory，支持8位/16位/32位分块拷贝操作。 |
 | [asc_set_copy_pad_val](vector_datamove/asc_set_copy_pad_val.md)         | 和asc_copy_gm2ub_align或asc_copy_ub2gm_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。 |
+| [asc_copy_ub2l1](vector_datamove/asc_copy_ub2l1.md)         | 将数据从Unified Buffer (UB) 搬运到 搬运到L1 Buffer。 |
 
 ## 维测接口
 |   API名称   |   说明   |
@@ -242,6 +244,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_get_smmu_tag_version](sys_var/asc_get_smmu_tag_version.md) | 获取SMMU（System Memory Management Unit）版本信息。 |
 | [asc_get_status](sys_var/asc_get_status.md) | 获取状态信息。 |
 | [asc_get_sys_virtual_base](sys_var/asc_get_sys_virtual_base.md) | 获取系统虚拟基地址。 |
+| [asc_get_vf_len](sys_var/asc_get_vf_len.md) | 获取Tensor位宽VL（Vector Length）的大小。 |
 
 
 ## 缓存控制
