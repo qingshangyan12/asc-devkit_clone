@@ -12,8 +12,6 @@
  * \file device_atomic_functions_impl.h
  * \brief
  */
-#ifndef IMPL_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_IMPL_H
-#define IMPL_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_IMPL_H
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
@@ -21,8 +19,6 @@
 #warning "impl/simt_api/device_atomic_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "simt_api/device_atomic_functions.h" and use public functions or variables defined in interface header files."
 #endif
 
-<<<<<<< HEAD
-=======
 #ifndef IMPL_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_IMPL_H
 #define IMPL_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_IMPL_H
 
@@ -34,7 +30,6 @@
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 
->>>>>>> 31d5cd8a (add pure atomic)
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_add(__ubuf__ int32_t *address, int32_t val)
