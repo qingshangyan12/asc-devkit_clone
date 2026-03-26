@@ -150,10 +150,9 @@ OPPROF_2025xxxx_XXXXXX
     ```
 - 样例执行
   ```bash
-  ROUNDMODE=1
-  # ROUNDMODE  1:沿K轴切分  2：沿N轴切分
+  ROUNDMODE=1                      # ROUNDMODE  1:沿K轴切分  2：沿N轴切分
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake ..;make -j;                # 编译工程，注意CMakeLists中根据是否要使能unitflag在以下两个.asc文件中切换
+  cmake ..;make -j;                # 编译工程，注意CMakeLists中需根据切分方式和是否使能unitflag切换使用的.asc文件
   python3 ../scripts/gen_data.py   -round_mode=$ROUNDMODE  # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
