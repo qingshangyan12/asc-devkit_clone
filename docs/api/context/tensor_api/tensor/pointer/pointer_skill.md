@@ -110,7 +110,7 @@ __aicore__ inline auto MakeL1memPtr(const U& byteOffset);
 - `byteOffset`: 字节偏移量
 
 ### 返回值
-- 返回 L1 内存指针对象，类型为 `MemPtr<Hardware::L1, Iterator>`
+- 返回 L1 内存指针对象，类型为 `HardwareMemPtr<Hardware::L1, Iterator>`
 
 ### 约束条件
 - 地址必须在 L1 缓存范围内

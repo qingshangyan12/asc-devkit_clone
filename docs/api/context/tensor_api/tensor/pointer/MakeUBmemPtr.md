@@ -5,8 +5,8 @@
 | 产品     | 是否支持 |
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|√|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|√|
+|Atlas A3 训练系列产品/Atlas A3 推理系列产品|x|
+|Atlas A2 训练系列产品/Atlas A2 推理系列产品|x|
 |Atlas 200I/500 A2 推理产品|x|
 |Atlas 推理系列产品AI Core|x|
 |Atlas 推理系列产品Vector Core|x|
@@ -15,35 +15,51 @@
 
 ## 功能说明
 
-构造Coord对象，用于定义张量的坐标。
+创建 UB 指针，用于访问 AI Core 的 UB 的内存空间。
 
 ## 函数原型
 
 ```cpp
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeUBmemPtr(Iterator iter)
+
 template <typename T, typename U>
 __aicore__ inline auto MakeUBmemPtr(const U& byteOffset)
 ```
 
 ## 参数说明
 
+`表1` 模板参数说明
+
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| T | 输入 |数据类型 。 |
-| U | 输入 | 待偏移的数据类型。 |
-| byteOffset | 输入 | 偏移量。 |
+| T | 输入 | UB 指针的类型。 |
+| U | 输入 | 字节偏移量类型。 |
+
+`表2` 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|--------|-----------|------|
+| iter | 输入 | 迭代器或指针，指向UB的起始地址。 |
 
 ## 返回值说明
 
-返回对应内存的地址。
+- 返回 UB 内存指针对象，类型为 `HardwareMemPtr<Hardware::UB, Iterator>`
 
 ## 约束说明
 
-- 参数数量必须与对应的Shape维度数量一致。
-- 各参数必须为非负整数。
-- 坐标值必须在对应Shape维度的有效范围内。
-- 支持的数据类型包括：size_t、int等整数类型。
+- `iter` 必须是有效的迭代器类型
+- 偏移地址必须在 UB 内存范围内
 
 ## 调用示例
 
 ```cpp
+// 示例 1： 使用指针创建
+constexpr uint32_t TILE_LENGTH = 4;
+__cbuf__ float data[TILE_LENGTH] = {1, 2, 3, 4};
+auto ptr = MakeUBmemPtr(data);
+
+// 示例 2： 使用地址字节偏移创建
+uint32_t byteOffset = 128;
+auto ptr = MakeUBmemPtr<float>(byteOffset);
 ```
