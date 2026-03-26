@@ -1004,6 +1004,7 @@ __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
 {
     ASCENDC_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
                    { KERNEL_LOG(KERNEL_ERROR, "eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT); });
+#ifdef ASCENDC_CPU_DEBUG
     if ASCEND_IS_AIC {
         if (event == HardEvent::MTE2_V || event == HardEvent::V_MTE2 || event == HardEvent::MTE3_V
                       || event == HardEvent::V_MTE3 || event == HardEvent::V_V || event == HardEvent::S_V ||
@@ -1023,6 +1024,7 @@ __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
             return;
         }
     }
+#endif
     event_t e = static_cast<event_t>(eventID);
     switch (event) {
 #ifndef SPLIT_CORE_VEC // CUBE core
