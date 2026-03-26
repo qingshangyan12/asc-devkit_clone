@@ -503,16 +503,18 @@ function(npu_op_package target_package_name)
       set(CPACK_EXTERNAL_ENABLE_STAGING TRUE)
       set(CPACK_EXTERNAL_PACKAGE_SCRIPT ${ASCENDC_CMAKE_SCRIPTS_PATH}/makeself.cmake)
       set(CPACK_EXTERNAL_BUILT_PACKAGES ${CPACK_PACKAGE_DIRECTORY}/_CPack_Packages/Linux/External/${CPACK_PACKAGE_FILE_NAME}/${CPACK_PACKAGE_FILE_NAME})
-      set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_BINARY_DIR}/post_pack_script.cmake")
-      include(CPack)
-      file(WRITE "${CPACK_POST_BUILD_SCRIPTS}" "
-        set(ERROR_LOG_FILE \"\${KERNEL_BINARY_PATH}/compile_error.log\")
+      if (${ENABLE_SOURCE_PACKAGE})
+        set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_BINARY_DIR}/post_pack_script.cmake")
+        file(WRITE "${CPACK_POST_BUILD_SCRIPTS}" "
+          set(ERROR_LOG_FILE \"\${KERNEL_BINARY_PATH}/compile_error.log\")
 
-        if(EXISTS \"\${ERROR_LOG_FILE}\")
-          file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
-          message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
-        endif()
-      ")
+          if(EXISTS \"\${ERROR_LOG_FILE}\")
+            file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
+            message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
+          endif()
+        ")
+      endif()
+      include(CPack)
     endif()
   elseif("${_upper_target_type}" STREQUAL "STATIC")
     add_library(${target_package_name} STATIC)
@@ -578,10 +580,13 @@ function(npu_op_package target_package_name)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
 
-    install(CODE "
-      file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
-      message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
-    ")
+    if (${ENABLE_SOURCE_PACKAGE})
+      install(CODE "
+        file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
+        message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
+      ")
+    endif()
+
   elseif("${_upper_target_type}" STREQUAL "SHARED")
     add_library(${target_package_name} SHARED)
     set_target_properties(
@@ -632,10 +637,12 @@ function(npu_op_package target_package_name)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
 
-    install(CODE "
-      file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
-      message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
-    ")
+    if (${ENABLE_SOURCE_PACKAGE})
+      install(CODE "
+        file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
+        message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
+      ")
+    endif()
   endif()
 endfunction()
 
