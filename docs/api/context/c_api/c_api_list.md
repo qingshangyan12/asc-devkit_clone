@@ -124,7 +124,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 | API名称                                                                   |   说明   |
 |-------------------------------------------------------------------------|-----------|
-| [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0a.md)                     | 将GM中的数据搬运到L0A中。 |
+| [asc_copy_gm2l0a](cube_datamove/asc_copy_gm2l0a.md)                     | 将GM中的数据搬运到L0A中。 |
 | [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md)                     | 将GM中的数据搬运到L0B中。 | 
 | [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1)                     | 将GM中的数据搬运到L1中。|
 | <cann-filter npu_type = "950"> [asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)                     | 将GM中的数据padding后搬运到L1中。</cann-filter> |
@@ -142,7 +142,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_copy_l12bt](cube_datamove/asc_copy_l12bt.md)                       | 将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias。 |
 | [asc_copy_l12fb](cube_datamove/asc_copy_l12fb.md)                       | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
 | [asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
-| [asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到l0b Buffer里。 |
+| [asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |
 | [asc_copy_l12l0c](cube_datamove/asc_copy_l12l0c.md)                     | 将矩阵由L1 Buffer搬运到L0C Buffer中。 |
 | [asc_copy_l12l0b_sparse](cube_datamove/asc_copy_l12l0b_sparse.md)       | 用于搬运存放在L1 Buffer里的512B大小的稠密权重矩阵到L0B Buffer里，同时读取128B大小的索引矩阵用于稠密矩阵的稀疏化。 |
 | [asc_copy_l12l0b_trans](cube_datamove/asc_copy_l12l0b_trans)         | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |

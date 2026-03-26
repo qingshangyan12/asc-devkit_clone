@@ -42,6 +42,6 @@ PIPE_S
 
 ## 调用示例
 ```cpp
-uint64_t config;
+uint64_t config = 0;
 asc_set_gm2l1_nz_para(config);
 ```
