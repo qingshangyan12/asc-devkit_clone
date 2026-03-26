@@ -39,7 +39,8 @@ file(GLOB ASCENDC_UT_STRUCT_CASE_SRC
 )
 
 file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIC_CASE_SRC
-    npu_arch_2201/aic/*.cpp
+    npu_arch_2201/aic/test_tensor_data_copy.cpp
+    npu_arch_2201/aic/test_tensor_fixpipe.cpp
 )
 
 file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIV_CASE_SRC
