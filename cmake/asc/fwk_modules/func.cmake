@@ -200,7 +200,7 @@ function(simple_kernel_compile)
   set(BINCMP_COMPILE_LOG "${BINCMP_OUT_DIR}/compile.log")
 
   if (NOT ${ENABLE_CROSS_COMPILE})
-    if (${ENABLE_SOURCE_PACKAGE})
+    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
       add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
         COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} bash -c "
           ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \\
@@ -250,7 +250,7 @@ function(simple_kernel_compile)
     if (${bincmp_enable_binary_package} AND NOT DEFINED HOST_NATIVE_TILING_LIB)
       message(FATAL_ERROR "Native host libs was not set for cross compile!")
     endif()
-    if (${ENABLE_SOURCE_PACKAGE})
+    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
       add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
         COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} bash -c "
           ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \\
@@ -503,14 +503,14 @@ function(npu_op_package target_package_name)
       set(CPACK_EXTERNAL_ENABLE_STAGING TRUE)
       set(CPACK_EXTERNAL_PACKAGE_SCRIPT ${ASCENDC_CMAKE_SCRIPTS_PATH}/makeself.cmake)
       set(CPACK_EXTERNAL_BUILT_PACKAGES ${CPACK_PACKAGE_DIRECTORY}/_CPack_Packages/Linux/External/${CPACK_PACKAGE_FILE_NAME}/${CPACK_PACKAGE_FILE_NAME})
-      if (${ENABLE_SOURCE_PACKAGE})
+      if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
         set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_BINARY_DIR}/post_pack_script.cmake")
         file(WRITE "${CPACK_POST_BUILD_SCRIPTS}" "
           set(ERROR_LOG_FILE \"\${KERNEL_BINARY_PATH}/compile_error.log\")
 
           if(EXISTS \"\${ERROR_LOG_FILE}\")
             file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
-            message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
+            message(STATUS \"List of failure operators:\n ${LOG_CONTENT}\")
           endif()
         ")
       endif()
@@ -580,10 +580,10 @@ function(npu_op_package target_package_name)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
 
-    if (${ENABLE_SOURCE_PACKAGE})
+    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
       install(CODE "
         file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
-        message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
+        message(STATUS \"List of failure operators:\n ${LOG_CONTENT}\")
       ")
     endif()
 
@@ -637,10 +637,10 @@ function(npu_op_package target_package_name)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
 
-    if (${ENABLE_SOURCE_PACKAGE})
+    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
       install(CODE "
         file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
-        message(STATUS \"List of failure operators:\n $ {LOG_CONTENT}\")
+        message(STATUS \"List of failure operators:\n \${LOG_CONTENT}\")
       ")
     endif()
   endif()
