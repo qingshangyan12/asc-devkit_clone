@@ -20,7 +20,7 @@ import numpy as np
 
 def gen_golden_data_simple():
     dtype = np.float32
-    src_shape = [8]
+    src_shape = [8192]
     np.set_printoptions(threshold=sys.maxsize, suppress=False)
     src = np.random.uniform(-10.0, 10.0, src_shape).astype(dtype)
     golden = np.round(src)
