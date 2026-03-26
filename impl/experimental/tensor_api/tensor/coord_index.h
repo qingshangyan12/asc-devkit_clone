@@ -29,17 +29,17 @@ namespace AscendC {
 namespace Te {
 
 template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
+__host_aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
 
 template <typename T, typename U, typename S, size_t... Is>
-__aicore__ inline constexpr auto Crd2IdxTTT(const T& coord, const U& shape, const S& stride,
+__host_aicore__ inline constexpr auto Crd2IdxTTT(const T& coord, const U& shape, const S& stride,
     Std::index_sequence<Is...>)
 {
     return (... + Crd2Idx(Std::get<Is>(coord), Std::get<Is>(shape), Std::get<Is>(stride)));
 }
 
 template <typename T, typename U, typename S, size_t I0, size_t... Is>
-__aicore__ inline constexpr auto Crd2IdxITT(const T& coord, const U& shape, const S& stride,
+__host_aicore__ inline constexpr auto Crd2IdxITT(const T& coord, const U& shape, const S& stride,
     Std::index_sequence<I0,Is...>)
 {
     if constexpr (sizeof...(Is) == 0) {  // Avoid recursion and mod on single/last iter
@@ -57,7 +57,7 @@ __aicore__ inline constexpr auto Crd2IdxITT(const T& coord, const U& shape, cons
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride)
+__host_aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride)
 {
     if constexpr (Std::is_tuple_v<T>) {
         if constexpr (Std::is_tuple_v<U>) { // tuple tuple tuple
@@ -78,7 +78,7 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const Layout<U, S>& layout)
+__host_aicore__ inline constexpr auto Crd2Idx(const T& coord, const Layout<U, S>& layout)
 {
     return Crd2Idx(coord, layout.Shape(), layout.Stride());
 }

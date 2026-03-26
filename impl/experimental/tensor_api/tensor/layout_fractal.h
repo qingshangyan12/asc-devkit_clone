@@ -30,7 +30,7 @@
 namespace AscendC {
 namespace Te {
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNzLayout(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNzLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NZFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -39,7 +39,7 @@ __aicore__ inline decltype(auto) MakeNzLayout(U row, S column) {
 }
 
 template <typename U, typename S>
-__aicore__ inline decltype(auto) MakeL0CLayout(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeL0CLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return L0CFormatLayout<row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -48,7 +48,7 @@ __aicore__ inline decltype(auto) MakeL0CLayout(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNDLayout(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNDLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NDFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -57,7 +57,7 @@ __aicore__ inline decltype(auto) MakeNDLayout(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeDNLayout(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeDNLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return DNFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -66,7 +66,7 @@ __aicore__ inline decltype(auto) MakeDNLayout(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZnLayout(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeZnLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZNFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -75,7 +75,7 @@ __aicore__ inline decltype(auto) MakeZnLayout(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZzLayout(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeZzLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZZFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -84,7 +84,7 @@ __aicore__ inline decltype(auto) MakeZzLayout(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNnLayout(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNnLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NNFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -93,7 +93,7 @@ __aicore__ inline decltype(auto) MakeNnLayout(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column) { // 不转置(m, scaleK)
+__host_aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column) { // 不转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleANDFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -102,7 +102,7 @@ __aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column) { // 不转
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleADNLayout(U row, S column) { // 转置(m, scaleK)
+__host_aicore__ inline decltype(auto) MakeScaleADNLayout(U row, S column) { // 转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleADNFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -111,7 +111,7 @@ __aicore__ inline decltype(auto) MakeScaleADNLayout(U row, S column) { // 转置
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBNDLayout(U row, S column) { // 不转置(scaleK, n)
+__host_aicore__ inline decltype(auto) MakeScaleBNDLayout(U row, S column) { // 不转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleBNDFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -120,7 +120,7 @@ __aicore__ inline decltype(auto) MakeScaleBNDLayout(U row, S column) { // 不转
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column) { // 转置(scaleK, n)
+__host_aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column) { // 转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleBDNFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -129,13 +129,13 @@ __aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column) { // 转置
 }
 
 template <typename T, typename U, size_t... Is>
-__aicore__ inline decltype(auto) MakeFractalShape(T originShape, U innerShape, Std::index_sequence<Is...>) {
+__host_aicore__ inline decltype(auto) MakeFractalShape(T originShape, U innerShape, Std::index_sequence<Is...>) {
     auto outerShape = Std::make_tuple(Std::ceil_division(Std::get<Is>(originShape), Std::get<Is>(innerShape))...);
     return MakeShape(MakeShape(Std::get<Is>(innerShape), Std::get<Is>(outerShape))...);
 }
 
 template <typename T, typename U>
-__aicore__ inline decltype(auto) MakeFractalShape(T originShape, U innerShape) {
+__host_aicore__ inline decltype(auto) MakeFractalShape(T originShape, U innerShape) {
     static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "OriginShape and InnerShape must match");
     return MakeFractalShape(originShape, innerShape, Std::make_index_sequence<Std::tuple_size_v<U>>{});
 }

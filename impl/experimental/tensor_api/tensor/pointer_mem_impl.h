@@ -48,7 +48,7 @@ template <Hardware hardPos, typename Pointer>
 constexpr bool IsHardwareMemV = IsHardwareMem<hardPos, Pointer>::value;
 
 template <Hardware hardPos, typename Iterator>
-__aicore__ inline constexpr auto MakeMemPtr(Iterator iter) 
+__host_aicore__ inline constexpr auto MakeMemPtr(Iterator iter) 
 {
     if constexpr (IsHardwareMem<hardPos, Iterator>::value) {
         return iter;

@@ -35,14 +35,14 @@ struct ViewEngine
     using reference    = typename IterRef<iterator>::type; // T&
     using elementType = typename IterEle<iterator>::type; // rm_ref
     using valueType   = typename IterVal<iterator>::type; // rm_cvf
-    __aicore__ inline constexpr iterator const& Begin() const {
+    __host_aicore__ inline constexpr iterator const& Begin() const {
         return storage;
     }
 
-    __aicore__ inline constexpr iterator& Begin() {
+    __host_aicore__ inline constexpr iterator& Begin() {
         return storage;
     }
-    __aicore__ inline constexpr ViewEngine(iterator storage = {}) : storage(storage) {}
+    __host_aicore__ inline constexpr ViewEngine(iterator storage = {}) : storage(storage) {}
 private:
     iterator storage;
 };
@@ -55,10 +55,10 @@ struct ConstViewEngine
     using elementType = typename IterEle<iterator>::type; // rm_ref
     using valueType   = typename IterVal<iterator>::type; // rm_cvf
 
-    __aicore__ inline constexpr iterator const& Begin() const {
+    __host_aicore__ inline constexpr iterator const& Begin() const {
         return storage;
     }
-    __aicore__ inline constexpr ConstViewEngine(iterator storage = {}) : storage(storage) {}
+    __host_aicore__ inline constexpr ConstViewEngine(iterator storage = {}) : storage(storage) {}
 private:
     iterator storage;
 };

@@ -35,7 +35,7 @@ template <typename T>
 struct LocalTensor;
 
 template <typename Coord, typename LayoutType, typename TileShape>
-__aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const TileShape& tileShape) 
+__host_aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const TileShape& tileShape) 
 {
     using OriginShape = Std::remove_cvref_t<decltype(layout.Shape())>;
     if constexpr (nesting_depth_v<TileShape> == nesting_depth_v<OriginShape>	 
@@ -54,7 +54,7 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
 }
 
 template <typename Coord, typename LayoutType, typename TensorType>
- __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const LocalTensor<TensorType>& tileTensor) 
+ __host_aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const LocalTensor<TensorType>& tileTensor) 
 {
     using TensorLayoutType = typename LocalTensor<TensorType>::layoutType;
     static_assert(TensorLayoutType::rank == LayoutType::rank, "Tensor Rank must be equal to Layout rank");

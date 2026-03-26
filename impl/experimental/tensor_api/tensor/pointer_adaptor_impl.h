@@ -36,54 +36,54 @@ struct IterAdaptor
     using elementType = typename IterEle<iterator>::type; // rm_ref
     using valueType   = typename IterVal<iterator>::type; // rm_cvf
 
-    __aicore__ inline constexpr IterAdaptor(iterator ptr = {}) : ptr(ptr) {}
+    __host_aicore__ inline constexpr IterAdaptor(iterator ptr = {}) : ptr(ptr) {}
 
-    __aicore__ inline constexpr reference operator*() const {
+    __host_aicore__ inline constexpr reference operator*() const {
         return *ptr;
     }
 
     template <typename Index>
-    __aicore__ inline constexpr reference operator[](const Index& i) const {
+    __host_aicore__ inline constexpr reference operator[](const Index& i) const {
         auto ic = IndexCorrect(i);
         return ptr[ic];
     }
 
     template <typename Index>
-    __aicore__ inline constexpr DerivedType operator+(const Index& i) const {
+    __host_aicore__ inline constexpr DerivedType operator+(const Index& i) const {
         auto ic = IndexCorrect(i);
         return {ptr + ic};
     }
 
-    __aicore__ inline constexpr iterator Get() const {
+    __host_aicore__ inline constexpr iterator Get() const {
         return ptr; 
     }
 
-    __aicore__ inline constexpr friend bool operator==(const DerivedType& x, const DerivedType& y) {
+    __host_aicore__ inline constexpr friend bool operator==(const DerivedType& x, const DerivedType& y) {
         return x.ptr == y.ptr;
     }
 
-    __aicore__ inline constexpr friend bool operator!=(const DerivedType& x, const DerivedType& y) {
+    __host_aicore__ inline constexpr friend bool operator!=(const DerivedType& x, const DerivedType& y) {
         return x.ptr != y.ptr;
     }
 
-    __aicore__ inline constexpr friend bool operator< (const DerivedType& x, const DerivedType& y) {
+    __host_aicore__ inline constexpr friend bool operator< (const DerivedType& x, const DerivedType& y) {
         return x.ptr <  y.ptr; 
     }
 
-    __aicore__ inline constexpr friend bool operator<=(const DerivedType& x, const DerivedType& y) {
+    __host_aicore__ inline constexpr friend bool operator<=(const DerivedType& x, const DerivedType& y) {
         return x.ptr <= y.ptr; 
     }
 
-    __aicore__ inline constexpr friend bool operator> (const DerivedType& x, const DerivedType& y) {
+    __host_aicore__ inline constexpr friend bool operator> (const DerivedType& x, const DerivedType& y) {
         return x.ptr >  y.ptr; 
     }
 
-    __aicore__ inline constexpr friend bool operator>=(const DerivedType& x, const DerivedType& y) {
+    __host_aicore__ inline constexpr friend bool operator>=(const DerivedType& x, const DerivedType& y) {
         return x.ptr >= y.ptr; 
     }
 private:
     template <typename Index>
-    __aicore__ inline constexpr Index IndexCorrect(const Index& i) const {
+    __host_aicore__ inline constexpr Index IndexCorrect(const Index& i) const {
         if constexpr (is_b4_type<valueType>) {
             return i >> 1;
         } else {

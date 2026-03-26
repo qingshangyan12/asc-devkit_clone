@@ -30,7 +30,7 @@
 namespace AscendC {
 namespace Te {
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNzShape(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNzShape(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NZShapeFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -39,7 +39,7 @@ __aicore__ inline decltype(auto) MakeNzShape(U row, S column) {
 }
 
 template <typename U, typename S>
-__aicore__ inline decltype(auto) MakeL0CShape(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeL0CShape(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NZShapeFormat<uint16_t, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -48,7 +48,7 @@ __aicore__ inline decltype(auto) MakeL0CShape(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNDShape(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNDShape(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NDShapeFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -57,7 +57,7 @@ __aicore__ inline decltype(auto) MakeNDShape(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeDNShape(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeDNShape(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return DNShapeFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -66,7 +66,7 @@ __aicore__ inline decltype(auto) MakeDNShape(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZnShape(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeZnShape(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZNShapeFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -75,7 +75,7 @@ __aicore__ inline decltype(auto) MakeZnShape(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZzShape(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeZzShape(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZZShapeFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -84,7 +84,7 @@ __aicore__ inline decltype(auto) MakeZzShape(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNnShape(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNnShape(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleNNShapeFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -93,7 +93,7 @@ __aicore__ inline decltype(auto) MakeNnShape(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleANDShape(U row, S column) { // 不转置(m, scaleK)
+__host_aicore__ inline decltype(auto) MakeScaleANDShape(U row, S column) { // 不转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NDShapeFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -102,7 +102,7 @@ __aicore__ inline decltype(auto) MakeScaleANDShape(U row, S column) { // 不转�
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleADNShape(U row, S column) { // 转置(m, scaleK)
+__host_aicore__ inline decltype(auto) MakeScaleADNShape(U row, S column) { // 转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleDNShapeFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -111,7 +111,7 @@ __aicore__ inline decltype(auto) MakeScaleADNShape(U row, S column) { // 转置(
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBNDShape(U row, S column) { // 不转置(scaleK, n)
+__host_aicore__ inline decltype(auto) MakeScaleBNDShape(U row, S column) { // 不转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleNDShapeFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -120,7 +120,7 @@ __aicore__ inline decltype(auto) MakeScaleBNDShape(U row, S column) { // 不转�
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBDNShape(U row, S column) { // 转置(scaleK, n)
+__host_aicore__ inline decltype(auto) MakeScaleBDNShape(U row, S column) { // 转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return DNShapeFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -130,7 +130,7 @@ __aicore__ inline decltype(auto) MakeScaleBDNShape(U row, S column) { // 转置(
 
 // make stride
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNzStride(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNzStride(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NZStrideFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -139,7 +139,7 @@ __aicore__ inline decltype(auto) MakeNzStride(U row, S column) {
 }
 
 template <typename U, typename S>
-__aicore__ inline decltype(auto) MakeL0CStride(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeL0CStride(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NZStrideFormat<uint16_t, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -148,7 +148,7 @@ __aicore__ inline decltype(auto) MakeL0CStride(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNDStride(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNDStride(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NDStrideFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -157,7 +157,7 @@ __aicore__ inline decltype(auto) MakeNDStride(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeDNStride(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeDNStride(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return DNStrideFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -166,7 +166,7 @@ __aicore__ inline decltype(auto) MakeDNStride(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZnStride(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeZnStride(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZNStrideFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -175,7 +175,7 @@ __aicore__ inline decltype(auto) MakeZnStride(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZzStride(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeZzStride(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZZStrideFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -184,7 +184,7 @@ __aicore__ inline decltype(auto) MakeZzStride(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNnStride(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNnStride(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleNNStrideFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -193,7 +193,7 @@ __aicore__ inline decltype(auto) MakeNnStride(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleANDStride(U row, S column) { // 不转置(m, scaleK)
+__host_aicore__ inline decltype(auto) MakeScaleANDStride(U row, S column) { // 不转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NDStrideFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -202,7 +202,7 @@ __aicore__ inline decltype(auto) MakeScaleANDStride(U row, S column) { // 不转
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleADNStride(U row, S column) { // 转置(m, scaleK)
+__host_aicore__ inline decltype(auto) MakeScaleADNStride(U row, S column) { // 转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleDNStrideFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -211,7 +211,7 @@ __aicore__ inline decltype(auto) MakeScaleADNStride(U row, S column) { // 转置
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBNDStride(U row, S column) { // 不转置(scaleK, n)
+__host_aicore__ inline decltype(auto) MakeScaleBNDStride(U row, S column) { // 不转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleNDStrideFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -220,7 +220,7 @@ __aicore__ inline decltype(auto) MakeScaleBNDStride(U row, S column) { // 不转
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBDNStride(U row, S column) { // 转置(scaleK, n)
+__host_aicore__ inline decltype(auto) MakeScaleBDNStride(U row, S column) { // 转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return DNStrideFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -229,7 +229,7 @@ __aicore__ inline decltype(auto) MakeScaleBDNStride(U row, S column) { // 转置
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNzCoord(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNzCoord(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NZCoordFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -238,7 +238,7 @@ __aicore__ inline decltype(auto) MakeNzCoord(U row, S column) {
 }
 
 template <typename U, typename S>
-__aicore__ inline decltype(auto) MakeL0CCoord(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeL0CCoord(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NZCoordFormat<uint16_t, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -247,7 +247,7 @@ __aicore__ inline decltype(auto) MakeL0CCoord(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNDCoord(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNDCoord(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NDCoordFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -256,7 +256,7 @@ __aicore__ inline decltype(auto) MakeNDCoord(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeDNCoord(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeDNCoord(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return DNCoordormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -265,7 +265,7 @@ __aicore__ inline decltype(auto) MakeDNCoord(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZnCoord(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeZnCoord(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZNCoordFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -274,7 +274,7 @@ __aicore__ inline decltype(auto) MakeZnCoord(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZzCoord(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeZzCoord(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZZCoordFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -283,7 +283,7 @@ __aicore__ inline decltype(auto) MakeZzCoord(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNnCoord(U row, S column) {
+__host_aicore__ inline decltype(auto) MakeNnCoord(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleNNCoordFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -292,7 +292,7 @@ __aicore__ inline decltype(auto) MakeNnCoord(U row, S column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleANDCoord(U row, S column) { // 不转置(m, scaleK)
+__host_aicore__ inline decltype(auto) MakeScaleANDCoord(U row, S column) { // 不转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NDCoordFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -301,7 +301,7 @@ __aicore__ inline decltype(auto) MakeScaleANDCoord(U row, S column) { // 不转�
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleADNCoord(U row, S column) { // 转置(m, scaleK)
+__host_aicore__ inline decltype(auto) MakeScaleADNCoord(U row, S column) { // 转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleDNCoordFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -310,7 +310,7 @@ __aicore__ inline decltype(auto) MakeScaleADNCoord(U row, S column) { // 转置(
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBNDCoord(U row, S column) { // 不转置(scaleK, n)
+__host_aicore__ inline decltype(auto) MakeScaleBNDCoord(U row, S column) { // 不转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleNDCoordFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
@@ -319,7 +319,7 @@ __aicore__ inline decltype(auto) MakeScaleBNDCoord(U row, S column) { // 不转�
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBDNCoord(U row, S column) { // 转置(scaleK, n)
+__host_aicore__ inline decltype(auto) MakeScaleBDNCoord(U row, S column) { // 转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return DNCoordFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){

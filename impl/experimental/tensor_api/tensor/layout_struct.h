@@ -36,7 +36,7 @@ struct NzLayoutFormat {
     using type = NZFormatLayout<T, row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeNzLayout<T, U, S>(row, column);
     }  
 };
@@ -47,7 +47,7 @@ struct ZnLayoutFormat {
     using type = ZNFormatLayout<T, row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeZnLayout<T, U, S>(row, column);
     }  
 };
@@ -58,7 +58,7 @@ struct L0CLayoutFormat {
     using type = L0CFormatLayout<row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeL0CLayout<U, S>(row, column);
     }  
 };
@@ -69,7 +69,7 @@ struct DNLayoutFormat {
     using type = DNFormatLayout<T, row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeDNLayout<T, U, S>(row, column);
     }  
 };
@@ -80,7 +80,7 @@ struct NDLayoutFormat {
     using type = NDFormatLayout<T, row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeNDLayout<T, U, S>(row, column);
     }  
 };
@@ -91,7 +91,7 @@ struct ZzLayoutFormat {
     using type = ZZFormatLayout<T, row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeZzLayout<T, U, S>(row, column);
     }  
 };
@@ -102,7 +102,7 @@ struct NnLayoutFormat {
     using type = NNFormatLayout<T, row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeNnLayout<T, U, S>(row, column);
     }  
 };
@@ -113,7 +113,7 @@ struct ScaleANDLayoutFormat {
     using type = ScaleANDFormatLayout<T, row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeScaleANDLayout<T, U, S>(row, column);
     }  
 };
@@ -124,7 +124,7 @@ struct ScaleADNLayoutFormat {
     using type = ScaleADNFormatLayout<T, row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeScaleADNLayout<T, U, S>(row, column);
     }  
 };
@@ -135,7 +135,7 @@ struct ScaleBNDLayoutFormat {
     using type = ScaleBNDFormatLayout<T, row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeScaleBNDLayout<T, U, S>(row, column);
     }  
 };
@@ -146,7 +146,7 @@ struct ScaleBDNLayoutFormat {
     using type = ScaleBDNFormatLayout<T, row, column>;
 
     template <typename U, typename S>
-    __aicore__ inline decltype(auto) operator()(U row, S column) {
+    __host_aicore__ inline decltype(auto) operator()(U row, S column) {
         return MakeScaleBDNLayout<T, U, S>(row, column);
     }  
 };
