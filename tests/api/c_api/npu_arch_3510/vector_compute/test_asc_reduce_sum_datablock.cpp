@@ -38,7 +38,7 @@ TEST_F(TestVectorCompute##class_name##_##dst_type##_##src_type##_CApi, cce_name#
 
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Vcgadd, asc_reduce_sum_datablock, vcgadd, vector_half);
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Vcgadd, asc_reduce_sum_datablock, vcgadd, vector_float);
-// TEST_VECTOR_COMPUTE_VCGADD_INSTR(Vcgadd, asc_reduce_sum_datablock, vcgadd, vector_uint32_t, vector_uint16_t);
-// TEST_VECTOR_COMPUTE_VCGADD_INSTR(Vcgadd, asc_reduce_sum_datablock, vcgadd, vector_int32_t, vector_int16_t);
+TEST_VECTOR_COMPUTE_VCGADD_INSTR(Vcgadd, asc_reduce_sum_datablock, vcgadd, vector_uint32_t, vector_uint16_t);
+TEST_VECTOR_COMPUTE_VCGADD_INSTR(Vcgadd, asc_reduce_sum_datablock, vcgadd, vector_int32_t, vector_int16_t);
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Vcgadd, asc_reduce_sum_datablock, vcgadd, vector_uint32_t);
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Vcgadd, asc_reduce_sum_datablock, vcgadd, vector_int32_t);
