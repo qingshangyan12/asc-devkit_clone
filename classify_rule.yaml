@@ -84,7 +84,7 @@ asc-devkit:
       - impl/experimental/tensor_api/arch/cube_compute/mmad/mmad_routing.h
       - impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_routing.h
       - impl/experimental/tensor_api/algorithm/mad_impl.h
-
+      - impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_reduce_sum_datablock.h
   llt:
     ut_check: true
     st_check: false
