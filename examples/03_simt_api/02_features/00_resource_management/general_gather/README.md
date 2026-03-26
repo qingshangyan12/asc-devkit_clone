@@ -112,7 +112,7 @@
   * output shape：input_shape[:axis] + indices_shape[batch_dims:] + input_shape[axis+1:]
   * 样例实现中，axis和batch_dims也支持传入负值，并会在计算前转换为对应的非负维度索引
 - 数据切分：
-  * gridDim：使用设备AIV核数作为block数，充分利用所有物理核心
+  * gridDim：根据收集总数据量动态分配。优先根据blockDim按需计算block数；当所需block数超过设备AIV核数时，取设备AIV核数作为block数
   * blockDim：根据具体总数据量动态分配，最大不超过2048
   * 单线程处理：根据具体收集数据量均衡分配，每个线程处理的元素数量最多相差1个。在核函数中以线程总数作为循环步幅，每个线程从起始位置begin = blockIdx.x * blockDim.x + threadIdx.x开始，以步长stride = gridDim.x * blockDim.x遍历并处理元素
 
