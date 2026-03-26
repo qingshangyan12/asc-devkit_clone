@@ -5,17 +5,10 @@
 | 产品     | 是否支持 |
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|x|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|x|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
 
 ## 功能说明
 
-创建 Fixbuf 上的指针，用于访问 AI Core 的 Fixbuf 的内存空间。
+创建FIXBUF上的指针，用于访问AI Core的FIXBUF的内存空间。
 
 ## 函数原型
 
@@ -33,34 +26,33 @@ __aicore__ inline auto MakeFixbufmemPtr(const U& byteOffset)
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| T | 输入 | Fixbuf 的指针的类型。 |
+| T | 输入 | FIXBUF的指针类型，`__fbuf__ T`。 |
 | U | 输入 | 字节偏移量类型。 |
 
 `表2` 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| iter | 输入 | 迭代器或指针，指向Fixbuf的起始地址。 |
+| iter | 输入 | 指针，指向FIXBUF的起始地址，类型为`__fbuf__ T`。 |
 
 ## 返回值说明
 
-- 返回 Fixbuf 内存指针对象，类型为 `HardwareMemPtr<Hardware::Fixbuf, Iterator>`
-
+- 返回FIXBUF内存指针对象，类型为 `HardwareMemPtr<Hardware::Fixbuf, Iterator>`。
 
 ## 约束说明
 
-- `iter` 必须是有效的迭代器类型
-- 偏移地址必须在 Fixbuf 内存范围内
+- iter必须是有效的迭代器类型。
+- 偏移地址必须在FIXBUF内存范围内。
 
 ## 调用示例
 
 ```cpp
 // 示例 1： 使用指针创建
-constexpr uint32_t TILE_LENGTH = 4;
-__cbuf__ float data[TILE_LENGTH] = {1, 2, 3, 4};
+constexpr uint32_t L1_SIZE = 128;
+__fbuf__ float data[L1_SIZE];
 auto ptr = MakeFixbufmemPtr(data);
 
 // 示例 2： 使用地址字节偏移创建
 uint32_t byteOffset = 128;
-auto ptr = MakeFixbufmemPtr<float>(byteOffset);
+auto ptr = MakeFixbufmemPtr<__fbuf__ float>(byteOffset);
 ```
