@@ -26,9 +26,8 @@ function(add_asc_executable TARGET_NAME SOURCE_FILE)
     #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
     # ======================================================================================
     target_compile_options(${TARGET_NAME} PRIVATE
-        $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+        $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510 --enable-simt -O3 -std=c++17>
         $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:-g -O0>>
-        --enable-simt
     )
     
     target_link_directories(${TARGET_NAME} PRIVATE
@@ -37,9 +36,11 @@ function(add_asc_executable TARGET_NAME SOURCE_FILE)
     
     target_link_libraries(${TARGET_NAME} PRIVATE 
         m
-        --enable-simt
         $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:runtime_camodel>>
         $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:npu_drv>>
+        platform
+        tiling_api
+        dl
     )
 endfunction()
 
@@ -47,4 +48,4 @@ endfunction()
 # 创建可执行文件
 # ======================================================================================
 add_asc_executable(gather gather.asc)
-add_asc_executable(gatherv2 gather_v2.asc)
+add_asc_executable(gather_v2 gather_v2.asc)

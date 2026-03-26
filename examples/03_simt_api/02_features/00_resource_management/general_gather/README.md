@@ -1,7 +1,7 @@
 # SIMT编程模式实现Gather算子样例
 
 ## 概述
-样例基于Ascend C SIMT编程方式实现支持泛化shape的Gather算子，从输入张量中采集指定的m行数据，展示泛化场景离散内存访问类算子的开发方法。
+样例基于Ascend C SIMT编程方式实现支持泛化shape的Gather算子，包括基础版gather和增强版gather_v2。gather算子从二维输入张量中采集指定索引的行数据，gather_v2算子支持从多维输入张量中按指定维度收集数据，并支持batch_dims批量处理模式。样例展示了泛化场景离散内存访问类算子的开发方法。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -10,7 +10,7 @@
 ```
 ├── general_gather
 │   ├── CMakeLists.txt         # cmake编译文件
-│   ├── gather_v2.asc          # SIMT实现gatherv2调用样例
+│   ├── gather_v2.asc          # SIMT实现gather_v2调用样例
 │   ├── gather.asc             # SIMT实现gather调用样例
 |   └── README.md
 ```
@@ -53,8 +53,8 @@
 
 ### 2. gather_v2算子
 - 算子功能：  
- gather_v2算子实现了从多维输入张量input中按照指定维度axis收集数据的功能，indices张量指定了要收集的索引位置。支持batch_dims批量处理模式， 让不同的 batch 使用不同的索引集合。
-- 计算流程：
+ gather_v2算子实现了从多维输入张量input中按照指定维度axis收集数据的功能，indices张量指定了要收集的索引位置。支持batch_dims批量处理模式， 让不同的batch使用不同的索引集合。
+- 处理流程：
  例如输入张量input的shape为(2, 2, 3, 2)和索引张量indices的shape为 (2, 2)：
  
  ```
@@ -81,8 +81,8 @@
   [0, 1]]
  ```
  axis=2, batch_dims=1表明收集维度为2，并且每个batch下使用不同的索引：
- - batch=0 使用 indices[0]=[1, 2]，从input[0]中在维度2上收集第1、2行
- - batch=1 使用 indices[1]=[0, 1]，从input[1]中在维度2上收集第0、1行
+ - batch=0: output[0, :, :, :] = input[0, :, [1, 2], :]，即从input[0]的维度2上收集indices[0]对应的的切片
+ - batch=1: output[1, :, :, :] = input[1, :, [0, 1], :]，即从input[1]的维度2上收集indices[0]对应的的切片
  ```
  output:
   [[[[ 3,  4],
@@ -97,24 +97,32 @@
     [[19, 20],
     [21, 22]]]]
  ``` 
- <table>
- <tr><td rowspan="1" align="center">算子类型</td><td colspan="4" align="center">gather_v2</td></tr>
- </tr>
- <tr><td rowspan="5" align="center">算子输入</td><td align="center">name</td><td align="center">data type</td><td align="center">format</td><td align="center">约束/说明</td></tr>
- <tr><td align="center">input</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
- <tr><td align="center">indices</td><td align="center">uint32_t / int32_t</td><td align="center">ND</td><td align="center">indices.shape[0:batch_dims] = input.shape[0:batch_dims]</td></tr>
- <tr><td align="center">axis</td><td align="center">int32_t</td><td align="center">-</td><td align="center">batch_dims <= axis < input.rank</td></tr>
- <tr><td align="center">batch_dims</td><td align="center">int32_t</td><td align="center">-</td><td align="center">0 <= batch_dims <= min(input.rank, indices.rank)</td></tr>
- </tr>
- <tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">float</td><td align="center">ND</td><td align="center">input.shape[0:batch_dims] + input.shape[batch_dims:axis] + indices.shape[batch_dims:] + input.shape[axis+1:]</td></tr>
- </tr>
- <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_custom_v2</td></tr>
- </table>
+<table>
+<tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">gather_v2</td></tr>
+</tr>
+<tr><td rowspan="5" align="center">算子输入</td><td align="center">name</td><td align="center">data type</td><td align="center">format</td><td align="center">description</td></tr>
+<tr><td align="center">input</td><td align="center">float</td><td align="center">ND</td><td align="center">多维输入张量</td></tr>
+<tr><td align="center">indices</td><td align="center">uint32_t / int32_t</td><td align="center">ND</td><td align="center">索引张量，指定收集位置</td></tr>
+<tr><td align="center">axis</td><td align="center">int32_t</td><td align="center"></td><td align="center">标量，用于指定收集的维度</td></tr>
+<tr><td align="center">batch_dims</td><td align="center">int32_t</td><td align="center">-</td><td align="center">标量，用于指定批处理的维度</td></tr>
+</tr>
+<tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">float</td><td align="center">ND</td><td align="center">收集后的输出张量</td></tr>
+</tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_custom_v2</td></tr>
+</table>
 
-- 数据切分：  
-  * gridDim：根据具体输入shape和设备AIV核数动态分配，最大不超过65535
-  * blockDim：根据具体输入shape动态分配，最大不超过2048
-  * 单线程处理：根据具体收集数据量均衡分配，每个线程处理的元素数量最多相差 1 个
+- 约束条件：
+  * indices：indices的前batch_dims维必须与input的前batch_dims维相同，即indices.shape[0:batch_dims] = input.shape[0:batch_dims]
+  * axis：收集维度必须满足batch_dims <= axis < input.rank，即axis不能小于batch_dims，且不能超过input的维度数
+  * batch_dims：批量维度数必须满足0 <= batch_dims <= min(input.rank, indices.rank)，即不能超过input和indices中较小的维度数
+- 数据切分：
+  * gridDim：使用设备AIV核数作为block数，充分利用所有物理核心
+  * blockDim：根据具体总数据量动态分配，最大不超过2048
+  * 单线程处理：根据具体收集数据量均衡分配，每个线程处理的元素数量最多相差1个。在核函数中以线程总数作为循环步幅，每个线程从起始位置begin = blockIdx.x * blockDim.x + threadIdx.x开始，以步长stride = gridDim.x * blockDim.x遍历并处理元素
+  
+  这种切分的方式的优势在于：
+  * 负载均衡：所有线程的工作量差异最多为1个元素，避免线程空闲
+  * 内存访问友好：相邻线程访问连续的内存地址，有利于合并访存
 
 - 算子实现：  
   gather_v2算子的实现流程为从多维输入张量input中按照指定维度axis收集数据。基于上述数据切分策略，每个线程会动态处理一部分数据，对每个输出索引进行分解，将输出的一维索引转换为逻辑坐标，从而根据indices找到对应的收集位置，最后计算input的线性索引并完成数据搬运。
@@ -145,7 +153,7 @@
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..; make -j;            # 编译工程
   ./gather                      # 执行样例
-  ./gatherv2
+  ./gather_v2
   ```
   执行结果如下，说明精度对比成功。
   ```
