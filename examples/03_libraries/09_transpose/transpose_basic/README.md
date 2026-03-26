@@ -6,6 +6,7 @@
 
 ## 支持的产品
 
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
@@ -22,7 +23,7 @@
 
 ## 算子描述
 
-本样例支持三种转置场景：
+本样例提供三种转置场景：
 
 ### 场景1: 2D矩阵转置
 
@@ -46,28 +47,6 @@
 - 数据类型：half
 
 ## 算子实现
-
-### API说明
-
-本样例使用的基础Transpose API定义在 `kernel_operator_vec_transpose_intf.h`:
-
-```cpp
-// 简单2D矩阵转置 (固定16x16)
-template <typename T>
-__aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src);
-
-// 4D张量转置 (支持NCHW/NHWC互转)
-template <typename T>
-__aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const LocalTensor<uint8_t>& sharedTmpBuffer, const TransposeParamsExt& transposeParams);
-```
-
-### 静态内存实现
-
-本样例采用静态内存版本，特点：
-- 使用静态 LocalTensor（通过 `TPosition::VECCALC` 和固定地址）
-- 不使用 TPipe 和 TQue 动态内存管理
-- 使用 `SetFlag/WaitFlag` 进行事件同步
 
 ### 实现流程
 
@@ -133,11 +112,3 @@ python3 ../scripts/verify_result.py -scenarioNum 3 output/output.bin output/gold
 test pass!
 ```
 
-## 与动态内存版本对比
-
-| 特性 | 动态内存版本 | 静态内存版本 (本样例) |
-|------|-------------|---------------------|
-| 内存管理 | TPipe + TQue | 静态 LocalTensor |
-| 编程风格 | 类封装 | 函数式模板 |
-| 地址分配 | 运行时动态 | 编译时静态 |
-| 同步机制 | 队列自动同步 | SetFlag/WaitFlag |
