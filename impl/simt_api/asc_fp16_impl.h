@@ -22,14 +22,15 @@
 #ifndef IMPL_SIMT_API_ASC_FP16_IMPL_H
 #define IMPL_SIMT_API_ASC_FP16_IMPL_H
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#include "__clang_cce_simt_fp16.h"
+#endif
+
 #include "simt_api/device_types.h"
 #include "impl/simt_api/internal_functions_impl.h"
 #include "impl/simt_api/math_functions_impl.h"
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#include "__clang_cce_simt_fp16.h"
-#endif
 
 constexpr uint32_t __INTERNAL_HALF_INF = 0x7C00;
 constexpr uint32_t __INTERNAL_HALF_NEG_INF = 0xFC00;
@@ -989,6 +990,57 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ half2* address, half2
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(reinterpret_cast<__gm__ int32_t*>(address), reinterpret_cast<int32_t&>(val));
 }
+
+#else
+#ifndef ASCENDC_CPU_DEBUG
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_add(half *address, half val)
+{
+    __atomic_add(address, val);
+    return *address;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_add(half2 *address, half2 val)
+{
+    return __atomic_add(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_sub(half2 *address, half2 val)
+{
+    return __atomic_sub(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_exch(half2 *address, half2 val)
+{
+    return __atomic_exch(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_max(half *address, half val)
+{
+    __atomic_max(address, val);
+    return *address;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_max(half2 *address, half2 val)
+{
+    return __atomic_max(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_min(half *address, half val)
+{
+    __atomic_min(address, val);
+    return *address;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_min(half2 *address, half2 val)
+{
+    return __atomic_min(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_cas(half2 *address, half2 compare, half2 val)
+{
+    return __atomic_cas(address, compare, val);
+}
+#endif
 #endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_shfl(half var, int32_t src_lane, int32_t width)

@@ -22,14 +22,15 @@
 #ifndef IMPL_SIMT_API_ASC_BF16_IMPL_H
 #define IMPL_SIMT_API_ASC_BF16_IMPL_H
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#include "__clang_cce_simt_bf16.h"
+#endif
+
 #include "simt_api/device_types.h"
 #include "impl/simt_api/internal_functions_impl.h"
 #include "impl/simt_api/math_functions_impl.h"
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#include "__clang_cce_simt_bf16.h"
-#endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hisnan(bfloat16_t x)
 {
@@ -969,6 +970,57 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ bfloat16x2_t* address
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(reinterpret_cast<__gm__ int32_t*>(address), reinterpret_cast<int32_t&>(val));
 }
+
+#else
+#ifndef ASCENDC_CPU_DEBUG
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_atomic_add(bfloat16_t *address, bfloat16_t val)
+{
+    __atomic_add(address, val);
+    return *address;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_add(bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return __atomic_add(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_sub(bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return __atomic_sub(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_exch(bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return __atomic_exch(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_atomic_max(bfloat16_t *address, bfloat16_t val)
+{
+    __atomic_max(address, val);
+    return *address;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_max(bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return __atomic_max(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_atomic_min(bfloat16_t *address, bfloat16_t val)
+{
+    __atomic_min(address, val);
+    return *address;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_min(bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return __atomic_min(address, val);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_cas(bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val)
+{
+    return __atomic_cas(address, compare, val);
+}
+#endif
 #endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t make_bfloat162(bfloat16_t x, bfloat16_t y)

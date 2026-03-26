@@ -22,13 +22,14 @@
 #ifndef IMPL_SIMT_API_ASC_FP8_IMPL_H
 #define IMPL_SIMT_API_ASC_FP8_IMPL_H
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#include "__clang_cce_simt_fp8.h"
+#endif
+
 #include "simt_api/device_types.h"
 #include "impl/simt_api/internal_functions_impl.h"
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#include "__clang_cce_simt_fp8.h"
-#endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline hifloat8x2_t __float22hif82_rna(const float2 x) {
     return __cvt_hifloat8x2_t<__internal_get_round<__RoundMode::CAST_ROUND>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
