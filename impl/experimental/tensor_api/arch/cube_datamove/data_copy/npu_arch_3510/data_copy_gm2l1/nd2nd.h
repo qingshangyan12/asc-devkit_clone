@@ -8,6 +8,14 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning                                                                                                               \
+    "impl/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_gm2l1/nd2nd.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 /*!
  * \file nd2nd.h
  * \brief
@@ -42,27 +50,18 @@ private:
     {
         CheckTemplate<trait, T, U>();
 
+        using type = typename U::elementType;
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
         auto srcShapeRows = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
         auto srcShapeColumns = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
-        auto dstShapeColumns = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
-        auto dstStrideRows = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
         auto srcStrideRows = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
 
-        using type = typename U::elementType;
-        uint8_t cacheMode = GetCacheModeFromTensor(src);
+        auto dstShapeColumns = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+        auto dstStrideRows = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
 
-        using ShapeRow1 = typename GetFourDimType<U, AttrInfo::SHAPE, AttrInfo::ROW, 1>::type;
-        // compact mode, dst_stride equals burst_len, padding cnt is zero
-        // src and dst contiguous case, can directly copy without padding, only one row copy is needed
-        // the src is 1D tensor with only column shape, we can directly copy with burst len as column shape
-        if constexpr (Std::is_constant<1, ShapeRow1>::value) {
-            CopyGmToCbufAlignV2Base::DataCopy(dst, src, 1, srcShapeColumns * sizeof(type), 0, 0, cacheMode, 0,
-                                              srcShapeColumns * sizeof(type));
-            return;
-        }
+        uint8_t cacheMode = GetCacheModeFromTensor(src);
 
         // lprp mode, dst_stride % C0_SIZE should be 0
         // multi rows copy, dst non-contiguous case
@@ -98,4 +97,9 @@ private:
 } // namespace Te
 } // namespace AscendC
 
+#endif
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
