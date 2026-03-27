@@ -2,7 +2,8 @@
 
 ## 概述
 
-本样例展示了如何使用PyTorch的torch.library机制注册自定义算子，并通过`<<<>>>`内核调用符调用核函数，以简单的Add算子为例，实现两个向量的逐元素相加。
+本样例展示了如何使用PyTorch的torch.library机制注册自定义算子，并通过`<<<>>>`内核调用符调用核函数，以简单的Add算子为例，实现两个向量的逐元素相加。  
+开启Profiling打点能力，采集并展示自定义算子基础信息，分析自定义算子的性能数据。
 
 ## 支持的产品
 
@@ -14,9 +15,10 @@
 
 ```
 ├── torch_library
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── add_custom_test.py      // PyTorch调用脚本
-│   └── add_custom.asc          // Ascend C算子实现 & 自torch.library注册
+│   ├── CMakeLists.txt           // 编译工程文件
+│   ├── add_custom_test.py       // PyTorch调用脚本
+│   ├── add_custom.asc           // Ascend C算子实现 & 自torch.library注册
+│   └── add_custom_profiling.asc // 开启Profiling采集和分析数据
 ```
 
 ## 算子描述
@@ -125,3 +127,69 @@
   Ran 1 test in **s
   OK
   ```
+
+## 性能分析
+
+- 样例执行
+
+  在本样例根目录下修改`add_custom_test.py`，替换为加载`libascendc_ops_profiling.so`，执行如下步骤，运行该样例。
+
+  ```bash
+  mkdir -p build; cd build
+  cmake ..; make -j
+  msprof --application="python3 ../add_custom_test.py" --output="../result"
+  ```
+
+- 执行结果
+
+  在`result`目录中生成性能数据`PROF_000001_*`，性能数据目录结构示例如下。
+
+  ```
+  ├── msprof_*.db  
+  ├── mindstudio_profiler_output
+  │    ├── msprof_*.json
+  │    ├── step_trace_*.json
+  │    ├── xx_*.csv
+  ...
+  │    └── README.txt 
+  ├── mindstudio_profiler_log
+  │    ├── collection_device_{id}.log
+  │    ├── collection_host.log
+  ...
+  │    └── msprof_analysis_*.log
+  ├── device_{id}
+  ...
+  │    └── data
+  ├── host
+  ...
+  │    └── data
+  ```
+
+- 数据分析
+
+  打开`PROF_000001_*/mindstudio_profiler_output/op_summary_*.csv`，查看性能分析数据，示例如下。
+    
+  <table>
+    <tr>
+      <td align="center">Device_id</td>
+      <td align="center">Model ID</td>
+      <td align="center">Task ID</td>
+      <td align="center">Stream ID</td>
+      <td align="center">Op Name</td>
+      <td align="center">Op Type</td>
+      <td align="center">Op State</td>
+      <td align="center">Task Type</td>
+      <td align="center">...</td>
+    </tr>
+    <tr>
+      <td align="center">0</td>
+      <td align="center">4294967295</td>
+      <td align="center">0</td>
+      <td align="center">46</td>
+      <td align="center">_Z10add_customPhS_S_j</td>
+      <td align="center">_Z10add_customPhS_S_j</td>
+      <td align="center">dynamic</td>
+      <td align="center">AI_VECTOR_CORE</td>
+      <td align="center">...</td>
+    </tr>
+  </table>

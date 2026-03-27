@@ -58,3 +58,47 @@ target_compile_options(ascendc_ops PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
     # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
 )
+
+# ======================================================================================
+# 开启Profiling编译选项配置
+# ======================================================================================
+if (DEFINED ENV{ASCEND_HOME_PATH})
+    set(ASCEND_PATH $ENV{ASCEND_HOME_PATH})
+else ()
+    set(ASCEND_PATH /usr/local/Ascend/cann)
+endif()
+
+set(PROFILING_INCLUDE_DIRS
+    ${ASCEND_PATH}/include/aclnn
+    ${ASCEND_PATH}/include/graph
+    ${ASCEND_PATH}/pkg_inc
+    ${ASCEND_PATH}/include
+    ${TORCH_NPU_PATH}/include/aclnn
+    ${TORCH_NPU_PATH}/include/third_party/op-plugin
+)
+
+add_library(ascendc_ops_profiling SHARED
+    add_custom_profiling.asc
+)
+
+target_include_directories(ascendc_ops_profiling PRIVATE
+    ${TORCH_INCLUDE_DIRS}
+    ${TORCH_NPU_INCLUDE_DIRS}
+    ${PROFILING_INCLUDE_DIRS}
+)
+
+target_link_libraries(ascendc_ops_profiling PRIVATE
+    torch_npu
+    Python3::Python
+    nnopbase
+    msprofiler
+)
+
+target_link_directories(ascendc_ops_profiling PRIVATE
+    ${TORCH_NPU_LIBRARIES}
+)
+
+target_compile_options(ascendc_ops_profiling PRIVATE
+    ${TORCH_CXX_FLAGS}
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
+)
