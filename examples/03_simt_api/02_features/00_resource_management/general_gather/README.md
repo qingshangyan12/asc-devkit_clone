@@ -19,9 +19,9 @@
 ## 算子描述
 ### 1. gather算子
 
-- 算子功能：
-  gather算子实现了从形状为M * N的二维输入张量input中获取指定索引的m行数据的功能，这m行的行索引由输入index指定。算子输出output第i行数据的计算公式为：
+- 算子功能： 
 
+  gather算子实现了从形状为M * N的二维输入张量input中获取指定索引的m行数据的功能，这m行的行索引由输入index指定。算子输出output第i行数据的计算公式为：
   ```text
   output[i] = input[index[i]]
   ```
@@ -43,15 +43,19 @@
   * 最大处理能力：65535 * 2048 = 134215680行
 
 - 算子实现：
+
   gather算子的实现流程为从输入input（Global Memory）中获取指定索引的数据。基于上述数据切分，首先计算线程应处理数据的索引，然后通过赋值操作将一行数据存储到Global Memory上。由于计算过程相对简单，设置核函数的最大线程数限制为2048。
 
 - 调用实现：
+
   使用内核调用符<<<>>>调用核函数。
 
 ### 2. gather_v2算子
 - 算子功能：
+
   gather_v2算子实现了从多维输入张量input中按照指定维度axis收集数据的功能，indices张量指定了要收集的索引位置。支持batch_dims批量处理模式，让不同的batch使用不同的索引集合。
 - 处理流程：
+
   例如输入张量input的shape为(2, 2, 3, 2)，索引张量indices的shape为(2, 2)：
 
   ```text
@@ -94,7 +98,8 @@
      [[19, 20],
       [21, 22]]]]
   ```
-
+ 
+- 算子规格：
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">gather_v2</td></tr>
   <tr><td rowspan="5" align="center">算子输入</td><td align="center">name</td><td align="center">data type</td><td align="center">format</td><td align="center">description</td></tr>
@@ -120,8 +125,10 @@
   * 负载均衡：所有线程的工作量差异最多为1个元素，避免线程空闲
   * 内存访问友好：相邻线程访问连续的内存地址，有利于合并访存
 - 算子实现：
+
   gather_v2算子的实现流程为从多维输入张量input中按照指定维度axis收集数据。基于上述数据切分策略，每个线程会动态处理一部分数据，对每个输出索引进行分解，将输出的一维索引转换为逻辑坐标，从而根据indices找到对应的收集位置，最后计算input的线性索引并完成数据搬运。
 - 调用实现：
+
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
