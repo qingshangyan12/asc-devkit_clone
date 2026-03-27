@@ -37,7 +37,7 @@ asc-devkit:
       - impl/basic_api/reg_compute/kernel_reg_compute_struct_intf_impl.h
       - impl/basic_api/reg_compute/kernel_reg_compute_common_intf_impl.h
       - impl/basic_api/reg_compute/kernel_reg_compute_intf_impl.h
-      - impl/basic_api/reg_compute/dav_c310/kernel_reg_compute_datatype_impl.h
+      - impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_datatype_impl.h
       - impl/adv_api/detail/math/**/*.h
       - impl/adv_api/detail/quantization/**/*.h
       - impl/adv_api/detail/activation/**/*.h
@@ -90,6 +90,19 @@ asc-devkit:
       - impl/basic_api/dav_m510/kfc/kfc_comm_client.h
       - impl/basic_api/dav_m510/kfc/kfc_comm_server.h
       - impl/basic_api/dav_c310/kfc/kfc_comm_client.h
+      - impl/basic_api/dav_3510/kernel_operator_reg_others_impl.h
+      - impl/basic_api/kernel_operator_mm_bitmode_struct.h
+      - impl/basic_api/dav_3510/kfc/kfc_log.h
+      - impl/basic_api/dav_3510/core_mng/roc/kernel_operator_cube_group_handle_impl.h
+      - impl/basic_api/dav_3510/kernel_operator_proposal_impl.h
+      - impl/basic_api/dav_3510/kernel_operator_common_impl.h
+      - impl/basic_api/dav_3510/kernel_operator_vec_vpadding_impl.h
+      - impl/basic_api/dav_3510/core_mng/roc/kernel_operator_group_barrier_impl.h
+      - impl/basic_api/dav_3510/kfc/kfc_comm_client.h
+      - impl/basic_api/dav_3510/kernel_operator_list_tensor_impl.h
+      - impl/basic_api/dav_3510/core_mng/roc/kernel_operator_cube_group_info.h
+      - impl/basic_api/kernel_operator_list_tensor_intf_impl.h
+      - impl/basic_api/dav_3510/kernel_operator_determine_compute_sync_impl.h
 
   llt:
     ut_check: true

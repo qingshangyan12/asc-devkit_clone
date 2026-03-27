@@ -58,23 +58,23 @@
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_sync_impl.h"
 #include "dav_l300/kernel_operator_set_atomic_impl.h"
-#include "dav_c310/kernel_operator_common_impl.h"
+#include "dav_3510/kernel_operator_common_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_c310/kernel_operator_set_atomic_impl.h"
-#include "dav_c310/kernel_operator_common_impl.h"
-#include "dav_c310/kernel_operator_sync_impl.h"
-#include "dav_c310/kernel_operator_vec_duplicate_impl.h"
+#include "dav_3510/kernel_operator_set_atomic_impl.h"
+#include "dav_3510/kernel_operator_common_impl.h"
+#include "dav_3510/kernel_operator_sync_impl.h"
+#include "dav_3510/kernel_operator_vec_duplicate_impl.h"
 #if KFC_C310_SSBUF == 1
-#include "dav_c310/kfc/kfc_comm_client.h"
-#include "dav_c310/kfc/kfc_comm_server.h"
+#include "dav_3510/kfc/kfc_comm_client.h"
+#include "dav_3510/kfc/kfc_comm_server.h"
 #else
-#include "dav_c310/kfc/kfc_comm_client_gm.h"
-#include "dav_c310/kfc/kfc_comm_server_gm.h"
+#include "dav_3510/kfc/kfc_comm_client_gm.h"
+#include "dav_3510/kfc/kfc_comm_server_gm.h"
 #endif
-#include "dav_c310/core_mng/roc/kernel_operator_cube_group_handle_impl.h"
-#include "dav_c310/core_mng/roc/kernel_operator_group_barrier_impl.h"
+#include "dav_3510/core_mng/roc/kernel_operator_cube_group_handle_impl.h"
+#include "dav_3510/core_mng/roc/kernel_operator_group_barrier_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_set_atomic_impl.h"
 #include "dav_m510/kernel_operator_common_impl.h"
@@ -83,7 +83,7 @@
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_sync_impl.h"
 #include "dav_l311/kernel_operator_set_atomic_impl.h"
-#include "dav_c310/kernel_operator_common_impl.h"
+#include "dav_3510/kernel_operator_common_impl.h"
 #endif
 #include "kernel_pop_stack_buffer.h"
 
