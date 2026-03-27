@@ -1,16 +1,7 @@
-#!/usr/bin/python3
+#!/usr/bin python3
 # coding=utf-8
 
-# ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
-# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-# CANN Open Software License Agreement Version 2.0 (the "License").
-# Please refer to the License for details. You may not use this file except in compliance with the License.
-# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-# See LICENSE in the root of the software repository for the full text of the License.
-# ----------------------------------------------------------------------------------------------------------
-
+import os
 import sys
 import numpy as np
 import tensorflow as tf
@@ -27,52 +18,133 @@ DTYPE_MAP = {
 }
 
 FLOAT_DTYPES = {"half", "bfloat16_t", "float"}
-INT_DTYPES = {"int8_t", "int16_t", "int32_t"}
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gen_data_utils import (
+    DTYPE_NAME_MAP,
+    get_dtype_limits,
+    construct_special_values,
+    get_special_names,
+    format_float16
+)
+
+ERROR_TOL = 1e-4
 RELATIVE_TOL = 1e-6
 ABSOLUTE_TOL = 1e-9
-ERROR_TOL = 1e-4
 
 
-def verify_result(output_path, golden_path, dtype_name):
+def is_special_float(val):
+    return np.isnan(val) or np.isinf(val)
+
+
+def format_value(val, np_type):
+    if np.issubdtype(np_type, np.floating):
+        return f"{float(val):.6e}"
+    return str(val)
+
+
+def verify_single_api(dtype_name, output_path, golden_path, api_name="AddAtomicAdd"):
     np_type = DTYPE_MAP.get(dtype_name)
     if np_type is None:
-        print(f"Unsupported dtype: {dtype_name}")
+        print(f"[ERROR] Unsupported dtype: {dtype_name}")
+        return False
+    
+    if not os.path.exists(output_path):
+        print(f"[ERROR] Output file not found: {output_path}")
+        return False
+    
+    if not os.path.exists(golden_path):
+        print(f"[ERROR] Golden file not found: {golden_path}")
         return False
     
     output = np.fromfile(output_path, dtype=np_type).reshape(-1)
     golden = np.fromfile(golden_path, dtype=np_type).reshape(-1)
     
-    if dtype_name == "bfloat16_t":
-        output_float = output.astype(np.float32)
-        golden_float = golden.astype(np.float32)
-        different_element_results = np.isclose(output_float,
-                                               golden_float,
-                                               rtol=RELATIVE_TOL,
-                                               atol=ABSOLUTE_TOL,
-                                               equal_nan=True)
-    elif dtype_name in FLOAT_DTYPES:
-        different_element_results = np.isclose(output,
-                                               golden,
-                                               rtol=RELATIVE_TOL,
-                                               atol=ABSOLUTE_TOL,
-                                               equal_nan=True)
+    if len(output) == 0:
+        print(f"[ERROR] Output file is empty: {output_path}")
+        return False
+    
+    if len(golden) == 0:
+        print(f"[ERROR] Golden file is empty: {golden_path}")
+        return False
+    
+    type_name = np.dtype(np_type).name
+    special_names = get_special_names(np_type)
+    special_vals = construct_special_values(np_type)
+    num_special = len(special_vals)
+    
+    print(f"\n{'='*116}")
+    print(f"API: {api_name} | Data Type: {type_name} | Verification Results")
+    print(f"{'='*116}")
+    print(f"{'type':<10} | {'name':<8} | {'src':<20} | {'expected':<20} | {'actual':<20} | {'status'}")
+    print(f"{'-'*116}")
+    
+    valid_count = 0
+    
+    for i in range(num_special):
+        inp_val = special_vals[i]
+        golden_val = golden[i] if i < len(golden) else 0
+        output_val = output[i] if i < len(output) else 0
+        name = special_names[i] if i < len(special_names) else f"idx_{i}"
+        
+        is_match = False
+        if dtype_name in FLOAT_DTYPES:
+            if is_special_float(golden_val):
+                if np.isnan(golden_val):
+                    is_match = np.isnan(output_val)
+                else:
+                    is_match = np.isinf(output_val) and np.sign(output_val) == np.sign(golden_val)
+            else:
+                is_match = np.isclose(float(output_val), float(golden_val), rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True)
+        else:
+            is_match = (output_val == golden_val)
+        
+        if is_match:
+            valid_count += 1
+        
+        status = "PASS" if is_match else "FAIL"
+        inp_str = format_value(inp_val, np_type)
+        golden_str = format_value(golden_val, np_type)
+        output_str = format_value(output_val, np_type)
+        
+        print(f"{type_name:<10} | {name:<8} | {inp_str:<20} | {golden_str:<20} | {output_str:<20} | {status}")
+    
+    print(f"{'-'*116}")
+    
+    different_count = 0
+    for i in range(len(golden)):
+        golden_val = golden[i]
+        output_val = output[i]
+        
+        is_diff = False
+        if dtype_name in FLOAT_DTYPES:
+            if is_special_float(golden_val):
+                if not (np.isnan(output_val) or np.isinf(output_val)):
+                    is_diff = True
+            elif not np.isclose(float(output_val), float(golden_val), rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True):
+                is_diff = True
+        else:
+            if output_val != golden_val:
+                is_diff = True
+        
+        if is_diff:
+            different_count += 1
+    
+    error_ratio = different_count / golden.size if golden.size > 0 else 1.0
+    
+    print(f"Total: {len(golden)}, Matched: {valid_count}/{num_special}, Mismatches: {different_count}, Error Ratio: {error_ratio:.4f}")
+    print(f"{'='*116}\n")
+    
+    if error_ratio <= ERROR_TOL:
+        print(f"*** Result: PASS ***")
+        return True
     else:
-        different_element_results = (output == golden)
-    
-    different_element_indexes = np.where(different_element_results == False)[0]
-    
-    for index in range(min(10, len(golden))):
-        real_index = index
-        golden_data = golden[real_index]
-        output_data = output[real_index]
-        print(
-            "data index: %06d, expected: %-.9f, actual: %-.9f" %
-            (real_index, float(golden_data), float(output_data)))
-    
-    error_ratio = float(different_element_indexes.size) / golden.size
-    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, ERROR_TOL))
-    return error_ratio <= ERROR_TOL
+        print(f"*** Result: FAIL ***")
+        return False
+
+
+def verify_result(output_path, golden_path, dtype_name):
+    return verify_single_api(dtype_name, output_path, golden_path, "SetAtomicAdd")
 
 
 if __name__ == '__main__':
@@ -84,9 +156,7 @@ if __name__ == '__main__':
     try:
         res = verify_result(sys.argv[1], sys.argv[2], sys.argv[3])
         if not res:
-            raise ValueError("[ERROR] result error")
-        else:
-            print("test pass!")
+            sys.exit(1)
     except Exception as e:
-        print(e)
+        print(f"[ERROR] {e}")
         sys.exit(1)

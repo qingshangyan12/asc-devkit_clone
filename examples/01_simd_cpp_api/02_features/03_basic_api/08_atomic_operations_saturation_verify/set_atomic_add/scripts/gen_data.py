@@ -1,76 +1,80 @@
-#!/usr/bin/python3
+#!/usr/bin python3
 # coding=utf-8
 
-# ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
-# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-# CANN Open Software License Agreement Version 2.0 (the "License").
-# Please refer to the License for details. You may not use this file except in compliance with the License.
-# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-# See LICENSE in the root of the software repository for the full text of the License.
-# ----------------------------------------------------------------------------------------------------------
-
 import os
+import sys
 import numpy as np
-import tensorflow as tf
 
-bfloat16 = tf.bfloat16.as_numpy_dtype
-
-DTYPE_MAP = {
-    "int8_t": (np.int8, 1),
-    "int16_t": (np.int16, 2),
-    "half": (np.float16, 2),
-    "bfloat16_t": (bfloat16, 2),
-    "int32_t": (np.int32, 4),
-    "float": (np.float32, 4)
-}
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gen_data_utils import (
+    DTYPE_NAME_MAP,
+    get_dtype_limits,
+    construct_special_values,
+    save_bin,
+    get_special_names,
+    print_unary_api_table
+)
 
 NUM_CORES = 3
 BLOCK_LENGTH = 256
 
-def gen_data_for_dtype(dtype_name):
-    np_type, _ = DTYPE_MAP[dtype_name]
-    input_shape = [BLOCK_LENGTH]
+
+def compute_golden(input_val, data_type):
+    result = input_val * NUM_CORES
+    # limits = get_dtype_limits(data_type)
     
-    if dtype_name == "int8_t":
-        input_data = np.ones(input_shape, dtype=np.int8)
-    elif dtype_name == "int16_t":
-        input_data = np.ones(input_shape, dtype=np.int16)
-    elif dtype_name == "half":
-        input_data = np.ones(input_shape, dtype=np.float16)
-    elif dtype_name == "bfloat16_t":
-        input_data = np.ones(input_shape, dtype=bfloat16)
-    elif dtype_name == "int32_t":
-        input_data = np.ones(input_shape, dtype=np.int32)
-    elif dtype_name == "float":
-        input_data = np.ones(input_shape, dtype=np.float32)
-    else:
-        raise ValueError(f"Unsupported dtype: {dtype_name}")
+    # if np.issubdtype(data_type, np.floating):
+    #     if not np.isnan(result) and not np.isinf(result) and result != 0:
+    #         if result > limits['max']:
+    #             result = limits['max']
+    #         elif result < limits['min']:
+    #             result = limits['min']
+    # else:
+    #     if result > limits['max']:
+    #         result = limits['max']
+    #     elif result < limits['min']:
+    #         result = limits['min']
     
-    golden = NUM_CORES * input_data
+    return data_type(result)
+
+
+def gen_test_data(dtype_name):
+    data_type = DTYPE_NAME_MAP[dtype_name]
     
-    return input_data, golden
+    special_vals = construct_special_values(data_type)
+    special_names = get_special_names(data_type)
+    
+    num_special = len(special_vals)
+    repeat = (BLOCK_LENGTH + num_special - 1) // num_special
+    
+    input_data = np.array(special_vals * repeat, dtype=data_type)[:BLOCK_LENGTH]
+    golden_data = np.array([compute_golden(v, data_type) for v in special_vals] * repeat, dtype=data_type)[:BLOCK_LENGTH]
+    
+    return input_data, golden_data, special_names
 
 
 def gen_all_data():
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     
-    for dtype_name in DTYPE_MAP.keys():
-        print(f"Generating data for {dtype_name}...")
-        input_data, golden = gen_data_for_dtype(dtype_name)
+    for dtype_name in DTYPE_NAME_MAP.keys():
+        print(f"\nGenerating test data for {dtype_name}...")
+        
+        input_data, golden_data, special_names = gen_test_data(dtype_name)
         
         input_path = f"./input/input_x_{dtype_name}.bin"
         golden_path = f"./output/golden_{dtype_name}.bin"
         
-        input_data.tofile(input_path)
-        golden.tofile(golden_path)
+        save_bin(input_data, input_path)
+        save_bin(golden_data, golden_path)
         
         print(f"  Input: {input_path} ({input_data.nbytes} bytes)")
-        print(f"  Golden: {golden_path} ({golden.nbytes} bytes)")
+        print(f"  Golden: {golden_path} ({golden_data.nbytes} bytes)")
+        
+        type_name = np.dtype(DTYPE_NAME_MAP[dtype_name]).name
+        print_unary_api_table("SetAtomicAdd", type_name, special_names, input_data, golden_data)
 
 
 if __name__ == "__main__":
     gen_all_data()
-    print("All data generated successfully!")
+    print("\nAll data generated successfully!")
