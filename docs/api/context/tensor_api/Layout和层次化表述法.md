@@ -145,9 +145,11 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 | L0C | / | Int<16>{} | ceil_div(row, Int<16>{}) | c0Ele | ceil_div(column, c0Ele) | c0Ele | c0Ele * Int<16>{} | Int<1>{} | c0Ele * ceil_align(row, Int<16>{}) |
 | ZN | T | c0Ele | ceil_div(row, c0Ele) | Int<16>{} | ceil_div(column, Int<16>{}) | Int<1>{} | c0Ele * ceil_align(column, Int<16>{}) | c0Ele | c0Ele * Int<16>{} |
 | DN | T | Int<1>{} | row | Int<1>{} | column | Int<0>{} | Int<1>{} | Int<0>{} | row |
-| DN | fp8_e8m0_t | Int<1>{} | row | Int<2>{} | column / MX_SCALE_K0 | Int<0>{} | MX_SCALE_K0 | Int<1>{} | MX_SCALE_K0 * row |
 | ND | T | Int<1>{} | row | Int<1>{} | column | Int<0>{} | column | Int<0>{} | Int<1>{} |
-| ND | fp8_e8m0_t | Int<2>{} | row / MX_SCALE_K0 | Int<1>{} | column | Int<1>{} | MX_SCALE_K0 * column | Int<0>{} | MX_SCALE_K0 |
 | ZZ | T | Int<16>{} | ceil_div(row, Int<16>{}) | c0Ele | ceil_div(column, c0Ele) | c0Ele | Int<16>{} * ceil_align(column, c0Ele) | Int<1>{} | c0Ele * Int<16>{} |
 | ZZ | fp8_e8m0_t | Int<16>{} | ceil_div(row, Int<16>{}) | MX_SCALE_K0 | column / MX_SCALE_K0 | MX_SCALE_K0 | column * Int<16>{} | Int<1>{} | C0_SIZE<> |
 | NN | fp8_e8m0_t | MX_SCALE_K0 | row / MX_SCALE_K0 | Int<16>{} | ceil_div(column, Int<16>{}) | Int<1>{} | C0_SIZE<> | MX_SCALE_K0 | row * Int<16>{} |
+| ScaleAND | fp8_e8m0_t | Int<1>{} | row | Int<1>{} | column | Int<0>{} | column | Int<0>{} | Int<1>{} |
+| ScaleADN | fp8_e8m0_t | Int<1>{} | row | Int<2>{} | column / MX_SCALE_K0 | Int<0>{} | MX_SCALE_K0 | Int<1>{} | MX_SCALE_K0 * row |
+| ScaleBND | fp8_e8m0_t | Int<2>{} | row / MX_SCALE_K0 | Int<1>{} | column | Int<1>{} | MX_SCALE_K0 * column | Int<0>{} | MX_SCALE_K0 |
+| ScaleBDN | Int<1>{} | row | Int<1>{} | column | Int<0>{} | Int<1>{} | Int<0>{} | row |
