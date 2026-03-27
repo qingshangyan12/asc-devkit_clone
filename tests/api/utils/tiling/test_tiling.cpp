@@ -838,3 +838,23 @@ TEST_F(TestTiling, TestPlatformAscendCInitWithAclRt)
         EXPECT_NE(nullptr, ret);
     }
 }
+
+TEST_F(TestTiling, TestPlatformAscendCInitWithRuntimePlatformInfos)
+{
+    const char* customSocVersion = "Ascend910B1";
+    
+    MOCKER_CPP(&fe::PlatformInfoManager::InitRuntimePlatformInfos,
+        uint32_t(fe::PlatformInfoManager::*)(const std::string &))
+        .stubs()
+        .will(returnValue(0));
+    
+    MOCKER_CPP(&fe::PlatformInfoManager::GetRuntimePlatformInfosByDevice,
+        uint32_t(fe::PlatformInfoManager::*)(int32_t, fe::PlatFormInfos&))
+        .stubs()
+        .will(returnValue(0));
+    
+    auto ret = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit(customSocVersion);
+    EXPECT_NE(nullptr, ret);
+    
+    GlobalMockObject::verify();
+}
