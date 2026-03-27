@@ -24,7 +24,7 @@
 #if (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_common_impl.h"
 #else
-#include "dav_c310/kernel_operator_common_impl.h"
+#include "dav_3510/kernel_operator_common_impl.h"
 #endif
 
 #ifdef ASCENDC_CPU_DEBUG
@@ -32,6 +32,7 @@
 #endif
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#include "simt_api/device_types.h"
 #include "simt_api/cpp/kernel_simt_common_intf.h"
 #include "simt_api/cpp/kernel_simt_atomic_intf.h"
 #include "simt_api/cpp/kernel_simt_cast_intf.h"

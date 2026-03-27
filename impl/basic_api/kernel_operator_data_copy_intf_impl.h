@@ -118,7 +118,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, 
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, intriParams));
 
-    // dav_c310 DataCopyGM2L1ND2NZ support small C0 mode and antiquant mode
+    // dav_3510 DataCopyGM2L1ND2NZ support small C0 mode and antiquant mode
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     if constexpr (enableSmallC0) {
         DataCopyGM2L1ND2NZ<T, enableSmallC0>(dst, src, intriParams);
