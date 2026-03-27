@@ -33,7 +33,7 @@ struct MAkeNzFrameLayout {
     }
 };
 
-template <typename T = half, int32_t C0 =32>
+template <typename T = half, int32_t C0 = 32>
 struct LayoutTrait {
     using type = T;
     static constexpr int32_t C0_size = C0;;
