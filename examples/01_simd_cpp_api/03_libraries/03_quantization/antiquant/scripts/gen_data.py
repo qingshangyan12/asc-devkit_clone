@@ -26,21 +26,30 @@ def gen_golden_data_simple():
     src = np.random.uniform(-10, 10, [8, 128]).astype(np.int8)
     offset = np.random.uniform(-10, 10, [1, 128]).astype(np.float16)
     scale = np.random.uniform(-10, 10, [1, 128]).astype(np.float16)
-    src_fp32 = src.astype(np.float16)
-    dst = np.zeros([8, 128]).astype(np.float16)
-
+    # 2201的数据
+    dst = np.zeros([8, 128]).astype(np.float32)
     for i in range(0, K):
         for j in range(0, N):
-            dst[i][j] = scale[i // groupSize][j] * (src_fp32[i][j] + offset[i // groupSize][j])
-
+            dst[i][j] = scale[i // groupSize][j] * (src[i][j] + offset[i // groupSize][j])
     dst = dst.astype(np.float16)
-
+    src_fp32 = src.astype(np.float32)
+    offset_fp32 = offset.astype(np.float32)
+    scale_fp32 = scale.astype(np.float32)
+    # 3510的数据
+    dst1 = np.zeros([8, 128]).astype(np.float32)
+    for i in range(0, K):
+        for j in range(0, N):
+            dst1[i][j] = scale_fp32[i // groupSize][j] * (
+                src_fp32[i][j] + offset_fp32[i // groupSize][j]
+            )
+    dst1 = dst1.astype(np.float16)
     os.makedirs("input", exist_ok=True)
     src.tofile("./input/input_src.bin")
     offset.tofile("./input/input_offset.bin")
     scale.tofile("./input/input_scale.bin")
     os.makedirs("output", exist_ok=True)
     dst.tofile("./output/golden.bin")
+    dst1.tofile("./output/golden1.bin")
 
 if __name__ == "__main__":
     gen_golden_data_simple()
