@@ -61,6 +61,10 @@ public:
         }
 
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            #ifdef __XBL_PRINT__
+            AscendC::printf("[Patch] copy_gm_to_cbuf_align_v2 %p,%p,%d,%d,%d,%d,%d,%d,%d,%d,%d", dst, src, 0, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, true,
+                cacheMode, srcStride, dstStride);
+            #endif
             copy_gm_to_cbuf_align_v2(dst, src, 0, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, true,
                 cacheMode, srcStride, dstStride);
         }
@@ -95,6 +99,9 @@ public:
             mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
             mte2NzPara |= static_cast<uint64_t>(ndNum);            // MTE2_NZ_PARA[15:0]
             SetMTE2NzPara(mte2NzPara);   // CCE: store parameters for ND2NZ DMA instructions
+            #ifdef __XBL_PRINT__
+            AscendC::printf("[Patch] copy_gm_to_cbuf_multi_nd2nz %d,%d,%d,%d,%p,%p,%d,%d,%d,%d,%d,%d,%d", loop4DstStride, loop3DstStride, loop2DstStride, ndNum, dst, src, 0, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, enableSmallC0);
+            #endif
             copy_gm_to_cbuf_multi_nd2nz(dst, src, 0, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, enableSmallC0);
         }
     }
@@ -129,6 +136,9 @@ public:
             mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
             mte2NzPara |= static_cast<uint64_t>(dnNum);            // MTE2_NZ_PARA[15:0]
             SetMTE2NzPara(mte2NzPara);   // CCE: store parameters for DN2NZ DMA instructions
+            #ifdef __XBL_PRINT__
+            AscendC::printf("[Patch] copy_gm_to_cbuf_multi_dn2nz %d,%d,%d,%d,%p,%p,%d,%d,%d,%d,%d,%d,%d", loop4DstStride, loop3DstStride, loop2DstStride, dnNum, dst, src, 0, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, enableSmallC0);
+            #endif
             copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, enableSmallC0);
         }
     }
@@ -151,6 +161,9 @@ private:
         }
 
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            #ifdef __XBL_PRINT__
+            AscendC::printf("[Patch] copy_cbuf_to_bt %p,%p,%d,%d,%d,%d,%d", dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
+            #endif
             copy_cbuf_to_bt(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
         }
     }
@@ -173,6 +186,9 @@ private:
         }
 
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            #ifdef __XBL_PRINT__
+            AscendC::printf("[Patch] copy_cbuf_to_fbuf %p,%p,%d,%d,%d,%d", (__fbuf__ void*)dst, (__cbuf__ void*)src, blockCount, blockLen, srcStride, dstStride);
+            #endif
             copy_cbuf_to_fbuf((__fbuf__ void*)dst, (__cbuf__ void*)src, blockCount, blockLen, srcStride, dstStride);
         }
     }
