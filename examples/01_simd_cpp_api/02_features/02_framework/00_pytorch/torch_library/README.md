@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例展示了如何使用PyTorch的torch.library机制注册自定义算子，并通过`<<<>>>`内核调用符调用核函数，以简单的Add算子为例，实现两个向量的逐元素相加。
+本样例展示了如何使用PyTorch的torch.library机制注册自定义算子，并通过`<<<>>>`内核调用符调用核函数，以简单的Add算子为例，实现两个向量的逐元素相加。并展示如何在自定义算子中上报算子基础信息，支持在torch采集的profiling数据中展示。
 
 ## 支持的产品
 
@@ -14,9 +14,10 @@
 
 ```
 ├── torch_library
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── add_custom_test.py      // PyTorch调用脚本
-│   └── add_custom.asc          // Ascend C算子实现 & 自torch.library注册
+│   ├── CMakeLists.txt           // 编译工程文件
+│   ├── add_custom_test.py       // PyTorch调用脚本
+│   ├── add_custom.asc           // Ascend C算子实现 & 自torch.library注册
+│   └── add_custom_profiling.asc // 开启Profiling采集和分析数据
 ```
 
 ## 算子描述
@@ -125,3 +126,52 @@
   Ran 1 test in **s
   OK
   ```
+
+## 自定义算子Profiling扩展
+
+- 上报Shape信息
+  
+  Profiling提供Shape信息上报的接口`aclprofStr2Id`、`aclprofRangePushEx`、`aclprofRangePop`，其中 `aclprofStr2Id` 用于将算子名、算子类型转化为hashId，`aclprofRangePushEx` 和 `aclprofRangePop` 分别在 `<<<>>>` 前后调用，上报Shape信息。
+
+  算子信息上报需要构造 `aclprofEventAttributes` 结构体，包含版本、大小、类型和tensor信息，其中 `messageType` 固定MESSAGE_TYPE_TENSOR_INFO类型为0，`aclprofTensorInfo` 为上报的tensor信息。`opNameId`、`opTypeId` 字段通过 `aclprofStr2Id` 接口转化算子名、算子类型获取，每包数据 `tensorNum` 不超过5，超过5请分成多包数据上报，`tensors` 为 `aclprofTensor` 结构，从算子的 `at::Tensor` 获取。
+
+- 样例执行
+
+  在本样例根目录下修改`add_custom_test.py`，替换为加载`libascendc_ops_profiling.so`，执行如下步骤，运行该样例。
+
+  ```bash
+  mkdir -p build; cd build
+  cmake ..; make -j
+  msprof --application="python3 ../add_custom_test.py" --output="../result"
+  ```
+
+- Shape信息展示
+
+  打开`PROF_000001_*/mindstudio_profiler_output/op_summary_*.csv`，查看Shape信息，样例中Shape信息写入如下字段。
+    
+  <table>
+    <tr>
+      <td align="center">...</td>
+      <td align="center">Op Name</td>
+      <td align="center">Op Type</td>
+      <td align="center">Input Shapes</td>
+      <td align="center">Input Data Types</td>
+      <td align="center">Input Formats</td>
+      <td align="center">Output Shapes</td>
+      <td align="center">Output Data Types</td>
+      <td align="center">Output Formats</td>
+      <td align="center">...</td>
+    </tr>
+    <tr>
+      <td align="center">...</td>
+      <td align="center">_Z10add_customPhS_S_j</td>
+      <td align="center">_Z10add_customPhS_S_j</td>
+      <td align="center">"8,2048;8:2048"</td>
+      <td align="center">FLOAT16;FLOAT16</td>
+      <td align="center">ND;ND</td>
+      <td align="center">"8,2048"</td>
+      <td align="center">FLOAT16</td>
+      <td align="center">ND</td>
+      <td align="center">...</td>
+    </tr>
+  </table>
