@@ -328,8 +328,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_cal_remquo(float &abs_x, f
 #define __INTERNAL_REMQUOF(x, y, quo)                                                                               \
     do {                                                                                                            \
         bool is_x_pos = (x) >= 0;                                                                                   \
-        float abs_x = abs(x);                                                                                       \
-        float abs_y = abs(y);                                                                                       \
+        float abs_x = fabsf(x);                                                                                       \
+        float abs_y = fabsf(y);                                                                                       \
         bool is_x_inf = abs_x > ASCRT_INF_F || isnan(x);                                                            \
         bool is_y_inf = abs_y > ASCRT_INF_F || isnan(y);                                                            \
         *(quo) = 0;                                                                                                 \
@@ -415,8 +415,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_set_res_mod_neg(float mod
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
 {
     bool is_x_pos = x > 0;
-    float abs_x = abs(x);
-    float abs_y = abs(y);
+    float abs_x = fabsf(x);
+    float abs_y = fabsf(y);
     bool is_x_nan = isnan(x);
     bool is_y_nan = isnan(y);
 
