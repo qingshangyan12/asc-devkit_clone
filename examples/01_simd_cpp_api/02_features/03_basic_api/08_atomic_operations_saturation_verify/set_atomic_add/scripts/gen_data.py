@@ -11,24 +11,63 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-
 import os
 import numpy as np
 
-def gen_golden_data_simple():
-    input_type = np.float32
-    output_type = np.float32
-    use_core_num = 3
-    block_length = 256
-    input_shape = [block_length]
-    output_shape = input_shape
-    input_x = np.ones(input_shape).astype(input_type)
-    golden = use_core_num * input_x
+DTYPE_MAP = {
+    "int8_t": (np.int8, 1),
+    "int16_t": (np.int16, 2),
+    "half": (np.float16, 2),
+    "bfloat16_t": (np.float16, 2),
+    "int32_t": (np.int32, 4),
+    "float": (np.float32, 4)
+}
+
+NUM_CORES = 3
+BLOCK_LENGTH = 256
+
+def gen_data_for_dtype(dtype_name):
+    np_type, _ = DTYPE_MAP[dtype_name]
+    input_shape = [BLOCK_LENGTH]
+    
+    if dtype_name == "int8_t":
+        input_data = np.ones(input_shape, dtype=np.int8)
+    elif dtype_name == "int16_t":
+        input_data = np.ones(input_shape, dtype=np.int16)
+    elif dtype_name == "half":
+        input_data = np.ones(input_shape, dtype=np.float16)
+    elif dtype_name == "bfloat16_t":
+        input_data = np.ones(input_shape, dtype=np.float16)
+    elif dtype_name == "int32_t":
+        input_data = np.ones(input_shape, dtype=np.int32)
+    elif dtype_name == "float":
+        input_data = np.ones(input_shape, dtype=np.float32)
+    else:
+        raise ValueError(f"Unsupported dtype: {dtype_name}")
+    
+    golden = NUM_CORES * input_data
+    
+    return input_data, golden
+
+
+def gen_all_data():
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
-    input_x.tofile("./input/input_x.bin")
-    golden.tofile("./output/golden.bin")
+    
+    for dtype_name in DTYPE_MAP.keys():
+        print(f"Generating data for {dtype_name}...")
+        input_data, golden = gen_data_for_dtype(dtype_name)
+        
+        input_path = f"./input/input_x_{dtype_name}.bin"
+        golden_path = f"./output/golden_{dtype_name}.bin"
+        
+        input_data.tofile(input_path)
+        golden.tofile(golden_path)
+        
+        print(f"  Input: {input_path} ({input_data.nbytes} bytes)")
+        print(f"  Golden: {golden_path} ({golden.nbytes} bytes)")
 
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    gen_all_data()
+    print("All data generated successfully!")
