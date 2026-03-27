@@ -6,7 +6,7 @@
 | :------------ | :------------: |
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √ |
 | <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √ |
-| Ascend 950PR/Ascend 950DT | √    |
+|<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
 
 ## 功能说明
 
@@ -18,7 +18,7 @@
 
 - 当数据类型位宽为32位时，每个DataBlock包含8个数，指令内部会循环8次，每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成2个新的DataBlock放入目的地址中。如下图所示：![](../figures/asc_transto5hd_b32.png "图2 输入数据类型位宽为32位时的转换规则")
 
--当数据类型位宽为8位时，每个DataBlock包含32个数，指令内部会循环16次，每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成半个DataBlock放入目的地址中，读取和存放是在DataBlock的高半部还是低半部由参数srcHighHalf和dstHighHalf决定。如下图所示：![](../figures/asc_transto5hd_b8.png "图3 输入数据类型位宽为8位时的转换规则")
+- 当数据类型位宽为8位时，每个DataBlock包含32个数，指令内部会循环16次，每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成半个DataBlock放入目的地址中，读取和存放是在DataBlock的高半部还是低半部由参数srcHighHalf和dstHighHalf决定。如下图所示：![](../figures/asc_transto5hd_b8.png "图3 输入数据类型位宽为8位时的转换规则")
 
 基于以上的转换规则，使用该接口进行NC1HWC0格式转换或者矩阵转置。NC1HWC0格式转换相对复杂，这里给出其具体的转换方法：
 
@@ -26,6 +26,7 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 
 ## 函数原型
 
+- 常规计算
 ```cpp
 __aicore__ inline void asc_transto5hd_b32(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride)
@@ -33,22 +34,22 @@ __aicore__ inline void asc_transto5hd_b16(ub_addr8_t dst, ub_addr8_t src, uint8_
     uint16_t dst_stride, uint16_t src_stride)
 __aicore__ inline void asc_transto5hd_b8(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
-<cann-filter npu_type = "950">
+```
+
+- 同步计算
+```cpp
 __aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride)
 __aicore__ inline void asc_transto5hd_b16_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride)
 __aicore__ inline void asc_transto5hd_b8_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
-</cann-filter>
 ```
 
 ## 参数说明
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |
-|addr|输出|地址寄存器。|
-|src_array|输入|操作数地址序列。|
 |dst|输出|目的地址寄存器。|
 |src|输入|源地址寄存器。|
 |repeat|输入|重复迭代次数， repeat∈[0,255]。<br>注意事项：<br>&bull; 当repeat为1时，目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置加上dst_stride/src_stride。如果要让目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置，需要将dst_stride/src_stride置为0。<br>&bull;当repeat大于1时，第一次repeat中目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置，第二次会加上dst_stride/src_stride。以此类推。|
