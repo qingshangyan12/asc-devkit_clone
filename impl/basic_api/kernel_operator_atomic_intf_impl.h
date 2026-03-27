@@ -25,7 +25,7 @@
 #if (__NPU_ARCH__ == 5102)
     #include "dav_m510/kernel_operator_atomic_impl.h"
 #else 
-    #include "dav_c310/kernel_operator_atomic_impl.h"
+    #include "dav_3510/kernel_operator_atomic_impl.h"
 #endif
 
 namespace AscendC {
