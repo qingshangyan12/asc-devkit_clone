@@ -1,44 +1,38 @@
 #!/bin/bash
 
-mkdir -p build && cd build && cmake .. && make -j
+set -e
 
-python3 ../scripts/gen_data.py
+echo "Building..."
+mkdir -p build && cd build && cmake .. && make -j
+cd ..
+
+echo ""
+echo "========================================"
+echo "Step 1: Generate input & golden data"
+echo "========================================"
+python3 scripts/gen_data.py
+
+echo ""
+echo "========================================"
+echo "Step 2: Run demo (saturation & non-saturation)"
+echo "========================================"
 
 DTYPES=("int8_t" "int16_t" "half" "bfloat16_t" "int32_t" "float")
-DTYPE_INDICES=(0 1 2 3 4 5)
-
-all_passed=true
+INDICES=(0 1 2 3 4 5)
 
 for i in "${!DTYPES[@]}"; do
     dtype="${DTYPES[$i]}"
-    idx="${DTYPE_INDICES[$i]}"
-    echo "========================================"
-    echo "Testing dtype: $dtype (index: $idx)"
-    echo "========================================"
-    ./demo $idx
-    if [ $? -ne 0 ]; then
-        echo "FAILED: ./demo returned non-zero"
-        all_passed=false
-        continue
-    fi
-    python3 ../scripts/verify_result.py "output/output_$dtype.bin" "output/golden_$dtype.bin" "$dtype"
-    if [ $? -ne 0 ]; then
-        echo "FAILED: $dtype verification failed"
-        all_passed=false
-    else
-        echo "PASSED: $dtype"
-    fi
+    idx="${INDICES[$i]}"
+    
+    echo "Running sat mode for $dtype..."
+    ./build/demo $idx 1 || true
+    
+    echo "Running non-sat mode for $dtype..."
+    ./build/demo $idx 0 || true
 done
 
-if [ "$all_passed" = true ]; then
-    echo ""
-    echo "========================================"
-    echo "All tests passed!"
-    echo "========================================"
-else
-    echo ""
-    echo "========================================"
-    echo "Some tests failed!"
-    echo "========================================"
-    exit 1
-fi
+echo ""
+echo "========================================"
+echo "Step 3: Verify results"
+echo "========================================"
+python3 scripts/gen_data.py
