@@ -46,6 +46,7 @@ private:
             return;
         }
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            AscendC::printf("[Patch] load_cbuf_to_ca %p,%p,%d,%d,%d,%d,%d,%d,%d\n", dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, transpose);
             load_cbuf_to_ca(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, transpose);
         }
     }
@@ -90,6 +91,7 @@ private:
             return;
         }
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            AscendC::printf("[Patch] load_cbuf_to_cb %p,%p,%d,%d,%d,%d,%d,%d,%d\n", dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, transpose);
             load_cbuf_to_cb(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, transpose);
         }
     }

@@ -47,6 +47,9 @@ private:
             return;
         }
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            AscendC::printf("[Patch] copy_matrix_cc_to_gm %p,%p,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", dst, src, 0, nSize, mSize, dstStride, srcStride, cacheMode, 0, unitFlag, static_cast<uint64_t>(quantPre),
+                reluEn, isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false, 
+                nz2dnEn);
             copy_matrix_cc_to_gm(dst, src, 0, nSize, mSize, dstStride, srcStride, cacheMode, 0, unitFlag, static_cast<uint64_t>(quantPre),
                 reluEn, isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false, 
                 nz2dnEn); 
@@ -73,6 +76,9 @@ private:
             return;
         }
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            AscendC::printf("[Patch] copy_matrix_cc_to_ub %p,%p,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", dst, src, 0, nSize, mSize, dstStride, srcStride, dualDstCtl, subBlockId, 0, unitFlag, static_cast<uint64_t>(quantPre),
+                reluEn, false, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false, 
+                nz2dnEn);
             copy_matrix_cc_to_ub(dst, src, 0, nSize, mSize, dstStride, srcStride, dualDstCtl, subBlockId, 0, unitFlag, static_cast<uint64_t>(quantPre),
                 reluEn, false, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false, 
                 nz2dnEn); 
