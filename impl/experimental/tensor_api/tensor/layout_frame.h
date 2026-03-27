@@ -26,9 +26,10 @@ struct MAkeNzFrameLayout {
     template <typename TraitType>
     __aicore__ inline static auto Make(size_t row, size_t column) {
         static constexpr int32_t c0Ele = TraitType::C0_size;
-        return LayoutConstructor(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED), Std::Int<c0Ele>{},
-                                 Std::ceil_division(column, c0Ele), Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{},
-                                 Std::Int<1>{}, c0Ele * Std::ceil_align(row, FRACTAL_FIXED));
+        auto shape = GetTuple(t0, t1, t2, t3);
+        auto stride = GetTuple(ts...);
+        using LayoutT = Layout<decltype(shape), decltype(stride), Pattern>;
+        return LayoutT(shape, stride);
     }
 };
 
@@ -50,7 +51,7 @@ struct FindLayoutFromPattern<Pattern, Std::tuple<Std::tuple<Pattern, FrameLayout
 template <typename Pattern, typename NotMatchTuple, typename... Rest>
 struct FindLayoutFromPattern<Pattern, Std::tuple<NotMatchTuple, Rest...>> {};
 
-template <typename LayoutPattern, typename TraitType, typename Args...>
+template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
     using GetLayoutMakeFun = typename FindLayoutFromPattern<LayoutPattern>::type;
     return GetLayoutMakeFun::Make<TraitType>(args...);
