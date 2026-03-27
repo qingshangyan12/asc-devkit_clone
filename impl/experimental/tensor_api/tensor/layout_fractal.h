@@ -29,6 +29,7 @@
 
 namespace AscendC {
 namespace Te {
+
 template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeNzLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
