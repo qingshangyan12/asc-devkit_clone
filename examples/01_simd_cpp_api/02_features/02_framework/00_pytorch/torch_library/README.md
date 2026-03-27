@@ -131,9 +131,9 @@
 
 - 上报Shape信息
   
-  Profiling提供`Shape`信息上报的接口`aclprofStr2Id`、`aclprofRangePushEx`、`aclprofRangePop`，其中`aclprofStr2Id`用于将算子名、算子类型转化为`hashId`，`aclprofRangePushEx`和`aclprofRangePop`分别在`<<<>>>`前后调用，上报`Shape`信息。
+  Profiling提供Shape信息上报的接口`aclprofStr2Id`、`aclprofRangePushEx`、`aclprofRangePop`，其中 `aclprofStr2Id` 用于将算子名、算子类型转化为hashId，`aclprofRangePushEx` 和 `aclprofRangePop` 分别在 `<<<>>>` 前后调用，上报Shape信息。
 
-  算子信息上报需要构造`aclprofEventAttributes`结构体，包含版本、大小、类型和tensor信息，其中`messageType`固定`MESSAGE_TYPE_TENSOR_INFO`为0，`aclprofTensorInfo`包含`opNameId`、`opTypeId`、`resv`、`tensorNum`、`kernelType`、`blockNums`、`stream`、`tensors`字段。`opNameId`、`opTypeId`字段通过`aclprofStr2Id`接口转化算子名、算子类型获取，每包数据`tensorNum`不超过5，超过5请分成多包数据上报，`tensors`为`aclprofTensor`结构，从算子的`at::Tensor`获取。
+  算子信息上报需要构造 `aclprofEventAttributes` 结构体，包含版本、大小、类型和tensor信息，其中 `messageType` 固定MESSAGE_TYPE_TENSOR_INFO类型为0，`aclprofTensorInfo` 为上报的tensor信息。`opNameId`、`opTypeId` 字段通过 `aclprofStr2Id` 接口转化算子名、算子类型获取，每包数据 `tensorNum` 不超过5，超过5请分成多包数据上报，`tensors` 为 `aclprofTensor` 结构，从算子的 `at::Tensor` 获取。
 
 - 样例执行
 
