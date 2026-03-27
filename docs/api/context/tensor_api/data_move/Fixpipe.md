@@ -5,14 +5,6 @@
 | 产品                                        | 是否支持 |
 | ------------------------------------------- | :------: |
 | Ascend 950PR/Ascend 950DT                   |    √     |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 |    x     |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 |    x     |
-| Atlas 200I/500 A2 推理产品                  |    x     |
-| Atlas 推理系列产品AI Core                   |    x     |
-| Atlas 推理系列产品Vector Core               |    x     |
-| Atlas 训练系列产品                          |    x     |
-| Atlas 200/300/500 推理产品                  |    x     |
-
 
 ## 功能说明
 
@@ -27,24 +19,21 @@ Fixpipe能够在矩阵计算完成后对计算结果进行处理，并通过PIPE
 ## 函数原型
 
 ```cpp
-// 通路L0C->GM/UB, 不使能量化功能
+// 通路L0C->GM/UB, 不使能量化的整块搬运功能
 template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U>
-__aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplate<T, U>, void>::type Fixpipe(const T& dst, const U& src, const FixpipeParams& params = FixpipeParams{})
+__aicore__ inline void Fixpipe(const T& dst, const U& src, const FixpipeParams& params = FixpipeParams{})
 
-// 通路L0C->GM/UB, 使能量化功能
+// 通路L0C->GM/UB, 使能量化功能的整块搬运功能
 template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S>
-__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplate<T, U, S>, void>::type 
-Fixpipe(const T& dst, const U& src, const S& quant, const FixpipeParams& params = FixpipeParams{});
+__aicore__ inline void Fixpipe(const T& dst, const U& src, const S& quant, const FixpipeParams& params = FixpipeParams{});
 
-// 通路L0C->GM/UB, 不使能量化功能，将src搬运到dst指定坐标coord右下角区域
+// 通路L0C->GM/UB, 不使能量化功能的带坐标偏移的搬运功能
 template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename Coord>
-__aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplateWithCoord<T, U, Coord>, void>::type
-Fixpipe(const T& dst, const U& src, const Coord& coord, const FixpipeParams& params = FixpipeParams{});
+__aicore__ inline void Fixpipe(const T& dst, const U& src, const Coord& coord, const FixpipeParams& params = FixpipeParams{});
 
-// 通路L0C->GM/UB, 使能量化功能，将src搬运到dst指定坐标coord右下角区域
+// 通路L0C->GM/UB, 使能量化功能的带坐标偏移的搬运功能
 template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S, typename Coord>
-__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplateWithCoord<T, U, S, Coord>, void>::type
-Fixpipe(const T& dst, const U& src, const S& quant, const Coord& coord, const FixpipeParams& params = FixpipeParams{});
+__aicore__ inline void Fixpipe(const T& dst, const U& src, const S& quant, const Coord& coord, const FixpipeParams& params = FixpipeParams{});
 ```
 
 ## 参数说明
@@ -53,11 +42,11 @@ Fixpipe(const T& dst, const U& src, const S& quant, const Coord& coord, const Fi
 
 | 参数名            | 描述                                                         |
 | ----------------- | ------------------------------------------------------------ |
-| T                 | 目的操作数的数据类型，通过MakeTensor构造的[GlobalTensor/LocalTensor类型](../../tensor/Tensor.md)，存储位置支持GM和UB，数据格式支持ND、DN和NZ。 |
+| T                 | 目的操作数的数据类型，通过MakeTensor构造的[GlobalTensor/LocalTensor类型](../struct/tensor/Tensor.md)，存储位置支持GM和UB，数据格式支持ND、DN和NZ。 |
 | U                 | 源操作数的数据类型，通过MakeTensor构造的LocalTensor类型，存储位置仅支持L0C，数据格式仅支持NZ。  |
-| S                 | 量化参数的数据类型，可以是Scalar或者是通过MakeTensor构造的LocalTensor类型（存储位置仅支持L1，数据格式仅支持ND）。量化系数数据类型为uint64_t。 |
-| Coord             | 坐标偏移的数据类型，通过MakeCoord构造的[Coord类型](../../tensor/Coord.md)。 |
-| FixpipeTrait | Fixpipe相关配置参数，类型为FixpipeTrait：<br/>struct FixpipeTrait {<br/>    RoundMode roundMode = RoundMode::DEFAULT;<br/>    bool enableRelu = false;<br/>    bool enableChannelSplit = false;<br/>    DualDstMode dualDstCtl = DualDstMode::DUAL_DST_DISABLE;<br/>};<br/>constexpr FixpipeTrait DEFAULT_FIXPIPE_TRAIT; |
+| S                 | 量化参数的数据类型，可以是Scalar或者是通过MakeTensor构造的LocalTensor类型，存储位置仅支持L1，数据格式仅支持ND。量化系数数据类型为uint64_t。 |
+| Coord             | 坐标偏移的数据类型，通过MakeCoord构造的[Coord类型](../struct/coord/Coord.md)。 |
+| FixpipeTrait | Fixpipe相关配置参数，类型为FixpipeTrait：<br/>struct FixpipeTrait {<br/>    &emsp;RoundMode roundMode = RoundMode::DEFAULT;<br/>    &emsp;bool enableRelu = false;<br/>    &emsp;bool enableChannelSplit = false;<br/>    &emsp;DualDstMode dualDstCtl = DualDstMode::DUAL_DST_DISABLE;<br/>};<br/>默认值为constexpr FixpipeTrait DEFAULT_FIXPIPE_TRAIT; |
 
 
 **表 2**  FixpipeTrait参数说明
@@ -78,7 +67,7 @@ Fixpipe(const T& dst, const U& src, const S& quant, const Coord& coord, const Fi
 | src    | 输入      | 源操作数。   |
 | quant  | 输入      | 量化参数。     |
 | coord  | 输入      | 目的操作数上的偏移坐标。 |
-| params | 输入      | 运行时参数结构体，类型为FixpipeParams：<br/>struct FixpipeParams {<br/> uint8_t unitFlag = 0;<br/>} |
+| params | 输入      | 运行时参数结构体，类型为FixpipeParams：<br/>struct FixpipeParams {<br/> &emsp;uint8_t unitFlag = 0;<br/>}; |
 
 
 **表 4**  FixpipeParams参数说明
@@ -110,26 +99,19 @@ Fixpipe(const T& dst, const U& src, const S& quant, const Coord& coord, const Fi
 
 ## 返回值说明
 
-VerifyingFixpipeTemplate/VerifyingFixpipeQuantTemplate/VerifyingFixpipeTemplateWithCoord/VerifyingFixpipeQuantTemplateWithCoord表达式为模板参数校验表达式，执行效果如下：
-
--   校验表达式成立，表明输入参数符合Fixpipe接口入参数据类型约束，Fixpipe函数表达式返回值为void。
--   校验表达式不成立，表明输入参数不符合Fixpipe接口入参数据类型约束。上述四个模板参数表达式均不通过时，Fixpipe函数声明失效，继而会导致编译错误。
-
-## 理论性能
-
-当前版本暂不支持理论性能计算。
+void
 
 ## 约束说明
 
--   地址重叠约束：NA。
+-   地址重叠约束：源操作数与目的操作数位于不同物理位置，不存在地址重叠场景。
 -   地址对齐约束：源操作数起始地址要求64字节对齐。目的操作数为NZ格式时，其地址要求满足32字节对齐；目的操作数为ND/DN格式且输出到UB上时，其地址和长度要求32字节对齐。
 -   参数组合约束：目的操作数位于GM上，其数据格式为NZ，且其数据类型和源操作数都为float时才能使能通道拆分，若不开启通道拆分，需要保证目的操作数的分形与L0C一致。
 -   环境影响约束：接口调用不影响全局状态，无需复原。
 -   特殊数据类型约束：使用float->hifloat8_t特殊类型时，需注意FixpipeTrait量化舍入参数roundMode配置。
 -   性能约束：无。
--   异常和边界值处理：输入为inf或nan时，输出量化结果为inf或nan；输入为0时，输出为0；输入超过MAX/MIN范围时，输出为MAX/MIN。
+-   异常和边界值处理：float量化成float场景，精度无法达到双万分之一，可以达到双千分之一。
 -   Tensor Layout相关约束：
-    -   Shape、Stride只支持四维，针对不同的物理存储位置，四个维度的配置均有不同的约束，部分维度为固定值，不可配置。详见[层次化表达法](../../tensor/Layout和层次化表述法.md)。
+    -   Shape、Stride只支持四维，针对不同的物理存储位置，四个维度的配置均有不同的约束，部分维度为固定值，不可配置。详见[层次化表达法](../Layout和层次化表述法.md)。
     -   Shape、Stride具体维度的数据，仅支持基础整数类型和Std::Int类型。
     -   Fixpipe Vector量化场景要求quant参数数据格式是ND，存储位置是L1，地址要求32字节对齐。
 
@@ -203,7 +185,7 @@ Copy(CopyAtom<CopyTraits<CopyGM2L1, DataCopyTraitDefault>>{}, quantTensor, globa
 Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{}, globalC, l0CTensor, quantTensor, MakeCoord(row, col), AscendC::Te::FixpipeParams{3});
 
 // 用户自定义FixpipeTrait参数
-constexpr FixpipeTrait fixpipeTrait = {RoundMode::DEFAULT, true, false, SINGLE_DST_MODE};
+constexpr FixpipeTrait fixpipeTrait = {RoundMode::DEFAULT, true, false, DUAL_DST_DISABLE};
 
 struct FixpipeTraitCustom {
     using TraitType = FixpipeTrait;
@@ -213,4 +195,4 @@ struct FixpipeTraitCustom {
 Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitCustom>>{}, globalC, l0CTensor);
 ...
 ```
-完整样例请参考[TensorAPI样例代码](../../../../../../examples/02_features/05_tensor_api)。
+完整样例请参考[TensorAPI样例代码](../../../../../examples/02_features/05_tensor_api/04_tensor_api_matmul_relu_quant/tensor_api_matmul.asc)。
