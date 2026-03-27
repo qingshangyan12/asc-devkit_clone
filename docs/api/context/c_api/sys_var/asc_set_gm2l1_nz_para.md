@@ -29,7 +29,7 @@ __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config)
 
 |参数名|输入/输出| 描述        |
 | :------ | :---  |:----------|
-|config   |输入   | 待设置的寄存器值。 |
+| config | 输入 | 待设置的寄存器值。 |
 
 ## 返回值说明
 
@@ -45,6 +45,14 @@ PIPE_S
 
 ## 调用示例
 ```cpp
-uint64_t config;
+uint64_t nzDstStride = 16;
+uint64_t config = nzDstStride << 48; //[63:48]
+uint64_t nDstStride = 32;
+config |= nDstStride << 32; //[47:32]
+uint64_t C0Stride = 32;
+config |= C0Stride << 16; //[31:16]
+uint64_t ndNum = 64;
+config |= ndNum; //[15:0]
+
 asc_set_gm2l1_nz_para(config);
 ```
