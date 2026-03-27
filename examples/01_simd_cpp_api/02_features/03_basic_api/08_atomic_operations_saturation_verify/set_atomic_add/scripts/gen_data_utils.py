@@ -70,7 +70,7 @@ def get_dtype_limits(data_type):
 
 def construct_special_values(data_type):
     limits = get_dtype_limits(data_type)
-    specials = [limits['min'], limits['max'], limits['pos_zero'], limits['neg_zero']]
+    specials = [limits['min'], limits['max'], limits['pos_zero']]
     if np.issubdtype(data_type, np.floating):
         specials.extend([limits['nan'], limits['pos_inf'], limits['neg_inf']])
     return specials
@@ -93,7 +93,7 @@ def save_bin(data, path):
 
 
 def get_special_names(data_type):
-    special_names = ['min', 'max', '+0', '-0']
+    special_names = ['min', 'max', 'zero']
     if np.issubdtype(data_type, np.floating):
         special_names.extend(['NaN', '+INF', '-INF'])
     return special_names

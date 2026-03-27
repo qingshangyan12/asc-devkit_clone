@@ -30,6 +30,18 @@ NUM_CORES = 3
 BLOCK_LENGTH = 256
 ERROR_TOL = 1e-4
 
+RESET = "\033[0m"
+BOLD = "\033[1m"
+GREEN = "\033[92m"
+RED = "\033[91m"
+YELLOW = "\033[93m"
+BLUE = "\033[94m"
+CYAN = "\033[96m"
+
+
+def color_text(text, color):
+    return f"{color}{text}{RESET}"
+
 
 def format_value(val, np_type):
     if np.issubdtype(np_type, np.floating):
@@ -58,7 +70,9 @@ def count_diff(golden, output, dtype_name):
 
 
 def verify_all():
-    print("\nVerifying output vs golden...")
+    print(f"\n{BLUE}{'='*70}{RESET}")
+    print(f"{BLUE}  Verify Output vs Golden{RESET}")
+    print(f"{BLUE}{'='*70}{RESET}")
     
     all_pass = True
     
@@ -96,11 +110,10 @@ def verify_all():
         
         type_name = np.dtype(data_type).name
         
-        print(f"\n{'='*115}")
-        print(f" DataType: {type_name:<10} | BLOCK_LENGTH: {BLOCK_LENGTH} | NUM_CORES: {NUM_CORES}")
-        print(f"{'='*115}")
-        print(f" {'name':<8} | {'input':<14} | {'golden(sat)':<16} | {'golden(non-sat)':<16} | {'output(sat)':<16} | {'output(non-sat)':<16}")
-        print(f"{'-'*115}")
+        print(f"\n{CYAN}[{type_name}]{RESET} BLOCK={BLOCK_LENGTH} CORES={NUM_CORES}")
+        print(f"{'-'*70}")
+        print(f" {'name':<8} | {'input':<14} | {'golden(sat)':<14} | {'golden(non-sat)':<14} | {'output(sat)':<14} | {'output(non-sat)':<14}")
+        print(f"{'-'*70}")
         
         for i in range(num_special):
             inp_val = special_vals[i]
@@ -116,32 +129,39 @@ def verify_all():
             osat_str = format_value(output_sat_val, data_type) if has_sat else "-"
             onsat_str = format_value(output_non_sat_val, data_type) if has_non_sat else "-"
             
-            print(f" {name:<8} | {inp_str:<14} | {gsat_str:<16} | {gnsat_str:<16} | {osat_str:<16} | {onsat_str:<16}")
+            print(f" {name:<8} | {inp_str:<14} | {gsat_str:<14} | {gnsat_str:<14} | {osat_str:<14} | {onsat_str:<14}")
         
-        print(f"{'-'*115}")
+        print(f"{'-'*70}")
         
         diff_sat = count_diff(golden_sat, output_sat, dtype_name) if has_sat else 0
         diff_non_sat = count_diff(golden_non_sat, output_non_sat, dtype_name) if has_non_sat else 0
         
-        print(f" Summary: total={BLOCK_LENGTH}, special={num_special}")
-        print(f"   Saturation:     mismatches={diff_sat}")
-        print(f"   Non-saturation: mismatches={diff_non_sat}")
-        print(f"{'='*115}")
+        sat_status = color_text("OK", GREEN) if diff_sat == 0 else color_text("FAIL", RED)
+        non_sat_status = color_text("OK", GREEN) if diff_non_sat == 0 else color_text("FAIL", RED)
+        
+        print(f" Total: {BLOCK_LENGTH}, Special: {num_special}")
+        print(f"   Saturation:     {sat_status} (mismatches={diff_sat})")
+        print(f"   Non-saturation: {non_sat_status} (mismatches={diff_non_sat})")
         
         result_sat = "PASS" if (diff_sat == 0 or not has_sat) else "FAIL"
         result_non_sat = "PASS" if (diff_non_sat == 0 or not has_non_sat) else "FAIL"
-        print(f" Result: sat={result_sat}, non-sat={result_non_sat}")
-        print(f"{'='*115}")
+        
+        if result_sat == "PASS" and result_non_sat == "PASS":
+            result_str = color_text(f"[PASS]", GREEN)
+        else:
+            result_str = color_text(f"[FAIL]", RED)
+        
+        print(f" Result: sat={result_sat}, non-sat={result_non_sat} {result_str}")
         
         if result_sat != "PASS" or result_non_sat != "PASS":
             all_pass = False
     
-    print("\n" + "="*50)
+    print(f"\n{BLUE}{'='*70}{RESET}")
     if all_pass:
-        print("All tests PASSED!")
+        print(f"  {color_text('All tests PASSED!', GREEN)}")
     else:
-        print("Some tests FAILED!")
-    print("="*50)
+        print(f"  {color_text('Some tests FAILED!', RED)}")
+    print(f"{BLUE}{'='*70}{RESET}\n")
     
     return all_pass
 
