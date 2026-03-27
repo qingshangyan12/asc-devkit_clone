@@ -115,7 +115,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
     通过[MakeRowMajorLayout](../constructor/MakeRowMajorLayout.md)接口可以快速的构造连续的RowMajor Layout格式，自行设置StrideRow1可以构造非连续的RowMajor Layout格式。
 
--   ColumnMajor Layout，一种使用层次化表述法描述的二维列优先排布格式。
+- ColumnMajor Layout，一种使用层次化表述法描述的二维列优先排布格式。
 
     ColumnMajor Layout格式的ShapeRow0和ShapeColumn0为固定值，即内层矩阵的Shape为1 \* 1，StrideRow0和StrideColumn0也为固定值0，内层矩阵只有一个元素，没有Stride的概念。StrideRow1为1，表示外层矩阵行方向上是连续的。
 
