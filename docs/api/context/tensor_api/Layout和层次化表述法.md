@@ -12,10 +12,10 @@ Shape用于表达Tensor形状，Stride则用于区分不同的排布：
 图中每个方格中的数字表示该位置元素在内存中按顺序排列时的下标。对于相同的矩阵位置，排布方式不同时，其在内存中的顺序可能是不同的，例如，矩阵坐标 \(1, 0\) 在行优先和列优先的情况下，对应元素在内存中的顺序分别是4和1。
 
 **图 1**  行优先排布 
-![](../../figure/行优先排布.png "行优先排布")
+![](/figure/行优先排布.png "行优先排布")
 
 **图 2**  列优先排布
-![](../../figure/列优先排布.png "列优先排布")
+![](/figure/列优先排布.png "列优先排布")
 
 ## 层次化表述法
 
@@ -27,7 +27,7 @@ Shape用于表达Tensor形状，Stride则用于区分不同的排布：
 -   Stride\(\(1, 4\), \(2, 12\)\)
 
 **图 3**  层次化表述法
-![](../../figure/层次化表述法.png "层次化表述法")
+![](/figure/层次化表述法.png "层次化表述法")
 
 图中展示了两层矩阵：内层矩阵为内部用灰色线包裹的矩阵，外层矩阵为将内层矩阵视为一个元素时黑色线包裹的矩阵。
 
@@ -65,7 +65,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     Stride = ((Std::Int<32 / sizeof(T)>{}, Std::Int<32 / sizeof(T) * 16>{}), (Std::Int<1>{}, 32 / sizeof(T) * row))
     ```
 
-    ![](../../figure/分形变换.png)
+    ![](/figure/分形变换.png)
 
     通过[MakeNZLayout](../constructor/MakeNZLayout.md)接口可以快速的构造连续的NZ Layout格式，自行设置StrideRow1和StrideColum1可以构造非连续的NZ Layout格式。
 
@@ -89,7 +89,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
         Stride = ((Std::Int<1>{}, 32 / sizeof(T) * column), (Std::Int<32 / sizeof(T)>{}, Std::Int<32 / sizeof(T) * 16>{}))
         ```
 
-        ![](../../figure/分形变换-0.png)
+        ![](/figure/分形变换-0.png)
 
         通过[MakeZNLayout](../constructor/MakeZNLayout.md)接口可以快速的构造连续的ZN Layout格式，自行设置StrideRow1和StrideColum1可以构造非连续的ZN Layout格式。
 
@@ -111,7 +111,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     Stride = ((Std::Int<0>{}, column),(Std::Int<0>{}, Std::Int<1>{}))
     ```
 
-    ![](../../figure/分形变换-1.png)
+    ![](/figure/分形变换-1.png)
 
     通过[MakeRowMajorLayout](../constructor/MakeRowMajorLayout.md)接口可以快速的构造连续的RowMajor Layout格式，自行设置StrideRow1可以构造非连续的RowMajor Layout格式。
 
@@ -133,7 +133,21 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     Stride = ((Std::Int<0>{}, Std::Int<1>{}),(Std::Int<0>{}, row))
     ```
 
-    ![](../../figure/分形变换-2.png)
+    ![](/figure/分形变换-2.png)
 
     通过[MakeColumnMajorLayout](../constructor/MakeColumnMajorLayout.md)接口可以快速的构造连续的ColumnMajor Layout格式，自行设置StrideColumn1值可以构造非连续的ColumnMajor Layout格式。
 
+## 数据结构表
+
+| LayoutFormat | 类型 | ShapeRow0 | ShapeRow1 | ShapeColumn0 | ShapeColumn1 | StrideRow0 | StrideRow1 | StrideColumn0 | StrideColumn1 |
+|-------------|------|-----------|-----------|--------------|--------------|------------|------------|---------------|---------------|
+| NZ | T | Int<16>{} | ceil_div(row, Int<16>{}) | Int<32/sizoef(T)> | ceil_div(column, c0Ele) | c0Ele | c0Ele * Int<16>{} | Int<1>{} | c0Ele * ceil_align(row, Int<16>{}) |
+| L0C | / | Int<16>{} | ceil_div(row, Int<16>{}) | c0Ele | ceil_div(column, c0Ele) | c0Ele | c0Ele * Int<16>{} | Int<1>{} | c0Ele * ceil_align(row, Int<16>{}) |
+| ZN | T | c0Ele | ceil_div(row, c0Ele) | Int<16>{} | ceil_div(column, Int<16>{}) | Int<1>{} | c0Ele * ceil_align(column, Int<16>{}) | c0Ele | c0Ele * Int<16>{} |
+| DN | T | Int<1>{} | row | Int<1>{} | column | Int<0>{} | Int<1>{} | Int<0>{} | row |
+| DN | fp8_e8m0_t | Int<1>{} | row | Int<2>{} | column / MX_SCALE_K0 | Int<0>{} | MX_SCALE_K0 | Int<1>{} | MX_SCALE_K0 * row |
+| ND | T | Int<1>{} | row | Int<1>{} | column | Int<0>{} | column | Int<0>{} | Int<1>{} |
+| ND | fp8_e8m0_t | Int<2>{} | row / MX_SCALE_K0 | Int<1>{} | column | Int<1>{} | MX_SCALE_K0 * column | Int<0>{} | MX_SCALE_K0 |
+| ZZ | T | Int<16>{} | ceil_div(row, Int<16>{}) | c0Ele | ceil_div(column, c0Ele) | c0Ele | Int<16>{} * ceil_align(column, c0Ele) | Int<1>{} | c0Ele * Int<16>{} |
+| ZZ | fp8_e8m0_t | Int<16>{} | ceil_div(row, Int<16>{}) | MX_SCALE_K0 | column / MX_SCALE_K0 | MX_SCALE_K0 | column * Int<16>{} | Int<1>{} | C0_SIZE<> |
+| NN | fp8_e8m0_t | MX_SCALE_K0 | row / MX_SCALE_K0 | Int<16>{} | ceil_div(column, Int<16>{}) | Int<1>{} | C0_SIZE<> | MX_SCALE_K0 | row * Int<16>{} |
