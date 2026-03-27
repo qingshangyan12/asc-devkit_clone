@@ -21,6 +21,10 @@
 #warning "impl/simt_api/device_atomic_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "simt_api/device_atomic_functions.h" and use public functions or variables defined in interface header files."
 #endif
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#include "__clang_cce_simt_atomic.h"
+#endif
+
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_add(__ubuf__ int32_t *address, int32_t val)
@@ -383,237 +387,239 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_xor(__gm__ uint64_t *a
 {
     return atomicXOr(address, val);
 }
-#else
 
+#else
+#ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_add(int32_t *address, int32_t val)
 {
-    return atomicAdd(address, val);
+    return __atomic_add(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_add(uint32_t *address, uint32_t val)
 {
-    return atomicAdd(address, val);
+    return __atomic_add(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_atomic_add(float *address, float val)
 {
-    return atomicAdd(address, val);
+    return __atomic_add(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_atomic_add(int64_t *address, int64_t val)
 {
-    return atomicAdd(address, val);
+    return __atomic_add(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_add(uint64_t *address, uint64_t val)
 {
-    return atomicAdd(address, val);
+    return __atomic_add(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_sub(int32_t *address, int32_t val)
 {
-    return atomicSub(address, val);
+    return __atomic_sub(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_sub(uint32_t *address, uint32_t val)
 {
-    return atomicSub(address, val);
+    return __atomic_sub(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_atomic_sub(float *address, float val)
 {
-    return atomicSub(address, val);
+    return __atomic_sub(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_atomic_sub(int64_t *address, int64_t val)
 {
-    return atomicSub(address, val);
+    return __atomic_sub(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_sub(uint64_t *address, uint64_t val)
 {
-    return atomicSub(address, val);
+    return __atomic_sub(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_exch(int32_t *address, int32_t val)
 {
-    return atomicExch(address, val);
+    return __atomic_exch(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_exch(uint32_t *address, uint32_t val)
 {
-    return atomicExch(address, val);
+    return __atomic_exch(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_atomic_exch(int64_t *address, int64_t val)
 {
-    return atomicExch(address, val);
+    return __atomic_exch(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_exch(uint64_t *address, uint64_t val)
 {
-    return atomicExch(address, val);
+    return __atomic_exch(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_atomic_exch(float *address, float val)
 {
-    return atomicExch(address, val);
+    return __atomic_exch(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_max(int32_t *address, int32_t val)
 {
-    return atomicMax(address, val);
+    return __atomic_max(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_max(uint32_t *address, uint32_t val)
 {
-    return atomicMax(address, val);
+    return __atomic_max(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_atomic_max(float *address, float val)
 {
-    return atomicMax(address, val);
+    return __atomic_max(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_atomic_max(int64_t *address, int64_t val)
 {
-    return atomicMax(address, val);
+    return __atomic_max(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_max(uint64_t *address, uint64_t val)
 {
-    return atomicMax(address, val);
+    return __atomic_max(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_min(int32_t *address, int32_t val)
 {
-    return atomicMin(address, val);
+    return __atomic_min(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_min(uint32_t *address, uint32_t val)
 {
-    return atomicMin(address, val);
+    return __atomic_min(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_atomic_min(float *address, float val)
 {
-    return atomicMin(address, val);
+    return __atomic_min(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_atomic_min(int64_t *address, int64_t val)
 {
-    return atomicMin(address, val);
+    return __atomic_min(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_min(uint64_t *address, uint64_t val)
 {
-    return atomicMin(address, val);
+    return __atomic_min(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_inc(uint32_t *address, uint32_t val)
 {
-    return atomicInc(address, val);
+    return __atomic_inc(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_inc(uint64_t *address, uint64_t val)
 {
-    return atomicInc(address, val);
+    return __atomic_inc(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_dec(uint32_t *address, uint32_t val)
 {
-    return atomicDec(address, val);
+    return __atomic_dec(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_dec(uint64_t *address, uint64_t val)
 {
-    return atomicDec(address, val);
+    return __atomic_dec(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_cas(int32_t *address, int32_t compare, int32_t val)
 {
-    return atomicCAS(address, compare, val);
+    return __atomic_cas(address, compare, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_cas(uint32_t *address, uint32_t compare, uint32_t val)
 {
-    return atomicCAS(address, compare, val);
+    return __atomic_cas(address, compare, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_atomic_cas(int64_t *address, int64_t compare, int64_t val)
 {
-    return atomicCAS(address, compare, val);
+    return __atomic_cas(address, compare, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_cas(uint64_t *address, uint64_t compare, uint64_t val)
 {
-    return atomicCAS(address, compare, val);
+    return __atomic_cas(address, compare, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_atomic_cas(float *address, float compare, float val)
 {
-    return atomicCAS(address, compare, val);
+    return __atomic_cas(address, compare, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_and(int32_t *address, int32_t val)
 {
-    return atomicAnd(address, val);
+    return __atomic_and(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_and(uint32_t *address, uint32_t val)
 {
-    return atomicAnd(address, val);
+    return __atomic_and(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_atomic_and(int64_t *address, int64_t val)
 {
-    return atomicAnd(address, val);
+    return __atomic_and(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_and(uint64_t *address, uint64_t val)
 {
-    return atomicAnd(address, val);
+    return __atomic_and(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_or(int32_t *address, int32_t val)
 {
-    return atomicOr(address, val);
+    return __atomic_or(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_or(uint32_t *address, uint32_t val)
 {
-    return atomicOr(address, val);
+    return __atomic_or(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_atomic_or(int64_t *address, int64_t val)
 {
-    return atomicOr(address, val);
+    return __atomic_or(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_or(uint64_t *address, uint64_t val)
 {
-    return atomicOr(address, val);
+    return __atomic_or(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_xor(int32_t *address, int32_t val)
 {
-    return atomicXOr(address, val);
+    return __atomic_xor(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_atomic_xor(uint32_t *address, uint32_t val)
 {
-    return atomicXOr(address, val);
+    return __atomic_xor(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_atomic_xor(int64_t *address, int64_t val)
 {
-    return atomicXOr(address, val);
+    return __atomic_xor(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_xor(uint64_t *address, uint64_t val)
 {
-    return atomicXOr(address, val);
+    return __atomic_xor(address, val);
 }
+#endif
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_ATOMIC_FUNCTIONS_IMPL__)
