@@ -95,10 +95,7 @@ DataCopyGM2L1提供数据搬运功能，该接口支持Global Memory到L1 Buffer
 
 ## 返回值说明
 
-VerifyingDataCopyTemplate表达式为模板参数T和U的校验表达式，VerifyingDataCopyTemplateWithCoord表达式为模板参数T、U和Coord的校验表达式，执行效果如下：
-
-- 校验表达式成立，表明输入参数符合DataCopy接口入参数据类型约束，DataCopy函数表达式返回值为void。
-- 校验表达式不成立，表明输入参数不符合DataCopy接口入参数据类型约束时，DataCopy函数声明失效，继而会导致编译错误。
+无
 
 ## 约束说明
 
