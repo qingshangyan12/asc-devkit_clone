@@ -2,7 +2,9 @@
 
 ## 概述
 
-本样例基于Copy实现数据搬运，适用于VECIN，VECOUT之间的数据搬运，支持mask操作和DataBlock间隔操作。
+本样例在数据搬运场景下，基于Copy API实现VECIN和VECOUT存储单元之间的数据搬运，支持mask操作和DataBlock间隔操作。Copy API是Ascend C提供的矢量计算基础接口，用于在LocalTensor之间进行数据拷贝，支持灵活的元素选择和间隔控制。
+
+数据搬运过程包括：Global Memory（GM）→VECIN队列、VECIN→VECOUT（使用Copy API）、VECOUT队列→Global Memory（GM）。其中Copy API通过mask参数控制参与计算的元素数量，通过DataBlock参数控制数据块的地址步长，实现对数据搬运过程的精细化管理。
 
 ## 支持的产品
 
@@ -26,10 +28,11 @@
 
 - 样例功能：  
 
-  本样例是展示使用Copy进行VECIN，VECOUT之间的数据搬运，支持mask操作和DataBlock间隔操作。Copy的具体参数介绍可以参考[Copy](../../../../../../docs/api/context/DataCopy.md)。
+  本样例是展示使用Copy进行VECIN，VECOUT之间的数据搬运，支持mask操作和DataBlock间隔操作。Copy的具体参数介绍可以参考[Copy API文档](../../../../../../docs/api/context/Copy.md)。
 - 样例规格：  
 
-  <table>
+  <table border="2" align="center">
+  <caption>表1：样例输入输出规格</caption>
   <tr><td rowspan="3" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[1,512]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
@@ -42,7 +45,10 @@
 
 - 样例实现：
   - kernel实现   
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Copy基础API接口将输入srcLocal的数值搬运到dstLocal中，再搬出到外部存储上。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Copy基础API接口将输入srcLocal的数值搬运到dstLocal中，再搬出到外部存储上。Copy API的参数说明：
+    - mask：控制每次迭代内参与计算的元素数量，本样例中mask=64表示前64个元素参与计算
+    - repeat：重复次数，本样例中repeat=8表示执行8次拷贝操作
+    - DataBlock参数：{1, 1, 8, 8}表示同一迭代内datablock的地址步长为1，相邻迭代间的地址步长为8
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
