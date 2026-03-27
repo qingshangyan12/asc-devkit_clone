@@ -5,17 +5,10 @@
 | 产品     | 是否支持 |
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|√|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|√|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
 
 ## 功能说明
 
-执行数据复制操作，支持不同存储空间之间的数据搬运。
+执行数据复制操作，通过CopyAtom选择不同存储空间之间的数据搬运。
 
 ## 函数原型
 
@@ -36,7 +29,7 @@ __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params
 
 ## 返回值说明
 
-无
+无。
 
 ## 约束说明
 
@@ -47,9 +40,12 @@ __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params
 ## 调用示例
 
 ```cpp
-// 创建CopyAtom
-auto copyAtom = AscendC::MakeCopy(arg1, arg2, arg3);
-
-// 执行复制操作
-AscendC::Copy(copyAtom, dst, src);
+// 以CopyL0C2GM为例
+// 调用方式1
+Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{}, globalC, l0CTensor);
+// 调用方式2
+CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{}.Call(globalC, l0CTensor);
+// 调用方式3
+auto atomCopyL0C2GM = MakeCopy(CopyL0C2GM{}, FixpipeTraitDefault{});
+atomCopyL0C2GM.Call(globalC, l0CTensor);
 ```
