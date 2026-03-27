@@ -69,5 +69,3 @@ Tensor API文档目录，整体使用时可以引入tensor.h，Tensor API列表�
 |   API名称   |   说明   |
 |----------|-----------|
 | [Mmad](./arch/cube_compute/Mad.md) | 完成矩阵乘加操作。 |
-
-

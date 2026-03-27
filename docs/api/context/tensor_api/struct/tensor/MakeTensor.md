@@ -20,7 +20,7 @@
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | iter | 输入 | 迭代器，要求传入ViewEngine对象，用于创建LocalTensor。 |
-| args | 输入 | 可变参数，当前支持传入一个或两个参数。<br>&bull; 当传入一个入参时：根据传入的Layout对象创建LocalTenosr。<br>&bull; 当传入两个入参时：根据传入的参数构建Layout 对象，并基于该Layout创建LocalTensor。 |
+| args | 输入 | 可变参数，当前支持传入一个或两个参数。<br>&bull; 当传入一个入参时：根据传入的Layout对象创建LocalTensor。<br>&bull; 当传入两个入参时：根据传入的参数构建Layout 对象，并基于该Layout创建LocalTensor。 |
 
 ## 返回值说明
 - 返回LocalTensor<TensorAttribute<Engine, Layout>>类型的张量对象。
