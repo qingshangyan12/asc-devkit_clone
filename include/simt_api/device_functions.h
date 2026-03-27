@@ -386,6 +386,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ float2* address, floa
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ float4* address, float4 val);
 #endif
 
+#ifndef ASCENDC_CPU_DEBUG
+static __SIMT_DEVICE_FUNCTIONS_DECL__ void dcci(void *dst, uint64_t entire);
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+static __SIMT_DEVICE_FUNCTIONS_DECL__ void dcci(__gm__ void *dst, uint64_t entire);
+#endif
+#endif
+
 #include "impl/simt_api/device_functions_impl.h"
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_H__)
