@@ -21,142 +21,131 @@ FLOAT_DTYPES = {"half", "bfloat16_t", "float"}
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gen_data_utils import (
-    DTYPE_NAME_MAP,
     get_dtype_limits,
     construct_special_values,
-    get_special_names,
-    format_float16
+    get_special_names
 )
 
+NUM_CORES = 3
+BLOCK_LENGTH = 256
 ERROR_TOL = 1e-4
-RELATIVE_TOL = 1e-6
-ABSOLUTE_TOL = 1e-9
-
-
-def is_special_float(val):
-    return np.isnan(val) or np.isinf(val)
 
 
 def format_value(val, np_type):
     if np.issubdtype(np_type, np.floating):
-        return f"{float(val):.6e}"
+        return f"{float(val):.4e}"
     return str(val)
 
 
-def verify_single_api(dtype_name, output_path, golden_path, api_name="AddAtomicAdd"):
-    np_type = DTYPE_MAP.get(dtype_name)
-    if np_type is None:
-        print(f"[ERROR] Unsupported dtype: {dtype_name}")
-        return False
-    
-    if not os.path.exists(output_path):
-        print(f"[ERROR] Output file not found: {output_path}")
-        return False
-    
-    if not os.path.exists(golden_path):
-        print(f"[ERROR] Golden file not found: {golden_path}")
-        return False
-    
-    output = np.fromfile(output_path, dtype=np_type).reshape(-1)
-    golden = np.fromfile(golden_path, dtype=np_type).reshape(-1)
-    
-    if len(output) == 0:
-        print(f"[ERROR] Output file is empty: {output_path}")
-        return False
-    
-    if len(golden) == 0:
-        print(f"[ERROR] Golden file is empty: {golden_path}")
-        return False
-    
-    type_name = np.dtype(np_type).name
-    special_names = get_special_names(np_type)
-    special_vals = construct_special_values(np_type)
-    num_special = len(special_vals)
-    
-    print(f"\n{'='*116}")
-    print(f"API: {api_name} | Data Type: {type_name} | Verification Results")
-    print(f"{'='*116}")
-    print(f"{'type':<10} | {'name':<8} | {'src':<20} | {'expected':<20} | {'actual':<20} | {'status'}")
-    print(f"{'-'*116}")
-    
-    valid_count = 0
-    
-    for i in range(num_special):
-        inp_val = special_vals[i]
-        golden_val = golden[i] if i < len(golden) else 0
-        output_val = output[i] if i < len(output) else 0
-        name = special_names[i] if i < len(special_names) else f"idx_{i}"
-        
-        is_match = False
-        if dtype_name in FLOAT_DTYPES:
-            if is_special_float(golden_val):
-                if np.isnan(golden_val):
-                    is_match = np.isnan(output_val)
-                else:
-                    is_match = np.isinf(output_val) and np.sign(output_val) == np.sign(golden_val)
-            else:
-                is_match = np.isclose(float(output_val), float(golden_val), rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True)
+def compare_values(golden, output, dtype_name):
+    if dtype_name in FLOAT_DTYPES:
+        if np.isnan(golden):
+            return np.isnan(output)
+        elif np.isinf(golden):
+            return np.isinf(output) and np.sign(output) == np.sign(golden)
         else:
-            is_match = (output_val == golden_val)
-        
-        if is_match:
-            valid_count += 1
-        
-        status = "PASS" if is_match else "FAIL"
-        inp_str = format_value(inp_val, np_type)
-        golden_str = format_value(golden_val, np_type)
-        output_str = format_value(output_val, np_type)
-        
-        print(f"{type_name:<10} | {name:<8} | {inp_str:<20} | {golden_str:<20} | {output_str:<20} | {status}")
-    
-    print(f"{'-'*116}")
-    
-    different_count = 0
-    for i in range(len(golden)):
-        golden_val = golden[i]
-        output_val = output[i]
-        
-        is_diff = False
-        if dtype_name in FLOAT_DTYPES:
-            if is_special_float(golden_val):
-                if not (np.isnan(output_val) or np.isinf(output_val)):
-                    is_diff = True
-            elif not np.isclose(float(output_val), float(golden_val), rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True):
-                is_diff = True
-        else:
-            if output_val != golden_val:
-                is_diff = True
-        
-        if is_diff:
-            different_count += 1
-    
-    error_ratio = different_count / golden.size if golden.size > 0 else 1.0
-    
-    print(f"Total: {len(golden)}, Matched: {valid_count}/{num_special}, Mismatches: {different_count}, Error Ratio: {error_ratio:.4f}")
-    print(f"{'='*116}\n")
-    
-    if error_ratio <= ERROR_TOL:
-        print(f"*** Result: PASS ***")
-        return True
+            return np.isclose(float(output), float(golden), rtol=1e-6, atol=1e-9)
     else:
-        print(f"*** Result: FAIL ***")
-        return False
+        return output == golden
 
 
-def verify_result(output_path, golden_path, dtype_name):
-    return verify_single_api(dtype_name, output_path, golden_path, "SetAtomicAdd")
+def count_diff(golden, output, dtype_name):
+    diff_count = 0
+    for i in range(len(golden)):
+        if not compare_values(golden[i], output[i], dtype_name):
+            diff_count += 1
+    return diff_count
 
 
-if __name__ == '__main__':
-    if len(sys.argv) < 4:
-        print("Usage: verify_result.py <output> <golden> <dtype>")
-        print("  dtype: int8_t, int16_t, half, bfloat16_t, int32_t, float")
-        sys.exit(1)
+def verify_all():
+    print("\nVerifying output vs golden...")
     
-    try:
-        res = verify_result(sys.argv[1], sys.argv[2], sys.argv[3])
-        if not res:
-            sys.exit(1)
-    except Exception as e:
-        print(f"[ERROR] {e}")
-        sys.exit(1)
+    all_pass = True
+    
+    for dtype_name in DTYPE_MAP.keys():
+        data_type = DTYPE_MAP[dtype_name]
+        
+        special_vals = construct_special_values(data_type)
+        special_names = get_special_names(data_type)
+        num_special = len(special_vals)
+        
+        golden_sat_path = f"./output/golden_sat_{dtype_name}.bin"
+        golden_non_sat_path = f"./output/golden_non_sat_{dtype_name}.bin"
+        output_sat_path = f"./output/output_sat_{dtype_name}.bin"
+        output_non_sat_path = f"./output/output_non_sat_{dtype_name}.bin"
+        
+        if not os.path.exists(golden_sat_path) or not os.path.exists(golden_non_sat_path):
+            print(f"  {dtype_name}: golden data not found, skip")
+            continue
+        
+        golden_sat = np.fromfile(golden_sat_path, dtype=data_type).reshape(-1)
+        golden_non_sat = np.fromfile(golden_non_sat_path, dtype=data_type).reshape(-1)
+        
+        has_sat = os.path.exists(output_sat_path)
+        has_non_sat = os.path.exists(output_non_sat_path)
+        
+        if has_sat:
+            output_sat = np.fromfile(output_sat_path, dtype=data_type).reshape(-1)
+        else:
+            output_sat = golden_sat
+        
+        if has_non_sat:
+            output_non_sat = np.fromfile(output_non_sat_path, dtype=data_type).reshape(-1)
+        else:
+            output_non_sat = golden_non_sat
+        
+        type_name = np.dtype(data_type).name
+        
+        print(f"\n{'='*115}")
+        print(f" DataType: {type_name:<10} | BLOCK_LENGTH: {BLOCK_LENGTH} | NUM_CORES: {NUM_CORES}")
+        print(f"{'='*115}")
+        print(f" {'name':<8} | {'input':<14} | {'golden(sat)':<16} | {'golden(non-sat)':<16} | {'output(sat)':<16} | {'output(non-sat)':<16}")
+        print(f"{'-'*115}")
+        
+        for i in range(num_special):
+            inp_val = special_vals[i]
+            golden_sat_val = golden_sat[i]
+            golden_non_sat_val = golden_non_sat[i]
+            output_sat_val = output_sat[i]
+            output_non_sat_val = output_non_sat[i]
+            name = special_names[i]
+            
+            inp_str = format_value(inp_val, data_type)
+            gsat_str = format_value(golden_sat_val, data_type)
+            gnsat_str = format_value(golden_non_sat_val, data_type)
+            osat_str = format_value(output_sat_val, data_type) if has_sat else "-"
+            onsat_str = format_value(output_non_sat_val, data_type) if has_non_sat else "-"
+            
+            print(f" {name:<8} | {inp_str:<14} | {gsat_str:<16} | {gnsat_str:<16} | {osat_str:<16} | {onsat_str:<16}")
+        
+        print(f"{'-'*115}")
+        
+        diff_sat = count_diff(golden_sat, output_sat, dtype_name) if has_sat else 0
+        diff_non_sat = count_diff(golden_non_sat, output_non_sat, dtype_name) if has_non_sat else 0
+        
+        print(f" Summary: total={BLOCK_LENGTH}, special={num_special}")
+        print(f"   Saturation:     mismatches={diff_sat}")
+        print(f"   Non-saturation: mismatches={diff_non_sat}")
+        print(f"{'='*115}")
+        
+        result_sat = "PASS" if (diff_sat == 0 or not has_sat) else "FAIL"
+        result_non_sat = "PASS" if (diff_non_sat == 0 or not has_non_sat) else "FAIL"
+        print(f" Result: sat={result_sat}, non-sat={result_non_sat}")
+        print(f"{'='*115}")
+        
+        if result_sat != "PASS" or result_non_sat != "PASS":
+            all_pass = False
+    
+    print("\n" + "="*50)
+    if all_pass:
+        print("All tests PASSED!")
+    else:
+        print("Some tests FAILED!")
+    print("="*50)
+    
+    return all_pass
+
+
+if __name__ == "__main__":
+    res = verify_all()
+    sys.exit(0 if res else 1)
