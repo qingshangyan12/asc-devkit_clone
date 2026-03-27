@@ -61,6 +61,8 @@ private:
         using dstType = typename T::elementType;
 
         bool convControl = false;
+        static_assert(Std::is_same_v<srcType, half>);
+        static_assert(Std::is_same_v<dstType, float>);
 
         if (Std::is_same_v<srcType, half> && Std::is_same_v<dstType, float>) {
             convControl = true;
