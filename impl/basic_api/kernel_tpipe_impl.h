@@ -21,8 +21,8 @@
 #ifndef ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "dav_c310/kernel_tpipe_impl_c310.h"
-#include "dav_c310/kernel_tpipe_impl_c310_vec.h"
+#include "dav_3510/kernel_tpipe_impl_c310.h"
+#include "dav_3510/kernel_tpipe_impl_c310_vec.h"
 #include "kernel_tquesync_impl.h"
 #else
 #include <type_traits>
