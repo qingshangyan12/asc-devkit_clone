@@ -124,7 +124,7 @@
     }
     
     
-（2）GetBlockIdx在AIC和AIV的取值范围不同，其取值与算子设置的逻辑核数和一个AI Core中的AIC与AIV的比例有关。本样例中设置NUM_BLOCKS=8、AIC与AIV的比例为1:2，因此GetBlockIdx在AIC和AIV的取值范围分别为0-7和0-15。
+（2）GetBlockIdx在AIC和AIV的取值范围不同，其取值与算子设置的逻辑核数和一个AI Core中的AIC与AIV的比例有关。本样例中设置NUM_BLOCKS=8、AIC与AIV的比例为1:2（配置__mix__(1,2)），因此GetBlockIdx在AIC和AIV的取值范围分别为0-7和0-15。
 
  (3) 样例采用[静态tensor编程范式](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850/opdevg/Ascendcopdevg/atlas_ascendc_10_00019.html)需要手动插入核内同步。
 
@@ -149,7 +149,7 @@
 
 - 样例执行
   ```bash
-  M=256 K=1024 N=128
+  M=32 K=32 N=64
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake .. -DM_SIZE=$M -DK_SIZE=$K -DN_SIZE=$N;make -j;    # 编译工程
   python3 ../scripts/gen_data.py -m=$M -k=$K -n=$N   # 生成测试输入数据
