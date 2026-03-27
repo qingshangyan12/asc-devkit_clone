@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍了调用Fill实现将Global Memory上的数据初始化为0。
+本样例在需要预先初始化Global Memory数据的场景下，基于Fill高阶API实现将Global Memory上的数据初始化为指定值，并配合Add接口完成向量加法计算。Fill接口支持在数据搬运前对输出空间进行初始化，常用于workspace地址或输出数据清零场景。样例演示了如何使用Fill接口将输出空间初始化为当前核的blockIdx值，然后进行向量加法计算，并将结果累加到已初始化的输出空间上。更多API详细信息请参考[Fill API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0891.html)。
 
 ## 支持的产品
 
@@ -23,10 +23,11 @@
 
 ## 样例描述
 - 样例功能：  
-  用于将输出Global Memory上的数据初始化为0。Add的结果放入初始化为0后的Global Memory上。
+  本样例演示Fill API的使用场景。首先使用Fill接口将输出Global Memory初始化为当前核的blockIdx值（单核场景下为0），然后将两个输入向量从Global Memory搬运到Local Memory，使用Add接口进行向量加法计算，最后将计算结果通过SetAtomicAdd累加到已初始化的输出Global Memory上。这种模式常见于需要预先清零输出空间的场景。
 
 - 样例规格：  
-  <table>
+  <table border="2" align="center">
+  <caption>表1：样例输入输出规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">fill</td></tr>
 
   <tr><td rowspan="4" align="center">样例输入</td></tr>
@@ -39,15 +40,22 @@
   <tr><td align="center">output_z</td><td align="center">[1,256]</td><td align="center">float</td><td align="center">ND</td></tr>
 
 
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">fill_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">init_global_memory_custom</td></tr>
   </table>
 
 - 样例实现：  
-  本样例中实现的是固定shape为输入input_x[1,256]，input_y[1,256]，输出output_z[1,256]的fill样例，所用api详细介绍请参考[Fill](../../../../../docs/api/context/Fill.md)。
+  本样例中实现的是固定shape为输入input_x[1,256]，input_y[1,256]，输出output_z[1,256]的fill样例，所用API详细介绍请参考[Fill API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0891.html)。
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Fill高阶API接口完成初始化为0的计算，使用Add得到最终结果，再搬出到外部存储上。
+    计算逻辑包含以下步骤：
+    1. 使用Fill高阶API将输出Global Memory初始化为当前核的blockIdx值
+    2. 设置MTE3_MTE2同步事件，确保Fill操作完成后再进行后续的Unified Buffer操作
+    3. 将输入数据从Global Memory搬运到Local Memory（Unified Buffer）
+    4. 使用Add接口在Local Memory进行向量加法计算
+    5. 使用SetAtomicAdd模式将计算结果累加到输出Global Memory
+    
+    整个过程展示了Fill API的典型使用场景：在正式计算前预先初始化输出空间。
 
   - Tiling实现
 
