@@ -13,12 +13,15 @@
 
 import os
 import numpy as np
+import tensorflow as tf
+
+bfloat16 = tf.bfloat16.as_numpy_dtype
 
 DTYPE_MAP = {
     "int8_t": (np.int8, 1),
     "int16_t": (np.int16, 2),
     "half": (np.float16, 2),
-    "bfloat16_t": (np.float16, 2),
+    "bfloat16_t": (bfloat16, 2),
     "int32_t": (np.int32, 4),
     "float": (np.float32, 4)
 }
@@ -37,7 +40,7 @@ def gen_data_for_dtype(dtype_name):
     elif dtype_name == "half":
         input_data = np.ones(input_shape, dtype=np.float16)
     elif dtype_name == "bfloat16_t":
-        input_data = np.ones(input_shape, dtype=np.float16)
+        input_data = np.ones(input_shape, dtype=bfloat16)
     elif dtype_name == "int32_t":
         input_data = np.ones(input_shape, dtype=np.int32)
     elif dtype_name == "float":

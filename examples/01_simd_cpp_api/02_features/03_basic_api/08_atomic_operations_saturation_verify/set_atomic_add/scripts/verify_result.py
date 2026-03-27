@@ -13,12 +13,15 @@
 
 import sys
 import numpy as np
+import tensorflow as tf
+
+bfloat16 = tf.bfloat16.as_numpy_dtype
 
 DTYPE_MAP = {
     "int8_t": np.int8,
     "int16_t": np.int16,
     "half": np.float16,
-    "bfloat16_t": np.float16,
+    "bfloat16_t": bfloat16,
     "int32_t": np.int32,
     "float": np.float32
 }
@@ -40,7 +43,15 @@ def verify_result(output_path, golden_path, dtype_name):
     output = np.fromfile(output_path, dtype=np_type).reshape(-1)
     golden = np.fromfile(golden_path, dtype=np_type).reshape(-1)
     
-    if dtype_name in FLOAT_DTYPES:
+    if dtype_name == "bfloat16_t":
+        output_float = output.astype(np.float32)
+        golden_float = golden.astype(np.float32)
+        different_element_results = np.isclose(output_float,
+                                               golden_float,
+                                               rtol=RELATIVE_TOL,
+                                               atol=ABSOLUTE_TOL,
+                                               equal_nan=True)
+    elif dtype_name in FLOAT_DTYPES:
         different_element_results = np.isclose(output,
                                                golden,
                                                rtol=RELATIVE_TOL,
