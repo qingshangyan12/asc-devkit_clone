@@ -128,7 +128,13 @@
   OK
   ```
 
-## 性能分析
+## 自定义算子Profiling扩展
+
+- 上报Shape信息
+  
+  Profiling提供`Shape`信息上报的接口`aclprofStr2Id`、`aclprofRangePushEx`、`aclprofRangePop`，其中`aclprofStr2Id`用于将算子名、算子类型转化为`hashId`，`aclprofRangePushEx`和`aclprofRangePop`分别在`<<<>>>`前后调用，上报`Shape`信息。
+
+  算子信息上报需要构造`aclprofEventAttributes`结构体，包含版本、大小、类型和tensor信息，其中`messageType`固定`MESSAGE_TYPE_TENSOR_INFO`为0，`aclprofTensorInfo`包含`opNameId`、`opTypeId`、`resv`、`tensorNum`、`kernelType`、`blockNums`、`stream`、`tensors`字段。`opNameId`、`opTypeId`字段通过`aclprofStr2Id`接口转化算子名、算子类型获取，每包数据`tensorNum`不超过5，超过5请分成多包数据上报，`tensors`为`aclprofTensor`结构，从算子的`at::Tensor`获取。
 
 - 样例执行
 
@@ -140,56 +146,33 @@
   msprof --application="python3 ../add_custom_test.py" --output="../result"
   ```
 
-- 执行结果
+- Shape信息展示
 
-  在`result`目录中生成性能数据`PROF_000001_*`，性能数据目录结构示例如下。
-
-  ```
-  ├── msprof_*.db  
-  ├── mindstudio_profiler_output
-  │    ├── msprof_*.json
-  │    ├── step_trace_*.json
-  │    ├── xx_*.csv
-  ...
-  │    └── README.txt 
-  ├── mindstudio_profiler_log
-  │    ├── collection_device_{id}.log
-  │    ├── collection_host.log
-  ...
-  │    └── msprof_analysis_*.log
-  ├── device_{id}
-  ...
-  │    └── data
-  ├── host
-  ...
-  │    └── data
-  ```
-
-- 数据分析
-
-  打开`PROF_000001_*/mindstudio_profiler_output/op_summary_*.csv`，查看性能分析数据，示例如下。
+  打开`PROF_000001_*/mindstudio_profiler_output/op_summary_*.csv`，查看Shape信息，样例中Shape信息写入如下字段。
     
   <table>
     <tr>
-      <td align="center">Device_id</td>
-      <td align="center">Model ID</td>
-      <td align="center">Task ID</td>
-      <td align="center">Stream ID</td>
+      <td align="center">...</td>
       <td align="center">Op Name</td>
       <td align="center">Op Type</td>
-      <td align="center">Op State</td>
-      <td align="center">Task Type</td>
+      <td align="center">Input Shapes</td>
+      <td align="center">Input Data Types</td>
+      <td align="center">Input Formats</td>
+      <td align="center">Output Shapes</td>
+      <td align="center">Output Data Types</td>
+      <td align="center">Output Formats</td>
       <td align="center">...</td>
     </tr>
     <tr>
-      <td align="center">0</td>
-      <td align="center">4294967295</td>
-      <td align="center">0</td>
-      <td align="center">46</td>
+      <td align="center">...</td>
       <td align="center">_Z10add_customPhS_S_j</td>
       <td align="center">_Z10add_customPhS_S_j</td>
-      <td align="center">dynamic</td>
-      <td align="center">AI_VECTOR_CORE</td>
+      <td align="center">"8,2048;8:2048"</td>
+      <td align="center">FLOAT16;FLOAT16</td>
+      <td align="center">ND;ND</td>
+      <td align="center">"8,2048"</td>
+      <td align="center">FLOAT16</td>
+      <td align="center">ND</td>
       <td align="center">...</td>
     </tr>
   </table>
