@@ -26,52 +26,14 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE TORCH_NPU_PATH
 )
-set(TORCH_NPU_INCLUDE_DIRS ${TORCH_NPU_PATH}/include)
-set(TORCH_NPU_LIBRARIES ${TORCH_NPU_PATH}/lib)
 
-add_library(ascendc_ops SHARED
-    add_custom.asc
-)
-
-target_include_directories(ascendc_ops PRIVATE
-    ${TORCH_INCLUDE_DIRS}
-    ${TORCH_NPU_INCLUDE_DIRS}
-)
-
-target_link_libraries(ascendc_ops PRIVATE
-    torch_npu
-    Python3::Python
-)
-
-target_link_directories(ascendc_ops PRIVATE
-    ${TORCH_NPU_LIBRARIES}
-)
-
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
-set(COMPILE_OPTIONS
-    ${TORCH_CXX_FLAGS}
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
-)
-
-target_compile_options(ascendc_ops PRIVATE
-    ${COMPILE_OPTIONS}
-)
-
-# ======================================================================================
-# 开启Profiling编译选项配置
-# ======================================================================================
 if (DEFINED ENV{ASCEND_HOME_PATH})
     set(ASCEND_PATH $ENV{ASCEND_HOME_PATH})
 else ()
     set(ASCEND_PATH /usr/local/Ascend/cann)
 endif()
 
+set(TORCH_NPU_INCLUDE_DIRS ${TORCH_NPU_PATH}/include)
 set(PROFILING_INCLUDE_DIRS
     ${ASCEND_PATH}/include/aclnn
     ${ASCEND_PATH}/include/graph
@@ -80,9 +42,10 @@ set(PROFILING_INCLUDE_DIRS
     ${TORCH_NPU_PATH}/include/aclnn
     ${TORCH_NPU_PATH}/include/third_party/op-plugin
 )
+set(TORCH_NPU_LIBRARIES ${TORCH_NPU_PATH}/lib)
 
 add_library(ascendc_ops_profiling SHARED
-    add_custom_profiling.asc
+    add_custom.asc
 )
 
 target_include_directories(ascendc_ops_profiling PRIVATE
@@ -102,6 +65,13 @@ target_link_directories(ascendc_ops_profiling PRIVATE
     ${TORCH_NPU_LIBRARIES}
 )
 
-target_compile_options(ascendc_ops_profiling PRIVATE
-    ${COMPILE_OPTIONS}
+# ======================================================================================
+# NPU 编译选项配置
+#
+# 说明：
+#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+# ======================================================================================
+target_compile_options(ascendc_ops PRIVATE
+    ${TORCH_CXX_FLAGS}
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
 )

@@ -18,8 +18,6 @@ import torch
 import torch_npu
 from torch_npu.testing.testcase import TestCase, run_tests
 torch.ops.load_library("libascendc_ops.so")
-# 开启Profiling分析性能数据
-# torch.ops.load_library("libascendc_ops_profiling.so")
 
 
 class TestCustomAdd(TestCase):
