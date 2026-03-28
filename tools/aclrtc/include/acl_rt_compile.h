@@ -41,6 +41,29 @@ aclError aclrtcCreateProg(aclrtcProg *prog, const char *src, const char *name, i
 aclError aclrtcCompileProg(aclrtcProg prog, int numOptions, const char **options);
 
 /**
+ * @brief Notes the given name expression denoting the address of a global function or device variable.
+ * @param[in] prog Runtime Compilation program.
+ * @param[in] nameExpression Constant expression denoting the address of a global function or
+ *                           device variable. The identical name expression string must be provided
+ *                           on a subsequent call to aclrtcGetLoweredName to extract the lowered name.
+ * @return aclError: ACL_RTC_SUCCESS or ACL_ERROR_RTC_XXX
+ */
+aclError aclrtcAddNameExpression(aclrtcProg prog, const char *const nameExpression);
+
+/**
+ * @brief Extracts the lowered (mangled) name for a global function or device variable.
+ * @param[in] prog Runtime Compilation program.
+ * @param[in] nameExpression Constant expression denoting the address of a global function or
+ *                           device variable. Must be identical to the name expression previously
+ *                           provided to aclrtcAddNameExpression.
+ * @param[out] loweredName Lowered (mangled) name corresponding to the provided name expression.
+ *                         The memory containing the name is released when the program is destroyed
+ *                         by aclrtcDestroyProg.
+ * @return aclError: ACL_RTC_SUCCESS or ACL_ERROR_RTC_XXX
+ */
+aclError aclrtcGetLoweredName(aclrtcProg prog, const char *nameExpression, const char **loweredName);
+
+/**
  * @brief Destroys the given program.
  * @param[in,out] prog Runtime Compilation program.
  * @return aclError: ACL_RTC_SUCCESS or ACL_ERROR_RTC_XXX
