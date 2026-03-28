@@ -8,7 +8,7 @@
 
 ## 功能概述
 
-Coshape表示Layout的陪域（codomain）的形状，即在给定的stride下，坐标映射所覆盖的索引跨度。
+Coshape表示Layout陪域的形状，即在给定的stride下，坐标映射所覆盖的索引跨度。
 
 ## 函数原型
 

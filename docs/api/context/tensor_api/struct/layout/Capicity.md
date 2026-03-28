@@ -1,4 +1,4 @@
-# Capicity
+# Capacity
 
 ## 产品支持情况
 
@@ -8,7 +8,7 @@
 
 ## 功能概述
 
-Coshape表示Layout实际所占空间的大小，即在给定的stride下，Layout布局可覆盖的容量上界。
+Capacity表示Layout实际所占空间的大小，即在给定的stride下，Layout布局可覆盖的容量上界。
 
 ## 函数原型
 
@@ -46,6 +46,6 @@ __aicore__ inline constexpr auto Capacity(const Layout<Shape, Stride>& layout);
    ```cpp
   using namespace AscendC::Te;
   auto layout = MakeLayout(MakeShape(10, 20), MakeStride(1, 100));
-  auto capicity = Capicity(layout); //capicity = 2000
+  auto capacity = Capacity(layout); // capacity = 2000
   ```
   

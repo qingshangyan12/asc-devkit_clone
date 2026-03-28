@@ -1,3 +1,4 @@
+<!-- codespell:ignore MakeFixbufmemPtr FIXBUF Fixbufmem -->
 # MakeFixbufmemPtr
 
 ## 产品支持情况

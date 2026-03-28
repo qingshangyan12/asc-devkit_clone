@@ -1,3 +1,4 @@
+<!-- codespell:ignore Cosize -->
 # Cosize
 
 ## 产品支持情况
@@ -8,7 +9,7 @@
 
 ## 功能概述
 
-Coshape表示Layout的陪域（codomain）的大小，即在给定的stride下，坐标映射所覆盖的空间大小。
+Cosize表示Layout陪域的大小，即在给定的stride下，坐标映射所覆盖的空间大小。
 
 ## 函数原型
 
