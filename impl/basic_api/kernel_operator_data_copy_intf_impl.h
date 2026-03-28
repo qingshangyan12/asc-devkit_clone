@@ -33,76 +33,6 @@ namespace AscendC {
 /* **************************************************************************************************
  * DataCopy                                             *
  * ************************************************************************************************* */
-template <typename T>
-__aicore__ inline constexpr bool IsBasicDataCopySupportedType()
-{
-    using PrimType = PrimT<T>;
-    return Std::is_same<PrimType, int8_t>::value || Std::is_same<PrimType, uint8_t>::value ||
-        Std::is_same<PrimType, int16_t>::value || Std::is_same<PrimType, uint16_t>::value ||
-        Std::is_same<PrimType, int32_t>::value || Std::is_same<PrimType, uint32_t>::value ||
-        Std::is_same<PrimType, int64_t>::value || Std::is_same<PrimType, uint64_t>::value ||
-        Std::is_same<PrimType, half>::value || Std::is_same<PrimType, float>::value ||
-        Std::is_same<PrimType, double>::value
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-        || Std::is_same<PrimType, bfloat16_t>::value
-#endif
-        ;
-}
-
-template <typename T>
-__aicore__ inline constexpr bool IsNd2NzSupportedType()
-{
-    using PrimType = PrimT<T>;
-    return Std::is_same<PrimType, int8_t>::value || Std::is_same<PrimType, uint8_t>::value ||
-        Std::is_same<PrimType, int16_t>::value || Std::is_same<PrimType, uint16_t>::value ||
-        Std::is_same<PrimType, int32_t>::value || Std::is_same<PrimType, uint32_t>::value ||
-        Std::is_same<PrimType, half>::value || Std::is_same<PrimType, float>::value
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-        || Std::is_same<PrimType, bfloat16_t>::value
-#endif
-        ;
-}
-
-template <typename T>
-__aicore__ inline constexpr bool IsDataCopyPadSupportedType()
-{
-    return IsBasicDataCopySupportedType<T>();
-}
-
-template <typename T>
-__aicore__ inline void CheckBasicDataCopyTypeSupport(const __gm__ char* apiName)
-{
-    ASCENDC_DEBUG_ASSERT((IsBasicDataCopySupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype support in %s, supported dtypes are int8_t/uint8_t/int16_t/uint16_t/int32_t/"
-        "uint32_t/int64_t/uint64_t/half/bfloat16_t/float/double.\n", apiName));
-}
-
-template <typename T>
-__aicore__ inline void CheckNd2NzTypeSupport(const __gm__ char* apiName)
-{
-    ASCENDC_DEBUG_ASSERT((IsNd2NzSupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype support in %s, supported dtypes are int8_t/uint8_t/int16_t/uint16_t/int32_t/"
-        "uint32_t/half/bfloat16_t/float.\n", apiName));
-}
-
-template <typename T>
-__aicore__ inline void CheckDataCopyPadTypeSupport(const __gm__ char* apiName)
-{
-    ASCENDC_DEBUG_ASSERT((IsDataCopyPadSupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype support in %s, supported dtypes are half/bfloat16_t/int16_t/uint16_t/float/"
-        "int32_t/uint32_t/int8_t/uint8_t/int64_t/uint64_t/double.\n", apiName));
-}
-
-template <typename T, typename U>
-__aicore__ inline void CheckBasicDataCopyMixedTypeSupport(const __gm__ char* apiName)
-{
-    const bool isSupportedSameType = Std::is_same<PrimT<T>, PrimT<U>>::value;
-    const bool isSupportedHalfToFloat = Std::is_same<PrimT<T>, float>::value && Std::is_same<PrimT<U>, half>::value;
-    ASCENDC_DEBUG_ASSERT((isSupportedSameType || isSupportedHalfToFloat), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype support in %s, supported dtype combinations are same primitive dtype or half -> "
-        "float.\n", apiName));
-}
-
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from src to dst, applicable to vector data
@@ -824,11 +754,6 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
     const uint32_t count)
 {
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    CheckDataCopyCountCommon<T>(count, "DataCopy from GlobalTensor to LocalTensor");
-#endif
-#endif
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
     struct DataCopyParams repeatParams;
     DataCopyCheck<T>(count, repeatParams);
@@ -846,11 +771,6 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src,
     const uint32_t count)
 {
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    CheckDataCopyCountCommon<T>(count, "DataCopy from LocalTensor to GlobalTensor");
-#endif
-#endif
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
     struct DataCopyParams repeatParams;
     DataCopyCheck<T>(count, repeatParams);
@@ -868,11 +788,6 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    CheckDataCopyCountCommon<T>(count, "DataCopy from LocalTensor to LocalTensor");
-#endif
-#endif
     ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
         "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
         "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
