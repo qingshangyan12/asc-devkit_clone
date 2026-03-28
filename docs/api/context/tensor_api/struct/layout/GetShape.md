@@ -6,20 +6,6 @@
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
 
-## 产品支持情况
-
-|产品|是否支持|
-|--|:-:|
-|Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|√|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|√|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
-
-
 ## 功能说明
 
 获取描述张量形状的Shape对象。
@@ -27,12 +13,21 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline decltype(auto) GetShape() const
+template <size_t... Is, typename ShapeType, typename StrideType>
+__aicore__ inline constexpr auto GetShape(const Layout<ShapeType, StrideType>& layout)
 ```
 
 ## 参数说明
 
-无
+| 模板参数 | 类型 | 含义 |
+|---------|------|
+| Is... | 输入 | 可选。多级索引递归选取。 |
+| ShapeType |  输入 | Layout的shape类型。 |
+| StrideType |  输入 | Layout的stride的类型。 |
+
+| 模板参数 | 类型 | 含义 |
+|---------|------|
+| layout |  输入 | Layout对象 |
 
 ## 返回值说明
 
@@ -40,9 +35,17 @@ __aicore__ inline decltype(auto) GetShape() const
 
 ## 约束说明
 
-无
+- Is...选择有效，不超过Layout的范围
 
 ## 调用示例
 
-见[5.13.1.4-调用示例](GetLayout.md)。
+```cpp
+using namespace AscendC::Te;
 
+auto layout = MakeNDLayout(128,128);
+// 无模板实参时 Is... 为空，等价于 layout.Shape<>() 得到整个shape元组
+auto shapeTuple = GetShape(layout);
+
+// 带索引时等价于 layout.Shape<0>()，按递归取shape子结构或某一维
+auto s0 = GetShape<0>(layout);
+```

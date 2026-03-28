@@ -30,7 +30,7 @@ __aicore__ inline constexpr auto Select(const Layout<Shape, Stride>& layout)
 ## 约束说明
 
 - layout必须是有效的Layout对象。
-- 索引Is必须在有效范围内。
+- 索引Is...必须在有效范围内。
 
 ## 调用示例
 
