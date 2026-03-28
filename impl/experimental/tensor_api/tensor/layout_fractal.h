@@ -145,8 +145,9 @@ struct MAkeNzFrameLayout {
     template <typename TraitType>
     __aicore__ inline static auto Make(size_t row, size_t column) {
         static constexpr int32_t c0Ele = TraitType::C0_size;
-        auto shape = GetTuple(t0, t1, t2, t3);
-        auto stride = GetTuple(ts...);
+        using T = typename TraitType::type;
+        auto shape = TupleDispatcher<LayoutFormat::NZ, TupleFormat::Shape, T>::apply(row, column);
+        auto stride = TupleDispatcher<LayoutFormat::NZ, TupleFormat::Stride, T>::apply(row, column);
         using LayoutT = Layout<decltype(shape), decltype(stride), Pattern>;
         return LayoutT(shape, stride);
     }
