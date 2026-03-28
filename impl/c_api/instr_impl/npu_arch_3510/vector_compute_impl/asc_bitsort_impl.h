@@ -26,44 +26,34 @@
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
 __aicore__ inline void asc_bitsort_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1,
-                                        uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-                                        uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-                                        uint8_t src1_repeat_stride, bool repeat_stride_mode, bool stride_size_mode)
+                                        int32_t repeat)
 {
     if ASC_IS_AIV {
-        vbs(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
-            src0_repeat_stride, src1_repeat_stride, repeat_stride_mode, stride_size_mode);
+        uint64_t config = (static_cast<uint64_t>(repeat) & 0xff) << 56;
+        vbs(dst, src0, src1, config);
     }
 }
 
 __aicore__ inline void asc_bitsort_sync_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1,
-                                             uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-                                             uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-                                             uint8_t src1_repeat_stride, bool repeat_stride_mode, bool stride_size_mode)
+                                             int32_t repeat)
 {
-    asc_bitsort_impl(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
-                     src0_repeat_stride, src1_repeat_stride, repeat_stride_mode, stride_size_mode);
+    asc_bitsort_impl(dst, src0, src1, repeat);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_bitsort_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1,
-                                        uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-                                        uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-                                        uint8_t src1_repeat_stride, bool repeat_stride_mode, bool stride_size_mode)
+                                        int32_t repeat)
 {
     if ASC_IS_AIV {
-        vbs(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
-            src0_repeat_stride, src1_repeat_stride, repeat_stride_mode, stride_size_mode);
+        uint64_t config = (static_cast<uint64_t>(repeat) & 0xff) << 56;
+        vbs(dst, src0, src1, config);
     }
 }
 
 __aicore__ inline void asc_bitsort_sync_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1,
-                                             uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-                                             uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-                                             uint8_t src1_repeat_stride, bool repeat_stride_mode, bool stride_size_mode)
+                                             int32_t repeat)
 {
-    asc_bitsort_impl(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
-                     src0_repeat_stride, src1_repeat_stride, repeat_stride_mode, stride_size_mode);
+    asc_bitsort_impl(dst, src0, src1, repeat);
     asc_sync_post_process();
 }
 

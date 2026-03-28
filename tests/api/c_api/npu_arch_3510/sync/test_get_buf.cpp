@@ -20,20 +20,20 @@ protected:
 };
 
 namespace {
-void get_buf_stub(pipe_t pipe, uint64_t buf_id, bool mode)
+void get_buf_stub(pipe_t pipe, uint8_t buf_id, bool mode)
 {
     EXPECT_EQ(pipe, pipe_t::PIPE_MTE3);
-    EXPECT_EQ(buf_id, static_cast<uint64_t>(10));
+    EXPECT_EQ(buf_id, static_cast<uint8_t>(10));
     EXPECT_EQ(mode, false);
 }
 }
 
 TEST_F(TestSysVarGetBufCAPI, c_api_get_buf_Succ)
 {
-    MOCKER_CPP(get_buf, void(pipe_t, uint64_t, bool))
+    MOCKER_CPP(get_buf, void(pipe_t, uint8_t, bool))
         .times(1)
         .will(invoke(get_buf_stub));
 
-    asc_get_buf(pipe_t::PIPE_MTE3, static_cast<uint64_t>(10), false);
+    asc_get_buf(pipe_t::PIPE_MTE3, static_cast<uint8_t>(10), false);
     GlobalMockObject::verify();
 }

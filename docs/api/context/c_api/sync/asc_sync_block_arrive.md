@@ -6,6 +6,7 @@
 | :-----------| :------: |
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
 | <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
+|<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
 
 ## 功能说明
 
@@ -14,7 +15,7 @@
 ## 函数原型
 
     ```cpp
-    __aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint8_t mode, int64_t flagID)
+   __aicore__ inline void asc_sync_block_arrive(pipe_t pipe, int64_t flag_id)
     ```
 
 ## 参数说明
@@ -22,8 +23,7 @@
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
 | pipe | 输入 | 设置这条指令所在的流水类型。|
-| mode | 输入 | 核间同步模式，用于指定同步的行为类型。共有三种同步模式：<br/>mode 0：AI Core核间的同步控制。对于AIC场景，同步所有的AIC核，直到所有的AIC核都执行到asc_sync_block_arrive时，asc_sync_block_wait后续的指令才会执行；对于AIV场景，同步所有的AIV核，直到所有的AIV核都执行到asc_sync_block_arrive时，asc_sync_block_wait后续的指令才会执行。<br/>mode 1：AI Core内部，AIV核之间的同步控制。如果两个AIV核都运行了asc_sync_block_arrive，asc_sync_block_wait后续的指令才会执行。<br/>mode 2：AI Core内部，AIC与AIV之间的同步控制。在AIC核执行了asc_sync_block_arrive之后，两个AIV上的asc_sync_block_wait后续的指令才会继续执行，两个AIV核都执行了asc_sync_block_arrive之后，AIC上的asc_sync_block_wait后续的指令才能执行。|
-| flagID | 输入 | 事件标号，用于标识同一组同步信号。取值范围为[0,10]。|
+| flag_id | 输入 | 事件标号，用于标识同一组同步信号。取值范围为[0,10]。|
 
 ## 返回值说明
 
@@ -47,8 +47,7 @@ PIPE_S
 // Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步基地址ffts_addr
 uint64_t config = *(__gm__ uint64_t*)ffts_addr;
 asc_set_ffts_base_addr(config);
-uint8_t mode = 0;
-int64_t flagID = 1;
-asc_sync_block_arrive(PIPE_S, mode, flagID);
-asc_sync_block_wait(PIPE_S, flagID);  
+int64_t flag_id = 1;
+asc_sync_block_arrive(PIPE_S, flag_id);
+asc_sync_block_wait(PIPE_S, flag_id);  
 ```
