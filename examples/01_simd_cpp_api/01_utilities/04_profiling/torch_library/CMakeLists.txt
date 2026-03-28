@@ -71,7 +71,7 @@ target_link_directories(ascendc_ops_profiling PRIVATE
 # 说明：
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
-target_compile_options(ascendc_ops PRIVATE
+target_compile_options(ascendc_ops_profiling PRIVATE
     ${TORCH_CXX_FLAGS}
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
 )
