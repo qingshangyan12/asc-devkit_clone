@@ -334,6 +334,7 @@ REGISTER_TILING_DEFAULT')
         tiling_key_deterministic = {}
         default_kernel_type = KernelMetaType.KERNEL_TYPE_MAX
         default_kernel_type_for_group = KernelMetaType.KERNEL_TYPE_MAX
+        dump_info = {"dump_type": ""}
         func_name_exist = False
 
         need_find_kernel_type = (not CommonUtility.is_m510() and not CommonUtility.is_l300() and \
@@ -513,7 +514,7 @@ REGISTER_TILING_DEFAULT')
 
         return InferChannelParamsFromIFile(tiling_key_list, code_channel, hard_sync, no_kfc_server_flag, \
                                            enable_deterministic, tiling_key_kernel_type, no_set_kernel_type, \
-                                           default_kernel_type, decode_tiling_result,
+                                           default_kernel_type, dump_info, decode_tiling_result,
                                            default_tiling_struct, tiling_struct_expr_map, tiling_key_struct_map, \
                                            register_tiling_struct, tpl_tiling_struct, set_task_bar, wait_task_bar, \
                                            tiling_key_deterministic, tiling_key_group_map)
