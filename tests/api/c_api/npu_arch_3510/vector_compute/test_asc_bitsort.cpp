@@ -25,15 +25,12 @@ protected:
 #define TEST_ASC_BITSORT_REPEAT(data_type)                                                                             \
     namespace {                                                                                                        \
     void vbs_repeat_##data_type##_stub(__ubuf__ data_type* dst, __ubuf__ data_type* src0, __ubuf__ uint32_t* src1,     \
-                                       uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,            \
-                                       uint8_t src1_block_stride, uint8_t dst_repeat_stride,                           \
-                                       uint8_t src0_repeat_stride, uint8_t src1_repeat_stride,                         \
-                                       bool repeat_stride_mode, bool stride_size_mode)                                 \
+                                       uint64_t config)                                                                \
     {                                                                                                                  \
         EXPECT_EQ(dst, reinterpret_cast<__ubuf__ data_type*>(1));                                                      \
         EXPECT_EQ(src0, reinterpret_cast<__ubuf__ data_type*>(2));                                                     \
         EXPECT_EQ(src1, reinterpret_cast<__ubuf__ uint32_t*>(3));                                                      \
-        EXPECT_EQ(repeat, 10);                                                                                         \
+        EXPECT_EQ(config, static_cast<uint64_t>(10) << 56);                                                            \
     }                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -43,12 +40,11 @@ protected:
         __ubuf__ data_type* src0 = reinterpret_cast<__ubuf__ data_type*>(2);                                           \
         __ubuf__ uint32_t* src1 = reinterpret_cast<__ubuf__ uint32_t*>(3);                                             \
                                                                                                                        \
-        MOCKER_CPP(vbs, void(__ubuf__ data_type*, __ubuf__ data_type*, __ubuf__ uint32_t*, uint8_t, uint8_t, uint8_t,  \
-                             uint8_t, uint8_t, uint8_t, uint8_t, bool, bool))                                          \
+        MOCKER_CPP(vbs, void(__ubuf__ data_type*, __ubuf__ data_type*, __ubuf__ uint32_t*, uint64_t))                  \
             .stubs()                                                                                                   \
             .will(invoke(vbs_repeat_##data_type##_stub));                                                              \
                                                                                                                        \
-        asc_bitsort(dst, src0, src1, 10, 1, 2, 3, 4, 5, 6, true, false);                                               \
+        asc_bitsort(dst, src0, src1, 10);                                                                              \
     }                                                                                                                  \
                                                                                                                        \
     TEST_F(TestAscBitsortCAPI, c_api_bitsort_sync_##data_type##_repeat)                                                \
@@ -57,12 +53,11 @@ protected:
         __ubuf__ data_type* src0 = reinterpret_cast<__ubuf__ data_type*>(2);                                           \
         __ubuf__ uint32_t* src1 = reinterpret_cast<__ubuf__ uint32_t*>(3);                                             \
                                                                                                                        \
-        MOCKER_CPP(vbs, void(__ubuf__ data_type*, __ubuf__ data_type*, __ubuf__ uint32_t*, uint8_t, uint8_t, uint8_t,  \
-                             uint8_t, uint8_t, uint8_t, uint8_t, bool, bool))                                          \
+        MOCKER_CPP(vbs, void(__ubuf__ data_type*, __ubuf__ data_type*, __ubuf__ uint32_t*, uint64_t))                  \
             .stubs()                                                                                                   \
             .will(invoke(vbs_repeat_##data_type##_stub));                                                              \
                                                                                                                        \
-        asc_bitsort_sync(dst, src0, src1, 10, 1, 2, 3, 4, 5, 6, true, false);                                          \
+        asc_bitsort_sync(dst, src0, src1, 10);                                                                         \
     }
 
 TEST_ASC_BITSORT_REPEAT(half)

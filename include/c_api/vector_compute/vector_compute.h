@@ -22,16 +22,6 @@
 #include "instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
-#define asc_transto5hd_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half) asc_transto5hd_b8_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half)
-
-#define asc_transto5hd_b16(dst, src, repeat, dstStride, srcStride) asc_transto5hd_b16_impl(dst, src, repeat, dstStride, srcStride)
-
-#define asc_transto5hd_b32(dst, src, repeat, dstStride, srcStride) asc_transto5hd_b32_impl(dst, src, repeat, dstStride, srcStride)
-
-#endif
-
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array);
  	 
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t** src_array);
@@ -154,6 +144,19 @@ __aicore__ inline void asc_brcb(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src,
 __aicore__ inline void asc_brcb_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src,
     uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat);
 
+// ==========asc_transto5hd==========
+__aicore__ inline void asc_transto5hd_b8(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half);
+
+__aicore__ inline void asc_transto5hd_b8_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half);
+
+__aicore__ inline void asc_transto5hd_b16(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
+
+__aicore__ inline void asc_transto5hd_b16_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
+
+__aicore__ inline void asc_transto5hd_b32(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
+
+__aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 // ==========asc_bitsort(half/float)==========
@@ -167,47 +170,33 @@ __aicore__ inline void asc_bitsort_sync(__ubuf__ float* dst, __ubuf__ float* src
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-__aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1,
-                                   uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-                                   uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-                                   uint8_t src1_repeat_stride, bool repeat_stride_mode, bool stride_size_mode);
+__aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
 __aicore__ inline void asc_bitsort_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1,
-                                        uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-                                        uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t
-                                        src0_repeat_stride, uint8_t src1_repeat_stride, bool repeat_stride_mode, bool
-                                        stride_size_mode);
+                                        int32_t repeat);
 
-__aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1,
-                                   uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-                                   uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-                                   uint8_t src1_repeat_stride, bool repeat_stride_mode, bool stride_size_mode);
+__aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
 __aicore__ inline void asc_bitsort_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1,
-                                        uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-                                        uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t
-                                        src0_repeat_stride, uint8_t src1_repeat_stride, bool repeat_stride_mode, bool
-                                        stride_size_mode);
+                                        int32_t repeat);
 
-__aicore__ inline void asc_mrgsort4(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat,
-                                    uint16_t region_proposal_li0, uint16_t region_proposal_li1,
-                                    uint16_t region_proposal_li2, uint16_t region_proposal_li3, bool is_all_stored,
-                                    uint8_t mask_signal);
+__aicore__ inline void asc_mrgsort4(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t element_length_0,
+                                    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3,
+                                    bool if_exhausted_suspension, uint8_t valid_bit);
 
 __aicore__ inline void asc_mrgsort4_sync(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat,
-                                         uint16_t region_proposal_li0, uint16_t region_proposal_li1,
-                                         uint16_t region_proposal_li2, uint16_t region_proposal_li3, bool is_all_stored,
-                                         uint8_t mask_signal);
+                                         uint16_t element_length_0, uint16_t element_length_1,
+                                         uint16_t element_length_2, uint16_t element_length_3,
+                                         bool if_exhausted_suspension, uint8_t valid_bit);
 
-__aicore__ inline void asc_mrgsort4(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat,
-                                    uint16_t region_proposal_li0, uint16_t region_proposal_li1,
-                                    uint16_t region_proposal_li2, uint16_t region_proposal_li3, bool is_all_stored,
-                                    uint8_t mask_signal);
+__aicore__ inline void asc_mrgsort4(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t element_length_0,
+                                    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3,
+                                    bool if_exhausted_suspension, uint8_t valid_bit);
 
 __aicore__ inline void asc_mrgsort4_sync(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat,
-                                         uint16_t region_proposal_li0, uint16_t region_proposal_li1,
-                                         uint16_t region_proposal_li2, uint16_t region_proposal_li3, bool is_all_stored,
-                                         uint8_t mask_signal);
+                                         uint16_t element_length_0, uint16_t element_length_1,
+                                         uint16_t element_length_2, uint16_t element_length_3,
+                                         bool if_exhausted_suspension, uint8_t valid_bit);
 
 // ==========asc_transpose(int16_t/uint16_t)==========
 __aicore__ inline void asc_transpose(__ubuf__ int16_t* dst, __ubuf__ int16_t* src);
@@ -217,19 +206,6 @@ __aicore__ inline void asc_transpose_sync(__ubuf__ int16_t* dst, __ubuf__ int16_
 __aicore__ inline void asc_transpose(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
 
 __aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
-
-// ==========asc_transto5hd==========
-__aicore__ inline void asc_transto5hd_b8(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half);
-
-__aicore__ inline void asc_transto5hd_b8_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half);
-
-__aicore__ inline void asc_transto5hd_b16(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
-
-__aicore__ inline void asc_transto5hd_b16_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
-
-__aicore__ inline void asc_transto5hd_b32(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
-
-__aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
 
 #endif
 
@@ -2359,4 +2335,3 @@ __aicore__ inline void asc_squeeze(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* sr
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
 #endif    
-

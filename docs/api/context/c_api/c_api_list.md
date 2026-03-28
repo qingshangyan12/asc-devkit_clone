@@ -204,6 +204,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_mmad_sparse](cube_compute/asc_mmad_sparse.md) | 完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。 |
 | [asc_set_fp32_mode](cube_compute/asc_set_fp32_mode.md) | 用于设置Mmad计算开启FP32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据在参与Mmad计算之前不做舍入处理。 |
 | [asc_set_l0c2gm_config](cube_compute/asc_set_l0c2gm_config.md) | 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。 |
+| [asc_get_l0c2gm_config](cube_compute/asc_get_l0c2gm_config.md) | 数据搬运过程中进行随路量化时，通过调用该接口获取量化流程中的矢量量化参数。 |
 | [asc_enable_hf32](cube_compute/asc_enable_hf32.md) | 用于设置Mmad计算开启HF32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32。 |
 
 
@@ -214,6 +215,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |   API名称   |   说明   |
 |----------|-----------|
 | <cann-filter npu_type = "950"> [asc_release_buf](sync/asc_release_buf.md)| 释放缓存。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_get_buf](sync/asc_get_buf.md)| AI Core内部异步流水线同步的指令。</cann-filter> |
 | [asc_sync_notify](sync/asc_sync_notify.md)| 设置同步标志。 |
 | [asc_sync_wait](sync/asc_sync_wait.md)| 等待同步标志。 |
 | [asc_sync_pipe](sync/asc_sync_pipe.md)| 等待指定流水线操作完成。 |
@@ -268,6 +270,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |----------|-----------|
 | [asc_datacache_preload](cache_ctrl/asc_datacache_preload.md)| 从源地址所在的特定GM地址预加载数据到Data Cache中。 |
 | [asc_dcci](cache_ctrl/asc_dcci.md) | 用于刷新Cache， 保证Cache的一致性。 |
+| <cann-filter npu_type = "950"> [asc_dci](cache_ctrl/asc_dci.md) | 数据缓存失效，使整个数据缓存无效化。</cann-filter>|
 | [asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md) | 获取ICache的Preload的状态。 |
 | [asc_icache_preload](cache_ctrl/asc_icache_preload.md) | 从指令所在DDR地址预加载数据到对应的cacheline中。 |
 

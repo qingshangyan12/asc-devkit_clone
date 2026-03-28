@@ -13,35 +13,27 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-template <typename DTYPE>
-__aicore__ inline void rls_buf_stub(pipe_t pipe, DTYPE buf_id, bool mode) {
-    EXPECT_EQ(pipe, static_cast<pipe_t>(pipe_t::PIPE_S));
-    EXPECT_EQ(buf_id, static_cast<DTYPE>(11));
-    EXPECT_EQ(mode, static_cast<bool>(true));
-}
-
 class TEST_ASC_RELEASE_BUF : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
 };
 
-#define TEST_ASC_RELEASE_BUF(dtype)  \
-                                                                                      \
-TEST_F(TEST_ASC_RELEASE_BUF, TEST_ASC_RELEASE_BUF_##dtype)               \
-{                                                                                     \
-    MOCKER_CPP(rls_buf, void(pipe_t, dtype, bool))                    \
-            .times(1)                                                                           \
-            .will(invoke(rls_buf_stub<dtype>));                               \
-                                                                                                \
-    pipe_t pipe = static_cast<pipe_t>(pipe_t::PIPE_S);                                              \
-    dtype buf_id = static_cast<dtype>(11);                                             \
-    bool mode = static_cast<bool>(true);                                             \
-                                                                                                    \
-    asc_release_buf(pipe, buf_id, mode);         \
-    GlobalMockObject::verify();                                                                 \
+namespace {
+void rls_buf_stub(pipe_t pipe, uint8_t buf_id, bool mode)
+{
+    EXPECT_EQ(pipe, pipe_t::PIPE_S);
+    EXPECT_EQ(buf_id, static_cast<uint8_t>(11));
+    EXPECT_EQ(mode, false);
 }
+} // namespace
 
-// ==========asc_release_buf==========
-TEST_ASC_RELEASE_BUF(uint8_t);
-TEST_ASC_RELEASE_BUF(uint64_t);
+TEST_F(TEST_ASC_RELEASE_BUF, c_api_release_buf_Succ)
+{
+    MOCKER_CPP(rls_buf, void(pipe_t, uint8_t, bool))
+        .times(1)
+        .will(invoke(rls_buf_stub));
+
+    asc_release_buf(pipe_t::PIPE_S, static_cast<uint8_t>(11), false);
+    GlobalMockObject::verify();
+}
