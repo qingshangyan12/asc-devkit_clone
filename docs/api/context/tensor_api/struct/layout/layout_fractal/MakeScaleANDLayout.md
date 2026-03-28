@@ -1,15 +1,21 @@
 # MakeScaleBDNLayout
 
+## 产品支持情况
+
+| 产品     | 是否支持 |
+| ----------- |:----:|
+|Ascend 950PR/Ascend 950DT|√|
+
 ## 函数原型
 
 ```cpp
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column)
+__aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column)
 ```
 
 ## 功能描述
 
-创建 ScaleBDN 格式的 Layout 对象。ScaleBDN 格式用于矩阵 B 的转置布局（scaleK, n），常用于矩阵乘法中 B 矩阵转置后的存储。
+创建 ScaleAND 格式的 Layout 对象。ScaleBDN 格式用于矩阵 B 的转置布局（scaleK, n），常用于矩阵乘法中 B 矩阵转置后的存储。
 
 ## 参数说明
 
@@ -23,9 +29,9 @@ __aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column)
 
 ## 返回值
 
-- 输入为编译时常量时，返回ScaleADNLayout格式的Layout类型。
-- 输入为整型变量时，返回ScaleADNLayout格式的Layout对象。
-- ScaleADNLayout分形数值及对齐说明可参见[Layout和层次化表述法](../../../Layout和层次化表述法.md)
+- 输入为编译时常量时，返回ScaleANDLayout格式的Layout类型。
+- 输入为整型变量时，返回ScaleANDLayout格式的Layout对象。
+- ScaleANDLayout分形数值及对齐说明可参见[Layout和层次化表述法](../../../Layout和层次化表述法.md)
 
 ## 使用示例
 
