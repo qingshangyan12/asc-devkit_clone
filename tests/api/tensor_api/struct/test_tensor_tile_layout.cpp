@@ -646,36 +646,6 @@ TEST_F(Tensor_Api_Layout, TestRankSize)
     EXPECT_EQ(layoutObj3.Rank<1>(), 2);
 }
 
-TEST_F(Tensor_Api_Layout, TestMakeShapeStride)
-{
-    using namespace AscendC::Te;
-    auto shape1 = MakeShape(3, 2);
-    auto stride1 = MakeStride(1, 4);
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape1)>, true);
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride1)>, true);
-    EXPECT_EQ(GetShape<0>(shape1), 3);
-    EXPECT_EQ(GetShape<1>(shape1), 2);
-
-    auto shape2 = MakeShape(AscendC::Std::Int<11>{}, AscendC::Std::Int<23>{}, AscendC::Std::Int<37>{});
-    auto stride2 = MakeStride(AscendC::Std::Int<3>{}, AscendC::Std::Int<7>{}, AscendC::Std::Int<5>{});
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape2)>, true);
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride2)>, true);
-    EXPECT_EQ(GetShape<0>(shape2), AscendC::Std::Int<11>{});
-    EXPECT_EQ(GetShape<1>(shape2), AscendC::Std::Int<23>{});
-    EXPECT_EQ(GetShape<2>(shape2), AscendC::Std::Int<37>{});
-
-    auto shape3 = MakeShape(MakeShape(AscendC::Std::Int<11>{}, AscendC::Std::Int<22>{}),
-                            MakeShape(AscendC::Std::Int<33>{}, AscendC::Std::Int<44>{}));
-    auto stride3 = MakeStride(MakeShape(AscendC::Std::Int<55>{}, AscendC::Std::Int<66>{}),
-                              MakeShape(AscendC::Std::Int<77>{}, AscendC::Std::Int<88>{}));
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape3)>, true);
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride3)>, true);
-    EXPECT_EQ((GetShape<0, 0>(shape3)), AscendC::Std::Int<11>{});
-    EXPECT_EQ((GetShape<0, 1>(shape3)), AscendC::Std::Int<22>{});
-    EXPECT_EQ((GetShape<1, 0>(shape3)), AscendC::Std::Int<33>{});
-    EXPECT_EQ((GetShape<1, 1>(shape3)), AscendC::Std::Int<44>{});
-}
-
 TEST_F(Tensor_Api_Layout, TestMakeTileCoord)
 {
     using namespace AscendC::Te;

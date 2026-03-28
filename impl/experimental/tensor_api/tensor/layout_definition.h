@@ -30,7 +30,16 @@
 namespace AscendC {
 namespace Te {
 struct NzLayoutPattern{};
+
+struct NDLayoutPattern{};
+
 struct DefaultLayoutPattern{};
+
+template <typename T = half, int32_t C0 = 32>
+struct LayoutTrait {
+    using type = T;
+    static constexpr int32_t C0_size = C0;;
+};
     
 
 template <typename T, typename U, typename S>
