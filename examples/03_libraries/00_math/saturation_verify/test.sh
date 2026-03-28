@@ -13,7 +13,7 @@ run_test() {
     echo ""
     echo "========================================="
     echo "INPUT_SIZE:     $INPUT_SIZE"
-    echo "INPUT_API_ID:   $INPUT_API_ID (1: exp, 2: mul, 3: adds, 4: leakyrelu)"
+    echo "INPUT_API_ID:   $INPUT_API_ID (1: exp, 2: mul, 3: adds, 4: leakyrelu, 5: ln, 6: abs, 7: reciprocal, 8: sqrt, 9: rsqrt, 10: relu, 11: add, 12: sub, 13: div, 14: max, 15: min)"
     echo "INPUT_API_TYPE: $INPUT_API_TYPE (${API_TYPE_NAMES[$INPUT_API_TYPE]})"
     echo "INPUT_DATA_TYPE: $data_type (${TYPE_NAMES[$data_type]})"
     echo "========================================="
@@ -41,6 +41,17 @@ case $INPUT_API_ID in
     2) EXPECTED_TYPE=2 ;; # 双目API
     3) EXPECTED_TYPE=3 ;; # 双目矢量API
     4) EXPECTED_TYPE=3 ;; # 双目矢量API
+    5) EXPECTED_TYPE=1 ;; # 单目API
+    6) EXPECTED_TYPE=1 ;; # 单目API
+    7) EXPECTED_TYPE=1 ;; # 单目API
+    8) EXPECTED_TYPE=1 ;; # 单目API
+    9) EXPECTED_TYPE=1 ;; # 单目API
+    10) EXPECTED_TYPE=1 ;; # 单目API
+    11) EXPECTED_TYPE=2 ;; # 双目API
+    12) EXPECTED_TYPE=2 ;; # 双目API
+    13) EXPECTED_TYPE=2 ;; # 双目API
+    14) EXPECTED_TYPE=2 ;; # 双目API
+    15) EXPECTED_TYPE=2 ;; # 双目API
     *) echo "Error: Unknown API_ID=$INPUT_API_ID"; exit 1 ;;
 esac
 
@@ -50,6 +61,17 @@ if [ "$INPUT_API_TYPE" != "$EXPECTED_TYPE" ]; then
     echo "  Mul (API_ID 2) should use API_TYPE=2 (Binary)"
     echo "  Adds (API_ID 3) should use API_TYPE=3 (BinaryScalar)"
     echo "  LeakyRelu (API_ID 4) should use API_TYPE=3 (BinaryScalar)"
+    echo "  Ln (API_ID 5) should use API_TYPE=1 (Unary)"
+    echo "  Abs (API_ID 6) should use API_TYPE=1 (Unary)"
+    echo "  Reciprocal (API_ID 7) should use API_TYPE=1 (Unary)"
+    echo "  Sqrt (API_ID 8) should use API_TYPE=1 (Unary)"
+    echo "  Rsqrt (API_ID 9) should use API_TYPE=1 (Unary)"
+    echo "  Relu (API_ID 10) should use API_TYPE=1 (Unary)"
+    echo "  Add (API_ID 11) should use API_TYPE=2 (Binary)"
+    echo "  Sub (API_ID 12) should use API_TYPE=2 (Binary)"
+    echo "  Div (API_ID 13) should use API_TYPE=2 (Binary)"
+    echo "  Max (API_ID 14) should use API_TYPE=2 (Binary)"
+    echo "  Min (API_ID 15) should use API_TYPE=2 (Binary)"
     exit 1
 fi
 

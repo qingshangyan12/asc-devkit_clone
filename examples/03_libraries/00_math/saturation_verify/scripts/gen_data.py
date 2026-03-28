@@ -21,11 +21,33 @@ from gen_data_exp import compute_exp_golden, gen_exp_data
 from gen_data_mul import compute_mul_golden, gen_mul_data
 from gen_data_adds import compute_adds_golden, gen_adds_data
 from gen_data_leakyrelu import compute_leakyrelu_golden, gen_leakyrelu_data
+from gen_data_ln import compute_ln_golden, gen_ln_data
+from gen_data_abs import compute_abs_golden, gen_abs_data
+from gen_data_reciprocal import compute_reciprocal_golden, gen_reciprocal_data
+from gen_data_sqrt import compute_sqrt_golden, gen_sqrt_data
+from gen_data_rsqrt import compute_rsqrt_golden, gen_rsqrt_data
+from gen_data_relu import compute_relu_golden, gen_relu_data
+from gen_data_add import compute_add_golden, gen_add_data
+from gen_data_sub import compute_sub_golden, gen_sub_data
+from gen_data_div import compute_div_golden, gen_div_data
+from gen_data_max import compute_max_golden, gen_max_data
+from gen_data_min import compute_min_golden, gen_min_data
 
 API_ID_EXP = 1
 API_ID_MUL = 2
 API_ID_ADDS = 3
 API_ID_LEAKYRELU = 4
+API_ID_LN = 5
+API_ID_ABS = 6
+API_ID_RECIPROCAL = 7
+API_ID_SQRT = 8
+API_ID_RSQRT = 9
+API_ID_RELU = 10
+API_ID_ADD = 11
+API_ID_SUB = 12
+API_ID_DIV = 13
+API_ID_MAX = 14
+API_ID_MIN = 15
 
 TYPE_MAP = {
     1: np.float16,
@@ -38,7 +60,18 @@ API_NAME_MAP = {
     1: "exp",
     2: "mul",
     3: "adds",
-    4: "leakyrelu"
+    4: "leakyrelu",
+    5: "ln",
+    6: "abs",
+    7: "reciprocal",
+    8: "sqrt",
+    9: "rsqrt",
+    10: "relu",
+    11: "add",
+    12: "sub",
+    13: "div",
+    14: "max",
+    15: "min"
 }
 
 
@@ -46,8 +79,8 @@ def main():
     parser = argparse.ArgumentParser(description="Generate golden data for saturation verify.")
     parser.add_argument('-inputSize', type=int, required=True,
                         help="Total number of elements in the tensor")
-    parser.add_argument('-apiId', type=int, default=1, choices=[1, 2, 3, 4],
-                        help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu")
+    parser.add_argument('-apiId', type=int, default=1, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+                        help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu, 5=ln, 6=abs, 7=reciprocal, 8=sqrt, 9=rsqrt, 10=relu, 11=add, 12=sub, 13=div, 14=max, 15=min")
     parser.add_argument('-inputType', type=int, default=1, choices=[1, 2, 3, 4],
                         help="Input type: 1=float16, 2=float32, 3=int16, 4=int32")
     parser.add_argument('-apiType', type=int, default=1, choices=[1, 2, 3],
@@ -68,6 +101,28 @@ def main():
         gen_adds_data(input_type, args.inputSize)
     elif args.apiId == API_ID_LEAKYRELU:
         gen_leakyrelu_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_LN:
+        gen_ln_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_ABS:
+        gen_abs_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_RECIPROCAL:
+        gen_reciprocal_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_SQRT:
+        gen_sqrt_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_RSQRT:
+        gen_rsqrt_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_RELU:
+        gen_relu_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_ADD:
+        gen_add_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_SUB:
+        gen_sub_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_DIV:
+        gen_div_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_MAX:
+        gen_max_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_MIN:
+        gen_min_data(input_type, args.inputSize)
     else:
         raise ValueError(f"Unsupported API ID: {args.apiId}")
 

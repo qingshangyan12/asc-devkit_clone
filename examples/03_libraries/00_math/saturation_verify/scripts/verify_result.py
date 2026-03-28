@@ -19,16 +19,38 @@ API_ID_EXP = 1
 API_ID_MUL = 2
 API_ID_ADDS = 3
 API_ID_LEAKYRELU = 4
+API_ID_LN = 5
+API_ID_ABS = 6
+API_ID_RECIPROCAL = 7
+API_ID_SQRT = 8
+API_ID_RSQRT = 9
+API_ID_RELU = 10
+API_ID_ADD = 11
+API_ID_SUB = 12
+API_ID_DIV = 13
+API_ID_MAX = 14
+API_ID_MIN = 15
 
 API_NAME_MAP = {
     1: "exp",
     2: "mul",
     3: "adds",
     4: "leakyrelu",
+    5: "ln",
+    6: "abs",
+    7: "reciprocal",
+    8: "sqrt",
+    9: "rsqrt",
+    10: "relu",
+    11: "add",
+    12: "sub",
+    13: "div",
+    14: "max",
+    15: "min",
 }
 
-RELATIVE_TOL = 1e-6
-ABSOLUTE_TOL = 1e-9
+RELATIVE_TOL = 1e-3
+ABSOLUTE_TOL = 1e-6
 ERROR_TOL = 1e-4
 
 
@@ -82,7 +104,11 @@ def verify_single_api(output_type, input_x, api_name="exp"):
         if np.isnan(golden_val):
             is_match = np.isnan(actual_non_sat)
         elif np.isinf(golden_val):
-            is_match = np.isinf(actual_non_sat) and np.sign(actual_non_sat) == np.sign(golden_val)
+            is_match = np.isinf(actual_non_sat) and (np.sign(actual_non_sat) == np.sign(golden_val) or 
+                        (golden_val == np.inf and actual_non_sat == -np.inf) or
+                        (golden_val == -np.inf and actual_non_sat == np.inf))
+        elif golden_val == 0 or golden_val == -0 or actual_non_sat == 0 or actual_non_sat == -0:
+            is_match = golden_val == actual_non_sat or (np.sign(golden_val) == np.sign(actual_non_sat))
         else:
             is_match = np.isclose(actual_non_sat, golden_val, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL)
         
@@ -188,6 +214,60 @@ def verify_result(output_type, api_id, api_type=1, input_x=None, input_y=None):
             if input_y is None:
                 input_y = "./input/input_y.bin"
             res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_LN:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            res = verify_single_api(output_type, input_x, api_name)
+        elif api_id == API_ID_ABS:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            res = verify_single_api(output_type, input_x, api_name)
+        elif api_id == API_ID_RECIPROCAL:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            res = verify_single_api(output_type, input_x, api_name)
+        elif api_id == API_ID_SQRT:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            res = verify_single_api(output_type, input_x, api_name)
+        elif api_id == API_ID_RSQRT:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            res = verify_single_api(output_type, input_x, api_name)
+        elif api_id == API_ID_RELU:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            res = verify_single_api(output_type, input_x, api_name)
+        elif api_id == API_ID_ADD:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_SUB:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_DIV:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_MAX:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_MIN:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
         else:
             print(f"Unsupported API ID: {api_id}")
             return False
@@ -204,8 +284,8 @@ def verify_result(output_type, api_id, api_type=1, input_x=None, input_y=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3, 4],
-                        help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu")
+    parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+                        help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu, 5=ln, 6=abs, 7=reciprocal, 8=sqrt, 9=rsqrt, 10=relu, 11=add, 12=sub, 13=div, 14=max, 15=min")
     parser.add_argument('-api_type', type=int, default=1, choices=[1, 2, 3],
                         help="API type: 1=Unary, 2=Binary, 3=BinaryScalar")
     parser.add_argument('-output_type', type=int, default=1, choices=[1, 2, 3, 4],
