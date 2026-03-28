@@ -290,22 +290,27 @@ def args_parse():
 if __name__ == "__main__":
     args = args_parse()
     kernel_builder = CompileKernel(args)
+<<<<<<< HEAD
     if kernel_builder.fail_constructor:
         sys.exit()
+=======
+    if kernel_bulder.fail_constructor:
+        return
+>>>>>>> parent of 9c6ffb2d... 1
     kernel_builder.clean()
     if args.enable_binary == "False":
         if not kernel_builder.ascendc_gen_impl():
-            sys.exit()
+            return
         kernel_builder.clean()
     else:
         if not kernel_builder.ascendc_gen_impl():
-            sys.exit()
+            return
         if not kernel_builder.ascendc_gen_param():
-            sys.exit()
+            return
         if not kernel_builder.ascendc_put_json():
-            sys.exit()
+            return
         if not kernel_builder.ascendc_put_tiling():
-            sys.exit()
+            return
         if not kernel_builder.ascendc_build():
-            sys.exit()
+            return
         kernel_builder.clean()
