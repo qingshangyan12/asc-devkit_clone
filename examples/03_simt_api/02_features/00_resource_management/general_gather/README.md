@@ -108,7 +108,7 @@
   * indices：indices的前batch_dims维必须与input的前batch_dims维相同，即indices.shape[0:batch_dims] = input.shape[0:batch_dims]
   * axis：收集维度axis不能小于batch_dims，且不能超过input的维度数，即batch_dims <= axis < input.rank
   * batch_dims：批量维度数不能超过input和indices中较小的维度数，即0 <= batch_dims <= min(input.rank, indices.rank)
-  * output shape：input_shape[:axis] + indices_shape[batch_dims:] + input_shape[axis+1:]
+  * output.shape：input.shape[:axis] + indices.shape[batch_dims:] + input.shape[axis+1:]
   * 样例实现中，axis和batch_dims也支持传入负值，并会在计算前转换为对应的非负维度索引
 - 数据切分：
   * gridDim：根据收集总数据量动态分配。优先根据blockDim按需计算block数；当所需block数超过设备AIV核数时，取设备AIV核数作为block数
