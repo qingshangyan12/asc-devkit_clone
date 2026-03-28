@@ -1,0 +1,110 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+import os
+import copy
+import struct
+import numpy as np
+
+def extract_relu_params(relu_pre):
+    relu_pre = int(relu_pre)
+    relu_alpha_bits = (relu_pre >> 13) & 0xFFFFF
+    sign_bit = (relu_alpha_bits >> 18) & 0x1
+    exponent = (relu_alpha_bits >> 10) & 0xFF
+    mantissa = relu_alpha_bits & 0x3FF
+    exponent_bias = 127
+    relu_alpha = (-1) ** sign_bit * (1 + mantissa / 1024) * (2 ** (exponent - exponent_bias))
+    if relu_alpha == (-1) ** 0 * (1 + 0 / 1024) * (2 ** (0 - exponent_bias)):
+        relu_alpha = 0.0
+    return relu_alpha
+
+def extract_quant_params(quant_pre):
+    quant_pre = int(quant_pre)
+    quant_alpha_bits = (quant_pre >> 13) & 0xFFFFF
+    mode_control_bit = (quant_pre >> 36) & 0x1
+    offset = (quant_pre >> 37) & 0x1FF
+    sign = (quant_pre >> 46) & 0x1
+    n = (quant_pre >> 32) & 0xF
+    sign_bit = (quant_alpha_bits >> 18) & 0x1
+    exponent = (quant_alpha_bits >> 10) & 0xFF
+    mantissa = quant_alpha_bits & 0x3FF
+    exponent_bias = 127
+    quant_alpha = (-1) ** sign_bit * (1 + mantissa / 1024) * (2 ** (exponent - exponent_bias))
+    return quant_alpha, offset, sign, n, mode_control_bit
+
+def saturation(value, min_val, max_val, target_type):
+    x_clamped = np.clip(value, min_val, max_val)
+    return np.round(x_clamped).astype(target_type)
+
+def qf322b8_pre(data, quant_pre, relu_pre):
+    quant_alpha, offset, sign, n_shift, mode_control_bit = extract_quant_params(quant_pre)
+    relu_alpha = extract_relu_params(relu_pre)
+    if mode_control_bit == 1:
+        data = data / (2 ** n_shift)
+        data = saturation(data, -32768, 32767, np.int16)
+    data = data.astype(np.float32)
+    if data >= 0:
+        data = data * quant_alpha
+    else:
+        data = data * relu_alpha
+    quant_data = saturation(data, -256, 255, np.int16) + offset
+    if sign:
+        return saturation(quant_data, -128, 127, np.int8)
+    else:
+        return saturation(quant_data, 0, 255, np.uint8)
+
+def gen_quant(input_dtype, output_dtype, pre_quant_mode, pre_relu_mode):
+    M = 128
+    K = 128
+    N = 256
+    kRound = 2
+
+    if input_dtype == 'half':
+        input_type = np.float16
+        x1_gm = np.random.uniform(-3.0, 3.0, [M, K]).astype(input_type)
+        x2_gm = np.random.uniform(-3.0, 3.0, [K, N]).astype(input_type)
+        golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(np.float32)
+    else:
+        input_type = np.int8
+        x1_gm = np.random.randint(-3, 3, [M, K]).astype(input_type)
+        x2_gm = np.random.randint(-3, 3, [K, N]).astype(input_type)
+        golden = np.matmul(x1_gm.astype(np.int32), x2_gm.astype(np.int32)).astype(np.int32)
+
+    # 量化参数
+    quant_scalar = 2.0
+    norm_relu_alpha = 0
+    relu_alpha_val = 1 if not pre_relu_mode else norm_relu_alpha
+    relu_alpha = struct.unpack('!I', struct.pack('!f', relu_alpha_val))[0]
+
+    # 构造量化参数向量（每列一个）
+    temp_quant_tensor = ((quant_scalar * np.ones((1, N), dtype=np.float32)).astype(np.float32))[0]
+    temp_quant_tensor_api = copy.deepcopy(temp_quant_tensor).astype(np.uint64)
+    for i, _ in enumerate(temp_quant_tensor_api):
+        temp_quant_tensor_api[i] = struct.unpack('!I', struct.pack('!f', temp_quant_tensor[i]))[0]
+        if output_dtype == 'int8':
+            temp_quant_tensor_api[i] = temp_quant_tensor_api[i] | np.uint64(0x400000000000)
+    quant_tensor = np.frombuffer(temp_quant_tensor_api, np.uint64)
+    quant_tensor = quant_tensor.astype(np.uint64)
+
+    # 量化真值生成
+    quant_golden = np.zeros((M, N), dtype=np.int8)
+    for i in range(M):
+        for j in range(N):
+            quant_golden[i, j] = qf322b8_pre(golden[i, j], quant_tensor[j], relu_alpha)
+
+    # 布局调整（NZ）
+    block_cols = 32
+    quant_golden = quant_golden.reshape((M // 16, 16, N // block_cols, block_cols)).transpose(2, 0, 1, 3).astype(np.int8)
+
+    # K轴拆分
+    if kRound > 1:
+        x1_gm = x1_gm.reshape(M, kRound, K // kRound).transpose(1, 0, 2)
+
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
+
+    x1_gm.astype(input_type).tofile("./input/x1_gm.bin")
+    x2_gm.astype(input_type).tofile("./input/x2_gm.bin")
+    if pre_quant_mode == 2:
+        quant_tensor.tofile("./input/quant_pre.bin")
+    quant_golden.astype(np.int8).tofile("./output/golden.bin")
