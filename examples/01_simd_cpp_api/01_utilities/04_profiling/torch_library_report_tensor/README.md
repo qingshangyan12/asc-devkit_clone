@@ -1,4 +1,4 @@
-# torch.library注册自定义算子直调样例
+# torch.library集成Profiling上报Shape信息
 
 ## 概述
 
