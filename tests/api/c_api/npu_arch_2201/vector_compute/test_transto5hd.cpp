@@ -49,3 +49,20 @@ TEST_F(TestTransdataTo5HDCAPI, c_api_set_va_reg_Succ)
     asc_transto5hd_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
     GlobalMockObject::verify();
 }
+
+TEST_F(TestTransdataTo5HDCAPI, c_api_set_va_reg_sync_Succ)
+{
+    ub_addr8_t dst = ub_addr8_t::VA0;
+    ub_addr8_t src = ub_addr8_t::VA2;
+    uint8_t repeat = 1;
+    uint16_t dst_stride = 1;
+    uint16_t src_stride = 1;
+    bool dst_high_half = false;
+    bool src_high_half = false;
+    MOCKER_CPP(scatter_vnchwconv_b8, void(ub_addr8_t, ub_addr8_t, uint8_t, uint16_t, uint16_t, bool, bool))
+            .times(1)
+            .will(invoke(scatter_vnchwconv_b8_stub));
+
+    asc_transto5hd_b8_sync(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+    GlobalMockObject::verify();
+}
