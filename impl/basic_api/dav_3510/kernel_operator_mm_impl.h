@@ -833,7 +833,7 @@ __aicore__ inline void SetLoadDataRepeatCal(const LoadDataRepeatParam repeatPara
     Internal::g_rptConfig = rptConfig;
 }
 
-__aicore__ inline SetLoadDataRepeatStride(uint16_t dstStride) {
+__aicore__ inline void SetLoadDataRepeatStride(uint16_t dstStride) {
     uint64_t rptConfig = Internal::g_rptConfig;
     constexpr uint32_t dstStrideShiftBit = 32;
     rptConfig |= uint64_t(dstStride) << dstStrideShiftBit;
