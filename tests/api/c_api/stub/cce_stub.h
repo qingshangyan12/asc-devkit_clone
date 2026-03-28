@@ -35,6 +35,10 @@ void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* bas
 inline void wait_intra_block(pipe_t pipe, uint8_t flag_id) {}
 inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {}
 
+inline void vbr(vector_f8e4m3& dst, fp8_e4m3fn_t value) {}
+inline void vbr(vector_f8e5m2& dst, fp8_e5m2_t value) {}
+inline void vbr(vector_f8e8m0& dst, fp8_e8m0_t value) {}
+
 // ==========copy_cbuf_to_ubuf===========
 inline void copy_cbuf_to_ubuf(__ubuf__ void *dst_addr, __cbuf__ void *src_addr, bool sub_blockid, 
     uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap) {}
