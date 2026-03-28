@@ -1253,10 +1253,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     compile_info.tiling_key_kernel_type = infered_info_from_ifile.tiling_key_kernel_type
     compile_info.no_set_kernel_type = infered_info_from_ifile.no_set_kernel_type
     compile_info.default_kernel_type = infered_info_from_ifile.default_kernel_type
-    compile_info.dump_info = infered_info_from_ifile.dump_info \
-        if (infered_info_from_ifile.dump_info.get('dump_type') is not None
-        and infered_info_from_ifile.dump_info.get('dump_size') is not None) \
-        else {'dump_type': '', 'dump_size': 1024}
+    compile_info.dump_info = {'dump_type': '', 'dump_size': 1024}
 
     # generate tiling struct size, dfx section
     if global_var_storage.get_variable("ascendc_tiling_no_register"):

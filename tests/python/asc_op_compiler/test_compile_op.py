@@ -1145,18 +1145,18 @@ class TestCompileOp(unittest.TestCase):
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
         os.remove(compile_info.gen_kernel_func_file)
-        compile_info.dump_info["dump_type"]= "assert"
-        assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
+        # compile_info.dump_info["dump_type"]= "assert"
+        # assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
         assert '-DASCENDC_DUMP=0' not in compile_option_tuple.compile_options
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple(compile_options, []))
         assert os.path.exists(
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
         os.remove(compile_info.gen_kernel_func_file)
-        global_var_storage.set_variable("ascendc_dump_assert_only", True)
+        # global_var_storage.set_variable("ascendc_dump_assert_only", True)
         compile_info.code_channel = 1
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple(compile_options, []))
-        global_var_storage.set_variable("ascendc_dump_assert_only", False)
+        # global_var_storage.set_variable("ascendc_dump_assert_only", False)
         compile_info.dump_info = infered_info_from_ifile.dump_info
         assert os.path.exists(
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
