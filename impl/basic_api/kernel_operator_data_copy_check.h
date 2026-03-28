@@ -27,77 +27,75 @@ namespace AscendC {
 /* **************************************************************************************************
  * DataCopy                                             *
  * ************************************************************************************************* */
-__aicore__ inline void CheckDataCopyParamsCommon(const DataCopyParams& intriParams, const __gm__ char* apiName)
+template <typename T>
+__aicore__ inline constexpr bool IsBasicDataCopySupportedType()
 {
-    CheckValueRange<uint16_t>(intriParams.blockCount, 1, UINT12_MAX, "blockCount", apiName); CheckValueRange<uint16_t>(
-        intriParams.blockLen, 1, UINT16_MAX, "blockLen", apiName);
+    return SupportType<PrimT<T>, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t,
+        half, float, double>()
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        || SupportType<PrimT<T>, bfloat16_t>()
+#endif
+        ;
 }
 
 template <typename T>
-__aicore__ inline void CheckDataCopyCountCommon(const uint32_t count, const __gm__ char* apiName)
+__aicore__ inline constexpr bool IsNd2NzSupportedType()
 {
-    using PrimType = PrimT<T>;
-    ASCENDC_DEBUG_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check count value in %s, count * sizeof(T) must be 32B "
-        "align, current count value is %u.\n", apiName, count));
-}
-
-__aicore__ inline void GetDataCopyUnitsByRoute(const Hardware srcHwPos, const Hardware dstHwPos,
-    uint16_t& srcBurstUnit, uint16_t& dstBurstUnit, uint16_t& srcStrideUnit, uint16_t& dstStrideUnit)
-{
-    srcBurstUnit = ONE_BLK_SIZE;
-    dstBurstUnit = ONE_BLK_SIZE;
-    srcStrideUnit = ONE_BLK_SIZE;
-    dstStrideUnit = ONE_BLK_SIZE;
-
-    if (srcHwPos == Hardware::L1 && dstHwPos == Hardware::BIAS) {
-        dstBurstUnit = 64;
-        srcStrideUnit = ONE_BLK_SIZE;
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-        srcBurstUnit = ONE_BLK_SIZE;
-        dstStrideUnit = ONE_BLK_SIZE;
-#else
-        srcBurstUnit = 64;
-        dstStrideUnit = 64;
+    return SupportType<PrimT<T>, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float>()
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        || SupportType<PrimT<T>, bfloat16_t>()
 #endif
-    } else if (srcHwPos == Hardware::L1 && dstHwPos == Hardware::FIXBUF) {
-        dstBurstUnit = 128;
-        srcStrideUnit = ONE_BLK_SIZE;
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-        srcBurstUnit = 64;
-        dstStrideUnit = 64;
-#else
-        srcBurstUnit = 128;
-        dstStrideUnit = 128;
+        ;
+}
+
+template <typename T>
+__aicore__ inline constexpr bool IsDataCopyPadSupportedType()
+{
+    return IsBasicDataCopySupportedType<T>();
+}
+
+template <typename T>
+__aicore__ inline void CheckBasicDataCopyTypeSupport(const __gm__ char* apiName)
+{
+    ASCENDC_DEBUG_ASSERT((IsBasicDataCopySupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype support in %s, supported dtypes are int8_t/uint8_t/int16_t/uint16_t/int32_t/"
+        "uint32_t/int64_t/uint64_t/half/bfloat16_t/float/double.\n", apiName));
+}
+
+template <typename T>
+__aicore__ inline void CheckNd2NzTypeSupport(const __gm__ char* apiName)
+{
+    ASCENDC_DEBUG_ASSERT((IsNd2NzSupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype support in %s, supported dtypes are int8_t/uint8_t/int16_t/uint16_t/int32_t/"
+        "uint32_t/half/bfloat16_t/float.\n", apiName));
+}
+
+template <typename T>
+__aicore__ inline void CheckDataCopyPadTypeSupport(const __gm__ char* apiName)
+{
+    ASCENDC_DEBUG_ASSERT((IsDataCopyPadSupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype support in %s, supported dtypes are half/bfloat16_t/int16_t/uint16_t/float/"
+        "int32_t/uint32_t/int8_t/uint8_t/int64_t/uint64_t/double.\n", apiName));
+}
+
+template <typename T, typename U>
+__aicore__ inline void CheckBasicDataCopyMixedTypeSupport(const __gm__ char* apiName)
+{
+    ASCENDC_DEBUG_ASSERT((SupportType<Tuple<PrimT<T>, PrimT<U>>,
+        Tuple<int8_t, int8_t>, Tuple<uint8_t, uint8_t>, Tuple<int16_t, int16_t>, Tuple<uint16_t, uint16_t>,
+        Tuple<int32_t, int32_t>, Tuple<uint32_t, uint32_t>, Tuple<int64_t, int64_t>, Tuple<uint64_t, uint64_t>,
+        Tuple<half, half>, Tuple<float, float>, Tuple<double, double>, Tuple<float, half>>
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        || SupportType<Tuple<PrimT<T>, PrimT<U>>, Tuple<bfloat16_t, bfloat16_t>>()
 #endif
-    }
+        ), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype support in %s, supported dtype combinations are "
+        "same primitive dtype or half -> float.\n", apiName));
 }
 
-template <typename SrcT, typename DstT>
-__aicore__ inline void CalculateDataCopyRequiredBytes(const DataCopyParams& intriParams, const Hardware srcHwPos,
-    const Hardware dstHwPos, uint64_t& srcRequiredBytes, uint64_t& dstRequiredBytes)
+__aicore__ inline void CheckDataCopyParamsCommon(const DataCopyParams& intriParams, const __gm__ char* apiName)
 {
-    uint16_t srcBurstUnit = ONE_BLK_SIZE;
-    uint16_t dstBurstUnit = ONE_BLK_SIZE;
-    uint16_t srcStrideUnit = ONE_BLK_SIZE;
-    uint16_t dstStrideUnit = ONE_BLK_SIZE;
-    GetDataCopyUnitsByRoute(srcHwPos, dstHwPos, srcBurstUnit, dstBurstUnit, srcStrideUnit, dstStrideUnit);
-    if (srcHwPos == Hardware::L1 && dstHwPos == Hardware::BIAS && sizeof(SrcT) != sizeof(DstT)) {
-        dstBurstUnit = static_cast<uint16_t>(dstBurstUnit * sizeof(DstT) / sizeof(SrcT));
-    }
-
-    srcRequiredBytes = static_cast<uint64_t>(intriParams.blockCount) * intriParams.blockLen * srcBurstUnit +
-        static_cast<uint64_t>(intriParams.blockCount - 1) * intriParams.srcStride * srcStrideUnit;
-    dstRequiredBytes = static_cast<uint64_t>(intriParams.blockCount) * intriParams.blockLen * dstBurstUnit +
-        static_cast<uint64_t>(intriParams.blockCount - 1) * intriParams.dstStride * dstStrideUnit;
-}
-
-__aicore__ inline void CheckRequiredBytes(const uint64_t requiredBytes, const uint64_t tensorSizeBytes,
-    const __gm__ char* tensorName, const __gm__ char* apiName)
-{
-    ASCENDC_DEBUG_ASSERT((requiredBytes <= tensorSizeBytes), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s "
-        "size in %s, tensor size needs to be at least %llu bytes, while current tensor size is only %llu bytes.\n", tensorName,
-        apiName, static_cast<unsigned long long>(requiredBytes), static_cast<unsigned long long>(tensorSizeBytes)));
+    CheckValueRange<uint16_t>(intriParams.blockCount, 1, UINT12_MAX, "blockCount", apiName);
+    CheckValueRange<uint16_t>(intriParams.blockLen, 1, UINT16_MAX, "blockLen", apiName);
 }
 
 __aicore__ inline void CheckDataCopyLocalRoute(const Hardware srcHwPos, const Hardware dstHwPos, const TPosition srcPos,
@@ -147,25 +145,9 @@ template <typename T>
 __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
     const DataCopyParams& intriParams, const __gm__ char* apiName)
 {
-    (void)src;
-    using PrimType = PrimT<T>;
-    const TPosition dstPos = static_cast<TPosition>(dst.GetPosition());
-    const Hardware dstHwPos = GetPhyType(dstPos);
-    const uint64_t dstTensorSizeBytes = static_cast<uint64_t>(dst.GetSize()) * sizeof(PrimType);
-    uint64_t srcRequiredBytes = 0;
-    uint64_t dstRequiredBytes = 0;
-    CalculateDataCopyRequiredBytes<PrimType, PrimType>(intriParams, Hardware::GM, dstHwPos, srcRequiredBytes,
-        dstRequiredBytes);
-
     CheckDataCopyParamsCommon(intriParams, apiName);
-    ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::UB || dstHwPos == Hardware::L1),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor route in %s, supported routes are GM -> UB / "
-        "L1, current dst TPosition is %s.\n", apiName, GetTPositionName(dstPos)));
+    CheckTensorPhyPosition<Hardware::L1, Hardware::UB>(dst, "dst", "A1 / B1 / C1 / VECIN", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
-    ASCENDC_DEBUG_ASSERT((dstRequiredBytes <= dstTensorSizeBytes), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
-        "check dstLocal size in %s, tensor size needs to be at least %llu bytes, while current tensor size is only "
-        "%llu bytes.\n", apiName, static_cast<unsigned long long>(dstRequiredBytes),
-        static_cast<unsigned long long>(dstTensorSizeBytes)));
 }
 
 template <typename T>
@@ -173,63 +155,33 @@ __aicore__ inline void CheckDataCopyTensor(const GlobalTensor<T>& dst, const Loc
     const DataCopyParams& intriParams, const __gm__ char* apiName)
 {
     (void)dst;
-    using PrimType = PrimT<T>;
-    const TPosition srcPos = static_cast<TPosition>(src.GetPosition());
-    const Hardware srcHwPos = GetPhyType(srcPos);
-    const uint64_t srcTensorSizeBytes = static_cast<uint64_t>(src.GetSize()) * sizeof(PrimType);
-    uint64_t srcRequiredBytes = 0;
-    uint64_t dstRequiredBytes = 0;
     CheckDataCopyParamsCommon(intriParams, apiName);
-    ASCENDC_DEBUG_ASSERT((srcHwPos == Hardware::UB || srcHwPos == Hardware::L1),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor route in %s, supported routes are UB -> GM / "
-        "L1 -> GM, current src TPosition is %s.\n", apiName, GetTPositionName(srcPos)));
+    CheckTensorPhyPosition<Hardware::L1, Hardware::UB>(src, "src", "A1 / B1 / VECOUT", apiName);
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
-    CalculateDataCopyRequiredBytes<PrimType, PrimType>(intriParams, srcHwPos, Hardware::GM, srcRequiredBytes,
-        dstRequiredBytes);
-
-    ASCENDC_DEBUG_ASSERT((srcRequiredBytes <= srcTensorSizeBytes), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
-        "check srcLocal size in %s, tensor size needs to be at least %llu bytes, while current tensor size is only "
-        "%llu bytes.\n", apiName, static_cast<unsigned long long>(srcRequiredBytes),
-        static_cast<unsigned long long>(srcTensorSizeBytes)));
 }
 
 template <typename T>
 __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const DataCopyParams& intriParams, const __gm__ char* apiName)
 {
-    using PrimType = PrimT<T>;
     const TPosition dstPos = static_cast<TPosition>(dst.GetPosition());
     const TPosition srcPos = static_cast<TPosition>(src.GetPosition());
     const Hardware dstHwPos = GetPhyType(dstPos);
     const Hardware srcHwPos = GetPhyType(srcPos);
-    const uint64_t srcTensorSizeBytes = static_cast<uint64_t>(src.GetSize()) * sizeof(PrimType);
-    const uint64_t dstTensorSizeBytes = static_cast<uint64_t>(dst.GetSize()) * sizeof(PrimType);
-    uint64_t srcRequiredBytes = 0;
-    uint64_t dstRequiredBytes = 0;
 
     CheckDataCopyParamsCommon(intriParams, apiName);
     CheckDataCopyLocalRoute(srcHwPos, dstHwPos, srcPos, dstPos, apiName);
     CheckDataCopyLocalAlignment(dst, src, srcHwPos, dstHwPos, apiName);
-    CalculateDataCopyRequiredBytes<PrimType, PrimType>(intriParams, srcHwPos, dstHwPos, srcRequiredBytes,
-        dstRequiredBytes);
-    CheckRequiredBytes(srcRequiredBytes, srcTensorSizeBytes, "srcLocal", apiName);
-    CheckRequiredBytes(dstRequiredBytes, dstTensorSizeBytes, "dstLocal", apiName);
 }
 
 template <typename T, typename U>
 __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const DataCopyParams& intriParams, const __gm__ char* apiName)
 {
-    using PrimDstType = PrimT<T>;
-    using PrimSrcType = PrimT<U>;
     const TPosition dstPos = static_cast<TPosition>(dst.GetPosition());
     const TPosition srcPos = static_cast<TPosition>(src.GetPosition());
     const Hardware dstHwPos = GetPhyType(dstPos);
     const Hardware srcHwPos = GetPhyType(srcPos);
-    const uint64_t srcTensorSizeBytes = static_cast<uint64_t>(src.GetSize()) * sizeof(PrimSrcType);
-    const uint64_t dstTensorSizeBytes = static_cast<uint64_t>(dst.GetSize()) * sizeof(PrimDstType);
-    uint64_t srcRequiredBytes = 0;
-    uint64_t dstRequiredBytes = 0;
 
     CheckDataCopyParamsCommon(intriParams, apiName);
     ASCENDC_DEBUG_ASSERT((srcHwPos == Hardware::L1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor "
@@ -240,58 +192,28 @@ __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const Loca
         GetTPositionName(dstPos)));
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckTensorAlignment(dst, 64, "dst", apiName);
-    CalculateDataCopyRequiredBytes<PrimSrcType, PrimDstType>(intriParams, srcHwPos, dstHwPos, srcRequiredBytes,
-        dstRequiredBytes);
-    CheckRequiredBytes(srcRequiredBytes, srcTensorSizeBytes, "srcLocal", apiName);
-    CheckRequiredBytes(dstRequiredBytes, dstTensorSizeBytes, "dstLocal", apiName);
 }
 
 __aicore__ inline void CheckNd2NzParamsCommon(const Nd2NzParams& intriParams, const __gm__ char* apiName)
 {
     CheckValueRange<decltype(intriParams.ndNum)>(intriParams.ndNum, 0, UINT12_MAX, "ndNum", apiName);
-    CheckValueRange<decltype(intriParams.nValue)>(intriParams.nValue, 0, 16384, "nValue", apiName); CheckValueRange<
-        decltype(intriParams.dstNzC0Stride)>(intriParams.dstNzC0Stride, 0, 16384, "dstNzC0Stride", apiName);
-    CheckValueRange<decltype(intriParams.dstNzNStride)>(intriParams.dstNzNStride, 0, 16384, "dstNzNStride", apiName);
+    CheckValueRange<decltype(intriParams.nValue)>(intriParams.nValue, 0, 16384, "nValue", apiName);
+    CheckValueRange<decltype(intriParams.dValue)>(intriParams.dValue, 0, 65535, "dValue", apiName);
+    CheckValueRange<decltype(intriParams.srcNdMatrixStride)>(intriParams.srcNdMatrixStride, 0, 65535, "srcNdMatrixStride", apiName);
+    CheckValueRange<decltype(intriParams.srcDValue)>(intriParams.srcDValue, 1, 16384, "srcDValue", apiName);
+    CheckValueRange<decltype(intriParams.dstNzC0Stride)>(intriParams.dstNzC0Stride, 1, 16384, "dstNzC0Stride", apiName);
+    CheckValueRange<decltype(intriParams.dstNzNStride)>(intriParams.dstNzNStride, 1, 16384, "dstNzNStride", apiName);
+    CheckValueRange<decltype(intriParams.dstNzMatrixStride)>(intriParams.dstNzMatrixStride, 0, 65535, "dstNzMatrixStride", apiName);
 }
 
 __aicore__ inline void CheckNz2NdParamsCommon(const Nz2NdParamsFull& intriParams, const __gm__ char* apiName)
 {
     constexpr uint16_t nz2NdLimit = 8192;
-    CheckValueRange<decltype(intriParams.ndNum)>(intriParams.ndNum, 0, UINT12_MAX, "ndNum", apiName); CheckValueRange<
-        decltype(intriParams.nValue)>(intriParams.nValue, 1, nz2NdLimit, "nValue", apiName);
-    CheckValueRange<decltype(intriParams.dValue)>(intriParams.dValue, 1, nz2NdLimit, "dValue", apiName); CheckValueRange<
-        decltype(intriParams.srcNdMatrixStride)>(intriParams.srcNdMatrixStride, 1, VALUE_512, "srcNdMatrixStride", apiName);
+    CheckValueRange<decltype(intriParams.ndNum)>(intriParams.ndNum, 0, UINT12_MAX, "ndNum", apiName);
+    CheckValueRange<decltype(intriParams.nValue)>(intriParams.nValue, 1, nz2NdLimit, "nValue", apiName);
+    CheckValueRange<decltype(intriParams.dValue)>(intriParams.dValue, 1, nz2NdLimit, "dValue", apiName);
+    CheckValueRange<decltype(intriParams.srcNdMatrixStride)>(intriParams.srcNdMatrixStride, 1, VALUE_512, "srcNdMatrixStride", apiName);
     CheckValueRange<decltype(intriParams.srcNStride)>(intriParams.srcNStride, 0, UINT12_MAX, "srcNStride", apiName);
-}
-
-template <typename T>
-__aicore__ inline uint64_t CalculateNd2NzDstRequiredBytes(const Nd2NzParams& intriParams)
-{
-    if (intriParams.ndNum == 0 || intriParams.nValue == 0 || intriParams.dValue == 0) { return 0; }
-    return static_cast<uint64_t>(intriParams.ndNum - 1) * intriParams.dstNzMatrixStride * sizeof(PrimT<T>) +
-        static_cast<uint64_t>(intriParams.nValue - 1) * intriParams.dstNzNStride * DEFAULT_C0_SIZE +
-        static_cast<uint64_t>(DivCeil(intriParams.dValue * sizeof(PrimT<T>), DEFAULT_C0_SIZE) - 1) *
-        intriParams.dstNzC0Stride * DEFAULT_C0_SIZE + DEFAULT_C0_SIZE;
-}
-
-template <typename T>
-__aicore__ inline uint64_t CalculateNd2NzSrcRequiredBytes(const Nd2NzParams& intriParams)
-{
-    if (intriParams.ndNum == 0 || intriParams.nValue == 0 || intriParams.dValue == 0) { return 0; }
-    return (static_cast<uint64_t>(intriParams.ndNum - 1) * intriParams.srcNdMatrixStride +
-        static_cast<uint64_t>(intriParams.nValue - 1) * intriParams.srcDValue + intriParams.dValue) *
-        sizeof(PrimT<T>);
-}
-
-template <typename T>
-__aicore__ inline uint64_t CalculateNz2NdSrcRequiredBytes(const Nz2NdParamsFull& intriParams)
-{
-    if (intriParams.ndNum == 0 || intriParams.nValue == 0 || intriParams.dValue == 0) { return 0; }
-    const uint64_t nzWidth = 16;
-    const uint64_t srcMatrixStrideUnit = 256;
-    return static_cast<uint64_t>(intriParams.ndNum - 1) * intriParams.srcNdMatrixStride * srcMatrixStrideUnit *
-        sizeof(PrimT<T>) + static_cast<uint64_t>(intriParams.dValue / nzWidth - 1) * intriParams.srcNStride *
-        nzWidth * sizeof(PrimT<T>) + nzWidth * intriParams.nValue * sizeof(PrimT<T>);
 }
 
 template <typename T>
@@ -304,20 +226,6 @@ __aicore__ inline void CheckNd2NzRoute(const Hardware srcHwPos, const Hardware d
     ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::L1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor "
         "position in %s, supported positions are TSCM, current position is %s.\n", apiName,
         GetTPositionName(dstPos)));
-}
-
-template <typename T>
-__aicore__ inline void CheckNd2NzFormat(const Nd2NzParams& intriParams, const __gm__ char* apiName)
-{
-    ASCENDC_DEBUG_ASSERT((intriParams.ndNum == 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check ndNum value in %s, current value is %llu, valid value is 1.\n", apiName,
-        static_cast<unsigned long long>(intriParams.ndNum)));
-    ASCENDC_DEBUG_ASSERT((intriParams.dValue * sizeof(PrimT<T>) % ONE_BLK_SIZE == 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dValue in %s, dValue * sizeof(T) must be 32B aligned.\n",
-        apiName));
-    ASCENDC_DEBUG_ASSERT((intriParams.srcDValue * sizeof(PrimT<T>) % ONE_BLK_SIZE == 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check srcDValue in %s, srcDValue * sizeof(T) must be 32B aligned.\n", apiName));
 }
 
 __aicore__ inline void CheckUbToL1Route(const Hardware srcHwPos, const Hardware dstHwPos, const TPosition srcPos,
@@ -335,18 +243,9 @@ template <typename T>
 __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
     const Nd2NzParams& intriParams, const __gm__ char* apiName)
 {
-    (void)src;
-    const TPosition dstPos = static_cast<TPosition>(dst.GetPosition());
-    const Hardware dstHwPos = GetPhyType(dstPos);
-    const uint64_t dstTensorSizeBytes = static_cast<uint64_t>(dst.GetSize()) * sizeof(PrimT<T>);
-    const uint64_t dstRequiredBytes = CalculateNd2NzDstRequiredBytes<T>(intriParams);
-
     CheckNd2NzParamsCommon(intriParams, apiName);
-    ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::L1 || dstHwPos == Hardware::UB),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor position in %s, supported positions are "
-        "A1 / B1 / VECIN, current position is %s.\n", apiName, GetTPositionName(dstPos)));
+    CheckTensorPhyPosition<Hardware::L1, Hardware::UB>(dst, "dst", "A1 / B1 / C1 / VECIN", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
-    CheckRequiredBytes(dstRequiredBytes, dstTensorSizeBytes, "dstLocal", apiName);
 }
 
 template <typename T>
@@ -357,18 +256,10 @@ __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const Loca
     const TPosition srcPos = static_cast<TPosition>(src.GetPosition());
     const Hardware dstHwPos = GetPhyType(dstPos);
     const Hardware srcHwPos = GetPhyType(srcPos);
-    const uint64_t srcTensorSizeBytes = static_cast<uint64_t>(src.GetSize()) * sizeof(PrimT<T>);
-    const uint64_t dstTensorSizeBytes = static_cast<uint64_t>(dst.GetSize()) * sizeof(PrimT<T>);
-    const uint64_t srcRequiredBytes = CalculateNd2NzSrcRequiredBytes<T>(intriParams);
-    const uint64_t dstRequiredBytes = CalculateNd2NzDstRequiredBytes<T>(intriParams);
-
     CheckNd2NzParamsCommon(intriParams, apiName);
     CheckNd2NzRoute<T>(srcHwPos, dstHwPos, srcPos, dstPos, apiName);
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
-    CheckNd2NzFormat<T>(intriParams, apiName);
-    CheckRequiredBytes(srcRequiredBytes, srcTensorSizeBytes, "srcLocal", apiName);
-    CheckRequiredBytes(dstRequiredBytes, dstTensorSizeBytes, "dstLocal", apiName);
 }
 
 template <typename T>
@@ -378,8 +269,6 @@ __aicore__ inline void CheckDataCopyTensor(const GlobalTensor<T>& dst, const Loc
     (void)dst;
     const TPosition srcPos = static_cast<TPosition>(src.GetPosition());
     const Hardware srcHwPos = GetPhyType(srcPos);
-    const uint64_t srcTensorSizeBytes = static_cast<uint64_t>(src.GetSize()) * sizeof(PrimT<T>);
-    const uint64_t srcRequiredBytes = CalculateNz2NdSrcRequiredBytes<T>(intriParams);
 
     CheckNz2NdParamsCommon(intriParams, apiName);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
@@ -396,7 +285,6 @@ __aicore__ inline void CheckDataCopyTensor(const GlobalTensor<T>& dst, const Loc
         "check dValue value in %s, dValue must be divisible by %u, current value is %u.\n", apiName,
         static_cast<uint32_t>(BLOCK_CUBE), intriParams.dValue));
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
-    CheckRequiredBytes(srcRequiredBytes, srcTensorSizeBytes, "srcLocal", apiName);
 }
 
 template <typename T>
@@ -428,49 +316,24 @@ __aicore__ inline void CheckDataCopyPadParamsCommon(const DataCopyExtParams& dat
     }
 }
 
-template <typename ParamsT>
-__aicore__ inline uint64_t CalculateDataCopyPadLinearBytes(const ParamsT& dataCopyParams)
-{
-    if (dataCopyParams.blockCount == 0 || dataCopyParams.blockLen == 0) { return 0; }
-    return static_cast<uint64_t>(dataCopyParams.blockCount) * AlignUp(dataCopyParams.blockLen, DEFAULT_C0_SIZE) +
-        static_cast<uint64_t>(dataCopyParams.blockCount - 1) * dataCopyParams.srcStride * DEFAULT_C0_SIZE;
-}
-
-template <typename T, typename ParamsT, typename PadParamsT>
-__aicore__ inline uint64_t CalculateDataCopyPadDstBytes(const ParamsT& dataCopyParams, const PadParamsT& padParams)
-{
-    if (dataCopyParams.blockCount == 0 || dataCopyParams.blockLen == 0) { return 0; }
-    const uint64_t paddingSize = static_cast<uint64_t>(padParams.leftPadding + padParams.rightPadding) *
-        sizeof(PrimT<T>);
-    return static_cast<uint64_t>(dataCopyParams.blockCount) *
-        AlignUp(dataCopyParams.blockLen + paddingSize, DEFAULT_C0_SIZE) +
-        static_cast<uint64_t>(dataCopyParams.blockCount - 1) * dataCopyParams.dstStride * DEFAULT_C0_SIZE;
-}
-
 template <typename T, typename ParamsT, typename PadParamsT>
 __aicore__ inline void CheckGmToLocalPadTensor(const LocalTensor<T>& dst, const ParamsT& dataCopyParams,
     const PadParamsT& padParams, const bool isGmToUb, const bool isValidDst, const __gm__ char* apiName)
 {
-    const uint64_t dstRequiredBytes = CalculateDataCopyPadDstBytes<T>(dataCopyParams, padParams);
-    const uint64_t dstTensorSizeBytes = static_cast<uint64_t>(dst.GetSize()) * sizeof(PrimT<T>);
     CheckDataCopyPadParamsCommon<T>(dataCopyParams, isGmToUb, apiName);
     ASCENDC_DEBUG_ASSERT((isValidDst), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor route in %s, "
         "current dst TPosition is %s.\n", apiName, GetTPositionName(static_cast<TPosition>(dst.GetPosition()))));
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
-    CheckRequiredBytes(dstRequiredBytes, dstTensorSizeBytes, "dstLocal", apiName);
 }
 
 template <typename T, typename ParamsT>
 __aicore__ inline void CheckLocalToGmPadTensor(const LocalTensor<T>& src, const ParamsT& dataCopyParams,
     const bool isValidSrc, const __gm__ char* apiName)
 {
-    const uint64_t srcRequiredBytes = CalculateDataCopyPadLinearBytes(dataCopyParams);
-    const uint64_t srcTensorSizeBytes = static_cast<uint64_t>(src.GetSize()) * sizeof(PrimT<T>);
     CheckDataCopyPadParamsCommon<T>(dataCopyParams, false, apiName);
     ASCENDC_DEBUG_ASSERT((isValidSrc), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor route in %s, "
         "current src TPosition is %s.\n", apiName, GetTPositionName(static_cast<TPosition>(src.GetPosition()))));
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
-    CheckRequiredBytes(srcRequiredBytes, srcTensorSizeBytes, "srcLocal", apiName);
 }
 
 template <typename T, typename ParamsT>
@@ -481,18 +344,12 @@ __aicore__ inline void CheckPadUbToL1Tensor(const LocalTensor<T>& dst, const Loc
     const TPosition srcPos = static_cast<TPosition>(src.GetPosition());
     const Hardware dstHwPos = GetPhyType(dstPos);
     const Hardware srcHwPos = GetPhyType(srcPos);
-    const uint64_t srcRequiredBytes = CalculateDataCopyPadLinearBytes(dataCopyParams);
-    const uint64_t dstRequiredBytes = CalculateNd2NzDstRequiredBytes<T>(nd2nzParams);
-    const uint64_t srcTensorSizeBytes = static_cast<uint64_t>(src.GetSize()) * sizeof(PrimT<T>);
-    const uint64_t dstTensorSizeBytes = static_cast<uint64_t>(dst.GetSize()) * sizeof(PrimT<T>);
 
     CheckDataCopyPadParamsCommon<T>(dataCopyParams, false, apiName);
     CheckNd2NzParamsCommon(nd2nzParams, apiName);
     CheckUbToL1Route(srcHwPos, dstHwPos, srcPos, dstPos, apiName);
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
-    CheckRequiredBytes(srcRequiredBytes, srcTensorSizeBytes, "srcLocal", apiName);
-    CheckRequiredBytes(dstRequiredBytes, dstTensorSizeBytes, "dstLocal", apiName);
 }
 
 template <typename T>
