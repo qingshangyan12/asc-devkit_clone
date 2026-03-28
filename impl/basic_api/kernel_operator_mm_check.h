@@ -63,6 +63,9 @@ __aicore__ inline void CheckMmadParamsCommon(const MmadParams& mmadParams, const
     CheckValueRange<uint16_t>(mmadParams.m, 0, UINT12_MAX, "m", apiName);
     CheckValueRange<uint16_t>(mmadParams.n, 0, UINT12_MAX, "n", apiName);
     CheckValueRange<uint16_t>(mmadParams.k, 0, UINT12_MAX, "k", apiName);
+    ASCENDC_DEBUG_ASSERT((mmadParams.unitFlag == 0 || mmadParams.unitFlag == 2 || mmadParams.unitFlag == 3),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check unitFlag value in %s, supported values are 0, 2, and 3.\n",
+        apiName));
 }
 
 template <typename T, typename U, typename S>
@@ -70,14 +73,12 @@ __aicore__ inline void CheckMmadTensorCommon(const LocalTensor<T>& dst, const Lo
     const LocalTensor<S>& filter, const MmadParams& mmadParams, const __gm__ char* apiName)
 {
     constexpr uint32_t align1024B = 1024;
-    const uint32_t dstAlign = (IsSameType<PrimT<T>, half>::value && IsSameType<PrimT<U>, half>::value &&
-        IsSameType<PrimT<S>, half>::value) ? VALUE_512 : align1024B;
 
     CheckMmadParamsCommon(mmadParams, apiName);
     CheckTensorPhyPosition<Hardware::L0C>(dst, "dstLocal", "CO1", apiName);
     CheckTensorPhyPosition<Hardware::L0A>(fm, "fmLocal", "A2", apiName);
     CheckTensorPhyPosition<Hardware::L0B>(filter, "filterLocal", "B2", apiName);
-    CheckTensorAlignment(dst, dstAlign, "dst", apiName);
+    CheckTensorAlignment(dst, align1024B, "dst", apiName);
     CheckTensorAlignment(fm, VALUE_512, "fm", apiName);
     CheckTensorAlignment(filter, VALUE_512, "filter", apiName);
 }
@@ -113,6 +114,37 @@ __aicore__ inline void CheckFixpipeQuantPreWithWorkspaceCommon(const QuantMode_t
         "when cbufWorkspace is given, supported values are VDEQF16 / VQF322B8_PRE / VREQ8.\n", apiName));
 }
 
+template <typename T, typename U>
+__aicore__ inline void CheckFixpipeQuantPreCommon(const QuantMode_t quantPre, const __gm__ char* apiName)
+{
+    if constexpr (IsSameType<U, float>::value && SupportType<T, int8_t, uint8_t>()) {
+        ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::QF322B8_PRE ||
+            quantPre == QuantMode_t::VQF322B8_PRE), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check quantPre value in %s, when src is float and dst is int8_t / uint8_t, supported values "
+            "are QF322B8_PRE and VQF322B8_PRE.\n", apiName));
+    } else if constexpr (IsSameType<U, float>::value && IsSameType<T, half>::value) {
+        ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::F322F16), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check quantPre value in %s, when src is float and dst is half, supported value is F322F16.\n",
+            apiName));
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    } else if constexpr (IsSameType<U, float>::value && IsSameType<T, bfloat16_t>::value) {
+        ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::F322BF16), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check quantPre value in %s, when src is float and dst is bfloat16_t, supported value is "
+            "F322BF16.\n", apiName));
+#endif
+    } else if constexpr (IsSameType<U, int32_t>::value && SupportType<T, int8_t, uint8_t>()) {
+        ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::REQ8 ||
+            quantPre == QuantMode_t::VREQ8), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check quantPre value in %s, when src is int32_t and dst is int8_t / uint8_t, supported values "
+            "are REQ8 and VREQ8.\n", apiName));
+    } else if constexpr (IsSameType<U, int32_t>::value && IsSameType<T, half>::value) {
+        ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::DEQF16 ||
+            quantPre == QuantMode_t::VDEQF16), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check quantPre value in %s, when src is int32_t and dst is half, supported values are DEQF16 "
+            "and VDEQF16.\n", apiName));
+    }
+}
+
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void CheckFixpipeParamsV220Common(const FixpipeParamsV220& intriParams, const __gm__ char* apiName)
 {
@@ -121,6 +153,9 @@ __aicore__ inline void CheckFixpipeParamsV220Common(const FixpipeParamsV220& int
             intriParams.nSize % 8 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check nSize value in %s, "
             "when isChannelSplit is true, its valid range is 1 ~ 4095 and must be divisible by 8, current value "
             "is %u.\n", apiName, intriParams.nSize));
+        ASCENDC_DEBUG_ASSERT((IsSameType<T, float>::value && IsSameType<U, float>::value),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check isChannelSplit value in %s, isChannelSplit can be "
+            "enabled only when src and dst are both float.\n", apiName));
     } else if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         CheckValueRange<uint16_t>(intriParams.nSize, 1, UINT12_MAX, "nSize", apiName);
     } else {
@@ -141,44 +176,21 @@ __aicore__ inline void CheckFixpipeParamsV220Common(const FixpipeParamsV220& int
         CheckValueRange<uint16_t>(intriParams.dstNdStride, 1, UINT16_MAX, "dstNdStride", apiName);
     }
 
-    if constexpr (IsSameType<U, float>::value && SupportType<T, int8_t, uint8_t>()) {
-        ASCENDC_DEBUG_ASSERT((intriParams.quantPre == QuantMode_t::QF322B8_PRE ||
-            intriParams.quantPre == QuantMode_t::VQF322B8_PRE), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-            "Failed to check quantPre value in %s, when src is float and dst is int8_t / uint8_t, supported values "
-            "are QF322B8_PRE and VQF322B8_PRE.\n", apiName));
-    } else if constexpr (IsSameType<U, float>::value && IsSameType<T, half>::value) {
-        ASCENDC_DEBUG_ASSERT((intriParams.quantPre == QuantMode_t::F322F16), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-            "Failed to check quantPre value in %s, when src is float and dst is half, supported value is F322F16.\n",
-            apiName));
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    } else if constexpr (IsSameType<U, float>::value && IsSameType<T, bfloat16_t>::value) {
-        ASCENDC_DEBUG_ASSERT((intriParams.quantPre == QuantMode_t::F322BF16), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-            "Failed to check quantPre value in %s, when src is float and dst is bfloat16_t, supported value is "
-            "F322BF16.\n", apiName));
-#endif
-    } else if constexpr (IsSameType<U, int32_t>::value && SupportType<T, int8_t, uint8_t>()) {
-        ASCENDC_DEBUG_ASSERT((intriParams.quantPre == QuantMode_t::REQ8 ||
-            intriParams.quantPre == QuantMode_t::VREQ8), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-            "Failed to check quantPre value in %s, when src is int32_t and dst is int8_t / uint8_t, supported values "
-            "are REQ8 and VREQ8.\n", apiName));
-    } else if constexpr (IsSameType<U, int32_t>::value && IsSameType<T, half>::value) {
-        ASCENDC_DEBUG_ASSERT((intriParams.quantPre == QuantMode_t::DEQF16 ||
-            intriParams.quantPre == QuantMode_t::VDEQF16), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-            "Failed to check quantPre value in %s, when src is int32_t and dst is half, supported values are DEQF16 "
-            "and VDEQF16.\n", apiName));
-    }
+    CheckFixpipeQuantPreCommon<T, U>(intriParams.quantPre, apiName);
 }
 
-template <typename S>
-__aicore__ inline void CheckFixpipeWorkspace(const LocalTensor<S>& cbufWorkspace,
+template <typename T>
+__aicore__ inline void CheckFixpipeWorkspace(const LocalTensor<T>& cbufWorkspace,
     const FixpipeParamsV220& intriParams, const __gm__ char* apiName)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
-    CheckTensorPhyPosition<Hardware::UB>(cbufWorkspace, "cbufWorkspace", "UB", apiName);
-#else
-    CheckTensorPhyPosition<Hardware::L1>(cbufWorkspace, "cbufWorkspace", "L1", apiName);
-#endif
-    CheckFixpipeQuantPreWithWorkspaceCommon(intriParams.quantPre, apiName);
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint64_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check cbufWorkspace dtype in %s, supported dtype is uint64_t.\n", apiName));
+    CheckTensorPhyPosition<Hardware::L1>(cbufWorkspace, "cbufWorkspace", "A1", apiName);
+
+    ASCENDC_DEBUG_ASSERT((intriParams.quantPre == QuantMode_t::VDEQF16 ||
+        intriParams.quantPre == QuantMode_t::VQF322B8_PRE || intriParams.quantPre == QuantMode_t::VREQ8),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in %s, "
+        "when cbufWorkspace is given, supported values are VDEQF16 / VQF322B8_PRE / VREQ8.\n", apiName));
 }
 
 template <typename T, typename U, const FixpipeConfig& config>
