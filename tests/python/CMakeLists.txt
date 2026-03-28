@@ -96,8 +96,6 @@ add_custom_target(run_all_tests_and_clean ALL
     COMMAND rm -f ${ASCENDC_DIR}/tests/python/adapter/stub_kernels/ascendc_impl.dat
     # created by tests/python/CMakeLists.txt
     COMMAND rm -f ${OPC_BASE}/asc_opc/stub/files/kernel_meta/MatMul_build_res.o
-    # created by tests/python/CMakeLists.txt
-    COMMAND rm -rf ${ASCENDC_DIR}/out/
     # created by run_python_llt_test
     COMMAND rm -f ${ASCENDC_DIR}/null
     DEPENDS ascendc_pyut_asc_compile_common ascendc_pyut_asc_op_compiler asc_opc_unittest ascendc_pyut_compile_trace_log ascendc_pyut_aclrt_launch_kernel 
