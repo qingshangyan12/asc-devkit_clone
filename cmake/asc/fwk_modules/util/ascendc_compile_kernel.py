@@ -40,8 +40,6 @@ class CompileKernel:
         self.compile_sh = []
         self.target_name = args.target_name
         self.auto_gen_path = args.auto_gen_path
-        self.skip_error = args.skip_error
-        self.fail_constructor = False
         self.source_ini_file = os.path.join(self.auto_gen_path, self.target_name + "_custom_source_files.ini")
 
         if os.path.exists(self.source_ini_file):
@@ -62,19 +60,6 @@ class CompileKernel:
             self.json_file = args.json_file
         else:
             self.json_file = None
-
-    def write_error(self, error_info):
-        log_file = os.path.join(self.op_output, "compile_error.log")
-        with open(log_file, 'a') as f:
-            f.write(f"Fail op_info: {self.op_type}, fail unit: {self.op_soc_ver}, fail_info: {error_info}\n")
-
-    def deal_compile_error(self, error_info):
-        if self.skip_error:
-            self.write_error(error_info)
-            return False
-        else:
-            raise RuntimeError(error_info)
-            return False
 
     def get_op_cpp_file(self):
         src_ini_config = configparser.ConfigParser()
@@ -103,13 +88,11 @@ class CompileKernel:
                     find_cpp_file = True
                     break
         if find_cpp_file != find_type:
-            self.fail_constructor = True
-            return deal_compile_error(
+            raise ValueError(
                 f"Miss kernel implementation for op '{self.op_type}' on target '{self.op_soc_ver}'. "
                 f"\nHost claims support, but kernel only define {src_compute_units_low}. "
                 f"Please check ini file :'{self.source_ini_file}'. "
             )
-        return True
 
     def clean(self: any):
         if 'dump_cce' not in self.op_debug_config:
@@ -131,7 +114,7 @@ class CompileKernel:
         py_files = glob.glob(os.path.join(self.working_dir, "dynamic", "*.py"))
         if py_files is None or len(py_files) != 1:
             self.clean()
-            return deal_compile_error("compile py file {} generated error!".format(py_files))
+            raise RuntimeError("compile py file {} generated error!".format(py_files))
         self.op_impl_py = os.path.join(
             self.working_dir, "dynamic", self.op_type + ".py"
         )
@@ -140,10 +123,9 @@ class CompileKernel:
         os.rename(py_files[0], self.op_impl_py)
         if not os.path.exists(self.op_impl_py):
             self.clean()
-            return deal_compile_error(
+            raise RuntimeError(
                 "compile py file {} not generated!".format(self.op_impl_py)
             )
-        return True
 
     def ascendc_gen_param(self: any):
         bin_param_path = os.path.join(self.working_dir, "bin_param")
@@ -166,12 +148,11 @@ class CompileKernel:
         bin_param_files = glob.glob(os.path.join(bin_param_path, "*.json"))
         if bin_param_files is None or len(bin_param_files) <= 0:
             self.clean()
-            return deal_compile_error("compile binary param json file not generated!")
+            raise RuntimeError("compile binary param json file not generated!")
         self.compile_sh = glob.glob(os.path.join(bin_param_path, "*.sh"))
         if self.compile_sh is None or len(self.compile_sh) != len(bin_param_files):
             self.clean()
-            return deal_compile_error("compile binary shell file not generated!")
-        return True
+            raise RuntimeError("compile binary shell file not generated!")
 
     def ascendc_put_tiling(self: any):
         tiling_path = os.path.join(
@@ -182,8 +163,7 @@ class CompileKernel:
         os.symlink(self.op_tiling, tiling_so)
         if not os.path.exists(tiling_so):
             self.clean()
-            return deal_compile_error("prepare tiling lib {} link failed!".format(tiling_so))
-        return True
+            raise RuntimeError("prepare tiling lib {} link failed!".format(tiling_so))
 
     def ascendc_put_json(self: any):
         if self.json_file is not None:
@@ -198,8 +178,7 @@ class CompileKernel:
             build_json_file = os.path.join(json_file_dir, "aic-{}-ops-info.json".format(self.op_soc_ver))
             if not os.path.exists(build_json_file):
                 self.clean()
-                return deal_compile_error("prepare json file aic-{}-ops-info.json failed!".format(self.op_soc_ver))
-        return True
+                raise RuntimeError("prepare json file aic-{}-ops-info.json failed!".format(self.op_soc_ver))
 
     def ascendc_build(self: any):
         op_info = ascendc_op_info.OpInfo(self.op_type, self.op_cfg_ini)
@@ -232,9 +211,8 @@ class CompileKernel:
         else:
             cmd_str = ('export HI_PYTHON=python3 && export ASCEND_CUSTOM_OPP_PATH={} && make -f {} PY={} OUT={} CPP={}')
         if os.system(cmd_str.format(self.build_opp_path, mkfile, self.op_impl_py, op_bin_dir, self.op_cpp_file)) != 0:
-            return deal_compile_error('Kernel Compilation Error: OpType {} Kernel File {}!'.format(
+            raise RuntimeError('Kernel Compilation Error: OpType {} Kernel File {}!'.format(
                 self.op_type, self.op_cpp_file))
-        return True
 
 
 def args_parse():
@@ -281,36 +259,20 @@ def args_parse():
     parser.add_argument(
         "-a", "--auto-gen-path", nargs="?", default=None, help="auto gen file path."
     )
-    parser.add_argument(
-        "-s", "--skip-error", nargs="?", const=True, default=False, help="skip compile error."
-    )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = args_parse()
     kernel_builder = CompileKernel(args)
-<<<<<<< HEAD
-    if kernel_builder.fail_constructor:
-        sys.exit()
-=======
-    if kernel_bulder.fail_constructor:
-        return
->>>>>>> parent of 9c6ffb2d... 1
     kernel_builder.clean()
     if args.enable_binary == "False":
-        if not kernel_builder.ascendc_gen_impl():
-            return
+        kernel_builder.ascendc_gen_impl()
         kernel_builder.clean()
     else:
-        if not kernel_builder.ascendc_gen_impl():
-            return
-        if not kernel_builder.ascendc_gen_param():
-            return
-        if not kernel_builder.ascendc_put_json():
-            return
-        if not kernel_builder.ascendc_put_tiling():
-            return
-        if not kernel_builder.ascendc_build():
-            return
+        kernel_builder.ascendc_gen_impl()
+        kernel_builder.ascendc_gen_param()
+        kernel_builder.ascendc_put_json()
+        kernel_builder.ascendc_put_tiling()
+        kernel_builder.ascendc_build()
         kernel_builder.clean()
