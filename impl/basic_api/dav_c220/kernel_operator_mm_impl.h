@@ -370,11 +370,7 @@ __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, uint64_t b
             KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype "
             "combination is dst: int32_t, fm: int8_t, filter: int8_t; dst: float, fm: half, filter: half; dst: "
             "float, fm: float, filter: float; dst: float, fm: bfloat16_t, filter: bfloat16_t;"));
-        if constexpr ((IsSameType<U, int4b_t>::value) && (IsSameType<S, int4b_t>::value)) {
-#if __NPU_ARCH__ == 2201
-            ASCENDC_DEBUG_ASSERT((mmadParams.k % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "MmadParams.k must be an "
-        "even number when U and S are int4b_t.\n"));
-#endif
+            if constexpr ((IsSameType<U, int4b_t>::value) && (IsSameType<S, int4b_t>::value)) {
             mad_s4(c, (__ca__ void *)a, (__cb__ void *)b, mmadParams.m, mmadParams.k, mmadParams.n,
                 mmadParams.unitFlag, mmadParams.kDirectionAlign, cmatrixSource,
                 mmadParams.cmatrixInitVal);
