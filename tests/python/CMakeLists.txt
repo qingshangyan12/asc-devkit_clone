@@ -47,8 +47,6 @@ run_python_llt_test(
     TARGET ascendc_pyut_asc_op_compiler
     SRC_FILES_DIR ${ASCENDC_DIR}/tools/build/asc_op_compile_base/asc_op_compiler/
     TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/asc_op_compiler/
-    ENV_FILE ${ASCENDC_DIR}/tests/python/ci/set_python_env.sh
-    ENV_PARAMS ${ASCENDC_DIR}\ py_ut \ 910
     PRE_TEST_COMMAND
     COVERAGERC_DIR
 )
@@ -79,8 +77,6 @@ run_python_llt_test(
     SRC_FILES_DIR ${ASCENDC_DIR}/tools/build/asc_opc/python
     TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/asc_opc
     EXPORT_PYTHONPATH  ${ASCENDC_DIR}/tools/build/asc_opc
-    ENV_FILE ${ASCENDC_DIR}/tests/python/asc_opc/common/ci/set_python_env.sh
-    ENV_PARAMS ${ASCENDC_DIR}\ py_ut\ 310
     COVERAGERC_DIR
 )
 
@@ -100,7 +96,7 @@ add_custom_target(run_all_tests_and_clean ALL
     COMMAND rm -f ${ASCENDC_DIR}/tests/python/adapter/stub_kernels/ascendc_impl.dat
     # created by tests/python/CMakeLists.txt
     COMMAND rm -f ${OPC_BASE}/asc_opc/stub/files/kernel_meta/MatMul_build_res.o
-    # created by tests/python/asc_opc/common/ci/set_python_env.sh
+    # created by tests/python/CMakeLists.txt
     COMMAND rm -rf ${ASCENDC_DIR}/out/
     # created by run_python_llt_test
     COMMAND rm -f ${ASCENDC_DIR}/null
