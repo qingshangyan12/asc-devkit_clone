@@ -12,9 +12,9 @@
  * \file kernel_struct_binary.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_BINARY_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_BINARY_H__
 #endif
 
 #ifndef ASCENDC_MODULE_STRUCT_BINARY_H
@@ -29,7 +29,6 @@
 #endif
 
 namespace AscendC {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 struct BinaryConfig {
     int8_t scalarTensorIndex = 1;
 };
@@ -37,7 +36,6 @@ struct BinaryConfig {
 constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};
 
 struct BinaryDefaultType {};
-#endif
 
 struct BinaryRepeatParams {
     __aicore__ BinaryRepeatParams() {}
@@ -66,7 +64,7 @@ struct BinaryRepeatParams {
 } // namespace AscendC
 #endif // ASCENDC_MODULE_STRUCT_BINARY_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_BINARY_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_BINARY_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_BINARY_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_BINARY_H__
 #endif

@@ -12,10 +12,10 @@
  * \file kernel_operator_vec_brcb_intf_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/kernel_operator_vec_brcb_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_brcb_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BRCB_INTF_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BRCB_INTF_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BRCB_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BRCB_INTERFACE_IMPL_H
@@ -23,6 +23,8 @@
 #include "kernel_check.h"
 #include "kernel_struct_brcb.h"
 #include "mstx_local_tensor_info.h"
+#include "kernel_npu_debug.h"
+
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_brcb_impl.h"
@@ -33,7 +35,7 @@
 #elif __NPU_ARCH__ == 3002
 #include "dav_m300/kernel_operator_vec_brcb_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_c310/kernel_operator_vec_brcb_impl.h"
+#include "dav_3510/kernel_operator_vec_brcb_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_brcb_impl.h"
 #elif __NPU_ARCH__ == 3003
@@ -58,6 +60,16 @@ template <typename T>
 __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const uint8_t repeatTime,
     const BrcbRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Brcb", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"));
+    ASCENDC_DEBUG_ASSERT((src0.GetSize() >= 8 * repeatTime), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src0 "
+        "tensor size in Brcb, it must be src0.GetSize() >= 8 * repeatTime, current src0.GetSize() is %u, repeatTime is "
+        "%u.\n", src0.GetSize(), repeatTime));
+    ASCENDC_DEBUG_ASSERT((src0.GetPhyAddr() != dst.GetPhyAddr()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Brcb does not "
+        "support src0 tensor and dst tensor having same addr.\n"));
+    ASCENDC_DEBUG_WARNING((repeatParams.dstBlkStride != 0), KERNEL_LOG_INTERNAL(KERNEL_WARN, "dstBlkStride = 0 in Brcb "
+        "is equivalent to dstBlkStride = 1.\n"));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBrcbInfo(dst, src0, repeatTime, repeatParams, "Brcb");
 #endif
@@ -72,7 +84,7 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BRCB_INTERFACE_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BRCB_INTF_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BRCB_INTF_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BRCB_INTF_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BRCB_INTF_IMPL_H__
 #endif

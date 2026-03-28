@@ -12,9 +12,9 @@
  * \file kernel_operator_mm_intf.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_MM_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_MM_INTERFACE_H
@@ -176,6 +176,13 @@ template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D
     typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData3DParamsV2<U>& loadDataParams);
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
+template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG,
+    typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const LoadData3DParamsV2<U>& loadDataParams);
+#endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <TPosition DstPos, TPosition SrcPos, typename T>
@@ -382,6 +389,10 @@ __aicore__ inline void SetLoadDataBoundary(uint32_t boundaryValue);
 
 __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams);
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
+__aicore__ inline void SetLoadDataRepeatWithStride(const LoadDataRepeatParamWithStride& repeatParams);
+#endif
+
 /* **************************************************************************************************
  * LoadImageToLocal                                             *
  * ************************************************************************************************* */
@@ -476,7 +487,7 @@ __aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode);
 #include "../../impl/basic_api/kernel_operator_mm_intf_impl.h"
 
 #endif // ASCENDC_MODULE_OPERATOR_MM_INTERFACE_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_H__
 #endif

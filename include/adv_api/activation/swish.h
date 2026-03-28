@@ -13,9 +13,9 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWISH_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWISH_H__
 #endif
 
 #ifndef LIB_SWISH_SWISH_H
@@ -23,7 +23,7 @@
 
 #include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "../../../impl/adv_api/detail/activation/swish/swish_c310_impl.h"
+#include "../../../impl/adv_api/detail/activation/swish/swish_3510_impl.h"
 #else
 #include "../../../impl/adv_api/detail/activation/swish/swish_common_impl.h"
 #endif
@@ -53,7 +53,7 @@ __aicore__ inline __inout_pipe__(V) void Swish(
 }  // namespace AscendC
 #endif  // LIB_SWISH_SWISH_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWISH_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWISH_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWISH_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWISH_H__
 #endif

@@ -35,7 +35,31 @@ def add_time_stamp_codes(desc_id, space_len: int = 1):
 
 def gen_init_dump_code(is_mix: bool, dump_size: int):
     source = ""
-    source += "    AscendC::SetSysWorkspaceForce(workspace);\n"
+    source += "    #if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON\n"
+    source += "    workspace += " + str(global_var_storage.get_variable("ascendc_required_dump_workspace_size")) + ";\n"
+    source += "    #endif\n"
+    if global_var_storage.get_variable("ascendc_enable_dump_workspace") is True or \
+        (not CommonUtility.is_support_workspace_offset()):
+        source += "    AscendC::SetSysWorkspaceForce(workspace);\n"
+    else:
+        source += "    // actually SetSysWorkspaceForce is empty function here\n"
+        source += "    AscendC::SetSysWorkspaceForce(workspace);\n"
+    source += "    #if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON\n"
+    source += "    constexpr uint32_t ASCENDC_DUMP_SIZE = 123;\n"
+    if global_var_storage.get_variable("ascendc_dump_assert_only") is True:
+        if is_mix:
+            source += "    AscendC::StoreArgsOfInitDump(true);\n"
+        else:
+            source += "    AscendC::StoreArgsOfInitDump(false);\n"
+    else:
+        if is_mix:
+            source += "    AscendC::InitDump(true, ASCENDC_DUMP_SIZE);\n"
+        else:
+            source += "    AscendC::InitDump(false, ASCENDC_DUMP_SIZE);\n"
+    if global_var_storage.get_variable("ascendc_recognize_simtvf") is True:
+        source += "    AscendC::Simt::SetSimtDumpWorkspace(workspace);\n"
+    source += add_time_stamp_codes('TIME_STAMP_WRAP_INIT_DUMP')
+    source += "    #endif\n"
     return source
 
 
@@ -411,7 +435,7 @@ def get_tiling_key_struct_size_map(tiling_key_struct_size_map, name_part, compil
 def gen_tiling_struct_and_dfx_section_head():
     source = f"#undef __global__\n"
     source += f"#define __global__ inline\n"
-    source += "#include \"kernel_utils.h\"\n"
+    source += "#include \"kernel_common.h\"\n"
     source += "#undef __global__\n"
     source += "#if ASCENDC_CPU_DEBUG\n"
     source += "#define __global__\n"

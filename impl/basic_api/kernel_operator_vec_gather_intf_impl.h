@@ -12,16 +12,17 @@
  * \file kernel_operator_vec_gather_intf_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/kernel_operator_vec_gather_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_gather_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_INTF_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_INTF_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_GATHER_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_GATHER_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
 #include "kernel_check.h"
 #include "kernel_struct_gather.h"
+#include "kernel_npu_debug.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_gather_impl.h"
@@ -32,7 +33,7 @@
 #elif __NPU_ARCH__ == 3002
 #include "dav_m300/kernel_operator_vec_gather_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_c310/kernel_operator_vec_gather_impl.h"
+#include "dav_3510/kernel_operator_vec_gather_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_gather_impl.h"
 #elif __NPU_ARCH__ == 3003
@@ -89,10 +90,20 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
  */
 template <typename T>
 __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint64_t mask,
-    const uint8_t repeatTime, const uint16_t dstRepStride)
+    const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint64_t mask, const uint8_t repeatTime,
+    const uint16_t dstRepStride)
 {
     using PrimType = PrimT<T>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Gather", NamedTensor(dst, "dst"), NamedTensor(src, "src"), NamedTensor(srcOffset, "srcOffset"));
+    CheckMaskValue<PrimType>(mask, "Gather");
+    // srcBaseAddr should not exceed the size of src tensor
+    CheckValueRange<uint32_t>(srcBaseAddr, 0, src.GetSize() * sizeof(PrimType) - 1, "srcBaseAddr", "Gather");
+    // srcBaseAddr should be aligned with src dtype
+    ASCENDC_DEBUG_ASSERT((srcBaseAddr % sizeof(PrimType) == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+        "srcBaseAddr value in Gather, it must be divisible by sizeof(T), current srcBaseAddr is %u, sizeof(T) is %u.\n",
+        srcBaseAddr, sizeof(PrimType)));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncGather(dst, src, srcOffset, srcBaseAddr, mask, repeatTime, dstRepStride, "Gather")) {
         ASCENDC_REPORT_CHECK_ERROR("Gather", KernelFuncType::MASK_COUNT_MODE);
@@ -116,10 +127,20 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
  */
 template <typename T>
 __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint64_t mask[],
-    const uint8_t repeatTime, const uint16_t dstRepStride)
+    const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint64_t mask[], const uint8_t repeatTime,
+    const uint16_t dstRepStride)
 {
     using PrimType = PrimT<T>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Gather", NamedTensor(dst, "dst"), NamedTensor(src, "src"), NamedTensor(srcOffset, "srcOffset"));
+    CheckMaskArray<PrimType>(mask, "Gather");
+    // srcBaseAddr should not exceed the size of src tensor
+    CheckValueRange<uint32_t>(srcBaseAddr, 0, src.GetSize() * sizeof(PrimType) - 1, "srcBaseAddr", "Gather");
+    // srcBaseAddr should be aligned with src dtype
+    ASCENDC_DEBUG_ASSERT((srcBaseAddr % sizeof(PrimType) == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+        "srcBaseAddr value in Gather, it must be divisible by sizeof(T), current srcBaseAddr is %u, sizeof(T) is %u.\n",
+        srcBaseAddr, sizeof(PrimType)));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncGather(dst, src, srcOffset, srcBaseAddr, mask, repeatTime, dstRepStride, "Gather")) {
         ASCENDC_REPORT_CHECK_ERROR("Gather", KernelFuncType::MASK_BIT_MODE);
@@ -202,7 +223,7 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_GATHER_INTERFACE_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_INTF_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_INTF_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_INTF_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_INTF_IMPL_H__
 #endif

@@ -14,9 +14,9 @@
  * Formula:  Sinh(x) = e^(x-ln2) - e^(-x-ln2)
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SINH_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SINH_H__
 #endif
 
 #ifndef LIB_MATH_SINH_H
@@ -29,7 +29,7 @@
 #include "../../../impl/adv_api/detail/math/sinh/sinh_common_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
-#include "../../../impl/adv_api/detail/math/sinh/sinh_c310_impl.h"
+#include "../../../impl/adv_api/detail/math/sinh/sinh_3510_impl.h"
 #endif
 
 namespace AscendC {
@@ -118,7 +118,7 @@ __aicore__ inline void Sinh(const LocalTensor<T>& dstTensor, const LocalTensor<T
 
 #endif // LIB_MATH_SINH_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SINH_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SINH_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SINH_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SINH_H__
 #endif

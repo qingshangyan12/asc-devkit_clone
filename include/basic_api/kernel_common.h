@@ -12,9 +12,9 @@
  * \file kernel_common.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_COMMON_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_COMMON_H__
 #endif
 
 #ifndef ASCENDC_KERNEL_COMMON_H
@@ -44,6 +44,13 @@ class TPipe;
 template <typename T>
 class GlobalTensor;
 } // namespace AscendC
+
+template <auto funcPtr, typename... Args> __aicore__ inline void asc_vf_call(Args &&... args)
+{
+#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) 
+        funcPtr(args...);
+#endif
+}
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V1) || defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
@@ -227,7 +234,7 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetDumpWorkSpacePtr()
 }
 #endif
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_COMMON_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_COMMON_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_COMMON_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_COMMON_H__
 #endif

@@ -138,15 +138,14 @@ def _gen_compile_cmd_m510(src_file: str, dst_file: str, compile_option_tuple, ti
 
     for option in compile_option_tuple.compile_options:
         compile_cmd += [option]
-    compile_cmd += [src_file, "--cce-aicore-arch=dav-510r2", "-D__NPU_ARCH__=5102",
+    compile_cmd += [src_file, "--cce-aicore-arch=dav-510r2",
                     "--cce-aicore-only", "-o", dst_file,
                     "-mllvm", "-cce-aicore-stack-size=0x8000",
                     "-mllvm", "-cce-aicore-function-stack-size=0x8000",
                     "-mllvm", "-cce-aicore-record-overflow=false",
                     "-mllvm", "-cce-aicore-addr-transform",
                     "-mllvm", "--cce-aicore-jump-expand=true",
-                    "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
-                    "-mllvm", "-cce-aicore-dcci-before-kernel-end=false"
+                    "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false"
                     ]
     if global_var_storage.get_variable("ascendc_enable_sanitizer"):
         compile_cmd += ["--cce-enable-sanitizer", "-g"]

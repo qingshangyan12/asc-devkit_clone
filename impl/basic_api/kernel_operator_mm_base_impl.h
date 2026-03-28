@@ -12,10 +12,10 @@
  * \file kernel_operator_mm_base_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/kernel_operator_mm_base_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_mm_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BASE_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BASE_IMPL_H__
 #endif
 
 #ifndef ASCENDC_MODULE_OPERATOR_MM_BASE_IMPL_H
@@ -33,7 +33,7 @@
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_mm_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_c310/kernel_operator_mm_impl.h"
+#include "dav_3510/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3003)
@@ -229,6 +229,63 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
             ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
     }
 }
+
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
+template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG,
+    typename U = PrimT<T>, typename std::enable_if<IsSameType<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStrideImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const LoadData3DParamsV2<U>& loadDataParams)
+{
+    ASCENDC_ASSERT(CheckFuncLoadData3dv2(dst, src, loadDataParams, "LoadDataWithStride with LoadData3DParamsV2"), {
+        ASCENDC_REPORT_CHECK_ERROR("LoadDataWithStride with LoadData3DParamsV2", KernelFuncType::NONE_MODE);
+    });
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+
+    const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
+    ASCENDC_ASSERT(loadDataParams.kExtension * sizeof(T) % ONE_BLK_SIZE == 0, {
+        KERNEL_LOG(KERNEL_ERROR, "kExtension * sizeof(T) must be a multiple of 32");});
+    ASCENDC_ASSERT(loadDataParams.mExtension % 16 == 0, {
+        KERNEL_LOG(KERNEL_ERROR, "mExtension should be a multiple of 16");});
+    ASCENDC_ASSERT(loadDataParams.kStartPt * sizeof(T) % ONE_BLK_SIZE == 0, {
+        KERNEL_LOG(KERNEL_ERROR, "kStartPt * sizeof(T) must be a multiple of 32");});
+    ASCENDC_ASSERT(loadDataParams.mStartPt % 16 == 0, {
+        KERNEL_LOG(KERNEL_ERROR, "mStartPt should be a multiple of 16");});
+
+    CheckTensorPos<T>(src, Hardware::L1, "src", "A1 / B1", "LoadDataWithStride with LoadData3DParamsV2");
+    if (dstScope == Hardware::L0A) {
+        CheckTensorAlign<T>(dst, VALUE_512, "dst", "LoadDataWithStride with LoadData3DParamsV2");
+        LoadData3DV2L12L0AWithStrideCal((__ca__ PrimT<T>*)dst.GetPhyAddr(),
+                              (__cbuf__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
+    } else if (dstScope == Hardware::L0B) {
+        CheckTensorAlign<T>(dst, VALUE_512, "dst", "LoadDataWithStride with LoadData3DParamsV2");
+        LoadData3DV2L12L0BWithStrideCal((__cb__ PrimT<T>*)dst.GetPhyAddr(),
+                              (__cbuf__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
+    } else if (dstScope == Hardware::UB) {
+        CheckTensorAlign<T>(dst, ONE_BLK_SIZE, "dst", "LoadDataWithStride with LoadData3DParamsV2");
+        LoadData3DV2L12UBWithStrideCal((__ubuf__ PrimT<T>*)dst.GetPhyAddr(),
+                             (__cbuf__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
+    } else {
+        ASCENDC_CHECK_TPOSITION((false), "dst", "A2 / B2 / UB", "LoadDataWithStride with LoadData3DParamsV2",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+    }
+}
+
+// cce compiler process load3d bfloat16_t using B8, so use the half dtype instead
+template <const IsResetLoad3dConfig& defaultConfig>
+[[deprecated("NOTICE: LoadDataWithStride<IsResetLoad3dConfig> has been deprecated and will be removed in the next version."
+             " Please do not use it!")]]
+__aicore__ inline void LoadDataWithStride(const LocalTensor<bfloat16_t>& dst, const LocalTensor<bfloat16_t>& src,
+    const LoadData3DParamsV2<bfloat16_t>& loadDataParams)
+{
+    LoadDataWithStrideImpl<bfloat16_t, defaultConfig>(dst, src, loadDataParams);
+}
+#endif
 
 #if ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||            \
      (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
@@ -661,6 +718,13 @@ __aicore__ inline void SetLoadDataRepeatImpl(const LoadDataRepeatParam& repeatPa
     SetLoadDataRepeatCal(repeatParams);
 }
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
+__aicore__ inline void SetLoadDataRepeatWithStrideImpl(const LoadDataRepeatParamWithStride& repeatParams)
+{
+    SetLoadDataRepeatWithStrideCal(repeatParams);
+}
+#endif
+
 /* **************************************************************************************************
  * LoadDataUnzipImpl                                             *
  * ************************************************************************************************* */
@@ -699,7 +763,7 @@ __aicore__ inline void LoadDataUnzipImpl(const LocalTensor<T>& dst, const Global
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_BASE_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BASE_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BASE_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BASE_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BASE_IMPL_H__
 #endif

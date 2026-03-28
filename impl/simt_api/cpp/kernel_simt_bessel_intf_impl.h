@@ -11,27 +11,27 @@
 #ifndef IMPL_SIMT_API_CPP_KERNEL_SIMT_BESSEL_INTERFACE_IMPL_H
 #define IMPL_SIMT_API_CPP_KERNEL_SIMT_BESSEL_INTERFACE_IMPL_H
 
-#include "impl/simt_api/cpp/dav_c310/kernel_simt_bessel_impl.h"
+#include "impl/simt_api/cpp/dav_3510/kernel_simt_bessel_impl.h"
 
 namespace AscendC {
 namespace Simt {
 
 template <typename T>
-__aicore__ inline T J0(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T J0(T x)
 {
     static_assert(SupportType<T, float>(), "Input type only supports float.");
     return J0Impl(x);
 }
 
 template <typename T>
-__aicore__ inline T J1(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T J1(T x)
 {
     static_assert(SupportType<T, float>(), "Input type only supports float.");
     return J1Impl(x);
 }
 
 template <typename T, typename U>
-__aicore__ inline U Jn(T n, U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline U Jn(T n, U x)
 {
     static_assert(SupportType<T, int>(), "Input(n) type only supports int.");
     static_assert(SupportType<U, float>(), "Input(x) type only supports float.");
@@ -39,21 +39,21 @@ __aicore__ inline U Jn(T n, U x)
 }
 
 template <typename T>
-__aicore__ inline T Y0(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Y0(T x)
 {
     static_assert(SupportType<T, float>(), "Input type only supports float.");
     return Y0Impl(x);
 }
 
 template <typename T>
-__aicore__ inline T Y1(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Y1(T x)
 {
     static_assert(SupportType<T, float>(), "Input type only supports float.");
     return Y1Impl(x);
 }
 
 template <typename T, typename U>
-__aicore__ inline U Yn(T n, U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline U Yn(T n, U x)
 {
     static_assert(SupportType<T, int>(), "Input(n) type only supports int.");
     static_assert(SupportType<U, float>(), "Input(x) type only supports float.");

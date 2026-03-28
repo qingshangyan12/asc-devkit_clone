@@ -16,7 +16,7 @@
  * and then calculating by function approximation.
  * k=round(x/π), x0=x-kπ, x0 belongs to [-π/2, π/2]
  * π=π_0+π_1+π_2+π_3 achieve final precision compensation.
- * Final solution：
+ * Final solution�?
  *   k = round(x * invpi)
  *   x -= k * pi_0
  *   x -= k * pi_1
@@ -29,9 +29,9 @@
  *   R3 = -0.1666665792
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIN_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIN_H__
 #endif
 
 #ifndef LIB_MATH_SIN_H
@@ -45,7 +45,7 @@
 #include "../../../impl/adv_api/detail/math/sin/sin_common_impl.h"
 #elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 #include "sin_utils.h"
-#include "../../../impl/adv_api/detail/math/sin/sin_c310_impl.h"
+#include "../../../impl/adv_api/detail/math/sin/sin_3510_impl.h"
 #endif
 
 namespace AscendC {
@@ -217,7 +217,7 @@ __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 
 #endif  // LIB_MATH_SIN_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIN_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIN_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIN_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIN_H__
 #endif

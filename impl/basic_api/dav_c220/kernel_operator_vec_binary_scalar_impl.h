@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,14 +12,15 @@
  * \file kernel_operator_vec_binary_scalar_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_c220/kernel_operator_vec_binary_scalar_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_IMPL_H
 #include "kernel_struct_unary.h"
+#include "kernel_npu_debug.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -243,7 +244,9 @@ __aicore__ inline void ShiftLeftIntrinsicsImpl(__ubuf__ T* dst, __ubuf__ T* src,
     static_assert(SupportType<T, uint16_t, uint32_t, int16_t, int32_t>(), "Failed to check dtype in ShiftLeft, current "
         "api support dtype combination is src and dst both: uint16_t / uint32_t / int16_t / int32_t.");
     // B16 must be in range [0, 16]. B32 must be in range [0, 32].
-    ASCENDC_CHECK_VALUE_RANGE(scalarValue, 0, sizeof(T) * 8, "scalarValue", "ShiftLeft"); // sizeof(T) * 8 as max
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckValueRange<T>(scalarValue, 0, sizeof(T) * 8, "scalarValue", "ShiftLeft");
+#endif
     vshl(dst, src, static_cast<uint32_t>(scalarValue), repeatTime, static_cast<uint16_t>(repeatParams.dstBlkStride),
         static_cast<uint16_t>(repeatParams.srcBlkStride), static_cast<uint16_t>(repeatParams.dstRepStride), static_cast<uint16_t>(repeatParams.srcRepStride));
 }
@@ -295,12 +298,15 @@ template <typename T>
 __aicore__ inline void ShiftRightIntrinsicsImpl(__ubuf__ T* dst, __ubuf__ T* src, T scalarValue, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams, bool roundEn)
 {
-    ASCENDC_ASSERT((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to "
-        "check dtype in ShiftRight, current api support dtype combination is src and dst both: int16_t, uint16_t, "
-        "int32_t, uint32_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype in ShiftRight, current api support dtype combination is src and dst both: int16_t / "
+        "uint16_t / int32_t / uint32_t.\n"));
+    ASCENDC_DEBUG_WARNING((!(SupportType<T, uint16_t, uint32_t>() && roundEn)), KERNEL_LOG_INTERNAL(KERNEL_WARN,
+        "roundEn does not take effect in ShiftRight when dtype is uint16_t / uint32_t.\n"));
     // B16 must be in range [0, 16]. B32 must be in range [0, 32].
-    ASCENDC_CHECK_VALUE_RANGE(scalarValue, 0, sizeof(T) * 8, "scalarValue", "ShiftRight"); // sizeof(T) * 8 as max
-
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckValueRange<T>(scalarValue, 0, sizeof(T) * 8, "scalarValue", "ShiftRight");
+#endif
     if (roundEn) {
         if constexpr (SupportType<T, int16_t, int32_t>()) {
             vshr(dst, src, (int32_t)scalarValue, repeatTime, repeatParams.dstBlkStride, repeatParams.srcBlkStride,
@@ -414,7 +420,7 @@ __aicore__ inline void LeakyReluImpl(__ubuf__ T* dst, __ubuf__ T* src, const T& 
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_IMPL_H__
 #endif

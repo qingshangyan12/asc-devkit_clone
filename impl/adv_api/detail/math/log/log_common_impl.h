@@ -13,10 +13,10 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/math/log/log_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/log.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG_LOG_COMMON_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG_LOG_COMMON_IMPL_H__
 #endif
 #ifndef IMPL_MATH_LOG_LOG_COMMON_IMPL_H
 #define IMPL_MATH_LOG_LOG_COMMON_IMPL_H
@@ -31,7 +31,7 @@
 #include "../../api_check/kernel_api_check.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
-#include "log_c310_impl.h"
+#include "log_3510_impl.h"
 #endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
@@ -166,7 +166,7 @@ __aicore__ inline void Log10Impl(const LocalTensor<T>& dstTensor, const LocalTen
 #endif
 #endif  // IMPL_MATH_LOG_LOG_COMMON_IMPL_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG_LOG_COMMON_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG_LOG_COMMON_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG_LOG_COMMON_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG_LOG_COMMON_IMPL_H__
 #endif

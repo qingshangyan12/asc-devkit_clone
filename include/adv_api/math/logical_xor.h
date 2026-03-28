@@ -13,10 +13,9 @@
  * \brief
  */
 
-
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_XOR_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_XOR_H__
 #endif
 
 #ifndef LIB_MATH_LOGICAL_XOR_H
@@ -24,7 +23,7 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
-#include "../../../impl/adv_api/detail/math/logical_xor/logical_xor_c310_impl.h"
+#include "../../../impl/adv_api/detail/math/logical_xor/logical_xor_3510_impl.h"
 
 namespace AscendC {
 #pragma begin_pipe(V)
@@ -47,7 +46,7 @@ __aicore__ inline void LogicalXor(const LocalTensor<T>& dst, const LocalTensor<U
 #endif
 #endif // LIB_MATH_LOGICAL_XOR_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_XOR_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_XOR_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_XOR_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_XOR_H__
 #endif

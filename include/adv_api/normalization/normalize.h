@@ -13,9 +13,9 @@
  * \brief Given mean and variance, calculate rstd and output.
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H__
 #endif
 
 #ifndef LIB_NORMALIZATION_NORMALIZE_H
@@ -26,7 +26,7 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/normalization/normalize/normalize_common_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "../../../impl/adv_api/detail/normalization/normalize/normalize_c310_impl.h"
+#include "../../../impl/adv_api/detail/normalization/normalize/normalize_3510_impl.h"
 #endif
 namespace AscendC {
 #pragma begin_pipe(V)
@@ -93,7 +93,7 @@ __aicore__ inline void Normalize(const LocalTensor<T>& output, const LocalTensor
 #endif
 #endif // LIB_NORMALIZATION_NORMALIZE_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H__
 #endif

@@ -12,10 +12,10 @@
  * \file kernel_reg.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/kernel_reg.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_common.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_H__
 #endif
 #ifndef ASCENDC_KERNEL_REG_IMPL_H
 #define ASCENDC_KERNEL_REG_IMPL_H
@@ -75,6 +75,7 @@ template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
         return;
     }
 #else
+    static_assert(pipe != PIPE_S, "PipeBarrier<PIPE_S> is not supported on current device!");
     if ASCEND_IS_AIC {
         if constexpr (pipe == PIPE_MTE3) {
             return;
@@ -103,6 +104,7 @@ template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
     }
 #endif
 #if (__NPU_ARCH__ == 2201)
+    ASCENDC_DEBUG_ASSERT(pipe != PIPE_S, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "PipeBarrier<PIPE_S> is not supported on current device!"));
     if ASCEND_IS_AIC {
         if constexpr (pipe == PIPE_V) {
             return;
@@ -634,7 +636,7 @@ __aicore__ inline void SetAippFunctionsImpl(__gm__ T* src0, AippInputFormat form
 
 } // namespace AscendC
 #endif // ASCENDC_KERNEL_REG_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_H__
 #endif

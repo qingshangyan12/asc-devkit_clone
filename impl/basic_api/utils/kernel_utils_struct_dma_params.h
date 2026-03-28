@@ -12,10 +12,10 @@
  * \file kernel_utils_struct_dma_params.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/utils/kernel_utils_struct_dma_params.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_STRUCT_DMA_PARAMS_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_STRUCT_DMA_PARAMS_H__
 #endif
 #ifndef ASCENDC_MODULE_UTILS_STRUCT_DMA_PARAMS_H
 #define ASCENDC_MODULE_UTILS_STRUCT_DMA_PARAMS_H
@@ -32,8 +32,8 @@ struct QuantParams {
     uint64_t deqScalar;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct Nz2NdParams {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     __aicore__ Nz2NdParams() {}
 
     __aicore__ Nz2NdParams(const uint16_t ndNumIn, const uint16_t srcNdStrideIn, const uint32_t dstNdStrideIn)
@@ -46,9 +46,7 @@ struct Nz2NdParams {
     uint16_t ndNum = 1; // loop3Size
     uint16_t srcNdStride = 0; // loop3SrcStride
     uint32_t dstNdStride = 0; // loop3DstStride
-};
 #else
-struct Nz2NdParams {
     __aicore__ Nz2NdParams()
     {
         nz2ndEn = false;
@@ -73,10 +71,9 @@ struct Nz2NdParams {
     uint16_t srcNdStride = 0;
     uint16_t dstNdStride = 0;
     uint16_t originalNSize = 0;
-};
 #endif
+};
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 struct Nz2DnParams {
     __aicore__ Nz2DnParams() {}
 
@@ -94,7 +91,6 @@ struct Nz2DnParams {
     uint32_t dstDnMatrixStride = 0; // loop3DstStride
     uint16_t srcNzC0Stride = 0; // loop0SrcStride
 };
-#endif
 
 template <typename T = int32_t>
 struct FixpipeParams {
@@ -130,7 +126,7 @@ struct FixpipeParams {
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_UTILS_STRUCT_DMA_PARAMS_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_STRUCT_DMA_PARAMS_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_STRUCT_DMA_PARAMS_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_STRUCT_DMA_PARAMS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_STRUCT_DMA_PARAMS_H__
 #endif

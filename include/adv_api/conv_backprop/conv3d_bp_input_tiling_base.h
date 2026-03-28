@@ -12,11 +12,6 @@
  * \file conv3d_bp_input_tiling_base.h
  * \brief
  */
-
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CONV3D_BP_INPUT_TILING_BASE_H
-#endif
 #ifndef CONV3D_BP_INPUT_TILING_BASE_H
 #define CONV3D_BP_INPUT_TILING_BASE_H
 
@@ -103,7 +98,6 @@ protected:
     Conv3DBpDxDesc descInfo;
     Conv3DBpAttr attrInfo;
     Conv3DDxBpCalcShape shapeCalc;
-    uint32_t blockDim_ = 1;
     uint32_t coreNum_ = 1;
     OpType opType_ = OpType::kConv3DTranspose;
 private:
@@ -118,8 +112,3 @@ private:
 };
 }  // namespace optiling
 #endif  // CONV3D_BP_INPUT_TILING_BASE_H
-
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CONV3D_BP_INPUT_TILING_BASE_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CONV3D_BP_INPUT_TILING_BASE_H
-#endif

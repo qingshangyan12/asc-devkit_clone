@@ -12,10 +12,10 @@
  * \file dropout_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/filter/dropout/dropout_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/filter/dropout.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DROPOUT_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DROPOUT_IMPL_H__
 #endif
 
 #ifndef IMPL_FILTER_DROPOUT_DROPOUT_IMPL_H
@@ -29,7 +29,7 @@
 #include "dropout_m300_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-#include "dropout_c310_impl.h"
+#include "dropout_3510_impl.h"
 #endif
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/filter/dropout/dropout_check.h"
@@ -138,7 +138,7 @@ __aicore__ inline void DropOutImpl(const LocalTensor<T>& dstLocal, const LocalTe
 } // namespace AscendC
 #endif // IMPL_FILTER_DROPOUT_DROPOUT_IMPL_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DROPOUT_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DROPOUT_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DROPOUT_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DROPOUT_IMPL_H__
 #endif

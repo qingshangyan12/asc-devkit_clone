@@ -13,9 +13,9 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SELECTWITHBYTESMASK_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SELECTWITHBYTESMASK_H__
 #endif
 
 #ifndef LIB_SELECT_SELECT_WITH_BYTES_MASK_H
@@ -26,7 +26,7 @@
 #include "kernel_utils.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-#include "../../../impl/adv_api/detail/select/selectwithbytesmask/selectwithbytesmask_c310_impl.h"
+#include "../../../impl/adv_api/detail/select/selectwithbytesmask/selectwithbytesmask_3510_impl.h"
 #else
 #include "../../../impl/adv_api/detail/select/selectwithbytesmask/selectwithbytesmask_impl.h"
 #endif
@@ -91,7 +91,7 @@ __aicore__ inline void Select(const LocalTensor<T>& dst, T src0, const LocalTens
 #endif
 #endif // LIB_SELECT_SELECT_WITH_BYTES_MASK_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SELECTWITHBYTESMASK_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SELECTWITHBYTESMASK_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SELECTWITHBYTESMASK_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SELECTWITHBYTESMASK_H__
 #endif

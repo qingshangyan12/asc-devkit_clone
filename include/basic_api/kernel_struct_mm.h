@@ -12,9 +12,9 @@
  * \file kernel_struct_mm.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_MM_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_MM_H__
 #endif
 #ifndef ASCENDC_MODULE_STRUCT_MM_H
 #define ASCENDC_MODULE_STRUCT_MM_H
@@ -117,7 +117,6 @@ struct Nd2NzParamsV2 {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct LoadData2DMxParams {
     __aicore__ LoadData2DMxParams() {}
 
@@ -139,7 +138,6 @@ struct LoadData2DMxParams {
     uint16_t srcStride = 0;
     uint16_t dstStride = 0;
 };
-#endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename TYPE>
@@ -495,6 +493,25 @@ struct LoadDataRepeatParam {
 };
 #endif // Turing versions
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
+struct LoadDataRepeatParamWithStride {
+    __aicore__ LoadDataRepeatParamWithStride() {}
+
+    __aicore__ LoadDataRepeatParamWithStride(const uint16_t repeatStrideIn, const uint8_t repeatTimeIn,
+        const uint8_t repeatModeIn,  const uint16_t dstStrideIn)
+        : repeatStride(repeatStrideIn),
+          repeatTime(repeatTimeIn),
+          repeatMode(repeatModeIn),
+          dstStride(dstStrideIn)
+    {}
+
+    uint16_t repeatStride = 0;
+    uint8_t repeatTime = 1;
+    uint8_t repeatMode = 0;
+    uint16_t dstStride = 0;
+};
+#endif
+
 struct LoadImageToLocalParams {
     __aicore__ LoadImageToLocalParams() {}
 
@@ -558,7 +575,7 @@ struct CheckLocalMemoryIAParam {
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_STRUCT_MM_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_MM_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_MM_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_MM_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_MM_H__
 #endif

@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_vec_cmpsel_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_m200/kernel_operator_vec_cmpsel_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
@@ -149,12 +149,37 @@ __aicore__ inline void CompareCompute(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf_
         repeatParams);
 }
 
+
+template <typename T, typename U>
+__aicore__ inline void CheckVcmpvDtype()
+{
+    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, int8_t, uint8_t>()),
+        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
+        "half / float, dst: int8_t / uint8_t.");});
+}
+
+template <typename T>
+__aicore__ inline void CheckVcmpDtype()
+{
+    ASCENDC_ASSERT((SupportType<T, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, "
+        "current api support dtype combination is src: half / float.");});
+}
+
+template <typename T, typename U>
+__aicore__ inline void CheckVcmpvsDtype()
+{
+    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
+        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compares / CompareScalar, current api support dtype "
+            "combination is src0: half / float, dst: uint8_t.");});
+}
+
 // Compare::Level 0 - mask bit mode
 template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode,
     const uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     (void)(mask);
+    CheckVcmpvDtype<T, U>();
     VcmpvIntrinsicsImpl(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode, repeatTime, repeatParams);
 }
 
@@ -164,6 +189,7 @@ __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* 
     const uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     (void)(mask);
+    CheckVcmpvDtype<T, U>();
     VcmpvIntrinsicsImpl(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode, repeatTime, repeatParams);
 }
 
@@ -172,6 +198,7 @@ template <typename T, typename U>
 __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode,
     const uint32_t count)
 {
+    CheckVcmpvDtype<T, U>();
     CompareCompute(dst, src0, src1, cmpMode, count);
 }
 
@@ -183,6 +210,7 @@ __aicore__ inline void VcmpImpl(__ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpM
     if constexpr (isSetMask) {
         AscendCUtils::SetMask<T>(mask[1], mask[0]);
     }
+    CheckVcmpDtype<T>();
     VcmpIntrinsicsImpl(src0, src1, cmpMode, repeatParams);
 }
 
@@ -193,6 +221,7 @@ __aicore__ inline void VcmpImpl(__ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpM
     if constexpr (isSetMask) {
         AscendCUtils::SetMask<T>(mask);
     }
+    CheckVcmpDtype<T>();
     VcmpIntrinsicsImpl(src0, src1, cmpMode, repeatParams);
 }
 
@@ -253,6 +282,7 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, T src1, CMP
     const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     (void)(mask);
+    CheckVcmpvsDtype<T, U>();
     VcmpvsIntrinsicsImpl(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode,
         repeatTime, repeatParams);
 }
@@ -263,6 +293,7 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, T src1, CMP
     const uint64_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     (void)(mask);
+    CheckVcmpvsDtype<T, U>();
     VcmpvsIntrinsicsImpl(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode,
         repeatTime, repeatParams);
 }
@@ -295,6 +326,7 @@ template <typename T, typename U>
 __aicore__ inline void VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, T src1, CMPMODE cmpMode,
     const uint32_t count)
 {
+    CheckVcmpvsDtype<T, U>();
     CompareScalarCompute(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode, count);
 }
 
@@ -544,7 +576,7 @@ __aicore__ inline void SetCmpMaskImpl(__ubuf__ T* src)
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__
 #endif

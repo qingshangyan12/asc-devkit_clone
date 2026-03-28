@@ -13,9 +13,9 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_XOR_SUM_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_XOR_SUM_H__
 #endif
 
 #ifndef LIB_REDUCE_REDUCE_XOR_SUM_H
@@ -25,7 +25,7 @@
 #include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "../../../impl/adv_api/detail/reduce/reduce_xor_sum/reduce_xor_sum_c310_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_xor_sum/reduce_xor_sum_3510_impl.h"
 #else
 #include "../../../impl/adv_api/detail/reduce/reduce_xor_sum/reduce_xor_sum_common_impl.h"
 #endif
@@ -95,7 +95,7 @@ __aicore__ inline void ReduceXorSum(LocalTensor<T>& dstTensor, const LocalTensor
 
 #endif  // LIB_REDUCE_XOR_SUM_REDUCE_XOR_SUM_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_XOR_SUM_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_XOR_SUM_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_XOR_SUM_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_XOR_SUM_H__
 #endif

@@ -13,10 +13,10 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/math/xor/xor_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/xor.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_XOR_XOR_COMMON_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_XOR_XOR_COMMON_IMPL_H__
 #endif
 #ifndef LIB_XOR_XOR_COMMON_IMPL_H
 #define LIB_XOR_XOR_COMMON_IMPL_H
@@ -29,7 +29,7 @@
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
 #include "xor_v300_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "xor_c310_impl.h"
+#include "xor_3510_impl.h"
 #endif
 
 namespace AscendC {
@@ -50,7 +50,7 @@ __aicore__ inline void IsXorParamValid(const LocalTensor<T>& dstTensor, const Lo
 
 #endif  // LIB_XOR_XOR_COMMON_IMPL_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_XOR_XOR_COMMON_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_XOR_XOR_COMMON_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_XOR_XOR_COMMON_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_XOR_XOR_COMMON_IMPL_H__
 #endif

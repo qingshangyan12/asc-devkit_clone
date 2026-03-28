@@ -12,9 +12,9 @@
  * \file kernel_reg_compute_vec_ternary_scalar_intf_impl.h
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#pragma message("kernel_reg_compute_vec_ternary_scalar_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use kernel_reg_compute_intf.h and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic/reg_compute/kernel_reg_compute_vec_ternary_scalar_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use \"#include \"reg_compute/kernel_reg_compute_vec_ternary_scalar_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_TERNARY_SCALAR_INTF_IMPL__
 #endif
 
@@ -28,7 +28,7 @@
 #elif __NPU_ARCH__ == 5102
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_vec_ternary_scalar_impl.h"
 #else
-#include "../../basic_api/reg_compute/dav_c310/kernel_reg_compute_vec_ternary_scalar_impl.h"
+#include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_ternary_scalar_impl.h"
 #endif
 
 namespace AscendC {
@@ -44,7 +44,7 @@ __simd_callee__ inline void Axpy(S& dstReg, S& srcReg, const U scalarValue, Mask
 #endif // ASCENDC_KERNEL_REG_COMPUTE_VEC_TERNARY_SCALAR_INTERFACE_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_TERNARY_SCALAR_INTF_IMPL__)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_TERNARY_SCALAR_INTF_IMPL__
 #endif
 

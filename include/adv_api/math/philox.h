@@ -12,9 +12,9 @@
  * \file philox.h
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PHILOX_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PHILOX_H__
 #endif
 
 #ifndef LIB_MATH_PHILOX_H
@@ -22,7 +22,7 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
-#include "../../../impl/adv_api/detail/math/philox/philox_c310_impl.h"
+#include "../../../impl/adv_api/detail/math/philox/philox_3510_impl.h"
 
 namespace AscendC {
 
@@ -48,7 +48,7 @@ __aicore__ inline void PhiloxRandom(const LocalTensor<T>& dstLocal, const Philox
 #endif
 #endif // LIB_MATH_PHILOX_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PHILOX_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PHILOX_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PHILOX_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PHILOX_H__
 #endif

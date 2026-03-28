@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_vec_gather_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_c220/kernel_operator_vec_gather_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_GATHER_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_GATHER_IMPL_H
@@ -50,9 +50,9 @@ __aicore__ inline void GatherImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __
     const uint16_t dstRepStride)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination is src and "
-            "dst both: half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination "
+            "is src and dst both: half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t.\n"));
         uint32_t offsetAddr = (uint64_t)srcLocal + srcBaseAddr;
 #if ASCENDC_CPU_DEBUG
         uint64_t cpuAddr = (uint64_t)srcLocal + srcBaseAddr;
@@ -63,8 +63,6 @@ __aicore__ inline void GatherImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __
             vgather((__ubuf__ uint16_t *)dstLocal, srcOffsetLocal, offsetAddr, dstRepStride, repeatTime);
         } else if constexpr (sizeof(T) == sizeof(uint32_t)) {
             vgather((__ubuf__ uint32_t *)dstLocal, srcOffsetLocal, offsetAddr, dstRepStride, repeatTime);
-        } else {
-            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "size of dtype for Gather should be 2 / 4"); });
         }
     }
 }
@@ -75,9 +73,9 @@ __aicore__ inline void GatherImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __
     const uint16_t dstRepStride)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination is src and "
-            "dst both: half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination "
+            "is src and dst both: half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t.\n"));
         uint32_t offsetAddr = (uint64_t)srcLocal + srcBaseAddr;
 #if ASCENDC_CPU_DEBUG
         uint64_t cpuAddr = (uint64_t)srcLocal + srcBaseAddr;
@@ -90,14 +88,12 @@ __aicore__ inline void GatherImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __
         } else if constexpr (sizeof(T) == sizeof(uint32_t)) {
             vgather((__ubuf__ uint32_t *)dstLocal, (__ubuf__ uint32_t *)srcOffsetLocal, offsetAddr, dstRepStride,
                 repeatTime);
-        } else {
-            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "size of dtype for Gather should be 2 / 4"); });
         }
     }
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_GATHER_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_IMPL_H__
 #endif

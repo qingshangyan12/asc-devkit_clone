@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -13,10 +13,10 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/kernel_log.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_common.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_LOG_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_LOG_H__
 #endif
 
 #ifndef ASCENDC_MODULE_KERNEL_LOG_INTF_H
@@ -52,6 +52,15 @@ namespace AscendC {
         }                              \
     } while (0)
 #endif
+
+// intend to give warning when cond is false instead of abort
+#define ASCENDC_ASSERT_WARNING(cond, behavior) \
+    do {                                       \
+        if (!(cond)) {                         \
+            behavior;                          \
+        }                                      \
+    } while (0)
+
 
 #else // defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
 
@@ -331,6 +340,14 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
             abort();                                                                                                    \
         }                                                                                                               \
     } while (0)
+#define ASC_WARNING_MSG__(prompt, expr, fmt, ...)                                                                        \
+    do                                                                                                                   \
+    {                                                                                                                    \
+        if (!(expr))                                                                                                     \
+        {                                                                                                                \
+            fprintf(stderr, "%s[WARNING] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr, ##__VA_ARGS__); \
+        }                                                                                                                \
+    } while (0)
 #else
 #if defined(ASC_DEVKIT_VERSION_STR) && defined(ASC_DEVKIT_TIMESTAMP)
 #define ASSERT_MSG(expr, fmt, ...)  \
@@ -355,6 +372,16 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
             trap();                                                                                        \
         }                                                                                                  \
     } while (0)
+#define ASC_WARNING_MSG__(prompt, expr, fmt, ...)                                                          \
+    do {                                                                                                   \
+        ENABLE_ASSERT();                                                                                   \
+        ENABLE_ASSERT_DUMP_SIZE();                                                                         \
+        if (!(expr)) {                                                                                     \
+            AscendC::AssertPrint("%s[WARNING] [CANN_VERSION : %s][TimeStamp : %u] %s:%u: Assertion `%s' " fmt, prompt,\
+            (__gm__ const char*)(ASC_DEVKIT_VERSION_STR), static_cast<uint64_t>(ASC_DEVKIT_TIMESTAMP),                 \
+            __FILE__, __LINE__, #expr, ##__VA_ARGS__);                                                     \
+        }                                                                                                  \
+    } while (0)
 #else
 #define ASSERT_MSG(expr, fmt, ...)                                                                                \
     do {                                                                                                          \
@@ -374,6 +401,14 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
             trap();                                                                                               \
         }                                                                                                         \
     } while (0)
+#define ASC_WARNING_MSG__(prompt, expr, fmt, ...)                                                                  \
+    do {                                                                                                          \
+        ENABLE_ASSERT();                                                                                          \
+        ENABLE_ASSERT_DUMP_SIZE();                                                                                \
+        if (!(expr)) {                                                                                            \
+            AscendC::AssertPrint("%s[WARNING] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr, ##__VA_ARGS__); \
+        }                                                                                                         \
+    } while (0)
 #endif
 #endif
 
@@ -381,7 +416,7 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
 #define ASCENDC_NPU_DEBUG_ASSERT_IMPL(expr) NPU_ASSERT_MSG(expr)
 #endif
 
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
 #define VA_ARGS_IS_EMPTY(...) (sizeof(#__VA_ARGS__) == 1)
 #define ASCENDC_DEBUG_ASSERT_IMPL(expr, ...)       \
     do {                                           \
@@ -391,6 +426,18 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
                 ASC_ASSERT_MSG__(prompt, expr, "\n");\
             } else {                               \
                 ASC_ASSERT_MSG__(prompt, expr, __VA_ARGS__);\
+            }                                      \
+        }                                          \
+    } while (0)
+
+#define ASCENDC_DEBUG_WARNING_IMPL(expr, ...)       \
+    do {                                           \
+        __gm__ const char* prompt = "";            \
+        if (!(expr)) {                             \
+            if (VA_ARGS_IS_EMPTY(__VA_ARGS__)) {   \
+                ASC_WARNING_MSG__(prompt, expr, "\n");\
+            } else {                               \
+                ASC_WARNING_MSG__(prompt, expr, __VA_ARGS__);\
             }                                      \
         }                                          \
     } while (0)
@@ -428,6 +475,7 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
 #endif
 #else
 #define ASCENDC_DEBUG_ASSERT_IMPL(...)
+#define ASCENDC_DEBUG_WARNING_IMPL(...)
 #define ASCENDC_DEBUG_DEPRECATE_ASSERT_IMPL(...)
 #endif
 }
@@ -436,20 +484,23 @@ namespace AscendC{
 #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
 #define KERNEL_LOG_INTERNAL(level, format, ...) KERNEL_LOG_##level(format, ##__VA_ARGS__)
 #define ASCENDC_DEBUG_ASSERT(...) ASCENDC_ASSERT(__VA_ARGS__)
+#define ASCENDC_DEBUG_WARNING(...) ASCENDC_ASSERT_WARNING(__VA_ARGS__)
 #else
 #ifdef ASCENDC_DEBUG
 #define KERNEL_LOG_INTERNAL(level, format, ...) format, ##__VA_ARGS__
 #define ASCENDC_DEBUG_ASSERT(...) ASCENDC_DEBUG_ASSERT_IMPL(__VA_ARGS__)
+#define ASCENDC_DEBUG_WARNING(...) ASCENDC_DEBUG_WARNING_IMPL(__VA_ARGS__)
 #else
 #define KERNEL_LOG_INTERNAL(level, format, ...)
 #define ASCENDC_DEBUG_ASSERT(...)
+#define ASCENDC_DEBUG_WARNING(...)
 #endif
 #endif
 }
 
 #endif // ASCENDC_MODULE_KERNEL_LOG_INTF_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_LOG_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_LOG_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_LOG_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_LOG_H__
 #endif

@@ -12,10 +12,10 @@
  * \file kernel_event.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/kernel_event.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_EVENT_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_EVENT_H__
 #endif
 
 #ifndef ASCENDC_KERNEL_EVENT_IMPL_H
@@ -24,6 +24,7 @@
 #include "kernel_macros.h"
 #include "kernel_log.h"
 #include "common_types.h"
+#include "impl/utils/common_types.h"
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
 #include "stub_def.h"
@@ -32,7 +33,6 @@
 
 namespace AscendC {
 using QuePosition = TPosition;
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
 
 enum class HardEvent : uint8_t {
     // src_dst
@@ -1004,6 +1004,27 @@ __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
 {
     ASCENDC_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
                    { KERNEL_LOG(KERNEL_ERROR, "eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT); });
+#ifdef ASCENDC_CPU_DEBUG
+    if ASCEND_IS_AIC {
+        if (event == HardEvent::MTE2_V || event == HardEvent::V_MTE2 || event == HardEvent::MTE3_V
+                      || event == HardEvent::V_MTE3 || event == HardEvent::V_V || event == HardEvent::S_V ||
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                      event == HardEvent::V_S || event == HardEvent::MTE2_MTE3 || event == HardEvent::MTE3_MTE2
+                      || event == HardEvent::MTE3_S || event == HardEvent::S_MTE3) {
+#else
+                      event == HardEvent::V_S) {
+#endif
+            return;
+        }
+    }
+    if ASCEND_IS_AIV {
+        if ((event == HardEvent::MTE2_MTE1) || (event == HardEvent::MTE1_MTE2) ||
+                      (event == HardEvent::MTE1_M) || (event == HardEvent::M_MTE1) || (event == HardEvent::M_FIX) ||
+                      (event == HardEvent::FIX_M)) {
+            return;
+        }
+    }
+#endif
     event_t e = static_cast<event_t>(eventID);
     switch (event) {
 #ifndef SPLIT_CORE_VEC // CUBE core
@@ -1135,7 +1156,7 @@ __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
 }  // namespace AscendC
 
 #endif  // ASCENDC_KERNEL_EVENT_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_EVENT_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_EVENT_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_EVENT_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_EVENT_H__
 #endif

@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_dump_tensor_intf_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/kernel_operator_dump_tensor_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_dump_tensor_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
@@ -33,15 +33,13 @@
 #elif __NPU_ARCH__ == 3002
 #include "dav_m300/kernel_operator_dump_tensor_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_c310/kernel_operator_dump_tensor_impl.h"
+#include "dav_3510/kernel_operator_dump_tensor_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_dump_tensor_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_dump_tensor_impl.h"
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_dump_tensor_impl.h"
-#elif (__NPU_ARCH__ == 3102)
-#include "dav_m310/kernel_operator_dump_tensor_impl.h"
 #endif
 
 #ifdef ASCENDC_CPU_DEBUG
@@ -57,7 +55,7 @@ __aicore__ inline void DumpTensor(const LocalTensor<T> &input, uint32_t desc, ui
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     DumpTensorLocal2GMImpl(input, desc, dumpSize);
 #endif
     return;
@@ -69,7 +67,7 @@ __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, u
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     DumpTensorGM2GMImpl(input, desc, dumpSize);
 #endif
     return;
@@ -81,7 +79,7 @@ __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, u
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     DumpShapeImpl(shapeInfo);
     DumpTensorGM2GMImpl(input, desc, dumpSize);
 #endif
@@ -94,7 +92,7 @@ __aicore__ inline void DumpTensor(const LocalTensor<T>& input, uint32_t desc, ui
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     DumpShapeImpl(shapeInfo);
     DumpTensorLocal2GMImpl(input, desc, dumpSize);
 #endif
@@ -108,7 +106,7 @@ __aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t ind
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode.");});
 #endif
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP)
     if (countOff > input.GetSize()) {
         ASCENDC_ASSERT((false),
             { KERNEL_LOG(KERNEL_ERROR, "tensor offset [%d] exceeds limit [%d]",
@@ -127,7 +125,7 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode.");});
 #endif
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP)
     if (countOff > input.GetSize()) {
         ASCENDC_ASSERT((false),
             { KERNEL_LOG(KERNEL_ERROR, "tensor offset [%d] exceeds limit [%d]",
@@ -144,14 +142,14 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
 template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -164,7 +162,7 @@ using ::printf;
 template<typename... Args>
 inline auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)...))
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     return printf(std::forward<Args>(args)...);
 #else
     return 0;
@@ -175,7 +173,7 @@ inline auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)..
 template <class... Args>
 inline void PRINTF(const char* fmt, Args&&... args)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -185,7 +183,7 @@ inline void PRINTF(const char* fmt, Args&&... args)
 template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -193,7 +191,7 @@ __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -213,7 +211,7 @@ __aicore__ inline void StoreArgsOfInitDump(bool mixFlag, __gm__ uint8_t* dumpAdd
 template <class... Args>
 __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
 #ifdef ASCENDC_DUMP_ASSERT_ONLY
     if (g_dumpAddrAssertOnlyReserved == nullptr) {
         InitDump(g_mixFlagAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
@@ -265,7 +263,7 @@ __aicore__ inline void PrintTimeStamp(uint32_t descId)
 
 }  // namespace AscendC
 #endif  // END OF ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H__
 #endif

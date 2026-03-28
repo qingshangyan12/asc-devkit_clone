@@ -14,9 +14,9 @@
  * Mathematical formulas: Power(x, y) = x ^ y
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_H__
 #endif
 
 #ifndef LIB_MATH_POWER_H
@@ -30,7 +30,7 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/math/power/power_common_utils.h"
-#include "../../../impl/adv_api/detail/math/power/power_c310_impl.h"
+#include "../../../impl/adv_api/detail/math/power/power_3510_impl.h"
 #endif
 
 namespace AscendC {
@@ -518,7 +518,7 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scala
 #endif
 #endif  // LIB_MATH_POWER_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_H__
 #endif

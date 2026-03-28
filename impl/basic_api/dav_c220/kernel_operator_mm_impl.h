@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,14 +12,15 @@
  * \file kernel_operator_mm_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_c220/kernel_operator_mm_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #include "kernel_struct_mm.h"
+#include "kernel_npu_debug.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -33,12 +34,13 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
             load_cbuf_to_ca_s4((__ca__ void *)dst, (__cbuf__ void *)src, loadDataParam.startIndex,
                 loadDataParam.repeatTimes, loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, 0, inc);
         } else {
+            using U = typename Conditional<SupportType<T, uint16_t, int16_t>(), half, T>::type;
             if (loadDataParam.ifTranspose) {
-                load_cbuf_to_ca(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
-                    loadDataParam.dstGap, loadDataParam.sid, 1, inc);
+                load_cbuf_to_ca((__ca__ U*)dst, (__cbuf__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+                    loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, 1, inc);
             } else {
-                load_cbuf_to_ca(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
-                    loadDataParam.dstGap, loadDataParam.sid, 0, inc);
+                load_cbuf_to_ca((__ca__ U*)dst, (__cbuf__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+                    loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, 0, inc);
             }
         }
     }
@@ -52,12 +54,13 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
             load_cbuf_to_cb_s4((__cb__ void *)dst, (__cbuf__ void *)src, loadDataParam.startIndex,
                 loadDataParam.repeatTimes, loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, 0, inc);
         } else {
+            using U = typename Conditional<SupportType<T, uint16_t, int16_t>(), half, T>::type;
             if (loadDataParam.ifTranspose) {
-                load_cbuf_to_cb(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
-                    loadDataParam.dstGap, loadDataParam.sid, 1, inc);
+                load_cbuf_to_cb((__cb__ U*)dst, (__cbuf__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+                    loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, 1, inc);
             } else {
-                load_cbuf_to_cb(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
-                    loadDataParam.dstGap, loadDataParam.sid, 0, inc);
+                load_cbuf_to_cb((__cb__ U*)dst, (__cbuf__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+                    loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, 0, inc);
             }
         }
     }
@@ -67,8 +70,11 @@ template <typename T>
 __aicore__ inline void LoadData2DGM2L0ACal(__ca__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParam)
 {
     if ASCEND_IS_AIC {
-        load_gm_to_ca(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
-            loadDataParam.dstGap, loadDataParam.sid, (addr_cal_mode_t)0);
+        ASCENDC_DEBUG_ASSERT((!SupportType<T, int4b_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "LoadData with LoadData2DParams, GM -> A2 does not support int4b_t.\n"));
+        using U = typename Conditional<SupportType<T, uint16_t, int16_t>(), half, T>::type;
+        load_gm_to_ca((__ca__ U*)dst, (__gm__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+            loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, (addr_cal_mode_t)0);
     }
 }
 
@@ -76,8 +82,11 @@ template <typename T>
 __aicore__ inline void LoadData2DGM2L0BCal(__cb__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParam)
 {
     if ASCEND_IS_AIC {
-        load_gm_to_cb(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
-            loadDataParam.dstGap, loadDataParam.sid, (addr_cal_mode_t)0);
+        ASCENDC_DEBUG_ASSERT((!SupportType<T, int4b_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "LoadData with LoadData2DParams, GM -> B2 does not support int4b_t.\n"));
+        using U = typename Conditional<SupportType<T, uint16_t, int16_t>(), half, T>::type;
+        load_gm_to_cb((__cb__ U*)dst, (__gm__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+            loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, (addr_cal_mode_t)0);
     }
 }
 
@@ -85,12 +94,15 @@ template <typename T>
 __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParam)
 {
     if ASCEND_IS_AIC {
+        ASCENDC_DEBUG_ASSERT((!SupportType<T, int4b_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "LoadData with LoadData2DParams, GM -> A1 / B1 does not support int4b_t.\n"));
+        using U = typename Conditional<SupportType<T, uint16_t, int16_t>(), half, T>::type;
         if (loadDataParam.addrMode == 0) {
-            load_gm_to_cbuf(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
-                loadDataParam.dstGap, loadDataParam.sid, inc);
+            load_gm_to_cbuf((__cbuf__ U*)dst, (__gm__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+                loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, inc);
         } else {
-            load_gm_to_cbuf(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
-                loadDataParam.dstGap, loadDataParam.sid, dec);
+            load_gm_to_cbuf((__cbuf__ U*)dst, (__gm__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+                loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, dec);
         }
     }
 }
@@ -98,31 +110,41 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T *dst, __cbuf__ T *src, const LoadData2DParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadData with LoadData2DParamsV2 from A1 to A2");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadData with LoadData2DParamsV2 from A1 to A2");
+#endif
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BCal(__cb__ T *dst, __cbuf__ T *src, const LoadData2DParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadData with LoadData2DParamsV2 from B1 to B2");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadData with LoadData2DParamsV2 from B1 to B2");
+#endif
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DGM2L0ACal(__ca__ T *dst, __gm__ T *src, const LoadData2DParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadData with LoadData2DParamsV2 from GM to A2");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadData with LoadData2DParamsV2 from GM to A2");
+#endif
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DGM2L0BCal(__cb__ T *dst, __gm__ T *src, const LoadData2DParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadData with LoadData2DParamsV2 from GM to B2");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadData with LoadData2DParamsV2 from GM to B2");
+#endif
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T *dst, __gm__ T *src, const LoadData2DParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadData with LoadData2DParamsV2 from GM to A1 / B1");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadData with LoadData2DParamsV2 from GM to A1 / B1");
+#endif
 }
 
 template <typename T>
@@ -130,9 +152,6 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(__ca__ T *dst, __cbuf__ T *s
     const LoadData2dTransposeParams &loadDataParam)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<T, half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadDataWithTranspose when dst position is A2, current "
-            "api support dtype combination is dst: half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t");});
         if constexpr (!IsSameType<T, int4b_t>::value) {
             load_cbuf_to_ca_transpose(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes,
                 loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
@@ -145,10 +164,6 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *s
     const LoadData2dTransposeParams &loadDataParam)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<T, half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t, int4b_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadDataWithTranspose when dst position is B2, current "
-            "api support dtype combination is dst: half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t, "
-            "int4b_t");});
         if constexpr (IsSameType<T, int4b_t>::value) {
             load_cbuf_to_cb_transpose_s4((__cb__ void *)dst, (__cbuf__ void *)src, loadDataParam.startIndex,
                 loadDataParam.repeatTimes, loadDataParam.srcStride, loadDataParam.dstGap, inc,
@@ -164,7 +179,9 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *src,
     const LoadData2dTransposeParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadDataWithTranspose with LoadData2dTransposeParamsV2 from B1 to B2");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadDataWithTranspose with LoadData2dTransposeParamsV2 from B1 to B2");
+#endif
 }
 
 /* **************************************************************************************************
@@ -388,7 +405,7 @@ __aicore__ inline void LoadDataWithSparseCal(const LocalTensor<T> &dst, const Lo
     }
 }
 
-template <typename T = int8_t, typename std::enable_if<IsSameType<PrimT<T>, int8_t>::value, bool>::type = true> 
+template <typename T = int8_t, typename std::enable_if<IsSameType<PrimT<T>, int8_t>::value, bool>::type = true>
 __aicore__ inline void LoadUnzipIndexCal(const GlobalTensor<T>& src, uint32_t numOfIndexTabEntry)
 {
     ASCENDC_REPORT_NOT_SUPPORT(false, "LoadUnzipIndex");
@@ -676,7 +693,7 @@ __aicore__ inline void LoadDataUnzipToL0ACal(__ca__ T *dst, __gm__ T *src)
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H__
 #endif

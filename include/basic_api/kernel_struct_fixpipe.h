@@ -12,9 +12,9 @@
  * \file kernel_struct_fixpipe.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H__
 #endif
 
 #ifndef ASCENDC_MODULE_STRUCT_FIXPIPE_H
@@ -171,10 +171,10 @@ struct TransformParams<CO2Layout::COLUMN_MAJOR> {
 };
 
 template <CO2Layout format = CO2Layout::ROW_MAJOR>
-struct FixpipeParamsC310 {
-    __aicore__ FixpipeParamsC310() {}
+struct FixpipeParamsArch3510 {
+    __aicore__ FixpipeParamsArch3510() {}
 
-    __aicore__ FixpipeParamsC310(const uint16_t nSizeIn, const uint16_t mSizeIn, const uint16_t srcStrideIn,
+    __aicore__ FixpipeParamsArch3510(const uint16_t nSizeIn, const uint16_t mSizeIn, const uint16_t srcStrideIn,
         const uint32_t dstStrideIn)
     {
         nSize = nSizeIn;
@@ -182,11 +182,10 @@ struct FixpipeParamsC310 {
         srcStride = srcStrideIn;
         dstStride = dstStrideIn;
     }
-#if (__NPU_ARCH__ == 5102)
     ReluMode preReluMode = ReluMode::NO_RELU;
     ClipReluMode preClipReluMode = ClipReluMode::NOCLIP_RELU;
     uint64_t reluScalar;
-#endif
+    uint64_t vectorRelu;
     uint16_t nSize = 0;
     uint16_t mSize = 0;  // M-DirectionSize
     uint16_t srcStride = 0;
@@ -202,6 +201,15 @@ struct FixpipeParamsC310 {
     typename TransformParams<format>::PARAMS params;
     bool isChannelSplit = false;
 };
+
+template <CO2Layout format = CO2Layout::ROW_MAJOR>
+struct FixpipeParamsC310 : FixpipeParamsArch3510<format> {
+    __aicore__ FixpipeParamsC310() : FixpipeParamsArch3510<format>() {}
+    
+    __aicore__ FixpipeParamsC310(const uint16_t nSizeIn, const uint16_t mSizeIn, 
+                                const uint16_t srcStrideIn, const uint32_t dstStrideIn)
+        : FixpipeParamsArch3510<format>(nSizeIn, mSizeIn, srcStrideIn, dstStrideIn) {}
+};
 #endif
 
 using FixpipeParamsM300 = FixpipeParamsV220;
@@ -210,7 +218,7 @@ using FixpipeParamsM310 = FixpipeParamsV220;
 
 #endif // ASCENDC_MODULE_STRUCT_FIXPIPE_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H__
 #endif

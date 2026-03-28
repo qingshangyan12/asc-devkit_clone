@@ -12,10 +12,10 @@
  * \file kernel_utils_ceil_oom_que.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/utils/kernel_utils_ceil_oom_que.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H__
 #endif
 #ifndef ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
 #define ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
@@ -389,12 +389,6 @@ template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&
 using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
-template <auto funcPtr, typename... Args> __aicore__ inline void asc_vf_call(Args &&... args)
-{
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) 
-        funcPtr(args...);
-#endif
-}
 namespace AscendC {
 template <typename T> class LocalTensor;
 
@@ -452,7 +446,7 @@ template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&
 #endif
 
 #endif // ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H__
 #endif

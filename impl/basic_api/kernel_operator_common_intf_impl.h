@@ -12,10 +12,10 @@
  * \file kernel_operator_common_intf_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/kernel_operator_common_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_common_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_IMPL_H__
 #endif
 
 #ifndef ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_IMPL_H
@@ -23,6 +23,10 @@
 #include "kernel_tensor.h"
 #include "kernel_struct_mm.h"
 #include "kernel_operator_data_copy_intf.h"
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__
+#endif
 #include "kernel_operator_sys_var_intf.h"
 
 /*
@@ -54,23 +58,23 @@
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_sync_impl.h"
 #include "dav_l300/kernel_operator_set_atomic_impl.h"
-#include "dav_c310/kernel_operator_common_impl.h"
+#include "dav_3510/kernel_operator_common_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_c310/kernel_operator_set_atomic_impl.h"
-#include "dav_c310/kernel_operator_common_impl.h"
-#include "dav_c310/kernel_operator_sync_impl.h"
-#include "dav_c310/kernel_operator_vec_duplicate_impl.h"
+#include "dav_3510/kernel_operator_set_atomic_impl.h"
+#include "dav_3510/kernel_operator_common_impl.h"
+#include "dav_3510/kernel_operator_sync_impl.h"
+#include "dav_3510/kernel_operator_vec_duplicate_impl.h"
 #if KFC_C310_SSBUF == 1
-#include "dav_c310/kfc/kfc_comm_client.h"
-#include "dav_c310/kfc/kfc_comm_server.h"
+#include "dav_3510/kfc/kfc_comm_client.h"
+#include "dav_3510/kfc/kfc_comm_server.h"
 #else
-#include "dav_c310/kfc/kfc_comm_client_gm.h"
-#include "dav_c310/kfc/kfc_comm_server_gm.h"
+#include "dav_3510/kfc/kfc_comm_client_gm.h"
+#include "dav_3510/kfc/kfc_comm_server_gm.h"
 #endif
-#include "dav_c310/core_mng/roc/kernel_operator_cube_group_handle_impl.h"
-#include "dav_c310/core_mng/roc/kernel_operator_group_barrier_impl.h"
+#include "dav_3510/core_mng/roc/kernel_operator_cube_group_handle_impl.h"
+#include "dav_3510/core_mng/roc/kernel_operator_group_barrier_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_set_atomic_impl.h"
 #include "dav_m510/kernel_operator_common_impl.h"
@@ -79,7 +83,7 @@
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_sync_impl.h"
 #include "dav_l311/kernel_operator_set_atomic_impl.h"
-#include "dav_c310/kernel_operator_common_impl.h"
+#include "dav_3510/kernel_operator_common_impl.h"
 #endif
 #include "kernel_pop_stack_buffer.h"
 
@@ -209,7 +213,7 @@ __aicore__ static inline void ResetCtrlSpr(){
 #endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_IMPL_H__
 #endif

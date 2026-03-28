@@ -8,9 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_H
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_H__
 #endif
 
 #ifndef LIB_REDUCE_REDUCE_H
@@ -29,13 +29,13 @@
 #include "../../../impl/adv_api/detail/reduce/reduce_any/reduce_any_v220_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_all/reduce_all_v220_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "../../../impl/adv_api/detail/reduce/reduce_max/reduce_max_c310_impl.h"
-#include "../../../impl/adv_api/detail/reduce/reduce_min/reduce_min_c310_impl.h"
-#include "../../../impl/adv_api/detail/reduce/reduce_sum/reduce_sum_c310_impl.h"
-#include "../../../impl/adv_api/detail/reduce/reduce_mean/reduce_mean_c310_impl.h"
-#include "../../../impl/adv_api/detail/reduce/reduce_any/reduce_any_c310_impl.h"
-#include "../../../impl/adv_api/detail/reduce/reduce_all/reduce_all_c310_impl.h"
-#include "../../../impl/adv_api/detail/reduce/reduce_prod/reduce_prod_c310_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_max/reduce_max_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_min/reduce_min_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_sum/reduce_sum_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_mean/reduce_mean_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_any/reduce_any_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_all/reduce_all_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_prod/reduce_prod_3510_impl.h"
 #endif
 #if ASCENDC_CPU_DEBUG
 #include "kernel_log.h"
@@ -407,7 +407,7 @@ __aicore__ inline void ReduceAll(
 #endif
 #endif // LIB_REDUCE_REDUCE_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_H__
 #endif
