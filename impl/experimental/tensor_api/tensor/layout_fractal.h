@@ -141,19 +141,29 @@ __aicore__ inline decltype(auto) MakeFractalShape(T originShape, U innerShape) {
     return MakeFractalShape(originShape, innerShape, Std::make_index_sequence<Std::tuple_size_v<U>>{});
 }
 
-struct MAkeNzFrameLayout {
+struct MakeNzFrameLayout {
     template <typename TraitType>
     __aicore__ inline static auto Make(size_t row, size_t column) {
-        static constexpr int32_t c0Ele = TraitType::C0_size;
         using T = typename TraitType::type;
         auto shape = TupleDispatcher<LayoutFormat::NZ, TupleFormat::Shape, T>::apply(row, column);
         auto stride = TupleDispatcher<LayoutFormat::NZ, TupleFormat::Stride, T>::apply(row, column);
-        using LayoutT = Layout<decltype(shape), decltype(stride), Pattern>;
+        using LayoutT = Layout<decltype(shape), decltype(stride), NzLayoutPattern>;
         return LayoutT(shape, stride);
     }
 };
 
-using LayoutFormatSet = Std::tuple<Std::tuple<NzLayoutPattern, MakeNzFrameLayout>>;
+struct MakeNDFrameLayout {
+    template <typename TraitType>
+    __aicore__ inline static auto Make(size_t row, size_t column) {
+        using T = typename TraitType::type;
+        auto shape = TupleDispatcher<LayoutFormat::ND, TupleFormat::Shape, T>::apply(row, column);
+        auto stride = TupleDispatcher<LayoutFormat::ND, TupleFormat::Stride, T>::apply(row, column);
+        using LayoutT = Layout<decltype(shape), decltype(stride), NDLayoutPattern>;
+        return LayoutT(shape, stride);
+    }
+};
+
+using LayoutFormatSet = Std::tuple<Std::tuple<NzLayoutPattern, MakeNzFrameLayout>, Std::tuple<NDLayoutPattern, MakeNDFrameLayout>>;
 
 template <typename LayoutPattern, typename Tuple = LayoutFormatSet>
 struct FindLayoutFromPattern;
