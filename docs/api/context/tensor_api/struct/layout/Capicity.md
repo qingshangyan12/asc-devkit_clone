@@ -1,5 +1,11 @@
 # Capicity
 
+## 产品支持情况
+
+| 产品     | 是否支持 |
+| ----------- |:----:|
+|Ascend 950PR/Ascend 950DT|√|
+
 ## 功能概述
 
 Coshape表示Layout实际所占空间的大小，即在给定的stride下，Layout布局可覆盖的容量上界。

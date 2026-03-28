@@ -1,5 +1,11 @@
 # Coshape
 
+## 产品支持情况
+
+| 产品     | 是否支持 |
+| ----------- |:----:|
+|Ascend 950PR/Ascend 950DT|√|
+
 ## 功能概述
 
 Coshape表示Layout的陪域（codomain）的形状，即在给定的stride下，坐标映射所覆盖的索引跨度。

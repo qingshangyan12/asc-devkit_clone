@@ -5,13 +5,6 @@
 | 产品     | 是否支持 |
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|x|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|x|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
 
 ## 功能说明
 
@@ -36,7 +29,7 @@ struct ScaleBNDLayoutFormat {
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| T | 输入 | 数据类型模板参数。<br>AscendC 950PR/AscendC 950DT 支持的数据类型为：fp8_e8m0_t。 |
+| T | 输入 | 数据类型模板参数。<br>支持的数据类型为：fp8_e8m0_t。 |
 | row | 输入 | 矩阵的总行数 |
 | column | 输入 | 矩阵的总列数 |
 

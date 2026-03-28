@@ -29,7 +29,7 @@ struct L0CLayoutFormat {
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| T | 输入 | 数据类型模板参数。<br>AscendC 950PR/AscendC 950DT 支持的数据类型为：int32_t、float。 |
+| T | 输入 | 数据类型模板参数。<br>支持的数据类型为：int32_t、float。 |
 | row | 输入 | 矩阵的总行数 |
 | column | 输入 | 矩阵的总列数 |
 

@@ -29,7 +29,7 @@ struct ScaleADNLayoutFormat {
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| T | 输入 | 数据类型模板参数。<br>AscendC 950PR/AscendC 950DT 支持的数据类型为：fp8_e8m0_t。 |
+| T | 输入 | 数据类型模板参数。<br>支持的数据类型为：fp8_e8m0_t。 |
 | row | 输入 | 矩阵的总行数 |
 | column | 输入 | 矩阵的总列数 |
 
