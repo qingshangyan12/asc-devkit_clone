@@ -35,7 +35,8 @@ __aicore__ inline constexpr auto GetStride(const Layout<ShapeType, StrideType>& 
 
 ## 约束说明
 
-- Is...选择有效，不超过Layout的范围
+- layout必须是有效的Layout对象。
+- 索引Is...必须在有效范围内。
 
 ## 调用示例
 

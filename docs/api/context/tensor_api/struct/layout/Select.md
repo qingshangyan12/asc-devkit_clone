@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-选择Layout的指定维度，返回子Layout。
+选择Layout的shape和stride指定维度组成新的layout对象。
 
 ## 函数原型
 
