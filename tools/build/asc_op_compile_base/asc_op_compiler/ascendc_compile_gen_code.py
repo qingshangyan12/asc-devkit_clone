@@ -33,10 +33,8 @@ def add_time_stamp_codes(desc_id, space_len: int = 1):
     return source
 
 
-def gen_init_dump_code(is_mix: bool, dump_size: int):
-    source = ""
-    source += "    AscendC::SetSysWorkspaceForce(workspace);\n"
-    return source
+def gen_init_dump_code():
+    return "    AscendC::SetSysWorkspaceForce(workspace);\n"
 
 
 def gen_usr_origin_kernel_function_call(func_name: str, opinfo: OpInfo, tiling_info: TilingInfo,
@@ -296,7 +294,7 @@ def set_workspace_param(opinfo: OpInfo, tiling_info: TilingInfo):
 
 
 def add_op_param_to_workspace(opinfo: OpInfo, tiling_info: TilingInfo, source: str, \
-                              dump_size: int, compile_options: list, compile_info: CompileInfo):
+                              compile_options: list, compile_info: CompileInfo):
     input_output_info = []
     for io_info in [opinfo.inputs, opinfo.outputs]:
         if list(io_info):
