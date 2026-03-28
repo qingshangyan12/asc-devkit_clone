@@ -13,7 +13,6 @@
 
     ```cpp
     __aicore__ inline void asc_release_buf(pipe_t pipe, uint8_t buf_id, bool mode)
-    __aicore__ inline void asc_release_buf(pipe_t pipe, uint64_t buf_id, bool mode)
     ```
 
 ## 参数说明
@@ -21,7 +20,7 @@
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
 | pipe | 输入 | 该指令的执行流水线。 |
-| buf_id | 输入 | buffer标号。|
+| buf_id | 输入 | buffer标号。取值范围[0, 31]。|
 | mode | 输入 | 执行模式。<br>&bull; false：该指令等待pipe所对应的流水线中所有前置指令完成后执行。<br>&bull; true：该指令等待pipe所对应的流水线中所有前置指令完成且相同buf_id的所有asc_release_buf指令执行完成后执行。 |
 
 ## 返回值说明
@@ -42,7 +41,7 @@ PIPE_S
 
 ```cpp
 //buffer标号为1
-int64_t buf_id = 1;
+uint8_t buf_id = 1;
 //等待PIPE_S中所有前置指令完成后释放标号为1的缓存
 bool mode = false;
 asc_get_buf(PIPE_S, buf_id, mode);  
