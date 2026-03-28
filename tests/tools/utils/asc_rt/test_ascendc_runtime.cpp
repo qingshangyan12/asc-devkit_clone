@@ -395,6 +395,7 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtype) {
     EXPECT_EQ(ret, 0);
 }
 
+
 TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoCoreRation) {
     void* funcHandle = nullptr;
     unsigned short aicRation;
