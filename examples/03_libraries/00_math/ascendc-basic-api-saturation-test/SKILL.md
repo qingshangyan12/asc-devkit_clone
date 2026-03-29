@@ -1,6 +1,6 @@
 ---
 name: ascendc-basic-api-saturation-test
-description: Ascend C 基础API饱和/非饱和模式验证技能。
+description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户提供想验证的基础API名称（必选）、asc-devkit仓中该API的参考样例链接或者样例文件夹名称（可选）。
 ---
 
 # Ascend C 基础API饱和/非饱和模式验证
@@ -22,7 +22,8 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。
     - 如果用户既未提供API参考样例路径，在样例仓也未检索到对应API样例，进行报错提示用户，终止当前流程。
 
 - Step2. 在新路径下执行样例
-    - 按样例的README中的编译执行章节，新增`test.sh`并执行，确认基线样例功能正常。如果功能不正常，进行报错提示用户，终止当前流程。
+    - 基于样例的README中编译执行章节，在新路径样例目录下新增`test.sh`。
+    - 进入到`test.sh`所在的目录，执行`test.sh`，确认基线样例功能正常。如果功能不正常，进行报错提示用户，终止当前流程。
 
 ### 阶段二、整改样例
 
@@ -41,7 +42,37 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。
     - 关键整改内容如下
         - 样例目录结构参照模板样式。
         - 支持不同的数据类型输入场景。
-        - 支持饱和/非饱和模式，涵盖数据构造和算子.asc代码适配。
+        - 支持饱和/非饱和模式，涵盖数据构造和算子.asc代码适配。  
+        
+    - 注意事项
+        - `{api_name}.asc`文件的饱和/非饱和模式的代码适配方式，无需参考API文档，请严格遵守以下写法，不要随意自行修改。(参考`set_atomic_add_refactor`中`set_atomic_add.asc`的`SetSaturationMode`函数实现即可，区分浮点型和整型)
+        ```cpp
+        if constexpr (std::is_same_v<DataType, float> || std::is_same_v<DataType, half> || std::is_same_v<DataType, bfloat16_t>) {
+            if (isSat) {
+                // 浮点型，饱和模式
+                set_ctrl(sbitset0(get_ctrl(), AscendC::CTRL_48_BIT));
+            } else {
+                // 浮点型，INF/NAN模式
+                set_ctrl(sbitset1(get_ctrl(), AscendC::CTRL_48_BIT));
+            }
+        } else {
+            if (isSat) {
+                // 整型，饱和模式
+                set_ctrl(sbitset1(get_ctrl(), AscendC::CTRL_53_BIT));
+            } else {
+                // 整型，INF/NAN模式
+                set_ctrl(sbitset0(get_ctrl(), AscendC::CTRL_53_BIT));
+            }
+        }
+        ```
+        - 样例的`output`与`golden`的输出结果-真值比对方式，请采用`verify_result.py`脚本，不要采用其他方式（比如`{api_name}.asc`文件中的cpp代码比对方式）。
 
 ### 阶段三、验证整改后的样例
 - 执行`test.sh`脚本，确认重构整改后的样例功能正常（无编译错误），打印结果符合预期（包含不同数据类型输入、饱和/非饱和模式输入场景下的结果打印）
+
+## 常见问题速查
+### 若样例执行，找不到已配置的CANN环境，可自行配置
+```bash 
+source /home/developer/Ascend/cann-9.0.0/set_env.sh
+```
+注：以上仅限gitcode算力平台生效，其他工作环境请自行配置
