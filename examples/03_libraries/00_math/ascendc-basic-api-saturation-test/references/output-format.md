@@ -82,5 +82,33 @@
     - golden(sat)和output(sat)输出，采用蓝色标识
     - verify result的结果不是100%时，采用红色标识，结果是100%时候，采用绿色标识
 
+## 双输出场景
+比如ReduceMax/ReduceMin/ReduceSum等归约API，除了输出最大值/最小值/和值外，还会输出对应索引。
+
+- 输入数据类型为浮点型，比如half类型，则verify_result.py的打印结果如下（要求每一行内容能跟表头对齐）：
+
+    [API: ReduceMax]--[InputDataType: half]--[OutputDataType: half]
+    | inputType    | outputType    | input1     | golden(non-sat)  | output1 | output2 | golden(sat) | output1 | output2 | output(non-sat) | output1 | output2 | output(sat) | output1 | output2 |
+    | ---          | ---           | ---        | ---              | ---     | ---     | ---         | ---     | ---     | ---              | ---     | ---     | ---          | ---     | ---     |
+    | half         | half          | min        | -                | -       | -       | -           | -       | -       | -                | -       | -       | -            | -       | -       |
+    | half         | half          | max        | -                | -       | -       | -           | -       | -       | -                | -       | -       | -            | -       | -       |
+    | half         | half          | +0         | -                | -       | -       | -           | -       | -       | -                | -       | -       | -            | -       | -       |
+    | half         | half          | -0         | -                | -       | -       | -           | -       | -       | -                | -       | -       | -            | -       | -       |
+    | half         | half          | nan        | -                | -       | -       | -           | -       | -       | -                | -       | -       | -            | -       | -       |
+    | half         | half          | inf        | -                | -       | -       | -           | -       | -       | -                | -       | -       | -            | -       | -       |
+    | half         | half          | -inf       | -                | -       | -       | -           | -       | -       | -                | -       | -       | -            | -       | -       |
+    Sat verify result: Matches: xx / 7.
+    Non-sat verify results: Matches: xx / 7.
+
+- 注意事项
+    - 每一行内容能跟表头对齐
+    - 输出值用output1表示，索引用output2表示
+    - 不同数据类型之间的表格，要至少隔开一行，方便呈现
+    - 第一行[API: xxx]内容，采用黄色等醒目颜色标识
+    - golden(non-sat)和output(non-sat)输出，采用橙色标识
+    - golden(sat)和output(sat)输出，采用蓝色标识
+    - verify result的结果不是100%时，采用红色标识，结果是100%时候，采用绿色标识
+    - 索引验证：如果golden索引与output索引一致，则视为匹配（忽略值是否正确）
+
 ## 更多输入场景
-参考单个输入、双个输入场景，以此类推。
+参考单个输入、双个输入、双输出场景，以此类推。

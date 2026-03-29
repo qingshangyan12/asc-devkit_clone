@@ -42,7 +42,7 @@ def pad_colored(value, width, color):
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gen_data_utils import (
     get_dtype_limits,
-    construct_special_values,
+    generate_one_input,
     get_special_names
 )
 
@@ -87,7 +87,7 @@ def verify_all():
     for dtype_name in DTYPE_MAP.keys():
         data_type = DTYPE_MAP[dtype_name]
         
-        special_vals = construct_special_values(data_type)
+        special_vals = generate_one_input(data_type)
         special_names = get_special_names(data_type)
         num_special = len(special_vals)
         

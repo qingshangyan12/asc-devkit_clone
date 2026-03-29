@@ -9,7 +9,7 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
 
 **适用**：某个API饱和/非饱和模式验证，必须包含：具体API名称（如Add/Mul等等）、饱和/非饱和模式验证关键提示词。
 
-**不适用**：未提供具体的正确的API名称；未饱和以上关键提示词。
+**不适用**：未提供具体的正确的API名称；未提供以上关键提示词。
 
 ---
 
@@ -23,7 +23,7 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
 
 - Step2. 在新路径下执行样例
     - 基于样例的README中编译执行章节，在新路径样例目录下新增`test.sh`。
-    - 进入到`test.sh`所在的目录，执行`test.sh`，确认基线样例功能正常。如果功能不正常，进行报错提示用户，终止当前流程。
+    - 进入到`test.sh`所在的目录，执行`bash test.sh`，确认基线样例功能正常。如果功能不正常，进行报错提示用户，终止当前流程。
 
 ### 阶段二、整改样例
 
@@ -48,6 +48,8 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
     - `verify_result.py`的输出格式参考`references/output-format.md`
 
     - `gen_data.py`中，如果是单输入场景调用`gen_data_utils`的`generate_one_input`函数来构造输入，如果是双输入场景调用`gen_data_utils`的`generate_two_inputs`函数来构造输入
+
+    - `test.sh`拷贝`set_atomic_add_refactor`的test.sh内容，基于当前API支持的数据类型，适配修改`DTYPES`和`INDICES`。
         
     - 注意事项
         - `{api_name}.asc`文件的饱和/非饱和模式的代码适配方式，无需参考API文档，请严格遵守以下写法，不要随意自行修改。(参考`set_atomic_add_refactor`中`set_atomic_add.asc`的`SetSaturationMode`函数实现即可，区分浮点型和整型)
