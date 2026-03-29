@@ -71,30 +71,34 @@ __aicore__ inline void SetSaturationMode()
     if constexpr (std::is_same_v<DataType, float> || 
                   std::is_same_v<DataType, half> || 
                   std::is_same_v<DataType, bfloat16_t>) {
-        // 浮点类型: CTRL_48_BIT
         if (isSat) {
+            // 浮点型，饱和模式
             set_ctrl(sbitset0(get_ctrl(), AscendC::CTRL_48_BIT));
         } else {
+            // 浮点型，INF/NAN模式
             set_ctrl(sbitset1(get_ctrl(), AscendC::CTRL_48_BIT));
         }
     } else {
-        // 整数类型: CTRL_53_BIT
         if (isSat) {
+            // 整型，饱和模式
             set_ctrl(sbitset1(get_ctrl(), AscendC::CTRL_53_BIT));
         } else {
+            // 整型，INF/NAN模式
             set_ctrl(sbitset0(get_ctrl(), AscendC::CTRL_53_BIT));
         }
     }
 }
 ```
 
-**调用位置:**
+**调用位置:**  
+在调用API之前。
+
 ```cpp
 __aicore__ inline void CopyOut()
 {
     // ... DataCopy 完成
     SetSaturationMode<T>();          // 设置饱和度模式
-    AscendC::SetAtomicAdd<T>();     // 执行原子加
+    AscendC::SetAtomicAdd<T>();     // 调用API
     // ...
 }
 ```
@@ -176,13 +180,13 @@ int main(int argc, char* argv[])
 | 饱和度 | 无 | 分别生成 sat/non-sat 两套 golden |
 
 **Refactor 数据内容:**
+使用 `generate_one_input()` 或 `generate_two_inputs()` 生成测试数据:
 ```python
-def construct_special_values(data_type):
-    limits = get_dtype_limits(data_type)
-    specials = [limits['min'], limits['max'], limits['pos_zero']]
-    if np.issubdtype(data_type, np.floating):
-        specials.extend([limits['nan'], limits['pos_inf'], limits['neg_inf']])
-    return specials
+# 单目API (如 Exp, Ln)
+special_vals = generate_one_input(data_type)
+
+# 双目API (如 Add, Mul)
+inputs_a, inputs_b = generate_two_inputs(data_type)
 ```
 
 ---
@@ -192,25 +196,47 @@ def construct_special_values(data_type):
 | 特性 | Baseline | Refactor |
 |------|----------|----------|
 | 验证方式 | 单文件比对 | 遍历 6 种类型 |
-| 输出格式 | 简单文本 | 彩色表格 |
+| 输出格式 | 简单文本 | 带颜色标识的对齐表格 |
 | 特殊值处理 | 无 | NaN/Inf 专门处理 |
 
 **Refactor 表格输出示例:**
 ```
-======================================================================
-  Verify Output vs Golden
-======================================================================
-[int64] BLOCK=256 CORES=3
-----------------------------------------------------------------------
- name     | input         | golden(sat)   | golden(non-sat) | output(sat)    | output(non-sat)
-----------------------------------------------------------------------
- min      | -9.2234e+18   | -2.7668e+19   | -2.7668e+19    | -2.7668e+19    | -2.7668e+19
- max      | 9.2234e+18    | 2.7668e+19    | 2.7668e+19     | 2.7668e+19     | 2.7668e+19
- ...
-----------------------------------------------------------------------
-   Saturation:     OK (mismatches=0)
-   Non-saturation: OK (mismatches=0)
- Result: sat=PASS, non-sat=PASS [PASS]
+[API: SetAtomicAdd]--[InputDataType: half]--[OutputDataType: half]  (黄色)
+| inputType    | outputType    | input1     | golden(sat)  | golden(non-sat) | output(sat)  | output(non-sat) |
+| ---          | ---           | ---        | ---          | ---             | ---          | ---             |
+| half         | half          | min        | 1.9200e+02   | 1.9200e+02      | 1.9200e+02   | 1.9200e+02      |  (golden(sat)/output(sat): 橙色, golden(non-sat)/output(non-sat): 蓝色)
+| half         | half          | max        | 6.5535e+04   | 6.5535e+04      | 6.5535e+04   | 6.5535e+04      |
+...
+ Sat verify result: Matches: 7 / 7.  (100%: 绿色, <100%: 红色)
+ Non-sat verify results: Matches: 7 / 7.  (100%: 绿色, <100%: 红色)
+```
+
+**输出格式要点:**
+- 首行: `[API: {API_NAME}]--[InputDataType: {dtype}]--[OutputDataType: {dtype}]` (双短横线 `--`，黄色)
+- 表头: 使用固定宽度对齐 (`<12`, `<10`, `<14`, `<16` 等)
+- 分隔线: `| --- |` 格式
+- 数据行: 每列内容与表头对齐
+- 颜色标识:
+  - `golden(sat)` 和 `output(sat)`: 橙色
+  - `golden(non-sat)` 和 `output(non-sat)`: 蓝色
+- 底部结果:
+  - 100% 匹配: 绿色
+  - 非 100% 匹配: 红色
+- 不同数据类型之间空行分隔
+
+**颜色实现关键代码:**
+```python
+RESET = "\033[0m"
+YELLOW = "\033[93m"
+GREEN = "\033[92m"
+RED = "\033[91m"
+BLUE = "\033[94m"
+ORANGE = "\033[38;5;208m"
+
+def pad_colored(value, width, color):
+    val_str = str(value)
+    padding = width - len(val_str)
+    return f"{color_text(val_str, color)}{' ' * padding}"
 ```
 
 ---
@@ -219,9 +245,38 @@ def construct_special_values(data_type):
 
 **职责:**
 - `get_dtype_limits()`: 获取各类型数值范围
-- `construct_special_values()`: 构造特殊测试值
+- `generate_one_input()`: 生成单目API特殊测试值
+- `generate_two_inputs()`: 生成双目API特殊测试值组合
 - `save_bin()`: 保存二进制文件
 - `get_special_names()`: 获取特殊值名称列表
+
+**generate_one_input() - 单目API测试数据:**
+```python
+def generate_one_input(data_type):
+    limits = get_dtype_limits(data_type)
+    specials = [limits['min'], limits['max'], limits['pos_zero'], limits['neg_zero']]
+    if np.issubdtype(data_type, np.floating):
+        specials.extend([limits['nan'], limits['pos_inf'], limits['neg_inf']])
+    return specials
+```
+- 浮点型: 7个值 (min, max, +0, -0, NaN, +INF, -INF)
+- 整型: 4个值 (min, max, +0, -0)
+
+**generate_two_inputs() - 双目API测试数据:**
+```python
+def generate_two_inputs(data_type):
+    vals = generate_one_input(data_type)
+    inputs_a = []
+    inputs_b = []
+    for a in vals:
+        for b in vals:
+            inputs_a.append(a)
+            inputs_b.append(b)
+    return np.array(inputs_a, dtype=data_type), np.array(inputs_b, dtype=data_type)
+```
+- 浮点型: 7×7 = 49 种组合
+- 整型: 4×4 = 16 种组合
+- 返回两个数组，分别对应第一个输入和第二个输入
 
 **依赖关系:**
 ```
@@ -255,10 +310,12 @@ verify_result.py → gen_data_utils.py
 
 - [ ] 支持多种 numpy 数据类型
 - [ ] 使用 tensorflow 处理 bfloat16
+- [ ] 使用 `generate_one_input()` 生成单目API测试数据
+- [ ] 使用 `generate_two_inputs()` 生成双目API测试数据组合
 - [ ] 生成特殊值测试用例 (min, max, zero, NaN, ±INF)
 - [ ] 分别生成 sat/non-sat 两套 golden
-- [ ] 验证脚本支持彩色输出
-- [ ] 提取公共工具到 `*_utils.py`
+- [ ] 验证脚本支持对齐表格输出
+- [ ] 提取公共工具到 `gen_data_utils.py`
 
 ---
 

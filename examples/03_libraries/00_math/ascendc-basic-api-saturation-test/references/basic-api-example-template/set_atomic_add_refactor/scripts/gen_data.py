@@ -20,7 +20,7 @@ DTYPE_MAP = {
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gen_data_utils import (
     get_dtype_limits,
-    construct_special_values,
+    generate_one_input,
     save_bin
 )
 
@@ -34,24 +34,13 @@ def compute_golden(input_val, data_type, saturation=True):
     limits = get_dtype_limits(data_type)
     
     if np.issubdtype(data_type, np.floating):
-        if saturation and not np.isnan(result) and not np.isinf(result) and result != 0:
-            if result > limits['max']:
-                result = limits['max']
-            elif result < limits['min']:
-                result = limits['min']
+        if saturation and not np.isnan(result):
+            result = np.clip(result, limits['min'], limits['max'])
         elif saturation and np.isnan(result):
             result = 0.0
-        elif saturation and np.isinf(result):
-            if result > limits['max']:
-                result = limits['max']
-            elif result < limits['min']:
-                result = limits['min']
     else:
         if saturation:
-            if result > limits['max']:
-                result = limits['max']
-            elif result < limits['min']:
-                result = limits['min']
+            result = np.clip(result, limits['min'], limits['max'])
     
     return result
 
@@ -65,7 +54,7 @@ def gen_data():
     for dtype_name in DTYPE_MAP.keys():
         data_type = DTYPE_MAP[dtype_name]
         
-        special_vals = construct_special_values(data_type)
+        special_vals = generate_one_input(data_type)
         num_special = len(special_vals)
         
         repeat = (BLOCK_LENGTH + num_special - 1) // num_special

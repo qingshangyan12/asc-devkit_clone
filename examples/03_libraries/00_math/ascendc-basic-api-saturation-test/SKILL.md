@@ -41,8 +41,13 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
         - 结合`set_atomic_add_baseline`代码和`set_atomic_add_refactor`代码，以及`example_refactor_rules.md`，明确需要重构整改的要点。
     - 关键整改内容如下
         - 样例目录结构参照模板样式。
+        - 多核样例改造成单核样例（比如若numsBlock>1则改成1，并对应适配修改地址偏移、tiling相关代码）。
         - 支持不同的数据类型输入场景。
         - 支持饱和/非饱和模式，涵盖数据构造和算子.asc代码适配。  
+    
+    - `verify_result.py`的输出格式参考`references/output-format.md`
+
+    - `gen_data.py`中，如果是单输入场景调用`gen_data_utils`的`generate_one_input`函数来构造输入，如果是双输入场景调用`gen_data_utils`的`generate_two_inputs`函数来构造输入
         
     - 注意事项
         - `{api_name}.asc`文件的饱和/非饱和模式的代码适配方式，无需参考API文档，请严格遵守以下写法，不要随意自行修改。(参考`set_atomic_add_refactor`中`set_atomic_add.asc`的`SetSaturationMode`函数实现即可，区分浮点型和整型)
@@ -71,8 +76,13 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
 - 执行`test.sh`脚本，确认重构整改后的样例功能正常（无编译错误），打印结果符合预期（包含不同数据类型输入、饱和/非饱和模式输入场景下的结果打印）
 
 ## 常见问题速查
-### 若样例执行，找不到已配置的CANN环境，可自行配置
+
+### 1. 若执行样例找不到已配置的CANN环境，可自行配置
 ```bash 
 source /home/developer/Ascend/cann-9.0.0/set_env.sh
 ```
 注：以上仅限gitcode算力平台生效，其他工作环境请自行配置
+
+### 2. 验证脚本要点
+- 验证脚本必须使用Python，不能用C++内联比对
+- 只需要比对前20个元素即可快速验证
