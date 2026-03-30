@@ -20,7 +20,7 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
 - Step1. 拷贝基线样例
     - **【重要】优先级**：用户提供的参考样例 > `asc-devkit/examples`检索到的调用该API的样例
     - **必须优先使用用户提供的参考样例**（即使不是相同API，但样例写法差不多），不要自行检索其他样例
-    - 将对应样例目录，拷贝到当前目录下的`tmp-workspace`中
+    - 将对应样例目录，拷贝到当前目录下的`tmp-workspace`中，并进行更名为{api_name}_saturation_verify
     - 如果用户既未提供API参考样例路径，在样例仓也未检索到对应API样例，进行报错提示用户，终止当前流程
 
 - Step2. 在新路径下执行样例
@@ -64,7 +64,7 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
   - **双输入-类型A**：表格列 `| input1 | input2 |`
   - **双输入-类型B**：表格列 `| input1 | scalar |`
 - **重要**：多输入场景需遍历所有组合（比如双输入场景，浮点型7²=49行，整型4²=16行）
-- output与golden的比对逻辑：使用verify_result.py验证，禁用{api_name}.asc中的CompareResult等函数
+- **结果验证方式**：详细说明见 `example-refactor-rules.md` 第 1.6 节
 
 ##### 4. `test.sh` 文件
 - **必须严格参照模板** `set_atomic_add_refactor/test.sh`
@@ -88,18 +88,28 @@ source /home/developer/Ascend/cann-9.0.0/set_env.sh
 
 ### 2. **【重要】如何判断API有几个输入**
 
-- 查看API文档的"参数说明"表格，统计"源操作数"类型的参数数量。
-  - 1个tensor → 单输入。比如`Exp`有`src`一个输入源操作数，属于单个输入场景；
-  - 2个tensor → 双输入-类型A（2 tensor）。比如`Add`有`src0`和`src1`两个输入源操作数，属于两个输入场景；
-  - 1个tensor + 1个scalar → 双输入-类型B。比如`Adds`有`src`和`scalarValue`两个输入源操作数，属于两个输入场景；  
-  依此类推
+**第一步：查看API函数原型**
 
-- 结合"功能说明"，确认上述结论
+查看 `asc-devkit/docs/api/context/{API_NAME}.md` 中的"函数原型"章节：
+- 如果只有一个 `src` 参数 → 单输入
+- 如果有 `src0`, `src1` 两个参数 → 双输入-类型A（2 tensor）
+- 如果有 `src` + `scalarValue` 参数 → 双输入-类型B（1 tensor + 1 scalar）
 
-- 小结如下
+**第二步：结合"参数说明"表格验证**
 
-  | API输入数量类型 | 示例API |
-  |---------|--------|
-  | 单输入（1 tensor） | Exp等 |
-  | 双输入-类型A（2 tensor） | Add等 |
-  | 双输入-类型B（1 tensor + 1 scalar） | Adds等 |
+在"参数说明"表格中，检查"参数名称"列：
+- 统计所有"源操作数"类型的参数
+- 确认哪些是 `tensor`，哪些是 `scalar`
+
+**第三步：结合"功能说明"确认**
+
+查看功能说明中的数学公式，例如：
+- Adds: `z = x + scalarValue` → 有 x 和 scalarValue 两个输入
+
+**【常见API判断速查】**
+
+| API输入数量类型 | 示例API | 特征 |
+|---------|--------|------|
+| 单输入（1 tensor） | Exp,Ln,Abs,Reciprocal,Sqrt,Rsqrt,Relu | 函数原型只有1个src参数 |
+| 双输入-类型A（2 tensor） | Add,Sub,Mul,Div,Max,Min | 函数原型有src0, src1两个tensor参数 |
+| 双输入-类型B（1 tensor + 1 scalar） | Adds,Muls,Maxs,Mins,LeakyRelu | 函数原型有src和scalarValue参数 |
