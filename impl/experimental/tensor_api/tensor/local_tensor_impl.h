@@ -197,6 +197,16 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
     return MakeLocalTensor<Iterator>{}(iter, args...);
 }
 
+template <typename Tensor, typename Coord, typename T>
+__aicore__ inline decltype(auto) Slice(const Tensor& tensor, const Coord& coord, const T& t)
+{
+    static_assert(IsTileTensorV<Tensor>, "Tensor must be of type LocalTensor.");
+    static_assert(Std::is_tuple_v<T> || is_layout_v<T>, "Only Support 2D Shape or Layout Type.");
+    
+    auto iter = tensor.Data() + Layout()(coord);
+    return MakeTensor(iter, MakeTileLayout(coord, tensor.Layout(), t));
+}
+
 } // namespace Te
 } // namespace AscendC
 
