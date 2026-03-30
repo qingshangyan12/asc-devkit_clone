@@ -58,9 +58,10 @@ using Tile = Std::tuple<Layouts...>;
 template <typename... Coords>
 using Coord = Std::tuple<Coords...>;
 
-template <typename T, typename U>
+template <typename T, typename U, typename LayoutPattern = DefaultPattern>
 struct Layout : private Std::tuple<T, U>
 {
+    using tag = LayoutPattern;
     static constexpr auto size = StaticLayoutSize<T, U>::size;
     static constexpr auto depth = nesting_depth_v<T>;
     static constexpr auto rank = Std::tuple_size_v<T>;
