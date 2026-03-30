@@ -17,8 +17,8 @@
 | [gather_mask_custom_mode](./gather_mask_custom_mode)                                                             | 本样例基于GatherMask基础API的用户自定义模式接口实现数据聚合，可用于以用户输入的Tensor数值对应的二进制为gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中                                                                         |
 | [select](./select)                                                                                               | 本样例基于Select完成选择操作，可用于给定两个源操作数src0和src1，根据selMask（用于选择的Mask掩码）的比特位值选取元素，得到目的操作数dst                                                                                            |
 | [select_flexible_scalar_argument_position](./select_flexible_scalar_argument_position)     | 本样例基于Select实现对于给定的两个源操作数src0和scalar标量，根据selMask（用于选择的Mask掩码）的比特位值选取元素，得到目的操作数dst。选择的规则为：当selMask的比特位是1时，从src0中选取，比特位是0时选取scalar标量                                                                                                                                                                             |
-| [create_vec_index](./create_vec_index) | 本样例基于CreateVecIndex实现创建指定起始值的向量索引的方法 |
-| [brcb](./brcb) | 本样例基于Brcb实现数据填充，可用于输入一个tensor，每一次取输入张量中的8个数填充到结果张量的8个datablock中 |
+| [create_vec_index](./create_vec_index) | 本样例介绍了调用CreateVecIndex实现创建指定起始值的向量索引的方法 |
+| [brcb](./brcb) | 本样例基于Brcb实现数据填充，可用于每次取输入张量中的8个数填充到结果张量的8个datablock中 |
 | [duplicate](./duplicate) | 本样例基于Duplicate实现数据填充，可用于将一个变量或立即数复制多次并填充到向量中 |
 | [gather](./gather)         | 本样例基于Gather实现对于给定的输入张量和一个地址偏移量，根据偏移地址将输入张量按元素收集到结果张量中 |
 | [gatherb](./gatherb) | 本样例基于Gatherb实现对于给定的输入张量和一个地址偏移量，根据偏移地址按照DataBlock的粒度将输入张量按元素收集到结果张量中     |
@@ -30,7 +30,7 @@
 | [proposal_concat](./proposal_concat) | 本样例介绍基础api ProposalConcat的调用，该api的功能：将连续元素合入Region Proposal内对应位置，每次迭代会将16个连续元素合入到16个Region Proposal的对应位置里 |
 | [proposal_extract](./proposal_extract) | 本样例介绍基础api ProposalExtract的调用，该api的功能：与ProposalConcat相反，从Region Proposal内将相应位置的单个元素抽取后重排，每次迭代处理16个Region Proposals，抽取16个元素后连续排列 |
 | [rp_sort16](./rp_sort16) | 本样例介绍基础api RpSort16的调用，该api的功能：根据Region Proposals中的score域对其进行排序（score大的排前面），每次排16个Region Proposals |
-| [sort32](./sort32) | 本样例基于Sort32实现排序操作，该接口一次迭代可以完成32个数的排序 |
+| [sort32](./sort32) | 本样例基于Sort32实现对128个元素进行排序操作 |
 | [reduce_max_computation_of_the_first_n_data_elements](./reduce_max_computation_of_the_first_n_data_elements)         | 本样例基于ReduceMax的tensor前n个数据计算接口实现最大值归约，可用于指定从输入tensor的前n个数据中计算找出最大值及最大值对应的索引位置              |
 | [reduce_max_high_dimensional_tensor_sharding_computation](./reduce_max_high_dimensional_tensor_sharding_computation) | 本样例基于ReduceMax的tensor高维切分计算接口实现最大值归约，可用于从所有的输入数据中找出最大值及最大值对应的索引位置，使用mask用于控制每次迭代内参与计算的元素。            |
 | [reduce_min_computation_of_the_first_n_data_elements](./reduce_min_computation_of_the_first_n_data_elements)         | 本样例基于ReduceMin的tensor前n个数据计算接口实现最小值归约，可用于指定从输入tensor的前n个数据中找出最小值及最小值对应的索引值              |
