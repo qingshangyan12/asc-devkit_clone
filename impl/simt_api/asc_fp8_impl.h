@@ -22,6 +22,10 @@
 #ifndef IMPL_SIMT_API_ASC_FP8_IMPL_H
 #define IMPL_SIMT_API_ASC_FP8_IMPL_H
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#include "__clang_cce_simt_fp8.h"
+#endif
+
 #include "simt_api/device_types.h"
 #include "impl/simt_api/internal_functions_impl.h"
 
