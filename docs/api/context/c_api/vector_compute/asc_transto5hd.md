@@ -128,55 +128,28 @@ __ubuf__ half dst[total_length];
 const uint32_t DST_STEP = 16;
 const uint32_t SRC_STEP = 16 * 16;
 const uint32_t OFFSET = 16 * 16 * 16;
-// src_list和dst_list是16个DataBlock地址的数组
-for (int j = 0; j < 4; ++j) {
-    __ubuf__ half* src_list[16] = {
-        (__ubuf__ half*)(src + OFFSET * j + 0 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 1 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 2 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 3 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 4 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 5 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 6 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 7 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 8 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 9 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 10 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 11 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 12 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 13 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 14 * SRC_STEP),
-        (__ubuf__ half*)(src + OFFSET * j + 15 * SRC_STEP)
-    };
-    __ubuf__ half* dst_list[16] = {
-        (__ubuf__ half*)(dst + OFFSET * j + 0 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 1 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 2 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 3 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 4 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 5 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 6 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 7 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 8 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 9 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 10 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 11 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 12 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 13 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 14 * DST_STEP),
-        (__ubuf__ half*)(dst + OFFSET * j + 15 * DST_STEP)
-    };
-}
 const int32_t VA_REG_ARRAY_LEN = 8;
 uint8_t repeat = 16;
 uint16_t dst_stride = 16;
 uint16_t src_stride = 1;
 
-// asc_set_va_reg接口要求前8个和后8个地址序列与地址寄存器分别关联
-asc_set_va_reg(VA0, dst_list);
-asc_set_va_reg(VA1, dst_list + VA_REG_ARRAY_LEN);
-asc_set_va_reg(VA2, src_list);
-asc_set_va_reg(VA3, src_list + VA_REG_ARRAY_LEN);
+// src_list和dst_list定义在循环外部
+__ubuf__ half* src_list[16];
+__ubuf__ half* dst_list[16];
 
-asc_transto5hd_b16(VA0, VA2, repeat, dst_stride, src_stride);
+for (int j = 0; j < 4; ++j) {
+    // 在循环内更新地址列表
+    for (int i = 0; i < 16; ++i) {
+        src_list[i] = (__ubuf__ half*)(src + OFFSET * j + i * SRC_STEP);
+        dst_list[i] = (__ubuf__ half*)(dst + OFFSET * j + i * DST_STEP);
+    }
+    
+    // 每次循环都要设置寄存器并执行转换
+    asc_set_va_reg(VA0, dst_list);
+    asc_set_va_reg(VA1, dst_list + VA_REG_ARRAY_LEN);
+    asc_set_va_reg(VA2, src_list);
+    asc_set_va_reg(VA3, src_list + VA_REG_ARRAY_LEN);
+    
+    asc_transto5hd_b16(VA0, VA2, repeat, dst_stride, src_stride);
+}
 ```
