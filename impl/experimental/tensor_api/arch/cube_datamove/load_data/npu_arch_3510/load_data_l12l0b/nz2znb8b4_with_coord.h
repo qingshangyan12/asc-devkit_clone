@@ -54,7 +54,7 @@ private:
         uint16_t nLoop = mStep >> SHIFT_M_STEP_B4;
         mStep = M_STEP_MIN_VAL_B4;
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
-            auto sliceDst = dst(MakeCoord(MakeCoord(0, idx), MakeCoord(0, 0)));
+            auto sliceDst = dst.Slice(MakeCoord(MakeCoord(0, idx), MakeCoord(0, 0)));
             LoadCbufToCbS43510::LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             mStartPosition += M_STEP_MIN_VAL_B4;
         }
@@ -71,7 +71,7 @@ private:
         uint16_t nLoop = mStep >> SHIFT_M_STEP_B8;
         mStep = M_STEP_MIN_VAL_B8;
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
-            auto sliceDst = dst(MakeCoord(MakeCoord(0, idx), MakeCoord(0, 0)));
+            auto sliceDst = dst.Slice(MakeCoord(MakeCoord(0, idx), MakeCoord(0, 0)));
             LoadCbufToCb3510::LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             mStartPosition += M_STEP_MIN_VAL_B8;
         }
