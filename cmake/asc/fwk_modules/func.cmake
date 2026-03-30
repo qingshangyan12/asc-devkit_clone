@@ -1063,6 +1063,10 @@ function(npu_op_package_add target_package_name)
     get_property(KERNEL_SRC_BASE GLOBAL PROPERTY _ASC_TGT_KERNEL_${_ascendc_kernel_target}_SRC_BASE)
     get_property(KERNEL_TILING_LIBRARY GLOBAL PROPERTY _ASC_TGT_KERNEL_${_ascendc_kernel_target}_TILING_LIBRARY)
     set(KERNEL_DYNAMIC_PATH ${KERNEL_BINARY_PATH}/binary/dynamic/)
+
+    set(KERNEL_COMPILE_TARGETS "")
+    set(KERNEL_COMPILE_TARGET_COUNT 0)
+
     foreach(compute_unit ${ASCEND_COMPUTE_UNIT})
       # generate aic-${compute_unit}-ops-info.json
       add_ops_info_target(TARGET ${_ascendc_kernel_target}_ops_info_gen_${compute_unit}
@@ -1097,14 +1101,36 @@ function(npu_op_package_add target_package_name)
                                 TARGET_NAME ${_ascendc_kernel_target}
                                 PACKAGE_NAME ${target_package_name}
                                 OUT_DIR ${KERNEL_BINARY_PATH}/binary/)
+
+          list(APPEND KERNEL_COMPILE_TARGETS ${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT})
+          math(EXPR KERNEL_COMPILE_TARGET_COUNT "${KERNEL_COMPILE_TARGET_COUNT} + 1")
         endif()
       endforeach()
-      get_is_all_op_fail(${CMAKE_CURRENT_BINARY_DIR}/binary TYPE_NAME_LIST ${target_package_name})
     endforeach()
+
+    add_custom_target(${_ascendc_kernel_target}_check_all_fail
+      COMMAND ${CMAKE_COMMAND} -E echo "Checking all operators compilation status."
+    )
+
+    if(DEFINED KERNEL_COMPILE_TARGETS)
+      add_dependencies(${_ascendc_kernel_target}_check_all_fail ${KERNEL_COMPILE_TARGETS})
+    endif()
+
+    add_custom_command(TARGET ${_ascendc_kernel_target}_check_all_fail
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/check_all_fail.cmake
+              -DOUT_DIR=${KERNEL_BINARY_PATH}/binary
+              -DTYPE_COUNT=${KERNEL_COMPILE_TARGET_COUNT}
+              -DTARGET_NAME=${target_package_name}
+              -DPROPERTY_NAME=_ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL
+    )
   endif()
 
   get_property(all_op_fail GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL)
-  message("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa  ${all_op_fail}")
+  if(NOT DEFINED all_op_fail)
+    set(all_op_fail FALSE)
+  endif()
+  message("All operators compile failed: ${all_op_fail}")
   if("${output_type}" STREQUAL "RUN" AND NOT all_op_fail)
     if(_ascendc_tiling_target)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
