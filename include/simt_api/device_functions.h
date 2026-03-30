@@ -424,6 +424,14 @@ static __SIMT_DEVICE_FUNCTIONS_DECL__ int __popc(unsigned long x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s);
 
+#ifndef ASCENDC_CPU_DEBUG
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+static __SIMT_DEVICE_FUNCTIONS_DECL__ void dcci(__gm__ void *dst, uint64_t entire);
+#else
+static __SIMT_DEVICE_FUNCTIONS_DECL__ void dcci(void *dst, uint64_t entire);
+#endif
+#endif
+
 #include "impl/simt_api/device_functions_impl.h"
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_H__)
