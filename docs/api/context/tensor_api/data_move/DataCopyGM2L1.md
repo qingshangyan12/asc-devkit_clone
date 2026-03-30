@@ -16,6 +16,7 @@ DataCopyGM2L1提供数据搬运功能，该接口支持Global Memory到L1 Buffer
 - DN2NZ：DN格式到NZ格式的数据搬运
 - DN2ZN：DN格式到ZN格式的数据搬运
 - NZ2NZ：NZ格式到NZ格式的数据搬运
+- ZN2ZN：ZN格式到ZN格式的数据搬运
 - Scale相关格式转换：ScaleAND2ZZ、ScaleADN2ZZ、ZZ2ZZ、ScaleBND2NN、ScaleBDN2NN、NN2NN
 
 ### 不支持坐标偏移的接口
@@ -86,6 +87,7 @@ DataCopyGM2L1提供数据搬运功能，该接口支持Global Memory到L1 Buffer
 | DN | NZ | int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float |
 | DN | ZN | fp4x2_e2m1_t/fp4x2_e1m2_t/int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float |
 | NZ | NZ | int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/int64_t/uint64_t |
+| ZN | ZN | int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/int64_t/uint64_t |
 | ScaleAND | ZZ | fp8_e8m0_t |
 | ScaleADN | ZZ | fp8_e8m0_t |
 | ZZ | ZZ | fp8_e8m0_t |
