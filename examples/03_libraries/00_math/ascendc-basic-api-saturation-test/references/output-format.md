@@ -81,6 +81,7 @@
     - golden(non-sat)和output(non-sat)输出，采用橙色标识
     - golden(sat)和output(sat)输出，采用蓝色标识
     - verify result的结果不是100%时，采用红色标识，结果是100%时候，采用绿色标识
+    - 多输入场景，需遍历所有输入组合
 
 ## 双输出场景
 比如ReduceMax/ReduceMin/ReduceSum等归约API，除了输出最大值/最小值/和值外，还会输出对应索引。

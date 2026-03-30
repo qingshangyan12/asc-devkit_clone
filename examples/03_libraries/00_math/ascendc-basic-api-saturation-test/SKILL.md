@@ -27,60 +27,61 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
 
 ### 阶段二、整改样例
 
-- Step1. 分析API资料
+#### Step1. 分析API资料
+查看 `asc-devkit/docs/api/context/` API文档，重点分析：
+- 产品支持：必须是Atlas A2 训练/推理系列产品支持的API
+- 数据类型：输入/输出的合法数据类型组合（如half/float/int16_t/int32_t等）
 
-    查看 `asc-devkit/docs/api/context/` API 文档，找到对应的API接口文档，重点分析以下内容：
-    - 产品支持情况，要求是Atlas A2 训练系列产品/Atlas A2 推理系列产品支持的API，否则报错提示用户，终止当前流程。  
-    - 参数说明表格，查看输入/输出数据类型支持情况（比如half/float/bfloat16_t/int8_t/int16_t/int32_t等），为下一步的样例改造做准备。
-    
-    注意：1、只关注Atlas A2 训练系列产品/Atlas A2 推理系列产品的数据类型支持情况；2、要关注输入数据类型和输出数据类型的合法组合。
+#### Step2. 按文件重构
 
-- Step2. 参考样例模板进行整改
-    
-    - 样例模板在`references/basic-api-example-template`
-        - 结合`set_atomic_add_baseline`代码和`set_atomic_add_refactor`代码，以及`example_refactor_rules.md`，明确需要重构整改的要点。
-    - 关键整改内容如下
-        - 样例目录结构参照模板样式。
-        - 多核样例改造成单核样例（比如若numsBlock>1则改成1，并对应适配修改地址偏移、tiling相关代码）。
-        - 支持不同的数据类型输入场景。
-        - 支持饱和/非饱和模式，涵盖数据构造和算子.asc代码适配。
-    
-    - `verify_result.py`的输出格式参考`references/output-format.md`
-        - 单输入场景：参考"单个输入场景"章节
-        - 双输入场景（如Add/Mul）：参考"两个输入场景"章节  
-        - 双输出场景（如ReduceMax/ReduceMin/ReduceSum）：参考"双输出场景"章节，使用`output1`表示值，`output2`表示索引
+##### 1. `{api_name}.asc` 文件
+- **多核→单核**：`numBlocks>1`改为`1`，适配地址偏移和tiling
+- **模板化数据类型**：使用`template<typename T>`支持多种类型
+- **饱和/非饱和模式**：在API调用前插入`SetSaturationMode<T>()`函数
+  ```cpp
+  // 浮点型(float/half/bfloat16)：CTRL_48_BIT
+  // 整型(int8/16/32)：CTRL_53_BIT
+  if constexpr (std::is_same_v<DataType, float> || std::is_same_v<DataType, half> || std::is_same_v<DataType, bfloat16_t>) {
+    if (isSat) {
+        // 浮点型，饱和模式
+        set_ctrl(sbitset0(get_ctrl(), AscendC::CTRL_48_BIT));
+    } else {
+        // 浮点型，INF/NAN模式
+        set_ctrl(sbitset1(get_ctrl(), AscendC::CTRL_48_BIT));
+    }
+  } else {
+    if (isSat) {
+        // 整型，饱和模式
+        set_ctrl(sbitset1(get_ctrl(), AscendC::CTRL_53_BIT));
+    } else {
+        // 整型，INF/NAN模式
+        set_ctrl(sbitset0(get_ctrl(), AscendC::CTRL_53_BIT));
+    }
+  }
+  ```
 
-    - `gen_data.py`中，如果是单输入场景调用`gen_data_utils`的`generate_one_input`函数来构造输入，如果是双输入场景调用`gen_data_utils`的`generate_two_inputs`函数来构造输入
+##### 2. `gen_data.py` 文件
+- 特殊值构造：使用`get_dtype_limits()`获取min/max/0/NaN/INF等
+- 数据生成：
+  - 单输入：`generate_one_input(data_type)`
+  - 双输入：`generate_two_inputs(data_type)` 生成所有组合
+  - 多输入：依次类推，新增函数实现功能
+- Golden计算：分别计算sat和non-sat模式结果
 
-    - `test.sh`拷贝`set_atomic_add_refactor`的test.sh内容，基于当前API支持的数据类型，适配修改`DTYPES`和`INDICES`。
+##### 3. `verify_result.py` 文件
+- 输出格式：参考 `references/output-format.md`
+  - 单输入场景
+  - 双输入场景（如Add/Mul）
+  - 双输出场景（如ReduceMax，使用output1=值，output2=索引）
+- **重要**：多输入场景需遍历所有组合（比如双输入场景，浮点型7²=49行，整型4²=16行）
+- 比对逻辑：推荐使用Python验证，而非.asc中的CompareResult函数
 
-    - 双输出API的处理（如ReduceMax/ReduceMin/ReduceSum等）
-        - 双输出API输出格式参考`output-format.md`中的"双输出场景"章节，使用`output1`表示值输出，`output2`表示索引输出
-        - 索引验证规则：golden索引与output索引一致即视为匹配（可忽略值是否正确）
-
-    - 部分基线样例中`.asc`文件已有`CompareResult`等函数用于比对结果，可参考该函数的逻辑来生成`verify_result.py`。推荐使用`verify_result.py`来完成样例的`output`与`golden`的输出结果-真值比对，而不是`.asc`文件的函数。
-
-    - 注意事项
-        - `{api_name}.asc`文件的饱和/非饱和模式的代码适配方式，无需参考API文档，请严格遵守以下写法，不要随意自行修改。(参考`set_atomic_add_refactor`中`set_atomic_add.asc`的`SetSaturationMode`函数实现即可，区分浮点型和整型)
-        ```cpp
-        if constexpr (std::is_same_v<DataType, float> || std::is_same_v<DataType, half> || std::is_same_v<DataType, bfloat16_t>) {
-            if (isSat) {
-                // 浮点型，饱和模式
-                set_ctrl(sbitset0(get_ctrl(), AscendC::CTRL_48_BIT));
-            } else {
-                // 浮点型，INF/NAN模式
-                set_ctrl(sbitset1(get_ctrl(), AscendC::CTRL_48_BIT));
-            }
-        } else {
-            if (isSat) {
-                // 整型，饱和模式
-                set_ctrl(sbitset1(get_ctrl(), AscendC::CTRL_53_BIT));
-            } else {
-                // 整型，INF/NAN模式
-                set_ctrl(sbitset0(get_ctrl(), AscendC::CTRL_53_BIT));
-            }
-        }
-        ```
+##### 4. `test.sh` 文件
+拷贝 `set_atomic_add_refactor/test.sh`，适配DTYPES和INDICES：
+```bash
+DTYPES=("int16_t" "int32_t" "half" "float")  # 根据API支持的数据类型
+INDICES=(0 1 2 3)
+```
 
 ### 阶段三、验证整改后的样例
 - 执行`test.sh`脚本，确认重构整改后的样例功能正常（无编译错误），打印结果符合预期（包含不同数据类型输入、饱和/非饱和模式输入场景下的结果打印）
@@ -92,7 +93,3 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
 source /home/developer/Ascend/cann-9.0.0/set_env.sh
 ```
 注：以上仅限gitcode算力平台生效，其他工作环境请自行配置
-
-### 2. 验证脚本要点
-- 验证脚本必须使用Python，不能用C++内联比对
-- 只需要比对前20个元素即可快速验证
