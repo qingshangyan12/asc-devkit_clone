@@ -18,23 +18,29 @@ Fixpipe能够在矩阵计算完成后对计算结果进行处理，并通过PIPE
 
 ## 函数原型
 
-```cpp
-// 通路L0C->GM/UB, 不使能量化的整块搬运功能
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U>
-__aicore__ inline void Fixpipe(const T& dst, const U& src, const FixpipeParams& params = FixpipeParams{})
+- 通路L0C->GM/UB, 不使能量化的整块搬运功能
+  ```cpp
+  template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U>
+  __aicore__ inline void Fixpipe(const T& dst, const U& src, const FixpipeParams& params = FixpipeParams{})
+  ```
 
-// 通路L0C->GM/UB, 使能量化功能的整块搬运功能
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S>
-__aicore__ inline void Fixpipe(const T& dst, const U& src, const S& quant, const FixpipeParams& params = FixpipeParams{});
+- 通路L0C->GM/UB, 使能量化功能的整块搬运功能
+  ```cpp
+  template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S>
+  __aicore__ inline void Fixpipe(const T& dst, const U& src, const S& quant, const FixpipeParams& params = FixpipeParams{})
+  ```
 
-// 通路L0C->GM/UB, 不使能量化功能的带坐标偏移的搬运功能
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename Coord>
-__aicore__ inline void Fixpipe(const T& dst, const U& src, const Coord& coord, const FixpipeParams& params = FixpipeParams{});
+- 通路L0C->GM/UB, 不使能量化功能的带坐标偏移的搬运功能
+  ```cpp
+  template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename Coord>
+  __aicore__ inline void Fixpipe(const T& dst, const U& src, const Coord& coord, const FixpipeParams& params = FixpipeParams{})
+  ```
 
-// 通路L0C->GM/UB, 使能量化功能的带坐标偏移的搬运功能
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S, typename Coord>
-__aicore__ inline void Fixpipe(const T& dst, const U& src, const S& quant, const Coord& coord, const FixpipeParams& params = FixpipeParams{});
-```
+- 通路L0C->GM/UB, 使能量化功能的带坐标偏移的搬运功能
+  ```cpp
+  template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S, typename Coord>
+  __aicore__ inline void Fixpipe(const T& dst, const U& src, const S& quant, const Coord& coord, const FixpipeParams& params = FixpipeParams{})
+  ```
 
 ## 参数说明
 

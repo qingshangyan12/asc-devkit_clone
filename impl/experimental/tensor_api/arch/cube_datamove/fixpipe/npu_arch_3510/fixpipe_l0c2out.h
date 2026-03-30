@@ -1,13 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
-
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
@@ -18,35 +17,59 @@
 
 /*!
  * \file fixpipe_l0c2out.h
- * \brief
+ * \brief Refactored implementation using strategy pattern for better maintainability
  */
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_L0C2OUT_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_L0C2OUT_H
 
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_l0c2out/nz2nz.h"
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_l0c2out/nz2nd.h"
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_l0c2out/nz2dn.h"
+// Unified strategy-based implementation
+#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/strategies/nz_conversion.h"
 
 namespace AscendC {
 namespace Te {
 
+/**
+ * \brief Fixpipe L0C to output executor for 3510 architecture
+ *
+ * This class provides the main entry point for Fixpipe operations.
+ * It uses the strategy pattern internally for better code organization.
+ */
 class FixpipeL0C2Out3510 {
 public:
+    /**
+     * \brief Execute Fixpipe operation
+     * \tparam trait Fixpipe trait configuration
+     * \tparam T Destination tensor type
+     * \tparam U Source tensor type
+     * \tparam Params Parameter pack types
+     * \param dst Destination tensor
+     * \param src Source tensor
+     * \param params Additional parameters
+     */
     template <const FixpipeTrait& trait, typename T, typename U, typename... Params>
-    __aicore__ inline static void Run(const T& dst, const U& src, const Params&... params) {
+    __aicore__ inline static void Run(const T& dst, const U& src, const Params&... params)
+    {
         Execute<trait>(dst, src, params...);
     }
 
 private:
+    /**
+     * \brief Internal execution with automatic quantization mode detection
+     */
     template <const FixpipeTrait& trait, typename T, typename U, typename... Params>
-    __aicore__ inline static void Execute(const T& dst, const U& src, const Params&... params) {
+    __aicore__ inline static void Execute(const T& dst, const U& src, const Params&... params)
+    {
         constexpr auto quantPre = GetFixpipeQuantPre<trait, T, U>();
-        if constexpr (IsL0cNZFormat<U>::value && (IsNZFormat<T>::value || IsL0cNZFormat<T>::value)) {
-            Fixpipe2OutNz2Nz3510::Run<trait, quantPre, T, U>(dst, src, params...);
-        } else if constexpr (IsL0cNZFormat<U>::value && IsNDFormat<T>::value) {
-            Fixpipe2OutNz2Nd3510::Run<trait, quantPre, T, U>(dst, src, params...);
-        } else if constexpr (IsL0cNZFormat<U>::value && IsDNFormat<T>::value) {
-            Fixpipe2OutNz2Dn3510::Run<trait, quantPre, T, U>(dst, src, params...);
+
+        // Use new strategy-based executor
+        if constexpr (IsL0cNZFormat<U>::value) {
+            if constexpr (IsNZFormat<T>::value || IsL0cNZFormat<T>::value) {
+                NzToNzStrategy::Execute<trait, quantPre, T, U>(dst, src, params...);
+            } else if constexpr (IsNDFormat<T>::value) {
+                NzToNdStrategy::Execute<trait, quantPre, T, U>(dst, src, params...);
+            } else if constexpr (IsDNFormat<T>::value) {
+                NzToDnStrategy::Execute<trait, quantPre, T, U>(dst, src, params...);
+            }
         }
     }
 };

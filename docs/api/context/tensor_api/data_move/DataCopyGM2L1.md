@@ -41,19 +41,17 @@ DataCopyGM2L1提供数据搬运功能，该接口支持Global Memory到L1 Buffer
 
 - 不支持坐标偏移的接口
 
-    ```cpp
-    template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U>
-    __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplate<T, U>, void>::type
-    DataCopy(const T& dst, const U& src)
-    ```
+  ```cpp
+  template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U>
+  __aicore__ inline void DataCopy(const T& dst, const U& src)
+  ```
 
 - 支持坐标偏移的接口
 
-    ```cpp
-    template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U, typename Coord>
-    __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplateWithCoord<T, U, Coord>, void>::type
-    DataCopy(const T& dst, const U& src, const Coord& coord)
-    ```
+  ```cpp
+  template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U, typename Coord>
+  __aicore__ inline void DataCopy(const T& dst, const U& src, const Coord& coord)
+  ```
 
 ## 参数说明
 
@@ -95,14 +93,11 @@ DataCopyGM2L1提供数据搬运功能，该接口支持Global Memory到L1 Buffer
 
 ## 返回值说明
 
-VerifyingDataCopyTemplate表达式为模板参数T和U的校验表达式，VerifyingDataCopyTemplateWithCoord表达式为模板参数T、U和Coord的校验表达式，执行效果如下：
-
-- 校验表达式成立，表明输入参数符合DataCopy接口入参数据类型约束，DataCopy函数表达式返回值为void。
-- 校验表达式不成立，表明输入参数不符合DataCopy接口入参数据类型约束时，DataCopy函数声明失效，继而会导致编译错误。
+无
 
 ## 约束说明
 
-- 地址重叠约束：无约束。
+- 地址重叠约束：源操作数和目的操作数位于不同物理位置，不存在地址重叠场景。
 - 地址对齐约束：源操作数起始地址要求按元素位宽对齐。目的操作数起始地址要求满足32字节对齐。
 - 参数组合约束：无约束。
 - 环境影响约束：无约束。
@@ -114,6 +109,10 @@ VerifyingDataCopyTemplate表达式为模板参数T和U的校验表达式，Verif
   - Shape、Stride具体维度的数据，仅支持基础整数类型和Std::Int类型。
   - 支持坐标偏移的接口中，coord需要满足对应源操作数分形的对齐要求。
   - ND2ND场景只支持一维数据格式，Layout的Shape中的ShapeRow1或ShapeColumn1需要设置为Std::Int<1>{}。
+
+## 流水类型
+
+PIPE_MTE2
 
 ## 调用示例
 
@@ -133,11 +132,9 @@ __gm__ half gmAAddr[256*256*2];
 __cbuf__ half l1Addr[256*256*2];
 auto gmAPtr = MakeGMmemPtr(gmAAddr);
 auto l1Ptr = MakeL1memPtr(l1Addr);
-auto gmABuff = gmAPtr + 0;
-auto l1Buff = l1Ptr + 0;
 
-auto srcTensor = MakeTensor(gmABuff, srcLayout);
-auto dstTensor = MakeTensor(l1Buff, dstLayout);
+auto srcTensor = MakeTensor(gmAPtr, srcLayout);
+auto dstTensor = MakeTensor(l1Ptr, dstLayout);
 
 // 调用方式1
 Copy(CopyAtom<CopyTraits<CopyGM2L1, DataCopyTraitDefault>>{}, dstTensor, srcTensor);
