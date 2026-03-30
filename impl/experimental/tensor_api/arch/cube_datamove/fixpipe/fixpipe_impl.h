@@ -68,7 +68,7 @@ template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typenam
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplateWithCoord<T, U, Coord>, void>::type
 Fixpipe(const T& dst, const U& src, const Coord& coord, const FixpipeParams& params = FixpipeParams{})
 {
-    auto sliceTensor = dst(coord, src);
+    auto sliceTensor = dst.Slice(coord, src.Layout());
     Fixpipe<trait>(sliceTensor, src, params);
 }
 
@@ -76,7 +76,7 @@ template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typenam
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplateWithCoord<T, U, S, Coord>, void>::type
 Fixpipe(const T& dst, const U& src, const S& quant, const Coord& coord, const FixpipeParams& params = FixpipeParams{})
 {
-    auto sliceTensor = dst(coord, src);
+    auto sliceTensor = dst.Slice(coord, src.Layout());
     Fixpipe<trait>(sliceTensor, src, quant, params);
 }
 
