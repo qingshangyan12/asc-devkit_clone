@@ -155,7 +155,7 @@ private:
             InsertSync();
             auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * CBURST_NUM_3510));
             auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * CBURST_NUM_3510));
-            DataCopyWrapper<trait, quantPre>(dst(dstCoord), src(srcCoord),
+            DataCopyWrapper<trait, quantPre>(dst.Slice(dstCoord), src.Slice(srcCoord),
                 mainLoopParam, tuple_sequence<decltype(mainLoopParam)>{});
         }
         if (tailNSize) {
@@ -164,7 +164,7 @@ private:
             InsertSync();
             auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * CBURST_NUM_3510));
             auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * CBURST_NUM_3510));
-            DataCopyWrapper<trait, quantPre>(dst(dstCoord), src(srcCoord),
+            DataCopyWrapper<trait, quantPre>(dst.Slice(dstCoord), src.Slice(srcCoord),
                 tailParam, tuple_sequence<decltype(tailParam)>{});
         }
     }
