@@ -140,7 +140,7 @@ struct is_layout<Layout<T, U, S>> : Std::true_type {};
 template <typename T>
 constexpr bool is_layout_v = is_layout<T>::value;
 
-template <typename T>
+template <typename T, typename = void>
 struct PatternTrait;
 
 template <typename T>
