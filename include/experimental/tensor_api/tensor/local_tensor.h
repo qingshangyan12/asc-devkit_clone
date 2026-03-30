@@ -31,6 +31,9 @@ namespace Te {
 template <typename Iterator, typename... Args>
 __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args);
 
+template <typename Tensor, typename Coord, typename T>
+__aicore__ inline decltype(auto) Slice(const Tensor& tensor, const Coord& coord, const T& t);
+
 } // namespace Te
 } // namespace AscendC
 
