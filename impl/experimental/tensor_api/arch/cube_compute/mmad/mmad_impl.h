@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_MMAD_IMPL_H
 
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/mmad_routing.h"
+#include "impl/experimental/tensor_api/tensor/get_pattern.h"
 
 namespace AscendC {
 namespace Te {
@@ -51,6 +52,38 @@ Mmad(const T& dst, const U& fm, const S& filter, const Params& params)
    using Tensor2Tensor = typename MmadTensor2Tensor<dstPos, fmPos, filterPos, Hardware::MAX, 
       CURRENT_ARCH_VERSION>::type;
    Tensor2Tensor{}.template Run<trait>(dst, fm, filter, params);
+}
+
+template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename Params>
+__aicore__ inline typename Std::enable_if<VerifyingMmadTemplate<T, U, S>, void>::type 
+MmadV2(const T& dst, const U& fm, const S& filter, const Params& params)
+{
+   constexpr Hardware dstPos = GetHardPos<T>();
+   constexpr Hardware fmPos = GetHardPos<U>();
+   constexpr Hardware filterPos = GetHardPos<S>();
+   using DstPattern = PatternTraitT<T>;
+   using FmPattern = PatternTraitT<U>;
+   using FilterPattern = PatternTraitT<S>;
+   using Tensor2Tensor = typename MmadTensor2TensorV2<dstPos, fmPos, filterPos, Hardware::MAX,
+      CURRENT_ARCH_VERSION, DstPattern, FmPattern, FilterPattern>::type;
+   Tensor2Tensor{}.template Run<trait>(dst, fm, filter, params);
+}
+
+template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V, typename Params>
+__aicore__ inline typename Std::enable_if<VerifyingMmadWithBiasTemplate<T, U, S, V>, void>::type 
+MmadV2(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
+{
+   constexpr Hardware dstPos = GetHardPos<T>();
+   constexpr Hardware fmPos = GetHardPos<U>();
+   constexpr Hardware filterPos = GetHardPos<S>();
+   constexpr Hardware biasPos = GetHardPos<V>();
+   using DstPattern = PatternTraitT<T>;
+   using FmPattern = PatternTraitT<U>;
+   using FilterPattern = PatternTraitT<S>;
+   using BiasPattern = PatternTraitT<V>;
+   using Tensor2Tensor = typename MmadTensor2TensorV2<dstPos, fmPos, filterPos, biasPos,
+      CURRENT_ARCH_VERSION, DstPattern, FmPattern, FilterPattern, BiasPattern>::type;
+   Tensor2Tensor{}.template Run<trait>(dst, fm, filter, bias, params);
 }
 
 template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V, typename Params>
