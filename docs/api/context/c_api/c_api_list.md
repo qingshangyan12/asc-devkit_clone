@@ -169,13 +169,6 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_copy_pad_val](vector_datamove/asc_set_copy_pad_val.md)         | 和asc_copy_gm2ub_align或asc_copy_ub2gm_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。 |
 | [asc_copy_ub2l1](vector_datamove/asc_copy_ub2l1.md)         | 将数据从Unified Buffer (UB) 搬运到 搬运到L1 Buffer。 |
 
-## 维测接口
-|   API名称   |   说明   |
-|----------|-----------|
-| [assert](debug/assert.md) | 在算子Kernel侧实现代码中需要增加断言的地方使用assert检查代码，并格式化输出一些调测信息。 |
-| [dump](debug/dump.md) | 将对应内存上的数据打印出来,同时支持打印自定义的附加信息（仅支持uint32_t类型的信息）。 |
-| [printf](debug/printf.md) | 该接口提供NPU域调试场景下的格式化输出功能。 |
-
 ## 标量操作
 
 标量操作类API，单独使用时可以引入scalar_compute.h，此类API列表如下：
