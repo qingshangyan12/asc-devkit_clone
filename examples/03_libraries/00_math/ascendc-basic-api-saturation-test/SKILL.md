@@ -59,6 +59,7 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
     }
   }
   ```
+可结合参考`references/basic-api-example-template/example_refactore_rules.md`。
 
 ##### 2. `gen_data.py` 文件
 - 特殊值构造：使用`get_dtype_limits()`获取min/max/0/NaN/INF等
@@ -67,6 +68,7 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
   - 双输入：`generate_two_inputs(data_type)` 生成所有组合
   - 多输入：依次类推，新增函数实现功能
 - Golden计算：分别计算sat和non-sat模式结果
+可结合参考`references/basic-api-example-template/example_refactore_rules.md`。
 
 ##### 3. `verify_result.py` 文件
 - 输出格式：参考 `references/output-format.md`
@@ -75,6 +77,7 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
   - 双输出场景（如ReduceMax，使用output1=值，output2=索引）
 - **重要**：多输入场景需遍历所有组合（比如双输入场景，浮点型7²=49行，整型4²=16行）
 - 比对逻辑：推荐使用Python验证，而非.asc中的CompareResult函数
+可结合参考`references/basic-api-example-template/example_refactore_rules.md`和`references/output-format.md`。
 
 ##### 4. `test.sh` 文件
 拷贝 `set_atomic_add_refactor/test.sh`，适配DTYPES和INDICES：
@@ -82,6 +85,7 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
 DTYPES=("int16_t" "int32_t" "half" "float")  # 根据API支持的数据类型
 INDICES=(0 1 2 3)
 ```
+可结合参考`references/basic-api-example-template/example_refactore_rules.md`。
 
 ### 阶段三、验证整改后的样例
 - 执行`test.sh`脚本，确认重构整改后的样例功能正常（无编译错误），打印结果符合预期（包含不同数据类型输入、饱和/非饱和模式输入场景下的结果打印）
