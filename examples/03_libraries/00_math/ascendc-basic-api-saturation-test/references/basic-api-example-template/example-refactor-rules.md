@@ -4,6 +4,15 @@
 
 ---
 
+## 准备工作-分析API资料
+
+查看 `asc-devkit/docs/api/context/{API_NAME}.md` API文档，重点分析：
+- **产品支持**：必须是Atlas A2 训练/推理系列产品支持的API
+- **数据类型**：输入/输出的合法数据类型组合（如half/float/int16_t/int32_t等）
+- **输入数量**：参考本文档的 **判断API输入数量的标准**
+
+---
+
 ## 一、重构要点（按文件汇总）
 
 ### 1.1 `{api_name}.asc`
@@ -123,29 +132,7 @@ inQueueSrc2.FreeTensor(src2Local);
 ### 1.5 `test.sh`（必须严格拷贝模板）
 
 ```bash
-# 单输入示例
-DTYPES=("half" "float")
-SPECIAL_INDICES=(0 1 2 3 4 5 6)
-
-for i in "${!DTYPES[@]}"; do
-    for j in "${!SPECIAL_INDICES[@]}"; do
-        ./build/demo $i $j 1  # sat模式
-        ./build/demo $i $j 0  # non-sat模式
-    done
-done
-```
-
-```bash
-# 双输入-类型A（2 tensor）或 双输入-类型B（1 tensor + 1 scalar）
-DTYPES=("half" "float") # 根据API实际支持的数据类型改写
-
-# 注意：多个输入的数据类型相同，只需要一层循环遍历数据类型。如果多个输入的数据类型不相同，需要按支持的数据类型组合方式，进行多层循环遍历。
-for i in "${!DTYPES[@]}"; do
-    # sat模式
-    ./build/demo $i 1
-    # non-sat模式
-    ./build/demo $i 0
-done
+DTYPES=("half" "float") # 根据实际支持的数据类型改写
 ```
 
 **模板代码**：直接拷贝 `set_atomic_add_refactor/test.sh`
@@ -179,7 +166,7 @@ done
 
 ---
 
-## 三、判断API输入类型的标准
+## 三、判断API输入数量的标准
 
 **【重要】必须先判断API类型再开始实现！**
 
@@ -207,7 +194,6 @@ done
 ❌ **错误1：将Adds等当作单输入处理**
 - Adds有src和scalarValue两个参数，是双输入-类型B
 - 需要2个输入文件（input_x和input_scalar）
-- Compute函数需要双循环遍历所有组合
 
 ❌ **错误2：忽略scalar参数**
 - 双输入-类型B的scalar也是特殊值，需要构造测试数据
