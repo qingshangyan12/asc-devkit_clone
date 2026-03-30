@@ -20,9 +20,11 @@ def gen_golden_data_simple():
     outter = 64
     data_type = np.float32
     src = np.ones([outter, inner]).astype(data_type)
+    # 使用1.1作为初始值，使得乘法累乘有意义
+    src = src * 1.1
     golden = np.copy(src)
     for i in range(outter - 1):
-        golden[i + 1] = golden[i] + golden[i + 1]
+        golden[i + 1] = golden[i] * golden[i + 1]
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     src.tofile('./input/input_x.bin')
