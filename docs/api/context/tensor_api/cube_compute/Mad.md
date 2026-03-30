@@ -5,44 +5,27 @@
 | 产品     | 是否支持 |
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|√|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|√|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
 
 ## 功能说明
 
-执行矩阵乘加操作，计算公式如下：
-$$
-dst = src_0 * src_1 + dst
-$$
+执行矩阵乘加（C += A \* B 或 C = A \* B + Bias）操作。支持 `MmadOperation` 操作，用于执行基本计算。
 
 ## 函数原型
 
 ```cpp
 template <typename Tp, const Tp& traits, typename T, typename... Params>
-__aicore__ inline void Mad(const MmadAtom<T>& atomMad, const Params& ...params)
+__aicore__ inline void Mad(const MmadAtom<T>& atomMmad, const Params& ...params)
 
 template <typename T, typename... Params>
-__aicore__ inline void Mad(const MmadAtom<T>& atomMad, const Params& ...params)
-```
-
-## API映射关系
-与built-in接口映射关系：
-Mad接口是在built-in接口(mad)的基础上进行抽象封装实现的，其对应的底层built-in接口为：
-```cpp
-
+__aicore__ inline void Mad(const MmadAtom<T>& atomMmad, const Params& ...params)
 ```
 
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| atomMad | 输入 | 矩阵乘加原子操作对象。 |
-| params | 输入 | 矩阵乘加操作的参数，可变参数。 |
+| atomMmad | 输入 | MmadAtom 对象，封装了具体的矩阵乘加操作和 traits 配置。 |
+| params | 输入 | 矩阵乘加操作的参数，可变参数。通常包括：<br>- 目的张量 C（L0C）<br>- 源张量 B（L0B，右矩阵）<br>- 源张量 A（L0A，左矩阵）<br>- 参数（如 defaultMmadParams）<br>- 可选：偏置张量（Bias） |
 
 ## 返回值说明
 
@@ -50,16 +33,28 @@ Mad接口是在built-in接口(mad)的基础上进行抽象封装实现的，其�
 
 ## 约束说明
 
-- atomMad必须是有效的MmadAtom对象。
-- params的数量和类型必须与矩阵乘加操作的要求匹配。
+- atomMmad必须是有效的MmadAtom对象；
+- params的数量和类型必须与矩阵乘加操作的要求匹配；
 - 源操作数和目的操作数必须位于支持的存储空间。
 
 ## 调用示例
 
 ```cpp
-// 创建MmadAtom
-auto mmadAtom = AscendC::MakeMad(arg1, arg2, arg3);
+// 下面接口为3种调用方式的示例
+// 调用方式1
+Mad(MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}, L0CTensor, L0ATensor, L0BTensor, para);
+// 调用方式2
+MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}.Call(L0CTensor, L0ATensor, L0BTensor, para);
+// 调用方式3
+auto atomMmad = MakeMmad(MmadOperation{}, MmadTraitDefault{});
+atomMmad.Call(L0CTensor, L0ATensor, L0BTensor, para);
 
-// 执行矩阵乘加操作
-AscendC::Mad(mmadAtom, dst, src0, src1);
+// 带Bias的调用方式
+Mad(MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}, L0CTensor, L0ATensor, L0BTensor, biasTensor, para);
+
 ```
+
+## 相关参考
+
+- [MmadAtom](../struct/atom/MmadAtom.md)
+- [Mmad](./Mmad.md)
