@@ -492,7 +492,8 @@ function(npu_op_package target_package_name)
             DESTINATION ${install_path})
 
     get_property(enable_cpack GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_CPACK)
-    if (${enable_cpack})
+    get_property(all_op_compile_fail GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_name}_ALL_FAIL)
+    if (${enable_cpack} AND NOT ${all_op_compile_fail})
       # CPack config
       set(CPACK_PACKAGE_NAME ${CMAKE_PROJECT_NAME})
       set(CPACK_PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
@@ -514,7 +515,6 @@ function(npu_op_package target_package_name)
         set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_BINARY_DIR}/post_pack_script.cmake")
         file(WRITE "${CPACK_POST_BUILD_SCRIPTS}" "
           set(ERROR_LOG_FILE \"\${KERNEL_BINARY_PATH}/compile_error.log\")
-
           if(EXISTS \"\${ERROR_LOG_FILE}\")
             file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
             message(STATUS \"List of failure operators:\n ${LOG_CONTENT}\")
@@ -930,6 +930,26 @@ function(get_current_pack_target sub_target output_var)
   endif()
 endfunction()
 
+function(get_is_all_op_fail BINCMP_OUT_DIR TYPE_NAME_LIST target_name)
+  execute_process(
+      COMMAND grep -c "Fail op_info:" "${BINCMP_OUT_DIR}/compile_error.log"
+      OUTPUT_VARIABLE FAILED_COUNT
+      ERROR_QUIET
+  )
+
+  list(LENGTH TYPE_NAME_LIST TOTAL_COUNT)
+
+  if(NOT FAILED_COUNT)
+      set(FAILED_COUNT 0)
+  endif()
+
+  set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_name}_ALL_FAIL False)
+  if(${FAILED_COUNT} EQUAL ${TOTAL_COUNT})
+      set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_name}_ALL_FAIL True)
+      message(STATUS "All ${FAILED_COUNT} operators failed out of ${TOTAL_COUNT} total")
+  endif()
+endfunction()
+
 function(npu_op_package_add target_package_name)
   cmake_parse_arguments(ADD_TARGET "" "PACKAGE_PATH" "TYPE;LIBRARY;FILES" ${ARGN})
   if(DEFINED ADD_TARGET_LIBRARY AND DEFINED ADD_TARGET_FILES)
@@ -1082,6 +1102,7 @@ function(npu_op_package_add target_package_name)
                                 OUT_DIR ${KERNEL_BINARY_PATH}/binary/)
         endif()
       endforeach()
+      get_is_all_op_fail(${CMAKE_CURRENT_BINARY_DIR}/binary TYPE_NAME_LIST ${target_package_name})
     endforeach()
   endif()
 
