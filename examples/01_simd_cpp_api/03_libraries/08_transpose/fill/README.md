@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Kernel直调算子工程，介绍了调用Fill高阶API实现fill单算子，主要演示Fill高阶API在Kernel直调工程中的调用。
+本样例在需要预先初始化Global Memory数据的场景下，基于Fill高阶API实现将Global Memory上的数据初始化为指定值，并配合Add接口完成向量加法计算。Fill接口支持在数据搬运前对输出空间进行初始化，常用于workspace地址或输出数据清零场景。
 
 ## 支持的产品
 
@@ -18,37 +18,44 @@
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── fill.asc                // Ascend C算子实现 & 调用样例
+│   └── fill.asc                // Ascend C样例实现 & 调用样例
 ```
 
-## 算子描述
-- 算子功能：  
-  fill单算子，用于将输出Global Memory上的数据初始化为0。两个输入作为Add计算的输入，Add的结果放入初始化为0后的Global Memory上。
-- 算子规格：  
-  <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">fill</td></tr>
+## 样例描述
+- 样例功能：  
+  本样例演示Fill API的使用场景。首先使用Fill接口将输出Global Memory初始化为当前核的blockIdx值（单核场景下为0），然后将两个输入向量从Global Memory搬运到Local Memory，使用Add接口进行向量加法计算，最后将计算结果通过SetAtomicAdd累加到已初始化的输出Global Memory上。更多API详细信息请参考[Fill API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0891.html)。
 
-  <tr><td rowspan="4" align="center">算子输入</td></tr>
+- 样例规格：  
+  <table border="2" align="center">
+  <caption>表1：样例输入输出规格</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">fill</td></tr>
+
+  <tr><td rowspan="4" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input_x</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">input_y</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input_x</td><td align="center">[1,256]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input_y</td><td align="center">[1,256]</td><td align="center">float</td><td align="center">ND</td></tr>
 
 
-  <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">output_z</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td></tr>
+  <tr><td align="center">output_z</td><td align="center">[1,256]</td><td align="center">float</td><td align="center">ND</td></tr>
 
 
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">fill_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">init_global_memory_custom</td></tr>
   </table>
 
-- 算子实现：  
-  本样例中实现的是固定shape为输入input_x[256]，input_y[256]，输出output_z[256]的fill算子。
+- 样例实现：  
+  本样例中实现的是固定shape为输入input_x[1,256]，input_y[1,256]，输出output_z[1,256]的fill样例，所用API详细介绍请参考[Fill API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0891.html)。
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Fill高阶API接口完成fill计算，得到最终结果，再搬出到外部存储上。
-
-    fill算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm、yGm存储在xLocal、yLocal中，并对Global Memory上的数据初始化，Compute任务负责对xLocal、yLocal执行fill计算，计算结果存储在zLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor zGm。
+    计算逻辑包含以下步骤：
+    1. 使用Fill高阶API将输出Global Memory初始化为当前核的blockIdx值
+    2. 设置MTE3_MTE2同步事件，确保Fill操作完成后再进行后续的Unified Buffer操作
+    3. 将输入数据从Global Memory搬运到Local Memory（Unified Buffer）
+    4. 使用Add接口在Local Memory进行向量加法计算
+    5. 使用SetAtomicAdd模式将计算结果累加到输出Global Memory
+    
+    整个过程展示了Fill API的典型使用场景：在正式计算前预先初始化输出空间。
 
   - Tiling实现
 
@@ -59,7 +66,7 @@
 
 ## 编译运行  
 
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
