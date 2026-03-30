@@ -77,9 +77,10 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S
     }
 }
 
-template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const Layout<U, S>& layout)
+template <typename T, typename LayoutType>
+__aicore__ inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout)
 {
+    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return Crd2Idx(coord, layout.Shape(), layout.Stride());
 }
 

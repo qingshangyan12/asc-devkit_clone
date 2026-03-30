@@ -29,6 +29,19 @@
 
 namespace AscendC {
 namespace Te {
+struct NzLayoutPattern{};
+
+struct NDLayoutPattern{};
+
+struct DefaultPattern{};
+
+template <typename T = half, int32_t C0 = 32>
+struct LayoutTrait {
+    using type = T;
+    static constexpr int32_t C0_size = C0;
+    static constexpr int32_t C0_element = C0 / sizeof(T);
+};
+    
 
 template <typename T, typename U, typename S>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
@@ -46,9 +59,10 @@ using Tile = Std::tuple<Layouts...>;
 template <typename... Coords>
 using Coord = Std::tuple<Coords...>;
 
-template <typename T, typename U>
+template <typename T, typename U, typename LayoutPattern = DefaultPattern>
 struct Layout : private Std::tuple<T, U>
 {
+    using tag = LayoutPattern;
     static constexpr auto size = StaticLayoutSize<T, U>::size;
     static constexpr auto depth = nesting_depth_v<T>;
     static constexpr auto rank = Std::tuple_size_v<T>;
@@ -121,11 +135,27 @@ struct Layout : private Std::tuple<T, U>
 template <typename T>
 struct is_layout : Std::false_type {};
 
-template <typename T, typename U>
-struct is_layout<Layout<T, U>> : Std::true_type {};
+template <typename T, typename U, typename S>
+struct is_layout<Layout<T, U, S>> : Std::true_type {};
 
 template <typename T>
 constexpr bool is_layout_v = is_layout<T>::value;
+
+template <typename T, typename = void>
+struct PatternTrait;
+
+template <typename T>
+struct PatternTrait<T, Std::enable_if_t<is_layout_v<Std::remove_cvref_t<T>>>> {
+    using type = typename Std::remove_cvref_t<T>::tag;
+};
+
+template <typename T>
+struct PatternTrait<T, Std::enable_if_t<IsTileTensorV<Std::remove_cvref_t<T>>>> {
+    using type = typename PatternTrait<decltype(Std::declval<const T&>().Layout())>::type;
+};
+
+template <typename T>
+using PatternTraitT = typename PatternTrait<T>::type;
 
 } // namespace Te
 } // namespace AscendC
