@@ -35,11 +35,11 @@ struct NDLayoutPattern{};
 
 struct DefaultPattern{};
 
-template <typename T = half, int32_t C0 = 32>
+template <typename T = uint16_t, size_t C0 = 32>
 struct LayoutTrait {
     using type = T;
-    static constexpr int32_t C0_size = C0;
-    static constexpr int32_t C0_element = C0 / sizeof(T);
+    static constexpr size_t C0_size = C0;
+    static constexpr size_t C0_element = C0 / sizeof(T);
 };
     
 
