@@ -8,5 +8,5 @@
 
 | 目录名称  | 功能描述 |
 | --------- | --------- |
-| [tensorflow_builtin](./tensorflow_builtin/) | 本样例展示了如何使用Ascend C自定义算子AddCustom映射到TensorFlow内置算子Add，并通过TensorFlow调用Ascend C算子 |
-| [tensorflow_custom](./tensorflow_custom/) | 本样例展示了如何使用Ascend C自定义算子AddCustom映射到TensorFlow自定义算子AddCustom，并通过TensorFlow调用Ascend C算子 |
+| [tensorflow_builtin](./tensorflow_builtin/) | 样例展示将Ascend C自定义算子映射到TensorFlow内置算子，并通过TensorFlow调用 |
+| [tensorflow_custom](./tensorflow_custom/) | 样例展示将Ascend C自定义算子映射到TensorFlow自定义算子，并通过TensorFlow调用 |
