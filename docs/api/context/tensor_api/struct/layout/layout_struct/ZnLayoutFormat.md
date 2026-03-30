@@ -5,17 +5,10 @@
 | 产品     | 是否支持 |
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|√|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|√|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
 
 ## 功能说明
 
-ZnLayoutFormat用于定义Zn格式的布局，Zn格式是NZ格式的转置版本，外层矩阵按列存储，内层矩阵按行存储。
+ZnLayoutFormat用于定义Zn格式的布局，Zn格式是NZ格式的转置版本，外层矩阵按列优先存储，内层矩阵按行优先存储。
 
 ## 结构体定义
 
@@ -35,21 +28,43 @@ struct ZnLayoutFormat {
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-|--------|------|------|
-| row | 输入 | 内层矩阵的行数，固定为1。 |
-| column | 输入 | 内层矩阵的列数，固定为1。 |
+|--------|-----------|------|
+| T | 输入 | 数据类型模板参数。<br>支持的数据类型为：fp4x2_e2m1_t、fp4x2_e1m2_t、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t |
+| row | 输入 | 矩阵的总行数 |
+| column | 输入 | 矩阵的总列数 |
+
+## 返回值
+
+- 输入为编译时常量时，返回Zn格式的Layout类型。
+- 输入为整型变量时，返回Zn格式的Layout对象。
+- 对于T数据类型为fp4x2_e2m1_t、fp4x2_e1m2_t时，NzLayout的小分形行数为64，列数为16。
+- **自动对齐**: 如果输入的行数不是 64 的倍数，列数不是16的倍数，返回的Layout会向上取整。例如：
+  - 对于T为half类型，输入 `row = 17, column = 33` 会自动对齐为 `row = 64, column = 48`
+- 对于T数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t时，NzLayout的小分形行数为32B/sizeof(T) ，列数为16。
+- **自动对齐**: 如果输入的行数不是 32B/sizeof(T) 的倍数，列数不是16的倍数，返回的Layout会向上取整。例如：
+  - 对于T为half类型，输入 `row = 17, column = 33` 会自动对齐为 `row = 32, column = 48`
+
 ## 约束说明
 
-- T必须是有效的数据类型，如half、float、int32_t等。
-- 内层矩阵的大小固定为(32 / sizeof(T)) * 16 。
+- 参数row和column需为size_t类型或Int整型常量。
 
 ## 调用示例
 
 ```cpp
 // 创建Zn格式Layout
-using T = half;
-size_t mLength = 128;
-size_t kLength = 64;
+using namespace AscendC::Te;
+// 根据flag的值，选择Nn格式或Zz分形的类型
+constexpr bool flag = true;
+using MyLayoutType = conditional_t<flag, NzFormatLayout<half>, ZnFormatLayout<half>>;
+size_t m = 128;
+size_t n = 128;
+auto layoutAL1 = MyLayoutType{}(m, n);
 
-auto layout = AscendC::MakeZnLayout<T>(size_t mLength, size_t kLength);
+// 编译时常量传参构造Layout
+using MyZnLayout = ZnLayoutFormat<half>::type<Std::Int<32>, Std::Int<32>>;
+auto staticLayout = MyZnLayout{};
+
+// 运行时变量传参构造Layout
+ZnLayoutFormat<half> znFormat;
+auto layout = znFormat(32, 32);
 ```

@@ -5,38 +5,55 @@
 | 产品     | 是否支持 |
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|√|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|√|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
 
 ## 功能说明
 
-构造Zz格式的Layout对象。Zz格式是一种特殊的分块存储格式。
+创建Zz格式的布局，Zz格式是一种特殊的分块存储格式。
 
 ## 函数原型
 
 ```cpp
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZzLayout(size_t row, size_t column)
+__aicore__ inline decltype(auto) MakeZzLayout(U row, S column)
 ```
 
 ## 参数说明
 
+`表1` 模板参数说明
+
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| row | 输入 | 矩阵的行数。 |
-| column | 输入 | 矩阵的列数。 |
+| T | 输入 | 数据类型，支持fp8_e8m0_t、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t。 |
+| U | 输入 | 行数类型，size_t或Int整型常。 |
+| S | 输入 | 列数类型，size_t或Int整型常。 |
+
+`表2` 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|--------|-----------|------|
+| row | 输入 | 矩阵的总行数。 |
+| column | 输入 | 矩阵的总列数。 |
 
 ## 返回值说明
 
-返回Zz格式的Layout对象。
+- 输入为编译时常量时，返回ZZ格式的Layout类型。
+- 输入为整型变量时，返回ZZ格式的Layout对象。
+- ZzLayout分形数值及对齐说明可参见[Layout和层次化表述法](../../../Layout和层次化表述法.md)
 
 ## 约束说明
 
-- T必须是有效的数据类型，如half、float、int32_t等。
-- row和column必须为正整数。
-- 内层矩阵的大小固定为(32 / sizeof(T)) * 16 。
+- 参数row和column需为size_t类型或Int整型常量。
+- 对于T数据类型为fp8_e8m0_t时，column需为2的倍数。
+
+## 调用示例
+
+```cpp
+// 创建ZZ格式Layout
+using namespace AscendC::Te;
+// 编译时常量传参构造Layout
+using MyZZLayout = MakeZzLayout<half, Std::Int<32>, Std::Int<32>>;
+auto staticLayout = MyZZLayout{};
+
+// 运行时变量传参构造Layout
+auto layout = MakeZzLayout<half>(32, 32);
+```

@@ -5,17 +5,10 @@
 | 产品     | 是否支持 |
 | ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|√|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|√|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
 
 ## 功能说明
 
-选择Layout的指定维度，返回子Layout。
+选择Layout的shape和stride指定维度组成新的layout对象并返回。
 
 ## 函数原型
 
@@ -37,7 +30,7 @@ __aicore__ inline constexpr auto Select(const Layout<Shape, Stride>& layout)
 ## 约束说明
 
 - layout必须是有效的Layout对象。
-- 索引Is必须在有效范围内。
+- 索引Is...必须在有效范围内。
 
 ## 调用示例
 
