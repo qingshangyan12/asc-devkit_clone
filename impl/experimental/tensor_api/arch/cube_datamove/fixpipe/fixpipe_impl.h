@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_FIXPIPE_IMPL_H
 
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_routing.h"
+#include "impl/experimental/tensor_api/tensor/get_pattern.h"
 
 namespace AscendC {
 namespace Te {
@@ -51,6 +52,50 @@ Fixpipe(const T& dst, const U& src, const FixpipeParams& params = FixpipeParams{
     constexpr Hardware quantPos = Hardware::MAX;
     using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos, CURRENT_ARCH_VERSION>::type;
     Tensor2Tensor{}.template Run<trait>(dst, src, params);
+}
+
+template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U>
+__aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplate<T, U>, void>::type
+FixpipeV2(const T& dst, const U& src, const FixpipeParams& params = FixpipeParams{})
+{
+    constexpr Hardware dstPos = GetHardPos<T>();
+    constexpr Hardware srcPos = GetHardPos<U>();
+    constexpr Hardware quantPos = Hardware::MAX;
+    using DstPattern = PatternTraitT<T>;
+    using SrcPattern = PatternTraitT<U>;
+    using Tensor2Tensor = typename
+        FixpipeTensor2TensorV2<dstPos, srcPos, quantPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
+    Tensor2Tensor::Run<trait>(dst, src, params);
+}
+
+template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S>
+__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplate<T, U, S>, void>::type
+FixpipeV2(const T& dst, const U& src, const S& quant, const FixpipeParams& params = FixpipeParams{})
+{
+    constexpr Hardware dstPos = GetHardPos<T>();
+    constexpr Hardware srcPos = GetHardPos<U>();
+    constexpr Hardware quantPos = Hardware::L1;
+    using DstPattern = PatternTraitT<T>;
+    using SrcPattern = PatternTraitT<U>;
+    using Tensor2Tensor = typename
+        FixpipeTensor2TensorV2<dstPos, srcPos, quantPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
+    Tensor2Tensor::Run<trait>(dst, src, quant, params);
+}
+
+template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename Coord>
+__aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplateWithCoord<T, U, Coord>, void>::type
+FixpipeV2(const T& dst, const U& src, const Coord& coord, const FixpipeParams& params = FixpipeParams{})
+{
+    auto sliceTensor = dst(coord, src);
+    FixpipeV2<trait>(sliceTensor, src, params);
+}
+
+template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S, typename Coord>
+__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplateWithCoord<T, U, S, Coord>, void>::type
+FixpipeV2(const T& dst, const U& src, const S& quant, const Coord& coord, const FixpipeParams& params = FixpipeParams{})
+{
+    auto sliceTensor = dst(coord, src);
+    FixpipeV2<trait>(sliceTensor, src, quant, params);
 }
 
 template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S>

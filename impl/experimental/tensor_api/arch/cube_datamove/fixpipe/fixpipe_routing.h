@@ -34,6 +34,23 @@ public:
     __aicore__ inline void Run(const Args&... args) {}
 };
 
+template <Hardware dstPos, Hardware srcpos, Hardware quantpos, uint32_t Version, typename DstLayoutPattern, typename SrcLayoutPattern>
+struct FixpipeTensor2TensorV2 {
+    using type = FixpipeIgnore;
+};
+
+template <>
+struct FixpipeTensor2TensorV2<Hardware::GM, Hardware::L0C, Hardware::MAX, ArchVersion::V3510,
+    NDLayoutPattern, NzLayoutPattern> {
+    using type = FixpipeNz2Nd3510;
+};
+
+template <>
+struct FixpipeTensor2TensorV2<Hardware::GM, Hardware::L0C, Hardware::L1, ArchVersion::V3510,
+    NDLayoutPattern, NzLayoutPattern> {
+    using type = FixpipeQuantL0C2Out3510;
+};
+
 template <Hardware dstPos, Hardware srcpos, Hardware quantpos, uint32_t Version>
 struct FixpipeTensor2Tensor {
     using type = FixpipeIgnore;
