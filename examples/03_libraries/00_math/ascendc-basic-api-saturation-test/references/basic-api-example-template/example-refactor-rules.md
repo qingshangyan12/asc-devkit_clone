@@ -137,16 +137,14 @@ done
 
 ```bash
 # 双输入-类型A（2 tensor）或 双输入-类型B（1 tensor + 1 scalar）
-DTYPES=("half" "float")
-INPUT_INDICES=(0 1 2 3 4 5 6)
+DTYPES=("half" "float") # 根据API实际支持的数据类型改写
 
+# 注意：多个输入的数据类型相同，只需要一层循环遍历数据类型。如果多个输入的数据类型不相同，需要按支持的数据类型组合方式，进行多层循环遍历。
 for i in "${!DTYPES[@]}"; do
-    for j in "${!INPUT_INDICES[@]}"; do
-        for k in "${!INPUT_INDICES[@]}"; do
-            ./build/demo $i $j $k 1  # sat模式
-            ./build/demo $i $j $k 0  # non-sat模式
-        done
-    done
+    # sat模式
+    ./build/demo $i 1
+    # non-sat模式
+    ./build/demo $i 0
 done
 ```
 
@@ -183,9 +181,36 @@ done
 
 ## 三、判断API输入类型的标准
 
-**如何判断API应该使用哪种表格格式？**
+**【重要】必须先判断API类型再开始实现！**
 
-参考并遵守`SKILL.md`的 **【重要】如何判断API有几个输入** 内容。
+### 判断步骤
+
+1. **查看API参数说明**（必做）
+   - 如果只有1个`src`输入 源操作数 → 单输入（1 tensor）
+   - 如果有`src0`, `src1`两个输入 源操作数 → 双输入-类型A（2 tensor）
+   - 如果有`src` + `scalarValue`输入 源操作数 → 双输入-类型B（1 tensor + 1 scalar）
+
+2. **对照常见API速查表**（必做）
+   | API输入数量类型 | 示例API | 特征 |
+   |---------|--------|------|
+   | 单输入（1 tensor） | Exp, Ln, Abs, Reciprocal, Sqrt, Rsqrt, Relu | 参数说明只有1个src输入参数 |
+   | 双输入-类型A（2 tensor） | Add, Sub, Mul, Div, Max, Min | 参数说明有src0, src1两个tensor输入参数 |
+   | 双输入-类型B（1 tensor + 1 scalar） | Adds, Muls, Maxs, Mins, LeakyRelu | 参数说明有src和scalarValue输入参数 |
+
+3. **确认后再实现**（必做）
+   - 单输入：生成1个输入文件，使用generate_one_input
+   - 双输入-类型A：生成2个tensor输入文件，使用generate_two_inputs
+   - 双输入-类型B：生成1个tensor+1个scalar输入文件，使用generate_two_inputs
+
+### 常见错误警示
+
+❌ **错误1：将Adds等当作单输入处理**
+- Adds有src和scalarValue两个参数，是双输入-类型B
+- 需要2个输入文件（input_x和input_scalar）
+- Compute函数需要双循环遍历所有组合
+
+❌ **错误2：忽略scalar参数**
+- 双输入-类型B的scalar也是特殊值，需要构造测试数据
 
 ---
 
