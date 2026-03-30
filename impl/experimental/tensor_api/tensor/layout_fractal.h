@@ -175,7 +175,13 @@ struct FindLayoutFromPattern<Pattern, Std::tuple<Std::tuple<Pattern, FrameLayout
 };
 
 template <typename Pattern, typename NotMatchTuple, typename... Rest>
-struct FindLayoutFromPattern<Pattern, Std::tuple<NotMatchTuple, Rest...>> {};
+struct FindLayoutFromPattern<Pattern, Std::tuple<NotMatchTuple, Rest...>>
+    : FindLayoutFromPattern<Pattern, Std::tuple<Rest...>> {};
+
+template <typename Pattern>
+struct FindLayoutFromPattern<Pattern, Std::tuple<>> {
+    static_assert(!Std::is_same_v<Pattern, Pattern>, "Unsupported layout pattern.");
+};
 
 template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
