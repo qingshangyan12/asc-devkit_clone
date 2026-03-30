@@ -156,6 +156,37 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     __aicore__ inline constexpr auto Tile(const Layouts&... layouts) const {
         return MakeTensor(Data(), Layout().Tile(layouts...));
     }
+
+    template <typename Coord, typename Shape>
+    __aicore__ inline decltype(auto) Slice(const Coord& coord, const Shape& shape)
+    {
+        static_assert(Std::is_tuple_v<Coord> && Std::is_tuple_v<Shape>, "ShapeType or StrideType is not tuple!");
+        static_assert(nesting_depth_v<Shape> == TWO_DIM_DATA, "Only Support Two Dim Shape");
+        
+        auto iter = Data() + Layout()(coord);
+        auto newLayout = MakeLayout(shape);
+        return MakeTensor(iter, newLayout);
+    }
+
+    template <typename Coord, typename LayoutType>
+    __aicore__ inline decltype(auto) Slice(const Coord& coord, const LayoutType& layout)
+    {
+        auto innerRow = Std::get<0>(Std::get<0>(Layout().Shape()));
+        auto innerCol = Std::get<0>(Std::get<1>(Layout().Shape()));
+
+        auto srcRow = innerRow * Std::get<1>(Std::get<0>(Layout().Shape())) - Std::get<0>(coord);
+        auto srcCol = innerCol * Std::get<1>(Std::get<1>(Layout().Shape())) - Std::get<1>(coord);
+
+        auto dstRow = Std::get<0>(Std::get<0>(layout.Shape())) * Std::get<1>(Std::get<0>(layout.Shape()));
+        auto dstCol = Std::get<0>(Std::get<1>(layout.Shape())) * Std::get<1>(Std::get<1>(layout.Shape()));
+
+        auto realRow = Std::min(srcRow, dstRow);
+        auto realCol = Std::min(srcCol, dstCol);
+        
+        auto iter = Data() + Layout()(coord);
+        auto newLayout = MakeLayout(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), Layout().Stride());
+        return MakeTensor(iter, newLayout);
+    }
 };
 
 template <typename T>
@@ -195,6 +226,20 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
     static_assert(HasDereference<Iterator>::value, "Expected iterator iter in MakeLocalTensor(iter, args...)");
     static_assert(!(HasDereference<Args>::value && ...), "Expected layout args... in MakeLocalTensor(iter, args...)");
     return MakeLocalTensor<Iterator>{}(iter, args...);
+}
+
+template <typename Tensor, typename Coord, typename Shape>
+__aicore__ inline decltype(auto) Slice(const Tensor& tensor, const Coord& coord, const Shape& shape)
+{
+    // 断言Tensor是LocalTensor类型
+
+    tensor.template Slice(coord, shape);
+}
+
+template <typename Tensor, typename Coord, typename LayoutType>
+__aicore__ inline decltype(auto) Slice(const Tensor& tensor, const Coord& coord, const LayoutType& layout)
+{
+    tensor.template Slice(coord, layout); 
 }
 
 } // namespace Te
