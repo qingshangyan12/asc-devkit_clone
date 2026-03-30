@@ -1,4 +1,4 @@
-# move_successive_align样例
+# reg_ld_st_align样例
 
 ## 概述
 本样例演示了SIMD场景下，基于RegBase编程范式的连续对齐搬运算子的核函数直调方法，算子支持单核运行。
@@ -8,9 +8,9 @@
 
 ## 目录结构介绍
 ```
-├── move_successive_align
+├── reg_ld_st_align
 │   ├── CMakeLists.txt                            // 编译工程文件
-│   └── move_successive_align.asc                 // AscendC算子实现 & 调用样例
+│   └── reg_ld_st_align.asc                 // AscendC算子实现 & 调用样例
 ```
 
 ## 算子描述
@@ -26,7 +26,7 @@
   </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">y</td><td align="center">1024</td><td align="center">float</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">move_successive_align_kernel</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reg_ld_st_align_kernel</td></tr>
   </table>
 - 算子实现：  
   主要包括以下步骤：
