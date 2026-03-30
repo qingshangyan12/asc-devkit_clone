@@ -40,10 +40,19 @@
 
 - 样例执行
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  ./demo                        # 执行样例
+  mkdir -p build && cd build;
+  cmake -DRUN_MODE=npu -DNPU_ARCH=dav-2201 ..;make -j;
+  ./demo
   ```
+
+  将 `RUN_MODE` 改为 `cpu` 可使用 CPU 调试模式运行。
+
+  | 参数 | 说明 | 默认值 |
+  |------|------|--------|
+  | `RUN_MODE` | 运行模式：`npu` 或 `cpu` | `npu` |
+  | `NPU_ARCH` | NPU 架构：`dav-2201`（Atlas A2 系列）、`dav-3510`（Atlas A3 系列/Ascend 950 系列） | `dav-2201` |
+  | `INSTALL_DIR` | CANN 安装路径（cpu 模式），默认读取 `$ASCEND_HOME_PATH` 环境变量 | `$ASCEND_HOME_PATH` |
+
   执行结果如下，说明执行成功。
   ```bash
   [Block (0/8)]: Hello World!!!
