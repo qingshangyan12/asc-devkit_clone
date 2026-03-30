@@ -39,11 +39,26 @@
     ```
 
 - 样例执行
-  ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  ./demo                        # 执行样例
-  ```
+  - NPU 模式（默认）
+    ```bash
+    mkdir -p build && cd build;
+    cmake -DRUN_MODE=npu -DNPU_ARCH=dav-2201 ..;make -j;
+    ./demo
+    ```
+  - CPU 调试模式
+    ```bash
+    mkdir -p build && cd build;
+    cmake -DRUN_MODE=cpu -DSOC_VERSION=Ascend910B1 -DINSTALL_DIR=/usr/local/Ascend/cann ..;make -j;
+    ./demo
+    ```
+
+  | 参数 | 说明 | 默认值 |
+  |------|------|--------|
+  | `RUN_MODE` | 运行模式：`npu` 或 `cpu` | `npu` |
+  | `NPU_ARCH` | NPU 架构（npu 模式）：`dav-2201`（Atlas A2 系列）、`dav-3510`（Atlas A3 系列/Ascend 950 系列） | `dav-2201` |
+  | `SOC_VERSION` | 芯片版本（cpu 模式）：如 `Ascend910B1` | `Ascend910B1` |
+  | `INSTALL_DIR` | CANN 安装路径（cpu 模式） | `/mnt/workspace/gitCode/cann/Ascend/cann` |
+
   执行结果如下，说明执行成功。
   ```bash
   [Block (0/8)]: Hello World!!!

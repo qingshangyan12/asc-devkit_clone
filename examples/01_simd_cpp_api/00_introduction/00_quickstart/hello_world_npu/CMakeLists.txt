@@ -20,12 +20,71 @@ add_executable(demo
 )
 
 # ======================================================================================
-# NPU 编译选项配置
+# 编译模式与 NPU 架构配置
 #
 # 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+#   - RUN_MODE: 编译运行模式，支持 npu（默认）和 cpu（CPU 调试模式）
+#   - NPU_ARCH: NPU 硬件架构，例如 dav-2201、dav-3510
+#   - INSTALL_DIR: CANN 安装路径（cpu 模式下需要）
+#   - SOC_VERSION: 芯片版本（cpu 模式下需要）
+#
+# 用法示例：
+#   cmake -DRUN_MODE=npu -DNPU_ARCH=dav-2201 ..
+#   cmake -DRUN_MODE=cpu -DSOC_VERSION=Ascend910B1 -DINSTALL_DIR=/path/to/cann ..
 # ======================================================================================
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
-)
+set(RUN_MODE "npu" CACHE STRING "Run mode: npu or cpu")
+set(NPU_ARCH "dav-2201" CACHE STRING "NPU architecture, e.g. dav-2201, dav-3510")
+
+if(RUN_MODE STREQUAL "npu")
+    # ====================npu模式====================
+    target_compile_options(demo PRIVATE
+        $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH}>
+    )
+elseif(RUN_MODE STREQUAL "cpu")
+    # ====================cpu debug模式====================
+    set(INSTALL_DIR "/mnt/workspace/gitCode/cann/Ascend/cann" CACHE PATH "CANN install directory")
+    set(SOC_VERSION "Ascend910B1" CACHE STRING "SoC version, e.g. Ascend910B1")
+
+    target_compile_options(demo PRIVATE
+        -g
+        $<$<COMPILE_LANGUAGE:ASC>:--run-mode=cpu>
+        -std=c++17
+    )
+
+    target_compile_definitions(demo PRIVATE
+        _GLIBCXX_USE_CXX11_ABI=0
+        ASCENDC_DEBUG=1
+    )
+
+    target_include_directories(demo PRIVATE
+        ${INSTALL_DIR}/tools/tikicpulib/lib/include
+    )
+
+    target_link_options(demo PRIVATE
+        $<$<COMPILE_LANGUAGE:ASC>:--run-mode=cpu>
+        -L${INSTALL_DIR}/tools/tikicpulib/lib
+        -L${INSTALL_DIR}/tools/tikicpulib/lib/${SOC_VERSION}
+        -L${INSTALL_DIR}/tools/simulator/${SOC_VERSION}/lib
+        -L${INSTALL_DIR}/lib64
+        -Wl,-rpath,${INSTALL_DIR}/tools/tikicpulib/lib
+        -Wl,-rpath,${INSTALL_DIR}/tools/tikicpulib/lib/${SOC_VERSION}
+        -Wl,-rpath,${INSTALL_DIR}/tools/simulator/${SOC_VERSION}/lib
+        -Wl,-rpath,${INSTALL_DIR}/lib64
+    )
+
+    target_link_libraries(demo PRIVATE
+        -Wl,-Bdynamic,--no-as-needed
+        ascendc_acl_stub
+        cpudebug_cceprint
+        cpudebug_npuchk
+        cpudebug_stubreg
+        pem_davinci
+        cpudebug
+        c_sec
+        -pthread
+        stdc++
+        -Wl,--as-needed
+    )
+else()
+    message(FATAL_ERROR "Unsupported RUN_MODE: ${RUN_MODE}, expected 'npu' or 'cpu'")
+endif()
