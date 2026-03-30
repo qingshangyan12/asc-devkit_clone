@@ -105,12 +105,12 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
-        return operator()(coord, EmptyShape<LayoutType::depth>{});
+        return Slice(coord, EmptyShape<LayoutType::depth>{});
     }
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
-        return operator()(coord, EmptyShape<LayoutType::depth>{});
+        return Slice(coord, EmptyShape<LayoutType::depth>{});
     }
 
     template <typename Coord0, typename Coord1, typename... Coords>
@@ -124,14 +124,14 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     }
 
 	template <typename Coord, typename InfoType>
- 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const InfoType& info) {
+ 	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const InfoType& info) {
  	    auto iter = Data() + Layout()(coord);
  	    auto tileLayout = MakeTileLayout(coord, Layout(), info);
  	    return MakeTensor(iter, tileLayout);
  	}
  	 
  	template <typename Coord, typename InfoType>
- 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const InfoType& info) const {
+ 	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const InfoType& info) const {
  	    auto iter = Data() + Layout()(coord);
  	    auto tileLayout = MakeTileLayout(coord, Layout(), info);
  	    return MakeTensor(iter, tileLayout);
@@ -195,6 +195,71 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
     static_assert(HasDereference<Iterator>::value, "Expected iterator iter in MakeLocalTensor(iter, args...)");
     static_assert(!(HasDereference<Args>::value && ...), "Expected layout args... in MakeLocalTensor(iter, args...)");
     return MakeLocalTensor<Iterator>{}(iter, args...);
+}
+
+template <typename Coord, typename LayoutType, typename T>
+__aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const LayoutType& layout, const T& t)
+{
+    using OriginShape = Std::remove_cvref_t<decltype(layout.Shape())>;
+
+    if constexpr (is_layout_v<T>) {
+        using TileShape = Std::remove_cvref_t<decltype(t.Shape())>;
+
+        static_assert(nesting_depth_v<OriginShape> == FOUR_DIM_DATA,
+            "When third argument is Layout, source layout must be four dimensional.");
+        static_assert(nesting_depth_v<TileShape> == FOUR_DIM_DATA,
+            "When third argument is Layout, tile layout must be four dimensional.");
+
+        auto innerRow = Std::get<0>(Std::get<0>(layout.Shape()));
+        auto innerCol = Std::get<0>(Std::get<1>(layout.Shape()));
+
+        auto srcRow = innerRow * Std::get<1>(Std::get<0>(layout.Shape())) - Std::get<0>(coord);
+        auto srcCol = innerCol * Std::get<1>(Std::get<1>(layout.Shape())) - Std::get<1>(coord);
+
+        auto dstRow = Std::get<0>(Std::get<0>(t.Shape())) * Std::get<1>(Std::get<0>(t.Shape()));
+        auto dstCol = Std::get<0>(Std::get<1>(t.Shape())) * Std::get<1>(Std::get<1>(t.Shape()));
+
+        auto realRow = Std::min(srcRow, dstRow);
+        auto realCol = Std::min(srcCol, dstCol);
+
+        return MakeLayout(
+            MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)),
+            layout.Stride());
+    } else {
+        static_assert(Std::is_tuple_v<T>, "Third argument must be Shape(tuple) or Layout.");
+        static_assert(nesting_depth_v<T> == TWO_DIM_DATA,
+            "When third argument is Shape, only support two dimensional Shape.");
+        static_assert(nesting_depth_v<OriginShape> == FOUR_DIM_DATA,
+            "When third argument is Shape, source layout must be four dimensional.");
+
+        auto innerRow = Std::get<0>(GetShape<0>(layout));
+        auto innerCol = Std::get<0>(GetShape<1>(layout));
+
+        return MakeLayout(
+            MakeFractalShape(t, MakeShape(innerRow, innerCol)),
+            layout.Stride());
+    }
+}
+
+template <typename Tensor, typename Coord, typename T>
+__aicore__ inline decltype(auto) Slice(const Tensor& tensor, const Coord& coord, const T& t)
+{
+    static_assert(IsTileTensorV<Tensor>, "Tensor must be of type LocalTensor.");
+    static_assert(Std::is_tuple_v<T> || is_layout_v<T>,
+        "Only support Shape(tuple) or Layout type.");
+
+    if constexpr (is_layout_v<T>) {
+        using TileShape = Std::remove_cvref_t<decltype(t.Shape())>;
+        static_assert(nesting_depth_v<TileShape> == FOUR_DIM_DATA,
+            "When third argument is Layout, only support four dimensional Layout.");
+    } else {
+        static_assert(nesting_depth_v<T> == TWO_DIM_DATA,
+            "When third argument is Shape, only support two dimensional Shape.");
+    }
+
+    auto iter = tensor.Data() + tensor.Layout()(coord);
+    auto sliceLayout = MakeSliceLayout(coord, tensor.Layout(), t);
+    return MakeTensor(iter, sliceLayout);
 }
 
 } // namespace Te
