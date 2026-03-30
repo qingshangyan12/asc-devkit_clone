@@ -1,0 +1,18 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "myprovider": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "volcengine",
+      "options": {
+        "baseURL": "https://ark.cn-beijing.volces.com/api/v3",
+        "apiKey": "68f2385f-8538-4ee9-b12b-0aead99f7476"
+      },
+      "models": {
+        "ep-20260227092012-9t24g": {
+          "name": "GLM-4-7-ep-20260227092012-9t24g"
+        }
+      }
+    }
+  }
+}
