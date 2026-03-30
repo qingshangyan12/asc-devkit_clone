@@ -40,7 +40,7 @@ INPUT_OUTPUT_DTYPE_LEN = {"float": 4, "bool": 1, "int32": 4, "int64": 8, "half":
 
 InferChannelParamsFromIFile = namedtuple('InferChannelParamsFromIFile', \
     ['tiling_key_list', 'code_channel', 'hard_sync', 'no_kfc_server_flag', "enable_deterministic", \
-    'tiling_key_kernel_type', "no_set_kernel_type", "default_kernel_type", "template_tiling_info",\
+    'tiling_key_kernel_type', "no_set_kernel_type", "default_kernel_type", "dump_info", "template_tiling_info",\
     'default_tiling_struct', 'tiling_struct_expr_map', 'tiling_key_struct_map', 'register_tiling_struct', \
     'tpl_tiling_struct', 'super_kernel_early_start_set_flag', 'super_kernel_early_start_wait_flag', \
     'tiling_key_deterministic', 'tiling_key_group_map'])

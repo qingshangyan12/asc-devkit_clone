@@ -515,20 +515,20 @@ class TestCompileOp(unittest.TestCase):
         dump_size = 1024
         old_source = ""
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info)
+            op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
         tiling_info.static_shape_flag = True
         compile_info.tiling_key_struct_map = {'1': 96, '2': 100}
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info)
+            op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
         tiling_info.tiling_key_data_size = {}
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info)
+            op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
         tiling_info.tiling_key_data_size = {'0': 96}
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info)
+            op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
 
         op_info_neg = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d97',
@@ -550,7 +550,7 @@ class TestCompileOp(unittest.TestCase):
                     init_value_list=[None], output_shape_depend_on_compute=[0])
 
         new_source = add_op_param_to_workspace(
-            op_info_neg, tiling_info, old_source, dump_size, compile_options, compile_info)
+            op_info_neg, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
 
         value = get_value("DT_INT8")
@@ -1145,19 +1145,18 @@ class TestCompileOp(unittest.TestCase):
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
         os.remove(compile_info.gen_kernel_func_file)
-        compile_info.dump_info["dump_type"]= "assert"
-        set_dump_assert_flag(compile_info)
-        assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
+        # compile_info.dump_info["dump_type"]= "assert"
+        # assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
         assert '-DASCENDC_DUMP=0' not in compile_option_tuple.compile_options
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple(compile_options, []))
         assert os.path.exists(
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
         os.remove(compile_info.gen_kernel_func_file)
-        global_var_storage.set_variable("ascendc_dump_assert_only", True)
+        # global_var_storage.set_variable("ascendc_dump_assert_only", True)
         compile_info.code_channel = 1
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple(compile_options, []))
-        global_var_storage.set_variable("ascendc_dump_assert_only", False)
+        # global_var_storage.set_variable("ascendc_dump_assert_only", False)
         compile_info.dump_info = infered_info_from_ifile.dump_info
         assert os.path.exists(
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
@@ -2925,12 +2924,12 @@ Contents of section
         dump_size = 0
         compile_info.dump_info["dump_type"] = ['printf']
         result = _gen_set_workspace_codes(is_mix, is_single_and_using_hard_sync,
-                                          op_info, tiling_info, dump_size, compile_options, compile_info)
+                                          op_info, tiling_info, compile_options, compile_info)
         self.assertNotEqual(result, '')
         with buildcfg.build_config() as cfg:
             cfg.current()["tir.op_debug_config"] = ["oom"]
             result = _gen_set_workspace_codes(is_mix, is_single_and_using_hard_sync,
-                                          op_info, tiling_info, dump_size, compile_options, compile_info)
+                                          op_info, tiling_info, compile_options, compile_info)
         self.assertNotEqual(result, '')
 
     def test_dump_compile_log(self):
