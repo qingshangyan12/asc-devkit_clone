@@ -35,6 +35,16 @@ public:
     __aicore__ inline void Run(const Args&... args) {}
 };
 
+template <Hardware dstTPos, Hardware srcTpos, uint32_t Version, typename DstLayoutPattern, typename SrcLayoutPattern>
+struct DataCopyTensor2TensorV2{
+    using type = DataCopyIgnore;
+};
+
+template <>
+struct DataCopyTensor2TensorV2<Hardware::L1, Hardware::GM, ArchVersion::V3510, NzLayoutPattern, NDLayoutPattern> {
+    using type = CopyGmToCbufMultiND2Nz;
+};
+
 template <Hardware dstTPos, Hardware srcTpos, uint32_t Version>
 struct DataCopyTensor2Tensor {
     using type = DataCopyIgnore;

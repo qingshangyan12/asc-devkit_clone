@@ -146,39 +146,30 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape) {
     }
 }
 
-template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto GetShape(const Layout<ShapeType, StrideType>& layout)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
+__aicore__ inline constexpr auto GetShape(const LayoutType& layout)
 {
-    static_assert(Std::is_tuple_v<ShapeType> && Std::is_tuple_v<StrideType>, "ShapeType or StrideType is not tuple!");
     return layout.template Shape<Is...>();
 }
 
-template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto GetShape(Layout<ShapeType, StrideType>& layout)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
+__aicore__ inline constexpr auto GetShape(LayoutType& layout)
 {
-    static_assert(Std::is_tuple_v<ShapeType> && Std::is_tuple_v<StrideType>, "ShapeType or StrideType is not tuple!");
     return layout.template Shape<Is...>();
 }
 
-template <typename Tuple>
-__aicore__ inline constexpr auto GetShape(const Tuple& shape)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
+__aicore__ inline constexpr auto GetStride(const LayoutType& layout)
 {
-    static_assert(Std::is_tuple_v<Tuple> || Std::is_integral_v<Tuple>, "shape is not a tuple or integer");
-    return shape;
+    return layout.template Stride<Is...>();
 }
 
-template <size_t I, size_t... Is, typename Tuple>
-__aicore__ inline constexpr auto GetShape(const Tuple& shape)
-{
-    if constexpr (Std::is_tuple_v<Tuple>) {
-        return GetShape<Is...>(Std::get<I>(shape));
-    } else {
-        return GetTuple<I, Is...>(shape);
-    }
-}
-
-template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto GetStride(const Layout<ShapeType, StrideType>& layout)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
+__aicore__ inline constexpr auto GetStride(LayoutType& layout)
 {
     static_assert(Std::is_tuple_v<ShapeType> && Std::is_tuple_v<StrideType>, "ShapeType or StrideType is not tuple!");
     return layout.template Stride<Is...>();
