@@ -228,30 +228,63 @@ function(simple_kernel_compile)
     #     VERBATIM
     #   )
     if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
-      add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
-        COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} bash -c \
-          "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \
-          --op-type=${BINCMP_OP_TYPE} \
-          --src-file=${BINCMP_SRC} \
-          --compute-unit=${BINCMP_COMPUTE_UNIT} \
-          --compile-options='${BINCMP_OPTIONS}' \
-          --debug-config='${BINCMP_CONFIGS}' \
-          --config-ini=${BINCMP_OPS_INFO} \
-          --tiling-lib=${BINCMP_TILING_LIB} \
-          --output-path=${BINCMP_OUT_DIR} \
-          --dynamic-dir=${BINCMP_DYNAMIC_PATH} \
-          --enable-binary='${bincmp_enable_binary_package}' \
-          --json-file=${BINCMP_JSON_FILE} \
-          --target-name=${BINCMP_TARGET_NAME} \
-          --auto-gen-path=${auto_gen_path} \
-          --build-tool=$(MAKE) > ${BINCMP_COMPILE_LOG} 2>&1 || true"
-        COMMAND ${CMAKE_COMMAND} -E env bash -c \
+      # add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
+      #   COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} bash -c \
+      #     "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \
+      #     --op-type=${BINCMP_OP_TYPE} \
+      #     --src-file=${BINCMP_SRC} \
+      #     --compute-unit=${BINCMP_COMPUTE_UNIT} \
+      #     --compile-options='${BINCMP_OPTIONS}' \
+      #     --debug-config='${BINCMP_CONFIGS}' \
+      #     --config-ini=${BINCMP_OPS_INFO} \
+      #     --tiling-lib=${BINCMP_TILING_LIB} \
+      #     --output-path=${BINCMP_OUT_DIR} \
+      #     --dynamic-dir=${BINCMP_DYNAMIC_PATH} \
+      #     --enable-binary='${bincmp_enable_binary_package}' \
+      #     --json-file=${BINCMP_JSON_FILE} \
+      #     --target-name=${BINCMP_TARGET_NAME} \
+      #     --auto-gen-path=${auto_gen_path} \
+      #     --build-tool=$(MAKE) > ${BINCMP_COMPILE_LOG} 2>&1 || true"
+      #   COMMAND ${CMAKE_COMMAND} -E env bash -c \
+      #     "if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
+      #     echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_ERROR_LOG}; \
+      #     cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_ERROR_LOG}; \
+      #     echo '' >> ${BINCMP_ERROR_LOG}; \
+      #     fi"
+      #   VERBATIM
+      # )
+      set(COMPILE_CMD 
+        "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \
+            --op-type=${BINCMP_OP_TYPE} \
+            --src-file=${BINCMP_SRC} \
+            --compute-unit=${BINCMP_COMPUTE_UNIT} \
+            --compile-options='${BINCMP_OPTIONS}' \
+            --debug-config='${BINCMP_CONFIGS}' \
+            --config-ini=${BINCMP_OPS_INFO} \
+            --tiling-lib=${BINCMP_TILING_LIB} \
+            --output-path=${BINCMP_OUT_DIR} \
+            --dynamic-dir=${BINCMP_DYNAMIC_PATH} \
+            --enable-binary='${bincmp_enable_binary_package}' \
+            --json-file=${BINCMP_JSON_FILE} \
+            --target-name=${BINCMP_TARGET_NAME} \
+            --auto-gen-path=${auto_gen_path} \
+            --build-tool=$(MAKE) > ${BINCMP_COMPILE_LOG} 2>&1 || true"
+      )
+
+      # 定义错误检查命令
+      set(CHECK_ERROR_CMD
           "if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
-          echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_ERROR_LOG}; \
-          cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_ERROR_LOG}; \
-          echo '' >> ${BINCMP_ERROR_LOG}; \
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_ERROR_LOG}; \
+              cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_ERROR_LOG}; \
+              echo '' >> ${BINCMP_ERROR_LOG}; \
           fi"
-        VERBATIM
+      )
+
+      # 使用变量
+      add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
+          COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} bash -c "${COMPILE_CMD}"
+          COMMAND ${CMAKE_COMMAND} -E env bash -c "${CHECK_ERROR_CMD}"
+          VERBATIM
       )
     # if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
     #   add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
