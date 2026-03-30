@@ -1,21 +1,21 @@
-# move_successive_align样例
+# reg_ld_st_unalign样例
 
 ## 概述
-本样例演示了SIMD场景下，基于RegBase编程范式的连续对齐搬运算子的核函数直调方法，算子支持单核运行。
+本样例演示了SIMD场景下，基于RegBase编程范式的连续非对齐搬运算子的核函数直调方法，算子支持单核运行。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
 ```
-├── move_successive_align
-│   ├── CMakeLists.txt                            // 编译工程文件
-│   └── move_successive_align.asc                 // AscendC算子实现 & 调用样例
+├── reg_ld_st_unalign
+│   ├── CMakeLists.txt                 // 编译工程文件
+│   └── vector_add.asc                 // AscendC算子实现 & 调用样例
 ```
 
 ## 算子描述
 - 算子功能：  
-  在源操作数和目的操作数地址均32B对齐的情况下，搬运1024个float类型数据。
+  输入一个长度为1024的向量，在源操作数和目的操作数地址均非32B对齐的情况下，搬运128个float类型数据。
 - 算子规格：
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="3" align="center">AIV算子</td></tr>
@@ -26,14 +26,13 @@
   </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">y</td><td align="center">1024</td><td align="center">float</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">move_successive_align_kernel</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reg_ld_st_unalign_kernel</td></tr>
   </table>
 - 算子实现：  
   主要包括以下步骤：
   1. 初始化参数
   2. 将数据从GM搬运到UB
-  3. 当mode=0，调用CopyVF搬运1024个float数，写回UB;
-     当mode=1，调用CopyWithPostModeVF，开启post mode，搬运1024个float数，写回UB
+  3. 将UB上源操作数和目的操作数地址偏移一个元素（4 Btype）长度，使得起始地址非32B对齐，调用CopyVF从该地址开始搬运128个float数，写回UB
   4. 将数据从UB搬运回GM
   
   - 调用实现  
