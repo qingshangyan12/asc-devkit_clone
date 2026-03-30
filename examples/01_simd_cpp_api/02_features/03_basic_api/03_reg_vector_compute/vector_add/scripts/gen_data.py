@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# coding=utf-8
+
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2025 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -9,29 +12,21 @@
 # ----------------------------------------------------------------------------------------------------------
 
 
-cmake_minimum_required(VERSION 3.16)
+import os
+import numpy as np
 
-find_package(ASC REQUIRED)
+def gen_golden_data_simple():
+    inner = 64
+    outter = 64
+    data_type = np.float32
+    src = np.ones([outter, inner]).astype(data_type)
+    golden = np.copy(src)
+    for i in range(outter - 1):
+        golden[i + 1] = golden[i] + golden[i + 1]
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
+    src.tofile('./input/input_x.bin')
+    golden.tofile('./output/golden.bin')
 
-project(kernel_samples LANGUAGES ASC CXX)
-
-add_executable(demo
-    move_successive_align.asc
-)
-
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-)
-
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
-)
+if __name__ == "__main__":
+    gen_golden_data_simple()
