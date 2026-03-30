@@ -43,29 +43,11 @@ struct CopyGM2L1 {
     }
 };
 
-struct CopyGM2L1V2 {
-    template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args& ...args)
-    {
-        DataCopyV2<traits, Args...>(args...);
-    }
-};
-
 template <typename Traits>
 struct CopyTraits<CopyGM2L1, Traits> : public CopyTraits<CopyGM2L1, Traits, CopyGM2L1, DataCopyTraitDefault> {};
 
 template <>
 struct CopyTraits<CopyGM2L1> : public CopyTraits<CopyGM2L1, DataCopyTraitDefault> {};
-
-template <typename Traits>
-struct CopyTraits<CopyGM2L1V2, Traits> : public CopyTraits<CopyGM2L1V2, Traits, CopyGM2L1V2, DataCopyTraitDefault> {};
-
-template <>
-struct CopyTraits<CopyGM2L1V2> : public CopyTraits<CopyGM2L1V2, DataCopyTraitDefault> {};
-
-using CopyL12BT = CopyGM2L1;
-using CopyL12FB = CopyGM2L1;
-
 }
 }
 
