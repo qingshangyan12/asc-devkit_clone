@@ -75,7 +75,7 @@ private:
     __aicore__ inline static decltype(auto) TileSrcTensor(const T& src, uint16_t calNSize, uint16_t nIterIndex) {
         auto coord = MakeCoord(MakeCoord(Std::Int<0>{}, Std::Int<0>{}), MakeCoord(Std::Int<0>{}, nIterIndex * MAIN_LOOP_N_SIZE_3510));
         auto shape = MakeShape(MakeShape(Std::Int<1>{}, Std::Int<1>{}), MakeShape(Std::Int<1>{}, calNSize));
-        return src(coord, shape);
+        return src.Slice(coord, shape);
     }
 };
 
