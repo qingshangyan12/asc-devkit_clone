@@ -19,6 +19,7 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
 
 - Step1. 拷贝基线样例
     - 基于用户提供的指定API参考样例路径（如果用户未提供，去样例仓 `asc-devkit/examples` 检索，找到最匹配的），将对应样例目录，拷贝到当前目录下的`tmp-workspace`中。
+    优先级：用户提供的参考样例 > `asc-devkit/examples`检索到的调用该API的样例
     - 如果用户既未提供API参考样例路径，在样例仓也未检索到对应API样例，进行报错提示用户，终止当前流程。
 
 - Step2. 在新路径下执行样例
@@ -34,10 +35,12 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
 
 #### Step2. 按文件重构
 
+以下内容是重构要点总结，具体明细可参考`references/basic-api-example-template/example-refactor-rules.md`。
+
 ##### 1. `{api_name}.asc` 文件
 - **多核→单核**：`numBlocks>1`改为`1`，适配地址偏移和tiling
 - **模板化数据类型**：使用`template<typename T>`支持多种类型
-- **饱和/非饱和模式**：在API调用前插入`SetSaturationMode<T>()`函数
+- **饱和/非饱和模式**：在API调用前插入`SetSaturationMode<T>()`函数（参考`references/basic-api-example-template/example-refactor-rules.md`）
   ```cpp
   // 浮点型(float/half/bfloat16)：CTRL_48_BIT
   // 整型(int8/16/32)：CTRL_53_BIT
