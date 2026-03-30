@@ -22,6 +22,10 @@
 #ifndef IMPL_SIMT_API_ASC_BF16_IMPL_H
 #define IMPL_SIMT_API_ASC_BF16_IMPL_H
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#include "__clang_cce_simt_bf16.h"
+#endif
+
 #include "simt_api/device_types.h"
 #include "impl/simt_api/internal_functions_impl.h"
 #include "impl/simt_api/math_functions_impl.h"
@@ -968,95 +972,55 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ bfloat16x2_t* address
 }
 
 #else
+#ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_atomic_add(bfloat16_t *address, bfloat16_t val)
 {
-    atomicAdd(address, val);
+    __atomic_add(address, val);
     return *address;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_add(bfloat16x2_t *address, bfloat16x2_t val)
 {
-    return atomicAdd(address, val);
+    return __atomic_add(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_sub(bfloat16x2_t *address, bfloat16x2_t val)
 {
-    return atomicSub(address, val);
+    return __atomic_sub(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_exch(bfloat16x2_t *address, bfloat16x2_t val)
 {
-    return atomicExch(address, val);
+    return __atomic_exch(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_atomic_max(bfloat16_t *address, bfloat16_t val)
 {
-    atomicMax(address, val);
+    __atomic_max(address, val);
     return *address;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_max(bfloat16x2_t *address, bfloat16x2_t val)
 {
-    return atomicMax(address, val);
+    return __atomic_max(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_atomic_min(bfloat16_t *address, bfloat16_t val)
 {
-    atomicMin(address, val);
+    __atomic_min(address, val);
     return *address;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_min(bfloat16x2_t *address, bfloat16x2_t val)
 {
-    return atomicMin(address, val);
+    return __atomic_min(address, val);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_cas(bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val)
 {
-    return atomicCAS(address, compare, val);
+    return __atomic_cas(address, compare, val);
 }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_ldcg(bfloat16_t* address)
-{
-    return __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(address);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_ldcg(bfloat16x2_t* address)
-{
-    int32_t t = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(reinterpret_cast<int32_t*>(address));
-    return reinterpret_cast<bfloat16x2_t&>(t);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_ldca(bfloat16_t* address)
-{
-    return __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(address);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_ldca(bfloat16x2_t* address)
-{
-    int32_t t = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(reinterpret_cast<int32_t*>(address));
-    return reinterpret_cast<bfloat16x2_t&>(t);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(bfloat16_t* address, bfloat16_t val)
-{
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(address, val);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(bfloat16x2_t* address, bfloat16x2_t val)
-{
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(reinterpret_cast<int32_t*>(address), reinterpret_cast<int32_t&>(val));
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(bfloat16_t* address, bfloat16_t val)
-{
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(address, val);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(bfloat16x2_t* address, bfloat16x2_t val)
-{
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(reinterpret_cast<int32_t*>(address), reinterpret_cast<int32_t&>(val));
-}
+#endif
 #endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t make_bfloat162(bfloat16_t x, bfloat16_t y)
