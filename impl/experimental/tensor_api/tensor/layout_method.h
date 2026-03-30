@@ -147,31 +147,31 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape) {
     }
 }
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto GetShape(const LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return layout.template Shape<Is...>();
 }
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto GetShape(LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return layout.template Shape<Is...>();
 }
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto GetStride(const LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return layout.template Stride<Is...>();
 }
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto GetStride(LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return layout.template Stride<Is...>();
 }
 
@@ -196,55 +196,55 @@ struct CoshapeCompute {
     }
 };
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto Coshape(const LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     auto shape = GetShape<Is...>(layout);
     auto stride = GetStride<Is...>(layout);
     auto coCoord = CoshapeCompute{}(shape, stride);
     return coCoord + Std::Int<1>{};
 }
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto Cosize(const LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return TupleSize(Coshape<Is...>(layout));
 }
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto Rank(const LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return layout.template Rank<Is...>();
 }
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto Select(const LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return MakeLayout(SelectTuple<Is...>(layout.Shape()), SelectTuple<Is...>(layout.Stride()));
 }
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto Get(const LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return MakeLayout(GetTuple<Is...>(layout.Shape()), GetTuple<Is...>(layout.Stride()));
 }
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto Size(const LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return layout.template Size<Is...>();
 }
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto Capacity(const LayoutType& layout)
 {
-    static_assert(is_layout_v<Std::remove_cvref_t<LayoutType>>, "layout is not Layout");
     return layout.Capacity();
 }
 

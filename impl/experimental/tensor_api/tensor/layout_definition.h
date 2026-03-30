@@ -33,12 +33,13 @@ struct NzLayoutPattern{};
 
 struct NDLayoutPattern{};
 
-struct DefaultLayoutPattern{};
+struct DefaultPattern{};
 
 template <typename T = half, int32_t C0 = 32>
 struct LayoutTrait {
     using type = T;
-    static constexpr int32_t C0_size = C0;;
+    static constexpr int32_t C0_size = C0;
+    static constexpr int32_t C0_element = C0 / sizeof(T);
 };
     
 
@@ -58,7 +59,7 @@ using Tile = Std::tuple<Layouts...>;
 template <typename... Coords>
 using Coord = Std::tuple<Coords...>;
 
-template <typename T, typename U, typename LayoutPattern = DefaultLayoutPattern>
+template <typename T, typename U, typename LayoutPattern = DefaultPattern>
 struct Layout : private Std::tuple<T, U>
 {
     using tag = LayoutPattern;
@@ -139,6 +140,22 @@ struct is_layout<Layout<T, U, S>> : Std::true_type {};
 
 template <typename T>
 constexpr bool is_layout_v = is_layout<T>::value;
+
+template <typename T, typename = void>
+struct PatternTrait;
+
+template <typename T>
+struct PatternTrait<T, Std::enable_if_t<is_layout_v<Std::remove_cvref_t<T>>>> {
+    using type = typename Std::remove_cvref_t<T>::tag;
+};
+
+template <typename T>
+struct PatternTrait<T, Std::enable_if_t<IsTileTensorV<Std::remove_cvref_t<T>>>> {
+    using type = typename PatternTrait<decltype(Std::declval<const T&>().Layout())>::type;
+};
+
+template <typename T>
+using PatternTraitT = typename PatternTrait<T>::type;
 
 } // namespace Te
 } // namespace AscendC

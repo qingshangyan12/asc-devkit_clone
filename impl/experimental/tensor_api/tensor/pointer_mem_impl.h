@@ -97,11 +97,11 @@ struct FindPtrFromPattern<PtrPattern, Std::tuple<Std::tuple<PtrPattern, MakeMemF
 template <typename PtrPattern, typename NotMatchTuple, typename... Rest>
 struct FindPtrFromPattern<PtrPattern, Std::tuple<NotMatchTuple, Rest...>> {};
 
-template <typename PtrPattern, typename TraitType, typename Iterator, typename... Args>
-__aicore__ inline constexpr auto MakeMemPtrV2(Iterator iter, Args... args) 
+template <typename PtrPattern, typename TraitType, typename... Args>
+__aicore__ inline constexpr auto MakeMemPtrV2(Args... args) 
 {
     using GetPtrMakeFun = typename FindPtrFromPattern<PtrPattern>::type;
-    return GetPtrMakeFun::template Make<TraitType>(iter, args...);
+    return GetPtrMakeFun::template Make<TraitType>(args...);
 }
 
 

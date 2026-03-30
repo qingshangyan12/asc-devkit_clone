@@ -145,8 +145,11 @@ struct MakeNzFrameLayout {
     template <typename TraitType>
     __aicore__ inline static auto Make(size_t row, size_t column) {
         using T = typename TraitType::type;
-        auto shape = TupleDispatcher<LayoutFormat::NZ, TupleFormat::Shape, T>::apply(row, column);
-        auto stride = TupleDispatcher<LayoutFormat::NZ, TupleFormat::Stride, T>::apply(row, column);
+        constexpr auto c0Ele = TraitType::C0_element;
+        auto shape = MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED),
+                               Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele));
+        auto stride = MakeStride(Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{},
+                                 Std::Int<1>{}, c0Ele * Std::ceil_align(row, FRACTAL_FIXED));
         using LayoutT = Layout<decltype(shape), decltype(stride), NzLayoutPattern>;
         return LayoutT(shape, stride);
     }
@@ -156,8 +159,8 @@ struct MakeNDFrameLayout {
     template <typename TraitType>
     __aicore__ inline static auto Make(size_t row, size_t column) {
         using T = typename TraitType::type;
-        auto shape = TupleDispatcher<LayoutFormat::ND, TupleFormat::Shape, T>::apply(row, column);
-        auto stride = TupleDispatcher<LayoutFormat::ND, TupleFormat::Stride, T>::apply(row, column);
+        auto shape = MakeShape(row, column);
+        auto stride = MakeStride(column, Std::Int<1>{});
         using LayoutT = Layout<decltype(shape), decltype(stride), NDLayoutPattern>;
         return LayoutT(shape, stride);
     }

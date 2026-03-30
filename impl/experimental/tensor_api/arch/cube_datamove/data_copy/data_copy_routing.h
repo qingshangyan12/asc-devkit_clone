@@ -46,7 +46,7 @@ struct DataCopyTensor2TensorV2{
 };
 
 template <>
-struct DataCopyTensor2TensorV2<Hardware::L1, Hardware::GM, ArchVersion::V3510, LayoutPattern::NzLayoutPattern, NDLayoutPattern> {
+struct DataCopyTensor2TensorV2<Hardware::L1, Hardware::GM, ArchVersion::V3510, NzLayoutPattern, NDLayoutPattern> {
     using type = CopyGmToCbufMultiND2Nz;
 };
 
