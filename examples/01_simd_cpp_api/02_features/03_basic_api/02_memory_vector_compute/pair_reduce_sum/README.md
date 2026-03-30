@@ -1,11 +1,17 @@
 # PairReduceSum样例
+
 ## 概述
-本样例在归约场景下，基于[PairReduceSum](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0085.html)对数据（a1, a2, a3, a4, a5, a6...）的相邻两个元素求和为（a1+a2, a3+a4, a5+a6, ......）。PairReduceSum接口适用于需要成对元素求和的场景，如信号处理、特征聚合等。
+
+本样例在归约场景下，基于[PairReduceSum](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0085.html)对数据（a1, a2, a3, a4, a5, a6...）的相邻两个元素求和为（a1+a2, a3+a4, a5+a6, ......），即对每个pair（偶数下标与奇数下标组成的相邻元素对）进行求和归约，输出元素个数为输入的一半。PairReduceSum接口适用于需要成对元素求和的场景，如信号处理、特征聚合等。样例输入数据类型为half，输入shape为[128]的Tensor，输入数据先从Global Memory搬运至片上存储（LocalTensor），然后使用PairReduceSum接口完成相邻元素求和计算，最后将计算结果从片上存储搬出至Global Memory，输出shape为[64]的half类型Tensor。
+
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
 ## 目录结构介绍
+
 ```
 ├── pair_reduce_sum
 │   ├── scripts
@@ -13,36 +19,43 @@
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-   │   └── pair_reduce_sum.asc      // Ascend C样例实现 & 调用样例
+│   └── pair_reduce_sum.asc     // Ascend C 样例实现 & 调用
 ```
 
 ## 样例描述
-- 样例功能：
-   PairReduceSumCustom样例对每个pair内所有元素求和。
-- 样例规格：
-   <table border="2" align="center">
-   <caption>表1：PairReduceSum样例规格</caption>
-   <tr>
-   <td rowspan="1" align="center">样例类型(OpType)</td>
-   <td colspan="4" align="center">PairReduceSum</td></tr>
-   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-   <tr><td align="center">x</td><td align="center">[128]</td><td align="center">half</td><td align="center">ND</td></tr>
-   <tr><td rowspan="2" align="center">样例输出</td></tr>
-   <tr><td align="center">y</td><td align="center">[64]</td><td align="center">half</td><td align="center">ND</td></tr>
 
-   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">pair_reduce_sum_custom</td></tr>
-   </table>
+- 样例功能：  
+  本样例使用PairReduceSum接口对输入Tensor中每个pair内的相邻元素（偶数下标与奇数下标）进行求和归约，输出元素个数为输入的一半。例如输入数据为（a1, a2, a3, a4, a5, a6, ...），则输出为（a1+a2, a3+a4, a5+a6, ...）。
+
+- 样例规格：  
+  <table border="2" align="center">
+  <caption>表1：PairReduceSum样例规格</caption>
+  <tr>
+  <td rowspan="1" align="center">样例类型(OpType)</td>
+  <td colspan="4" align="center">PairReduceSum</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[128]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td></tr>
+  <tr><td align="center">y</td><td align="center">[64]</td><td align="center">half</td><td align="center">ND</td></tr>
+
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">pair_reduce_sum_custom</td></tr>
+  </table>
+
+- 样例实现：  
+  本样例中实现的是固定shape为输入x[128]，输出y[64]的PairReduceSum样例。
 
 - Kernel实现
 
-   计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用PairReduceSum基础API接口完成计算，得到最终结果，再搬出到外部存储上。
+  计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用PairReduceSum基础API接口完成计算，得到最终结果，再搬出到外部存储上。
 
+  本样例的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal中每对相邻元素（偶数下标与奇数下标）求和，并将结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
-- 调用实现
-   使用内核调用符<<<>>>调用核函数。
+- 调用实现  
+  使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
-在本样例根目录下执行如下步骤，编译并执行样例。
+
+在本样例根目录下执行如下步骤，编译并运行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
