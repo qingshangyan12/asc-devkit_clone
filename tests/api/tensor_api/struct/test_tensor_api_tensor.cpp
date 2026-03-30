@@ -417,3 +417,43 @@ TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperationInt3D)
     EXPECT_EQ(AscendC::Std::get<1>(stride).value, 2);
     EXPECT_EQ(AscendC::Std::get<2>(stride).value, 1);
 }
+
+TEST_F(Tensor_Api_Tensor, SliceFormSrcTensorToDstTensor)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t TILE_LENGTH = 8;
+    __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
+    auto ptr = MakeGMmemPtr(data);
+
+    // 源 tensor：4维 fractal layout
+    auto srcShape = MakeFractalShape(
+        MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<4>{}),
+        MakeShape(AscendC::Std::Int<6>{}, AscendC::Std::Int<8>{})
+    );
+    auto srcStride = MakeStride(
+        MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<2>{}),
+        MakeStride(AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{})
+    );
+
+    auto tensor = MakeTensor(ptr, srcShape, srcStride);
+    EXPECT_EQ(tensor.Data(), ptr);
+
+    auto coord = MakeCoord(AscendC::Std::Int<20>{}, AscendC::Std::Int<30>{});
+
+    // 传 shape
+    auto shape = MakeShape(2, 2);
+    auto newTensor1 = Slice(tensor, coord, shape);
+    EXPECT_EQ(newTensor1.Data(), tensor.Data() + tensor.Layout()(coord));
+    EXPECT_EQ(Std::Std::get<0>(Std::Std::get<0>(newTensor1.Layout().Shape())), 6);
+    EXPECT_EQ(Std::Std::get<0>(Std::Std::get<1>(newTensor1.Layout().Shape())), 8);
+
+    // 传 layout
+    auto tileLayout = MakeLayout(
+        MakeFractalShape(MakeShape(10, 20), MakeShape(2, 2)),
+        tensor.Stride());
+    auto newTensor2 = Slice(tensor, coord, tileLayout);
+    EXPECT_EQ(newTensor2.Data(), tensor.Data() + tensor.Layout()(coord));
+    EXPECT_EQ(Std::Std::get<0>(Std::Std::get<0>(newTensor2.Layout().Shape())), 6);
+    EXPECT_EQ(Std::Std::get<0>(Std::Std::get<1>(newTensor2.Layout().Shape())), 8);
+}
