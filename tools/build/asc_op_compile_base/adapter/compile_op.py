@@ -1042,6 +1042,7 @@ def handle_compile_options(compile_info: CompileInfo, compile_option_tuple, tili
 
     # check whether ccec_O0 or ccec_g opend in compile context
     compile_info.is_debug = CommonUtility.check_debug_options(compile_option_tuple.compile_options)
+    compile_option_tuple.compile_options.append('-DONE_CORE_DUMP_SIZE=' + str(compile_info.dump_info["dump_size"]))
     if global_var_storage.get_variable("ascendc_recognize_simtvf") is True:
         compile_option_tuple.compile_options.append('-DASCENDC_RECOGNIZE_SIMT_VF')
 
@@ -1257,6 +1258,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     compile_info.tiling_key_kernel_type = infered_info_from_ifile.tiling_key_kernel_type
     compile_info.no_set_kernel_type = infered_info_from_ifile.no_set_kernel_type
     compile_info.default_kernel_type = infered_info_from_ifile.default_kernel_type
+    compile_info.dump_info = {'dump_type': '', 'dump_size': 1024}
 
     # generate tiling struct size, dfx section
     if global_var_storage.get_variable("ascendc_tiling_no_register"):
