@@ -221,8 +221,7 @@ function(simple_kernel_compile)
 
       set(CHECK_ERROR_CMD
           "if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
-              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_ERROR_LOG}; \
-              cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_ERROR_LOG}; \
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
               echo '' >> ${BINCMP_ERROR_LOG}; \
           fi"
       )
@@ -276,8 +275,7 @@ function(simple_kernel_compile)
 
       set(CHECK_ERROR_CMD
           "if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
-              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}, fail info:' >> ${BINCMP_ERROR_LOG}; \
-              cat ${BINCMP_COMPILE_LOG} >> ${BINCMP_ERROR_LOG}; \
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
               echo '' >> ${BINCMP_ERROR_LOG}; \
           fi"
       )
@@ -492,8 +490,7 @@ function(npu_op_package target_package_name)
             DESTINATION ${install_path})
 
     get_property(enable_cpack GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_CPACK)
-    get_property(all_op_compile_fail GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_name}_ALL_FAIL)
-    if (${enable_cpack} AND NOT ${all_op_compile_fail})
+    if (${enable_cpack})
       # CPack config
       set(CPACK_PACKAGE_NAME ${CMAKE_PROJECT_NAME})
       set(CPACK_PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
@@ -1106,7 +1103,9 @@ function(npu_op_package_add target_package_name)
     endforeach()
   endif()
 
-  if("${output_type}" STREQUAL "RUN")
+  get_property(all_op_fail GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL)
+  message("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa  ${all_op_fail}")
+  if("${output_type}" STREQUAL "RUN" AND NOT all_op_fail)
     if(_ascendc_tiling_target)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
         add_library(${target_package_name}_ascendc_${_ascendc_tiling_target} SHARED)
@@ -1287,7 +1286,7 @@ function(npu_op_package_add target_package_name)
         )
       endif()
     endif()
-  elseif("${output_type}" STREQUAL "STATIC")
+  elseif("${output_type}" STREQUAL "STATIC" AND NOT all_op_fail)
     if(_ascendc_tiling_target)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
         add_library(${target_package_name}_ascendc_${_ascendc_tiling_target} SHARED)
@@ -1327,7 +1326,7 @@ function(npu_op_package_add target_package_name)
         PACKAGE_NAME ${target_package_name}
         TARGETS ${_ascendc_kernel_target} ${_ascendc_kernel_target}_opregistry)
     endif()
-  elseif("${output_type}" STREQUAL "SHARED")
+  elseif("${output_type}" STREQUAL "SHARED" AND NOT all_op_fail)
     if(_ascendc_tiling_target)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
         add_library(${target_package_name}_ascendc_${_ascendc_tiling_target} SHARED)
