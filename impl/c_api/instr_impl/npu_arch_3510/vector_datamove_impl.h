@@ -5906,6 +5906,26 @@ __simd_callee__ inline void asc_scatter(vector_float& dst, __ubuf__ float* src, 
     asc_scatter_impl(dst, src, index, mask);
 }
 
+__simd_callee__ inline void asc_scatter(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
 // ==========asc_copy_gm2ub_align(int8_t/uint8_t/fp8_e5m2_t/fp8_e4m3fn_t/hifloat8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t n_burst, uint32_t len_burst,
             uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_gap, uint32_t dst_gap)
