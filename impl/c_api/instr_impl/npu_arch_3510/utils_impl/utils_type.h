@@ -38,6 +38,8 @@ using vector_store_align = vector_align;
 using vector_load_align = vector_align;
 using iter_reg = vector_address;
 
+
+
 #if (defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1))
 
 using float4_e1m2x2_t = fp4x2_e1m2_t;
