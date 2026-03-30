@@ -929,7 +929,7 @@ endfunction()
 
 function(get_is_all_op_fail BINCMP_OUT_DIR TYPE_NAME_LIST target_name)
   execute_process(
-      COMMAND grep -c "Fail op_info:" "${BINCMP_OUT_DIR}/compile_error.log"
+      COMMAND grep -c "fail op-type:" "${BINCMP_OUT_DIR}/compile_error.log"
       OUTPUT_VARIABLE FAILED_COUNT
       ERROR_QUIET
   )
