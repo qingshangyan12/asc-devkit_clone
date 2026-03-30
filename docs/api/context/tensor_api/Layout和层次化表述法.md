@@ -69,7 +69,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
     ![分形变换](/figure/分形变换.png)
 
-    通过[MakeNzLayout](struct/layout/layout_fractal/MakeNzLayout.md)接口可以快速构造连续的NZ Layout格式，自行设置StrideRow1和StrideColum1可以构造非连续的NZ Layout格式。
+    通过[MakeNzLayout](struct/layout/layout_fractal/MakeNZLayout.md)接口可以快速构造连续的NZ Layout格式，自行设置StrideRow1和StrideColum1可以构造非连续的NZ Layout格式。
 
 - ZN Layout
 
@@ -93,7 +93,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
     ![分形变换](/figure/分形变换-0.png)
 
-    通过[MakeZnLayout](struct/layout/layout_fractal/MakeZnLayout.md)接口可以快速构造连续的ZN Layout格式，自行设置StrideRow1和StrideColum1可以构造非连续的ZN Layout格式。
+    通过[MakeZnLayout](struct/layout/layout_fractal/MakeZNLayout.md)接口可以快速构造连续的ZN Layout格式，自行设置StrideRow1和StrideColum1可以构造非连续的ZN Layout格式。
 
 - ND Layout，一种使用层次化表述法描述的二维行优先排布格式。
 
