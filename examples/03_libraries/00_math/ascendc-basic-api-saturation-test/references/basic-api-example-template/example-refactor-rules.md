@@ -38,12 +38,18 @@ if constexpr (std::is_same_v<DataType, float> || std::is_same_v<DataType, half> 
     specialValueCnt = 7;
 }
 SetSaturationMode<T>();
+// scalar数据从输入的src2Local获取
+// 浮点类型输入，则tensor输入为 [MIN, MIN, MIN, MIN, MIN, MIN, MIN, MAX, MAX, ...]
+// 浮点类型输入，则scalar输入为 [MIN, MAX, +0, -0, NaN, +INF, -INF, ...]
 for (int i = 0; i < specialValueCnt; ++i) {
     AscendC::Duplicate(dstLocalTmp, T(0), INPUT_TENSOR_SIZE);
     for (int j = 0; j < specialValueCnt; ++j) {
-        // 通过for循环，对tensor用不同的scalar进行计算处理
+        // 通过for循环，对tensor用不同的scalar进行计算处理（MIN->MAX->+0->-0->NaN->+INF->-INF）
         T scalar = src2Local.GetValue(j);
         AscendC::Adds(dstLocalTmp, src1Local, scalar, INPUT_TENSOR_SIZE);
+        // tensor+scalar = MIN + MIN的结果在dstLocalTmp.GetValue(i * specialValueCnt)
+        // tensor+scalar = MIN + MAX，放到dstLocald的j + i * specialValueCnt位置。
+        // ...依此类推
         dstLocal.SetValue(j + i * specialValueCnt, dstLocalTmp.GetValue(i * specialValueCnt));
     }
 }
