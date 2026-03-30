@@ -47,7 +47,7 @@ if constexpr (std::is_same_v<DataType, float> || std::is_same_v<DataType, half> 
     specialValueCnt = 7;
 }
 SetSaturationMode<T>();
-// scalar数据从输入的src2Local获取
+// scalar数据从输入的src2Local获取，scalar的输入也是特殊值数据（MIN/MAX/+0/-0/NaN/INF等）
 // 浮点类型输入，则tensor输入为 [MIN, MIN, MIN, MIN, MIN, MIN, MIN, MAX, MAX, ...]
 // 浮点类型输入，则scalar输入为 [MIN, MAX, +0, -0, NaN, +INF, -INF, ...]
 for (int i = 0; i < specialValueCnt; ++i) {
@@ -82,11 +82,11 @@ inQueueSrc2.FreeTensor(src2Local);
 |---------|-------------|---------|
 | 单输入（1 tensor） | 每个special_index对应一个特殊值 | 7 |
 | 双输入-类型A（2 tensor） | 所有输入组合 | 7×7=49 (浮点型) / 4×4=16 (整型) |
-| 双输入-类型B（1 tensor + 1 scalar） | 所有输入组合 | 7×7=49 (浮点型) / 4×4=16 (整型) |
+| 双输入-类型B（1 tensor + 1 scalar） | 所有输入组合（tensor和scalar都使用特殊值） | 7×7=49 (浮点型) / 4×4=16 (整型) |
 
 - 单输入：使用 `generate_one_input()`
 - 双输入-类型A（2 tensor）：使用 `generate_two_inputs()`
-- 双输入-类型B（1 tensor + 1 scalar）：使用 `generate_two_inputs()`，scalar跟tensor一样构造方式
+- 双输入-类型B（1 tensor + 1 scalar）：使用 `generate_two_inputs()`，tensor和scalar都使用相同的特殊值列表生成
 - Golden计算：分别计算sat和non-sat两套结果
 
 **模板代码**：直接拷贝 `set_atomic_add_refactor/scripts/gen_data.py`
@@ -162,6 +162,7 @@ DTYPES=("half" "float") # 根据实际支持的数据类型改写
 - [ ] **单输入：表格必须有 input1 列**
 - [ ] **双输入-类型A（2 tensor）：表格必须有 input1, input2 列**
 - [ ] **双输入-类型B（1 tensor + 1 scalar）：表格必须有 input1, scalar 列**
+- [ ] **【关键】双输入-类型B的scalar必须使用特殊值（MIN/MAX/+0/-0/NaN/INF等），不能使用固定值**
 - [ ] 输出格式符合 `references/output-format.md`
 
 ---
@@ -197,6 +198,14 @@ DTYPES=("half" "float") # 根据实际支持的数据类型改写
 
 ❌ **错误2：忽略scalar参数**
 - 双输入-类型B的scalar也是特殊值，需要构造测试数据
+
+❌ **错误3：scalar参数使用错误的测试值**
+- **【关键澄清】双输入-类型B中的scalar参数分为两类：**
+  1. **数据型scalar**：如Adds中的第二个操作数，scalar值作为数据参与运算，应使用特殊值（MIN/MAX/+0/-0/NaN/INF等）
+  2. **系数型scalar**：如LeakyRelu中的negative_slope（负斜率系数），用于控制负值的缩放比例，也应使用特殊值测试
+
+- **正确做法**：scalar参数无论是数据型还是系数型，都必须使用特殊值生成测试数据（与tensor输入使用相同的generate_two_inputs）
+- scalar的special value组合方式与tensor完全相同
 
 ---
 
