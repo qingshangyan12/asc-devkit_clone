@@ -52,6 +52,7 @@ class CompileInfo:
         self.raw_tiling_key_kernel_type: dict = {}
         self.no_set_kernel_type: bool = True
         self.default_kernel_type: KernelMetaType = KernelMetaType.KERNEL_TYPE_MAX
+        self.dump_info: dict = {}
         self.sub_core_type: int = -1
         self.template_tiling_info: dict = {}
         self.tiling_key_struct_map: dict = {}
@@ -876,6 +877,7 @@ def convert_customized_config_to_inferchannel(config: CustomizedConfig):
     no_set_kernel_type = False
     default_kernel_type = first_tiling_info.kernel_type
     code_channel = -1
+    dump_info = {'dump_type': ''}
     template_tiling_info = {}
     default_tiling_struct = config.default_tiling_struct_name
     tiling_struct_expr_map = {}
@@ -889,7 +891,7 @@ def convert_customized_config_to_inferchannel(config: CustomizedConfig):
 
     return InferChannelParamsFromIFile(tiling_key_list, code_channel, hard_sync, no_kfc_server_flag, \
                                            enable_deterministic, tiling_key_kernel_type, no_set_kernel_type,\
-                                           default_kernel_type, template_tiling_info,
+                                           default_kernel_type, dump_info, template_tiling_info,
                                            default_tiling_struct, tiling_struct_expr_map, tiling_key_struct_map,\
                                            register_tiling_struct, tpl_tiling_struct, set_task_bar, wait_task_bar, \
                                            tiling_key_deterministic, None)
