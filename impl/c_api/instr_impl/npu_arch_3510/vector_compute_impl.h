@@ -3301,32 +3301,32 @@ __simd_callee__ inline void asc_mul(vector_float& dst, vector_float src0, vector
 // ==========asc_mul_scalar(int16_t/uint16_t/half/int32_t/uint32_t/float)==========
 __simd_callee__ inline void asc_mul_scalar(vector_int16_t& dst, vector_int16_t src, int16_t value, vector_bool mask)
 {
-    asc_mul_salar_impl(dst, src, value, mask);
+    asc_mul_scalar_impl(dst, src, value, mask);
 }
 
 __simd_callee__ inline void asc_mul_scalar(vector_uint16_t& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
 {
-    asc_mul_salar_impl(dst, src, value, mask);
+    asc_mul_scalar_impl(dst, src, value, mask);
 }
 
 __simd_callee__ inline void asc_mul_scalar(vector_half& dst, vector_half src, half value, vector_bool mask)
 {
-    asc_mul_salar_impl(dst, src, value, mask);
+    asc_mul_scalar_impl(dst, src, value, mask);
 }
 
 __simd_callee__ inline void asc_mul_scalar(vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask)
 {
-    asc_mul_salar_impl(dst, src, value, mask);
+    asc_mul_scalar_impl(dst, src, value, mask);
 }
 
 __simd_callee__ inline void asc_mul_scalar(vector_uint32_t& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
 {
-    asc_mul_salar_impl(dst, src, value, mask);
+    asc_mul_scalar_impl(dst, src, value, mask);
 }
 
 __simd_callee__ inline void asc_mul_scalar(vector_float& dst, vector_float src, float value, vector_bool mask)
 {
-    asc_mul_salar_impl(dst, src, value, mask);
+    asc_mul_scalar_impl(dst, src, value, mask);
 }
 
 // ==========asc_eq(vcmp int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
