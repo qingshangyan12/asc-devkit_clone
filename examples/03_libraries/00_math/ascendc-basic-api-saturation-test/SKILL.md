@@ -43,14 +43,23 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
         - 样例目录结构参照模板样式。
         - 多核样例改造成单核样例（比如若numsBlock>1则改成1，并对应适配修改地址偏移、tiling相关代码）。
         - 支持不同的数据类型输入场景。
-        - 支持饱和/非饱和模式，涵盖数据构造和算子.asc代码适配。  
+        - 支持饱和/非饱和模式，涵盖数据构造和算子.asc代码适配。
     
     - `verify_result.py`的输出格式参考`references/output-format.md`
+        - 单输入场景：参考"单个输入场景"章节
+        - 双输入场景（如Add/Mul）：参考"两个输入场景"章节  
+        - 双输出场景（如ReduceMax/ReduceMin/ReduceSum）：参考"双输出场景"章节，使用`output1`表示值，`output2`表示索引
 
     - `gen_data.py`中，如果是单输入场景调用`gen_data_utils`的`generate_one_input`函数来构造输入，如果是双输入场景调用`gen_data_utils`的`generate_two_inputs`函数来构造输入
 
     - `test.sh`拷贝`set_atomic_add_refactor`的test.sh内容，基于当前API支持的数据类型，适配修改`DTYPES`和`INDICES`。
-        
+
+    - 双输出API的处理（如ReduceMax/ReduceMin/ReduceSum等）
+        - 双输出API输出格式参考`output-format.md`中的"双输出场景"章节，使用`output1`表示值输出，`output2`表示索引输出
+        - 索引验证规则：golden索引与output索引一致即视为匹配（可忽略值是否正确）
+
+    - 部分基线样例中`.asc`文件已有`CompareResult`等函数用于比对结果，可参考该函数的逻辑来生成`verify_result.py`。推荐使用`verify_result.py`来完成样例的`output`与`golden`的输出结果-真值比对，而不是`.asc`文件的函数。
+
     - 注意事项
         - `{api_name}.asc`文件的饱和/非饱和模式的代码适配方式，无需参考API文档，请严格遵守以下写法，不要随意自行修改。(参考`set_atomic_add_refactor`中`set_atomic_add.asc`的`SetSaturationMode`函数实现即可，区分浮点型和整型)
         ```cpp
@@ -72,7 +81,6 @@ description: Ascend C 基础API饱和/非饱和模式验证技能。需要用户
             }
         }
         ```
-        - 样例的`output`与`golden`的输出结果-真值比对方式，请采用`verify_result.py`脚本，不要采用其他方式（比如`{api_name}.asc`文件中的cpp代码比对方式）。
 
 ### 阶段三、验证整改后的样例
 - 执行`test.sh`脚本，确认重构整改后的样例功能正常（无编译错误），打印结果符合预期（包含不同数据类型输入、饱和/非饱和模式输入场景下的结果打印）
