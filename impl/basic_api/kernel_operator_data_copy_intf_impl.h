@@ -25,6 +25,7 @@
 #include "mstx_local_tensor_info.h"
 
 #include "kernel_check.h"
+#include "kernel_operator_data_copy_check.h"
 
 #include "kernel_operator_data_copy_base_impl.h"
 
@@ -51,6 +52,12 @@ __aicore__ inline void __inout_pipe__(MTE2) DataCopy(const LocalTensor<T>& dst, 
 #endif
     using PrimType = PrimT<T>;
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckBasicDataCopyTypeSupport<T>("DataCopy from GlobalTensor to LocalTensor with DataCopyParams");
+    CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from GlobalTensor to LocalTensor with DataCopyParams");
+#endif
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopy(dst, src, repeatParams, "DataCopy from GlobalTensor to LocalTensor")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopy from GlobalTensor to LocalTensor", KernelFuncType::NONE_MODE);
@@ -159,6 +166,12 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, 
     CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
     using PrimType = PrimT<T>;
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckNd2NzTypeSupport<T>("DataCopy from GlobalTensor to LocalTensor with Nd2NzParams");
+    CheckDataCopyTensor(dst, src, intriParams, "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams");
+#endif
+#endif
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, intriParams));
     if (dstHWPos == Hardware::L1) {
         // gm -> l1
@@ -167,10 +180,10 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, 
     } else if (dstHWPos == Hardware::UB) {
         DataCopyGM2UBND2NZImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(),
             intriParams);
-    } else {
-        ASCENDC_CHECK_TPOSITION(false, "dst", "A1 / B1 / VECIN",
-            "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams",
-            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+    } else { 
+         ASCENDC_CHECK_TPOSITION(false, "dst", "A1 / B1 / VECIN", 
+             "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams", 
+             ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
     }
 }
 #endif
@@ -224,12 +237,13 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src,
     const Nd2NzParams &intriParams)
 {
-    CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
     using PrimType = PrimT<T>;
-    CheckTensorPos<T>(src, Hardware::UB, "src", "VECIN / VECCALC / VECOUT",
-        "DataCopy from LocalTensor to LocalTensor with Nd2NzParams");
-    CheckTensorPos<T>(dst, Hardware::L1, "dst", "TSCM",
-        "DataCopy from LocalTensor to LocalTensor with Nd2NzParams");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckNd2NzTypeSupport<T>("DataCopy from LocalTensor to LocalTensor with Nd2NzParams");
+    CheckDataCopyTensor(dst, src, intriParams, "DataCopy from LocalTensor to LocalTensor with Nd2NzParams");
+#endif
+#endif
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, intriParams));
     DataCopyUB2L1ND2NZImpl((__cbuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         intriParams);
@@ -254,6 +268,12 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst,
 #endif
     using PrimType = PrimT<T>;
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckBasicDataCopyTypeSupport<T>("DataCopy from LocalTensor to GlobalTensor with DataCopyParams");
+    CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from LocalTensor to GlobalTensor with DataCopyParams");
+#endif
+#endif
 #ifdef ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopy(dst, src, repeatParams, "DataCopy from LocalTensor to GlobalTensor")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopy from LocalTensor to GlobalTensor", KernelFuncType::NONE_MODE);
@@ -324,6 +344,12 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
     MstxTensor::GetMstxDataCopyInfo(dst, src, repeatParams, "DataCopy");
 #endif
     using PrimType = PrimT<T>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckBasicDataCopyTypeSupport<T>("DataCopy from LocalTensor to LocalTensor with DataCopyParams");
+    CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from LocalTensor to LocalTensor with DataCopyParams");
+#endif
+#endif
 
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
@@ -400,6 +426,12 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<U> 
 #endif
     using PrimDstType = PrimT<T>;
     using PrimSrcType = PrimT<U>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckBasicDataCopyMixedTypeSupport<T, U>("DataCopy from LocalTensor to LocalTensor with T / U");
+    CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from LocalTensor to LocalTensor with T / U");
+#endif
+#endif
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
 
@@ -806,6 +838,11 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst,
 {
     CheckNz2NdParams(intriParams);
     using PrimType = PrimT<T>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyTensor(dst, src, intriParams, "DataCopy with Nz2NdParamsFull");
+#endif
+#endif
 #ifdef ASCENDC_CPU_DEBUG
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, intriParams)));
     bool isUsedProcessLock = false;
@@ -1198,6 +1235,13 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
     MstxTensor::GetMstxDataCopyPadInfo(dst, src, dataCopyParams, padParams, "DataCopyPad");
 #endif
     using PrimType = PrimT<T>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams");
+    CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams,
+        "DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams");
+#endif
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to VECIN / VECOUT", KernelFuncType::NONE_MODE);
@@ -1229,6 +1273,13 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T> &d
     MstxTensor::GetMstxDataCopyPadInfo(dst, src, dataCopyParams, "DataCopyPad");
 #endif
     using PrimType = PrimT<T>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams");
+    CheckDataCopyPadTensor(dst, src, dataCopyParams,
+        "DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams");
+#endif
+#endif
 #if (__NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
         return;
@@ -1258,6 +1309,13 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
     if ASCEND_IS_AIC {
         return;
     }
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams");
+    CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams,
+        "DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams");
+#endif
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to VECIN / VECOUT", KernelFuncType::NONE_MODE);
@@ -1302,6 +1360,13 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T> &d
     if ASCEND_IS_AIC {
         return;
     }
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams");
+    CheckDataCopyPadTensor(dst, src, dataCopyParams,
+        "DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams");
+#endif
+#endif
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams)));
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     if (srcHWPos == Hardware::UB) {
@@ -1336,6 +1401,12 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T> &dst,
 {
     CheckNd2NzParams(nd2nzParams, "DataCopyPad with Nd2NzParams");
     using PrimType = PrimT<T>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad with Nd2NzParams");
+    CheckDataCopyPadTensor(dst, src, dataCopyParams, nd2nzParams, "DataCopyPad with Nd2NzParams");
+#endif
+#endif
     CheckTensorPos<T>(dst, Hardware::L1, "dst", "TSCM", "DataCopyPad with Nd2NzParams");
     CheckTensorPos<T>(src, Hardware::UB, "src", "VECIN / VECOUT", "DataCopyPad with Nd2NzParams");
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams, nd2nzParams)));
@@ -1352,6 +1423,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxDataCopyPadInfo(dst, src, dataCopyParams, padParams, "DataCopyPad");
 #endif
+
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to VECIN / VECOUT", KernelFuncType::NONE_MODE);
@@ -1383,6 +1455,12 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
     if ASCEND_IS_AIC {
         return;
     }
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from GM to VECIN/VECOUT");
+    CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT");
+#endif
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to VECIN / VECOUT", KernelFuncType::NONE_MODE);
@@ -1431,6 +1509,12 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
     if ASCEND_IS_AIC {
         return;
     }
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from GM to VECIN / VECOUT");
+    CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN / VECOUT");
+#endif
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to VECIN / VECOUT", KernelFuncType::NONE_MODE);
@@ -1480,6 +1564,13 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T> &d
     if ASCEND_IS_AIC {
         return;
     }
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams");
+    CheckDataCopyPadTensor(dst, src, dataCopyParams,
+        "DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams");
+#endif
+#endif
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams)));
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     if (srcHWPos == Hardware::UB) {
@@ -1514,6 +1605,12 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T> &dst, const LocalTensor<
 {
     CheckNd2NzParams(nd2nzParams, "DataCopyPad with Nd2NzParams");
     using PrimType = PrimT<T>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckDataCopyPadTypeSupport<T>("DataCopyPad with Nd2NzParams");
+    CheckDataCopyPadTensor(dst, src, dataCopyParams, nd2nzParams, "DataCopyPad with Nd2NzParams");
+#endif
+#endif
     CheckTensorPos<T>(dst, Hardware::L1, "dst", "TSCM", "DataCopyPad with Nd2NzParams");
     CheckTensorPos<T>(src, Hardware::UB, "src", "VECIN / VECOUT", "DataCopyPad with Nd2NzParams");
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams, nd2nzParams)));
