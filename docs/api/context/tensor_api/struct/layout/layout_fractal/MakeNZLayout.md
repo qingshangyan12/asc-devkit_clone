@@ -1,69 +1,58 @@
-# MakeNZLayout
+# MakeNzLayout
 
 ## 产品支持情况
 
-|产品|是否支持|
-|--|:-:|
+| 产品     | 是否支持 |
+| ----------- |:----:|
 |Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|x|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|x|
-|Atlas 200I/500 A2 推理产品|x|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Atlas 200/300/500 推理产品|x|
-
-
 
 ## 功能说明
 
-根据输入的行数和列数，生成[层次化表述法](../../../Layout和层次化表述法.md)的NZ Layout结构，该结构为连续的NZ Layout结构，即数据紧密排列。
-
-```cpp
-Layout = ((Shape) : (Stride))
-Shape = ((Std::Int<16>{}, row / 16), (Std::Int<32 / sizeof(T)>{}, column / (32 / sizeof(T))))
-Stride = ((Std::Int<32 / sizeof(T)>{}, Std::Int<32 / sizeof(T) * 16>{}), (Std::Int<1>{}, 32 / sizeof(T) * row))
-```
+创建NZ格式的布局，NZ格式是昇腾AI处理器常用的分块存储格式，外层矩阵按行存储，内层矩阵按列存储。
 
 ## 函数原型
 
 ```cpp
-// 生成的Layout为静态数据
-template <typename T, size_t row, size_t column> NZLayout
-
-// 生成的Layout为动态数据
-template <typename T>
-__aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column)
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeNzLayout(U row, S column)
 ```
 
 ## 参数说明
 
-|参数名| 输入/输出 |描述|
-|--|--|--|
-|T|输入|基础数据类型，例如half或者float。|
-|row|输入|把数据看做连续的二维数据时，对应的行数。|
-|column|输入|把数据看做连续的二维数据时，对应的列数。|
+`表1` 模板参数说明
 
+| 参数名 | 输入/输出 | 描述 |
+|--------|-----------|------|
+| T | 输入 | 数据类型，支持int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t。 |
+| U | 输入 | 行数类型，size_t或Int整型常。 |
+| S | 输入 | 列数类型，size_t或Int整型常。 |
+
+`表2` 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|--------|-----------|------|
+| row | 输入 | 矩阵的总行数。 |
+| column | 输入 | 矩阵的总列数。 |
 
 ## 返回值说明
 
-无
+- 输入为编译时常量时，返回NZ格式的Layout类型。
+- 输入为整型变量时，返回NZ格式的Layout对象。
+- Nz分形数值及对齐说明可参见[Layout和层次化表述法](../../../Layout和层次化表述法.md)。
 
 ## 约束说明
 
--   基础数据类型的位宽，需大于等于1。
--   输入的row和column，应保证计算公式结果大于零，整除有效无余数。
+参数row和column需为size_t类型或Int整型常量。
 
 ## 调用示例
 
 ```cpp
-// 生成的Layout为动态数据
-using SrcT = half;
-size_t mLength = 128;
-size_t kLength = 64;
-auto srcLayout = AscendC::MakeNZLayout<SrcT>(mLength, kLength);
+// 创建NZ格式Layout
+using namespace AscendC::Te;
+// 编译时常量传参构造Layout
+using MyNzLayout = MakeNzLayout<half, Std::Int<32>, Std::Int<32>>;
+auto staticLayout = MyNzLayout{};
 
-// 生成的Layout为静态数据
-NZLayout<SrcT, 128, 64> srcLayout;
+// 运行时变量传参构造Layout
+auto layout = MakeNzLayout<half>(32, 32);
 ```
-
