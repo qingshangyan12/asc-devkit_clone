@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍调用CastDequant基础API实现对输入做量化并进行精度转换。
+本样例在模型量化推理场景下，基于CastDequant基础API实现反量化与类型转换功能，用于将量化后的低精度数据恢复并进行精度转换。样例展示了将int16_t类型输入数据经过反量化计算后，转换为uint8_t类型输出的过程，支持halfBlock模式和向量反量化模式。
 
 ## 支持的产品
 
@@ -21,34 +21,33 @@
 │   └── cast_dequant.asc      // Ascend C算子实现 & 调用样例
 ```
 
-## 算子描述
+## 样例描述
 
-- 算子功能：  
-  CastDequantCustom单算子，将int16_t数据类型输入量化并进行精度转换，得到uint8_t类型的输出。
+- 样例功能：
+  CastDequantCustom样例，将int16_t数据类型输入经过反量化计算后进行精度转换，得到uint8_t类型的输出。
 
-- 算子规格：  
-  <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">CastDequantCustom</td></tr>
+- 样例规格：
+  <table border="2" align="center">
+  <caption>表1：样例输入输出规格</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">CastDequantCustom</td></tr>
 
-  <tr><td rowspan="3" align="center">算子输入</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">inputGm</td><td align="center">256</td><td align="center">int16_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">inputGm</td><td align="center">[256]</td><td align="center">int16_t</td><td align="center">ND</td></tr>
 
-  <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">outputGm</td><td align="center">512</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td></tr>
+  <tr><td align="center">outputGm</td><td align="center">[512]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
 
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">cast_dequants_custom</td></tr>
   </table>
 
-- 算子实现：  
+- 样例实现：
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用CastDequant基础API接口完成量化计算，得到最终结果，再搬出到外部存储上。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用CastDequant基础API接口完成反量化计算和精度转换，得到最终结果，再搬出到外部存储上。
 
-    CastDequantCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor inputGm存储在srcLocal中，Compute任务负责对srcLocal执行量化计算和精度转换，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor outputGm。
-
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行  
