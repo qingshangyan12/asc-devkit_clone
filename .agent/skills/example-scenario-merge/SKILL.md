@@ -1,6 +1,6 @@
 ---
-name: example-merge
-description: 样例合并技能。用于将功能相同但场景不同的多个样例合并为一个多场景样例。
+name: example-scenario-merge
+description: 样例多场景合并技能。用于将功能相同但场景不同的多个样例合并为一个多场景样例。
 ---
 
 # 样例合并技能
