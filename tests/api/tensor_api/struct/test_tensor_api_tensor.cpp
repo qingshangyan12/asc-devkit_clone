@@ -417,3 +417,22 @@ TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperationInt3D)
     EXPECT_EQ(AscendC::Std::get<1>(stride).value, 2);
     EXPECT_EQ(AscendC::Std::get<2>(stride).value, 1);
 }
+
+TEST_F(Tensor_Api_Tensor, SetL2CacheHint)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t TILE_LENGTH = 8;
+    __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
+    auto ptr = MakeGMmemPtr(data);
+    auto tensor = MakeTensor(ptr, MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}),
+                             MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
+
+    EXPECT_EQ(tensor.Data().Get(), data);
+
+    tensor.SetL2CacheHint(CacheMode::CACHE_MODE_DISABLE)
+    EXPECT_NE(tensor.Data().Get(), data);
+
+    tensor.SetL2CacheHint(CacheMode::CACHE_MODE_NORMAL)
+    EXPECT_EQ(tensor.Data().Get(), data);
+}
