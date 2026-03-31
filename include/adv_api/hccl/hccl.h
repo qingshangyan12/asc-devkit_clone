@@ -416,6 +416,7 @@ public:
 private:
     HcclImpl<serverType, config> impl_;
 };
+
 }  // namespace AscendC
 
 #include "../../../impl/adv_api/detail/hccl/impl/hccl_impl.h"
