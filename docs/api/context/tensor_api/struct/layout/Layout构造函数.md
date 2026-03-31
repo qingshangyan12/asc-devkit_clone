@@ -50,7 +50,7 @@ __aicore__ inline constexpr Layout(const ShapeType& shape  = {}, const StrideTyp
 
 ## 约束说明
 
-构造Layout对象时传入的Shape和Stride结构，需是[Std::tuple](../../utils/容器函数.md)结构类型，且满足Std::tuple结构类型的使用约束。
+构造Layout对象时传入的Shape和Stride结构，需是[Std::tuple](../../../容器函数.md)结构类型，且满足Std::tuple结构类型的使用约束。
 
 ## 调用示例
 
