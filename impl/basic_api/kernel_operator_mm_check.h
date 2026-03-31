@@ -244,13 +244,7 @@ __aicore__ static inline void CheckLoadData2dLocal2Local(const LocalTensor<T>& d
     const __gm__ char* apiName)
 {
     CheckTensorPhyPosition<Hardware::L1>(src, "src", "A1 / B1", apiName);
-    if ((TPosition)src.GetPosition() == TPosition::A1) {
-        CheckTensorPhyPosition<Hardware::L0A>(dst, "dst", "A2", apiName);
-    } else if ((TPosition)src.GetPosition() == TPosition::B1){
-        CheckTensorPhyPosition<Hardware::L0B>(dst, "dst", "B2", apiName);
-    } else { // TSCM etc, other L1 pos
-        CheckTensorPhyPosition<Hardware::L0A, Hardware::L0B>(dst, "dst", "A2 / B2", apiName);
-    }
+    CheckTensorPhyPosition<Hardware::L0A, Hardware::L0B>(dst, "dst", "A2 / B2", apiName);
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckTensorAlignment(dst, VALUE_512, "dst", apiName);
 }
@@ -317,13 +311,7 @@ __aicore__ static inline void CheckLoadDataWithTranspose(const LocalTensor<T>& d
 // dav_c310 + dav_m510 + dav_m310 not support A1 -> A2
 #if __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102 && __NPU_ARCH__ != 3102
     CheckTensorPhyPosition<Hardware::L1>(src, "src", "A1 / B1", apiName);
-    if ((TPosition)src.GetPosition() == TPosition::A1) {
-        CheckTensorPhyPosition<Hardware::L0A>(dst, "dst", "A2 when src TPosition is A1", apiName);
-    } else if ((TPosition)src.GetPosition() == TPosition::B1) {
-        CheckTensorPhyPosition<Hardware::L0B>(dst, "dst", "B2 when src TPosition is B1", apiName);
-    } else {  // TSCM etc, other L1 pos
-        CheckTensorPhyPosition<Hardware::L0A, Hardware::L0B>(dst, "dst", "A2 / B2", apiName);
-    }
+    CheckTensorPhyPosition<Hardware::L0A, Hardware::L0B>(dst, "dst", "A2 / B2", apiName);
     if ((TPosition)dst.GetPosition() == TPosition::A2) {
         CheckLoadDataWithTransposeDtype<T>(apiName, true);
     } else {
