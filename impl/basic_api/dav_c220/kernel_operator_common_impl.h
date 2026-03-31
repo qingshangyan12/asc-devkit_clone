@@ -116,6 +116,63 @@ __aicore__ inline void CheckLocalMemoryIAImpl(const CheckLocalMemoryIAParam& che
     }
 }
 
+// if isSetRelated, only
+template <int8_t startBit, int8_t endBit, bool isSetRelated>
+__aicore__ inline void CheckCtrlSprBitRange()
+{
+    static_assert((startBit <= endBit && startBit >= 0 && endBit < 64), "Invalid bit range on current device!");
+    if constexpr(isSetRelated) {
+        static_assert((6 <= startBit && endBit <= 10) || (startBit == endBit && (startBit == 46 || startBit == 47 ||
+            startBit == 48 || startBit == 51 || startBit == 52 || startBit == 53 || startBit == 56 || startBit == 59 ||
+            startBit == 63)), "Invalid startBit / endBit on current device!");
+    }
+}
+
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline void SetCtrlSprImpl(int64_t value)
+{
+    CheckCtrlSprBitRange<startBit, endBit, true>();
+    if (endBit - startBit == 63) {
+        set_ctrl(value);
+        return;
+    }
+    uint64_t mask = ((uint64_t(1) << (endBit - startBit + 1)) - 1) << startBit;
+    mask = ~mask;
+    int64_t setValue = get_ctrl() & mask;
+    setValue |= (value << startBit);
+    set_ctrl(setValue);
+}
+
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline int64_t GetCtrlSprImpl()
+{
+    CheckCtrlSprBitRange<startBit, endBit, false>();
+    int64_t value = get_ctrl();
+    if (endBit - startBit == 63) {
+        return value;
+    }
+    value = value >> startBit;
+    value &= ((uint64_t(1) << (endBit - startBit + 1)) - 1);
+    return value;
+}
+
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline void ResetCtrlSprImpl()
+{
+    CheckCtrlSprBitRange<startBit, endBit, true>();
+    int64_t defaultCtrl = 0x1000000000000008; // default value of ctrl
+    if (endBit - startBit == 63) {
+        set_ctrl(defaultCtrl);
+        return;
+    }
+    uint64_t mask = ((uint64_t(1) << (endBit - startBit + 1)) - 1) << startBit;
+    defaultCtrl = defaultCtrl & mask;
+    mask = ~mask;
+    int64_t value = get_ctrl() & mask;
+    value = value | defaultCtrl;
+    set_ctrl(value);
+}
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__)
