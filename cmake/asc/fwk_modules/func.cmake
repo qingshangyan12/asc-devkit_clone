@@ -1022,11 +1022,12 @@ function(npu_op_package_add target_package_name)
         )
       endif()
       get_target_property(opmaster_so_name ${target_package_name}_ascendc_${_ascendc_tiling_target} OUTPUT_NAME)
-      add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/scripts/install.sh
-        APPEND
-        COMMAND sed -i "s/opmaster_so_name=libcust_opmaster_rt2.0.so/opmaster_so_name=lib${opmaster_so_name}.so/g" ${CMAKE_BINARY_DIR}/scripts/install.sh
-      )
+      if(TARGET modify_vendor AND NOT TARGET ${target_package_name}_update_opmaster_so_name)
+        add_custom_target(${target_package_name}_update_opmaster_so_name ALL
+          COMMAND sed -i "s/opmaster_so_name=libcust_opmaster_rt2.0.so/opmaster_so_name=lib${opmaster_so_name}.so/g" ${CMAKE_BINARY_DIR}/scripts/install.sh
+          DEPENDS modify_vendor
+        )
+      endif()
       if(DEFINED ADD_TARGET_PACKAGE_PATH)
         set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_TILING_PATH ${ADD_TARGET_PACKAGE_PATH})
       else()
@@ -1055,11 +1056,12 @@ function(npu_op_package_add target_package_name)
         set_target_properties(${target_package_name}_ascendc_cust_op_proto PROPERTIES OUTPUT_NAME cust_opsproto_rt2.0)
       endif()
       get_target_property(opsproto_so_name ${target_package_name}_ascendc_cust_op_proto OUTPUT_NAME)
-      add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/scripts/install.sh
-        APPEND
-        COMMAND sed -i "s/opsproto_so_name=libcust_opsproto_rt2.0.so/opsproto_so_name=lib${opsproto_so_name}.so/g" ${CMAKE_BINARY_DIR}/scripts/install.sh
-      )
+      if(TARGET modify_vendor AND NOT TARGET ${target_package_name}_update_opsproto_so_name)
+        add_custom_target(${target_package_name}_update_opsproto_so_name ALL
+          COMMAND sed -i "s/opsproto_so_name=libcust_opsproto_rt2.0.so/opsproto_so_name=lib${opsproto_so_name}.so/g" ${CMAKE_BINARY_DIR}/scripts/install.sh
+          DEPENDS modify_vendor
+        )
+      endif()
       target_sources(${target_package_name}_ascendc_cust_op_proto PRIVATE $<TARGET_OBJECTS:${_ascendc_graph_target}>)
       target_link_libraries(${target_package_name}_ascendc_cust_op_proto PRIVATE intf_pub
         $<IF:$<TARGET_EXISTS:cust_intf_pub>,cust_intf_pub,>
@@ -1112,11 +1114,12 @@ function(npu_op_package_add target_package_name)
         set_target_properties(${target_package_name}_ascendc_cust_opapi PROPERTIES OUTPUT_NAME cust_opapi)
       endif()
       get_target_property(opapi_so_name ${target_package_name}_ascendc_cust_opapi OUTPUT_NAME)
-      add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/scripts/install.sh
-        APPEND
-        COMMAND sed -i "s/opapi_so_name=libcust_opapi.so/opapi_so_name=lib${opapi_so_name}.so/g" ${CMAKE_BINARY_DIR}/scripts/install.sh
-      )
+      if(TARGET modify_vendor AND NOT TARGET ${target_package_name}_update_opapi_so_name)
+        add_custom_target(${target_package_name}_update_opapi_so_name ALL
+          COMMAND sed -i "s/opapi_so_name=libcust_opapi.so/opapi_so_name=lib${opapi_so_name}.so/g" ${CMAKE_BINARY_DIR}/scripts/install.sh
+          DEPENDS modify_vendor
+        )
+      endif()
       target_sources(${target_package_name}_ascendc_cust_opapi PRIVATE
         $<TARGET_OBJECTS:${_ascendc_aclnn_target}>
       )
