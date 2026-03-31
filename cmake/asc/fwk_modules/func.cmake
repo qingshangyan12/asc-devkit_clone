@@ -572,8 +572,9 @@ function(npu_op_package target_package_name)
       OUTPUT_PATH install_path
     )
     install(TARGETS ${target_package_name} EXPORT ${target_package_name}-targets INCLUDES DESTINATION ${install_path})
-    set(ERROR_LOG_FILE "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
+    set(POST_PACK_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
     install(CODE "
+      set(ERROR_LOG_FILE \"${POST_PACK_ERROR_LOG}\")
       if(EXISTS \"${ERROR_LOG_FILE}\")
         file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
         message(STATUS \"\")
@@ -634,8 +635,9 @@ function(npu_op_package target_package_name)
       OUTPUT_PATH install_path
     )
     install(TARGETS ${target_package_name} EXPORT ${target_package_name}-targets INCLUDES DESTINATION ${install_path})
-    set(ERROR_LOG_FILE "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
+    set(POST_PACK_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
     install(CODE "
+      set(ERROR_LOG_FILE \"${POST_PACK_ERROR_LOG}\")
       if(EXISTS \"${ERROR_LOG_FILE}\")
         file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
         message(STATUS \"\")
