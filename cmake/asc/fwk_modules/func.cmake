@@ -1408,6 +1408,7 @@ function(npu_op_package_add target_package_name)
         if (${kernel_enable_binary_package})
           # gen binary_info_config.json and <file_name>.json
           if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
+            set(BINCMP_COMPILE_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile.log")
             set(CONFIG_CMD
               "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/insert_simplified_keys.py \
                   -p ${kernel_binary_dir}/binary/${compute_unit} && \
@@ -1416,7 +1417,7 @@ function(npu_op_package_add target_package_name)
                   -s ${compute_unit} && \
                   mkdir -p ${kernel_binary_dir}/binary/config/${compute_unit} && \
                   mv ${kernel_binary_dir}/binary/${compute_unit}/*.json \
-                  ${kernel_binary_dir}/binary/config/${compute_unit} || true"
+                  ${kernel_binary_dir}/binary/config/${compute_unit} > ${BINCMP_COMPILE_LOG} 2>&1 || true"
             )
 
             add_custom_target(${_ascendc_kernel_target}_ascendc_bin_${compute_unit}_gen_ops_config
