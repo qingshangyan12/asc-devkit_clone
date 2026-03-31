@@ -204,3 +204,76 @@ $$
   ```log
   SUCCESS
   ```
+
+## 缓存编译加速（可选）
+
+本样例支持通过 ccache 加速重复编译，提供单机缓存和分布式缓存两种模式。
+
+### 前提条件
+
+- ccache >= 4.0（`ccache --version` 确认输出中含 `redis-storage`）
+
+  ```bash
+  apt install ccache
+  ```
+
+### 单机缓存
+
+通过 cmake 参数启用，无需修改 CMakeLists.txt：
+
+```bash
+mkdir -p build && cd build
+cmake -DENABLE_CCACHE=ON .. && make -j binary package
+```
+
+首次编译后，清空 build 目录重建可命中缓存：
+
+```bash
+rm -rf build && mkdir -p build && cd build
+cmake -DENABLE_CCACHE=ON .. && make -j binary package
+```
+
+查看缓存统计：
+
+```bash
+ccache --show-stats
+# 预期：二次编译 Primary storage Hits 100%
+```
+
+### 分布式缓存（ccache + Redis）
+
+适用于多机共享缓存场景：机器 A 编译后将结果推送至 Redis，机器 B 直接从 Redis 命中，无需重复编译。
+
+**1. 部署 Redis 服务**（在 Redis 服务器上执行）：
+
+```bash
+apt install redis-server
+redis-server --daemonize yes --bind 0.0.0.0 --port 6379
+```
+
+**2. 在各编译机器上配置 ccache**（将 `<REDIS_IP>` 替换为 Redis 服务器的实际 IP 地址）：
+
+```bash
+# 验证 Redis 可达
+redis-cli -h <REDIS_IP> -p 6379 ping   # 返回 PONG 表示连通
+
+# 配置 Redis 为二级缓存
+ccache --set-config=secondary_storage=redis://<REDIS_IP>:6379
+
+# 若各机器编译器路径不同但版本一致，按内容匹配编译器
+ccache --set-config=compiler_check=content
+```
+
+**3. 编译**（与单机模式相同）：
+
+```bash
+mkdir -p build && cd build
+cmake -DENABLE_CCACHE=ON .. && make -j binary package
+```
+
+机器 A 编译后缓存写入 Redis，机器 B 执行相同命令时从 Redis 命中。查看统计：
+
+```bash
+ccache --show-stats
+# 预期：机器 A Secondary storage Misses > 0；机器 B Secondary storage Hits > 0
+```
