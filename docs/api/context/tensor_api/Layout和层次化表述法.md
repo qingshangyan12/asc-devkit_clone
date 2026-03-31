@@ -12,11 +12,11 @@ Shape用于表达Tensor形状，Stride则用于区分不同的排布：
 
 图中每个方格中的数字表示该位置元素在内存中按顺序排列时的下标。对于相同的矩阵位置，排布方式不同时，其在内存中的顺序可能是不同的，例如，矩阵坐标 \(1, 0\) 在行优先和列优先的情况下，对应元素在内存中的顺序分别是4和1。
 
-![行优先排布](/figure/行优先排布.png)
 **图 1**  行优先排布  
+![行优先排布](/figure/行优先排布.png)
 
-![列优先排布](/figure/列优先排布.png )
 **图 2**  列优先排布  
+![列优先排布](/figure/列优先排布.png )
 
 ## 层次化表述法
 
@@ -28,8 +28,8 @@ Shape用于表达Tensor形状，Stride则用于区分不同的排布：
 
 - Stride\(\(1, 4\), \(2, 12\)\)
 
-![层次化表述法](/figure/层次化表述法.png "层次化表述法")
 **图 3**  层次化表述法  
+![层次化表述法](/figure/层次化表述法.png "层次化表述法")
 
 图中展示了两层矩阵：内层矩阵为内部用灰色线包裹的矩阵，外层矩阵为将内层矩阵视为一个元素时黑色线包裹的矩阵。
 
@@ -67,8 +67,8 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     Stride = ((Std::Int<32 / sizeof(T)>{}, Std::Int<32 / sizeof(T) * 16>{}), (Std::Int<1>{}, 32 / sizeof(T) * row))
     ```
 
-    ![分形变换](/figure/分形变换.png)
     **图 4**  NZ Layout示意图  
+    ![分形变换](/figure/分形变换.png)
 
     通过[MakeNzLayout](struct/layout/layout_fractal/MakeNZLayout.md)接口可以快速构造连续的NZ Layout格式，自行设置StrideRow1和StrideColum1可以构造非连续的NZ Layout格式。
 
@@ -92,8 +92,8 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     Stride = ((Std::Int<1>{}, 32 / sizeof(T) * column), (Std::Int<32 / sizeof(T)>{}, Std::Int<32 / sizeof(T) * 16>{}))
     ```
 
-    ![分形变换](/figure/分形变换-0.png)
     **图 5**  ZN Layout示意图  
+    ![分形变换](/figure/分形变换-0.png) 
 
     通过[MakeZnLayout](struct/layout/layout_fractal/MakeZNLayout.md)接口可以快速构造连续的ZN Layout格式，自行设置StrideRow1和StrideColum1可以构造非连续的ZN Layout格式。
 
@@ -115,8 +115,8 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     Stride = ((Std::Int<0>{}, column),(Std::Int<0>{}, Std::Int<1>{}))
     ```
 
-    ![分形变换](/figure/分形变换-1.png)
     **图 6**  ND Layout示意图  
+    ![分形变换](/figure/分形变换-1.png)
 
     通过[MakeNDLayout](struct/layout/layout_fractal/MakeNDLayout.md)接口可以快速的构造连续的ND Layout格式，自行设置StrideRow1可以构造非连续的ND Layout格式。
 
@@ -138,8 +138,8 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     Stride = ((Std::Int<0>{}, Std::Int<1>{}),(Std::Int<0>{}, row))
     ```
 
-    ![分形变换](/figure/分形变换-2.png)
     **图 7**  DN Layout示意图  
+    ![分形变换](/figure/分形变换-2.png) 
 
     通过[MakeDNLayout](struct/layout/layout_fractal/MakeDNLayout.md)接口可以快速的构造连续的DN Layout格式，自行设置StrideColumn1值可以构造非连续的DN Layout格式。
 
