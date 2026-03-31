@@ -145,16 +145,16 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 ## 数据结构表
 
-每种分形对应的Layout格式如下表所示。
+每种分形对应的Layout格式如下表所示，其中T指的是支持的数据类型中除fp8_e8m0_t之外的数据类型，C0_ELEMENT = Std::Int<32/sizeof(T)>{}，特殊情况当T为fp4x2_e2m1_t或fp4x2_e1m2_t时，C0_ELEMENT = Std::Int<64>{}。
 
 | LayoutFormat | 类型 | ShapeRow0 | ShapeRow1 | ShapeColumn0 | ShapeColumn1 | StrideRow0 | StrideRow1 | StrideColumn0 | StrideColumn1 |
 |-------------|------|-----------|-----------|--------------|--------------|------------|------------|---------------|---------------|
-| NZ | T | Int<16>{} | ceil_div(row, Int<16>{}) | Int<32/sizeof(T)>{} | ceil_div(column, Int<32/sizeof(T)>{}) | Int<32/sizeof(T)>{} | Int<32/sizeof(T)>{} * Int<16>{} | Int<1>{} | Int<32/sizeof(T)>{} * ceil_align(row, Int<16>{}) |
-| L0C | / | Int<16>{} | ceil_div(row, Int<16>{}) | Int<32/sizeof(T)>{} | ceil_div(column, Int<32/sizeof(T)>{}) | Int<32/sizeof(T)>{} | Int<32/sizeof(T)>{} * Int<16>{} | Int<1>{} | Int<32/sizeof(T)>{} * ceil_align(row, Int<16>{}) |
-| ZN | T | Int<32/sizeof(T)>{} | ceil_div(row, Int<32/sizeof(T)>{}) | Int<16>{} | ceil_div(column, Int<16>{}) | Int<1>{} | Int<32/sizeof(T)>{} * ceil_align(column, Int<16>{}) | Int<32/sizeof(T)>{} | Int<32/sizeof(T)>{} * Int<16>{} |
+| NZ | T | Int<16>{} | ceil_div(row, Int<16>{}) | C0_ELEMENT | ceil_div(column, C0_ELEMENT) | C0_ELEMENT | C0_ELEMENT * Int<16>{} | Int<1>{} | C0_ELEMENT * ceil_align(row, Int<16>{}) |
+| L0C | / | Int<16>{} | ceil_div(row, Int<16>{}) | C0_ELEMENT | ceil_div(column, C0_ELEMENT) | C0_ELEMENT | C0_ELEMENT * Int<16>{} | Int<1>{} | C0_ELEMENT * ceil_align(row, Int<16>{}) |
+| ZN | T | C0_ELEMENT | ceil_div(row, C0_ELEMENT) | Int<16>{} | ceil_div(column, Int<16>{}) | Int<1>{} | C0_ELEMENT * ceil_align(column, Int<16>{}) | C0_ELEMENT | C0_ELEMENT * Int<16>{} |
 | DN | T | Int<1>{} | row | Int<1>{} | column | Int<0>{} | Int<1>{} | Int<0>{} | row |
 | ND | T | Int<1>{} | row | Int<1>{} | column | Int<0>{} | column | Int<0>{} | Int<1>{} |
-| ZZ | T | Int<16>{} | ceil_div(row, Int<16>{}) | Int<32/sizeof(T)>{} | ceil_div(column, Int<32/sizeof(T)>{}) | Int<32/sizeof(T)>{} | Int<16>{} * ceil_align(column, Int<32/sizeof(T)>{}) | Int<1>{} | Int<32/sizeof(T)>{} * Int<16>{} |
+| ZZ | T | Int<16>{} | ceil_div(row, Int<16>{}) | C0_ELEMENT | ceil_div(column, C0_ELEMENT) | C0_ELEMENT | Int<16>{} * ceil_align(column, C0_ELEMENT) | Int<1>{} | C0_ELEMENT * Int<16>{} |
 | ZZ | fp8_e8m0_t | Int<16>{} | ceil_div(row, Int<16>{}) | Int<2>{} | column / Int<2>{} | Int<2>{} | column * Int<16>{} | Int<1>{} | Int<32>{} |
 | NN | fp8_e8m0_t | Int<2>{} | row / Int<2>{} | Int<16>{} | ceil_div(column, Int<16>{}) | Int<1>{} | Int<32>{} | Int<2>{} | row * Int<16>{} |
 | ScaleAND | fp8_e8m0_t | Int<1>{} | row | Int<1>{} | column | Int<0>{} | column | Int<0>{} | Int<1>{} |
