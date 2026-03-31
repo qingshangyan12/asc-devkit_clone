@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    #根据是否要使能unitflag在以下两个.asc文件中切换
-    #mmad_unitflag_disable.asc
-    mmad_unitflag_enable.asc
+    #根据测试场景在以下.asc文件中切换
+    # mmad_unitflag_n_round.asc    #沿N轴切分
+    mmad_unitflag_k_round.asc     #沿K轴切分
 )
 
 target_link_libraries(demo PRIVATE
@@ -26,6 +26,19 @@ target_link_libraries(demo PRIVATE
     platform
     m
 )
+
+message(STATUS "[INFO] EN_UNITFLAG is ${EN_UNITFLAG}")
+
+target_compile_definitions(demo PRIVATE
+    EN_UNITFLAG=${EN_UNITFLAG}
+)
+
+# ======================================================================================
+# NPU 编译选项配置
+#
+# 说明：
+#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+# ======================================================================================
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
 )

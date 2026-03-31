@@ -3,7 +3,11 @@
 
 ## 概述
 
-本样例介绍是否使能unitFlag对于Mmad指令执行矩阵乘法性能的影响。
+本样例介绍了在沿K轴切分和沿N轴切分两种场景下，unitFlag功能的使能方式，以及对应的性能测试和调优的方法。  
+
+unitFlag是一种实现Mmad指令与Fixpipe指令细粒度并行的优化特性，使能后硬件每计算完一个分形即可将结果搬出，从而提升矩阵乘法的执行效率。  
+样例提供了两种典型切分场景的实现： 沿K轴切分 （多次Mmad对应一次Fixpipe）和 沿N轴切分 （一次Mmad对应多次Fixpipe），详细说明了unitFlag参数（取值2或3）在不同场景下的配置策略。  
+此外，样例还涵盖了性能调优方法，包括上板调优和仿真调优两种模式，帮助开发者定位性能瓶颈并优化算子实现。
 
 ## 支持的产品
 
@@ -15,23 +19,34 @@
 ```
 ├── mmad_unitflag
 │   ├── scripts
-│   │   ├── gen_data.py             // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
-│   ├── CMakeLists.txt              // 编译工程文件
-│   ├── data_utils.h                // 数据读入写出函数
-│   └── mmad_unitflag_disable.asc                    // 不使能unitFlag
-│   └── mmad_unitflag_enable.asc                    // 使能unitFlag
+│   │   ├── gen_data.py                      // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py                 // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt                       // 编译工程文件
+│   ├── data_utils.h                         // 数据读入写出函数
+│   ├── mmad_unitflag_k_round.asc            // 沿K轴切分
+│   └── mmad_unitflag_n_round.asc            // 沿N轴切分
 ```
 
-## 算子描述
+## 样例描述
 
-unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。取值说明如下：
-0：保留值；
-2：使能unitFlag，硬件执行完指令之后，不会关闭unitFlag功能；
-3：使能unitFlag，硬件执行完指令之后，会将unitFlag功能关闭。
-使能该功能时，Mmad指令的unitFlag在最后1个分形设置为3、其余分形计算设置为2即可。
+- 沿K轴切分：  
+A矩阵shape为[128, 512]，B矩阵shape为[512, 256]，执行矩阵乘法时，需要沿着K轴进行迭代循环，假设每次迭代K长度为64，则需要迭代8次，此时8次Mmad对应1次Fixpipe操作。  
+前7次Mmad的unitFlag都设置为2，保证后续Mmad可以写入L0C；  
+最后1次Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；  
+Fixpipe的unitFlag设置为3，保证后续Mmad可以顺利写入L0C。
 
-下面以一个示例说明使能unitFlag前后。假设有A矩阵shape为[128, 512],B矩阵shape为[512, 256],执行A、B矩阵乘法时，需要沿着K轴进行迭代循环，假设每次迭代K长度为64，则需要迭代8次，此时8次Mmad对应1次Fixpipe操作。此时，前7次Mmad的unitFlag都设置为2，保证后续Mmad可以写入L0C；最后1次Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；当Mmad使能unitFlag时，Fixpipe也必须使能unitFlag，Fixpipe的unitFlag设置为3，保证后续Mmad可以顺利写入L0C。
+- 沿N轴切分：  
+A矩阵shape为[128, 128]，B矩阵shape为[128, 256]，执行矩阵搬出时，沿着N轴分2次搬出，此时1次Mmad对应2次Fixpipe操作。  
+Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；  
+每次Fixpipe的unitFlag都设置为3，保证后续其他Mmad在复用这块L0C地址时可以顺利写入。  
+
+- unitFlag参数说明：  
+unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：  
+0：不使能unitFlag；  
+1：保留值；  
+2：使能unitFlag，硬件执行完指令之后，不会关闭unitFlag功能；  
+3：使能unitFlag，硬件执行完指令之后，会将unitFlag功能关闭。  
+使能该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。  
 
 另外，需要注意当使能unitFlag时，L0C上的LocalTensor不能用[TQue](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0137.html)获取，需要改用[TBuf](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0161.html)。
 
@@ -51,6 +66,7 @@ unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能�
 ```bash
 msprof op ./demo
 ```
+
 **2.查看性能数据**
 
 在当前目录下会生成OPPPROF_为前缀的文件夹，目录结构及文件说明如下：
@@ -81,17 +97,20 @@ cmake -DRUN_MODE=sim -DSOC_VERSION=${SOC_VERSION} ..
 # 多线程编译
 make -j$(nproc)     
 ```
+
 **2.配置运行时依赖**
 
 添加运行时依赖库路径（需替换{SOC_VERSION}为实际NPU型号）：
 ```bash
 export LD_LIBRARY_PATH=${ASCEND_HOME_PATH}/tools/simulator/${SOC_VERSION}/lib/:$LD_LIBRARY_PATH  
 ```
+
 **3.执行仿真调优命令**
 
 ```bash
 msprof op simulator ./demo
 ```
+
 **4.查看仿真性能数据**
 
 当前目录下会生成OPPROF_前缀的文件夹，目录结构如下：
@@ -107,7 +126,9 @@ OPPROF_2025xxxx_XXXXXX
     ├── visualize_data.bin                  # 算子可视化文件（可通过MindStudio Insight加载，直观查看算子性能）
     └── trace.json                          # 算子所有核的流水图
 ```
+
 **补充说明**
+
 更多性能指标的详细说明及调优方案，可参考《算子开发工具》手册。
 
 ## 编译运行
@@ -131,9 +152,11 @@ OPPROF_2025xxxx_XXXXXX
     ```
 - 样例执行
   ```bash
+  ENUNITFLAG=true ROUNDMODE=1      # ENUNITFLAG true:使能unitflag false:不使能unitflag  ROUNDMODE 1:沿K轴切分 2：沿N轴切分
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake ..;make -j;                # 编译工程，注意CMakeLists中根据是否要使能unitflag在以下两个.asc文件中切换
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  cmake .. -DEN_UNITFLAG=$ENUNITFLAG; 
+  make -j;                # 编译工程，注意CMakeLists中需根据切分方式切换使用的.asc文件
+  python3 ../scripts/gen_data.py   -round_mode=$ROUNDMODE  # 生成测试输入数据，需根据切分方式切换，1：沿K轴切分 2：沿N轴切分
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
