@@ -26,6 +26,7 @@ opapi_relpath=$vendordir/op_api/lib/${opapi_so_name}
 QUIET="y"
 INSTALL_FOR_ALL="n"
 FORCE_INSTALL="n"
+VALIDATE_DEBUG="y" # Debug-only switch. Set to "n" or remove in release.
 
 CURR_OPERATE_USER="$(id -nu 2>/dev/null)"
 CURR_OPERATE_GROUP="$(id -ng 2>/dev/null)"
@@ -62,6 +63,12 @@ done
 log() {
     cur_date=$(date +"%Y-%m-%d %H:%M:%S")
     echo "[ops_custom] [$cur_date] "$1
+}
+
+debug_log() {
+    if [ "${VALIDATE_DEBUG}" = "y" ]; then
+        log "[DEBUG] $1"
+    fi
 }
 
 resolve_so_path() {
@@ -132,13 +139,25 @@ validate_so_dlopen() {
     local so_path="$1"
     local so_name="$2"
     local err_msg=""
+    local so_dir=""
+    local dlopen_lib_path=""
 
-    err_msg=$(python3 - "${so_path}" << 'PY'
+    debug_log "validate_so_dlopen start: so=${so_name}, path=${so_path}, ASCEND_HOME_PATH=${ASCEND_HOME_PATH}"
+    so_dir=$(dirname "${so_path}")
+    dlopen_lib_path="${so_dir}:${sourcedir}/${vendordir}/op_api/lib"
+    if [ -n "${ASCEND_HOME_PATH}" ]; then
+        dlopen_lib_path="${dlopen_lib_path}:${ASCEND_HOME_PATH}/lib64"
+    fi
+
+    err_msg=$(LD_LIBRARY_PATH="${dlopen_lib_path}:${LD_LIBRARY_PATH}" python3 - "${so_path}" << 'PY'
 import ctypes
 import os
 import sys
 
 path = sys.argv[1]
+if not os.path.exists(path):
+    print(f"{path}: file not found in package")
+    sys.exit(1)
 try:
     ctypes.CDLL(path, mode=os.RTLD_NOW)
 except Exception as exc:
@@ -147,9 +166,11 @@ except Exception as exc:
 PY
 )
     if [ $? -ne 0 ]; then
+        err_msg="${err_msg//${so_path}/${so_name}}"
         log "[ERROR] Failed to load ${so_name} wish env ASCEND_HOME_PATH(${ASCEND_HOME_PATH}),error message is ${err_msg}."
         return 1
     fi
+    debug_log "validate_so_dlopen success: so=${so_name}"
     return 0
 }
 
@@ -161,6 +182,7 @@ validate_so_arch() {
     local env_arch=""
     local so_arch_display=""
 
+    debug_log "validate_so_arch start: so=${so_name}, path=${so_path}"
     so_machine_raw=$(readelf -h "${so_path}" 2>/dev/null | awk -F: '/Machine:/{gsub(/^ +/, "", $2); print $2; exit}')
     if [ -z "${so_machine_raw}" ]; then
         log "[ERROR] Failed to parse architecture from '${so_name}'."
@@ -175,6 +197,7 @@ validate_so_arch() {
         log "[ERROR] The architecture of the shared library '${so_name}' (${so_arch_display}) is incompatible with the current running environment (${env_arch})."
         return 1
     fi
+    debug_log "validate_so_arch success: so=${so_name}, so_arch=${so_arch_display}, env_arch=${env_arch}"
     return 0
 }
 
@@ -184,8 +207,10 @@ validate_so_glibc() {
     local required_glibc=""
     local env_glibc=""
 
+    debug_log "validate_so_glibc start: so=${so_name}, path=${so_path}"
     required_glibc=$(strings -a "${so_path}" 2>/dev/null | grep -o 'GLIBC_[0-9]\+\.[0-9]\+' | sed 's/GLIBC_//' | sort -V | tail -n 1)
     if [ -z "${required_glibc}" ]; then
+        debug_log "validate_so_glibc skip: so=${so_name}, no GLIBC symbol found"
         return 0
     fi
 
@@ -199,6 +224,7 @@ validate_so_glibc() {
         log "[ERROR] The shared library '${so_name}' was linked against a newer version of the GNU C Library (glibc). The current runtime enviroment has an older version of glibs, which does not provide the required symbols."
         return 1
     fi
+    debug_log "validate_so_glibc success: so=${so_name}, required_glibc=${required_glibc}, env_glibc=${env_glibc}"
     return 0
 }
 
@@ -206,12 +232,15 @@ validate_shared_libraries() {
     local so_name=""
     local so_path=""
 
+    debug_log "validate_shared_libraries enter"
     if [ "${FORCE_INSTALL}" = "y" ]; then
         log "[WARNING] --force is enabled, skip shared library validation."
+        debug_log "validate_shared_libraries bypass by --force"
         return 0
     fi
 
     for so_name in "${opmaster_so_name}" "${opsproto_so_name}" "${opapi_so_name}"; do
+        debug_log "validate_shared_libraries checking so=${so_name}"
         so_path=$(resolve_so_path "${so_name}")
         if [ -z "${so_path}" ] || [ ! -f "${so_path}" ]; then
             log "[ERROR] Failed to find shared library '${so_name}' in package path."
@@ -219,12 +248,16 @@ validate_shared_libraries() {
         fi
 
         if [ -n "${ASCEND_HOME_PATH}" ]; then
+            debug_log "validate_shared_libraries branch=dlopen so=${so_name}"
             validate_so_dlopen "${so_path}" "${so_name}" || return 1
         else
+            debug_log "validate_shared_libraries branch=arch+glibc so=${so_name}"
             validate_so_arch "${so_path}" "${so_name}" || return 1
             validate_so_glibc "${so_path}" "${so_name}" || return 1
         fi
+        debug_log "validate_shared_libraries checked so=${so_name} success"
     done
+    debug_log "validate_shared_libraries success"
     return 0
 }
 
