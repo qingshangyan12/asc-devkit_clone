@@ -25,7 +25,19 @@ add_executable(demo
 # 说明：
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
+set(NPU_ARCH "dav-2201")
+# set(NPU_ARCH "dav-3510")
+
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH}>
+)
+
+# ======================================================================================
+# 数据生成脚本配置
+# ======================================================================================
+add_custom_target(gen_data
+    COMMAND ${CMAKE_COMMAND} -E env NPU_ARCH=${NPU_ARCH} python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_data.py
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating test data for ${NPU_ARCH}"
+    VERBATIM
 )
