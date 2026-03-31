@@ -27,6 +27,44 @@
 namespace AscendC {
 namespace Te {
 
+enum class CacheMode {
+    CACHE_MODE_DISABLE = 0,
+    CACHE_MODE_NORMAL = 1,
+    CACHE_MODE_LAST = 2,
+    CACHE_MODE_PERSISTENT = 4
+};
+
+struct L2CacheAlter3510 {
+template <typename Iterator>
+    __aicore__ __inline__ static void Run(Iterator& storage, CacheMode mode)
+    {
+        constexpr uint64_t L2_CACHE_OFFSET = 60;
+        constexpr uint64_t L2_CACHE_OFFSET_MASK = (1ul << L2_CACHE_OFFSET) - 1;
+
+        uint64_t value = 0;
+        if (mode == CacheMode::CACHE_MODE_DISABLE) {
+            value = uint64_t(0b100) << L2_CACHE_OFFSET;
+        } else if (mode == CacheMode::CACHE_MODE_NORMAL) {
+            value = uint64_t(0b000) << L2_CACHE_OFFSET;
+        }
+        storage = storage & L2_CACHE_OFFSET_MASK | value;
+    }
+};
+
+using L2CacheAlterSet = Std::tuple<Std::tuple<Std::Int<ArchVersion::V3510>, L2CacheAlter3510>>;
+
+template <typename Pattern, typename Tuple = L2CacheAlterSet>
+struct FindL2CacheAlterSet;
+
+template <typename Pattern, typename Function, typename... Rest>
+struct FindL2CacheAlterSet<Pattern, Std::tuple<Std::tuple<Pattern, Funtion>, Rest...>> {
+    using type = Function;
+}
+
+template <typename Pattern, typename NotMatchTuple, typename... Rest>
+struct FindL2CacheAlterSet<Pattern, Std::tuple<NotMatchTuple, Rest...>>
+    : FindL2CacheAlterSet<Pattern, Std::tuple<Rest...>> {};
+
 template <typename Iterator>
 struct ViewEngine
 {
@@ -42,6 +80,11 @@ struct ViewEngine
         return storage;
     }
     __aicore__ inline constexpr ViewEngine(iterator storage = {}) : storage(storage) {}
+
+    __aicore__ inline constexpr void SetL2CacheHint(CacheMode mode) const {
+        using l2CacheAlter = typename FindL2CacheAlterSet<Std::Int<CURRENT_ARCH_VERSION>>::type;
+        l2CacheAlter::Run(storage, mode);
+    }
 private:
     iterator storage;
 };
