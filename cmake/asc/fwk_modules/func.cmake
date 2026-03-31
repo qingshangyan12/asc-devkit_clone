@@ -196,12 +196,12 @@ function(simple_kernel_compile)
     set(BINCMP_OPS_INFO ${auto_gen_path}/aic-${BINCMP_COMPUTE_UNIT}-ops-info.ini)
   endif()
   get_property(bincmp_enable_binary_package GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_ENABLE_BINARY_PACKAGE)
-  set(BINCMP_ERROR_LOG "${BINCMP_OUT_DIR}/compile_error.log")
-  set(BINCMP_COMPILE_LOG "${BINCMP_OUT_DIR}/compile.log")
+  set(BINCMP_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile_error.log")
+  set(BINCMP_COMPILE_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile.log")
 
   if (NOT ${ENABLE_CROSS_COMPILE})
     if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
-      set(COMPILE_CMD 
+      set(COMPILE_CMD
         "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \
             --op-type=${BINCMP_OP_TYPE} \
             --src-file=${BINCMP_SRC} \
@@ -255,7 +255,7 @@ function(simple_kernel_compile)
       message(FATAL_ERROR "Native host libs was not set for cross compile!")
     endif()
     if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
-      set(COMPILE_CMD 
+      set(COMPILE_CMD
         "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py \
             --op-type=${BINCMP_OP_TYPE} \
             --src-file=${BINCMP_SRC} \
@@ -511,7 +511,7 @@ function(npu_op_package target_package_name)
       if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
         set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_BINARY_DIR}/post_pack_script.cmake")
         file(WRITE "${CPACK_POST_BUILD_SCRIPTS}" "
-          set(ERROR_LOG_FILE \"\${KERNEL_BINARY_PATH}/compile_error.log\")
+          set(ERROR_LOG_FILE \"\${CMAKE_CURRENT_BINARY_DIR}/compile_error.log\")
           if(EXISTS \"\${ERROR_LOG_FILE}\")
             file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
             message(STATUS \"=========== Failed operators ===========\")
@@ -565,6 +565,7 @@ function(npu_op_package target_package_name)
       OUTPUT_PATH install_path
     )
     install(TARGETS ${target_package_name} EXPORT ${target_package_name}-targets INCLUDES DESTINATION ${install_path})
+    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/post_install.cmake)")
     adapt_install_path(
       INPUT_PATH lib/cmake/${target_package_name}
       INPUT_TARGET ${target_package_name}
@@ -585,13 +586,6 @@ function(npu_op_package target_package_name)
     )
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
-
-    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
-      install(CODE "
-        file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
-        message(STATUS \"List of failure operators:\n ${LOG_CONTENT}\")
-      ")
-    endif()
 
   elseif("${_upper_target_type}" STREQUAL "SHARED")
     add_library(${target_package_name} SHARED)
@@ -622,6 +616,7 @@ function(npu_op_package target_package_name)
       OUTPUT_PATH install_path
     )
     install(TARGETS ${target_package_name} EXPORT ${target_package_name}-targets INCLUDES DESTINATION ${install_path})
+    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/post_install.cmake)")
     adapt_install_path(
       INPUT_PATH lib/cmake/${target_package_name}
       INPUT_TARGET ${target_package_name}
@@ -642,13 +637,6 @@ function(npu_op_package target_package_name)
     )
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}-config.cmake
       DESTINATION ${install_path})
-
-    if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
-      install(CODE "
-        file(READ \"${KERNEL_BINARY_PATH}/compile_error.log\" LOG_CONTENT)
-        message(STATUS \"List of failure operators:\n \${LOG_CONTENT}\")
-      ")
-    endif()
   endif()
 endfunction()
 
@@ -939,26 +927,6 @@ function(get_current_pack_target sub_target output_var)
   endif()
 endfunction()
 
-function(get_is_all_op_fail BINCMP_OUT_DIR TYPE_NAME_LIST target_name)
-  execute_process(
-      COMMAND grep -c "fail op-type:" "${BINCMP_OUT_DIR}/compile_error.log"
-      OUTPUT_VARIABLE FAILED_COUNT
-      ERROR_QUIET
-  )
-
-  list(LENGTH TYPE_NAME_LIST TOTAL_COUNT)
-
-  if(NOT FAILED_COUNT)
-      set(FAILED_COUNT 0)
-  endif()
-
-  set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_name}_ALL_FAIL False)
-  if(${FAILED_COUNT} EQUAL ${TOTAL_COUNT})
-      set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_name}_ALL_FAIL True)
-      message(STATUS "All ${FAILED_COUNT} operators failed out of ${TOTAL_COUNT} total")
-  endif()
-endfunction()
-
 function(npu_op_package_add target_package_name)
   cmake_parse_arguments(ADD_TARGET "" "PACKAGE_PATH" "TYPE;LIBRARY;FILES" ${ARGN})
   if(DEFINED ADD_TARGET_LIBRARY AND DEFINED ADD_TARGET_FILES)
@@ -1131,7 +1099,7 @@ function(npu_op_package_add target_package_name)
     add_custom_command(TARGET ${_ascendc_kernel_target}_check_all_fail
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/check_all_fail.cmake
-              -DOUT_DIR=${KERNEL_BINARY_PATH}/binary
+              -DOUT_DIR=${CMAKE_CURRENT_BINARY_DIR}
               -DTYPE_COUNT=${KERNEL_COMPILE_TARGET_COUNT}
               -DTARGET_NAME=${target_package_name}
               -DPROPERTY_NAME=_ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL
