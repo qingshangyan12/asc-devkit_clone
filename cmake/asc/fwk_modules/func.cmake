@@ -575,7 +575,7 @@ function(npu_op_package target_package_name)
     set(POST_PACK_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
     install(CODE "
       set(ERROR_LOG_FILE \"${POST_PACK_ERROR_LOG}\")
-      if(EXISTS \"${ERROR_LOG_FILE}\")
+      if(EXISTS \"\${ERROR_LOG_FILE}\")
         file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
         message(STATUS \"\")
         message(STATUS \"=========== Failed operators ===========\")
@@ -638,7 +638,7 @@ function(npu_op_package target_package_name)
     set(POST_PACK_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
     install(CODE "
       set(ERROR_LOG_FILE \"${POST_PACK_ERROR_LOG}\")
-      if(EXISTS \"${ERROR_LOG_FILE}\")
+      if(EXISTS \"\${ERROR_LOG_FILE}\")
         file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
         message(STATUS \"\")
         message(STATUS \"=========== Failed operators ===========\")
@@ -1510,6 +1510,7 @@ function(npu_op_package_add target_package_name)
         )
         install(DIRECTORY ${kernel_binary_dir}/binary/config/
                 DESTINATION ${install_path}
+                OPTIONAL
         )
       endif()
 
