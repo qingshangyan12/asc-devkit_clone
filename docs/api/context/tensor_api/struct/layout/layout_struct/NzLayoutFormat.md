@@ -37,9 +37,7 @@ struct NzLayoutFormat {
 
 - 输入为编译时常量时，返回DN格式的Layout类型。
 - 输入为整型变量时，返回DN格式的Layout对象。
-- NzLayout的小分形行数为16，列数为32B/sizeof(T)。
-- **自动对齐**: 如果输入的行数不是 16 的倍数，列数不是32B/sizeof(T)的倍数，返回的Layout会向上取整。例如：
-  - 对于T为half类型，输入 `row = 17, column = 33` 会自动对齐为 `row = 32, column = 48`。
+- 返回对齐后的Layout，对齐方式及对应位置的参数大小说明详见[Layout和层次化表述法](../../../Layout和层次化表述法.md)。
 
 ## 约束说明
 

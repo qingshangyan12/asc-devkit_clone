@@ -1,4 +1,3 @@
-<!-- codespell:ignore Cosize -->
 # Cosize
 
 ## 产品支持情况

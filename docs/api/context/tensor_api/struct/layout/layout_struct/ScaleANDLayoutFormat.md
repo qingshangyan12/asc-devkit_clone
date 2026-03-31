@@ -37,7 +37,7 @@ struct ScaleANDLayoutFormat {
 
 - 输入为编译时常量时，返回DN格式的Layout类型。
 - 输入为整型变量时，返回DN格式的Layout对象。
-- ScaleAND格式的小分形固定为，行数固定为1，列数为1。
+- 返回对齐后的Layout，对齐方式及对应位置的参数大小说明详见[Layout和层次化表述法](../../../Layout和层次化表述法.md)。
 
 ## 约束说明
 

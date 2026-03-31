@@ -37,6 +37,7 @@ __aicore__ inline decltype(auto) MakeL0CLayout(U row, S column)
 
 - 输入为编译时常量时，返回L0C格式的Layout类型。
 - 输入为整型变量时，返回L0C格式的Layout对象。
+- 返回对齐后的Layout，对齐方式及对应位置的参数大小说明详见[Layout和层次化表述法](../../../Layout和层次化表述法.md)。
 
 ## 约束说明
 

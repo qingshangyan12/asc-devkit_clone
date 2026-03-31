@@ -37,12 +37,8 @@ struct ZnLayoutFormat {
 
 - 输入为编译时常量时，返回Zn格式的Layout类型。
 - 输入为整型变量时，返回Zn格式的Layout对象。
-- 对于T数据类型为fp4x2_e2m1_t、fp4x2_e1m2_t时，NzLayout的小分形行数为64，列数为16。
-- **自动对齐**: 如果输入的行数不是 64 的倍数，列数不是16的倍数，返回的Layout会向上取整。例如：
-  - 对于T为half类型，输入 `row = 17, column = 33` 会自动对齐为 `row = 64, column = 48`。
-- 对于T数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t时，NzLayout的小分形行数为32B/sizeof(T) ，列数为16。
-- **自动对齐**: 如果输入的行数不是 32B/sizeof(T) 的倍数，列数不是16的倍数，返回的Layout会向上取整。例如：
-  - 对于T为half类型，输入 `row = 17, column = 33` 会自动对齐为 `row = 32, column = 48`。
+- 返回对齐后的Layout，对齐方式及对应位置的参数大小说明详见[Layout和层次化表述法](../../../Layout和层次化表述法.md)。
+
 
 ## 约束说明
 
