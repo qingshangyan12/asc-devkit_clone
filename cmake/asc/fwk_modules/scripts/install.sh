@@ -10,14 +10,22 @@
 # ----------------------------------------------------------------------------------------------------------
 
 vendor_name=customize
+opmaster_so_name=libcust_opmaster_rt2.0.so
+opsproto_so_name=libcust_opsproto_rt2.0.so
+opapi_so_name=libcust_opapi.so
 targetdir=/usr/local/Ascend/opp
 target_custom=0
 
 sourcedir=$PWD/packages
 vendordir=vendors/$vendor_name
+host_arch=$(uname -m)
+opmaster_relpath=$vendordir/op_impl/ai_core/tbe/op_tiling/lib/linux/$host_arch/${opmaster_so_name}
+opsproto_relpath=$vendordir/op_proto/lib/linux/$host_arch/${opsproto_so_name}
+opapi_relpath=$vendordir/op_api/lib/${opapi_so_name}
 
 QUIET="y"
 INSTALL_FOR_ALL="n"
+FORCE_INSTALL="n"
 
 CURR_OPERATE_USER="$(id -nu 2>/dev/null)"
 CURR_OPERATE_GROUP="$(id -ng 2>/dev/null)"
@@ -38,6 +46,10 @@ do
         INSTALL_FOR_ALL="y"
         shift
     ;;
+    --force)
+        FORCE_INSTALL="y"
+        shift
+    ;;
     --*)
         shift
     ;;
@@ -50,6 +62,169 @@ done
 log() {
     cur_date=$(date +"%Y-%m-%d %H:%M:%S")
     echo "[ops_custom] [$cur_date] "$1
+}
+
+resolve_so_path() {
+    local so_name="$1"
+    local so_path=""
+    local search_dir=""
+
+    if [ "${so_name}" = "${opmaster_so_name}" ]; then
+        search_dir="${sourcedir}/${vendordir}/op_impl/ai_core/tbe/op_tiling/lib/linux"
+        if [ -d "${search_dir}" ]; then
+            so_path=$(find "${search_dir}" -type f -name "${so_name}" 2>/dev/null | head -n 1)
+        fi
+    elif [ "${so_name}" = "${opsproto_so_name}" ]; then
+        search_dir="${sourcedir}/${vendordir}/op_proto/lib/linux"
+        if [ -d "${search_dir}" ]; then
+            so_path=$(find "${search_dir}" -type f -name "${so_name}" 2>/dev/null | head -n 1)
+        fi
+    elif [ "${so_name}" = "${opapi_so_name}" ]; then
+        so_path="${sourcedir}/${opapi_relpath}"
+    fi
+
+    echo "${so_path}"
+}
+
+normalize_arch() {
+    local arch_raw="$1"
+    case "${arch_raw}" in
+        x86_64|X86_64|Advanced\ Micro\ Devices\ X86-64)
+            echo "x86_64"
+            ;;
+        aarch64|AArch64)
+            echo "aarch64"
+            ;;
+        *)
+            echo "${arch_raw}"
+            ;;
+    esac
+}
+
+format_so_arch() {
+    local arch_raw="$1"
+    case "${arch_raw}" in
+        x86_64|X86_64|Advanced\ Micro\ Devices\ X86-64)
+            echo "x86_64"
+            ;;
+        aarch64|AArch64)
+            echo "AArch64"
+            ;;
+        *)
+            echo "${arch_raw}"
+            ;;
+    esac
+}
+
+version_gt() {
+    local version_a="$1"
+    local version_b="$2"
+    local max_version
+
+    max_version=$(printf "%s\n%s\n" "${version_a}" "${version_b}" | sort -V | tail -n 1)
+    if [ "${version_a}" = "${max_version}" ] && [ "${version_a}" != "${version_b}" ]; then
+        return 0
+    fi
+    return 1
+}
+
+validate_so_dlopen() {
+    local so_path="$1"
+    local so_name="$2"
+    local err_msg=""
+
+    err_msg=$(python3 - "${so_path}" << 'PY'
+import ctypes
+import sys
+
+path = sys.argv[1]
+try:
+    ctypes.CDLL(path, mode=ctypes.RTLD_NOW)
+except Exception as exc:
+    print(str(exc))
+    sys.exit(1)
+PY
+)
+    if [ $? -ne 0 ]; then
+        log "[ERROR] Failed to load ${so_name} wish env ASCEND_HOME_PATH(${ASCEND_HOME_PATH}),error message is ${err_msg}."
+        return 1
+    fi
+    return 0
+}
+
+validate_so_arch() {
+    local so_path="$1"
+    local so_name="$2"
+    local so_machine_raw=""
+    local so_arch_norm=""
+    local env_arch=""
+    local so_arch_display=""
+
+    so_machine_raw=$(readelf -h "${so_path}" 2>/dev/null | awk -F: '/Machine:/{gsub(/^ +/, "", $2); print $2; exit}')
+    if [ -z "${so_machine_raw}" ]; then
+        log "[ERROR] Failed to parse architecture from '${so_name}'."
+        return 1
+    fi
+
+    env_arch=$(uname -m)
+    so_arch_norm=$(normalize_arch "${so_machine_raw}")
+    so_arch_display=$(format_so_arch "${so_machine_raw}")
+
+    if [ "${so_arch_norm}" != "${env_arch}" ]; then
+        log "[ERROR] The architecture of the shared library '${so_name}' (${so_arch_display}) is incompatible with the current running environment (${env_arch})."
+        return 1
+    fi
+    return 0
+}
+
+validate_so_glibc() {
+    local so_path="$1"
+    local so_name="$2"
+    local required_glibc=""
+    local env_glibc=""
+
+    required_glibc=$(strings -a "${so_path}" 2>/dev/null | grep -o 'GLIBC_[0-9]\+\.[0-9]\+' | sed 's/GLIBC_//' | sort -V | tail -n 1)
+    if [ -z "${required_glibc}" ]; then
+        return 0
+    fi
+
+    env_glibc=$(ldd --version 2>/dev/null | head -n 1 | grep -o '[0-9]\+\.[0-9]\+' | head -n 1)
+    if [ -z "${env_glibc}" ]; then
+        log "[ERROR] Failed to get glibc version from current runtime environment."
+        return 1
+    fi
+
+    if version_gt "${required_glibc}" "${env_glibc}"; then
+        log "[ERROR] The shared library '${so_name}' was linked against a newer version of the GNU C Library (glibc). The current runtime enviroment has an older version of glibs, which does not provide the required symbols."
+        return 1
+    fi
+    return 0
+}
+
+validate_shared_libraries() {
+    local so_name=""
+    local so_path=""
+
+    if [ "${FORCE_INSTALL}" = "y" ]; then
+        log "[WARNING] --force is enabled, skip shared library validation."
+        return 0
+    fi
+
+    for so_name in "${opmaster_so_name}" "${opsproto_so_name}" "${opapi_so_name}"; do
+        so_path=$(resolve_so_path "${so_name}")
+        if [ -z "${so_path}" ] || [ ! -f "${so_path}" ]; then
+            log "[ERROR] Failed to find shared library '${so_name}' in package path."
+            return 1
+        fi
+
+        if [ -n "${ASCEND_HOME_PATH}" ]; then
+            validate_so_dlopen "${so_path}" "${so_name}" || return 1
+        else
+            validate_so_arch "${so_path}" "${so_name}" || return 1
+            validate_so_glibc "${so_path}" "${so_name}" || return 1
+        fi
+    done
+    return 0
 }
 
 set_install_for_all_mod() {
@@ -344,6 +519,12 @@ if [ ! -d "${targetdir}/$vendordir" ];then
     fi
 else
     apply_chmod "${targetdir}/$vendordir" "750" "${INSTALL_FOR_ALL}"
+fi
+
+log "[INFO] validate shared libraries before installation"
+validate_shared_libraries
+if [ $? -ne 0 ]; then
+    exit 1
 fi
 
 log "[INFO] upgrade framework"
