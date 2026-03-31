@@ -48,8 +48,8 @@ __aicore__ inline auto MakeGMmemPtr(const U& byteOffset)
 
 ```cpp
 // 示例 1： 使用指针创建
-constexpr uint32_t L1_SIZE = 128;
-__gm__ float data[L1_SIZE];
+constexpr uint32_t Tile_LENGTH = 128;
+__gm__ float data[Tile_LENGTH];
 auto ptr = MakeGMmemPtr(data);
 
 // 示例 2： 使用地址字节偏移创建

@@ -49,7 +49,7 @@ __aicore__ inline auto MakeUBmemPtr(const U& byteOffset)
 ```cpp
 // 示例 1： 使用指针创建
 constexpr uint32_t TILE_LENGTH = 4;
-__ubuf__ float data[L1_SIZE];
+__ubuf__ float data[TILE_LENGTH];
 auto ptr = MakeUBmemPtr(data);
 
 // 示例 2： 使用地址字节偏移创建

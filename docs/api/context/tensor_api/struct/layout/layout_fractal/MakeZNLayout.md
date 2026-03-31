@@ -34,7 +34,7 @@ __aicore__ inline decltype(auto) MakeZnLayout(U row, S column)
 | row | 输入 | 矩阵的总行数。 |
 | column | 输入 | 矩阵的总列数。 |
 
-## 返回值值说明
+## 返回值说明
 
 - 输入为编译时常量时，返回ZN格式的Layout类型。
 - 输入为整型变量时，返回ZN格式的Layout对象。

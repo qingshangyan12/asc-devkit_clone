@@ -35,8 +35,8 @@ struct NDLayoutFormat {
 
 ## 返回值
 
-- 输入为编译时常量时，返回DN格式的Layout类型。
-- 输入为整型变量时，返回DN格式的Layout对象。
+- 输入为编译时常量时，返回ND格式的Layout类型。
+- 输入为整型变量时，返回ND格式的Layout对象。
 - 返回Layout对应位置的参数大小说明详见[Layout和层次化表述法](../../../Layout和层次化表述法.md)。
 
 ## 约束说明

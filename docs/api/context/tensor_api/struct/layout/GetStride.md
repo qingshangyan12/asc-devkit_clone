@@ -45,7 +45,7 @@ using namespace AscendC::Te;
 
 auto layout = MakeNDLayout(128,128);
 // 无模板实参时 Is... 为空，等价于 layout.Shape<>() 得到整个shape元组
-auto shapeTuple = GetStride(layout);
+auto strideTuple = GetStride(layout);
 
 // 带索引时等价于 layout.Shape<0>()，按递归取shape子结构或某一维
 auto s0 = GetStride<0>(layout);

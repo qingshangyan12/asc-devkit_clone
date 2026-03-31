@@ -50,8 +50,8 @@ __aicore__ inline auto MakeL0BmemPtr(const U& byteOffset)
 
 ```cpp
 // 示例 1： 使用指针创建
-constexpr uint32_t L1_SIZE = 128;
-__cb__ float data[L1_SIZE];
+constexpr uint32_t Tile_LENGTH = 128;
+__cb__ float data[Tile_LENGTH];
 auto ptr = MakeL0BmemPtr(data);
 
 // 示例 2： 使用地址字节偏移创建

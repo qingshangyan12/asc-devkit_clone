@@ -49,8 +49,8 @@ __aicore__ inline auto MakeBiasmemPtr(const U& byteOffset)
 
 ```cpp
 // 示例 1： 使用指针创建
-constexpr uint32_t L1_SIZE = 128;
-__bias__ float data[L1_SIZE];
+constexpr uint32_t Tile_LENGTH = 128;
+__bias__ float data[Tile_LENGTH];
 auto ptr = MakeBiasmemPtr(data);
 
 // 示例 2： 使用地址字节偏移创建
