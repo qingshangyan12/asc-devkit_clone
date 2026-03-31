@@ -97,7 +97,8 @@ struct MakeNnFrameLayout {
     }
 };
 
-using LayoutFormatSet = Std::tuple<Std::tuple<NzLayoutPattern, MakeNzFrameLayout>, Std::tuple<NDLayoutPattern, MakeNDFrameLayout>, Std::tuple<DNLayoutPattern, MakeDNFrameLayout>, Std::tuple<NDLayoutPattern, MakeNDFrameLayout>>;
+using LayoutFormatSet = Std::tuple<Std::tuple<NzLayoutPattern, MakeNzFrameLayout>, Std::tuple<NDLayoutPattern, MakeNDFrameLayout>, Std::tuple<DNLayoutPattern, MakeDNFrameLayout>, Std::tuple<NnLayoutPattern, MakeNnFrameLayout>,
+                                    Std::tuple<ZzLayoutPattern, MakeZzFrameLayout>>;
 
 template <typename LayoutPattern, typename Tuple = LayoutFormatSet>
 struct FindLayoutFromPattern;
