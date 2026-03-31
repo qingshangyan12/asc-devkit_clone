@@ -19,13 +19,22 @@
 │   │   └── verify_result.py                 // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt                       // 编译工程文件
 │   ├── data_utils.h                         // 数据读入写出函数
-│   ├── mmad_unitflag_disable_k_round.asc    // 沿K轴切分，不使能unitFlag
-│   ├── mmad_unitflag_enable_k_round.asc     // 沿K轴切分，使能unitFlag
-│   ├── mmad_unitflag_disable_n_round.asc    // 沿N轴切分，不使能unitFlag
-│   └── mmad_unitflag_enable_n_round.asc     // 沿N轴切分，使能unitFlag
+│   ├── mmad_unitflag_k_round.asc            // 沿K轴切分
+│   └── mmad_unitflag_n_round.asc            // 沿N轴切分
 ```
 
 ## 算子描述
+
+- 沿K轴切分：  
+A矩阵shape为[128, 512]，B矩阵shape为[512, 256]，执行矩阵乘法时，需要沿着K轴进行迭代循环，假设每次迭代K长度为64，则需要迭代8次，此时8次Mmad对应1次Fixpipe操作。  
+前7次Mmad的unitFlag都设置为2，保证后续Mmad可以写入L0C；  
+最后1次Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；  
+Fixpipe的unitFlag设置为3，保证后续Mmad可以顺利写入L0C。
+
+- 沿N轴切分：  
+A矩阵shape为[128, 128]，B矩阵shape为[128, 256]，执行矩阵搬出时，沿着N轴分2次搬出，此时1次Mmad对应2次Fixpipe操作。  
+Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；  
+每次Fixpipe的unitFlag都设置为3，保证后续其他Mmad在复用这块L0C地址时可以顺利写入。  
 
 - unitFlag参数说明：  
 unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：  
@@ -33,18 +42,7 @@ unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能�
 1：保留值；  
 2：使能unitFlag，硬件执行完指令之后，不会关闭unitFlag功能；  
 3：使能unitFlag，硬件执行完指令之后，会将unitFlag功能关闭。  
-使能该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。
-
-- 沿K轴切分样例：  
-A矩阵shape为[128, 512]，B矩阵shape为[512, 256]，执行矩阵乘法时，需要沿着K轴进行迭代循环，假设每次迭代K长度为64，则需要迭代8次，此时8次Mmad对应1次Fixpipe操作。  
-前7次Mmad的unitFlag都设置为2，保证后续Mmad可以写入L0C；  
-最后1次Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；  
-Fixpipe的unitFlag设置为3，保证后续Mmad可以顺利写入L0C。
-
-- 沿N轴切分样例：  
-A矩阵shape为[128, 128]，B矩阵shape为[128, 256]，执行矩阵搬出时，沿着N轴分2次搬出，此时1次Mmad对应2次Fixpipe操作。  
-Mmad的unitFlag都设置为3，保证Fixpipe可以读取L0C；  
-每次Fixpipe的unitFlag都设置为3，保证后续其他Mmad在复用这块L0C地址时可以顺利写入。  
+使能该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。  
 
 另外，需要注意当使能unitFlag时，L0C上的LocalTensor不能用[TQue](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0137.html)获取，需要改用[TBuf](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0161.html)。
 
@@ -150,10 +148,11 @@ OPPROF_2025xxxx_XXXXXX
     ```
 - 样例执行
   ```bash
-  ROUNDMODE=1                      # ROUNDMODE  1:沿K轴切分  2：沿N轴切分
+  ENUNITFLAG=true ROUNDMODE=1      # ENUNITFLAG true:使能unitflag false:不使能unitflag  ROUNDMODE 1:沿K轴切分 2：沿N轴切分
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake ..;make -j;                # 编译工程，注意CMakeLists中需根据切分方式和是否使能unitflag切换使用的.asc文件
-  python3 ../scripts/gen_data.py   -round_mode=$ROUNDMODE  # 生成测试输入数据
+  cmake .. -DEN_UNITFLAG=$ENUNITFLAG; 
+  make -j;                # 编译工程，注意CMakeLists中需根据切分方式切换使用的.asc文件
+  python3 ../scripts/gen_data.py   -round_mode=$ROUNDMODE  # 生成测试输入数据，需根据切分方式切换，1：沿K轴切分 2：沿N轴切分
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```

@@ -16,7 +16,6 @@ import numpy as np
 import tensorflow as tf
 
 
-# for float32
 relative_tol = 1e-3
 absolute_tol = 1e-3
 error_tol = 1e-3

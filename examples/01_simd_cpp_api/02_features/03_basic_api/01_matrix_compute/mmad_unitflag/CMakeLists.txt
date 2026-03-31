@@ -16,10 +16,8 @@ project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
     #根据测试场景在以下.asc文件中切换
-    # mmad_unitflag_disable_n_round.asc    #沿N轴切分，不使能unitFlag
-    # mmad_unitflag_enable_n_round.asc     #沿N轴切分，使能unitFlag
-    # mmad_unitflag_disable_k_round.asc    #沿K轴切分，不使能unitFlag
-    mmad_unitflag_enable_k_round.asc     #沿K轴切分，使能unitFlag
+    # mmad_unitflag_n_round.asc    #沿N轴切分
+    mmad_unitflag_k_round.asc     #沿K轴切分
 )
 
 target_link_libraries(demo PRIVATE
@@ -28,6 +26,19 @@ target_link_libraries(demo PRIVATE
     platform
     m
 )
+
+message(STATUS "[INFO] EN_UNITFLAG is ${EN_UNITFLAG}")
+
+target_compile_definitions(demo PRIVATE
+    EN_UNITFLAG=${EN_UNITFLAG}
+)
+
+# ======================================================================================
+# NPU 编译选项配置
+#
+# 说明：
+#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+# ======================================================================================
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
 )
