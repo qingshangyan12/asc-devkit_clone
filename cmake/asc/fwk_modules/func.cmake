@@ -197,7 +197,8 @@ function(simple_kernel_compile)
   endif()
   get_property(bincmp_enable_binary_package GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_ENABLE_BINARY_PACKAGE)
   set(BINCMP_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile_error.log")
-  set(BINCMP_COMPILE_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile.log")
+  set(BINCMP_COMPILE_LOG "${CMAKE_CURRENT_BINARY_DIR}/${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}_compile.log")
+  set(COMPILE_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile.log")
 
   if (NOT ${ENABLE_CROSS_COMPILE})
     if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
@@ -223,6 +224,7 @@ function(simple_kernel_compile)
           "if grep -q -i 'error\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
               echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
               echo '' >> ${BINCMP_ERROR_LOG}; \
+              cat ${BINCMP_COMPILE_LOG} >> ${COMPILE_LOG}; \
           fi"
       )
 
@@ -277,6 +279,7 @@ function(simple_kernel_compile)
           "if grep -q -i 'error\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
               echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
               echo '' >> ${BINCMP_ERROR_LOG}; \
+              cat ${BINCMP_COMPILE_LOG} >> ${COMPILE_LOG}; \
           fi"
       )
 
@@ -1417,7 +1420,7 @@ function(npu_op_package_add target_package_name)
                   -s ${compute_unit} && \
                   mkdir -p ${kernel_binary_dir}/binary/config/${compute_unit} && \
                   mv ${kernel_binary_dir}/binary/${compute_unit}/*.json \
-                  ${kernel_binary_dir}/binary/config/${compute_unit} > ${BINCMP_COMPILE_LOG} 2>&1 || true"
+                  ${kernel_binary_dir}/binary/config/${compute_unit} >> ${BINCMP_COMPILE_LOG} 2>&1 || true"
             )
 
             add_custom_target(${_ascendc_kernel_target}_ascendc_bin_${compute_unit}_gen_ops_config
