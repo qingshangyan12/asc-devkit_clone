@@ -25,7 +25,12 @@ add_executable(demo
 # 说明：
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
+set(NPU_ARCH "dav-2201")
+# set(NPU_ARCH "dav-3510")
+
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH}>
 )
+set(ENV{NPU_ARCH} "${NPU_ARCH}")
+# 生成NPU_ARCH指定的测试输入数据
+execute_process(COMMAND python3 ../scripts/gen_data.py)
