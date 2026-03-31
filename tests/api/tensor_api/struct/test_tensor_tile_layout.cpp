@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
 #include "include/experimental/tensor_api/tensor.h"
+#include "impl/experimental/tensor_api/tensor/frame_layout.h"
 
 
 class Tensor_Api_Layout : public testing::Test {
@@ -870,7 +871,6 @@ TEST_F(Tensor_Api_Layout, TestMakeNDLayout)
     EXPECT_EQ(AscendC::Std::get<0>(strideCol2), 0);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 1);
 }
-
 // Shape为{{1, row},{1, column}}
 // Stride为{{0, 1}, {0, row}}
 TEST_F(Tensor_Api_Layout, TestMakeDNLayout)
@@ -1133,4 +1133,33 @@ TEST_F(Tensor_Api_Layout, TestStructLayout)
     EXPECT_EQ(AscendC::Std::get<0>(scaleADNShape), 1);
     EXPECT_EQ(AscendC::Std::get<0>(scaleBNDShape), 2);
     EXPECT_EQ(AscendC::Std::get<0>(scaleBDNShape), 1);
+}
+
+TEST_F(Tensor_Api_Layout, TestMakeFrameLayout)
+{
+    using namespace AscendC::Te;
+
+    auto ndLayout = MakeFrameLayout<NDLayoutPattern, LayoutTrait<>>(128, 256);
+    EXPECT_EQ(GetShape<0>(ndLayout), 128);
+    EXPECT_EQ(GetShape<1>(ndLayout), 256);
+    EXPECT_EQ(GetStride<0>(ndLayout), 256);
+    EXPECT_EQ(GetStride<1>(ndLayout), 1);
+    EXPECT_TRUE((AscendC::Std::is_same_v<PatternTraitT<decltype(ndLayout)>, NDLayoutPattern>));
+
+    auto nzLayout = MakeFrameLayout<NzLayoutPattern, LayoutTrait<float>>(128, 256);
+    auto nzShape0 = GetShape<0>(nzLayout);
+    auto nzShape1 = GetShape<1>(nzLayout);
+    auto nzStride0 = GetStride<0>(nzLayout);
+    auto nzStride1 = GetStride<1>(nzLayout);
+    constexpr int c0Ele = 32 / sizeof(float);
+
+    EXPECT_EQ(AscendC::Std::get<0>(nzShape0), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(nzShape0), 128 / 16);
+    EXPECT_EQ(AscendC::Std::get<0>(nzShape1), c0Ele);
+    EXPECT_EQ(AscendC::Std::get<1>(nzShape1), 256 / c0Ele);
+    EXPECT_EQ(AscendC::Std::get<0>(nzStride0), c0Ele);
+    EXPECT_EQ(AscendC::Std::get<1>(nzStride0), c0Ele * 16);
+    EXPECT_EQ(AscendC::Std::get<0>(nzStride1), 1);
+    EXPECT_EQ(AscendC::Std::get<1>(nzStride1), 128 * c0Ele);
+    EXPECT_TRUE((AscendC::Std::is_same_v<PatternTraitT<decltype(nzLayout)>, NzLayoutPattern>));
 }
