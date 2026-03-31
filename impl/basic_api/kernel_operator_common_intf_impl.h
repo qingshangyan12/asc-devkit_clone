@@ -210,6 +210,18 @@ template <int8_t startBit, int8_t endBit>
 __aicore__ static inline void ResetCtrlSpr(){
     ResetCtrlSprImpl<startBit, endBit>();
 }
+#elif (__NPU_ARCH__ == 2201)
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline void SetCtrlSpr(int64_t value)
+{
+    SetCtrlSprImpl<startBit, endBit>(value);
+}
+
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline int64_t GetCtrlSpr()
+{
+    return GetCtrlSprImpl<startBit, endBit>();
+}
 #endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_IMPL_H
