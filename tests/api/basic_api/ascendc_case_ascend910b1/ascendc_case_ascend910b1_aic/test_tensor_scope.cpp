@@ -325,7 +325,7 @@ INSTANTIATE_TEST_CASE_P(TEST_CUBE_OP, CubeOpTestsuite, ::testing::Values(
     CubeOpTestParams{FixpipeOpTest<half, float, Fixpipe<half, float>>, "Fixpipe", {TPosition::VECIN}, "src", "VECIN", "CO1" },
     CubeOpTestParams{FixpipeOpTest2<half, float, Fixpipe<half, float>>, "Fixpipe", {TPosition::VECIN, TPosition::VECIN}, "src", "VECIN", "CO1" },
     // Fixpipe的dst位置,与se确认为A1
-    CubeOpTestParams{FixpipeOpTest2<half, float, Fixpipe<half, float>>, "Fixpipe", {TPosition::CO2, TPosition::CO1}, "dst", "CO2", "A1" },
+    CubeOpTestParams{FixpipeOpTest2<half, float, Fixpipe<half, float>>, "Fixpipe", {TPosition::CO2, TPosition::CO1}, "dst", "CO2", "L1 / UB" },
     // LoadData
     CubeOpTestParams{LoadData2dOpTest<half, LoadData>, "LoadData", {TPosition::CO2, TPosition::CO1}, "src", "CO1", "A1 / B1 / GM" },
     CubeOpTestParams{LoadData2dOpTest<half, LoadData>, "LoadData", {TPosition::CO2, TPosition::A1}, "dst", "CO2", "A2 / B2" },
@@ -371,4 +371,3 @@ TEST_P(CubeOpTestsuite, CubeOpTestCase)
     EXPECT_EQ(remove(fileName.c_str()), 0);
     count++;
 }
-
