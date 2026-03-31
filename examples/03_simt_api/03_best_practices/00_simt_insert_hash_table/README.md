@@ -60,7 +60,7 @@ struct Bucket {
 ## 算子描述
 
 - 算子功能：  
-  InsertHashTable算子实现将N个键值对插入容量为Z的哈希表中，其中key为int64_t类型数，value为长度N的float类型的Tensor。
+  InsertHashTable算子实现将N个键值对插入容量为Z的哈希表中，其中key为int64_t类型数，value为长度M的float类型的Tensor。
 
 - 算子规格：  
   <table>
