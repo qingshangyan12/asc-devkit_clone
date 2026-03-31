@@ -83,3 +83,63 @@ TEST_F(Tensor_Api_Atom, CopyL0C2UBWithOperation)
 
     EXPECT_EQ(dst[0], 0);
 }
+
+TEST_F(Tensor_Api_Atom, CopyL12UBND2ND)
+{
+    using namespace AscendC::Std;
+    using namespace AscendC::Te;
+
+    constexpr uint32_t m = 64;
+    constexpr uint32_t n = 64;
+    using type = half;
+
+    __cbuf__ type src[m * n] = {0};
+    __ubuf__ type dst[m * n] = {0};
+
+    auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeNDLayout<type>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeNDLayout<type>(m, n));
+
+    Copy(CopyAtom<CopyTraits<CopyL12UB, DataCopyTraitDefault>>{}, ubTensor, l1Tensor);
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+TEST_F(Tensor_Api_Atom, CopyL12UBDN2DN)
+{
+    using namespace AscendC::Std;
+    using namespace AscendC::Te;
+
+    constexpr uint32_t m = 64;
+    constexpr uint32_t n = 64;
+    using type = half;
+
+    __cbuf__ type src[m * n] = {0};
+    __ubuf__ type dst[m * n] = {0};
+
+    auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeDNLayout<type>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeDNLayout<type>(m, n));
+
+    Copy(CopyAtom<CopyTraits<CopyL12UB, DataCopyTraitDefault>>{}, ubTensor, l1Tensor);
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+TEST_F(Tensor_Api_Atom, CopyL12UBNZ2NZ)
+{
+    using namespace AscendC::Std;
+    using namespace AscendC::Te;
+
+    constexpr uint32_t m = 64;
+    constexpr uint32_t n = 64;
+    using type = half;
+
+    __cbuf__ type src[m * n] = {0};
+    __ubuf__ type dst[m * n] = {0};
+
+    auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeNZLayout<type>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeNZLayout<type>(m, n));
+
+    Copy(CopyAtom<CopyTraits<CopyL12UB, DataCopyTraitDefault>>{}, ubTensor, l1Tensor);
+
+    EXPECT_EQ(dst[0], 0);
+}
