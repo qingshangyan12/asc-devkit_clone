@@ -1407,16 +1407,35 @@ function(npu_op_package_add target_package_name)
       if (${kernel_enable_binary_package} OR ${kernel_enable_source_package})
         if (${kernel_enable_binary_package})
           # gen binary_info_config.json and <file_name>.json
-          add_custom_target(${_ascendc_kernel_target}_ascendc_bin_${compute_unit}_gen_ops_config
-                            COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/insert_simplified_keys.py
-                                    -p ${kernel_binary_dir}/binary/${compute_unit}
-                            COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_ops_config.py
-                                    -p ${kernel_binary_dir}/binary/${compute_unit}
-                                    -s ${compute_unit}
-                            COMMAND ${CMAKE_COMMAND} -E make_directory
-                                    ${kernel_binary_dir}/binary/config/${compute_unit}
-                            COMMAND mv ${kernel_binary_dir}/binary/${compute_unit}/*.json
-                                    ${kernel_binary_dir}/binary/config/${compute_unit})
+          if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
+            set(CONFIG_CMD
+              "${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/insert_simplified_keys.py \
+                  -p ${kernel_binary_dir}/binary/${compute_unit} && \
+                  ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_ops_config.py \
+                  -p ${kernel_binary_dir}/binary/${compute_unit} \
+                  -s ${compute_unit} && \
+                  ${CMAKE_COMMAND} -E make_directory \
+                  ${kernel_binary_dir}/binary/config/${compute_unit} && \
+                  mv ${kernel_binary_dir}/binary/${compute_unit}/*.json \
+                  ${kernel_binary_dir}/binary/config/${compute_unit} || true"
+            )
+
+            add_custom_target(${_ascendc_kernel_target}_ascendc_bin_${compute_unit}_gen_ops_config
+                COMMAND ${CMAKE_COMMAND} -E bash -c "${CONFIG_CMD}"
+                VERBATIM
+            )
+          else()
+            add_custom_target(${_ascendc_kernel_target}_ascendc_bin_${compute_unit}_gen_ops_config
+                COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/insert_simplified_keys.py
+                        -p ${kernel_binary_dir}/binary/${compute_unit}
+                COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_ops_config.py
+                        -p ${kernel_binary_dir}/binary/${compute_unit}
+                        -s ${compute_unit}
+                COMMAND ${CMAKE_COMMAND} -E make_directory
+                        ${kernel_binary_dir}/binary/config/${compute_unit}
+                COMMAND mv ${kernel_binary_dir}/binary/${compute_unit}/*.json
+                        ${kernel_binary_dir}/binary/config/${compute_unit})
+          endif()
         else()
           if (NOT TARGET ${_ascendc_kernel_target}_ascendc_bin_${compute_unit}_gen_ops_config)
             add_custom_target(${_ascendc_kernel_target}_ascendc_bin_${compute_unit}_gen_ops_config)
