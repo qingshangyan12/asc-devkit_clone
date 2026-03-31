@@ -40,8 +40,7 @@
 | [repeat_reduce_sum](./repeat_reduce_sum)                                                                             | 本样例基于RepeatReduceSum实现求和归约，可用于每个repeat内所有数据求和                   |
 | [scatter_950](./scatter_950) | 本样例基于Scatter指令实现数据离散，可用于根据一个输入张量、一个目的地址偏移张量和偏移地址，将输入张量分散到结果张量中。                                                                                              |
 | [trans_data_to_5hd](./trans_data_to_5hd) | 本样例基于TransDataTo5HD实现数据格式转换，可用于NCHW格式转换成NC1HWC0格式，特别的也可以用于二维矩阵数据块的转置 |
-| [transpose_common](./transpose_common) | 本样例基于Transpose实现普通转置，适用于对16*16的二维矩阵数据块进行转置 |
-| [transpose_enhanced](./transpose_enhanced) | 本样例基于Transpose实现增强转置，适用于对16*16的二维矩阵数据块进行转置，也可用于[N,C,H,W]与[N,H,W,C]互相转换 |
+| [transpose](./transpose_common) | 本样例基于Transpose实现普通转置和增强转置，适用于对16*16的二维矩阵数据块进行转置，也适用于[N,C,H,W]与[N,H,W,C]四维矩阵互相转换 |
 | [whole_reduce_max](./whole_reduce_max)                                                                               | 本样例基于WholeReduceMax实现最大值归约，可用于对每个repeat内所有数据求最大值以及其索引index，返回的索引值为每个repeat内部索引                  |
 | [whole_reduce_min](./whole_reduce_min)                                                                               | 本样例基于WholeReduceMin实现获得每个repeat内所有数据的最小值及其索引index的功能，返回的索引值为每个repeat内部索引                  |
 | [whole_reduce_sum](./whole_reduce_sum)                                                                               | 本样例基于WholeReduceSum实现对每个repeat内所有数据求和的功能                    |
