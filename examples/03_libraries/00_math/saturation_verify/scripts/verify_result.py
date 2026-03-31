@@ -30,6 +30,9 @@ API_ID_SUB = 12
 API_ID_DIV = 13
 API_ID_MAX = 14
 API_ID_MIN = 15
+API_ID_MULS = 16
+API_ID_MAXS = 17
+API_ID_MINS = 18
 
 API_NAME_MAP = {
     1: "exp",
@@ -47,6 +50,9 @@ API_NAME_MAP = {
     13: "div",
     14: "max",
     15: "min",
+    16: "muls",
+    17: "maxs",
+    18: "mins",
 }
 
 RELATIVE_TOL = 1e-3
@@ -268,6 +274,24 @@ def verify_result(output_type, api_id, api_type=1, input_x=None, input_y=None):
             if input_y is None:
                 input_y = "./input/input_y.bin"
             res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_MULS:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_MAXS:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_MINS:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
         else:
             print(f"Unsupported API ID: {api_id}")
             return False
@@ -284,8 +308,8 @@ def verify_result(output_type, api_id, api_type=1, input_x=None, input_y=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-                        help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu, 5=ln, 6=abs, 7=reciprocal, 8=sqrt, 9=rsqrt, 10=relu, 11=add, 12=sub, 13=div, 14=max, 15=min")
+    parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+                        help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu, 5=ln, 6=abs, 7=reciprocal, 8=sqrt, 9=rsqrt, 10=relu, 11=add, 12=sub, 13=div, 14=max, 15=min, 16=muls, 17=maxs, 18=mins")
     parser.add_argument('-api_type', type=int, default=1, choices=[1, 2, 3],
                         help="API type: 1=Unary, 2=Binary, 3=BinaryScalar")
     parser.add_argument('-output_type', type=int, default=1, choices=[1, 2, 3, 4],

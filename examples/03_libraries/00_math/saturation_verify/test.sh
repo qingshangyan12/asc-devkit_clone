@@ -13,7 +13,7 @@ run_test() {
     echo ""
     echo "========================================="
     echo "INPUT_SIZE:     $INPUT_SIZE"
-    echo "INPUT_API_ID:   $INPUT_API_ID (1: exp, 2: mul, 3: adds, 4: leakyrelu, 5: ln, 6: abs, 7: reciprocal, 8: sqrt, 9: rsqrt, 10: relu, 11: add, 12: sub, 13: div, 14: max, 15: min)"
+    echo "INPUT_API_ID:   $INPUT_API_ID (1: exp, 2: mul, 3: adds, 4: leakyrelu, 5: ln, 6: abs, 7: reciprocal, 8: sqrt, 9: rsqrt, 10: relu, 11: add, 12: sub, 13: div, 14: max, 15: min, 16: muls, 17: maxs, 18: mins)"
     echo "INPUT_API_TYPE: $INPUT_API_TYPE (${API_TYPE_NAMES[$INPUT_API_TYPE]})"
     echo "INPUT_DATA_TYPE: $data_type (${TYPE_NAMES[$data_type]})"
     echo "========================================="
@@ -52,6 +52,9 @@ case $INPUT_API_ID in
     13) EXPECTED_TYPE=2 ;; # 双目API
     14) EXPECTED_TYPE=2 ;; # 双目API
     15) EXPECTED_TYPE=2 ;; # 双目API
+    16) EXPECTED_TYPE=3 ;; # 双目标量API
+    17) EXPECTED_TYPE=3 ;; # 双目标量API
+    18) EXPECTED_TYPE=3 ;; # 双目标量API
     *) echo "Error: Unknown API_ID=$INPUT_API_ID"; exit 1 ;;
 esac
 
@@ -72,6 +75,9 @@ if [ "$INPUT_API_TYPE" != "$EXPECTED_TYPE" ]; then
     echo "  Div (API_ID 13) should use API_TYPE=2 (Binary)"
     echo "  Max (API_ID 14) should use API_TYPE=2 (Binary)"
     echo "  Min (API_ID 15) should use API_TYPE=2 (Binary)"
+    echo "  Muls (API_ID 16) should use API_TYPE=3 (BinaryScalar)"
+    echo "  Maxs (API_ID 17) should use API_TYPE=3 (BinaryScalar)"
+    echo "  Mins (API_ID 18) should use API_TYPE=3 (BinaryScalar)"
     exit 1
 fi
 

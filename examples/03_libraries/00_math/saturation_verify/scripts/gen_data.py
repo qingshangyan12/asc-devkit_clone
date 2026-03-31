@@ -32,6 +32,9 @@ from gen_data_sub import compute_sub_golden, gen_sub_data
 from gen_data_div import compute_div_golden, gen_div_data
 from gen_data_max import compute_max_golden, gen_max_data
 from gen_data_min import compute_min_golden, gen_min_data
+from gen_data_muls import compute_muls_golden, gen_muls_data
+from gen_data_maxs import compute_maxs_golden, gen_maxs_data
+from gen_data_mins import compute_mins_golden, gen_mins_data
 
 API_ID_EXP = 1
 API_ID_MUL = 2
@@ -48,6 +51,9 @@ API_ID_SUB = 12
 API_ID_DIV = 13
 API_ID_MAX = 14
 API_ID_MIN = 15
+API_ID_MULS = 16
+API_ID_MAXS = 17
+API_ID_MINS = 18
 
 TYPE_MAP = {
     1: np.float16,
@@ -71,7 +77,10 @@ API_NAME_MAP = {
     12: "sub",
     13: "div",
     14: "max",
-    15: "min"
+    15: "min",
+    16: "muls",
+    17: "maxs",
+    18: "mins"
 }
 
 
@@ -79,8 +88,8 @@ def main():
     parser = argparse.ArgumentParser(description="Generate golden data for saturation verify.")
     parser.add_argument('-inputSize', type=int, required=True,
                         help="Total number of elements in the tensor")
-    parser.add_argument('-apiId', type=int, default=1, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-                        help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu, 5=ln, 6=abs, 7=reciprocal, 8=sqrt, 9=rsqrt, 10=relu, 11=add, 12=sub, 13=div, 14=max, 15=min")
+    parser.add_argument('-apiId', type=int, default=1, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+                        help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu, 5=ln, 6=abs, 7=reciprocal, 8=sqrt, 9=rsqrt, 10=relu, 11=add, 12=sub, 13=div, 14=max, 15=min, 16=muls, 17=maxs, 18=mins")
     parser.add_argument('-inputType', type=int, default=1, choices=[1, 2, 3, 4],
                         help="Input type: 1=float16, 2=float32, 3=int16, 4=int32")
     parser.add_argument('-apiType', type=int, default=1, choices=[1, 2, 3],
@@ -123,6 +132,12 @@ def main():
         gen_max_data(input_type, args.inputSize)
     elif args.apiId == API_ID_MIN:
         gen_min_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_MULS:
+        gen_muls_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_MAXS:
+        gen_maxs_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_MINS:
+        gen_mins_data(input_type, args.inputSize)
     else:
         raise ValueError(f"Unsupported API ID: {args.apiId}")
 
