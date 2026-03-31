@@ -70,7 +70,7 @@ LocalTensor用于存放AI Core中Local Memory（内部存储）的数据，它�
 
 - 功能说明
 
-    获取ViewEngin对象。
+    获取ViewEngine对象。
 
 - 函数原型
   ```cpp
