@@ -10,7 +10,6 @@
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
 #include "include/experimental/tensor_api/tensor.h"
-#include "impl/experimental/tensor_api/tensor/frame_layout.h"
 
 
 class Tensor_Api_Layout : public testing::Test {
