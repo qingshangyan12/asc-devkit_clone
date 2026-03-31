@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示了基于AntiQuant高阶API实现antiquant算子。样例按元素做伪量化计算。
+本样例演示了基于AntiQuant高阶API实现antiquant样例。该样例按元素做伪量化计算。
 
 ## 支持的产品
 
@@ -55,13 +55,11 @@
   </table>
 
 - 算子实现：  
-  本样例中实现的是固定shape为输入src[8, 128]、offset[1, 128]、scale[1, 128]，输出dst[8, 128]的antiquant_custom算子。本样例为PER_CHANNEL场景（按通道量化），将int8_t数据类型伪量化为half数据类型。
+  本样例中实现的是固定shape为输入src[8, 128]、offset[1, 128]、scale[1, 128]，输出dst[8, 128]的antiquant_custom算子。本样例为PER_CHANNEL场景（按通道量化），在950PR上推荐使用AntiQuantize，将int8_t数据类型伪量化为half数据类型。
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用AntiQuant高阶API接口完成reducemean计算，得到最终结果，再搬出到外部存储上。
-
-    AntiQuantCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm、offsetGm、scaleGm存储在srcLocal、offsetLocal、scaleGm中，Compute任务负责对srcLocal、offsetLocal、scaleGm执行antiquant计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用AntiQuant高阶API接口完成伪量化计算，得到最终结果，再搬出到外部存储上。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -90,7 +88,6 @@
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
   ```
   执行结果如下，说明精度对比成功。
