@@ -42,13 +42,7 @@ struct FixpipeTensor2TensorV2 {
 template <>
 struct FixpipeTensor2TensorV2<Hardware::GM, Hardware::L0C, Hardware::MAX, ArchVersion::V3510,
     NDLayoutPattern, NzLayoutPattern> {
-    using type = FixpipeNz2Nd3510;
-};
-
-template <>
-struct FixpipeTensor2TensorV2<Hardware::GM, Hardware::L0C, Hardware::L1, ArchVersion::V3510,
-    NDLayoutPattern, NzLayoutPattern> {
-    using type = FixpipeQuantL0C2Out3510;
+    using type = Fixpipe2OutNz2Nd3510;
 };
 
 template <Hardware dstPos, Hardware srcpos, Hardware quantpos, uint32_t Version>

@@ -56,7 +56,7 @@ LoadDataV2(const T& dst, const U& src)
     using SrcPattern = PatternTraitT<U>;
     using Tensor2Tensor = typename
         LoadDataTensor2TensorNoCoordV2<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
-    Tensor2Tensor{}.template Run<trait, T, U>(dst, src);
+    Tensor2Tensor::Run<trait>(dst, src);
 }
 
 template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U, class Coord>
@@ -69,18 +69,6 @@ LoadData(const T& dst, const U& src, const Coord& coord)
     Tensor2Tensor{}.template Run<trait, T, U, Coord>(dst, src, coord);
 }
 
-template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U, class Coord>
-__aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplateWithCoord<T, U, Coord>, void>::type 
-LoadDataV2(const T& dst, const U& src, const Coord& coord)
-{
-    constexpr Hardware dstPos = GetHardPos<T>();
-    constexpr Hardware srcPos = GetHardPos<U>();
-    using DstPattern = PatternTraitT<T>;
-    using SrcPattern = PatternTraitT<U>;
-    using Tensor2Tensor = typename
-        LoadDataTensor2TensorV2<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
-    Tensor2Tensor{}.template Run<trait, T, U, Coord>(dst, src, coord);
-}
 } // namespace Te
 } // namespace AscendC
 #endif // IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_LOAD_DATA_IMPL_H

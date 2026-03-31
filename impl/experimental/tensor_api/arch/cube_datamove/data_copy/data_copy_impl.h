@@ -57,7 +57,7 @@ DataCopyV2(const T& dst, const U& src)
     using SrcPattern = PatternTraitT<U>;
     using Tensor2Tensor = typename
         DataCopyTensor2TensorV2<dstTPos, srcTPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
-    Tensor2Tensor{}::Run<trait>(dst, src);
+    Tensor2Tensor::Run<trait>(dst, src);
 }
 
 template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U, typename Coord>
