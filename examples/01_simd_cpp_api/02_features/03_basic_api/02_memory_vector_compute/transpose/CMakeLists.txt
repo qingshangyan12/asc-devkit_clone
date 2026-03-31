@@ -15,8 +15,16 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+# 场景参数（通过命令行传入）
+# SCENARIO_NUM: 场景编号
+#   1 - 普通转置
+#   2 - 增强转置
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-2)")
+
+add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+
 add_executable(demo
-    transpose_common.asc
+    transpose.asc
 )
 
 target_link_libraries(demo PRIVATE
