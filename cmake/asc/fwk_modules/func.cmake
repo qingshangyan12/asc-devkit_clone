@@ -567,7 +567,18 @@ function(npu_op_package target_package_name)
       OUTPUT_PATH install_path
     )
     install(TARGETS ${target_package_name} EXPORT ${target_package_name}-targets INCLUDES DESTINATION ${install_path})
-    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/post_install.cmake)")
+    set(ERROR_LOG_FILE "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
+    install(CODE "
+      if(EXISTS \"${ERROR_LOG_FILE}\")
+        file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
+        message(STATUS \"\")
+        message(STATUS \"=========== Failed operators ===========\")
+        message(STATUS \"\${ERROR_CONTENT}\")
+        message(STATUS \"========================================\")
+      else()
+        message(STATUS \"No compilation errors found in \${ERROR_LOG_FILE}\")
+      endif()
+    ")
     adapt_install_path(
       INPUT_PATH lib/cmake/${target_package_name}
       INPUT_TARGET ${target_package_name}
@@ -618,7 +629,18 @@ function(npu_op_package target_package_name)
       OUTPUT_PATH install_path
     )
     install(TARGETS ${target_package_name} EXPORT ${target_package_name}-targets INCLUDES DESTINATION ${install_path})
-    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/post_install.cmake)")
+    set(ERROR_LOG_FILE "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
+    install(CODE "
+      if(EXISTS \"${ERROR_LOG_FILE}\")
+        file(READ \"\${ERROR_LOG_FILE}\" ERROR_CONTENT)
+        message(STATUS \"\")
+        message(STATUS \"=========== Failed operators ===========\")
+        message(STATUS \"\${ERROR_CONTENT}\")
+        message(STATUS \"========================================\")
+      else()
+        message(STATUS \"No compilation errors found in \${ERROR_LOG_FILE}\")
+      endif()
+    ")
     adapt_install_path(
       INPUT_PATH lib/cmake/${target_package_name}
       INPUT_TARGET ${target_package_name}
