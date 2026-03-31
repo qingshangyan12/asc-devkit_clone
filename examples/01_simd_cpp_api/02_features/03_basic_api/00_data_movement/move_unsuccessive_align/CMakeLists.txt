@@ -16,7 +16,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    move_successive_align.asc
+    move_unsuccessive_align.asc
 )
 
 target_link_libraries(demo PRIVATE
