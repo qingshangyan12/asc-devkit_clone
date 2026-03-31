@@ -1414,14 +1414,13 @@ function(npu_op_package_add target_package_name)
                   ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_ops_config.py \
                   -p ${kernel_binary_dir}/binary/${compute_unit} \
                   -s ${compute_unit} && \
-                  ${CMAKE_COMMAND} -E make_directory \
-                  ${kernel_binary_dir}/binary/config/${compute_unit} && \
+                  mkdir -p ${kernel_binary_dir}/binary/config/${compute_unit} && \
                   mv ${kernel_binary_dir}/binary/${compute_unit}/*.json \
                   ${kernel_binary_dir}/binary/config/${compute_unit} || true"
             )
 
             add_custom_target(${_ascendc_kernel_target}_ascendc_bin_${compute_unit}_gen_ops_config
-                COMMAND ${CMAKE_COMMAND} -E bash -c "${CONFIG_CMD}"
+                COMMAND bash -c "${CONFIG_CMD}"
                 VERBATIM
             )
           else()
