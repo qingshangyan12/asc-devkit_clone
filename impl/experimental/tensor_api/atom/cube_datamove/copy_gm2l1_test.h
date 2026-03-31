@@ -16,11 +16,11 @@
 #endif
 
 /*!
-* \file copy_gm2l1.h
+* \file copy_gm2l1_test.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_GM2L1_H
-#define IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_GM2L1_H
+#ifndef IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_GM2L1_TEST_H
+#define IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_GM2L1_TEST_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 
