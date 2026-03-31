@@ -50,7 +50,10 @@ template <>
 struct CopyTraits<CopyGM2L1> : public CopyTraits<CopyGM2L1, DataCopyTraitDefault> {};
 }
 }
-
+ 
+using CopyL12BT = CopyGM2L1; 
+using CopyL12FB = CopyGM2L1; 
+ 
 #endif // IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_GM2L1_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
