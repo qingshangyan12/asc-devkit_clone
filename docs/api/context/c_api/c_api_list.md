@@ -393,7 +393,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_int4x22half](reg/reg_vector/asc_int4x22half.md) | 将int4x2_t类型数据转换为half类型。 |
 | [asc_int4x22int16](reg/reg_vector/asc_int4x22int16.md) | 将int4x2_t类型转换为int16_t类型。 |
 | [asc_int642float](reg/reg_vector/asc_int642float.md) | 将int64_t类型数据转换为float类型，并支持多种舍入模式。 |
-| [asc_int642int32](reg/reg_vector/asc_int642int32.md) | 将int64_t类型转换为int32_t类型，不饱和模式，写入目的操作数的上半部分。 |
+| [asc_int642int32](reg/reg_vector/asc_int642int32.md) | 将int64_t类型转换为int32_t类型。 |
 | [asc_int82half](reg/reg_vector/asc_int82half.md) | 将int8_t类型数据转换为half类型。 |
 | [asc_int82int16](reg/reg_vector/asc_int82int16.md) | 将int8_t类型数据转换为int16_t类型。 |
 | [asc_int82int32](reg/reg_vector/asc_int82int32.md) | 将int8_t类型转换为int32_t类型。 |
