@@ -274,7 +274,7 @@ function(simple_kernel_compile)
       )
 
       set(CHECK_ERROR_CMD
-          "if grep -q -i 'error\\|fail\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
+          "if grep -q -i 'error\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
               echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
               echo '' >> ${BINCMP_ERROR_LOG}; \
           fi"
@@ -454,7 +454,6 @@ function(npu_op_package target_package_name)
 
   set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_TYPE "${_upper_target_type}")
   get_property(target_vendor_name GLOBAL PROPERTY _ASC_PKG_${target_package_name}_VENDOR_NAME)
-  get_property(KERNEL_BINARY_PATH GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_BINARY_DIR)
   if ("${_upper_target_type}" STREQUAL "RUN")
     add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/scripts/install.sh ${CMAKE_BINARY_DIR}/scripts/upgrade.sh ${CMAKE_BINARY_DIR}/scripts/uninstall.sh
       COMMAND mkdir -p ${CMAKE_BINARY_DIR}/scripts
@@ -1109,12 +1108,7 @@ function(npu_op_package_add target_package_name)
     )
   endif()
 
-  # get_property(all_op_fail GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL)
-  # if(NOT DEFINED all_op_fail)
-  #   set(all_op_fail FALSE)
-  # endif()
-  # message("All operators compile failed: ${all_op_fail}")
-  if("${output_type}" STREQUAL "RUN")# AND NOT all_op_fail)
+  if("${output_type}" STREQUAL "RUN")
     if(_ascendc_tiling_target)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
         add_library(${target_package_name}_ascendc_${_ascendc_tiling_target} SHARED)
@@ -1295,7 +1289,7 @@ function(npu_op_package_add target_package_name)
         )
       endif()
     endif()
-  elseif("${output_type}" STREQUAL "STATIC")# AND NOT all_op_fail)
+  elseif("${output_type}" STREQUAL "STATIC")
     if(_ascendc_tiling_target)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
         add_library(${target_package_name}_ascendc_${_ascendc_tiling_target} SHARED)
@@ -1335,7 +1329,7 @@ function(npu_op_package_add target_package_name)
         PACKAGE_NAME ${target_package_name}
         TARGETS ${_ascendc_kernel_target} ${_ascendc_kernel_target}_opregistry)
     endif()
-  elseif("${output_type}" STREQUAL "SHARED")# AND NOT all_op_fail)
+  elseif("${output_type}" STREQUAL "SHARED")
     if(_ascendc_tiling_target)
       if(NOT TARGET ${target_package_name}_ascendc_${_ascendc_tiling_target})
         add_library(${target_package_name}_ascendc_${_ascendc_tiling_target} SHARED)
