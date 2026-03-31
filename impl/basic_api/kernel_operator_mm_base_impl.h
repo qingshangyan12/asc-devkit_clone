@@ -231,7 +231,7 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
 }
 
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG,
     typename U = PrimT<T>, typename std::enable_if<IsSameType<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LoadDataWithStrideImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
@@ -701,7 +701,7 @@ __aicore__ inline void SetLoadDataRepeatImpl(const LoadDataRepeatParam& repeatPa
     SetLoadDataRepeatCal(repeatParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline void SetLoadDataRepeatWithStrideImpl(const LoadDataRepeatParamWithStride& repeatParams)
 {
     SetLoadDataRepeatWithStrideCal(repeatParams);
