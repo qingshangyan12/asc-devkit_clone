@@ -24,7 +24,7 @@
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 
-#include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/data_copy_impl.h"
+#include "impl/experimental/tensor_api/arch/data_copy_impl.h"
 #include "impl/experimental/tensor_api/atom/copy_traits_impl.h"
 
 namespace AscendC {
@@ -35,7 +35,7 @@ struct DataCopyTraitDefault {
     static constexpr const TraitType value = DEFAULT_DATA_COPY_TRAIT;
 };
 
-struct CopyGM2L1 {
+struct DataCopyOp {
     template <typename Tp, const Tp& traits, typename... Args>
     __aicore__ inline static void Copy(const Args& ...args)
     {
@@ -44,13 +44,15 @@ struct CopyGM2L1 {
 };
 
 template <typename Traits>
-struct CopyTraits<CopyGM2L1, Traits> : public CopyTraits<CopyGM2L1, Traits, CopyGM2L1, DataCopyTraitDefault> {};
+struct CopyTraits<DataCopyOp, Traits> : public CopyTraits<DataCopyOp, Traits, DataCopyOp, DataCopyTraitDefault> {};
 
 template <>
-struct CopyTraits<CopyGM2L1> : public CopyTraits<CopyGM2L1, DataCopyTraitDefault> {};
+struct CopyTraits<DataCopyOp> : public CopyTraits<DataCopyOp, DataCopyTraitDefault> {};
 
-using CopyL12BT = CopyGM2L1;
-using CopyL12FB = CopyGM2L1;
+using CopyGM2L1 = DataCopyOp;
+using CopyL12BT = DataCopyOp;
+using CopyL12FB = DataCopyOp;
+using CopyL12UB = DataCopyOp;
 
 }
 }
