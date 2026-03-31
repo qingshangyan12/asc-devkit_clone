@@ -139,56 +139,6 @@ __aicore__ inline decltype(auto) MakeFractalShape(T originShape, U innerShape) {
     return MakeFractalShape(originShape, innerShape, Std::make_index_sequence<Std::tuple_size_v<U>>{});
 }
 
-struct MakeNzFrameLayout {
-    template <typename TraitType>
-    __aicore__ inline static auto Make(size_t row, size_t column) {
-        using T = typename TraitType::type;
-        constexpr auto c0Ele = TraitType::C0_element;
-        auto shape = MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED),
-                               Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele));
-        auto stride = MakeStride(Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{},
-                                 Std::Int<1>{}, c0Ele * Std::ceil_align(row, FRACTAL_FIXED));
-        using LayoutT = Layout<decltype(shape), decltype(stride), NzLayoutPattern>;
-        return LayoutT(shape, stride);
-    }
-};
-
-struct MakeNDFrameLayout {
-    template <typename TraitType>
-    __aicore__ inline static auto Make(size_t row, size_t column) {
-        using T = typename TraitType::type;
-        auto shape = MakeShape(row, column);
-        auto stride = MakeStride(column, Std::Int<1>{});
-        using LayoutT = Layout<decltype(shape), decltype(stride), NDLayoutPattern>;
-        return LayoutT(shape, stride);
-    }
-};
-
-using LayoutFormatSet = Std::tuple<Std::tuple<NzLayoutPattern, MakeNzFrameLayout>, Std::tuple<NDLayoutPattern, MakeNDFrameLayout>>;
-
-template <typename LayoutPattern, typename Tuple = LayoutFormatSet>
-struct FindLayoutFromPattern;
-
-template <typename Pattern, typename FrameLayout, typename... Rest>
-struct FindLayoutFromPattern<Pattern, Std::tuple<Std::tuple<Pattern, FrameLayout>, Rest...>> {
-    using type = FrameLayout;
-};
-
-template <typename Pattern, typename NotMatchTuple, typename... Rest>
-struct FindLayoutFromPattern<Pattern, Std::tuple<NotMatchTuple, Rest...>>
-    : FindLayoutFromPattern<Pattern, Std::tuple<Rest...>> {};
-
-template <typename Pattern>
-struct FindLayoutFromPattern<Pattern, Std::tuple<>> {
-    static_assert(!Std::is_same_v<Pattern, Pattern>, "Unsupported layout pattern.");
-};
-
-template <typename LayoutPattern, typename TraitType, typename... Args>
-__aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
-    using GetLayoutMakeFun = typename FindLayoutFromPattern<LayoutPattern>::type;
-    return GetLayoutMakeFun::Make<TraitType>(args...);
-}
-
 } // namespace Te
 } // namespace AscendC
 

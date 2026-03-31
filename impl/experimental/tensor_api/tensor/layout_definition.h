@@ -29,6 +29,12 @@
 namespace AscendC {
 namespace Te {
 
+struct ZnLayoutPattern{};
+
+struct ZzLayoutPattern{};
+
+struct NnLayoutPattern{};
+
 struct NzLayoutPattern{};
 
 struct NDLayoutPattern{};
