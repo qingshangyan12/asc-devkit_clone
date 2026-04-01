@@ -1,16 +1,17 @@
-# reg_ld_st_align样例
+# ld_st_reg_align样例
 
 ## 概述
-本样例基于RegBase编程范式实现reg的连续对齐搬运操作。
+本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的对齐数据搬运操作，该样例使用LoadAlign，StoreAlign接口，以及POST_MODE_UPDATE和DATA_BLOCK_COPY模式的使能。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
 ```
-├── reg_ld_st_align
+├── ld_st_reg_align
 │   ├── CMakeLists.txt                      // 编译工程文件
-│   └── reg_ld_st_align.asc                 // AscendC样例实现 & 调用样例
+│   └── README.md                           // 样例介绍
+│   └── ld_st_reg_align.asc                 // AscendC样例实现 & 调用样例
 ```
 
 ## 样例描述
@@ -21,22 +22,49 @@
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
   </tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">x</td><td align="center">[1024]</td><td align="center">float</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1024]</td><td align="center">float</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reg_ld_st_align_kernel</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_align_kernel</td></tr>
   </table>
 - 样例实现：  
-  主要包括以下步骤：
-  1. 初始化参数
-  2. 将数据从GM搬运到UB
-  3. 当mode=0，调用CopySucceVF搬运1024个float数，写回UB;
-     当mode=1，调用CopySucceWithPostModeVF，开启post mode，搬运1024个float数，写回UB
-     当mode=2，调用CopyUnSucceVF，进行非连续搬运，共搬运1024个float数，写回UB
-     当mode=3，调用CopyUnSucceWithPostModeVF，进行非连续搬运，开启post mode，共搬运1024个float数，写回UB
-  4. 将数据从UB搬运回GM
+  实现以下搬运模式：
+   
+   <table>
+  <tr>
+    <td align="center">mode</td>
+    <td align="center">调用函数</td>
+    <td align="center">搬运方式</td>
+    <td align="center">Post Mode</td>
+  </tr>
+  <tr>
+    <td align="center">0</td>
+    <td align="center">CopySucceVF</td>
+    <td align="center">连续搬运</td>
+    <td align="center">关闭</td>
+  </tr>
+  <tr>
+    <td align="center">1</td>
+    <td align="center">CopySucceWithPostModeVF</td>
+    <td align="center">连续搬运</td>
+    <td align="center">开启</td>
+  </tr>
+  <tr>
+    <td align="center">2</td>
+    <td align="center">CopyUnSucceVF</td>
+    <td align="center">非连续搬运</td>
+    <td align="center">关闭</td>
+  </tr>
+  <tr>
+    <td align="center">3</td>
+    <td align="center">CopyUnSucceWithPostModeVF</td>
+    <td align="center">非连续搬运</td>
+    <td align="center">开启</td>
+  </tr>
+</table>
+
   
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
