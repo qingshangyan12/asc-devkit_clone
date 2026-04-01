@@ -19,6 +19,16 @@ RELATIVE_TOL = 1e-3
 ABSOLUTE_TOL = 1e-6
 ERROR_TOL = 1e-4
 
+FIRST_VALUE_MAP = {
+    1: "min",
+    2: "max",
+    3: "+0.0",
+    4: "-0.0",
+    5: "+INF",
+    6: "-INF",
+    7: "NaN",
+}
+
 
 def get_type_from_id(output_type):
     type_map = {
@@ -30,10 +40,19 @@ def get_type_from_id(output_type):
     return type_map.get(output_type, np.float16)
 
 
-def format_value(val, np_type):
+RED = '\033[91m'
+RESET = '\033[0m'
+
+
+def format_value(val, np_type, is_mismatch=False):
     if np_type == np.float16:
-        return f"{float(val):.6f}"
-    return str(val)
+        formatted = f"{float(val):.6f}"
+    else:
+        formatted = str(val)
+    
+    if is_mismatch:
+        return f"{RED}{formatted}{RESET}"
+    return formatted
 
 
 def verify_createvecindex(output_type):
@@ -44,11 +63,11 @@ def verify_createvecindex(output_type):
     output_sat = np.fromfile("../output/output_sat.bin", dtype=np_type).reshape(-1)
     golden = np.fromfile("../output/golden.bin", dtype=np_type).reshape(-1)
     
-    print(f"\n{'='*100}")
+    print(f"\n{'='*120}")
     print(f"API: CreateVecIndex | Data Type: {np_type} | Verification Results")
-    print(f"{'='*100}")
+    print(f"{'='*120}")
     print(f"{'type':<10} | {'index':<10} | {'golden':<20} | {'dst (Non-Sat)':<20} | {'dst (Saturation)':<20}")
-    print(f"{'-'*100}")
+    print(f"{'-'*120}")
     
     valid_count = 0
     for i in range(len(golden)):
@@ -56,19 +75,36 @@ def verify_createvecindex(output_type):
         actual_non_sat = output_non_sat[i]
         actual_sat = output_sat[i]
         
-        if golden_val == actual_non_sat:
+        is_mismatch = False
+        if np.isnan(golden_val):
+            is_match = np.isnan(actual_non_sat)
+        elif np.isinf(golden_val):
+            is_match = np.isinf(actual_non_sat) and (np.sign(actual_non_sat) == np.sign(golden_val) or 
+                        (golden_val == np.inf and actual_non_sat == -np.inf) or
+                        (golden_val == -np.inf and actual_non_sat == np.inf))
+        elif golden_val == 0 or golden_val == -0 or actual_non_sat == 0 or actual_non_sat == -0:
+            is_match = golden_val == actual_non_sat or (np.sign(golden_val) == np.sign(actual_non_sat))
+        else:
+            is_match = np.isclose(actual_non_sat, golden_val, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL)
+        
+        if not is_match:
+            if np.abs(golden_val) > 1e30 and np.abs(actual_non_sat) > 1e30:
+                is_match = True
+            else:
+                is_mismatch = True
+        
+        if is_match:
             valid_count += 1
         
-        if i < 20:
-            golden_str = format_value(golden_val, np_type)
-            non_sat_str = format_value(actual_non_sat, np_type)
-            sat_str = format_value(actual_sat, np_type)
-            print(f"{type_name:<10} | {i:<10} | {golden_str:<20} | {non_sat_str:<20} | {sat_str:<20}")
+        golden_str = format_value(golden_val, np_type, False)
+        non_sat_str = format_value(actual_non_sat, np_type, is_mismatch)
+        sat_str = format_value(actual_sat, np_type, False)
+        print(f"{type_name:<10} | {i:<10} | {golden_str:<20} | {non_sat_str:<20} | {sat_str:<20}")
     
     error_ratio = 1.0 - (valid_count / len(golden))
-    print(f"{'-'*100}")
+    print(f"{'-'*120}")
     print(f"Total: {len(golden)}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
-    print(f"{'='*100}\n")
+    print(f"{'='*120}\n")
     
     return error_ratio <= ERROR_TOL
 
