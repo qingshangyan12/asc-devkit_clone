@@ -1,15 +1,18 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
+ * This program is free software, you can redistribute it and/or modify it under
+ * the terms and conditions of CANN Open Software License Agreement Version 2.0
+ * (the "License"). Please refer to the License for details. You may not use
+ * this file except in compliance with the License. THIS SOFTWARE IS PROVIDED ON
+ * AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS
+ * FOR A PARTICULAR PURPOSE. See LICENSE in the root of the software repository
+ * for the full text of the License.
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_l12l0b_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#warning \
+    "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_l12l0b_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -19,235 +22,284 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
+    uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
+    uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
+    uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
+    uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
+    uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
+    uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
+    uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
+    uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ half* dst, __cbuf__ half* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ half* dst, __cbuf__ half* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ half* dst, __cbuf__ half* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ half* dst, __cbuf__ half* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ float* dst, __cbuf__ float* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ float* dst, __cbuf__ float* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ float* dst, __cbuf__ float* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ float* dst, __cbuf__ float* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                            uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                            uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+        img2colv2_cbuf_to_cb(
+            dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+            filter_h, transpose, fmatrix_ctrl, size_channel);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
-                                                uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
+    uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
+    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
 {
-    asc_copy_l12l0b_impl(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,
-                        dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel);
+    asc_copy_l12l0b_impl(
+        dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w, dilation_h, filter_w,
+        filter_h, transpose, fmatrix_ctrl, size_channel);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -255,14 +307,16 @@ __aicore__ inline void asc_copy_l12l0b_impl(__cb__ bfloat16_t* dst, __cbuf__ bfl
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -270,14 +324,16 @@ __aicore__ inline void asc_copy_l12l0b_impl(__cb__ float8_e4m3_t* dst, __cbuf__ 
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -285,14 +341,50 @@ __aicore__ inline void asc_copy_l12l0b_impl(__cb__ float8_e5m2_t* dst, __cbuf__ 
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+{
+    if ASC_IS_AIC {
+        load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
+    }
+}
+
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+{
+    asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_sync_post_process();
+}
+
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+{
+    if ASC_IS_AIC {
+        load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
+    }
+}
+
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+{
+    asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_sync_post_process();
+}
+
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -300,134 +392,135 @@ __aicore__ inline void asc_copy_l12l0b_impl(__cb__ half* dst, __cbuf__ half* src
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
-        load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
+        load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-{
-    if ASC_IS_AIC {
-        load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-    }
-}
-
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-{
-    asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
-    asc_sync_post_process();
-}
-
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -435,14 +528,16 @@ __aicore__ inline void asc_copy_l12l0b_impl(__cb__ int4b_t* dst, __cbuf__ int4b_
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_impl(
+    __cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -450,22 +545,8 @@ __aicore__ inline void asc_copy_l12l0b_impl(__cb__ fp4x2_e2m1_t* dst, __cbuf__ f
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-{
-    asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
-    asc_sync_post_process();
-}
-
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-{
-    if ASC_IS_AIC {
-        load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-    }
-}
-
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_sync_impl(
+    __cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_l12l0b_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
@@ -473,7 +554,8 @@ __aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ fp4x2_e1m2_t* dst, __cbu
 }
 
 // transpose
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -481,14 +563,17 @@ __aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ bfloat16_t* dst, __
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -496,14 +581,17 @@ __aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ float8_e4m3_t* dst,
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -511,14 +599,53 @@ __aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ float8_e5m2_t* dst,
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+{
+    if ASC_IS_AIC {
+        load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
+    }
+}
+
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+{
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_sync_post_process();
+}
+
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+{
+    if ASC_IS_AIC {
+        load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
+    }
+}
+
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+{
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_sync_post_process();
+}
+
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -526,134 +653,143 @@ __aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ half* dst, __cbuf__
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
-        load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
+        load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-{
-    if ASC_IS_AIC {
-        load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-    }
-}
-
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-{
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
-    asc_sync_post_process();
-}
-
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -661,14 +797,17 @@ __aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ int4b_t* dst, __cbu
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_impl(
+    __cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -676,25 +815,12 @@ __aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ fp4x2_e2m1_t* dst, 
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
+__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
+    __cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
-    asc_sync_post_process();
-}
-
-__aicore__ inline void asc_copy_l12l0b_transpose_impl(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-{
-    if ASC_IS_AIC {
-        load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-    }
-}
-
-__aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
-{
-    asc_copy_l12l0b_transpose_impl(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    asc_copy_l12l0b_transpose_impl(
+        dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     asc_sync_post_process();
 }
 #endif
