@@ -25,7 +25,7 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl.h"
 
-//asc_mins int32_t
+//asc_min_scalar int32_t
 __simd_callee__ inline void asc_min_scalar_impl(vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask)
 {
     if ASC_IS_AIV{
@@ -33,7 +33,7 @@ __simd_callee__ inline void asc_min_scalar_impl(vector_int32_t& dst, vector_int3
     }
 }
 
-//asc_mins uint32_t
+//asc_min_scalar uint32_t
 __simd_callee__ inline void asc_min_scalar_impl(vector_uint32_t& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
 {
     if ASC_IS_AIV{
@@ -49,7 +49,7 @@ __simd_callee__ inline void asc_min_scalar_impl(vector_int16_t& dst, vector_int1
     }
 }
 
-//asc_mins uint16_t
+//asc_min_scalar uint16_t
 __simd_callee__ inline void asc_min_scalar_impl(vector_uint16_t& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
 {
     if ASC_IS_AIV{
@@ -57,7 +57,7 @@ __simd_callee__ inline void asc_min_scalar_impl(vector_uint16_t& dst, vector_uin
     }
 }
 
-//asc_mins int8_t
+//asc_min_scalar int8_t
 __simd_callee__ inline void asc_min_scalar_impl(vector_int8_t& dst, vector_int8_t src, int8_t value, vector_bool mask)
 {
     if ASC_IS_AIV{
@@ -65,7 +65,7 @@ __simd_callee__ inline void asc_min_scalar_impl(vector_int8_t& dst, vector_int8_
     }
 }
 
-//asc_mins uint8_t
+//asc_min_scalar uint8_t
 __simd_callee__ inline void asc_min_scalar_impl(vector_uint8_t& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
     if ASC_IS_AIV{
@@ -73,7 +73,7 @@ __simd_callee__ inline void asc_min_scalar_impl(vector_uint8_t& dst, vector_uint
     }
 }
 
-//asc_mins float
+//asc_min_scalar float
 __simd_callee__ inline void asc_min_scalar_impl(vector_float& dst, vector_float src, float value, vector_bool mask)
 {
     if ASC_IS_AIV{
@@ -81,7 +81,7 @@ __simd_callee__ inline void asc_min_scalar_impl(vector_float& dst, vector_float 
     }
 }
 
-//asc_mins half
+//asc_min_scalar half
 __simd_callee__ inline void asc_min_scalar_impl(vector_half& dst, vector_half src, half value, vector_bool mask)
 {
     if ASC_IS_AIV{
