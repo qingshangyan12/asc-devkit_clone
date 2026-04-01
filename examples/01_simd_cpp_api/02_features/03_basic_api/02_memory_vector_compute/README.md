@@ -25,12 +25,11 @@
 | [get_reduce_repeat_max_min_spr](./get_reduce_repeat_max_min_spr)                                                               | 本样例介绍基础api GetReduceRepeatMaxMinSpr的调用，GetReduceRepeatMaxMinSpr的功能是获取ReduceMax、ReduceMin连续场景下的最大/最小值以及相应的索引值            |
 | [get_reduce_repeat_sum_spr](./get_reduce_repeat_sum_spr)                                                                                         | 本样例介绍基础api GetReduceRepeatSumSpr的调用。GetReduceRepeatSumSpr的功能是获取ReduceSum接口的计算结果 |
 | [pair_reduce_sum](./pair_reduce_sum)                                                                                           | 本样例基于PairReduceSum实现求和归约，可用于相邻两个（奇数下标和偶数下标）元素求和                  |
-| [mrg_sort](./mrg_sort) | 本样例基于MrgSort基础API实现将已排好序的最多4条队列，合并成1条队列，结果按照score域由大到小排序 |
+| [mrg_sort](./mrg_sort) | 本样例基于Sort32和MrgSort基础API实现将已排好序的最多4条队列，合并成1条队列，结果按照score域由大到小排序 |
 | [mrg_sort4](./mrg_sort4) | 本样例介绍基础api MrgSort4的调用，该api的功能：将已经排好序的最多4条Region Proposals队列，排列合并成1条队列，结果按照score域由大到小排序 |
 | [proposal_concat](./proposal_concat) | 本样例介绍基础api ProposalConcat的调用，该api的功能：将连续元素合入Region Proposal内对应位置，每次迭代会将16个连续元素合入到16个Region Proposal的对应位置里 |
 | [proposal_extract](./proposal_extract) | 本样例介绍基础api ProposalExtract的调用，该api的功能：与ProposalConcat相反，从Region Proposal内将相应位置的单个元素抽取后重排，每次迭代处理16个Region Proposals，抽取16个元素后连续排列 |
 | [rp_sort16](./rp_sort16) | 本样例介绍基础api RpSort16的调用，该api的功能：根据Region Proposals中的score域对其进行排序（score大的排前面），每次排16个Region Proposals |
-| [sort32](./sort32) | 本样例基于Sort32实现对128个元素进行排序操作 |
 | [reduce_max_computation_of_the_first_n_data_elements](./reduce_max_computation_of_the_first_n_data_elements)         | 本样例基于ReduceMax的tensor前n个数据计算接口实现最大值归约，可用于指定从输入tensor的前n个数据中计算找出最大值及最大值对应的索引位置              |
 | [reduce_max_high_dimensional_tensor_sharding_computation](./reduce_max_high_dimensional_tensor_sharding_computation) | 本样例基于ReduceMax的tensor高维切分计算接口实现最大值归约，可用于从所有的输入数据中找出最大值及最大值对应的索引位置，使用mask用于控制每次迭代内参与计算的元素。            |
 | [reduce_min_computation_of_the_first_n_data_elements](./reduce_min_computation_of_the_first_n_data_elements)         | 本样例基于ReduceMin的tensor前n个数据计算接口实现最小值归约，可用于指定从输入tensor的前n个数据中找出最小值及最小值对应的索引值              |
