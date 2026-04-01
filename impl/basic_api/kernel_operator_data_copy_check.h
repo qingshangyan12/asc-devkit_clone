@@ -30,7 +30,7 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline constexpr bool IsBasicDataCopySupportedType()
 {
-    return SupportType<PrimT<T>, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t,
+    return SupportType<PrimT<T>, int4b_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t,
         half, float, double>()
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         || SupportType<PrimT<T>, bfloat16_t>()
@@ -41,7 +41,7 @@ __aicore__ inline constexpr bool IsBasicDataCopySupportedType()
 template <typename T>
 __aicore__ inline constexpr bool IsNd2NzSupportedType()
 {
-    return SupportType<PrimT<T>, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float>()
+    return SupportType<PrimT<T>, int4b_t, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float>()
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         || SupportType<PrimT<T>, bfloat16_t>()
 #endif
@@ -58,7 +58,7 @@ template <typename T>
 __aicore__ inline void CheckBasicDataCopyTypeSupport(const __gm__ char* apiName)
 {
     ASCENDC_DEBUG_ASSERT((IsBasicDataCopySupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype support in %s, supported dtypes are int8_t/uint8_t/int16_t/uint16_t/int32_t/"
+        "Failed to check dtype support in %s, supported dtypes are int4b_t/int8_t/uint8_t/int16_t/uint16_t/int32_t/"
         "uint32_t/int64_t/uint64_t/half/bfloat16_t/float/double.\n", apiName));
 }
 
@@ -66,7 +66,7 @@ template <typename T>
 __aicore__ inline void CheckNd2NzTypeSupport(const __gm__ char* apiName)
 {
     ASCENDC_DEBUG_ASSERT((IsNd2NzSupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype support in %s, supported dtypes are int8_t/uint8_t/int16_t/uint16_t/int32_t/"
+        "Failed to check dtype support in %s, supported dtypes are int4b_t/int8_t/uint8_t/int16_t/uint16_t/int32_t/"
         "uint32_t/half/bfloat16_t/float.\n", apiName));
 }
 
@@ -74,7 +74,7 @@ template <typename T>
 __aicore__ inline void CheckDataCopyPadTypeSupport(const __gm__ char* apiName)
 {
     ASCENDC_DEBUG_ASSERT((IsDataCopyPadSupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype support in %s, supported dtypes are half/bfloat16_t/int16_t/uint16_t/float/"
+        "Failed to check dtype support in %s, supported dtypes are int4b_t/half/bfloat16_t/int16_t/uint16_t/float/"
         "int32_t/uint32_t/int8_t/uint8_t/int64_t/uint64_t/double.\n", apiName));
 }
 
