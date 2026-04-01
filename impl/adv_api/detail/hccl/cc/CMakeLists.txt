@@ -10,6 +10,8 @@
 
 # CC_BASE_DIR points to asc-devkit root
 set(CC_BASE_DIR ${ASCENDC_DIR})
+# CC_SRC_DIR points to this cc directory (replaces OPS_BASE_DIR/src in original hccl)
+set(CC_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(BUILD_OPEN_PROJECT)
     set(INSTALL_AICPU_KERNEL_JSON_DIR mc2_client/built-in/data/op/aicpu)
