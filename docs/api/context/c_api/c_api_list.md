@@ -306,7 +306,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 <cann-filter npu_type="950">
 
-## 寄存器数据搬运
+## Reg数据搬运
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -323,7 +323,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_storeunalign](reg/reg_store/asc_storeunalign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 | [asc_storeunalign_postupdate](reg/reg_store/asc_storeunalign_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 
-## 寄存器计算
+## Reg矢量计算
 
 |   API名称   |   说明   |
 |----------|-----------|
