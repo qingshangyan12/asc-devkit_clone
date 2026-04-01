@@ -1,12 +1,14 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under
+ * the terms and conditions of CANN Open Software License Agreement Version 2.0
+ * (the "License"). Please refer to the License for details. You may not use
+ * this file except in compliance with the License. THIS SOFTWARE IS PROVIDED ON
+ * AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS
+ * FOR A PARTICULAR PURPOSE. See LICENSE in the root of the software repository
+ * for the full text of the License.
+ */
 
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_UTILS_C_API_TYPE_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_UTILS_C_API_TYPE_H
@@ -49,23 +51,23 @@ using float8_e8m0_t = fp8_e8m0_t;
 #else
 
 struct fp4x2_e2m1_t {
-    float4_e2m1x2_t data;
+  float4_e2m1x2_t data;
 };
 
 struct fp4x2_e1m2_t {
-    float4_e1m2x2_t data;
+  float4_e1m2x2_t data;
 };
 
 struct fp8_e4m3fn_t {
-    float8_e4m3_t data;
+  float8_e4m3_t data;
 };
 
 struct fp8_e5m2_t {
-    float8_e5m2_t data;
+  float8_e5m2_t data;
 };
 
 struct fp8_e8m0_t {
-    float8_e8m0_t data;
+  float8_e8m0_t data;
 };
 
 #endif
