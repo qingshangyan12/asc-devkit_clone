@@ -11,7 +11,11 @@
 # CC_BASE_DIR points to asc-devkit root
 set(CC_BASE_DIR ${ASCENDC_DIR})
 
-if(NOT BUILD_OPEN_PROJECT)
+if(BUILD_OPEN_PROJECT)
+    set(INSTALL_AICPU_KERNEL_JSON_DIR mc2_client/built-in/data/op/aicpu)
+    set(INSTALL_DEVICE_TAR_DIR mc2_client/Ascend/aicpu)
+    set(INSTALL_INCLUDE_DIR mc2_client/include)
+else()
     set(INSTALL_AICPU_KERNEL_JSON_DIR ${INSTALL_LIBRARY_DIR})
 endif()
 
