@@ -2781,7 +2781,7 @@ __simd_callee__ inline void asc_uint162uint32(vector_uint32_t& dst, vector_uint1
 
 __simd_callee__ inline void asc_uint162uint32_v2(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask)
 {
-    asc_uint162uint32_impl(dst, src, mask);
+    asc_uint162uint32_v2_impl(dst, src, mask);
 }
 
 // ==========asc_hif82float==========
