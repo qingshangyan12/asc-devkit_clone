@@ -7,7 +7,7 @@ BasedOnStyle: Google
 AccessModifierOffset: -4
 
 # 开括号(开圆括号、开尖括号、开方括号)后的对齐: Align, DontAlign, AlwaysBreak(总是在开括号后换行)
-AlignAfterOpenBracket: Align #存在冲突，基线是AlwaysBreak
+AlignAfterOpenBracket: AlwaysBreak
 
 # 连续赋值时，对齐所有等号
 AlignConsecutiveAssignments: false
@@ -16,7 +16,7 @@ AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 
 # 右对齐逃脱换行(使用反斜杠换行)的反斜杠
-AlignEscapedNewlines: Right #存在冲突，基线是Left
+AlignEscapedNewlines: Left
 
 AllowAllArgumentsOnNextLine: true
 
@@ -27,16 +27,16 @@ AlignOperands: true
 AlignTrailingComments: true
 
 # 不允许函数声明的所有参数在放在下一行
-AllowAllParametersOfDeclarationOnNextLine: false #存在冲突，基线是true
+AllowAllParametersOfDeclarationOnNextLine: true
 
 # 不允许短的块放在同一行
-AllowShortBlocksOnASingleLine: true #存在冲突，基线是false
+AllowShortBlocksOnASingleLine: false
 
 # 允许短的case标签放在同一行
 AllowShortCaseLabelsOnASingleLine: false
 
 # 允许短的函数放在同一行: None, InlineOnly(定义在类中), Empty(空函数), Inline(定义在类中，空函数), All
-AllowShortFunctionsOnASingleLine: Empty #存在冲突，且字段不一致，基线是true
+AllowShortFunctionsOnASingleLine: true
 
 # 允许短的if语句保持在同一行
 AllowShortIfStatementsOnASingleLine: false
@@ -88,9 +88,9 @@ BraceWrapping:
   # 分离空函数
   SplitEmptyFunction: false
   # 分离空语句
-  SplitEmptyRecord: false #存在冲突
+  SplitEmptyRecord: true
   # 分离空命名空间
-  SplitEmptyNamespace: false #存在冲突
+  SplitEmptyNamespace: true
 
 # 在二元运算符前换行: None(在操作符后换行), NonAssignment(在非赋值的操作符前换行), All(在操作符前换行)
 BreakBeforeBinaryOperators: NonAssignment
