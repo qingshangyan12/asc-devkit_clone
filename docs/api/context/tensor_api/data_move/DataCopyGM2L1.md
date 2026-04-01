@@ -41,19 +41,17 @@ DataCopyGM2L1提供数据搬运功能，该接口支持Global Memory到L1 Buffer
 
 - 不支持坐标偏移的接口
 
-    ```cpp
-    template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U>
-    __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplate<T, U>, void>::type
-    DataCopy(const T& dst, const U& src)
-    ```
+  ```cpp
+  template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U>
+  __aicore__ inline typename void DataCopy(const T& dst, const U& src)
+  ```
 
 - 支持坐标偏移的接口
 
-    ```cpp
-    template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U, typename Coord>
-    __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplateWithCoord<T, U, Coord>, void>::type
-    DataCopy(const T& dst, const U& src, const Coord& coord)
-    ```
+  ```cpp
+  template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U, typename Coord>
+  __aicore__ inline void DataCopy(const T& dst, const U& src, const Coord& coord)
+  ```
 
 ## 参数说明
 
@@ -61,10 +59,10 @@ DataCopyGM2L1提供数据搬运功能，该接口支持Global Memory到L1 Buffer
 
 | 参数名 | 描述 |
 | -- | -- |
+| DataCopyTrait | 预留参数，保持默认值即可。 |
 | T | 目的操作数的数据类型，通过MakeTensor构造的[LocalTensor类型](../struct/tensor/LocalTensor.md)，存储位置支持L1，数据格式支持ND、NZ、ZN、ZZ和NN。 |
 | U | 源操作数的数据类型，通过MakeTensor构造的[LocalTensor类型](../struct/tensor/LocalTensor.md)，存储位置支持GM，数据格式仅支持ND、DN、NZ、ZN、ZZ、NN、ScaleAND、ScaleADN、ScaleBND和ScaleBDN。 |
-| Coord | 坐标偏移的数据类型，通过MakeCoord构造的[Coord类型](../struct/coord/Coord.md)。 |
-| DataCopyTrait | 预留参数，保持默认值即可。 |
+| Coord | 偏移坐标的数据类型，通过MakeCoord构造的[Coord类型](../struct/coord/Coord.md)。 |
 
 **表 2**  参数说明
 
@@ -99,7 +97,7 @@ DataCopyGM2L1提供数据搬运功能，该接口支持Global Memory到L1 Buffer
 
 ## 约束说明
 
-- 地址重叠约束：无约束。
+- 地址重叠约束：源操作数与目的操作数位于不同物理位置，不存在地址重叠场景。
 - 地址对齐约束：源操作数起始地址要求按元素位宽对齐。目的操作数起始地址要求满足32字节对齐。
 - 参数组合约束：无约束。
 - 环境影响约束：无约束。
@@ -108,9 +106,13 @@ DataCopyGM2L1提供数据搬运功能，该接口支持Global Memory到L1 Buffer
 - 异常和边界值处理：无约束。
 - Tensor Layout相关约束：
   - Shape、Stride只支持四维，针对不同的物理存储位置，四个维度的配置均有不同的约束，部分维度为固定值，不可配置。详见[层次化表达法](../Layout和层次化表述法.md)。
-  - Shape、Stride具体维度的数据，仅支持基础整数类型和Std::Int类型。
+  - Shape、Stride具体维度的数据，仅支持size_t和Std::Int类型。
   - 支持坐标偏移的接口中，coord需要满足对应源操作数分形的对齐要求。
   - ND2ND场景只支持一维数据格式，Layout的Shape中的ShapeRow1或ShapeColumn1需要设置为Std::Int<1>{}。
+
+## 流水类型
+
+PIPE_MTE2
 
 ## 调用示例
 
@@ -148,4 +150,4 @@ atomCopyGM2L1.Call(dstTensor, srcTensor);
 ...
 ```
 
-更多样例请参考[TensorAPI样例代码](../../../../../examples/01_simd_cpp_api/02_features/05_tensor_api)。
+完整样例请参考[TensorAPI样例代码](../../../../../examples/01_simd_cpp_api/02_features/05_tensor_api/matmul_quant_relu/matmul_quant_relu.asc)。
