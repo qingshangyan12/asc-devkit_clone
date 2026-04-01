@@ -13,7 +13,7 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-class TEST_ASC_RELEASE_BUF : public testing::Test {
+class TEST_ASC_UNLOCK : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -28,12 +28,12 @@ void rls_buf_stub(pipe_t pipe, uint8_t buf_id, bool mode)
 }
 } // namespace
 
-TEST_F(TEST_ASC_RELEASE_BUF, c_api_release_buf_Succ)
+TEST_F(TEST_ASC_UNLOCK, c_api_release_buf_Succ)
 {
     MOCKER_CPP(rls_buf, void(pipe_t, uint8_t, bool))
         .times(1)
         .will(invoke(rls_buf_stub));
 
-    asc_release_buf(pipe_t::PIPE_S, static_cast<uint8_t>(11), false);
+    asc_unlock(pipe_t::PIPE_S, static_cast<uint8_t>(11), false);
     GlobalMockObject::verify();
 }

@@ -1,4 +1,4 @@
-# asc_release_buf
+# asc_unlock
 ## 产品支持情况
 
 | 产品 | 是否支持  |
@@ -12,7 +12,7 @@
 ## 函数原型
 
     ```cpp
-    __aicore__ inline void asc_release_buf(pipe_t pipe, uint8_t buf_id, bool mode)
+    __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t buf_id, bool mode)
     ```
 
 ## 参数说明
@@ -33,9 +33,9 @@ PIPE_S
 
 ## 约束说明
 
-- 必须与asc_get_buf搭配使用，且需要使用相同的buf_id与mode。此外，asc_release_buf必须始终插在对应的asc_get_buf指令之后，否则硬件行为无定义。
-- 具有相同buf_id的asc_get_buf与asc_release_buf组合，无论pipe与mode是否相同，均不得在编程顺序中嵌套，否则硬件行为将不可预测。
-- 对于程序顺序中连续出现的，具有相同pipe与buf_id的指令对，后一个asc_get_buf将不再阻塞流水线运行，若需实现同一流水线的依赖关系，则必须使用指令asc_sync_pipe。
+- 必须与asc_lock搭配使用，且需要使用相同的buf_id与mode。此外，asc_unlock必须始终插在对应的asc_lock指令之后，否则硬件行为无定义。
+- 具有相同buf_id的asc_lock与asc_unlock组合，无论pipe与mode是否相同，均不得在编程顺序中嵌套，否则硬件行为将不可预测。
+- 对于程序顺序中连续出现的，具有相同pipe与buf_id的指令对，后一个asc_lock将不再阻塞流水线运行，若需实现同一流水线的依赖关系，则必须使用指令asc_sync_pipe。
 
 ## 调用示例
 
@@ -44,6 +44,6 @@ PIPE_S
 uint8_t buf_id = 1;
 //等待PIPE_S中所有前置指令完成后释放标号为1的缓存
 bool mode = false;
-asc_get_buf(PIPE_S, buf_id, mode);  
-asc_release_buf(PIPE_S, buf_id, mode);  
+asc_lock(PIPE_S, buf_id, mode);  
+asc_unlock(PIPE_S, buf_id, mode);  
 ```
