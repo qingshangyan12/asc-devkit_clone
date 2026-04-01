@@ -68,6 +68,9 @@ target_include_directories(
 
 add_subdirectory(tiling)
 
+# HCCL collective communication (mc2_client/mc2_server)
+add_subdirectory(detail/hccl/cc)
+
 if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
   include(ExternalProject)
   ExternalProject_Add(device_tiling

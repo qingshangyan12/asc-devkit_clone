@@ -535,3 +535,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         TASK_NUM 1
     )
 endforeach()
+
+# ================ HCCL CC tests (migrated from hccl project) ================
+add_subdirectory(hccl/cc)
