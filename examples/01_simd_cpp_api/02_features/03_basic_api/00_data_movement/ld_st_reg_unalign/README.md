@@ -1,16 +1,17 @@
-# reg_ld_st_unalign样例
+# ld_st_reg_unalign样例
 
 ## 概述
-本样例基于RegBase编程范式实现reg的连续非对齐搬运操作。
+本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的非对齐数据搬运操作，该样例使用LoadUnAlign，StoreUnAlign，LoadUnAlignPre，StoreUnAlignPost接口。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
 ```
-├── reg_ld_st_unalign
+├── ld_st_reg_unalign
 │   ├── CMakeLists.txt                 // 编译工程文件
-│   └── vector_add.asc                 // AscendC样例实现 & 调用样例
+│   └── README.md                      // 样例介绍
+│   └── ld_st_reg_unalign.asc          // AscendC样例实现 & 调用样例
 ```
 
 ## 样例描述
@@ -21,19 +22,15 @@
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
   </tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">x</td><td align="center">[1024]</td><td align="center">float</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[128]</td><td align="center">float</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 128]</td><td align="center">float</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reg_ld_st_unalign_kernel</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_unalign_kernel</td></tr>
   </table>
 - 样例实现：  
-  主要包括以下步骤：
-  1. 初始化参数
-  2. 将数据从GM搬运到UB
-  3. 将UB上源操作数和目的操作数地址偏移一个元素（4 Btype）长度，使得起始地址非32B对齐，调用CopyVF从该地址开始搬运128个float数，写回UB
-  4. 将数据从UB搬运回GM
+   将UB上源操作数和目的操作数地址偏移一个元素（4 Btype）长度，使得起始地址非32B对齐，调用CopyVF从该地址开始搬运128个float数，写回UB(Unified Buffer)。
   
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
