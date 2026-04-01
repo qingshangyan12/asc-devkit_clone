@@ -9,6 +9,8 @@
 # ----------------------------------------------------------------------------------------------------------
 
 # Check if all operators failed compilation
+# The CPACK_ASC_ALL_KERNELS_FAIL variable should be set in func.cmake before include(CPack)
+# CPack will pass this variable to this script automatically
 if(DEFINED CPACK_ASC_ALL_KERNELS_FAIL AND CPACK_ASC_ALL_KERNELS_FAIL)
   message(STATUS "All operators failed, skipping package creation")
   return()
@@ -47,5 +49,4 @@ if (NOT "${CPACK_PACKAGE_DIRECTORY}x" STREQUAL "${CPACK_INSTALL_PREFIX}x")
         WORKING_DIRECTORY ${CPACK_TEMPORARY_DIRECTORY}
     )
 endif()
-
 
