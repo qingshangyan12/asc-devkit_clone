@@ -1143,7 +1143,7 @@ function(npu_op_package_add target_package_name)
       endif()
     ")
 
-    add_custom_target(${_ascendc_kernel_target}_check_all_fail
+    add_custom_target(${target_package_name}_check_all_fail
       COMMAND ${CMAKE_COMMAND} -P "${CHECK_SCRIPT}"
       DEPENDS ${KERNEL_COMPILE_TARGETS}
     )
@@ -1416,7 +1416,24 @@ function(npu_op_package_add target_package_name)
     if (NOT TARGET binary)
       add_custom_target(binary)
     endif()
-    add_dependencies(binary ${_ascendc_kernel_target}_check_all_fail)
+
+    if (NOT TARGET ${target_package_name}_deal_all_fail)
+      add_custom_target(${target_package_name}_deal_all_fail
+        COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_${target_package_name}.cmake"
+      )
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_${target_package_name}.cmake"
+"# Check if all kernels failed for this package
+get_property(all_fail GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL)
+if(all_fail)
+  message(FATAL_ERROR \"All kernels failed for package ${target_package_name}. Cannot proceed with build.\")
+else()
+  message(STATUS \"Not all kernels failed for package ${target_package_name}, continuing build.\")
+endif()
+"
+      )
+    endif()
+    add_dependencies(binary ${target_package_name}_deal_all_fail)
+    add_dependencies(${target_package_name}_deal_all_fail ${target_package_name}_check_all_fail)
     get_property(kernel_enable_binary_package GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_BINARY_PACKAGE)
     get_property(kernel_enable_source_package GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_SOURCE_PACKAGE)
     if(NOT "${output_type}" STREQUAL "RUN")
