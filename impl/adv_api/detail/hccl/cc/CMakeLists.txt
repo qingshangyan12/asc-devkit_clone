@@ -474,14 +474,38 @@ endif()
 add_subdirectory(common)
 add_subdirectory(ops)
 
+if(DEVICE_MODE)
+    set(CCL_KERNEL_TAR_DIR ${CC_BASE_DIR}/build_device/ccl_kernel_tar_pkg/)
+    if(KERNEL_MODE)
+        set(CCL_KERNEL_TAR_LIBS
+            ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libmc2_server.so
+        )
+        pack_targets_and_files(
+            OUTPUT_TARGET "generate_device_aicpu_package"
+            OUTPUT "mc2_server.tar.gz"
+            FILES ${CCL_KERNEL_TAR_LIBS}
+            MANIFEST "bin_hash.cfg"
+            TAR_ROOT_DIR "aicpu_kernels_device"
+        )
+        add_dependencies(generate_device_aicpu_package mc2_server)
+        sign_file(
+            INPUT "mc2_server.tar.gz"
+            CONFIG "${CMAKE_CURRENT_SOURCE_DIR}/scripts/sign/hccl_check_cfg.xml"
+            RESULT_VAR "mc2_server_sign_file"
+            DEPENDS generate_device_aicpu_package
+        )
+        add_dependencies(sign_mc2_server generate_device_aicpu_package)
+    endif()
+endif()
+
 if(DEVICE_MODE AND KERNEL_MODE)
-    set(CCL_KERNEL_TAR_DIR ${CC_BASE_DIR}/build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)
+    set(CCL_KERNEL_TAR_DIR_DEVICE ${CC_BASE_DIR}/build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)
     add_custom_command(
         TARGET mc2_server
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CCL_KERNEL_TAR_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mc2_server> ${CCL_KERNEL_TAR_DIR}
-        COMMENT "Copying libmc2_server.so to ${CCL_KERNEL_TAR_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CCL_KERNEL_TAR_DIR_DEVICE}
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mc2_server> ${CCL_KERNEL_TAR_DIR_DEVICE}
+        COMMENT "Copying libmc2_server.so to ${CCL_KERNEL_TAR_DIR_DEVICE}"
     )
 
     set(AICPU_CUSTOM_DIR ${CC_BASE_DIR}/build_device/aicpu_custom/)
@@ -492,6 +516,23 @@ if(DEVICE_MODE AND KERNEL_MODE)
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mc2_server> ${AICPU_CUSTOM_DIR}/libmc2_server.so
         COMMENT "Copying libmc2_server.so to ${AICPU_CUSTOM_DIR}/libmc2_server.so"
     )
+endif()
+
+if (NOT DEVICE_MODE)
+    message(STATUS "Detected INSTALL_LIBRARY_DIR: ${INSTALL_LIBRARY_DIR}")
+
+    set(BUILD_DEVICE_DIR ${CC_BASE_DIR}/build_device/)
+    add_custom_target(install_tar DEPENDS
+        ${BUILD_DEVICE_DIR}/signatures/mc2_server.tar.gz
+        ${BUILD_DEVICE_DIR}/aicpu_custom/libmc2_server.so
+    )
+    install(FILES ${BUILD_DEVICE_DIR}/signatures/mc2_server.tar.gz
+        DESTINATION ${INSTALL_DEVICE_TAR_DIR} OPTIONAL
+    )
+    install(FILES ${BUILD_DEVICE_DIR}/aicpu_custom/libmc2_server.so
+        DESTINATION ${INSTALL_AICPU_KERNEL_JSON_DIR} OPTIONAL
+    )
+    add_dependencies(install_tar mc2_client)
 endif()
 
 # Install migrated public headers

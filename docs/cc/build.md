@@ -165,9 +165,9 @@ bash build.sh --ut
 
 2. 关闭验签
 
-   源码仓编译生成的`cann-hccl_<version>_linux-<arch>.run`软件包中包含`aicpu_hccl.tar.gz`（HCCL AICPU 算子包)。
+   源码仓编译生成的`cann-hccl_<version>_linux-<arch>.run`软件包中包含`mc2_server.tar.gz`（HCCL AICPU 算子包)。
 
-   `aicpu_hccl.tar.gz`会在业务启动时加载至Device，加载过程中默认会由驱动进行安全验签，确保包可信。由于开发者通过本源码仓自行编译生成的`aicpu_hccl.tar.gz`包中并不含签名头，所以需要关闭驱动安全验签的机制。
+   `mc2_server.tar.gz`会在业务启动时加载至Device，加载过程中默认会由驱动进行安全验签，确保包可信。由于开发者通过本源码仓自行编译生成的`mc2_server.tar.gz`包中并不含签名头，所以需要关闭驱动安全验签的机制。
 
    **关闭验签方式：**
 

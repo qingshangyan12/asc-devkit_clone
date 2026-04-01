@@ -170,7 +170,7 @@ function build_device(){
     echo "TARGET_LIST=${TARGET_LIST}"
     PKG_TARGET_LIST="generate_device_aicpu_package"
     echo "PKG_TARGET_LIST=${PKG_TARGET_LIST}"
-    SIGN_TARGET_LIST="sign_aicpu_hccl"
+    SIGN_TARGET_LIST="sign_mc2_server"
     echo "SIGN_TARGET_LIST=${SIGN_TARGET_LIST}"
     build ${TARGET_LIST} ${PKG_TARGET_LIST} ${SIGN_TARGET_LIST}
 }
