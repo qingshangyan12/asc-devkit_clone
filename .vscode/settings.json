@@ -16,5 +16,6 @@
     },
     "[python]": {
         "editor.tabSize": 4
-    }
+    },
+    "wecode-cpp.languageProvider": "Tag"
 }
