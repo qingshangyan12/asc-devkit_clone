@@ -38,10 +38,10 @@ namespace AscendC {
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input GlobalTensor
- * @param [in] intriParams.blockCount number of blocks
- * @param [in] intriParams.blockLen Length of blocks
- * @param [in] intriParams.srcGap src block gap
- * @param [in] intriParams.dstGap dst block gap
+ * @param [in] repeatParams.blockCount number of blocks
+ * @param [in] repeatParams.blockLen Length of blocks
+ * @param [in] repeatParams.srcGap src block gap
+ * @param [in] repeatParams.dstGap dst block gap
  */
 template <typename T>
 __aicore__ inline void __inout_pipe__(MTE2) DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
@@ -254,10 +254,10 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output GlobalTensor
  * @param [in] src input LocalTensor
- * @param [in] intriParams.blockCount number of blocks
- * @param [in] intriParams.blockLen Length of blocks
- * @param [in] intriParams.srcGap src block gap
- * @param [in] intriParams.dstGap dst block gap
+ * @param [in] repeatParams.blockCount number of blocks
+ * @param [in] repeatParams.blockLen Length of blocks
+ * @param [in] repeatParams.srcGap src block gap
+ * @param [in] repeatParams.dstGap dst block gap
  */
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src,
@@ -331,10 +331,10 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst,
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
- * @param [in] intriParams.blockCount number of blocks
- * @param [in] intriParams.blockLen Length of blocks
- * @param [in] intriParams.srcGap src block gap
- * @param [in] intriParams.dstGap dst block gap
+ * @param [in] repeatParams.blockCount number of blocks
+ * @param [in] repeatParams.blockLen Length of blocks
+ * @param [in] repeatParams.srcGap src block gap
+ * @param [in] repeatParams.dstGap dst block gap
  */
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src,
@@ -412,10 +412,10 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
  * @brief datacopy from L1 to bt, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
- * @param [in] intriParams.blockCount number of blocks
- * @param [in] intriParams.blockLen Length of blocks
- * @param [in] intriParams.srcGap src block gap
- * @param [in] intriParams.dstGap dst block gap
+ * @param [in] repeatParams.blockCount number of blocks
+ * @param [in] repeatParams.blockLen Length of blocks
+ * @param [in] repeatParams.srcGap src block gap
+ * @param [in] repeatParams.dstGap dst block gap
  */
 template <typename T, typename U>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<U> &src,
@@ -489,10 +489,10 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<U> 
  * @param [in] src input LocalTensor
  * @param [in] mask[]/mask mask array/count
  * @param [in] repeatTime repeat times
- * @param [in] intriParams.dstStride dst block stride
- * @param [in] intriParams.srcStride src block stride
- * @param [in] intriParams.dstRepeatSize dst repeat stride
- * @param [in] intriParams.srcRepeatSize src repeat stride
+ * @param [in] repeatParams.dstStride dst block stride
+ * @param [in] repeatParams.srcStride src block stride
+ * @param [in] repeatParams.dstRepeatSize dst repeat stride
+ * @param [in] repeatParams.srcRepeatSize src repeat stride
  */
 // Copy::Level 0 - mask bit mode
 template <typename T, bool IsSetMask>
