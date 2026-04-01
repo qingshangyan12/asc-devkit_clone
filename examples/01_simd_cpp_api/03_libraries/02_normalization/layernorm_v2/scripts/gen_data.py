@@ -10,32 +10,63 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-
-
 import os
 import numpy as np
+import sys
 
-
-def gen_golden_data_simple():
-    shape = [32, 32]
-    inputX = np.arange(shape[0]*shape[1]).reshape(shape).astype(np.float32)
-    gamma = np.arange(shape[1]).reshape(shape[1]).astype(np.float32)
-    beta = np.arange(shape[1]).reshape(shape[1]).astype(np.float32)
-
+def gen_coop_final_data():
+    A_LENGTH = 32
+    R_LENGTH = 32
+    R_LENGTH_WITH_PAD = 32
+    EPSILON = 0.0001
+    dtype = np.float32
+    
+    inputX = np.arange(A_LENGTH * R_LENGTH).reshape([A_LENGTH, R_LENGTH]).astype(dtype)
+    gamma = np.arange(R_LENGTH).reshape([R_LENGTH]).astype(dtype)
+    beta = np.arange(R_LENGTH).reshape([R_LENGTH]).astype(dtype)
+    
+    # 计算LayerNorm真值
     reduce_axis = 1
-    mean  = np.mean(inputX, reduce_axis, keepdims=True)
-    variance = np.mean(np.power((inputX - mean),2), reduce_axis, keepdims=True)
-    result = gamma*((inputX - mean) / np.sqrt(variance + 0.0001)) + beta
-    rstd = 1 / np.sqrt(variance + 0.0001)
-
+    mean = np.mean(inputX, reduce_axis, keepdims=True)
+    variance = np.mean(np.power((inputX - mean), 2), reduce_axis, keepdims=True)
+    rstd = 1.0 / np.sqrt(variance + EPSILON)
+    layernorm_result = gamma * ((inputX - mean) / np.sqrt(variance + EPSILON)) + beta
+    
+    variance_calc = 1.0 / (rstd * rstd)
+    normalize_result = gamma * ((inputX - mean) / np.sqrt(variance + EPSILON)) + beta
+    
+    # 验证数学等价性
+    max_diff = np.max(np.abs(layernorm_result - normalize_result))
+    
+    if max_diff < 1e-10:
+        print("LayerNorm and Normalize are mathematically equivalent")
+    else:
+        print(f"Tiny difference detected: {max_diff}")
+    
+    # 从rstd计算方差: var = 1/(rstd*rstd) - epsilon
+    variance_calc = 1.0 / (rstd * rstd) - EPSILON
+    
+    # 检查方差计算正确性
+    var_diff = np.max(np.abs(variance - variance_calc))
+    if var_diff < 1e-6:
+        print("Variance calculation is correct")
+    else:
+        print(f"Variance calculation difference: {var_diff}")
+    
+    # 保存输入文件
     os.makedirs("input", exist_ok=True)
+    inputX.tofile("./input/coop_inputX.bin")
+    gamma.tofile("./input/coop_gamma.bin")
+    beta.tofile("./input/coop_beta.bin")
+
+    # 保存真值文件
     os.makedirs("output", exist_ok=True)
-    inputX.tofile("./input/input_inputX.bin")
-    gamma.tofile("./input/input_gamma.bin")
-    beta.tofile("./input/input_beta.bin")
-    result.tofile("./output/golden_output_result.bin")
-    mean.tofile("./output/golden_output_mean.bin")
-    rstd.tofile("./output/golden_output_rstd.bin")
+    layernorm_result.tofile("./output/golden_coop_layernormY.bin")
+    mean.reshape(-1).tofile("./output/golden_coop_mean.bin")
+    rstd.reshape(-1).tofile("./output/golden_coop_rstd.bin")
+    variance_calc.reshape(-1).tofile("./output/golden_coop_var.bin")
+    normalize_result.tofile("./output/golden_coop_normalizeY.bin")
+
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    gen_coop_final_data()

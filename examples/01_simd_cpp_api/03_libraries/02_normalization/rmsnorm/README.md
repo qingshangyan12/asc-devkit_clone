@@ -37,17 +37,19 @@
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">src</td><td align="center">1 * 1 * 16</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">gamma</td><td align="center">16</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">src</td><td align="center">[B, S, H]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">gamma</td><td align="center">[H]</td><td align="center">float</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">dst</td><td align="center">1 * 1 * 16</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">dst</td><td align="center">[B, S, H]</td><td align="center">float</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">rmsnorm_custom</td></tr>
   </table>
 
 - 算子实现：  
-  本样例中实现的是固定shape(src[1, 1, 16]，gamma[16]，dst[1, 1, 16])的rmsnorm算子。
+  本样例中实现的是固定shape(src[B, S, H]=[4, 8, 64]，gamma[H]=[64]，dst[B, S, H]=[4, 8, 64])的rmsnorm算子。
+
+  本样例使用 **基本块模式**（isBasicBlock=true），H=64 为 64 的倍数，B*S=32 为 8 的倍数，满足 RmsNorm 基本块要求，性能更优。详细说明请参考 [RmsNorm API文档](../../../../../docs/api/context/RmsNorm.md)。
 
   - Kernel实现
 
@@ -85,10 +87,27 @@
 - 样例执行
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
+  cmake -DNPU_ARCH=dav-2201 ..;make -j;             # 编译工程（默认npu模式）
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
   ```
+
+  使用 CPU调试 模式时，添加 `-DRUN_MODE=cpu` 参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DRUN_MODE=cpu -DNPU_ARCH=dav-2201 ..;make -j; # cpu调试模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `NPU_ARCH` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
