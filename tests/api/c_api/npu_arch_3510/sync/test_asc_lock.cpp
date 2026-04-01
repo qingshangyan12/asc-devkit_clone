@@ -13,7 +13,7 @@
 #include "c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-class TestSysVarGetBufCAPI : public testing::Test {
+class TestAscLockCAPI : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -28,12 +28,12 @@ void get_buf_stub(pipe_t pipe, uint8_t buf_id, bool mode)
 }
 }
 
-TEST_F(TestSysVarGetBufCAPI, c_api_get_buf_Succ)
+TEST_F(TestAscLockCAPI, asc_lock_Succ)
 {
     MOCKER_CPP(get_buf, void(pipe_t, uint8_t, bool))
         .times(1)
         .will(invoke(get_buf_stub));
 
-    asc_get_buf(pipe_t::PIPE_MTE3, static_cast<uint8_t>(10), false);
+    asc_lock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(10), false);
     GlobalMockObject::verify();
 }
