@@ -1124,14 +1124,10 @@ function(npu_op_package_add target_package_name)
 
     file(WRITE "${CHECK_SCRIPT}" "
       set(ERROR_LOG_FILE \"${ERROR_LOG_FILE}\")
-      message(STATUS \"Checking error log: \${ERROR_LOG_FILE}\")
       if(EXISTS \"\${ERROR_LOG_FILE}\")
         file(READ \"\${ERROR_LOG_FILE}\" ERROR_LOG_CONTENT)
-        message(STATUS \"0000000000000000000000000000000\")
-        message(STATUS \"\${ERROR_LOG_CONTENT}\")
-        message(STATUS \"111111111111111111111111111111\")
         execute_process(
-          COMMAND bash -c \"grep 'fail op-type:' '\${ERROR_LOG_FILE}' | wc -l || echo 0\"
+          COMMAND bash -c \"grep -c 'fail op-type:' '\${ERROR_LOG_FILE}' || echo 0\"
           OUTPUT_VARIABLE FAILED_COUNT
           OUTPUT_STRIP_TRAILING_WHITESPACE
         )
