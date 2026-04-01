@@ -11,10 +11,8 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-
 import os
 import numpy as np
-
 
 def gen_golden_data_simple():
     shape=[4,8]
