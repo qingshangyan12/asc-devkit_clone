@@ -47,21 +47,9 @@ struct LoadDataTensor2TensorNoCoordV2<Hardware::L0A, Hardware::L1, ArchVersion::
 };
 
 template <>
-struct LoadDataTensor2TensorNoCoordV2<Hardware::L0B, Hardware::L1, ArchVersion::V3510, NzLayoutPattern, NzLayoutPattern>
+struct LoadDataTensor2TensorNoCoordV2<Hardware::L0B, Hardware::L1, ArchVersion::V3510, ZnLayoutPattern, NzLayoutPattern>
 {
-    using type = LoadDataL12L0BZN2ZN3510;
-};
-
-template <>
-struct LoadDataTensor2TensorV2<Hardware::L0A, Hardware::L1, ArchVersion::V3510, NzLayoutPattern, NzLayoutPattern>
-{
-    using type = LoadDataL12L0ANZ2NZWithCoord3510;
-};
-
-template <>
-struct LoadDataTensor2TensorV2<Hardware::L0B, Hardware::L1, ArchVersion::V3510, NzLayoutPattern, NzLayoutPattern>
-{
-    using type = LoadDataL12L0BZN2ZNWithCoord3510;
+    using type = LoadDataL12L0BNZ2ZN3510;
 };
 
 template <Hardware dstPos, Hardware srcPos, uint32_t Version>

@@ -41,7 +41,7 @@ struct FixpipeTensor2TensorV2 {
 
 template <>
 struct FixpipeTensor2TensorV2<Hardware::GM, Hardware::L0C, Hardware::MAX, ArchVersion::V3510,
-    NDLayoutPattern, NzLayoutPattern> {
+        NDLayoutPattern, NzLayoutPattern> {
     using type = Fixpipe2OutNz2Nd3510;
 };
 

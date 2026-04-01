@@ -63,27 +63,11 @@ FixpipeV2(const T& dst, const U& src, const FixpipeParams& params = FixpipeParam
     constexpr Hardware quantPos = Hardware::MAX;
     using DstPattern = PatternTraitT<T>;
     using SrcPattern = PatternTraitT<U>;
+    constexpr auto quantPre = GetFixpipeQuantPre<trait, T, U>();
     using Tensor2Tensor = typename
         FixpipeTensor2TensorV2<dstPos, srcPos, quantPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
-    Tensor2Tensor::Run<trait>(dst, src, params);
+    Tensor2Tensor::Run<trait, quantPre>(dst, src, params);
 }
-
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename Coord>
-__aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplateWithCoord<T, U, Coord>, void>::type
-FixpipeV2(const T& dst, const U& src, const Coord& coord, const FixpipeParams& params = FixpipeParams{})
-{
-    auto sliceTensor = dst(coord, src);
-    FixpipeV2<trait>(sliceTensor, src, params);
-}
-
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S, typename Coord>
-__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplateWithCoord<T, U, S, Coord>, void>::type
-FixpipeV2(const T& dst, const U& src, const S& quant, const Coord& coord, const FixpipeParams& params = FixpipeParams{})
-{
-    auto sliceTensor = dst(coord, src);
-    FixpipeV2<trait>(sliceTensor, src, quant, params);
-}
-
 template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplate<T, U, S>, void>::type
 Fixpipe(const T& dst, const U& src, const S& quant, const FixpipeParams& params = FixpipeParams{})
