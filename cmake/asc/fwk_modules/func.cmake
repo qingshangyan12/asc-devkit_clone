@@ -1119,22 +1119,37 @@ function(npu_op_package_add target_package_name)
       endforeach()
     endforeach()
 
-    add_custom_target(${_ascendc_kernel_target}_check_all_fail
-      COMMAND ${CMAKE_COMMAND} -E echo "Checking all operators compilation status."
-    )
+    set(ERROR_LOG_FILE "${CMAKE_CURRENT_BINARY_DIR}/compile_error.log")
+    if(EXISTS "${ERROR_LOG_FILE}")
+      set(CHECK_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_script.cmake")
 
-    if(DEFINED KERNEL_COMPILE_TARGETS)
-      add_dependencies(${_ascendc_kernel_target}_check_all_fail ${KERNEL_COMPILE_TARGETS})
+      file(WRITE "${CHECK_SCRIPT}" "
+        execute_process(
+          COMMAND grep -c 'fail op-type:' '${ERROR_LOG_FILE}'
+          OUTPUT_VARIABLE FAILED_COUNT
+          ERROR_QUIET
+        )
+        if(NOT FAILED_COUNT)
+          set(FAILED_COUNT 0)
+        endif()
+        message(STATUS \"Found \${FAILED_COUNT} failed operators out of ${KERNEL_COMPILE_TARGET_COUNT} total\")
+        if(\${FAILED_COUNT} EQUAL ${KERNEL_COMPILE_TARGET_COUNT})
+          set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL TRUE)
+          message(STATUS \"Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to TRUE\")
+        else()
+          set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL FALSE)
+          message(STATUS \"Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to FALSE\")
+        endif()
+      ")
+
+      add_custom_command(TARGET ${_ascendc_kernel_target}_check_all_fail
+        COMMAND ${CMAKE_COMMAND} -P "${CHECK_SCRIPT}"
+        DEPENDS ${KERNEL_COMPILE_TARGETS}
+      )
+    else()
+      set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL FALSE)
+      message(STATUS "Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to FALSE (no error log)")
     endif()
-
-    add_custom_command(TARGET ${_ascendc_kernel_target}_check_all_fail
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/check_all_fail.cmake
-              -DOUT_DIR=${CMAKE_CURRENT_BINARY_DIR}
-              -DTYPE_COUNT=${KERNEL_COMPILE_TARGET_COUNT}
-              -DTARGET_NAME=${target_package_name}
-              -DPROPERTY_NAME=_ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL
-    )
   endif()
 
   if("${output_type}" STREQUAL "RUN")
