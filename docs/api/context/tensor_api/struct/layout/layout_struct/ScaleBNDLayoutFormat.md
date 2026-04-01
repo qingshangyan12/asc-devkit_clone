@@ -42,7 +42,7 @@ struct ScaleBNDLayoutFormat {
 ## 约束说明
 
 - 参数row和column需为整型。
-- 参数row需满足2的倍数。
+- 对于T为fp8_e8m0_t时，row需为2的倍数。
 
 ## 调用示例
 

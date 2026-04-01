@@ -43,7 +43,7 @@ __aicore__ inline decltype(auto) MakeZzLayout(U row, S column)
 ## 约束说明
 
 - 参数row和column需为size_t类型或Int整型常量。
-- 对于T数据类型为fp8_e8m0_t时，column需为2的倍数。
+- 对于T为fp8_e8m0_t时，column需为2的倍数。
 
 ## 调用示例
 
