@@ -1,7 +1,7 @@
 # reg_ld_st_mask样例
 
 ## 概述
-本样例基于RegBase编程范式实现数据从UB到MaskReg之间的搬入搬出。
+本样例基于RegBase编程范式实现UB(Unified Buffer)对MaskReg(掩码寄存器)的搬入搬出，以及使用mask进行掩码搬出的操作。样例使用LoadAlign，StoreAlign，CreateMask，Duplicate接口。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -13,6 +13,7 @@
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
+|   |── README.md                      // 样例介绍
 │   └── reg_ld_st_mask.asc             // AscendC样例实现 & 调用样例
 ```
 
@@ -24,22 +25,19 @@
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
   </tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">x</td><td align="center">[1024]</td><td align="center">uint8_t</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">uint8_t</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1024]</td><td align="center">uint8_t</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">uint8_t</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reg_ld_st_mask</td></tr>
   </table>
 - 样例实现：  
-  主要包括以下步骤：
-  1. 初始化参数
-  2. 将数据从GM搬运到UB
-  3. 调用CopyVF，调用LoadAlign将UB的前256bit(32个uint8_t)数据拷入mask，
-  本样例中，前32个uint8_t数据分别为1,0,...,0，芯片每次从低位读取数字，这32个数字最终填充到MaskReg中为
-  b'1000...000，然后调用Duplicate指令，使用该掩码将只填充RegTensor第一个数为1，随后将RegTensor内的结果保存到UB。
-  随后，样例中将MaskReg中的比特位全部置为1，将该数据输出到UB中，对应32个uint8_t数，每个数的每位比特位都为1，因此每个数的值都是255(0xFFFF..FF)
-  4. 将结果从UB搬运回GM
+  1. 调用CopyVF，调用LoadAlign将UB的前256bit(32个uint8_t)数据拷入mask，
+  本样例中，前32个uint8_t数据分别为1,0,...,0，芯片每次从低位读取数字，这32个数字最终填充到MaskReg中为b'1000...000
+  2. 调用Duplicate指令，使用该掩码将只填充RegTensor第一个数为1
+  3. 将RegTensor内的结果保存到UB
+  4. 样例中将MaskReg中的比特位全部置为1，将该数据输出到UB中，对应32个uint8_t数，每个数的每位比特位都为1，因此每个数的值都是255(0xFFFF..FF)
   
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
