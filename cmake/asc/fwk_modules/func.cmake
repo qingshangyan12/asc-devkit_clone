@@ -1120,10 +1120,10 @@ function(npu_op_package_add target_package_name)
     endforeach()
 
     set(ERROR_LOG_FILE "${CMAKE_CURRENT_BINARY_DIR}/compile_error.log")
-    if(EXISTS "${ERROR_LOG_FILE}")
-      set(CHECK_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_script.cmake")
+    set(CHECK_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_script.cmake")
 
-      file(WRITE "${CHECK_SCRIPT}" "
+    file(WRITE "${CHECK_SCRIPT}" "
+      if(EXISTS \"${ERROR_LOG_FILE}\")
         execute_process(
           COMMAND grep -c 'fail op-type:' '${ERROR_LOG_FILE}'
           OUTPUT_VARIABLE FAILED_COUNT
@@ -1140,17 +1140,17 @@ function(npu_op_package_add target_package_name)
           set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL FALSE)
           message(STATUS \"Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to FALSE\")
         endif()
-      ")
+      else()
+        set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL FALSE)
+        message(STATUS \"Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to FALSE (no error log)\")
+      endif()
+    ")
 
-      add_custom_target(${_ascendc_kernel_target}_check_all_fail
-        COMMAND ${CMAKE_COMMAND} -P "${CHECK_SCRIPT}"
-        DEPENDS ${KERNEL_COMPILE_TARGETS}
-      )
-      add_dependencies(binary ${_ascendc_kernel_target}_check_all_fail)
-    else()
-      set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL FALSE)
-      message(STATUS "Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to FALSE (no error log)")
-    endif()
+    add_custom_target(${_ascendc_kernel_target}_check_all_fail
+      COMMAND ${CMAKE_COMMAND} -P "${CHECK_SCRIPT}"
+      DEPENDS ${KERNEL_COMPILE_TARGETS}
+    )
+    add_dependencies(binary ${_ascendc_kernel_target}_check_all_fail)
   endif()
 
   if("${output_type}" STREQUAL "RUN")
