@@ -16,18 +16,17 @@ import os
 import numpy as np
 
 def gen_golden_data_simple():
-    inner = 64
-    outter = 64
+    totalLength = 256
     data_type = np.float32
-    src = np.ones([outter, inner]).astype(data_type)
-    # 使用1.1作为初始值，使得乘法累乘有意义
-    src = src * 1.1
-    golden = np.copy(src)
-    for i in range(outter - 1):
-        golden[i + 1] = golden[i] * golden[i + 1]
+    # 生成两个 [1, 256] 矩阵
+    x = np.random.uniform(1, 2, [1, totalLength]).astype(data_type)
+    y = np.random.uniform(1, 2, [1, totalLength]).astype(data_type)
+    # 计算逐元素乘法 z = x * y
+    golden = x * y
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
-    src.tofile('./input/input_x.bin')
+    x.tofile('./input/input_x.bin')
+    y.tofile('./input/input_y.bin')
     golden.tofile('./output/golden.bin')
 
 if __name__ == "__main__":

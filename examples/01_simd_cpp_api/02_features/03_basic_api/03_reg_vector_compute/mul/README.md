@@ -1,7 +1,8 @@
 # mul样例
 
 ## 概述
-本样例基于RegBase编程范式实现Mul运算。
+本样例基于RegBase编程范式实现Mul运算，主要调用Mul接口。
+- Add/Exp/Sqrt/Ln/Log/Log2/Log10/Neg接口皆可参考该样例
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -18,29 +19,24 @@
 
 ## 样例描述
 - 样例功能：
-  样例输入一个[64, 64]的矩阵，沿着行方向做逐行累乘操作，由于每一行依赖上一行计算的结果，在代码中插入了写-读同步。
+  对两个相同大小的向量做逐元素乘法，向量数据量为256，数据类型为float。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
   </tr>
-  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">x</td><td align="center">[64]</td><td align="center">float</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
+   <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[64]</td><td align="center">float</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mul</td></tr>
   </table>
 - 样例实现：
-  主要包括以下步骤：
-  1. 初始化参数
-  2. 将数据从GM搬运到UB
-  3. 调用MulVF进行计算，结果写回UB
-  4. 将结果从UB搬运回GM
-
+   MulVF函数内调用Mul接口进行计算，结果写回UB
   - 调用实现
     使用内核调用符<<<>>>调用核函数。
-  - Add/Exp/Sqrt/Ln/Log/Log2/Log10/Neg接口皆可参考该样例
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
