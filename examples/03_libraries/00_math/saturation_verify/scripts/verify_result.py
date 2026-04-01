@@ -80,6 +80,7 @@ def get_special_names(data_type):
     names = ['min', 'max', '+0', '-0']
     if np.issubdtype(data_type, np.floating):
         names.extend(['NaN', '+INF', '-INF'])
+        # names.extend(['NaN', '+INF', '-INF', 'min_normal', 'neg_min_normal'])
     return names
 
 
@@ -94,11 +95,11 @@ def verify_single_api(output_type, input_x, api_name="exp"):
     
     special_names = get_special_names(np_type)
     
-    print(f"\n{'='*116}")
+    print(f"\n{'='*130}")
     print(f"API: {api_name} | Data Type: {np_type} | Verification Results")
-    print(f"{'='*116}")
-    print(f"{'type':<8} | {'src':<26} | {'dst (API Output, Non-Sat)':<26} | {'dst (API Output, Saturation)':<26}")
-    print(f"{'-'*116}")
+    print(f"{'='*130}")
+    print(f"{'type':<8} | {'src':<32} | {'dst (API Output, Non-Sat)':<32} | {'dst (API Output, Saturation)':<32}")
+    print(f"{'-'*130}")
     
     valid_count = 0
     for i in range(len(golden)):
@@ -126,12 +127,12 @@ def verify_single_api(output_type, input_x, api_name="exp"):
             inp_str = format_value(inp_val, np_type)
             non_sat_str = format_value(actual_non_sat, np_type)
             sat_str = format_value(actual_sat, np_type)
-            print(f"{type_name:<8} | {name:<6}{inp_str:<20} | {non_sat_str:<26} | {sat_str:<26}")
+            print(f"{type_name:<8} | {name:<14}{inp_str:<18} | {non_sat_str:<32} | {sat_str:<32}")
     
     error_ratio = 1.0 - (valid_count / len(golden))
-    print(f"{'-'*116}")
+    print(f"{'-'*130}")
     print(f"Total: {len(golden)}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
-    print(f"{'='*116}\n")
+    print(f"{'='*130}\n")
     
     return error_ratio <= ERROR_TOL
 
@@ -149,11 +150,11 @@ def verify_binary_api(output_type, input_x, input_y, api_name="mul"):
     special_names = get_special_names(np_type)
     num_special = len(special_names)
     
-    print(f"\n{'='*124}")
+    print(f"\n{'='*138}")
     print(f"API: {api_name} | Data Type: {np_type} | Verification Results")
-    print(f"{'='*124}")
-    print(f"{'type':<8} | {'src0':<26} | {'src1':<26} | {'dst (API Output, Non-Sat)':<26} | {'dst (API Output, Saturation)':<26}")
-    print(f"{'-'*124}")
+    print(f"{'='*138}")
+    print(f"{'type':<8} | {'src0':<32} | {'src1':<32} | {'dst (API Output, Non-Sat)':<32} | {'dst (API Output, Saturation)':<32}")
+    print(f"{'-'*138}")
     
     valid_count = 0
     printed_count = 0
@@ -184,13 +185,13 @@ def verify_binary_api(output_type, input_x, input_y, api_name="mul"):
             inp_b_str = format_value(inp_b, np_type)
             non_sat_str = format_value(actual_non_sat, np_type)
             sat_str = format_value(actual_sat, np_type)
-            print(f"{type_name:<8} | {name_a:<6}{inp_a_str:<20} | {name_b:<6}{inp_b_str:<20} | {non_sat_str:<26} | {sat_str:<26}")
+            print(f"{type_name:<8} | {name_a:<14}{inp_a_str:<18} | {name_b:<14}{inp_b_str:<18} | {non_sat_str:<32} | {sat_str:<32}")
             printed_count += 1
     
     error_ratio = 1.0 - (valid_count / len(golden))
-    print(f"{'-'*124}")
+    print(f"{'-'*138}")
     print(f"Total: {len(golden)}, Unique: {printed_count}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
-    print(f"{'='*124}\n")
+    print(f"{'='*138}\n")
     
     return error_ratio <= ERROR_TOL
 

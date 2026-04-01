@@ -36,6 +36,10 @@ def get_dtype_limits(data_type):
             'pos_inf': np.array(np.inf, dtype=data_type),
             'neg_inf': np.array(-np.inf, dtype=data_type),
 
+            # # 最小正规数和负最小正规数
+            # 'min_normal': np.array(finfo.tiny, dtype=data_type),
+            # 'neg_min_normal': np.array(-finfo.tiny, dtype=data_type),
+
             # 用于正常值测试（验证API基本功能）
             # 'min': 1.234,
             # 'max': -0.399,
@@ -69,6 +73,7 @@ def construct_special_values(data_type):
     specials = [limits['min'], limits['max'], limits['pos_zero'], limits['neg_zero']]
     if np.issubdtype(data_type, np.floating):
         specials.extend([limits['nan'], limits['pos_inf'], limits['neg_inf']])
+        # specials.extend([limits['min_normal'], limits['neg_min_normal']])
     return specials
 
 
@@ -92,6 +97,7 @@ def get_special_names(data_type):
     special_names = ['min', 'max', '+0', '-0']
     if np.issubdtype(data_type, np.floating):
         special_names.extend(['NaN', '+INF', '-INF'])
+        # special_names.extend(['NaN', '+INF', '-INF', 'min_normal', 'neg_min_normal'])
     return special_names
 
 
@@ -102,26 +108,26 @@ def format_float16(val):
 
 
 def print_unary_api_table(api_name, type_name, special_names, inputs, golden):
-    print(f"\n{'='*116}")
+    print(f"\n{'='*130}")
     print(f"API: {api_name} | Data Type: {type_name} | Gen Golden")
-    print(f"{'='*116}")
-    print(f"{'type':<8} | {'src':<26} | {'dst (Numpy-Golden)':<26}")
-    print(f"{'-'*116}")
+    print(f"{'='*130}")
+    print(f"{'type':<8} | {'src':<32} | {'dst (Numpy-Golden)':<32}")
+    print(f"{'-'*130}")
     for i, name in enumerate(special_names):
         inp_val = inputs[i]
         out_val = golden[i]
         inp_str = format_float16(inp_val) if inputs.dtype == np.float16 else str(inp_val)
         out_str = format_float16(out_val) if golden.dtype == np.float16 else str(out_val)
-        print(f"{type_name:<8} | {name:<6}{inp_str:<20} | {out_str:<26}")
-    print(f"{'='*116}\n")
+        print(f"{type_name:<8} | {name:<14}{inp_str:<18} | {out_str:<32}")
+    print(f"{'='*130}\n")
 
 
 def print_binary_api_table(api_name, type_name, special_names, inputs_a, inputs_b, golden):
-    print(f"\n{'='*124}")
+    print(f"\n{'='*138}")
     print(f"API: {api_name} | Data Type: {type_name} | Gen Golden")
-    print(f"{'='*124}")
-    print(f"{'type':<8} | {'src0':<26} | {'src1':<26} | {'dst (Numpy-Golden)':<26}")
-    print(f"{'-'*124}")
+    print(f"{'='*138}")
+    print(f"{'type':<8} | {'src0':<32} | {'src1':<32} | {'dst (Numpy-Golden)':<32}")
+    print(f"{'-'*138}")
     for i, name_a in enumerate(special_names):
         for j, name_b in enumerate(special_names):
             idx = i * len(special_names) + j
@@ -131,5 +137,5 @@ def print_binary_api_table(api_name, type_name, special_names, inputs_a, inputs_
             inp_a_str = format_float16(inp_a) if inputs_a.dtype == np.float16 else str(inp_a)
             inp_b_str = format_float16(inp_b) if inputs_b.dtype == np.float16 else str(inp_b)
             out_str = format_float16(out_val) if golden.dtype == np.float16 else str(out_val)
-            print(f"{type_name:<8} | {name_a:<6}{inp_a_str:<20} | {name_b:<6}{inp_b_str:<20} | {out_str:<26}")
-    print(f"{'='*124}\n")
+            print(f"{type_name:<8} | {name_a:<14}{inp_a_str:<18} | {name_b:<14}{inp_b_str:<18} | {out_str:<32}")
+    print(f"{'='*138}\n")
