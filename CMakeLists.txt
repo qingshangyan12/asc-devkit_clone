@@ -42,6 +42,8 @@ if(CCACHE_PROGRAM)
   set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
 endif()
 
+include(cmake/hccl/func.cmake)
+
 add_subdirectory(impl)
 
 if(BUILD_OPEN_PROJECT)

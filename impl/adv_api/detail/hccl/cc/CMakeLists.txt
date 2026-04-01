@@ -8,8 +8,6 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
 
-cmake_minimum_required(VERSION 3.16.0)
-
 # CC_BASE_DIR points to asc-devkit root
 set(CC_BASE_DIR ${ASCENDC_DIR})
 
@@ -376,12 +374,7 @@ add_library(mc2_client SHARED)
 
 if(NOT KERNEL_MODE)
     # Generate JSON from ini
-    set(CC_CMAKE_DIR ${CC_BASE_DIR}/impl/adv_api/detail/hccl/cc/cmake/)
-    if(EXISTS "${CC_CMAKE_DIR}/scripts/parser_ini.py")
-        set(PARSER_INI_SCRIPT ${CC_CMAKE_DIR}/scripts/parser_ini.py)
-    else()
-        set(PARSER_INI_SCRIPT ${ASCENDC_DIR}/cmake/scripts/parser_ini.py)
-    endif()
+    set(PARSER_INI_SCRIPT ${ASCENDC_DIR}/cmake/scripts/parser_ini.py)
     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/libmc2_server.json
         COMMAND ${HI_PYTHON} ${PARSER_INI_SCRIPT} ${CMAKE_CURRENT_SOURCE_DIR}/ops/scatter/scatter_aicpu_kernel.ini ${CMAKE_CURRENT_BINARY_DIR}/libmc2_server.json
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -490,7 +483,7 @@ if(DEVICE_MODE)
         add_dependencies(generate_device_aicpu_package mc2_server)
         sign_file(
             INPUT "mc2_server.tar.gz"
-            CONFIG "${CMAKE_CURRENT_SOURCE_DIR}/scripts/sign/hccl_check_cfg.xml"
+            CONFIG "${ASCENDC_DIR}/scripts/sign/hccl_check_cfg.xml"
             RESULT_VAR "mc2_server_sign_file"
             DEPENDS generate_device_aicpu_package
         )

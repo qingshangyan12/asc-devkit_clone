@@ -12,8 +12,11 @@ set_package(asc-devkit VERSION "9.0.0")
 
 set_build_dependencies(runtime "CUR_MAJOR_MINOR_VER")
 set_build_dependencies(metadef "CUR_MAJOR_MINOR_VER")
+set_build_dependencies(hcomm ">=8.5")
+set_build_dependencies(bisheng-compiler ">=8.5")
 
 set_run_dependencies(runtime "CUR_MAJOR_MINOR_VER")
+set_run_dependencies(hcomm "CUR_MAJOR_MINOR_VER")
 set_run_dependencies(ge-executor "CUR_MAJOR_MINOR_VER")
 set_run_dependencies(metadef "CUR_MAJOR_MINOR_VER")
 set_run_dependencies(opbase "CUR_MAJOR_MINOR_VER")
