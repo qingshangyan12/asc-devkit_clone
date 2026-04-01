@@ -40,7 +40,7 @@ def Mean(x, n, insum, scalar):
 
 def gen_golden_data_simple():
     dtype = np.float32
-    outter = 1
+    outter = 3
     inner = 32
     n = 32
     cast = 0
