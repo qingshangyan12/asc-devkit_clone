@@ -34,19 +34,20 @@ def gen_golden_data_simple():
     #非对齐搬运20个half类型数据
     data_copy_pad_len = 20 
 
-
     min_val, max_val = get_range_by_dtype(input_type)
-    input_shape = [block_length]
+    input_shape = [data_copy_pad_len]
     output_shape = [block_length]
     input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
     golden = np.zeros(output_shape).astype(output_type)
-    for i in range(data_copy_pad_len):
-        golden[i] = input_x[i] + scalar
+    for i in range(block_length):
+        if i < data_copy_pad_len:
+            golden[i] = input_x[i] + scalar
+        else:
+            golden[i] = 1
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     input_x.tofile("./input/input_x.bin")
     golden.tofile("./output/golden.bin")
-
 
 if __name__ == "__main__":
     gen_golden_data_simple()

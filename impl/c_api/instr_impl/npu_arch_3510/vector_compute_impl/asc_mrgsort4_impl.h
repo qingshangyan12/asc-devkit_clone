@@ -26,44 +26,44 @@
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
 __aicore__ inline void asc_mrgsort4_impl(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat,
-                                         uint16_t region_proposal_li0, uint16_t region_proposal_li1,
-                                         uint16_t region_proposal_li2, uint16_t region_proposal_li3,
-                                         bool is_all_stored, uint8_t mask_signal)
+                                         uint16_t element_length_0, uint16_t element_length_1,
+                                         uint16_t element_length_2, uint16_t element_length_3,
+                                         bool if_exhausted_suspension, uint8_t valid_bit)
 {
     if ASC_IS_AIV {
-        vmrgsort4(dst, src, repeat, region_proposal_li0, region_proposal_li1, region_proposal_li2, region_proposal_li3,
-                  is_all_stored, mask_signal);
+        vmrgsort4(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
+                  if_exhausted_suspension, valid_bit);
     }
 }
 
 __aicore__ inline void asc_mrgsort4_sync_impl(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat,
-                                              uint16_t region_proposal_li0, uint16_t region_proposal_li1,
-                                              uint16_t region_proposal_li2, uint16_t region_proposal_li3,
-                                              bool is_all_stored, uint8_t mask_signal)
+                                              uint16_t element_length_0, uint16_t element_length_1,
+                                              uint16_t element_length_2, uint16_t element_length_3,
+                                              bool if_exhausted_suspension, uint8_t valid_bit)
 {
-    asc_mrgsort4_impl(dst, src, repeat, region_proposal_li0, region_proposal_li1, region_proposal_li2, region_proposal_li3,
-                      is_all_stored, mask_signal);
+    asc_mrgsort4_impl(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
+                      if_exhausted_suspension, valid_bit);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mrgsort4_impl(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat,
-                                         uint16_t region_proposal_li0, uint16_t region_proposal_li1,
-                                         uint16_t region_proposal_li2, uint16_t region_proposal_li3,
-                                         bool is_all_stored, uint8_t mask_signal)
+                                         uint16_t element_length_0, uint16_t element_length_1,
+                                         uint16_t element_length_2, uint16_t element_length_3,
+                                         bool if_exhausted_suspension, uint8_t valid_bit)
 {
     if ASC_IS_AIV {
-        vmrgsort4(dst, src, repeat, region_proposal_li0, region_proposal_li1, region_proposal_li2, region_proposal_li3,
-                  is_all_stored, mask_signal);
+        vmrgsort4(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
+                  if_exhausted_suspension, valid_bit);
     }
 }
 
 __aicore__ inline void asc_mrgsort4_sync_impl(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat,
-                                              uint16_t region_proposal_li0, uint16_t region_proposal_li1,
-                                              uint16_t region_proposal_li2, uint16_t region_proposal_li3,
-                                              bool is_all_stored, uint8_t mask_signal)
+                                              uint16_t element_length_0, uint16_t element_length_1,
+                                              uint16_t element_length_2, uint16_t element_length_3,
+                                              bool if_exhausted_suspension, uint8_t valid_bit)
 {
-    asc_mrgsort4_impl(dst, src, repeat, region_proposal_li0, region_proposal_li1, region_proposal_li2, region_proposal_li3,
-                      is_all_stored, mask_signal);
+    asc_mrgsort4_impl(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
+                      if_exhausted_suspension, valid_bit);
     asc_sync_post_process();
 }
 

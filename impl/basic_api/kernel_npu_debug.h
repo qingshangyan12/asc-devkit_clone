@@ -180,6 +180,11 @@ __aicore__ inline void CheckMaskValue(const uint64_t mask, const __gm__ char* ap
         return;
     }
 
+#if __NPU_ARCH__ == 2002
+    ASCENDC_DEBUG_ASSERT((mask != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value in %s, when in"
+        "norm mode, mask cannot be 0 on current platform.\n", apiName));
+#endif
+
     if constexpr (sizeof(T) == 2) {
         CheckValueRange<uint64_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 2" , apiName);
     } else if constexpr (sizeof(T) == 4) {
