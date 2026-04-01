@@ -1127,7 +1127,7 @@ function(npu_op_package_add target_package_name)
       message(STATUS \"Checking error log: \${ERROR_LOG_FILE}\")
       if(EXISTS \"\${ERROR_LOG_FILE}\")
         execute_process(
-          COMMAND bash -c \"grep -c 'fail op-type:' '\${ERROR_LOG_FILE}' || echo 0\"
+          COMMAND bash -c \"grep 'fail op-type:' '\${ERROR_LOG_FILE}' | wc -l || echo 0\"
           OUTPUT_VARIABLE FAILED_COUNT
           OUTPUT_STRIP_TRAILING_WHITESPACE
         )
