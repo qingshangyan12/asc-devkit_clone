@@ -1123,13 +1123,15 @@ function(npu_op_package_add target_package_name)
     set(CHECK_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_script.cmake")
 
     file(WRITE "${CHECK_SCRIPT}" "
-      if(EXISTS \"${ERROR_LOG_FILE}\")
+      set(ERROR_LOG_FILE \"${ERROR_LOG_FILE}\")
+      message(STATUS \"Checking error log: \${ERROR_LOG_FILE}\")
+      if(EXISTS \"\${ERROR_LOG_FILE}\")
         execute_process(
-          COMMAND grep -c 'fail op-type:' '${ERROR_LOG_FILE}'
+          COMMAND bash -c \"grep -c 'fail op-type:' '\${ERROR_LOG_FILE}' || echo 0\"
           OUTPUT_VARIABLE FAILED_COUNT
-          ERROR_QUIET
+          OUTPUT_STRIP_TRAILING_WHITESPACE
         )
-        string(STRIP \"\${FAILED_COUNT}\" FAILED_COUNT)
+        message(STATUS \"Raw FAILED_COUNT value: '\${FAILED_COUNT}'\")
         if(NOT FAILED_COUNT)
           set(FAILED_COUNT 0)
         endif()
@@ -1144,6 +1146,7 @@ function(npu_op_package_add target_package_name)
       else()
         set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL FALSE)
         message(STATUS \"Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to FALSE (no error log)\")
+        message(STATUS \"ERROR_LOG_FILE does not exist: \${ERROR_LOG_FILE}\")
       endif()
     ")
 
