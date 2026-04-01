@@ -11,7 +11,7 @@
 /* !
  * \file asc_bf16_impl.h
  * \brief
- */
+ */ 
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
