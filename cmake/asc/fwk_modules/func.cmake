@@ -1142,10 +1142,11 @@ function(npu_op_package_add target_package_name)
         endif()
       ")
 
-      add_custom_command(TARGET ${_ascendc_kernel_target}_check_all_fail
+      add_custom_target(${_ascendc_kernel_target}_check_all_fail
         COMMAND ${CMAKE_COMMAND} -P "${CHECK_SCRIPT}"
         DEPENDS ${KERNEL_COMPILE_TARGETS}
       )
+      add_dependencies(binary ${_ascendc_kernel_target}_check_all_fail)
     else()
       set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL FALSE)
       message(STATUS "Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to FALSE (no error log)")
