@@ -11,13 +11,29 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-
 import os
 import numpy as np
 
-
 def gen_golden_data_simple():
+    """
+    生成AntiQuant样例的输入数据和真值数据。
+
+    计算公式（PER_CHANNEL场景）：
+    dst[i][j] = scale[i // groupSize][j] * (src[i][j] + offset[i // groupSize][j])
+
+    Args:
+        无参数
+
+    Returns:
+        无返回值，生成的数据保存到文件：
+        - ./input/input_src.bin: int8_t类型输入数据
+        - ./input/input_offset.bin: half类型偏移量数据
+        - ./input/input_scale.bin: half类型缩放因子数据
+        - ./output/golden.bin: half类型真值输出数据
+    """
     np.random.seed(10)
+    npu_arch = os.environ.get("NPU_ARCH")
+
     N = 128
     K = 8
     offsetLength = 1
@@ -26,14 +42,28 @@ def gen_golden_data_simple():
     src = np.random.uniform(-10, 10, [8, 128]).astype(np.int8)
     offset = np.random.uniform(-10, 10, [1, 128]).astype(np.float16)
     scale = np.random.uniform(-10, 10, [1, 128]).astype(np.float16)
-    src_fp32 = src.astype(np.float16)
-    dst = np.zeros([8, 128]).astype(np.float16)
 
-    for i in range(0, K):
-        for j in range(0, N):
-            dst[i][j] = scale[i // groupSize][j] * (src_fp32[i][j] + offset[i // groupSize][j])
-
-    dst = dst.astype(np.float16)
+    if npu_arch == "dav-2201":
+        dst = np.zeros([8, 128]).astype(np.float32)
+        for i in range(0, K):
+            for j in range(0, N):
+                dst[i][j] = scale[i // groupSize][j] * (
+                    src[i][j] + offset[i // groupSize][j]
+                )
+        dst = dst.astype(np.float16)
+    elif npu_arch == "dav-3510":
+        src_fp32 = src.astype(np.float32)
+        offset_fp32 = offset.astype(np.float32)
+        scale_fp32 = scale.astype(np.float32)
+        dst = np.zeros([8, 128]).astype(np.float32)
+        for i in range(0, K):
+            for j in range(0, N):
+                dst[i][j] = scale_fp32[i // groupSize][j] * (
+                    src_fp32[i][j] + offset_fp32[i // groupSize][j]
+                )
+        dst = dst.astype(np.float16)
+    else:
+        raise ValueError(f"Unsupported NPU architecture: {npu_arch}")
 
     os.makedirs("input", exist_ok=True)
     src.tofile("./input/input_src.bin")
