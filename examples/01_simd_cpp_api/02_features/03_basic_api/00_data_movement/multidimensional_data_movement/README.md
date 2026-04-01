@@ -22,7 +22,7 @@
 
 - 样例功能
 
-  本样例基于2D Padding场景，通过多维数据搬运接口将数据从GM(Global Memory)搬运至UB(Unified Buffer)。
+  本样例基于2D Padding场景，通过多维数据搬运接口将数据从GM(Global Memory)搬运至UB(Unified Buffer)。接口资料参考[多维数据搬运](../../../../../../docs/api/context/多维数据搬运（ISASI）.md)。
 
 - 样例规格
 

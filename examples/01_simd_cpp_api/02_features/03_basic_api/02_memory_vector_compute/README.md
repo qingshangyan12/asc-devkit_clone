@@ -23,19 +23,13 @@
 | [gather](./gather)         | 本样例基于Gather实现对于给定的输入张量和一个地址偏移量，根据偏移地址将输入张量按元素收集到结果张量中 |
 | [gatherb](./gatherb) | 本样例基于Gatherb实现对于给定的输入张量和一个地址偏移量，根据偏移地址按照DataBlock的粒度将输入张量按元素收集到结果张量中     |
 | [get_reduce_repeat_max_min_spr](./get_reduce_repeat_max_min_spr)                                                               | 本样例介绍基础api GetReduceRepeatMaxMinSpr的调用，GetReduceRepeatMaxMinSpr的功能是获取ReduceMax、ReduceMin连续场景下的最大/最小值以及相应的索引值            |
-| [get_reduce_repeat_sum_spr](./get_reduce_repeat_sum_spr)                                                                                         | 本样例介绍基础api GetReduceRepeatSumSpr的调用。GetReduceRepeatSumSpr的功能是获取ReduceSum接口的计算结果 |
 | [pair_reduce_sum](./pair_reduce_sum)                                                                                           | 本样例基于PairReduceSum实现求和归约，可用于相邻两个（奇数下标和偶数下标）元素求和                  |
 | [mrg_sort](./mrg_sort) | 本样例基于Sort32和MrgSort基础API实现将已排好序的最多4条队列，合并成1条队列，结果按照score域由大到小排序 |
 | [mrg_sort4](./mrg_sort4) | 本样例介绍基础api MrgSort4的调用，该api的功能：将已经排好序的最多4条Region Proposals队列，排列合并成1条队列，结果按照score域由大到小排序 |
 | [proposal_concat](./proposal_concat) | 本样例介绍基础api ProposalConcat的调用，该api的功能：将连续元素合入Region Proposal内对应位置，每次迭代会将16个连续元素合入到16个Region Proposal的对应位置里 |
 | [proposal_extract](./proposal_extract) | 本样例介绍基础api ProposalExtract的调用，该api的功能：与ProposalConcat相反，从Region Proposal内将相应位置的单个元素抽取后重排，每次迭代处理16个Region Proposals，抽取16个元素后连续排列 |
 | [rp_sort16](./rp_sort16) | 本样例介绍基础api RpSort16的调用，该api的功能：根据Region Proposals中的score域对其进行排序（score大的排前面），每次排16个Region Proposals |
-| [reduce_max_computation_of_the_first_n_data_elements](./reduce_max_computation_of_the_first_n_data_elements)         | 本样例基于ReduceMax的tensor前n个数据计算接口实现最大值归约，可用于指定从输入tensor的前n个数据中计算找出最大值及最大值对应的索引位置              |
-| [reduce_max_high_dimensional_tensor_sharding_computation](./reduce_max_high_dimensional_tensor_sharding_computation) | 本样例基于ReduceMax的tensor高维切分计算接口实现最大值归约，可用于从所有的输入数据中找出最大值及最大值对应的索引位置，使用mask用于控制每次迭代内参与计算的元素。            |
-| [reduce_min_computation_of_the_first_n_data_elements](./reduce_min_computation_of_the_first_n_data_elements)         | 本样例基于ReduceMin的tensor前n个数据计算接口实现最小值归约，可用于指定从输入tensor的前n个数据中找出最小值及最小值对应的索引值              |
-| [reduce_min_high_dimensional_tensor_sharding_computation](./reduce_min_high_dimensional_tensor_sharding_computation) | 本样例基于ReduceMin的tensor高维切分计算接口实现最小值归约，可用于从所有的输入数据中找出最小值及最小值对应的索引位置，使用mask用于控制每次迭代内参与计算的元素。            |
-| [reduce_sum_computation_of_the_first_n_data_elements](./reduce_sum_computation_of_the_first_n_data_elements)         | 本样例基于ReduceSum的tensor前n个数据计算接口实现求和归约，可用于指定对输入tensor的前n个数据求和                 |
-| [reduce_sum_high_dimensional_tensor_sharding_computation](./reduce_sum_high_dimensional_tensor_sharding_computation)     | 本样例基于ReduceSum的tensor高维切分计算接口实现求和归约，可用于对所有的输入数据求和，使用mask用于控制每次迭代内参与计算的元素                |
+| [reduce_computation](./reduce_computation)         | 本样例基于ReduceMax/ReduceMin/ReduceSum接口实现归约计算              |
 | [repeat_reduce_sum](./repeat_reduce_sum)                                                                             | 本样例基于RepeatReduceSum实现求和归约，可用于每个repeat内所有数据求和                   |
 | [scatter_950](./scatter_950) | 本样例基于Scatter指令实现数据离散，可用于根据一个输入张量、一个目的地址偏移张量和偏移地址，将输入张量分散到结果张量中。                                                                                              |
 | [trans_data_to_5hd](./trans_data_to_5hd) | 本样例基于TransDataTo5HD实现数据格式转换，可用于NCHW格式转换成NC1HWC0格式，特别的也可以用于二维矩阵数据块的转置 |
