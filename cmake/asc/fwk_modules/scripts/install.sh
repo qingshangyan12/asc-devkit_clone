@@ -67,26 +67,57 @@ debug_log() {
     fi
 }
 
-resolve_so_path() {
+resolve_so_paths() {
     local so_name="$1"
-    local so_path=""
     local search_dir=""
+    local so_path=""
+    local arch_dir=""
+    local has_arch_dir=0
+    local found_any=0
 
     if [ "${so_name}" = "${opmaster_so_name}" ]; then
         search_dir="${sourcedir}/${vendordir}/op_impl/ai_core/tbe/op_tiling/lib/linux"
-        if [ -d "${search_dir}" ]; then
-            so_path=$(find "${search_dir}" -type f -name "${so_name}" 2>/dev/null | head -n 1)
-        fi
     elif [ "${so_name}" = "${opsproto_so_name}" ]; then
         search_dir="${sourcedir}/${vendordir}/op_proto/lib/linux"
-        if [ -d "${search_dir}" ]; then
-            so_path=$(find "${search_dir}" -type f -name "${so_name}" 2>/dev/null | head -n 1)
-        fi
     elif [ "${so_name}" = "${opapi_so_name}" ]; then
         so_path="${sourcedir}/${vendordir}/op_api/lib/${opapi_so_name}"
+        if [ -f "${so_path}" ]; then
+            echo "${so_path}"
+            return 0
+        fi
+        return 1
+    else
+        return 1
     fi
 
-    echo "${so_path}"
+    if [ ! -d "${search_dir}" ]; then
+        return 1
+    fi
+
+    for arch_dir in aarch64 x86_64 x86; do
+        if [ -d "${search_dir}/${arch_dir}" ]; then
+            has_arch_dir=1
+            so_path=$(find "${search_dir}/${arch_dir}" -type f -name "${so_name}" -print -quit 2>/dev/null)
+            if [ -z "${so_path}" ]; then
+                log "[ERROR] Failed to find shared library '${so_name}' in package path '${search_dir}/${arch_dir}'."
+                return 1
+            fi
+            echo "${so_path}"
+            found_any=1
+        fi
+    done
+
+    if [ "${has_arch_dir}" -eq 1 ]; then
+        return 0
+    fi
+
+    so_path=$(find "${search_dir}" -type f -name "${so_name}" -print -quit 2>/dev/null)
+    if [ -n "${so_path}" ]; then
+        echo "${so_path}"
+        found_any=1
+    fi
+
+    [ "${found_any}" -eq 1 ]
 }
 
 map_arch() {
@@ -132,37 +163,23 @@ build_dlopen_lib_path() {
     echo "${dlopen_lib_path}"
 }
 
-run_ldd_with_libpath() {
-    local so_path="$1"
-    local dlopen_lib_path="$2"
-
-    LD_LIBRARY_PATH="${dlopen_lib_path}:${LD_LIBRARY_PATH}" ldd "${so_path}" 2>&1
-}
-
 validate_so_dlopen() {
     local so_path="$1"
     local so_name="$2"
     local err_msg=""
     local so_dir=""
     local dlopen_lib_path=""
-    local file_info=""
-    local ldd_not_found=""
-    local ldd_output=""
-    local ldd_output_one_line=""
 
     debug_log "validate_so_dlopen start: so=${so_name}, path=${so_path}, ASCEND_HOME_PATH=${ASCEND_HOME_PATH}"
     so_dir=$(dirname "${so_path}")
     dlopen_lib_path=$(build_dlopen_lib_path "${so_dir}")
 
-    err_msg=$(LD_LIBRARY_PATH="${dlopen_lib_path}:${LD_LIBRARY_PATH}" python3 - "${so_path}" << 'PY'
+err_msg=$(LD_LIBRARY_PATH="${dlopen_lib_path}:${LD_LIBRARY_PATH}" python3 - "${so_path}" << 'PY'
 import ctypes
 import os
 import sys
 
 path = sys.argv[1]
-if not os.path.exists(path):
-    print(f"{path}: file not found in package")
-    sys.exit(1)
 try:
     ctypes.CDLL(path, mode=os.RTLD_NOW)
 except Exception as exc:
@@ -173,25 +190,6 @@ PY
     if [ $? -ne 0 ]; then
         err_msg="${err_msg//${so_path}/${so_name}}"
         log "[ERROR] Failed to load ${so_name} wish env ASCEND_HOME_PATH(${ASCEND_HOME_PATH}),error message is ${err_msg}."
-        if [ -f "${so_path}" ]; then
-            file_info=$(file "${so_path}" 2>/dev/null | cut -d: -f2- | sed 's/^ *//')
-            ldd_output=$(run_ldd_with_libpath "${so_path}" "${dlopen_lib_path}")
-            ldd_not_found=$(echo "${ldd_output}" | grep "not found" | tr '\n' ';')
-            if [ -n "${ldd_not_found}" ]; then
-                log "[ERROR] Diagnostic: ${so_name} exists, but some dependent libraries are missing: ${ldd_not_found}"
-            else
-                ldd_output_one_line=$(echo "${ldd_output}" | head -n 1)
-                log "[ERROR] Diagnostic: ${so_name} exists, but dynamic loading failed. This is usually caused by dependent libraries or architecture incompatibility (for example, aarch64 package on x86_64 host)."
-                if [ -n "${file_info}" ]; then
-                    log "[ERROR] Diagnostic file info (${so_name}): ${file_info}"
-                fi
-                if [ -n "${ldd_output_one_line}" ]; then
-                    log "[ERROR] Diagnostic ldd output (${so_name}): ${ldd_output_one_line}"
-                fi
-            fi
-        else
-            log "[ERROR] Diagnostic: ${so_name} is missing in package path: ${so_path}"
-        fi
         return 1
     fi
     debug_log "validate_so_dlopen success: so=${so_name}"
@@ -201,9 +199,9 @@ PY
 validate_so_arch() {
     local so_path="$1"
     local so_name="$2"
+    local env_arch="$3"
     local so_machine_raw=""
     local so_arch_norm=""
-    local env_arch=""
     local so_arch_display=""
 
     debug_log "validate_so_arch start: so=${so_name}, path=${so_path}"
@@ -213,7 +211,6 @@ validate_so_arch() {
         return 1
     fi
 
-    env_arch=$(uname -m)
     so_arch_norm=$(map_arch "${so_machine_raw}" "norm")
     so_arch_display=$(map_arch "${so_machine_raw}" "display")
 
@@ -228,8 +225,8 @@ validate_so_arch() {
 validate_so_glibc() {
     local so_path="$1"
     local so_name="$2"
+    local env_glibc="$3"
     local required_glibc=""
-    local env_glibc=""
 
     debug_log "validate_so_glibc start: so=${so_name}, path=${so_path}"
     required_glibc=$(strings -a "${so_path}" 2>/dev/null | grep -o 'GLIBC_[0-9]\+\.[0-9]\+' | sed 's/GLIBC_//' | sort -V | tail -n 1)
@@ -238,7 +235,6 @@ validate_so_glibc() {
         return 0
     fi
 
-    env_glibc=$(ldd --version 2>/dev/null | head -n 1 | grep -o '[0-9]\+\.[0-9]\+' | head -n 1)
     if [ -z "${env_glibc}" ]; then
         log "[ERROR] Failed to get glibc version from current runtime environment."
         return 1
@@ -255,6 +251,9 @@ validate_so_glibc() {
 validate_shared_libraries() {
     local so_name=""
     local so_path=""
+    local so_paths=""
+    local env_arch=""
+    local env_glibc=""
 
     debug_log "validate_shared_libraries enter"
     if [ "${FORCE_INSTALL}" = "y" ]; then
@@ -263,24 +262,40 @@ validate_shared_libraries() {
         return 0
     fi
 
-    for so_name in "${opmaster_so_name}" "${opsproto_so_name}" "${opapi_so_name}"; do
-        debug_log "validate_shared_libraries checking so=${so_name}"
-        so_path=$(resolve_so_path "${so_name}")
-        if [ -z "${so_path}" ] || [ ! -f "${so_path}" ]; then
-            log "[ERROR] Failed to find shared library '${so_name}' in package path."
-            return 1
-        fi
-
-        if [ -n "${ASCEND_HOME_PATH}" ]; then
-            debug_log "validate_shared_libraries branch=dlopen so=${so_name}"
-            validate_so_dlopen "${so_path}" "${so_name}" || return 1
-        else
-            debug_log "validate_shared_libraries branch=arch+glibc so=${so_name}"
-            validate_so_arch "${so_path}" "${so_name}" || return 1
-            validate_so_glibc "${so_path}" "${so_name}" || return 1
-        fi
-        debug_log "validate_shared_libraries checked so=${so_name} success"
-    done
+    env_arch=$(uname -m)
+    if [ -n "${ASCEND_HOME_PATH}" ]; then
+        for so_name in "${opmaster_so_name}" "${opsproto_so_name}" "${opapi_so_name}"; do
+            debug_log "validate_shared_libraries checking so=${so_name}"
+            so_paths=$(resolve_so_paths "${so_name}")
+            if [ $? -ne 0 ] || [ -z "${so_paths}" ]; then
+                log "[ERROR] Failed to find shared library '${so_name}' in package path."
+                return 1
+            fi
+            while IFS= read -r so_path; do
+                [ -z "${so_path}" ] && continue
+                debug_log "validate_shared_libraries branch=dlopen so=${so_name}, path=${so_path}"
+                validate_so_dlopen "${so_path}" "${so_name}" || return 1
+            done <<< "${so_paths}"
+            debug_log "validate_shared_libraries checked so=${so_name} success"
+        done
+    else
+        env_glibc=$(ldd --version 2>/dev/null | head -n 1 | grep -o '[0-9]\+\.[0-9]\+' | head -n 1)
+        for so_name in "${opmaster_so_name}" "${opsproto_so_name}" "${opapi_so_name}"; do
+            debug_log "validate_shared_libraries checking so=${so_name}"
+            so_paths=$(resolve_so_paths "${so_name}")
+            if [ $? -ne 0 ] || [ -z "${so_paths}" ]; then
+                log "[ERROR] Failed to find shared library '${so_name}' in package path."
+                return 1
+            fi
+            while IFS= read -r so_path; do
+                [ -z "${so_path}" ] && continue
+                debug_log "validate_shared_libraries branch=arch+glibc so=${so_name}, path=${so_path}"
+                validate_so_arch "${so_path}" "${so_name}" "${env_arch}" || return 1
+                validate_so_glibc "${so_path}" "${so_name}" "${env_glibc}" || return 1
+            done <<< "${so_paths}"
+            debug_log "validate_shared_libraries checked so=${so_name} success"
+        done
+    fi
     debug_log "validate_shared_libraries success"
     return 0
 }
