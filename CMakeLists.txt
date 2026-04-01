@@ -75,7 +75,6 @@ elseif(BUILD_OPEN_PROJECT)
   endif()
   add_version_info_targets()
   pack_built_in()
-  add_subdirectory(src)
 endif()
 
 if(PACKAGE_OPEN_PROJECT)
