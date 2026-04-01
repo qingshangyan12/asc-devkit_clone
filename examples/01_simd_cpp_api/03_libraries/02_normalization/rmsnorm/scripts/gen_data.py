@@ -47,8 +47,8 @@ def rms_norm(x, gamma, epsilon=1e-8, axis=-1):
 
 def gen_golden_data_simple():
     dtype = np.float32
-    src_gm = generate_random_data(-1, 1, [1, 1, 16], dtype)
-    gamma_gm = generate_random_data(-1, 1, [16], dtype)
+    src_gm = generate_random_data(-1, 1, [4, 8, 64], dtype)
+    gamma_gm = generate_random_data(-1, 1, [64], dtype)
     os.makedirs("input", exist_ok=True)
     src_gm.reshape(-1).tofile("./input/input_inputX.bin")
     gamma_gm.reshape(-1).tofile("./input/input_gamma.bin")
@@ -58,7 +58,7 @@ def gen_golden_data_simple():
     golden_gm = rms_norm(src_gm, gamma_gm, epsilon).astype(dtype)
     os.makedirs("output", exist_ok=True)
     golden_gm.reshape(-1).tofile("./output/golden.bin")
-    tiling = np.array([1, 1, 16], dtype="uint32")
+    tiling = np.array([4, 8, 64], dtype="uint32")
     tiling.tofile("./input/input_tiling.bin")
 
 
