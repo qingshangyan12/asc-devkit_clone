@@ -1129,6 +1129,7 @@ function(npu_op_package_add target_package_name)
           OUTPUT_VARIABLE FAILED_COUNT
           ERROR_QUIET
         )
+        string(STRIP \"\${FAILED_COUNT}\" FAILED_COUNT)
         if(NOT FAILED_COUNT)
           set(FAILED_COUNT 0)
         endif()
