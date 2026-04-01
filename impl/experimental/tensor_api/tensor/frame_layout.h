@@ -75,6 +75,7 @@ struct MakeZzFrameLayout {
     template <typename TraitType>
     __aicore__ inline static auto Make(size_t row, size_t column) {
         using T = typename TraitType::type;
+        constexpr auto c0Ele = TraitType::C0_element;
         auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
                                MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele)));
         auto stride = MakeStride(MakeStride(Std::Int<c0Ele>{}, FRACTAL_FIXED * Std::ceil_align(column, c0Ele)),
@@ -88,6 +89,7 @@ struct MakeNnFrameLayout {
     template <typename TraitType>
     __aicore__ inline static auto Make(size_t row, size_t column) {
         using T = typename TraitType::type;
+        constexpr auto c0Ele = TraitType::C0_element;
         auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
                                MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele)));
         auto stride = MakeStride(MakeStride(Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{}),
@@ -98,7 +100,7 @@ struct MakeNnFrameLayout {
 };
 
 using LayoutFormatSet = Std::tuple<Std::tuple<NzLayoutPattern, MakeNzFrameLayout>, Std::tuple<NDLayoutPattern, MakeNDFrameLayout>, Std::tuple<DNLayoutPattern, MakeDNFrameLayout>, Std::tuple<NnLayoutPattern, MakeNnFrameLayout>,
-                                    Std::tuple<ZzLayoutPattern, MakeZzFrameLayout>>;
+                                    Std::tuple<ZzLayoutPattern, MakeZzFrameLayout>, Std::tuple<ZnLayoutPattern, MakeZnFrameLayout>>;
 
 template <typename LayoutPattern, typename Tuple = LayoutFormatSet>
 struct FindLayoutFromPattern;

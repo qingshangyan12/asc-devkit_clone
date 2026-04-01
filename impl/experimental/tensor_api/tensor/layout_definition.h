@@ -39,6 +39,8 @@ struct NzLayoutPattern{};
 
 struct NDLayoutPattern{};
 
+struct DNLayoutPattern{};
+
 struct DefaultPattern{};
 
 template <typename T = uint16_t, size_t C0 = 32>
