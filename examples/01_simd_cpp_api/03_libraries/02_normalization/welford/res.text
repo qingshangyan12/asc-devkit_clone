@@ -1,0 +1,70 @@
+# Welford融合算子精度失败分析报告
+
+## 问题描述
+运行npu模式时，Welford融合算子的 `finalVar` (finalize输出的方差) 精度验证失败：
+- 输出值: 14243182592.0
+- 期望值: 1998170624.0
+- 误差: 12245012480.0
+
+## 根本原因
+`WelfordFinalize` API 的参数 `rRec` 和 `abRec` 设置错误
+
+## 错误代码位置
+文件: welford.asc，第250-259行
+
+```cpp
+struct AscendC::WelfordFinalizePara finalizePara = {
+    tilingData.rnLength,   // 1
+    8,                     // abLength: 8
+    0,                     // head: 0
+    0,                     // headLength: 0
+    0,                     // tail: 0
+    0,                     // tailCountLength: 0
+    1.0f,                  // abRec: 错误！应为 0.125f (1/8)
+    1.0f                   // rRec:  错误！应为 0.125f (1/8)
+};
+```
+
+## 正确参数说明
+根据 WelfordFinalize.md 文档：
+- `rRec` = 1/(rnLength × abLength)，表示Reduce轴长度的倒数
+- `abRec` = 1/abLength，表示每次计算块大小的倒数
+
+当前场景参数：
+- rnLength = 1
+- abLength = 8
+- 正确值: rRec = 1/(1×8) = 0.125f, abRec = 0.125f
+
+## 对比官方正确实现
+参考 welford_finalize.asc (官方示例) 第41-42行：
+```cpp
+this->abRec = 1.0f / abLength;   // 正确: 1/8 = 0.125f
+this->rRec = 1.0f / rLength;    // 正确: 1/8 = 0.125f
+```
+
+## 修复建议
+将 welford.asc 中的 finalizePara 参数修改为：
+```cpp
+struct AscendC::WelfordFinalizePara finalizePara = {
+    tilingData.rnLength,   // 1
+    8,                     // abLength: 8
+    0,                     // head: 0
+    0,                     // headLength: 0
+    0,                     // tail: 0
+    0,                     // tailLength: 0
+    0.125f,                // abRec: 1.0f / 8.0f
+    0.125f                 // rRec:  1.0f / 8.0f
+};
+```
+
+或者使用计算得到：
+```cpp
+float abRec = 1.0f / 8.0f;
+float rRec = 1.0f / 8.0f;
+struct AscendC::WelfordFinalizePara finalizePara = {
+    1, 8, 0, 0, 0, 0, abRec, rRec
+};
+```
+
+## 结论
+该样例代码中的 WelfordFinalize 参数 rRec 和 abRec 错误地设置为 1.0f，而应该设置为 0.125f (即 1/8)。这是导致精度验证失败的直接原因。
