@@ -1,12 +1,14 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under
+ * the terms and conditions of CANN Open Software License Agreement Version 2.0
+ * (the "License"). Please refer to the License for details. You may not use
+ * this file except in compliance with the License. THIS SOFTWARE IS PROVIDED ON
+ * AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS
+ * FOR A PARTICULAR PURPOSE. See LICENSE in the root of the software repository
+ * for the full text of the License.
+ */
 
 /* !
  * \file asc_store_impl.h
@@ -22,7 +24,7 @@
 #define CCE_VF_VEC_LEN 256
 #endif
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  int8_t* dst, vector_int8_t src)
+__simd_callee__ inline void asc_store_impl(__ubuf__ int8_t* dst, vector_int8_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -32,7 +34,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__  int8_t* dst, vector_int8_t 
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  uint8_t* dst, vector_uint8_t src)
+__simd_callee__ inline void asc_store_impl(__ubuf__ uint8_t* dst, vector_uint8_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -42,7 +44,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__  uint8_t* dst, vector_uint8_
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  int16_t* dst, vector_int16_t src) 
+__simd_callee__ inline void asc_store_impl(__ubuf__ int16_t* dst, vector_int16_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -52,7 +54,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__  int16_t* dst, vector_int16_
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  uint16_t* dst, vector_uint16_t src)
+__simd_callee__ inline void asc_store_impl(__ubuf__ uint16_t* dst, vector_uint16_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -62,7 +64,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__  uint16_t* dst, vector_uint1
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  int32_t* dst, vector_int32_t src)
+__simd_callee__ inline void asc_store_impl(__ubuf__ int32_t* dst, vector_int32_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -72,7 +74,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__  int32_t* dst, vector_int32_
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  uint32_t* dst, vector_uint32_t src)
+__simd_callee__ inline void asc_store_impl(__ubuf__ uint32_t* dst, vector_uint32_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -102,7 +104,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ float* dst, vector_float src
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  int64_t* dst, vector_int64_t src)
+__simd_callee__ inline void asc_store_impl(__ubuf__ int64_t* dst, vector_int64_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -183,7 +185,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ fp4x2_e1m2_t* dst, vector_fp
 }
 
 // asc_store(with count)
-__simd_callee__ inline void asc_store_impl(__ubuf__  int8_t* dst, vector_int8_t src, uint32_t count)
+__simd_callee__ inline void asc_store_impl(__ubuf__ int8_t* dst, vector_int8_t src, uint32_t count)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -192,7 +194,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__  int8_t* dst, vector_int8_t 
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  uint8_t* dst, vector_uint8_t src, uint32_t count)
+__simd_callee__ inline void asc_store_impl(__ubuf__ uint8_t* dst, vector_uint8_t src, uint32_t count)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -201,7 +203,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__  uint8_t* dst, vector_uint8_
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  int16_t* dst, vector_int16_t src, uint32_t count)
+__simd_callee__ inline void asc_store_impl(__ubuf__ int16_t* dst, vector_int16_t src, uint32_t count)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -210,7 +212,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__  int16_t* dst, vector_int16_
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  uint16_t* dst, vector_uint16_t src, uint32_t count)
+__simd_callee__ inline void asc_store_impl(__ubuf__ uint16_t* dst, vector_uint16_t src, uint32_t count)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -219,7 +221,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__  uint16_t* dst, vector_uint1
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  int32_t* dst, vector_int32_t src, uint32_t count)
+__simd_callee__ inline void asc_store_impl(__ubuf__ int32_t* dst, vector_int32_t src, uint32_t count)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -228,7 +230,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__  int32_t* dst, vector_int32_
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  uint32_t* dst, vector_uint32_t src, uint32_t count)
+__simd_callee__ inline void asc_store_impl(__ubuf__ uint32_t* dst, vector_uint32_t src, uint32_t count)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -255,7 +257,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ float* dst, vector_float src
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__  int64_t* dst, vector_int64_t src, uint32_t count)
+__simd_callee__ inline void asc_store_impl(__ubuf__ int64_t* dst, vector_int64_t src, uint32_t count)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
