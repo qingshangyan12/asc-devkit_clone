@@ -7,15 +7,6 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-
-# Check if all operators failed compilation
-# The CPACK_ASC_ALL_KERNELS_FAIL variable should be set in func.cmake before include(CPack)
-# CPack will pass this variable to this script automatically
-if(DEFINED CPACK_ASC_ALL_KERNELS_FAIL AND CPACK_ASC_ALL_KERNELS_FAIL)
-  message(STATUS "All operators failed, skipping package creation")
-  return()
-endif()
-
 execute_process(COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/util/makeself/makeself.sh
                         --header ${CMAKE_CURRENT_LIST_DIR}/util/makeself/makeself-header.sh
                         --help-header ./help.info --tar-format posix
