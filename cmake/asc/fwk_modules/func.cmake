@@ -1150,7 +1150,7 @@ function(npu_op_package_add target_package_name)
       COMMAND ${CMAKE_COMMAND} -P "${CHECK_SCRIPT}"
       DEPENDS ${KERNEL_COMPILE_TARGETS}
     )
-    add_dependencies(binary ${_ascendc_kernel_target}_check_all_fail)
+
   endif()
 
   if("${output_type}" STREQUAL "RUN")
@@ -1419,6 +1419,7 @@ function(npu_op_package_add target_package_name)
     if (NOT TARGET binary)
       add_custom_target(binary)
     endif()
+    add_dependencies(binary ${_ascendc_kernel_target}_check_all_fail)
     get_property(kernel_enable_binary_package GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_BINARY_PACKAGE)
     get_property(kernel_enable_source_package GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_SOURCE_PACKAGE)
     if(NOT "${output_type}" STREQUAL "RUN")
