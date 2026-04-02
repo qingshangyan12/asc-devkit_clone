@@ -1,12 +1,13 @@
 # 语言: None, Cpp, Java, JavaScript, ObjC, Proto, TableGen, TextProto
 Language: Cpp
 # BasedOnStyle: LLVM
+BasedOnStyle: Google
 
 # 访问说明符(public、private等)的偏移
 AccessModifierOffset: -4
 
 # 开括号(开圆括号、开尖括号、开方括号)后的对齐: Align, DontAlign, AlwaysBreak(总是在开括号后换行)
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: AlwaysBreak
 
 # 连续赋值时，对齐所有等号
 AlignConsecutiveAssignments: false
@@ -15,7 +16,9 @@ AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 
 # 右对齐逃脱换行(使用反斜杠换行)的反斜杠
-AlignEscapedNewlines: Right
+AlignEscapedNewlines: Left
+
+AllowAllArgumentsOnNextLine: true
 
 # 水平对齐二元和三元表达式的操作数
 AlignOperands: true
@@ -24,16 +27,16 @@ AlignOperands: true
 AlignTrailingComments: true
 
 # 不允许函数声明的所有参数在放在下一行
-AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: true
 
 # 不允许短的块放在同一行
-AllowShortBlocksOnASingleLine: true
+AllowShortBlocksOnASingleLine: false
 
 # 允许短的case标签放在同一行
 AllowShortCaseLabelsOnASingleLine: false
 
 # 允许短的函数放在同一行: None, InlineOnly(定义在类中), Empty(空函数), Inline(定义在类中，空函数), All
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: true
 
 # 允许短的if语句保持在同一行
 AllowShortIfStatementsOnASingleLine: false
@@ -59,6 +62,7 @@ BinPackParameters: true
 
 # 大括号换行，只有当BreakBeforeBraces设置为Custom时才有效
 BraceWrapping:
+  AfterCaseLabel: false
   # class定义后面
   AfterClass: false
   # 控制语句后面
@@ -84,9 +88,9 @@ BraceWrapping:
   # 分离空函数
   SplitEmptyFunction: false
   # 分离空语句
-  SplitEmptyRecord: false
+  SplitEmptyRecord: true
   # 分离空命名空间
-  SplitEmptyNamespace: false
+  SplitEmptyNamespace: true
 
 # 在二元运算符前换行: None(在操作符后换行), NonAssignment(在非赋值的操作符前换行), All(在操作符前换行)
 BreakBeforeBinaryOperators: NonAssignment
