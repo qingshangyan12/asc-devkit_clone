@@ -1142,7 +1142,6 @@ function(npu_op_package_add target_package_name)
       endif()
       # Write the result to a file that can be read by func.cmake
       file(WRITE \"\${OUTPUT_FILE}\" \"\${ALL_FAIL_RESULT}\")
-      message(STATUS \"All fail result written to \${OUTPUT_FILE}: \${ALL_FAIL_RESULT}\")
     ")
 
     add_custom_target(${target_package_name}_check_all_fail
