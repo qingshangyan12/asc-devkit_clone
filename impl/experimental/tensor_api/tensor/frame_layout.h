@@ -99,29 +99,18 @@ struct MakeNnFrameLayout {
     }
 };
 
-using LayoutFormatSet = Std::tuple<Std::tuple<NzLayoutPattern, MakeNzFrameLayout>, Std::tuple<NDLayoutPattern, MakeNDFrameLayout>, Std::tuple<DNLayoutPattern, MakeDNFrameLayout>, Std::tuple<NnLayoutPattern, MakeNnFrameLayout>,
-                                    Std::tuple<ZzLayoutPattern, MakeZzFrameLayout>, Std::tuple<ZnLayoutPattern, MakeZnFrameLayout>>;
-
-template <typename LayoutPattern, typename Tuple = LayoutFormatSet>
-struct FindLayoutFromPattern;
-
-template <typename Pattern, typename FrameLayout, typename... Rest>
-struct FindLayoutFromPattern<Pattern, Std::tuple<Std::tuple<Pattern, FrameLayout>, Rest...>> {
-    using type = FrameLayout;
-};
-
-template <typename Pattern, typename NotMatchTuple, typename... Rest>
-struct FindLayoutFromPattern<Pattern, Std::tuple<NotMatchTuple, Rest...>>
-    : FindLayoutFromPattern<Pattern, Std::tuple<Rest...>> {};
-
-template <typename Pattern>
-struct FindLayoutFromPattern<Pattern, Std::tuple<>> {
-    static_assert(!Std::is_same_v<Pattern, Pattern>, "Unsupported layout pattern.");
-};
+using LayoutFormatSet = TupleMap<
+    Std::tuple<NzLayoutPattern, MakeNzFrameLayout>,
+    Std::tuple<NDLayoutPattern, MakeNDFrameLayout>,
+    Std::tuple<DNLayoutPattern, MakeDNFrameLayout>,
+    Std::tuple<NnLayoutPattern, MakeNnFrameLayout>,
+    Std::tuple<ZzLayoutPattern, MakeZzFrameLayout>,
+    Std::tuple<ZnLayoutPattern, MakeZnFrameLayout>>;
 
 template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
-    using GetLayoutMakeFun = typename FindLayoutFromPattern<LayoutPattern>::type;
+    using GetLayoutMakeFun = typename LayoutFormatSet::template Get<LayoutPattern>;
+    static_assert(!Std::is_same_v<GetLayoutMakeFun, EmptyValue>, "Unsupported layout pattern.");
     return GetLayoutMakeFun::Make<TraitType>(args...);
 }
 
