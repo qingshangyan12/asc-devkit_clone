@@ -1115,9 +1115,11 @@ function(npu_op_package_add target_package_name)
 
     set(ERROR_LOG_FILE "${CMAKE_CURRENT_BINARY_DIR}/compile_error.log")
     set(CHECK_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_script.cmake")
+    set(OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/all_fail_result_${target_package_name}.txt")
 
     file(WRITE "${CHECK_SCRIPT}" "
       set(ERROR_LOG_FILE \"${ERROR_LOG_FILE}\")
+      set(OUTPUT_FILE \"${OUTPUT_FILE}\")
       if(EXISTS \"\${ERROR_LOG_FILE}\")
         file(READ \"\${ERROR_LOG_FILE}\" ERROR_LOG_CONTENT)
         execute_process(
@@ -1131,16 +1133,16 @@ function(npu_op_package_add target_package_name)
         endif()
         message(STATUS \"Found \${FAILED_COUNT} failed operators out of ${KERNEL_COMPILE_TARGET_COUNT} total\")
         if(\${FAILED_COUNT} EQUAL ${KERNEL_COMPILE_TARGET_COUNT})
-          set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL TRUE)
-          message(STATUS \"Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to TRUE\")
+          set(ALL_FAIL_RESULT TRUE)
         else()
-          set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL FALSE)
-          message(STATUS \"Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to FALSE\")
+          set(ALL_FAIL_RESULT FALSE)
         endif()
       else()
-        set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL FALSE)
-        message(STATUS \"Set global property _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL to FALSE (log_file does not exist)\")
+        set(ALL_FAIL_RESULT FALSE)
       endif()
+      # Write the result to a file that can be read by func.cmake
+      file(WRITE \"\${OUTPUT_FILE}\" \"\${ALL_FAIL_RESULT}\")
+      message(STATUS \"All fail result written to \${OUTPUT_FILE}: \${ALL_FAIL_RESULT}\")
     ")
 
     add_custom_target(${target_package_name}_check_all_fail
@@ -1418,16 +1420,24 @@ function(npu_op_package_add target_package_name)
     endif()
 
     if (NOT TARGET ${target_package_name}_deal_all_fail)
+      set(OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/all_fail_result_${target_package_name}.txt")
       add_custom_target(${target_package_name}_deal_all_fail
-        COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_${target_package_name}.cmake"
+        COMMAND ${CMAKE_COMMAND} -D_OUTPUT_FILE=${OUTPUT_FILE} -P "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_${target_package_name}.cmake"
       )
-      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_${target_package_name}.cmake"
-"# Check if all kernels failed for this package
-get_property(all_fail GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_package_name}_ALL_FAIL)
-if(all_fail)
-  message(FATAL_ERROR \"All kernels failed for package ${target_package_name}. Cannot proceed with build.\")
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_${target_package_name}.cmake" "
+# Check if all kernels failed for this package
+# Read the result from the output file
+if(EXISTS \"\${_OUTPUT_FILE}\")
+  file(READ \"\${_OUTPUT_FILE}\" ALL_FAIL_VALUE)
+  string(STRIP \"\${ALL_FAIL_VALUE}\" ALL_FAIL_VALUE)
+  message(STATUS \"Read ALL_FAIL_VALUE from file: \${ALL_FAIL_VALUE}\")
+  if(ALL_FAIL_VALUE STREQUAL \"TRUE\")
+    message(FATAL_ERROR \"All kernels failed for package ${target_package_name}. Cannot proceed with build.\")
+  else()
+    message(STATUS \"Not all kernels failed for package ${target_package_name}, continuing build.\")
+  endif()
 else()
-  message(STATUS \"Not all kernels failed for package ${target_package_name}, continuing build.\")
+  message(FATAL_ERROR \"Output file \${_OUTPUT_FILE} does not exist. Cannot determine if all kernels failed.\")
 endif()
 "
       )
