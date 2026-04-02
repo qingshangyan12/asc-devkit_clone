@@ -22,7 +22,6 @@ vendordir=vendors/$vendor_name
 QUIET="y"
 INSTALL_FOR_ALL="n"
 FORCE_INSTALL="n"
-VALIDATE_DEBUG="y" # Debug-only switch. Set to "n" or remove in release.
 
 CURR_OPERATE_USER="$(id -nu 2>/dev/null)"
 CURR_OPERATE_GROUP="$(id -ng 2>/dev/null)"
@@ -59,12 +58,6 @@ done
 log() {
     cur_date=$(date +"%Y-%m-%d %H:%M:%S")
     echo "[ops_custom] [$cur_date] "$1
-}
-
-debug_log() {
-    if [ "${VALIDATE_DEBUG}" = "y" ]; then
-        log "[DEBUG] $1"
-    fi
 }
 
 resolve_so_paths() {
@@ -170,7 +163,6 @@ validate_so_dlopen() {
     local so_dir=""
     local dlopen_lib_path=""
 
-    debug_log "validate_so_dlopen start: so=${so_name}, path=${so_path}, ASCEND_HOME_PATH=${ASCEND_HOME_PATH}"
     so_dir=$(dirname "${so_path}")
     dlopen_lib_path=$(build_dlopen_lib_path "${so_dir}")
 
@@ -192,7 +184,6 @@ PY
         log "[ERROR] Failed to load ${so_name} wish env ASCEND_HOME_PATH(${ASCEND_HOME_PATH}),error message is ${err_msg}."
         return 1
     fi
-    debug_log "validate_so_dlopen success: so=${so_name}"
     return 0
 }
 
@@ -204,7 +195,6 @@ validate_so_arch() {
     local so_arch_norm=""
     local so_arch_display=""
 
-    debug_log "validate_so_arch start: so=${so_name}, path=${so_path}"
     so_machine_raw=$(readelf -h "${so_path}" 2>/dev/null | awk -F: '/Machine:/{gsub(/^ +/, "", $2); print $2; exit}')
     if [ -z "${so_machine_raw}" ]; then
         log "[ERROR] Failed to parse architecture from '${so_name}'."
@@ -218,7 +208,6 @@ validate_so_arch() {
         log "[ERROR] The architecture of the shared library '${so_name}' (${so_arch_display}) is incompatible with the current running environment (${env_arch})."
         return 1
     fi
-    debug_log "validate_so_arch success: so=${so_name}, so_arch=${so_arch_display}, env_arch=${env_arch}"
     return 0
 }
 
@@ -228,10 +217,8 @@ validate_so_glibc() {
     local env_glibc="$3"
     local required_glibc=""
 
-    debug_log "validate_so_glibc start: so=${so_name}, path=${so_path}"
     required_glibc=$(strings -a "${so_path}" 2>/dev/null | grep -o 'GLIBC_[0-9]\+\.[0-9]\+' | sed 's/GLIBC_//' | sort -V | tail -n 1)
     if [ -z "${required_glibc}" ]; then
-        debug_log "validate_so_glibc skip: so=${so_name}, no GLIBC symbol found"
         return 0
     fi
 
@@ -244,7 +231,6 @@ validate_so_glibc() {
         log "[ERROR] The shared library '${so_name}' was linked against a newer version of the GNU C Library (glibc). The current runtime enviroment has an older version of glibs, which does not provide the required symbols."
         return 1
     fi
-    debug_log "validate_so_glibc success: so=${so_name}, required_glibc=${required_glibc}, env_glibc=${env_glibc}"
     return 0
 }
 
@@ -255,17 +241,14 @@ validate_shared_libraries() {
     local env_arch=""
     local env_glibc=""
 
-    debug_log "validate_shared_libraries enter"
     if [ "${FORCE_INSTALL}" = "y" ]; then
         log "[WARNING] --force is enabled, skip shared library validation."
-        debug_log "validate_shared_libraries bypass by --force"
         return 0
     fi
 
     env_arch=$(uname -m)
     if [ -n "${ASCEND_HOME_PATH}" ]; then
         for so_name in "${opmaster_so_name}" "${opsproto_so_name}" "${opapi_so_name}"; do
-            debug_log "validate_shared_libraries checking so=${so_name}"
             so_paths=$(resolve_so_paths "${so_name}")
             if [ $? -ne 0 ] || [ -z "${so_paths}" ]; then
                 log "[ERROR] Failed to find shared library '${so_name}' in package path."
@@ -273,15 +256,12 @@ validate_shared_libraries() {
             fi
             while IFS= read -r so_path; do
                 [ -z "${so_path}" ] && continue
-                debug_log "validate_shared_libraries branch=dlopen so=${so_name}, path=${so_path}"
                 validate_so_dlopen "${so_path}" "${so_name}" || return 1
             done <<< "${so_paths}"
-            debug_log "validate_shared_libraries checked so=${so_name} success"
         done
     else
         env_glibc=$(ldd --version 2>/dev/null | head -n 1 | grep -o '[0-9]\+\.[0-9]\+' | head -n 1)
         for so_name in "${opmaster_so_name}" "${opsproto_so_name}" "${opapi_so_name}"; do
-            debug_log "validate_shared_libraries checking so=${so_name}"
             so_paths=$(resolve_so_paths "${so_name}")
             if [ $? -ne 0 ] || [ -z "${so_paths}" ]; then
                 log "[ERROR] Failed to find shared library '${so_name}' in package path."
@@ -289,14 +269,11 @@ validate_shared_libraries() {
             fi
             while IFS= read -r so_path; do
                 [ -z "${so_path}" ] && continue
-                debug_log "validate_shared_libraries branch=arch+glibc so=${so_name}, path=${so_path}"
                 validate_so_arch "${so_path}" "${so_name}" "${env_arch}" || return 1
                 validate_so_glibc "${so_path}" "${so_name}" "${env_glibc}" || return 1
             done <<< "${so_paths}"
-            debug_log "validate_shared_libraries checked so=${so_name} success"
         done
     fi
-    debug_log "validate_shared_libraries success"
     return 0
 }
 
