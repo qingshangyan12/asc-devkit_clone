@@ -18,6 +18,7 @@
 #include "include/utils/base/sys_macros.h"
 #include "include/utils/base/sys_constants.h"
 #include "include/utils/common_types.h"
+#include "experimental/tensor_api/utils/cache.h"
 
 namespace AscendC { 
 namespace Te {
