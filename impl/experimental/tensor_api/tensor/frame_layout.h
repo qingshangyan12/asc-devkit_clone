@@ -111,7 +111,7 @@ template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
     using GetLayoutMakeFun = typename LayoutFormatSet::template Get<LayoutPattern>;
     static_assert(!Std::is_same_v<GetLayoutMakeFun, EmptyValue>, "Unsupported layout pattern.");
-    return GetLayoutMakeFun::Make<TraitType>(args...);
+    return GetLayoutMakeFun::template Make<TraitType>(args...);
 }
 
 } // namespace Te

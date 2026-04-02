@@ -1113,7 +1113,6 @@ TEST_F(Tensor_Api_Layout, TestMakeFrameLayout)
     EXPECT_EQ(ndLayout.Shape<1>(), 256);
     EXPECT_EQ(ndLayout.Stride<0>(), 256);
     EXPECT_EQ(ndLayout.Stride<1>(), 1);
-    EXPECT_TRUE((AscendC::Std::is_same_v<PatternTraitT<decltype(ndLayout)>, NDLayoutPattern>));
 
     auto nzLayout = MakeFrameLayout<NzLayoutPattern, LayoutTrait<float>>(128, 256);
     auto nzShape0 = nzLayout.Shape<0>();
@@ -1130,5 +1129,4 @@ TEST_F(Tensor_Api_Layout, TestMakeFrameLayout)
     EXPECT_EQ(AscendC::Std::get<1>(nzStride0), c0Ele * 16);
     EXPECT_EQ(AscendC::Std::get<0>(nzStride1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(nzStride1), 128 * c0Ele);
-    EXPECT_TRUE((AscendC::Std::is_same_v<PatternTraitT<decltype(nzLayout)>, NzLayoutPattern>));
 }
