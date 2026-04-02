@@ -33,11 +33,11 @@ __aicore__ inline constexpr auto MakeGMmemPtr(Iterator iter)
 
 ## 返回值说明
 
-- 返回GM内存指针对象，类型为 `HardwareMemPtr<Hardware::GM, Iterator>`。
+返回GM内存指针对象，类型为 `HardwareMemPtr<Hardware::GM, Iterator>`。
 
 ## 约束说明
 
-- iter必须是有效的迭代器类型。
+iter必须是有效的迭代器类型。
 
 ## 调用示例
 
