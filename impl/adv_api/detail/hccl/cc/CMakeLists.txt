@@ -50,13 +50,7 @@ set(CMAKE_C_COMPILE_OBJECT
     "<CMAKE_C_COMPILER> <DEFINES> -D__FILE__='\"$(notdir $(abspath <SOURCE>))\"' -Wno-builtin-macro-redefined <INCLUDES> <FLAGS> -o <OBJECT> -c <SOURCE>"
 )
 
-if(ENABLE_TEST)
-    include(${HCCL_CC_DIR}/cmake/config.cmake)
-    include(${HCCL_CC_DIR}/cmake/intf_pub_gccnative.cmake)
-    include(${HCCL_CC_DIR}/cmake/function.cmake)
-    include(${HCCL_CC_DIR}/cmake/third_party/gtest.cmake)
-
-elseif(ENABLE_CUSTOM)
+if(ENABLE_CUSTOM)
     # 自定义算子打包
     if(NOT CUSTOM_OPS_NAME)
         message(FATAL_ERROR "Custom ops name is not set")
