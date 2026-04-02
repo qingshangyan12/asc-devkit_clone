@@ -2,11 +2,11 @@
 
 ## 概述
 
-本样例介绍如何使用组合API Fixpipe或基础API DataCopy将矩阵乘的结果从L0C直接搬出到GM，并支持随路NZ2ND、UnitFlag与随路量化、Relu能力组合。
+本样例介绍如何使用组合API Fixpipe或基础API DataCopy将矩阵乘的结果从L0C直接搬出到GM，并支持随路NZ2ND、unitFlag与随路量化、Relu能力组合。
 
 完整的矩阵乘法流程涉及四个阶段的数据搬运和计算：
 1. **GM → L1**：通过DataCopy随路转换ND2NZ指令，将A、B矩阵从GM搬运到L1，同时完成ND到NZ格式的转换
-2. **L1 → L0A/L0B**：通过LoadData系列指令，将A、B矩阵从L1搬运到L0A/L0B，完成NZ到Zz/Zn格式的转换
+2. **L1 → L0A/L0B**：通过LoadData系列指令，将A、B矩阵从L1搬运到L0A/L0B，完成NZ到ZZ/ZN格式的转换
 3. **L0A × L0B → L0C**：通过Mmad指令执行矩阵乘法计算，结果存储在L0C中
 4. **L0C → GM**：通过Fixpipe或DataCopy指令将结果从L0C直接搬出到GM，支持随路NZ2ND、量化、Relu等操作
 
@@ -40,20 +40,20 @@
 
 ### 样例功能
 
-本样例中实现了[M, N, K]固定为[128, 256, 128]的矩阵乘法，对应的数学表达式为：
+本样例中实现了 [M, N, K] 固定为 [128, 256, 128] 的矩阵乘法，对应的数学表达式为：
 ```
 C = A * B
 ```
-其中A的形状为[M, K], B的形状为[K, N], C的形状为[M, N]。
+其中A的形状为 [M, K], B的形状为 [K, N], C的形状为 [M, N]。
 
 ### 样例规格
 
 <table>
 <tr><td rowspan="1" align="center">样例类型</td><td colspan="4" align="center">矩阵乘法</td></tr>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">A</td><td align="center">(128, 128)</td><td align="center">half/int8_t</td><td align="center">ND</td></tr>
-<tr><td align="center">B</td><td align="center">(128, 256)</td><td align="center">half/int8_t</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">(128, 256)</td><td align="center">float/half/bfloat16_t/int8_t</td><td align="center">ND/NZ</td></tr>
+<tr><td align="center">A</td><td align="center">[128, 128]</td><td align="center">half/int8_t</td><td align="center">ND</td></tr>
+<tr><td align="center">B</td><td align="center">[128, 256]</td><td align="center">half/int8_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[128, 256]</td><td align="center">float/half/bfloat16_t/int8_t</td><td align="center">ND/NZ</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">fixpipe_co12gm</td></tr>
 </table>
 
@@ -402,14 +402,14 @@ AscendC::DataCopy(cGM, c, intriParams);
 
 - 样例执行
   ```bash
-  QUANTMODE=2 OUTPUTFORMAT=1 PREQUANTMODE=1 PRERELUMODE=0 ENUNITFLAG=false USEDATACOPY=false
+  QUANTMODE=3 OUTPUTFORMAT=1 PREQUANTMODE=1 PRERELUMODE=0 ENUNITFLAG=false USEDATACOPY=false ISCHANNELSPLIT=false
   # QUANTMODE: 0-5; OUTPUTFORMAT: 0:NZ 1:ND; PREQUANTMODE: 1:SCALAR 2:VECTOR; PRERELUMODE: 0:disable 1:Norm relu
   mkdir -p build && cd build;
-  cmake .. -DQUANT_MODE=$QUANTMODE -DOUTPUT_FORMAT=$OUTPUTFORMAT -DPRE_QUANT_MODE=$PREQUANTMODE -DPRE_RELU_MODE=$PRERELUMODE -DEN_UNIT_FLAG=$ENUNITFLAG -DUSE_DATA_COPY=$USEDATACOPY;
+  cmake .. -DQUANT_MODE=$QUANTMODE -DOUTPUT_FORMAT=$OUTPUTFORMAT -DPRE_QUANT_MODE=$PREQUANTMODE -DPRE_RELU_MODE=$PRERELUMODE -DEN_UNIT_FLAG=$ENUNITFLAG -DUSE_DATA_COPY=$USEDATACOPY -DIS_CHANNEL_SPLIT=$ISCHANNELSPLIT;
   make -j;
-  python3 ../scripts/gen_data_f322f16.py -output_format=$OUTPUTFORMAT -pre_quant_mode=$PREQUANTMODE -pre_relu_mode=$PRERELUMODE;
+  python3 ../scripts/gen_data_f322s8.py -output_format=$OUTPUTFORMAT -pre_quant_mode=$PREQUANTMODE -pre_relu_mode=$PRERELUMODE;
   ./demo
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin -quant_mode=$QUANTMODE
   ```
   执行结果如下，说明精度对比成功。
   ```bash
