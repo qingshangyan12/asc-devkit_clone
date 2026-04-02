@@ -14,6 +14,7 @@
 
 import sys
 import numpy as np
+import argparse
 
 
 RELATIVE_TOL = 1e-6
@@ -21,12 +22,16 @@ ABSOLUTE_TOL = 1e-9
 ERROR_TOL = 1e-4
 
 
-def verify_result(output, golden):
+def verify_result(scenarioNum, output, golden):
     output_type = np.float16
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
-    output = output[0:2]
-    golden = golden[0:2]
+    if scenarioNum in (1, 5):
+        output = output[0:2]
+        golden = golden[0:2]
+    else:
+        output = output[0]
+        golden = golden[0]
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=RELATIVE_TOL,
@@ -38,8 +43,9 @@ def verify_result(output, golden):
         golden_data = golden[real_index]
         output_data = output[real_index]
         print(
-            "data index: %06d, expected: %-.9f, actual: %-.9f" %
-            (real_index, golden_data, output_data))
+            "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f" %
+            (real_index, golden_data, output_data,
+             abs(output_data - golden_data) / golden_data))
         if index == 100:
             break
     error_ratio = float(different_element_indexes.size) / golden.size
@@ -48,8 +54,13 @@ def verify_result(output, golden):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 7))
+    parser.add_argument('output', type=str)
+    parser.add_argument('golden', type=str)
+    args = parser.parse_args()
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
+        res = verify_result(args.scenarioNum, args.output, args.golden)
         if not res:
             raise ValueError("[ERROR] result error")
         else:

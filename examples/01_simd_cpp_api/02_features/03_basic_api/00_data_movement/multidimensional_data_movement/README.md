@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何使用多维数据搬运接口实现GM(Global Memory)到UB(Unified Buffer)通路的数据搬运，并在搬运过程中进行随路Padding。
+本样例介绍如何使用多维数据搬运接口实现GM（Global Memory）到UB（Unified Buffer）通路的数据搬运，并在搬运过程中进行随路Padding。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -22,7 +22,7 @@
 
 - 样例功能
 
-  本样例基于2D Padding场景，通过多维数据搬运接口将数据从GM(Global Memory)搬运至UB(Unified Buffer)。
+  本样例基于2D Padding场景，通过多维数据搬运接口将数据从GM（Global Memory）搬运至UB（Unified Buffer）。接口资料参考[多维数据搬运](../../../../../../docs/api/context/多维数据搬运（ISASI）.md)。
 
 - 样例规格
 
@@ -36,7 +36,7 @@
 - 样例实现：
   - kernel实现   
 
-    输入数据从GM(Global Memory)搬运至UB(Unified Buffer)时，通过配置搬入的维度和对应的Stride，实现2D Padding，将GM(Global Memory)上[2, 8]的数据，搬运至UB(Unified Buffer)并Padding为[4, 16]。
+    输入数据从GM（Global Memory）搬运至UB（Unified Buffer）时，通过配置搬入的维度和对应的Stride，实现2D Padding，将GM（Global Memory）上[2, 8]的数据，搬运至UB（Unified Buffer）并Padding为[4, 16]。
 
     ```cpp
     // 2D Padding场景，2维数据搬运
