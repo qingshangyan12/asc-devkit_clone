@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-创建BIAS上的指针，用于访问AI Core的BIAS的内存空间。
+创建BiasTable Buffer上的指针，用于访问AI Core的BiasTable Buffer的内存空间。
 
 ## 函数原型
 
@@ -34,18 +34,18 @@ __aicore__ inline auto MakeBiasmemPtr(const U& byteOffset)
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| iter | 输入 | 指针，指向BIAS的起始地址，类型为 `__biasbuf__ T*`。 |
-| byteOffset | 输入 | BIAS内存起始地址的字节偏移量。 |
+| iter | 输入 | 指针，指向BiasTable Buffer的起始地址，类型为 `__biasbuf__ T*`。 |
+| byteOffset | 输入 | BiasTable Buffer内存起始地址的字节偏移量。 |
 
 ## 返回值说明
 
-- 返回BIAS内存指针对象，类型为 `HardwareMemPtr<Hardware::BIAS, Iterator>`。
+- 返回BiasTable Buffer内存指针对象，类型为 `HardwareMemPtr<Hardware::BIAS, Iterator>`。
 
 
 ## 约束说明
 
 - iter必须是有效的迭代器类型。
-- 偏移地址必须在BIAS内存范围内。
+- 偏移地址必须在BiasTable Buffer内存范围内。
 
 ## 调用示例
 
