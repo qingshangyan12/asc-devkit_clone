@@ -101,10 +101,14 @@ def get_special_names(data_type):
     return special_names
 
 
-def format_float16(val):
-    if np.issubdtype(val.dtype, np.floating):
-        return f"{float(val):.6f}"
-    return str(val)
+def format_value(val):
+    # if np.issubdtype(val.dtype, np.floating):
+    #     return f"{float(val):.6f}"
+    # return str(val)
+    if val.dtype == np.float16:
+        return f"{float(val):.8f}"
+    else:
+        return str(val)
 
 
 def print_unary_api_table(api_name, type_name, special_names, inputs, golden):
@@ -116,8 +120,8 @@ def print_unary_api_table(api_name, type_name, special_names, inputs, golden):
     for i, name in enumerate(special_names):
         inp_val = inputs[i]
         out_val = golden[i]
-        inp_str = format_float16(inp_val) if inputs.dtype == np.float16 else str(inp_val)
-        out_str = format_float16(out_val) if golden.dtype == np.float16 else str(out_val)
+        inp_str = format_value(inp_val)
+        out_str = format_value(out_val)
         print(f"{type_name:<8} | {name:<14}{inp_str:<18} | {out_str:<32}")
     print(f"{'='*130}\n")
 
@@ -134,8 +138,8 @@ def print_binary_api_table(api_name, type_name, special_names, inputs_a, inputs_
             out_val = golden[idx]
             inp_a = inputs_a[idx]
             inp_b = inputs_b[idx]
-            inp_a_str = format_float16(inp_a) if inputs_a.dtype == np.float16 else str(inp_a)
-            inp_b_str = format_float16(inp_b) if inputs_b.dtype == np.float16 else str(inp_b)
-            out_str = format_float16(out_val) if golden.dtype == np.float16 else str(out_val)
+            inp_a_str = format_value(inp_a)
+            inp_b_str = format_value(inp_b)
+            out_str = format_value(out_val)
             print(f"{type_name:<8} | {name_a:<14}{inp_a_str:<18} | {name_b:<14}{inp_b_str:<18} | {out_str:<32}")
     print(f"{'='*138}\n")

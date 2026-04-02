@@ -71,8 +71,11 @@ def get_type_from_id(output_type):
 
 
 def format_value(val, np_type):
+    # if np_type == np.float16:
+    #     return f"{float(val):.6f}"
+    # return str(val)
     if np_type == np.float16:
-        return f"{float(val):.6f}"
+        return f"{float(val):.8f}"
     return str(val)
 
 

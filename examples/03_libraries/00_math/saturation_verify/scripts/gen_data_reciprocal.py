@@ -17,7 +17,8 @@ from gen_data_utils import DATA_TYPE_MAP, construct_special_values, save_bin, ge
 
 def compute_reciprocal_golden(input_array):
     with np.errstate(over='ignore', under='ignore', invalid='ignore'):
-        result = np.where(input_array == 0, np.inf, np.reciprocal(input_array))
+        # result = np.where(input_array == 0, np.inf, np.reciprocal(input_array))
+        result = np.reciprocal(input_array)
     return result.astype(input_array.dtype)
 
 
