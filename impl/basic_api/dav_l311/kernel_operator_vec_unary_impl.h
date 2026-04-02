@@ -54,14 +54,16 @@ namespace AscendC {
 #define UNARY_VEC_NORMAL_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE)                                                           \
 template <typename T = DATA_TYPE, bool isSetMask = true>                                                                         \
 __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask,                          \
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)                                                            \
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)                                                             \
 {                                                                                                                                \
+        if constexpr (isSetMask) {                                                                                               \
+            SetVectorMask<DATA_TYPE>(mask);                                                                                      \
+        }                                                                                                                        \
     __VEC_SCOPE__                                                                                                                \
     {                                                                                                                            \
         RegTensor<DATA_TYPE> vreg0;                                                                                              \
         RegTensor<DATA_TYPE> vreg1;                                                                                              \
-        uint32_t sreg = (uint32_t)mask;                                                                                          \
-        MaskReg preg = CreatePredicate<DATA_TYPE>(sreg);                                                                         \
+        MaskReg preg = MovePredicate<DATA_TYPE>();                                                                               \
         uint32_t strideConfig0 = (uint32_t)repeatParams.srcBlkStride;                                                            \
         uint32_t repeatStrideConfig0 = (uint32_t)repeatParams.srcRepStride;                                                      \
         uint32_t strideConfig1 = (uint32_t)repeatParams.dstBlkStride;                                                            \

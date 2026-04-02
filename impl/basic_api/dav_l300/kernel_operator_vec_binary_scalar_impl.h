@@ -44,8 +44,7 @@ namespace AscendC {
         __VEC_SCOPE__                                                                                               \
         {                                                                                                           \
             RegTensor<DATA_TYPE> srcReg, dstReg;                                                                    \
-            uint32_t sreg = (uint32_t)(mask);                                                                       \
-            MaskReg preg = CreatePredicate<DATA_TYPE>(sreg);                                                        \
+            MaskReg preg = MovePredicate<DATA_TYPE>();                                                              \
             uint32_t srcBlkStride = static_cast<uint32_t>(repeatParams.srcBlkStride);                                          \
             uint32_t dstBlkStride = static_cast<uint32_t>(repeatParams.dstBlkStride);                                          \
             uint32_t srcRepStride = static_cast<uint32_t>(repeatParams.srcRepStride);                                          \
@@ -119,6 +118,9 @@ namespace AscendC {
     __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, DATA_TYPE scalarValue,       \
         const uint64_t mask, const uint8_t repeatTimes, const UnaryRepeatParams& repeatParams)                      \
     {                                                                                                               \
+        if constexpr (isSetMask) {                                                                                  \
+            SetVectorMask<DATA_TYPE>(mask[1], mask[0]);                                                             \
+        }                                                                                                           \
         CONTINUOUS_MODE_FUNC(OP_NAME, DATA_TYPE, dst, src, scalarValue, mask, repeatTimes, repeatParams)            \
     }
 

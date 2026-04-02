@@ -54,18 +54,16 @@ __aicore__ inline void AxpyIntrinsicsImpl(__ubuf__ T* dst, __ubuf__ T* src, T sc
 {
     __VEC_SCOPE__
     {
-        MaskReg preg;
-        uint32_t sreg = (uint32_t)mask;
-        preg = CreatePredicate<T>(sreg);
+        MaskReg preg = MovePredicate<T>();
         RegTensor<T> vreg0;
         RegTensor<T> vreg1;
         uint32_t srcBlkStride = static_cast<uint32_t>(repeatParams.srcBlkStride);
         uint32_t dstBlkStride = static_cast<uint32_t>(repeatParams.dstBlkStride);
         uint32_t srcRepStride = static_cast<uint32_t>(repeatParams.srcRepStride);
         uint32_t dstRepStride = static_cast<uint32_t>(repeatParams.dstRepStride);
+        DataCopy(vreg1, dst, dstBlkStride, 0, preg);
         for (uint16_t i = 0; i < (uint16_t)repeatTimes; ++i) {
             DataCopy<T, PostLiteral::POST_MODE_UPDATE>(vreg0, src, srcBlkStride, srcRepStride, preg);
-            DataCopy(vreg1, dst, dstBlkStride, 0, preg);
             Axpy(vreg1, vreg0, scalarValue, preg);
             DataCopy<T, PostLiteral::POST_MODE_UPDATE>(dst, vreg1, dstBlkStride, dstRepStride, preg);
         }
@@ -206,7 +204,10 @@ template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void AxpyImpl(__ubuf__ T* dst, __ubuf__ U* src, const U& scalarValue,
                                 uint64_t mask, const uint8_t repeatTimes,
                                 const UnaryRepeatParams& repeatParams)
-{
+{    
+    if constexpr (isSetMask) {
+        SetVectorMask<T>(mask);
+    }
     if constexpr ((sizeof(T) == sizeof(U)) && (std::is_same_v<T, half> || std::is_same_v<T, float>)) {
         return AxpyIntrinsicsImpl(dst, src, scalarValue, mask, repeatTimes, repeatParams);
     } else if constexpr (std::is_same_v<T, float> && std::is_same_v<U, half>) {

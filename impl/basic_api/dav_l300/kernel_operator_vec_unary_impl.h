@@ -165,12 +165,14 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
     __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask,                       \
         const uint8_t repeatTimes, const UnaryRepeatParams& repeatParams)                                                         \
     {                                                                                                                             \
+        if constexpr (isSetMask) {                                                                                                \
+            SetVectorMask<DATA_TYPE>(mask);                                                                           \
+        }                                                                                                                         \
         __VEC_SCOPE__                                                                                                             \
         {                                                                                                                         \
             RegTensor<DATA_TYPE> vreg0;                                                                                           \
             RegTensor<DATA_TYPE> vreg1;                                                                                           \
-            uint32_t sreg = (uint32_t)mask;                                                                                       \
-            MaskReg preg = CreatePredicate<DATA_TYPE>(sreg);                                                                      \
+            MaskReg preg = MovePredicate<DATA_TYPE>();                                                                            \
             uint32_t strideConfig0 = static_cast<uint32_t>(repeatParams.srcBlkStride);                                            \
             uint32_t repeatStrideConfig0 = static_cast<uint32_t>(repeatParams.srcRepStride);                                      \
             uint32_t strideConfig1 = static_cast<uint32_t>(repeatParams.dstBlkStride);                                            \
