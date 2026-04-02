@@ -280,7 +280,7 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
         }
 #endif
 #ifdef __DAV_VEC__
-        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "[AIV Block %u/%u] ", GetBlockIdx(), GetBlockNum());
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "[AIV Block %u/%u] ", GetBlockIdx(), GetBlockNum()*GetTaskRatio());
 #else
         __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "[AIC Block %u/%u] ", GetBlockIdx(), GetBlockNum());
 #endif
