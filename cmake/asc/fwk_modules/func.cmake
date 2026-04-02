@@ -223,8 +223,11 @@ function(simple_kernel_compile)
       # Collect failure information and append it to BINCMP_ERROR_LOG
       set(CHECK_ERROR_CMD
           "if grep -q -i 'error\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
-              echo '' >> ${BINCMP_ERROR_LOG}; \
-              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
+              ERROR_MSG='fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.'; \
+              if [ ! -f ${BINCMP_ERROR_LOG} ] || ! grep -qF \"\${ERROR_MSG}\" ${BINCMP_ERROR_LOG}; then \
+                  echo '' >> ${BINCMP_ERROR_LOG}; \
+                  echo \"\${ERROR_MSG}\" >> ${BINCMP_ERROR_LOG}; \
+              fi; \
               cat ${BINCMP_COMPILE_LOG} >> ${COMPILE_LOG}; \
           fi; \
           rm -f ${BINCMP_COMPILE_LOG}"
@@ -277,11 +280,14 @@ function(simple_kernel_compile)
             --build-tool=$(MAKE) > ${BINCMP_COMPILE_LOG} 2>&1 || true"
       )
 
-      # Collect failure information and append to BINCMP_ERROR_LOG
+      # Collect failure information and append it to BINCMP_ERROR_LOG
       set(CHECK_ERROR_CMD
           "if grep -q -i 'error\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
-              echo '' >> ${BINCMP_ERROR_LOG}; \
-              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
+              ERROR_MSG='fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.'; \
+              if [ ! -f ${BINCMP_ERROR_LOG} ] || ! grep -qF \"\${ERROR_MSG}\" ${BINCMP_ERROR_LOG}; then \
+                  echo '' >> ${BINCMP_ERROR_LOG}; \
+                  echo \"\${ERROR_MSG}\" >> ${BINCMP_ERROR_LOG}; \
+              fi; \
               cat ${BINCMP_COMPILE_LOG} >> ${COMPILE_LOG}; \
           fi; \
           rm -f ${BINCMP_COMPILE_LOG}"
