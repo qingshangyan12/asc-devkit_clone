@@ -48,7 +48,7 @@ struct NDLayoutFormat {
 ```cpp
 // 创建ND格式Layout
 using namespace AscendC::Te;
-// 根据flag的值，选择DN格式或NDLayout的类型
+// 根据flag的值，选择DN格式或ND格式的类型
 constexpr bool flag = true;
 using MyLayoutType = conditional_t<flag, DNLayoutFormat<half>, NDLayoutFormat<half>>;
 size_t m = 128;

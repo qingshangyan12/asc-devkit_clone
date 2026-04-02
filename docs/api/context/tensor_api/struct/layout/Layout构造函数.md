@@ -18,7 +18,6 @@ __aicore__ inline constexpr Layout(const ShapeType& shape  = {}, const StrideTyp
 
 ## 参数说明
 
-
 <table><thead align="left"><tr id="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_row6223476444"><th class="cellrowborder" valign="top" width="17.22%" id="mcps1.1.4.1.1"><p id="p1085176175119">参数名</p>
 </th>
 <th class="cellrowborder" valign="top" width="15.340000000000002%" id="mcps1.1.4.1.2"><p id="p1851763519">输入/输出</p>
@@ -54,10 +53,11 @@ __aicore__ inline constexpr Layout(const ShapeType& shape  = {}, const StrideTyp
 
 ## 调用示例
 
-```
-AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
-AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
+```cpp
+using namespace AscendC::Te;
 
-AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>> layoutInit(shape, stride);
+auto shape = MakeShape(10, 20, 30);
+auto stride = MakeStride(1, 100, 200);
+Layout<decltype(shape), decltype(stride)> layoutInit(shape, stride);
 ```
 

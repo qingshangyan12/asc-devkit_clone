@@ -44,7 +44,7 @@ __aicore__ inline constexpr auto GetShape(const Layout<ShapeType, StrideType>& l
 using namespace AscendC::Te;
 
 auto layout = MakeNDLayout(128,128);
-// 无模板实参时 Is... 为空，等价于 layout.Shape<>() 得到整个shape元组
+// 无模板实参时 Is... 为空，等价于 layout.Shape() 得到整个shape元组
 auto shapeTuple = GetShape(layout);
 
 // 带索引时等价于 layout.Shape<0>()，按递归取shape子结构或某一维

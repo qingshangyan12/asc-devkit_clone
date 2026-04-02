@@ -26,7 +26,8 @@ __aicore__ inline auto MakeL0AmemPtr(const U& byteOffset)
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| T | 输入 | L0A的指针类型，`__ca__ T`。 |
+| Iterator | 输入 | 迭代器或指针类型。 |
+| T | 输入 | 元素类型。 |
 | U | 输入 | 字节偏移量类型。 |
 
 `表2` 参数说明
@@ -34,6 +35,7 @@ __aicore__ inline auto MakeL0AmemPtr(const U& byteOffset)
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
 | iter | 输入 | 指针，指向L0A的起始地址，类型为`__ca__ T`。 |
+| byteOffset | 输入 | L0A内存起始地址的字节偏移量。 |
 
 
 ## 返回值说明
@@ -49,6 +51,8 @@ __aicore__ inline auto MakeL0AmemPtr(const U& byteOffset)
 ## 调用示例
 
 ```cpp
+using namespace AscendC::Te;
+
 // 示例 1： 使用指针创建
 constexpr uint32_t Tile_LENGTH = 128;
 __ca__ float data[Tile_LENGTH];

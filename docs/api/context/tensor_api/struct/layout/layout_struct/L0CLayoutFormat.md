@@ -48,7 +48,7 @@ struct L0CLayoutFormat {
 ```cpp
 // 创建L0C格式Layout
 using namespace AscendC::Te;
-// 根据flag的值，选择DN格式或L0C的类型
+// 根据flag的值，选择L0C格式或DN格式的类型
 constexpr bool flag = true;
 using MakeLayoutGM = conditional_t<flag, DNLayoutFormat<half>, L0CLayoutFormat<half>>;
 size_t m = 128;

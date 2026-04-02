@@ -8,7 +8,7 @@
 
 ## 功能概述
 
-用于返回Layout的有效数据所占空间的大小。
+用于返回Layout的有效元素个数。
 
 ## 函数原型
 
@@ -35,13 +35,12 @@ __aicore__ inline constexpr auto Size(const Layout<Shape, Stride>& layout);
 
 ### 返回值
 
-返回Layout的秩，即返回Layout布局的Shape或其子结构的元组（tuple）维度的个数。
+返回Layout的有效元素个数。
 
 ### 示例代码
 
    ```cpp
   using namespace AscendC::Te;
   auto layout = MakeLayout(MakeShape(10, 20), MakeStride(1, 100));
-  auto size = Size(layout); //rank1 = 200
+  auto size = Size(layout); //size = 200
   ```
-  

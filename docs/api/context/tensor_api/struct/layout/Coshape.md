@@ -35,7 +35,7 @@ __aicore__ inline constexpr auto Coshape(const Layout<Shape, Stride>& layout);
 
 ### 返回值
 
-返回坐标映射覆盖Layout的索引。
+返回坐标映射覆盖的索引跨度（最大线性索引 + 1）。
 
 ### 约束条件
 

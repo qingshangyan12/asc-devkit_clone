@@ -46,17 +46,19 @@ template <typename T> struct is_layout
 ## 调用示例
 
 ```cpp
+using namespace AscendC::Te;
+
 // 初始化Layout数据结构并判断其类型
-AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
-AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
+auto shape = MakeShape(10, 20, 30);
+auto stride = MakeStride(1, 100, 200);
 
-auto layoutMake = AscendC::MakeLayout(shape, stride);
-AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>> layoutInit(shape, stride);
+auto layoutMake = MakeLayout(shape, stride);
+Layout<decltype(shape), decltype(stride)> layoutInit(shape, stride);
 
-bool value = AscendC::is_layout<decltype(shape)>::value; //value = false
-value = AscendC::is_layout<decltype(stride)>::value; //value = false
+bool value = is_layout<decltype(shape)>::value; // value = false
+value = is_layout<decltype(stride)>::value; // value = false
 
-value = AscendC::is_layout<decltype(layoutMake)>::value;//value = true
-value = AscendC::is_layout<decltype(layoutInit)>::value;//value = true
+value = is_layout<decltype(layoutMake)>::value; // value = true
+value = is_layout<decltype(layoutInit)>::value; // value = true
 ```
 

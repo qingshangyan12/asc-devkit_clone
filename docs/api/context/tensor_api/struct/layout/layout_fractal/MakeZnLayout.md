@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-创建Zn格式的布局，Zn格式是Zn格式的转置版本，外层矩阵按列优先存储，内层矩阵按行优先存储。
+创建Zn格式的布局，外层矩阵按列优先存储，内层矩阵按行优先存储。
 
 ## 函数原型
 
@@ -50,8 +50,7 @@ __aicore__ inline decltype(auto) MakeZnLayout(U row, S column)
 // 创建ZN格式Layout
 using namespace AscendC::Te;
 // 编译时常量传参构造Layout
-using MyZnLayout = MakeZnLayout<half, Std::Int<32>, Std::Int<32>>;
-auto staticLayout = MyZnLayout{};
+auto staticLayout = MakeZnLayout<half>(Std::Int<32>{}, Std::Int<32>{});
 
 // 运行时变量传参构造Layout
 auto layout = MakeZnLayout<half>(32, 32);

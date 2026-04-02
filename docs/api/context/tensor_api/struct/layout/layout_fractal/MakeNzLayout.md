@@ -50,8 +50,7 @@ __aicore__ inline decltype(auto) MakeNzLayout(U row, S column)
 // 创建NZ格式Layout
 using namespace AscendC::Te;
 // 编译时常量传参构造Layout
-using MyNzLayout = MakeNzLayout<half, Std::Int<32>, Std::Int<32>>;
-auto staticLayout = MyNzLayout{};
+auto staticLayout = MakeNzLayout<half>(Std::Int<32>{}, Std::Int<32>{});
 
 // 运行时变量传参构造Layout
 auto layout = MakeNzLayout<half>(32, 32);

@@ -51,8 +51,7 @@ __aicore__ inline decltype(auto) MakeDNLayout(U row, S column)
 using namespace AscendC::Te;
 
 // 编译时常量传参构造Layout
-using MyDNLayout = MakeDNLayout<half, Std::Int<32>, Std::Int<32>>;
-auto staticLayout = MyDNLayout{};
+auto staticLayout = MakeDNLayout<half>(Std::Int<32>{}, Std::Int<32>{});
 
 // 运行时变量传参构造Layout
 auto layout = MakeDNLayout<half>(32, 32);

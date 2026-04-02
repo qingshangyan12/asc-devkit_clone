@@ -7,7 +7,7 @@
 |Ascend 950PR/Ascend 950DT|√|
 
 ## 功能说明
-DN
+
 ScaleBDNLayoutFormat用于定义ScaleBDN格式的布局，ScaleBDN格式是一种支持缩放的布局，也是一种特殊的DN格式。
 
 ## 结构体定义
@@ -48,18 +48,18 @@ struct ScaleBDNLayoutFormat {
 ```cpp
 // 创建ScaleBDN格式Layout
 using namespace AscendC::Te;
-// 根据flag的值，选择Nn格式或Zz分形的类型
+// 根据flag的值，选择ScaleBND格式或ScaleBDN格式的类型
 constexpr bool flag = true;
 using MyLayoutType = conditional_t<flag, ScaleBNDFormatLayout<fp8_e8m0_t>, ScaleBDNFormatLayout<fp8_e8m0_t>>;
-size_t m = 128;
+size_t scaleK = 128;
 size_t n = 128;
-auto layoutAL1 = MyLayoutType{}(m, n);
+auto layoutAL1 = MyLayoutType{}(scaleK, n);
 
 // 编译时常量传参构造Layout
-using MyScaleBDNLayout = ScaleBDNLayoutFormat<half>::type<Std::Int<64>, Std::Int<32>>;
+using MyScaleBDNLayout = ScaleBDNLayoutFormat<fp8_e8m0_t>::type<Std::Int<64>, Std::Int<32>>;
 auto staticLayout = MyScaleBDNLayout{};
 
 // 运行时变量传参构造Layout
-ScaleBDNLayoutFormat<half> scaleBDNFormat;
+ScaleBDNLayoutFormat<fp8_e8m0_t> scaleBDNFormat;
 auto layout = scaleBDNFormat(64, 32);
 ```

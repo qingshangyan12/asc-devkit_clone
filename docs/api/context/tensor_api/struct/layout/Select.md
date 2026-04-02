@@ -35,9 +35,11 @@ __aicore__ inline constexpr auto Select(const Layout<Shape, Stride>& layout)
 ## 调用示例
 
 ```cpp
-auto shape = AscendC::MakeShape(10, 20, 30);
-auto layout = AscendC::MakeLayout(shape);
+using namespace AscendC::Te;
+
+auto shape = MakeShape(10, 20, 30);
+auto layout = MakeLayout(shape);
 
 // 选择第0和第1维度
-auto subLayout = AscendC::Select<0, 1>(layout);
+auto subLayout = Select<0, 1>(layout);
 ```

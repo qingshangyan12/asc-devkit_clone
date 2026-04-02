@@ -49,7 +49,7 @@ struct NnLayoutFormat {
 ```cpp
 // 创建Nn格式Layout
 using namespace AscendC::Te;
-// 根据flag的值，选择Nn格式或Zz分形的类型
+// 根据flag的值，选择NN格式或ZZ格式的类型
 constexpr bool flag = true;
 using MyLayoutType = conditional_t<flag, NnLayoutFormat<fp8_e8m0_t>, ZzLayoutFormat<fp8_e8m0_t>>;
 size_t m = 128;
@@ -57,10 +57,10 @@ size_t n = 128;
 auto layoutAL1 = MyLayoutType{}(m, n);
 
 // 编译时常量传参构造Layout
-using MyNNLayout = NnLayoutFormat<half>::type<Std::Int<32>, Std::Int<32>>;
+using MyNNLayout = NnLayoutFormat<fp8_e8m0_t>::type<Std::Int<32>, Std::Int<32>>;
 auto staticLayout = MyNNLayout{};
 
 // 运行时变量传参构造Layout
-NnLayoutFormat<half> nnFormat;
+NnLayoutFormat<fp8_e8m0_t> nnFormat;
 auto layout = nnFormat(32, 32);
 ```

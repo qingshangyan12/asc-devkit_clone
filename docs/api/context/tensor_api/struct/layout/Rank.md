@@ -36,6 +36,7 @@ __aicore__ inline constexpr auto Rank(const Layout<Shape, Stride>& layout);
 返回Layout的秩，即返回Layout布局的Shape或其子结构的元组（tuple）维度的个数。
 
 ### 示例代码
+
    ```cpp
   using namespace AscendC::Te;
   auto layout = MakeLayout(MakeShape(10, 20), MakeStride(1, 100));

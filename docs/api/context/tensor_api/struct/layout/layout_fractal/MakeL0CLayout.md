@@ -49,8 +49,7 @@ __aicore__ inline decltype(auto) MakeL0CLayout(U row, S column)
 // 创建L0C格式Layout
 using namespace AscendC::Te;
 // 编译时常量传参构造Layout
-using MyL0CLayout = MakeL0CLayout<Std::Int<32>, Std::Int<32>>;
-auto staticLayout = MyL0CLayout{};
+auto staticLayout = MakeL0CLayout(Std::Int<32>{}, Std::Int<32>{});
 
 // 运行时变量传参构造Layout
 auto layout = MakeL0CLayout(32, 32);

@@ -35,7 +35,7 @@ __aicore__ inline constexpr auto Cosize(const Layout<Shape, Stride>& layout);
 
 ### 返回值
 
-返回坐标映射覆盖Layout的索引。
+返回坐标映射覆盖的空间大小。
 
 ### 约束条件
 

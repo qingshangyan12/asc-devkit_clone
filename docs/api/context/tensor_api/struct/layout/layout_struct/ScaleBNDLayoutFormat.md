@@ -41,26 +41,28 @@ struct ScaleBNDLayoutFormat {
 
 ## 约束说明
 
-- 参数row和column需为整型。
+- 参数row和column需为size_t类型或Int整型常量。
 - 对于T为fp8_e8m0_t时，row需为2的倍数。
 
 ## 调用示例
 
 ```cpp
 // 创建ScaleBND格式Layout
-// 根据flag的值，选择Nn格式或Zz分形的类型
+using namespace AscendC::Te;
+
+// 根据flag的值，选择ScaleBND格式或ScaleBDN格式的类型
 constexpr bool flag = true;
 using MyLayoutType = conditional_t<flag, ScaleBNDFormatLayout<fp8_e8m0_t>, ScaleBDNFormatLayout<fp8_e8m0_t>>;
-size_t m = 128;
+size_t scaleK = 128;
 size_t n = 128;
-auto layoutAL1 = MyLayoutType{}(m, n);
+auto layoutAL1 = MyLayoutType{}(scaleK, n);
 
 // 编译时常量
-using MyScaleBNDLayout = ScaleBNDLayoutFormat<half>::type<Std::Int<64>, Std::Int<32>>;
+using MyScaleBNDLayout = ScaleBNDLayoutFormat<fp8_e8m0_t>::type<Std::Int<64>, Std::Int<32>>;
 constexpr MyScaleBNDLayout staticLayout1;
 auto staticLayout2 = MyScaleBNDLayout{};
 
 // 运行时值
-ScaleBNDLayoutFormat<half> scaleBNDFormat;
+ScaleBNDLayoutFormat<fp8_e8m0_t> scaleBNDFormat;
 auto layout = scaleBNDFormat(64, 32);
 ```

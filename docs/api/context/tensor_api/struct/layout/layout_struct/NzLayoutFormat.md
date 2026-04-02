@@ -48,7 +48,7 @@ struct NzLayoutFormat {
 ```cpp
 // 创建NZ格式Layout
 using namespace AscendC::Te;
-// 根据flag的值，选择Nn格式或Zz分形的类型
+// 根据flag的值，选择NZ格式或ZN格式的类型
 constexpr bool flag = true;
 using MyLayoutType = conditional_t<flag, NzFormatLayout<half>, ZnFormatLayout<half>>;
 size_t m = 128;

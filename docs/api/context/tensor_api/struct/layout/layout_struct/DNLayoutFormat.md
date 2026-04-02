@@ -49,12 +49,12 @@ struct DNLayoutFormat {
 ```cpp
 // 创建DN格式Layout
 using namespace AscendC::Te;
-// 根据flag的值，选择DN格式或NDLayout的类型
+// 根据flag的值，选择DN格式或ND格式的类型
 constexpr bool flag = true;
 using MyLayoutType = conditional_t<flag, DNLayoutFormat<half>, NDLayoutFormat<half>>;
 size_t m = 128;
 size_t n = 128;
-auto layoutAL1 = MyLayout{}(m, n);
+auto layoutAL1 = MyLayoutType{}(m, n);
 
 // 编译时常量传参构造Layout
 using MyDNLayout = DNLayoutFormat<half>::type<Std::Int<32>, Std::Int<32>>;

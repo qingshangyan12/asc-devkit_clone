@@ -15,17 +15,24 @@ __aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column)
 
 ## 功能描述
 
-创建 ScaleAND 格式的 Layout 对象。ScaleAND格式用于矩阵 B 的转置布局（scaleK, n），常用于矩阵乘法中 B 矩阵转置后的存储。
+创建 ScaleAND 格式的 Layout 对象。ScaleAND 格式用于矩阵 A 的非转置布局（m, scaleK）。
 
 ## 参数说明
 
-| 参数名 | 类型 | 描述 |
-|--------|------|------|
-| T | 模板参数 | 数据类型，支持数据类型为fp8_e8m0_t。 |
-| U | 模板参数 | 行参数类型，可以是编译时常量或运行时变量 |
-| S | 模板参数 | 列参数类型，可以是编译时常量或运行时变量 |
-| row | U | 矩阵的行数 |
-| column | S | 矩阵的列数 |
+`表1` 模板参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|--------|-----------|------|
+| T | 输入 | 数据类型，支持数据类型为 `fp8_e8m0_t`。 |
+| U | 输入 | 行参数类型，可以是编译时常量或运行时变量。 |
+| S | 输入 | 列参数类型，可以是编译时常量或运行时变量。 |
+
+`表2` 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|--------|-----------|------|
+| row | 输入 | 矩阵的行数（`m`）。 |
+| column | 输入 | 矩阵的列数（`scaleK`）。 |
 
 ## 返回值
 
@@ -40,13 +47,15 @@ __aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column)
 ## 使用示例
 
 ```cpp
+using namespace AscendC::Te;
+
 // 使用编译时常量
-using Layout1 = decltype(MakeScaleANDLayout<fp8_e8m0_t, Std::Int<64>, Std::Int<32>>(Std::Int<64>{}, Std::Int<32>{}));
+auto staticLayout = MakeScaleANDLayout<fp8_e8m0_t>(Std::Int<32>{}, Std::Int<64>{});
 
 // 使用运行时变量
+size_t m = 32;
 size_t scaleK = 64;
-size_t n = 32;
-auto layout2 = MakeScaleANDLayout<fp8_e8m0_t>(scaleK, n);
+auto layout2 = MakeScaleANDLayout<fp8_e8m0_t>(m, scaleK);
 ```
 
 

@@ -50,8 +50,7 @@ __aicore__ inline decltype(auto) MakeNDLayout(U row, S column)
 // 创建ND格式Layout
 using namespace AscendC::Te;
 // 编译时常量传参构造Layout
-using MyNDLayout = MakeNDLayout<half, Std::Int<32>, Std::Int<32>>;
-auto staticLayout = MyNDLayout{};
+auto staticLayout = MakeNDLayout<half>(Std::Int<32>{}, Std::Int<32>{});
 
 // 运行时变量传参构造Layout
 auto layout = MakeNDLayout<half>(32, 32);
