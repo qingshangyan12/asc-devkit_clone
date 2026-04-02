@@ -15,8 +15,16 @@ find_package(ASC REQUIRED HINTS $ENV{ASCEND_INSTALL_PATH}/compiler/tikcpp/ascend
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+# 场景参数（通过命令行传入）
+# SCENARIO_NUM: 场景编号
+#   1 - 内置固定模式
+#   2 - 用户自定义模式
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-2)")
+
+add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+
 add_executable(demo
-    gather_mask_built_in_fixed_mode.asc
+    gather_mask.asc
 )
 
 target_link_libraries(demo PRIVATE
