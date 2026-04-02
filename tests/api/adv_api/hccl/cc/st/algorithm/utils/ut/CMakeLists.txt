@@ -18,7 +18,7 @@ add_subdirectory(testcase)
 # hccl-model-proxy和hccl-verifier由同级src/目录构建，替代原先由外部脚本构建的checker_fwk
 target_link_libraries(hccl_checker_ops_utest PRIVATE
     gtest
-    pthread
+    -lpthread
     hccl-model-proxy
     hccl-verifier
 )
