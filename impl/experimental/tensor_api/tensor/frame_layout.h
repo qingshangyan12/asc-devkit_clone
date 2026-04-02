@@ -38,8 +38,8 @@ struct MakeNDFrameLayout {
     template <typename TraitType>
     __aicore__ inline static auto Make(size_t row, size_t column) {
         using T = typename TraitType::type;
-        auto shape = MakeShape(row, column);
-        auto stride = MakeStride(column, Std::Int<1>{});
+        auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
+        auto stride = MakeStride(MakeStride(Std::Int<0>{}, column), MakeStride(Std::Int<0>{}, Std::Int<1>{}));
         using LayoutT = Layout<decltype(shape), decltype(stride), NDLayoutPattern>;
         return LayoutT(shape, stride);
     }

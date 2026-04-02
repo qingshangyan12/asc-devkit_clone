@@ -83,3 +83,76 @@ TEST_F(Tensor_Api_Atom, CopyL0C2UBWithOperation)
 
     EXPECT_EQ(dst[0], 0);
 }
+
+TEST_F(Tensor_Api_Atom, CopyGM2L1V2Operation)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t TILE_LENGTH = 16 * 16;
+
+    __gm__ float src[TILE_LENGTH] = {0};
+    __cbuf__ float dst[TILE_LENGTH] = {0};
+
+    auto gmSrc = MakeTensor(MakeGMmemPtr(src), MakeFrameLayout<NDLayoutPattern, LayoutTrait<float>>(16, 16));
+    auto l1Dst = MakeTensor(MakeL1memPtr(dst), MakeFrameLayout<NzLayoutPattern, LayoutTrait<float>>(16, 16));
+
+    auto atomCopy = MakeCopy(CopyGM2L1V2{}, DataCopyTraitDefaultV2{});
+    atomCopy.Call(l1Dst, gmSrc);
+
+    CopyAtom<CopyTraits<CopyGM2L1V2, DataCopyTraitDefaultV2>>{}.Call(l1Dst, gmSrc);
+
+    Copy(CopyAtom<CopyTraits<CopyGM2L1V2, DataCopyTraitDefaultV2>>{}, l1Dst, gmSrc);
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+TEST_F(Tensor_Api_Atom, CopyL0C2OutV2Operation)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t TILE_LENGTH = 32 * 32;
+
+    __cc__ float src[TILE_LENGTH] = {0};
+    __gm__ float dst[TILE_LENGTH] = {0};
+
+    auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeFrameLayout<NzLayoutPattern, LayoutTrait<>>(32, 32));
+    auto gmDst = MakeTensor(MakeGMmemPtr(dst), MakeFrameLayout<NDLayoutPattern, LayoutTrait<>>(32, 32));
+
+    auto atomCopy = MakeCopy(CopyL0C2OutV2{}, FixpipeTraitDefaultV2{});
+    atomCopy.Call(gmDst, l0cSrc);
+
+    CopyAtom<CopyTraits<CopyL0C2OutV2, FixpipeTraitDefaultV2>>{}.Call(gmDst, l0cSrc);
+
+    FixpipeParams params;
+    Copy(CopyAtom<CopyTraits<CopyL0C2OutV2, FixpipeTraitDefaultV2>>{}, gmDst, l0cSrc, params);
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+TEST_F(Tensor_Api_Atom, CopyL12L0V2Operation)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t TILE_LENGTH = 16 * 16;
+
+    __cbuf__ float l1SrcNz[TILE_LENGTH] = {0};
+    __ca__ float l0aDst[TILE_LENGTH] = {0};
+    __cb__ float l0bDst[TILE_LENGTH] = {0};
+
+    auto l1TensorNz = MakeTensor(MakeL1memPtr(l1SrcNz), MakeFrameLayout<NzLayoutPattern, LayoutTrait<float>>(16, 16));
+    auto l0aTensor = MakeTensor(MakeL0AmemPtr(l0aDst), MakeFrameLayout<NzLayoutPattern, LayoutTrait<float>>(16, 16));
+    auto l0bTensor = MakeTensor(MakeL0BmemPtr(l0bDst), MakeFrameLayout<ZnLayoutPattern, LayoutTrait<float>>(16, 16));
+
+    auto atomCopy = MakeCopy(CopyL12L0V2{}, LoadDataTraitDefaultV2{});
+    atomCopy.Call(l0aTensor, l1TensorNz);
+    atomCopy.Call(l0bTensor, l1TensorNz);
+
+    CopyAtom<CopyTraits<CopyL12L0V2, LoadDataTraitDefaultV2>>{}.Call(l0aTensor, l1TensorNz);
+    CopyAtom<CopyTraits<CopyL12L0V2, LoadDataTraitDefaultV2>>{}.Call(l0bTensor, l1TensorNz);
+
+    Copy(CopyAtom<CopyTraits<CopyL12L0V2, LoadDataTraitDefaultV2>>{}, l0aTensor, l1TensorNz);
+    Copy(CopyAtom<CopyTraits<CopyL12L0V2, LoadDataTraitDefaultV2>>{}, l0bTensor, l1TensorNz);
+
+    EXPECT_EQ(l0aDst[0], 0);
+    EXPECT_EQ(l0bDst[0], 0);
+}
