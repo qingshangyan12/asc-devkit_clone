@@ -56,7 +56,7 @@ LoadDataV2(const T& dst, const U& src)
     using SrcPattern = PatternTraitT<U>;
     using Tensor2Tensor = typename
         LoadDataTensor2TensorNoCoordV2<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
-    Tensor2Tensor::Run<trait>(dst, src);
+    Tensor2Tensor::template Run<trait>(dst, src);
 }
 
 template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U, class Coord>

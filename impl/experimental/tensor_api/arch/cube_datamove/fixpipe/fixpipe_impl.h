@@ -66,7 +66,7 @@ FixpipeV2(const T& dst, const U& src, const FixpipeParams& params = FixpipeParam
     constexpr auto quantPre = GetFixpipeQuantPre<trait, T, U>();
     using Tensor2Tensor = typename
         FixpipeTensor2TensorV2<dstPos, srcPos, quantPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
-    Tensor2Tensor::Run<trait, quantPre>(dst, src, params);
+    Tensor2Tensor::template Run<trait, quantPre>(dst, src, params);
 }
 template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplate<T, U, S>, void>::type

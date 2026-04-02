@@ -66,7 +66,7 @@ MmadV2(const T& dst, const U& fm, const S& filter, const Params& params)
    using FilterPattern = PatternTraitT<S>;
    using Tensor2Tensor = typename MmadTensor2TensorV2<dstPos, fmPos, filterPos, Hardware::MAX,
       CURRENT_ARCH_VERSION, DstPattern, FmPattern, FilterPattern>::type;
-   Tensor2Tensor{}.template Run<trait>(dst, fm, filter, params);
+   Tensor2Tensor::template Run<trait>(dst, fm, filter, params);
 }
 
 template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V, typename Params>
