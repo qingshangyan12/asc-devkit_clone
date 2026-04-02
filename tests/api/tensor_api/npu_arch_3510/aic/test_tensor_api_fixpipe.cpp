@@ -107,7 +107,7 @@ public:
 
         if constexpr (QUANT_MODE == QuantMode_t::NoQuant || QUANT_MODE == QuantMode_t::F322F16) {
             if constexpr (HAS_COORD) {
-                gm_addr_global = gmTensor(MakeCoord(base, base), gmTensor.Layout().Shape()).Data().Get();
+                gm_addr_global = gmTensor.Slice(MakeCoord(base, base), TranShapeTo2D(gmTensor.Layout().Shape())).Data().Get();
                 Fixpipe<DEFAULT_FIXPIPE_TRAIT>(gmTensor, l0cTensor, MakeCoord(base, base));
             } else {
                 gm_addr_global = gmC_;
@@ -118,7 +118,7 @@ public:
             auto qMatrixLayout = MakeNDLayout<uint64_t>(1, nLength_);
             auto qTensor = MakeTensor(qIterator, qMatrixLayout);
             if constexpr (HAS_COORD) {
-                gm_addr_global = gmTensor(MakeCoord(base, base), gmTensor.Layout().Shape()).Data().Get();
+                gm_addr_global = gmTensor.Slice(MakeCoord(base, base), TranShapeTo2D(gmTensor.Layout().Shape())).Data().Get();
                 Fixpipe<DEFAULT_FIXPIPE_TRAIT>(gmTensor, l0cTensor, qTensor, MakeCoord(base, base));
             } else {
                 gm_addr_global = gmC_;
@@ -127,7 +127,7 @@ public:
         } else {
             uint64_t quant = 1;
             if constexpr (HAS_COORD) {
-                gm_addr_global = gmTensor(MakeCoord(base, base), gmTensor.Layout().Shape()).Data().Get();
+                gm_addr_global = gmTensor.Slice(MakeCoord(base, base), TranShapeTo2D(gmTensor.Layout().Shape())).Data().Get();
                 Fixpipe<DEFAULT_FIXPIPE_TRAIT>(gmTensor, l0cTensor, quant, MakeCoord(base, base));
             } else {
                 gm_addr_global = gmC_;
@@ -144,6 +144,17 @@ private:
     __gm__ DstT* gmC_;
     __cbuf__ uint64_t* qAddr;
     __cc__ L0cT* l0cAddr;
+
+    template<typename Shape>
+    __aicore__ inline auto TranShapeTo2D(Shape shape) {
+        auto dim0 = AscendC::Std::get<0>(shape);
+        auto dim1 = AscendC::Std::get<1>(shape);
+        auto m0 = AscendC::Std::get<0>(dim0);
+        auto m1 = AscendC::Std::get<1>(dim0);
+        auto n0 = AscendC::Std::get<0>(dim1);
+        auto n1 = AscendC::Std::get<1>(dim1);
+        return MakeShape(m0 * m1, n0 * n1);
+    }
 
     __aicore__ inline constexpr auto MakeGMTensor()
     {
