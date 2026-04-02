@@ -222,8 +222,8 @@ function(simple_kernel_compile)
 
       set(CHECK_ERROR_CMD
           "if grep -q -i 'error\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
-              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
               echo '' >> ${BINCMP_ERROR_LOG}; \
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
               cat ${BINCMP_COMPILE_LOG} >> ${COMPILE_LOG}; \
           fi; \
           rm -f ${BINCMP_COMPILE_LOG}"
@@ -278,8 +278,8 @@ function(simple_kernel_compile)
 
       set(CHECK_ERROR_CMD
           "if grep -q -i 'error\\|exception\\|traceback' ${BINCMP_COMPILE_LOG}; then \
-              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
               echo '' >> ${BINCMP_ERROR_LOG}; \
+              echo 'fail op-type: ${BINCMP_OP_TYPE}, fail compute-unit: ${BINCMP_COMPUTE_UNIT}.' >> ${BINCMP_ERROR_LOG}; \
               cat ${BINCMP_COMPILE_LOG} >> ${COMPILE_LOG}; \
           fi; \
           rm -f ${BINCMP_COMPILE_LOG}"
