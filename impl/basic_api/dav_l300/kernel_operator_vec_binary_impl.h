@@ -94,14 +94,16 @@ const uint32_t L1_DUMP_UB_SIZE = TOTAL_UB_SIZE - 32 * 1024;
     __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src0, __ubuf__ DATA_TYPE* src1,           \
         const uint64_t mask,                                                                                                \
         const uint8_t repeatTimes, const BinaryRepeatParams& repeatParams)                                                  \
-    {                                                                                                                       \
+    {                                                                                                                        \
+        if constexpr (isSetMask) {                                                                                           \
+            SetVectorMask<DATA_TYPE>(mask);                                                                                  \
+        }                                                                                                                    \
         __VEC_SCOPE__                                                                                                       \
         {                                                                                                                   \
             RegTensor<DATA_TYPE> vreg0;                                                                                     \
             RegTensor<DATA_TYPE> vreg1;                                                                                     \
             RegTensor<DATA_TYPE> vreg2;                                                                                     \
-            uint32_t sreg = (uint32_t)mask;                                                                                 \
-            MaskReg preg = CreatePredicate<DATA_TYPE>(sreg);                                                                \
+            MaskReg preg = MovePredicate<DATA_TYPE>();                                                                      \
             uint32_t strideConfig0 = static_cast<uint32_t>(repeatParams.src0BlkStride);                                                  \
             uint32_t repeatStrideConfig0 = static_cast<uint32_t>(repeatParams.src0RepStride);                                            \
             uint32_t strideConfig1 = static_cast<uint32_t>(repeatParams.src1BlkStride);                                                  \
