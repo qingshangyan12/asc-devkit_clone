@@ -13,6 +13,7 @@
 import os
 import numpy as np
 import tensorflow as tf
+import argparse
 np.random.seed(19)
 
 
@@ -307,15 +308,30 @@ def copy_conv2d_gen_data(params):
     return fmi, weight, deq_tensor_value, elewise_tensor, fmo
 
 
-def gen_golden_data():
-    my_params = {"fm_shape": [1, 4, 4, 32], "weight_shape": [1, 2, 2, 128, 32],
-                "fm_type": np.int8, "weight_type": np.int8,
-                "dst_l0c_type": "float32", "deq_dtype": np.float32, "dst_gm_type": np.float16,
-                "stride_list": [1, 1], "pad_list": [0, 0, 0, 0],
-                "dilation_list": [1, 1], "pad_value": 0,
-                "quantize_params": {"mode": "int322fp16", "mode_param": 0.5}, "kernel_name": "cce_copy_conv2d",
-                "deq_type": "scalar", "relu": True, "nz2nd": True, "channel_split": False,
-                "init_l1out": True, "clip_relu": 0, "ele_wise": 0, "elewise_op": 0}
+def gen_golden_data(scenarioNum):
+    """
+    生成测试输入数据和真值数据
+    Args:
+        scenarioNum: 场景编号(1=Scalar量化,2=Tensor量化)
+    """
+    if scenarioNum == 1:
+        my_params = {"fm_shape": [1, 4, 4, 32], "weight_shape": [1, 2, 2, 128, 32],
+                    "fm_type": np.int8, "weight_type": np.int8,
+                    "dst_l0c_type": "float32", "deq_dtype": np.float32, "dst_gm_type": np.float16,
+                    "stride_list": [1, 1], "pad_list": [0, 0, 0, 0],
+                    "dilation_list": [1, 1], "pad_value": 0,
+                    "quantize_params": {"mode": "int322fp16", "mode_param": 0.5}, "kernel_name": "cce_copy_conv2d",
+                    "deq_type": "scalar", "relu": True, "nz2nd": True, "channel_split": False,
+                    "init_l1out": True, "clip_relu": 0, "ele_wise": 0, "elewise_op": 0}
+    else:
+        my_params = {"fm_shape": [1, 4, 4, 32], "weight_shape": [1, 2, 2, 128, 32],
+                    "fm_type": np.int8, "weight_type": np.int8,
+                    "dst_l0c_type": "float32", "deq_dtype": np.uint64, "dst_gm_type": np.float16,
+                    "stride_list": [1, 1], "pad_list": [0, 0, 0, 0],
+                    "dilation_list": [1, 1], "pad_value": 0,
+                    "quantize_params": {"mode": "int322fp16", "mode_param": 1}, "kernel_name": "cce_copy_conv2d",
+                    "deq_type": "tensor", "relu": True, "nz2nd": True, "channel_split": False,
+                    "init_l1out": True, "clip_relu": 0, "ele_wise": 0, "elewise_op": 0}
 
     fm_data, we_data, deq_tensor_value, elewise_tensor, golden_data = copy_conv2d_gen_data(my_params)
 
@@ -329,7 +345,10 @@ def gen_golden_data():
     tiling[6] = 32
     tiling[7] = 1
     tiling[8] = 1
-    tiling[9] = 11
+    if scenarioNum == 1:
+        tiling[9] = 11
+    else:
+        tiling[9] = 10
     tiling[10] = True
     tiling[11] = True
     tiling[12] = False
@@ -348,4 +367,7 @@ def gen_golden_data():
 
 
 if __name__ == "__main__":
-    gen_golden_data()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 5))
+    args = parser.parse_args()
+    gen_golden_data(args.scenarioNum)
