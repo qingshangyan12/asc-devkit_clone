@@ -58,7 +58,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     // StrideRow1应满足：（StrideRow1 - ShapeRow0 * ShapeColumn0）% ShapeColumn0 = 0
     ```
 
-    下面是一个连续的NZ Layout的示例。
+    下面是一个连续的Nz Layout的示例。
 
     ```cpp
     Layout = ((Shape) : (Stride))
@@ -69,7 +69,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     **图 4**  Nz Layout示意图  
     ![分形变换](/figure/分形变换.png)
 
-    通过[MakeNzLayout](struct/layout/layout_fractal/MakeNzLayout.md)接口可以快速构造连续的NZ Layout格式，自行设置StrideRow1和StrideColumn1可以构造非连续的NZ Layout格式。
+    通过[MakeNzLayout](struct/layout/layout_fractal/MakeNzLayout.md)接口可以快速构造连续的Nz Layout格式，自行设置StrideRow1和StrideColumn1可以构造非连续的Nz Layout格式。
 
 - Zn Layout
 
@@ -82,18 +82,18 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     // StrideRow1应满足：（StrideColumn1 - ShapeRow0 * ShapeColumn0）% ShapeRow0 = 0
     ```
 
-    下面是一个连续的ZN Layout的示例。
+    下面是一个连续的Zn Layout的示例。
 
     ```cpp
     Layout = ((Shape) : (Stride))
-    Shape = ((Std::Int<32 / sizeof(T)>{}, row / 32 / sizeof(T)), (Std::Int<16>{}, column / 16))
+    Shape = ((Std::Int<32 / sizeof(T)>{}, row / (32 / sizeof(T))), (Std::Int<16>{}, column / 16))
     Stride = ((Std::Int<1>{}, 32 / sizeof(T) * column), (Std::Int<32 / sizeof(T)>{}, Std::Int<32 / sizeof(T) * 16>{}))
     ```
 
     **图 5**  Zn Layout示意图  
     ![分形变换](/figure/分形变换-0.png) 
 
-    通过[MakeZnLayout](struct/layout/layout_fractal/MakeZnLayout.md)接口可以快速构造连续的ZN Layout格式，自行设置StrideRow1和StrideColumn1可以构造非连续的ZN Layout格式。
+    通过[MakeZnLayout](struct/layout/layout_fractal/MakeZnLayout.md)接口可以快速构造连续的Zn Layout格式，自行设置StrideRow1和StrideColumn1可以构造非连续的Zn Layout格式。
 
 - ND Layout，一种使用层次化表述法描述的二维行优先排布格式。
 
