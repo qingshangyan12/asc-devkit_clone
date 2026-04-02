@@ -34,15 +34,6 @@
 namespace AscendC {
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
 
-__aicore__ inline void EnablePrintf()
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_TIME_STAMP_ON)
-    static const struct BinaryMetaAscFeature __asc_feature_print__ __attribute__ ((used, section (".ascend.meta"))) =
-    {4, 4, 1};
-#endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
-}
-
-
 template <typename T>
 __aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType();
 
@@ -1009,7 +1000,6 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        __asc_aicore::enable_asc_diagnostics();
 #if !defined(__NPU_DEVICE__)
         if (printType != DumpType::DUMP_ASSERT) {
             PrintCommonHead(printType);
