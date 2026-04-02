@@ -16,6 +16,7 @@
 #define IMPL_SIMT_API_CPP_KERNEL_SIMT_COMMON_INTERFACE_IMPL_H
 
 #include "impl/simt_api/cpp/dav_3510/kernel_simt_common_impl.h"
+#include <type_traits>
 
 namespace AscendC {
 namespace Simt {
