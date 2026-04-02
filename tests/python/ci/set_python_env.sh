@@ -13,13 +13,9 @@ set -e
 
 top_dir=$1
 test_type=$2
-soc_info=$3
 base_path=$top_dir/build/
 
 #LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=$base_path/llt/tensor_engine/ut:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=$base_path/metadef/register:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=$base_path/air/graph_metadef/register:$LD_LIBRARY_PATH
 export ASCEND_OPP_PATH=$top_dir/out/onetrack/llt/$test_type/obj
 mkdir -p "$ASCEND_OPP_PATH"
 echo "os=linux" > "$ASCEND_OPP_PATH/scene.info"
