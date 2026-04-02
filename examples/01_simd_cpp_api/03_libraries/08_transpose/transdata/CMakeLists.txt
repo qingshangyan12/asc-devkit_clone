@@ -15,6 +15,10 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+set(TRANS_MODE "1" CACHE STRING "TransData使用场景(1-4)")
+
+add_definitions(-DTRANS_MODE=${TRANS_MODE})
+
 add_executable(demo
     transdata.asc
 )
