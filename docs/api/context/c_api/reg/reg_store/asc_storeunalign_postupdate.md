@@ -32,6 +32,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对�
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp8_e8m0_t*& dst, vector_store_unalign& src0, vector_fp8_e8m0_t src1)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp4x2_e2m1_t*& dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp4x2_e1m2_t*& dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1)
+    __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ int4b_t*& dst, vector_store_unalign& src0, vector_int4x2_t src1)
     ```
 
 - 使用uint32_t作为存储偏移量
@@ -53,6 +54,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对�
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp8_e8m0_t*& dst, vector_store_unalign& src0, vector_fp8_e8m0_t src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp4x2_e2m1_t*& dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp4x2_e1m2_t*& dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1, uint32_t count)
+    __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ int4b_t*& dst, vector_store_unalign& src0, vector_int4x2_t src1, uint32_t count)
     ```
 
 - 使用iter_reg作为存储偏移量
@@ -74,6 +76,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对�
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp8_e8m0_t* dst, vector_store_unalign& src0, vector_fp8_e8m0_t src1, iter_reg& count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1, iter_reg& count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1, iter_reg& count)
+    __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ int4b_t* dst, vector_store_unalign& src0, vector_int4x2_t src1, iter_reg& count)
     ```
 
 ## 参数说明
