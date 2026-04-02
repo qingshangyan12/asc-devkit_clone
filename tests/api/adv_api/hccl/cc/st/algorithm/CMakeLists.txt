@@ -15,7 +15,7 @@ if (BUILD_OPEN_PROJECT)
     set(UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils/src)
     set(TESTCASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/testcase)
     set(ASCEND_HOME_PATH ${ASCEND_CANN_PACKAGE_PATH})
-    set(HCCL_DEV_BASE ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../../hccl)
+    set(HCCL_DEV_BASE ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../impl/adv_api/detail/hccl/cc)
     set(THIRD_PARTH_PATH ${HCCL_DEV_BASE}/output/third_party)
 endif()
 

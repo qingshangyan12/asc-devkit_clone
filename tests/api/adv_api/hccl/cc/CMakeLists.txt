@@ -9,8 +9,6 @@
 # -----------------------------------------------------------------------------------------------------------
 
 # Common path configuration for hccl cc tests
-set(HCCL_DEV_BASE ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../impl/adv_api/detail/hccl/cc)
-set(ASCEND_HOME_PATH ${ASCEND_CANN_PACKAGE_PATH})
 
 add_subdirectory(ut)
 add_subdirectory(st)
