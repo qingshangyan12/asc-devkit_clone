@@ -65,13 +65,13 @@ struct LoadDataTensor2TensorNoCoord {
 template <>
 struct LoadDataTensor2TensorNoCoord<Hardware::L0A, Hardware::L1, ArchVersion::V3510>
 {
-    using type = LoadDataL12L0ANZ2NZ3510;
+    using type = LoadDataL12L0A3510;
 };
 
 template <>
 struct LoadDataTensor2TensorNoCoord<Hardware::L0B, Hardware::L1, ArchVersion::V3510>
 {
-    using type = LoadDataL12L0BNZ2ZN3510;
+    using type = LoadDataL12L0B3510;
 };
 
 template <>
