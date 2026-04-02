@@ -170,12 +170,12 @@ template <typename T, size_t row, size_t column, typename Enable = void>
 struct NZLayoutFormatImpl;
 
 template <typename T, size_t row, size_t column>
-struct NZLayoutFormatImpl<T, row, column, typename Std::enable_if<!Std::is_same_v<T, Std::ignore_t>>::type> {
+struct NZLayoutFormatImpl<T, row, column, typename Std::enable_if<!Std::is_one_of_attr_v<T, Std::ignore_t>>::type> {
     using type = Layout<NZShapeFormat<T, row, column>, NZStrideFormat<T, row, column>>;
 };
 
 template <typename T, size_t row, size_t column>
-struct NZLayoutFormatImpl<T, row, column, typename Std::enable_if<Std::is_same_v<T, Std::ignore_t>>::type> {
+struct NZLayoutFormatImpl<T, row, column, typename Std::enable_if<Std::is_one_of_attr_v<T, Std::ignore_t>>::type> {
     using type = Layout<NZShapeFormat<uint16_t, row, column>, NZStrideFormat<uint16_t, row, column>>;
 };
 
