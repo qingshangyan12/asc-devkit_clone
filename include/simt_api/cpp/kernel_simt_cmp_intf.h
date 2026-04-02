@@ -16,13 +16,13 @@
 namespace AscendC {
 namespace Simt {
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool IsFinite(T x);
+__aicore__ inline bool IsFinite(T x);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool IsNan(T x);
+__aicore__ inline bool IsNan(T x);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool IsInf(T x);
+__aicore__ inline bool IsInf(T x);
 }  // namespace Simt
 }  // namespace AscendC
 

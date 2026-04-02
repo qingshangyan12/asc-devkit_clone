@@ -19,10 +19,10 @@ namespace Simt {
 #ifndef ASCENDC_CPU_DEBUG
 #if !defined(__CHECK_FEATURE_AT_PRECOMPILE) || (defined(__CHECK_FEATURE_AT_PRECOMPILE) && defined(__NPU_DEVICE__))
 template <class... Args>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void PRINTF(const __gm__ char* fmt, Args&&... args);
+__aicore__ inline void PRINTF(const __gm__ char* fmt, Args&&... args);
 
 template <class... Args>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void printf(const __gm__ char* fmt, Args&&... args);
+__aicore__ inline void printf(const __gm__ char* fmt, Args&&... args);
 
 #endif
 #endif

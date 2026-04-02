@@ -16,40 +16,40 @@
 
 namespace AscendC {
 namespace Simt {
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t WarpAllSync(int32_t predicate);
+__aicore__ inline int32_t WarpAllSync(int32_t predicate);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t WarpAnySync(int32_t predicate);
+__aicore__ inline int32_t WarpAnySync(int32_t predicate);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t Uni(int32_t predicate);
+__aicore__ inline int32_t Uni(int32_t predicate);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t WarpBallotSync(int32_t predicate);
+__aicore__ inline uint32_t WarpBallotSync(int32_t predicate);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t WarpActiveMask();
-
-template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T WarpShflSync(T var, int32_t srcLane, int32_t width = warpSize);
+__aicore__ inline uint32_t WarpActiveMask();
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T WarpShflUpSync(T var, uint32_t delta, int32_t width = warpSize);
+__aicore__ inline T WarpShflSync(T var, int32_t srcLane, int32_t width = warpSize);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T WarpShflDownSync(T var, uint32_t delta, int32_t width = warpSize);
+__aicore__ inline T WarpShflUpSync(T var, uint32_t delta, int32_t width = warpSize);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T WarpShflXorSync(T var, int32_t laneMask, int32_t width = warpSize);
+__aicore__ inline T WarpShflDownSync(T var, uint32_t delta, int32_t width = warpSize);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T WarpReduceAddSync(T val);
+__aicore__ inline T WarpShflXorSync(T var, int32_t laneMask, int32_t width = warpSize);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T WarpReduceMaxSync(T val);
+__aicore__ inline T WarpReduceAddSync(T val);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T WarpReduceMinSync(T val);
+__aicore__ inline T WarpReduceMaxSync(T val);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void ThreadBarrier();
+template <typename T>
+__aicore__ inline T WarpReduceMinSync(T val);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void ThreadFence();
+__aicore__ inline void ThreadBarrier();
+
+__aicore__ inline void ThreadFence();
 }  // namespace Simt
 }  // namespace AscendC
 

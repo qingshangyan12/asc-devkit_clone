@@ -17,22 +17,22 @@ namespace AscendC {
 namespace Simt {
 
 template <typename T, typename U, RoundMode roundMode, SatMode satMode = SatMode::NO_SAT>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Cast(U x);
+__aicore__ inline T Cast(U x);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Round(T x);
+__aicore__ inline T Round(T x);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Rint(T x);
+__aicore__ inline T Rint(T x);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Floor(T x);
+__aicore__ inline T Floor(T x);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Ceil(T x);
+__aicore__ inline T Ceil(T x);
 
 template <typename T>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Trunc(T x);
+__aicore__ inline T Trunc(T x);
 
 }  // namespace Simt
 }  // namespace AscendC
