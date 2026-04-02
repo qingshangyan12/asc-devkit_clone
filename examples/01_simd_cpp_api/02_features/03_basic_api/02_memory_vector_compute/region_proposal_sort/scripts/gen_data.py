@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# coding=utf-8
+
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2025 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -9,31 +12,32 @@
 # ----------------------------------------------------------------------------------------------------------
 
 
-cmake_minimum_required(VERSION 3.16)
+import os
+import argparse
+import numpy as np
+np.random.seed(9)
 
-find_package(ASC REQUIRED)
 
-project(kernel_samples LANGUAGES ASC CXX)
+def gen_golden_data():
+    """
+    生成Region Proposal排序流水线的测试数据和Golden数据
+    输入：[1, 64]个half score值
+    输出：[1, 64]个half score值（按降序排列）
+    流水线：ProposalConcat → RpSort16 → MrgSort4 → ProposalExtract
+    """
+    score_count = 64
+    input_type = np.dtype("float16")
 
-add_executable(demo
-    block_reduce_max.asc
-)
+    src = np.random.uniform(-1000, 1000, [1, score_count]).astype(input_type)
 
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-    dl
-)
+    # 全局降序排序作为golden
+    golden = np.sort(src.flatten())[::-1].astype(input_type).reshape(1, -1)
 
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
-)
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
+    src.tofile("./input/input_x.bin")
+    golden.tofile("./output/golden.bin")
+
+
+if __name__ == "__main__":
+    gen_golden_data()

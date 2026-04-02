@@ -16,7 +16,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    mrg_sort4.asc
+    region_proposal_sort.asc
 )
 
 target_link_libraries(demo PRIVATE
