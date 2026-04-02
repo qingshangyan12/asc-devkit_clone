@@ -1289,35 +1289,88 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, 
     return 1.0f / norm4df(a, b, c, d);
 }
 
-#define __INTERNAL_NORMF(n, a)                              \
-    do {                                                    \
-        if ((n) <= 0) {                                     \
-            return fabsf((a)[0]);                           \
-        }                                                   \
-        float m = 0;                                        \
-        int32_t has_nan = 0;                                \
-        for (int i = 0; i < (n); i++) {                     \
-            m = fmaxf(m, fabsf((a)[i]));                    \
-            if (isinf((a)[i])) {                            \
-                return ASCRT_INF_F;                         \
-            }                                               \
-            if (isnan((a)[i])) {                            \
-                has_nan = 1;                                \
-            }                                               \
-        }                                                   \
-        if (has_nan) {                                      \
-            return ASCRT_INF_F / ASCRT_INF_F;               \
-        }                                                   \
-        if (m == 0.0f || isnan(m)) {                        \
-            return m;                                       \
-        }                                                   \
-        float sum = 0.0f;                                   \
-        for (int i = 0; i < (n); i++) {                     \
-            sum = fmaf(((a)[i] / m), ((a)[i] / m), sum);    \
-        }                                                   \
-        return m * sqrtf(sum);                              \
-    } while (0)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4 __internal_to_float4(float* a) {
+    float4* arr = (float4*)a;
+    return *arr;
+}
 
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifdef __NPU_ARCH__
+#ifndef ASCENDC_CPU_DEBUG
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4 __internal_to_float4(__gm__ float* a) {
+    __gm__ float4* arr = (__gm__ float4*)a;
+    return *arr;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4 __internal_to_float4(__ubuf__ float* a) {
+    __ubuf__ float4* arr = (__ubuf__ float4*)a;
+    return *arr;
+}
+#endif
+#endif
+#endif
+
+#define __INTERNAL_NORMF(n, a)                                                                \
+    do {                                                                                      \
+        if ((n) <= 0) {                                                                       \
+            return __fabsf((a)[0]);                                                           \
+        }                                                                                     \
+        float m = 0;                                                                          \
+        int head = (4 - ((uintptr_t)(a) % 16) / 4);                                           \
+        if (head > (n)) head = (n);                                                           \
+        for (int i = 0; i < head; i++) {                                                      \
+            if (isinf((a)[i])) {                                                              \
+                return ASCRT_INF_F;                                                           \
+            }                                                                                 \
+            m = __fmaxf(m, __fabsf((a)[i]));                                                  \
+        }                                                                                     \
+        int vec_end = (n) - ((n) - head) % 4;                                                 \
+        if ((n) - head > 3) {                                                                 \
+            for (int i = head; i < vec_end; i += 4) {                                         \
+                float4 v = __internal_to_float4((a) + i);                                     \
+                if (isinf(v.x) || isinf(v.y) || isinf(v.z) || isinf(v.w)) {                   \
+                    return ASCRT_INF_F;                                                       \
+                }                                                                             \
+                m = __fmaxf(m, __fabsf(v.x));                                                 \
+                m = __fmaxf(m, __fabsf(v.y));                                                 \
+                m = __fmaxf(m, __fabsf(v.z));                                                 \
+                m = __fmaxf(m, __fabsf(v.w));                                                 \
+            }                                                                                 \
+        }                                                                                     \
+        for (int i = vec_end; i < (n); i++) {                                                 \
+            if (isinf((a)[i])) {                                                              \
+                return ASCRT_INF_F;                                                           \
+            }                                                                                 \
+            m = __fmaxf(m, __fabsf((a)[i]));                                                  \
+        }                                                                                     \
+        if (m == 0.0f || isnan(m)) {                                                          \
+            return m;                                                                         \
+        }                                                                                     \
+        float sum = 0.0f;                                                                     \
+        float inv_m = 1.0f / m;                                                               \
+        for (int i = 0; i < head; i++) {                                                      \
+            float ni = (a)[i] * inv_m;                                                        \
+            sum = fmaf(ni, ni, sum);                                                          \
+        }                                                                                     \
+        if ((n) - head > 3) {                                                                 \
+            for (int i = head; i < vec_end; i += 4) {                                         \
+                float4 v = __internal_to_float4((a) + i);                                     \
+                float n0 = v.x * inv_m;                                                       \
+                float n1 = v.y * inv_m;                                                       \
+                float n2 = v.z * inv_m;                                                       \
+                float n3 = v.w * inv_m;                                                       \
+                sum = fmaf(n0, n0, sum);                                                      \
+                sum = fmaf(n1, n1, sum);                                                      \
+                sum = fmaf(n2, n2, sum);                                                      \
+                sum = fmaf(n3, n3, sum);                                                      \
+            }                                                                                 \
+        }                                                                                     \
+        for (int i = vec_end; i < (n); i++) {                                                 \
+            float ni = (a)[i] * inv_m;                                                        \
+            sum = fmaf(ni, ni, sum);                                                          \
+        }                                                                                     \
+        return m * sqrtf(sum);                                                                \
+    } while (0)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, float* a)
 {
@@ -2748,27 +2801,42 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_yn_case3(int n, float x)
     float prev = y0f(x);
     float current = y1f(x);
     float scale_factor = 1.0f;
+    float inv_x = 2.0f / x;
 
+    float mult = 0.0f;
+    float value = 0.0f;
+    float inv = 0.0f;
     int k = 1;
-    float mult = 2 * k / x;
-    float value = mult * current - prev;  
-    prev = current;
-    current = value;
-    k += 1;
-    while (k < n) {
-        if (fabsf(mult) > 1.0f  && fabsf(current) > 1.0f && k > 2) { // 2 : index
-            current = 1.0f;
-        }
-        mult = 2 * k / x; // 2:Constant coefficient 2 * k / x
+    for (; k + 2 < n; k += 3) {
+        mult = k * inv_x;
         value = mult * current - prev;
         prev = current;
         current = value;
-        k += 1;
+
+        mult = (k + 1) * inv_x;
+        value = mult * current - prev;
+        prev = current;
+        current = value;
+
+        mult = (k + 2) * inv_x;
+        value = mult * current - prev;
+        prev = current;
+        current = value;
+
         if (fabsf(mult) > 1.0f && fabsf(current) > 1.0f) {
-            prev = prev / current;
-            scale_factor = scale_factor / current;
-            value = value / current;
+            inv = 1.0f / current;
+            prev *= inv;
+            scale_factor *= inv;
+            value *= inv;
+            current = 1.0f;
         }
+    }
+    while (k < n) {
+        mult = k * inv_x;
+        value = mult * current - prev;
+        prev = current;
+        current = value;
+        k++;
     }
     return value / scale_factor;
 }
