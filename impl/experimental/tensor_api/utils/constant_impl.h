@@ -74,8 +74,7 @@ __aicore__ inline constexpr auto GetHardPos()
 }
 
 template <typename ElementType, typename DataType>
-inline constexpr bool is_one_of_attr_v = Std::is_one_of_v<ElementType, __gm__ DataType, __cbuf__ DataType, __ca__ DataType, 
-                                                        __cb__ DataType, __cc__ DataType, __ubuf__ DataType, DataType>;
+inline constexpr bool is_one_of_attr_v = Std::is_one_of_v<ElementType, DataType, Std::unwrap_decay_t<DataType>>;
 
 template <typename DataType>
 inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t> || is_one_of_attr_v<DataType, fp4x2_e2m1_t>;
