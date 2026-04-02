@@ -151,7 +151,7 @@ __simd_callee__ inline void asc_loadalign_postupdate_impl(vector_uint64_t& dst, 
     }
 }
 
-__simd_callee__ inline void asc_loadalign_postupdate_impl(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_postupdate_impl(vector_bool& dst, __ubuf__ uint32_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         plds(dst, src, offset, NORM, POST_UPDATE);
@@ -361,7 +361,7 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate_impl(vector_bfloat
     }
 }
 
-__simd_callee__ inline void asc_loadalign_upsample_postupdate_impl(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_upsample_postupdate_impl(vector_bool& dst, __ubuf__ uint32_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         plds(dst, src, offset, US, POST_UPDATE);
@@ -459,7 +459,7 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate_impl(vector_bflo
     }
 }
 
-__simd_callee__ inline void asc_loadalign_downsample_postupdate_impl(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_downsample_postupdate_impl(vector_bool& dst, __ubuf__ uint32_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         plds(dst, src, offset, DS, POST_UPDATE);
