@@ -26,7 +26,9 @@ adv_test_targets=(
     ascendc_ut_adv_api_tiling_ascend910B1_AIV
     ascendc_ut_adv_api_tiling_ascend950pr_9599_AIC
     ascendc_ut_adv_api_tiling_ascend950pr_9599_AIV
-    ascendc_ut_cc_api_ascend950pr_9599
+    hccl_ut_prepare_env_list
+    hccl_checker_ops_utest
+    hccl_checker_ops_stest
 )
 
 basic_test_one_targets=(
