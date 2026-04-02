@@ -15,7 +15,6 @@
 import sys
 import numpy as np
 import ml_dtypes
-bfloat16 = ml_dtypes.bfloat16
 
 RELATIVE_TOL = 1e-3
 ABSOLUTE_TOL = 1e-3
