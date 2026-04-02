@@ -32,6 +32,7 @@ using vector_fp8_e4m3fn_t = vector_f8e4m3;
 using vector_fp8_e5m2_t = vector_f8e5m2;
 using vector_fp8_e8m0_t = vector_f8e8m0;
 using vector_int4x2_t = vector_s4x2;
+using vector_int4b_t = vector_s4x2;
 using vector_fp4x2_e2m1_t = vector_f4e2m1x2;
 using vector_fp4x2_e1m2_t = vector_f4e1m2x2;
 using vector_store_unalign = vector_align;
