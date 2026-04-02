@@ -70,7 +70,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     **图 4**  Nz Layout示意图  
     ![分形变换](/figure/分形变换.png)
 
-    通过[MakeNzLayout](struct/layout/layout_fractal/MakeNzLayout.md)接口可以快速构造连续的NZ Layout格式，自行设置StrideRow1和StrideColum1可以构造非连续的NZ Layout格式。
+    通过[MakeNzLayout](struct/layout/layout_fractal/MakeNzLayout.md)接口可以快速构造连续的NZ Layout格式，自行设置StrideRow1和StrideColumn1可以构造非连续的NZ Layout格式。
 
 - Zn Layout
 
