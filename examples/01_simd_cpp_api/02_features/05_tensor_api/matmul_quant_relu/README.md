@@ -72,6 +72,15 @@
     source ${install_path}/cann/set_env.sh
     ```
 
+- 软连接配置
+  需要将tensor_api相关代码软连接到cann包路径下才可以编译运行
+  ```bash
+  cd ${install_path}/cann/x86-64-linux/asc/impl
+  ln -s ${code_path}/impl/experimental  # ${code_path}表示本地代码下载路径
+  cd ../include
+  ln -s ${code_path}/include/experimental
+  ```
+
 - 样例执行  
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
