@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-NzLayoutFormat用于定义NZ格式的布局，NZ格式是昇腾AI处理器常用的分块存储格式，外层矩阵按行存储，内层矩阵按列存储。
+NzLayoutFormat用于定义Nz格式的布局，外层矩阵按行存储，内层矩阵按列存储。
 
 ## 结构体定义
 
@@ -48,7 +48,7 @@ struct NzLayoutFormat {
 ```cpp
 // 创建NZ格式Layout
 using namespace AscendC::Te;
-// 根据flag的值，选择NZ格式或ZN格式的类型
+// 根据flag的值，选择Nz格式或Zn格式的类型
 constexpr bool flag = true;
 using MyLayoutType = conditional_t<flag, NzFormatLayout<half>, ZnFormatLayout<half>>;
 size_t m = 128;

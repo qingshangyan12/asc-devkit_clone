@@ -15,7 +15,7 @@ __aicore__ inline decltype(auto) MakeNnLayout(U row, S column)
 
 ## 功能描述
 
-创建 NN 格式的 Layout 对象。NN 格式是 AI CORE 中用于 fp8_e8m0_t 数据类型的特殊分块存储格式。
+创建Nn格式的Layout对象。Nn格式是AI CORE中用于fp8_e8m0_t数据类型的特殊分块存储格式。
 
 ## 参数说明
 

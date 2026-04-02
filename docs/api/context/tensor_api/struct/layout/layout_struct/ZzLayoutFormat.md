@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-ZzLayoutFormat用于定义ZZ格式的布局，ZZ格式是一种特殊的分块存储格式。
+ZzLayoutFormat用于定义Zz格式的布局，Zz格式是一种特殊的分块存储格式。
 
 ## 结构体定义
 
@@ -49,7 +49,7 @@ struct ZzLayoutFormat {
 ```cpp
 // 创建Zz格式Layout
 using namespace AscendC::Te;
-// 根据flag的值，选择NN格式或ZZ格式的类型
+// 根据flag的值，选择Nn格式或Zz格式的类型
 constexpr bool flag = true;
 using MyLayoutType = conditional_t<flag, NnLayoutFormat<fp8_e8m0_t>, ZzLayoutFormat<fp8_e8m0_t>>;
 size_t m = 128;

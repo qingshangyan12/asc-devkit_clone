@@ -8,7 +8,7 @@
 
 ## 功能概述
 
-Coshape表示Layout陪域的形状，即在给定的stride下，坐标映射所覆盖的索引跨度。
+Coshape表示有效逻辑坐标映射的空间的形状，即陪域(codomain)的形状。
 
 ## 函数原型
 
@@ -35,7 +35,7 @@ __aicore__ inline constexpr auto Coshape(const Layout<Shape, Stride>& layout);
 
 ### 返回值
 
-返回坐标映射覆盖的索引跨度（最大线性索引 + 1）。
+返回Layout的陪域(codomain)的形状。
 
 ### 约束条件
 

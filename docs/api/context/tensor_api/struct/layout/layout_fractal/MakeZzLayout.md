@@ -36,8 +36,8 @@ __aicore__ inline decltype(auto) MakeZzLayout(U row, S column)
 
 ## 返回值说明
 
-- 输入为编译时常量时，返回ZZ格式的Layout类型。
-- 输入为整型变量时，返回ZZ格式的Layout对象。
+- 输入为编译时常量时，返回Zz格式的Layout类型。
+- 输入为整型变量时，返回Zz格式的Layout对象。
 - 返回对齐后的Layout，对齐方式及对应位置的参数大小说明详见[Layout和层次化表述法](../../../Layout和层次化表述法.md)。
 
 ## 约束说明
@@ -48,7 +48,7 @@ __aicore__ inline decltype(auto) MakeZzLayout(U row, S column)
 ## 调用示例
 
 ```cpp
-// 创建ZZ格式Layout
+// 创建Zz格式Layout
 using namespace AscendC::Te;
 // 编译时常量传参构造Layout
 auto staticLayout = MakeZzLayout<half>(Std::Int<32>{}, Std::Int<32>{});
