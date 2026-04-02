@@ -515,8 +515,13 @@ function build_test_part() {
   fi
 
   for tag in "${TEST_TARGET_LIST[@]}"; do
-    TARGETS="${TARGETS} --target ${tag}"
-    TEST_MOD="${tag},${TEST_MOD}"
+    if [ "${tag}" == "hccl_checker_ops_stest" ]; then
+      local hccl_st_dir="${CURRENT_DIR}/tests/api/adv_api/hccl/cc/st/algorithm"
+      bash ${hccl_st_dir}/build.sh
+    else
+      TARGETS="${TARGETS} --target ${tag}"
+      TEST_MOD="${tag},${TEST_MOD}"
+    fi
   done
 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=${TEST_MOD}"
