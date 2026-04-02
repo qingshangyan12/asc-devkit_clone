@@ -12,7 +12,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import numpy as np
-from gen_data_utils import DATA_TYPE_MAP, construct_special_values, save_bin, get_special_names, print_unary_api_table
+from gen_data_utils import DATA_TYPE_MAP, construct_multi_block_data, save_bin, get_special_names, print_unary_api_table
 
 
 def compute_ln_golden(input_array):
@@ -25,8 +25,7 @@ def gen_ln_data(input_type, input_size):
     data_type = DATA_TYPE_MAP[input_type]
     type_name = np.dtype(data_type).name
     
-    special_vals = construct_special_values(data_type)
-    inputs = np.array(special_vals, dtype=data_type)
+    inputs = construct_multi_block_data(data_type)
     golden = compute_ln_golden(inputs)
     
     save_bin(inputs, f"./input/input_x.bin")

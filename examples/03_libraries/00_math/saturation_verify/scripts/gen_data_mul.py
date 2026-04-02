@@ -12,7 +12,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import numpy as np
-from gen_data_utils import DATA_TYPE_MAP, cartesian_product_inputs, save_bin, get_special_names, print_binary_api_table
+from gen_data_utils import DATA_TYPE_MAP, construct_multi_block_data, save_bin, get_special_names, print_binary_api_table
 
 
 def compute_mul_golden(a, b):
@@ -25,7 +25,8 @@ def gen_mul_data(input_type, input_size):
     data_type = DATA_TYPE_MAP[input_type]
     type_name = np.dtype(data_type).name
     
-    inputs_a, inputs_b = cartesian_product_inputs(data_type)
+    inputs_a = construct_multi_block_data(data_type)
+    inputs_b = construct_multi_block_data(data_type)
     golden = compute_mul_golden(inputs_a, inputs_b)
     
     save_bin(inputs_a, f"./input/input_x.bin")

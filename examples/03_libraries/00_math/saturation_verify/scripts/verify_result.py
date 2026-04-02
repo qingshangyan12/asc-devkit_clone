@@ -96,8 +96,6 @@ def verify_single_api(output_type, input_x, api_name="exp"):
     golden = np.fromfile("./output/golden.bin", dtype=np_type).reshape(-1)
     input_x = np.fromfile(input_x, dtype=np_type).reshape(-1)
     
-    special_names = get_special_names(np_type)
-    
     print(f"\n{'='*130}")
     print(f"API: {api_name} | Data Type: {np_type} | Verification Results")
     print(f"{'='*130}")
@@ -125,12 +123,11 @@ def verify_single_api(output_type, input_x, api_name="exp"):
         if is_match:
             valid_count += 1
         
-        if i < len(special_names):
-            name = special_names[i]
+        if i < 128 * 2:
             inp_str = format_value(inp_val, np_type)
             non_sat_str = format_value(actual_non_sat, np_type)
             sat_str = format_value(actual_sat, np_type)
-            print(f"{type_name:<8} | {name:<14}{inp_str:<18} | {non_sat_str:<32} | {sat_str:<32}")
+            print(f"{i:<8} | {inp_str:<32} | {non_sat_str:<32} | {sat_str:<32}")
     
     error_ratio = 1.0 - (valid_count / len(golden))
     print(f"{'-'*130}")
@@ -150,9 +147,6 @@ def verify_binary_api(output_type, input_x, input_y, api_name="mul"):
     input_x = np.fromfile(input_x, dtype=np_type).reshape(-1)
     input_y = np.fromfile(input_y, dtype=np_type).reshape(-1)
     
-    special_names = get_special_names(np_type)
-    num_special = len(special_names)
-    
     print(f"\n{'='*138}")
     print(f"API: {api_name} | Data Type: {np_type} | Verification Results")
     print(f"{'='*138}")
@@ -160,7 +154,6 @@ def verify_binary_api(output_type, input_x, input_y, api_name="mul"):
     print(f"{'-'*138}")
     
     valid_count = 0
-    printed_count = 0
     for idx in range(len(golden)):
         inp_a = input_x[idx]
         inp_b = input_y[idx]
@@ -178,22 +171,17 @@ def verify_binary_api(output_type, input_x, input_y, api_name="mul"):
         
         if is_match:
             valid_count += 1
-        
-        if idx < num_special * num_special:
-            i = idx // num_special
-            j = idx % num_special
-            name_a = special_names[i]
-            name_b = special_names[j]
+
+        if idx < 128 * 2:
             inp_a_str = format_value(inp_a, np_type)
             inp_b_str = format_value(inp_b, np_type)
             non_sat_str = format_value(actual_non_sat, np_type)
             sat_str = format_value(actual_sat, np_type)
-            print(f"{type_name:<8} | {name_a:<14}{inp_a_str:<18} | {name_b:<14}{inp_b_str:<18} | {non_sat_str:<32} | {sat_str:<32}")
-            printed_count += 1
+            print(f"{idx:<8} | {inp_a_str:<32} | {inp_b_str:<32} | {non_sat_str:<32} | {sat_str:<32}")
     
     error_ratio = 1.0 - (valid_count / len(golden))
     print(f"{'-'*138}")
-    print(f"Total: {len(golden)}, Unique: {printed_count}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
+    print(f"Total: {len(golden)}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
     print(f"{'='*138}\n")
     
     return error_ratio <= ERROR_TOL

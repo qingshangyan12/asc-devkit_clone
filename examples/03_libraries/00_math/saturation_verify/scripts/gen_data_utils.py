@@ -22,12 +22,14 @@ DATA_TYPE_MAP = {
     4: np.int32,
 }
 
+NUM_BLOCKS = 8
+BLOCK_SIZE = 128
+
 
 def get_dtype_limits(data_type):
     if np.issubdtype(data_type, np.floating):
         finfo = np.finfo(data_type)
         return {
-            # 用于边界值/特殊值测试
             'min': finfo.min,
             'max': finfo.max,
             'pos_zero': np.array(+0.0, dtype=data_type),
@@ -35,34 +37,14 @@ def get_dtype_limits(data_type):
             'nan': np.array(np.nan, dtype=data_type),
             'pos_inf': np.array(np.inf, dtype=data_type),
             'neg_inf': np.array(-np.inf, dtype=data_type),
-
-            # # 最小正规数和负最小正规数
-            # 'min_normal': np.array(finfo.tiny, dtype=data_type),
-            # 'neg_min_normal': np.array(-finfo.tiny, dtype=data_type),
-
-            # 用于正常值测试（验证API基本功能）
-            # 'min': 1.234,
-            # 'max': -0.399,
-            # 'pos_zero': 9.99,
-            # 'neg_zero': -1.88,
-            # 'nan': -6.68,
-            # 'pos_inf': 0.111,
-            # 'neg_inf': 7.777,
         }
     elif np.issubdtype(data_type, np.integer):
         iinfo = np.iinfo(data_type)
         return {
-            # 用于边界值/特殊值测试
             'min': np.array(iinfo.min, dtype=data_type),
             'max': np.array(iinfo.max, dtype=data_type),
             'pos_zero': np.array(+0, dtype=data_type),
             'neg_zero': np.array(-0, dtype=data_type),
-
-            # 用于正常值测试（验证API基本功能）
-            # 'min': 99,
-            # 'max': -88,
-            # 'pos_zero': 6,
-            # 'neg_zero': -3,
         }
     else:
         raise ValueError(f"Unsupported data type: {data_type}")
@@ -73,8 +55,33 @@ def construct_special_values(data_type):
     specials = [limits['min'], limits['max'], limits['pos_zero'], limits['neg_zero']]
     if np.issubdtype(data_type, np.floating):
         specials.extend([limits['nan'], limits['pos_inf'], limits['neg_inf']])
-        # specials.extend([limits['min_normal'], limits['neg_min_normal']])
     return specials
+
+
+def construct_block_data(data_type):
+    specials = construct_special_values(data_type)
+    block = np.ones(BLOCK_SIZE, dtype=data_type)
+    
+    idx = 0
+    for special in specials:
+        repeat_count = 16
+        block[idx:idx + repeat_count] = special
+        idx += repeat_count
+    
+    return block
+
+
+def construct_multi_block_data(data_type):
+    blocks = []
+    for _ in range(NUM_BLOCKS):
+        block = construct_block_data(data_type)
+        blocks.append(block)
+    return np.concatenate(blocks)
+
+
+def get_representative_values(data_type):
+    specials = construct_special_values(data_type)
+    return specials[:7] if len(specials) >= 7 else specials
 
 
 def cartesian_product_inputs(data_type):
@@ -117,12 +124,12 @@ def print_unary_api_table(api_name, type_name, special_names, inputs, golden):
     print(f"{'='*130}")
     print(f"{'type':<8} | {'src':<32} | {'dst (Numpy-Golden)':<32}")
     print(f"{'-'*130}")
-    for i, name in enumerate(special_names):
+    for i in range(len(golden) // 4):
         inp_val = inputs[i]
         out_val = golden[i]
         inp_str = format_value(inp_val)
         out_str = format_value(out_val)
-        print(f"{type_name:<8} | {name:<14}{inp_str:<18} | {out_str:<32}")
+        print(f"{i:<8} | {inp_str:<32} | {out_str:<32}")
     print(f"{'='*130}\n")
 
 
@@ -132,14 +139,12 @@ def print_binary_api_table(api_name, type_name, special_names, inputs_a, inputs_
     print(f"{'='*138}")
     print(f"{'type':<8} | {'src0':<32} | {'src1':<32} | {'dst (Numpy-Golden)':<32}")
     print(f"{'-'*138}")
-    for i, name_a in enumerate(special_names):
-        for j, name_b in enumerate(special_names):
-            idx = i * len(special_names) + j
-            out_val = golden[idx]
-            inp_a = inputs_a[idx]
-            inp_b = inputs_b[idx]
-            inp_a_str = format_value(inp_a)
-            inp_b_str = format_value(inp_b)
-            out_str = format_value(out_val)
-            print(f"{type_name:<8} | {name_a:<14}{inp_a_str:<18} | {name_b:<14}{inp_b_str:<18} | {out_str:<32}")
+    for i in range(len(golden) // 4):
+        inp_a = inputs_a[i]
+        inp_b = inputs_b[i]
+        out_val = golden[i]
+        inp_a_str = format_value(inp_a)
+        inp_b_str = format_value(inp_b)
+        out_str = format_value(out_val)
+        print(f"{i:<8} | {inp_a_str:<32} | {inp_b_str:<32} | {out_str:<32}")
     print(f"{'='*138}\n")
