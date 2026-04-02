@@ -46,6 +46,6 @@ shape和stride及其递归到某层的子结构，需满足二者的维度相同
    ```cpp
   using namespace AscendC::Te;
   auto layout = MakeLayout(MakeShape(10, 20), MakeStride(1, 100));
-  auto index = Coshape(layout); //index = 1910
+  auto coshape = Coshape(layout); //coshape = 1910
   ```
   
