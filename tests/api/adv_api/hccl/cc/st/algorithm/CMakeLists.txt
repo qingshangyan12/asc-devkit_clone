@@ -10,21 +10,13 @@
 
 cmake_minimum_required(VERSION 3.16.0)
 project(hccl_checker_ops_stest)
-set(TOP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../..)
 
 if (BUILD_OPEN_PROJECT)
     set(UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils/src)
     set(TESTCASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/testcase)
-    set(ASCEND_HOME_PATH $ENV{ASCEND_HOME_PATH})
-    set(HCCL_DEV_BASE ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
+    set(ASCEND_HOME_PATH ${ASCEND_CANN_PACKAGE_PATH})
+    set(HCCL_DEV_BASE ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../../hccl)
     set(THIRD_PARTH_PATH ${HCCL_DEV_BASE}/output/third_party)
-
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-        set(ASCEND_HOME_PATH "${ASCEND_HOME_PATH}/x86_64-linux")
-    else()
-        set(ASCEND_HOME_PATH "${ASCEND_HOME_PATH}/aarch64-linux")
-    endif()
-    message(STATUS "Final Ascend Path: ${ASCEND_HOME_PATH}")
 endif()
 
 # 下载并编译gtest

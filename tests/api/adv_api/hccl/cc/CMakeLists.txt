@@ -8,5 +8,9 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
 
+# Common path configuration for hccl cc tests
+set(HCCL_DEV_BASE ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../hccl)
+set(ASCEND_HOME_PATH ${ASCEND_CANN_PACKAGE_PATH})
+
 add_subdirectory(ut)
 add_subdirectory(st)

@@ -77,3 +77,8 @@ if (BUILD_OPEN_PROJECT)
         -D_GLIBCXX_USE_CXX11_ABI=0
     )
 endif()
+
+run_llt_test(
+    TARGET hccl_checker_ops_stest
+    TASK_NUM 1
+)

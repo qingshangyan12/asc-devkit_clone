@@ -29,12 +29,12 @@ target_compile_options(hccl-model-proxy PRIVATE
 )
 
 target_link_libraries(hccl-model-proxy PUBLIC
-    # 链接hccl_depends_stub
-    hcomm
-    unified_dlog
-    mmpa
-    acl_rt
-    scatter_aicpu_kernel
+    # 链接hccl_depends_stub (添加hccl_cc_stub_前缀避免与asc-devkit中同名target冲突)
+    hccl_cc_stub_hcomm
+    hccl_cc_stub_dlog
+    hccl_cc_stub_mmpa
+    hccl_cc_stub_acl_rt
+    hccl_cc_stub_mc2_server
 )
 
 if (BUILD_OPEN_PROJECT)

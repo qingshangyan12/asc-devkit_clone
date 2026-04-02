@@ -8,8 +8,8 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
 
-add_library(hcomm SHARED hccl_depends_stub.cc)
-target_compile_options(hcomm PRIVATE
+add_library(hccl_cc_stub_hcomm SHARED hccl_depends_stub.cc)
+target_compile_options(hccl_cc_stub_hcomm PRIVATE
     -std=c++14
     -fno-common
     -fno-strict-aliasing
@@ -18,8 +18,8 @@ target_compile_options(hcomm PRIVATE
     -O0
 )
 
-add_library(unified_dlog SHARED hccl_depends_stub.cc)
-target_compile_options(unified_dlog PRIVATE
+add_library(hccl_cc_stub_dlog SHARED hccl_depends_stub.cc)
+target_compile_options(hccl_cc_stub_dlog PRIVATE
     -std=c++14
     -fno-common
     -fno-strict-aliasing
@@ -28,8 +28,8 @@ target_compile_options(unified_dlog PRIVATE
     -O0
 )
 
-add_library(mmpa SHARED hccl_depends_stub.cc)
-target_compile_options(mmpa PRIVATE
+add_library(hccl_cc_stub_mmpa SHARED hccl_depends_stub.cc)
+target_compile_options(hccl_cc_stub_mmpa PRIVATE
     -std=c++14
     -fno-common
     -fno-strict-aliasing
@@ -38,8 +38,8 @@ target_compile_options(mmpa PRIVATE
     -O0
 )
 
-add_library(acl_rt SHARED hccl_depends_stub.cc)
-target_compile_options(acl_rt PRIVATE
+add_library(hccl_cc_stub_acl_rt SHARED hccl_depends_stub.cc)
+target_compile_options(hccl_cc_stub_acl_rt PRIVATE
     -std=c++14
     -fno-common
     -fno-strict-aliasing
