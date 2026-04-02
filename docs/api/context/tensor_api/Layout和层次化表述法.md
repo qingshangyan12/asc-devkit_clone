@@ -83,7 +83,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
         ```
         Layout = ((Shape) : (Stride))
-        Shape = ((Std::Int<32 / sizeof(T)>{}, row / 32 / sizeof(T)), (Std::Int<16>{}, column / 16))
+        Shape = ((Std::Int<32 / sizeof(T)>{}, row / (32 / sizeof(T))), (Std::Int<16>{}, column / 16))
         Stride = ((Std::Int<1>{}, 32 / sizeof(T) * column), (Std::Int<32 / sizeof(T)>{}, Std::Int<32 / sizeof(T) * 16>{}))
         ```
 
