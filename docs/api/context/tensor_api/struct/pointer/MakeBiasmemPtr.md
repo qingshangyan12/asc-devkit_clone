@@ -41,7 +41,6 @@ __aicore__ inline auto MakeBiasmemPtr(const U& byteOffset)
 
 返回BiasTable Buffer内存指针对象，类型为 `HardwareMemPtr<Hardware::BIAS, Iterator>`。
 
-
 ## 约束说明
 
 - iter必须是有效的迭代器类型。
