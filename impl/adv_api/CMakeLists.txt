@@ -67,6 +67,7 @@ target_include_directories(
             $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
 
 add_subdirectory(tiling)
+add_subdirectory(detail/hccl/cc)
 
 if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
   include(ExternalProject)
