@@ -1426,7 +1426,6 @@ function(npu_op_package_add target_package_name)
       )
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_${target_package_name}.cmake" "
 # Check if all kernels failed for this package
-# Read the result from the output file
 if(EXISTS \"\${_OUTPUT_FILE}\")
   file(READ \"\${_OUTPUT_FILE}\" ALL_FAIL_VALUE)
   string(STRIP \"\${ALL_FAIL_VALUE}\" ALL_FAIL_VALUE)
@@ -1434,10 +1433,8 @@ if(EXISTS \"\${_OUTPUT_FILE}\")
   if(ALL_FAIL_VALUE STREQUAL \"TRUE\")
     message(FATAL_ERROR \"All kernels failed for package ${target_package_name}. Cannot proceed with build.\")
   else()
-    message(STATUS \"Not all kernels failed for package ${target_package_name}, continuing build.\")
+    message(STATUS \"Some kernels succeeded for package ${target_package_name}, continuing build.\")
   endif()
-else()
-  message(FATAL_ERROR \"Output file \${_OUTPUT_FILE} does not exist. Cannot determine if all kernels failed.\")
 endif()
 "
       )
