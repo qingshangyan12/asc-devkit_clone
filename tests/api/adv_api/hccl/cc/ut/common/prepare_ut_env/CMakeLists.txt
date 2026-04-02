@@ -25,7 +25,6 @@ target_compile_options(hccl_ut_prepare_env   PRIVATE
 
 target_link_libraries(hccl_ut_prepare_env  PRIVATE
     $<BUILD_INTERFACE:intf_llt_pub_basic>
-    -lpthread
     -Wl,--whole-archive
     -Wl,--no-whole-archive
     -lgcov
