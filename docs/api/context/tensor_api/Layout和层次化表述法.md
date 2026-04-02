@@ -62,8 +62,8 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
     ```cpp
     Layout = ((Shape) : (Stride))
-    Shape = ((Std::Int<32 / sizeof(T)>{}, row / (32 / sizeof(T))), (Std::Int<16>{}, column / 16))
-    Stride = ((Std::Int<1>{}, 32 / sizeof(T) * column), (Std::Int<32 / sizeof(T)>{}, Std::Int<32 / sizeof(T) * 16>{}))
+    Shape = (Shape = (Std::Int<32 / sizeof(T)>{}, row / (32 / sizeof(T))), Shape = (Std::Int<16>{}, column / 16))
+    Stride = (Stride = (Std::Int<1>{}, 32 / sizeof(T) * column), Stride = (Std::Int<32 / sizeof(T)>{}, Std::Int<32 / sizeof(T) * 16>{}))
     ```
 
     **图 4**  Nz Layout示意图  
