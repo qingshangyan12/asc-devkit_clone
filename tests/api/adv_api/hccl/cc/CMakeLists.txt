@@ -16,7 +16,6 @@ file(GLOB HCCL_CC_UT_SRC_FILES
 )
 
 file(GLOB HCCL_CC_ST_SRC_FILES
-    st/algorithm/testcase/main.cc
     st/algorithm/testcase/scatter_testcase.cc
     st/algorithm/testcase/all_reduce_testcase.cc
     st/algorithm/testcase/all_reduce_parallel_testcase.cc
