@@ -397,3 +397,33 @@ TEST_F(Tensor_Api_Atom, CopyGM2L1V2Operation)
 
     EXPECT_EQ(dst[0], 0);
 }
+
+TEST_F(Tensor_Api_Atom, MmadV2Operation)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t TILE_LENGTH = 16 * 16;
+
+    __ca__ float l0aBuffer[TILE_LENGTH] = {0};
+    __cb__ float l0bBuffer[TILE_LENGTH] = {0};
+    __cc__ float l0cBuffer[TILE_LENGTH] = {0};
+
+    auto l0aTensor = MakeTensor(MakeL0AmemPtr(l0aBuffer), MakeFrameLayout<NzLayoutPattern, LayoutTrait<float>>(16, 16));
+    auto l0bTensor = MakeTensor(MakeL0BmemPtr(l0bBuffer), MakeFrameLayout<ZnLayoutPattern, LayoutTrait<float>>(16, 16));
+    auto l0cTensor = MakeTensor(MakeL0CmemPtr(l0cBuffer), MakeFrameLayout<NzLayoutPattern, LayoutTrait<>>(16, 16));
+
+    auto mmadParams = defaultMmadParams;
+    mmadParams.m = 16;
+    mmadParams.n = 16;
+    mmadParams.k = 16;
+
+    auto atomMad = MakeMad(MmadOperationV2{}, MmadTraitDefaultV2{});
+    atomMad.Call(l0cTensor, l0aTensor, l0bTensor, mmadParams);
+
+    MmadAtom<MmadTraits<MmadOperationV2, MmadTraitDefaultV2>>{}.Call(l0cTensor, l0aTensor, l0bTensor, mmadParams);
+
+    Mad(MmadAtom<MmadTraits<MmadOperationV2, MmadTraitDefaultV2>>{}, l0cTensor, l0aTensor, l0bTensor, mmadParams);
+
+    EXPECT_EQ(l0cBuffer[0], 0);
+}
+
