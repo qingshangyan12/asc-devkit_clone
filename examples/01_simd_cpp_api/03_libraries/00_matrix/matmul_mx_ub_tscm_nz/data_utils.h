@@ -26,14 +26,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fstream>
-#if defined(__CCE_KT_TEST__)
-#define SET_G_CORE_TYPE_IS_AIV thread_local int g_coreType = 2
-#define SET_G_CORE_TYPE_IS_AIC thread_local int g_coreType = 1
-#else
-#define SET_G_CORE_TYPE_IS_AIV
-#define SET_G_CORE_TYPE_IS_AIC
-#endif
-#define ASCENDC_CUBE_ONLY
 
 #define ERROR_LOG(fmt, args...) fprintf(stdout, "[ERROR]  " fmt "\n", ##args)
 

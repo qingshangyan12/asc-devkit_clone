@@ -40,6 +40,18 @@ Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../sys_var/as
    __aicore__ inline void asc_dcci_entire_ub(__gm__ void* dst)
    __aicore__ inline void asc_dcci_entire_out(__gm__ void* dst)
    __aicore__ inline void asc_dcci_entire_atomic(__gm__ void* dst)
+   // 刷新传入的UB地址空间地址所在的单个Cache Line
+   __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
+   __aicore__ inline void asc_ub_dcci_single_all(__ubuf__ void* dst)
+   __aicore__ inline void asc_ub_dcci_single_ub(__ubuf__ void* dst)
+   __aicore__ inline void asc_ub_dcci_single_out(__ubuf__ void* dst)
+   __aicore__ inline void asc_ub_dcci_single_atomic(__ubuf__ void* dst)
+   // 刷新传入的UB地址空间地址中所有Cache Line
+   __aicore__ inline void asc_ub_dcci_entire(__ubuf__ void* dst)
+   __aicore__ inline void asc_ub_dcci_entire_all(__ubuf__ void* dst)
+   __aicore__ inline void asc_ub_dcci_entire_ub(__ubuf__ void* dst)
+   __aicore__ inline void asc_ub_dcci_entire_out(__ubuf__ void* dst)
+   __aicore__ inline void asc_ub_dcci_entire_atomic(__ubuf__ void* dst)
    ```
 
 ## 参数说明
@@ -61,7 +73,7 @@ PIPE_S
 
 ## 约束说明
 
-针对Ascend 950PR/Ascend 950DT，不支持asc_dcci_single_ub、asc_dcci_entire_ub接口。
+针对Ascend 950PR/Ascend 950DT，不支持asc_dcci_single_ub、asc_dcci_entire_ub、asc_ub_dcci_single_ub、asc_ub_dcci_entire_ub接口。
 
 </cann-filter>
 

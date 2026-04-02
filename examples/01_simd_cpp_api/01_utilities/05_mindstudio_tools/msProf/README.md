@@ -56,7 +56,7 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
     
   通过性能流水仿真，可以在不实际部署到昇腾AI处理器上的情况下，模拟算子的运行性能，通过指令流水图、算子代码热点图、内存通路吞吐率波形图等可视化数据，以便进一步分析优化算子计算瓶颈。
     
-    基于可执行文件demo通过msprof op simulator执行算子仿真调优：
+    基于可执行文件demo_sim通过msprof op simulator执行算子仿真调优：
     ```
     msprof op simulator --soc-version=Ascendxxxyy ./demo_sim
     ```

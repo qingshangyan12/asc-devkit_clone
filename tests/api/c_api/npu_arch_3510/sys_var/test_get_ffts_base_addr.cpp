@@ -27,9 +27,9 @@ int64_t asc_get_ffts_base_addr_stub()
 }
 }
 
-TEST_F(TestGetFftsBaseAddr, asc_get_ffts_base_addr_Succ)
+TEST_F(TestGetFftsBaseAddr, asc_get_ffts_base_addr_cube_Succ)
 {
-
+    g_coreType = C_API_AIC_TYPE;
     MOCKER_CPP(get_ffts_base_addr, int64_t(void))
             .times(1)
             .will(invoke(asc_get_ffts_base_addr_stub));
@@ -37,4 +37,14 @@ TEST_F(TestGetFftsBaseAddr, asc_get_ffts_base_addr_Succ)
     int64_t val = asc_get_ffts_base_addr();
     EXPECT_EQ(2, val);
     GlobalMockObject::verify();
+    g_coreType = C_API_AIV_TYPE;
+}
+
+TEST_F(TestGetFftsBaseAddr, asc_get_ffts_base_addr_vec_Succ)
+{
+    g_coreType = C_API_AIV_TYPE;
+    int64_t val = asc_get_ffts_base_addr();
+    EXPECT_EQ(0, val);
+    GlobalMockObject::verify();
+    g_coreType = C_API_AIV_TYPE;
 }

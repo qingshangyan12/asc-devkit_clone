@@ -167,7 +167,7 @@ __aicore__ inline bool IsScalarQuantMode(QuantMode_t quantPre)
 }
 
 template <const FixpipeConfig& config>
-__aicore__ inline void CopyReluTensorToFbuf(const FixpipeTiling &fixpipeTiling, uint16_t calNSize, uint16_t nIterIndex, const FixpipeParamsC310<config.format>& intriParams)
+__aicore__ inline void CopyReluTensorToFbuf(const FixpipeTiling &fixpipeTiling, uint16_t calNSize, uint16_t nIterIndex, const FixpipeParamsArch3510<config.format>& intriParams)
 {
     constexpr uint32_t deqTensorAddrAlignValue = 128;
     uint16_t deqDataSize = DivCeil(calNSize * sizeof(uint64_t), deqTensorAddrAlignValue) * deqTensorAddrAlignValue;
@@ -188,7 +188,7 @@ __aicore__ inline void CopyReluTensorToFbuf(const FixpipeTiling &fixpipeTiling, 
 
 template <const FixpipeConfig& config>
 __aicore__ inline void CopyDeqTensorToFbuf(
-    __cbuf__ uint64_t *cbufWorkspace, const FixpipeTiling &fixpipeTiling, uint16_t calNSize, uint16_t nIterIndex, const FixpipeParamsC310<config.format>& intriParams)
+    __cbuf__ uint64_t *cbufWorkspace, const FixpipeTiling &fixpipeTiling, uint16_t calNSize, uint16_t nIterIndex, const FixpipeParamsArch3510<config.format>& intriParams)
 {
     constexpr uint32_t deqTensorAddrAlignValue = 128;
     uint16_t deqDataSize = DivCeil(calNSize * sizeof(uint64_t), deqTensorAddrAlignValue) * deqTensorAddrAlignValue;
@@ -224,7 +224,7 @@ __aicore__ inline void CopyDeqTensorToFbuf(
 }
 
 template <const FixpipeConfig& config>
-__aicore__ inline void SetLoop3Para(const FixpipeParamsC310<config.format>& intriParams)
+__aicore__ inline void SetLoop3Para(const FixpipeParamsArch3510<config.format>& intriParams)
 {
     // the loop3DstStride range has increased.
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
@@ -251,7 +251,7 @@ __aicore__ inline void SetLoop3Para(const FixpipeParamsC310<config.format>& intr
 // move data L0C->L1
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0cToL1(__cbuf__ DstT* dst, __cc__ SrcT* src,
-    const FixpipeParamsC310<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+    const FixpipeParamsArch3510<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex = 0)
 {
     ASCENDC_DEBUG_ASSERT((!(intriParams.isChannelSplit)), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check isChannelSplit in Fixpipe, when src position is "
@@ -296,7 +296,7 @@ __aicore__ inline void FixpipeL0cToL1(__cbuf__ DstT* dst, __cc__ SrcT* src,
 // move data L0C->UB
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0cToUB(__ubuf__ DstT* dst, __cc__ SrcT* src,
-    const FixpipeParamsC310<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+    const FixpipeParamsArch3510<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex = 0)
 {
     ASCENDC_DEBUG_ASSERT((!(intriParams.isChannelSplit)), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check isChannelSplit in Fixpipe, when src position is "
@@ -355,7 +355,7 @@ __aicore__ inline void FixpipeL0cToUB(__ubuf__ DstT* dst, __cc__ SrcT* src,
 }
 
 template <const FixpipeConfig& config>
-__aicore__ inline uint64_t GetGMLen(const FixpipeParamsC310<config.format>& intriParams,
+__aicore__ inline uint64_t GetGMLen(const FixpipeParamsArch3510<config.format>& intriParams,
                                     const uint16_t calNSize, const uint16_t dstEleSize)
 {
     constexpr uint16_t fractalNsize = 16;
@@ -379,7 +379,7 @@ __aicore__ inline uint64_t GetGMLen(const FixpipeParamsC310<config.format>& intr
 // move data L0C->GM
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0cToOut(__gm__ DstT* dst, __cc__ SrcT* src,
-    const FixpipeParamsC310<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+    const FixpipeParamsArch3510<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
     const uint8_t cacheMode, uint16_t nIterIndex = 0)
 {
     if (intriParams.isChannelSplit) {
@@ -428,7 +428,7 @@ __aicore__ inline void FixpipeL0cToOut(__gm__ DstT* dst, __cc__ SrcT* src,
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2L1ImplN(__cbuf__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
-    const FixpipeParamsC310<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+    const FixpipeParamsArch3510<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex)
 {
     // mov deq tensor from L1 to FB
@@ -440,7 +440,7 @@ __aicore__ inline void FixpipeL0C2L1ImplN(__cbuf__ DstT* dst, __cc__ SrcT* src, 
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2L1ImplR(__cbuf__ DstT* dst, __cc__ SrcT* src,
-    const FixpipeParamsC310<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+    const FixpipeParamsArch3510<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex)
 {
     // mov deq tensor from L1 to FB
@@ -452,7 +452,7 @@ __aicore__ inline void FixpipeL0C2L1ImplR(__cbuf__ DstT* dst, __cc__ SrcT* src,
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2UBImplN(__ubuf__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
-    const FixpipeParamsC310<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+    const FixpipeParamsArch3510<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex)
 {
     // mov deq tensor from L1 to FB
@@ -464,7 +464,7 @@ __aicore__ inline void FixpipeL0C2UBImplN(__ubuf__ DstT* dst, __cc__ SrcT* src, 
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2UBImplR(__ubuf__ DstT* dst, __cc__ SrcT* src,
-    const FixpipeParamsC310<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+    const FixpipeParamsArch3510<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex)
 {
     // mov deq tensor from L1 to FB
@@ -476,7 +476,7 @@ __aicore__ inline void FixpipeL0C2UBImplR(__ubuf__ DstT* dst, __cc__ SrcT* src,
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2GMImplN(__gm__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
-    const FixpipeParamsC310<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+    const FixpipeParamsArch3510<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex, const uint8_t cacheMode)
 {
     // mov deq tensor from L1 to FB
@@ -488,7 +488,7 @@ __aicore__ inline void FixpipeL0C2GMImplN(__gm__ DstT* dst, __cc__ SrcT* src, __
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2GMImplR(__gm__ DstT* dst, __cc__ SrcT* src,
-    const FixpipeParamsC310<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+    const FixpipeParamsArch3510<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
     uint16_t nIterIndex, const uint8_t cacheMode)
 {
     // mov deq tensor from L1 to FB
@@ -499,7 +499,7 @@ __aicore__ inline void FixpipeL0C2GMImplR(__gm__ DstT* dst, __cc__ SrcT* src,
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig &config>
-__aicore__ inline void CheckFixpipeQuantParams(const FixpipeParamsC310<config.format> &params)
+__aicore__ inline void CheckFixpipeQuantParams(const FixpipeParamsArch3510<config.format> &params)
 {
     if (params.quantPre == QuantMode_t::NoQuant) {
         ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, float>, Tuple<int32_t, int32_t>>()),
@@ -533,7 +533,7 @@ __aicore__ inline void CheckFixpipeQuantParams(const FixpipeParamsC310<config.fo
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config, bool IsGm= false>
-__aicore__ inline void CheckFixpipeParams(__cc__ SrcT *src, const FixpipeParamsC310<config.format>& params)
+__aicore__ inline void CheckFixpipeParams(__cc__ SrcT *src, const FixpipeParamsArch3510<config.format>& params)
 {
     static_assert(SupportType<Tuple<SrcT, DstT>, Tuple<float, bfloat16_t>, Tuple<float, half>,
         Tuple<float, fp8_e4m3fn_t>, Tuple<float, hifloat8_t>, Tuple<float, int8_t>,
@@ -599,7 +599,7 @@ __aicore__ inline void CheckFixpipeParams(__cc__ SrcT *src, const FixpipeParamsC
 
 template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void CheckFixpipeL0C2UBParam(
-    __ubuf__ DstT *dst, __cc__ SrcT *src, const FixpipeParamsC310<config.format> &params)
+    __ubuf__ DstT *dst, __cc__ SrcT *src, const FixpipeParamsArch3510<config.format> &params)
 {
     CheckFixpipeParams<DstT, SrcT, config>(src, params);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -611,7 +611,7 @@ __aicore__ inline void CheckFixpipeL0C2UBParam(
 
 template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void CheckFixpipeL0C2L1Param(
-    __cbuf__ DstT *dst, __cc__ SrcT *src, const FixpipeParamsC310<config.format> &params)
+    __cbuf__ DstT *dst, __cc__ SrcT *src, const FixpipeParamsArch3510<config.format> &params)
 {
     CheckFixpipeParams<DstT, SrcT, config>(src, params);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -622,14 +622,14 @@ __aicore__ inline void CheckFixpipeL0C2L1Param(
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
-__aicore__ inline void CheckFixpipeL0C2GMParam(__gm__ DstT *dst, __cc__ SrcT *src, const FixpipeParamsC310<config.format>& params)
+__aicore__ inline void CheckFixpipeL0C2GMParam(__gm__ DstT *dst, __cc__ SrcT *src, const FixpipeParamsArch3510<config.format>& params)
 {
     CheckFixpipeParams<DstT, SrcT, config, true>(src, params);
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2L1Impl(
-    __cbuf__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsC310<config.format>& intriParams)
+    __cbuf__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsArch3510<config.format>& intriParams)
 {
     CheckFixpipeL0C2L1Param<DstT, SrcT, config>(dst, src, intriParams);
     // nz2nd/nz2dn need set LOOP3_PARA
@@ -679,7 +679,7 @@ __aicore__ inline void FixpipeL0C2L1Impl(
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
-    const FixpipeParamsC310<config.format> &intriParams)
+    const FixpipeParamsArch3510<config.format> &intriParams)
 {
     CheckFixpipeL0C2L1Param<DstT, SrcT, config>(dst, src, intriParams);
     // nz2nd/nz2dn need set LOOP3_PARA
@@ -715,7 +715,7 @@ __aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT* dst, __cc__ SrcT* src, _
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2UBImpl(
-    __ubuf__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsC310<config.format>& intriParams)
+    __ubuf__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsArch3510<config.format>& intriParams)
 {
     CheckFixpipeL0C2UBParam<DstT, SrcT, config>(dst, src, intriParams);
     // nz2nd/nz2dn need set LOOP3_PARA
@@ -764,7 +764,7 @@ __aicore__ inline void FixpipeL0C2UBImpl(
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2UBImpl(__ubuf__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
-    const FixpipeParamsC310<config.format>& intriParams)
+    const FixpipeParamsArch3510<config.format>& intriParams)
 {
     CheckFixpipeL0C2UBParam<DstT, SrcT, config>(dst, src, intriParams);
     // nz2nd/nz2dn need set LOOP3_PARA
@@ -799,7 +799,7 @@ __aicore__ inline void FixpipeL0C2UBImpl(__ubuf__ DstT* dst, __cc__ SrcT* src, _
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src,
-    const FixpipeParamsC310<config.format>& intriParams, const uint8_t cacheMode = 0)
+    const FixpipeParamsArch3510<config.format>& intriParams, const uint8_t cacheMode = 0)
 {
     CheckFixpipeL0C2GMParam<DstT, SrcT, config>(dst, src, intriParams);
     // nz2nd/nz2dn need set LOOP3_PARA
@@ -846,7 +846,7 @@ __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src,
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
-    const FixpipeParamsC310<config.format>& intriParams, const uint8_t cacheMode = 0)
+    const FixpipeParamsArch3510<config.format>& intriParams, const uint8_t cacheMode = 0)
 {
     CheckFixpipeL0C2GMParam<DstT, SrcT, config>(dst, src, intriParams);
     // nz2nd/nz2dn need set LOOP3_PARA

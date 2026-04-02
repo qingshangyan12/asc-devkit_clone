@@ -11,15 +11,15 @@
 #ifndef IMPL_SIMT_API_CPP_KERNEL_SIMT_CAST_INTERFACE_IMPL_H
 #define IMPL_SIMT_API_CPP_KERNEL_SIMT_CAST_INTERFACE_IMPL_H
 
-#include "impl/simt_api/cpp/dav_c310/kernel_simt_cast_impl.h"
-#include "impl/simt_api/cpp/dav_c310/kernel_simt_cast_sat_impl.h"
+#include "impl/simt_api/cpp/dav_3510/kernel_simt_cast_impl.h"
+#include "impl/simt_api/cpp/dav_3510/kernel_simt_cast_sat_impl.h"
 
 namespace AscendC {
 namespace Simt {
 
 #if defined(ASCENDC_CPU_DEBUG)
 template <typename T, typename U, RoundMode roundMode, SatMode satMode>
-__aicore__ inline T Cast(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Cast(U x)
 {
     if constexpr (roundMode == RoundMode::CAST_EVEN || roundMode == RoundMode::CAST_ZERO ||
                   roundMode == RoundMode::CAST_FLOOR || roundMode == RoundMode::CAST_CEIL) {
@@ -40,7 +40,7 @@ __aicore__ inline T Cast(U x)
 }
 #else
 template <typename T, typename U, RoundMode roundMode, SatMode satMode>
-__aicore__ inline T Cast(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Cast(U x)
 {
     if constexpr (roundMode == RoundMode::CAST_RINT || roundMode == RoundMode::CAST_FLOOR ||
                   roundMode == RoundMode::CAST_CEIL || roundMode == RoundMode::CAST_ROUND ||
@@ -81,35 +81,35 @@ __aicore__ inline T Cast(U x)
 #endif
 
 template <typename T>
-__aicore__ inline T Round(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Round(T x)
 {
     static_assert(SupportType<T, float, half, bfloat16_t>(), "Input type only supports float, half, bfloat16.");
     return RoundImpl(x);
 }
 
 template <typename T>
-__aicore__ inline T Rint(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Rint(T x)
 {
     static_assert(SupportType<T, float, half, bfloat16_t>(), "Input type only supports float, half, bfloat16.");
     return RintImpl(x);
 }
 
 template <typename T>
-__aicore__ inline T Floor(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Floor(T x)
 {
     static_assert(SupportType<T, float, half, bfloat16_t>(), "Input type only supports float, half, bfloat16.");
     return FloorImpl(x);
 }
 
 template <typename T>
-__aicore__ inline T Ceil(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Ceil(T x)
 {
     static_assert(SupportType<T, float, half, bfloat16_t>(), "Input type only supports float, half, bfloat16.");
     return CeilImpl(x);
 }
 
 template <typename T>
-__aicore__ inline T Trunc(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T Trunc(T x)
 {
     static_assert(SupportType<T, float, half, bfloat16_t>(), "Input type only supports float, half, bfloat16.");
     return TruncImpl(x);
