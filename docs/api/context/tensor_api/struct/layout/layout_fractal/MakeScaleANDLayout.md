@@ -31,8 +31,8 @@ __aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column)
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| row | 输入 | 矩阵的行数（`m`）。 |
-| column | 输入 | 矩阵的列数（`scaleK`）。 |
+| row | 输入 | 矩阵的行数。 |
+| column | 输入 | 矩阵的列数。 |
 
 ## 返回值
 

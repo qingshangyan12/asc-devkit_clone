@@ -19,11 +19,15 @@ __aicore__ inline constexpr auto GetStride(const Layout<ShapeType, StrideType>& 
 
 ## 参数说明
 
+表1 模板参数说明
+
 | 参数名 | 输入/输出 | 描述 |
 | -------- | ----------- | ------ |
 | Is... | 输入 | 可选。多级索引递归选取。 |
 | ShapeType | 输入 | Layout的shape类型。 |
 | StrideType | 输入 | Layout的stride类型。 |
+
+表2 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | -------- | ----------- | ------ |

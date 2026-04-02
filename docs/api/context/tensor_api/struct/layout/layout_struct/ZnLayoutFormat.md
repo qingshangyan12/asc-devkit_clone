@@ -29,9 +29,9 @@ struct ZnLayoutFormat {
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| T | 输入 | 数据类型模板参数。<br>支持的数据类型为：fp4x2_e2m1_t、fp4x2_e1m2_t、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t |
-| row | 输入 | 矩阵的总行数 |
-| column | 输入 | 矩阵的总列数 |
+| T | 输入 | 数据类型模板参数。<br>支持的数据类型为：fp4x2_e2m1_t、fp4x2_e1m2_t、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t。 |
+| row | 输入 | 矩阵的总行数。 |
+| column | 输入 | 矩阵的总列数。 |
 
 ## 返回值
 

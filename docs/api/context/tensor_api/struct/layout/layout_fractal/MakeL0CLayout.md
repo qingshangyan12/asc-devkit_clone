@@ -23,8 +23,8 @@ __aicore__ inline decltype(auto) MakeL0CLayout(U row, S column)
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| U | 输入 | 行数类型，size_t或Int整型常。 |
-| S | 输入 | 列数类型，size_t或Int整型常。 |
+| U | 输入 | 行数类型，size_t或Int整型常量。 |
+| S | 输入 | 列数类型，size_t或Int整型常量。 |
 
 `表2` 参数说明
 

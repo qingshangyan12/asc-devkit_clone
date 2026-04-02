@@ -24,8 +24,8 @@ __aicore__ inline decltype(auto) MakeDNLayout(U row, S column)
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
 | T | 输入 | 数据类型，支持int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t。 |
-| U | 输入 | 行数类型，size_t或Int整型常。 |
-| S | 输入 | 列数类型，size_t或Int整型常。 |
+| U | 输入 | 行数类型，size_t或Int整型常量。 |
+| S | 输入 | 列数类型，size_t或Int整型常量。 |
 
 `表2` 参数说明
 
