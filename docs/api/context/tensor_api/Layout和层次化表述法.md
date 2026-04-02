@@ -136,4 +136,3 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     ![](figure/分形变换-2.png)
 
     通过[MakeColumnMajorLayout](struct/layout/layout_fractal/MakeColumnMajorLayout.md)接口可以快速的构造连续的ColumnMajor Layout格式，自行设置StrideColumn1值可以构造非连续的ColumnMajor Layout格式。
-
