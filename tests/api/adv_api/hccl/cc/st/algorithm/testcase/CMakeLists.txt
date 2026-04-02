@@ -27,7 +27,7 @@ if (BUILD_OPEN_PROJECT)
         ${THIRD_PARTH_PATH}/gtest_shared/include
 
         # HCCL仓头文件
-        ${HCCL_DEV_BASE}/src/ops/op_common/inc
+        ${HCCL_DEV_BASE}/impl/adv_api/detail/hccl/cc/src/ops/op_common/inc
 
         # Ascend安装包头文件
         ${ASCEND_HOME_PATH}/include

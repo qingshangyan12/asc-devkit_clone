@@ -44,7 +44,7 @@ if (BUILD_OPEN_PROJECT)
         ${ASCEND_HOME_PATH}/pkg_inc/hccl
 
         # hccl-dev头文件
-        ${HCCL_DEV_BASE}/src/common
+        ${HCCL_DEV_BASE}/impl/adv_api/detail/hccl/cc/src/common
 
         ${UTILS_DIR}/sim_world
         ${UTILS_DIR}/hccl_proxy
