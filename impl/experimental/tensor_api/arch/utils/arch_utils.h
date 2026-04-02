@@ -54,7 +54,7 @@ __aicore__ inline uint8_t GetCacheModeFromTensor(const T& tensor)
 #endif
 
 template <QuantMode_t quantPre>
-using IsScalarQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, SCALAR_QUANT_MODE>;
+using IsScalarQuantMode = is_one_of_attr_value<QuantMode_t, quantPre, SCALAR_QUANT_MODE>;
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define TILE_OP_INTERNAL_TENSOR_QUANT_MODE                                                            \
@@ -68,7 +68,7 @@ using IsScalarQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, SCALAR_QUA
 #endif
 
 template <QuantMode_t quantPre>
-using IsVectorQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, TILE_OP_INTERNAL_TENSOR_QUANT_MODE>;
+using IsVectorQuantMode = is_one_of_attr_value<QuantMode_t, quantPre, TILE_OP_INTERNAL_TENSOR_QUANT_MODE>;
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define TILE_OP_INTERNAL_DIRECT_QUANT_MODE QuantMode_t::F322F16, QuantMode_t::F322BF16
@@ -79,7 +79,7 @@ using IsVectorQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, TILE_OP_IN
 #endif
 
 template <QuantMode_t quantPre>
-using IsDirectQuantMode = Std::is_one_of_value<QuantMode_t, quantPre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
+using IsDirectQuantMode = is_one_of_attr_value<QuantMode_t, quantPre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
 
 template <typename T, AttrInfo info1, AttrInfo info2, size_t dim>
 __aicore__ inline constexpr decltype(auto) GetEleFromLayout(const T& layout)

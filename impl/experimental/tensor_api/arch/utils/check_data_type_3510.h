@@ -39,7 +39,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
+            is_one_of_attr_v<
                 Std::tuple<dstDataType, fmDataType, filterDataType>,
                 Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
                 Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
@@ -64,7 +64,7 @@ public:
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         if constexpr (biasPos == Hardware::BIAS) {
             static_assert(
-                Std::is_one_of_v<
+                is_one_of_attr_v<
                     Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
                     Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
                     Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
@@ -77,7 +77,7 @@ public:
                 "The data type is not supported for BIAS position.");
         } else if constexpr (biasPos == Hardware::L0C) {
             static_assert(
-                Std::is_one_of_v<
+                is_one_of_attr_v<
                     Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
                     Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
                     Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
@@ -101,7 +101,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
+            is_one_of_attr_v<
                 Std::tuple<dstDataType, fmDataType, filterDataType>,
                 Std::tuple<__cc__ int32_t, __ca__ int8_t, __cb__ int8_t>,
                 Std::tuple<__cc__ float, __ca__ half, __cb__ half>,
@@ -128,7 +128,7 @@ public:
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         if constexpr (biasPos == Hardware::BIAS) {
             static_assert(
-                Std::is_one_of_v<
+                is_one_of_attr_v<
                     Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
                     Std::tuple<__biasbuf__ int32_t, __cc__ int32_t, __ca__ int8_t, __cb__ int8_t>,
                     Std::tuple<__biasbuf__ float, __cc__ float, __ca__ half, __cb__ half>,
@@ -142,7 +142,7 @@ public:
                 "The data type is not supported for BIAS position.");
         } else if constexpr (biasPos == Hardware::L0C) {
             static_assert(
-                Std::is_one_of_v<
+                is_one_of_attr_v<
                     Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
                     Std::tuple<__cc__ int32_t, __cc__ int32_t, __ca__ int8_t, __cb__ int8_t>,
                     Std::tuple<__cc__ float, __cc__ float, __ca__ half, __cb__ half>,
@@ -166,7 +166,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
+            is_one_of_attr_v<
                 Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ half, __gm__ half>,
                 Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ float, __gm__ float>,
                 Std::tuple<__cbuf__ int8_t, __gm__ int8_t>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>,
@@ -187,7 +187,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
+            is_one_of_attr_v<
                 Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ half, __gm__ half>,
                 Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ float, __gm__ float>,
                 Std::tuple<__cbuf__ int8_t, __gm__ int8_t>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>,
@@ -210,7 +210,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ fp8_e8m0_t, __gm__ fp8_e8m0_t>>,
+            is_one_of_attr_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ fp8_e8m0_t, __gm__ fp8_e8m0_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -223,7 +223,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
+            is_one_of_attr_v<
                 Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ half, __gm__ half>,
                 Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ float, __gm__ float>,
                 Std::tuple<__cbuf__ int8_t, __gm__ int8_t>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>,
@@ -255,7 +255,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
+            is_one_of_attr_v<
                 Std::tuple<dstDataType, srcDataType>, Std::tuple<__biasbuf__ float, __cbuf__ bfloat16_t>,
                 Std::tuple<__biasbuf__ float, __cbuf__ half>, Std::tuple<__biasbuf__ float, __cbuf__ float>,
                 Std::tuple<__biasbuf__ int32_t, __cbuf__ int32_t>>,
@@ -271,7 +271,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_same_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<__fbuf__ uint64_t, __cbuf__ uint64_t>>,
+            Std::is_one_of_attr_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<__fbuf__ uint64_t, __cbuf__ uint64_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -284,13 +284,13 @@ public:
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             (quantPre == QuantMode_t::NoQuant &&
-             Std::is_one_of_v<
+             Std::is_one_of_attr_v<
                  Std::tuple<dstType, srcType>, Std::tuple<__gm__ float, __cc__ float>,
                  Std::tuple<__gm__ int32_t, __cc__ int32_t>>) ||
                 (quantPre == QuantMode_t::F322F16 &&
-                 Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ half, __cc__ float>>) ||
+                 Std::is_one_of_attr_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ half, __cc__ float>>) ||
                 (quantPre == QuantMode_t::F322BF16 &&
-                 Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ bfloat16_t, __cc__ float>>),
+                 Std::is_one_of_attr_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ bfloat16_t, __cc__ float>>),
             "The data type is not supported.");
 #endif
     }
@@ -303,13 +303,13 @@ public:
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             (quantPre == QuantMode_t::NoQuant &&
-             Std::is_one_of_v<
+             Std::is_one_of_attr_v<
                  Std::tuple<dstType, srcType>, Std::tuple<__ubuf__ float, __cc__ float>,
                  Std::tuple<__ubuf__ int32_t, __cc__ int32_t>>) ||
                 (quantPre == QuantMode_t::F322F16 &&
-                 Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__ubuf__ half, __cc__ float>>) ||
+                 Std::is_one_of_attr_v<Std::tuple<dstType, srcType>, Std::tuple<__ubuf__ half, __cc__ float>>) ||
                 (quantPre == QuantMode_t::F322BF16 &&
-                 Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__ubuf__ bfloat16_t, __cc__ float>>),
+                 Std::is_one_of_attr_v<Std::tuple<dstType, srcType>, Std::tuple<__ubuf__ bfloat16_t, __cc__ float>>),
             "The data type is not supported.");
 #endif
     }
@@ -322,7 +322,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
+            Std::is_one_of_attr_v<
                 Std::tuple<dstDataType, srcDataType>, Std::tuple<__ca__ half, __cbuf__ half>,
                 Std::tuple<__ca__ int16_t, __cbuf__ int16_t>, Std::tuple<__ca__ uint16_t, __cbuf__ uint16_t>,
                 Std::tuple<__ca__ bfloat16_t, __cbuf__ bfloat16_t>, Std::tuple<__ca__ uint32_t, __cbuf__ uint32_t>,
@@ -345,7 +345,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
+            Std::is_one_of_attr_v<
                 Std::tuple<dstDataType, srcDataType>, Std::tuple<__cb__ half, __cbuf__ half>,
                 Std::tuple<__cb__ int16_t, __cbuf__ int16_t>, Std::tuple<__cb__ uint16_t, __cbuf__ uint16_t>,
                 Std::tuple<__cb__ bfloat16_t, __cbuf__ bfloat16_t>, Std::tuple<__cb__ uint32_t, __cbuf__ uint32_t>,

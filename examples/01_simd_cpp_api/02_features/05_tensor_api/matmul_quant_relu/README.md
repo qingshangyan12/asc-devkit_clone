@@ -56,7 +56,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
@@ -71,6 +71,15 @@
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
+
+- 软连接配置
+  当前tensor_api样只做展示使用，相关代码只存在于开源仓，未打包到CANN包内，需要将tensor_api相关代码软连接到CANN包路径下才可以编译运行
+  ```bash
+  cd ${install_path}/cann/x86-64-linux/asc/impl
+  ln -s ${code_path}/impl/experimental  # ${code_path}表示本地代码下载路径
+  cd ../include
+  ln -s ${code_path}/include/experimental
+  ```
 
 - 样例执行  
   ```bash

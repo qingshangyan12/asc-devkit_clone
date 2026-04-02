@@ -34,7 +34,7 @@ static constexpr bool VerifyingFixpipeTemplate = (IsTileTensorV<T> && IsTileTens
 
 template <typename T, typename U, typename S>
 static constexpr bool VerifyingFixpipeQuantTemplate =
-    (IsTileTensorV<T> && IsTileTensorV<U> && (IsTileTensorV<S> || Std::is_same_v<S, uint64_t>));
+    (IsTileTensorV<T> && IsTileTensorV<U> && (IsTileTensorV<S> || Std::is_one_of_attr_v<S, uint64_t>));
 
 template <typename T, typename U, typename Coord>
 constexpr bool VerifyingFixpipeTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingFixpipeTemplate<T, U>;

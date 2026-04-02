@@ -79,7 +79,7 @@ private:
             ExecuteScaleDataCopy<trait, T, U>(dst, src);
         } else {
             // assert error
-            static_assert(Std::is_same_v<T, U>, "The data format is not supported.");
+            static_assert(Std::is_one_of_attr_v<T, U>, "The data format is not supported.");
         }
     }
 
@@ -106,7 +106,7 @@ private:
             CopyGmToCbufScaleBNn2Nn::Run<trait, T, U>(dst, src);
         } else {
             // assert error
-            static_assert(Std::is_same_v<T, U>, "The data format is not supported.");
+            static_assert(Std::is_one_of_attr_v<T, U>, "The data format is not supported.");
         }
     }
 };
