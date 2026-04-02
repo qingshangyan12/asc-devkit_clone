@@ -60,13 +60,8 @@ using CopyUB2L1 = DataCopyOp;
 
 }
 }
-<<<<<<< HEAD:impl/experimental/tensor_api/atom/cube_datamove/copy_gm2l1.h
-  
-#endif // IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_GM2L1_H
-=======
 
 #endif // IMPL_TENSOR_API_ATOM_COPY_DATACOPY_TRAITS_IMPL_H
->>>>>>> upstream/tensor_api_experimental:impl/experimental/tensor_api/atom/copy_datacopy_traits_impl.h
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
