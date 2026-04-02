@@ -63,35 +63,31 @@ private:
 
         uint8_t cacheMode = GetCacheModeFromTensor(src);
 
-        // lprp mode, dst_stride % C0_SIZE should be 0
+        // normal mode, dst_stride % C0_SIZE should be 0
+        // compact mode, blockLen equals dstStride
         // multi rows copy, dst non-contiguous case
-        constexpr uint8_t blockSizeElem = C0_SIZE<> / sizeof(type);
-        uint32_t validCol = srcShapeColumns;
-        uint32_t gapElem = dstShapeColumns - validCol;
-        uint8_t padCount = gapElem % blockSizeElem;
-
         uint32_t blockCount = srcShapeRows;
         uint32_t blockLen = srcShapeColumns * sizeof(type);
         uint64_t srcStride = srcStrideRows * sizeof(type);
         uint32_t dstStride = dstStrideRows * sizeof(type);
 
-        uint8_t leftPaddingCnt = 0;
-        uint8_t rightPaddingCnt = padCount;
-
         if ((srcShapeRows == 1) || (srcShapeColumns == 1)
             || (srcStrideRows == srcShapeColumns && dstStrideRows == dstShapeColumns
                 && srcStrideRows == dstStrideRows)) {
-            // compact mode
+            // compact mode, one line
             blockCount = 1;
             // must use srcShape, there is a scenario of small to large, using dstShape will cause src out of bound
             blockLen = srcShapeRows * srcShapeColumns * sizeof(type);
-            leftPaddingCnt = 0;
-            rightPaddingCnt = 0;
             srcStride = 0;
             dstStride = blockLen;
         }
-        CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, cacheMode,
-                                          srcStride, dstStride);
+        if constexpr (is_b4_type<type>) {
+            // move fp4 as b8, need to be divided by 2
+            blockLen = blockLen >> 1;
+            srcStride = srcStride >> 1;
+            dstStride = dstStride >> 1;
+        }
+        CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride);
     }
 };
 } // namespace Te
