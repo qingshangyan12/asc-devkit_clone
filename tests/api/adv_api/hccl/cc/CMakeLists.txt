@@ -11,4 +11,4 @@
 # Common path configuration for hccl cc tests
 
 add_subdirectory(ut)
-add_subdirectory(st)
+add_subdirectory(st/algorithm/utils/ut)

@@ -10,25 +10,22 @@
 
 cmake_minimum_required(VERSION 3.16.0)
 project(hccl_checker_ops_utest)
+set(TOP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../)
+
+# 编译HCCL业务so文件
+execute_process(
+    COMMAND bash ${TOP_DIR}/hccl/test/utils/vm-plugins/verifier/script/build.sh
+    RESULT_VARIABLE HCCL_BUILD_RESULT
+)
+if(NOT HCCL_BUILD_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed to execute hccl build script. Exit code: ${HCCL_BUILD_RESULT}")
+endif()
 
 set(src_list)
 add_executable(hccl_checker_ops_utest ${src_list})
 add_subdirectory(testcase)
-
-# hccl-model-proxy和hccl-verifier由同级src/目录构建，替代原先由外部脚本构建的checker_fwk
 target_link_libraries(hccl_checker_ops_utest PRIVATE
-    gtest
-    -lpthread
-    hccl-model-proxy
-    hccl-verifier
-)
-
-target_include_directories(hccl_checker_ops_utest PRIVATE
-    ${UTILS_DIR}/hccl_verifier
-    ${UTILS_DIR}/hccl_proxy
-    ${UTILS_DIR}/sim_world
-    ${UTILS_DIR}/common/exception
-    ${UTILS_DIR}/common/utils
+    checker_fwk
 )
 
 target_compile_options(hccl_checker_ops_utest PRIVATE
