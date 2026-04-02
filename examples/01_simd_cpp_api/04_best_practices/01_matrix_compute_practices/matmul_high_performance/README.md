@@ -36,6 +36,96 @@
 
 ## 样例实现
 
+### 类实现说明
+
+本样例通过三个独立的类实现不同的优化策略，每个类对应特定的Case版本。
+
+| 类名 | 对应Case | 实现特点 | 使用的核函数 | 优化特性 |
+|------|---------|---------|-------------|---------|
+| **MatmulKernel** | Case 0-4 | 基础实现，运行时Tiling | matmul_custom (isMdl=false)<br>matmul_custom_mdl (isMdl=true) | - Case 0: 单核基础版本<br>- Case 1: 单核Tiling优化<br>- Case 2: 多核切分 2x12<br>- Case 3: 多核切分 4x6<br>- Case 4: MDL模式 |
+| **MatmulKernelL2Cache** | Case 6 | L2Cache优化，运行时Tiling | matmul_custom_mdl_l2cache | - MDL模式<br>- L1Cache优化<br>- L2Cache优化 (A矩阵M轴切分) |
+| **MatmulKernelMdlL2CacheConstant** | Case 7-8 | 常量Tiling，编译期计算 | matmul_custom_mdl_l2cache_constant (useUnitFlag=false)<br>matmul_custom_mdl_l2cache_constant_unitflag (useUnitFlag=true) | - MDL模式<br>- L1Cache优化<br>- L2Cache优化<br>- 常量Tiling (编译期计算)<br>- UnitFlag优化 (Case 8) |
+
+---
+
+### 类实现特点分析
+
+#### 1. Tiling机制特点
+
+| 类 | Tiling类型 | Init方法签名 | Tiling数据来源 |
+|----|-----------|-------------|---------------|
+| **MatmulKernel** | `TCubeTiling` | `Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, const TCubeTiling& tiling)` | 从GM内存拷贝完整的Tiling数据结构 |
+| **MatmulKernelL2Cache** | `TCubeTiling` | `Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, const TCubeTiling& tiling)` | 从GM内存拷贝完整的Tiling数据结构 |
+| **MatmulKernelMdlL2CacheConstant** | `MatmulProblemShape`（自定义结构体） | `Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, GM_ADDR tiling)` | 仅拷贝shape信息，Tiling参数编译期常量化 |
+
+**特点说明**：
+- `MatmulKernel`和`MatmulKernelL2Cache`使用`TCubeTiling`类型，需要从GM内存拷贝完整的Tiling数据结构，Tiling参数在运行时由Scalar单元计算
+- `MatmulKernelMdlL2CacheConstant`使用自定义的`MatmulProblemShape`结构体，仅包含shape信息（M, N, K, singleCoreM等），Tiling参数已在编译期通过`CONSTANT_CFG`计算完成，运行时无需Scalar计算
+
+#### 2. Matmul配置方式特点
+
+| 类 | 配置方式 | 配置来源 | 配置时机 |
+|----|---------|---------|---------|
+| **MatmulKernel** | `CFG_NORM` 或 `CFG_MDL` | 模板参数`isMdl`决定 | 编译期确定配置模式 |
+| **MatmulKernelL2Cache** | `CFG_MDL`（固定） | 类成员常量 | 编译期固定为MDL模式 |
+| **MatmulKernelMdlL2CacheConstant** | `CONSTANT_CFG`（编译期常量） | `GetCustomConstantCFG<>()`函数生成 | 编译期计算所有Tiling参数 |
+
+**特点说明**：
+- `MatmulKernel`通过模板参数`isMdl`在编译期选择`CFG_NORM`或`CFG_MDL`配置模式
+- `MatmulKernelL2Cache`固定使用`CFG_MDL`配置模式
+- `MatmulKernelMdlL2CacheConstant`使用`CONSTANT_CFG`，所有Tiling参数（depthA1, depthB1, stepKa, stepKb等）在编译期计算为常量，运行时无需Scalar单元计算
+
+#### 3. Process方法计算流程特点
+
+**MatmulKernel::Process** (matmul.h:120-129)
+```cpp
+matmulObj.SetTensorA(aGlobal, IS_TRANS_A);
+matmulObj.SetTensorB(bGlobal, IS_TRANS_B);
+if (tiling.isBias) {
+    matmulObj.SetBias(biasGlobal);
+}
+matmulObj.IterateAll(cGlobal);  // 单次迭代
+matmulObj.End();
+```
+
+**MatmulKernelL2Cache::Process** (matmul.h:204-228)
+```cpp
+REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, &tiling);
+// ... offset计算
+for (int i = 0; i < 2; i++) {  // 循环2次，L2Cache优化
+    matmulObj.SetTensorA(aGlobal[offsetA + i * (M >> 1) * K], IS_TRANS_A);
+    matmulObj.SetTensorB(bGlobal[offsetB], IS_TRANS_B);
+    if (tiling.isBias) {
+        matmulObj.SetBias(biasGlobal);
+    }
+    matmulObj.IterateAll(cGlobal[offsetC + i * (M >> 1) * N]);
+}
+matmulObj.End();
+```
+
+**MatmulKernelMdlL2CacheConstant::Process** (matmul.h:316-341)
+```cpp
+REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
+matmulObj.SetOrgShape(shapes.m, shapes.n, shapes.k);  // 额外调用SetOrgShape
+// ... offset计算
+for (int i = 0; i < 2; i++) {  // 循环2次，L2Cache优化
+    matmulObj.SetTensorA(aGlobal[offsetA + i * (M >> 1) * K], IS_TRANS_A);
+    matmulObj.SetTensorB(bGlobal[offsetB], IS_TRANS_B);
+    if (shapes.isBias) {
+        matmulObj.SetBias(biasGlobal);
+    }
+    matmulObj.IterateAll(cGlobal[offsetC + i * (M >> 1) * N]);
+}
+matmulObj.End();
+```
+
+**特点说明**：
+- **计算流程**：`MatmulKernel`单次迭代，`MatmulKernelL2Cache`和`MatmulKernelMdlL2CacheConstant`循环2次（L2Cache优化，A矩阵M轴切分）
+- **REGIST_MATMUL_OBJ调用**：`MatmulKernel`在核函数中注册，其他类在Process方法中注册
+- **REGIST_MATMUL_OBJ参数**：`MatmulKernelMdlL2CacheConstant`传入`nullptr`（使用CONSTANT_CFG），其他类传入`&tiling`
+- **SetOrgShape调用**：仅`MatmulKernelMdlL2CacheConstant`需要调用`SetOrgShape`，因为使用自定义shape结构体
+
+
 ### 性能指标说明
 
 | 指标 | 说明 |
@@ -459,22 +549,11 @@ UnitFlag功能示意图：
 
 ### 样例执行
 ```bash
-mkdir -p build && cd build;    # 创建并进入build目录
-cmake ..;make -j;              # 编译工程
-python3 ../scripts/gen_data.py # 生成测试输入数据
-
-# 执行不同的优化case（通过参数指定case编号）
-./demo 0   # Case 0: 单核基础版本
-./demo 1   # Case 1: 单核Tiling优化
-./demo 2   # Case 2: 多核切分 2x12
-./demo 3   # Case 3: 多核切分 4x6
-./demo 4   # Case 4: 多核MDL版本
-./demo 5   # Case 5: 多核MDL + L1Cache
-./demo 6   # Case 6: 多核MDL + L1Cache + L2Cache
-./demo 7   # Case 7: 多核MDL + L1Cache + L2Cache + Constants Tiling
-./demo 8   # Case 8: 多核MDL + L1Cache + L2Cache + Constants Tiling + UnitFlag
-
-python3 ../scripts/verify_result.py output/output.bin output/golden.bin # 验证输出结果是否正确
+  mkdir -p build && cd build;   # 创建并进入build目录
+  cmake -DCASE_TYPE=0 ..;make -j;  # 编译指定case（默认为0，可替换为0-8）
+  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  ./demo                           # 执行（使用编译时指定的case）
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
 ```
 
 执行结果如下，说明精度对比成功。
