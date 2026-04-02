@@ -38,6 +38,11 @@ struct DataCopyTensor2Tensor {
     using type = DataCopyIgnore;
 };
 
+template <Hardware dstTPos, Hardware srcTpos, uint32_t Version, typename DstLayoutPattern, typename SrcLayoutPattern>
+struct DataCopyTensor2TensorV2 {
+    using type = DataCopyIgnore;
+};
+
 } // namespace Te
 } // namespace AscendC
 
