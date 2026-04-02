@@ -53,8 +53,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     Layout = ((Shape) : (Stride))
     Shape = ((Std::Int<16>{}, ShapeRow1), (Std::Int<32 / sizeof(T)>{}, ShapeColumn1))
     Stride = ((Std::Int<32 / sizeof(T)>{}, StrideRow1), (Std::Int<1>{}, StrideColumn1))
-    // StrideRow1应满足：
-    （StrideRow1 - ShapeRow0 * ShapeColumn0）% ShapeColumn0 = 0
+    // StrideRow1应满足：（StrideRow1 - ShapeRow0 * ShapeColumn0）% ShapeColumn0 = 0
     ```
 
     下面是一个连续的NZ Layout的示例。
@@ -77,8 +76,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
         Layout = ((Shape) : (Stride))
         Shape = ((Std::Int<32 / sizeof(T)>{}, ShapeRow1), (Std::Int<16>{}, ShapeColumn1))
         Stride = ((Std::Int<1>{}, StrideRow1), (Std::Int<32 / sizeof(T)>{}, StrideColumn1))
-        // StrideRow1应满足：
-        （StrideColumn1 - ShapeRow0 * ShapeColumn0）% ShapeRow0 = 0
+        // StrideRow1应满足：（StrideColumn1 - ShapeRow0 * ShapeColumn0）% ShapeRow0 = 0
         ```
 
         下面是一个连续的ZN Layout的示例。
