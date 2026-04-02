@@ -12,7 +12,7 @@
 set -e
 
 QUANT_MODE=${1:-"s322s8"}       # 模式 f322bf16, f322f16, f322s8, s322f16, s322s8
-PRE_QUANT_MODE=${2:-1}          # 量化模式 1:Scalar, 2:Vector
+PRE_QUANT_MODE=${2:-1}          # 量化模式 1:Scalar, 2:Vector （f322bf16, f322f16模式下该参数无效）
 PRE_RELU_MODE=${3:-0}           # Relu模式 0:disable, 1:NormRelu
 EN_UNIT_FLAG=${4:-false}        # 是否使用unitFlag
 USE_DATA_COPY=${5:-false}       # 是否使用DataCopy接口代替Fixpipe接口
