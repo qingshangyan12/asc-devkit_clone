@@ -24,7 +24,7 @@
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 
-#include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/data_copy_impl.h"
+#include "impl/experimental/tensor_api/arch/data_copy_impl.h"
 #include "impl/experimental/tensor_api/atom/copy_traits_impl.h"
 
 namespace AscendC {
