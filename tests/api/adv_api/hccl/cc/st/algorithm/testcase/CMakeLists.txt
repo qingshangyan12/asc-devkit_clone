@@ -39,11 +39,11 @@ if (BUILD_OPEN_PROJECT)
         ${ASCEND_HOME_PATH}/pkg_inc/hcomm/ccu
 
         # 本仓代码头文件
-        ${HCCL_DEV_BASE}/src/common
-        ${HCCL_DEV_BASE}/src/ops
-        ${HCCL_DEV_BASE}/src/ops/op_common
-        ${HCCL_DEV_BASE}/src/ops/op_common/inc
-        ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
+        ${HCCL_DEV_BASE}/impl/adv_api/detail/hccl/cc/src/common
+        ${HCCL_DEV_BASE}/impl/adv_api/detail/hccl/cc/src/ops
+        ${HCCL_DEV_BASE}/impl/adv_api/detail/hccl/cc/src/ops/op_common
+        ${HCCL_DEV_BASE}/impl/adv_api/detail/hccl/cc/src/ops/op_common/inc
+        ${HCCL_DEV_BASE}/impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym
 
         ${UTILS_DIR}/sim_world
         ${UTILS_DIR}/common/utils
