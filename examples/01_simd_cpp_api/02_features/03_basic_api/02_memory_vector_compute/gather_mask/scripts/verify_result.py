@@ -21,8 +21,12 @@ ABSOLUTE_TOL = 1e-9
 ERROR_TOL = 1e-4
 
 
-def verify_result(output, golden):
-    output_type = np.uint32
+def verify_result(output, golden, scenarioNum):
+    if scenarioNum == 1:
+        output_type = np.uint16
+    else:
+        output_type = np.uint32
+
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     different_element_results = np.isclose(output,
@@ -47,7 +51,11 @@ def verify_result(output, golden):
 
 if __name__ == '__main__':
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
+        scenarioNum = 1
+        if len(sys.argv) > 3:
+            scenarioNum = int(sys.argv[3])
+
+        res = verify_result(sys.argv[1], sys.argv[2], scenarioNum)
         if not res:
             raise ValueError("[ERROR] result error")
         else:
