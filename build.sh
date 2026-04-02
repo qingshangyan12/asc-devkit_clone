@@ -515,8 +515,19 @@ function build_test_part() {
   fi
 
   for tag in "${TEST_TARGET_LIST[@]}"; do
-    TARGETS="${TARGETS} --target ${tag}"
-    TEST_MOD="${tag},${TEST_MOD}"
+    if [ "$tag" == "hccl_checker_ops_stest" ]; then
+      local st_build_shell="${CURRENT_DIR}/tests/api/adv_api/hccl/cc/st/algorithm/build.sh"
+      echo "st_build_shell = ${st_build_shell}"
+      if [ -e ${st_build_shell} ]; then
+        echo "开始执行st..."
+        bash ${st_build_shell}
+      else
+        echo "${st_build_shell} 文件不存在!"
+      fi
+    else
+      TARGETS="${TARGETS} --target ${tag}"
+      TEST_MOD="${tag},${TEST_MOD}"
+    fi
   done
 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=${TEST_MOD}"
