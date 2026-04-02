@@ -119,7 +119,7 @@ namespace AscendC {
         const uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)                      \
     {                                                                                                               \
         if constexpr (isSetMask) {                                                                                  \
-            SetVectorMask<DATA_TYPE>(mask[1], mask[0]);                                                             \
+            SetVectorMask<DATA_TYPE>(mask);                                                             \
         }                                                                                                           \
         CONTINUOUS_MODE_FUNC(OP_NAME, DATA_TYPE, dst, src, scalarValue, mask, repeatTime, repeatParams)            \
     }
