@@ -20,25 +20,25 @@ protected:
 };
 
 namespace {
-void plds_stub(vector_bool &dst, __ubuf__ uint32_t *&src, int32_t offset, Literal dist) {
+void plds_stub(vector_bool &dst, __ubuf__ uint32_t *src, int32_t offset, Literal dist) {
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
     EXPECT_EQ(offset, static_cast<int32_t>(0));
     EXPECT_EQ(dist, static_cast<Literal>(Literal::NORM));
 }
 
-void plds_upsample_stub(vector_bool &dst, __ubuf__ uint32_t *&src, int32_t offset, Literal dist) {
+void plds_upsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, int32_t offset, Literal dist) {
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
     EXPECT_EQ(offset, static_cast<int32_t>(0));
     EXPECT_EQ(dist, static_cast<Literal>(Literal::US));
 }
 
-void plds_downsample_stub(vector_bool &dst, __ubuf__ uint32_t *&src, int32_t offset, Literal dist) {
+void plds_downsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, int32_t offset, Literal dist) {
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
     EXPECT_EQ(offset, static_cast<int32_t>(0));
     EXPECT_EQ(dist, static_cast<Literal>(Literal::DS));
 }
 
-void plds_offset_stub(vector_bool &dst, __ubuf__ uint32_t *&src, int32_t offset, Literal dist) {
+void plds_offset_stub(vector_bool &dst, __ubuf__ uint32_t *src, int32_t offset, Literal dist) {
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
     EXPECT_EQ(offset, static_cast<int32_t>(33));
     EXPECT_EQ(dist, static_cast<Literal>(Literal::NORM));
