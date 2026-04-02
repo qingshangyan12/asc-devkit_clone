@@ -58,7 +58,7 @@ if (BUILD_OPEN_PROJECT)
 
     target_link_libraries(hccl_checker_ops_stest PRIVATE
         gtest
-        -lpthread
+        pthread
         hccl-model-proxy
         hccl-verifier
         # 链接hccl库

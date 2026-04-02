@@ -12,16 +12,6 @@
 #include "hcomm_diag.h"
 #include "hcomm_host_profiling_dl.h"
 
-// 取消宏定义，避免函数定义被宏替换
-#undef HcommGetProfilingSysCycleTime
-#undef HcommProfilingRegThread
-#undef HcommProfilingUnRegThread
-#undef HcommProfilingReportKernel
-#undef HcommProfilingReportOp
-#undef HcclDfxRegOpInfo
-#undef HcclProfilingReportOp
-#undef HcclReportAicpuKernel
-
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
