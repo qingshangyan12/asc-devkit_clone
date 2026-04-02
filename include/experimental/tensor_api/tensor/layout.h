@@ -48,16 +48,20 @@ __aicore__ inline constexpr auto MakeLayout(const T& shape);
 template <size_t... Is, typename LayoutType>
 __aicore__ inline constexpr auto Rank(const LayoutType& layout);
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto GetShape(const LayoutType& layout);
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto GetShape(LayoutType& layout);
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto GetStride(const LayoutType& layout);
 
-template <size_t... Is, typename LayoutType>
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
 __aicore__ inline constexpr auto GetStride(LayoutType& layout);
 
 template <size_t... Is, typename LayoutType>

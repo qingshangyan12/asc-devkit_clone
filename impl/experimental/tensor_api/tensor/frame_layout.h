@@ -94,7 +94,7 @@ struct MakeNnFrameLayout {
                                MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele)));
         auto stride = MakeStride(MakeStride(Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{}),
                                  MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(row, FRACTAL_FIXED)));
-        using LayoutT = Layout<decltype(shape), decltype(stride), NDLayoutPattern>;
+        using LayoutT = Layout<decltype(shape), decltype(stride), NnLayoutPattern>;
         return LayoutT(shape, stride);
     }
 };
