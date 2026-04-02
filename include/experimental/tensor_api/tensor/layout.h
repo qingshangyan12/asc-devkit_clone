@@ -122,7 +122,7 @@ __aicore__ inline decltype(auto) MakeScaleBNDLayout(U row, S column);
 template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column);
 
- template <typename Layout, typename TileShape>
+template <typename Layout, typename TileShape>
 __aicore__ inline decltype(auto) MakeTileLayout(const Layout& layout, const TileShape& tileShape);
 
 } // namespace Te

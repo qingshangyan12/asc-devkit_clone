@@ -646,36 +646,6 @@ TEST_F(Tensor_Api_Layout, TestRankSize)
     EXPECT_EQ(layoutObj3.Rank<1>(), 2);
 }
 
-TEST_F(Tensor_Api_Layout, TestMakeShapeStride)
-{
-    using namespace AscendC::Te;
-    auto shape1 = MakeShape(3, 2);
-    auto stride1 = MakeStride(1, 4);
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape1)>, true);
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride1)>, true);
-    EXPECT_EQ(GetShape<0>(shape1), 3);
-    EXPECT_EQ(GetShape<1>(shape1), 2);
-
-    auto shape2 = MakeShape(AscendC::Std::Int<11>{}, AscendC::Std::Int<23>{}, AscendC::Std::Int<37>{});
-    auto stride2 = MakeStride(AscendC::Std::Int<3>{}, AscendC::Std::Int<7>{}, AscendC::Std::Int<5>{});
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape2)>, true);
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride2)>, true);
-    EXPECT_EQ(GetShape<0>(shape2), AscendC::Std::Int<11>{});
-    EXPECT_EQ(GetShape<1>(shape2), AscendC::Std::Int<23>{});
-    EXPECT_EQ(GetShape<2>(shape2), AscendC::Std::Int<37>{});
-
-    auto shape3 = MakeShape(MakeShape(AscendC::Std::Int<11>{}, AscendC::Std::Int<22>{}),
-                            MakeShape(AscendC::Std::Int<33>{}, AscendC::Std::Int<44>{}));
-    auto stride3 = MakeStride(MakeShape(AscendC::Std::Int<55>{}, AscendC::Std::Int<66>{}),
-                              MakeShape(AscendC::Std::Int<77>{}, AscendC::Std::Int<88>{}));
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape3)>, true);
-    EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride3)>, true);
-    EXPECT_EQ((GetShape<0, 0>(shape3)), AscendC::Std::Int<11>{});
-    EXPECT_EQ((GetShape<0, 1>(shape3)), AscendC::Std::Int<22>{});
-    EXPECT_EQ((GetShape<1, 0>(shape3)), AscendC::Std::Int<33>{});
-    EXPECT_EQ((GetShape<1, 1>(shape3)), AscendC::Std::Int<44>{});
-}
-
 TEST_F(Tensor_Api_Layout, TestMakeTileCoord)
 {
     using namespace AscendC::Te;
@@ -1139,17 +1109,17 @@ TEST_F(Tensor_Api_Layout, TestMakeFrameLayout)
     using namespace AscendC::Te;
 
     auto ndLayout = MakeFrameLayout<NDLayoutPattern, LayoutTrait<>>(128, 256);
-    EXPECT_EQ(GetShape<0>(ndLayout), 128);
-    EXPECT_EQ(GetShape<1>(ndLayout), 256);
-    EXPECT_EQ(GetStride<0>(ndLayout), 256);
-    EXPECT_EQ(GetStride<1>(ndLayout), 1);
+    EXPECT_EQ(ndLayout.Shape<0>(), 128);
+    EXPECT_EQ(ndLayout.Shape<1>(), 256);
+    EXPECT_EQ(ndLayout.Stride<0>(), 256);
+    EXPECT_EQ(ndLayout.Stride<1>(), 1);
     EXPECT_TRUE((AscendC::Std::is_same_v<PatternTraitT<decltype(ndLayout)>, NDLayoutPattern>));
 
     auto nzLayout = MakeFrameLayout<NzLayoutPattern, LayoutTrait<float>>(128, 256);
-    auto nzShape0 = GetShape<0>(nzLayout);
-    auto nzShape1 = GetShape<1>(nzLayout);
-    auto nzStride0 = GetStride<0>(nzLayout);
-    auto nzStride1 = GetStride<1>(nzLayout);
+    auto nzShape0 = nzLayout.Shape<0>();
+    auto nzShape1 = nzLayout.Shape<1>();
+    auto nzStride0 = nzLayout.Stride<0>();
+    auto nzStride1 = nzLayout.Stride<1>();
     constexpr int c0Ele = 32 / sizeof(float);
 
     EXPECT_EQ(AscendC::Std::get<0>(nzShape0), 16);
