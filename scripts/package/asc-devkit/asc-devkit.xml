@@ -93,10 +93,6 @@
     <file_info copy_type="delivery" src_path="asc-devkit" dst_path="asc-devkit" install_path="$(TARGET_ENV)/include/version" install_type="all">
         <file value="asc_devkit_version.h" install_mod="550" entity="true" install_softlink="$(TARGET_ENV)/include/ascendc/asc_devkit_version.h"/>
     </file_info>
-    <file_info value="hccl_script" copy_type="source" src_path="" dst_path="share/info/hccl" install_path="share/info/hccl">
-        <file value="script" entity="true"/>
-        <file value="version.info" dst_path="share/info/hccl" install_path="share/info/hccl"/>
-    </file_info>
     <file_info copy_type="delivery" src_path="lib/host/asc/impl" dst_path="$(TARGET_ENV)/asc/impl" install_path="$(TARGET_ENV)/asc/impl" install_type="all">
         <file value="utils" install_mod="550" entity="true"/>
         <file value="basic_api" install_mod="550" entity="true"/>
