@@ -31,9 +31,5 @@ if (BUILD_OPEN_PROJECT)
     message(STATUS "Final Ascend Path: ${ASCEND_HOME_PATH}")
 endif()
 
-# 下载并编译gtest
-set(CANN_3RD_LIB_PATH ${HCCL_DEV_BASE}/third_party)
-include(${HCCL_DEV_BASE}/cmake/third_party/gtest.cmake)
-
 add_subdirectory(testcase)
 add_subdirectory(utils)
