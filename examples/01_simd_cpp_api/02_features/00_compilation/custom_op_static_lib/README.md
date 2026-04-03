@@ -14,7 +14,7 @@
 ## 目录结构介绍
 
 ```
-├── static_aclnn_invocation
+├── custom_op_static_lib
 │   ├── app                       // 链接静态库并执行算子
 │   │   ├── CMakeLists.txt
 │   │   └── main.cpp

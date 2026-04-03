@@ -1,8 +1,8 @@
-# RegBase Add样例介绍
+# RegBase样例介绍
 
 ## 概述
 
-样例介绍RegBase编程的vector计算功能。
+样例介绍RegBase编程的Vector计算功能。
 
 ## 样例列表
 

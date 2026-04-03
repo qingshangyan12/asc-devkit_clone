@@ -1,8 +1,8 @@
-# MatmulLeakyRelu 样例介绍
+# FusionOperation样例介绍
 
 ## 概述
 
-样例介绍自定义融合计算。
+样例介绍自定义融合计算，包含Cube与Vector融合计算和SIMT + SIMD混合编程融合计算。
 
 ## 样例列表
 
