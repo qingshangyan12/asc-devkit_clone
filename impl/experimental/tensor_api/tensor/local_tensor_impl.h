@@ -28,6 +28,13 @@
 
 namespace AscendC {
 namespace Te {
+    
+enum class CacheMode {
+    CACHE_MODE_DISABLE = 0,
+    CACHE_MODE_NORMAL = 1,
+    CACHE_MODE_LAST = 2,
+    CACHE_MODE_PERSISTENT = 4
+};
 
 // struct LocalTensor
 template <typename EngineType, typename LayoutType>

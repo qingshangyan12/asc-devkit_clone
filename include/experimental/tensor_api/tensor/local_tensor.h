@@ -23,7 +23,6 @@
 
 #include "impl/experimental/tensor_api/tensor/tuple_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
-#include "experimental/tensor_api/utils/cache.h"
 
 // algorithm 
 namespace AscendC {
