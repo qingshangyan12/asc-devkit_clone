@@ -197,6 +197,27 @@ TEST_F(FloatComputeTestsuite1, MathIntegerTest)
     float y_f = 2.0f;
     float res_div = fdividef(x_f, y_f);
     EXPECT_EQ(res_div, 0.5f);
+
+
+    x_f = 0.0f;
+    y_f = -1.0f;
+    float res_after = nextafterf(x_f, y_f);
+    EXPECT_EQ(res_after, -1.4013e-45f);
+
+    x_f = 0.0f;
+    y_f = 1.0f;
+    res_after = nextafterf(x_f, y_f);
+    EXPECT_EQ(res_after, 1.4013e-45f);
+
+    x_f = NAN;
+    y_f = 1.0f;
+    res_after = nextafterf(x_f, y_f);
+    EXPECT_TRUE(std::isnan(res_after));
+
+    x_f = -1.0f;
+    y_f = 0.0f;
+    res_after = copysignf(x_f, y_f);
+    EXPECT_EQ(res_after, 1.0f);
 }
 
 void VerifyFloatNumberMath(float x, float xExpected, float epsilon = 1e-5)
