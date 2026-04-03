@@ -39,16 +39,16 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
+            is_one_of_attr_v<
                 Std::tuple<dstDataType, fmDataType, filterDataType>,
-                Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
-                Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
-                Std::tuple<__cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e2m1_t>,
-                Std::tuple<__cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e1m2_t>,
-                Std::tuple<__cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>,
-                Std::tuple<__cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>,
-                Std::tuple<__cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>,
-                Std::tuple<__cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>>,
+                Std::tuple<float, fp4x2_e2m1_t, fp4x2_e2m1_t>,
+                Std::tuple<float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+                Std::tuple<float, fp4x2_e1m2_t, fp4x2_e2m1_t>,
+                Std::tuple<float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+                Std::tuple<float, fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                Std::tuple<float, fp8_e4m3fn_t, fp8_e5m2_t>,
+                Std::tuple<float, fp8_e5m2_t, fp8_e4m3fn_t>,
+                Std::tuple<float, fp8_e5m2_t, fp8_e5m2_t>>,
             "The data type is not supported for L0C position.");
 #endif
     }
@@ -64,29 +64,29 @@ public:
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         if constexpr (biasPos == Hardware::BIAS) {
             static_assert(
-                Std::is_one_of_v<
+                is_one_of_attr_v<
                     Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e2m1_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e1m2_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>>,
+                    Std::tuple<float, float, fp4x2_e2m1_t, fp4x2_e2m1_t>,
+                    Std::tuple<float, float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+                    Std::tuple<float, float, fp4x2_e1m2_t, fp4x2_e2m1_t>,
+                    Std::tuple<float, float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+                    Std::tuple<float, float, fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                    Std::tuple<float, float, fp8_e4m3fn_t, fp8_e5m2_t>,
+                    Std::tuple<float, float, fp8_e5m2_t, fp8_e4m3fn_t>,
+                    Std::tuple<float, float, fp8_e5m2_t, fp8_e5m2_t>>,
                 "The data type is not supported for BIAS position.");
         } else if constexpr (biasPos == Hardware::L0C) {
             static_assert(
-                Std::is_one_of_v<
+                is_one_of_attr_v<
                     Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e2m1_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e1m2_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>>,
+                    Std::tuple<float, float, fp4x2_e2m1_t, fp4x2_e2m1_t>,
+                    Std::tuple<float, float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+                    Std::tuple<float, float, fp4x2_e1m2_t, fp4x2_e2m1_t>,
+                    Std::tuple<float, float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+                    Std::tuple<float, float, fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                    Std::tuple<float, float, fp8_e4m3fn_t, fp8_e5m2_t>,
+                    Std::tuple<float, float, fp8_e5m2_t, fp8_e4m3fn_t>,
+                    Std::tuple<float, float, fp8_e5m2_t, fp8_e5m2_t>>,
                 "The data type is not supported for L0C position.");
         }
 #endif
@@ -101,17 +101,17 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
+            is_one_of_attr_v<
                 Std::tuple<dstDataType, fmDataType, filterDataType>,
-                Std::tuple<__cc__ int32_t, __ca__ int8_t, __cb__ int8_t>,
-                Std::tuple<__cc__ float, __ca__ half, __cb__ half>,
-                Std::tuple<__cc__ float, __ca__ float, __cb__ float>,
-                Std::tuple<__cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>,
-                Std::tuple<__cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>,
-                Std::tuple<__cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>,
-                Std::tuple<__cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>,
-                Std::tuple<__cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>,
-                Std::tuple<__cc__ float, __ca__ hifloat8_t, __cb__ hifloat8_t>>,
+                Std::tuple<int32_t, int8_t, int8_t>,
+                Std::tuple<float, half, half>,
+                Std::tuple<float, float, float>,
+                Std::tuple<float, bfloat16_t, bfloat16_t>,
+                Std::tuple<float, fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                Std::tuple<float, fp8_e4m3fn_t, fp8_e5m2_t>,
+                Std::tuple<float, fp8_e5m2_t, fp8_e4m3fn_t>,
+                Std::tuple<float, fp8_e5m2_t, fp8_e5m2_t>,
+                Std::tuple<float, hifloat8_t, hifloat8_t>>,
             "The data type is not supported for L0C position.");
 #endif
     }
@@ -128,31 +128,31 @@ public:
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         if constexpr (biasPos == Hardware::BIAS) {
             static_assert(
-                Std::is_one_of_v<
+                is_one_of_attr_v<
                     Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
-                    Std::tuple<__biasbuf__ int32_t, __cc__ int32_t, __ca__ int8_t, __cb__ int8_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ half, __cb__ half>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ float, __cb__ float>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>,
-                    Std::tuple<__biasbuf__ float, __cc__ float, __ca__ hifloat8_t, __cb__ hifloat8_t>>,
+                    Std::tuple<int32_t, int32_t, int8_t, int8_t>,
+                    Std::tuple<float, float, half, half>,
+                    Std::tuple<float, float, float, float>,
+                    Std::tuple<float, float, bfloat16_t, bfloat16_t>,
+                    Std::tuple<float, float, fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                    Std::tuple<float, float, fp8_e4m3fn_t, fp8_e5m2_t>,
+                    Std::tuple<float, float, fp8_e5m2_t, fp8_e4m3fn_t>,
+                    Std::tuple<float, float, fp8_e5m2_t, fp8_e5m2_t>,
+                    Std::tuple<float, float, hifloat8_t, hifloat8_t>>,
                 "The data type is not supported for BIAS position.");
         } else if constexpr (biasPos == Hardware::L0C) {
             static_assert(
-                Std::is_one_of_v<
+                is_one_of_attr_v<
                     Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
-                    Std::tuple<__cc__ int32_t, __cc__ int32_t, __ca__ int8_t, __cb__ int8_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ half, __cb__ half>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ float, __cb__ float>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>,
-                    Std::tuple<__cc__ float, __cc__ float, __ca__ hifloat8_t, __cb__ hifloat8_t>>,
+                    Std::tuple<int32_t, int32_t, int8_t, int8_t>,
+                    Std::tuple<float, float, half, half>,
+                    Std::tuple<float, float, float, float>,
+                    Std::tuple<float, float, bfloat16_t, bfloat16_t>,
+                    Std::tuple<float, float, fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                    Std::tuple<float, float, fp8_e4m3fn_t, fp8_e5m2_t>,
+                    Std::tuple<float, float, fp8_e5m2_t, fp8_e4m3fn_t>,
+                    Std::tuple<float, float, fp8_e5m2_t, fp8_e5m2_t>,
+                    Std::tuple<float, float, hifloat8_t, hifloat8_t>>,
                 "The data type is not supported for L0C position.");
         }
 #endif
@@ -166,15 +166,15 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
-                Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ half, __gm__ half>,
-                Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ float, __gm__ float>,
-                Std::tuple<__cbuf__ int8_t, __gm__ int8_t>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>,
-                Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, Std::tuple<__cbuf__ uint16_t, __gm__ uint16_t>,
-                Std::tuple<__cbuf__ int32_t, __gm__ int32_t>, Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>,
-                Std::tuple<__cbuf__ fp8_e5m2_t, __gm__ fp8_e5m2_t>,
-                Std::tuple<__cbuf__ fp8_e4m3fn_t, __gm__ fp8_e4m3fn_t>,
-                Std::tuple<__cbuf__ hifloat8_t, __gm__ hifloat8_t>>,
+            is_one_of_attr_v<
+                Std::tuple<dstDataType, srcDataType>, Std::tuple<half, half>,
+                Std::tuple<bfloat16_t, bfloat16_t>, Std::tuple<float, float>,
+                Std::tuple<int8_t, int8_t>, Std::tuple<uint8_t, uint8_t>,
+                Std::tuple<int16_t, int16_t>, Std::tuple<uint16_t, uint16_t>,
+                Std::tuple<int32_t, int32_t>, Std::tuple<uint32_t, uint32_t>,
+                Std::tuple<fp8_e5m2_t, fp8_e5m2_t>,
+                Std::tuple<fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                Std::tuple<hifloat8_t, hifloat8_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -187,17 +187,17 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
-                Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ half, __gm__ half>,
-                Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ float, __gm__ float>,
-                Std::tuple<__cbuf__ int8_t, __gm__ int8_t>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>,
-                Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, Std::tuple<__cbuf__ uint16_t, __gm__ uint16_t>,
-                Std::tuple<__cbuf__ int32_t, __gm__ int32_t>, Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>,
-                Std::tuple<__cbuf__ fp4x2_e1m2_t, __gm__ fp4x2_e1m2_t>,
-                Std::tuple<__cbuf__ fp4x2_e2m1_t, __gm__ fp4x2_e2m1_t>,
-                Std::tuple<__cbuf__ fp8_e5m2_t, __gm__ fp8_e5m2_t>,
-                Std::tuple<__cbuf__ fp8_e4m3fn_t, __gm__ fp8_e4m3fn_t>,
-                Std::tuple<__cbuf__ hifloat8_t, __gm__ hifloat8_t>>,
+            is_one_of_attr_v<
+                Std::tuple<dstDataType, srcDataType>, Std::tuple<half, half>,
+                Std::tuple<bfloat16_t, bfloat16_t>, Std::tuple<float, float>,
+                Std::tuple<int8_t, int8_t>, Std::tuple<uint8_t, uint8_t>,
+                Std::tuple<int16_t, int16_t>, Std::tuple<uint16_t, uint16_t>,
+                Std::tuple<int32_t, int32_t>, Std::tuple<uint32_t, uint32_t>,
+                Std::tuple<fp4x2_e1m2_t, fp4x2_e1m2_t>,
+                Std::tuple<fp4x2_e2m1_t, fp4x2_e2m1_t>,
+                Std::tuple<fp8_e5m2_t, fp8_e5m2_t>,
+                Std::tuple<fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                Std::tuple<hifloat8_t, hifloat8_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -210,7 +210,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ fp8_e8m0_t, __gm__ fp8_e8m0_t>>,
+            is_one_of_attr_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<fp8_e8m0_t, fp8_e8m0_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -223,16 +223,16 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
-                Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ half, __gm__ half>,
-                Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ float, __gm__ float>,
-                Std::tuple<__cbuf__ int8_t, __gm__ int8_t>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>,
-                Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, Std::tuple<__cbuf__ uint16_t, __gm__ uint16_t>,
-                Std::tuple<__cbuf__ int32_t, __gm__ int32_t>, Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>,
-                Std::tuple<__cbuf__ int64_t, __gm__ int64_t>, Std::tuple<__cbuf__ uint64_t, __gm__ uint64_t>,
-                Std::tuple<__cbuf__ fp8_e5m2_t, __gm__ fp8_e5m2_t>,
-                Std::tuple<__cbuf__ fp8_e4m3fn_t, __gm__ fp8_e4m3fn_t>,
-                Std::tuple<__cbuf__ hifloat8_t, __gm__ hifloat8_t>>,
+            is_one_of_attr_v<
+                Std::tuple<dstDataType, srcDataType>, Std::tuple<half, half>,
+                Std::tuple<bfloat16_t, bfloat16_t>, Std::tuple<float, float>,
+                Std::tuple<int8_t, int8_t>, Std::tuple<uint8_t, uint8_t>,
+                Std::tuple<int16_t, int16_t>, Std::tuple<uint16_t, uint16_t>,
+                Std::tuple<int32_t, int32_t>, Std::tuple<uint32_t, uint32_t>,
+                Std::tuple<int64_t, int64_t>, Std::tuple<uint64_t, uint64_t>,
+                Std::tuple<fp8_e5m2_t, fp8_e5m2_t>,
+                Std::tuple<fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                Std::tuple<hifloat8_t, hifloat8_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -255,10 +255,10 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
-                Std::tuple<dstDataType, srcDataType>, Std::tuple<__biasbuf__ float, __cbuf__ bfloat16_t>,
-                Std::tuple<__biasbuf__ float, __cbuf__ half>, Std::tuple<__biasbuf__ float, __cbuf__ float>,
-                Std::tuple<__biasbuf__ int32_t, __cbuf__ int32_t>>,
+            is_one_of_attr_v<
+                Std::tuple<dstDataType, srcDataType>, Std::tuple<float, bfloat16_t>,
+                Std::tuple<float, half>, Std::tuple<float, float>,
+                Std::tuple<int32_t, int32_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -271,7 +271,7 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_same_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<__fbuf__ uint64_t, __cbuf__ uint64_t>>,
+            is_one_of_attr_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<uint64_t, uint64_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -284,13 +284,13 @@ public:
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             (quantPre == QuantMode_t::NoQuant &&
-             Std::is_one_of_v<
-                 Std::tuple<dstType, srcType>, Std::tuple<__gm__ float, __cc__ float>,
-                 Std::tuple<__gm__ int32_t, __cc__ int32_t>>) ||
+             is_one_of_attr_v<
+                 Std::tuple<dstType, srcType>, Std::tuple<float, float>,
+                 Std::tuple<int32_t, int32_t>>) ||
                 (quantPre == QuantMode_t::F322F16 &&
-                 Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ half, __cc__ float>>) ||
+                 is_one_of_attr_v<Std::tuple<dstType, srcType>, Std::tuple<half, float>>) ||
                 (quantPre == QuantMode_t::F322BF16 &&
-                 Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ bfloat16_t, __cc__ float>>),
+                 is_one_of_attr_v<Std::tuple<dstType, srcType>, Std::tuple<bfloat16_t, float>>),
             "The data type is not supported.");
 #endif
     }
@@ -303,13 +303,13 @@ public:
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             (quantPre == QuantMode_t::NoQuant &&
-             Std::is_one_of_v<
-                 Std::tuple<dstType, srcType>, Std::tuple<__ubuf__ float, __cc__ float>,
-                 Std::tuple<__ubuf__ int32_t, __cc__ int32_t>>) ||
+             is_one_of_attr_v<
+                 Std::tuple<dstType, srcType>, Std::tuple<float, float>,
+                 Std::tuple<int32_t, int32_t>>) ||
                 (quantPre == QuantMode_t::F322F16 &&
-                 Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__ubuf__ half, __cc__ float>>) ||
+                 is_one_of_attr_v<Std::tuple<dstType, srcType>, Std::tuple<half, float>>) ||
                 (quantPre == QuantMode_t::F322BF16 &&
-                 Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__ubuf__ bfloat16_t, __cc__ float>>),
+                 is_one_of_attr_v<Std::tuple<dstType, srcType>, Std::tuple<bfloat16_t, float>>),
             "The data type is not supported.");
 #endif
     }
@@ -322,17 +322,17 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
-                Std::tuple<dstDataType, srcDataType>, Std::tuple<__ca__ half, __cbuf__ half>,
-                Std::tuple<__ca__ int16_t, __cbuf__ int16_t>, Std::tuple<__ca__ uint16_t, __cbuf__ uint16_t>,
-                Std::tuple<__ca__ bfloat16_t, __cbuf__ bfloat16_t>, Std::tuple<__ca__ uint32_t, __cbuf__ uint32_t>,
-                Std::tuple<__ca__ int32_t, __cbuf__ int32_t>, Std::tuple<__ca__ float, __cbuf__ float>,
-                Std::tuple<__ca__ uint8_t, __cbuf__ uint8_t>, Std::tuple<__ca__ int8_t, __cbuf__ int8_t>,
-                Std::tuple<__ca__ fp8_e4m3fn_t, __cbuf__ fp8_e4m3fn_t>,
-                Std::tuple<__ca__ fp8_e5m2_t, __cbuf__ fp8_e5m2_t>,
-                Std::tuple<__ca__ fp4x2_e2m1_t, __cbuf__ fp4x2_e2m1_t>,
-                Std::tuple<__ca__ fp4x2_e1m2_t, __cbuf__ fp4x2_e1m2_t>,
-                Std::tuple<__ca__ hifloat8_t, __cbuf__ hifloat8_t>>,
+            is_one_of_attr_v<
+                Std::tuple<dstDataType, srcDataType>, Std::tuple<half, half>,
+                Std::tuple<int16_t, int16_t>, Std::tuple<uint16_t, uint16_t>,
+                Std::tuple<bfloat16_t, bfloat16_t>, Std::tuple<uint32_t, uint32_t>,
+                Std::tuple<int32_t, int32_t>, Std::tuple<float, float>,
+                Std::tuple<uint8_t, uint8_t>, Std::tuple<int8_t, int8_t>,
+                Std::tuple<fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                Std::tuple<fp8_e5m2_t, fp8_e5m2_t>,
+                Std::tuple<fp4x2_e2m1_t, fp4x2_e2m1_t>,
+                Std::tuple<fp4x2_e1m2_t, fp4x2_e1m2_t>,
+                Std::tuple<hifloat8_t, hifloat8_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -345,17 +345,17 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<
-                Std::tuple<dstDataType, srcDataType>, Std::tuple<__cb__ half, __cbuf__ half>,
-                Std::tuple<__cb__ int16_t, __cbuf__ int16_t>, Std::tuple<__cb__ uint16_t, __cbuf__ uint16_t>,
-                Std::tuple<__cb__ bfloat16_t, __cbuf__ bfloat16_t>, Std::tuple<__cb__ uint32_t, __cbuf__ uint32_t>,
-                Std::tuple<__cb__ int32_t, __cbuf__ int32_t>, Std::tuple<__cb__ float, __cbuf__ float>,
-                Std::tuple<__cb__ uint8_t, __cbuf__ uint8_t>, Std::tuple<__cb__ int8_t, __cbuf__ int8_t>,
-                Std::tuple<__cb__ fp8_e4m3fn_t, __cbuf__ fp8_e4m3fn_t>,
-                Std::tuple<__cb__ fp8_e5m2_t, __cbuf__ fp8_e5m2_t>,
-                Std::tuple<__cb__ fp4x2_e2m1_t, __cbuf__ fp4x2_e2m1_t>,
-                Std::tuple<__cb__ fp4x2_e1m2_t, __cbuf__ fp4x2_e1m2_t>,
-                Std::tuple<__cb__ hifloat8_t, __cbuf__ hifloat8_t>>,
+            is_one_of_attr_v<
+                Std::tuple<dstDataType, srcDataType>, Std::tuple<half, half>,
+                Std::tuple<int16_t, int16_t>, Std::tuple<uint16_t, uint16_t>,
+                Std::tuple<bfloat16_t, bfloat16_t>, Std::tuple<uint32_t, uint32_t>,
+                Std::tuple<int32_t, int32_t>, Std::tuple<float, float>,
+                Std::tuple<uint8_t, uint8_t>, Std::tuple<int8_t, int8_t>,
+                Std::tuple<fp8_e4m3fn_t, fp8_e4m3fn_t>,
+                Std::tuple<fp8_e5m2_t, fp8_e5m2_t>,
+                Std::tuple<fp4x2_e2m1_t, fp4x2_e2m1_t>,
+                Std::tuple<fp4x2_e1m2_t, fp4x2_e1m2_t>,
+                Std::tuple<hifloat8_t, hifloat8_t>>,
             "The data type is not supported.");
 #endif
     }
