@@ -23,17 +23,10 @@
 #define IMPL_TENSOR_API_TENSOR_ENGINE_IMPL_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
+#include "impl/experimental/tensor_api/utils/map_impl.h"
 
 namespace AscendC {
 namespace Te {
-
-enum class CacheMode {
-    CACHE_MODE_DISABLE = 0,
-    CACHE_MODE_NORMAL = 1,
-    CACHE_MODE_LAST = 2,
-    CACHE_MODE_PERSISTENT = 4
-};
-
 struct L2CacheAlter3510 {
 template <typename Iterator>
     __aicore__ __inline__ static void Run(Iterator& storage, CacheMode mode)
@@ -49,35 +42,6 @@ template <typename Iterator>
         }
         storage = storage & L2_CACHE_OFFSET_MASK | value;
     }
-};
-
-struct EmptyValue {template <typename ...Args> __aicore__ __inline__ static void Run(const Args&... args) {} };
-
-template <typename... Pairs>
-class TupleMap {
-private:
-    using MapType = Std::tuple<Pairs...>;
-    static constexpr size_t MapSize = sizeof...(Pairs);
-
-    template <typename Key, size_t Index, size_t MaxSize>
-    struct FindImpl {
-        using CurrentPair = typename Std::tuple_element<Index, MapType>::type;
-        using CurrentKey  = typename Std::tuple_element<0, CurrentPair>::type;
-        using CurrentVal  = typename Std::tuple_element<1, CurrentPair>::type;
-
-        using NextResult = typename FindImpl<Key, Index + 1, MaxSize>::type;
-
-        using type = Std::conditional_t<Std::is_same_v<CurrentKey, Key>, CurrentVal, NextResult>;
-    };
-
-    template <typename Key, size_t MaxSize>
-    struct FindImpl<Key, MaxSize, MaxSize> {
-        using type = EmptyValue;
-    };
-
-public:
-    template <typename Key>
-    using Get = typename FindImpl<Key, 0, MapSize>::type;
 };
 
 using L2CacheAlterSet = TupleMap<Std::tuple<Std::Int<ArchVersion::V3510>, L2CacheAlter3510>>;
