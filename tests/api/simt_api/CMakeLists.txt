@@ -31,13 +31,13 @@ set(ASCENDC_TEST_HEADER_FILES
 # # ================ simt_api kernel ut ================
 # ascend950pr_9599 simt test cases
 file(GLOB ASCENDC_TEST_ascend950pr_9599_SIMT_CASE_SRC_FILES
-    common_simt/simt_compiler_stub.cpp
+    common_simt/*.cpp
     ascendc_case_ascend950pr_9599_simt/*.cpp
 )
 
 # mc62cm12aa simt test cases
 file(GLOB ASCENDC_TEST_mc62cm12aa_SIMT_CASE_SRC_FILES
-    common_simt/simt_compiler_stub.cpp
+    common_simt/*.cpp
     ascendc_case_mc62cm12aa_simt/*.cpp
 )
 
@@ -68,8 +68,6 @@ foreach(product_type ${SIMT_PRODUCT_TYPE_LIST})
 
     target_link_libraries(ascendc_ut_simt_api_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
-        $<$<STREQUAL:${product_type},ascend950pr_9599>:tikicpulib::ascend950pr_9599>
-        $<$<STREQUAL:${product_type},mc62cm12aa>:tikicpulib::mc62cm12aa>
         kernel_tiling
         -Wl,--no-as-needed
         error_manager
