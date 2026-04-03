@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -7,20 +7,27 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include <gtest/gtest.h>
-#include <type_traits>
-#include "kernel_operator.h"
 
-class CommonTestsuite : public testing::Test {
-protected:
-    void SetUp() {}
-    void TearDown() {}
-};
+/*!
+ * \file device_sync_functions_debug.cpp
+ * \brief
+ */
 
-TEST_F(CommonTestsuite, BlockIdxAndNumTestCase)
+#if defined(ASCENDC_CPU_DEBUG)
+#include "stub_def.h"
+#include "kernel_simt_cpu.h"
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+void __sync_workitems()
 {
-    int blockIdx = AscendC::Simt::GetBlockIdx();
-    int blockNum = AscendC::Simt::GetBlockNum();
-    EXPECT_EQ(blockIdx, 0);
-    EXPECT_EQ(blockNum, 8);
+    AscendC::Simt::Sync();
 }
+
+void __threadfence()
+{
+}
+void __threadfence_block()
+{
+}
+#endif
+#endif
