@@ -114,9 +114,21 @@ create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PAT
 create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "asc_op_compile_base-*.dist-info"
 create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "asc_opc_tool"
 create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "asc_opc_tool-*.dist-info"
+# hccl python whl 软链接
+create_softlink_if_exists "${WHL_INSTALL_DIR_PATH}" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "hccl"
+create_softlink_if_exists "${WHL_INSTALL_DIR_PATH}" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "hccl-*.dist-info"
 
-# 调用hccl自定义创建软链接脚本
-hccl_custom_script="${curpath}/hccl_custom_create_softlink.sh"
-if [ -f "${hccl_custom_script}" ]; then
-    sh "${hccl_custom_script}" "$@"
-fi
+python_dir_chmod_set() {
+    local dir="$1"
+    if [ ! -d "$dir" ]; then
+        return
+    fi
+    if [ $(id -u) -eq 0 ]; then
+        chmod 755 "$dir" > /dev/null 2>&1
+    else
+        chmod 750 "$dir" > /dev/null 2>&1
+    fi
+}
+
+python_dir_chmod_set "$WHL_SOFTLINK_INSTALL_DIR_PATH"
+python_dir_chmod_set "$(dirname $WHL_SOFTLINK_INSTALL_DIR_PATH)"
