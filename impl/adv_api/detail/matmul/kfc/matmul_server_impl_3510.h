@@ -473,7 +473,7 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
 #endif
 
     IterateSetMessage(msg, body);
-    uint64_t size = tiling_.GetSingleCoreM() * tiling_.GetSingleCoreN();
+    uint64_t size = tiling_.GetBatchNum() * tiling_.GetSingleCoreM() * tiling_.GetSingleCoreN();
 
     if constexpr (NeedTransitByGm(C_TYPE::pos)) {
         GlobalTensor<DstT> cGlobal;
