@@ -21,7 +21,7 @@
 
 namespace AscendC { 
 namespace Te {
-    
+
 enum class MmadType : uint8_t { NORMAL = 0, MX = 1};
 
 struct MmadTrait {
