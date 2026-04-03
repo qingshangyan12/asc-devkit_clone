@@ -34,7 +34,7 @@
     ```cpp
     AscendC::GatherMask(dstLocal, src0Local, src1Pattern, reduceMode, mask, gatherMaskParams, rsvdCnt);
     ```
-- 参数：使用内置固定模式src1Pattern=2进行元素选取，reduceMode=false（Normal模式），mask=0, gatherMaskParams={1, 1, 0, 0}
+- 参数：使用内置固定模式src1Pattern=2进行元素选取，reduceMode=false（Normal模式），mask=0，gatherMaskParams={1, 1, 0, 0}
 
 **场景2：用户自定义模式**
 - 说明：通过用户输入的`src1Local`对应的二进制作为掩码，来获取数据
@@ -45,7 +45,7 @@
     ```cpp
     AscendC::GatherMask (dstLocal, src0Local, src1Local, reduceMode, mask, gatherMaskParams, rsvdCnt);
     ```
-- 参数：使用用户提供的Tensor进行元素选取，reduceMode=true（Counter模式），mask=70, gatherMaskParams={1, 2, 4, 0}
+- 参数：使用用户提供的Tensor进行元素选取，reduceMode=true（Counter模式），mask=70，gatherMaskParams={1, 2, 4, 0}
 
 ## 编译运行
 
@@ -77,7 +77,7 @@
   python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin  # 验证输出结果是否正确
   ```
   其中编译参数使用说明如下表所示：
-  <table border="2" align="center">
+  <table border="2">
   <caption>表1：编译参数说明</caption>
   <tr>
     <th>参数</th>
