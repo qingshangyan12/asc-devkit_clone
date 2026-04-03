@@ -20,6 +20,7 @@ version_compat_func_path="${curpath}/version_compatiable.inc"
 common_func_v2_path="${curpath}/common_func_v2.inc"
 version_cfg_path="${curpath}/version_cfg.inc"
 asc_devkit_func_path="${curpath}/asc-devkit_func.sh"
+hccl_func_path="${curpath}/hccl_func.sh"
 pkg_version_path="${curpath}/../../version.info"
 install_info_old="/etc/ascend_install.info"
 run_dir="$(echo "$2" | cut -d'-' -f 3-)"
@@ -29,6 +30,9 @@ run_dir="$(echo "$2" | cut -d'-' -f 3-)"
 . "${common_func_v2_path}"
 . "${version_cfg_path}"
 . "${asc_devkit_func_path}"
+if [ -f "${hccl_func_path}" ]; then
+    . "${hccl_func_path}"
+fi
 
 if [ "$(id -u)" != "0" ]; then
     log_dir="${HOME}/var/log/ascend_seclog"

@@ -133,3 +133,10 @@ remove_softlink "asc_opc_tool-*.dist-info"
 remove_empty_dir "$WHL_SOFTLINK_INSTALL_DIR_PATH"
 remove_empty_dir "$install_path/$latest_dir/python"
 remove_empty_dir "$install_path/$latest_dir"
+
+# 调用hccl自定义删除软链接脚本
+curpath=$(dirname $(readlink -f "$0"))
+hccl_custom_script="${curpath}/hccl_custom_remove_softlink.sh"
+if [ -f "${hccl_custom_script}" ]; then
+    sh "${hccl_custom_script}" "$@"
+fi

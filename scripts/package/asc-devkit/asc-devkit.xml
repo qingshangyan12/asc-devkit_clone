@@ -16,11 +16,16 @@
         <os_version>$(OS_VER)</os_version>
         <arch>$(ARCH)</arch>
     </generate_info>
+    <generate_info value="hccl_version.h" dst_path="share/info/asc-devkit" install_path="$(TARGET_ENV)/include/version" install_mod="440" install_type="devel" generator="version_header">
+       <HCCL_VERSION>$(ASCEND_VER)</HCCL_VERSION>
+       <HCCL_TIMESTAMP>$(TIMESTAMP_NO)</HCCL_TIMESTAMP>
+    </generate_info>
 
     <block_info dependtree="false" dst_path="asc-devkit" block_conf_path="ascend">
         <block name="EngineeringCommon"/>
         <block name="EngineeringFiles"/>
         <block name="DevlibCommon"/>
+        <block name="HcclLib"/>
     </block_info>
 
     <dir_info value="asc-devkit" install_mod="550">
@@ -30,6 +35,8 @@
         <path value="tools/ascendc_tools" install_mod="750"/>
         <path value="share" install_mod="750"/>
         <path value="share/info" install_mod="750"/>
+        <path value="share/info/hccl" install_mod="750"/>
+        <path value="share/info/hccl/script" install_mod="550"/>
         <path value="$(TARGET_ENV)/tikcpp" install_softlink="compiler/tikcpp;tools/tikcpp"/>
         <path value="$(TARGET_ENV)/tikcpp/tikcfw"/>
         <path value="$(TARGET_ENV)/tikcpp/tikcfw/include"/>
@@ -85,6 +92,10 @@
     </file_info>
     <file_info copy_type="delivery" src_path="asc-devkit" dst_path="asc-devkit" install_path="$(TARGET_ENV)/include/version" install_type="all">
         <file value="asc_devkit_version.h" install_mod="550" entity="true" install_softlink="$(TARGET_ENV)/include/ascendc/asc_devkit_version.h"/>
+    </file_info>
+    <file_info value="hccl_script" copy_type="source" src_path="" dst_path="share/info/hccl" install_path="share/info/hccl">
+        <file value="script" entity="true"/>
+        <file value="version.info" dst_path="share/info/hccl" install_path="share/info/hccl"/>
     </file_info>
     <file_info copy_type="delivery" src_path="lib/host/asc/impl" dst_path="$(TARGET_ENV)/asc/impl" install_path="$(TARGET_ENV)/asc/impl" install_type="all">
         <file value="utils" install_mod="550" entity="true"/>

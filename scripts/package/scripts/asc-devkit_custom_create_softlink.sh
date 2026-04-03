@@ -114,3 +114,9 @@ create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PAT
 create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "asc_op_compile_base-*.dist-info"
 create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "asc_opc_tool"
 create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "asc_opc_tool-*.dist-info"
+
+# 调用hccl自定义创建软链接脚本
+hccl_custom_script="${curpath}/hccl_custom_create_softlink.sh"
+if [ -f "${hccl_custom_script}" ]; then
+    sh "${hccl_custom_script}" "$@"
+fi

@@ -177,4 +177,13 @@ custom_uninstall
 if [ $? -ne 0 ]; then
     exit 1
 fi
+
+# 调用hccl自定义卸载脚本
+hccl_custom_script="${curpath}/hccl_custom_uninstall.sh"
+if [ -f "${hccl_custom_script}" ]; then
+    sh "${hccl_custom_script}" "$@"
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
+fi
 exit 0
