@@ -14,13 +14,50 @@
 #include "kernel_simt_cpu.h"
 #include "stub_def.h"
 #include <cmath>
+int64_t block_idx = 0;
+int64_t block_num = 8;
+
+
+uint32_t g_threadDimX = 1024;
+uint32_t g_threadDimY = 1;
+
+thread_local uint32_t g_threadIdxX = 1;
+thread_local uint32_t g_threadIdxY = 1;
+thread_local uint32_t g_threadIdxZ = 1;
 
 int32_t asc_get_block_idx()
 {
-    return block_idx;
+    return 0;
 }
 
 int32_t asc_get_block_num()
 {
-    return block_num;
+    return 1;
+}
+
+int64_t clz(uint64_t x)
+{
+    return 0;
+}
+int64_t bcnt1(uint64_t x)
+{
+    return 0;
+}
+namespace AscendC {
+namespace check {
+struct VecBinaryScalarApiParams {
+};
+
+bool CheckFunVecBinaryScalarImplForMaskArray(VecBinaryScalarApiParams &chkParams,
+                                             const uint64_t mask[],
+                                             const char *intriName) { return true; }
+bool CheckFunVecBinaryScalarImpl(VecBinaryScalarApiParams &chkParams, const uint64_t mask, const char *intriName) {
+    return true;
+}
+bool CheckFunVecBinaryScalarImpl(VecBinaryScalarApiParams &chkParams, const char *intriName) { return true; }
+}
+}
+
+uint64_t atomicAdd(uint64_t *addr, uint64_t val) {
+    return 0;
 }
