@@ -56,54 +56,6 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iter)
     }
 }
 
-struct GMMemPtrPattern {};
-
-struct L1MemPtrPattern {};
-
-struct MakeGMMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        if constexpr (IsHardwareMem<Hardware::GM, Iterator>::value) {
-            return iter;
-        } else {
-            return HardwareMemPtr<Hardware::GM, Iterator>{iter};
-        }
-    }
-};
-
-struct MakeL1MemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        if constexpr (IsHardwareMem<Hardware::L1, Iterator>::value) {
-            return iter;
-        } else {
-            return HardwareMemPtr<Hardware::L1, Iterator>{iter};
-        }
-    }
-};
-
-
-using PtrMemSet = Std::tuple<Std::tuple<GMMemPtrPattern, MakeGMMemPtr>, Std::tuple<L1MemPtrPattern, MakeL1MemPtr>>;
-
-template <typename PtrPattern, typename Tuple = PtrMemSet>
-struct FindPtrFromPattern;
-
-template <typename PtrPattern, typename MakeMemFun, typename... Rest>
-struct FindPtrFromPattern<PtrPattern, Std::tuple<Std::tuple<PtrPattern, MakeMemFun>, Rest...>> {
-    using type = MakeMemFun;
-};
-
-template <typename PtrPattern, typename NotMatchTuple, typename... Rest>
-struct FindPtrFromPattern<PtrPattern, Std::tuple<NotMatchTuple, Rest...>> {};
-
-template <typename PtrPattern, typename TraitType, typename... Args>
-__aicore__ inline constexpr auto MakeMemPtrV2(Args... args) 
-{
-    using GetPtrMakeFun = typename FindPtrFromPattern<PtrPattern>::type;
-    return GetPtrMakeFun::template Make<TraitType>(args...);
-}
-
-
 } // namespace Te
 } // namespace AscendC
 
