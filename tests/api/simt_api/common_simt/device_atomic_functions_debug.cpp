@@ -1,0 +1,433 @@
+/**
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/*!
+ * \file device_atomic_functions_debug.cpp
+ * \brief
+ */
+#if defined(ASCENDC_CPU_DEBUG)
+#include <bitset>
+#include <string>
+#include "kernel_utils.h"
+#include "ascendc_log.h"
+#include "kernel_process_lock.h"
+#include "kernel_simt_cpu.h"
+#include "stub_def.h"
+
+namespace AscendC {
+template <typename T>
+T AtomicSubCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() { *address -= val; });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+template <typename T>
+T AtomicExchCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() { *address = val; });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+template <typename T>
+T AtomicIncCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        if (*address >= val) {
+            *address = static_cast<T>(0);
+        } else {
+            *address += static_cast<T>(1);
+        }
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+template <typename T>
+T AtomicDecCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        if (*address == static_cast<T>(0) || *address > val) {
+            *address = val;
+        } else {
+            *address -= static_cast<T>(1);
+        }
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+template <typename T>
+T AtomicCasCPU(__gm__ T *address, T compare, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, compare, val]() {
+        if (!(*address > compare) && !(*address < compare)) {
+            *address = val;
+        }
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+template <typename T>
+T AtomicAndCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val, ret]() { *address = ret & val; });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+template <typename T>
+T AtomicOrCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val, ret]() { *address = ret | val; });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+template <typename T>
+T AtomicXorCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val, ret]() { *address = ret ^ val; });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+#define REGISTER_SIMT_ATOMIC_SUB(INTRI, TYPE)                                   \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicSubCPU<TYPE>(dst, val);                                    \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_SIMT_ATOMIC_SUB(atomicSub, uint32_t);
+REGISTER_SIMT_ATOMIC_SUB(atomicSub, int32_t);
+REGISTER_SIMT_ATOMIC_SUB(atomicSub, uint64_t);
+REGISTER_SIMT_ATOMIC_SUB(atomicSub, int64_t);
+REGISTER_SIMT_ATOMIC_SUB(atomicSub, float);
+#endif
+
+#define REGISTER_SIMT_ATOMIC_EXCH(INTRI, TYPE)                                  \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicExchCPU<TYPE>(dst, val);                                   \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_SIMT_ATOMIC_EXCH(atomicExch, int32_t);
+REGISTER_SIMT_ATOMIC_EXCH(atomicExch, int64_t);
+REGISTER_SIMT_ATOMIC_EXCH(atomicExch, float);
+#endif
+
+#define REGISTER_SIMT_ATOMIC_INC(INTRI, TYPE)                                   \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicIncCPU<TYPE>(dst, val);                                    \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_SIMT_ATOMIC_INC(atomicInc, uint32_t);
+REGISTER_SIMT_ATOMIC_INC(atomicInc, uint64_t);
+#endif
+
+#define REGISTER_SIMT_ATOMIC_DEC(INTRI, TYPE)                                   \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicDecCPU<TYPE>(dst, val);                                    \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_SIMT_ATOMIC_DEC(atomicDec, uint32_t);
+REGISTER_SIMT_ATOMIC_DEC(atomicDec, uint64_t);
+#endif
+
+#define REGISTER_SIMT_ATOMIC_CAS(INTRI, TYPE)                                   \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val1, TYPE val2)                          \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val1, (%s)val2);",                                 \
+            __func__, #TYPE, #TYPE, #TYPE);                                     \
+        return AtomicCasCPU<TYPE>(dst, val1, val2);                             \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_SIMT_ATOMIC_CAS(atomicCAS, int32_t);
+REGISTER_SIMT_ATOMIC_CAS(atomicCAS, int64_t);
+REGISTER_SIMT_ATOMIC_CAS(atomicCAS, float);
+#endif
+
+#define REGISTER_SIMT_ATOMIC_AND(INTRI, TYPE)                                   \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicAndCPU<TYPE>(dst, val);                                    \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_SIMT_ATOMIC_AND(atomicAnd, uint32_t);
+REGISTER_SIMT_ATOMIC_AND(atomicAnd, int32_t);
+REGISTER_SIMT_ATOMIC_AND(atomicAnd, uint64_t);
+REGISTER_SIMT_ATOMIC_AND(atomicAnd, int64_t);
+#endif
+
+#define REGISTER_SIMT_ATOMIC_OR(INTRI, TYPE)                                    \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicOrCPU<TYPE>(dst, val);                                     \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_SIMT_ATOMIC_OR(atomicOr, uint32_t);
+REGISTER_SIMT_ATOMIC_OR(atomicOr, int32_t);
+REGISTER_SIMT_ATOMIC_OR(atomicOr, uint64_t);
+REGISTER_SIMT_ATOMIC_OR(atomicOr, int64_t);
+#endif
+
+#define REGISTER_SIMT_ATOMIC_XOR(INTRI, TYPE)                                   \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicXorCPU<TYPE>(dst, val);                                    \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_SIMT_ATOMIC_XOR(atomicXOr, uint32_t);
+REGISTER_SIMT_ATOMIC_XOR(atomicXOr, int32_t);
+REGISTER_SIMT_ATOMIC_XOR(atomicXOr, uint64_t);
+REGISTER_SIMT_ATOMIC_XOR(atomicXOr, int64_t);
+#endif
+
+template <typename T>
+T AtomicAddVecCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        (*address).x += val.x;
+        (*address).y += val.y;
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+#define REGISTER_ATOMIC_ADD_VEC(INTRI, TYPE)                                    \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicAddVecCPU<TYPE>(dst, val);                                 \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_ATOMIC_ADD_VEC(atomicAdd, half2);
+REGISTER_ATOMIC_ADD_VEC(atomicAdd, bfloat16x2_t);
+#endif
+
+template <typename T>
+T AtomicSubVecCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        (*address).x -= val.x;
+        (*address).y -= val.y;
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+#define REGISTER_ATOMIC_SUB_VEC(INTRI, TYPE)                                    \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicSubVecCPU<TYPE>(dst, val);                                 \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_ATOMIC_SUB_VEC(atomicSub, half2);
+REGISTER_ATOMIC_SUB_VEC(atomicSub, bfloat16x2_t);
+#endif
+
+template <typename T>
+T AtomicExchVecCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        (*address).x = val.x;
+        (*address).y = val.y;
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+#define REGISTER_ATOMIC_EXCH_VEC(INTRI, TYPE)                                   \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicExchVecCPU<TYPE>(dst, val);                                \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_ATOMIC_EXCH_VEC(atomicExch, half2);
+REGISTER_ATOMIC_EXCH_VEC(atomicExch, bfloat16x2_t);
+#endif
+
+template <typename T>
+T AtomicMaxVecCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        if ((*address).x < val.x) {
+            (*address).x = val.x;
+        }
+        if ((*address).y < val.y) {
+            (*address).y = val.y;
+        }
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+#define REGISTER_ATOMIC_MAX_VEC(INTRI, TYPE)                                    \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicMaxVecCPU<TYPE>(dst, val);                                 \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_ATOMIC_MAX_VEC(atomicMax, half2);
+REGISTER_ATOMIC_MAX_VEC(atomicMax, bfloat16x2_t);
+#endif
+
+template <typename T>
+T AtomicMinVecCPU(__gm__ T *address, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        if ((*address).x > val.x) {
+            (*address).x = val.x;
+        }
+        if ((*address).y > val.y) {
+            (*address).y = val.y;
+        }
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+#define REGISTER_ATOMIC_MIN_VEC(INTRI, TYPE)                                    \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val)                                      \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val);",                                            \
+            __func__, #TYPE, #TYPE);                                            \
+        return AtomicMinVecCPU<TYPE>(dst, val);                                 \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_ATOMIC_MIN_VEC(atomicMin, half2);
+REGISTER_ATOMIC_MIN_VEC(atomicMin, bfloat16x2_t);
+#endif
+
+template <typename T>
+T AtomicCasVecCPU(__gm__ T *address, T compare, T val)
+{
+    T ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, compare, val]() {
+        if (!((*address).x > compare.x) && !((*address).x < compare.x)) {
+            (*address).x = val.x;
+        }
+        if (!((*address).y > compare.y) && !((*address).y < compare.y)) {
+            (*address).y = val.y;
+        }
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+#define REGISTER_SIMT_ATOMIC_CAS_VEC(INTRI, TYPE)                               \
+    TYPE INTRI(__gm__ TYPE *dst, TYPE val1, TYPE val2)                          \
+    {                                                                           \
+        ASCENDC_LOG(ASCENDC_LOG_DEBUG,                                          \
+            "%s((%s)dst, (%s)val1, (%s)val2);",                                 \
+            __func__, #TYPE, #TYPE, #TYPE);                                     \
+        return AtomicCasVecCPU<TYPE>(dst, val1, val2);                          \
+    }
+
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+REGISTER_SIMT_ATOMIC_CAS_VEC(atomicCAS, half2);
+REGISTER_SIMT_ATOMIC_CAS_VEC(atomicCAS, bfloat16x2_t);
+#endif
+
+} // namespace AscendC
+#endif
