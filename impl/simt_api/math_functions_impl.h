@@ -481,7 +481,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float remainderf(float x, float y)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float copysignf(float x, float y)
 {
-    return (y > 0) ? fabsf(x) : -fabsf(x);
+    return (y >= 0) ? fabsf(x) : -fabsf(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float nearbyintf(float x)
@@ -495,17 +495,26 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float nearbyintf(float x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float nextafterf(float x, float y)
 {
     uint32_t *f = reinterpret_cast<uint32_t *>(&x);
+    if (isnan(x) || isnan(y)) {
+        return ASCRT_NAN_F;
+    }
     if (x > 0) {
         if (x < y) {  // when x < src, x bit +1
             (*f)++;
         } else if (x > y) {  // when x > src, x bit -1
             (*f)--;
         }
-    } else {
+    } else if (x < 0){
         if (x > y) {
             (*f)++;
         } else if (x < y) {
             (*f)--;
+        }
+    } else if (x == 0){
+        if (y > 0) {
+            *f = 1;
+        } else if (y < 0) {
+            *f = 0x80000001;
         }
     }
     return x;
