@@ -16,6 +16,12 @@
 #include "simt_stub.h"
 #include "stub_def.h"
 #include "stub_fun.h"
+#include "asc_bf16_debug.cpp"
+#include "asc_fp16_debug.cpp"
+#include "device_atomic_functions_debug.cpp"
+#include "device_sync_functions_debug.cpp"
+#include "device_warp_functions_debug.cpp"
+#include "math_functions_debug.cpp"
 
 #include <cstdint>
 
