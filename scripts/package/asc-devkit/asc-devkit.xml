@@ -25,6 +25,9 @@
         <block name="EngineeringCommon"/>
         <block name="EngineeringFiles"/>
         <block name="DevlibCommon"/>
+    </block_info>
+
+    <block_info dependtree="false" dst_path="hccl" block_conf_path="ascend">
         <block name="HcclLib"/>
     </block_info>
 
