@@ -35,7 +35,7 @@ import tbe.common.context.op_context as op_context
 from tbe.common.repository_manager.utils.repository_manager_log import LOG_INSTANCE
 from .global_storage import global_var_storage
 from .ascendc_common_utility import CommonUtility
-from .generate_tiling_code import generate_pointer_directly_assess_data
+from .generate_tiling_code import generate_pointer_directly_assess_data, generate_static_pointer_v1_constexpr
 
 OpInfo = namedtuple('OpInfo', ['kernel_name', 'op_type', 'inputs', 'outputs', 'attrs', 'impl_mode', 'origin_inputs',\
                     'origin_outputs', 'param_type_dynamic', 'mc2_ctx', 'param_type_list', 'init_value_list',\
@@ -94,6 +94,7 @@ def load_op_host_tiling_lib():
         "/" + op_impl_path + f"/ai_core/tbe/op_host/"
     builtin_op_host_tiling_pattern = builtin_op_host_tiling_prefix + f"**/*.so"
     builtin_op_host_tiling_file_path = glob.glob(builtin_op_host_tiling_pattern, recursive=True)
+    builtin_op_host_tiling_file_path.sort(key=lambda x: os.path.basename(x) == "libophost_legacy.so")
     import platform
     archlinux = platform.machine()
     if 'x86' in archlinux:
@@ -592,25 +593,9 @@ def gen_micro_assign_value_of_tiling(tiling_struct: str, tiling_raw_data: str):
     return class_body, tiling_assign_str
 
 
-def gen_static_shape(tiling_def, tiling_raw_data, struct_tiling_def_base, all_dynamic_struct_def_except_self):
-    field_list: list = tiling_def.field_list
-    class_name_upper = tiling_def.class_name.upper()
-    class_body = f"#ifndef __{class_name_upper}_HEADER__\n"
-    class_body += f"#define __{class_name_upper}_HEADER__\n"
-    class_body += "#include \"kernel_tiling/kernel_tiling.h\"\n"
-    class_body += f"#ifdef ASCENDC_CPU_DEBUG\n"
-    class_body += f"#include \"kernel_log.h\"\n"
-    class_body += "#else\n"
-    class_body += "#ifndef __aicore__\n"
-    class_body += "#define __aicore__ [aicore]\n"
-    class_body += "#endif\n"
-    class_body += "#endif\n"
-    if not global_var_storage.get_variable("ascendc_tiling_no_register"):
-        class_body += "#define REGISTER_TILINGDATA_SIZE(tiling_struct, counter) \n\n"
-    # all tiling struct info by dynamic, except the only one top-level struct of static-shape one itself
-    class_body += all_dynamic_struct_def_except_self
+def gen_static_struct_body_v1(class_name, field_list, tiling_raw_data, struct_tiling_def_base):
     # the only one top-level struct of static-shape one itself
-    class_body += f"class {tiling_def.class_name}\n"
+    class_body = f"class {class_name}\n"
     class_body += "{\n"
     class_body += "public:\n"
     has_arr = False
@@ -629,11 +614,139 @@ def gen_static_shape(tiling_def, tiling_raw_data, struct_tiling_def_base, all_dy
             class_body += f"{field.struct_type} {field.name};\n"
 
     class_body += "};\n\n"
-    body, tiling_assign_str = gen_micro_assign_value_of_tiling(tiling_def.class_name, tiling_raw_data)
-    class_body += body
-    class_body += generate_pointer_directly_assess_data(False, True, tiling_assign_str)
-    class_body += f"#endif // __{class_name_upper}_HEADER__\n\n"
+    body, tiling_assign_str = gen_micro_assign_value_of_tiling(class_name, tiling_raw_data)
+    return class_body, body, tiling_assign_str
+
+
+def gen_micro_assign_value_of_tiling_force_constexpr(tiling_struct: str):
+    short_soc_version = get_soc_spec("SHORT_SOC_VERSION")
+    class_body = ""
+
+    if short_soc_version == "Ascend310P":
+        class_body += "#define GET_TILING_DATA(tiling_data, tiling_arg)                                           \\\n"
+        class_body += f"    static constexpr {tiling_struct} tiling_data;\n\n"
+
+        class_body += "#define GET_TILING_DATA_WITH_STRUCT(tiling_struct, tiling_data, tiling_arg)                \\\n"
+        class_body += f"    static constexpr tiling_struct tiling_data;\n\n"
+
+        class_body += "#define GET_TILING_DATA_MEMBER(tiling_type, member, var, tiling)                           \\\n"
+        class_body += "    static constexpr tiling_type __ascendc_point##var;                                     \\\n"
+        class_body += "    auto& var = __ascendc_point##var.member;\n\n"
+    else:
+        if global_var_storage.get_variable("ascendc_tiling_no_register"):
+            class_body += "#define GET_TILING_DATA(tiling_data, tiling_arg)                                         \n"
+        else:
+            class_body += \
+                f"#define GET_TILING_DATA(tiling_data, tiling_arg)                                           \\\n"
+            class_body += f"    static constexpr {tiling_struct} tiling_data;\n\n"
+
+        class_body += "#define GET_TILING_DATA_WITH_STRUCT(tiling_struct, tiling_data, tiling_arg)                \\\n"
+        class_body += "    REGISTER_TILINGDATA_SIZE(tiling_struct, __COUNTER__);                                  \\\n"
+        class_body += f"    static constexpr tiling_struct tiling_data;\n\n"
+
+        class_body += "#define GET_TILING_DATA_MEMBER(tiling_type, member, var, tiling)                            \\\n"
+        class_body += "    REGISTER_TILINGDATA_SIZE(tiling_type, __COUNTER__);                                  \\\n"
+        class_body += "    static constexpr tiling_type __ascendc_point##var;                                   \\\n"
+        class_body += "    auto& var = __ascendc_point##var.member;\n\n"
     return class_body
+
+
+def gen_static_struct_body_v1_force_constexpr(class_name, field_list, tiling_raw_data, struct_tiling_def_base):
+    tiling_size = len(tiling_raw_data)
+    tiling_format = {"tiling": [tiling_size, "uint8"]}
+
+    #decode tiling data without struct
+    tiling_data, _ = decode(tiling_raw_data, tiling_format)
+    tiling_arr_data = tiling_data["tiling"]
+    tiling_arr_data_str = ", ".join(f"{x}" for x in tiling_arr_data)
+
+    class_body = f"static constexpr uint8_t __ascendc_arr_tiling_data[{tiling_size}] = {{{tiling_arr_data_str}}};\n"
+
+    class_body += f"class {class_name}Aux\n"
+    class_body += "{\n"
+    class_body += "public:\n"
+    has_arr_aux = False
+    need_std_array = False
+    for field in field_list:
+        if field.class_type == 0:
+            class_body += f"    {field.dtype} {field.name};\n"
+        elif field.class_type == 1:
+            has_arr_aux = True
+            need_std_array = True
+            class_body += f"    std::array<{field.dtype}, {field.arr_size}> {field.name};\n"
+        elif field.class_type == 2:
+            has_arr_aux |= is_struct_have_arr(struct_tiling_def_base[field.struct_type],
+                has_arr_aux, struct_tiling_def_base)
+            # if struct is from api, add a namespace
+            if struct_tiling_def_base[field.struct_type].is_api:
+                class_body += f"{_TILING_NAMESPACE}::"
+            class_body += f"{field.struct_type} {field.name};\n"
+    class_body += "};\n\n"
+
+    class_body += f"static constexpr {class_name}Aux __ascendc_tiling_aux = "\
+                  f"convert_from_bytes<{class_name}Aux>(__ascendc_arr_tiling_data);\n"
+
+    # the only one top-level struct of static-shape one itself
+    class_body += f"class {class_name}\n"
+    class_body += "{\n"
+    class_body += "public:\n"
+    has_arr = False
+    for field in field_list:
+        if field.class_type == 0:
+            class_body += f"    static constexpr {field.dtype} {field.name} = __ascendc_tiling_aux.{field.name};\n"
+        elif field.class_type == 1:
+            has_arr = True
+            class_body += f"    static constexpr std::array<{field.dtype}, {field.arr_size}> {field.name} = "\
+                          f"__ascendc_tiling_aux.{field.name};\n"
+        elif field.class_type == 2:
+            has_arr |= is_struct_have_arr(struct_tiling_def_base[field.struct_type],
+                has_arr, struct_tiling_def_base)
+            # if struct is from api, add a namespace
+            class_body += f"static constexpr "
+            if struct_tiling_def_base[field.struct_type].is_api:
+                class_body += f"{_TILING_NAMESPACE}::"
+            class_body += f"{field.struct_type} {field.name} = __ascendc_tiling_aux.{field.name};\n"
+
+    class_body += "};\n\n"
+    body = gen_micro_assign_value_of_tiling_force_constexpr(class_name)
+    return class_body, body, need_std_array
+
+
+def gen_static_shape(tiling_def, tiling_raw_data, struct_tiling_def_base, \
+                     all_dynamic_struct_def_except_self, tiling_const_propagation: bool = False):
+    field_list: list = tiling_def.field_list
+    class_name_upper = tiling_def.class_name.upper()
+    class_body_header = f"#ifndef __{class_name_upper}_HEADER__\n"
+    class_body_header += f"#define __{class_name_upper}_HEADER__\n"
+    class_body = "#include \"kernel_tiling/kernel_tiling.h\"\n"
+    class_body += f"#ifdef ASCENDC_CPU_DEBUG\n"
+    class_body += f"#include \"kernel_log.h\"\n"
+    class_body += "#else\n"
+    class_body += "#ifndef __aicore__\n"
+    class_body += "#define __aicore__ [aicore]\n"
+    class_body += "#endif\n"
+    class_body += "#endif\n"
+    if not global_var_storage.get_variable("ascendc_tiling_no_register"):
+        class_body += "#define REGISTER_TILINGDATA_SIZE(tiling_struct, counter) \n\n"
+    # all tiling struct info by dynamic, except the only one top-level struct of static-shape one itself
+    class_body += all_dynamic_struct_def_except_self
+    # the only one top-level struct of static-shape one itself
+    if not tiling_const_propagation:
+        class_body_v1, body_v1, tiling_assign_str = gen_static_struct_body_v1(\
+            tiling_def.class_name, field_list, tiling_raw_data, struct_tiling_def_base)
+        class_body += class_body_v1
+        class_body += body_v1
+        class_body += generate_pointer_directly_assess_data(False, True, tiling_assign_str)
+    else:
+        class_body_v1_expr, body_v1_constexpr, need_std_array = gen_static_struct_body_v1_force_constexpr(\
+            tiling_def.class_name, field_list, tiling_raw_data, struct_tiling_def_base)
+        if need_std_array:
+            class_body_header += "#include <array>\n"
+        class_body += class_body_v1_expr
+        class_body += body_v1_constexpr
+        class_body += generate_static_pointer_v1_constexpr()
+    class_body_ender = f"#endif // __{class_name_upper}_HEADER__\n"
+    return (class_body_header + class_body + class_body_ender)
 
 
 def get_dynamic_cpu_assign_tiling_data(struct_tiling_def_base, field_list, left_value, offset=0):
@@ -869,6 +982,53 @@ def is_static_input_base_value_depend(input_ele, idx, value_depends: dict, param
     return True
 
 
+def _check_negative_shape(shapes):
+    for shape in shapes:
+        if shape < 0:
+            return True
+    return False
+
+
+def _check_single_element_shape(ele, idx, enable_vd, value_depends, param_types):
+    if _check_negative_shape(ele["shape"]):
+        return True
+    if enable_vd:
+        if not is_static_input_base_value_depend(ele, idx, value_depends, param_types):
+            return True
+    return False
+
+
+def _check_input_list_shape(input_list, idx, enable_vd, value_depends, param_types):
+    for single in input_list:
+        if _check_single_element_shape(single, idx, enable_vd, value_depends, param_types):
+            return True
+    return False
+
+
+def _check_inputs_shape(inputs, enable_vd, value_depends, param_types):
+    for idx, input_ele in enumerate(inputs):
+        if input_ele is None:
+            continue
+        if isinstance(input_ele, (list, tuple)):
+            if _check_input_list_shape(input_ele, idx, enable_vd, value_depends, param_types):
+                return True
+        else:
+            if _check_single_element_shape(input_ele, idx, enable_vd, value_depends, param_types):
+                return True
+    return False
+
+
+def _check_outputs_shape(outputs):
+    if outputs is None:
+        return False
+    for output_ele in outputs:
+        if output_ele is None:
+            continue
+        if _check_negative_shape(output_ele["shape"]):
+            return True
+    return False
+
+
 def is_static_shape(inputs: list, outputs: list, value_depends: dict = None, param_types: list = None, enable_vd=False):
     """check if static shape, find dynamic shape if shape<0 in inputs
 
@@ -881,33 +1041,11 @@ def is_static_shape(inputs: list, outputs: list, value_depends: dict = None, par
     """
     if not inputs and not outputs:
         mode = op_context.get_op_mode()
-        return False if mode == "dynamic" else True
-    for idx, input_ele in enumerate(inputs):
-        if input_ele is None:
-            continue
-        if isinstance(input_ele, (list, tuple)):
-            for single in input_ele:
-                for shape in single["shape"]:
-                    if shape < 0:
-                        return False
-                if enable_vd:
-                    if is_static_input_base_value_depend(single, idx, value_depends, param_types) == False:
-                        return False
-        else:
-            for shape in input_ele["shape"]:
-                if shape < 0:
-                    return False
-            if enable_vd:
-                if is_static_input_base_value_depend(input_ele, idx, value_depends, param_types) == False:
-                    return False
-
-    if outputs is not None:
-        for output_ele in outputs:
-            if output_ele is None:
-                continue
-            for shape in output_ele["shape"]:
-                if shape < 0:
-                    return False
+        return mode != "dynamic"
+    if _check_inputs_shape(inputs, enable_vd, value_depends, param_types):
+        return False
+    if _check_outputs_shape(outputs):
+        return False
     return True
 
 
@@ -1169,7 +1307,7 @@ def get_tiling_copy_func_and_micro(class_name):
     class_body += get_tiling_data_func()
 
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-    if short_soc_version in ["Ascend950", "mc62cm12a"]:
+    if short_soc_version in ["Ascend950", "MC62CM12A", "MC32DM11A"]:
         # use __AUX__ to create a new struct to reduce running time. __AUX__ name does not matter
         # original: initialize, then write value    use __AUX__: write value, then interpret_cast to needed struct
         class_body += _get_tiling_data_without_time_stamp(class_name)
@@ -1431,7 +1569,8 @@ def get_tiling_info_isolate(op_info: OpInfo, input_tiling_info_dict: dict):
             "kernel_meta_path": kernel_meta_path,
             "tiling_key_list": input_tiling_info_dict["tiling_key_list"],
             "tiling_key_group_map": input_tiling_info_dict["tiling_key_group_map"],
-            "is_static_shape": False
+            "is_static_shape": False,
+            "tiling_const_propagation": global_var_storage.get_variable("ascendc_tiling_const_propagation")
         }
         is_static_flag = is_static_shape(op_info.origin_inputs, op_info.outputs, \
             input_tiling_info_dict["value_depends"], op_info.param_type_list, \
@@ -1597,7 +1736,8 @@ def get_static_run_info(op_info, context):
         op_info.origin_outputs, None, None, op_info.attrs)
 
 
-def generate_static_tiling_struct_file(optype, run_info, tiling_info, tiling_key_list, tiling_key_group_map):
+def generate_static_tiling_struct_file(optype, run_info, tiling_info, tiling_key_list, tiling_key_group_map, \
+                                       tiling_const_propagation: bool = False):
     # bytes.fromhex(run_info["tiling_data"]) can deserialization DumpBytesBuffer
     # save undecoded tiling data for replay
     tiling_info.tiling_data = run_info["tiling_data"]
@@ -1633,8 +1773,8 @@ def generate_static_tiling_struct_file(optype, run_info, tiling_info, tiling_key
     # all tiling struct info by dynamic, except the only one top-level struct of static-shape one itself
     all_dynamic_struct_def_except_self = gen_all_dynamic_struct_def_except_self(\
         is_optype_self, str(tiling_info.tiling_key), tiling_key_list, optype, tiling_key_group_map)
-    tiling_info.file_content = gen_static_shape(\
-        tiling_def, run_info["tiling_data"], struct_tiling_def_base, all_dynamic_struct_def_except_self)
+    tiling_info.file_content = gen_static_shape(tiling_def, run_info["tiling_data"], struct_tiling_def_base, \
+                                                all_dynamic_struct_def_except_self, tiling_const_propagation)
     tiling_info.tiling_data_size = tiling_def.data_size
     total_workspace_size = sum(run_info["workspaces"])
     tiling_info.static_workspace_size = total_workspace_size
@@ -1672,7 +1812,9 @@ def process_tiling_info(op_info: OpInfo, tiling_key_list: list = None, value_dep
     context = get_context()
     if static_shape:
         run_info = get_static_run_info(op_info, context)
-        generate_static_tiling_struct_file(optype, run_info, tiling_info, tiling_key_list, tiling_key_group_map)
+        tiling_const_propagation = global_var_storage.get_variable("ascendc_tiling_const_propagation")
+        generate_static_tiling_struct_file(\
+            optype, run_info, tiling_info, tiling_key_list, tiling_key_group_map, tiling_const_propagation)
         static_post_process_of_workspace(context, run_info, tiling_info.static_workspace_size)
     else:
         tiling_info.static_shape_flag = False

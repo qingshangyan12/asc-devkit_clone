@@ -13,7 +13,6 @@
  * \brief
  */
 
-
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_XOR_H__
@@ -24,7 +23,7 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
-#include "../../../impl/adv_api/detail/math/logical_xor/logical_xor_c310_impl.h"
+#include "../../../impl/adv_api/detail/math/logical_xor/logical_xor_3510_impl.h"
 
 namespace AscendC {
 #pragma begin_pipe(V)

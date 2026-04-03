@@ -52,6 +52,8 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllToAll(__
     xnData_[4] = strideSize;
     xnData_[5] = 0;
     xnData_[6] = strideSize * ccuParam_.rankId;
+    uint64_t loopCount = 8;
+    CalcGoSize(sliceSizeAlltoall, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[7]);
     return;
 }
  
@@ -64,15 +66,12 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllToAllVWr
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
  
-    uint64_t tmpCount = commParam->count / ccuParam_.rankNum;
-    uint64_t loopCount = CCU_LOOP_COUNT;
+    uint64_t loopCount = CCU_LOOP_COUNT_ATAVW;
  
     xnData_[1] = reinterpret_cast<uint64_t>(commParam->sendBuf); // 1 is index of xnData
     xnData_[2] = commParam->wParamExt.sendSizes; // 2 is index of xnData
     xnData_[8] = commParam->wParamExt.remoteWinOffset; // 8 is index of xnData
     uint64_t sliceSize = commParam->count;
-    loopCount = CCU_LOOP_COUNT_ATAVW;
- 
  
     uint64_t loopSize = loopCount * CCU_MEMSLICE_SIZE;
     uint64_t m = sliceSize / loopSize;

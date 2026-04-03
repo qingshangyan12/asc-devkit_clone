@@ -11,28 +11,28 @@
 #ifndef IMPL_SIMT_API_CPP_KERNEL_SIMT_CMP_INTERFACE_IMPL_H
 #define IMPL_SIMT_API_CPP_KERNEL_SIMT_CMP_INTERFACE_IMPL_H
 
-#include "impl/simt_api/cpp/dav_c310/kernel_simt_cmp_impl.h"
+#include "impl/simt_api/cpp/dav_3510/kernel_simt_cmp_impl.h"
 
 namespace AscendC {
 namespace Simt {
 template <typename T>
-__aicore__ inline bool IsFinite(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool IsFinite(T x)
 {
-    static_assert(SupportType<T, half, float>(), "Input type T only supports half, float.");
+    static_assert(SupportTypeSimtInternel<T, half, float>, "Input type T only supports half, float.");
     return IsFiniteImpl(x);
 }
 
 template <typename T>
-__aicore__ inline bool IsNan(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool IsNan(T x)
 {
-    static_assert(SupportType<T, half, float>(), "Input type T only supports half, float.");
+    static_assert(SupportTypeSimtInternel<T, half, float>, "Input type T only supports half, float.");
     return IsNanImpl(x);
 }
 
 template <typename T>
-__aicore__ inline bool IsInf(T x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool IsInf(T x)
 {
-    static_assert(SupportType<T, half, float>(), "Input type T only supports half, float.");
+    static_assert(SupportTypeSimtInternel<T, half, float>, "Input type T only supports half, float.");
     return IsInfImpl(x);
 }
 

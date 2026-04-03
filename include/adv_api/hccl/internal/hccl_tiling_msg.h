@@ -12,12 +12,6 @@
  * \file hccl_tiling_msg.h
  * \brief
  */
-
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_TILING_MSG_H__
-#endif
-
 #ifndef IMPL_HCCL_HCCL_TILING_MSG_H
 #define IMPL_HCCL_HCCL_TILING_MSG_H
 
@@ -53,12 +47,8 @@ struct Mc2CcTilingInner {
     char algConfig[ALG_CONFIG_SIZE];
     uint32_t opType;
     uint32_t reduceType;
+    char reserved2[232];
 };
 } // namespace AscendC
 
 #endif // IMPL_HCCL_HCCL_TILING_MSG_H
-
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_TILING_MSG_H__)
-#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_TILING_MSG_H__
-#endif

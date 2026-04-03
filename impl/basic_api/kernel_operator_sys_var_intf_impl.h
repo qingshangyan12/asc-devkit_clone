@@ -34,7 +34,7 @@
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_sys_var_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_c310/kernel_operator_sys_var_impl.h"
+#include "dav_3510/kernel_operator_sys_var_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_sys_var_impl.h"
 #elif __NPU_ARCH__ == 3003
@@ -48,6 +48,28 @@
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_dynamic_block_num;
 #endif
 #endif
+
+namespace sk {
+// transmit block local variable information in SK "sub-kernel"
+struct SkSystemArgs {
+    uint16_t skBlockIdx;    // sub-kernel block idx
+    uint16_t skNumBlocks;    // sub-kernel block num
+    uint16_t skTaskSyncCfg; // sync type for "early-start"
+    uint8_t reserve[10];
+    inline __aicore__ uint16_t SkGetBlockIdx() {
+        return skBlockIdx;
+    }
+    inline __aicore__ uint16_t SkGetNumBlocks() {
+        return skNumBlocks;
+    }
+    inline __aicore__ uint16_t SkGetTaskSyncCfg() {
+        return skTaskSyncCfg;
+    }
+    inline __aicore__ void SkSetTaskSyncCfg(uint16_t config) {
+        skTaskSyncCfg = config;
+    }
+};
+}
 
 namespace AscendC {
 
