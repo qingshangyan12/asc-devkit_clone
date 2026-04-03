@@ -42,22 +42,8 @@ def verify_result_float(output, golden):
     return compare_data(output_data, golden_data)
 
 
-def verify_result_int16(output, golden):
-    """验证场景3: int16_t类型"""
-    output_type = np.int16
-    
-    output_data = np.fromfile(output, dtype=output_type)
-    golden_data = np.fromfile(golden, dtype=output_type)
-    
-    # 整型使用精确比较
-    different_count = np.sum(output_data != golden_data)
-    error_ratio = float(different_count) / golden_data.size
-    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, ERROR_TOL))
-    return error_ratio <= ERROR_TOL
-
-
 def verify_result_int8(output, golden):
-    """验证场景4: int8_t类型"""
+    """验证场景3: int8_t类型"""
     output_type = np.int8
     
     output_data = np.fromfile(output, dtype=output_type)
@@ -68,6 +54,16 @@ def verify_result_int8(output, golden):
     error_ratio = float(different_count) / golden_data.size
     print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, ERROR_TOL))
     return error_ratio <= ERROR_TOL
+
+
+def verify_result_nchw2nc1hwc0(output, golden):
+    """验证场景4: NCHW → NC1HWC0 格式转换"""
+    output_type = np.float16
+    
+    output_data = np.fromfile(output, dtype=output_type)
+    golden_data = np.fromfile(golden, dtype=output_type)
+    
+    return compare_data(output_data, golden_data)
 
 
 def compare_data(output, golden):
@@ -97,9 +93,9 @@ def verify_result(scenarioNum, output, golden):
     elif scenarioNum == 2:
         return verify_result_float(output, golden)
     elif scenarioNum == 3:
-        return verify_result_int16(output, golden)
-    elif scenarioNum == 4:
         return verify_result_int8(output, golden)
+    elif scenarioNum == 4:
+        return verify_result_nchw2nc1hwc0(output, golden)
     else:
         raise ValueError(f"Unsupported scenario: {scenarioNum}")
 
@@ -107,7 +103,7 @@ def verify_result(scenarioNum, output, golden):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 5),
-                        help='Scenario number: 1=half, 2=float, 3=int16, 4=int8')
+                        help='Scenario number: 1=half, 2=float, 3=int8, 4=NCHW2NC1HWC0')
     parser.add_argument('output', type=str, help='Output file path')
     parser.add_argument('golden', type=str, help='Golden file path')
     args = parser.parse_args()

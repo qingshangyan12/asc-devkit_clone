@@ -39,19 +39,23 @@
 - 输出shape：[128]
 - 数据类型：float
 
-### 场景3: int16_t类型数据转换
-
-- 算子功能：将数据进行5HD格式转换
-- 输入shape：[256]（16块 × 16元素/块）
-- 输出shape：[256]
-- 数据类型：int16_t
-
-### 场景4: int8_t类型数据转换
+### 场景3: int8_t类型数据转换
 
 - 算子功能：将数据进行5HD格式转换
 - 输入shape：[512]（16块 × 32元素/块）
 - 输出shape：[512]
 - 数据类型：int8_t
+- 特殊说明：b8类型需要两次scatter完成完整转置
+  - 第一次: srcHighHalf=false, dstHighHalf=false (处理前半部分)
+  - 第二次: srcHighHalf=true, dstHighHalf=true (处理后半部分)
+
+### 场景4: NCHW → NC1HWC0 格式转换
+
+- 算子功能：将NCHW格式数据转换为NC1HWC0格式
+- 输入shape：[N=2, C=32, H=16, W=16]
+- 输出shape：[N=2, C1=2, H=16, W=16, C0=16]
+- 数据类型：half
+- 转换公式：NC1HWC0[n, c1, h, w, c0] = NCHW[n, c1*C0 + c0, h, w]
 
 ## 算子实现
 
@@ -101,24 +105,24 @@ python3 ../scripts/gen_data.py -scenarioNum 2 -size 128
 python3 ../scripts/verify_result.py -scenarioNum 2 output/output.bin output/golden.bin
 ```
 
-### 场景3: int16_t类型数据转换
+### 场景3: int8_t类型数据转换
 
 ```bash
 mkdir -p build && cd build
-cmake -DSCENARIO_NUM=3 -DSIZE=256 ..
+cmake -DSCENARIO_NUM=3 -DSIZE=512 ..
 make -j
-python3 ../scripts/gen_data.py -scenarioNum 3 -size 256
+python3 ../scripts/gen_data.py -scenarioNum 3 -size 512
 ./demo
 python3 ../scripts/verify_result.py -scenarioNum 3 output/output.bin output/golden.bin
 ```
 
-### 场景4: int8_t类型数据转换
+### 场景4: NCHW → NC1HWC0 格式转换
 
 ```bash
 mkdir -p build && cd build
-cmake -DSCENARIO_NUM=4 -DSIZE=512 ..
+cmake -DSCENARIO_NUM=4 -DSIZE=16384 ..
 make -j
-python3 ../scripts/gen_data.py -scenarioNum 4 -size 512
+python3 ../scripts/gen_data.py -scenarioNum 4 -size 16384
 ./demo
 python3 ../scripts/verify_result.py -scenarioNum 4 output/output.bin output/golden.bin
 ```
