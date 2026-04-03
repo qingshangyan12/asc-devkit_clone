@@ -22,8 +22,6 @@
 | [duplicate](./duplicate) | 本样例基于Duplicate实现数据填充，可用于将一个变量或立即数复制多次并填充到向量中 |
 | [gather](./gather)         | 本样例基于Gather实现对于给定的输入张量和一个地址偏移量，根据偏移地址将输入张量按元素收集到结果张量中 |
 | [gatherb](./gatherb) | 本样例基于Gatherb实现对于给定的输入张量和一个地址偏移量，根据偏移地址按照DataBlock的粒度将输入张量按元素收集到结果张量中     |
-| [get_reduce_repeat_max_min_spr](./get_reduce_repeat_max_min_spr)                                                               | 本样例介绍基础api GetReduceRepeatMaxMinSpr的调用，GetReduceRepeatMaxMinSpr的功能是获取ReduceMax、ReduceMin连续场景下的最大/最小值以及相应的索引值            |
-| [pair_reduce_sum](./pair_reduce_sum)                                                                                           | 本样例基于PairReduceSum实现求和归约，可用于相邻两个（奇数下标和偶数下标）元素求和                  |
 | [mrg_sort](./mrg_sort) | 本样例基于Sort32和MrgSort基础API实现将已排好序的最多4条队列，合并成1条队列，结果按照score域由大到小排序 |
 | [mrg_sort4](./mrg_sort4) | 本样例介绍基础api MrgSort4的调用，该api的功能：将已经排好序的最多4条Region Proposals队列，排列合并成1条队列，结果按照score域由大到小排序 |
 | [proposal_concat](./proposal_concat) | 本样例介绍基础api ProposalConcat的调用，该api的功能：将连续元素合入Region Proposal内对应位置，每次迭代会将16个连续元素合入到16个Region Proposal的对应位置里 |
@@ -35,7 +33,4 @@
 | [trans_data_to_5hd](./trans_data_to_5hd) | 本样例基于TransDataTo5HD实现数据格式转换，可用于NCHW格式转换成NC1HWC0格式，特别的也可以用于二维矩阵数据块的转置 |
 | [transpose_common](./transpose_common) | 本样例基于Transpose实现普通转置，适用于对16*16的二维矩阵数据块进行转置 |
 | [transpose_enhanced](./transpose_enhanced) | 本样例基于Transpose实现增强转置，适用于对16*16的二维矩阵数据块进行转置，也可用于[N,C,H,W]与[N,H,W,C]互相转换 |
-| [whole_reduce_max](./whole_reduce_max)                                                                               | 本样例基于WholeReduceMax实现最大值归约，可用于对每个repeat内所有数据求最大值以及其索引index，返回的索引值为每个repeat内部索引                  |
-| [whole_reduce_min](./whole_reduce_min)                                                                               | 本样例基于WholeReduceMin实现获得每个repeat内所有数据的最小值及其索引index的功能，返回的索引值为每个repeat内部索引                  |
-| [whole_reduce_sum](./whole_reduce_sum)                                                                               | 本样例基于WholeReduceSum实现对每个repeat内所有数据求和的功能                    |
-| [whole_reduce_sum_unalign](./whole_reduce_sum_unalign/) |本样例介绍非对齐WholeReduceSum算子的核函数直调方法，采用核函数<<<>>>调用，有效降低调度开销，实现高效的算子执行 |
+| [whole_reduce_min_max_sum](./whole_reduce_min_max_sum)                                                                               | 本样例介绍归约类接口在多种场景下的使用方法，包括WholeReduceMax、WholeReduceMin、WholeReduceSum、RepeatReduceSum，以及WholeReduceMax/Min配合GetReduceRepeatMaxMinSpr获取全局极值及索引的使用方法。                  |
