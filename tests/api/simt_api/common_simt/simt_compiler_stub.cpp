@@ -17,10 +17,10 @@
 
 int32_t asc_get_block_idx()
 {
-    return block_idx;
+    return 0;
 }
 
 int32_t asc_get_block_num()
 {
-    return block_num;
+    return 1;
 }
