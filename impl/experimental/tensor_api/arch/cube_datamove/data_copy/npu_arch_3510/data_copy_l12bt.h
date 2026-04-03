@@ -62,7 +62,7 @@ private:
 
         bool convControl = false;
 
-        if (Std::is_same_v<srcType, __cbuf__ half> && Std::is_same_v<dstType, __biasbuf__ float>) {
+        if (is_one_of_attr_v<srcType, __cbuf__ half> && is_one_of_attr_v<dstType, __biasbuf__ float>) {
             convControl = true;
         }
         uint16_t blockCount = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
