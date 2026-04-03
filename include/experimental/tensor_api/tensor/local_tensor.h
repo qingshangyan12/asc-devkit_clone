@@ -21,7 +21,6 @@
 #ifndef INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 #define INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 
-#include "experimental/tensor_api/utils/cache.h"
 #include "impl/experimental/tensor_api/tensor/tuple_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
 

@@ -45,46 +45,6 @@ __aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride);
 template <typename T>
 __aicore__ inline constexpr auto MakeLayout(const T& shape);
 
-template <size_t... Is, typename LayoutType>
-__aicore__ inline constexpr auto Rank(const LayoutType& layout);
-
-template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
-__aicore__ inline constexpr auto GetShape(const LayoutType& layout);
-
-template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
-__aicore__ inline constexpr auto GetShape(LayoutType& layout);
-
-template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
-__aicore__ inline constexpr auto GetStride(const LayoutType& layout);
-
-template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
-__aicore__ inline constexpr auto GetStride(LayoutType& layout);
-
-template <size_t... Is, typename LayoutType>
-__aicore__ inline constexpr auto Select(const LayoutType& layout);
-
-template <size_t... Is, typename LayoutType>
-__aicore__ inline constexpr auto Get(const LayoutType& layout);
-
-template <size_t... Is, typename LayoutType>
-__aicore__ inline constexpr auto Size(const LayoutType& layout);
-
-template <size_t... Is, typename LayoutType>
-__aicore__ inline constexpr auto Capacity(const LayoutType& layout);
-
-template <size_t... Is, typename LayoutType>
-__aicore__ inline constexpr auto Coshape(const LayoutType& layout);
-
-template <size_t... Is, typename LayoutType>
-__aicore__ inline constexpr auto Cosize(const LayoutType& layout);
-
-template <typename T, typename LayoutType>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout);
-
 template <typename T, typename U, typename S>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
 
