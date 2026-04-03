@@ -481,7 +481,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float remainderf(float x, float y)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float copysignf(float x, float y)
 {
-    return (y > 0) ? fabsf(x) : -fabsf(x);
+    return (y > 0 || y == 0) ? fabsf(x) : -fabsf(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float nearbyintf(float x)
