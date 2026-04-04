@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file hccl_aicpu.h
@@ -17,25 +17,25 @@
 
 #include "../../common/hccl_aicpu_impl.h"
 
-namespace AscendC  {
-template<const auto &config>
+namespace AscendC {
+template <const auto& config>
 template <bool commit>
 __aicore__ inline HcclHandle
 HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::BatchWrite(GM_ADDR batchWriteInfo, uint32_t itemNum,
         uint16_t queueID)
 {
-    return CommonPrepareImpl<true>({HcclCMDType::HCCL_CMD_BATCH_WRITE, batchWriteInfo, batchWriteInfo, itemNum,
-                                    static_cast<HcclDataType>(queueID), static_cast<HcclDataType>(queueID),
-                                    static_cast<HcclReduceOp>(queueID + GetBlockIdx() * queueNum_)});
+    return CommonPrepareImpl<true>(
+        {HcclCMDType::HCCL_CMD_BATCH_WRITE, batchWriteInfo, batchWriteInfo, itemNum, static_cast<HcclDataType>(queueID),
+         static_cast<HcclDataType>(queueID), static_cast<HcclReduceOp>(queueID + GetBlockIdx() * queueNum_)});
 }
 
-template<const auto &config>
+template <const auto& config>
 template <bool commit>
-__aicore__ inline HcclHandle
-HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::AlltoAllvWrite(GM_ADDR usrIn, GM_ADDR sendOffsets,
-        GM_ADDR sendSizes, uint64_t remoteWinOffset, uint64_t localDataSize)
+__aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::AlltoAllvWrite(
+    GM_ADDR usrIn, GM_ADDR sendOffsets, GM_ADDR sendSizes, uint64_t remoteWinOffset, uint64_t localDataSize)
 {
-    CommonPrepareParam commonPrepareParam = {HcclCMDType::HCCL_CMD_HALF_ALLTOALLV,
+    CommonPrepareParam commonPrepareParam = {
+        HcclCMDType::HCCL_CMD_HALF_ALLTOALLV,
         usrIn,
         usrIn,
         localDataSize,
@@ -45,8 +45,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::AlltoAllvWrite(GM_ADDR
         0,
         1,
         {},
-        {reinterpret_cast<uint64_t>(sendOffsets), reinterpret_cast<uint64_t>(sendSizes), remoteWinOffset}
-    };
+        {reinterpret_cast<uint64_t>(sendOffsets), reinterpret_cast<uint64_t>(sendSizes), remoteWinOffset}};
 
     return CommonPrepareImpl<commit>(commonPrepareParam);
 }
@@ -55,29 +54,31 @@ template<const auto &config>
 __aicore__ inline void
 HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::InterHcclGroupSync(int8_t srcGroupID, HcclHandle srcHandleID)
 {
-    ASCENDC_HCCL_API_ASSERT(curVersion_ != HcclTilingVersion::INVALID_TILING_VERSION, { return; },
-                            "Call InterHcclGroupSync failed, ensure Hccl::Init func has been called successfully!");
+    ASCENDC_HCCL_API_ASSERT(
+        curVersion_ != HcclTilingVersion::INVALID_TILING_VERSION, { return; },
+        "Call InterHcclGroupSync failed, ensure Hccl::Init func has been called successfully!");
     CommonPrepareParam param;
     param.commType.msgType = ControlMsgType::HCCL_CMD_INTER_GROUP_SYNC;
     SendMsgToServer(0U, param, srcGroupID, srcHandleID);
     ++(curMsgPosition_[0U]);
-    ASCENDC_HCCL_API_ASSERT(curMsgPosition_[0U] < HCCL_MSG_CNT, {return; },
-                            "Message amount exceeds the maximum value when sync group.");
+    ASCENDC_HCCL_API_ASSERT(
+        curMsgPosition_[0U] < HCCL_MSG_CNT, { return; }, "Message amount exceeds the maximum value when sync group.");
     if (workingFlag_) {
         UpdateControlMsgCount(hcclMsgArea_, ControlMsgType::HCCL_CMD_INTER_GROUP_SYNC);
     }
 }
 
-template<const auto &config>
+template <const auto& config>
 __aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetWindowsInAddr(uint32_t rankId)
 {
     if (curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION) {
         return 0UL;
     }
-    ASCENDC_HCCL_API_ASSERT(rankId < GetRankDim(), { return nullptr; },
-                            "GetWindowsInAddr failed, rankId[%u], expected less than[%u]", rankId, GetRankDim());
+    ASCENDC_HCCL_API_ASSERT(
+        rankId < GetRankDim(), { return nullptr; }, "GetWindowsInAddr failed, rankId[%u], expected less than[%u]",
+        rankId, GetRankDim());
     if (devType_ != HCCL_ASCEND910B) {
-        __gm__ HcclContextDef::HcclOpResParam *hcclContext = (__gm__ HcclContextDef::HcclOpResParam *)hcclContext_;
+        __gm__ HcclContextDef::HcclOpResParam* hcclContext = (__gm__ HcclContextDef::HcclOpResParam*)hcclContext_;
         if (rankId == hcclContext->rankId) {
             return reinterpret_cast<GM_ADDR>(hcclContext->localWindowsIn);
         } else {
@@ -97,16 +98,17 @@ __aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
     }
 }
 
-template<const auto &config>
+template <const auto& config>
 __aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetWindowsOutAddr(uint32_t rankId)
 {
     if (curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION) {
         return 0UL;
     }
-    ASCENDC_HCCL_API_ASSERT(rankId < GetRankDim(), { return nullptr; },
-                            "GetWindowsOutAddr failed, rankId[%u], expected less than[%u]", rankId, GetRankDim());
+    ASCENDC_HCCL_API_ASSERT(
+        rankId < GetRankDim(), { return nullptr; }, "GetWindowsOutAddr failed, rankId[%u], expected less than[%u]",
+        rankId, GetRankDim());
     if (devType_ != HCCL_ASCEND910B) {
-        __gm__ HcclContextDef::HcclOpResParam *hcclContext = (__gm__ HcclContextDef::HcclOpResParam *)hcclContext_;
+        __gm__ HcclContextDef::HcclOpResParam* hcclContext = (__gm__ HcclContextDef::HcclOpResParam*)hcclContext_;
         if (rankId == hcclContext->rankId) {
             return reinterpret_cast<GM_ADDR>(hcclContext->localWindowsOut);
         } else {
@@ -133,7 +135,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::Init(GM_ADDR context, 
     HcclTilingVersion version;
     if (initTiling != nullptr) {
         version = HcclTilingVersion::NEW_TILING_VERSION;
-        auto initTilingPtr = static_cast<__gm__ Mc2InitTilingInner *>(initTiling);
+        auto initTilingPtr = static_cast<__gm__ Mc2InitTilingInner*>(initTiling);
         debugMode_ = initTilingPtr->debugMode;
         queueNum_ = initTilingPtr->queueNum;
         devType_ = initTilingPtr->devType;
@@ -144,9 +146,9 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::Init(GM_ADDR context, 
     InitInner(context, version);
 }
 
-template <const auto &config>
-__aicore__ inline void
-HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::InitV2(GM_ADDR context, const void *initTiling)
+template <const auto& config>
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::InitV2(
+    GM_ADDR context, const void* initTiling)
 {
     ASCENDC_HCCL_API_ASSERT(initTiling != nullptr, { return HCCL_FAILED; },
                             "Call InitV2 failed, ensure initTiling is not nullptr!");
@@ -158,31 +160,35 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::InitV2(GM_ADDR context
     tilingBaseAddr_ = reinterpret_cast<uint64_t>(initTiling);
 }
 
-template<const auto &config>
-__aicore__ inline int32_t
-HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SetCcTiling(__gm__ void *ccOpTilingData)
+template <const auto& config>
+__aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SetCcTiling(
+    __gm__ void* ccOpTilingData)
 {
-    ASCENDC_HCCL_API_ASSERT(curVersion_ == HcclTilingVersion::NEW_TILING_VERSION, { return HCCL_FAILED; },
-                            "Call SetCcTiling failed, ensure Hccl::InitV1 func has been called successfully!");
-    ASCENDC_HCCL_API_ASSERT(ccOpTilingData != nullptr, { return HCCL_FAILED; },
-                            "Call SetCcTiling failed, ensure ccOpTilingData is not nullptr");
-    const uint32_t opType = (static_cast<__gm__ Mc2CcTilingInner *>(ccOpTilingData))->opType;
-    ASCENDC_HCCL_API_ASSERT(opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL),
-                            { return HCCL_FAILED; }, "Call SetCcTiling failed, ensure cmdType is valid");
+    ASCENDC_HCCL_API_ASSERT(
+        curVersion_ == HcclTilingVersion::NEW_TILING_VERSION, { return HCCL_FAILED; },
+        "Call SetCcTiling failed, ensure Hccl::InitV1 func has been called successfully!");
+    ASCENDC_HCCL_API_ASSERT(
+        ccOpTilingData != nullptr, { return HCCL_FAILED; },
+        "Call SetCcTiling failed, ensure ccOpTilingData is not nullptr");
+    const uint32_t opType = (static_cast<__gm__ Mc2CcTilingInner*>(ccOpTilingData))->opType;
+    ASCENDC_HCCL_API_ASSERT(
+        opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
+        "Call SetCcTiling failed, ensure cmdType is valid");
     KERNEL_LOG(KERNEL_INFO, "CmdType = %d, ccOpTilingData = %lu ", opType, reinterpret_cast<uint64_t>(ccOpTilingData));
     ccOpTilingDataTable_[opType] = reinterpret_cast<uint64_t>(ccOpTilingData);
     return HCCL_SUCCESS;
 }
 
-template <const auto &config>
+template <const auto& config>
 __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SetCcTilingV2(uint64_t offset)
 {
-    ASCENDC_HCCL_API_ASSERT(curVersion_ == HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION,
-                            { return HCCL_FAILED; },
-                            "Call SetCcTiling failed, ensure Hccl::InitV2 func has been called successfully!");
-    const uint32_t opType = (reinterpret_cast<Mc2CcTilingInner *>(tilingBaseAddr_ + offset))->opType;
-    ASCENDC_HCCL_API_ASSERT(opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL),
-                            { return HCCL_FAILED; }, "Call SetCcTiling failed, ensure cmdType is valid");
+    ASCENDC_HCCL_API_ASSERT(
+        curVersion_ == HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION, { return HCCL_FAILED; },
+        "Call SetCcTiling failed, ensure Hccl::InitV2 func has been called successfully!");
+    const uint32_t opType = (reinterpret_cast<Mc2CcTilingInner*>(tilingBaseAddr_ + offset))->opType;
+    ASCENDC_HCCL_API_ASSERT(
+        opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
+        "Call SetCcTiling failed, ensure cmdType is valid");
     ccOpTilingDataTable_[opType] = offset;
     return HCCL_SUCCESS;
 }
@@ -195,7 +201,7 @@ __aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, conf
     return hcclContext_->rankNum;
 }
 
-template<const auto &config>
+template <const auto& config>
 template <ScopeType type>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::QueueBarrier(uint16_t queueID)
 {
@@ -203,31 +209,33 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     param.commType.msgType = ControlMsgType::HCCL_CMD_BARRIER;
     SendMsgToServer(queueID, param);
     ++(curMsgPosition_[queueID]);
-    ASCENDC_HCCL_API_ASSERT(curMsgPosition_[queueID] < HCCL_MSG_CNT, { return; },
-                            "Message amount exceeds the maximum value when barrier.");
+    ASCENDC_HCCL_API_ASSERT(
+        curMsgPosition_[queueID] < HCCL_MSG_CNT, { return; }, "Message amount exceeds the maximum value when barrier.");
     if (workingFlag_) {
         UpdateControlMsgCount(hcclMsgArea_, ControlMsgType::HCCL_CMD_BARRIER);
     }
 }
 
-template<const auto &config>
+template <const auto& config>
 template <bool sync>
-__aicore__ inline int32_t
-HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::Iterate(HcclHandle handleId,
-        uint16_t *seqSlices, uint16_t seqSliceLen)
+__aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::Iterate(
+    HcclHandle handleId, uint16_t* seqSlices, uint16_t seqSliceLen)
 {
-    ASCENDC_HCCL_API_ASSERT(curVersion_ == HcclTilingVersion::NEW_TILING_VERSION ||
-                            curVersion_ == HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION,
-                            { return HCCL_FAILED; }, "Initialization has not been done properly.");
-    ASCENDC_HCCL_API_ASSERT(seqSlices != nullptr && seqSliceLen != 0U, { return HCCL_FAILED; },
-                            "Invalid param for Iterate.");
+    ASCENDC_HCCL_API_ASSERT(
+        curVersion_ == HcclTilingVersion::NEW_TILING_VERSION ||
+            curVersion_ == HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION,
+        { return HCCL_FAILED; }, "Initialization has not been done properly.");
+    ASCENDC_HCCL_API_ASSERT(
+        seqSlices != nullptr && seqSliceLen != 0U, { return HCCL_FAILED; }, "Invalid param for Iterate.");
     const uint16_t stepSize = GetStepSizeByHandle(handleId);
     const uint16_t stepsPerRepeat = GetStepCntsPerRepeatByHandle(handleId);
-    ASCENDC_HCCL_API_ASSERT(stepSize > 0U && stepsPerRepeat > 1U, { return HCCL_FAILED; },
-                            "Handle id %d is not for fine-grained.", handleId);
-    uint16_t &curSlice = handleId2CurrSliceId_[handleId];
-    KERNEL_LOG(KERNEL_INFO, "The step size for handle %d is %u, current slice and total slices are %u/%u.",
-               handleId, stepSize, curSlice, stepsPerRepeat);
+    ASCENDC_HCCL_API_ASSERT(
+        stepSize > 0U && stepsPerRepeat > 1U, { return HCCL_FAILED; }, "Handle id %d is not for fine-grained.",
+        handleId);
+    uint16_t& curSlice = handleId2CurrSliceId_[handleId];
+    KERNEL_LOG(
+        KERNEL_INFO, "The step size for handle %d is %u, current slice and total slices are %u/%u.", handleId, stepSize,
+        curSlice, stepsPerRepeat);
 
     // Only for All2AllV + pairwise
     if (curSlice >= stepsPerRepeat * handleIdRepeat_[handleId]) {
@@ -237,7 +245,8 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::Iterate(HcclHandle han
     const uint16_t slicesPerRepeat = stepsPerRepeat;
     const uint32_t rankId = GetRankId();
     const uint32_t rankDim = GetRankDim();
-    ASCENDC_HCCL_API_ASSERT(rankDim != 0U, { return HCCL_FAILED; }, "Invalid rank-dim.");
+    ASCENDC_HCCL_API_ASSERT(
+        rankDim != 0U, { return HCCL_FAILED; }, "Invalid rank-dim.");
     for (uint16_t i = 0U; i < seqSliceLen; ++i) {
         if constexpr (sync) {
             if ((curSlice + 1) % stepSize == 0) {
