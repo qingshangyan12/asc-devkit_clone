@@ -115,11 +115,16 @@ private:
 
     __aicore__ inline void InitWorkingFlag();
 
-    __aicore__ inline void InitInner(GM_ADDR context, HcclTilingVersion version);
+    __aicore__ inline void InitInner(uint64_t msgAddr, HcclTilingVersion version);
 
 private:
     uint64_t ccOpTilingDataTable_[static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)] = {0UL};
-    __gm__ HcclCombineOpParam *hcclContext_;
+    uint64_t ccOpParamTable_[static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)] = {0UL};
+#if __NPU_ARCH__ == 3510
+    __gm__ OpResCtx *hcclContext_;
+#else
+   __gm__ HcclCombineOpParam *hcclContext_;
+#endif
     __gm__ HcclMsgArea *hcclMsgArea_;
     uint64_t tilingBaseAddr_;
     uint16_t queueNum_ = 0U;
