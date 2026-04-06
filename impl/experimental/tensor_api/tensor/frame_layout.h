@@ -23,7 +23,6 @@ namespace Te {
 struct MakeNzFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
-        using S = typename TraitType::type;
         constexpr auto c0Ele = TraitType::C0_element;
         auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
                                MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele)));
@@ -34,10 +33,22 @@ struct MakeNzFrameLayout {
     }
 };
 
+struct MakeL0CFrameLayout {
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
+        constexpr auto c0Ele = LayoutTrait<uint16_t>::C0_element;
+        auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
+                               MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele)));
+        auto stride = MakeStride(MakeStride(Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{}),
+                                 MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(row, FRACTAL_FIXED)));
+        using LayoutT = Layout<decltype(shape), decltype(stride), L0CLayoutPattern>;
+        return LayoutT(shape, stride);
+    }
+};
+
 struct MakeNDFrameLayout {
-    template <typename TraitType>
-    __aicore__ inline static auto Make(size_t row, size_t column) {
-        using T = typename TraitType::type;
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
         auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
         auto stride = MakeStride(MakeStride(Std::Int<0>{}, column), MakeStride(Std::Int<0>{}, Std::Int<1>{}));
         using LayoutT = Layout<decltype(shape), decltype(stride), NDLayoutPattern>;
@@ -46,35 +57,32 @@ struct MakeNDFrameLayout {
 };
 
 struct MakeZnFrameLayout {
-    template <typename TraitType>
-    __aicore__ inline static auto Make(size_t row, size_t column) {
-        using T = typename TraitType::type;
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
         constexpr auto c0Ele = TraitType::C0_element;
-        auto shape = MakeShape(MakeShape(Std::Int<c0Ele>{},  Std::ceil_division(row, c0Ele)),
-                               MakeShape(Std::Int<FRACTAL_FIXED>{},  Std::ceil_division(column, FRACTAL_FIXED)));
-        auto stride = MakeStride(MakeStride(Std::Int<1>{},  c0Ele * Std::ceil_align(column, FRACTAL_FIXED)),
-                                 MakeStride(Std::Int<c0Ele>{},  Std::Int<c0Ele * FRACTAL_FIXED>{}));
+        auto shape = MakeShape(MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(row, c0Ele)),
+                               MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
+        auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(column, FRACTAL_FIXED)),
+                                 MakeStride(Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{}));
         using LayoutT = Layout<decltype(shape), decltype(stride), ZnLayoutPattern>;
         return LayoutT(shape, stride);
     }
 };
 
 struct MakeDNFrameLayout {
-    template <typename TraitType>
-    __aicore__ inline static auto Make(size_t row, size_t column) {
-        using T = typename TraitType::type;
-        constexpr auto c0Ele = TraitType::C0_element;
-        auto shape = MakeShape(row, column);
-        auto stride = MakeStride(Std::Int<1>{}, row);
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
+        auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
+        auto stride = MakeStride(MakeStride(Std::Int<0>{}, Std::Int<1>{}), MakeStride(Std::Int<0>{}, row));
         using LayoutT = Layout<decltype(shape), decltype(stride), DNLayoutPattern>;
         return LayoutT(shape, stride);
     }
 };
 
 struct MakeZzFrameLayout {
-    template <typename TraitType>
-    __aicore__ inline static auto Make(size_t row, size_t column) {
-        using T = typename TraitType::type;
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
+        using DataType = typename TraitType::type;
         constexpr auto c0Ele = TraitType::C0_element;
         auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
                                MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele)));
@@ -86,26 +94,86 @@ struct MakeZzFrameLayout {
 };
 
 struct MakeNnFrameLayout {
-    template <typename TraitType>
-    __aicore__ inline static auto Make(size_t row, size_t column) {
-        using T = typename TraitType::type;
-        constexpr auto c0Ele = TraitType::C0_element;
-        auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
-                               MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele)));
-        auto stride = MakeStride(MakeStride(Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{}),
-                                 MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(row, FRACTAL_FIXED)));
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
+        using DataType = typename TraitType::type;
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t>,
+            "NnLayoutPattern only supports fp8_e8m0_t.");
+        auto shape = MakeShape(MakeShape(Std::Int<MX_SCALE_K0>{}, row / MX_SCALE_K0),
+                               MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
+        auto stride = MakeStride(MakeStride(Std::Int<1>{}, Std::Int<C0_SIZE<fp8_e8m0_t>>{}),
+                                 MakeStride(Std::Int<MX_SCALE_K0>{}, row * FRACTAL_FIXED));
         using LayoutT = Layout<decltype(shape), decltype(stride), NnLayoutPattern>;
+        return LayoutT(shape, stride);
+    }
+};
+
+struct MakeScaleANDFrameLayout {
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
+        using DataType = typename TraitType::type;
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t>,
+            "ScaleANDLayoutPattern only supports fp8_e8m0_t.");
+        auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
+        auto stride = MakeStride(MakeStride(Std::Int<0>{}, column), MakeStride(Std::Int<0>{}, Std::Int<1>{}));
+        using LayoutT = Layout<decltype(shape), decltype(stride), ScaleANDLayoutPattern>;
+        return LayoutT(shape, stride);
+    }
+};
+
+struct MakeScaleADNFrameLayout {
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
+        using DataType = typename TraitType::type;
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t>,
+            "ScaleADNLayoutPattern only supports fp8_e8m0_t.");
+        auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<MX_SCALE_K0>{}, column / MX_SCALE_K0));
+        auto stride = MakeStride(MakeStride(Std::Int<0>{}, Std::Int<MX_SCALE_K0>{}),
+                                 MakeStride(Std::Int<1>{}, MX_SCALE_K0 * row));
+        using LayoutT = Layout<decltype(shape), decltype(stride), ScaleADNLayoutPattern>;
+        return LayoutT(shape, stride);
+    }
+};
+
+struct MakeScaleBNDFrameLayout {
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
+        using DataType = typename TraitType::type;
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t>,
+            "ScaleBNDLayoutPattern only supports fp8_e8m0_t.");
+        auto shape = MakeShape(MakeShape(Std::Int<MX_SCALE_K0>{}, row / MX_SCALE_K0), MakeShape(Std::Int<1>{}, column));
+        auto stride = MakeStride(MakeStride(Std::Int<1>{}, MX_SCALE_K0 * column),
+                                 MakeStride(Std::Int<0>{}, Std::Int<MX_SCALE_K0>{}));
+        using LayoutT = Layout<decltype(shape), decltype(stride), ScaleBNDLayoutPattern>;
+        return LayoutT(shape, stride);
+    }
+};
+
+struct MakeScaleBDNFrameLayout {
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
+        using DataType = typename TraitType::type;
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t>,
+            "ScaleBDNLayoutPattern only supports fp8_e8m0_t.");
+        auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
+        auto stride = MakeStride(MakeStride(Std::Int<0>{}, Std::Int<1>{}), MakeStride(Std::Int<0>{}, row));
+        using LayoutT = Layout<decltype(shape), decltype(stride), ScaleBDNLayoutPattern>;
         return LayoutT(shape, stride);
     }
 };
 
 using LayoutFormatSet = TupleMap<
     Std::tuple<NzLayoutPattern, MakeNzFrameLayout>,
+    Std::tuple<L0CLayoutPattern, MakeL0CFrameLayout>,
     Std::tuple<NDLayoutPattern, MakeNDFrameLayout>,
     Std::tuple<DNLayoutPattern, MakeDNFrameLayout>,
     Std::tuple<NnLayoutPattern, MakeNnFrameLayout>,
     Std::tuple<ZzLayoutPattern, MakeZzFrameLayout>,
-    Std::tuple<ZnLayoutPattern, MakeZnFrameLayout>>;
+    Std::tuple<ZnLayoutPattern, MakeZnFrameLayout>,
+    Std::tuple<ScaleANDLayoutPattern, MakeScaleANDFrameLayout>,
+    Std::tuple<ScaleADNLayoutPattern, MakeScaleADNFrameLayout>,
+    Std::tuple<ScaleBNDLayoutPattern, MakeScaleBNDFrameLayout>,
+    Std::tuple<ScaleBDNLayoutPattern, MakeScaleBDNFrameLayout>>;
 
 template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
@@ -117,7 +185,7 @@ __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_TENSOR_LAYOUT_FRACTAL_H
+#endif // IMPL_TENSOR_API_TENSOR_FRAME_LAYOUT_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
