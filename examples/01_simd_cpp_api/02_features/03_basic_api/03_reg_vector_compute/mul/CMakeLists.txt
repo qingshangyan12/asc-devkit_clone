@@ -16,7 +16,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    move_successive_align.asc
+    mul.asc
 )
 
 target_link_libraries(demo PRIVATE
@@ -34,4 +34,5 @@ target_link_libraries(demo PRIVATE
 # ======================================================================================
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--cce-simd-vf-fusion=false>
 )

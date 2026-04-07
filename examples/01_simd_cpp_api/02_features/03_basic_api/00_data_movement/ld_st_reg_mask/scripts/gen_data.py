@@ -19,8 +19,10 @@ import numpy as np
 def gen_data():
     src = np.zeros(1024, dtype=np.uint8)
     src[0] = 1
+    src[31] = 1
     dst = np.zeros(1024, dtype=np.uint8)
-    dst[0] = 1
+    dst[0] = 2
+    dst[248] = 2
     dst[256:256 + 32] = 255
     return src, dst
 
