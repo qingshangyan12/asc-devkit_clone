@@ -139,6 +139,7 @@ __aicore__ inline decltype(auto) MakeFractalShape(T originShape, U innerShape) {
     return MakeFractalShape(originShape, innerShape, Std::make_index_sequence<Std::tuple_size_v<U>>{});
 }
 
+
 } // namespace Te
 } // namespace AscendC
 
