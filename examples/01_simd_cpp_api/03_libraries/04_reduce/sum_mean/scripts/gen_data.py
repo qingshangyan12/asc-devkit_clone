@@ -7,16 +7,16 @@
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# INCLUDING BUT NOT LIMITED TO LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-
 
 import os
 import numpy as np
 
 
 def calculateSum(arr, dtype):
+    """递归二分求和，模拟硬件归约过程"""
     n = len(arr)
     if n == 1:
         return arr
@@ -32,37 +32,47 @@ def calculateSum(arr, dtype):
     return calculateSum(newInput, dtype)
 
 
-def Mean(x, n, insum, scalar):
+def Sum(x, n, insum):
+    """计算每行的和"""
     for i, _ in enumerate(x):
         res = calculateSum(x[i, :n], x.dtype)
-        insum[i] = res * scalar
+        insum[i] = res
 
 
-def gen_golden_data_simple():
+def gen_golden_data():
+    """
+    生成测试输入数据和真值数据
+    """
     dtype = np.float32
-    outter = 1
-    inner = 32
-    n = 32
-    cast = 0
+    outter = 3  # 行数
+    inner = 32  # 列数
+    n = 32  # 实际元素个数
+
+    # 生成随机输入数据
     x = np.random.randint(-100, 100, [outter, inner]).astype(dtype)
+
+    # 计算输出对齐后的大小
     if dtype == np.float16:
         outter_pad = (outter * 2 + 31) // 32 * 32 // 2
     else:
         outter_pad = (outter * 4 + 31) // 32 * 32 // 4
-    if cast == 1:
-        scalar = np.float32(1 / n)
-        x_cast = x.astype(np.float32)
-        golden = np.zeros(outter_pad, dtype=np.float32)
-        Mean(x_cast, n, golden, scalar)
-        golden = golden.astype(np.float16)
-    else:
-        scalar = dtype(1 / n)
-        golden = np.zeros(outter_pad, dtype=dtype)
-        Mean(x, n, golden, scalar)
+
+    golden = np.zeros(outter_pad, dtype=dtype)
+
+    # 场景：Sum - 求和
+    Sum(x, n, golden)
+    print("Generating golden data for Sum scenario")
+
+    # 保存二进制文件
     os.makedirs("input", exist_ok=True)
     x.tofile("./input/input_x.bin")
     os.makedirs("output", exist_ok=True)
     golden.tofile("./output/golden.bin")
 
+    print(f"Input shape: {x.shape}")
+    print(f"Output shape: {golden.shape}")
+    print(f"Golden data: {golden[:outter]}")
+
+
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    gen_golden_data()
