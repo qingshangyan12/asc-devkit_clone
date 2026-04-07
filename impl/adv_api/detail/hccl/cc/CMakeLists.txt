@@ -84,7 +84,6 @@ if(ENABLE_CUSTOM)
 
     include(${HCCL_CC_DIR}/cmake/config.cmake)
     include(${HCCL_CC_DIR}/cmake/func.cmake)
-    include(${HCCL_CC_DIR}/cmake/package.cmake)
 
     # AICPU Device 构建目标
     add_custom_target(custom_aicpu)
@@ -95,7 +94,6 @@ if(ENABLE_CUSTOM)
 
 elseif(BUILD_OPEN_PROJECT)
     include(${HCCL_CC_DIR}/cmake/config.cmake)
-    include(${HCCL_CC_DIR}/cmake/package.cmake)
     include(${HCCL_CC_DIR}/cmake/func.cmake)
     include(${HCCL_CC_DIR}/version.cmake)
     if(ENABLE_OPEN_SRC)
