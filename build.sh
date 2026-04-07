@@ -31,6 +31,9 @@ CMAKE_TOOLCHAIN_FILE_VAL=""
 CHANGED_FILES=""
 CI_MODE=FALSE
 FULL_MODE="false"  # 新增变量，用于控制是否全量构建
+ENABLE_SIGN="false"
+VERSION_INFO="8.5.0"
+CUSTOM_SIGN_SCRIPT="${CURRENT_DIR}/impl/adv_api/detail/hccl/cc/scripts/sign/community_sign_build.py"
 
 dotted_line="----------------------------------------------------------------"
 
@@ -492,8 +495,8 @@ function cmake_config()
 
 function build()
 {
-  local target="$1"
-  cmake --build . --target ${target} -j ${THREAD_NUM}
+  log "Info: build target:$@ JOB_NUM:${JOB_NUM}"
+  cmake --build . --target "$@" -j ${THREAD_NUM}
 }
 
 function build_package(){
