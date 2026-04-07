@@ -22,36 +22,54 @@
 │   └── block_reduce_min_max_sum.asc      // Ascend C样例实现 & 调用样例
 ```
 
-## 场景详细说明
+## 场景说明
 
 本样例通过编译参数 `SCENARIO_NUM` 选择不同的归约场景，所有场景数据格式为 ND，核函数名为 `block_reduce_custom`。
 
-**场景1：BlockReduceMax**
-- 输入：[1, 128]个half元素，mask=128（256/sizeof(half)），repeat=1
-- 输出：[1, 64]个half元素（前8个为有效值，对应8个datablock各自的最大值）
-- 实现：`BlockReduceMax<half>(dstLocal, srcLocal, repeat=1, mask=128, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
-- 说明：对每个datablock内所有元素求最大值，一个datablock处理32字节即16个half元素，128个元素共8个datablock，输出8个最大值存入dstLocal前8个位置，硬件要求输出buffer为64个元素
+**场景1：BlockReduceMax<half>**
+- 输入：[1, 256]个half元素，mask=128（256/sizeof(half)），repeat=2
+- 输出：[1, 16]个half元素（对应16个datablock各自的最大值）
+- 实现：`BlockReduceMax<half>(dstLocal, srcLocal, repeat=2, mask=128, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
+- 说明：对每个datablock内所有元素求最大值，一个datablock处理32字节即16个half元素，256个元素共16个datablock，输出16个最大值存入dstLocal前16个位置
 
-**场景2：BlockReduceMin**
-- 输入：[1, 128]个half元素，mask=128，repeat=1
-- 输出：[1, 64]个half元素（前8个为有效值，对应8个datablock各自的最小值）
-- 实现：`BlockReduceMin<half>(dstLocal, srcLocal, repeat=1, mask=128, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
-- 说明：对每个datablock内所有元素求最小值，一个datablock处理32字节即16个half元素，128个元素共8个datablock，输出8个最小值存入dstLocal前8个位置，硬件要求输出buffer为64个元素
+**场景2：BlockReduceMin<half>**
+- 输入：[1, 512]个half元素，mask=128（256/sizeof(half)），repeat=4
+- 输出：[1, 32]个half元素（对应32个datablock各自的最小值）
+- 实现：`BlockReduceMin<half>(dstLocal, srcLocal, repeat=4, mask=128, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
+- 说明：对每个datablock内所有元素求最小值，一个datablock处理32字节即16个half元素，512个元素共32个datablock，输出32个最小值存入dstLocal前32个位置
 
-**场景3：BlockReduceSum**
-- 输入：[1, 128]个half元素，mask=128，repeat=1
-- 输出：[1, 64]个half元素（前8个为有效值，对应8个datablock各自的求和结果）
-- 实现：`BlockReduceSum<half>(dstLocal, srcLocal, repeat=1, mask=128, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
-- 说明：对每个datablock内所有元素求和，源操作数相加采用二叉树方式两两相加，一个datablock处理32字节即16个half元素，128个元素共8个datablock，输出8个求和结果存入dstLocal前8个位置，硬件要求输出buffer为64个元素
+**场景3：BlockReduceSum<float>**
+- 输入：[1, 128]个float元素，mask=64（256/sizeof(float)），repeat=2
+- 输出：[1, 16]个float元素（对应16个datablock各自的求和结果）
+- 实现：`BlockReduceSum<float>(dstLocal, srcLocal, repeat=2, mask=8, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
+- 说明：对每个datablock内所有元素求和，源操作数相加采用二叉树方式两两相加，一个datablock处理32字节即8个float元素，128个元素共16个datablock，输出16个求和结果存入dstLocal前16个位置
 
 ## 样例规格
 
 <table border="2" align="center">
-<caption>表1：样例输入输出规格（所有场景）</caption>
+<caption>表1：样例输入输出规格（场景1：BlockReduceMax）</caption>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">y</td><td align="center">[1, 64]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">block_reduce_custom</td></tr>
+</table>
+
+<table border="2" align="center">
+<caption>表2：样例输入输出规格（场景2：BlockReduceMin）</caption>
+<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">y</td><td align="center">[1, 32]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">block_reduce_custom</td></tr>
+</table>
+
+<table border="2" align="center">
+<caption>表3：样例输入输出规格（场景3：BlockReduceSum）</caption>
+<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">block_reduce_custom</td></tr>
 </table>
 
@@ -77,7 +95,9 @@
 
 - 样例执行
   ```bash
-  SCENARIO_NUM=1
+  cd ..
+  rm -rf build
+  SCENARIO_NUM=3
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake .. -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据

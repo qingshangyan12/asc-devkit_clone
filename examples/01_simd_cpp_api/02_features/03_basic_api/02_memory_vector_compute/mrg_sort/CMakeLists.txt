@@ -15,6 +15,12 @@ find_package(ASC REQUIRED HINTS $ENV{ASCEND_INSTALL_PATH}/compiler/tikcpp/ascend
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+# 场景编号说明：
+# scenarioNum=1: 128个元素，4条队列，每条32个元素
+# scenarioNum=2: 96个元素，3条队列，每条32个元素
+# scenarioNum=3: 1024个元素，32条队列，每4条合并为一组，repeatTimes=8
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-3)")
+
 add_executable(demo
     mrg_sort.asc
 )
@@ -36,4 +42,8 @@ target_link_libraries(demo PRIVATE
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
     # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+)
+
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
 )
