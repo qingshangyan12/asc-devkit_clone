@@ -97,6 +97,7 @@ struct LoadDataTrait {
     bool transposed = false;
 };
 
+
 } // namespace Te 
 } // namespace AscendC
 

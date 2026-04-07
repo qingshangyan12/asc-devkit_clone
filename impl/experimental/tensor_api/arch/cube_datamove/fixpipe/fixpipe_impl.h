@@ -22,12 +22,12 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_FIXPIPE_IMPL_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_FIXPIPE_IMPL_H
 
+#include "include/experimental/tensor_api/utils/utils.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_routing.h"
 
 namespace AscendC {
 namespace Te {
 
-constexpr FixpipeTrait DEFAULT_FIXPIPE_TRAIT;
 
 template <typename T, typename U>
 static constexpr bool VerifyingFixpipeTemplate = (IsTileTensorV<T> && IsTileTensorV<U>);
