@@ -20,6 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 #include "impl/utils/debug/asc_debug_utils.h"
 #endif
@@ -145,6 +146,7 @@ template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::enable_asc_diagnostics();
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -152,6 +154,7 @@ template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::enable_asc_diagnostics();
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -176,6 +179,7 @@ template <class... Args>
 inline void PRINTF(const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::enable_asc_diagnostics();
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -186,6 +190,7 @@ template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::enable_asc_diagnostics();
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -194,6 +199,7 @@ template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::enable_asc_diagnostics();
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -221,6 +227,7 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
         InitDump(g_mixFlagAssertOnlyReserved, g_dumpAddrAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
     }
 #endif
+    __asc_aicore::enable_asc_assert();
     PrintfImpl(DumpType::DUMP_ASSERT, fmt, args...);
 #else
     return;
