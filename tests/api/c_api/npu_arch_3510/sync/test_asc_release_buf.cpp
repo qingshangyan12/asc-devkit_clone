@@ -20,11 +20,11 @@ protected:
 };
 
 namespace {
-void rls_buf_stub(pipe_t pipe, uint8_t buf_id, bool mode)
+void rls_buf_stub(pipe_t pipe, uint8_t mutex_id, bool disable_blocking)
 {
     EXPECT_EQ(pipe, pipe_t::PIPE_S);
-    EXPECT_EQ(buf_id, static_cast<uint8_t>(11));
-    EXPECT_EQ(mode, false);
+    EXPECT_EQ(mutex_id, static_cast<uint8_t>(11));
+    EXPECT_EQ(disable_blocking, false);
 }
 } // namespace
 
