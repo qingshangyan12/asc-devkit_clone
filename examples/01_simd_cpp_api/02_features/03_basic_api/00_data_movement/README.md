@@ -15,7 +15,6 @@
 | [data_copy_ub2l1](./data_copy_ub2l1) | 本样例在Mmad矩阵乘场景下，基于DataCopy实现UB（Unified Buffer）到L1（L1 Buffer）的数据搬运 |
 | [data_copy_gm2ub_slice](./data_copy_gm2ub_slice) | 本样例基于DataCopy实现数据切片搬运，提取多维Tensor数据的子集进行GM（Global Memory）与UB（Unified Buffer）通路之间的搬运 |
 | [data_copy_gm2ub_nddma](./data_copy_gm2ub_nddma) | 本样例介绍如何使用多维数据搬运接口实现GM（Global Memory）到UB（Unified Buffer）通路的数据搬运，并在搬运过程中进行随路Padding |
-| [move_mask_reg](./move_mask_reg) | 本样例演示了SIMD场景下，基于RegBase编程范式下数据从UB到MaskReg之间的搬入搬出。 |
-| [move_successive_align](./move_successive_align) | 本样例演示了SIMD场景下，基于RegBase编程范式的连续对齐搬运算子的核函数直调方法，算子支持单核运行。 |
-| [move_successive_unalign](./move_successive_unalign) | 本样例演示了SIMD场景下，基于RegBase编程范式的连续非对齐搬运算子的核函数直调方法，算子支持单核运行。 |
-| [move_unsuccessive_align](./move_unsuccessive_align) | 本样例演示了SIMD场景下，基于RegBase编程范式的非连续对齐搬运算子的核函数直调方法，算子支持单核运行。 |
+| [ld_st_reg_mask](./ld_st_reg_mask) | 本样例基于RegBase编程范式实现UB(Unified Buffer)对MaskReg(掩码寄存器)的搬入搬出，以及使用mask进行掩码搬出的操作 |
+| [ld_st_reg_align](./ld_st_reg_align) | 本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的对齐数据搬运操作 |
+| [ld_st_reg_unalign](./ld_st_reg_unalign) | 本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的非对齐数据搬运操作 |
