@@ -129,7 +129,7 @@ elseif(BUILD_OPEN_PROJECT)
     if (NOT DEVICE_MODE)
         message(STATUS "Detected INSTALL_LIBRARY_DIR: ${INSTALL_LIBRARY_DIR}")
 
-        set(BUILD_DEVICE_DIR ${HCCL_CC_DIR}/build_device/)
+        set(BUILD_DEVICE_DIR ${CMAKE_SOURCE_DIR}/build_device/)
         add_custom_target(install_tar DEPENDS
             ${BUILD_DEVICE_DIR}/signatures/mc2_server.tar.gz
             ${BUILD_DEVICE_DIR}/aicpu_custom/libmc2_server.so
