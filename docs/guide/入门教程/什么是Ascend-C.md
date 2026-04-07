@@ -44,7 +44,7 @@ Ascend C提供多层级API，满足多维场景算子开发诉求。
 
 ## API参考<a name="zh-cn_topic_0000002484241782_section116808372193"></a>
 
-[![](../figures/zh-cn_image_0000002533161263.png)](../api)
+[![](../figures/zh-cn_image_0000002533161263.png)](../../api)
 
 ## 算子实践参考<a name="zh-cn_topic_0000002484241782_section16680133716195"></a>
 
