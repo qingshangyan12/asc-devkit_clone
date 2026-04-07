@@ -140,6 +140,8 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/selector
+
+    ${ASCENDC_INCLUDE_DIR}
 )
 
 if(BUILD_OPEN_PROJECT)
@@ -410,6 +412,7 @@ endif()
 
 target_include_directories(mc2_client PRIVATE
     ${INCLUDE_LIST}
+    hcomm
 )
 
 target_compile_definitions(mc2_client PRIVATE
