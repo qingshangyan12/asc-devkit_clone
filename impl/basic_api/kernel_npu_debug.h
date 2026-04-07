@@ -199,6 +199,38 @@ __aicore__ inline void CheckMaskValue(const uint64_t mask, const __gm__ char* ap
     }
 }
 
+// Reduce API specific mask check: mask must be >= 1 in norm mode (not allow mask=0)
+// Used by: WholeReduceMax/Min/Sum, BlockReduceMax/Min/Sum, PairReduceSum, RepeatReduceSum
+template <typename T, bool isSetMask = true>
+__aicore__ inline void CheckReduceMaskValue(const uint64_t mask, const __gm__ char* apiName)
+{
+    if ASCEND_IS_AIC {
+        return;   // AIC does not need to check mask
+    }
+    if constexpr(!isSetMask) {
+        return;   // when isSetMask = false, use previous mask. Thus no need for check.
+    }
+
+    if (!IsMaskNorm()) {
+        // counter mode: mask should be in range [0, UINT32_MAX]
+        ASCENDC_DEBUG_ASSERT((mask <= UINT32_MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value when "
+            "counter mode in %s, mask should be in range [0, UINT32_MAX], current value is %llu.\n", apiName, mask));
+        return;
+    }
+
+    // norm mode: reduce APIs require mask >= 1
+    ASCENDC_DEBUG_ASSERT((mask >= 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value in %s, when in "
+        "norm mode, mask must be >= 1 for reduce APIs, current value is %llu.\n", apiName, mask));
+
+    if constexpr (sizeof(T) == 2) {
+        // half: mask in [1, 128]
+        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask", apiName);
+    } else if constexpr (sizeof(T) == 4) {
+        // float: mask in [1, 64]
+        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask", apiName);
+    }
+}
+
 __aicore__ inline void CheckCalcount(const int32_t calcount, const __gm__ char* paramName, const __gm__ char* apiName)
 {
     ASCENDC_DEBUG_ASSERT((calcount >= 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s value in %s, %s should "
