@@ -32,7 +32,7 @@
 namespace AscendC {
 namespace Te {
 
-    
+
 template <>
 struct DataCopyTensor2Tensor<Hardware::L1, Hardware::GM, ArchVersion::V3510> {
     using type = DataCopyGM2L13510;

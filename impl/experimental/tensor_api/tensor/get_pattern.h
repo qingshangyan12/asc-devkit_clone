@@ -24,12 +24,12 @@ template <typename T, typename = void>
 struct PatternTrait;
 
 template <typename T>
-struct PatternTrait<T, Std::enable_if_t<is_layout_v<Std::remove_cvref_t<T>>>> {
+struct PatternTrait<T, Std::enable_if_t<is_layout_v<T>>> {
     using type = typename Std::remove_cvref_t<T>::tag;
 };
 
 template <typename T>
-struct PatternTrait<T, Std::enable_if_t<IsTileTensorV<Std::remove_cvref_t<T>>>> {
+struct PatternTrait<T, Std::enable_if_t<IsTileTensorV<T>>> {
     using type = typename PatternTrait<decltype(Std::declval<const T&>().Layout())>::type;
 };
 
