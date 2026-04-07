@@ -25,8 +25,8 @@ struct MakeNzFrameLayout {
     __aicore__ inline static auto Make(T row, U column) {
         constexpr auto c0Ele = TraitType::C0_element;
         auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
-                               MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele)));
-        auto stride = MakeStride(MakeStride(Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{}),
+                               MakeShape(c0Ele, Std::ceil_division(column, c0Ele)));
+        auto stride = MakeStride(MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}),
                                  MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(row, FRACTAL_FIXED)));
         using LayoutT = Layout<decltype(shape), decltype(stride), NzLayoutPattern>;
         return LayoutT(shape, stride);
@@ -38,8 +38,8 @@ struct MakeL0CFrameLayout {
     __aicore__ inline static auto Make(T row, U column) {
         constexpr auto c0Ele = LayoutTrait<uint16_t>::C0_element;
         auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
-                               MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele)));
-        auto stride = MakeStride(MakeStride(Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{}),
+                               MakeShape(c0Ele, Std::ceil_division(column, c0Ele)));
+        auto stride = MakeStride(MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}),
                                  MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(row, FRACTAL_FIXED)));
         using LayoutT = Layout<decltype(shape), decltype(stride), L0CLayoutPattern>;
         return LayoutT(shape, stride);
@@ -60,10 +60,10 @@ struct MakeZnFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
         constexpr auto c0Ele = TraitType::C0_element;
-        auto shape = MakeShape(MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(row, c0Ele)),
+        auto shape = MakeShape(MakeShape(c0Ele, Std::ceil_division(row, c0Ele)),
                                MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
         auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(column, FRACTAL_FIXED)),
-                                 MakeStride(Std::Int<c0Ele>{}, Std::Int<c0Ele * FRACTAL_FIXED>{}));
+                                 MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}));
         using LayoutT = Layout<decltype(shape), decltype(stride), ZnLayoutPattern>;
         return LayoutT(shape, stride);
     }
@@ -85,9 +85,9 @@ struct MakeZzFrameLayout {
         using DataType = typename TraitType::type;
         constexpr auto c0Ele = TraitType::C0_element;
         auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
-                               MakeShape(Std::Int<c0Ele>{}, Std::ceil_division(column, c0Ele)));
-        auto stride = MakeStride(MakeStride(Std::Int<c0Ele>{}, FRACTAL_FIXED * Std::ceil_align(column, c0Ele)),
-                                 MakeStride(Std::Int<1>{}, Std::Int<c0Ele * FRACTAL_FIXED>{}));
+                               MakeShape(c0Ele, Std::ceil_division(column, c0Ele)));
+        auto stride = MakeStride(MakeStride(c0Ele, FRACTAL_FIXED * Std::ceil_align(column, c0Ele)),
+                                 MakeStride(Std::Int<1>{}, c0Ele * Std::Int<FRACTAL_FIXED>{}));
         using LayoutT = Layout<decltype(shape), decltype(stride), ZzLayoutPattern>;
         return LayoutT(shape, stride);
     }

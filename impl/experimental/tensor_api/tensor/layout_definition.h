@@ -53,11 +53,11 @@ struct ScaleBDNLayoutPattern{};
 
 struct DefaultPattern{};
 
-template <typename T = uint16_t, size_t C0 = 32, size_t C0_ELE = 0>
+template <typename T = uint16_t, size_t C0 = 32>
 struct LayoutTrait {
     using type = T;
-    static constexpr size_t C0_size = Std::is_same_v<T, fp8_e8m0_t> ? MX_SCALE_K0 : (is_b4_type<T> ? (C0 * 2) : C0);
-    static constexpr size_t C0_element = (C0_ELE != 0) ? C0_ELE : (C0_size / sizeof(T));
+    static constexpr size_t C0_size = C0;
+    static constexpr auto C0_element = Std::Int<C0_size / sizeof(T)>{};
 };
 
 template <typename T, typename U, typename S>
