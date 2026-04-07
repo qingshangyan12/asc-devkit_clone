@@ -23,7 +23,6 @@
 #define IMPL_TENSOR_API_ATOM_CUBE_COMPUTE_CUBE_COMPUTE_IMPL_H
 
 #include "impl/experimental/tensor_api/atom/cube_compute/mmad.h"
-#include "impl/experimental/tensor_api/atom/cube_compute/mmad_test.h"
 
 #endif // IMPL_TENSOR_API_ATOM_CUBE_COMPUTE_CUBE_COMPUTE_IMPL_H
 
