@@ -796,7 +796,6 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE);
     if (g_sysPrintFifoSpace != nullptr) {
-        __asc_aicore::enable_asc_diagnostics();
 #if !defined(__NPU_DEVICE__)
         if (printType != DumpType::DUMP_ASSERT) {
             PrintCommonHead(printType);

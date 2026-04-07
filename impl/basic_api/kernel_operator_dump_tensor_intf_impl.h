@@ -47,6 +47,7 @@
 #ifdef ASCENDC_CPU_DEBUG
 #include <cstdio>
 #include <utility>
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 #endif
 
 namespace AscendC {
@@ -145,6 +146,7 @@ template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::enable_asc_diagnostics();
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -152,6 +154,7 @@ template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::enable_asc_diagnostics();
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -176,6 +179,7 @@ template <class... Args>
 inline void PRINTF(const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::enable_asc_diagnostics();
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -186,6 +190,7 @@ template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::enable_asc_diagnostics();
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -194,6 +199,7 @@ template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::enable_asc_diagnostics();
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -221,6 +227,7 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
         InitDump(g_mixFlagAssertOnlyReserved, g_dumpAddrAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
     }
 #endif
+    __asc_aicore::enable_asc_assert();
     PrintfImpl(DumpType::DUMP_ASSERT, fmt, args...);
 #else
     return;
