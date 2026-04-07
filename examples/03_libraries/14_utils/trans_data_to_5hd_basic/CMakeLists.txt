@@ -19,11 +19,9 @@ add_executable(demo
     trans_data_to_5hd_basic.asc
 )
 
-message(STATUS "[INFO] SIZE is ${SIZE}")
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
 
 target_compile_definitions(demo PRIVATE
-    SIZE=${SIZE}
     SCENARIO_NUM=${SCENARIO_NUM}
 )
 

@@ -55,7 +55,6 @@
 - 输入shape：[N=2, C=32, H=16, W=16]
 - 输出shape：[N=2, C1=2, H=16, W=16, C0=16]
 - 数据类型：half
-- 转换公式：NC1HWC0[n, c1, h, w, c0] = NCHW[n, c1*C0 + c0, h, w]
 
 ## 算子实现
 
@@ -87,9 +86,9 @@ source ${install_path}/cann/set_env.sh
 
 ```bash
 mkdir -p build && cd build
-cmake -DSCENARIO_NUM=1 -DSIZE=256 ..
+cmake -DSCENARIO_NUM=1 ..
 make -j
-python3 ../scripts/gen_data.py -scenarioNum 1 -size 256
+python3 ../scripts/gen_data.py -scenarioNum 1
 ./demo
 python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/golden.bin
 ```
@@ -98,9 +97,9 @@ python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/gold
 
 ```bash
 mkdir -p build && cd build
-cmake -DSCENARIO_NUM=2 -DSIZE=128 ..
+cmake -DSCENARIO_NUM=2 ..
 make -j
-python3 ../scripts/gen_data.py -scenarioNum 2 -size 128
+python3 ../scripts/gen_data.py -scenarioNum 2
 ./demo
 python3 ../scripts/verify_result.py -scenarioNum 2 output/output.bin output/golden.bin
 ```
@@ -109,9 +108,9 @@ python3 ../scripts/verify_result.py -scenarioNum 2 output/output.bin output/gold
 
 ```bash
 mkdir -p build && cd build
-cmake -DSCENARIO_NUM=3 -DSIZE=512 ..
+cmake -DSCENARIO_NUM=3 ..
 make -j
-python3 ../scripts/gen_data.py -scenarioNum 3 -size 512
+python3 ../scripts/gen_data.py -scenarioNum 3
 ./demo
 python3 ../scripts/verify_result.py -scenarioNum 3 output/output.bin output/golden.bin
 ```
@@ -120,9 +119,9 @@ python3 ../scripts/verify_result.py -scenarioNum 3 output/output.bin output/gold
 
 ```bash
 mkdir -p build && cd build
-cmake -DSCENARIO_NUM=4 -DSIZE=16384 ..
+cmake -DSCENARIO_NUM=4 ..
 make -j
-python3 ../scripts/gen_data.py -scenarioNum 4 -size 16384
+python3 ../scripts/gen_data.py -scenarioNum 4
 ./demo
 python3 ../scripts/verify_result.py -scenarioNum 4 output/output.bin output/golden.bin
 ```
