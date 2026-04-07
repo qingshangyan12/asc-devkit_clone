@@ -27,7 +27,7 @@
 
 - 样例规格：
 
-<table border="2" align="center">
+<table border="2">
 <caption>表1：Region Proposal排序样例规格</caption>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 64]</td><td align="center">half</td><td align="center">ND</td></tr>
