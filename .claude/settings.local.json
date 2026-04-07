@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"d:\\\\code\\\\asc-devkit\\\\examples\\\\01_simd_cpp_api\\\\03_libraries\\\\04_reduce\\\\reducemax_min_mean_sum\"/*.asc)"
+    ]
+  }
+}
