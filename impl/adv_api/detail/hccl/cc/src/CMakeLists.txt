@@ -21,6 +21,7 @@ endif()
 
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
+    ${HCCL_HCOMM_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/common/hcomm_dlsym
 
@@ -412,7 +413,6 @@ endif()
 
 target_include_directories(mc2_client PRIVATE
     ${INCLUDE_LIST}
-    hcomm
 )
 
 target_compile_definitions(mc2_client PRIVATE
