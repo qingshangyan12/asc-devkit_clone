@@ -35,20 +35,6 @@ public:
     __aicore__ inline void Run(const Args&... args) {}
 };
 
-template<Hardware dstPos, Hardware fmPos, Hardware filterPos, Hardware biasPos, uint32_t Version,
-    typename DstLayoutPattern, typename FmLayoutPattern, typename FilterLayoutPattern>
-struct MmadTensor2TensorV2
-{
-    using type = MmadIgnore;
-};
-
-template<>
-struct MmadTensor2TensorV2<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::MAX, ArchVersion::V3510,
-    NzLayoutPattern, NzLayoutPattern, ZnLayoutPattern>
-{
-    using type = MmadNoBiasDetails;
-};
-
 template<Hardware dstPos, Hardware fmPos, Hardware filterPos, Hardware biasPos, uint32_t Version>
 struct MmadTensor2Tensor
 {

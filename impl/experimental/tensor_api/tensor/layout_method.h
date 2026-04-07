@@ -147,35 +147,29 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape) {
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto GetShape(const LayoutType& layout)
 {
     return layout.template Shape<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto GetShape(LayoutType& layout)
 {
     return layout.template Shape<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto GetStride(const LayoutType& layout)
 {
     return layout.template Stride<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<is_layout_v<Std::remove_cvref_t<LayoutType>>>>
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
 __aicore__ inline constexpr auto GetStride(LayoutType& layout)
-{
-    return layout.template Stride<Is...>();
-}
-
-template <size_t... Is, typename ShapeType, typename StrideType, typename LayoutPattern>
-__aicore__ inline constexpr auto GetStride(Layout<ShapeType, StrideType, LayoutPattern>& layout)
 {
     return layout.template Stride<Is...>();
 }
@@ -201,8 +195,9 @@ struct CoshapeCompute {
     }
 };
 
-template <size_t... Is, typename ShapeType, typename StrideType, typename LayoutPattern>
-__aicore__ inline constexpr auto Coshape(const Layout<ShapeType, StrideType, LayoutPattern>& layout)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+__aicore__ inline constexpr auto Coshape(const LayoutType& layout)
 {
     auto shape = GetShape<Is...>(layout);
     auto stride = GetStride<Is...>(layout);
@@ -210,38 +205,44 @@ __aicore__ inline constexpr auto Coshape(const Layout<ShapeType, StrideType, Lay
     return coCoord + Std::Int<1>{};
 }
 
-template <size_t... Is, typename ShapeType, typename StrideType, typename LayoutPattern>
-__aicore__ inline constexpr auto Cosize(const Layout<ShapeType, StrideType, LayoutPattern>& layout)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+__aicore__ inline constexpr auto Cosize(const LayoutType& layout)
 {
     return TupleSize(Coshape<Is...>(layout));
 }
 
-template <size_t... Is, typename ShapeType, typename StrideType, typename LayoutPattern>
-__aicore__ inline constexpr auto Rank(const Layout<ShapeType, StrideType, LayoutPattern>& layout)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+__aicore__ inline constexpr auto Rank(const LayoutType& layout)
 {
     return layout.template Rank<Is...>();
 }
 
-template <size_t... Is, typename ShapeType, typename StrideType, typename LayoutPattern>
-__aicore__ inline constexpr auto Select(const Layout<ShapeType, StrideType, LayoutPattern>& layout)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+__aicore__ inline constexpr auto Select(const LayoutType& layout)
 {
     return MakeLayout(SelectTuple<Is...>(layout.Shape()), SelectTuple<Is...>(layout.Stride()));
 }
 
-template <size_t... Is, typename ShapeType, typename StrideType, typename LayoutPattern>
-__aicore__ inline constexpr auto Get(const Layout<ShapeType, StrideType, LayoutPattern>& layout)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+__aicore__ inline constexpr auto Get(const LayoutType& layout)
 {
     return MakeLayout(GetTuple<Is...>(layout.Shape()), GetTuple<Is...>(layout.Stride()));
 }
 
-template <size_t... Is, typename ShapeType, typename StrideType, typename LayoutPattern>
-__aicore__ inline constexpr auto Size(const Layout<ShapeType, StrideType, LayoutPattern>& layout)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+__aicore__ inline constexpr auto Size(const LayoutType& layout)
 {
     return layout.template Size<Is...>();
 }
 
-template <size_t... Is, typename ShapeType, typename StrideType, typename LayoutPattern>
-__aicore__ inline constexpr auto Capacity(const Layout<ShapeType, StrideType, LayoutPattern>& layout)
+template <size_t... Is, typename LayoutType,
+    typename = Std::enable_if_t<is_layout_v<LayoutType>>>
+__aicore__ inline constexpr auto Capacity(const LayoutType& layout)
 {
     return layout.Capacity();
 }

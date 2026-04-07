@@ -35,17 +35,6 @@ public:
     __aicore__ inline void Run(const Args&... args) {}
 };
 
-template <Hardware dstPos, Hardware srcPos, uint32_t Version, typename DstLayoutPattern, typename SrcLayoutPattern>
-struct LoadDataTensor2TensorNoCoordV2 {
-    using type = LoadDataIgnore;
-};
-
-template <>
-struct LoadDataTensor2TensorNoCoordV2<Hardware::L0A, Hardware::L1, ArchVersion::V3510, NzLayoutPattern, NzLayoutPattern>
-{
-    using type = LoadDataL12L0ANZ2NZ3510;
-};
-
 template <>
 struct LoadDataTensor2TensorNoCoordV2<Hardware::L0B, Hardware::L1, ArchVersion::V3510, ZnLayoutPattern, NzLayoutPattern>
 {

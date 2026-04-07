@@ -82,8 +82,11 @@ __aicore__ inline decltype(auto) MakeScaleBNDLayout(U row, S column);
 template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column);
 
-template <typename Layout, typename TileShape>
-__aicore__ inline decltype(auto) MakeTileLayout(const Layout& layout, const TileShape& tileShape);
+template <typename Coord, typename LayoutType, typename TileShape>
+__aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const TileShape& tileShape);
+
+template <typename Coord, typename LayoutType, typename TensorType>
+__aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const LocalTensor<TensorType>& tileTensor);
 
 } // namespace Te
 } // namespace AscendC

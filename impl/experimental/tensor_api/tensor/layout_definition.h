@@ -156,7 +156,7 @@ template <typename T, typename U, typename S>
 struct is_layout<Layout<T, U, S>> : Std::true_type {};
 
 template <typename T>
-constexpr bool is_layout_v = is_layout<T>::value;
+constexpr bool is_layout_v = is_layout<Std::remove_cvref_t<T>>::value;
 
 } // namespace Te
 } // namespace AscendC

@@ -33,11 +33,6 @@ namespace AscendC {
 namespace Te {
 
 template <>
-struct DataCopyTensor2TensorV2<Hardware::L1, Hardware::GM, ArchVersion::V3510, NzLayoutPattern, NDLayoutPattern> {
-    using type = CopyGmToCbufMultiND2Nz;
-};
-
-template <>
 struct DataCopyTensor2Tensor<Hardware::L1, Hardware::GM, ArchVersion::V3510> {
     using type = DataCopyGM2L13510;
 };

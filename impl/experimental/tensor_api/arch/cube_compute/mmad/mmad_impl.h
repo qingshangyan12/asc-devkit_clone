@@ -54,21 +54,6 @@ Mmad(const T& dst, const U& fm, const S& filter, const Params& params)
    Tensor2Tensor{}.template Run<trait>(dst, fm, filter, params);
 }
 
-template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename Params>
-__aicore__ inline typename Std::enable_if<VerifyingMmadTemplate<T, U, S>, void>::type 
-MmadV2(const T& dst, const U& fm, const S& filter, const Params& params)
-{
-   constexpr Hardware dstPos = GetHardPos<T>();
-   constexpr Hardware fmPos = GetHardPos<U>();
-   constexpr Hardware filterPos = GetHardPos<S>();
-   using DstPattern = PatternTraitT<T>;
-   using FmPattern = PatternTraitT<U>;
-   using FilterPattern = PatternTraitT<S>;
-   using Tensor2Tensor = typename MmadTensor2TensorV2<dstPos, fmPos, filterPos, Hardware::MAX,
-      CURRENT_ARCH_VERSION, DstPattern, FmPattern, FilterPattern>::type;
-   Tensor2Tensor::template Run<trait>(dst, fm, filter, params);
-}
-
 template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V, typename Params>
 __aicore__ inline typename Std::enable_if<VerifyingMmadWithBiasTemplate<T, U, S, V>, void>::type 
 Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)

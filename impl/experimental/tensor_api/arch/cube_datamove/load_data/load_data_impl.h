@@ -46,19 +46,6 @@ LoadData(const T& dst, const U& src)
     Tensor2Tensor{}.template Run<trait, T, U>(dst, src);
 }
 
-template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U>
-__aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplate<T, U>, void>::type 
-LoadDataV2(const T& dst, const U& src)
-{
-    constexpr Hardware dstPos = GetHardPos<T>();
-    constexpr Hardware srcPos = GetHardPos<U>();
-    using DstPattern = PatternTraitT<T>;
-    using SrcPattern = PatternTraitT<U>;
-    using Tensor2Tensor = typename
-        LoadDataTensor2TensorNoCoordV2<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern>::type;
-    Tensor2Tensor::template Run<trait>(dst, src);
-}
-
 template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U, class Coord>
 __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplateWithCoord<T, U, Coord>, void>::type 
 LoadData(const T& dst, const U& src, const Coord& coord)
