@@ -34,8 +34,9 @@
   </table>
 - 样例实现：  
 <p align="center">
-  <img src="img/ld_st_reg_mask.png" width="1000">
+  <img src="figures/ld_st_reg_mask.png" width="1000">
 </p>
+
   1. 在CopyVF函数里，调用Load接口从UB搬运256bit(32*uint8_t)数据到MaskReg，以实现mask的动态设置。本样例中，32个uint8_t数据设置为1,0,...,1，即第一个数和最后一个数为1(b'00000001)，因为芯片每次从低位读取数字，所以这32个数字最终填充到MaskReg中为b'1000...1...000。
   2. 调用Duplicate指令进行数据填充，MaskReg可以指示计算过程中参与计算的元素，由step1可知MaskReg中第1个bit和第249个bit为1，使用该掩码将只填充RegTensor第1个数和第249个数为2。
   3. 使用Store接口将RegTensor内的结果保存到UB。
