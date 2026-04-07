@@ -145,6 +145,9 @@ template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
+    __asc_aicore::enable_asc_diagnostics();
+#endif
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -152,6 +155,9 @@ template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
+    __asc_aicore::enable_asc_diagnostics();
+#endif
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -176,6 +182,9 @@ template <class... Args>
 inline void PRINTF(const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
+    __asc_aicore::enable_asc_diagnostics();
+#endif
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -186,6 +195,9 @@ template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
+    __asc_aicore::enable_asc_diagnostics();
+#endif
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -194,6 +206,9 @@ template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
+    __asc_aicore::enable_asc_diagnostics();
+#endif
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
@@ -220,6 +235,9 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
     } else {
         InitDump(g_mixFlagAssertOnlyReserved, g_dumpAddrAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
     }
+#endif
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
+    __asc_aicore::enable_asc_assert();
 #endif
     PrintfImpl(DumpType::DUMP_ASSERT, fmt, args...);
 #else
