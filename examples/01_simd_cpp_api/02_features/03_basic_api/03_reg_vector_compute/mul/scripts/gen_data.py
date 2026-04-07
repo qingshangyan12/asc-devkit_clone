@@ -16,11 +16,11 @@ import os
 import numpy as np
 
 def gen_golden_data_simple():
-    totalLength = 256
+    total_length = 256
     data_type = np.float32
     # 生成两个 [1, 256] 矩阵
-    x = np.random.uniform(1, 2, [1, totalLength]).astype(data_type)
-    y = np.random.uniform(1, 2, [1, totalLength]).astype(data_type)
+    x = np.random.uniform(1, 2, [1, total_length]).astype(data_type)
+    y = np.random.uniform(1, 2, [1, total_length]).astype(data_type)
     # 计算逐元素乘法 z = x * y
     golden = x * y
     os.makedirs("input", exist_ok=True)
