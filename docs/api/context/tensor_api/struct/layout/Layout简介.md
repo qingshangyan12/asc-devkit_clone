@@ -116,55 +116,6 @@ Layout包含两个核心组成部分：
 ## 需要包含的头文件<a name="zh-cn_topic_0000002213064918_section78885814919"></a>
 
 ```
-#include "kernel_operator_layout.h"
+#include "include/experimental/tensor_api/tensor.h"
 ```
-
-## 原型定义<a name="section10580930144614"></a>
-
-```
-template <typename ShapeType, typename StrideType>
-struct Layout : private Std::tuple<ShapeType, StrideType> {
-    __aicore__ inline constexpr Layout(const ShapeType& shape  = {}, const StrideType& stride = {}) : Std::tuple<ShapeType, StrideType>(shape, stride) {}
-
-    __aicore__ inline constexpr decltype(auto) layout() {}
-    __aicore__ inline constexpr decltype(auto) layout() const {}
-    
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Shape() {}
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Shape() const {}
-
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Stride() {}
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Stride() const {}
-    
-    template <typename CoordType>
-    __aicore__ inline constexpr auto operator()(const CoordType& coord) const {}
-}
-```
-
-## 模板参数<a name="section116801320102618"></a>
-
-**表 3**  模板参数说明
-
-<a name="table13588175515344"></a>
-<table><thead align="left"><tr id="row1160915519346"><th class="cellrowborder" valign="top" width="21.8%" id="mcps1.2.3.1.1"><p id="p9609105553412"><a name="p9609105553412"></a><a name="p9609105553412"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="78.2%" id="mcps1.2.3.1.2"><p id="p156091955143419"><a name="p156091955143419"></a><a name="p156091955143419"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row260915573419"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.3.1.1 "><p id="p2060925573411"><a name="p2060925573411"></a><a name="p2060925573411"></a>ShapeType</p>
-</td>
-<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.2.3.1.2 "><p id="p823866165711"><a name="p823866165711"></a><a name="p823866165711"></a><span id="ph184621011705"><a name="ph184621011705"></a><a name="ph184621011705"></a><a href="../../../容器函数.md">Std::tuple</a>结构类型，用于定义数据的逻辑形状，例如二维矩阵的行数和列数或多维张量的各维度大小。</span></p>
-</td>
-</tr>
-<tr id="row1545073919457"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.3.1.1 "><p id="p1745103924512"><a name="p1745103924512"></a><a name="p1745103924512"></a>StrideType</p>
-</td>
-<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.2.3.1.2 "><p id="p64517398452"><a name="p64517398452"></a><a name="p64517398452"></a><span id="ph292255305"><a name="ph292255305"></a><a name="ph292255305"></a><a href="../../../容器函数.md">Std::tuple</a>结构类型，用于定义各维度在内存中的步长，即同维度相邻元素在内存中的间隔，间隔的单位为元素，与Shape的维度信息一一对应。</span></p>
-</td>
-</tr>
-</tbody>
-</table>
-
+详细定义介绍请参考[Layout](Layout.md)。
