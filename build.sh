@@ -639,6 +639,7 @@ main() {
     cd ${BUILD_DIR}
     CUSTOM_OPTION="${CURRENT_CUSTOM_OPTION} -DPACKAGE_OPEN_PROJECT=ON"
     build_package
+    [ -n "${BUILD_DEVICE_DIR}" ] && rm -rf ${BUILD_DEVICE_DIR}
   else
     cmake_config
     build all
