@@ -73,8 +73,8 @@ if(ENABLE_CUSTOM)
     message(STATUS "Custom ops vendor: ${CUSTOM_OPS_VENDOR}")
     message(STATUS "Custom ops path: ${CUSTOM_OPS_PATH}")
 
-    set(BUILD_DEVICE_DIR ${HCCL_CC_DIR}/build_device)
-    set(BUILD_DIR ${HCCL_CC_DIR}/build)
+    set(BUILD_DEVICE_DIR ${CMAKE_SOURCE_DIR}/build_device)
+    set(BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
     set(CUSTOM_OPS_OPP_PATH "opp/vendors/${CUSTOM_OPS_VENDOR}")
     set(CUSTOM_OPS_OPP_INC_PATH "${CUSTOM_OPS_OPP_PATH}/include")
     set(CUSTOM_OPS_OPP_LIB_PATH "${CUSTOM_OPS_OPP_PATH}/lib64")
@@ -102,7 +102,7 @@ elseif(BUILD_OPEN_PROJECT)
     add_subdirectory(src)
 
     if(DEVICE_MODE)
-        set(CCL_KERNEL_TAR_DIR ${HCCL_CC_DIR}/build_device/ccl_kernel_tar_pkg/)
+        set(CCL_KERNEL_TAR_DIR ${CMAKE_SOURCE_DIR}/build_device/ccl_kernel_tar_pkg/)
         if(KERNEL_MODE)
             set(CCL_KERNEL_TAR_LIBS
                 ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libmc2_server.so
