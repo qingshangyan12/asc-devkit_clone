@@ -833,22 +833,14 @@ __aicore__ inline void SetLoadDataRepeatCal(const LoadDataRepeatParam repeatPara
     Internal::g_rptConfig = rptConfig;
 }
 
-__aicore__ inline void SetLoadDataRepeatStride(uint16_t dstStride) {
+template <typename T>
+__aicore__ inline void SetLoadDataRepeatStride(const LoadData3DParamsV2<T>& loadDataParams) {
+    uint16_t dstStride = loadDataParams.enTranspose ?
+        CeilDivision(loadDataParams.kExtension, BLOCK_CUBE) : CeilDivision(loadDataParams.mExtension, BLOCK_CUBE);
     uint64_t rptConfig = Internal::g_rptConfig;
     constexpr uint32_t dstStrideShiftBit = 32;
     rptConfig |= uint64_t(dstStride) << dstStrideShiftBit;
     set_l3d_rpt(rptConfig);
-}
-
-template <typename T>
-__aicore__ inline void SetLoadDataRepeatStride(const LoadData3DParamsV2<T>& loadDataParams) {
-    if (!loadDataParams.enTranspose) {
-        uint16_t dstStride = CeilDivision(loadDataParams.mExtension, BLOCK_CUBE);
-        SetLoadDataRepeatStride(dstStride);
-    } else {
-        uint16_t dstStride = CeilDivision(loadDataParams.kExtension, BLOCK_CUBE);
-        SetLoadDataRepeatStride(dstStride);
-    }
 }
 
 /* **************************************************************************************************
