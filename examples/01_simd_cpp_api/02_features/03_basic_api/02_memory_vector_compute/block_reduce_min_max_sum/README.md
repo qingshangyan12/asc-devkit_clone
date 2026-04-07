@@ -26,32 +26,41 @@
 
 本样例通过编译参数 `SCENARIO_NUM` 选择不同的归约场景，所有场景数据格式为 ND，核函数名为 `block_reduce_custom`。
 
-**场景1：BlockReduceMax**
+**场景1：BlockReduceMax<half>**
 - 输入：[1, 128]个half元素，mask=128（256/sizeof(half)），repeat=1
 - 输出：[1, 64]个half元素（前8个为有效值，对应8个datablock各自的最大值）
 - 实现：`BlockReduceMax<half>(dstLocal, srcLocal, repeat=1, mask=128, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
 - 说明：对每个datablock内所有元素求最大值，一个datablock处理32字节即16个half元素，128个元素共8个datablock，输出8个最大值存入dstLocal前8个位置，硬件要求输出buffer为64个元素
 
-**场景2：BlockReduceMin**
+**场景2：BlockReduceMin<half>**
 - 输入：[1, 128]个half元素，mask=128，repeat=1
 - 输出：[1, 64]个half元素（前8个为有效值，对应8个datablock各自的最小值）
 - 实现：`BlockReduceMin<half>(dstLocal, srcLocal, repeat=1, mask=128, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
 - 说明：对每个datablock内所有元素求最小值，一个datablock处理32字节即16个half元素，128个元素共8个datablock，输出8个最小值存入dstLocal前8个位置，硬件要求输出buffer为64个元素
 
-**场景3：BlockReduceSum**
-- 输入：[1, 128]个half元素，mask=128，repeat=1
-- 输出：[1, 64]个half元素（前8个为有效值，对应8个datablock各自的求和结果）
-- 实现：`BlockReduceSum<half>(dstLocal, srcLocal, repeat=1, mask=128, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
-- 说明：对每个datablock内所有元素求和，源操作数相加采用二叉树方式两两相加，一个datablock处理32字节即16个half元素，128个元素共8个datablock，输出8个求和结果存入dstLocal前8个位置，硬件要求输出buffer为64个元素
+**场景3：BlockReduceSum<float>**
+- 输入：[1, 64]个float元素，mask=64（256/sizeof(float)），repeat=1
+- 输出：[1, 32]个float元素（前8个为有效值，对应8个datablock各自的求和结果）
+- 实现：`BlockReduceSum<float>(dstLocal, srcLocal, repeat=1, mask=64, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
+- 说明：对每个datablock内所有元素求和，源操作数相加采用二叉树方式两两相加，一个datablock处理32字节即8个float元素，64个元素共8个datablock，输出8个求和结果存入dstLocal前8个位置，硬件要求输出buffer为32个元素
 
 ## 样例规格
 
 <table border="2" align="center">
-<caption>表1：样例输入输出规格（所有场景）</caption>
+<caption>表1：样例输入输出规格（场景1/2：BlockReduceMax/Min）</caption>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">y</td><td align="center">[1, 64]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">block_reduce_custom</td></tr>
+</table>
+
+<table border="2" align="center">
+<caption>表2：样例输入输出规格（场景3：BlockReduceSum）</caption>
+<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">y</td><td align="center">[1, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">block_reduce_custom</td></tr>
 </table>
 

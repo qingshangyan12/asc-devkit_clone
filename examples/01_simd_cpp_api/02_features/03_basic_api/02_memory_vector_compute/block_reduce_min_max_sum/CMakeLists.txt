@@ -17,9 +17,9 @@ project(kernel_samples LANGUAGES ASC CXX)
 
 # 场景参数（通过命令行传入）
 # SCENARIO_NUM: 场景编号
-#   1 - BlockReduceMax：每个datablock内求最大值，输入[1, 128]，输出[1, 8]
-#   2 - BlockReduceMin：每个datablock内求最小值，输入[1, 128]，输出[1, 8]
-#   3 - BlockReduceSum：每个datablock内求和，输入[1, 128]，输出[1, 8]
+#   1 - BlockReduceMax<half>：每个datablock内求最大值，输入[1, 128]，输出[1, 64]（前8个有效）
+#   2 - BlockReduceMin<half>：每个datablock内求最小值，输入[1, 128]，输出[1, 64]（前8个有效）
+#   3 - BlockReduceSum<float>：每个datablock内求和，输入[1, 64]，输出[1, 32]（前8个有效）
 set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-3)")
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
