@@ -21,7 +21,6 @@ endif()
 
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
-    ${HCCL_HCOMM_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/common/hcomm_dlsym
 
