@@ -20,7 +20,7 @@ def gen_golden_data_simple():
     dtype = np.float32
     input_type = dtype
     min_val, max_val = -10, 10
-    input_shape = [2, 32]
+    input_shape = [128, 32]
     input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
     reduce_axis = 1
     golden = np.sum(input_x, axis=reduce_axis)

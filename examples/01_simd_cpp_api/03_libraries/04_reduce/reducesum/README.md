@@ -43,7 +43,7 @@
   </table>
 
 - 算子实现：  
-  本样例中实现的是固定shape为输入src[2, 32]，输出dst[2]的ReduceSumCustom算子。
+  本样例中实现的是固定shape为输入src[128, 32]，输出dst[128]的ReduceSumCustom算子。
 
   - Kernel实现
 
