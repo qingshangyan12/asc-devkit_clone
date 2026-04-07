@@ -2,7 +2,7 @@
 
 ## 概述
 本样例基于RegBase编程范式实现Mul运算，主要调用Mul接口。
-- Add/Exp/Sqrt/Ln/Log/Log2/Log10/Neg接口皆可参考该样例
+- Add/Sub/Div/Max/Min/Prelu接口皆可参考该样例
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -14,7 +14,8 @@
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
-│   └── mul.asc                        // AscendC样例实现 & 调用样例
+│   ├── mul.asc                        // AscendC样例实现 & 调用样例
+│   └── README.md                      // 样例介绍
 ```
 
 ## 样例描述
@@ -41,7 +42,7 @@
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
