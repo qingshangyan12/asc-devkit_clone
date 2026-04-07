@@ -65,10 +65,15 @@ private:
         if (Std::is_same_v<srcType, __cbuf__ half> && Std::is_same_v<dstType, __biasbuf__ float>) {
             convControl = true;
         }
+
         uint16_t blockCount = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
         uint16_t blockLen = Std::ceil_division(srcCol, C0_ELEMENT<dstType>);
+        if constexpr (Std::is_same_v<srcType, __cbuf__ float> || Std::is_same_v<srcType, __cbuf__ int32_t>) {
+            blockLen = Std::ceil_align(blockLen, 2);
+        }
+
         uint16_t srcStride = (srcRow - srcCol) / C0_ELEMENT<srcType>;
-        uint16_t dstStride = (dstRow - srcCol) / C0_ELEMENT<dstType>;
+        uint16_t dstStride = Std::ceil_align((dstRow - srcCol) / C0_ELEMENT<dstType>, 2);
         CopyL12BTInstr::DataCopy(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
     }
 };
