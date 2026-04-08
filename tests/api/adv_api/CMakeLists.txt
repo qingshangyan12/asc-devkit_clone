@@ -10,7 +10,7 @@
 project(ascendc_adv_api_tests)
 cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
-find_package(tikicpulib REQUIRED)
+find_package(cpudebug REQUIRED)
 
 set(ASCENDC_ADV_API_INCLUDE ${ASCENDC_DIR}/include/adv_api)
 set(ASCENDC_ADV_API_IMPL ${ASCENDC_DIR}/impl/adv_api)
@@ -418,13 +418,13 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
     target_link_libraries(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         kernel_tiling
-        $<$<STREQUAL:${product_type},ascend310p>:tikicpulib::ascend310p>
-        $<$<STREQUAL:${product_type},ascend610>:tikicpulib::ascend610>
-        $<$<STREQUAL:${product_type},ascend910B1_AIC>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},ascend910B1_AIV>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:tikicpulib::ascend950pr_9599>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:tikicpulib::ascend950pr_9599>
-        $<$<STREQUAL:${product_type},ascend310B1>:tikicpulib::ascend310B1>
+        $<$<STREQUAL:${product_type},ascend310p>:cpudebug::ascend310p>
+        $<$<STREQUAL:${product_type},ascend610>:cpudebug::ascend610>
+        $<$<STREQUAL:${product_type},ascend910B1_AIC>:cpudebug::ascend910B1>
+        $<$<STREQUAL:${product_type},ascend910B1_AIV>:cpudebug::ascend910B1>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:cpudebug::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:cpudebug::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend310B1>:cpudebug::ascend310B1>
         -Wl,--no-as-needed
         error_manager
         mmpa

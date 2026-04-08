@@ -1084,7 +1084,7 @@ def generate_host_stub_head_code_cpu() -> str:
 #include <string.h>
 #include <stdint.h>
 #include <dlfcn.h>
-#include "tikicpulib.h"
+#include "cpudebug.h"
 #include "acl/acl.h"
     ''')
     return buff.getvalue()

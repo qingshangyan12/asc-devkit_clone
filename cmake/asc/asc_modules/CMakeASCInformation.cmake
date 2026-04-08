@@ -120,7 +120,7 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
         list(GET _ARCH_TO_SOC_DIR_MAP ${_soc_dir_index} _SOC_DIR)
         
         # system include
-        set(ASC_CPU_SYSTEM_INCLUDE_OPTIONS "-isystem$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/include -isystem$ENV{ASCEND_HOME_PATH}/include \
+        set(ASC_CPU_SYSTEM_INCLUDE_OPTIONS "-isystem$ENV{ASCEND_HOME_PATH}/tools/cpudebug/include -isystem$ENV{ASCEND_HOME_PATH}/include \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/adv_api \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/basic_api -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/c_api \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/micro_api -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/simt_api \
@@ -141,10 +141,10 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
         link_libraries(
             -Wl,-rpath,$ENV{ASCEND_HOME_PATH}/lib64
             -Wl,-L$ENV{ASCEND_HOME_PATH}/lib64
-            -Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib
-            -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib
-            -Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/${_SOC_DIR}
-            -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/${_SOC_DIR}
+            -Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/cpudebug/lib64
+            -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/cpudebug/lib64
+            -Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/cpudebug/lib64/${_SOC_DIR}
+            -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/cpudebug/lib64/${_SOC_DIR}
             -Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/simulator/${_SOC_DIR}/lib
             -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/simulator/${_SOC_DIR}/lib
             -Wl,-Bdynamic,--no-as-needed

@@ -12,14 +12,14 @@
 cmake_minimum_required(VERSION 3.16)
 project(cpudebug)
 
-find_package(tikicpulib REQUIRED)
+find_package(cpudebug REQUIRED)
 add_executable(add ${CMAKE_CURRENT_SOURCE_DIR}/add.cpp)
 target_compile_options(add PRIVATE
     -g -O2 -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -Wall -Werror
 )
 target_link_libraries(add PRIVATE
     ascendcl
-    tikicpulib::${soc_version}
+    cpudebug::${soc_version}
 )
 
 install(TARGETS add
