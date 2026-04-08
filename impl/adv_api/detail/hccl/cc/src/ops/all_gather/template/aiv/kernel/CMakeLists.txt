@@ -16,6 +16,7 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/hccl_aiv_all_gather_op_910
         -I${OPS_BASE_DIR}/src/ops/op_common/template/aiv/aiv_interface/
         -I${ASCENDC_INCLUDE_DIR}
         -I${ASCENDC_INCLUDE_DIR}/basic_api
+        -I${ASCENDC_IMPL_DIR}
         -I${ASCENDC_IMPL_DIR}/basic_api
         -I${ASCENDC_DIR}
         -mllvm -cce-aicore-record-overflow=false -mllvm -cce-aicore-addr-transform -mllvm
