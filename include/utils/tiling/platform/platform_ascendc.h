@@ -64,6 +64,7 @@ enum class SocVersion {
     ASCEND310B,    // Ascend310B1, Ascend310B2, Ascend310B3, Ascend310B4
     ASCEND950,  // ASCEND950, __DAV_C310__
     ASCEND910_55,  // ASCEND910_55, __DAV_310R6__
+    ASCEND910_95,  // Deprecated, for compatibility only
     AS31XM1,
     ASCEND031,
     ASCEND035,
@@ -81,8 +82,6 @@ enum class SocVersion {
     KIRINX90,
     KIRIN9030,
     RESERVED_VERSION = 99999
-};
-
 enum class ReservedSize {
     RESERVED_SIZE_8K,
     RESERVED_SIZE_16K,
