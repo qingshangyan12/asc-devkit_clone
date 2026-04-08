@@ -485,7 +485,7 @@ add_subdirectory(common)
 add_subdirectory(ops)
 
 if(DEVICE_MODE AND KERNEL_MODE)
-    set(CCL_KERNEL_TAR_DIR ${HCCL_CC_DIR}/build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)
+    set(CCL_KERNEL_TAR_DIR ${CMAKE_SOURCE_DIR}/build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)
     add_custom_command(
         TARGET mc2_server
         POST_BUILD
@@ -495,7 +495,7 @@ if(DEVICE_MODE AND KERNEL_MODE)
         COMMENT "Copying libmc2_server.so&libmc2_kernel_compat.so to ${CCL_KERNEL_TAR_DIR}"
     )
 
-    set(AICPU_CUSTOM_DIR ${HCCL_CC_DIR}/build_device/aicpu_custom/)
+    set(AICPU_CUSTOM_DIR ${CMAKE_SOURCE_DIR}/build_device/aicpu_custom/)
     add_custom_command(
         TARGET mc2_server
         POST_BUILD
