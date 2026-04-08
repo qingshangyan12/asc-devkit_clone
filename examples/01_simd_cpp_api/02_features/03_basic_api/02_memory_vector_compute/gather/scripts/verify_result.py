@@ -22,7 +22,7 @@ ERROR_TOL = 1e-4
 
 
 def verify_result(output, golden, scenarioNum):
-    if scenarioNum == 2:
+    if scenarioNum == 2 or scenarioNum == 1:
         output_type = np.uint32
     else:
         output_type = np.uint16

@@ -29,7 +29,7 @@
 - 说明：通过`src1Pattern`选择对应的二进制作为掩码，来获取数据
 - 输入：[1, 256]
 - 输出：[1, 256]
-- 数据类型：uint16
+- 数据类型：uint32
 - 实现：
     ```cpp
     AscendC::GatherMask(dstLocal, src0Local, src1Pattern, reduceMode, mask, gatherMaskParams, rsvdCnt);
