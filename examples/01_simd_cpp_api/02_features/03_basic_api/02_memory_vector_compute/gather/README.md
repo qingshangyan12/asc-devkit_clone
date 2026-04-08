@@ -27,7 +27,7 @@
 
 **场景1：内置固定模式**
 - 说明：通过`src1Pattern`选择对应的二进制作为掩码，来获取数据
-- 输入：[1, 256]
+- 输入：src0Local=[1, 256]
 - 输出：[1, 256]
 - 数据类型：uint32
 - 实现：
@@ -38,7 +38,7 @@
 
 **场景2：用户自定义模式**
 - 说明：通过用户输入的`src1Local`对应的二进制作为掩码，来获取数据
-- 输入：input = [1, 256], src1Local = [1, 32]
+- 输入：src0Local=[1, 256], src1Local=[1, 32]
 - 输出：[1, 256]
 - 数据类型：uint32
 - 实现：
@@ -49,9 +49,9 @@
 
 **场景3：张量偏移模式**
 - 说明：根据用户输入的地址偏移张量`srcOffset`进行地址偏移，来获取数据
-- 输入：input = [1, 128], srcOffset = [1, 128]
+- 输入：src0Local=[1, 128], srcOffset=[1, 128]
 - 输出：[1, 128]
-- 数据类型：输入输出uint16，src1Local类型为uint32
+- 数据类型：输入输出uint16，srcOffset类型为uint32
 - 实现：
     ```cpp
     AscendC::Gather(dstLocal, src0Local, srcOffset, srcBaseAddr, count);
@@ -60,14 +60,14 @@
 
 **场景4：DataBlock偏移模式**
 - 说明：根据用户输入的地址偏移张量`srcOffset`（按照DataBlock的粒度）进行地址偏移，来获取数据
-- 输入：input = [1, 128], src1Local = [1, 8]
+- 输入：src0Local=[1, 128], srcOffset=[1, 8]
 - 输出：[1, 128]
-- 数据类型：输入输出uint16，src1Local类型为uint32
+- 数据类型：输入输出uint16，srcOffset类型为uint32
 - 实现：
     ```cpp
     AscendC::Gatherb<T>(dstLocal, src0Local, srcOffset, repeatTime, params);
     ```
-- 参数：用户输入的srcOffset是每个datablock在源操作数中对应的地址偏移，repeatTime=1表示重复迭代次数，params={1,8}是用于控制指令迭代的参数
+- 参数：用户输入的srcOffset是每个datablock在源操作数中对应的地址偏移，repeatTime=1表示重复迭代次数，params={1,8}
 
 ## 编译运行
 
