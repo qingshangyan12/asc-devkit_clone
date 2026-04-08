@@ -449,7 +449,6 @@ add_dependencies(mc2_client mc2_compat)
 if(BUILD_OPEN_PROJECT)
     target_link_libraries(mc2_client PRIVATE
         -Wl,--no-as-needed
-        hcomm
         mc2_compat
         acl_rt
         c_sec
@@ -464,7 +463,6 @@ else()
         $<BUILD_INTERFACE:npu_runtime_headers>
         $<BUILD_INTERFACE:mmpa_headers>
         -Wl,--no-as-needed
-        hcomm
         mc2_compat
         acl_rt
         c_sec
