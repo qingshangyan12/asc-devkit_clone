@@ -1129,4 +1129,16 @@ TEST_F(Tensor_Api_Layout, TestMakeFrameLayout)
     EXPECT_EQ(AscendC::Std::get<1>(nzStride0), c0Ele * 16);
     EXPECT_EQ(AscendC::Std::get<0>(nzStride1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(nzStride1), 128 * c0Ele);
+
+    auto customNzLayout = MakeFrameLayout<NzLayoutPattern, LayoutTrait<float, 16>>(128, 256);
+    auto customNzShape1 = customNzLayout.Shape<1>();
+    auto customNzStride0 = customNzLayout.Stride<0>();
+    auto customNzStride1 = customNzLayout.Stride<1>();
+
+    EXPECT_EQ(AscendC::Std::get<0>(customNzShape1), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(customNzShape1), 256 / 16);
+    EXPECT_EQ(AscendC::Std::get<0>(customNzStride0), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(customNzStride0), 16 * 16);
+    EXPECT_EQ(AscendC::Std::get<0>(customNzStride1), 1);
+    EXPECT_EQ(AscendC::Std::get<1>(customNzStride1), 128 * 16);
 }
