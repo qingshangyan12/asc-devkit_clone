@@ -41,6 +41,14 @@ __aicore__ inline void enable_asc_diagnostics()
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
 }
 
+__aicore__ inline void enable_asc_assert()
+{
+#if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
+    static const struct AscTlv __asc_assert_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
+    {4, 4, 1};
+#endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+}
+
 template <typename T, typename U, typename... Args>
 __aicore__ constexpr bool is_same_in_list()
 {

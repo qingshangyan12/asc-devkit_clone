@@ -22,6 +22,7 @@
 #include "kernel_tensor.h"
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 #include "impl/utils/debug/asc_debug_utils.h"
+#include "utils/debug/asc_printf.h"
 #endif
 
 #if __NPU_ARCH__ == 1001
@@ -140,6 +141,15 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
     return;
 }
 
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
+template <class... Args>
+__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    printf(fmt, args...);
+#endif
+}
+#else
 #if defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
 template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
@@ -199,6 +209,7 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 }
 #endif // ASCENDC_CPU_DEBUG
 #endif // defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
+#endif // __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 
 #if defined(ASCENDC_DUMP_ASSERT_ONLY)
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpAddrAssertOnlyReserved;
@@ -210,6 +221,17 @@ __aicore__ inline void StoreArgsOfInitDump(bool mixFlag, __gm__ uint8_t* dumpAdd
 }
 #endif
 
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
+template <class... Args>
+__aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    printf_impl_assert(fmt, args...);
+#else
+    return;
+#endif
+}
+#else
 template <class... Args>
 __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
 {
@@ -226,6 +248,7 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
     return;
 #endif
 }
+#endif // __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 
 // for auto open ASCENDC_DUMP macros
 #ifdef __CHECK_FEATURE_AT_PRECOMPILE
