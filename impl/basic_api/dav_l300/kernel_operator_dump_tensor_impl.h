@@ -248,7 +248,7 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& tensor, uint
             0, 0, static_cast<uint64_t>(QuantMode_t::NoQuant),
             static_cast<uint8_t>(false), false, false,
             static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true,
-            false, false, false);
+            false, false, false, false);
     }
     PipeBarrier<PIPE_ALL>();
     ptr->dumpOffset -= offset;
