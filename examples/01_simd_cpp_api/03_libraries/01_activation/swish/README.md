@@ -2,7 +2,13 @@
 
 ## 概述
 
-本样例演示了基于Swish高阶API的算子实现。在神经网络中，Swish是一个重要的激活函数。
+本样例在深度学习模型激活函数场景下，基于Swish/Silu/SwiGLU高阶API实现激活函数计算。三个API具有紧密的数学关系：
+
+- **Swish（默认）**：`y = x / (1 + exp(-beta * x))`，beta为可调节参数，本样例beta=1.702（GELU近似）
+- **Silu**：Swish在beta=1时的特例，`y = x / (1 + exp(-x))`，比ReLU更平滑，梯度不会完全消失
+- **SwiGLU**：采用Swish作为激活函数的GLU变体，`dst = src0 * Swish(src1)`，常用于LLaMA等模型的FFN层
+
+本样例通过编译宏 `USE_SILU_MODE` 和 `USE_SWIGLU_MODE` 控制三种模式，使用float数据类型，输入Tensor元素个数为32。
 
 ## 支持的产品
 
@@ -15,51 +21,101 @@
 ```
 ├── swish
 │   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
-│   ├── CMakeLists.txt          // 编译工程文件
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本（支持三种模式）
+│   ├── CMakeLists.txt          // 编译工程文件（支持 -DUSE_SILU_MODE / -DUSE_SWIGLU_MODE）
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── swish.asc               // Ascend C算子实现 & 调用样例
+│   └── swish.asc               // Ascend C算子实现 & 调用样例（三种模式合并）
 ```
 
-## 算子描述
+## 样例规格
 
-- 算子功能：  
-  在神经网络中，Swish是一个重要的激活函数。
+### Swish模式（默认）
 
-  计算公式如下，其中β为常数：
-  $$dstLocal_i = Swish(srcLocal_i)$$
-  $$Swish(x)=x/(1 + e^{(-\beta x)})$$
+<div align="left">
+<table>
+<caption>表1：Swish模式样例规格</caption>
+<tr><td align="center" rowspan="1">样例类型(OpType)</td><td align="center" colspan="4"> swish </td></tr>
 
-- 算子规格：  
-  <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> swish </td></tr>
+<tr><td align="center" rowspan="3">样例输入</td></tr>
+<tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src</td><td align="center">[1, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center" rowspan="2">样例输出</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
 
-  <tr><td rowspan="3" align="center">算子输入</td></tr>
-  <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">src</td><td align="center">32</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">dst</td><td align="center">32</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center" rowspan="1">核函数名</td><td align="center" colspan="4">swish_custom</td></tr>
+</table>
+</div>
 
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">swish_custom</td></tr>
-  </table>
+### Silu模式
 
-- 算子实现：  
-  本样例中实现的是固定shape为输入src[32]，输出dst[32]的swish_custom算子。
+<div align="left">
+<table>
+<caption>表2：Silu模式样例规格</caption>
+<tr><td align="center" rowspan="1">样例类型(OpType)</td><td align="center" colspan="4"> silu </td></tr>
 
-  - Kernel实现
+<tr><td align="center" rowspan="3">样例输入</td></tr>
+<tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src</td><td align="center">[1, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center" rowspan="2">样例输出</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Swish高阶API接口完成Swish计算，得到最终结果，再搬出到外部存储上。
+<tr><td align="center" rowspan="1">核函数名</td><td align="center" colspan="4">swish_custom</td></tr>
+</table>
+</div>
 
-    swish_custom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行Swish计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+### SwiGLU模式
 
-  - 调用实现  
-    使用内核调用符<<<>>>调用核函数。
+<div align="left">
+<table>
+<caption>表3：SwiGLU模式样例规格</caption>
+<tr><td align="center" rowspan="1">样例类型(OpType)</td><td align="center" colspan="4"> swiglu </td></tr>
 
-## 编译运行  
+<tr><td align="center" rowspan="4">样例输入</td></tr>
+<tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[1, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center" rowspan="2">样例输出</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
 
-在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量  
+<tr><td align="center" rowspan="1">核函数名</td><td align="center" colspan="4">swish_custom</td></tr>
+</table>
+</div>
+
+## 样例实现
+
+本样例实现的是固定shape的样例，输入元素个数为32。
+
+- **Kernel实现**
+
+  核心计算步骤：将输入数据搬入后，调用对应的高阶API完成计算，再将结果搬出。
+
+  Swish模式调用方式：
+  ```cpp
+  AscendC::Swish(dstLocal, srcLocal, dataSize, scalarValue);
+  ```
+
+  Silu模式调用方式：
+  ```cpp
+  AscendC::Silu<T, false>(dstLocal, srcLocal, dataSize);
+  ```
+
+  SwiGLU模式调用方式：
+  ```cpp
+  AscendC::SwiGLU(dstLocal, src0Local, src1Local, betaValue, tmpLocal);
+  ```
+
+- **调用实现**
+
+  使用内核调用符 `<<<>>>` 调用核函数。
+
+## 编译运行
+
+在本样例根目录下执行如下步骤，编译并执行样例。
+
+- 配置环境变量
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+
   - 默认路径，root用户安装CANN软件包
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
@@ -74,14 +130,58 @@
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
-    
+
 - 样例执行
+
+  **Swish模式（默认）**：
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
-  ./demo                        # 执行编译生成的可执行程序，执行样例
+  mkdir -p build && cd build;
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j;
+  python3 ../scripts/gen_data.py
+  ./demo
   ```
+
+  **Silu模式**：
+  ```bash
+  mkdir -p build && cd build;
+  cmake -DUSE_SILU_MODE=ON -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j;
+  python3 ../scripts/gen_data.py --silu-mode
+  ./demo
+  ```
+
+  **SwiGLU模式**：
+  ```bash
+  mkdir -p build && cd build;
+  cmake -DUSE_SWIGLU_MODE=ON -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j;
+  python3 ../scripts/gen_data.py --swiglu-mode
+  ./demo
+  ```
+
+  使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行 `rm CMakeCache.txt` 后重新cmake。
+
+- 编译选项说明
+
+  <div align="left">
+  <table>
+  <caption>表4：编译选项说明</caption>
+  <tr><td align="center">选项</td><td align="center">可选值</td><td align="center">说明</td></tr>
+  <tr><td align="center">CMAKE_ASC_RUN_MODE</td><td align="center">npu（默认）、cpu、sim</td><td align="center">运行模式：NPU运行、CPU调试、NPU仿真</td></tr>
+  <tr><td align="center">CMAKE_ASC_ARCHITECTURES</td><td align="center">dav-2201（默认）、dav-3510</td><td align="center">NPU架构：dav-2201对应Atlas A2/A3系列，dav-3510对应Ascend 950PR/Ascend 950DT</td></tr>
+  <tr><td align="center">USE_SILU_MODE</td><td align="center">OFF（默认）、ON</td><td align="center">样例模式：OFF为Swish，ON为Silu</td></tr>
+  <tr><td align="center">USE_SWIGLU_MODE</td><td align="center">OFF（默认）、ON</td><td align="center">样例模式：OFF为Swish/Silu，ON为SwiGLU</td></tr>
+  </table>
+  </div>
+
+- 执行结果
+
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
