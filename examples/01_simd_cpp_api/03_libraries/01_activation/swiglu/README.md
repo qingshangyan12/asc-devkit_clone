@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示了基于SwiGLU高阶API实现的算子实现。样例采用Swish作为激活函数的GLU变体。
+本样例在激活函数场景下，基于SwiGLU高阶API实现SwiGLU算子，采用Swish作为激活函数的GLU变体。本样例使用float数据类型，输入Tensor元素个数为32，通过CopyIn-Compute-CopyOut三阶段流水线完成计算。更多API详细信息请参考[SwiGLU API文档](../../../../../docs/api/context/SwiGLU.md)。
 
 ## 支持的产品
 
@@ -21,9 +21,9 @@
 │   └── swiglu.asc              // Ascend C算子实现 & 调用样例
 ```
 
-## 算子描述
+## 样例描述
 
-- 算子功能：  
+- 样例功能：
   SwiGLU是采用Swish作为激活函数的GLU变体。
 
   计算公式如下：
@@ -31,30 +31,29 @@
   其中Swish激活函数的计算公式如下（β为常量）：
   $$Swish(x)=x/(1 + e^{(-\beta x)})$$
 
-- 算子规格：  
-  <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> swiglu </td></tr>
+- 样例规格：
+  <table border="2" align="center">
+  <caption>表1：样例规格表</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> swiglu </td></tr>
 
-  <tr><td rowspan="4" align="center">算子输入</td></tr>
+  <tr><td rowspan="4" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">src0</td><td align="center">32</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">src1</td><td align="center">32</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">dst</td><td align="center">32</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">src0</td><td align="center">[32]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">src1</td><td align="center">[32]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td></tr>
+  <tr><td align="center">dst</td><td align="center">[32]</td><td align="center">float</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">swiglu_custom</td></tr>
   </table>
 
-- 算子实现：  
-  本样例中实现的是固定shape为输入src0[32]、src1[32]，输出dst[32]的swiglu_custom算子。
+- 样例实现：
+  本样例中实现的是固定shape为输入src0[32]、src1[32]，输出dst[32]的swiglu_custom样例。
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用SwiGLU高阶API接口完成SwiGLU计算，得到最终结果，再搬出到外部存储上。
+    核心计算步骤：将输入数据从Global Memory搬运到Local Tensor后，调用 `AscendC::SwiGLU(dstLocal, src0Local, src1Local, betaValue)` 完成SwiGLU计算，再将结果搬回Global Memory。
 
-    swiglu_custom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor src0Gm、src1Gm存储在srcLocal中，Compute任务负责对src0Local、src1Local执行SwiGLU计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
-
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行  
