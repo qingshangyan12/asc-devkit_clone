@@ -165,7 +165,7 @@ void RunKernelOperatorMmImplCoverage()
     loadData3dParams.fMatrixCtrl = false;
     SetFmatrix(SetFMatrixBitModeParams(loadData3dParams), FmatrixMode::FMATRIX_LEFT);
     SetLoadDataPaddingValue(0);
-    SetLoadDataRepeat({0, 1, 0, 1});
+    SetLoadDataRepeat({0, 1, 0});
     LoadData3DV2L12L0BCal((__cb__ half *)dstB2.GetPhyAddr(), (__cbuf__ half *)srcB1.GetPhyAddr(), loadData3dParams);
 
     MOCKER(raise).stubs().will(returnValue(0));
