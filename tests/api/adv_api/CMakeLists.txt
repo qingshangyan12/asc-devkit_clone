@@ -445,7 +445,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         error_manager
         mmpa
         c_sec
-        $<$<STREQUAL:${product_type},KirinX90_AIV>:c_secshared>
         -Wl,--as-needed
     )
 
