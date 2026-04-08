@@ -57,7 +57,7 @@ template <typename T = uint16_t, size_t C0 = 32>
 struct LayoutTrait {
     using type = T;
     static constexpr auto C0_SIZE = Std::Int<C0>{};
-    static constexpr auto C0_ELEMENT = Std::Int<C0_SIZE / sizeof(T)>{};
+    static constexpr auto C0_ELEMENT = C0_SIZE / Std::Int<sizeof(T)>{};
 };
 
 template <typename T, typename U, typename S>
