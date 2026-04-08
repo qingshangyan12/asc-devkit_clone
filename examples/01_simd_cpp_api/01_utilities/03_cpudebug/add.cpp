@@ -14,7 +14,7 @@
  */
 #include "kernel_operator.h"
 #include "data_utils.h"
-#include "tikicpulib.h"
+#include "cpudebug.h"
 
 constexpr int32_t TOTAL_LENGTH = 8 * 2048;                            // total length of data
 constexpr int32_t USE_CORE_NUM = 8;                                   // num of core used

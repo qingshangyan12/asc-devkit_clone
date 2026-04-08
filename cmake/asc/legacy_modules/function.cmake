@@ -330,7 +330,7 @@ function(ascendc_library target_name target_type)
 
     # Generate host-side bin file based on device.o and host_stub.cpp
     if("${RUN_MODE}" STREQUAL "cpu")
-        find_package(tikicpulib REQUIRED)
+        find_package(cpudebug REQUIRED)
     endif()
     set_source_files_properties(${${device_target}_auto_gen_dir}/host_stub.cpp PROPERTIES GENERATED TRUE)
     add_library(${device_target}_host_stub_obj OBJECT
@@ -339,7 +339,7 @@ function(ascendc_library target_name target_type)
 
     target_link_libraries(${device_target}_host_stub_obj PRIVATE
         $<BUILD_INTERFACE:host_intf_pub>
-        $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},cpu>:tikicpulib::${SOC_VERSION}>>
+        $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},cpu>:cpudebug::${SOC_VERSION}>>
     )
 
     target_compile_definitions(${device_target}_host_stub_obj PRIVATE
@@ -390,7 +390,7 @@ function(ascendc_library target_name target_type)
         target_compile_definitions(${target_name} PRIVATE ASCENDC_CPU_DEBUG=1 ASCENDC_DEBUG=1 ASCENDC_DUMP=0)
         target_link_libraries(${target_name}
             PUBLIC
-                tikicpulib::${SOC_VERSION}
+                cpudebug::${SOC_VERSION}
             PRIVATE
                 $<BUILD_INTERFACE:host_intf_pub>
             INTERFACE

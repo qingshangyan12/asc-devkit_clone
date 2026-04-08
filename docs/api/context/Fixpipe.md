@@ -631,7 +631,7 @@ M方向切分：
 
     ```
     #ifdef ASCENDC_CPU_DEBUG
-    #include "tikicpulib.h"
+    #include "cpudebug.h"
     #endif
     #include "kernel_operator.h"
     
@@ -969,7 +969,7 @@ M方向切分：
 
     ```
     #ifdef ASCENDC_CPU_DEBUG
-    #include "tikicpulib.h"
+    #include "cpudebug.h"
     #endif
     #include "kernel_operator.h"
     

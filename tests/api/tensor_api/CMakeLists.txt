@@ -10,7 +10,7 @@
 project(ascendc_tensor_api_tests)
 cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
-find_package(tikicpulib REQUIRED)
+find_package(cpudebug REQUIRED)
 
 set(ASCENDC_UT_PRODUCT_TYPE_LIST
     NPU_ARCH_2201_AIC
@@ -86,10 +86,10 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
 
     target_link_libraries(ascendc_ut_tensor_api_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
-        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIC>:tikicpulib::ascend950pr_9599>
-        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIV>:tikicpulib::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:cpudebug::ascend910B1>
+        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:cpudebug::ascend910B1>
+        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIC>:cpudebug::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIV>:cpudebug::ascend950pr_9599>
         -Wl,--no-as-needed
         error_manager
         mmpa

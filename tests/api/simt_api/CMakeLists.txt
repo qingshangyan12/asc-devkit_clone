@@ -10,7 +10,7 @@
 project(ascendc_simt_api_tests)
 cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
-find_package(tikicpulib REQUIRED)
+find_package(cpudebug REQUIRED)
 
 set(SIMT_PRODUCT_TYPE_LIST_INIT ascend950pr_9599)
 set(SIMT_PRODUCT_TYPE_LIST ${SIMT_PRODUCT_TYPE_LIST_INIT} CACHE STRING "Supported product types")
@@ -68,8 +68,8 @@ foreach(product_type ${SIMT_PRODUCT_TYPE_LIST})
 
     target_link_libraries(ascendc_ut_simt_api_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
-        $<$<STREQUAL:${product_type},ascend950pr_9599>:tikicpulib::ascend950pr_9599>
-        $<$<STREQUAL:${product_type},mc62cm12aa>:tikicpulib::mc62cm12aa>
+        $<$<STREQUAL:${product_type},ascend950pr_9599>:cpudebug::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},mc62cm12aa>:cpudebug::mc62cm12aa>
         kernel_tiling
         -Wl,--no-as-needed
         error_manager

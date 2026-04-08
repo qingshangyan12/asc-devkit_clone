@@ -16,7 +16,7 @@ project(kernel_samples)
 set(ASC_SRC_FILE gather_and_adds.asc)
 
 if("${RUN_MODE}" STREQUAL "cpu")
-    find_package(tikicpulib REQUIRED)
+    find_package(cpudebug REQUIRED)
     set_source_files_properties(${ASC_SRC_FILE} PROPERTIES LANGUAGE CXX)
 else()
     find_package(ASC REQUIRED)
@@ -49,5 +49,5 @@ target_link_libraries(demo PRIVATE
     $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:runtime_camodel>>
     $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:npu_drv>>
     $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},cpu>:cpudebug_acl_stub>>
-    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},cpu>:tikicpulib::ascend950pr_9599>>
+    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},cpu>:cpudebug::ascend950pr_9599>>
 )

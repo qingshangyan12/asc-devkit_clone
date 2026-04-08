@@ -10,7 +10,7 @@
 project(ascendc_basic_api_tests)
 cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
-find_package(tikicpulib REQUIRED)
+find_package(cpudebug REQUIRED)
 
 add_subdirectory(ascendc_header_checker)
 
@@ -212,20 +212,20 @@ foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
     target_link_libraries(ascendc_ut_basic_api_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         kernel_tiling
-        $<$<STREQUAL:${product_type},ascend910>:tikicpulib::ascend910>
-        $<$<STREQUAL:${product_type},ascend610>:tikicpulib::ascend610>
-        $<$<STREQUAL:${product_type},ascend310p>:tikicpulib::ascend310p>
-        $<$<STREQUAL:${product_type},ascend910B1_AIC>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},ascend910B1_AIV>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},ascend910B1_AIV_MSTX>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},ascend310B1>:tikicpulib::ascend310B1>
-        $<$<STREQUAL:${product_type},ascend610Lite>:tikicpulib::ascend610Lite>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:tikicpulib::ascend950pr_9599>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_BASIC>:tikicpulib::ascend950pr_9599>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_FRAMEWORK>:tikicpulib::ascend950pr_9599>
-        $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:tikicpulib::mc62cm12aa>
-        $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:tikicpulib::mc62cm12aa>
-        $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:tikicpulib::mc62cm12aa>
+        $<$<STREQUAL:${product_type},ascend910>:cpudebug::ascend910>
+        $<$<STREQUAL:${product_type},ascend610>:cpudebug::ascend610>
+        $<$<STREQUAL:${product_type},ascend310p>:cpudebug::ascend310p>
+        $<$<STREQUAL:${product_type},ascend910B1_AIC>:cpudebug::ascend910B1>
+        $<$<STREQUAL:${product_type},ascend910B1_AIV>:cpudebug::ascend910B1>
+        $<$<STREQUAL:${product_type},ascend910B1_AIV_MSTX>:cpudebug::ascend910B1>
+        $<$<STREQUAL:${product_type},ascend310B1>:cpudebug::ascend310B1>
+        $<$<STREQUAL:${product_type},ascend610Lite>:cpudebug::ascend610Lite>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:cpudebug::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_BASIC>:cpudebug::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_FRAMEWORK>:cpudebug::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:cpudebug::mc62cm12aa>
+        $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:cpudebug::mc62cm12aa>
+        $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:cpudebug::mc62cm12aa>
         -Wl,--no-as-needed
         error_manager
         mmpa
