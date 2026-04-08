@@ -427,7 +427,11 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
     )
 
     target_link_directories(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/lib64
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:${ASCEND_CANN_PACKAGE_PATH}/lib64>
+    )
+
+    set_target_properties(ascendc_ut_adv_api_kernel_${product_type} PROPERTIES
+        BUILD_RPATH "$<$<STREQUAL:${product_type},KirinX90_AIV>:${ASCEND_CANN_PACKAGE_PATH}/lib64>"
     )
 
     target_link_libraries(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
@@ -445,7 +449,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         error_manager
         mmpa
         c_sec
-        c_secshared
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:c_secshared>
         -Wl,--as-needed
     )
 
