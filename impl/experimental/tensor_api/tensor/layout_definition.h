@@ -29,36 +29,7 @@
 namespace AscendC {
 namespace Te {
 
-struct ZnLayoutPattern{};
-
-struct ZzLayoutPattern{};
-
-struct NnLayoutPattern{};
-
-struct NzLayoutPattern{};
-
-struct L0CLayoutPattern{};
-
-struct NDLayoutPattern{};
-
-struct DNLayoutPattern{};
-
-struct ScaleANDLayoutPattern{};
-
-struct ScaleADNLayoutPattern{};
-
-struct ScaleBNDLayoutPattern{};
-
-struct ScaleBDNLayoutPattern{};
-
-struct DefaultPattern{};
-
-template <typename T = uint16_t, size_t C0 = 32>
-struct LayoutTrait {
-    using type = T;
-    static constexpr auto C0_SIZE = Std::Int<C0>{};
-    static constexpr auto C0_ELEMENT = C0_SIZE / Std::Int<sizeof(T)>{};
-};
+struct DefaultPattern;
 
 template <typename T, typename U, typename S>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
