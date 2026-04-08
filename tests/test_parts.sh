@@ -19,6 +19,7 @@ adv_test_targets=(
     ascendc_ut_adv_api_kernel_ascend910B1_AIV
     ascendc_ut_adv_api_kernel_ascend950pr_9599_AIC
     ascendc_ut_adv_api_kernel_ascend950pr_9599_AIV
+    ascendc_ut_adv_api_kernel_KirinX90_AIV
     ascendc_ut_adv_api_tiling_ascend310p
     ascendc_ut_adv_api_tiling_ascend610
     ascendc_ut_adv_api_tiling_ascend310B1
