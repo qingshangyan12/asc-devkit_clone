@@ -49,9 +49,9 @@ def gen_golden_data(scenario_num):
     """
     
     if scenario_num == 1:
-        input_x = np.arange(1, 129).astype(np.uint16)
-        gdst = np.arange(2, 129, 2).astype(np.uint16)
-        gzero = np.zeros(64).astype(np.uint16)
+        input_x = np.arange(1, 257).astype(np.uint16)
+        gdst = np.arange(2, 257, 2).astype(np.uint16)
+        gzero = np.zeros(128).astype(np.uint16)
         golden = np.concatenate([gdst, gzero]).astype(np.uint16)
         save_data(input_x, golden=golden)
     elif scenario_num == 2:
@@ -79,12 +79,12 @@ def gen_golden_data(scenario_num):
 
 
 def gen_golden_data_custom():
-    one_repeat_size = 128
+    one_repeat_size = 256
     data_block_size = 32
     input_type = np.uint32
     output_type = input_type
     type_size = np.dtype(input_type).itemsize
-    block_length = 128
+    block_length = 256
     mask = 70
     src0_block_stride = 1
     repeat_times = 2

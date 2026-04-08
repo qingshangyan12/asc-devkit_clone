@@ -29,8 +29,8 @@ def verify_result(output, golden, scenarioNum):
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     if scenarioNum == 1:
-        different_element_results = np.isclose(output[0:64],
-                                           golden[0:64],
+        different_element_results = np.isclose(output[0:128],
+                                           golden[0:128],
                                            rtol=RELATIVE_TOL,
                                            atol=ABSOLUTE_TOL,
                                            equal_nan=True)

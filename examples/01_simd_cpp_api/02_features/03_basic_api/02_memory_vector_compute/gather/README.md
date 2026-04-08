@@ -27,19 +27,19 @@
 
 **场景1：内置固定模式**
 - 说明：通过`src1Pattern`选择对应的二进制作为掩码，来获取数据
-- 输入：[1, 128]
-- 输出：[1, 128]
+- 输入：[1, 256]
+- 输出：[1, 256]
 - 数据类型：uint16
 - 实现：
     ```cpp
     AscendC::GatherMask(dstLocal, src0Local, src1Pattern, reduceMode, mask, gatherMaskParams, rsvdCnt);
     ```
-- 参数：dstLocal和src0Local采用地址复用，并使用内置固定模式src1Pattern=2进行元素选取，reduceMode=false（Normal模式），mask=0，gatherMaskParams={1, 1, 0, 0}
+- 参数：dstLocal和src0Local采用地址复用，并使用内置固定模式src1Pattern=2进行元素选取，reduceMode=false（Normal模式），mask=0，gatherMaskParams={1, 4, 8, 0}
 
 **场景2：用户自定义模式**
 - 说明：通过用户输入的`src1Local`对应的二进制作为掩码，来获取数据
-- 输入：input = [1, 128], src1Local = [1, 32]
-- 输出：[1, 128]
+- 输入：input = [1, 256], src1Local = [1, 32]
+- 输出：[1, 256]
 - 数据类型：uint32
 - 实现：
     ```cpp
