@@ -22,6 +22,7 @@ endif()
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
     ${HCCL_CC_INCLUDE_DIR}/hcomm
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
     ${CMAKE_CURRENT_SOURCE_DIR}/common
