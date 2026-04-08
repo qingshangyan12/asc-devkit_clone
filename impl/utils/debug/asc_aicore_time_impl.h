@@ -60,14 +60,14 @@ __aicore__ inline void asc_time_stamp(uint32_t desc_id)
 __aicore__ inline void asc_prof_start()
 {
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
-    bisheng::cce::metrics_prof_start();
+    metrics_prof_start();
 #endif
 }
 
 __aicore__ inline void asc_prof_stop()
 {
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
-    bisheng::cce::metrics_prof_stop();
+    metrics_prof_stop();
 #endif
 }
 
@@ -75,13 +75,13 @@ __aicore__ inline void asc_prof_stop()
 template<pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 {
-    bisheng::cce::mark_stamp<pipe>(idx);
+    mark_stamp<pipe>(idx);
 }
 
 template<pipe_t pipe, uint16_t idx>
 __aicore__ inline void asc_mark_stamp()
 {
-    bisheng::cce::mark_stamp<pipe>(idx);
+    mark_stamp<pipe>(idx);
 }
 #endif
 } // namespace __asc_aicore
