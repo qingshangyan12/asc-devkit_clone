@@ -430,10 +430,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},KirinX90_AIV>:${ASCEND_CANN_PACKAGE_PATH}/lib64>
     )
 
-    set_target_properties(ascendc_ut_adv_api_kernel_${product_type} PROPERTIES
-        BUILD_RPATH "$<$<STREQUAL:${product_type},KirinX90_AIV>:${ASCEND_CANN_PACKAGE_PATH}/lib64>"
-    )
-
     target_link_libraries(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         kernel_tiling
