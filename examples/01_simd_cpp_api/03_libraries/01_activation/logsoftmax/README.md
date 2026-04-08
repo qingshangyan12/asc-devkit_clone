@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示了基于LogSoftMax高阶API的算子实现。样例对输入tensor做LogSoftmax计算。
+本样例在多分类任务场景下，基于LogSoftMax高阶API对输入Tensor做LogSoftmax计算。该API常用于多分类任务的输出层，与交叉熵损失函数配合使用，其数值稳定性优于直接计算log(softmax(x))。计算过程为：先对last轴求行最大值(max)，然后用输入减去max得到sub，再对sub求exp，然后对exp结果按行求和(sum)，最后用exp除以sum得到dst，再对dst做log10计算。本样例使用float数据类型，输入Tensor shape为[128, 128]，通过CopyIn-Compute-CopyOut三阶段流水线完成计算。
 
 ## 支持的产品
 
@@ -21,44 +21,43 @@
 │   └── logsoftmax.asc          // Ascend C算子实现 & 调用样例
 ```
 
-## 算子描述
+## 样例描述
 
-- 算子功能：  
-  对输入tensor做LogSoftmax计算。
+- 样例功能：
+  对输入Tensor做LogSoftmax计算。
 
   计算公式如下：
   $$dst_i = LogSoftMax(src_i)$$
   $$LogSoftmax(x_i)=\log(\frac{\exp(x_i)}{\sum_j \exp(x_j)})$$
 
-- 算子规格：  
-  <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> logsoftmax </td></tr>
+- 样例规格：
+  <table border="2" align="center">
+  <caption>表1：样例规格表</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> logsoftmax </td></tr>
 
-  <tr><td rowspan="3" align="center">算子输入</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">src</td><td align="center">128 * 128</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">dst</td><td align="center">128 * 128</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">src</td><td align="center">[128, 128]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td></tr>
+  <tr><td align="center">dst</td><td align="center">[128, 128]</td><td align="center">float</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">logsoftmax_custom</td></tr>
   </table>
 
-- 算子实现：  
-  本样例中实现的是固定shape为输入src[128, 128]，输出dst[128, 128]的logsoftmax_custom算子。
+- 样例实现：
+  本样例中实现的是固定shape为输入src[128, 128]，输出dst[128, 128]的logsoftmax_custom样例。
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用LogSoftMax高阶API接口完成LogSoftMax计算，得到最终结果，再搬出到外部存储上。
+    核心计算步骤：将输入数据从Global Memory搬运到Local Tensor后，调用 `AscendC::LogSoftMax(dstLocal, sumTempLocal, maxTempLocal, srcLocal, sharedTmpBuffer, tiling, srcShape)` 完成LogSoftMax计算，再将结果搬回Global Memory。
 
-    logsoftmax_custom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行LogSoftMax计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
-
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量  
+在本样例根目录下执行如下步骤，编译并执行样例。
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -74,14 +73,34 @@
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
-    
+
 - 样例执行
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
-  ./demo                        # 执行编译生成的可执行程序，执行样例
+  mkdir -p build && cd build;
+  cmake -DNPU_ARCH=dav-2201 ..;make -j; # 默认npu模式
+  python3 ../scripts/gen_data.py
+  ./demo
   ```
+
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DRUN_MODE=cpu` 或 `-DRUN_MODE=sim` 参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DRUN_MODE=cpu -DNPU_ARCH=dav-2201 ..;make -j; # cpu调试模式
+  cmake -DRUN_MODE=sim -DNPU_ARCH=dav-2201 ..;make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `NPU_ARCH` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
+- 执行结果
+
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
