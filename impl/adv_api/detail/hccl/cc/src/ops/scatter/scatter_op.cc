@@ -58,7 +58,7 @@ HcclResult HcclScatter(void *sendBuf, void *recvBuf, uint64_t recvCount,
         return HcclScatterInner(sendBuf, recvBuf, recvCount, dataType, root, comm, stream);
     }
 
-    if (deviceType != DevType::DEV_TYPE_910_93 && !HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen() && !HcclCheckAivEnableOpen()) {
+    if (deviceType != DevType::DEV_TYPE_910_93 && !HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen()) {
         return HcclScatterInner(sendBuf, recvBuf, recvCount, dataType, root, comm, stream);
     }
 

@@ -248,10 +248,6 @@ HcclResult InsV2AllReduceConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
         // CCU模式
         tempAlgResource0.ccuKernels.push_back(resCtx.ccuKernels[0]);
         tempAlgResource1.ccuKernels.push_back(resCtx.ccuKernels[1]);
-    } else if (param.engine == CommEngine::COMM_ENGINE_AIV) {
-        // AIV模式
-        tempAlgResource0.aivCommInfoPtr = resCtx.aivCommInfoPtr;
-        tempAlgResource1.aivCommInfoPtr = resCtx.aivCommInfoPtr;
     } else if (param.engine == CommEngine::COMM_ENGINE_AICPU) {
         // AICPU模式
         const auto &channels = resCtx.channels[0];

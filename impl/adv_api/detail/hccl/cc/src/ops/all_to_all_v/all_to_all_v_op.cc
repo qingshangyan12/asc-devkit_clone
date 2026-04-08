@@ -23,7 +23,7 @@ extern "C" unsigned int LaunchAicpuKernel(OpParam *param);
 HcclResult HcclAlltoAll(const void *sendBuf, uint64_t sendCount, HcclDataType sendType, const void *recvBuf,
     uint64_t recvCount, HcclDataType recvType, HcclComm comm, aclrtStream stream)
 {
-    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen() && !HcclCheckAivEnableOpen()) {
+    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen()) {
         return HcclAlltoAllInner(sendBuf, sendCount, sendType, recvBuf, recvCount, recvType, comm, stream);
     }
     HCCL_INFO("Start to run execute HcclAlltoAll");
@@ -85,7 +85,7 @@ HcclResult HcclAlltoAll(const void *sendBuf, uint64_t sendCount, HcclDataType se
 HcclResult HcclAlltoAllV(const void *sendBuf, const void *sendCounts, const void *sdispls, HcclDataType sendType,
     const void *recvBuf, const void *recvCounts, const void *rdispls, HcclDataType recvType, HcclComm comm, aclrtStream stream)
 {
-    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen() && !HcclCheckAivEnableOpen()) {
+    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen()) {
         return HcclAlltoAllVInner(sendBuf, sendCounts, sdispls, sendType, recvBuf, recvCounts, rdispls, recvType, comm, stream);
     }
     HCCL_INFO("Start to run execute HcclAlltoAllV");
@@ -146,7 +146,7 @@ HcclResult HcclAlltoAllV(const void *sendBuf, const void *sendCounts, const void
 HcclResult HcclAlltoAllVC(const void *sendBuf, const void *sendCountMatrix, HcclDataType sendType,
     const void *recvBuf, HcclDataType recvType, HcclComm comm, aclrtStream stream)
 {
-    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen() && !HcclCheckAivEnableOpen()) {
+    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen()) {
         return HcclAlltoAllVCInner(sendBuf, sendCountMatrix, sendType, recvBuf, recvType, comm, stream);
     }
     HCCL_INFO("Start to run execute HcclAlltoAllVC");

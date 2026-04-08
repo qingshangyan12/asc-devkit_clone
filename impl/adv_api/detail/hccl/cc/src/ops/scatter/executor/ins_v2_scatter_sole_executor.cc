@@ -12,7 +12,6 @@
 #include "ins_temp_scatter_mesh_1D.h"
 #include "ins_temp_scatter_nhr.h"
 #ifndef AICPU_COMPILE
-#include "aiv_temp_scatter_mesh_1D.h"
 #include "ccu_temp_scatter_mesh1d.h"
 #include "ccu_temp_scatter_nhr1d_mem2mem.h"
 #include "ccu_kernel_scatter_nhr1d_mem2mem.h"
@@ -154,8 +153,6 @@ HcclResult InsV2ScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLo
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_SCATTER, InsScatterMesh1D, InsV2ScatterSoleExecutor, TopoMatch1D, InsTempScatterMesh1D);
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_SCATTER, InsScatterNHR, InsV2ScatterSoleExecutor, TopoMatch1D, InsTempScatterNHR);
 #ifndef AICPU_COMPILE
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_SCATTER, AivScatterMesh1D, InsV2ScatterSoleExecutor, TopoMatch1D,
-    AivTempScatterMesh1D);
 // ccu template
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_SCATTER, CcuScatterMesh1D, InsV2ScatterSoleExecutor, TopoMatch1D, CcuTempScatterMesh1D);
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_SCATTER, CcuScatterNHRMem2Mem1D, InsV2ScatterSoleExecutor, TopoMatch1D, CcuTempScatterNHR1DMem2Mem);

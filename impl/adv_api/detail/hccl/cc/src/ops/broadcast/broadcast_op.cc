@@ -22,7 +22,7 @@ extern "C" unsigned int LaunchAicpuKernel(OpParam *param);
 
 HcclResult HcclBroadcast(void *buf, uint64_t count, HcclDataType dataType, uint32_t root, HcclComm comm, aclrtStream stream)
 {
-    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen() && !HcclCheckAivEnableOpen()) {
+    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen()) {
         return HcclBroadcastInner(buf, count, dataType, root, comm, stream);
     }
     HCCL_INFO("Start to run execute HcclBroadcast");
