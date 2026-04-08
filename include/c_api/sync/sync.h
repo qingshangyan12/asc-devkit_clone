@@ -63,7 +63,7 @@ __aicore__ inline void asc_sync();
 
 #define asc_release_buf(pipe, buf_id, mode) rls_buf((pipe), (buf_id), (mode))
 
-#define asc_lock(pipe, buf_id, mode) asc_lock_impl((pipe), (buf_id), (mode))
+#define asc_lock(pipe, mutex_id, disable_blocking) asc_lock_impl((pipe), (mutex_id), (disable_blocking))
 
 #endif
 
