@@ -31,7 +31,7 @@ L2 Cache的带宽相比GM的带宽有数倍的提升，因此当数据命中L2 C
 
 Ascend C基于GlobalTensor提供了SetL2CacheHint接口，用户可以根据需要指定CacheMode。
 
-考虑如下场景，构造两个Tensor的计算，x的输入Shape为\(5120, 5120\)，y的输入Shape为\(5120, 15360\)，z的输出Shape为\(5120, 15360\)，由于两个Tensor的Shape不相等，x分别与y的3个数据块依次相加。该方案主要为了演示CacheMode的功能，示例代码中故意使用重复搬运x的实现方式，真实设计中并不需要采用这个方案。下文完整样例请参考[设置合理L2 CacheMode样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/l2_cache_bypass)。
+考虑如下场景，构造两个Tensor的计算，x的输入Shape为\(5120, 5120\)，y的输入Shape为\(5120, 15360\)，z的输出Shape为\(5120, 15360\)，由于两个Tensor的Shape不相等，x分别与y的3个数据块依次相加。该方案主要为了演示CacheMode的功能，示例代码中故意使用重复搬运x的实现方式，真实设计中并不需要采用这个方案。
 
 ![](../../../figures/最佳实践优化Reduce使用章节-64.png)
 
