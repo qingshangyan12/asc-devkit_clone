@@ -181,14 +181,28 @@ __aicore__ inline void scalar_printf_impl(DumpType debugType, __gm__ const char*
 }
 
 template <class... Args>
-__aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
+__aicore__ inline void printf_impl_common(__gm__ const char* fmt, Args&&... args)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
-    enable_asc_diagnostics();
     scalar_printf_impl(DumpType::DUMP_SCALAR, fmt, args...);
     set_ctrl(ctrlValue);
 }
+
+template <class... Args>
+__aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
+{
+    enable_asc_diagnostics();
+    printf_impl_common(fmt, args...);
+}
+
+template <class... Args>
+__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
+{
+    enable_asc_assert();
+    printf_impl_common(fmt, args...);
+}
+
 } // namespace __asc_aicore
 #else
 #include <cstdio>
