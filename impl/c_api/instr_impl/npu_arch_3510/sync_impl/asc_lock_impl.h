@@ -25,7 +25,7 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-#define asc_lock_impl(pipe, buf_id, mode) get_buf((pipe), (buf_id), (mode))
+#define asc_lock_impl(pipe, mutex_id, disable_blocking) get_buf((pipe), (mutex_id), (disable_blocking))
 
 #endif
 
