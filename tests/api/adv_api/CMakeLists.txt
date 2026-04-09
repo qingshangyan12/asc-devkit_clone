@@ -443,7 +443,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         error_manager
         mmpa
         c_sec
-        $<$<STREQUAL:${product_type},KirinX90_AIV>:-Wl,--defsym=libc_secshared.so=libc_sec.so>
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:-L /home/jenkins/Ascend/cann-9.0.0/x86_64-linux/lib64/device/lib64 -l:libc_sec.so>
         -Wl,--as-needed
     )
 
