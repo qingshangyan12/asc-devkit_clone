@@ -13,86 +13,48 @@
 
 
 import os
-import sys
-import torch
+import argparse
 import numpy as np
-from ml_dtypes import bfloat16
 
 
-def gen_golden_data_simple():
-    dtype = np.float32
-
-    x_gm_type = dtype
-    y_gm_type = dtype
-
-    if x_gm_type == np.int8:
-        range_min = -128
-        range_max = 127
-    elif x_gm_type == np.uint8:
-        range_min = 0
-        range_max = 255
-    elif x_gm_type == np.int16:
-        range_min = -32768
-        range_max = 32767
-    elif x_gm_type == np.uint16:
-        range_min = 0
-        range_max = 65535
-    elif x_gm_type == np.int32:
-        range_min = -2147483648
-        range_max = 2147483647
-    elif x_gm_type == np.uint32:
-        range_min = 0
-        range_max = 4294967295
-    elif x_gm_type == np.int64:
-        range_min = -9223372036854775808
-        range_max = 9223372036854775807
-    elif x_gm_type == np.uint64:
-        range_min = 0
-        range_max = 18446744073709551615
-    else:
-        range_min = -10
-        range_max = 10
-
+def gen_golden_data(scenarioNum):
+    """
+    生成测试输入数据和真值数据
+    Args:
+        scenarioNum: 场景编号(1=ReduceMax,2=ReduceMin,3=ReduceMean,4=ReduceSum)
+    """
     np.random.seed(0)
 
-    a_length = 136
-    r_length = 32
+    # 所有场景统一使用 [136, 32] 数据，Pattern=RA
+    # 输入shape: [32, 136] (Pattern=RA: rLength=32, aLength=136)
+    dtype = np.float32
+    x_gm = np.random.uniform(-10, 10, [32, 136]).astype(dtype)
 
-    pattern = 1
-    x_gm_shape = [a_length, -1]
-    if pattern == 1:
-        x_gm_shape = [r_length, -1]
-
-    x_gm = np.random.uniform(range_min, range_max, [4352]).reshape(x_gm_shape).astype(x_gm_type)
-
-    if x_gm_type == bfloat16:
-        tensor_x = torch.from_numpy(x_gm.astype(np.float32))
-        tensor_y, top_indices = torch.max(tensor_x, 1)
-        if pattern == 1:
-            tensor_y, top_indices = torch.max(tensor_x, 0)
-        y_gm = tensor_y.cpu().numpy().astype(y_gm_type)
-    elif x_gm_type == np.uint32 or x_gm_type == np.uint16:
-        tensor_x = torch.from_numpy(x_gm.astype(np.int64))
-        tensor_x = tensor_x.to(torch.int64)
-        tensor_y, top_indices = torch.max(tensor_x, 1)
-        if pattern == 1:
-            tensor_y, top_indices = torch.max(tensor_x, 0)
-        y_gm = tensor_y.cpu().numpy().astype(y_gm_type)
-    elif x_gm_type == np.uint64:
-        y_gm = np.max(x_gm, axis=1)
-        if pattern == 1:
-            y_gm = np.max(x_gm, axis=0)
+    # 根据场景选择不同的reduce操作 (axis=0, 在32维度上reduce，输出136)
+    if scenarioNum == 1:
+        # ReduceMax
+        y_gm = np.max(x_gm, axis=0).astype(dtype)
+    elif scenarioNum == 2:
+        # ReduceMin
+        y_gm = np.min(x_gm, axis=0).astype(dtype)
+    elif scenarioNum == 3:
+        # ReduceMean
+        y_gm = np.mean(x_gm, axis=0).astype(dtype)
+    elif scenarioNum == 4:
+        # ReduceSum
+        y_gm = np.sum(x_gm, axis=0).astype(dtype)
     else:
-        tensor_x = torch.from_numpy(x_gm)
-        tensor_y, top_indices = torch.max(tensor_x, 1)
-        if pattern == 1:
-            tensor_y, top_indices = torch.max(tensor_x, 0)
-        y_gm = tensor_y.cpu().numpy().astype(y_gm_type)
+        raise ValueError(f"Unsupported scenarioNum: {scenarioNum}")
 
+    # 保存数据
     os.makedirs("input", exist_ok=True)
     x_gm.tofile("./input/input_x.bin")
     os.makedirs("output", exist_ok=True)
     y_gm.tofile("./output/golden.bin")
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    parser = argparse.ArgumentParser(description='生成ReduceMax/Min/Mean/Sum测试数据')
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 5),
+                        help='场景编号：1=ReduceMax, 2=ReduceMin, 3=ReduceMean, 4=ReduceSum')
+    args = parser.parse_args()
+    gen_golden_data(args.scenarioNum)
