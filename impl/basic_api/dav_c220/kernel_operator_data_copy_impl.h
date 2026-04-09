@@ -26,12 +26,16 @@ namespace AscendC {
 // DataCopyParams:    uint16_t blockCount, uint16_t blockLen
 // DataCopyExtParams: uint16_t blockCount, uint32_t blockLen
 template <typename T>
-__aicore__ inline void CheckDataCopyPadParams(uint16_t blockCount, uint32_t blockLen, bool isGMtoUB)
+__aicore__ inline void CheckDataCopyPadParams(uint16_t blockCount, uint32_t blockLen, bool isGMtoUB, bool isExtParams)
 {
 #if ASCENDC_CPU_DEBUG
     constexpr uint32_t dataCopyPadBlkLenLimit = 2097151;    // 21 bits in total, thus range [0, 2097151]
-    ASCENDC_CHECK_VALUE_RANGE(blockCount, 0, UINT12_MAX, "blockCount", "DataCopyPad");
-    ASCENDC_CHECK_VALUE_RANGE(blockLen, 0, dataCopyPadBlkLenLimit, "blockLen", "DataCopyPad");
+    ASCENDC_CHECK_VALUE_RANGE(blockCount, 1, UINT12_MAX, "blockCount", "DataCopyPad");
+    if (isExtParams) {  // DataCopyExtParams: blockLen range [1, 2097151]
+        ASCENDC_CHECK_VALUE_RANGE(blockLen, 1, dataCopyPadBlkLenLimit, "blockLen", "DataCopyPad");
+    } else {            // DataCopyParams: blockLen range [1, 65535]
+        ASCENDC_CHECK_VALUE_RANGE(blockLen, 1, UINT16_MAX, "blockLen", "DataCopyPad");
+    }
     if (isGMtoUB) {
         ASCENDC_ASSERT((blockLen % sizeof(T) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to check blockLen value in "
             "DataCopyPad from GM to VECIN / VECOUT, it must be divisible by %zu, current value is %lu.", sizeof(T),
@@ -434,7 +438,7 @@ __aicore__ inline void DataCopyPadGm2UBImpl(__ubuf__ T* dst, __gm__ T* src, cons
     }
     ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(dst)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, 
         "Failed to check dst tensor address alignment in DataCopyPad from GM to VECIN / VECOUT, it should be 32B aligned.\n"));
-    CheckDataCopyPadParams<T>(intriParams.blockCount, static_cast<uint32_t>(intriParams.blockLen), true);
+    CheckDataCopyPadParams<T>(intriParams.blockCount, static_cast<uint32_t>(intriParams.blockLen), true, false);
     if (padParams.isPad) {
         set_mov_pad_val(padParams.paddingValue);
     }
@@ -471,7 +475,7 @@ __aicore__ inline void DataCopyPadGm2UBImpl(__ubuf__ T* dst, __gm__ T* src, cons
     }
     ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(dst)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed "
         "to check dst tensor address alignment in DataCopyPad from GM to VECIN / VECOUT, it should be 32B aligned.\n"));
-    CheckDataCopyPadParams<T>(intriParams.blockCount, intriParams.blockLen, true);
+    CheckDataCopyPadParams<T>(intriParams.blockCount, intriParams.blockLen, true, true);
     if (padParams.isPad) {
         set_mov_pad_val(GetScalarBitcodeValue(static_cast<T>(padParams.paddingValue)));
     }
@@ -518,7 +522,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
     }
     ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed "
         "to check src tensor address alignment in DataCopyPad from VECIN / VECOUT to GM, it should be 32B aligned.\n"));
-    CheckDataCopyPadParams<T>(intriParams.blockCount, static_cast<uint32_t>(intriParams.blockLen), false);
+    CheckDataCopyPadParams<T>(intriParams.blockCount, static_cast<uint32_t>(intriParams.blockLen), false, false);
     if constexpr (g_gm_overflow_check && (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE
         || sizeof(T) == B32_BYTE_SIZE || sizeof(T) == B64_BYTE_SIZE)) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -548,7 +552,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
     }
     ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed "
         "to check src tensor address alignment in DataCopyPad from VECIN / VECOUT to GM, it should be 32B aligned.\n"));
-    CheckDataCopyPadParams<T>(intriParams.blockCount, intriParams.blockLen, false);
+    CheckDataCopyPadParams<T>(intriParams.blockCount, intriParams.blockLen, false, true);
     if constexpr (g_gm_overflow_check && (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE
         || sizeof(T) == B32_BYTE_SIZE || sizeof(T) == B64_BYTE_SIZE)) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -578,7 +582,7 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
     ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
     ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
     ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
-    CheckDataCopyPadParams<T>(intriParams.blockCount, static_cast<uint32_t>(intriParams.blockLen), false);
+    CheckDataCopyPadParams<T>(intriParams.blockCount, static_cast<uint32_t>(intriParams.blockLen), false, false);
     if ASCEND_IS_AIV {
         ASCENDC_ASSERT((GetKfcClient() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "kfc client ptr can not be nullptr"); });
         ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, 
@@ -627,7 +631,7 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
     ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
     ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
     ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
-    CheckDataCopyPadParams<T>(intriParams.blockCount, intriParams.blockLen, false);
+    CheckDataCopyPadParams<T>(intriParams.blockCount, intriParams.blockLen, false, true);
     if ASCEND_IS_AIV {
         ASCENDC_ASSERT((GetKfcClient() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "kfc client ptr can not be nullptr"); });
         ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, 
