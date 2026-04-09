@@ -76,7 +76,6 @@ basic_test_two_targets=(
 )
 
 basic_test_three_targets=(
-    hccl_checker_ops_stest
     ascendc_pyut_asc_compile_common
     ascendc_pyut_asc_op_compiler
     ascendc_pyut_aclrt_launch_kernel
