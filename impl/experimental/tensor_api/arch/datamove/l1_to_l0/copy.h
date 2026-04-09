@@ -37,6 +37,16 @@ struct LoadDataTraitDefault {
     static constexpr const TraitType value = DEFAULT_LOAD_DATA_TRAIT;
 };
 
+using CopyModeSet = TupleMap<
+    Std::tuple<Std::tuple<1, 0>, CopyMode::NORMAL>,
+    Std::tuple<Std::tuple<0, 0>, CopyMode::TRANS>,
+    Std::tuple<Std::tuple<0, 1>, CopyMode::TRANSB8B4>>;
+
+using CopyModeCoordSet = TupleMap<
+    Std::tuple<Std::tuple<1, 0>, CopyMode::NORMAL_COORD>,
+    Std::tuple<Std::tuple<0, 0>, CopyMode::TRANS_COORD>,
+    Std::tuple<Std::tuple<0, 1>, CopyMode::TRANSB8B4_COORD>>;
+
 struct CopyL12L0 {
 public:
     template <typename Tp, const Tp& traits, typename... Args>
@@ -53,7 +63,12 @@ private:
     {
         constexpr Hardware dstPos = GetHardPos<T>();
         constexpr Hardware srcPos = GetHardPos<U>();
-        using Tensor2Tensor = typename LoadDataTensor2TensorNoCoord<dstPos, srcPos, CURRENT_ARCH_VERSION>::type;
+        using DstPattern = PatternTraitT<T>;
+        using SrcPattern = PatternTraitT<U>;
+        constexpr bool is_b8b4_type = sizeof(typename T::elementType) == 1;
+        constexpr bool no_trans = Std::is_same_v(DstPattern, SrcPattern);
+        using LoadMode = typename CopyModeSet::template Get<Std::tuple<no_trans, is_b8b4_type>>;
+        using Tensor2Tensor = typename LoadDataTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern, LoadMode>::type;
         Tensor2Tensor::template Run<trait, T, U>(dst, src);
     }
 
@@ -62,7 +77,12 @@ private:
     {
         constexpr Hardware dstPos = GetHardPos<T>();
         constexpr Hardware srcPos = GetHardPos<U>();
-        using Tensor2Tensor = typename LoadDataTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION>::type;
+        using DstPattern = PatternTraitT<T>;
+        using SrcPattern = PatternTraitT<U>;
+        constexpr bool is_b8b4_type = sizeof(typename T::elementType) == 1;
+        constexpr bool no_trans = Std::is_same_v(DstPattern, SrcPattern);
+        using LoadMode = typename CopyModeCoordSet::template Get<Std::tuple<no_trans, is_b8b4_type>>;
+        using Tensor2Tensor = typename LoadDataTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern, LoadMode>::type;
         Tensor2Tensor::template Run<trait, T, U, Coord>(dst, src, coord);
     }
 };

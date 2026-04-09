@@ -64,6 +64,10 @@ enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
 
 enum class TupleFormat : uint8_t { Shape, Stride, Coord};
 
+enum class CopyMode : uint8_t {
+    NORMAL, NORMAL_COORD, TRANS, TRANSB8B4, TRANS_COORD, TRANSB8B4_COORD
+};
+
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
 
