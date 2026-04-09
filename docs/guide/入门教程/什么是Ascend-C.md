@@ -14,7 +14,7 @@ Ascend C提供多层级API，满足多维场景算子开发诉求。
 
 ## 快速入门<a name="zh-cn_topic_0000002484241782_section11489186191713"></a>
 
-[![](../figures/zh-cn_image_0000002533161249.png)](./快速入门)
+[![](../figures/zh-cn_image_0000002533161249.png)](./快速入门/)
 
 ## 成长地图<a name="zh-cn_topic_0000002484241782_section181811514171911"></a>
 
@@ -40,7 +40,7 @@ Ascend C提供多层级API，满足多维场景算子开发诉求。
 
 ## 概念原理<a name="zh-cn_topic_0000002484241782_section126809373191"></a>
 
-[![](../figures/zh-cn_image_0000002533161259.png)](../编程指南/概念原理和术语)
+[![](../figures/zh-cn_image_0000002533161259.png)](../编程指南/概念原理和术语/)
 
 ## API参考<a name="zh-cn_topic_0000002484241782_section116808372193"></a>
 
@@ -48,7 +48,7 @@ Ascend C提供多层级API，满足多维场景算子开发诉求。
 
 ## 算子实践参考<a name="zh-cn_topic_0000002484241782_section16680133716195"></a>
 
-[![](../figures/zh-cn_image_0000002533161267.png)](../算子实践参考)
+[![](../figures/zh-cn_image_0000002533161267.png)](../算子实践参考/)
 
 Ascend C支持在如下AI处理器型号使用：
 
@@ -59,4 +59,3 @@ Ascend C支持在如下AI处理器型号使用：
 -   Atlas 200I/500 A2 推理产品
 -   Atlas 推理系列产品
 -   Atlas 训练系列产品
-
