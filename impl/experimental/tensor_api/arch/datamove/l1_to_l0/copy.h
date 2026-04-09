@@ -10,22 +10,22 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/datamove/copy_l12l0.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+    "impl/tensor_api/arch/datamove/l1_to_l0/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
 /*!
-* \file copy_l12l0.h
+* \file copy.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_ARCH_DATAMOVE_COPY_L12L0_H
-#define IMPL_TENSOR_API_ARCH_DATAMOVE_COPY_L12L0_H
+#ifndef IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_COPY_H
+#define IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_COPY_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 
 #include "impl/experimental/tensor_api/atom/copy_traits_impl.h"
-#include "impl/experimental/tensor_api/arch/datamove/load_data/load_data_routing.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/routing.h"
 
 namespace AscendC {
 namespace Te {
@@ -76,7 +76,7 @@ struct CopyTraits<CopyL12L0> : public CopyTraits<CopyL12L0, LoadDataTraitDefault
 }
 }
 
-#endif // IMPL_TENSOR_API_ARCH_DATAMOVE_COPY_L12L0_H
+#endif // IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_COPY_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
