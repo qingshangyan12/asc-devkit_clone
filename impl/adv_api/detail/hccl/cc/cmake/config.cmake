@@ -80,13 +80,16 @@ if(AARCH_MODE)
         c_sec
         unified_dlog
         mmpa
-        hcomm
-    ) 
-    foreach(STUB ${STUBS}) 
-        if(NOT TARGET ${STUB}) 
-            generate_stub(${STUB}) 
-        endif() 
+    )
+    foreach(STUB ${STUBS})
+        if(NOT TARGET ${STUB})
+            generate_stub(${STUB})
+        endif()
     endforeach()
+endif()
+
+if(NOT TARGET hcomm)
+    generate_stub(hcomm)
 endif()
 
 if(CUSTOM_ASCEND_CANN_PACKAGE_PATH)
