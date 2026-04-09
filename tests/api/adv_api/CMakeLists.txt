@@ -387,6 +387,36 @@ file(GLOB ASCENDC_TEST_ascend310B1_CASE_SRC_FILES
     matmul/scheduler/test_scheduler_norm.cpp
 )
 
+# 1. 在CMake中执行 shell find 命令，查找CANN目录下的 libc_sec*.so
+execute_process(
+    COMMAND find /home/jenkins/Ascend/ -name "libc_sec*.so"
+    OUTPUT_VARIABLE LIBC_SEC_PATHS  # 存储找到的所有库路径
+    ERROR_VARIABLE FIND_ERROR      # 存储执行错误
+    RESULT_VARIABLE FIND_RET       # 存储命令执行结果（0=成功）
+    OUTPUT_STRIP_TRAILING_WHITESPACE # 去掉末尾换行/空格
+)
+
+# 2. 检查find命令是否执行成功
+if(NOT FIND_RET EQUAL 0)
+    message(FATAL_ERROR "查找 libc_sec 库失败！错误: ${FIND_ERROR}")
+endif()
+
+# 3. 检查是否找到库
+if(NOT LIBC_SEC_PATHS)
+    message(FATAL_ERROR "未找到 libc_sec.so / libc_secshared.so！请检查CANN安装路径")
+endif()
+
+# 4. 提取库所在的目录（自动获取 /xxx/toolkit/lib64）
+get_filename_component(LIBC_SEC_DIR ${LIBC_SEC_PATHS} DIRECTORY)
+
+# 5. 自动把库目录加入链接器搜索路径（解决ld找不到库）
+link_directories(${LIBC_SEC_DIR})
+
+# 打印日志（编译时能看到，方便排查）
+message(STATUS "自动找到 libc_sec 库路径: ${LIBC_SEC_DIR}")
+
+
+
 foreach(product_type ${PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_adv_api_kernel_${product_type}
         ${ASCENDC_DIR}/tests/main_global.cpp
@@ -426,10 +456,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         -Werror
     )
 
-    target_link_directories(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
-        $<$<STREQUAL:${product_type},KirinX90_AIV>:${ASCEND_CANN_PACKAGE_PATH}/lib64>
-    )
-
     target_link_libraries(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         kernel_tiling
@@ -444,7 +470,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         -Wl,--no-as-needed
         error_manager
         mmpa
-        $<$<STREQUAL:${product_type},KirinX90_AIV>:-Wl,--defsym=libc_secshared.so=libc_sec.so>
         c_sec
         -Wl,--as-needed
     )
