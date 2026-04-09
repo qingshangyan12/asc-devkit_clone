@@ -19,10 +19,10 @@
  * \file nz2znb8b4_with_coord.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0B_NZ2ZNB8B4_WITH_COORD_H
-#define IMPL_TENSOR_API_ARCH_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0B_NZ2ZNB8B4_WITH_COORD_H
+#ifndef IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_NPU_ARCH_3510_LOAD_DATA_L12L0B_NZ2ZNB8B4_WITH_COORD_H
+#define IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_NPU_ARCH_3510_LOAD_DATA_L12L0B_NZ2ZNB8B4_WITH_COORD_H
 
-#include "impl/experimental/tensor_api/arch/datamove/load_data/npu_arch_3510/instruction.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/instruction.h"
 
 namespace AscendC {
 namespace Te {
@@ -38,8 +38,8 @@ private:
     template <const LoadDataTrait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
     {
-        CheckFormat::CheckZNTemplate<T>();
-        CheckFormat::CheckNZTemplate<U>();
+        CheckLayoutPattern<ZnLayoutPattern, T>();
+        CheckLayoutPattern<NzLayoutPattern, U>();
         CheckDataTypeFor3510::CheckL12L0BDataType<T, U>();
     }
 
@@ -116,7 +116,7 @@ private:
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0B_NZ2ZNB8B4_WITH_COORD_H
+#endif // IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_NPU_ARCH_3510_LOAD_DATA_L12L0B_NZ2ZNB8B4_WITH_COORD_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
