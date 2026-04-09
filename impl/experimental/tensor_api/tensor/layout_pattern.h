@@ -16,6 +16,7 @@
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_PATTERN_H
 
 #include "impl/experimental/tensor_api/tensor/layout_method.h"
+#include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -85,18 +86,18 @@ struct MakeZnFrameLayout {
     }
 };
 
-struct MakeZnFp4FrameLayout {
+struct MakeZnFP4FrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
         using DataType = typename TraitType::type;
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         static_assert(is_b4_type<DataType> && c0Ele == 64,
-            "ZnLayoutPatternFp4 only supports fp8_e8m0_t and ShapeColumn0 as 64.");
+            "ZnLayoutPatternFP4 only supports fp8_e8m0_t and ShapeColumn0 as 64.");
         auto shape = MakeShape(MakeShape(c0Ele, Std::ceil_division(row, c0Ele)),
                                MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
         auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(column, FRACTAL_FIXED)),
                                  MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}));
-        using LayoutT = Layout<decltype(shape), decltype(stride), ZnLayoutPatternFp4>;
+        using LayoutT = Layout<decltype(shape), decltype(stride), ZnLayoutPatternFP4>;
         return LayoutT(shape, stride);
     }
 };
