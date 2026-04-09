@@ -23,7 +23,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_GM2L1_DN2ZZ_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_GM2L1_DN2ZZ_H
 
-#include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/instruction.h"
+#include "impl/experimental/tensor_api/arch/datamove/gm_to_l1/npu_arch_3510/instruction.h"
 
 namespace AscendC {
 namespace Te {

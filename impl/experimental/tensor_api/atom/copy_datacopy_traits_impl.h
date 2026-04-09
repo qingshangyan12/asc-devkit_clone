@@ -49,7 +49,6 @@ struct CopyTraits<DataCopyOp, Traits> : public CopyTraits<DataCopyOp, Traits, Da
 template <>
 struct CopyTraits<DataCopyOp> : public CopyTraits<DataCopyOp, DataCopyTraitDefault> {};
 
-using CopyGM2L1 = DataCopyOp;
 using CopyL12UB = DataCopyOp;
 
 using CopyGM2UB = DataCopyOp;
