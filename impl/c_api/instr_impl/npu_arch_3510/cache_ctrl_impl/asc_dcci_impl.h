@@ -25,10 +25,19 @@
  
 #include "instr_impl/npu_arch_3510/utils_impl.h"
 
+#ifndef ASCENDC_CPU_DEBUG
+namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single_impl(__gm__ void* dst)
 {
     dcci(dst, cache_line_t::SINGLE_CACHE_LINE);
 }
+}
+#else
+__aicore__ inline void asc_dcci_single_impl(__gm__ void* dst)
+{
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE);
+}
+#endif // ASCENDC_CPU_DEBUG
 
 __aicore__ inline void asc_ub_dcci_single_impl(__ubuf__ void* dst)
 {

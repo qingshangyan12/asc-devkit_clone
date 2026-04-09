@@ -23,10 +23,22 @@
 #include "cache_ctrl_impl/asc_dcci_impl.h"
 #include "cache_ctrl_impl/asc_icache_preload_impl.h"
 
+#ifndef ASCENDC_CPU_DEBUG
+namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst)
 {
     asc_dcci_single_impl(dst);
 }
+}
+#else
+#ifndef __ASC_DCCI_DEFINED__
+#define __ASC_DCCI_DEFINED__
+__aicore__ inline void asc_dcci_single(__gm__ void *dst)
+{
+    asc_dcci_single_impl(dst);
+}
+#endif // __ASC_DCCI_DEFINED__
+#endif // ASCENDC_CPU_DEBUG
 
 __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
 {
