@@ -23,6 +23,7 @@
 #include "cache_ctrl_impl/asc_dcci_impl.h"
 #include "cache_ctrl_impl/asc_icache_preload_impl.h"
 
+namespace __asc_simd_vf {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst)
 {
     asc_dcci_single_impl(dst);
@@ -31,6 +32,7 @@ __aicore__ inline void asc_dcci_single(__gm__ void* dst)
 __aicore__ inline void asc_dcci_entire(__gm__ void* dst)
 {
     asc_dcci_entire_impl(dst);
+}
 }
 
 __aicore__ inline void asc_dcci_single_all(__gm__ void* dst)

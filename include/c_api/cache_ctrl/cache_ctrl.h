@@ -29,9 +29,11 @@
 
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len);
 
+namespace __asc_simd_vf {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst);
 
 __aicore__ inline void asc_dcci_entire(__gm__ void* dst);
+}
 
 __aicore__ inline void asc_dcci_single_all(__gm__ void* dst);
 
