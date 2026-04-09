@@ -28,10 +28,19 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
     asc_datacache_preload_impl(address, offset);
 }
 
+#ifndef ASCENDC_CPU_DEBUG
+namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst)
 {
     asc_dcci_single_impl(dst);
 }
+}
+#else
+__aicore__ inline void asc_dcci_single(__gm__ void *dst)
+{
+    asc_dcci_single_impl(dst);
+}
+#endif // ASCENDC_CPU_DEBUG
 
 __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
 {
