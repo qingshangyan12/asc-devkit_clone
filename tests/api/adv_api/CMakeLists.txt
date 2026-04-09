@@ -38,14 +38,6 @@ set(ASCENDC_TEST_HEADER_FILES
     ${ASCENDC_DIR}/impl/basic_api
 )
 
-set(LIBC_SEC_DIR "/home/jenkins/Ascend/cann-9.0.0/x86_64-linux/lib64/device/lib64")
-
-execute_process(
-    COMMAND ln -sf libc_sec.so libc_secshared.so
-    WORKING_DIRECTORY ${LIBC_SEC_DIR}
-)
-
-
 # # ================ adv_api kernel ut ================
 # ascend610 test cases
 file(GLOB ASCENDC_TEST_ascend610_CASE_SRC_FILES
@@ -451,6 +443,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         error_manager
         mmpa
         c_sec
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:-Wl,--defsym=libc_secshared=libc_sec>
         -Wl,--as-needed
     )
 
