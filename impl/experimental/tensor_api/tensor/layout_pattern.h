@@ -16,7 +16,6 @@
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_PATTERN_H
 
 #include "impl/experimental/tensor_api/tensor/layout_method.h"
-#include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
 
 namespace AscendC {
 namespace Te {
