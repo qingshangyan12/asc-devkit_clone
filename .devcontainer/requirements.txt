@@ -1,0 +1,30 @@
+setuptools>=75,<80
+attrs
+decorator
+psutil
+scipy
+absl-py
+ml-dtypes
+tornado
+
+# Cython
+# h5py==3.1.0
+# tensorflow==2.6.5
+# protobuf==3.19.4
+numpy>=2.2,<2.3
+pybind11>=2.13.6,<3.0.0
+
+PyYAML
+ruamel.yaml
+jinja2
+Path
+dataclasses
+
+coverage
+pytest
+cloudpickle
+build
+
+sympy==1.13.1;python_version=="3.10"
+torch==2.6.0;python_version=="3.10"
+torch==2.7.1;python_version=="3.12"

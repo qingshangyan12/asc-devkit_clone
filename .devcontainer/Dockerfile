@@ -2,45 +2,55 @@
 # docker run -it --rm ascendc_images:ubuntu24.04
 FROM ubuntu:24.04
 
+# ============================================================
+# 镜像源配置
+# 清华源:   mirrors.tuna.tsinghua.edu.cn
+# 中科大源: mirrors.ustc.edu.cn
+# 阿里源:   mirrors.aliyun.com
+# ============================================================
+ARG APT_MIRROR=mirrors.tuna.tsinghua.edu.cn
+ARG PYPI_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple
+ARG CONDA_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/anaconda
+ARG REPO_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/git/git-repo
+
+# ============================================================
+# 基础环境变量
+# ============================================================
 USER root
 WORKDIR /tmp
-
 ENV TZ=Asia/Shanghai
 ENV LANG=C.UTF-8
-RUN sed -i 's@//ports.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list.d/ubuntu.sources && apt update
+ENV SHELL=/bin/zsh
 
-# # 时区 & 语言
-# RUN apt install -y tzdata lsb-release
-# # 网络 & 安全
-# RUN apt install -y curl wget gnupg2 openssl libssl-dev pciutils net-tools
-# # 压缩 & 文件处理
-# RUN apt install -y unzip zip xz-utils liblzma-dev dos2unix m4 gawk patch
-# # 编译工具链
-# RUN apt install -y build-essential gcc g++ make cmake ninja-build ccache autoconf automake libtool pkg-config gfortran
-# # 开发库
-# RUN apt install -y zlib1g zlib1g-dev libsqlite3-dev libffi-dev libbz2-dev libreadline-dev libncurses-dev
-# # 数学库（BLAS / LAPACK）
-# RUN apt install -y libblas-dev libblas3 liblapack-dev liblapack3 libopenblas-dev
-# 调试 & 分析
-# RUN apt install -y gdb gdbserver lsof lcov
-# 版本控制 & 脚本
-# RUN apt install -y git git-lfs expect
-# 实用工具
-# RUN apt install -y vim tmux htop tree file jq
-# RUN apt install -y tzdata lsb-release curl wget gnupg2 openssl pciutils net-tools gawk build-essential cmake ccache autoconf automake libtool pkg-config lcov git git-lfs vim htop tree && rm -rf /var/lib/apt/lists/*
-
+# ============================================================
+# apt 换源 & 系统包安装
+# ============================================================
+RUN sed -i "s@//ports.ubuntu.com@//${APT_MIRROR}@g" /etc/apt/sources.list.d/ubuntu.sources && \
+    apt update
 RUN apt install -y \
-      tzdata lsb-release \
-      curl wget gnupg2 openssl \
-      build-essential cmake ninja-build ccache pkg-config \
-      gdb gdbserver \
-      git git-lfs \
-      lcov \
-      vim htop tree zsh \
+      tzdata lsb-release curl wget gnupg2 openssl \
+      build-essential cmake ninja-build ccache pkg-config autoconf automake libtool gperf \
+      gdb gdbserver git git-lfs lcov vim htop tree zsh \
       && rm -rf /var/lib/apt/lists/*
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# oh-my-zsh + plugin
+# ============================================================
+# repo 工具
+# ============================================================
+RUN curl -fsSL ${REPO_MIRROR} -o /usr/local/bin/repo && \
+    chmod a+x /usr/local/bin/repo
+
+# ============================================================
+# git 全局配置
+# ============================================================
+RUN git config --global core.autocrlf input && \
+    git config --global core.editor vim && \
+    git config --global color.ui auto && \
+    git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+
+# ============================================================
+# oh-my-zsh + 插件（需要访问 GitHub，偶尔会变动）
+# ============================================================
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && \
     git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions \
         /root/.oh-my-zsh/custom/plugins/zsh-autosuggestions && \
@@ -49,31 +59,31 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
     sed -i 's/plugins=(git)/plugins=(git z zsh-autosuggestions zsh-syntax-highlighting)/' /root/.zshrc && \
     sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="agnoster"/' /root/.zshrc && \
     chsh -s $(which zsh) root
-ENV SHELL=/bin/zsh
 
-# git config
-RUN git config --global core.autocrlf input && \
-    git config --global core.editor vim && \
-    git config --global color.ui auto && \
-    git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
-
-# miniconda
-RUN wget -q https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-aarch64.sh \
+# ============================================================
+# miniconda + Python 环境
+# ============================================================
+RUN wget -q ${CONDA_MIRROR}/miniconda/Miniconda3-latest-Linux-aarch64.sh \
          -O /tmp/miniconda.sh && \
     bash /tmp/miniconda.sh -b -p /opt/conda && \
     rm /tmp/miniconda.sh
 ENV PATH=/opt/conda/bin:$PATH
-RUN printf "[global]\nindex-url = https://pypi.tuna.tsinghua.edu.cn/simple\n" > /etc/pip.conf
-RUN conda config --file /opt/conda/.condarc --remove channels defaults && \
-    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free && \
-    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main && \
-    conda config --set show_channel_urls yes && \
-    conda config --set channel_priority strict && \
+RUN printf "[global]\nindex-url = ${PYPI_MIRROR}\n" > /etc/pip.conf
+RUN printf "channels:\n\
+  - ${CONDA_MIRROR}/pkgs/main\n\
+  - ${CONDA_MIRROR}/pkgs/free\n\
+show_channel_urls: true\n\
+channel_priority: strict\n" > /root/.condarc && \
     conda create -q -y -n py310 python=3.10 && \
     conda create -q -y -n py312 python=3.12 && \
     conda clean -ya
+
+# ============================================================
+# shell 个性化配置
+# ============================================================
 RUN conda init zsh && \
-    echo "conda activate py312" >> /root/.zshrc
+    echo "conda activate py312" >> /root/.zshrc && \
+    echo "export REPO_URL=\"${REPO_MIRROR}\"" >> /root/.zshrc
 
 # AscendC banner
 RUN cat >> /root/.zshrc << 'EOF'
