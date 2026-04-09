@@ -9,22 +9,16 @@
 */
 
 /*!
-* \file frame_layout.h
+* \file layout_frame.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_TENSOR_FRAME_LAYOUT_H
-#define IMPL_TENSOR_API_TENSOR_FRAME_LAYOUT_H
+#ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_FRAME_H
+#define IMPL_TENSOR_API_TENSOR_LAYOUT_FRAME_H
 
-#include "impl/experimental/tensor_api/tensor/frame_layout_pattern.h"
+#include "impl/experimental/tensor_api/tensor/layout_pattern.h"
 
 namespace AscendC {
 namespace Te {
-
-template <typename T = uint16_t, size_t C0 = 32 / sizeof(T)>
-struct LayoutTrait {
-    using type = T;
-    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
-};
 
 using LayoutFormatSet = TupleMap<
     Std::tuple<NzLayoutPattern, MakeNzFrameLayout>,
@@ -39,6 +33,40 @@ using LayoutFormatSet = TupleMap<
     Std::tuple<ScaleBNDLayoutPattern, MakeScaleBNDFrameLayout>,
     Std::tuple<ScaleBDNLayoutPattern, MakeScaleBDNFrameLayout>>;
 
+template <typename T, typename = void>
+struct PatternTrait;
+
+template <typename T>
+struct PatternTrait<T, Std::enable_if_t<is_layout_v<T>>> {
+    using type = typename Std::remove_cvref_t<T>::tag;
+};
+
+template <typename T>
+struct PatternTrait<T, Std::enable_if_t<IsTileTensorV<T>>> {
+    using type = typename PatternTrait<decltype(Std::declval<const T&>().Layout())>::type;
+};
+
+template <typename T>
+using GetLayoutPattern = typename PatternTrait<T>::type;
+
+template <typename T = uint16_t, size_t C0 = 32 / sizeof(T)>
+struct LayoutTraitDefault {
+    using type = T;
+    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
+};
+
+template <typename T = fp8_e8m0_t, size_t C0 = 2 / sizeof(T)>
+struct LayoutTraitScale {
+    using type = T;
+    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
+};
+
+template <typename T = fp4x2_e2m1_t, size_t C0 = 64 / sizeof(T)>
+struct LayoutTraitFP4 {
+    using type = T;
+    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
+};
+
 template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
     using GetLayoutMakeFun = typename LayoutFormatSet::template Get<LayoutPattern>;
@@ -46,10 +74,18 @@ __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
     return GetLayoutMakeFun::template Make<TraitType>(args...);
 }
 
+template <typename LayoutPattern, typename TraitType>
+struct FrameLayoutFormat {
+    template <typename... Args>
+    __aicore__ inline decltype(auto) operator()(const Args&... args) {
+        return MakeFrameLayout<LayoutPattern, TraitType>(args...);
+    }
+};
+
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_TENSOR_FRAME_LAYOUT_H
+#endif // IMPL_TENSOR_API_TENSOR_LAYOUT_FRAME_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

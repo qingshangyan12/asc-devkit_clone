@@ -9,11 +9,11 @@
 */
 
 /*!
-* \file frame_layout_pattern.h
+* \file layout_pattern.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_TENSOR_FRAME_LAYOUT_PATTERN_H
-#define IMPL_TENSOR_API_TENSOR_FRAME_LAYOUT_PATTERN_H
+#ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_PATTERN_H
+#define IMPL_TENSOR_API_TENSOR_LAYOUT_PATTERN_H
 
 #include "impl/experimental/tensor_api/tensor/layout_method.h"
 
@@ -49,7 +49,8 @@ struct MakeNzFrameLayout {
 struct MakeL0CFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
-        constexpr auto c0Ele = Std::Int<C0_ELEMENT<uint16_t>>{};
+        constexpr auto c0Ele = TraitType::C0_ELEMENT;
+        static_assert(c0Ele == 16, "L0CLayoutPattern only supports ShapeColumn0 as 16.");
         auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
                                MakeShape(c0Ele, Std::ceil_division(column, c0Ele)));
         auto stride = MakeStride(MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}),
@@ -109,12 +110,12 @@ struct MakeNnFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
         using DataType = typename TraitType::type;
-        static_assert(Std::is_same_v<DataType, fp8_e8m0_t>,
-            "NnLayoutPattern only supports fp8_e8m0_t.");
-        auto shape = MakeShape(MakeShape(Std::Int<MX_SCALE_K0>{}, row / MX_SCALE_K0),
-                               MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
-        auto stride = MakeStride(MakeStride(Std::Int<1>{}, Std::Int<C0_SIZE<fp8_e8m0_t>>{}),
-                                 MakeStride(Std::Int<MX_SCALE_K0>{}, row * FRACTAL_FIXED));
+        constexpr auto c0Ele = TraitType::C0_ELEMENT;
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t> && c0Ele == 2,
+            "NnLayoutPattern only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+        auto shape = MakeShape(MakeShape(c0Ele, row / c0Ele), MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
+        auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * Std::Int<FRACTAL_FIXED>{}),
+                                 MakeStride(c0Ele, row * FRACTAL_FIXED));
         using LayoutT = Layout<decltype(shape), decltype(stride), NnLayoutPattern>;
         return LayoutT(shape, stride);
     }
@@ -124,8 +125,7 @@ struct MakeScaleANDFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
         using DataType = typename TraitType::type;
-        static_assert(Std::is_same_v<DataType, fp8_e8m0_t>,
-            "ScaleANDLayoutPattern only supports fp8_e8m0_t.");
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t> , "ScaleANDLayoutPattern only supports fp8_e8m0_t.");
         auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
         auto stride = MakeStride(MakeStride(Std::Int<0>{}, column), MakeStride(Std::Int<0>{}, Std::Int<1>{}));
         using LayoutT = Layout<decltype(shape), decltype(stride), ScaleANDLayoutPattern>;
@@ -137,11 +137,12 @@ struct MakeScaleADNFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
         using DataType = typename TraitType::type;
-        static_assert(Std::is_same_v<DataType, fp8_e8m0_t>,
-            "ScaleADNLayoutPattern only supports fp8_e8m0_t.");
-        auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<MX_SCALE_K0>{}, column / MX_SCALE_K0));
-        auto stride = MakeStride(MakeStride(Std::Int<0>{}, Std::Int<MX_SCALE_K0>{}),
-                                 MakeStride(Std::Int<1>{}, MX_SCALE_K0 * row));
+        constexpr auto c0Ele = TraitType::C0_ELEMENT;
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t> && c0Ele == 2,
+            "ScaleADNLayoutPattern only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+        auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(c0Ele, column / c0Ele));
+        auto stride = MakeStride(MakeStride(Std::Int<0>{}, c0Ele),
+                                 MakeStride(Std::Int<1>{}, c0Ele * row));
         using LayoutT = Layout<decltype(shape), decltype(stride), ScaleADNLayoutPattern>;
         return LayoutT(shape, stride);
     }
@@ -151,11 +152,12 @@ struct MakeScaleBNDFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
         using DataType = typename TraitType::type;
-        static_assert(Std::is_same_v<DataType, fp8_e8m0_t>,
-            "ScaleBNDLayoutPattern only supports fp8_e8m0_t.");
-        auto shape = MakeShape(MakeShape(Std::Int<MX_SCALE_K0>{}, row / MX_SCALE_K0), MakeShape(Std::Int<1>{}, column));
-        auto stride = MakeStride(MakeStride(Std::Int<1>{}, MX_SCALE_K0 * column),
-                                 MakeStride(Std::Int<0>{}, Std::Int<MX_SCALE_K0>{}));
+        constexpr auto c0Ele = TraitType::C0_ELEMENT;
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t> && c0Ele == 2,
+            "ScaleBNDLayoutPattern only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+        auto shape = MakeShape(MakeShape(c0Ele, row / c0Ele), MakeShape(Std::Int<1>{}, column));
+        auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * column),
+                                 MakeStride(Std::Int<0>{}, c0Ele));
         using LayoutT = Layout<decltype(shape), decltype(stride), ScaleBNDLayoutPattern>;
         return LayoutT(shape, stride);
     }
@@ -165,8 +167,7 @@ struct MakeScaleBDNFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
         using DataType = typename TraitType::type;
-        static_assert(Std::is_same_v<DataType, fp8_e8m0_t>,
-            "ScaleBDNLayoutPattern only supports fp8_e8m0_t.");
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t> , "ScaleBDNLayoutPattern only supports fp8_e8m0_t.");
         auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
         auto stride = MakeStride(MakeStride(Std::Int<0>{}, Std::Int<1>{}), MakeStride(Std::Int<0>{}, row));
         using LayoutT = Layout<decltype(shape), decltype(stride), ScaleBDNLayoutPattern>;
@@ -174,7 +175,8 @@ struct MakeScaleBDNFrameLayout {
     }
 };
 
+
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_TENSOR_FRAME_LAYOUT_PATTERN_H
+#endif // IMPL_TENSOR_API_TENSOR_LAYOUT_PATTERN_H

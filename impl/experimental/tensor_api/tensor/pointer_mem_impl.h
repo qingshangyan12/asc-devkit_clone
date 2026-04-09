@@ -23,7 +23,6 @@
 #define IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
 
 #include "impl/experimental/tensor_api/tensor/pointer_adaptor_impl.h"
-
 namespace AscendC {
 namespace Te {
 
@@ -55,7 +54,6 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iter)
         return HardwareMemPtr<hardPos, Iterator>{iter};
     }
 }
-
 } // namespace Te
 } // namespace AscendC
 

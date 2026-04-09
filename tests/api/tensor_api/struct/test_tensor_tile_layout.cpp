@@ -1108,13 +1108,13 @@ TEST_F(Tensor_Api_Layout, TestMakeFrameLayout)
 {
     using namespace AscendC::Te;
 
-    auto ndLayout = MakeFrameLayout<NDLayoutPattern, LayoutTrait<>>(128, 256);
+    auto ndLayout = MakeFrameLayout<NDLayoutPattern, LayoutTraitDefault<>>(128, 256);
     EXPECT_EQ(AscendC::Std::get<1>(ndLayout.Shape<0>()), 128);
     EXPECT_EQ(AscendC::Std::get<1>(ndLayout.Shape<1>()), 256);
     EXPECT_EQ(AscendC::Std::get<1>(ndLayout.Stride<0>()), 256);
     EXPECT_EQ(AscendC::Std::get<1>(ndLayout.Stride<1>()), 1);
 
-    auto nzLayout = MakeFrameLayout<NzLayoutPattern, LayoutTrait<float>>(128, 256);
+    auto nzLayout = MakeFrameLayout<NzLayoutPattern, LayoutTraitDefault<float>>(128, 256);
     auto nzShape0 = nzLayout.Shape<0>();
     auto nzShape1 = nzLayout.Shape<1>();
     auto nzStride0 = nzLayout.Stride<0>();
@@ -1130,7 +1130,7 @@ TEST_F(Tensor_Api_Layout, TestMakeFrameLayout)
     EXPECT_EQ(AscendC::Std::get<0>(nzStride1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(nzStride1), 128 * c0Ele);
 
-    auto customNzLayout = MakeFrameLayout<NzLayoutPattern, LayoutTrait<float, 16>>(128, 256);
+    auto customNzLayout = MakeFrameLayout<NzLayoutPattern, LayoutTraitDefault<float, 16>>(128, 256);
     auto customNzShape1 = customNzLayout.Shape<1>();
     auto customNzStride0 = customNzLayout.Stride<0>();
     auto customNzStride1 = customNzLayout.Stride<1>();
