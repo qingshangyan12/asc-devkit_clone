@@ -373,6 +373,36 @@ SelectorStatus AllReduceAutoSelector::SelectMeshAlgoAicpu(const TopoInfoWithNetL
     return SelectorStatus::MATCH;
 }
 
+SelectorStatus AllReduceAutoSelector::SelectAivAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
+                                                    const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
+                                                    std::string &selectAlgName) const
+{
+    (void)configAlgMap;
+    HCCL_DEBUG("[Algo][AllReduceAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
+    
+    //aiv 模式不支持 PROD
+    CHK_PRT_RET(opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD,
+        HCCL_DEBUG("[Algo][AllReduceAutoSelector] ReduceOp[%d] is not supported yet for aiv mode.",
+            opParam.reduceType),
+        SelectorStatus::NOT_MATCH);
+
+    if (Is64BitDataType(opParam.DataDes.dataType)) {
+        HCCL_DEBUG("[Algo][AllReduceAutoSelector] aiv mode not support INT64, UINT64, FP64.");
+        return SelectorStatus::NOT_MATCH;
+    }
+
+ 
+    u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
+    u64 dataSize = opParam.DataDes.count * perDataSize;
+    if (IsSmallData(dataSize)) {
+        selectAlgName = "AivAllReduceMesh1DOneShot";
+    } else {
+        selectAlgName = "AivAllReduceMesh1DTwoShot";
+    }
+    HCCL_DEBUG("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+    return SelectorStatus::MATCH;
+}
+
 SelectorStatus AllReduceAutoSelector::SelectDPUAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
         const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap, std::string &selectAlgName) const
 {
