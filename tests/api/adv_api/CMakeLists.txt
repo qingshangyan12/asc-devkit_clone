@@ -428,6 +428,16 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         -Werror
     )
 
+    if(${product_type} STREQUAL "KirinX90_AIV")
+        set(LIBC_SEC_DIR /home/jenkins/Ascend/cann-9.0.0/x86_64-linux/lib64/device/lib64)
+        execute_process(
+            COMMAND ln -sf libc_sec.so libc_secshared.so
+            WORKING_DIRECTORY ${LIBC_SEC_DIR}
+            OUTPUT_QUIET
+            ERROR_QUIET
+        )
+    endif()
+
     target_link_libraries(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         kernel_tiling
@@ -443,7 +453,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         error_manager
         mmpa
         c_sec
-        $<$<STREQUAL:${product_type},KirinX90_AIV>:-L /home/jenkins/Ascend/cann-9.0.0/x86_64-linux/lib64/device/lib64 -l:libc_sec.so>
         -Wl,--as-needed
     )
 
