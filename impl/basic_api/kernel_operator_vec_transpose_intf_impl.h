@@ -48,6 +48,28 @@
 
 namespace AscendC {
 #pragma begin_pipe(V)
+
+// TransDataTo5HD common checks: dtype, dstHighHalf/srcHighHalf, repeatTimes
+// Used by: all 3 TransDataTo5HD overloads
+template <typename T>
+__aicore__ inline void CheckTransDataTo5HDParams(const TransDataTo5HDParams& nchwconvParams)
+{
+    using PrimType = PrimT<T>;
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype is "
+        "int8_t / uint8_t / int16_t / uint16_t / half / int32_t / uint32_t / float.\n"));
+    // dstHighHalf/srcHighHalf only valid for int8_t/uint8_t
+    if constexpr (!SupportType<PrimType, int8_t, uint8_t>()) {
+        ASCENDC_DEBUG_ASSERT((nchwconvParams.dstHighHalf == false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dstHighHalf in TransDataTo5HD, "
+            "dstHighHalf is only valid for int8_t / uint8_t dtype.\n"));
+        ASCENDC_DEBUG_ASSERT((nchwconvParams.srcHighHalf == false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check srcHighHalf in TransDataTo5HD, "
+            "srcHighHalf is only valid for int8_t / uint8_t dtype.\n"));
+    }
+    CheckValueRange<int32_t>(nchwconvParams.repeatTimes, 0, 255, "repeatTimes", "TransDataTo5HD");
+}
+
 /* **************************************************************************************************
  * Transpose                                            *
  * ************************************************************************************************* */
@@ -92,21 +114,8 @@ __aicore__ inline void TransDataTo5HD(const LocalTensor<T> (&dstList)[NCHW_CONV_
     const LocalTensor<T> (&srcList)[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201))
-    using PrimType = PrimT<T>;
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype is "
-        "int8_t / uint8_t / int16_t / uint16_t / half / int32_t / uint32_t / float.\n"));
-    // dstHighHalf/srcHighHalf only valid for int8_t/uint8_t
-    if constexpr (!SupportType<PrimType, int8_t, uint8_t>()) {
-        ASCENDC_DEBUG_ASSERT((nchwconvParams.dstHighHalf == false),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dstHighHalf in TransDataTo5HD, "
-            "dstHighHalf is only valid for int8_t / uint8_t dtype.\n"));
-        ASCENDC_DEBUG_ASSERT((nchwconvParams.srcHighHalf == false),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check srcHighHalf in TransDataTo5HD, "
-            "srcHighHalf is only valid for int8_t / uint8_t dtype.\n"));
-    }
-    CheckValueRange<int32_t>(nchwconvParams.repeatTimes, 0, 255, "repeatTimes", "TransDataTo5HD");
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckTransDataTo5HDParams<T>(nchwconvParams);
     for (int32_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
         CheckTensorPhyPosition<Hardware::UB>(dstList[i], "dstList", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
         CheckTensorPhyPosition<Hardware::UB>(srcList[i], "srcList", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
@@ -136,26 +145,17 @@ __aicore__ inline void TransDataTo5HD(uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE]
     uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201))
-    using PrimType = PrimT<T>;
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype is "
-        "int8_t / uint8_t / int16_t / uint16_t / half / int32_t / uint32_t / float.\n"));
-    // dstHighHalf/srcHighHalf only valid for int8_t/uint8_t
-    if constexpr (!SupportType<PrimType, int8_t, uint8_t>()) {
-        ASCENDC_DEBUG_ASSERT((nchwconvParams.dstHighHalf == false),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dstHighHalf in TransDataTo5HD, "
-            "dstHighHalf is only valid for int8_t / uint8_t dtype.\n"));
-        ASCENDC_DEBUG_ASSERT((nchwconvParams.srcHighHalf == false),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check srcHighHalf in TransDataTo5HD, "
-            "srcHighHalf is only valid for int8_t / uint8_t dtype.\n"));
-    }
-    CheckValueRange<int32_t>(nchwconvParams.repeatTimes, 0, 255, "repeatTimes", "TransDataTo5HD");
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckTransDataTo5HDParams<T>(nchwconvParams);
     for (int32_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
-        ASCENDC_DEBUG_ASSERT((dstList[i] % ONE_BLK_SIZE == 0),
+        uint64_t dstAddr = (uint8_t *)dstList[i] -
+                           (uint8_t*)(GetTPipePtr()->GetBaseAddr(int8_t(AscendC::TPosition(TPosition::VECIN))));
+        uint64_t srcAddr = (uint8_t *)srcList[i] -
+                           (uint8_t*)(GetTPipePtr()->GetBaseAddr(int8_t(AscendC::TPosition(TPosition::VECIN))));
+        ASCENDC_DEBUG_ASSERT((dstAddr % ONE_BLK_SIZE == 0),
             KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dstList alignment in TransDataTo5HD, "
             "all addresses should be 32B aligned.\n"));
-        ASCENDC_DEBUG_ASSERT((srcList[i] % ONE_BLK_SIZE == 0),
+        ASCENDC_DEBUG_ASSERT((srcAddr % ONE_BLK_SIZE == 0),
             KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check srcList alignment in TransDataTo5HD, "
             "all addresses should be 32B aligned.\n"));
     }
@@ -228,21 +228,8 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(const Local
     const LocalTensor<uint64_t> &src, const TransDataTo5HDParams &nchwconvParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201))
-    using PrimType = PrimT<T>;
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype is "
-        "int8_t / uint8_t / int16_t / uint16_t / half / int32_t / uint32_t / float.\n"));
-    // dstHighHalf/srcHighHalf only valid for int8_t/uint8_t
-    if constexpr (!SupportType<PrimType, int8_t, uint8_t>()) {
-        ASCENDC_DEBUG_ASSERT((nchwconvParams.dstHighHalf == false),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dstHighHalf in TransDataTo5HD, "
-            "dstHighHalf is only valid for int8_t / uint8_t dtype.\n"));
-        ASCENDC_DEBUG_ASSERT((nchwconvParams.srcHighHalf == false),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check srcHighHalf in TransDataTo5HD, "
-            "srcHighHalf is only valid for int8_t / uint8_t dtype.\n"));
-    }
-    CheckValueRange<int32_t>(nchwconvParams.repeatTimes, 0, 255, "repeatTimes", "TransDataTo5HD");
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    CheckTransDataTo5HDParams<T>(nchwconvParams);
     CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
     CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "TransDataTo5HD");

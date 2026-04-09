@@ -199,38 +199,6 @@ __aicore__ inline void CheckMaskValue(const uint64_t mask, const __gm__ char* ap
     }
 }
 
-// Reduce API specific mask check: mask must be >= 1 in norm mode (not allow mask=0)
-// Used by: WholeReduceMax/Min/Sum, BlockReduceMax/Min/Sum, PairReduceSum, RepeatReduceSum
-template <typename T, bool isSetMask = true>
-__aicore__ inline void CheckReduceMaskValue(const uint64_t mask, const __gm__ char* apiName)
-{
-    if ASCEND_IS_AIC {
-        return;   // AIC does not need to check mask
-    }
-    if constexpr(!isSetMask) {
-        return;   // when isSetMask = false, use previous mask. Thus no need for check.
-    }
-
-    if (!IsMaskNorm()) {
-        // counter mode: mask should be in range [0, UINT32_MAX]
-        ASCENDC_DEBUG_ASSERT((mask <= UINT32_MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value when "
-            "counter mode in %s, mask should be in range [0, UINT32_MAX], current value is %llu.\n", apiName, mask));
-        return;
-    }
-
-    // norm mode: reduce APIs require mask >= 1
-    ASCENDC_DEBUG_ASSERT((mask >= 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value in %s, when in "
-        "norm mode, mask must be >= 1 for reduce APIs, current value is %llu.\n", apiName, mask));
-
-    if constexpr (sizeof(T) == 2) {
-        // half: mask in [1, 128]
-        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask", apiName);
-    } else if constexpr (sizeof(T) == 4) {
-        // float: mask in [1, 64]
-        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask", apiName);
-    }
-}
-
 __aicore__ inline void CheckCalcount(const int32_t calcount, const __gm__ char* paramName, const __gm__ char* apiName)
 {
     ASCENDC_DEBUG_ASSERT((calcount >= 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s value in %s, %s should "
@@ -242,6 +210,68 @@ __aicore__ inline void CheckVectorTensor(const __gm__ char* apiName, const Ts& .
 {
     (CheckTensorPhyPosition<Hardware::UB>(tensors.tensor, tensors.tensorName, "VECIN / VECCALC / VECOUT", apiName), ...);
     (CheckTensorAlignment(tensors.tensor, ONE_BLK_SIZE, tensors.tensorName, apiName), ...);
+}
+
+// Reduce base checks: dtype, repeatTime, position, src alignment
+// Shared by BlockReduce and WholeReduce (both maskCount and maskBit overloads)
+template <typename T>
+__aicore__ inline void CheckReduceBaseParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const int32_t repeatTime, const __gm__ char* apiName)
+{
+    using PrimType = PrimT<T>;
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype in %s, current api support dtype combination is "
+        "src and dst both: half / float.\n", apiName));
+    CheckValueRange<int32_t>(repeatTime, 0, 255, "repeatTime", apiName);
+    CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
+}
+
+// BlockReduce common checks: dtype, repeatTime, position, alignment
+// Used by: BlockReduceSum/Max/Min (both maskCount and maskBit overloads)
+template <typename T>
+__aicore__ inline void CheckBlockReduceParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const int32_t repeatTime, const __gm__ char* apiName)
+{
+    CheckReduceBaseParams<T>(dst, src, repeatTime, apiName);
+    using PrimType = PrimT<T>;
+    if constexpr (sizeof(PrimType) == 2) {
+        CheckTensorAlignment(dst, 16, "dst", apiName);  // half: 16B
+    } else if constexpr (sizeof(PrimType) == 4) {
+        CheckTensorAlignment(dst, 32, "dst", apiName);  // float: 32B
+    }
+}
+
+// WholeReduce common checks: dtype, repeatTime, position, alignment (with order)
+// Used by: WholeReduceMax/Min (both maskCount and maskBit overloads)
+template <typename T>
+__aicore__ inline void CheckWholeReduceCommonParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const int32_t repeatTime, ReduceOrder order, const __gm__ char* apiName)
+{
+    CheckReduceBaseParams<T>(dst, src, repeatTime, apiName);
+    CheckValueRange<int>(static_cast<int>(order), 0, 3, "order", apiName);
+    using PrimType = PrimT<T>;
+    if constexpr (sizeof(PrimType) == 2) {
+        CheckTensorAlignment(dst, 4, "dst", apiName);  // half: 4B
+    } else if constexpr (sizeof(PrimType) == 4) {
+        CheckTensorAlignment(dst, 8, "dst", apiName);  // float: 8B
+    }
+}
+
+// WholeReduce common checks: dtype, repeatTime, position, alignment (without order)
+// Used by: WholeReduceSum (both maskCount and maskBit overloads)
+template <typename T>
+__aicore__ inline void CheckWholeReduceCommonParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const int32_t repeatTime, const __gm__ char* apiName)
+{
+    CheckReduceBaseParams<T>(dst, src, repeatTime, apiName);
+    using PrimType = PrimT<T>;
+    if constexpr (sizeof(PrimType) == 2) {
+        CheckTensorAlignment(dst, 2, "dst", apiName);  // half: 2B
+    } else if constexpr (sizeof(PrimType) == 4) {
+        CheckTensorAlignment(dst, 4, "dst", apiName);  // float: 4B
+    }
 }
 
 } // namespace AscendC
