@@ -18,8 +18,8 @@ Ascend C提供多层级API，满足多维场景算子开发诉求。
 
 ## 成长地图<a name="zh-cn_topic_0000002484241782_section181811514171911"></a>
 
-<div style="position:relative;display:inline-block;width:100%;">
-  <img src="../figures/zh-cn_image_0000002533161253.png" style="display:block;width:100%;" />
+<div style="position:relative;display:inline-block;max-width:992px;width:100%;">
+  <img src="../figures/zh-cn_image_0000002533161253.png" style="display:block;max-width:992px;width:100%;" />
   <a href="环境准备.md" title="环境准备" style="position:absolute;left:17.3%;top:10.3%;width:9.3%;height:3.9%;display:block;border:2px solid transparent;"></a>
   <a href="../编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md" title="SIMD编程模型" style="position:absolute;left:17.8%;top:26.9%;width:10.9%;height:4.1%;display:block;border:2px solid transparent;"></a>
   <a href="../编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md" title="SIMT编程模型" style="position:absolute;left:30.4%;top:27.3%;width:11.9%;height:3.3%;display:block;border:2px solid transparent;"></a>
