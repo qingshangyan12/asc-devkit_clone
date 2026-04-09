@@ -76,15 +76,53 @@
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
-    
+
 - 样例执行
+
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
+  cmake -DNPU_ARCH=dav-2201 ..;make -j;             # 编译工程
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
   ```
+
   执行结果如下，说明精度对比成功。
+
+  ```bash
+  test pass!
+  ```
+
+  **编译选项说明**
+
+  | 参数 | 说明 | 可选值 | 默认值 |
+  |------|------|---------|---------|
+  | `RUN_MODE` | 运行模式：`npu`（NPU模式）、`cpu`（CPU调试模式）、`sim`（NPU仿真模式） | `npu`、`cpu`、`sim` | `npu` |
+  | `NPU_ARCH` | NPU硬件架构 | `dav-2201`、`dav-3510` | `dav-2201` |
+
+  **NPU_ARCH 对应产品**
+
+  | NPU_ARCH | 对应产品 |
+  |----------|---------|
+  | `dav-2201` | Atlas A2 训练/推理系列产品、Atlas A3 训练/推理系列产品 |
+  | `dav-3510` | Ascend 950PR/Ascend 950DT |
+
+  **多模式编译示例**
+
+  - CPU调试模式：
+
+    ```bash
+    cmake -DRUN_MODE=cpu -DNPU_ARCH=dav-2201 ..;make -j
+    ```
+
+  - NPU仿真模式：
+
+    ```bash
+    cmake -DRUN_MODE=sim -DNPU_ARCH=dav-2201 ..;make -j
+    ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 ``rm CMakeCache.txt` 后重新 cmake。
+  执行结果如下，说明精度对比成功。
+
   ```bash
   test pass!
   ```
