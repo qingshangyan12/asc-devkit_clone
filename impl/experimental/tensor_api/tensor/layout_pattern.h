@@ -21,7 +21,7 @@ namespace AscendC {
 namespace Te {
 
 struct ZnLayoutPattern {};
-struct ZnLayoutPatternFP4 {};
+struct FP4ZnLayoutPattern {};
 struct ZzLayoutPattern {};
 struct NnLayoutPattern {};
 struct NzLayoutPattern {};

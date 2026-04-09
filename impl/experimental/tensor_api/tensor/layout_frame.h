@@ -33,7 +33,7 @@ using LayoutFormatSet = TupleMap<
     Std::tuple<ScaleBNDLayoutPattern, MakeScaleBNDFrameLayout>,
     Std::tuple<ScaleBDNLayoutPattern, MakeScaleBDNFrameLayout>,
     Std::tuple<ScaleZzLayoutPattern, MakeScaleZzFrameLayout>,
-    Std::tuple<ZnLayoutPatternFP4, MakeZnFP4FrameLayout>>;
+    Std::tuple<FP4ZnLayoutPattern, MakeZnFP4FrameLayout>>;
 
 template <typename T = uint16_t, size_t C0 = 32 / sizeof(T)>
 struct LayoutTraitDefault {
