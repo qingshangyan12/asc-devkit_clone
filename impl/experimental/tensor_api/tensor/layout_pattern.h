@@ -21,12 +21,14 @@ namespace AscendC {
 namespace Te {
 
 struct ZnLayoutPattern {};
+struct ZnLayoutPatternFP4 {};
 struct ZzLayoutPattern {};
 struct NnLayoutPattern {};
 struct NzLayoutPattern {};
 struct L0CLayoutPattern {};
 struct NDLayoutPattern {};
 struct DNLayoutPattern {};
+struct ScaleZzLayoutPattern {};
 struct ScaleANDLayoutPattern {};
 struct ScaleADNLayoutPattern {};
 struct ScaleBNDLayoutPattern {};
@@ -83,6 +85,22 @@ struct MakeZnFrameLayout {
     }
 };
 
+struct MakeZnFp4FrameLayout {
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
+        using DataType = typename TraitType::type;
+        constexpr auto c0Ele = TraitType::C0_ELEMENT;
+        static_assert(is_b4_type<DataType> && c0Ele == 64,
+            "ZnLayoutPatternFp4 only supports fp8_e8m0_t and ShapeColumn0 as 64.");
+        auto shape = MakeShape(MakeShape(c0Ele, Std::ceil_division(row, c0Ele)),
+                               MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
+        auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(column, FRACTAL_FIXED)),
+                                 MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}));
+        using LayoutT = Layout<decltype(shape), decltype(stride), ZnLayoutPatternFp4>;
+        return LayoutT(shape, stride);
+    }
+};
+
 struct MakeDNFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
@@ -102,6 +120,22 @@ struct MakeZzFrameLayout {
         auto stride = MakeStride(MakeStride(c0Ele, FRACTAL_FIXED * Std::ceil_align(column, c0Ele)),
                                  MakeStride(Std::Int<1>{}, c0Ele * Std::Int<FRACTAL_FIXED>{}));
         using LayoutT = Layout<decltype(shape), decltype(stride), ZzLayoutPattern>;
+        return LayoutT(shape, stride);
+    }
+};
+
+struct MakeScaleZzFrameLayout {
+    template <typename TraitType, typename T, typename U>
+    __aicore__ inline static auto Make(T row, U column) {
+        using DataType = typename TraitType::type;
+        constexpr auto c0Ele = TraitType::C0_ELEMENT;
+        static_assert(Std::is_same_v<DataType, fp8_e8m0_t> && c0Ele == 2,
+            "ScaleZzLayoutPattern only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+        auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
+                               MakeShape(c0Ele, Std::ceil_division(column, c0Ele)));
+        auto stride = MakeStride(MakeStride(c0Ele, FRACTAL_FIXED * Std::ceil_align(column, c0Ele)),
+                                 MakeStride(Std::Int<1>{}, c0Ele * Std::Int<FRACTAL_FIXED>{}));
+        using LayoutT = Layout<decltype(shape), decltype(stride), ScaleZzLayoutPattern>;
         return LayoutT(shape, stride);
     }
 };

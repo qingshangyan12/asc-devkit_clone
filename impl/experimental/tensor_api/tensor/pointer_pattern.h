@@ -9,72 +9,44 @@
 */
 
 /*!
-* \file pointer_pattern.h
+ * \file pointer_pattern.h
 * \brief
 */
 #ifndef IMPL_TENSOR_API_TENSOR_POINTER_PATTERN_H
 #define IMPL_TENSOR_API_TENSOR_POINTER_PATTERN_H
 
-#include "impl/experimental/tensor_api/tensor/pointer_mem_impl.h"
+#include "impl/experimental/tensor_api/utils/map_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_pattern_impl.h"
 
 namespace AscendC {
 namespace Te {
 
-struct MakeGMMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::GM, Iterator>{iter};
-    }
-};
+struct GMMemPtrPattern {};
+struct UBMemPtrPattern {};
+struct L1MemPtrPattern {};
+struct L0AMemPtrPattern {};
+struct L0BMemPtrPattern {};
+struct L0CMemPtrPattern {};
+struct BiasMemPtrPattern {};
+struct FixbufMemPtrPattern {};
 
-struct MakeUBMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::UB, Iterator>{iter};
-    }
-};
+using PtrMemSet = TupleMap<
+    Std::tuple<GMMemPtrPattern, MakeGMMemPtr>,
+    Std::tuple<UBMemPtrPattern, MakeUBMemPtr>,
+    Std::tuple<L1MemPtrPattern, MakeL1MemPtr>,
+    Std::tuple<L0AMemPtrPattern, MakeL0AMemPtr>,
+    Std::tuple<L0BMemPtrPattern, MakeL0BMemPtr>,
+    Std::tuple<L0CMemPtrPattern, MakeL0CMemPtr>,
+    Std::tuple<BiasMemPtrPattern, MakeBiasMemPtr>,
+    Std::tuple<FixbufMemPtrPattern, MakeFixbufMemPtr>>;
 
-struct MakeL1MemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::L1, Iterator>{iter};
-    }
-};
-
-struct MakeL0AMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::L0A, Iterator>{iter};
-    }
-};
-
-struct MakeL0BMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::L0B, Iterator>{iter};
-    }
-};
-
-struct MakeL0CMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::L0C, Iterator>{iter};
-    }
-};
-
-struct MakeBiasMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::BIAS, Iterator>{iter};
-    }
-};
-
-struct MakeFixbufMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::FIXBUF, Iterator>{iter};
-    }
-};
+template <typename PtrPattern, typename TraitType, typename... Args>
+__aicore__ inline constexpr auto MakeMemPatternPtr(Args... args)
+{
+    using GetPtrMakeFun = typename PtrMemSet::template Get<PtrPattern>;
+    static_assert(!Std::is_same_v<GetPtrMakeFun, EmptyValue>, "Unsupported pointer pattern.");
+    return GetPtrMakeFun::template Make<TraitType>(args...);
+}
 
 } // namespace Te
 } // namespace AscendC
