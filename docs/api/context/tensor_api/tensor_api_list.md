@@ -14,6 +14,7 @@ Tensor API文档目录，整体使用时可以引入tensor.h，Tensor API列表�
 | [Layout](struct/layout/Layout简介.md) | 定义Layout |
 | [LocalTensor](struct/tensor/LocalTensor.md) | 定义LocalTensor |
 | [Pointer](struct/pointer/Pointer.md) | 定义迭代器 |
+| [ViewEngine](struct/pointer/ViewEngine.md) | 定义视图引擎 |
 | [Tile](struct/tile/Tile.md) | 张量分块 |
 
 ### Atom原子操作
@@ -53,8 +54,6 @@ Tensor API文档目录，整体使用时可以引入tensor.h，Tensor API列表�
 | [MakeStride](struct/layout/MakeStride.md) | 构造Stride |
 | [GetShape](struct/layout/GetShape.md) | 获取Shape |
 | [GetStride](struct/layout/GetStride.md) | 获取Stride |
-| [Size](struct/layout/Size.md) | 返回Shape的总大小 |
-| [Capacity](struct/layout/Capacity.md) | 返回Layout的容量 |
 
 ### Coord
 
@@ -78,20 +77,21 @@ Tensor API文档目录，整体使用时可以引入tensor.h，Tensor API列表�
 | [MakeScaleANDLayout](struct/layout/layout_fractal/MakeScaleANDLayout.md) | 构造ScaleA ND Layout |
 | [MakeScaleBDNLayout](struct/layout/layout_fractal/MakeScaleBDNLayout.md) | 构造ScaleB DN Layout |
 | [MakeScaleBNDLayout](struct/layout/layout_fractal/MakeScaleBNDLayout.md) | 构造ScaleB ND Layout |
-| [is_Layout](struct/layout/is_layout.md) | 判断Layout |
-| [Select](struct/layout/Select.md) | 构造子Layout |
-| [Rank](struct/layout/Rank.md) | 返回Layout中的秩 |
+| [Capacity](struct/layout/Capacity.md) | 返回Layout的容量 |
 | [Coshape](struct/layout/Coshape.md) | 返回实际Shape空间 |
 | [Cosize](struct/layout/Cosize.md) | 返回实际占用的内存 |
+| [is_layout](struct/layout/is_layout.md) | 判断Layout |
+| [Get](struct/layout/Get.md) | 构造子Layout |
+| [Select](struct/layout/Select.md) | 构造子Layout |
+| [Rank](struct/layout/Rank.md) | 返回Layout中的秩 |
+| [Size](struct/layout/Size.md) | 返回Shape的总大小 |
 
 ### Tensor
 
 | API名称 | 说明 |
 | ---------- | ----------- |
 | [MakeTensor](struct/tensor/MakeTensor.md) | 构造LocalTensor |
-| [GetLayout](struct/tensor/GetLayout.md)  | 返回Layout对象 |
 | [Crd2Idx](struct/tensor/Crd2Idx.md) | Coordinate转Index |
-| [运算符重载](struct/tensor/运算符重载.md) | LocalTensor运算符重载 |
 
 ### Tile
 
@@ -103,19 +103,20 @@ Tensor API文档目录，整体使用时可以引入tensor.h，Tensor API列表�
 
 | API名称 | 说明 |
 | ---------- | ----------- |
-| [MakeGMmemPtr](struct/pointer/MakeGMmemPtr.md) | 构造GM Pointer迭代器 |
-| [MakeUBmemPtr](struct/pointer/MakeUBmemPtr.md) | 构造UB Pointer迭代器 |
-| [MakeL1memPtr](struct/pointer/MakeL1memPtr.md) | 构造L1 Pointer迭代器 |
-| [MakeL0AmemPtr](struct/pointer/MakeL0AmemPtr.md) | 构造L0A Pointer迭代器 |
-| [MakeL0BmemPtr](struct/pointer/MakeL0BmemPtr.md) | 构造L0B Pointer迭代器 |
-| [MakeL0CmemPtr](struct/pointer/MakeL0CmemPtr.md) | 构造L0C Pointer迭代器 |
-| [MakeBiasmemPtr](struct/pointer/MakeBiasmemPtr.md) | 构造Bias Pointer迭代器 |
-| [MakeFixbufmemPtr](struct/pointer/MakeFixbufmemPtr.md) | 构造Fixbuf Pointer迭代器 |
-| [ViewEngine](struct/pointer/ViewEngine.md) | 查看引擎 |
+| [MakeBiasmemPtr](struct/pointer/MakeBiasmemPtr.md) | 构造BiasTable Buffer上的Pointer迭代器 |
+| [MakeFixbufmemPtr](struct/pointer/MakeFixbufmemPtr.md) | 构造Fixpipe Buffer上的Pointer迭代器 |
+| [MakeGMmemPtr](struct/pointer/MakeGMmemPtr.md) | 构造GM上的Pointer迭代器 |
+| [MakeL0AmemPtr](struct/pointer/MakeL0AmemPtr.md) | 构造L0A上的Pointer迭代器 |
+| [MakeL0BmemPtr](struct/pointer/MakeL0BmemPtr.md) | 构造L0B上的Pointer迭代器 |
+| [MakeL0CmemPtr](struct/pointer/MakeL0CmemPtr.md) | 构造L0C上的Pointer迭代器 |
+| [MakeL1memPtr](struct/pointer/MakeL1memPtr.md) | 构造L1上的Pointer迭代器 |
+| [MakeUBmemPtr](struct/pointer/MakeUBmemPtr.md) | 构造UB上的Pointer迭代器 |
 
 ## 数据搬运
 
-数据搬运类API，单独使用时可以引入tensor_tile_arch.h，此类API列表如下：
+数据搬运类API，此类API列表如下：
+
+### 通用搬运接口
 
 ### 通用搬运接口
 
@@ -127,14 +128,14 @@ Tensor API文档目录，整体使用时可以引入tensor.h，Tensor API列表�
 
 |   API名称   |   说明   |
 |----------|-----------|
-| [DataCopy](data_move/DataCopyGM2L1.md) | CUBE计算，支持GM2L1搬运处理 |
-| [DataCopyFromL1](data_move/DataCopyFromL1.md) | L1 Buffer到Bias/Fixpipe的数据搬运 |
-| [LoadData](data_move/LoadData.md) | L1到L0A/L0B的加载接口 |
-| [Fixpipe](data_move/Fixpipe.md) | FixPIPE搬出接口 |
+| [DataCopyGM2L1](data_move/DataCopyGM2L1.md) | CUBE计算，支持GM2L1搬运处理 |
+| [DataCopyFromL1](data_move/DataCopyFromL1.md) | CUBE计算，支持L12BIAS/L12FIXBUF搬运处理 |
+| [LoadData](data_move/LoadData.md) | CUBE计算，支持L12L0A/L12L0B搬运处理 |
+| [Fixpipe](data_move/Fixpipe.md) | CUBE计算，支持L0C2GM/L0C2UB搬运处理 |
 
 ## 矩阵计算
 
-矩阵计算类API，单独使用时可以引入tensor_tile_arch.h，此类API列表如下：
+矩阵计算类API，此类API列表如下：
 
 ### 通用计算接口
 
