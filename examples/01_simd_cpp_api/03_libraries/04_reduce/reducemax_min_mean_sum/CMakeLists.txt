@@ -15,9 +15,23 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+# ======================================================================================
+# 场景配置（通过编译时宏传递）
+# SCENARIO_NUM: 场景编号
+#   1 - ReduceMax：输入shape [136, 32]，输出shape [136]，Pattern=RA
+#   2 - ReduceMin：输入shape [136, 32]，输出shape [136]，Pattern=RA
+#   3 - ReduceMean：输入shape [136, 32]，输出shape [136]，Pattern=RA
+#   4 - ReduceSum：输入shape [136, 32]，输出shape [136]，Pattern=RA
+# ======================================================================================
+set(SCENARIO_NUM "1" CACHE STRING "场景编号 (1=ReduceMax, 2=ReduceMin, 3=ReduceMean, 4=ReduceSum)")
+
+add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+
 add_executable(demo
-    reducemean.asc
+    reducemax_min_mean_sum.asc
 )
+
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "CMAKE_ASC_ARCHITECTURES, e.g. dav-2201, dav-3510")
 
 target_link_libraries(demo PRIVATE
     tiling_api
@@ -29,13 +43,6 @@ target_link_libraries(demo PRIVATE
     graph_base
 )
 
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
