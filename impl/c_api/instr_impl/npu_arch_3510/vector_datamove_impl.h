@@ -3998,7 +3998,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(
     asc_loadalign_postupdate_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_loadalign_postupdate(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_postupdate(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     asc_loadalign_postupdate_impl(dst, src, offset);
 }
@@ -4102,7 +4102,8 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(
     asc_loadalign_brc_postupdate_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_loadalign_brc_postupdate(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_brc_postupdate(
+    vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     asc_loadalign_brc_postupdate_impl(dst, src, offset);
 }
@@ -4184,7 +4185,8 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     asc_loadalign_upsample_postupdate_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_loadalign_upsample_postupdate(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_upsample_postupdate(
+    vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     asc_loadalign_upsample_postupdate_impl(dst, src, offset);
 }
@@ -4265,7 +4267,8 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     asc_loadalign_downsample_postupdate_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_downsample_postupdate(
+    vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     asc_loadalign_downsample_postupdate_impl(dst, src, offset);
 }
@@ -4345,7 +4348,8 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
     asc_loadalign_unpack_postupdate_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_loadalign_unpack_postupdate(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate(
+    vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     asc_loadalign_unpack_postupdate_impl(dst, src, offset);
 }
@@ -4436,7 +4440,8 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
     asc_loadalign_unpack_postupdate_v2_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+    vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     asc_loadalign_unpack_postupdate_v2_impl(dst, src, offset);
 }
@@ -4487,7 +4492,8 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
     asc_loadalign_brc_postupdate_v2_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     asc_loadalign_brc_postupdate_v2_impl(dst, src, offset);
 }
@@ -4616,7 +4622,8 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     asc_loadalign_deintlv_postupdate_impl(dst0, dst1, src, offset);
 }
 
-__simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_int4x2_t& dst0, vector_int4x2_t& dst1, __ubuf__ int4b_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_deintlv_postupdate(
+    vector_int4x2_t& dst0, vector_int4x2_t& dst1, __ubuf__ int4b_t*& src, int32_t offset)
 {
     asc_loadalign_deintlv_postupdate_impl(dst0, dst1, src, offset);
 }
