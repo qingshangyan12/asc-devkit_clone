@@ -20,6 +20,7 @@
 #define __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_ASSERT_H__
 #endif
 
+#include <cassert>
 #include "impl/utils/sys_macros.h"
 #include "simt_api/device_types.h"
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -46,8 +47,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 
 #undef assert
 #undef ascendc_assert
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
 #define assert(...) ASC_INTERNAL_ASSERT_IMPL(ASC_INTERNAL_GET_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ascendc_assert(...) ASC_INTERNAL_ASSERT_IMPL(ASC_INTERNAL_GET_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ascendc_assert(...) assert(__VA_ARGS__)
+#else
+#define assert(...)
+#define ascendc_assert(...)
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_ASSERT_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
