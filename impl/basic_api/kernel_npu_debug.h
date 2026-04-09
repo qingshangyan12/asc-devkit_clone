@@ -201,33 +201,21 @@ __aicore__ inline void CheckMaskValue(const uint64_t mask, const __gm__ char* ap
 
 // Reduce API specific mask check: mask must be >= 1 in norm mode (not allow mask=0)
 // Used by: WholeReduceMax/Min/Sum, BlockReduceMax/Min/Sum, PairReduceSum, RepeatReduceSum
+// Reuses CheckMaskValue for common checks, adds norm-mode mask>=1 requirement
 template <typename T, bool isSetMask = true>
 __aicore__ inline void CheckReduceMaskValue(const uint64_t mask, const __gm__ char* apiName)
 {
+    CheckMaskValue<T, isSetMask>(mask, apiName);
+    // norm mode: reduce APIs additionally require mask >= 1
     if ASCEND_IS_AIC {
-        return;   // AIC does not need to check mask
-    }
-    if constexpr(!isSetMask) {
-        return;   // when isSetMask = false, use previous mask. Thus no need for check.
-    }
-
-    if (!IsMaskNorm()) {
-        // counter mode: mask should be in range [0, UINT32_MAX]
-        ASCENDC_DEBUG_ASSERT((mask <= UINT32_MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value when "
-            "counter mode in %s, mask should be in range [0, UINT32_MAX], current value is %llu.\n", apiName, mask));
         return;
     }
-
-    // norm mode: reduce APIs require mask >= 1
-    ASCENDC_DEBUG_ASSERT((mask >= 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value in %s, when in "
-        "norm mode, mask must be >= 1 for reduce APIs, current value is %llu.\n", apiName, mask));
-
-    if constexpr (sizeof(T) == 2) {
-        // half: mask in [1, 128]
-        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask", apiName);
-    } else if constexpr (sizeof(T) == 4) {
-        // float: mask in [1, 64]
-        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask", apiName);
+    if constexpr(!isSetMask) {
+        return;
+    }
+    if (IsMaskNorm()) {
+        ASCENDC_DEBUG_ASSERT((mask >= 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value in %s, when in "
+            "norm mode, mask must be >= 1 for reduce APIs, current value is %llu.\n", apiName, mask));
     }
 }
 
@@ -242,6 +230,157 @@ __aicore__ inline void CheckVectorTensor(const __gm__ char* apiName, const Ts& .
 {
     (CheckTensorPhyPosition<Hardware::UB>(tensors.tensor, tensors.tensorName, "VECIN / VECCALC / VECOUT", apiName), ...);
     (CheckTensorAlignment(tensors.tensor, ONE_BLK_SIZE, tensors.tensorName, apiName), ...);
+}
+
+// TransDataTo5HD common checks: dtype, dstHighHalf/srcHighHalf, repeatTimes
+// Used by: all 3 TransDataTo5HD overloads
+template <typename T>
+__aicore__ inline void CheckTransDataTo5HDParams(const TransDataTo5HDParams& nchwconvParams)
+{
+    using PrimType = PrimT<T>;
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype is "
+        "int8_t / uint8_t / int16_t / uint16_t / half / int32_t / uint32_t / float.\n"));
+    // dstHighHalf/srcHighHalf only valid for int8_t/uint8_t
+    if constexpr (!SupportType<PrimType, int8_t, uint8_t>()) {
+        ASCENDC_DEBUG_ASSERT((nchwconvParams.dstHighHalf == false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dstHighHalf in TransDataTo5HD, "
+            "dstHighHalf is only valid for int8_t / uint8_t dtype.\n"));
+        ASCENDC_DEBUG_ASSERT((nchwconvParams.srcHighHalf == false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check srcHighHalf in TransDataTo5HD, "
+            "srcHighHalf is only valid for int8_t / uint8_t dtype.\n"));
+    }
+    CheckValueRange<int32_t>(nchwconvParams.repeatTimes, 0, 255, "repeatTimes", "TransDataTo5HD");
+}
+
+// BlockReduce common checks: dtype, repeatTime, position, alignment
+// Used by: BlockReduceSum/Max/Min (both maskCount and maskBit overloads)
+template <typename T>
+__aicore__ inline void CheckBlockReduceParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const int32_t repeatTime, const __gm__ char* apiName)
+{
+    using PrimType = PrimT<T>;
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype in %s, current api support dtype combination is "
+        "src and dst both: half / float.\n", apiName));
+    CheckValueRange<int32_t>(repeatTime, 0, 255, "repeatTime", apiName);
+    CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
+    if constexpr (sizeof(PrimType) == 2) {
+        CheckTensorAlignment(dst, 16, "dst", apiName);  // half: 16B
+    } else if constexpr (sizeof(PrimType) == 4) {
+        CheckTensorAlignment(dst, 32, "dst", apiName);  // float: 32B
+    }
+}
+
+// WholeReduce common checks: dtype, repeatTime, position, alignment (with order)
+// Used by: WholeReduceMax/Min (both maskCount and maskBit overloads)
+template <typename T>
+__aicore__ inline void CheckWholeReduceCommonParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const int32_t repeatTime, ReduceOrder order, const __gm__ char* apiName)
+{
+    using PrimType = PrimT<T>;
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype in %s, current api support dtype combination is "
+        "src and dst both: half / float.\n", apiName));
+    CheckValueRange<int32_t>(repeatTime, 0, 255, "repeatTime", apiName);
+    CheckValueRange<int>(static_cast<int>(order), 0, 3, "order", apiName);
+    CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
+    if constexpr (sizeof(PrimType) == 2) {
+        CheckTensorAlignment(dst, 4, "dst", apiName);  // half: 4B
+    } else if constexpr (sizeof(PrimType) == 4) {
+        CheckTensorAlignment(dst, 8, "dst", apiName);  // float: 8B
+    }
+}
+
+// WholeReduce common checks: dtype, repeatTime, position, alignment (without order)
+// Used by: WholeReduceSum (both maskCount and maskBit overloads)
+template <typename T>
+__aicore__ inline void CheckWholeReduceCommonParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const int32_t repeatTime, const __gm__ char* apiName)
+{
+    using PrimType = PrimT<T>;
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype in %s, current api support dtype combination is "
+        "src and dst both: half / float.\n", apiName));
+    CheckValueRange<int32_t>(repeatTime, 0, 255, "repeatTime", apiName);
+    CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
+    if constexpr (sizeof(PrimType) == 2) {
+        CheckTensorAlignment(dst, 2, "dst", apiName);  // half: 2B
+    } else if constexpr (sizeof(PrimType) == 4) {
+        CheckTensorAlignment(dst, 4, "dst", apiName);  // float: 4B
+    }
+}
+
+// LoadData3D V1 parameter range checks
+// Used by: LoadData with LoadData3DParamsV1
+template <typename U>
+__aicore__ inline void CheckLoadData3dv1Params(const LoadData3DParamsV1<U>& loadDataParams)
+{
+    CheckValueRange<uint16_t>(loadDataParams.l1H, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1H", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint16_t>(loadDataParams.l1W, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1W", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.c1Index, MIN_LOAD3D_C1_IDX, MAX_LOAD3D_C1_IDX, "c1Index",
+        "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.fetchFilterW, MIN_LOAD3D_FETCH_FILTER, MAX_LOAD3D_FETCH_FILTER,
+        "fetchFilterW", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.fetchFilterH, MIN_LOAD3D_FETCH_FILTER, MAX_LOAD3D_FETCH_FILTER,
+        "fetchFilterH", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.leftTopW, MIN_LOAD3D_LEFT_TOP, MAX_LOAD3D_LEFT_TOP, "leftTopW",
+        "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.leftTopH, MIN_LOAD3D_LEFT_TOP, MAX_LOAD3D_LEFT_TOP, "leftTopH",
+        "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.strideW, MIN_LOAD3D_STRIDE, MAX_LOAD3D_STRIDE, "strideW",
+        "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.strideH, MIN_LOAD3D_STRIDE, MAX_LOAD3D_STRIDE, "strideH",
+        "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.filterW, MIN_LOAD3D_FILTER, MAX_LOAD3D_FILTER, "filterW",
+        "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.filterH, MIN_LOAD3D_FILTER, MAX_LOAD3D_FILTER, "filterH",
+        "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.dilationFilterW, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
+        "dilationFilterW", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.dilationFilterH, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
+        "dilationFilterH", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.jumpStride, MIN_LOAD3D_JUMP_STRIDE, MAX_LOAD3D_JUMP_STRIDE, "jumpStride",
+        "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.repeatMode, 0, 1, "repeatMode", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.cSize, 0, 1, "cSize", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int32_t>(loadDataParams.repeatTime, MIN_LOAD3D_REPEAT_TIMES, MAX_LOAD3D_FILTER, "repeatTime",
+        "LoadData with LoadData3DParamsV1");
+}
+
+// LoadData3D V2 parameter range checks
+// Used by: LoadData with LoadData3DParamsV2
+template <typename U>
+__aicore__ inline void CheckLoadData3dv2Params(const LoadData3DParamsV2<U>& loadDataParams)
+{
+    CheckValueRange<uint16_t>(loadDataParams.l1H, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1H", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint16_t>(loadDataParams.l1W, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1W", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint16_t>(loadDataParams.kExtension, MIN_LOAD3D_EXTENSION, MAX_LOAD3D_EXTENSION, "kExtension",
+        "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint16_t>(loadDataParams.mExtension, MIN_LOAD3D_EXTENSION, MAX_LOAD3D_EXTENSION, "mExtension",
+        "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint16_t>(loadDataParams.kStartPt, MIN_LOAD3D_START_PT, MAX_LOAD3D_START_PT, "kStartPt",
+        "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint16_t>(loadDataParams.mStartPt, MIN_LOAD3D_START_PT, MAX_LOAD3D_START_PT, "mStartPt",
+        "LoadData with LoadData3DParamsV2");
+    CheckValueRange<int32_t>(loadDataParams.strideW, MIN_LOAD3D_STRIDE, MAX_LOAD3D_STRIDE, "strideW",
+        "LoadData with LoadData3DParamsV2");
+    CheckValueRange<int32_t>(loadDataParams.strideH, MIN_LOAD3D_STRIDE, MAX_LOAD3D_STRIDE, "strideH",
+        "LoadData with LoadData3DParamsV2");
+    CheckValueRange<int32_t>(loadDataParams.filterW, MIN_LOAD3D_FILTER, MAX_LOAD3D_FILTER, "filterW",
+        "LoadData with LoadData3DParamsV2");
+    CheckValueRange<int32_t>(loadDataParams.filterH, MIN_LOAD3D_FILTER, MAX_LOAD3D_FILTER, "filterH",
+        "LoadData with LoadData3DParamsV2");
+    CheckValueRange<int32_t>(loadDataParams.dilationFilterW, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
+        "dilationFilterW", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<int32_t>(loadDataParams.dilationFilterH, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
+        "dilationFilterH", "LoadData with LoadData3DParamsV2");
 }
 
 } // namespace AscendC

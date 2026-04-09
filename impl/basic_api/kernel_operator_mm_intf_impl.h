@@ -172,36 +172,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     } else if (dstScope == Hardware::UB) {
         CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "LoadData with LoadData3DParamsV1");
     }
-    CheckValueRange<uint16_t>(loadDataParams.l1H, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1H", "LoadData with LoadData3DParamsV1");
-    CheckValueRange<uint16_t>(loadDataParams.l1W, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1W", "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.c1Index, MIN_LOAD3D_C1_IDX, MAX_LOAD3D_C1_IDX, "c1Index",
-        "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.fetchFilterW, MIN_LOAD3D_FETCH_FILTER, MAX_LOAD3D_FETCH_FILTER,
-        "fetchFilterW", "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.fetchFilterH, MIN_LOAD3D_FETCH_FILTER, MAX_LOAD3D_FETCH_FILTER,
-        "fetchFilterH", "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.leftTopW, MIN_LOAD3D_LEFT_TOP, MAX_LOAD3D_LEFT_TOP, "leftTopW",
-        "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.leftTopH, MIN_LOAD3D_LEFT_TOP, MAX_LOAD3D_LEFT_TOP, "leftTopH",
-        "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.strideW, MIN_LOAD3D_STRIDE, MAX_LOAD3D_STRIDE, "strideW",
-        "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.strideH, MIN_LOAD3D_STRIDE, MAX_LOAD3D_STRIDE, "strideH",
-        "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.filterW, MIN_LOAD3D_FILTER, MAX_LOAD3D_FILTER, "filterW",
-        "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.filterH, MIN_LOAD3D_FILTER, MAX_LOAD3D_FILTER, "filterH",
-        "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.dilationFilterW, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
-        "dilationFilterW", "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.dilationFilterH, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
-        "dilationFilterH", "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.jumpStride, MIN_LOAD3D_JUMP_STRIDE, MAX_LOAD3D_JUMP_STRIDE, "jumpStride",
-        "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.repeatMode, 0, 1, "repeatMode", "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.cSize, 0, 1, "cSize", "LoadData with LoadData3DParamsV1");
-    CheckValueRange<int32_t>(loadDataParams.repeatTime, MIN_LOAD3D_REPEAT_TIMES, MAX_LOAD3D_FILTER, "repeatTime",
-        "LoadData with LoadData3DParamsV1");
+    CheckLoadData3dv1Params<U>(loadDataParams);
 #endif
 #endif
     LoadDataImpl<T, defaultConfig>(dst, src, loadDataParams);
@@ -260,28 +231,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     } else if (dstScope == Hardware::UB) {
         CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "LoadData with LoadData3DParamsV2");
     }
-    CheckValueRange<uint16_t>(loadDataParams.l1H, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1H", "LoadData with LoadData3DParamsV2");
-    CheckValueRange<uint16_t>(loadDataParams.l1W, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1W", "LoadData with LoadData3DParamsV2");
-    CheckValueRange<uint16_t>(loadDataParams.kExtension, MIN_LOAD3D_EXTENSION, MAX_LOAD3D_EXTENSION, "kExtension",
-        "LoadData with LoadData3DParamsV2");
-    CheckValueRange<uint16_t>(loadDataParams.mExtension, MIN_LOAD3D_EXTENSION, MAX_LOAD3D_EXTENSION, "mExtension",
-        "LoadData with LoadData3DParamsV2");
-    CheckValueRange<uint16_t>(loadDataParams.kStartPt, MIN_LOAD3D_START_PT, MAX_LOAD3D_START_PT, "kStartPt",
-        "LoadData with LoadData3DParamsV2");
-    CheckValueRange<uint16_t>(loadDataParams.mStartPt, MIN_LOAD3D_START_PT, MAX_LOAD3D_START_PT, "mStartPt",
-        "LoadData with LoadData3DParamsV2");
-    CheckValueRange<int32_t>(loadDataParams.strideW, MIN_LOAD3D_STRIDE, MAX_LOAD3D_STRIDE, "strideW",
-        "LoadData with LoadData3DParamsV2");
-    CheckValueRange<int32_t>(loadDataParams.strideH, MIN_LOAD3D_STRIDE, MAX_LOAD3D_STRIDE, "strideH",
-        "LoadData with LoadData3DParamsV2");
-    CheckValueRange<int32_t>(loadDataParams.filterW, MIN_LOAD3D_FILTER, MAX_LOAD3D_FILTER, "filterW",
-        "LoadData with LoadData3DParamsV2");
-    CheckValueRange<int32_t>(loadDataParams.filterH, MIN_LOAD3D_FILTER, MAX_LOAD3D_FILTER, "filterH",
-        "LoadData with LoadData3DParamsV2");
-    CheckValueRange<int32_t>(loadDataParams.dilationFilterW, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
-        "dilationFilterW", "LoadData with LoadData3DParamsV2");
-    CheckValueRange<int32_t>(loadDataParams.dilationFilterH, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
-        "dilationFilterH", "LoadData with LoadData3DParamsV2");
+    CheckLoadData3dv2Params<U>(loadDataParams);
 #endif
 #endif
 #if ASCENDC_CPU_DEBUG
