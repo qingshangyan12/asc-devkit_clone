@@ -24,6 +24,84 @@
 #include "kernel_struct_unary.h"
 
 namespace AscendC {
+namespace Internal {
+template <auto func, bool isSetMask, bool isMaskBitMode, bool isNormalMode, typename T>
+__aicore__ inline void VecUnaryLevel0VFImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t maskArray[],
+    const uint64_t maskCount, const uint8_t repeatTime, const UnaryRepeatParams &repeatParams,
+    __ubuf__ uint64_t *maskBuf)
+{
+    uint32_t count = VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArray, maskCount, maskBuf);
+    uint16_t newRepeatTimes = 0;
+    newRepeatTimes = VecMicroGetRepeatTimes<T, isNormalMode>(count, repeatTime);
+    Reg::MaskReg maskReg;
+    if constexpr (isNormalMode) {
+        maskReg = VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
+    }
+    constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
+    for (uint16_t index = 0; index < newRepeatTimes; ++index) {
+        if constexpr (!isNormalMode) {
+            maskReg = VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
+        }
+        Reg::RegTensor<T> dstVreg;
+        Reg::RegTensor<T> srcVreg;
+        Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcVreg,
+            src + index * repeatParams.srcRepStride * ElePerBlkT, repeatParams.srcBlkStride, maskReg);
+        func(dstVreg, srcVreg, maskReg);
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+            dst + index * repeatParams.dstRepStride * ElePerBlkT, dstVreg, repeatParams.dstBlkStride, maskReg);
+    }
+}
+
+template <auto func, bool isSetMask, bool isMaskBitMode, typename T>
+__aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t maskArray[],
+    const uint64_t maskCount, const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
+{
+    if constexpr (isMaskBitMode) {
+        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
+    } else {
+        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
+    }
+    __ubuf__ uint64_t *maskBuf = nullptr;
+
+    if (Internal::IsCounterMode()) {
+        if constexpr (!isSetMask) {
+            maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2); // maskReg 256bit PK-> 128bit
+        }
+        VF_CALL<VecUnaryLevel0VFImpl<func, isSetMask, isMaskBitMode, false, T>>(dst, src, maskArray, maskCount,
+            repeatTime, repeatParams, maskBuf);
+        if constexpr (!isSetMask) {
+            AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
+        }
+    } else {
+        if constexpr (isMaskBitMode) {
+            if constexpr (SupportBytes<T, 1>()) {
+                ASCENDC_ASSERT(isSetMask, "mask must be set when sizeof(T) is 1.");
+                auto eventIDV2S = GetTPipePtr()->FetchEventID(HardEvent::V_S);
+                SetFlag<HardEvent::V_S>(eventIDV2S);
+                WaitFlag<HardEvent::V_S>(eventIDV2S);
+                maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 4);
+                maskBuf[0] = maskArray[0];
+                maskBuf[1] = maskArray[1];
+                maskBuf[2] = maskArray[2];
+                maskBuf[3] = maskArray[3];
+                auto eventIDS2V = GetTPipePtr()->FetchEventID(HardEvent::S_V);
+                SetFlag<HardEvent::S_V>(eventIDS2V);
+                WaitFlag<HardEvent::S_V>(eventIDS2V);
+            } else if constexpr (isSetMask) {
+                SetVectorMask<T>(maskArray[1], maskArray[0]); // set mask to SPR.MASK, movp in VF
+            }
+        }
+        // when isSetMask is false, normal mode, maskBuf = nullptr, not support B8
+        VF_CALL<VecUnaryLevel0VFImpl<func, isSetMask, isMaskBitMode, true, T>>(dst, src, maskArray, maskCount,
+            repeatTime, repeatParams, maskBuf);
+        if constexpr (isMaskBitMode && SupportBytes<T, 1>()) {
+            AscendC::AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
+        }
+    }
+}
+} // namespace Internal
+
 // Macros for level-0 api with type not support
 #define UNARY_VEC_NORMAL_NOT_SUPPORT(FUNC_NAME)                                                                                  \
     template <typename T, bool isSetMask = true>                                                                                 \
@@ -327,83 +405,6 @@ UNARY_VEC_COUNTER_IMPL(NotImpl, Not, float, vector_f32);
 UNARY_VEC_COUNTER_IMPL(NotImpl, Not, uint32_t, vector_u32);
 UNARY_VEC_COUNTER_IMPL(NotImpl, Not, int32_t, vector_s32);
 
-namespace Internal {
-template <auto func, bool isSetMask, bool isMaskBitMode, bool isNormalMode, typename T>
-__aicore__ inline void VecUnaryLevel0VFImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t maskArray[],
-    const uint64_t maskCount, const uint8_t repeatTime, const UnaryRepeatParams &repeatParams,
-    __ubuf__ uint64_t *maskBuf)
-{
-    uint32_t count = VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArray, maskCount, maskBuf);
-    uint16_t newRepeatTimes = 0;
-    newRepeatTimes = VecMicroGetRepeatTimes<T, isNormalMode>(count, repeatTime);
-    Reg::MaskReg maskReg;
-    if constexpr (isNormalMode) {
-        maskReg = VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
-    }
-    constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
-    for (uint16_t index = 0; index < newRepeatTimes; ++index) {
-        if constexpr (!isNormalMode) {
-            maskReg = VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
-        }
-        Reg::RegTensor<T> dstVreg;
-        Reg::RegTensor<T> srcVreg;
-        Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcVreg,
-            src + index * repeatParams.srcRepStride * ElePerBlkT, repeatParams.srcBlkStride, maskReg);
-        func(dstVreg, srcVreg, maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            dst + index * repeatParams.dstRepStride * ElePerBlkT, dstVreg, repeatParams.dstBlkStride, maskReg);
-    }
-}
-
-template <auto func, bool isSetMask, bool isMaskBitMode, typename T>
-__aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t maskArray[],
-    const uint64_t maskCount, const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
-{
-    if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
-    } else {
-        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
-    }
-    __ubuf__ uint64_t *maskBuf = nullptr;
-
-    if (Internal::IsCounterMode()) {
-        if constexpr (!isSetMask) {
-            maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2); // maskReg 256bit PK-> 128bit
-        }
-        VF_CALL<VecUnaryLevel0VFImpl<func, isSetMask, isMaskBitMode, false, T>>(dst, src, maskArray, maskCount,
-            repeatTime, repeatParams, maskBuf);
-        if constexpr (!isSetMask) {
-            AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
-        }
-    } else {
-        if constexpr (isMaskBitMode) {
-            if constexpr (SupportBytes<T, 1>()) {
-                ASCENDC_ASSERT(isSetMask, "mask must be set when sizeof(T) is 1.");
-                auto eventIDV2S = GetTPipePtr()->FetchEventID(HardEvent::V_S);
-                SetFlag<HardEvent::V_S>(eventIDV2S);
-                WaitFlag<HardEvent::V_S>(eventIDV2S);
-                maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 4);
-                maskBuf[0] = maskArray[0];
-                maskBuf[1] = maskArray[1];
-                maskBuf[2] = maskArray[2];
-                maskBuf[3] = maskArray[3];
-                auto eventIDS2V = GetTPipePtr()->FetchEventID(HardEvent::S_V);
-                SetFlag<HardEvent::S_V>(eventIDS2V);
-                WaitFlag<HardEvent::S_V>(eventIDS2V);
-            } else if constexpr (isSetMask) {
-                SetVectorMask<T>(maskArray[1], maskArray[0]); // set mask to SPR.MASK, movp in VF
-            }
-        }
-        // when isSetMask is false, normal mode, maskBuf = nullptr, not support B8
-        VF_CALL<VecUnaryLevel0VFImpl<func, isSetMask, isMaskBitMode, true, T>>(dst, src, maskArray, maskCount,
-            repeatTime, repeatParams, maskBuf);
-        if constexpr (isMaskBitMode && SupportBytes<T, 1>()) {
-            AscendC::AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
-        }
-    }
-}
-} // namespace Internal
 
 /* **************************************************************************************************
  * Exp                                             *
