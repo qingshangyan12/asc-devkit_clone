@@ -441,3 +441,86 @@ TEST_F(TestTiling, TestAxpyTiling)
 
 ## 合入代码
 当开发者完成高阶API的编码和测试后，请参考[贡献指南](../CONTRIBUTING.md)将代码合入本仓库。
+
+---
+
+## 351x架构高阶API开发
+
+### 概述
+
+在351x架构中，高阶API的开发与220x架构有所不同，因为351x架构的Vector Core中Unified Buffer和Vector计算单元之间新增了一个Register存储层次。在351x架构中，需要将数据从Unified Buffer搬运到寄存器中，再由Vector计算单元进行计算。同样，Vector计算单元的输出结果会先存储到寄存器中，之后开发者需要将寄存器中的数据搬回Unified Buffer。
+
+### 设计API
+
+与220x架构的高阶API设计过程相同，根据API的算法公式，分析Kernel侧需要定义的函数原型及使用的API等。由于Reg矢量计算API Reg::Axpy支持对应的算法功能，因此在API实现中可以直接调用该API Axpy。在Tiling侧的设计和开发中，开发者可以参考220x架构中的思路。此外，对于220x架构中已实现的API，351x架构可以复用220x架构的Tiling函数。在当前的样例中，351x架构下的Axpy高阶API接口不需要临时空间，因此无需开发Tiling函数。
+
+### 开发API
+
+351x架构上高阶API的内部实现与220x架构上的实现存在差异。在351x架构上开发时，开发者需遵循Regbase编程模型，API的实现函数AxpyImpl使用`__simd_vf__`关键词修饰，函数内部通过调用SIMD_VF函数，宏函数AxpyCompute内部调用Reg矢量计算API实现具体功能。
+
+SIMD_VF函数的参数包括计算所需的源操作数、目的操作数及切分参数。其中，计算的迭代次数、单次计算数据量等切分参数，在220x架构下由AxpySub函数计算；而在351x架构中，这些参数需要在SIMD_VF函数外部进行计算，因为SIMD_VF中的Scalar计算会影响指令流水。因此，建议开发者在编程时先在外部完成Scalar计算，再将结果作为参数传入SIMD_VF函数，以避免Scalar指令的发射和计算导致的瓶颈。
+
+通过GetVecLen函数获取Vector单元一次迭代计算的最大数据量，为256字节，根据待计算的数据量（calCount，单位元素个数），计算单次迭代处理的数据个数和迭代次数。将这些参数连同操作数dst、src和scalarValue一起传入SIMD_VF函数。
+
+```cpp
+__simd_vf__ inline void AxpyImpl(const LocalTensor<T>& dstLocal, const LocalTensor<U>& srcLocal,
+const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+{
+    __ubuf__ T* dst = (__local_mem__ T *)dstLocal.GetPhyAddr();
+    __ubuf__ U* src = (__local_mem__ U *)srcLocal.GetPhyAddr();
+    // 单次迭代计算数据个数
+    constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
+    // 迭代次数
+    uint16_t repeatTimes = CeilDivision(calCount, oneRepSize);
+    AxpyCompute<T, U>(dst, src, scalarValue, calCount, repeatTimes, oneRepSize);
+}
+```
+
+Axpy的源操作数和目的操作数存在float和float、half和float、half和half三种组合。对于half和float场景，由于Reg::Axpy不支持源操作数和目的操作数的数据类型不一致，因此需要在计算前分配一块临时寄存器空间，调用Reg::Cast对源操作数进行类型转换，使其与目的操作数的数据类型一致。以下是宏函数代码，具体步骤为：
+
+1. 申请寄存器（包括RegTensor和MaskReg）。
+2. 根据数据类型组合编写不同的代码分支。
+3. 将计算得到的迭代次数作为循环次数。
+4. 在每次循环中，调用Reg::UpdateMask来更新mask寄存器。
+5. 调用Reg::LoadAlign将UB中的数据搬入寄存器。
+6. 调用计算指令Reg::Axpy。
+7. 调用Reg::StoreAlign将结果数据从寄存器搬回UB。
+
+```cpp
+constexpr Reg::CastTrait castTraitF162F32 = {
+    Reg::RegLayout::ZERO, Reg::SatMode::UNKNOWN, Reg::MaskMergeMode::ZEROING, RoundMode::UNKNOWN};
+template<typename T, typename U>
+__simd_callee__ inline void AxpyCompute(__local_mem__ T* dst, __local_mem__ U* src, U scalarValue, uint32_t calCount, uint16_t repeatTimes, uint16_t oneRepSize)
+{
+    Reg::MaskReg mask;
+    Reg::RegTensor<T> dstVreg;
+    Reg::RegTensor<U> srcVreg;
+    if constexpr (IsSameType<U, half>::value && IsSameType<T, half>::value) {
+        for (uint16_t i = 0; i < repeatTimes; ++i) {
+            mask = Reg::UpdateMask<T>(calCount);
+            Reg::LoadAlign(srcVreg, src + i * oneRepSize);
+            Reg::LoadAlign(dstVreg, dst + i * oneRepSize);
+            Reg::Axpy(dstVreg, srcVreg, scalarValue, mask);
+            Reg::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
+        }
+    } else if constexpr (IsSameType<U, half>::value && IsSameType<T, float>::value) {
+        Reg::RegTensor<float> tempSrcVreg;
+        for (uint16_t i = 0; i < repeatTimes; ++i) {
+            mask = Reg::UpdateMask<T>(calCount);
+            Reg::LoadAlign<U, Reg::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * oneRepSize);
+            Reg::Cast<float, U, castTraitF162F32>(tempSrcVreg, srcVreg, mask);
+            Reg::LoadAlign(dstVreg, dst + i * oneRepSize);
+            Reg::Axpy(dstVreg, tempSrcVreg, scalarValue, mask);
+            Reg::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
+        }
+    } else if constexpr (IsSameType<U, float>::value && IsSameType<T, float>::value) {
+        for (uint16_t i = 0; i < repeatTimes; ++i) {
+            mask = Reg::UpdateMask<T>(calCount);
+            Reg::LoadAlign(srcVreg, src + i * oneRepSize);
+            Reg::LoadAlign(dstVreg, dst + i * oneRepSize);
+            Reg::Axpy(dstVreg, srcVreg, scalarValue, mask);
+            Reg::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
+        }
+    }
+}
+```
