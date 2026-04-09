@@ -415,8 +415,6 @@ link_directories(${LIBC_SEC_DIR})
 # 打印日志（编译时能看到，方便排查）
 message(STATUS "自动找到 libc_sec 库路径: ${LIBC_SEC_DIR}")
 
-
-
 foreach(product_type ${PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_adv_api_kernel_${product_type}
         ${ASCENDC_DIR}/tests/main_global.cpp
@@ -471,6 +469,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         error_manager
         mmpa
         c_sec
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:-Wl,--defsym=libc_secshared.so=libc_sec.so>
         -Wl,--as-needed
     )
 
