@@ -25,6 +25,7 @@
 #include "impl/experimental/tensor_api/arch/datamove/load_data/copy_l12l0.h"
 #include "impl/experimental/tensor_api/atom/cube_datamove/cube_datamove_impl.h"
 #include "impl/experimental/tensor_api/atom/vector_datamove/vector_datamove_impl.h"
+#include "impl/experimental/tensor_api/arch/datamove/l0c_to_out/copy.h"
 
 #include "impl/experimental/tensor_api/arch/datamove/l1_to_bt/copy.h"
 #include "impl/experimental/tensor_api/arch/datamove/l1_to_fb/copy.h"
