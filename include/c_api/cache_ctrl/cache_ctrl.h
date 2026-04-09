@@ -29,7 +29,16 @@
 
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len);
 
+#ifndef ASCENDC_CPU_DEBUG
+namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst);
+}
+#else
+#ifndef __ASC_DCCI_INTERFACE__
+#define __ASC_DCCI_INTERFACE__
+__aicore__ inline void asc_dcci_single(__gm__ void *dst);
+#endif // __ASC_DCCI_INTERFACE__
+#endif // ASCENDC_CPU_DEBUG
 
 __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst);
 
