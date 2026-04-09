@@ -464,7 +464,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         error_manager
         mmpa
         c_sec
-        $<$<STREQUAL:${product_type},KirinX90_AIV>:libc_secshared>
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:/home/jenkins/Ascend/cann-9.0.0/x86_64-linux/lib64/device/lib64/libc_secshared.so>
         -Wl,--as-needed
     )
 
