@@ -429,14 +429,25 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
     )
 
     if(${product_type} STREQUAL "KirinX90_AIV")
-        set(LIBC_SEC_DIR /home/jenkins/Ascend/cann-9.0.0/x86_64-linux/lib64/device/lib64)
-        execute_process(
-            COMMAND ln -sf libc_sec.so libc_secshared.so
-            WORKING_DIRECTORY ${LIBC_SEC_DIR}
-            OUTPUT_QUIET
-            ERROR_QUIET
-        )
+    # 库的绝对路径（固定不变）
+    set(LIBC_SEC_PATH "/home/jenkins/Ascend/cann-9.0.0/x86_64-linux/lib64/device/lib64")
+    
+    # 强制创建软链接（绝对路径，保证100%成功）
+    execute_process(
+        COMMAND ln -sf "${LIBC_SEC_PATH}/libc_sec.so" "${LIBC_SEC_PATH}/libc_secshared.so"
+        RESULT_VARIABLE LN_RESULT
+        OUTPUT_QUIET
+        ERROR_QUIET
+    )
+
+    # 配置运行时库路径（让系统运行时能找到这个文件）
+    target_link_directories(ascendc_ut_adv_api_kernel_${product_type} PRIVATE ${LIBC_SEC_PATH})
+    set_target_properties(ascendc_ut_adv_api_kernel_${product_type} PROPERTIES
+        BUILD_RPATH ${LIBC_SEC_PATH}
+        INSTALL_RPATH ${LIBC_SEC_PATH}
+    )
     endif()
+
 
     target_link_libraries(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
@@ -453,6 +464,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         error_manager
         mmpa
         c_sec
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:libc_secshared>
         -Wl,--as-needed
     )
 
