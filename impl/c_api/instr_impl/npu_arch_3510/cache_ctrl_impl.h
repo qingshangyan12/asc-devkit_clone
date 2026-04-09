@@ -29,6 +29,7 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
 }
 
 //==============asc_dcci(__gm__)===============
+namespace __asc_simd_vf {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst)
 {
     asc_dcci_single_impl(dst);
@@ -37,6 +38,7 @@ __aicore__ inline void asc_dcci_single(__gm__ void* dst)
 __aicore__ inline void asc_dcci_entire(__gm__ void* dst)
 {
     asc_dcci_entire_impl(dst);
+}
 }
 
 __aicore__ inline void asc_dcci_single_all(__gm__ void* dst)
