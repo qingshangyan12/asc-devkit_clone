@@ -1477,7 +1477,7 @@ endif()
                   -p ${kernel_binary_dir}/binary/${compute_unit} && \
                   ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_ops_config.py \
                   -p ${kernel_binary_dir}/binary/${compute_unit} \
-                  -s ${compute_unit} && \
+                  -s ${compute_unit} --skip-error ${ASCEND_SKIP_FAILED_COMPUTE_UNIT} && \
                   mkdir -p ${kernel_binary_dir}/binary/config/${compute_unit} && \
                   mv ${kernel_binary_dir}/binary/${compute_unit}/*.json \
                   ${kernel_binary_dir}/binary/config/${compute_unit} >> ${COMPILE_LOG} 2>&1 || true"
