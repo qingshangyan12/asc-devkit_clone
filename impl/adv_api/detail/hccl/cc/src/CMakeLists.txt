@@ -450,6 +450,7 @@ if(BUILD_OPEN_PROJECT)
     target_link_libraries(mc2_client PRIVATE
         -Wl,--no-as-needed
         mc2_compat
+        hcomm
         acl_rt
         c_sec
         unified_dlog
@@ -464,6 +465,7 @@ else()
         $<BUILD_INTERFACE:mmpa_headers>
         -Wl,--no-as-needed
         mc2_compat
+        hcomm
         acl_rt
         c_sec
         unified_dlog

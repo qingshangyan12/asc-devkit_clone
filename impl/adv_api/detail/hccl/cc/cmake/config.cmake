@@ -80,6 +80,7 @@ if(AARCH_MODE)
         c_sec
         unified_dlog
         mmpa
+        hcomm
     ) 
     foreach(STUB ${STUBS}) 
         if(NOT TARGET ${STUB}) 
