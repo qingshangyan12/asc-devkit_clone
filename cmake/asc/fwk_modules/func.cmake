@@ -196,7 +196,9 @@ function(simple_kernel_compile)
     set(BINCMP_OPS_INFO ${auto_gen_path}/aic-${BINCMP_COMPUTE_UNIT}-ops-info.ini)
   endif()
   get_property(bincmp_enable_binary_package GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_ENABLE_BINARY_PACKAGE)
-  set(BINCMP_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile_error.log")
+
+  get_property(error_msg_file GLOBAL PROPERTY _ASC_PKG_ERROR_FILE)
+  set(BINCMP_ERROR_LOG ${error_msg_file})
   set(BINCMP_COMPILE_LOG "${CMAKE_CURRENT_BINARY_DIR}/${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}_compile.log")
   set(COMPILE_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile.log")
 
@@ -467,6 +469,10 @@ function(npu_op_package target_package_name)
 
   set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_TYPE "${_upper_target_type}")
   get_property(target_vendor_name GLOBAL PROPERTY _ASC_PKG_${target_package_name}_VENDOR_NAME)
+
+  set(POST_PACK_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile_error.log")
+  set_property(GLOBAL PROPERTY _ASC_PKG_ERROR_FILE ${POST_PACK_ERROR_LOG})
+
   if ("${_upper_target_type}" STREQUAL "RUN")
     add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/scripts/install.sh ${CMAKE_BINARY_DIR}/scripts/upgrade.sh ${CMAKE_BINARY_DIR}/scripts/uninstall.sh
       COMMAND mkdir -p ${CMAKE_BINARY_DIR}/scripts
@@ -522,7 +528,6 @@ function(npu_op_package target_package_name)
       set(CPACK_EXTERNAL_BUILT_PACKAGES ${CPACK_PACKAGE_DIRECTORY}/_CPack_Packages/Linux/External/${CPACK_PACKAGE_FILE_NAME}/${CPACK_PACKAGE_FILE_NAME})
       if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
         set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_BINARY_DIR}/post_pack_script.cmake")
-        set(POST_PACK_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
         file(WRITE "${CPACK_POST_BUILD_SCRIPTS}" "
           set(ERROR_LOG_FILE \"${POST_PACK_ERROR_LOG}\")
           if(EXISTS \"\${ERROR_LOG_FILE}\")
@@ -579,7 +584,6 @@ function(npu_op_package target_package_name)
     )
     install(TARGETS ${target_package_name} EXPORT ${target_package_name}-targets INCLUDES DESTINATION ${install_path})
     if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
-      set(POST_PACK_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
       install(CODE "
         set(ERROR_LOG_FILE \"${POST_PACK_ERROR_LOG}\")
         if(EXISTS \"\${ERROR_LOG_FILE}\")
@@ -642,7 +646,6 @@ function(npu_op_package target_package_name)
     )
     install(TARGETS ${target_package_name} EXPORT ${target_package_name}-targets INCLUDES DESTINATION ${install_path})
     if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
-      set(POST_PACK_ERROR_LOG "${CMAKE_CURRENT_BINARY_DIR}/op_kernel/compile_error.log")
       install(CODE "
         set(ERROR_LOG_FILE \"${POST_PACK_ERROR_LOG}\")
         if(EXISTS \"\${ERROR_LOG_FILE}\")
@@ -1126,7 +1129,8 @@ function(npu_op_package_add target_package_name)
     endforeach()
 
     if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
-      set(ERROR_LOG_FILE "${CMAKE_CURRENT_BINARY_DIR}/compile_error.log")
+      get_property(error_file GLOBAL PROPERTY _ASC_PKG_ERROR_FILE)
+      set(ERROR_LOG_FILE ${error_file})
       set(CHECK_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/check_all_fail_script.cmake")
       set(OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/all_fail_result_${target_package_name}.txt")
 
