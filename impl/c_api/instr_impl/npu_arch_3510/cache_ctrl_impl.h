@@ -95,19 +95,19 @@ __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
     asc_ub_dcci_single_impl(dst);
 }
 
-__aicore__ inline void asc_ub_dcci_single_out(__ubuf__ void* dst)
+__aicore__ inline void asc_dcci_entire_all()
 {
-    asc_ub_dcci_single_out_impl(dst);
+    asc_dcci_entire_all_impl();
 }
 
-__aicore__ inline void asc_ub_dcci_single_atomic(__ubuf__ void* dst)
+__aicore__ inline void asc_dcci_entire_out()
 {
-    asc_ub_dcci_single_atomic_impl(dst);
+    asc_dcci_entire_out_impl();
 }
 
-__aicore__ inline void asc_ub_dcci_single_all(__ubuf__ void* dst)
+__aicore__ inline void asc_dcci_entire_atomic()
 {
-    asc_ub_dcci_single_all_impl(dst);
+    asc_dcci_entire_atomic_impl();
 }
 
 //=========asc_get_icache_preload_status========
