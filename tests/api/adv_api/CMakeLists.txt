@@ -387,8 +387,6 @@ file(GLOB ASCENDC_TEST_ascend310B1_CASE_SRC_FILES
     matmul/scheduler/test_scheduler_norm.cpp
 )
 
-message(STATUS "ASCEND_CANN_PACKAGE_PATH 路径: ${ASCEND_CANN_PACKAGE_PATH}")
-
 foreach(product_type ${PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_adv_api_kernel_${product_type}
         ${ASCENDC_DIR}/tests/main_global.cpp
@@ -445,10 +443,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         c_sec
         $<$<STREQUAL:${product_type},KirinX90_AIV>:-Wl,--defsym=libc_secshared=libc_sec>
         -Wl,--as-needed
-    )
-
-    set_target_properties(ascendc_ut_adv_api_kernel_${product_type} PROPERTIES
-        BUILD_RPATH ${LIBC_SEC_DIR}
     )
 
     run_llt_test(
