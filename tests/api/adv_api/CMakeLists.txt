@@ -441,7 +441,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         error_manager
         mmpa
         c_sec
-        $<$<STREQUAL:${product_type},KirinX90_AIV>:-Wl,--defsym=libc_secshared=libc_sec>
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:-Wl,--undefined=libc_secshared.so -Wl,--defsym=libc_secshared.so=libc_sec.so>
         -Wl,--as-needed
     )
 
