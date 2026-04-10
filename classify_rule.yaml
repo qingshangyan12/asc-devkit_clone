@@ -75,7 +75,6 @@ asc-devkit:
       - impl/experimental/tensor_api/tensor/tuple_fractal.h
       - impl/experimental/tensor_api/tensor/layout_size.h
       - impl/experimental/tensor_api/tensor/layout_static_fractal.h
-      - impl/experimental/tensor_api/tensor/get_pattern.h
       - impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_gm2l1/nd2zz.h
       - impl/experimental/tensor_api/atom/mad_traits_impl.h
       - impl/experimental/tensor_api/atom/cube_compute/mmad.h
@@ -90,6 +89,7 @@ asc-devkit:
       - impl/experimental/tensor_api/arch/vector_datamove/data_copy/data_copy_routing.h
       - impl/experimental/tensor_api/arch/data_copy_routing_base.h
       - impl/experimental/tensor_api/atom/vector_datamove/vector_datamove_impl.h
+      - impl/experimental/tensor_api/tensor/get_pattern.h
       - impl/basic_api/dav_c310/kernel_operator_proposal_impl.h
       - impl/basic_api/dav_c310/kfc/kfc_comm_server.h
       - impl/adv_api/detail/reduce/reduce_mean/reduce_mean_3510_impl.h
