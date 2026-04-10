@@ -27,6 +27,7 @@
 #include "experimental/tensor_api/tensor/layout.h"
 #include "experimental/tensor_api/tensor/local_tensor.h"
 #include "experimental/tensor_api/tensor/pointer.h"
+#include "experimental/tensor_api/tensor/layout_struct.h"
 #include "experimental/tensor_api/utils/utils.h"
 
 #endif // INCLUDE_TENSOR_API_TENSOR_H
