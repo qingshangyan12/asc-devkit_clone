@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
 #include "include/experimental/tensor_api/tensor.h"
+#include "impl/experimental/tensor_api/tensor/pointer_pattern.h"
 
 class Tensor_Api_Tensor : public testing::Test {
 protected:
@@ -153,6 +154,48 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
     EXPECT_EQ(MakeL0CmemPtr(l0cPtr), l0cPtr);
     EXPECT_EQ(MakeBiasmemPtr(biasPtr), biasPtr);
     EXPECT_EQ(MakeFixbufmemPtr(fixbufPtr), fixbufPtr);
+}
+
+TEST_F(Tensor_Api_Tensor, IteratorMakeMemPatternPtrOperation)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t TILE_LENGTH = 128;
+    __gm__ float gmData[TILE_LENGTH] = {0};
+    __ubuf__ float ubData[TILE_LENGTH] = {0};
+    __cbuf__ float l1Data[TILE_LENGTH] = {0};
+    __ca__ float l0aData[TILE_LENGTH] = {0};
+    __cb__ float l0bData[TILE_LENGTH] = {0};
+    __cc__ float l0cData[TILE_LENGTH] = {0};
+    __biasbuf__ float biasData[TILE_LENGTH] = {0};
+    __fbuf__ float fixbufData[TILE_LENGTH] = {0};
+
+    auto gmPtr = MakeMemPatternPtr<GMMemPtrPattern, EmptyTrait>(gmData);
+    auto ubPtr = MakeMemPatternPtr<UBMemPtrPattern, EmptyTrait>(ubData);
+    auto l1Ptr = MakeMemPatternPtr<L1MemPtrPattern, EmptyTrait>(l1Data);
+    auto l0aPtr = MakeMemPatternPtr<L0AMemPtrPattern, EmptyTrait>(l0aData);
+    auto l0bPtr = MakeMemPatternPtr<L0BMemPtrPattern, EmptyTrait>(l0bData);
+    auto l0cPtr = MakeMemPatternPtr<L0CMemPtrPattern, EmptyTrait>(l0cData);
+    auto biasPtr = MakeMemPatternPtr<BiasMemPtrPattern, EmptyTrait>(biasData);
+    auto fixbufPtr = MakeMemPatternPtr<FixbufMemPtrPattern, EmptyTrait>(fixbufData);
+
+    EXPECT_EQ(gmPtr.Get(), gmData);
+    EXPECT_EQ(ubPtr.Get(), ubData);
+    EXPECT_EQ(l1Ptr.Get(), l1Data);
+    EXPECT_EQ(l0aPtr.Get(), l0aData);
+    EXPECT_EQ(l0bPtr.Get(), l0bData);
+    EXPECT_EQ(l0cPtr.Get(), l0cData);
+    EXPECT_EQ(biasPtr.Get(), biasData);
+    EXPECT_EQ(fixbufPtr.Get(), fixbufData);
+
+    EXPECT_TRUE((IsHardwareMemV<Hardware::GM, decltype(gmPtr)>));
+    EXPECT_TRUE((IsHardwareMemV<Hardware::UB, decltype(ubPtr)>));
+    EXPECT_TRUE((IsHardwareMemV<Hardware::L1, decltype(l1Ptr)>));
+    EXPECT_TRUE((IsHardwareMemV<Hardware::L0A, decltype(l0aPtr)>));
+    EXPECT_TRUE((IsHardwareMemV<Hardware::L0B, decltype(l0bPtr)>));
+    EXPECT_TRUE((IsHardwareMemV<Hardware::L0C, decltype(l0cPtr)>));
+    EXPECT_TRUE((IsHardwareMemV<Hardware::BIAS, decltype(biasPtr)>));
+    EXPECT_TRUE((IsHardwareMemV<Hardware::FIXBUF, decltype(fixbufPtr)>));
 }
 
 TEST_F(Tensor_Api_Tensor, IteratorGetOperation)

@@ -20,7 +20,8 @@
 
 namespace AscendC {
 namespace Te {
-
+    
+struct EmptyTrait {};
 struct GMMemPtrPattern {};
 struct UBMemPtrPattern {};
 struct L1MemPtrPattern {};
