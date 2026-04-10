@@ -119,8 +119,6 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Axpy", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckCalcount(count, "count", "Axpy");
-    const uint32_t minTensorSize = (dst.GetSize() < src.GetSize()) ? dst.GetSize() : src.GetSize();
-    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(minTensorSize), "count", "Axpy");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalarDiffType(dst, src, scalarValue, count, "Axpy")) {

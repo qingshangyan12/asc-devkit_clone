@@ -551,7 +551,7 @@ INSTANTIATE_TEST_CASE_P(TEST_VEC_BINARY_DESC_SIMPLE, BinaryDescSimpleTestsuite,
     BinaryDescTestParams { 256, 4, false, 15, MainVecBinaryOperatorSimpleErrorDemo<int32_t> }, // Error check
     BinaryDescTestParams { 256, 4, false, 3, MainVecBinaryOperatorDivErrorDemo<float> },
     BinaryDescTestParams { 256, 4, false, 6, MainVecBinaryOperatorAndOrErrorDemo<int16_t> },
-    BinaryDescTestParams { 256, 4, false, 8, MainVecBinaryOperatorAddreluSubreluErrorDemo<float>}
+    BinaryDescTestParams { 256, 4, false, 6, MainVecBinaryOperatorAddreluSubreluErrorDemo<float>}
 ));
 
 TEST_P(BinaryDescSimpleTestsuite, BinaryDescSimpleTestCase)

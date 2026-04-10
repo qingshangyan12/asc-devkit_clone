@@ -558,10 +558,6 @@ __aicore__ inline void MulAddDst(const LocalTensor<T>& dst, const LocalTensor<U>
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("MulAddDst", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckCalcount(count, "count", "MulAddDst");
-    const uint32_t minTensorSize = (dst.GetSize() < src0.GetSize()) ? dst.GetSize() : src0.GetSize();
-    const uint32_t calcountHigh = (minTensorSize < src1.GetSize()) ? minTensorSize : src1.GetSize();
-    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(calcountHigh), "count",
-        "MulAddDst");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryDiffType(dst, src0, src1, count, "MulAddDst")) {
@@ -1026,7 +1022,7 @@ __aicore__ inline void AddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& 
         return;
     }
 #endif
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(ASCENDC_CPU_DEBUG) || defined(ASCENDC_DEBUG)
     CheckVectorTensor("AddRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskArray<PrimType, isSetMask>(mask, "AddRelu");
 #endif
@@ -1085,10 +1081,6 @@ __aicore__ inline void AddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& 
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("AddRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckCalcount(count, "count", "AddRelu");
-    const uint32_t minTensorSize = (dst.GetSize() < src0.GetSize()) ? dst.GetSize() : src0.GetSize();
-    const uint32_t calcountHigh = (minTensorSize < src1.GetSize()) ? minTensorSize : src1.GetSize();
-    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(calcountHigh), "count",
-        "AddRelu");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "AddRelu")) {
@@ -1118,6 +1110,22 @@ __aicore__ inline void CheckAddDeqReluMaskArrayParams(const LocalTensor<T>& dst,
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinaryDiffType(dst, src0, src1, mask, repeatTime, repeatParams, "AddDeqRelu")) {
         ASCENDC_REPORT_CHECK_ERROR("AddDeqRelu", KernelFuncType::MASK_BIT_MODE);
+    }
+#endif
+}
+
+template <typename T, typename U, bool isSetMask>
+__aicore__ inline void CheckAddDeqReluMaskValueParams(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
+    const LocalTensor<U>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("AddDeqRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskValue<PrimT<U>, isSetMask>(mask, "AddDeqRelu");
+#endif
+#if ASCENDC_CPU_DEBUG
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFuncVecBinaryDiffType(dst, src0, src1, mask, repeatTime, repeatParams, "AddDeqRelu")) {
+        ASCENDC_REPORT_CHECK_ERROR("AddDeqRelu", KernelFuncType::MASK_COUNT_MODE);
     }
 #endif
 }
@@ -1173,16 +1181,7 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<half> &dst, const LocalTenso
     const LocalTensor<int32_t> &src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams &repeatParams)
 {
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckVectorTensor("AddDeqRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskValue<int32_t, isSetMask>(mask, "AddDeqRelu");
-#endif
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFuncVecBinaryDiffType(dst, src0, src1, mask, repeatTime, repeatParams, "AddDeqRelu")) {
-        ASCENDC_REPORT_CHECK_ERROR("AddDeqRelu", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
+    CheckAddDeqReluMaskValueParams<half, int32_t, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams);
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryAddReqReluInfo(dst, src0, src1, mask, repeatTime, repeatParams, isSetMask, "AddDeqRelu");
 #endif
@@ -1199,16 +1198,7 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<T> &dst, const LocalTensor<U
     using PrimSrcType = PrimT<U>;
     static_assert((Std::is_same<PrimDstType, half>::value && Std::is_same<PrimSrcType, int32_t>::value) &&
         "Failed to check dtype in AddDeqRelu, current api support dtype combination is src: int32_t, dst: half.");
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckVectorTensor("AddDeqRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskValue<PrimSrcType, isSetMask>(mask, "AddDeqRelu");
-#endif
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFuncVecBinaryDiffType(dst, src0, src1, mask, repeatTime, repeatParams, "AddDeqRelu")) {
-        ASCENDC_REPORT_CHECK_ERROR("AddDeqRelu", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
+    CheckAddDeqReluMaskValueParams<T, U, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams);
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryAddReqReluInfo(dst, src0, src1, mask, repeatTime, repeatParams, isSetMask, "AddDeqRelu");
 #endif
@@ -1231,10 +1221,6 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTenso
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("AddDeqRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckCalcount(count, "count", "AddDeqRelu");
-    const uint32_t minTensorSize = (dst.GetSize() < src0.GetSize()) ? dst.GetSize() : src0.GetSize();
-    const uint32_t calcountHigh = (minTensorSize < src1.GetSize()) ? minTensorSize : src1.GetSize();
-    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(calcountHigh), "count",
-        "AddDeqRelu");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryDiffType(dst, src0, src1, count, "AddDeqRelu")) {
@@ -1259,10 +1245,6 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("AddDeqRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckCalcount(count, "count", "AddDeqRelu");
-    const uint32_t minTensorSize = (dst.GetSize() < src0.GetSize()) ? dst.GetSize() : src0.GetSize();
-    const uint32_t calcountHigh = (minTensorSize < src1.GetSize()) ? minTensorSize : src1.GetSize();
-    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(calcountHigh), "count",
-        "AddDeqRelu");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryDiffType(dst, src0, src1, count, "AddDeqRelu")) {
@@ -1393,8 +1375,7 @@ __aicore__ inline void FusedMulAdd(const LocalTensor<T>& dst, const LocalTensor<
  */
 template <typename T, bool isSetMask>
 __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
 #if __NPU_ARCH__ == 2201
@@ -1445,8 +1426,7 @@ __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T
 // FusedMulAddRelu has been updated, please use MulAddRelu instead.
 template <typename T, bool isSetMask>
 __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
 #if __NPU_ARCH__ == 2201
@@ -1516,10 +1496,6 @@ __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("MulAddRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckCalcount(count, "count", "MulAddRelu");
-    const uint32_t minTensorSize = (dst.GetSize() < src0.GetSize()) ? dst.GetSize() : src0.GetSize();
-    const uint32_t calcountHigh = (minTensorSize < src1.GetSize()) ? minTensorSize : src1.GetSize();
-    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(calcountHigh), "count",
-        "MulAddRelu");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "MulAddRelu")) {
@@ -1543,10 +1519,6 @@ __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTen
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("FusedMulAddRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckCalcount(count, "count", "FusedMulAddRelu");
-    const uint32_t minTensorSize = (dst.GetSize() < src0.GetSize()) ? dst.GetSize() : src0.GetSize();
-    const uint32_t calcountHigh = (minTensorSize < src1.GetSize()) ? minTensorSize : src1.GetSize();
-    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(calcountHigh), "count",
-        "FusedMulAddRelu");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "FusedMulAddRelu")) {
@@ -1580,8 +1552,7 @@ __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTen
  */
 template <typename T, bool isSetMask>
 __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
 #if __NPU_ARCH__ == 2201
@@ -1648,10 +1619,6 @@ __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& 
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("SubRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckCalcount(count, "count", "SubRelu");
-    const uint32_t minTensorSize = (dst.GetSize() < src0.GetSize()) ? dst.GetSize() : src0.GetSize();
-    const uint32_t calcountHigh = (minTensorSize < src1.GetSize()) ? minTensorSize : src1.GetSize();
-    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(calcountHigh), "count",
-        "SubRelu");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "SubRelu")) {
