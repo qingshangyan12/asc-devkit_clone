@@ -28,6 +28,8 @@ using LayoutFormatSet = TupleMap<
     Std::tuple<NnLayoutPattern, MakeNnFrameLayout>,
     Std::tuple<ZzLayoutPattern, MakeZzFrameLayout>,
     Std::tuple<ZnLayoutPattern, MakeZnFrameLayout>,
+    Std::tuple<RowMajorLayoutPattern, MakeRowMajorFrameLayout>,
+    Std::tuple<ColumnMajorLayoutPattern, MakeColumnMajorFrameLayout>,
     Std::tuple<ScaleANDLayoutPattern, MakeScaleANDFrameLayout>,
     Std::tuple<ScaleADNLayoutPattern, MakeScaleADNFrameLayout>,
     Std::tuple<ScaleBNDLayoutPattern, MakeScaleBNDFrameLayout>,

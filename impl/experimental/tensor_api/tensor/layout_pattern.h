@@ -28,6 +28,8 @@ struct NzLayoutPattern {};
 struct L0CLayoutPattern {};
 struct NDLayoutPattern {};
 struct DNLayoutPattern {};
+struct RowMajorLayoutPattern {};
+struct ColumnMajorLayoutPattern {};
 struct ScaleZzLayoutPattern {};
 struct ScaleANDLayoutPattern {};
 struct ScaleADNLayoutPattern {};
