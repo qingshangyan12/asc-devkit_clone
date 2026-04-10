@@ -78,6 +78,20 @@ __aicore__ inline uint64_t asc_debug_get_block_idx()
     return asc_debug_get_block_idx_impl();
 }
 
+__aicore__ inline uint64_t asc_debug_get_block_num()
+{
+    return get_block_num();
+}
+
+__aicore__ inline uint64_t asc_debug_get_block_total_num()
+{
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+    return asc_debug_get_block_num() * get_task_ration();
+#else
+    return asc_debug_get_block_num();
+#endif
+}
+
 __aicore__ inline int64_t asc_debug_get_program_counter()
 {
     return get_pc();
@@ -253,6 +267,27 @@ template <typename T>
 __aicore__ constexpr inline DumpTensorDataType get_dump_datatype()
 {
     return get_dump_datatype_impl<T>();
+}
+
+__aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint64_t& version, uint64_t& timeStamp)
+{
+#ifdef ASC_DEVKIT_VERSION_STR
+    versionStr = const_cast<__gm__ char*>(ASC_DEVKIT_VERSION_STR);
+#else
+    versionStr = const_cast<__gm__ char*>("Unknown ASC_DEVKIT version");
+#endif
+
+#ifdef ASC_DEVKIT_TIMESTAMP
+    timeStamp = static_cast<uint64_t>(ASC_DEVKIT_TIMESTAMP);
+#else
+    timeStamp = 0;
+#endif
+
+#ifdef ASC_DEVKIT_VERSION
+    version = static_cast<uint64_t>(ASC_DEVKIT_VERSION);
+#else
+    version = 0;
+#endif
 }
 
 } // namespace __asc_aicore
