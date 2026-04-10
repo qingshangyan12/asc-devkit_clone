@@ -15,7 +15,6 @@
 import os
 import numpy as np
 import ml_dtypes
-bfloat16 = ml_dtypes.bfloat16
 
 def gen_golden_data():
     m, n, k, is_bias = 8192, 8192, 8192, False
