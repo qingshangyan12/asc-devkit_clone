@@ -29,8 +29,6 @@
 namespace AscendC {
 namespace Te {
 
-struct DefaultPattern;
-
 template <typename T, typename U, typename S>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
 
@@ -52,7 +50,7 @@ struct DefaultInfo {};
 template <typename T, typename U, typename Info = DefaultInfo>
 struct Layout : private Std::tuple<T, U>
 {
-    using info = Info;
+    using tag = Info;
     static constexpr auto size = StaticLayoutSize<T, U>::size;
     static constexpr auto depth = nesting_depth_v<T>;
     static constexpr auto rank = Std::tuple_size_v<T>;
