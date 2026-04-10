@@ -24,7 +24,6 @@
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 #include "impl/experimental/tensor_api/tensor/layout_fractal.h"
-#include "impl/experimental/tensor_api/tensor/layout_static_fractal.h"
 
 namespace AscendC {
 namespace Te {
