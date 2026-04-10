@@ -23,8 +23,18 @@
 #ifndef IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_ROUTING_H
 #define IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_ROUTING_H
 
-#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0a.h"
-#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0b.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0a/nz2nz.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0a/zn2nz.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0a/zn2nzb8b4.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0a/nz2nz_with_coord.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0a/zn2nz_with_coord.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0a/zn2nzb8b4_with_coord.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0b/zn2zn.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0b/nz2zn.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0b/nz2znb8b4.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0b/zn2zn_with_coord.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0b/nz2zn_with_coord.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_l0/npu_arch_3510/l12l0b/nz2znb8b4_with_coord.h"
 
 namespace AscendC {
 namespace Te {
@@ -35,38 +45,81 @@ public:
     __aicore__ inline void static Run(const Args&... args) {}
 };
 
-template <Hardware dstPos, Hardware srcPos, uint32_t Version>
+template <Hardware dstPos, Hardware srcPos, uint32_t Version, typename DstLayoutPattern, typename SrcLayoutPattern, CopyMode copyMode>
 struct LoadDataTensor2Tensor {
     using type = LoadDataIgnore;
 };
 
-template <Hardware dstPos, Hardware srcPos, uint32_t Version>
-struct LoadDataTensor2TensorNoCoord {
-    using type = LoadDataIgnore;
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3510, NzLayoutPattern, NzLayoutPattern, CopyMode::NORMAL>
+{
+    using type = LoadDataL12L0ANZ2NZ3510;
 };
 
 template <>
-struct LoadDataTensor2TensorNoCoord<Hardware::L0A, Hardware::L1, ArchVersion::V3510>
+struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3510, NzLayoutPattern, NzLayoutPattern, CopyMode::NORMAL_COORD>
 {
-    using type = LoadDataL12L0A3510;
+    using type = LoadDataL12L0ANZ2NZWithCoord3510;
 };
 
 template <>
-struct LoadDataTensor2TensorNoCoord<Hardware::L0B, Hardware::L1, ArchVersion::V3510>
+struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3510, ZnLayoutPattern, NzLayoutPattern, CopyMode::TRANS>
 {
-    using type = LoadDataL12L0B3510;
+    using type = LoadDataL12L0AZN2NZ3510;
 };
 
 template <>
-struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3510>
+struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3510, ZnLayoutPattern, NzLayoutPattern, CopyMode::TRANS_COORD>
 {
-    using type = LoadDataL12L0AWithCoord3510;
+    using type = LoadDataL12L0AZN2NZWithCoord3510;
 };
 
 template <>
-struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3510>
+struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3510, ZnLayoutPattern, NzLayoutPattern, CopyMode::TRANSB8B4>
 {
-    using type = LoadDataL12L0BWithCoord3510;
+    using type = LoadDataL12L0AZN2NZB8B43510;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3510, ZnLayoutPattern, NzLayoutPattern, CopyMode::TRANSB8B4_COORD>
+{
+    using type = LoadDataL12L0AZN2NZB8B4WithCoord3510;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3510, ZnLayoutPattern, ZnLayoutPattern, CoordMode::NORMAL>
+{
+    using type = LoadDataL12L0BZN2ZN3510;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3510, ZnLayoutPattern, ZnLayoutPattern, CopyMode::NORMAL_COORD>
+{
+    using type = LoadDataL12L0BZN2ZNWithCoord3510;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3510, NzLayoutPattern, ZnLayoutPattern, CopyMode::TRANS>
+{
+    using type = LoadDataL12L0BNZ2ZN3510;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3510, NzLayoutPattern, ZnLayoutPattern, CopyMode::TRANS_COORD>
+{
+    using type = LoadDataL12L0BNZ2ZNWithCoord3510;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3510, NzLayoutPattern, ZnLayoutPattern, CopyMode::TRANSB8B4>
+{
+    using type = LoadDataL12L0BNZ2ZNB8B43510;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3510, NzLayoutPattern, ZnLayoutPattern, CopyMode::TRANSB8B4_COORD>
+{
+    using type = LoadDataL12L0BNZ2ZNB8B4WithCoord3510;
 };
 } // namespace Te
 } // namespace AscendC
