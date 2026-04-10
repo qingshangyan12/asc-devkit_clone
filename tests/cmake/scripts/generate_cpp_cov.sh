@@ -93,6 +93,7 @@ filter_coverage() {
 generate_html() {
   local _filtered_file="$1"
   local _out_path="$2"
+  local _src_path="$3"
 
   \which genhtml >/dev/null 2>&1
   if [[ $? -ne 0 ]]; then
@@ -104,7 +105,7 @@ generate_html() {
   if [[ ! -d "${_out_path}" ]]; then
     mk_dir "${_out_path}"
   fi
-  genhtml "${_filtered_file}" -o "${_out_path}"
+  genhtml --prefix "${_src_path}" "${_filtered_file}" -o "${_out_path}"
 }
 
 
@@ -120,4 +121,4 @@ _cann_path="$4"
 
 generate_coverage "${_src}" "${_cov_file}" "${_cann_path}"
 filter_coverage   "${_cov_file}" "${_cov_file}_filtered"
-generate_html     "${_cov_file}_filtered" "${_out}"
+generate_html     "${_cov_file}_filtered" "${_out}" "${_src}"

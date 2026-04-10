@@ -26,6 +26,7 @@
 namespace AscendC {
 namespace Te {
 
+    
 class CopyL12UBIgnore {
 public:
     template <const CopyL12UBTrait& trait, typename ...Args>
