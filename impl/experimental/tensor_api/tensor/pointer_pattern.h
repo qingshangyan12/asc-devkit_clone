@@ -22,27 +22,27 @@ namespace AscendC {
 namespace Te {
     
 struct EmptyTrait {};
-struct GMMemPtrPattern {};
-struct UBMemPtrPattern {};
-struct L1MemPtrPattern {};
-struct L0AMemPtrPattern {};
-struct L0BMemPtrPattern {};
-struct L0CMemPtrPattern {};
-struct BiasMemPtrPattern {};
-struct FixbufMemPtrPattern {};
+struct GMMemPtr {};
+struct UBMemPtr {};
+struct L1MemPtr {};
+struct L0AMemPtr {};
+struct L0BMemPtr {};
+struct L0CMemPtr {};
+struct BiasMemPtr {};
+struct FixbufMemPtr {};
 
 using PtrMemSet = TupleMap<
-    Std::tuple<GMMemPtrPattern, MakeGMMemPtr>,
-    Std::tuple<UBMemPtrPattern, MakeUBMemPtr>,
-    Std::tuple<L1MemPtrPattern, MakeL1MemPtr>,
-    Std::tuple<L0AMemPtrPattern, MakeL0AMemPtr>,
-    Std::tuple<L0BMemPtrPattern, MakeL0BMemPtr>,
-    Std::tuple<L0CMemPtrPattern, MakeL0CMemPtr>,
-    Std::tuple<BiasMemPtrPattern, MakeBiasMemPtr>,
-    Std::tuple<FixbufMemPtrPattern, MakeFixbufMemPtr>>;
+    Std::tuple<GMMemPtr, MakeGMMemPtr>,
+    Std::tuple<UBMemPtr, MakeUBMemPtr>,
+    Std::tuple<L1MemPtr, MakeL1MemPtr>,
+    Std::tuple<L0AMemPtr, MakeL0AMemPtr>,
+    Std::tuple<L0BMemPtr, MakeL0BMemPtr>,
+    Std::tuple<L0CMemPtr, MakeL0CMemPtr>,
+    Std::tuple<BiasMemPtr, MakeBiasMemPtr>,
+    Std::tuple<FixbufMemPtr, MakeFixbufMemPtr>>;
 
 template <typename PtrPattern, typename TraitType, typename... Args>
-__aicore__ inline constexpr auto MakeMemPatternPtr(Args... args)
+__aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
     using GetPtrMakeFun = typename PtrMemSet::template Get<PtrPattern>;
     static_assert(!Std::is_same_v<GetPtrMakeFun, EmptyValue>, "Unsupported pointer pattern.");
