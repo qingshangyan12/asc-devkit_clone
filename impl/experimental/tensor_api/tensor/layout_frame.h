@@ -66,7 +66,7 @@ template <typename LayoutPattern, typename TraitType>
 struct FrameLayoutFormat {
     template <typename... Args>
     __aicore__ inline decltype(auto) operator()(const Args&... args) {
-        return MakeFrameLayout<LayoutPattern, TraitType, LayoutSet>(args...);
+        return MakeFrameLayout<LayoutPattern, TraitType>(args...);
     }
 };
 
