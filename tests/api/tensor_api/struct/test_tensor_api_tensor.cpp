@@ -155,7 +155,7 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
     EXPECT_EQ(MakeFixbufmemPtr(fixbufPtr), fixbufPtr);
 }
 
-TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
+TEST_F(Tensor_Api_Tensor, IteratorMakeMemPatternPtrOperation)
 {
     using namespace AscendC::Te;
 
