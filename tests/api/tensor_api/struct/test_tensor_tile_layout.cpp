@@ -1067,42 +1067,6 @@ TEST_F(Tensor_Api_Layout, TestStaticLayout)
     EXPECT_EQ(AscendC::Std::get<0>(scaleBDNShape), 1);
 }
 
-TEST_F(Tensor_Api_Layout, TestStructLayout)
-{
-    using namespace AscendC::Te;
-    auto NDLayout = NDLayoutFormat<half>{}(256, 256);
-    auto StaticNDLayout = NDLayoutFormat<half>::type<AscendC::Std::Int<16>{}, AscendC::Std::Int<16>{}>{};
-    auto DNLayout = DNLayoutFormat<half>{}(256, 256);
-    auto NzLayout = NzLayoutFormat<half>{}(256, 256);
-    auto ZnLayout = ZnLayoutFormat<half>{}(256, 256);
-    auto NnLayout = NnLayoutFormat<fp8_e8m0_t>{}(16, 32);
-    auto scaleANDLayout = ScaleANDLayoutFormat<fp8_e8m0_t>{}(16, 32);
-    auto scaleADNLayout = ScaleADNLayoutFormat<fp8_e8m0_t>{}(16, 32);
-    auto scaleBNDLayout = ScaleBNDLayoutFormat<fp8_e8m0_t>{}(16, 32);
-    auto scaleBDNLayout = ScaleBDNLayoutFormat<fp8_e8m0_t>{}(16, 32);
-
-    auto NDShape = GetShape<0>(NDLayout);
-    auto staticNDShape = GetShape<0>(StaticNDLayout);
-    auto DNShape = GetShape<0>(DNLayout);
-    auto NzShape = GetShape<0>(NzLayout);
-    auto ZnShape = GetShape<0>(ZnLayout);
-    auto NnShape = GetShape<1>(NnLayout);
-    auto scaleANDShape = GetShape<0>(scaleANDLayout);
-    auto scaleADNShape = GetShape<0>(scaleADNLayout);
-    auto scaleBNDShape = GetShape<0>(scaleBNDLayout);
-    auto scaleBDNShape = GetShape<0>(scaleBDNLayout);
-
-    EXPECT_EQ(AscendC::Std::get<1>(NDShape), 256);
-    EXPECT_EQ(AscendC::Std::get<1>(staticNDShape), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(DNShape), 256);
-    EXPECT_EQ(AscendC::Std::get<1>(NzShape), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(ZnShape), 16);
-    EXPECT_EQ(AscendC::Std::get<0>(NnShape), 16);
-    EXPECT_EQ(AscendC::Std::get<0>(scaleANDShape), 1);
-    EXPECT_EQ(AscendC::Std::get<0>(scaleADNShape), 1);
-    EXPECT_EQ(AscendC::Std::get<0>(scaleBNDShape), 2);
-    EXPECT_EQ(AscendC::Std::get<0>(scaleBDNShape), 1);
-}
 
 TEST_F(Tensor_Api_Layout, TestMakeFrameLayout)
 {
