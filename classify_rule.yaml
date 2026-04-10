@@ -75,7 +75,8 @@ asc-devkit:
       - impl/experimental/tensor_api/arch/utils/is_format.h
       - impl/experimental/tensor_api/tensor/tuple_fractal.h
       - impl/experimental/tensor_api/tensor/layout_size.h
-      - impl/experimental/tensor_api/tensor/layout_static_fractal.h
+      - impl/experimental/tensor_api/tensor/layout_static_fractal.h 
+      - impl/experimental/tensor_api/tensor/get_pattern.h
       - impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_gm2l1/nd2zz.h
       - impl/experimental/tensor_api/atom/mad_traits_impl.h
       - impl/experimental/tensor_api/atom/cube_compute/mmad.h
