@@ -2,7 +2,7 @@
 
 ## 抽象硬件架构<a name="section3163536195018"></a>
 
-AI Core上SIMD（Single Instruction Multiple Data，单指令多数据）与SIMT（Single Instruction Multiple Thread，单指令多线程）混合编程当前仅支持Ascend 950PR/Ascend 950DT。该架构通过统一的计算资源和内存层级，实现向量级并行与线程级并行的高效协同。
+AI Core上SIMD（Single Instruction Multiple Data，单指令多数据）与SIMT（Single Instruction Multiple Thread，单指令多线程）混合编程，结合了SIMD多数据并行计算能力与SIMT离散访存的优势，实现向量级并行与线程级并行的高效协同。当前仅支持Ascend 950PR/Ascend 950DT。
 
 整个执行过程以Vector Function（VF）为基本调度单位，VF为一个基本函数块。SIMD与SIMT混合编程支持在同一算子中灵活切换SIMD与SIMT执行方式，两种不同类型的VF可以快速切换，每个VF代表一个独立的计算任务片段，通常对应算子中的一段可并行处理的逻辑，从而在性能、能效与开发效率之间取得更优平衡。在SIMD与SIMT混合编程中：
 
