@@ -1013,8 +1013,7 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
  */
 template <typename T, bool isSetMask>
 __aicore__ inline void AddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
 #if __NPU_ARCH__ == 2201
