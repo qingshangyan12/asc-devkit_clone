@@ -21,6 +21,7 @@
 #define ASCENDC_MODULE_UTILS_CONSTANTS_H
 #include "utils/kernel_utils_ceil_oom_que.h"
 #include "utils/kernel_utils_dump_constants.h"
+#include "impl/utils/common_types.h"
 
 namespace AscendC {
 const int32_t DEFAULT_BLK_NUM = 8;
@@ -493,107 +494,10 @@ template <> struct GetPadValueType<fp4x2_e2m1_t> {
 };
 #endif
 
-template <bool condition, class T1, class T2>
-struct Conditional {
-    using type = T1;
-};
-
-template <class T1, class T2>
-struct Conditional<false, T1, T2> {
-    using type = T2;
-};
-
 template <bool condition1, bool condition2, class T1, class T2, class T3, class T4> struct ConditionalMulti {
     using type = typename Conditional<condition1, typename Conditional<condition2, T1, T2>::type,
         typename Conditional<condition2, T3, T4>::type>::type;
 };
-
-template <int bitNum, bool sign = true>
-struct IntegerSubType {
-    static int const kBits = bitNum;
-    static bool const kSigned = sign;
-
-    using T = typename Conditional<kSigned, int8_t, uint8_t>::type;
-    using Storage = uint8_t;
-
-    static Storage const mask = Storage(((static_cast<uint64_t>(1)) << static_cast<uint32_t>(kBits)) - 1);
-    Storage storage;
-    __aicore__ inline IntegerSubType() = default;
-
-    __aicore__ inline IntegerSubType(uint32_t value)
-        : storage(reinterpret_cast<Storage const &>(value) & mask) {}
-
-    __aicore__ inline IntegerSubType(int32_t value)
-        : storage(reinterpret_cast<Storage const &>(value) & mask) {}
-
-    __aicore__ inline operator T() const
-    {
-        if (kSigned && ((storage & Storage(static_cast<uint64_t>(1) << static_cast<uint32_t>(kBits - 1))) != 0)) {
-            // Sign extend
-            return T(storage) | ~T(mask);
-        }
-        return T(storage);
-    }
-
-    __aicore__ inline bool operator == (IntegerSubType const &rhs) const
-    {
-        return storage == rhs.storage;
-    }
-
-    __aicore__ inline bool operator != (IntegerSubType const &rhs) const
-    {
-        return storage != rhs.storage;
-    }
-
-    __aicore__ inline bool operator > (IntegerSubType const &rhs) const
-    {
-        bool lhsIsNeg = (this->storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(this->kBits - 1)));
-        bool rhsIsNeg = (rhs.storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(rhs.kBits - 1)));
-        if (kSigned && (lhsIsNeg != rhsIsNeg)) {
-            return (!lhsIsNeg) && rhsIsNeg;
-        }
-        return this->storage > rhs.storage;
-    }
-
-    __aicore__ inline bool operator >= (IntegerSubType const &rhs) const
-    {
-        bool lhsIsNeg = (this->storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(this->kBits - 1)));
-        bool rhsIsNeg = (rhs.storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(rhs.kBits - 1)));
-        if (kSigned && (lhsIsNeg != rhsIsNeg)) {
-            return (!lhsIsNeg) && rhsIsNeg;
-        }
-        return storage >= rhs.storage;
-    }
-
-    __aicore__ inline bool operator < (IntegerSubType const &rhs) const
-    {
-        return !(*this >= rhs);
-    }
-
-    __aicore__ inline bool operator <= (IntegerSubType const &rhs) const
-    {
-        return !(*this > rhs);
-    }
-};
-
-using int4b_t = IntegerSubType<INT4_BIT_NUM, true>;
-
-#if (__NPU_ARCH__ == 5102)
-using int2b_t = IntegerSubType<INT2_BIT_NUM, true>;
-using int1b_t = IntegerSubType<INT1_BIT_NUM, true>;
-using uint1b_t = IntegerSubType<INT1_BIT_NUM, false>;
-#endif
-
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
-using uint4b_t = IntegerSubType<INT4_BIT_NUM, false>;
-using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
-using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
-#endif
-#if !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)))
-using fp8_e8m0_t = uint8_t;
-#elif !defined(ASCENDC_CPU_DEBUG)
-using fp8_e8m0_t = float8_e8m0_t;
-#endif
 
 using mx_fp8_e5m2_t = struct {};
 using mx_fp8_e4m3_t = struct {};
