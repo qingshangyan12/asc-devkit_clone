@@ -33,9 +33,11 @@ template<const LoadDataTrait& trait, bool transpose>
 constexpr LoadDataTrait TransTrait = LoadDataTrait(trait, transpose); 
 
 template <typename T>
-__aicore__ inline uint8_t GetCacheModeFromTensor(const T& tensor) {
+__aicore__ inline uint8_t GetCacheModeFromTensor(T& tensor) {
     if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-        return static_cast<uint8_t>((reinterpret_cast<uint64_t>(tensor.Data().Get())) >> L2_CACHE_OFFSET);
+        uint8_t cacheMode =  static_cast<uint8_t>((reinterpret_cast<uint64_t>(tensor.Data().Get())) >> L2_CACHE_OFFSET);
+        tensor.SetL2CacheHint(CacheMode::CACHE_MODE_NORMAL);
+        return cacheMode;
     } else {
         return 0;
     }
