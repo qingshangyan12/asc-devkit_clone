@@ -1105,6 +1105,23 @@ __aicore__ inline void AddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& 
 /* **************************************************************************************************
  * AddDeqRelu                                             *
  * ************************************************************************************************* */
+template <typename T, typename U, bool isSetMask>
+__aicore__ inline void CheckAddDeqReluMaskArrayParams(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
+    const LocalTensor<U>& src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("AddDeqRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskArray<PrimT<U>, isSetMask>(mask, "AddDeqRelu");
+#endif
+#if ASCENDC_CPU_DEBUG
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFuncVecBinaryDiffType(dst, src0, src1, mask, repeatTime, repeatParams, "AddDeqRelu")) {
+        ASCENDC_REPORT_CHECK_ERROR("AddDeqRelu", KernelFuncType::MASK_BIT_MODE);
+    }
+#endif
+}
+
 /*
  * @ingroup AddDeqRelu Level 0
  * @brief dst = DeqRelu(src0 + src1)
@@ -1125,16 +1142,7 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTenso
     const LocalTensor<int32_t>& src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckVectorTensor("AddDeqRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskArray<int32_t, isSetMask>(mask, "AddDeqRelu");
-#endif
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFuncVecBinaryDiffType(dst, src0, src1, mask, repeatTime, repeatParams, "AddDeqRelu")) {
-        ASCENDC_REPORT_CHECK_ERROR("AddDeqRelu", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
+    CheckAddDeqReluMaskArrayParams<half, int32_t, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams);
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryAddReqReluInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask, "AddDeqRelu");
 #endif
@@ -1151,16 +1159,7 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U
     using PrimSrcType = PrimT<U>;
     static_assert((Std::is_same<PrimDstType, half>::value && Std::is_same<PrimSrcType, int32_t>::value) &&
         "Failed to check dtype in AddDeqRelu, current api support dtype combination is src: int32_t, dst: half.");
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckVectorTensor("AddDeqRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskArray<PrimSrcType, isSetMask>(mask, "AddDeqRelu");
-#endif
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFuncVecBinaryDiffType(dst, src0, src1, mask, repeatTime, repeatParams, "AddDeqRelu")) {
-        ASCENDC_REPORT_CHECK_ERROR("AddDeqRelu", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
+    CheckAddDeqReluMaskArrayParams<T, U, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams);
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryAddReqReluInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask, "AddDeqRelu");
 #endif

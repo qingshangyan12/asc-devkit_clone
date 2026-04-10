@@ -491,8 +491,8 @@ __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<
     }
 #endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<MaskCheckType, isSetMask>(mask, "SubReluCast");
+    CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
