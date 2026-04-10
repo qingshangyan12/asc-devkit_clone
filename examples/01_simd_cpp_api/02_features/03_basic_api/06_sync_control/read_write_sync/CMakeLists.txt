@@ -34,6 +34,13 @@ add_executable(demo
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
 set(NPU_ARCH "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
+
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
+)
+
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH}>
     $<$<COMPILE_LANGUAGE:ASC>:--cce-simd-vf-fusion=false>

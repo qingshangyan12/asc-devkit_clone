@@ -1,7 +1,21 @@
 # read_write_sync样例
 
 ## 概述
-本样例演示了SIMD场景下，基于RegBase编程范式下读操作与写操作之间依赖场景下的同步，样例中使用到了寄存器保序这一关键特性，可以优化读写之间的同步指令。
+本样例演示了基于RegBase编程范式下对UB（Unified Buffer）读或写操作的同步指令使用。样例中使用到了寄存器保序特性（优化读写之间的同步指令）和LoalMemBar接口来保序。本样例支持两种计算场景：读写依赖和写写依赖，通过环境变量选择场景。
+    <table>
+ 	  	 	<tr>
+ 	  	 		<td>scenarioNum</td>
+ 	  	 		<td>同步场景</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>1</td>
+ 	  	 		<td>读写依赖（寄存器保序）</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>2</td>
+ 	  	 		<td>写写依赖（LocalMemBar）</td>
+ 	  	 	</tr>
+ 	  	 </table>
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -19,7 +33,7 @@
 
 ## 算子描述
 - 算子功能：  
-  算子输入一个长度为1024的向量A和一个长度为1024的向量B，数据类型为float，进行向量相加操作。
+  算子输入一个长度为1024的向量A和一个长度为1024的向量B，数据类型为float，进行向量相加或相减操作。
 - 算子规格：
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="3" align="center">AIV算子</td></tr>
@@ -35,11 +49,8 @@
   </table>
 - 算子实现：  
   主要包括以下步骤：
-  1. 初始化参数
-  2. 将数据从GM搬运到UB
-  3. 调用AddVF进行计算，在vf函数中每次迭代读取向量A到reg0，读取向量B的数据到reg1，进行相加后结果写到reg0，随后将reg0的数据保存到dstAddr，写指令与Add指令都用到了寄存器reg0，读指令与Add指令都用到了寄存器reg1，触发了寄存器保序机制，可以优化掉读写之间的同步指令
-  4. 将结果从UB搬运回GM
-  
+  1. 在vf函数中每次迭代读取向量A到reg0，读取向量B的数据到reg1，进行相加后结果写到reg0，随后将reg0的数据保存到dstAddr，写指令与Add指令都用到了寄存器reg0，读指令与Add指令都用到了寄存器reg1，触发了寄存器保序机制，可以优化掉读写之间的同步指令。
+  2. 在vf函数中每次迭代读取向量A到reg0，读取向量B的数据到reg1，进行相减后结果写到reg3，每次迭代都将reg3的数据保存到dstAddr，由于每次保存的数据地址都相同，所以需要加LocalMemBar指令来保序。该样例场景2只为演示LocalMemBar指令的使用。
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
@@ -64,9 +75,10 @@
     
 - 样例执行
   ```bash
+  SCENARIO=1
   mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DNPU_ARCH=dav-3510 ..;make -j;                                     # 编译工程（默认npu模式）
-  python3 ../scripts/gen_data.py                                            # 生成测试输入数据
+  cmake -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j;           # 编译工程（默认npu模式）
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO                     # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   ```
 
@@ -74,18 +86,20 @@
 
   示例如下：
   ```bash
-  cmake -DRUN_MODE=cpu -DNPU_ARCH=dav-3510 ..;make -j; # cpu调试模式
-  cmake -DRUN_MODE=sim -DNPU_ARCH=dav-3510 ..;make -j; # NPU仿真模式
+  SCENARIO=1
+  cmake -DRUN_MODE=cpu -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # cpu调试模式
+  cmake -DRUN_MODE=sim -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # NPU仿真模式
   ```
 
-  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+  > **注意：** 切换编译模式或场景前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
 
-  | 选项 | 可选值 | 说明 |
-  |------|--------|------|
-  | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `NPU_ARCH` | `dav-3510`（默认） | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+| ----------------| -----------------------------| ---------------------------------------------------|
+| `RUN_MODE`　　 | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
+| `NPU_ARCH`　　 | `dav-3510`（默认）　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| `SCENARIO_NUM` | `1`（默认）、`2`　　　　　　| 场景编号：1=读写依赖，2=写写依赖　　　　　　　　　|
 
 - 执行结果
 
