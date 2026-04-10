@@ -325,12 +325,6 @@ __aicore__ inline void asc_set_ndim_pad_value(int8_t pad_value);
 
 __aicore__ inline void asc_set_ndim_pad_value(uint8_t pad_value);
 
-__aicore__ inline void asc_set_ndim_pad_value(fp8_e8m0_t pad_value);
-
-__aicore__ inline void asc_set_ndim_pad_value(fp8_e5m2_t pad_value);
-
-__aicore__ inline void asc_set_ndim_pad_value(fp8_e4m3fn_t pad_value);
-
 __aicore__ inline void asc_set_ndim_pad_value(int16_t pad_value);
 
 __aicore__ inline void asc_set_ndim_pad_value(uint16_t pad_value);
@@ -425,18 +419,6 @@ __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* sr
 __aicore__ inline void asc_set_copy_pad_val(int8_t pad_value);
 
 __aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(fp4x2_e2m1_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(fp4x2_e1m2_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(fp8_e8m0_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(fp8_e5m2_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(fp8_e4m3fn_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(hifloat8_t pad_value);
 
 __aicore__ inline void asc_set_copy_pad_val(int16_t pad_value);
 
