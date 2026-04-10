@@ -76,17 +76,20 @@ endfunction(generate_stub)
 
 if(AARCH_MODE)
     set(STUBS
-        hcomm 
         ccl_kernel
         c_sec
         unified_dlog
         mmpa
-    ) 
-    foreach(STUB ${STUBS}) 
-        if(NOT TARGET ${STUB}) 
-            generate_stub(${STUB}) 
-        endif() 
+    )
+    foreach(STUB ${STUBS})
+        if(NOT TARGET ${STUB})
+            generate_stub(${STUB})
+        endif()
     endforeach()
+endif()
+
+if(NOT TARGET hcomm)
+    generate_stub(hcomm)
 endif()
 
 if(CUSTOM_ASCEND_CANN_PACKAGE_PATH)
@@ -131,7 +134,7 @@ endif()
 #endif()
 
 if (CMAKE_INSTALL_PREFIX STREQUAL /usr/local)
-    set(CMAKE_INSTALL_PREFIX     "${CMAKE_CURRENT_SOURCE_DIR}/output"  CACHE STRING "path for install()" FORCE)
+    set(CMAKE_INSTALL_PREFIX     "${HCCL_CC_DIR}/output"  CACHE STRING "path for install()" FORCE)
 endif ()
 
 set(HI_PYTHON                     "python3"                       CACHE   STRING   "python executor")

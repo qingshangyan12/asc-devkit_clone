@@ -34,7 +34,7 @@ target_link_libraries(hccl-model-proxy PUBLIC
     unified_dlog
     mmpa
     acl_rt
-    scatter_aicpu_kernel
+    mc2_server
 )
 
 if (BUILD_OPEN_PROJECT)

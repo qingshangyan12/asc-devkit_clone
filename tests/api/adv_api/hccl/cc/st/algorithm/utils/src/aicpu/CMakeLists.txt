@@ -9,7 +9,7 @@
 # -----------------------------------------------------------------------------------------------------------
 
 set(INCLUDE_LIST
-    ${HCCL_DEV_BASE}/include
+    ${HCCL_CC_INCLUDE_DIR}
     ${HCCL_DEV_BASE}/src/common
     ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
 
@@ -154,7 +154,7 @@ list(APPEND INCLUDE_LIST
     ${ASCEND_HOME_PATH}/pkg_inc/trace/
 )
 
-add_library(scatter_aicpu_kernel SHARED
+add_library(mc2_server SHARED
     ${HCCL_DEV_BASE}/src/common/utils.cc
     # ${HCCL_DEV_BASE}/src/common/adapter_acl.cc
     ${HCCL_DEV_BASE}/src/common/config_log.cc
@@ -260,28 +260,28 @@ add_library(scatter_aicpu_kernel SHARED
     ${HCCL_DEV_BASE}/src/ops/reduce/template/aicpu/reduce_aicpu_reduce_nhr.cc
 )
 
-target_include_directories(scatter_aicpu_kernel PRIVATE
+target_include_directories(mc2_server PRIVATE
     ${INCLUDE_LIST}
 )
 
-target_compile_options(scatter_aicpu_kernel PRIVATE
+target_compile_options(mc2_server PRIVATE
     -g
     -O0
     -fstack-protector-all
     -D_GLIBCXX_USE_CXX11_ABI=0
 )
 
-target_link_options(scatter_aicpu_kernel PRIVATE
+target_link_options(mc2_server PRIVATE
     -Wl,-z,relro
     -Wl,-z,now
     -Wl,-z,noexecstack
     $<$<CONFIG:Release>:-s>
 )
 
-target_compile_definitions(scatter_aicpu_kernel PRIVATE
+target_compile_definitions(mc2_server PRIVATE
     -DAICPU_COMPILE
 )
 
-target_link_libraries(scatter_aicpu_kernel PRIVATE
+target_link_libraries(mc2_server PRIVATE
     -Wl,--no-as-needed
 )

@@ -12,6 +12,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_v2_recv_sole_executor.cc
 )
 
-target_sources(hccl PRIVATE
+target_sources(mc2_client PRIVATE
     ${src_list}
 )

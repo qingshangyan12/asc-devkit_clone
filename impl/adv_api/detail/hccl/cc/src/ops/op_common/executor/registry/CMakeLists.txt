@@ -12,6 +12,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/coll_alg_v2_exec_registry.cc
 )
 
-target_sources(hccl PRIVATE
+target_sources(mc2_client PRIVATE
     ${src_list}
 )

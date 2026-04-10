@@ -19,6 +19,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_reduce_scatter_mesh2die.cc
 )
 
-target_sources(hccl PRIVATE
+target_sources(mc2_client PRIVATE
     ${src_list}
 )

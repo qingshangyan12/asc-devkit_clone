@@ -9,6 +9,9 @@
 # -----------------------------------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.16.0)
 option(BUILD_OPEN_PROJECT "Build open hccl project." ON)
+
+set(HCCL_CC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(HCCL_CC_INCLUDE_DIR ${ASCENDC_DIR}/include/adv_api/hccl/internal)
 message(STATUS "KERNEL_MODE=${KERNEL_MODE}")
 message(STATUS "BUILD_OPEN_PROJECT=${BUILD_OPEN_PROJECT}")
 message(STATUS "AARCH_MODE=${AARCH_MODE}")
@@ -36,7 +39,6 @@ if((BUILD_OPEN_PROJECT AND KERNEL_MODE) OR AARCH_MODE)
     set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/bin/aarch64-target-linux-gnu-g++)
     set(CMAKE_C_COMPILER   ${TOOLCHAIN_DIR}/bin/aarch64-target-linux-gnu-gcc)
 endif()
-project(hccl)
 
 set(CMAKE_C_FLAGS_RELEASE "")
 set(CMAKE_CXX_FLAGS_RELEASE "")
@@ -48,14 +50,7 @@ set(CMAKE_C_COMPILE_OBJECT
     "<CMAKE_C_COMPILER> <DEFINES> -D__FILE__='\"$(notdir $(abspath <SOURCE>))\"' -Wno-builtin-macro-redefined <INCLUDES> <FLAGS> -o <OBJECT> -c <SOURCE>"
 )
 
-if(ENABLE_TEST)
-    include(cmake/config.cmake)
-    include(cmake/intf_pub_gccnative.cmake)
-    include(cmake/function.cmake)
-    include(cmake/third_party/gtest.cmake)
-    add_subdirectory(test)
-
-elseif(ENABLE_CUSTOM)
+if(ENABLE_CUSTOM)
     # 自定义算子打包
     if(NOT CUSTOM_OPS_NAME)
         message(FATAL_ERROR "Custom ops name is not set")
@@ -78,8 +73,8 @@ elseif(ENABLE_CUSTOM)
     message(STATUS "Custom ops vendor: ${CUSTOM_OPS_VENDOR}")
     message(STATUS "Custom ops path: ${CUSTOM_OPS_PATH}")
 
-    set(BUILD_DEVICE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build_device)
-    set(BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build)
+    set(BUILD_DEVICE_DIR ${CMAKE_SOURCE_DIR}/build_device)
+    set(BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
     set(CUSTOM_OPS_OPP_PATH "opp/vendors/${CUSTOM_OPS_VENDOR}")
     set(CUSTOM_OPS_OPP_INC_PATH "${CUSTOM_OPS_OPP_PATH}/include")
     set(CUSTOM_OPS_OPP_LIB_PATH "${CUSTOM_OPS_OPP_PATH}/lib64")
@@ -87,9 +82,8 @@ elseif(ENABLE_CUSTOM)
     set(CUSTOM_OPS_OPP_AICPU_CONFIG_PATH "${CUSTOM_OPS_OPP_PATH}/aicpu/config")
     set(CUSTOM_OPS_OPP_AICPU_KERNEL_PATH "${CUSTOM_OPS_OPP_PATH}/aicpu/kernel")
 
-    include(cmake/config.cmake)
-    include(cmake/func.cmake)
-    include(cmake/package.cmake)
+    include(${HCCL_CC_DIR}/cmake/config.cmake)
+    include(${HCCL_CC_DIR}/cmake/func.cmake)
 
     # AICPU Device 构建目标
     add_custom_target(custom_aicpu)
@@ -99,62 +93,59 @@ elseif(ENABLE_CUSTOM)
     add_subdirectory(${CUSTOM_OPS_PATH})
 
 elseif(BUILD_OPEN_PROJECT)
-    include(cmake/config.cmake)
-    include(cmake/package.cmake)
-    include(cmake/func.cmake)
-    include(version.cmake)
+    include(${HCCL_CC_DIR}/cmake/config.cmake)
+    include(${HCCL_CC_DIR}/cmake/func.cmake)
+    include(${HCCL_CC_DIR}/version.cmake)
     if(ENABLE_OPEN_SRC)
         check_pkg_build_deps("hccl")
     endif()
-    add_version_info_targets()
-    pack_built_in()
     add_subdirectory(src)
 
     if(DEVICE_MODE)
-        set(CCL_KERNEL_TAR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build_device/ccl_kernel_tar_pkg/)
+        set(CCL_KERNEL_TAR_DIR ${CMAKE_SOURCE_DIR}/build_device/ccl_kernel_tar_pkg/)
         if(KERNEL_MODE)
             set(CCL_KERNEL_TAR_LIBS
-                ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libscatter_aicpu_kernel.so
-                ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libhccl_kernel_compat.so
+                ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libmc2_server.so
+                ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libmc2_kernel_compat.so
             )
             pack_targets_and_files(
                 OUTPUT_TARGET "generate_device_aicpu_package"
-                OUTPUT "aicpu_hccl.tar.gz"
+                OUTPUT "mc2_server.tar.gz"
                 FILES ${CCL_KERNEL_TAR_LIBS}
                 MANIFEST "bin_hash.cfg"
                 TAR_ROOT_DIR "aicpu_kernels_device"
             )
-            add_dependencies(generate_device_aicpu_package scatter_aicpu_kernel)
+            add_dependencies(generate_device_aicpu_package mc2_server)
             sign_file(
-                INPUT "aicpu_hccl.tar.gz"
-                CONFIG "${CMAKE_CURRENT_SOURCE_DIR}/scripts/sign/hccl_check_cfg.xml"
-                RESULT_VAR "aicpu_hccl_sign_file"
+                INPUT "mc2_server.tar.gz"
+                CONFIG "${HCCL_CC_DIR}/scripts/sign/hccl_check_cfg.xml"
+                RESULT_VAR "mc2_server_sign_file"
                 DEPENDS generate_device_aicpu_package
             )
-            add_dependencies(sign_aicpu_hccl generate_device_aicpu_package)
+            add_dependencies(sign_mc2_server generate_device_aicpu_package)
         endif()
     endif()
 
     if (NOT DEVICE_MODE)
         message(STATUS "Detected INSTALL_LIBRARY_DIR: ${INSTALL_LIBRARY_DIR}")
 
-        set(BUILD_DEVICE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build_device/)
+        set(BUILD_DEVICE_DIR ${CMAKE_SOURCE_DIR}/build_device/)
         add_custom_target(install_tar DEPENDS
-            ${BUILD_DEVICE_DIR}/signatures/aicpu_hccl.tar.gz
-            ${BUILD_DEVICE_DIR}/aicpu_custom/libscatter_aicpu_kernel.so
+            ${BUILD_DEVICE_DIR}/signatures/mc2_server.tar.gz
+            ${BUILD_DEVICE_DIR}/aicpu_custom/libmc2_server.so
         )
-        install(FILES ${BUILD_DEVICE_DIR}/signatures/aicpu_hccl.tar.gz
+        install(FILES ${BUILD_DEVICE_DIR}/signatures/mc2_server.tar.gz
             DESTINATION ${INSTALL_DEVICE_TAR_DIR} OPTIONAL
         )
-        install(FILES ${BUILD_DEVICE_DIR}/aicpu_custom/libscatter_aicpu_kernel.so
+        install(FILES ${BUILD_DEVICE_DIR}/aicpu_custom/libmc2_server.so
             DESTINATION ${INSTALL_AICPU_KERNEL_JSON_DIR} OPTIONAL
         )
-        add_dependencies(install_tar hccl)
+        add_dependencies(install_tar mc2_client)
     endif()
 
     set(HCCL_HEAD
-        include/hccl.h
-        include/hccl_mc2.h
+        ${HCCL_CC_INCLUDE_DIR}/hccl.h
+        ${HCCL_CC_INCLUDE_DIR}/hccl_mc2.h
     )
 
     set(HCCL_JSON
@@ -167,5 +158,3 @@ elseif(BUILD_OPEN_PROJECT)
         DESTINATION ${INSTALL_INCLUDE_DIR}/hccl/ OPTIONAL
     )
 endif()
-
-# this is a test commit

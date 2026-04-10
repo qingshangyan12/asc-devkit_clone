@@ -15,6 +15,6 @@ set(src_list
 
 )
 
-target_sources(hccl PRIVATE
+target_sources(mc2_client PRIVATE
     ${src_list}
 )

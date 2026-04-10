@@ -12,6 +12,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_alg_base.cc
 )
 
-target_sources(hccl PRIVATE
+target_sources(mc2_client PRIVATE
     ${src_list}
 )

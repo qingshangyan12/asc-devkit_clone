@@ -13,6 +13,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_scatter_nhr1d_mem2mem.cc
 )
 
-target_sources(hccl PRIVATE
+target_sources(mc2_client PRIVATE
     ${src_list}
 )

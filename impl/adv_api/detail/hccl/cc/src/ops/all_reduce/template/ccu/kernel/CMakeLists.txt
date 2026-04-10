@@ -18,6 +18,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_all_reduce_mesh1d_mem2mem_2die_oneshot.cc
 )
 
-target_sources(hccl PRIVATE
+target_sources(mc2_client PRIVATE
     ${src_list}
 )

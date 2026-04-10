@@ -9,11 +9,10 @@
 # -----------------------------------------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.16.0)
-project(hccl)
 
 if(BUILD_OPEN_PROJECT)
     message(STATUS "open TOP_DIR = ${TOP_DIR}")
-    set(OPS_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../)
+    set(OPS_BASE_DIR ${HCCL_CC_DIR})
 else()
     message(STATUS "close TOP_DIR = ${TOP_DIR}")
     set(OPS_BASE_DIR ${TOP_DIR}/hccl/)
@@ -21,7 +20,12 @@ else()
 endif()
 
 set(INCLUDE_LIST
-    ${OPS_BASE_DIR}/include
+    ${HCCL_CC_INCLUDE_DIR}
+    ${HCCL_CC_INCLUDE_DIR}/hcomm
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/common/hcomm_dlsym
 
@@ -222,7 +226,7 @@ else()
 endif()
 
 if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
-    add_library(scatter_aicpu_kernel SHARED
+    add_library(mc2_server SHARED
         ${CMAKE_CURRENT_SOURCE_DIR}/common/utils.cc
         # ${CMAKE_CURRENT_SOURCE_DIR}/common/adapter_acl.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/common/config_log.cc
@@ -344,80 +348,80 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/send/executor/ins_v2_send_sole_executor.cc
     )
 
-    target_include_directories(scatter_aicpu_kernel PRIVATE
+    target_include_directories(mc2_server PRIVATE
         ${INCLUDE_LIST}
     )
 
-    target_compile_options(scatter_aicpu_kernel PRIVATE
+    target_compile_options(mc2_server PRIVATE
         $<$<CONFIG:Debug>:-g>
         $<$<CONFIG:Release>:-O3>
         -fstack-protector-all
     )
 
-    target_link_options(scatter_aicpu_kernel PRIVATE
+    target_link_options(mc2_server PRIVATE
         -Wl,-z,relro
         -Wl,-z,now
         -Wl,-z,noexecstack
         $<$<CONFIG:Release>:-s>
     )
 
-    target_compile_definitions(scatter_aicpu_kernel PRIVATE
+    target_compile_definitions(mc2_server PRIVATE
         -DAICPU_COMPILE
     )
 
-    target_link_directories(scatter_aicpu_kernel PRIVATE
+    target_link_directories(mc2_server PRIVATE
  	    ${ASCEND_CANN_PACKAGE_PATH}/devlib/device
  	)
 
-    target_link_libraries(scatter_aicpu_kernel PRIVATE
+    target_link_libraries(mc2_server PRIVATE
         -Wl,--no-as-needed
         ccl_kernel
-        hccl_kernel_compat
+        mc2_kernel_compat
         -Wl,--no-as-needed
     )
 
-    add_dependencies(scatter_aicpu_kernel hccl_kernel_compat)
+    add_dependencies(mc2_server mc2_kernel_compat)
 endif()
 
 add_definitions(-DORION_MODE)
 
-add_library(hccl SHARED)
+add_library(mc2_client SHARED)
 
 if(NOT KERNEL_MODE)
     # 基于ini生成json文件
-    SET(HCCL_CMAKE_DIR ${OPS_BASE_DIR}/cmake/)
+    SET(HCCL_CMAKE_DIR ${HCCL_CC_DIR}/cmake/)
     message(STATUS "HCCL_CMAKE_DIR = ${HCCL_CMAKE_DIR}")
-    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/libscatter_aicpu_kernel.json
-        COMMAND ${HI_PYTHON} ${HCCL_CMAKE_DIR}/scripts/parser_ini.py ${CMAKE_CURRENT_SOURCE_DIR}/ops/scatter/scatter_aicpu_kernel.ini ${CMAKE_CURRENT_BINARY_DIR}/libscatter_aicpu_kernel.json
+    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/libmc2_server.json
+        COMMAND ${HI_PYTHON} ${HCCL_CMAKE_DIR}/scripts/parser_ini.py ${CMAKE_CURRENT_SOURCE_DIR}/ops/scatter/mc2_server.ini ${CMAKE_CURRENT_BINARY_DIR}/libmc2_server.json
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
-    add_custom_target(aicpu_kernel_json DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/libscatter_aicpu_kernel.json)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libscatter_aicpu_kernel.json
+    add_custom_target(aicpu_kernel_json DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/libmc2_server.json)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libmc2_server.json
         DESTINATION ${INSTALL_AICPU_KERNEL_JSON_DIR} OPTIONAL
     )
-    add_dependencies(hccl aicpu_kernel_json)
+    add_dependencies(mc2_client aicpu_kernel_json)
 endif()
 
 if(BUILD_OPEN_PROJECT)
-    target_compile_definitions(hccl PRIVATE
+    target_compile_definitions(mc2_client PRIVATE
         OPEN_BUILD_PROJECT
         $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
     )
 else()
-    target_compile_definitions(hccl PRIVATE
+    target_compile_definitions(mc2_client PRIVATE
         $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
     )
 endif()
 
-target_include_directories(hccl PRIVATE
+target_include_directories(mc2_client PRIVATE
     ${INCLUDE_LIST}
 )
 
-target_compile_definitions(hccl PRIVATE
+target_compile_definitions(mc2_client PRIVATE
     -DHOST_COMPILE
 )
 
-target_compile_options(hccl PRIVATE
+target_compile_options(mc2_client PRIVATE
     -Werror
     -fno-common
     -fno-strict-aliasing
@@ -429,24 +433,24 @@ target_compile_options(hccl PRIVATE
 )
 
 # libhccl
-target_link_options(hccl PRIVATE
+target_link_options(mc2_client PRIVATE
     -Wl,-z,relro
     -Wl,-z,now
     -Wl,-z,noexecstack
     $<$<CONFIG:Release>:-s>
 )
 
-target_link_directories(hccl PRIVATE
+target_link_directories(mc2_client PRIVATE
     ${ASCEND_CANN_PACKAGE_PATH}/lib64
 )
 
-add_dependencies(hccl hccl_compat)
+add_dependencies(mc2_client mc2_compat)
 
 if(BUILD_OPEN_PROJECT)
-    target_link_libraries(hccl PRIVATE
+    target_link_libraries(mc2_client PRIVATE
         -Wl,--no-as-needed
+        mc2_compat
         hcomm
-        hccl_compat
         acl_rt
         c_sec
         unified_dlog
@@ -454,14 +458,14 @@ if(BUILD_OPEN_PROJECT)
         -Wl,--no-as-needed
     )
 else()
-    target_link_libraries(hccl PRIVATE
+    target_link_libraries(mc2_client PRIVATE
         $<BUILD_INTERFACE:slog_headers>
         $<BUILD_INTERFACE:msprof_headers>
         $<BUILD_INTERFACE:npu_runtime_headers>
         $<BUILD_INTERFACE:mmpa_headers>
         -Wl,--no-as-needed
+        mc2_compat
         hcomm
-        hccl_compat
         acl_rt
         c_sec
         unified_dlog
@@ -471,11 +475,11 @@ else()
     )
 endif()
 
-install(TARGETS hccl
+install(TARGETS mc2_client
     LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
 )
 if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
-    install(TARGETS scatter_aicpu_kernel
+    install(TARGETS mc2_server
         LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
     )
 endif()
@@ -484,22 +488,22 @@ add_subdirectory(common)
 add_subdirectory(ops)
 
 if(DEVICE_MODE AND KERNEL_MODE)
-    set(CCL_KERNEL_TAR_DIR ${OPS_BASE_DIR}/build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)
+    set(CCL_KERNEL_TAR_DIR ${CMAKE_SOURCE_DIR}/build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)
     add_custom_command(
-        TARGET scatter_aicpu_kernel
+        TARGET mc2_server
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CCL_KERNEL_TAR_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:scatter_aicpu_kernel> ${CCL_KERNEL_TAR_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:hccl_kernel_compat> ${CCL_KERNEL_TAR_DIR}
-        COMMENT "Copying libscatter_aicpu_kernel.so&libhccl_kernel_compat.so to ${CCL_KERNEL_TAR_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mc2_server> ${CCL_KERNEL_TAR_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mc2_kernel_compat> ${CCL_KERNEL_TAR_DIR}
+        COMMENT "Copying libmc2_server.so&libmc2_kernel_compat.so to ${CCL_KERNEL_TAR_DIR}"
     )
 
-    set(AICPU_CUSTOM_DIR ${OPS_BASE_DIR}/build_device/aicpu_custom/)
+    set(AICPU_CUSTOM_DIR ${CMAKE_SOURCE_DIR}/build_device/aicpu_custom/)
     add_custom_command(
-        TARGET scatter_aicpu_kernel
+        TARGET mc2_server
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${AICPU_CUSTOM_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:scatter_aicpu_kernel> ${AICPU_CUSTOM_DIR}/libscatter_aicpu_kernel.so
-        COMMENT "Copying libscatter_aicpu_kernel.so to ${AICPU_CUSTOM_DIR}/libscatter_aicpu_kernel.so"
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mc2_server> ${AICPU_CUSTOM_DIR}/libmc2_server.so
+        COMMENT "Copying libmc2_server.so to ${AICPU_CUSTOM_DIR}/libmc2_server.so"
     )
 endif()

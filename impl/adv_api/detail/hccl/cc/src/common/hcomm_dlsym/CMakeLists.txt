@@ -10,6 +10,10 @@
 
 if(BUILD_OPEN_PROJECT)
     set(INCLUDE_LIST
+        ${HCCL_CC_INCLUDE_DIR}/hcomm
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
         ${CMAKE_CURRENT_SOURCE_DIR}/..
 
         ${ASCEND_CANN_PACKAGE_PATH}/include
@@ -65,24 +69,24 @@ else()
     )
 endif()
 
-add_library(hccl_compat SHARED)
+add_library(mc2_compat SHARED)
 
 if(BUILD_OPEN_PROJECT)
-    target_compile_definitions(hccl_compat PRIVATE
+    target_compile_definitions(mc2_compat PRIVATE
         OPEN_BUILD_PROJECT
         $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
     )
 else()
-    target_compile_definitions(hccl_compat PRIVATE
+    target_compile_definitions(mc2_compat PRIVATE
         $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
     )
 endif()
 
-target_include_directories(hccl_compat PRIVATE
+target_include_directories(mc2_compat PRIVATE
     ${INCLUDE_LIST}
 )
 
-target_compile_options(hccl_compat PRIVATE
+target_compile_options(mc2_compat PRIVATE
     -Werror
     -fno-common
     -fno-strict-aliasing
@@ -93,7 +97,7 @@ target_compile_options(hccl_compat PRIVATE
     -fstack-protector-all
 )
 
-target_link_options(hccl_compat PRIVATE
+target_link_options(mc2_compat PRIVATE
     -Wl,-z,relro
     -Wl,-z,now
     -Wl,-z,noexecstack
@@ -101,13 +105,13 @@ target_link_options(hccl_compat PRIVATE
 )
 
 if(BUILD_OPEN_PROJECT)
-    target_link_libraries(hccl_compat PRIVATE
+    target_link_libraries(mc2_compat PRIVATE
         -Wl,--no-as-needed
         unified_dlog
         -Wl,--no-as-needed
     )
 else()
-    target_link_libraries(hccl_compat PRIVATE
+    target_link_libraries(mc2_compat PRIVATE
         $<BUILD_INTERFACE:slog_headers>
         -Wl,--no-as-needed
         unified_dlog
@@ -115,15 +119,15 @@ else()
     )
 endif()
 
-target_link_directories(hccl_compat PRIVATE
+target_link_directories(mc2_compat PRIVATE
     ${ASCEND_CANN_PACKAGE_PATH}/lib64
 )
 
-install(TARGETS hccl_compat
+install(TARGETS mc2_compat
     LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
 )
 
-target_sources(hccl_compat PRIVATE
+target_sources(mc2_compat PRIVATE
     hccl_rank_graph_dl.cc
     hccl_res_dl.cc
     hcomm_primitives_dl.cc
@@ -133,35 +137,35 @@ target_sources(hccl_compat PRIVATE
 )
 
 if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
-    add_library(hccl_kernel_compat SHARED
+    add_library(mc2_kernel_compat SHARED
         hcomm_device_dlsym.cc
         hcomm_primitives_dl.cc
         hcomm_diag_dl.cc
         hcomm_device_profiling_dl.cc
     )
 
-    target_include_directories(hccl_kernel_compat PRIVATE
+    target_include_directories(mc2_kernel_compat PRIVATE
         ${INCLUDE_LIST}
     )
 
-    target_compile_options(hccl_kernel_compat PRIVATE
+    target_compile_options(mc2_kernel_compat PRIVATE
         $<$<CONFIG:Debug>:-g>
         $<$<CONFIG:Release>:-O3>
         -fstack-protector-all
     )
 
-    target_link_options(hccl_kernel_compat PRIVATE
+    target_link_options(mc2_kernel_compat PRIVATE
         -Wl,-z,relro
         -Wl,-z,now
         -Wl,-z,noexecstack
         $<$<CONFIG:Release>:-s>
     )
 
-    target_link_directories(hccl_kernel_compat PRIVATE
+    target_link_directories(mc2_kernel_compat PRIVATE
  	    ${ASCEND_CANN_PACKAGE_PATH}/devlib/device
  	)
 
-    install(TARGETS hccl_kernel_compat
+    install(TARGETS mc2_kernel_compat
         LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
     )
 endif()

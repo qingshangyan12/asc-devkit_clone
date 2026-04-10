@@ -10,13 +10,17 @@
 
 cmake_minimum_required(VERSION 3.16.0)
 project(hccl_checker_ops_stest)
-set(TOP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../..)
+set(HCCL_CC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../impl/adv_api/detail/hccl/cc)
+get_filename_component(HCCL_CC_DIR "${HCCL_CC_DIR}" ABSOLUTE)
+set(HCCL_CC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../include/adv_api/hccl/internal)
+get_filename_component(HCCL_CC_INCLUDE_DIR "${HCCL_CC_INCLUDE_DIR}" ABSOLUTE)
+set(TOP_DIR ${HCCL_CC_DIR}/..)
 
 if (BUILD_OPEN_PROJECT)
     set(UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils/src)
     set(TESTCASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/testcase)
     set(ASCEND_HOME_PATH $ENV{ASCEND_HOME_PATH})
-    set(HCCL_DEV_BASE ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
+    set(HCCL_DEV_BASE ${HCCL_CC_DIR})
     set(THIRD_PARTH_PATH ${HCCL_DEV_BASE}/output/third_party)
 
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
@@ -26,10 +30,6 @@ if (BUILD_OPEN_PROJECT)
     endif()
     message(STATUS "Final Ascend Path: ${ASCEND_HOME_PATH}")
 endif()
-
-# 下载并编译gtest
-set(CANN_3RD_LIB_PATH ${HCCL_DEV_BASE}/third_party)
-include(${HCCL_DEV_BASE}/cmake/third_party/gtest.cmake)
 
 add_subdirectory(testcase)
 add_subdirectory(utils)

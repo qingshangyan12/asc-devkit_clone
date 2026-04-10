@@ -22,7 +22,7 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/compat.cc
 )
 
-target_sources(hccl PRIVATE
+target_sources(mc2_client PRIVATE
     ${src_list}
 )
 

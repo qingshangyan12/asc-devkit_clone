@@ -15,6 +15,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_reduce_scatter_concurrent_executor.cc
 )
 
-target_sources(hccl PRIVATE
+target_sources(mc2_client PRIVATE
     ${src_list}
 )
