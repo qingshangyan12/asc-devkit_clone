@@ -77,7 +77,7 @@
   ```bash
   SCENARIO=1
   mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j;           # 编译工程（默认npu模式）
+  cmake -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j;            # 编译工程（默认npu模式）
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO                     # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   ```
@@ -98,8 +98,8 @@
 | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
 | ----------------| -----------------------------| ---------------------------------------------------|
 | `RUN_MODE`　　 | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
-| `NPU_ARCH`　　 | `dav-3510`（默认）　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-| `SCENARIO_NUM` | `1`（默认）、`2`　　　　　　| 场景编号：1=读写依赖，2=写写依赖　　　　　　　　　|
+| `NPU_ARCH`　　 | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| `SCENARIO_NUM` | `1`、`2`　　　　　　　　　　| 场景编号：1=读写依赖，2=写写依赖　　　　　　　　　|
 
 - 执行结果
 

@@ -37,6 +37,14 @@ set(NPU_ARCH "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
 
+if(NOT DEFINED SCENARIO_NUM)
+    message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=1 or -DSCENARIO_NUM=2")
+endif()
+
+if(NOT SCENARIO_NUM EQUAL 1 AND NOT SCENARIO_NUM EQUAL 2)
+    message(FATAL_ERROR "SCENARIO_NUM must be 1 or 2, got: ${SCENARIO_NUM}")
+endif()
+
 target_compile_definitions(demo PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
 )
