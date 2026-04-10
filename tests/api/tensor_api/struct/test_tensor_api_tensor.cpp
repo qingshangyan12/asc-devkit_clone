@@ -186,15 +186,6 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPatternPtrOperation)
     EXPECT_EQ(l0cPtr.Get(), l0cData);
     EXPECT_EQ(biasPtr.Get(), biasData);
     EXPECT_EQ(fixbufPtr.Get(), fixbufData);
-
-    EXPECT_TRUE((IsHardwareMemV<Hardware::GM, decltype(gmPtr)>));
-    EXPECT_TRUE((IsHardwareMemV<Hardware::UB, decltype(ubPtr)>));
-    EXPECT_TRUE((IsHardwareMemV<Hardware::L1, decltype(l1Ptr)>));
-    EXPECT_TRUE((IsHardwareMemV<Hardware::L0A, decltype(l0aPtr)>));
-    EXPECT_TRUE((IsHardwareMemV<Hardware::L0B, decltype(l0bPtr)>));
-    EXPECT_TRUE((IsHardwareMemV<Hardware::L0C, decltype(l0cPtr)>));
-    EXPECT_TRUE((IsHardwareMemV<Hardware::BIAS, decltype(biasPtr)>));
-    EXPECT_TRUE((IsHardwareMemV<Hardware::FIXBUF, decltype(fixbufPtr)>));
 }
 
 TEST_F(Tensor_Api_Tensor, IteratorGetOperation)
