@@ -1,4 +1,4 @@
-# read_write_sync样例
+# reg_sync样例
 
 ## 概述
 本样例演示了基于RegBase编程范式下对UB（Unified Buffer）读或写操作的同步指令使用。样例中使用到了寄存器保序特性（优化读写之间的同步指令）和LoalMemBar接口来保序。本样例支持两种计算场景：读写依赖和写写依赖，通过环境变量选择场景。
@@ -22,12 +22,12 @@
 
 ## 目录结构介绍
 ```
-├── read_write_sync
+├── reg_sync
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
-│   ├── read_write_sync.asc            // AscendC算子实现 & 调用样例
+│   ├── reg_sync.asc                   // AscendC算子实现 & 调用样例
 │   └── README.md                      // 样例介绍
 ```
 
@@ -45,7 +45,7 @@
   </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">1024</td><td align="center">float</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">read_write_sync</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reg_sync</td></tr>
   </table>
 - 算子实现：  
   主要包括以下步骤：

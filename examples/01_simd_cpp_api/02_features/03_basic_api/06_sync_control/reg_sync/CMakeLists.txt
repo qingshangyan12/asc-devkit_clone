@@ -24,7 +24,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    read_write_sync.asc
+    reg_sync.asc
 )
 
 # ======================================================================================
