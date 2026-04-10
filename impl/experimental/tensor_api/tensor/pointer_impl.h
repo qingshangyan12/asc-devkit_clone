@@ -25,6 +25,7 @@
 #include "impl/experimental/tensor_api/tensor/pointer_adaptor_impl.h"
 #include "impl/experimental/tensor_api/tensor/pointer_mem_impl.h"
 #include "impl/experimental/tensor_api/tensor/engine_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_pattern.h"
 
 namespace AscendC {
 namespace Te {

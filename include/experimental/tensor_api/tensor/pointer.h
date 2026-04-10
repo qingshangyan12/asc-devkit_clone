@@ -22,7 +22,6 @@
 #define INCLUDE_TENSOR_API_TENSOR_POINTER_H
 
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
-#include "impl/experimental/tensor_api/tensor/pointer_pattern.h"
 
 // algorithm
 namespace AscendC {
