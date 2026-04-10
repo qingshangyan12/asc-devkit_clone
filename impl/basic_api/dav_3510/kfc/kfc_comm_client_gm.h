@@ -67,7 +67,7 @@ public:
 
             // During debugging, CPU need to know the global variable address of the tpipe.
 #if ASCENDC_CPU_DEBUG
-            ubMsg = reinterpret_cast<__ubuf__ KfcMsg *>(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN) +
+            ubMsg = reinterpret_cast<__ubuf__ KfcMsg *>(GetBaseAddrCpu((int8_t)TPosition::VECIN) +
                 TOTAL_UB_SIZE + 2*1024 - sizeof(KfcMsg));
 #else
             // 310的ub total 256kb, TOTAL_UB_SIZE: 248kb, ascendc: 2kb, 约定kfc使用2kb内的末位128b地址，kfcMsg定长128b

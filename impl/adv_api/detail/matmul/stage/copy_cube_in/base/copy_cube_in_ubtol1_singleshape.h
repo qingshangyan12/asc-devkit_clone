@@ -114,7 +114,7 @@ public:
             }
         }
         tbuffTmp.dataLen = orgHeight * orgWidth * sizeof(TransT);
-        tbuffTmp.absAddr = GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::A1)) + tbuffTmp.bufferAddr;
+        tbuffTmp.absAddr = GetBaseAddrCpu(static_cast<uint8_t>(TPosition::A1)) + tbuffTmp.bufferAddr;
 #endif
 
         l1.SetAddr(tbuffTmp);

@@ -510,7 +510,7 @@ public:
         if constexpr (PhyPosIsUB(Tpos)) {
             tbufOutTmp.absAddr = reinterpret_cast<uint8_t*>(addr);
         } else if constexpr (Tpos == TPosition::TSCM) {
-            tbufOutTmp.absAddr = GetTPipePtr()->GetBaseAddr((uint8_t)(Tpos)) + addr;
+            tbufOutTmp.absAddr = GetBaseAddrCpu((uint8_t)(Tpos)) + addr;
         }
 #endif
         localTensor.SetAddr(tbufOutTmp);

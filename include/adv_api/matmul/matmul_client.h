@@ -2414,7 +2414,7 @@ private:
         
         tbufOutTmp.bufferAddr = kfcMsg_.body.aAddr;
 #if ASCENDC_CPU_DEBUG
-        tbufOutTmp.absAddr = GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::A1)) + kfcMsg_.body.aAddr;
+        tbufOutTmp.absAddr = GetBaseAddrCpu(static_cast<uint8_t>(TPosition::A1)) + kfcMsg_.body.aAddr;
 #endif
 
         LocalTensor<SrcAT> leftMatrix;
@@ -2452,7 +2452,7 @@ private:
         tbufOutTmp.dataLen = orgHeightAlign * orgWidthAlign * bitSize;
         tbufOutTmp.bufferAddr = kfcMsg_.body.aAddr;
 #if ASCENDC_CPU_DEBUG
-        tbufOutTmp.absAddr = GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::A1));
+        tbufOutTmp.absAddr = GetBaseAddrCpu(static_cast<uint8_t>(TPosition::A1));
 #endif
 
         LocalTensor<SrcAT> leftMatrix;
@@ -2553,7 +2553,7 @@ private:
         
         tbufOutTmp.bufferAddr = kfcMsg_.body.bAddr;
 #if ASCENDC_CPU_DEBUG
-        tbufOutTmp.absAddr = GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::B1)) + kfcMsg_.body.bAddr;
+        tbufOutTmp.absAddr = GetBaseAddrCpu(static_cast<uint8_t>(TPosition::B1)) + kfcMsg_.body.bAddr;
 #endif
         LocalTensor<SrcBT> rightMatrix;
         rightMatrix.SetAddr(tbufOutTmp);
@@ -2577,7 +2577,7 @@ private:
         tbufOutTmp.dataLen = Ceil(singleCoreM_ * sizeof(BiasT), ONE_BLK_SIZE);
         tbufOutTmp.bufferAddr = kfcMsg_.body.biasAddr;
 #if ASCENDC_CPU_DEBUG
-        tbufOutTmp.absAddr = GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::B1)) + kfcMsg_.body.biasAddr;
+        tbufOutTmp.absAddr = GetBaseAddrCpu(static_cast<uint8_t>(TPosition::B1)) + kfcMsg_.body.biasAddr;
 #endif
 
         LocalTensor<BiasT> biasMatrix;
@@ -2732,7 +2732,7 @@ private:
 
         tbufOutTmp.bufferAddr = kfcMsg_.body.quantAddr;
 #if ASCENDC_CPU_DEBUG
-        tbufOutTmp.absAddr = GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::A1)) + tbufOutTmp.bufferAddr;
+        tbufOutTmp.absAddr = GetBaseAddrCpu(static_cast<uint8_t>(TPosition::A1)) + tbufOutTmp.bufferAddr;
 #endif
         LocalTensor<ScaleT> leftMatrix;
         leftMatrix.SetAddr(tbufOutTmp);
@@ -2796,7 +2796,7 @@ private:
         }
         tbufOutTmp.bufferAddr = kfcMsg_.body.quantScalar;
 #if ASCENDC_CPU_DEBUG
-        tbufOutTmp.absAddr = GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::B1)) + tbufOutTmp.bufferAddr;
+        tbufOutTmp.absAddr = GetBaseAddrCpu(static_cast<uint8_t>(TPosition::B1)) + tbufOutTmp.bufferAddr;
 #endif
         LocalTensor<ScaleT> rightMatrix;
         rightMatrix.SetAddr(tbufOutTmp);

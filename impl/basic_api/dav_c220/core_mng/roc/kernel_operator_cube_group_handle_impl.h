@@ -78,7 +78,7 @@ __aicore__ inline CubeResGroupHandle<T>::CubeResGroupHandle(
 
 #if ASCENDC_CPU_DEBUG
         ubMsg =
-            reinterpret_cast<__ubuf__ T *>(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECOUT) + ubMsgAddr);
+            reinterpret_cast<__ubuf__ T *>(GetBaseAddrCpu((int8_t)TPosition::VECOUT) + ubMsgAddr);
 #else
         ubMsg = reinterpret_cast<__ubuf__ T *>(ubMsgAddr);
 #endif

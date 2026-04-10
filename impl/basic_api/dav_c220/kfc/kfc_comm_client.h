@@ -75,7 +75,7 @@ public:
 
             // During debugging, CPU need to know the global variable address of the tpipe.
 #if ASCENDC_CPU_DEBUG
-            ubMsg = reinterpret_cast<__ubuf__ KfcMsg *>(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN) +
+            ubMsg = reinterpret_cast<__ubuf__ KfcMsg *>(GetBaseAddrCpu((int8_t)TPosition::VECIN) +
                 TOTAL_UB_SIZE - sizeof(KfcMsg));
 #else
             ubMsg = reinterpret_cast<__ubuf__ KfcMsg *>(TOTAL_UB_SIZE - sizeof(KfcMsg));

@@ -100,7 +100,7 @@ __aicore__ inline __sync_alias__ LocalTensor<T> TBuf<pos>::GetWithOffset(uint32_
     addr.bufferAddr = ptr->address + bufOffset;
     addr.dataLen = ptr->dataLen;
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    auto absAddr = GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(pos));
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(pos));
     addr.absAddr = absAddr + addr.bufferAddr;
 #endif
     LocalTensor<T> output;

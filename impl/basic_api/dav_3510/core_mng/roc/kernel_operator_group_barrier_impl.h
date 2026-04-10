@@ -51,7 +51,7 @@ __aicore__ inline GroupBarrier<pipeMode>::GroupBarrier(
         // worst case: max aiv wait max aiv, thus need at least max aiv block which first element is 1 to atomic add
 #if ASCENDC_CPU_DEBUG
         __ubuf__ int32_t *dst = reinterpret_cast<__ubuf__ int32_t *>(
-            GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::VECOUT)) + UB_START_ADDR);
+            GetBaseAddrCpu(static_cast<uint8_t>(TPosition::VECOUT)) + UB_START_ADDR);
 #else
         __ubuf__ int32_t *dst = reinterpret_cast<__ubuf__ int32_t *>(UB_START_ADDR);
 #endif
@@ -129,7 +129,7 @@ __aicore__ inline void GroupBarrier<pipeMode>::__WriteCurrentValue(__gm__ Barrie
 #if ASCENDC_CPU_DEBUG
         ProcessLock::GetProcessLock()->Write();
         __ubuf__ int32_t *dst =
-            (__ubuf__ int32_t *)(GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::VECIN)) + UB_START_ADDR);
+            (__ubuf__ int32_t *)(GetBaseAddrCpu(static_cast<uint8_t>(TPosition::VECIN)) + UB_START_ADDR);
         DataCopyParams dataCopyParams =
         {
             num,
