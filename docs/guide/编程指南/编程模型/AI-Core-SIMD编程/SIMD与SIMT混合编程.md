@@ -85,7 +85,7 @@ SIMD与SIMT编程存在以下差异：
 </thead>
 <tbody><tr id="row831491414559"><td class="cellrowborder" valign="top" width="14.018598140185981%" headers="mcps1.1.5.1.1 "><p id="p1780259331"><a name="p1780259331"></a><a name="p1780259331"></a>全局内存</p>
 </td>
-<td class="cellrowborder" valign="top" width="30.23888376162383762%" headers="mcps1.1.5.1.2 "><p id="p123149149558"><a name="p123149149558"></a><a name="p123149149558"></a>所有核的核函数（AIC、AIV）</p>
+<td class="cellrowborder" valign="top" width="30.23888376162383762%" headers="mcps1.1.5.1.2 "><p id="p123149149558"><a name="p123149149558"></a><a name="p123149149558"></a>所有核的核函数</p>
 </td>
 <td class="cellrowborder" valign="top" width="17.928207179282072%" headers="mcps1.1.5.1.3 "><p id="p2314614185513"><a name="p2314614185513"></a><a name="p2314614185513"></a>应用程序</p>
 </td>
@@ -130,9 +130,9 @@ SIMD与SIMT编程存在以下差异：
 </tbody>
 </table>
 
-- 全局内存即Global Memory,存储空间大，带宽低，生命周期与整个应用程序一致，通常用于存储输入输出数据；
-- 共享内存是每个AIV核拥有的独立Unified Buffer（UB），生命周期和AIV核函数一致，常作为全局内存的缓冲；
-- 最靠近Vector计算单元的是寄存器，SIMT和SIMD模式下各自拥有一块私有寄存器内存。
+- 全局内存即Global Memory，存储空间大，带宽低，生命周期与整个应用程序一致，通常用于存储输入输出数据；
+- 共享内存是每个AIV核拥有的独立Unified Buffer（UB），生命周期和AIV核函数一致，常作为全局内存的缓存；
+- 最靠近Vector计算单元的是寄存器，SIMT和SIMD模式各自拥有一块私有寄存器内存。
 
 整体内存架构如下图所示：
 
@@ -142,14 +142,12 @@ SIMD与SIMT编程存在以下差异：
 在SIMT工作模式下，各个内存的工作流程如下：
 -   每个线程独立的寄存器和栈，用于存储局部变量。可用寄存器数量与线程块中线程数有关，具体支持情况请见[表5](../../语言扩展层/SIMT-BuiltIn关键字.md#table1715318510594)。
 -   线程块内所有线程共享本地内存Unified Buffer（UB），该内存区域由线程块内所有线程共同访问，且其生命周期和线程块一致。
--   所有线程均可通过Data Cache（DCache）访问全局内存（GM），Data Cache是从UB上单独划分出来的一个缓冲空间，内存大小可配置范围为32KB-128KB，具体配置方法详见下文[UB内存分配](#section3725125414229)。
+-   所有线程均可通过Data Cache（DCache）访问全局内存（GM），Data Cache是从UB上单独划分出来的一个缓存空间，内存大小可配置范围为32KB到128KB，具体配置方法详见下文[UB内存分配](#section3725125414229)。
 
 在SIMD工作模式下，各个内存的工作流程如下：
--   SIMD的Register File（简称RF）包含多种类型的Reg矢量计算寄存器，用于SIMD VF函数内部存储计算数据，Reg的类型请见Reg数据类型定义。
--   RF中所有Reg共享本地内存，即Unified Buffer。
--   单核内所有VF Reg寄存器共享内存资源UB，再通过显式的Load/Store指令，从UB加载到Reg矢量计算寄存器中执行计算操作。
-
-
+-   SIMD的Register File（简称RF）包含多种类型的Reg矢量计算寄存器，用于SIMD VF函数内部存储计算数据，Reg的类型请见[Reg数据类型定义](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/RegTensor.md)。
+-   单核内所有VF Reg寄存器共享内存资源UB。
+-   在SIMD模式下，不支持直接从全局内存加载数据到Reg矢量计算寄存器，需先将数据从全局内存GM搬运至UB，再通过显式的Load/Store指令，从UB加载到Reg矢量计算寄存器中执行计算操作。
 
 ## UB内存分配<a name="section3725125414229"></a>
 
