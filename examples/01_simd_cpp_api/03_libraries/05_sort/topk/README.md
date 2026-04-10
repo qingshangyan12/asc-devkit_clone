@@ -55,39 +55,70 @@
 
   - Tiling实现
 
-    topk算子的tiling实现流程如下：首先获取topk接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据输入长度dataLength确定所需tiling参数。
+    topk算子的tiling实现流程如下：首先获取topk接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据输入长度dataLength确定所需所需tiling参数。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
+### 编译选项说明
 
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
-    
-- 样例执行
+| 参数 | 说明 | 可选值 | 默认值 |
+|------|------|---------|--------|
+| RUN_MODE | 运行模式 | npuudi, cpu, sim | npu |
+| NPU_ARCH | NPU硬件架构 | dav-2201, dav-3510 | dav-2201 |
+
+### 配置环境变量
+
+请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+
+- 默认路径，root用户安装CANN软件包
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
-  ./demo                        # 执行编译生成的可执行程序，执行样例
+  source /usr/local/Ascend/cann/set_env.sh
   ```
-  执行结果如下，说明精度对比成功。
+
+- 默认路径，非root用户安装CANN软件包
   ```bash
-  test pass!
+  source $HOME/Ascend/cann/set_env.sh
   ```
+
+- 指定路径install_path，安装CANN软件包
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
+
+### 样例执行
+
+**NPU模式（默认）：**
+```bash
+mkdir -p build && cd build;      # 创建并进入build目录
+cmake .. -DNPU_ARCH=dav-2201;make -j;    # 编译工程
+python3 ../scripts/gen_data.py   # 生成测试输入数据
+./demo                           # 执行编译生成的可执行程序，执行样例
+```
+
+**CPU调试模式：**
+```bash
+mkdir -p build && cd build;      # 创建并进入build目录
+cmake .. -DRUN_MODE=cpu -DNPU_ARCH=dav-2201;make -j;    # 编译工程
+python3 ../scripts/gen_data.py   # 生成测试输入数据
+./demo                           # 执行编译生成的可执行程序，执行样例
+```
+
+**NPU仿真模式：**
+```bash
+mkdir -p build && cd build;      # 创建并进入build目录
+cmake .. -DRUN_MODE=sim -DNPU_ARCH=dav-2201;make -j;    # 编译工程
+python3 ../scripts/gen_data.py   # 生成测试输入数据
+./demo                           # 执行编译生成的可执行程序，执行样例
+```
+
+> **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+执行结果如下，说明精度对比成功。
+```bash
+test pass!
+```
