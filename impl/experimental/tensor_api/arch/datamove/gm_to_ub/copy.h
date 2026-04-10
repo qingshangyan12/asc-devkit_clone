@@ -28,7 +28,6 @@
 namespace AscendC {
 namespace Te {
 
-
 constexpr CopyGM2UBTrait DEFAULT_COPY_GM_TO_UB_TRAIT;
 
 struct CopyGM2UBTraitDefault {
@@ -41,7 +40,9 @@ public:
     template <typename Tp, const Tp& traits, typename... Args>
     __aicore__ inline static void Copy(const Args& ...args)
     {
-        DataCopyImpl<traits, Args...>(args...);
+        if ASCEND_IS_AIV {
+            DataCopyImpl<traits, Args...>(args...);
+        }
     }
 
 private:

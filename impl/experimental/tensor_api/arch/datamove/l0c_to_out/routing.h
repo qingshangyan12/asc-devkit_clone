@@ -28,6 +28,7 @@
 namespace AscendC {
 namespace Te {
 
+    
 class FixpipeIgnore {
 public:
     template <const FixpipeTrait& trait, typename ...Args>
