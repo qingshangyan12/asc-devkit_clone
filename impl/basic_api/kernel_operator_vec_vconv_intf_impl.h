@@ -195,6 +195,12 @@ __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<
 {
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
+    using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)),
+        DstPrimType, SrcPrimType>::type;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("CastDequant", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskArray<MaskCheckType, isSetMask>(mask, "CastDequant");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalarDiffType(dst.template ReinterpretCast<half>(), src, static_cast<SrcPrimType>(0), mask,
@@ -211,6 +217,12 @@ __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<
 {
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
+    using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)),
+        DstPrimType, SrcPrimType>::type;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("CastDequant", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskValue<MaskCheckType, isSetMask>(mask, "CastDequant");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalarDiffType(dst.template ReinterpretCast<half>(), src, static_cast<SrcPrimType>(0), mask,
@@ -232,6 +244,12 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
 #endif
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
+    using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)),
+        DstPrimType, SrcPrimType>::type;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("CastDeq", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskArray<MaskCheckType, isSetMask>(mask, "CastDeq");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalarDiffType(dst.template ReinterpretCast<half>(), src, static_cast<SrcPrimType>(0), mask,
@@ -253,6 +271,12 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
 #endif
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
+    using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)),
+        DstPrimType, SrcPrimType>::type;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("CastDeq", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskValue<MaskCheckType, isSetMask>(mask, "CastDeq");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalarDiffType(dst.template ReinterpretCast<half>(), src, static_cast<SrcPrimType>(0), mask,
@@ -281,6 +305,12 @@ __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<
 {
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("CastDequant", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    const uint32_t minTensorSize = (dst.GetSize() < src.GetSize()) ? dst.GetSize() : src.GetSize();
+    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(minTensorSize), "count",
+        "CastDequant");
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalarDiffType(dst.template ReinterpretCast<half>(), src, static_cast<SrcPrimType>(0),
         count, "CastDequant")) {
@@ -301,6 +331,12 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
 #endif
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("CastDeq", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    const uint32_t minTensorSize = (dst.GetSize() < src.GetSize()) ? dst.GetSize() : src.GetSize();
+    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(minTensorSize), "count",
+        "CastDeq");
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalarDiffType(dst.template ReinterpretCast<half>(), src, static_cast<SrcPrimType>(0),
         count, "CastDeq")) {
@@ -334,10 +370,15 @@ template <typename T, typename U, bool isSetMask>
 __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
     const LocalTensor<U>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
+    using MaskCheckType = typename Conditional<(sizeof(PrimT<T>) >= sizeof(PrimT<U>)), PrimT<T>, PrimT<U>>::type;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
         return;
     }
+#endif
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("AddReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskValue<MaskCheckType, isSetMask>(mask, "AddReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -358,10 +399,15 @@ __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<
     const LocalTensor<U>& src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+    using MaskCheckType = typename Conditional<(sizeof(PrimT<T>) >= sizeof(PrimT<U>)), PrimT<T>, PrimT<U>>::type;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
         return;
     }
+#endif
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("AddReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskArray<MaskCheckType, isSetMask>(mask, "AddReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -392,6 +438,13 @@ __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<
     if (g_coreType == AIC) {
         return;
     }
+#endif
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("AddReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    const uint32_t minTensorSize = (dst.GetSize() < src0.GetSize()) ? dst.GetSize() : src0.GetSize();
+    const uint32_t calcountHigh = (minTensorSize < src1.GetSize()) ? minTensorSize : src1.GetSize();
+    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(calcountHigh), "count",
+        "AddReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryCmp(dst, src0, src1, count, "AddReluCast")) {
@@ -430,10 +483,16 @@ __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<
 {
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
+    using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)),
+        DstPrimType, SrcPrimType>::type;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
         return;
     }
+#endif
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskValue<MaskCheckType, isSetMask>(mask, "SubReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -456,10 +515,16 @@ __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<
 {
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
+    using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)),
+        DstPrimType, SrcPrimType>::type;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
         return;
     }
+#endif
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskArray<MaskCheckType, isSetMask>(mask, "SubReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -492,6 +557,13 @@ __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<
     if (g_coreType == AIC) {
         return;
     }
+#endif
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    const uint32_t minTensorSize = (dst.GetSize() < src0.GetSize()) ? dst.GetSize() : src0.GetSize();
+    const uint32_t calcountHigh = (minTensorSize < src1.GetSize()) ? minTensorSize : src1.GetSize();
+    CheckValueRange<uint64_t>(static_cast<uint64_t>(count), 0, static_cast<uint64_t>(calcountHigh), "count",
+        "SubReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryCmp(dst, src0, src1, count, "SubReluCast")) {
