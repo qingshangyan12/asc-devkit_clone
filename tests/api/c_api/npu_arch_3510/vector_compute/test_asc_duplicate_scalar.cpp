@@ -13,7 +13,7 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-#define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(class_name, c_api_name, cce_name, data_type) \
+#define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(class_name, c_api_name, cce_name, data_type, s_type) \
                                                                                                 \
 class TestVectorCompute##class_name####data_type##CApi : public testing::Test {                 \
 protected:                                                                                      \
@@ -29,7 +29,7 @@ void cce_name##_##data_type##_Stub(vector_##data_type& dst, data_type src0,     
 TEST_F(TestVectorCompute##class_name####data_type##CApi, c_api_name##_##data_type##_Succ)       \
 {                                                                                               \
     vector_##data_type dst;                                                                     \
-    data_type src0;                                                                             \
+    s_type src0;                                                                                \
     vector_bool mask;                                                                           \
                                                                                                 \
     MOCKER_CPP(cce_name, void(vector_##data_type&, data_type, vector_bool, Literal))            \
@@ -40,19 +40,19 @@ TEST_F(TestVectorCompute##class_name####data_type##CApi, c_api_name##_##data_typ
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, uint8_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int8_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fp8_e4m3fn_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fp8_e5m2_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, uint16_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int16_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, half);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, bfloat16_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, uint32_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int32_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, float);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, uint8_t, uint8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int8_t, int8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fp8_e4m3fn_t, int8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fp8_e5m2_t, int8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, uint16_t, uint16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int16_t, int16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, half, half);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, bfloat16_t, bfloat16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, uint32_t, uint32_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int32_t, int32_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, float, float);
 
-#define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(class_name, c_api_name, cce_name, data_type)                    \
+#define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(class_name, c_api_name, cce_name, data_type, s_type)            \
                                                                                                                        \
     class TestVectorCompute##class_name####data_type##CApi : public testing::Test {                                    \
     protected:                                                                                                         \
@@ -67,7 +67,7 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fl
     TEST_F(TestVectorCompute##class_name####data_type##CApi, c_api_name##_##data_type##_Succ)                          \
     {                                                                                                                  \
         vector_##data_type dst;                                                                                        \
-        data_type value;                                                                                               \
+        s_type value;                                                                                                  \
                                                                                                                        \
         MOCKER_CPP(cce_name, void(vector_##data_type&, data_type))                                                     \
             .times(1)                                                                                                  \
@@ -77,15 +77,15 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, fl
         GlobalMockObject::verify();                                                                                    \
     }
 
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, uint8_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, int8_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, uint16_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, int16_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, uint32_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, int32_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, half);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, float);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, bfloat16_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, fp8_e4m3fn_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, fp8_e5m2_t);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, fp8_e8m0_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, uint8_t, uint8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, int8_t, int8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, uint16_t, uint16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, int16_t, int16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, uint32_t, uint32_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, int32_t, int32_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, half, half);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, float, float);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, bfloat16_t, bfloat16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, fp8_e4m3fn_t, int8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, fp8_e5m2_t, int8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, fp8_e8m0_t, int8_t);
