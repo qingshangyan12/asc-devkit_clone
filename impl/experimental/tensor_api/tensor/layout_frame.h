@@ -55,14 +55,14 @@ struct LayoutTraitFP4 {
     static constexpr auto C0_ELEMENT = Std::Int<C0>{};
 };
 
-template <typename LayoutPattern, typename TraitType, typename LayoutSet = LayoutFormatSet, typename... Args>
+template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
-    using GetLayoutMakeFun = typename LayoutSet::template Get<LayoutPattern>;
+    using GetLayoutMakeFun = typename LayoutFormatSet::template Get<LayoutPattern>;
     static_assert(!Std::is_same_v<GetLayoutMakeFun, EmptyValue>, "Unsupported layout pattern.");
     return GetLayoutMakeFun::template Make<TraitType>(args...);
 }
 
-template <typename LayoutPattern, typename TraitType, typename LayoutSet = LayoutFormatSet>
+template <typename LayoutPattern, typename TraitType>
 struct FrameLayoutFormat {
     template <typename... Args>
     __aicore__ inline decltype(auto) operator()(const Args&... args) {
