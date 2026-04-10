@@ -96,7 +96,7 @@ struct MakeZnFP4FrameLayout {
                                MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
         auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(column, FRACTAL_FIXED)),
                                  MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}));
-        using LayoutT = Layout<decltype(shape), decltype(stride), ZnLayoutPatternFP4>;
+        using LayoutT = Layout<decltype(shape), decltype(stride), FP4ZnLayoutPattern>;
         return LayoutT(shape, stride);
     }
 };
