@@ -418,7 +418,7 @@ __aicore__ inline void CheckFixpipeParams(__cc__ SrcT *src, const FixpipeParamsA
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     CheckFixpipeQuantParams<DstT, SrcT, config>(params);
     constexpr uint32_t L0C_SRC_ALIGN = 16 * sizeof(float); // src must align with 16 elements, each of them is F32 / S32
-    uint64_t srcAbsAddr = src - (SrcT*)(GetTPipePtr()->GetBaseAddr(int8_t(TPosition::CO1)));
+    uint64_t srcAbsAddr = src - (SrcT*)(GetBaseAddrCpu(int8_t(TPosition::CO1)));
     ASCENDC_ASSERT((srcAbsAddr % L0C_SRC_ALIGN == 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check src start "\
         "address alignment in Fixpipe");});
 
