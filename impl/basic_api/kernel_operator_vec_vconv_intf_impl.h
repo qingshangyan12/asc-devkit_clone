@@ -373,7 +373,7 @@ __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<
         return;
     }
 #endif
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(ASCENDC_CPU_DEBUG) || defined(ASCENDC_DEBUG)
     CheckVectorTensor("AddReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<MaskCheckType, isSetMask>(mask, "AddReluCast");
 #endif
@@ -545,13 +545,14 @@ template <typename T, typename U>
 __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1,
     const uint32_t count)
 {
-    using DstPrimType = PrimT<T>; using SrcPrimType = PrimT<U>;
+    using DstPrimType = PrimT<T>; 
+    using SrcPrimType = PrimT<U>;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
         return;
     }
 #endif
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#if defined(ASCENDC_CPU_DEBUG) || defined(ASCENDC_DEBUG)
     CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckCalcount(static_cast<int32_t>(count), "count", "SubReluCast");
 #endif
