@@ -37,7 +37,15 @@ WORKDIR /tmp
 # ============================================================
 # APT mirror & system packages (single layer to avoid stale cache)
 # ============================================================
-RUN sed -i "s@//ports.ubuntu.com@//${APT_MIRROR}@g" /etc/apt/sources.list.d/ubuntu.sources && \
+RUN arch="$(dpkg --print-architecture)" && \
+    if [ "${arch}" = "arm64" ]; then \
+      sed -i -E "s#https?://ports.ubuntu.com/ubuntu-ports#https://${APT_MIRROR}/ubuntu-ports#g" \
+        /etc/apt/sources.list.d/ubuntu.sources; \
+    else \
+      sed -i -E "s#https?://archive.ubuntu.com/ubuntu#https://${APT_MIRROR}/ubuntu#g; \
+                 s#https?://security.ubuntu.com/ubuntu#https://${APT_MIRROR}/ubuntu#g" \
+        /etc/apt/sources.list.d/ubuntu.sources; \
+    fi && \
     apt update && \
     apt install -y --no-install-recommends \
       tzdata lsb-release curl wget gnupg2 openssl ca-certificates openssh-client \
@@ -59,6 +67,13 @@ RUN git config --global core.autocrlf input && \
     git config --global core.editor vim && \
     git config --global color.ui auto && \
     git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+
+# ============================================================
+# Trust gitcode.com SSH host key
+# ============================================================
+RUN mkdir -p /root/.ssh && \
+    ssh-keyscan -H gitcode.com >> /root/.ssh/known_hosts && \
+    chmod 600 /root/.ssh/known_hosts
 
 # ============================================================
 # oh-my-zsh + plugins (via gitcode mirror)
@@ -89,9 +104,8 @@ RUN conda config --remove channels defaults 2>/dev/null || true && \
 # ============================================================
 RUN printf "[global]\nindex-url = ${PYPI_MIRROR}\n" > /etc/pip.conf
 
-COPY environment-310.yml environment-312.yml /tmp/
-RUN conda env create -q -f /tmp/environment-310.yml && \
-    conda env create -q -f /tmp/environment-312.yml && \
+COPY environment-312.yml /tmp/
+RUN conda env create -q -f /tmp/environment-312.yml && \
     conda clean -ya
 
 # ============================================================
@@ -102,17 +116,15 @@ RUN conda init zsh && \
     echo "export REPO_URL=\"${REPO_MIRROR}\"" >> /root/.zshrc
 
 # AscendC banner
-RUN cat >> /root/.zshrc << 'EOF'
-
-echo "\033[1;36m"
-echo " █████╗ ███████╗ ██████╗███████╗███╗   ██╗██████╗  ██████╗"
-echo "██╔══██╗██╔════╝██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝"
-echo "███████║███████╗██║     █████╗  ██╔██╗ ██║██║  ██║██║     "
-echo "██╔══██║╚════██║██║     ██╔══╝  ██║╚██╗██║██║  ██║██║     "
-echo "██║  ██║███████║╚██████╗███████╗██║ ╚████║██████╔╝╚██████╗"
-echo "╚═╝  ╚═╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚═════╝  ╚═════╝"
-echo "\033[0m"
-EOF
+RUN printf '\n\
+echo "\\033[1;36m"\n\
+echo " █████╗ ███████╗ ██████╗███████╗███╗   ██╗██████╗  ██████╗"\n\
+echo "██╔══██╗██╔════╝██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝"\n\
+echo "███████║███████╗██║     █████╗  ██╔██╗ ██║██║  ██║██║     "\n\
+echo "██╔══██║╚════██║██║     ██╔══╝  ██║╚██╗██║██║  ██║██║     "\n\
+echo "██║  ██║███████║╚██████╗███████╗██║ ╚████║██████╔╝╚██████╗"\n\
+echo "╚═╝  ╚═╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚═════╝  ╚═════╝"\n\
+echo "\\033[0m"\n' >> /root/.zshrc
 
 RUN rm -rf /tmp/*
 

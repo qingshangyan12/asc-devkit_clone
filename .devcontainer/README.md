@@ -10,6 +10,10 @@ Ubuntu 24.04 development environment for AscendC NPU kernel development.
 | docker buildx | any |
 | Ascend driver | installed on host |
 
+> The Ascend **driver** is installed on the host and mounted read-only into the container (`/usr/local/Ascend/driver`, `/usr/local/Ascend/add-ons`).
+>
+> The **CANN toolkit and ops packages** should be installed inside the container, not on the host. Installing CANN on the host risks overwriting a shared environment when multiple developers use the same machine. After opening the container, install the matching CANN packages **manually**.
+
 Check your Docker version:
 ```bash
 docker --version
@@ -41,11 +45,11 @@ docker buildx build --network host \
 
 Available mirrors:
 
-| | Huawei (default) | Tsinghua | USTC |
-|-|------------------|----------|------|
-| APT | `mirrors.huaweicloud.com` | `mirrors.tuna.tsinghua.edu.cn` | `mirrors.ustc.edu.cn` |
-| Conda | — | `mirrors.tuna.tsinghua.edu.cn/anaconda` | `mirrors.ustc.edu.cn/anaconda` |
-| PyPI | `repo.huaweicloud.com/repository/pypi/simple` | `pypi.tuna.tsinghua.edu.cn/simple` | `pypi.mirrors.ustc.edu.cn/simple` |
+| Build arg | Default | Tsinghua | USTC | Huawei |
+|-----------|---------|----------|------|--------|
+| `APT_MIRROR` | `mirrors.huaweicloud.com` | `mirrors.tuna.tsinghua.edu.cn` | `mirrors.ustc.edu.cn` | `mirrors.huaweicloud.com` |
+| `CONDA_MIRROR` | `mirrors.tuna.tsinghua.edu.cn/anaconda` | `mirrors.tuna.tsinghua.edu.cn/anaconda` | `mirrors.ustc.edu.cn/anaconda` | — |
+| `PYPI_MIRROR` | `repo.huaweicloud.com/repository/pypi/simple` | `pypi.tuna.tsinghua.edu.cn/simple` | `pypi.mirrors.ustc.edu.cn/simple` | `repo.huaweicloud.com/repository/pypi/simple` |
 
 ## Open in VS Code
 
@@ -57,11 +61,10 @@ Ctrl+Shift+P → Dev Containers: Reopen in Container
 
 ## Python Environments
 
-Two conda environments are pre-installed:
+One conda environment is pre-installed:
 
 | Environment | Python | PyTorch |
 |-------------|--------|---------|
-| `py310` | 3.10 | 2.6.0 |
 | `py312` | 3.12 | 2.7.1 |
 
 Default active environment is `py312`.
