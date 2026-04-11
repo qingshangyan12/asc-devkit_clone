@@ -30,11 +30,9 @@ __aicore__ inline void CheckDataCopyPadParams(uint16_t blockCount, uint32_t bloc
 {
 #if ASCENDC_CPU_DEBUG
     constexpr uint32_t dataCopyPadBlkLenLimit = 2097151;    // 21 bits in total, thus range [0, 2097151]
-    ASCENDC_CHECK_VALUE_RANGE(blockCount, 1, UINT12_MAX, "blockCount", "DataCopyPad");
-    if (isExtParams) {  // DataCopyExtParams: blockLen range [1, 2097151]
-        ASCENDC_CHECK_VALUE_RANGE(blockLen, 1, dataCopyPadBlkLenLimit, "blockLen", "DataCopyPad");
-    } else {            // DataCopyParams: blockLen range [1, 65535]
-        ASCENDC_CHECK_VALUE_RANGE(blockLen, 1, UINT16_MAX, "blockLen", "DataCopyPad");
+    ASCENDC_CHECK_VALUE_RANGE(blockCount, 0, UINT12_MAX, "blockCount", "DataCopyPad");
+    if (isExtParams) {  // DataCopyExtParams: blockLen range [0, 2097151]
+        ASCENDC_CHECK_VALUE_RANGE(blockLen, 0, dataCopyPadBlkLenLimit, "blockLen", "DataCopyPad");
     }
     if (isGMtoUB) {
         ASCENDC_ASSERT((blockLen % sizeof(T) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to check blockLen value in "
