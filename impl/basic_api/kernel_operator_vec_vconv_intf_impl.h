@@ -365,7 +365,8 @@ template <typename T, typename U, bool isSetMask>
 __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1,
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    using DstPrimType = PrimT<T>; using SrcPrimType = PrimT<U>;
+    using SrcPrimType = PrimT<U>;
+    using DstPrimType = PrimT<T>;
     using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)), DstPrimType, SrcPrimType>::type;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
@@ -394,7 +395,8 @@ template <typename T, typename U, bool isSetMask>
 __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1,
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    using DstPrimType = PrimT<T>; using SrcPrimType = PrimT<U>;
+    using SrcPrimType = PrimT<U>;
+    using DstPrimType = PrimT<T>;
     using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)), DstPrimType, SrcPrimType>::type;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
@@ -475,7 +477,8 @@ template <typename T, typename U, bool isSetMask>
 __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1,
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    using DstPrimType = PrimT<T>; using SrcPrimType = PrimT<U>;
+    using DstPrimType = PrimT<T>; 
+    using SrcPrimType = PrimT<U>;
     using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)), DstPrimType, SrcPrimType>::type;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
@@ -504,7 +507,8 @@ template <typename T, typename U, bool isSetMask>
 __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1,
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    using DstPrimType = PrimT<T>; using SrcPrimType = PrimT<U>;
+    using SrcPrimType = PrimT<U>;
+    using DstPrimType = PrimT<T>;
     using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)), DstPrimType, SrcPrimType>::type;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
