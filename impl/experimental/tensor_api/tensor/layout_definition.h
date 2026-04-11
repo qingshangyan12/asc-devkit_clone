@@ -50,7 +50,10 @@ struct DefaultInfo {};
 template <typename T, typename U, typename Info = DefaultInfo>
 struct Layout : private Std::tuple<T, U>
 {
+private:
     using tag = Info;
+
+public:
     static constexpr auto size = StaticLayoutSize<T, U>::size;
     static constexpr auto depth = nesting_depth_v<T>;
     static constexpr auto rank = Std::tuple_size_v<T>;
@@ -74,6 +77,11 @@ struct Layout : private Std::tuple<T, U>
     __aicore__ inline constexpr decltype(auto) layout() const
     {
         return *this;
+    }
+
+    __aicore__ inline constexpr auto Tag() const
+    {
+        return tag{};
     }
 
     template <size_t... I>
@@ -119,6 +127,44 @@ struct Layout : private Std::tuple<T, U>
         return TupleSize<I...>(Shape());
     }
 };
+
+template <typename T, typename = void>
+struct GetPattern {
+    static_assert(sizeof(T) == 0,
+        "GetPattern requires Layout<T, U, Std::tuple<LayoutPattern, TraitType>> or a type exposing Layout().");
+};
+
+template <typename T, typename U, typename LayoutPattern, typename TraitType>
+struct GetPattern<Layout<T, U, Std::tuple<LayoutPattern, TraitType>>, void> {
+    using type = LayoutPattern;
+};
+
+template <typename T>
+struct GetPattern<T, void_t<decltype(Std::declval<const T&>().Layout())>> {
+    using type = typename GetPattern<Std::remove_cvref_t<decltype(Std::declval<const T&>().Layout())>>::type;
+};
+
+template <typename T>
+using GetPatternT = typename GetPattern<Std::remove_cvref_t<T>>::type;
+
+template <typename T, typename = void>
+struct GetTraitType {
+    static_assert(sizeof(T) == 0,
+        "GetTraitType requires Layout<T, U, Std::tuple<LayoutPattern, TraitType>> or a type exposing Layout().");
+};
+
+template <typename T, typename U, typename LayoutPattern, typename TraitType>
+struct GetTraitType<Layout<T, U, Std::tuple<LayoutPattern, TraitType>>, void> {
+    using type = TraitType;
+};
+
+template <typename T>
+struct GetTraitType<T, void_t<decltype(Std::declval<const T&>().Layout())>> {
+    using type = typename GetTraitType<Std::remove_cvref_t<decltype(Std::declval<const T&>().Layout())>>::type;
+};
+
+template <typename T>
+using GetTraitTypeT = typename GetTraitType<Std::remove_cvref_t<T>>::type;
 
 template <typename T>
 struct is_layout : Std::false_type {};
