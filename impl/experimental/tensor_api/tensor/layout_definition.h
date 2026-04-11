@@ -125,8 +125,7 @@ public:
 
 template <typename T, typename = void>
 struct GetLayoutInfo {
-    static_assert(sizeof(T) == 0,
-        "GetLayoutInfo requires Layout<T, U, Std::tuple<LayoutPattern, TraitType>> or a type exposing Layout().");
+    static_assert(false, "GetLayoutTrait/GetLayoutPattern requires LayoutType");
 };
 
 template <typename T, typename U, typename LayoutPattern, typename TraitType>
@@ -135,7 +134,7 @@ struct GetLayoutInfo<Layout<T, U, Std::tuple<LayoutPattern, TraitType>>, void> {
 };
 
 template <typename T>
-using GetLayoutInfoT = typename GetLayoutInfo<Std::remove_cvref_t<T>>::type;
+using GetLayoutInfoT = typename GetLayoutInfo<T>::type;
 
 template <typename T, typename = void>
 struct GetPattern {
