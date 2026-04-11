@@ -204,8 +204,8 @@ __aicore__ inline void CopyCbufToBt(uint64_t dst, __cbuf__ T* src, const uint16_
         if constexpr (std::is_same<T, bfloat16_t>::value || std::is_same<T, float>::value
                       || std::is_same<T, int32_t>::value || std::is_same<T, half>::value) {
             if constexpr (sizeof(T) == 4) {
-                ASCENDC_DEBUG_ASSERT((blockLen % 2 == 0), {
-                    KERNEL_LOG(KERNEL_ERROR, "For float or int32_t type, blockLen must be even when DataCopy from L1 to BIAS.");});
+                ASCENDC_DEBUG_ASSERT((blockLen % 2 == 0), {KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "For float or int32_t type, blockLen must be even when DataCopy from L1 to BIAS.");});
                 if (blockLen % 2 != 0) {
                     return;
                 }
