@@ -122,6 +122,93 @@ TEST_P(DataCopyL12L0cTestsuite, DataCopyL12L0cOpTestCase)
 }
 
 namespace AscendC {
+// T for l1->c2(bias) and l1->c2pipe2gm(fixbuf)
+template <typename T, TPosition DstPos> class KernelDataCopyL12BiasOrFixbuf {
+public:
+    __aicore__ inline KernelDataCopyL12BiasOrFixbuf() = default;
+    __aicore__ inline void Init(__gm__ uint8_t* srcGm)
+    {
+        srcGlobal.SetGlobalBuffer((__gm__ T*)srcGm);
+        pipe.InitBuffer(inQueueSrcA1, 1, 512 * sizeof(T));
+        pipe.InitBuffer(outQueueDst, 1, 128 * sizeof(T));
+    }
+    __aicore__ inline void Process()
+    {
+        CopyIn();
+        Compute();
+    }
+
+private:
+    __aicore__ inline void CopyIn()
+    {
+        LocalTensor<T> srcLocal = inQueueSrcA1.AllocTensor<T>();
+        DataCopy(srcLocal, srcGlobal, 512);
+        inQueueSrcA1.EnQue(srcLocal);
+    }
+    __aicore__ inline void Compute()
+    {
+        LocalTensor<T> srcLocal = inQueueSrcA1.DeQue<T>();
+        LocalTensor<T> dstLocal = outQueueDst.template AllocTensor<T>();
+        DataCopy(dstLocal, srcLocal, 128);
+        outQueueDst.FreeTensor(dstLocal);
+        inQueueSrcA1.FreeTensor(srcLocal);
+    }
+
+private:
+    TPipe pipe;
+    TQue<TPosition::A1, 1> inQueueSrcA1;
+    TQue<DstPos, 1> outQueueDst;
+    GlobalTensor<T> srcGlobal;
+};
+} // namespace AscendC
+
+template <typename T, TPosition DstPos>
+__global__ __aicore__ void MainDataCopyL12BiasOrFixbuf(__gm__ uint8_t* srcGm)
+{
+    AscendC::KernelDataCopyL12BiasOrFixbuf<T, DstPos> op;
+    op.Init(srcGm);
+    op.Process();
+}
+
+struct DataCopyL12BiasOrFixbufTestParams {
+    int32_t typeSize;
+    void (*CalFunc)(__gm__ uint8_t*);
+};
+
+class DataCopyL12BiasOrFixbufTestsuite : public testing::Test,
+    public testing::WithParamInterface<DataCopyL12BiasOrFixbufTestParams> {
+protected:
+    void SetUp()
+    {
+        g_coreType = AIC_TYPE;
+    }
+    void TearDown()
+    {
+        AscendC::CheckSyncState();
+        g_coreType = MIX_TYPE;
+        GlobalMockObject::verify();
+    }
+};
+
+INSTANTIATE_TEST_CASE_P(TEST_OPEARATION_DATACOPYL12BIASORFIXBUF, DataCopyL12BiasOrFixbufTestsuite,
+    ::testing::Values(
+    DataCopyL12BiasOrFixbufTestParams { 4, MainDataCopyL12BiasOrFixbuf<float, TPosition::C2> },
+    DataCopyL12BiasOrFixbufTestParams { 4, MainDataCopyL12BiasOrFixbuf<float, TPosition::C2PIPE2GM> },
+    DataCopyL12BiasOrFixbufTestParams { 2, MainDataCopyL12BiasOrFixbuf<half, TPosition::C2> },
+    DataCopyL12BiasOrFixbufTestParams { 2, MainDataCopyL12BiasOrFixbuf<half, TPosition::C2PIPE2GM> },
+    DataCopyL12BiasOrFixbufTestParams { 2, MainDataCopyL12BiasOrFixbuf<bfloat16_t, TPosition::C2> },
+    DataCopyL12BiasOrFixbufTestParams { 2, MainDataCopyL12BiasOrFixbuf<bfloat16_t, TPosition::C2PIPE2GM> },
+    DataCopyL12BiasOrFixbufTestParams { 4, MainDataCopyL12BiasOrFixbuf<int32_t, TPosition::C2> },
+    DataCopyL12BiasOrFixbufTestParams { 4, MainDataCopyL12BiasOrFixbuf<int32_t, TPosition::C2PIPE2GM> }));
+
+TEST_P(DataCopyL12BiasOrFixbufTestsuite, DataCopyL12BiasOrFixbufOpTestCase)
+{
+    auto param = GetParam();
+    uint8_t srcGm[512 * param.typeSize] = {0};
+    param.CalFunc(srcGm);
+}
+
+namespace AscendC {
 // T, U for gm->l1 nd2nz
 template <typename T> class KernelDataCopyGm2L1Nd2Nz {
 public:
