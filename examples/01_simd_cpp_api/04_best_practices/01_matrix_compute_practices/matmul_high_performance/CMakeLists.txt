@@ -11,13 +11,36 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+if(DEFINED RUN_MODE)
+    set(CMAKE_ASC_RUN_MODE ${RUN_MODE} CACHE STRING "Alias of RUN_MODE")
+endif()
+
+if(DEFINED NPU_ARCH)
+    set(CMAKE_ASC_ARCHITECTURES ${NPU_ARCH} CACHE STRING "Alias of NPU_ARCH")
+endif()
+
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+set(CASE_TYPE 6 CACHE STRING "Case type to compile (0-8)")
+set(NPU_ARCH "dav-2201" CACHE STRING "NPU architecture, e.g. dav-2201, dav-3510")
+
 add_executable(demo
     matmul.asc
 )
+
+if(NPU_ARCH STREQUAL "dav-2201")
+    target_compile_definitions(demo PRIVATE
+        CASE_TYPE=${CASE_TYPE}
+        NPU_ARCH_DAV_2201
+    )
+elseif(NPU_ARCH STREQUAL "dav-3510")
+    target_compile_definitions(demo PRIVATE
+        CASE_TYPE=${CASE_TYPE}
+        NPU_ARCH_DAV_3510
+    )
+endif()
 
 target_link_libraries(demo PRIVATE
     tiling_api
@@ -27,14 +50,6 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2002>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH}>
 )
