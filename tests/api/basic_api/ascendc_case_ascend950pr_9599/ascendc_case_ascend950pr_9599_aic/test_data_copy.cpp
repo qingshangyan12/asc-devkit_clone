@@ -332,7 +332,7 @@ INSTANTIATE_TEST_CASE_P(TEST_DATA_COPY_AIC, TestDataCopySuite,
     TestDataCopyParams { 64, 1, main_tensortrait_data_copy_dn2nz_kernel<uint32_t> },
     TestDataCopyParams { 256, 1, main_tensortrait_data_copy_kernel_fixpipe<int8_t> },
     TestDataCopyParams { 256, 4, MainDataCopyL0C2GMCacheModeKernel<float> },
-    TestDataCopyParams { 256, 4, MainDataCopyL0C2GMCacheModeWithDisableCacheKernel<float> }
+    TestDataCopyParams { 256, 4, MainDataCopyL0C2GMCacheModeWithDisableCacheKernel<float> },
     TestDataCopyParams { 64, 4, MainDataCopyL12BTKernel<float> },
     TestDataCopyParams { 64, 4, MainDataCopyL12BTKernel<int32_t> },
     TestDataCopyParams { 64, 2, MainDataCopyL12BTKernel<half> },
