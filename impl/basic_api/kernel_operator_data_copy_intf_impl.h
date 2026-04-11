@@ -595,17 +595,20 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T> &dst, 
     DataCopyGetOffsetList(dstSliceInfo, dstShapeInfo, dimValue, &dstOffsetListSize, dstOffsetList);
     struct DataCopyParams repeatParams;
     repeatParams.blockLen = srcSliceInfo[0].burstLen;
-    uint32_t oneSliceLen = srcSliceInfo[0].burstLen * AscendCUtils::GetC0Count(sizeof(T)) + srcSliceInfo[0].stride;
+    constexpr uint32_t c0Count = IsHalfByteDataType<T>() ? ConstantsInternal::ONE_BLK_FP4_NUM :
+        AscendCUtils::GetC0Count(sizeof(T));
+    constexpr uint32_t elemByteSize = IsHalfByteDataType<T>() ? sizeof(T) / ConstantsInternal::INT4_TWO : sizeof(T);
+    uint32_t oneSliceLen = srcSliceInfo[0].burstLen * c0Count + srcSliceInfo[0].stride;
     repeatParams.blockCount =
         (srcSliceInfo[0].endIndex - srcSliceInfo[0].startIndex + 1 + srcSliceInfo[0].stride) / oneSliceLen;
-    repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
+    repeatParams.dstStride = dstSliceInfo[0].stride * elemByteSize / AscendCUtils::GetC0Size();
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     const uint8_t cacheMode = ExtractCacheMode(src);
 #endif
 
-    if ((srcSliceInfo[0].stride * sizeof(T)) % AscendCUtils::GetC0Size() == 0) {
-        repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
+    if ((srcSliceInfo[0].stride * elemByteSize) % AscendCUtils::GetC0Size() == 0) {
+        repeatParams.srcStride = srcSliceInfo[0].stride * elemByteSize / AscendCUtils::GetC0Size();
         for (uint32_t i = 0; i < srcOffsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopyGM2UBImpl((__ubuf__ T *)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
@@ -616,7 +619,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T> &dst, 
 #endif
         }
     } else {
-        repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(T);
+        repeatParams.srcStride = srcSliceInfo[0].stride * elemByteSize;
         for (uint32_t i = 0; i < srcOffsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopySliceGm2UBImpl((__ubuf__ T *)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
@@ -671,16 +674,19 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T> &dst,
 
     struct DataCopyParams repeatParams;
     repeatParams.blockLen = srcSliceInfo[0].burstLen;
-    uint32_t oneSliceLen = srcSliceInfo[0].burstLen * AscendCUtils::GetC0Count(sizeof(T)) + srcSliceInfo[0].stride;
+    constexpr uint32_t c0Count = IsHalfByteDataType<T>() ? ConstantsInternal::ONE_BLK_FP4_NUM :
+        AscendCUtils::GetC0Count(sizeof(T));
+    constexpr uint32_t elemByteSize = IsHalfByteDataType<T>() ? sizeof(T) / ConstantsInternal::INT4_TWO : sizeof(T);
+    uint32_t oneSliceLen = srcSliceInfo[0].burstLen * c0Count + srcSliceInfo[0].stride;
     repeatParams.blockCount =
         (srcSliceInfo[0].endIndex - srcSliceInfo[0].startIndex + 1 + srcSliceInfo[0].stride) / oneSliceLen;
-    repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
+    repeatParams.srcStride = srcSliceInfo[0].stride * elemByteSize / AscendCUtils::GetC0Size();
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     const uint8_t cacheMode = ExtractCacheMode(dst);
 #endif
-    if ((dstSliceInfo[0].stride * sizeof(T)) % AscendCUtils::GetC0Size() == 0) {
-        repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
+    if ((dstSliceInfo[0].stride * elemByteSize) % AscendCUtils::GetC0Size() == 0) {
+        repeatParams.dstStride = dstSliceInfo[0].stride * elemByteSize / AscendCUtils::GetC0Size();
         for (uint32_t i = 0; i < srcOffsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopyUB2GMImpl((__gm__ T *)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
@@ -691,7 +697,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T> &dst,
 #endif
         }
     } else {
-        repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(T);
+        repeatParams.dstStride = dstSliceInfo[0].stride * elemByteSize;
         for (uint32_t i = 0; i < srcOffsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopySliceUB2GMImpl((__gm__ T *)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
@@ -733,7 +739,14 @@ __aicore__ inline void DataCopyCheck(const uint32_t count, DataCopyParams& repea
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
     } else
 #endif
-    {
+    if constexpr (IsHalfByteDataType<PrimType>()) {
+        ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
+            "check count value in DataCopy from GlobalTensor to LocalTensor or from LocalTensor to GlobalTensor, "
+            "count must be 32B align for half-byte data type, current count value is %u. "
+            "In NPU mode, no error is reported. The value is rounded down by 32B.",
+            count); });
+        repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
+    } else {
         ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
             "check count value in DataCopy from GlobalTensor to LocalTensor or from LocalTensor to GlobalTensor, "
             "count * sizeof(T) must be 32B align, current count value is %u. "
@@ -788,10 +801,18 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
-        "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
-        "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
-        count); });
+    if constexpr (IsHalfByteDataType<PrimType>()) {
+        ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
+            "check count value in DataCopy from LocalTensor to LocalTensor, count must be 32B align for "
+            "half-byte data type, current count value is %u. In NPU mode, no error is reported. "
+            "The value is rounded down by 32B.",
+            count); });
+    } else {
+        ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
+            "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
+            "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
+            count); });
+    }
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
     struct DataCopyParams repeatParams;
 
@@ -799,17 +820,37 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
-    repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(T));
+    if constexpr (IsHalfByteDataType<PrimType>()) {
+        repeatParams.blockLen = count / ConstantsInternal::;
+    } else {
+        repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(T));
+    }
 #else
     if (srcHWPos != Hardware::L1) {  // UB -> UB, UB -> L1
-        repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+        if constexpr (IsHalfByteDataType<PrimType>()) {
+            repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
+        } else {
+            repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+        }
     } else {                         // L1 -> UB, L1 -> BT, L1 -> FB
         if (dstHWPos == Hardware::UB) {
-            repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+            if constexpr (IsHalfByteDataType<PrimType>()) {
+                repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
+            } else {
+                repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+            }
         } else if (dstHWPos == Hardware::BIAS) {
-            repeatParams.blockLen = count / (64 / sizeof(PrimType));   // BT blockLen is in unit of 64B
+            if constexpr (IsHalfByteDataType<PrimType>()) {
+                repeatParams.blockLen = count / (64 * ConstantsInternal::INT4_TWO / sizeof(PrimType));  // BT blockLen is in unit of 64B
+            } else {
+                repeatParams.blockLen = count / (64 / sizeof(PrimType));   // BT blockLen is in unit of 64B
+            }
         } else if (dstHWPos == Hardware::FIXBUF) {
-            repeatParams.blockLen = count / (128 / sizeof(PrimType));  // FB blockLen is in unit of 128B
+            if constexpr (IsHalfByteDataType<PrimType>()) {
+                repeatParams.blockLen = count / (128 * ConstantsInternal::INT4_TWO / sizeof(PrimType));  // FB blockLen is in unit of 128B
+            } else {
+                repeatParams.blockLen = count / (128 / sizeof(PrimType));  // FB blockLen is in unit of 128B
+            }
         }
     }
 #endif
