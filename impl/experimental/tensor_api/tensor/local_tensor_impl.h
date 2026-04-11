@@ -137,7 +137,7 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
  	    return MakeTensor(iter, coordLayout);
  	}
 
-    template <typename Coord, typename InfoType>
+    template <typename Coord, typename Shape, typename = Std::enable_if_t<!is_layout_v<Shape>>>
  	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Shape& shape) {
         auto iter = Data() + Layout()(coord);
         auto coordLayout = MakeCoordLayout(coord, Layout());
@@ -145,7 +145,7 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
         return MakeTensor(iter, tileLayout);
  	} 
 
-    template <typename Coord, typename Layout, >
+    template <typename Coord, typename Layout, typename = Std::enable_if_t<is_layout_v<Layout>>>
  	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Layout& layout) {
         auto iter = Data() + Layout()(coord);
         auto coordLayout = MakeCoordLayout(coord, Layout());

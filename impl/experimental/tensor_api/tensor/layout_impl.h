@@ -31,7 +31,7 @@
 namespace AscendC {
 namespace Te {
 
-template <typename LayoutType, typename TileShape>
+template <typename LayoutType, typename TileShape, typename = Std::enable_if_t<!is_layout_v<TileShape>>>
 __aicore__ inline decltype(auto) MakeTileLayout(const LayoutType& layout, const TileShape& tileShape) 
 {
     using OriginShape = Std::remove_cvref_t<decltype(layout.Shape())>;
@@ -56,7 +56,7 @@ __aicore__ inline decltype(auto) MakeTileLayout(const LayoutType& layout, const 
     } 
 }
 
-template <typename SrcLayoutType, typename DstLayoutType>
+template <typename SrcLayoutType, typename DstLayoutType, typename = Std::enable_if_t<is_layout_v<DstLayoutType>>>
  __aicore__ inline decltype(auto) MakeTileLayout(const SrcLayoutType& srcLayout, DstLayoutType& dstLayout) 
 {
     using TensorLayoutType = typename LocalTensor<TensorType>::layoutType;
