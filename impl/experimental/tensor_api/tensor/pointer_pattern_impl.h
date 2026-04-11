@@ -38,12 +38,6 @@ __aicore__ inline auto MakeHardwareMemPtr(Iterator iter)
     return HardwareMemPtrV2<PtrPattern, Iterator>{iter};
 }
 
-template <typename PtrPattern, typename Iterator>
-__aicore__ inline auto MakeHardwareMemPtrV2(Iterator iter)
-{
-    return HardwareMemPtrV2<PtrPattern, Iterator>{iter};
-}
-
 struct MakeGMMemPtr {
     template <typename PtrPattern, typename TraitType, typename Arg>
     __aicore__ inline static auto Make(const Arg& arg) {
@@ -55,7 +49,7 @@ struct MakeUBMemPtr {
     template <typename PtrPattern, typename TraitType, typename Arg>
     __aicore__ inline static auto Make(const Arg& arg) {
         using T = typename TraitType::type;
-        return MakeHardwareMemPtrV2<PtrPattern>(reinterpret_cast<__ubuf__ T*>(get_imm(0) + arg));
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__ubuf__ T*>(get_imm(0) + arg));
     }
 };
 
@@ -63,7 +57,7 @@ struct MakeL1MemPtr {
     template <typename PtrPattern, typename TraitType, typename Arg>
     __aicore__ inline static auto Make(const Arg& arg) {
         using T = typename TraitType::type;
-        return MakeHardwareMemPtrV2<PtrPattern>(reinterpret_cast<__cbuf__ T*>(get_imm(0) + arg));
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__cbuf__ T*>(get_imm(0) + arg));
     }
 };
 
@@ -71,7 +65,7 @@ struct MakeL0AMemPtr {
     template <typename PtrPattern, typename TraitType, typename Arg>
     __aicore__ inline static auto Make(const Arg& arg) {
         using T = typename TraitType::type;
-        return MakeHardwareMemPtrV2<PtrPattern>(reinterpret_cast<__ca__ T*>(get_imm(0) + arg));
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__ca__ T*>(get_imm(0) + arg));
     }
 };
 
@@ -79,7 +73,7 @@ struct MakeL0BMemPtr {
     template <typename PtrPattern, typename TraitType, typename Arg>
     __aicore__ inline static auto Make(const Arg& arg) {
         using T = typename TraitType::type;
-        return MakeHardwareMemPtrV2<PtrPattern>(reinterpret_cast<__cb__ T*>(get_imm(0) + arg));
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__cb__ T*>(get_imm(0) + arg));
     }
 };
 
@@ -87,7 +81,7 @@ struct MakeL0CMemPtr {
     template <typename PtrPattern, typename TraitType, typename Arg>
     __aicore__ inline static auto Make(const Arg& arg) {
         using T = typename TraitType::type;
-        return MakeHardwareMemPtrV2<PtrPattern>(reinterpret_cast<__cc__ T*>(get_imm(0) + arg));
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__cc__ T*>(get_imm(0) + arg));
     }
 };
 
@@ -95,7 +89,7 @@ struct MakeBiasMemPtr {
     template <typename PtrPattern, typename TraitType, typename Arg>
     __aicore__ inline static auto Make(const Arg& arg) {
         using T = typename TraitType::type;
-        return MakeHardwareMemPtrV2<PtrPattern>(reinterpret_cast<__biasbuf__ T*>(get_imm(0) + arg));
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__biasbuf__ T*>(get_imm(0) + arg));
     }
 };
 
@@ -103,7 +97,7 @@ struct MakeFixbufMemPtr {
     template <typename PtrPattern, typename TraitType, typename Arg>
     __aicore__ inline static auto Make(const Arg& arg) {
         using T = typename TraitType::type;
-        return MakeHardwareMemPtrV2<PtrPattern>(reinterpret_cast<__fbuf__ T*>(get_imm(0) + arg));
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__fbuf__ T*>(get_imm(0) + arg));
     }
 };
 
