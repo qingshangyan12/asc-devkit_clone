@@ -545,23 +545,6 @@ $$
 
 ## 编译运行
 
-### 切换Case
-
-在 cmake 编译时通过 `-DCASE_TYPE=N` 指定要编译的 case：
-
-```bash
-cmake -DCASE_TYPE=6 ..   # 编译 case 6（可替换为0-6）
-```
-
-各 case 说明：
-- `0`: 单核标量版本
-- `1`: 单核向量版本
-- `2`: 多核均匀切分 (dataCopyLen=4096)
-- `3`: 多核均匀切分 (dataCopyLen=16384)
-- `4`: 双缓冲优化
-- `5`: 双缓冲 + L2Cache bypass
-- `6`: 双缓冲 + L2Cache bypass + 避免Bank Conflict
-
 ### 编译执行
 
 在本样例根目录下执行如下步骤，编译并执行算子：
@@ -584,13 +567,31 @@ cmake -DCASE_TYPE=6 ..   # 编译 case 6（可替换为0-6）
     ```
     
 - **样例执行**
-  ```bash 
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake -DNPU_ARCH=2201 -DCASE_TYPE=6 ..;make -j;  # 编译指定case（NPU_ARCH: 2201=A3, 3510=A5；CASE_TYPE: 0-6）
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
-  ./demo                           # 执行（使用编译时指定的case）
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  ```bash
+  CMAKE_ASC_ARCHITECTURES=dav-2201
+  CASE_TYPE=6
+  mkdir -p build && cd build;  # 创建并进入build目录
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=$CMAKE_ASC_ARCHITECTURES -DCMAKE_ASC_RUN_MODE=npu -DCASE_TYPE=$CASE_TYPE; make -j;
+  python3 ../scripts/gen_data.py
+  ./demo
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin
   ```
+
+  使用NPU仿真模式时，设置 `-DCMAKE_ASC_RUN_MODE=sim` 即可
+  ```bash
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=$CMAKE_ASC_ARCHITECTURES -DCMAKE_ASC_RUN_MODE=npu -DCASE_TYPE=$CASE_TYPE; make -j; # npu模式
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=$CMAKE_ASC_ARCHITECTURES -DCMAKE_ASC_RUN_MODE=sim -DCASE_TYPE=$CASE_TYPE; make -j; # npu仿真模式
+  ```
+
+  编译选项说明：
+
+  | 参数 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` / `dav-3510` | NPU架构（dav-2201对应 Atlas A2/A3 系列，dav-3510对应Ascend 950PR/Ascend 950DT） |
+  | `CASE_TYPE` | `0` / `1` / `2` / `3` / `4` / `5` / `6` | 指定优化case |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）/ `cpu` / `sim` | 运行模式：NPU运行、CPU模式、NPU仿真 |
+
+  > **注意：** 切换 `CMAKE_ASC_RUN_MODE` / `CMAKE_ASC_ARCHITECTURES` / `CASE_TYPE` 前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
   
   执行结果如下，说明精度对比成功。
   ```bash
