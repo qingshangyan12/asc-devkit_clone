@@ -71,7 +71,7 @@ add_subdirectory(tiling)
 if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
   include(ExternalProject)
   ExternalProject_Add(device_tiling
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tiling
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake/device
     CONFIGURE_COMMAND ${CMAKE_COMMAND}
     -G ${CMAKE_GENERATOR}
     -DBUILD_OPEN_PROJECT=${BUILD_OPEN_PROJECT}
@@ -99,13 +99,13 @@ install(
   FILES ${KERNEL_TILING_HEAD}
   DESTINATION
     ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
-  OPTIONAL)
+  ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
 
 # copy detail to asc impl
 install(
   DIRECTORY detail/
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail
-  OPTIONAL FILES_MATCHING
+  ${INSTALL_OPTIONAL} COMPONENT asc-devkit FILES_MATCHING
   PATTERN "*.h"
   PATTERN "CMakeLists.txt" EXCLUDE)
 
@@ -113,7 +113,7 @@ install(
 install(
   DIRECTORY tiling/
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/tiling
-  OPTIONAL FILES_MATCHING
+  ${INSTALL_OPTIONAL} COMPONENT asc-devkit FILES_MATCHING
   PATTERN "*.h"
   PATTERN "CMakeLists.txt" EXCLUDE)
 
@@ -121,7 +121,7 @@ install(
 install(
   DIRECTORY ${ASCENDC_INCLUDE_DIR}/adv_api/
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
-  OPTIONAL)
+  ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
 
 # generate softlink
 configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/kernel_headers.cmake
