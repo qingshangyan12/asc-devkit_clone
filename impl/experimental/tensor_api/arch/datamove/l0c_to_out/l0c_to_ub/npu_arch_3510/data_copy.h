@@ -1,0 +1,302 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning                                                                                                               \
+    "impl/tensor_api/arch/datamove/l0c_to_out/l0c_to_ub/npu_arch_3510/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
+/*!
+ * \file data_copy.h
+ * \brief
+ */
+#ifndef IMPL_TENSOR_API_ARCH_DATAMOVE_L0C_TO_OUT_L0C_TO_UB_NPU_ARCH_3510_DATA_COPY_H
+#define IMPL_TENSOR_API_ARCH_DATAMOVE_L0C_TO_OUT_L0C_TO_UB_NPU_ARCH_3510_DATA_COPY_H
+
+#include "impl/experimental/tensor_api/utils/utils_impl.h"
+#include "impl/experimental/tensor_api/arch/datamove/l1_to_fb/npu_arch_3510/nd2nd.h"
+#include "impl/experimental/tensor_api/arch/datamove/l0c_to_out/common/instruction.h"
+#include "impl/experimental/tensor_api/arch/datamove/l0c_to_out/l0c_to_ub/npu_arch_3510/instruction.h"
+
+namespace AscendC {
+namespace Te {
+
+using CopyL0C2UBTrait = FixpipeTrait;
+
+class DataCopyL0C2UB3510 {
+public:
+    template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src, const FixpipeParams& params)
+    {
+        CheckTemplate<trait, quantPre, T, U>();
+        SetRegisterImpl<T, U>(dst, src);
+        DataCopyImpl<trait, quantPre, T, U>(dst, src, params);
+    }
+
+    template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src, uint64_t quant, const FixpipeParams& params)
+    {
+        CheckTemplate<trait, quantPre, T, U>();
+        SetRegisterImpl<T, U>(dst, src, quant);
+        DataCopyImpl<trait, quantPre, T, U>(dst, src, params);
+    }
+
+private:
+    template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U>
+    __aicore__ inline static constexpr void CheckTemplate()
+    {
+        if constexpr (IsNDFormat<T>::value) {
+            CheckFormat::CheckNDTemplate<T>();
+        } else if constexpr (IsDNFormat<T>::value) {
+            CheckFormat::CheckDNTemplate<T>();
+        } else if constexpr (IsNZFormat<T>::value || IsL0cNZFormat<T>::value) {
+            CheckFormat::CheckFixpipeNZTemplate<T, trait.enableChannelSplit>();
+            static_assert(trait.dualDstCtl != DUAL_DST_SPLIT_N, "If split N when fixpipe, NZ is not supported");
+        }
+
+        CheckFormat::CheckL0CNZTemplate<U>();
+        CheckDataTypeFor3510::CheckL0C2UbDataType<quantPre, T, U>();
+    }
+
+    template <typename T, typename U>
+    __aicore__ inline static void SetRegisterImpl(const T& /*dst*/, const U& /*src*/)
+    {
+        if constexpr (IsNDFormat<T>::value) {
+            constexpr uint32_t ndNum = 1;
+            constexpr uint32_t srcNdStride = 0;
+            constexpr uint32_t dstNdStride = 0;
+            SetRegister3510::SetRegister(ndNum, dstNdStride, srcNdStride);
+        } else if constexpr (IsDNFormat<T>::value) {
+            // 寄存器 constexpr 常量配置
+            constexpr uint32_t dnNum = 1;
+            constexpr uint32_t dstDnMatrixStride = 0;
+            constexpr uint32_t srcNzMatrixStride = 0;
+            constexpr uint32_t srcNzC0Stride = 1;
+            SetRegister3510::SetRegister(dnNum, dstDnMatrixStride, srcNzMatrixStride, srcNzC0Stride);
+        }
+    }
+
+    template <typename T, typename U>
+    __aicore__ inline static void SetRegisterImpl(const T& /*dst*/, const U& /*src*/, uint64_t quant)
+    {
+        if constexpr (IsNDFormat<T>::value) {
+            constexpr uint32_t ndNum = 1;
+            constexpr uint32_t srcNdStride = 0;
+            constexpr uint32_t dstNdStride = 0;
+            SetRegister3510::SetRegister(quant, ndNum, dstNdStride, srcNdStride);
+        } else if constexpr (IsDNFormat<T>::value) {
+            // 寄存器 constexpr 常量配置
+            constexpr uint32_t dnNum = 1;
+            constexpr uint32_t dstDnMatrixStride = 0;
+            constexpr uint32_t srcNzMatrixStride = 0;
+            constexpr uint32_t srcNzC0Stride = 1;
+            SetRegister3510::SetRegister(quant, dnNum, dstDnMatrixStride, srcNzMatrixStride, srcNzC0Stride);
+        }
+    }
+
+    template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U>
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const FixpipeParams& params)
+    {
+        const auto& dstLayout = dst.Layout();
+        const auto& srcLayout = src.Layout();
+
+        uint32_t nSize =
+            Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout)
+                         * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout),
+                     GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout)
+                         * GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout));
+        uint32_t mSize =
+            Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout)
+                         * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout),
+                     GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout)
+                         * GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout));
+        uint32_t srcStride =
+            GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
+        uint32_t dstStride = 0;
+
+        if constexpr (IsNDFormat<T>::value) {
+            dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
+
+        } else {
+            dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout);
+        }
+
+        bool reluEn = trait.enableRelu;
+        uint8_t unitFlag = params.unitFlag;
+        bool nz2ndEn = IsNDFormat<T>::value;
+        bool nz2dnEn = IsDNFormat<T>::value;
+
+        uint8_t cacheMode = GetCacheModeFromTensor(dst);
+        bool isChannelSplit = trait.enableChannelSplit;
+
+        uint8_t dualDstCtl = trait.dualDstCtl;
+        bool subBlockId = false;
+        CopyMatrixCcToUb3510::DataCopy<quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, dualDstCtl, reluEn,
+                                                       unitFlag, subBlockId, isChannelSplit, nz2ndEn, nz2dnEn);
+    }
+};
+
+class DataCopyL0C2UBVectorQuant3510 {
+public:
+    template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
+    __aicore__ inline static void Run(const T& dst, const U& src, const V& quant, const FixpipeParams& params)
+    {
+        CheckTemplate<trait, T, U>();
+        SetRegisterImpl<trait, T, U>(dst, src);
+        DataCopyImpl<trait, quantPre, T, U, V>(dst, src, quant, params);
+    }
+
+private:
+    template <const CopyL0C2UBTrait& trait, typename T, typename U>
+    __aicore__ inline static constexpr void CheckTemplate()
+    {
+        if constexpr (IsNDFormat<T>::value) {
+            CheckFormat::CheckNDTemplate<T>();
+        } else if constexpr (IsDNFormat<T>::value) {
+            CheckFormat::CheckDNTemplate<T>();
+        } else if constexpr (IsNZFormat<T>::value || IsL0cNZFormat<T>::value) {
+            CheckFormat::CheckFixpipeNZTemplate<T, trait.enableChannelSplit>();
+        }
+        CheckFormat::CheckL0CNZTemplate<U>();
+    }
+
+    template <const CopyL0C2UBTrait& trait, typename T, typename U, bool IsTail>
+    __aicore__ inline static auto GenerateParams(const T& dst, const U& src, const FixpipeParams& params)
+    {
+        const auto& dstLayout = dst.Layout();
+        const auto& srcLayout = src.Layout();
+
+        uint32_t nSize = GetColumnTotalSize(srcLayout);
+        if constexpr (IsTail) {
+            nSize %= MAIN_LOOP_N_SIZE_3510;
+        } else {
+            if (nSize > MAIN_LOOP_N_SIZE_3510) {
+                nSize = MAIN_LOOP_N_SIZE_3510;
+            }
+        }
+
+        const uint32_t mSize = GetRowTotalSize(srcLayout);
+        const uint32_t srcStride = GetColumnStride(srcLayout) / FRACTAL_FIXED;
+        uint32_t dstStride = 0;
+        if constexpr (IsNDFormat<T>::value) {
+            dstStride = GetRowStride(dstLayout);
+        } else {
+            dstStride = GetColumnStride(dstLayout);
+        }
+
+        const bool reluEnable = trait.enableRelu;
+        const uint8_t unitFlag = params.unitFlag;
+
+        constexpr bool nz2ndEnable = IsNDFormat<T>::value;
+        constexpr bool nz2dnEnable = IsDNFormat<T>::value;
+
+        const bool channelSplit = trait.enableChannelSplit;
+
+        bool subBlockId = false;
+        uint8_t dualDstCtl = trait.dualDstCtl;
+
+        return Std::make_tuple(nSize, mSize, srcStride, dstStride, dualDstCtl, reluEn, unitFlag, subBlockId,
+                               channelSplit, nz2ndEn, nz2dnEn);
+    }
+
+    template <typename T>
+    __aicore__ inline static void CopyL12Fb(const T& src, uint16_t calNSize, uint16_t nIterIndex)
+    {
+        auto dstAddr = reinterpret_cast<__fbuf__ uint64_t*>(AllocFbTempBuf(calNSize));
+        auto dst = MakeTensor(MakeFixbufmemPtr(dstAddr), src.Layout());
+        auto coord = MakeCoord(MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
+                               MakeCoord(Std::Int<0>{}, nIterIndex * MAIN_LOOP_N_SIZE_3510));
+        auto shape = MakeShape(MakeShape(Std::Int<1>{}, Std::Int<1>{}), MakeShape(Std::Int<1>{}, calNSize));
+        auto tileSrc = src(coord, shape);
+        DataCopyL12FB3510::Run<DEFAULT_DATA_COPY_TRAIT>(dst, tileSrc);
+        SetFpc(dstAddr);
+    }
+
+    template <QuantMode_t quantPre, typename T, typename U, typename ParamTuple, size_t... Is>
+    __aicore__ inline static void DataCopyWrapper(const T& dst, const U& src, const ParamTuple& paramTuple,
+                                                  Std::index_sequence<Is...>)
+    { CopyMatrixCcToUb3510::DataCopy<quantPre>(dst, src, Std::get<Is>(paramTuple)...); }
+
+    template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
+    __aicore__ inline static void ExecuteDataCopy(const T& dst, const U& src, const V& quant, uint16_t nIterNum,
+                                                  uint32_t calNSize, uint32_t tailNSize, const FixpipeParams& params)
+    {
+        const auto mainLoopParam = GenerateParams<trait, T, U, false>(dst, src, params);
+
+        for (uint16_t i = 0; i < nIterNum; ++i) {
+            CopyL12Fb(quant, calNSize, i);
+            InsertSync();
+
+            const auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * CBURST_NUM_3510));
+            const auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * MAIN_LOOP_N_SIZE_3510));
+
+            DataCopyWrapper<quantPre>(dst(dstCoord), src(srcCoord), mainLoopParam,
+                                      Std::make_index_sequence<Std::tuple_size_v<decltype(mainLoopParam)>>{});
+        }
+
+        if (tailNSize) {
+            const auto tailParam = GenerateParams<trait, T, U, true>(dst, src, params);
+
+            CopyL12Fb(quant, tailNSize, nIterNum);
+            InsertSync();
+
+            const auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * CBURST_NUM_3510));
+            const auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * MAIN_LOOP_N_SIZE_3510));
+
+            DataCopyWrapper<quantPre>(dst(dstCoord), src(srcCoord), tailParam,
+                                      Std::make_index_sequence<Std::tuple_size_v<decltype(tailParam)>>{});
+        }
+    }
+
+    template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const V& quant, const FixpipeParams& params)
+    {
+        uint32_t nSize = GetColumnTotalSize(src.Layout());
+        uint16_t nIterNum = 1;
+        uint32_t calNSize = nSize;
+        uint32_t tailNSize = 0;
+        if (calNSize > MAIN_LOOP_N_SIZE_3510) {
+            nIterNum = nSize / MAIN_LOOP_N_SIZE_3510;
+            tailNSize = nSize % MAIN_LOOP_N_SIZE_3510;
+            calNSize = MAIN_LOOP_N_SIZE_3510;
+        }
+        ExecuteDataCopy<trait, quantPre>(dst, src, quant, nIterNum, calNSize, tailNSize, params);
+    }
+
+    template <const CopyL0C2UBTrait& trait, typename T, typename U>
+    __aicore__ inline static void SetRegisterImpl(const T& /*dst*/, const U& /*src*/)
+    {
+        if constexpr (IsNDFormat<T>::value) {
+            constexpr uint32_t ndNum = 1;
+            constexpr uint32_t srcNdStride = 0;
+            constexpr uint32_t dstNdStride = 0;
+            SetRegister3510::SetRegister(ndNum, dstNdStride, srcNdStride);
+        } else if constexpr (IsDNFormat<T>::value) {
+            // 寄存器 constexpr 常量配置
+            constexpr uint32_t dnNum = 1;
+            constexpr uint32_t dstDnMatrixStride = 0;
+            constexpr uint32_t srcNzMatrixStride = 0;
+            constexpr uint32_t srcNzC0Stride = 1;
+            SetRegister3510::SetRegister(dnNum, dstDnMatrixStride, srcNzMatrixStride, srcNzC0Stride);
+        }
+    }
+};
+
+} // namespace Te
+} // namespace AscendC
+
+#endif // IMPL_TENSOR_API_ARCH_DATAMOVE_L0C_TO_OUT_L0C_TO_UB_NPU_ARCH_3510_DATA_COPY_H
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
