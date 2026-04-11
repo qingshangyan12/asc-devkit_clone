@@ -21,21 +21,21 @@ namespace AscendC {
 namespace Te {
 
 using LayoutFormatSet = TupleMap<
-    Std::tuple<NzLayoutPattern, MakeNzFrameLayout>,
-    Std::tuple<L0CLayoutPattern, MakeL0CFrameLayout>,
-    Std::tuple<NDLayoutPattern, MakeNDFrameLayout>,
-    Std::tuple<DNLayoutPattern, MakeDNFrameLayout>,
-    Std::tuple<NnLayoutPattern, MakeNnFrameLayout>,
-    Std::tuple<ZzLayoutPattern, MakeZzFrameLayout>,
-    Std::tuple<ZnLayoutPattern, MakeZnFrameLayout>,
-    Std::tuple<RowMajorLayoutPattern, MakeRowMajorFrameLayout>,
-    Std::tuple<ColumnMajorLayoutPattern, MakeColumnMajorFrameLayout>,
-    Std::tuple<ScaleANDLayoutPattern, MakeScaleANDFrameLayout>,
-    Std::tuple<ScaleADNLayoutPattern, MakeScaleADNFrameLayout>,
-    Std::tuple<ScaleBNDLayoutPattern, MakeScaleBNDFrameLayout>,
-    Std::tuple<ScaleBDNLayoutPattern, MakeScaleBDNFrameLayout>,
-    Std::tuple<ScaleZzLayoutPattern, MakeScaleZzFrameLayout>,
-    Std::tuple<FP4ZnLayoutPattern, MakeZnFP4FrameLayout>>;
+    Std::tuple<NzLayoutPtn, MakeNzFrameLayout>,
+    Std::tuple<L0CLayoutPtn, MakeL0CFrameLayout>,
+    Std::tuple<NDLayoutPtn, MakeNDFrameLayout>,
+    Std::tuple<DNLayoutPtn, MakeDNFrameLayout>,
+    Std::tuple<NnLayoutPtn, MakeNnFrameLayout>,
+    Std::tuple<ZzLayoutPtn, MakeZzFrameLayout>,
+    Std::tuple<ZnLayoutPtn, MakeZnFrameLayout>,
+    Std::tuple<RowMajorLayoutPtn, MakeRowMajorFrameLayout>,
+    Std::tuple<ColumnMajorLayoutPtn, MakeColumnMajorFrameLayout>,
+    Std::tuple<ScaleANDLayoutPtn, MakeScaleANDFrameLayout>,
+    Std::tuple<ScaleADNLayoutPtn, MakeScaleADNFrameLayout>,
+    Std::tuple<ScaleBNDLayoutPtn, MakeScaleBNDFrameLayout>,
+    Std::tuple<ScaleBDNLayoutPtn, MakeScaleBDNFrameLayout>,
+    Std::tuple<ScaleZzLayoutPtn, MakeScaleZzFrameLayout>,
+    Std::tuple<FP4ZnLayoutPtn, MakeZnFP4FrameLayout>>;
 
 template <typename T = uint16_t, size_t C0 = 32 / sizeof(T)>
 struct LayoutTraitDefault {

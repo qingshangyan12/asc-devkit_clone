@@ -20,22 +20,22 @@
 namespace AscendC {
 namespace Te {
 
-struct ZnLayoutPattern {};
-struct FP4ZnLayoutPattern {};
-struct ZzLayoutPattern {};
-struct NnLayoutPattern {};
-struct NzLayoutPattern {};
-struct L0CLayoutPattern {};
-struct NDLayoutPattern {};
-struct DNLayoutPattern {};
-struct RowMajorLayoutPattern {};
-struct ColumnMajorLayoutPattern {};
-struct ScaleZzLayoutPattern {};
-struct ScaleANDLayoutPattern {};
-struct ScaleADNLayoutPattern {};
-struct ScaleBNDLayoutPattern {};
-struct ScaleBDNLayoutPattern {};
-struct DefaultPattern {};
+struct ZnLayoutPtn {};
+struct FP4ZnLayoutPtn {};
+struct ZzLayoutPtn {};
+struct NnLayoutPtn {};
+struct NzLayoutPtn {};
+struct L0CLayoutPtn {};
+struct NDLayoutPtn {};
+struct DNLayoutPtn {};
+struct RowMajorLayoutPtn {};
+struct ColumnMajorLayoutPtn {};
+struct ScaleZzLayoutPtn {};
+struct ScaleANDLayoutPtn {};
+struct ScaleADNLayoutPtn {};
+struct ScaleBNDLayoutPtn {};
+struct ScaleBDNLayoutPtn {};
+struct DefaultPtn {};
 
 struct MakeNzFrameLayout {
     template <typename TraitType, typename T, typename U>
