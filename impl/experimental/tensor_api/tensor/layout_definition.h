@@ -123,25 +123,25 @@ public:
     }
 };
 
-template <typename T, typename = void>
+template <typename T>
 struct GetLayoutInfo {
     static_assert(false, "GetLayoutTrait/GetLayoutPattern requires LayoutType");
 };
 
 template <typename T, typename U, typename LayoutPattern, typename TraitType>
-struct GetLayoutInfo<Layout<T, U, Std::tuple<LayoutPattern, TraitType>>, void> {
+struct GetLayoutInfo<Layout<T, U, Std::tuple<LayoutPattern, TraitType>>> {
     using type = Std::tuple<LayoutPattern, TraitType>;
 };
 
 template <typename T>
 using GetLayoutInfoT = typename GetLayoutInfo<T>::type;
 
-template <typename T, typename = void>
+template <typename T>
 struct GetPattern {
     using type = typename Std::tuple_element<0, GetLayoutInfoT<T>>::type;
 };
 
-template <typename T, typename = void>
+template <typename T>
 struct GetTraitType {
     using type = typename Std::tuple_element<1, GetLayoutInfoT<T>>::type;
 };
