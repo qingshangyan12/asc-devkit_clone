@@ -7,9 +7,6 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-if(POLICY CMP0135)
-    cmake_policy(SET CMP0135 NEW)
-endif()
 set(GENERATE_CPP_COV ${CMAKE_CURRENT_LIST_DIR}/scripts/generate_cpp_cov.sh)
 
 find_package(Python3 COMPONENTS Interpreter)
