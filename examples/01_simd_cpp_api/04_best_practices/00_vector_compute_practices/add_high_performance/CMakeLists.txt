@@ -11,6 +11,17 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(RUN_MODE "npu" CACHE STRING "Run mode: npu or sim")
+set(CMAKE_ASC_RUN_MODE ${RUN_MODE} CACHE STRING "Alias of RUN_MODE")
+set(NPU_ARCH "2201" CACHE STRING "NPU architecture: 2201(A3) or 3510(A5)")
+
+if(NOT NPU_ARCH EQUAL 2201 AND NOT NPU_ARCH EQUAL 3510)
+    message(FATAL_ERROR "Unsupported NPU_ARCH=${NPU_ARCH}, only 2201(A3) and 3510(A5) are supported")
+endif()
+
+# ASC simulator checks architecture at project() stage.
+set(CMAKE_ASC_ARCHITECTURES "dav-${NPU_ARCH}" CACHE STRING "Alias of NPU_ARCH")
+
 find_package(ASC REQUIRED HINTS $ENV{ASCEND_INSTALL_PATH}/compiler/tikcpp/ascendc_kernel_cmake)
 
 project(kernel_samples LANGUAGES ASC CXX)
@@ -20,16 +31,6 @@ set(CASE_TYPE 0 CACHE STRING "Case type to compile (0-7)")
 add_executable(demo
     add.asc
 )
-
-set(NPU_ARCH "" CACHE STRING "NPU architecture: 2201(A3) or 3510(A5)")
-
-if(NOT NPU_ARCH)
-    message(FATAL_ERROR "NPU_ARCH is required. Usage: cmake -DNPU_ARCH=2201(A3) or -DNPU_ARCH=3510(A5)")
-endif()
-
-if(NOT NPU_ARCH EQUAL 2201 AND NOT NPU_ARCH EQUAL 3510)
-    message(FATAL_ERROR "Unsupported NPU_ARCH=${NPU_ARCH}, only 2201(A3) and 3510(A5) are supported")
-endif()
 
 target_compile_definitions(demo PRIVATE
     CASE_TYPE=${CASE_TYPE}
