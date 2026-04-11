@@ -18,7 +18,7 @@
 ```
 
 ## 算子描述
-- 算子功能：
+- 算子功能：  
   本样例中实现的是[m, n, k]固定为[128, 128, 64]的稀疏矩阵乘算子，使用Ascend C基础Api MmadWithSparse接口实现。4选2 sparseMatmul是一种特殊的矩阵乘，要求一个连续的4个权重或激活值的组中，最多只有2个值为非零，其余2个强制为零，算子的数学表达式为：
   ```
   C = A * B
@@ -37,7 +37,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_with_sparse_custom</td></tr>
   </table>
 
-- 算子实现：
+- 算子实现：  
   算子实现流程分为以下步骤：
   - **CopyIn**: 将Global Memory上的输入数据搬运到Local Memory L1中，并把加载索引矩阵到L1中，其中Index分型与B矩阵分型必须为Zn分型，即GM上的B矩阵必须为转置，Index离线生成必须为Zn排布
   - **SplitB**: 使用LoadDataWithSparse将B矩阵和索引矩阵从L1搬运到L0B与内置索引buffer中
