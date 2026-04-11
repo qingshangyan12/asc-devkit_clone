@@ -733,12 +733,19 @@ __aicore__ inline void DataCopyCheck(const uint32_t count, DataCopyParams& repea
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
     } else
 #endif
-    {
-        ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
-            "check count value in DataCopy from GlobalTensor to LocalTensor or from LocalTensor to GlobalTensor, "
-            "count * sizeof(T) must be 32B align, current count value is %u. "
+    if constexpr (IsHalfByteDataType<PrimType>()) {
+        ASCENDC_DEBUG_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check count value in DataCopy from GlobalTensor to LocalTensor or from LocalTensor to "
+            "GlobalTensor, count must be 32B align for half-byte data type, current count value is %u. "
             "In NPU mode, no error is reported. The value is rounded down by 32B.",
-            count); });
+            count));
+        repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
+    } else {
+        ASCENDC_DEBUG_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), KERNEL_LOG_INTERNAL(
+            KERNEL_ERROR, "Failed to check count value in DataCopy from GlobalTensor to LocalTensor or from "
+            "LocalTensor to GlobalTensor, count * sizeof(T) must be 32B align, current count value is %u. "
+            "In NPU mode, no error is reported. The value is rounded down by 32B.",
+            count));
         repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
     }
 }
@@ -788,10 +795,19 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
-        "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
-        "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
-        count); });
+    if constexpr (IsHalfByteDataType<PrimType>()) {
+        ASCENDC_DEBUG_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check count value in DataCopy from LocalTensor to LocalTensor, count must be 32B align for "
+            "half-byte data type, current count value is %u. In NPU mode, no error is reported. "
+            "The value is rounded down by 32B.",
+            count); });
+    } else {
+        ASCENDC_DEBUG_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), KERNEL_LOG_INTERNAL(
+            KERNEL_ERROR, "Failed to check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) "
+            "must be 32B align, current count value is %u. In NPU mode, no error is reported. The value is rounded"
+            "down by 32B.",
+            count); });
+    }
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
     struct DataCopyParams repeatParams;
 
@@ -799,17 +815,37 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
-    repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(T));
+    if constexpr (IsHalfByteDataType<PrimType>()) {
+        repeatParams.blockLen = count / ConstantsInternal::;
+    } else {
+        repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(T));
+    }
 #else
     if (srcHWPos != Hardware::L1) {  // UB -> UB, UB -> L1
-        repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+        if constexpr (IsHalfByteDataType<PrimType>()) {
+            repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
+        } else {
+            repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+        }
     } else {                         // L1 -> UB, L1 -> BT, L1 -> FB
         if (dstHWPos == Hardware::UB) {
-            repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
-        } else if (dstHWPos == Hardware::BIAS) {
-            repeatParams.blockLen = count / (64 / sizeof(PrimType));   // BT blockLen is in unit of 64B
-        } else if (dstHWPos == Hardware::FIXBUF) {
-            repeatParams.blockLen = count / (128 / sizeof(PrimType));  // FB blockLen is in unit of 128B
+            if constexpr (IsHalfByteDataType<PrimType>()) {
+                repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
+            } else {
+                repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+            }
+        } else if (dstHWPos == Hardware::BIAS) {  // BT blockLen is in unit of 64B
+            if constexpr (IsHalfByteDataType<PrimType>()) {
+                repeatParams.blockLen = count / (64 * ConstantsInternal::INT4_TWO / sizeof(PrimType));
+            } else {
+                repeatParams.blockLen = count / (64 / sizeof(PrimType));
+            }
+        } else if (dstHWPos == Hardware::FIXBUF) {  // FB blockLen is in unit of 128B
+            if constexpr (IsHalfByteDataType<PrimType>()) {
+                repeatParams.blockLen = count / (128 * ConstantsInternal::INT4_TWO / sizeof(PrimType));
+            } else {
+                repeatParams.blockLen = count / (128 / sizeof(PrimType));
+            }
         }
     }
 #endif
