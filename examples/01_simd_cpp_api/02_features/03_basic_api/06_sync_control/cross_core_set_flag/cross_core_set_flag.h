@@ -297,23 +297,20 @@ public:
     }
     __aicore__ inline void ProcessMode0()
     {
-        const uint32_t xAddr = 0;                                   // GM(initialData)  -> UB(xLocal), tensor address
-        const uint32_t yAddr = this->blockLength * sizeof(float);   // GM(atomicResult) -> UB(ylocal), tensor address
+        const uint32_t xAddr = 0;                                   
+        const uint32_t yAddr = this->blockLength * sizeof(float);   
 
         AscendC::LocalTensor<float> xLocal(AscendC::TPosition::VECCALC, xAddr, this->blockLength);
         AscendC::LocalTensor<float> yLocal(AscendC::TPosition::VECCALC, yAddr, this->blockLength);
-
-        // 1. Same data moves to each AIV.                           GM(initialData) -> UB(xLocal)     PIPE_MTE2
-        AscendC::DataCopy(xLocal, initialDataGm, this->blockLength);  // PIPE_MTE2
+                     
+        AscendC::DataCopy(xLocal, initialDataGm, this->blockLength); 
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-        // 2. Each AIV data multiply with its own blockIdx value.    UB(xLocal) computation            PIPE_V
-        AscendC::Muls(xLocal, xLocal, float(AscendC::GetBlockIdx()), this->blockLength);    // PIPE_V
+        AscendC::Muls(xLocal, xLocal, float(AscendC::GetBlockIdx()), this->blockLength);
         AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-        // 3. Each AIV data move to GM with atomic add.              UB(xLocal) -> GM(atomicResult)    PIPE_MTE3
         // UB 到 GM 搬运启用原子累加：搬运至 atomicResult 的数据与原值累加后覆盖原值
         AscendC::SetAtomicAdd<float>(); 
         // DataCopy属于PIPE_MTE3流水操作
@@ -337,30 +334,28 @@ public:
     {
         // 16个aiv，GetBlockIdx取值为0-15。
          if ((AscendC::GetBlockIdx() == 2)||(AscendC::GetBlockIdx() == 3)) {
-            const uint32_t xAddr = 0;                                   // GM(initialData)  -> UB(xLocal), tensor address
-            const uint32_t yAddr = this->blockLength * sizeof(float);   // GM(atomicResult) -> UB(ylocal), tensor address
+            const uint32_t xAddr = 0;                                   
+            const uint32_t yAddr = this->blockLength * sizeof(float);  
 
             AscendC::LocalTensor<float> xLocal(AscendC::TPosition::VECCALC, xAddr, this->blockLength);
             AscendC::LocalTensor<float> yLocal(AscendC::TPosition::VECCALC, yAddr, this->blockLength);
 
-            // 1. Same data moves to each AIV.                           GM(initialData) -> UB(xLocal)     PIPE_MTE2
-            AscendC::DataCopy(xLocal, initialDataGm, this->blockLength);  // PIPE_MTE2
+            AscendC::DataCopy(xLocal, initialDataGm, this->blockLength);
             AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-            AscendC::Muls(xLocal, xLocal, float(AscendC::GetBlockIdx()), this->blockLength);   // PIPE_V
+            AscendC::Muls(xLocal, xLocal, float(AscendC::GetBlockIdx()), this->blockLength);
             AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-            // 3. Each AIV data move to GM with atomic add.              UB(xLocal) -> GM(atomicResult)    PIPE_MTE3
             AscendC::SetAtomicAdd<float>();
-            AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);   // PIPE_MTE3
-            AscendC::CrossCoreSetFlag<1, PIPE_MTE3>(0);  // Set flag to notify other aiv in same AI Core that current aiv has finished DataCopy process
-            AscendC::CrossCoreWaitFlag(0);               // Block current aiv until all aiv in same AI Core finish DataCopy process
+            AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
+            AscendC::CrossCoreSetFlag<1, PIPE_MTE3>(0);  
+            AscendC::CrossCoreWaitFlag(0);             
             AscendC::SetAtomicNone();
 
             if (AscendC::GetBlockIdx() == 2) {
-                AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);   // PIPE_MTE2
+                AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength); 
                 AscendC::printf("============== In PrintTensor Process AIV %d ==============", AscendC::GetBlockIdx());
                 AscendC::DumpTensor(yLocal, AscendC::GetBlockIdx(), this->blockLength);
                 AscendC::DataCopy(atomicResultGm, yLocal, this->blockLength);
