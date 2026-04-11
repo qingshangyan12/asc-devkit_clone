@@ -362,9 +362,10 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
  * @param [in] intriParams.src1RepStride src repeat stride
  */
 // AddReluCast::Level 0 - mask count mode
-template <typename T, typename U, bool isSetMask>
-__aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
-    const LocalTensor<U>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask, typename MaskType>
+__aicore__ inline void AddReluCastMaskMode(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
+    const LocalTensor<U>& src1, MaskType mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams,
+    KernelFuncType kernelFuncType)
 {
     using MaskCheckType = typename Conditional<(sizeof(PrimT<T>) >= sizeof(PrimT<U>)), PrimT<T>, PrimT<U>>::type;
 #if __NPU_ARCH__ == 2201
@@ -374,48 +375,38 @@ __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("AddReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "AddReluCast");
+    if constexpr (std::is_pointer<MaskType>::value) { CheckMaskArray<MaskCheckType, isSetMask>(mask, "AddReluCast"); }
+    else { CheckMaskValue<MaskCheckType, isSetMask>(mask, "AddReluCast"); }
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinaryCmp(dst, src0, src1, mask, repeatTime, repeatParams, "AddReluCast")) {
-        ASCENDC_REPORT_CHECK_ERROR("AddReluCast", KernelFuncType::MASK_COUNT_MODE);
+        ASCENDC_REPORT_CHECK_ERROR("AddReluCast", kernelFuncType);
     }
 #endif
 #ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask, repeatTime, repeatParams, isSetMask, "AddReluCast");
+    if constexpr (std::is_pointer<MaskType>::value) {
+        MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask, "AddReluCast");
+    } else { MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask, repeatTime, repeatParams, isSetMask, "AddReluCast"); }
 #endif
     AddReluCastImpl<PrimT<T>, PrimT<U>, isSetMask>((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<U>*)src0.GetPhyAddr(),
         (__ubuf__ PrimT<U>*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-// AddReluCast::Level 0 - mask bit mode
+template <typename T, typename U, bool isSetMask>
+__aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
+    const LocalTensor<U>& src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+    AddReluCastMaskMode<T, U, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams, KernelFuncType::MASK_COUNT_MODE);
+}
+
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
     const LocalTensor<U>& src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    using MaskCheckType = typename Conditional<(sizeof(PrimT<T>) >= sizeof(PrimT<U>)), PrimT<T>, PrimT<U>>::type;
-#if __NPU_ARCH__ == 2201
-    if (g_coreType == AIC) {
-        return;
-    }
-#endif
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckVectorTensor("AddReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "AddReluCast");
-#endif
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFuncVecBinaryCmp(dst, src0, src1, mask, repeatTime, repeatParams, "AddReluCast")) {
-        ASCENDC_REPORT_CHECK_ERROR("AddReluCast", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask, "AddReluCast");
-#endif
-    AddReluCastImpl<PrimT<T>, PrimT<U>, isSetMask>((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<U>*)src0.GetPhyAddr(),
-        (__ubuf__ PrimT<U>*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
+    AddReluCastMaskMode<T, U, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams, KernelFuncType::MASK_BIT_MODE);
 }
 
 /*
@@ -478,47 +469,23 @@ __aicore__ inline bool BypassSubReluCastOnAicCore()
 #endif
 }
 
-template <typename T, typename U>
-__aicore__ inline void CheckSubReluCastVectorTensor(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
-    const LocalTensor<U>& src1)
+template <typename MaskCheckType, bool isSetMask, typename MaskType>
+__aicore__ inline void CheckSubReluCastMask(MaskType mask)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    if constexpr (std::is_pointer<MaskType>::value) { CheckMaskArray<MaskCheckType, isSetMask>(mask, "SubReluCast"); }
+    else { CheckMaskValue<MaskCheckType, isSetMask>(mask, "SubReluCast"); }
 #endif
 }
 
-template <typename MaskCheckType, bool isSetMask>
-__aicore__ inline void CheckSubReluCastMask(uint64_t mask)
-{
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "SubReluCast");
-#endif
-}
-
-template <typename MaskCheckType, bool isSetMask>
-__aicore__ inline void CheckSubReluCastMask(uint64_t* mask)
-{
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "SubReluCast");
-#endif
-}
-
-template <typename T, typename U, bool isSetMask>
+template <typename T, typename U, bool isSetMask, typename MaskType>
 __aicore__ inline void ReportSubReluCastMstx(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
-    const LocalTensor<U>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    const LocalTensor<U>& src1, MaskType mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
 #ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask, repeatTime, repeatParams, isSetMask, "SubReluCast");
-#endif
-}
-
-template <typename T, typename U, bool isSetMask>
-__aicore__ inline void ReportSubReluCastMstx(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
-    const LocalTensor<U>& src1, uint64_t* mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
-{
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask,
-        "SubReluCast");
+    if constexpr (std::is_pointer<MaskType>::value) {
+        MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask, "SubReluCast");
+    } else { MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask, repeatTime, repeatParams, isSetMask, "SubReluCast"); }
 #endif
 }
 
@@ -531,10 +498,10 @@ __aicore__ inline void SubReluCastMaskMode(const LocalTensor<T>& dst, const Loca
     using SrcPrimType = PrimT<U>;
     using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)),
         DstPrimType, SrcPrimType>::type;
-    if (BypassSubReluCastOnAicCore()) {
-        return;
-    }
-    CheckSubReluCastVectorTensor(dst, src0, src1);
+    if (BypassSubReluCastOnAicCore()) { return; }
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+#endif
     CheckSubReluCastMask<MaskCheckType, isSetMask>(mask);
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -548,23 +515,18 @@ __aicore__ inline void SubReluCastMaskMode(const LocalTensor<T>& dst, const Loca
         repeatParams);
 }
 
-// AddReluCast::Level 0 - mask count mode
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
     const LocalTensor<U>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    SubReluCastMaskMode<T, U, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams,
-        KernelFuncType::MASK_COUNT_MODE);
+    SubReluCastMaskMode<T, U, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams, KernelFuncType::MASK_COUNT_MODE);
 }
 
-// SubReluCast::Level 0 - mask bit mode
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
-    const LocalTensor<U>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+    const LocalTensor<U>& src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    SubReluCastMaskMode<T, U, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams,
-        KernelFuncType::MASK_BIT_MODE);
+    SubReluCastMaskMode<T, U, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams, KernelFuncType::MASK_BIT_MODE);
 }
 
 /*
@@ -579,8 +541,7 @@ template <typename T, typename U>
 __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
     const LocalTensor<U>& src1, const uint32_t count)
 {
-    using DstPrimType = PrimT<T>;
-    using SrcPrimType = PrimT<U>;
+    using DstPrimType = PrimT<T>; using SrcPrimType = PrimT<U>;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
         return;

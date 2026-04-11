@@ -1242,8 +1242,8 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U
     static_assert((Std::is_same<PrimDstType, half>::value && Std::is_same<PrimSrcType, int32_t>::value) &&
         "Failed to check dtype in AddDeqRelu, current api support dtype combination is src: int32_t, dst: half.");
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckCalcount(count, "count", "AddDeqRelu");    
     CheckVectorTensor("AddDeqRelu", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckCalcount(count, "count", "AddDeqRelu");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryDiffType(dst, src0, src1, count, "AddDeqRelu")) {
