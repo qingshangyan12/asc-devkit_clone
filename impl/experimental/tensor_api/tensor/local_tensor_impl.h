@@ -103,6 +103,16 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
         return Data()[Layout()(coord)];
     }
 
+    template <typename Coord>
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
+        return operator()(coord, EmptyShape<LayoutType::depth>{});
+    }
+
+    template <typename Coord>
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
+        return operator()(coord, EmptyShape<LayoutType::depth>{});
+    }
+
     template <typename Coord0, typename Coord1, typename... Coords>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) {
         return operator()(MakeCoord(c0,c1,cs...));
