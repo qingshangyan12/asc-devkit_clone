@@ -1,8 +1,4 @@
 name: py312
-channels:
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free
-  - nodefaults
 dependencies:
   - python=3.12
   - pip
@@ -20,11 +16,11 @@ dependencies:
     - PyYAML
     - ruamel.yaml
     - jinja2
-    - Path
-    - dataclasses
     - coverage
     - pytest
     - cloudpickle
     - build
-    - protobuf
+    - onnx==1.16.0
+    - protobuf==3.20.3
     - torch==2.7.1
+    - expecttest

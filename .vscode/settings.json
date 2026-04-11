@@ -9,6 +9,7 @@
     "cmake.buildDirectory": "${workspaceFolder}/build",
     "files.associations": {
         "*.asc": "cpp",
+        "*.aicpu": "cpp",
         ".clang-format": "yaml",
         ".clangd": "yaml",
         "*requirements*.txt": "pip-requirements"

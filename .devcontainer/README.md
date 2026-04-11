@@ -10,6 +10,10 @@ Ubuntu 24.04 development environment for AscendC NPU kernel development.
 | docker buildx | any |
 | Ascend driver | installed on host |
 
+> The Ascend **driver** is installed on the host and mounted read-only into the container (`/usr/local/Ascend/driver`, `/usr/local/Ascend/add-ons`).
+>
+> The **CANN toolkit and ops packages** should be installed inside the container, not on the host. Installing CANN on the host risks overwriting a shared environment when multiple developers use the same machine. After opening the container, install the matching CANN packages **manually**.
+
 Check your Docker version:
 ```bash
 docker --version
@@ -26,6 +30,8 @@ chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 
 ## Build the Image
 
+> **Build time:** approximately 5 minutes on a typical connection. The dominant cost is downloading the conda environment and PyTorch. Subsequent rebuilds hit the Docker layer cache and complete in seconds if only non-package layers changed.
+
 ```bash
 docker buildx build --network host -t ascendc:ubuntu24.04 .devcontainer/
 ```
@@ -41,13 +47,15 @@ docker buildx build --network host \
 
 Available mirrors:
 
-| | Huawei (default) | Tsinghua | USTC |
-|-|------------------|----------|------|
-| APT | `mirrors.huaweicloud.com` | `mirrors.tuna.tsinghua.edu.cn` | `mirrors.ustc.edu.cn` |
-| Conda | — | `mirrors.tuna.tsinghua.edu.cn/anaconda` | `mirrors.ustc.edu.cn/anaconda` |
-| PyPI | `repo.huaweicloud.com/repository/pypi/simple` | `pypi.tuna.tsinghua.edu.cn/simple` | `pypi.mirrors.ustc.edu.cn/simple` |
+| Build arg | Default | Tsinghua | USTC | Huawei |
+|-----------|---------|----------|------|--------|
+| `APT_MIRROR` | `mirrors.huaweicloud.com` | `mirrors.tuna.tsinghua.edu.cn` | `mirrors.ustc.edu.cn` | `mirrors.huaweicloud.com` |
+| `CONDA_MIRROR` | `mirrors.tuna.tsinghua.edu.cn/anaconda` | `mirrors.tuna.tsinghua.edu.cn/anaconda` | `mirrors.ustc.edu.cn/anaconda` | — |
+| `PYPI_MIRROR` | `repo.huaweicloud.com/repository/pypi/simple` | `pypi.tuna.tsinghua.edu.cn/simple` | `pypi.mirrors.ustc.edu.cn/simple` | `repo.huaweicloud.com/repository/pypi/simple` |
 
 ## Open in VS Code
+
+> If the image has not been built manually, VS Code will build it automatically on first open — expect the same ~5 minute build time.
 
 Install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension, then:
 
@@ -57,11 +65,10 @@ Ctrl+Shift+P → Dev Containers: Reopen in Container
 
 ## Python Environments
 
-Two conda environments are pre-installed:
+One conda environment is pre-installed:
 
 | Environment | Python | PyTorch |
 |-------------|--------|---------|
-| `py310` | 3.10 | 2.6.0 |
 | `py312` | 3.12 | 2.7.1 |
 
 Default active environment is `py312`.
