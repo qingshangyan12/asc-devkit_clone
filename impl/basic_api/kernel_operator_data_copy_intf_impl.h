@@ -733,12 +733,19 @@ __aicore__ inline void DataCopyCheck(const uint32_t count, DataCopyParams& repea
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
     } else
 #endif
-    {
-        ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
-            "check count value in DataCopy from GlobalTensor to LocalTensor or from LocalTensor to GlobalTensor, "
-            "count * sizeof(T) must be 32B align, current count value is %u. "
+    if constexpr(Std::is_same<PrimType, uint4b_t>::value) {
+        ASCENDC_DEBUG_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check count value in DataCopy from GlobalTensor to LocalTensor or from LocalTensor to "
+            "GlobalTensor, count must be 32B align for half-byte data type, current count value is %u. "
             "In NPU mode, no error is reported. The value is rounded down by 32B.",
-            count); });
+            count));
+        repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
+    } else {
+        ASCENDC_DEBUG_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), KERNEL_LOG_INTERNAL(
+            KERNEL_ERROR, "Failed to check count value in DataCopy from GlobalTensor to LocalTensor or from "
+            "LocalTensor to GlobalTensor, count * sizeof(T) must be 32B align, current count value is %u. "
+            "In NPU mode, no error is reported. The value is rounded down by 32B.",
+            count));
         repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
     }
 }
@@ -788,9 +795,12 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
-        "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
-        "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
+    if constexpr(Std::is_same<PrimType, uint4b_t>::value) {
+        count = count / 2;
+    }
+    ASCENDC_DEBUG_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B "
+        "align, current count value is %u. In NPU mode, no error is reported. The value is roundeddown by 32B.",
         count); });
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
     struct DataCopyParams repeatParams;
