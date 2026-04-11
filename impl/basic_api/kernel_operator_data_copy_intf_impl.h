@@ -708,6 +708,16 @@ template <typename T>
 __aicore__ inline void DataCopyCheck(const uint32_t count, DataCopyParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+    if constexpr (Std::is_same<PrimType, int4b_t>::value) {
+        ASCENDC_DEBUG_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check count value in DataCopy from GlobalTensor to LocalTensor or from LocalTensor to "
+            "GlobalTensor, count must be 32B align for half-byte data type, current count value is %u. "
+            "In NPU mode, no error is reported. The value is rounded down by 32B.",
+            count));
+        uint32_t alignedCount = AlignUp(count, ConstantsInternal::ONE_BLK_FP4_NUM);
+        repeatParams.blockLen = alignedCount / ConstantsInternal::ONE_BLK_FP4_NUM;
+        return;
+    }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
     if constexpr(Std::is_same<PrimType, int2b_t>::value) {
         ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_B2_NUM == 0),
@@ -719,7 +729,7 @@ __aicore__ inline void DataCopyCheck(const uint32_t count, DataCopyParams& repea
             { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
                     In NPU mode, no error is reported. The value is rounded down by 32B.", count); });
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_B1_NUM;
-    } else if constexpr (Std::is_same<PrimType, fp4x2_e2m1_t>::value || Std::is_same<PrimType, fp4x2_e1m2_t>::value || Std::is_same<PrimType, int4b_t>::value) {
+    } else if constexpr (Std::is_same<PrimType, fp4x2_e2m1_t>::value || Std::is_same<PrimType, fp4x2_e1m2_t>::value) {
         ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0),
             { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
                     In NPU mode, no error is reported. The value is rounded down by 32B.", count); });
@@ -788,28 +798,40 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
-        "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
-        "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
-        count); });
-    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
+    uint32_t alignedCount = count;
+    if constexpr (Std::is_same<PrimType, int4b_t>::value) {
+        ASCENDC_DEBUG_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check count value in DataCopy from LocalTensor to LocalTensor, count must be 32B align for "
+            "half-byte data type, current count value is %u. In NPU mode, no error is reported. The value is "
+            "roundeddown by 32B.",
+            count));
+        alignedCount = AlignUp(count, ConstantsInternal::ONE_BLK_FP4_NUM);
+        alignedCount = alignedCount / INT4_TWO;
+    } else {
+        ASCENDC_DEBUG_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), KERNEL_LOG_INTERNAL(
+            KERNEL_ERROR, "Failed to check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) "
+            "must be 32B align, current count value is %u. In NPU mode, no error is reported. The value is "
+            "roundeddown by 32B.",
+            count));
+    }
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, alignedCount)));
     struct DataCopyParams repeatParams;
 
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
-    repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(T));
+    repeatParams.blockLen = alignedCount / AscendCUtils::GetC0Count(sizeof(T));
 #else
     if (srcHWPos != Hardware::L1) {  // UB -> UB, UB -> L1
-        repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+        repeatParams.blockLen = alignedCount / AscendCUtils::GetC0Count(sizeof(PrimType));
     } else {                         // L1 -> UB, L1 -> BT, L1 -> FB
         if (dstHWPos == Hardware::UB) {
-            repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+            repeatParams.blockLen = alignedCount / AscendCUtils::GetC0Count(sizeof(PrimType));
         } else if (dstHWPos == Hardware::BIAS) {
-            repeatParams.blockLen = count / (64 / sizeof(PrimType));   // BT blockLen is in unit of 64B
+            repeatParams.blockLen = alignedCount / (64 / sizeof(PrimType));   // BT blockLen is in unit of 64B
         } else if (dstHWPos == Hardware::FIXBUF) {
-            repeatParams.blockLen = count / (128 / sizeof(PrimType));  // FB blockLen is in unit of 128B
+            repeatParams.blockLen = alignedCount / (128 / sizeof(PrimType));  // FB blockLen is in unit of 128B
         }
     }
 #endif

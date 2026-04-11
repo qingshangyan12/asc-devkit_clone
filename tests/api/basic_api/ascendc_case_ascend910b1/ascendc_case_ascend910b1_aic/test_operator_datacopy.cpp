@@ -122,6 +122,83 @@ TEST_P(DataCopyL12L0cTestsuite, DataCopyL12L0cOpTestCase)
 }
 
 namespace AscendC {
+template <typename T, TPosition SrcPos, TPosition DstPos> class KernelDataCopyL12Local {
+public:
+    __aicore__ inline KernelDataCopyL12Local() = default;
+    __aicore__ inline void Init(__gm__ uint8_t* srcGm)
+    {
+        srcGlobal.SetGlobalBuffer((__gm__ T*)srcGm);
+    }
+    __aicore__ inline void Process()
+    {
+        LocalMemAllocator<Hardware::L1> srcAllocator;
+        LocalTensor<T> srcLocal = srcAllocator.template Alloc<SrcPos, T>(512);
+        DataCopy(srcLocal, srcGlobal, 512);
+        if constexpr (DstPos == TPosition::C2) {
+            LocalMemAllocator<Hardware::BIAS> dstAllocator;
+            LocalTensor<T> dstLocal = dstAllocator.template Alloc<T>(128);
+            DataCopy(dstLocal, srcLocal, 128);
+        } else {
+            LocalMemAllocator<Hardware::FIXBUF> dstAllocator;
+            LocalTensor<T> dstLocal = dstAllocator.template Alloc<T>(128);
+            DataCopy(dstLocal, srcLocal, 128);
+        }
+    }
+
+private:
+    GlobalTensor<T> srcGlobal;
+};
+} // namespace AscendC
+
+template <typename T, TPosition SrcPos, TPosition DstPos>
+__global__ __aicore__ void MainDataCopyL12Local(__gm__ uint8_t* srcGm)
+{
+    AscendC::KernelDataCopyL12Local<T, SrcPos, DstPos> op;
+    op.Init(srcGm);
+    op.Process();
+}
+
+struct DataCopyL12LocalTestParams {
+    int32_t typeSize;
+    void (*CalFunc)(__gm__ uint8_t*);
+};
+
+class DataCopyL12LocalTestsuite : public testing::Test,
+    public testing::WithParamInterface<DataCopyL12LocalTestParams> {
+protected:
+    void SetUp()
+    {
+        g_coreType = AIC_TYPE;
+    }
+    void TearDown()
+    {
+        AscendC::CheckSyncState();
+        g_coreType = MIX_TYPE;
+    }
+};
+
+INSTANTIATE_TEST_CASE_P(TEST_OPEARATION_DATACOPYL12LOCAL, DataCopyL12LocalTestsuite,
+    ::testing::Values(DataCopyL12LocalTestParams { 4, MainDataCopyL12Local<float, TPosition::C1, TPosition::C2> },
+        DataCopyL12LocalTestParams { 4, MainDataCopyL12Local<float, TPosition::B1, TPosition::C2PIPE2GM> },
+        DataCopyL12LocalTestParams { 2, MainDataCopyL12Local<half, TPosition::C1, TPosition::C2> },
+        DataCopyL12LocalTestParams { 2, MainDataCopyL12Local<half, TPosition::A1, TPosition::C2PIPE2GM> },
+        DataCopyL12LocalTestParams { 2, MainDataCopyL12Local<half, TPosition::B1, TPosition::C2PIPE2GM> },
+        DataCopyL12LocalTestParams { 2, MainDataCopyL12Local<half, TPosition::C1, TPosition::C2PIPE2GM> },
+        DataCopyL12LocalTestParams { 4, MainDataCopyL12Local<int32_t, TPosition::C1, TPosition::C2> },
+        DataCopyL12LocalTestParams { 4, MainDataCopyL12Local<int32_t, TPosition::A1, TPosition::C2PIPE2GM> },
+        DataCopyL12LocalTestParams { 4, MainDataCopyL12Local<int32_t, TPosition::B1, TPosition::C2PIPE2GM> },
+        DataCopyL12LocalTestParams { 2, MainDataCopyL12Local<bfloat16_t, TPosition::C1, TPosition::C2> },
+        DataCopyL12LocalTestParams { 2, MainDataCopyL12Local<bfloat16_t, TPosition::B1, TPosition::C2PIPE2GM> }));
+
+TEST_P(DataCopyL12LocalTestsuite, DataCopyL12LocalOpTestCase)
+{
+    auto param = GetParam();
+    uint8_t srcGm[512 * param.typeSize] = {0};
+
+    param.CalFunc(srcGm);
+}
+
+namespace AscendC {
 // T, U for gm->l1 nd2nz
 template <typename T> class KernelDataCopyGm2L1Nd2Nz {
 public:
