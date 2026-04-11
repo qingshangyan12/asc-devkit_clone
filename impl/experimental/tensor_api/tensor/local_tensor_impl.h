@@ -124,18 +124,34 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     }
 
 	template <typename Coord, typename InfoType>
- 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const InfoType& info) {
+ 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
  	    auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeTileLayout(coord, Layout(), info);
+ 	    auto tileLayout = MakeTileLayout(coord, Layout());
  	    return MakeTensor(iter, tileLayout);
  	}
  	 
  	template <typename Coord, typename InfoType>
- 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const InfoType& info) const {
+ 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
  	    auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeTileLayout(coord, Layout(), info);
- 	    return MakeTensor(iter, tileLayout);
+ 	    auto coordLayout = MakeCoordLayout(coord, Layout());
+ 	    return MakeTensor(iter, coordLayout);
  	}
+
+    template <typename Coord, typename InfoType>
+ 	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Shape& shape) {
+        auto iter = Data() + Layout()(coord);
+        auto coordLayout = MakeCoordLayout(coord, Layout());
+        auto tileLayout = MakeTileLayout(coordLayout, shape);
+        return MakeTensor(iter, tileLayout);
+ 	} 
+
+    template <typename Coord, typename Layout, >
+ 	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Layout& layout) {
+        auto iter = Data() + Layout()(coord);
+        auto coordLayout = MakeCoordLayout(coord, Layout());
+        auto tileLayout = MakeTileLayout(coordLayout, layout);
+        return MakeTensor(iter, tileLayout);
+ 	} 
 
     template <typename... Layouts>
     __aicore__ inline constexpr auto Compose(const Layouts&... layouts) {

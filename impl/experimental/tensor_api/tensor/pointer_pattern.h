@@ -44,9 +44,19 @@ using PtrMemSet = TupleMap<
 template <typename PtrPattern, typename TraitType, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
+    using Arg = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
+    static_assert(!IsMemPtrIterator<Arg>::value, "MakeMemPtr expects a byteOffset. ");
+    
     using GetPtrMakeFun = typename PtrMemSet::template Get<PtrPattern>;
-    static_assert(!Std::is_same_v<GetPtrMakeFun, EmptyValue>, "Unsupported pointer pattern.");
-    return GetPtrMakeFun::template Make<TraitType>(args...);
+    return GetPtrMakeFun::template Make<PtrPattern, TraitType>(args...);
+}
+
+template <typename PtrPattern, typename... Args>
+__aicore__ inline constexpr auto MakeMemPtr(Args... args)
+{
+    using Arg = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
+    static_assert(IsMemPtrIterator<Arg>::value, "MakeMemPtr<PtrPattern>(arg) expects an iterator/pointer");
+    return MakeHardwareMemPtr<PtrPattern>(args...);
 }
 
 } // namespace Te
