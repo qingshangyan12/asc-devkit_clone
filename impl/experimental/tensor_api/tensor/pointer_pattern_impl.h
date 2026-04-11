@@ -47,7 +47,7 @@ __aicore__ inline auto MakeHardwareMemPtrV2(Iterator iter)
 struct MakeGMMemPtr {
     template <typename PtrPattern, typename TraitType, typename Arg>
     __aicore__ inline static auto Make(const Arg& arg) {
-        static_assert(sizeof(Arg) == 0, "GMMemPtr does not support byteOffset construction.");
+        static_assert(false, "GMMemPtr does not support byteOffset construction.");
     }
 };
 
