@@ -19,13 +19,7 @@ add_executable(demo
     cross_core_set_flag.asc
 )
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
-message(STATUS "[INFO] M_SIZE is ${M_SIZE}")
-message(STATUS "[INFO] K_SIZE is ${K_SIZE}")
-message(STATUS "[INFO] N_SIZE is ${N_SIZE}")
 target_compile_definitions(demo PRIVATE
-    M_SIZE=${M_SIZE}
-    K_SIZE=${K_SIZE}
-    N_SIZE=${N_SIZE}
     SCENARIO_NUM=${SCENARIO_NUM}
 )
 

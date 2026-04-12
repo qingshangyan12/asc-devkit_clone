@@ -65,8 +65,65 @@
     <td>mode 2（AIC等AIV）、mode2（AIV等AIC）、mode0（AIC全核同步）</td>
   </tr>
 </table>
-本样例通过 `SCENARIO` 变量控制执行分支，该变量的不同取值对应不同的业务场景和同步模式。如上表所示，当 `SCENARIO` 取不同值时，会分别演示纯 Vector 计算场景和 Cube 与 Vector 融合计算场景下三种同步模式的具体使用方法。
+本样例通过SCENARIO控制执行分支，该变量的不同取值对应不同的业务场景和同步模式。如上表所示，当 SCENARIO取不同值时，会分别演示纯 Vector 计算场景和 Cube 与 Vector 融合计算场景下三种同步模式的具体使用方法。
 
+### 计算公式与样例规格
+
+#### SCENARIO=0（纯 Vector 计算场景，模式0）
+- 计算公式：
+  $$
+  z = \sum_{i=0}^{15} (x \times i)
+  $$
+  - x 为输入向量，全为1
+  - i 为每个AIV的BlockIdx（取值范围0-15）
+  - z 为所有AIV计算结果的累加值
+
+- 样例规格：
+  <table border="1" align="center">
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">CrossCoreSetFlagMode0</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[32]</td><td align="center">float32</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[32]</td><td align="center">float32</td><td align="center">ND</td></tr>
+  </table>
+
+#### SCENARIO=1（纯 Vector 计算场景，模式1）
+- 计算公式：
+  $$
+  z = (x \times 2) + (x \times 3)
+  $$
+  - x 为输入向量，全为1
+  - 仅BlockIdx=2和3的AIV参与计算
+  - z 为这两个AIV计算结果的累加值
+
+- 样例规格：
+  <table border="1" align="center">
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">CrossCoreSetFlagMode1</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[32]</td><td align="center">float32</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[32]</td><td align="center">float32</td><td align="center">ND</td></tr>
+  </table>
+
+#### SCENARIO=2（Cube 与 Vector 融合计算场景）
+- 计算公式：
+  $$
+  C = \text{LeakyRelu}(Cast(A) \times Cast(B))
+  $$
+  - A 为左矩阵，形状为[M, K]，数据类型为uint8
+  - B 为右矩阵，形状为[K, N]，数据类型为uint8
+  - 首先将A和B数据类型从uint8转换为half
+  - 然后执行矩阵乘：A × B
+  - 最后对结果执行LeakyRelu运算
+  - C 为最终结果，形状为[M, N]，数据类型为float32
+
+- 样例规格：
+  <table border="1" align="center">
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">CrossCoreSetFlagMode2</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td align="center">a</td><td align="center">[32, 32]</td><td align="center">uint8</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">[32, 64]</td><td align="center">uint8</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[32, 64]</td><td align="center">float32</td><td align="center">ND</td><td align="center">-</td></tr>
+  </table>
+## 样例实现
 ### 1. Cube与Vector融合计算场景
 #### 1.1 整体逻辑
 <p align="center">
@@ -78,9 +135,9 @@
 
 本样例针对融合算子(配置__mix__(1,2))场景展开，每个AI Core内部有1个AIC和2个AIV。配置逻辑核数numBlocks = 8，对应 8 个 AIC 与 16 个 AIV。如图1所示，整体计算逻辑分为三个核心阶段：精度转换阶段、分块矩阵乘与原子累加阶段、LeakyRelu运算与结果回写阶段。
 #### 1.2 精度转换阶段(模式 2，单个AI Core内部AIC等AIV)
-由于GM上左右矩阵的数据类型为U8,并不满足mmad指令对输入数据类型的要求，需要先将GM上的数据搬运到AIV中进行精度转换后，才能在AIC中进行分块矩阵乘计算。因此，
+由于GM上左右矩阵的数据类型为uint8,并不满足mmad指令对输入数据类型的要求，需要先将GM上的数据搬运到AIV中进行精度转换后，才能在AIC中进行分块矩阵乘计算。因此，
 每个AI Core内部，一个AIC 需要等待该AI Core内部其它2 个 AIV 完成数据精度转换后，才能开始分块矩阵乘计算。
-具体来说：将 GM 中左矩阵(A矩阵)数据沿 K 轴切分 8 份，分配至 BlockIdx 为偶数的 AIV 中完成 U8 到 F16 的精度转换；将 GM 中右矩阵(B矩阵)数据沿 K 轴切分 8 份，分配至 BlockIdx 为奇数的 AIV 中完成 U8 到 F16 的精度转换。如图2所示，根据以上描述，需要使用核间同步模式2。
+具体来说：将 GM 中左矩阵(A矩阵)数据沿 K 轴切分 8 份，分配至 BlockIdx 为偶数的 AIV 中完成 uint8 到 half 的精度转换；将 GM 中右矩阵(B矩阵)数据沿 K 轴切分 8 份，分配至 BlockIdx 为奇数的 AIV 中完成 uint8 到 half 的精度转换。如图2所示，根据以上描述，需要使用核间同步模式2。
 上述描述对应的代码段如下：
 
         if (blockIdx % 2 == 0) {
@@ -132,14 +189,14 @@ $$
 图3：分块矩阵乘与原子累加阶段，模式0示意图
 </p>
 
-#### 1.4 LeakRelu 运算与结果回写阶段(模式 2，AIC等AIV)
+#### 1.4 LeakyRelu与结果回写阶段(模式 2，AIC等AIV)
 每个 AI Core 内部，2 个 AIV 需等待 AIC 完成分块矩阵乘及原子累加操作后，才能对C矩阵分块执行LeakyRelu运算。
-具体来说是对累加得到的C矩阵，沿 M 轴切分 16 份，分配至 16 个 AIV 中分别执行 LeakRelu 运算。如图4所示，根据以上描述，需要使用核间同步模式2（单个AI Core内部2个AIV等一个AIC）。上述描述对应的代码段如下：
+具体来说是对累加得到的C矩阵，沿 M 轴切分 16 份，分配至 16 个 AIV 中分别执行 LeakyRelu 运算。如图4所示，根据以上描述，需要使用核间同步模式2（单个AI Core内部2个AIV等一个AIC）。上述描述对应的代码段如下：
 
         // 模式2,每一个AICore内部，2个AIV等AIC
         AscendC::CrossCoreWaitFlag(SYNC_AIC_AIV_FLAG);
 
-        // 进行leakrelu运算
+        // 进行LeakyRelu运算
         float alpha = 0.001;
         ...
         AscendC::LeakyRelu(reluCLocal, cLocal, alpha, C_AIV_BLOCKS_LENGTH);
@@ -214,7 +271,8 @@ if ASCEND_IS_AIV {
 ```
 (2) [GetBlockIdx](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0185.html)(获取当前核的index)在AIC和AIV的取值范围不同，其取值与算子设置的逻辑核数和一个AI Core中的AIC与AIV的比例有关。本样例中设置NUM_BLOCKS=8、AIC与AIV的比例为1:2，因此GetBlockIdx在AIC和AIV的取值范围分别为0-7和0-15。
 
-(3) 样例采用[静态tensor编程范式](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850/opdevg/Ascendcopdevg/atlas_ascendc_10_00019.html)需要手动插入[核内同步](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0185.html)。
+(3) 样例采用[静态tensor编程范式](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850/opdevg/Ascendcopdevg/atlas_ascendc_10_00019.html)需要手动插入[核内同步](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0185.html)。另外，静态Tensor编程方式中需要开发者手动调用[InitSocState()](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_00094.html)接口初始化全局状态寄存器。
+
 #### 3.2 纯Vector计算场景
 (1) 在使用 CrossCoreSetFlag 与 CrossCoreWaitFlag 核间同步接口时，即使是纯 Vector 计算场景，核函数也不能使用__vector__ 修饰符。
 本样例核函数采用__mix__(1,2) 修饰，但在纯 Vector 场景下，由于仅执行矢量计算，必须通过 ASCEND_IS_AIV 宏确保程序仅在 AIV 核上运行，否则会导致程序卡死。
@@ -226,7 +284,7 @@ if ASCEND_IS_AIV {
 ```
  (2) 模式 1 要求参与同步的 2个AIV 必须属于同一个AI Core，否则程序会卡死。本样例中，参与同步的两个AIV的 GetBlockIdx=2、3 同属第 2 个 AI Core(下标从 1 开始)；若将GetBlockIdx改为 3 和 4(分别属于两个不同的AI Core)，程序将卡死。
 
- (3) 样例采用[静态tensor编程范式](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850/opdevg/Ascendcopdevg/atlas_ascendc_10_00019.html)需要手动插入[核内同步](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0185.html)。
+ (3) 样例采用[静态tensor编程范式](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850/opdevg/Ascendcopdevg/atlas_ascendc_10_00019.html)需要手动插入[核内同步](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0185.html)。另外，静态Tensor编程方式中需要开发者手动调用[InitSocState()](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_00094.html)接口初始化全局状态寄存器。
 ## 编译运行  
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
@@ -249,17 +307,17 @@ if ASCEND_IS_AIV {
 - 样例执行
   ```bash
   SCENARIO=0 #取值为0、1、2
-  M=256 K=1024 N=128 # Cube和Vector融合计算场景所需矩阵shape参数
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake .. -DSCENARIO_NUM=$SCENARIO -DM_SIZE=$M -DK_SIZE=$K -DN_SIZE=$N;make -j;             # 编译工程
-  if [ "$val" -eq 2 ]; then
+  cmake .. -DSCENARIO_NUM=$SCENARIO;make -j;             # 编译工程
+  if [ "$SCENARIO" -eq 2 ]; then
     echo "Cube和Vector融合计算场景"
-    python3 ../scripts/gen_data.py -m=$M -k=$K -n=$N   # 生成测试输入数据
+    python3 ../scripts/gen_data.py   # 生成测试输入数据
     ./demo                           # 执行编译生成的可执行程序，执行样例
     python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   else
     echo "纯Vector计算场景"
     ./demo                         # 执行样例
+  fi
   ```
   执行结果如下，说明精度对比成功。
   ```bash

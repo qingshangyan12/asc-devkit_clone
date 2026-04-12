@@ -20,8 +20,11 @@ def leaky_relu(x, alpha=0.001):
     # 计算Leaky ReLU
     return np.maximum(alpha * x, x)
 
-def gen_golden_data(M=0, K=0, N=0):
+def gen_golden_data():
     # 需要将左、右矩阵的K轴切分8次，分配到8个aicore中
+    M = 32
+    K = 32
+    N = 64
     num_Blocks = 8
     input_type = np.uint8
     temp_type = np.half
@@ -51,9 +54,4 @@ def gen_golden_data(M=0, K=0, N=0):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-m', type=int)
-    parser.add_argument('-k', type=int)
-    parser.add_argument('-n', type=int)
-    args = parser.parse_args()
-    gen_golden_data(args.m, args.k, args.n)
+    gen_golden_data()

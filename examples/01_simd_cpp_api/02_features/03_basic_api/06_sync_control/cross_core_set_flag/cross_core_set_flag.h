@@ -24,9 +24,9 @@
 
 constexpr uint32_t BUFFER_NUM = 1;
 
-constexpr uint32_t M = M_SIZE;
-constexpr uint32_t N = N_SIZE;
-constexpr uint32_t K = K_SIZE;
+constexpr uint32_t M = 32;
+constexpr uint32_t N = 64;
+constexpr uint32_t K = 32;
 constexpr uint32_t NUM_BLOCKS = 8;
 
 constexpr uint32_t A_BLOCKS_LENGTH = M * K / NUM_BLOCKS;
@@ -127,7 +127,7 @@ public:
         // 模式2,每一个AICore内部，2个AIV等AIC
         AscendC::CrossCoreWaitFlag(SYNC_AIC_AIV_FLAG);
 
-        // 进行leakrelu运算
+        // 进行LeakyRelu运算
         float alpha = 0.001;
         AscendC::DataCopy(cLocal, CVectorGM, C_AIV_BLOCKS_LENGTH); 
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
