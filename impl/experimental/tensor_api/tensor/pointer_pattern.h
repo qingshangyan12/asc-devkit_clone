@@ -21,7 +21,7 @@
 namespace AscendC {
 namespace Te {
 
-namespace Hardware {
+namespace HardWare {
     struct EmptyTrait {};
     struct GM {};
     struct UB {};
@@ -34,30 +34,30 @@ namespace Hardware {
 }
 
 using PtrMemSet = TupleMap<
-    Std::tuple<Hardware::UB, MakeUBMemPtr>,
-    Std::tuple<Hardware::L1, MakeL1MemPtr>,
-    Std::tuple<Hardware::L0A, MakeL0AMemPtr>,
-    Std::tuple<Hardware::L0B, MakeL0BMemPtr>,
-    Std::tuple<Hardware::L0C, MakeL0CMemPtr>,
-    Std::tuple<Hardware::Bias, MakeBiasMemPtr>,
-    Std::tuple<Hardware::Fixbuf, MakeFixbufMemPtr>>;
+    Std::tuple<HardWare::UB, MakeUBMemPtr>,
+    Std::tuple<HardWare::L1, MakeL1MemPtr>,
+    Std::tuple<HardWare::L0A, MakeL0AMemPtr>,
+    Std::tuple<HardWare::L0B, MakeL0BMemPtr>,
+    Std::tuple<HardWare::L0C, MakeL0CMemPtr>,
+    Std::tuple<HardWare::Bias, MakeBiasMemPtr>,
+    Std::tuple<HardWare::Fixbuf, MakeFixbufMemPtr>>;
 
-template <typename PtrPattern, typename TraitType, typename... Args>
+template <typename HardWare, typename TraitType, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
     using Arg = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
     static_assert(!IsMemPtrIterator<Arg>::value, "MakeMemPtr expects a byteOffset. ");
     
-    using GetPtrMakeFun = typename PtrMemSet::template Get<PtrPattern>;
-    return GetPtrMakeFun::template Make<PtrPattern, TraitType>(args...);
+    using GetPtrMakeFun = typename PtrMemSet::template Get<HardWare>;
+    return GetPtrMakeFun::template Make<HardWare, TraitType>(args...);
 }
 
-template <typename PtrPattern, typename... Args>
+template <typename HardWare, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
     using Arg = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
-    static_assert(IsMemPtrIterator<Arg>::value, "MakeMemPtr<PtrPattern>(arg) expects an iterator/pointer");
-    return MakeHardwareMemPtr<PtrPattern>(args...);
+    static_assert(IsMemPtrIterator<Arg>::value, "MakeMemPtr<HardWare>(arg) expects an iterator/pointer");
+    return MakeHardwareMemPtr<HardWare>(args...);
 }
 
 } // namespace Te
