@@ -185,8 +185,9 @@ __aicore__ inline constexpr decltype(auto) GetEleImpl(T&& t)
     }
 }
 
-template <size_t... Is, typename Tuple>
-__aicore__ inline constexpr decltype(auto) GetEle(Tuple&& t)
+template <size_t... Is, typename Tuple,
+    typename = Std::enable_if_t<Std::is_tuple_v<Tuple>>>
+__aicore__ inline constexpr decltype(auto) Get(Tuple&& t)
 {
     if constexpr (sizeof...(Is) == 0) {
         return GetEleImpl(GetTuple(static_cast<Tuple&&>(t)));

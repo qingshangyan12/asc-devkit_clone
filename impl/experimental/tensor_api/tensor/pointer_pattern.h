@@ -34,7 +34,6 @@ namespace Hardware {
 }
 
 using PtrMemSet = TupleMap<
-    Std::tuple<Hardware::GM, MakeGMMemPtr>,
     Std::tuple<Hardware::UB, MakeUBMemPtr>,
     Std::tuple<Hardware::L1, MakeL1MemPtr>,
     Std::tuple<Hardware::L0A, MakeL0AMemPtr>,
