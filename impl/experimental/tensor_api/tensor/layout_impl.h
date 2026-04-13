@@ -32,7 +32,7 @@ namespace AscendC {
 namespace Te {
 
 template <typename LayoutType, typename TileShape, Std::enable_if_t<!is_layout_v<TileShape>, int> = 0>
-__aicore__ inline decltype(auto) MakeTileLayout(const LayoutType& layout, const TileShape& tileShape) 
+__aicore__ inline decltype(auto) MakeSliceLayout(const LayoutType& layout, const TileShape& tileShape) 
 {
     static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
     using OriginShape = Std::remove_cvref_t<decltype(layout.Shape())>;
@@ -59,7 +59,7 @@ __aicore__ inline decltype(auto) MakeTileLayout(const LayoutType& layout, const 
 }
 
 template <typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<is_layout_v<DstLayoutType>, int> = 0>
-__aicore__ inline decltype(auto) MakeTileLayout(const SrcLayoutType& srcLayout, const DstLayoutType& dstLayout) 
+__aicore__ inline decltype(auto) MakeSliceLayout(const SrcLayoutType& srcLayout, const DstLayoutType& dstLayout) 
 {
     static_assert(is_layout_v<SrcLayoutType>, "SrcLayoutType must be Layout");
     static_assert(Std::remove_cvref_t<SrcLayoutType>::rank == Std::remove_cvref_t<DstLayoutType>::rank,

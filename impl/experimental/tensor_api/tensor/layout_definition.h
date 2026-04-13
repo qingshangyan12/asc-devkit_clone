@@ -50,9 +50,6 @@ struct DefaultInfo {};
 template <typename T, typename U, typename Info = DefaultInfo>
 struct Layout : private Std::tuple<T, U>
 {
-private:
-    using tag = Info;
-
 public:
     static constexpr auto size = StaticLayoutSize<T, U>::size;
     static constexpr auto depth = nesting_depth_v<T>;
@@ -121,6 +118,8 @@ public:
     {
         return TupleSize<I...>(Shape());
     }
+private:
+    using tag = Info;
 };
 
 template <typename T>

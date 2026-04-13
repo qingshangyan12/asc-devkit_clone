@@ -131,7 +131,7 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
  	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) {
         auto iter = Data() + Layout()(coord);
  	    auto coordLayout = MakeCoordLayout(coord, Layout());
- 	    auto tileLayout = MakeTileLayout(coordLayout, info);
+ 	    auto tileLayout = MakeSliceLayout(coordLayout, info);
  	    return MakeTensor(iter, tileLayout);
  	}
 
@@ -139,7 +139,7 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
  	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const{
         auto iter = Data() + Layout()(coord);
  	    auto coordLayout = MakeCoordLayout(coord, Layout());
- 	    auto tileLayout = MakeTileLayout(coordLayout, info);
+ 	    auto tileLayout = MakeSliceLayout(coordLayout, info);
  	    return MakeTensor(iter, tileLayout);
  	}
 
