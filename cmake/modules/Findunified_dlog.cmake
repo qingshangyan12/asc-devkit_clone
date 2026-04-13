@@ -39,6 +39,9 @@ unset(_cmake_expected_targets)
 
 find_path(unified_dlog_INCLUDE_DIR
     NAMES base/dlog_pub.h
+    PATHS
+        "${ASCEND_CANN_PACKAGE_ENV_PATH}"
+        "${ASCEND_CANN_PACKAGE_PATH}"
     PATH_SUFFIXES pkg_inc
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH)
@@ -79,19 +82,19 @@ if(unified_dlog_FOUND)
     if(_unified_dlog_is_imported)
         set_target_properties(unified_dlog PROPERTIES
             INTERFACE_COMPILE_DEFINITIONS "PROCESS_LOG"
-            INTERFACE_LINK_LIBRARIES "unified_dlog_headers"
+            INTERFACE_INCLUDE_DIRECTORIES "${unified_dlog_INCLUDE_DIR};${unified_dlog_INCLUDE_DIR}/base"
             IMPORTED_LOCATION "${unified_dlog_SHARED_LIBRARY}"
         )
     else()
         set_target_properties(unified_dlog PROPERTIES
             INTERFACE_COMPILE_DEFINITIONS "PROCESS_LOG"
-            INTERFACE_LINK_LIBRARIES "unified_dlog_headers"
+            INTERFACE_INCLUDE_DIRECTORIES "${unified_dlog_INCLUDE_DIR};${unified_dlog_INCLUDE_DIR}/base"
         )
     endif()
 
     include(CMakePrintHelpers)
     cmake_print_properties(TARGETS unified_dlog
-        PROPERTIES INTERFACE_COMPILE_DEFINITIONS INTERFACE_LINK_LIBRARIES IMPORTED_LOCATION
+        PROPERTIES INTERFACE_COMPILE_DEFINITIONS INTERFACE_INCLUDE_DIRECTORIES IMPORTED_LOCATION
     )
     cmake_print_properties(TARGETS unified_dlog_headers
         PROPERTIES INTERFACE_INCLUDE_DIRECTORIES

@@ -86,12 +86,12 @@ if(mmpa_FOUND)
     get_target_property(_mmpa_is_imported mmpa IMPORTED)
     if(_mmpa_is_imported)
         set_target_properties(mmpa PROPERTIES
-            INTERFACE_LINK_LIBRARIES "mmpa_headers"
+            INTERFACE_INCLUDE_DIRECTORIES "${mmpa_INCLUDE_DIR};${mmpa_INCLUDE_DIR}/mmpa;${mmpa_INCLUDE_DIR}/mmpa/sub_inc"
             IMPORTED_LOCATION "${mmpa_SHARED_LIBRARY}"
         )
     else()
         set_target_properties(mmpa PROPERTIES
-            INTERFACE_LINK_LIBRARIES "mmpa_headers"
+            INTERFACE_INCLUDE_DIRECTORIES "${mmpa_INCLUDE_DIR};${mmpa_INCLUDE_DIR}/mmpa;${mmpa_INCLUDE_DIR}/mmpa/sub_inc"
         )
     endif()
 
@@ -101,21 +101,21 @@ if(mmpa_FOUND)
     get_target_property(_static_mmpa_is_imported static_mmpa IMPORTED)
     if(_static_mmpa_is_imported)
         set_target_properties(static_mmpa PROPERTIES
-            INTERFACE_LINK_LIBRARIES "mmpa_headers"
+            INTERFACE_INCLUDE_DIRECTORIES "${mmpa_INCLUDE_DIR};${mmpa_INCLUDE_DIR}/mmpa;${mmpa_INCLUDE_DIR}/mmpa/sub_inc"
             IMPORTED_LOCATION "${mmpa_STATIC_LIBRARY}"
         )
     else()
         set_target_properties(static_mmpa PROPERTIES
-            INTERFACE_LINK_LIBRARIES "mmpa_headers"
+            INTERFACE_INCLUDE_DIRECTORIES "${mmpa_INCLUDE_DIR};${mmpa_INCLUDE_DIR}/mmpa;${mmpa_INCLUDE_DIR}/mmpa/sub_inc"
         )
     endif()
 
     include(CMakePrintHelpers)
     cmake_print_properties(TARGETS mmpa
-        PROPERTIES INTERFACE_LINK_LIBRARIES IMPORTED_LOCATION
+        PROPERTIES INTERFACE_INCLUDE_DIRECTORIES IMPORTED_LOCATION
     )
     cmake_print_properties(TARGETS static_mmpa
-        PROPERTIES INTERFACE_LINK_LIBRARIES IMPORTED_LOCATION
+        PROPERTIES INTERFACE_INCLUDE_DIRECTORIES IMPORTED_LOCATION
     )
     cmake_print_properties(TARGETS mmpa_headers
         PROPERTIES INTERFACE_INCLUDE_DIRECTORIES

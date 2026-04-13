@@ -22,6 +22,12 @@ if (NOT EXISTS "${ASCEND_CANN_PACKAGE_PATH}")
     message(FATAL_ERROR "${ASCEND_CANN_PACKAGE_PATH} does not exist, please install the cann package and set environment variables.")
 endif()
 
+string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" SYSTEM_LOWER_PROCESSOR)
+set(ASCEND_CANN_PACKAGE_ENV_PATH "${ASCEND_CANN_PACKAGE_PATH}")
+if(EXISTS "${ASCEND_CANN_PACKAGE_PATH}/${SYSTEM_LOWER_PROCESSOR}-linux")
+    set(ASCEND_CANN_PACKAGE_ENV_PATH "${ASCEND_CANN_PACKAGE_PATH}/${SYSTEM_LOWER_PROCESSOR}-linux")
+endif()
+
 if (CMAKE_INSTALL_PREFIX STREQUAL /usr/local)
     set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/_CPack_Packages/makeself_staging" CACHE STRING "path for install()" FORCE)
 endif()

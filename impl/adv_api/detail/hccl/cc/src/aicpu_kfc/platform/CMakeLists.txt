@@ -35,6 +35,7 @@ set(platform_include_list
     ${CMAKE_CURRENT_SOURCE_DIR}/inc
     ${CMAKE_CURRENT_SOURCE_DIR}/inc/adapter
     ${CMAKE_CURRENT_SOURCE_DIR}/inc/adapter/host
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adapter/hccd
     ${CMAKE_CURRENT_SOURCE_DIR}/task
     ${CMAKE_CURRENT_SOURCE_DIR}/common/
     ${CMAKE_CURRENT_SOURCE_DIR}/common/buffer_manager
@@ -76,6 +77,10 @@ set(platform_include_list
     ${CMAKE_CURRENT_SOURCE_DIR}/../legacy/framework/topo
     ${CMAKE_CURRENT_SOURCE_DIR}/../legacy/framework/topo/new_topo_builder/common
     ${CMAKE_CURRENT_SOURCE_DIR}/../legacy/framework/topo/new_topo_builder/rank_graph
+    ${CMAKE_CURRENT_SOURCE_DIR}/../framework/common/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../framework/common/src/mgr
+    ${ASCENDC_INCLUDE_DIR}/adv_api/hccl/internal/hcomm
+    ${ASCENDC_INCLUDE_DIR}/adv_api/hccl/internal/hcomm/hccl
 )
 
 if(BUILD_OPEN_PROJECT)
@@ -106,6 +111,9 @@ if(BUILD_OPEN_PROJECT)
         ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/mmpa/
 
         # 包间接口
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/pkg_inc/
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/pkg_inc/hccl/
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/pkg_inc/base/
         ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
         ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/
         ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu/

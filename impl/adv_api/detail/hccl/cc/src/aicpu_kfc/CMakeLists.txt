@@ -189,6 +189,9 @@ if(BUILD_OPEN_PROJECT)
         ${ASCEND_CANN_PACKAGE_PATH}/include/driver/
 
         # 包间接口
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/pkg_inc/
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/pkg_inc/hccl/
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/pkg_inc/base/
         ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
         ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu/
         ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu/common/
