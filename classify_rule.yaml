@@ -112,6 +112,7 @@ asc-devkit:
       - impl/basic_api/dav_c220/kernel_operator_vec_gather_impl.h
       - impl/basic_api/dav_m510/kernel_operator_vec_gather_impl.h
       - impl/basic_api/dav_m300/kernel_operator_vec_gather_impl.h
+      - impl/simt_api/cpp/kernel_simt_print_intf_impl.h
 
   llt:
     ut_check: true
