@@ -20,26 +20,28 @@
 
 namespace AscendC {
 namespace Te {
-    
-struct EmptyTrait {};
-struct GMMemPtr {};
-struct UBMemPtr {};
-struct L1MemPtr {};
-struct L0AMemPtr {};
-struct L0BMemPtr {};
-struct L0CMemPtr {};
-struct BiasMemPtr {};
-struct FixbufMemPtr {};
+
+namespace Hardware {
+    struct EmptyTrait {};
+    struct GM {};
+    struct UB {};
+    struct L1 {};
+    struct L0A {};
+    struct L0B {};
+    struct L0C {};
+    struct Bias {};
+    struct Fixbuf {};
+}
 
 using PtrMemSet = TupleMap<
-    Std::tuple<GMMemPtr, MakeGMMemPtr>,
-    Std::tuple<UBMemPtr, MakeUBMemPtr>,
-    Std::tuple<L1MemPtr, MakeL1MemPtr>,
-    Std::tuple<L0AMemPtr, MakeL0AMemPtr>,
-    Std::tuple<L0BMemPtr, MakeL0BMemPtr>,
-    Std::tuple<L0CMemPtr, MakeL0CMemPtr>,
-    Std::tuple<BiasMemPtr, MakeBiasMemPtr>,
-    Std::tuple<FixbufMemPtr, MakeFixbufMemPtr>>;
+    Std::tuple<Hardware::GM, MakeGMMemPtr>,
+    Std::tuple<Hardware::UB, MakeUBMemPtr>,
+    Std::tuple<Hardware::L1, MakeL1MemPtr>,
+    Std::tuple<Hardware::L0A, MakeL0AMemPtr>,
+    Std::tuple<Hardware::L0B, MakeL0BMemPtr>,
+    Std::tuple<Hardware::L0C, MakeL0CMemPtr>,
+    Std::tuple<Hardware::Bias, MakeBiasMemPtr>,
+    Std::tuple<Hardware::Fixbuf, MakeFixbufMemPtr>>;
 
 template <typename PtrPattern, typename TraitType, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
