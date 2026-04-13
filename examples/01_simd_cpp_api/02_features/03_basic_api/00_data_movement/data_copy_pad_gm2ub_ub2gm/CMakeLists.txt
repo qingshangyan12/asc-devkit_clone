@@ -11,13 +11,32 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+if(DEFINED RUN_MODE)
+    set(CMAKE_ASC_RUN_MODE ${RUN_MODE} CACHE STRING "Alias of RUN_MODE")
+endif()
+
+if(DEFINED NPU_ARCH)
+    set(CMAKE_ASC_ARCHITECTURES ${NPU_ARCH} CACHE STRING "Alias of NPU_ARCH")
+endif()
+
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+# 场景参数（通过命令行传入）
+# SCENARIO_NUM: 场景编号
+#   1 - 输入[1, 20]，输出[1, 32]，使用SetPadValue填充
+#   2 - 输入[32, 59]，输出[32, 64]，rightPadding，不使用SetPadValue
+#   3 - 输入[3, 24]，输出[1, 80]，Compact模式
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-2)")
+
+add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+
 add_executable(demo
     data_copy_pad.asc
 )
+
+set(NPU_ARCH "dav-2201" CACHE STRING "NPU ARCH, e.g. dav-2201, dav-3510")
 
 target_link_libraries(demo PRIVATE
     tiling_api
@@ -34,6 +53,5 @@ target_link_libraries(demo PRIVATE
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH}>
 )
