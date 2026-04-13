@@ -63,11 +63,26 @@ __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
     return GetLayoutMakeFun::template Make<TraitType>(args...);
 }
 
+template <typename LayoutPattern, typename... Args>
+__aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
+    using GetLayoutMakeFun = typename LayoutFormatSet::template Get<LayoutPattern>;
+    static_assert(!Std::is_same_v<GetLayoutMakeFun, EmptyValue>, "Unsupported layout pattern.");
+    return GetLayoutMakeFun::template Make<LayoutTraitDefault>(args...);
+}
+
 template <typename LayoutPattern, typename TraitType>
 struct FrameLayoutFormat {
     template <typename... Args>
     __aicore__ inline decltype(auto) operator()(const Args&... args) {
         return MakeFrameLayout<LayoutPattern, TraitType>(args...);
+    }
+};
+
+template <typename LayoutPattern>
+struct FrameLayoutFormat {
+    template <typename... Args>
+    __aicore__ inline decltype(auto) operator()(const Args&... args) {
+        return MakeFrameLayout<LayoutPattern>(args...);
     }
 };
 
