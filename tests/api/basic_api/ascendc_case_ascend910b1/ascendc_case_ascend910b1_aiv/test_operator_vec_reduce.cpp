@@ -573,9 +573,11 @@ protected:
     void SetUp()
     {
         AscendC::SetGCoreType(2);
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
     }
     void TearDown()
     {
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::SetGCoreType(0);
         block_idx = 0;
         block_num = 8;
@@ -730,9 +732,14 @@ TEST_F(TestWholeReduceMaxNpuDebug, OrderOverflow)
 
 class TestWholeReduceMinNpuDebug : public testing::Test {
 protected:
-    void SetUp() { AscendC::SetGCoreType(2); }
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
+    }
     void TearDown()
     {
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::SetGCoreType(0);
         block_idx = 0;
         block_num = 8;
@@ -827,9 +834,14 @@ TEST_F(TestWholeReduceMinNpuDebug, OrderOverflow)
 
 class TestWholeReduceSumNpuDebug : public testing::Test {
 protected:
-    void SetUp() { AscendC::SetGCoreType(2); }
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
+    }
     void TearDown()
     {
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::SetGCoreType(0);
         block_idx = 0;
         block_num = 8;
@@ -925,9 +937,14 @@ TEST_F(TestWholeReduceSumNpuDebug, RepeatTimeOverflow)
 
 class TestBlockReduceMaxNpuDebug : public testing::Test {
 protected:
-    void SetUp() { AscendC::SetGCoreType(2); }
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
+    }
     void TearDown()
     {
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::SetGCoreType(0);
         block_idx = 0;
         block_num = 8;
@@ -1007,9 +1024,14 @@ TEST_F(TestBlockReduceMaxNpuDebug, RepeatTimeOverflow)
 
 class TestBlockReduceMinNpuDebug : public testing::Test {
 protected:
-    void SetUp() { AscendC::SetGCoreType(2); }
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
+    }
     void TearDown()
     {
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::SetGCoreType(0);
         block_idx = 0;
         block_num = 8;
@@ -1089,9 +1111,14 @@ TEST_F(TestBlockReduceMinNpuDebug, RepeatTimeOverflow)
 
 class TestBlockReduceSumNpuDebug : public testing::Test {
 protected:
-    void SetUp() { AscendC::SetGCoreType(2); }
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
+    }
     void TearDown()
     {
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::SetGCoreType(0);
         block_idx = 0;
         block_num = 8;
@@ -1175,9 +1202,14 @@ TEST_F(TestBlockReduceSumNpuDebug, RepeatTimeOverflow)
 
 class TestPairReduceSumNpuDebug : public testing::Test {
 protected:
-    void SetUp() { AscendC::SetGCoreType(2); }
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
+    }
     void TearDown()
     {
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::SetGCoreType(0);
         block_idx = 0;
         block_num = 8;
@@ -1295,9 +1327,14 @@ TEST_F(TestPairReduceSumNpuDebug, RepeatTimeOverflow)
 
 class TestRepeatReduceSumNpuDebug : public testing::Test {
 protected:
-    void SetUp() { AscendC::SetGCoreType(2); }
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
+    }
     void TearDown()
     {
+        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::SetGCoreType(0);
         block_idx = 0;
         block_num = 8;
