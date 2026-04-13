@@ -22,6 +22,7 @@
 #include "kernel_tensor.h"
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 #include "impl/utils/debug/asc_debug_utils.h"
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 #endif
 
 #if __NPU_ARCH__ == 1001
@@ -140,6 +141,23 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
     return;
 }
 
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
+template <class... Args>
+__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::printf_impl(fmt, args...);
+#endif
+}
+
+template <class... Args>
+__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::printf_impl(fmt, args...);
+#endif
+}
+#else
 #if defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
 template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
@@ -199,6 +217,7 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 }
 #endif // ASCENDC_CPU_DEBUG
 #endif // defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
+#endif // __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 
 #if defined(ASCENDC_DUMP_ASSERT_ONLY)
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpAddrAssertOnlyReserved;
@@ -214,47 +233,11 @@ template <class... Args>
 __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-#ifdef ASCENDC_DUMP_ASSERT_ONLY
-    if (g_dumpAddrAssertOnlyReserved == nullptr) {
-        InitDump(g_mixFlagAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
-    } else {
-        InitDump(g_mixFlagAssertOnlyReserved, g_dumpAddrAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
-    }
-#endif
-    PrintfImpl(DumpType::DUMP_ASSERT, fmt, args...);
+    printf_impl_assert(fmt, args...);
 #else
     return;
 #endif
 }
-
-// for auto open ASCENDC_DUMP macros
-#ifdef __CHECK_FEATURE_AT_PRECOMPILE
-#if !defined(__NPU_HOST__) && !defined(__NPU_DEVICE__) && !defined(__ASCC_HOST__) && !defined(__ASCC_DEVICE__)
-#define DumpTensor(...)            \
-    do {                           \
-        ENABLE_PRINTF();           \
-        ENABLE_PRINTF_DUMP_SIZE(); \
-    } while (0)
-
-#define DumpAccChkPoint(...)       \
-    do {                           \
-        ENABLE_PRINTF();           \
-        ENABLE_PRINTF_DUMP_SIZE(); \
-    } while (0)
-
-#define printf(...)                \
-    do {                           \
-        ENABLE_PRINTF();           \
-        ENABLE_PRINTF_DUMP_SIZE(); \
-    } while (0)
-
-#define PRINTF(...)                \
-    do {                           \
-        ENABLE_PRINTF();           \
-        ENABLE_PRINTF_DUMP_SIZE(); \
-    } while (0)
-#endif // !defined(__NPU_HOST__) && !defined(__NPU_DEVICE__) && !defined(__ASCC_HOST__) && !defined(__ASCC_DEVICE__)
-#endif // __CHECK_FEATURE_AT_PRECOMPILE
 
 __aicore__ inline void PrintTimeStamp(uint32_t descId)
 {
