@@ -76,13 +76,13 @@ __aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const Layou
 {
     static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
 
-    auto innerRow = Std::get<0>(Std::get<0>(layout.Shape()));
-    auto innerCol = Std::get<0>(Std::get<1>(layout.Shape()));
+    auto innerRow = Std::get<0>(Std::get<0>(layout.Shape())) - Std::get<0>(Std::get<0>(coord));
+    auto innerCol = Std::get<0>(Std::get<1>(layout.Shape())) - Std::get<0>(Std::get<1>(coord));
 
-    auto srcRow = innerRow * Std::get<1>(Std::get<0>(layout.Shape())) - Std::get<0>(coord);
-    auto srcCol = innerCol * Std::get<1>(Std::get<1>(layout.Shape())) - Std::get<1>(coord);
+    auto outerRow = Std::get<1>(Std::get<0>(layout.Shape())) - Std::get<1>(Std::get<0>(coord));
+    auto outerCol = Std::get<1>(Std::get<1>(layout.Shape())) - Std::get<1>(Std::get<1>(coord));
 
-    return MakeLayout(MakeFractalShape(MakeShape(srcRow, srcCol), MakeShape(innerRow, innerCol)), layout.Stride());
+    return MakeLayout(MakeFractalShape(MakeShape(innerRow, outerRow), MakeShape(innerCol, outerCol)), layout.Stride());
 }
 
 } // namespace Te
