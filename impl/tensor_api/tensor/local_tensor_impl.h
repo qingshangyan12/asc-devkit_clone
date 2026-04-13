@@ -113,14 +113,14 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
         return operator()(MakeCoord(c0,c1,cs...));
     }
 
-	template <typename Coord, typename InfoType>
+	template <typename Coord>
  	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
  	    auto iter = Data() + Layout()(coord);
  	    auto coordLayout = MakeCoordLayout(coord, Layout());
  	    return MakeTensor(iter, coordLayout);
  	}
  	 
- 	template <typename Coord, typename InfoType>
+ 	template <typename Coord>
  	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
         auto iter = Data() + Layout()(coord);
  	    auto coordLayout = MakeCoordLayout(coord, Layout());
