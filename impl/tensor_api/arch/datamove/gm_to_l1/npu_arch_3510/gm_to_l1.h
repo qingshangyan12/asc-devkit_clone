@@ -42,14 +42,14 @@ namespace Te {
 
 class DataCopyGM2L13510 {
 public:
-    template <const DataCopyTrait& trait, typename T, typename U>
+    template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
         Execute<trait>(dst, src);
     }
 
 private:
-    template <const DataCopyTrait& trait, typename T, typename U>
+    template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Execute(const T& dst, const U& src)
     {
         if constexpr (IsNDFormat<U>::value && IsNDFormat<T>::value) {
@@ -87,7 +87,7 @@ private:
         }
     }
 
-    template <const DataCopyTrait& trait, typename T, typename U>
+    template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void ExecuteScaleDataCopy(const T& dst, const U& src)
     {
         if constexpr (IsScaleANDFormat<U>::value && IsZZFormat<T>::value) {
