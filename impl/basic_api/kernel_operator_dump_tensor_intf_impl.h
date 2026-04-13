@@ -229,6 +229,7 @@ __aicore__ inline void StoreArgsOfInitDump(bool mixFlag, __gm__ uint8_t* dumpAdd
 }
 #endif
 
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 template <class... Args>
 __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
 {
@@ -238,6 +239,24 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
     return;
 #endif
 }
+#else
+template <class... Args>
+__aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
+{
+#ifdef ASCENDC_DUMP
+#ifdef ASCENDC_DUMP_ASSERT_ONLY	
+    if (g_dumpAddrAssertOnlyReserved == nullptr) {
+        InitDump(g_mixFlagAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
+    } else {
+        InitDump(g_mixFlagAssertOnlyReserved, g_dumpAddrAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
+    }
+#endif
+    PrintfImpl(DumpType::DUMP_ASSERT, fmt, args...);
+#else
+    return;
+#endif
+}
+#endif
 
 __aicore__ inline void PrintTimeStamp(uint32_t descId)
 {
