@@ -6,7 +6,6 @@
 
 ## 支持的产品
 
-- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -29,7 +28,8 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量  
+- 配置环境变量
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -51,7 +51,7 @@
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j
   python3 ../scripts/gen_data.py
-  ./demo
+  msprof op simulator --soc-version=Ascend910B1 ./demo    # 通过msprof op simulator执行算子调优
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin
   ```
   请根据实际测试的 NPU 硬件架构选择对应的 `CMAKE_ASC_ARCHITECTURES` 参数
@@ -65,28 +65,11 @@
   test pass!
   ```
 
-## 仿真产物说明
-
-执行 `./demo` 后，CAmodel 仿真器会在 `build/` 目录下生成 dump 文件。文件命名格式为 `core{N}.{unit}M.{type}.dump`，其中：
-
-- **`core{N}`**：AI Core 编号，从0开始
-- **`{unit}M`**：计算单元，`cubecore0` 为 Cube 单元（矩阵乘），`veccore0`/`veccore1` 为 Vector 单元（向量计算）
-- **`{type}`**：日志类型，含义如下
-
-| 日志类型 | 说明 |
-|---------|------|
-| `instr_log` | 指令执行流水，记录每条指令的 cycle、PC 地址、指令类型及操作数，用于分析指令时序与流水线排布；为指令执行后的状态，目标寄存器状态已更新，可以用于查看发射指令是否正确，域段配置参数是否正确，执行结果是否正确，指令是否有遗漏 |
-| `instr_popped_log` | 指令出队日志，记录指令从流水线出队的时序，为指令执行前的状态，目标寄存器状态未更新 |
-| `dcache_log` | 数据缓存访问日志，记录 DCache 命中/未命中及回填等，用于优化数据搬运逻辑 |
-| `ifu.icache_log` | 指令缓存访问日志，记录 ICache 预取请求与地址，用于用于分析cache性能 |
-
-> **说明**：未参与计算的 AI Core 对应的 dump 文件为空（0 字节）。
-
 ## 仿真调优
 
-基于 `./demo` 产生的 dump 文件，可通过 msprof op simulator 进行仿真性能分析，生成可视化的指令流水图等信息，指令如下：
+基于 `./demo` 可通过 msprof op simulator 进行仿真性能分析，生成可视化的指令流水图等信息，指令如下：
 ```bash
-msprof op simulator --soc-version=Ascend910B1 ./demo
+msprof op simulator --soc-version=<soc_version> ./demo
 ```
   > AI处理器的型号<soc_version>请通过如下方式获取：
   > - 针对如下产品型号：在安装昇腾AI处理器的服务器执行`npu-smi info`命令进行查询，获取**Name**信息。实际配置值为AscendName，例如**Name**取值为xxxyy，实际配置值为Ascendxxxyy。
@@ -97,7 +80,6 @@ msprof op simulator --soc-version=Ascend910B1 ./demo
   >   id：设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id
   >
   >   chip_id：芯片id，通过`npu-smi info -m`命令查出的Chip ID即为芯片id
-  >   - Ascend 950PR/Ascend 950DT
   >   - Atlas A3 训练系列产品 / Atlas A3 推理系列产品
 
 命令完成后，会在当前目录下生成以 `OPPROF_{timestamp}_XXX` 命名的文件夹，产物结构如下：
@@ -112,8 +94,8 @@ OPPROF_{timestamp}_XXX/
   └── visualize_data.bin   # MindStudio Insight 呈现文件
 ```
 
-执行后可通过以下方式打开 `trace.json`，查看指令流水图：
-- **MindStudio Insight**：打开 `visualize_data.bin` 查看
+执行后可通过以下方式查看指令流水图：
+- **MindStudio Insight**：打开 `visualize_data.bin` 或 `trace.json` 进行可视化呈现
 - **Chrome浏览器**：在地址栏输入 `chrome://tracing`，将 `trace.json` 文件拖到空白处打开
 
 
