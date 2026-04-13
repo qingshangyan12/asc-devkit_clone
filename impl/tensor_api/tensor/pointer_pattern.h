@@ -20,33 +20,44 @@
 
 namespace AscendC {
 namespace Te {
-    
-struct EmptyTrait {};
-struct GMMemPtr {};
-struct UBMemPtr {};
-struct L1MemPtr {};
-struct L0AMemPtr {};
-struct L0BMemPtr {};
-struct L0CMemPtr {};
-struct BiasMemPtr {};
-struct FixbufMemPtr {};
+
+namespace Location {
+    struct EmptyTrait {};
+    struct GM {};
+    struct UB {};
+    struct L1 {};
+    struct L0A {};
+    struct L0B {};
+    struct L0C {};
+    struct Bias {};
+    struct Fixbuf {};
+}
 
 using PtrMemSet = TupleMap<
-    Std::tuple<GMMemPtr, MakeGMMemPtr>,
-    Std::tuple<UBMemPtr, MakeUBMemPtr>,
-    Std::tuple<L1MemPtr, MakeL1MemPtr>,
-    Std::tuple<L0AMemPtr, MakeL0AMemPtr>,
-    Std::tuple<L0BMemPtr, MakeL0BMemPtr>,
-    Std::tuple<L0CMemPtr, MakeL0CMemPtr>,
-    Std::tuple<BiasMemPtr, MakeBiasMemPtr>,
-    Std::tuple<FixbufMemPtr, MakeFixbufMemPtr>>;
+    Std::tuple<Location::UB, MakeUBMemPtr>,
+    Std::tuple<Location::L1, MakeL1MemPtr>,
+    Std::tuple<Location::L0A, MakeL0AMemPtr>,
+    Std::tuple<Location::L0B, MakeL0BMemPtr>,
+    Std::tuple<Location::L0C, MakeL0CMemPtr>,
+    Std::tuple<Location::Bias, MakeBiasMemPtr>,
+    Std::tuple<Location::Fixbuf, MakeFixbufMemPtr>>;
 
-template <typename PtrPattern, typename TraitType, typename... Args>
+template <typename HardWare, typename TraitType, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
-    using GetPtrMakeFun = typename PtrMemSet::template Get<PtrPattern>;
-    static_assert(!Std::is_same_v<GetPtrMakeFun, EmptyValue>, "Unsupported pointer pattern.");
-    return GetPtrMakeFun::template Make<TraitType>(args...);
+    using Arg = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
+    static_assert(!IsMemPtrIterator<Arg>::value, "MakeMemPtr expects a byteOffset. ");
+    
+    using GetPtrMakeFun = typename PtrMemSet::template Get<HardWare>;
+    return GetPtrMakeFun::template Make<HardWare, TraitType>(args...);
+}
+
+template <typename HardWare, typename... Args>
+__aicore__ inline constexpr auto MakeMemPtr(Args... args)
+{
+    using Arg = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
+    static_assert(IsMemPtrIterator<Arg>::value, "MakeMemPtr<HardWare>(arg) expects an iterator/pointer");
+    return MakeHardwareMemPtr<HardWare>(args...);
 }
 
 } // namespace Te

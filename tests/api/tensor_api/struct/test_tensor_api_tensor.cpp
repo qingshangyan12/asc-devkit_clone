@@ -118,7 +118,6 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
     using namespace AscendC::Te;
 
     constexpr uint32_t TILE_LENGTH = 128;
-    __gm__ float gmData[TILE_LENGTH] = {0};
     __ubuf__ float ubData[TILE_LENGTH] = {0};
     __cbuf__ float l1Data[TILE_LENGTH] = {0};
     __ca__ float l0aData[TILE_LENGTH] = {0};
@@ -127,7 +126,6 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
     __biasbuf__ float biasData[TILE_LENGTH] = {0};
     __fbuf__ float fixbufData[TILE_LENGTH] = {0};
 
-    auto gmPtr = MakeGMmemPtr(gmData);
     auto ubPtr = MakeUBmemPtr(ubData);
     auto l1Ptr = MakeL1memPtr(l1Data);
     auto l0aPtr = MakeL0AmemPtr(l0aData);
@@ -136,7 +134,6 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
     auto biasPtr = MakeBiasmemPtr(biasData);
     auto fixbufPtr = MakeFixbufmemPtr(fixbufData);
 
-    EXPECT_EQ(gmPtr.Get(), gmData);
     EXPECT_EQ(ubPtr.Get(), ubData);
     EXPECT_EQ(l1Ptr.Get(), l1Data);
     EXPECT_EQ(l0aPtr.Get(), l0aData);
@@ -145,7 +142,6 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
     EXPECT_EQ(biasPtr.Get(), biasData);
     EXPECT_EQ(fixbufPtr.Get(), fixbufData);
 
-    EXPECT_EQ(MakeGMmemPtr(gmPtr), gmPtr);
     EXPECT_EQ(MakeUBmemPtr(ubPtr), ubPtr);
     EXPECT_EQ(MakeL1memPtr(l1Ptr), l1Ptr);
     EXPECT_EQ(MakeL0AmemPtr(l0aPtr), l0aPtr);
@@ -169,14 +165,14 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPatternPtrOperation)
     __biasbuf__ float biasData[TILE_LENGTH] = {0};
     __fbuf__ float fixbufData[TILE_LENGTH] = {0};
 
-    auto gmPtr = MakeMemPtr<GMMemPtr, EmptyTrait>(gmData);
-    auto ubPtr = MakeMemPtr<UBMemPtr, EmptyTrait>(ubData);
-    auto l1Ptr = MakeMemPtr<L1MemPtr, EmptyTrait>(l1Data);
-    auto l0aPtr = MakeMemPtr<L0AMemPtr, EmptyTrait>(l0aData);
-    auto l0bPtr = MakeMemPtr<L0BMemPtr, EmptyTrait>(l0bData);
-    auto l0cPtr = MakeMemPtr<L0CMemPtr, EmptyTrait>(l0cData);
-    auto biasPtr = MakeMemPtr<BiasMemPtr, EmptyTrait>(biasData);
-    auto fixbufPtr = MakeMemPtr<FixbufMemPtr, EmptyTrait>(fixbufData);
+    auto gmPtr = MakeMemPtr<Location::GM>(gmData);
+    auto ubPtr = MakeMemPtr<Location::UB>(ubData);
+    auto l1Ptr = MakeMemPtr<Location::L1>(l1Data);
+    auto l0aPtr = MakeMemPtr<Location::L0A>(l0aData);
+    auto l0bPtr = MakeMemPtr<Location::L0B>(l0bData);
+    auto l0cPtr = MakeMemPtr<Location::L0C>(l0cData);
+    auto biasPtr = MakeMemPtr<Location::Bias>(biasData);
+    auto fixbufPtr = MakeMemPtr<Location::Fixbuf>(fixbufData);
     EXPECT_EQ(gmPtr.Get(), gmData);
     EXPECT_EQ(ubPtr.Get(), ubData);
     EXPECT_EQ(l1Ptr.Get(), l1Data);

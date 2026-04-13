@@ -31,15 +31,14 @@
 namespace AscendC {
 namespace Te {
 
-template <typename T>
-struct LocalTensor;
-
-template <typename Coord, typename LayoutType, typename TileShape>
-__aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const TileShape& tileShape) 
+template <typename LayoutType, typename TileShape, Std::enable_if_t<!is_layout_v<TileShape>, int> = 0>
+__aicore__ inline decltype(auto) MakeSliceLayout(const LayoutType& layout, const TileShape& tileShape) 
 {
+    static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
     using OriginShape = Std::remove_cvref_t<decltype(layout.Shape())>;
-    if constexpr (nesting_depth_v<TileShape> == nesting_depth_v<OriginShape>	 
-            && Std::tuple_size_v<TileShape> == Std::tuple_size_v<OriginShape>) {	 
+    if constexpr (Std::is_tuple_v<TileShape>
+            && nesting_depth_v<TileShape> == nesting_depth_v<OriginShape>
+            && Std::tuple_size_v<TileShape> == Std::tuple_size_v<OriginShape>) {
         return MakeLayout(tileShape, layout.Stride());	 
     } else {
         static_assert(Std::is_tuple_v<TileShape>,"TileShape must be a tuple");
@@ -48,30 +47,42 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
 
         auto innerRow = Std::get<0>(GetShape<0>(layout));
         auto innerCol = Std::get<0>(GetShape<1>(layout));
+
+        auto srcRow = innerRow * Std::get<1>(GetShape<0>(layout));
+        auto srcCol = innerCol * Std::get<1>(GetShape<1>(layout));
+
+        auto realRow = Std::min(srcRow, Std::get<0>(tileShape));	 
+        auto realCol = Std::min(srcCol, Std::get<1>(tileShape));
     
-        return MakeLayout(MakeFractalShape(tileShape, MakeShape(innerRow, innerCol)), layout.Stride()); 
+        return MakeLayout(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride()); 
     } 
 }
 
-template <typename Coord, typename LayoutType, typename TensorType>
- __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const LocalTensor<TensorType>& tileTensor) 
+template <typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<is_layout_v<DstLayoutType>, int> = 0>
+__aicore__ inline decltype(auto) MakeSliceLayout(const SrcLayoutType& srcLayout, const DstLayoutType& dstLayout) 
 {
-    using TensorLayoutType = typename LocalTensor<TensorType>::layoutType;
-    static_assert(TensorLayoutType::rank == LayoutType::rank, "Tensor Rank must be equal to Layout rank");
+    static_assert(is_layout_v<SrcLayoutType>, "SrcLayoutType must be Layout");
+    static_assert(Std::remove_cvref_t<SrcLayoutType>::rank == Std::remove_cvref_t<DstLayoutType>::rank,
+        "Tensor Rank must be equal to Layout rank");
 
-    auto innerRow = Std::get<0>(Std::get<0>(layout.Shape()));
-    auto innerCol = Std::get<0>(Std::get<1>(layout.Shape()));
+    auto dstRow = Std::get<0>(Std::get<0>(dstLayout.Shape())) * Std::get<1>(Std::get<0>(dstLayout.Shape()));
+    auto dstCol = Std::get<0>(Std::get<1>(dstLayout.Shape())) * Std::get<1>(Std::get<1>(dstLayout.Shape()));
 
-    auto srcRow = innerRow * Std::get<1>(Std::get<0>(layout.Shape())) - Std::get<0>(coord);
-    auto srcCol = innerCol * Std::get<1>(Std::get<1>(layout.Shape())) - Std::get<1>(coord);
+    return MakeSliceLayout(srcLayout, MakeShape(dstRow, dstCol));
+}
 
-    auto dstRow = Std::get<0>(Std::get<0>(tileTensor.Shape())) * Std::get<1>(Std::get<0>(tileTensor.Shape()));
-    auto dstCol = Std::get<0>(Std::get<1>(tileTensor.Shape())) * Std::get<1>(Std::get<1>(tileTensor.Shape()));
+template <typename Coord, typename LayoutType>
+__aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const LayoutType& layout) 
+{
+    static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
 
-    auto realRow = Std::min(srcRow, dstRow);	 
-    auto realCol = Std::min(srcCol, dstCol);
+    auto innerRow = Std::get<0>(Std::get<0>(layout.Shape())) - Std::get<0>(Std::get<0>(coord));
+    auto innerCol = Std::get<0>(Std::get<1>(layout.Shape())) - Std::get<0>(Std::get<1>(coord));
 
-    return MakeLayout(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride());
+    auto outerRow = Std::get<1>(Std::get<0>(layout.Shape())) - Std::get<1>(Std::get<0>(coord));
+    auto outerCol = Std::get<1>(Std::get<1>(layout.Shape())) - Std::get<1>(Std::get<1>(coord));
+
+    return MakeLayout(MakeFractalShape(MakeShape(innerRow, outerRow), MakeShape(innerCol, outerCol)), layout.Stride());
 }
 
 } // namespace Te
