@@ -22,9 +22,10 @@ ERROR_TOL = 1e-4
 
 
 def verify_result(output, golden):
-    output_type = np.int32
+    output_type = np.float32
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
+    print(output)
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=RELATIVE_TOL,

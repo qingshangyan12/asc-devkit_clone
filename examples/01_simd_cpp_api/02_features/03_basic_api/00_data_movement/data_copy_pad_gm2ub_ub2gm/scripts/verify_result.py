@@ -13,6 +13,7 @@
 
 
 import sys
+import argparse
 import numpy as np
 
 
@@ -21,8 +22,14 @@ ABSOLUTE_TOL = 1e-9
 ERROR_TOL = 1e-4
 
 
-def verify_result(output, golden):
-    output_type = np.float16
+def verify_result(output, golden, scenarioNum=1):
+    # 根据场景选择数据类型
+    if scenarioNum == 2:
+        output_type = np.float32
+    else:
+        output_type = np.float16
+    
+    np.set_printoptions(threshold=np.inf)
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     different_element_results = np.isclose(output,
@@ -46,8 +53,14 @@ def verify_result(output, golden):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('output_file', help='Output file path')
+    parser.add_argument('golden_file', help='Golden file path')
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2, 3], help='Scenario number')
+    args = parser.parse_args()
+    
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
+        res = verify_result(args.output_file, args.golden_file, args.scenarioNum)
         if not res:
             raise ValueError("[ERROR] result error")
         else:
