@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/datamove/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+    "impl/tensor_api/arch/datamove/l1_to_l0b/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -19,13 +19,13 @@
 * \file copy.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_COPY_H
-#define IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_COPY_H
+#ifndef IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0B_COPY_H
+#define IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0B_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
 
 #include "impl/tensor_api/atom/copy_traits_impl.h"
-#include "impl/tensor_api/arch/datamove/l1_to_l0/routing.h"
+#include "impl/tensor_api/arch/datamove/l1_to_l0b/routing.h"
 
 namespace AscendC {
 namespace Te {
@@ -37,7 +37,7 @@ struct LoadDataTraitDefault {
     static constexpr const TraitType value = DEFAULT_LOAD_DATA_TRAIT;
 };
 
-struct CopyL12L0 {
+struct CopyL12L0B {
 public:
     template <typename Tp, const Tp& traits, typename... Args>
     __aicore__ inline static void Copy(const Args& ...args)
@@ -68,15 +68,15 @@ private:
 };
 
 template <typename Traits>
-struct CopyTraits<CopyL12L0, Traits> : public CopyTraits<CopyL12L0, Traits, CopyL12L0, LoadDataTraitDefault> {};
+struct CopyTraits<CopyL12L0B, Traits> : public CopyTraits<CopyL12L0B, Traits, CopyL12L0B, LoadDataTraitDefault> {};
 
 template <>
-struct CopyTraits<CopyL12L0> : public CopyTraits<CopyL12L0, LoadDataTraitDefault> {};
+struct CopyTraits<CopyL12L0B> : public CopyTraits<CopyL12L0B, LoadDataTraitDefault> {};
 
 }
 }
 
-#endif // IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0_COPY_H
+#endif // IMPL_TENSOR_API_ARCH_DATAMOVE_L1_TO_L0B_COPY_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
