@@ -41,9 +41,9 @@ PIPE_S
 
 ```cpp
 //buffer标号为1
-uint8_t buf_id = 1;
+uint8_t mutex_id = 1;
 //等待PIPE_S中所有前置指令完成后释放标号为1的缓存
-bool mode = false;
-asc_lock(PIPE_S, buf_id, mode);  
-asc_unlock(PIPE_S, buf_id, mode);  
+bool disable_blocking = false;
+asc_lock(PIPE_S, mutex_id, disable_blocking);  
+asc_unlock(PIPE_S, mutex_id, disable_blocking);  
 ```
