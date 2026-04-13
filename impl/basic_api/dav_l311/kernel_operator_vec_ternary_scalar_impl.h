@@ -160,11 +160,6 @@ __simd_callee__ inline void Axpy(RegT &dstReg, RegU &srcReg, U scalarValue, Reg:
     if constexpr (SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<uint64_t, uint64_t>,
         Tuple<int64_t, int64_t>>()) {
         Reg::Axpy(dstReg, srcReg, scalarValue, mask);
-    } else if constexpr (SupportType<Tuple<T, U>, Tuple<bfloat16_t, bfloat16_t>>()) {
-        RegT tmpReg;
-        Reg::Duplicate(tmpReg, scalarValue, mask);
-        Reg::Mul(tmpReg, srcReg, tmpReg, mask);
-        Reg::Add(dstReg, tmpReg, dstReg, mask);
     } else if constexpr (SupportType<Tuple<T, U>, Tuple<float, half>>()) {
         RegU tmpReg;
         RegT cvtReg;
@@ -182,7 +177,7 @@ template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void AxpyImpl(__ubuf__ T *dst, __ubuf__ U *src, const U &scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert(SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<bfloat16_t, bfloat16_t>,
+    static_assert(SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>,
         Tuple<float, half>>(),
         "current data type is not supported on current device!");
     constexpr auto func = RegAxpy::Axpy<T, U, Reg::RegTensor<T>, Reg::RegTensor<U>>;
@@ -193,7 +188,7 @@ template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void AxpyImpl(__ubuf__ T *dst, __ubuf__ U *src, const U &scalarValue, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert(SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<bfloat16_t, bfloat16_t>,
+    static_assert(SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>,
         Tuple<float, half>>(),
         "current data type is not supported on current device!");
     constexpr auto func = RegAxpy::Axpy<T, U, Reg::RegTensor<T>, Reg::RegTensor<U>>;
@@ -205,7 +200,7 @@ __aicore__ inline void AxpyImpl(__ubuf__ T *dst, __ubuf__ U *src, const U &scala
 template <typename T, typename U>
 __aicore__ inline void AxpyImpl(__ubuf__ T *dst, __ubuf__ U *src, const U &scalarValue, const int32_t &calCount)
 {
-    static_assert(SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<bfloat16_t, bfloat16_t>,
+    static_assert(SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>,
         Tuple<float, half>, Tuple<uint64_t, uint64_t>, Tuple<int64_t, int64_t>>(),
         "current data type is not supported on current device!");
     if constexpr (SupportBytes<T, 8>()) {
