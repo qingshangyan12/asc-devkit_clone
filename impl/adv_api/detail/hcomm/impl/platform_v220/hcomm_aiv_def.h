@@ -59,7 +59,6 @@ private:
 
 private:
     HcommHandle curHandleId_ = static_cast<int8_t>(-1);
-    TPipe pipe_;
     LocalTensor<uint64_t> ubLocal_;
     LocalTensor<uint32_t> ubLocalHead_;
 };
