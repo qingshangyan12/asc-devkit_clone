@@ -51,6 +51,11 @@ struct LayoutTraitFP4 {
     static constexpr auto C0_ELEMENT = Std::Int<C0>{};
 };
 
+template <size_t C0 = 32>
+struct Element {
+    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
+};
+
 template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
     using GetLayoutMakeFun = typename LayoutFormatSet::template Get<LayoutPattern>;
