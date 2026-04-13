@@ -28,6 +28,7 @@
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #define __simt_gm__ __gm__
 #else
+#include "__clang_cce_simt_atomic.h"
 #define __simt_gm__ 
 #endif
 
