@@ -21,7 +21,7 @@
 namespace AscendC {
 namespace Te {
 
-namespace HardWare {
+namespace Location {
     struct EmptyTrait {};
     struct GM {};
     struct UB {};
@@ -34,13 +34,13 @@ namespace HardWare {
 }
 
 using PtrMemSet = TupleMap<
-    Std::tuple<HardWare::UB, MakeUBMemPtr>,
-    Std::tuple<HardWare::L1, MakeL1MemPtr>,
-    Std::tuple<HardWare::L0A, MakeL0AMemPtr>,
-    Std::tuple<HardWare::L0B, MakeL0BMemPtr>,
-    Std::tuple<HardWare::L0C, MakeL0CMemPtr>,
-    Std::tuple<HardWare::Bias, MakeBiasMemPtr>,
-    Std::tuple<HardWare::Fixbuf, MakeFixbufMemPtr>>;
+    Std::tuple<Location::UB, MakeUBMemPtr>,
+    Std::tuple<Location::L1, MakeL1MemPtr>,
+    Std::tuple<Location::L0A, MakeL0AMemPtr>,
+    Std::tuple<Location::L0B, MakeL0BMemPtr>,
+    Std::tuple<Location::L0C, MakeL0CMemPtr>,
+    Std::tuple<Location::Bias, MakeBiasMemPtr>,
+    Std::tuple<Location::Fixbuf, MakeFixbufMemPtr>>;
 
 template <typename HardWare, typename TraitType, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)

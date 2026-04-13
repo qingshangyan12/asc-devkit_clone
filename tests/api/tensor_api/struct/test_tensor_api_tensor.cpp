@@ -165,14 +165,14 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPatternPtrOperation)
     __biasbuf__ float biasData[TILE_LENGTH] = {0};
     __fbuf__ float fixbufData[TILE_LENGTH] = {0};
 
-    auto gmPtr = MakeMemPtr<HardWare::GM>(gmData);
-    auto ubPtr = MakeMemPtr<HardWare::UB>(ubData);
-    auto l1Ptr = MakeMemPtr<HardWare::L1>(l1Data);
-    auto l0aPtr = MakeMemPtr<HardWare::L0A>(l0aData);
-    auto l0bPtr = MakeMemPtr<HardWare::L0B>(l0bData);
-    auto l0cPtr = MakeMemPtr<HardWare::L0C>(l0cData);
-    auto biasPtr = MakeMemPtr<HardWare::Bias>(biasData);
-    auto fixbufPtr = MakeMemPtr<HardWare::Fixbuf>(fixbufData);
+    auto gmPtr = MakeMemPtr<Location::GM>(gmData);
+    auto ubPtr = MakeMemPtr<Location::UB>(ubData);
+    auto l1Ptr = MakeMemPtr<Location::L1>(l1Data);
+    auto l0aPtr = MakeMemPtr<Location::L0A>(l0aData);
+    auto l0bPtr = MakeMemPtr<Location::L0B>(l0bData);
+    auto l0cPtr = MakeMemPtr<Location::L0C>(l0cData);
+    auto biasPtr = MakeMemPtr<Location::Bias>(biasData);
+    auto fixbufPtr = MakeMemPtr<Location::Fixbuf>(fixbufData);
     EXPECT_EQ(gmPtr.Get(), gmData);
     EXPECT_EQ(ubPtr.Get(), ubData);
     EXPECT_EQ(l1Ptr.Get(), l1Data);
