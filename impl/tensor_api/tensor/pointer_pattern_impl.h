@@ -20,59 +20,71 @@
 namespace AscendC {
 namespace Te {
 
-struct MakeGMMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::GM, Iterator>{iter};
-    }
-};
+template <typename T, typename = void>
+struct IsMemPtrIterator : Std::false_type {};
+
+template <typename T>
+struct IsMemPtrIterator<T, void_t<decltype(*Std::declval<T&>())>> : Std::true_type {};
+
+template <typename PtrPattern, typename Iterator>
+__aicore__ inline auto MakeHardwareMemPtr(Iterator iter)
+{
+    return HardwareMemPtrV2<PtrPattern, Iterator>{iter};
+}
 
 struct MakeUBMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::UB, Iterator>{iter};
+    template <typename PtrPattern, typename TraitType, typename Arg>
+    __aicore__ inline static auto Make(const Arg& arg) {
+        using T = typename TraitType::type;
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__ubuf__ T*>(get_imm(0) + arg));
     }
 };
 
 struct MakeL1MemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::L1, Iterator>{iter};
+    template <typename PtrPattern, typename TraitType, typename Arg>
+    __aicore__ inline static auto Make(const Arg& arg) {
+        using T = typename TraitType::type;
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__cbuf__ T*>(get_imm(0) + arg));
     }
 };
 
 struct MakeL0AMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::L0A, Iterator>{iter};
+    template <typename PtrPattern, typename TraitType, typename Arg>
+    __aicore__ inline static auto Make(const Arg& arg) {
+        using T = typename TraitType::type;
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__ca__ T*>(get_imm(0) + arg));
     }
 };
 
 struct MakeL0BMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::L0B, Iterator>{iter};
+    template <typename PtrPattern, typename TraitType, typename Arg>
+    __aicore__ inline static auto Make(const Arg& arg) {
+        using T = typename TraitType::type;
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__cb__ T*>(get_imm(0) + arg));
     }
 };
 
 struct MakeL0CMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::L0C, Iterator>{iter};
+    template <typename PtrPattern, typename TraitType, typename Arg>
+    __aicore__ inline static auto Make(const Arg& arg) {
+        using T = typename TraitType::type;
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__cc__ T*>(get_imm(0) + arg));
     }
 };
 
 struct MakeBiasMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::BIAS, Iterator>{iter};
+    template <typename PtrPattern, typename TraitType, typename Arg>
+    __aicore__ inline static auto Make(const Arg& arg) {
+        using T = typename TraitType::type;
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__biasbuf__ T*>(get_imm(0) + arg));
     }
 };
 
 struct MakeFixbufMemPtr {
-    template <typename TraitType, typename Iterator>
-    __aicore__ inline static auto Make(Iterator iter) {
-        return HardwareMemPtr<Hardware::FIXBUF, Iterator>{iter};
+    template <typename PtrPattern, typename TraitType, typename Arg>
+    __aicore__ inline static auto Make(const Arg& arg) {
+        using T = typename TraitType::type;
+        return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<__fbuf__ T*>(get_imm(0) + arg));
     }
 };
 
