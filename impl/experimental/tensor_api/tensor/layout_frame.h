@@ -22,20 +22,16 @@ namespace Te {
 
 using LayoutFormatSet = TupleMap<
     Std::tuple<NzLayoutPtn, MakeNzFrameLayout>,
-    Std::tuple<L0CLayoutPtn, MakeL0CFrameLayout>,
     Std::tuple<NDLayoutPtn, MakeNDFrameLayout>,
     Std::tuple<DNLayoutPtn, MakeDNFrameLayout>,
     Std::tuple<NnLayoutPtn, MakeNnFrameLayout>,
     Std::tuple<ZzLayoutPtn, MakeZzFrameLayout>,
     Std::tuple<ZnLayoutPtn, MakeZnFrameLayout>,
-    Std::tuple<RowMajorLayoutPtn, MakeRowMajorFrameLayout>,
-    Std::tuple<ColumnMajorLayoutPtn, MakeColumnMajorFrameLayout>,
     Std::tuple<ScaleANDLayoutPtn, MakeScaleANDFrameLayout>,
     Std::tuple<ScaleADNLayoutPtn, MakeScaleADNFrameLayout>,
     Std::tuple<ScaleBNDLayoutPtn, MakeScaleBNDFrameLayout>,
     Std::tuple<ScaleBDNLayoutPtn, MakeScaleBDNFrameLayout>,
-    Std::tuple<ScaleZzLayoutPtn, MakeScaleZzFrameLayout>,
-    Std::tuple<FP4ZnLayoutPtn, MakeZnFP4FrameLayout>>;
+    Std::tuple<ScaleZzLayoutPtn, MakeScaleZzFrameLayout>>;
 
 template <typename T = uint16_t, size_t C0 = 32 / sizeof(T)>
 struct LayoutTraitDefault {
