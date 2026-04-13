@@ -32,11 +32,11 @@ namespace AscendC {
 __aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::HcommImpl()
 {
     TBuf<TPosition::VECOUT> rdmaInBuf;
-    pipe_.InitBuffer(rdmaInBuf, HCOMM_MEM_BLOCK_SIZE);
+    GetTPipePtr()->InitBuffer(rdmaInBuf, HCOMM_MEM_BLOCK_SIZE);
     ubLocal_ = rdmaInBuf.Get<uint64_t>();
 
     TBuf<TPosition::VECOUT> rdmaInBuf2;
-    pipe_.InitBuffer(rdmaInBuf2, HCOMM_MEM_BLOCK_SIZE);
+    GetTPipePtr()->InitBuffer(rdmaInBuf2, HCOMM_MEM_BLOCK_SIZE);
     ubLocalHead_ = rdmaInBuf2.Get<uint32_t>();
 }
 

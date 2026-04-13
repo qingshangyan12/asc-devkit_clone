@@ -84,7 +84,7 @@ __aicore__ inline void Ub2Gm(
 
 __aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::HcommImpl()
 {
-    pipe_.InitBuffer(hcommBuf_, HCOMM_TMP_BUF_SIZE);
+    GetTPipePtr()->InitBuffer(hcommBuf_, HCOMM_TMP_BUF_SIZE);
     wqeItem_ = hcommBuf_.Get<uint32_t>();
     cqeItem_ = wqeItem_[16];
     sqPI_ = cqeItem_[8];
@@ -210,10 +210,6 @@ __aicore__ inline bool HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::JudgeHand
             KERNEL_LOG(KERNEL_ERROR, "Wait Judge HandleId failed without Commit");
             return false;
         }
-        if (handleWaitList_[handleId]) {
-            KERNEL_LOG(KERNEL_ERROR, "Wait Judge HandleId failed with already Wait");
-            return false;
-        }
     } else {
         // Commit操作，拒绝对已进行Commit的handleId进行操作
         if (handleCommitList_[handleId]) {
@@ -270,6 +266,9 @@ template <pipe_t pipe>
 __aicore__ inline int32_t HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Wait(HcommHandle handleId)
 {
     KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = Wait, handleId = %u", handleId);
+    if (handleWaitList_[handleId]) {
+        return HCOMM_SUCCESS;
+    }
     if (!JudgeHandleId<true>(handleId)) {
         return HCOMM_FAILED;
     }
