@@ -51,11 +51,6 @@ struct LayoutTraitFP4 {
     static constexpr auto C0_ELEMENT = Std::Int<C0>{};
 };
 
-template <size_t C0 = 32>
-struct Element {
-    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
-};
-
 template <typename T, typename = void>
 struct IsFrameLayoutTrait : Std::false_type {};
 

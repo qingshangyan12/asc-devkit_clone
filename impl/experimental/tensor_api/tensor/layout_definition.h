@@ -124,7 +124,7 @@ private:
 
 template <typename T>
 struct GetLayoutInfo {
-    static_assert(false, "GetLayoutTrait/GetLayoutPattern requires LayoutType");
+    static_assert(!Std::is_same_v<T, T>, "GetLayoutTrait/GetLayoutPattern requires LayoutType");
 };
 
 template <typename T, typename U, typename LayoutPattern, typename TraitType>
