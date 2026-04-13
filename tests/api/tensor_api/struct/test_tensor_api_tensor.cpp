@@ -187,6 +187,32 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
     EXPECT_EQ(fixbufPtr.Get(), fixbufData);
 }
 
+TEST_F(Tensor_Api_Tensor, ByteOffsetMakeMemPatternPtrOperation)
+{
+    using namespace AscendC::Te;
+
+    struct FloatTrait {
+        using type = float;
+    };
+
+    constexpr uint64_t BYTE_OFFSET = 128;
+    auto ubPtr = MakeMemPtr<Location::UB, FloatTrait>(BYTE_OFFSET);
+    auto l1Ptr = MakeMemPtr<Location::L1, FloatTrait>(BYTE_OFFSET);
+    auto l0aPtr = MakeMemPtr<Location::L0A, FloatTrait>(BYTE_OFFSET);
+    auto l0bPtr = MakeMemPtr<Location::L0B, FloatTrait>(BYTE_OFFSET);
+    auto l0cPtr = MakeMemPtr<Location::L0C, FloatTrait>(BYTE_OFFSET);
+    auto biasPtr = MakeMemPtr<Location::Bias, FloatTrait>(BYTE_OFFSET);
+    auto fixbufPtr = MakeMemPtr<Location::Fixbuf, FloatTrait>(BYTE_OFFSET);
+
+    EXPECT_EQ(ubPtr.Get(), reinterpret_cast<__ubuf__ float*>(get_imm(0) + BYTE_OFFSET));
+    EXPECT_EQ(l1Ptr.Get(), reinterpret_cast<__cbuf__ float*>(get_imm(0) + BYTE_OFFSET));
+    EXPECT_EQ(l0aPtr.Get(), reinterpret_cast<__ca__ float*>(get_imm(0) + BYTE_OFFSET));
+    EXPECT_EQ(l0bPtr.Get(), reinterpret_cast<__cb__ float*>(get_imm(0) + BYTE_OFFSET));
+    EXPECT_EQ(l0cPtr.Get(), reinterpret_cast<__cc__ float*>(get_imm(0) + BYTE_OFFSET));
+    EXPECT_EQ(biasPtr.Get(), reinterpret_cast<__biasbuf__ float*>(get_imm(0) + BYTE_OFFSET));
+    EXPECT_EQ(fixbufPtr.Get(), reinterpret_cast<__fbuf__ float*>(get_imm(0) + BYTE_OFFSET));
+}
+
 TEST_F(Tensor_Api_Tensor, IteratorGetOperation)
 {
     using namespace AscendC::Te;

@@ -15,41 +15,18 @@
 #ifndef IMPL_TENSOR_API_TENSOR_POINTER_PATTERN_H
 #define IMPL_TENSOR_API_TENSOR_POINTER_PATTERN_H
 
-#include "impl/tensor_api/utils/map_impl.h"
+#include "impl/tensor_api/tensor/pointer_mem_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern_impl.h"
 
 namespace AscendC {
 namespace Te {
-
-namespace Location {
-    struct EmptyTrait {};
-    struct GM {};
-    struct UB {};
-    struct L1 {};
-    struct L0A {};
-    struct L0B {};
-    struct L0C {};
-    struct Bias {};
-    struct Fixbuf {};
-}
-
-using PtrMemSet = TupleMap<
-    Std::tuple<Location::UB, MakeUBMemPtr>,
-    Std::tuple<Location::L1, MakeL1MemPtr>,
-    Std::tuple<Location::L0A, MakeL0AMemPtr>,
-    Std::tuple<Location::L0B, MakeL0BMemPtr>,
-    Std::tuple<Location::L0C, MakeL0CMemPtr>,
-    Std::tuple<Location::Bias, MakeBiasMemPtr>,
-    Std::tuple<Location::Fixbuf, MakeFixbufMemPtr>>;
 
 template <typename HardWare, typename TraitType, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
     using Arg = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
     static_assert(!IsMemPtrIterator<Arg>::value, "MakeMemPtr expects a byteOffset. ");
-    
-    using GetPtrMakeFun = typename PtrMemSet::template Get<HardWare>;
-    return GetPtrMakeFun::template Make<HardWare, TraitType>(args...);
+    return MakeLocationMemPtr<HardWare, TraitType>(args...);
 }
 
 template <typename HardWare, typename... Args>
