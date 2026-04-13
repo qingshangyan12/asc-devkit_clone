@@ -13,41 +13,64 @@
 
 
 import os
+import argparse
 import numpy as np
+np.random.seed(9)
 
 
-def get_range_by_dtype(input_type):
-    try:
-        if input_type == np.float16 or input_type == np.float32 or input_type == np.float64:
-            return np.finfo(input_type).min, np.finfo(input_type).max
-        else:
-            return np.iinfo(input_type).min, np.iinfo(input_type).max
-    except ValueError:
-        print(f"Unsupported data type:{input_type}")
+def gen_golden_data(scenarioNum=1):
+    """
+    根据场景编号生成输入数据和Golden数据
+    场景1：输入[1, 20]，输出[1, 32]，使用SetPadValue填充
+    场景2：输入[32, 59]，输出[32, 64]，rightPadding，不使用SetPadValue
+    场景3：输入[3, 24]，输出[1, 80]，Compact模式
+    """
+    if scenarioNum == 1:
+        src_rows = 1
+        src_cols = 20
+        dst_cols = 32
+        use_setpadvalue = True
+        data_type = np.float16
+    elif scenarioNum == 2:
+        src_rows = 32
+        src_cols = 59
+        dst_cols = 64
+        use_setpadvalue = False
+        data_type = np.float32
+    elif scenarioNum == 3:
+        src_rows = 3
+        src_cols = 24
+        dst_cols = 80
+        use_setpadvalue = False
+        data_type = np.float16
+    
+    input_x = np.random.uniform(-10, 10, [src_rows, src_cols]).astype(data_type)
 
-def gen_golden_data_simple():
-    input_type = np.float16
-    output_type = input_type
-    block_length = 32
-    #与算子中标量值保持一致
-    scalar = 0
-    #非对齐搬运20个half类型数据
-    data_copy_pad_len = 20 
+    if scenarioNum == 1 or scenarioNum == 2:
+        golden = np.zeros([src_rows, dst_cols], dtype=data_type)
+        for i in range(src_rows):
+            for j in range(src_cols):
+                golden[i, j] = input_x[i, j]
+        
+        if use_setpadvalue:
+            for i in range(src_rows):
+                for j in range(src_cols, dst_cols):
+                    golden[i, j] = 1
+    
+    elif scenarioNum == 3:
+        golden = np.zeros([dst_cols], dtype=data_type)
+        input_flatten = input_x.flatten()
+        golden[:72] = input_flatten
+        golden = golden.reshape(1,80)
 
-    min_val, max_val = get_range_by_dtype(input_type)
-    input_shape = [data_copy_pad_len]
-    output_shape = [block_length]
-    input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
-    golden = np.zeros(output_shape).astype(output_type)
-    for i in range(block_length):
-        if i < data_copy_pad_len:
-            golden[i] = input_x[i] + scalar
-        else:
-            golden[i] = 1
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     input_x.tofile("./input/input_x.bin")
     golden.tofile("./output/golden.bin")
 
+
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2, 3])
+    args = parser.parse_args()
+    gen_golden_data(args.scenarioNum)
