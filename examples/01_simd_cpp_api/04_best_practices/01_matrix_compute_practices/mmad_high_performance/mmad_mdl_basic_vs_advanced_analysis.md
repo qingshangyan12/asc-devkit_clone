@@ -167,38 +167,53 @@ for (uint32_t kIndex = 0; kIndex < kLoopCount; kIndex++) {
 
 基础API使用**静态tensor + SetFlag/WaitFlag**同步模型：
 
-| 层级 | 正向同步 | 反向同步 |
-|------|----------|----------|
-| GM→L1 | `SetFlag<MTE2_MTE1>` / `WaitFlag<MTE2_MTE1>` | `WaitFlag<MTE1_MTE2>` / `SetFlag<MTE1_MTE2>` |
-| L1→L0 | `SetFlag<MTE1_M>` / `WaitFlag<MTE1_M>` | `WaitFlag<M_MTE1>` / `SetFlag<M_MTE1>` |
+| 层级 | 正向同步（当前循环内） | 反向同步（跨循环依赖） |
+|------|------------------------|------------------------|
+| GM→L1 | `SetFlag<MTE2_MTE1>` → `WaitFlag<MTE2_MTE1>` | `WaitFlag<MTE1_MTE2>` → `SetFlag<MTE1_MTE2>` |
+| L1→L0 | `SetFlag<MTE1_M>` → `WaitFlag<MTE1_M>` | `WaitFlag<M_MTE1>` → `SetFlag<M_MTE1>` |
 
-### 3.3 CopyIn中的缓存命中判断
+### 3.3 修改前的同步流程
 
-```cpp
-__aicore__ inline void CopyInA(AscendC::LocalTensor<half> a1Local, uint32_t kIndex, uint32_t mIndex)
-{
-    const uint32_t kModStepKa = kIndex % stepKa;
-    if (kModStepKa == 0) {
-        // 缓存未命中：执行大包搬运
-        WaitFlag<MTE1_MTE2>(mte2DBFlagA);  // 等待L0消费完
-        DataCopy(a1Local, aGM[...], nd2nzA1Params);
-        SetFlag<MTE2_MTE1>(0);              // 通知DataLoad数据就绪
-        mte2DBFlagA = 1 - mte2DBFlagA;      // 切换Ping/Pong
-    }
-    // else: 缓存命中，跳过搬运
-}
+修改前的同步流程如下（以A矩阵为例，B矩阵类似）：
+
+```
+CopyInA (kIndex % stepKa == 0时执行):
+    WaitFlag<MTE1_MTE2>(mte2DBFlagA)   ← 等待上一个buffer被消费完
+    DataCopy(GM → A1 Ping/Pong)
+    SetFlag<MTE2_MTE1>(0)              ← 通知DataLoadA数据就绪
+    mte2DBFlagA = 1 - mte2DBFlagA
+
+DataLoadA (每次循环执行):
+    if (kIndex % stepKa == 0)
+        WaitFlag<MTE2_MTE1>(0)         ← 等待CopyInA完成
+    LoadData(A1 → A2)
+    // ← 没有SetFlag<MTE1_MTE2>！
+
+Compute (每次循环执行):
+    SetFlag<MTE1_M>(mte1DBFlag)
+    WaitFlag<MTE1_M>(mte1DBFlag)
+    Mmad(...)
+    SetFlag<M_MTE1>(mte1DBFlag)        ← 通知下一轮DataLoad
+    mte1DBFlag = 1 - mte1DBFlag
 ```
 
-### 3.4 DataLoad中的K偏移计算
+### 3.4 修改前存在的同步缺陷
 
-```cpp
-// 修改前（简化版）
-uint32_t srcAddr = kModStepKa * baseK * baseM;  // A矩阵L1偏移
+**关键问题：DataLoadA/DataLoadB 之后缺少 `SetFlag<MTE1_MTE2>`**
+
+`MTE1_MTE2` 是反向同步事件，用于防止 MTE2（CopyIn）覆盖 MTE1（DataLoad）尚未消费完的 L1 buffer。完整的同步对应该为：
+
+```
+生产端（CopyIn）:  WaitFlag<MTE1_MTE2>  ← 等待消费端释放
+消费端（DataLoad）: SetFlag<MTE1_MTE2>  ← 消费完毕后释放
 ```
 
-### 3.5 L1缓存释放
+修改前，只有 `InitSyncFlags` 中初始设置了 `SetFlag<MTE1_MTE2>(0/1/2/3)`，DataLoad 之后没有任何 `SetFlag<MTE1_MTE2>`。这意味着：
 
-修改前的基础API **没有显式的L1缓存释放机制**。`SetFlag<MTE1_MTE2>` 在每次DataLoad后都执行，而不是仅在最 后一个K块完成时执行。
+- **第一次 CopyInA**（kIndex=0）：`WaitFlag<MTE1_MTE2>(0)` 消耗了 InitSyncFlags 的初始 flag，正常通过
+- **第二次 CopyInA**（kIndex=8）：`WaitFlag<MTE1_MTE2>(1)` 会**永久阻塞**，因为没有任何地方再次 `SetFlag<MTE1_MTE2>(1)`
+
+> **注意**：在实际硬件上，由于 SetFlag/WaitFlag 是基于 event ID 的信号量机制，InitSyncFlags 设置的 flag 在第一次 WaitFlag 时被消耗后就不再有效。后续如果没有对应的 SetFlag，WaitFlag 就会一直等待。因此在 stepKa > 1 的场景下，修改前的代码**实际上无法正确运行**。
 
 ---
 
@@ -211,62 +226,46 @@ uint32_t srcAddr = kModStepKa * baseK * baseM;  // A矩阵L1偏移
 | **K循环结构** | 内外双层循环（outerIdx + innerIdx），以 minStepK 为粒度 | 简单线性循环（kIndex: 0 → kLoopCount） |
 | **同步模型** | TQue（EnQue/DeQue/AllocTensor/FreeTensor） | 静态tensor（SetFlag/WaitFlag） |
 | **L1缓存命中** | `Hit(posL1, bufferPos)` 显式判断 | `kIndex % stepKa == 0` 隐式判断 |
-| **L1缓存释放** | `ClearL1BufferCache()` 在外层循环边界判断 | 无显式释放，MTE1_MTE2在每次循环SetFlag |
+| **L1缓存释放** | `FreeTensor` 在 ClearL1BufferCache 中调用 | **缺失**：DataLoad 后没有 SetFlag<MTE1_MTE2> |
 | **K偏移计算** | `kAxisL1Offset = (kInnerIdx % stepKa) * baseK` | 相同逻辑 `kModStepKa * baseK * baseM` |
-| **外层K索引** | `GetOuterKaIdx() = outerIdx / kaStepFactor` | 无概念，直接用 kIndex |
-| **A/B独立切换** | kaStepFactor/kbStepFactor 控制A/B不同步切换 | mte2DBFlagA/mte2DBFlagB 独立管理，但线性循环中缺乏外层语义 |
+| **A/B独立切换** | kaStepFactor/kbStepFactor 控制A/B不同步切换 | mte2DBFlagA/mte2DBFlagB 独立管理 |
 
-### 4.2 循环结构的根本差异
+### 4.2 循环结构差异分析
 
-高阶API的双层循环天然表达了 **A/B矩阵L1 buffer异步切换** 的语义：
+**重要说明：双层循环与线性循环在功能上是等价的**。
 
-```
-stepKa=8, stepKb=4, minStepK=4, kaStepFactor=2, kbStepFactor=1
+线性循环 `for (kIndex = 0; kIndex < kLoopCount; kIndex++)` 与双层循环 `kIndex = outerKIdx * minStepK + innerKOffset` 产生的 kIndex 序列完全相同，判断条件也完全相同（`kIndex % stepKa == 0`）。
 
-外层循环0: innerStartIdx=0
-  → A: outerKaIdx=0 (触发CopyInA), B: outerKbIdx=0 (触发CopyInB)
-  内层: kIndex=0,1,2,3
+双层循环的真正价值在于：
 
-外层循环1: innerStartIdx=4
-  → A: outerKaIdx=0 (不触发CopyInA, 缓存命中), B: outerKbIdx=1 (触发CopyInB)
-  内层: kIndex=4,5,6,7
+1. **语义清晰**：`outerKaIdx` 和 `outerKbIdx` 显式表达了A/B矩阵在外层循环维度的独立进度，这在高阶API中用于 ClearL1BufferCache 的判断逻辑
+2. **扩展性**：双层循环为未来添加 Preload（预取下一个L1 tile）等优化提供了自然的插入点
+3. **与高阶API对齐**：保持代码结构一致，便于理解和维护
 
-外层循环2: innerStartIdx=8
-  → A: outerKaIdx=1 (触发CopyInA), B: outerKbIdx=2 (触发CopyInB)
-  内层: kIndex=8,9,10,11
+但在当前代码中，这些 `outerKaIdx`/`outerKbOuterIdx` 变量虽然被计算但未被直接使用（缓存命中仍通过 `kIndex % stepKa == 0` 判断），所以**双层循环目前仅是代码风格/语义上的改进，不影响执行逻辑**。
 
-外层循环3: innerStartIdx=12
-  → A: outerKaIdx=1 (不触发CopyInA, 缓存命中), B: outerKbIdx=3 (触发CopyInB)
-  内层: kIndex=12,13,14,15
-```
+### 4.3 L1缓存释放差异（核心差异）
 
-**关键观察**：在外层循环1中，A矩阵缓存命中（outerKaIdx仍为0），B矩阵缓存未命中（outerKbIdx从0变为1）。这天然表达了"stepKa=8的A矩阵每2个外层循环才需要搬运一次，而stepKb=4的B矩阵每个外层循环都需要搬运"。
+这是**修改前后的真正区别**。
 
-而基础API的线性循环 `kIndex=0,1,...,127`，虽然通过 `kIndex % stepKa == 0` 也能判断缓存命中，但缺乏外层语义，无法正确表达 **A/B在不同时间点切换L1 Ping/Pong buffer** 的协调关系。
+高阶API中，`FreeTensor` 在 `ClearL1BufferCache` 中被调用，语义是"当前L1 buffer的数据已全部消费完毕，释放buffer允许下一次 CopyIn 覆盖"。对应到基础API的静态tensor模型，等价操作是在 DataLoad 消费完最后一个K块后执行 `SetFlag<MTE1_MTE2>`。
 
-### 4.3 L1缓存释放差异
-
-高阶API的 `ClearL1BufferCache` 在外层循环边界判断是否需要释放：
-
-```
-outerIdx=1结束时: nextOuterKaIdx=0 (与curKaOuterIdx=0相同) → A不释放
-                  nextOuterKbIdx=1 (与curKbOuterIdx=0不同) → B释放
-
-outerIdx=2结束时: nextOuterKaIdx=1 (与curKaOuterIdx=0不同) → A释放
-                  nextOuterKbIdx=2 (与curKbOuterIdx=1不同) → B释放
-```
-
-基础API中，MTE1_MTE2 的 SetFlag 机制需要在DataLoad完成时通知CopyIn可以覆盖buffer。修改前每个循环都执行 SetFlag，但更精确的做法是**仅在当前K块是某个buffer的最后一个K块时才释放**，避免过早释放导致数据被覆盖。
+| 高阶API | 基础API等价 | 说明 |
+|---------|------------|------|
+| `AllocTensor(bufferPos)` | `LocalTensor<T>(pos, offset, size)` | 静态tensor预分配 |
+| `EnQue(tensor)` | `SetFlag<MTE2_MTE1>` | 通知下游数据就绪 |
+| `DeQue()` | `WaitFlag<MTE2_MTE1>` | 等待上游数据就绪 |
+| `Hit(posL1, bufferPos)` | `kIndex % stepKa == 0` | 缓存命中判断 |
+| `FreeTensor(bufferPos)` | `SetFlag<MTE1_MTE2>` | **释放buffer，允许覆盖** ← 修改前缺失 |
 
 ### 4.4 同步模型差异
 
-| 高阶API (TQue) | 基础API (SetFlag/WaitFlag) | 说明 |
-|-----------------|---------------------------|------|
-| `AllocTensor(bufferPos)` | N/A（静态tensor预分配） | 基础API在Process()开头一次性分配所有buffer |
-| `EnQue(tensor)` | `SetFlag<MTE2_MTE1>` | 通知DataLoad数据已就绪 |
-| `DeQue()` | `WaitFlag<MTE2_MTE1>` | 等待DataCopy完成 |
-| `Hit(posL1, bufferPos)` | `kIndex % stepKa == 0` | 判断是否需要搬运 |
-| `FreeTensor(bufferPos)` | `SetFlag<MTE1_MTE2>` | 通知CopyIn可以覆盖buffer |
+高阶API使用 TQue（EnQue/DeQue），基础API使用静态tensor（SetFlag/WaitFlag）。两者在功能上等价，区别仅在于接口形式：
+
+- TQue 是队列抽象，EnQue/DeQue 隐含了硬件事件同步
+- SetFlag/WaitFlag 是底层原语，需要开发者手动管理 flag ID 和配对关系
+
+基础API选择 SetFlag/WaitFlag 是因为静态 tensor 不支持 TQue 接口。
 
 ---
 
@@ -305,7 +304,7 @@ __aicore__ inline void InitSyncFlags()
 }
 ```
 
-**原因**：明确区分A矩阵（flag 0,1）和B矩阵（flag 2,3）的MTE1_MTE2同步标志，与CopyInB中 `WaitFlag<MTE1_MTE2>(mte2DBFlagB + 2)` 和 DataLoadB后 `SetFlag<MTE1_MTE2>(currMte2IdxB + 2)` 的用法一致。
+**原因**：明确区分A矩阵（flag 0,1）和B矩阵（flag 2,3）的 MTE1_MTE2 同步标志，与 CopyInB 中 `WaitFlag<MTE1_MTE2>(mte2DBFlagB + 2)` 和 DataLoadB 后 `SetFlag<MTE1_MTE2>(currMte2IdxB + 2)` 的用法一致。
 
 ### 5.2 修改2：Process() 引入内外双层K循环
 
@@ -344,11 +343,13 @@ for (uint32_t outerKIdx = 0; outerKIdx < outerKIter; outerKIdx++) {
 }
 ```
 
-### 5.3 修改3：L1缓存释放优化
+**注意**：双层循环产生的 kIndex 序列与线性循环完全相同，判断条件也相同。这个修改是**语义和代码结构上的改进**，不是功能修正。其价值在于与高阶API的 KLoopMDLBase 结构对齐，便于理解和维护。
 
-**修改前**：每个K循环的DataLoad后都执行 SetFlag<MTE1_MTE2>，不论当前K块是否是buffer的最后一个消费者。
+### 5.3 修改3：补全缺失的 SetFlag<MTE1_MTE2>（核心修改）
 
-**修改后**：参考高阶API的FreeTensor语义，仅在当前K块是某个L1 buffer的**最后一个K块**时才释放：
+**修改前**：DataLoadA/DataLoadB 之后**没有** `SetFlag<MTE1_MTE2>`，导致 CopyInA/CopyInB 中的 `WaitFlag<MTE1_MTE2>` 在第二次触发时永久阻塞。
+
+**修改后**：参考高阶API的 `FreeTensor` 语义，在 DataLoad 消费完当前K块后，**仅在该K块是L1 buffer的最后一个消费者时**才释放：
 
 ```cpp
 DataLoadA(a1LocalTmp, a2Local, mIndex, kIndex);
@@ -362,41 +363,62 @@ if ((kIndex + 1) % stepKb == 0)
     AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(currMte2IdxB + 2);
 ```
 
+**为什么只在最后一个K块才 SetFlag**：
+
+一个 L1 buffer 被 stepKa 个 K 块共享（例如 stepKa=8 时，kIndex=0~7 共享 A1 Ping）。只有当最后一个 K 块（kIndex=7）的 DataLoad 完成后，该 buffer 中的数据才全部被消费完毕，此时才能安全释放，允许 CopyIn 覆盖。
+
+如果每个 K 块都 SetFlag，会导致：
+1. 过早释放：kIndex=0 的 DataLoad 后就释放，但 kIndex=1~7 还没从这个 buffer 读取
+2. flag 计数错误：多次 SetFlag 同一个 flag ID，而 CopyIn 只 WaitFlag 一次，可能导致后续 WaitFlag 立即通过
+
 ---
 
 ## 六、修改原因详解
 
-### 6.1 为什么要引入双层K循环
+### 6.1 为什么要补全 SetFlag<MTE1_MTE2>
 
-**问题**：线性循环 `kIndex=0,1,...,127` 无法自然表达 stepKa≠stepKb 时 A/B 矩阵 L1 buffer 的异步切换节奏。
+**修改前代码存在同步死锁缺陷**。
 
-以 stepKa=8, stepKb=4 为例：
+`MTE1_MTE2` 是反向同步事件，保证"消费完才能覆盖"。完整的同步链路为：
 
-| kIndex范围 | A矩阵L1状态 | B矩阵L1状态 |
-|-----------|-------------|-------------|
-| 0-3 | 第1次CopyIn（Ping） | 第1次CopyIn（Ping） |
-| 4-7 | **缓存命中**（Ping） | 第2次CopyIn（Pong） |
-| 8-11 | 第2次CopyIn（Pong） | 第3次CopyIn（Ping） |
-| 12-15 | **缓存命中**（Pong） | 第4次CopyIn（Pong） |
+```
+CopyInA:  WaitFlag<MTE1_MTE2>(mte2DBFlagA)  ← 我要写这个buffer，等你说消费完了
+DataLoadA: SetFlag<MTE1_MTE2>(currMte2IdxA) ← 我消费完了，你可以写了
+```
 
-线性循环中，kIndex=4时A缓存命中但B需要搬运，kIndex=8时两者都需要搬运。这种不同的节奏在双层循环中自然体现：
+修改前只有 WaitFlag 没有 SetFlag（除 InitSyncFlags 的初始值），第二次 CopyInA 会因 WaitFlag 无法通过而永久阻塞。
 
-- **外层循环0** (innerStartIdx=0)：A=miss, B=miss → 两者都CopyIn
-- **外层循环1** (innerStartIdx=4)：A=hit(outerKaIdx仍=0), B=miss(outerKbIdx变为1) → 仅B CopyIn
-- **外层循环2** (innerStartIdx=8)：A=miss(outerKaIdx变为1), B=miss → 两者都CopyIn
-- **外层循环3** (innerStartIdx=12)：A=hit(outerKaIdx仍=1), B=miss → 仅B CopyIn
+**这等价于高阶API中缺少 FreeTensor**：如果高阶API不调用 FreeTensor，AllocTensor 会因 TQue 满而阻塞，效果相同。
 
-双层循环的 `kaStepFactor` 和 `kbStepFactor` 天然编码了这个节奏。
+### 6.2 为什么 SetFlag 要加条件判断
 
-### 6.2 为什么要优化L1缓存释放
+条件 `(kIndex + 1) % stepKa == 0` 的含义是"当前K块是该L1 buffer的最后一个消费者"。
 
-**问题**：修改前每个K循环的DataLoad后都执行 `SetFlag<MTE1_MTE2>`，这意味着CopyIn在下一个 `kIndex % stepKa == 0` 时 WaitFlag 会立即通过，可能导致 **L1 buffer中的数据尚未被所有K块消费完就被覆盖**。
+这对应高阶API中 `ClearL1BufferCache` 的判断逻辑：
+```cpp
+int32_t curKaIdx = MATMUL_MODULE(KLoop)->GetNextOuterKaIdx();
+if (curKaIdx != curKaOuterIdx) {
+    MATMUL_MODULE(CopyCubeInA)->ClearLoadData();  // FreeTensor
+}
+```
 
-例如，当 stepKa=8 时，A矩阵的一个L1 buffer被 kIndex=0~7 共8个K块共享。如果 kIndex=0 的 DataLoad 完成后就 SetFlag，那么 kIndex=8 的 CopyIn 会 WaitFlag 通过后立即写入同一个buffer，而此时 kIndex=1~7 的 DataLoad 尚未从这个buffer读取数据。
+高阶API在外层循环边界判断"下一个outerKaIdx与当前不同"时释放，等价于基础API中"当前K块是stepKa对齐的最后一个"时释放。
 
-**修改后**：仅在 `(kIndex + 1) % stepKa == 0` 时 SetFlag，即最后一个K块消费完毕后才释放buffer。这对应高阶API中 `ClearL1BufferCache` 仅在 `nextOuterKaIdx != curKaOuterIdx` 时调用 `FreeTensor` 的语义。
+对于 stepKa=8：
+- 高阶API：outerIdx=1结束时，nextOuterKaIdx = (1+1)/2 = 1 ≠ curKaOuterIdx=0，所以释放
+- 基础API：kIndex=7时，(7+1)%8==0，所以释放
 
-### 6.3 为什么保持静态tensor模型
+两者在时机上完全一致。
+
+### 6.3 双层循环的意义
+
+诚然，双层循环在当前代码中**不改变功能**。它的意义在于：
+
+1. **语义对齐**：与高阶API KLoopMDLBase 的结构一致，便于代码审查者理解 A/B 异步切换的节奏
+2. **扩展性**：为 Preload 等优化提供自然的插入点（外层循环末尾是发起预取的位置）
+3. **辅助变量**：`curKaOuterIdx`/`curKbOuterIdx` 等变量虽然当前未直接使用，但为未来扩展（如尾部处理、动态 tileShape）预留了接口
+
+### 6.4 为什么保持静态tensor模型
 
 高阶API使用 TQue（EnQue/DeQue）模型，而基础API使用静态tensor（SetFlag/WaitFlag）模型。两者的映射关系：
 
@@ -408,7 +430,7 @@ if ((kIndex + 1) % stepKb == 0)
 | `Hit(posL1, bufferPos)` | `kIndex % stepKa == 0` | 缓存命中判断 |
 | `FreeTensor(bufferPos)` | `SetFlag<MTE1_MTE2>` | 释放buffer，允许覆盖 |
 
-基础API的静态tensor模型在功能上完全等价于TQue，只是同步接口不同。修改时保持静态tensor模型，仅调整循环结构和缓存释放时机。
+基础API的静态tensor模型在功能上完全等价于TQue，只是同步接口不同。修改时保持静态tensor模型，仅补全了缺失的 `SetFlag<MTE1_MTE2>`。
 
 ---
 
@@ -421,7 +443,7 @@ if ((kIndex + 1) % stepKb == 0)
 | 0 | 0 (miss) | 0 (miss) | ✓ Ping | ✓ Ping | ✗ (0+1)%8≠0 | ✗ (0+1)%4≠0 |
 | 1 | 1 | 1 | ✗ | ✗ | ✗ (1+1)%8≠0 | ✗ (1+1)%4≠0 |
 | 2 | 2 | 2 | ✗ | ✗ | ✗ (2+1)%8≠0 | ✗ (2+1)%4≠0 |
-| 3 | 3 | 3 | ✗ | ✗ | ✗ (3+1)%8≠0 | ✓ (3+1)%4==0 → SetFlag B |
+| 3 | 3 | 3 | ✗ | ✗ | ✗ (3+1)%8≠0 | ✓ (3+1)%4==0 → SetFlag B(2) |
 
 ### 7.2 外层循环1 (innerStartIdx=4)
 
@@ -430,7 +452,7 @@ if ((kIndex + 1) % stepKb == 0)
 | 4 | 4 | 0 (miss) | ✗ | ✓ Pong | ✗ (4+1)%8≠0 | ✗ (4+1)%4≠0 |
 | 5 | 5 | 1 | ✗ | ✗ | ✗ (5+1)%8≠0 | ✗ (5+1)%4≠0 |
 | 6 | 6 | 2 | ✗ | ✗ | ✗ (6+1)%8≠0 | ✗ (6+1)%4≠0 |
-| 7 | 7 | 3 | ✗ | ✗ | ✓ (7+1)%8==0 → SetFlag A | ✓ (7+1)%4==0 → SetFlag B |
+| 7 | 7 | 3 | ✗ | ✗ | ✓ (7+1)%8==0 → SetFlag A(0) | ✓ (7+1)%4==0 → SetFlag B(3) |
 
 ### 7.3 外层循环2 (innerStartIdx=8)
 
@@ -439,14 +461,24 @@ if ((kIndex + 1) % stepKb == 0)
 | 8 | 0 (miss) | 0 (miss) | ✓ Pong | ✓ Ping | ✗ (8+1)%8≠0 | ✗ (8+1)%4≠0 |
 | 9 | 1 | 1 | ✗ | ✗ | ✗ (9+1)%8≠0 | ✗ (9+1)%4≠0 |
 | 10 | 2 | 2 | ✗ | ✗ | ✗ (10+1)%8≠0 | ✗ (10+1)%4≠0 |
-| 11 | 3 | 3 | ✗ | ✗ | ✗ (11+1)%8≠0 | ✓ (11+1)%4==0 → SetFlag B |
+| 11 | 3 | 3 | ✗ | ✗ | ✗ (11+1)%8≠0 | ✓ (11+1)%4==0 → SetFlag B(2) |
 
-### 7.4 关键观察
+### 7.4 同步链路验证
 
-1. **A矩阵每8个K块才释放一次L1 buffer**（kIndex=7, 15, 23...），对应 stepKa=8
-2. **B矩阵每4个K块释放一次L1 buffer**（kIndex=3, 7, 11...），对应 stepKb=4
-3. **CopyInA每8个K块触发一次**（kIndex=0, 8, 16...），且在释放后才能写入
-4. **CopyInB每4个K块触发一次**（kIndex=0, 4, 8...），且在释放后才能写入
+以 A 矩阵为例，验证 SetFlag/WaitFlag 的完整配对：
+
+```
+InitSyncFlags: SetFlag<MTE1_MTE2>(0), SetFlag<MTE1_MTE2>(1)
+
+kIndex=0, CopyInA: WaitFlag<MTE1_MTE2>(0) ← 消耗Init的flag(0)，通过
+kIndex=7, DataLoadA: SetFlag<MTE1_MTE2>(0) ← 补充flag(0)
+kIndex=8, CopyInA: WaitFlag<MTE1_MTE2>(1) ← 消耗Init的flag(1)，通过
+kIndex=15, DataLoadA: SetFlag<MTE1_MTE2>(1) ← 补充flag(1)
+kIndex=16, CopyInA: WaitFlag<MTE1_MTE2>(0) ← 消耗kIndex=7补充的flag(0)，通过
+...
+```
+
+每次 CopyInA 的 WaitFlag 都有对应的 SetFlag 提供信号，不会死锁。
 
 ---
 
@@ -463,10 +495,22 @@ if ((kIndex + 1) % stepKb == 0)
 
 ## 九、总结
 
-本次修改的核心思想是**参考高阶API的K轴双层循环结构，使基础API的MDL实现能正确协调 stepKa≠stepKb 时 A/B 矩阵的 L1 缓存节奏**。关键修改点：
+### 9.1 修改的核心：补全缺失的 SetFlag<MTE1_MTE2>
 
-1. **循环重构**：线性K循环 → 内外双层K循环（以 minStepK 为粒度）
-2. **缓存释放优化**：每次循环释放 → 仅在最后一个K块消费完毕时释放
-3. **保持同步模型**：坚持使用 SetFlag/WaitFlag，不引入 EnQue/DeQue
+修改前代码存在**同步死锁缺陷**：DataLoad 消费完 L1 buffer 后没有 `SetFlag<MTE1_MTE2>`，导致 CopyIn 中的 `WaitFlag<MTE1_MTE2>` 在第二次触发时永久阻塞。
 
-这些修改使基础API的MDL实现语义与高阶API对齐，同时保持了静态tensor模型的简洁性。
+修改后参考高阶API的 `FreeTensor` 语义，在 DataLoad 消费完当前K块后，**仅在该K块是L1 buffer的最后一个消费者时**（`(kIndex+1) % stepKa == 0`）执行 `SetFlag<MTE1_MTE2>`，补全了同步链路。
+
+### 9.2 双层循环：语义改进，非功能修正
+
+双层循环与线性循环在功能上完全等价（kIndex 序列和判断条件相同），其价值在于：
+- 与高阶API KLoopMDLBase 结构对齐，提升代码可读性
+- 为 Preload 等扩展优化提供自然的插入点
+
+### 9.3 修改汇总
+
+| 修改 | 类型 | 影响 |
+|------|------|------|
+| InitSyncFlags 注释更新 | 注释 | 无功能影响 |
+| 双层K循环 | 代码重构 | 功能等价，语义改进 |
+| **补全 SetFlag<MTE1_MTE2>** | **Bug修复** | **修复同步死锁，使代码可正确运行** |
