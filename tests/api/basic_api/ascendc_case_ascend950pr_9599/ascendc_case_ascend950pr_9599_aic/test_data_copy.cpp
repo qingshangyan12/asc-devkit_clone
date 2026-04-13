@@ -220,6 +220,23 @@ void MainDataCopyL12FBKernel(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t*
 }
 
 template<typename T>
+void MainDataCopyL12BTOddBlockLenKernel(__gm__ uint8_t* __restrict__ srcGm,
+    __gm__ uint8_t* __restrict__ dstGm, __gm__ int32_t dataSize)
+{
+    TPipe tpipe;
+    TBuf<TPosition::C1> tbufL1;
+    tpipe.InitBuffer(tbufL1, dataSize * sizeof(T));
+    LocalTensor<T> l1Local = tbufL1.Get<T>();
+
+    TBuf<TPosition::C2> tbufC2;
+    tpipe.InitBuffer(tbufC2, dataSize * sizeof(T));
+    LocalTensor<T> biasLocal = tbufC2.Get<T>();
+
+    DataCopyParams params{1, 1, 0, 0};  // blockLen = 1 (odd)
+    DataCopy(biasLocal, l1Local, params);
+}
+
+template<typename T>
 void main_tensortrait_data_copy_kernel_fixpipe(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __restrict__ dstGm, __gm__ int32_t dataSize)
 {
     TPipe tpipe;
@@ -340,7 +357,9 @@ INSTANTIATE_TEST_CASE_P(TEST_DATA_COPY_AIC, TestDataCopySuite,
     TestDataCopyParams { 64, 4, MainDataCopyL12FBKernel<float> },
     TestDataCopyParams { 64, 4, MainDataCopyL12FBKernel<int32_t> },
     TestDataCopyParams { 64, 2, MainDataCopyL12FBKernel<half> },
-    TestDataCopyParams { 128, 1, MainDataCopyL12FBKernel<int8_t> }
+    TestDataCopyParams { 128, 1, MainDataCopyL12FBKernel<int8_t> },
+    TestDataCopyParams { 16, 4, MainDataCopyL12BTOddBlockLenKernel<float> },
+    TestDataCopyParams { 16, 4, MainDataCopyL12BTOddBlockLenKernel<int32_t> }
     ));
 
 TEST_P(TestDataCopySuite, TestDataCopyPadCases)
