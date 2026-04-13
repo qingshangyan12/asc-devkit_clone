@@ -13,27 +13,27 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-class TEST_ASC_RELEASE_BUF : public testing::Test {
+class TEST_ASC_UNLOCK : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
 };
 
 namespace {
-void rls_buf_stub(pipe_t pipe, uint8_t buf_id, bool mode)
+void rls_buf_stub(pipe_t pipe, uint8_t mutex_id, bool disable_blocking)
 {
     EXPECT_EQ(pipe, pipe_t::PIPE_S);
-    EXPECT_EQ(buf_id, static_cast<uint8_t>(11));
-    EXPECT_EQ(mode, false);
+    EXPECT_EQ(mutex_id, static_cast<uint8_t>(11));
+    EXPECT_EQ(disable_blocking, false);
 }
 } // namespace
 
-TEST_F(TEST_ASC_RELEASE_BUF, c_api_release_buf_Succ)
+TEST_F(TEST_ASC_UNLOCK, c_api_release_buf_Succ)
 {
     MOCKER_CPP(rls_buf, void(pipe_t, uint8_t, bool))
         .times(1)
         .will(invoke(rls_buf_stub));
 
-    asc_release_buf(pipe_t::PIPE_S, static_cast<uint8_t>(11), false);
+    asc_unlock(pipe_t::PIPE_S, static_cast<uint8_t>(11), false);
     GlobalMockObject::verify();
 }
