@@ -12,8 +12,6 @@
 #define AICPU_KFC_INTERFACE_H
 
 #include <cstdint>
-#include "log.h"
-#include "hccl_inner_def.h"
 
 extern "C" {
 __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void *args[])

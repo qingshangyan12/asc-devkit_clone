@@ -9,12 +9,12 @@
  */
 
 #include "aicpu_kfc_interface.h"
+#include "log.h"
 
-using namespace HcclApi;
 extern "C" {
 __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void *args[])
 {
-    HCCL_INFO("Runing RunAicpuKfcSrvLaunch for mc2_server.");
-    return HCCL_SUCCESS;
+    HCCL_INFO("Runing Mc2ServerKernel for mc2_server.");
+    return 0;
 }
 }
