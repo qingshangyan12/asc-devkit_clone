@@ -1,7 +1,29 @@
 # ld_st_reg_align样例
 
 ## 概述
-本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的对齐数据搬运操作，该样例使用LoadAlign，StoreAlign接口，以及POST_MODE_UPDATE和DATA_BLOCK_COPY模式的使能。
+本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的对齐数据搬运操作，该样例使用LoadAlign，StoreAlign接口，以及POST_MODE_UPDATE和DATA_BLOCK_COPY模式的使能。本样例支持四种搬运场景，通过环境变量选择场景。
+    <table>
+ 	  	 	<tr>
+ 	  	 		<td>scenarioNum</td>
+ 	  	 		<td>搬运场景</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>1</td>
+ 	  	 		<td>连续搬运</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>2</td>
+ 	  	 		<td>连续搬运(postUpdate模式)</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>3</td>
+ 	  	 		<td>非连续搬运</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>4</td>
+ 	  	 		<td>非连续搬运(postUpdate模式)</td>
+ 	  	 	</tr>
+ 	  	 </table>
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -34,31 +56,31 @@
    
    <table>
   <tr>
-    <td align="center">mode</td>
+    <td align="center">scenarioNum</td>
     <td align="center">调用函数</td>
     <td align="center">搬运方式</td>
     <td align="center">Post Mode</td>
   </tr>
   <tr>
-    <td align="center">0</td>
+    <td align="center">1</td>
     <td align="center">CopySucceVF</td>
     <td align="center">连续搬运</td>
     <td align="center">关闭</td>
   </tr>
   <tr>
-    <td align="center">1</td>
+    <td align="center">2</td>
     <td align="center">CopySucceWithPostModeVF</td>
     <td align="center">连续搬运</td>
     <td align="center">开启</td>
   </tr>
   <tr>
-    <td align="center">2</td>
+    <td align="center">3</td>
     <td align="center">CopyUnSucceVF</td>
     <td align="center">非连续搬运</td>
     <td align="center">关闭</td>
   </tr>
   <tr>
-    <td align="center">3</td>
+    <td align="center">4</td>
     <td align="center">CopyUnSucceWithPostModeVF</td>
     <td align="center">非连续搬运</td>
     <td align="center">开启</td>
@@ -90,8 +112,9 @@
     
 - 样例执行
   ```bash
+  SCENARIO=1
   mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DNPU_ARCH=dav-3510 ..;make -j;                                     # 编译工程
+  cmake -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j;           # 编译工程（默认npu模式）
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   ```
 
@@ -99,18 +122,20 @@
 
   示例如下：
   ```bash
-  cmake -DRUN_MODE=cpu -DNPU_ARCH=dav-3510 ..;make -j; # cpu调试模式
-  cmake -DRUN_MODE=sim -DNPU_ARCH=dav-3510 ..;make -j; # NPU仿真模式
+  SCENARIO=1
+  cmake -DRUN_MODE=cpu -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # cpu调试模式
+  cmake -DRUN_MODE=sim -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # NPU仿真模式
   ```
 
-  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+  > **注意：** 切换编译模式或场景前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
 
-  | 选项 | 可选值 | 说明 |
-  |------|--------|------|
-  | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `NPU_ARCH` | `dav-3510`（默认） | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
+| ----------------| -----------------------------| --------------------------------------------------------------------------------------|
+| `RUN_MODE`　　 | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
+| `NPU_ARCH`　　 | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT　　　　　　　　　　　　　　　　　　|
+| `SCENARIO_NUM` | `1`、`2`、`3`、`4`　　　　　| 场景编号：1=连续搬运，2=连续搬运(postUpdate)，3=非连续搬运，4=非连续搬运(postUpdate) |
 
 - 执行结果
 

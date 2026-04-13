@@ -41,6 +41,21 @@ target_link_libraries(demo PRIVATE
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
 set(NPU_ARCH "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
+
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+
+if(NOT DEFINED SCENARIO_NUM)
+    message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=1/2/3/4")
+endif()
+
+if(NOT SCENARIO_NUM EQUAL 1 AND NOT SCENARIO_NUM EQUAL 2 AND NOT SCENARIO_NUM EQUAL 3 AND NOT SCENARIO_NUM EQUAL 4)
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3 or 4, got: ${SCENARIO_NUM}")
+endif()
+
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
+)
+
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH}>
 )
