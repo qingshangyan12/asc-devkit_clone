@@ -9,12 +9,15 @@
  */
 
 #include "aicpu_kfc_interface.h"
-#include "log.h"
+#include <cstdlib>
 
 extern "C" {
 __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void *args[])
 {
-    HCCL_INFO("Runing Mc2ServerKernel for mc2_server.");
+    // 通过解引用空指针触发SIGSEGV信号，操作系统收到该信号后会终止进程并生成core dump文件
+    // 如果运行时产生了core dump，说明外部调用成功进入了此函数；如果没有core dump，说明此函数未被调用到
+    volatile int *p = nullptr;
+    *p = 0xDEAD;
     return 0;
 }
 }
