@@ -31,7 +31,7 @@ message(STATUS "HCCL_OPEN_CODE_BASE_DIR = ${HCCL_OPEN_CODE_BASE_DIR}")
 message(STATUS "HCCL_BASE_DIR = ${HCCL_BASE_DIR}")
 
 set(hccl_include_list
-    ${HCCL_BASE_DIR}/../include/hccl
+    ${HCCL_HCOMM_HEADER_DIR}
     ${HCCL_BASE_DIR}/algorithm/base/inc
     ${HCCL_BASE_DIR}/algorithm/pub_inc
     ${HCCL_BASE_DIR}/pub_inc
@@ -488,6 +488,11 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     )
 
     set(CCL_KERNEL_INCLUDE_LIST
+        ${HCCL_HCOMM_HEADER_DIR}
+        ${HCCL_HCOMM_HEADER_DIR}/hccl
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_BASE_DIR}/../include/hccl
         ${HCCL_BASE_DIR}/pub_inc
         ${TOP_DIR}/abl/atrace/inc/utrace
@@ -570,8 +575,8 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${HCCL_BASE_DIR}/algorithm/base/alg_template/temp_scatter
         ${HCCL_BASE_DIR}/algorithm/base/alg_template
         ${HCCL_BASE_DIR}/algorithm/pub_inc
-        ${HCCL_BASE_DIR}/../pkg_inc/
-        ${HCCL_BASE_DIR}/../pkg_inc/hccl/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc//hccl/
 
         ${HCCL_BASE_DIR}/platform/
         ${HCCL_BASE_DIR}/platform/inc/
@@ -600,11 +605,11 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${HCCL_BASE_DIR}/platform/common
         ${HCCL_BASE_DIR}/platform/common/unique
         ${hccl_include_list}
-        ${HCCL_BASE_DIR}/../include
-        ${HCCL_BASE_DIR}/../include/hccl
-        ${HCCL_BASE_DIR}/../inc/hccl/hccl
-        ${HCCL_BASE_DIR}/../pkg_inc/
-        ${HCCL_BASE_DIR}/../pkg_inc/hccl/
+        ${HCCL_HCOMM_HEADER_DIR}
+        ${HCCL_HCOMM_HEADER_DIR}/hccl
+        # ${HCCL_BASE_DIR}/../inc/hccl/hccl
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl/
         ${HCCL_BASE_DIR}/pub_inc
         ${HCCL_BASE_DIR}/pub_inc/aicpu
 
@@ -612,6 +617,8 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${HCCL_BASE_DIR}/framework/device/common
         ${HCCL_BASE_DIR}/framework/device/inc
         ${HCCL_BASE_DIR}/framework/device/framework
+        ${HCCL_BASE_DIR}/legacy/framework/communicator/aicpu/inc
+        ${HCCL_BASE_DIR}/legacy/unified_platform/pub_inc
 
         # runtime头文件
         ${ASCEND_CANN_PACKAGE_PATH}/include/
@@ -639,7 +646,7 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/asc/hccl/internal/
         ${ASCEND_CANN_PACKAGE_PATH}/include/ascendc/
 
-        ${HCCL_BASE_DIR}/../externel_depends/tsch/
+        ${HCCL_HCOMM_HEADER_DIR}/externel_depends/tsch/
         ${RDMA_CORE_INCLUDE_DIR}
         ${THIRD_PARTY_NLOHMANN_PATH}
 
@@ -653,7 +660,17 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${HCCL_BASE_DIR}/framework/next/comms/comm_engine_res/threads/slaves/
         ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator/aicpu
         ${HCCL_BASE_DIR}/framework/next/coll_comms/dfx
+        ${include_list}
     )
+
+    file(GLOB_RECURSE legacy_include_dirs LIST_DIRECTORIES TRUE
+        ${HCCL_BASE_DIR}/legacy/*
+    )
+    foreach(dir ${legacy_include_dirs})
+        if(IS_DIRECTORY ${dir})
+            list(APPEND CCL_KERNEL_INCLUDE_LIST ${dir})
+        endif()
+    endforeach()
 
     target_include_directories(ccl_kernel PRIVATE
         ${CCL_KERNEL_INCLUDE_LIST}
@@ -730,8 +747,8 @@ if(NOT BUILD_OPEN_PROJECT)
 
         ${HCCL_BASE_DIR}/platform/hccp/inc
         ${HCCL_BASE_DIR}/platform/hccp/inc/network
-	    ${HCCL_BASE_DIR}/../pkg_inc/
-        ${HCCL_BASE_DIR}/../pkg_inc/hccl/
+	    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl/
 
         ${HCCL_BASE_DIR}/framework
  	    ${HCCL_BASE_DIR}/framework/common
@@ -857,7 +874,7 @@ if(BUILD_OPEN_PROJECT AND KERNEL_MODE)
 endif()
 
 if(DEVICE_MODE AND KERNEL_MODE)
-    set(CCL_KERNEL_TAR_DIR ${HCCL_BASE_DIR}/../build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)
+    set(CCL_KERNEL_TAR_DIR ${CMAKE_SOURCE_DIR}/build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)
     add_custom_command(
         TARGET ccl_kernel
         POST_BUILD

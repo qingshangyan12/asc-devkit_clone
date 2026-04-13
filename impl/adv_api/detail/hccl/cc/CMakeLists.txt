@@ -106,7 +106,6 @@ elseif(BUILD_OPEN_PROJECT)
  	    check_pkg_build_deps("hcomm")
     endif()
     add_version_info_targets()
-    add_subdirectory(src/aicpu_kfc)
 
     set(HCCL_HEAD
         ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl/hccl_comm.h
@@ -297,6 +296,7 @@ file(CREATE_LINK "../hcomm/hcomm_res_defs.h" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFI
     if(ENABLE_OPEN_SRC)
         check_pkg_build_deps("hccl")
     endif()
+    add_subdirectory(src/aicpu_kfc)
     add_subdirectory(src)
 
     if(DEVICE_MODE)
