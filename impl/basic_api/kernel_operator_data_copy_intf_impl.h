@@ -62,6 +62,7 @@ __aicore__ inline void __inout_pipe__(MTE2) DataCopy(const LocalTensor<T>& dst, 
     if (!CheckFuncDataCopy(dst, src, repeatParams, "DataCopy from GlobalTensor to LocalTensor")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopy from GlobalTensor to LocalTensor", KernelFuncType::NONE_MODE);
     }
+    
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, repeatParams));
 #endif
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
