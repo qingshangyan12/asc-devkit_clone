@@ -32,7 +32,7 @@
 /*
  * ingroup：SetAtomicAdd
  * brief：Set the next data from UB to the outside of AI Core whether the move write Tensor operation performs
- * atomic accumulation.
+ * atomic accumulation. testesttest
  */
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_set_atomic_impl.h"
