@@ -81,6 +81,8 @@ extern HcclResult HcclKfcOpArgsSetCommEngine(void *opArgs, uint8_t commEngine);
 */
 extern HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void *opArgs, void **opResCtx);
 
+extern HcclResult HcclAllocComResourceByTiling(HcclComm comm, void *stream, void* mc2Tiling, void** opResCtx);
+
 #ifdef __cplusplus
 }
 #endif  // __cplusplus

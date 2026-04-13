@@ -163,3 +163,9 @@ HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void *opArgs, void 
 
     return HCCL_SUCCESS;
 }
+
+HcclResult HcclAllocComResourceByTiling(HcclComm comm, void *stream, void* mc2Tiling, void** opResCtx)
+{
+    HCCL_INFO("Trying to use HcclAllocComResourceByTiling through mc2_client");
+    return HCCL_SUCCESS;
+}

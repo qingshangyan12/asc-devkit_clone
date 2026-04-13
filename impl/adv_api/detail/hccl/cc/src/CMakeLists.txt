@@ -145,6 +145,8 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/selector
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/framework/device/aicpu_kfc
 )
 
 if(BUILD_OPEN_PROJECT)
@@ -346,6 +348,8 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
 
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/recv/executor/ins_v2_recv_sole_executor.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/send/executor/ins_v2_send_sole_executor.cc
+    
+        ${CMAKE_CURRENT_SOURCE_DIR}/framework/device/aicpu_kfc/aicpu_kfc_interface.cc
     )
 
     target_include_directories(mc2_server PRIVATE
