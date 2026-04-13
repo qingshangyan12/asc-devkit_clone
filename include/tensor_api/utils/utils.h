@@ -67,7 +67,6 @@ struct DataCopyTrait {};
 
 enum class RoundMode : uint8_t {DEFAULT = 0, HYBRID};
 
-
 enum DualDstMode : uint8_t {
     DUAL_DST_DISABLE = 0,
     DUAL_DST_SPLIT_M,
