@@ -1,4 +1,4 @@
-# 基于MatmulLeakyRelu算子的msProf样例
+# 基于MatmulLeakyRelu算子的profiling样例
 
 ## 概述
 

@@ -65,7 +65,7 @@
   test pass!
   ```
 
-## 仿真产物说明
+## 仿真结果说明
 
 执行 `./demo` 后，CAmodel 仿真器会在 `build/` 目录下生成 dump 文件。文件命名格式为 `core{N}.{unit}M.{type}.dump`，其中：
 
