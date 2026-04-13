@@ -590,7 +590,7 @@
 <td class="cellrowborder" valign="top" width="19.66%"><p id="p108711142246"><a name="p108711142246"></a><a name="p108711142246"></a>1</p>
 </td>
 </tr>
-<tr id="row488141452411"><td class="cellrowborder" valign="top" width="60.39%"><p id="p15882142245"><a name="p15882142245"></a><a name="p15882142245"></a>float8_e4m3x2_t，float8_e5m2x2_t, hifloat8x2_t</p>
+<tr id="row488141452411"><td class="cellrowborder" valign="top" width="60.39%"><p id="p15882142245"><a name="p15882142245"></a><a name="p15882142245"></a>float8_e4m3x2_t，float8_e5m2x2_t，hifloat8x2_t</p>
 </td>
 <td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="p19881214142414"><a name="p19881214142414"></a><a name="p19881214142414"></a>2</p>
 </td>
