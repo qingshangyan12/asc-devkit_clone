@@ -16,7 +16,7 @@
 #include "hccl_inner_def.h"
 
 extern "C" {
-__attribute__((visibility("default"))) uint32_t RunAicpuKfcSrvLaunch(void *args[]);
+__attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void *args[])
 }
 
 #endif // __MC2_AICPU_INTERFACE_HPP__
