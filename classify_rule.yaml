@@ -106,6 +106,7 @@ asc-devkit:
       - impl/basic_api/dav_3510/core_mng/roc/kernel_operator_cube_group_info.h
       - impl/basic_api/kernel_operator_list_tensor_intf_impl.h
       - impl/basic_api/dav_3510/kernel_operator_determine_compute_sync_impl.h
+      - impl/simt_api/cpp/kernel_simt_print_intf_impl.h
 
   llt:
     ut_check: true
