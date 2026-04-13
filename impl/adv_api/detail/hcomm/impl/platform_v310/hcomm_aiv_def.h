@@ -54,7 +54,6 @@ private:
     __aicore__ inline bool JudgeHandleId(HcommHandle handleId);
 
 private:
-    TPipe pipe_;
     TBuf<TPosition::VECOUT> hcommBuf_;
     LocalTensor<uint32_t> wqeItem_;
     LocalTensor<uint32_t> cqeItem_;
