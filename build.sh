@@ -37,6 +37,7 @@ function log() {
     echo "[$current_time] "$1
 }
 
+
 usage() {
   local specific_help="$1"
 
