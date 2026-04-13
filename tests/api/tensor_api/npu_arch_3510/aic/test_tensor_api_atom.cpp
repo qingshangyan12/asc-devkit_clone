@@ -9,14 +9,21 @@
 */
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
-#include "include/experimental/tensor_api/tensor.h"
+#include "include/tensor_api/tensor.h"
 
 class Tensor_Api_Atom : public testing::Test {
 protected:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() {}
-    void TearDown() {}
+   
+    void SetUp()
+    {
+        AscendC::SetGCoreType(AscendC::MIX_TYPE);
+    }
+    void TearDown()
+    {
+        AscendC::SetGCoreType(AscendC::MIX_TYPE);
+    }
 };
 
 TEST_F(Tensor_Api_Atom, CopyL0C2UBOperation)
