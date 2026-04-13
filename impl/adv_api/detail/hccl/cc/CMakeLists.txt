@@ -93,6 +93,204 @@ if(ENABLE_CUSTOM)
     add_subdirectory(${CUSTOM_OPS_PATH})
 
 elseif(BUILD_OPEN_PROJECT)
+    # include(${HCCL_CC_DIR}/cmake/third_party/openssl.cmake)
+    include(${HCCL_CC_DIR}/cmake/third_party/ubengine.cmake)
+    include(${HCCL_CC_DIR}/cmake/third_party/rdma-core.cmake)
+    include(${HCCL_CC_DIR}/cmake/third_party/json.cmake)
+    include(${HCCL_CC_DIR}/cmake/hcomm_utils.cmake)
+    include(${HCCL_CC_DIR}/cmake/config_hcomm.cmake)
+    # include(${HCCL_CC_DIR}/cmake/package.cmake)
+    include(${HCCL_CC_DIR}/cmake/func_hcomm.cmake)
+    # include(${HCCL_CC_DIR}/version.cmake)
+    if(ENABLE_OPEN_SRC)
+ 	    check_pkg_build_deps("hcomm")
+    endif()
+    add_version_info_targets()
+    add_subdirectory(src/aicpu_kfc)
+
+    set(HCCL_HEAD
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl/hccl_comm.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl/hccl_types.h
+        src/aicpu_kfc/pub_inc/hccn_rping.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl/hccl_rank_graph.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl/hccl_res.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl/hccl_sym_win.h
+    )
+
+    set(HCOMM_HEAD
+         ${HCCL_CC_INCLUDE_DIR}/hcomm/hcomm_primitives.h
+    )
+
+    # todo:未找到ccl_kenel.json?
+    set(HCCL_JSON
+        cmake/scripts/ccl_kernel.json
+    )
+
+    # if(DEVICE_MODE)
+    #     set(CCL_KERNEL_TAR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build_device/ccl_kernel_tar_pkg/)
+
+    #     message(STATUS "Detected CUSTOM_SIGN_SCRIPT: ${CUSTOM_SIGN_SCRIPT}")
+    #     message(STATUS "Detected ENABLE_SIGN: ${ENABLE_SIGN}")
+
+    #     if(KERNEL_MODE)
+    #         set(CCL_KERNEL_TAR_LIBS
+    #             ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libccl_kernel_plf.so
+    #             ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libccl_kernel.so
+    #         )
+    #         pack_targets_and_files(
+    #             OUTPUT_TARGET "generate_device_aicpu_package"
+    #             OUTPUT "aicpu_hcomm.tar.gz"
+    #             FILES ${CCL_KERNEL_TAR_LIBS}
+    #             MANIFEST "bin_hash.cfg"
+    #             TAR_ROOT_DIR "aicpu_kernels_device"
+    #         )
+    #         add_dependencies(generate_device_aicpu_package ccl_kernel)
+    #         sign_file(
+    #             INPUT "aicpu_hcomm.tar.gz"
+    #             CONFIG "${CMAKE_CURRENT_SOURCE_DIR}/scripts/sign/hcomm_check_cfg.xml"
+    #             RESULT_VAR "aicpu_hcomm_sign_file"
+    #             DEPENDS generate_device_aicpu_package
+    #         )
+    #         add_dependencies(sign_aicpu_hcomm generate_device_aicpu_package)
+    #     endif()
+    # endif()
+
+    # todo:是否需要保留
+    # if (NOT DEVICE_MODE)
+    #     message(STATUS "Detected INSTALL_LIBRARY_DIR: ${INSTALL_LIBRARY_DIR}")
+
+    #     set(BUILD_DEVICE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build_device/)
+    #     set(BUILD_HCCD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build_hccd/)
+    #     add_custom_target(install_tar DEPENDS
+    #         ${BUILD_DEVICE_DIR}/signatures/cann-hcomm-compat.tar.gz
+    #         ${BUILD_DEVICE_DIR}/signatures/aicpu_hcomm.tar.gz
+    #         ${BUILD_HCCD_DIR}/signatures/cann-hccd-compat.tar.gz
+    #         ${BUILD_DEVICE_DIR}/src/framework/libaicpu_custom.so
+    #         ${BUILD_DEVICE_DIR}/src/framework/libaicpu_custom.json
+    #     )
+    #     install(FILES ${BUILD_DEVICE_DIR}/signatures/cann-hcomm-compat.tar.gz
+    #         DESTINATION ${INSTALL_DEVICE_TAR_DIR} OPTIONAL
+    #     )
+    #     install(FILES ${BUILD_DEVICE_DIR}/signatures/aicpu_hcomm.tar.gz
+    #         DESTINATION ${INSTALL_DEVICE_TAR_DIR} OPTIONAL
+    #     )
+    #     install(FILES ${BUILD_HCCD_DIR}/signatures/cann-hccd-compat.tar.gz
+    #         DESTINATION ${INSTALL_DEVICE_TAR_DIR} OPTIONAL
+    #     )
+    #     install(FILES ${BUILD_DEVICE_DIR}/src/framework/libaicpu_custom.so
+    #         DESTINATION ${INSTALL_CCL_KERNEL_JSON_DIR} OPTIONAL
+    #     )
+    #     install(FILES ${BUILD_DEVICE_DIR}/src/framework/libaicpu_custom.json
+    #         DESTINATION ${INSTALL_CCL_KERNEL_JSON_DIR} OPTIONAL
+    #     )
+
+    #     add_custom_target(install_ccl_kernel DEPENDS
+    #         ${BUILD_DEVICE_DIR}/src/framework/libccl_kernel.so
+    #     )
+    #     install(FILES ${BUILD_DEVICE_DIR}/src/framework/libccl_kernel.so
+    #         DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
+    #     )
+    #     add_dependencies(install_tar hcomm)
+    #     add_dependencies(install_ccl_kernel hcomm)
+    # endif()
+
+    # 重复配置
+    # install(FILES
+    #     ${HCCL_HEAD}
+    #     ${HCCL_JSON}
+    #     DESTINATION ${INSTALL_INCLUDE_DIR}/hccl/ OPTIONAL
+    # )
+    install(FILES
+        ${HCOMM_HEAD}
+        DESTINATION ${INSTALL_INCLUDE_DIR}/ OPTIONAL
+    )
+    install(FILES
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/hcomm_primitives.h
+        DESTINATION ${INSTALL_INCLUDE_DIR}/hcomm/ OPTIONAL
+    )
+    install(FILES
+        # todo: 没有这个文件？
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/hcomm_res.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/hcomm_res_defs.h
+        DESTINATION ${INSTALL_INCLUDE_DIR}/hcomm/ OPTIONAL
+    )
+    # todo:这些file的作用
+    install(CODE [[
+file(MAKE_DIRECTORY "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/hcomm/include/hccl")
+file(REMOVE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/hcomm/include/hcomm_primitives.h")
+file(REMOVE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/hcomm/include/hccl/hcomm_primitives.h")
+file(CREATE_LINK "../hcomm/hcomm_primitives.h" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/hcomm/include/hccl/hcomm_primitives.h" SYMBOLIC)
+file(REMOVE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/hcomm/include/hcomm_res_defs.h")
+file(REMOVE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/hcomm/include/hccl/hcomm_res_defs.h")
+file(CREATE_LINK "../hcomm/hcomm_res_defs.h" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/hcomm/include/hccl/hcomm_res_defs.h" SYMBOLIC)
+]])
+
+    set(HCCL_PKG_HEAD
+        # todo: 一些文件没有，添加了hccl_diag.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/base.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/hccl_ex.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/hccl_one_sided_services.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/hccl_res_expt.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/hcom.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/hccl_diag.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/hcomm_diag.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/dtype_common.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/workflow.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/hccl_inner.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl/hccl_ctrl_plane.h
+    )
+    install(FILES
+        ${HCCL_PKG_HEAD}
+        DESTINATION ${INSTALL_PKG_INCLUDE_DIR}/hccl/ OPTIONAL
+    )
+    set(HCCL_PKG_CCU_HEAD
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_assist_pub.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_common.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_condition_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_kernel_resource.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_datatype_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_funccall_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_instr_info_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_interface_assist_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_kernel_arg.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_kernel_signature.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_kernel.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_loopblock_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_loopcall_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_loopgroupcall_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_microcode_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_operator_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_arg_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_base_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_block_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_context_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_funcblock_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_funccall_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_jump_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_jumplabel_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_loopblock_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_loopcall_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_reference_manager_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_rep_type_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_repeat_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_res_repo.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_task_arg_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/ccu_task_param_v1.h
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu/hccl_ccu_res.h
+    )
+    install(FILES
+        ${HCCL_PKG_CCU_HEAD}
+        DESTINATION ${INSTALL_PKG_INCLUDE_DIR}/hcomm/ccu/ OPTIONAL
+    )
+    # todo:这个文件没有
+    set(HCOMM_PKG_HEAD
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/hcomm_primitives_expt.h
+    )
+    install(FILES
+        ${HCOMM_PKG_HEAD}
+        DESTINATION ${INSTALL_PKG_INCLUDE_DIR}/hcomm/ OPTIONAL
+    )
+
     include(${HCCL_CC_DIR}/cmake/config.cmake)
     include(${HCCL_CC_DIR}/cmake/func.cmake)
     include(${HCCL_CC_DIR}/version.cmake)
@@ -107,6 +305,9 @@ elseif(BUILD_OPEN_PROJECT)
             set(CCL_KERNEL_TAR_LIBS
                 ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libmc2_server.so
                 ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libmc2_kernel_compat.so
+                # hcomm
+                ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libccl_kernel_plf.so
+                ${CCL_KERNEL_TAR_DIR}/aicpu_kernels_device/libccl_kernel.so 
             )
             pack_targets_and_files(
                 OUTPUT_TARGET "generate_device_aicpu_package"
@@ -116,6 +317,8 @@ elseif(BUILD_OPEN_PROJECT)
                 TAR_ROOT_DIR "aicpu_kernels_device"
             )
             add_dependencies(generate_device_aicpu_package mc2_server)
+            # hcomm
+            add_dependencies(generate_device_aicpu_package ccl_kernel)
             sign_file(
                 INPUT "mc2_server.tar.gz"
                 CONFIG "${HCCL_CC_DIR}/scripts/sign/hccl_check_cfg.xml"
@@ -143,14 +346,14 @@ elseif(BUILD_OPEN_PROJECT)
         add_dependencies(install_tar mc2_client)
     endif()
 
-    set(HCCL_HEAD
+    list(APPEND HCCL_HEAD
         ${HCCL_CC_INCLUDE_DIR}/hccl.h
         ${HCCL_CC_INCLUDE_DIR}/hccl_mc2.h
     )
 
-    set(HCCL_JSON
-        # hccl json 待补充
-    )
+    # set(HCCL_JSON
+    #     # hccl json 待补充
+    # )
 
     install(FILES
         ${HCCL_HEAD}

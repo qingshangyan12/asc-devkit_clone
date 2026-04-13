@@ -27,18 +27,11 @@ endforeach()
 unset(_cmake_expected_target)
 
 if(_cmake_targets_defined STREQUAL _cmake_expected_targets)
+    set(unified_dlog_FOUND TRUE)
     unset(_cmake_targets_defined)
     unset(_cmake_targets_not_defined)
     unset(_cmake_expected_targets)
-    unset(CMAKE_IMPORT_FILE_VERSION)
-    cmake_policy(POP)
     return()
-endif()
-
-if(NOT _cmake_targets_defined STREQUAL "")
-    string(REPLACE ";" ", " _cmake_targets_defined_text "${_cmake_targets_defined}")
-    string(REPLACE ";" ", " _cmake_targets_not_defined_text "${_cmake_targets_not_defined}")
-    message(FATAL_ERROR "Some (but not all) targets in this export set were already defined.\nTargets Defined: ${_cmake_targets_defined_text}\nTargets not yet defined: ${_cmake_targets_not_defined_text}\n")
 endif()
 unset(_cmake_targets_defined)
 unset(_cmake_targets_not_defined)
@@ -72,17 +65,29 @@ if(unified_dlog_FOUND)
     cmake_print_variables(unified_dlog_INCLUDE_DIR)
     cmake_print_variables(unified_dlog_SHARED_LIBRARY)
 
-    add_library(unified_dlog SHARED IMPORTED)
-    set_target_properties(unified_dlog PROPERTIES
-        INTERFACE_COMPILE_DEFINITIONS "PROCESS_LOG"
-        INTERFACE_LINK_LIBRARIES "unified_dlog_headers"
-        IMPORTED_LOCATION "${unified_dlog_SHARED_LIBRARY}"
-    )
-
-    add_library(unified_dlog_headers INTERFACE IMPORTED)
+    if(NOT TARGET unified_dlog_headers)
+        add_library(unified_dlog_headers INTERFACE IMPORTED)
+    endif()
     set_target_properties(unified_dlog_headers PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${unified_dlog_INCLUDE_DIR};${unified_dlog_INCLUDE_DIR}/base"
     )
+
+    if(NOT TARGET unified_dlog)
+        add_library(unified_dlog SHARED IMPORTED)
+    endif()
+    get_target_property(_unified_dlog_is_imported unified_dlog IMPORTED)
+    if(_unified_dlog_is_imported)
+        set_target_properties(unified_dlog PROPERTIES
+            INTERFACE_COMPILE_DEFINITIONS "PROCESS_LOG"
+            INTERFACE_LINK_LIBRARIES "unified_dlog_headers"
+            IMPORTED_LOCATION "${unified_dlog_SHARED_LIBRARY}"
+        )
+    else()
+        set_target_properties(unified_dlog PROPERTIES
+            INTERFACE_COMPILE_DEFINITIONS "PROCESS_LOG"
+            INTERFACE_LINK_LIBRARIES "unified_dlog_headers"
+        )
+    endif()
 
     include(CMakePrintHelpers)
     cmake_print_properties(TARGETS unified_dlog
@@ -91,6 +96,7 @@ if(unified_dlog_FOUND)
     cmake_print_properties(TARGETS unified_dlog_headers
         PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
     )
+    unset(_unified_dlog_is_imported)
 endif()
 
 # Cleanup temporary variables.

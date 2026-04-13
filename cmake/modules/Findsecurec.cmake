@@ -13,6 +13,30 @@ if (securec_FOUND)
   return()
 endif()
 
+set(_cmake_targets_defined "")
+set(_cmake_targets_not_defined "")
+set(_cmake_expected_targets "")
+foreach(_cmake_expected_target IN ITEMS c_sec c_sec_static c_sec_headers)
+  list(APPEND _cmake_expected_targets "${_cmake_expected_target}")
+  if(TARGET "${_cmake_expected_target}")
+    list(APPEND _cmake_targets_defined "${_cmake_expected_target}")
+  else()
+    list(APPEND _cmake_targets_not_defined "${_cmake_expected_target}")
+  endif()
+endforeach()
+unset(_cmake_expected_target)
+
+if(_cmake_targets_defined STREQUAL _cmake_expected_targets)
+  set(securec_FOUND TRUE)
+  unset(_cmake_targets_defined)
+  unset(_cmake_targets_not_defined)
+  unset(_cmake_expected_targets)
+  return()
+endif()
+unset(_cmake_targets_defined)
+unset(_cmake_targets_not_defined)
+unset(_cmake_expected_targets)
+
 set(C_SEC_HEAD_SEARCH_PATHS
   ${ASCEND_DIR}/${SYSTEM_PREFIX}/include
   # ${TOP_DIR}/abl/libc_sec/include             # compile with ci
@@ -64,26 +88,54 @@ if(securec_FOUND)
   set(C_SEC_INCLUDE_DIR ${C_SEC_INCLUDE})
   get_filename_component(C_SEC_LIBRARY_DIR ${C_SEC_STATIC_LIBRARY} DIRECTORY)
 
-  add_library(c_sec_headers INTERFACE IMPORTED)
+  if(NOT TARGET c_sec_headers)
+    add_library(c_sec_headers INTERFACE IMPORTED)
+  endif()
   target_include_directories(c_sec_headers INTERFACE ${C_SEC_INCLUDE})
 
-  add_library(c_sec_static STATIC IMPORTED)
-  set_target_properties(c_sec_static PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${C_SEC_INCLUDE}"
-    IMPORTED_LOCATION "${C_SEC_STATIC_LIBRARY}"
-  )
-
-  add_library(c_sec SHARED IMPORTED)
-  if(WIN32)
-    set_target_properties(c_sec PROPERTIES
+  if(NOT TARGET c_sec_static)
+    add_library(c_sec_static STATIC IMPORTED)
+  endif()
+  get_target_property(_c_sec_static_is_imported c_sec_static IMPORTED)
+  if(_c_sec_static_is_imported)
+    set_target_properties(c_sec_static PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${C_SEC_INCLUDE}"
-      IMPORTED_IMPLIB "${C_SEC_IMPLIB}"
-      IMPORTED_LOCATION "${C_SEC_SHARED_DLL}"
+      IMPORTED_LOCATION "${C_SEC_STATIC_LIBRARY}"
     )
   else()
-    set_target_properties(c_sec PROPERTIES
+    set_target_properties(c_sec_static PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${C_SEC_INCLUDE}"
-      IMPORTED_LOCATION       "${C_SEC_SHARED_LIBRARY}"
     )
   endif()
+
+  if(NOT TARGET c_sec)
+    add_library(c_sec SHARED IMPORTED)
+  endif()
+  get_target_property(_c_sec_is_imported c_sec IMPORTED)
+  if(WIN32)
+    if(_c_sec_is_imported)
+      set_target_properties(c_sec PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${C_SEC_INCLUDE}"
+        IMPORTED_IMPLIB "${C_SEC_IMPLIB}"
+        IMPORTED_LOCATION "${C_SEC_SHARED_DLL}"
+      )
+    else()
+      set_target_properties(c_sec PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${C_SEC_INCLUDE}"
+      )
+    endif()
+  else()
+    if(_c_sec_is_imported)
+      set_target_properties(c_sec PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${C_SEC_INCLUDE}"
+        IMPORTED_LOCATION "${C_SEC_SHARED_LIBRARY}"
+      )
+    else()
+      set_target_properties(c_sec PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${C_SEC_INCLUDE}"
+      )
+    endif()
+  endif()
+  unset(_c_sec_is_imported)
+  unset(_c_sec_static_is_imported)
 endif()

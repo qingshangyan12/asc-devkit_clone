@@ -42,3 +42,7 @@ oat_reports/
 oat_reports/
 
 log/
+
+build_mc2_compile
+
+third_party

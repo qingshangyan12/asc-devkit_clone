@@ -27,18 +27,11 @@ endforeach()
 unset(_cmake_expected_target)
 
 if(_cmake_targets_defined STREQUAL _cmake_expected_targets)
+    set(mmpa_FOUND TRUE)
     unset(_cmake_targets_defined)
     unset(_cmake_targets_not_defined)
     unset(_cmake_expected_targets)
-    unset(CMAKE_IMPORT_FILE_VERSION)
-    cmake_policy(POP)
     return()
-endif()
-
-if(NOT _cmake_targets_defined STREQUAL "")
-    string(REPLACE ";" ", " _cmake_targets_defined_text "${_cmake_targets_defined}")
-    string(REPLACE ";" ", " _cmake_targets_not_defined_text "${_cmake_targets_not_defined}")
-    message(FATAL_ERROR "Some (but not all) targets in this export set were already defined.\nTargets Defined: ${_cmake_targets_defined_text}\nTargets not yet defined: ${_cmake_targets_not_defined_text}\n")
 endif()
 unset(_cmake_targets_defined)
 unset(_cmake_targets_not_defined)
@@ -80,22 +73,42 @@ if(mmpa_FOUND)
     cmake_print_variables(mmpa_SHARED_LIBRARY)
     cmake_print_variables(mmpa_STATIC_LIBRARY)
 
-    add_library(mmpa SHARED IMPORTED)
-    set_target_properties(mmpa PROPERTIES
-        INTERFACE_LINK_LIBRARIES "mmpa_headers"
-        IMPORTED_LOCATION "${mmpa_SHARED_LIBRARY}"
-    )
-
-    add_library(static_mmpa STATIC IMPORTED)
-    set_target_properties(static_mmpa PROPERTIES
-        INTERFACE_LINK_LIBRARIES "mmpa_headers"
-        IMPORTED_LOCATION "${mmpa_STATIC_LIBRARY}"
-    )
-
-    add_library(mmpa_headers INTERFACE IMPORTED)
+    if(NOT TARGET mmpa_headers)
+        add_library(mmpa_headers INTERFACE IMPORTED)
+    endif()
     set_target_properties(mmpa_headers PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${mmpa_INCLUDE_DIR};${mmpa_INCLUDE_DIR}/mmpa;${mmpa_INCLUDE_DIR}/mmpa/sub_inc"
     )
+
+    if(NOT TARGET mmpa)
+        add_library(mmpa SHARED IMPORTED)
+    endif()
+    get_target_property(_mmpa_is_imported mmpa IMPORTED)
+    if(_mmpa_is_imported)
+        set_target_properties(mmpa PROPERTIES
+            INTERFACE_LINK_LIBRARIES "mmpa_headers"
+            IMPORTED_LOCATION "${mmpa_SHARED_LIBRARY}"
+        )
+    else()
+        set_target_properties(mmpa PROPERTIES
+            INTERFACE_LINK_LIBRARIES "mmpa_headers"
+        )
+    endif()
+
+    if(NOT TARGET static_mmpa)
+        add_library(static_mmpa STATIC IMPORTED)
+    endif()
+    get_target_property(_static_mmpa_is_imported static_mmpa IMPORTED)
+    if(_static_mmpa_is_imported)
+        set_target_properties(static_mmpa PROPERTIES
+            INTERFACE_LINK_LIBRARIES "mmpa_headers"
+            IMPORTED_LOCATION "${mmpa_STATIC_LIBRARY}"
+        )
+    else()
+        set_target_properties(static_mmpa PROPERTIES
+            INTERFACE_LINK_LIBRARIES "mmpa_headers"
+        )
+    endif()
 
     include(CMakePrintHelpers)
     cmake_print_properties(TARGETS mmpa
@@ -107,6 +120,8 @@ if(mmpa_FOUND)
     cmake_print_properties(TARGETS mmpa_headers
         PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
     )
+    unset(_mmpa_is_imported)
+    unset(_static_mmpa_is_imported)
 endif()
 
 # Cleanup temporary variables.

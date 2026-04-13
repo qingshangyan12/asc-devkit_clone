@@ -15,6 +15,19 @@ endif()
 
 include(FindPackageHandleStandardArgs)
 
+macro(asc_reuse_or_add_imported_library target_name target_type target_location)
+  if(NOT TARGET ${target_name})
+    add_library(${target_name} ${target_type} IMPORTED)
+  endif()
+
+  get_target_property(_asc_target_is_imported ${target_name} IMPORTED)
+  if(_asc_target_is_imported)
+    set_target_properties(${target_name} PROPERTIES
+      IMPORTED_LOCATION "${target_location}"
+    )
+  endif()
+endmacro()
+
 set(METADEF_HEAD_SEARCH_PATHS
   ${ASCEND_DIR}/${SYSTEM_PREFIX}/include
   ${TOP_DIR}/metadef/inc/external/            # compile with ci
@@ -41,11 +54,7 @@ find_library(REGISTER_LIB_DIR
 
 if(REGISTER_LIB_DIR)
   get_filename_component(REGISTER_LIB_DIR ${REGISTER_LIB_DIR} REALPATH)
-  add_library(register SHARED IMPORTED)
-  set_target_properties(register PROPERTIES
-    # INTERFACE_INCLUDE_DIRECTORIES ${METADEF_INC_DIR}
-    IMPORTED_LOCATION ${REGISTER_LIB_DIR}
-  )
+  asc_reuse_or_add_imported_library(register SHARED ${REGISTER_LIB_DIR})
   message(STATUS "Found register library:${REGISTER_LIB_DIR}")
 else()
   if(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG)
@@ -63,11 +72,7 @@ find_library(OPP_REGISTRY_LIB_DIR
 
 if(OPP_REGISTRY_LIB_DIR)
   get_filename_component(OPP_REGISTRY_LIB_DIR ${OPP_REGISTRY_LIB_DIR} REALPATH)
-  add_library(opp_registry SHARED IMPORTED)
-  set_target_properties(opp_registry PROPERTIES
-    # INTERFACE_INCLUDE_DIRECTORIES ${METADEF_INC_DIR}
-    IMPORTED_LOCATION ${OPP_REGISTRY_LIB_DIR}
-  )
+  asc_reuse_or_add_imported_library(opp_registry SHARED ${OPP_REGISTRY_LIB_DIR})
   message(STATUS "Found opp_registry library:${OPP_REGISTRY_LIB_DIR}")
 else()
   if(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG)
@@ -85,11 +90,7 @@ find_library(EXEGRAPH_LIB_DIR
 
 if(EXEGRAPH_LIB_DIR)
   get_filename_component(EXEGRAPH_LIB_DIR ${EXEGRAPH_LIB_DIR} REALPATH)
-  add_library(exe_graph SHARED IMPORTED)
-  set_target_properties(exe_graph PROPERTIES
-    # INTERFACE_INCLUDE_DIRECTORIES ${METADEF_INC_DIR}/exe_graph
-    IMPORTED_LOCATION ${EXEGRAPH_LIB_DIR}
-  )
+  asc_reuse_or_add_imported_library(exe_graph SHARED ${EXEGRAPH_LIB_DIR})
   message(STATUS "Found exe_graph library:${EXEGRAPH_LIB_DIR}")
 else()
   if(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG)
@@ -107,10 +108,7 @@ find_library(ERROR_MANAGER_LIB_DIR
 
 if(ERROR_MANAGER_LIB_DIR)
   get_filename_component(ERROR_MANAGER_LIB_DIR ${ERROR_MANAGER_LIB_DIR} REALPATH)
-  add_library(error_manager SHARED IMPORTED)
-  set_target_properties(error_manager PROPERTIES
-          IMPORTED_LOCATION ${ERROR_MANAGER_LIB_DIR}
-          )
+  asc_reuse_or_add_imported_library(error_manager SHARED ${ERROR_MANAGER_LIB_DIR})
   message(STATUS "Found error_manager library:${ERROR_MANAGER_LIB_DIR}")
 else()
   if(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG)
@@ -126,17 +124,16 @@ find_library(METADEF_LIB_DIR
   NO_CMAKE_FIND_ROOT_PATH
 )
 
-add_library(metadef_headers INTERFACE)
+if(NOT TARGET metadef_headers)
+  add_library(metadef_headers INTERFACE)
+endif()
 target_include_directories(metadef_headers INTERFACE
-  METADEF_HEAD_SEARCH_PATHS
+  ${METADEF_HEAD_SEARCH_PATHS}
 )
 
 if(METADEF_LIB_DIR)
   get_filename_component(METADEF_LIB_DIR ${METADEF_LIB_DIR} REALPATH)
-  add_library(metadef SHARED IMPORTED)
-  set_target_properties(metadef PROPERTIES
-    IMPORTED_LOCATION ${METADEF_LIB_DIR}
-  )
+  asc_reuse_or_add_imported_library(metadef SHARED ${METADEF_LIB_DIR})
   message(STATUS "Found metadef library:${METADEF_LIB_DIR}")
 else()
   if(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG)
@@ -154,10 +151,7 @@ find_library(GRAPH_LIB_DIR
 
 if(GRAPH_LIB_DIR)
   get_filename_component(GRAPH_LIB_DIR ${GRAPH_LIB_DIR} REALPATH)
-  add_library(graph SHARED IMPORTED)
-  set_target_properties(graph PROPERTIES
-    IMPORTED_LOCATION ${GRAPH_LIB_DIR}
-  )
+  asc_reuse_or_add_imported_library(graph SHARED ${GRAPH_LIB_DIR})
   message(STATUS "Found graph library:${GRAPH_LIB_DIR}")
 else()
   if(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG)
@@ -175,10 +169,7 @@ find_library(GRAPH_BASE_LIB_DIR
 
 if(GRAPH_BASE_LIB_DIR)
   get_filename_component(GRAPH_BASE_LIB_DIR ${GRAPH_BASE_LIB_DIR} REALPATH)
-  add_library(graph_base SHARED IMPORTED)
-  set_target_properties(graph_base PROPERTIES
-          IMPORTED_LOCATION ${GRAPH_BASE_LIB_DIR}
-          )
+  asc_reuse_or_add_imported_library(graph_base SHARED ${GRAPH_BASE_LIB_DIR})
   message(STATUS "Found graph_base library:${GRAPH_BASE_LIB_DIR}")
 else()
   if(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG)
@@ -196,11 +187,7 @@ find_library(REGISTER_STATIC_LIB_DIR
 
 if(REGISTER_STATIC_LIB_DIR)
   get_filename_component(REGISTER_STATIC_LIB_DIR ${REGISTER_STATIC_LIB_DIR} REALPATH)
-  add_library(rt2_registry_static STATIC IMPORTED)
-  set_target_properties(rt2_registry_static PROPERTIES
-    # INTERFACE_INCLUDE_DIRECTORIES ${METADEF_INC_DIR}
-    IMPORTED_LOCATION ${REGISTER_STATIC_LIB_DIR}
-  )
+  asc_reuse_or_add_imported_library(rt2_registry_static STATIC ${REGISTER_STATIC_LIB_DIR})
   message(STATUS "Found rt2_registry library:${REGISTER_STATIC_LIB_DIR}")
 else()
   if(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG)
