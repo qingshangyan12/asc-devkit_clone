@@ -387,6 +387,159 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_reduce_min(half val);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 make_half2(half x, half y);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ushort_as_half(const unsigned short int x);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __heq(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hne(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hle(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hge(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hlt(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hgt(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hequ(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hneu(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hleu(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hgeu(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hltu(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hgtu(half x, half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbeqx2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbnex2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hblex2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbgex2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbltx2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbgtx2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbequx2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbneux2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbleux2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbgeux2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbltux2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ bool __hbgtux2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __heqx2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hnex2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hlex2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hgex2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hltx2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hgtx2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hequx2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hneux2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hleux2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hgeux2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hltux2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hgtux2(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __heqx2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hnex2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hlex2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hgex2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hltx2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hgtx2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hequx2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hneux2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hleux2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hgeux2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hltux2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __hgtux2_mask(half2 x, half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __isnanx2(half2 x);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hmaxx2(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hminx2(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __haddx2(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hsubx2(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hmulx2(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __haddx2_rn(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hsubx2_rn(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hmulx2_rn(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hdivx2(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __habsx2(const half2 x);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hfmax2(const half2 x, const half2 y, const half2 z);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hnegx2(const half2 x);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hadd(const half x, const half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hsub(const half x, const half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hmul(const half x, const half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hadd_rn(const half x, const half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hsub_rn(const half x, const half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hmul_rn(const half x, const half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hdiv(const half x, const half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hneg(const half x);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hmax_nan(const half x, const half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hmin_nan(const half x, const half y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half __hfma_relu(const half x, const half y, const half z);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hmaxx2_nan(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hminx2_nan(const half2 x, const half2 y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hfmax2_relu(const half2 x, const half2 y, const half2 z);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hcmadd(const half2 x, const half2 y, const half2 z);
+
 #include "impl/simt_api/asc_fp16_impl.h"
 
 #endif
