@@ -68,7 +68,7 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const SrcLayoutType& srcLayout,
     auto dstRow = Std::get<0>(Std::get<0>(dstLayout.Shape())) * Std::get<1>(Std::get<0>(dstLayout.Shape()));
     auto dstCol = Std::get<0>(Std::get<1>(dstLayout.Shape())) * Std::get<1>(Std::get<1>(dstLayout.Shape()));
 
-    return MakeTileLayout(srcLayout, MakeShape(dstRow, dstCol));
+    return MakeSliceLayout(srcLayout, MakeShape(dstRow, dstCol));
 }
 
 template <typename Coord, typename LayoutType>
