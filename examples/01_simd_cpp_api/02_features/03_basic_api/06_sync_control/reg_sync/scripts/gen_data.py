@@ -13,24 +13,35 @@
 
 
 import os
+import argparse
 import numpy as np
 
 
-def get_data():
-    x = np.zeros([1024]).astype(np.float32)
-    y = np.zeros([1024]).astype(np.float32)
-    y[:64] = 1
-    y[64:128] = 2
-    return x, y
+def get_data(scenarioNum=1):
+    x = np.random.randn(1024).astype(np.float32)
+    y = np.random.randn(1024).astype(np.float32)
+    if scenarioNum == 1:
+        z = x + y
+    elif scenarioNum == 2:
+        z = x - y
+        z[:64] = z[-64:]
+    else:
+        raise ValueError(f"Unsupported scenarioNum: {scenarioNum}")
+    return x, y, z
 
 
-def gen_golden_data_simple():
+def gen_golden_data_simple(scenarioNum=1):
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
-    x, y = get_data()
-    x.tofile("./input/input.bin")
-    y.tofile("./output/golden.bin")
+    x, y, z = get_data(scenarioNum)
+    x.tofile("./input/input_x.bin")
+    y.tofile("./input/input_y.bin")
+    z.tofile("./output/golden.bin")
 
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2],
+                        help='Scenario number: 1=Add, 2=Sub')
+    args = parser.parse_args()
+    gen_golden_data_simple(args.scenarioNum)
