@@ -508,6 +508,20 @@ function build_package(){
 
 function build_test() {
   cmake_config
+  if [ -n "${TEST_MOD}" ] && [ "${TEST_MOD}" != "all" ]; then
+    local target_args=""
+    IFS=',' read -ra test_target_list <<< "${TEST_MOD}"
+    for tag in "${test_target_list[@]}"; do
+      if [ -n "${tag}" ]; then
+        target_args="${target_args} --target ${tag}"
+      fi
+    done
+    if [ "${COV}" == "true" ]; then
+      target_args="${target_args} --target collect_coverage_data"
+    fi
+    cmake --build . ${target_args} -j ${THREAD_NUM}
+    return 0
+  fi
   build all
 }
 
@@ -535,6 +549,9 @@ function build_test_part() {
   done
 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=${TEST_MOD}"
+  if [[ "${TEST_MOD}" == *"hccl_ut_mc2_server_kernel"* ]]; then
+    CUSTOM_OPTION="${CUSTOM_OPTION} -DDEVICE_MODE=ON -DKERNEL_MODE=ON"
+  fi
   if [ "${COV}" == "true" ]; then
     TARGETS="${TARGETS} --target collect_coverage_data"
   fi
@@ -591,7 +608,13 @@ main() {
   CUSTOM_OPTION="${CUSTOM_OPTION} -DCUSTOM_ASCEND_CANN_PACKAGE_PATH=${ASCEND_CANN_PACKAGE_PATH}"
 
   if [ -n "${TEST}" ];then
-    CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=ON -DTEST_MOD=all"
+    if [ -z "${TEST_MOD}" ]; then
+      TEST_MOD=all
+    fi
+    CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=ON -DTEST_MOD=${TEST_MOD}"
+    if [[ "${TEST_MOD}" == *"hccl_ut_mc2_server_kernel"* ]]; then
+      CUSTOM_OPTION="${CUSTOM_OPTION} -DDEVICE_MODE=ON -DKERNEL_MODE=ON"
+    fi
   fi
 
   if [ -n "${TEST_PART}" ]; then

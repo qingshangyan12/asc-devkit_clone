@@ -12,6 +12,7 @@
 set -e
 
 adv_test_targets=(
+    hccl_ut_mc2_server_kernel
     ascendc_ut_adv_api_kernel_ascend310p
     ascendc_ut_adv_api_kernel_ascend610
     ascendc_ut_adv_api_kernel_ascend310B1

@@ -13,3 +13,9 @@ set(UT_COMMON_INCLUDE_LIST
 )
 
 add_subdirectory(common/prepare_ut_env)
+
+if(TARGET mc2_server AND TARGET ccl_kernel)
+    add_subdirectory(aicpu_kfc)
+else()
+    message(STATUS "Skip hccl mc2_server kernel UT because mc2_server/ccl_kernel is unavailable in this build.")
+endif()

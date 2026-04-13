@@ -48,3 +48,5 @@ build_mc2_compile
 third_party
 
 build_device/
+
+build_ut_mc2_server_kernel/
