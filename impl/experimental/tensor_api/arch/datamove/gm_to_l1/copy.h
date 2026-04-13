@@ -56,7 +56,7 @@ private:
     template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U, typename Coord>
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const Coord& coord)
     {
-        auto sliceTensor = src(coord, dst);
+        auto sliceTensor = src.Slice(coord, dst.Layout());
         DataCopyImpl<trait, T, decltype(sliceTensor)>(dst, sliceTensor);
     }
 };

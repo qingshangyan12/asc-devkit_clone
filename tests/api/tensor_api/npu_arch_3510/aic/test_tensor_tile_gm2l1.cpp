@@ -1829,7 +1829,7 @@ void DataCopyGm2L1Sim(const T& dst, const U& src)
 template <typename T, typename U, typename Coord>
 void DataCopyGm2L1Sim(const T& dst, const U& src, const Coord& coord)
 {
-    auto sliceTensor = src(coord, dst);
+    auto sliceTensor = src.Slice(coord, dst.Layout());
     DataCopyGm2L1Sim(dst, sliceTensor);
 }
 

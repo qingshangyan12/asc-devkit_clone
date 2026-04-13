@@ -53,7 +53,7 @@ template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, type
 __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplateWithCoord<T, U, Coord>, void>::type
 DataCopy(const T& dst, const U& src, const Coord& coord)
 {
-    auto sliceTensor = src(coord, dst);
+    auto sliceTensor = src.Slice(coord, dst.Layout());
     DataCopy<trait, T, decltype(sliceTensor)>(dst, sliceTensor);
 }
 

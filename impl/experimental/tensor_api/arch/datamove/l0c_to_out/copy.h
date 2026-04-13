@@ -88,7 +88,7 @@ private:
     __aicore__ inline static typename Std::enable_if<VerifyingFixpipeTemplateWithCoord<T, U, Coord>, void>::type
     FixpipeImpl(const T& dst, const U& src, const Coord& coord, const FixpipeParams& params = FixpipeParams{})
     {
-        auto sliceTensor = dst(coord, src);
+        auto sliceTensor = dst.Slice(coord, src.Layout());
         FixpipeImpl<trait>(sliceTensor, src, params);
     }
 
@@ -97,7 +97,7 @@ private:
     FixpipeImpl(const T& dst, const U& src, const S& quant, const Coord& coord,
                 const FixpipeParams& params = FixpipeParams{})
     {
-        auto sliceTensor = dst(coord, src);
+        auto sliceTensor = dst.Slice(coord, src.Layout());
         FixpipeImpl<trait>(sliceTensor, src, quant, params);
     }
 };
