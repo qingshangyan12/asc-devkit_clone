@@ -109,7 +109,7 @@ __simd_callee__ inline void ErfinvCoreCompute(
     Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask)
 {
     Reg::RegTensor<float> oppositeXReg, temp1Reg, log2TempReg, negLog2Reg;
-    Reg::RegTensor<float> rsqrtNegLogReg, nearOneResult, middleResult;
+    Reg::RegTensor<float> sqrtNegLogReg, rsqrtNegLogReg, nearOneResult, middleResult;
     Reg::RegTensor<uint32_t> signBitReg, resultBitsReg;
     Reg::MaskReg cmpMask;
 
@@ -131,7 +131,8 @@ __simd_callee__ inline void ErfinvCoreCompute(
     Reg::Compare<float, CMPMODE::LT>(cmpMask, log2TempReg, oppositeXReg, mask);
 
     // Compute near-±1 approximation
-    Reg::Rsqrt(rsqrtNegLogReg, negLog2Reg, mask);
+    Reg::Sqrt(sqrtNegLogReg, negLog2Reg, mask);
+    Reg::Div(rsqrtNegLogReg, 1.0f, sqrtNegLogReg, mask);
     ErfinvComputeNearOne(nearOneResult, rsqrtNegLogReg, mask);
 
     // Extract sign bit from original x
