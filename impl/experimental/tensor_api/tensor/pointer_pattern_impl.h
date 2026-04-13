@@ -26,12 +26,6 @@ struct IsMemPtrIterator : Std::false_type {};
 template <typename T>
 struct IsMemPtrIterator<T, void_t<decltype(*Std::declval<T&>())>> : Std::true_type {};
 
-template <typename T, typename = void>
-struct HasMemPtrTraitDataType : Std::false_type {};
-
-template <typename T>
-struct HasMemPtrTraitDataType<T, void_t<typename T::type>> : Std::true_type {};
-
 template <typename PtrPattern, typename Iterator>
 __aicore__ inline auto MakeHardwareMemPtr(Iterator iter)
 {
