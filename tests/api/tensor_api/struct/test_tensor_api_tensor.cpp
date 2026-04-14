@@ -478,7 +478,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorSliceOperation)
     auto tensor = MakeTensor(ptr, layout);
     auto coord = MakeCoord(MakeCoord(0, 1), MakeCoord(0, 2));
 
-    auto shapeSlice = tensor.Slice(coord, MakeShape(3, 3));
+    auto shapeSlice = Slice(tensor, coord, MakeShape(3, 3));
     EXPECT_EQ(shapeSlice.Data(), ptr + layout(coord));
     auto shapeSliceShape = shapeSlice.Shape();
     auto shapeSliceStride = shapeSlice.Stride();
@@ -514,7 +514,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorSliceWithLayoutInfoOperation)
     auto infoLayout = MakeLayout(MakeShape(MakeShape(1, 5), MakeShape(3, 1)),
                                  MakeStride(MakeStride(9, 10), MakeStride(11, 12)));
 
-    auto layoutSlice = tensor.Slice(coord, infoLayout);
+    auto layoutSlice = Slice(tensor, coord, infoLayout);
     EXPECT_EQ(layoutSlice.Data(), ptr + layout(coord));
 
     auto layoutSliceShape = layoutSlice.Shape();
