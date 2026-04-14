@@ -20,13 +20,12 @@
 namespace AscendC {
 namespace Te {
 
-struct ZnLayoutPtn {};
-struct ZzLayoutPtn {};
-struct NnLayoutPtn {};
-struct NzLayoutPtn {};
+struct ZNLayoutPtn {};
+struct ZZLayoutPtn {};
+struct NNLayoutPtn {};
+struct NZLayoutPtn {};
 struct NDLayoutPtn {};
 struct DNLayoutPtn {};
-struct ScaleZzLayoutPtn {};
 struct ScaleANDLayoutPtn {};
 struct ScaleADNLayoutPtn {};
 struct ScaleBNDLayoutPtn {};

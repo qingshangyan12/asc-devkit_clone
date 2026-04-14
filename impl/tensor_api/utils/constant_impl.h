@@ -65,7 +65,6 @@ enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
 enum class TupleFormat : uint8_t { Shape, Stride, Coord};
 
 namespace Location {
-    struct EmptyTrait {};
     struct GM {};
     struct UB {};
     struct L1 {};
