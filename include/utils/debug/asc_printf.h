@@ -55,6 +55,14 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 #endif
 #endif
 
+namespace __asc_simd_vf {
+template <class... Args>
+__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+{
+    
+}
+}
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__
