@@ -25,10 +25,12 @@ curl -fsSL "https://github.com/docker/buildx/releases/latest/download/buildx-lin
 chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 ```
 
+> [!WARNING]
 > The Ascend **driver** directory (`/usr/local/Ascend/driver`) is mounted read-only into the container. The **CANN toolkit and ops packages** should be installed inside the container after startup — not on the host. Installing CANN on the host risks overwriting a shared environment.
 
 ## Build the Image
 
+> [!TIP]
 > **Build time:** approximately 5 minutes on a typical connection. The dominant cost is downloading the conda environment and PyTorch. Subsequent rebuilds hit the Docker layer cache and complete in seconds if only non-package layers changed.
 
 ```bash
@@ -37,6 +39,7 @@ docker buildx build --network host -t ascendc:ubuntu24.04 .devcontainer/
 
 ## Quick Start (Human Users)
 
+> [!NOTE]
 > If you are an AI agent, skip to [Quick Start (AI Agent)](#quick-start-ai-agent).
 
 ### With NPU
@@ -78,6 +81,7 @@ Agents (e.g. Claude Code, CI runners) can run the container directly without VS 
 
 Then **show the user the exact `docker run` command** you are about to execute and wait for confirmation before proceeding.
 
+> [!IMPORTANT]
 > Some steps require user action: CANN toolkit and ops packages must be installed inside the container
 > after startup. Ask the user to provide the CANN package paths or installer commands.
 
@@ -115,6 +119,7 @@ docker run -itd --name ascendc_container ascendc:ubuntu24.04
 
 If the user needs to mount data directories, append each as `-v /host/path:/container/path`.
 
+> [!NOTE]
 > After starting the container, install CANN toolkit and ops packages manually, or automate via a setup script.
 
 ## Python Environments
