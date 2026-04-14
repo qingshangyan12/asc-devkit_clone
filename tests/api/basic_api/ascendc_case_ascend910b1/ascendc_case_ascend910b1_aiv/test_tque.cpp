@@ -54,21 +54,31 @@ TEST_F(TEST_TSCM, TEST_ALLOC_AND_FREE_BUFFER) {
 }
 
 TEST_F(TEST_TSCM, TEST_ALLOC_TOO_MUCH_BUFFER_IN_ONE_INITBUFFER) {
+    std::cout << "[DEBUG] TEST_ALLOC_TOO_MUCH_BUFFER_IN_ONE_INITBUFFER start" << std::endl;
     g_coreType = AscendC::AIV_TYPE;
+    std::cout << "[DEBUG] g_coreType set" << std::endl;
     TPipe pipe;
+    std::cout << "[DEBUG] TPipe created" << std::endl;
     TQue<TPosition::VECIN, 1> tque1;
+    std::cout << "[DEBUG] TQue created" << std::endl;
     MOCKER(raise, int(*)(int)).times(2).will(returnValue(0));
+    std::cout << "[DEBUG] MOCKER setup done" << std::endl;
 
     static int32_t count =0;
     std::string fileName = "print_ut_aiv_init_buffer" + std::to_string(getpid()) + "_" + std::to_string(count)+ ".txt";
     freopen(fileName.c_str(), "w", stdout);
+    std::cout << "[DEBUG] freopen to file done" << std::endl;
 
     pipe.InitBuffer(tque1, 65, 1024);
+    std::cout << "[DEBUG] pipe.InitBuffer done" << std::endl;
 
     // 恢复printf
     fclose(stdout);
+    std::cout << "[DEBUG] fclose(stdout) done" << std::endl;
     freopen("/dev/tty", "w", stdout);
+    std::cout << "[DEBUG] freopen /dev/tty write done" << std::endl;
     freopen("/dev/tty", "r", stdin);
+    std::cout << "[DEBUG] freopen /dev/tty read done" << std::endl;
 
     // 校验真值
     std::ifstream resultFile(fileName, std::ios::in);
@@ -80,15 +90,24 @@ TEST_F(TEST_TSCM, TEST_ALLOC_TOO_MUCH_BUFFER_IN_ONE_INITBUFFER) {
     std::cout << "resultString is " << resultString  << std::endl;
     std::cout << "goldenStr is " << goldenStr  << std::endl;
     EXPECT_TRUE(resultString.find(goldenStr) != std::string::npos);
+    std::cout << "[DEBUG] EXPECT_TRUE done" << std::endl;
     EXPECT_EQ(remove(fileName.c_str()), 0);
+    std::cout << "[DEBUG] TEST_ALLOC_TOO_MUCH_BUFFER_IN_ONE_INITBUFFER end" << std::endl;
 }
 
 // 预计分配到65会挂
 TEST_F(TEST_TSCM, TEST_ALLOC_MANY_BUFFER_IN_MULTIPLE_INITBUFFER) {
+    std::cout << "[DEBUG] TEST_ALLOC_MANY_BUFFER_IN_MULTIPLE_INITBUFFER start" << std::endl;
     g_coreType = AscendC::AIV_TYPE;
+    std::cout << "[DEBUG] g_coreType set" << std::endl;
     TPipe pipe;
+    std::cout << "[DEBUG] TPipe created" << std::endl;
     TQue<TPosition::VECIN, 1> tque1;
     TQue<TPosition::VECIN, 1> tque2;
+    std::cout << "[DEBUG] TQue created" << std::endl;
     pipe.InitBuffer(tque1, 32, 1024);
+    std::cout << "[DEBUG] pipe.InitBuffer tque1 done" << std::endl;
     pipe.InitBuffer(tque2, 32, 1024);
+    std::cout << "[DEBUG] pipe.InitBuffer tque2 done" << std::endl;
+    std::cout << "[DEBUG] TEST_ALLOC_MANY_BUFFER_IN_MULTIPLE_INITBUFFER end" << std::endl;
 }
