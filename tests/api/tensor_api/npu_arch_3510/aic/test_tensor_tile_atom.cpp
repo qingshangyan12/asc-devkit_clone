@@ -115,7 +115,7 @@ TEST_F(Tensor_Api_Atom, CopyL0C2GMOperation)
     auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeLayout(shape, stride));
     auto gmDst = MakeTensor(MakeGMmemPtr(dst), MakeLayout(shape, stride));
 
-    auto atomCopy = MakeCopy(CopyL0C2GM{}, FixpipeTraitDefault{});
+    auto atomCopy = MakeCopy(CopyL0C2GM{}, CopyL0C2GMTraitDefault{});
     atomCopy.Call(gmDst, l0cSrc);
 
     atomCopy.Call(gmDst, l0cSrc, coord);
