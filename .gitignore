@@ -5,6 +5,7 @@ output
 __pycache__/
 /examples/**/build/
 AGENTS.md
+.agents
 oat_reports/
 
 oat_reports/
