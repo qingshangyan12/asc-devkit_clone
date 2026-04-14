@@ -20,6 +20,12 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #ifndef ASCENDC_CPU_DEBUG
 #include <type_traits>
 
+// push
+// #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+// #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+// #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__
+// #endif
+
 #include "impl/utils/sys_macros.h"
 #include "impl/utils/debug/asc_utils_types.h"
 #include "impl/utils/debug/asc_debug_types.h"
@@ -33,6 +39,11 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #endif
 
 namespace __asc_aicore {
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+{
+    copy_ubuf_to_gm_align_v2(dst, src, 1, size, 0, 0, 0, 0);
+}
+
 __aicore__ inline void enable_asc_diagnostics()
 {
 #if defined(__ENABLE_ASCENDC_PRINTF__)
@@ -251,6 +262,218 @@ __aicore__ constexpr inline DumpTensorDataType get_dump_datatype()
 
 } // namespace __asc_aicore
 #endif
+
+namespace __asc_simd_vf {
+using __cce_scalar::get_coreid;
+
+template <uint64_t timeoutCycle = 15 * 1000 * 1000> // 20ms * 15
+__simd_callee__ inline void ringbuf_wait_rts_sync()
+{
+    // return ringbuf_wait_rts_sync_impl<timeoutCycle>();
+}
+
+__simd_callee__ inline void asc_entire_dcci_impl(__gm__ uint64_t* ptr)
+{
+    // __asc_aicore::dcci(ptr, cache_line_t::ENTIRE_DATA_CACHE,
+    //                    dcci_dst_t::CACHELINE_OUT);
+}
+
+__simd_callee__ inline uint64_t asc_debug_get_system_cycle_impl()
+{
+    uint64_t sysCnt = 0;
+    asm volatile("MOV %0, SYS_CNT\n" : "+l"(sysCnt));
+    return sysCnt;
+}
+
+template <uint64_t timeoutCycle>
+__simd_callee__ inline void ringbuf_wait_rts_sync_impl()
+{
+    const uint64_t firstTimeStamp = asc_debug_get_system_cycle_impl();
+    while (static_cast<uint64_t>(asc_debug_get_system_cycle_impl()) - firstTimeStamp < timeoutCycle) {
+        // Wait for RTS sync
+    }
+}
+__simd_callee__ inline __gm__ RingBufReadInfo* get_ring_buf_read_info(
+    __gm__ BlockRingBufInfo* block_ring_buf_info)
+{
+    __gm__ uint8_t* block_head = reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info);
+
+    return reinterpret_cast<__gm__ RingBufReadInfo*>(block_head + sizeof(BlockRingBufInfo));
+}
+
+__simd_callee__ inline __gm__ RingBufWriteInfo* get_ring_buf_write_info(
+    __gm__ BlockRingBufInfo* block_ring_buf_info)
+{
+    __gm__ uint8_t* ring_buf_addr = reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info->ringBufAddr);
+
+    return reinterpret_cast<__gm__ RingBufWriteInfo*>(ring_buf_addr + block_ring_buf_info->ringBufLen);
+}
+
+__simd_callee__ inline bool ringbuf_read_wait(__gm__ RingBufReadInfo* readInfo)
+{
+    constexpr uint32_t maxCounter = 15;
+    uint32_t counter = 0;
+    while (readInfo->bufOffset == 0) {
+        if (counter >= maxCounter) { // max wait 15 * 300ms, rts read gm per 200ms
+            return false;
+        }
+        ringbuf_wait_rts_sync(); // wait 20 * 15 ms
+        ++counter;
+        __asc_aicore::asc_entire_dcci((__gm__ uint64_t*)readInfo);
+    }
+    return true;
+}
+
+__simd_callee__ inline void ringbuf_skip_directly(__gm__ RingBufWriteInfo* writeInfo)
+{
+    writeInfo->bufOffset = 0;
+    __asc_aicore::asc_entire_dcci((__gm__ uint64_t*)writeInfo);
+}
+
+__simd_callee__ inline void ringbuf_skip_with_info(
+    __gm__ RingBufWriteInfo* writeInfo, __gm__ uint8_t* ringBufAddr, const uint32_t& ringBufLen)
+{
+    __gm__ SkipTlv* skipInfo = reinterpret_cast<__gm__ SkipTlv*>(ringBufAddr + writeInfo->bufOffset);
+    skipInfo->type = static_cast<uint32_t>(DumpType::DUMP_SKIP);
+    skipInfo->length = ringBufLen - writeInfo->bufOffset - sizeof(SkipTlv);
+    writeInfo->bufOffset = 0;
+    writeInfo->packIdx += 1;
+    __asc_aicore::asc_entire_dcci((__gm__ uint64_t*)skipInfo);
+    __asc_aicore::asc_entire_dcci((__gm__ uint64_t*)writeInfo);
+    return;
+}
+
+__simd_callee__ inline bool ringbuf_overflow_wait(__gm__ RingBufReadInfo* readInfo, __gm__ RingBufWriteInfo* writeInfo,
+                                   const uint32_t& tlvLen)
+{
+    constexpr uint32_t maxCounter = 15;
+    uint32_t counter = 0;
+    while (writeInfo->bufOffset < readInfo->bufOffset && writeInfo->bufOffset + tlvLen >= readInfo->bufOffset) {
+        if (counter >= maxCounter) { // max wait 15 * 300ms, rts read gm per 200ms
+            return false;
+        }
+        ringbuf_wait_rts_sync(); // wait 20 * 15 ms
+        ++counter;
+        __asc_aicore::asc_entire_dcci((__gm__ uint64_t*)readInfo);
+    }
+    return true;
+}
+
+__simd_callee__ inline void update_write_info(__gm__ RingBufWriteInfo* writeInfo, const uint32_t& tlvLen)
+{
+    writeInfo->bufOffset += tlvLen;
+    writeInfo->packIdx += 1;
+    __asc_aicore::asc_entire_dcci((__gm__ uint64_t*)writeInfo);
+}
+
+__simd_callee__ inline bool check_and_wait_ring_buf_space(
+    __gm__ BlockRingBufInfo* block_ring_buf_info, uint32_t tlv_len)
+{
+    constexpr uint32_t minTlvLen = sizeof(SkipTlv);
+
+    __gm__ uint8_t* ringBufAddr = reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info->ringBufAddr);
+    uint32_t ringBufLen = block_ring_buf_info->ringBufLen;
+
+    __gm__ RingBufReadInfo* read_info = get_ring_buf_read_info(block_ring_buf_info);
+    __gm__ RingBufWriteInfo* write_info = get_ring_buf_write_info(block_ring_buf_info);
+
+    if (minTlvLen >= ringBufLen || tlv_len > ringBufLen) {
+        return false;
+    } else if (write_info->bufOffset + minTlvLen >= ringBufLen) {
+        if (!ringbuf_read_wait(read_info)) { // check read is begin
+            return false;
+        }
+        ringbuf_skip_directly(write_info);
+    } else if (write_info->bufOffset + tlv_len > ringBufLen) {
+        if (!ringbuf_read_wait(read_info)) { // check read is begin
+            return false;
+        }
+        ringbuf_skip_with_info(write_info, ringBufAddr, ringBufLen);
+    }
+    if (write_info->packIdx > 0 &&
+        write_info->bufOffset < read_info->bufOffset &&
+        write_info->bufOffset + tlv_len >= read_info->bufOffset) {
+        return ringbuf_overflow_wait(read_info, write_info, tlv_len);
+    }
+    return true;
+}
+
+__simd_callee__ inline uint32_t asc_debug_get_core_idx_impl()
+{
+    constexpr uint32_t dumpCoreNums = 108;
+    return get_coreid() % dumpCoreNums;
+}
+
+__simd_callee__ inline uint32_t asc_debug_get_core_idx()
+{
+    return asc_debug_get_core_idx_impl();
+}
+
+__simd_callee__ __gm__ inline BlockRingBufInfo* get_block_ring_buf_info()
+{
+    uint32_t blockIdx = asc_debug_get_core_idx();
+    uint32_t blockLength = reinterpret_cast<__gm__ BlockRingBufInfo*>(g_sysPrintFifoSpace)->length;
+    __gm__ BlockRingBufInfo* blockInfo =
+        reinterpret_cast<__gm__ BlockRingBufInfo*>(g_sysPrintFifoSpace + blockLength * blockIdx);
+    // return blockInfo->magic == 0xAE86 ? blockInfo : nullptr;
+    return blockInfo;
+}
+
+__simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr()
+{
+    static __ubuf__ uint8_t info[sizeof(BlockVFBufInfo)];
+    return (__ubuf__ BlockVFBufInfo *)info;
+}
+
+__simd_callee__ __gm__ inline uint8_t* call_get_ring_buf_tlv(__gm__ BlockRingBufInfo* block_ring_buf_info)
+{
+    __gm__ RingBufWriteInfo* writeInfo = get_ring_buf_write_info(block_ring_buf_info);
+    __gm__ uint8_t* ringBufAddr = reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info->ringBufAddr);
+    return ringBufAddr + writeInfo->bufOffset;
+}
+
+// #define ASC_IS_AIV ASCEND_IS_AIV
+// __simd_callee__ inline void asc_copy_ub2gm_impl(__gm__ void* dst, __ubuf__ void* src, uint16_t n_burst,
+//     uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+// {
+//     if ASC_IS_AIV {
+//         copy_ubuf_to_gm(dst, src, 0, n_burst, burst_len, src_gap, dst_gap);
+//     }
+// }
+
+// constexpr uint16_t ASC_C_API_ONE_DATABLOCK_SIZE = 32;
+// __simd_callee__ inline void asc_copy_ub2gm_impl(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+// {
+//     asc_copy_ub2gm_impl(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
+// }
+
+// __simd_callee__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+// {
+//     asc_copy_ub2gm_impl(dst, src, size);
+// }
+
+__simd_callee__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+{
+    __cce_scalar::copy_ubuf_to_gm_align_v2(dst, src, 1, size, 0, 0, 0, 0);
+}
+
+__simd_callee__ void asc_vf_printf_ub2gm()
+{
+    __ubuf__ BlockVFBufInfo *blockInfo = get_printf_ubuf_addr();
+    __gm__ BlockRingBufInfo *block_ring_buf_info = get_block_ring_buf_info();
+    const uint32_t tlv_len = blockInfo->writeLen;
+
+    if (!check_and_wait_ring_buf_space(block_ring_buf_info, tlv_len)) {
+        return;
+    }
+
+    // asc_copy_ub2gm(call_get_ring_buf_tlv(block_ring_buf_info), blockInfo->buffer, tlv_len);
+    asc_copy_ub2gm_align(call_get_ring_buf_tlv(block_ring_buf_info), blockInfo->buffer, tlv_len);
+
+    __gm__ RingBufWriteInfo *write_info = get_ring_buf_write_info(block_ring_buf_info);
+    update_write_info(write_info, tlv_len);
+}
+}
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
