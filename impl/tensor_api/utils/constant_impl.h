@@ -22,24 +22,13 @@
 #ifndef IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
 #define IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
 
-#include <cstdint>
-#include <utility>
-#include <type_traits>
-#include "impl/tensor_api/utils/macro_impl.h"
-#include "include/utils/std/tuple.h"
-#include "include/utils/std/type_traits.h"
-#include "include/utils/std/utility.h"
-#include "include/utils/std/algorithm.h"
+#include "impl/tensor_api/utils/extra_impl.h"
 
 namespace AscendC {
 namespace Te {
 constexpr size_t TWO_DIM_DATA = 2;
 constexpr size_t FOUR_DIM_DATA = 4;
 constexpr size_t FRACTAL_FIXED = 16;
-constexpr size_t DISABLE_COORD = 0;
-constexpr size_t ENABLE_COORD = 1;
-constexpr size_t SHIFT_LEFT_16 = 0x00010000;
-constexpr size_t L2_CACHE_OFFSET = 60;
 constexpr size_t MX_SCALE_K0 = 2;
 constexpr uint32_t BLOCK_CUBE = 16;
 
@@ -62,8 +51,6 @@ constexpr uint32_t CURRENT_ARCH_VERSION = GetArchVersion{}();
 
 enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
 
-enum class TupleFormat : uint8_t { Shape, Stride, Coord};
-
 namespace Location {
     struct GM {};
     struct UB {};
@@ -84,8 +71,45 @@ __aicore__ inline constexpr auto GetHardPos()
    return T::iterator::hardPos;
 }
 
-template <typename... Args>
-inline constexpr bool is_one_of_attr_v = Std::is_one_of_v<Std::unwrap_decay_t<Args>...>;
+template <typename T>
+struct locationAttr {
+    using gmAttr =          __gm__      T*;
+    using cbufAttr =        __cbuf__    T*;
+    using caAttr =          __ca__      T*;
+    using cbAttr =          __cb__      T*;
+    using ccAttr =          __cc__      T*;
+    using ubufAttr =        __ubuf__    T*;
+    using fbufAttr =        __fbuf__    T*;
+    using ssbufAttr =       __ssbuf__   T*;
+    using biasbufAttr =     __biasbuf__ T*;
+
+    using type = Std::tuple<gmAttr, cbufAttr, caAttr, cbAttr, ccAttr, ubufAttr, fbufAttr, ssbufAttr, biasbufAttr>;    
+};
+
+template <typename A, typename ProcessedTuple>
+struct AllElementsSameAsA;
+
+template <typename A, typename First, typename... Rest>
+struct AllElementsSameAsA<A, Std::tuple<First, Rest...>> {
+    static constexpr bool value = Std::is_same_v<A, typename IterEle<First>::type> || AllElementsSameAsA<A, Std::tuple<Rest...>>::value;
+};
+
+template <typename A>
+struct AllElementsSameAsA<A, Std::tuple<>> { static constexpr bool value = false; };
+
+template <typename A, typename... BList>
+struct CheckAllSame;
+
+template <typename A, typename B, typename... RestB>
+struct CheckAllSame<A, B, RestB...> {
+    static constexpr bool value =  Std::is_same_v<A, B> || AllElementsSameAsA<A, typename locationAttr<B>::type>::value || CheckAllSame<A, RestB...>::value;
+};
+
+template <typename A>
+struct CheckAllSame<A> { static constexpr bool value = false; };
+
+template <typename A, typename... BList>
+constexpr bool is_one_of_attr_v = CheckAllSame<A, BList...>::value;
 
 template <typename DataType>
 inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t>;
