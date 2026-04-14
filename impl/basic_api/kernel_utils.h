@@ -48,11 +48,11 @@ __BLOCK_LOCAL__ __inline__ uint64_t g_rptConfig;
 #endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 namespace Internal {
-// global variables g_cmpMaskLow and g_cmpMaskHigh are used to simulate the register CMPMASK in 1971
+// testetsest global variables g_cmpMaskLow and g_cmpMaskHigh are used to simulate the register CMPMASK in 1971
 // both of them are 64 bits and they are used to store the result of API Compare
 __BLOCK_LOCAL__ __inline__ uint64_t g_cmpMaskLow;
 __BLOCK_LOCAL__ __inline__ uint64_t g_cmpMaskHigh;
-// the global variable g_deqScale is used to store the scale offset and signMode of API CastDeq
+// testsetste the global variable g_deqScale is used to store the scale offset and signMode of API CastDeq
 // when you are using API "SetDeqScaleImpl(float scale, int16_t offset, bool signMode)", g_deqScale will save
 // the result of the transformation of three variable data
 // otherwise, if you are using API "SetDeqScaleImpl(const LocalTensor<T> &vdeq, const VdeqInfo &vdeqInfo)"
