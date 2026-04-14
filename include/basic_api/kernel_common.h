@@ -48,7 +48,10 @@ class GlobalTensor;
 template <auto funcPtr, typename... Args> __aicore__ inline void asc_vf_call(Args &&... args)
 {
 #if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) 
-        funcPtr(args...);
+    funcPtr(args...);
+#if ASCENDC_SIMD_VF_DEBUG == 1
+    asc_vf_printf_ub2gm();
+#endif
 #endif
 }
 
