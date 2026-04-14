@@ -74,26 +74,21 @@ template <typename Coord, typename LayoutType, typename TensorType>
     return MakeLayout(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride());
 }
 
-template <typename T, typename U>
-__aicore__ inline constexpr auto MakeMinLayoutValue(const T& src, const U& dst);
-
-template <typename T, typename U, size_t... Is>
-__aicore__ inline constexpr auto MakeMinLayoutValueImpl(const T& src, const U& dst, Std::index_sequence<Is...>)
-{
-    return MakeShape(MakeMinLayoutValue(Std::get<Is>(src), Std::get<Is>(dst))...);
-}
-
-template <typename T, typename U>
-__aicore__ inline constexpr auto MakeMinLayoutValue(const T& src, const U& dst)
-{
-    static_assert(IsSameTupleStructureV<T, U>, "SrcLayout and DstLayout must have same tuple structure");
-    if constexpr (Std::is_tuple_v<Std::remove_cvref_t<T>>) {
-        return MakeMinLayoutValueImpl(
-            src, dst, Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<T>>>{});
-    } else {
+struct MinOp {
+    template <typename T, typename U>
+    __aicore__ inline constexpr auto operator()(const T& src, const U& dst) const
+    {
         return Std::min(src, dst);
     }
-}
+};
+
+struct DiffOp {
+    template <typename T, typename U>
+    __aicore__ inline constexpr auto operator()(const T& shape, const U& coord) const
+    {
+        return shape - coord;
+    }
+};
 
 template <typename LayoutType, typename TileShape, Std::enable_if_t<!is_layout_v<TileShape>, int> = 0>
 __aicore__ inline decltype(auto) MakeSliceLayout(const LayoutType& layout, const TileShape& tileShape) 
@@ -129,32 +124,8 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const SrcLayoutType& srcLayout,
     static_assert(SrcLayoutType::rank == DstLayoutType::rank,
         "Tensor Rank must be equal to Layout rank");
 
-    auto sliceShape = MakeMinLayoutValue(srcLayout.Shape(), dstLayout.Shape());
+    auto sliceShape = TransformTupleApply(srcLayout.Shape(), dstLayout.Shape(), MinOp{});
     return MakeLayout(sliceShape, srcLayout.Stride());
-}
-
-template <typename ShapeType, typename CoordType>
-__aicore__ inline constexpr auto MakeCoordShape(const ShapeType& shape, const CoordType& coord);
-
-template <typename ShapeType, typename CoordType, size_t... Is>
-__aicore__ inline constexpr auto MakeCoordShapeImpl(const ShapeType& shape, const CoordType& coord,
-    Std::index_sequence<Is...>)
-{
-    return MakeShape(MakeCoordShape(Std::get<Is>(shape), Std::get<Is>(coord))...);
-}
-
-template <typename ShapeType, typename CoordType>
-__aicore__ inline constexpr auto MakeCoordShape(const ShapeType& shape, const CoordType& coord)
-{
-    if constexpr (Std::is_tuple_v<ShapeType>) {
-        static_assert(nesting_depth_v<ShapeType> == nesting_depth_v<CoordType> && Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>,
-            "coord and layout.Shape() must have same tuple structure");
-        return MakeCoordShapeImpl(shape, coord,
-            Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<ShapeType>>>{});
-    } else {
-        static_assert(!Std::is_tuple_v<CoordType>, "coord and layout.Shape() must have same tuple structure");
-        return shape - coord;
-    }
 }
 
 template <typename Coord, typename LayoutType>
@@ -166,7 +137,7 @@ __aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const Layou
     static_assert(nesting_depth_v<ShapeType> == nesting_depth_v<CoordType> && 
         Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>, 
         "Shape and coord must have same tuple structure");
-    auto coordShape = MakeCoordShape(layout.Shape(), coord);
+    auto coordShape = TransformTupleApply(layout.Shape(), coord, DiffOp{});
     return MakeLayout(coordShape, layout.Stride());
 }
 
