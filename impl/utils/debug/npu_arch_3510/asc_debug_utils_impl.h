@@ -113,6 +113,53 @@ __aicore__ constexpr inline DumpTensorDataType get_dump_datatype_impl()
 }
 
 }
+
+namespace __asc_simd_vf {
+template <typename T>
+__simd_callee__ constexpr inline DumpTensorDataType get_dump_datatype_impl()
+{
+    if constexpr (std::is_same<T, bool>::value) {
+        return DumpTensorDataType::ACL_BOOL;
+    } else if (std::is_same<T, uint8_t>::value) {
+        return DumpTensorDataType::ACL_UINT8;
+    } else if (std::is_same<T, int8_t>::value) {
+        return DumpTensorDataType::ACL_INT8;
+    } else if (std::is_same<T, int16_t>::value) {
+        return DumpTensorDataType::ACL_INT16;
+    } else if (std::is_same<T, uint16_t>::value) {
+        return DumpTensorDataType::ACL_UINT16;
+    } else if (std::is_same<T, int32_t>::value) {
+        return DumpTensorDataType::ACL_INT32;
+    } else if (std::is_same<T, uint32_t>::value) {
+        return DumpTensorDataType::ACL_UINT32;
+    } else if (std::is_same<T, uint64_t>::value) {
+        return DumpTensorDataType::ACL_UINT64;
+    } else if (std::is_same<T, int64_t>::value) {
+        return DumpTensorDataType::ACL_INT64;
+    } else if (std::is_same<T, float>::value) {
+        return DumpTensorDataType::ACL_FLOAT;
+    } else if (std::is_same<T, half>::value) {
+        return DumpTensorDataType::ACL_FLOAT16;
+    } else if (std::is_same<T, bfloat16_t>::value) {
+        return DumpTensorDataType::ACL_BF16;
+    } else if (std::is_same<T, hifloat8_t>::value) {
+        return DumpTensorDataType::ACL_HIFLOAT8;
+    } else if (std::is_same<T, float8_e5m2_t>::value) {
+        return DumpTensorDataType::ACL_FLOAT8_E5M2;
+    } else if (std::is_same<T, float8_e4m3_t>::value) {
+        return DumpTensorDataType::ACL_FLOAT8_E4M3FN;
+    } else if (std::is_same<T, float8_e8m0_t>::value) {
+        return DumpTensorDataType::ACL_FLOAT8_E8M0;
+    } else if (std::is_same<T, float4_e2m1x2_t>::value) {
+        return DumpTensorDataType::ACL_FLOAT4_E2M1;
+    } else if (std::is_same<T, float4_e1m2x2_t>::value) {
+        return DumpTensorDataType::ACL_FLOAT4_E1M2;
+    } else {
+        return DumpTensorDataType::ACL_MAX;
+    }
+}
+}
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS_IMPL__

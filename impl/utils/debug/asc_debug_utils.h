@@ -32,7 +32,75 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "impl/utils/debug/npu_arch_3510/asc_debug_utils_impl.h"
 #endif
 
+namespace __asc_simd_vf {
+__simd_callee__ inline uint32_t get_cstring_len_simd(__ubuf__ const char* s)
+{
+    uint32_t i = 0;
+    while (*(s + i) != '\0') {
+        i++;
+    }
+    return i + 1;
+}
+
+__simd_callee__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
+{
+    if (b == 0) {
+        return 0;
+    }
+    return (a + b - 1) / b;
+}
+
+__simd_callee__ constexpr inline uint32_t align_up(uint32_t a, uint32_t b)
+{
+    return div_ceil(a, b) * b;
+}
+
+template <typename T>
+__simd_callee__ constexpr inline DumpTensorDataType get_dump_datatype_impl();
+
+template <typename T>
+__simd_callee__ constexpr inline DumpTensorDataType get_dump_datatype()
+{
+    return get_dump_datatype_impl<T>();
+}
+
+__simd_callee__ inline void enable_asc_diagnostics()
+{
+#if defined(__ENABLE_ASCENDC_PRINTF__)
+#if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
+    static const struct AscTlv __asc_debug_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
+    {4, 4, 1};
+#endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#endif // __ENABLE_ASCENDC_PRINTF__
+}
+
+__simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr(uint64_t addr)
+{
+    constexpr uint32_t safeStaticLen = 32;
+    static __ubuf__ uint64_t info[safeStaticLen];
+    if (addr != 0) {
+        info[0] = addr;
+    }
+    return (__ubuf__ BlockVFBufInfo*)(info[0]);
+}
+
+__simd_callee__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+{
+    __cce_scalar::copy_ubuf_to_gm_align_v2(dst, src, 1, size, 0, 0, 0, 0);
+}
+
+__simd_callee__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size)
+{
+    __cce_scalar::copy_ubuf_to_ubuf(dst, src, 1, size / 32, 0, 0);
+}
+} // namespace __asc_simd_vf
+
 namespace __asc_aicore {
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+{
+    copy_ubuf_to_gm_align_v2(dst, src, 1, size, 0, 0, 0, 0);
+}
+
 __aicore__ inline void enable_asc_diagnostics()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
@@ -290,6 +358,115 @@ __aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint
 #endif
 }
 
+__aicore__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr_aicore(uint64_t addr)
+{
+    return __asc_simd_vf::get_printf_ubuf_addr(addr);
+}
+
+__aicore__ __gm__ inline BlockRingBufInfo* get_block_ring_buf_info()
+{
+    uint32_t blockIdx = asc_debug_get_core_idx();
+    uint32_t blockLength = reinterpret_cast<__gm__ BlockRingBufInfo*>(g_sysPrintFifoSpace)->length;
+    __gm__ BlockRingBufInfo* blockInfo =
+        reinterpret_cast<__gm__ BlockRingBufInfo*>(g_sysPrintFifoSpace + blockLength * blockIdx);
+    // magic check to be considered
+    return blockInfo;
+}
+
+__aicore__ inline __gm__ RingBufReadInfo* get_ring_buf_read_info(
+    __gm__ BlockRingBufInfo* block_ring_buf_info)
+{
+    __gm__ uint8_t* block_head = reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info);
+    return reinterpret_cast<__gm__ RingBufReadInfo*>(block_head + sizeof(BlockRingBufInfo));
+}
+
+__aicore__ inline __gm__ RingBufWriteInfo* get_ring_buf_write_info(
+    __gm__ BlockRingBufInfo* block_ring_buf_info)
+{
+    __gm__ uint8_t* ring_buf_addr = reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info->ringBufAddr);
+    return reinterpret_cast<__gm__ RingBufWriteInfo*>(ring_buf_addr + block_ring_buf_info->ringBufLen);
+}
+
+__aicore__ __gm__ inline uint8_t* call_get_ring_buf_tlv(__gm__ BlockRingBufInfo* block_ring_buf_info)
+{
+    __gm__ RingBufWriteInfo* writeInfo = get_ring_buf_write_info(block_ring_buf_info);
+    __gm__ uint8_t* ringBufAddr = reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info->ringBufAddr);
+    return ringBufAddr + writeInfo->bufOffset;
+}
+
+__aicore__ inline void update_write_info(__gm__ RingBufWriteInfo* writeInfo, const uint32_t& tlvLen)
+{
+    writeInfo->bufOffset += tlvLen;
+    writeInfo->packIdx += 1;
+    __asc_aicore::asc_entire_dcci((__gm__ uint64_t*)writeInfo);
+}
+
+__aicore__ inline void asc_vf_dump_ub2gm()
+{
+    __ubuf__ BlockVFBufInfo *blockInfo = get_printf_ubuf_addr_aicore(0);
+    __ubuf__ DumpTensorTlv *tlv = (__ubuf__ DumpTensorTlv*)blockInfo->buffer;
+    
+    __gm__ BlockRingBufInfo *block_ring_buf_info = get_block_ring_buf_info();
+    __gm__ DumpTensorTlv *dumpTlv = reinterpret_cast<__gm__ DumpTensorTlv*>(call_get_ring_buf_tlv(block_ring_buf_info));
+    const uint32_t tlv_len = blockInfo->writeLen;
+
+    // if (!check_and_wait_ring_buf_space(block_ring_buf_info, tlv_len)) {
+    //     return;
+    // }
+
+    // asc_copy_ub2gm_align(dumpTlv, blockInfo->buffer, tlv_len);
+    sync_all();
+    dumpTlv->type = tlv->type;
+    dumpTlv->length = tlv->length;
+    dumpTlv->dataType = tlv->dataType;
+    dumpTlv->desc = tlv->desc;
+    dumpTlv->position = tlv->position;
+    dumpTlv->dumpSize = tlv->dumpSize;
+    for (uint32_t i = 0; i < tlv->dumpSize; ++i) {
+        ((__gm__ uint32_t*)(dumpTlv + 1))[i] = ((__ubuf__ uint32_t*)(tlv + 1))[i];
+    }
+    sync_all();
+
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(dumpTlv));
+
+    __gm__ RingBufWriteInfo *write_info = get_ring_buf_write_info(block_ring_buf_info);
+    update_write_info(write_info, tlv_len);
+}
+
+__aicore__ inline void asc_vf_printf_ub2gm()
+{
+    __ubuf__ BlockVFBufInfo *blockInfo = get_printf_ubuf_addr_aicore(0);
+    __ubuf__ PrintTlv *tlv = (__ubuf__ PrintTlv*)blockInfo->buffer;
+    __gm__ BlockRingBufInfo *block_ring_buf_info = get_block_ring_buf_info();
+    __gm__ PrintTlv *printTlv = reinterpret_cast<__gm__ PrintTlv*>(call_get_ring_buf_tlv(block_ring_buf_info));
+    const uint32_t tlv_len = blockInfo->writeLen;
+
+    sync_all();
+    printTlv->type = tlv->type;
+    printTlv->length = tlv->length;
+    printTlv->fmtOffset = tlv->fmtOffset;
+    // for (uint32_t i = 0; i < tlv->length; ++i) {
+    for (uint32_t i = 0; i < 4; ++i) {
+        ((__gm__ uint8_t*)(printTlv + 1))[i] = ((__ubuf__ uint8_t*)(tlv + 1) + tlv->fmtOffset)[i];
+    }
+    sync_all();
+
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(printTlv));
+    __gm__ RingBufWriteInfo *write_info = get_ring_buf_write_info(block_ring_buf_info);
+    update_write_info(write_info, tlv_len);
+}
+
+__aicore__ inline void asc_vf_debug_ub2gm()
+{
+    __ubuf__ BlockVFBufInfo *blockInfo = get_printf_ubuf_addr_aicore(0);
+    // 读取 TLV type 字段判断数据类型
+    __ubuf__ uint32_t* tlv = reinterpret_cast<__ubuf__ uint32_t*>(blockInfo->buffer);
+    if (*tlv == static_cast<uint32_t>(DumpType::DUMP_TENSOR)) {
+        asc_vf_dump_ub2gm();
+    } else {
+        asc_vf_printf_ub2gm();
+    }
+}
 } // namespace __asc_aicore
 #endif
 
