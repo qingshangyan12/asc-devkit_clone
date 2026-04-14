@@ -181,7 +181,8 @@ add_library(
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:${TOP_DIR}/metadef/base/asc/tilingdata_base_impl.cc>
   )
 
-target_include_directories(tiling_api PRIVATE
+
+  target_include_directories(tiling_api PRIVATE
   ${KERNEL_TILING_DIR}
   ${ASCENDC_DIR}/include/utils/context
   ${ASCENDC_DIR}/include/utils/tiling/platform
@@ -195,6 +196,8 @@ target_include_directories(tiling_api PRIVATE
   $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${TOP_DIR}/ace/npuruntime/runtime/dfx/include/log/toolchain>>
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:$<BUILD_INTERFACE:${TOP_DIR}/metadef/pkg_inc>>
 )
+
+add_dependencies(tiling_api gen_kernel_tiling)
 
 target_compile_options(
   tiling_api
