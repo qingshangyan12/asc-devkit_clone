@@ -226,8 +226,6 @@ __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& c
     return static_cast<Tensor&&>(tensor).Slice(coord, info);
 }
 
-
-
 } // namespace Te
 } // namespace AscendC
 
