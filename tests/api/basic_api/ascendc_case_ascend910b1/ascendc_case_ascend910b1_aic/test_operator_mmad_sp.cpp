@@ -212,11 +212,9 @@ protected:
     void SetUp()
     {
         g_coreType = AscendC::AIC_TYPE;
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
     }
     void TearDown()
     {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::CheckSyncState();
         g_coreType = AscendC::MIX_TYPE;
         block_idx = 0;
@@ -326,11 +324,9 @@ protected:
     void SetUp()
     {
         g_coreType = AscendC::AIC_TYPE;
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
     }
     void TearDown()
     {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::CheckSyncState();
         g_coreType = AscendC::MIX_TYPE;
         block_idx = 0;

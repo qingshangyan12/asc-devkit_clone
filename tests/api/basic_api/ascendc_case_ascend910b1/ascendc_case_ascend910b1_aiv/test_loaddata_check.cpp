@@ -347,11 +347,9 @@ protected:
     void SetUp()
     {
         AscendC::SetGCoreType(2);
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
     }
     void TearDown()
     {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::SetGCoreType(0);
         block_idx = 0;
         block_num = 8;
@@ -784,11 +782,9 @@ protected:
     void SetUp()
     {
         AscendC::SetGCoreType(2);
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
     }
     void TearDown()
     {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
         AscendC::SetGCoreType(0);
         block_idx = 0;
         block_num = 8;
