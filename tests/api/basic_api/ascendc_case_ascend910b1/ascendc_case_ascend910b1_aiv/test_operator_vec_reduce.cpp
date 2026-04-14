@@ -557,8 +557,8 @@ TEST_P(RepeatReduceSumTestsuite, RepeatReduceSumTestCase)
 }
 
 // ============================================================
-// WholeReduceMax NPU Debug validation - negative test cases
-// Cover: Tensor position, Tensor alignment, mask, parameter range
+// Reduce API NPU Debug validation - parameterized negative tests
+// Cover: Tensor position, mask, parameter range for all Reduce APIs
 // ============================================================
 
 namespace {
@@ -566,9 +566,40 @@ int32_t RaiseStubForNpuDebug(int32_t i)
 {
     return 0;
 }
-}
 
-class TestWholeReduceMaxNpuDebug : public testing::Test {
+enum class ReduceApiType : int32_t {
+    WHOLE_REDUCE_MAX,
+    WHOLE_REDUCE_MIN,
+    WHOLE_REDUCE_SUM,
+    BLOCK_REDUCE_MAX,
+    BLOCK_REDUCE_MIN,
+    BLOCK_REDUCE_SUM,
+    PAIR_REDUCE_SUM,
+    REPEAT_REDUCE_SUM,
+};
+
+enum class NegCaseType : int32_t {
+    DST_NOT_UB,
+    SRC_NOT_UB,
+    MASK_COUNT_ZERO,
+    MASK_COUNT_EXCEED_HALF,
+    MASK_COUNT_EXCEED_FLOAT,
+    REPEAT_TIME_OVERFLOW,
+    ORDER_OVERFLOW,
+    DST_NOT_UB_MASK_BIT,
+};
+
+struct ReduceNpuDebugParams {
+    ReduceApiType apiType;
+    NegCaseType negType;
+    int32_t dtypeSize; // 2=half, 4=float
+    int32_t expectedRaiseCount;
+    const char* caseName;
+};
+} // namespace
+
+class TestReduceNpuDebug : public testing::Test,
+                           public testing::WithParamInterface<ReduceNpuDebugParams> {
 protected:
     void SetUp()
     {
@@ -590,839 +621,451 @@ protected:
     }
 };
 
-// --- 1. Tensor physical position negative cases ---
-
-// dst on L0A (not UB) - mask count mode
-TEST_F(TestWholeReduceMaxNpuDebug, DstPositionNotUbMaskCount)
+TEST_P(TestReduceNpuDebug, NegativeCase)
 {
+    auto p = GetParam();
     TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
+    MOCKER(raise, int32_t (*)(int32_t)).times(p.expectedRaiseCount).will(invoke(RaiseStubForNpuDebug));
 
-    TBuf<TPosition::A2> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMax<half>(dstLocal, srcLocal, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
-}
-
-// dst on L0A (not UB) - mask bit mode
-TEST_F(TestWholeReduceMaxNpuDebug, DstPositionNotUbMaskBit)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::A2> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    uint64_t masks[2] = { FULL_MASK, FULL_MASK };
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMax<half>(dstLocal, srcLocal, masks, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
-}
-
-// src on L1 (not UB) - mask count mode
-TEST_F(TestWholeReduceMaxNpuDebug, SrcPositionNotUbMaskCount)
-{
-    TPipe tpipe;
-    TBuf<TPosition::A1> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMax<half>(dstLocal, srcLocal, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
-}
-
-// --- 2. Mask negative cases ---
-
-// mask count mode, mask=0 (reduce API requires mask >= 1)
-TEST_F(TestWholeReduceMaxNpuDebug, MaskCountZero)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMax<half>(dstLocal, srcLocal, 0, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
-}
-
-// mask count mode, mask=129 (exceeds half upper bound 128)
-TEST_F(TestWholeReduceMaxNpuDebug, MaskCountExceedUpperHalf)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 256 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMax<half>(dstLocal, srcLocal, 129, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
-}
-
-// mask count mode, mask=65 (exceeds float upper bound 64)
-TEST_F(TestWholeReduceMaxNpuDebug, MaskCountExceedUpperFloat)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(float));
-    LocalTensor<float> srcLocal = srcBuf.Get<float>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(float));
-    LocalTensor<float> dstLocal = dstBuf.Get<float>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMax<float>(dstLocal, srcLocal, 65, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
-}
-
-// --- 3. Parameter range negative cases ---
-
-// repeatTime=256 (exceeds [0, 255])
-TEST_F(TestWholeReduceMaxNpuDebug, RepeatTimeOverflow)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMax<half>(dstLocal, srcLocal, 128, 256, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
-}
-
-// order=4 (exceeds [0, 3])
-TEST_F(TestWholeReduceMaxNpuDebug, OrderOverflow)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMax<half>(dstLocal, srcLocal, 128, 1, 1, 1, 8, static_cast<ReduceOrder>(4));
-}
-
-// ============================================================
-// WholeReduceMin NPU Debug validation - negative test cases
-// Same checks as WholeReduceMax: position, alignment, mask, order
-// ============================================================
-
-class TestWholeReduceMinNpuDebug : public testing::Test {
-protected:
-    void SetUp()
-    {
-        AscendC::SetGCoreType(2);
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
+    bool isFloat = (p.dtypeSize == 4);
+    bool srcOnA1 = (p.negType == NegCaseType::SRC_NOT_UB);
+    bool dstOnA2 = (p.negType == NegCaseType::DST_NOT_UB || p.negType == NegCaseType::DST_NOT_UB_MASK_BIT);
+    int32_t srcSize = isFloat ? 128 : 128;
+    if (p.negType == NegCaseType::MASK_COUNT_EXCEED_HALF && !isFloat) {
+        srcSize = 256;
     }
-    void TearDown()
-    {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
-        AscendC::CheckSyncState();
-        GlobalMockObject::verify();
+    int32_t dstSize = 16;
+
+    // Declare TBuf objects with full TEST_P scope lifetime
+    TBuf<TPosition::VECCALC> srcBufUb;   // src on UB (VECCALC)
+    TBuf<TPosition::A1>      srcBufA1;   // src on L1 (A1)
+    TBuf<TPosition::VECCALC> dstBufUb;   // dst on UB (VECCALC)
+    TBuf<TPosition::A2>      dstBufA2;   // dst on L0A (A2)
+
+    LocalTensor<half> srcHalf;
+    LocalTensor<float> srcFloat;
+    LocalTensor<half> dstHalf;
+    LocalTensor<float> dstFloat;
+
+    // Init src buffer and get tensor
+    if (srcOnA1) {
+        tpipe.InitBuffer(srcBufA1, srcSize * (isFloat ? sizeof(float) : sizeof(half)));
+        if (isFloat) { srcFloat = srcBufA1.Get<float>(); } else { srcHalf = srcBufA1.Get<half>(); }
+    } else {
+        tpipe.InitBuffer(srcBufUb, srcSize * (isFloat ? sizeof(float) : sizeof(half)));
+        if (isFloat) { srcFloat = srcBufUb.Get<float>(); } else { srcHalf = srcBufUb.Get<half>(); }
     }
-};
 
-TEST_F(TestWholeReduceMinNpuDebug, DstPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::A2> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMin<half>(dstLocal, srcLocal, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
-}
-
-TEST_F(TestWholeReduceMinNpuDebug, SrcPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::A1> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMin<half>(dstLocal, srcLocal, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
-}
-
-TEST_F(TestWholeReduceMinNpuDebug, MaskCountZero)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMin<half>(dstLocal, srcLocal, 0, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
-}
-
-TEST_F(TestWholeReduceMinNpuDebug, RepeatTimeOverflow)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMin<half>(dstLocal, srcLocal, 128, 256, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
-}
-
-TEST_F(TestWholeReduceMinNpuDebug, OrderOverflow)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceMin<half>(dstLocal, srcLocal, 128, 1, 1, 1, 8, static_cast<ReduceOrder>(4));
-}
-
-// ============================================================
-// WholeReduceSum NPU Debug validation - negative test cases
-// Same as Max/Min but no order parameter
-// ============================================================
-
-class TestWholeReduceSumNpuDebug : public testing::Test {
-protected:
-    void SetUp()
-    {
-        AscendC::SetGCoreType(2);
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
+    // Init dst buffer and get tensor
+    if (dstOnA2) {
+        tpipe.InitBuffer(dstBufA2, dstSize * (isFloat ? sizeof(float) : sizeof(half)));
+        if (isFloat) { dstFloat = dstBufA2.Get<float>(); } else { dstHalf = dstBufA2.Get<half>(); }
+    } else {
+        tpipe.InitBuffer(dstBufUb, dstSize * (isFloat ? sizeof(float) : sizeof(half)));
+        if (isFloat) { dstFloat = dstBufUb.Get<float>(); } else { dstHalf = dstBufUb.Get<half>(); }
     }
-    void TearDown()
-    {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
-        AscendC::CheckSyncState();
-        GlobalMockObject::verify();
+
+    // Invoke the corresponding Reduce API with illegal params
+    switch (p.apiType) {
+        case ReduceApiType::WHOLE_REDUCE_MAX:
+            if (isFloat) {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        WholeReduceMax<float>(dstFloat, srcFloat, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        WholeReduceMax<float>(dstFloat, srcFloat, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        WholeReduceMax<float>(dstFloat, srcFloat, 0, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::MASK_COUNT_EXCEED_FLOAT:
+                        WholeReduceMax<float>(dstFloat, srcFloat, 65, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        WholeReduceMax<float>(dstFloat, srcFloat, 128, 256, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::ORDER_OVERFLOW:
+                        WholeReduceMax<float>(dstFloat, srcFloat, 128, 1, 1, 1, 8, static_cast<ReduceOrder>(4));
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        WholeReduceMax<half>(dstHalf, srcHalf, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
+                        break;
+                    case NegCaseType::DST_NOT_UB_MASK_BIT: {
+                        uint64_t masks[2] = { FULL_MASK, FULL_MASK };
+                        WholeReduceMax<half>(dstHalf, srcHalf, masks, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
+                        break;
+                    }
+                    case NegCaseType::SRC_NOT_UB:
+                        WholeReduceMax<half>(dstHalf, srcHalf, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        WholeReduceMax<half>(dstHalf, srcHalf, 0, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::MASK_COUNT_EXCEED_HALF:
+                        WholeReduceMax<half>(dstHalf, srcHalf, 129, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        WholeReduceMax<half>(dstHalf, srcHalf, 128, 256, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::ORDER_OVERFLOW:
+                        WholeReduceMax<half>(dstHalf, srcHalf, 128, 1, 1, 1, 8, static_cast<ReduceOrder>(4));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        case ReduceApiType::WHOLE_REDUCE_MIN:
+            if (isFloat) {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        WholeReduceMin<float>(dstFloat, srcFloat, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        WholeReduceMin<float>(dstFloat, srcFloat, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        WholeReduceMin<float>(dstFloat, srcFloat, 0, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::MASK_COUNT_EXCEED_FLOAT:
+                        WholeReduceMin<float>(dstFloat, srcFloat, 65, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        WholeReduceMin<float>(dstFloat, srcFloat, 128, 256, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::ORDER_OVERFLOW:
+                        WholeReduceMin<float>(dstFloat, srcFloat, 128, 1, 1, 1, 8, static_cast<ReduceOrder>(4));
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        WholeReduceMin<half>(dstHalf, srcHalf, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        WholeReduceMin<half>(dstHalf, srcHalf, 128, 1, 1, 1, 8, ReduceOrder::ORDER_VALUE_INDEX);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        WholeReduceMin<half>(dstHalf, srcHalf, 0, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::MASK_COUNT_EXCEED_HALF:
+                        WholeReduceMin<half>(dstHalf, srcHalf, 129, 1, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        WholeReduceMin<half>(dstHalf, srcHalf, 128, 256, 1, 1, 8, ReduceOrder::ORDER_ONLY_VALUE);
+                        break;
+                    case NegCaseType::ORDER_OVERFLOW:
+                        WholeReduceMin<half>(dstHalf, srcHalf, 128, 1, 1, 1, 8, static_cast<ReduceOrder>(4));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        case ReduceApiType::WHOLE_REDUCE_SUM:
+            if (isFloat) {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        WholeReduceSum<float>(dstFloat, srcFloat, 128, 1, 1, 1, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        WholeReduceSum<float>(dstFloat, srcFloat, 128, 1, 1, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        WholeReduceSum<float>(dstFloat, srcFloat, 0, 1, 1, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_EXCEED_FLOAT:
+                        WholeReduceSum<float>(dstFloat, srcFloat, 65, 1, 1, 1, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        WholeReduceSum<float>(dstFloat, srcFloat, 128, 256, 1, 1, 8);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        WholeReduceSum<half>(dstHalf, srcHalf, 128, 1, 1, 1, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        WholeReduceSum<half>(dstHalf, srcHalf, 128, 1, 1, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        WholeReduceSum<half>(dstHalf, srcHalf, 0, 1, 1, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_EXCEED_HALF:
+                        WholeReduceSum<half>(dstHalf, srcHalf, 129, 1, 1, 1, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        WholeReduceSum<half>(dstHalf, srcHalf, 128, 256, 1, 1, 8);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        case ReduceApiType::BLOCK_REDUCE_MAX:
+            if (isFloat) {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        BlockReduceMax<float>(dstFloat, srcFloat, 64, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        BlockReduceMax<float>(dstFloat, srcFloat, 64, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        BlockReduceMax<float>(dstFloat, srcFloat, 0, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        BlockReduceMax<float>(dstFloat, srcFloat, 64, 256, 8, 1, 8);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        BlockReduceMax<half>(dstHalf, srcHalf, 128, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        BlockReduceMax<half>(dstHalf, srcHalf, 128, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        BlockReduceMax<half>(dstHalf, srcHalf, 0, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        BlockReduceMax<half>(dstHalf, srcHalf, 128, 256, 8, 1, 8);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        case ReduceApiType::BLOCK_REDUCE_MIN:
+            if (isFloat) {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        BlockReduceMin<float>(dstFloat, srcFloat, 64, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        BlockReduceMin<float>(dstFloat, srcFloat, 64, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        BlockReduceMin<float>(dstFloat, srcFloat, 0, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        BlockReduceMin<float>(dstFloat, srcFloat, 64, 256, 8, 1, 8);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        BlockReduceMin<half>(dstHalf, srcHalf, 128, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        BlockReduceMin<half>(dstHalf, srcHalf, 128, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        BlockReduceMin<half>(dstHalf, srcHalf, 0, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        BlockReduceMin<half>(dstHalf, srcHalf, 128, 256, 8, 1, 8);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        case ReduceApiType::BLOCK_REDUCE_SUM:
+            if (isFloat) {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        BlockReduceSum<float>(dstFloat, srcFloat, 64, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        BlockReduceSum<float>(dstFloat, srcFloat, 64, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        BlockReduceSum<float>(dstFloat, srcFloat, 0, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        BlockReduceSum<float>(dstFloat, srcFloat, 64, 256, 8, 1, 8);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        BlockReduceSum<half>(dstHalf, srcHalf, 128, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        BlockReduceSum<half>(dstHalf, srcHalf, 128, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        BlockReduceSum<half>(dstHalf, srcHalf, 0, 1, 8, 1, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        BlockReduceSum<half>(dstHalf, srcHalf, 128, 256, 8, 1, 8);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        case ReduceApiType::PAIR_REDUCE_SUM:
+            if (isFloat) {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        PairReduceSum<float>(dstFloat, srcFloat, 1, 64, 8, 1, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        PairReduceSum<float>(dstFloat, srcFloat, 1, 64, 8, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        PairReduceSum<float>(dstFloat, srcFloat, 1, 0, 8, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_EXCEED_FLOAT:
+                        PairReduceSum<float>(dstFloat, srcFloat, 1, 65, 8, 1, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        PairReduceSum<float>(dstFloat, srcFloat, 256, 64, 8, 1, 8);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        PairReduceSum<half>(dstHalf, srcHalf, 1, 128, 8, 1, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        PairReduceSum<half>(dstHalf, srcHalf, 1, 128, 8, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        PairReduceSum<half>(dstHalf, srcHalf, 1, 0, 8, 1, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_EXCEED_HALF:
+                        PairReduceSum<half>(dstHalf, srcHalf, 1, 129, 8, 1, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        PairReduceSum<half>(dstHalf, srcHalf, 256, 128, 8, 1, 8);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        case ReduceApiType::REPEAT_REDUCE_SUM:
+            if (isFloat) {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        RepeatReduceSum<float>(dstFloat, srcFloat, 1, 64, 1, 1, 8, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        RepeatReduceSum<float>(dstFloat, srcFloat, 1, 64, 1, 1, 8, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        RepeatReduceSum<float>(dstFloat, srcFloat, 1, 0, 1, 1, 8, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_EXCEED_FLOAT:
+                        RepeatReduceSum<float>(dstFloat, srcFloat, 1, 65, 1, 1, 8, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        RepeatReduceSum<float>(dstFloat, srcFloat, 256, 64, 1, 1, 8, 8);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (p.negType) {
+                    case NegCaseType::DST_NOT_UB:
+                        RepeatReduceSum<half>(dstHalf, srcHalf, 1, 64, 1, 1, 8, 8);
+                        break;
+                    case NegCaseType::SRC_NOT_UB:
+                        RepeatReduceSum<half>(dstHalf, srcHalf, 1, 64, 1, 1, 8, 8);
+                        break;
+                    case NegCaseType::MASK_COUNT_ZERO:
+                        RepeatReduceSum<half>(dstHalf, srcHalf, 1, 0, 1, 1, 8, 8);
+                        break;
+                    case NegCaseType::REPEAT_TIME_OVERFLOW:
+                        RepeatReduceSum<half>(dstHalf, srcHalf, 256, 64, 1, 1, 8, 8);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
     }
-};
-
-TEST_F(TestWholeReduceSumNpuDebug, DstPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::A2> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceSum<half>(dstLocal, srcLocal, 128, 1, 1, 1, 8);
 }
 
-TEST_F(TestWholeReduceSumNpuDebug, SrcPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::A1> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceSum<half>(dstLocal, srcLocal, 128, 1, 1, 1, 8);
-}
-
-TEST_F(TestWholeReduceSumNpuDebug, MaskCountZero)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceSum<half>(dstLocal, srcLocal, 0, 1, 1, 1, 8);
-}
-
-TEST_F(TestWholeReduceSumNpuDebug, MaskCountExceedUpperFloat)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(float));
-    LocalTensor<float> srcLocal = srcBuf.Get<float>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(float));
-    LocalTensor<float> dstLocal = dstBuf.Get<float>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceSum<float>(dstLocal, srcLocal, 65, 1, 1, 1, 8);
-}
-
-TEST_F(TestWholeReduceSumNpuDebug, RepeatTimeOverflow)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    WholeReduceSum<half>(dstLocal, srcLocal, 128, 256, 1, 1, 8);
-}
-
-// ============================================================
-// BlockReduceMax NPU Debug validation - negative test cases
-// BlockReduce dst alignment: half=16B, float=32B
-// BlockReduce only has mask count mode (no mask bit overload for C220)
-// ============================================================
-
-class TestBlockReduceMaxNpuDebug : public testing::Test {
-protected:
-    void SetUp()
-    {
-        AscendC::SetGCoreType(2);
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
-    }
-    void TearDown()
-    {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
-        AscendC::CheckSyncState();
-        GlobalMockObject::verify();
-    }
-};
-
-TEST_F(TestBlockReduceMaxNpuDebug, DstPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::A2> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceMax<half>(dstLocal, srcLocal, 128, 1, 8, 1, 8);
-}
-
-TEST_F(TestBlockReduceMaxNpuDebug, SrcPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::A1> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceMax<half>(dstLocal, srcLocal, 128, 1, 8, 1, 8);
-}
-
-TEST_F(TestBlockReduceMaxNpuDebug, MaskCountZero)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceMax<half>(dstLocal, srcLocal, 0, 1, 8, 1, 8);
-}
-
-TEST_F(TestBlockReduceMaxNpuDebug, RepeatTimeOverflow)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceMax<half>(dstLocal, srcLocal, 128, 256, 8, 1, 8);
-}
-
-// ============================================================
-// BlockReduceMin NPU Debug validation - negative test cases
-// Same checks as BlockReduceMax
-// ============================================================
-
-class TestBlockReduceMinNpuDebug : public testing::Test {
-protected:
-    void SetUp()
-    {
-        AscendC::SetGCoreType(2);
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
-    }
-    void TearDown()
-    {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
-        AscendC::CheckSyncState();
-        GlobalMockObject::verify();
-    }
-};
-
-TEST_F(TestBlockReduceMinNpuDebug, DstPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::A2> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceMin<half>(dstLocal, srcLocal, 128, 1, 8, 1, 8);
-}
-
-TEST_F(TestBlockReduceMinNpuDebug, SrcPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::A1> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceMin<half>(dstLocal, srcLocal, 128, 1, 8, 1, 8);
-}
-
-TEST_F(TestBlockReduceMinNpuDebug, MaskCountZero)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceMin<half>(dstLocal, srcLocal, 0, 1, 8, 1, 8);
-}
-
-TEST_F(TestBlockReduceMinNpuDebug, RepeatTimeOverflow)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceMin<half>(dstLocal, srcLocal, 128, 256, 8, 1, 8);
-}
-
-// ============================================================
-// BlockReduceSum NPU Debug validation - negative test cases
-// Same checks as BlockReduceMax
-// ============================================================
-
-class TestBlockReduceSumNpuDebug : public testing::Test {
-protected:
-    void SetUp()
-    {
-        AscendC::SetGCoreType(2);
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
-    }
-    void TearDown()
-    {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
-        AscendC::CheckSyncState();
-        GlobalMockObject::verify();
-    }
-};
-
-TEST_F(TestBlockReduceSumNpuDebug, DstPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::A2> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceSum<half>(dstLocal, srcLocal, 128, 1, 8, 1, 8);
-}
-
-TEST_F(TestBlockReduceSumNpuDebug, SrcPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::A1> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceSum<half>(dstLocal, srcLocal, 128, 1, 8, 1, 8);
-}
-
-TEST_F(TestBlockReduceSumNpuDebug, MaskCountZero)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceSum<half>(dstLocal, srcLocal, 0, 1, 8, 1, 8);
-}
-
-TEST_F(TestBlockReduceSumNpuDebug, RepeatTimeOverflow)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    BlockReduceSum<half>(dstLocal, srcLocal, 128, 256, 8, 1, 8);
-}
-
-// ============================================================
-// PairReduceSum NPU Debug validation - negative test cases
-// PairReduceSum signature (mask count): (dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride)
-// PairReduceSum signature (mask bit):   (dst, src, repeatTime, mask[], dstRepStride, srcBlkStride, srcRepStride)
-// Validation: position (UB), alignment (dst/src 32B), mask, repeatTime
-// Note: mask bit nullptr test omitted - ASCENDC_DEBUG_ASSERT does not terminate in UT,
-//       causing subsequent code to dereference null pointer (same as WholeReduceMax MaskBitNullPtr).
-// ============================================================
-
-class TestPairReduceSumNpuDebug : public testing::Test {
-protected:
-    void SetUp()
-    {
-        AscendC::SetGCoreType(2);
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
-    }
-    void TearDown()
-    {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
-        AscendC::CheckSyncState();
-        GlobalMockObject::verify();
-    }
-};
-
-// dst on L0A (not UB) - mask count mode
-TEST_F(TestPairReduceSumNpuDebug, DstPositionNotUbMaskCount)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::A2> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    PairReduceSum<half>(dstLocal, srcLocal, 1, 128, 8, 1, 8);
-}
-
-// src on L1 (not UB) - mask count mode
-TEST_F(TestPairReduceSumNpuDebug, SrcPositionNotUbMaskCount)
-{
-    TPipe tpipe;
-    TBuf<TPosition::A1> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    PairReduceSum<half>(dstLocal, srcLocal, 1, 128, 8, 1, 8);
-}
-
-// mask count mode, mask=0 (reduce API requires mask >= 1)
-TEST_F(TestPairReduceSumNpuDebug, MaskCountZero)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    PairReduceSum<half>(dstLocal, srcLocal, 1, 0, 8, 1, 8);
-}
-
-// mask count mode, mask=129 (exceeds half upper bound 128)
-TEST_F(TestPairReduceSumNpuDebug, MaskCountExceedUpperHalf)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 256 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    PairReduceSum<half>(dstLocal, srcLocal, 1, 129, 8, 1, 8);
-}
-
-// mask count mode, mask=65 (exceeds float upper bound 64)
-TEST_F(TestPairReduceSumNpuDebug, MaskCountExceedUpperFloat)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(float));
-    LocalTensor<float> srcLocal = srcBuf.Get<float>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(float));
-    LocalTensor<float> dstLocal = dstBuf.Get<float>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    PairReduceSum<float>(dstLocal, srcLocal, 1, 65, 8, 1, 8);
-}
-
-// repeatTime=256 (exceeds [0, 255])
-TEST_F(TestPairReduceSumNpuDebug, RepeatTimeOverflow)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    PairReduceSum<half>(dstLocal, srcLocal, 256, 128, 8, 1, 8);
-}
-
-// ============================================================
-// RepeatReduceSum NPU Debug validation - negative test cases
-// RepeatReduceSum signature (mask count only): (dst, src, repeatTime, mask, dstBlkStride, srcBlkStride, dstRepStride, srcRepStride)
-// Validation: position (dst/src UB), alignment (src 32B, dst half=2B/float=4B), mask count, repeatTime
-// Note: Only mask count mode exists for C220.
-// ============================================================
-
-class TestRepeatReduceSumNpuDebug : public testing::Test {
-protected:
-    void SetUp()
-    {
-        AscendC::SetGCoreType(2);
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
-    }
-    void TearDown()
-    {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
-        AscendC::CheckSyncState();
-        GlobalMockObject::verify();
-    }
-};
-
-// dst on L0A (not UB)
-TEST_F(TestRepeatReduceSumNpuDebug, DstPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::A2> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    RepeatReduceSum<half>(dstLocal, srcLocal, 1, 64, 1, 1, 8, 8);
-}
-
-// src on L1 (not UB)
-TEST_F(TestRepeatReduceSumNpuDebug, SrcPositionNotUb)
-{
-    TPipe tpipe;
-    TBuf<TPosition::A1> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    RepeatReduceSum<half>(dstLocal, srcLocal, 1, 64, 1, 1, 8, 8);
-}
-
-// mask count mode, mask=0 (reduce API requires mask >= 1)
-TEST_F(TestRepeatReduceSumNpuDebug, MaskCountZero)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    RepeatReduceSum<half>(dstLocal, srcLocal, 1, 0, 1, 1, 8, 8);
-}
-
-// mask count mode, mask=65 (exceeds float upper bound 64)
-TEST_F(TestRepeatReduceSumNpuDebug, MaskCountExceedUpperFloat)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(float));
-    LocalTensor<float> srcLocal = srcBuf.Get<float>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(float));
-    LocalTensor<float> dstLocal = dstBuf.Get<float>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    RepeatReduceSum<float>(dstLocal, srcLocal, 1, 65, 1, 1, 8, 8);
-}
-
-// repeatTime=256 (exceeds [0, 255])
-TEST_F(TestRepeatReduceSumNpuDebug, RepeatTimeOverflow)
-{
-    TPipe tpipe;
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 128 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 16 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    RepeatReduceSum<half>(dstLocal, srcLocal, 256, 64, 1, 1, 8, 8);
-}
+INSTANTIATE_TEST_CASE_P(TEST_REDUCE_NPU_DEBUG, TestReduceNpuDebug,
+    ::testing::Values(
+        // WholeReduceMax
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MAX, NegCaseType::DST_NOT_UB, 2, 1, "WholeReduceMax_DstNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MAX, NegCaseType::DST_NOT_UB_MASK_BIT, 2, 1, "WholeReduceMax_DstNotUbMaskBit"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MAX, NegCaseType::SRC_NOT_UB, 2, 1, "WholeReduceMax_SrcNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MAX, NegCaseType::MASK_COUNT_ZERO, 2, 0, "WholeReduceMax_MaskZero"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MAX, NegCaseType::MASK_COUNT_EXCEED_HALF, 2, 0, "WholeReduceMax_MaskExceedHalf"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MAX, NegCaseType::MASK_COUNT_EXCEED_FLOAT, 4, 0, "WholeReduceMax_MaskExceedFloat"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MAX, NegCaseType::REPEAT_TIME_OVERFLOW, 2, 1, "WholeReduceMax_RepeatOverflow"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MAX, NegCaseType::ORDER_OVERFLOW, 2, 1, "WholeReduceMax_OrderOverflow"},
+
+        // WholeReduceMin
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MIN, NegCaseType::DST_NOT_UB, 2, 1, "WholeReduceMin_DstNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MIN, NegCaseType::SRC_NOT_UB, 2, 1, "WholeReduceMin_SrcNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MIN, NegCaseType::MASK_COUNT_ZERO, 2, 0, "WholeReduceMin_MaskZero"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MIN, NegCaseType::REPEAT_TIME_OVERFLOW, 2, 1, "WholeReduceMin_RepeatOverflow"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_MIN, NegCaseType::ORDER_OVERFLOW, 2, 1, "WholeReduceMin_OrderOverflow"},
+
+        // WholeReduceSum
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_SUM, NegCaseType::DST_NOT_UB, 2, 1, "WholeReduceSum_DstNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_SUM, NegCaseType::SRC_NOT_UB, 2, 1, "WholeReduceSum_SrcNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_SUM, NegCaseType::MASK_COUNT_ZERO, 2, 0, "WholeReduceSum_MaskZero"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_SUM, NegCaseType::MASK_COUNT_EXCEED_FLOAT, 4, 0, "WholeReduceSum_MaskExceedFloat"},
+        ReduceNpuDebugParams{ReduceApiType::WHOLE_REDUCE_SUM, NegCaseType::REPEAT_TIME_OVERFLOW, 2, 1, "WholeReduceSum_RepeatOverflow"},
+
+        // BlockReduceMax
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_MAX, NegCaseType::DST_NOT_UB, 2, 1, "BlockReduceMax_DstNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_MAX, NegCaseType::SRC_NOT_UB, 2, 1, "BlockReduceMax_SrcNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_MAX, NegCaseType::MASK_COUNT_ZERO, 2, 0, "BlockReduceMax_MaskZero"},
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_MAX, NegCaseType::REPEAT_TIME_OVERFLOW, 2, 1, "BlockReduceMax_RepeatOverflow"},
+
+        // BlockReduceMin
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_MIN, NegCaseType::DST_NOT_UB, 2, 1, "BlockReduceMin_DstNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_MIN, NegCaseType::SRC_NOT_UB, 2, 1, "BlockReduceMin_SrcNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_MIN, NegCaseType::MASK_COUNT_ZERO, 2, 0, "BlockReduceMin_MaskZero"},
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_MIN, NegCaseType::REPEAT_TIME_OVERFLOW, 2, 1, "BlockReduceMin_RepeatOverflow"},
+
+        // BlockReduceSum
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_SUM, NegCaseType::DST_NOT_UB, 2, 1, "BlockReduceSum_DstNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_SUM, NegCaseType::SRC_NOT_UB, 2, 1, "BlockReduceSum_SrcNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_SUM, NegCaseType::MASK_COUNT_ZERO, 2, 0, "BlockReduceSum_MaskZero"},
+        ReduceNpuDebugParams{ReduceApiType::BLOCK_REDUCE_SUM, NegCaseType::REPEAT_TIME_OVERFLOW, 2, 1, "BlockReduceSum_RepeatOverflow"},
+
+        // PairReduceSum
+        ReduceNpuDebugParams{ReduceApiType::PAIR_REDUCE_SUM, NegCaseType::DST_NOT_UB, 2, 1, "PairReduceSum_DstNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::PAIR_REDUCE_SUM, NegCaseType::SRC_NOT_UB, 2, 1, "PairReduceSum_SrcNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::PAIR_REDUCE_SUM, NegCaseType::MASK_COUNT_ZERO, 2, 0, "PairReduceSum_MaskZero"},
+        ReduceNpuDebugParams{ReduceApiType::PAIR_REDUCE_SUM, NegCaseType::MASK_COUNT_EXCEED_HALF, 2, 1, "PairReduceSum_MaskExceedHalf"},
+        ReduceNpuDebugParams{ReduceApiType::PAIR_REDUCE_SUM, NegCaseType::MASK_COUNT_EXCEED_FLOAT, 4, 1, "PairReduceSum_MaskExceedFloat"},
+        ReduceNpuDebugParams{ReduceApiType::PAIR_REDUCE_SUM, NegCaseType::REPEAT_TIME_OVERFLOW, 2, 2, "PairReduceSum_RepeatOverflow"},
+
+        // RepeatReduceSum
+        ReduceNpuDebugParams{ReduceApiType::REPEAT_REDUCE_SUM, NegCaseType::DST_NOT_UB, 2, 1, "RepeatReduceSum_DstNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::REPEAT_REDUCE_SUM, NegCaseType::SRC_NOT_UB, 2, 1, "RepeatReduceSum_SrcNotUb"},
+        ReduceNpuDebugParams{ReduceApiType::REPEAT_REDUCE_SUM, NegCaseType::MASK_COUNT_ZERO, 2, 0, "RepeatReduceSum_MaskZero"},
+        ReduceNpuDebugParams{ReduceApiType::REPEAT_REDUCE_SUM, NegCaseType::MASK_COUNT_EXCEED_FLOAT, 4, 0, "RepeatReduceSum_MaskExceedFloat"},
+        ReduceNpuDebugParams{ReduceApiType::REPEAT_REDUCE_SUM, NegCaseType::REPEAT_TIME_OVERFLOW, 2, 2, "RepeatReduceSum_RepeatOverflow"}
+    ));

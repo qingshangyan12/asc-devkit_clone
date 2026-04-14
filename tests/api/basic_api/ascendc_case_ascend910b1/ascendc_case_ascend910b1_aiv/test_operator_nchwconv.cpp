@@ -306,13 +306,3 @@ TEST_F(TestTransDataTo5HDNpuDebug, RepeatTimesOverflow)
     MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
     TransDataTo5HD<half>(dstList, srcList, params);
 }
-
-// --- Overload 3: (LocalTensor<uint64_t> &dst, LocalTensor<uint64_t> &src) - dst position not UB ---
-// Note: Removed - Overload 3 uses VA register address lists. In UT framework, ASCENDC_DEBUG_ASSERT
-// does not terminate execution after position check failure, and subsequent CPU Debug code
-// (CheckFunTransDataTo5HD / TransDataTo5HDVldVaRegImpl) accesses the tensor's physical memory,
-// which causes segfault when tensor is on a non-UB position (e.g., A2).
-// This scenario should be tested on NPU instead.
-
-// --- Overload 3: src position not UB ---
-// Note: Removed - Same reason as above.

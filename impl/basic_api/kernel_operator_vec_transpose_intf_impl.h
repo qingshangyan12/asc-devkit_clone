@@ -159,12 +159,12 @@ __aicore__ inline void TransDataTo5HD(uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE]
                            (uint8_t*)(GetTPipePtr()->GetBaseAddr(int8_t(AscendC::TPosition(TPosition::VECIN))));
         uint64_t srcAddr = (uint8_t *)srcList[i] -
                            (uint8_t*)(GetTPipePtr()->GetBaseAddr(int8_t(AscendC::TPosition(TPosition::VECIN))));
-        ASCENDC_ASSERT((dstAddr % ONE_BLK_SIZE == 0),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dst tensor address list alignment in TransDataTo5HD, "
-            "it should be 32B aligned");});
-        ASCENDC_ASSERT((srcAddr % ONE_BLK_SIZE == 0),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check src tensor address list alignment in TransDataTo5HD, "
-            "it should be 32B aligned");});
+        ASCENDC_DEBUG_ASSERT((dstAddr % ONE_BLK_SIZE == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor address list alignment in TransDataTo5HD, "
+            "it should be 32B aligned.\n"));
+        ASCENDC_DEBUG_ASSERT((srcAddr % ONE_BLK_SIZE == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor address list alignment in TransDataTo5HD, "
+            "it should be 32B aligned.\n"));
     }
 #endif
     TransDataTo5HDImpl<T>(dstList, srcList, nchwconvParams);
