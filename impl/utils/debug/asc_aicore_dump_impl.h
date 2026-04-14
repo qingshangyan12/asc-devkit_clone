@@ -27,6 +27,8 @@
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
 #endif
 
+using vector_uint8_t = vector_u8;
+
 namespace __asc_aicore {
 
 template <AscendC::Hardware hardware, typename T, typename U>
@@ -174,6 +176,97 @@ __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t
 
 using namespace __asc_aicore;
 #endif
+
+namespace __asc_simd_vf {
+// 辅助函数：在 UBuf 的 buffer 中构造 DumpTensorInfo 头部
+template <AscendC::Hardware hardware, typename T, typename U>
+__simd_callee__ inline void set_dump_tlv_info_ubuf(U src, __ubuf__ DumpTensorTlv* dumpTlv,
+    uint32_t alignDumpLen, uint32_t desc, uint32_t dumpSize)
+{
+    dumpTlv->dumpType = static_cast<uint32_t>(DumpType::DUMP_TENSOR);
+    dumpTlv->dumpLength = sizeof(DumpTensorInfo) - sizeof(uint32_t[2]) + alignDumpLen;
+    dumpTlv->addr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src));
+    dumpTlv->dataType = static_cast<uint32_t>(get_dump_datatype<T>());
+    dumpTlv->desc = desc;
+    dumpTlv->blockIdx = static_cast<uint16_t>(0U);  // set in aicore
+    dumpTlv->bufferId = static_cast<uint32_t>(0U);
+    dumpTlv->position = static_cast<uint16_t>(hardware);
+    dumpTlv->dim = static_cast<uint32_t>(0U);
+    for (uint32_t i = 0; i < 8; ++i) {
+        dumpTlv->shape[i] = static_cast<uint32_t>(0U);
+    }
+    dumpTlv->resv1 = static_cast<uint32_t>(0U);
+    dumpTlv->dumpSize = dumpSize * sizeof(T);
+}
+
+// 辅助函数：将源数据填入 buffer 中 DumpTensorInfo 之后的 dumpData 区域
+template <AscendC::Hardware hardware, typename T, typename U>
+__simd_callee__ inline void set_dump_tlv_data_ubuf(U src, __ubuf__ DumpTensorTlv* dumpTlv,
+    uint32_t alignDumpLen, uint32_t dumpSize)
+{
+    __ubuf__ T* dumpDstAddr = reinterpret_cast<__ubuf__ T*>(dumpTlv + 1);
+
+    // 使用scalar方式进行搬运，暂不考虑搬运性能
+    for (uint32_t i = 0; i < dumpSize; i++) {
+        dumpDstAddr[i] = src[i];
+    }
+}
+
+template <AscendC::Hardware hardware, typename T, typename U>
+__simd_callee__ inline void asc_dump_impl(U src, uint32_t desc, uint32_t dumpSize)
+{
+    __ubuf__ BlockVFBufInfo *blockInfo = get_printf_ubuf_addr();
+    
+    constexpr uint16_t dataBlockSize = 32;
+    uint32_t alignDumpLen = align_up(dumpSize * sizeof(T), dataBlockSize);
+    uint32_t tlvLen = sizeof(DumpTensorInfo) + alignDumpLen;
+
+    // Step 1: 在 BlockVFBufInfo.buffer 中构造 DumpTensorInfo TLV
+    __ubuf__ DumpTensorTlv* dumpTlv = (__ubuf__ DumpTensorTlv*)blockInfo->buffer;
+    set_dump_tlv_info_ubuf<hardware, T>(src, dumpTlv, alignDumpLen, desc, dumpSize);
+    set_dump_tlv_data_ubuf<hardware, T>(src, dumpTlv, alignDumpLen, dumpSize);
+
+    // Step 2: 设置 writeLen，表示 buffer 中待搬运的数据长度
+    blockInfo->magic = 0xF0A00B0F;
+    blockInfo->writeLen = tlvLen;
+}
+
+template <typename T>
+__simd_callee__ inline void asc_dump_reg(vector_uint8_t *input, uint32_t desc, uint32_t dumpSize) {
+    enable_asc_diagnostics();
+
+    __ubuf__ BlockVFBufInfo *blockInfo = get_printf_ubuf_addr();
+    constexpr uint16_t dataBlockSize = 32;
+    uint32_t alignDumpLen = align_up(dumpSize * sizeof(T), dataBlockSize);
+    uint32_t tlvLen = sizeof(DumpTensorInfo) + alignDumpLen;
+
+    // 检查 buffer 容量
+    uint32_t bufferCapacity = blockInfo->length * sizeof(uint16_t);
+    if (tlvLen > bufferCapacity) {
+        return;
+    }
+
+    // // Step 1: 构造头部
+    // __ubuf__ uint8_t* tlvBase = reinterpret_cast<__ubuf__ uint8_t*>(blockInfo->buffer);
+    // set_dump_tlv_info_ubuf<AscendC::Hardware::UB, T>(input, tlvBase, alignDumpLen, desc, dumpSize);
+
+    // // Step 2: 用 asc_storealign 将 vector 寄存器数据存入 buffer 的 dumpData 区域
+    // __ubuf__ uint8_t* dumpDataAddr = tlvBase + sizeof(DumpTensorInfo);
+    // asc_storealign(dumpDataAddr, *input, static_cast<vector_bool>(true));
+
+    // // Step 3: 设置 writeLen 并搬运到 GM
+    // blockInfo->writeLen = tlvLen;
+    // asc_vf_printf_ub2gm();
+}
+
+// 内存数据dump
+template <typename T>
+__simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dumpSize) {
+    // 如下指令无法使用，且在simd_callee中不涉及：get_ctrl()，set_atomic_none(), set_ctrl()
+    enable_asc_diagnostics();
+    asc_dump_impl<AscendC::Hardware::UB, T>(input, desc, dumpSize);
+}
+} // namespace __asc_simd_vf
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_DUMP_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
