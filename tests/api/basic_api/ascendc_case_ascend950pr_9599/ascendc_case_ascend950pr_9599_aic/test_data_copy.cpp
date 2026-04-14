@@ -190,7 +190,8 @@ void main_tensortrait_data_copy_dn2nz_kernel(__gm__ uint8_t* __restrict__ srcGm,
 }
 
 template<typename T>
-void MainDataCopyL12BTKernel(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __restrict__ dstGm, __gm__ int32_t dataSize)
+void MainDataCopyL12BTKernel(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __restrict__ dstGm,
+                             __gm__ int32_t dataSize)
 {
     TPipe tpipe;
     TBuf<TPosition::C1> tbufL1;
@@ -205,7 +206,8 @@ void MainDataCopyL12BTKernel(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t*
 }
 
 template<typename T>
-void MainDataCopyL12FBKernel(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __restrict__ dstGm, __gm__ int32_t dataSize)
+void MainDataCopyL12FBKernel(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __restrict__ dstGm,
+                             __gm__ int32_t dataSize)
 {
     TPipe tpipe;
     TBuf<TPosition::C1> tbufL1;
