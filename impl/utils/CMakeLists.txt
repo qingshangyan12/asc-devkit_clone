@@ -23,7 +23,7 @@ install(
 )
 
 install(FILES common_types.h sys_constants.h sys_macros.h
-    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/utils COMPONENT asc-devkit
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/utils
 )
 
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/tiling/platform")
