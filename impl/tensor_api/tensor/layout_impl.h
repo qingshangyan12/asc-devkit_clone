@@ -114,8 +114,7 @@ template <typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<is_la
 __aicore__ inline decltype(auto) MakeSliceLayout(const SrcLayoutType& srcLayout, const DstLayoutType& dstLayout) 
 {
     static_assert(is_layout_v<SrcLayoutType>, "SrcLayoutType must be Layout");
-    static_assert(SrcLayoutType::rank == DstLayoutType::rank && 
-        Std::tuple_size_v<SrcLayoutType> == Std::tuple_size_v<DstLayoutType>,
+    static_assert(SrcLayoutType::rank == DstLayoutType::rank,
         "SrcLayout Rank must be equal to DstLayout Rank");
 
     auto sliceShape = TransformTupleApply(srcLayout.Shape(), dstLayout.Shape(), MinOp{});
