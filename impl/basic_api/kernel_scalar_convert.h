@@ -136,7 +136,7 @@ __aicore__ constexpr inline float ToFloat(const T& bVal)
 }
 
 #else
-__aicore__ inline float Cast(const bfloat16_t& bVal)
+__aicore__ constexpr inline float Cast(const bfloat16_t& bVal)
 {
     bfloat16_t bNum = bVal;
     union ToFloatUnion {
@@ -155,7 +155,7 @@ __aicore__ inline float Cast(const bfloat16_t& bVal)
 }
 
 // ToFloat has been updated, please use Cast instead.
-__aicore__ inline float ToFloat(const bfloat16_t& bVal)
+__aicore__ constexpr inline float ToFloat(const bfloat16_t& bVal)
 {
     return Cast(bVal);
 }

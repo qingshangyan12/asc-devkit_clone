@@ -62,6 +62,35 @@ __aicore__ inline U Cast(T valueIn);
 template <typename T, typename U, RoundMode roundMode>
 __aicore__ inline U ScalarCast(T valueIn);
 
+#if defined(__NPU_ARCH__) &&                                                    \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                        \
+     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                        \
+     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+// 所有架构共用的：float -> bfloat16_t
+__aicore__ inline bfloat16_t Cast(const float& fVal);
+#endif
+
+#if defined(__NPU_ARCH__) &&                                                    \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                        \
+     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+// 各架构特化的：类型 -> float
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+template <typename T, typename U = float,
+          typename = Std::enable_if_t<
+              (Std::is_same<T, bfloat16_t>::value || Std::is_same<T, hifloat8_t>::value ||
+               Std::is_same<T, fp8_e5m2_t>::value || Std::is_same<T, fp8_e4m3fn_t>::value ||
+               Std::is_same<T, fp4x2_e1m2_t>::value || Std::is_same<T, fp4x2_e2m1_t>::value),
+              void>>
+__aicore__ constexpr inline U Cast(T bVal);
+#else
+__aicore__ constexpr inline float Cast(const bfloat16_t& bVal);
+#endif
+
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+template <typename T>
+__aicore__ constexpr inline float Cast(const T& bVal);
+#endif
+
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T>
 __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value);
