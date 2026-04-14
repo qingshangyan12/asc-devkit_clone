@@ -1,18 +1,31 @@
 # 编译构建
 
 ## 环境准备<a name="prepare&install"></a>
+根据**本地是否有 NPU 设备**和**使用目的**选择对应方式：
+
+|  | 社区体验 / 算子开发（商用 CANN） | 开发者贡献（CANN master） |
+| :--- | :--- | :--- |
+| **无本地 NPU 设备** | [WebIDE](#社区体验--算子开发webide) | [WebIDE + 手动安装 CANN master](#仓库贡献webide--手动安装-cann-master) |
+| **有本地 NPU 设备** | [Docker 镜像（推荐）](#方式一docker-镜像推荐) / [手动安装稳定版](#方式二手动安装稳定版-cann) | [Dev Container（推荐）](#方式一dev-container推荐) / [手动安装 CANN master](#方式二手动安装-cann-master) |
+
+```text
+                你的目标是？
+              /          \
+      体验/运行样例       贡献代码/开发
+           |             /        \
+       有NPU设备？   Dev Container  手动安装CANN
+      /         \    (★推荐)
+    无            有
+    ↓             ↓
+  WebIDE      Docker镜像
+  (云端)     (Ascend Hub)
+```
+
 本项目支持源码编译，在源码编译前，需要确保已经安装驱动、固件和CANN软件（Ascend-cann-toolkit和Ascend-cann-ops）。
 
-  软件安装方式请根据如下描述进行选择：
+### 无本地 NPU 设备
 
-| 安装方式 | 说明 |使用场景|
-| :--- | :--- | :--- |
-| 使用WebIDE安装 | WebIDE可提供在线直接运行的昇腾环境。目前仅适用于Atlas A2系列产品，ARM架构。当前可提供单机算力，**默认安装最新商发版CANN软件包和固件/驱动包。**<br>**对于master分支的使用，需要参考场景三安装最新社区包。**| 适用于没有昇腾设备的开发者。|
-| 使用Docker部署 | Docker镜像是一种CANN高效部署方式，目前仅适用于Atlas A2系列产品，OS仅支持Ubuntu操作系统。**默认安装最新商发版CANN软件包和固件/驱动包。**|适用有昇腾设备，需要快速搭建环境的开发者。|
-| 手动安装软件包 | - |适用有昇腾设备，想体验手动安装CANN包或体验最新master分支能力的开发者。|
-
-
-### 场景一：使用WebIDE安装
+#### 社区体验 / 算子开发：WebIDE
 
 对于无环境的用户，可直接使用WebIDE开发平台，即“**一站式开发平台**”，该平台为您提供在线可直接运行的昇腾环境，环境中已安装必备的软件包，无需手动安装。
 > **说明**：
@@ -26,8 +39,47 @@
 
    <img src="./figures/webIDE.png" alt="云平台"  width="1000px" height="150px">
 
+#### 仓库贡献：WebIDE + 手动安装 CANN master
 
-### 场景二：使用Docker部署
+步骤一：按上节方式启动 WebIDE 环境。
+
+步骤二：在 WebIDE 终端中手动安装 CANN master 包，替换预装的商用版本：
+
+如果您想体验**master分支最新能力**，单击[下载链接](https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master)获取软件包，按照如下步骤进行安装。更多安装指导请参考[CANN软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
+
+1. 安装固件和驱动。
+
+    运行算子时必须安装驱动与固件，若仅编译算子，可跳过本操作，安装指导请参考[CANN软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
+   
+2. 安装社区版CANN toolkit包。
+
+    ```bash
+    # 确保安装包具有可执行权限
+    chmod +x Ascend-cann-toolkit_${cann_version}_linux-${arch}.run
+    # 安装命令
+    ./Ascend-cann-toolkit_${cann_version}_linux-${arch}.run --install --install-path=${install_path}
+    ```
+
+3. 安装社区版CANN ops包。
+
+    运行算子前必须安装本包，若仅编译算子，可跳过本操作。
+
+    ```bash
+    # 确保安装包具有可执行权限
+    chmod +x Ascend-cann-${soc_name}-ops_${cann_version}_linux-${arch}.run
+    # 安装命令
+    ./Ascend-cann-${soc_name}-ops_${cann_version}_linux-${arch}.run --install --install-path=${install_path}
+    ```
+    - \$\{cann\_version\}：表示CANN包版本号。
+    - \$\{arch\}：表示CPU架构，如aarch64、x86_64。
+    - \$\{soc\_name\}：表示NPU型号名称。
+    - \$\{install\_path\}：表示指定安装路径，需要与toolkit包安装在相同路径，root用户默认安装在`/usr/local/Ascend`目录，非root用户默认安装在`$HOME/Ascend`目录。
+
+### 有本地 NPU 设备
+
+#### 体验 / 算子开发
+
+##### 方式一：Docker 镜像（推荐）
 
 >**说明：**
 <br>镜像文件比较大，正常网速下，下载时间约为5-10分钟，请您耐心等待。
@@ -71,9 +123,17 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 | `swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:9.0.0-beta.1-910b-ubuntu22.04-py3.11` | 指定要运行的Docker镜像。 |请确保此镜像名和标签（tag）与你通过`docker pull`拉取的镜像完全一致。 |
 | `bash` | 容器启动后立即执行的命令。 |- |
 
-### 场景三：手动安装软件包
+##### 方式二：手动安装稳定版 CANN
 
-**场景1：体验master版本能力或基于master版本进行开发**
+如果您想体验**官网正式发布的CANN包**能力，请访问[CANN官网下载中心](https://www.hiascend.com/cann/download)，选择对应版本CANN软件包（仅支持CANN 8.5.0及后续版本）进行安装。
+
+#### 仓库贡献
+
+##### 方式一：Dev Container（推荐）
+
+对于仓库贡献场景，建议优先使用 Dev Container，在已安装驱动、固件和 CANN 软件包的本地 NPU 环境中进行开发。
+
+##### 方式二：手动安装 CANN master
 
 如果您想体验**master分支最新能力**，单击[下载链接](https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master)获取软件包，按照如下步骤进行安装。更多安装指导请参考[CANN软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
 
@@ -264,4 +324,3 @@ bash build.sh --basic_test_three --cann_3rd_lib_path={PATH_TO_DOWNLOAD}  # 批�
 | boost | 1.87.0 | [boost_1_87_0.tar.gz](https://gitcode.com/cann-src-third-party/boost/releases/download/v1.87.0/boost_1_87_0.tar.gz) |
 | mockcpp | 2.7 | [makeself-release-2.5.0-patch1.tar.gz](https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h3/mockcpp-2.7.tar.gz) |
 | mockcpp_patch | 2.7 | [mockcpp-2.7_py3-h3.patch](https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h3/mockcpp-2.7_py3-h3.patch) |
-
