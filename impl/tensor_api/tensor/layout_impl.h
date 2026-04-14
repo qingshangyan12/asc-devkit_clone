@@ -74,6 +74,27 @@ template <typename Coord, typename LayoutType, typename TensorType>
     return MakeLayout(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride());
 }
 
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeMinLayoutValue(const T& src, const U& dst);
+
+template <typename T, typename U, size_t... Is>
+__aicore__ inline constexpr auto MakeMinLayoutValueImpl(const T& src, const U& dst, Std::index_sequence<Is...>)
+{
+    return MakeShape(MakeMinLayoutValue(Std::get<Is>(src), Std::get<Is>(dst))...);
+}
+
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeMinLayoutValue(const T& src, const U& dst)
+{
+    static_assert(IsSameTupleStructureV<T, U>, "SrcLayout and DstLayout must have same tuple structure");
+    if constexpr (Std::is_tuple_v<Std::remove_cvref_t<T>>) {
+        return MakeMinLayoutValueImpl(
+            src, dst, Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<T>>>{});
+    } else {
+        return Std::min(src, dst);
+    }
+}
+
 template <typename LayoutType, typename TileShape, Std::enable_if_t<!is_layout_v<TileShape>, int> = 0>
 __aicore__ inline decltype(auto) MakeSliceLayout(const LayoutType& layout, const TileShape& tileShape) 
 {
@@ -108,10 +129,8 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const SrcLayoutType& srcLayout,
     static_assert(SrcLayoutType::rank == DstLayoutType::rank,
         "Tensor Rank must be equal to Layout rank");
 
-    auto dstRow = Std::get<0>(Std::get<0>(dstLayout.Shape())) * Std::get<1>(Std::get<0>(dstLayout.Shape()));
-    auto dstCol = Std::get<0>(Std::get<1>(dstLayout.Shape())) * Std::get<1>(Std::get<1>(dstLayout.Shape()));
-
-    return MakeSliceLayout(srcLayout, MakeShape(dstRow, dstCol));
+    auto sliceShape = MakeMinLayoutValue(srcLayout.Shape(), dstLayout.Shape());
+    return MakeLayout(sliceShape, srcLayout.Stride());
 }
 
 template <typename ShapeType, typename CoordType>
