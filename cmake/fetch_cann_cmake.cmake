@@ -9,18 +9,22 @@
 # ----------------------------------------------------------------------------------------------------------
 
 if(NOT PROJECT_SOURCE_DIR)
+    message(STATUS "=====1=====")
     if(CANN_3RD_LIB_PATH AND IS_DIRECTORY "${CANN_3RD_LIB_PATH}/cann-cmake")
+        message(STATUS "=====2=====")
         include("${CANN_3RD_LIB_PATH}/cmake/function/prepare.cmake")
     else()
         include(FetchContent)
-
+        message(STATUS "=====3=====")
         set(CANN_CMAKE_TAG "master-001")
         if(CANN_3RD_LIB_PATH AND EXISTS "${CANN_3RD_LIB_PATH}/cmake-${CANN_CMAKE_TAG}.tar.gz")
+            message(STATUS "=====4=====")
             FetchContent_Declare(
                 cann-cmake
                 URL "${CANN_3RD_LIB_PATH}/cmake-${CANN_CMAKE_TAG}.tar.gz"
             )
         else()
+            message(STATUS "=====5=====")
             FetchContent_Declare(
                 cann-cmake
                 GIT_REPOSITORY https://gitcode.com/cann/cmake.git
