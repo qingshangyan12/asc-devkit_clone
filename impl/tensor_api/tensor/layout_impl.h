@@ -141,24 +141,14 @@ __aicore__ inline constexpr auto MakeCoordShape(const ShapeType& shape, const Co
 template <typename Coord, typename LayoutType>
 __aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const LayoutType& layout) 
 {
-    static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
     using ShapeType = Std::remove_cvref_t<decltype(layout.Shape())>;
     using CoordType = Std::remove_cvref_t<Coord>;
-    if constexpr (Std::is_tuple_v<CoordType>
-            && nesting_depth_v<ShapeType> == nesting_depth_v<CoordType>
-            && Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>) {
-        auto coordShape = MakeCoordShape(layout.Shape(), coord);
-        return MakeLayout(coordShape, layout.Stride());
-    } else {
-        static_assert(Std::is_tuple_v<CoordType>, "Coord must be a tuple");
-        static_assert(Std::tuple_size_v<CoordType> == TWO_DIM_DATA, "Only Support Two Dim Coord");
-        static_assert(Std::remove_cvref_t<LayoutType>::rank == TWO_DIM_DATA,
-            "Only Support Rank-2 Layout when coord structure differs from shape");
-
-        auto coordShape = MakeShape(Product{}(GetShape<0>(layout)) - Std::get<0>(coord),
-                                    Product{}(GetShape<1>(layout)) - Std::get<1>(coord));
-        return MakeSliceLayout(layout, coordShape);
-    }
+    static_assert(is_layout_v<LayoutType> && Std::is_tuple_v<CoordType>, "LayoutType must be Layout");
+    static_assert(nesting_depth_v<ShapeType> == nesting_depth_v<CoordType> && 
+        Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>, 
+        "Shape and coord must have same tuple structure");
+    auto coordShape = MakeCoordShape(layout.Shape(), coord);
+    return MakeLayout(coordShape, layout.Stride());
 }
 
 } // namespace Te

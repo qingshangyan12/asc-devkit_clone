@@ -488,34 +488,6 @@ TEST_F(Tensor_Api_Tensor, LocalTensorSliceOperation)
     EXPECT_EQ(layoutSlice[MakeCoord(0, 2)], 7);
 }
 
-TEST_F(Tensor_Api_Tensor, LocalTensorCoordViewFrameLayoutOperation)
-{
-    using namespace AscendC::Te;
-
-    constexpr uint32_t TILE_LENGTH = 1024;
-    __gm__ float data[TILE_LENGTH] = {0};
-    auto ptr = MakeGMmemPtr(data);
-    auto layout = MakeFrameLayout<ZnLayoutPtn, LayoutTraitDefault<float>>(32, 32);
-    auto tensor = MakeTensor(ptr, layout);
-
-    auto subTensor = tensor(MakeCoord(8, 16));
-    EXPECT_EQ(subTensor.Data(), ptr + layout(MakeCoord(8, 16)));
-
-    auto shape = subTensor.Shape();
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(shape)), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(shape)), 3);
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(shape)), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(shape)), 1);
-
-    subTensor[MakeCoord(0, 0)] = 3.0f;
-    subTensor[MakeCoord(15, 15)] = 4.0f;
-
-    EXPECT_EQ(subTensor[MakeCoord(0, 0)], 3.0f);
-    EXPECT_EQ(subTensor[MakeCoord(15, 15)], 4.0f);
-    EXPECT_EQ(tensor[MakeCoord(8, 16)], 3.0f);
-    EXPECT_EQ(tensor[MakeCoord(23, 31)], 4.0f);
-}
-
 TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperation)
 {
     using namespace AscendC::Te;
