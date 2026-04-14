@@ -199,6 +199,20 @@ $$
   ./custom_opp_*.run
   ```
 
+- 可选：并行生成两个独立 RUN 包
+
+  ```bash
+  mkdir -p build_parallel && cd build_parallel
+  cmake .. -DCUSTOM_OP_ENABLE_PARALLEL_RUN_PACKAGES=ON
+  cmake --build . -j
+
+  # add_custom 包（包含 add_custom/add_custom_tiling_sink/add_custom_template）
+  ./add_custom/custom_opp_*.run
+
+  # leaky_relu_custom 包
+  ./leaky_relu_custom/custom_opp_*.run
+  ```
+
   执行结果如下，说明执行成功。
 
   ```log
