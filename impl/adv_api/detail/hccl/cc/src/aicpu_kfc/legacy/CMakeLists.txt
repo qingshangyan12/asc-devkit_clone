@@ -62,6 +62,7 @@ target_include_directories(hccl_v2 PRIVATE
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/trace/
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/asc/hccl/internal/
 
+    ${HCCL_HCOMM_HEADER_DIR}
     ${HCCL_HCOMM_HEADER_DIR}/hccl/
     ${HCCL_BASE_DIR}/pkg_inc
     #${HCCL_BASE_DIR}/pkg_inc/hccl/
@@ -71,7 +72,7 @@ target_include_directories(hccl_v2 PRIVATE
     ${HCCL_BASE_DIR}/platform/hccp/inc/network
     ${RDMA_CORE_INCLUDE_DIR}
     ${HCCL_BASE_DIR}/platform/hccp/orion/hcomm_dev/inc/network
-    ${HCCL_BASE_DIR}/externel_depends/tsch
+    ${HCCL_HCOMM_HEADER_DIR}/externel_depends/tsch
 )
 
 # 每个文件夹单独组织要参与编译的文件
