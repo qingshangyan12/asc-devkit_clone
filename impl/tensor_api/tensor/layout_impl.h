@@ -90,22 +90,22 @@ struct DiffOp {
     }
 };
 
-template <typename LayoutType, typename TileShape, Std::enable_if_t<!is_layout_v<TileShape>, int> = 0>
-__aicore__ inline decltype(auto) MakeSliceLayout(const LayoutType& layout, const TileShape& tileShape) 
+template <typename LayoutType, typename SliceShape, Std::enable_if_t<!is_layout_v<SliceShape>, int> = 0>
+__aicore__ inline decltype(auto) MakeSliceLayout(const LayoutType& layout, const SliceShape& sliceShape) 
 {
     static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
     using OriginShape = Std::remove_cvref_t<decltype(layout.Shape())>;
-        static_assert(Std::is_tuple_v<TileShape>,"TileShape must be a tuple");
-        static_assert(nesting_depth_v<TileShape> == TWO_DIM_DATA, "Only Support Two Dim TileShape");
-        static_assert(nesting_depth_v<OriginShape> == FOUR_DIM_DATA, "Only Support Four Dim Layout");
+    static_assert(Std::is_tuple_v<SliceShape>,"SliceShape must be a tuple");
+    static_assert(nesting_depth_v<SliceShape> == TWO_DIM_DATA, "Only Support Two Dim SliceShape");
+    static_assert(nesting_depth_v<OriginShape> == FOUR_DIM_DATA, "Only Support Four Dim Layout");
     auto innerRow = Std::get<0>(GetShape<0>(layout));
     auto innerCol = Std::get<0>(GetShape<1>(layout));
 
     auto srcRow = innerRow * Std::get<1>(GetShape<0>(layout));
     auto srcCol = innerCol * Std::get<1>(GetShape<1>(layout));
 
-    auto realRow = Std::min(srcRow, Std::get<0>(tileShape));	 
-    auto realCol = Std::min(srcCol, Std::get<1>(tileShape));
+    auto realRow = Std::min(srcRow, Std::get<0>(sliceShape));	 
+    auto realCol = Std::min(srcCol, Std::get<1>(sliceShape));
 
     return MakeLayout(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride()); 
 }
