@@ -22,6 +22,9 @@
 
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
 #include "impl/utils/debug/asc_aicore_dump_impl.h"
+#if __NPU_ARCH__ == 3510
+#include "instr_impl/npu_arch_3510/utils_impl/utils_type.h"
+#endif
 #endif
 
 namespace __asc_aicore {
@@ -36,6 +39,15 @@ __aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t du
 
 template<typename T>
 __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dumpSize);
+}
+
+namespace __asc_simd_vf {
+template <typename T>
+__simd_callee__ inline void asc_dump_reg(vector_uint8_t *input, uint32_t desc, uint32_t dump_size);
+
+// 内存数据dump
+template <typename T>
+__simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size);
 }
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_DUMP_H__)
