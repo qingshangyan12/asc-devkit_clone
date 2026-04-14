@@ -164,6 +164,102 @@ enum class TraceId : uint32_t {
 };
 #endif
 } // namespace __asc_aicore
+
+namespace __asc_simd_vf {
+enum class DumpType : uint8_t {
+    DUMP_DEFAULT = 0,
+    DUMP_SCALAR,
+    DUMP_TENSOR,
+    DUMP_SHAPE,
+    DUMP_ASSERT,
+    DUMP_META,
+    DUMP_TIME_STAMP,
+    DUMP_SIMT,
+    DUMP_BUFI,
+    DUMP_BUFO,
+    DUMP_SKIP
+};
+
+// #define SIMD_VF_PRINTF_UBUF_MAX_SIZE 30
+#define SIMD_VF_PRINTF_UBUF_MAX_SIZE 256
+
+struct BlockVFBufInfo {
+    uint32_t magic = 0xF0A00B0F;
+    uint32_t length = SIMD_VF_PRINTF_UBUF_MAX_SIZE;
+    uint32_t writeLen = 0;
+    uint16_t pidx = 0;
+    uint8_t flag = 0;
+    uint8_t resv = 0;
+    uint16_t buffer[SIMD_VF_PRINTF_UBUF_MAX_SIZE];
+};
+
+struct BlockRingBufInfo {
+    uint32_t length = 0U;      // total size per block (include head and r/w info)
+    uint32_t coreId = 0U;      // current core id
+    uint32_t blockNum = 0U;    // total core num
+    uint32_t ringBufLen = 0U;  // fifo buff size (print tlv storage)
+    uint16_t magic = 0U;       // magic number
+    uint16_t flag = 0U;        // 0: simd, 1: simt
+    uint32_t rsv = 0U;         // reserve
+    uint64_t ringBufAddr = 0U; // start addr of fifo buff
+    uint32_t resvMem[6];       // reserved
+};
+
+struct RingBufWriteInfo {
+    uint32_t type = static_cast<uint32_t>(DumpType::DUMP_BUFI); // DumpType = DUMP_BUFI
+    uint32_t length = 0U;                                       // u64 + u64
+    uint64_t bufOffset = 0U;                                    // the offset of write addr relative to ringBufAddr
+    uint64_t packIdx = 0U;                                      // print pack counter
+};
+
+struct RingBufReadInfo {
+    uint32_t type = static_cast<uint32_t>(DumpType::DUMP_BUFO); // DumpType = DUMP_BUFO
+    uint32_t length = 0U;                                       // u64 + u64
+    uint64_t bufOffset = 0U;                                    // the offset of read addr relative to ringBufAddr
+    uint64_t resv = 0U;
+};
+
+// %d
+struct PrintfInfo {
+    uint32_t printfType;
+    uint32_t printfLength;
+    uint32_t blockIdx = 0;
+    uint32_t resv = 0;
+    uint64_t fmtOffset = 0U;
+    // uint64_t Param[num] = 0U;
+    // char_t fmt[fmtLength];
+};
+
+// // %s
+// struct PrintfInfo {
+//     uint32_t printfType;
+//     uint32_t printfLength;
+//     uint32_t blockIdx = 0;
+//     uint32_t resv = 0;
+//     uint64_t fmtOffset = 0U;
+//     uint64_t Param[num] = 0U;
+//     char_t fmt[fmtLength];
+//     char_t paramStr1[param1Length];
+//     char_t paramStr2[param2Length];
+// };
+
+struct DumpTensorInfo {
+    uint32_t dumpType;
+    uint32_t dumpLength;
+    uint32_t addr;
+    uint32_t dataType;
+    uint32_t desc;
+    uint32_t bufferId;
+    uint16_t position;
+    uint16_t blockIdx = 0;
+    uint32_t dim = 0;
+    uint32_t shape[8] = 0;
+    uint32_t resv1 = 0;
+    uint32_t dumpSize;
+    uint8_t dumpData[dumpSize];
+};
+}
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_TYPES__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_TYPES__
