@@ -40,7 +40,7 @@ struct MakeNzFrameLayout {
                                MakeShape(c0Ele, Std::ceil_division(column, c0Ele)));
         auto stride = MakeStride(MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}),
                                  MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(row, FRACTAL_FIXED)));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NzLayoutPtn, TraitType>>;
+        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NZLayoutPtn, TraitType>>;
         return LayoutT(shape, stride);
     }
 };
@@ -63,7 +63,7 @@ struct MakeZnFrameLayout {
                                MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
         auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(column, FRACTAL_FIXED)),
                                  MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ZnLayoutPtn, TraitType>>;
+        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ZNLayoutPtn, TraitType>>;
         return LayoutT(shape, stride);
     }
 };
@@ -86,7 +86,7 @@ struct MakeZzFrameLayout {
                                MakeShape(c0Ele, Std::ceil_division(column, c0Ele)));
         auto stride = MakeStride(MakeStride(c0Ele, FRACTAL_FIXED * Std::ceil_align(column, c0Ele)),
                                  MakeStride(Std::Int<1>{}, c0Ele * Std::Int<FRACTAL_FIXED>{}));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ZzLayoutPtn, TraitType>>;
+        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ZZLayoutPtn, TraitType>>;
         return LayoutT(shape, stride);
     }
 };
@@ -113,7 +113,7 @@ struct MakeNnFrameLayout {
         auto shape = MakeShape(MakeShape(c0Ele, row / c0Ele), MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
         auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * Std::Int<FRACTAL_FIXED>{}),
                                  MakeStride(c0Ele, row * FRACTAL_FIXED));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NnLayoutPtn, TraitType>>;
+        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NNLayoutPtn, TraitType>>;
         return LayoutT(shape, stride);
     }
 };
