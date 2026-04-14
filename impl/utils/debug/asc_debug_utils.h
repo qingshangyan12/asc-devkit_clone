@@ -252,6 +252,38 @@ __aicore__ constexpr inline DumpTensorDataType get_dump_datatype()
 } // namespace __asc_aicore
 #endif
 
+namespace __asc_simd_vf {
+inline uint64_t check_and_wait_ring_buf_space(
+    __gm__ BlockRingBufInfo* block_ring_buf_info, uint64_t tlv_len)
+{
+    __gm__ RingBufReadInfo* read_info = get_ring_buf_read_info(block_ring_buf_info);
+    __gm__ RingBufWriteInfo* write_info = get_ring_buf_write_info(block_ring_buf_info);
+
+    uint64_t start_offset = __atomic_add(&write_info->bufOffset, tlv_len);
+    uint64_t end_offset = start_offset + tlv_len;
+    if (end_offset > read_info->bufOffset + block_ring_buf_info->ringBufLen) {
+        ring_buffer_wait(read_info, end_offset - block_ring_buf_info->ringBufLen);
+    }
+    return start_offset;
+}
+
+void asc_vf_printf_ub2gm()
+{
+    __ubuf__ BlockVFBufInfo *blockInfo = get_printf_ubuf_base_addr();
+    __gm__ BlockRingBufInfo *block_ring_buf_info = get_block_ring_buf_info();
+    const uint32_t tlv_len = blockInfo->writeLen;
+
+    if (!check_and_wait_ring_buf_space(block_ring_buf_info, tlv_len)) {
+        return;
+    }
+
+    asc_copy_ub2gm(call_get_ring_buf_tlv(block_ring_buf_info), blockInfo->buffer, tlv_len);
+
+    __gm__ RingBufWriteInfo *write_info = get_ring_buf_write_info(block_ring_buf_info);
+    update_write_info(write_info, tlv_len);
+}
+}
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__
