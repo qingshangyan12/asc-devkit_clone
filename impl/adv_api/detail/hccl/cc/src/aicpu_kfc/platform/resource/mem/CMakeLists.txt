@@ -30,8 +30,8 @@ target_sources(ccl_kernel_plf_a  PRIVATE
     mem_mapping_manager_device.cc
 )
 
-target_sources(hccd  PRIVATE
-    heterog_mem_blocks_manager.cc
-    mem_device.cc
-    mem_host.cc
-)
+# target_sources(hccd  PRIVATE
+#     heterog_mem_blocks_manager.cc
+#     mem_device.cc
+#     mem_host.cc
+# )

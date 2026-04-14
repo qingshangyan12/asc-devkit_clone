@@ -22,10 +22,10 @@ target_sources(hccl_plf PRIVATE
     transport_shm_event.cc
 )
 
-target_sources(hccd PRIVATE
-    transport_tcp.cc
-    transport_net.cc
-)
+# target_sources(hccd PRIVATE
+#     transport_tcp.cc
+#     transport_net.cc
+# )
 
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}

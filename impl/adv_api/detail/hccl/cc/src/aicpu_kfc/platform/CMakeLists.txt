@@ -12,8 +12,8 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 if(BUILD_OPEN_PROJECT)
     message(STATUS "open CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
     set(HCCL_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../)
-    set(HCCL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../include/hccl)
-    message(STATUS "open HCCL_INC_DIR = ${HCCL_INC_DIR}")
+    # set(HCCL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../include/hccl)
+    # message(STATUS "open HCCL_INC_DIR = ${HCCL_INC_DIR}")
     set(HCCL_OPEN_CODE_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../)
     set(HCCL_THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../../)
 else()
@@ -85,10 +85,10 @@ if(BUILD_OPEN_PROJECT)
     )
 
     target_include_directories(hccl_plf PRIVATE
-        ${HCCL_BASE_DIR}/../include
-        ${HCCL_BASE_DIR}/../include/hccl/
-        ${HCCL_BASE_DIR}/../pkg_inc
-        ${HCCL_BASE_DIR}/../pkg_inc/hccl
+        ${HCCL_HCOMM_HEADER_DIR}
+        ${HCCL_HCOMM_HEADER_DIR}/hccl
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
         ${HCCL_BASE_DIR}/pub_inc
         ${CMAKE_CURRENT_SOURCE_DIR}/hccp/inc/
         ${CMAKE_CURRENT_SOURCE_DIR}/hccp/inc/network

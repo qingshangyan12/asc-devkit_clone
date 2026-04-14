@@ -56,7 +56,7 @@ target_include_directories(ccl_kernel_decoupler_open BEFORE PRIVATE
     ${OPEN_HCCL_INCLUDE_ROOT}/ops/op_common/inc
     ${OPEN_HCCL_INCLUDE_ROOT}/common
     ${OPEN_HCCL_INCLUDE_ROOT}/common/hcomm_dlsym
-    ${HCCL_BASE_DIR}/../pkg_inc/hcomm/ccu
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     $<TARGET_PROPERTY:ccl_kernel,INCLUDE_DIRECTORIES>
 )
 
@@ -85,11 +85,11 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include
     ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/hccl
-    ${HCCL_BASE_DIR}/../include
-    ${HCCL_BASE_DIR}/../include/hccl
-    ${HCCL_BASE_DIR}/../pkg_inc
-    ${HCCL_BASE_DIR}/../pkg_inc/hccl
-    ${HCCL_BASE_DIR}/../pkg_inc/hcomm/ccu
+    ${HCCL_HCOMM_HEADER_DIR}
+    ${HCCL_HCOMM_HEADER_DIR}/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/cce
     ${HCCL_BASE_DIR}/platform/hccp/external_depends/inc/log
 )
 

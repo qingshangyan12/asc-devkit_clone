@@ -20,8 +20,6 @@ add_subdirectory(coll_alg_factory)
 add_subdirectory(alg_registry)
 add_subdirectory(interface)
 add_subdirectory(selector)
-
-set(HCCL_BASE_DIR ${HCOMM_REAL_PATH})
  
 # 添加项目外部头文件
 target_compile_definitions(hccl_v2_native_alg_repo PRIVATE
@@ -34,25 +32,25 @@ target_compile_definitions(hccl_v2_alg_frame PRIVATE
  
 target_include_directories(hccl_v2_native_alg_repo PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/base/inc
-    ${HCCL_BASE_DIR}/src/algorithm/base/inc
-    ${HCCL_BASE_DIR}/src/algorithm/pub_inc
-    ${HCCL_BASE_DIR}/src/pub_inc
-    ${HCCL_BASE_DIR}/src/pub_inc/hccl
+    ${HCCL_BASE_DIR}/algorithm/base/inc
+    ${HCCL_BASE_DIR}/algorithm/pub_inc
+    ${HCCL_BASE_DIR}/pub_inc
+    ${HCCL_BASE_DIR}/pub_inc/hccl
     ${HCCL_BASE_DIR}/inc
     ${HCCL_BASE_DIR}/inc/adapter
-    ${HCCL_BASE_DIR}/src/algorithm/impl/resource_manager
-    ${HCCL_BASE_DIR}/src/platform/hccp/inc/network
+    ${HCCL_BASE_DIR}/algorithm/impl/resource_manager
+    ${HCCL_BASE_DIR}/platform/hccp/inc/network
     ${RDMA_CORE_INCLUDE_DIR}
 
-    ${HCCL_BASE_DIR}/pkg_inc
-    ${HCCL_BASE_DIR}/include
-    ${HCCL_BASE_DIR}/include/hccl/
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
+    ${HCCL_HCOMM_HEADER_DIR}
+    ${HCCL_HCOMM_HEADER_DIR}/hccl/
     ${HCCL_BASE_DIR}/inc/external/
     ${HCCL_BASE_DIR}/inc/external/hccl
-    ${HCCL_BASE_DIR}/src/algorithm/pub_inc
-    ${HCCL_BASE_DIR}/src/algorithm/base/alg_template
-    ${HCCL_BASE_DIR}/src/algorithm/base/communicator
-    ${HCCL_BASE_DIR}/src/legacy/service/collective/alg/coll_alg_factory/alg_aiv_instruction
+    ${HCCL_BASE_DIR}/algorithm/pub_inc
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template
+    ${HCCL_BASE_DIR}/algorithm/base/communicator
+    ${HCCL_BASE_DIR}/legacy/service/collective/alg/coll_alg_factory/alg_aiv_instruction
 
     ${THIRD_PARTY_NLOHMANN_PATH}
     ${ASCEND_CANN_PACKAGE_PATH}/include/
@@ -73,16 +71,16 @@ target_include_directories(hccl_v2_native_alg_repo PRIVATE
 )
 
 target_include_directories(hccl_v2_alg_frame PRIVATE
-    ${HCCL_BASE_DIR}/pkg_inc
-    ${HCCL_BASE_DIR}/include
-    ${HCCL_BASE_DIR}/include/hccl/
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
+    ${HCCL_HCOMM_HEADER_DIR}
+    ${HCCL_HCOMM_HEADER_DIR}/hccl/
     ${HCCL_BASE_DIR}/inc/external/
     ${HCCL_BASE_DIR}/inc/external/hccl
-    ${HCCL_BASE_DIR}/src/algorithm/pub_inc
-    ${HCCL_BASE_DIR}/src/algorithm/base/alg_template
-    ${HCCL_BASE_DIR}/src/hccl/algorithm/base/communicator
-    ${HCCL_BASE_DIR}/src/legacy/service/collective/alg/coll_alg_factory/alg_aiv_instruction
-    ${HCCL_BASE_DIR}/src/platform/hccp/inc/network
+    ${HCCL_BASE_DIR}/algorithm/pub_inc
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template
+    ${HCCL_BASE_DIR}/hccl/algorithm/base/communicator
+    ${HCCL_BASE_DIR}/legacy/service/collective/alg/coll_alg_factory/alg_aiv_instruction
+    ${HCCL_BASE_DIR}/platform/hccp/inc/network
     ${RDMA_CORE_INCLUDE_DIR}
 
     ${THIRD_PARTY_NLOHMANN_PATH}

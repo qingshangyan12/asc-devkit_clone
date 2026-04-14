@@ -22,13 +22,13 @@ target_sources(hccl_plf   PRIVATE
     adapter_error_manager_pub_extend.cc
     ${src_list}
 )
-target_sources(hccd   PRIVATE
-    adapter_hal.cc
-    adapter_hccp.cc
-    adapter_rts.cc
-    adapter_tdt.cc
-    adapter_verbs.cc
-)
+# target_sources(hccd   PRIVATE
+#     adapter_hal.cc
+#     adapter_hccp.cc
+#     adapter_rts.cc
+#     adapter_tdt.cc
+#     adapter_verbs.cc
+# )
 
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}

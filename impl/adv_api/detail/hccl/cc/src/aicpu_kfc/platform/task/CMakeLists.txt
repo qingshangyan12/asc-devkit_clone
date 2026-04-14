@@ -23,9 +23,9 @@ target_sources(hccl_plf PRIVATE
     ${src_list}
 )
 
-target_sources(hccd PRIVATE
-    dispatcher.cc
-)
+# target_sources(hccd PRIVATE
+#     dispatcher.cc
+# )
 
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}

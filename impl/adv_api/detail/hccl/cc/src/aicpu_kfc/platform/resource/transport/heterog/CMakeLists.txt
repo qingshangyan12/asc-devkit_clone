@@ -21,6 +21,6 @@ target_sources(hccl_plf PRIVATE
     ${src_list}
 )
 
-target_sources(hccd PRIVATE
-    ${src_list}
-)
+# target_sources(hccd PRIVATE
+#     ${src_list}
+# )

@@ -89,11 +89,13 @@ if(BUILD_OPEN_PROJECT)
         LOG_CPP)
 
     target_include_directories(hccl_alg PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../pub_inc
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../include
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../include/hccl
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../pkg_inc
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../pkg_inc/hccl
+        ${HCCL_HCOMM_HEADER_DIR}
+        ${HCCL_HCOMM_HEADER_DIR}/hccl
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+        ${HCCL_BASE_DIR}/pub_inc
+        ${HCCL_BASE_DIR}/platform/hccp/inc
+        ${HCCL_BASE_DIR}/platform/hccp/inc/network
 
         # runtime头文件
         ${ASCEND_CANN_PACKAGE_PATH}/include/

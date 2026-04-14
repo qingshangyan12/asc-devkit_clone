@@ -16,7 +16,6 @@ IF (DEFINED ENV{HCCL_LOCAL_BUILD})
 ENDIF ()
 
 set(HCCL_V2_CODE_ROOT ${ORION_REAL_PATH})
-set(HCCL_BASE_DIR ${HCOMM_REAL_PATH})
 
 # 指定hccl编译为动态库
 add_library(hccl_v2 SHARED ""
@@ -39,11 +38,11 @@ target_compile_definitions(hccl_v2 PRIVATE
 
 target_include_directories(hccl_v2 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/base/inc
-    ${HCCL_BASE_DIR}/src/pub_inc
-    ${HCCL_BASE_DIR}/src/pub_inc/hccl
+    ${HCCL_BASE_DIR}/pub_inc
+    ${HCCL_BASE_DIR}/pub_inc/hccl
     ${HCCL_BASE_DIR}/include
     ${HCCL_BASE_DIR}/inc/adapter
-    ${HCCL_BASE_DIR}/src/algorithm/impl/resource_manager
+    ${HCCL_BASE_DIR}/algorithm/impl/resource_manager
 
     ${THIRD_PARTY_NLOHMANN_PATH}
     ${ASCEND_CANN_PACKAGE_PATH}/include/
@@ -63,15 +62,15 @@ target_include_directories(hccl_v2 PRIVATE
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/trace/
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/asc/hccl/internal/
 
-    ${HCCL_BASE_DIR}/include/hccl/
+    ${HCCL_HCOMM_HEADER_DIR}/hccl/
     ${HCCL_BASE_DIR}/pkg_inc
     #${HCCL_BASE_DIR}/pkg_inc/hccl/
-    ${HCCL_BASE_DIR}/src/algorithm/pub_inc
-    ${HCCL_BASE_DIR}/src/algorithm/base/alg_template
-    ${HCCL_BASE_DIR}/src/algorithm/base/communicator
-    ${HCCL_BASE_DIR}/src/platform/hccp/inc/network
+    ${HCCL_BASE_DIR}/algorithm/pub_inc
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template
+    ${HCCL_BASE_DIR}/algorithm/base/communicator
+    ${HCCL_BASE_DIR}/platform/hccp/inc/network
     ${RDMA_CORE_INCLUDE_DIR}
-    ${HCCL_BASE_DIR}/src/platform/hccp/orion/hcomm_dev/inc/network
+    ${HCCL_BASE_DIR}/platform/hccp/orion/hcomm_dev/inc/network
     ${HCCL_BASE_DIR}/externel_depends/tsch
 )
 
@@ -135,10 +134,10 @@ target_compile_definitions(ccl_dpu PRIVATE
 
 target_include_directories(ccl_dpu PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/base/inc
-    ${HCCL_BASE_DIR}/include/
-    ${HCCL_BASE_DIR}/include/hccl
+    ${HCCL_HCOMM_HEADER_DIR}
+    ${HCCL_HCOMM_HEADER_DIR}/hccl
     ${HCCL_BASE_DIR}/pkg_inc
-    ${HCCL_BASE_DIR}/src/pub_inc/hccl
+    ${HCCL_BASE_DIR}/pub_inc/hccl
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/hccl
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
