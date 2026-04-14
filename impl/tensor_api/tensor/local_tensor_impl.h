@@ -221,6 +221,11 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
     return MakeLocalTensor<Iterator>{}(iter, args...);
 }
 
+template <typename Tensor, typename Coord, typename Info>
+__aicore__ inline constexpr decltype(auto) Slice(const Tensor& tensor, const Coord& coord, const Info& info) {
+    tensor.Slice(coord, info);
+}
+
 } // namespace Te
 } // namespace AscendC
 
