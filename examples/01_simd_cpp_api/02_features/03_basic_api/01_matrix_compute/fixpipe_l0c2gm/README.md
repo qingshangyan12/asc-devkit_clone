@@ -22,6 +22,33 @@
 │   └── fixpipe_l0c2gm.asc             // Ascend C样例实现 & 调用样例
 ```
 
+## FixpipeParamsV220 与 FixpipeParamsArch3510 结构体对比
+
+不同产品支持的参数结构体不同：
+- **Ascend 950PR/Ascend 950DT**：支持 `FixpipeParamsV220` 和 `FixpipeParamsArch3510` 两种参数结构体，推荐使用 `FixpipeParamsArch3510`
+- **Atlas A3 训练/推理系列、Atlas A2 训练/推理系列**：仅支持 `FixpipeParamsV220`
+
+本样例通过编译参数 `CMAKE_ASC_ARCHITECTURES` 选择不同架构，根据架构自动选择对应的参数结构体：
+- `dav-2201` 架构：使用 `FixpipeParamsV220`
+- `dav-3510` 架构：使用 `FixpipeParamsArch3510`
+
+| 成员名 | FixpipeParamsV220 | FixpipeParamsArch3510 | 说明 |
+|:------:|:------------------:|:---------------------:|:-----|
+| `nSize` | ✅ | ✅ | 源NZ矩阵在N方向上的大小 |
+| `mSize` | ✅ | ✅ | 源NZ矩阵在M方向上的大小 |
+| `srcStride` | ✅ | ✅ | 源NZ矩阵中相邻Z排布的起始地址偏移 |
+| `dstStride` | ✅ | ✅ | 目的矩阵中相邻Z排布的起始地址偏移（NZ格式）或每行元素个数（ND/DN格式） |
+| `quantPre` | ✅ | ✅ | 量化模式控制 |
+| `deqScalar` | ✅ | ✅ | scalar量化参数 |
+| `reluEn` | ✅ | ✅ | ReLU开关 |
+| `unitFlag` | ✅ | ✅ | Mmad与Fixpipe细粒度并行控制 |
+| `isChannelSplit` | ✅ | ✅ | 通道拆分开关 |
+| `ndNum` / `srcNdStride` / `dstNdStride` | ✅ | ✅（在TransformParams中） | NZ2ND场景下控制多矩阵传输的参数，在V220中为独立成员，在Arch3510中被整合到`TransformParams`结构体中 |
+| `dnNum` / `srcNzMatrixStride` / `dstDnMatrixStride` / `srcNzC0Stride` | ❌ | ✅（在TransformParams中） | NZ2DN场景下控制多矩阵传输的参数，仅Arch3510支持 |
+| `TransformParams` | ❌ | ✅ | 基于模板参数的类型选择器，根据CO2Layout自动选择参数类型 |
+| `dualDstCtrl` | ❌ | ✅ | 双目标模式控制，支持M维度拆分或N维度拆分 |
+| `subBlockId` | ❌ | ✅ | 单目标模式下指示目标UB的编号 |
+
 ## 场景详细说明
 
 本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `fixpipe_l0c2gm`。
@@ -38,11 +65,11 @@
 - 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>` 指定ROW_MAJOR格式转换
 - 说明：将CO1中的NZ格式数据转换为ND格式输出到GM
 
-**场景3：输出格式DN，输出数据类型float**
+**场景3：输出格式DN，输出数据类型float（仅Ascend 950PR/Ascend 950DT支持）**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [256, 128] float类型，DN格式
 - 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_COLUMN_MAJOR>` 指定COLUMN_MAJOR格式转换
-- 说明：将CO1中的NZ格式数据转换为DN格式输出到GM（仅Ascend 950PR/Ascend 950DT支持）
+- 说明：将CO1中的NZ格式数据转换为DN格式输出到GM
 
 **场景4：输出格式ND，输出数据类型int8_t，使能Scalar量化**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
@@ -102,26 +129,27 @@
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake .. -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程（默认dav-2201 NPU模式）
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin  # 验证输出结果是否正确
   ```
-    使用NPU仿真模式时，添加 `-DRUN_MODE=sim` 参数即可。
-
+    使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  
   示例如下：
   ```bash
-  cmake -DRUN_MODE=sim -DNPU_ARCH=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
 
-  | 选项 | 可选值 | 说明 |
-  |------|--------|------|
-  | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `NPU_ARCH` | `dav-2201`（默认）、`dav-3510` | NPU 架构，dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | 参数 | 说明 | 可选值 | 默认值 |
+  |------|------|---------|--------|
+  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, sim | npu |
+  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-2201 |
+  | SCENARIO_NUM | 场景编号 | 1-7 | 1 |
 
   执行结果如下，说明精度对比成功。
   ```bash
