@@ -164,6 +164,138 @@ enum class TraceId : uint32_t {
 };
 #endif
 } // namespace __asc_aicore
+
+namespace __asc_simd_vf {
+enum class DumpTensorDataType : uint32_t {
+    ACL_FLOAT = 0,
+    ACL_FLOAT16 = 1,
+    ACL_INT8 = 2,
+    ACL_INT32 = 3,
+    ACL_UINT8 = 4,
+    ACL_INT16 = 6,
+    ACL_UINT16 = 7,
+    ACL_UINT32 = 8,
+    ACL_INT64 = 9,
+    ACL_UINT64 = 10,
+    ACL_DOUBLE = 11,
+    ACL_BOOL = 12,
+    ACL_STRING = 13,
+    ACL_COMPLEX64 = 16,
+    ACL_COMPLEX128 = 17,
+    ACL_BF16 = 27,
+    ACL_INT4 = 29,
+    ACL_UINT1 = 30,
+    ACL_COMPLEX32 = 33,
+    ACL_HIFLOAT8 = 34,
+    ACL_FLOAT8_E5M2 = 35,
+    ACL_FLOAT8_E4M3FN = 36,
+    ACL_FLOAT8_E8M0 = 37,
+    ACL_FLOAT6_E3M2 = 38,
+    ACL_FLOAT6_E2M3 = 39,
+    ACL_FLOAT4_E2M1 = 40,
+    ACL_FLOAT4_E1M2 = 41,
+    ACL_MAX = 42,
+};
+
+enum class DumpType : uint8_t {
+    DUMP_DEFAULT = 0,
+    DUMP_SCALAR,
+    DUMP_TENSOR,
+    DUMP_SHAPE,
+    DUMP_ASSERT,
+    DUMP_META,
+    DUMP_TIME_STAMP,
+    DUMP_SIMT,
+    DUMP_BUFI,
+    DUMP_BUFO,
+    DUMP_SKIP
+};
+
+struct SkipTlv {
+    uint32_t type = static_cast<uint32_t>(DumpType::DUMP_SKIP); // DumpType = DUMP_SKIP
+    uint32_t length = 0U;
+};
+
+#define SIMD_VF_PRINTF_UBUF_MAX_SIZE 1024
+
+struct BlockVFBufInfo {
+    uint32_t magic = 0xF0A00B0F;
+    uint32_t length = SIMD_VF_PRINTF_UBUF_MAX_SIZE;
+    uint32_t writeLen = 0;
+    uint16_t pidx = 0;
+    uint8_t flag = 0;
+    uint8_t resv = 0;
+    uint16_t buffer[SIMD_VF_PRINTF_UBUF_MAX_SIZE];
+};
+
+struct BlockRingBufInfo {
+    uint32_t length = 0U;      // total size per block (include head and r/w info)
+    uint32_t coreId = 0U;      // current core id
+    uint32_t blockNum = 0U;    // total core num
+    uint32_t ringBufLen = 0U;  // fifo buff size (print tlv storage)
+    uint16_t magic = 0U;       // magic number
+    uint16_t flag = 0U;        // 0: simd, 1: simt
+    uint32_t rsv = 0U;         // reserve
+    uint64_t ringBufAddr = 0U; // start addr of fifo buff
+    uint32_t resvMem[6];       // reserved
+};
+
+struct RingBufWriteInfo {
+    uint32_t type = static_cast<uint32_t>(DumpType::DUMP_BUFI); // DumpType = DUMP_BUFI
+    uint32_t length = 0U;                                       // u64 + u64
+    uint64_t bufOffset = 0U;                                    // the offset of write addr relative to ringBufAddr
+    uint64_t packIdx = 0U;                                      // print pack counter
+};
+
+struct RingBufReadInfo {
+    uint32_t type = static_cast<uint32_t>(DumpType::DUMP_BUFO); // DumpType = DUMP_BUFO
+    uint32_t length = 0U;                                       // u64 + u64
+    uint64_t bufOffset = 0U;                                    // the offset of read addr relative to ringBufAddr
+    uint64_t resv = 0U;
+};
+
+// %d
+struct PrintfInfo {
+    uint32_t printfType = 0U;
+    uint32_t printfLength = 0U;
+    uint32_t blockIdx = 0U;
+    uint32_t resv = 0U;
+    uint64_t fmtOffset = 0U;
+    // uint64_t Param[num] = 0U;
+    // char_t fmt[fmtLength];
+};
+
+// // %s
+// struct PrintfInfo {
+//     uint32_t printfType;
+//     uint32_t printfLength;
+//     uint32_t blockIdx = 0;
+//     uint32_t resv = 0;
+//     uint64_t fmtOffset = 0U;
+//     uint64_t Param[num] = 0U;
+//     char_t fmt[fmtLength];
+//     char_t paramStr1[param1Length];
+//     char_t paramStr2[param2Length];
+// };
+
+struct DumpTensorInfo {
+    uint32_t dumpType;
+    uint32_t dumpLength;
+    uint32_t addr;
+    uint32_t dataType;
+    uint32_t desc;
+    uint32_t bufferId;
+    uint16_t position;
+    uint16_t blockIdx = 0;
+    uint32_t dim = 0;
+    uint32_t shape[8] = {0};
+    uint32_t resv1 = 0;
+    uint32_t dumpSize;
+    // uint8_t dumpData[dumpSize];
+    // uint8_t dumpData[256];
+};
+}
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_TYPES__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_TYPES__
