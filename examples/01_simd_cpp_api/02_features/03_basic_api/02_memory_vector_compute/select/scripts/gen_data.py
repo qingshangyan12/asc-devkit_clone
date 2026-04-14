@@ -41,10 +41,9 @@ def gen_golden_data(scenario_num):
     output_type = input_type
     input_size = 256
     input_sel_size = 8 if scenario_num == 1 else 32
-    input_y_size = 256
+    input_y_size = 256 if (scenario_num == 1 or scenario_num == 3) else 8
     output_size = 256
     mask_num = 64  # selMask的有效数值
-    scalar = 0 # 标量
 
     input_shape = [input_size]
     input_sel_shape = [input_sel_size]
@@ -56,16 +55,9 @@ def gen_golden_data(scenario_num):
 
     min_val, max_val = get_range_by_dtype(input_type)
     input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
-    input_y = None
+    input_y = np.random.uniform(min_val, max_val, input_y_shape).astype(input_type)
     
     golden = np.ones(output_shape).astype(output_type)
-
-    os.makedirs("input", exist_ok=True)
-    os.makedirs("output", exist_ok=True)
-
-    if scenario_num == 1 or scenario_num == 3:
-        input_y = np.random.uniform(min_val, max_val, input_y_shape).astype(input_type)
-        input_y.tofile("./input/input_y.bin")
 
     for i in range(input_size):
         if scenario_num == 1:
@@ -78,11 +70,15 @@ def gen_golden_data(scenario_num):
         if(input_sel[byte_idx] >> bit_idx) & 1:
             golden[i] = input_x[i]
         else:
-            golden[i] = input_y[i] if (scenario_num == 1 or scenario_num == 3) else scalar
+            golden[i] = input_y[i] if (scenario_num == 1 or scenario_num == 3) else input_y[0]
     
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     input_x.tofile("./input/input_x.bin")
+    input_y.tofile("./input/input_y.bin")
     input_sel.tofile("./input/input_sel.bin")
     golden.tofile("./output/golden.bin")
+
 
 
 if __name__ == "__main__":
