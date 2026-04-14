@@ -816,6 +816,17 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 
     target_include_directories(ccl_kernel PRIVATE ${ORION_HEAD_LIST})
 
+    if(TARGET mc2_server)
+        target_include_directories(mc2_server PRIVATE
+            ${CCL_KERNEL_INCLUDE_LIST}
+            ${ORION_HEAD_LIST}
+        )
+        target_link_libraries(mc2_server PRIVATE
+            ccl_kernel
+        )
+        add_dependencies(mc2_server ccl_kernel)
+    endif()
+
     add_subdirectory(device)
 endif()
 
@@ -897,10 +908,71 @@ if(NOT BUILD_OPEN_PROJECT)
         ${HCCL_BASE_DIR}/framework
  	    ${HCCL_BASE_DIR}/framework/common
  	    ${HCCL_BASE_DIR}/framework/common/src
- 	    ${HCCL_BASE_DIR}/framework/common/src/mgr
- 	    ${HCCL_BASE_DIR}/framework/communicator
- 	    ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/resource/engine
+        ${HCCL_BASE_DIR}/framework/common/src/mgr
+        ${HCCL_BASE_DIR}/framework/communicator
+        ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/resource/engine
     )
+    if(TARGET mc2_server)
+        target_include_directories(mc2_server PRIVATE
+            ${HCCL_HCOMM_HEADER_DIR}/hccl
+            ${HCCL_BASE_DIR}/pub_inc
+            ${HCCL_BASE_DIR}/pub_inc/inner
+            ${HCCL_BASE_DIR}/pub_inc/aicpu
+            ${HCCL_BASE_DIR}/pub_inc/new
+
+            ${HCCL_BASE_DIR}/hccl/hccl_comm/wrapper/notify/
+
+            ${TOP_DIR}/inc
+            ${TOP_DIR}/inc/driver
+            ${TOP_DIR}/metadef/inc/external
+            ${TOP_DIR}/metadef/pkg_inc
+            ${TOP_DIR}/metadef/pkg_inc
+            ${TOP_DIR}/open_source/json/include
+            ${TOP_DIR}/inc/aicpu/
+            ${TOP_DIR}/atc/opcompiler/ascendc_compiler/api
+            ${TOP_DIR}/atc/opcompiler/ascendc_compiler/api/impl
+            ${TOP_DIR}/atc/opcompiler/ascendc_compiler/api/include
+            ${TOP_DIR}/abl/adump/inc/adump
+            ${TOP_DIR}/abl/atrace/inc/utrace
+            ${TOP_DIR}/runtime/include/external
+            ${TOP_DIR}/runtime/include/external/acl
+            ${TOP_DIR}/runtime/pkg_inc
+            ${TOP_DIR}/runtime/pkg_inc/runtime
+            ${TOP_DIR}/runtime/pkg_inc/profiling
+            ${TOP_DIR}/runtime/pkg_inc/trace
+            ${TOP_DIR}/runtime/pkg_inc/base
+            ${TOP_DIR}/runtime/pkg_inc/aicpu_sched
+            ${TOP_DIR}/asc/asc-devkit
+            ${TOP_DIR}/asc/asc-devkit/include/adv_api/hccl/internal
+
+            ${TOP_DIR}/ace/comop/inc
+
+            ${HCCL_BASE_DIR}/platform/
+            ${HCCL_BASE_DIR}/platform/inc/
+            ${HCCL_BASE_DIR}/platform/inc/adapter
+            ${HCCL_BASE_DIR}/platform/resource/transport/heterog/
+            ${HCCL_BASE_DIR}/platform/resource/transport/host/
+            ${HCCL_BASE_DIR}/platform/resource/transport/
+            ${HCCL_BASE_DIR}/platform/resource/notify/
+            ${HCCL_BASE_DIR}/platform/resource/dispatcher_ctx
+            ${HCCL_BASE_DIR}/platform/task
+            ${HCCL_BASE_DIR}/platform/common
+            ${HCCL_BASE_DIR}/platform/common/unique
+            ${HCCL_BASE_DIR}/platform/common/unfold_cache
+
+            ${HCCL_BASE_DIR}/platform/hccp/inc
+            ${HCCL_BASE_DIR}/platform/hccp/inc/network
+            ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/
+            ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl/
+
+            ${HCCL_BASE_DIR}/framework
+            ${HCCL_BASE_DIR}/framework/common
+            ${HCCL_BASE_DIR}/framework/common/src
+            ${HCCL_BASE_DIR}/framework/common/src/mgr
+            ${HCCL_BASE_DIR}/framework/communicator
+            ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/resource/engine
+        )
+    endif()
     target_link_libraries(ccl_kernel PRIVATE
         $<BUILD_INTERFACE:intf_pub_cxx14>
         $<BUILD_INTERFACE:mmpa_headers>
@@ -1019,7 +1091,7 @@ if(BUILD_OPEN_PROJECT AND KERNEL_MODE)
 endif()
 
 if(DEVICE_MODE AND KERNEL_MODE)
-    set(CCL_KERNEL_TAR_DIR ${HCCL_BASE_DIR}/../build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)
+    set(CCL_KERNEL_TAR_DIR ${CMAKE_SOURCE_DIR}/build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)
     add_custom_command(
         TARGET ccl_kernel
         POST_BUILD
