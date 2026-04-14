@@ -135,19 +135,11 @@ protected:
     void SetUp()
     {
         AscendC::SetGCoreType(2);
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(false);
     }
     void TearDown()
     {
-        AscendC::KernelRaise::GetInstance().SetRaiseMode(true);
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
         AscendC::CheckSyncState();
+        AscendC::SetGCoreType(0);
         GlobalMockObject::verify();
     }
 };
