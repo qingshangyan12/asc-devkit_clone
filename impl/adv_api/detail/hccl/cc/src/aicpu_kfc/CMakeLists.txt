@@ -25,6 +25,9 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
         ${HCCL_BASE_DIR}/pub_inc
+        ${HCCL_BASE_DIR}/pub_inc/aicpu
+        ${HCCL_BASE_DIR}/pub_inc/inner
+        ${HCCL_BASE_DIR}/pub_inc/new
         ${HCCL_BASE_DIR}/platform/hccp/inc
         ${HCCL_BASE_DIR}/platform/hccp/inc/network
         # todo: 这个文件在什么地方
@@ -65,6 +68,9 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_HCOMM_HEADER_DIR}
         ${HCCL_HCOMM_HEADER_DIR}
         ${HCCL_BASE_DIR}/pub_inc
+        ${HCCL_BASE_DIR}/pub_inc/aicpu
+        ${HCCL_BASE_DIR}/pub_inc/inner
+        ${HCCL_BASE_DIR}/pub_inc/new
         ${HCCL_BASE_DIR}/platform/hccp/inc
         ${HCCL_BASE_DIR}/platform/hccp/inc/network
         ${RDMA_CORE_INCLUDE_DIR}
@@ -119,12 +125,47 @@ target_compile_definitions(ccl_kernel_plf_a PRIVATE
     $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
 )
 
+# platform头文件
+set(hccl_plf_include_list
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/inc/adapter
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/inc/adapter/host
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/task
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/buffer_manager
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/unfold_cache
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/p2p_mgmt
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/unique
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/misc/network_manager
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/misc/gradient_segment
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport/device
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport/host
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport/heterog
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport/onesided
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport/onesided/device
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/mem
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/dispatcher_ctx
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/notify
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/socket
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/stream
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/rma_buffer
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/remote_access
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/task
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/tbe_vector_reduce
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/aiv_communication    
+)
+
 # 设置ccl_kernel_plf 包含文件列表
 set(ccl_kernel_plf_include_list
+    # todo这个头文件又是什么
     ${include_list}
     ${HCCL_BASE_DIR}/hccl/hccl_comm/wrapper/notify/
     ${HCCL_BASE_DIR}/common/debug/profiling/inc/aicpu
     ${HCCL_BASE_DIR}/framework/common/src/aicpu
+    ${hccl_plf_include_list}
 )
 
 # 指定ccl_kernel_plf所需头文件搜索路径

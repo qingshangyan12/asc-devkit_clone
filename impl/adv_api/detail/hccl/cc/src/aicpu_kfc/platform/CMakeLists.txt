@@ -9,6 +9,7 @@
 # -----------------------------------------------------------------------------------------------------------
 set(CMAKE_VERBOSE_MAKEFILE on)
 
+# todo: 删除hccl_plf的编译，似乎aicpu不需要？
 if(BUILD_OPEN_PROJECT)
     message(STATUS "open CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
     set(HCCL_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../)

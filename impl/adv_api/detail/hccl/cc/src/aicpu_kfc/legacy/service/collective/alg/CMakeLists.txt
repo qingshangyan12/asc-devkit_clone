@@ -10,7 +10,7 @@ add_library(hccl_v2_alg_frame SHARED ""
 FILE(GLOB_RECURSE sources_list LIST_DIRECTORIES TRUE ${HCCL_V2_CODE_ROOT})
  
 foreach (dir ${sources_list})
-    IF ((IS_DIRECTORY ${dir}) AND (${dir} MATCHES "src/legacy"))
+    IF ((IS_DIRECTORY ${dir}) AND (${dir} MATCHES "aicpu_kfc/legacy"))
         target_include_directories(hccl_v2_native_alg_repo PRIVATE ${dir})
         target_include_directories(hccl_v2_alg_frame PRIVATE ${dir})
     endif ()

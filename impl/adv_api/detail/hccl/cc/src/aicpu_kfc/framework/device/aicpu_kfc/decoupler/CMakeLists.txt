@@ -90,6 +90,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/cce
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/platform/hccp/external_depends/inc/log
 )
 

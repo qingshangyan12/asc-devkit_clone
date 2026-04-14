@@ -25,7 +25,7 @@ add_library(hccl_v2 SHARED ""
 FILE(GLOB_RECURSE sources_list LIST_DIRECTORIES TRUE ${HCCL_V2_CODE_ROOT}/*)
 
 foreach (dir ${sources_list})
-    IF ((IS_DIRECTORY ${dir} ) AND (${dir} MATCHES "src/legacy") AND (NOT ${dir} MATCHES "src/legacy/mdpi"))
+    IF ((IS_DIRECTORY ${dir} ) AND (${dir} MATCHES "aicpu_kfc/legacy") AND (NOT ${dir} MATCHES "aicpu_kfc/legacy/mdpi"))
         target_include_directories(hccl_v2 PRIVATE ${dir})
     endif ()
 endforeach ()

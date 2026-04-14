@@ -32,7 +32,7 @@ message(STATUS "HCCL_BASE_DIR = ${HCCL_BASE_DIR}")
 add_library(hcomm  SHARED)
 
 set(hccl_include_list
-    ${HCCL_BASE_DIR}/../include/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/hccl
     ${HCCL_BASE_DIR}/algorithm/base/inc
     ${HCCL_BASE_DIR}/algorithm/pub_inc
     ${HCCL_BASE_DIR}/pub_inc
@@ -139,11 +139,11 @@ if(BUILD_OPEN_PROJECT)
     target_include_directories(hcomm PRIVATE
         ${HCCL_BASE_DIR}/pub_inc
         ${HCCL_BASE_DIR}/pub_inc/new/
-        ${HCCL_BASE_DIR}/../include
-        ${HCCL_BASE_DIR}/../include/hccl
-        ${HCCL_BASE_DIR}/../pkg_inc/
-        ${HCCL_BASE_DIR}/../pkg_inc/hccl/
-        ${HCCL_BASE_DIR}/../pkg_inc/hcomm/ccu
+        ${HCCL_HCOMM_HEADER_DIR}
+        ${HCCL_HCOMM_HEADER_DIR}/hccl
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_BASE_DIR}/platform/common
         ${CANN_3RD_LIB_PATH}/hcomm_utils/${PRODUCT_SIDE}/include/legacy
         ${HCCL_BASE_DIR}/platform/legacy/inc
@@ -289,7 +289,7 @@ set(ORION_HEAD_LIST)
 FILE(GLOB_RECURSE sources_list LIST_DIRECTORIES TRUE ${HCCL_V2_CODE_ROOT})
 
 foreach (dir ${sources_list})
-    IF ((IS_DIRECTORY ${dir}) AND (${dir} MATCHES "src/legacy") AND (NOT ${dir} MATCHES "src/legacy/mdpi"))
+    IF ((IS_DIRECTORY ${dir}) AND (${dir} MATCHES "aicu_kfc/legacy") AND (NOT ${dir} MATCHES "aicpu_kfc/legacy/mdpi"))
         list(APPEND ORION_HEAD_LIST ${dir})
     endif()
 endforeach()
@@ -643,7 +643,7 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     )
 
     set(CCL_KERNEL_INCLUDE_LIST
-        ${HCCL_BASE_DIR}/../include/hccl
+        ${HCCL_HCOMM_HEADER_DIR}/hccl
         ${HCCL_BASE_DIR}/pub_inc
         ${TOP_DIR}/abl/atrace/inc/utrace
         ${HCCL_BASE_DIR}/algorithm/base/inc
@@ -725,8 +725,8 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${HCCL_BASE_DIR}/algorithm/base/alg_template/temp_scatter
         ${HCCL_BASE_DIR}/algorithm/base/alg_template
         ${HCCL_BASE_DIR}/algorithm/pub_inc
-        ${HCCL_BASE_DIR}/../pkg_inc/
-        ${HCCL_BASE_DIR}/../pkg_inc/hccl/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl/
 
         ${HCCL_BASE_DIR}/platform/
         ${HCCL_BASE_DIR}/platform/inc/
@@ -755,11 +755,11 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${HCCL_BASE_DIR}/platform/common
         ${HCCL_BASE_DIR}/platform/common/unique
         ${hccl_include_list}
-        ${HCCL_BASE_DIR}/../include
-        ${HCCL_BASE_DIR}/../include/hccl
+        ${HCCL_HCOMM_HEADER_DIR}
+        ${HCCL_HCOMM_HEADER_DIR}/hccl
         ${HCCL_BASE_DIR}/../inc/hccl/hccl
-        ${HCCL_BASE_DIR}/../pkg_inc/
-        ${HCCL_BASE_DIR}/../pkg_inc/hccl/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl/
         ${HCCL_BASE_DIR}/pub_inc
         ${HCCL_BASE_DIR}/pub_inc/aicpu
 
@@ -794,7 +794,7 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/asc/hccl/internal/
         ${ASCEND_CANN_PACKAGE_PATH}/include/ascendc/
 
-        ${HCCL_BASE_DIR}/../externel_depends/tsch/
+        ${HCCL_HCOMM_HEADER_DIR}/externel_depends/tsch/
         ${RDMA_CORE_INCLUDE_DIR}
         ${THIRD_PARTY_NLOHMANN_PATH}
 
@@ -842,7 +842,7 @@ if(NOT BUILD_OPEN_PROJECT)
         endif()
     endforeach()
     target_include_directories(ccl_kernel PRIVATE
-        ${HCCL_BASE_DIR}/../include/hccl
+        ${HCCL_HCOMM_HEADER_DIR}/hccl
         ${HCCL_BASE_DIR}/pub_inc
         ${HCCL_BASE_DIR}/pub_inc/inner
         ${HCCL_BASE_DIR}/pub_inc/aicpu
@@ -891,8 +891,8 @@ if(NOT BUILD_OPEN_PROJECT)
 
         ${HCCL_BASE_DIR}/platform/hccp/inc
         ${HCCL_BASE_DIR}/platform/hccp/inc/network
-	    ${HCCL_BASE_DIR}/../pkg_inc/
-        ${HCCL_BASE_DIR}/../pkg_inc/hccl/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl/
 
         ${HCCL_BASE_DIR}/framework
  	    ${HCCL_BASE_DIR}/framework/common
