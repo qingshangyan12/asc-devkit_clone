@@ -4,6 +4,7 @@
 
 >[!NOTE]说明 
 >该性能优化指导适用于如下产品型号：
+>-   Ascend 950PR/Ascend 950DT
 >-   Atlas A3 训练系列产品/Atlas A3 推理系列产品
 >-   Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -31,9 +32,7 @@ L2 Cache的带宽相比GM的带宽有数倍的提升，因此当数据命中L2 C
 
 Ascend C基于GlobalTensor提供了SetL2CacheHint接口，用户可以根据需要指定CacheMode。
 
-考虑如下场景，构造两个Tensor的计算，x的输入Shape为\(5120, 5120\)，y的输入Shape为\(5120, 15360\)，z的输出Shape为\(5120, 15360\)，由于两个Tensor的Shape不相等，x分别与y的3个数据块依次相加。该方案主要为了演示CacheMode的功能，示例代码中故意使用重复搬运x的实现方式，真实设计中并不需要采用这个方案。下文完整样例请参考[设置合理L2 CacheMode样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/l2_cache_bypass)。
-
-![](../../../figures/最佳实践优化Reduce使用章节-64.png)
+考虑如下场景，构造两个Tensor的计算，x的输入Shape为\(8192, 8192\)，y的输入Shape为\(8192, 8192\)，z的输出Shape为\(8192, 8192\)。下文完整样例请参考[设置合理L2 CacheMode样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/add_high_performance)
 
 <a name="table12921549195512"></a>
 <table><thead align="left"><tr id="row1229364945511"><th class="cellrowborder" valign="top" width="6.813978389954251%" id="mcps1.1.4.1.1"><p id="p2081249145715"><a name="p2081249145715"></a><a name="p2081249145715"></a>实现方案</p>
@@ -46,27 +45,27 @@ Ascend C基于GlobalTensor提供了SetL2CacheHint接口，用户可以根据需�
 </thead>
 <tbody><tr id="row1629374995517"><td class="cellrowborder" valign="top" width="6.813978389954251%" headers="mcps1.1.4.1.1 "><p id="p108124995710"><a name="p108124995710"></a><a name="p108124995710"></a>实现方法</p>
 </td>
-<td class="cellrowborder" valign="top" width="42.67497323079919%" headers="mcps1.1.4.1.2 "><p id="p1764591574211"><a name="p1764591574211"></a><a name="p1764591574211"></a>总数据量700MB，其中：x：100MB；y：300MB；z：300MB。</p>
-<p id="p13628115612406"><a name="p13628115612406"></a><a name="p13628115612406"></a>使用40个核参与计算，按列方向切分。</p>
-<p id="p5900191641514"><a name="p5900191641514"></a><a name="p5900191641514"></a>x、y、z 对应GlobalTensor的CacheMode均设置为CACHE_MODE_NORMAL，需要经过L2 Cache，需要进入L2 Cache的总数据量为700MB。</p>
+<td class="cellrowborder" valign="top" width="42.67497323079919%" headers="mcps1.1.4.1.2 "><p id="p1764591574211"><a name="p1764591574211"></a><a name="p1764591574211"></a>总数据量384MB，其中：x：128MB；y：128MB；z：128MB。</p>
+<p id="p13628115612406"><a name="p13628115612406"></a><a name="p13628115612406"></a>使用48个核参与计算，按行方向切分6份，列方向切分8份。</p>
+<p id="p5900191641514"><a name="p5900191641514"></a><a name="p5900191641514"></a>x、y、z 对应GlobalTensor的CacheMode均设置为CACHE_MODE_NORMAL，需要经过L2 Cache，需要进入L2 Cache的总数据量为384MB。</p>
 </td>
-<td class="cellrowborder" valign="top" width="50.51104837924658%" headers="mcps1.1.4.1.3 "><p id="p2198131313619"><a name="p2198131313619"></a><a name="p2198131313619"></a>总数据量700MB，其中：x：100MB；y：300MB；z：300MB。</p>
-<p id="p3198111373618"><a name="p3198111373618"></a><a name="p3198111373618"></a>使用40个核参与计算，按列方向切分。</p>
-<p id="p1545392118509"><a name="p1545392118509"></a><a name="p1545392118509"></a>x对应的GlobalTensor的CacheMode设置为CACHE_MODE_NORMAL；y和z对应的GlobalTensor的CacheMode设置为CACHE_MODE_DISABLE。只有需要频繁访问的x，设置为需要经过L2 Cache。需要进入L2 Cache的总数据量为100MB。</p>
+<td class="cellrowborder" valign="top" width="50.51104837924658%" headers="mcps1.1.4.1.3 "><p id="p2198131313619"><a name="p2198131313619"></a><a name="p2198131313619"></a>总数据量384MB，其中：x：128MB；y：128MB；z：128MB。</p>
+<p id="p3198111373618"><a name="p3198111373618"></a><a name="p3198111373618"></a>使用48个核参与计算，按行方向切分6份，列方向切分8份。</p>
+<p id="p1545392118509"><a name="p1545392118509"></a><a name="p1545392118509"></a>z对应的GlobalTensor的CacheMode设置为CACHE_MODE_NORMAL；x和y对应的GlobalTensor的CacheMode设置为CACHE_MODE_DISABLE。只将z设置为需要经过L2 Cache。需要进入L2 Cache的总数据量为128MB。</p>
 </td>
 </tr>
 <tr id="row3293124918559"><td class="cellrowborder" valign="top" width="6.813978389954251%" headers="mcps1.1.4.1.1 "><p id="p12812993573"><a name="p12812993573"></a><a name="p12812993573"></a>示例代码</p>
 </td>
-<td class="cellrowborder" valign="top" width="42.67497323079919%" headers="mcps1.1.4.1.2 "><a name="screen924835613570"></a><a name="screen924835613570"></a><pre class="screen" codetype="Cpp" id="screen924835613570">xGm.SetGlobalBuffer((__gm__ float *)x + AscendC::GetBlockIdx() * TILE_N);
-yGm.SetGlobalBuffer((__gm__ float *)y + AscendC::GetBlockIdx() * TILE_N);
-zGm.SetGlobalBuffer((__gm__ float *)z + AscendC::GetBlockIdx() * TILE_N);</pre>
+<td class="cellrowborder" valign="top" width="42.67497323079919%" headers="mcps1.1.4.1.2 "><a name="screen924835613570"></a><a name="screen924835613570"></a><pre class="screen" codetype="Cpp" id="screen924835613570">xGm.SetGlobalBuffer((__gm__ half *)x + startM * totalN + startN, bufferSize);
+yGm.SetGlobalBuffer((__gm__ half *)y + startM * totalN + startN, bufferSize);
+zGm.SetGlobalBuffer((__gm__ half *)z + startM * totalN + startN, bufferSize);</pre>
 </td>
-<td class="cellrowborder" valign="top" width="50.51104837924658%" headers="mcps1.1.4.1.3 "><a name="screen271414925813"></a><a name="screen271414925813"></a><pre class="screen" codetype="Cpp" id="screen271414925813">xGm.SetGlobalBuffer((__gm__ float *)x + AscendC::GetBlockIdx() * TILE_N);
-yGm.SetGlobalBuffer((__gm__ float *)y + AscendC::GetBlockIdx() * TILE_N);
-zGm.SetGlobalBuffer((__gm__ float *)z + AscendC::GetBlockIdx() * TILE_N);
-// disable the L2 cache mode of y and z
-yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
-zGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);</pre>
+<td class="cellrowborder" valign="top" width="50.51104837924658%" headers="mcps1.1.4.1.3 "><a name="screen271414925813"></a><a name="screen271414925813"></a><pre class="screen" codetype="Cpp" id="screen271414925813">xGm.SetGlobalBuffer((__gm__ half *)x + startM * totalN + startN, bufferSize);
+yGm.SetGlobalBuffer((__gm__ half *)y + startM * totalN + startN, bufferSize);
+zGm.SetGlobalBuffer((__gm__ half *)z + startM * totalN + startN, bufferSize);
+// disable the L2 cache mode of x and y
+xGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);</pre>
 </td>
 </tr>
 </tbody>
