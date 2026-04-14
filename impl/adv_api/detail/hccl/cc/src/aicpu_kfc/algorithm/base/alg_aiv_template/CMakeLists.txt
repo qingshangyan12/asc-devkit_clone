@@ -7,10 +7,10 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
-add_subdirectory(all_gather)
-add_subdirectory(all_gather_v)
-add_subdirectory(all_reduce)
-add_subdirectory(all_to_all)
-add_subdirectory(broadcast)
-add_subdirectory(reduce_scatter)
-add_subdirectory(reduce_scatter_v)
+# add_subdirectory(all_gather)
+# add_subdirectory(all_gather_v)
+# add_subdirectory(all_reduce)
+# add_subdirectory(all_to_all)
+# add_subdirectory(broadcast)
+# add_subdirectory(reduce_scatter)
+# add_subdirectory(reduce_scatter_v)
