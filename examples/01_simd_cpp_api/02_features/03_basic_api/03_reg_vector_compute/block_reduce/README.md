@@ -3,7 +3,6 @@
 ## 概述
 本样例基于RegBase编程范式实现ReduceDataBlock运算，主要调用ReduceDataBlock接口（SUM模式）。
 - ReduceDataBlock接口支持SUM/MAX/MIN等归约模式，本样例以SUM模式为例
-- 与Reduce接口不同，ReduceDataBlock对每个DataBlock(32B)内的元素进行归约，而非整个repeat
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT

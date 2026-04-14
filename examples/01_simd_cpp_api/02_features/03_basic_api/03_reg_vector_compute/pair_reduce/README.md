@@ -24,15 +24,7 @@
   对输入向量做PairReduceElem归约求和运算，向量shape为[1, 256]，数据类型为float。
   PairReduceElem对相邻奇偶元素对求和：dst[i] = src[2i] + src[2i+1]
   256个float输入产生128个求和结果。
-- 数据布局示意：
 
-```
-输出缓冲区布局（以 float 为例，oneRepeatSize=64，repeatTimes=4）：
-|<-- repeat 0 -->|<-- repeat 1 -->|<-- repeat 2 -->|<-- repeat 3 -->|
-[有效0-31|无效0-31|有效32-63|无效32-63|有效64-95|无效64-95|有效96-127|无效96-127]
- ^^^^^^^^         ^^^^^^^^^        ^^^^^^^^^         ^^^^^^^^^^
- 32个有效          32个有效         32个有效          32个有效
-```
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
@@ -40,14 +32,14 @@
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[128]</td><td align="center">float</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 128]</td><td align="center">float</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">pair_reduce</td></tr>
   </table>
 - 样例实现：
    PairReduceSumVF函数内调用PairReduceElem接口进行归约计算：
    - 使用LoadAlign加载数据到寄存器
-   - 使用PairReduceElem<PairReduce::SUM>对相邻奇偶元素对求和
+   - 使用PairReduceElem(PairReduce::SUM)对相邻奇偶元素对求和
    - 使用StoreAlign将结果写回UB
   - 调用实现
     使用内核调用符<<<>>>调用核函数。
@@ -91,10 +83,10 @@
 
 - 编译选项说明
 
-|| 选项　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
-|| ------------| -----------------------------| ---------------------------------------------------|
-|| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
-|| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| 选项　　　　　　　　　　　| 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+| ---------------------------| -----------------------------| ---------------------------------------------------|
+| `CMAKE_ASC_RUN_MODE`　　　| `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
 
