@@ -104,6 +104,18 @@ __aicore__ constexpr inline DumpTensorDataType get_dump_datatype_impl()
 }
 
 }
+
+namespace __asc_simd_vf {
+__simd_callee__ inline uint64_t asc_debug_get_block_idx_impl()
+{
+#if defined(__DAV_VEC__)
+    return __cce_scalar::get_block_idx() * __cce_scalar::get_subblockdim() + __cce_scalar::get_subblockid();
+#else
+    return __cce_scalar::get_block_idx();
+#endif
+}
+}
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS_IMPL__
