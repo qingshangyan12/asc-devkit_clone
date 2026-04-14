@@ -33,12 +33,9 @@ template <typename T>
 struct IsPtrTrait<T, void_t<typename T::type>> : Std::true_type {};
 
 template <typename T>
-constexpr bool IsPtrTraitV = IsPtrTrait<T>::value;
+using MemPtrTraitT = typename Std::conditional<IsPtrTraitV<T>::value, T, PtrTrait<T>>::type;
 
-template <typename T>
-using MemPtrTraitT = typename Std::conditional<IsPtrTraitV<T>, T, PtrTrait<T>>::type;
-
-template <typename HardWare, typename TraitOrType = PtrTrait<>, typename... Args>
+template <typename HardWare, typename TraitOrType, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
     using Arg = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
