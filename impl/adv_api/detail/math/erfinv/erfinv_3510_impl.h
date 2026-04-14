@@ -40,8 +40,14 @@ constexpr float ERFINV_LOG2_THRESHOLD = -8.2f;
 // Polynomial coefficients for near-±1 approximation (using rsqrtNegLog)
 // poly = ((((0.83535343 * rsqrtNegLog - 0.09522479) * rsqrtNegLog - 0.67521554) * rsqrtNegLog + 1.5970111) * rsqrtNegLog - 0.6630042) * rsqrtNegLog - 0.5899144
 __simd_callee__ inline void ErfinvComputeNearOne(
-    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& rsqrtNegLogReg, Reg::MaskReg& mask)
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& negLog2Reg, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask)
 {
+    Reg::RegTensor<float> sqrtNegLogReg, rsqrtNegLogReg, oneReg, denominatorReg;
+
+    Reg::Sqrt(sqrtNegLogReg, negLog2Reg, mask);
+    Reg::Duplicate(oneReg, 1.0f, mask);
+    Reg::Div(rsqrtNegLogReg, oneReg, sqrtNegLogReg, mask);
+
     constexpr float COEF0 = 0.83535343f;
     constexpr float COEF1 = -0.09522479f;
     constexpr float COEF2 = -0.67521554f;
@@ -61,14 +67,22 @@ __simd_callee__ inline void ErfinvComputeNearOne(
     Reg::Mul(tmpReg, tmpReg, rsqrtNegLogReg, mask);
     Reg::Adds(tmpReg, tmpReg, COEF5, mask);
 
+    Reg::Div(denominatorReg, oneReg, rsqrtNegLogReg, mask);
     // finalTerm = tmpReg / rsqrtNegLog
-    Reg::Div(dstReg, tmpReg, rsqrtNegLogReg, mask);
+    Reg::Mul(dstReg, denominatorReg, tmpReg, mask);
+
+    // Extract sign bit from original x
+    Reg::Duplicate(signBitReg, 0x80000000u, mask);
+    Reg::And(signBitReg, (Reg::RegTensor<uint32_t>&)srcReg, signBitReg, mask);
+
+    // Apply sign bit to near-±1 result
+    Reg::Or(dstReg, signBitReg, (Reg::RegTensor<uint32_t>&)dstReg, mask);
 }
 
 // Polynomial coefficients for middle range approximation (using negLog2)
 // poly = (((((((-2.5172708e-10 * negLog2 + 9.427429e-9) * negLog2 - 1.2054752e-7) * negLog2 + 2.1697005e-7) * negLog2 + 8.0621484e-6) * negLog2 - 3.1675492e-5) * negLog2 - 0.0007743631) * negLog2 + 0.005546588) * negLog2 + 0.16082023) * negLog2 + 0.8862269
 __simd_callee__ inline void ErfinvComputeMiddle(
-    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& negLog2Reg, Reg::MaskReg& mask)
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& negLog2Reg, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask)
 {
     constexpr float COEF0 = -2.5172708e-10f;
     constexpr float COEF1 = 9.427429e-9f;
@@ -101,7 +115,7 @@ __simd_callee__ inline void ErfinvComputeMiddle(
     Reg::Mul(tmpReg, tmpReg, negLog2Reg, mask);
     Reg::Adds(tmpReg, tmpReg, COEF9, mask);
 
-    dstReg = tmpReg;
+    Reg::Mul(dstReg, tmpReg, srcReg, mask);
 }
 
 // Core computation for erfinv
@@ -111,7 +125,7 @@ __simd_callee__ inline void ErfinvCoreCompute(
     Reg::RegTensor<float> oppositeXReg, temp1Reg, log2TempReg, negLog2Reg;
     Reg::RegTensor<float> sqrtNegLogReg, rsqrtNegLogReg, nearOneResult, middleResult;
     Reg::RegTensor<uint32_t> signBitReg, resultBitsReg;
-    Reg::MaskReg cmpMask;
+    Reg::MaskReg nearOneMask, middleMask;
 
     // oppositeX = -x
     Reg::Neg(oppositeXReg, srcReg, mask);
@@ -128,28 +142,17 @@ __simd_callee__ inline void ErfinvCoreCompute(
 
     // Check if log2Temp < -8.2f (near ±1 case)
     Reg::Duplicate(oppositeXReg, ERFINV_LOG2_THRESHOLD, mask);
-    Reg::Compare<float, CMPMODE::LT>(cmpMask, log2TempReg, oppositeXReg, mask);
+    Reg::Compare<float, CMPMODE::LT>(nearOneMask, log2TempReg, oppositeXReg, mask);
+    Reg::Compare<float, CMPMODE::GE>(middleMask, log2TempReg, oppositeXReg, mask);
 
     // Compute near-±1 approximation
-    Reg::Sqrt(sqrtNegLogReg, negLog2Reg, mask);
-    Reg::RegTensor<float> oneReg;
-    Reg::Duplicate(oneReg, 1.0f, mask);
-    Reg::Div(rsqrtNegLogReg, oneReg, sqrtNegLogReg, mask);
-    ErfinvComputeNearOne(nearOneResult, rsqrtNegLogReg, mask);
-
-    // Extract sign bit from original x
-    Reg::Duplicate(signBitReg, 0x80000000u, mask);
-    Reg::And(signBitReg, (Reg::RegTensor<uint32_t>&)srcReg, signBitReg, mask);
-
-    // Apply sign bit to near-±1 result
-    Reg::Or(resultBitsReg, signBitReg, (Reg::RegTensor<uint32_t>&)nearOneResult, mask);
+    ErfinvComputeNearOne(nearOneResult, negLog2Reg, srcReg, nearOneMask);
 
     // Compute middle range approximation
-    ErfinvComputeMiddle(middleResult, negLog2Reg, mask);
-    Reg::Mul(middleResult, middleResult, srcReg, mask);
+    ErfinvComputeMiddle(middleResult, negLog2Reg, srcReg, middleMask);
 
     // Select result based on threshold
-    Reg::Select(dstReg, (Reg::RegTensor<float>&)resultBitsReg, middleResult, cmpMask);
+    Reg::Select(dstReg, nearOneResult, middleResult, nearOneMask);
 }
 
 template <typename T, bool isReuseSource = false>
