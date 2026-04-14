@@ -181,6 +181,8 @@ add_library(
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:${TOP_DIR}/metadef/base/asc/tilingdata_base_impl.cc>
   )
 
+add_dependencies(tiling_api gen_kernel_tiling)
+
 target_include_directories(tiling_api PRIVATE
   ${KERNEL_TILING_DIR}
   ${ASCENDC_DIR}/include/utils/context
