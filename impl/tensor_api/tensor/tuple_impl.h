@@ -78,7 +78,7 @@ __aicore__ inline constexpr auto TransformTupleApply(const T& t, const U& u, con
         return TransformTupleApplyImpl(
             t, u, f, Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<T>>>{});
     } else {
-        static_assert(!Std::is_tuple_v<Std::remove_cvref_t<U>>, "Two tuple needs to be the same tuple size")
+        static_assert(!Std::is_tuple_v<Std::remove_cvref_t<U>>, "Two tuple needs to be the same tuple size");
         return f(t, u);
     }
 }
