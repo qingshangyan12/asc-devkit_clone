@@ -74,6 +74,93 @@ template <typename Coord, typename LayoutType, typename TensorType>
     return MakeLayout(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride());
 }
 
+template <typename LayoutType, typename TileShape, Std::enable_if_t<!is_layout_v<TileShape>, int> = 0>
+__aicore__ inline decltype(auto) MakeSliceLayout(const LayoutType& layout, const TileShape& tileShape) 
+{
+    static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
+    using OriginShape = Std::remove_cvref_t<decltype(layout.Shape())>;
+    if constexpr (Std::is_tuple_v<TileShape>
+            && nesting_depth_v<TileShape> == nesting_depth_v<OriginShape>
+            && Std::tuple_size_v<TileShape> == Std::tuple_size_v<OriginShape>) {
+        return MakeLayout(tileShape, layout.Stride());	 
+    } else {
+        static_assert(Std::is_tuple_v<TileShape>,"TileShape must be a tuple");
+        static_assert(nesting_depth_v<TileShape> == TWO_DIM_DATA, "Only Support Two Dim TileShape");
+        static_assert(nesting_depth_v<OriginShape> == FOUR_DIM_DATA, "Only Support Four Dim Layout");
+
+        auto innerRow = Std::get<0>(GetShape<0>(layout));
+        auto innerCol = Std::get<0>(GetShape<1>(layout));
+
+        auto srcRow = innerRow * Std::get<1>(GetShape<0>(layout));
+        auto srcCol = innerCol * Std::get<1>(GetShape<1>(layout));
+
+        auto realRow = Std::min(srcRow, Std::get<0>(tileShape));	 
+        auto realCol = Std::min(srcCol, Std::get<1>(tileShape));
+    
+        return MakeLayout(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride()); 
+    } 
+}
+
+template <typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<is_layout_v<DstLayoutType>, int> = 0>
+__aicore__ inline decltype(auto) MakeSliceLayout(const SrcLayoutType& srcLayout, const DstLayoutType& dstLayout) 
+{
+    static_assert(is_layout_v<SrcLayoutType>, "SrcLayoutType must be Layout");
+    static_assert(SrcLayoutType::rank == DstLayoutType::rank,
+        "Tensor Rank must be equal to Layout rank");
+
+    auto dstRow = Std::get<0>(Std::get<0>(dstLayout.Shape())) * Std::get<1>(Std::get<0>(dstLayout.Shape()));
+    auto dstCol = Std::get<0>(Std::get<1>(dstLayout.Shape())) * Std::get<1>(Std::get<1>(dstLayout.Shape()));
+
+    return MakeSliceLayout(srcLayout, MakeShape(dstRow, dstCol));
+}
+
+template <typename ShapeType, typename CoordType>
+__aicore__ inline constexpr auto MakeCoordShape(const ShapeType& shape, const CoordType& coord);
+
+template <typename ShapeType, typename CoordType, size_t... Is>
+__aicore__ inline constexpr auto MakeCoordShapeImpl(const ShapeType& shape, const CoordType& coord,
+    Std::index_sequence<Is...>)
+{
+    return MakeShape(MakeCoordShape(Std::get<Is>(shape), Std::get<Is>(coord))...);
+}
+
+template <typename ShapeType, typename CoordType>
+__aicore__ inline constexpr auto MakeCoordShape(const ShapeType& shape, const CoordType& coord)
+{
+    if constexpr (Std::is_tuple_v<ShapeType>) {
+        static_assert(nesting_depth_v<ShapeType> == nesting_depth_v<CoordType> && Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>,
+            "coord and layout.Shape() must have same tuple structure");
+        return MakeCoordShapeImpl(shape, coord,
+            Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<ShapeType>>>{});
+    } else {
+        static_assert(!Std::is_tuple_v<CoordType>, "coord and layout.Shape() must have same tuple structure");
+        return shape - coord;
+    }
+}
+
+template <typename Coord, typename LayoutType>
+__aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const LayoutType& layout) 
+{
+    static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
+    using ShapeType = Std::remove_cvref_t<decltype(layout.Shape())>;
+    using CoordType = Std::remove_cvref_t<Coord>;
+    if constexpr (Std::is_tuple_v<CoordType>
+            && nesting_depth_v<ShapeType> == nesting_depth_v<CoordType>
+            && Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>) {
+        auto coordShape = MakeCoordShape(layout.Shape(), coord);
+        return MakeLayout(coordShape, layout.Stride());
+    } else {
+        static_assert(Std::is_tuple_v<CoordType>, "Coord must be a tuple");
+        static_assert(Std::tuple_size_v<CoordType> == TWO_DIM_DATA, "Only Support Two Dim Coord");
+        static_assert(Std::remove_cvref_t<LayoutType>::rank == TWO_DIM_DATA,
+            "Only Support Rank-2 Layout when coord structure differs from shape");
+
+        auto coordShape = MakeShape(Product{}(GetShape<0>(layout)) - Std::get<0>(coord),
+                                    Product{}(GetShape<1>(layout)) - Std::get<1>(coord));
+        return MakeSliceLayout(layout, coordShape);
+    }
+}
+
 } // namespace Te
 } // namespace AscendC
 
