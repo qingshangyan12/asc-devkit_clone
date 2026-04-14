@@ -9,29 +9,55 @@
 # ----------------------------------------------------------------------------------------------------------
 
 
-npu_op_kernel_sources(ascendc_kernels
-    OP_TYPE AddCustom
-    KERNEL_DIR add_custom
-    KERNEL_FILE add_custom_kernel.cpp
-)
+if(CUSTOM_OP_SELECTED_PROFILE STREQUAL "add_custom")
+    npu_op_kernel_sources(ascendc_kernels
+        OP_TYPE AddCustom
+        KERNEL_DIR add_custom
+        KERNEL_FILE add_custom_kernel.cpp
+    )
 
-npu_op_kernel_sources(ascendc_kernels
-    OP_TYPE LeakyReluCustom
-    KERNEL_DIR leaky_relu_custom
-    KERNEL_FILE leaky_relu_custom_kernel.cpp
-)
+    npu_op_kernel_sources(ascendc_kernels
+        OP_TYPE AddCustomTilingSink
+        KERNEL_DIR add_custom_tiling_sink
+        KERNEL_FILE add_custom_tiling_sink_kernel.cpp
+    )
 
-npu_op_kernel_sources(ascendc_kernels
-    OP_TYPE AddCustomTilingSink
-    KERNEL_DIR add_custom_tiling_sink
-    KERNEL_FILE add_custom_tiling_sink_kernel.cpp
-)
+    npu_op_kernel_sources(ascendc_kernels
+        OP_TYPE AddCustomTemplate
+        KERNEL_DIR add_custom_template
+        KERNEL_FILE add_custom_template.cpp
+    )
+elseif(CUSTOM_OP_SELECTED_PROFILE STREQUAL "leaky_relu_custom")
+    npu_op_kernel_sources(ascendc_kernels
+        OP_TYPE LeakyReluCustom
+        KERNEL_DIR leaky_relu_custom
+        KERNEL_FILE leaky_relu_custom_kernel.cpp
+    )
+elseif(CUSTOM_OP_SELECTED_PROFILE STREQUAL "all")
+    npu_op_kernel_sources(ascendc_kernels
+        OP_TYPE AddCustom
+        KERNEL_DIR add_custom
+        KERNEL_FILE add_custom_kernel.cpp
+    )
 
-npu_op_kernel_sources(ascendc_kernels
-    OP_TYPE AddCustomTemplate
-    KERNEL_DIR add_custom_template
-    KERNEL_FILE add_custom_template.cpp
-)
+    npu_op_kernel_sources(ascendc_kernels
+        OP_TYPE LeakyReluCustom
+        KERNEL_DIR leaky_relu_custom
+        KERNEL_FILE leaky_relu_custom_kernel.cpp
+    )
+
+    npu_op_kernel_sources(ascendc_kernels
+        OP_TYPE AddCustomTilingSink
+        KERNEL_DIR add_custom_tiling_sink
+        KERNEL_FILE add_custom_tiling_sink_kernel.cpp
+    )
+
+    npu_op_kernel_sources(ascendc_kernels
+        OP_TYPE AddCustomTemplate
+        KERNEL_DIR add_custom_template
+        KERNEL_FILE add_custom_template.cpp
+    )
+endif()
 
 npu_op_kernel_library(ascendc_kernels
     SRC_BASE ${CMAKE_CURRENT_SOURCE_DIR}

@@ -9,10 +9,22 @@
 # ----------------------------------------------------------------------------------------------------------
 
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tf_plugin")
-    add_subdirectory(tf_plugin)
-endif()
+if(CUSTOM_OP_SELECTED_PROFILE STREQUAL "add_custom")
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tf_plugin")
+        add_subdirectory(tf_plugin)
+    endif()
+elseif(CUSTOM_OP_SELECTED_PROFILE STREQUAL "leaky_relu_custom")
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/onnx_plugin")
+        add_subdirectory(onnx_plugin)
+    endif()
+elseif(CUSTOM_OP_SELECTED_PROFILE STREQUAL "all")
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tf_plugin")
+        add_subdirectory(tf_plugin)
+    endif()
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/onnx_plugin")
-    add_subdirectory(onnx_plugin)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/onnx_plugin")
+        add_subdirectory(onnx_plugin)
+    endif()
+else()
+    message(FATAL_ERROR "Unsupported CUSTOM_OP_SELECTED_PROFILE: ${CUSTOM_OP_SELECTED_PROFILE}")
 endif()

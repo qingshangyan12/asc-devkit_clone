@@ -9,13 +9,30 @@
 # ----------------------------------------------------------------------------------------------------------
 
 
-file(GLOB host_ops_srcs
-    add_custom/add_custom_host.cpp
-    add_custom_tiling_sink/add_custom_tiling_sink_tiling.cpp
-    add_custom_tiling_sink/add_custom_tiling_sink.cpp
-    add_custom_template/add_custom_template.cpp
-    leaky_relu_custom/leaky_relu_custom_host.cpp
-)
+if(CUSTOM_OP_SELECTED_PROFILE STREQUAL "add_custom")
+    file(GLOB host_ops_srcs
+        add_custom/add_custom_host.cpp
+        add_custom_tiling_sink/add_custom_tiling_sink_tiling.cpp
+        add_custom_tiling_sink/add_custom_tiling_sink.cpp
+        add_custom_template/add_custom_template.cpp
+    )
+    set(enable_add_tiling_sink TRUE)
+elseif(CUSTOM_OP_SELECTED_PROFILE STREQUAL "leaky_relu_custom")
+    file(GLOB host_ops_srcs
+        leaky_relu_custom/leaky_relu_custom_host.cpp
+    )
+    set(enable_add_tiling_sink FALSE)
+elseif(CUSTOM_OP_SELECTED_PROFILE STREQUAL "all")
+    file(GLOB host_ops_srcs
+        add_custom/add_custom_host.cpp
+        add_custom_tiling_sink/add_custom_tiling_sink_tiling.cpp
+        add_custom_tiling_sink/add_custom_tiling_sink.cpp
+        add_custom_template/add_custom_template.cpp
+        leaky_relu_custom/leaky_relu_custom_host.cpp
+    )
+    set(enable_add_tiling_sink TRUE)
+endif()
+
 npu_op_code_gen(
     SRC ${host_ops_srcs}
     PACKAGE ${package_name}
@@ -23,9 +40,6 @@ npu_op_code_gen(
 )
 npu_op_library(cust_optiling TILING
     ${host_ops_srcs}
-)
-npu_op_device_tiling_library(cust_opmaster SHARED
-    add_custom_tiling_sink/add_custom_tiling_sink_tiling.cpp
 )
 
 file(GLOB autogen_aclnn_src ${ASCEND_AUTOGEN_PATH}/aclnn_*.cpp)
@@ -41,10 +55,20 @@ npu_op_library(cust_op_proto GRAPH
     ${proto_src}
 )
 
+set(package_libs
+    cust_optiling
+    cust_opapi
+    cust_op_proto
+)
+
+if(enable_add_tiling_sink)
+    npu_op_device_tiling_library(cust_opmaster SHARED
+        add_custom_tiling_sink/add_custom_tiling_sink_tiling.cpp
+    )
+    list(APPEND package_libs cust_opmaster)
+endif()
+
 npu_op_package_add(${package_name}
     LIBRARY
-        cust_optiling
-        cust_opapi
-        cust_op_proto
-        cust_opmaster  # for tiling sink
+        ${package_libs}
 )
