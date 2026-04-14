@@ -43,6 +43,6 @@ oat_reports/
 
 log/
 
-third_party/
+/third_party/
 
 openssl-device-src/
