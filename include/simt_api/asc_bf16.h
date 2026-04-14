@@ -8,6 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+
 #ifndef INCLUDE_SIMT_API_ASC_BF16_H
 #define INCLUDE_SIMT_API_ASC_BF16_H
 
