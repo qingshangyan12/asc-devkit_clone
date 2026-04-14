@@ -30,10 +30,10 @@
 namespace AscendC {
 namespace Te {
 
-constexpr LoadDataTrait DEFAULT_COPY_L1_TO_L0A_TRAIT;
+constexpr CopyL12L0ATrait DEFAULT_COPY_L1_TO_L0A_TRAIT;
 
 struct CopyL12L0ATraitDefault {
-    using TraitType = LoadDataTrait;
+    using TraitType = CopyL12L0ATrait;
     static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0A_TRAIT;
 };
 
@@ -48,7 +48,7 @@ public:
     }
 
 private:
-    template<const LoadDataTrait& trait = DEFAULT_COPY_L1_TO_L0A_TRAIT, typename T, typename U>
+    template<const CopyL12L0ATrait& trait = DEFAULT_COPY_L1_TO_L0A_TRAIT, typename T, typename U>
     __aicore__ inline static void LoadData(const T& dst, const U& src)
     {
         constexpr Hardware dstPos = GetHardPos<T>();
@@ -57,7 +57,7 @@ private:
         Tensor2Tensor::template Run<trait, T, U>(dst, src);
     }
 
-    template<const LoadDataTrait& trait = DEFAULT_COPY_L1_TO_L0A_TRAIT, typename T, typename U, class Coord>
+    template<const CopyL12L0ATrait& trait = DEFAULT_COPY_L1_TO_L0A_TRAIT, typename T, typename U, class Coord>
     __aicore__ inline static void LoadData(const T& dst, const U& src, const Coord& coord)
     {
         constexpr Hardware dstPos = GetHardPos<T>();
