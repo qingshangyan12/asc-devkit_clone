@@ -71,7 +71,7 @@ add_subdirectory(tiling)
 if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
   include(ExternalProject)
   ExternalProject_Add(device_tiling
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake/device
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tiling
     CONFIGURE_COMMAND ${CMAKE_COMMAND}
     -G ${CMAKE_GENERATOR}
     -DBUILD_OPEN_PROJECT=${BUILD_OPEN_PROJECT}
