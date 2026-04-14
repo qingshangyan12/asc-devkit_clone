@@ -91,20 +91,6 @@ struct MakeZzFrameLayout {
     }
 };
 
-struct MakeScaleZzFrameLayout {
-    template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column) {
-        constexpr auto c0Ele = TraitType::C0_ELEMENT;
-        static_assert(c0Ele == 2, "ScaleZzLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
-        auto shape = MakeShape(MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED)),
-                               MakeShape(c0Ele, Std::ceil_division(column, c0Ele)));
-        auto stride = MakeStride(MakeStride(c0Ele, FRACTAL_FIXED * Std::ceil_align(column, c0Ele)),
-                                 MakeStride(Std::Int<1>{}, c0Ele * Std::Int<FRACTAL_FIXED>{}));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ScaleZzLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
-    }
-};
-
 struct MakeNnFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
