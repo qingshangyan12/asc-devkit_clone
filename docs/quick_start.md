@@ -81,7 +81,7 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
     运行算子时必须安装驱动与固件，若仅编译算子，可跳过本操作，安装指导请参考[CANN软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
    
-2. 安装社区版CANN toolkit包。
+2. 安装最新版CANN toolkit包。
 
     ```bash
     # 确保安装包具有可执行权限
@@ -90,7 +90,7 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
     ./Ascend-cann-toolkit_${cann_version}_linux-${arch}.run --install --install-path=${install_path}
     ```
 
-3. 安装社区版CANN ops包。
+3. 安装最新版CANN ops包。
 
     运行算子前必须安装本包，若仅编译算子，可跳过本操作。
 
@@ -109,6 +109,10 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
 如果您想体验**官网正式发布的CANN包**能力，请访问[CANN官网下载中心](https://www.hiascend.com/cann/download)，选择对应版本CANN软件包（仅支持CANN 8.5.0及后续版本）进行安装。
 
+进入官网后，首先点击**版本选择**，定位目标版本。随后，根据您的**产品系列**、**CPU架构**和**操作系统**，选择合适的安装方式。我们提供了多种安装方式，以Ubuntu为例，包括：**在线安装（apt-get）、在线安装（Conda）、离线安装（Runfile）**，您可根据实际需求灵活选择。
+
+> [!NOTE]
+> 如果您不清楚设备的具体硬件信息，可使用页面提供的相关命令进行查询。系统将根据查询结果自动匹配对应的**产品系列**。
 
 ## 环境验证
 
