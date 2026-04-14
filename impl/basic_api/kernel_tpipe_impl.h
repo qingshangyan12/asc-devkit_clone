@@ -160,7 +160,10 @@ __aicore__ inline void TPipe::AllocAddrs(TBufType* ptr, const First& addr, const
     constexpr bool useAltBufId = T::config.consumerSize > 1;
     ptr->state = TBufState::FREE;
     ptr->freeBufEvt = T::freeBufEvt;
-    if constexpr (T::queDepth == 0) {
+    if constexpr (UseBufIdSync<T>()) {
+        ptr->bufId = AllocMutexID();
+        ptr->bufIdAlt = INVALID_TEVENTID;
+    } else if constexpr (T::queDepth == 0) {
         ptr->enQueEvtID = AllocEventID<T::enQueEvt>();
         ptr->freeBufEvtID = AllocEventID<T::freeBufEvt>();
         SetFlag<T::freeBufEvt>(ptr->freeBufEvtID);
@@ -267,7 +270,10 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
     for (int32_t i = 0; i < num; i++, ptr++) {
         ptr->state = TBufState::FREE;
         ptr->freeBufEvt = T::freeBufEvt;
-        if constexpr (T::queDepth == 0) {
+        if constexpr (UseBufIdSync<T>()) {
+            ptr->bufId = AllocMutexID();
+            ptr->bufIdAlt = INVALID_TEVENTID;
+        } else if constexpr (T::queDepth == 0) {
             ptr->enQueEvtID = AllocEventID<T::enQueEvt>();
             ptr->freeBufEvtID = AllocEventID<T::freeBufEvt>();
             SetFlag<T::freeBufEvt>(ptr->freeBufEvtID);
@@ -927,6 +933,18 @@ __aicore__ inline void TPipe::InitSocState() const
 {
     AscendCUtils::InitSocStateImpl();
 }
+
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102
+__aicore__ inline MutexID TPipe::AllocMutexID()
+{
+    return ::AscendC::AllocMutexID();
+}
+
+__aicore__ inline void TPipe::ReleaseMutexID(MutexID id)
+{
+    ::AscendC::ReleaseMutexID(id);
+}
+#endif
 
 __aicore__ inline void TPipe::ResetPool()
 {
