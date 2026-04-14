@@ -33,6 +33,11 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #endif
 
 namespace __asc_aicore {
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+{
+    copy_ubuf_to_gm_align_v2(dst, src, 1, size, 0, 0, 0, 0);
+}
+
 __aicore__ inline void enable_asc_diagnostics()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
@@ -288,6 +293,20 @@ __aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint
 #else
     version = 0;
 #endif
+}
+
+__aicore__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr_aicore(uint64_t addr, uint16_t blockIdx = 0)
+{
+    return __asc_simd_vf::get_printf_ubuf_addr(addr, blockIdx);
+}
+
+__aicore__ __gm__ inline BlockRingBufInfo* get_block_ring_buf_info()
+{
+    const uint32_t blockIdx = asc_debug_get_core_idx();
+    const uint32_t blockLength = reinterpret_cast<__gm__ BlockRingBufInfo*>(g_sysPrintFifoSpace)->length;
+    __gm__ BlockRingBufInfo* blockInfo =
+        reinterpret_cast<__gm__ BlockRingBufInfo*>(g_sysPrintFifoSpace + blockLength * blockIdx);
+    return blockInfo;
 }
 
 } // namespace __asc_aicore
