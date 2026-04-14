@@ -2,6 +2,18 @@ set(HCCL_HCOMM_HEADER_DIR ${HCCL_CC_INCLUDE_DIR}/hcomm)
 set(HCCL_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(ORION_REAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/legacy)
 set(HCOMM_REAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/..)
+
+#组件间对外头文件目录
+add_library(hccl_headers INTERFACE)
+target_include_directories(hccl_headers INTERFACE
+    $<BUILD_INTERFACE:${TOP_DIR}/hcomm/include>
+    $<BUILD_INTERFACE:${TOP_DIR}/hcomm/include/hccl>
+    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:include/hccl>
+    $<INSTALL_INTERFACE:include/hccl/external>
+    $<INSTALL_INTERFACE:include/hccl/external/hccl>
+)
+
 # 创建 ccl_kernel_plf共享库
 add_library(ccl_kernel_plf  SHARED)
 # 创建 ccl_kernel_plf_a静态库
@@ -12,6 +24,7 @@ if(BUILD_OPEN_PROJECT)
     include(${HCCL_CC_DIR}/cmake/hcomm_utils.cmake)
     include(${HCCL_CC_DIR}/cmake/third_party/json.cmake)
     include(${HCCL_CC_DIR}/cmake/third_party/openssl.cmake)
+    include(${HCCL_CC_DIR}/cmake/third_party/rdma-core.cmake)
 
     target_compile_definitions(ccl_kernel_plf PRIVATE
         OPEN_BUILD_PROJECT)

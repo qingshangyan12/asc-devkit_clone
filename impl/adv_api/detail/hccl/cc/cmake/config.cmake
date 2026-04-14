@@ -74,19 +74,38 @@ function(generate_stub STUB)
     endif() 
 endfunction(generate_stub) 
 
-if(AARCH_MODE)
-    set(STUBS
-        ccl_kernel
-        c_sec
-        unified_dlog
-        mmpa
-    )
-    foreach(STUB ${STUBS})
-        if(NOT TARGET ${STUB})
-            generate_stub(${STUB})
-        endif()
-    endforeach()
+if (NOT DEVICE_MODE)
+set(HOST_STUBS
+    ascendcl
+    tsdclient
+)
 endif()
+
+if (AARCH_MODE)
+    set(STUBS
+        ascend_hal
+        slog
+        aicpu_sharder
+        ${HOST_STUBS}
+    )
+else()
+    set(STUBS
+        ascend_hal
+        slog
+        aicpu_sharder
+        ${HOST_STUBS}
+        runtime
+        acl_rt
+        opp_registry
+        error_manager
+    )
+endif()
+
+foreach(STUB ${STUBS})
+    if(NOT TARGET ${STUB})
+        generate_stub(${STUB})
+    endif()
+endforeach()
 
 # if(NOT TARGET hcomm)
 #     generate_stub(hcomm)

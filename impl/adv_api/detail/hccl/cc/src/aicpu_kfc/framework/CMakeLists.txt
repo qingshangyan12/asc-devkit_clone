@@ -289,7 +289,7 @@ set(ORION_HEAD_LIST)
 FILE(GLOB_RECURSE sources_list LIST_DIRECTORIES TRUE ${HCCL_V2_CODE_ROOT})
 
 foreach (dir ${sources_list})
-    IF ((IS_DIRECTORY ${dir}) AND (${dir} MATCHES "aicu_kfc/legacy") AND (NOT ${dir} MATCHES "aicpu_kfc/legacy/mdpi"))
+    IF ((IS_DIRECTORY ${dir}) AND (${dir} MATCHES "aicpu_kfc/legacy") AND (NOT ${dir} MATCHES "aicpu_kfc/legacy/mdpi"))
         list(APPEND ORION_HEAD_LIST ${dir})
     endif()
 endforeach()
