@@ -15,7 +15,7 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-2)")
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-4)")
 set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "CMAKE_ASC_ARCHITECTURES, e.g. dav-2201, dav-3510")
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})

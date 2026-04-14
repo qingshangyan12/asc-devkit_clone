@@ -34,17 +34,17 @@ def gen_golden_data(scenario_num):
     """
     生成测试输入数据和真值数据
     Args:
-        scenario_num: 场景编号(1=双Tensor模式,2=Tensor+Scalar模式)
+        scenario_num: 场景编号
     """
     input_type = np.float32
     input_sel_type = np.uint8
     output_type = input_type
     input_size = 256
-    input_sel_size = 128 if scenario_num == 1 else 32
+    input_sel_size = 8 if scenario_num == 1 else 32
     input_y_size = 256
     output_size = 256
-    mask_num = 64  # 场景1使用，selMask的有效数值
-    scalar = 0 # 场景2使用
+    mask_num = 64  # selMask的有效数值
+    scalar = 0 # 标量
 
     input_shape = [input_size]
     input_sel_shape = [input_sel_size]
@@ -63,7 +63,7 @@ def gen_golden_data(scenario_num):
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
-    if scenario_num == 1:
+    if scenario_num == 1 or scenario_num == 3:
         input_y = np.random.uniform(min_val, max_val, input_y_shape).astype(input_type)
         input_y.tofile("./input/input_y.bin")
 
@@ -72,13 +72,13 @@ def gen_golden_data(scenario_num):
             sel_idx = i % mask_num
             byte_idx = sel_idx // 8
             bit_idx = sel_idx % 8
-        elif scenario_num == 2:
+        elif scenario_num == 2 or scenario_num == 3 or scenario_num == 4:
             byte_idx = i // 8
             bit_idx = i % 8
         if(input_sel[byte_idx] >> bit_idx) & 1:
             golden[i] = input_x[i]
         else:
-            golden[i] = input_y[i] if scenario_num == 1 else scalar
+            golden[i] = input_y[i] if (scenario_num == 1 or scenario_num == 3) else scalar
     
     input_x.tofile("./input/input_x.bin")
     input_sel.tofile("./input/input_sel.bin")
@@ -87,6 +87,6 @@ def gen_golden_data(scenario_num):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenario_num', type=int, default=1, choices=range(1, 3))
+    parser.add_argument('-scenario_num', type=int, default=1, choices=range(1, 5))
     args = parser.parse_args()
     gen_golden_data(args.scenario_num)
