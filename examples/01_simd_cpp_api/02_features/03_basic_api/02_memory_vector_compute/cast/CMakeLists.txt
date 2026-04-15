@@ -27,6 +27,10 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
+target_compile_definitions(demo PRIVATE
+    SCENARIO=${SCENARIO}
+)
+
 # ======================================================================================
 # NPU 编译选项配置
 #
