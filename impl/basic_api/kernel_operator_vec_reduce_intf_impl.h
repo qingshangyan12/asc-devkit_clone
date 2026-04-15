@@ -74,9 +74,12 @@ __aicore__ inline void BlockReduceSum(const LocalTensor<T>& dst, const LocalTens
     CheckMaskValue<PrimType, isSetMask>(mask, "BlockReduceSum");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "BlockReduceSum, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "BlockReduceSum, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "BlockReduceSum");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -114,9 +117,12 @@ __aicore__ inline void BlockReduceMax(const LocalTensor<T>& dst, const LocalTens
     CheckMaskValue<PrimType, isSetMask>(mask, "BlockReduceMax");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "BlockReduceMax, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "BlockReduceMax, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "BlockReduceMax");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -154,9 +160,12 @@ __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTens
     CheckMaskValue<PrimType, isSetMask>(mask, "BlockReduceMin");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "BlockReduceMin, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "BlockReduceMin, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "BlockReduceMin");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -198,9 +207,12 @@ __aicore__ inline void PairReduceSum(const LocalTensor<T>& dst, const LocalTenso
     CheckMaskValue<PrimType, isSetMask>(mask, "PairReduceSum");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "PairReduceSum, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "PairReduceSum, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "PairReduceSum");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -227,9 +239,12 @@ __aicore__ inline void BlockReduceSum(const LocalTensor<T>& dst, const LocalTens
     CheckMaskArray<PrimType, isSetMask>(mask, "BlockReduceSum");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "BlockReduceSum, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "BlockReduceSum, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "BlockReduceSum");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -256,9 +271,12 @@ __aicore__ inline void BlockReduceMax(const LocalTensor<T>& dst, const LocalTens
     CheckMaskArray<PrimType, isSetMask>(mask, "BlockReduceMax");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "BlockReduceMax, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "BlockReduceMax, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "BlockReduceMax");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -285,9 +303,12 @@ __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTens
     CheckMaskArray<PrimType, isSetMask>(mask, "BlockReduceMin");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "BlockReduceMin, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "BlockReduceMin, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "BlockReduceMin");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -318,9 +339,12 @@ __aicore__ inline void PairReduceSum(const LocalTensor<T>& dst, const LocalTenso
     CheckMaskArray<PrimType, isSetMask>(mask, "PairReduceSum");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "PairReduceSum, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "PairReduceSum, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "PairReduceSum");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -381,9 +405,12 @@ __aicore__ inline void RepeatReduceSum(const LocalTensor<T>& dst, const LocalTen
     CheckMaskValue<PrimType, isSetMask>(mask, "RepeatReduceSum");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "RepeatReduceSum, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "RepeatReduceSum, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "RepeatReduceSum");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -446,9 +473,12 @@ __aicore__ inline void WholeReduceSum(const LocalTensor<T>& dst, const LocalTens
     CheckMaskArray<PrimType, isSetMask>(mask, "WholeReduceSum");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "WholeReduceSum, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "WholeReduceSum, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceSum");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -487,11 +517,15 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
     CheckMaskArray<PrimType, isSetMask>(mask, "WholeReduceMax");
 #endif
 #endif
-#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "WholeReduceMax, current api support dtype combination is src and dst both: half / float");});
+#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 2201))
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "WholeReduceMax, current api support dtype combination is src and dst both: half / float.\n"));
 #endif
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceMax");
+#endif
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
     (__NPU_ARCH__ == 5102) ||                        \
@@ -537,11 +571,14 @@ __aicore__ inline void WholeReduceMinCommon(const LocalTensor<T>& dst, const Loc
     const int32_t srcRepStride, ReduceOrder order)
 {
     using PrimType = PrimT<T>;
-#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "WholeReduceMin, current api support dtype combination is src and dst both: half / float");});
+#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 2201))
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "WholeReduceMin, current api support dtype combination is src and dst both: half / float.\n"));
 #endif
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceMin");
+#endif
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
     (__NPU_ARCH__ == 5102) ||                        \
@@ -626,9 +663,12 @@ __aicore__ inline void WholeReduceSum(const LocalTensor<T>& dst, const LocalTens
     CheckMaskValue<PrimType, isSetMask>(mask, "WholeReduceSum");
 #endif
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "WholeReduceSum, current api support dtype combination is src and dst both: half / float");});
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "WholeReduceSum, current api support dtype combination is src and dst both: half / float.\n"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceSum");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -656,11 +696,15 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
     CheckMaskValue<PrimType, isSetMask>(mask, "WholeReduceMax");
 #endif
 #endif
-#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "WholeReduceMax, current api support dtype combination is src and dst both: half / float");});
+#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 ||
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 2201)
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "WholeReduceMax, current api support dtype combination is src and dst both: half / float.\n"));
 #endif
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201)
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceMax");
+#endif
 #if __NPU_ARCH__ == 2201
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMax");
 #elif __NPU_ARCH__ == 2002
