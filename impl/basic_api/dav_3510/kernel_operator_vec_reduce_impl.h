@@ -725,6 +725,27 @@ __simd_vf__ inline void ReduceB64SumImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLo
     Reg::StoreAlign(dstLocal, vreg1, maskFirstVal);
 }
 
+template <typename T, int foldNum = 1>
+__simd_vf__ inline void ReduceSumFoldImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal, uint32_t count)
+{
+    constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
+    Reg::RegTensor<T> srcReg0, srcReg1;
+    Reg::RegTensor<T> dstReg0, dstReg1;
+    Reg::MaskReg fullMask = Reg::CreateMask<T>();
+    Reg::MaskReg maskFirstVal = Reg::CreateMask<T, Reg::MaskPattern::VL1>();
+    Reg::LoadAlign(srcReg0, srcLocal);
+    Reg::LoadAlign(srcReg1, srcLocal + oneRepSize);
+    Reg::Add(dstReg0, srcReg0, srcReg1, fullMask);
+    if constexpr (foldNum == 2) {
+        Reg::LoadAlign(srcReg0, srcLocal + 2 * oneRepSize);
+        Reg::LoadAlign(srcReg1, srcLocal + 3 * oneRepSize);
+        Reg::Add(dstReg1, srcReg0, srcReg1, fullMask);
+        Reg::Add(dstReg0, dstReg0, dstReg1, fullMask);
+    }
+    Reg::ReduceSum(dstReg0, dstReg0, fullMask);
+    Reg::StoreAlign(dstLocal, dstReg0, maskFirstVal);
+}
+
 template <typename T>
 __aicore__ inline void ReduceSumImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal, __ubuf__ T *workLocal, uint32_t count)
 {
@@ -735,6 +756,10 @@ __aicore__ inline void ReduceSumImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal,
         constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
         if (count <= oneRepSize) {
             ReduceSumCounterMode<T, 1>(dstLocal, srcLocal, workLocal, count, 8);
+        } else if (count == oneRepSize * 2) {
+            ReduceSumFoldImpl<T, 1>(dstLocal, srcLocal, count);
+        } else if (count == oneRepSize * 4) {
+            ReduceSumFoldImpl<T, 2>(dstLocal, srcLocal, count);
         } else if (count <= oneRepSize * oneRepSize) {
             ReduceSumCounterMode<T, 2>(dstLocal, srcLocal, workLocal, count, 8);
         } else {
