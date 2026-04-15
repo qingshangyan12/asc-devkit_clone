@@ -111,6 +111,20 @@ __aicore__ inline void CheckTensorAlignment(const LocalTensor<T>& inputTensor, u
         tensorName, apiName, alignBytes, static_cast<unsigned long long>(tensorAddr)));
 }
 
+__aicore__ inline void CheckAddrAlignment(uint64_t addr, TPosition pos, uint32_t alignBytes,
+    const __gm__ char* addrName, const __gm__ char* apiName)
+{
+    uint64_t checkAddr = addr;
+#ifdef ASCENDC_CPU_DEBUG
+    auto positionHardMap = ConstDefiner::Instance().positionHardMap;
+    checkAddr = addr - reinterpret_cast<uint64_t>(
+        ConstDefiner::Instance().hardwareCpuBufferMap.at(positionHardMap.at(pos)));
+#endif
+    ASCENDC_DEBUG_ASSERT((checkAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s "
+        "address alignment in %s, all addresses should be %u bytes aligned.\n",
+        addrName, apiName, alignBytes));
+}
+
 template <typename T>
 __aicore__ inline void CheckValueRange(T value, T valueLow, T valueHigh, const __gm__ char* paramName,
     const __gm__ char* apiName)
@@ -167,6 +181,22 @@ __aicore__ inline void CheckMaskArray(const uint64_t mask[], const __gm__ char* 
             "in %s, when sizeof(T) == 8, mask[0] should be in range [0, UINT32_MAX], current value is %llu.\n", apiName,
             mask[0]));
     }
+}
+
+// Reduce API mask bit mode check for c220 (2201):
+// mask bit mode: mask[0] and mask[1] must not be both zero for 16-bit operand; mask[0] must not be zero for 32-bit operand
+template <typename T>
+__aicore__ inline void CheckReduceMaskNotAllZero(const uint64_t mask[], const __gm__ char* apiName)
+{
+#if __NPU_ARCH__ == 2201
+    if constexpr (sizeof(T) == 2) {
+        ASCENDC_DEBUG_ASSERT(!(mask[0] == 0 && mask[1] == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+            "mask[] in %s, mask[0] and mask[1] must not be both zero.\n", apiName));
+    } else if constexpr (sizeof(T) == 4) {
+        ASCENDC_DEBUG_ASSERT((mask[0] != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask[] in %s, mask[0] "
+            "must not be zero for 32-bit operand.\n", apiName));
+    }
+#endif
 }
 
 template <typename T, bool isSetMask = true>

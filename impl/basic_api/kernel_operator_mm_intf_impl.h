@@ -36,8 +36,10 @@ namespace AscendC {
 template <typename U>
 __aicore__ inline void CheckLoadData3dv1Params(const LoadData3DParamsV1<U>& loadDataParams)
 {
-    CheckValueRange<uint16_t>(loadDataParams.l1H, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1H", "LoadData with LoadData3DParamsV1");
-    CheckValueRange<uint16_t>(loadDataParams.l1W, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1W", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint16_t>(loadDataParams.l1H, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1H",
+        "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint16_t>(loadDataParams.l1W, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1W",
+        "LoadData with LoadData3DParamsV1");
     CheckValueRange<int32_t>(loadDataParams.c1Index, MIN_LOAD3D_C1_IDX, MAX_LOAD3D_C1_IDX, "c1Index",
         "LoadData with LoadData3DParamsV1");
     CheckValueRange<int32_t>(loadDataParams.fetchFilterW, MIN_LOAD3D_FETCH_FILTER, MAX_LOAD3D_FETCH_FILTER,
@@ -56,6 +58,7 @@ __aicore__ inline void CheckLoadData3dv1Params(const LoadData3DParamsV1<U>& load
         "LoadData with LoadData3DParamsV1");
     CheckValueRange<int32_t>(loadDataParams.filterH, MIN_LOAD3D_FILTER, MAX_LOAD3D_FILTER, "filterH",
         "LoadData with LoadData3DParamsV1");
+    // dilationFilter upper bound is 255, same as MAX_LOAD3D_FILTER
     CheckValueRange<int32_t>(loadDataParams.dilationFilterW, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
         "dilationFilterW", "LoadData with LoadData3DParamsV1");
     CheckValueRange<int32_t>(loadDataParams.dilationFilterH, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
@@ -64,6 +67,7 @@ __aicore__ inline void CheckLoadData3dv1Params(const LoadData3DParamsV1<U>& load
         "LoadData with LoadData3DParamsV1");
     CheckValueRange<int32_t>(loadDataParams.repeatMode, 0, 1, "repeatMode", "LoadData with LoadData3DParamsV1");
     CheckValueRange<int32_t>(loadDataParams.cSize, 0, 1, "cSize", "LoadData with LoadData3DParamsV1");
+    // repeatTime upper bound is 255, same as MAX_LOAD3D_FILTER
     CheckValueRange<int32_t>(loadDataParams.repeatTime, MIN_LOAD3D_REPEAT_TIMES, MAX_LOAD3D_FILTER, "repeatTime",
         "LoadData with LoadData3DParamsV1");
 }
@@ -73,8 +77,10 @@ __aicore__ inline void CheckLoadData3dv1Params(const LoadData3DParamsV1<U>& load
 template <typename U>
 __aicore__ inline void CheckLoadData3dv2Params(const LoadData3DParamsV2<U>& loadDataParams)
 {
-    CheckValueRange<uint16_t>(loadDataParams.l1H, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1H", "LoadData with LoadData3DParamsV2");
-    CheckValueRange<uint16_t>(loadDataParams.l1W, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1W", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint16_t>(loadDataParams.l1H, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1H",
+        "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint16_t>(loadDataParams.l1W, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1W",
+        "LoadData with LoadData3DParamsV2");
     CheckValueRange<uint16_t>(loadDataParams.kExtension, MIN_LOAD3D_EXTENSION, MAX_LOAD3D_EXTENSION, "kExtension",
         "LoadData with LoadData3DParamsV2");
     CheckValueRange<uint16_t>(loadDataParams.mExtension, MIN_LOAD3D_EXTENSION, MAX_LOAD3D_EXTENSION, "mExtension",
@@ -91,6 +97,7 @@ __aicore__ inline void CheckLoadData3dv2Params(const LoadData3DParamsV2<U>& load
         "LoadData with LoadData3DParamsV2");
     CheckValueRange<int32_t>(loadDataParams.filterH, MIN_LOAD3D_FILTER, MAX_LOAD3D_FILTER, "filterH",
         "LoadData with LoadData3DParamsV2");
+    // dilationFilter upper bound is 255, same as MAX_LOAD3D_FILTER
     CheckValueRange<int32_t>(loadDataParams.dilationFilterW, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
         "dilationFilterW", "LoadData with LoadData3DParamsV2");
     CheckValueRange<int32_t>(loadDataParams.dilationFilterH, MIN_LOAD3D_DILATION_FILTER, MAX_LOAD3D_FILTER,
@@ -246,6 +253,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     CheckLoadData3dv1Params<U>(loadDataParams);
 #endif
 #endif
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckLoadData3dParams(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.strideW, loadDataParams.strideH);
     ASCENDC_CHECK_VALUE_RANGE(loadDataParams.c1Index, MIN_LOAD3D_C1_IDX, MAX_LOAD3D_C1_IDX, "c1Index",
         "LoadData with LoadData3DParamsV1");
@@ -261,6 +269,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
         "LoadData with LoadData3DParamsV1");
     ASCENDC_CHECK_VALUE_RANGE(loadDataParams.repeatMode, 0, 1, "repeatMode", "LoadData with LoadData3DParamsV1");
     ASCENDC_CHECK_VALUE_RANGE(loadDataParams.cSize, 0, 1, "cSize", "LoadData with LoadData3DParamsV1");
+#endif
     LoadDataImpl<T, defaultConfig>(dst, src, loadDataParams);
 }
 
@@ -303,7 +312,8 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "LoadData with LoadData3DParamsV2");
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
     if (dstScope == Hardware::L0A) {
-        ASCENDC_DEBUG_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, float, uint32_t, int32_t, int4b_t>()),
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, float,
+            uint32_t, int32_t, int4b_t>()),
             KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst "
             "position is A2, current api support dtype combination is src and dst both: uint8_t / int8_t / half / "
             "bfloat16_t / float / uint32_t / int32_t / int4b_t.\n"));
