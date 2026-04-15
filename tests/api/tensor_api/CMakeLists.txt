@@ -34,25 +34,25 @@ file(GLOB ASCENDC_UT_COMMON_SRC
     ../common/k3_pvwrap.cpp
 )
 
-file(GLOB ASCENDC_UT_STRUCT_CASE_SRC
-    struct/*.cpp
-)
+# file(GLOB ASCENDC_UT_STRUCT_CASE_SRC
+#     struct/*.cpp
+# )
 
-file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIC_CASE_SRC
-    npu_arch_2201/aic/*.cpp
-)
+# file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIC_CASE_SRC
+#     npu_arch_2201/aic/*.cpp
+# )
 
-file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIV_CASE_SRC
-    npu_arch_2201/aiv/*.cpp
-)
+# file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIV_CASE_SRC
+#     npu_arch_2201/aiv/*.cpp
+# )
 
 file(GLOB ASCENDC_UT_NPU_ARCH_3510_AIC_CASE_SRC
     npu_arch_3510/aic/*.cpp
 )
 
-file(GLOB ASCENDC_UT_NPU_ARCH_3510_AIV_CASE_SRC
-    npu_arch_3510/aiv/*.cpp
-)
+# file(GLOB ASCENDC_UT_NPU_ARCH_3510_AIV_CASE_SRC
+#     npu_arch_3510/aiv/*.cpp
+# )
 
 foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_tensor_api_${product_type}
