@@ -31,6 +31,38 @@
 
 namespace AscendC {
 #pragma begin_pipe(V)
+
+enum class ReduceType{
+    SUM=0,
+    MAX,
+    MIN
+};
+
+template <ReduceType reduceType, bool isSetMask=true, typename T>
+__aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask, 
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <ReduceType reduceType, bool isSetMask=true, typename T>
+__aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask, 
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <ReduceType reduceType, bool isSetMask=true, typename T>
+__aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask, 
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <ReduceType reduceType, bool isSetMask=true, typename T>
+__aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int64_t mask[], 
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <ReduceType reduceType, bool isSetMask=true, typename T>
+__aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int64_t mask[], 
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <ReduceType reduceType, bool isSetMask=true, typename T>
+__aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int64_t mask[], 
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+
 /* *************** BlockReduceMax /BlockReduceMin /BlockReduceSum PairReduceSum ********************* */
 /*
  * @ingroup BlockReduceSum
