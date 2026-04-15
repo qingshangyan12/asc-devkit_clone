@@ -47,7 +47,33 @@
 #include <utility>
 #endif
 
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+#include "../utils/std/type_traits.h"
+#include "../utils/std/utility.h"
+#endif
+
 namespace AscendC {
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+template <typename T, template <typename...> class Template>
+struct is_specialization_of : Std::false_type {};
+
+template <template <typename...> class Template, typename... Args>
+struct is_specialization_of<Template<Args...>, Template> : Std::true_type {};
+
+template <typename T, template <typename...> class Template>
+inline constexpr bool is_specialization_of_v = is_specialization_of<T, Template>::value;
+
+template <typename T>
+__aicore__ inline decltype(auto) unwrap(T&& arg) {
+    using DecayedT = Std::decay_t<T>;
+    if constexpr (is_specialization_of_v<DecayedT, Proxy>) {
+        return arg.Get();
+    } else {
+        return Std::forward<T>(arg);
+    }
+}
+#endif
+
 template <typename T>
 __aicore__ inline void DumpTensor(const LocalTensor<T> &input, uint32_t desc, uint32_t dumpSize)
 {
@@ -143,14 +169,22 @@ template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #ifdef ASCENDC_DUMP
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+    PrintfImpl(DumpType::DUMP_SCALAR, fmt, unwrap(Std::forward<Args>(args))...);
+#else
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
+#endif
 #endif
 }
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
 #ifdef ASCENDC_DUMP
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+    PrintfImpl(DumpType::DUMP_SCALAR, fmt, unwrap(Std::forward<Args>(args))...);
+#else
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
+#endif
 #endif
 }
 
@@ -174,7 +208,11 @@ template <class... Args>
 inline void PRINTF(const char* fmt, Args&&... args)
 {
 #ifdef ASCENDC_DUMP
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+    PrintfImpl(DumpType::DUMP_SCALAR, fmt, unwrap(Std::forward<Args>(args))...);
+#else
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
+#endif
 #endif
 }
 #endif // defined(__NPU_HOST__) || defined(__ASCC_HOST__)
@@ -184,7 +222,11 @@ template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #ifdef ASCENDC_DUMP
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+    PrintfImpl(DumpType::DUMP_SCALAR, fmt, unwrap(Std::forward<Args>(args))...);
+#else
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
+#endif
 #endif
 }
 
@@ -192,7 +234,11 @@ template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
 #ifdef ASCENDC_DUMP
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+    PrintfImpl(DumpType::DUMP_SCALAR, fmt, unwrap(Std::forward<Args>(args))...);
+#else
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
+#endif
 #endif
 }
 #endif // ASCENDC_CPU_DEBUG
@@ -219,7 +265,11 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
         InitDump(g_mixFlagAssertOnlyReserved, g_dumpAddrAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
     }
 #endif
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+    PrintfImpl(DumpType::DUMP_ASSERT, fmt, unwrap(Std::forward<Args>(args))...);
+#else
     PrintfImpl(DumpType::DUMP_ASSERT, fmt, args...);
+#endif
 #else
     return;
 #endif
