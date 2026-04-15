@@ -40,6 +40,24 @@ struct ScaleBNDLayoutPtn {};
 struct ScaleBDNLayoutPtn {};
 struct DefaultPtn {};
 
+template <typename T = uint16_t, size_t C0 = 32 / sizeof(T)>
+struct LayoutTraitDefault {
+    using type = T;
+    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
+};
+
+template <typename T = fp8_e8m0_t, size_t C0 = 2 / sizeof(T)>
+struct LayoutTraitScale {
+    using type = T;
+    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
+};
+
+template <typename T = fp4x2_e2m1_t, size_t C0 = 64 / sizeof(T)>
+struct LayoutTraitFP4 {
+    using type = T;
+    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
+};
+
 struct MakeNzFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
@@ -48,8 +66,7 @@ struct MakeNzFrameLayout {
                                MakeShape(c0Ele, Std::ceil_division(column, c0Ele)));
         auto stride = MakeStride(MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}),
                                  MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(row, FRACTAL_FIXED)));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NZLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
+        return MakePatternLayout<NZLayoutPtn, TraitType>(shape, stride);
     }
 };
 
@@ -58,8 +75,7 @@ struct MakeNDFrameLayout {
     __aicore__ inline static auto Make(T row, U column) {
         auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
         auto stride = MakeStride(MakeStride(Std::Int<0>{}, column), MakeStride(Std::Int<0>{}, Std::Int<1>{}));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NDLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
+        return MakePatternLayout<NDLayoutPtn, TraitType>(shape, stride);
     }
 };
 
@@ -71,8 +87,7 @@ struct MakeZnFrameLayout {
                                MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
         auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * Std::ceil_align(column, FRACTAL_FIXED)),
                                  MakeStride(c0Ele, c0Ele * Std::Int<FRACTAL_FIXED>{}));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ZNLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
+        return MakePatternLayout<ZNLayoutPtn, TraitType>(shape, stride);
     }
 };
 
@@ -81,8 +96,7 @@ struct MakeDNFrameLayout {
     __aicore__ inline static auto Make(T row, U column) {
         auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
         auto stride = MakeStride(MakeStride(Std::Int<0>{}, Std::Int<1>{}), MakeStride(Std::Int<0>{}, row));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<DNLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
+        return MakePatternLayout<DNLayoutPtn, TraitType>(shape, stride);
     }
 };
 
@@ -94,8 +108,7 @@ struct MakeZzFrameLayout {
                                MakeShape(c0Ele, Std::ceil_division(column, c0Ele)));
         auto stride = MakeStride(MakeStride(c0Ele, FRACTAL_FIXED * Std::ceil_align(column, c0Ele)),
                                  MakeStride(Std::Int<1>{}, c0Ele * Std::Int<FRACTAL_FIXED>{}));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ZZLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
+        return MakePatternLayout<ZZLayoutPtn, TraitType>(shape, stride);
     }
 };
 
@@ -107,8 +120,7 @@ struct MakeNnFrameLayout {
         auto shape = MakeShape(MakeShape(c0Ele, row / c0Ele), MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
         auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * Std::Int<FRACTAL_FIXED>{}),
                                  MakeStride(c0Ele, row * FRACTAL_FIXED));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<NNLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
+        return MakePatternLayout<NNLayoutPtn, TraitType>(shape, stride);
     }
 };
 
@@ -119,8 +131,7 @@ struct MakeScaleANDFrameLayout {
         static_assert(c0Ele == 2, "ScaleANDLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
         auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
         auto stride = MakeStride(MakeStride(Std::Int<0>{}, column), MakeStride(Std::Int<0>{}, Std::Int<1>{}));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ScaleANDLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
+        return MakePatternLayout<ScaleANDLayoutPtn, TraitType>(shape, stride);
     }
 };
 
@@ -132,8 +143,7 @@ struct MakeScaleADNFrameLayout {
         auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(c0Ele, column / c0Ele));
         auto stride = MakeStride(MakeStride(Std::Int<0>{}, c0Ele),
                                  MakeStride(Std::Int<1>{}, c0Ele * row));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ScaleADNLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
+        return MakePatternLayout<ScaleADNLayoutPtn, TraitType>(shape, stride);
     }
 };
 
@@ -145,8 +155,7 @@ struct MakeScaleBNDFrameLayout {
         auto shape = MakeShape(MakeShape(c0Ele, row / c0Ele), MakeShape(Std::Int<1>{}, column));
         auto stride = MakeStride(MakeStride(Std::Int<1>{}, c0Ele * column),
                                  MakeStride(Std::Int<0>{}, c0Ele));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ScaleBNDLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
+        return MakePatternLayout<ScaleBNDLayoutPtn, TraitType>(shape, stride);
     }
 };
 
@@ -155,8 +164,7 @@ struct MakeScaleBDNFrameLayout {
     __aicore__ inline static auto Make(T row, U column) {
         auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
         auto stride = MakeStride(MakeStride(Std::Int<0>{}, Std::Int<1>{}), MakeStride(Std::Int<0>{}, row));
-        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ScaleBDNLayoutPtn, TraitType>>;
-        return LayoutT(shape, stride);
+        return MakePatternLayout<ScaleBDNLayoutPtn, TraitType>(shape, stride);
     }
 };
 

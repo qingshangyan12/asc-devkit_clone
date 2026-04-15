@@ -40,24 +40,6 @@ using LayoutFormatSet = TupleMap<
     Std::tuple<ScaleBNDLayoutPtn, MakeScaleBNDFrameLayout>,
     Std::tuple<ScaleBDNLayoutPtn, MakeScaleBDNFrameLayout>>;
 
-template <typename T = uint16_t, size_t C0 = 32 / sizeof(T)>
-struct LayoutTraitDefault {
-    using type = T;
-    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
-};
-
-template <typename T = fp8_e8m0_t, size_t C0 = 2 / sizeof(T)>
-struct LayoutTraitScale {
-    using type = T;
-    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
-};
-
-template <typename T = fp4x2_e2m1_t, size_t C0 = 64 / sizeof(T)>
-struct LayoutTraitFP4 {
-    using type = T;
-    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
-};
-
 template <typename T, typename = void>
 struct IsFrameLayoutTrait : Std::false_type {};
 
@@ -92,6 +74,12 @@ struct FrameLayoutFormat {
         return MakeFrameLayout<LayoutPattern, TraitType>(args...);
     }
 };
+
+template <typename LayoutPattern, typename TraitType, typename... Args>
+__aicore__ inline decltype(auto) MakeFrameLayoutV2(const Args&... args) {
+    return MakeFrameLayoutImpl<LayoutPattern, TraitType>(args...);
+}
+
 } // namespace Te
 } // namespace AscendC
 
