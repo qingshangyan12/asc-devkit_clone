@@ -30,6 +30,20 @@ namespace AscendC {
 namespace Te {
 
 template <typename T>
+struct GetTypeFromTwoDimTrait;
+
+template <Hardware hPos, typename Pointer, typename Shape, typename Stride, typename LayoutPattern>
+struct GetTypeFromTwoDimTrait<
+    LocalTensor<TensorAttribute<ViewEngine<HardwareMemPtr<hPos, Pointer>>, 
+        Layout<Shape, Stride, LayoutPattern>>>> {
+    using ShapeRow = typename Std::tuple_element<0, Shape>::type;
+    using ShapeColumn = typename Std::tuple_element<1, Shape>::type;
+
+    using StrideRow = typename Std::tuple_element<0, Stride>::type;
+    using StrideColumn = typename Std::tuple_element<1, Stride>::type;
+};
+
+template <typename T>
 struct GetTypeFromFourDimTrait;
 
 template <Hardware hPos, typename Pointer, typename Shape1, typename Shape2, typename Stride1, typename Stride2,
