@@ -49,7 +49,7 @@ static void ascendc_set_exception_dump_info(uint32_t dumpSize)
     return exception_dump_source
 
 
-def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool, dump_assert: bool) -> str:
+def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool) -> str:
     """Generate host_stub.cpp head code."""
 
     type_nums = 0
@@ -68,17 +68,6 @@ def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool, du
 #include <securec.h>
 ''')
 
-    if dump_assert:
-        buff.write(r'''
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-#define ASCENDC_EXCEPTION_DUMP_HEAD 2U
-
-typedef struct rtArgsSizeInfo {
-    void *infoAddr;
-    uint32_t atomicIndex;
-} rtArgsSizeInfo_t;
-#endif
-''')
     buff.write('\n')
     buff.write('''static char ascendcErrMsg[1024] = {0};
 ''')
@@ -169,17 +158,8 @@ uint32_t GetCoreNumForMixVectorCore(uint32_t *aiCoreNum, uint32_t *vectorCoreNum
 uint32_t LaunchAscendKernelForVectorCore(const char *opType, void *handle, const uint64_t key, void **args, uint32_t size,
     const void *stream, bool enableProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks, uint32_t aivNumBlocksOffset);
 ''')
-    if dump_assert:
-        buff.write('''int32_t rtSetExceptionExtInfo(const rtArgsSizeInfo_t * const sizeInfo);
 
-namespace Adx {
-    void *AdumpGetSizeInfoAddr(uint32_t space, uint32_t &atomicIndex);
-}
-}
-namespace Adx {
-''')
-    else:
-        buff.write('''}\n\nnamespace Adx {''')
+    buff.write('''}\n\nnamespace Adx {''')
 
     buff.write('''
     void AdumpPrintWorkSpace(const void *workSpaceAddr, const size_t dumpWorkSpaceSize,
@@ -281,8 +261,5 @@ void __register_kernels(void)
     buff.write('''    AscendProfRegister();
 }
 ''')
-
-    if dump_assert:
-        buff.write(generate_host_stub_set_exception_dump_source())
 
     return buff.getvalue()
