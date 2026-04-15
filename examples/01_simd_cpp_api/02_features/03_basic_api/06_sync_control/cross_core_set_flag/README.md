@@ -70,7 +70,7 @@
 ### 计算公式与样例规格
 
 #### SCENARIO=0（纯 Vector 计算场景，模式0）
-- 计算公式：
+- 计算公式：  
   $$
   z = \sum_{i=0}^{15} (x \times i)
   $$
@@ -87,7 +87,7 @@
   </table>
 
 #### SCENARIO=1（纯 Vector 计算场景，模式1）
-- 计算公式：
+- 计算公式：  
   $$
   z = (x \times 2) + (x \times 3)
   $$
@@ -104,7 +104,7 @@
   </table>
 
 #### SCENARIO=2（Cube 与 Vector 融合计算场景）
-- 计算公式：
+- 计算公式：  
   $$
   C = \text{LeakyRelu}(Cast(A) \times Cast(B))
   $$
