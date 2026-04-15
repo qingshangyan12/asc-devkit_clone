@@ -51,7 +51,7 @@
   - dstBlkStride：单次迭代内，不同datablock间地址步长
   - dstRepStride：相邻迭代间，相同datablock地址步长
 
-  - Kernel实现
+  - Kernel实现  
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，首先分配输出缓冲区，然后使用CreateVecIndex基础API接口生成索引向量，得到最终结果，再搬出到外部存储上。
 
   - 调用实现  

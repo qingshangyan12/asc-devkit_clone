@@ -22,13 +22,11 @@
 │   └── matmul_mixdualmaster.asc              // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   本样例核函数类型为MIX，且AIC核数：AIV核数=1：2，且A矩阵和B矩阵同时使能IBSHARE参数，同一AIC对应的两个AIV的输入AB矩阵数据在L1 Buffer上相同。  
   通过设置MatmulConfig参数enableMixDualMaster使能双主模式。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 12288, N = 256, K = 128。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

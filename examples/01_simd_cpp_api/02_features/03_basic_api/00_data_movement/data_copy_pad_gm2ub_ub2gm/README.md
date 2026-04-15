@@ -27,7 +27,6 @@
 ## 样例描述
 
 - 样例功能：  
-
   样例展示了使用DataCopyPad将非32字节对齐的数据从Global Memory搬入VECIN并进行数据填充的使用方法。非32字节对齐指的是数据字节数不满足32字节对齐要求（例如40字节的20个half元素），硬件要求LocalTensor必须32字节对齐，因此需要通过填充操作补齐到64字节（32个half元素）。填充方法为使用DataCopyPadExtParams结构体配置填充参数，配合SetPadValue API设置填充值。更多API详细信息请参考[DataCopyPad API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0265.html)和[SetPadValue API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0266.html)。
 - 样例规格：  
 
@@ -43,7 +42,7 @@
 
 
 - 样例实现：
-  - kernel实现   
+  - kernel实现  
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用DataCopyPad基础API接口将输入srcLocal的数值搬运到dstLocal中，再搬出到外部存储上。
 
     DataCopyPadCustom样例的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。  
@@ -68,9 +67,9 @@
       // 非32字节对齐数据拷贝：从全局内存到本地缓冲区，并填充12个half元素
       AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams); 
       ```
-    - Compute任务
+    - Compute任务  
       负责使用Adds对srcLocal和scalar求和，并将结果存储到dstLocal中。  
-    - CopyOut任务
+    - CopyOut任务  
       负责将输出数据从dstLocal连续非对齐搬运至Global Memory上的输出Tensor dstGlobal。
 
   - 调用实现  

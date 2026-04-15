@@ -48,12 +48,10 @@
 - 样例实现:  
   本样例实现了固定shape输入inputGm[1，1024]，量化参数scale=2.0、offset=0.9。本样例为PER_TENSOR场景（按张量量化），将float数据类型量化为int8_t数据类型。
 
-  - Kernel实现
-
+  - Kernel实现  
     计算逻辑是：Ascend C提供的矢量。计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用AscendQuant（A2A3）或Quantize（950系列）高阶API接口完成量化计算，得到最终结果，再搬出到外部存储上。
 
-  - Tiling实现
-
+  - Tiling实现  
     QuantCustom样例的tiling实现流程如下：首先获取AscendQuant或Quantize接口能完成计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度dataLength确定所需tiling参数。
 
   - 调用实现  
@@ -98,14 +96,12 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
-
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `NPU_ARCH` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   
-- 执行结果
-
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

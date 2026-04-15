@@ -20,8 +20,7 @@
 
 ## 样例描述
 
-- 样例功能
-
+- 样例功能  
   本样例基于2D Padding场景，通过多维数据搬运接口将数据从GM（Global Memory）搬运至UB（Unified Buffer）。接口资料参考[多维数据搬运](../../../../../../docs/api/context/多维数据搬运（ISASI）.md)。
 
 - 样例规格
@@ -34,8 +33,7 @@
   </table>
 
 - 样例实现：
-  - kernel实现   
-
+  - kernel实现  
     输入数据从GM（Global Memory）搬运至UB（Unified Buffer）时，通过配置搬入的维度和对应的Stride，实现2D Padding，将GM（Global Memory）上[2, 8]的数据，搬运至UB（Unified Buffer）并Padding为[4, 16]。
 
     ```cpp

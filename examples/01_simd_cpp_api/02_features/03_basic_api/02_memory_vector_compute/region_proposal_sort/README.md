@@ -22,7 +22,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   将64个score值通过完整流水线排序后输出。一个Region Proposal由8个half元素组成，其中第5个元素（offset=4）为score域。
 
 - 样例规格：
@@ -36,7 +36,7 @@
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">region_proposal_sort_custom</td></tr>
 </table>
 
-- 样例实现：
+- 样例实现：  
   本样例实现的是Region Proposal排序完整流水线：
   1. **ProposalConcat**：将连续的16个score值合入16个Region Proposal的score域位置（offset=4），共4组，每组1次repeat
   2. **RpSort16**：对每组16个Region Proposal按score域从大到小排序，共4组
@@ -45,7 +45,7 @@
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash

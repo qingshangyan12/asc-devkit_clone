@@ -21,12 +21,10 @@
 
 ## 样例描述
 
-- 样例功能： 
-
+- 样例功能：  
   MatmulMxUbTscmNzCustom样例调用Matmul API计算时，A、B矩阵内存逻辑位置使用VECOUT，scaleA、scaleB矩阵内存逻辑位置使用TSCM，4个输入矩阵都是NZ格式。左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 64，N = 128，K = 128，scaleK = 4。其中scaleK为K整除32的结果4。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulMxUbTscmNzCustom</td></tr>

@@ -27,7 +27,6 @@
 ## 样例描述
 
 - 样例功能：  
-
   本样例是展示使用Copy进行VECIN，VECOUT之间的数据搬运，支持mask操作和DataBlock间隔操作。Copy的具体参数介绍可以参考[Copy API文档](../../../../../../docs/api/context/Copy.md)。
 - 样例规格：  
 
@@ -44,7 +43,7 @@
 
 
 - 样例实现：
-  - kernel实现   
+  - kernel实现  
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Copy基础API接口将输入srcLocal的数值搬运到dstLocal中，再搬出到外部存储上。Copy API的参数说明：
     - mask：控制每次迭代内参与计算的元素数量，本样例中mask=64表示前64个元素参与计算
     - repeat：重复次数，本样例中repeat=8表示执行8次拷贝操作

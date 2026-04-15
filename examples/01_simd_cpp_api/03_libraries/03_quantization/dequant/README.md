@@ -23,8 +23,7 @@
 
 ## 样例描述
 
-- 样例功能：
-
+- 样例功能：  
   该样例对输入tensor按元素做反量化计算，将int32_t数据类型反量化为float等数据类型。
 
 - 样例规格：
@@ -46,16 +45,13 @@
   <br clear="left" />
 <br />
 
-- 样例实现：
-
+- 样例实现：  
    本样例中实现的是固定shape输入为inputGm[128, 32], scaleGm[1，32]，输出为outputGm[128, 32]。按元素做反量化计算，将int32_t数据类型反量化为float等数据类型。
 
-  - Kernel实现
-
+  - Kernel实现  
     计算逻辑是： 本样例将输入数据搬运进片上存储，然后使用AscendDequant（A2/A3）或Dequantize（950系列）高阶API接口完成反量化计算，得到最终结果，再搬出外部存储上。
 
-  - Tiling实现
-
+  - Tiling实现  
     DequantCustom样例的tiling实现流程如下：首先获取AscendDequant或Dequantize接口能完成计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度dataLength确定所需tiling参数。
 
   - 调用实现  
@@ -100,14 +96,12 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
-
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `NPU_ARCH` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   
-- 执行结果
-
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
