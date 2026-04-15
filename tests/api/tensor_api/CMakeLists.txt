@@ -23,6 +23,7 @@ set(ASCENDC_UT_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/..
     ${ASCENDC_DIR}/
     ${ASCENDC_DIR}/include
+    ${ASCENDC_DIR}/include/c_api
     ${ASCENDC_DIR}/include/utils
     ${ASCENDC_DIR}/impl
 )

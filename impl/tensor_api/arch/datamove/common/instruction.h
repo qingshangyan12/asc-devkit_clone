@@ -23,6 +23,8 @@
 #define IMPL_TENSOR_API_ARCH_DATAMOVE_COMMON_INSTRUCTION_H
 
 #include "impl/tensor_api/arch/datamove/common/l0c2out_utils.h"
+#include "include/c_api/sys_var/sys_var.h"
+#include "include/c_api/sync/sync.h"
 
 namespace AscendC {
 namespace Te {
@@ -70,7 +72,7 @@ private:
             return;
         }
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            set_quant_pre(quant);
+            asc_set_l0c_copy_prequant(quant);
         }
     }
 
@@ -84,7 +86,7 @@ private:
             loop3Para |= static_cast<uint64_t>(dstStride) << SHIFT_LOOP3_DST_STRIDE;
             loop3Para |= static_cast<uint64_t>(srcStride) << SHIFT_LOOP3_SRC_MATRIX;
             loop3Para |= static_cast<uint64_t>(num);
-            set_loop3_para(loop3Para);
+            asc_set_l0c2gm_nz2nd(loop3Para);
         }
     }
 
@@ -96,7 +98,7 @@ private:
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             uint64_t channelPara = 0;
             channelPara |= static_cast<uint64_t>(srcNZC0Stride) << SHIFT_CHANNEL_C0_STRIDE;
-            set_channel_para(channelPara);
+            asc_set_l0c2gm_channel_para(channelPara);
         }
     }
 
@@ -113,7 +115,7 @@ __aicore__ inline auto AllocFbTempBuf(const uint16_t& /* calNSize */)
     }
     uint64_t deqTensorTempBuf = 0;
     if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-        deqTensorTempBuf = reinterpret_cast<uint64_t>(get_imm(0));
+        deqTensorTempBuf = reinterpret_cast<uint64_t>(asc_get_phy_buf_addr(0));
     }
     return deqTensorTempBuf;
 }
@@ -126,7 +128,7 @@ __aicore__ inline void SetFpc(const __fbuf__ T* deqTensorTempBuf)
     }
     if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
         uint64_t deqTensorAddr = (reinterpret_cast<uint64_t>(deqTensorTempBuf) >> 7) << 8;
-        set_fpc(deqTensorAddr);
+        asc_set_l0c2gm_quant(deqTensorAddr);
     }
 }
 
@@ -136,7 +138,7 @@ __aicore__ inline void InsertSync()
         return;
     }
     if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-        pipe_barrier(PIPE_FIX);
+        asc_sync(PIPE_FIX);
     }
 }
 
