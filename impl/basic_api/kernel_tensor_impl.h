@@ -1407,11 +1407,9 @@ __aicore__ inline __inout_pipe__(S)
     __gm__ PrimType* addr = ExtractL2CacheGmAddr(this->address_);
     return Proxy{&addr[offset]};
 #else
-#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     uintptr_t tmpAddr = AlignPtr<PrimType>(this->oriAddress_ + offset);
     dcci(reinterpret_cast<__gm__ uint64_t *>(tmpAddr),
         cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
-#endif
     return Proxy{&this->oriAddress_[offset]};
 #endif
 }
