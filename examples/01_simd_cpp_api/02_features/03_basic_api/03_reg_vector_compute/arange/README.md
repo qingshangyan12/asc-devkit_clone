@@ -12,7 +12,7 @@
 ```
 ├── arange
 │   ├── scripts
-│   │   │   ├── gen_data.py                // 真值数据生成脚本
+│   │   │   ├── gen_data.py            // 真值数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── arange.asc                     // AscendC样例实现 & 调用样例
@@ -21,21 +21,20 @@
 
 ## 样例描述
 - 样例功能：
-  生成从0开始的递增索引序列，向量元素个数为256，数据类型为float。
+  生成从0开始的递增索引序列，向量shape为[1, 256]，数据类型为float。
   Arange以起始值为0生成递增索引：{0, 1, 2, 3, ..., 255}。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">arange</td></tr>
   </table>
-- 样例实现：
+- 样例实现：  
   ArangeVF函数内调用Arange接口进行索引生成：
   - 使用Arange接口生成递增索引，每次repeat生成oneRepeatSize个索引
-  - 每次repeat后更新起始值（scalarValue += oneRepeatSize）
-  - 使用StoreAlign将结果写回UB
-  - 调用实现
+  - 每次repeat后更新起始值
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 注意事项

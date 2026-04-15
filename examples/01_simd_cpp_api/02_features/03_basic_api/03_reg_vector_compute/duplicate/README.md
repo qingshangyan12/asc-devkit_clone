@@ -1,9 +1,9 @@
 # duplicate样例
 
 ## 概述
-本样例基于RegBase编程范式实现Duplicate运算（标量填充模式），主要调用`AscendC::Reg::Duplicate`接口。
-- `AscendC::Reg::Duplicate(dstReg, scalarValue, mask)` 接口将一个标量值复制多次并填充到向量中
-- `AscendC::Reg::Duplicate(dstReg, srcReg, mask)` 接口将源RegTensor的第一个元素复制多次并填充到向量中
+本样例基于RegBase编程范式实现Duplicate运算（标量填充模式），主要调用Duplicate接口。
+- `Duplicate(dstReg, scalarValue, mask)` 接口将一个标量值复制多次并填充到向量中
+- `Duplicate(dstReg, srcReg, mask)` 接口将源RegTensor的第一个元素复制多次并填充到向量中
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -12,7 +12,7 @@
 ```
 ├── duplicate
 │   ├── scripts
-│   │   │   ├── gen_data.py                // 真值数据生成脚本
+│   │   │   ├── gen_data.py            // 真值数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── duplicate.asc                  // AscendC样例实现 & 调用样例
@@ -21,27 +21,20 @@
 
 ## 样例描述
 - 样例功能：
-  将标量值3.14填充到输出向量的每个位置，向量元素个数为256，数据类型为float。
-  DuplicateScalar: dst[i] = 3.14, for all i。
+  将标量值3.14填充到输出向量的每个位置，向量元素个数为256，数据类型为float。  
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">duplicate</td></tr>
   </table>
-- 样例实现：
+- 样例实现：  
   DuplicateScalarVF函数内调用`AscendC::Reg::Duplicate`接口进行标量填充：
   - 使用Duplicate接口将标量值填充到dstReg的每个元素
   - 使用StoreAlign将结果写回UB
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
-
-## 注意事项
-- Duplicate接口（标量填充模式）不需要输入数据，只需指定填充的标量值
-- Duplicate接口两种模式：
-  - 标量填充：`AscendC::Reg::Duplicate(dstReg, scalarValue, mask)`，将标量值填充到向量
-  - Tensor填充：`AscendC::Reg::Duplicate(dstReg, srcReg, mask)`，将源RegTensor的第一个元素填充到向量
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
