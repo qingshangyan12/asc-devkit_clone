@@ -25,6 +25,7 @@
 #include "impl/tensor_api/tensor/pointer_impl.h"
 #include "impl/tensor_api/tensor/local_tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
+#include "include/c_api/vector_datamove/vector_datamove.h"
 
 namespace AscendC {
 namespace Te {
@@ -61,7 +62,7 @@ private:
         }
 
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            copy_gm_to_ubuf_align_v2(dst, src, 0, blockCount, blockLen, leftPaddingCount, rightPaddingCount, isPad,
+            asc_copy_gm2ub_align(dst, src, blockCount, blockLen, leftPaddingCount, rightPaddingCount, isPad,
                                      cacheMode, srcStride, dstStride);
         }
     }
