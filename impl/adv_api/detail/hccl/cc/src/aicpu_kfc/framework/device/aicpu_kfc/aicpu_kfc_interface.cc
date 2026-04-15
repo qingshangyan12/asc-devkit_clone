@@ -585,6 +585,8 @@ constexpr u32 GROUP_DYN_FLAG = 23U;
 constexpr u32 GROUP_TILING_MAGIC_NUM = 99U;
 __attribute__((visibility("default"))) uint32_t RunAicpuKfcSrvLaunch(void *args[])
 {
+    return Mc2ServerKernel(args);
+
     if (args == nullptr) {
         HCCL_ERROR("args is null.");
         return HCCL_E_PARA;
