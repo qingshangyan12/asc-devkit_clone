@@ -216,13 +216,7 @@ protected:
     void TearDown()
     {
         AscendC::CheckSyncState();
-        g_coreType = AscendC::MIX_TYPE;
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
+        AscendC::SetGCoreType(0);
         GlobalMockObject::verify();
     }
 };
@@ -328,13 +322,7 @@ protected:
     void TearDown()
     {
         AscendC::CheckSyncState();
-        g_coreType = AscendC::MIX_TYPE;
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
+        AscendC::SetGCoreType(0);
         GlobalMockObject::verify();
     }
 };
@@ -426,117 +414,6 @@ TEST_F(TestMmadWithSparseNpuDebug, FilterPositionNotB2)
     mmadParams.m = 16;
     mmadParams.n = 16;
     mmadParams.k = 64;
-    mmadParams.unitFlag = false;
-    mmadParams.kDirectionAlign = 0;
-    mmadParams.cmatrixSource = false;
-    mmadParams.cmatrixInitVal = false;
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    MmadWithSparse(dstLocal, fmLocal, filterLocal, mmadParams);
-}
-
-// m exceeds UINT12_MAX (4096)
-TEST_F(TestMmadWithSparseNpuDebug, MOverflow)
-{
-    if ASCEND_IS_AIV {
-        return;
-    }
-    // m=4097, dst needs m*n elements; fm needs m*k elements; filter needs k/2*n elements
-    constexpr int32_t testM = 4097;
-    constexpr int32_t testN = 16;
-    constexpr int32_t testK = 64;
-
-    TPipe tpipe;
-    TBuf<TPosition::CO1> dstBuf;
-    tpipe.InitBuffer(dstBuf, testM * testN * sizeof(int32_t));
-    LocalTensor<int32_t> dstLocal = dstBuf.Get<int32_t>();
-
-    TBuf<TPosition::A2> fmBuf;
-    tpipe.InitBuffer(fmBuf, testM * testK * sizeof(int8_t));
-    LocalTensor<int8_t> fmLocal = fmBuf.Get<int8_t>();
-
-    TBuf<TPosition::B2> filterBuf;
-    tpipe.InitBuffer(filterBuf, testK / 2 * testN * sizeof(int8_t));
-    LocalTensor<int8_t> filterLocal = filterBuf.Get<int8_t>();
-
-    MmadParams mmadParams;
-    mmadParams.m = testM;  // exceeds UINT12_MAX=4096
-    mmadParams.n = testN;
-    mmadParams.k = testK;
-    mmadParams.unitFlag = false;
-    mmadParams.kDirectionAlign = 0;
-    mmadParams.cmatrixSource = false;
-    mmadParams.cmatrixInitVal = false;
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    MmadWithSparse(dstLocal, fmLocal, filterLocal, mmadParams);
-}
-
-// n exceeds UINT12_MAX (4096)
-TEST_F(TestMmadWithSparseNpuDebug, NOverflow)
-{
-    if ASCEND_IS_AIV {
-        return;
-    }
-    // n=4097, dst needs m*n elements; fm needs m*k elements; filter needs k/2*n elements
-    constexpr int32_t testM = 16;
-    constexpr int32_t testN = 4097;
-    constexpr int32_t testK = 64;
-
-    TPipe tpipe;
-    TBuf<TPosition::CO1> dstBuf;
-    tpipe.InitBuffer(dstBuf, testM * testN * sizeof(int32_t));
-    LocalTensor<int32_t> dstLocal = dstBuf.Get<int32_t>();
-
-    TBuf<TPosition::A2> fmBuf;
-    tpipe.InitBuffer(fmBuf, testM * testK * sizeof(int8_t));
-    LocalTensor<int8_t> fmLocal = fmBuf.Get<int8_t>();
-
-    TBuf<TPosition::B2> filterBuf;
-    tpipe.InitBuffer(filterBuf, testK / 2 * testN * sizeof(int8_t));
-    LocalTensor<int8_t> filterLocal = filterBuf.Get<int8_t>();
-
-    MmadParams mmadParams;
-    mmadParams.m = testM;
-    mmadParams.n = testN;  // exceeds UINT12_MAX=4096
-    mmadParams.k = testK;
-    mmadParams.unitFlag = false;
-    mmadParams.kDirectionAlign = 0;
-    mmadParams.cmatrixSource = false;
-    mmadParams.cmatrixInitVal = false;
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    MmadWithSparse(dstLocal, fmLocal, filterLocal, mmadParams);
-}
-
-// k exceeds UINT12_MAX (4096)
-TEST_F(TestMmadWithSparseNpuDebug, KOverflow)
-{
-    if ASCEND_IS_AIV {
-        return;
-    }
-    // k=4097, dst needs m*n elements; fm needs m*k elements; filter needs k/2*n elements
-    constexpr int32_t testM = 16;
-    constexpr int32_t testN = 16;
-    constexpr int32_t testK = 4097;
-
-    TPipe tpipe;
-    TBuf<TPosition::CO1> dstBuf;
-    tpipe.InitBuffer(dstBuf, testM * testN * sizeof(int32_t));
-    LocalTensor<int32_t> dstLocal = dstBuf.Get<int32_t>();
-
-    TBuf<TPosition::A2> fmBuf;
-    tpipe.InitBuffer(fmBuf, testM * testK * sizeof(int8_t));
-    LocalTensor<int8_t> fmLocal = fmBuf.Get<int8_t>();
-
-    TBuf<TPosition::B2> filterBuf;
-    tpipe.InitBuffer(filterBuf, testK / 2 * testN * sizeof(int8_t));
-    LocalTensor<int8_t> filterLocal = filterBuf.Get<int8_t>();
-
-    MmadParams mmadParams;
-    mmadParams.m = testM;
-    mmadParams.n = testN;
-    mmadParams.k = testK;  // exceeds UINT12_MAX=4096
     mmadParams.unitFlag = false;
     mmadParams.kDirectionAlign = 0;
     mmadParams.cmatrixSource = false;
