@@ -252,10 +252,10 @@ TILINGKEY_PAR_COMPILE is {}".format(parallel_compile_check), AscendCLogLevel.LOG
     mk_file = f'{dstfile_with_pid}.mk'
     if parallel_compile_check == '1':
         _ignore_parallel_job_self_set()
-        cmd = ['make', '-f', mk_file, "VERBOSE=1"]
+        cmd = ['pwd; env;', 'make', '-f', mk_file, "VERBOSE=1", ' > /tmp/test.log 2>&1']
     else:
         ascendc_self_par_job_num = _get_parallel_job_without_op_project(len(tiling_key_list))
-        cmd = ['make', '-f', mk_file, '-j', f'{ascendc_self_par_job_num}', "VERBOSE=1"]
+        cmd = ['pwd; env;', 'make', '-f', mk_file, '-j', f'{ascendc_self_par_job_num}', "VERBOSE=1", , ' > /tmp/test.log 2>&1']
     cmd_str = ' '.join(cmd)
     file_name = ""
     if global_var_storage.get_variable("ascendc_enable_build_log") is True:
