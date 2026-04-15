@@ -49,7 +49,12 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
         auto innerRow = Std::get<0>(GetShape<0>(layout));
         auto innerCol = Std::get<0>(GetShape<1>(layout));
     
-        return MakeLayout(MakeFractalShape(tileShape, MakeShape(innerRow, innerCol)), layout.Stride()); 
+        auto shape = MakeFractalShape(tileShape, MakeShape(innerRow, innerCol));
+        auto stride = layout.Stride();
+        using trait = GetLayoutTrait<LayoutType>;
+        using pattern = GetLayoutPattern<LayoutType>;
+        using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<pattern, trait>>;
+        return LayoutT(shape, stride);
     } 
 }
 
@@ -71,7 +76,12 @@ template <typename Coord, typename LayoutType, typename TensorType>
     auto realRow = Std::min(srcRow, dstRow);	 
     auto realCol = Std::min(srcCol, dstCol);
 
-    return MakeLayout(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride());
+    auto shape = MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol));
+    auto stride = layout.Stride();
+    using trait = GetLayoutTrait<LayoutType>;
+    using pattern = GetLayoutPattern<LayoutType>;
+    using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<pattern, trait>>;
+    return LayoutT(shape, stride);
 }
 
 struct MinOp {
