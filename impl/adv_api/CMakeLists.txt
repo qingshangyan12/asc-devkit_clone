@@ -100,13 +100,13 @@ install(
   FILES ${KERNEL_TILING_HEAD}
   DESTINATION
     ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
-  OPTIONAL)
+  ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
 
 # copy detail to asc impl
 install(
   DIRECTORY detail/
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail
-  OPTIONAL FILES_MATCHING
+  ${INSTALL_OPTIONAL} COMPONENT asc-devkit FILES_MATCHING
   PATTERN "*.h"
   PATTERN "CMakeLists.txt" EXCLUDE)
 
@@ -114,7 +114,7 @@ install(
 install(
   DIRECTORY tiling/
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/tiling
-  OPTIONAL FILES_MATCHING
+  ${INSTALL_OPTIONAL} COMPONENT asc-devkit FILES_MATCHING
   PATTERN "*.h"
   PATTERN "CMakeLists.txt" EXCLUDE)
 
@@ -122,7 +122,7 @@ install(
 install(
   DIRECTORY ${ASCENDC_INCLUDE_DIR}/adv_api/
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
-  OPTIONAL)
+  ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
 
 # generate softlink
 configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/kernel_headers.cmake

@@ -29,7 +29,7 @@ target_link_libraries(host_bisheng_obj PRIVATE
 )
 
 install(TARGETS host_bisheng_obj
-    DESTINATION .
+    DESTINATION . COMPONENT asc-devkit
 )
 
 # Public compile rules of device
