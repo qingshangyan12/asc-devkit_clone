@@ -20,9 +20,9 @@
 ```
 
 ## 样例描述
-- 样例功能：
-  对输入向量做PairReduceElem归约求和运算，向量shape为[1, 256]，数据类型为float。
-  PairReduceElem对相邻奇偶元素对求和：dst[i] = src[2i] + src[2i+1]
+- 样例功能：  
+  对输入向量做PairReduceElem归约求和运算，向量shape为[1, 256]，数据类型为float。  
+  PairReduceElem对相邻奇偶元素对求和：dst[i] = src[2i] + src[2i+1]  
   256个float输入产生128个求和结果。
 
 - 样例规格：

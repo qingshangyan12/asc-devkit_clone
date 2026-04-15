@@ -147,16 +147,16 @@ asc-devkit/
 
 ### API分类
 
-| 分类 | 说明 | 示例API |
-| ------ | ------ | --------- |
+| 分类　　　 | 说明　　　　 | 示例API　　　　　　　　　　　|
+| ------------| --------------| ------------------------------|
 | vec_binary | 矢量二元运算 | Add, Sub, Mul, Div, Max, Min |
-| vec_unary | 矢量一元运算 | Relu, Exp, Cast, Abs |
-| vec_reduce | 矢量归约 | Sum, Max, Mean |
-| data_copy | 数据搬运 | DataCopy, LoadData |
-| fixpipe | 流水线控制 | Fixpipe |
-| mm | 矩阵乘法 | Mmad, Conv2D |
-| scalar | 标量运算 | ToFloat |
-| atomic | 原子操作 | AtomicAdd, AtomicCAS |
+| vec_unary　| 矢量一元运算 | Relu, Exp, Cast, Abs　　　　 |
+| vec_reduce | 矢量归约　　 | Sum, Max, Mean　　　　　　　 |
+| data_copy　| 数据搬运　　 | DataCopy, LoadData　　　　　 |
+| fixpipe　　| 流水线控制　 | Fixpipe　　　　　　　　　　　|
+| mm　　　　 | 矩阵乘法　　 | Mmad, Conv2D　　　　　　　　 |
+| scalar　　 | 标量运算　　 | ToFloat　　　　　　　　　　　|
+| atomic　　 | 原子操作　　 | AtomicAdd, AtomicCAS　　　　 |
 
 ---
 
