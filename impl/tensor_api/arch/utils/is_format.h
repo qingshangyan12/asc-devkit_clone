@@ -30,6 +30,20 @@ namespace AscendC {
 namespace Te {
 
 template <typename T>
+struct GetTypeFromTwoDimTrait;
+
+template <Hardware hPos, typename Pointer, typename Shape, typename Stride, typename LayoutPattern>
+struct GetTypeFromTwoDimTrait<
+    LocalTensor<TensorAttribute<ViewEngine<HardwareMemPtr<hPos, Pointer>>, 
+        Layout<Shape, Stride, LayoutPattern>>>> {
+    using ShapeRow = typename Std::tuple_element<0, Shape>::type;
+    using ShapeColumn = typename Std::tuple_element<1, Shape>::type;
+
+    using StrideRow = typename Std::tuple_element<0, Stride>::type;
+    using StrideColumn = typename Std::tuple_element<1, Stride>::type;
+};
+
+template <typename T>
 struct GetTypeFromFourDimTrait;
 
 template <Hardware hPos, typename Pointer, typename Shape1, typename Shape2, typename Stride1, typename Stride2,
@@ -49,6 +63,29 @@ struct GetTypeFromFourDimTrait<
 };
 
 enum class AttrInfo : uint8_t {SHAPE, STRIDE, ROW, COLUMN};
+
+template <typename T, AttrInfo info, size_t dim> 
+struct GetTwoDimType;
+
+template <typename T>
+struct GetTwoDimType<T, AttrInfo::SHAPE, 0> {
+    using type = Std::remove_cvref_t<typename GetTypeFromTwoDimTrait<T>::ShapeRow>;
+};
+
+template <typename T>
+struct GetTwoDimType<T, AttrInfo::SHAPE, 1> {
+    using type = Std::remove_cvref_t<typename GetTypeFromTwoDimTrait<T>::ShapeColumn>;
+};
+
+template <typename T>
+struct GetTwoDimType<T, AttrInfo::STRIDE, 0> {
+    using type = Std::remove_cvref_t<typename GetTypeFromTwoDimTrait<T>::StrideRow>;
+};
+
+template <typename T>
+struct GetTwoDimType<T, AttrInfo::STRIDE, 1> {
+    using type = Std::remove_cvref_t<typename GetTypeFromTwoDimTrait<T>::StrideColumn>;
+};
 
 template <typename T, AttrInfo info1, AttrInfo info2, size_t dim> 
 struct GetFourDimType;
