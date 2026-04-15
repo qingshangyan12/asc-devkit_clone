@@ -22,8 +22,8 @@
 #include "kernel_tensor.h"
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 #include "impl/utils/debug/asc_debug_utils.h"
-#include "impl/utils/debug/asc_aicore_printf_impl.h"
 #endif
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_dump_tensor_impl.h"
