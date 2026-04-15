@@ -75,9 +75,12 @@ ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP = {
     "complex64": 16,
     "bfloat16_t": 27,
     "int4b_t": 29,
+    "int2b_t": 31,
+    "complex32": 33,
     "hifloat8_t": 34,
     "fp8_e5m2_t": 35,
     "fp8_e4m3fn_t": 36,
+    "fp8_e8m0_t": 37,
     "fp4x2_e2m1_t": 40,
     "fp4x2_e1m2_t": 41
 }
