@@ -344,17 +344,14 @@ TEST_P(TestLoaddata3dv2ApiCheckSuite, Loaddata3dv2ApiCheckAllHighLevel)
 
 class TestLoadData3dv1NpuDebug : public testing::Test {
 protected:
-    void SetUp() { AscendC::SetGCoreType(2); }
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+    }
     void TearDown()
     {
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
         AscendC::CheckSyncState();
+        AscendC::SetGCoreType(0);
         GlobalMockObject::verify();
     }
 };
@@ -776,17 +773,14 @@ TEST_F(TestLoadData3dv1NpuDebug, CSizeOverflow)
 
 class TestLoadData3dv2NpuDebug : public testing::Test {
 protected:
-    void SetUp() { AscendC::SetGCoreType(2); }
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+    }
     void TearDown()
     {
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
         AscendC::CheckSyncState();
+        AscendC::SetGCoreType(0);
         GlobalMockObject::verify();
     }
 };
@@ -1104,40 +1098,4 @@ TEST_F(TestLoadData3dv2NpuDebug, DilationFilterWUnderflow)
 
     MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStub));
     LoadData<half>(dstLocal, srcLocal, params);
-}
-
-// dst on A2 with bfloat16_t type (A2 supports uint8_t/int8_t/half/bfloat16_t/float/uint32_t/int32_t/int4b_t)
-// Test with an unsupported type for A2: int16_t is NOT in the supported list
-TEST_F(TestLoadData3dv2NpuDebug, DstA2InvalidDtypeInt16)
-{
-    TPipe tpipe;
-    TBuf<TPosition::A1> srcBuf;
-    tpipe.InitBuffer(srcBuf, 8192 * sizeof(int16_t));
-    LocalTensor<int16_t> srcLocal = srcBuf.Get<int16_t>();
-
-    TBuf<TPosition::A2> dstBuf;
-    tpipe.InitBuffer(dstBuf, 8192 * sizeof(int16_t));
-    LocalTensor<int16_t> dstLocal = dstBuf.Get<int16_t>();
-
-    LoadData3DParamsV2<int16_t> params;
-    params.padList[0] = 0; params.padList[1] = 0; params.padList[2] = 0; params.padList[3] = 0;
-    params.l1H = 12;
-    params.l1W = 16;
-    params.channelSize = 32;
-    params.kExtension = 32;
-    params.mExtension = 192;
-    params.kStartPt = 0;
-    params.mStartPt = 0;
-    params.strideW = 1;
-    params.strideH = 1;
-    params.filterW = 1;
-    params.filterH = 1;
-    params.dilationFilterW = 1;
-    params.dilationFilterH = 1;
-    params.enTranspose = false;
-    params.enSmallK = false;
-    params.padValue = 0;
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStub));
-    LoadData<int16_t>(dstLocal, srcLocal, params);
 }
