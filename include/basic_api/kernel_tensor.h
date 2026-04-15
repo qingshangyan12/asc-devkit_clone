@@ -231,6 +231,48 @@ private:
 #endif
 };
 
+
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+template<typename T>
+class TensorProxy {
+public:
+    __aicore__ inline TensorProxy(__gm__ T* p, T val) : ptr(p), snapValue(val) {}
+
+    __aicore__ inline TensorProxy(const TensorProxy&) = default;
+
+    __aicore__ inline TensorProxy& operator=(const T value) && {
+        *ptr = value;
+        dcci(reinterpret_cast<__gm__ uint64_t *>(ptr),
+            cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        return *this;
+    }
+
+    __aicore__ inline TensorProxy& operator=(const TensorProxy& src) && {
+        dcci(reinterpret_cast<__gm__ uint64_t *>(src.ptr),
+            cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        *ptr = *src.ptr;
+        snapValue = src.snapValue;
+        dcci(reinterpret_cast<__gm__ uint64_t *>(ptr),
+            cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        return *this;
+    }
+
+    __aicore__ inline operator T() const {
+        return snapValue;
+    }
+
+    __aicore__ inline T Get() const {
+        return snapValue;
+    }
+
+    __gm__ T* operator&() const = delete;
+
+public:
+    __gm__ T* ptr;
+    T snapValue;
+};
+#endif
+
 template <typename T> class GlobalTensor : public BaseGlobalTensor<T>, public BaseTensorTraitTensor<T> {
 public:
     using PrimType = PrimT<T>;
@@ -244,10 +286,16 @@ public:
     __aicore__ inline __gm__ PrimType* GetPhyAddr(const uint64_t offset) const;
 
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint64_t offset) const;
-    __aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator()(const uint64_t offset) const;
+
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint64_t offset);
-    __aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator()(const uint64_t offset);
+#endif
+    
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+    __aicore__ inline __inout_pipe__(S) TensorProxy<PrimType> operator()(const uint64_t offset);
+    __aicore__ inline __inout_pipe__(S) TensorProxy<PrimType> operator()(const uint64_t offset) const;
+#else
+    __aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator()(const uint64_t offset) const;
 #endif
     __aicore__ inline void SetValue(const uint64_t offset, PrimType value);
 
