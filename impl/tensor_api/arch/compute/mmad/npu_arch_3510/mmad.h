@@ -38,18 +38,18 @@ private:
     template <const MmadTrait& trait, typename T, typename U, typename S>
     __aicore__ inline static constexpr void CheckTemplateForNormal()
     {
-        CheckFormat::CheckL0CNZTemplate<T>();
-        CheckFormat::CheckNZTemplate<U>();
-        CheckFormat::CheckZNTemplate<S>();
+        CheckLayoutPattern<T>();
+        CheckLayoutPattern<U>();
+        CheckLayoutPattern<S>();
         CheckDataTypeFor3510::CheckMmadDataType<T, U, S>();
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S>
     __aicore__ inline static constexpr void CheckTemplateForMx()
     {
-        CheckFormat::CheckL0CNZTemplate<T>();
-        CheckFormat::CheckNZTemplate<U>();
-        CheckFormat::CheckZNTemplate<S>();
+        CheckLayoutPattern<T>();
+        CheckLayoutPattern<U>();
+        CheckLayoutPattern<S>();
         CheckDataTypeFor3510::CheckMxMmadDataType<T, U, S>();
     }
     
