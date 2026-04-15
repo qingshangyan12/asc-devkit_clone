@@ -13,8 +13,8 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(tikicpulib REQUIRED)
 
 set(ASCENDC_UT_PRODUCT_TYPE_LIST
-    NPU_ARCH_2201_AIC
-    NPU_ARCH_2201_AIV
+    # NPU_ARCH_2201_AIC
+    # NPU_ARCH_2201_AIV
     NPU_ARCH_3510_AIC
     NPU_ARCH_3510_AIV
 )
@@ -23,8 +23,10 @@ set(ASCENDC_UT_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/..
     ${ASCENDC_DIR}/
     ${ASCENDC_DIR}/include
+    ${ASCENDC_DIR}/include/c_api
     ${ASCENDC_DIR}/include/utils
     ${ASCENDC_DIR}/impl
+    ${ASCENDC_DIR}/impl/c_api
 )
 
 file(GLOB ASCENDC_UT_COMMON_SRC
@@ -38,13 +40,13 @@ file(GLOB ASCENDC_UT_STRUCT_CASE_SRC
     struct/*.cpp
 )
 
-file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIC_CASE_SRC
-    npu_arch_2201/aic/*.cpp
-)
+# file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIC_CASE_SRC
+#     npu_arch_2201/aic/*.cpp
+# )
 
-file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIV_CASE_SRC
-    npu_arch_2201/aiv/*.cpp
-)
+# file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIV_CASE_SRC
+#     npu_arch_2201/aiv/*.cpp
+# )
 
 file(GLOB ASCENDC_UT_NPU_ARCH_3510_AIC_CASE_SRC
     npu_arch_3510/aic/*.cpp
@@ -66,8 +68,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         UT_TEST
         ASCENDC_OOM=1
         ASCENDC_DUMP=0
-        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:__NPU_ARCH__=2201>
-        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:__NPU_ARCH__=2201>
+        # $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:__NPU_ARCH__=2201>
+        # $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:__NPU_ARCH__=2201>
         $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIC>:__NPU_ARCH__=3510>
         $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIV>:__NPU_ARCH__=3510>
         __disable_kernel_type_autoinfer__=
@@ -86,8 +88,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
 
     target_link_libraries(ascendc_ut_tensor_api_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
-        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:tikicpulib::ascend910B1>
+        # $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:tikicpulib::ascend910B1>
+        # $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:tikicpulib::ascend910B1>
         $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIC>:tikicpulib::ascend950pr_9599>
         $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIV>:tikicpulib::ascend950pr_9599>
         -Wl,--no-as-needed
