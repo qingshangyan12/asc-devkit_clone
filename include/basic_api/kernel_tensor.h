@@ -234,6 +234,33 @@ private:
 template <typename T> class GlobalTensor : public BaseGlobalTensor<T>, public BaseTensorTraitTensor<T> {
 public:
     using PrimType = PrimT<T>;
+
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+    struct Proxy {
+        __gm__ PrimType* ptr;
+        __aicore__ inline Proxy& operator=(const PrimType value) {
+            *ptr = value;
+            dcci(reinterpret_cast<__gm__ uint64_t *>(ptr),
+                cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+            return *this;
+        }
+        __aicore__ inline Proxy& operator=(const Proxy& src) {
+            dcci(reinterpret_cast<__gm__ uint64_t *>(src.ptr),
+                cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+            *ptr = *src.ptr;
+            dcci(reinterpret_cast<__gm__ uint64_t *>(ptr),
+                cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+            return *this;
+        }
+        // 隐式类型转换
+        __aicore__ inline operator PrimType() const {
+            return *ptr;
+        }
+        private:
+            __gm__ PrimType* operator&() const = delete;
+    };
+#endif
+
     __aicore__ inline GlobalTensor<T>();
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     __aicore__ inline ~GlobalTensor<T>();
@@ -244,10 +271,16 @@ public:
     __aicore__ inline __gm__ PrimType* GetPhyAddr(const uint64_t offset) const;
 
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint64_t offset) const;
-    __aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator()(const uint64_t offset) const;
+
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint64_t offset);
-    __aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator()(const uint64_t offset);
+#endif
+    
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+    __aicore__ inline __inout_pipe__(S) Proxy operator()(const uint64_t offset);
+    __aicore__ inline __inout_pipe__(S) Proxy operator()(const uint64_t offset) const;
+#else
+    __aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator()(const uint64_t offset) const;
 #endif
     __aicore__ inline void SetValue(const uint64_t offset, PrimType value);
 
