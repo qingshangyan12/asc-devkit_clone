@@ -44,7 +44,7 @@ public:
             return;
         }
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            copy_ubuf_to_gm_align_v2((__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, blockLen, cacheMode,
+            asc_copy_ub2gm((__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, blockLen, cacheMode,
                                      dstStride, srcStride);
         }
     }

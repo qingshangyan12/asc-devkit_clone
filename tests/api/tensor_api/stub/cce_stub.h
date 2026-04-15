@@ -50,4 +50,10 @@ mock_copy_matrix_cc_to_gm(float, float);
 mock_copy_matrix_cc_to_gm(half, float);
 mock_copy_matrix_cc_to_gm(int8_t, int32_t);
 
+inline void create_ca_matrix_h(__ca__ bfloat16_t* dst, int64_t repeat, half value) {}
+inline void create_ca_matrix_ui(__ca__ bfloat16_t* dst, int64_t repeat, int32_t value) {}
+inline void create_cb_matrix_h(__ca__ bfloat16_t* dst, int64_t repeat, half value) {}
+inline void create_cb_matrix_ui(__ca__ bfloat16_t* dst, int64_t repeat, int32_t value) {}
+inline void create_cbuf_matrix_h(__ca__ bfloat16_t* dst, int64_t repeat, half value) {}
+inline void create_cbuf_matrix_ui(__ca__ bfloat16_t* dst, int64_t repeat, int32_t value) {}
 #endif
