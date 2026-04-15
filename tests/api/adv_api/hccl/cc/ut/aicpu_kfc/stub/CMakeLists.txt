@@ -82,6 +82,13 @@ list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX "aicpu_kfc/framework/communicat
 list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX "aicpu_kfc/framework/common/src/topo/topo_device/topoinfo_ranktableParser_device.cc")
 list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX "aicpu_kfc/framework/communicator/impl/independent_op/data_api/hccl_api_data_aicpu_ts.cc")
 list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX "aicpu_kfc/framework/common/src/topo/topo_device/.*")
+list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX ".*aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_open.*\\.cc")
+
+# 重复定义冲突
+list(FILTER COMMON_SOURCES EXCLUDE REGEX ".*/common/debug/profiling/plugin_runner_device\\.cc$")
+list(FILTER COMMON_SOURCES EXCLUDE REGEX ".*/common/debug/profiling/task_exception_handler_device\\.cc$")
+list(FILTER COMMON_SOURCES EXCLUDE REGEX ".*/common/stream/stream_utils_aicpu\\.cc$")
+list(FILTER COMMON_SOURCES EXCLUDE REGEX ".*/common/launch_device/launch_device\\.cc$")
 
 set(orion_list
     ${HCCL_CODE_ROOT}/framework/next/comms/comm_engine_res/threads/aicpu_ts_thread.cc
@@ -130,13 +137,15 @@ target_include_directories(hccl_llt  PRIVATE
     ${HCCL_LLT_ROOT}/stub
     ${HCCL_LLT_ROOT}/stub/legacy/
 
+    
+    ${HCCL_CODE_ROOT}
     ${HCCL_CODE_ROOT}/framework/common/src
-    ${HCCL_CODE_ROOT}/include/
-    ${HCCL_CODE_ROOT}/include/hccl/
-    ${HCCL_CODE_ROOT}/pkg_inc
-    ${HCCL_CODE_ROOT}/pkg_inc/hccl
-    ${HCCL_CODE_ROOT}/pkg_inc/hcomm/ccu
-    ${HCCL_CODE_ROOT}/externel_depends/tsch
+    ${HCCL_HCOMM_HEADER_DIR}
+    ${HCCL_HCOMM_HEADER_DIR}/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
+    ${HCCL_HCOMM_HEADER_DIR}/externel_depends/tsch
     ${HCCL_CODE_ROOT}/pub_inc/
     ${HCCL_CODE_ROOT}/pub_inc/inner
     ${HCCL_CODE_ROOT}/pub_inc/aicpu
@@ -145,7 +154,6 @@ target_include_directories(hccl_llt  PRIVATE
     ${HCCL_CODE_ROOT}/platform/hccp/inc/network
     ${RDMA_CORE_INCLUDE_DIR}
     ${HCCL_CODE_ROOT}/pkg_inc
-    ${HCCL_CODE_ROOT}/external_depends
 
     # hccl/hccl目录下头文件
     ${HCCL_CODE_ROOT}/inc

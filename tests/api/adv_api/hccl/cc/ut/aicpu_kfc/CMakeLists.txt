@@ -392,3 +392,4 @@ set(UT_COMMON_INCLUDE_LIST
 
 add_subdirectory(stub)
 add_subdirectory(testcase)
+endif()
