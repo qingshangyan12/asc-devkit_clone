@@ -75,12 +75,7 @@ __aicore__ inline bfloat16_t Cast(const float& fVal);
      (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 // 各架构特化的：类型 -> float
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-template <typename T, typename U = float,
-          typename = Std::enable_if_t<
-              (Std::is_same<T, bfloat16_t>::value || Std::is_same<T, hifloat8_t>::value ||
-               Std::is_same<T, fp8_e5m2_t>::value || Std::is_same<T, fp8_e4m3fn_t>::value ||
-               Std::is_same<T, fp4x2_e1m2_t>::value || Std::is_same<T, fp4x2_e2m1_t>::value),
-              void>>
+template <typename T, typename U, typename>
 __aicore__ constexpr inline U Cast(T bVal);
 #else
 __aicore__ inline float Cast(const bfloat16_t& bVal);
