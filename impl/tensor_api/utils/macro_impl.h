@@ -21,6 +21,7 @@
 */
 #ifndef IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
 #define IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
+#include "c_api/asc_simd.h"
 #include "include/utils/base/sys_macros.h"
 #include "include/utils/base/sys_constants.h"
 
