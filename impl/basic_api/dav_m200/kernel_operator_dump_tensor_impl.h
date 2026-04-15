@@ -112,56 +112,6 @@ __aicore__ inline uint32_t GetdataCopyCount(uint32_t dataLen)
 __aicore__ inline int64_t GetBlockNum();
 __aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
 {
-    if (g_dumpWorkspaceReserved == nullptr) {
-        ASCENDC_ASSERT((false),
-            { KERNEL_LOG(KERNEL_ERROR, "init dump get nullptr system workspace ptr"); });
-        return;
-    }
-    uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved) - DUMP_WORKSPACE_SIZE;
-    uint32_t totalBlockNum = GetBlockNum();
-    uint32_t blockDumpSize = DUMP_UINTSIZE; // DUMP_UINTSIZE is 1M
-#ifdef __ENABLE_VECTOR_CORE__
-#if defined(__DAV_M200_VEC__)
-    uint32_t numBlocks = GetBlockIdxImpl() - get_data_main_base();
-#else
-    uint32_t numBlocks = GetBlockIdxImpl() - get_data_main_base() + AIV_CORE_NUM;
-#endif
-#else
-    uint32_t numBlocks = GetBlockIdxImpl() + AIV_CORE_NUM;
-#endif
-    if (numBlocks >= DUMP_CORE_COUNT) {
-        return;
-    }
-    uint32_t blkInfoLen = sizeof(BlockInfo);
-    uint64_t blockInfoStart = dumpWorkspaceStart + numBlocks * DUMP_UINTSIZE;
-    PipeBarrier<PIPE_ALL>();
-    *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_LEN_POS) = blockDumpSize;
-    *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_CORE_POS) = numBlocks;
-    *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_BLOCKNUM_POS) = totalBlockNum;
-    *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_DUMPOFFSET_POS) = blockDumpSize - blkInfoLen - sizeof(DumpMeta);
-    *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_MAGIC_POS) = 0x5aa5bccd;
-    *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_RSV_POS) = 0;
-    *((__gm__ uint64_t *)((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_DUMP_ADDR)) = blockInfoStart + blkInfoLen + sizeof(DumpMeta);
-    PipeBarrier<PIPE_ALL>();
-    dcci((__gm__ uint64_t *)blockInfoStart, cache_line_t::ENTIRE_DATA_CACHE);
-    // write DUM_META message
-    uint32_t coreType = 1;
-#if defined(__DAV_M200_VEC__)
-    coreType = 2;
-#endif
-    blockInfoStart = blockInfoStart + sizeof(BlockInfo);
-    *(__gm__ uint32_t*)((__gm__ uint8_t*)blockInfoStart + DUMP_META_TYPE_POS) =
-        static_cast<uint32_t>(DumpType::DUMP_META);
-    *(__gm__ uint32_t*)((__gm__ uint8_t*)blockInfoStart + DUMP_META_LEN_POS) = 8;
-    *(__gm__ uint16_t*)((__gm__ uint8_t*)blockInfoStart + DUMP_META_BLOCK_DIM_POS) =
-        static_cast<uint16_t>(GetBlockNum());
-    *(__gm__ uint8_t*)((__gm__ uint8_t*)blockInfoStart + DUMP_META_CORE_TYPE_POS) =
-        static_cast<uint8_t>(coreType);
-    *(__gm__ uint8_t*)((__gm__ uint8_t*)blockInfoStart + DUMP_META_TASK_RATION) =
-        static_cast<uint8_t>(GetTaskRationImpl());
-    *((__gm__ uint32_t*)blockInfoStart + DUMP_META_RSV_POS) = 0;
-    PipeBarrier<PIPE_ALL>();
-    dcci((__gm__ uint64_t *)blockInfoStart, cache_line_t::ENTIRE_DATA_CACHE);
 }
 
 template <typename T>
@@ -705,7 +655,7 @@ __aicore__ inline void WriteTLHead(DumpType printType, uint64_t tmpAddr, __gm__ 
 template <class... Args>
 __aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char *fmt, Args&&... args)
 {
-#ifdef ASCENDC_DUMP
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
 #ifdef __ENABLE_VECTOR_CORE__
 #if defined(__DAV_M200_VEC__)
     uint32_t blockIdx = GetBlockIdxImpl() - get_data_main_base();
@@ -763,31 +713,63 @@ __aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char *f
 #endif
 }
 
+__aicore__ __gm__ inline BlockRingBufInfo* GetBlockRingBufInfo();
+__aicore__ __gm__ inline RingBufWriteInfo* GetRingBufWriteInfo(__gm__ BlockRingBufInfo* blockRingBufInfo);
+
 template <class... Args>
-__aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args);
+__aicore__ inline void PrintCommonHead(DumpType printType)
+{
+    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
+    if (blockRingBufInfo == nullptr) {
+        return;
+    }
+    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
+    if (writeInfo == nullptr || writeInfo->packIdx != 0) {
+        return;
+    }
+
+    uint64_t __ascendc_tStamp = 0;
+    uint64_t __ascendc_version = 0;
+    __gm__ char* __ascendc_versionStr = nullptr;
+    GetCannVersion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
+    if (__ascendc_tStamp == 0) {
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
+    } else {
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
+    }
+}
 
 template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
+    uint64_t ctrlValue = get_ctrl();
+    set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE);
     if (g_sysPrintFifoSpace != nullptr) {
-        PrintfRingBufImpl(printType, fmt, args...);
+        __asc_aicore::enable_asc_diagnostics();
+#if !defined(__NPU_DEVICE__)
+        if (printType != DumpType::DUMP_ASSERT) {
+            PrintCommonHead(printType);
+        }
+#endif
+#ifdef __DAV_VEC__
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "[AIV Block %u/%u] ", GetBlockIdx(), GetBlockNum());
+#else
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "[AIC Block %u/%u] ", GetBlockIdx(), GetBlockNum());
+#endif
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, fmt, args...);
     } else {
-        uint64_t ctrlValue = get_ctrl();
-        set_atomic_none();
         PrintfEntityImpl(printType, fmt, args...);
-        set_ctrl(ctrlValue);
     }
+    set_ctrl(ctrlValue);
 }
 
 __aicore__ inline void EnablePrintf()
 {
-#if defined(__ENABLE_ASCENDC_PRINTF__)
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_TIME_STAMP_ON)
     static const struct BinaryMetaAscFeature __asc_feature_print__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 1};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
-#endif // __ENABLE_ASCENDC_PRINTF__
 }
 
 __aicore__ __gm__ inline RingBufReadInfo* GetRingBufReadInfo(__gm__ BlockRingBufInfo* blockRingBufInfo)
@@ -1061,12 +1043,6 @@ __aicore__ inline void WriteRingBufTlvData(__gm__ PrintTlvInfoHead* printTlv, __
     SetArgsData(paramAddr, 0, strParamOffset, args...);
 }
 
-template <class... Args>
-__aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
-{
-    __asc_aicore::printf_impl(fmt, args...);
-}
-
 template <typename T>
 __aicore__ inline Hardware CheckDumpTensorPosition(const LocalTensor<T>& src)
 {
@@ -1235,7 +1211,7 @@ __aicore__ inline void WriteRingBufTlvData(
 template <template <typename> class Tensor, typename T>
 __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
-#ifdef ASCENDC_DUMP
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     EnablePrintf();
     if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
         ASCENDC_ASSERT((false),
@@ -1317,21 +1293,9 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 }
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 {
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP)
-    g_dumpWorkspaceReserved = GetSysWorkSpacePtr();
-    InitDumpImpl(mixFlag, gmLen);
-#else
-    return;
-#endif
 }
 __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
 {
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP)
-    g_dumpWorkspaceReserved = dumpStartAddr + DUMP_WORKSPACE_SIZE;
-    InitDumpImpl(mixFlag, gmLen);
-#else
-    return;
-#endif
 }
 }
 #endif
