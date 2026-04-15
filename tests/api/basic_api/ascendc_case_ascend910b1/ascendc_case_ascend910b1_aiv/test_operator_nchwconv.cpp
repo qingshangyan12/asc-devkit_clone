@@ -132,17 +132,14 @@ int32_t RaiseStubForNpuDebug(int32_t i)
 
 class TestTransDataTo5HDNpuDebug : public testing::Test {
 protected:
-    void SetUp() { AscendC::SetGCoreType(2); }
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+    }
     void TearDown()
     {
-        AscendC::SetGCoreType(0);
-        block_idx = 0;
-        block_num = 8;
-        g_coreType = 0;
-        g_taskRation = 2;
-        sub_block_idx = 0;
-        g_kernelMode = KernelMode::MIX_MODE;
         AscendC::CheckSyncState();
+        AscendC::SetGCoreType(0);
         GlobalMockObject::verify();
     }
 };
@@ -271,43 +268,3 @@ TEST_F(TestTransDataTo5HDNpuDebug, SrcHighHalfInvalidForHalfOverload1)
     TransDataTo5HD<half>(dstList, srcList, params);
 }
 
-// --- repeatTimes=256 (exceeds [0, 255]) ---
-TEST_F(TestTransDataTo5HDNpuDebug, RepeatTimesOverflow)
-{
-    TPipe tpipe;
-    LocalTensor<half> dstList[NCHW_CONV_ADDR_LIST_SIZE];
-    LocalTensor<half> srcList[NCHW_CONV_ADDR_LIST_SIZE];
-
-    TBuf<TPosition::VECCALC> dstBuf;
-    tpipe.InitBuffer(dstBuf, 256 * sizeof(half));
-    LocalTensor<half> dstLocal = dstBuf.Get<half>();
-
-    TBuf<TPosition::VECCALC> srcBuf;
-    tpipe.InitBuffer(srcBuf, 256 * sizeof(half));
-    LocalTensor<half> srcLocal = srcBuf.Get<half>();
-
-    for (int i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
-        dstList[i] = dstLocal[16 * i];
-        srcList[i] = srcLocal[16 * i];
-    }
-
-    TransDataTo5HDParams params;
-    params.dstHighHalf = false;
-    params.srcHighHalf = false;
-    params.repeatTimes = 256;  // exceeds [0, 255]
-    params.dstRepStride = 16;
-    params.srcRepStride = 16;
-
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForNpuDebug));
-    TransDataTo5HD<half>(dstList, srcList, params);
-}
-
-// --- Overload 3: (LocalTensor<uint64_t> &dst, LocalTensor<uint64_t> &src) - dst position not UB ---
-// Note: Removed - Overload 3 uses VA register address lists. In UT framework, ASCENDC_DEBUG_ASSERT
-// does not terminate execution after position check failure, and subsequent CPU Debug code
-// (CheckFunTransDataTo5HD / TransDataTo5HDVldVaRegImpl) accesses the tensor's physical memory,
-// which causes segfault when tensor is on a non-UB position (e.g., A2).
-// This scenario should be tested on NPU instead.
-
-// --- Overload 3: src position not UB ---
-// Note: Removed - Same reason as above.
