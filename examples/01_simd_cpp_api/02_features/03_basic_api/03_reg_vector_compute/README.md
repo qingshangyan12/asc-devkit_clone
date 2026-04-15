@@ -16,3 +16,5 @@
 | [block_reduce](./block_reduce) | 本样例基于RegBase编程范式实现ReduceDataBlock运算（SUM模式），对每个DataBlock(32B)内元素归约 |
 | [cast](./cast)　　　　　　　　 | 本样例基于RegBase编程范式实现Cast运算，用于RegTensor数据类型转换（位宽大转小/小转大）　　　 |
 | [truncate](./truncate)　　　　 | 本样例基于RegBase编程范式实现Truncate运算，将浮点数截断到整数位　　　　　　　　　　　　　　 |
+| [arange](./arange)　　　　　　 | 本样例基于RegBase编程范式实现Arange运算，以标量值为起始生成递增/递减索引序列　　　　　　　　|
+| [duplicate](./duplicate)　　　 | 本样例基于RegBase编程范式实现Duplicate运算（标量填充），将标量值填充到向量的每个位置　　　　　|
