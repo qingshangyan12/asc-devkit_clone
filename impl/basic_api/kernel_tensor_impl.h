@@ -1386,7 +1386,7 @@ __aicore__ inline __inout_pipe__(S)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     __gm__ PrimType* addr = ExtractL2CacheGmAddr(this->address_);
-    return Proxy{addr[offset]};
+    return Proxy{&addr[offset]};
 #else
     uintptr_t tmpAddr = AlignPtr<PrimType>(this->oriAddress_ + offset);
     if (tmpAddr != lastReadCacheAddr) {
@@ -1405,7 +1405,7 @@ __aicore__ inline __inout_pipe__(S)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     __gm__ PrimType* addr = ExtractL2CacheGmAddr(this->address_);
-    return Proxy{addr[offset]};
+    return Proxy{&addr[offset]};
 #else
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     uintptr_t tmpAddr = AlignPtr<PrimType>(this->oriAddress_ + offset);
