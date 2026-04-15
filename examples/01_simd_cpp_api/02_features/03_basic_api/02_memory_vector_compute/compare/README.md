@@ -125,8 +125,7 @@
 | `NPU_ARCH` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列、dav-3510 对应 Ascend 950PR/Ascend 950DT |
 | `SCENARIO_NUM` | `1`（默认）、`2`、`3`、`4` | 场景编号<br>1：Compare<br>2：Compare（结果存入寄存器）<br>3：Compares<br>4：Compares（灵活标量位置） |
 
-- 执行结果
-
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

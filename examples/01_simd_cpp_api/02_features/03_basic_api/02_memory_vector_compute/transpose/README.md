@@ -43,8 +43,7 @@
   | 2 | 增强转置 | [3,3,2,8] | [3,2,8,3] | half | NCHW | NHWC | TRANSPOSE_NCHW2NHWC |
   | 3 | 5HD格式转换 | [2,32,16,16] | [2,2,16,16,16] | half | NCHW | NC1HWC0 | / |
 
-- 数据格式说明：
-
+- 数据格式说明：  
   卷积神经网络的特征图（Feature Map）通常用四维数组保存，即4D，4D格式解释如下：
     - N：Batch数量。
     - H：Height，特征图高度。

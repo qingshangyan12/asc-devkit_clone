@@ -45,14 +45,12 @@
 
   输出Tensor { shape:[B, S, N, H/N], origin_shape:[B, S, N, H/N], format:"ND", origin_format:"ND"}
 
-  - Kernel实现
-
+  - Kernel实现  
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Transpose高阶API接口完成Transpose计算，得到最终结果，再搬出到外部存储上。
 
     TransposeCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行Transpose计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
-  - Tiling实现
-
+  - Tiling实现  
     使用Ascend C提供的GetTransposeTilingInfo接口，获取所需的Tiling参数，并调用GetTransposeMaxMinTmpSize接口获取Transpose接口计算所需的临时空间大小。
 
   - 调用实现  
