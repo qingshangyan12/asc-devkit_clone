@@ -241,6 +241,7 @@ tilingkey parallel compile num is {ascendc_self_par_job_num}", AscendCLogLevel.L
 
 
 def compile_multi_tilingkey(tiling_key_list, cmds_list, dstfile_name, compile_log_path):
+    print("yyc test enter compile_multi_tilingkey", flush=True)
     parallel_compile_check = os.getenv('TILINGKEY_PAR_COMPILE')
     if parallel_compile_check not in [None, '1', '0']:
         CommonUtility.print_compile_log("", "TILINGKEY_PAR_COMPILE ONLY SUPPORT 0 OR 1, current \
@@ -251,10 +252,10 @@ TILINGKEY_PAR_COMPILE is {}".format(parallel_compile_check), AscendCLogLevel.LOG
     mk_file = f'{dstfile_with_pid}.mk'
     if parallel_compile_check == '1':
         _ignore_parallel_job_self_set()
-        cmd = ['make', '-f', mk_file]
+        cmd = ['make', '-f', mk_file, "VERBOSE=1"]
     else:
         ascendc_self_par_job_num = _get_parallel_job_without_op_project(len(tiling_key_list))
-        cmd = ['make', '-f', mk_file, '-j', f'{ascendc_self_par_job_num}']
+        cmd = ['make', '-f', mk_file, '-j', f'{ascendc_self_par_job_num}', "VERBOSE=1"]
     cmd_str = ' '.join(cmd)
     file_name = ""
     if global_var_storage.get_variable("ascendc_enable_build_log") is True:
@@ -270,14 +271,15 @@ TILINGKEY_PAR_COMPILE is {}".format(parallel_compile_check), AscendCLogLevel.LOG
                 cmd_str = ' '.join(cmd)
         except Exception as err:
             raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write log failed, reason is:", err))
-    ret = os.system(f'{cmd_str} > /dev/null')
-    if ret != 0 and global_var_storage.get_variable("ascendc_enable_build_log") is True:
-        file_name_parts = file_name.split('.')
-        new_file_name = file_name_parts[0] + "_error." + file_name_parts[-1]
-        os.rename(file_name, new_file_name)
-        CommonUtility.print_compile_log("", "Operator {}_{}: errors occurred during compile phase \
-of {}, See also {}".format(kernel_name, hash_name, \
-str(CompileStage.COMPILE), new_file_name), AscendCLogLevel.LOG_ERROR)
+    ret = os.system(f'{cmd_str}')
+    if ret != 0:
+        if global_var_storage.get_variable("ascendc_enable_build_log") is True:
+            file_name_parts = file_name.split('.')
+            new_file_name = file_name_parts[0] + "_error." + file_name_parts[-1]
+            os.rename(file_name, new_file_name)
+            CommonUtility.print_compile_log("", "Operator {}_{}: errors occurred during compile phase \
+    of {}, See also {}".format(kernel_name, hash_name, \
+    str(CompileStage.COMPILE), new_file_name), AscendCLogLevel.LOG_ERROR)
         raise Exception("An error occurred during compile phases of {}".format(str(CompileStage.COMPILE)))
     if not global_var_storage.get_variable("ascendc_compile_debug_config"):
         CommonUtility.remove_temp_file(mk_file)
