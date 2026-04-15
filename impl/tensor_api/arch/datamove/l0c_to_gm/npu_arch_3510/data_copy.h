@@ -56,14 +56,14 @@ private:
     __aicore__ inline static constexpr void CheckTemplate()
     {
         if constexpr (IsNDFormat<T>::value) {
-            CheckFormat::CheckNDTemplate<T>();
+            CheckLayoutPattern<T>();
         } else if constexpr (IsDNFormat<T>::value) {
-            CheckFormat::CheckDNTemplate<T>();
+            CheckLayoutPattern<T>();
         } else if constexpr (IsNZFormat<T>::value || IsL0cNZFormat<T>::value) {
             CheckFormat::CheckFixpipeNZTemplate<T, trait.enableChannelSplit>();
         }
 
-        CheckFormat::CheckL0CNZTemplate<U>();
+        CheckLayoutPattern<U>();
     }
 
     template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U>
@@ -112,13 +112,13 @@ private:
     __aicore__ inline static constexpr void CheckTemplate()
     {
         if constexpr (IsNDFormat<T>::value) {
-            CheckFormat::CheckNDTemplate<T>();
+            CheckLayoutPattern<T>();
         } else if constexpr (IsDNFormat<T>::value) {
-            CheckFormat::CheckDNTemplate<T>();
+            CheckLayoutPattern<T>();
         } else if constexpr (IsNZFormat<T>::value || IsL0cNZFormat<T>::value) {
             CheckFormat::CheckFixpipeNZTemplate<T, trait.enableChannelSplit>();
         }
-        CheckFormat::CheckL0CNZTemplate<U>();
+        CheckLayoutPattern<U>();
     }
 
     template <const CopyL0C2GMTrait& trait, typename T, typename U, bool IsTail>
