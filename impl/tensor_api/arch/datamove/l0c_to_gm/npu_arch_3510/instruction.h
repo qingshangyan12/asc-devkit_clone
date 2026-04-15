@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_DATAMOVE_L0C_TO_GM_NPU_ARCH_3510_INSTRUCTION_H
 
 #include "impl/tensor_api/arch/utils/arch_utils.h"
+#include "include/c_api/cube_datamove/cube_datamove.h"
 
 namespace AscendC {
 namespace Te {
@@ -38,7 +39,7 @@ public:
             return;
         }
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            copy_matrix_cc_to_gm(dst.Data().Get(), src.Data().Get(), 0, nSize, mSize, dstStride, srcStride, cacheMode,
+            asc_copy_l0c2gm(dst.Data().Get(), src.Data().Get(), nSize, mSize, dstStride, srcStride, cacheMode,
                                  0, unitFlag, static_cast<uint64_t>(quantPre), reluEn, isChannelSplit, nz2ndEn,
                                  static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
                                  false, false, nz2dnEn);

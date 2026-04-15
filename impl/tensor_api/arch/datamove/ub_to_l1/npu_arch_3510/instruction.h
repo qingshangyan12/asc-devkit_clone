@@ -25,6 +25,7 @@
 #include "impl/tensor_api/tensor/pointer_impl.h"
 #include "impl/tensor_api/tensor/local_tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
+#include "include/c_api/vector_datamove/vector_datamove.h"
 
 namespace AscendC {
 namespace Te {
@@ -45,7 +46,7 @@ public:
         }
 
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            copy_ubuf_to_cbuf((__cbuf__ void*)dst, (__ubuf__ void*)src, 0, blockCount, blockLen, srcStride, dstStride);
+            asc_copy_ub2l1((__cbuf__ void*)dst, (__ubuf__ void*)src, 0, blockCount, blockLen, srcStride, dstStride);
         }
     }
 };
