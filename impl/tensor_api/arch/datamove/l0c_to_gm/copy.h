@@ -92,13 +92,7 @@ private:
     }
 };
 
-struct CopyL0C2GMWith {
-    template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
-    {
-        // custom function Fixpipe<traits, Args...>(args...);
-    }
-};
+using CopyL0C2GMWith = CopyL0C2GM;
 
 } // namespace Te
 } // namespace AscendC
