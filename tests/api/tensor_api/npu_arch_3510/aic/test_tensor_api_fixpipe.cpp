@@ -62,7 +62,7 @@ public:
         constexpr uint32_t base = 16;
         quant_pre_global = static_cast<uint64_t>(QUANT_MODE);
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeL0CLayout(mLength_, nLength_);
+        auto l0cMatrixLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(mLength_, nLength_);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);
         if constexpr (C_TYPE::format == CubeFormat::ND) {
             if constexpr (HAS_COORD) {
@@ -115,7 +115,7 @@ public:
             }
         } else if constexpr (IS_TENSOR) {
             auto qIterator = MakeL1memPtr(qAddr);
-            auto qMatrixLayout = MakeNDLayout<uint64_t>(1, nLength_);
+            auto qMatrixLayout = MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<uint64_t>>(1, nLength_);
             auto qTensor = MakeTensor(qIterator, qMatrixLayout);
             if constexpr (HAS_COORD) {
                 gm_addr_global = gmTensor(MakeCoord(base, base), gmTensor.Layout().Shape()).Data().Get();
@@ -150,15 +150,15 @@ private:
         auto gmIterator = MakeGMmemPtr(gmC_);
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
             using CastT = std::conditional_t<sizeof(DstT) == 4, half, DstT>;
-            auto gmMatrixLayout = MakeNzLayout<CastT>(mLength_, nLength_);
+            auto gmMatrixLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<CastT>>(mLength_, nLength_);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         } else if constexpr (C_TYPE::format == CubeFormat::DN) {
-            auto gmMatrixLayout = MakeDNLayout<DstT>(mLength_, nLength_);
+            auto gmMatrixLayout = MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<DstT>>(mLength_, nLength_);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         } else {
-            auto gmMatrixLayout = MakeNDLayout<DstT>(mLength_, nLength_);
+            auto gmMatrixLayout = MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<DstT>>(mLength_, nLength_);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         }
