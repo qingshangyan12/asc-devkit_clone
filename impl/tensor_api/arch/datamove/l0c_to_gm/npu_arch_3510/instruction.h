@@ -38,7 +38,7 @@ public:
             return;
         }
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            copy_matrix_cc_to_gm(dst.Data().Get(), src.Data().Get(), 0, nSize, mSize, dstStride, srcStride, cacheMode,
+            asc_copy_l0c2gm(dst.Data().Get(), src.Data().Get(), nSize, mSize, dstStride, srcStride, cacheMode,
                                  0, unitFlag, static_cast<uint64_t>(quantPre), reluEn, isChannelSplit, nz2ndEn,
                                  static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
                                  false, false, nz2dnEn);
