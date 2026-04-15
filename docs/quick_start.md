@@ -7,14 +7,16 @@
 
 | 安装方式 | 说明 |使用场景|
 | :--- | :--- | :--- |
-| 使用WebIDE安装 | WebIDE可提供在线直接运行的昇腾环境，当前可提供单机算力，默认安装最新商发版CANN软件包和固件/驱动包。目前仅适用于Atlas A2系列产品，ARM架构。| 适用于没有昇腾设备的开发者。|
-| 使用Docker部署 | Docker镜像是一种CANN高效部署方式，目前仅适用于Atlas A2系列产品，OS仅支持Ubuntu操作系统。|适用有昇腾设备，需要快速搭建环境的开发者。|
+| 使用WebIDE安装 | WebIDE可提供在线直接运行的昇腾环境。目前仅适用于Atlas A2系列产品，ARM架构。当前可提供单机算力，**默认安装最新商发版CANN软件包和固件/驱动包。**<br>**对于master分支的使用，需要参考场景三安装最新社区包。**| 适用于没有昇腾设备的开发者。|
+| 使用Docker部署 | Docker镜像是一种CANN高效部署方式，目前仅适用于Atlas A2系列产品，OS仅支持Ubuntu操作系统。**默认安装最新商发版CANN软件包和固件/驱动包。**|适用有昇腾设备，需要快速搭建环境的开发者。|
 | 手动安装软件包 | - |适用有昇腾设备，想体验手动安装CANN包或体验最新master分支能力的开发者。|
 
 
 ### 场景一：使用WebIDE安装
 
-对于无环境的用户，可直接使用WebIDE开发平台，即“**一站式开发平台**”，该平台为您提供在线可直接运行的昇腾环境，环境中已安装必备的软件包，无需手动安装。更多关于开发平台的介绍请参考[LINK](https://gitcode.com/org/cann/discussions/54)。
+对于无环境的用户，可直接使用WebIDE开发平台，即“**一站式开发平台**”，该平台为您提供在线可直接运行的昇腾环境，环境中已安装必备的软件包，无需手动安装。
+> **说明**：
+<br>环境默认安装最新商发版CANN包和固件/驱动包，源码下载时注意与软件配套。更多关于开发平台的介绍请参考[LINK](https://gitcode.com/org/cann/discussions/54)。
 
 1. 进入开源项目，单击“`云开发`”按钮，使用已认证过的华为云账号登录。若未注册或认证，请根据页面提示进行注册和认证。
 
@@ -27,8 +29,9 @@
 
 ### 场景二：使用Docker部署
 
-**说明：**
+>**说明：**
 <br>镜像文件比较大，正常网速下，下载时间约为5-10分钟，请您耐心等待。
+<br>环境默认安装最新商发版CANN包和固件/驱动包，源码下载时注意与软件配套。
 
 **1.安装固件和驱动**：请参考[CANN软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
 
@@ -78,7 +81,7 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
     运行算子时必须安装驱动与固件，若仅编译算子，可跳过本操作，安装指导请参考[CANN软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
    
-2. 安装社区版CANN toolkit包。
+2. 安装最新版CANN toolkit包。
 
     ```bash
     # 确保安装包具有可执行权限
@@ -87,7 +90,7 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
     ./Ascend-cann-toolkit_${cann_version}_linux-${arch}.run --install --install-path=${install_path}
     ```
 
-3. 安装社区版CANN ops包。
+3. 安装最新版CANN ops包。
 
     运行算子前必须安装本包，若仅编译算子，可跳过本操作。
 
@@ -106,6 +109,10 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
 如果您想体验**官网正式发布的CANN包**能力，请访问[CANN官网下载中心](https://www.hiascend.com/cann/download)，选择对应版本CANN软件包（仅支持CANN 8.5.0及后续版本）进行安装。
 
+进入官网后，首先点击**版本选择**，定位目标版本。随后，根据您的**产品系列**、**CPU架构**和**操作系统**，选择合适的安装方式。我们提供了多种安装方式，以Ubuntu为例，包括：**在线安装（apt-get）、在线安装（Conda）、离线安装（Runfile）**，您可根据实际需求灵活选择。
+
+> [!NOTE]
+> 如果您不清楚设备的具体硬件信息，可使用页面提供的相关命令进行查询。系统将根据查询结果自动匹配对应的**产品系列**。
 
 ## 环境验证
 
