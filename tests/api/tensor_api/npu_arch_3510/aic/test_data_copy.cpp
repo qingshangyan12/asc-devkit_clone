@@ -164,6 +164,8 @@ __aicore__ inline void tensor2tensor_run_stub(const T& dst, const U& src, const 
     check_coord_success<Coord>(coord);
 }
 
+#define MAKE_LAYOUT_TYPE(fmt) fmt##LayoutPtn
+
 // create tensor
 #define CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
     using namespace AscendC::Te; \
