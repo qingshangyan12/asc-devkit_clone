@@ -11,9 +11,20 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+if(DEFINED RUN_MODE)
+    set(CMAKE_ASC_RUN_MODE ${RUN_MODE} CACHE STRING "Alias of RUN_MODE")
+endif()
+
+if(DEFINED NPU_ARCH)
+    set(CMAKE_ASC_ARCHITECTURES ${NPU_ARCH} CACHE STRING "Alias of NPU_ARCH")
+endif()
+
+set(TRANS_MODE ${TRANS_MODE} CACHE STRING "TransData使用场景(1-4)")
+
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
+
 
 add_executable(demo
     transdata.asc
@@ -24,13 +35,18 @@ target_link_libraries(demo PRIVATE
     register
 )
 
+target_compile_definitions(demo PRIVATE
+    SCENARIO=${SCENARIO}
+)
+
 # ======================================================================================
 # NPU 编译选项配置
 #
 # 说明：
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
+set(NPU_ARCH "dav-2201" CACHE STRING "NPU ARCH, e.g. dav-2201, dav-3510")
+
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH}>
 )
