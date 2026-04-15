@@ -26,30 +26,35 @@
   CastCustom算子根据源操作数和目的操作数Tensor的数据类型进行精度转换。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> cast </td></tr>
+  <caption>表1：样例规格</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> cast </td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">512</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">y</td><td align="center">512</td><td align="center">int32_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 512]</td><td align="center">int32_t/int4b_t</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">cast_custom</td></tr>
   </table>
 
-- 算子实现：  
-  本样例中实现的是固定shape为输入x[512]，输出y[512]的CastCustom算子。
+- 场景说明：  
+  <table>
+  <caption>表2：SCENARIO参数说明</caption>
+  <tr><td align="center">SCENARIO</td><td align="center">输入类型</td><td align="center">输出类型</td><td align="center">说明</td></tr>
+  <tr><td align="center">1</td><td align="center">half</td><td align="center">int32_t</td><td align="center">half转int32_t</td></tr>
+  <tr><td align="center">2</td><td align="center">half</td><td align="center">int4b_t</td><td align="center">half转int4b_t</td></tr>
+  </table>
+
+- 样例实现：  
+  本样例中实现的是固定shape为输入x[1, 512]，输出y[1, 512]的CastCustom样例，支持half到int32_t和half到int4b_t两种转换场景。
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Cast基础API接口完成cast计算，得到最终结果，再搬出到外部存储上。
-
-    CastCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行精度转换，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
-
-
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Cast基础API接口完成cast计算，得到最终结果，再搬出到外部存储上。对于int4b_t场景，由于int4b_t使用int8_t类型传递，需要进行ReinterpretCast类型转换。
 
   - 调用实现  
-    使用内核调用符<<<>>>调用核函数。
+    使用内核调用符<<<>>>调用核函数，通过SCENARIO参数控制转换场景。
 
 ## 编译运行  
 在本样例根目录下执行如下步骤，编译并执行算子。
