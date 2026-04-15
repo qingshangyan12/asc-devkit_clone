@@ -31,8 +31,8 @@ TEST_F(Tensor_Api_Atom, CopyGM2L1Operation)
 
     auto coord = MakeCoord(Int<20>{}, Int<30>{});
 
-    auto gmSrc = MakeTensor(MakeGMmemPtr(src), MakeNDLayout<float>(11, 12));
-    auto l1Dst = MakeTensor(MakeL1memPtr(dst), MakeNzLayout<float>(11, 12));
+    auto gmSrc = MakeTensor(MakeGMmemPtr(src), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<float>>(11, 12));
+    auto l1Dst = MakeTensor(MakeL1memPtr(dst), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(11, 12));
 
     auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
     atomCopy.Call(l1Dst, gmSrc);
@@ -111,8 +111,8 @@ TEST_F(Tensor_Api_Atom, CopyL0C2GMOperation)
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
     constexpr uint32_t m = 64;
     constexpr uint32_t n = 32;
-    auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeL0CLayout(m, n));
-    auto gmDst = MakeTensor(MakeGMmemPtr(dst), MakeNDLayout<float>(m, n));
+    auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(m, n));
+    auto gmDst = MakeTensor(MakeGMmemPtr(dst), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     auto atomCopy = MakeCopy(CopyL0C2GM{}, CopyL0C2GMTraitDefault{});
     atomCopy.Call(gmDst, l0cSrc);
@@ -149,8 +149,8 @@ TEST_F(Tensor_Api_Atom, CopyL0C2GMWithOperation)
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
     constexpr uint32_t m = 32;
     constexpr uint32_t n = 64;
-    auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeL0CLayout(m, n));
-    auto gmDst = MakeTensor(MakeGMmemPtr(dst), MakeNDLayout<float>(m, n));
+    auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(m, n));
+    auto gmDst = MakeTensor(MakeGMmemPtr(dst), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     auto atomCopy = MakeCopy(CopyL0C2GM{});
     atomCopy.with(12).Call(gmDst, l0cSrc);

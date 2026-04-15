@@ -37,8 +37,9 @@ TEST_F(Tensor_Api_Atom, CopyL0C2UBOperation)
     __ubuf__ float dst[TILE_LENGTH] = {0};
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
-    auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeL0CLayout(32, 32));
-    auto ubDst = MakeTensor(MakeUBmemPtr(dst), MakeNDLayout<float>(32, 32));
+    auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(32, 32));
+    auto ubDst = MakeTensor(MakeUBmemPtr(dst), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<float>>(32, 32));
+    // auto ubDst = MakeTensor(MakeUBmemPtr(dst), MakeNDLayout<float>(32, 32));
 
     auto atomCopy = MakeCopy(CopyL0C2UB{}, CopyL0C2UBTraitDefault{});
     atomCopy.Call(ubDst, l0cSrc);
@@ -72,8 +73,9 @@ TEST_F(Tensor_Api_Atom, CopyL0C2UBWithOperation)
     __ubuf__ float dst[TILE_LENGTH] = {0};
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
-    auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeL0CLayout(32, 32));
-    auto ubDst = MakeTensor(MakeUBmemPtr(dst), MakeNDLayout<float>(32, 32));
+    auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(32, 32));
+    auto ubDst = MakeTensor(MakeUBmemPtr(dst), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<float>>(32, 32));
+    // auto ubDst = MakeTensor(MakeUBmemPtr(dst), MakeNDLayout<float>(32, 32));
 
     auto atomCopy = MakeCopy(CopyL0C2UB{});
     atomCopy.with(12).Call(ubDst, l0cSrc);
@@ -104,9 +106,10 @@ TEST_F(Tensor_Api_Atom, CopyL12UBND2ND)
     __ubuf__ type dst[m * n] = {0};
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
-
-    auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeNDLayout<type>(m, n));
-    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeNDLayout<type>(m, n));
+    auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    // auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeNDLayout<type>(m, n));
+    // auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeNDLayout<type>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyL12UB, CopyL12UBTraitDefault>>{}, ubTensor, l1Tensor, coord);
 
@@ -127,8 +130,10 @@ TEST_F(Tensor_Api_Atom, CopyL12UBDN2DN)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeDNLayout<type>(m, n));
-    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeDNLayout<type>(m, n));
+    auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    // auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeDNLayout<type>(m, n));
+    // auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeDNLayout<type>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyL12UB, CopyL12UBTraitDefault>>{}, ubTensor, l1Tensor, coord);
 
@@ -149,8 +154,8 @@ TEST_F(Tensor_Api_Atom, CopyL12UBNZ2NZ)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeNzLayout<type>(m, n));
-    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeNzLayout<type>(m, n));
+    auto l1Tensor = MakeTensor(MakeL1memPtr(src), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<type>>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyL12UB, CopyL12UBTraitDefault>>{}, ubTensor, l1Tensor, coord);
 
@@ -172,8 +177,10 @@ TEST_F(Tensor_Api_Atom, CopyGM2UBND2ND)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto gmTensor = MakeTensor(MakeGMmemPtr(src), MakeNDLayout<type>(m, n));
-    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeNDLayout<type>(m, n));
+    auto gmTensor = MakeTensor(MakeGMmemPtr(src), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    // auto gmTensor = MakeTensor(MakeGMmemPtr(src), MakeNDLayout<type>(m, n));
+    // auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeNDLayout<type>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault>>{}, ubTensor, gmTensor, coord);
 
@@ -194,8 +201,10 @@ TEST_F(Tensor_Api_Atom, CopyGM2UBDN2DN)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto gmTensor = MakeTensor(MakeGMmemPtr(src), MakeDNLayout<type>(m, n));
-    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeDNLayout<type>(m, n));
+    auto gmTensor = MakeTensor(MakeGMmemPtr(src), MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    // auto gmTensor = MakeTensor(MakeGMmemPtr(src), MakeDNLayout<type>(m, n));
+    // auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeDNLayout<type>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault>>{}, ubTensor, gmTensor, coord);
 
@@ -216,8 +225,8 @@ TEST_F(Tensor_Api_Atom, CopyGM2UBNZ2NZ)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto gmTensor = MakeTensor(MakeGMmemPtr(src), MakeNzLayout<type>(m, n));
-    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeNzLayout<type>(m, n));
+    auto gmTensor = MakeTensor(MakeGMmemPtr(src), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(dst), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<type>>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault>>{}, ubTensor, gmTensor, coord);
 
@@ -238,8 +247,10 @@ TEST_F(Tensor_Api_Atom, CopyUB2L1ND2ND)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeNDLayout<type>(m, n));
-    auto l1Tensor = MakeTensor(MakeL1memPtr(dst), MakeNDLayout<type>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto l1Tensor = MakeTensor(MakeL1memPtr(dst), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    // auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeNDLayout<type>(m, n));
+    // auto l1Tensor = MakeTensor(MakeL1memPtr(dst), MakeNDLayout<type>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyUB2L1, CopyUB2L1TraitDefault>>{}, l1Tensor, ubTensor, coord);
 
@@ -260,8 +271,10 @@ TEST_F(Tensor_Api_Atom, CopyUB2L1DN2DN)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeDNLayout<type>(m, n));
-    auto l1Tensor = MakeTensor(MakeL1memPtr(dst), MakeDNLayout<type>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto l1Tensor = MakeTensor(MakeL1memPtr(dst), MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    // auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeDNLayout<type>(m, n));
+    // auto l1Tensor = MakeTensor(MakeL1memPtr(dst), MakeDNLayout<type>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyUB2L1, CopyUB2L1TraitDefault>>{}, l1Tensor, ubTensor, coord);
 
@@ -282,8 +295,8 @@ TEST_F(Tensor_Api_Atom, CopyUB2L1NZ2NZ)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeNzLayout<type>(m, n));
-    auto l1Tensor = MakeTensor(MakeL1memPtr(dst), MakeNzLayout<type>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto l1Tensor = MakeTensor(MakeL1memPtr(dst), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<type>>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyUB2L1, CopyUB2L1TraitDefault>>{}, l1Tensor, ubTensor, coord);
 
@@ -304,8 +317,10 @@ TEST_F(Tensor_Api_Atom, CopyUB2GMND2ND)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeNDLayout<type>(m, n));
-    auto gmTensor = MakeTensor(MakeGMmemPtr(dst), MakeNDLayout<type>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto gmTensor = MakeTensor(MakeGMmemPtr(dst), MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    // auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeNDLayout<type>(m, n));
+    // auto gmTensor = MakeTensor(MakeGMmemPtr(dst), MakeNDLayout<type>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyUB2GM, CopyUB2GMTraitDefault>>{}, gmTensor, ubTensor, coord);
 
@@ -326,8 +341,10 @@ TEST_F(Tensor_Api_Atom, CopyUB2GMDN2DN)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeDNLayout<type>(m, n));
-    auto gmTensor = MakeTensor(MakeGMmemPtr(dst), MakeDNLayout<type>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto gmTensor = MakeTensor(MakeGMmemPtr(dst), MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    // auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeDNLayout<type>(m, n));
+    // auto gmTensor = MakeTensor(MakeGMmemPtr(dst), MakeDNLayout<type>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyUB2GM, CopyUB2GMTraitDefault>>{}, gmTensor, ubTensor, coord);
 
@@ -348,8 +365,8 @@ TEST_F(Tensor_Api_Atom, CopyUB2GMNZ2NZ)
 
     auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
-    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeNzLayout<type>(m, n));
-    auto gmTensor = MakeTensor(MakeGMmemPtr(dst), MakeNzLayout<type>(m, n));
+    auto ubTensor = MakeTensor(MakeUBmemPtr(src), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<type>>(m, n));
+    auto gmTensor = MakeTensor(MakeGMmemPtr(dst), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<type>>(m, n));
 
     Copy(CopyAtom<CopyTraits<CopyUB2GM, CopyUB2GMTraitDefault>>{}, gmTensor, ubTensor, coord);
 
