@@ -20,20 +20,47 @@ protected:
 };
 
 namespace {
-void get_buf_stub(pipe_t pipe, uint8_t mutex_id, bool disable_blocking)
+void get_buf_block_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
 {
     EXPECT_EQ(pipe, pipe_t::PIPE_MTE3);
     EXPECT_EQ(mutex_id, static_cast<uint8_t>(10));
-    EXPECT_EQ(disable_blocking, false);
+    EXPECT_EQ(mode, ASC_LOCK_BLOCK);
+}
+
+void get_buf_non_block_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
+{
+    EXPECT_EQ(pipe, pipe_t::PIPE_MTE3);
+    EXPECT_EQ(mutex_id, static_cast<uint8_t>(10));
+    EXPECT_EQ(mode, ASC_LOCK_NON_BLOCK);
 }
 }
 
-TEST_F(TestAscLockCAPI, asc_lock_Succ)
+TEST_F(TestAscLockCAPI, asc_lock_DefaultBlockSucc)
 {
     MOCKER_CPP(get_buf, void(pipe_t, uint8_t, bool))
         .times(1)
-        .will(invoke(get_buf_stub));
+        .will(invoke(get_buf_block_stub));
 
-    asc_lock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(10), false);
+    asc_lock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(10));
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestAscLockCAPI, asc_lock_BlockSucc)
+{
+    MOCKER_CPP(get_buf, void(pipe_t, uint8_t, bool))
+        .times(1)
+        .will(invoke(get_buf_block_stub));
+
+    asc_lock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(10), ASC_LOCK_BLOCK);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestAscLockCAPI, asc_lock_NonBlockSucc)
+{
+    MOCKER_CPP(get_buf, void(pipe_t, uint8_t, bool))
+        .times(1)
+        .will(invoke(get_buf_non_block_stub));
+
+    asc_lock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(10), ASC_LOCK_NON_BLOCK);
     GlobalMockObject::verify();
 }
