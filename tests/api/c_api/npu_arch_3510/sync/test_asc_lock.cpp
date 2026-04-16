@@ -24,14 +24,14 @@ void get_buf_block_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
 {
     EXPECT_EQ(pipe, pipe_t::PIPE_MTE3);
     EXPECT_EQ(mutex_id, static_cast<uint8_t>(10));
-    EXPECT_EQ(mode, ASC_LOCK_BLOCK);
+    EXPECT_EQ(mode, false);
 }
 
 void get_buf_non_block_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
 {
     EXPECT_EQ(pipe, pipe_t::PIPE_MTE3);
     EXPECT_EQ(mutex_id, static_cast<uint8_t>(10));
-    EXPECT_EQ(mode, ASC_LOCK_NON_BLOCK);
+    EXPECT_EQ(mode, true);
 }
 }
 
