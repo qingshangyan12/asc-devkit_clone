@@ -34,8 +34,9 @@
   </table>
 - 样例实现：  
 <p align="center">
-  <img src="img/ld_st_reg_mask.png" width="1000">
+  <img src="figures/ld_st_reg_mask.png" width="1000">
 </p>
+
   1. 在CopyVF函数里，调用Load接口从UB搬运256bit(32*uint8_t)数据到MaskReg，以实现mask的动态设置。本样例中，32个uint8_t数据设置为1,0,...,1，即第一个数和最后一个数为1(b'00000001)，因为芯片每次从低位读取数字，所以这32个数字最终填充到MaskReg中为b'1000...1...000。
   2. 调用Duplicate指令进行数据填充，MaskReg可以指示计算过程中参与计算的元素，由step1可知MaskReg中第1个bit和第249个bit为1，使用该掩码将只填充RegTensor第1个数和第249个数为2。
   3. 使用Store接口将RegTensor内的结果保存到UB。
@@ -66,10 +67,30 @@
 - 样例执行
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake ..;make -j;                                                         # 编译工程
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（默认npu模式）
   python3 ../scripts/gen_data.py                                            # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   ```
+
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+| 选项　　　　　　　　　　　| 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+| ---------------------------| -----------------------------| ---------------------------------------------------|
+| `CMAKE_ASC_RUN_MODE`　　　| `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
+- 执行结果
+
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

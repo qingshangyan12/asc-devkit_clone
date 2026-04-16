@@ -11,6 +11,9 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
+
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
@@ -19,11 +22,11 @@ project(kernel_samples LANGUAGES ASC CXX)
 # SCENARIO_NUM: 场景编号
 #   1 - WholeReduceMax：每个repeat内求最大值及索引，输入[1, 1024]，输出[1, 16]
 #   2 - WholeReduceMin：每个repeat内求最小值及索引，输入[1, 1024]，输出[1, 16]
-#   3 - WholeReduceSum：每个repeat内求和，输入[1, 2048]，输出[1, 16]
-#   4 - RepeatReduceSum：累加模式求和，输入[1, 2048]，输出[1, 16]
+#   3 - WholeReduceSum：每个repeat内求和，输入float类型[1, 2048]，输出[1, 32]
+#   4 - RepeatReduceSum：累加模式求和，输入float类型[1, 2048]，输出[1, 32]
 #   5 - WholeReduceMax + GetReduceRepeatMaxMinSpr：求全局最大值及索引，输入[1, 1024]，输出[1, 16]
 #   6 - WholeReduceMin + GetReduceRepeatMaxMinSpr：求全局最小值及索引，输入[1, 1024]，输出[1, 16]
-#   7 - WholeReduceSum非对齐场景：对每行非对齐数据求和，输入[13, 123]，输出[1, 13]
+#   7 - WholeReduceSum非对齐场景：对每行非对齐数据求和，输入float类型[13, 57]，输出[1, 13]
 set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-7)")
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
@@ -40,13 +43,6 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
