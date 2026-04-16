@@ -12,9 +12,9 @@
 | [mul](./mul)　　　　　　　　　 | 本样例基于RegBase编程范式实现Mul运算，Add/Sub/Div/Max/Min/Prelu接口皆可参考该样例　　　　　 |
 | [muls](./muls)　　　　　　　　 | 本样例基于RegBase编程范式实现Muls运算，Adds/Maxs/Mins/LeakyRelu接口皆可参考该样例　　　　　 |
 | [reduce](./reduce)　　　　　　 | 本样例基于RegBase编程范式实现Reduce运算（SUM模式），Reduce接口支持SUM/MAX/MIN归约模式　　　 |
-| [pair_reduce](./pair_reduce)　 | 本样例基于RegBase编程范式实现PairReduceElem运算（SUM模式），对相邻奇偶元素对进行归约求和　　|
-| [block_reduce](./block_reduce) | 本样例基于RegBase编程范式实现ReduceDataBlock运算（SUM模式），对每个DataBlock(32B)内元素归约 |
+| [reduce_pair](./reduce_pair)　 | 本样例基于RegBase编程范式实现PairReduceElem运算（SUM模式），对相邻奇偶元素对进行归约求和　　|
+| [reduce_block](./reduce_block) | 本样例基于RegBase编程范式实现ReduceDataBlock运算（SUM模式），对每个DataBlock(32B)内元素归约 |
 | [cast](./cast)　　　　　　　　 | 本样例基于RegBase编程范式实现Cast运算，用于RegTensor数据类型转换（位宽大转小/小转大）　　　 |
 | [truncate](./truncate)　　　　 | 本样例基于RegBase编程范式实现Truncate运算，将浮点数截断到整数位　　　　　　　　　　　　　　 |
 | [arange](./arange)　　　　　　 | 本样例基于RegBase编程范式实现Arange运算，以标量值为起始生成递增/递减索引序列　　　　　　　　|
-| [duplicate](./duplicate)　　　 | 本样例基于RegBase编程范式实现Duplicate运算（标量填充），将标量值填充到向量的每个位置　　　　　|
+| [duplicate](./duplicate)　　　 | 本样例基于RegBase编程范式实现Duplicate运算（标量填充），将标量值填充到向量的每个位置　　　　|
