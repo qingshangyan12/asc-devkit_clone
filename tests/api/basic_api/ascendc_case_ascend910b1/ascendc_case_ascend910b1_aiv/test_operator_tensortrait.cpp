@@ -124,15 +124,15 @@ TEST_F(TensorTraitTest, IsLayoutOperation)
 
     AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>> layoutInit(shape, stride);
 
-    EXPECT_EQ(AscendC::IsLayout<decltype(shape)>::value, false);
-    EXPECT_EQ(AscendC::IsLayout<decltype(stride)>::value, false);
-    EXPECT_EQ(AscendC::IsLayout<decltype(layoutMake)>::value, true);
-    EXPECT_EQ(AscendC::IsLayout<decltype(layoutInit)>::value, true);
+    EXPECT_EQ(AscendC::is_layout<decltype(shape)>::value, false);
+    EXPECT_EQ(AscendC::is_layout<decltype(stride)>::value, false);
+    EXPECT_EQ(AscendC::is_layout<decltype(layoutMake)>::value, true);
+    EXPECT_EQ(AscendC::is_layout<decltype(layoutInit)>::value, true);
 
-    EXPECT_EQ(AscendC::IsLayoutV<decltype(shape)>, false);
-    EXPECT_EQ(AscendC::IsLayoutV<decltype(stride)>, false);
-    EXPECT_EQ(AscendC::IsLayoutV<decltype(layoutMake)>, true);
-    EXPECT_EQ(AscendC::IsLayoutV<decltype(layoutInit)>, true);
+    EXPECT_EQ(AscendC::is_layout_v<decltype(shape)>, false);
+    EXPECT_EQ(AscendC::is_layout_v<decltype(stride)>, false);
+    EXPECT_EQ(AscendC::is_layout_v<decltype(layoutMake)>, true);
+    EXPECT_EQ(AscendC::is_layout_v<decltype(layoutInit)>, true);
 }
 
 TEST_F(TensorTraitTest, TensorTraitOperation)
