@@ -34,6 +34,18 @@ namespace Te {
 template <typename T>
 struct LocalTensor;
 
+template <typename LayoutType>
+struct LayoutInfoCompat {
+    using PatternType = DefaultPtn;
+    using TraitType = DefaultInfo;
+};
+
+template <typename ShapeType, typename StrideType, typename LayoutPattern, typename LayoutTrait>
+struct LayoutInfoCompat<Layout<ShapeType, StrideType, Std::tuple<LayoutPattern, LayoutTrait>>> {
+    using PatternType = LayoutPattern;
+    using TraitType = LayoutTrait;
+};
+
 template <typename Coord, typename LayoutType, typename TileShape>
 __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const TileShape& tileShape) 
 {
@@ -100,8 +112,8 @@ __aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const Layou
         Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>, 
         "Shape and coord must have same tuple structure");
     auto coordShape = TransformTupleApply(layout.Shape(), coord, DiffOp{});
-    using TraitType = GetLayoutTrait<LayoutType>;
-    using PatternType = GetLayoutPattern<LayoutType>;
+    using TraitType = typename LayoutInfoCompat<Std::remove_cvref_t<LayoutType>>::TraitType;
+    using PatternType = typename LayoutInfoCompat<Std::remove_cvref_t<LayoutType>>::PatternType;
     return MakePatternLayout<PatternType, TraitType>(coordShape, layout.Stride());
 }
 
@@ -121,8 +133,8 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const Layou
 
     auto realRow = Std::min(srcRow, Std::get<0>(sliceShape));	 
     auto realCol = Std::min(srcCol, Std::get<1>(sliceShape));
-    using TraitType = GetLayoutTrait<LayoutType>;
-    using PatternType = GetLayoutPattern<LayoutType>;
+    using TraitType = typename LayoutInfoCompat<Std::remove_cvref_t<LayoutType>>::TraitType;
+    using PatternType = typename LayoutInfoCompat<Std::remove_cvref_t<LayoutType>>::PatternType;
     return MakePatternLayout<PatternType, TraitType>(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride());
 }
 
@@ -135,8 +147,8 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const SrcLa
 
     auto sliceLayout = MakeCoordLayout(coord, srcLayout);
     auto sliceShape = TransformTupleApply(sliceLayout.Shape(), dstLayout.Shape(), MinOp{});
-    using TraitType = GetLayoutTrait<SrcLayoutType>;
-    using PatternType = GetLayoutPattern<SrcLayoutType>;
+    using TraitType = typename LayoutInfoCompat<Std::remove_cvref_t<SrcLayoutType>>::TraitType;
+    using PatternType = typename LayoutInfoCompat<Std::remove_cvref_t<SrcLayoutType>>::PatternType;
     return MakePatternLayout<PatternType, TraitType>(sliceShape, srcLayout.Stride());
 }
 
