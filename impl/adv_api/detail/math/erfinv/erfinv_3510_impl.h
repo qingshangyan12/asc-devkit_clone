@@ -39,10 +39,11 @@ constexpr float ERFINV_LOG2_THRESHOLD = -8.2f;
 
 // Polynomial coefficients for near-±1 approximation (using rsqrtNegLog)
 // poly = ((((0.83535343 * rsqrtNegLog - 0.09522479) * rsqrtNegLog - 0.67521554) * rsqrtNegLog + 1.5970111) * rsqrtNegLog - 0.6630042) * rsqrtNegLog - 0.5899144
+template <typename T>
 __simd_callee__ inline void ErfinvComputeNearOne(
-    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& negLog2Reg, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask)
+    Reg::RegTensor<T>& dstReg, Reg::RegTensor<T>& negLog2Reg, Reg::RegTensor<T>& srcReg, Reg::MaskReg& mask)
 {
-    Reg::RegTensor<float> sqrtNegLogReg, rsqrtNegLogReg, oneReg, zeroReg, denominatorReg, finalTerm, absFinalReg, tempNegReg;
+    Reg::RegTensor<T> sqrtNegLogReg, rsqrtNegLogReg, oneReg, zeroReg, denominatorReg, finalTerm, absFinalReg, tempNegReg;
     Reg::MaskReg signBitReg;
 
     Reg::Sqrt(sqrtNegLogReg, negLog2Reg, mask);
@@ -56,7 +57,7 @@ __simd_callee__ inline void ErfinvComputeNearOne(
     constexpr float COEF4 = -0.09522479f;
     constexpr float COEF5 = 0.83535343f;
 
-    Reg::RegTensor<float> tmpReg;
+    Reg::RegTensor<T> tmpReg;
     Reg::Muls(tmpReg, rsqrtNegLogReg, COEF0, mask);
     Reg::Adds(tmpReg, tmpReg, COEF1, mask);
     Reg::Mul(tmpReg, tmpReg, rsqrtNegLogReg, mask);
@@ -74,7 +75,7 @@ __simd_callee__ inline void ErfinvComputeNearOne(
 
     // Extract sign bit from original x
     Reg::Duplicate(zeroReg, 0.0f, mask);
-    Reg::Compare<float, CMPMODE::LT>(signBitReg, srcReg, zeroReg, mask);
+    Reg::Compare<T, CMPMODE::LT>(signBitReg, srcReg, zeroReg, mask);
     Reg::Abs(absFinalReg, finalTerm, mask);
     Reg::Neg(tempNegReg, absFinalReg, signBitReg);
     // Apply sign bit to near-±1 result
@@ -83,8 +84,9 @@ __simd_callee__ inline void ErfinvComputeNearOne(
 
 // Polynomial coefficients for middle range approximation (using negLog2)
 // poly = (((((((-2.5172708e-10 * negLog2 + 9.427429e-9) * negLog2 - 1.2054752e-7) * negLog2 + 2.1697005e-7) * negLog2 + 8.0621484e-6) * negLog2 - 3.1675492e-5) * negLog2 - 0.0007743631) * negLog2 + 0.005546588) * negLog2 + 0.16082023) * negLog2 + 0.8862269
+template <typename T>
 __simd_callee__ inline void ErfinvComputeMiddle(
-    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& negLog2Reg, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask)
+    Reg::RegTensor<T>& dstReg, Reg::RegTensor<T>& negLog2Reg, Reg::RegTensor<T>& srcReg, Reg::MaskReg& mask)
 {
     constexpr float COEF0 = -2.5172708e-10f;
     constexpr float COEF1 = 9.427429e-9f;
@@ -97,7 +99,7 @@ __simd_callee__ inline void ErfinvComputeMiddle(
     constexpr float COEF8 = 0.16082023f;
     constexpr float COEF9 = 0.8862269f;
 
-    Reg::RegTensor<float> tmpReg;
+    Reg::RegTensor<T> tmpReg;
     Reg::Muls(tmpReg, negLog2Reg, COEF0, mask);
     Reg::Adds(tmpReg, tmpReg, COEF1, mask);
     Reg::Mul(tmpReg, tmpReg, negLog2Reg, mask);
@@ -121,12 +123,12 @@ __simd_callee__ inline void ErfinvComputeMiddle(
 }
 
 // Core computation for erfinv
+template <typename T>
 __simd_callee__ inline void ErfinvCoreCompute(
-    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask)
+    Reg::RegTensor<T>& dstReg, Reg::RegTensor<T>& srcReg, Reg::MaskReg& mask)
 {
-    Reg::RegTensor<float> oppositeXReg, temp1Reg, log2TempReg, negLog2Reg;
-    Reg::RegTensor<float> sqrtNegLogReg, rsqrtNegLogReg, nearOneResult, middleResult;
-    Reg::RegTensor<uint32_t> signBitReg, resultBitsReg;
+    Reg::RegTensor<T> oppositeXReg, temp1Reg, log2TempReg, negLog2Reg;
+    Reg::RegTensor<T> sqrtNegLogReg, rsqrtNegLogReg, nearOneResult, middleResult;
     Reg::MaskReg nearOneMask, middleMask;
 
     // oppositeX = -x
@@ -163,7 +165,7 @@ __simd_vf__ inline void ErfinvCoreImpl(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uin
     Reg::MaskReg mask;
     Reg::RegTensor<T> srcReg;
     Reg::RegTensor<float> castReg;
-    Reg::RegTensor<float> dstReg;
+    Reg::RegTensor<T> dstReg;
 
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = Reg::UpdateMask<float>(calCount);
