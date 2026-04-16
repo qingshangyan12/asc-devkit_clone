@@ -278,6 +278,19 @@ public:
         (void)addr;
     }
 #endif
+template <typename T>
+__aicore__ static inline void OOMCheckAddrRangeImp(__gm__ T* gmAddr, const uint64_t gmSize)
+{
+    #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+    uint64_t ioCount = g_oomAddrArange.count;
+    if (ioCount >= g_oomAddrArangeMaxSize) {
+        return;
+    }
+    g_oomAddrArange.addr[ioCount] = reinterpret_cast<uintptr_t>(gmAddr);
+    g_oomAddrArange.len[ioCount] = gmSize;
+    g_oomAddrArange.count+=1;
+    #endif
+}
 
     __aicore__ static inline uint64_t GetGMLen(const DataCopyParams& intriParams, const bool& isSrc,
                                                const bool& isMovAlignIntri)
@@ -407,6 +420,8 @@ public:
 #endif // L2_CACHE_HINT
         constexpr uint64_t errCode = 0X5A5A0001;
         if (status) {
+            OOMCheckAddrRangeImp(gmAddr, gmLen);
+/*
 #if defined(__NPU_ARCH__) &&                                                                                    \
     ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) ||    \
      (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) ||    \
@@ -415,6 +430,8 @@ public:
 #else
             trap(errCode);
 #endif
+*/
+   
         }
 #endif
     }
