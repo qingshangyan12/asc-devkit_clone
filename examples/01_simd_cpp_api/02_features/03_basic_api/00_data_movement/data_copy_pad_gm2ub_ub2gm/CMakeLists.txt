@@ -23,7 +23,7 @@ project(kernel_samples LANGUAGES ASC CXX)
 #   1 - 输入[1, 20]，输出[1, 32]，half类型，使用SetPadValue填充
 #   2 - 输入[32, 59]，输出[32, 64]，float类型，rightPadding，不使用SetPadValue
 #   3 - 输入[3, 24]，输出[1, 80]，half类型，Compact模式
-set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-2)")
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-3)")
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
 
