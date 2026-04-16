@@ -145,7 +145,6 @@ public:
     template <class T>
     __aicore__ inline void SetWorkspace(GlobalTensor<T>& addr)
     {
-        ASSERT(addr.GetSize() > 0);
         SetWorkspace(addr.GetPhyAddr(), addr.GetSize() * sizeof(T));
     }
 
