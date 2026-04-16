@@ -11,13 +11,8 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-if(DEFINED RUN_MODE)
-    set(CMAKE_ASC_RUN_MODE ${RUN_MODE} CACHE STRING "Alias of RUN_MODE")
-endif()
-
-if(DEFINED NPU_ARCH)
-    set(CMAKE_ASC_ARCHITECTURES ${NPU_ARCH} CACHE STRING "Alias of NPU_ARCH")
-endif()
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
 find_package(ASC REQUIRED)
 
@@ -34,14 +29,6 @@ target_link_libraries(demo PRIVATE
     m
 )
 
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
-set(NPU_ARCH "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
-
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
 
 if(NOT DEFINED SCENARIO_NUM)
@@ -57,5 +44,5 @@ target_compile_definitions(demo PRIVATE
 )
 
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH}>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
