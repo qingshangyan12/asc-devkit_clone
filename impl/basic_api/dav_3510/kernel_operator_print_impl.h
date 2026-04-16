@@ -29,6 +29,15 @@
 namespace AscendC {
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
 
+__aicore__ inline uint8_t GetDumpBlockIdx()
+{
+    if ASCEND_IS_AIV {
+        return GetBlockIdxImpl();
+    } else {
+        return GetBlockIdxImpl() + AIV_CORE_NUM;
+    }
+}
+
 __aicore__ __gm__ inline BlockInfo *GetBlockInfo()
 {
     uint8_t core = GetDumpBlockIdx();
