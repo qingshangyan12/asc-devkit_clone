@@ -11,9 +11,21 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
+
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
+
+# 场景参数（通过命令行传入）
+# SCENARIO_NUM: 场景编号
+#   1 - [1, 512]数据搬运，mask连续模式
+#   2 - 从[18, 64]搬运[18, 8]数据，mask连续模式
+#   3 - 从[18, 64]搬运[18, 8]数据，counter模式
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1,2,3)")
+
+add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
 
 add_executable(demo
     copy.asc
@@ -27,13 +39,6 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )

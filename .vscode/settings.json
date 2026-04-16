@@ -1,0 +1,20 @@
+{
+    "files.eol": "\n",
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "editor.wordWrap": "on",
+    "editor.renderWhitespace": "all",
+    "editor.trimWhitespaceOnDelete": true,
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "files.associations": {
+        "*.asc": "cpp",
+        "*.aicpu": "cpp",
+        ".clang-format": "yaml",
+        ".clangd": "yaml",
+        "*requirements*.txt": "pip-requirements"
+    },
+    "[python]": {
+        "editor.tabSize": 4
+    }
+}
