@@ -109,30 +109,30 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 
   ```json
   {
-    "clangd.path": "/usr/bin/clangd-15",
+    "clangd.path": "/usr/bin/clangd",
     "clangd.arguments": [
         "--background-index=0",
         "--clang-tidy=0"
     ],
-    "files.associations": {
-        "*.asc": "cpp"
-    }
+    "C_Cpp.intelliSenseEngine": "disabled"
   }
   ```
 
-- 在项目根目录下配置 `.clangd`（示例）完整 `.clangd`文件在本目录下给出.
+- 在项目根目录下配置 `.clangd`（示例）完整 `.clangd`文件在本目录下给出，其中涉及 CANN 头文件目录需自行替换实际安装位置，`.clangd`默认为`/usr/local/Ascend`.
 
   ```yaml
   CompileFlags:
+    CompilationDatabase: None
     Add:
       - "-std=c++17"
+      - "-stdlib=libstdc++"
       - "-DASCENDC_CPU_DEBUG=1"
       - "-D__NPU_ARCH__=2201"
       ...
 
   ---
   If:
-    PathMatch: ".*\\.asc$"
+    PathMatch: ".*\\.(asc|aicpu)$"
   CompileFlags:
     Add:
       - "-x"
