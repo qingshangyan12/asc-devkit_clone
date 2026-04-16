@@ -1,7 +1,9 @@
 # PipeBarrier样例
 
 ## 概述
-本样例基于PipeBarrier实现核内同步，适用于以下场景：阻塞相同流水，具有数据依赖的相同流水之间需要插入此同步。本样例，使用静态Tensor编程方式，所有核内同步操作均需要用户自行处理。
+
+本样例基于PipeBarrier实现核内多流水同步控制，完整展示了数据搬入、向量计算、数据搬出全流程中的同步机制。样例涵盖了PIPE_MTE2（搬入流水）、PIPE_V（矢量计算流水）、PIPE_MTE3（搬出流水）三种流水类型的单流水同步，以及使用SetFlag/WaitFlag进行的多流水同步。
+
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
@@ -12,57 +14,147 @@
 
 ```
 ├── pipe_barrier
-│   ├── CMakeLists.txt              // 编译工程文件
-│   └── pipe_barrier.asc           // Ascend C算子实现 & 调用样例
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt          // 编译工程文件
+│   ├── data_utils.h            // 数据读入写出函数
+│   └── pipe_barrier.asc        // Ascend C样例实现 & 调用样例
 ```
 
-## 算子描述
+## 样例功能描述
+
+本样例在核内同步场景下，展示了完整数据处理流程中的多级流水同步控制。样例包含三个处理阶段：
+
+### 1. 搬入阶段（PIPE_MTE2同步）
+
+当多条数据搬入指令的搬入目的地址Unified Buffer存在重叠时，需要使用PipeBarrier<PIPE_MTE2>阻塞MTE2搬入流水，保证数据搬入顺序正确。
+
+本样例中，src1和src2在UB上分配的地址区间有128个float元素的重叠：
+```
+src1Addr = 256 * sizeof(float)         // src1起始地址，元素个数为256
+src2Addr = (256 + 128) * sizeof(float) // src2起始地址，元素个数为256
+```
+
+为保证src2的数据不被src1在重叠区间覆盖，必须先搬入src2，再搬入src1：
+```
+DataCopy(src2Local, src2Global, srcDataSize); // 先搬入src2
+PipeBarrier<PIPE_MTE2>();                     // 阻塞MTE2流水
+DataCopy(src1Local, src1Global, srcDataSize); // 后搬入src1
+```
+
+### 2. 计算阶段（PIPE_V同步）
+
+使用SetFlag/WaitFlag进行MTE2->V多流水同步，确保所有数据搬入完成后才开始向量计算：
+```
+SetFlag<HardEvent::MTE2_V>(EVENT_ID0);
+WaitFlag<HardEvent::MTE2_V>(EVENT_ID0);
+```
+
+执行Add计算得到中间结果，然后使用PipeBarrier<PIPE_V>阻塞矢量流水，确保Add完成后再执行Mul：
+```
+Add(dstLocal, src0Local, src1Local, srcDataSize);  // dst = src0 + src1
+PipeBarrier<PIPE_V>();                              // 阻塞PIPE_V流水
+Mul(dst2Local, dstLocal, src0Local, srcDataSize);  // dst2 = dst * src0 = (src0+src1)*src0
+```
+
+### 3. 搬出阶段（PIPE_MTE3同步）
+
+使用SetFlag/WaitFlag进行V->MTE3多流水同步，确保所有向量计算完成后才开始数据搬出：
+```
+SetFlag<HardEvent::V_MTE3>(EVENT_ID0);
+WaitFlag<HardEvent::V_MTE3>(EVENT_ID0);
+```
+
+使用PipeBarrier<PIPE_MTE3>阻塞MTE3搬出流水，保证dst搬出完成后再搬出dst2：
+```
+DataCopy(dstGlobal, dstLocal, dstDataSize);  // 搬出dst
+PipeBarrier<PIPE_MTE3>();                     // 阻塞MTE3流水
+DataCopy(dst2Global, dst2Local, dstDataSize); // 搬出dst2
+```
 
 
-注意事项：调用PipeBarrier<PIPE_S>()会引发硬件错误，Scalar流水之间的同步请使用[DataSyncBarrier](../data_sync_barrier/)。
+### 样例规格
 
+<table>
+<caption>表1：样例输入输出规格</caption>
+<tr><td rowspan="1" align="center">样例类型</td><td colspan="4" align="center">核内多流水同步</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">src2</td><td align="center">[256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[512]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">pipe_barrier_custom</td></tr>
+</table>
 
-PIPE_MTE2/PIPE_MTE3在搬运地址有重叠的情况下需要开发者插入同步。例如，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
+**输出数据布局说明：**
+- output[0:256]：Add结果 dst = src0 + src1
+- output[256:512]：Mul结果 dst2 = dst * src0 = (src0 + src1) * src0
 
-如下所示，静态Tensor编程方式创建src1和src2两个长度为256的LocalTensor时，存在一段长度为128的地址重叠。
-
-
-    static constexpr uint32_t src1Addr = 256 * sizeof(float); // src1起始地址，长度为256
-    static constexpr uint32_t src2Addr = (256 + 128) * sizeof(float); // src2起始地址，长度为256
-    
-样例预期的输出是dst = scr0 + scr1，因此为了保证搬入的src2的数据不会覆盖src1在重叠区间的值，必须保证先搬入src2，后搬入src1，此时需要在两条数据搬入指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
-
-    AscendC::DataCopy(src0Local, src0Global, srcDataSize);
-    AscendC::DataCopy(src2Local, src2Global, srcDataSize);
-    AscendC::PipeBarrier<PIPE_MTE2>();
-    AscendC::DataCopy(src1Local, src1Global, srcDataSize);
 ## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+在本样例根目录下执行如下步骤，编译并执行样例。
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
+### 配置环境变量
 
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
-  
-- 样例执行
+请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+
+- 默认路径，root用户安装CANN软件包
   ```bash
-  mkdir -p build && cd build;      # 创建并进入build目录
-  cmake ..;make -j;                # 编译工程
-  ./demo                           # 执行编译生成的可执行程序，执行样例
+  source /usr/local/Ascend/cann/set_env.sh
   ```
-  执行结果如下，说明精度对比成功。
+
+- 默认路径，非root用户安装CANN软件包
   ```bash
-  test pass!
+  source $HOME/Ascend/cann/set_env.sh
   ```
+
+- 指定路径install_path，安装CANN软件包
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
+
+### 样例执行
+
+```bash
+mkdir -p build && cd build;      # 创建并进入build目录
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                # 编译工程，默认npu模式
+python3 ../scripts/gen_data.py   # 生成测试输入数据
+./demo                           # 执行编译生成的可执行程序，执行样例
+python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # 验证输出结果是否正确
+```
+
+使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+示例如：
+```bash
+cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
+cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+```
+
+> **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+### 编译选项说明
+
+<table>
+<caption>表2：编译参数说明</caption>
+<tr><th>参数</th><th>说明</th><th>可选值</th><th>默认值</th></tr>
+<tr><td>CMAKE_ASC_RUN_MODE</td><td>运行模式</td><td>npu, cpu, sim</td><td>npu</td></tr>
+<tr><td>CMAKE_ASC_ARCHITECTURES</td><td>NPU硬件架构</td><td>dav-2201, dav-3510</td><td>dav-2201</td></tr>
+</table>
+
+执行结果如下，说明精度对比成功。
+```bash
+error ratio: 0.0000, tolerance: 0.0010
+test pass!
+```
+
+## 注意事项
+
+1. **PIPE_S流水同步**：Scalar流水之间的同步由硬件自动保证，调用PipeBarrier<PIPE_S>()会引发硬件错误，Scalar流水之间的同步请使用[DataSyncBarrier](../data_sync_barrier/)。
+
+2. **编译器自动同步**：开启自动同步（Kernel直调样例工程和自定义样例开发工程已默认开启）的情况下，编译器会自动插入PIPE_V同步，部分场景下无需开发者手动插入。本样例为展示PipeBarrier使用方法，手动插入同步。
+
+3. **SetFlag/WaitFlag与PipeBarrier的区别**：
+   - **PipeBarrier**：用于同一流水线内部的同步，阻塞相同流水
+   - **SetFlag/WaitFlag**：用于不同流水线之间的同步，实现多流水同步
