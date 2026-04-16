@@ -11,9 +11,9 @@
 
 > [!TIP] 选择建议
 >
-> - 为了保障开发体验环境的质量，推荐用户基于**容器化技术**完成**环境准备**
-> - 如不希望使用容器，也可在带 NPU 设备的主机上完成**环境准备**，请参考[CANN软件安装指南 - 在物理机上安装](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)
-> - 针对仅体验“编译安装本开源仓 + 仿真环境运行算子“的用户，不要求主机带 NPU 设备，可跳过安装 NPU驱动和固件，直接安装 CANN 包，请参考[下载安装 CANN 包](#📥-下载安装-cann-包)
+> - 为了保障开发体验环境的质量，推荐用户基于**容器化技术**完成**环境准备**。
+> - 如不希望使用容器，也可在带 NPU 设备的主机上完成**环境准备**，请参考[CANN软件安装指南 - 在物理机上安装](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
+> - 针对仅体验"编译安装本开源仓 + 仿真环境运行算子"的用户，不要求主机带 NPU 设备，可跳过安装 NPU驱动和固件，直接安装 CANN 包，请参考[下载安装 CANN 包](#📥-下载安装-cann-包)。
 
 <!-- 待加入 AI Agent 使能的逻辑 -->
 
@@ -21,32 +21,32 @@
 
 对于无 NPU 设备的用户，可使用**云开发环境**提供的 NPU 计算资源进行开发体验，**云开发环境**提供了在线直接运行的昇腾ARM架构环境。目前仅适用于Atlas A2系列产品，提供两种接入方式：
 
-- **WebIDE开发平台**，即“**一站式开发平台**”，提供网页版的便携开发体验
-- **VSCode IDE**，支持远程连接**云开发环境**，提供 VSCode 强大插件市场的支持
+- **WebIDE开发平台**，即"**一站式开发平台**"，提供网页版的便携开发体验。
+- **VSCode IDE**，支持远程连接**云开发环境**，提供 VSCode 强大插件市场的支持。
 
-1. 进入开源仓 Gitcode 页面，单击“`云开发`”按钮，使用已认证过的华为云账号登录。若未注册或认证，请根据页面提示进行注册和认证
+1. 进入开源仓 Gitcode 页面，单击"`云开发`"按钮，使用已认证过的华为云账号登录。若未注册或认证，请根据页面提示进行注册和认证。
 
    <p align="center"><img src="./figures/cloudIDE.png" alt="云平台"  width="750px" height="90px"></p>
 
-2. 根据页面提示创建并启动云开发环境，单击”`连接 > WebIDE 或 Visual Studio Code`”进入云开发环境，开源项目的资源默认在`/mnt/workspace`目录下
+2. 根据页面提示创建并启动云开发环境，单击"`连接 > WebIDE 或 Visual Studio Code`"进入云开发环境，开源项目的资源默认在`/mnt/workspace`目录下。
 
    <p align="center"><img src="./figures/webIDE.png" alt="云平台"  width="1000px" height="150px"></p>
 
 > [!NOTE] 使用说明
 >
-> - 环境默认安装了最新的商用版 NPU驱动和固件、 CANN 包，源码下载时注意与软件配套
-> - 如需下载特定版本的 CANN 包，请参考[下载安装 CANN 包](#📥-下载安装-cann-包)
-> - 更多关于**WebIDE开发平台**的介绍，请参考[云开发平台介绍](https://gitcode.com/org/cann/discussions/54)
-> - [Huawei Developer Space 插件](https://marketplace.visualstudio.com/items?itemName=HuaweiCloud.developerspace)为 VSCode IDE 接入**云开发环境**提供技术支持
+> - 环境默认安装了最新的商用版 NPU驱动和固件、 CANN 包，源码下载时注意与软件配套。
+> - 如需下载特定版本的 CANN 包，请参考[下载安装 CANN 包](#📥-下载安装-cann-包)。
+> - 更多关于**WebIDE开发平台**的介绍，请参考[云开发平台介绍](https://gitcode.com/org/cann/discussions/54)。
+> - [Huawei Developer Space 插件](https://marketplace.visualstudio.com/items?itemName=HuaweiCloud.developerspace)为 VSCode IDE 接入**云开发环境**提供技术支持。
 
 ### 2️⃣ CANN 官方 Docker 镜像
 
-对于有 NPU 设备的用户，可使用 CANN 官方 Docker 镜像进行开发体验
+对于有 NPU 设备的用户，可使用 CANN 官方 Docker 镜像进行开发体验。
 
 1. 确认主机环境
 
-   - 是否已安装NPU驱动和固件，使用`npu-smi info`能够输出 NPU 相关信息，如没有安装，请参考[CANN软件安装指南 - 在物理机上安装](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)
-   - 是否已安装 Docker，使用`docker --version`能够输出 Docker 版本信息，如没有安装，请参考[Docker 官方安装指南](https://docs.docker.com/engine/install/)
+   - 是否已安装NPU驱动和固件，使用`npu-smi info`能够输出 NPU 相关信息，如没有安装，请参考[CANN软件安装指南 - 在物理机上安装](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
+   - 是否已安装 Docker，使用`docker --version`能够输出 Docker 版本信息，如没有安装，请参考[Docker 官方安装指南](https://docs.docker.com/engine/install/)。
 
 2. 下载 CANN 镜像
 
@@ -59,12 +59,12 @@
     ```
 
     > [!NOTE] 使用说明
-    > - 镜像默认安装了对应版本的 CANN 包，源码下载时注意与软件配套
-    > - 镜像文件比较大，正常网速下，下载时间约为5～10分钟，请您耐心等待
+    > - 镜像默认安装了对应版本的 CANN 包，源码下载时注意与软件配套。
+    > - 镜像文件比较大，正常网速下，下载时间约为5～10分钟，请您耐心等待。
 
 3. 运行 Docker
 
-    拉取镜像后，需要以特定参数启动，以便容器内能访问宿主机的 NPU 设备
+    拉取镜像后，需要以特定参数启动，以便容器内能访问宿主机的 NPU 设备。
 
     ```bash
     docker run \
@@ -101,26 +101,26 @@
 
 ### 3️⃣ DevContainer
 
-对于有 NPU 设备的用户，推荐使用 DevContainer 进行生态开发者贡献
+对于有 NPU 设备的用户，推荐使用 DevContainer 进行生态开发者贡献。
 
-DevContainer 基于 VS Code Dev Containers，通过仓库内 `.devcontainer` 配置自动构建一致的容器化开发环境，内置 `conda`、`Python` 等开发工具链。与宿主机的 NPU 驱动共享设备访问，适合需要编译源码、运行 UT、向本仓贡献代码的场景。详细说明请参考 [`.devcontainer/README.md`](../.devcontainer/README.md)
+DevContainer 基于 VS Code Dev Containers，通过仓库内 `.devcontainer` 配置自动构建一致的容器化开发环境，内置 `conda`、`Python` 等开发工具链。与宿主机的 NPU 驱动共享设备访问，适合需要编译源码、运行 UT、向本仓贡献代码的场景。详细说明请参考 [`.devcontainer/README.md`](../.devcontainer/README.md)。
 
 > [!NOTE] 使用说明
-> DevContainer 仅挂载宿主机的 NPU 驱动（只读），**CANN toolkit 和 ops 包需在容器启动后手动安装**，请参考[下载安装 CANN 包](#📥-下载安装-cann-包)
+> DevContainer 仅挂载宿主机的 NPU 驱动（只读），**CANN toolkit 和 ops 包需在容器启动后手动安装**，请参考[下载安装 CANN 包](#📥-下载安装-cann-包)。
 
 ### 📥 下载安装 CANN 包
 <!-- 待加入 AI Agent 下载 & 安装 CANN 包的 skill -->
-CANN 包分为 CANN toolkit 包和 CANN ops 包
+CANN 包分为 CANN toolkit 包和 CANN ops 包。
 
 #### 下载 CANN 包
 
 1. <a name="下载-cann-商用社区版"></a>下载 CANN 商用/社区版
 
-    如果您想体验**官网正式发布的CANN包**，请访问[CANN 安装部署-昇腾社区](https://www.hiascend.com/cann/download)获取对应版本 CANN 包
+    如果您想体验**官网正式发布的CANN包**，请访问[CANN 安装部署-昇腾社区](https://www.hiascend.com/cann/download)获取对应版本 CANN 包。
 
 2. <a name="下载-cann-master"></a>下载 CANN master
 
-    如果您想体验 **CANN master**，请访问[CANN master obs 镜像网站](https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master)，下载**日期最新**的 CANN 包
+    如果您想体验 **CANN master**，请访问[CANN master obs 镜像网站](https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master)，下载**日期最新**的 CANN 包。
 
 #### 安装 CANN 包
 
@@ -128,18 +128,18 @@ CANN 包分为 CANN toolkit 包和 CANN ops 包
 
     ```bash
     chmod +x Ascend-cann-toolkit_${cann_version}_linux-$(uname -m).run
-    ./Ascend-cann-toolkit_${cann_version}_linux-$(uname -m).run --quiet --install --install-path=${install_path}
+    ./Ascend-cann-toolkit_${cann_version}_linux-$(uname -m).run --install --install-path=${install_path}
     ```
 
 2. 安装 CANN ops 包 (可选)
 
     ```bash
     chmod +x Ascend-cann-${soc_name}-ops_${cann_version}_linux-$(uname -m).run
-    ./Ascend-cann-${soc_name}-ops_${cann_version}_linux-$(uname -m).run --quiet --install --install-path=${install_path}
+    ./Ascend-cann-${soc_name}-ops_${cann_version}_linux-$(uname -m).run --install --install-path=${install_path}
     ```
 
     > [!IMPORTANT] 安装说明
-    > [examples](../examples)中部分算子样例的编译运行依赖本包，若想完整体验样例编译运行流程，建议安装此包
+    > [examples](../examples)中部分算子样例的编译运行依赖本包，若想完整体验样例编译运行流程，建议安装此包。
 
 | 参数 | 说明 |
 | :--- | :--- |
@@ -150,7 +150,7 @@ CANN 包分为 CANN toolkit 包和 CANN ops 包
 ## ✅ 环境验证
 
 > [!NOTE] 使用前须知
-> 云开发环境和 CANN 官方 Docker 镜像已预装 CANN 包，可直接执行以下命令验证；DevContainer 和手动安装用户请在安装 CANN 包后执行
+> 云开发环境和 CANN 官方 Docker 镜像已预装 CANN 包，可直接执行以下命令验证；DevContainer 和手动安装用户请在安装 CANN 包后执行。
 
 验证环境和驱动是否正常：
 
@@ -172,7 +172,7 @@ CANN 包分为 CANN toolkit 包和 CANN ops 包
 ## ⚙️ 环境变量配置
 
 > [!NOTE] 使用前须知
-> 云开发环境和 CANN 官方 Docker 镜像已自动配置环境变量，可跳过此步骤
+> 云开发环境和 CANN 官方 Docker 镜像已自动配置环境变量，可跳过此步骤。
 
 按需选择合适的命令使环境变量生效：
 
@@ -194,9 +194,12 @@ source /usr/local/Ascend/cann/set_env.sh
 git clone https://gitcode.com/cann/asc-devkit.git
 ```
 
-### 📦 安装依赖
+### 📦 依赖检查
 
-（如您使用**容器化技术**，则可跳过此步骤）以下所列仅为本开源仓源码编译用到的依赖：
+> [!NOTE] 使用前须知
+> 如您使用**容器化技术**，容器中已为您安装好依赖，可跳过此步骤。
+
+以下为本开源仓源码编译和 examples 算子样例编译运行的基础依赖条件：
 
 - python >= 3.9.0
 - gcc >= 7.3.0
@@ -206,7 +209,7 @@ git clone https://gitcode.com/cann/asc-devkit.git
 
 1. 编译
 
-   本开源仓提供一键式编译安装能力
+   本开源仓提供一键式编译安装能力。
 
    方式一：进入本开源仓代码根目录，执行如下命令：
 
@@ -220,7 +223,7 @@ git clone https://gitcode.com/cann/asc-devkit.git
    bash build.sh --pkg --cann_3rd_lib_path={PATH_TO_DOWNLOAD} # PATH_TO_DOWNLOAD 为自定义下载目录
    ```
 
-   编译完成后会在`build_out`目录下生成`cann-asc-devkit_${cann_version}_linux-$(uname -m).run`软件包
+   编译完成后会在`build_out`目录下生成`cann-asc-devkit_${cann_version}_linux-$(uname -m).run`软件包。
 
    > [!CAUTION] 编译报错可能
    > 本仓依赖其他 CANN 开源仓，**暂不支持独立升级**，须搭配对应版本的 CANN 包进行编译：
@@ -229,14 +232,14 @@ git clone https://gitcode.com/cann/asc-devkit.git
 
 2. 安装
 
-   在开源仓根目录下执行下列命令，将编译生成的 run 包安装到默认路径`/usr/local/Ascend`；或安装到指定的 CANN 包的装包路径`${install_path}`，同时会覆盖原 CANN 包中的 Ascend C 内容
+   在开源仓根目录下执行下列命令，将编译生成的 run 包安装到默认路径`/usr/local/Ascend`；或安装到指定的 CANN 包的装包路径`${install_path}`，同时会覆盖原 CANN 包中的 Ascend C 内容。
 
    ```bash
    cd build_out
    # 默认路径安装 run 包
-   ./cann-asc-devkit_${cann_version}_linux-$(uname -m).run --quiet --full
+   ./cann-asc-devkit_${cann_version}_linux-$(uname -m).run --full
    # 指定路径安装 run 包
-   # ./cann-asc-devkit_${cann_version}_linux-$(uname -m).run --quiet --full --install-path=${install_path}
+   # ./cann-asc-devkit_${cann_version}_linux-$(uname -m).run --full --install-path=${install_path}
    ```
 
 ### 🧪 UT 验证
@@ -272,7 +275,7 @@ git clone https://gitcode.com/cann/asc-devkit.git
 
 #### UT 执行
 
-方式一：在开源仓根目录执行下列命令，将按各模块依次批跑 tests 目录下的用例，得到结果日志，用于看护编译是否正常
+方式一：在开源仓根目录执行下列命令，将按各模块依次批跑 tests 目录下的用例，得到结果日志，用于看护编译是否正常。
 
 ```bash
 bash build.sh --adv_test                         # 批跑 tests 目录下 adv_api 里的用例
@@ -281,7 +284,7 @@ bash build.sh --basic_test_two                   # 批跑 tests 目录下 basic_
 bash build.sh --basic_test_three                 # 批跑 tests 目录下 basic_api part-three 里的用例
 ```
 
-方式二：用户也可使用离线下载功能，手动下载[三方库源码包](#开源第三方软件依赖)存放至自定义目录 PATH_TO_DOWNLOAD，在开源仓根目录执行下列命令，同时批跑执行各模块的用例
+方式二：用户也可使用离线下载功能，手动下载[三方库源码包](#开源第三方软件依赖)存放至自定义目录 PATH_TO_DOWNLOAD，在开源仓根目录执行下列命令，同时批跑执行各模块的用例。
 
 ```bash
 # 以 PATH_TO_DOWNLOAD 为自定义下载目录为例
