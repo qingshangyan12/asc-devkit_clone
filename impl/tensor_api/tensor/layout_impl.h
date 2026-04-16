@@ -100,7 +100,9 @@ __aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const Layou
         Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>, 
         "Shape and coord must have same tuple structure");
     auto coordShape = TransformTupleApply(layout.Shape(), coord, DiffOp{});
-    return MakeLayout(coordShape, layout.Stride());
+    using TraitType = GetLayoutTrait<LayoutType>;
+    using PatternType = GetLayoutPattern<LayoutType>;
+    return MakePatternLayout<PatternType, TraitType>(coordShape, layout.Stride());
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!IsLayoutV<SliceShape>, int> = 0>
