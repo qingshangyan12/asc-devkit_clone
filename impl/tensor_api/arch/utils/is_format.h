@@ -56,7 +56,7 @@ template <typename hPos, typename Pointer,
           typename StrideRows, typename StrideCols, 
           typename LayoutPattern>
 struct GetTypeFromNDimTrait<
-    LocalTensor<TensorAttribute<ViewEngine<HardwareMemPtrV2<hPos, Pointer>>,
+    LocalTensor<TensorAttribute<ViewEngine<HardwareMemPtr<hPos, Pointer>>,
         Layout<Shape<ShapeRows, ShapeCols>, Stride<StrideRows, StrideCols>, LayoutPattern>>>> {
     template <size_t Dim>
     using ShapeRowDim = typename Std::tuple_element<Dim, ShapeRows>::type;
