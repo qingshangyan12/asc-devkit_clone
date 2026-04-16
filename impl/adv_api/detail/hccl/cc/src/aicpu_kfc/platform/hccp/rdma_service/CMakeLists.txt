@@ -65,8 +65,8 @@ target_include_directories(rs PRIVATE
 
     # 第三方库依赖路径
     ${OPENSSL_INCLUDE_DIR}
-    ${CANN_3RD_LIB_PATH}/hcomm_utils/${PRODUCT_SIDE}/include/tls_adp
-    ${CANN_3RD_LIB_PATH}/hcomm_utils/${PRODUCT_SIDE}/include/kms
+    ${CANN_3RD_LIB_PATH}/hcomm_utils/${HCOMM_UTILS_ACTIVE_SIDE}/include/tls_adp
+    ${CANN_3RD_LIB_PATH}/hcomm_utils/${HCOMM_UTILS_ACTIVE_SIDE}/include/kms
 
     # rdma头文件
     ${RDMA_CORE_INCLUDE_DIR}

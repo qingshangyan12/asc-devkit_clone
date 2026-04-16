@@ -145,7 +145,7 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl/
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_BASE_DIR}/platform/common
-        ${CANN_3RD_LIB_PATH}/hcomm_utils/${PRODUCT_SIDE}/include/legacy
+        ${CANN_3RD_LIB_PATH}/hcomm_utils/${HCOMM_UTILS_ACTIVE_SIDE}/include/legacy
         ${HCCL_BASE_DIR}/platform/legacy/inc
         ${RDMA_CORE_INCLUDE_DIR}
         ${HCCL_BASE_DIR}/platform/hccp/inc/
