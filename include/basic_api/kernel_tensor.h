@@ -234,10 +234,9 @@ private:
 
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
 template<typename T>
-struct TensorProxy {
-    public:
-    __gm__ T* ptr;
-    T snapValue;
+class TensorProxy {
+public:
+    __aicore__ inline TensorProxy(__gm__ T* p, T val) : ptr(p), snapValue(val) {}
 
     __aicore__ inline TensorProxy(const TensorProxy&) = default;
 
@@ -248,7 +247,7 @@ struct TensorProxy {
         return *this;
     }
 
-    __aicore__ inline TensorProxy& operator=(const TensorProxy& src) {
+    __aicore__ inline TensorProxy& operator=(const TensorProxy& src) && {
         dcci(reinterpret_cast<__gm__ uint64_t *>(src.ptr),
             cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
         *ptr = *src.ptr;
@@ -262,12 +261,15 @@ struct TensorProxy {
         return snapValue;
     }
 
-    T Get() const {
+    __aicore__ inline T Get() const {
         return snapValue;
     }
 
-    private:
     __gm__ T* operator&() const = delete;
+
+public:
+    __gm__ T* ptr;
+    T snapValue;
 };
 #endif
 
