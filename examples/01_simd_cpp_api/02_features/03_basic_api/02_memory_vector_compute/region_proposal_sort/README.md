@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于[ProposalConcat](../../../../../../docs/api/context/ProposalConcat.md)、[RpSort16](../../../../../../docs/api/context/RpSort16.md)、[MrgSort4](../../../../../../docs/api/context/MrgSort4.md)和[ProposalExtract](../../../../../../docs/api/context/ProposalExtract.md)四个接口实现完整排序流水线。首先通过ProposalConcat将连续score值合入Region Proposal格式，再经RpSort16对每组16个Region Proposal按score域降序排列，然后通过MrgSort4将4组已排序的Region Proposal合并为1组，最后通过ProposalExtract从合并后的Region Proposal中提取score域，得到全局降序排列的连续score值。
+本样例基于ProposalConcat、RpSort16、MrgSort4和ProposalExtract四个接口实现完整排序流水线。首先通过ProposalConcat将连续score值合入Region Proposal格式，再经RpSort16对每组16个Region Proposal按score域降序排列，然后通过MrgSort4将4组已排序的Region Proposal合并为1组，最后通过ProposalExtract从合并后的Region Proposal中提取score域，得到全局降序排列的连续score值。
 
 ## 支持的产品
 
@@ -27,7 +27,7 @@
 
 - 样例规格：
 
-<table border="2" align="center">
+<table border="2">
 <caption>表1：Region Proposal排序样例规格</caption>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 64]</td><td align="center">half</td><td align="center">ND</td></tr>
@@ -45,32 +45,54 @@
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
+### 编译选项说明
 
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+| 参数 | 说明 | 可选值 | 默认值 |
+|------|------|---------|--------|
+| CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+| CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2002 | dav-2002 |
 
-- 样例执行
+### 配置环境变量
+
+请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+
+- 默认路径，root用户安装CANN软件包
   ```bash
-  mkdir -p build && cd build;      # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
-  ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin  # 验证输出结果是否正确
+  source /usr/local/Ascend/cann/set_env.sh
   ```
-  执行结果如下，说明精度对比成功。
+
+- 默认路径，非root用户安装CANN软件包
   ```bash
-  test pass!
+  source $HOME/Ascend/cann/set_env.sh
   ```
+
+- 指定路径install_path，安装CANN软件包
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
+
+### 样例执行
+
+```bash
+mkdir -p build && cd build;      # 创建并进入build目录
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-2002 ..;make -j;    # 编译工程，默认npu模式
+python3 ../scripts/gen_data.py   # 生成测试输入数据
+./demo                           # 执行编译生成的可执行程序，执行样例
+python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin  # 验证输出结果是否正确
+```
+
+使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+示例如：
+```bash
+cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2002 ..;make -j; # cpu调试模式
+cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2002 ..;make -j; # NPU仿真模式
+```
+
+> **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+执行结果如下，说明精度对比成功。
+```bash
+test pass!
+```
