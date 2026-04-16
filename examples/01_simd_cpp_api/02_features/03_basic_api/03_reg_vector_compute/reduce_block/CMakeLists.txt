@@ -19,7 +19,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    block_reduce.asc
+    reduce_block.asc
 )
 
 target_link_libraries(demo PRIVATE
