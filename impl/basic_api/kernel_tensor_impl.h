@@ -1382,11 +1382,11 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
 template <typename T> 
 __aicore__ inline __inout_pipe__(S)
-Proxy<typename GlobalTensor<T>::PrimType> GlobalTensor<T>::operator()(const uint64_t offset)
+TensorProxy<typename GlobalTensor<T>::PrimType> GlobalTensor<T>::operator()(const uint64_t offset)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     __gm__ PrimType* addr = ExtractL2CacheGmAddr(this->address_);
-    return Proxy<PrimType>{&addr[offset], addr[offset]};
+    return TensorProxy<PrimType>{&addr[offset], addr[offset]};
 #else
     uintptr_t tmpAddr = AlignPtr<PrimType>(this->oriAddress_ + offset);
     if (tmpAddr != lastReadCacheAddr) {
@@ -1394,22 +1394,22 @@ Proxy<typename GlobalTensor<T>::PrimType> GlobalTensor<T>::operator()(const uint
         dcci(reinterpret_cast<__gm__ uint64_t *>(lastReadCacheAddr),
             cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
     }
-    return Proxy<PrimType>{&this->oriAddress_[offset], this->oriAddress_[offset]};
+    return TensorProxy<PrimType>{&this->oriAddress_[offset], this->oriAddress_[offset]};
 #endif
 }
 
 template <typename T>
 __aicore__ inline __inout_pipe__(S)
-Proxy<typename GlobalTensor<T>::PrimType> GlobalTensor<T>::operator()(const uint64_t offset) const
+TensorProxy<typename GlobalTensor<T>::PrimType> GlobalTensor<T>::operator()(const uint64_t offset) const
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     __gm__ PrimType* addr = ExtractL2CacheGmAddr(this->address_);
-    return Proxy<PrimType>addr[offset], addr[offset]};
+    return TensorProxy<PrimType>addr[offset], addr[offset]};
 #else
     uintptr_t tmpAddr = AlignPtr<PrimType>(this->oriAddress_ + offset);
     dcci(reinterpret_cast<__gm__ uint64_t *>(tmpAddr),
         cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
-    return Proxy<PrimType>{&this->oriAddress_[offset], this->oriAddress_[offset]};
+    return TensorProxy<PrimType>{&this->oriAddress_[offset], this->oriAddress_[offset]};
 #endif
 }
 
