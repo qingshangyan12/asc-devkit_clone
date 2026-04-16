@@ -141,6 +141,7 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
     return;
 }
 
+// only 51, 71, 82 supports printf/assert. the other code is left to avoid errors in test cases.
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
@@ -155,6 +156,16 @@ __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     __asc_aicore::printf_impl(fmt, args...);
+#endif
+}
+
+template <class... Args>
+__aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    __asc_aicore::printf_impl_assert(fmt, args...);
+#else
+    return;
 #endif
 }
 #else
@@ -217,46 +228,17 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 }
 #endif // ASCENDC_CPU_DEBUG
 #endif // defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
-#endif // __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 
-#if defined(ASCENDC_DUMP_ASSERT_ONLY)
-__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpAddrAssertOnlyReserved;
-__BLOCK_LOCAL__ __inline__ bool g_mixFlagAssertOnlyReserved;
-__aicore__ inline void StoreArgsOfInitDump(bool mixFlag, __gm__ uint8_t* dumpAddr = nullptr)
-{
-    g_mixFlagAssertOnlyReserved = mixFlag;
-    g_dumpAddrAssertOnlyReserved = dumpAddr;
-}
-#endif
-
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 template <class... Args>
 __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    printf_impl_assert(fmt, args...);
-#else
-    return;
-#endif
-}
-#else
-template <class... Args>
-__aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
-{
-#ifdef ASCENDC_DUMP
-#ifdef ASCENDC_DUMP_ASSERT_ONLY	
-    if (g_dumpAddrAssertOnlyReserved == nullptr) {
-        InitDump(g_mixFlagAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
-    } else {
-        InitDump(g_mixFlagAssertOnlyReserved, g_dumpAddrAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
-    }
-#endif
     PrintfImpl(DumpType::DUMP_ASSERT, fmt, args...);
 #else
     return;
 #endif
 }
-#endif
+#endif // __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 
 __aicore__ inline void PrintTimeStamp(uint32_t descId)
 {
