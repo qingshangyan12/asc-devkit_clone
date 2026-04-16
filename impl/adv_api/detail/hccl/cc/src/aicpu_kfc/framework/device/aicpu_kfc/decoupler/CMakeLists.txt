@@ -80,6 +80,7 @@ set(open_exec_impl_src_list
 set(ASCEND_CANN_PACKAGE_DECOUPLER_INCLUDE_DIRS
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/acl
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
 )
 
 if(ASCEND_CANN_PACKAGE_ENV_PATH)
@@ -87,6 +88,8 @@ if(ASCEND_CANN_PACKAGE_ENV_PATH)
         ${ASCEND_CANN_PACKAGE_ENV_PATH}/include
         ${ASCEND_CANN_PACKAGE_ENV_PATH}/include/acl
         ${ASCEND_CANN_PACKAGE_ENV_PATH}/include/hccl
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/pkg_inc
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/pkg_inc/base
     )
 endif()
 
