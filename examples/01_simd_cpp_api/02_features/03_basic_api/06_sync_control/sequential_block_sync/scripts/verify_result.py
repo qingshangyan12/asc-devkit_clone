@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# coding=utf-8
+
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2025 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -9,31 +12,30 @@
 # ----------------------------------------------------------------------------------------------------------
 
 
-cmake_minimum_required(VERSION 3.16)
+import os
+import sys
+import numpy as np
 
-find_package(ASC REQUIRED)
 
-project(kernel_samples LANGUAGES ASC CXX)
+LOSS = 1e-3
+MINIMUM = 10e-10
 
-add_executable(demo
-    init_determine_compute_workspace.asc
-)
 
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-    dl
-)
+def verify_result(output, golden):
+    output_type = np.float32
+    output = np.fromfile(output, dtype=output_type)
+    golden = np.fromfile(golden, dtype=output_type)
+    result = np.abs(output - golden)
+    deno = np.maximum(np.abs(output), np.abs(golden))
+    result_atol = np.less_equal(result, LOSS)
+    result_rtol = np.less_equal(result / np.add(deno, MINIMUM), LOSS)
+    if not result_rtol.all() and not result_atol.all():
+        if np.sum(result_rtol == False) > output.size * LOSS \
+            and np.sum(result_atol == False) > output.size * LOSS:
+            print("[ERROR] result error")
+            return False
+    print("test pass")
+    return True
 
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
-)
+if __name__ == '__main__':
+    verify_result(sys.argv[1],sys.argv[2])
