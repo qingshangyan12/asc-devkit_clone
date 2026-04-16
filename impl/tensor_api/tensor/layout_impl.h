@@ -37,7 +37,7 @@ struct LocalTensor;
 template <typename LayoutType>
 struct LayoutInfoCompat {
     using PatternType = DefaultPtn;
-    using TraitType = DefaultInfo;
+    using TraitType = LayoutTraitDefault;
 };
 
 template <typename ShapeType, typename StrideType, typename LayoutPattern, typename LayoutTrait>
