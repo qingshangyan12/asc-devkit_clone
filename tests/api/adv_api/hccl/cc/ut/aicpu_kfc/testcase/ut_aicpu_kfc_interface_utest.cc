@@ -31,3 +31,5 @@ protected:
 };
 
 TEST_F(MC2AicpuInterface_UT, RunAicpuKfcResInit_nullptr) { EXPECT_EQ(HCCL_E_PARA, RunAicpuKfcResInit(nullptr)); }
+
+TEST_F(MC2AicpuInterface_UT, RunAicpuKfcSrvLaunch_nullptr) { EXPECT_EQ(HCCL_E_PARA, RunAicpuKfcSrvLaunch(nullptr)); }

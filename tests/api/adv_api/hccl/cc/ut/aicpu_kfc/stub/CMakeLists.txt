@@ -82,7 +82,7 @@ list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX "aicpu_kfc/framework/communicat
 list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX "aicpu_kfc/framework/common/src/topo/topo_device/topoinfo_ranktableParser_device.cc")
 list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX "aicpu_kfc/framework/communicator/impl/independent_op/data_api/hccl_api_data_aicpu_ts.cc")
 list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX "aicpu_kfc/framework/common/src/topo/topo_device/.*")
-list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX ".*aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_open.*\\.cc")
+list(FILTER FRAMEWORK_HOST_SOURCES EXCLUDE REGEX ".*aicpu_kfc/framework/device/aicpu_kfc/decoupler/.*\\.cc")
 
 # 重复定义冲突
 list(FILTER COMMON_SOURCES EXCLUDE REGEX ".*/common/debug/profiling/plugin_runner_device\\.cc$")
@@ -431,6 +431,220 @@ target_compile_definitions(hccl_llt    PRIVATE
 
 target_compile_options(hccl_llt   PRIVATE
     -O0 -U_FORTIFY_SOURCE -g
+)
+
+get_filename_component(OPEN_HCCL_SRC_ROOT "${HCCL_CODE_ROOT}/.." ABSOLUTE)
+set(HCCL_DECOUPLER_SRC_DIR
+    ${HCCL_CODE_ROOT}/framework/device/aicpu_kfc/decoupler
+)
+
+set(hccl_llt_decoupler_src_list
+    ${HCCL_DECOUPLER_SRC_DIR}/comm_kfc_aicpu_server.cc
+    ${HCCL_DECOUPLER_SRC_DIR}/comm_kfc_dispatcher.cc
+)
+
+set(hccl_llt_decoupler_open_src_list
+    ${HCCL_DECOUPLER_SRC_DIR}/comm_kfc_open_kernel_adapter.cc
+)
+
+set(hccl_llt_decoupler_open_exec_src_list
+    ${HCCL_DECOUPLER_SRC_DIR}/comm_kfc_open_kernel_executor.cc
+)
+
+set(hccl_llt_decoupler_open_exec_impl_src_list
+    ${HCCL_DECOUPLER_SRC_DIR}/comm_kfc_open_env_adapter.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/channel/channel.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/channel/channel_request.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/executor_base.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/executor_v2_base.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/alg_template_base.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/alg_v2_template_base.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/template_utils.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/registry/alg_v2_template_register.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/wrapper/alg_data_trans_wrapper.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/wrapper/dpu_alg_data_trans_wrapper.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo/topo.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo/topo_match_1d.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo/topo_match_base.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo/topo_match_multilevel.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo/topo_match_ubx.cc
+
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sole_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/executor/ins_reduce_scatter_parallel_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sequence_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_nhr.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D_meshchunk.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1d_dpu.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_aicpu_reduce_nhr.cc
+
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/executor/ins_v2_all_gather_sole_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/executor/ins_v2_all_gather_parallel_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
+
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
+
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/executor/ins_v2_all_reduce_parallel_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/executor/ins_v2_all_reduce_sequence_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_one_shot.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_nhr.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_aicpu_reduce_nhr.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_reduce_scatter_mesh_1D_intra.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_reduce_scatter_mesh_1D_dpu_inter.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_gather_mesh_1D_intra.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_gather_nhr_dpu_inter.cc
+)
+
+add_library(hccl_llt_decoupler OBJECT ${hccl_llt_decoupler_src_list})
+set_target_properties(hccl_llt_decoupler PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_compile_definitions(hccl_llt_decoupler PRIVATE
+    $<TARGET_PROPERTY:hccl_llt,COMPILE_DEFINITIONS>
+)
+
+target_compile_options(hccl_llt_decoupler PRIVATE
+    $<TARGET_PROPERTY:hccl_llt,COMPILE_OPTIONS>
+)
+
+target_include_directories(hccl_llt_decoupler PRIVATE
+    ${HCCL_HCOMM_HEADER_DIR}/../
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    ${HCCL_CODE_ROOT}/legacy/unified_platform/resource/stream/aicpu
+    $<TARGET_PROPERTY:hccl_llt,INCLUDE_DIRECTORIES>
+)
+
+add_library(hccl_llt_decoupler_open OBJECT ${hccl_llt_decoupler_open_src_list})
+set_target_properties(hccl_llt_decoupler_open PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_compile_definitions(hccl_llt_decoupler_open PRIVATE
+    $<TARGET_PROPERTY:hccl_llt,COMPILE_DEFINITIONS>
+)
+
+target_compile_options(hccl_llt_decoupler_open PRIVATE
+    $<TARGET_PROPERTY:hccl_llt,COMPILE_OPTIONS>
+)
+
+target_include_directories(hccl_llt_decoupler_open BEFORE PRIVATE
+    ${HCCL_HCOMM_HEADER_DIR}/../
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    ${OPEN_HCCL_SRC_ROOT}/common
+    ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
+    $<TARGET_PROPERTY:hccl_llt,INCLUDE_DIRECTORIES>
+)
+
+add_library(hccl_llt_decoupler_open_exec OBJECT ${hccl_llt_decoupler_open_exec_src_list})
+set_target_properties(hccl_llt_decoupler_open_exec PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_compile_definitions(hccl_llt_decoupler_open_exec PRIVATE
+    $<TARGET_PROPERTY:hccl_llt,COMPILE_DEFINITIONS>
+    AICPU_COMPILE
+)
+
+target_compile_options(hccl_llt_decoupler_open_exec PRIVATE
+    $<TARGET_PROPERTY:hccl_llt,COMPILE_OPTIONS>
+)
+
+target_include_directories(hccl_llt_decoupler_open_exec BEFORE PRIVATE
+    ${HCCL_DECOUPLER_SRC_DIR}
+    ${HCCL_HCOMM_HEADER_DIR}/../
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/channel
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/registry
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/registry
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/wrapper
+    ${OPEN_HCCL_SRC_ROOT}/common
+    ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
+    ${ASCEND_CANN_PACKAGE_PATH}/include
+    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/acl
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/hccl
+    ${HCCL_HCOMM_HEADER_DIR}
+    ${HCCL_HCOMM_HEADER_DIR}/hccl
+    ${HCCL_CODE_ROOT}/pub_inc
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
+    ${HCCL_CODE_ROOT}/platform/hccp/external_depends/inc/log
+)
+
+add_library(hccl_llt_decoupler_open_exec_impl OBJECT ${hccl_llt_decoupler_open_exec_impl_src_list})
+set_target_properties(hccl_llt_decoupler_open_exec_impl PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_compile_definitions(hccl_llt_decoupler_open_exec_impl PRIVATE
+    $<TARGET_PROPERTY:hccl_llt,COMPILE_DEFINITIONS>
+    AICPU_COMPILE
+)
+
+target_compile_options(hccl_llt_decoupler_open_exec_impl PRIVATE
+    $<TARGET_PROPERTY:hccl_llt,COMPILE_OPTIONS>
+    -Wno-unused-function
+    -Wno-unused-variable
+    -Wno-unused-value
+    -Wno-sign-compare
+)
+
+target_include_directories(hccl_llt_decoupler_open_exec_impl BEFORE PRIVATE
+    ${HCCL_HCOMM_HEADER_DIR}/../
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/channel
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/registry
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/registry
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/wrapper
+    ${OPEN_HCCL_SRC_ROOT}/common
+    ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
+    ${OPEN_HCCL_SRC_ROOT}/hccl_public
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/executor
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aiv
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/executor
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aiv
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/executor
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aiv
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/executor
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aiv
+    ${ASCEND_CANN_PACKAGE_PATH}/include
+    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/acl
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/hccl
+    ${HCCL_HCOMM_HEADER_DIR}
+    ${HCCL_HCOMM_HEADER_DIR}/hccl
+    ${HCCL_CODE_ROOT}/pub_inc
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
+    ${HCCL_CODE_ROOT}/platform/hccp/external_depends/inc/log
+)
+
+target_sources(hccl_llt PRIVATE
+    $<TARGET_OBJECTS:hccl_llt_decoupler>
+    $<TARGET_OBJECTS:hccl_llt_decoupler_open>
+    $<TARGET_OBJECTS:hccl_llt_decoupler_open_exec>
+    $<TARGET_OBJECTS:hccl_llt_decoupler_open_exec_impl>
 )
 
 target_link_libraries(hccl_llt  PRIVATE

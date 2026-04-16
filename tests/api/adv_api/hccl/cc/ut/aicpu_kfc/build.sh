@@ -15,6 +15,7 @@ trap 'echo "Error: build.sh failed at line $LINENO" >&2; exit 1' ERR
 CURRENT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 BUILD_DIR="${CURRENT_DIR}/build"
 THIRD_PARTY_DIR="${BUILD_DIR}/third_party"
+TEST_BIN="${BUILD_DIR}/testcase/aicpu_kfc_utest_aicpu"
 THREAD_NUM=$(nproc)
 BUILD_TYPE="Debug"
 CANN_PATH=""
@@ -31,7 +32,7 @@ Options:
   -p, --cann_path <PATH>  Ascend CANN installation path
       --build-type <TYPE> CMake build type, default: Debug
       --asan              Enable ASAN
-      --build-only        Configure and build only, do not run ctest
+      --build-only        Configure and build only, do not run the test binary
       --clean             Remove build directory and exit
   -h, --help              Show this help
 EOF
@@ -133,4 +134,4 @@ if [[ "${BUILD_ONLY}" == "true" ]]; then
 fi
 
 export LD_LIBRARY_PATH="${BUILD_DIR}/stub:${LD_LIBRARY_PATH:-}"
-ctest --test-dir "${BUILD_DIR}" --output-on-failure -R '^aicpu_kfc_utest_aicpu$'
+"${TEST_BIN}"
