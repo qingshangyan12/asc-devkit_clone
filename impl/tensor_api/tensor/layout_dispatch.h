@@ -56,12 +56,39 @@ __aicore__ inline decltype(auto) GetTuple(Ts&&... ts) {
     return Make2Params2Tuple(MakeTupleCons{}, ts...);
 }
 
- template <typename T0, typename T1, typename T2, typename T3, typename... Ts> 
- __aicore__ inline decltype(auto) LayoutConstructor(T0&& t0, T1&& t1, T2&& t2, T3&& t3, Ts&&... ts) { 
+template <typename T0, typename T1, typename T2, typename T3, typename... Ts> 
+__aicore__ inline decltype(auto) LayoutConstructor(T0&& t0, T1&& t1, T2&& t2, T3&& t3, Ts&&... ts) { 
      auto shape = GetTuple(t0, t1, t2, t3); 
      auto stride = GetTuple(ts...); 
      return Layout(shape, stride); 
  }
+
+template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>, typename ShapeType, typename StrideType>
+__aicore__ inline constexpr auto MakePatternLayout(const ShapeType& shape, const StrideType& stride)
+{
+    using LayoutT = Layout<ShapeType, StrideType, Std::tuple<LayoutPattern, TraitType>>;
+    return LayoutT(shape, stride);
+} 
+
+//  Tuple dispatch
+template <typename LayoutPattern, typename TraitType>
+struct TupleDispatcher;
+
+template <typename TraitType>
+struct TupleDispatcher<NDLayoutPtn, TraitType> {
+    template <typename U, typename S>
+    __aicore__ inline static decltype(auto) apply(U row, S column) {
+        auto shape = GetTuple(Std::Int<1>{}, row, Std::Int<1>{}, column);
+        auto stride = GetTuple(Std::Int<0>{}, column, Std::Int<0>{}, Std::Int<1>{});
+        return MakePatternLayout<NDLayoutPtn, TraitType>(shape, stride);
+    }
+};
+
+template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>, typename... Args>
+__aicore__ inline constexpr auto MakeFrameLayoutImpl(const Args&... args)
+{
+    return TupleDispatcher<LayoutPattern, TraitType>::apply(args);
+}
 
 // layout_dispatch.h
 template <LayoutFormat format, typename T>
