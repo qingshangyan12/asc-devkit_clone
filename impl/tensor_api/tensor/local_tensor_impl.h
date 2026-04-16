@@ -226,7 +226,7 @@ __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& c
 
 template <typename T, typename TargetLayoutPtn>
 __aicore__ inline constexpr bool IsMatchLayoutPattern() {
-    using Layout = typename Std::conditional_t<is_layout_v<T>, T, typename T::layoutType>::type;
+    using Layout = typename Std::conditional_t<IsLayoutV<T>, T, typename T::layoutType>::type;
     using LayoutPattern = GetLayoutPattern<Layout>;
     return Std::is_same_v<LayoutPattern, TargetLayoutPtn>;
 }
