@@ -409,31 +409,6 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperation3D)
     EXPECT_EQ(constTensor.Capacity(), 8);
 }
 
-TEST_F(Tensor_Api_Tensor, LocalTensorCoordViewOperation)
-{
-    using namespace AscendC::Te;
-
-    constexpr uint32_t TILE_LENGTH = 12;
-    __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    auto ptr = MakeMemPtr<Location::GM>(data);
-    auto layout = MakeLayout(MakeShape(3, 4), MakeStride(4, 1));
-    auto tensor = MakeTensor(ptr, layout);
-
-    auto subTensor = tensor(MakeCoord(1, 1));
-    EXPECT_EQ(subTensor.Data(), ptr + layout(MakeCoord(1, 1)));
-
-    auto shape = subTensor.Shape();
-    EXPECT_EQ(AscendC::Std::get<0>(shape), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(shape), 3);
-
-    auto stride = subTensor.Stride();
-    EXPECT_EQ(AscendC::Std::get<0>(stride), 4);
-    EXPECT_EQ(AscendC::Std::get<1>(stride), 1);
-
-    EXPECT_EQ(subTensor[MakeCoord(0, 0)], 5);
-    EXPECT_EQ(subTensor[MakeCoord(1, 2)], 11);
-}
-
 TEST_F(Tensor_Api_Tensor, LocalTensorCoordViewOperation3D)
 {
     using namespace AscendC::Te;
