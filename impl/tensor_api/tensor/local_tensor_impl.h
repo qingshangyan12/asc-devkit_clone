@@ -144,14 +144,14 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     template <typename Coord, typename Info>
  	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) {
         auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeSliceLayout(coord, coordLayout, info);
+ 	    auto tileLayout = MakeSliceLayout(coord, Layout(), info);
  	    return MakeTensor(iter, tileLayout);
  	}
 
     template <typename Coord, typename Info>
  	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const{
         auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeSliceLayout(coord, coordLayout, info);
+ 	    auto tileLayout = MakeSliceLayout(coord, Layout(), info);
  	    return MakeTensor(iter, tileLayout);
  	}
 
