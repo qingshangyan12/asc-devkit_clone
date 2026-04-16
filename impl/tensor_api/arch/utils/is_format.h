@@ -314,6 +314,33 @@ struct IsScaleBDNFormat { // shape = ((1, row),(1,col)) stride = ((0, 1),(0, row
     static constexpr bool value = IsDNFormat<T>::normalValue;
 };
 
+template <typename T, typename TargetLayoutPtn>
+__aicore__ inline constexpr bool IsMatchLayoutPattern()
+{
+    using Layout = typename Std::conditional<is_layout_v<T>, T, typename T::layoutType>::type using LayoutPattern =
+        GetLayoutPattern<Layout>;
+    return Std::is_same_v<LayoutPattern, TargetLayoutPtn>;
+}
+
+template <typename T>
+__aicore__ inline constexpr bool IsZNLayout()
+{ return IsMatchLayoutPattern<T, ZNLayoutPtn>(); }
+template <typename T>
+__aicore__ inline constexpr bool IsZZLayout()
+{ return IsMatchLayoutPattern<T, ZZLayoutPtn>(); }
+template <typename T>
+__aicore__ inline constexpr bool IsNNLayout()
+{ return IsMatchLayoutPattern<T, NNLayoutPtn>(); }
+template <typename T>
+__aicore__ inline constexpr bool IsNZLayout()
+{ return IsMatchLayoutPattern<T, NZLayoutPtn>(); }
+template <typename T>
+__aicore__ inline constexpr bool IsNDLayout()
+{ return IsMatchLayoutPattern<T, NDLayoutPtn>(); }
+template <typename T>
+__aicore__ inline constexpr bool IsDNLayout()
+{ return IsMatchLayoutPattern<T, DNLayoutPtn>(); }
+
 } // namespace Te
 } // namespace AscendC
 
