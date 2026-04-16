@@ -48,8 +48,8 @@ private:
     template<const LoadDataTrait& trait = DEFAULT_COPY_L1_TO_L0A_TRAIT, typename T, typename U>
     __aicore__ inline static void LoadData(const T& dst, const U& src)
     {
-        constexpr Hardware dstPos = GetHardPos<T>();
-        constexpr Hardware srcPos = GetHardPos<U>();
+        using dstPos = GetLocationT<T>;
+        using srcPos = GetLocationT<U>;
         using Tensor2Tensor = typename CopyL12L0ATensor2TensorNoCoord<dstPos, srcPos, CURRENT_ARCH_VERSION>::type;
         Tensor2Tensor::template Run<trait, T, U>(dst, src);
     }
@@ -57,8 +57,8 @@ private:
     template<const LoadDataTrait& trait = DEFAULT_COPY_L1_TO_L0A_TRAIT, typename T, typename U, class Coord>
     __aicore__ inline static void LoadData(const T& dst, const U& src, const Coord& coord)
     {
-        constexpr Hardware dstPos = GetHardPos<T>();
-        constexpr Hardware srcPos = GetHardPos<U>();
+        using dstPos = GetLocationT<T>;
+        using srcPos = GetLocationT<U>;
         using Tensor2Tensor = typename CopyL12L0ATensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION>::type;
         Tensor2Tensor::template Run<trait, T, U, Coord>(dst, src, coord);
     }

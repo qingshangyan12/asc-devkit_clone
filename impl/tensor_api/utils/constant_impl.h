@@ -66,10 +66,13 @@ namespace Location {
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
 
-template<typename T>
-__aicore__ inline constexpr auto GetHardPos()
+template <typename T>
+using GetLocationT = typename T::iterator::ptrPattern;
+
+template <typename T>
+__aicore__ inline constexpr auto GetLocation()
 {
-   return T::iterator::hardPos;
+    return GetLocationT<T>{};
 }
 
 template <typename T>

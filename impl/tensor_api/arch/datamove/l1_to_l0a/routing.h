@@ -34,24 +34,24 @@ public:
     __aicore__ inline void static Run(const Args&... args) {}
 };
 
-template <Hardware dstPos, Hardware srcPos, uint32_t Version>
+template <typename dstPos, typename srcPos, uint32_t Version>
 struct CopyL12L0ATensor2Tensor {
     using type = CopyL12L0AIgnore;
 };
 
-template <Hardware dstPos, Hardware srcPos, uint32_t Version>
+template <typename dstPos, typename srcPos, uint32_t Version>
 struct CopyL12L0ATensor2TensorNoCoord {
     using type = CopyL12L0AIgnore;
 };
 
 template <>
-struct CopyL12L0ATensor2TensorNoCoord<Hardware::L0A, Hardware::L1, ArchVersion::V3510>
+struct CopyL12L0ATensor2TensorNoCoord<Location::L0A, Location::L1, ArchVersion::V3510>
 {
     using type = LoadDataL12L0A3510;
 };
 
 template <>
-struct CopyL12L0ATensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3510>
+struct CopyL12L0ATensor2Tensor<Location::L0A, Location::L1, ArchVersion::V3510>
 {
     using type = LoadDataL12L0AWithCoord3510;
 };
@@ -63,3 +63,4 @@ struct CopyL12L0ATensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3510>
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
+
