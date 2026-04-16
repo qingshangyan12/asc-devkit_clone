@@ -77,6 +77,19 @@ set(open_exec_impl_src_list
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_gather_nhr_dpu_inter.cc
 )
 
+set(ASCEND_CANN_PACKAGE_DECOUPLER_INCLUDE_DIRS
+    ${ASCEND_CANN_PACKAGE_PATH}/include
+    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
+)
+
+if(ASCEND_CANN_PACKAGE_ENV_PATH)
+    list(APPEND ASCEND_CANN_PACKAGE_DECOUPLER_INCLUDE_DIRS
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/include
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/include/acl
+        ${ASCEND_CANN_PACKAGE_ENV_PATH}/include/hccl
+    )
+endif()
+
 add_library(ccl_kernel_decoupler OBJECT ${src_list})
 set_target_properties(ccl_kernel_decoupler PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
@@ -148,11 +161,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/registry
     ${OPEN_HCCL_SRC_ROOT}/common
     ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
-    ${ASCEND_CANN_PACKAGE_PATH}/include
-    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/acl
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/hccl
+    ${ASCEND_CANN_PACKAGE_DECOUPLER_INCLUDE_DIRS}
     ${HCCL_HCOMM_HEADER_DIR}
     ${HCCL_HCOMM_HEADER_DIR}/hccl
     ${HCCL_BASE_DIR}/pub_inc
@@ -215,11 +224,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec_impl BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aiv
-    ${ASCEND_CANN_PACKAGE_PATH}/include
-    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/acl
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/hccl
+    ${ASCEND_CANN_PACKAGE_DECOUPLER_INCLUDE_DIRS}
     ${HCCL_HCOMM_HEADER_DIR}
     ${HCCL_HCOMM_HEADER_DIR}/hccl
     ${HCCL_BASE_DIR}/pub_inc
