@@ -375,7 +375,6 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
 
     target_link_libraries(mc2_server PRIVATE
         -Wl,--no-as-needed
-        ccl_kernel
         mc2_kernel_compat
         -Wl,--no-as-needed
     )
@@ -486,6 +485,7 @@ endif()
 
 add_subdirectory(common)
 add_subdirectory(ops)
+add_subdirectory(aicpu_kfc)
 
 if(DEVICE_MODE AND KERNEL_MODE)
     set(CCL_KERNEL_TAR_DIR ${CMAKE_SOURCE_DIR}/build_device/ccl_kernel_tar_pkg/aicpu_kernels_device)

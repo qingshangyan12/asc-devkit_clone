@@ -9,6 +9,7 @@
 # -----------------------------------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.16.0)
 option(BUILD_OPEN_PROJECT "Build open hccl project." ON)
+option(KERNEL_MODE "Kernel mode." ON)
 
 set(HCCL_CC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(HCCL_CC_INCLUDE_DIR ${ASCENDC_DIR}/include/adv_api/hccl/internal)
@@ -22,23 +23,23 @@ if(CCAHE_PROGRAM)
     set(CMAKE_CXX_COMPILER_LAUNCHER ${CCAHE_PROGRAM})
 endif()
 
-if((BUILD_OPEN_PROJECT AND KERNEL_MODE) OR AARCH_MODE)
-    # need to switch
-    set(CMAKE_SYSTEM_NAME Linux)
-    set(CMAKE_SYSTEM_PROCESSOR aarch64)
-    #Change the path to the absolute path of the cross compilation tool after the toolkit package is decompressed
-    # set cross compile toolchain dir
-    set(TOOLCHAIN_DIR ${CUSTOM_ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/)
-    #Specify cross compiler
-    message(STATUS "TOOLCHAIN_DIR=${TOOLCHAIN_DIR}")
-    if (NOT "x${TOOLCHAIN_DIR}" STREQUAL "x")
-        if (NOT IS_DIRECTORY ${TOOLCHAIN_DIR})
-            message(FATAL_ERROR "specify cross compile toolchain directory(${TOOLCHAIN_DIR}) is not exist")
-        endif()
-    endif()
-    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/bin/aarch64-target-linux-gnu-g++)
-    set(CMAKE_C_COMPILER   ${TOOLCHAIN_DIR}/bin/aarch64-target-linux-gnu-gcc)
-endif()
+# if((BUILD_OPEN_PROJECT AND KERNEL_MODE) OR AARCH_MODE)
+#     # need to switch
+#     set(CMAKE_SYSTEM_NAME Linux)
+#     set(CMAKE_SYSTEM_PROCESSOR aarch64)
+#     #Change the path to the absolute path of the cross compilation tool after the toolkit package is decompressed
+#     # set cross compile toolchain dir
+#     set(TOOLCHAIN_DIR ${CUSTOM_ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/)
+#     #Specify cross compiler
+#     message(STATUS "TOOLCHAIN_DIR=${TOOLCHAIN_DIR}")
+#     if (NOT "x${TOOLCHAIN_DIR}" STREQUAL "x")
+#         if (NOT IS_DIRECTORY ${TOOLCHAIN_DIR})
+#             message(FATAL_ERROR "specify cross compile toolchain directory(${TOOLCHAIN_DIR}) is not exist")
+#         endif()
+#     endif()
+#     set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/bin/aarch64-target-linux-gnu-g++)
+#     set(CMAKE_C_COMPILER   ${TOOLCHAIN_DIR}/bin/aarch64-target-linux-gnu-gcc)
+# endif()
 
 set(CMAKE_C_FLAGS_RELEASE "")
 set(CMAKE_CXX_FLAGS_RELEASE "")
