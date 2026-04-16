@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于[GatherMask](../../../../../../docs/api/context/GatherMask.md)、[Gather](../../../../../../docs/api/context/Gather.md)、[Gatherb](../../../../../../docs/api/context/GatherB.md)等接口完成多种场景模式下的数据选择功能，包括内置固定模式、用户自定义模式、张量偏移模式、DataBlock偏移模式，实现从源操作数中选取元素写入目的操作数。样例支持通过编译参数切换不同场景，便于开发者理解Gather类接口的使用方法和实现差异。
+本样例基于GatherMask、Gather、Gatherb等接口完成多种场景模式下的数据选择功能，包括内置固定模式、用户自定义模式、张量偏移模式、DataBlock偏移模式，实现从源操作数中选取元素写入目的操作数。样例支持通过编译参数切换不同场景，便于开发者理解Gather类接口的使用方法和实现差异。
 
 ## 支持的产品
 
@@ -96,7 +96,7 @@
   cmake .. -DNPU_ARCH=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程
   python3 ../scripts/gen_data.py -scenario_num=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin  # 验证输出结果是否正确
+  python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin $SCENARIO_NUM  # 验证输出结果是否正确
   ```
 
   使用CPU调试或NPU仿真模式时，添加 `-DRUN_MODE=cpu` 或 `-DRUN_MODE=sim` 参数即可。
@@ -105,7 +105,7 @@
  	cmake -DRUN_MODE=cpu -DNPU_ARCH=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU调试模式
   cmake -DRUN_MODE=sim -DNPU_ARCH=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU仿真模式
  	```
-  若需详细了解CPU调试相关内容，请参考[03_cpudebug样例](../../../01_utilities/03_cpudebug)。
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
 

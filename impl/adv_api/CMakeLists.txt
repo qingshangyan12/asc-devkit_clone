@@ -71,7 +71,8 @@ add_subdirectory(tiling)
 if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
   include(ExternalProject)
   ExternalProject_Add(device_tiling
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake/device
+    # SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake/device
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tiling
     CONFIGURE_COMMAND ${CMAKE_COMMAND}
     -G ${CMAKE_GENERATOR}
     -DCANN_3RD_LIB_PATH=${CANN_3RD_LIB_PATH}
@@ -92,6 +93,7 @@ if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
     -DPRODUCT_SIDE=device
     <SOURCE_DIR>
     BUILD_ALWAYS 1)
+  add_dependencies(device_tiling gen_kernel_tiling)
 endif()
 
 
