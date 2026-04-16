@@ -135,7 +135,7 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const SrcLa
     auto sliceShape = TransformTupleApply(sliceLayout.Shape(), dstLayout.Shape(), MinOp{});
     using TraitType = GetLayoutTrait<LayoutType>;
     using PatternType = GetLayoutPattern<LayoutType>;
-    return MakePatternLayout<PatternType, TraitType>(sliceShape, layout.Stride());
+    return MakePatternLayout<PatternType, TraitType>(sliceShape, srcLayout.Stride());
 }
 
 } // namespace Te
