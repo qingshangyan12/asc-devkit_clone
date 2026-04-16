@@ -58,7 +58,7 @@ public:
         using biasDataType = typename V::elementType;
         using fmDataType = typename U::elementType;
         using filterDataType = typename S::elementType;
-        using biasPos = GetLocationT<V>;
+        using biasPos = GetPtrPattern<V>;
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         if constexpr (Std::is_same_v<biasPos, Location::BIAS>) {
             static_assert(

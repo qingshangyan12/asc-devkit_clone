@@ -49,6 +49,15 @@ struct GetArchVersion {
 
 constexpr uint32_t CURRENT_ARCH_VERSION = GetArchVersion{}();
 
+namespace CopyMode {
+    struct NORMAL {};
+    struct NORMAL_COORD {};
+    struct TRANS {};
+    struct TRANS_COORD {};
+    struct TRANS_B8B4 {};
+    struct TRANS_B8B4_COORD {};
+};
+
 enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
 
 namespace Location {
@@ -65,15 +74,6 @@ namespace Location {
 
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
-
-template <typename T>
-using GetLocationT = typename T::iterator::ptrPattern;
-
-template <typename T>
-__aicore__ inline constexpr auto GetLocation()
-{
-    return GetLocationT<T>{};
-}
 
 template <typename T>
 struct locationAttr {

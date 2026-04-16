@@ -50,8 +50,8 @@ private:
     template <const CopyGM2UBTrait& trait = DEFAULT_COPY_GM_TO_UB_TRAIT, typename T, typename U>
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
     {
-        using dstTPos = GetLocationT<T>;
-        using srcTPos = GetLocationT<U>;
+        using dstTPos = GetPtrPattern<T>;
+        using srcTPos = GetPtrPattern<U>;
         using Tensor2Tensor = typename CopyGM2UBTensor2Tensor<dstTPos, srcTPos, CURRENT_ARCH_VERSION>::type;
         Tensor2Tensor::template Run<trait, T, U>(dst, src);
     }

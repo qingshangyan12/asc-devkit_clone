@@ -32,6 +32,10 @@ struct HardwareMemPtr : IterAdaptor<Pointer, HardwareMemPtr<PtrPattern, Pointer>
     using ptrPattern = PtrPattern;
 };
 
+template <typename T>
+using GetPtrPattern = typename T::iterator::ptrPattern;
+
+// is hardware mem
 template <typename PtrPattern, typename Pointer, typename = void>
 struct IsHardwareMem : Std::false_type {};
 
