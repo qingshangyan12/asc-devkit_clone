@@ -25,7 +25,14 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-#define asc_lock_impl(pipe, mutex_id, mode) get_buf((pipe), (mutex_id), (mode))
+#define asc_lock_impl(pipe, mutex_id, mode)     \
+    do {                                        \
+        if ((mode) == ASC_LOCK_BLOCK) {         \
+            get_buf((pipe), (mutex_id), false); \
+        } else {                                \
+            get_buf((pipe), (mutex_id), true);  \
+        }                                       \
+    } while (0)
 
 #endif
 
