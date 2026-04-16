@@ -202,7 +202,7 @@ template <typename Arg0, typename... Args>
     __aicore__ inline constexpr auto operator()(const Arg0& arg0, const Args&... args) const {
         if constexpr (HasDereference<Arg0>::value) {
             using Engine = ViewEngine<Arg0>;
-            if constexpr (sizeof...(Args) == 1 && (is_layout<Args>::value && ...)) {
+            if constexpr (sizeof...(Args) == 1 && (IsLayoutV<Args> && ...)) {
                 return LocalTensor<TensorAttribute<Engine, Args...>>{Engine{arg0}, args...};
             } else {
                 return LocalTensor<TensorAttribute<Engine, decltype(MakeLayout(args...))>>{Engine{arg0}, MakeLayout(args...)};
