@@ -114,17 +114,17 @@
   ```bash
   SCENARIO=1
   mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j;           # 编译工程（默认npu模式）
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # 编译工程（默认npu模式）
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   ```
 
-  使用 CPU调试 或 NPU仿真 模式时，添加 `-DRUN_MODE=cpu` 或 `-DRUN_MODE=sim` 参数即可。
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
   SCENARIO=1
-  cmake -DRUN_MODE=cpu -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # cpu调试模式
-  cmake -DRUN_MODE=sim -DNPU_ARCH=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式或场景前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -133,8 +133,8 @@
 
 | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
 | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
-| `RUN_MODE`　　 | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
-| `NPU_ARCH`　　 | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT　　　　　　　　　　　　　　　　　　|
+| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 | `SCENARIO_NUM` | `1`、`2`、`3`、`4`　　　　　| 场景编号：1=连续搬运，2=连续搬运(postUpdate)，3=非连续搬运，4=非连续搬运(postUpdate) |
 
 - 执行结果
