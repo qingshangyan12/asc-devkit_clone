@@ -241,7 +241,7 @@ struct Proxy {
 
     __aicore__ inline Proxy(const Proxy&) = default;
 
-    __aicore__ inline Proxy& operator=(const T value) {
+    __aicore__ inline Proxy& operator=(const T value) && {
         *ptr = value;
         dcci(reinterpret_cast<__gm__ uint64_t *>(ptr),
             cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
