@@ -73,8 +73,8 @@ struct MakeNzFrameLayout {
 struct MakeNDFrameLayout {
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
-        auto shape = MakeShape(MakeShape(Std::Int<1>{}, row), MakeShape(Std::Int<1>{}, column));
-        auto stride = MakeStride(MakeStride(Std::Int<0>{}, column), MakeStride(Std::Int<0>{}, Std::Int<1>{}));
+        auto shape = GetTuple(Std::Int<1>{}, row, Std::Int<1>{}, column);
+        auto stride = GetTuple(Std::Int<0>{}, column, Std::Int<0>{}, Std::Int<1>{});
         return MakePatternLayout<NDLayoutPtn, TraitType>(shape, stride);
     }
 };
