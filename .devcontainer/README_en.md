@@ -33,7 +33,7 @@ chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 ```
 
 > [!WARNING]
-> The Ascend **driver** directory (`/usr/local/Ascend/driver`) is mounted read-only into the container. The **CANN toolkit and ops packages** should be installed inside the container after startup — not on the host. Installing CANN on the host risks overwriting a shared environment.
+> The Ascend driver directory (`/usr/local/Ascend/driver`) is mounted read-only into the container. The **CANN toolkit and ops packages** should be installed inside the container after startup — not on the host. Installing CANN on the host risks overwriting a shared environment.
 
 ## Build the Image
 
@@ -68,7 +68,8 @@ Copy `devcontainer.json` to a local override and remove all NPU-specific entries
 ```
 
 **In `mounts`**, remove the driver and device-related bind mounts:
-```
+
+```text
 source=/usr/local/Ascend/driver,...
 source=/usr/local/dcmi,...
 source=/usr/local/bin/npu-smi,...
