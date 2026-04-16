@@ -473,8 +473,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorSliceOperation)
         24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
         36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47};
     auto ptr = MakeGMmemPtr(data);
-    auto layout = MakeLayout(MakeShape(MakeShape(2, 3), MakeShape(2, 4)),
-                             MakeStride(MakeStride(1, 4), MakeStride(2, 12)));
+    auto layout = MakeFrameLayout<ScaleANDLayoutPtn, LayoutTraitDefault<float, 2>>(6, 8);
     auto tensor = MakeTensor(ptr, layout);
     auto coord = MakeCoord(1, 2);
 
@@ -482,18 +481,18 @@ TEST_F(Tensor_Api_Tensor, LocalTensorSliceOperation)
     EXPECT_EQ(shapeSlice.Data(), ptr + layout(coord));
     auto shapeSliceShape = shapeSlice.Shape();
     auto shapeSliceStride = shapeSlice.Stride();
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(shapeSliceShape)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(shapeSliceShape)), 2);
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(shapeSliceShape)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(shapeSliceShape)), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(shapeSliceShape)), 1);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(shapeSliceShape)), 3);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(shapeSliceShape)), 1);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(shapeSliceShape)), 3);
 
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(shapeSliceStride)), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(shapeSliceStride)), 4);
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(shapeSliceStride)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(shapeSliceStride)), 12);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(shapeSliceStride)), 0);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(shapeSliceStride)), 8);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(shapeSliceStride)), 0);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(shapeSliceStride)), 1);
 
-    EXPECT_EQ(shapeSlice[MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0))], 28);
-    EXPECT_EQ(shapeSlice[MakeCoord(MakeCoord(1, 1), MakeCoord(0, 1))], 45);
+    EXPECT_EQ(shapeSlice[MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0))], 10);
+    EXPECT_EQ(shapeSlice[MakeCoord(MakeCoord(0, 2), MakeCoord(0, 1))], 27);
 }
 
 TEST_F(Tensor_Api_Tensor, LocalTensorSliceWithLayoutInfoOperation)
@@ -507,12 +506,10 @@ TEST_F(Tensor_Api_Tensor, LocalTensorSliceWithLayoutInfoOperation)
         24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
         36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47};
     auto ptr = MakeGMmemPtr(data);
-    auto layout = MakeLayout(MakeShape(MakeShape(2, 3), MakeShape(2, 4)),
-                             MakeStride(MakeStride(1, 4), MakeStride(2, 12)));
+    auto layout = MakeFrameLayout<ScaleANDLayoutPtn, LayoutTraitDefault<float, 2>>(6, 8);
     auto tensor = MakeTensor(ptr, layout);
     auto coord = MakeCoord(MakeCoord(0, 1), MakeCoord(0, 2));
-    auto infoLayout = MakeLayout(MakeShape(MakeShape(1, 5), MakeShape(3, 1)),
-                                 MakeStride(MakeStride(9, 10), MakeStride(11, 12)));
+    auto infoLayout = MakeFrameLayout<ScaleANDLayoutPtn, LayoutTraitDefault<float, 2>>(2, 4);
 
     auto layoutSlice = Slice(tensor, coord, infoLayout);
     EXPECT_EQ(layoutSlice.Data(), ptr + layout(coord));
@@ -521,16 +518,16 @@ TEST_F(Tensor_Api_Tensor, LocalTensorSliceWithLayoutInfoOperation)
     auto layoutSliceStride = layoutSlice.Stride();
     EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(layoutSliceShape)), 1);
     EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(layoutSliceShape)), 2);
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(layoutSliceShape)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(layoutSliceShape)), 1);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(layoutSliceShape)), 1);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(layoutSliceShape)), 4);
 
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(layoutSliceStride)), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(layoutSliceStride)), 4);
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(layoutSliceStride)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(layoutSliceStride)), 12);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(layoutSliceStride)), 0);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(layoutSliceStride)), 8);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(layoutSliceStride)), 0);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(layoutSliceStride)), 1);
 
-    EXPECT_EQ(layoutSlice[MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0))], 28);
-    EXPECT_EQ(layoutSlice[MakeCoord(MakeCoord(0, 1), MakeCoord(1, 0))], 34);
+    EXPECT_EQ(layoutSlice[MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0))], 10);
+    EXPECT_EQ(layoutSlice[MakeCoord(MakeCoord(0, 1), MakeCoord(0, 3))], 21);
 }
 
 TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperation)

@@ -95,7 +95,7 @@ __aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const Layou
 {
     using ShapeType = Std::remove_cvref_t<decltype(layout.Shape())>;
     using CoordType = Std::remove_cvref_t<Coord>;
-    static_assert(is_layout_v<LayoutType> && Std::is_tuple_v<CoordType>, "LayoutType must be Layout");
+    static_assert(IsLayoutV<LayoutType> && Std::is_tuple_v<CoordType>, "LayoutType must be Layout");
     static_assert(nesting_depth_v<ShapeType> == nesting_depth_v<CoordType> && 
         Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>, 
         "Shape and coord must have same tuple structure");
@@ -103,10 +103,10 @@ __aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const Layou
     return MakeLayout(coordShape, layout.Stride());
 }
 
-template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!is_layout_v<SliceShape>, int> = 0>
+template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!IsLayoutV<SliceShape>, int> = 0>
 __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape) 
 {
-    static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
+    static_assert(IsLayoutV<LayoutType>, "LayoutType must be Layout");
     using OriginShape = Std::remove_cvref_t<decltype(layout.Shape())>;
     static_assert(Std::is_tuple_v<SliceShape>,"SliceShape must be a tuple");
     static_assert(nesting_depth_v<SliceShape> == TWO_DIM_DATA, "Only Support Two Dim SliceShape");
@@ -124,10 +124,10 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const Layou
     return MakePatternLayout<PatternType, TraitType>(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride());
 }
 
-template <typename Coord, typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<is_layout_v<DstLayoutType>, int> = 0>
+template <typename Coord, typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<IsLayoutV<DstLayoutType>, int> = 0>
 __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const SrcLayoutType& srcLayout, const DstLayoutType& dstLayout) 
 {
-    static_assert(is_layout_v<SrcLayoutType>, "SrcLayoutType must be Layout");
+    static_assert(IsLayoutV<SrcLayoutType>, "SrcLayoutType must be Layout");
     static_assert(SrcLayoutType::rank == DstLayoutType::rank,
         "SrcLayout Rank must be equal to DstLayout Rank");
 

@@ -152,13 +152,13 @@ template <typename T>
 using GetLayoutPattern = typename GetPattern<Std::remove_cvref_t<T>>::type;
 
 template <typename T>
-struct is_layout : Std::false_type {};
+struct IsLayout : Std::false_type {};
 
 template <typename T, typename U, typename S>
-struct is_layout<Layout<T, U, S>> : Std::true_type {};
+struct IsLayout<Layout<T, U, S>> : Std::true_type {};
 
 template <typename T>
-constexpr bool is_layout_v = is_layout<Std::remove_cvref_t<T>>::value;
+constexpr bool IsLayoutV = IsLayout<Std::remove_cvref_t<T>>::value;
 
 } // namespace Te
 } // namespace AscendC

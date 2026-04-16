@@ -181,13 +181,13 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 };
 
 template <typename T>
-struct IsTileTensor : Std::false_type {};
+struct IsAttrTensor : Std::false_type {};
 
 template <typename Engine, typename Layout>
-struct IsTileTensor<LocalTensor<TensorAttribute<Engine,Layout>>> : Std::true_type {};
+struct IsAttrTensor<LocalTensor<TensorAttribute<Engine,Layout>>> : Std::true_type {};
 
 template <typename T>
-constexpr bool IsTileTensorV = IsTileTensor<Std::remove_cvref_t<T>>::value;
+constexpr bool IsAttrTensorV = IsAttrTensor<Std::remove_cvref_t<T>>::value;
 
 // make_tensor.h
 template <typename T, typename = void>
