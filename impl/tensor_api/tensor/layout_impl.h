@@ -114,8 +114,8 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const Layou
     auto innerRow = Std::get<0>(GetShape<0>(layout));
     auto innerCol = Std::get<0>(GetShape<1>(layout));
 
-    auto srcRow = innerRow * Std::get<1>(GetShape<0>(layout))- Std::get<0>(coord);
-    auto srcCol = innerCol * Std::get<1>(GetShape<1>(layout))- Std::get<1>(coord);
+    auto srcRow = innerRow * Std::get<1>(GetShape<0>(layout)) - Std::get<0>(coord);
+    auto srcCol = innerCol * Std::get<1>(GetShape<1>(layout)) - Std::get<1>(coord);
 
     auto realRow = Std::min(srcRow, Std::get<0>(sliceShape));	 
     auto realCol = Std::min(srcCol, Std::get<1>(sliceShape));

@@ -476,7 +476,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorSliceOperation)
     auto layout = MakeLayout(MakeShape(MakeShape(2, 3), MakeShape(2, 4)),
                              MakeStride(MakeStride(1, 4), MakeStride(2, 12)));
     auto tensor = MakeTensor(ptr, layout);
-    auto coord = MakeCoord(MakeCoord(0, 1), MakeCoord(0, 2));
+    auto coord = MakeCoord(1, 2);
 
     auto shapeSlice = Slice(tensor, coord, MakeShape(3, 3));
     EXPECT_EQ(shapeSlice.Data(), ptr + layout(coord));
