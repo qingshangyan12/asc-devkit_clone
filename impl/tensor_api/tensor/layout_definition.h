@@ -122,9 +122,14 @@ private:
     using tag = Info;
 };
 
+struct DefaultPtn;
+
+template <typename T, size_t C0>
+struct LayoutTraitDefault;
+
 template <typename T>
 struct GetLayoutInfo {
-    static_assert(!Std::is_same_v<T, T>, "GetLayoutTrait/GetLayoutPattern requires LayoutType");
+    using type = Std::tuple<DefaultPtn, LayoutTraitDefault<uint16_t, 32 / sizeof(uint16_t)>>;
 };
 
 template <typename T, typename U, typename LayoutPattern, typename TraitType>
