@@ -11,13 +11,8 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-if(DEFINED RUN_MODE)
-    set(CMAKE_ASC_RUN_MODE ${RUN_MODE} CACHE STRING "Alias of RUN_MODE")
-endif()
-
-if(DEFINED NPU_ARCH)
-    set(CMAKE_ASC_ARCHITECTURES ${NPU_ARCH} CACHE STRING "Alias of NPU_ARCH")
-endif()
+set(CMAKE_ASC_RUN_MODE "sim" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 
 find_package(ASC REQUIRED)
 
@@ -27,6 +22,18 @@ add_executable(demo
     mmad.asc
 )
 
+if(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
+    set(NPU_ARCH_ID 2201)
+elseif(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
+    set(NPU_ARCH_ID 3510)
+else()
+    message(FATAL_ERROR "Unsupported CMAKE_ASC_ARCHITECTURES=${CMAKE_ASC_ARCHITECTURES}, only dav-2201 and dav-3510 are supported")
+endif()
+
+target_compile_definitions(demo PRIVATE
+    NPU_ARCH=${NPU_ARCH_ID}
+)
+
 target_link_libraries(demo PRIVATE
     tiling_api
     register
@@ -34,20 +41,14 @@ target_link_libraries(demo PRIVATE
     m
     dl
 )
-set(NPU_ARCH "dav-2201" CACHE STRING "NPU ARCH, e.g. dav-2201, dav-3510")
 
-# ASC 编译器通过 --npu-arch 自动为 device 侧（__aicore__ 代码）定义 __NPU_ARCH__，
-# 但 host 侧（main 函数等 C++ 代码）无法看到此内置宏。
-# 因此显式定义 __ASC_NPU_ARCH__ 供整个编译单元（host + device）共用，
-# 使 main() 中的架构分支也能正确工作。
-if(NPU_ARCH STREQUAL "dav-2201")
-    set(_NPU_ARCH_NUM 2201)
-elseif(NPU_ARCH STREQUAL "dav-3510")
-    set(_NPU_ARCH_NUM 3510)
-else()
-    message(FATAL_ERROR "Unsupported NPU_ARCH: ${NPU_ARCH}, must be dav-2201 or dav-3510")
-endif()
+# ======================================================================================
+# NPU 编译选项配置
+#
+# 说明：
+#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+# ======================================================================================
 
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH} -D__ASC_NPU_ARCH__=${_NPU_ARCH_NUM}>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
