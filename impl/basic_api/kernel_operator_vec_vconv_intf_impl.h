@@ -433,7 +433,6 @@ template <typename T, typename U>
 __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1,
     const uint32_t count)
 {
-    using DstPrimType = PrimT<T>; using SrcPrimType = PrimT<U>;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
         return;
@@ -451,8 +450,8 @@ __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, "AddReluCast", count);
 #endif
-    AddReluCastImpl((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src0.GetPhyAddr(),
-        (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), count);
+    AddReluCastImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<U>*)src0.GetPhyAddr(),	 
+         (__ubuf__ PrimT<U>*)src1.GetPhyAddr(), count);
 }
 
 /* **************************************************************************************************
