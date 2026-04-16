@@ -7,9 +7,11 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-
+include(cmake/fetch_cann_cmake.cmake)
 cmake_minimum_required(VERSION 3.16.0)
 project(asc-devkit)
+
+init_cann_project()
 
 option(BUILD_OPEN_PROJECT "Build open asc-devkit lib project" ON)
 
