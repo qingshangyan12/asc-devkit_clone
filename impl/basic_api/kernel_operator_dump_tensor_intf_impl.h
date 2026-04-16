@@ -53,19 +53,15 @@
 #endif
 
 namespace AscendC {
-
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
 template <typename T, template <typename...> class Template>
 struct is_specialization_of : Std::false_type {};
 
-
 template <template <typename...> class Template, typename... Args>
 struct is_specialization_of<Template<Args...>, Template> : Std::true_type {};
 
-
 template <typename T, template <typename...> class Template>
 inline constexpr bool is_specialization_of_v = is_specialization_of<T, Template>::value;
-
 
 template <typename T>
 __aicore__ inline decltype(auto) unwrap(T&& arg) {

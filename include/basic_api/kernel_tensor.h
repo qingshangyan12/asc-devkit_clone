@@ -307,9 +307,6 @@ public:
     template <typename U> __aicore__ inline GlobalTensor<U> ReinterpretCast() const;
 #endif
 
-
-
-
 public:
     // element number of Tensor
     uint64_t bufferSize_;
