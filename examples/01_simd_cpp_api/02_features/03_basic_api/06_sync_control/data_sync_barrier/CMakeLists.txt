@@ -9,6 +9,23 @@
 # ----------------------------------------------------------------------------------------------------------
 
 
+  "provider": {
+    "myprovider": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "volcengine",
+      "options": {
+        "baseURL": "https://ark.cn-beijing.volces.com/api/v3",
+        "apiKey": "xxx111111111111111"
+      },
+      "models": {
+        "ep-xxx22222222222222": {
+          "name": "GLM-4-7-ep-xxx22222222222222"
+        }
+      }
+    }
+  },
+  
+
 cmake_minimum_required(VERSION 3.16)
 
 find_package(ASC REQUIRED)
