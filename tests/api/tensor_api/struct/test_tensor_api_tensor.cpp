@@ -25,7 +25,7 @@ TEST_F(Tensor_Api_Tensor, ViewEngineOperation)
 
     constexpr uint32_t TILE_LENGTH = 4;
     __gm__ float data[TILE_LENGTH] = {1, 2, 3, 4};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto layout = MakeLayout(MakeShape(2, 2), MakeStride(2, 1));
     auto tensor = MakeTensor(ptr, layout);
 
@@ -50,7 +50,7 @@ TEST_F(Tensor_Api_Tensor, ViewEngineOperation)
 
     constexpr uint32_t TILE_LENGTH_3D = 8;
     __gm__ float data3d[TILE_LENGTH_3D] = {1, 2, 3, 4, 5, 6, 7, 8};
-    auto ptr3d = MakeGMmemPtr(data3d);
+    auto ptr3d = MakeMemPtr<Location::GM>(data3d);
     auto layout3d = MakeLayout(MakeShape(2, 2, 2), MakeStride(4, 2, 1));
     auto tensor3d = MakeTensor(ptr3d, layout3d);
 
@@ -74,7 +74,7 @@ TEST_F(Tensor_Api_Tensor, ViewEngineOperationInt)
 
     constexpr uint32_t TILE_LENGTH = 4;
     __gm__ float data[TILE_LENGTH] = {5, 6, 7, 8};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto layout = MakeLayout(MakeShape(AscendC::Std::Int<1>{}, AscendC::Std::Int<4>{}),
                              MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<1>{}));
     auto tensor = MakeTensor(ptr, layout);
@@ -94,7 +94,7 @@ TEST_F(Tensor_Api_Tensor, ViewEngineOperationInt)
 
     constexpr uint32_t TILE_LENGTH_3D = 8;
     __gm__ float data3d[TILE_LENGTH_3D] = {9, 10, 11, 12, 13, 14, 15, 16};
-    auto ptr3d = MakeGMmemPtr(data3d);
+    auto ptr3d = MakeMemPtr<Location::GM>(data3d);
     auto layout3d = MakeLayout(MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}),
                                MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
     auto tensor3d = MakeTensor(ptr3d, layout3d);
@@ -127,14 +127,14 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
     __biasbuf__ float biasData[TILE_LENGTH] = {0};
     __fbuf__ float fixbufData[TILE_LENGTH] = {0};
 
-    auto gmPtr = MakeGMmemPtr(gmData);
-    auto ubPtr = MakeUBmemPtr(ubData);
-    auto l1Ptr = MakeL1memPtr(l1Data);
-    auto l0aPtr = MakeL0AmemPtr(l0aData);
-    auto l0bPtr = MakeL0BmemPtr(l0bData);
-    auto l0cPtr = MakeL0CmemPtr(l0cData);
-    auto biasPtr = MakeBiasmemPtr(biasData);
-    auto fixbufPtr = MakeFixbufmemPtr(fixbufData);
+    auto gmPtr = MakeMemPtr<Location::GM>(gmData);
+    auto ubPtr = MakeMemPtr<Location::UB>(ubData);
+    auto l1Ptr = MakeMemPtr<Location::L1>(l1Data);
+    auto l0aPtr = MakeMemPtr<Location::L0A>(l0aData);
+    auto l0bPtr = MakeMemPtr<Location::L0B>(l0bData);
+    auto l0cPtr = MakeMemPtr<Location::L0C>(l0cData);
+    auto biasPtr = MakeMemPtr<Location::BIAS>(biasData);
+    auto fixbufPtr = MakeMemPtr<Location::FIXBUF>(fixbufData);
 
     EXPECT_EQ(gmPtr.Get(), gmData);
     EXPECT_EQ(ubPtr.Get(), ubData);
@@ -145,14 +145,14 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
     EXPECT_EQ(biasPtr.Get(), biasData);
     EXPECT_EQ(fixbufPtr.Get(), fixbufData);
 
-    EXPECT_EQ(MakeGMmemPtr(gmPtr), gmPtr);
-    EXPECT_EQ(MakeUBmemPtr(ubPtr), ubPtr);
-    EXPECT_EQ(MakeL1memPtr(l1Ptr), l1Ptr);
-    EXPECT_EQ(MakeL0AmemPtr(l0aPtr), l0aPtr);
-    EXPECT_EQ(MakeL0BmemPtr(l0bPtr), l0bPtr);
-    EXPECT_EQ(MakeL0CmemPtr(l0cPtr), l0cPtr);
-    EXPECT_EQ(MakeBiasmemPtr(biasPtr), biasPtr);
-    EXPECT_EQ(MakeFixbufmemPtr(fixbufPtr), fixbufPtr);
+    EXPECT_EQ(MakeMemPtr<Location::GM>(gmPtr), gmPtr);
+    EXPECT_EQ(MakeMemPtr<Location::UB>(ubPtr), ubPtr);
+    EXPECT_EQ(MakeMemPtr<Location::L1>(l1Ptr), l1Ptr);
+    EXPECT_EQ(MakeMemPtr<Location::L0A>(l0aPtr), l0aPtr);
+    EXPECT_EQ(MakeMemPtr<Location::L0B>(l0bPtr), l0bPtr);
+    EXPECT_EQ(MakeMemPtr<Location::L0C>(l0cPtr), l0cPtr);
+    EXPECT_EQ(MakeMemPtr<Location::BIAS>(biasPtr), biasPtr);
+    EXPECT_EQ(MakeMemPtr<Location::FIXBUF>(fixbufPtr), fixbufPtr);
 }
 
  TEST_F(Tensor_Api_Tensor, IteratorMakeMemPatternPtrOperation)
@@ -175,8 +175,8 @@ TEST_F(Tensor_Api_Tensor, IteratorMakeMemPtrOperation)
     auto l0aPtr = MakeMemPtr<Location::L0A>(l0aData);
     auto l0bPtr = MakeMemPtr<Location::L0B>(l0bData);
     auto l0cPtr = MakeMemPtr<Location::L0C>(l0cData);
-    auto biasPtr = MakeMemPtr<Location::Bias>(biasData);
-    auto fixbufPtr = MakeMemPtr<Location::Fixbuf>(fixbufData);
+    auto biasPtr = MakeMemPtr<Location::BIAS>(biasData);
+    auto fixbufPtr = MakeMemPtr<Location::FIXBUF>(fixbufData);
     EXPECT_EQ(gmPtr.Get(), gmData);
     EXPECT_EQ(ubPtr.Get(), ubData);
     EXPECT_EQ(l1Ptr.Get(), l1Data);
@@ -201,8 +201,8 @@ TEST_F(Tensor_Api_Tensor, ByteOffsetMakeMemPatternPtrOperation)
     auto l0aPtr = MakeMemPtr<Location::L0A, FloatTrait>(BYTE_OFFSET);
     auto l0bPtr = MakeMemPtr<Location::L0B, FloatTrait>(BYTE_OFFSET);
     auto l0cPtr = MakeMemPtr<Location::L0C, FloatTrait>(BYTE_OFFSET);
-    auto biasPtr = MakeMemPtr<Location::Bias, FloatTrait>(BYTE_OFFSET);
-    auto fixbufPtr = MakeMemPtr<Location::Fixbuf, FloatTrait>(BYTE_OFFSET);
+    auto biasPtr = MakeMemPtr<Location::BIAS, FloatTrait>(BYTE_OFFSET);
+    auto fixbufPtr = MakeMemPtr<Location::FIXBUF, FloatTrait>(BYTE_OFFSET);
 
     EXPECT_EQ(ubPtr.Get(), reinterpret_cast<__ubuf__ float*>(get_imm(0) + BYTE_OFFSET));
     EXPECT_EQ(l1Ptr.Get(), reinterpret_cast<__cbuf__ float*>(get_imm(0) + BYTE_OFFSET));
@@ -219,7 +219,7 @@ TEST_F(Tensor_Api_Tensor, IteratorGetOperation)
 
     constexpr uint32_t TILE_LENGTH = 4;
     __gm__ float data[TILE_LENGTH] = {1, 2, 3, 4};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto offsetPtr = ptr + 2;
 
     EXPECT_EQ(ptr.Get(), data);
@@ -232,7 +232,7 @@ TEST_F(Tensor_Api_Tensor, IteratorOperatorOperation)
 
     constexpr uint32_t TILE_LENGTH = 4;
     __gm__ float data[TILE_LENGTH] = {1, 2, 3, 4};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto next = ptr + 1;
     auto far = ptr + 3;
 
@@ -258,7 +258,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorOperation)
 
     constexpr uint32_t TILE_LENGTH = 6;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto layout = MakeLayout(MakeShape(2, 3), MakeStride(3, 1));
     auto tensor = MakeTensor(ptr, layout);
 
@@ -285,7 +285,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorOperationInt)
 
     constexpr uint32_t TILE_LENGTH = 6;
     __gm__ float data[TILE_LENGTH] = {6, 7, 8, 9, 10, 11};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto layout = MakeLayout(MakeShape(AscendC::Std::Int<3>{}, AscendC::Std::Int<2>{}),
                              MakeStride(AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
     auto tensor = MakeTensor(ptr, layout);
@@ -307,7 +307,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorOperation3D)
 
     constexpr uint32_t TILE_LENGTH = 8;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto layout = MakeLayout(MakeShape(2, 2, 2), MakeStride(4, 2, 1));
     auto tensor = MakeTensor(ptr, layout);
 
@@ -336,7 +336,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperation)
 
     constexpr uint32_t TILE_LENGTH = 6;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto layout = MakeLayout(MakeShape(2, 3), MakeStride(3, 1));
     const auto constTensor = MakeTensor(ptr, layout);
 
@@ -363,7 +363,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperationInt)
 
     constexpr uint32_t TILE_LENGTH = 6;
     __gm__ float data[TILE_LENGTH] = {10, 11, 12, 13, 14, 15};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto layout = MakeLayout(MakeShape(AscendC::Std::Int<1>{}, AscendC::Std::Int<6>{}),
                              MakeStride(AscendC::Std::Int<6>{}, AscendC::Std::Int<1>{}));
     const auto constTensor = MakeTensor(ptr, layout);
@@ -385,7 +385,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperation3D)
 
     constexpr uint32_t TILE_LENGTH = 8;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto layout = MakeLayout(MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}),
                              MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
     const auto constTensor = MakeTensor(ptr, layout);
@@ -415,7 +415,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorCoordViewOperation)
 
     constexpr uint32_t TILE_LENGTH = 12;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto layout = MakeLayout(MakeShape(3, 4), MakeStride(4, 1));
     auto tensor = MakeTensor(ptr, layout);
 
@@ -441,7 +441,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorCoordViewOperation3D)
     constexpr uint32_t TILE_LENGTH = 24;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
                                       12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto layout = MakeLayout(MakeShape(2, 3, 4), MakeStride(12, 4, 1));
     auto tensor = MakeTensor(ptr, layout);
 
@@ -507,6 +507,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorSliceWithLayoutInfoOperation)
         36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47};
     auto ptr = MakeGMmemPtr(data);
     auto layout = MakeFrameLayout<ScaleANDLayoutPtn, LayoutTraitDefault<float, 2>>(6, 8);
+
     auto tensor = MakeTensor(ptr, layout);
     auto coord = MakeCoord(MakeCoord(0, 1), MakeCoord(0, 2));
     auto infoLayout = MakeFrameLayout<ScaleANDLayoutPtn, LayoutTraitDefault<float, 2>>(2, 4);
@@ -536,7 +537,7 @@ TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperation)
 
     constexpr uint32_t TILE_LENGTH = 6;
     __gm__ float data[TILE_LENGTH] = {10, 11, 12, 13, 14, 15};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto tensor = MakeTensor(ptr, MakeShape(2, 3), MakeStride(3, 1));
 
     EXPECT_EQ(tensor.Data(), ptr);
@@ -557,7 +558,7 @@ TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperationInt)
 
     constexpr uint32_t TILE_LENGTH = 6;
     __gm__ float data[TILE_LENGTH] = {10, 11, 12, 13, 14, 15};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto tensor = MakeTensor(ptr, MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<3>{}),
                              MakeStride(AscendC::Std::Int<3>{}, AscendC::Std::Int<1>{}));
 
@@ -579,7 +580,7 @@ TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperationInt3D)
 
     constexpr uint32_t TILE_LENGTH = 8;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
-    auto ptr = MakeGMmemPtr(data);
+    auto ptr = MakeMemPtr<Location::GM>(data);
     auto tensor = MakeTensor(ptr, MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}),
                              MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
 
