@@ -231,36 +231,49 @@ private:
 #endif
 };
 
+
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
+template<typename T>
+struct Proxy {
+    public:
+    __gm__ T* ptr;
+    T snapValue;
+
+    __aicore__ inline Proxy(const Proxy&) = default;
+
+    __aicore__ inline Proxy& operator=(const T value) {
+        *ptr = value;
+        dcci(reinterpret_cast<__gm__ uint64_t *>(ptr),
+            cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        return *this;
+    }
+
+    __aicore__ inline Proxy& operator=(const Proxy& src) {
+        dcci(reinterpret_cast<__gm__ uint64_t *>(src.ptr),
+            cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        *ptr = *src.ptr;
+        snapValue = src.snapValue;
+        dcci(reinterpret_cast<__gm__ uint64_t *>(ptr),
+            cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        return *this;
+    }
+
+    __aicore__ inline operator T() const {
+        return snapValue;
+    }
+
+    T Get() const {
+        return snapValue;
+    }
+
+    private:
+    __gm__ T* operator&() const = delete;
+};
+#endif
+
 template <typename T> class GlobalTensor : public BaseGlobalTensor<T>, public BaseTensorTraitTensor<T> {
 public:
     using PrimType = PrimT<T>;
-
-#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
-    struct Proxy {
-        __gm__ PrimType* ptr;
-        __aicore__ inline Proxy& operator=(const PrimType value) {
-            *ptr = value;
-            dcci(reinterpret_cast<__gm__ uint64_t *>(ptr),
-                cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
-            return *this;
-        }
-        __aicore__ inline Proxy& operator=(const Proxy& src) {
-            dcci(reinterpret_cast<__gm__ uint64_t *>(src.ptr),
-                cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
-            *ptr = *src.ptr;
-            dcci(reinterpret_cast<__gm__ uint64_t *>(ptr),
-                cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
-            return *this;
-        }
-        // 隐式类型转换
-        __aicore__ inline operator PrimType() const {
-            return *ptr;
-        }
-        private:
-            __gm__ PrimType* operator&() const = delete;
-    };
-#endif
-
     __aicore__ inline GlobalTensor<T>();
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     __aicore__ inline ~GlobalTensor<T>();
@@ -277,8 +290,8 @@ public:
 #endif
     
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
-    __aicore__ inline __inout_pipe__(S) Proxy operator()(const uint64_t offset);
-    __aicore__ inline __inout_pipe__(S) Proxy operator()(const uint64_t offset) const;
+    __aicore__ inline __inout_pipe__(S) Proxy<PrimType> operator()(const uint64_t offset);
+    __aicore__ inline __inout_pipe__(S) Proxy<PrimType> operator()(const uint64_t offset) const;
 #else
     __aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator()(const uint64_t offset) const;
 #endif
@@ -293,6 +306,9 @@ public:
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     template <typename U> __aicore__ inline GlobalTensor<U> ReinterpretCast() const;
 #endif
+
+
+
 
 public:
     // element number of Tensor
