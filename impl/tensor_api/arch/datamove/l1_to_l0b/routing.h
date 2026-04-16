@@ -39,24 +39,11 @@ public:
     __aicore__ inline void static Run(const Args&... args) {}
 };
 
-<<<<<<< HEAD
-template <typename dstPos, typename srcPos, uint32_t Version>
-=======
 template <typename dstPos, typename srcPos, uint32_t Version, typename DstLayoutPattern, typename SrcLayoutPattern, typename CopyMode>
->>>>>>> upstream/tensor_api_experimental
 struct CopyL12L0BTensor2Tensor {
     using type = CopyL12L0BIgnore;
 };
 
-<<<<<<< HEAD
-template <typename dstPos, typename srcPos, uint32_t Version>
-struct CopyL12L0BTensor2TensorNoCoord {
-    using type = CopyL12L0BIgnore;
-};
-
-template <>
-struct CopyL12L0BTensor2TensorNoCoord<Location::L0B, Location::L1, ArchVersion::V3510>
-=======
 template <>
 struct CopyL12L0BTensor2Tensor<Location::L0B, Location::L1, ArchVersion::V3510, ZNLayoutPtn, ZNLayoutPtn, CopyMode::NORMAL>
 {
@@ -65,17 +52,12 @@ struct CopyL12L0BTensor2Tensor<Location::L0B, Location::L1, ArchVersion::V3510, 
 
 template <>
 struct CopyL12L0BTensor2Tensor<Location::L0B, Location::L1, ArchVersion::V3510, ZNLayoutPtn, ZNLayoutPtn, CopyMode::NORMAL_COORD>
->>>>>>> upstream/tensor_api_experimental
 {
     using type = LoadDataL12L0BZN2ZNWithCoord3510;
 };
 
 template <>
-<<<<<<< HEAD
-struct CopyL12L0BTensor2Tensor<Location::L0B, Location::L1, ArchVersion::V3510>
-=======
 struct CopyL12L0BTensor2Tensor<Location::L0B, Location::L1, ArchVersion::V3510, NZLayoutPtn, ZNLayoutPtn, CopyMode::TRANS>
->>>>>>> upstream/tensor_api_experimental
 {
     using type = LoadDataL12L0BNZ2ZN3510;
 };
