@@ -11,13 +11,8 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-if(DEFINED RUN_MODE)
-    set(CMAKE_ASC_RUN_MODE ${RUN_MODE} CACHE STRING "Alias of RUN_MODE")
-endif()
-
-if(DEFINED NPU_ARCH)
-    set(CMAKE_ASC_ARCHITECTURES ${NPU_ARCH} CACHE STRING "Alias of NPU_ARCH")
-endif()
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 
 find_package(ASC REQUIRED)
 
@@ -40,8 +35,6 @@ add_executable(demo
     whole_reduce_min_max_sum.asc
 )
 
-set(NPU_ARCH "dav-2201" CACHE STRING "NPU ARCH, e.g. dav-2201, dav-3510")
-
 target_link_libraries(demo PRIVATE
     tiling_api
     register
@@ -50,12 +43,6 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${NPU_ARCH}>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )

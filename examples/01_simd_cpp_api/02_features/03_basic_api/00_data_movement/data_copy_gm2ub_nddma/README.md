@@ -1,10 +1,11 @@
-# DataCopy多维数据搬运样例
+# DataCopy多维数据搬运接口示例
 
 ## 概述
 
-本样例介绍如何使用多维数据搬运接口实现GM（Global Memory）到UB（Unified Buffer）通路的数据搬运，并在搬运过程中进行随路Padding。
+本样例介绍如何使用多维数据搬运接口实现GM（Global Memory）到UB（Unified Buffer）通路的数据搬运，通过自由配置搬入的维度信息以及对应的Stride，可以用于Padding、Transpose、BroadCast、Slice等多种数据变换操作。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
@@ -18,67 +19,105 @@
 │   └── multidimensional_data_movement.asc      // Ascend C样例实现 & 调用样例
 ```
 
-## 样例描述
+## 场景说明
 
-- 样例功能
+本样例通过编译参数 `SCENARIO_NUM` 选择不同场景，所有场景数据格式为二维ND格式，核函数名为 `datacopy_custom`。
 
-  本样例基于2D Padding场景，通过多维数据搬运接口将数据从GM（Global Memory）搬运至UB（Unified Buffer）。接口资料参考[多维数据搬运](../../../../../../docs/api/context/多维数据搬运（ISASI）.md)。
+<table border="2">
+<caption>表1：场景配置对照表</caption>
+<tr><th>scenarioNum</th><th>输入Shape</th><th>输出Shape</th><th>数据类型</th><th>说明</th></tr>
+<tr><td>1</td><td>[16, 32]</td><td>[32, 64]</td><td>float32</td><td>Padding场景</td></td>
+<tr><td>2</td><td>[28, 15]</td><td>[32, 32]</td><td>float</td><td>Padding场景，使能最近值填充方式</td></tr>
+<tr><td>3</td><td>[16, 64]</td><td>[64, 16]</td><td>float32</td><td>Transpose场景</td></tr>
+<tr><td>4</td><td>[1, 16]</td><td>[3, 16]</td><td>float32</td><td>BroadCast场景</td></tr>
+<tr><td>5</td><td>[32, 64]</td><td>[16, 16]</td><td>float32</td><td>Slice场景</td></tr>
+</table>
 
-- 样例规格
+### 场景详细说明
 
-  <table border="2" align="center">
-  <tr><td rowspan="1" align="center">类型</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">样例输入</td><td align="center">x</td><td align="center">[2, 8]</td><td align="center">float32</td><td align="center">ND</td></tr>
-  <tr><td align="center">样例输出</td><td align="center">z</td><td align="center">[4, 16]</td><td align="center">float32</td><td align="center">ND</td></tr>
-  <tr><td align="center">核函数名</td><td colspan="4" align="center">datacopy_custom</td></tr>
-  </table>
+**场景1：Padding场景**
+- 输入：[16, 32]个float32元素
+- 输出：[32, 64]个float32元素
+- 参数配置：NdDmaLoopInfo={{1, 32}, {1, 64}, {32, 16}, {15, 13}, {17, 3}}，paddingValue=0
+- 说明：将GM上[16, 32]的数据搬运至UB并Padding为[32, 64]，左Padding 15，上Padding 13，右Padding 17，下Padding 3，Padding值填充为0
 
-- 样例实现：
-  - kernel实现   
+**场景2：Padding场景，使能最近值填充方式**
+- 输入：[28, 15]个float32元素
+- 输出：[32, 32]个float32元素
+- 参数配置：NdDmaLoopInfo={{1, 15}, {1, 32}, {15, 28}, {11, 3}, {6, 1}}，isNearestValueMode=true
+- 说明：将GM上[28, 15]的数据搬运至UB并Padding为[32, 32]，使能最近值填充模式，Padding位置填充边界数据而非0
 
-    输入数据从GM（Global Memory）搬运至UB（Unified Buffer）时，通过配置搬入的维度和对应的Stride，实现2D Padding，将GM（Global Memory）上[2, 8]的数据，搬运至UB（Unified Buffer）并Padding为[4, 16]。
+**场景3：Transpose场景**
+- 输入：[16, 64]个float32元素
+- 输出：[64, 16]个float32元素
+- 参数配置：NdDmaLoopInfo={{1, 64}, {16, 1}, {64, 16}, {0, 0}, {0, 0}}
+- 说明：将GM上[16, 64]的数据搬运至UB并转置为[64, 16]，通过配置stride实现行列互换
 
-    ```cpp
-    // 2D Padding场景，2维数据搬运
-    // xGmShape：[2, 8]，搬运8列2行数据，左Padding 3，上Padding 1，右Padding 5，下Padding 1，xLocalShape：[4, 16]
-    AscendC::NdDmaLoopInfo<2> loopInfo{{1, 8}, {1, 16}, {8, 2}, {3, 1}, {5, 1}};
-    AscendC::NdDmaParams<T, 2> params{loopInfo, 0};  // padding的值为0
-    AscendC::NdDmaDci();  // 刷新cache
-    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
-    AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
-    ```
+**场景4：BroadCast场景**
+- 输入：[1, 16]个float32元素
+- 输出：[3, 16]个float32元素
+- 参数配置：NdDmaLoopInfo={{1, 0}, {1, 16}, {16, 3}, {0, 0}, {0, 0}}
+- 说明：将GM上[1, 16]的数据搬运至UB并广播为[3, 16]，通过配置stride为0实现行数据复制
 
-  - 调用实现  
-    使用内核调用符<<<>>>调用核函数。
+**场景5：Slice场景**
+- 输入：[32, 64]个float32元素
+- 输出：[16, 16]个float32元素
+- 参数配置：NdDmaLoopInfo={{1, 64}, {1, 16}, {16, 16}, {0, 0}, {0, 0}}
+- 说明：将GM上[32, 64]的数据搬运至UB并截取为[16, 16]，通过配置搬运数据量实现最终数据切片
 
-## 编译运行  
+## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-    
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
-    
-- 样例执行
+### 编译选项说明
+
+| 参数 | 说明 | 可选值 | 默认值 |
+|------|------|---------|--------|
+| CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+| CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-3510 | dav-3510 |
+| SCENARIO_NUM | 场景编号 | 1, 2, 3, 4, 5 | 1 |
+
+### 配置环境变量
+
+请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+
+- 默认路径，root用户安装CANN软件包
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
-  ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  source /usr/local/Ascend/cann/set_env
   ```
-  执行结果如下，说明精度对比成功。
+
+- 默认路径，非root用户安装CANN软件包
   ```bash
-  test pass!
+  source $HOME/Ascend/cann/set_env.sh
   ```
+
+- 指定路径install_path，安装CANN软件包
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
+
+### 样例执行
+
+```bash
+SCENARIO_NUM=1
+mkdir -p build && cd build;      # 创建并进入build目录
+cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # 编译工程，默认npu模式
+python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO   # 生成测试输入数据
+./demo                           # 执行编译生成的可执行程序，执行样例
+python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # 验证输出结果是否正确
+```
+
+使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+示例如：
+```bash
+cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+```
+
+> **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+执行结果如下，说明精度对比成功。
+```bash
+test pass!
+```
