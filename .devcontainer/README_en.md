@@ -33,7 +33,7 @@ chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 ```
 
 > [!WARNING]
-> The Ascend **driver** directory (`/usr/local/Ascend/driver`) is mounted read-only into the container. The **CANN toolkit and ops packages** should be installed inside the container after startup — not on the host. Installing CANN on the host risks overwriting a shared environment.
+> The Ascend driver directory (`/usr/local/Ascend/driver`) is mounted read-only into the container. The **CANN toolkit and ops packages** should be installed inside the container after startup — not on the host. Installing CANN on the host risks overwriting a shared environment.
 
 ## Build the Image
 
@@ -61,14 +61,15 @@ Ctrl+Shift+P → Dev Containers: Reopen in Container
 
 Copy `devcontainer.json` to a local override and remove all NPU-specific entries:
 
-**In `runArgs`**, remove all `--device` lines (`davinci0-7`, `davinci_manager`, `devmm_svm`, `hisi_hdc`). If you have no other args, set:
+**In `runArgs`**, remove all NPU-related entries: the three access flags (`--ipc=host`, `--net=host`, `--privileged`) and all `--device` lines (`davinci0-7`, `davinci_manager`, `devmm_svm`, `hisi_hdc`), and set it to:
 
 ```jsonc
 "runArgs": []
 ```
 
 **In `mounts`**, remove the driver and device-related bind mounts:
-```
+
+```text
 source=/usr/local/Ascend/driver,...
 source=/usr/local/dcmi,...
 source=/usr/local/bin/npu-smi,...
@@ -97,6 +98,7 @@ Then **show the user the exact `docker run` command** you are about to execute a
 
 ```bash
 docker run -itd --name ascendc_container \
+  --ipc=host --net=host --privileged \
   --device=/dev/davinci0 \
   --device=/dev/davinci1 \
   --device=/dev/davinci2 \
