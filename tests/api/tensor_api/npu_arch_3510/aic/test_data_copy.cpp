@@ -147,7 +147,7 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
 template<typename T, typename DTYPE, int SIZE1, int SIZE2, typename LOCATION, CubeLayout LAYOUT>
 __aicore__ inline void check_tensor_success(const T& tensor) {
     using namespace AscendC::Te;
-    using hardwarePos = GetPtrPattern<T>;
+    using hardwarePos = GetMemLocation<T>;
     EXPECT_TRUE((std::is_same_v<hardwarePos, LOCATION>));
 }
 

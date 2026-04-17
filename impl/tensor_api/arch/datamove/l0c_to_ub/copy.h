@@ -46,8 +46,8 @@ private:
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src,
                                                const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
     {
-        using dstPos = GetPtrPattern<T>;
-        using srcPos = GetPtrPattern<U>;
+        using dstPos = GetMemLocation<T>;
+        using srcPos = GetMemLocation<U>;
         using Tensor2Tensor = typename CopyL0C2UBTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION>::type;
         Tensor2Tensor{}.template Run<trait>(dst, src, params);
     }
@@ -56,8 +56,8 @@ private:
     __aicore__ inline static typename Std::enable_if<Std::is_same_v<S, uint64_t>, void>::type
     DataCopyImpl(const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
     {
-        using dstPos = GetPtrPattern<T>;
-        using srcPos = GetPtrPattern<U>;
+        using dstPos = GetMemLocation<T>;
+        using srcPos = GetMemLocation<U>;
         using Tensor2Tensor = typename CopyL0C2UBTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION>::type;
         Tensor2Tensor{}.template Run<trait>(dst, src, quant, params);
     }
@@ -66,8 +66,8 @@ private:
     __aicore__ inline static typename Std::enable_if<IsAttrTensorV<S>, void>::type
     DataCopyImpl(const T& dst, const U& src, const S& quant, const FixpipeParams& params = DEFAULT_FIXPIPE_PARAMS)
     {
-        using dstPos = GetPtrPattern<T>;
-        using srcPos = GetPtrPattern<U>;
+        using dstPos = GetMemLocation<T>;
+        using srcPos = GetMemLocation<U>;
         using Tensor2Tensor = typename CopyL0C2UBVectorQuantTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION>::type;
         Tensor2Tensor{}.template Run<trait>(dst, src, quant, params);
     }

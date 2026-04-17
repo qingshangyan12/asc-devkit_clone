@@ -47,8 +47,8 @@ private:
     template <const CopyL12BTTrait& trait = DEFAULT_COPY_L1_BT_TRAIT, typename T, typename U>
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
     {
-        using dstTPos = GetPtrPattern<T>;
-        using srcTPos = GetPtrPattern<U>;
+        using dstTPos = GetMemLocation<T>;
+        using srcTPos = GetMemLocation<U>;
         using Tensor2Tensor = typename CopyL12BTTensor2Tensor<dstTPos, srcTPos, CURRENT_ARCH_VERSION>::type;
         Tensor2Tensor::template Run<trait, T, U>(dst, src);
     }
