@@ -13,15 +13,18 @@
 
 
 import os
+import argparse
 import numpy as np
 
-def gen_golden_data_simple():
-    total_length = 256
+
+def gen_golden_data_simple(scenarioNum=1):
+    total_length = 1024
     data_type = np.float32
-    # 生成两个 [1, 256] 矩阵
+    # 生成两个 [1, 1024] 向量
     x = np.random.uniform(1, 2, [1, total_length]).astype(data_type)
     y = np.random.uniform(1, 2, [1, total_length]).astype(data_type)
     # 计算逐元素乘法 z = x * y
+    # 场景1（单核）和场景2（4核）的计算结果相同，都是完整的逐元素乘法
     golden = x * y
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -29,5 +32,10 @@ def gen_golden_data_simple():
     y.tofile('./input/input_y.bin')
     golden.tofile('./output/golden.bin')
 
+
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2],
+                        help='Scenario number: 1=Single core, 2=4 cores')
+    args = parser.parse_args()
+    gen_golden_data_simple(args.scenarioNum)
