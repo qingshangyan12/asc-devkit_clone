@@ -38,8 +38,7 @@ private:
     template <const CopyL12L0ATrait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
     {
-        CheckLayoutPattern<U>();
-        CheckLayoutPattern<T>();
+        CheckLayoutPattern<T, U>();
         CheckDataTypeFor3510::CheckL12L0ADataType<T, U>();
     }
 
@@ -47,7 +46,6 @@ private:
     __aicore__ inline static void LoadDataImpl(const T& dst, const U& src)
     {
         CheckTemplate<trait, T, U>();
-        using DstType = typename T::elementType;
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
         uint16_t mStartPosition = 0;
@@ -55,6 +53,7 @@ private:
         auto mStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
         auto kStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
         // Nz -> Nz
+        using DstType = typename T::elementType;
         constexpr uint32_t KHALF = 2;
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / STRIDE_UNIT;
