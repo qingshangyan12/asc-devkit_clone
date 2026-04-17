@@ -206,7 +206,7 @@ using LayoutPatternCheckSet = TupleMap<
     Std::tuple<ScaleBDNLayoutPtn, CheckScaleBDNLayoutPattern>>;
 
 template <typename T>
-__aicore__ inline decltype(auto) CheckLayoutPattern() {
+__aicore__ inline constexpr decltype(auto) CheckLayoutPattern() {
     using Layout = typename T::layoutType;
     using LayoutPattern = GetLayoutPattern<Layout>;
     using TraitType = GetLayoutTrait<Layout>;

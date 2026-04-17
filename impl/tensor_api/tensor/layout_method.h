@@ -155,7 +155,7 @@ __aicore__ inline constexpr auto GetShape(const LayoutType& layout)
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto GetShape(LayoutType& layout)
+__aicore__ inline constexpr auto GetShape(const LayoutType& layout)
 {
     return layout.template Shape<Is...>();
 }
@@ -169,7 +169,7 @@ __aicore__ inline constexpr auto GetStride(const LayoutType& layout)
 
 template <size_t... Is, typename LayoutType,
     typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto GetStride(LayoutType& layout)
+__aicore__ inline constexpr auto GetStride(const LayoutType& layout)
 {
     return layout.template Stride<Is...>();
 }
@@ -186,7 +186,7 @@ __aicore__ inline constexpr decltype(auto) GetEleImpl(T&& t)
 }
 
 template <size_t... Is, typename Tuple,
-    typename = Std::enable_if_t<Std::is_tuple_v<Tuple>>>
+    typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
 __aicore__ inline constexpr decltype(auto) Get(Tuple&& t)
 {
     if constexpr (sizeof...(Is) == 0) {
