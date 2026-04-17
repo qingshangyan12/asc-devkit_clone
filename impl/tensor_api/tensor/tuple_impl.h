@@ -134,7 +134,11 @@ template <size_t... Is, typename Tuple>
 __aicore__ inline constexpr auto GetTuple(Tuple&& t) 
 {
     auto element = Get<Is...>(static_cast<Tuple&&>(t));
-    return Std::conditional_t<Std::is_tuple_v<decltype(element)>, element, Std::make_tuple(element)>{};
+    if constexpr (Std::is_tuple_v<Std::remove_cvref_t<decltype(element)>>) {
+        return element;
+    } else {
+        return Std::make_tuple(element);
+    }
 }
 
 template <size_t... Is, typename Tuple>
