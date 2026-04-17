@@ -43,6 +43,11 @@ target_include_directories(topoaddrinfo PRIVATE
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
 )
 
+target_link_directories(topoaddrinfo PRIVATE
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/lib64
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/devlib/device
+)
+
 target_link_libraries(topoaddrinfo PRIVATE
     dl
     c_sec
