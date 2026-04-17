@@ -9,28 +9,27 @@
  */
 
 /*!
- * \file reduce_all_check_c310.h
+ * \file reduce_any_check_3510.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/api_check/kernel_check/reduce/reduce_all/reduce_all_check_c310.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/reduce/reduce.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/adv_api/detail/api_check/kernel_check/reduce/reduce_any/reduce_any_check_3510.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/reduce/reduce.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_ALL_CHECK_C310_H__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_ANY_CHECK_C310_H__
 #endif
 
-#ifndef IMPL_API_CHECK_KERNEL_CHECK_REDUCE_REDUCE_ALL_REDUCE_ALL_CHECK_C310_H_
-#define IMPL_API_CHECK_KERNEL_CHECK_REDUCE_REDUCE_ALL_REDUCE_ALL_CHECK_C310_H_
+#ifndef IMPL_API_CHECK_KERNEL_CHECK_REDUCE_REDUCE_ANY_REDUCE_ANY_CHECK_C310_H_
+#define IMPL_API_CHECK_KERNEL_CHECK_REDUCE_REDUCE_ANY_REDUCE_ANY_CHECK_C310_H_
 
 #include "../reduce_check.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {
-
 template <typename T, class pattern>
-class CheckFuncClassReduceAll : public CheckFuncClassReduce<T, pattern> {
+class CheckFuncClassReduceAny : public CheckFuncClassReduce<T, pattern> {
 public:
-    __aicore__ inline CheckFuncClassReduceAll(__gm__ const char* name) : CheckFuncClassReduce<T, pattern>(name){};
+    __aicore__ inline CheckFuncClassReduceAny(__gm__ const char* name) : CheckFuncClassReduce<T, pattern>(name){};
 
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
@@ -42,7 +41,7 @@ public:
         ASCENDC_ASSERT((srcShape[1] * sizeof(T) % ONE_BLK_SIZE == 0 || HighLevelAPIParametersPrint), {
             KERNEL_LOG(
                 KERNEL_ERROR,
-                "[ReduceAll] The result of srcShape[1] * sizeof(T) cannot be %u, "
+                "[ReduceAny] The result of srcShape[1] * sizeof(T) cannot be %u, "
                 "should be an integer multiple of 32.",
                 srcShape[1] * sizeof(T));
         });
@@ -50,9 +49,9 @@ public:
 };
 } // namespace HighLevelApiCheck
 } // namespace AscendC
-#endif // IMPL_API_CHECK_KERNEL_CHECK_REDUCE_REDUCE_ALL_REDUCE_ALL_CHECK_C310_H_
+#endif // IMPL_API_CHECK_KERNEL_CHECK_REDUCE_REDUCE_ANY_REDUCE_ANY_CHECK_C310_H_
 
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_ALL_CHECK_C310_H__)
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_ANY_CHECK_C310_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_ALL_CHECK_C310_H__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_ANY_CHECK_C310_H__
 #endif
