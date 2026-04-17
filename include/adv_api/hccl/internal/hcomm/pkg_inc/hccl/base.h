@@ -10,7 +10,7 @@
 
 #ifndef HCCL_BASE_H
 #define HCCL_BASE_H
-#include <hccl_types.h>
+#include <hccl/hccl_types.h>
 #include <string>
 #ifdef __cplusplus
 extern "C" {
