@@ -9,6 +9,7 @@
 # -----------------------------------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.16.0)
 option(BUILD_OPEN_PROJECT "Build open hccl project." ON)
+option(KERNEL_MODE "Kernel mode." ON)
 
 set(HCCL_CC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(HCCL_CC_INCLUDE_DIR ${ASCENDC_DIR}/include/adv_api/hccl/internal)
