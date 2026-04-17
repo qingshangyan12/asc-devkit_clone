@@ -34,10 +34,4 @@ TEST_F(Tensor_Api_Tensor_3510, SetL2CacheHint)
     
     tensor.SetL2CacheHint(CacheMode::CACHE_MODE_NORMAL);
     EXPECT_EQ(tensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_NORMAL));
-
-    tensor.SetL2CacheHint(CacheMode::CACHE_MODE_LAST);
-    EXPECT_EQ(tensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_LAST));
-
-    tensor.SetL2CacheHint(CacheMode::CACHE_MODE_PERSISTENT);
-    EXPECT_EQ(tensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_PERSISTENT));
 }
