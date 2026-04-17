@@ -61,12 +61,10 @@
 
 ## 样例描述
 
-- 样例功能：
-
+- 样例功能：  
   本样例基于ReduceMax/ReduceMin/ReduceSum接口实现归约计算，包含前n个数据计算接口和tensor高维切分计算接口。接口资料参考[ReduceMax](../../../../../../docs/api/context/ReduceMax.md)/[ReduceMin](../../../../../../docs/api/context/ReduceMin.md)/[ReduceSum](../../../../../../docs/api/context/ReduceSum.md)。
 
-- 样例规格：
-
+- 样例规格：  
   不同场景的输入输出规格如下表所示：
 
   <table border="2" align="center">
@@ -149,14 +147,13 @@
     - 调用ReduceMax/ReduceMin/ReduceSum接口完成归约计算。
     - 在ReduceSum前n个数据计算场景，调用[GetReduceRepeatSumSpr](../../../../../../docs/api/context/GetReduceRepeatSumSpr(ISASI).md)获取计算结果。
 
-- 调用实现
-
+- 调用实现  
   使用内核调用符`<<<>>>`调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash

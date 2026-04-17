@@ -18,8 +18,7 @@
 ```
 
 ## 样例描述
-- 样例功能：
-
+- 样例功能：  
   本样例将位于UB（Unified Buffer）上的shape为[1, 16]的数据广播到[16, 16]，并搬运到CO1（L0C Buffer）。接口资料参考[BroadCastVecToMM](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0257.html)。
 - 样例规格：
   <table border="2" align="center">
@@ -39,8 +38,7 @@
     - 调用BroadCastVecToMM基础API，将UB（Unified Buffer）上的数据从[1, 16]广播到[16, 16]，并搬运到CO1（L0C Buffer）。
     - 调用DataCopy增强数据搬运接口，将广播后的数据从CO1（L0C Buffer）搬运到UB（Unified Buffer）。
 
-- 调用实现
-
+- 调用实现  
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

@@ -17,14 +17,12 @@
 │   └── matmul_a2b2_share.asc   // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例样例中包含两个Matmul对象，每个对象的Matmul计算有不同的左矩阵、右矩阵，相同的bias。
   
   通过设置每个Matmul对象中MatmulConfig的isA2B2Shared参数值为true，开启A2和B2的全局管理，即两个Matmul对象共享A2和B2。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 7680, N = 480, K = 320。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
