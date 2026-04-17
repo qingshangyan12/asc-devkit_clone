@@ -30,6 +30,7 @@
 namespace AscendC {
 namespace Te {
 
+
 } // namespace Te
 } // namespace AscendC
 
