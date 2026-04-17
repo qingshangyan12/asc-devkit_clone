@@ -708,6 +708,8 @@ template <typename T>
 __aicore__ inline void DataCopyCheck(const uint32_t count, DataCopyParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+    static_assert(!Std::is_same<PrimType, int4b_t>::value,
+        "DataCopy from LocalTensor to LocalTensor with count does not support int4b_t.");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
     if constexpr(Std::is_same<PrimType, int2b_t>::value) {
         ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_B2_NUM == 0),
@@ -788,6 +790,8 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t count)
 {
     using PrimType = PrimT<T>;
+    static_assert(!Std::is_same<PrimType, int4b_t>::value,
+        "DataCopy from LocalTensor to LocalTensor with count does not support int4b_t.");
     ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
         "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
         "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
