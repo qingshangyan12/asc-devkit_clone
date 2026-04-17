@@ -23,7 +23,7 @@
 #include "kernel_common.h"
 #include "dav_3510/kernel_operator_common_impl.h"
 #include "dav_3510/kernel_operator_set_atomic_impl.h"
-#include "dav_3510/kernel_tpipe_impl_c310.h"
+#include "dav_3510/kernel_tpipe_impl_3510.h"
 #include "kfc_log.h"
 #include "kernel_tpipe.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)

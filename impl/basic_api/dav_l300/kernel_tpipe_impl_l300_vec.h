@@ -9,7 +9,7 @@
 */
 
 /*!
- * \file kernel_tpipe_impl_c310.h
+ * \file kernel_tpipe_impl_3510.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
