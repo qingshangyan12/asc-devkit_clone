@@ -86,21 +86,44 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
     source ${install_path}/cann/set_env.sh
     ```
 
-- 样例执行  
+- 样例执行
+
   - MODE ： 设置A、B的数据类型组合
     - 0 : 对应A hifloat8   B hifloat8场景
     - 1 : 对应A fp8_e4m3fn B fp8_e4m3fn场景
     - 2 : 对应A fp8_e5m2   B fp8_e5m2场景
     - 3 : 对应A fp8_e4m3fn B fp8_e5m2场景
     - 4 : 对应A fp8_e5m2   B fp8_e4m3fn场景
+
   ```bash
   mkdir -p build && cd build;        # 创建并进入build目录
-  cmake .. -DDT_MODE=0;make -j;      # 编译工程, 0可选01234， 例如cmake .. -DDT_MODE=1;make -j;
+  cmake -DDT_MODE=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;      # 编译工程, 0可选01234， 例如cmake .. -DDT_MODE=1;make -j;
   python3 ../scripts/gen_data.py  0  # 生成测试输入数据, 0可选01234， 例如python3 ../scripts/gen_data.py  1
   ./demo                             # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
-  执行结果如下，说明精度对比成功。
+
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例如：
+  ```bash
+  cmake -DDT_MODE=0 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DDT_MODE=0 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | | 参数 | 说明 | 可选值 | 默认值 |
+  |------|------|---------|--------|
+  | DT_MODE | 数据类型模式 | 0, 1, 2, 3, 4 | 0 |
+  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-3510 | dav-3510 |
+
+- 执行结果
+
+  执行结果如下，说明精度对比成功：
   ```bash
   test pass!
   ```
