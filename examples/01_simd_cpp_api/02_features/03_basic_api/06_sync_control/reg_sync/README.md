@@ -101,8 +101,7 @@
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 | `SCENARIO_NUM` | `1`、`2`　　　　　　　　　　| 场景编号：1=读写依赖，2=写写依赖　　　　　　　　　|
 
-- 执行结果
-
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

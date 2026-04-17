@@ -43,14 +43,12 @@
 - 算子实现：  
   本样例中实现的是固定shape为输入src[16, 31]，输出dst[16, 32]的pad_custom算子。
 
-  - Kernel实现
-
+  - Kernel实现  
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Pad高阶API接口完成Pad计算，得到最终结果，再搬出到外部存储上。
 
     pad算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，并对Global Memory上的数据初始化，Compute任务负责对srcLocal执行add计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
-  - Tiling实现
-
+  - Tiling实现  
     将TilingData中的Pad Tiling信息传入Pad接口参与计算。
 
   - 调用实现  

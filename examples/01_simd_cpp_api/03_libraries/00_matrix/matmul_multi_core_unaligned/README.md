@@ -19,12 +19,10 @@
 │   └── matmul_multi_core_unaligned.asc              // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例调用Matmul API，对多核非对齐切分的A、B矩阵做矩阵乘和加Bias偏置。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 1000, N = 700, K = 500。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

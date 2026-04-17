@@ -75,12 +75,10 @@
 
 ## 样例描述
 
-- 样例功能
-
+- 样例功能  
   将矩阵乘的结果从CO1（L0C Buffer）搬运到GM（Global Memory），支持以下两种随路量化模式：
   - Scalar量化：使用SetFixpipePreQuant接口设置Scalar量化参数。
-  - Tensor量化：使用SetFixPipeConfig接口设置Tensor量化参数。
-
+  - Tensor量化：使用SetFixPipeConfig接口设置Tensor量化参数。  
   并支持与随路NZ2ND、relu激活能力组合。接口资料参考随路量化激活搬运。
 
 - 样例规格
@@ -163,8 +161,7 @@
 
     - 配置DataCopyCO12DstParams参数用于DataCopy随路量化激活搬运，将Mmad计算出的结果从CO1（L0C Buffer）搬出到GM（Global Memory）。
 
-  - 调用实现
-
+  - 调用实现  
     使用内核调用符`<<<>>>`调用核函数。
 
 ## 编译运行 
@@ -212,14 +209,12 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
-
   | 参数 | 说明 | 可选值 | 默认值 |
   |------|------|---------|--------|
   | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
   | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-2201 |
 
-- 执行结果
-
+- 执行结果  
   执行结果如下，说明精度对比成功：
   ```bash
   test pass!
