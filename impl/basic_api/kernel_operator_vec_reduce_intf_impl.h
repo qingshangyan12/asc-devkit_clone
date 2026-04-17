@@ -140,6 +140,31 @@ __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTens
     ReduceDataBlock<ReduceType::MIN>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);    
 }
 
+template <ReduceType reduceType, typename T, bool isSetMask=true>
+__aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask, 
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+{
+    static_assert((SupportEnum<reduceType, ReduceType::SUM>()),
+        "current ReducePair api only support ReduceType::SUM");
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecReducePairInfo(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, 
+        "ReducePair<ReduceType::SUM>");
+#endif
+    using PrimType = PrimT<T>;
+    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
+        "ReducePair<ReduceType::SUM>, current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "PairReduceSum");
+#if ASCENDC_CPU_DEBUG
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
+        "PairReduceSum")) {
+        ASCENDC_REPORT_CHECK_ERROR("PairReduceSum", KernelFuncType::MASK_COUNT_MODE);
+    }
+#endif
+    PairReduceSumImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), repeatTime,
+        mask, dstRepStride, srcBlkStride, srcRepStride);
+}
+
 /*
  * @ingroup PairReduceSum
  * @brief Sum of adjacent inner pair (parity) elements
@@ -156,22 +181,8 @@ __aicore__ inline void PairReduceSum(const LocalTensor<T>& dst, const LocalTenso
     const int32_t repeatTime, const int32_t mask, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecReducePairInfo(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "PairReduceSum");
-#endif
-    using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "PairReduceSum, current api support dtype combination is src and dst both: half / float");});
-    ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "PairReduceSum");
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        "PairReduceSum")) {
-        ASCENDC_REPORT_CHECK_ERROR("PairReduceSum", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-    PairReduceSumImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), repeatTime,
-        mask, dstRepStride, srcBlkStride, srcRepStride);
+    ReducePair<ReduceType::SUM, T, isSetMask>(dst,  src, mask, repeatTime, dstRepStride,
+        srcBlkStride, srcRepStride);
 }
 
 /*
@@ -244,11 +255,12 @@ __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTens
     ReduceDataBlock<ReduceType::MIN>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
-template <typename T, bool isSetMask>
-__aicore__ inline void PairReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const int32_t repeatTime, const uint64_t mask[], const int32_t dstRepStride, const int32_t srcBlkStride,
-    const int32_t srcRepStride)
+template <ReduceType reduceType, typename T, bool isSetMask=true>
+__aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int64_t mask[], 
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+    static_assert((SupportEnum<reduceType, ReduceType::SUM>()),
+        "current ReducePair api only support ReduceType::SUM");
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReducePairInfo(dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "PairReduceSum");
 #endif
@@ -265,6 +277,14 @@ __aicore__ inline void PairReduceSum(const LocalTensor<T>& dst, const LocalTenso
 #endif
     PairReduceSumImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), repeatTime,
         mask, dstRepStride, srcBlkStride, srcRepStride);
+}
+
+template <typename T, bool isSetMask>
+__aicore__ inline void PairReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const int32_t repeatTime, const uint64_t mask[], const int32_t dstRepStride, const int32_t srcBlkStride,
+    const int32_t srcRepStride)
+{
+    ReducePair<ReduceType::SUM, t, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
