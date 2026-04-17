@@ -61,6 +61,12 @@ struct CheckNDLayoutPattern {
     }
 };
 
+struct CheckNDExtLayoutPattern {
+    template <typename T, typename TraitType>
+    __aicore__ inline static constexpr void Check() {
+    }
+};
+
 struct CheckDNLayoutPattern {
     template <typename T, typename TraitType>
     __aicore__ inline static constexpr void Check() {
