@@ -186,7 +186,7 @@ __aicore__ inline constexpr decltype(auto) GetEleImpl(T&& t)
 }
 
 template <size_t... Is, typename Tuple,
-    typename = Std::enable_if_t<Std::is_tuple_v<Tuple>>>
+    typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
 __aicore__ inline constexpr decltype(auto) Get(Tuple&& t)
 {
     if constexpr (sizeof...(Is) == 0) {
