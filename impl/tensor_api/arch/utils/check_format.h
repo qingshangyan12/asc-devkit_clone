@@ -61,11 +61,23 @@ struct CheckNDLayoutPattern {
     }
 };
 
+struct CheckNDExtLayoutPattern {
+    template <typename T, typename TraitType>
+    __aicore__ inline static constexpr void Check() {
+    }
+};
+
 struct CheckDNLayoutPattern {
     template <typename T, typename TraitType>
     __aicore__ inline static constexpr void Check() {
         using StrideRow0 = typename GetNDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         static_assert(Std::is_same_v<StrideRow0, Std::Int<1>>, "Src->Layout->Stride->Row must be Int<1>!");
+    }
+};
+
+struct CheckDNExtLayoutPattern {
+    template <typename T, typename TraitType>
+    __aicore__ inline static constexpr void Check() {
     }
 };
 
@@ -199,7 +211,9 @@ using LayoutPatternCheckSet = TupleMap<
     Std::tuple<NNLayoutPtn, CheckNnLayoutPattern>,
     Std::tuple<NZLayoutPtn, CheckNzLayoutPattern>,
     Std::tuple<NDLayoutPtn, CheckNDLayoutPattern>,
+    Std::tuple<NDExtLayoutPtn, CheckNDExtLayoutPattern>,
     Std::tuple<DNLayoutPtn, CheckDNLayoutPattern>,
+    Std::tuple<DNExtLayoutPtn, CheckDNExtLayoutPattern>,
     Std::tuple<ScaleANDLayoutPtn, CheckScaleANDLayoutPattern>,
     Std::tuple<ScaleADNLayoutPtn, CheckScaleADNLayoutPattern>,
     Std::tuple<ScaleBNDLayoutPtn, CheckScaleBNDLayoutPattern>,
