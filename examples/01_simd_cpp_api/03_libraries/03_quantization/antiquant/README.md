@@ -44,10 +44,9 @@
   <br clear="left" />
 <br />
 
-- 样例实现：
+- 样例实现：  
   本样例中实现的是固定shape为输入src[8, 128]、offset[1, 128]、scale[1, 128]，输出dst[8, 128]的antiquant_custom样例。按元素做反量化计算，将int8_t类型数据转换为half类型数据。
-  - Kernel实现
-
+  - Kernel实现  
     计算逻辑是： 本样例将输入数据搬运进片上存储，然后使用AscendAntiQuant（A2/A3）或AntiQuantize（950系列）高阶API接口完成反量化计算，得到最终结果，再搬出外部存储上。
 
   - 调用实现  
@@ -91,14 +90,12 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
-
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `NPU_ARCH` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   
-- 执行结果
-
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

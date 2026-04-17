@@ -34,12 +34,12 @@
   </table>
 
 - 样例实现：  
-  - Kernel实现   
+  - Kernel实现  
     计算逻辑是：输入数据需要先按切片参数从GM（Global Memory）搬运到UB（Unified Buffer），再搬出到外部GM（Global Memory）上。
     
     接口详细描述参考Ascend C API DataCopy切片数据搬运。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行  

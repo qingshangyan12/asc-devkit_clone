@@ -17,8 +17,7 @@
 │   └── batch_matmul_bias_reuse.asc              // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   BatchMatmul样例，批量处理3组Matmul计算，每组对NORMAL格式的A、B矩阵分别做矩阵乘和加bias偏置。通过配置MatmulConfig的isBiasBatch参数，使能每次Matmul计算时复用同一个Bias矩阵。
   
   NORMAL格式具体可参考[IterateBatch](../../../../../docs/api/context/IterateBatch.md)中对该数据排布的介绍。
@@ -26,8 +25,7 @@
 - 约束条件
   - 输入和输出的Layout类型都为NORMAL时，不支持BatchMode为SINGLE_LARGE_THAN_L1的场景。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：BatchNum = 3, M = 32, N = 256, K = 64。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="6" align="center">Matmul</td></tr>

@@ -21,12 +21,10 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
 │   └── matmul_l2cache.asc      // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   本样例以AI处理器的L2 Cache大小192M为例，根据样例的输入、输出shape，计算样例输入和输出的总数据量为((30720 * 4096) + (4096 * 1024) + (1024) + (30720 * 1024)) * 2 = 322963456字节（约308M），大于L2 Cache（192M），无法保证计算前读取的数据能够命中L2 Cache，而Global Memory带宽低于L2 Cache，且两者之间差距较大，搬运数据成为样例运行的性能瓶颈。因此需要将输入数据切分成多块，使得每个数据块的计算数据量（包含输入和输出），能够命中L2 Cache。本样例提供了L2CacheOptimizer类，其中GetTileNum接口用于自动根据左右矩阵的Shape获取左右矩阵总L2切分份数，GetBlockShape接口获取L2切分后M、N、K轴的长度，GetBlockCoord接口返回对应切块的位置坐标，即M、N、K方向相对矩阵起始位置的偏移。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 30720, N = 1024, K = 4096。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
