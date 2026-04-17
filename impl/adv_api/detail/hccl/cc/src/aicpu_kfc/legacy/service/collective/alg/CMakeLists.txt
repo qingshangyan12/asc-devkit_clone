@@ -100,6 +100,9 @@ target_include_directories(hccl_v2_alg_frame PRIVATE
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/asc/hccl/internal/
 )
 
+target_link_libraries(hccl_v2_native_alg_repo PRIVATE json)
+target_link_libraries(hccl_v2_alg_frame PRIVATE json)
+
 target_compile_options(hccl_v2_native_alg_repo PRIVATE
         -std=c++14
         -Werror
@@ -142,6 +145,16 @@ target_link_options(hccl_v2_alg_frame PRIVATE
     -Wl,-z,now
     -Wl,-z,noexecstack
     $<$<CONFIG:Release>:-s>
+)
+
+target_link_directories(hccl_v2_native_alg_repo PRIVATE
+    ${ASCEND_CANN_PACKAGE_PATH}/lib64
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/lib64
+)
+
+target_link_directories(hccl_v2_alg_frame PRIVATE
+    ${ASCEND_CANN_PACKAGE_PATH}/lib64
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/lib64
 )
  
 target_link_libraries(hccl_v2_native_alg_repo PRIVATE

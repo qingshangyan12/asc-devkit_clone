@@ -29,7 +29,7 @@ if((BUILD_OPEN_PROJECT AND KERNEL_MODE) OR AARCH_MODE)
     set(CMAKE_SYSTEM_PROCESSOR aarch64)
     #Change the path to the absolute path of the cross compilation tool after the toolkit package is decompressed
     # set cross compile toolchain dir
-    set(TOOLCHAIN_DIR ${CUSTOM_ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/)
+    set(TOOLCHAIN_DIR ${ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc)
     #Specify cross compiler
     message(STATUS "TOOLCHAIN_DIR=${TOOLCHAIN_DIR}")
     if (NOT "x${TOOLCHAIN_DIR}" STREQUAL "x")

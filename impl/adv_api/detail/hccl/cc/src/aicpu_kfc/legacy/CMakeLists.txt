@@ -186,6 +186,12 @@ target_link_options(ccl_dpu PRIVATE
     -Wl,--exclude-libs,ALL
     $<$<CONFIG:Release>:-s>
 )
+
+target_link_directories(ccl_dpu PRIVATE
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/lib64
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/devlib/device
+)
+
 # 将库文件链接到目标ccl_dpu
 target_link_libraries(ccl_dpu
     -Wl,--no-as-needed
@@ -206,6 +212,12 @@ install(TARGETS  ccl_dpu
 
 # 需要链接的库，后需增加
 IF (NOT DEFINED ENV{HCCL_LOCAL_BUILD})
+target_link_directories(hccl_v2 PRIVATE
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/lib64
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/devlib
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/devlib/device
+)
+
 target_link_libraries(hccl_v2 PRIVATE
     -Wl,--no-as-needed
     c_sec

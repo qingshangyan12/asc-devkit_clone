@@ -74,26 +74,40 @@ function(generate_stub STUB)
     endif() 
 endfunction(generate_stub) 
 
-if(AARCH_MODE)
+if (NOT DEVICE_MODE)
+set(HOST_STUBS
+    ascendcl
+    tsdclient
+)
+endif()
+
+if (AARCH_MODE)
     set(STUBS
-        c_sec
-        unified_dlog
-        mmpa
+        ascend_hal
+        slog
+        aicpu_sharder
+        ${HOST_STUBS}
     )
-    foreach(STUB ${STUBS})
-        if(NOT TARGET ${STUB})
-            generate_stub(${STUB})
-        endif()
-    endforeach()
+else()
+    set(STUBS
+        ascend_hal
+        slog
+        aicpu_sharder
+        ${HOST_STUBS}
+        runtime
+        acl_rt
+    )
 endif()
 
-if(NOT TARGET ccl_kernel)
-    generate_stub(ccl_kernel)
-endif()
+foreach(STUB ${STUBS})
+    if(NOT TARGET ${STUB})
+        generate_stub(${STUB})
+    endif()
+endforeach()
 
-if(NOT TARGET hcomm)
-    generate_stub(hcomm)
-endif()
+# if(NOT TARGET hcomm)
+#     generate_stub(hcomm)
+# endif()
 
 if(CUSTOM_ASCEND_CANN_PACKAGE_PATH)
     set(ASCEND_CANN_PACKAGE_PATH  ${CUSTOM_ASCEND_CANN_PACKAGE_PATH})
@@ -152,7 +166,9 @@ set(INSTALL_LIBRARY_DIR hccl/lib64)
 set(INSTALL_INCLUDE_DIR hccl/include)
 set(INSTALL_AICPU_KERNEL_JSON_DIR hccl/built-in/data/op/aicpu)
 set(INSTALL_DEVICE_TAR_DIR hccl/Ascend/aicpu)
-
+set(INSTALL_PKG_INCLUDE_DIR hccl/pkg_inc)
+set(INSTALL_CCL_KERNEL_JSON_DIR hccl/built-in/data/op/aicpu)
+set(INSTALL_DPU_KERNEL_JSON_DIR hcccl/built-in/data/op/dpu)
 if (ENABLE_TEST)
     set(CMAKE_SKIP_RPATH FALSE)
 else ()

@@ -92,6 +92,8 @@ target_include_directories(ccl_kernel_decoupler PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/../
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
     $<TARGET_PROPERTY:ccl_kernel,INCLUDE_DIRECTORIES>
 )
 
@@ -113,6 +115,8 @@ target_include_directories(ccl_kernel_decoupler_open BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/common
     ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
     $<TARGET_PROPERTY:ccl_kernel,INCLUDE_DIRECTORIES>
 )
 
@@ -131,6 +135,8 @@ target_compile_options(ccl_kernel_decoupler_open_exec PRIVATE
 target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${HCCL_HCOMM_HEADER_DIR}/../
+    ${HCCL_HCOMM_HEADER_DIR}
+    ${HCCL_HCOMM_HEADER_DIR}/hccl
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor
@@ -153,8 +159,8 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include
     ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/acl
     ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/hccl
-    ${HCCL_HCOMM_HEADER_DIR}
-    ${HCCL_HCOMM_HEADER_DIR}/hccl
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
     ${HCCL_BASE_DIR}/pub_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
@@ -180,6 +186,8 @@ target_compile_options(ccl_kernel_decoupler_open_exec_impl PRIVATE
 
 target_include_directories(ccl_kernel_decoupler_open_exec_impl BEFORE PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/../
+    ${HCCL_HCOMM_HEADER_DIR}
+    ${HCCL_HCOMM_HEADER_DIR}/hccl
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor
@@ -220,8 +228,8 @@ target_include_directories(ccl_kernel_decoupler_open_exec_impl BEFORE PRIVATE
     ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include
     ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/acl
     ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/hccl
-    ${HCCL_HCOMM_HEADER_DIR}
-    ${HCCL_HCOMM_HEADER_DIR}/hccl
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
+    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
     ${HCCL_BASE_DIR}/pub_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
