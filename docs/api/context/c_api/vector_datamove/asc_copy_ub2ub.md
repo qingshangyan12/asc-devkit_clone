@@ -6,6 +6,7 @@
 | :----------------------- | :------: |
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
 | <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
+|<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √</cann-filter> |
 
 ## 功能说明
 
@@ -58,6 +59,7 @@ PIPE_V
 - dst的起始地址要求32字节对齐。
 - 如果需要执行多条asc_copy_ub2ub指令，且asc_copy_ub2ub指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_ub2ub指令的串行化，防止出现异常数据。
 - 同步计算包含同步等待。
+- 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
 
 ## 调用示例
 
