@@ -10,7 +10,6 @@
 
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
-#include <type_traits>
 #include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
