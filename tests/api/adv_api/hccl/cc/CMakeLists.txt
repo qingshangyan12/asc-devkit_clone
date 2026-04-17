@@ -9,3 +9,8 @@
 # -----------------------------------------------------------------------------------------------------------
 
 add_subdirectory(ut)
+
+option(ENABLE_HCCL_CC_ST "Enable HCCL CC ST tests" OFF)
+if(ENABLE_HCCL_CC_ST)
+    add_subdirectory(st/algorithm)
+endif()
