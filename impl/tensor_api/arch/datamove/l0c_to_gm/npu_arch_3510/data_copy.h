@@ -35,7 +35,7 @@ public:
     template <const CopyL0C2GMTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src, const FixpipeParams& params)
     {
-        constexpr QuantMode_t quantPre = GetFixpipeQuantPre<trait.roundMode, T, U>();
+        constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U>();
         CheckTemplate<trait, quantPre, T, U>();
         CheckDataTypeFor3510::CheckL0C2GmDataType<quantPre, T, U>();
         SetRegisterImpl<T, U>(dst, src);
@@ -45,7 +45,7 @@ public:
     template <const CopyL0C2GMTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src, uint64_t quant, const FixpipeParams& params)
     {
-        constexpr QuantMode_t quantPre = GetFixpipeQuantPre<trait.roundMode, T, U, uint64_t>();
+        constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U, uint64_t>();
         CheckTemplate<trait, quantPre, T, U>();
         SetRegisterImpl<T, U>(dst, src, quant);
         DataCopyImpl<trait, quantPre, T, U>(dst, src, params);
@@ -65,8 +65,8 @@ private:
         const auto& dstLayout = dst.Layout();
         const auto& srcLayout = src.Layout();
 
-        uint32_t nSize = Std::min(GetColumnTotalSize(srcLayout), GetColumnTotalSize(dstLayout));
-        uint32_t mSize = Std::min(GetRowTotalSize(srcLayout), GetRowTotalSize(dstLayout));
+        uint32_t nSize = Std::min(GetToalColumnShape(srcLayout), GetToalColumnShape(dstLayout));
+        uint32_t mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
         uint32_t srcStride = GetColumnStride<1>(srcLayout) / FRACTAL_FIXED;
         uint32_t dstStride = 0;
 
@@ -84,7 +84,7 @@ private:
         uint8_t cacheMode = dst.Engine().GetCacheMode();
         bool isChannelSplit = trait.enableChannelSplit;
 
-        CopyMatrixCcToGm3510::DataCopy<quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, cacheMode, reluEn,
+        CopyMatrixCcToGmInstr::DataCopy<quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, cacheMode, reluEn,
                                                        unitFlag, isChannelSplit, nz2ndEn, nz2dnEn);
     }
 };
@@ -94,7 +94,7 @@ public:
     template <const CopyL0C2GMTrait& trait, typename T, typename U, typename V>
     __aicore__ inline static void Run(const T& dst, const U& src, const V& quant, const FixpipeParams& params)
     {
-        constexpr QuantMode_t quantPre = GetFixpipeQuantPre<trait.roundMode, T, U, V>();
+        constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U, V>();
         CheckTemplate<trait, T, U>();
         SetRegisterImpl<T, U>(dst, src);
         DataCopyImpl<trait, quantPre, T, U, V>(dst, src, quant, params);
@@ -114,7 +114,7 @@ private:
         const auto& dstLayout = dst.Layout();
         const auto& srcLayout = src.Layout();
 
-        uint32_t nSize = GetColumnTotalSize(srcLayout);
+        uint32_t nSize = GetToalColumnShape(srcLayout);
         if constexpr (IsTail) {
             nSize %= MAIN_LOOP_N_SIZE_3510;
         } else {
@@ -123,7 +123,7 @@ private:
             }
         }
 
-        const uint32_t mSize = GetRowTotalSize(srcLayout);
+        const uint32_t mSize = GetTotalRowShape(srcLayout);
         const uint32_t srcStride = GetColumnStride<1>(srcLayout) / FRACTAL_FIXED;
         uint32_t dstStride = 0;
         if constexpr (IsNDFormat<T>::value) {
@@ -160,7 +160,7 @@ private:
     template <QuantMode_t quantPre, typename T, typename U, typename ParamTuple, size_t... Is>
     __aicore__ inline static void DataCopyWrapper(const T& dst, const U& src, const ParamTuple& paramTuple,
                                                   Std::index_sequence<Is...>)
-    { CopyMatrixCcToGm3510::DataCopy<quantPre>(dst, src, Std::get<Is>(paramTuple)...); }
+    { CopyMatrixCcToGmInstr::DataCopy<quantPre>(dst, src, Std::get<Is>(paramTuple)...); }
 
     template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
     __aicore__ inline static void ExecuteDataCopy(const T& dst, const U& src, const V& quant, uint16_t nIterNum,
@@ -196,7 +196,7 @@ private:
     template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const V& quant, const FixpipeParams& params)
     {
-        uint32_t nSize = GetColumnTotalSize(src.Layout());
+        uint32_t nSize = GetToalColumnShape(src.Layout());
         uint16_t nIterNum = 1;
         uint32_t calNSize = nSize;
         uint32_t tailNSize = 0;
