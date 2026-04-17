@@ -42,9 +42,10 @@ template <ReduceType reduceType, typename T, bool isSetMask=true>
 __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask, 
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
 
-template <ReduceType reduceType,typename T, bool isSetMask=true>
+template <ReduceType reduceType, typename T, bool isSetMask=true>
 __aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask, 
-    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride, 
+    ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
 
 template <ReduceType reduceType, typename T, bool isSetMask=true>
 __aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask, 
@@ -56,7 +57,8 @@ __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTen
 
 template <ReduceType reduceType, typename T, bool isSetMask=true>
 __aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int64_t mask[], 
-    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride, 
+    ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
 
 template <ReduceType reduceType, typename T, bool isSetMask=true>
 __aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int64_t mask[], 
