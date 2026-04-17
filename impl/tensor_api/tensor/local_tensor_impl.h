@@ -131,20 +131,6 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
         return operator()(MakeCoord(c0,c1,cs...));
     }
 
-	template <typename Coord, typename InfoType>
- 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const InfoType& info) {
- 	    auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeTileLayout(coord, Layout(), info);
- 	    return MakeTensor(iter, tileLayout);
- 	}
- 	 
- 	template <typename Coord, typename InfoType>
- 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const InfoType& info) const {
- 	    auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeTileLayout(coord, Layout(), info);
- 	    return MakeTensor(iter, tileLayout);
- 	}
-
     template <typename Coord, typename Info>
   	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) {
         auto iter = Data() + Layout()(coord);
