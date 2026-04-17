@@ -76,7 +76,6 @@ endfunction(generate_stub)
 
 if(AARCH_MODE)
     set(STUBS
-        ccl_kernel
         c_sec
         unified_dlog
         mmpa
@@ -86,6 +85,10 @@ if(AARCH_MODE)
             generate_stub(${STUB})
         endif()
     endforeach()
+endif()
+
+if(NOT TARGET ccl_kernel)
+    generate_stub(ccl_kernel)
 endif()
 
 if(NOT TARGET hcomm)
