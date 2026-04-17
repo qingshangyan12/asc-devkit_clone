@@ -24,15 +24,13 @@
 
 ## 样例描述
 
-- 样例功能： 
-
+- 样例功能：  
   调用Matmul高阶API时开启B矩阵的IBShare功能，计算过程中同一AIC对应的两个AIV在每次迭代时用到的B矩阵在L1 Buffer上的数据一致。
 
 - 约束条件：
   - A矩阵或B矩阵单独使能IBShare的场景，要求复用的矩阵必须在L1 Buffer上全载。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 64, N = 256, K = 384。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulIBShareBCustom</td></tr>

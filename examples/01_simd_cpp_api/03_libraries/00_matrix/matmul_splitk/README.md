@@ -17,18 +17,16 @@
 │   └── matmul_splitk.asc       // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   本样例通过调用Matmul Tiling API时调用EnableMultiCoreSplitK使能多核切K，获取多核切K的tiling计算参数，将单次Iterate计算分配到多个核进行。在Kernel实现中，先将输出Global Memory清零，随后开启AtomicAdd累加，待同一次Iterate计算分配到多个的核的计算完成后，结果累加至输出Global Memory上。
 
 - 约束条件
   - 使能多核切K的场景，获取C矩阵结果时仅支持输出到Global Memory。
-  - 使能多核切K的场景，需在Kernel侧代码中首次将C矩阵分片的结果写入Global Memory之前，先清零Global Memory，随后在获取C矩阵分片的结果时，再开启AtomicAdd累加。
+  - 使能多核切K的场景，需在Kernel侧代码中首次将C矩阵分片的结果写入Global Memory之前，先清零Global Memory，随后在获取C矩阵分片的结果时，再开启AtomicAdd累加。  
     如果不预先清零Global Memory，可能会因为累加Global Memory中的原始无效数据而产生精度问题。
   - 使能多核切K的场景，不支持开启Bias。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 16, N = 16, K = 1024。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

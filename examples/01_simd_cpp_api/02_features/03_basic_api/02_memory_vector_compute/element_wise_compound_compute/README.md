@@ -63,7 +63,7 @@
 
   输入输出shape均为[1, 512]，format为ND，核函数名为`element_wise_compound_compute_custom`。
 
-- 样例实现：
+- 样例实现：  
   输入数据从Global Memory搬运至LocalTensor，根据SCENARIO_NUM编译参数执行对应的复合计算，结果再搬出到Global Memory。实现流程包含CopyIn、Compute、CopyOut三个任务，使用内核调用符`<<<>>>`调用核函数。
 
 ## 编译运行  
@@ -112,7 +112,6 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
-
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |

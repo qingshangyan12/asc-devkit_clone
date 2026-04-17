@@ -36,8 +36,7 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
     msprof op ./demo
     ```
 
-    - 性能数据说明
-
+    - 性能数据说明  
       命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
 
       ```bash

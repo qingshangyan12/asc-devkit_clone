@@ -18,12 +18,10 @@
 ```
 
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例调用Matmul API对输入的A、B矩阵做矩阵乘和加bias偏置的计算。其中A矩阵的输入位置为VECOUT。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 31, N = 31, K = 31。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>

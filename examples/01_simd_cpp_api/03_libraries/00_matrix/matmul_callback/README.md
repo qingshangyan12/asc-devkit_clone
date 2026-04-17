@@ -17,11 +17,10 @@ Matmul API模板参数MatmulCallbackFunc的自定义使用方式。MatmulCallbac
 │   └── matmul_callback.asc     // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例对输入的A、B矩阵做矩阵乘和加bias偏置。将自定义的左矩阵搬运函数CustomDataCopyInA作为参数传递给Matmul的模板参数MatmulCallbackFunc，实现左矩阵从Global Memory到A1(L1 Buffer)的自定义搬运，本样例以输入A矩阵为例，实现callback回调功能，对于输入B矩阵、输出C矩阵的callback回调功能也可以参考该样例的实现。
 
-- 样例规格： 
+- 样例规格：  
   本样例中：M = 2560, N = 128, K = 512。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

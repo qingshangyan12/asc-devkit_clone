@@ -20,12 +20,10 @@
 ```
 
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例调用Matmul API计算时int8_t类型输入，计算结果以half类型反量化输出，同时支持同一系数的反量化模式与向量的反量化模式。该场景下将C矩阵数据从CO1搬出到Global Memory时，会执行反量化操作，对输出矩阵的所有值采用同一系数或向量进行反量化。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 1024, N = 1024, K = 1024。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
