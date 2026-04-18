@@ -31,6 +31,7 @@ constexpr uint64_t COMMIT_VALID_MASK = 987654321U;   // commit msg valid mask
 constexpr uint64_t FINALIZE_FINISH_CNT = 1234567899999999999UL;  // server write finish msg when all hccl task finished
 constexpr int8_t INVALID_HANDLE_ID = static_cast<int8_t>(-1);
 constexpr int8_t HCCL_MAX_HANDLE_ID = 63;
+constexpr uint8_t HCCL_ALG_MAX_NUM = 8;
 
 enum class HcclTilingVersion: uint8_t {
     DEPRECATED_TILING_VERSION,          // Deprecated tiling version
@@ -202,6 +203,19 @@ struct CommKfcContext {
     uint64_t hcclContext;
     char reserved[48];
     CommKfcApiContext apiCtx;
+};
+
+struct AlgInfo {
+    uint64_t offset;
+    uint64_t opParam;
+};
+struct OpResCtx {
+    uint64_t version;
+    uint64_t workspace;
+    uint64_t workspaceSize;
+    uint64_t rankId;
+    uint64_t rankSize;
+    AlgInfo algInfo[HCCL_ALG_MAX_NUM];
 };
 }
 
