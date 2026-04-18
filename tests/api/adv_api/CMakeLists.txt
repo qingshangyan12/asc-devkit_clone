@@ -435,6 +435,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
     run_llt_test(
         TARGET ascendc_ut_adv_api_kernel_${product_type}
         TASK_NUM 1
+        ENABLE_GTEST_PARALLEL ON
     )
 endforeach()
 
