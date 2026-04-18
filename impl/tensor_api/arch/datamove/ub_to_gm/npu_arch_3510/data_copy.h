@@ -67,13 +67,13 @@ private:
             int64_t dstStride =
                 GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout) * sizeof(DST_TYPE);
 
-            if constexpr (is_b4_type<SRC_TYPE>) {
+            if constexpr (IsB4Type<SRC_TYPE>) {
                 // move fp4 as b8, need to be divided by 2
                 blockLen = blockLen >> 1;
                 srcStride = srcStride >> 1;
             }
 
-            if constexpr (is_b4_type<DST_TYPE>) {
+            if constexpr (IsB4Type<DST_TYPE>) {
                 dstStride = dstStride >> 1;
             }
 
@@ -90,13 +90,13 @@ private:
             int64_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout)
                                 * sizeof(DST_TYPE);
 
-            if constexpr (is_b4_type<SRC_TYPE>) {
+            if constexpr (IsB4Type<SRC_TYPE>) {
                 // move fp4 as b8, need to be divided by 2
                 blockLen = blockLen >> 1;
                 srcStride = srcStride >> 1;
             }
 
-            if constexpr (is_b4_type<DST_TYPE>) {
+            if constexpr (IsB4Type<DST_TYPE>) {
                 dstStride = dstStride >> 1;
             }
 
@@ -114,13 +114,13 @@ private:
             int64_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout)
                                 * sizeof(DST_TYPE);
 
-            if constexpr (is_b4_type<SRC_TYPE>) {
+            if constexpr (IsB4Type<SRC_TYPE>) {
                 // move fp4 as b8, need to be divided by 2
                 blockLen = blockLen >> 1;
                 srcStride = srcStride >> 1;
             }
 
-            if constexpr (is_b4_type<DST_TYPE>) {
+            if constexpr (IsB4Type<DST_TYPE>) {
                 dstStride = dstStride >> 1;
             }
 

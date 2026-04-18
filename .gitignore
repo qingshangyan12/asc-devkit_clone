@@ -5,3 +5,5 @@ output
 __pycache__/
 /examples/**/build/
 AGENTS.md
+# OpenCode 配置
+.opencode/

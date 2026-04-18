@@ -80,7 +80,7 @@ private:
             srcStride = 0;
             dstStride = blockLen;
         }
-        if constexpr (is_b4_type<type>) {
+        if constexpr (IsB4Type<type>) {
             // move fp4 as b8, need to be divided by 2
             blockLen = blockLen >> 1;
             srcStride = srcStride >> 1;

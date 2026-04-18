@@ -169,7 +169,7 @@ struct CheckArrangement {
     using StrideColumn1Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
 
     __aicore__ inline static constexpr bool IsScaleType() {
- 	    return is_one_of_attr_v<type, fp8_e8m0_t>;
+ 	    return IsOneOfAttrV<type, fp8_e8m0_t>;
  	}
 
     static constexpr ShapeRow0Type ShapeRow0{};
