@@ -1,18 +1,18 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 
 /*!
-* \file utils.h
-* \brief
-*/
+ * \file utils.h
+ * \brief
+ */
 #ifndef INCLUDE_TENSOR_API_UTILS_UTILS_H
 #define INCLUDE_TENSOR_API_UTILS_UTILS_H
 
@@ -20,7 +20,7 @@
 #include "include/utils/base/sys_constants.h"
 #include "include/utils/common_types.h"
 
-namespace AscendC { 
+namespace AscendC {
 namespace Te {
 
 enum class CacheMode {
@@ -43,12 +43,12 @@ struct MmadTrait {
         disableGemv = disableGemvIn;
         mmadType = mmadTypeIn;
     };
-    
+
     int32_t fmOffset = 0;
     bool kDirectionAlign = false;
     bool cmatrixSource = false;
     bool disableGemv = true;
-    MmadType mmadType = MmadType::NORMAL; 
+    MmadType mmadType = MmadType::NORMAL;
 };
 
 struct MmadParams {
@@ -56,7 +56,7 @@ struct MmadParams {
 
     __aicore__ constexpr MmadParams(uint16_t mIn, uint16_t nIn, uint16_t kIn, uint8_t unitFlagIn, bool cmatrixInitValIn) : 
         m(mIn), n(nIn), k(kIn), unitFlag(unitFlagIn), cmatrixInitVal(cmatrixInitValIn){};
-    
+
     uint16_t m = 0;
     uint16_t n = 0;
     uint16_t k = 0;
@@ -65,6 +65,10 @@ struct MmadParams {
 };
 
 struct DataCopyTrait {};
+struct CopyGM2UBTrait {};
+struct CopyL12UBTrait {};
+struct CopyUB2L1Trait {};
+struct CopyUB2GMTrait {};
 
 enum class RoundMode : uint8_t {DEFAULT = 0, HYBRID};
 
@@ -78,20 +82,38 @@ enum DualDstMode : uint8_t {
 struct FixpipeTrait {
     __aicore__ constexpr FixpipeTrait() {}
 
-    __aicore__ constexpr FixpipeTrait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn, DualDstMode dualDstCtlIn) :
-        roundMode(roundModeIn), enableRelu(enableReluIn), enableChannelSplit(enableChannelSplitIn), dualDstCtl(dualDstCtlIn) {}
+    __aicore__ constexpr FixpipeTrait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn) :
+        roundMode(roundModeIn), enableRelu(enableReluIn), enableChannelSplit(enableChannelSplitIn)
+    {}
 
     RoundMode roundMode = RoundMode::DEFAULT;
     bool enableRelu = false;
     bool enableChannelSplit = false;
-    DualDstMode dualDstCtl = DUAL_DST_DISABLE;
+};
+
+struct CopyL0C2GMTrait : public FixpipeTrait {
+    __aicore__ constexpr CopyL0C2GMTrait() {}
+
+    __aicore__ constexpr CopyL0C2GMTrait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn) :
+        FixpipeTrait(roundModeIn, enableReluIn, enableChannelSplitIn)
+    {}
+};
+
+struct CopyL0C2UBTrait : public FixpipeTrait {
+    __aicore__ constexpr CopyL0C2UBTrait() {}
+
+    __aicore__ constexpr CopyL0C2UBTrait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn,
+                                         DualDstMode dualDstCtlIn) :
+        FixpipeTrait(roundModeIn, enableReluIn, enableChannelSplitIn), dualDstCtl(dualDstCtlIn)
+    {}
+    DualDstMode dualDstCtl = DualDstMode::DUAL_DST_DISABLE;
 };
 
 struct FixpipeParams {
-   __aicore__ constexpr FixpipeParams() {};
+    __aicore__ constexpr FixpipeParams(){};
 
-   __aicore__ constexpr FixpipeParams(uint8_t unitFlagIn) : unitFlag(unitFlagIn) {};
-    
+    __aicore__ constexpr FixpipeParams(uint8_t unitFlagIn) : unitFlag(unitFlagIn){};
+
     uint8_t unitFlag = 0;
 };
 
@@ -105,7 +127,7 @@ struct LoadDataTrait {
     bool transposed = false;
 };
 
-} // namespace Te 
+} // namespace Te
 } // namespace AscendC
 
 #endif // INCLUDE_TENSOR_API_UTILS_UTILS_H
