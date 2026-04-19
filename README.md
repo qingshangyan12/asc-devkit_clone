@@ -1,4 +1,15 @@
+<div align="center">
+
 # Ascend C
+
+<h4>昇腾 AI 处理器算子开发核心仓（Ascend C 编程 API 与样例）</h4>
+
+[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://gitcode.com/cann/asc-devkit/tree/master/docs)
+[![license](https://img.shields.io/badge/license-CANN_Open_2.0-lightgrey.svg)](https://gitcode.com/cann/asc-devkit/blob/master/LICENSE)
+[![contributing](https://img.shields.io/badge/CONTRIBUTING-teal)](https://gitcode.com/cann/asc-devkit/blob/master/CONTRIBUTING.md)
+[![SIG](https://img.shields.io/badge/SIG-ascendc-yellow)](https://gitcode.com/cann/community/tree/master/CANN/sigs/ascendc)
+
+</div>
 
 ## 🔥Latest News
 - [2026/01] 优化样例、融合编译性能等；
