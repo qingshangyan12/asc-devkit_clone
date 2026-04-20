@@ -30,7 +30,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/third_party/makeself-fetch.cmake)
 set(script_prefix ${CMAKE_SOURCE_DIR}/scripts/package/scripts/)
 install(DIRECTORY ${script_prefix}/
     DESTINATION asc-devkit/script
-    COMPONENT asc-devkit
     FILE_PERMISSIONS
     OWNER_READ OWNER_WRITE OWNER_EXECUTE  # 文件权限
     GROUP_READ GROUP_EXECUTE
@@ -51,7 +50,7 @@ set(SCRIPTS_FILES
 )
 
 install(FILES ${SCRIPTS_FILES}
-    DESTINATION asc-devkit/script COMPONENT asc-devkit
+    DESTINATION asc-devkit/script
 )
 
 set(COMMON_FILES
@@ -77,26 +76,24 @@ set(CONF_FILES
     ${CMAKE_SOURCE_DIR}/scripts/package/common/cfg/path.cfg
 )
 install(FILES ${CONF_FILES}
-    DESTINATION asc-devkit/conf COMPONENT asc-devkit
+    DESTINATION asc-devkit/conf
 )
 install(FILES ${PACKAGE_FILES}
-   DESTINATION asc-devkit/script COMPONENT asc-devkit
+   DESTINATION asc-devkit/script
 )
 install(FILES ${LATEST_MANGER_FILES}
-    DESTINATION latest_manager COMPONENT asc-devkit
+    DESTINATION latest_manager
 )
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/package/latest_manager/scripts/
-    DESTINATION latest_manager COMPONENT asc-devkit
+    DESTINATION latest_manager
 )
 install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
     DESTINATION asc-devkit
     RENAME version.info
-    COMPONENT asc-devkit
 )
 install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
     DESTINATION .
     RENAME version.info
-    COMPONENT asc-devkit
 )
 # ============= CPack =============
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")

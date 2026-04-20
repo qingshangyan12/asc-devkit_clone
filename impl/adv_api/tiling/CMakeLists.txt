@@ -243,10 +243,10 @@ else()
 endif()
 
 install(TARGETS tiling_api ARCHIVE DESTINATION ${ASCENDC_API_ADV_INSTALL_DIR}
-                                   ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
+                                   OPTIONAL)
 
 install(TARGETS tiling_api
-        ARCHIVE DESTINATION ${ASCENDC_API_ADV_MULT_INSTALL_DIR} ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
+        ARCHIVE DESTINATION ${ASCENDC_API_ADV_MULT_INSTALL_DIR} OPTIONAL)
 
 configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/tiling_headers.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/tiling_headers.cmake @ONLY)
