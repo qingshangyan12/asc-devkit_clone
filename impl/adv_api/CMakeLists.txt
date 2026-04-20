@@ -145,6 +145,8 @@ configure_file(
 )
 install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/utils_headers.cmake)
 
+add_subdirectory(detail/hccl/cc)
+
 if(NOT BUILD_OPEN_PROJECT)
   install_package(
     PACKAGE kernel_tiling
