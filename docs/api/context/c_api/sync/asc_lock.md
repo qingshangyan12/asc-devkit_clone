@@ -19,7 +19,7 @@ enum ascMutexExecuteMode {
 };
 
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id)
-__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, ascMutexExecuteMode mode)
+__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode)
 ```
 
 ## 参数说明
