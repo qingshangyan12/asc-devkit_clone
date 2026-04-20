@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -17,25 +17,34 @@ import sys
 import numpy as np
 
 
-LOSS = 1e-3 # 容忍偏差，一般fp16要求绝对误差和相对误差均不超过千分之一
+LOSS = 1e-3
 MINIMUM = 10e-10
 
 
-def verify_result(real_result, golden):
-    output_type = np.float32
-    real_result = np.fromfile(real_result, dtype=output_type) # 从bin文件读取实际运算结果
-    golden = np.fromfile(golden, dtype=output_type) # 从bin文件读取预期运算结果
-    result = np.abs(real_result - golden) # 计算运算结果和预期结果偏差
-    deno = np.maximum(np.abs(real_result), np.abs(golden)) # 获取最大值并组成新数组
-    result_atol = np.less_equal(result, LOSS) # 计算绝对误差
-    result_rtol = np.less_equal(result / np.add(deno, MINIMUM), LOSS) # 计算相对误差
+def verify_result(real_result, golden, dtype):
+    real_result = np.fromfile(real_result, dtype=dtype)
+    golden = np.fromfile(golden, dtype=dtype)
+    result = np.abs(real_result - golden)
+    deno = np.maximum(np.abs(real_result), np.abs(golden))
+    result_atol = np.less_equal(result, LOSS)
+    result_rtol = np.less_equal(result / np.add(deno, MINIMUM), LOSS)
     if not result_rtol.all() and not result_atol.all():
         if np.sum(result_rtol == False) > real_result.size * LOSS \
             and np.sum(result_atol == False) > real_result.size * LOSS:
             print("[ERROR] result error")
             return False
-    print("test pass")
     return True
 
+
 if __name__ == '__main__':
-    verify_result(sys.argv[1],sys.argv[2])
+    ctrl_pass = verify_result("./output/output_ctrl.bin", "./output/golden_ctrl.bin", np.int64)
+    if not ctrl_pass:
+        print("[ERROR] output_ctrl.bin failed")
+    atomic_add_pass = verify_result("./output/output_atomic_add.bin", "./output/golden_atomic_add.bin", np.float32)
+    if not atomic_add_pass:
+        print("[ERROR] output_atomic_add.bin failed")
+    
+    if ctrl_pass and atomic_add_pass:
+        print("test pass")
+    else:
+        print("[ERROR] test failed")
