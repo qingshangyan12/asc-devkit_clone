@@ -24,8 +24,7 @@
 
 ## 样例描述
 
-- 样例功能
-
+- 样例功能  
   将Mmad矩阵乘结果通过Fixpipe从CO1（L0C Buffer）搬入GM（Global Memory），使能随路量化将float类型数据量化为half类型，并完成NZ到ND格式的转换。
 
 - 样例规格
@@ -44,8 +43,7 @@
   - 调用基础API Mmad进行矩阵乘计算。
   - 调用基础API Fixpipe将数据从CO1（L0C Buffer）搬运到GM（Global Memory），使能随路量化将float类型数据量化为half类型，并完成NZ到ND格式的转换。
 
-- 调用实现
-
+- 调用实现  
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

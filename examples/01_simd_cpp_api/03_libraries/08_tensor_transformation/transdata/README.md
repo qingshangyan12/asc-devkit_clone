@@ -29,8 +29,7 @@
   - 场景1：NCDHW -> NDC1HWC0， mode = 3
   - 场景2：NDC1HWC0 -> NCDHW， mode = 4
   - 场景3：NCDHW -> FRACTAL_Z_3D，  mode = 1
-  - 场景4：FRACTAL_Z_3D -> NCDHW，  mode = 2
-
+  - 场景4：FRACTAL_Z_3D -> NCDHW，  mode = 2  
   除维度顺序变换外，其中涉及到C轴和N轴的拆分，具体转换方式为，C轴拆分为C1轴、C0轴，N轴拆分为N1轴、N0轴。  
   对于位宽为16的数据类型的数据，C0和N0固定为16，C1和N1的计算公式如下：  
   $$ C1 = (C + C0 - 1) / C0 $$
@@ -52,8 +51,7 @@
 - 算子实现：  
   本样例中实现的是固定shape为输入src[16, 16, 1, 3, 5]，输出dst[16, 16, 1, 3, 5]的transdata_custom算子。参数mode = 1，即数据格式转换场景为NCDHW -> FRACTAL_Z_3D。
 
-  - Kernel实现
-
+  - Kernel实现  
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用TransData高阶API接口完成TransData计算，得到最终结果，再搬出到外部存储上。
 
     transdata_custom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行TransData计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
