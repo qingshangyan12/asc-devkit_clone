@@ -50,7 +50,7 @@ set(SCRIPTS_FILES
 )
 
 install(FILES ${SCRIPTS_FILES}
-    DESTINATION asc-devkit/script
+    DESTINATION asc-devkit/script COMPONENT asc-devkit
 )
 
 set(COMMON_FILES
@@ -76,19 +76,19 @@ set(CONF_FILES
     ${CMAKE_SOURCE_DIR}/scripts/package/common/cfg/path.cfg
 )
 install(FILES ${CONF_FILES}
-    DESTINATION asc-devkit/conf
+    DESTINATION asc-devkit/conf COMPONENT asc-devkit
 )
 install(FILES ${PACKAGE_FILES}
-   DESTINATION asc-devkit/script
+   DESTINATION asc-devkit/script COMPONENT asc-devkit
 )
 install(FILES ${LATEST_MANGER_FILES}
-    DESTINATION latest_manager
+    DESTINATION latest_manager COMPONENT asc-devkit
 )
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/package/latest_manager/scripts/
-    DESTINATION latest_manager
+    DESTINATION latest_manager COMPONENT asc-devkit
 )
 install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
-    DESTINATION asc-devkit
+    DESTINATION asc-devkit COMPONENT asc-devkit
     RENAME version.info
 )
 install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
