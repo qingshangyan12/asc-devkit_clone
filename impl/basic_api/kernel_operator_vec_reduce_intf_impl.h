@@ -140,7 +140,7 @@ __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTens
     ReduceDataBlock<NewReduceType::MIN>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
-template <NewReduceType reduceType, typename T, bool isSetMask=true>
+template <NewReduceType reduceType, typename T, bool isSetMask>
 __aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
@@ -255,7 +255,7 @@ __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTens
     ReduceDataBlock<NewReduceType::MIN>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
-template <NewReduceType reduceType, typename T, bool isSetMask=true>
+template <NewReduceType reduceType, typename T, bool isSetMask>
 __aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[],
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
@@ -301,7 +301,7 @@ __aicore__ inline void ReduceRepeat(const LocalTensor<U>& dst, const LocalTensor
     if constexpr (reduceType == NewReduceType::SUM) {
         WholeReduceSum<T, isSetMask, U>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
     } else {
-        static_assert(T == U, "current ReduceRepeat for MAX/MIN only support same src and dst types");
+        static_assert(std::is_same_v<T,U>, "current ReduceRepeat for MAX/MIN only support same src and dst types");
         if constexpr (reduceType == NewReduceType::MAX) {
             WholeReduceMax<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
         } else {
@@ -318,7 +318,7 @@ __aicore__ inline void ReduceRepeat(const LocalTensor<U>& dst, const LocalTensor
         if constexpr (reduceType == NewReduceType::SUM) {
         WholeReduceSum<T, isSetMask, U>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
     } else {
-        static_assert(T == U, "current ReduceRepeat for MAX/MIN only support same src and dst types");
+        static_assert(std::is_same_v<T,U>, "current ReduceRepeat for MAX/MIN only support same src and dst types");
         if constexpr (reduceType == NewReduceType::MAX) {
             WholeReduceMax<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
         } else {
