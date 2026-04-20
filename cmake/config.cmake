@@ -17,7 +17,7 @@ elseif(DEFINED ENV{ASCEND_OPP_PATH})
 else()
     set(ASCEND_CANN_PACKAGE_PATH "/usr/local/Ascend/cann")
 endif()
-
+# 以上可以删除
 if (NOT EXISTS "${ASCEND_CANN_PACKAGE_PATH}")
     message(FATAL_ERROR "${ASCEND_CANN_PACKAGE_PATH} does not exist, please install the cann package and set environment variables.")
 endif()
