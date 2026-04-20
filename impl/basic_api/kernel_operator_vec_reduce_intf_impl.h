@@ -62,7 +62,6 @@ template <NewReduceType reduceType, typename T, bool isSetMask>
 __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
- // 根据 reduceType 抽取不同的 dfx name 和校验名
     constexpr char const* apiName = []() -> char const* {
         if constexpr (reduceType == NewReduceType::SUM) return "ReduceDataBlock<NewReduceType::SUM>";
         else if constexpr (reduceType == NewReduceType::MAX) return "ReduceDataBlock<NewReduceType::MAX>";
@@ -313,7 +312,7 @@ __aicore__ inline void ReduceRepeat(const LocalTensor<U>& dst, const LocalTensor
     const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride, ReduceOrder order)
 {
-        if constexpr (reduceType == NewReduceType::SUM) {
+    if constexpr (reduceType == NewReduceType::SUM) {
         WholeReduceSum<T, isSetMask, U>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
     } else {
         static_assert(std::is_same_v<T,U>, "current ReduceRepeat for MAX/MIN only support same src and dst types");
@@ -522,8 +521,8 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
 #if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        "WholeReduceMin")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMin", KernelFuncType::MASK_BIT_MODE);
+        "WholeReduceMax")) {
+        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMax", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
     WholeReduceMaxImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask,
@@ -667,8 +666,8 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
 #if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        "WholeReduceMin")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMin", KernelFuncType::MASK_BIT_MODE);
+        "WholeReduceMax")) {
+        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMax", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
     WholeReduceMaxImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
