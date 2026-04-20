@@ -8,10 +8,10 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-cmake_minimum_required(VERSION 3.16.0)
-include(../fetch_cann_cmake.cmake)
-project(ascendc_tiling_api)
+# cmake_minimum_required(VERSION 3.16.0)
+# include(../fetch_cann_cmake.cmake)
+# project(ascendc_tiling_api)
 
-init_cann_project()
-set(INSTALL_LIBRARY_DIR ${CMAKE_HOST_SYSTEM_PROCESSOR}-linux/lib64/device)
-add_subdirectory(../../impl/adv_api/tiling tiling)
+# init_cann_project()
+# set(INSTALL_LIBRARY_DIR ${CMAKE_HOST_SYSTEM_PROCESSOR}-linux/lib64/device)
+# add_subdirectory(../../impl/adv_api/tiling tiling)

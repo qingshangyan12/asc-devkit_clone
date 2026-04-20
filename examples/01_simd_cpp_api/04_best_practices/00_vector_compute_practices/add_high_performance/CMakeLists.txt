@@ -11,26 +11,30 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
+
 find_package(ASC REQUIRED HINTS $ENV{ASCEND_INSTALL_PATH}/compiler/tikcpp/ascendc_kernel_cmake)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(CASE_TYPE 0 CACHE STRING "Case type to compile (0-7)")
+set(SCENARIO 0 CACHE STRING "Case type to compile (0-6)")
 
 add_executable(demo
     add.asc
 )
 
-target_compile_definitions(demo PRIVATE
-    CASE_TYPE=${CASE_TYPE}
-)
+if(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
+    set(NPU_ARCH_ID 2201)
+elseif(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
+    set(NPU_ARCH_ID 3510)
+else()
+    message(FATAL_ERROR "Unsupported CMAKE_ASC_ARCHITECTURES=${CMAKE_ASC_ARCHITECTURES}, only dav-2201 and dav-3510 are supported")
+endif()
 
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-    dl
+target_compile_definitions(demo PRIVATE
+    SCENARIO=${SCENARIO}
+    NPU_ARCH=${NPU_ARCH_ID}
 )
 
 # ======================================================================================
@@ -39,6 +43,7 @@ target_link_libraries(demo PRIVATE
 # 说明：
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
+
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )

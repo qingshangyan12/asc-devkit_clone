@@ -46,8 +46,7 @@
 - 样例实现：  
   本样例中实现的是固定shape为输入input_x[1,256]，input_y[1,256]，输出output_z[1,256]的fill样例，所用API详细介绍请参考[Fill API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0891.html)。
 
-  - Kernel实现
-
+  - Kernel实现  
     计算逻辑包含以下步骤：
     1. 使用Fill高阶API将输出Global Memory初始化为当前核的blockIdx值
     2. 设置MTE3_MTE2同步事件，确保Fill操作完成后再进行后续的Unified Buffer操作
@@ -57,8 +56,7 @@
     
     整个过程展示了Fill API的典型使用场景：在正式计算前预先初始化输出空间。
 
-  - Tiling实现
-
+  - Tiling实现  
     本样例中，无需tiling实现。
 
   - 调用实现  
