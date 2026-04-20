@@ -59,22 +59,22 @@ private:
             blockCount = GetTotalRowShape(srcLayout);
             blockLen = GetTotalColumnShape(srcLayout) * sizeof(SRC_TYPE);
 
-            srcStride = GetRowStride<1>(srcLayout) * sizeof(SRC_TYPE);
-            dstStride = GetRowStride<1>(dstLayout) * sizeof(DST_TYPE);
+            srcStride = GetElement<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout) * sizeof(SRC_TYPE);
+            dstStride = GetElement<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout) * sizeof(DST_TYPE);
 
         } else if constexpr (IsDNExtLayout<U>() && IsDNExtLayout<T>()) {
             blockCount = GetTotalColumnShape(srcLayout);
             blockLen = GetTotalRowShape(srcLayout) * sizeof(SRC_TYPE);
 
-            srcStride = GetColumnStride<1>(srcLayout) * sizeof(SRC_TYPE);
-            dstStride = GetColumnStride<1>(dstLayout) * sizeof(DST_TYPE);
+            srcStride = GetElement<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) * sizeof(SRC_TYPE);
+            dstStride = GetElement<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) * sizeof(DST_TYPE);
 
         } else if constexpr (IsNZLayout<U>() && IsNZLayout<T>()) { // NZ format
-            blockCount = GetColumnShape<1>(srcLayout);
-            blockLen = GetTotalRowShape(srcLayout) * GetColumnShape<0>(srcLayout) * sizeof(SRC_TYPE);
+            blockCount = GetElement<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+            blockLen = GetTotalRowShape(srcLayout) * GetElement<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout) * sizeof(SRC_TYPE);
 
-            srcStride = GetColumnStride<1>(srcLayout) * sizeof(SRC_TYPE);
-            dstStride = GetColumnStride<1>(dstLayout) * sizeof(DST_TYPE);
+            srcStride = GetElement<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) * sizeof(SRC_TYPE);
+            dstStride = GetElement<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) * sizeof(DST_TYPE);
         } else {
             static_assert((IsNDExtLayout<U>() && IsNDExtLayout<T>()) || (IsDNExtLayout<U>() && IsDNExtLayout<T>())
                               || (IsNZLayout<U>() && IsNZLayout<T>()),

@@ -29,25 +29,6 @@
 namespace AscendC {
 namespace Te {
 
-template <typename T>
-struct GetTypeFromFourDimTrait;
-
-template <typename PtrPattern, typename Pointer, typename Shape1, typename Shape2, typename Stride1, typename Stride2,
-    typename LayoutPattern>
-struct GetTypeFromFourDimTrait<
-    LocalTensor<TensorAttribute<ViewEngine<HardwareMemPtr<PtrPattern, Pointer>>,
-        Layout<Shape<Shape1, Shape2>, Stride<Stride1, Stride2>, LayoutPattern>>>> {
-    using ShapeRowsZeroDim = typename Std::tuple_element<0, Shape1>::type;
-    using ShapeRowsOneDim = typename Std::tuple_element<1, Shape1>::type;
-    using ShapeColumnsZeroDim = typename Std::tuple_element<0, Shape2>::type;
-    using ShapeColumnsOneDim = typename Std::tuple_element<1, Shape2>::type;
-
-    using StrideRowsZeroDim = typename Std::tuple_element<0, Stride1>::type;
-    using StrideRowsOneDim = typename Std::tuple_element<1, Stride1>::type;
-    using StrideColumnsZeroDim = typename Std::tuple_element<0, Stride2>::type;
-    using StrideColumnsOneDim = typename Std::tuple_element<1, Stride2>::type;
-};
-
 // 辅助模板：将类型统一转换为 tuple
 template <typename T, bool IsTuple>
 struct ToTupleImpl;
@@ -95,9 +76,14 @@ struct GetTypeFromNDimTrait<
     using StrideColDim = typename Std::tuple_element<Dim, StrideColTuple>::type;
 };
 
-enum class AttrInfo : uint8_t {SHAPE, STRIDE, ROW, COLUMN};
+namespace AttrInfo {
+    struct SHAPE {};
+    struct STRIDE {};
+    struct ROW {};
+    struct COLUMN {};
+};
 
-template <typename T, AttrInfo info1, AttrInfo info2, size_t dim>
+template <typename T, typename info1, typename info2, size_t dim>
 struct GetNDimType;
 
 template <typename T, size_t dim>
@@ -120,53 +106,17 @@ struct GetNDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, dim> {
     using type = Std::remove_cvref_t<typename GetTypeFromNDimTrait<T>::template StrideColDim<dim>>;
 };
 
-template <typename T, AttrInfo info1, AttrInfo info2, size_t dim> 
-struct GetFourDimType;
-
-template <typename T>
-struct GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0> {
-    using type = Std::remove_cvref_t<typename GetTypeFromFourDimTrait<T>::ShapeRowsZeroDim>;
-};
-template <typename T>
-struct GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 1> {
-    using type = Std::remove_cvref_t<typename GetTypeFromFourDimTrait<T>::ShapeRowsOneDim>;
-};
-template <typename T>
-struct GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0> {
-    using type = Std::remove_cvref_t<typename GetTypeFromFourDimTrait<T>::ShapeColumnsZeroDim>;
-};
-template <typename T>
-struct GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 1> {
-    using type = Std::remove_cvref_t<typename GetTypeFromFourDimTrait<T>::ShapeColumnsOneDim>;
-};
-template <typename T>
-struct GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0> {
-    using type = Std::remove_cvref_t<typename GetTypeFromFourDimTrait<T>::StrideRowsZeroDim>;
-};
-template <typename T>
-struct GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1> {
-    using type = Std::remove_cvref_t<typename GetTypeFromFourDimTrait<T>::StrideRowsOneDim>;
-};
-template <typename T>
-struct GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0> {
-    using type = Std::remove_cvref_t<typename GetTypeFromFourDimTrait<T>::StrideColumnsZeroDim>;
-};
-template <typename T>
-struct GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1> {
-    using type = Std::remove_cvref_t<typename GetTypeFromFourDimTrait<T>::StrideColumnsOneDim>;
-};
-
 template <typename T>
 struct CheckArrangement {
     using type = typename T::elementType;
-    using ShapeRow0Type = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-    using ShapeRow1Type = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 1>::type;
-    using ShapeColumn0Type = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-    using ShapeColumn1Type = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 1>::type;
-    using StrideRow0Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-    using StrideRow1Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
-    using StrideColumn0Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-    using StrideColumn1Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
+    using ShapeRow0Type = typename GetNDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+    using ShapeRow1Type = typename GetNDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 1>::type;
+    using ShapeColumn0Type = typename GetNDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+    using ShapeColumn1Type = typename GetNDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 1>::type;
+    using StrideRow0Type = typename GetNDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+    using StrideRow1Type = typename GetNDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
+    using StrideColumn0Type = typename GetNDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+    using StrideColumn1Type = typename GetNDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
 
     __aicore__ inline static constexpr bool IsScaleType() {
  	    return is_one_of_attr_v<type, fp8_e8m0_t>;

@@ -67,8 +67,7 @@ private:
     template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
     {
-        // CheckLayoutPattern<T>
-        // CheckLayoutPattern<U>
+        // CheckLayoutPattern<U, T>();
     }
 
     template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U>
@@ -79,13 +78,13 @@ private:
 
         uint32_t nSize = Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout));
         uint32_t mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
-        uint32_t srcStride = GetColumnStride<1>(srcLayout) / FRACTAL_FIXED;
+        uint32_t srcStride = GetElement<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
         uint32_t dstStride = 0;
 
         if constexpr (IsNDExtLayout<T>()) {
-            dstStride = GetRowStride<1>(dstLayout);
+            dstStride = GetElement<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
         } else {
-            dstStride = GetColumnStride<1>(dstLayout);
+            dstStride = GetElement<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout);
         }
 
         bool reluEn = trait.enableRelu;
@@ -116,8 +115,7 @@ private:
     template <const CopyL0C2GMTrait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
     {
-        // CheckLayoutPattern<T>
-        // CheckLayoutPattern<U>
+        // CheckLayoutPattern<U, T>();
     }
 
     template <const CopyL0C2GMTrait& trait, typename T, typename U, bool IsTail>
@@ -136,12 +134,12 @@ private:
         }
 
         const uint32_t mSize = GetTotalRowShape(srcLayout);
-        const uint32_t srcStride = GetColumnStride<1>(srcLayout) / FRACTAL_FIXED;
+        const uint32_t srcStride = GetElement<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
         uint32_t dstStride = 0;
         if constexpr (IsNDExtLayout<T>()) {
-            dstStride = GetRowStride<1>(dstLayout);
+            dstStride = GetElement<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
         } else {
-            dstStride = GetColumnStride<1>(dstLayout);
+            dstStride = GetElement<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout);
         }
 
         const bool reluEnable = trait.enableRelu;
