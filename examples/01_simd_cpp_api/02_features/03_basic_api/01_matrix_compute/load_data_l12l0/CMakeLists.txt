@@ -1,8 +1,5 @@
-#!/usr/bin/python3
-# coding=utf-8
-
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -11,23 +8,27 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+cmake_minimum_required(VERSION 3.16)
 
-import os
-import numpy as np
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 
+find_package(ASC REQUIRED)
 
-def gen_golden_data_simple():
-    input_x = np.random.randn(2, 32, 16, 16).astype(np.float16)
-    # 将NCHW (2, 32, 16, 16) 转换为NC1HWC0 (2, 2, 16, 16, 16)
-    # 1. 将C维度拆分为C1和C0
-    # 2. 调整维度顺序
-    golden = input_x.reshape(2, 2, 16, 16, 16).transpose(0, 1, 3, 4, 2)
+project(kernel_samples LANGUAGES ASC CXX)
 
-    os.makedirs("input", exist_ok=True)
-    os.makedirs("output", exist_ok=True)
-    input_x.tofile("./input/input_x.bin")
-    golden.tofile("./output/golden.bin")
+add_executable(demo
+    load_data_l12l0.asc
+)
 
+target_link_libraries(demo PRIVATE)
 
-if __name__ == "__main__":
-    gen_golden_data_simple()
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
+)
+
+target_compile_options(demo PRIVATE
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+)

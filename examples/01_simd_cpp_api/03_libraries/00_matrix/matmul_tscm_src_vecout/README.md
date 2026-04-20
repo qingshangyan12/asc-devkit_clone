@@ -17,15 +17,13 @@
 │   └── matmul_tscm_src_vecout.asc              // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例中自定义A矩阵从VECOUT到L1的数据搬入，使A矩阵全部数据常驻在L1中，调用Matmul API计算时，A矩阵为TSCM输入，B矩阵设为GM输入，对输入的A、B矩阵做矩阵乘和加Bias偏置。
 
 - 约束条件
   - TSCM输入的矩阵必须能在L1 Buffer上全载。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 32, N = 256, K = 32。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

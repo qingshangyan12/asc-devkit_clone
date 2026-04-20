@@ -52,8 +52,7 @@
 - 样例实现：  
   本样例中实现的是固定shape为输入src[1, 32]，输出dst[1, 32]的gelu_custom样例。
 
-  - Kernel实现
-
+  - Kernel实现  
     核心计算步骤：将输入数据从Global Memory搬运到Local Tensor后，调用 `AscendC::Gelu(dstLocal, srcLocal, dataSize)` 完成GELU计算，再将结果搬回Global Memory。
 
   - 调用实现  
@@ -62,7 +61,7 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -98,14 +97,12 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
-
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `NPU_ARCH` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
-- 执行结果
-
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

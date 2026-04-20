@@ -25,8 +25,7 @@
 
 ## 样例描述
 
-- 样例功能： 
-
+- 样例功能：  
   调用Matmul高阶API时开启A、B矩阵的IBShare功能，计算过程中同一AIC对应的两个AIV在每次迭代时用到的A、B矩阵在L1 Buffer上的数据一致。
 
   A矩阵与B矩阵均使能IBShare时，不对k列进行切分计算；均未使能IBSHARE时，按照k列进行切分计算。通过对比两种场景的运行时间，可以得出该特性的性能提升。
@@ -34,8 +33,7 @@
   不使能AB矩阵ibshareAB场景的数据处理说明图示(A矩阵和B矩阵切分处理)：![alt text](./pictures/matmul_noABshare.png)  
 
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 128, N = 256, K = 384。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>

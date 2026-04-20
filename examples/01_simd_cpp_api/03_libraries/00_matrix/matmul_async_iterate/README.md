@@ -18,12 +18,10 @@
 │   └── matmul_async_iterate.asc              // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例实现调用Iterate和GetTensorC输出到VECIN的异步场景矩阵乘计算。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 640, N = 1024, K = 512。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

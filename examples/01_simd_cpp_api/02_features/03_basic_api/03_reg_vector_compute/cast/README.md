@@ -27,8 +27,7 @@
   - 说明：从half到int32_t的Cast指令每次处理64个数据，具体流程和示意图如下：
     - 搬入：调用LoadAlign接口，使用解压缩模式，搬入数据至2\*N位置，同时2\*N+1位置置0
     - 计算：调用Cast接口，输入输出位宽比为1:2，所以从xReg的2\*N位置读取数据，类型转换后依次写入至yReg
-    - 搬出：调用StoreAlign接口，常规搬出
-
+    - 搬出：调用StoreAlign接口，常规搬出  
     <img src="figure/reg_cast_1.png">
   - 样例规格：
     <table>
@@ -38,9 +37,9 @@
     <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 256]</td><td align="center">int32_t</td></tr>
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">cast</td></tr>
     </table>
-  - 样例实现：
+  - 样例实现：  
     CastVF函数内调用Cast接口进行计算，结果写回UB
-    - 调用实现
+    - 调用实现  
       使用内核调用符<<<>>>调用核函数。
 
   **场景2：数据类型位宽大转小**
@@ -49,8 +48,7 @@
   - 说明：从half到int32_t的Cast指令每次处理64个数据，具体流程和示意图如下：
     - 搬入：调用LoadAlign接口，常规搬入
     - 计算：调用Cast接口，输入输出位宽比为2:1，所以从xReg依次读取数据，类型转换后依次写入至yReg的2\*N位置，同时2\*N+1位置置0
-    - 搬出：调用StoreAlign接口，采用压缩模式，仅搬出2\*N位置的数据
-
+    - 搬出：调用StoreAlign接口，采用压缩模式，仅搬出2\*N位置的数据  
     <img src="figure/reg_cast_2.png">
   - 样例规格：
     <table>
@@ -67,7 +65,7 @@
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -111,8 +109,7 @@
 | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
-- 执行结果
-
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

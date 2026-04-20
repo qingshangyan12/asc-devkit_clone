@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -11,20 +11,24 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-
 import sys
+import argparse
 import numpy as np
 import tensorflow as tf
 
 
-relative_tol = 1e-3
-absolute_tol = 1e-5
-error_tol = 1e-3
+relative_tol = 1e-6
+absolute_tol = 1e-9
+error_tol = 1e-4
 
 
-def verify_result(output, golden):
-    output = np.fromfile(output, dtype=np.float16).reshape(-1)
-    golden = np.fromfile(golden, dtype=np.float16).reshape(-1)
+def verify_result(scenarioNum, output, golden):
+    if scenarioNum > 6:
+        output_type = np.float32
+    else:
+        output_type = np.int32
+    output = np.fromfile(output, dtype=output_type).reshape(-1)
+    golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=relative_tol,
@@ -42,13 +46,17 @@ def verify_result(output, golden):
         if index == 100:
             break
     error_ratio = float(different_element_indexes.size) / golden.size
-    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, error_tol))
     return error_ratio <= error_tol
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 16))
+    parser.add_argument('output', type=str)
+    parser.add_argument('golden', type=str)
+    args = parser.parse_args()
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
+        res = verify_result(args.scenarioNum, args.output, args.golden)
         if not res:
             raise ValueError("[ERROR] result error")
         else:
