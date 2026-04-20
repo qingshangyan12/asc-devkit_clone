@@ -817,17 +817,30 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     target_include_directories(ccl_kernel PRIVATE ${ORION_HEAD_LIST})
 
     if(TARGET mc2_server)
+        target_compile_definitions(mc2_server PRIVATE
+            $<TARGET_PROPERTY:ccl_kernel,COMPILE_DEFINITIONS>
+        )
+        target_compile_options(mc2_server PRIVATE
+            $<TARGET_PROPERTY:ccl_kernel,COMPILE_OPTIONS>
+        )
         target_include_directories(mc2_server PRIVATE
             ${CCL_KERNEL_INCLUDE_LIST}
             ${ORION_HEAD_LIST}
         )
         target_link_libraries(mc2_server PRIVATE
-            ccl_kernel
+            -Wl,--no-as-needed
+            c_sec
+            ccl_kernel_plf
+            mmpa
+            -Wl,--as-needed
+            -lrt
+            -ldl
+            -lpthread
         )
-        add_dependencies(mc2_server ccl_kernel)
     endif()
 
     add_subdirectory(device)
+
 endif()
 
 target_include_directories(hcomm PRIVATE ${ORION_HEAD_LIST})
