@@ -206,10 +206,10 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
     
     auto NnLayout = MakeFrameLayout<NNLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(16, 48); // (scaleK, n)
     auto Zzlayout = MakeFrameLayout<ZZLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(48, 16); // (m, scaleK)
-    auto MxANDLayout = MakeFrameLayout<ScaleANDExtLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(48, 16); // (m, scaleK) 不转置
-    auto MxADNLayout = MakeFrameLayout<ScaleADNExtLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(48, 16); // (m, scaleK) 转置
-    auto MxBNDLayout = MakeFrameLayout<ScaleBNDExtLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(16, 48); // (scaleK, n) 不转置
-    auto MxBDNLayout = MakeFrameLayout<ScaleBDNExtLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(16, 48); // (scaleK, n) 转置
+    auto MxANDLayout = MakeFrameLayout<ScaleANDLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(48, 16); // (m, scaleK) 不转置
+    auto MxADNLayout = MakeFrameLayout<ScaleADNLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(48, 16); // (m, scaleK) 转置
+    auto MxBNDLayout = MakeFrameLayout<ScaleBNDLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(16, 48); // (scaleK, n) 不转置
+    auto MxBDNLayout = MakeFrameLayout<ScaleBDNLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(16, 48); // (scaleK, n) 转置
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(NnLayout)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(NnLayout)), 16);
