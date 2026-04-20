@@ -42,7 +42,10 @@ __aicore__ inline void ScmDataCopyMsg(__cbuf__ void* dst, __gm__ void* src, cons
     int32_t ubAddr)
 {
     ASSERT(g_coreType == AIV);
-    ASSERT(GetKfcClient() != nullptr);
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ASCENDC_DEBUG_ASSERT((GetKfcClient() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "ScmDataCopyMsg requires KFC capability to be enabled through REG_MATMUL_OBJ.\n"));
+#endif
     auto msg = GetKfcClient()->AllocMessage();
     ASSERT(sizeof(msg->buffer) >= sizeof(struct Gm2L1Params));
 
