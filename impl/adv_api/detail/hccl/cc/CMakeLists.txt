@@ -24,21 +24,17 @@ if(CCAHE_PROGRAM)
 endif()
 
 if((BUILD_OPEN_PROJECT AND KERNEL_MODE) OR AARCH_MODE)
-    # need to switch
-    set(CMAKE_SYSTEM_NAME Linux)
-    set(CMAKE_SYSTEM_PROCESSOR aarch64)
-    #Change the path to the absolute path of the cross compilation tool after the toolkit package is decompressed
-    # set cross compile toolchain dir
     set(TOOLCHAIN_DIR ${ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc)
-    #Specify cross compiler
     message(STATUS "TOOLCHAIN_DIR=${TOOLCHAIN_DIR}")
     if (NOT "x${TOOLCHAIN_DIR}" STREQUAL "x")
         if (NOT IS_DIRECTORY ${TOOLCHAIN_DIR})
             message(FATAL_ERROR "specify cross compile toolchain directory(${TOOLCHAIN_DIR}) is not exist")
         endif()
     endif()
-    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/bin/aarch64-target-linux-gnu-g++)
-    set(CMAKE_C_COMPILER   ${TOOLCHAIN_DIR}/bin/aarch64-target-linux-gnu-gcc)
+    if (NOT EXISTS ${TOOLCHAIN_DIR}/bin/aarch64-target-linux-gnu-gcc OR
+        NOT EXISTS ${TOOLCHAIN_DIR}/bin/aarch64-target-linux-gnu-g++)
+        message(FATAL_ERROR "aarch64 cross compiler is not found in ${TOOLCHAIN_DIR}/bin")
+    endif()
 endif()
 
 set(CMAKE_C_FLAGS_RELEASE "")
