@@ -14,8 +14,8 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 
 if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
- 	    message(FATAL_ERROR "CMAKE_ASC_ARCHITECTURES must be dav-3510，but got ${CMAKE_ASC_ARCHITECTURES}")
- 	endif()
+    message(FATAL_ERROR "CMAKE_ASC_ARCHITECTURES must be dav-3510，but got ${CMAKE_ASC_ARCHITECTURES}")
+endif()
 
 find_package(ASC REQUIRED)
 

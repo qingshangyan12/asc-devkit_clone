@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于SetCtrlSpr、GetCtrlSpr、ResetCtrlSpr接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能。CTRL寄存器用于控制数据从L0C Buffer/Unified Buffer/L1 Buffer搬运至Global Memory时原子操作的使能及数据类型选择，通过SetCtrlSpr设置特定比特位使能原子操作，GetCtrlSpr读取验证设置结果，ResetCtrlSpr重置比特位恢复默认状态。展示了三个系统变量访问API的联合使用场景，用于实现原子操作模式的动态配置与验证。
+本样例基于SetCtrlSpr、GetCtrlSpr、ResetCtrlSpr接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能。
 
 ## 支持的产品
 
@@ -81,10 +81,10 @@
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  |------|------|---------|--------|
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
-  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-3510 |
+  | 参数 | 可选值 | 说明 | 默认值 |
+  |------|--------|------|--------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 | `npu` |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`、`dav-3510` | NPU 硬件架构 | `dav-2201` |
 
 - 执行结果
 
@@ -92,64 +92,3 @@
   ```bash
   test pass
   ```
-
-## API说明
-
-### GetCtrlSpr
-
-读取CTRL寄存器特定比特位上的值。
-
-```cpp
-template <int8_t startBit, int8_t endBit>
-__aicore__ static inline int64_t GetCtrlSpr()
-```
-
-- 参数说明：
-  - `startBit`：起始比特位索引
-  - `endBit`：终止比特位索引
-- 返回值：CTRL寄存器对应比特位上的值
-
-### SetCtrlSpr
-
-对CTRL寄存器的特定比特位进行设置。
-
-```cpp
-template <int8_t startBit, int8_t endBit>
-__aicore__ static inline void SetCtrlSpr(int64_t value)
-```
-
-- 参数说明：
-  - `startBit`：起始比特位索引
-  - `endBit`：终止比特位索引
-  - `value`：起止比特位上新设置的值
-
-### ResetCtrlSpr
-
-对CTRL寄存器的特定比特位做重置。
-
-```cpp
-template <int8_t startBit, int8_t endBit>
-__aicore__ static inline void ResetCtrlSpr()
-```
-
-- 参数说明：
-  - `startBit`：起始比特位索引
-  - `endBit`：终止比特位索引
-
-## CTRL寄存器常用比特位说明
-
-<table>
-<caption>表2：CTRL寄存器常用比特位功能说明</caption>
-<tr><th align="center">CTRL寄存器比特位</th><th align="center">功能</th><th align="center">默认值</th></tr>
-<tr><td align="center">CTRL[8:6]</td><td>控制数据搬运至Global Memory时原子操作的使能及数据类型选择。3'b001表示使能原子操作，数据类型为float</td><td align="center">3'b000</td></tr>
-<tr><td align="center">CTRL[10:9]</td><td>控制原子操作的类型（ADD/MAX/MIN），仅在CTRL[8:6]使能原子操作时生效</td><td align="center">2'b00</td></tr>
-<tr><td align="center">CTRL[48]</td><td>控制浮点数计算和浮点数精度转换时的饱和模式</td><td align="center">1'b0</td></tr>
-<tr><td align="center">CTRL[53]</td><td>控制整数计算指令的饱和模式</td><td align="center">1'b0</td></tr>
-<tr><td align="center">CTRL[60]</td><td>控制饱和模式的全局生效方式</td><td align="center">1'b1</td></tr>
-</table>
-
-## 约束说明
-
-- SetCtrlSpr和ResetCtrlSpr仅支持CTRL[8:6]、CTRL[10:9]、CTRL[45]、CTRL[48]、CTRL[50]、CTRL[53]、CTRL[59]、CTRL[60]比特位
-- 对于CTRL[8:6]和CTRL[10:9]的设置，建议使用原子操作API（SetAtomicAdd、SetAtomicMax、SetAtomicMin等）
-- SetCtrlSpr设置后需要使用硬件事件同步（SetFlag/WaitFlag）确保设置生效后再调用GetCtrlSpr读取
