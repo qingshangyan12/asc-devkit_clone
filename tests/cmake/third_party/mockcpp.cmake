@@ -49,7 +49,7 @@ if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
         set(MOCKCPP_PATCH_FILE "${CANN_3RD_LIB_PATH}/mockcpp-2.7_py3-h3.patch")  # 本地补丁文件路径
 
         set(PATCH_FILE ${MOCKCPP_DOWNLOAD_PATH}/mockcpp-2.7_py3-h3.patch)
-        set(PATCH_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h3/mockcpp-2.7_py3-h3.patch")
+        set(PATCH_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h5/mockcpp-2.7-h5.patch")
 
         # 首先处理补丁文件：检查本地是否存在，不存在则下载
         if (EXISTS "${MOCKCPP_PATCH_FILE}")
