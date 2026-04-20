@@ -38,15 +38,9 @@ TEST_F(Tensor_Api_Atom, CopyGM2L1Operation)
     auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
     atomCopy.Call(l1Dst, gmSrc);
 
-    atomCopy.Call(l1Dst, gmSrc, coord);
-
     CopyAtom<CopyTraits<CopyGM2L1, CopyGM2L1TraitDefault>>{}.Call(l1Dst, gmSrc);
 
-    CopyAtom<CopyTraits<CopyGM2L1, CopyGM2L1TraitDefault>>{}.Call(l1Dst, gmSrc, coord);
-
     Copy(CopyAtom<CopyTraits<CopyGM2L1, CopyGM2L1TraitDefault>>{}, l1Dst, gmSrc);
-
-    Copy(CopyAtom<CopyTraits<CopyGM2L1, CopyGM2L1TraitDefault>>{}, l1Dst, gmSrc, coord);
 
     EXPECT_EQ(dst[0], 0);
 }

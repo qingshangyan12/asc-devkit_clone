@@ -248,7 +248,7 @@ TEST_F(Tensor_Api_Atom, CopyGM2UBND2ND)
     auto gmTensor = MakeTensor(MakeMemPtr<Location::GM>(src), MakeFrameLayout<NDExtLayoutPtn>(m, n));
     auto ubTensor = MakeTensor(MakeMemPtr<Location::UB>(dst), MakeFrameLayout<NDExtLayoutPtn>(m, n));
 
-    Copy(CopyAtom<CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault>>{}, ubTensor, gmTensor, coord);
+    Copy(CopyAtom<CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault>>{}, ubTensor, gmTensor);
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -265,12 +265,11 @@ TEST_F(Tensor_Api_Atom, CopyGM2UBDN2DN)
     __gm__ type src[m * n] = {0};
     __ubuf__ type dst[m * n] = {0};
 
-    auto coord = MakeCoord(MakeCoord(Int<0>{}, Int<0>{}), MakeCoord(Int<0>{}, Int<0>{}));
 
     auto gmTensor = MakeTensor(MakeMemPtr<Location::GM>(src), MakeFrameLayout<DNExtLayoutPtn>(m, n));
     auto ubTensor = MakeTensor(MakeMemPtr<Location::UB>(dst), MakeFrameLayout<DNExtLayoutPtn>(m, n));
 
-    Copy(CopyAtom<CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault>>{}, ubTensor, gmTensor, coord);
+    Copy(CopyAtom<CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault>>{}, ubTensor, gmTensor);
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -287,15 +286,12 @@ TEST_F(Tensor_Api_Atom, CopyGM2UBNZ2NZ)
     __gm__ type src[m * n] = {0};
     __ubuf__ type dst[m * n] = {0};
 
-    auto coord = MakeCoord(MakeCoord(Int<0>{}, Int<0>{}), MakeCoord(Int<0>{}, Int<0>{}));
-    ;
-
     auto gmTensor =
         MakeTensor(MakeMemPtr<Location::GM>(src), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<type>>(m, n));
     auto ubTensor =
         MakeTensor(MakeMemPtr<Location::UB>(dst), MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<type>>(m, n));
 
-    Copy(CopyAtom<CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault>>{}, ubTensor, gmTensor, coord);
+    Copy(CopyAtom<CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault>>{}, ubTensor, gmTensor);
 
     EXPECT_EQ(dst[0], 0);
 }
