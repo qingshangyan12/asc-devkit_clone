@@ -24,24 +24,18 @@ add_executable(demo
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
 
+if(NOT DEFINED SCENARIO_NUM)
+    message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=1/2/3/4/5/6")
+endif()
+
+if(NOT SCENARIO_NUM EQUAL 1 AND NOT SCENARIO_NUM EQUAL 2 AND NOT SCENARIO_NUM EQUAL 3 AND NOT SCENARIO_NUM EQUAL 4 AND NOT SCENARIO_NUM EQUAL 5 AND NOT SCENARIO_NUM EQUAL 6)
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4, 5, or 6, got: ${SCENARIO_NUM}")
+endif()
+
 target_compile_definitions(demo PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
 )
 
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-    dl
-)
-
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
