@@ -436,7 +436,6 @@ target_link_options(mc2_client PRIVATE
     -Wl,-z,relro
     -Wl,-z,now
     -Wl,-z,noexecstack
-    -Wl,-Bsymbolic-functions
     $<$<CONFIG:Release>:-s>
 )
 
