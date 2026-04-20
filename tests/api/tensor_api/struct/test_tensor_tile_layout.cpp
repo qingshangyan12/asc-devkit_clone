@@ -1062,10 +1062,10 @@ TEST_F(Tensor_Api_Layout, TestStaticLayout)
     auto NzLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<half>>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
     auto ZnLayout = MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<half>>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
     auto NnLayout = MakeFrameLayout<NNLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
-    auto scaleANDLayout = MakeFrameLayout<ScaleANDExtLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
-    auto scaleADNLayout = MakeFrameLayout<ScaleADNExtLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
-    auto scaleBNDLayout = MakeFrameLayout<ScaleBNDExtLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
-    auto scaleBDNLayout = MakeFrameLayout<ScaleBDNExtLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
+    auto scaleANDLayout = MakeFrameLayout<ScaleANDLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
+    auto scaleADNLayout = MakeFrameLayout<ScaleADNLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
+    auto scaleBNDLayout = MakeFrameLayout<ScaleBNDLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
+    auto scaleBDNLayout = MakeFrameLayout<ScaleBDNLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
 
     auto NDShape = GetShape<0>(NDLayout);
     auto staticNDShape = GetShape<0>(StaticNDLayout);
