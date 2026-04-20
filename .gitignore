@@ -42,3 +42,11 @@ oat_reports/
 oat_reports/
 
 log/
+
+/third_party/
+
+/openssl-device-src/
+
+/build_device/
+
+tests/api/adv_api/hccl/cc/ut/aicpu_kfc/build
