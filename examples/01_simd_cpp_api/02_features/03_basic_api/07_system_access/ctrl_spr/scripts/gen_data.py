@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -16,30 +16,28 @@ import os
 import numpy as np
 
 
-def get_range_by_dtype(input_type):
-    try:
-        if input_type == np.float16 or input_type == np.float32 or input_type == np.float64:
-            return np.finfo(input_type).min, np.finfo(input_type).max
-        else:
-            return np.iinfo(input_type).min, np.iinfo(input_type).max
-    except ValueError:
-        print(f"Unsupported data type:{input_type}")
+TOTAL_COUNT = 4
+OUTPUT_TOTAL = 8
 
 
-def gen_golden_data_simple():
-    input_type = np.float32
-    output_type = np.float32
-    min_val, max_val = get_range_by_dtype(input_type)
-    block_length = 1024
-    input_shape = [block_length]
-    output_shape = [block_length]
-    input_x = np.random.uniform(min_val / 3, max_val / 3, input_shape).astype(input_type)
-    golden = input_x
-    os.makedirs("input", exist_ok=True)
+def gen_golden_data():
+    """
+    生成Golden数据：
+    - [0-3]：SetCtrlSpr(1)后的寄存器值 → 全为1（int64_t）
+    - [3-7]：ResetCtrlSpr后的寄存器值 → 全为0（int64_t）
+    
+    CTRL[8:6]比特位功能说明：
+    - 3'b000（值=0）：不使能原子操作
+    - 3'b001（值=1）：使能原子操作，数据类型为float
+    """
     os.makedirs("output", exist_ok=True)
-    input_x.tofile("./input/input_x.bin")
+    
+    golden = np.zeros(OUTPUT_TOTAL, dtype=np.int64)
+    golden[0:TOTAL_COUNT] = 1
+    golden[TOTAL_COUNT:OUTPUT_TOTAL] = 0
+    
     golden.tofile("./output/golden.bin")
 
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    gen_golden_data()
