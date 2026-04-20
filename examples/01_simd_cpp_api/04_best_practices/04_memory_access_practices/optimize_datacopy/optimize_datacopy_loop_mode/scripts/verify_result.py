@@ -14,7 +14,6 @@
 
 import sys
 import numpy as np
-import tensorflow as tf
 
 
 float32 = tf.float32.as_numpy_dtype
