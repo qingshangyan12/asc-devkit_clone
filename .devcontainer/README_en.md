@@ -19,6 +19,32 @@ Ubuntu 24.04 containerized development environment for AscendC NPU kernel develo
 > [!IMPORTANT]
 > The host's Ascend driver directory (`/usr/local/Ascend/driver`) is mounted into the container as **read-only**. The **CANN toolkit and ops packages** should be installed inside the container after startup, not on the host — installing on the host tends to pollute the host environment and cause confusing environment variable exports.
 
+### Check Docker and buildx
+
+Confirm Docker is installed with version ≥ 23.0.0:
+
+```bash
+docker --version
+```
+
+If the command is missing or the version is too low, follow the [Docker official installation guide](https://docs.docker.com/engine/install/) to install or upgrade.
+
+> [!TIP]
+> It is recommended to add the current user to the `docker` group to avoid needing `sudo` every time:
+> ```bash
+> sudo usermod -aG docker $USER && newgrp docker
+> ```
+
+Image building depends on the `docker buildx` plugin. Run `docker buildx version` to check; if the command is not found, install it:
+
+```bash
+mkdir -p /usr/local/lib/docker/cli-plugins
+ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+curl -fsSL "https://github.com/docker/buildx/releases/latest/download/buildx-linux-${ARCH}" \
+     -o /usr/local/lib/docker/cli-plugins/docker-buildx
+chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
+```
+
 ## Quick Start (Human Users)
 
 > [!NOTE]
@@ -34,30 +60,16 @@ Download and install the version for your platform from the [Visual Studio Code]
 
 In VS Code, press `Ctrl+Shift+X` to open the Extensions view, then search for and install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
-### Step 3: Install Docker
-
-Follow the [Docker official installation guide](https://docs.docker.com/engine/install/) and verify that the version is ≥ 23.0.0:
-
-```bash
-docker --version
-```
-
-> [!TIP]
-> It is recommended to add the current user to the `docker` group to avoid needing `sudo` every time:
-> ```bash
-> sudo usermod -aG docker $USER && newgrp docker
-> ```
-
-### Step 4: Clone the repository
+### Step 3: Clone the repository
 
 ```bash
 git clone https://gitcode.com/cann/asc-devkit.git
 cd asc-devkit
 ```
 
-### Step 5: Prepare based on NPU availability
+### Step 4: Prepare based on NPU availability
 
-#### 5.1 With NPU: verify driver and device nodes
+#### 4.1 With NPU: verify driver and device nodes
 
 On the host, run:
 
@@ -71,7 +83,7 @@ If any command fails or returns no output, the Ascend driver is not ready. Refer
 
 If the host has fewer than 8 NPUs, edit `.devcontainer/devcontainer.json` and remove the extra `--device=/dev/davinciN` lines (run `ls /dev/davinci*` to check the actual device count).
 
-#### 5.2 Without NPU: adjust devcontainer.json
+#### 4.2 Without NPU: adjust devcontainer.json
 
 Machines without NPU must first remove device and driver mount configurations.
 
@@ -92,7 +104,7 @@ source=/etc/ascend_install.info,...
 
 Keep the `ccache` volume and any data directories you added yourself.
 
-### Step 6: Open the project in the container
+### Step 5: Open the project in the container
 
 Open this project directory in VS Code, press `Ctrl+Shift+P`, and run:
 
@@ -102,11 +114,11 @@ Dev Containers: Reopen in Container
 
 The Dev Containers extension will automatically build the image and start the container. The first build takes about 5 minutes (mostly downloading the conda environment and PyTorch); subsequent opens hit the Docker layer cache and complete in seconds.
 
-### Step 7: Install CANN inside the container
+### Step 6: Install CANN inside the container
 
 After the container starts, in the container terminal refer to the [📥 Download and Install CANN Packages](../docs/quick_start.md#cann-install) section to download and install the toolkit and ops packages.
 
-### Step 8: Verify environment
+### Step 7: Verify environment
 
 In the container terminal, refer to the [✅ Environment Verification](../docs/quick_start.md#cann-verify) section to confirm NPU device and CANN package status, then follow [⚙️ Environment Variable Configuration](../docs/quick_start.md#cann-env-setup) to load the environment variables. You can then begin kernel development.
 
@@ -122,19 +134,9 @@ AI Agents (such as Claude Code, CI runners) can run the container directly witho
 
 After confirmation, **show the user the exact `docker run` command** you are about to execute and wait for user confirmation before proceeding.
 
+For Docker and buildx checks and installation, see [Check Docker and buildx](#check-docker-and-buildx).
+
 ### Build the image
-
-The build command depends on `docker buildx`. If it is not installed, run:
-
-```bash
-mkdir -p /usr/local/lib/docker/cli-plugins
-ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
-curl -fsSL "https://github.com/docker/buildx/releases/latest/download/buildx-linux-${ARCH}" \
-     -o /usr/local/lib/docker/cli-plugins/docker-buildx
-chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
-```
-
-Then build the image:
 
 ```bash
 docker buildx build --network host -t ascendc:ubuntu24.04 .devcontainer/
@@ -168,19 +170,16 @@ docker run -itd --name ascendc_container \
 
 If the host has fewer than 8 NPUs, remove the corresponding `--device=/dev/davinciN` lines (run `ls /dev/davinci*` to check the actual device count).
 
-If the user needs to mount data directories, append each as `-v /host/path:/container/path`.
-
 ### Without NPU
 
 ```bash
 docker run -itd --name ascendc_container ascendc:ubuntu24.04
 ```
 
-If the user needs to mount data directories, append each as `-v /host/path:/container/path`.
-
 > [!IMPORTANT]
 >
-> After the container starts, CANN toolkit and ops packages must be installed manually inside the container. Ask the user for the CANN package paths or installer commands, or refer to the [📥 Download and Install CANN Packages](../docs/quick_start.md#cann-install) section.
+> - If the user needs to mount data directories, append each as `-v /host/path:/container/path`.
+> - After the container starts, CANN toolkit and ops packages must be installed manually inside the container. Ask the user for the CANN package paths or installer commands, or refer to the [📥 Download and Install CANN Packages](../docs/quick_start.md#cann-install) section.
 
 ## Python Environment
 
