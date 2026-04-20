@@ -145,7 +145,8 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const SrcLa
         "SrcLayout Rank must be equal to DstLayout Rank");
 
     auto sliceLayout = MakeCoordLayout(coord, srcLayout);
-    auto sliceShape = TransformTupleApply(sliceLayout.Shape(), dstLayout.Shape(), MinOp{});
+    auto outerShape = TransformTupleApply(GetShape<1>(sliceLayout), GetShape<1>(dstLayout), MinOp{});
+    auto sliceShape = MakeShape(srcLayout.template Shape<0>(), outerShape);
     using TraitType = GetLayoutTrait<SrcLayoutType>;
     using PatternType = GetLayoutPattern<SrcLayoutType>;
     return MakePatternLayout<PatternType, TraitType>(sliceShape, srcLayout.Stride());
