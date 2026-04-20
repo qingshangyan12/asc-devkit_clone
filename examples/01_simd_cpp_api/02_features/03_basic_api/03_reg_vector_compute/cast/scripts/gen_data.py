@@ -16,10 +16,21 @@ import os
 import sys
 import numpy as np
 
+def get_saturation(data, data_type):
+    return np.clip(data, np.iinfo(data_type).min, np.iinfo(data_type).max)
+
 def gen_golden_data_simple(src_data_type, dst_data_type):
     total_length = 256
-    x = np.random.uniform(-100, 100, [1, total_length]).astype(src_data_type)
-    golden = np.rint(x).astype(dst_data_type)
+    if scenario_num == 1:
+        src_data_type = np.float16
+        dst_data_type = np.int32
+        x = np.random.uniform(-100, 100, [1, total_length]).astype(src_data_type)
+        golden = np.floor(x).astype(dst_data_type)
+    else:
+        src_data_type = np.float32
+        dst_data_type = np.int16
+        x = np.random.uniform(-100, 100, [1, total_length]).astype(src_data_type)
+        golden = get_saturation(np.round(x), dst_data_type).astype(dst_data_type)
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     x.tofile('./input/input_x.bin')
@@ -27,10 +38,4 @@ def gen_golden_data_simple(src_data_type, dst_data_type):
 
 if __name__ == "__main__":
     scenario_num = int(sys.argv[1])
-    if scenario_num == 1:
-        src_data_type = np.float16
-        dst_data_type = np.int32
-    else:
-        src_data_type = np.float32
-        dst_data_type = np.int16
-    gen_golden_data_simple(src_data_type, dst_data_type)
+    gen_golden_data_simple()
