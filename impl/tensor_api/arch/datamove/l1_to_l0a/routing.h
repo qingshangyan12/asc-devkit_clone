@@ -53,33 +53,15 @@ struct CopyL12L0ATensor2Tensor<Location::L0A, Location::L1, ArchVersion::V3510, 
 };
 
 template <>
-struct CopyL12L0ATensor2Tensor<Location::L0A, Location::L1, ArchVersion::V3510, NZLayoutPtn, NZLayoutPtn, CopyMode::NORMAL_COORD>
-{
-    using type = LoadDataL12L0ANZ2NZWithCoord3510;
-};
-
-template <>
 struct CopyL12L0ATensor2Tensor<Location::L0A, Location::L1, ArchVersion::V3510, NZLayoutPtn, ZNLayoutPtn, CopyMode::TRANS>
 {
     using type = LoadDataL12L0AZN2NZ3510;
 };
 
 template <>
-struct CopyL12L0ATensor2Tensor<Location::L0A, Location::L1, ArchVersion::V3510, NZLayoutPtn, ZNLayoutPtn, CopyMode::TRANS_COORD>
-{
-    using type = LoadDataL12L0AZN2NZWithCoord3510;
-};
-
-template <>
 struct CopyL12L0ATensor2Tensor<Location::L0A, Location::L1, ArchVersion::V3510, NZLayoutPtn, ZNLayoutPtn, CopyMode::TRANS_B8B4>
 {
     using type = LoadDataL12L0AZN2NZB8B43510;
-};
-
-template <>
-struct CopyL12L0ATensor2Tensor<Location::L0A, Location::L1, ArchVersion::V3510, NZLayoutPtn, ZNLayoutPtn, CopyMode::TRANS_B8B4_COORD>
-{
-    using type = LoadDataL12L0AZN2NZB8B4WithCoord3510;
 };
 } // namespace Te
 } // namespace AscendC
