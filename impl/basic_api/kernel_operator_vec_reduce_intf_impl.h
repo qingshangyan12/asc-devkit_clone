@@ -144,8 +144,8 @@ template <NewReduceType reduceType, typename T, bool isSetMask>
 __aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
-    static_assert((SupportEnum<reduceType, NewReduceType::SUM>()),
-        "current ReducePair api only support NewReduceType::SUM");
+    ASCENDC_ASSERT((SupportEnum<reduceType, NewReduceType::SUM>()),{ KERNEL_LOG(KERNEL_ERROR, 
+        "current ReducePair api only support NewReduceType::SUM");});
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReducePairInfo(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask,
         "ReducePair<NewReduceType::SUM>");
@@ -259,8 +259,8 @@ template <NewReduceType reduceType, typename T, bool isSetMask>
 __aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[],
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
-    static_assert((SupportEnum<reduceType, NewReduceType::SUM>()),
-        "current ReducePair api only support NewReduceType::SUM");
+    ASCENDC_ASSERT((SupportEnum<reduceType, NewReduceType::SUM>()),{ KERNEL_LOG(KERNEL_ERROR, 
+        "current ReducePair api only support NewReduceType::SUM");});
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReducePairInfo(dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "ReducePair<NewReduceType::SUM>");
 #endif
