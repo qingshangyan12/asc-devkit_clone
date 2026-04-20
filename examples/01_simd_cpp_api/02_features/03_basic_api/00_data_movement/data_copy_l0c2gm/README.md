@@ -217,6 +217,7 @@
   |------|------|---------|--------|
   | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
   | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-2201 |
+  | SCENARIO_NUM | 场景编号 | 1-6 | - |
 
 - 执行结果
 
