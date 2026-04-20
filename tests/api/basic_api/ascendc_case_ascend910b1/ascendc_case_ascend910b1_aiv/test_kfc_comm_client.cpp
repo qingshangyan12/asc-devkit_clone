@@ -75,3 +75,23 @@ TEST_P(TestKfcClientSuite, TestKfcClientConstruct)
     uint16_t instID = 0x1234;
     uint32_t KfcMsgFlag =  KfcMsgMakeFlag(funID, instID);
 }
+
+TEST_F(TestKfcClientSuite, ScmDataCopyMsgRequiresRegisteredMatmulObject)
+{
+    int32_t gCoreTypeTemp = g_coreType;
+    auto* kfcClientBak = g_kfcClient;
+    AscendC::SetGCoreType(2);
+    g_kfcClient = nullptr;
+    uint8_t src[256] = {0};
+    DataCopyParams intriParams {2, 4, 6, 8};
+    auto dst = reinterpret_cast<__cbuf__ void*>(static_cast<uintptr_t>(0x40));
+
+    EXPECT_DEATH(
+        {
+            ScmDataCopyMsg(dst, src, intriParams, 123);
+        },
+        "");
+
+    g_kfcClient = kfcClientBak;
+    AscendC::SetGCoreType(gCoreTypeTemp);
+}
