@@ -45,7 +45,7 @@ class KernelMmad {
 public:
     __aicore__ inline KernelMmad()
     {
-        // 左矩阵分形的shape
+        //左矩阵分形的shape
         fractalShape[0] = 16;
         fractalShape[1] = 32 / sizeof(half);
         fractalSize = 16 * fractalShape[1];
@@ -54,18 +54,18 @@ public:
     }
     __aicore__ inline void InitAIC(GM_ADDR A, GM_ADDR B, GM_ADDR C)
     {
-        ACUBEGM.SetGlobalBuffer((__gm__ half*)A + A_BLOCKS_LENGTH * AscendC::GetBlockIdx(), A_BLOCKS_LENGTH);
-        BCUBEGM.SetGlobalBuffer((__gm__ half*)B + B_BLOCKS_LENGTH * AscendC::GetBlockIdx(), B_BLOCKS_LENGTH);
-        CCUBEGM.SetGlobalBuffer((__gm__ float*)C, C_AIC_BLOCKS_LENGTH);
+        ACUBEGM.SetGlobalBuffer((__gm__ half *)A + A_BLOCKS_LENGTH * AscendC::GetBlockIdx(), A_BLOCKS_LENGTH);
+        BCUBEGM.SetGlobalBuffer((__gm__ half *)B + B_BLOCKS_LENGTH * AscendC::GetBlockIdx(), B_BLOCKS_LENGTH);
+        CCUBEGM.SetGlobalBuffer((__gm__ float *)C, C_AIC_BLOCKS_LENGTH);
     }
 
     __aicore__ inline void InitAIV(GM_ADDR a, GM_ADDR b, GM_ADDR A, GM_ADDR B, GM_ADDR C)
     {
-        aGM.SetGlobalBuffer((__gm__ uint8_t*)a + A_BLOCKS_LENGTH * (AscendC::GetBlockIdx() / 2), A_BLOCKS_LENGTH);
-        bGM.SetGlobalBuffer((__gm__ uint8_t*)b + B_BLOCKS_LENGTH * (AscendC::GetBlockIdx() / 2), B_BLOCKS_LENGTH);
-        AVectorGM.SetGlobalBuffer((__gm__ half*)A + A_BLOCKS_LENGTH * (AscendC::GetBlockIdx() / 2), A_BLOCKS_LENGTH);
-        BVectorGM.SetGlobalBuffer((__gm__ half*)B + B_BLOCKS_LENGTH * (AscendC::GetBlockIdx() / 2), B_BLOCKS_LENGTH);
-        CVectorGM.SetGlobalBuffer((__gm__ float*)C + C_AIV_BLOCKS_LENGTH * AscendC::GetBlockIdx(), C_AIV_BLOCKS_LENGTH);
+        aGM.SetGlobalBuffer((__gm__ uint8_t *)a + A_BLOCKS_LENGTH * (AscendC::GetBlockIdx() / 2), A_BLOCKS_LENGTH);
+        bGM.SetGlobalBuffer((__gm__ uint8_t *)b + B_BLOCKS_LENGTH * (AscendC::GetBlockIdx() / 2), B_BLOCKS_LENGTH);
+        AVectorGM.SetGlobalBuffer((__gm__ half *)A + A_BLOCKS_LENGTH * (AscendC::GetBlockIdx() / 2), A_BLOCKS_LENGTH);
+        BVectorGM.SetGlobalBuffer((__gm__ half *)B + B_BLOCKS_LENGTH * (AscendC::GetBlockIdx() / 2), B_BLOCKS_LENGTH);
+        CVectorGM.SetGlobalBuffer((__gm__ float *)C + C_AIV_BLOCKS_LENGTH * AscendC::GetBlockIdx(), C_AIV_BLOCKS_LENGTH);
     }
     __aicore__ inline void ProcessAIC()
     {
@@ -76,6 +76,7 @@ public:
         AscendC::LocalTensor<half> b2Local(AscendC::TPosition::B2, b2LocalAddr, bSizeAlignL0);
         AscendC::LocalTensor<float> c1Local(AscendC::TPosition::CO1, c1LocalAddr, cSizeAlignL0);
 
+
         // 模式2,每一个AICore内部，AIC等2个AIV
         AscendC::CrossCoreWaitFlag(SYNC_AIV_AIC_FLAG);
 
@@ -85,8 +86,8 @@ public:
         Compute(a2Local, b2Local, c1Local);
         CopyOut(c1Local);
         // 模式0,8个AICore 包含的8个AIC同步
-        AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);
-        AscendC::CrossCoreWaitFlag(SYNC_AIC_FLAG);
+        AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);  
+        AscendC::CrossCoreWaitFlag(SYNC_AIC_FLAG);  
 
         // 模式2,每一个AICore内部，2个AIV等AIC
         AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);
@@ -128,7 +129,7 @@ public:
 
         // 进行LeakyRelu运算
         float alpha = 0.001;
-        AscendC::DataCopy(cLocal, CVectorGM, C_AIV_BLOCKS_LENGTH);
+        AscendC::DataCopy(cLocal, CVectorGM, C_AIV_BLOCKS_LENGTH); 
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
         AscendC::LeakyRelu(reluCLocal, cLocal, alpha, C_AIV_BLOCKS_LENGTH);
@@ -138,12 +139,12 @@ public:
     }
 
 private:
-    __aicore__ inline uint16_t CeilDivision(uint16_t numerator, uint16_t denominator)
+    __aicore__ inline uint16_t CeilDivision(uint16_t numerator, uint16_t denominator) 
     {
         return (numerator + denominator - 1) / denominator;
     }
 
-    __aicore__ inline uint16_t CeilAlign(uint16_t numerator, uint16_t denominator)
+    __aicore__ inline uint16_t CeilAlign(uint16_t numerator, uint16_t denominator) 
     {
         return (numerator + denominator - 1) / denominator * denominator;
     }
@@ -202,8 +203,7 @@ private:
             AscendC::LoadData(b2Local[i * dstOffset], b1Local[i * srcOffset], loadDataParams);
         }
     }
-    __aicore__ inline void Compute(
-        AscendC::LocalTensor<half>& a2Local, AscendC::LocalTensor<half>& b2Local, AscendC::LocalTensor<float>& c1Local)
+    __aicore__ inline void Compute(AscendC::LocalTensor<half>& a2Local, AscendC::LocalTensor<half>& b2Local, AscendC::LocalTensor<float>& c1Local)
     {
         // M与MTE1流水在L0A、L0B上存在写后读依赖
         AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
@@ -217,7 +217,7 @@ private:
     }
     __aicore__ inline void CopyOut(AscendC::LocalTensor<float>& c1Local)
     {
-        // M与FIX流水在L0C存在写后读依赖
+         // M与FIX流水在L0C存在写后读依赖
         AscendC::SetFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
 
@@ -261,18 +261,18 @@ private:
     uint16_t fractalSize = 0;
     uint16_t fractalNum = 0;
     int32_t blockIdx = 0;
-    uint32_t a1LocalAddr = 0;
-    uint32_t b1LocalAddr = aSizeAlignL1;
-    uint32_t a2LocalAddr = 0;
-    uint32_t b2LocalAddr = 0;
-    uint32_t c1LocalAddr = 0;
+    uint32_t  a1LocalAddr = 0;
+    uint32_t  b1LocalAddr = aSizeAlignL1;
+    uint32_t  a2LocalAddr = 0;
+    uint32_t  b2LocalAddr = 0;
+    uint32_t  c1LocalAddr = 0;
 
-    uint32_t aAddr = 0;
-    uint32_t bAddr = A_BLOCKS_LENGTH;
-    uint32_t cAddr = A_BLOCKS_LENGTH + B_BLOCKS_LENGTH;
-    uint32_t castAAddr = 0;
-    uint32_t castBAddr = A_BLOCKS_LENGTH;
-    uint32_t reluCAddr = A_BLOCKS_LENGTH + B_BLOCKS_LENGTH;
+    uint32_t  aAddr = 0;
+    uint32_t  bAddr = A_BLOCKS_LENGTH;
+    uint32_t  cAddr = A_BLOCKS_LENGTH + B_BLOCKS_LENGTH;
+    uint32_t  castAAddr = 0;
+    uint32_t  castBAddr = A_BLOCKS_LENGTH;
+    uint32_t  reluCAddr = A_BLOCKS_LENGTH + B_BLOCKS_LENGTH;
 };
 
 class KernelCrossCoreSetFlag {
@@ -281,8 +281,8 @@ public:
     __aicore__ inline void Init(GM_ADDR initialData, GM_ADDR atomicResult, uint32_t totalLength)
     {
         this->blockLength = totalLength;
-        initialDataGm.SetGlobalBuffer((__gm__ float*)initialData, this->blockLength);
-        atomicResultGm.SetGlobalBuffer((__gm__ float*)atomicResult, this->blockLength);
+        initialDataGm.SetGlobalBuffer((__gm__ float *)initialData, this->blockLength);
+        atomicResultGm.SetGlobalBuffer((__gm__ float *)atomicResult, this->blockLength);
     }
 
     __aicore__ inline void Process()
@@ -297,13 +297,13 @@ public:
     }
     __aicore__ inline void ProcessMode0()
     {
-        const uint32_t xAddr = 0;
-        const uint32_t yAddr = this->blockLength * sizeof(float);
+        const uint32_t xAddr = 0;                                   
+        const uint32_t yAddr = this->blockLength * sizeof(float);   
 
         AscendC::LocalTensor<float> xLocal(AscendC::TPosition::VECCALC, xAddr, this->blockLength);
         AscendC::LocalTensor<float> yLocal(AscendC::TPosition::VECCALC, yAddr, this->blockLength);
-
-        AscendC::DataCopy(xLocal, initialDataGm, this->blockLength);
+                     
+        AscendC::DataCopy(xLocal, initialDataGm, this->blockLength); 
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
@@ -312,18 +312,18 @@ public:
         AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
         // UB 到 GM 搬运启用原子累加：搬运至 atomicResult 的数据与原值累加后覆盖原值
-        AscendC::SetAtomicAdd<float>();
+        AscendC::SetAtomicAdd<float>(); 
         // DataCopy属于PIPE_MTE3流水操作
-        AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
+        AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);   
         // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成
-        AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
+        AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);  
         // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
-        AscendC::CrossCoreWaitFlag(0);
+        AscendC::CrossCoreWaitFlag(0);               
         // 关闭原子累加
-        AscendC::SetAtomicNone();
+        AscendC::SetAtomicNone();  
 
         if (AscendC::GetBlockIdx() == 0) {
-            AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength); // PIPE_MTE2
+            AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);   // PIPE_MTE2
             AscendC::printf("============== In PrintTensor Process AIV %d ==============", AscendC::GetBlockIdx());
             AscendC::DumpTensor(yLocal, AscendC::GetBlockIdx(), this->blockLength);
             AscendC::DataCopy(atomicResultGm, yLocal, this->blockLength);
@@ -333,9 +333,9 @@ public:
     __aicore__ inline void ProcessMode1()
     {
         // 16个aiv，GetBlockIdx取值为0-15。
-        if ((AscendC::GetBlockIdx() == 2) || (AscendC::GetBlockIdx() == 3)) {
-            const uint32_t xAddr = 0;
-            const uint32_t yAddr = this->blockLength * sizeof(float);
+         if ((AscendC::GetBlockIdx() == 2)||(AscendC::GetBlockIdx() == 3)) {
+            const uint32_t xAddr = 0;                                   
+            const uint32_t yAddr = this->blockLength * sizeof(float);  
 
             AscendC::LocalTensor<float> xLocal(AscendC::TPosition::VECCALC, xAddr, this->blockLength);
             AscendC::LocalTensor<float> yLocal(AscendC::TPosition::VECCALC, yAddr, this->blockLength);
@@ -350,12 +350,12 @@ public:
 
             AscendC::SetAtomicAdd<float>();
             AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
-            AscendC::CrossCoreSetFlag<1, PIPE_MTE3>(0);
-            AscendC::CrossCoreWaitFlag(0);
+            AscendC::CrossCoreSetFlag<1, PIPE_MTE3>(0);  
+            AscendC::CrossCoreWaitFlag(0);             
             AscendC::SetAtomicNone();
 
             if (AscendC::GetBlockIdx() == 2) {
-                AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);
+                AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength); 
                 AscendC::printf("============== In PrintTensor Process AIV %d ==============", AscendC::GetBlockIdx());
                 AscendC::DumpTensor(yLocal, AscendC::GetBlockIdx(), this->blockLength);
                 AscendC::DataCopy(atomicResultGm, yLocal, this->blockLength);
@@ -370,13 +370,12 @@ private:
     uint32_t blockLength;
 };
 
-uint32_t VerifyResult(std::vector<float>& output, std::vector<float>& golden)
+uint32_t VerifyResult(std::vector<float> &output, std::vector<float> &golden)
 {
-    auto printTensor = [](std::vector<float>& tensor, const char* name) {
+    auto printTensor = [](std::vector<float> &tensor, const char *name) {
         constexpr size_t maxPrintSize = 20;
         std::cout << name << ": ";
-        std::copy(
-            tensor.begin(), tensor.begin() + std::min(tensor.size(), maxPrintSize),
+        std::copy(tensor.begin(), tensor.begin() + std::min(tensor.size(), maxPrintSize),
             std::ostream_iterator<float>(std::cout, " "));
         if (tensor.size() > maxPrintSize) {
             std::cout << "...";

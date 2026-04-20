@@ -89,16 +89,15 @@ public:
     __aicore__ inline void Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, const TCubeTiling& tiling);
     __aicore__ inline void Process(AscendC::TPipe* pipe);
 
-    AscendC::Matmul<
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, MatmulConfig>
+    AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
+                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, MatmulConfig>
         matmulObj;
 
 private:
-    __aicore__ inline void CalcOffset(
-        int32_t blockIdx, int32_t& offsetA, int32_t& offsetB, int32_t& offsetC, int32_t& offsetBias);
+    __aicore__ inline void CalcOffset(int32_t blockIdx, int32_t& offsetA, int32_t& offsetB, int32_t& offsetC,
+                                      int32_t& offsetBias);
 
     AscendC::GlobalTensor<AType> aGlobal;
     AscendC::GlobalTensor<BType> bGlobal;
@@ -108,8 +107,8 @@ private:
 };
 
 template <typename AType, typename BType, typename CType, typename BiasType, bool isMdl>
-__aicore__ inline void MatmulKernel<AType, BType, CType, BiasType, isMdl>::Init(
-    GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, const TCubeTiling& tiling)
+__aicore__ inline void MatmulKernel<AType, BType, CType, BiasType, isMdl>::Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias,
+                                                                                GM_ADDR c, const TCubeTiling& tiling)
 {
     this->tiling = tiling;
     aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ AType*>(a), tiling.M * tiling.Ka);
@@ -142,8 +141,9 @@ __aicore__ inline void MatmulKernel<AType, BType, CType, BiasType, isMdl>::Proce
 }
 
 template <typename AType, typename BType, typename CType, typename BiasType, bool isMdl>
-__aicore__ inline void MatmulKernel<AType, BType, CType, BiasType, isMdl>::CalcOffset(
-    int32_t blockIdx, int32_t& offsetA, int32_t& offsetB, int32_t& offsetC, int32_t& offsetBias)
+__aicore__ inline void
+MatmulKernel<AType, BType, CType, BiasType, isMdl>::CalcOffset(int32_t blockIdx, int32_t& offsetA, int32_t& offsetB,
+                                                               int32_t& offsetC, int32_t& offsetBias)
 {
     const TCubeTiling& tiling = this->tiling;
     auto mSingleBlocks = (tiling.M + tiling.singleCoreM - 1) / tiling.singleCoreM;
@@ -178,16 +178,15 @@ public:
     __aicore__ inline void Process(AscendC::TPipe* pipe);
 
     static constexpr auto MatmulConfig = CFG_MDL;
-    AscendC::Matmul<
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, MatmulConfig>
+    AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
+                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, MatmulConfig>
         matmulObj;
 
 private:
-    __aicore__ inline void CalcOffset(
-        int32_t blockIdx, int32_t& offsetA, int32_t& offsetB, int32_t& offsetC, int32_t& offsetBias);
+    __aicore__ inline void CalcOffset(int32_t blockIdx, int32_t& offsetA, int32_t& offsetB, int32_t& offsetC,
+                                      int32_t& offsetBias);
 
     AscendC::GlobalTensor<AType> aGlobal;
     AscendC::GlobalTensor<BType> bGlobal;
@@ -199,8 +198,8 @@ private:
 };
 
 template <typename AType, typename BType, typename CType, typename BiasType>
-__aicore__ inline void MatmulKernelL2Cache<AType, BType, CType, BiasType>::Init(
-    GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, const TCubeTiling& tiling)
+__aicore__ inline void MatmulKernelL2Cache<AType, BType, CType, BiasType>::Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias,
+                                                                                 GM_ADDR c, const TCubeTiling& tiling)
 {
     this->tiling = tiling;
     aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ AType*>(a), tiling.M * tiling.Ka);
@@ -241,8 +240,9 @@ __aicore__ inline void MatmulKernelL2Cache<AType, BType, CType, BiasType>::Proce
 }
 
 template <typename AType, typename BType, typename CType, typename BiasType>
-__aicore__ inline void MatmulKernelL2Cache<AType, BType, CType, BiasType>::CalcOffset(
-    int32_t blockIdx, int32_t& offsetA, int32_t& offsetB, int32_t& offsetC, int32_t& offsetBias)
+__aicore__ inline void
+MatmulKernelL2Cache<AType, BType, CType, BiasType>::CalcOffset(int32_t blockIdx, int32_t& offsetA, int32_t& offsetB,
+                                                                int32_t& offsetC, int32_t& offsetBias)
 {
     const TCubeTiling& tiling = this->tiling;
     constexpr uint32_t mSingleBlocks = 4;
@@ -293,8 +293,8 @@ public:
     MatmulProblemShape shapes;
 
 private:
-    __aicore__ inline void CalcOffset(
-        const MatmulProblemShape& param, uint32_t& offsetA, uint32_t& offsetB, uint32_t& offsetC, uint32_t& offsetBias);
+    __aicore__ inline void CalcOffset(const MatmulProblemShape& param, uint32_t& offsetA, uint32_t& offsetB,
+                                      uint32_t& offsetC, uint32_t& offsetBias);
 
     AscendC::GlobalTensor<AType> aGlobal;
     AscendC::GlobalTensor<BType> bGlobal;
@@ -305,8 +305,9 @@ private:
 };
 
 template <typename AType, typename BType, typename CType, typename BiasType, bool useUnitFlag>
-__aicore__ inline void MatmulKernelMdlL2CacheConstant<AType, BType, CType, BiasType, useUnitFlag>::Init(
-    GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, GM_ADDR tiling)
+__aicore__ inline void
+MatmulKernelMdlL2CacheConstant<AType, BType, CType, BiasType, useUnitFlag>::Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias,
+                                                                                   GM_ADDR c, GM_ADDR tiling)
 {
     CopyTiling(&shapes, tiling);
     if (AscendC::GetBlockIdx() >= shapes.usedCoreNum) {
@@ -323,8 +324,8 @@ __aicore__ inline void MatmulKernelMdlL2CacheConstant<AType, BType, CType, BiasT
 }
 
 template <typename AType, typename BType, typename CType, typename BiasType, bool useUnitFlag>
-__aicore__ inline void MatmulKernelMdlL2CacheConstant<AType, BType, CType, BiasType, useUnitFlag>::Process(
-    AscendC::TPipe* pipe)
+__aicore__ inline void
+MatmulKernelMdlL2CacheConstant<AType, BType, CType, BiasType, useUnitFlag>::Process(AscendC::TPipe* pipe)
 {
     REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
     matmulObj.SetOrgShape(shapes.m, shapes.n, shapes.k);
@@ -375,14 +376,14 @@ __aicore__ inline void MatmulKernelMdlL2CacheConstant<AType, BType, CType, BiasT
 template <typename TilingType, bool isTiling = false>
 inline void SetTilingTypes(TilingType& tilingApi, optiling::TCubeTiling& tilingData)
 {
-    tilingApi.SetAType(
-        matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16, IS_TRANS_A);
-    tilingApi.SetBType(
-        matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16, IS_TRANS_B);
-    tilingApi.SetCType(
-        matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);
-    tilingApi.SetBiasType(
-        matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);
+    tilingApi.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16,
+                       IS_TRANS_A);
+    tilingApi.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16,
+                       IS_TRANS_B);
+    tilingApi.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+                       matmul_tiling::DataType::DT_FLOAT16);
+    tilingApi.SetBiasType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+                          matmul_tiling::DataType::DT_FLOAT16);
     tilingApi.SetOrgShape(M, N, K);
     tilingApi.SetShape(M, N, K);
     tilingApi.EnableBias(IS_BIAS);

@@ -1,20 +1,19 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
 
 /*!
  * \file kernel_operator_vec_ternary_scalar_intf_impl.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message( \
-        "impl/basic_api/kernel_operator_vec_ternary_scalar_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_ternary_scalar_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message("impl/basic_api/kernel_operator_vec_ternary_scalar_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_ternary_scalar_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TERNARY_SCALAR_INTF_IMPL_H__
 #endif
@@ -62,9 +61,8 @@ namespace AscendC {
  * @param [in] intriParams.src0RepStride src repeat stride
  */
 template <typename T, typename U, bool isSetMask>
-__aicore__ inline void Axpy(
-    const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
-    const UnaryRepeatParams& repeatParams)
+__aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue,
+    uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     using MaskCheckType = typename Conditional<(sizeof(PrimT<T>) >= sizeof(PrimT<U>)), PrimT<T>, PrimT<U>>::type;
@@ -80,14 +78,13 @@ __aicore__ inline void Axpy(
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryTenaryInfo<T, U, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Axpy");
 #endif
-    AxpyImpl<T, U, isSetMask>(
-        (__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams);
+    AxpyImpl<T, U, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, mask,
+        repeatTime, repeatParams);
 }
 
 template <typename T, typename U, bool isSetMask>
-__aicore__ inline void Axpy(
-    const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue, uint64_t mask[],
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+__aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue,
+    uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     using MaskCheckType = typename Conditional<(sizeof(PrimT<T>) >= sizeof(PrimT<U>)), PrimT<T>, PrimT<U>>::type;
@@ -101,11 +98,10 @@ __aicore__ inline void Axpy(
     }
 #endif
 #ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecUnaryTenaryInfo<T, U, isSetMask>(
-        dst, src, mask[0], mask[1], repeatTime, repeatParams, "Axpy");
+    MstxTensor::GetMstxVecUnaryTenaryInfo<T, U, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams, "Axpy");
 #endif
-    AxpyImpl<T, U, isSetMask>(
-        (__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams);
+    AxpyImpl<T, U, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, mask,
+        repeatTime, repeatParams);
 }
 
 /*
@@ -117,8 +113,8 @@ __aicore__ inline void Axpy(
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
-__aicore__ inline void Axpy(
-    const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue, const int32_t& count)
+__aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue,
+    const int32_t& count)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Axpy", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
