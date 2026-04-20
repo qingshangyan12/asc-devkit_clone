@@ -13,7 +13,7 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-class TestSimdAtomicDcci : public testing::Test { 
+class TestSimdAtomicDcci : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -24,7 +24,12 @@ void dcci_Stub(__gm__ void* dst)
 {
     EXPECT_EQ((__gm__ void*)3, dst);
 }
+
+void dcci_Stub_ub(__ubuf__ void* dst)
+{
+    EXPECT_EQ((__ubuf__ void*)3, dst);
 }
+} // namespace
 
 #define TEST_DCCI(entire, type)                                                          \
 TEST_F(TestSimdAtomicDcci, dcci_gm_##entire##_##type##_##void_ptr_uint64_t_Succ)         \
@@ -44,3 +49,19 @@ TEST_DCCI(single, atomic);
 TEST_DCCI(entire, all);
 TEST_DCCI(entire, out);
 TEST_DCCI(entire, atomic);
+
+#define TEST_DCCI_UB(entire, type)                                                                                     \
+    TEST_F(TestSimdAtomicDcci, dcci_ub_##entire##_##type##_##void_ptr_uint64_t_Succ)                                   \
+    {                                                                                                                  \
+        __ubuf__ void* dst = (__ubuf__ void*)3;                                                                        \
+        MOCKER(dcci, void(__ubuf__ void*, uint64_t, uint64_t)).times(1).will(invoke(dcci_Stub_ub));                    \
+        asc_ub_dcci_##entire##_##type(dst);                                                                            \
+        GlobalMockObject::verify();                                                                                    \
+    }
+
+TEST_DCCI_UB(single, all);
+TEST_DCCI_UB(single, out);
+TEST_DCCI_UB(single, atomic);
+TEST_DCCI_UB(entire, all);
+TEST_DCCI_UB(entire, out);
+TEST_DCCI_UB(entire, atomic);
