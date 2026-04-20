@@ -87,7 +87,7 @@ ls /usr/local/Ascend/driver         # 确认驱动目录
 
 无NPU的机器需先移除设备与驱动挂载配置。
 
-**在`runArgs`中**，删除所有NPU相关行——包括三个设备访问标志（`--ipc=host`、`--net=host`、`--privileged`）以及所有`--device`行（`davinci0-7`、`davinci_manager`、`devmm_svm`、`hisi_hdc`）——将其设置为：
+**在`runArgs`中**，删除所有NPU相关行：设备访问标志行（`--ipc=host`、`--net=host`、`--privileged`）以及`--device`行（`davinci0-7`、`davinci_manager`、`devmm_svm`、`hisi_hdc`），并将其设置为：
 
 ```jsonc
 "runArgs": []

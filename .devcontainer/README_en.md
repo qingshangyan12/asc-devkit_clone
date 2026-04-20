@@ -87,7 +87,7 @@ If the host has fewer than 8 NPUs, edit `.devcontainer/devcontainer.json` and re
 
 Machines without NPU must first remove device and driver mount configurations.
 
-**In `runArgs`**, remove all NPU-related entries — including the three device access flags (`--ipc=host`, `--net=host`, `--privileged`) and all `--device` lines (`davinci0-7`, `davinci_manager`, `devmm_svm`, `hisi_hdc`) — and set it to:
+**In `runArgs`**, remove all NPU-related entries: the device access flags (`--ipc=host`, `--net=host`, `--privileged`) and `--device` lines (`davinci0-7`, `davinci_manager`, `devmm_svm`, `hisi_hdc`), and set it to:
 
 ```jsonc
 "runArgs": []
