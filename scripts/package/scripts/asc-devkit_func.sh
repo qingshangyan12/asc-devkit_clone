@@ -258,3 +258,109 @@ remove_stub_softlink() {
 }
 
 pkg_arch_name="$(get_pkg_arch_name)"
+
+create_compiler_atc_fwkacllib_softlink() {
+    local install_path="$1"
+    local in_install_for_all="$2"
+    local dir_mod="" dir_mod_new=""
+    local pkg=""
+    local pkg_installed=""
+
+    local file=""
+    local lib64_file_list="$(ls ${install_path}/hccl/lib64 | awk '{print $NF}')"
+
+    for pkg in "compiler" "atc" "fwkacllib"; do
+        if [ "${in_install_for_all}" = "" ]; then
+            dir_mod_new="750"
+            dir_mod="750"
+            if [ "$pkg" = "compiler" ]; then
+                dir_mod="550"
+            fi
+        else
+            dir_mod_new="755"
+            dir_mod="755"
+            if [ "$pkg" = "compiler" ]; then
+                dir_mod="555"
+            fi
+        fi
+
+        mkdir -p "${install_path}/${pkg}"
+        chmod "${dir_mod_new}" "${install_path}/${pkg}"
+
+        if [ "$pkg" = "compiler" ]; then
+            if [ -e "${install_path}/${pkg}/include" ]; then
+                chmod "${dir_mod_new}" "${install_path}/${pkg}/include"
+                remove_dir "${install_path}/${pkg}/include/hccl"
+                chmod "${dir_mod}" "${install_path}/${pkg}/include"
+            fi
+
+            if [ -e "${install_path}/hccl/include/hccl" ]; then
+                if [ ! -e "${install_path}/${pkg}/include" ]; then
+                    mkdir -p "${install_path}/${pkg}/include"
+                fi
+                chmod "${dir_mod_new}" "${install_path}/${pkg}/include"
+                mkdir -p "${install_path}/${pkg}/include/hccl"
+                chmod "${dir_mod_new}" "${install_path}/${pkg}/include/hccl"
+                create_softlink_by_relative_ln "${install_path}/hccl/include/hccl" "${install_path}/${pkg}/include/hccl" "*" "."
+                chmod "${dir_mod}" "${install_path}/${pkg}/include/hccl"
+                chmod "${dir_mod}" "${install_path}/${pkg}/include"
+            fi
+        fi
+
+        mkdir -p "${install_path}/${pkg}/lib64"
+        chmod "${dir_mod_new}" "${install_path}/${pkg}/lib64"
+        for file in $lib64_file_list; do
+            if [ "$file" != "plugin" ]; then
+                create_softlink_by_relative_ln "${install_path}/hccl/lib64" "${install_path}/${pkg}/lib64" "${file}"
+            fi
+        done
+
+        chmod "${dir_mod}" "${install_path}/${pkg}/lib64"
+
+        chmod "${dir_mod}" "${install_path}/${pkg}"
+
+    done
+}
+
+remove_compiler_atc_fwkacllib_softlink() {
+    local install_path="$1"
+    local pkg=""
+    local file=""
+    local lib64_file_list="$(ls ${install_path}/hccl/lib64 | awk '{print $NF}')"
+
+    for pkg in "compiler" "atc" "fwkacllib"; do
+        if [ -e "${install_path}/${pkg}/include" ]; then
+            chmod u+w "${install_path}/${pkg}/include"
+            remove_dir "${install_path}/${pkg}/include/hccl"
+            if [ "$pkg" = "compiler" ]; then
+                chmod u-w "${install_path}/${pkg}/include"
+            fi
+        fi
+
+        if [ -e "${install_path}/${pkg}/lib64" ]; then
+            chmod u+w "${install_path}/${pkg}/lib64"
+            for file in $lib64_file_list; do
+                if [ "$file" != "plugin" ]; then
+                    \rm -rf "${install_path}/${pkg}/lib64/${file}"
+                fi
+            done
+        fi
+
+        if [ -e "${install_path}/${pkg}" ]; then
+            chmod u+w "${install_path}/${pkg}"
+        fi
+        remove_dir_if_empty "${install_path}/${pkg}/lib64"
+        if [ -e "${install_path}/${pkg}/lib64" ]; then
+            if [ "$pkg" = "compiler" ]; then
+                chmod u-w "${install_path}/${pkg}/lib64"
+            fi
+        fi
+        remove_dir_if_empty "${install_path}/${pkg}/include"
+        remove_dir_if_empty "${install_path}/${pkg}"
+        if [ -e "${install_path}/${pkg}" ]; then
+            if [ "$pkg" = "compiler" ]; then
+                chmod u-w "${install_path}/${pkg}"
+            fi
+        fi
+    done
+}
