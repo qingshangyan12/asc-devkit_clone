@@ -1,0 +1,155 @@
+# CtrlSpr样例
+
+## 概述
+
+本样例基于SetCtrlSpr、GetCtrlSpr、ResetCtrlSpr接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能。CTRL寄存器用于控制数据从L0C Buffer/Unified Buffer/L1 Buffer搬运至Global Memory时原子操作的使能及数据类型选择，通过SetCtrlSpr设置特定比特位使能原子操作，GetCtrlSpr读取验证设置结果，ResetCtrlSpr重置比特位恢复默认状态。展示了三个系统变量访问API的联合使用场景，用于实现原子操作模式的动态配置与验证。
+
+## 支持的产品
+
+- Ascend 950PR/Ascend 950DT
+
+## 目录结构介绍
+
+```
+├── ctrl_spr
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt          // 编译工程文件
+│   ├── data_utils.h            // 数据读入写出函数
+│   └── ctrl_spr.asc            // Ascend C样例实现 & 调用样例
+```
+
+## 样例描述
+
+- 样例功能：  
+  验证CTRL寄存器操作的完整流程：SetCtrlSpr（设置特定比特位值） → GetCtrlSpr（读取验证） → ResetCtrlSpr（重置） → GetCtrlSpr（读取验证）。
+
+- 样例规格：
+  <table>
+  <caption>表1：样例规格说明</caption>
+  <tr><td rowspan="1" align="center">样例输入</td><td colspan="4" align="center">无输入数据（仅验证寄存器操作）</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">dst</td><td align="center">[8]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">kernel_ctrl_spr</td></tr>  
+  </table>
+
+
+## 编译运行
+
+在本样例根目录下执行如下步骤，编译并执行样例。
+
+- 配置环境变量  
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，root用户安装CANN软件包
+
+    ```bash
+    source /usr/local/Ascend/cann/set_env.sh
+    ```
+
+  - 默认路径，非root用户安装CANN软件包
+
+    ```bash
+    source $HOME/Ascend/cann/set_env.sh
+    ```
+
+  - 指定路径install_path，安装CANN软件包
+
+    ```bash
+    source ${install_path}/cann/set_env.sh
+    ```
+
+- 样例执行
+
+  ```bash
+  mkdir -p build && cd build;                                          # 创建并进入build目录
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                 # 编译工程，默认npu模式
+  python3 ../scripts/gen_data.py                                       # 生成测试输入数据
+  ./demo                                                               # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # 验证输出结果是否正确
+  ```
+
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  
+  示例如：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;  # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;  # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 参数 | 说明 | 可选值 | 默认值 |
+  |------|------|---------|--------|
+  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-3510 |
+
+- 执行结果
+
+  执行结果如下，说明精度对比成功：
+  ```bash
+  test pass
+  ```
+
+## API说明
+
+### GetCtrlSpr
+
+读取CTRL寄存器特定比特位上的值。
+
+```cpp
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline int64_t GetCtrlSpr()
+```
+
+- 参数说明：
+  - `startBit`：起始比特位索引
+  - `endBit`：终止比特位索引
+- 返回值：CTRL寄存器对应比特位上的值
+
+### SetCtrlSpr
+
+对CTRL寄存器的特定比特位进行设置。
+
+```cpp
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline void SetCtrlSpr(int64_t value)
+```
+
+- 参数说明：
+  - `startBit`：起始比特位索引
+  - `endBit`：终止比特位索引
+  - `value`：起止比特位上新设置的值
+
+### ResetCtrlSpr
+
+对CTRL寄存器的特定比特位做重置。
+
+```cpp
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline void ResetCtrlSpr()
+```
+
+- 参数说明：
+  - `startBit`：起始比特位索引
+  - `endBit`：终止比特位索引
+
+## CTRL寄存器常用比特位说明
+
+<table>
+<caption>表2：CTRL寄存器常用比特位功能说明</caption>
+<tr><th align="center">CTRL寄存器比特位</th><th align="center">功能</th><th align="center">默认值</th></tr>
+<tr><td align="center">CTRL[8:6]</td><td>控制数据搬运至Global Memory时原子操作的使能及数据类型选择。3'b001表示使能原子操作，数据类型为float</td><td align="center">3'b000</td></tr>
+<tr><td align="center">CTRL[10:9]</td><td>控制原子操作的类型（ADD/MAX/MIN），仅在CTRL[8:6]使能原子操作时生效</td><td align="center">2'b00</td></tr>
+<tr><td align="center">CTRL[48]</td><td>控制浮点数计算和浮点数精度转换时的饱和模式</td><td align="center">1'b0</td></tr>
+<tr><td align="center">CTRL[53]</td><td>控制整数计算指令的饱和模式</td><td align="center">1'b0</td></tr>
+<tr><td align="center">CTRL[60]</td><td>控制饱和模式的全局生效方式</td><td align="center">1'b1</td></tr>
+</table>
+
+## 约束说明
+
+- SetCtrlSpr和ResetCtrlSpr仅支持CTRL[8:6]、CTRL[10:9]、CTRL[45]、CTRL[48]、CTRL[50]、CTRL[53]、CTRL[59]、CTRL[60]比特位
+- 对于CTRL[8:6]和CTRL[10:9]的设置，建议使用原子操作API（SetAtomicAdd、SetAtomicMax、SetAtomicMin等）
+- SetCtrlSpr设置后需要使用硬件事件同步（SetFlag/WaitFlag）确保设置生效后再调用GetCtrlSpr读取
