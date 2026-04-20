@@ -46,8 +46,6 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     using engineType  = EngineType;
     using layoutType  = LayoutType;
 
-    Std::tuple<layoutType, engineType> rep;
-
     __aicore__ inline constexpr LocalTensor() {}
     __aicore__ inline constexpr LocalTensor(const EngineType& engine, const LayoutType& layout) : rep(layout, engine) {}
 
@@ -105,20 +103,16 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
-        auto iter = Data() + Layout()(coord);
+        auto sliceEngine = Engine() + Layout()(coord);
  	    auto coordLayout = MakeCoordLayout(coord, Layout());
-        auto tensor = MakeTensor(iter, coordLayout);
-        tensor.SetL2CacheHint(static_cast<CacheMode>(Engine().GetCacheMode()));
- 	    return tensor;
+ 	    return TensorType<decltype(sliceEngine), decltype(coordLayout)>{sliceEngine, coordLayout};
     }
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
-        auto iter = Data() + Layout()(coord);
+        auto sliceEngine = Engine() + Layout()(coord);
  	    auto coordLayout = MakeCoordLayout(coord, Layout());
-        auto tensor = MakeTensor(iter, coordLayout);
-        tensor.SetL2CacheHint(static_cast<CacheMode>(Engine().GetCacheMode()));
- 	    return tensor;
+ 	    return TensorType<decltype(sliceEngine), decltype(coordLayout)>{sliceEngine, coordLayout};
     }
 
     template <typename Coord0, typename Coord1, typename... Coords>
@@ -133,20 +127,16 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
     template <typename Coord, typename Info>
   	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) {
-        auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeSliceLayout(coord, Layout(), info);
-        auto tensor = MakeTensor(iter, tileLayout);
-        tensor.SetL2CacheHint(static_cast<CacheMode>(Engine().GetCacheMode()));
- 	    return tensor;
+        auto sliceEngine = Engine() + Layout()(coord);
+ 	    auto coordLayout = MakeSliceLayout(coord, Layout(), info);
+ 	    return TensorType<decltype(sliceEngine), decltype(coordLayout)>{sliceEngine, coordLayout};
   	}
 
     template <typename Coord, typename Info>
   	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const{
-        auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeSliceLayout(coord, Layout(), info);
-        auto tensor = MakeTensor(iter, tileLayout);
-        tensor.SetL2CacheHint(static_cast<CacheMode>(Engine().GetCacheMode()));
- 	    return tensor;
+        auto sliceEngine = Engine() + Layout()(coord);
+ 	    auto coordLayout = MakeSliceLayout(coord, Layout(), info);
+ 	    return TensorType<decltype(sliceEngine), decltype(coordLayout)>{sliceEngine, coordLayout};
   	}
 
     template <typename... Layouts>
@@ -172,6 +162,12 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     __aicore__ inline constexpr void SetL2CacheHint(CacheMode mode) {
         Engine().SetCacheMode(mode);
     }
+
+private:
+    Std::tuple<layoutType, engineType> rep;
+
+    template <typename TensorEngine, typename TensorLayout>
+    using TensorType = LocalTensor<TensorAttribute<TensorEngine, TensorLayout>>;
 };
 
 template <typename T>
@@ -218,12 +214,6 @@ __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& c
     return static_cast<Tensor&&>(tensor).Slice(coord, info);
 }
 
-template <typename T, typename TargetLayoutPtn>
-__aicore__ inline constexpr bool IsMatchLayoutPattern() {
-    using Layout = typename Std::conditional_t<IsLayoutV<T>, T, typename T::layoutType>::type;
-    using LayoutPattern = GetLayoutPattern<Layout>;
-    return Std::is_same_v<LayoutPattern, TargetLayoutPtn>;
-}
 
 } // namespace Te
 } // namespace AscendC
