@@ -48,7 +48,11 @@ struct Gm2L1Nd2NzParams {
 __aicore__ inline void ScmDataCopyMsg(__cbuf__ void* dst, __gm__ void* src, const DataCopyParams& intriParams,
     int32_t ubAddr)
 {
-    ASSERT(GetKfcClient() != nullptr);
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ASCENDC_DEBUG_ASSERT((GetKfcClient() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "DataCopy Gm2L1 is software-emulated on this device and works with Matmul API. Use REGISTER_MATMUL_OBJ "
+        "to enable Matmul API first.\n"));
+#endif
     auto msg = GetKfcClient()->AllocMessage();
     ASSERT(sizeof(msg->buffer) >= sizeof(struct Gm2L1Params));
 
