@@ -8,6 +8,4 @@
 
 | 目录名称 | 功能描述 |
 | ------- | -------- |
-| [get_ctrl_spr](./get_ctrl_spr)     | 本样例基于GetCtrlSpr接口实现读取CTRL寄存器特定比特位值的功能。 |
-| [reset_ctrl_spr](./reset_ctrl_spr) | 本样例基于ResetCtrlSpr接口实现重置CTRL寄存器特定比特位的功能。 |
-| [set_ctrl_spr](./set_ctrl_spr)     | 本样例基于SetCtrlSpr接口实现设置CTRL寄存器特定比特位的功能。 |
+| [ctrl_spr](./ctrl_spr)             | 本样例基于SetCtrlSpr、GetCtrlSpr、ResetCtrlSpr接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能。 |
