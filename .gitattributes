@@ -1,5 +1,2 @@
 docs/api/context/c_api/figures/*.png filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
-docs/cc/figures/*.png filter=lfs diff=lfs merge=lfs -text
-docs/cc/figures/algorithm_analyzer/*.png filter=lfs diff=lfs merge=lfs -text
-docs/cc/api/context/figures/*.png filter=lfs diff=lfs merge=lfs -text
