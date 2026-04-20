@@ -67,8 +67,7 @@ private:
     template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
     {
-        // CheckLayoutPattern<T>
-        // CheckLayoutPattern<U>
+        CheckLayoutPattern<U, T>();
     }
 
     template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U>
@@ -116,8 +115,7 @@ private:
     template <const CopyL0C2GMTrait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
     {
-        // CheckLayoutPattern<T>
-        // CheckLayoutPattern<U>
+        CheckLayoutPattern<U, T>();
     }
 
     template <const CopyL0C2GMTrait& trait, typename T, typename U, bool IsTail>

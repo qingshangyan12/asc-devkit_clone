@@ -40,8 +40,7 @@ private:
     __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckDataTypeFor3510::CheckL12FbDataType<T, U>();
-        // CheckLayoutPattern<T>
-        // CheckLayoutPattern<U>
+        CheckLayoutPattern<U, T>();
     }
 
     template <const CopyL12FBTrait& trait, typename T, typename U>
