@@ -19,11 +19,11 @@
 #include <functional>
 #include "hccl_common.h"
 #include "hccl_types.h"
-#include "alg_type.h"
+#include "../../../common/alg_type.h"
 #include "hccl_res.h"
-#include "hcomm_primitives_dl.h"
+#include "../../../common/hcomm_dlsym/hcomm_primitives_dl.h"
 #include "hccl_rank_graph.h"
-#include "binary_stream.h"
+#include "../../../common/binary_stream.h"
 #include "hccl_ccu_res.h"
 
 namespace ops_hccl {

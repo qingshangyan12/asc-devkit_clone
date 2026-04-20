@@ -91,6 +91,7 @@ target_compile_options(ccl_kernel_decoupler PRIVATE
 target_include_directories(ccl_kernel_decoupler PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/../
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
     ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
@@ -243,3 +244,11 @@ target_sources(ccl_kernel PRIVATE
     $<TARGET_OBJECTS:ccl_kernel_decoupler_open_exec>
     $<TARGET_OBJECTS:ccl_kernel_decoupler_open_exec_impl>
 )
+
+if(TARGET mc2_server)
+    target_sources(mc2_server PRIVATE
+        $<TARGET_OBJECTS:ccl_kernel_decoupler>
+        $<TARGET_OBJECTS:ccl_kernel_decoupler_open>
+        $<TARGET_OBJECTS:ccl_kernel_decoupler_open_exec>
+    )
+endif()

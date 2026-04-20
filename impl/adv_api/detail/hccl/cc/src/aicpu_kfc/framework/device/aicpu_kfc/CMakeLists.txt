@@ -9,6 +9,25 @@
 # -----------------------------------------------------------------------------------------------------------
 target_sources(ccl_kernel PRIVATE aicpu_kfc_interface.cc)
 
+if(TARGET mc2_server)
+    add_library(mc2_server_aicpu_kfc_interface OBJECT aicpu_kfc_interface.cc)
+    set_target_properties(mc2_server_aicpu_kfc_interface PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
+    )
+    target_compile_definitions(mc2_server_aicpu_kfc_interface PRIVATE
+        $<TARGET_PROPERTY:ccl_kernel,COMPILE_DEFINITIONS>
+    )
+    target_compile_options(mc2_server_aicpu_kfc_interface PRIVATE
+        $<TARGET_PROPERTY:ccl_kernel,COMPILE_OPTIONS>
+    )
+    target_include_directories(mc2_server_aicpu_kfc_interface PRIVATE
+        $<TARGET_PROPERTY:ccl_kernel,INCLUDE_DIRECTORIES>
+    )
+    target_sources(mc2_server PRIVATE
+        $<TARGET_OBJECTS:mc2_server_aicpu_kfc_interface>
+    )
+endif()
+
 add_subdirectory(algorithm)
 add_subdirectory(common)
 add_subdirectory(dfx)

@@ -20,20 +20,42 @@
 #include "common/aicpu_kfc_def.h"
 #include "comm_kfc_open_kernel_adapter.h"
 #include "dispatcher.h"
+#include "hcomm_primitives.h"
 
 namespace hccl {
 class HcclCommAicpu;
 class Stream;
 }
+class CollCommAicpuMgr;
+class CollCommAicpu;
+
+enum class ServerExecResourceType {
+    LEGACY,
+    NEXT_AICPU
+};
 
 struct ServerExecCtx {
     u64 offset;
     u64 opParamKey;
     std::string commName;
     std::vector<uint8_t> baseOpParam;
+    ServerExecResourceType resourceType{ServerExecResourceType::LEGACY};
     hccl::HcclCommAicpu *commAicpu{nullptr};
     HcclDispatcher dispatcher{nullptr};
     hccl::Stream *mainStream{nullptr};
+    CollCommAicpuMgr *commMgr{nullptr};
+    CollCommAicpu *collCommAicpu{nullptr};
+    ThreadHandle mainThread{0};
+};
+
+struct ServerProgress {
+    const char *stage{"INIT"};
+    u32 msgPos{0U};
+    u32 repeatIdx{0U};
+    u32 turnIdx{0U};
+    u64 opParamKey{0U};
+    u64 waitAddr{0U};
+    u64 recordAddr{0U};
 };
 
 class CommKfcAicpuServer {
@@ -64,15 +86,21 @@ private:
     static constexpr u64 KFC_NSEC_PER_SEC = 1000000000UL;
 #endif
     HcclResult GetServerInfoForSync(HcclHandle handle, u32 &msgPos, u32 &repeat) const;
+    void DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const;
+    void UpdateProgress(const char *stage, u32 msgPos, u32 repeatIdx, u32 turnIdx, u64 opParamKey, u64 waitAddr,
+        u64 recordAddr);
     void KeepAlive() { lastMsgTimestamp_ = GetCurCpuTimestamp(); }
     bool IsTimeout() const { return GetCurCpuTimestamp() - lastMsgTimestamp_ >= timeout_ * KFC_NSEC_PER_SEC; }
     void SetMsgPosByHandle(HcclHandle handle, u32 msgPos) { handleIdToMsgPos_[handle] = msgPos; }
     void SetRepeatByHandle(HcclHandle handle, u32 repeat) { handleIdToRepeat_[handle] = repeat; }
+    u64 ResolveLogicalStrideCount(const HcclApi::HcclMsg &msg, u32 msgPos);
+    bool TryReadMsg(u32 msgPos, HcclApi::HcclMsg &msg) const;
 
 private:
     std::unordered_map<uintptr_t, void *> ctxToOpHandle_{};
     std::unordered_map<HcclHandle, u32> handleIdToMsgPos_{};
     std::unordered_map<HcclHandle, u32> handleIdToRepeat_{};
+    std::unordered_map<u32, u64> logicalStrideByMsgPos_{};
     std::vector<ServerExecCtx> execCtxList_{};
     const ServerExecCtx *syncExecCtx_{nullptr};
     HcclApi::HcclMsgArea *msgArea_{nullptr};
@@ -81,6 +109,7 @@ private:
     u64 turnNumsAddr_{0UL};
     u32 groupIdx_;
     u32 rankNum_{0U};
+    ServerProgress lastProgress_{};
 };
 
 #endif //HCCL_COMM_KFC_AICPU_SERVER_H
