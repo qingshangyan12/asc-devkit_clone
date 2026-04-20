@@ -178,7 +178,7 @@ private:
 #define MAKE_LAYOUT_FUNC(NAME)                                                                                         \
     template <typename T>                                                                                              \
     constexpr auto Make##NAME = [](auto row, auto col) {                                                               \
-        constexpr size_t C0 = is_b4_type<T> ? 64 : 32 / sizeof(T);                                                               \
+        constexpr size_t C0 = IsB4Type<T> ? 64 : 32 / sizeof(T);                                                               \
         return MakeFrameLayout<NAME##LayoutPtn, LayoutTraitDefault<T, C0>>(row, col);                                  \
     };
 
@@ -1337,7 +1337,7 @@ void SimND2Nz(const T& dst, const U& src)
     auto srcSM1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
     auto srcSN1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
 
-    if (is_b4_type<srcType>) {
+    if (IsB4Type<srcType>) {
         EXPECT_TRUE(N % 2 == 0) << "For b4 type, col shape must be even for ND format, but got N: " << N;
         EXPECT_TRUE(srcSM1 % 2 == 0) << "For b4 type, col stride must be even for ND format, but got srcSM1: "
                                      << srcSM1;
@@ -1420,7 +1420,7 @@ void SimDN2Nz(const T& dst, const U& src)
     static_assert(Std::is_same_v<DstLayoutPtn, NZLayoutPtn>);
     static_assert(Std::is_same_v<SrcLayoutPtn, DNExtLayoutPtn>);
     using srcType = typename U::elementType;
-    static_assert(!is_b4_type<srcType>, "DN2NZ does not support b4 type");
+    static_assert(!IsB4Type<srcType>, "DN2NZ does not support b4 type");
     static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
     auto dstLayout = dst.Layout();
     auto srcLayout = src.Layout();
@@ -1469,7 +1469,7 @@ void SimDN2Zn(const T& dst, const U& src)
     auto N = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
 
     auto srcColStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
-    if (is_b4_type<srcType>) {
+    if (IsB4Type<srcType>) {
         EXPECT_TRUE(M % 2 == 0) << "For b4 type, col shape must be even for ND format, but got M: " << M;
         EXPECT_TRUE(srcColStride % 2 == 0)
             << "For b4 type, col stride must be even for ND format, but got srcColStride: " << srcColStride;
