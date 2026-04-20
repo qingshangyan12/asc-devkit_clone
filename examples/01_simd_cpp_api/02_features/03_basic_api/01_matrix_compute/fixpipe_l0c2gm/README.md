@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C（CO1 Buffer）搬出到GM（Global Memory），支持多种输出格式（NZ、ND、DN）、数据类型转换、随路量化、ReLU以及ChannelSplit等功能。这些接口用于将L0C中的矩阵乘计算结果高效地传输到全局内存，并支持各种数据格式转换和预处理能力。
+本样例介绍如何使用Fixpipe将矩阵乘的结果从CO1（L0C Buffer）搬出到GM（Global Memory），支持多种输出格式（Nz、ND、DN）、数据类型转换、随路量化、ReLU以及ChannelSplit等功能。这些接口用于将L0C中的矩阵乘计算结果高效地传输到全局内存，并支持各种数据格式转换和预处理能力。
 
 ## 支持的产品
 
@@ -22,27 +22,67 @@
 │   └── fixpipe_l0c2gm.asc             // Ascend C样例实现 & 调用样例
 ```
 
+## FixpipeParamsV220 与 FixpipeParamsArch3510 结构体对比
+
+不同产品支持的参数结构体不同：
+- **Ascend 950PR/Ascend 950DT**：支持 `FixpipeParamsV220` 和 `FixpipeParamsArch3510` 两种参数结构体，推荐使用 `FixpipeParamsArch3510`
+- **Atlas A3 训练/推理系列、Atlas A2 训练/推理系列**：仅支持 `FixpipeParamsV220`
+
+本样例通过编译参数 `CMAKE_ASC_ARCHITECTURES` 选择不同架构，根据架构自动选择对应的参数结构体：
+- `dav-2201` 架构：使用 `FixpipeParamsV220`
+- `dav-3510` 架构：使用 `FixpipeParamsArch3510`
+
+| 成员名 | FixpipeParamsV220 | FixpipeParamsArch3510 | 说明 |
+|:------:|:------------------:|:---------------------:|:-----|
+| `nSize` | ✅ | ✅ | 输出矩阵在N方向上的大小 |
+| `mSize` | ✅ | ✅ | 输出矩阵在M方向上的大小 |
+| `srcStride` | ✅ | ✅ | 源Nz矩阵中相邻Z排布的起始地址偏移 |
+| `dstStride` | ✅ | ✅ | 目的矩阵中相邻Z排布的起始地址偏移（Nz格式）或每行元素个数（ND/DN格式） |
+| `quantPre` | ✅ | ✅ | 量化模式控制 |
+| `deqScalar` | ✅ | ✅ | scalar量化参数 |
+| `reluEn` | ✅ | ✅ | ReLU开关 |
+| `unitFlag` | ✅ | ✅ | Mmad与Fixpipe细粒度并行控制 |
+| `isChannelSplit` | ✅ | ✅ | 通道拆分开关 |
+| `ndNum` / `srcNdStride` / `dstNdStride` | ✅ | ✅（在TransformParams中） | NZ2ND场景下控制多矩阵传输的参数，在V220中为独立成员，在Arch3510中被整合到`TransformParams`结构体中 |
+| `dnNum` / `srcNzMatrixStride` / `dstDnMatrixStride` / `srcNzC0Stride` | ❌ | ✅（在TransformParams中） | NZ2DN场景下控制多矩阵传输的参数，仅Arch3510支持 |
+| `TransformParams` | ❌ | ✅ | 基于模板参数的类型选择器，根据CO2Layout自动选择参数类型 |
+| `dualDstCtrl` | ❌ | ✅ | 双目标模式控制，支持M维度拆分或N维度拆分 |
+| `subBlockId` | ❌ | ✅ | 单目标模式下指示目标UB的编号 |
+
 ## 场景详细说明
 
-本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `fixpipe_l0c2gm`。
+本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景, SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `fixpipe_l0c2gm`。
 
-**场景1：输出格式NZ，输出数据类型float**
+<table>
+<caption style="font-weight: normal;">
+ 	     <span style="font-weight: bold; font-size: 1.2em;">📌 表1：scenarioNum不同取值的含义</span>
+<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C数据类型</td><td align="center">输出数据类型</td><td align="center">输出格式</td><td align="center">是否使能量化</td><td align="center">是否使能ReLU</td><td align="center">是否使能ChannelSplit</td></tr>
+<tr><td align="center">1</td><td align="center">float</td><td align="center">float</td><td align="center">Nz</td><td align="center">否</td><td align="center">否</td><td align="center">否</td></tr>
+<tr><td align="center">2</td><td align="center">float</td><td align="center">float</td><td align="center">ND</td><td align="center">否</td><td align="center">否</td><td align="center">否</td></tr>
+<tr><td align="center">3</td><td align="center">float</td><td align="center">float</td><td align="center">DN</td><td align="center">否</td><td align="center">否</td><td align="center">否</td></tr>
+<tr><td align="center">4</td><td align="center">float</td><td align="center">int8_t</td><td align="center">ND</td><td align="center">是</td><td align="center">否</td><td align="center">否</td></tr>
+<tr><td align="center">5</td><td align="center">float</td><td align="center">int8_t</td><td align="center">ND</td><td align="center">是</td><td align="center">否</td><td align="center">否</td></tr>
+<tr><td align="center">6</td><td align="center">float</td><td align="center">float</td><td align="center">ND</td><td align="center">否</td><td align="center">是</td><td align="center">否</td></tr>
+<tr><td align="center">7</td><td align="center">float</td><td align="center">float</td><td align="center">Nz</td><td align="center">否</td><td align="center">否</td><td align="center">是</td></tr>
+</table>
+
+**场景1：输出格式Nz，输出数据类型float**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
-- 输出：C [128, 256] float类型，NZ格式
-- 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_NZ>` 将数据从CO1搬出到GM，输出为NZ格式
-- 说明：CO1数据为NZ格式直接输出到GM的NZ格式，数据保持原格式不变
+- 输出：C [128, 256] float类型，Nz格式
+- 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_NZ>` 将数据从CO1搬出到GM，输出为Nz格式
+- 说明：CO1数据为Nz格式直接输出到GM的Nz格式，数据保持原格式不变
 
 **场景2：输出格式ND，输出数据类型float**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] float类型，ND格式
 - 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>` 指定ROW_MAJOR格式转换
-- 说明：将CO1中的NZ格式数据转换为ND格式输出到GM
+- 说明：将CO1中的Nz格式数据转换为ND格式输出到GM，ND格式没有Nz格式的对齐要求，输出时需要按实际大小配置参数
 
-**场景3：输出格式DN，输出数据类型float**
+**场景3：输出格式DN，输出数据类型float（仅Ascend 950PR/Ascend 950DT支持）**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [256, 128] float类型，DN格式
 - 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_COLUMN_MAJOR>` 指定COLUMN_MAJOR格式转换
-- 说明：将CO1中的NZ格式数据转换为DN格式输出到GM（仅Ascend 950PR/Ascend 950DT支持）
+- 说明：将CO1中的Nz格式数据转换为DN格式输出到GM
 
 **场景4：输出格式ND，输出数据类型int8_t，使能Scalar量化**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
@@ -62,21 +102,11 @@
 - 实现：设置 `fixpipeParams.reluEn = true` 开启ReLU功能
 - 说明：在数据从CO1搬出到GM的过程中执行ReLU操作，即将负值置为0
 
-**场景7：输出格式NZ，输出数据类型float使能ChannelSplit**
+**场景7：输出格式Nz，输出数据类型float使能ChannelSplit**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
-- 输出：C [128, 512] float类型，NZ格式（使能通道拆分）
+- 输出：C [128, 512] float类型，Nz格式（使能通道拆分）
 - 实现：设置 `fixpipeParams.isChannelSplit = true` 开启ChannelSplit功能
-- 说明：在数据从CO1搬出到GM的过程中开启通道拆分功能，即将16x16小z分型矩阵拆分成两个独立的16X8小z分型矩阵输出到GM，Fixpipe接口的输入输出必须均为float类型，且仅支持NZ格式
-
-| scenarioNum | L0C数据类型 | 输出数据类型 | 输出格式 | 是否使能ReLU | 是否使能ChannelSplit |
-|:-----------:|:----------:|:-----------:|:--------:|:------------:|:--------------------:|
-| 1 | float | float | NZ | 否 | 否 |
-| 2 | float | float | ND | 否 | 否 |
-| 3 | float | float | DN | 否 | 否 |
-| 4 | float | int8_t | ND | 否 | 否 |
-| 5 | float | int8_t | ND | 否 | 否 |
-| 6 | float | float | ND | 是 | 否 |
-| 7 | float | float | NZ | 否 | 是 |
+- 说明：在数据从CO1搬出到GM的过程中开启通道拆分功能，即将16x16小z分型矩阵拆分成两个独立的16X8小z分型矩阵输出到GM，Fixpipe接口的输入输出必须均为float类型，且仅支持Nz格式
 
 ## 编译运行
 
@@ -102,16 +132,16 @@
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake .. -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程（默认dav-2201 NPU模式）
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin  # 验证输出结果是否正确
   ```
-    使用NPU仿真模式时，添加 `-DRUN_MODE=sim` 参数即可。
-
+    使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  
   示例如下：
   ```bash
-  cmake -DRUN_MODE=sim -DNPU_ARCH=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -119,8 +149,9 @@
 - 编译选项说明
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `NPU_ARCH` | `dav-2201`（默认）、`dav-3510` | NPU 架构，dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构，dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | 1-7 | 场景编号 |
 
   执行结果如下，说明精度对比成功。
   ```bash
