@@ -24,7 +24,13 @@
   **场景1：数据类型位宽小转大**
   - 输入：half数据类型，位宽为16bit
   - 输出：int32_t数据类型，位宽为32bit
-  - 说明：从half到int32_t的Cast指令每次处理64个数据，具体流程和示意图如下：
+  - 参数说明：
+    - layoutMode = RegLayout::ZERO: Cast接口从xReg索引2\*N+0的位置读取数据，用于配合LoadAlign接口将输入数据依次搬入xReg的2\*N位置
+    - satMode = SatMode::NO_SAT：本场景介绍浮点数转整数的非饱和模式，输入数据超过输出数据类型最值时，结果被截断为输出数据类型的宽度。例如输入half值为4294967297.0，对应整数4294967297（0x100000001），则取低32位，输出int32_t值为1
+    - roundMode = RoundMode::CAST_FLOOR：本场景介绍floor（向下取整）舍入模式。例如输入half值为2.5，则输出int32值为2
+    - mask：Cast接口中，mask会按照入输入和输出中，位宽较大的数据类型来筛选，所以本场景按照int32_t数据类型生成MaskReg
+  - 实现流程：  
+    从half到int32_t的Cast指令每次处理64个数据，具体流程和示意图如下：
     - 搬入：调用LoadAlign接口，使用解压缩模式，搬入数据至2\*N位置，同时2\*N+1位置置0
     - 计算：调用Cast接口，输入输出位宽比为1:2，所以从xReg的2\*N位置读取数据，类型转换后依次写入至yReg
     - 搬出：调用StoreAlign接口，常规搬出
@@ -46,7 +52,13 @@
   **场景2：数据类型位宽大转小**
   - 输入：float数据类型，位宽为32bit
   - 输出：int16_t数据类型，位宽为16bit
-  - 说明：从half到int32_t的Cast指令每次处理64个数据，具体流程和示意图如下：
+  - 参数说明：
+    - layoutMode = RegLayout::ZERO: Cast接口将数据写入yReg索引2\*N+0的位置，用于配合StoreAlign接口搬出yReg的2\*N位置的数据
+    - satMode = SatMode::SAT：本场景介绍浮点数转整数的饱和模式，输入数据超过输出数据类型最值时，结果为输出类型的对应最值。例如输入half值为4294967297.0，对应整数4294967297（0x100000001），则取int32_t的最大值，输出int32_t值为2147483647
+    - roundMode = RoundMode::CAST_ROUND：本场景介绍round（四舍五入取整）舍入模式。例如输入half值为2.5，则输出int32值为3
+    - mask：Cast接口中，mask会按照入输入和输出中，位宽较大的数据类型来筛选，所以本场景按照float数据类型生成MaskReg
+  - 实现流程：  
+    从float到int16_t的Cast指令每次处理64个数据，具体流程和示意图如下：
     - 搬入：调用LoadAlign接口，常规搬入
     - 计算：调用Cast接口，输入输出位宽比为2:1，所以从xReg依次读取数据，类型转换后依次写入至yReg的2\*N位置，同时2\*N+1位置置0
     - 搬出：调用StoreAlign接口，采用压缩模式，仅搬出2\*N位置的数据
