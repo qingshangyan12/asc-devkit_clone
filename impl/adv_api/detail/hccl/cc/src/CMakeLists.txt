@@ -362,6 +362,7 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
         -Wl,-z,relro
         -Wl,-z,now
         -Wl,-z,noexecstack
+        -Wl,-Bsymbolic-functions
         -Wl,-z,defs
         $<$<CONFIG:Release>:-s>
     )
