@@ -61,13 +61,13 @@ enum class ReluMode{
 };
 
 union NotNumUnion {
-    __simd_callee__ NotNumUnion() {}
+    NotNumUnion() {}
     float f;
     uint32_t i;
 };
 
 union HalfUnion {
-    __simd_callee__ HalfUnion() {}
+    HalfUnion() {}
     half f;
     uint16_t i;
 };
