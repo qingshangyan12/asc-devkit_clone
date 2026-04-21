@@ -1,5 +1,8 @@
+#!/usr/bin/python3
+# coding=utf-8
+
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -9,31 +12,27 @@
 # ----------------------------------------------------------------------------------------------------------
 
 
-cmake_minimum_required(VERSION 3.16)
+import os
+import numpy as np
 
-find_package(ASC REQUIRED)
 
-project(kernel_samples LANGUAGES ASC CXX)
+def gen_golden_data():
+    """
+    生成纯搬运的输入数据和Golden数据
+    输入x: [8192]，元素值为0,1,2,...,8191
+    输出z: [8192]，元素值与x相同（纯搬运）
+    """
+    data_type = np.float32
+    total_length = 8192
+    
+    input_x = np.arange(0, total_length, 1, data_type)
+    golden = input_x
+    
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
+    input_x.tofile("./input/input_x.bin")
+    golden.tofile("./output/golden.bin")
 
-add_executable(demo
-    init_determine_compute_workspace.asc
-)
 
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-    dl
-)
-
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
-)
+if __name__ == "__main__":
+    gen_golden_data()
