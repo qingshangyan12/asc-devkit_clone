@@ -16,9 +16,10 @@ import os
 import sys
 import math
 import numpy as np
+import argparse
 
 
-def gen_golden_data_simple():
+def gen_golden_data_simple(clamp_type):
     # 初始化参数
     dtype = np.float32
     src_shape = [256]
@@ -38,7 +39,6 @@ def gen_golden_data_simple():
     # 生成 golden 数据
     n = data_size - 0
     golden = src[:n]
-    clamp_type = 0
     if clamp_type == 0:
         golden = np.clip(src, a_min=scalar, a_max=None)
     else:
@@ -50,4 +50,7 @@ def gen_golden_data_simple():
     golden.tofile("./output/golden.bin")
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--scenario', type=int, choices=(0, 1), help='指定clampmin或者clampmax，取值0或1')
+    args = parser.parse_args()
+    gen_golden_data_simple(args.scenario if args.scenario else 0)
