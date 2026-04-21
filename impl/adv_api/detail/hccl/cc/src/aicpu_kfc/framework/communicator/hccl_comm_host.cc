@@ -302,7 +302,7 @@ namespace hccl
         commAicpuParam_.deviceType = static_cast<u32>(devType_);
         std::string jsonPath;
         CHK_RET(GetKernelFilePath(jsonPath));
-        jsonPath += "ccl_kernel.json";
+        jsonPath += (devType_ == DevType::DEV_TYPE_950) ? "libmc2_server.json" : "ccl_kernel.json";
    
         HcclResult retCode = LoadBinaryFromFile(jsonPath.c_str(), ACL_RT_BINARY_LOAD_OPT_CPU_KERNEL_MODE, 0, binHandle_);
         CHK_PRT_RET(retCode != HCCL_SUCCESS,
