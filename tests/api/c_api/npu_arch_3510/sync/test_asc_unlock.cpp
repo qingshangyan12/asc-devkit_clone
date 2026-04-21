@@ -20,18 +20,18 @@ protected:
 };
 
 namespace {
-void rls_buf_stub(pipe_t pipe, uint8_t mutex_id, bool disable_blocking)
+void rls_buf_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
 {
     EXPECT_EQ(pipe, pipe_t::PIPE_S);
     EXPECT_EQ(mutex_id, static_cast<uint8_t>(11));
-    EXPECT_EQ(disable_blocking, false);
+    EXPECT_EQ(mode, false);
 }
 
-void rls_buf_non_block_stub(pipe_t pipe, uint8_t mutex_id, bool disable_blocking)
+void rls_buf_non_block_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
 {
     EXPECT_EQ(pipe, pipe_t::PIPE_S);
     EXPECT_EQ(mutex_id, static_cast<uint8_t>(11));
-    EXPECT_EQ(disable_blocking, true);
+    EXPECT_EQ(mode, true);
 }
 } // namespace
 
