@@ -77,32 +77,32 @@ struct GetTypeFromNDimTrait<
 };
 
 namespace AttrInfo {
-    struct SHAPE {};
-    struct STRIDE {};
-    struct ROW {};
-    struct COLUMN {};
+    struct Shape {};
+    struct Stride {};
+    struct Row {};
+    struct Column {};
 };
 
 template <typename T, typename info1, typename info2, size_t dim>
 struct GetNDimType;
 
 template <typename T, size_t dim>
-struct GetNDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, dim> {
+struct GetNDimType<T, AttrInfo::Shape, AttrInfo::Row, dim> {
     using type = Std::remove_cvref_t<typename GetTypeFromNDimTrait<T>::template ShapeRowDim<dim>>;
 };
 
 template <typename T, size_t dim>
-struct GetNDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, dim> {
+struct GetNDimType<T, AttrInfo::Shape, AttrInfo::Column, dim> {
     using type = Std::remove_cvref_t<typename GetTypeFromNDimTrait<T>::template ShapeColDim<dim>>;
 };
 
 template <typename T, size_t dim>
-struct GetNDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, dim> {
+struct GetNDimType<T, AttrInfo::Stride, AttrInfo::Row, dim> {
     using type = Std::remove_cvref_t<typename GetTypeFromNDimTrait<T>::template StrideRowDim<dim>>;
 };
 
 template <typename T, size_t dim>
-struct GetNDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, dim> {
+struct GetNDimType<T, AttrInfo::Stride, AttrInfo::Column, dim> {
     using type = Std::remove_cvref_t<typename GetTypeFromNDimTrait<T>::template StrideColDim<dim>>;
 };
 
@@ -125,6 +125,13 @@ using GetLayoutT = typename GetLayout<T>::type;
 template <typename T, typename TargetLayoutPtn>
 __aicore__ inline constexpr bool IsMatchLayoutPattern()
 {
+    using LayoutT = GetLayoutT<T>;
+    using LayoutPattern = GetLayoutPattern<LayoutT>;
+    return Std::is_same_v<LayoutPattern, TargetLayoutPtn>;
+}
+
+template<typename T, typename TargetLayoutPtn>
+static constexpr bool IsSatisfiedPtnFormat() {
     using LayoutT = GetLayoutT<T>;
     using LayoutPattern = GetLayoutPattern<LayoutT>;
     return Std::is_same_v<LayoutPattern, TargetLayoutPtn>;
