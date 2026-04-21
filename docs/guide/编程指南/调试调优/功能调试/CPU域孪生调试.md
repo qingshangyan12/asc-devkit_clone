@@ -55,7 +55,7 @@
 > - **地址空间限定符**：如 `__gm__`（Global Memory）、`__ubuf__`（Unified Buffer）等。
 >
 > 由于这些限定符在CPU模式下被置空，**仅通过BuiltIn关键字区分的函数签名将被视为相同**，从而导致重定义编译错误。典型问题场景包括：
-> 1. **Device侧函数与Host侧函数同名**：如下例中，`add` 函数仅通过 `__aicore__` 区分，在CPU调试模式下两个声明将冲突：
+> 1. **Device侧函数与Host侧函数同名**：如下例中，`add` 函数仅通过 `__aicore__` 区分运行域，在CPU调试模式下两个声明将冲突：
 >    ```asc
 >    __aicore__ inline void add(int x, int y);  // Device侧
 >    void add(int x, int y);                    // Host侧（等同于 __host__）
