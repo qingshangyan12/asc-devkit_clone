@@ -51,7 +51,7 @@ private:
         int64_t srcStride = 0;
         int64_t dstStride = 0;
 
-        if constexpr (IsNDExtLayout<U>() && IsNDExtLayout<T>()) {
+        if constexpr (IsSatisfiedPtnFormat<U, NDExtLayoutPtn>::value && IsSatisfiedPtnFormat<T, NDExtLayoutPtn>::value) {
             blockCount = GetTotalRowShape(srcLayout);
             // Next three parameters are in unit of 32B
             blockLen = Std::ceil_division(GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
@@ -59,7 +59,7 @@ private:
             srcStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) - GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
             dstStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) - GetTotalColumnShape(srcLayout), C0_ELEMENT<DST_TYPE>);
 
-        } else if constexpr (IsDNExtLayout<U>() && IsDNExtLayout<T>()) {
+        } else if constexpr (IsSatisfiedPtnFormat<U, DNExtLayoutPtn>::value && IsSatisfiedPtnFormat<T, DNExtLayoutPtn>::value) {
             blockCount = GetTotalColumnShape(srcLayout);
             // Next three parameters are in unit of 32B
             blockLen = Std::ceil_division(GetTotalRowShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
@@ -67,7 +67,7 @@ private:
             srcStride = Std::ceil_division((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) - GetTotalRowShape(srcLayout)), C0_ELEMENT<SRC_TYPE>);
             dstStride = Std::ceil_division((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) - GetTotalRowShape(srcLayout)), C0_ELEMENT<DST_TYPE>);
 
-        } else if constexpr (IsNZLayout<U>() && IsNZLayout<T>()) {
+        } else if constexpr (IsSatisfiedPtnFormat<U, NZLayoutPtn>::value && IsSatisfiedPtnFormat<T, NZLayoutPtn>::value) {
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             // Next three parameters are in unit of 32B
             // note: C0_Byte_Size == 32B
@@ -77,8 +77,8 @@ private:
             dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / C0_ELEMENT<DST_TYPE> - blockLen;
 
         } else {
-            static_assert((IsNDExtLayout<U>() && IsNDExtLayout<T>()) || (IsDNExtLayout<U>() && IsDNExtLayout<T>())
-                              || (IsNZLayout<U>() && IsNZLayout<T>()),
+            static_assert((IsSatisfiedPtnFormat<U, NDExtLayoutPtn>::value && IsSatisfiedPtnFormat<T, NDExtLayoutPtn>::value) || (IsSatisfiedPtnFormat<U, DNExtLayoutPtn>::value && IsSatisfiedPtnFormat<T, DNExtLayoutPtn>::value)
+                              || (IsSatisfiedPtnFormat<U, NZLayoutPtn>::value && IsSatisfiedPtnFormat<T, NZLayoutPtn>::value),
                           "Unsupported layout type combination for DataCopyL12UB3510");
         }
         CopyCbufToUbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);

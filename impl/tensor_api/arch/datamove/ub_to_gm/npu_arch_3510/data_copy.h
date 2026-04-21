@@ -53,7 +53,7 @@ private:
         int64_t srcStride = 0;
         int64_t dstStride = 0;
 
-        if constexpr (IsNDExtLayout<U>() && IsNDExtLayout<T>()) {
+        if constexpr (IsSatisfiedPtnFormat<U, NDExtLayoutPtn>::value && IsSatisfiedPtnFormat<T, NDExtLayoutPtn>::value) {
             blockCount = GetTotalRowShape(srcLayout);
             // Next three parameters are in unit of 1B
             blockLen = GetTotalColumnShape(srcLayout) * sizeof(SRC_TYPE);
@@ -61,7 +61,7 @@ private:
             srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) * sizeof(SRC_TYPE);
             dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) * sizeof(DST_TYPE);
 
-        } else if constexpr (IsDNExtLayout<U>() && IsDNExtLayout<T>()) {
+        } else if constexpr (IsSatisfiedPtnFormat<U, DNExtLayoutPtn>::value && IsSatisfiedPtnFormat<T, DNExtLayoutPtn>::value) {
             blockCount = GetTotalColumnShape(srcLayout);
             // Next three parameters are in unit of 1B
             blockLen = GetTotalRowShape(srcLayout) * sizeof(SRC_TYPE);
@@ -69,7 +69,7 @@ private:
             srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) * sizeof(SRC_TYPE);
             dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) * sizeof(DST_TYPE);
 
-        } else if constexpr (IsNZLayout<U>() && IsNZLayout<T>()) { // NZ format
+        } else if constexpr (IsSatisfiedPtnFormat<U, NZLayoutPtn>::value && IsSatisfiedPtnFormat<T, NZLayoutPtn>::value) { // NZ format
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             // Next three parameters are in unit of 1B
             blockLen = GetTotalRowShape(srcLayout) * GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout) * sizeof(SRC_TYPE);
@@ -77,8 +77,8 @@ private:
             srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) * sizeof(SRC_TYPE);
             dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) * sizeof(DST_TYPE);
         } else {
-            static_assert((IsNDExtLayout<U>() && IsNDExtLayout<T>()) || (IsDNExtLayout<U>() && IsDNExtLayout<T>())
-                              || (IsNZLayout<U>() && IsNZLayout<T>()),
+            static_assert((IsSatisfiedPtnFormat<U, NDExtLayoutPtn>::value && IsSatisfiedPtnFormat<T, NDExtLayoutPtn>::value) || (IsSatisfiedPtnFormat<U, DNExtLayoutPtn>::value && IsSatisfiedPtnFormat<T, DNExtLayoutPtn>::value)
+                              || (IsSatisfiedPtnFormat<U, NZLayoutPtn>::value && IsSatisfiedPtnFormat<T, NZLayoutPtn>::value),
                           "Unsupported layout type combination for DataCopyUB2GM3510");
         }
         if constexpr (IsB4Type<SRC_TYPE>) {
