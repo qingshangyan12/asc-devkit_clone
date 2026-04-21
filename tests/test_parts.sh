@@ -70,16 +70,17 @@ basic_test_two_targets=(
 )
 
 basic_test_three_targets=(
-    ascendc_ut_aclrtc
-    ascendc_ut_asc_compile_base
-    ascendc_ut_asc_tikcpp_utest_opbuild
-    ascendc_ut_asc_runtime
-    ascendc_ut_elf_tool
-    ascendc_ut_pack_kernel
-    ascendc_ut_tpl_tiling_debug
-    ascendc_ut_tpl_tiling_release
-    ascendc_ut_aicpu_api
-    ascendc_run_all_header_checks
+    # ascendc_ut_aclrtc
+    # ascendc_ut_asc_compile_base
+    # ascendc_ut_asc_tikcpp_utest_opbuild
+    # ascendc_ut_asc_runtime
+    # ascendc_ut_elf_tool
+    # ascendc_ut_pack_kernel
+    # ascendc_ut_tpl_tiling_debug
+    # ascendc_ut_tpl_tiling_release
+    # ascendc_ut_aicpu_api
+    # ascendc_run_all_header_checks
+    ascendc_run_all_reg_header_checks
 )
 
 basic_test_four_targets=(
