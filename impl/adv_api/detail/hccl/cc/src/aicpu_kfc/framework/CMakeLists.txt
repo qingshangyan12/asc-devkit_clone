@@ -815,6 +815,10 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     )
 
     target_include_directories(ccl_kernel PRIVATE ${ORION_HEAD_LIST})
+    if(TARGET json)
+        target_link_libraries(ccl_kernel PRIVATE json)
+        add_dependencies(ccl_kernel json)
+    endif()
 
     function(add_mc2_server_ccl_object target_name)
         if(TARGET mc2_server)
@@ -831,6 +835,10 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
                 ${CCL_KERNEL_INCLUDE_LIST}
                 ${ORION_HEAD_LIST}
             )
+            if(TARGET json)
+                target_link_libraries(${target_name} PRIVATE json)
+                add_dependencies(${target_name} json)
+            endif()
             target_sources(mc2_server PRIVATE $<TARGET_OBJECTS:${target_name}>)
             add_dependencies(mc2_server ${target_name})
         endif()
@@ -860,6 +868,10 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
             -ldl
             -lpthread
         )
+        if(TARGET json)
+            target_link_libraries(mc2_server PRIVATE json)
+            add_dependencies(mc2_server json)
+        endif()
     endif()
 
     add_subdirectory(device)
