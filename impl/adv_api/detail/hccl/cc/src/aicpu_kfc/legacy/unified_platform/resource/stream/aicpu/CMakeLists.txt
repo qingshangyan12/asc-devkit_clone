@@ -29,3 +29,15 @@ target_sources(ccl_kernel PRIVATE
         rtsq_base.cc
 )
 endif()
+
+if(TARGET mc2_server)
+target_sources(mc2_server PRIVATE
+        stream_lite.cc
+        hccl_sqe_v82.cc
+        hccl_sqe.cc
+        sqe_mgr.cc
+        sqe_build_a5.cc
+        rtsq_a5.cc
+        rtsq_base.cc
+)
+endif()

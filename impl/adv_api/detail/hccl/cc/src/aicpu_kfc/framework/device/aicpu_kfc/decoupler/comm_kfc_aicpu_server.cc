@@ -15,11 +15,13 @@
 #include "alg_param.h"
 #include "log.h"
 #include "common/aicpu_kfc_utils.h"
+#ifndef MC2_SERVER_ONLY
 #include "hccl_mc2_ex.h"
 #include "framework/aicpu_communicator.h"
 #include "framework/aicpu_hccl_process.h"
-#include "hccl_common.h"
 #include "sqe_build_a5.h"
+#endif
+#include "hccl_common.h"
 #include "aicpu_indop_process.h"
 #include "coll_comm_aicpu.h"
 #include "coll_comm_aicpu_mgr.h"
@@ -44,6 +46,7 @@ static const std::vector<HcclCMDType> SUPPORT_OP_LIST {
         }                                                           \
     } while (0)
 
+#ifndef MC2_SERVER_ONLY
 hccl::HcclCommAicpu *FindCommAicpuByName(const std::string &commName)
 {
     std::vector<std::pair<std::string, hccl::HcclCommAicpu *>> aicpuCommInfo;
@@ -57,6 +60,7 @@ hccl::HcclCommAicpu *FindCommAicpuByName(const std::string &commName)
     }
     return nullptr;
 }
+#endif
 
 CollCommAicpuMgr *FindNextCommMgrByName(const std::string &commName)
 {
@@ -250,6 +254,11 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx *ctx)
             execCtx.collCommAicpu = collCommAicpu;
             execCtx.mainThread = mainThread;
         } else {
+#ifdef MC2_SERVER_ONLY
+            HCCL_ERROR("Group %u: mc2_server does not support legacy resource for commName[%s], opParamKey %#llx.",
+                       groupIdx_, commName.c_str(), opParamKey);
+            return HCCL_E_PARA;
+#else
             hccl::HcclCommAicpu *commAicpu = FindCommAicpuByName(commName);
             CHK_PRT_RET(commAicpu == nullptr,
                         HCCL_ERROR("Group %u: failed to find commAicpu for commName[%s], opParamKey %#llx.",
@@ -258,6 +267,7 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx *ctx)
             execCtx.commAicpu = commAicpu;
             execCtx.dispatcher = commAicpu->GetDispatcher();
             execCtx.mainStream = &commAicpu->GetMainStream();
+#endif
         }
         execCtxList_.push_back(execCtx);
         HCCL_INFO("Group %u: add exec ctx for opParamKey %#llx, commName[%s], resource type %u, "
@@ -395,6 +405,10 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
         return HCCL_SUCCESS;
     }
 
+#ifdef MC2_SERVER_ONLY
+    HCCL_ERROR("Group %u: mc2_server does not support legacy CCore wait.", groupIdx_);
+    return HCCL_E_INTERNAL;
+#else
     CHK_PTR_NULL(execCtx.mainStream);
     uint8_t *sqeBuffer = nullptr;
     uint8_t *sqeTypeAddr = nullptr;
@@ -419,6 +433,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
     HcclResult ret = LaunchTask(execCtx.dispatcher, *execCtx.mainStream);
     HCCL_INFO("[MC2_OPEN_DIAG][CcoreWaitEnd] group %u, turnNum %u, ret %u.", groupIdx_, turnNum, ret);
     return ret;
+#endif
 }
 
 HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
@@ -449,6 +464,10 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
         return HCCL_SUCCESS;
     }
 
+#ifdef MC2_SERVER_ONLY
+    HCCL_ERROR("Group %u: mc2_server does not support legacy CCore post.", groupIdx_);
+    return HCCL_E_INTERNAL;
+#else
     CHK_PTR_NULL(execCtx.mainStream);
     uint8_t *sqeBuffer = nullptr;
     uint8_t *sqeTypeAddr = nullptr;
@@ -472,6 +491,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
     HcclResult ret = LaunchTask(execCtx.dispatcher, *execCtx.mainStream);
     HCCL_INFO("[MC2_OPEN_DIAG][CcorePostEnd] group %u, turnNum %u, ret %u.", groupIdx_, turnNum, ret);
     return ret;
+#endif
 }
 
 HcclResult CommKfcAicpuServer::FormatOpParamFromMsg(
@@ -610,6 +630,10 @@ HcclResult CommKfcAicpuServer::IsAllTaskFinished(u32 msgPos, bool &isFinish)
         return HCCL_SUCCESS;
     }
 
+#ifdef MC2_SERVER_ONLY
+    HCCL_ERROR("Group %u: mc2_server does not support legacy task finish check.", groupIdx_);
+    return HCCL_E_INTERNAL;
+#else
     // opHandles_能保证不为空，同一个通信域检查任何一个ophandle即可
     CHK_PRT_RET(ctxToOpHandle_.empty(), HCCL_ERROR("Group %u: legacy op handle is empty.", groupIdx_),
                 HCCL_E_INTERNAL);
@@ -635,6 +659,7 @@ HcclResult CommKfcAicpuServer::IsAllTaskFinished(u32 msgPos, bool &isFinish)
         HCCL_INFO("Group %u: Op handle %#llx is released, HCCL context %#llxx.", groupIdx_, it.second, it.first);
     }
     return HCCL_SUCCESS;
+#endif
 }
 
 HcclResult CommKfcAicpuServer::InterGroupSync(const CommKfcAicpuServer &otherServer, HcclHandle handle)
@@ -658,9 +683,14 @@ HcclResult CommKfcAicpuServer::InterGroupSync(const CommKfcAicpuServer &otherSer
     if (syncExecCtx_->resourceType == ServerExecResourceType::NEXT_AICPU) {
         return LaunchOpenCcoreWait(*syncExecCtx_, waitAddr, repeat, turnNumsAddr_, false);
     }
+#ifdef MC2_SERVER_ONLY
+    HCCL_ERROR("Group %u: mc2_server does not support legacy inter-group sync.", groupIdx_);
+    return HCCL_E_INTERNAL;
+#else
     CHK_PRT_RET(ctxToOpHandle_.empty(), HCCL_ERROR("Group %u: legacy op handle is empty.", groupIdx_),
                 HCCL_E_INTERNAL);
     return HcclLaunchCcoreWait(ctxToOpHandle_.begin()->second, waitAddr, repeat, turnNumsAddr_, false);
+#endif
 }
 
 HcclResult CommKfcAicpuServer::CheckTimeOut(u32 msgPos)
@@ -810,6 +840,12 @@ HcclResult CommKfcAicpuServer::ErrorDfxProcess(HcclResult errorCode)
         return (errorCode == HCCL_E_AGAIN) ? HCCL_SUCCESS : errorCode;
     }
 
+#ifdef MC2_SERVER_ONLY
+    AicpuKfcUtils::PrintAllHcclMsgArea(msgArea_, rankNum_, errorCode != HCCL_E_AGAIN);
+    HCCL_ERROR("Group %u: mc2_server does not support legacy error process, errorCode[%u].",
+               groupIdx_, static_cast<u32>(errorCode));
+    return (errorCode == HCCL_E_AGAIN) ? HCCL_SUCCESS : errorCode;
+#else
     CHK_PRT_RET(ctxToOpHandle_.empty(), HCCL_ERROR("Group %u: legacy op handle is empty.", groupIdx_),
                 HCCL_E_INTERNAL);
     void *firstHandle = ctxToOpHandle_.begin()->second;
@@ -822,4 +858,5 @@ HcclResult CommKfcAicpuServer::ErrorDfxProcess(HcclResult errorCode)
         HcclPrintTaskExceptionAllComm(firstHandle);
     }
     return errorCode;
+#endif
 }

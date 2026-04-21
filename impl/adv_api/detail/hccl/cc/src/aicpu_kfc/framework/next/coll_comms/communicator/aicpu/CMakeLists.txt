@@ -24,3 +24,12 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${src_list}
     )
 endif()
+
+if(TARGET mc2_server)
+    target_include_directories(mc2_server PRIVATE
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator/ns_recovery/aicpu
+    )
+    target_sources(mc2_server PRIVATE
+        ${src_list}
+    )
+endif()

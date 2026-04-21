@@ -15,3 +15,9 @@ set(src_list
 target_sources(ccl_kernel PRIVATE
     ${src_list}
 )
+
+if(TARGET mc2_server)
+    target_sources(mc2_server PRIVATE
+        aicpu_kfc_utils.cc
+    )
+endif()

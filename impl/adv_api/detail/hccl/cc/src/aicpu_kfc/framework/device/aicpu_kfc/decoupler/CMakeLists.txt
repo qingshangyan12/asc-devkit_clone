@@ -246,9 +246,32 @@ target_sources(ccl_kernel PRIVATE
 )
 
 if(TARGET mc2_server)
+    add_library(mc2_server_decoupler OBJECT ${src_list})
+    set_target_properties(mc2_server_decoupler PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+    target_compile_definitions(mc2_server_decoupler PRIVATE
+        $<TARGET_PROPERTY:ccl_kernel,COMPILE_DEFINITIONS>
+        MC2_SERVER_ONLY
+    )
+
+    target_compile_options(mc2_server_decoupler PRIVATE
+        $<TARGET_PROPERTY:ccl_kernel,COMPILE_OPTIONS>
+    )
+
+    target_include_directories(mc2_server_decoupler PRIVATE
+        ${HCCL_HCOMM_HEADER_DIR}/../
+        ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
+        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
+        ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
+        $<TARGET_PROPERTY:ccl_kernel,INCLUDE_DIRECTORIES>
+    )
+
     target_sources(mc2_server PRIVATE
-        $<TARGET_OBJECTS:ccl_kernel_decoupler>
+        $<TARGET_OBJECTS:mc2_server_decoupler>
         $<TARGET_OBJECTS:ccl_kernel_decoupler_open>
         $<TARGET_OBJECTS:ccl_kernel_decoupler_open_exec>
+        $<TARGET_OBJECTS:ccl_kernel_decoupler_open_exec_impl>
     )
 endif()

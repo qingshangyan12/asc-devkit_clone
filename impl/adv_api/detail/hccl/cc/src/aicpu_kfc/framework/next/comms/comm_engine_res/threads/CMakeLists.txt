@@ -25,3 +25,9 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${src_list}
     )
 endif()
+
+if(TARGET mc2_server)
+    target_sources(mc2_server PRIVATE
+        ${src_list}
+    )
+endif()

@@ -12,7 +12,9 @@
 
 #include "common/aicpu_hccl_common.h"
 #include "utils/hccl_aicpu_utils.h"
+#ifndef MC2_SERVER_ONLY
 #include "dfx/aicpu_profiling_manager.h"
+#endif
 
 using namespace HcclApi;
 namespace {
@@ -390,7 +392,11 @@ bool AicpuKfcUtils::IsDebugModeEquals(const AicpuComContext &ctx, const uint8_t 
 
 bool AicpuKfcUtils::NeedRecordTimeTaken(const AicpuComContext &ctx)
 {
+#ifdef MC2_SERVER_ONLY
+    return IsDebugModeEquals(ctx, MC2_DEBUG_TIME_TAKEN);
+#else
     return IsDebugModeEquals(ctx, MC2_DEBUG_TIME_TAKEN) || dfx::ProfilingManager::GetProfL1State();
+#endif
 }
 
 void AicpuKfcUtils::PrintApiStats(HcclMsgArea *hcclMsgArea, const s32 logLevel)
@@ -484,6 +490,10 @@ void AicpuKfcUtils::PrintAllHcclMsgAreaForMulti(HcclMsgArea *hcclMsgArea, bool e
 }
 
 HcclResult AicpuKfcUtils::ThreadBarrier(u64 timeout) {
+#ifdef MC2_SERVER_ONLY
+    (void)timeout;
+    return HCCL_SUCCESS;
+#else
     const u32 threadNum = HcclAicpuUtils::GetBlockNum();
     if (threadNum <= 1U) {
         return HCCL_SUCCESS;
@@ -508,15 +518,20 @@ HcclResult AicpuKfcUtils::ThreadBarrier(u64 timeout) {
         }
     }
     return HCCL_SUCCESS;
+#endif
 }
 
 HcclResult AicpuKfcUtils::TraceProfSubmit()
 {
+#ifdef MC2_SERVER_ONLY
+    return HCCL_SUCCESS;
+#else
     if (dfx::ProfilingManager::GetProfL1State()) {
         CHK_PRT_RET(dfx::AicpuProfilingManager::ReportTaskInfo() != HCCL_SUCCESS, HCCL_ERROR("prof task info failed"),
                     HCCL_E_INTERNAL);
     }
     return HCCL_SUCCESS;
+#endif
 }
 
 void AicpuKfcUtils::PrintHcclCommParamDesc(const CommKfcParamDesc &desc)

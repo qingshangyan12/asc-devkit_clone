@@ -24,3 +24,11 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         sync_data_aicpu_ts.cc
     )
 endif()
+
+if(TARGET mc2_server)
+    target_sources(mc2_server PRIVATE
+        ${common_src_list}
+        hccl_api_data_aicpu_ts.cc
+        sync_data_aicpu_ts.cc
+    )
+endif()
