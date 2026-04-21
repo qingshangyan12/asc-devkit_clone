@@ -43,7 +43,7 @@ __aicore__ inline void asc_dcci_entire_all()
     asc_dcci_entire_all_impl();
 }
 
-__aicore__ inline void asc_dcci_entire_out(t)
+__aicore__ inline void asc_dcci_entire_out()
 {
     asc_dcci_entire_out_impl();
 }
