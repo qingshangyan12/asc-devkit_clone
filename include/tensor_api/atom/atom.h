@@ -21,26 +21,8 @@
 #ifndef INCLUDE_TENSOR_API_ATOM_ATOM_H
 #define INCLUDE_TENSOR_API_ATOM_ATOM_H
 
-#include "impl/tensor_api/atom/copy_atom_impl.h"
-#include "impl/tensor_api/atom/mmad_atom_impl.h"
-
-namespace AscendC {
-namespace Te {
-
-template <typename CopyOperation, typename... CopyOpArgs>
-struct CopyTraits;
-
-template <typename... Args>
-struct CopyAtom;
-
-template <typename MadOperation, typename... MadOpArgs>
-struct MmadTraits;
-
-template <typename... Args>
-struct MmadAtom;
-
-}
-}
+#include "include/tensor_api/atom/cube_datamove/copy_atom.h"
+#include "include/tensor_api/atom/cube_compute/mmad_atom.h"
 
 #endif // INCLUDE_TENSOR_API_ATOM_ATOM_H
 
