@@ -1,0 +1,206 @@
+# Regbase API 掩码控制
+
+## 1. 掩码概述
+
+Regbase API中，掩码作为参数传递给计算接口，实现局部掩码控制。每次计算可以使用不同的掩码。
+
+### 1.1 与Membase的区别
+
+| 特性 | Membase | Regbase |
+|-----|---------|---------|
+| 掩码位置 | 全局Mask寄存器 | 参数传递 |
+| 设置方式 | `asc_set_vector_mask` | 创建/更新掩码寄存器 |
+| 作用范围 | 影响后续所有计算 | 仅影响当前计算 |
+| 灵活性 | 相对固定 | 灵活，每次计算可不同 |
+
+---
+
+## 2. 掩码创建
+
+### 2.1 创建接口
+
+```cpp
+vector_bool mask;
+mask = asc_create_mask_b8(PAT_ALL);   // 8位数据
+mask = asc_create_mask_b16(PAT_ALL);  // 16位数据
+mask = asc_create_mask_b32(PAT_ALL);  // 32位数据
+```
+
+### 2.2 模式参数
+
+| 参数 | 说明 |
+|-----|------|
+| PAT_ALL | 所有元素为True |
+| PAT_OTHER | 其他模式（参考API文档） |
+
+### 2.3 示例
+
+```cpp
+vector_bool mask;
+mask = asc_create_mask_b16(PAT_ALL);  // 创建128个元素全为True的掩码
+```
+
+---
+
+## 3. 掩码更新
+
+### 3.1 更新接口
+
+```cpp
+mask = asc_update_mask_b8(length);   // 根据长度更新8位掩码
+mask = asc_update_mask_b16(length);  // 根据长度更新16位掩码
+mask = asc_update_mask_b32(length);  // 根据长度更新32位掩码
+```
+
+**功能**：根据需要操作的元素数量生成对应的掩码。
+
+### 3.2 使用场景
+
+- 处理非VL长度的数据时
+- 处理数据尾块时
+- 需要部分元素参与计算时
+
+### 3.3 示例
+
+```cpp
+// 只处理64个元素（half类型，VL=128）
+vector_bool mask = asc_update_mask_b16(64);
+
+asc_add(dst, src0, src1, mask);  // 只有前64个元素参与计算
+```
+
+---
+
+## 4. 从寄存器读取掩码
+
+### 4.1 asc_get_mask_spr
+
+```cpp
+asc_get_mask_spr(vector_bool& mask);
+```
+
+**功能**：从特殊寄存器SPR{MASK1, MASK0}读取mask值。
+
+---
+
+## 5. 掩码使用示例
+
+### 5.1 全元素计算
+
+```cpp
+vector_half src0, src1, dst;
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
+
+asc_add(dst, src0, src1, mask);  // 所有128个元素参与计算
+```
+
+### 5.2 部分元素计算
+
+```cpp
+vector_half src0, src1, dst;
+vector_bool mask = asc_update_mask_b16(64);  // 只处理64个元素
+
+asc_add(dst, src0, src1, mask);  // 前64个元素参与计算
+```
+
+### 5.3 循环处理
+
+```cpp
+constexpr uint32_t one_repeat_size = 128;  // half类型VL元素数
+uint32_t total_length = 500;
+uint32_t repeat_time = (total_length + one_repeat_size - 1) / one_repeat_size;
+
+for (uint16_t i = 0; i < repeat_time; ++i) {
+    uint32_t remaining = total_length - i * one_repeat_size;
+    uint32_t count = (remaining > one_repeat_size) ? one_repeat_size : remaining;
+    
+    vector_bool mask = asc_update_mask_b16(count);  // 根据剩余元素更新掩码
+    
+    asc_loadalign(src, src_addr + i * one_repeat_size);
+    asc_add(dst, src, src, mask);
+    asc_storealign(dst_addr + i * one_repeat_size, dst, mask);
+}
+```
+
+### 5.4 比较结果作为掩码
+
+```cpp
+vector_half src0, src1;
+vector_bool cmp_result, mask;
+vector_half dst;
+
+mask = asc_create_mask_b16(PAT_ALL);
+asc_gt(cmp_result, src0, src1, mask);  // 比较结果存入cmp_result
+
+// 使用比较结果作为掩码进行后续操作
+asc_select(dst, src0, src1, cmp_result);
+```
+
+---
+
+## 6. 掩码逻辑运算
+
+### 6.1 逻辑与
+
+```cpp
+vector_bool mask0, mask1, result;
+asc_and(result, mask0, mask1);
+```
+
+### 6.2 逻辑或
+
+```cpp
+asc_or(result, mask0, mask1);
+```
+
+### 6.3 逻辑非
+
+```cpp
+asc_not(result, mask0);
+```
+
+### 6.4 逻辑异或
+
+```cpp
+asc_xor(result, mask0, mask1);
+```
+
+---
+
+## 7. 掩码与数据类型匹配
+
+掩码创建/更新接口需与数据类型匹配：
+
+| 数据类型 | 掩码接口 |
+|---------|---------|
+| int8_t, uint8_t, fp8等 | `asc_create_mask_b8`, `asc_update_mask_b8` |
+| half, int16_t, bfloat16等 | `asc_create_mask_b16`, `asc_update_mask_b16` |
+| float, int32_t等 | `asc_create_mask_b32`, `asc_update_mask_b32` |
+
+---
+
+## 8. 掩码寄存器约束
+
+### 8.1 位宽说明
+
+掩码寄存器位宽为VL/8 = 256B/8 = 32字节。
+
+对于不同数据类型：
+- 8位数据：掩码有256位（每个元素对应1位）
+- 16位数据：掩码有128位（每个元素对应1位）
+- 32位数据：掩码有64位（每个元素对应1位）
+
+### 8.2 位排列
+
+掩码按小端序排布，低位对应前面的元素：
+
+```
+bit0 → 元素0
+bit1 → 元素1
+...
+```
+
+---
+
+**文档版本**: 1.0  
+**适用产品**: Ascend 950PR/Ascend 950DT
