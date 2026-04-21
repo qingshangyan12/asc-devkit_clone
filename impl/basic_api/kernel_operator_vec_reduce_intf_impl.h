@@ -98,7 +98,7 @@ __aicore__ inline void BlockReduceSum(const LocalTensor<T>& dst, const LocalTens
     const int32_t repeatTime, const int32_t mask, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-    ReduceDataBlock<NewReduceType::SUM>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    ReduceDataBlock<NewReduceType::SUM, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
 /*
@@ -117,7 +117,7 @@ __aicore__ inline void BlockReduceMax(const LocalTensor<T>& dst, const LocalTens
     const int32_t repeatTime, const int32_t mask, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-    ReduceDataBlock<NewReduceType::MAX>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    ReduceDataBlock<NewReduceType::MAX, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
 /*
@@ -136,7 +136,7 @@ __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTens
     const int32_t repeatTime, const int32_t mask, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-    ReduceDataBlock<NewReduceType::MIN>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    ReduceDataBlock<NewReduceType::MIN, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
 template <NewReduceType reduceType, typename T, bool isSetMask>
@@ -151,7 +151,7 @@ __aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T
     using PrimType = PrimT<T>;
     ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
         "ReducePair<NewReduceType::SUM>, current api support dtype combination is src and dst both: half / float");});
-    ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "PairReduceSum");
+    ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "ReducePair<NewReduceType::SUM>");
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -234,7 +234,7 @@ __aicore__ inline void BlockReduceSum(const LocalTensor<T>& dst, const LocalTens
     const int32_t repeatTime, const uint64_t mask[], const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-    ReduceDataBlock<NewReduceType::SUM>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    ReduceDataBlock<NewReduceType::SUM, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
 template <typename T, bool isSetMask>
@@ -242,7 +242,7 @@ __aicore__ inline void BlockReduceMax(const LocalTensor<T>& dst, const LocalTens
     const int32_t repeatTime, const uint64_t mask[], const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-    ReduceDataBlock<NewReduceType::MAX>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    ReduceDataBlock<NewReduceType::MAX, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
 template <typename T, bool isSetMask>
@@ -250,7 +250,7 @@ __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTens
     const int32_t repeatTime, const uint64_t mask[], const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-    ReduceDataBlock<NewReduceType::MIN>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    ReduceDataBlock<NewReduceType::MIN, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
 template <NewReduceType reduceType, typename T, bool isSetMask>
