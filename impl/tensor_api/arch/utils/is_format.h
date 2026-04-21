@@ -130,13 +130,6 @@ __aicore__ inline constexpr bool IsMatchLayoutPattern()
     return Std::is_same_v<LayoutPattern, TargetLayoutPtn>;
 }
 
-template<typename T, typename TargetLayoutPtn>
-static constexpr bool IsSatisfiedPtnFormat() {
-    using LayoutT = GetLayoutT<T>;
-    using LayoutPattern = GetLayoutPattern<LayoutT>;
-    return Std::is_same_v<LayoutPattern, TargetLayoutPtn>;
-}
-
 template <typename T>
 __aicore__ inline constexpr bool IsZNLayout()
 { return IsMatchLayoutPattern<T, ZNLayoutPtn>(); }
