@@ -74,11 +74,26 @@ template <typename Coord, typename LayoutType, typename TensorType>
     return MakeLayout(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride());
 }
 
+template <typename T, typename U>
+__aicore__ inline constexpr auto MinIntegralConstant(const T& src, const U& dst)
+{
+    static_assert(IsIntegralConstantV<T> && IsIntegralConstantV<U>, "T and U must be Std::Int<>");
+    if constexpr (T::value < U::value) {
+        return T{};
+    } else {
+        return U{};
+    }
+}
+
 struct MinOp {
     template <typename T, typename U>
     __aicore__ inline constexpr auto operator()(const T& src, const U& dst) const
     {
-        return Std::min(src, dst);
+        if constexpr (IsIntegralConstantV<T> && IsIntegralConstantV<U>) {
+            return MinIntegralConstant(src, dst);
+        } else {
+            return Std::min(src, dst);
+        }
     }
 };
 
