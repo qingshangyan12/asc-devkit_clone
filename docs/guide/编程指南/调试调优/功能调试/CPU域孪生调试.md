@@ -36,7 +36,7 @@
     其他CMakeLists.txt项目配置[通过CMake编译](../../编译与运行/AI-Core-SIMD编译/通过CMake编译.md)进行编写。
 
 >[!NOTE]说明 
->为了实现CPU域与NPU域代码归一，框架在CPU域中仅对部分acl接口进行适配，开发者在使用CPU域调测功能时，仅支持使用如下acl接口，并且不支持用户自行链接ascendcl库：
+>为了实现CPU域与NPU域代码归一，框架在CPU域中仅对部分acl接口进行适配，开发者在使用CPU域调测功能时，仅支持使用如下acl接口，并且不支持用户自行链接**ascendcl库**：
 >-   有实际功能接口，支持CPU域调用
 >    -   aclDataTypeSize、aclFloat16ToFloat、aclFloatToFloat16。
 >    -   aclrtMalloc、aclrtFree、aclrtMallocHost、aclrtFreeHost、aclrtMemset、aclrtMemsetAsync、aclrtMemcpy、aclrtMemcpyAsync、aclrtMemcpy2d、aclrtMemcpy2dAsync、aclrtCreateContext、aclrtDestroyContext。
@@ -47,6 +47,25 @@
 >        aclInit、aclFinalize、aclrtGetVersion。
 >    -   运行时管理
 >        aclrtSetDevice、aclrtResetDevice、aclrtCreateStream、aclrtCreateStreamWithConfig、aclrtDestroyStream、aclrtDestroyStreamForce、aclrtSynchronizeStream、aclrtCreateContext、aclrtDestroyContext。
+
+> [!CAUTION]注意
+> 在CPU孪生调试模式下，编译器不识别AscendC提供的[SIMD-BuiltIn关键字](../../语言扩展层/SIMD-BuiltIn关键字.md)及[SIMT-BuiltIn关键字](../../语言扩展层/SIMT-BuiltIn关键字.md)，而是由孪生调试框架将这些关键字定义为空，包括
+> - **函数执行空间限定符**：如 `__aicore__`、`__global__`、`__host__` 等;
+> - **函数标记宏**：如 `__simd_vf__`、`__simd_callee__`、`__simt_vf__` 等；
+> - **地址空间限定符**：如 `__gm__`（Global Memory）、`__ubuf__`（Unified Buffer）等。
+>
+> 由于这些限定符在CPU模式下被置空，**仅通过BuiltIn关键字区分的函数签名将被视为相同**，从而导致重定义编译错误。典型问题场景包括：
+> 1. **Device侧函数与Host侧函数同名**：如下例中，`add` 函数仅通过 `__aicore__` 区分，在CPU调试模式下两个声明将冲突：
+>    ```asc
+>    __aicore__ inline void add(int x, int y);  // Device侧
+>    void add(int x, int y);                    // Host侧（等同于 __host__）
+>    ```
+> 2. **参数类型仅有地址空间限定符不同**：如下例中，两个Device侧函数仅在指针的地址空间限定符上不同：
+>    ```asc
+>    __aicore__ inline void process(__gm__ void* data, int size);
+>    __aicore__ inline void process(__ubuf__ void* data, int size);
+>   
+> **编写建议**：请勿定义仅依赖BuiltIn关键字来区分的函数。
 
 ## gdb调试<a name="section13838280458"></a>
 
