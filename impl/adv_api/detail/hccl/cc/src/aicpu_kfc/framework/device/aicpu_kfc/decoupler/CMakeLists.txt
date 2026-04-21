@@ -272,6 +272,5 @@ if(TARGET mc2_server)
         $<TARGET_OBJECTS:mc2_server_decoupler>
         $<TARGET_OBJECTS:ccl_kernel_decoupler_open>
         $<TARGET_OBJECTS:ccl_kernel_decoupler_open_exec>
-        $<TARGET_OBJECTS:ccl_kernel_decoupler_open_exec_impl>
     )
 endif()

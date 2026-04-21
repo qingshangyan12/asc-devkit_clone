@@ -17,7 +17,7 @@ target_sources(ccl_kernel PRIVATE
 )
 
 if(TARGET mc2_server)
-    target_sources(mc2_server PRIVATE
-        aicpu_kfc_utils.cc
+    add_mc2_server_ccl_object(mc2_server_aicpu_kfc_common
+        ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc_utils.cc
     )
 endif()

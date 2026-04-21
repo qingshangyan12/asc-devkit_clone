@@ -27,5 +27,11 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     )
 endif()
 
+if(TARGET mc2_server)
+    add_mc2_server_ccl_object(mc2_server_next_dfx
+        ${device_src_list}
+    )
+endif()
+
 add_subdirectory(profiling)
 add_subdirectory(taskException)

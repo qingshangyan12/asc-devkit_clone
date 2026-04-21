@@ -16,3 +16,9 @@ target_sources(ccl_kernel PRIVATE
     mirror_task_manager_lite.cc
 )
 endif()
+
+if(TARGET mc2_server)
+add_mc2_server_ccl_object(mc2_server_legacy_dfx_common
+    ${CMAKE_CURRENT_SOURCE_DIR}/mirror_task_manager_lite.cc
+)
+endif()

@@ -782,6 +782,13 @@ int32_t HcommAcquireComm(const char* commId)
     CHK_PTR_NULL(commId);
     DevType deviceType;
     CHK_RET(hrtGetDeviceType(deviceType));
+#ifdef MC2_SERVER_ONLY
+    CHK_PRT_RET(deviceType != DevType::DEV_TYPE_950,
+        HCCL_ERROR("%s only supports DEV_TYPE_950 in mc2_server, commId[%s]", __func__, commId),
+        HCCL_E_NOT_SUPPORT);
+    CollCommAicpuMgr *hcclComm = AicpuIndopProcess::AicpuGetCommMgrbyGroup(commId);
+    CHK_PRT_RET(!hcclComm, HCCL_ERROR("%s AicpuGetCommMgrbyGroup is null, commId[%s]", __func__, commId), HCCL_E_PTR);
+#else
     if (deviceType != DevType::DEV_TYPE_950) {
         HcclCommAicpu *hcclComm = AicpuHcclProcess::AicpuGetCommbyGroup(commId);
         CHK_PRT_RET(!hcclComm, HCCL_ERROR("%s AicpuGetCommbyGroup is null, commId[%s]", __func__, commId), HCCL_E_PTR);
@@ -790,6 +797,7 @@ int32_t HcommAcquireComm(const char* commId)
         CollCommAicpuMgr *hcclComm = AicpuIndopProcess::AicpuGetCommMgrbyGroup(commId);
         CHK_PRT_RET(!hcclComm, HCCL_ERROR("%s AicpuGetCommMgrbyGroup is null, commId[%s]", __func__, commId), HCCL_E_PTR);
     }
+#endif
     return HCCL_SUCCESS;
 }
 
@@ -816,6 +824,13 @@ int32_t HcommReleaseComm(const char* commId)
     CHK_PTR_NULL(commId);
     DevType deviceType;
     CHK_RET(hrtGetDeviceType(deviceType));
+#ifdef MC2_SERVER_ONLY
+    CHK_PRT_RET(deviceType != DevType::DEV_TYPE_950,
+        HCCL_ERROR("%s only supports DEV_TYPE_950 in mc2_server, commId[%s]", __func__, commId),
+        HCCL_E_NOT_SUPPORT);
+    AicpuIndopProcess::AicpuReleaseCommMgrbyGroup(commId);
+    HCCL_INFO("[%s] AicpuReleaseCommMgrbyGroup success, commId[%s]", __func__, commId);
+#else
     if (deviceType != DevType::DEV_TYPE_950) {
         AicpuHcclProcess::AicpuReleaseCommbyGroup(commId);
         HCCL_INFO("[%s] AicpuReleaseCommbyGroup success, commId[%s]", __func__, commId);
@@ -823,6 +838,7 @@ int32_t HcommReleaseComm(const char* commId)
         AicpuIndopProcess::AicpuReleaseCommMgrbyGroup(commId);
         HCCL_INFO("[%s] AicpuReleaseCommMgrbyGroup success, commId[%s]", __func__, commId);
     }
+#endif
     return HCCL_SUCCESS;
 }
 

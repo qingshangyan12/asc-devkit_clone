@@ -18,3 +18,10 @@ target_sources(ccl_kernel PRIVATE
     ${src_list}
 )
 endif()
+
+if(TARGET mc2_server)
+add_mc2_server_ccl_object(mc2_server_next_ns_recovery
+    ${CMAKE_CURRENT_SOURCE_DIR}/ns_recovery_func_lite.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ns_recovery_lite.cc
+)
+endif()

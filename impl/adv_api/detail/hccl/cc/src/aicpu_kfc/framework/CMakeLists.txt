@@ -816,6 +816,26 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 
     target_include_directories(ccl_kernel PRIVATE ${ORION_HEAD_LIST})
 
+    function(add_mc2_server_ccl_object target_name)
+        if(TARGET mc2_server)
+            add_library(${target_name} OBJECT ${ARGN})
+            set_target_properties(${target_name} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+            target_compile_definitions(${target_name} PRIVATE
+                $<TARGET_PROPERTY:ccl_kernel,COMPILE_DEFINITIONS>
+                MC2_SERVER_ONLY
+            )
+            target_compile_options(${target_name} PRIVATE
+                $<TARGET_PROPERTY:ccl_kernel,COMPILE_OPTIONS>
+            )
+            target_include_directories(${target_name} PRIVATE
+                ${CCL_KERNEL_INCLUDE_LIST}
+                ${ORION_HEAD_LIST}
+            )
+            target_sources(mc2_server PRIVATE $<TARGET_OBJECTS:${target_name}>)
+            add_dependencies(mc2_server ${target_name})
+        endif()
+    endfunction()
+
     if(TARGET mc2_server)
         target_compile_definitions(mc2_server PRIVATE
             $<TARGET_PROPERTY:ccl_kernel,COMPILE_DEFINITIONS>
@@ -829,8 +849,11 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         )
         target_link_libraries(mc2_server PRIVATE
             -Wl,--no-as-needed
+            ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/libascend_hal.so
             c_sec
+            unified_dlog
             ccl_kernel_plf
+            ccl_kernel_plf_a
             mmpa
             -Wl,--as-needed
             -lrt

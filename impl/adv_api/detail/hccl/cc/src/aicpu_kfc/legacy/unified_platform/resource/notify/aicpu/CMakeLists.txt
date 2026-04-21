@@ -23,9 +23,9 @@ target_sources(ccl_kernel PRIVATE
 endif()
 
 if(TARGET mc2_server)
-target_sources(mc2_server PRIVATE
-        notify_lite.cc
-        cnt_nto1_notify_lite.cc
-        cnt_1ton_notify_lite.cc
+add_mc2_server_ccl_object(mc2_server_legacy_notify_aicpu
+        ${CMAKE_CURRENT_SOURCE_DIR}/notify_lite.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/cnt_nto1_notify_lite.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/cnt_1ton_notify_lite.cc
 )
 endif()

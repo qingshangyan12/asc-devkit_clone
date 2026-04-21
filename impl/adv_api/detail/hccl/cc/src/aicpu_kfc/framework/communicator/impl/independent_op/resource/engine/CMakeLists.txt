@@ -25,3 +25,8 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     )
 endif()
 
+if(TARGET mc2_server)
+    add_mc2_server_ccl_object(mc2_server_indop_resource_engine
+        ${CMAKE_CURRENT_SOURCE_DIR}/notify_manager.cc
+    )
+endif()

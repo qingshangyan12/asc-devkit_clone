@@ -27,7 +27,10 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 endif()
 
 if(TARGET mc2_server)
-    target_sources(mc2_server PRIVATE
-        ${src_list}
+    add_mc2_server_ccl_object(mc2_server_threads
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpu_ts_thread.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_ts_thread.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/aiv_thread.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/thread.cc
     )
 endif()

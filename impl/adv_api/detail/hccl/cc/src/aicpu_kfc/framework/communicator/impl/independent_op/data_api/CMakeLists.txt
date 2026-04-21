@@ -26,9 +26,9 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 endif()
 
 if(TARGET mc2_server)
-    target_sources(mc2_server PRIVATE
-        ${common_src_list}
-        hccl_api_data_aicpu_ts.cc
-        sync_data_aicpu_ts.cc
+    add_mc2_server_ccl_object(mc2_server_indop_data_api
+        ${CMAKE_CURRENT_SOURCE_DIR}/launch_context.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/hccl_api_data_aicpu_ts.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/sync_data_aicpu_ts.cc
     )
 endif()

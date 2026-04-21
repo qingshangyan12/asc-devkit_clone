@@ -26,10 +26,14 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 endif()
 
 if(TARGET mc2_server)
-    target_include_directories(mc2_server PRIVATE
-        ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator/ns_recovery/aicpu
+    add_mc2_server_ccl_object(mc2_server_next_comm_aicpu
+        ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_indop_process.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/coll_comm_aicpu_mgr.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/coll_comm_aicpu.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/hccl_aicpu_hdc_handler.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/coll_comm_aicpu_destroy_func.cc
     )
-    target_sources(mc2_server PRIVATE
-        ${src_list}
+    target_include_directories(mc2_server_next_comm_aicpu PRIVATE
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator/ns_recovery/aicpu
     )
 endif()

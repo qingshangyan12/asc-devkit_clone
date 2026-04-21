@@ -17,3 +17,9 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${device_src_list}
     )
 endif()
+
+if(TARGET mc2_server)
+    add_mc2_server_ccl_object(mc2_server_next_profiling_aicpu
+        ${device_src_list}
+    )
+endif()
