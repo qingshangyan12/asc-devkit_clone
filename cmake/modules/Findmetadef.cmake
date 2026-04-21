@@ -53,6 +53,27 @@ else()
   endif()
 endif()
 
+find_library(GRAPH_LIB_DIR
+  NAME graph
+  PATHS ${METADEF_LIB_SEARCH_PATHS}
+  PATH_SUFFIXES lib64
+  NO_CMAKE_SYSTEM_PATH
+  NO_CMAKE_FIND_ROOT_PATH
+)
+
+if(GRAPH_LIB_DIR)
+  get_filename_component(GRAPH_LIB_DIR ${GRAPH_LIB_DIR} REALPATH)
+  add_library(graph SHARED IMPORTED)
+  set_target_properties(graph PROPERTIES
+    IMPORTED_LOCATION ${GRAPH_LIB_DIR}
+  )
+  message(STATUS "Found graph library:${GRAPH_LIB_DIR}")
+else()
+  if(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG)
+    message(STATUS "Cannot find library graph")
+  endif()
+endif()
+
 find_library(OPP_REGISTRY_LIB_DIR
   NAME opp_registry
   PATHS ${METADEF_LIB_SEARCH_PATHS}
