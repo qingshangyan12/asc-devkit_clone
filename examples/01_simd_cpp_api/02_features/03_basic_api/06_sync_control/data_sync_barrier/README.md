@@ -2,7 +2,9 @@
 
 ## 概述
 
-本样例介绍DataSyncBarrier的调用，该接口功能：阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，适用于核内标量单元流水（PIPE_S）的同步。
+本样例在矢量计算场景下，基于DataSyncBarrier实现核内内存访问完成屏障同步，用于确保数据搬运完成后才开始计算。样例实现了两个输入Tensor的逐元素加法运算，数据量为8192，数据类型为float。
+
+DataSyncBarrier接口功能：阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，适用于核内内存访问完成的同步场景。与SetFlag/WaitFlag事件同步不同，DataSyncBarrier是一种内存访问完成屏障，确保内存操作真正完成后再执行后续指令。
 
 ## 支持的产品
 
@@ -13,80 +15,93 @@
 
 ```
 ├── data_sync_barrier
-│   ├── CMakeLists.txt                   // 编译工程文件
-│   └── data_sync_barrier.asc      // Ascend C算子实现 & 调用样例
+│   ├── scripts
+│   │   ├── gen_data.py            // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py       // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt             // 编译工程文件
+│   ├── data_utils.h               // 数据读入写出函数
+│   └── data_sync_barrier.asc      // Ascend C样例实现 & 调用样例
 ```
 
-## 算子描述
+## 样例规格
 
-核内单流水同步指令包含[PipeBarrier](../pipe_barrier/)和DataSyncBarrier，其中调用PipeBarrier<PIPE_S>()会引发硬件错误。因此当需要做标量流水之间的同步需要使用DataSyncBarrier。
+<table border="2">
+<caption>表1：样例规格对照表</caption>
+<tr><th>类型</th><th>名称</th><th>Shape</th><th>数据类型</th><th>格式</th></tr>
+<tr><td>输入</td><td>x</td><td>[8192]</td><td>float</td><td>ND</td></tr>
+<tr><td>输入</td><td>y</td><td>[8192]</td><td>float</td><td>ND</td></tr>
+<tr><td>输出</td><td>z</td><td>[8192]</td><td>float</td><td>ND</td></tr>
+<tr><td>核函数名</td><td>kernel_data_sync_barrier</td><td>-</td><td>-</td><td>-</td></tr>
+</table>
 
-下面介绍 DataSyncBarrier 的一种使用场景：
-系统中有两个 AIV 核（核 0 与核 1），变量 x、y 初始值均为 1。核 0 通过标量流水接口[WriteGmByPassDCache](../../16_scalar_computation/write_gm_by_pass_dcache/)向GM依次写入 x=7、y=6；核 1 持续轮询变量 y，直到检测到 y=6 后，再从 GM 中读取变量 x 并打印。
+## DataSyncBarrier使用场景说明
 
-预期行为：当 y=6 写入 GM 时，x=7 必须已完成写入 GM，因此核 1 最终打印的 x 值应为 7。
+核内同步接口包含SetFlag/WaitFlag、PipeBarrier和DataSyncBarrier，各自适用场景不同：
 
-但由于标量流水不能保证指令间的写序一致性，若不加同步，可能出现 y 已更新而 x 尚未写入 GM 的情况，导致核 1 读到错误的 x 值。
-此时需要插入同步指令 DataSyncBarrier，以确保两次写操作顺序执行。
+- **SetFlag/WaitFlag**：用于不同pipe之间的生产者/消费者依赖同步，如MTE2搬运完成后通知V开始计算。
+- **PipeBarrier**：用于同一条流水内部前后指令的先后依赖。
+- **DataSyncBarrier**：用于等待内存访问真正完成，确保数据已写入存储单元后再执行后续操作。注意：DataSyncBarrier并非所有芯片都支持，使用前需确认目标芯片的API支持表。
 
-如下所示，核 0 通过同步指令完成对GM中张量srcGlobal第 1 个元素与第 0 个元素的顺序写入。调用DataSyncBarrier后，将阻塞后续WriteGmByPassDCache指令的执行，直至此前所有WriteGmByPassDCache类型的 GM(对应DDR) 访问指令全部完成。
+本样例展示了DataSyncBarrier在矢量计算场景中的使用：在数据搬运（DataCopy）完成后，调用DataSyncBarrier确保数据已写入UB存储单元，然后再执行加法计算（Add）。
 
-        if (blockIdx == 0) {
-            AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm)+1, value+1);
-            AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>(); // 三种取值，ALL(包含DDR+UB)、DDR、UB
-            AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm), value); // value = 6
-        }
+DataSyncBarrier的参数MemDsbT有三种取值：
+- **MemDsbT::ALL**：等待所有存储单元（DDR+UB）的内存访问完成
+- **MemDsbT::DDR**：等待GM（DDR）存储单元的内存访问完成
+- **MemDsbT::UB**：等待UB存储单元的内存访问完成
 
-在核 1 中，一直循环读取GM中输入tensor srcGlobal的第0个元素的取值value，当value的取值与核 0 向srcGlobal写入的值相等时，此时可以认为GM中srcGlobal第 1 个元素也已经被核 0 写入。
-
-        if (blockIdx == 1) {
-            while(true){
-                __gm__ T *addr = const_cast<__gm__ T *>(srcGlobal.GetPhyAddr());
-                T value = AscendC::ReadGmByPassDCache<T>(addr);
-                if(value == 6){
-                    __gm__ T *addr = const_cast<__gm__ T *>(srcGlobal.GetPhyAddr());
-                    T valueNew = AscendC::ReadGmByPassDCache<T>(addr+1);
-                    AscendC::printf("GM上addr+1位置的值：%u\n",valueNew);
-                    AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(dstGm), 2 * valueNew);
-                    return;
-                }
-            }
-        }
+本样例使用MemDsbT::UB，因为DataCopy搬运的目标是UB存储单元。
 
 ## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+### 编译选项说明
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+| 参数 | 说明 | 可选值 | 默认值 |
+|------|------|---------|--------|
+| CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+| CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-2201 |
 
-  - 默认路径，非root用户安装CANN软件包
+### 配置环境变量
 
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
+请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
 
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
-
-- 样例执行
-
+- 默认路径，root用户安装CANN软件包
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  ./demo                        # 执行编译生成的可执行程序，执行样例
+  source /usr/local/Ascend/cann/set_env.sh
   ```
 
-  执行结果如下，说明精度对比成功。
-
+- 默认路径，非root用户安装CANN软件包
   ```bash
-  test pass!
+  source $HOME/Ascend/cann/set_env.sh
   ```
+
+- 指定路径install_path，安装CANN软件包
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
+
+### 样例执行
+
+```bash
+mkdir -p build && cd build;
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
+python3 ../scripts/gen_data.py
+./demo
+python3 ../scripts/verify_result.py output/output.bin output/golden.bin
+```
+
+使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+示例如：
+```bash
+cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
+cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+```
+
+> **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+执行结果如下，说明精度对比成功。
+```bash
+test pass!
+```
