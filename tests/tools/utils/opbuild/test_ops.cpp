@@ -397,6 +397,33 @@ public:
 };
 OP_ADD(SocVersionTest1);
 
+class SocVersionDynamicIgnoreContTest : public OpDef {
+public:
+    SocVersionDynamicIgnoreContTest(const char* name) : OpDef(name)
+    {
+        this->Input("x1").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
+        this->Input("x2").ParamType(DYNAMIC).DataType({ ge::DT_INT64 });
+        this->Input("x3").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
+        this->Output("y1").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
+        OpAICoreConfig aicConfig;
+        this->AICore().AddConfig("ascend910", aicConfig);
+        OpAICoreConfig config_a;
+        config_a.Input("x1").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
+        config_a.Input("x2").ParamType(DYNAMIC).DataType({ ge::DT_INT64 });
+        config_a.Input("x3").ParamType(REQUIRED).DataType({ ge::DT_INT64 }).AutoContiguous();
+        config_a.Output("y1").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
+        this->AICore().AddConfig("ascend310p", config_a);
+
+        OpAICoreConfig config_b;
+        config_b.Input("x1").ParamType(REQUIRED).DataType({ ge::DT_INT64 }).AutoContiguous();
+        config_b.Input("x2").ParamType(DYNAMIC).DataType({ ge::DT_INT64 }).IgnoreContiguous();
+        config_b.Input("x3").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
+        config_b.Output("y1").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
+        this->AICore().AddConfig("ascend910b", config_b);
+    }
+};
+OP_ADD(SocVersionDynamicIgnoreContTest);
+
 class RmsNormGradTest : public OpDef {
 public:
     RmsNormGradTest(const char* name) : OpDef(name)
