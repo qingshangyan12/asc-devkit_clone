@@ -17,6 +17,8 @@ extern "C" {
  * x1 : required
  * x2 : dynamic
  * x3 : required
+ * x4 : required
+ * x5 : dynamic
  * out : required
  * workspaceSize : size of workspace(output).
  * executor : executor context(output).
@@ -26,6 +28,8 @@ aclnnStatus aclnnSocVersionDynamicIgnoreContTestGetWorkspaceSize(
     const aclTensor *x1,
     const aclTensorList *x2,
     const aclTensor *x3,
+    const aclTensor *x4,
+    const aclTensorList *x5,
     const aclTensor *out,
     uint64_t *workspaceSize,
     aclOpExecutor **executor);

@@ -137,6 +137,8 @@ REG_OP(SocVersionDynamicIgnoreContTest)
     .INPUT(x1, ge::TensorType::ALL())
     .DYNAMIC_INPUT(x2, ge::TensorType::ALL())
     .INPUT(x3, ge::TensorType::ALL())
+    .INPUT(x4, ge::TensorType::ALL())
+    .DYNAMIC_INPUT(x5, ge::TensorType::ALL())
     .OUTPUT(y1, ge::TensorType::ALL())
     .OP_END_FACTORY_REG(SocVersionDynamicIgnoreContTest);
 

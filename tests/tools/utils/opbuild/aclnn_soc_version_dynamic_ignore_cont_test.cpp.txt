@@ -50,36 +50,42 @@ enum NnopbaseAttrDtype {
     kNnopbaseString,
     kNnopbaseAttrEnd
 };
-uint32_t socSupportList[] = {SOC_VERSION_ASCEND310P,SOC_VERSION_ASCEND910A,SOC_VERSION_ASCEND910B};
+uint32_t socSupportList[] = {SOC_VERSION_ASCEND910A,SOC_VERSION_ASCEND310P,SOC_VERSION_ASCEND910B};
 uint32_t socSupportListLen = 3;
 
-TensorDesc inputDesc0_0[3] =
+TensorDesc inputDesc0_0[5] =
     {{ge::DT_INT64, ge::FORMAT_ND},
+     {ge::DT_INT64, ge::FORMAT_ND},
+     {ge::DT_INT64, ge::FORMAT_ND},
      {ge::DT_INT64, ge::FORMAT_ND},
      {ge::DT_INT64, ge::FORMAT_ND}};
 TensorDesc outputDesc0_0[1] =
     {{ge::DT_INT64, ge::FORMAT_ND}};
-SupportInfo list0_0 = {inputDesc0_0, 3, outputDesc0_0, 1};
+SupportInfo list0_0 = {inputDesc0_0, 5, outputDesc0_0, 1};
 SupportInfo supportInfo0[1] = {list0_0};
 OpSocSupportInfo socSupportInfo0= {supportInfo0, 1};
 
-TensorDesc inputDesc1_0[3] =
+TensorDesc inputDesc1_0[5] =
     {{ge::DT_INT64, ge::FORMAT_ND},
+     {ge::DT_INT64, ge::FORMAT_ND},
+     {ge::DT_INT64, ge::FORMAT_ND},
      {ge::DT_INT64, ge::FORMAT_ND},
      {ge::DT_INT64, ge::FORMAT_ND}};
 TensorDesc outputDesc1_0[1] =
     {{ge::DT_INT64, ge::FORMAT_ND}};
-SupportInfo list1_0 = {inputDesc1_0, 3, outputDesc1_0, 1};
+SupportInfo list1_0 = {inputDesc1_0, 5, outputDesc1_0, 1};
 SupportInfo supportInfo1[1] = {list1_0};
 OpSocSupportInfo socSupportInfo1= {supportInfo1, 1};
 
-TensorDesc inputDesc2_0[3] =
+TensorDesc inputDesc2_0[5] =
     {{ge::DT_INT64, ge::FORMAT_ND},
+     {ge::DT_INT64, ge::FORMAT_ND},
+     {ge::DT_INT64, ge::FORMAT_ND},
      {ge::DT_INT64, ge::FORMAT_ND},
      {ge::DT_INT64, ge::FORMAT_ND}};
 TensorDesc outputDesc2_0[1] =
     {{ge::DT_INT64, ge::FORMAT_ND}};
-SupportInfo list2_0 = {inputDesc2_0, 3, outputDesc2_0, 1};
+SupportInfo list2_0 = {inputDesc2_0, 5, outputDesc2_0, 1};
 SupportInfo supportInfo2[1] = {list2_0};
 OpSocSupportInfo socSupportInfo2= {supportInfo2, 1};
 
@@ -165,6 +171,8 @@ aclnnStatus aclnnSocVersionDynamicIgnoreContTestGetWorkspaceSize(
     const aclTensor *x1,
     const aclTensorList *x2,
     const aclTensor *x3,
+    const aclTensor *x4,
+    const aclTensorList *x5,
     const aclTensor *out,
     uint64_t *workspaceSize,
     aclOpExecutor **executor)
@@ -175,13 +183,15 @@ aclnnStatus aclnnSocVersionDynamicIgnoreContTestGetWorkspaceSize(
     void *nnopExecutor;
     static void *executorSpace = NULL;
     const char *opType = "SocVersionDynamicIgnoreContTest";
-    char inputDesc[] = {1, 2, 1};
+    char inputDesc[] = {1, 2, 1, 1, 2};
     char outputDesc[] = {1};
     char attrDesc[] = {};
 
     NNOPBASE_ASSERT_NOTNULL_RETVAL(x1);
     NNOPBASE_ASSERT_NOTNULL_RETVAL(x2);
     NNOPBASE_ASSERT_NOTNULL_RETVAL(x3);
+    NNOPBASE_ASSERT_NOTNULL_RETVAL(x4);
+    NNOPBASE_ASSERT_NOTNULL_RETVAL(x5);
     NNOPBASE_ASSERT_NOTNULL_RETVAL(out);
 
     if (!executorSpace) {
@@ -214,10 +224,26 @@ aclnnStatus aclnnSocVersionDynamicIgnoreContTestGetWorkspaceSize(
             NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddDynamicInput(*executor, x2, 1));
         }
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddInput(*executor, x3, 2));
+        NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddIgnoreContinuesInput(*executor, x4, 3));
+        if (NnopbaseAddIgnoreContiguousDynamicInput != NULL) {
+            NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddIgnoreContiguousDynamicInput(*executor, x5, 4));
+        } else {
+            NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddDynamicInput(*executor, x5, 4));
+        }
     } else {
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddInput(*executor, x1, 0));
-        NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddDynamicInput(*executor, x2, 1));
+        if (NnopbaseAddIgnoreContiguousDynamicInput != NULL) {
+            NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddIgnoreContiguousDynamicInput(*executor, x2, 1));
+        } else {
+            NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddDynamicInput(*executor, x2, 1));
+        }
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddInput(*executor, x3, 2));
+        NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddIgnoreContinuesInput(*executor, x4, 3));
+        if (NnopbaseAddIgnoreContiguousDynamicInput != NULL) {
+            NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddIgnoreContiguousDynamicInput(*executor, x5, 4));
+        } else {
+            NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddDynamicInput(*executor, x5, 4));
+        }
     }
     NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddOutput(*executor, out, 0));
     if (NnopbaseMatchArgs != NULL) {
@@ -230,6 +256,8 @@ aclnnStatus aclnnSocVersionDynamicIgnoreContTestGetWorkspaceSize(
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddParamName(*executor, 0, "x1", true));
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddParamName(*executor, 1, "x2", true));
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddParamName(*executor, 2, "x3", true));
+        NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddParamName(*executor, 3, "x4", true));
+        NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddParamName(*executor, 4, "x5", true));
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddParamName(*executor, 0, "out", false));
     }
     NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddSupportList(*executor, &supportList, socSupportList, socSupportListLen));
