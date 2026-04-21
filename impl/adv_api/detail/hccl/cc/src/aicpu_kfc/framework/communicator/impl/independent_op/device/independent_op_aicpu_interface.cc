@@ -9,8 +9,10 @@
  */
 
 #include "independent_op_aicpu_interface.h"
-#include "framework/aicpu_hccl_process.h"
 #include "aicpu_indop_process.h"
+#ifndef MC2_SERVER_ONLY
+#include "framework/aicpu_hccl_process.h"
+#endif
 
 extern "C" {
 __attribute__((visibility("default"))) uint32_t RunAicpuIndOpCommInit(void *args)
@@ -24,6 +26,11 @@ __attribute__((visibility("default"))) uint32_t RunAicpuIndOpCommInit(void *args
                 commAicpuParam->hcomId, commAicpuParam->deviceLogicId, commAicpuParam->devicePhyId, commAicpuParam->deviceType);
         return AicpuIndopProcess::AicpuIndOpCommInit(commAicpuParam);
     }
+#ifdef MC2_SERVER_ONLY
+    HCCL_ERROR("[RunAicpuIndOpCommInit] mc2_server does not support non-950 deviceType[%u].", devType);
+    return HCCL_E_NOT_SUPPORT;
+#else
     return AicpuHcclProcess::AicpuIndOpCommInit(commAicpuParam);
+#endif
 }
 }
