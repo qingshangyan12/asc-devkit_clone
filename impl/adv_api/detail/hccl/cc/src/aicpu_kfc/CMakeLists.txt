@@ -124,7 +124,12 @@ if(BUILD_OPEN_PROJECT)
 # todo:删除了非open project的定义
 endif()
 
-add_dependencies(ccl_kernel_plf json)
+if(TARGET json)
+    target_link_libraries(ccl_kernel_plf json)
+    target_link_libraries(ccl_kernel_plf_a json)
+    add_dependencies(ccl_kernel_plf json)
+    add_dependencies(ccl_kernel_plf_a json)
+endif()
 
 if(BUILD_OPEN_PROJECT)
     add_dependencies(ccl_kernel_plf hccl_legacy)
