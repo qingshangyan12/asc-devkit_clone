@@ -35,7 +35,7 @@ void rls_buf_non_block_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
 }
 } // namespace
 
-TEST_F(TEST_ASC_UNLOCK, asc_lock_DefaultBlockSucc)
+TEST_F(TEST_ASC_UNLOCK, asc_unlock_DefaultBlockSucc)
 {
     MOCKER_CPP(rls_buf, void(pipe_t, uint8_t, bool))
         .times(1)
@@ -45,7 +45,7 @@ TEST_F(TEST_ASC_UNLOCK, asc_lock_DefaultBlockSucc)
     GlobalMockObject::verify();
 }
 
-TEST_F(TEST_ASC_UNLOCK, asc_lock_BlockSucc)
+TEST_F(TEST_ASC_UNLOCK, asc_unlock_BlockSucc)
 {
     MOCKER_CPP(rls_buf, void(pipe_t, uint8_t, bool))
         .times(1)
@@ -55,7 +55,7 @@ TEST_F(TEST_ASC_UNLOCK, asc_lock_BlockSucc)
     GlobalMockObject::verify();
 }
 
-TEST_F(TEST_ASC_UNLOCK, asc_lock_NonBlockSucc)
+TEST_F(TEST_ASC_UNLOCK, asc_unlock_NonBlockSucc)
 {
     MOCKER_CPP(rls_buf, void(pipe_t, uint8_t, bool))
         .times(1)
