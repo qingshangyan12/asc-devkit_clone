@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -11,26 +11,26 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-
-import numpy as np
+import argparse
 import os
+import numpy as np
 
 
 def gen_golden_data():
-    M = 32
-    N = 32
-    K = 32
+    m=1
+    k=256
+    n=32
 
-    x1_gm = np.random.uniform(1, 10, [M, K]).astype(np.float16)
-    x2_gm = np.random.uniform(1, 10, [K, N]).astype(np.float16)
-    bias_gm = np.random.uniform(1, 10, [N]).astype(np.float16)
-    golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)) + bias_gm.astype(np.float32)
-    golden = golden.astype(np.float32)
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    x1_gm = np.random.uniform(1, 10, [m, k]).astype(np.float16)
+    x2_gm = np.random.uniform(1, 10, [k, n]).astype(np.float16)
+    golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(np.float32)
+    x2_gm = x2_gm.transpose()
+
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
+
     x1_gm.tofile("./input/x1_gm.bin")
     x2_gm.tofile("./input/x2_gm.bin")
-    bias_gm.tofile("./input/bias_gm.bin")
     golden.tofile("./output/golden.bin")
 
 
