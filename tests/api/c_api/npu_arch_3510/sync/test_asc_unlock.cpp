@@ -41,7 +41,7 @@ TEST_F(TEST_ASC_UNLOCK, asc_unlock_DefaultBlockSucc)
         .times(1)
         .will(invoke(rls_buf_stub));
 
-    asc_unlock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(10));
+    asc_unlock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(11));
     GlobalMockObject::verify();
 }
 
@@ -51,7 +51,7 @@ TEST_F(TEST_ASC_UNLOCK, asc_unlock_BlockSucc)
         .times(1)
         .will(invoke(rls_buf_stub));
 
-    asc_unlock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(10), ASC_LOCK_BLOCK);
+    asc_unlock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(11), ASC_LOCK_BLOCK);
     GlobalMockObject::verify();
 }
 
@@ -61,6 +61,6 @@ TEST_F(TEST_ASC_UNLOCK, asc_unlock_NonBlockSucc)
         .times(1)
         .will(invoke(rls_buf_non_block_stub));
 
-    asc_unlock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(10), ASC_LOCK_NON_BLOCK);
+    asc_unlock(pipe_t::PIPE_MTE3, static_cast<uint8_t>(11), ASC_LOCK_NON_BLOCK);
     GlobalMockObject::verify();
 }
