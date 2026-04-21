@@ -37,6 +37,12 @@ __attribute__((visibility("default"))) uint32_t RunAicpuIndOpThreadInit(void *ar
 #endif
 }
 
+__attribute__((visibility("default"))) uint32_t Mc2RunAicpuIndOpThreadInit(void *args)
+{
+    HCCL_INFO("[Mc2RunAicpuIndOpThreadInit] forward to RunAicpuIndOpThreadInit.");
+    return RunAicpuIndOpThreadInit(args);
+}
+
 __attribute__((visibility("default"))) uint32_t RunAicpuIndOpNotify(void *args)
 {
     CHK_PTR_NULL(args);
@@ -55,6 +61,12 @@ __attribute__((visibility("default"))) uint32_t RunAicpuIndOpNotify(void *args)
 #else
     return AicpuHcclProcess::AicpuIndOpNotifyInit(param);
 #endif
+}
+
+__attribute__((visibility("default"))) uint32_t Mc2RunAicpuIndOpNotify(void *args)
+{
+    HCCL_INFO("[Mc2RunAicpuIndOpNotify] forward to RunAicpuIndOpNotify.");
+    return RunAicpuIndOpNotify(args);
 }
 
 __attribute__((visibility("default"))) uint32_t RunAicpuThreadInit(void* args)
@@ -84,5 +96,11 @@ __attribute__((visibility("default"))) uint32_t RunAicpuThreadSupplementNotify(v
     HCCL_INFO("[RunAicpuThreadSupplementNotify] threadNum[%u], deviceLogicId[%d], deviceType[%u]", 
         param->threadNum, param->deviceLogicId, param->deviceType);
     return AicpuThreadProcess::AicpuThreadSupplementNotify(param);
+}
+
+__attribute__((visibility("default"))) uint32_t Mc2RunAicpuThreadSupplementNotify(void* args)
+{
+    HCCL_INFO("[Mc2RunAicpuThreadSupplementNotify] forward to RunAicpuThreadSupplementNotify.");
+    return RunAicpuThreadSupplementNotify(args);
 }
 }

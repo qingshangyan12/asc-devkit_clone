@@ -441,6 +441,7 @@ private:
     std::unique_ptr<HcclCommunicator> communicator_;
 
     bool isAicpuCommInit_ = false;
+    bool useMc2ServerKernelNames_ = false;
     CommAicpuParam commAicpuParam_;
     aclrtBinHandle binHandle_ = nullptr;
     DevType devType_ = DevType::DEV_TYPE_COUNT;

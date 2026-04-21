@@ -26,6 +26,7 @@ struct NsRecoveryData {
     std::vector<ChannelHandle> hostChannelHandleList_;
     uint32_t channelNum_;
     std::string commTag_;
+    bool useMc2ServerKernelNames_{false};
 };
 
 class NsRecoveryProcessor {
@@ -33,7 +34,8 @@ public:
     void SetKfcControlTransfer(std::shared_ptr<HDCommunicate> kfcControlTransferH2D, 
         std::shared_ptr<HDCommunicate> kfcStatusTransferD2H);
     void AddNsRecoveryData(const CommEngine& engine, const ChannelHandle *const channelHandles, 
-        const ChannelHandle *const hostChannelHandleList, uint32_t channelNum, const std::string &commTag);
+        const ChannelHandle *const hostChannelHandleList, uint32_t channelNum, const std::string &commTag,
+        bool useMc2ServerKernelNames);
     HcclResult StopLaunch();
     HcclResult Clean();
     HcclResult Resume(aclrtBinHandle binHandle);
@@ -50,4 +52,3 @@ private:
 }
 
 #endif
-

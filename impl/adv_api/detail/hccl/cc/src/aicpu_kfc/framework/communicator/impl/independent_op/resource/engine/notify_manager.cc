@@ -131,13 +131,15 @@ HcclResult NotifyManager::HcclAllocNotify(CommEngine commEngine, ::NotifyType no
     std::unique_ptr<NotifyHandle[]> handles;
     EXECEPTION_CATCH(handles = std::make_unique<NotifyHandle[]>(notifyNum), return HCCL_E_PTR);
     if (isAicpu) {
+        bool useMc2ServerKernelNames = callbacks_.useMc2ServerKernelNames ? callbacks_.useMc2ServerKernelNames() : false;
         if (!callbacks_.getAicpuCommState()) {
             HcclResult ret = callbacks_.kernelLaunchAicpuCommInit();
             CHK_PRT_RET(ret != HCCL_SUCCESS, 
                 HCCL_ERROR("[%s] kernelLaunchAicpuCommInit failed, return [%d].", __func__, ret), ret);
             callbacks_.setAicpuCommState(true);
         }
-        CHK_RET(AicpuLaunchMgr::NotifyKernelLaunchAlloc(newNotifys, commId_, handles, binHandle_));
+        CHK_RET(AicpuLaunchMgr::NotifyKernelLaunchAlloc(newNotifys, commId_, handles, binHandle_,
+            useMc2ServerKernelNames));
         for (uint32_t i = 0; i < notifyNum; ++i) {
             HCCL_INFO("[NotifyManager][%s] aicpu handles[%u] = [%lu]", __func__, i, handles[i]);
         }
@@ -192,7 +194,9 @@ HcclResult NotifyManager::HcommFreeNotify(uint32_t notifyNum, NotifyHandle *noti
     // 2. 先释放 Device 侧（若失败则直接返回，不动 Host）
     bool hasAicpu = !aicpuNotifys.empty();
     if (hasAicpu) {
-        HcclResult ret = AicpuLaunchMgr::NotifyKernelLaunchFree(aicpuNotifys, aicpuNotifys.size(), commId_, binHandle_);
+        bool useMc2ServerKernelNames = callbacks_.useMc2ServerKernelNames ? callbacks_.useMc2ServerKernelNames() : false;
+        HcclResult ret = AicpuLaunchMgr::NotifyKernelLaunchFree(aicpuNotifys, aicpuNotifys.size(), commId_,
+            binHandle_, useMc2ServerKernelNames);
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR("[NotifyManager][%s] NotifyKernelLaunchFree failed ret[%d], num[%u], skip host erase",
                 __func__, ret, aicpuNotifys.size());

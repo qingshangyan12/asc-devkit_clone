@@ -24,7 +24,8 @@ void NsRecoveryProcessor::SetKfcControlTransfer(std::shared_ptr<HDCommunicate> k
 }
 
 void NsRecoveryProcessor::AddNsRecoveryData(const CommEngine& engine, const ChannelHandle *const channelHandles, 
-    const ChannelHandle *const hostChannelHandleList, uint32_t channelNum, const std::string &commTag)
+    const ChannelHandle *const hostChannelHandleList, uint32_t channelNum, const std::string &commTag,
+    bool useMc2ServerKernelNames)
 {
     HCCL_INFO("[NsRecovery][AddData] AddNsRecoveryData for engine[%d], channelNum[%u], commTag[%s]", 
         static_cast<int>(engine), channelNum, commTag.c_str());
@@ -34,7 +35,7 @@ void NsRecoveryProcessor::AddNsRecoveryData(const CommEngine& engine, const Chan
         deviceList.push_back(channelHandles[index]);
         hostList.push_back(hostChannelHandleList[index]);
     }
-    NsRecoveryData data{deviceList, hostList, channelNum, commTag};
+    NsRecoveryData data{deviceList, hostList, channelNum, commTag, useMc2ServerKernelNames};
     nsRecoveryDatas_[engine].emplace_back(std::move(data));
 }
 
@@ -151,7 +152,7 @@ HcclResult NsRecoveryProcessor::Resume(aclrtBinHandle binHandle)
         if (recoveryData.first == COMM_ENGINE_AICPU || recoveryData.first == COMM_ENGINE_AICPU_TS) {
             for (auto& handleData : recoveryData.second) {
                 CHK_RET(hcomm::ChannelProcess::ChannelUpdateKernelLaunch(handleData.channelHandles_.data(), handleData.hostChannelHandleList_.data(), 
-                handleData.channelNum_, handleData.commTag_, binHandle));
+                handleData.channelNum_, handleData.commTag_, binHandle, handleData.useMc2ServerKernelNames_));
             }
         }
     }

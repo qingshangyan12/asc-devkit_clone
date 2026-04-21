@@ -15,6 +15,7 @@
 
 extern "C" {
 __attribute__((visibility("default"))) uint32_t RunAicpuIndOpCommInit(void *args);
+__attribute__((visibility("default"))) uint32_t Mc2RunAicpuIndOpCommInit(void *args);
 }
 
 #endif // INDEPENDENT_OP_AICPU_INTERFACE

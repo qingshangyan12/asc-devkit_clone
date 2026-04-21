@@ -76,6 +76,7 @@ private:
     u64 cclBufferSize_ = 0;
     std::string commId_;
     aclrtBinHandle binHandle_ = nullptr;
+    bool useMc2ServerKernelNames_ = false;
 
     // 管理器
     RegMemMgr regMemMgr_;

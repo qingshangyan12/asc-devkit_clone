@@ -375,10 +375,11 @@ HcclResult ChannelProcess::LaunchChannelKernelCommon(ChannelHandle *channelHandl
 }
 
 HcclResult ChannelProcess::ChannelKernelLaunchForComm(ChannelHandle *channelHandles, 
-    ChannelHandle *hostChannelHandles, uint32_t listNum, const std::string &commTag, aclrtBinHandle binHandle) 
+    ChannelHandle *hostChannelHandles, uint32_t listNum, const std::string &commTag, aclrtBinHandle binHandle,
+    bool useMc2ServerKernelNames)
 {
     return LaunchChannelKernelCommon(channelHandles, hostChannelHandles, listNum, 
-        commTag, binHandle, "RunAicpuIndOpChannelInitV2", true);
+        commTag, binHandle, hccl::GetAicpuIndOpChannelInitV2KernelName(useMc2ServerKernelNames), true);
 }
 
 HcclResult ChannelProcess::ChannelKernelLaunchForBase(ChannelHandle *channelHandles, 
@@ -642,7 +643,7 @@ HcclResult ChannelProcess::ChannelResume(const ChannelHandle *channelList, uint3
 }
 
 HcclResult ChannelProcess::ChannelUpdateKernelLaunch(ChannelHandle* deviceChannelHandles, ChannelHandle* hostChannelHandles, uint32_t listNum,
-    const std::string &commTag, aclrtBinHandle binHandle)
+    const std::string &commTag, aclrtBinHandle binHandle, bool useMc2ServerKernelNames)
 {
     HCCL_RUN_INFO("[%s] listNum[%u], commTag[%s]", __func__, listNum, commTag.c_str());
     std::vector<std::vector<char>> hostPackBuffers(listNum);
@@ -691,7 +692,7 @@ HcclResult ChannelProcess::ChannelUpdateKernelLaunch(ChannelHandle* deviceChanne
     channelParam.channelList = static_cast<void *>(deviceChannelList.ptr());
 
     // 调用抽离的通用内核启动函数
-    std::string kernelName = "RunAicpuIndOpChannelUpdateV2";
+    std::string kernelName = hccl::GetAicpuIndOpChannelUpdateV2KernelName(useMc2ServerKernelNames);
     CHK_RET(LaunchKernel(channelParam, binHandle, kernelName));
 
     HCCL_INFO("[%s] channel kernel launch success.", __func__);

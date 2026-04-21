@@ -422,6 +422,7 @@ HcclResult MyRank::CreateChannels(CommEngine engine, const std::string &commTag,
     }
 
     if (engine == COMM_ENGINE_AICPU || engine == COMM_ENGINE_AICPU_TS) {
+        bool useMc2ServerKernelNames = callbacks_.useMc2ServerKernelNames ? callbacks_.useMc2ServerKernelNames() : false;
         // 新增：添加 kernelLaunchAicpuCommInit 调用
         if (!callbacks_.getAicpuCommState()) {
             HCCL_INFO("MyRank::%s kernelLaunchAicpuCommInit start.", __func__);
@@ -432,10 +433,11 @@ HcclResult MyRank::CreateChannels(CommEngine engine, const std::string &commTag,
         }
 
         CHK_RET(ChannelProcess::ChannelKernelLaunchForComm(channelHandles, hostChannelHandleList, 
-            channelNum, commTag, binHandle_));
+            channelNum, commTag, binHandle_, useMc2ServerKernelNames));
 
         // ns recovery
-        nsRecoveryProcessor_->AddNsRecoveryData(engine, channelHandles, hostChannelHandleList, channelNum, commTag);
+        nsRecoveryProcessor_->AddNsRecoveryData(engine, channelHandles, hostChannelHandleList, channelNum, commTag,
+            useMc2ServerKernelNames);
 
         return HCCL_SUCCESS;
     }
@@ -583,4 +585,3 @@ HcclResult MyRank::Resume()
 }
 
 } // namespace hccl
-

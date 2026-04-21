@@ -19,6 +19,7 @@
 #include "../comms/ccu/ccu_kernel/ccu_kernel_mgr.h"
 #include "rt_external.h"
 #include "hccl_ccu_res.h"
+#include "launch_aicpu.h"
 
 using namespace hccl;
 /**
@@ -206,7 +207,8 @@ HcclResult HcclChannelAcquire(HcclComm comm, CommEngine engine,
             HCCL_INFO("[HcclChannelAcquire] ReportChannelAicpuKernel start");
             HcclCommDfx* hcclCommDfx = collComm->GetHcclCommDfx();
             CHK_PTR_NULL(hcclCommDfx);
-            std::string kernelName = "RunAicpuIndOpChannelInitV2";
+            bool useMc2ServerKernelNames = IsMc2ServerKernelBinHandle(hcclComm->GetBinHandle());
+            std::string kernelName = GetAicpuIndOpChannelInitV2KernelName(useMc2ServerKernelNames);
             CHK_RET(hcclCommDfx->ReportKernel(beginTime, commTag, kernelName, SalGetTid()));
             HCCL_INFO("[HcclChannelAcquire] ReportChannelAicpuKernel success");
         }

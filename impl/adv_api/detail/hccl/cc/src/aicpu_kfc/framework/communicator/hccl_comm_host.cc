@@ -287,6 +287,9 @@ namespace hccl
         callbacks.kernelLaunchAicpuCommInit = [this]() {
             return this->KernelLaunchAicpuCommInit();
         };
+        callbacks.useMc2ServerKernelNames = [this]() {
+            return this->useMc2ServerKernelNames_;
+        };
 
         // Aicpu通信域初始化参数
         auto ret = snprintf_s(commAicpuParam_.hcomId, HCOMID_MAX_SIZE, HCOMID_MAX_SIZE - 1, "%s", commName.c_str());
@@ -313,6 +316,7 @@ namespace hccl
                 ACL_RT_BINARY_LOAD_OPT_CPU_KERNEL_MODE,
                 0),
             retCode);
+        useMc2ServerKernelNames_ = (devType_ == DevType::DEV_TYPE_950) && IsMc2ServerKernelBinHandle(binHandle_);
         CHK_PTR_NULL(commV2);
 
         EXECEPTION_CATCH(collComm_ = std::make_unique<CollComm>(commV2, userRank, commName, callbacks),
@@ -361,7 +365,7 @@ namespace hccl
         CHK_RET(hrtStreamSetMode(localStream.ptr(), aicpuStreamMode));
 
         // 下kernel进行自定义算子aicpu侧通信域的公共初始化
-        std::string kernelName = "RunAicpuIndOpCommInit";
+        std::string kernelName = GetAicpuIndOpCommInitKernelName(useMc2ServerKernelNames_);
         HCCL_INFO("AicpuAclKernelLaunch start");
         u16 timeOut = NOTIFY_DEFAULT_WAIT_TIME > std::numeric_limits<uint16_t>::max() ? 
                         std::numeric_limits<uint16_t>::max() : NOTIFY_DEFAULT_WAIT_TIME;

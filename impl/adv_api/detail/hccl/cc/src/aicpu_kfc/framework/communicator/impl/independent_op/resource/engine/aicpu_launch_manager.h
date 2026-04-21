@@ -84,17 +84,20 @@ public:
     static HcclResult ThreadKernelLaunchImpl(std::vector<std::shared_ptr<Thread>> &newThreads,
         std::unique_ptr<ThreadHandle[]> &aicpuHandle, const ThreadKernelLaunchConfig &config);
     static HcclResult ThreadKernelLaunchForComm(std::vector<std::shared_ptr<Thread>> &newThreads,
-        const std::string &commId, std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle);
+        const std::string &commId, std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle,
+        bool useMc2ServerKernelNames);
     static HcclResult ThreadKernelLaunchForBase(std::vector<std::shared_ptr<Thread>> &newThreads,
         std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle);
     static HcclResult SupplementNotifyKernelLaunch(std::vector<std::shared_ptr<Thread>> &newThreads,
-        const std::string &commId, std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle);
+        const std::string &commId, std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle,
+        bool useMc2ServerKernelNames);
     static HcclResult ThreadKernelLaunchDestroy(ThreadHandle *threadHandles, uint32_t listNum, 
         aclrtBinHandle binHandle);
     static HcclResult NotifyKernelLaunchAlloc(std::vector<std::unique_ptr<LocalNotify>> &newNotifys,
-        const std::string &commId, std::unique_ptr<NotifyHandle[]> &hostHandle, aclrtBinHandle binCustomHandle);
+        const std::string &commId, std::unique_ptr<NotifyHandle[]> &hostHandle, aclrtBinHandle binCustomHandle,
+        bool useMc2ServerKernelNames);
     static HcclResult NotifyKernelLaunchFree(std::vector<NotifyHandle> &aicpuNotifys, uint32_t notifyNum,
-        const std::string &commId, aclrtBinHandle binCustomHandle);
+        const std::string &commId, aclrtBinHandle binCustomHandle, bool useMc2ServerKernelNames);
     template <typename OpParam>
     static HcclResult KernelLaunchAicpuCustom(OpParam &opParam, std::string kernelName, rtStream_t aicpuInitStream,
         aclrtBinHandle binCustomHandle);
@@ -102,7 +105,8 @@ private:
     HcclResult AiCpuStreamAllocAndGet(rtStream_t &aiCpuStream);
     static HcclResult PrepareAicpuNotifyParam(NotifyMgrAicpuParam &opParam, const std::string &commId,
         size_t notifyNum, bool freeFlag, void *deviceHandle);
-    static HcclResult LaunchNotifyKernel(NotifyMgrAicpuParam &opParam, aclrtBinHandle binCustomHandle);
+    static HcclResult LaunchNotifyKernel(NotifyMgrAicpuParam &opParam, aclrtBinHandle binCustomHandle,
+        bool useMc2ServerKernelNames);
     Stream opStream_;
 };
 }
