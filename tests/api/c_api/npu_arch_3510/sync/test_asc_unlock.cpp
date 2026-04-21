@@ -22,14 +22,14 @@ protected:
 namespace {
 void rls_buf_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
 {
-    EXPECT_EQ(pipe, pipe_t::PIPE_S);
+    EXPECT_EQ(pipe, pipe_t::PIPE_MTE3);
     EXPECT_EQ(mutex_id, static_cast<uint8_t>(11));
     EXPECT_EQ(mode, false);
 }
 
 void rls_buf_non_block_stub(pipe_t pipe, uint8_t mutex_id, bool mode)
 {
-    EXPECT_EQ(pipe, pipe_t::PIPE_S);
+    EXPECT_EQ(pipe, pipe_t::PIPE_MTE3);
     EXPECT_EQ(mutex_id, static_cast<uint8_t>(11));
     EXPECT_EQ(mode, true);
 }
