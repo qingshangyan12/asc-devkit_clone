@@ -184,7 +184,7 @@ target_compile_options(${TARGET_FILENAME} PRIVATE
     提供不同安装路径的环境变量配置命令。
     ```
     示例：
-    请根据当前环境上CANN开发套件包的[安装方式]，选择对应配置环境变量的命令。
+    请根据当前环境上CANN开发套件包的[安装方式]（相对路径），选择对应配置环境变量的命令。
     - 默认路径，root用户安装CANN软件包
       source /usr/local/Ascend/cann/set_env.sh
 
