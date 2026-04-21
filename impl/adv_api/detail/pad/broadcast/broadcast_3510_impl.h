@@ -983,7 +983,7 @@ __aicore__ inline bool BrcLastWrapperForThreeDim(
         } else {
             BrcLastE2BLessThanVL(dstUb, srcUb, sizeI[0], sizeI[1], sizeI[2], stride[0]);
         }
-    } else if (sizeI[2] < VF_LEN_HALF && sizeof(T) != sizeof(uint8_t)) {
+    } else if (sizeI[2] < VF_LEN_HALF) {
         uint32_t newDstShape[3] = {dstShape[0], dstShape[1], dstShape[2]};
         uint32_t newSrcStride[3] = {srcStride[0], srcStride[1], srcStride[2]};
         GatherWrapper(dstUb, srcUb, newDstShape, newSrcStride);
@@ -1170,7 +1170,7 @@ __aicore__ inline bool BrcNlastWrapperForThreeDim(
     stride[1] = static_cast<uint16_t>(srcStride[1]);
     stride[2] = static_cast<uint16_t>(srcStride[2]);
 
-    if (sizeI[2] < VF_LEN_HALF && sizeof(T) != sizeof(uint8_t)) {
+    if (sizeI[2] < VF_LEN_HALF) {
         uint32_t newDstShape[3] = {dstShape[0], dstShape[1], dstShape[2]};
         uint32_t newSrcStride[3] = {srcStride[0], srcStride[1], srcStride[2]};
         GatherWrapper(dstUb, srcUb, newDstShape, newSrcStride);
