@@ -29,7 +29,6 @@
 namespace AscendC {
 namespace Te {
 
-// 辅助模板：将类型统一转换为 tuple
 template <typename T, bool IsTuple>
 struct ToTupleImpl;
 
@@ -56,13 +55,11 @@ template <typename hPos, typename Pointer,
 struct GetTypeFromNDimTrait<
     LocalTensor<TensorAttribute<ViewEngine<HardwareMemPtr<hPos, Pointer>>,
         Layout<Shape<ShapeRows, ShapeCols>, Stride<StrideRows, StrideCols>, LayoutPattern>>>> {
-    // 统一转换为 tuple 类型
     using ShapeRowTuple = typename ToTuple<ShapeRows>::type;
     using ShapeColTuple = typename ToTuple<ShapeCols>::type;
     using StrideRowTuple = typename ToTuple<StrideRows>::type;
     using StrideColTuple = typename ToTuple<StrideCols>::type;
     
-    // 获取类型
     template <size_t Dim>
     using ShapeRowDim = typename Std::tuple_element<Dim, ShapeRowTuple>::type;
     
@@ -122,40 +119,18 @@ struct GetLayout<T, false> {
 template <typename T>
 using GetLayoutT = typename GetLayout<T>::type;
 
-template <typename T, typename TargetLayoutPtn>
-__aicore__ inline constexpr bool IsMatchLayoutPattern()
-{
-    using LayoutT = GetLayoutT<T>;
-    using LayoutPattern = GetLayoutPattern<LayoutT>;
-    return Std::is_same_v<LayoutPattern, TargetLayoutPtn>;
-}
+template <typename T, typename TargetLayoutPtn> 
+struct IsSatisfiedPtnFormat {
+private:
+    __aicore__ inline static constexpr bool IsMatchLayoutPattern() {
+        using LayoutT = GetLayoutT<T>;
+        using LayoutPattern = GetLayoutPattern<LayoutT>;
+        return Std::is_same_v<LayoutPattern, TargetLayoutPtn>;
+    }
 
-template <typename T>
-__aicore__ inline constexpr bool IsZNLayout()
-{ return IsMatchLayoutPattern<T, ZNLayoutPtn>(); }
-template <typename T>
-__aicore__ inline constexpr bool IsZZLayout()
-{ return IsMatchLayoutPattern<T, ZZLayoutPtn>(); }
-template <typename T>
-__aicore__ inline constexpr bool IsNNLayout()
-{ return IsMatchLayoutPattern<T, NNLayoutPtn>(); }
-template <typename T>
-__aicore__ inline constexpr bool IsNZLayout()
-{ return IsMatchLayoutPattern<T, NZLayoutPtn>(); }
-template <typename T>
-__aicore__ inline constexpr bool IsNDLayout()
-{ return IsMatchLayoutPattern<T, NDLayoutPtn>(); }
-template <typename T>
-__aicore__ inline constexpr bool IsDNLayout()
-{ return IsMatchLayoutPattern<T, DNLayoutPtn>(); }
-
-template <typename T>
-__aicore__ inline constexpr bool IsNDExtLayout()
-{ return IsMatchLayoutPattern<T, NDExtLayoutPtn>(); }
-template <typename T>
-__aicore__ inline constexpr bool IsDNExtLayout()
-{ return IsMatchLayoutPattern<T, DNExtLayoutPtn>(); }
-
+public:
+    static constexpr bool value = IsMatchLayoutPattern();
+};
 } // namespace Te
 } // namespace AscendC
 
