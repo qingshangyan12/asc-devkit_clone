@@ -28,6 +28,8 @@
 #include "include/tensor_api/tensor/local_tensor.h"
 #include "include/tensor_api/tensor/pointer.h"
 #include "include/tensor_api/utils/utils.h"
+#include "include/tensor_api/algorithm/copy.h"
+#include "include/tensor_api/algorithm/mmad.h"
 
 #endif // INCLUDE_TENSOR_API_TENSOR_H
 

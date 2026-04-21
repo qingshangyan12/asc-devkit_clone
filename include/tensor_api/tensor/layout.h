@@ -48,6 +48,14 @@ __aicore__ inline constexpr auto MakeLayout(const T& shape);
  template <typename T, typename Shape, typename Stride> 
  __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, const Stride& stride);
 
+template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>,
+    Std::enable_if_t<!IsIntegralConstantV<TraitType>, int> = 0, typename... Args>
+__aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args);
+
+template <typename LayoutPattern, typename IntType,
+    Std::enable_if_t<IsIntegralConstantV<IntType>, int> = 0, typename... Args>
+__aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args);
+
 } // namespace Te
 } // namespace AscendC
 
