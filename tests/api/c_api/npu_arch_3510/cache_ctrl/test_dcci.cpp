@@ -20,48 +20,49 @@ protected:
 };
 
 namespace {
-void dcci_Stub(__gm__ void* dst)
+void dcci_single_Stub(__gm__ void* dst)
 {
     EXPECT_EQ((__gm__ void*)3, dst);
 }
 
-void dcci_Stub_ub(__ubuf__ void* dst)
+void dcci_single_ub_Stub(__ubuf__ void* dst)
 {
     EXPECT_EQ((__ubuf__ void*)3, dst);
 }
+
+void dcci_entire_Stub(__gm__ void* dst)
+{
+    EXPECT_EQ((__gm__ void*)0, dst);
+}
+
 } // namespace
+
+TEST_F(TestSimdAtomicDcci, dcci_gm_single)
+{
+    __gm__ void* dst = (__gm__ void*)3;
+    MOCKER(dcci, void(__gm__ void*, uint64_t, uint64_t)).times(1).will(invoke(dcci_single_Stub));
+    asc_dcci_single(dst);
+    GlobalMockObject ::verify();
+}
+
+TEST_F(TestSimdAtomicDcci, dcci_ub_single_)
+{
+    __ubuf__ void* dst = (__ubuf__ void*)3;
+    MOCKER(dcci, void(__ubuf__ void*, uint64_t, uint64_t)).times(1).will(invoke(dcci_single_ub_Stub));
+    asc_ub_dcci_single(dst);
+    GlobalMockObject ::verify();
+}
 
 #define TEST_DCCI(entire, type)                                                          \
 TEST_F(TestSimdAtomicDcci, dcci_gm_##entire##_##type##_##void_ptr_uint64_t_Succ)         \
 {                                                                                        \
-    __gm__ void* dst = (__gm__ void*)3;                                                  \
     MOCKER(dcci, void(__gm__ void*, uint64_t, uint64_t))                                 \
         .times(1)                                                                        \
-        .will(invoke(dcci_Stub));                                                        \
-    asc_dcci_##entire##_##type(dst);                                                     \
+        .will(invoke(dcci_entire_Stub));                                                        \
+    asc_dcci_##entire##_##type();                                                     \
     GlobalMockObject::verify();                                                          \
 }                                                                                        \
 
-
-TEST_DCCI(single, all);
-TEST_DCCI(single, out);
-TEST_DCCI(single, atomic);
 TEST_DCCI(entire, all);
 TEST_DCCI(entire, out);
 TEST_DCCI(entire, atomic);
-
-#define TEST_DCCI_UB(entire, type)                                                                                     \
-    TEST_F(TestSimdAtomicDcci, dcci_ub_##entire##_##type##_##void_ptr_uint64_t_Succ)                                   \
-    {                                                                                                                  \
-        __ubuf__ void* dst = (__ubuf__ void*)3;                                                                        \
-        MOCKER(dcci, void(__ubuf__ void*, uint64_t, uint64_t)).times(1).will(invoke(dcci_Stub_ub));                    \
-        asc_ub_dcci_##entire##_##type(dst);                                                                            \
-        GlobalMockObject::verify();                                                                                    \
-    }
-
-TEST_DCCI_UB(single, all);
-TEST_DCCI_UB(single, out);
-TEST_DCCI_UB(single, atomic);
-TEST_DCCI_UB(entire, all);
-TEST_DCCI_UB(entire, out);
-TEST_DCCI_UB(entire, atomic);
