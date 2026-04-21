@@ -15,11 +15,11 @@
 #endif
 
 /*!
-* \file mad.h
+* \file mmad.h
 * \brief
 */
-#ifndef INCLUDE_TENSOR_API_ALGORITHM_MAD_H
-#define INCLUDE_TENSOR_API_ALGORITHM_MAD_H
+#ifndef INCLUDE_TENSOR_API_ALGORITHM_MMAD_H
+#define INCLUDE_TENSOR_API_ALGORITHM_MMAD_H
 
 #include "impl/tensor_api/algorithm/mmad_impl.h"
 
@@ -38,7 +38,7 @@ __aicore__ inline auto MakeMmad(const Args& ...traits);
 }
 }
 
-#endif // INCLUDE_TENSOR_API_ALGORITHM_MAD_H
+#endif // INCLUDE_TENSOR_API_ALGORITHM_MMAD_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
