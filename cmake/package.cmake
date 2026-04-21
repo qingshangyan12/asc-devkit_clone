@@ -90,6 +90,7 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/package/latest_manager/scripts/
 install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
     DESTINATION asc-devkit
     RENAME version.info
+    COMPONENT asc-devkit
 )
 install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
     DESTINATION .

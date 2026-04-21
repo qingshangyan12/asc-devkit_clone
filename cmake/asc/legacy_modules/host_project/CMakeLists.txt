@@ -61,4 +61,3 @@ target_include_directories(intf_host_bisheng INTERFACE
 target_compile_definitions(intf_host_bisheng INTERFACE
     ${DEFINITIONS}
 )
-
