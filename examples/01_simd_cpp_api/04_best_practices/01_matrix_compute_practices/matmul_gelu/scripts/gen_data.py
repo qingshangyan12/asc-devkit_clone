@@ -15,21 +15,27 @@
 import os
 import numpy as np
 
-
-def gen_golden_data_simple():
-    input_x = np.random.uniform(-10, 10, [8192, 8192]).astype(np.float32)
-    # 公式
-    # GELU(x) ≈ x / (1 + e^(-2 · √(2/π) · (x + 0.044715 · x³)))
-    # 其中，-2 · √(2/π) ≈ -1.595769
-    coeff = -1.595769
-    exponent = coeff * (input_x + 0.044715 * (input_x ** 3))
-    golden = input_x / (1 + np.exp(exponent))
+def gen_golden_data():
+    m, n, k, is_bias = 8192, 8192, 8192, False
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
-    input_x.tofile("./input/input_x.bin")
+
+    x1_gm = np.random.uniform(-1, 1, [m, k]).astype(np.float16)
+    x2_gm = np.random.uniform(-1, 1, [k, n]).astype(np.float16)
+    if is_bias:
+        bias_gm = np.random.uniform(-10, 10, [n]).reshape([n]).astype(np.float16)
+        golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(np.float32) + bias_gm
+        bias_gm.tofile("./input/bias_gm.bin")
+    else:
+        golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(np.float32)
+    golden = golden.astype(np.float32)
+    x1_gm.tofile("./input/x1_gm.bin")
+    # x2_gm transpose to match B matrix transpose
+    x2_gm = x2_gm.transpose()
+    x2_gm.tofile("./input/x2_gm.bin")
     golden.tofile("./output/golden.bin")
 
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    gen_golden_data()

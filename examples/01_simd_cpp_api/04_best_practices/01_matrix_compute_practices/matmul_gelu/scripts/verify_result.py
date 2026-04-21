@@ -11,14 +11,15 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+
 import sys
 import numpy as np
 
 
 # for float32
-relative_tol = 1e-6
-absolute_tol = 1e-9
-error_tol = 1e-4
+relative_tol = 1e-3
+absolute_tol = 1e-3
+error_tol = 1e-3
 
 
 def verify_result(output, golden):
@@ -41,6 +42,7 @@ def verify_result(output, golden):
         if index == 100:
             break
     error_ratio = float(different_element_indexes.size) / golden.size
+    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, error_tol))
     return error_ratio <= error_tol
 
 
