@@ -1,7 +1,7 @@
 # move_reg样例
 
 ## 概述
-本样例基于RegBase编程范式实现基于Mask的选择性数据拷贝功能，主要调用LoadUnAlignPre/LoadUnAlign/StoreUnAlign/StoreUnAlignPost接口进行非对齐数据搬运，调用MaskGenWithRegTensor接口从RegTensor生成MaskReg，调用Select接口根据mask完成选择性计算。
+本样例基于RegBase编程范式实现基于Mask的选择性数据拷贝功能。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -37,14 +37,6 @@
     MaskSelectCopyVF函数内先使用LoadUnAlignPre/LoadUnAlign加载cond数据到RegTensor，再通过MaskGenWithRegTensor&lt;float, 4&gt;从condReg的第4个b32偏移位置提取mask，然后使用LoadUnAlign加载x和y数据，调用Select根据mask完成选择性拷贝，最后通过StoreUnAlign/StoreUnAlignPost将结果写回UB。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
-
-## API说明
-- `LoadUnAlignPre`：非对齐加载前置操作，初始化UnalignRegForLoad
-- `LoadUnAlign`：非对齐加载，从UB地址加载数据到RegTensor
-- `StoreUnAlign`：非对齐存储，将RegTensor数据写入UB地址
-- `StoreUnAlignPost`：非对齐存储后置操作，完成最终写回
-- `MaskGenWithRegTensor`：从RegTensor中提取部分bit数据生成MaskReg
-- `Select`：根据MaskReg从两个源RegTensor中选择数据，mask位为1选src0，为0选src1
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。

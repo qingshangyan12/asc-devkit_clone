@@ -1,9 +1,21 @@
 # gather_ld_reg样例
 
 ## 概述
-本样例演示使用Gather接口实现离散数据搬入功能，包含两种场景：
-- 场景1：使用高维Gather接口（源操作数为LocalTensor/UB地址），按元素收集
-- 场景2：使用Reg::GatherB接口，按32字节DataBlock收集
+本样例基于RegBase编程范式实现离散数据搬入功能，支持两种场景，通过编译时宏选择场景。
+    <table>
+  	 	 	<tr>
+  	 	 		<td>scenarioNum</td>
+  	 	 		<td>搬入场景</td>
+  	 	 	</tr>
+  	 	 	<tr>
+  	 	 		<td>1</td>
+  	 	 		<td>Gather（从UB(Unified Buffer)按索引收集数据到RegTensor(Reg矢量计算基本单元)）</td>
+  	 	 	</tr>
+  	 	 	<tr>
+  	 	 		<td>2</td>
+  	 	 		<td>GatherB（按32字节DataBlock收集）</td>
+  	 	 	</tr>
+  	 </table>
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -21,49 +33,41 @@
 
 ## 样例描述
 - 样例功能：  
-  根据索引从源数据中离散收集元素到目的地址。
+  根据索引从源数据中离散收集元素到目的地址。输入向量shape为[1, 128]，数据类型为half。源数据长度为1024个元素，索引长度为128个元素，输出长度为128个元素。
 
-  **场景1：高维Gather模式**
-  - 使用高维Gather接口，源操作数为LocalTensor（UB地址）
-  - 按元素收集：dst[i] = src[offset[i]]
+  **场景1：Gather模式**
+  - 使用Gather接口，从UB按元素索引收集数据到RegTensor
+  - 按元素收集：dst[i] = src[index[i]]
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-    <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-    <tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">half</td></tr>
-    <tr><td></td><td align="center">offset</td><td align="center">[1, 128]</td><td align="center">uint32_t</td></tr>
-    <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 128]</td><td align="center">half</td></tr>
+    <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+    <tr><td></td><td align="center">src</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
+    <tr><td></td><td align="center">index</td><td align="center">[1, 128]</td><td align="center">uint32</td></tr>
+    <tr><td rowspan="1" align="center">样例输出</td><td align="center">dst</td><td align="center">[1, 128]</td><td align="center">half</td></tr>
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_ld_reg</td></tr>
     </table>
   - 样例实现：
-    调用高维Gather接口`AscendC::Gather(dstLocal, srcLocal, srcOffsetLocal, srcBaseAddr, count)`，源操作数为LocalTensor。
+    GatherVF函数内先通过LoadAlign加载索引数据到indexReg，再调用Gather接口从源地址按索引收集数据到dstReg，最后通过StoreAlign将结果写回UB。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
 
-  **场景2：Reg::GatherB模式**
-  - 使用Reg::GatherB接口，按32字节DataBlock收集
+  **场景2：GatherB模式**
+  - 使用GatherB接口，按32字节DataBlock收集
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-    <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-    <tr><td align="center">x</td><td align="center">[512]</td><td align="center">half</td></tr>
-    <tr><td></td><td align="center">index</td><td align="center">[1, 128]</td><td align="center">uint32_t</td></tr>
-    <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 128]</td><td align="center">half</td></tr>
+    <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+    <tr><td></td><td align="center">src</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
+    <tr><td></td><td align="center">index</td><td align="center">[1, 128]</td><td align="center">uint32</td></tr>
+    <tr><td rowspan="1" align="center">样例输出</td><td align="center">dst</td><td align="center">[1, 128]</td><td align="center">half</td></tr>
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_ld_reg</td></tr>
     </table>
   - 样例实现：
-    GatherBVF函数内调用`AscendC::Reg::GatherB(dstReg, baseAddr, indexReg, mask)`，按DataBlock收集。
+    GatherBVF函数内先通过LoadAlign加载索引数据到indexReg，再调用GatherB接口按DataBlock从源地址收集数据到dstReg，最后通过StoreAlign将结果写回UB。
     - baseAddr为UB基地址指针，index为DataBlock索引（需32B对齐）
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
-
-## API说明
-- `AscendC::Gather(dst, src, srcOffset, srcBaseAddr, count)`：高维Gather接口
-  - src为LocalTensor（UB地址），按元素收集
-  - srcOffset为每个元素的地址偏移（单位：Bytes）
-- `AscendC::Reg::GatherB(dstReg, baseAddr, indexReg, mask)`：Reg::GatherB接口
-  - baseAddr为UB基地址指针，按32字节DataBlock收集
-  - indexReg为DataBlock索引（uint32_t类型，索引值需32B对齐）
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
@@ -86,7 +90,7 @@
 
 - 样例执行
   ```bash
-  SCENARIO=1                                                                     # 选择执行场景（1=高维Gather，2=Reg::GatherB）
+  SCENARIO=1                                                                     # 选择执行场景（1=Gather，2=GatherB）
   mkdir -p build && cd build;                                                    # 创建并进入build目录
   cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;  # 编译工程（默认npu模式）
   python3 ../scripts/gen_data.py -scenarioNum $SCENARIO                          # 生成测试输入数据
@@ -101,13 +105,13 @@
   cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
-  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+  > **注意：** 切换编译模式或场景前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `SCENARIO_NUM` | 1、2 | 样例执行场景：场景1=高维Gather模式、场景2=Reg::GatherB模式 |
+  | `SCENARIO_NUM` | 1、2 | 样例执行场景：场景1=Gather模式、场景2=GatherB模式 |
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 

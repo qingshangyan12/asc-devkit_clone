@@ -1,8 +1,21 @@
 # mul样例
 
 ## 概述
-本样例基于RegBase编程范式实现Mul运算，主要调用Mul接口。
-- Add/Sub/Div/Max/Min/Prelu接口皆可参考该样例
+本样例基于RegBase编程范式实现逐元素乘法运算，支持多种场景，通过环境变量选择场景。
+    <table>
+ 	  	 	<tr>
+ 	  	 		<td>scenarioNum</td>
+ 	  	 		<td>计算场景</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>1</td>
+ 	  	 		<td>单核模式（1个核处理全部数据）</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>2</td>
+ 	  	 		<td>4核模式（4个核并行处理）</td>
+ 	  	 	</tr>
+ 	  	 </table>
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT

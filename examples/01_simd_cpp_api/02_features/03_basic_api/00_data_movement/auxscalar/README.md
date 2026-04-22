@@ -1,9 +1,7 @@
 # auxscalar样例
 
 ## 概述
-本样例演示使用AuxScalar方式从UB读取多个标量数据，结合Reg::Adds进行向量与标量加法计算，并使用Reg::StoreAlign（PostUpdate模式）写回UB。
-
-AuxScalar是指在RegBase编程范式下，通过`__ubuf__`指针直接下标访问（如`scalarAddr[0]`）从UB上读取单个标量值的方式。这种方式利用了硬件的辅助标量（Aux Scalar）读取能力，无需通过LoadAlign加载完整的RegTensor即可获取UB上的标量数据。
+本样例基于RegBase编程范式实现AuxScalar方式从UB(Unified Buffer)读取多个标量数据，结合Adds进行向量与标量加法计算。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -21,10 +19,10 @@ AuxScalar是指在RegBase编程范式下，通过`__ubuf__`指针直接下标访
 
 ## 样例描述
 - 样例功能：  
-  从UB上读取多个标量数据，每个标量参与一段连续向量元素的Adds计算。
-
-  **AuxScalar + Reg::Adds模式**
-  - 使用AuxScalar方式（`__ubuf__`指针下标访问）从UB读取标量，结合Reg::Adds进行向量与标量加法
+  从UB上读取4个标量数据，和向量x进行Adds计算。向量x shape为[1, 512]，通过for循环控制每个标量和128个连续的向量元素进行计算。  
+  
+  **AuxScalar + Adds模式**
+  - 使用AuxScalar方式（`__ubuf__`指针下标访问，如`scalarAddr[0]`）从UB读取标量，结合Adds进行向量与标量加法
   - 使用LoadAlign/StoreAlign的PostUpdate模式自动更新地址指针
   - 样例规格：
     <table>
@@ -36,19 +34,9 @@ AuxScalar是指在RegBase编程范式下，通过`__ubuf__`指针直接下标访
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">auxscalar</td></tr>
     </table>
   - 样例实现：
-    AuxScalarAddsVF函数内，通过`scalarAddr[i]`从UB读取第i个标量值，调用`Adds(zReg, xReg, scalar, mask)`进行向量加标量计算，使用PostUpdate模式的LoadAlign/StoreAlign自动更新地址指针。
+    AuxScalarAddsVF函数内，通过`scalarAddr[i]`从UB读取第i个标量值，调用`Adds`进行向量加标量计算。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
-
-## API说明
-- `scalarAddr[i]`：AuxScalar方式读取标量
-  - 通过`__ubuf__`指针直接下标访问，从UB上读取单个标量值，无需LoadAlign加载完整RegTensor
-- `Adds`：向量与标量加法
-  - 向量每个元素加上标量值
-- `LoadAlign`：PostUpdate模式加载
-  - 加载后源地址自动按stride更新
-- `StoreAlign`：PostUpdate模式写出
-  - 写出后目的地址自动按stride更新
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
