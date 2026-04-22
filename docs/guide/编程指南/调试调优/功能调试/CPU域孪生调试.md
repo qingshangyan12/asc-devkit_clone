@@ -58,11 +58,11 @@
 > 由于这种置空处理，**仅通过BuiltIn关键字区分的函数签名将被视为相同**，会导致重定义编译错误。
 > 
 > 典型问题场景包括：
-> 1. **Device侧函数与Host侧函数同名**：如下例中，`add` 函数仅通过 `__aicore__` 区分运行域，在 CPU 孪生调试模式下两个声明将冲突：
+> 1. **Device侧函数与Host侧函数同名**，如下例中，`add` 函数仅通过 `__aicore__` 区分运行域，在 CPU 孪生调试模式下两个声明将冲突：
 >    ```asc
 >    __aicore__ inline void add(int x, int y);  // Device侧
 >    void add(int x, int y);                    // Host侧（等同于 __host__）
-> 2. **参数类型仅有地址空间限定符不同**：如下例中，两个Device侧函数仅在指针的地址空间限定符上不同：
+> 2. **参数类型仅有地址空间限定符不同**，如下例中，两个Device侧函数仅在指针的地址空间限定符上不同：
 >    ```asc
 >    __aicore__ inline void process(__gm__ void* data, int size);
 >    __aicore__ inline void process(__ubuf__ void* data, int size);
