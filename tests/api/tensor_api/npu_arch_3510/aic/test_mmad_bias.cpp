@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tensor_api/stub/cce_stub.h"
-#include "include/experimental/tensor_api/tensor.h"
+#include "include/tensor_api/tensor.h"
 
 class Tensor_Api_Mmad_With_Bias : public testing::Test {
 protected:
@@ -24,6 +24,8 @@ protected:
     }
 };
 using namespace AscendC::Te;
+
+#define MAKE_LAYOUT_TYPE(fmt) fmt##LayoutPtn
 
 #define MMAD_WITH_BIAS_ON_BIAS_TEST_BASE(DST_TYPE, SRC_TYPE, BIAS_TYPE, M, N, K, K_DIRECTION_ALIGN, CMATRIX_SOURCE, MOCK_FUNC)\
 uint8_t A2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE[256 * 256 * sizeof(SRC_TYPE)] = {0};\
@@ -47,23 +49,23 @@ void MmadWithBiasOnBiasTest##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE(__cc__ DST_TYPE
 TEST_F(Tensor_Api_Mmad_With_Bias, MmadOperationWithBiasOnBias##MOCK_FUNC##_##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##M##_##N##_##K)\
 {\
     auto a2Addr = reinterpret_cast<__ca__ SRC_TYPE*>(A2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
-    auto l0aIterator = MakeL0AmemPtr(a2Addr);\
-    auto l0aMatrixLayout = MakeNzLayout<SRC_TYPE>(M, K);\
+    auto l0aIterator = MakeMemPtr<Location::L0A>(a2Addr);\
+    auto l0aMatrixLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(M, K);\
     auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout);\
 \
     auto b2Addr = reinterpret_cast<__cb__ SRC_TYPE*>(B2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
-    auto l0bIterator = MakeL0BmemPtr(b2Addr);\
-    auto l0bMatrixLayout = MakeZnLayout<SRC_TYPE>(K, N);\
+    auto l0bIterator = MakeMemPtr<Location::L0B>(b2Addr);\
+    auto l0bMatrixLayout = MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(K, N);\
     auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout);\
 \
     auto c2Addr = reinterpret_cast<__cc__ DST_TYPE*>(C2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
-    auto l0cIterator = MakeL0CmemPtr(c2Addr);\
-    auto l0cMatrixLayout = MakeNzLayout<AscendC::Std::ignore_t>(M, N);\
+    auto l0cIterator = MakeMemPtr<Location::L0C>(c2Addr);\
+    auto l0cMatrixLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(M, N);\
     auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);\
 \
     auto biasAddr = reinterpret_cast<__biasbuf__ BIAS_TYPE*>(BIAS##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
-    auto biasIterator = MakeBiasmemPtr(biasAddr);\
-    auto biasMatrixLayout = MakeNDLayout<BIAS_TYPE>(M, N);\
+    auto biasIterator = MakeMemPtr<Location::BIAS>(biasAddr);\
+    auto biasMatrixLayout = MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<BIAS_TYPE>>(M, N);\
     auto biasTensor = MakeTensor(biasIterator, biasMatrixLayout);\
 \
     MOCKER_CPP(MOCK_FUNC, void(__cc__ DST_TYPE *, __ca__ SRC_TYPE *,\
@@ -77,17 +79,17 @@ TEST_F(Tensor_Api_Mmad_With_Bias, MmadOperationWithBiasOnBias##MOCK_FUNC##_##DST
     para.k = K;\
     para.unitFlag = 0;\
     para.cmatrixInitVal = false;\
-    Mmad(l0cTensor, l0aTensor, l0bTensor, biasTensor, para);\
+    Mmad(MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}.with(para), l0cTensor, l0aTensor, l0bTensor, biasTensor);\
     GlobalMockObject::verify();\
 }
 
 #define MMAD_WITH_BIAS_ON_BIAS_TEST(D, S, T, M, N, K, KA, CS)    MMAD_WITH_BIAS_ON_BIAS_TEST_BASE(D, S, T, M, N, K, KA, CS, mad)
 #define MMAD_MX_WITH_BIAS_ON_BIAS_TEST(D, S, T, M, N, K, KA, CS)     MMAD_WITH_BIAS_ON_BIAS_TEST_BASE(D, S, T, M, N, K, KA, CS, mad_mx)
 
-MMAD_WITH_BIAS_ON_BIAS_TEST(float, float, float, 16, 16, 16, 0, 0);
-MMAD_WITH_BIAS_ON_BIAS_TEST(float, bfloat16_t, float, 16, 16, 16, 0, 0);
-MMAD_WITH_BIAS_ON_BIAS_TEST(float, half, float, 16, 16, 16, 0, 0);
-MMAD_WITH_BIAS_ON_BIAS_TEST(int32_t, int8_t, int32_t, 32, 32, 32, 0, 0);
+MMAD_WITH_BIAS_ON_BIAS_TEST(float, float, float, 16, 16, 16, true, 0);
+MMAD_WITH_BIAS_ON_BIAS_TEST(float, bfloat16_t, float, 16, 16, 16, true, 0);
+MMAD_WITH_BIAS_ON_BIAS_TEST(float, half, float, 16, 16, 16, true, 0);
+MMAD_WITH_BIAS_ON_BIAS_TEST(int32_t, int8_t, int32_t, 32, 32, 32, true, 0);
 
 
 // MMAD_MX_WITH_BIAS_ON_BIAS_TEST(float, fp4x2_e2m1_t, float, 32, 32, 32, 0, 0);
@@ -110,30 +112,30 @@ void MmadWithBiasOnL0CTest##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE(__cc__ DST_TYPE*
     EXPECT_EQ(k, K);\
     EXPECT_EQ(unitFlag, 0);\
     EXPECT_EQ(kDirectionAlign, K_DIRECTION_ALIGN);\
-    EXPECT_EQ(cmatrixSource, false);\
+    EXPECT_EQ(cmatrixSource, true);\
     EXPECT_EQ(cmatrixInitVal, false);\
 }\
 \
 TEST_F(Tensor_Api_Mmad_With_Bias, MmadOperationWithBiasOnL0C##MOCK_FUNC##_##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##M##_##N##_##K)\
 {\
     auto a2Addr = reinterpret_cast<__ca__ SRC_TYPE*>(L0CA2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
-    auto l0aIterator = MakeL0AmemPtr(a2Addr);\
-    auto l0aMatrixLayout = MakeNzLayout<SRC_TYPE>(M, K);\
+    auto l0aIterator = MakeMemPtr<Location::L0A>(a2Addr);\
+    auto l0aMatrixLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(M, K);\
     auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout);\
 \
     auto b2Addr = reinterpret_cast<__cb__ SRC_TYPE*>(L0CB2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
-    auto l0bIterator = MakeL0BmemPtr(b2Addr);\
-    auto l0bMatrixLayout = MakeZnLayout<SRC_TYPE>(K, N);\
+    auto l0bIterator = MakeMemPtr<Location::L0B>(b2Addr);\
+    auto l0bMatrixLayout = MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(K, N);\
     auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout);\
 \
     auto c2Addr = reinterpret_cast<__cc__ DST_TYPE*>(L0CC2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
-    auto l0cIterator = MakeL0CmemPtr(c2Addr);\
-    auto l0cMatrixLayout = MakeNzLayout<AscendC::Std::ignore_t>(M, N);\
+    auto l0cIterator = MakeMemPtr<Location::L0C>(c2Addr);\
+    auto l0cMatrixLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(M, N);\
     auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);\
 \
     auto biasAddr = reinterpret_cast<__cc__ BIAS_TYPE*>(L0CBIAS##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
-    auto biasIterator = MakeL0CmemPtr(biasAddr);\
-    auto biasMatrixLayout = MakeNDLayout<BIAS_TYPE>(M, N);\
+    auto biasIterator = MakeMemPtr<Location::BIAS>(biasAddr);\
+    auto biasMatrixLayout = MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<BIAS_TYPE>>(M, N);\
     auto biasTensor = MakeTensor(biasIterator, biasMatrixLayout);\
 \
     MOCKER_CPP(MOCK_FUNC, void(__cc__ DST_TYPE *, __ca__ SRC_TYPE *,\
@@ -147,17 +149,17 @@ TEST_F(Tensor_Api_Mmad_With_Bias, MmadOperationWithBiasOnL0C##MOCK_FUNC##_##DST_
     para.k = K;\
     para.unitFlag = 0;\
     para.cmatrixInitVal = false;\
-    Mmad(l0cTensor, l0aTensor, l0bTensor, biasTensor, para);\
+    Mmad(MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}.with(para), l0cTensor, l0aTensor, l0bTensor, biasTensor);\
     GlobalMockObject::verify();\
 }
 
 #define MMAD_WITH_BIAS_ON_L0C_TEST(D, S, T, M, N, K, KA, CS)        MMAD_WITH_BIAS_ON_L0C_TEST_BASE(D, S, T, M, N, K, KA, CS, mad)
 #define MMAD_MX_WITH_BIAS_ON_L0C_TEST(D, S, T, M, N, K, KA, CS)     MMAD_WITH_BIAS_ON_L0C_TEST_BASE(D, S, T, M, N, K, KA, CS, mad_mx)
 
-MMAD_WITH_BIAS_ON_L0C_TEST(float, float, float, 16, 16, 16, 0, 0);
-MMAD_WITH_BIAS_ON_L0C_TEST(float, bfloat16_t, float, 16, 16, 16, 0, 0);
-MMAD_WITH_BIAS_ON_L0C_TEST(float, half, float, 16, 16, 16, 0, 0);
-MMAD_WITH_BIAS_ON_L0C_TEST(int32_t, int8_t, int32_t, 32, 32, 32, 0, 0);
+MMAD_WITH_BIAS_ON_L0C_TEST(float, float, float, 16, 16, 16, true, 0);
+MMAD_WITH_BIAS_ON_L0C_TEST(float, bfloat16_t, float, 16, 16, 16, true, 0);
+MMAD_WITH_BIAS_ON_L0C_TEST(float, half, float, 16, 16, 16, true, 0);
+MMAD_WITH_BIAS_ON_L0C_TEST(int32_t, int8_t, int32_t, 32, 32, 32, true, 0);
 
 // MMAD_MX_WITH_BIAS_ON_L0C_TEST(float, fp4x2_e2m1_t, float, 32, 32, 32, 0, 0);
 // MMAD_MX_WITH_BIAS_ON_L0C_TEST(float, fp4x2_e1m2_t, float, 32, 32, 32, 0, 0);
