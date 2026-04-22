@@ -37,13 +37,6 @@ target_compile_definitions(demo PRIVATE
     NPU_ARCH=${NPU_ARCH_ID}
 )
 
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
-
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
