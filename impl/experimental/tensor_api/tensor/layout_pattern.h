@@ -23,7 +23,7 @@
 #ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_PATTERN_H
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_PATTERN_H
 
-#include "impl/tensor_api/tensor/layout_method.h"
+#include "impl/experimental/tensor_api/tensor/layout_method.h"
 
 namespace AscendC {
 namespace Te {
