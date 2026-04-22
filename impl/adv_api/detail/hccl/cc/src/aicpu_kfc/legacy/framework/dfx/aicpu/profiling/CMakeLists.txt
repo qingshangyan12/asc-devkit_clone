@@ -19,11 +19,3 @@ target_sources(ccl_kernel PRIVATE
     profiling_command_handle_lite.cc
 )
 endif()
-
-if(TARGET mc2_server)
-add_mc2_server_ccl_object(mc2_server_legacy_dfx_profiling
-    ${CMAKE_CURRENT_SOURCE_DIR}/profiling_handler_lite.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/profiling_reporter_lite.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/profiling_command_handle_lite.cc
-)
-endif()
