@@ -329,6 +329,19 @@ public:
     }
 
     template <typename T, typename U>
+    __aicore__ inline static constexpr void CheckL12L0ScaleDataType()
+    {
+        using srcDataType = typename U::elementType;
+        using dstDataType = typename T::elementType;
+
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        static_assert(
+            Std::is_one_of_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ fp8_e8m0_t, __gm__ fp8_e8m0_t>>,
+            "The data type is not supported.");
+#endif
+    }
+
+    template <typename T, typename U>
     __aicore__ inline static constexpr void CheckL12L0BDataType()
     {
         using srcDataType = typename U::elementType;
