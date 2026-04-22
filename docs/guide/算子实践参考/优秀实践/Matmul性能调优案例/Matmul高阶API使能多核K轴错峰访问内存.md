@@ -74,7 +74,7 @@ MTE2的搬运效率还可以通过查看其带宽利用率进行验证，如下�
 
 ## 设计优化方案<a name="section33901368431"></a>
 
-使能K轴错峰访问内存：在创建Matmul对象时，将MatmulConfig中的enableKdimReorderLoad参数设置为true。enableKdimReorderLoad参数的详细介绍请参考MatmulConfig。
+使能K轴错峰访问内存：在创建Matmul对象时，将[MatmulConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)中的enableKdimReorderLoad参数设置为true。enableKdimReorderLoad参数的详细介绍请参考[MatmulConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)。
 
 使能K轴错峰访问内存的完整样例请参考[K轴错峰加载数据的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_k_reorder_load)。使能该功能的主要步骤如下：
 

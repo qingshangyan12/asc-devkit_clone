@@ -29,7 +29,7 @@
 
 **获取存储单元的内存空间大小**
 
-开发者可以通过平台信息获取接口查询各存储单元的内存空间大小。
+开发者可以通过[平台信息获取](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/平台信息获取.md)接口查询各存储单元的内存空间大小。
 
 **各存储单元的最小访问粒度（对齐要求）**
 
@@ -175,7 +175,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
     需要注意以下几点：
 
-    -   建议通过AllocEventID或者FetchEventID接口获取EventID，以确保其合法性和有效性。
+    -   建议通过[AllocEventID](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AllocEventID.md)或者[FetchEventID](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FetchEventID.md)接口获取EventID，以确保其合法性和有效性。
     -   EventID的数量有限，使用后应立即调用ReleaseEventID释放资源，避免EventID耗尽，影响系统正常运行。
     -   SetFlag和WaitFlag必须成对使用，且SetFlag和WaitFlag的参数必须完全一致（包括模板参数和事件ID）。如果不匹配，可能导致当前核的计算异常，或影响下一个核的算子执行，引发timeout问题。
 
@@ -200,7 +200,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
     ![](../../../figures/new_核间同步.png)
 
-    CrossCoreSetFlag和CrossCoreWaitFlag接口配合使用。使用时需传入核间同步的标记ID\(flagId\)，即上图中的ID1，每个ID对应一个初始值为0的计数器。执行CrossCoreSetFlag后ID对应的计数器增加1；执行CrossCoreWaitFlag时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。flagId取值范围是0-10。
+    [CrossCoreSetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/CrossCoreSetFlag(ISASI).md)和[CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/CrossCoreWaitFlag(ISASI).md)接口配合使用。使用时需传入核间同步的标记ID\(flagId\)，即上图中的ID1，每个ID对应一个初始值为0的计数器。执行[CrossCoreSetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/CrossCoreSetFlag(ISASI).md)后ID对应的计数器增加1；执行[CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/CrossCoreWaitFlag(ISASI).md)时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。flagId取值范围是0-10。
 
     需要注意以下几点：
 

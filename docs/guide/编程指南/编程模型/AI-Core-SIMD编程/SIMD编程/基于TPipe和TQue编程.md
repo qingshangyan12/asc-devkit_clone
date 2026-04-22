@@ -9,7 +9,7 @@
 **图 1**  流水线并行示意图<a name="fig3986112422"></a>  
 ![](../../../../figures/流水线并行示意图.png "流水线并行示意图")
 
-Ascend C编程范式正是这样一种流水线式的编程范式，把算子核内的处理程序，分成多个**流水任务**，通过队列（TQue）完成**任务间通信和同步**，并通过统一的**资源管理**模块（TPipe）来统一管理内存、事件等资源。
+Ascend C编程范式正是这样一种流水线式的编程范式，把算子核内的处理程序，分成多个**流水任务**，通过队列（[TQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TQue.md)）完成**任务间通信和同步**，并通过统一的**资源管理**模块（[TPipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TPipe.md)）来统一管理内存、事件等资源。
 
 下文将从三种典型的算子类型出发，对这种基于TPipe和TQue的编程范式进行详细介绍。
 
@@ -64,14 +64,14 @@ for-loop {
 }
 ```
 
-任务间数据传递使用到的内存、事件等资源统一由管理模块Pipe进行管理。如下所示的内存管理示意图，TPipe通过InitBuffer接口对外提供队列内存初始化功能，开发者可以通过该接口为指定的队列分配内存。
+任务间数据传递使用到的内存、事件等资源统一由管理模块Pipe进行管理。如下所示的内存管理示意图，TPipe通过[InitBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/InitBuffer.md)接口对外提供队列内存初始化功能，开发者可以通过该接口为指定的队列分配内存。
 
-队列内存初始化完成后，需要使用内存时，通过调用AllocTensor来为LocalTensor分配内存，当创建的LocalTensor完成相关计算无需再使用时，再调用FreeTensor来回收LocalTensor的内存。
+队列内存初始化完成后，需要使用内存时，通过调用[AllocTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AllocTensor.md)来为LocalTensor分配内存，当创建的LocalTensor完成相关计算无需再使用时，再调用[FreeTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FreeTensor.md)来回收LocalTensor的内存。
 
 **图 2**  内存管理示意图<a name="fig375042942717"></a>  
 ![](../../../../figures/内存管理示意图.png "内存管理示意图")
 
-编程过程中使用到的临时变量内存同样通过Pipe进行管理。临时变量可以使用TBuf数据结构来申请指定TPosition上的存储空间。使用TBuf申请的内存空间只能参与计算，无法执行队列的入队出队操作。具体的接口使用说明请参考TBuf。
+编程过程中使用到的临时变量内存同样通过Pipe进行管理。临时变量可以使用[TBuf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TBuf.md)数据结构来申请指定TPosition上的存储空间。使用[TBuf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TBuf.md)申请的内存空间只能参与计算，无法执行队列的入队出队操作。具体的接口使用说明请参考[TBuf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TBuf.md)。
 
 按照上述编程范式进行编程即可实现单核上数据的并行处理。需要处理的数据被切分成n片，每个并行任务需要依次完成n个数据切片的处理。任务间的箭头表达数据间的依赖关系，比如CopyIn处理完第一个数据切片之后，Compute才能对该切片进行处理。
 
@@ -108,7 +108,7 @@ Cube计算流程同样也可以理解为CopyIn、Compute、CopyOut这几个阶�
 
 ![](../../../../figures/矩阵编程逻辑位置示意图-3.png)
 
-如上图所示：CopyIn阶段对应SetTensorA、SetTensorB、SetBias接口；Compute阶段对应Iterate接口；CopyOut阶段对应GetTensorC接口。具体流程可参考如下示例：
+如上图所示：CopyIn阶段对应[SetTensorA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetTensorA.md)、[SetTensorB](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetTensorB.md)、[SetBias](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetBias.md)接口；Compute阶段对应[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Iterate.md)接口；CopyOut阶段对应[GetTensorC](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetTensorC.md)接口。具体流程可参考如下示例：
 
 ```
 // 创建Matmul对象 创建对象时需要传入A、B、C、Bias的参数类型信息， 类型信息通过MatmulType来定义，包括：内存逻辑位置、数据格式、数据类型。
