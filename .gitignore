@@ -7,3 +7,16 @@ __pycache__/
 AGENTS.md
 oat_reports/
 log/
+# OpenCode 配置
+.opencode/
+
+.claude
+
+.agent/
+.agents/
+
+.arts/
+
+test_modified_samples.py
+
+.gitignore
