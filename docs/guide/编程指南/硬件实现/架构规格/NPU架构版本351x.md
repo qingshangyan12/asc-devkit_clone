@@ -160,7 +160,7 @@
 
 -   RegTensor
 
-    RegTensor用于存放Reg矢量计算数据， RegTensor位宽为VL（256B）。
+    RegTensor用于存放Reg矢量计算数据， RegTensor位宽为VL（Vector Length, 256字节）。
 
 -   MaskReg
 
