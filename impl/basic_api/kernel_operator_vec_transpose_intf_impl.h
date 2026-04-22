@@ -114,7 +114,6 @@ __aicore__ inline void TransDataTo5HD(const LocalTensor<T> (&dstList)[NCHW_CONV_
     const LocalTensor<T> (&srcList)[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     CheckTransDataTo5HDParams<T>(nchwconvParams);
     for (int32_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
         CheckTensorPhyPosition<Hardware::UB>(dstList[i], "dstList", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
@@ -122,7 +121,6 @@ __aicore__ inline void TransDataTo5HD(const LocalTensor<T> (&dstList)[NCHW_CONV_
         CheckTensorAlignment(dstList[i], ONE_BLK_SIZE, "dstList", "TransDataTo5HD");
         CheckTensorAlignment(srcList[i], ONE_BLK_SIZE, "srcList", "TransDataTo5HD");
     }
-#endif
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunTransDataTo5HD(dstList, srcList, nchwconvParams, "TransDataTo5HD")) {
@@ -145,13 +143,11 @@ __aicore__ inline void TransDataTo5HD(uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE]
     uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     CheckTransDataTo5HDParams<T>(nchwconvParams);
     for (int32_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
         CheckAddrAlignment(dstList[i], TPosition::VECIN, ONE_BLK_SIZE, "dstList", "TransDataTo5HD");
         CheckAddrAlignment(srcList[i], TPosition::VECIN, ONE_BLK_SIZE, "srcList", "TransDataTo5HD");
     }
-#endif
 #endif
 #if ASCENDC_CPU_DEBUG
     for (int8_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
@@ -220,13 +216,11 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(const Local
     const LocalTensor<uint64_t> &src, const TransDataTo5HDParams &nchwconvParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     CheckTransDataTo5HDParams<T>(nchwconvParams);
     CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
     CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "TransDataTo5HD");
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "TransDataTo5HD");
-#endif
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunTransDataTo5HD<T, uint64_t>(dst, src, nchwconvParams, "TransDataTo5HD")) {
