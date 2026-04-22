@@ -27,7 +27,6 @@ endif()
 
 if(TARGET mc2_server)
     add_mc2_server_ccl_object(mc2_server_next_comm_aicpu
-        ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_indop_process.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/coll_comm_aicpu_mgr.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/coll_comm_aicpu.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/hccl_aicpu_hdc_handler.cc

@@ -858,6 +858,7 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         target_link_libraries(mc2_server PRIVATE
             -Wl,--no-as-needed
             ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/libascend_hal.so
+            ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/libccl_kernel.so
             c_sec
             unified_dlog
             ccl_kernel_plf
