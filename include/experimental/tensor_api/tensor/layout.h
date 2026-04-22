@@ -45,87 +45,46 @@ __aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride);
 template <typename T>
 __aicore__ inline constexpr auto MakeLayout(const T& shape);
 
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Rank(const Layout<Shape, Stride>& layout);
-
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto GetShape(const Layout<Shape, Stride>& layout);
-
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto GetShape(Layout<Shape, Stride>& layout);
-
-template <typename Tuple>
-__aicore__ inline constexpr auto GetShape(const Tuple& shape);
-
-template <size_t I, size_t... Is, typename Tuple>
-__aicore__ inline constexpr auto GetShape(const Tuple& shape);
-
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto GetStride(const Layout<Shape, Stride>& layout);
-
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto GetStride(Layout<Shape, Stride>& layout);
-
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Select(const Layout<Shape, Stride>& layout);
-
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Get(const Layout<Shape, Stride>& layout);
-
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Size(const Layout<Shape, Stride>& layout);
-
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Capacity(const Layout<Shape, Stride>& layout);
-
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Coshape(const Layout<Shape, Stride>& layout);
-
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Cosize(const Layout<Shape, Stride>& layout);
-
-template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const Layout<U, S>& layout);
-
-template <typename T, typename Shape, typename Stride>
+template <typename T, typename Shape, typename Stride> 
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, const Stride& stride);
 
-// make_fractal.h
-template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNzLayout(U row, S column);
+template <size_t I, typename Tuple, typename Enable>
+__aicore__ inline constexpr auto Get(Tuple&& t);
 
-template <typename U, typename S>
-__aicore__ inline decltype(auto) MakeL0CLayout(U row, S column);
+template <size_t I0, size_t I1, size_t... Is, typename Tuple, typename Enable>
+__aicore__ inline constexpr auto Get(Tuple&& t);
 
-template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeDNLayout(U row, S column);
+template <typename Tuple, typename Enable>
+__aicore__ inline constexpr auto Get(Tuple&& t);
 
-template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNDLayout(U row, S column);
+template <size_t... Is, typename LayoutType, typename Enable>
+__aicore__ inline constexpr auto Cosize(const LayoutType& layout);
 
-template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZnLayout(U row, S column);
+template <size_t... Is, typename LayoutType, typename Enable>
+__aicore__ inline constexpr auto Rank(const LayoutType& layout);
 
-template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZzLayout(U row, S column);
+template <size_t... Is, typename LayoutType, typename Enable>
+__aicore__ inline constexpr auto Select(const LayoutType& layout);
 
-template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNnLayout(U row, S column);
+template <size_t... Is, typename LayoutType, typename Enable>
+__aicore__ inline constexpr auto Get(const LayoutType& layout);
 
-template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column);
+template <size_t... Is, typename LayoutType, typename Enable>
+__aicore__ inline constexpr auto Size(const LayoutType& layout);
 
-template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleADNLayout(U row, S column);
+template <size_t... Is, typename LayoutType, typename Enable>
+__aicore__ inline constexpr auto Capacity(const LayoutType& layout);
 
-template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBNDLayout(U row, S column);
+template <typename Tensor, typename Coord, typename Info>
+__aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info);
 
-template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column);
+template <typename LayoutPattern, typename TraitType,
+    Std::enable_if_t<!IsIntegralConstantV<TraitType>, int> Enable, typename... Args>
+__aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args);
 
- template <typename Layout, typename TileShape>
-__aicore__ inline decltype(auto) MakeTileLayout(const Layout& layout, const TileShape& tileShape);
+template <typename LayoutPattern, typename IntType,
+    Std::enable_if_t<IsIntegralConstantV<IntType>, int> Enable, typename... Args>
+__aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args);
 
 } // namespace Te
 } // namespace AscendC

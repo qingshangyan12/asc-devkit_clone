@@ -173,7 +173,7 @@ struct MakeLocalTensor {
     {
         if constexpr (HasDereference<Arg0>::value) {
             using Engine = ViewEngine<Arg0>;
-            if constexpr (sizeof...(Args) == 1 && (is_layout<Args>::value && ...)) {
+            if constexpr (sizeof...(Args) == 1 && (IsLayout<Args>::value && ...)) {
                 return LocalTensor<TensorAttribute<Engine, Args...>>{Engine{arg0}, args...};
             } else {
                 return LocalTensor<TensorAttribute<Engine, decltype(MakeLayout(args...))>>{
