@@ -121,8 +121,8 @@ __aicore__ inline void CheckAddrAlignment(uint64_t addr, TPosition pos, uint32_t
         ConstDefiner::Instance().hardwareCpuBufferMap.at(positionHardMap.at(pos)));
 #endif
     ASCENDC_DEBUG_ASSERT((checkAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s "
-        "address alignment in %s, all addresses should be %u bytes aligned.\n",
-        addrName, apiName, alignBytes));
+        "address alignment in %s, its address must align with %u bytes, current address is %llu.\n",
+        addrName, apiName, alignBytes, static_cast<unsigned long long>(checkAddr)));
 }
 
 template <typename T>
