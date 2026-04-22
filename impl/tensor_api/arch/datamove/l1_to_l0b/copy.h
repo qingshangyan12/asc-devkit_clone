@@ -35,16 +35,18 @@ struct CopyL12L0BTraitDefault {
 };
 
 using CopyL12L0BModeSet = TupleMap<
-    Std::tuple<Std::tuple<Std::Int<1>, Std::Int<0>>, CopyMode::NORMAL>,
-    Std::tuple<Std::tuple<Std::Int<1>, Std::Int<1>>, CopyMode::NORMAL>,
-    Std::tuple<Std::tuple<Std::Int<0>, Std::Int<0>>, CopyMode::TRANS>,
-    Std::tuple<Std::tuple<Std::Int<0>, Std::Int<1>>, CopyMode::TRANS_B8B4>>;
+    Std::tuple<Std::tuple<noTrans, noB8B4Type, noMxScale>, CopyMode::NORMAL>,
+    Std::tuple<Std::tuple<noTrans, isB8B4Type, noMxScale>, CopyMode::NORMAL>,
+    Std::tuple<Std::tuple<noTrans, isB8B4Type, isMxScale>, CopyMode::SCALE>,
+    Std::tuple<Std::tuple<isTrans, noB8B4Type, noMxScale>, CopyMode::TRANS>,
+    Std::tuple<Std::tuple<isTrans, isB8B4Type, noMxScale>, CopyMode::TRANS_B8B4>>;
 
 using CopyL12L0BModeCoordSet = TupleMap<
-    Std::tuple<Std::tuple<Std::Int<1>, Std::Int<0>>, CopyMode::NORMAL_COORD>,
-    Std::tuple<Std::tuple<Std::Int<1>, Std::Int<1>>, CopyMode::NORMAL_COORD>,
-    Std::tuple<Std::tuple<Std::Int<0>, Std::Int<0>>, CopyMode::TRANS_COORD>,
-    Std::tuple<Std::tuple<Std::Int<0>, Std::Int<1>>, CopyMode::TRANS_B8B4_COORD>>;
+    Std::tuple<Std::tuple<noTrans, noB8B4Type, noMxScale>, CopyMode::NORMAL_COORD>,
+    Std::tuple<Std::tuple<noTrans, isB8B4Type, noMxScale>, CopyMode::NORMAL_COORD>,
+    Std::tuple<Std::tuple<noTrans, isB8B4Type, isMxScale>, CopyMode::SCALE_COORD>,
+    Std::tuple<Std::tuple<isTrans, noB8B4Type, noMxScale>, CopyMode::TRANS_COORD>,
+    Std::tuple<Std::tuple<isTrans, isB8B4Type, noMxScale>, CopyMode::TRANS_B8B4_COORD>>;
 
 struct CopyL12L0B {
 public:
@@ -68,7 +70,8 @@ private:
         using SrcPattern = GetLayoutPattern<SrcLayout>;
         constexpr auto isB8B4Type = sizeof(typename T::elementType) == 1;
         constexpr auto noTrans = Std::is_same_v<DstPattern, SrcPattern>;
-        using CopyL12L0BMode = typename CopyL12L0BModeSet::template Get<Std::tuple<Std::Int<noTrans>, Std::Int<isB8B4Type>>>;
+        constexpr auto isMxScale = Std::is_same_v<DstPattern, NNLayoutPtn> && noTrans;
+        using CopyL12L0BMode = typename CopyL12L0BModeSet::template Get<Std::tuple<Std::Int<noTrans>, Std::Int<isB8B4Type>, Std::Int<isMxScale>>>;
         static_assert(!Std::is_same_v<CopyL12L0BMode, EmptyValue>, "Unsupported CopyL12L0BMode.");
         using Tensor2Tensor = typename CopyL12L0BTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern, CopyL12L0BMode>::type;
         Tensor2Tensor::template Run<trait, T, U>(dst, src);
