@@ -49,23 +49,24 @@
 >        aclrtSetDevice、aclrtResetDevice、aclrtCreateStream、aclrtCreateStreamWithConfig、aclrtDestroyStream、aclrtDestroyStreamForce、aclrtSynchronizeStream、aclrtCreateContext、aclrtDestroyContext。
 
 > [!CAUTION]注意
-> 在CPU孪生调试模式下，编译器不识别AscendC提供的[SIMD-BuiltIn关键字](../../语言扩展层/SIMD-BuiltIn关键字.md)及[SIMT-BuiltIn关键字](../../语言扩展层/SIMT-BuiltIn关键字.md)，而是由孪生调试框架将这些关键字定义为空，包括
+> 在CPU孪生调试模式下，编译器不识别Ascend C提供的[SIMD-BuiltIn关键字](../../语言扩展层/SIMD-BuiltIn关键字.md)及[SIMT-BuiltIn关键字](../../语言扩展层/SIMT-BuiltIn关键字.md)，包括
 > - **函数执行空间限定符**：如 `__aicore__`、`__global__`、`__host__` 等;
 > - **函数标记宏**：如 `__simd_vf__`、`__simd_callee__`、`__simt_vf__` 等；
-> - **地址空间限定符**：如 `__gm__`（Global Memory）、`__ubuf__`（Unified Buffer）等。
+> - **地址空间限定符**：如 `__gm__` 、`__ubuf__` 等。
 >
-> 由于这些限定符在CPU模式下被置空，**仅通过BuiltIn关键字区分的函数签名将被视为相同**，从而导致重定义编译错误。典型问题场景包括：
-> 1. **Device侧函数与Host侧函数同名**：如下例中，`add` 函数仅通过 `__aicore__` 区分运行域，在CPU调试模式下两个声明将冲突：
+> 这些关键字与 Device 侧执行强相关，在 CPU 孪生调试模式下无需实际生效，因此系统框架将这些关键字定义为空。
+> 由于这种置空处理，**仅通过BuiltIn关键字区分的函数签名将被视为相同**，会导致重定义编译错误。
+> 
+> 典型问题场景包括：
+> 1. **Device侧函数与Host侧函数同名**：如下例中，`add` 函数仅通过 `__aicore__` 区分运行域，在 CPU 孪生调试模式下两个声明将冲突：
 >    ```asc
 >    __aicore__ inline void add(int x, int y);  // Device侧
 >    void add(int x, int y);                    // Host侧（等同于 __host__）
->    ```
 > 2. **参数类型仅有地址空间限定符不同**：如下例中，两个Device侧函数仅在指针的地址空间限定符上不同：
 >    ```asc
 >    __aicore__ inline void process(__gm__ void* data, int size);
 >    __aicore__ inline void process(__ubuf__ void* data, int size);
->   
-> **编写建议**：请勿定义仅依赖BuiltIn关键字来区分的函数。
+> **在孪生调试场景下需特别注意**：请勿定义仅依赖BuiltIn关键字来区分的函数。
 
 ## gdb调试<a name="section13838280458"></a>
 
