@@ -37,7 +37,7 @@ SIMD Reg矢量计算编程架构中，通过发出指令到Reg矢量计算执行
 
 具体的调用关系图如下：
 
-![](../../../../figures/aicore.png)
+![](../../../../figures/reg_calculation_call_hierarchy.png)
 
 以下为唯一合法函数调用链：
 
