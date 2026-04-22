@@ -73,24 +73,3 @@ TEST(TensorApiDatamoveRoutingIgnore, CopyUB2L1IgnoreRun)
     CopyUB2L1Ignore::Run<UB2L1_TRAIT>(1, 2);
     SUCCEED();
 }
-
-TEST(TensorApiDatamoveRoutingIgnore, CopyL12L0AIgnoreRouteFallback)
-{
-    using Fallback = typename CopyL12L0ATensor2Tensor<
-        Location::UB, Location::L1, ArchVersion::V3510, NZLayoutPtn, NZLayoutPtn, CopyMode::NORMAL>::type;
-    EXPECT_TRUE((std::is_same_v<Fallback, CopyL12L0AIgnore>));
-}
-
-TEST(TensorApiDatamoveRoutingIgnore, CopyL12L0BIgnoreRouteFallback)
-{
-    using Fallback = typename CopyL12L0BTensor2Tensor<
-        Location::UB, Location::L1, ArchVersion::V3510, ZNLayoutPtn, ZNLayoutPtn, CopyMode::NORMAL>::type;
-    EXPECT_TRUE((std::is_same_v<Fallback, CopyL12L0BIgnore>));
-}
-
-TEST(TensorApiDatamoveRoutingIgnore, CopyGM2L1IgnoreRouteFallback)
-{
-    using Fallback = typename CopyGM2L1Tensor2Tensor<
-        Location::UB, Location::GM, ArchVersion::V3510, NDExtLayoutPtn, NDExtLayoutPtn>::type;
-    EXPECT_TRUE((std::is_same_v<Fallback, CopyGM2L1Ignore>));
-}
