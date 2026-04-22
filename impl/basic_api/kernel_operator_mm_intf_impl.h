@@ -30,7 +30,6 @@
 namespace AscendC {
 
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201))
 // LoadData3D V1 parameter range checks
 // Used by: LoadData with LoadData3DParamsV1
 template <typename U>
@@ -100,7 +99,6 @@ __aicore__ inline void CheckLoadData3dv2Params(const LoadData3DParamsV2<U>& load
     CheckValueRange<uint8_t>(loadDataParams.dilationFilterH, static_cast<uint8_t>(MIN_LOAD3D_DILATION_FILTER),
         static_cast<uint8_t>(MAX_LOAD3D_FILTER), "dilationFilterH", "LoadData with LoadData3DParamsV2");
 }
-#endif
 #endif
 
 /* **************************************************************************************************
@@ -234,11 +232,6 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     const LoadData3DParamsV1<U>& loadDataParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    using PrimType = PrimT<T>;
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, uint8_t, int8_t, half>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype in LoadData with LoadData3DParamsV1, current api support dtype combination is "
-        "src and dst both: uint8_t / int8_t / half.\n"));
     CheckTensorPhyPosition<Hardware::L1>(src, "src", "A1 / B1", "LoadData with LoadData3DParamsV1");
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "LoadData with LoadData3DParamsV1");
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
@@ -248,9 +241,6 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
         CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "LoadData with LoadData3DParamsV1");
     }
     CheckLoadData3dv1Params<U>(loadDataParams);
-#endif
-#endif
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckLoadData3dParams(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.strideW, loadDataParams.strideH);
     ASCENDC_CHECK_VALUE_RANGE(loadDataParams.c1Index, MIN_LOAD3D_C1_IDX, MAX_LOAD3D_C1_IDX, "c1Index",
         "LoadData with LoadData3DParamsV1");
@@ -303,31 +293,15 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     const LoadData3DParamsV2<U>& loadDataParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    using PrimType = PrimT<T>;
     CheckTensorPhyPosition<Hardware::L1>(src, "src", "A1 / B1", "LoadData with LoadData3DParamsV2");
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "LoadData with LoadData3DParamsV2");
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
-    if (dstScope == Hardware::L0A) {
-        ASCENDC_DEBUG_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, float,
-            uint32_t, int32_t, int4b_t>()),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst "
-            "position is A2, current api support dtype combination is src and dst both: uint8_t / int8_t / half / "
-            "bfloat16_t / float / uint32_t / int32_t / int4b_t.\n"));
-        CheckTensorAlignment(dst, VALUE_512, "dst", "LoadData with LoadData3DParamsV2");
-    } else if (dstScope == Hardware::L0B) {
-        ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, bfloat16_t, float, uint32_t, int32_t>()),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst "
-            "position is B2, current api support dtype combination is src and dst both: half / bfloat16_t / float / "
-            "uint32_t / int32_t.\n"));
+    if (dstScope == Hardware::L0A || dstScope == Hardware::L0B) {
         CheckTensorAlignment(dst, VALUE_512, "dst", "LoadData with LoadData3DParamsV2");
     } else if (dstScope == Hardware::UB) {
         CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "LoadData with LoadData3DParamsV2");
     }
     CheckLoadData3dv2Params<U>(loadDataParams);
-#endif
-#endif
-#if ASCENDC_CPU_DEBUG
     CheckLoadData3dv2ChannelSize<T>(loadDataParams.channelSize);
     CheckLoadData3dParams(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.strideW, loadDataParams.strideH);
     CheckLoadData3dv2MatrixParams<T>(loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
