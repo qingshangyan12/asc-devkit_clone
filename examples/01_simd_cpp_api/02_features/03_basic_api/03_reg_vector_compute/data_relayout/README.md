@@ -1,9 +1,21 @@
 # data_relayout样例
 
 ## 概述
-本样例基于RegBase编程范式，演示使用Interleave和Pack接口实现数据重排功能：
-- **场景1**：Interleave — 将两个uint16_t向量交织
-- **场景2**：Pack — 从uint32_t向量中提取低16位到uint16_t向量
+本样例基于RegBase编程范式实现数据重排功能，支持多种场景，通过环境变量选择场景。
+    <table>
+ 	  	 	<tr>
+ 	  	 		<td>scenarioNum</td>
+ 	  	 		<td>重排场景</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>1</td>
+ 	  	 		<td>Interleave（将两个uint16_t向量交织）</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>2</td>
+ 	  	 		<td>Pack（从uint32_t向量中提取低16位到uint16_t向量）</td>
+ 	  	 	</tr>
+ 	  	 </table>
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -58,17 +70,6 @@
     PackVF函数内调用Pack接口提取低16位，使用LoadAlign/StoreAlign的postUpdate模式。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
-
-## 关键API说明
-
-| API | 说明 |
-|-----|------|
-| `AscendC::Reg::Interleave<T>` | 将两个寄存器数据交织到两个输出寄存器 |
-| `AscendC::Reg::DeInterleave<T>` | 将两个寄存器数据反交织到两个输出寄存器 |
-| `AscendC::Reg::Pack<T16, T32, HighLowPart::LOWEST>` | 从宽类型提取窄类型低位数据 |
-| `AscendC::Reg::Pack<T16, T32, HighLowPart::HIGHEST>` | 从宽类型提取窄类型高位数据 |
-| `AscendC::Reg::HighLowPart::LOWEST` | Pack/UnPack的低位部分选择 |
-| `AscendC::Reg::HighLowPart::HIGHEST` | Pack/UnPack的高位部分选择 |
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。

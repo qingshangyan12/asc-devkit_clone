@@ -1,7 +1,7 @@
 # histogram样例
 
 ## 概述
-本样例基于RegBase编程范式实现Histograms运算，主要调用Histograms接口，使用LoadAlign/StoreAlign的postUpdate模式加载数据。
+本样例基于RegBase编程范式实现直方图统计功能。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -39,16 +39,6 @@
     - FREQUENCY模式统计每个值出现的频率
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
-
-## API说明
-- `LoadAlign<T, PostLiteral::POST_MODE_UPDATE>`：以postUpdate模式加载输入数据，地址自动递增
-- `Duplicate(dstReg, scalarValue)`：初始化dstReg为零
-- `Histograms<T, U, mode, type>`：直方图统计接口
-  - `HistogramsBinType::BIN0`：统计src中[0-127]区间数据
-  - `HistogramsBinType::BIN1`：统计src中[128-255]区间数据
-  - `HistogramsType::FREQUENCY`：频率统计模式
-  - `HistogramsType::ACCUMULATE`：累计统计模式
-- `StoreAlign<U, PostLiteral::POST_MODE_UPDATE>`：以postUpdate模式输出结果
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。

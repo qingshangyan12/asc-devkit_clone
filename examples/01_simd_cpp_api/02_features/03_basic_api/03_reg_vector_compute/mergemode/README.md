@@ -1,11 +1,7 @@
 # mergemode样例
 
 ## 概述
-本样例基于RegBase编程范式，综合演示以下特性：
-- **MaskMergeMode::MERGING**：Max接口的merging模式，未激活mask位保留dst原值
-- **LoadAlign/StoreAlign postUpdate模式**：地址自动递增
-- **UpdateMask**：数据非VL整数倍时动态生成mask
-- **ReduceMax**：使用Reduce<MAX>归约求全局最大值
+本样例基于RegBase编程范式综合演示MaskMergeMode、postUpdate、UpdateMask和ReduceMax等特性。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -41,18 +37,6 @@
     3. 输出为32B对齐的8个float，全局最大值在第一个元素。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
-
-## 关键API说明
-
-| API | 说明 |
-|-----|------|
-| `AscendC::Reg::Max<T, MaskMergeMode::MERGING>` | 逐元素最大值，MERGING模式：未激活mask位保留dst原值 |
-| `AscendC::Reg::MaskMergeMode::ZEROING` | ZEROING模式：未激活mask位置零 |
-| `AscendC::Reg::LoadAlign<T, PostLiteral::POST_MODE_UPDATE>` | postUpdate模式：加载后地址自动递增 |
-| `AscendC::Reg::StoreAlign<T, PostLiteral::POST_MODE_UPDATE>` | postUpdate模式：存储后地址自动递增 |
-| `AscendC::Reg::UpdateMask<T>(count)` | 根据剩余元素数动态生成mask（非VL整数倍时使用） |
-| `AscendC::Reg::Reduce<ReduceType::MAX>` | 块内归约取最大值，结果放在dstReg最低位 |
-| `AscendC::VF_CALL<Func>(args...)` | VF函数调用入口 |
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。

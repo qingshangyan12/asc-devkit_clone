@@ -1,7 +1,7 @@
 # gather样例
 
 ## 概述
-本样例基于RegBase编程范式，演示使用Gather接口（源操作数为寄存器）实现按索引收集元素功能。
+本样例基于RegBase编程范式实现按索引收集元素功能。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -37,14 +37,6 @@
     GatherVF函数内调用Gather接口按索引收集元素，使用LoadAlign/StoreAlign的postUpdate模式。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
-
-## 关键API说明
-
-| API | 说明 |
-|-----|------|
-| `AscendC::Reg::Gather<T, U>` | 根据索引从源寄存器中收集元素到目的寄存器，dst[i] = src[index[i]] |
-| `AscendC::Reg::LoadAlign<T, PostLiteral::POST_MODE_UPDATE>` | 对齐加载寄存器数据，加载后自动递增地址 |
-| `AscendC::Reg::StoreAlign<T, PostLiteral::POST_MODE_UPDATE>` | 对齐存储寄存器数据，存储后自动递增地址 |
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。

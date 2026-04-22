@@ -1,7 +1,7 @@
 # scatter_st_reg样例
 
 ## 概述
-本样例演示使用Reg::Scatter接口实现离散数据搬出功能（按元素分散到UB）。
+本样例基于RegBase编程范式实现离散数据搬出功能（按元素分散到UB(Unified Buffer)）。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -21,8 +21,8 @@
 - 样例功能：  
   根据索引将源数据中的元素离散分散到目的地址。
 
-  **Reg::Scatter模式**
-  - 使用Reg::Scatter接口，按元素分散到UB
+  **Scatter模式**
+  - 使用Scatter接口，按元素分散到UB
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
@@ -33,16 +33,11 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">scatter_st_reg</td></tr>
     </table>
   - 样例实现：
-    ScatterVF函数内调用`AscendC::Reg::Scatter(baseAddr, srcReg, indexReg, mask)`，按元素分散。
+    ScatterVF函数内调用`Scatter(baseAddr, srcReg, indexReg, mask)`，按元素分散。
     - baseAddr为UB基地址指针
     - indexReg为元素索引（uint16_t类型），指示srcReg中每个元素写入的位置
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
-
-## API说明
-- `AscendC::Reg::Scatter(baseAddr, srcReg, index, mask)`：Reg::Scatter接口
-  - baseAddr为UB基地址指针，按元素分散
-  - index为RegTensor<uint16_t>类型，指示srcReg中每个元素的写入位置（元素索引）
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
