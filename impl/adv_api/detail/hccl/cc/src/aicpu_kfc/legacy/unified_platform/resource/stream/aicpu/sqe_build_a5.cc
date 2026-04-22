@@ -18,8 +18,13 @@ constexpr u32 LOW_BITS = 16;
 
 u32 GetKernelExecTimeoutFromEnvConfig()
 {
+#ifdef MC2_SERVER_ONLY
+    constexpr u32 DEFAULT_MC2_SERVER_EXEC_TIMEOUT = 1080;
+    return DEFAULT_MC2_SERVER_EXEC_TIMEOUT;
+#else
     const u32 envTimeout  = CommunicatorImplLiteMgr::GetInstance().GetEnvConfig().hcclExecTimeout;
     return envTimeout;
+#endif
 }
 
 void BuildA5SqeNotifyWait(u32 streamId, u32 taskId, u32 notifyId, uint8_t * const sqeIn)

@@ -18,3 +18,10 @@ target_sources(ccl_kernel PRIVATE
         exception_defination.cc
 )
 endif()
+
+if(TARGET mc2_server)
+add_mc2_server_ccl_object(mc2_server_legacy_exception
+        ${CMAKE_CURRENT_SOURCE_DIR}/hccl_exception.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/exception_defination.cc
+)
+endif()

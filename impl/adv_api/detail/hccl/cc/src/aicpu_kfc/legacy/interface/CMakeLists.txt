@@ -18,3 +18,9 @@ target_sources(ccl_kernel PRIVATE
         aicpu_ts_thread_interface.cc
 )
 endif()
+
+if(TARGET mc2_server)
+    add_mc2_server_ccl_object(mc2_server_legacy_interface
+        ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_ts_thread_interface.cc
+    )
+endif()
