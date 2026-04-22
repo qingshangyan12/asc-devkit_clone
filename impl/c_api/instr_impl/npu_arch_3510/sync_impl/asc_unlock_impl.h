@@ -10,7 +10,7 @@
 
 /* !
  * \file asc_unlock_impl.h
- * \brief
+ * \brief asc_unlock接口的实现
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
