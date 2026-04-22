@@ -32,7 +32,7 @@ from .filelist import FileItem, FileList, fill_is_common_path
 from .utils.pkg_utils import (
     ContainAsteriskError, BLOCK_CONFIG_PATH,
     BlockConfigError, EnvNotSupported, IllegalVersionDir, PackageError,
-    InstallScriptFormatError, InstallScriptNotInPackageInfo, 
+    InstallScriptFormatError, InstallScriptNotInPackageInfo, MultiPkgSoftlinkError, MultiPkgModError, PkgInnerSoftlinkNotAllowed, 
     ParseOsArchError, VersionInfoNotExist, config_feature_to_set,
     flatten, star_pipe, merge_dict, yield_if
 )
@@ -103,6 +103,7 @@ class ParseEnv(NamedTuple):
     parse_option: ParseOption
     delivery_dir: str
     top_dir: str
+    package_attr: Dict
 
 
 class BlockElement(NamedTuple):
@@ -139,21 +140,32 @@ class FileInfoParsedResult(NamedTuple):
 
 class BlockConfig(NamedTuple):
     """块配置。"""
-
     dir_install_list: List[Dict]
     move_files: List[FileInfo]
     expand_content_list: List[Dict]
     package_content_list: List[Dict]
+    pkg_mod: List[PkgMod]
+    pkg_softlink: List[PkgSoftlink]
     generate_infos: List[GenerateInfo]
 
 
+class PkgMod(NamedTuple):
+    """包内文件权限。"""
+    path: str
+    mod: int
+
+class PkgSoftlink(NamedTuple):
+    """包内软链接"""
+    dst_path: str
+    src_path: str
+
 class PackerConfig(NamedTuple):
-    """安装相关配置。"""
+    """打包相关配置。"""
     fill_is_common_path: Callable[[FileList], Iterator[FileItem]]
 
 
 class XmlConfig(NamedTuple):
-    """安装xml配置。"""
+    """打包xml配置。"""
     default_config: Dict[str, str]
     package_attr: PackageAttr
     version_info: VersionInfo
@@ -185,6 +197,14 @@ class XmlConfig(NamedTuple):
         return self._collect_list('package_content_list')
 
     @property
+    def pkg_mods(self) -> List[PkgMod]:
+        return self._collect_list('pkg_mods')
+
+    @property
+    def pkg_softlink(self) -> List[PkgSoftlink]:
+        return self._collect_list('pkg_softlinks')
+
+    @property
     def generate_infos(self) -> List[GenerateInfo]:
         return self._collect_list('generate_infos')
 
@@ -207,7 +227,7 @@ def parse_package_info(package_info_ele: Optional[ET.Element]) -> Dict:
         # gen_version_info: 是否生成version.info文件
         bool_attrs = (
             'expand_asterisk', 'parallel', 'parallel_limit', 'package_check', 'check_features',
-            'use_move', 'gen_version_info'
+            'use_move', 'gen_version_info', 'copy_all'
         )
         bool_values = ('t', 'true', 'y', 'yes')
         if ele.tag in bool_attrs:
@@ -304,8 +324,8 @@ def render_semver(package_name: str, version: str) -> Iterator[Tuple[str, str]]:
     # 解析正式版本号（主版本.次版本.修订号）
     try:
         major, minor, patch = map(int, release_part)
-    except (ValueError, TypeError):
-        raise IllegalVersionDir(f"无效的版本号格式: {version}")
+    except (ValueError, TypeError) as ex:
+        raise IllegalVersionDir(f"无效的版本号格式: {version}") from ex
 
     yield f'{package_name}_VERSION_STR', f'"{version}"'
     yield f'{package_name}_MAJOR', str(major)
@@ -364,8 +384,8 @@ def render_semver(package_name: str, version: str) -> Iterator[Tuple[str, str]]:
 
     try:
         pre_type_weight, num_value = calc_pre_release()
-    except (ValueError, TypeError):
-        raise IllegalVersionDir(f"无效的预发布版本: {pre_release}")
+    except (ValueError, TypeError) as ex:
+        raise IllegalVersionDir(f"无效的预发布版本: {pre_release}") from ex
 
     if not pre_type_weight:
         raise IllegalVersionDir(f"无效的预发布版本: {pre_release}")
@@ -615,6 +635,11 @@ def evaluate_info(info: Dict[str, str],
     replace_env_func = partial(replace_env, env_dict)
     add_dst_path_func = partial(join_dst_path, loaded_block.dst_path)
 
+    def split_pkg_softlink(key: str, value: str) -> Tuple[str, str]:
+        if key == 'pkg_softlink':
+            return key, value.split(';')
+        return key, value
+
     def upper_value(key: str, value: str) -> Tuple[str, str]:
         if key == 'configurable':
             return key, value.upper()
@@ -631,7 +656,7 @@ def evaluate_info(info: Dict[str, str],
             return key, 'NA'
         return key, value
 
-    def merge_feature(key: str, value: str) -> Tuple[str, str]:
+    def merge_feature(key: str, value: str) -> Tuple[str, Set[str]]:
         if key in ('chip', 'feature'):
             config_features = config_feature_to_set(value, key)
             return key, config_features | getattr(loaded_block, f'{key}s')
@@ -682,8 +707,16 @@ def parse_dir_info_elements(loaded_block: LoadedBlockElement,
 
     return dir_infos
 
-
-def expand_dir(file_info: FileInfo, get_dst_target_func: Callable[[FileInfo], str]):
+def get_target_name(target_conf) -> str:
+    """获取目标名。"""
+    rename = target_conf.get('rename')
+    if rename:
+        return rename
+    value_list = target_conf.get('value').split('/')
+    target_name = value_list[-1] if value_list[-1] else value_list[-2]
+    return target_name
+ 	 
+def expand_dir(file_info: FileInfo, get_dst_target_func: Callable[[FileInfo], str], env: ParseEnv):
     """
     如果file_info中配置的路径是文件夹，需要展开到文件
     """
