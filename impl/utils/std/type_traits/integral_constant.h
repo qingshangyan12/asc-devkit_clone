@@ -53,12 +53,25 @@ __aicore__ inline constexpr Int<(t OP u)> operator OP (Int<t>, Int<u>) { \
     return {}; \
 }
 
+#define STD_INT_BINARY_CMP(OP) \
+template <auto t, auto u> \
+__aicore__ inline constexpr bool_constant<(t OP u)> operator OP (Int<t>, Int<u>) { \
+    return {}; \
+}
+
 STD_INT_BINARY_OP(+);
 STD_INT_BINARY_OP(-);
 STD_INT_BINARY_OP(*);
 STD_INT_BINARY_OP(/);
 STD_INT_BINARY_OP(%);
+STD_INT_BINARY_CMP(==);
+STD_INT_BINARY_CMP(!=);
+STD_INT_BINARY_CMP(<);
+STD_INT_BINARY_CMP(<=);
+STD_INT_BINARY_CMP(>);
+STD_INT_BINARY_CMP(>=);
 #undef STD_INT_BINARY_OP
+#undef STD_INT_BINARY_CMP
 
 }
 }
