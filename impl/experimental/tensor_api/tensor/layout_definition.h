@@ -52,7 +52,7 @@ struct Layout : private Std::tuple<T, U>
 {
 public:
     static constexpr auto size = StaticLayoutSize<T, U>::size;
-    static constexpr auto depth = NestingDepthV<T>;
+    static constexpr auto depth = nesting_depth_v<T>;
     static constexpr auto rank = Std::tuple_size_v<T>;
 
     __aicore__ inline constexpr Layout(const T& shape  = {}, const U& stride = {})
@@ -169,13 +169,13 @@ template <typename T>
 using GetLayoutPattern = typename GetPattern<Std::remove_cvref_t<T>>::type;
 
 template <typename T>
-struct IsLayout : Std::false_type {};
+struct is_layout : Std::false_type {};
 
 template <typename T, typename U, typename S>
-struct IsLayout<Layout<T, U, S>> : Std::true_type {};
+struct is_layout<Layout<T, U, S>> : Std::true_type {};
 
 template <typename T>
-constexpr bool IsLayoutV = IsLayout<Std::remove_cvref_t<T>>::value;
+constexpr bool IsLayoutV = is_layout<Std::remove_cvref_t<T>>::value;
 
 } // namespace Te
 } // namespace AscendC
