@@ -111,18 +111,17 @@ __aicore__ inline void CheckTensorAlignment(const LocalTensor<T>& inputTensor, u
         tensorName, apiName, alignBytes, static_cast<unsigned long long>(tensorAddr)));
 }
 
-__aicore__ inline void CheckAddrAlignment(uint64_t addr, TPosition pos, uint32_t alignBytes,
+__aicore__ inline void CheckAddrAlignment(uint64_t addr, Hardware phyPos, uint32_t alignBytes,
     const __gm__ char* addrName, const __gm__ char* apiName)
 {
     uint64_t checkAddr = addr;
 #ifdef ASCENDC_CPU_DEBUG
-    auto positionHardMap = ConstDefiner::Instance().positionHardMap;
     checkAddr = addr - reinterpret_cast<uint64_t>(
-        ConstDefiner::Instance().hardwareCpuBufferMap.at(positionHardMap.at(pos)));
+        ConstDefiner::Instance().hardwareCpuBufferMap.at(phyPos));
 #endif
     ASCENDC_DEBUG_ASSERT((checkAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s "
-        "address alignment in %s, all addresses should be %u bytes aligned.\n",
-        addrName, apiName, alignBytes));
+        "address alignment in %s, its address must align with %u bytes, current address is %llu.\n",
+        addrName, apiName, alignBytes, static_cast<unsigned long long>(checkAddr)));
 }
 
 template <typename T>
@@ -224,68 +223,6 @@ __aicore__ inline void CheckVectorTensor(const __gm__ char* apiName, const Ts& .
 {
     (CheckTensorPhyPosition<Hardware::UB>(tensors.tensor, tensors.tensorName, "VECIN / VECCALC / VECOUT", apiName), ...);
     (CheckTensorAlignment(tensors.tensor, ONE_BLK_SIZE, tensors.tensorName, apiName), ...);
-}
-
-// Reduce base checks: dtype, repeatTime, position, src alignment
-// Shared by BlockReduce and WholeReduce (both maskCount and maskBit overloads)
-template <typename T>
-__aicore__ inline void CheckReduceBaseParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const int32_t repeatTime, const __gm__ char* apiName)
-{
-    using PrimType = PrimT<T>;
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype in %s, current api support dtype combination is "
-        "src and dst both: half / float.\n", apiName));
-    CheckValueRange<int32_t>(repeatTime, 0, 255, "repeatTime", apiName);
-    CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", apiName);
-    CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", apiName);
-    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
-}
-
-// BlockReduce common checks: dtype, repeatTime, position, alignment
-// Used by: BlockReduceSum/Max/Min (both maskCount and maskBit overloads)
-template <typename T>
-__aicore__ inline void CheckBlockReduceParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const int32_t repeatTime, const __gm__ char* apiName)
-{
-    CheckReduceBaseParams<T>(dst, src, repeatTime, apiName);
-    using PrimType = PrimT<T>;
-    if constexpr (sizeof(PrimType) == 2) {
-        CheckTensorAlignment(dst, 16, "dst", apiName);  // half: 16B
-    } else if constexpr (sizeof(PrimType) == 4) {
-        CheckTensorAlignment(dst, 32, "dst", apiName);  // float: 32B
-    }
-}
-
-// WholeReduce common checks: dtype, repeatTime, position, alignment (with order)
-// Used by: WholeReduceMax/Min (both maskCount and maskBit overloads)
-template <typename T>
-__aicore__ inline void CheckWholeReduceCommonParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const int32_t repeatTime, ReduceOrder order, const __gm__ char* apiName)
-{
-    CheckReduceBaseParams<T>(dst, src, repeatTime, apiName);
-    CheckValueRange<int>(static_cast<int>(order), 0, 3, "order", apiName);
-    using PrimType = PrimT<T>;
-    if constexpr (sizeof(PrimType) == 2) {
-        CheckTensorAlignment(dst, 4, "dst", apiName);  // half: 4B
-    } else if constexpr (sizeof(PrimType) == 4) {
-        CheckTensorAlignment(dst, 8, "dst", apiName);  // float: 8B
-    }
-}
-
-// WholeReduce common checks: dtype, repeatTime, position, alignment (without order)
-// Used by: WholeReduceSum (both maskCount and maskBit overloads)
-template <typename T>
-__aicore__ inline void CheckWholeReduceCommonParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const int32_t repeatTime, const __gm__ char* apiName)
-{
-    CheckReduceBaseParams<T>(dst, src, repeatTime, apiName);
-    using PrimType = PrimT<T>;
-    if constexpr (sizeof(PrimType) == 2) {
-        CheckTensorAlignment(dst, 2, "dst", apiName);  // half: 2B
-    } else if constexpr (sizeof(PrimType) == 4) {
-        CheckTensorAlignment(dst, 4, "dst", apiName);  // float: 4B
-    }
 }
 
 } // namespace AscendC
