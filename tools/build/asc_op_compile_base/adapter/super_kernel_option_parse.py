@@ -168,7 +168,7 @@ def setup_super_kernel_option_parsers() -> ParserFactory:
     return factory
 
 
-def parse_super_kernel_options(option_string: str) -> bool:
+def parse_super_kernel_options(option_string: str, convert_underscore_to_hyphen: bool = False) -> bool:
     factory = setup_super_kernel_option_parsers()
     if not option_string.strip():
         return {}
@@ -180,6 +180,8 @@ def parse_super_kernel_options(option_string: str) -> bool:
             AscendCLogLevel.LOG_WARNING)
             continue
         key, value = map(str.strip, pair.split('=', 1))
+        if convert_underscore_to_hyphen:
+            key = key.replace('_', '-')
         if not key or not value:
             CommonUtility().ascendc_raise_python_err(ERR_CODE,
                 f"[Super Kernel] Invalid compile option: The key-value pair is missing for the option {pair}.")
