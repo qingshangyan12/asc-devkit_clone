@@ -192,7 +192,8 @@ HcclResult NotifyManager::HcommFreeNotify(uint32_t notifyNum, NotifyHandle *noti
     // 2. 先释放 Device 侧（若失败则直接返回，不动 Host）
     bool hasAicpu = !aicpuNotifys.empty();
     if (hasAicpu) {
-        HcclResult ret = AicpuLaunchMgr::NotifyKernelLaunchFree(aicpuNotifys, aicpuNotifys.size(), commId_, binHandle_);
+        HcclResult ret = AicpuLaunchMgr::NotifyKernelLaunchFree(aicpuNotifys, aicpuNotifys.size(), commId_,
+            binHandle_);
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR("[NotifyManager][%s] NotifyKernelLaunchFree failed ret[%d], num[%u], skip host erase",
                 __func__, ret, aicpuNotifys.size());

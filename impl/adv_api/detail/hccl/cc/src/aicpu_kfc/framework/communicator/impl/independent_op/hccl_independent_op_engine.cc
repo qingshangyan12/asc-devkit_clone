@@ -22,6 +22,7 @@
 #include "hccl_independent_common.h"
 #include "profiling/profiling.h"
 #include "aicpu_operator_pub.h"
+#include "launch_aicpu.h"
 using namespace hccl;
 constexpr u32 MAX_EXPORT_THREAD_NUM = 40U;
 
@@ -96,7 +97,7 @@ HcclResult HcclThreadAcquire(HcclComm comm, CommEngine engine, uint32_t threadNu
         if (engine == CommEngine::COMM_ENGINE_AICPU_TS || engine == CommEngine::COMM_ENGINE_AICPU) {
             hcclCommDfx->ReportMc2CommInfo(mc2CommInfo);
             HCCL_INFO("[HcclThreadAciqure] ReportThreadAciqureKernel begin");
-            const std::string KernelName = "RunAicpuIndOpThreadInit";
+            const std::string KernelName = kAicpuIndOpThreadInitKernelName;
             CHK_RET(hcclCommDfx->ReportKernel(beginTime, commId, KernelName, SalGetTid()));
             HCCL_INFO("[HcclThreadAciqure] ReportThreadAciqureKernel success");
         } else {

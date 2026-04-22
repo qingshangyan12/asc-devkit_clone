@@ -40,3 +40,9 @@ target_sources(ccl_kernel PRIVATE
     aicpu_utils.cc
 )
 endif()
+
+if(TARGET mc2_server)
+add_mc2_server_ccl_object(mc2_server_legacy_aicpu_comm_support
+    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_res_package_helper.cc
+)
+endif()

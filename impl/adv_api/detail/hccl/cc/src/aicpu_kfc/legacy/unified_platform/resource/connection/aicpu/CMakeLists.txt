@@ -20,3 +20,11 @@ target_sources(ccl_kernel PRIVATE
         ub_conn_lite_mgr.cc
 )
 endif()
+
+if(TARGET mc2_server)
+add_mc2_server_ccl_object(mc2_server_legacy_connection_aicpu
+        ${CMAKE_CURRENT_SOURCE_DIR}/rma_conn_lite.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ub_conn_lite.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ub_conn_lite_mgr.cc
+)
+endif()

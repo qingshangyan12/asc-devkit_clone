@@ -78,7 +78,7 @@ HcclResult IndependentOp::KernelLaunchAicpuCommInit()
     CHK_RET(hrtStreamSetMode(localStream.ptr(), aicpuStreamMode));
 
     // 下kernel进行自定义算子aicpu侧通信域的公共初始化
-    std::string kernelName = "RunAicpuIndOpCommInit";
+    std::string kernelName = kAicpuIndOpCommInitKernelName;
 
     u16 timeOut = NOTIFY_DEFAULT_WAIT_TIME > std::numeric_limits<uint16_t>::max() ? 
                     std::numeric_limits<uint16_t>::max() : NOTIFY_DEFAULT_WAIT_TIME;
@@ -88,8 +88,8 @@ HcclResult IndependentOp::KernelLaunchAicpuCommInit()
 
     // 打印增加初始化对应的参数
     HCCL_RUN_INFO("[%s] KernelLaunchAicpuCommInit Success", __func__);
-    const std::string profName = "RunAicpuIndOpCommInit";
-    HCCL_INFO("[%s] RunAicpuIndOpCommInit", __func__);
+    const std::string profName = kernelName;
+    HCCL_INFO("[%s] %s", __func__, kernelName.c_str());
     // 上报初始化kernel的时间
     HcommProfilingReportKernel(beginTime, profName.c_str());
     return HCCL_SUCCESS;

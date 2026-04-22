@@ -31,3 +31,11 @@ target_sources(ccl_kernel PRIVATE
         orion_adapter_hal.cc
 )
 endif()
+
+if(TARGET mc2_server)
+add_mc2_server_ccl_object(mc2_server_legacy_unified_common
+        ${CMAKE_CURRENT_SOURCE_DIR}/dev_capability.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/dlhal_function_v2.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/orion_adapter_hal.cc
+)
+endif()

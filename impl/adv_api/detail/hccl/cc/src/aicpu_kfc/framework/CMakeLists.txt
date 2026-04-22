@@ -815,6 +815,34 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     )
 
     target_include_directories(ccl_kernel PRIVATE ${ORION_HEAD_LIST})
+    if(TARGET json)
+        target_link_libraries(ccl_kernel PRIVATE json)
+        add_dependencies(ccl_kernel json)
+    endif()
+
+    function(add_mc2_server_ccl_object target_name)
+        if(TARGET mc2_server)
+            add_library(${target_name} OBJECT ${ARGN})
+            set_target_properties(${target_name} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+            target_compile_definitions(${target_name} PRIVATE
+                $<TARGET_PROPERTY:ccl_kernel,COMPILE_DEFINITIONS>
+                MC2_SERVER_ONLY
+            )
+            target_compile_options(${target_name} PRIVATE
+                $<TARGET_PROPERTY:ccl_kernel,COMPILE_OPTIONS>
+            )
+            target_include_directories(${target_name} PRIVATE
+                ${CCL_KERNEL_INCLUDE_LIST}
+                ${ORION_HEAD_LIST}
+            )
+            if(TARGET json)
+                target_link_libraries(${target_name} PRIVATE json)
+                add_dependencies(${target_name} json)
+            endif()
+            target_sources(mc2_server PRIVATE $<TARGET_OBJECTS:${target_name}>)
+            add_dependencies(mc2_server ${target_name})
+        endif()
+    endfunction()
 
     if(TARGET mc2_server)
         target_compile_definitions(mc2_server PRIVATE
@@ -829,14 +857,22 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         )
         target_link_libraries(mc2_server PRIVATE
             -Wl,--no-as-needed
+            ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/libascend_hal.so
+            ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/libccl_kernel.so
             c_sec
+            unified_dlog
             ccl_kernel_plf
+            ccl_kernel_plf_a
             mmpa
             -Wl,--as-needed
             -lrt
             -ldl
             -lpthread
         )
+        if(TARGET json)
+            target_link_libraries(mc2_server PRIVATE json)
+            add_dependencies(mc2_server json)
+        endif()
     endif()
 
     add_subdirectory(device)
@@ -1020,7 +1056,7 @@ add_subdirectory(nslbdp)
 add_subdirectory(next)
 
 if(NOT KERNEL_MODE)
-    SET(HCCL_CMAKE_DIR ${HCCL_OPEN_CODE_BASE_DIR}/../cmake/)
+    SET(HCCL_CMAKE_DIR ${HCCL_CC_DIR}/cmake/)
     message(STATUS "HCCL_CMAKE_DIR = ${HCCL_CMAKE_DIR}")
     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ccl_kernel.json
         COMMAND ${HI_PYTHON} ${HCCL_CMAKE_DIR}/scripts/parser_ini.py ${CMAKE_CURRENT_SOURCE_DIR}/device/framework/ccl_kernel.ini ${CMAKE_CURRENT_BINARY_DIR}/ccl_kernel.json
@@ -1032,7 +1068,7 @@ if(NOT KERNEL_MODE)
     )
 
     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/libaicpu_custom.json
-        COMMAND ${HI_PYTHON} ${HCCL_BASE_DIR}/../cmake/scripts/parser_ini.py ${CMAKE_CURRENT_SOURCE_DIR}/device/framework/aicpu_custom.ini ${CMAKE_CURRENT_BINARY_DIR}/libaicpu_custom.json
+        COMMAND ${HI_PYTHON} ${HCCL_CMAKE_DIR}/scripts/parser_ini.py ${CMAKE_CURRENT_SOURCE_DIR}/device/framework/aicpu_custom.ini ${CMAKE_CURRENT_BINARY_DIR}/libaicpu_custom.json
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
     add_custom_target(aicpu_custom_json DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/libaicpu_custom.json)
@@ -1041,7 +1077,7 @@ if(NOT KERNEL_MODE)
     )
 
     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/libccl_dpu.json
-        COMMAND ${HI_PYTHON} ${HCCL_BASE_DIR}/../cmake/scripts/parser_ini.py ${CMAKE_CURRENT_SOURCE_DIR}/../legacy/framework/communicator/hostdpu/ccl_dpu.ini ${CMAKE_CURRENT_BINARY_DIR}/libccl_dpu.json
+        COMMAND ${HI_PYTHON} ${HCCL_CMAKE_DIR}/scripts/parser_ini.py ${CMAKE_CURRENT_SOURCE_DIR}/../legacy/framework/communicator/hostdpu/ccl_dpu.ini ${CMAKE_CURRENT_BINARY_DIR}/libccl_dpu.json
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
     add_custom_target(dpu_kernel_json DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/libccl_dpu.json)
@@ -1089,7 +1125,7 @@ if(BUILD_OPEN_PROJECT AND KERNEL_MODE)
         )
 
         add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/libaicpu_custom.json
-            COMMAND ${HI_PYTHON} ${HCCL_BASE_DIR}/../cmake/scripts/parser_ini.py ${HCCL_BASE_DIR}/../src/framework/device/framework/aicpu_custom.ini ${CMAKE_CURRENT_BINARY_DIR}/libaicpu_custom.json
+            COMMAND ${HI_PYTHON} ${HCCL_CC_DIR}/cmake/scripts/parser_ini.py ${HCCL_BASE_DIR}/../src/framework/device/framework/aicpu_custom.ini ${CMAKE_CURRENT_BINARY_DIR}/libaicpu_custom.json
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         )
         add_custom_target(aicpu_custom_json DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/libaicpu_custom.json)

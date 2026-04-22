@@ -177,7 +177,7 @@ HcclResult AicpuLaunchMgr::ThreadKernelLaunchForComm(std::vector<std::shared_ptr
     ThreadKernelLaunchConfig config(
         commId,
         binHandle,
-        "RunAicpuIndOpThreadInit",
+        kAicpuIndOpThreadInitKernelName,
         false,
         CommConfiger::GetInstance().GetCommConfigExecTimeOut(commId),
         true,
@@ -211,7 +211,7 @@ HcclResult AicpuLaunchMgr::SupplementNotifyKernelLaunch(std::vector<std::shared_
     ThreadKernelLaunchConfig config(
         commId,      
         binHandle,
-        "RunAicpuThreadSupplementNotify",
+        kAicpuThreadSupplementNotifyKernelName,
         true,    
         defaultTimeOutSec,     
         false,
@@ -279,7 +279,8 @@ HcclResult AicpuLaunchMgr::LaunchNotifyKernel(NotifyMgrAicpuParam &opParam, aclr
     constexpr u32 aicpuStreamMode = 1;
     CHK_RET(hrtStreamSetMode(localStream.ptr(), aicpuStreamMode));
 
-    HcclResult ret = KernelLaunchAicpuCustom(opParam, "RunAicpuIndOpNotify", localStream.ptr(), binCustomHandle);
+    HcclResult ret = KernelLaunchAicpuCustom(opParam, kAicpuIndOpNotifyKernelName, localStream.ptr(),
+        binCustomHandle);
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[AicpuLaunchMgr][LaunchNotifyKernel] KernelLaunch failed, ret[%d]", ret), ret);
     CHK_RET(hcclStreamSynchronize(localStream.ptr(), CommConfiger::GetInstance().GetCommConfigExecTimeOut(opParam.hcomId)));

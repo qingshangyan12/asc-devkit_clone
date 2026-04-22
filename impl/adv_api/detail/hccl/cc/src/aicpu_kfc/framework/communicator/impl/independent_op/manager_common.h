@@ -13,6 +13,7 @@
 #include "hccl_types.h"
 #include "transport_manager.h"
 #include "common.h"
+#include <functional>
 #include <string>
 #include <vector>
 

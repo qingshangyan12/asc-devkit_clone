@@ -16,6 +16,13 @@
 #include "acl/acl_rt.h"
 
 namespace hccl {
+    constexpr const char *kAicpuIndOpCommInitKernelName = "RunAicpuIndOpCommInit";
+    constexpr const char *kAicpuIndOpThreadInitKernelName = "RunAicpuIndOpThreadInit";
+    constexpr const char *kAicpuIndOpChannelInitV2KernelName = "RunAicpuIndOpChannelInitV2";
+    constexpr const char *kAicpuIndOpChannelUpdateV2KernelName = "RunAicpuIndOpChannelUpdateV2";
+    constexpr const char *kAicpuIndOpNotifyKernelName = "RunAicpuIndOpNotify";
+    constexpr const char *kAicpuThreadSupplementNotifyKernelName = "RunAicpuThreadSupplementNotify";
+
     HcclResult AicpuAclKernelLaunch(const rtStream_t stm, void* addr, u32 size, aclrtBinHandle binHandle,
         const std::string &kernelName, bool isInitTask, u16 timeOut,
         void* tilingDataPtr = nullptr, u32 tilingDataSize = 0);

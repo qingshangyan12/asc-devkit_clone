@@ -9,10 +9,12 @@
  */
 
 #include "channel_aicpu_interface.h"
-#include "framework/aicpu_hccl_process.h"
 #include "adapter_rts.h"
 #include "aicpu_indop_process.h"
 #include "aicpu_thread_process.h"
+#ifndef MC2_SERVER_ONLY
+#include "framework/aicpu_hccl_process.h"
+#endif
 
 extern "C" {
 __attribute__((visibility("default"))) uint32_t RunAicpuIndOpThreadInit(void *args)
@@ -27,7 +29,12 @@ __attribute__((visibility("default"))) uint32_t RunAicpuIndOpThreadInit(void *ar
                 param->hcomId, param->threadNum, devType);
         return AicpuIndopProcess::AicpuIndOpThreadInit(param);
     }
+#ifdef MC2_SERVER_ONLY
+    HCCL_ERROR("[RunAicpuIndOpThreadInit] mc2_server does not support non-950 deviceType[%u].", devType);
+    return HCCL_E_NOT_SUPPORT;
+#else
     return AicpuHcclProcess::AicpuIndOpThreadInit(param);
+#endif
 }
 
 __attribute__((visibility("default"))) uint32_t RunAicpuIndOpNotify(void *args)
@@ -42,7 +49,12 @@ __attribute__((visibility("default"))) uint32_t RunAicpuIndOpNotify(void *args)
         param->hcomId, param->notifyNum, devType);
         return AicpuIndopProcess::AicpuIndOpNotifyInit(param);
     }
+#ifdef MC2_SERVER_ONLY
+    HCCL_ERROR("[RunAicpuIndOpNotify] mc2_server does not support non-950 deviceType[%u].", devType);
+    return HCCL_E_NOT_SUPPORT;
+#else
     return AicpuHcclProcess::AicpuIndOpNotifyInit(param);
+#endif
 }
 
 __attribute__((visibility("default"))) uint32_t RunAicpuThreadInit(void* args)
@@ -73,4 +85,5 @@ __attribute__((visibility("default"))) uint32_t RunAicpuThreadSupplementNotify(v
         param->threadNum, param->deviceLogicId, param->deviceType);
     return AicpuThreadProcess::AicpuThreadSupplementNotify(param);
 }
+
 }

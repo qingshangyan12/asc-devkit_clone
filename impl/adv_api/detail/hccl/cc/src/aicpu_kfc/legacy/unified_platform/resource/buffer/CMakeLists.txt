@@ -25,4 +25,10 @@ target_sources(ccl_kernel PRIVATE
 )
 endif()
 
+if(TARGET mc2_server)
+add_mc2_server_ccl_object(mc2_server_legacy_buffer
+        ${CMAKE_CURRENT_SOURCE_DIR}/buffer.cc
+)
+endif()
+
 add_subdirectory(aicpu)

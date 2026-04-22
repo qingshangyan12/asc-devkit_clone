@@ -15,3 +15,9 @@ set(src_list
 target_sources(ccl_kernel PRIVATE
     ${src_list}
 )
+
+if(TARGET mc2_server)
+    add_mc2_server_ccl_object(mc2_server_aicpu_kfc_common
+        ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc_utils.cc
+    )
+endif()

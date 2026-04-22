@@ -362,11 +362,14 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
         -Wl,-z,relro
         -Wl,-z,now
         -Wl,-z,noexecstack
+        -Wl,-Bsymbolic-functions
+        -Wl,-z,defs
         $<$<CONFIG:Release>:-s>
     )
 
     target_compile_definitions(mc2_server PRIVATE
         -DAICPU_COMPILE
+        MC2_SERVER_ONLY
     )
 
     target_link_directories(mc2_server PRIVATE
@@ -436,6 +439,7 @@ target_link_options(mc2_client PRIVATE
     -Wl,-z,relro
     -Wl,-z,now
     -Wl,-z,noexecstack
+    -Wl,-Bsymbolic-functions
     $<$<CONFIG:Release>:-s>
 )
 

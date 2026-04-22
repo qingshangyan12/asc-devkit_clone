@@ -583,4 +583,3 @@ HcclResult MyRank::Resume()
 }
 
 } // namespace hccl
-
