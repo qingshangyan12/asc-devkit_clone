@@ -64,7 +64,7 @@
 > ```asc
 > __aicore__ inline void add(int x, int y);  // Device侧
 > void add(int x, int y);                    // Host侧（等同于 __host__）
->  ````
+>  ```
 > 2. **参数类型仅有地址空间限定符不同**
 > 
 > 如下例中，两个Device侧函数仅在指针的地址空间限定符上不同：
