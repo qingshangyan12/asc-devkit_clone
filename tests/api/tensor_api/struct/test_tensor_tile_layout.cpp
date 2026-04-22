@@ -1103,6 +1103,7 @@ TEST_F(Tensor_Api_Layout, TestStructLayout)
     using namespace AscendC::Te;
     auto NDLayout = NDLayoutFormat<half>{}(256, 256);
     auto StaticNDLayout = NDLayoutFormat<half>::type<AscendC::Std::Int<16>{}, AscendC::Std::Int<16>{}>{};
+    auto minNum = AscendC::Std::min(AscendC::Std::Int<16>{}, AscendC::Std::Int<12>{});
     auto DNLayout = DNLayoutFormat<half>{}(256, 256);
     auto NzLayout = NzLayoutFormat<half>{}(256, 256);
     auto ZnLayout = ZnLayoutFormat<half>{}(256, 256);
@@ -1122,7 +1123,8 @@ TEST_F(Tensor_Api_Layout, TestStructLayout)
     auto scaleADNShape = GetShape<0>(scaleADNLayout);
     auto scaleBNDShape = GetShape<0>(scaleBNDLayout);
     auto scaleBDNShape = GetShape<0>(scaleBDNLayout);
-
+    EXPECT_TRUE(IsIntegralConstantV<decltype(minNum)>);
+    EXPECT_EQ(decltype(minNum){}, 12);
     EXPECT_EQ(AscendC::Std::get<1>(NDShape), 256);
     EXPECT_EQ(AscendC::Std::get<1>(staticNDShape), 16);
     EXPECT_EQ(AscendC::Std::get<1>(DNShape), 256);
