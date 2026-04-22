@@ -9,12 +9,12 @@
  */
 
 /* !
- * \file bitwise_or_check_c310.h
+ * \file bitwise_or_check_3510.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/api_check/kernel_check/math/bitwise_or/bitwise_or_check_c310.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/bitwise_or.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/adv_api/detail/api_check/kernel_check/math/bitwise_or/bitwise_or_check_3510.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/bitwise_or.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_BITWISE_OR_CHECK_C310_H__
 #endif
