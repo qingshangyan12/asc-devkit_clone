@@ -26,8 +26,6 @@ struct ManagerCallbacks {
     std::function<void(bool)> setAicpuCommState;
     // Aicpu通信域初始化
     std::function<HcclResult()> kernelLaunchAicpuCommInit;
-    // 是否使用mc2_server专属kernel名
-    std::function<bool()> useMc2ServerKernelNames;
 };
 
 struct ChannelManagerCallbacks {

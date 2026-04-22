@@ -41,15 +41,9 @@ public:
 public:
     std::string Describe() const
     {
-#ifdef MC2_SERVER_ONLY
         return StringFormat(
                 "DfxOpInfo: [opType:[%s], tag:[%s], algType:[%s], commIndex:[%u], commId[%s], beginTime:[%llu], endTime:[%llu], opIndex[%u], headOpCounterAddr[%llx], tailOpCounterAddr[%llx]",
                 op_.opType.Describe().c_str(), tag_.c_str(), algType_.c_str(), commIndex_, commId_.c_str(), beginTime_, endTime_, opIndex_, headOpCounterAddr_, tailOpCounterAddr_);
-#else
-        return StringFormat(
-                "DfxOpInfo: [collOperator:[%s], tag:[%s], algType:[%s], commIndex:[%u], commId[%s], beginTime:[%llu], endTime:[%llu], opIndex[%u], headOpCounterAddr[%llx], tailOpCounterAddr[%llx]",
- 	            CollOpToString(op_).c_str(), tag_.c_str(), algType_.c_str(), commIndex_, commId_.c_str(), beginTime_, endTime_, opIndex_, headOpCounterAddr_, tailOpCounterAddr_);
-#endif
     }
 };
 

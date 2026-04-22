@@ -34,9 +34,4 @@ __attribute__((visibility("default"))) uint32_t RunAicpuIndOpCommInit(void *args
 #endif
 }
 
-__attribute__((visibility("default"))) uint32_t Mc2RunAicpuIndOpCommInit(void *args)
-{
-    HCCL_INFO("[Mc2RunAicpuIndOpCommInit] forward to RunAicpuIndOpCommInit.");
-    return RunAicpuIndOpCommInit(args);
-}
 }

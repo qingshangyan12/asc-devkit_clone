@@ -107,7 +107,6 @@ HcclResult ThreadMgr::SupplementNotify(CommEngine engine, uint32_t threadNum, ui
 
     // thread资源 AICPU侧展开
     if ((engine == COMM_ENGINE_AICPU || engine == COMM_ENGINE_AICPU_TS) && needSupplementThread.size() > 0) {
-        bool useMc2ServerKernelNames = callbacks_.useMc2ServerKernelNames ? callbacks_.useMc2ServerKernelNames() : false;
         if (!callbacks_.getAicpuCommState()) {
             HCCL_INFO("ThreadMgr::SupplementNotify kernelLaunchAicpuCommInit start");
             HcclResult ret = callbacks_.kernelLaunchAicpuCommInit();
@@ -124,8 +123,7 @@ HcclResult ThreadMgr::SupplementNotify(CommEngine engine, uint32_t threadNum, ui
         }
         HCCL_INFO("ThreadMgr::SupplementNotify ThreadKernelLaunchForComm start needSupplementThread size[%zu]",
             needSupplementThread.size());
-        ret = AicpuLaunchMgr::SupplementNotifyKernelLaunch(needSupplementThread, commId_, threadHandle, binHandle_,
-            useMc2ServerKernelNames);
+        ret = AicpuLaunchMgr::SupplementNotifyKernelLaunch(needSupplementThread, commId_, threadHandle, binHandle_);
         HCCL_INFO("ThreadMgr::SupplementNotify ThreadKernelLaunchForComm end");
         CHK_PRT_RET(ret != HCCL_SUCCESS,
             HCCL_ERROR("[ThreadMgr][SupplementNotify] AiCpuKernelLaunch failed, return [%d].", ret), ret);
@@ -164,7 +162,6 @@ HcclResult ThreadMgr::SupplementThread(CommEngine engine, uint32_t supplementThr
     // thread资源 AICPU侧展开
     std::unique_ptr<ThreadHandle[]> hostHandle;
     if (engine == COMM_ENGINE_AICPU || engine == COMM_ENGINE_AICPU_TS) {
-        bool useMc2ServerKernelNames = callbacks_.useMc2ServerKernelNames ? callbacks_.useMc2ServerKernelNames() : false;
         if (!callbacks_.getAicpuCommState()) {
             HCCL_INFO("ThreadMgr::HcclAllocThreadRes kernelLaunchAicpuCommInit start");
             HcclResult ret = callbacks_.kernelLaunchAicpuCommInit();
@@ -176,8 +173,7 @@ HcclResult ThreadMgr::SupplementThread(CommEngine engine, uint32_t supplementThr
         EXECEPTION_CATCH(hostHandle = std::make_unique<ThreadHandle[]>(newThreads.size()),
             return HCCL_E_PTR);
         HCCL_INFO("ThreadMgr::HcclAllocThreadRes ThreadKernelLaunchForComm start");
-        ret = AicpuLaunchMgr::ThreadKernelLaunchForComm(newThreads, commId_, hostHandle, binHandle_,
-            useMc2ServerKernelNames);
+        ret = AicpuLaunchMgr::ThreadKernelLaunchForComm(newThreads, commId_, hostHandle, binHandle_);
         HCCL_INFO("ThreadMgr::HcclAllocThreadRes ThreadKernelLaunchForComm end");
         CHK_PRT_RET(ret != HCCL_SUCCESS,
             HCCL_ERROR("[ThreadMgr][HcclThreadAcquire] AiCpuKernelLaunch failed, return [%d].", ret), ret);
@@ -292,7 +288,6 @@ HcclResult ThreadMgr::HcclThreadAcquire(CommEngine engine, uint32_t threadNum,
     // thread资源 AICPU侧展开
     std::unique_ptr<ThreadHandle[]> hostHandle;
     if (engine == COMM_ENGINE_AICPU || engine == COMM_ENGINE_AICPU_TS) {
-        bool useMc2ServerKernelNames = callbacks_.useMc2ServerKernelNames ? callbacks_.useMc2ServerKernelNames() : false;
         if (!callbacks_.getAicpuCommState()) {
             HCCL_INFO("ThreadMgr::HcclAllocThreadRes kernelLaunchAicpuCommInit start");
             HcclResult ret = callbacks_.kernelLaunchAicpuCommInit();
@@ -304,8 +299,7 @@ HcclResult ThreadMgr::HcclThreadAcquire(CommEngine engine, uint32_t threadNum,
         EXECEPTION_CATCH(hostHandle = std::make_unique<ThreadHandle[]>(newThreads.size()),
             return HCCL_E_PTR);
         HCCL_INFO("ThreadMgr::HcclAllocThreadRes ThreadKernelLaunch start");
-        ret = AicpuLaunchMgr::ThreadKernelLaunchForComm(newThreads, commId_, hostHandle, binHandle_,
-            useMc2ServerKernelNames);
+        ret = AicpuLaunchMgr::ThreadKernelLaunchForComm(newThreads, commId_, hostHandle, binHandle_);
         HCCL_INFO("ThreadMgr::HcclAllocThreadRes ThreadKernelLaunch end");
         CHK_PRT_RET(ret != HCCL_SUCCESS,
             HCCL_ERROR("[ThreadMgr][HcclThreadAcquire] AiCpuKernelLaunch failed, return [%d].", ret), ret);
@@ -442,7 +436,6 @@ HcclResult ThreadMgr::ThreadExportToCommEngineAicpu(uint32_t threadNum, const Th
     }
     if (!hostThreads.empty()) {
         std::lock_guard<std::mutex> lock(threadMapMutex_);
-        bool useMc2ServerKernelNames = callbacks_.useMc2ServerKernelNames ? callbacks_.useMc2ServerKernelNames() : false;
         if (!callbacks_.getAicpuCommState()) {
             HcclResult ret = callbacks_.kernelLaunchAicpuCommInit();
             CHK_PRT_RET(ret != HCCL_SUCCESS,
@@ -452,8 +445,7 @@ HcclResult ThreadMgr::ThreadExportToCommEngineAicpu(uint32_t threadNum, const Th
         std::unique_ptr<ThreadHandle[]> aicpuHandle;
         EXECEPTION_CATCH(aicpuHandle = std::make_unique<ThreadHandle[]>(hostThreads.size()),
                          return HCCL_E_PTR);
-        HcclResult ret = AicpuLaunchMgr::ThreadKernelLaunchForComm(hostThreads, commId_, aicpuHandle, binHandle_,
-            useMc2ServerKernelNames);
+        HcclResult ret = AicpuLaunchMgr::ThreadKernelLaunchForComm(hostThreads, commId_, aicpuHandle, binHandle_);
         CHK_PRT_RET(ret != HCCL_SUCCESS,
                     HCCL_ERROR("[ThreadMgr][HcclThreadExportToCommEngine] AiCpuKernelLaunch failed, return [%d].", ret), ret);
         for (size_t i = 0; i < hostThreads.size(); ++i) {

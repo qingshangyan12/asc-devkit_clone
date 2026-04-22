@@ -17,58 +17,11 @@
 
 namespace hccl {
     constexpr const char *kAicpuIndOpCommInitKernelName = "RunAicpuIndOpCommInit";
-    constexpr const char *kMc2AicpuIndOpCommInitKernelName = "Mc2RunAicpuIndOpCommInit";
     constexpr const char *kAicpuIndOpThreadInitKernelName = "RunAicpuIndOpThreadInit";
-    constexpr const char *kMc2AicpuIndOpThreadInitKernelName = "Mc2RunAicpuIndOpThreadInit";
     constexpr const char *kAicpuIndOpChannelInitV2KernelName = "RunAicpuIndOpChannelInitV2";
-    constexpr const char *kMc2AicpuIndOpChannelInitV2KernelName = "Mc2RunAicpuIndOpChannelInitV2";
     constexpr const char *kAicpuIndOpChannelUpdateV2KernelName = "RunAicpuIndOpChannelUpdateV2";
-    constexpr const char *kMc2AicpuIndOpChannelUpdateV2KernelName = "Mc2RunAicpuIndOpChannelUpdateV2";
     constexpr const char *kAicpuIndOpNotifyKernelName = "RunAicpuIndOpNotify";
-    constexpr const char *kMc2AicpuIndOpNotifyKernelName = "Mc2RunAicpuIndOpNotify";
     constexpr const char *kAicpuThreadSupplementNotifyKernelName = "RunAicpuThreadSupplementNotify";
-    constexpr const char *kMc2AicpuThreadSupplementNotifyKernelName = "Mc2RunAicpuThreadSupplementNotify";
-
-    inline const char *GetAicpuIndOpCommInitKernelName(bool useMc2ServerKernelNames)
-    {
-        return useMc2ServerKernelNames ? kMc2AicpuIndOpCommInitKernelName : kAicpuIndOpCommInitKernelName;
-    }
-
-    inline const char *GetAicpuIndOpThreadInitKernelName(bool useMc2ServerKernelNames)
-    {
-        return useMc2ServerKernelNames ? kMc2AicpuIndOpThreadInitKernelName : kAicpuIndOpThreadInitKernelName;
-    }
-
-    inline const char *GetAicpuIndOpChannelInitV2KernelName(bool useMc2ServerKernelNames)
-    {
-        return useMc2ServerKernelNames ? kMc2AicpuIndOpChannelInitV2KernelName : kAicpuIndOpChannelInitV2KernelName;
-    }
-
-    inline const char *GetAicpuIndOpChannelUpdateV2KernelName(bool useMc2ServerKernelNames)
-    {
-        return useMc2ServerKernelNames ? kMc2AicpuIndOpChannelUpdateV2KernelName
-                                       : kAicpuIndOpChannelUpdateV2KernelName;
-    }
-
-    inline const char *GetAicpuIndOpNotifyKernelName(bool useMc2ServerKernelNames)
-    {
-        return useMc2ServerKernelNames ? kMc2AicpuIndOpNotifyKernelName : kAicpuIndOpNotifyKernelName;
-    }
-
-    inline const char *GetAicpuThreadSupplementNotifyKernelName(bool useMc2ServerKernelNames)
-    {
-        return useMc2ServerKernelNames ? kMc2AicpuThreadSupplementNotifyKernelName
-                                       : kAicpuThreadSupplementNotifyKernelName;
-    }
-
-    inline bool IsMc2ServerKernelBinHandle(aclrtBinHandle binHandle)
-    {
-        if (binHandle == nullptr) {
-            return false;
-        }
-        aclrtFuncHandle funcHandle = nullptr;
-        return aclrtBinaryGetFunction(binHandle, kMc2AicpuIndOpCommInitKernelName, &funcHandle) == ACL_SUCCESS;
-    }
 
     HcclResult AicpuAclKernelLaunch(const rtStream_t stm, void* addr, u32 size, aclrtBinHandle binHandle,
         const std::string &kernelName, bool isInitTask, u16 timeOut,

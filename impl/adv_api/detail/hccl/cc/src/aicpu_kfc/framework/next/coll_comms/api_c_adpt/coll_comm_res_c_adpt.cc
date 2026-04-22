@@ -207,8 +207,7 @@ HcclResult HcclChannelAcquire(HcclComm comm, CommEngine engine,
             HCCL_INFO("[HcclChannelAcquire] ReportChannelAicpuKernel start");
             HcclCommDfx* hcclCommDfx = collComm->GetHcclCommDfx();
             CHK_PTR_NULL(hcclCommDfx);
-            bool useMc2ServerKernelNames = IsMc2ServerKernelBinHandle(hcclComm->GetBinHandle());
-            std::string kernelName = GetAicpuIndOpChannelInitV2KernelName(useMc2ServerKernelNames);
+            std::string kernelName = kAicpuIndOpChannelInitV2KernelName;
             CHK_RET(hcclCommDfx->ReportKernel(beginTime, commTag, kernelName, SalGetTid()));
             HCCL_INFO("[HcclChannelAcquire] ReportChannelAicpuKernel success");
         }

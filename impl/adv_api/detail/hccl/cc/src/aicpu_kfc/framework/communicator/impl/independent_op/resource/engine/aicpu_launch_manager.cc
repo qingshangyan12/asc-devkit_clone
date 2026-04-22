@@ -172,13 +172,12 @@ HcclResult AicpuLaunchMgr::ThreadKernelLaunchImpl(
 
 // 集合通信使用，待归一到基础通信接口
 HcclResult AicpuLaunchMgr::ThreadKernelLaunchForComm(std::vector<std::shared_ptr<Thread>> &newThreads,
-    const std::string &commId, std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle,
-    bool useMc2ServerKernelNames)
+    const std::string &commId, std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle)
 {
     ThreadKernelLaunchConfig config(
         commId,
         binHandle,
-        GetAicpuIndOpThreadInitKernelName(useMc2ServerKernelNames),
+        kAicpuIndOpThreadInitKernelName,
         false,
         CommConfiger::GetInstance().GetCommConfigExecTimeOut(commId),
         true,
@@ -206,14 +205,13 @@ HcclResult AicpuLaunchMgr::ThreadKernelLaunchForBase(std::vector<std::shared_ptr
 
 // 补充notify使用
 HcclResult AicpuLaunchMgr::SupplementNotifyKernelLaunch(std::vector<std::shared_ptr<Thread>> &newThreads,
-    const std::string &commId, std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle,
-    bool useMc2ServerKernelNames)
+    const std::string &commId, std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle)
 {
     constexpr uint32_t defaultTimeOutSec = 120;
     ThreadKernelLaunchConfig config(
         commId,      
         binHandle,
-        GetAicpuThreadSupplementNotifyKernelName(useMc2ServerKernelNames),
+        kAicpuThreadSupplementNotifyKernelName,
         true,    
         defaultTimeOutSec,     
         false,
@@ -275,15 +273,14 @@ HcclResult AicpuLaunchMgr::PrepareAicpuNotifyParam(NotifyMgrAicpuParam &opParam,
     return HCCL_SUCCESS;
 }
 
-HcclResult AicpuLaunchMgr::LaunchNotifyKernel(NotifyMgrAicpuParam &opParam, aclrtBinHandle binCustomHandle,
-    bool useMc2ServerKernelNames)
+HcclResult AicpuLaunchMgr::LaunchNotifyKernel(NotifyMgrAicpuParam &opParam, aclrtBinHandle binCustomHandle)
 {
     Stream localStream(StreamType::STREAM_TYPE_ONLINE);
     constexpr u32 aicpuStreamMode = 1;
     CHK_RET(hrtStreamSetMode(localStream.ptr(), aicpuStreamMode));
 
-    HcclResult ret = KernelLaunchAicpuCustom(opParam, GetAicpuIndOpNotifyKernelName(useMc2ServerKernelNames),
-        localStream.ptr(), binCustomHandle);
+    HcclResult ret = KernelLaunchAicpuCustom(opParam, kAicpuIndOpNotifyKernelName, localStream.ptr(),
+        binCustomHandle);
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[AicpuLaunchMgr][LaunchNotifyKernel] KernelLaunch failed, ret[%d]", ret), ret);
     CHK_RET(hcclStreamSynchronize(localStream.ptr(), CommConfiger::GetInstance().GetCommConfigExecTimeOut(opParam.hcomId)));
@@ -291,8 +288,7 @@ HcclResult AicpuLaunchMgr::LaunchNotifyKernel(NotifyMgrAicpuParam &opParam, aclr
 }
 
 HcclResult AicpuLaunchMgr::NotifyKernelLaunchAlloc(std::vector<std::unique_ptr<LocalNotify>> &newNotifys,
-    const std::string &commId, std::unique_ptr<NotifyHandle[]> &hostHandle, aclrtBinHandle binCustomHandle,
-    bool useMc2ServerKernelNames)
+    const std::string &commId, std::unique_ptr<NotifyHandle[]> &hostHandle, aclrtBinHandle binCustomHandle)
 {
     size_t handleLen = sizeof(NotifyHandle) * newNotifys.size();
     DeviceMem deviceHandle = DeviceMem::alloc(handleLen);
@@ -320,7 +316,7 @@ HcclResult AicpuLaunchMgr::NotifyKernelLaunchAlloc(std::vector<std::unique_ptr<L
         HCCL_INFO("[AicpuLaunchMgr][%s] %s", __func__, oss.str().c_str());
     }
 
-    CHK_RET(LaunchNotifyKernel(opParam, binCustomHandle, useMc2ServerKernelNames));
+    CHK_RET(LaunchNotifyKernel(opParam, binCustomHandle));
 
     CHK_RET(hrtMemSyncCopy(hostHandle.get(), handleLen, opParam.deviceHandle,
         handleLen, HcclRtMemcpyKind::HCCL_RT_MEMCPY_KIND_DEVICE_TO_HOST));
@@ -330,7 +326,7 @@ HcclResult AicpuLaunchMgr::NotifyKernelLaunchAlloc(std::vector<std::unique_ptr<L
 }
 
 HcclResult AicpuLaunchMgr::NotifyKernelLaunchFree(std::vector<NotifyHandle> &aicpuNotifys, uint32_t notifyNum,
-    const std::string &commId, aclrtBinHandle binCustomHandle, bool useMc2ServerKernelNames)
+    const std::string &commId, aclrtBinHandle binCustomHandle)
 {
     size_t handleLen = sizeof(NotifyHandle) * notifyNum;
     DeviceMem deviceHandle = DeviceMem::alloc(handleLen);
@@ -342,7 +338,7 @@ HcclResult AicpuLaunchMgr::NotifyKernelLaunchFree(std::vector<NotifyHandle> &aic
     NotifyMgrAicpuParam opParam;
     CHK_RET(PrepareAicpuNotifyParam(opParam, commId, notifyNum, true, deviceHandle.ptr()));
 
-    CHK_RET(LaunchNotifyKernel(opParam, binCustomHandle, useMc2ServerKernelNames));
+    CHK_RET(LaunchNotifyKernel(opParam, binCustomHandle));
     HCCL_RUN_INFO("[AicpuLaunchMgr][%s] notify free kernalLaunch success, commid[%s], notifyNum[%u]",
         __func__, commId.c_str(), aicpuNotifys.size());
     return HCCL_SUCCESS;

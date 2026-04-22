@@ -31,15 +31,12 @@ HcclResult IndependentOp::SetIndependentOpConfig(const CommConfig &commConfig, c
     commId_ = commConfig.GetConfigCommName();
     commMemMgr_.CommSetHcclBufferManager(bufferManager);
     binHandle_ = binHandle;
-    useMc2ServerKernelNames_ = (static_cast<DevType>(topoAttr.deviceType) == DevType::DEV_TYPE_950) &&
-        IsMc2ServerKernelBinHandle(binHandle_);
 
     // aicpu侧初始化状态的回调函数
     ManagerCallbacks callbacks;
     callbacks.getAicpuCommState = [this]() { return this->GetAicpuCommState(); };
     callbacks.setAicpuCommState = [this](bool state) { this->SetAicpuCommState(state); };
     callbacks.kernelLaunchAicpuCommInit = [this]() { return this->KernelLaunchAicpuCommInit(); };
-    callbacks.useMc2ServerKernelNames = [this]() { return this->useMc2ServerKernelNames_; };
 
     CHK_PRT(engineResMgr_.Init(threadNum_, notifyNumPerThread_, commId_, binHandle, callbacks));
     CHK_PRT(channelMgr_.Init(binHandle, topoAttr.userRank, callbacks));
@@ -81,7 +78,7 @@ HcclResult IndependentOp::KernelLaunchAicpuCommInit()
     CHK_RET(hrtStreamSetMode(localStream.ptr(), aicpuStreamMode));
 
     // 下kernel进行自定义算子aicpu侧通信域的公共初始化
-    std::string kernelName = GetAicpuIndOpCommInitKernelName(useMc2ServerKernelNames_);
+    std::string kernelName = kAicpuIndOpCommInitKernelName;
 
     u16 timeOut = NOTIFY_DEFAULT_WAIT_TIME > std::numeric_limits<uint16_t>::max() ? 
                     std::numeric_limits<uint16_t>::max() : NOTIFY_DEFAULT_WAIT_TIME;

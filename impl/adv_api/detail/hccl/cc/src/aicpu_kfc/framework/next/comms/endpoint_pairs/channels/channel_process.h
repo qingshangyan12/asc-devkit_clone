@@ -30,7 +30,7 @@ public:
         uint32_t channelNum, CommEngine engine, aclrtBinHandle binHandle);
     static HcclResult ChannelGetStatus(const ChannelHandle *channelList, uint32_t listNum, int32_t *statusList);
     static HcclResult ChannelKernelLaunchForComm(ChannelHandle *channelHandles, ChannelHandle *hostChannelHandles,
-        uint32_t listNum, const std::string &commTag, aclrtBinHandle binHandle, bool useMc2ServerKernelNames);
+        uint32_t listNum, const std::string &commTag, aclrtBinHandle binHandle);
     static HcclResult ChannelGetNotifyNum(ChannelHandle channelHandle, uint32_t *notifyNum);
     static HcclResult ChannelGetRemoteMem(ChannelHandle channelHandle, CommMem **remoteMem, uint32_t *memNum, char **memTags);
     static HcclResult ChannelGetUserRemoteMem(ChannelHandle channelHandle, CommMem **remoteMem, char ***memTag, uint32_t *memNum);
@@ -41,7 +41,7 @@ public:
     static HcclResult ChannelClean(const ChannelHandle *channelList, uint32_t channelNum);
     static HcclResult ChannelResume(const ChannelHandle *channelList, uint32_t channelNum);
     static HcclResult ChannelUpdateKernelLaunch(ChannelHandle* deviceChannelHandles, ChannelHandle* hostChannelHandles, 
-        uint32_t listNum, const std::string &commTag, aclrtBinHandle binHandle, bool useMc2ServerKernelNames);
+        uint32_t listNum, const std::string &commTag, aclrtBinHandle binHandle);
     
 private:
     template <typename Func>

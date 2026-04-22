@@ -97,11 +97,7 @@ HcclResult HcclThreadAcquire(HcclComm comm, CommEngine engine, uint32_t threadNu
         if (engine == CommEngine::COMM_ENGINE_AICPU_TS || engine == CommEngine::COMM_ENGINE_AICPU) {
             hcclCommDfx->ReportMc2CommInfo(mc2CommInfo);
             HCCL_INFO("[HcclThreadAciqure] ReportThreadAciqureKernel begin");
-            DevType devType = DevType::DEV_TYPE_COUNT;
-            CHK_RET(hrtGetDeviceType(devType));
-            bool useMc2ServerKernelNames =
-                (devType == DevType::DEV_TYPE_950) && IsMc2ServerKernelBinHandle(hcclComm->GetBinHandle());
-            const std::string KernelName = GetAicpuIndOpThreadInitKernelName(useMc2ServerKernelNames);
+            const std::string KernelName = kAicpuIndOpThreadInitKernelName;
             CHK_RET(hcclCommDfx->ReportKernel(beginTime, commId, KernelName, SalGetTid()));
             HCCL_INFO("[HcclThreadAciqure] ReportThreadAciqureKernel success");
         } else {
