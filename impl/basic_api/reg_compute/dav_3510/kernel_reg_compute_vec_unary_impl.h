@@ -446,7 +446,7 @@ __simd_callee__ inline void SqrtImpl(U& dstReg, U& srcReg, MaskReg& mask)
                 vsqrt(dstRegCopy, srcRegCopy, mask, modeValue);
                 vmuls(tmpReg, dstRegCopy, multiplyFactor1.f, mask, modeValue);
                 vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
-            } else if  (IsSameType<ActualT, float>::value) {
+            } else if constexpr (IsSameType<ActualT, float>::value) {
                 NotNumUnion multiplyFactor0;
                 multiplyFactor0.i = 0x4B800000;
                 NotNumUnion multiplyFactor1;
