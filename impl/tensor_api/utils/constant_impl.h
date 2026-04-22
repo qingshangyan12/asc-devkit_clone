@@ -57,6 +57,8 @@ namespace CopyMode {
     struct TRANS_COORD {};
     struct TRANS_B8B4 {};
     struct TRANS_B8B4_COORD {};
+    struct SCALE {};
+    struct SCALE_COORD {};
 };
 
 enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
