@@ -257,6 +257,9 @@ TILINGKEY_PAR_COMPILE is {}".format(parallel_compile_check), AscendCLogLevel.LOG
         ascendc_self_par_job_num = _get_parallel_job_without_op_project(len(tiling_key_list))
         cmd = ['pwd; env;', 'make', '-f', mk_file, '-j', f'{ascendc_self_par_job_num}', "VERBOSE=1", , ' > /tmp/test.log 2>&1']
     cmd_str = ' '.join(cmd)
+    print("yyc pid:", os.getpid())
+    print("yyc MK cmd is:", cmd_str)
+
     file_name = ""
     if global_var_storage.get_variable("ascendc_enable_build_log") is True:
         file_name, kernel_name, hash_name = CommonUtility.get_build_file_name(cmds_list[0], CompileStage.COMPILE)
