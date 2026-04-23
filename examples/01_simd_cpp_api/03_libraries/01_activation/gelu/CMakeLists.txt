@@ -22,16 +22,6 @@ add_executable(demo
     gelu.asc
 )
 
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    unified_dlog
-    dl
-    m
-    graph_base
-)
-
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
