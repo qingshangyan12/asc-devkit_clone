@@ -35,7 +35,7 @@ def gen_golden_data_simple():
     output_shape = [block_length]
     input_x = np.random.randint(min_val, max_val, input_shape).astype(input_type)
     golden = np.zeros(output_shape).astype(output_type)
-    golden[0] = input_x[0]
+    golden[0] = input_x[0] + 100
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     input_x.tofile("./input/input_x.bin")
