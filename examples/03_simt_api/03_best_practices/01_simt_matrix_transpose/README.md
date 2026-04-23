@@ -63,6 +63,7 @@ $$
 **以一个block为例的映射关系**：
 
 下图给出了一个更直观的映射示意。左侧表示GM矩阵被切成32×32个tile，右侧表示其中一个block需要处理的一个tile，其大小为32×32。
+
 ![Block 映射](./figure/blockMapping.svg)
 
 以图中绿色元素为例，可以直接用kernel里的内置变量来推导它在GM中的input坐标。
