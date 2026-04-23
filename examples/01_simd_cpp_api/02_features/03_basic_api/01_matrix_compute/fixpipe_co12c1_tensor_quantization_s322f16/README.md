@@ -5,6 +5,7 @@
 本样例介绍如何使用基础API Fixpipe将Mmad矩阵乘的结果从CO1（L0C Buffer）搬入C1(L1 Buffer)，并使能随路Tensor量化将矩阵乘结果由int32_t类型数据量化为half类型。
 
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 

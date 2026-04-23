@@ -3,6 +3,7 @@
 用户自主管理CO1（L0C Buffer）的Matmul样例。将计算结果C矩阵保存在CO1位置，再调用基础API Fixpipe完成对结果从CO1到Global Memory的搬运。
 
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
