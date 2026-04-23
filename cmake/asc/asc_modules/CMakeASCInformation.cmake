@@ -83,14 +83,6 @@ if(NOT CMAKE_ASC_CREATE_SHARED_LIBRARY)
 <OBJECTS> <LINK_LIBRARIES>")
 endif()
 
-# rule variable to create a shared module : for fatbin(device.o)
-# normal output: libxxx.so     ASC output: xxx.o
-if(NOT CMAKE_ASC_CREATE_SHARED_MODULE)
-    set(CMAKE_SHARED_MODULE_PREFIX_ASC "")
-    set(CMAKE_SHARED_MODULE_SUFFIX_ASC ".o")
-    set(CMAKE_ASC_CREATE_SHARED_MODULE "${CMAKE_ASC_LLD_LINKER} -m aicorelinux -Ttext=0 <OBJECTS> -static -o <TARGET>")
-endif()
-
 set(CMAKE_ASC_INFORMATION_LOADED 1)   # 标记Cmake已经加载初始化ASC编程语言
 
 if(CMAKE_ASC_RUN_MODE STREQUAL "sim")
