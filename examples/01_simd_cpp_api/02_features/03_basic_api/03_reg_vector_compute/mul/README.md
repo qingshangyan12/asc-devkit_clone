@@ -63,7 +63,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mul</td></tr>
     </table>
   - 样例实现：
-    MulVF函数内调用Mul接口进行计算，结果写回UB。Kernel类通过模板参数`perCoreLength`指定每核处理的数据长度，`GetCoreOffset()`函数计算各核的数据偏移。
+    MulVF函数内调用Mul接口进行计算，结果写回UB。Kernel类通过模板参数`singleCoreLength`指定每核处理的数据量，`GetCoreOffset()`函数计算各核的数据偏移。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动4个核。
 
@@ -99,8 +99,8 @@
 
   示例如下：
   ```bash
-  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
-  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。

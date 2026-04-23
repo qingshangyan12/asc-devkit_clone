@@ -23,7 +23,6 @@
   
   **AuxScalar + Adds模式**
   - 使用AuxScalar方式（`__ubuf__`指针下标访问，如`scalarAddr[0]`）从UB读取标量，结合Adds进行向量与标量加法
-  - 使用LoadAlign/StoreAlign的PostUpdate模式自动更新地址指针
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>

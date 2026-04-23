@@ -1,7 +1,7 @@
 # mergemode样例
 
 ## 概述
-本样例基于RegBase编程范式综合演示MaskMergeMode、postUpdate、UpdateMask和ReduceMax等特性。
+本样例基于RegBase编程范式验证MaskMergeMode::MERGING模式的行为特性，演示未激活mask位保留dstReg原值的机制，使用Max接口进行验证。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -19,22 +19,35 @@
 
 ## 样例描述
 - 样例功能：  
-  对一个向量先做逐元素Max(x, x)（演示MaskMergeMode::MERGING），再做ReduceMax归约，得到全局最大值。向量shape为[1, 200]，数据类型为float。单核场景。
+  验证`MERGING`模式：当mask未激活时，dstReg的对应位保留原值而非参与计算。输入为200个负数（非VL整数倍），输出为2（未激活位保留的dstReg原值）。
 
-  **单核模式**
-  - 一个核处理全部200个数据（200非VL整数倍，VL=64 for float）
+  **验证原理**
+  - 输入：200个float负数（-100到-1），VL=256Byte，共4个repeat
+  - repeat 0-3：每个repeat前，Duplicate初始化dstReg=2
+  - Max MERGING：激活位=max(负数,负数)=负数，未激活位=保留dstReg原值=2
+  - Repeat 3（200个元素，最后一个repeat只有8个激活位）：
+    - yAddr[192:200] = 负数（8个激活位）
+    - yAddr[200:256] = 2（56个未激活位，MERGING保留dstReg原值）
+  - ReduceMax(yAddr[0:256]) = 2，验证MERGING模式确实保留了未激活位的dstReg原值
+
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
     <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-    <tr><td align="center">x</td><td align="center">[1, 200]</td><td align="center">float</td></tr>
+    <tr><td align="center">x</td><td align="center">[1, 200]</td><td align="center">float（负数）</td></tr>
     <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 8]</td><td align="center">float</td></tr>
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mergemode</td></tr>
     </table>
+
   - 样例实现：
-    1. **MaxMergeModeVF**：使用`Max<T, MaskMergeMode::MERGING>`进行逐元素最大值计算，未激活mask位保留dst原值；使用`LoadAlign/StoreAlign`的`PostLiteral::POST_MODE_UPDATE`模式自动递增地址；使用`UpdateMask`处理非VL整数倍的数据尾部。
-    2. **ReduceMaxVF**：使用`Reduce<ReduceType::MAX>`对每个VL块做块内归约，再用`Max`累加得到全局最大值。
-    3. 输出为32B对齐的8个float，全局最大值在第一个元素。
+    1. **MaxMergeModeVF**：
+       - 每轮循环先`Duplicate(dstReg, 2)`初始化dstReg
+       - 使用`UpdateMask`处理非VL整数倍数据
+       - 使用`Max`：激活位计算max值，未激活位保留dstReg原值=2
+       - 使用`StoreAlign(allMask)`写入整个VL，验证dstReg未激活位确实是2
+    2. **ReduceMaxVF**：对yAddr[0:256]做ReduceMax归约，结果应为2（未激活位保留的值）
+    3. 输出为32B对齐的8个float，ReduceMax结果在第一个元素，预期值为2
+
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
 
