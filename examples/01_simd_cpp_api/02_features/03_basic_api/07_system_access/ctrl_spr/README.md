@@ -2,14 +2,16 @@
 
 ## 概述
 
-本样例基于SetCtrlSpr、GetCtrlSpr、ResetCtrlSpr接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能，并通过原子累加操作验证功能是否正确。
+本样例基于 `SetCtrlSpr`、`GetCtrlSpr`、`ResetCtrlSpr` 接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能，并通过原子累加操作验证功能是否正确。
 
-本样例演示了设置、读取和重置CTRL[8:6]和CTRL[10:9]比特位：
+本样例演示了设置、读取和重置CTRL[8:6]和CTRL[10:9]比特位，：
 - CTRL[8:6]用于控制数据从L0C Buffer/Unified Buffer/L1 Buffer搬运至Global Memory时原子操作的使能及数据类型选择。设置为1时，使能原子操作，数据类型为float。
 - CTRL[10:9]用于控制原子操作的类型，设置为0时选择ADD操作。
 - 使用完寄存器后，用ResetCtrlSpr接口将寄存器设置回默认值，防止其他的数据搬运造成影响。
 
 样例使用2个核进行验证，每个核搬运256个float元素到同一目标地址，通过原子累加操作验证CTRL寄存器设置后的功能效果。
+
+> **注意：** 在实际使用过程中，CTRL[8:6]和CTRL[10:9]的组合设置已经封装了原子操作API `SetAtomicType`、`DisableDmaAtomic`、`SetAtomicAdd`、`SetAtomicMax`、`SetAtomicMin`，建议直接通过这些API进行配置。
 
 ## 支持的产品
 
@@ -86,11 +88,10 @@
   python3 ../scripts/verify_result.py                                  # 验证输出结果是否正确
   ```
 
-  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可，不支持 CPU模式。
   
   示例如：
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;  # cpu调试模式
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;  # NPU仿真模式
   ```
 
@@ -100,7 +101,7 @@
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
