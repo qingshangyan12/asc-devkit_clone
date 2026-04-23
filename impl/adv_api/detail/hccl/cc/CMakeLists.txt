@@ -132,6 +132,7 @@ elseif(BUILD_OPEN_PROJECT)
             ${BUILD_DEVICE_DIR}/aicpu_custom/libmc2_server.so
         )
         install(FILES ${BUILD_DEVICE_DIR}/signatures/mc2_server.tar.gz
+            COMPONENT asc-devkit
             DESTINATION ${INSTALL_DEVICE_TAR_DIR} OPTIONAL
         )
         install(FILES ${BUILD_DEVICE_DIR}/aicpu_custom/libmc2_server.so
@@ -145,13 +146,9 @@ elseif(BUILD_OPEN_PROJECT)
         ${HCCL_CC_INCLUDE_DIR}/hccl_mc2.h
     )
 
-    set(HCCL_JSON
-        # hccl json 待补充
-    )
-
     install(FILES
         ${HCCL_HEAD}
-        ${HCCL_JSON}
+        COMPONENT asc-devkit
         DESTINATION ${INSTALL_INCLUDE_DIR}/hccl/ OPTIONAL
     )
 endif()
