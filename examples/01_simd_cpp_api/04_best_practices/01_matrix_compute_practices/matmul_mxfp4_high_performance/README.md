@@ -192,11 +192,7 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
 
 ## 编译运行
 
-### 编译执行
-
-在本样例根目录下执行如下步骤，编译并执行样例：
-
-- **配置环境变量**
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -213,7 +209,7 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
     source ${install_path}/cann/set_env.sh
     ```
 
-- **样例执行**
+- 样例执行
   ```bash
   SCENARIO_NUM=2
   mkdir -p build && cd build;  # 创建并进入 build 目录
@@ -245,7 +241,7 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
   test pass!
   ```
 
-### 性能分析
+## 性能分析
 
 使用 `msprof` 工具获取详细性能数据：
 
