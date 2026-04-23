@@ -153,6 +153,7 @@
 -   同步事件需要由开发者使用SetFlag/WaitFlag\(ISASI\)和PipeBarrier\(ISASI\)手动插入，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。
 -   由于需要使用SetFlag/WaitFlag/PipeBarrier底层同步接口（属于ISASI硬件体系结构相关的接口），无法保证算子跨硬件版本兼容。
 -   Kernel入口处需要开发者手动调用InitSocState接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
+-   Kernel结束时，需要开发者手动调用PipeBarrier<PIPE_ALL>。
 
 ## 支持的API范围<a name="section2633193623711"></a>
 
