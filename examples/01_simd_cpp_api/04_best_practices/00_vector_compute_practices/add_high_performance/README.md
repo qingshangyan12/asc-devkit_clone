@@ -581,28 +581,24 @@ $$
 
 ## 编译运行
 
-### 切换Case
+- 切换Case
 
-在 cmake 编译时通过 `-DSCENARIO=N` 指定要编译的 case：
+  在 cmake 编译时通过 `-DSCENARIO=N` 指定要编译的 case：
 
-```bash
-cmake -DSCENARIO=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..   # 编译 case 6（可替换为0-6）
-```
+  ```bash
+  cmake -DSCENARIO=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..   # 编译 case 6（可替换为0-6）
+  ```
 
-各 case 说明：
-- `0`: 单核标量版本
-- `1`: 单核向量版本
-- `2`: 多核均匀切分 (dataCopyLen=4096)
-- `3`: 多核均匀切分 (数据大块搬运)
-- `4`: 双缓冲优化
-- `5`: 双缓冲 + L2Cache bypass
-- `6`: 双缓冲 + L2Cache bypass + 避免Bank Conflict
+  各 case 说明：
+  - `0`: 单核标量版本
+  - `1`: 单核向量版本
+  - `2`: 多核均匀切分 (dataCopyLen=4096)
+  - `3`: 多核均匀切分 (数据大块搬运)
+  - `4`: 双缓冲优化
+  - `5`: 双缓冲 + L2Cache bypass
+  - `6`: 双缓冲 + L2Cache bypass + 避免Bank Conflict
 
-### 编译执行
-
-在本样例根目录下执行如下步骤，编译并执行算子：
-
-- **配置环境变量**  
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -619,7 +615,7 @@ cmake -DSCENARIO=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..   # 编译 case 6（可
     source ${install_path}/cann/set_env.sh
     ```
     
-- **样例执行**
+- 样例执行
   ```bash 
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake -DSCENARIO=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # 编译工程，默认npu模式
@@ -652,7 +648,7 @@ cmake -DSCENARIO=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..   # 编译 case 6（可
   test pass!
   ```
 
-### 性能分析
+## 性能分析
 
 使用 `msprof` 工具获取详细性能数据：
 
