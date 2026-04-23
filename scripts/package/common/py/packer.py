@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import os
+import shlex
 import shutil
 import subprocess
 from argparse import Namespace
@@ -206,7 +207,8 @@ def exec_pack_cmd(delivery_dir: str,
                  package_name: str) -> str: 
     """执行打包命令"""
     if delivery_dir:
-        cmd = f'cd {delivery_dir} && {pack_cmd}'
+        safe_delivery_dir = shlex.quote(delivery_dir)
+        cmd = f'cd {safe_delivery_dir} && {pack_cmd}'
     else:
         cmd = pack_cmd
     CommLog.cilog_info("package cmd:%s", cmd)
