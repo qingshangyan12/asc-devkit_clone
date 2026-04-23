@@ -3,6 +3,7 @@
 多次批量处理Matmul计算的样例，包括非异步场景和异步场景的实现。
 
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
