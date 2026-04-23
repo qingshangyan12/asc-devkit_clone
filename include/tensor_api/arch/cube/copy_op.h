@@ -15,33 +15,27 @@
 #endif
 
 /*!
-* \file copy_atom.h
+* \file copy_op.h
 * \brief
 */
-#ifndef INCLUDE_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
-#define INCLUDE_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
-
-#include "impl/tensor_api/atom/copy_atom_impl.h"
+#ifndef INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
+#define INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 
 namespace AscendC {
 namespace Te {
 
-template <typename CopyOperation, typename... CopyOpArgs>
-struct CopyTraits;
-
-template <typename... Args>
-struct CopyAtom;
-
-template <typename CopyOperation>
-struct CopyAtom<CopyOperation>;
-
-template <typename... Args>
-struct CopyAtom<CopyTraits<Args...>>;
+struct CopyGM2L1;
+struct CopyL12L0B;
+struct CopyL12L0A;
+struct CopyL12FB;
+struct CopyL12BT;
+struct CopyL0C2GM;
+struct CopyL0C2GMWith;
 
 } // namespace Te
 } // namespace AscendC
 
-#endif // INCLUDE_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
+#endif // INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

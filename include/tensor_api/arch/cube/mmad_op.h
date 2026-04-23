@@ -15,33 +15,22 @@
 #endif
 
 /*!
-* \file mmad_atom.h
+* \file mmad_op.h
 * \brief
 */
-#ifndef INCLUDE_TENSOR_API_ATOM_CUBE_COMPUTE_MMAD_ATOM_H
-#define INCLUDE_TENSOR_API_ATOM_CUBE_COMPUTE_MMAD_ATOM_H
-
-#include "impl/tensor_api/atom/mmad_atom_impl.h"
+#ifndef INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
+#define INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
 
 namespace AscendC {
 namespace Te {
 
-template <typename MmaOperation, typename... MmaOpArgs>
-struct MmadTraits;
-
-template <typename... Args>
-struct MmadAtom;
-
-template <typename MmaOperation>
-struct MmadAtom<MmaOperation>;
-
-template <typename MmaOperation, typename... Args>
-struct MmadAtom<MmadTraits<MmaOperation, Args...>>;
+struct MmadTraitDefault;
+struct MmadOperation;
 
 } // namespace Te
 } // namespace AscendC
 
-#endif // INCLUDE_TENSOR_API_ATOM_CUBE_COMPUTE_MMAD_ATOM_H
+#endif // INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

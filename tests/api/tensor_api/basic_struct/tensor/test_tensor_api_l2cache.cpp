@@ -11,7 +11,7 @@
 #include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
-class Tensor_Api_Tensor_3510 : public testing::Test {
+class Tensor_Api_Tensor_CacheMode : public testing::Test {
 protected:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
@@ -19,7 +19,7 @@ protected:
     void TearDown() {}
 };
 
-TEST_F(Tensor_Api_Tensor_3510, SetL2CacheHint)
+TEST_F(Tensor_Api_Tensor_CacheMode, SetL2CacheHint)
 {
     using namespace AscendC::Te;
 
