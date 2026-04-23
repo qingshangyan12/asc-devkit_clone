@@ -558,7 +558,7 @@ $$MTE2耗时误差 = \frac{{1900.322\mu s} - {1832.1\mu s}}{{1832.1\mu s}} = 3.7
 ### 样例执行
 ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake -DCASE_TYPE=0 -DNPU_ARCH=dav-2201 ..;make -j;  # 编译指定case（默认为0，可替换为0-8），默认npu模式
+  cmake -DRUN_MODE=cpu -DCASE_TYPE=0 -DNPU_ARCH=dav-2201 ..;make -j;  # 编译指定case（默认为0，可替换为0-8），默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行（使用编译时指定的case）
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
