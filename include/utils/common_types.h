@@ -16,5 +16,12 @@
 #define INCLUDE_UTILS_COMMON_TYPES_H
 
 #include "impl/utils/common_types.h"
-
+namespace AscendC {
+enum class ReduceType {
+    NONE = -1,
+    SUM = 0,
+    MAX,
+    MIN,
+};
+} // namespace AscendC
 #endif

@@ -23,6 +23,7 @@
 #include "kernel_macros.h"
 #include "kernel_tensor.h"
 #include "utils/kernel_utils_mode.h"
+#include "utils/common_types.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -32,47 +33,41 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 
-enum class NewReduceType{
-    SUM=0,
-    MAX,
-    MIN
-};
-
-template <NewReduceType reduceType, typename T, bool isSetMask=true>
+template <ReduceType reduceType, typename T, bool isSetMask=true>
 __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
 
 
-template <NewReduceType reduceType, typename T, bool isSetMask=true>
+template <ReduceType reduceType, typename T, bool isSetMask=true>
 __aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
 
-template <NewReduceType reduceType, typename T, bool isSetMask=true>
+template <ReduceType reduceType, typename T, bool isSetMask=true>
 __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[],
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
 
-template <NewReduceType reduceType, typename T, bool isSetMask=true>
+template <ReduceType reduceType, typename T, bool isSetMask=true>
 __aicore__ inline void ReducePair(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[],
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
-template <NewReduceType reduceType, typename T, bool isSetMask = true, typename U = T>
+template <ReduceType reduceType, typename T, bool isSetMask = true, typename U = T>
 __aicore__ inline void ReduceRepeat(const LocalTensor<U>& dst, const LocalTensor<T>& src, const int32_t mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
     ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
 
-template <NewReduceType reduceType, typename T, bool isSetMask = true, typename U = T>
+template <ReduceType reduceType, typename T, bool isSetMask = true, typename U = T>
 __aicore__ inline void ReduceRepeat(const LocalTensor<U>& dst, const LocalTensor<T>& src, const uint64_t mask[],
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
     ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
 #else
 
-template <NewReduceType reduceType, typename T, bool isSetMask = true>
+template <ReduceType reduceType, typename T, bool isSetMask = true>
 __aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
     ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
 
-template <NewReduceType reduceType, typename T, bool isSetMask = true>
+template <ReduceType reduceType, typename T, bool isSetMask = true>
 __aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[],
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
     ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
