@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -31,11 +31,12 @@ def gen_golden_data_simple():
     output_type = np.int32
     min_val, max_val = get_range_by_dtype(input_type)
     block_length = 1024
+    add_value = 100
     input_shape = [block_length]
     output_shape = [block_length]
     input_x = np.random.randint(min_val, max_val, input_shape).astype(input_type)
     golden = np.zeros(output_shape).astype(output_type)
-    golden[0] = input_x[0]
+    golden[0] = input_x[0] + add_value
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     input_x.tofile("./input/input_x.bin")
