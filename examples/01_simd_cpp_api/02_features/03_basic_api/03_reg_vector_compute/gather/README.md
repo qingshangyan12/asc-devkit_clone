@@ -1,7 +1,7 @@
 # gather样例
 
 ## 概述
-本样例基于RegBase编程范式实现按索引收集元素功能。
+本样例基于RegBase编程范式实现按索引从RegTensor(Reg矢量计算基本单元)收集元素功能。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -22,8 +22,7 @@
   演示Gather接口（源操作数为寄存器）的用法。Gather根据索引从源向量中收集元素：dst[i] = src[index[i]]。
 
   **Gather模式**
-  - 1个half向量（128个元素）作为源数据，1个uint16_t向量（128个元素）作为索引，输出1个half向量
-  - Gather<half, uint16_t>：按索引从源向量中收集元素
+  - 源数据为数据量为128个元素的half类型向量，索引为数据量为128个元素的uint16_t类型向量，输出为数据量为128个元素的half类型向量。
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
@@ -34,7 +33,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather</td></tr>
     </table>
   - 样例实现：
-    GatherVF函数内调用Gather接口按索引收集元素，使用LoadAlign/StoreAlign的postUpdate模式。
+    GatherVF函数内调用Gather接口按索引收集元素。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
 

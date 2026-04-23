@@ -1,7 +1,7 @@
 # gather_ld_reg样例
 
 ## 概述
-本样例基于RegBase编程范式实现离散数据搬入功能，支持两种场景，通过编译时宏选择场景。
+本样例基于RegBase编程范式实现将离散数据从UB(Unified Buffer)搬入到RegTensor(Reg矢量计算基本单元)的功能，支持两种场景，通过编译时宏选择场景。
     <table>
   	 	 	<tr>
   	 	 		<td>scenarioNum</td>
@@ -9,11 +9,11 @@
   	 	 	</tr>
   	 	 	<tr>
   	 	 		<td>1</td>
-  	 	 		<td>Gather（从UB(Unified Buffer)按索引收集数据到RegTensor(Reg矢量计算基本单元)）</td>
+  	 	 		<td>Gather（从UB按索引将单点数据收集到RegTensor）</td>
   	 	 	</tr>
   	 	 	<tr>
   	 	 		<td>2</td>
-  	 	 		<td>GatherB（按32字节DataBlock收集）</td>
+  	 	 		<td>GatherB（从UB按索引将DataBlock大小的数据收集到RegTensor）</td>
   	 	 	</tr>
   	 </table>
 
@@ -33,19 +33,20 @@
 
 ## 样例描述
 - 样例功能：  
-  根据索引从源数据中离散收集元素到目的地址。输入向量shape为[1, 128]，数据类型为half。源数据长度为1024个元素，索引长度为128个元素，输出长度为128个元素。
+  根据索引从源数据中离散收集元素到目的地址。
 
   **场景1：Gather模式**
   - 使用Gather接口，从UB按元素索引收集数据到RegTensor
   - 按元素收集：dst[i] = src[index[i]]
+  - 源数据数据量为1024个元素，索引数据量为128个元素，输出数据量为128个元素。
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
     <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-    <tr><td></td><td align="center">src</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
-    <tr><td></td><td align="center">index</td><td align="center">[1, 128]</td><td align="center">uint32</td></tr>
+    <tr><td align="center">src</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
+    <tr><td align="center">index</td><td align="center">[1, 128]</td><td align="center">uint16</td></tr>
     <tr><td rowspan="1" align="center">样例输出</td><td align="center">dst</td><td align="center">[1, 128]</td><td align="center">half</td></tr>
-    <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_ld_reg</td></tr>
+    <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">gather_ld_reg</td></tr>
     </table>
   - 样例实现：
     GatherVF函数内先通过LoadAlign加载索引数据到indexReg，再调用Gather接口从源地址按索引收集数据到dstReg，最后通过StoreAlign将结果写回UB。
@@ -54,14 +55,15 @@
 
   **场景2：GatherB模式**
   - 使用GatherB接口，按32字节DataBlock收集
+  - 源数据数据量为1024个元素，索引数据量为8个元素（对应8个DataBlock），输出数据量为128个元素。
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
     <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-    <tr><td></td><td align="center">src</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
-    <tr><td></td><td align="center">index</td><td align="center">[1, 128]</td><td align="center">uint32</td></tr>
+    <tr><td align="center">src</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
+    <tr><td align="center">index</td><td align="center">[1, 8]</td><td align="center">uint32</td></tr>
     <tr><td rowspan="1" align="center">样例输出</td><td align="center">dst</td><td align="center">[1, 128]</td><td align="center">half</td></tr>
-    <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_ld_reg</td></tr>
+    <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">gather_ld_reg</td></tr>
     </table>
   - 样例实现：
     GatherBVF函数内先通过LoadAlign加载索引数据到indexReg，再调用GatherB接口按DataBlock从源地址收集数据到dstReg，最后通过StoreAlign将结果写回UB。
@@ -101,8 +103,8 @@
 
   示例如下：
   ```bash
-  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
-  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式或场景前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。

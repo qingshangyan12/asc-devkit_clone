@@ -51,7 +51,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">data_relayout</td></tr>
     </table>
   - 样例实现：
-    InterleaveVF函数内调用Interleave接口进行数据交织，使用LoadAlign/StoreAlign的postUpdate模式。
+    InterleaveVF函数内调用Interleave接口进行数据交织。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
 
@@ -67,7 +67,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">data_relayout</td></tr>
     </table>
   - 样例实现：
-    PackVF函数内调用Pack接口提取低16位，使用LoadAlign/StoreAlign的postUpdate模式。
+    PackVF函数内调用Pack接口提取低16位。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
 
@@ -103,8 +103,8 @@
 
   示例如下：
   ```bash
-  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
-  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
