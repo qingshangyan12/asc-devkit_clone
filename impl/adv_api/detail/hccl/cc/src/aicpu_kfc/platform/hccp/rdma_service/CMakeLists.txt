@@ -94,7 +94,7 @@ endif()
 
 # c_sec、mmpa、unified_dlog动态库搜索路径
 target_link_directories(rs PRIVATE
-    ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/
+    ${HCCL_DEVICE_LIB_DIRS}
 )
 
 target_compile_options(rs PRIVATE
@@ -122,7 +122,7 @@ target_compile_definitions(rs PRIVATE
 
 target_link_libraries(rs PRIVATE
     -Wl,--no-as-needed
-    c_sec
+    ${HCCL_C_SEC_LINK}
     $<$<STREQUAL:${PRODUCT_SIDE},host>:unified_dlog>
     tls_adp
     -Wl,--as-needed

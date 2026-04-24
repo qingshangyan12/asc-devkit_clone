@@ -63,13 +63,8 @@ if(NOT BUILD_OPEN_PROJECT)
 endif()
 
 target_link_directories(ra PRIVATE
-    ${ASCEND_CANN_PACKAGE_PATH}/lib64
+    ${HCCL_PRODUCT_LIB_DIRS}
 )
-if (DEVICE_MODE)
-    target_link_directories(ra PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/ # c_sec、mmpa、unified_dlog动态库搜索路径
-    )
-endif()
 
 target_compile_options(ra PRIVATE
     -Werror -fvisibility=hidden -fno-strict-aliasing -fsigned-char -fno-common -std=gnu11 -Wextra
@@ -84,7 +79,7 @@ target_link_options(ra PRIVATE
 
 target_link_libraries(ra PRIVATE
     -Wl,--no-as-needed
-    c_sec
+    ${HCCL_C_SEC_LINK}
     $<$<STREQUAL:${PRODUCT_SIDE},host>:unified_dlog>
     ra_hdc
     ra_peer

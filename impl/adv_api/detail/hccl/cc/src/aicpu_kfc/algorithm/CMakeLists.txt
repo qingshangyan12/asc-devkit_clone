@@ -126,7 +126,7 @@ if(BUILD_OPEN_PROJECT)
     )
 
     target_link_directories(hccl_alg PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/lib64
+        ${HCCL_PRODUCT_LIB_DIRS}
     )
 else()
     target_include_directories(hccl_alg PRIVATE
@@ -167,18 +167,18 @@ target_link_options(hccl_alg PRIVATE
 if(BUILD_OPEN_PROJECT)
     target_link_libraries(hccl_alg PRIVATE
         -Wl,--no-as-needed
-        c_sec
-        unified_dlog
-        mmpa
+        ${HCCL_C_SEC_LINK}
+        ${HCCL_UNIFIED_DLOG_LINK}
+        ${HCCL_MMPA_LINK}
         -Wl,--no-as-needed
         hccl_plf
     )
 else()
     target_link_libraries(hccl_alg PRIVATE
         -Wl,--no-as-needed
-        c_sec
-        unified_dlog
-        mmpa
+        ${HCCL_C_SEC_LINK}
+        ${HCCL_UNIFIED_DLOG_LINK}
+        ${HCCL_MMPA_LINK}
         -Wl,--no-as-needed
         hccl_plf
         ofed_headers
