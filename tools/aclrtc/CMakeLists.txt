@@ -67,5 +67,5 @@ install(TARGETS acl_rtc
 )
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/acl_rt_compile.h
-    DESTINATION ${INSTALL_LIBRARY_DIR}/acl COMPONENT asc-devkit
+    DESTINATION ${INSTALL_LIBRARY_DIR}/include/acl COMPONENT asc-devkit
 )
