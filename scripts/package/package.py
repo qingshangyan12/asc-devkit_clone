@@ -236,13 +236,20 @@ def generate_version_header_content(target_conf) -> Iterator[str]:
 
 
 def generate_customized_file(target_conf, ext_name, build_dir):
-    filepath = os.path.join(build_dir, target_conf.get('value'))
+    filepath = os.path.join(build_dir, target_conf['dst_path'], target_conf.get('value'))
+    dirpath = os.path.dirname(filepath)
 
     generator = target_conf.get('generator', 'info')
     if generator == 'version_header':
         content_list = generate_version_header_content(target_conf)
     else:
         content_list = generate_info_content(target_conf, ext_name)
+
+    if not os.path.exists(dirpath):
+        os.makedirs(dirpath)
+
+    if os.path.exists(filepath):
+        os.chmod(filepath, 0o700)
 
     file_content = '\n'.join(content_list)
     try:
@@ -251,6 +258,8 @@ def generate_customized_file(target_conf, ext_name, build_dir):
     except Exception as ex:
         CommLog.cilog_error(f"generate customized file {filepath} failed: {ex}!")
         return FAIL
+
+    os.chmod(filepath, 0o440)
 
     return SUCC
 
@@ -414,6 +423,7 @@ def execute_repack_process(xmlconfig: XmlConfig,
     """
     status = SUCC
     release_dir = delivery_dir
+    build_dir = delivery_dir.replace("_CPack_Packages/makeself_staging", "")
     # 生成自定义文件
     for item in xmlconfig.generate_infos:
         if generate_customized_file(item, package_option.ext_name, build_dir):

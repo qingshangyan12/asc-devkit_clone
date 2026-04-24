@@ -17,4 +17,12 @@ add_custom_target(ascendc_kernel_cmake ALL
 install(DIRECTORY ${ASC_CMAKE_MODULE_BINARY_DIR}
     DESTINATION ${INSTALL_LIBRARY_DIR} ${INSTALL_OPTIONAL} COMPONENT asc-devkit
     PATTERN "test_*" EXCLUDE
+    PATTERN "aicpu-config.cmake" EXCLUDE
+    PATTERN "asc-config.cmake" EXCLUDE
+)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/asc/aicpu-config.cmake
+    DESTINATION ${INSTALL_LIBRARY_DIR}/lib64/cmake ${INSTALL_OPTIONAL} COMPONENT asc-devkit
+)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/asc/asc-config.cmake
+    DESTINATION ${INSTALL_LIBRARY_DIR}/lib64/cmake ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
