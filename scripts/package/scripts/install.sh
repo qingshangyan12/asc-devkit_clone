@@ -695,7 +695,7 @@ install_run() {
         chmod_start
         new_echo "INFO" "install ${asc_devkit_install_path_param} ${asc_devkit_install_type}"
         log "INFO" "install ${asc_devkit_install_path_param} ${asc_devkit_install_type}"
-        sh "${curpath}/run_asc-devkit_install.sh" "install" "${asc_devkit_input_install_path}" "${asc_devkit_install_type}" \
+        sh "${curpath}/run_asc-devkit_install.sh" "install" "${asc_adevkit_input_install_path}" "${asc_devkit_install_type}" \
             "${is_quiet}" "${input_setenv}" "${docker_root}" "${in_install_for_all}" "$pkg_version_dir"
         if [ $? -eq 0 ]; then
             update_version_info_version

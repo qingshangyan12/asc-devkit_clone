@@ -69,7 +69,7 @@ configure_file(
 )
 
 set(OUT_PUT_SCENE
-    ${CPACK_CMAKE_BINARY_DIR}/scene.info
+    ${CPACK_CMAKE_BINARY_DIR}/share/info/asc-devkit/scene.info
 )
 set(OUT_PUT_SCENE_DIR
     ${STAGING_DIR}/asc-devkit
@@ -94,7 +94,7 @@ message(STATUS "makeself: ${makeself_param_string}")
 execute_process(COMMAND bash ${MAKESELF_EXE}
         --header ${MAKESELF_HEADER_EXE}
         --help-header asc-devkit/script/help.info
-        ${makeself_param_string} asc-devkit/script/install.sh
+        ${makeself_param_string} share/info/asc-devkit/script/install.sh
         WORKING_DIRECTORY ${STAGING_DIR}
         RESULT_VARIABLE EXEC_RESULT
         ERROR_VARIABLE  EXEC_ERROR

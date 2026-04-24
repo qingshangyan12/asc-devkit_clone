@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<config name="asc-devkit" copy_type="delivery" src_path="lib/host" dst_path="asc-devki" install_path="asc-devkit"
+<config name="asc-devkit" copy_type="delivery" src_path="lib/host" dst_path="asc-devkit" install_path="asc-devkit"
         install_own="$username:$usergroup" install_mod="750" install_type="all">
     <package_info>
         <product_name>cann</product_name>
