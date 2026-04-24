@@ -67,9 +67,10 @@ configure_file(
     ${OUT_PUT_FILELIST_DIR}
     COPYONLY
 )
+file(REMOVE ${CSV_OUTPUT})
 
 set(OUT_PUT_SCENE
-    ${CPACK_CMAKE_BINARY_DIR}/scene.info
+    ${CPACK_CMAKE_BINARY_DIR}/share/info/asc-devkit/scene.info
 )
 set(OUT_PUT_SCENE_DIR
     ${STAGING_DIR}/share/info/asc-devkit
