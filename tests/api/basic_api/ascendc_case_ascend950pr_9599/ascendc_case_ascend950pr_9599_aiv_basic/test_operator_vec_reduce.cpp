@@ -46,7 +46,7 @@ void VecWholeReduceSum(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8_t* __res
 
     AscendC::SetMaskCount();
     AscendC::SetVectorMask<T, MaskMode::COUNTER>(0, 144);
-    ReduceRepeat<ReduceType::SUM, T, false>(outputLocal, input0Local, repeatTimes, 1, 1, 8);
+    ReduceRepeat<ReduceType::SUM, T, false>(outputLocal, input0Local, AscendC::MASK_PLACEHOLDER_LIST, repeatTimes, 1, 1, 8);
     AscendC::ResetMask();
     ReduceRepeat<ReduceType::SUM, T>(outputLocal, input0Local, counterMask, repeatTimes, 1, 1, 8);
     AscendC::SetMaskNorm();
