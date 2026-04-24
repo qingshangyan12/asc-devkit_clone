@@ -35,8 +35,7 @@ function(library_interface_setup target_name)
         c_sec
     )
 
-    # for ACLRT_LAUNCH_KERNEL
-    if (ENABLE_ACLRT_LAUNCH)
+    if(ENABLE_ACLRT_LAUNCH)
         set(ACLRT_HEADER_INCLUDE_PATH ${CMAKE_BINARY_DIR}/include/${target_name} CACHE PATH "Path for aclrt header files")
         file(MAKE_DIRECTORY ${ACLRT_HEADER_INCLUDE_PATH})
 
@@ -69,14 +68,27 @@ endfunction()
 
 function(ascendc_fatbin_library target_name)
     set_source_files_properties(${ARGN} PROPERTIES LANGUAGE ASC)
-    # first generate device.o
     add_library(${target_name} OBJECT ${ARGN})
     target_compile_options(${target_name} PRIVATE
-        --aicore-only           # compile device.o
+        --aicore-only
     )
-    # lld -m aicorelinux to generate fatbin .o
-    add_library(${target_name}_fatbin MODULE $<TARGET_OBJECTS:${target_name}>)
-    set_target_properties(${target_name}_fatbin PROPERTIES OUTPUT_NAME ${target_name})
+    library_interface_setup(${target_name})
+
+    set(_asc_fatbin_linker "${CMAKE_ASC_COMPILER_LINKER}")
+    if(NOT _asc_fatbin_linker)
+        set(_asc_fatbin_linker "${CMAKE_ASC_LLD_LINKER}")
+    endif()
+
+    set(output_path ${CMAKE_INSTALL_PREFIX}/fatbin/${target_name}/${target_name}.o)
+    file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/fatbin/${target_name}/)
+    add_custom_target(lld_copy_${target_name} ALL
+        COMMAND ${_asc_fatbin_linker} -m aicorelinux -Ttext=0 $<TARGET_OBJECTS:${target_name}> -static -o ${output_path}
+        COMMAND cp ${output_path} ${CMAKE_CURRENT_BINARY_DIR}
+        COMMAND_EXPAND_LISTS
+        COMMENT "Generate final device.o from ascendc_fatbin_library"
+    )
+
+    add_dependencies(lld_copy_${target_name} ${target_name})
 endfunction()
 
 function(ascendc_compile_definitions target_name target_scope)
@@ -88,13 +100,11 @@ function(ascendc_compile_options target_name target_scope)
         set(kernel_compile_options_list)
         set(host_compile_options_list)
         set(find_host_compile_options_flag OFF)
-        # compile options are split by "-forward-options-to-host-compiler",
-        # options after this all belong to host compile options
         foreach(arg ${ARGN})
-            if (find_host_compile_options_flag)
+            if(find_host_compile_options_flag)
                 list(APPEND host_compile_options_list ${arg})
             else()
-                if (${arg} STREQUAL "-forward-options-to-host-compiler")
+                if(${arg} STREQUAL "-forward-options-to-host-compiler")
                     set(find_host_compile_options_flag ON)
                 else()
                     list(APPEND kernel_compile_options_list ${arg})
