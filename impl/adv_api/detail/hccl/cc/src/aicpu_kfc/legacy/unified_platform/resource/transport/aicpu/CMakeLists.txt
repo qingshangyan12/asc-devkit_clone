@@ -20,11 +20,3 @@ target_sources(ccl_kernel PRIVATE
         p2p_transport_lite_impl.cc
 )
 endif()
-
-if(TARGET mc2_server)
-add_mc2_server_ccl_object(mc2_server_legacy_transport_aicpu
-        ${CMAKE_CURRENT_SOURCE_DIR}/mem_transport_lite.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/ub_transport_lite_impl.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/p2p_transport_lite_impl.cc
-)
-endif()
