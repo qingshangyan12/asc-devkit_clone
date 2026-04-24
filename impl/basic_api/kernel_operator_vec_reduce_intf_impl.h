@@ -702,18 +702,6 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
         mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
-/*
- * @ingroup WholeReduceMin
- * @brief Index of the minimum value of all elements in each repeat
- * @param [out] dst output LocalTensor
- * @param [in] src input LocalTensor
- * @param [in] repeatTime repeat times
- * @param [in] mask mask count
- * @param [in] dstRepStride dst repeat stride
- * @param [in] srcBlkStride src block stride
- * @param [in] srcRepStride src repeat stride
- * @param [in] order specifies the output order, supports ORDER_VALUE_INDEX only
- */
 template <typename T, bool isSetMask>
 __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
