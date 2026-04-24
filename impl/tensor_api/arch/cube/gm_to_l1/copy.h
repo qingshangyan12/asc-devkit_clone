@@ -25,8 +25,8 @@
 
 namespace AscendC {
 namespace Te {
-
-constexpr CopyGM2L1Trait DEFAULT_COPY_GM_TO_L1_TRAIT = CopyGM2L1Trait {};
+struct CopyGM2L1Trait {};
+constexpr CopyGM2L1Trait DEFAULT_COPY_GM_TO_L1_TRAIT;
 
 struct CopyGM2L1TraitDefault {
     using TraitType = CopyGM2L1Trait;
