@@ -9,6 +9,7 @@
 */
 
 #include <gtest/gtest.h>
+#include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
 class Tensor_Api_Pointer : public testing::Test {

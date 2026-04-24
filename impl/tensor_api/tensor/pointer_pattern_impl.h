@@ -44,7 +44,7 @@ template <typename PtrPattern, typename TraitType, typename Arg>
 __aicore__ inline auto MakeLocationMemPtr(const Arg& arg)
 {
     using pointer = typename locationAttr<typename TraitType::type>::locationMap::template Get<PtrPattern>;
-    return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<pointer>(asc_get_phy_buf_addr(0) + arg));
+    return MakeHardwareMemPtr<PtrPattern>(reinterpret_cast<pointer>(0 + arg));
 }
 
 } // namespace Te

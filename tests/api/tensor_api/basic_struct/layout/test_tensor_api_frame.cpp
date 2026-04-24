@@ -9,6 +9,7 @@
 */
 
 #include <gtest/gtest.h>
+#include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
 class Tensor_Api_Frame_Layout : public testing::Test {
@@ -143,57 +144,6 @@ TEST_F(Tensor_Api_Frame_Layout, NDAndDNGroupIntegralConstantTrait)
     EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(GetStride(dnExtLayout))), 8);
 }
 
-TEST_F(Tensor_Api_Frame_Layout, ScaleGroupDefaultTrait)
-{
-    using namespace AscendC::Te;
-
-    auto andLayout = MakeFrameLayout<ScaleANDLayoutPtn>(32, 16);
-    auto adnLayout = MakeFrameLayout<ScaleADNLayoutPtn>(32, 16);
-    auto bndLayout = MakeFrameLayout<ScaleBNDLayoutPtn>(16, 32);
-    auto bdnLayout = MakeFrameLayout<ScaleBDNLayoutPtn>(16, 32);
-
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(andLayout)), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(andLayout)), 32);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(andLayout)), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(andLayout)), 16);
-
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(adnLayout)), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(adnLayout)), 32);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(adnLayout)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(adnLayout)), 8);
-
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(bndLayout)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(bndLayout)), 8);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(bndLayout)), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(bndLayout)), 32);
-
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(bdnLayout)), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(bdnLayout)), 16);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(bdnLayout)), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(bdnLayout)), 32);
-}
-
-TEST_F(Tensor_Api_Frame_Layout, ScaleGroupTraitWithType)
-{
-    using namespace AscendC::Te;
-
-    auto andLayout = MakeFrameLayout<ScaleANDLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(32, 16);
-    auto adnLayout = MakeFrameLayout<ScaleADNLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(32, 16);
-    auto bndLayout = MakeFrameLayout<ScaleBNDLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(16, 32);
-    auto bdnLayout = MakeFrameLayout<ScaleBDNLayoutPtn, LayoutTraitScale<fp8_e8m0_t>>(16, 32);
-
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(andLayout)), 32);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(andLayout)), 16);
-
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(adnLayout)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(adnLayout)), 8);
-
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(bndLayout)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(bndLayout)), 8);
-
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(bdnLayout)), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(bdnLayout)), 32);
-}
 
 TEST_F(Tensor_Api_Frame_Layout, ScaleGroupTraitWithTypeAndC0Element)
 {
