@@ -2,9 +2,9 @@
 
 ## 概述
 
-本样例基于 `SetCtrlSpr`、`GetCtrlSpr`、`ResetCtrlSpr` 接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能，并通过浮点数计算验证饱和模式是否正确。
+本样例基于 `SetCtrlSpr`、`GetCtrlSpr`、`ResetCtrlSpr` 接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能，并通过浮点数计算验证非饱和模式是否正确。
 
-本样例演示了设置、读取和重置CTRL[48]、CTRL[60]比特位：
+本样例演示了设置、读取和重置CTRL[48]、CTRL[60]比特位，验证非饱和模式：
 - CTRL[60]用于控制饱和模式的全局生效方式。设置为1时，使能全局设置饱和。
 - CTRL[48]用于控制浮点数计算和浮点数精度转换时的饱和模式，仅在CTRL[60]使能时生效。
   - 设置为0时（饱和模式）：INF输出会被饱和为±MAX（half类型为65504），NaN输出会被饱和为0。
@@ -34,7 +34,7 @@
 ## 样例描述
 
 - 样例功能：  
-  验证CTRL寄存器饱和模式操作的完整流程及其功能效果：
+  验证CTRL寄存器非饱和模式操作的完整流程及其功能效果：
   1. SetCtrlSpr：设置CTRL[60]=1使能全局生效，设置CTRL[48]=1选择非饱和模式（INF/NAN保持原输出）
   2. GetCtrlSpr：读取CTRL[48]设置后的值，存入ctrlLocal前4位
   3. Adds：执行half类型浮点数加法计算，输入包含INF值，存入dstLocal，用于验证非饱和模式下INF保持原值
@@ -45,7 +45,7 @@
   <table>
   <caption>表1：样例规格说明</caption>
   <tr><td rowspan="1" align="center">核数</td><td colspan="4" align="center">1</td></tr>
-  <tr><td rowspan="1" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">src</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">样例输出</td><td align="center">output_ctrl</td><td align="center">[1, 8]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
   <tr><td align="center">output_sat</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
@@ -54,7 +54,7 @@
 
 - 输出说明：
   - output_ctrl.bin：寄存器值验证输出，8个int64_t值（前4个为CTRL[48]设置后的值=1，后4个为CTRL[48]重置后的值=0）
-  - output_sat.bin：饱和模式功能验证输出，前128个为正常值+1，后128个为INF（非饱和模式下INF保持）
+  - output_sat.bin：非饱和模式功能验证输出，前128个为正常值+1，后128个为INF（非饱和模式下INF保持）
 
 - 验证逻辑：
   - 输入数据：前128个为正常值（0~127），后128个为INF
