@@ -44,8 +44,8 @@ target_include_directories(topoaddrinfo PRIVATE
 )
 
 target_link_directories(topoaddrinfo PRIVATE
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/lib64
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/devlib/device
+    ${HCCL_HOST_LIB_DIRS}
+    ${HCCL_HOST_DEVLIB_DIRS}
 )
 
 target_link_libraries(topoaddrinfo PRIVATE

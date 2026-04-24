@@ -114,13 +114,23 @@ if(BUILD_OPEN_PROJECT)
         ${THIRD_PARTY_NLOHMANN_PATH}
     )
 
-    target_link_directories(ccl_kernel_plf PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/ # c_sec、mmpa、unified_dlog动态库搜索路径
-    )
+    if(PRODUCT_SIDE STREQUAL "device")
+        target_link_directories(ccl_kernel_plf PRIVATE
+            ${HCCL_DEVICE_LIB_DIRS} # c_sec、mmpa、unified_dlog动态库搜索路径
+        )
 
-    target_link_directories(ccl_kernel_plf_a PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/ # c_sec、mmpa、unified_dlog动态库搜索路径
-    )
+        target_link_directories(ccl_kernel_plf_a PRIVATE
+            ${HCCL_DEVICE_LIB_DIRS} # c_sec、mmpa、unified_dlog动态库搜索路径
+        )
+    else()
+        target_link_directories(ccl_kernel_plf PRIVATE
+            ${HCCL_HOST_LIB_DIRS}
+        )
+
+        target_link_directories(ccl_kernel_plf_a PRIVATE
+            ${HCCL_HOST_LIB_DIRS}
+        )
+    endif()
 # todo:删除了非open project的定义
 endif()
 
@@ -258,9 +268,9 @@ target_link_options(ccl_kernel_plf_a PRIVATE
 if(BUILD_OPEN_PROJECT)
     target_link_libraries(ccl_kernel_plf
         -Wl,--no-as-needed
-        c_sec
+        ${HCCL_C_SEC_LINK}
         aicpu_sharder
-        mmpa
+        ${HCCL_MMPA_LINK}
         -Wl,--as-needed
         -lrt
         -ldl
@@ -269,9 +279,9 @@ if(BUILD_OPEN_PROJECT)
 
     target_link_libraries(ccl_kernel_plf_a
         -Wl,--no-as-needed
-        c_sec
+        ${HCCL_C_SEC_LINK}
         aicpu_sharder
-        mmpa
+        ${HCCL_MMPA_LINK}
         -Wl,--as-needed
         -lrt
         -ldl

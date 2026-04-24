@@ -93,7 +93,7 @@ set(includes
 target_include_directories(net_co PRIVATE ${includes})
 if(DEVICE_MODE)
     target_link_directories(net_co PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/ # c_sec、mmpa、unified_dlog动态库搜索路径
+        ${HCCL_DEVICE_LIB_DIRS} # c_sec、mmpa、unified_dlog动态库搜索路径
     )
 endif()
 
@@ -120,7 +120,7 @@ target_link_options(net_co PRIVATE
 #链接动态库
 target_link_libraries(net_co PRIVATE
     -Wl,--no-as-needed
-    c_sec
+    ${HCCL_C_SEC_LINK}
     $<$<STREQUAL:${PRODUCT_SIDE},host>:unified_dlog>
     -Wl,--as-needed
     -lrt

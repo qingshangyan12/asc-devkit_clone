@@ -148,13 +148,11 @@ target_link_options(hccl_v2_alg_frame PRIVATE
 )
 
 target_link_directories(hccl_v2_native_alg_repo PRIVATE
-    ${ASCEND_CANN_PACKAGE_PATH}/lib64
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/lib64
+    ${HCCL_HOST_LIB_DIRS}
 )
 
 target_link_directories(hccl_v2_alg_frame PRIVATE
-    ${ASCEND_CANN_PACKAGE_PATH}/lib64
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/lib64
+    ${HCCL_HOST_LIB_DIRS}
 )
  
 target_link_libraries(hccl_v2_native_alg_repo PRIVATE

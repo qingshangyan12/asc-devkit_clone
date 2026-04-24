@@ -193,7 +193,7 @@ if(BUILD_OPEN_PROJECT)
     )
 
     target_link_directories(hcomm PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/lib64
+        ${HCCL_PRODUCT_LIB_DIRS}
     )
 else()
     target_include_directories(hcomm PRIVATE
@@ -251,8 +251,8 @@ target_compile_definitions(hcomm PRIVATE
 if(BUILD_OPEN_PROJECT)
     target_link_libraries(hcomm
             -Wl,--no-as-needed
-            c_sec
-            unified_dlog
+            ${HCCL_C_SEC_LINK}
+            ${HCCL_UNIFIED_DLOG_LINK}
             acl_rt
             hccl_alg
             hccl_plf
@@ -265,9 +265,9 @@ else()
     target_link_libraries(hcomm
             $<BUILD_INTERFACE:kernel_tiling_headers>
             -Wl,--no-as-needed
-            c_sec
-            unified_dlog
-            mmpa
+            ${HCCL_C_SEC_LINK}
+            ${HCCL_UNIFIED_DLOG_LINK}
+            ${HCCL_MMPA_LINK}
             hccl_alg
             hccl_plf
             -Wl,--as-needed
@@ -813,6 +813,9 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     target_include_directories(ccl_kernel PRIVATE
         ${CCL_KERNEL_INCLUDE_LIST}
     )
+    target_link_directories(ccl_kernel PRIVATE
+        ${HCCL_PRODUCT_LIB_DIRS}
+    )
 
     target_include_directories(ccl_kernel PRIVATE ${ORION_HEAD_LIST})
     if(TARGET json)
@@ -855,15 +858,18 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
             ${CCL_KERNEL_INCLUDE_LIST}
             ${ORION_HEAD_LIST}
         )
+        target_link_directories(mc2_server PRIVATE
+            ${HCCL_DEVICE_LIB_DIRS}
+        )
         target_link_libraries(mc2_server PRIVATE
             -Wl,--no-as-needed
             ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/libascend_hal.so
             ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/libccl_kernel.so
-            c_sec
-            unified_dlog
+            ${HCCL_C_SEC_LINK}
+            ${HCCL_UNIFIED_DLOG_LINK}
             ccl_kernel_plf
             ccl_kernel_plf_a
-            mmpa
+            ${HCCL_MMPA_LINK}
             -Wl,--as-needed
             -lrt
             -ldl
@@ -1032,9 +1038,9 @@ if(NOT BUILD_OPEN_PROJECT)
         $<BUILD_INTERFACE:atrace_headers>
         $<BUILD_INTERFACE:kernel_tiling_headers>
         -Wl,--no-as-needed
-        c_sec
+        ${HCCL_C_SEC_LINK}
         ccl_kernel_plf
-        mmpa
+        ${HCCL_MMPA_LINK}
         -Wl,--as-needed
         -lrt
         -ldl
@@ -1115,8 +1121,8 @@ if(BUILD_OPEN_PROJECT AND KERNEL_MODE)
         target_link_libraries(ccl_kernel PRIVATE
             -Wl,--no-as-needed
             ascend_hal
-            c_sec
-            mmpa
+            ${HCCL_C_SEC_LINK}
+            ${HCCL_MMPA_LINK}
             ${CCL_KERNEL_PLF_PATH}
             -Wl,--as-needed
             -lrt
@@ -1134,7 +1140,7 @@ if(BUILD_OPEN_PROJECT AND KERNEL_MODE)
         )
 
         target_link_directories(ccl_kernel PRIVATE
-            ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/ # c_sec、mmpa、unified_dlog动态库搜索路径
+            ${HCCL_DEVICE_LIB_DIRS} # c_sec、mmpa、unified_dlog动态库搜索路径
         )
     endif()
 endif()
@@ -1160,8 +1166,8 @@ if(DEVICE_MODE AND KERNEL_MODE)
     set(AICPU_CUSTOM_LINK_LIBRARIES
         -Wl,--no-as-needed
         ascend_hal
-        c_sec
-        mmpa
+        ${HCCL_C_SEC_LINK}
+        ${HCCL_MMPA_LINK}
         -Wl,--whole-archive
         ccl_kernel_plf_a
         -Wl,--no-whole-archive
@@ -1200,7 +1206,7 @@ if(DEVICE_MODE AND KERNEL_MODE)
         ${ORION_HEAD_LIST}
     )
     target_link_directories(aicpu_custom PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/
+        ${HCCL_DEVICE_LIB_DIRS}
     )
     target_link_libraries(aicpu_custom PRIVATE ${AICPU_CUSTOM_LINK_LIBRARIES})
     add_dependencies(aicpu_custom ccl_kernel ccl_kernel_plf_a aicpu_custom_json)

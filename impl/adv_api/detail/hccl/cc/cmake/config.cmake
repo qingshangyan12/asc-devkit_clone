@@ -119,6 +119,28 @@ else()
     set(ASCEND_CANN_PACKAGE_PATH  "/usr/local/Ascend/ascend-toolkit/latest")
 endif()
 
+if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
+    set(HCCL_HOST_ARCH_PREFIX x86_64-linux)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64|arm64|arm")
+    set(HCCL_HOST_ARCH_PREFIX aarch64-linux)
+else()
+    message(FATAL_ERROR "Unsupported host architecture: ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+endif()
+
+set(HCCL_HOST_LIB_DIRS
+    ${ASCEND_CANN_PACKAGE_PATH}/lib64
+    ${ASCEND_CANN_PACKAGE_PATH}/${HCCL_HOST_ARCH_PREFIX}/lib64
+)
+
+set(HCCL_HOST_DEVLIB_DIRS
+    ${ASCEND_CANN_PACKAGE_PATH}/${HCCL_HOST_ARCH_PREFIX}/devlib
+    ${ASCEND_CANN_PACKAGE_PATH}/${HCCL_HOST_ARCH_PREFIX}/devlib/device
+)
+
+set(HCCL_DEVICE_LIB_DIRS
+    ${ASCEND_CANN_PACKAGE_PATH}/devlib/device
+)
+
 set(ASCEND_MOCKCPP_PACKAGE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 # if (NOT EXISTS "${ASCEND_CANN_PACKAGE_PATH}")
@@ -162,6 +184,21 @@ if(BUILD_OPEN_PROJECT AND KERNEL_MODE)
 else()
     set(PRODUCT_SIDE                  host)
 endif()
+
+if(PRODUCT_SIDE STREQUAL "device")
+    set(HCCL_PRODUCT_LIB_DIRS ${HCCL_DEVICE_LIB_DIRS})
+    set(HCCL_PRODUCT_DEVLIB_DIRS ${HCCL_DEVICE_LIB_DIRS})
+    set(HCCL_C_SEC_LINK -lc_sec)
+    set(HCCL_MMPA_LINK -lmmpa)
+    set(HCCL_UNIFIED_DLOG_LINK -lunified_dlog)
+else()
+    set(HCCL_PRODUCT_LIB_DIRS ${HCCL_HOST_LIB_DIRS})
+    set(HCCL_PRODUCT_DEVLIB_DIRS ${HCCL_HOST_DEVLIB_DIRS})
+    set(HCCL_C_SEC_LINK c_sec)
+    set(HCCL_MMPA_LINK mmpa)
+    set(HCCL_UNIFIED_DLOG_LINK unified_dlog)
+endif()
+
 set(INSTALL_LIBRARY_DIR hccl/lib64)
 set(INSTALL_INCLUDE_DIR hccl/include)
 set(INSTALL_AICPU_KERNEL_JSON_DIR hccl/built-in/data/op/aicpu)

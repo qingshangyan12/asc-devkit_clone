@@ -67,7 +67,7 @@ endif()
 
 # c_sec、mmpa、unified_dlog动态库搜索路径
 target_link_directories(ra_adp PRIVATE
-    ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/
+    ${HCCL_DEVICE_LIB_DIRS}
 )
 
 #编译选项
@@ -89,8 +89,8 @@ target_link_options(ra_adp PRIVATE
 target_link_libraries(ra_adp PRIVATE
     -Wl,--no-as-needed
     rs
-    c_sec
-    unified_dlog
+    ${HCCL_C_SEC_LINK}
+    ${HCCL_UNIFIED_DLOG_LINK}
     -Wl,--as-needed
     -lrt
     -ldl
