@@ -29,15 +29,3 @@ target_sources(ccl_kernel PRIVATE
         rtsq_base.cc
 )
 endif()
-
-if(TARGET mc2_server)
-add_mc2_server_ccl_object(mc2_server_legacy_stream_aicpu
-        ${CMAKE_CURRENT_SOURCE_DIR}/stream_lite.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/hccl_sqe_v82.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/hccl_sqe.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/sqe_mgr.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/sqe_build_a5.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/rtsq_a5.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/rtsq_base.cc
-)
-endif()
