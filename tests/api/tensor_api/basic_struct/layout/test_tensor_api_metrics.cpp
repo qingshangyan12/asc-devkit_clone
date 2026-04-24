@@ -9,6 +9,7 @@
 */
 
 #include <gtest/gtest.h>
+#include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
 class Tensor_Api_Layout_Metrics : public testing::Test {
@@ -42,5 +43,5 @@ TEST_F(Tensor_Api_Layout_Metrics, TestCrd2Idx)
     auto coord = MakeCoord(MakeCoord(1, 2), MakeCoord(3, 4));
 
     EXPECT_EQ(Crd2Idx(coord, shape, stride), layout(coord));
-    EXPECT_EQ(layout(coord), 117);
+    EXPECT_EQ(layout(coord), 119);
 }

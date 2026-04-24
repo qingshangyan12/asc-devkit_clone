@@ -9,7 +9,9 @@
 */
 
 #include <gtest/gtest.h>
+#include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
+
 
 class Tensor_Api_Layout_Struct : public testing::Test {
 protected:
@@ -90,11 +92,10 @@ TEST_F(Tensor_Api_Layout_Struct, TestMakeTuple)
 TEST_F(Tensor_Api_Layout_Struct, TestMakeIntTuple)
 {
     using namespace AscendC::Te;
-    using tensor_api_ut::Int;
 
-    auto shape = MakeShape(Int<4>{}, Int<5>{});
-    auto stride = MakeStride(Int<5>{}, Int<1>{});
-    auto coord = MakeCoord(Int<1>{}, Int<3>{});
+    auto shape = MakeShape(AscendC::Std::Int<4>{}, AscendC::Std::Int<5>{});
+    auto stride = MakeStride(AscendC::Std::Int<5>{}, AscendC::Std::Int<1>{});
+    auto coord = MakeCoord(AscendC::Std::Int<1>{}, AscendC::Std::Int<3>{});
 
     EXPECT_EQ(AscendC::Std::get<0>(shape).value, 4);
     EXPECT_EQ(AscendC::Std::get<1>(shape).value, 5);

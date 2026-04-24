@@ -10,59 +10,47 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/l0c_to_ub/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+    "impl/tensor_api/atom/cube/copy_l0c2ub.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
 /*!
- * \file copy.h
+ * \file copy_l0c2ub.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_L0C_TO_UB_COPY_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_L0C_TO_UB_COPY_H
+#ifndef IMPL_TENSOR_API_ATOM_CUBE_COPY_L0C2UB_H
+#define IMPL_TENSOR_API_ATOM_CUBE_COPY_L0C2UB_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "impl/tensor_api/arch/cube/l0c_to_ub/copy.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 
 namespace AscendC {
 namespace Te {
-struct CopyL0C2UBTrait{};
-constexpr CopyL0C2UBTrait DEFAULT_COPY_L0C2UB_TRAIT；
 
-struct CopyL0C2UBTraitDefault {
-    using TraitType = CopyL0C2UBTrait;
-    static constexpr const TraitType value = DEFAULT_COPY_L0C2UB_TRAIT;
+template <typename TraitStruct>
+struct CopyTraits<CopyL0C2UBWith, TraitStruct> {
+    using TraitType = typename TraitStruct::TraitType;
+    static constexpr const TraitType defaultTrait = TraitStruct::value;
+
+    template <const TraitType& trait = defaultTrait, typename... Args>
+    __aicore__ inline void CopyUnpack(const Args&... args) const
+    { CopyL0C2UBWith::Copy<TraitType, trait, Args...>(args..., params); }
+    FixpipeParams params;
 };
 
-struct CopyL0C2UBBase { };
-
-struct CopyL0C2UB : public CopyL0C2UBBase {
-public:
-    template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
-    {
-        if ASCEND_IS_AIV {
-            return;
-        }
-    }
+template <typename Traits>
+struct CopyTraits<CopyL0C2UB, Traits> : public CopyTraits<CopyL0C2UB, Traits, CopyL0C2UBWith, CopyL0C2UBTraitDefault> {
 };
 
-struct CopyL0C2UBWith : public CopyL0C2UBBase {
-public:
-    template <typename Tp, const Tp& trait, typename... Args>
-    __aicore__ inline static void Copy(const Args&... args)
-    {
-        if ASCEND_IS_AIV {
-            return;
-        }
-    }
-};
+template <>
+struct CopyTraits<CopyL0C2UB> : public CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault> {};
 
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_L0C_TO_UB_COPY_H
+#endif // IMPL_TENSOR_API_ATOM_VECTOR_COPY_L0C2UB_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

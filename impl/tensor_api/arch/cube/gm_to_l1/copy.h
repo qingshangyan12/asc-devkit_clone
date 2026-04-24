@@ -21,7 +21,7 @@
  */
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_COPY_H
 #define IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_COPY_H
-
+#include "impl/tensor_api/utils/utils_impl.h"
 
 namespace AscendC {
 namespace Te {
