@@ -57,7 +57,10 @@ using namespace AscendC::Te;
         para.unitFlag = 0;                                                                                         \
         para.cmatrixInitVal = false;                                                                              \
                                                                                                                    \
-        MmadOperation::Mmad<MmadTraitDefault::TraitType, MmadTraitDefault::value>(l0cTensor, l0aTensor, l0bTensor, biasTensor, para); \
+        auto mmadAtom = MakeMmad(MmadOperation{}, MmadTraitDefault{}).with(para);                                 \
+        Mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
+        Mmad<MmadTraitDefault::TraitType, MmadTraitDefault::value>(                                                 \
+            mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                                \
         EXPECT_EQ(c2Addr[0], static_cast<DST_TYPE>(0));                                                           \
     }
 
@@ -92,7 +95,10 @@ using namespace AscendC::Te;
         para.unitFlag = 0;                                                                                         \
         para.cmatrixInitVal = false;                                                                              \
                                                                                                                    \
-        MmadOperation::Mmad<MmadTraitDefault::TraitType, MmadTraitDefault::value>(l0cTensor, l0aTensor, l0bTensor, biasTensor, para); \
+        auto mmadAtom = MakeMmad(MmadOperation{}, MmadTraitDefault{}).with(para);                                 \
+        Mmad(mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                               \
+        Mmad<MmadTraitDefault::TraitType, MmadTraitDefault::value>(                                                 \
+            mmadAtom, l0cTensor, l0aTensor, l0bTensor, biasTensor);                                                \
         EXPECT_EQ(c2Addr[0], static_cast<DST_TYPE>(0));                                                           \
     }
 
