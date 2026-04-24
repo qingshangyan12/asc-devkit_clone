@@ -70,7 +70,6 @@ asc-devkit:
       - impl/c_api/instr_impl/npu_arch_2201/vector_compute_impl/asc_transto5hd_impl.h
       - impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_transto5hd_impl.h
       - impl/basic_api/dav_c310/kernel_operator_determine_compute_sync_impl.h
-
       - impl/tensor_api/arch/utils/is_format.h
       - impl/tensor_api/atom/cube/*.h
       - impl/tensor_api/atom/vector/*.h
@@ -78,8 +77,6 @@ asc-devkit:
       - impl/tensor_api/tensor/layout_size.h
       - impl/tensor_api/tensor/layout_static_fractal.h
       - impl/tensor_api/tensor/pointer_mem_impl.h
-
-
       - impl/basic_api/dav_c310/kernel_operator_proposal_impl.h
       - impl/basic_api/dav_c310/kfc/kfc_comm_server.h
       - impl/adv_api/detail/reduce/reduce_mean/reduce_mean_3510_impl.h
