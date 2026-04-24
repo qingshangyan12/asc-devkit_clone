@@ -12,32 +12,49 @@
 #include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
-class Tensor_Api_Mmad_3510 : public testing::Test {
+class Tensor_Api_Mmad : public testing::Test {
 protected:
-    static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
-
-    void SetUp() override 
+    void SetUp()
     {
         AscendC::SetGCoreType(1);
     }
-
-    void TearDown() override 
+    void TearDown()
     {
         AscendC::SetGCoreType(0);
     }
 };
 
-TEST_F(Tensor_Api_Mmad_3510, TestMakeMmadAtom)
-{
-    using namespace AscendC::Te;
+#define MMAD_INTERFACE_TEST(DST_TYPE, SRC_TYPE, M, N, K)                                                           \
+    TEST_F(Tensor_Api_Mmad, MmadInterface_##DST_TYPE##_##SRC_TYPE##_##M##_##N##_##K)                              \
+    {                                                                                                               \
+        using namespace AscendC::Te;                                                                                \
+        uint8_t a2Buf[256 * 256 * sizeof(SRC_TYPE)] = {0};                                                         \
+        uint8_t b2Buf[256 * 256 * sizeof(SRC_TYPE)] = {0};                                                         \
+        uint8_t c2Buf[256 * 256 * sizeof(DST_TYPE)] = {0};                                                         \
+                                                                                                                    \
+        auto a2Addr = reinterpret_cast<__ca__ SRC_TYPE*>(a2Buf);                                                   \
+        auto l0aTensor = MakeTensor(MakeMemPtr<Location::L0A>(a2Addr),                                             \
+                                    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(M, K));            \
+                                                                                                                    \
+        auto b2Addr = reinterpret_cast<__cb__ SRC_TYPE*>(b2Buf);                                                   \
+        auto l0bTensor = MakeTensor(MakeMemPtr<Location::L0B>(b2Addr),                                             \
+                                    MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<SRC_TYPE>>(K, N));            \
+                                                                                                                    \
+        auto c2Addr = reinterpret_cast<__cc__ DST_TYPE*>(c2Buf);                                                   \
+        auto l0cTensor = MakeTensor(MakeMemPtr<Location::L0C>(c2Addr),                                             \
+                                    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(M, N));                    \
+                                                                                                                    \
+        MmadParams para;                                                                                            \
+        para.m = M;                                                                                                 \
+        para.n = N;                                                                                                 \
+        para.k = K;                                                                                                 \
+        para.unitFlag = 0;                                                                                          \
+        para.cmatrixInitVal = true;                                                                                 \
+                                                                                                                    \
+        MmadOperation::Mmad<MmadTraitDefault::TraitType, MmadTraitDefault::value>(l0cTensor, l0aTensor, l0bTensor, para); \
+        EXPECT_EQ(c2Addr[0], static_cast<DST_TYPE>(0));                                                            \
+    }
 
-    auto atom = MakeMmad(MmadOperation{});
-    auto withAtom = atom.with(MmadParams{1, 2, 3, 4, false});
-
-    EXPECT_EQ(withAtom.params.m, 1);
-    EXPECT_EQ(withAtom.params.n, 2);
-    EXPECT_EQ(withAtom.params.k, 3);
-    EXPECT_EQ(withAtom.params.unitFlag, 4);
-    EXPECT_EQ(withAtom.params.cmatrixInitVal, false);
-}
+MMAD_INTERFACE_TEST(float, half, 16, 16, 16);
+MMAD_INTERFACE_TEST(float, float, 16, 16, 16);
+MMAD_INTERFACE_TEST(float, bfloat16_t, 16, 16, 16);
