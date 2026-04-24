@@ -71,7 +71,7 @@
 **Scalar单元**
 
 -   Scalar单元支持U16/S16/U32/S32/U64/S64/FP64数据类型。
--   在Reagbase架构中，Aux Scalar计算单元单独处理SIMD\_VF函数内的Scalar计算，Scalar计算单元处理SIMD\_VF函数外的Scalar计算。
+-   在Regbase架构中，Aux Scalar计算单元单独处理SIMD\_VF函数内的Scalar计算，Scalar计算单元处理SIMD\_VF函数外的Scalar计算。
 
 ## 存储单元<a name="section6500173264510"></a>
 
