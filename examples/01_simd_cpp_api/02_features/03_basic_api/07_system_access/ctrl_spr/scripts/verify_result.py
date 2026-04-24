@@ -51,19 +51,13 @@ def verify_sat(real_result, golden):
 
 
 if __name__ == '__main__':
-    print("验证 output_ctrl.bin...")
     ctrl_pass = verify_ctrl("./output/output_ctrl.bin", "./output/golden_ctrl.bin")
-    if ctrl_pass:
-        print("output_ctrl.bin 验证通过")
-    else:
-        print("[ERROR] output_ctrl.bin 验证失败")
+    if not ctrl_pass:
+        print("[ERROR] output_ctrl.bin failed")
     
-    print("验证 output_sat.bin...")
     sat_pass = verify_sat("./output/output_sat.bin", "./output/golden_sat.bin")
-    if sat_pass:
-        print("output_sat.bin 验证通过")
-    else:
-        print("[ERROR] output_sat.bin 验证失败")
+    if not sat_pass:
+        print("[ERROR] output_sat.bin failed")
     
     if ctrl_pass and sat_pass:
         print("test pass")
