@@ -42,13 +42,13 @@ void VecWholeReduceSum(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8_t* __res
     uint64_t mask[2] = {0xffffffff, 0xffffffff};
     uint64_t counterMask[2] = {144, 0};
     uint8_t repeatTimes = dataSize / (256 / sizeof(T));
-    WholeReduceSum<T>(outputLocal, input0Local, mask, repeatTimes, 1, 1, 8);
+    ReduceRepeat<ReduceType::SUM, T>(outputLocal, input0Local, mask, repeatTimes, 1, 1, 8);
 
     AscendC::SetMaskCount();
     AscendC::SetVectorMask<T, MaskMode::COUNTER>(0, 144);
-    WholeReduceSum<T, false>(outputLocal, input0Local, AscendC::MASK_PLACEHOLDER_LIST, repeatTimes, 1, 1, 8);
+    ReduceRepeat<ReduceType::SUM, T, false>(outputLocal, input0Local, repeatTimes, 1, 1, 8);
     AscendC::ResetMask();
-    WholeReduceSum<T>(outputLocal, input0Local, counterMask, repeatTimes, 1, 1, 8);
+    ReduceRepeat<ReduceType::SUM, T>(outputLocal, input0Local, counterMask, repeatTimes, 1, 1, 8);
     AscendC::SetMaskNorm();
 
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
