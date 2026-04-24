@@ -381,7 +381,11 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
 template<const auto &config>
 __aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetRankId() {
     if (curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION) {
+#if __NPU_ARCH__ == 3510
+        return hcclContext_->rankId;
+#else
         return (reinterpret_cast<__gm__ CommKfcContext *>(hcclContext_))->apiCtx.rankId;
+#endif
     }
     return hcclContext_->rankId;
 }
