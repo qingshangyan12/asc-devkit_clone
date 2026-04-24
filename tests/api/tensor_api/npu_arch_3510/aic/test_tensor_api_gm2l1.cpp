@@ -59,7 +59,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 
 } // namespace
 
-TEST_F(Tensor_Api_Copy_3510, CopyGM2L1RoutesToCubeArchCopy)
+TEST_F(Tensor_Api_Cube_Copy_3510, CopyGM2L1RoutesToCubeArchCopy)
 {
     using namespace AscendC::Te;
 
