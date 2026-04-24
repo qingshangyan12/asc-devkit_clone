@@ -52,7 +52,7 @@ endif()
 
 # c_sec、mmpa、unified_dlog动态库搜索路径
 target_link_directories(hccp_service.bin PRIVATE
-    ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/
+    ${HCCL_DEVICE_LIB_DIRS}
 )
 
 target_compile_options(hccp_service.bin PRIVATE
@@ -75,11 +75,11 @@ target_compile_definitions(hccp_service.bin PRIVATE
 )
 
 target_link_libraries(hccp_service.bin PRIVATE
-    c_sec
-    unified_dlog
+    ${HCCL_C_SEC_LINK}
+    ${HCCL_UNIFIED_DLOG_LINK}
     ra_adp
     rs
-    mmpa
+    ${HCCL_MMPA_LINK}
     tsd_eventclient
     -ldl
 )

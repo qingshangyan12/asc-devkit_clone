@@ -120,7 +120,7 @@ if(BUILD_OPEN_PROJECT)
     )
 
     target_link_directories(hccl_plf PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/lib64
+        ${HCCL_PRODUCT_LIB_DIRS}
     )
 else()
     target_include_directories(hccl_plf PRIVATE
@@ -184,9 +184,9 @@ if(BUILD_OPEN_PROJECT)
     target_link_libraries(hccl_plf
     PRIVATE
         -Wl,--no-as-needed
-        c_sec
-        unified_dlog
-        mmpa
+        ${HCCL_C_SEC_LINK}
+        ${HCCL_UNIFIED_DLOG_LINK}
+        ${HCCL_MMPA_LINK}
         runtime
         acl_rt
         error_manager
@@ -204,9 +204,9 @@ else()
         $<BUILD_INTERFACE:intf_pub_cxx14>
         $<BUILD_INTERFACE:hccl_headers>
         -Wl,--no-as-needed
-        c_sec
-        unified_dlog
-        mmpa
+        ${HCCL_C_SEC_LINK}
+        ${HCCL_UNIFIED_DLOG_LINK}
+        ${HCCL_MMPA_LINK}
         runtime
         ascendcl
         error_manager
