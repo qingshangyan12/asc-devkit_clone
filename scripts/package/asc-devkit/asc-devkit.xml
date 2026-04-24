@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<config name="asc-devkit" copy_type="delivery" src_path="lib/host" dst_path="asc-devki" install_path="asc-devkit"
+<config name="asc-devkit" copy_type="delivery" src_path="lib/host" dst_path="asc-devkit" install_path="asc-devkit"
         install_own="$username:$usergroup" install_mod="750" install_type="all">
     <package_info>
         <product_name>cann</product_name>
         <func_name>asc-devkit</func_name>
         <suffix>run</suffix>
-        <install_script>asc-devkit/script/install.sh</install_script>
-        <help>asc-devkit/script/help.info</help>
+        <install_script>share/info/asc-devkit/script/install.sh</install_script>
+        <help>share/info/asc-devkit/script/help.info</help>
         <version>asc-devkit/version.xml</version>
         <check_features>true</check_features>
         <copy_all>true</copy_all>
@@ -82,7 +82,7 @@
         <file value="version.info" install_mod="550" entity="true" install_softlink="compiler/version.info"/>
         <file value="scene.info" install_mod="550" entity="true"/>
     </file_info>
-    <file_info copy_type="delivery" src_path="asc-devkit/script" dst_path="share/info/asc-devkit" install_path="share/info/asc-devkit" install_type="all">
+    <file_info copy_type="delivery" src_path="asc-devkit/script" dst_path="share/info/asc-devkit/script" install_path="share/info/asc-devkit/script" install_type="all">
         <file value="filelist.csv" install_mod="550" entity="true"/>
     </file_info>
     <file_info copy_type="delivery" src_path="asc-devkit" dst_path="$(TARGET_ENV)/include/version" install_path="$(TARGET_ENV)/include/version" install_type="all">

@@ -104,6 +104,7 @@ class ParseEnv(NamedTuple):
     parse_option: ParseOption
     delivery_dir: str
     top_dir: str
+    package_attr: Dict
 
 
 
