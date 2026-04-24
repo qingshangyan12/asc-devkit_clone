@@ -1,10 +1,12 @@
 # Matrix Compute API样例介绍
 ## 概述
-本样例集介绍了Matmul API不同特性的典型用法，给出了对应的端到端实现。
+本样例集介绍了矩阵计算API不同特性的典型用法，给出了对应的端到端实现。
 
 ## 样例列表
 | 目录名称                                                                                       |  功能描述                                              |
 |--------------------------------------------------------------------------------------------| ---------------------------------------------------- |
+| [fixpipe_co12gm](./fixpipe_co12gm)               | 本样例介绍如何使用Fixpipe将矩阵乘的结果从CO1（L0C Buffer）搬出到GM（Global Memory） |
+| [fixpipe_co12ub](./fixpipe_co12ub)               | 本样例介绍如何使用Fixpipe将矩阵乘的结果从CO1（L0C Buffer）搬出到UB（Unified Buffer） |
 | [fixpipe_co12c1_quantization_s322f16](./fixpipe_co12c1_quantization_s322f16)               | 本样例介绍如何使用基础API Fixpipe将矩阵乘的结果从CO1搬入C1，并使能随路量化将矩阵乘结果由int32_t类型数据量化为half类型 |
 | [fixpipe_co12c1_quantization_s322s8](./fixpipe_co12c1_quantization_s322s8)               | 本样例介绍如何使用组合API Fixpipe或基础API DataCopy将矩阵乘的结果从L0C搬出到L1，并支持随路quant, relu能力组合，与unitflag能力组合，将矩阵乘结果由int32_t类型数据量化为int8_t类型 |
 | [fixpipe_co12c1_quantization_f322s8](./fixpipe_co12c1_quantization_f322s8)                 | 本样例介绍如何使用组合API Fixpipe或基础API DataCopy将矩阵乘的结果从L0C搬出到L1，并支持随路quant, relu能力组合，与unitflag能力组合，输入half类型数据，输出由float类型量化为int8_t类型, int8_t输出默认开启channel merge能力。 |
@@ -27,4 +29,5 @@
 | [mmad_s8_f16_f32_with_A_B_transpose_option](./mmad_s8_f16_f32_with_A_B_transpose_option)                                                           | 本样例介绍了在 int8_t / half / float 三种数据类型下，以及左、右矩阵均不转置 / 左矩阵不转置、右矩阵转置 / 左矩阵转置、右矩阵不转置 / 左、右矩阵均转置 共 12 种矩阵乘法场景中，相关指令的使用方法，其中 A 和 B 分别表示矩阵乘法的左右输入矩阵。|
 | [mmad_unitflag](./mmad_unitflag)                                                                             | 本样例介绍是否使能unitFlag对于Mmad指令执行矩阵乘法性能的影响。 |
 | [mmad_with_bias](./mmad_with_bias)                                                         | 本样例介绍基于基础API Mmad实现带Bias的矩阵乘 |
+| [mmad_with_gemv](./mmad_with_gemv)                                                         | 本样例介绍了Gemv（M=1）模式下的矩阵乘法 |
 | [mmad_with_sparse](./mmad_with_sparse)                                                     | 本样例介绍基础API MmadWithSparse调用 |
