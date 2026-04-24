@@ -27,8 +27,8 @@
 namespace AscendC {
 namespace Te {
 
-
-constexpr CopyL12UBTrait DEFAULT_COPY_L1_TO_UB_TRAIT = CopyL12UBTrait {};
+struct CopyL12UBTrait {};
+constexpr CopyL12UBTrait DEFAULT_COPY_L1_TO_UB_TRAIT;
 
 struct CopyL12UBTraitDefault {
     using TraitType = CopyL12UBTrait;

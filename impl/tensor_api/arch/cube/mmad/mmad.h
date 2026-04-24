@@ -24,7 +24,7 @@
 
 namespace AscendC {
 namespace Te {
-
+struct MmadTrait{};
 constexpr MmadTrait DEFAULT_MMAD_TRAIT;
 
 constexpr MmadParams defaultMmadParams = {0, 0, 0, 0, true};
