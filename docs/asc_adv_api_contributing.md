@@ -17,6 +17,57 @@ Ascend C高阶API的开发流程主要包括如下步骤：
 - 测试
   - UT测试
   - 单算子测试
+
+## 芯片平台支持
+
+高阶API通过预编译宏 `__NPU_ARCH__` 来区分和支持不同的芯片平台架构。不同架构版本的高阶API实现可能存在差异，主要体现在硬件特性、存储层次、计算单元等方面。
+
+### 架构版本说明
+
+当前高阶API主要支持以下NPU架构版本：
+
+- **220x架构**：对应 Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  - Vector计算单元直接从Unified Buffer获取数据进行计算
+
+- **351x架构**：对应 Ascend 950PR/Ascend 950DT
+  - 新增SIMD Register File存储层次，在SIMD程序中，数据从Unified Buffer搬运到Register进行计算
+  - 支持SIMT相关硬件单元（SIMT DCache、Warp Scheduler、SIMT Register File）
+
+### 架构区分实现方式
+
+在代码中通过条件编译来区分不同架构的实现：
+
+```cpp
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "../../../impl/adv_api/detail/math/axpy/axpy_3510_impl.h"
+#else
+#include "../../../impl/adv_api/detail/math/axpy/axpy_common_impl.h"
+#endif
+```
+
+在 `include/adv_api/kernel_api.h` 中，使用 `__NPU_ARCH__` 宏来控制不同架构下包含的头文件：
+
+```cpp
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "math/axpy.h"
+// ... 其他351x架构支持的API
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+#include "math/axpy.h"
+// ... 其他220x架构支持的API
+#endif
+```
+
+### 架构特定实现文件
+
+对于需要针对不同架构提供不同实现的API，可以在 `impl/adv_api/detail/` 目录下创建架构特定的实现文件：
+
+- `axpy_common_impl.h`：220x架构的通用实现
+- `axpy_3510_impl.h`：351x架构的实现
+
+这些实现文件在对外接口头文件中通过条件编译选择包含。
+
 ---
 ## 自定义开发全新API
 下面以高阶API `Axpy`为例，介绍如何从零开始，开发一个高阶API。本案例删除了部分非必要代码，您可以在代码仓的[axpy.h](../include/adv_api/math/axpy.h)、[axpy_tiling.h](../include/adv_api/math/axpy_tiling.h)、[axpy_tiling_intf.h](../include/adv_api/math/axpy_tiling_intf.h)、[axpy_common_impl.h](../impl/adv_api/detail/math/axpy/axpy_common_impl.h)、[axpy_tiling_impl.cpp](../impl/adv_api/tiling/math/axpy_tiling_impl.cpp)文件中查看全部代码。
@@ -441,3 +492,257 @@ TEST_F(TestTiling, TestAxpyTiling)
 
 ## 合入代码
 当开发者完成高阶API的编码和测试后，请参考[贡献指南](../CONTRIBUTING.md)将代码合入本仓库。
+
+---
+
+## 开发规范要求
+
+在开发高阶API时，需要遵循以下规范要求，以确保代码质量和一致性：
+
+### 内部头文件编译告警
+
+所有位于 `impl/` 目录下的内部实现头文件，必须添加编译告警，提示用户不要直接包含这些内部头文件。这是为了防止用户误用内部API，因为这些内部头文件中的函数和变量可能在未来的版本中被移除或修改。
+
+在实现头文件的开头添加以下代码：
+
+```cpp
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message( \
+    "impl/adv_api/detail/math/axpy/axpy_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/axpy.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_AXPY_AXPY_COMMON_IMPL_H__
+#endif
+```
+
+在文件末尾添加相应的清理代码：
+
+```cpp
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_AXPY_AXPY_COMMON_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_AXPY_AXPY_COMMON_IMPL_H__
+#endif
+```
+
+**注意**：
+- `__ASCENDC_INCLUDE_INTERNAL_HEADERS__` 是一个全局标志，用于检测是否正在包含内部头文件
+- `__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_*__` 是一个文件特定的标志，用于在文件结束时清理全局标志
+- 在 `#pragma message` 中，应该提供正确的公共头文件路径，引导用户使用正确的公共接口
+
+### 头文件保护宏
+
+所有头文件必须使用头文件保护宏（Include Guard）来防止重复包含。头文件保护宏的命名应该遵循以下规范：
+
+- 使用全大写字母
+- 使用下划线分隔单词
+- 以项目或模块名称开头
+- 以 `_H` 或 `_H_` 结尾
+
+示例：
+
+```cpp
+#ifndef LIB_MATH_AXPY_H
+#define LIB_MATH_AXPY_H
+
+// 头文件内容
+
+#endif // LIB_MATH_AXPY_H
+```
+
+### 文件命名规范
+
+- 公共接口头文件：使用小写字母和下划线，如 `axpy.h`、`axpy_tiling.h`
+- 内部实现头文件：使用小写字母和下划线，包含架构信息，如 `axpy_common_impl.h`、`axpy_3510_impl.h`
+- Tiling实现文件：使用小写字母和下划线，以 `_impl.cpp` 结尾，如 `axpy_tiling_impl.cpp`
+
+### 命名空间
+
+所有高阶API的实现都应该放在 `AscendC` 命名空间中：
+
+```cpp
+namespace AscendC {
+    template <typename T, typename U, bool isReuseSource = false>
+    __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor,
+        const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+    {
+        // 实现代码
+    }
+} // namespace AscendC
+```
+
+### 函数修饰符
+
+根据不同的架构和函数类型，使用正确的函数修饰符：
+
+- **220x架构**：使用 `__aicore__` 修饰符
+- **351x架构**：使用 `__simd_vf__` 或 `__simd_callee__` 修饰符
+
+示例：
+
+```cpp
+// 220x架构
+template <typename T, typename U, bool isReuseSource>
+__aicore__ inline void AxpyImpl(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor,
+    const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+{
+    // 实现代码
+}
+
+// 351x架构
+__simd_vf__ inline void AxpyImpl(const LocalTensor<T>& dstLocal, const LocalTensor<U>& srcLocal,
+    const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+{
+    // 实现代码
+}
+```
+
+### 版权声明
+
+所有源文件和头文件都应该包含版权声明。使用以下标准格式：
+
+```cpp
+/**
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+```
+
+### 注释规范
+
+- **文件注释**：在文件开头添加简短的文件描述
+- **函数注释**：使用 Doxygen 风格的注释，包含参数说明和返回值说明
+- **代码注释**：对于复杂的算法逻辑，添加必要的注释说明
+
+示例：
+
+```cpp
+/*!
+ * \file axpy.h
+ * \brief Compute axpy   dst = src * scalar + dst
+ */
+
+/*!
+ * \ingroup Axpy
+ * \brief compute axpy   dst = src * scalar + dst
+ * \tparam isReuseSource: Whether to reuse the buffer of srcTensor.
+ *         If the value is true, srcTensor can be used as tmpBuffer and the data in it will be overwritten.
+ *         If the value is false, srcTensor will not be used as tmpBuffer for calculation.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] srcTensor: input LocalTensor
+ * \param [in] scalarValue: input scalarValue
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
+ *             whose required space size should refer to corresponding tiling API, which is defined at axpy_tiling.h.
+ * \param [in] calCount: input total calCount
+ */
+template <typename T, typename U, bool isReuseSource = false>
+__aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor,
+    const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+{
+    // 实现代码
+}
+```
+
+### 代码格式化
+
+遵循项目的代码格式化规范，确保代码风格一致：
+
+- 使用一致的缩进（建议4个空格）
+- 在适当的位置添加空行，提高代码可读性
+- 使用有意义的变量名和函数名
+- 避免过长的代码行，建议每行不超过120个字符
+
+### 编译检查
+
+在提交代码前，确保：
+
+1. 代码能够正常编译，没有编译错误和警告
+2. UT测试全部通过
+3. 单算子测试验证功能正确性
+4. 遵循项目的代码规范和最佳实践
+
+---
+
+## 351x架构高阶API开发
+
+### 概述
+
+在351x架构中，高阶API的开发与220x架构有所不同，因为351x架构的Vector Core中Unified Buffer和Vector计算单元之间新增了一个Register存储层次。在351x架构中，需要将数据从Unified Buffer搬运到寄存器中，再由Vector计算单元进行计算。同样，Vector计算单元的输出结果会先存储到寄存器中，之后开发者需要将寄存器中的数据搬回Unified Buffer。
+
+### 设计API
+
+与220x架构的高阶API设计过程相同，根据API的算法公式，分析Kernel侧需要定义的函数原型及使用的API等。由于Reg矢量计算API Reg::Axpy支持对应的算法功能，因此在API实现中可以直接调用该API Axpy。在Tiling侧的设计和开发中，开发者可以参考220x架构中的思路。此外，对于220x架构中已实现的API，351x架构可以复用220x架构的Tiling函数。在当前的样例中，351x架构下的Axpy高阶API接口不需要临时空间，因此无需开发Tiling函数。
+
+### 开发API
+
+351x架构上高阶API的内部实现与220x架构上的实现存在差异。在351x架构上开发时，开发者需遵循[Regbase编程模型](./guide/编程指南/编程模型/AI-Core-SIMD编程/SIMD编程/Reg矢量计算编程.md)，API的实现函数AxpyImpl使用`__simd_vf__`关键词修饰，函数内部通过调用SIMD_VF函数，宏函数AxpyCompute内部调用Reg矢量计算API实现具体功能。
+
+SIMD_VF函数的参数包括计算所需的源操作数、目的操作数及切分参数。其中，计算的迭代次数、单次计算数据量等切分参数，在220x架构下由AxpySub函数计算；而在351x架构中，这些参数需要在SIMD_VF函数外部进行计算，因为SIMD_VF中的Scalar计算会影响指令流水。因此，建议开发者在编程时先在外部完成Scalar计算，再将结果作为参数传入SIMD_VF函数，以避免Scalar指令的发射和计算导致的瓶颈。
+
+通过GetVecLen函数获取Vector单元一次迭代计算的最大数据量，为256字节，根据待计算的数据量（calCount，单位元素个数），计算单次迭代处理的数据个数和迭代次数。将这些参数连同操作数dst、src和scalarValue一起传入SIMD_VF函数。
+
+```cpp
+__simd_vf__ inline void AxpyImpl(const LocalTensor<T>& dstLocal, const LocalTensor<U>& srcLocal,
+const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+{
+    __ubuf__ T* dst = (__local_mem__ T *)dstLocal.GetPhyAddr();
+    __ubuf__ U* src = (__local_mem__ U *)srcLocal.GetPhyAddr();
+    // 单次迭代计算数据个数
+    constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
+    // 迭代次数
+    uint16_t repeatTimes = CeilDivision(calCount, oneRepSize);
+    AxpyCompute<T, U>(dst, src, scalarValue, calCount, repeatTimes, oneRepSize);
+}
+```
+
+Axpy的源操作数和目的操作数存在float和float、half和float、half和half三种组合。对于half和float场景，由于Reg::Axpy不支持源操作数和目的操作数的数据类型不一致，因此需要在计算前分配一块临时寄存器空间，调用Reg::Cast对源操作数进行类型转换，使其与目的操作数的数据类型一致。以下是宏函数代码，具体步骤为：
+
+1. 申请寄存器（包括RegTensor和MaskReg）。
+2. 根据数据类型组合编写不同的代码分支。
+3. 将计算得到的迭代次数作为循环次数。
+4. 在每次循环中，调用Reg::UpdateMask来更新mask寄存器。
+5. 调用Reg::LoadAlign将UB中的数据搬入寄存器。
+6. 调用计算指令Reg::Axpy。
+7. 调用Reg::StoreAlign将结果数据从寄存器搬回UB。
+
+```cpp
+constexpr Reg::CastTrait castTraitF162F32 = {
+    Reg::RegLayout::ZERO, Reg::SatMode::UNKNOWN, Reg::MaskMergeMode::ZEROING, RoundMode::UNKNOWN};
+template<typename T, typename U>
+__simd_callee__ inline void AxpyCompute(__local_mem__ T* dst, __local_mem__ U* src, U scalarValue, uint32_t calCount, uint16_t repeatTimes, uint16_t oneRepSize)
+{
+    Reg::MaskReg mask;
+    Reg::RegTensor<T> dstVreg;
+    Reg::RegTensor<U> srcVreg;
+    if constexpr (IsSameType<U, half>::value && IsSameType<T, half>::value) {
+        for (uint16_t i = 0; i < repeatTimes; ++i) {
+            mask = Reg::UpdateMask<T>(calCount);
+            Reg::LoadAlign(srcVreg, src + i * oneRepSize);
+            Reg::LoadAlign(dstVreg, dst + i * oneRepSize);
+            Reg::Axpy(dstVreg, srcVreg, scalarValue, mask);
+            Reg::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
+        }
+    } else if constexpr (IsSameType<U, half>::value && IsSameType<T, float>::value) {
+        Reg::RegTensor<float> tempSrcVreg;
+        for (uint16_t i = 0; i < repeatTimes; ++i) {
+            mask = Reg::UpdateMask<T>(calCount);
+            Reg::LoadAlign<U, Reg::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * oneRepSize);
+            Reg::Cast<float, U, castTraitF162F32>(tempSrcVreg, srcVreg, mask);
+            Reg::LoadAlign(dstVreg, dst + i * oneRepSize);
+            Reg::Axpy(dstVreg, tempSrcVreg, scalarValue, mask);
+            Reg::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
+        }
+    } else if constexpr (IsSameType<U, float>::value && IsSameType<T, float>::value) {
+        for (uint16_t i = 0; i < repeatTimes; ++i) {
+            mask = Reg::UpdateMask<T>(calCount);
+            Reg::LoadAlign(srcVreg, src + i * oneRepSize);
+            Reg::LoadAlign(dstVreg, dst + i * oneRepSize);
+            Reg::Axpy(dstVreg, srcVreg, scalarValue, mask);
+            Reg::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
+        }
+    }
+}
+```
