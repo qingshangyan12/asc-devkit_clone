@@ -2,16 +2,18 @@
 
 ## 概述
 
-本样例基于 `SetCtrlSpr`、`GetCtrlSpr`、`ResetCtrlSpr` 接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能，并通过原子累加操作验证功能是否正确。
+本样例基于 `SetCtrlSpr`、`GetCtrlSpr`、`ResetCtrlSpr` 接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置功能，并通过浮点数计算验证饱和模式是否正确。
 
-本样例演示了设置、读取和重置CTRL[8:6]和CTRL[10:9]比特位，：
-- CTRL[8:6]用于控制数据从L0C Buffer/Unified Buffer/L1 Buffer搬运至Global Memory时原子操作的使能及数据类型选择。设置为1时，使能原子操作，数据类型为float。
-- CTRL[10:9]用于控制原子操作的类型，设置为0时选择ADD操作。
-- 使用完寄存器后，用ResetCtrlSpr接口将寄存器设置回默认值，防止其他的数据搬运造成影响。
+本样例演示了设置、读取和重置CTRL[48]、CTRL[60]比特位：
+- CTRL[60]用于控制饱和模式的全局生效方式。设置为1时，使能全局设置饱和。
+- CTRL[48]用于控制浮点数计算和浮点数精度转换时的饱和模式，仅在CTRL[60]使能时生效。
+  - 设置为0时（饱和模式）：INF输出会被饱和为±MAX（half类型为65504），NaN输出会被饱和为0。
+  - 设置为1时（非饱和模式）：INF/NaN保持原输出。
+- 使用完寄存器后，用ResetCtrlSpr接口将寄存器设置回默认值，防止后续计算受影响。
 
-样例使用2个核进行验证，每个核搬运256个float元素到同一目标地址，通过原子累加操作验证CTRL寄存器设置后的功能效果。
+样例使用单核验证：设置CTRL[60]=1使能全局饱和模式，设置CTRL[48]=1选择非饱和模式。通过half类型浮点数计算（Adds），输入包含INF值的数据，验证非饱和模式下INF保持原值。同时通过GetCtrlSpr读取CTRL[48]设置后和reset后的值进行验证。
 
-> **注意：** 在实际使用过程中，CTRL[8:6]和CTRL[10:9]的组合设置已经封装了原子操作API `SetAtomicType`、`DisableDmaAtomic`、`SetAtomicAdd`、`SetAtomicMax`、`SetAtomicMin`，建议直接通过这些API进行配置。
+> **注意：** CTRL[48]仅支持half数据类型的浮点数计算，以及hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t数据类型的精度转换。
 
 ## 支持的产品
 
@@ -32,26 +34,32 @@
 ## 样例描述
 
 - 样例功能：  
-  验证CTRL寄存器操作的完整流程及其功能效果：
-  1. CopyIn阶段：从GM搬运数据到UB
-  2. Compute阶段：SetCtrlSpr（设置CTRL[8:6]=1使能float原子操作，CTRL[10:9]=0选择ADD操作）→ GetCtrlSpr（读取验证）
-  3. CopyOut阶段：DataCopy（从UB搬运到GM进行原子累加）→ ResetCtrlSpr（重置寄存器）→ GetCtrlSpr（读取验证）
+  验证CTRL寄存器饱和模式操作的完整流程及其功能效果：
+  1. SetCtrlSpr：设置CTRL[60]=1使能全局生效，设置CTRL[48]=1选择非饱和模式（INF/NAN保持原输出）
+  2. GetCtrlSpr：读取CTRL[48]设置后的值，存入ctrlLocal前4位
+  3. Adds：执行half类型浮点数加法计算，输入包含INF值，存入dstLocal，用于验证非饱和模式下INF保持原值
+  4. ResetCtrlSpr：重置CTRL[48]、CTRL[60]为默认值
+  5. GetCtrlSpr：读取CTRL[48]重置后的值，存入ctrlLocal后4位
 
 - 样例规格：
   <table>
   <caption>表1：样例规格说明</caption>
-  <tr><td rowspan="1" align="center">核数</td><td colspan="4" align="center">2</td></tr>
-  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">src</td><td align="center">[2, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">dst_init（dst的初始值）</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="2" align="center">样例输出</td><td align="center">output_ctrl</td><td align="center">[2, 8]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
-  <tr><td align="center">output_atomic_add</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核数</td><td colspan="4" align="center">1</td></tr>
+  <tr><td rowspan="1" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">src</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">output_ctrl</td><td align="center">[1, 8]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">output_sat</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">kernel_ctrl_spr</td></tr>  
   </table>
 
 - 输出说明：
-  - output_ctrl.bin：寄存器值验证输出，每个核输出8个int64_t值（前4个为CTRL[8:6]设置后的值=1，后4个为CTRL[8:6]重置后的值=0）
-  - output_atomic_add.bin：原子累加功能验证输出，2个核的数据累加到同一目标地址
+  - output_ctrl.bin：寄存器值验证输出，8个int64_t值（前4个为CTRL[48]设置后的值=1，后4个为CTRL[48]重置后的值=0）
+  - output_sat.bin：饱和模式功能验证输出，前128个为正常值+1，后128个为INF（非饱和模式下INF保持）
+
+- 验证逻辑：
+  - 输入数据：前128个为正常值（0~127），后128个为INF
+  - 设置CTRL[48]=1（非饱和模式）：INF + 1 = INF（保持INF）
+  - CTRL[48]设置后的值=1，reset后的值=0
 
 
 ## 编译运行
@@ -88,11 +96,12 @@
   python3 ../scripts/verify_result.py                                  # 验证输出结果是否正确
   ```
 
-  使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可，不支持 CPU模式。
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
   
   示例如：
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;  # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -101,8 +110,10 @@
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
+  > **注意：** 本样例仅在 Ascend 950PR/Ascend 950DT 上支持。
 
 - 执行结果
 

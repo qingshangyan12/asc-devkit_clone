@@ -8,4 +8,4 @@
 
 | 目录名称 | 功能描述 |
 | ------- | -------- |
-| [ctrl_spr](./ctrl_spr)             | 本样例基于SetCtrlSpr、GetCtrlSpr、ResetCtrlSpr接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置，并验证原子累加功能。 |
+| [ctrl_spr](./ctrl_spr)             | 本样例基于SetCtrlSpr、GetCtrlSpr、ResetCtrlSpr接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置，并通过浮点数计算验证饱和模式是否正确。 |

@@ -16,7 +16,6 @@ import os
 import numpy as np
 
 
-NUM_BLOCKS = 2
 DATA_SIZE = 256
 CTRL_SIZE = 8
 
@@ -24,32 +23,32 @@ CTRL_SIZE = 8
 def gen_golden_data():
     """
     生成Golden数据：
-    1. input.bin：输入数据（2个核，每个核256个float）
-    2. dst_init.bin：dst初始值（用于初始化dstAtomicAddGm）
-    3. golden_ctrl.bin：寄存器值验证
-    4. golden_atomic_add.bin：原子累加功能验证
+    1. input.bin：输入数据（256个half），前128正常值，后128 INF
+    2. golden_ctrl.bin：寄存器值验证（8个int64），前4个=1（设置后），后4个=0（reset后）
+    3. golden_sat.bin：饱和模式功能验证（256个half），前128正常值+1，后128 INF
+    
+    CTRL[48]功能说明：
+    - CTRL[48]=0（饱和模式）：INF输出饱和为±MAX，NaN输出饱和为0
+    - CTRL[48]=1（非饱和模式）：INF/NaN保持原输出
+    - 需配合CTRL[60]=1使能全局饱和模式
     """
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     
-    src_data = np.arange(NUM_BLOCKS * DATA_SIZE, dtype=np.float32)
+    src_data = np.zeros(DATA_SIZE, dtype=np.float16)
+    src_data[:DATA_SIZE//2] = np.arange(DATA_SIZE//2, dtype=np.float16)
+    src_data[DATA_SIZE//2:] = np.inf
     src_data.tofile("./input/input.bin")
     
-    dst_init = np.zeros(DATA_SIZE, dtype=np.float32)
-    dst_init.tofile("./input/dst_init.bin")
-    
-    golden_ctrl = np.zeros(NUM_BLOCKS * CTRL_SIZE, dtype=np.int64)
-    for block_idx in range(NUM_BLOCKS):
-        offset = block_idx * CTRL_SIZE
-        golden_ctrl[offset:offset+CTRL_SIZE//2] = 1
-        golden_ctrl[offset+CTRL_SIZE//2:offset+CTRL_SIZE] = 0
+    golden_ctrl = np.zeros(CTRL_SIZE, dtype=np.int64)
+    golden_ctrl[:CTRL_SIZE//2] = 1
+    golden_ctrl[CTRL_SIZE//2:] = 0
     golden_ctrl.tofile("./output/golden_ctrl.bin")
     
-    golden_atomic_add = np.zeros(DATA_SIZE, dtype=np.float32)
-    for block_idx in range(NUM_BLOCKS):
-        block_offset = block_idx * DATA_SIZE
-        golden_atomic_add += src_data[block_offset:block_offset+DATA_SIZE]
-    golden_atomic_add.tofile("./output/golden_atomic_add.bin")
+    golden_sat = np.zeros(DATA_SIZE, dtype=np.float16)
+    golden_sat[:DATA_SIZE//2] = np.arange(DATA_SIZE//2, dtype=np.float16) + 1
+    golden_sat[DATA_SIZE//2:] = np.inf
+    golden_sat.tofile("./output/golden_sat.bin")
 
 
 if __name__ == "__main__":
