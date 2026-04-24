@@ -94,7 +94,7 @@ endif()
 
 # c_sec、mmpa、unified_dlog动态库搜索路径
 target_link_directories(rs PRIVATE
-    ${HCCL_DEVICE_LIB_DIRS}
+    ${HCCL_PRODUCT_LIB_DIRS}
 )
 
 target_compile_options(rs PRIVATE
