@@ -92,9 +92,15 @@ if(NOT BUILD_OPEN_PROJECT)
     )
 endif()
 
+if(PRODUCT_SIDE STREQUAL "device")
+    set(RS_LINK_DIRS ${HCCL_DEVICE_LIB_DIRS})
+else()
+    set(RS_LINK_DIRS ${HCCL_HOST_LIB_DIRS})
+endif()
+
 # c_sec、mmpa、unified_dlog动态库搜索路径
 target_link_directories(rs PRIVATE
-    ${HCCL_PRODUCT_LIB_DIRS}
+    ${RS_LINK_DIRS}
 )
 
 target_compile_options(rs PRIVATE
