@@ -25,8 +25,8 @@
 
 namespace AscendC {
 namespace Te {
-
-constexpr CopyL12L0ATrait DEFAULT_COPY_L1_TO_L0A_TRAIT = CopyL12L0ATrait{};
+struct CopyL12L0ATrait{};
+constexpr CopyL12L0ATrait DEFAULT_COPY_L1_TO_L0A_TRAIT ;
 
 struct CopyL12L0ATraitDefault {
     using TraitType = CopyL12L0ATrait;
