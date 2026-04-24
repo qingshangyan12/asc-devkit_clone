@@ -205,7 +205,7 @@ def gen_golden_data(scenarioNum=1):
     x2_gm.astype(input_type).tofile("./input/x2_gm.bin")
     x3_gm_float.astype(l1_input_type_float).tofile("./input/x3_gm_float.bin")
     x3_gm_int.astype(l1_input_type_int).tofile("./input/x3_gm_int.bin")
-    golden.astype(output_type).tofile("./output/golden.bin")
+    golden.tofile("./output/golden.bin")
     
 
 if __name__ == "__main__":
