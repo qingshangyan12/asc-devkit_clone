@@ -32,7 +32,7 @@ target_compile_definitions(demo PRIVATE
 )
 
 target_compile_definitions(demo PRIVATE
-    ASCENDC_TIME_STAMP_ON=${DASCENDC_TIME_STAMP_ON}
+    ASCENDC_DUMP=1
 )
 
 # ======================================================================================

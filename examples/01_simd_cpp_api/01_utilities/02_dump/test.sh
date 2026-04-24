@@ -1,3 +1,5 @@
+rm -rf build/
 mkdir -p build && cd build;
-cmake .. -DASCENDC_TIME_STAMP_ON; make -j;
+# cmake .. -DASCENDC_TIME_STAMP_ON; make -j;
+cmake ..; make -j;
 ./demo
