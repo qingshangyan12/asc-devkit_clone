@@ -27,7 +27,7 @@ protected:
     }
 };
 
-TEST_F(Tensor_Api_Mmad_With_3510, TestMmadWithAtom)
+TEST_F(Tensor_Api_Mmad_3510, TestMmadWithAtom)
 {
     using namespace AscendC::Te;
 
