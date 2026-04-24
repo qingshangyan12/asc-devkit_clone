@@ -620,24 +620,6 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
             continue;
         }
 
-        auto *aicpuTsThread = dynamic_cast<hccl::AicpuTsThread *>(thread);
-        if (aicpuTsThread != nullptr) {
-            u32 sqId = INVALID_UINT;
-            u32 sqHead = INVALID_UINT;
-            u32 sqTail = INVALID_UINT;
-            u32 sqDepth = INVALID_UINT;
-            u32 cqeStatus = INVALID_UINT;
-            HcclResult ret = aicpuTsThread->GetSqStatus(sqId, sqHead, sqTail, sqDepth, cqeStatus);
-            MC2_TIMEOUT_LOG(isHardTimeout,
-                "[MC2_OPEN_TIMEOUT][SqStatus] group %u, commName[%s], ret %u, sqId %u, head %u, tail %u, "
-                "depth %u, cqeStatus %u.",
-                groupIdx_, execCtx.commName.c_str(), ret, sqId, sqHead, sqTail, sqDepth, cqeStatus);
-        } else {
-            MC2_TIMEOUT_LOG(isHardTimeout,
-                "[MC2_OPEN_TIMEOUT][SqStatus] group %u, commName[%s], mainThread %p is not AicpuTsThread.",
-                groupIdx_, execCtx.commName.c_str(), thread);
-        }
-
         auto *streamLite = static_cast<Hccl::StreamLite *>(thread->GetStreamLitePtr());
         if (streamLite == nullptr || streamLite->GetRtsq() == nullptr) {
             MC2_TIMEOUT_LOG(isHardTimeout,
