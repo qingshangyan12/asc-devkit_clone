@@ -2,17 +2,14 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍基于Ascend C SIMT编程方式的性能调优思路。样例包含5个逐步优化的kernel版本，从最基础的数据复制与直接转置开始，逐步引入UB中转、全局访存合并以及通过padding降低UB Bank Conflict的优化方法，展示矩阵转置从“先做对”到“逐步做快”的完整优化路径。
-
-本样例均采用32×32的tile切分方式，并统一使用32×32线程块。即每个block启动1024个线程处理一个32×32的tile，每个线程只负责1个数据元素。这样的组织方式更直观，便于直接观察“一个线程对应一个元素”时，各版本kernel在GM访问、UB中转、UB转置读阶段的差异。
+本样例以矩阵转置为例，介绍基于Ascend C SIMT编程方式的性能调优思路。样例包含一个测试性能上限的基准版本以及3个逐步优化的kernel版本，从最基础的数据复制与直接转置开始，逐步引入UB中转、全局访存合并以及通过padding降低UB Bank Conflict的优化方法，展示SIMT编程方式的调优思路。
 
 **优化路径**：
 
-- Case 0：基准数据复制版本
-- Case 1：UB中转的数据复制版本
-- Case 2：直接索引转置版本
-- Case 3：UB中转 + 全局访存合并实现转置
-- Case 4：UB中转 + 全局访存合并 + 避免UB Bank Conflict
+- Case 0：矩阵复制版本（基准）
+- Case 1：直接索引转置版本
+- Case 2：UB中转 + 全局访存合并实现转置
+- Case 3：UB中转 + 全局访存合并 + 避免UB Bank Conflict
 
 ## 支持的产品
 
@@ -22,7 +19,7 @@
 
 ```text
 ├── martrix_transpose
-│   ├── matrix_transpose.asc       // Ascend C样例实现（包含5个优化case）
+│   ├── matrix_transpose.asc       // Ascend C样例实现（包含4个case）
 │   └── README.md                  // 本说明文档
 ```
 
@@ -30,7 +27,7 @@
 
 **样例功能**：
 
-样例实现的是float类型矩阵转置性能对比，并在Host侧对不同kernel的吞吐与结果正确性进行统一验证。样例默认矩阵大小为1024×1024，内部采用固定32×32 tile组织方式，每个kernel在相同输入、相同benchmark框架下运行，便于直接比较优化收益。
+样例实现的功能是固定shape为1024×1024的的矩阵转置
 
 矩阵转置的计算公式为：
 
@@ -45,20 +42,20 @@ $$
 
 ### 计算映射与线程切分
 
-本样例中的5个kernel都基于同一套tile切分方式组织计算。
+对矩阵转置这类二维规则计算，采用tile方式组织数据可以将大矩阵分解为若干局部子块，使每个block只处理一个局部区域，便于索引计算和线程协作。本样例中的4个kernel都基于同一套tile切分方式组织计算，便于比较不同kernel在相同切分方式下的访存行为差异。
+
+本样例中子块tile大小取32×32，主要是因为SIMT执行模型中一个warp包含32个线程。同一warp的线程可处理tile中同一行的32个连续元素。这样在访问GM时，一个warp能够按行读取连续数据，有利于形成连续的全局访存模式。
 
 **整体切分方式**：
 
-- 将整个输入矩阵按照32×32的tile进行划分
-- grid配置为(matrix_width/32,matrix_height/32,1)
-- 因此一个block对应处理输入矩阵中的一个大小为32×32的tile
+- 将整个输入矩阵进行tile划分，每个tile大小固定是32×32
+- grid配置为(matrix_width/32,matrix_height/32,1)，因此一个block对应处理输入矩阵中的一个大小为32×32的tile
 
 **block与线程组织**：
 
-- block配置固定为(32,32,1)
+- block配置固定为(32,32,1)，单个block总线程数为32×32=1024，每个线程只处理1个数据元素，恰好覆盖完整的一个tile
 - threadIdx.x方向有32个线程，对应tile内的列索引
 - threadIdx.y方向有32个线程，对应tile内的行索引
-- 单个block总线程数为32×32=1024，每个线程只处理1个数据元素，恰好覆盖完整的一个tile
 
 **以一个block为例的映射关系**：
 
@@ -96,35 +93,32 @@ int index = x_index + width * y_index;
 
 - index = x_index + width × y_index = 61 + 1024 × 66
 
-需要注意两层粒度：
-
-- 整个GM矩阵是1024×1024元素
-- 它按32×32元素切分后，每个方向共有32个tile，总计32×32个tile
-- 一个block只负责其中一个32×32 tile
-- 在这个tile内部，再由32×32个线程一一对应地处理32×32个元素
-
 **为什么采用这种切分方式**：
 
 - 一个线程对应一个数据，索引关系最直接，便于理解矩阵转置的地址映射
 - 所有版本都使用完全一致的线程布局，便于把性能差异归因到“是否使用UB”“是否做访存合并”“是否消除UB冲突”
 
+本样例的所有版本均采用以下的配置：
+
+- 每个tile的大小TILE_DIM=32
+- grid配置为(matrix_width/32,matrix_height/32,1)，每个block处理一个tile
+- block配置为(32,32,1)，每个线程处理tile内1个元素
+
 ### 性能指标说明
 
 **表1 MatrixTranspose性能指标字段说明表**
 
-|      字段名      | 字段含义                                     |
-| :--------------: | :------------------------------------------- |
-| Throughput(GB/s) | 有效带宽，按一次完整读入和一次完整写回统计。 |
-|     Time(ms)     | 单次kernel平均执行时间。                     |
-|      Result      | 结果校验是否通过。                           |
+| 字段名 | 字段含义 |
+| :----: | :------- |
+|        |          |
+|        |          |
+|        |          |
 
-本章节性能数据请根据实际运行环境补充。建议结合Throughput、Time和profiling工具中的GM搬运、UB访问、同步开销等指标，综合判断每个case的瓶颈来源。
+### Case 0：矩阵复制版本
 
-### Case 0：基准数据复制版本
+**实现方式**：对应样例中copy_kernel()函数
 
-**实现方式**：参考copy_kernel()函数实现
-
-该版本不做转置，只做相同位置的数据复制，用于给后续transpose kernel提供带宽上界参考。由于它不包含坐标交换，因此可以近似视作“理想访存模式”的参考基线，也是后续所有优化版本的性能参照。
+该版本不做转置，只做相同位置的数据复制，用于给后续实现转置的版本提供带宽上界参考。由于它不包含坐标交换，GM访存也是连续的，可以作为后续所有优化版本的性能参照。
 
 **关键代码**：
 
@@ -135,15 +129,6 @@ int index = x_index + width * y_index;
 
 output[index] = input[index];
 ```
-
-**样例配置**：
-
-- TILE_DIM=32
-- grid配置为(matrix_width/32,matrix_height/32,1)
-- block配置为(32,32,1)
-- 每个block处理一个32×32 tile
-- 每个线程处理tile内1个元素
-- 单个block总线程数为32×32=1024
 
 **性能数据**：
 
@@ -173,6 +158,12 @@ output[index] = input[index];
 - 对同一个warp中的相邻线程来说，GM读写方向一致，地址通常连续
 - 因此它反映的是“只做搬运、不做重排”时的理想带宽水平
 
+**性能数据**：
+
+| Throughput(GB/s) | Time(ms) | Result |
+| :--------------: | :------: | :----: |
+|                  |          |        |
+
 **性能优化建议**：
 
 > 💡 **先建立copy基线，再观察transpose优化收益**
@@ -181,72 +172,11 @@ output[index] = input[index];
 
 ---
 
-### Case 1：UB中转的数据复制版本
+### Case 1：直接索引转置版本
 
-**实现方式**：参考copy_shared_mem_kernel()函数实现
+**实现方式**：对应样例中transpose_naive_kernel()函数
 
-该版本在基准数据复制基础上引入UB中转，评估数据经过UB staging后的开销。它不改变全局访存方向，只是在GM与GM之间增加了一次UB读写与一次同步，用于隔离UB中转本身的成本。
-
-**关键代码**：
-
-```cpp
-__ubuf__ float tile[TILE_DIM][TILE_DIM];
-
-tile[threadIdx.y][threadIdx.x] = input[index];
-asc_syncthreads();
-output[index] = tile[threadIdx.y][threadIdx.x];
-```
-
-**样例配置**：
-
-- UB tile大小为32×32
-- grid配置与Case 0相同
-- block配置仍为(32,32,1)
-- 每个线程仍处理1个元素
-- 一个block仍完整覆盖一个32×32 tile，只是多了一次tile级别的UB落地与回写
-
-**性能数据**：
-
-| Throughput(GB/s) | Time(ms) | Result |
-| :--------------: | :------: | :----: |
-|                  |          |        |
-
-**实现过程拆解**：
-
-1. 每个线程先从GM读1个元素
-2. 把该元素写入UB中的tile[threadIdx.y][threadIdx.x]
-3. 所有线程通过asc_syncthreads()等待整个tile写完
-4. 每个线程再从UB原坐标读回同一个元素
-5. 最后写回GM中相同坐标的位置
-
-下图展示了Case1的数据流，这里每个tile会按照在input里的排布读取到UB，再写回到output相同的位置。
-![Block 映射](./figure/case1.svg)
-
-**优化效果分析**：
-
-- 该版本可用于评估UB读写与同步的固定成本
-- 若其带宽接近基准copy，说明UB staging开销较低
-- 若其性能明显低于基线copy，则说明后续transpose即使消除了Bank Conflict，UB中转本身仍可能成为不可忽略的固定开销
-
-**原理说明**：
-
-- 它的关键价值不在于变快，而在于把“GM直接复制”和“经过UB再复制”拆开比较
-- 由于读UB和写UB时都沿原坐标访问，所以它不体现转置重排的收益，只体现UB参与后的成本
-- 这一版使用32×32的UB tile，更接近“最基础的UB中转copy”实现，便于单独观察UB读写与同步本身带来的开销
-
-**性能优化建议**：
-
-> 💡 **先隔离UB中转开销，再引入转置访问**
->
-> 这样可以将“UB本身的成本”和“转置引入的访存代价”拆开观察，便于定位瓶颈来源。
-
----
-
-### Case 2：直接索引转置版本
-
-**实现方式**：参考transpose_naive_kernel()函数实现
-
-该版本直接按照转置公式计算输出坐标，不使用UB做重排，是最直接的transpose实现版本。它的价值在于提供“最简单、最容易理解”的转置基线，也便于观察矩阵转置最典型的性能问题。
+该版本直接按照转置公式计算输出坐标，是最直接的transpose实现版本。
 
 **关键代码**：
 
@@ -257,26 +187,12 @@ int index_out = y_index + height * x_index;
 output[index_out] = input[index_in];
 ```
 
-**样例配置**：
-
-- grid配置与Case 0相同
-- block配置为(32,32,1)
-- 不使用UB
-- 每个线程处理1个输出元素
-- 输出索引直接通过index_out = y_index + height * x_index计算得到
-- 一个block仍对应一个输入32×32 tile，但输出写回已经变成转置后的目标tile
-
-**性能数据**：
-
-| Throughput(GB/s) | Time(ms) | Result |
-| :--------------: | :------: | :----: |
-|                  |          |        |
 
 **实现过程拆解**：
 
 1. 线程先按原坐标读取输入元素
 2. 线程计算该元素转置后的输出位置
-3. 线程把数据直接写到转置后的全局地址
+3. 线程把数据直接写到转置后的GM地址
 
 线程直接从GM输入读出一个元素后，立刻把它写到转置后的GM目标位置，没有任何UB重排，因此最容易出现“读较规整、写不规整”的情况。这里“读较规整、写不规整”，关键要看同一批相邻线程访问的GM地址是否连续。
 
@@ -296,30 +212,30 @@ output[index_out] = input[index_in];
 
 因此，这一版的核心问题是转置后的写回地址不再连续，这通常会显著影响整体吞吐。
 
-**优化效果分析**：
+**性能数据**：
+
+| Throughput(GB/s) | Time(ms) | Result |
+| :--------------: | :------: | :----: |
+|                  |          |        |
+
+**性能分析**：
 
 - 该版本可作为最直接转置实现的基准
 - 输入读取通常仍较规整，但输出写回变成跨步访问
-
-**原理说明**：
-
-- 这版没有借助UB做中间重排，因此线程写回的目标地址不再按原顺序排列
-- 对同一批线程来说，读访问可能还是连续的，但写访问通常不再连续
-- 所以它清楚地说明：矩阵转置的主要难点通常不在“计算转置坐标”，而在“如何把转置后的写回也组织成高效访存”
 
 **性能优化建议**：
 
 > ⚠️ **naive transpose通常受限于非连续写访存**
 >
-> 即使计算逻辑简单，若输出写地址跨步过大，也会显著影响实际吞吐。
+> 可以使用UB中数据中转，把不连续的访问转移到UB内，保证GM读写的连续行从而提高性能
 
 ---
 
-### Case 3：全局访存合并的转置版本
+### Case 2：全局访存合并的转置版本
 
 **实现方式**：参考transpose_coalesced_kernel()函数实现
 
-该版本通过UB中转将GM的读写改造成更规整的访问模式，先解决全局访存合并问题。它是矩阵转置中非常典型的一步优化：先把“全局写不连续”变成“GM连续读 + UB内转置 + GM连续写”。
+该版本通过UB中转将GM的读写改为连续的访问模式，使得全局访存合并。
 
 **关键代码**：
 
@@ -334,14 +250,6 @@ int index_out = x_index + y_index * height;
 output[index_out] = tile[threadIdx.x][threadIdx.y];
 ```
 
-**样例配置**：
-
-- UB tile大小为32×32
-- 通过UB完成tile内转置
-- grid配置与Case 0相同
-- block配置仍为(32,32,1)
-- 每个线程先将1个输入元素写入UB，再从UB的转置坐标读取1个元素写回输出
-- 从block映射上看，一个block仍然只负责一个32×32 tile，但tile内数据会先在UB中完成一次坐标交换
 
 **性能数据**：
 
@@ -448,14 +356,14 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中Bank Conflict是如何产生的，以及Case 3和Case 4理论上的冲突强度差异。
 
 1. UB中的bank划分
-下图展示了Ascend 950PR/Ascend 950DT的UB划分规则，UB总大小为256KB，可以看成前后两行，每行128KB，前128KB对应bank0~bank7，后128KB对应bank8~bank15。`bank0`和`bank8`属于同一个group，`bank1`和`bank9`属于同一个group，依此类推。
-![Block 映射](./figure/bank.png)
-由于本样例中的tile很小：
+   下图展示了Ascend 950PR/Ascend 950DT的UB划分规则，UB总大小为256KB，可以看成前后两行，每行128KB，前128KB对应bank0~bank7，后128KB对应bank8~bank15。`bank0`和 `bank8`属于同一个group，`bank1`和 `bank9`属于同一个group，依此类推。
+   ![Block 映射](./figure/bank.png)
+   由于本样例中的tile很小：
 
 - `32×32×4B = 4096B`
 - `32×33×4B = 4224B`
 
-远小于128KB，所以一个tile通常只会落在前128KB区域内。这样在本文分析里，可以把它近似看成只使用`bank0~bank7`。
+远小于128KB，所以一个tile通常只会落在前128KB区域内。这样在本文分析里，可以把它近似看成只使用 `bank0~bank7`。
 
 1. 什么情况下会冲突
 
@@ -475,7 +383,7 @@ Case 3的关键读操作是：
 output[index_out] = tile[threadIdx.x][threadIdx.y];
 ```
 
-对一个warp中的线程，若固定`threadIdx.y = c`，令`threadIdx.x = t`，其中`t = 0~31`，那么它们从UB读取的地址可写成：
+对一个warp中的线程，若固定 `threadIdx.y = c`，令 `threadIdx.x = t`，其中 `t = 0~31`，那么它们从UB读取的地址可写成：
 
 ```text
 addr_case3(t) = B + 4 * (32t + c)
@@ -485,7 +393,7 @@ addr_case3(t) = B + 4 * (32t + c)
 
 - `B`表示tile在UB中的起始地址
 - `4`表示float占4字节
-- `32t`表示跨行访问，因为这里访问的是`tile[t][c]`
+- `32t`表示跨行访问，因为这里访问的是 `tile[t][c]`
 
 在UB的前128KB区域内，可以用下面的近似公式分析bank编号：
 
@@ -494,9 +402,9 @@ bank_case3(t) = floor(addr_case3(t) / 32) mod 8
               = (4t + floor(c / 8)) mod 8
 ```
 
-由于`4t mod 8`只会在`0`和`4`之间来回跳变，所以对固定的`c`来说，这32个线程只会打到2个bank上。
+由于 `4t mod 8`只会在 `0`和 `4`之间来回跳变，所以对固定的 `c`来说，这32个线程只会打到2个bank上。
 
-例如当`c = 0`时，bank序列为：
+例如当 `c = 0`时，bank序列为：
 
 ```text
 0,4,0,4,0,4,0,4,...
@@ -512,13 +420,13 @@ bank_case3(t) = floor(addr_case3(t) / 32) mod 8
 
 1. Case 4的冲突分析
 
-Case 4只改了一件事：把UB tile从`32×32`改成`32×33`，即：
+Case 4只改了一件事：把UB tile从 `32×32`改成 `32×33`，即：
 
 ```cpp
 __ubuf__ float tile[TILE_DIM][TILE_DIM + 1];
 ```
 
-对应同样的转置读操作，固定`threadIdx.y = c`、令`threadIdx.x = t`时，地址变成：
+对应同样的转置读操作，固定 `threadIdx.y = c`、令 `threadIdx.x = t`时，地址变成：
 
 ```text
 addr_case4(t) = B + 4 * (33t + c)
@@ -531,9 +439,9 @@ bank_case4(t) = floor(addr_case4(t) / 32) mod 8
               = (4t + floor((t + c) / 8)) mod 8
 ```
 
-相比Case 3，多出来的这一列padding让地址步长从`128B`变成了`132B`，打破了原来固定落在少数bank上的周期性。
+相比Case 3，多出来的这一列padding让地址步长从 `128B`变成了 `132B`，打破了原来固定落在少数bank上的周期性。
 
-例如当`c = 0`时，bank序列会扩展成：
+例如当 `c = 0`时，bank序列会扩展成：
 
 ```text
 0,4,0,4,0,4,0,4,
@@ -554,7 +462,6 @@ bank_case4(t) = floor(addr_case4(t) / 32) mod 8
 - Case 4：32个线程分散到8个bank，约4-way冲突
 
 因此，从理论上看，Case 4并不是“完全没有冲突”，而是把Case 3中很重的UB列读冲突，降低成了明显更轻的冲突。
-
 
 **内存布局优化**：
 
