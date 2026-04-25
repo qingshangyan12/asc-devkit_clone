@@ -33,6 +33,28 @@ protected:
     }
 };
 
+TEST_F(TestTiling, TestAddInputTdTensorSizeOverflow)
+{
+    gert::StorageShape overflow_shape = {{INT64_MAX, INT64_MAX}, {INT64_MAX, INT64_MAX}};
+    gert::StorageShape output_shape = {{1024, 5120}, {1024, 5120}};
+    std::string file_path = "./test_data.bin";
+    auto param = gert::TilingData::CreateCap(4096);
+    auto workspace_size_holder = gert::ContinuousVector::Create<size_t>(4096);
+    auto ws_size = reinterpret_cast<gert::ContinuousVector *>(workspace_size_holder.get());
+
+    auto holder = context_ascendc::ContextBuilder()
+        .NodeIoNum(1, 1)
+        .IrInstanceNum({1})
+        .SetOpNameType("tmpName", "tmpType")
+        .AddInputTd(0, ge::DT_FLOAT16, ge::FORMAT_ND, ge::FORMAT_ND, overflow_shape, file_path)
+        .AddOutputTd(0, ge::DT_FLOAT16, ge::FORMAT_ND, ge::FORMAT_ND, output_shape)
+        .TilingData(param.get())
+        .Workspace(ws_size)
+        .BuildTilingContext();
+
+    EXPECT_EQ(holder, nullptr);
+}
+
 
 TEST_F(TestTiling, GetShapeSize)
 {
