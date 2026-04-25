@@ -254,7 +254,7 @@ __aicore__ inline void CopyDeqTensorToFbuf(
         AscendCUtils::GetTemporaryFbBufferAddr<uint64_t>(0, deqDataSize / sizeof(uint64_t));
     uint32_t deqValueOffset = nIterIndex * fixpipeTiling.nSize;
     // L1 -> FB
-    uint16_t fbufBurstLen = deqDataSize / 128;  // copy from cbuf to fbuf, burst_len unit is 128Bytes
+    uint16_t fbufBurstLen = deqDataSize / 128;  // copy from cbuf to fbuf, len_burst unit is 128Bytes
     copy_cbuf_to_fbuf(deqTensorTempBuf, cbufWorkspace + deqValueOffset, 1, fbufBurstLen, 0, 0);
     // FPC of fixpipe buffer for Quant_PRE is FPC[15:8], unit is 128Bytes
     uint64_t deqTensorAddr = ((uint64_t)deqTensorTempBuf >> static_cast<uint64_t>(7)) << 8;
