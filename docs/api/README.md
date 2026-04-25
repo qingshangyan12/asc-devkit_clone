@@ -1,7 +1,7 @@
 # Ascend C API列表<a name="ZH-CN_TOPIC_0000001917094304"></a>
-Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行编程。
+Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/C++语法和类库API进行编程。
 ## API分类总览<a name="section3119442205518"></a>
-下表展示了 Ascend C API 的核心分类，帮助开发者根据编程模型和功能需求快速定位。
+下表展示了 Ascend C API 的核心分类，帮助开发者根据编程模型和功能需求快速定位所需API。
 <a name="table_api_classification"></a>
 <table><thead align="left"><tr id="row_header"><th class="cellrowborder" valign="top" width="18%" id="mcps1.1.3.1.1"><p id="p_header_1">API一级分类</p>
 </th>
@@ -16,22 +16,22 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_base"><a href="#section117632211201">基础API</a></p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_base_desc">单指令抽象的C++类库API，一般基于Tensor编程；逐步基于Layout完善Tensor编程能力；</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_base_desc">单指令抽象的C++类库API，一般基于Tensor编程，逐步基于Layout完善Tensor编程能力。</p>
 </td>
 </tr>
 <tr id="row_simd_2"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_c_api"><a href="context/c_api/README.md">C API</a></p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_c_api_desc">纯C接口，支持数组分配内存、基于指针的计算接口，提供与业界一致的C语言编程体验，并开放芯片完备编程能力。Atlas A2/A3支持SIMD的纯C接口；Ascend 950PR/Ascend 950DT将支持与业界类似的SIMT编程能力、SIMD/SIMT混合编程能力；</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_c_api_desc">纯C接口，支持数组分配内存、基于指针的计算接口，提供与业界一致的C语言编程体验，并开放芯片完备编程能力。Atlas A2/A3支持SIMD的纯C接口；Ascend 950PR/Ascend 950DT将支持与业界类似的SIMT编程能力、SIMD/SIMT混合编程能力。</p>
 </td>
 </tr>
 <tr id="row_simd_3"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_high_api"><a href="section3317105813235">高阶 API</a></p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_high_api_desc">基于单核对常见算法进行抽象和封装，提供公共算法的实现；</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_high_api_desc">基于单核对常见算法进行抽象和封装，提供公共算法的实现。</p>
 </td>
 </tr>
 <tr id="row_simd_4"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_simd_utils"><a href="section15221943104512">Utils API</a></p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_simd_utils_desc">SIMD侧公共接口，包含C++标准库、平台信息获取和Tiling相关API</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_simd_utils_desc">SIMD侧公共接口，包含C++标准库、平台信息获取和Tiling相关API。</p>
 </td>
 </tr>
 <tr id="row_simt"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.1"><p id="p_simt"><a href="section1416490133020">SIMT API</a></p>
@@ -45,7 +45,7 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_aicpu_none">-</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_aicpu_desc">提供核内的通用计算能力</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_aicpu_desc">提供核内的通用计算能力。</p>
 </td>
 </tr>
 <tr id="row_utils"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.1"><p id="p_utils"><a href="section15221943104512">Utils API</a></p>
