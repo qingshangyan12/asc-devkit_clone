@@ -11,10 +11,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/hcomm_diag_adapt.cc
 )
  
-target_sources(hcomm PRIVATE
-    ${src_list}
-)
-
 if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     target_sources(ccl_kernel PRIVATE
         ${src_list}
@@ -22,4 +18,3 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 endif()
 
 add_subdirectory(aicpu)
-add_subdirectory(host)

@@ -12,10 +12,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/hcclCommOp.cc
 )
 
-target_sources(hcomm PRIVATE
-    ${src_list}
-)
-
 set(device_src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/hcclCommDfxLite.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/hcclCommOp.cc

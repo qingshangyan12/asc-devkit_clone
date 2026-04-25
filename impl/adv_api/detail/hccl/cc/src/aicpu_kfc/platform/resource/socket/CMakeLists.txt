@@ -12,10 +12,6 @@ set(src_list
     hccl_network.cc
 )
 
-target_sources(hccl_plf PRIVATE
-    ${src_list}
-)
-
 # target_sources(hccd PRIVATE
 #     ${src_list}
 # )

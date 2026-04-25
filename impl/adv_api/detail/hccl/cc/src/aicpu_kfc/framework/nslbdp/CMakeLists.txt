@@ -12,10 +12,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/hccl_nslb_md5.cc
 )
 
-target_sources(hcomm PRIVATE
-    ${src_list}
-)
-
 if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     target_sources(ccl_kernel PRIVATE
         ${src_list}

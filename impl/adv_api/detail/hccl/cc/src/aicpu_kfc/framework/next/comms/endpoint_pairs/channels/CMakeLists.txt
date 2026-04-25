@@ -13,12 +13,4 @@ set(src_list
     channel_process.cc
 )
 
-target_sources(hcomm PRIVATE
-    ${src_list}
-)
-
 add_subdirectory(aicpu)
-add_subdirectory(host)
-add_subdirectory(slaves)
-add_subdirectory(ccu)
-add_subdirectory(aiv)

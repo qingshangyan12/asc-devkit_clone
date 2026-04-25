@@ -28,11 +28,6 @@ set(src_list
     read_write_lock.cc
 )
 
-target_sources(hccl_plf PRIVATE
-    ${src_list}
-    launch_aicpu.cc
-)
-
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}
 )

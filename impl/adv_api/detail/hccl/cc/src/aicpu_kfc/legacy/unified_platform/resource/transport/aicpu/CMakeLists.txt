@@ -7,12 +7,6 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
-target_sources(hccl_v2 PRIVATE
-        mem_transport_lite.cc
-        ub_transport_lite_impl.cc
-        p2p_transport_lite_impl.cc
-)
-
 if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 target_sources(ccl_kernel PRIVATE
         mem_transport_lite.cc

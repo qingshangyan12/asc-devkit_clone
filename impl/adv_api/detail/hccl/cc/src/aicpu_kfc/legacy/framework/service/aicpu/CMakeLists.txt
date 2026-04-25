@@ -7,14 +7,6 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
-target_sources(hccl_v2
-        PRIVATE
-        alg_topo_package_helper.cc
-        ins_executor.cc
-        ins_to_sqe_rule_v82.cc
-        ins_to_sqe_rule.cc
-)
-
 if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 target_sources(ccl_kernel PRIVATE
         alg_topo_package_helper.cc

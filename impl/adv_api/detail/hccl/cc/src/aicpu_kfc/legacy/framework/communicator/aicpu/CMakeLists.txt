@@ -10,21 +10,6 @@
 add_subdirectory(daemon)
 add_subdirectory(one_sided_component)
 
-target_sources(hccl_v2 PRIVATE
-    communicator_impl_lite_manager.cc
-    communicator_impl_lite.cc
-    aicpu_hdc_handler.cc
-    kernel_entrance.cc
-    aicpu_res_package_helper.cc
-    ns_recovery_handler_func.cc
-    aicpu_comm_destroy_func.cc
-    hdc_lite.cc
-    aicpu_mc2_handler.cc
-    hccl_mc2_ex.cc
-    aicpu_utils.cc
-    launch_device.cc
-)
-
 if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 target_sources(ccl_kernel PRIVATE
     communicator_impl_lite_manager.cc

@@ -8,9 +8,4 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
 
-target_sources(hcomm PRIVATE
-    ${src_list}
-)
-
 add_subdirectory(threads)
-add_subdirectory(ccu)

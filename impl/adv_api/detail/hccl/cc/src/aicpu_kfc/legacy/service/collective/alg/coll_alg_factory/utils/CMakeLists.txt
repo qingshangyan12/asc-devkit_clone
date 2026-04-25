@@ -5,4 +5,3 @@ add_subdirectory(common)
 add_subdirectory(device)
 
 # 仅 host 侧需要的文件
-add_subdirectory(host)

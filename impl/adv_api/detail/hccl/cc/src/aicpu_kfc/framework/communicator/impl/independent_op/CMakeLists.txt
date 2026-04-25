@@ -19,14 +19,8 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/hccl_independent_op_engine.cc
 )
  
-target_sources(hcomm PRIVATE
-    ${src_list}
-)
-
 add_subdirectory(channel)
 add_subdirectory(data_api)
 add_subdirectory(resource)
-add_subdirectory(rank_graph)
 add_subdirectory(device)
 add_subdirectory(diag)
-add_subdirectory(profiling)

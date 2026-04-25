@@ -9,13 +9,10 @@
 # -----------------------------------------------------------------------------------------------------------
 add_subdirectory(communicator)
 add_subdirectory(resource_manager)
-add_subdirectory(ccu)
-add_subdirectory(fault_recovery)
 add_subdirectory(service)
 add_subdirectory(misc)
 add_subdirectory(env_config)
 add_subdirectory(dfx)
 add_subdirectory(device_mode)
 add_subdirectory(entrance)
-add_subdirectory(aiv)
 add_subdirectory(topo)

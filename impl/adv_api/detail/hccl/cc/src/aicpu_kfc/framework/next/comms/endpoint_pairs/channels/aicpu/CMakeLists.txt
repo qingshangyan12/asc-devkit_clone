@@ -7,13 +7,4 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
-
-set(src_list
-    aicpu_ts_urma_channel.cc
-)
-
-target_sources(hcomm PRIVATE
-    ${src_list}
-)
-
 add_subdirectory(device)

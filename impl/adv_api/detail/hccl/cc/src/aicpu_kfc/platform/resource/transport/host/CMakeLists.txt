@@ -16,12 +16,6 @@ set(src_list
     transport_direct_npu.cc
 )
 
-target_sources(hccl_plf PRIVATE
-    ${src_list}
-    transport_roce.cc
-    transport_shm_event.cc
-)
-
 # target_sources(hccd PRIVATE
 #     transport_tcp.cc
 #     transport_net.cc

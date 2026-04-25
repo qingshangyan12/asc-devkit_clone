@@ -17,11 +17,6 @@ set(src_list
     adapter_trace.cc
 )
 
-target_sources(hccl_plf   PRIVATE
-    adapter_error_manager.cc
-    adapter_error_manager_pub_extend.cc
-    ${src_list}
-)
 # target_sources(hccd   PRIVATE
 #     adapter_hal.cc
 #     adapter_hccp.cc

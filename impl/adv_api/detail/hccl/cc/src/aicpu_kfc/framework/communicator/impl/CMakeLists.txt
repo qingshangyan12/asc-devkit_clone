@@ -12,15 +12,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/hccl_communicator_attrs.cc 
 )
 
-target_sources(hcomm PRIVATE
-    ${src_list}
-    ${CMAKE_CURRENT_SOURCE_DIR}/aclgraph/zero_copy_acl_graph.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/hccl_communicator_host.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/hccl_communicator_attrs_host.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/comm_topo_desc.cc
-    task_abort_handler.cc
-)
-
 if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     target_sources(ccl_kernel PRIVATE
         ${src_list}
@@ -30,7 +21,5 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 endif()
 
 add_subdirectory(resource_manager)
-add_subdirectory(one_sided_service)
 add_subdirectory(zero_copy)
 add_subdirectory(independent_op)
-add_subdirectory(symmetric_memory)

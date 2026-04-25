@@ -1,6 +1,5 @@
 add_subdirectory(alg_template)
 add_subdirectory(alg_ccu_context)
 add_subdirectory(alg_executor)
-add_subdirectory(alg_aiv_instruction)
 add_subdirectory(alg_topo_match)
 add_subdirectory(utils)

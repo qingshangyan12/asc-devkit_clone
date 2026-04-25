@@ -20,7 +20,6 @@
 #include "hccl_network.h"
 #include "externalinput.h"
 #include "transport_direct_npu.h"
-#include "launch_aicpu.h"
 #include "acl/acl_rt.h"
 
 using namespace std;

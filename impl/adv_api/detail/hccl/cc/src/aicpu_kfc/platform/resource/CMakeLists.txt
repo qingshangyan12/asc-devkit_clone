@@ -9,13 +9,10 @@
 # -----------------------------------------------------------------------------------------------------------
 add_subdirectory(mem)
 add_subdirectory(notify)
-add_subdirectory(rma_buffer)
 add_subdirectory(socket)
 add_subdirectory(stream)
-add_subdirectory(netdev)
 add_subdirectory(transport)
 add_subdirectory(transport/device)
-add_subdirectory(transport/heterog)
 add_subdirectory(transport/host)
 add_subdirectory(transport/onesided)
 add_subdirectory(transport/onesided/device)
