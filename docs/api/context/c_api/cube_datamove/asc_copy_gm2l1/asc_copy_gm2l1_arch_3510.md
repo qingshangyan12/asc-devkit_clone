@@ -17,13 +17,13 @@
 - 填充模式
 
     ```cpp
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t burst_num, uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride)
+    __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride)
     ```
 
 - 填充模式（同步）
 
     ```cpp
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t burst_num, uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride)
+    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride)
     ```
 
 - 2D搬运模式
@@ -74,7 +74,7 @@
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| burst_num | 输入 | 待搬运的连续传输数据块个数。 |
+| n_burst | 输入 | 待搬运的连续传输数据块个数。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为32个字节。 |
 | pad_func_mode | 输入 | 一个4Bit的值，用于指示通道上的padding功能，他会在32个字节的数据中填充数据；或从每个32个字节的读取数据中移除padding值。<br>&bull; 0：不做padding。 <br>&bull; 1：每有1个字节的数据，插入31个padding值。 <br>&bull; 2：每有2个字节的数据，插入15个padding值。 <br>&bull; 3：每有4个字节的数据，插入14个padding值。<br>&bull; 4：每有8个字节的数据，插入12个padding值。 <br>&bull; 5：每有16个字节的数据，插入8个padding值。<br>&bull; 6：每有32个字节的数据，移除28个最高有效位数据，只保留4个最低有效位元素。<br>&bull; 7：每有32个字节的数据，移除24个最高有效位数据，只保留8个最低有效位元素。<br>&bull; 8：每有32个字节的数据，移除16个最高有效位数据，只保留16个最低有效位元素。 |
 | src_stride | 输入 | 输入数据中两个相邻连续数据块之间的距离。 |
@@ -124,7 +124,7 @@ PIPE_MTE2
 
 ```cpp
 //待搬运的连续传输数据块个数为1
-constexpr uint32_t burst_num = 1;
+constexpr uint32_t n_burst = 1;
 //待搬运的每个连续传输数据块的长度为128个字节
 constexpr uint32_t len_burst = 4;
 //不对数据做padding
@@ -134,5 +134,5 @@ constexpr uint64_t src_stride = 0;
 constexpr uint32_t dst_stride = 0;
 __gm__ half src[256];
 __cbuf__ half dst[256];
-asc_copy_gm2l1(dst, src, burst_num, len_burst, pad_func_mode, src_stride, dst_stride);
+asc_copy_gm2l1(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
 ```

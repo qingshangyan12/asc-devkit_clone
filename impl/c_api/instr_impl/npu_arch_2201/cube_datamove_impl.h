@@ -1585,10 +1585,10 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uin
 }
 
 //=============asc_copy_l12fb===============
-__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_num, uint16_t len_burst,
+__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst,
                                       uint16_t src_gap_size, uint16_t dst_gap_size)
 {
-    asc_copy_l12fb_impl(dst, src, burst_num, len_burst, src_gap_size, dst_gap_size);
+    asc_copy_l12fb_impl(dst, src, n_burst, len_burst, src_gap_size, dst_gap_size);
 }
 
 __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)

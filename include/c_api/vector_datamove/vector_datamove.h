@@ -401,7 +401,7 @@ __aicore__ inline void asc_ndim_copy_dci();
 
 //======asc_copy_ub2l1=======
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src,
-                                      uint16_t burst_num, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+                                      uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size);
 

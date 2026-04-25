@@ -6582,8 +6582,8 @@ __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, ui
 }
 
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
-                                      uint16_t burst_num, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap) {
-    asc_copy_ub2ub_impl(dst, src, burst_num, len_burst, src_gap, dst_gap);
+                                      uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap) {
+    asc_copy_ub2ub_impl(dst, src, n_burst, len_burst, src_gap, dst_gap);
 }
 
 __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size) {

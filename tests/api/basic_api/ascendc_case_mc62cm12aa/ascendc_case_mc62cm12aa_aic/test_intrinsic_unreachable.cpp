@@ -38,7 +38,7 @@ public:
     __aicore__ inline void RunCopyGm2UbufAlignV2(GM_ADDR dstGm, GM_ADDR srcGm)
     {
         uint8_t sid = 0;
-        uint32_t burst_num = 1;
+        uint32_t n_burst = 1;
         uint32_t len_burst = 8;
         uint8_t left_padding_count = 0;
         uint8_t right_padding_count = 0;
@@ -46,7 +46,7 @@ public:
         uint8_t l2_cache_ctl = 0;
         uint64_t burst_src_stride = 8;
         uint32_t burst_dst_stride = 8;
-        copy_gm_to_ubuf_align_v2((__gm__ T *)dstGm, (__gm__ T *)srcGm, sid, burst_num,
+        copy_gm_to_ubuf_align_v2((__gm__ T *)dstGm, (__gm__ T *)srcGm, sid, n_burst,
             len_burst, left_padding_count, right_padding_count, constant_padding_ctl,
             l2_cache_ctl, burst_src_stride, burst_dst_stride);
 
@@ -55,7 +55,7 @@ public:
     __aicore__ inline void RunCopyGm2CbufAlignV2(GM_ADDR dstGm, GM_ADDR srcGm)
     {
         uint8_t sid = 0;
-        uint32_t burst_num = 1;
+        uint32_t n_burst = 1;
         uint32_t len_burst = 8;
         uint8_t left_padding_count = 0;
         uint8_t right_padding_count = 0;
@@ -63,7 +63,7 @@ public:
         uint8_t l2_cache_ctl = 0;
         uint64_t burst_src_stride = 8;
         uint32_t burst_dst_stride = 8;
-        copy_gm_to_cbuf_align_v2((__gm__ T *)dstGm, (__gm__ T *)srcGm, sid, burst_num,
+        copy_gm_to_cbuf_align_v2((__gm__ T *)dstGm, (__gm__ T *)srcGm, sid, n_burst,
             len_burst, left_padding_count, right_padding_count, constant_padding_ctl,
             l2_cache_ctl, burst_src_stride, burst_dst_stride);
     }
