@@ -1085,6 +1085,7 @@ def handle_compile_options(compile_info: CompileInfo, compile_option_tuple, tili
 
 
 def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_option_tuple, tiling_info: TilingInfo):
+    print("yyc test enter compile_kernel_and_meta", flush=True)
     CommonUtility.print_compile_log(op_info.kernel_name, "start to compile cce file...", AscendCLogLevel.LOG_INFO)
     msg_info = "<{}> <{}> compile kernel start".format(compile_info.op_type, compile_info.tiling_key_list)
     LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
@@ -1093,8 +1094,10 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
 
     if CommonUtility.is_v220() or CommonUtility.is_c310():
         if compile_info.no_set_kernel_type is True:
+            print("yyc test enter with no_kernel_type", flush=True)
             _compile_ascendc_cce_v220(compile_info, compile_option_tuple, tiling_info)
         else:
+            print("yyc test enter with kernel_type", flush=True)
             _compile_ascendc_cce_v220_with_kernel_type(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_m510():
         compile_info.code_channel = CORE_TYPE_CUBE
@@ -1377,6 +1380,7 @@ def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_op
         compile_options (list): compile options for bisheng
         code_channel (int): one of CORE_TYPE_MIX/CORE_TYPE_CUBE/CORE_TYPE_VEC
     """
+    print("yyc test enter compile_op", flush=True)
     LogUtil.detail_log_print(op_info.kernel_name, COMPILE_STAGE_MSG_INFO["compile_op_start"], AscendCLogLevel.LOG_INFO)
     LogUtil.detail_log_print(op_info.kernel_name, COMPILE_STAGE_MSG_INFO["preprocess_start"], AscendCLogLevel.LOG_INFO)
     # online compile reuses thread, dfx infos need to be reset.
@@ -1872,7 +1876,7 @@ def _compile_ascendc_cce_v220_with_kernel_type_for_dynamic(compile_info: Compile
     new_sources += "#endif\n"
     # add dfx info section to sourse file
     CommonUtility().ascendc_write_file(compile_info.gen_kernel_func_file, new_sources)
-
+    print("yyc test start compile multi keys", flush=True)
     if len(cmds_list_vec) != 0:
         compile_multi_tilingkey(tiling_key_vec, cmds_list_vec, \
             os.path.basename(compile_info.dst_file)[:-2] + "_tmp_aiv", compile_info.compile_log_path)
@@ -1880,6 +1884,7 @@ def _compile_ascendc_cce_v220_with_kernel_type_for_dynamic(compile_info: Compile
     if len(cmds_list_cube) != 0:
         compile_multi_tilingkey(tiling_key_cube, cmds_list_cube, \
             os.path.basename(compile_info.dst_file)[:-2] + "_tmp_aic", compile_info.compile_log_path)
+    print("yyc test start link fatbin", flush=True)
     fatbin_objs(obj_files, compile_info.dst_file, compile_info.is_debug, compile_info.compile_log_path)
     _generate_final_json(compile_info, tiling_info)
 
