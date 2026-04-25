@@ -111,7 +111,7 @@
       "id": "rectangle_637594919884",
       "type": "rectangle",
       "x": 585.25,
-      "y": 307.25,
+      "y": 328.91666666666663,
       "width": 414.99999999999994,
       "height": 125,
       "angle": 0,
@@ -128,8 +128,8 @@
         "type": 3
       },
       "seed": 347519091,
-      "version": 224,
-      "versionNonce": 119790138,
+      "version": 249,
+      "versionNonce": 1820246706,
       "isDeleted": false,
       "boundElements": [
         {
@@ -145,7 +145,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1777099164441,
+      "updated": 1777100024990,
       "link": null,
       "locked": false,
       "index": "a3"
@@ -154,7 +154,7 @@
       "id": "text_846823391965",
       "type": "text",
       "x": 598,
-      "y": 323.5,
+      "y": 345.16666666666663,
       "width": 383.25000000000006,
       "height": 22.5,
       "angle": 0,
@@ -169,11 +169,11 @@
       "frameId": null,
       "roundness": null,
       "seed": 1716806425,
-      "version": 174,
-      "versionNonce": 418156986,
+      "version": 199,
+      "versionNonce": 1875683314,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099201270,
+      "updated": 1777100024990,
       "link": null,
       "locked": false,
       "text": "LocalTensor<TensorAttribute<Engine, Layout>>",
@@ -190,10 +190,10 @@
     {
       "id": "text_924421763530",
       "type": "text",
-      "x": 649.75,
-      "y": 358.5,
-      "width": 302,
-      "height": 60,
+      "x": 648.1666666666667,
+      "y": 377.66666666666663,
+      "width": 314.5833333333334,
+      "height": 62.500000000000014,
       "angle": 0,
       "strokeColor": "#475569",
       "backgroundColor": "transparent",
@@ -206,8 +206,8 @@
       "frameId": null,
       "roundness": null,
       "seed": 1708621587,
-      "version": 287,
-      "versionNonce": 1698352806,
+      "version": 358,
+      "versionNonce": 1108757358,
       "isDeleted": false,
       "boundElements": [
         {
@@ -215,11 +215,11 @@
           "type": "arrow"
         }
       ],
-      "updated": 1777099211163,
+      "updated": 1777100196883,
       "link": null,
       "locked": false,
       "text": "rep = Std::tuple<layoutType, engineType>\nEngine() / Layout() / Data()\nShape() / Stride() / Size() / Capacity()",
-      "fontSize": 16,
+      "fontSize": 16.666666666666664,
       "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "middle",
@@ -545,7 +545,7 @@
     {
       "id": "text_241691094850",
       "type": "text",
-      "x": 171.89772727272725,
+      "x": 174.39772727272725,
       "y": 515.25,
       "width": 165.03977272727292,
       "height": 38.0794441531201,
@@ -561,11 +561,11 @@
       "frameId": null,
       "roundness": null,
       "seed": 1571003704,
-      "version": 623,
-      "versionNonce": 1529935674,
+      "version": 635,
+      "versionNonce": 1535523950,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099533951,
+      "updated": 1777100049581,
       "link": null,
       "locked": false,
       "text": "传入已构造的指针\n根据 byteOffset构造指针",
@@ -1112,9 +1112,9 @@
     {
       "id": "rectangle_724551647151",
       "type": "rectangle",
-      "x": 563.75,
-      "y": 541.25,
-      "width": 470.00000000000006,
+      "x": 572.0833333333334,
+      "y": 537.0833333333333,
+      "width": 458.3333333333335,
       "height": 62.49999999999997,
       "angle": 0,
       "strokeColor": "#334155",
@@ -1130,16 +1130,20 @@
         "type": 3
       },
       "seed": 82307441,
-      "version": 219,
-      "versionNonce": 1492775610,
+      "version": 262,
+      "versionNonce": 1745086766,
       "isDeleted": false,
       "boundElements": [
         {
           "id": "arrow_087489737918",
           "type": "arrow"
+        },
+        {
+          "id": "arrow_185440725054",
+          "type": "arrow"
         }
       ],
-      "updated": 1777099242890,
+      "updated": 1777100037812,
       "link": null,
       "locked": false,
       "index": "aX"
@@ -1147,8 +1151,8 @@
     {
       "id": "text_520196963407",
       "type": "text",
-      "x": 687.7499999999999,
-      "y": 560,
+      "x": 701.9166666666665,
+      "y": 557.5,
       "width": 239.49999999999991,
       "height": 25,
       "angle": 0,
@@ -1163,11 +1167,11 @@
       "frameId": null,
       "roundness": null,
       "seed": 730514434,
-      "version": 253,
-      "versionNonce": 867067130,
+      "version": 271,
+      "versionNonce": 188918770,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099319482,
+      "updated": 1777100032656,
       "link": null,
       "locked": false,
       "text": "MakeTensor(iter, args...)",
@@ -1184,8 +1188,8 @@
     {
       "id": "rectangle_756859295608",
       "type": "rectangle",
-      "x": 270,
-      "y": 668.75,
+      "x": 280.83333333333337,
+      "y": 662.0833333333335,
       "width": 253.74999999999997,
       "height": 133.74999999999994,
       "angle": 0,
@@ -1202,11 +1206,11 @@
         "type": 3
       },
       "seed": 386469763,
-      "version": 260,
-      "versionNonce": 1713653114,
+      "version": 282,
+      "versionNonce": 532164274,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099430906,
+      "updated": 1777100043306,
       "link": null,
       "locked": false,
       "index": "aa"
@@ -1214,8 +1218,8 @@
     {
       "id": "text_075463932237",
       "type": "text",
-      "x": 354,
-      "y": 683.75,
+      "x": 364.83333333333337,
+      "y": 677.0833333333335,
       "width": 133.25,
       "height": 21.25,
       "angle": 0,
@@ -1230,11 +1234,11 @@
       "frameId": null,
       "roundness": null,
       "seed": 822522490,
-      "version": 248,
-      "versionNonce": 155210982,
+      "version": 270,
+      "versionNonce": 635668594,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099427690,
+      "updated": 1777100043306,
       "link": null,
       "locked": false,
       "text": "坐标访问",
@@ -1251,8 +1255,8 @@
     {
       "id": "text_191546173337",
       "type": "text",
-      "x": 305.25,
-      "y": 714.25,
+      "x": 316.08333333333337,
+      "y": 707.5833333333335,
       "width": 253.96875000000006,
       "height": 67.5,
       "angle": 0,
@@ -1267,11 +1271,11 @@
       "frameId": null,
       "roundness": null,
       "seed": 725968598,
-      "version": 325,
-      "versionNonce": 362810214,
+      "version": 347,
+      "versionNonce": 150841906,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099571707,
+      "updated": 1777100043306,
       "link": null,
       "locked": false,
       "text": "tensor[coord]\n=> Data()[Layout()(coord)]\n=> iterator[offset]",
@@ -1288,8 +1292,8 @@
     {
       "id": "rectangle_628975165255",
       "type": "rectangle",
-      "x": 621.25,
-      "y": 670,
+      "x": 632.0833333333334,
+      "y": 663.3333333333335,
       "width": 310,
       "height": 133.74999999999994,
       "angle": 0,
@@ -1306,11 +1310,11 @@
         "type": 3
       },
       "seed": 1099421933,
-      "version": 221,
-      "versionNonce": 51751014,
+      "version": 243,
+      "versionNonce": 1340969970,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099436680,
+      "updated": 1777100043306,
       "link": null,
       "locked": false,
       "index": "ad"
@@ -1318,8 +1322,8 @@
     {
       "id": "text_515260626369",
       "type": "text",
-      "x": 751.5,
-      "y": 681.25,
+      "x": 762.3333333333334,
+      "y": 674.5833333333335,
       "width": 49.73529411764702,
       "height": 23.749999999999982,
       "angle": 0,
@@ -1334,11 +1338,16 @@
       "frameId": null,
       "roundness": null,
       "seed": 1749374181,
-      "version": 317,
-      "versionNonce": 1526464058,
+      "version": 340,
+      "versionNonce": 213534130,
       "isDeleted": false,
-      "boundElements": [],
-      "updated": 1777099596844,
+      "boundElements": [
+        {
+          "id": "arrow_185440725054",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1777100043306,
       "link": null,
       "locked": false,
       "text": "偏移",
@@ -1355,8 +1364,8 @@
     {
       "id": "text_156141561574",
       "type": "text",
-      "x": 662.75,
-      "y": 709.25,
+      "x": 673.5833333333334,
+      "y": 702.5833333333335,
       "width": 304.03124999999983,
       "height": 86.24999999999996,
       "angle": 0,
@@ -1371,11 +1380,11 @@
       "frameId": null,
       "roundness": null,
       "seed": 876994836,
-      "version": 207,
-      "versionNonce": 1350400250,
+      "version": 229,
+      "versionNonce": 262537522,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099573664,
+      "updated": 1777100043306,
       "link": null,
       "locked": false,
       "text": "tensor(coord) / Slice(coord, info)\n=> Engine + offset\n=> MakeCoordLayout /\nMakeSliceLayout",
@@ -1392,8 +1401,8 @@
     {
       "id": "rectangle_303872060643",
       "type": "rectangle",
-      "x": 986.25,
-      "y": 665,
+      "x": 997.0833333333334,
+      "y": 658.3333333333335,
       "width": 397.5,
       "height": 141.25,
       "angle": 0,
@@ -1410,11 +1419,11 @@
         "type": 3
       },
       "seed": 173042349,
-      "version": 258,
-      "versionNonce": 635761446,
+      "version": 280,
+      "versionNonce": 762514162,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099558123,
+      "updated": 1777100043306,
       "link": null,
       "locked": false,
       "index": "ag"
@@ -1422,10 +1431,10 @@
     {
       "id": "text_319060534155",
       "type": "text",
-      "x": 1071.5,
-      "y": 677.5,
+      "x": 1087.3333333333335,
+      "y": 671.6666666666669,
       "width": 307.17857142857144,
-      "height": 30.500000000000004,
+      "height": 25,
       "angle": 0,
       "strokeColor": "#0f172a",
       "backgroundColor": "transparent",
@@ -1438,15 +1447,15 @@
       "frameId": null,
       "roundness": null,
       "seed": 679270543,
-      "version": 281,
-      "versionNonce": 1642186170,
+      "version": 314,
+      "versionNonce": 1540860334,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099587904,
+      "updated": 1777100170734,
       "link": null,
       "locked": false,
       "text": "Operation routing 输入",
-      "fontSize": 18.517857142857142,
+      "fontSize": 20,
       "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "middle",
@@ -1459,8 +1468,8 @@
     {
       "id": "text_961059128774",
       "type": "text",
-      "x": 1021.6484375,
-      "y": 718,
+      "x": 1020.815104166667,
+      "y": 709.6666666666667,
       "width": 367.35937500000017,
       "height": 63.74999999999998,
       "angle": 0,
@@ -1475,11 +1484,11 @@
       "frameId": null,
       "roundness": null,
       "seed": 1998632633,
-      "version": 353,
-      "versionNonce": 813156518,
+      "version": 380,
+      "versionNonce": 963265202,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099604064,
+      "updated": 1777100172367,
       "link": null,
       "locked": false,
       "text": "1.GetMemLocation<T> 来自 Pointer\n2.GetLayoutPattern<layoutType> 来自 Layout\n共同决定 Copy/Mmad 路径",
@@ -1655,10 +1664,10 @@
     {
       "id": "arrow_021437545624",
       "type": "arrow",
-      "x": 565.9400074811992,
+      "x": 559.7147385229221,
       "y": 217.15241594767397,
-      "width": 154.9730965460367,
-      "height": 87.93994925261708,
+      "width": 172.41386065703148,
+      "height": 109.60661591928371,
       "angle": 0,
       "strokeColor": "#2563eb",
       "backgroundColor": "transparent",
@@ -1673,11 +1682,11 @@
         "type": 2
       },
       "seed": 885362989,
-      "version": 484,
-      "versionNonce": 430700134,
+      "version": 509,
+      "versionNonce": 1152883826,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099264530,
+      "updated": 1777100024990,
       "link": null,
       "locked": false,
       "points": [
@@ -1686,8 +1695,8 @@
           0
         ],
         [
-          154.9730965460367,
-          87.93994925261708
+          172.41386065703148,
+          109.60661591928371
         ]
       ],
       "lastCommittedPoint": null,
@@ -1708,10 +1717,10 @@
     {
       "id": "arrow_436783888706",
       "type": "arrow",
-      "x": 1037.1191394453415,
-      "y": 212.21127142846456,
-      "width": 133.44256634921317,
-      "height": 92.97129043425986,
+      "x": 1037.6217799536498,
+      "y": 217.43041092222052,
+      "width": 142.67034252856524,
+      "height": 109.41881760717058,
       "angle": 0,
       "strokeColor": "#7c3aed",
       "backgroundColor": "transparent",
@@ -1726,11 +1735,11 @@
         "type": 2
       },
       "seed": 833571146,
-      "version": 356,
-      "versionNonce": 1451889594,
+      "version": 381,
+      "versionNonce": 1546599986,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099164442,
+      "updated": 1777100024990,
       "link": null,
       "locked": false,
       "points": [
@@ -1739,8 +1748,8 @@
           0
         ],
         [
-          -133.44256634921317,
-          92.97129043425986
+          -142.67034252856524,
+          109.41881760717058
         ]
       ],
       "lastCommittedPoint": null,
@@ -1851,10 +1860,10 @@
     {
       "id": "arrow_087489737918",
       "type": "arrow",
-      "x": 788.2705342097339,
-      "y": 432.68919945745176,
-      "width": 1.1483060239778524,
-      "height": 105.60083778215233,
+      "x": 791.7375214636313,
+      "y": 455.1891994574517,
+      "width": 0.19595375240464818,
+      "height": 78.86623766279837,
       "angle": 0,
       "strokeColor": "#334155",
       "backgroundColor": "transparent",
@@ -1869,11 +1878,11 @@
         "type": 2
       },
       "seed": 422231106,
-      "version": 296,
-      "versionNonce": 828345210,
+      "version": 555,
+      "versionNonce": 1178173678,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099242890,
+      "updated": 1777100213845,
       "link": null,
       "locked": false,
       "points": [
@@ -1882,20 +1891,20 @@
           0
         ],
         [
-          1.1483060239778524,
-          105.60083778215233
+          0.19595375240464818,
+          78.86623766279837
         ]
       ],
       "lastCommittedPoint": null,
       "startBinding": {
         "elementId": "text_924421763530",
-        "focus": 0.08318601388110743,
-        "gap": 14.189199457451707
+        "focus": 0.08791918867278158,
+        "gap": 15.022532790785078
       },
       "endBinding": {
         "elementId": "rectangle_724551647151",
-        "focus": -0.0376367121054201,
-        "gap": 16
+        "focus": -0.040268640431798196,
+        "gap": 3.0278962130831815
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
@@ -1904,8 +1913,8 @@
     {
       "id": "arrow_109919671547",
       "type": "arrow",
-      "x": 795,
-      "y": 617.5,
+      "x": 805.8333333333334,
+      "y": 610.8333333333335,
       "width": 350,
       "height": 40,
       "angle": 0,
@@ -1922,11 +1931,11 @@
         "type": 2
       },
       "seed": 1122274445,
-      "version": 176,
-      "versionNonce": 275247910,
+      "version": 198,
+      "versionNonce": 535484466,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099369679,
+      "updated": 1777100043306,
       "link": null,
       "locked": false,
       "points": [
@@ -1949,10 +1958,10 @@
     {
       "id": "arrow_185440725054",
       "type": "arrow",
-      "x": 795,
-      "y": 620,
-      "width": 10,
-      "height": 40,
+      "x": 805.0000000000001,
+      "y": 612.5000000000002,
+      "width": 0.8333333333333712,
+      "height": 41.66666666666663,
       "angle": 0,
       "strokeColor": "#b45309",
       "backgroundColor": "transparent",
@@ -1967,11 +1976,11 @@
         "type": 2
       },
       "seed": 302784970,
-      "version": 176,
-      "versionNonce": 1653251686,
+      "version": 272,
+      "versionNonce": 1777800430,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099369679,
+      "updated": 1777100043516,
       "link": null,
       "locked": false,
       "points": [
@@ -1980,13 +1989,21 @@
           0
         ],
         [
-          -10,
-          40
+          -0.8333333333333712,
+          41.66666666666663
         ]
       ],
       "lastCommittedPoint": null,
-      "startBinding": null,
-      "endBinding": null,
+      "startBinding": {
+        "elementId": "rectangle_724551647151",
+        "focus": -0.020163191296464444,
+        "gap": 12.91666666666697
+      },
+      "endBinding": {
+        "elementId": "text_515260626369",
+        "focus": 0.6500600415897857,
+        "gap": 14
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "index": "au"
@@ -1994,8 +2011,8 @@
     {
       "id": "arrow_006396721977",
       "type": "arrow",
-      "x": 795,
-      "y": 618.75,
+      "x": 805.8333333333334,
+      "y": 612.0833333333335,
       "width": 350,
       "height": 40,
       "angle": 0,
@@ -2012,11 +2029,11 @@
         "type": 2
       },
       "seed": 235411424,
-      "version": 175,
-      "versionNonce": 162914726,
+      "version": 197,
+      "versionNonce": 1890841522,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1777099369679,
+      "updated": 1777100043306,
       "link": null,
       "locked": false,
       "points": [
@@ -2118,8 +2135,8 @@
     {
       "id": "text_769390652360",
       "type": "text",
-      "x": 885,
-      "y": 216.75,
+      "x": 884.1666666666667,
+      "y": 232.58333333333331,
       "width": 130,
       "height": 20,
       "angle": 0,
@@ -2134,8 +2151,8 @@
       "frameId": null,
       "roundness": null,
       "seed": 530709562,
-      "version": 294,
-      "versionNonce": 1747428582,
+      "version": 312,
+      "versionNonce": 1062661166,
       "isDeleted": false,
       "boundElements": [
         {
@@ -2143,7 +2160,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1777099144302,
+      "updated": 1777100180974,
       "link": null,
       "locked": false,
       "text": "LayoutType",
