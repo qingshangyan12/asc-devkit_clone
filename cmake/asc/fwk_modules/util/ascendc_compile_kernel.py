@@ -12,6 +12,7 @@
 
 import sys
 import os
+import shlex
 import subprocess
 import time
 import glob
@@ -205,12 +206,19 @@ class CompileKernel:
             sub_cmd.insert(0, "all: " + " ".join(all_tar))
             fd.write("\n".join(sub_cmd))
 
+        safe_build_opp_path = shlex.quote(self.build_opp_path)
+        safe_mkfile = shlex.quote(mkfile)
+        safe_op_impl_py = shlex.quote(self.op_impl_py)
+        safe_op_bin_dir = shlex.quote(op_bin_dir)
+        safe_op_cpp_file = shlex.quote(self.op_cpp_file)
+
         if os.getenv("TILINGKEY_PAR_COMPILE") is None:
             cmd_str = ('export HI_PYTHON=python3 && export ASCEND_CUSTOM_OPP_PATH={} && export TILINGKEY_PAR_COMPILE=1'
                        '&& make -f {} PY={} OUT={} CPP={}')
         else:
             cmd_str = ('export HI_PYTHON=python3 && export ASCEND_CUSTOM_OPP_PATH={} && make -f {} PY={} OUT={} CPP={}')
-        if os.system(cmd_str.format(self.build_opp_path, mkfile, self.op_impl_py, op_bin_dir, self.op_cpp_file)) != 0:
+        if os.system(cmd_str.format(safe_build_opp_path, safe_mkfile, 
+                                    safe_op_impl_py, safe_op_bin_dir, safe_op_cpp_file)) != 0:
             raise RuntimeError('Kernel Compilation Error: OpType {} Kernel File {}!'.format(
                 self.op_type, self.op_cpp_file))
 

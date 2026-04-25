@@ -13,6 +13,7 @@
 import configparser
 import argparse
 import os
+import shlex
 import stat
 import hashlib
 import multiprocessing
@@ -123,7 +124,8 @@ def run_compile_cmd(param_args):
     if param_args.parallel_jobs is not None:
         system_cpu_count = min(system_cpu_count, int(param_args.parallel_jobs))
     parallel_compile_job = system_cpu_count if system_cpu_count > 0 else 1
-    cmd = f"make -f {mkfile} -j{parallel_compile_job}"
+    safe_mkfile = shlex.quote(mkfile)
+    cmd = f"make -f {safe_mkfile} -j{parallel_compile_job}"
     ret = os.system(cmd)
     if ret != 0:
         raise RuntimeError('compile ascend all ops failed')
