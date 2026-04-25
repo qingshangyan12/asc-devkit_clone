@@ -71,7 +71,7 @@ EXAMPLE_LIST=(
     01_simd_cpp_api/03_libraries/12_math/acosh
     02_simd_c_api/00_introduction/01_add/c_api_async_add
     02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add
-    02_simd_c_api/00_introduction/01_add/c_api_sync_add
+    02_simd_c_api/00_introduction/01_add/c_api_sync_add1
 )
 
 # 时间格式化函数（秒转换为可读格式）
