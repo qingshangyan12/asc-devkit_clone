@@ -20,12 +20,19 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    mmad_gelu.asc
+    mmad_gelu_a2a3.asc
 )
-
+if(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
+    set(NPU_ARCH_ID 2201)
+elseif(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
+    set(NPU_ARCH_ID 3510)
+else()
+    message(FATAL_ERROR "Unsupported CMAKE_ASC_ARCHITECTURES=${CMAKE_ASC_ARCHITECTURES}, only dav-2201 and dav-3510 are supported")
+endif()
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
 
 target_compile_definitions(demo PRIVATE
+    NPU_ARCH=${NPU_ARCH_ID}
     SCENARIO_NUM=${SCENARIO_NUM}
 )
 
