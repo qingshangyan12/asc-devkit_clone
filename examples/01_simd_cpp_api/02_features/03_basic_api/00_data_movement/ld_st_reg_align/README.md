@@ -23,6 +23,14 @@
  	  	 		<td>4</td>
  	  	 		<td>非连续搬运(postUpdate模式)</td>
  	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>5</td>
+ 	  	 		<td>连续搬运(解压缩模式UNPACK搬入和压缩模式PACK搬出)</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>6</td>
+ 	  	 		<td>连续搬运(双搬入和双搬出模式)</td>
+ 	  	 	</tr>
  	  	 </table>
 
 ## 支持的产品
@@ -85,6 +93,18 @@
     <td align="center">非连续搬运</td>
     <td align="center">开启</td>
   </tr>
+  <tr>
+    <td align="center">5</td>
+    <td align="center">CopySucceWithPackVF</td>
+    <td align="center">连续搬运</td>
+    <td align="center">开启</td>
+  </tr>
+  <tr>
+    <td align="center">6</td>
+    <td align="center">CopySucceDoubleRegVF</td>
+    <td align="center">连续搬运</td>
+    <td align="center">关闭</td>
+  </tr>
 </table>
 
   
@@ -135,7 +155,7 @@
 | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
 | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-| `SCENARIO_NUM` | `1`、`2`、`3`、`4`　　　　　| 场景编号：1=连续搬运，2=连续搬运(postUpdate)，3=非连续搬运，4=非连续搬运(postUpdate) |
+| `SCENARIO_NUM` | `1`、`2`、`3`、`4`、`5`、`6` | 场景编号：1=连续搬运，2=连续搬运(postUpdate)，3=非连续搬运，4=非连续搬运(postUpdate)，5=连续搬运(解压缩搬入和压缩搬出)，6=连续搬运(双搬入和双搬出) |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。
