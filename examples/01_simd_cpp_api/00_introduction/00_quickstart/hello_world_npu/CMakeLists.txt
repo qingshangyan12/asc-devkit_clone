@@ -16,7 +16,7 @@ set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201,
 
 find_package(ASC REQUIRED)
 
-project(kernel_samples LANGUAGES ASC CXX)
+project(kernel_samples LANGUAGES ASC)
 
 add_executable(demo
     hello_world.asc
