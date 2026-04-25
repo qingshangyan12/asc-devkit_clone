@@ -14,10 +14,6 @@ set(src_list
     transport_remote_access.cc
 )
 
-target_sources(hccl_plf PRIVATE
-    ${src_list}
-)
-
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}
 )

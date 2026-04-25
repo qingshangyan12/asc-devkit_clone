@@ -8,9 +8,6 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
 add_subdirectory(pub_inc)
-add_subdirectory(trace)
-add_subdirectory(ccu)
 add_subdirectory(resource)
 add_subdirectory(common)
 add_subdirectory(external_system)
-add_subdirectory(aiv)

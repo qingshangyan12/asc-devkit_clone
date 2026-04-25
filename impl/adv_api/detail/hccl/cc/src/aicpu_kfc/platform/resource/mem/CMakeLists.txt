@@ -15,11 +15,6 @@ set(src_list
     mem_mapping_manager.cc
 )
 
-target_sources(hccl_plf PRIVATE
-    ${src_list}
-    mem_mapping_manager_host.cc
-)
-
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}
     mem_mapping_manager_device.cc

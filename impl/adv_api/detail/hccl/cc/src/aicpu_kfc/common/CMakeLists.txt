@@ -7,9 +7,4 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
-add_subdirectory(health)
-add_subdirectory(debug/profiling)
 add_subdirectory(debug/config)
-add_subdirectory(stream)
-add_subdirectory(launch_device)
-add_subdirectory(error_code)

@@ -14,10 +14,6 @@ set(src_list
     hccl_mem.cc
 )
 
-target_sources(hccl_plf PRIVATE
-    ${src_list}
-)
-
 set(kernel_src_list
     transport_mem.cc
 )

@@ -7,14 +7,6 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
-target_sources(hccl_v2 PRIVATE
-        mem_transport_manager.cc
-        cnt_notify_res_helper.cc
-        mem_transport_callback.cc
-        ub_memory_transport_mgr.cc
-        ub_memory_transport_mgr.h
-)
-
 if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 target_sources(ccl_kernel PRIVATE
         mem_transport_callback.cc

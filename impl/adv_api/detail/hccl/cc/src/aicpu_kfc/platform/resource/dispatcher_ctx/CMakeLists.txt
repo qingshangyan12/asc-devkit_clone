@@ -11,10 +11,6 @@ set(src_list
     dispatcher_ctx.cc
 )
 
-target_sources(hccl_plf PRIVATE
-    ${src_list}
-)
-
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}
 )

@@ -19,6 +19,124 @@ add_library(ccl_kernel_plf  SHARED)
 # 创建 ccl_kernel_plf_a静态库
 add_library(ccl_kernel_plf_a  STATIC)
 
+# 需要编译的文件list
+set(include_list
+    ${HCCL_BASE_DIR}/pub_inc
+    ${HCCL_BASE_DIR}/pub_inc/aicpu/
+    ${HCCL_BASE_DIR}/pub_inc/inner
+    ${HCCL_BASE_DIR}/pub_inc/new
+
+    ${HCCL_BASE_DIR}/algorithm/base/inc
+    ${HCCL_BASE_DIR}/algorithm/pub_inc
+    ${HCCL_BASE_DIR}/algorithm/base/alg_aiv_template
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template/component
+    ${HCCL_BASE_DIR}/algorithm/base/mc2_handler
+    ${HCCL_BASE_DIR}/algorithm/base/communicator
+    ${HCCL_BASE_DIR}/algorithm/impl
+    ${HCCL_BASE_DIR}/algorithm/impl/inc
+    ${HCCL_BASE_DIR}/algorithm/impl/legacy
+    ${HCCL_BASE_DIR}/algorithm/impl/legacy/operator
+    ${HCCL_BASE_DIR}/algorithm/base/communicator/legacy
+    ${HCCL_BASE_DIR}/algorithm/impl/resource_manager
+    ${HCCL_BASE_DIR}/algorithm/impl/task
+    ${HCCL_BASE_DIR}/algorithm/impl/operator
+    ${HCCL_BASE_DIR}/algorithm/impl/operator/registry
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/registry
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_send_receive
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_all_reduce
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_all_reduce/310P
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_all_gather
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_all_gather/310P
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_all_gather_v
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_reduce_scatter
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_reduce_scatter/310P
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_reduce_scatter_v
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_reduce_scatter_v/310P
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_all_to_all
+    ${HCCL_BASE_DIR}/algorithm/impl/coll_executor/coll_scatter
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template/temp_all_gather
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template/temp_all_reduce
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template/temp_alltoall
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template/temp_alltoallv
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template/temp_broadcast
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template/temp_reduce
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template/temp_reduce_scatter
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template/temp_scatter
+    ${HCCL_BASE_DIR}/algorithm/base/alg_template
+    ${HCCL_BASE_DIR}/algorithm/pub_inc
+
+    ${HCCL_BASE_DIR}/common/health
+    ${HCCL_BASE_DIR}/common/debug/profiling/inc
+    ${HCCL_BASE_DIR}/common/debug/config/
+    ${HCCL_BASE_DIR}/common/stream
+    ${HCCL_BASE_DIR}/common/launch_device
+
+    ${HCCL_BASE_DIR}/framework/inc
+    ${HCCL_BASE_DIR}/framework/inc/hccd
+    ${HCCL_BASE_DIR}/framework/cluster_maintenance/health/heartbeat/
+    ${HCCL_BASE_DIR}/framework/cluster_maintenance/detect/detect_connect_anomalies/
+    ${HCCL_BASE_DIR}/framework/cluster_maintenance/recovery/operator_retry
+    ${HCCL_BASE_DIR}/framework/
+    ${HCCL_BASE_DIR}/framework/common/src/
+    ${HCCL_BASE_DIR}/framework/common/src/exception
+    ${HCCL_BASE_DIR}/framework/common/src/config
+    ${HCCL_BASE_DIR}/framework/common/src/task
+    ${HCCL_BASE_DIR}/framework/common/src/topo
+    ${HCCL_BASE_DIR}/framework/common/src/mgr
+    ${HCCL_BASE_DIR}/framework/hcom
+    ${HCCL_BASE_DIR}/framework/communicator/impl/
+    ${HCCL_BASE_DIR}/framework/communicator/impl/one_sided_service/
+    ${HCCL_BASE_DIR}/framework/communicator/impl/zero_copy
+    ${HCCL_BASE_DIR}/framework/communicator/impl/resource_manager
+    ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op
+    ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/rank_graph
+    ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/resource/engine
+    ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/channel
+    ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/channel/device
+    ${HCCL_BASE_DIR}/framework/next/comms/comm_engine_res/threads
+    ${HCCL_BASE_DIR}/framework/next/coll_comms/rank
+    ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator
+    ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator/aicpu
+    ${HCCL_BASE_DIR}/framework/op_base/src/
+
+    ${HCCL_BASE_DIR}/platform/
+    ${HCCL_BASE_DIR}/platform/inc
+    ${HCCL_BASE_DIR}/platform/inc/adapter
+    ${HCCL_BASE_DIR}/platform/inc/adapter/hccd
+    ${HCCL_BASE_DIR}/platform/resource/dispatcher_ctx
+    ${HCCL_BASE_DIR}/platform/common/
+    ${HCCL_BASE_DIR}/platform/common/unique
+    ${HCCL_BASE_DIR}/platform/common/buffer_manager
+    ${HCCL_BASE_DIR}/platform/common/unfold_cache
+    ${HCCL_BASE_DIR}/platform/resource/transport
+    ${HCCL_BASE_DIR}/platform/resource/transport/device
+    ${HCCL_BASE_DIR}/platform/resource/transport/host
+    ${HCCL_BASE_DIR}/platform/resource/transport/heterog
+    ${HCCL_BASE_DIR}/platform/resource/transport/onesided
+    ${HCCL_BASE_DIR}/platform/resource/transport/onesided/device
+    ${HCCL_BASE_DIR}/platform/resource/notify
+    ${HCCL_BASE_DIR}/platform/ping_mesh
+    ${HCCL_BASE_DIR}/platform/resource/socket
+    ${HCCL_BASE_DIR}/platform/task
+    ${CANN_3RD_LIB_PATH}/hcomm_utils/${PRODUCT_SIDE}/include/legacy
+    ${HCCL_BASE_DIR}/platform/typical
+
+    ${HCCL_BASE_DIR}/framework/next/coll_comms/rank_pairs
+    ${HCCL_BASE_DIR}/legacy/unified_platform/resource/transport
+    ${HCCL_BASE_DIR}/legacy/common/utils/
+    ${HCCL_BASE_DIR}/legacy/common/exception/
+    ${HCCL_BASE_DIR}/legacy/common/types/
+    ${HCCL_BASE_DIR}/legacy/common/
+    ${HCCL_BASE_DIR}/legacy/framework/resource_manager/socket/
+    ${HCCL_BASE_DIR}/legacy/unified_platform/external_system/
+    ${HCCL_BASE_DIR}/legacy/unified_platform/common/
+    ${HCCL_BASE_DIR}/framework/next/comms/endpoint_pairs/sockets/
+    ${HCCL_BASE_DIR}/framework/next/comms/endpoints/
+    ${HCCL_BASE_DIR}/framework/next/comms/endpoint_pairs/
+)
+
 # 指定ccl_kernel_plf所需包含文件搜索路径
 if(BUILD_OPEN_PROJECT)
     include(${HCCL_CC_DIR}/cmake/hcomm_utils.cmake)
@@ -43,7 +161,6 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_BASE_DIR}/pub_inc/new
         ${HCCL_BASE_DIR}/platform/hccp/inc
         ${HCCL_BASE_DIR}/platform/hccp/inc/network
-        # todo: 这个文件在什么地方
         ${RDMA_CORE_INCLUDE_DIR}
 
         # runtime头文件
@@ -67,9 +184,7 @@ if(BUILD_OPEN_PROJECT)
 
         # 临时依赖头文件，待删除
         ${HCCL_HCOMM_HEADER_DIR}/externel_depends/tsch/
-        # todo
         ${RDMA_CORE_INCLUDE_DIR}
-        # todo:是否需要指定
         ${THIRD_PARTY_NLOHMANN_PATH}
     )
 
@@ -131,7 +246,6 @@ if(BUILD_OPEN_PROJECT)
             ${HCCL_HOST_LIB_DIRS}
         )
     endif()
-# todo:删除了非open project的定义
 endif()
 
 if(TARGET json)
@@ -142,7 +256,6 @@ if(TARGET json)
 endif()
 
 if(BUILD_OPEN_PROJECT)
-    add_dependencies(ccl_kernel_plf hccl_legacy)
 endif()
 
 target_compile_definitions(ccl_kernel_plf PRIVATE
@@ -153,47 +266,12 @@ target_compile_definitions(ccl_kernel_plf_a PRIVATE
     $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
 )
 
-# platform头文件
-set(hccl_plf_include_list
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/inc/adapter
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/inc/adapter/host
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/task
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/buffer_manager
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/unfold_cache
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/p2p_mgmt
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/unique
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/misc/network_manager
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/common/misc/gradient_segment
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport/device
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport/host
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport/heterog
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport/onesided
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/transport/onesided/device
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/mem
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/dispatcher_ctx
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/notify
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/socket
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/stream
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/rma_buffer
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/resource/
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/remote_access
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/task
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/tbe_vector_reduce
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/aiv_communication    
-)
-
 # 设置ccl_kernel_plf 包含文件列表
 set(ccl_kernel_plf_include_list
-    # todo这个头文件又是什么
     ${include_list}
     ${HCCL_BASE_DIR}/hccl/hccl_comm/wrapper/notify/
     ${HCCL_BASE_DIR}/common/debug/profiling/inc/aicpu
     ${HCCL_BASE_DIR}/framework/common/src/aicpu
-    ${hccl_plf_include_list}
 )
 
 # 指定ccl_kernel_plf所需头文件搜索路径
@@ -287,13 +365,10 @@ if(BUILD_OPEN_PROJECT)
         -ldl
         -lpthread
     )
-# todo:删除了非open的配置
 endif()
 
 add_subdirectory(framework)
-add_subdirectory(algorithm)
 add_subdirectory(platform)
-add_subdirectory(common)
 
 # 指定ccl_kernel_plf构建完成后安装到指定的目标位置
 install(TARGETS  ccl_kernel_plf
