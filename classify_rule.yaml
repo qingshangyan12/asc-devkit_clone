@@ -109,7 +109,7 @@ asc-devkit:
       - impl/basic_api/utils/kernel_check_vec_select_util.h
       - impl/basic_api/dav_3510/kernel_operator_vec_gather_impl.h
       - impl/basic_api/kernel_operator_vec_gather_intf_impl.h
-      - impl/basic_api/dav_c100/kernel_operator_vec_gather_impl
+      - impl/basic_api/dav_c100/kernel_operator_vec_gather_impl.h
       - impl/basic_api/dav_m200/kernel_operator_vec_gather_impl.h
       - impl/basic_api/utils/kernel_check_func.h
       - include/basic_api/kernel_operator_vec_gather_intf.h
