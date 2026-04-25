@@ -10,7 +10,7 @@
 
 >[!NOTE]说明 
 >-   静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
->-   本节涉及的完整样例请参考[静态Tensor编程样例](https://gitee.com/ascend/samples/tree/master/operator/ascendc/0_introduction/23_static_tensor_programming_kernellaunch)。
+>-   本节涉及的完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/04_resource_management/static_tensor_programming)。
 
 ## 编程范式<a name="section1486516584319"></a>
 

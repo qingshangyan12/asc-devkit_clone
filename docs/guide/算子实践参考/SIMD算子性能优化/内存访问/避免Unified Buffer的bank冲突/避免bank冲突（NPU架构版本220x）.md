@@ -311,7 +311,7 @@ bank冲突主要可以分为以下三种场景：
 
 -   **优化地址分配**
 
-    实现连续4096个float元素的加法z = x + y，通过在内存分配时适当扩大内存，保证在一个Repeat内，x和y不会同时出现在同一个bank group内，x/y和z不会同时出现同一个bank内。完整样例可参考[避免bank冲突样例](https://gitee.com/ascend/samples/tree/master/operator/ascendc/4_best_practices/4_bank_conflict)。
+    实现连续4096个float元素的加法z = x + y，通过在内存分配时适当扩大内存，保证在一个Repeat内，x和y不会同时出现在同一个bank group内，x/y和z不会同时出现同一个bank内。完整样例可参考[避免bank冲突样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/04_memory_access_practices/bank_conflict/bank_conflict)。
 
     实现方案对比如下：
 

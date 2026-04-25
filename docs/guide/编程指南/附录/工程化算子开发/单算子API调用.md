@@ -214,13 +214,13 @@ CHECK_ACL(aclnnFinalize());
 
         ```
         cd build
-        cmake ../src -DCMAKE_SKIP_RPATH=TRUE
+        cmake ..
         ```
 
     3.  执行如下命令，生成可执行文件。
 
         ```
-        make
+        make -j
         ```
 
         会在工程目录的output目录下生成可执行文件**execute\_add\_op**。
@@ -233,7 +233,6 @@ CHECK_ACL(aclnnFinalize());
     2.  在运行环境中，执行**execute\_add\_op**文件：
 
         ```
-        chmod +x execute_add_op
         ./execute_add_op
         ```
 
