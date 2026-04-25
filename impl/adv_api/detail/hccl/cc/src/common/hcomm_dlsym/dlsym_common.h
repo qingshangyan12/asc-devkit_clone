@@ -37,10 +37,12 @@ extern "C" {
 
 #define INIT_SUPPORT_FLAG(handle, func_name) \
     do { \
+        dlerror(); \
         void *ptr = (void *)dlsym(handle, #func_name); \
+        const char *err = dlerror(); \
         if (ptr == nullptr) { \
             g_##func_name##Supported = false; \
-            HCCL_DEBUG("[HcclWrapper] %s not supported", #func_name); \
+            HCCL_DEBUG("[HcclWrapper] %s not supported, %s", #func_name, err ? err : "(no error)"); \
         } else { \
             g_##func_name##Supported = true; \
         } \

@@ -449,11 +449,13 @@ target_link_directories(mc2_client PRIVATE
 
 add_dependencies(mc2_client mc2_compat)
 
+# libhcomm must precede mc2_compat: mc2_compat exports weak fallback wrappers
+# that must not preempt real HCOMM symbols during dynamic symbol binding.
 if(BUILD_OPEN_PROJECT)
     target_link_libraries(mc2_client PRIVATE
         -Wl,--no-as-needed
-        mc2_compat
         hcomm
+        mc2_compat
         acl_rt
         c_sec
         unified_dlog
@@ -467,8 +469,8 @@ else()
         $<BUILD_INTERFACE:npu_runtime_headers>
         $<BUILD_INTERFACE:mmpa_headers>
         -Wl,--no-as-needed
-        mc2_compat
         hcomm
+        mc2_compat
         acl_rt
         c_sec
         unified_dlog
