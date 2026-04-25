@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #define IMPL_COMMON_HCCL_AICPU_IMPL_H
 
 #include "hccl_aicpu_common.h"
+#include "hccl_control.h"
 
 namespace AscendC  {
 template <const auto &config>
@@ -376,18 +377,6 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
     ASCENDC_HCCL_API_ASSERT(curMsgPos >= 0, { return HCCL_FAILED; },
                             "Call Query failed, handleId[%d] was not got by Prepare interface.", handleId);
     return WaitFinishCntFromGm(curMsgPos, 0UL);
-}
-
-template<const auto &config>
-__aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetRankId() {
-    if (curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION) {
-#if __NPU_ARCH__ == 3510
-        return hcclContext_->rankId;
-#else
-        return (reinterpret_cast<__gm__ CommKfcContext *>(hcclContext_))->apiCtx.rankId;
-#endif
-    }
-    return hcclContext_->rankId;
 }
 
 template<const auto &config>
