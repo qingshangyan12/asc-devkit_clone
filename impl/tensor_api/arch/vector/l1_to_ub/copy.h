@@ -15,19 +15,20 @@
 #endif
 
 /*!
-* \file copy.h
-* \brief
-*/
+ * \file copy.h
+ * \brief
+ */
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_L1_TO_UB_COPY_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_L1_TO_UB_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
+#include "impl/tensor_api/arch/vector/l1_to_ub/routing.h"
 
 namespace AscendC {
 namespace Te {
 
-struct CopyL12UBTrait {};
+
 constexpr CopyL12UBTrait DEFAULT_COPY_L1_TO_UB_TRAIT;
 
 struct CopyL12UBTraitDefault {
@@ -40,6 +41,19 @@ public:
     template <typename Tp, const Tp& traits, typename... Args>
     __aicore__ inline static void Copy(const Args& ...args)
     {
+        if ASCEND_IS_AI {
+            DataCopyImpl<traits, Args...>(args...);
+        }
+    }
+
+private:
+    template <const CopyL12UBTrait& trait = DEFAULT_COPY_L1_TO_UB_TRAIT, typename T, typename U>
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
+    {
+        using dstTPos = GetMemLocation<T>;
+        using srcTPos = GetMemLocation<U>;
+        using Tensor2Tensor = typename CopyL12UBTensor2Tensor<dstTPos, srcTPos, CURRENT_ARCH_VERSION>::type;
+        Tensor2Tensor::template Run<trait, T, U>(dst, src);
     }
 };
 
