@@ -1,7 +1,7 @@
 # histogram样例
 
 ## 概述
-本样例基于RegBase编程范式实现直方图统计功能。
+本样例基于RegBase编程范式实现直方图统计功能，使用了Histograms接口。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -19,7 +19,7 @@
 
 ## 样例描述
 - 样例功能：  
-  对uint8_t输入数据做直方图统计，输入向量shape为[1, 256]，数据类型为uint8_t，输出为256个bin的直方图统计结果，数据类型为uint16_t。
+  对uint8_t输入数据做直方图统计，输入向量shape为[1, 256]，数据类型为uint8_t，输出向量shape为[1, 256]，即256个数值的直方图统计结果，数据类型为uint16_t。
 
   **场景1：单核模式**
   - 一个核处理全部256个输入数据，统计结果为256个bin的频率统计
@@ -28,14 +28,14 @@
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
     <tr><td rowspan="1" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
     <tr><td></td><td align="center">x</td><td align="center">[1, 256]</td><td align="center">uint8_t</td></tr>
-    <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[256]</td><td align="center">uint16_t</td></tr>
+    <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 256]</td><td align="center">uint16_t</td></tr>
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">histogram</td></tr>
     </table>
   - 样例实现：
     HistogramsVF函数内：
     1. 使用Duplicate初始化dstReg为0
     2. 使用LoadAlign的postUpdate模式加载输入数据
-    3. 调用Histograms接口进行统计计算，BIN0统计[0-127]区间、BIN1统计[128-255]区间
+    3. 调用Histograms接口进行统计计算，dst0统计[0-127]区间、dst1统计[128-255]区间
     4. 循环累加所有输入数据块的统计结果
     5. 使用StoreAlign的postUpdate模式一次性输出统计结果到UB
     - 调用实现
