@@ -1,4 +1,4 @@
-# AI Core SIMT编译<a name="ZH-CN_TOPIC_0000002561936205"></a>
+# AI Core SIMT编译基本用法<a name="ZH-CN_TOPIC_0000002561936205"></a>
 
 使用bisheng编译Ascend C SIMT源文件的基本命令是：
 ```
