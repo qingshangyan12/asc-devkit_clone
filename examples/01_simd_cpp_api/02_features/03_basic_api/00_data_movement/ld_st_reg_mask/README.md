@@ -40,7 +40,8 @@
   1. 在CopyVF函数里，调用Load接口从UB搬运256bit(32*uint8_t)数据到MaskReg，以实现mask的动态设置。本样例中，32个uint8_t数据设置为1,0,...,1，即第一个数和最后一个数为1(b'00000001)，因为芯片每次从低位读取数字，所以这32个数字最终填充到MaskReg中为b'1000...1...000。
   2. 调用Duplicate指令进行数据填充，MaskReg可以指示计算过程中参与计算的元素，由step1可知MaskReg中第1个bit和第249个bit为1，使用该掩码将只填充RegTensor第1个数和第249个数为2。
   3. 使用Store接口将RegTensor内的结果保存到UB。
-  4. 将MaskReg中的bit位全部置为1，通过Store接口将MaskReg中的数据保存到UB(地址=step3中的保存地址+256B)，实现MaskReg数据存储在UB上的功能。对应32个uint8_t数，每个数的每位比特位都为1，因此每个数的值都是255(0xFFFF..FF)。
+  4. 将MaskReg中的bit位全部置为1，通过Store接口将MaskReg中的数据保存到UB(地址=step3中的保存地址+256B)，实现MaskReg数据存储在UB上的功能。对应32个uint8_t数，每个数的每位比特位都为1，因此每个数的值都是255(0xFFFF..FF)。本步骤介绍使用Store接口的POST_MODE_NORMAL模式。
+  5. 将步骤4中的MaskReg连续30次依次存储至UB上，UB起始地址为step3中保存地址+2*256B，每次保存32个元素。本步骤介绍使用Store接口的POST_MODE_UPDATE模式。
   
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
