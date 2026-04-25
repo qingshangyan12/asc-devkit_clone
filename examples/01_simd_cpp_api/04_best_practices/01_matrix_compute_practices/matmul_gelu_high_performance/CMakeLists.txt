@@ -13,14 +13,14 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-2201, dav-3510")
-set(SCENARIO_NUM 1 CACHE STRING "Scenario: 1=非融合(C+V分离), 2=CV融合")
+set(SCENARIO_NUM 1 CACHE STRING "Scenario: 1=CV融合(GM中转), 2=CV融合(UB直通,仅A5)")
 
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    mmad_gelu_a2a3.asc
+    mmad_gelu.asc
 )
 if(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
     set(NPU_ARCH_ID 2201)
