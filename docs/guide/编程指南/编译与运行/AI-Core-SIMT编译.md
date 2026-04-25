@@ -9,7 +9,7 @@ bisheng可以通过-I <path>指定头文件按路径、-L <path> 指定链接库
 bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
 ```
 
-- simt编译 [LINK]()
+- Ai Core SIMT编译 [LINK]()
 ```
 // ----- simt_vec.asc -----
 __global__  simtKernel()
@@ -21,7 +21,7 @@ bisheng  -x asc simt_vec.o  main.o -o main --npu-arch=dav-xxxx --enable-simt
 bisheng main.cpp simt_vec.asc -o main --npu-arch=dav-xxxx --enable-simt
 ```
 
-- simt单独编译[LINK]()
+- Ai Core SIMT单独编译[LINK]()
 
  simt独立编译与aicore独立编译相同，需要在bisheng的命令行中增加-dc编译选项。
 下方示例中，definition.cu 定义了变量和函数，example.cu 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件
