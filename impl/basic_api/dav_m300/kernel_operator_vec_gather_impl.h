@@ -266,13 +266,13 @@ __aicore__ inline void GatherImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __
     const uint8_t srcRepStride)
 {
     static_assert(SupportBytes<T, 1, 2, 4>(), "Gather only support type b8/b16/b32 on current device");
-    uint32_t srcBaseOffset = srcBaseOffset/sizeof(T);
+    uint32_t srcBaseIndex = srcBaseOffset/sizeof(T);
     if constexpr (sizeof(T) == 1) {
-        GatherImplB8(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseOffset, mask, repeatTime, srcRepStride);
+        GatherImplB8(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseIndex, mask, repeatTime, srcRepStride);
     } else if constexpr (sizeof(T) == 2) {
-        GatherImplB16(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseOffset, mask, repeatTime, srcRepStride);
+        GatherImplB16(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseIndex, mask, repeatTime, srcRepStride);
     } else if constexpr (sizeof(T) == 4) {
-        GatherImplB32(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseOffset, mask, repeatTime, srcRepStride);
+        GatherImplB32(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseIndex, mask, repeatTime, srcRepStride);
     }
 }
 
@@ -283,13 +283,13 @@ __aicore__ inline void GatherImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __
     const uint8_t srcRepStride)
 {
     static_assert(SupportBytes<T, 1, 2, 4>(), "Gather only support type b8/b16/b32 on current device");
-    uint32_t srcBaseOffset = srcBaseOffset/sizeof(T);
+    uint32_t srcBaseIndex = srcBaseOffset/sizeof(T);
     if constexpr (sizeof(T) == 1) {
-        GatherImplB8(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseOffset, mask, repeatTime, srcRepStride);
+        GatherImplB8(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseIndex, mask, repeatTime, srcRepStride);
     } else if constexpr (sizeof(T) == 2) {
-        GatherImplB16(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseOffset, mask, repeatTime, srcRepStride);
+        GatherImplB16(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseIndex, mask, repeatTime, srcRepStride);
     } else if constexpr (sizeof(T) == 4) {
-        GatherImplB32(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseOffset, mask, repeatTime, srcRepStride);
+        GatherImplB32(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseIndex, mask, repeatTime, srcRepStride);
     }
 }
 
@@ -299,13 +299,13 @@ __aicore__ inline void GatherImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal, __
                                    const uint32_t srcBaseOffset, const uint32_t count)
 {
     static_assert(SupportBytes<T, 1, 2, 4>(), "Gather only support type b8/b16/b32 on current device");
-    uint32_t srcBaseOffset = srcBaseOffset/sizeof(T);
+    uint32_t srcBaseIndex = srcBaseOffset/sizeof(T);
     if constexpr (sizeof(T) == 1) {
-        GatherImplB8(dstLocal, srcLocal, srcOffsetLocal, srcBaseOffset, count);
+        GatherImplB8(dstLocal, srcLocal, srcOffsetLocal, srcBaseIndex, count);
     } else if constexpr (sizeof(T) == 2) {
-        GatherImplB16(dstLocal, srcLocal, srcOffsetLocal, srcBaseOffset, count);
+        GatherImplB16(dstLocal, srcLocal, srcOffsetLocal, srcBaseIndex, count);
     } else if constexpr (sizeof(T) == 4) {
-        GatherImplB32(dstLocal, srcLocal, srcOffsetLocal, srcBaseOffset, count);
+        GatherImplB32(dstLocal, srcLocal, srcOffsetLocal, srcBaseIndex, count);
     }
 }
 
