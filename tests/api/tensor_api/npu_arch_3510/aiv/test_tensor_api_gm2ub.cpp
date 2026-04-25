@@ -17,15 +17,10 @@ protected:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
 
-    void SetUp() override 
-    {
-        AscendC::SetGCoreType(1);
-    }
-
-    void TearDown() override 
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void SetUp()
+    { AscendC::SetGCoreType(AscendC::MIX_TYPE); }
+    void TearDown()
+    { AscendC::SetGCoreType(AscendC::MIX_TYPE); }
 };
 
 namespace {
@@ -60,7 +55,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 
 } // namespace
 
-TEST_F(Tensor_Api_Vector_Copy_3510, CopyGM2UBRoutesToVectorArchCopy)
+TEST_F(Tensor_Api_Vector_Copy_3510, CopyGM2UBND2ND)
 {
     using namespace AscendC::Te;
 
@@ -71,6 +66,43 @@ TEST_F(Tensor_Api_Vector_Copy_3510, CopyGM2UBRoutesToVectorArchCopy)
 
     auto gmTensor = MakeTensorAt<Location::GM>(src, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
     auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+
+    RunCopyCallPaths<CopyGM2UB, CopyGM2UBTraitDefault>(ubTensor, gmTensor);
+    RunCopyWithPaths<CopyGM2UB, CopyGM2UBTraitDefault>(ubTensor, gmTensor);
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+TEST_F(Tensor_Api_Vector_Copy_3510, CopyGM2UBDN2DN)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t m = 64;
+    constexpr uint32_t n = 64;
+    __gm__ int8_t src[m * n] = {0};
+    __ubuf__ int8_t dst[m * n] = {0};
+
+    auto gmTensor = MakeTensorAt<Location::GM>(src, MakeFrameLayout<DNExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<DNExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+
+    RunCopyCallPaths<CopyGM2UB, CopyGM2UBTraitDefault>(ubTensor, gmTensor);
+    RunCopyWithPaths<CopyGM2UB, CopyGM2UBTraitDefault>(ubTensor, gmTensor);
+
+    EXPECT_EQ(dst[0], 0);
+}
+
+
+TEST_F(Tensor_Api_Vector_Copy_3510, CopyGM2UBNZ2NZ)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t m = 64;
+    constexpr uint32_t n = 64;
+    __gm__ int8_t src[m * n] = {0};
+    __ubuf__ int8_t dst[m * n] = {0};
+
+    auto gmTensor = MakeTensorAt<Location::GM>(src, MakeFrameLayout<NZExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<NZExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
 
     RunCopyCallPaths<CopyGM2UB, CopyGM2UBTraitDefault>(ubTensor, gmTensor);
     RunCopyWithPaths<CopyGM2UB, CopyGM2UBTraitDefault>(ubTensor, gmTensor);
