@@ -72,7 +72,9 @@ target_compile_options(demo PRIVATE
         kernel_lib
     )
     ```
-
-
-
-
+    表1 常用的CMAKE配置变量说明
+    
+|  变量名称| 配置说明 |  
+|--|--|
+|CMAKE_BUILD_TYPE  | 编译模式选项，可配置为：“Release”，Release版本，不包含调试信息，编译最终发布的版本。“Debug”，Debug版本，包含调试信息，便于开发者开发和调试。 |  
+|CMAKE_INSTALL_PREFIX | 用于指定CMake执行install时，安装的路径前缀，执行install后编译产物（ascendc_library中指定的target以及对应的头文件）会安装在该路径下。默认路径为当前目录的out目录下。。 |  
