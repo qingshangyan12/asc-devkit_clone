@@ -71,7 +71,7 @@ for-loop {
 **图 2**  内存管理示意图<a name="fig375042942717"></a>  
 ![](../../../../figures/内存管理示意图.png "内存管理示意图")
 
-编程过程中使用到的临时变量内存同样通过Pipe进行管理。临时变量可以使用[TBuf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TBuf.md)数据结构来申请指定TPosition上的存储空间。使用[TBuf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TBuf.md)申请的内存空间只能参与计算，无法执行队列的入队出队操作。具体的接口使用说明请参考[TBuf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TBuf.md)。
+编程过程中使用到的临时变量内存同样通过Pipe进行管理。临时变量可以使用TBuf数据结构来申请指定TPosition上的存储空间。使用TBuf申请的内存空间只能参与计算，无法执行队列的入队出队操作。具体的接口使用说明请参考[TBuf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TBuf.md)。
 
 按照上述编程范式进行编程即可实现单核上数据的并行处理。需要处理的数据被切分成n片，每个并行任务需要依次完成n个数据切片的处理。任务间的箭头表达数据间的依赖关系，比如CopyIn处理完第一个数据切片之后，Compute才能对该切片进行处理。
 

@@ -57,7 +57,7 @@
 3.  Kernel侧注册Tiling结构体，解析Tiling数据至TilingData结构并使用。
 
     -   需要包含Tiling结构体定义头文件。
-    -   通过[REGISTER\_TILING\_DEFAULT](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/REGISTER_TILING_DEFAULT.md)或者[REGISTER\_TILING\_FOR\_TILINGKEY](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/REGISTER_TILING_FOR_TILINGKEY.md)注册Tiling结构体；通过[GET\_TILING\_DATA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GET_TILING_DATA.md)解析Tiling数据至TilingData结构并使用。其中[REGISTER\_TILING\_DEFAULT](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/REGISTER_TILING_DEFAULT.md)同时也用于标识使用标准C++语法定义TilingData结构体。
+    -   通过[REGISTER\_TILING\_DEFAULT](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/REGISTER_TILING_DEFAULT.md)或者[REGISTER\_TILING\_FOR\_TILINGKEY](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/REGISTER_TILING_FOR_TILINGKEY.md)注册Tiling结构体；通过[GET\_TILING\_DATA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GET_TILING_DATA.md)解析Tiling数据至TilingData结构并使用。其中REGISTER\_TILING\_DEFAULT同时也用于标识使用标准C++语法定义TilingData结构体。
 
     ```
     #include "kernel_operator.h"

@@ -10,7 +10,7 @@
 
 -   MDL模板的约束条件
 
-    MDL模板的[TCubeTiling结构体](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TCubeTiling结构体.md)需要满足TCubeTiling约束条件和MDL模板补充约束条件，具体请参考[TCubeTiling结构体](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TCubeTiling结构体.md)。
+    MDL模板的TCubeTiling结构体需要满足TCubeTiling约束条件和MDL模板补充约束条件，具体请参考[TCubeTiling结构体](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TCubeTiling结构体.md)。
 
 本案例的算子规格如下：
 

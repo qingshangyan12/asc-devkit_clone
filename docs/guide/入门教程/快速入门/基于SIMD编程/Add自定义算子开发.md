@@ -49,7 +49,7 @@
 
 4.  确定算子实现所需接口。
     -   实现涉及外部存储和内部存储间的数据搬运，查看Ascend C  API参考中的数据搬运接口，需要使用[DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DataCopy.md)来实现数据搬移。
-    -   本样例只涉及矢量计算的加法操作，查看Ascend C  API参考中的矢量计算接口[Memory矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Memory矢量计算.md)，初步分析可使用[Add](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Add.md)接口[Add](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Add.md)实现x+y。
+    -   本样例只涉及矢量计算的加法操作，查看Ascend C  API参考中的矢量计算接口[Memory矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Memory矢量计算.md)，初步分析可使用Add接口[Add](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Add.md)实现x+y。
     -   计算中使用到的Tensor数据结构，使用[AllocTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AllocTensor.md)、[FreeTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FreeTensor.md)进行申请和释放。
     -   并行流水任务之间使用Queue队列完成同步，会使用到[EnQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/EnQue.md)、[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DeQue.md)等接口。
 
@@ -403,7 +403,7 @@
     **图 5**  调用步骤<a name="zh-cn_topic_0000001565030288_fig1034911325594"></a>  
     ![](../../../figures/调用步骤.png "调用步骤")
 
-    如下示例中的acl API使用方法请参考《应用开发指南 \(C&C++\)》中的“Runtime API参考 > Stream管理”章节。
+    如下示例中的acl API使用方法请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
     ```
     std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y)

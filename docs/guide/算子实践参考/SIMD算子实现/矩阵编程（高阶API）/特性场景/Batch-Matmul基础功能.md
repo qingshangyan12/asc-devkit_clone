@@ -2,7 +2,7 @@
 
 ## 功能介绍<a name="zh-cn_topic_0000001726346562_section1953745712231"></a>
 
-Batch Matmul是指批量处理Matmul计算的场景。该场景对外提供了[IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateBatch.md)的调用接口，调用一次[IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateBatch.md)，可以计算出多个singleCoreM \* singleCoreN大小的C矩阵。
+Batch Matmul是指批量处理Matmul计算的场景。该场景对外提供了[IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateBatch.md)的调用接口，调用一次IterateBatch，可以计算出多个singleCoreM \* singleCoreN大小的C矩阵。
 
 Matmul单次计算的过程需要搬入和搬出数据，当进行多次Matmul计算且单次Matmul计算的输入shape较小时，搬运开销在整体耗时中占比较大。通过IterateBatch接口批量处理Matmul，可以有效提升带宽利用率。
 

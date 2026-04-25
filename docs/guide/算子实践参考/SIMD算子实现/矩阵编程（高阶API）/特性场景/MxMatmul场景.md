@@ -305,7 +305,7 @@ Kernel侧的关键步骤介绍如下：
     ```
 
 4.  **完成矩阵乘操作。**
-    -   调用[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Iterate.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Iterate.md)方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
+    -   调用[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Iterate.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
 
         ```
         while (mm.Iterate()) {   

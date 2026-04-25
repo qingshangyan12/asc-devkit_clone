@@ -2,7 +2,7 @@
 
 ## 简介<a name="section1825793122916"></a>
 
-Reg矢量计算API是面向RegBase架构开发的API，用户可以通过该API直接对芯片中涉及Vector计算的[寄存器](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/寄存器数据类型.md)进行操作，实现更大的灵活性和更好的性能。Reg矢量计算API与基础API功能相似，但与基础API输入和输出数据必须为LocalTensor不同，Reg矢量计算API的输入或输出数据均为Reg矢量计算[寄存器](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/寄存器数据类型.md)。对于计算类API，其功能是从给定的[寄存器](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/寄存器数据类型.md)获取数据，进行计算，并将结果保存在给定的[寄存器](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/寄存器数据类型.md)。对于搬运类API，其功能是实现UB和[寄存器](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/寄存器数据类型.md)的数据搬运。由此可见，Reg矢量计算API相较于基础API，将数据搬运和Reg计算过程交给用户自主控制，从而实现更大的开发自由度。
+Reg矢量计算API是面向RegBase架构开发的API，用户可以通过该API直接对芯片中涉及Vector计算的寄存器进行操作，实现更大的灵活性和更好的性能。Reg矢量计算API与基础API功能相似，但与基础API输入和输出数据必须为LocalTensor不同，Reg矢量计算API的输入或输出数据均为Reg矢量计算寄存器。对于计算类API，其功能是从给定的寄存器获取数据，进行计算，并将结果保存在给定的寄存器。对于搬运类API，其功能是实现UB和寄存器的数据搬运。由此可见，Reg矢量计算API相较于基础API，将数据搬运和Reg计算过程交给用户自主控制，从而实现更大的开发自由度。
 
 ## Regbase编程模型<a name="section1977234218287"></a>
 
@@ -66,7 +66,7 @@ __aicore__ inline void Compute()
 
 ## Reg矢量计算寄存器<a name="section1910719438134"></a>
 
-[Reg矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Reg矢量计算.md)API操作的基础数据类型介绍如下，具体API请参考[Reg矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Reg矢量计算.md)。
+Reg矢量计算API操作的基础数据类型介绍如下，具体API请参考[Reg矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Reg矢量计算.md)。
 
 -   **RegTensor**
 
