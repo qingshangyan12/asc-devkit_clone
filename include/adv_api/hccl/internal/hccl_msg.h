@@ -31,6 +31,7 @@ constexpr uint64_t FINALIZE_FINISH_CNT = 1234567899999999999UL;  // server write
 constexpr int8_t INVALID_HANDLE_ID = static_cast<int8_t>(-1);
 constexpr int8_t HCCL_MAX_HANDLE_ID = 63;
 constexpr uint8_t HCCL_ALG_MAX_NUM = 8;
+constexpr uint8_t HCCL_ALG_SUPPORT_NUM = 2;
 
 enum class HcclTilingVersion: uint8_t {
     DEPRECATED_TILING_VERSION,          // Deprecated tiling version

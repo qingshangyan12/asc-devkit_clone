@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2025-2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ public:
 
     __aicore__ inline GM_ADDR GetWindowsOutAddr(uint32_t rankId);
 
-    __aicore__ inline uint32_t GetRankId();
+    __aicore__ inline uint32_t GetRankId() { return hcclContext_->rankId; };
 
     __aicore__ inline uint32_t GetRankDim();
 
@@ -123,7 +123,7 @@ private:
 #if __NPU_ARCH__ == 3510
     __gm__ OpResCtx *hcclContext_;
 #else
-   __gm__ HcclCombineOpParam *hcclContext_;
+    __gm__ HcclCombineOpParam *hcclContext_;
 #endif
     __gm__ HcclMsgArea *hcclMsgArea_;
     uint64_t tilingBaseAddr_;

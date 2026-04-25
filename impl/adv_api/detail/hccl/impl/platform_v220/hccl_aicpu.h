@@ -71,9 +71,6 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::InterHcclGroupSync(int
 template <const auto& config>
 __aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetWindowsInAddr(uint32_t rankId)
 {
-    if (curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION) {
-        return 0UL;
-    }
     ASCENDC_HCCL_API_ASSERT(
         rankId < GetRankDim(), { return nullptr; }, "GetWindowsInAddr failed, rankId[%u], expected less than[%u]",
         rankId, GetRankDim());
@@ -101,9 +98,6 @@ __aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
 template <const auto& config>
 __aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetWindowsOutAddr(uint32_t rankId)
 {
-    if (curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION) {
-        return 0UL;
-    }
     ASCENDC_HCCL_API_ASSERT(
         rankId < GetRankDim(), { return nullptr; }, "GetWindowsOutAddr failed, rankId[%u], expected less than[%u]",
         rankId, GetRankDim());
@@ -200,10 +194,8 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
 }
 
 template<const auto &config>
-__aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetRankDim() {
-    if (curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION) {
-        return (reinterpret_cast<__gm__ CommKfcContext *>(hcclContext_))->apiCtx.rankNum;
-    }
+__aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetRankDim()
+{
     return hcclContext_->rankNum;
 }
 

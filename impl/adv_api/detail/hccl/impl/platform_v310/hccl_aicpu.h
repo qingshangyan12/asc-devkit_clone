@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2025-2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
     ASCENDC_HCCL_API_ASSERT(opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL),
                             { return HCCL_FAILED; }, "Call SetCcTiling failed, ensure cmdType is valid");
     ccOpTilingDataTable_[opType] = offset;
-    for (uint8_t i = 0; i < 2; i++) {
+    for (uint8_t i = 0; i < HCCL_ALG_SUPPORT_NUM; i++) {
         if (hcclContext_->algInfo[i].offset == offset) {
             ccOpParamTable_[opType] = hcclContext_->algInfo[i].opParam;
             break;
