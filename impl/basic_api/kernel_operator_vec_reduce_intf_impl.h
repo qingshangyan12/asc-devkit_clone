@@ -47,8 +47,8 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 
-namespace internal {
-// ReduceDataBlock internal implementation
+namespace Internal {
+// ReduceDataBlock Internal implementation
 template <ReduceType reduceType, typename T, bool isSetMask, typename MaskType>
 __aicore__ inline void ReduceDataBlockImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src, const MaskType mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
@@ -100,20 +100,20 @@ __aicore__ inline void ReduceRepeatImpl(const LocalTensor<T>& dst, const LocalTe
     }
 }
 #endif
-}  // namespace internal
+}  // namespace Internal
 
 template <ReduceType reduceType, typename T, bool isSetMask>
 __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
-    internal::ReduceDataBlockImpl<reduceType, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    Internal::ReduceDataBlockImpl<reduceType, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
 template <ReduceType reduceType, typename T, bool isSetMask>
 __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[],
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
-    internal::ReduceDataBlockImpl<reduceType, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    Internal::ReduceDataBlockImpl<reduceType, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
 template <ReduceType reduceType, typename T, bool isSetMask>
@@ -140,7 +140,7 @@ __aicore__ inline void ReduceRepeat(const LocalTensor<U>& dst, const LocalTensor
     const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride, ReduceOrder order)
 {
-    internal::ReduceRepeatImpl<reduceType, T, isSetMask, U>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+    Internal::ReduceRepeatImpl<reduceType, T, isSetMask, U>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
 template <ReduceType reduceType, typename T, bool isSetMask, typename U>
@@ -148,7 +148,7 @@ __aicore__ inline void ReduceRepeat(const LocalTensor<U>& dst, const LocalTensor
     const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride, ReduceOrder order)
 {
-    internal::ReduceRepeatImpl<reduceType, T, isSetMask, U>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+    Internal::ReduceRepeatImpl<reduceType, T, isSetMask, U>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 #else
 
@@ -157,7 +157,7 @@ __aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor
     const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride, ReduceOrder order)
 {
-    internal::ReduceRepeatImpl<reduceType, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+    Internal::ReduceRepeatImpl<reduceType, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
 template <ReduceType reduceType, typename T, bool isSetMask>
@@ -165,7 +165,7 @@ __aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor
     const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride, ReduceOrder order)
 {
-    internal::ReduceRepeatImpl<reduceType, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+    Internal::ReduceRepeatImpl<reduceType, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 #endif
 
