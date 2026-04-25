@@ -39,7 +39,7 @@ public:
     {
         uint8_t sid = 0;
         uint32_t burst_num = 1;
-        uint32_t burst_len = 8;
+        uint32_t len_burst = 8;
         uint8_t left_padding_count = 0;
         uint8_t right_padding_count = 0;
         bool constant_padding_ctl = false;
@@ -47,7 +47,7 @@ public:
         uint64_t burst_src_stride = 8;
         uint32_t burst_dst_stride = 8;
         copy_gm_to_ubuf_align_v2((__gm__ T *)dstGm, (__gm__ T *)srcGm, sid, burst_num,
-            burst_len, left_padding_count, right_padding_count, constant_padding_ctl,
+            len_burst, left_padding_count, right_padding_count, constant_padding_ctl,
             l2_cache_ctl, burst_src_stride, burst_dst_stride);
 
     }
@@ -56,7 +56,7 @@ public:
     {
         uint8_t sid = 0;
         uint32_t burst_num = 1;
-        uint32_t burst_len = 8;
+        uint32_t len_burst = 8;
         uint8_t left_padding_count = 0;
         uint8_t right_padding_count = 0;
         bool constant_padding_ctl = false;
@@ -64,7 +64,7 @@ public:
         uint64_t burst_src_stride = 8;
         uint32_t burst_dst_stride = 8;
         copy_gm_to_cbuf_align_v2((__gm__ T *)dstGm, (__gm__ T *)srcGm, sid, burst_num,
-            burst_len, left_padding_count, right_padding_count, constant_padding_ctl,
+            len_burst, left_padding_count, right_padding_count, constant_padding_ctl,
             l2_cache_ctl, burst_src_stride, burst_dst_stride);
     }
 

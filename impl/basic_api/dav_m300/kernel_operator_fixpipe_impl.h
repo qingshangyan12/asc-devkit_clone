@@ -123,8 +123,8 @@ template <typename T> struct FixpipeInfoParams {
         srcStride = intriParams.srcStride * BLOCK_CUBE + roundHowo;
 
         // original dst_stride unit is 32B, it's the gap, new dst_stride it's the stride
-        // note: input burst_len is calculated by src dtype, if src dtype is different with dst dtype, need to
-        // re-calculate burst_len for dst
+        // note: input len_burst is calculated by src dtype, if src dtype is different with dst dtype, need to
+        // re-calculate len_burst for dst
         if (intriParams.nz2ndParams.nz2ndEn) {
             // If NZ2ND is enabled, it is the dst_D value in unit of element. Loop2_dst_stride
             dstStride = intriParams.dstStride;
@@ -586,7 +586,7 @@ __aicore__ inline void CopyDeqTensorToFbuf(const FixpipeInfoParams<T>& fixpipeIn
         AscendCUtils::GetTemporaryFbBufferAddr<uint64_t>(0, deqDataSize / sizeof(uint64_t));
     uint32_t deqValueOffset = nIterIndex * fixpipeInfo.tiling.nSize;
     // L1 -> FB
-    uint16_t fbufBurstLen = deqDataSize / 128; // copy from cbuf to fbuf, burst_len unit is 128Bytes
+    uint16_t fbufBurstLen = deqDataSize / 128; // copy from cbuf to fbuf, len_burst unit is 128Bytes
     copy_cbuf_to_fbuf(deqTensorTempBuf, fixpipeInfo.cbufWorkspace + deqValueOffset, 1, fbufBurstLen, 0, 0);
     // FPC of fixpipe buffer for Quant_PRE is FPC[15:8], unit is 128Bytes
     uint64_t deqTensorAddr = ((uint64_t)deqTensorTempBuf >> static_cast<uint64_t>(7)) << 8;

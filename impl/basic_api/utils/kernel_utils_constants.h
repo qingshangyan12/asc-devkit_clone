@@ -222,9 +222,9 @@ const uint8_t MRG_SORT_ELEMENT_LEN = 4;
 const uint8_t DEFAULT_DATA_COPY_NBURST = 1;
 const uint8_t DEFAULT_DATA_COPY_STRIDE = 0;
 const int32_t BYTE_PER_FRACTAL = 512;
-const int32_t SRC_BURST_LEN_SIZE_ELE = 16;
+const int32_t SRC_len_burst_SIZE_ELE = 16;
 const int32_t SRC_GAP_SIZE_BYTE = 32;
-const int32_t DST_BURST_LEN_SIZE_ELE = 256;
+const int32_t DST_len_burst_SIZE_ELE = 256;
 const int32_t VREDUCE_PER_REP_OUTPUT = 2;
 const uint16_t ONE_PARAM_SIZE = 8;
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \

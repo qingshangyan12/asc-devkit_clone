@@ -236,7 +236,7 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
         uint16_t align = (dumpSize % DEFAULT_BLOCK_SIZE == 0) ? 0 : 1;
         uint16_t countBlks = align + dumpSize / DEFAULT_BLOCK_SIZE;
 
-        uint16_t burstLen = static_cast<uint16_t>(SRC_BURST_LEN_SIZE_ELE * SRC_BURST_LEN_SIZE_ELE
+        uint16_t burstLen = static_cast<uint16_t>(SRC_len_burst_SIZE_ELE * SRC_len_burst_SIZE_ELE
             * sizeof(float) / ONE_BLK_SIZE);
         uint16_t n = countBlks * BLOCK_CUBE;
         uint16_t m = (burstLen * ONE_BLK_SIZE / B32_BYTE_SIZE) / BLOCK_CUBE;
