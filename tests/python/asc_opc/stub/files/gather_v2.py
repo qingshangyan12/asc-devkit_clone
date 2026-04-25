@@ -752,7 +752,7 @@ class GatherV2():
             # loop num from x_src to block_ub
             x_to_block_loop_num = row_num_last_remaining // block_per_loop_num
             # compute output offset of every loop
-            burst_len_res = ceil_value(row_num_last_remaining * self.params_row * self.params_dsize,
+            len_burst_res = ceil_value(row_num_last_remaining * self.params_row * self.params_dsize,
                                        constant.BLOCK_SIZE)
             output_offset = (pre_i * self.indices_num + indices_num_offset + inner_indices_offset) * self.params_row \
                             + row_g * (row_num_last // res_to_gm_loop_num) * self.params_row
@@ -799,19 +799,19 @@ class GatherV2():
 
             # move result data from ub to gm
             tail_elem = (row_num_last_remaining * self.params_row) % self.block_elem
-            with tik_instance.if_scope(tik.all(tail_elem != 0, burst_len_res > 1)):
+            with tik_instance.if_scope(tik.all(tail_elem != 0, len_burst_res > 1)):
                 block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ),
                                                name="block_ub",
                                                scope=tik.scope_ubuf)
                 with tik_instance.for_range(0, self.block_elem) as num_i:
                     block_ub[num_i].set_as(res_ub[row_num_last_remaining * self.params_row - self.block_elem + num_i])
 
-                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res - 1, 0, 0)
+                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res - 1, 0, 0)
                 tik_instance.data_move(
                     self.y[output_offset + (row_num_last_remaining * self.params_row - self.block_elem)], block_ub, 0,
                     1, 1, 0, 0)
             with tik_instance.else_scope():
-                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def process_remaining_tail_mode_1(self, pre_i, indices_ub, res_ub, x_src):
         """
@@ -834,7 +834,7 @@ class GatherV2():
         tik_instance.data_move(indices_ub, self.indices[indices_num_offset], 0, 1,
                                ceil_value(self.indices_num_remaining * self.indices_dsize, constant.BLOCK_SIZE), 0, 0)
 
-        burst_len_res = ceil_value(self.indices_num_remaining * self.params_row * self.params_dsize,
+        len_burst_res = ceil_value(self.indices_num_remaining * self.params_row * self.params_dsize,
                                    constant.BLOCK_SIZE)
         output_offset = (pre_i * self.indices_num + indices_num_offset) * self.params_row
 
@@ -855,7 +855,7 @@ class GatherV2():
                 res_ub[res_ub_offset + i].set_as(block_ub[i])
 
         # copy result data from ub to gm
-        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def compute_mode_13(self, half_ub_size, block_id):
         """
@@ -948,7 +948,7 @@ class GatherV2():
         None
         """
         tik_instance = self.tik_instance
-        burst_len_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
 
         with tik_instance.for_range(0, loop_num) as inner_loop_i:
             inner_indices_offset = inner_loop_i * self.row_num_once_ub
@@ -974,7 +974,7 @@ class GatherV2():
                     res_ub[res_ub_offset + i].set_as(block_ub[ub_offset + i])
 
             # copy result data from ub to gm
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def process_last_mode_13(self, ub_tensor_list, offset_list, x_src):
         """
@@ -993,7 +993,7 @@ class GatherV2():
         tik_instance = self.tik_instance
         row_num_last, indices_ub, res_ub = ub_tensor_list
         indices_num_offset, inner_indices_offset, pre_i = offset_list
-        burst_len_res = ceil_value(row_num_last * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_res = ceil_value(row_num_last * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
         output_offset = (pre_i * self.indices_num + indices_num_offset + inner_indices_offset) * self.params_row
 
         with tik_instance.for_range(0, row_num_last, thread_num=2) as row_i:
@@ -1017,18 +1017,18 @@ class GatherV2():
 
         # move result data from ub to gm
         tail_elem = (row_num_last * self.params_row) % self.block_elem
-        with tik_instance.if_scope(tik.all(tail_elem != 0, burst_len_res > 1)):
+        with tik_instance.if_scope(tik.all(tail_elem != 0, len_burst_res > 1)):
             block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ),
                                            name="block_ub",
                                            scope=tik.scope_ubuf)
             with tik_instance.for_range(0, self.block_elem) as num_i:
                 block_ub[num_i].set_as(res_ub[row_num_last * self.params_row - self.block_elem + num_i])
 
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res - 1, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res - 1, 0, 0)
             tik_instance.data_move(self.y[output_offset + (row_num_last * self.params_row - self.block_elem)], block_ub,
                                    0, 1, 1, 0, 0)
         with tik_instance.else_scope():
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def process_remaining_tail_mode_13(self, pre_i, indices_ub, res_ub, x_src):
         """
@@ -1051,7 +1051,7 @@ class GatherV2():
         tik_instance.data_move(indices_ub, self.indices[indices_num_offset], 0, 1,
                                ceil_value(self.indices_num_remaining * self.indices_dsize, constant.BLOCK_SIZE), 0, 0)
 
-        burst_len_res = ceil_value(self.indices_num_remaining * self.params_row * self.params_dsize,
+        len_burst_res = ceil_value(self.indices_num_remaining * self.params_row * self.params_dsize,
                                    constant.BLOCK_SIZE)
         output_offset = (pre_i * self.indices_num + indices_num_offset) * self.params_row
 
@@ -1074,7 +1074,7 @@ class GatherV2():
                 res_ub[res_ub_offset + i].set_as(block_ub[ub_offset + i])
 
         # copy result data from ub to gm
-        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def compute_mode_4(self, half_ub_size, block_id):
         """
@@ -1163,7 +1163,7 @@ class GatherV2():
         None
         """
         tik_instance = self.tik_instance
-        burst_len_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
 
         with tik_instance.for_range(0, loop_num) as inner_loop_i:
             inner_indices_offset = inner_loop_i * self.row_num_once_ub
@@ -1181,7 +1181,7 @@ class GatherV2():
                     res_ub[res_ub_offset + i].set_as(x_ub[gm_offset + i])
 
             # copy result data from ub to gm
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def process_last_mode_4(self, tensor_list, offset_list):
         """
@@ -1201,7 +1201,7 @@ class GatherV2():
         row_num_last, indices_ub, res_ub, x_ub = tensor_list
         indices_num_offset, inner_indices_offset, pre_i = offset_list
 
-        burst_len_res = ceil_value(row_num_last * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_res = ceil_value(row_num_last * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
         output_offset = (pre_i * self.indices_num + indices_num_offset + inner_indices_offset) * self.params_row
 
         with tik_instance.for_range(0, row_num_last, thread_num=2) as row_i:
@@ -1217,18 +1217,18 @@ class GatherV2():
 
         # move result data from ub to gm
         tail_elem = (row_num_last * self.params_row) % self.block_elem
-        with tik_instance.if_scope(tik.all(tail_elem != 0, burst_len_res > 1)):
+        with tik_instance.if_scope(tik.all(tail_elem != 0, len_burst_res > 1)):
             block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ),
                                            name="block_ub",
                                            scope=tik.scope_ubuf)
             with tik_instance.for_range(0, self.block_elem) as num_i:
                 block_ub[num_i].set_as(res_ub[row_num_last * self.params_row - self.block_elem + num_i])
 
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res - 1, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res - 1, 0, 0)
             tik_instance.data_move(self.y[output_offset + (row_num_last * self.params_row - self.block_elem)], block_ub,
                                    0, 1, 1, 0, 0)
         with tik_instance.else_scope():
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def process_remaining_tail_mode_4(self, pre_i, indices_ub, res_ub, x_ub):
         """
@@ -1251,7 +1251,7 @@ class GatherV2():
         tik_instance.data_move(indices_ub, self.indices[indices_num_offset], 0, 1,
                                ceil_value(self.indices_num_remaining * self.indices_dsize, constant.BLOCK_SIZE), 0, 0)
 
-        burst_len_res = ceil_value(self.indices_num_remaining * self.params_row * self.params_dsize,
+        len_burst_res = ceil_value(self.indices_num_remaining * self.params_row * self.params_dsize,
                                    constant.BLOCK_SIZE)
         output_offset = (pre_i * self.indices_num + indices_num_offset) * self.params_row
 
@@ -1266,7 +1266,7 @@ class GatherV2():
                 res_ub[res_ub_offset + i].set_as(x_ub[gm_offset + i])
 
         # copy result data from ub to gm
-        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def compute_mode_2(self, half_ub_size, block_id):
         """
@@ -1325,7 +1325,7 @@ class GatherV2():
         process row_num_once_ub indices for tiling mode 2
         """
         tik_instance = self.tik_instance
-        burst_len_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
 
         with tik_instance.for_range(0, loop_num - 1) as row_i:
             indices_value = tik_instance.Scalar(dtype=self.indices_dtype, name="indices_value", init_value=0)
@@ -1333,29 +1333,29 @@ class GatherV2():
             gm_offset = (pre_i * self.params_axis + indices_value) * self.params_row
             output_offset = (pre_i * self.indices_num + indices_offset + row_i) * self.params_row
 
-            tik_instance.data_move(res_ub, self.x[gm_offset], 0, 1, burst_len_row, 0, 0)
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_row, 0, 0)
+            tik_instance.data_move(res_ub, self.x[gm_offset], 0, 1, len_burst_row, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_row, 0, 0)
 
     def indices_inner_gather_tail_2(self, loop_num, indices_offset, pre_i, indices_ub, res_ub):
         """
         process last loop num indices for tiling mode 2
         """
         tik_instance = self.tik_instance
-        burst_len_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
 
         indices_value = tik_instance.Scalar(dtype=self.indices_dtype, name="indices_value", init_value=0)
         indices_value.set_as(indices_ub[loop_num - 1])
         gm_offset = (pre_i * self.params_axis + indices_value) * self.params_row
         output_offset = (pre_i * self.indices_num + indices_offset + loop_num - 1) * self.params_row
 
-        tik_instance.data_move(res_ub, self.x[gm_offset], 0, 1, burst_len_row, 0, 0)
+        tik_instance.data_move(res_ub, self.x[gm_offset], 0, 1, len_burst_row, 0, 0)
 
         # set tail 32B of result to block_ub
         block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ), name="block_ub", scope=tik.scope_ubuf)
         with tik_instance.for_range(0, self.block_elem) as num_i:
             block_ub[num_i].set_as(res_ub[self.params_row - self.block_elem + num_i])
 
-        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_row - 1, 0, 0)
+        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_row - 1, 0, 0)
         tik_instance.data_move(self.y[output_offset + (self.params_row - self.block_elem)], block_ub, 0, 1, 1, 0, 0)
 
     def indices_inner_gather_remain_2(self, indices_offset, pre_i, indices_ub, res_ub):
@@ -1363,7 +1363,7 @@ class GatherV2():
         process tail indices in previous indices_num_remaining core for tiling mode 2
         """
         tik_instance = self.tik_instance
-        burst_len_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
 
         # move one indices data to ub from gm
         tik_instance.data_move(indices_ub, self.indices[indices_offset], 0, 1, 1, 0, 0)
@@ -1374,14 +1374,14 @@ class GatherV2():
         output_offset = (pre_i * self.indices_num + indices_offset) * self.params_row
 
         # copy one params_row from gm to res_ub
-        tik_instance.data_move(res_ub, self.x[gm_offset], 0, 1, burst_len_row, 0, 0)
+        tik_instance.data_move(res_ub, self.x[gm_offset], 0, 1, len_burst_row, 0, 0)
 
         # set tail 32B of result to block_ub
         block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ), name="block_ub", scope=tik.scope_ubuf)
         with tik_instance.for_range(0, self.block_elem) as num_i:
             block_ub[num_i].set_as(res_ub[self.params_row - self.block_elem + num_i])
 
-        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_row - 1, 0, 0)
+        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_row - 1, 0, 0)
         tik_instance.data_move(self.y[output_offset + (self.params_row - self.block_elem)], block_ub, 0, 1, 1, 0, 0)
 
     def compute_mode_5(self, half_ub_size, block_id):
@@ -1455,8 +1455,8 @@ class GatherV2():
         """
         tik_instance = self.tik_instance
         block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ), name="block_ub", scope=tik.scope_ubuf)
-        burst_len_sub_row = ceil_value(half_ub_params_elem, self.block_elem)
-        burst_len_sub_row_last = ceil_value(self.one_row_tail, self.block_elem)
+        len_burst_sub_row = ceil_value(half_ub_params_elem, self.block_elem)
+        len_burst_sub_row_last = ceil_value(self.one_row_tail, self.block_elem)
 
         # indices_row_num_once
         with tik_instance.for_range(0, loop_num) as row_i:
@@ -1469,16 +1469,16 @@ class GatherV2():
             with tik_instance.for_range(0, self.one_row_loop) as row_inner_i:
                 # move half_ub_params_elem data of one row to res_ub from gm
                 tik_instance.data_move(res_ub, self.x[gm_offset + row_inner_i * half_ub_params_elem], 0, 1,
-                                       burst_len_sub_row, 0, 0)
+                                       len_burst_sub_row, 0, 0)
                 # copy result data to gm from ub
                 tik_instance.data_move(self.y[output_offset + row_inner_i * half_ub_params_elem], res_ub, 0, 1,
-                                       burst_len_sub_row, 0, 0)
+                                       len_burst_sub_row, 0, 0)
 
             # process of one the tail part of params_row: one_row_tail
             with tik_instance.if_scope(self.one_row_tail > 0):
                 # move one_row_tail data to res_ub from gm
                 tik_instance.data_move(res_ub, self.x[gm_offset + (self.params_row - self.one_row_tail)], 0, 1,
-                                       burst_len_sub_row_last, 0, 0)
+                                       len_burst_sub_row_last, 0, 0)
 
                 # copy result data to gm from ub
                 with tik_instance.if_scope(tik.all(self.one_row_tail % self.block_elem != 0, loop_num - 1 == row_i)):
@@ -1486,12 +1486,12 @@ class GatherV2():
                         block_ub[num_i].set_as(res_ub[self.one_row_tail - self.block_elem + num_i])
 
                     tik_instance.data_move(self.y[output_offset + (self.params_row - self.one_row_tail)], res_ub, 0, 1,
-                                           burst_len_sub_row_last - 1, 0, 0)
+                                           len_burst_sub_row_last - 1, 0, 0)
                     tik_instance.data_move(self.y[output_offset + (self.params_row - self.block_elem)], block_ub, 0, 1,
                                            1, 0, 0)
                 with tik_instance.else_scope():
                     tik_instance.data_move(self.y[output_offset + (self.params_row - self.one_row_tail)], res_ub, 0, 1,
-                                           burst_len_sub_row_last, 0, 0)
+                                           len_burst_sub_row_last, 0, 0)
 
     # 'pylint: disable=too-many-arguments,huawei-too-many-arguments
     def process_remaining_tail_mode_5(self, indices_num_offset, pre_i, indices_ub, res_ub, half_ub_params_elem):
@@ -1514,8 +1514,8 @@ class GatherV2():
         # move one indices data to ub from gm
         tik_instance.data_move(indices_ub, self.indices[indices_num_offset], 0, 1, 1, 0, 0)
 
-        burst_len_sub_row = ceil_value(half_ub_params_elem, self.block_elem)
-        burst_len_sub_row_last = ceil_value(self.one_row_tail, self.block_elem)
+        len_burst_sub_row = ceil_value(half_ub_params_elem, self.block_elem)
+        len_burst_sub_row_last = ceil_value(self.one_row_tail, self.block_elem)
         output_offset = (pre_i * self.indices_num + indices_num_offset) * self.params_row
 
         indices_value = tik_instance.Scalar(dtype=self.indices_dtype, name="indices_value", init_value=0)
@@ -1526,16 +1526,16 @@ class GatherV2():
         with tik_instance.for_range(0, self.one_row_loop) as row_inner_i:
             # move half_ub_params_elem data of one row to res_ub from gm
             tik_instance.data_move(res_ub, self.x[gm_offset + row_inner_i * half_ub_params_elem], 0, 1,
-                                   burst_len_sub_row, 0, 0)
+                                   len_burst_sub_row, 0, 0)
             # copy result data to gm from ub
             tik_instance.data_move(self.y[output_offset + row_inner_i * half_ub_params_elem], res_ub, 0, 1,
-                                   burst_len_sub_row, 0, 0)
+                                   len_burst_sub_row, 0, 0)
 
         # process of one the tail part of params_row: one_row_tail
         with tik_instance.if_scope(self.one_row_tail > 0):
             # move one_row_tail data to res_ub from gm
             tik_instance.data_move(res_ub, self.x[gm_offset + (self.params_row - self.one_row_tail)], 0, 1,
-                                   burst_len_sub_row_last, 0, 0)
+                                   len_burst_sub_row_last, 0, 0)
             # copy result data to gm from ub
             with tik_instance.if_scope(self.one_row_tail % self.block_elem != 0):
                 block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ),
@@ -1545,12 +1545,12 @@ class GatherV2():
                     block_ub[num_i].set_as(res_ub[self.one_row_tail - self.block_elem + num_i])
 
                 tik_instance.data_move(self.y[output_offset + (self.params_row - self.one_row_tail)], res_ub, 0, 1,
-                                       burst_len_sub_row_last - 1, 0, 0)
+                                       len_burst_sub_row_last - 1, 0, 0)
                 tik_instance.data_move(self.y[output_offset + (self.params_row - self.block_elem)], block_ub, 0, 1, 1,
                                        0, 0)
             with tik_instance.else_scope():
                 tik_instance.data_move(self.y[output_offset + (self.params_row - self.one_row_tail)], res_ub, 0, 1,
-                                       burst_len_sub_row_last, 0, 0)
+                                       len_burst_sub_row_last, 0, 0)
 
     def compute_mode_3(self, half_ub_size, block_id):
         """
@@ -1671,8 +1671,8 @@ class GatherV2():
         None
         """
         tik_instance = self.tik_instance
-        burst_len_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
-        burst_len_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
 
         with tik_instance.for_range(0, loop_num) as inner_loop_i:
             inner_indices_offset = inner_loop_i * self.row_num_once_ub
@@ -1685,10 +1685,10 @@ class GatherV2():
                     gm_offset = (pre_i * self.params_axis + indices_value) * self.params_row
 
                     # move params_row from gm or UB or L1 to res_ub
-                    tik_instance.data_move(res_ub[row_i * self.params_row], x_src[gm_offset], 0, 1, burst_len_row, 0, 0)
+                    tik_instance.data_move(res_ub[row_i * self.params_row], x_src[gm_offset], 0, 1, len_burst_row, 0, 0)
 
             # copy result data from ub to gm
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def process_last_32b_aligned(self, ub_tensor_list, offset_list, x_src):
         """
@@ -1708,8 +1708,8 @@ class GatherV2():
 
         row_num_last, indices_ub, res_ub = ub_tensor_list
         indices_num_offset, inner_indices_offset, pre_i = offset_list
-        burst_len_res = ceil_value(row_num_last * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
-        burst_len_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_res = ceil_value(row_num_last * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
         output_offset = (pre_i * self.indices_num + indices_num_offset + inner_indices_offset) * self.params_row
 
         with tik_instance.new_stmt_scope(disable_sync=True):
@@ -1719,10 +1719,10 @@ class GatherV2():
                 gm_offset = (pre_i * self.params_axis + indices_value) * self.params_row
 
                 # move params_row data from gm or UB or L1 to res_ub
-                tik_instance.data_move(res_ub[row_i * self.params_row], x_src[gm_offset], 0, 1, burst_len_row, 0, 0)
+                tik_instance.data_move(res_ub[row_i * self.params_row], x_src[gm_offset], 0, 1, len_burst_row, 0, 0)
 
         # move result data from ub to gm
-        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     # 'pylint: disable=too-many-arguments,huawei-too-many-arguments
     def process_remaining_tail_32b_aligned(self, indices_num_offset, pre_i, indices_ub, res_ub, x_src):
@@ -1744,7 +1744,7 @@ class GatherV2():
         # move one indices data from gm to ub
         tik_instance.data_move(indices_ub, self.indices[indices_num_offset], 0, 1, 1, 0, 0)
 
-        burst_len_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
         output_offset = (pre_i * self.indices_num + indices_num_offset) * self.params_row
 
         indices_value = tik_instance.Scalar(dtype=self.indices_dtype, name="indices_value", init_value=0)
@@ -1752,10 +1752,10 @@ class GatherV2():
         gm_offset = (pre_i * self.params_axis + indices_value) * self.params_row
 
         # copy one params_row from gm or UB or L1 to res_ub
-        tik_instance.data_move(res_ub, x_src[gm_offset], 0, 1, burst_len_row, 0, 0)
+        tik_instance.data_move(res_ub, x_src[gm_offset], 0, 1, len_burst_row, 0, 0)
 
         # copy result data from ub to gm
-        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_row, 0, 0)
+        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_row, 0, 0)
 
     def compute_mode_7(self, half_ub_size, block_id):
         """
@@ -2443,7 +2443,7 @@ class GatherV2():
         indices_ub = self.buffers.get("indices_ub")
         params_ub = self.buffers.get("params_ub")
         res_ub = self.buffers.get("res_ub")
-        burst_len_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
         output_offset_base = batch_i * self.params_pre * self.indices_row
         indices_value = tik_instance.Scalar(dtype=self.indices_dtype, name="indices_value", init_value=0)
         batch_base = block_id * self.params_batch_each_core
@@ -2478,10 +2478,10 @@ class GatherV2():
                         res_ub[res_ub_offset + i].set_as(temp_ub_1[i])
 
             # copy result data from ub to gm
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
         with tik_instance.if_scope(tail_num > 0):
-            burst_len_res = ceil_value(tail_num * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+            len_burst_res = ceil_value(tail_num * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
             inner_indices_offset = indices_offset_base + loop_num * self.row_num_once_ub
             output_offset = (output_offset_base + pre_i * self.indices_row +
                              (indices_loop_offset + loop_num * self.row_num_once_ub)) * self.params_row
@@ -2504,18 +2504,18 @@ class GatherV2():
 
             # move result data from ub to gm
             tail_elem = (tail_num * self.params_row) % self.block_elem
-            with tik_instance.if_scope(tik.all(tail_elem != 0, burst_len_res > 1)):
+            with tik_instance.if_scope(tik.all(tail_elem != 0, len_burst_res > 1)):
                 block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ),
                                                name="block_ub",
                                                scope=tik.scope_ubuf)
                 with tik_instance.for_range(0, self.block_elem) as num_i:
                     block_ub[num_i].set_as(res_ub[tail_num * self.params_row - self.block_elem + num_i])
 
-                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res - 1, 0, 0)
+                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res - 1, 0, 0)
                 tik_instance.data_move(self.y[output_offset + (tail_num * self.params_row - self.block_elem)], block_ub,
                                        0, 1, 1, 0, 0)
             with tik_instance.else_scope():
-                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     # 'pylint:disable=E1136
     # 'pylint: disable=too-many-arguments,huawei-too-many-arguments
@@ -2527,7 +2527,7 @@ class GatherV2():
         loop_num = self.indices_row_num_last if is_last else self.indices_row_num_once
         indices_ub = self.buffers.get("indices_ub")
         res_ub = self.buffers.get("res_ub")
-        burst_len_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
         indices_value = tik_instance.Scalar(dtype=self.indices_dtype, name="indices_value", init_value=0)
         batch_base = block_id * self.params_batch_each_core
         if self.cached_types.get("cached_types_indices") == Constant.INDICES_CACHED_ALL and self.is_remaining == 0:
@@ -2543,21 +2543,21 @@ class GatherV2():
             output_offset = (output_offset_base + pre_i * self.indices_row +
                              (indices_loop_offset + row_i)) * self.params_row
 
-            tik_instance.data_move(res_ub, self.x[params_offset], 0, 1, burst_len_row, 0, 0)
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_row, 0, 0)
+            tik_instance.data_move(res_ub, self.x[params_offset], 0, 1, len_burst_row, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_row, 0, 0)
 
         indices_value.set_as(indices_ub[indices_offset_base + loop_num - 1])
         params_offset = (params_offset_base + indices_value) * self.params_row
         output_offset = (output_offset_base + pre_i * self.indices_row +
                          (indices_loop_offset + loop_num - 1)) * self.params_row
 
-        tik_instance.data_move(res_ub, self.x[params_offset], 0, 1, burst_len_row, 0, 0)
+        tik_instance.data_move(res_ub, self.x[params_offset], 0, 1, len_burst_row, 0, 0)
 
         # set tail 32B of result to block_ub
         block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ), name="block_ub", scope=tik.scope_ubuf)
         with tik_instance.for_range(0, self.block_elem) as num_i:
             block_ub[num_i].set_as(res_ub[self.params_row - self.block_elem + num_i])
-        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_row - 1, 0, 0)
+        tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_row - 1, 0, 0)
         tik_instance.data_move(self.y[output_offset + (self.params_row - self.block_elem)], block_ub, 0, 1, 1, 0, 0)
 
     # 'pylint: disable=too-many-arguments,huawei-too-many-arguments
@@ -3766,8 +3766,8 @@ class GatherV2():
         x_src = self.buffers.get("params_ub")
         indices_ub = self.buffers.get("indices_ub")
         res_ub = self.buffers.get("res_ub")
-        burst_len_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
-        burst_len_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_row = ceil_value(self.params_row * self.params_dsize, constant.BLOCK_SIZE)
 
         indices_value = tik_instance.Scalar(dtype=self.indices_dtype, name="indices_value", init_value=0)
         batch_base = block_id * self.params_batch_each_core
@@ -3792,15 +3792,15 @@ class GatherV2():
                     indices_value.set_as(indices_ub[inner_indices_offset + row_i])
                     params_offset = (params_offset_base + indices_value) * self.params_row
 
-                    tik_instance.data_move(res_ub[row_i * self.params_row], x_src[params_offset], 0, 1, burst_len_row,
+                    tik_instance.data_move(res_ub[row_i * self.params_row], x_src[params_offset], 0, 1, len_burst_row,
                                            0, 0)
 
             # move result data from ub to gm
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
         # process of the remaining part after block split
         with tik_instance.if_scope(tail_num > 0):
-            burst_len_res = ceil_value(tail_num * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+            len_burst_res = ceil_value(tail_num * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
             inner_indices_offset = indices_offset_base + loop_num * self.row_num_once_ub
             output_offset = (output_offset_base + pre_i * self.indices_row +
                              (indices_loop_offset + loop_num * self.row_num_once_ub)) * self.params_row
@@ -3811,11 +3811,11 @@ class GatherV2():
                     indices_value.set_as(indices_ub[inner_indices_offset + row_i])
                     params_offset = (params_offset_base + indices_value) * self.params_row
 
-                    tik_instance.data_move(res_ub[row_i * self.params_row], x_src[params_offset], 0, 1, burst_len_row,
+                    tik_instance.data_move(res_ub[row_i * self.params_row], x_src[params_offset], 0, 1, len_burst_row,
                                            0, 0)
 
             # move result data from ub to gm
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def large_params_row(self, indices_loop_offset, batch_i, block_id, pre_i, is_last):
         """
@@ -3828,8 +3828,8 @@ class GatherV2():
 
         half_ub_size = (self.ub_size - 2 * 1024) // 2
         half_ub_params_elem = half_ub_size // self.params_dsize
-        burst_len_sub_row = ceil_value(half_ub_params_elem, self.block_elem)
-        burst_len_sub_row_last = ceil_value(self.one_row_tail, self.block_elem)
+        len_burst_sub_row = ceil_value(half_ub_params_elem, self.block_elem)
+        len_burst_sub_row_last = ceil_value(self.one_row_tail, self.block_elem)
         indices_value = tik_instance.Scalar(dtype=self.indices_dtype, name="indices_value", init_value=0)
         batch_base = block_id * self.params_batch_each_core
         if self.cached_types.get("cached_types_indices") == Constant.INDICES_CACHED_ALL and self.is_remaining == 0:
@@ -3850,16 +3850,16 @@ class GatherV2():
             with tik_instance.for_range(0, self.one_row_loop) as row_inner_i:
                 # move half_ub_params_elem data of one row to res_ub from gm
                 tik_instance.data_move(res_ub, self.x[params_offset + row_inner_i * half_ub_params_elem], 0, 1,
-                                       burst_len_sub_row, 0, 0)
+                                       len_burst_sub_row, 0, 0)
                 # copy result data to gm from ub
                 tik_instance.data_move(self.y[output_offset + row_inner_i * half_ub_params_elem], res_ub, 0, 1,
-                                       burst_len_sub_row, 0, 0)
+                                       len_burst_sub_row, 0, 0)
 
             # process of one the tail part of params_row: one_row_tail
             with tik_instance.if_scope(self.one_row_tail > 0):
                 # move one_row_tail data to res_ub from gm
                 tik_instance.data_move(res_ub, self.x[params_offset + (self.params_row - self.one_row_tail)], 0, 1,
-                                       burst_len_sub_row_last, 0, 0)
+                                       len_burst_sub_row_last, 0, 0)
                 # copy result data to gm from ub
                 with tik_instance.if_scope(self.one_row_tail % self.block_elem != 0):
                     block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ),
@@ -3869,12 +3869,12 @@ class GatherV2():
                         block_ub[num_i].set_as(res_ub[self.one_row_tail - self.block_elem + num_i])
 
                     tik_instance.data_move(self.y[output_offset + (self.params_row - self.one_row_tail)], res_ub, 0, 1,
-                                           burst_len_sub_row_last - 1, 0, 0)
+                                           len_burst_sub_row_last - 1, 0, 0)
                     tik_instance.data_move(self.y[output_offset + (self.params_row - self.block_elem)], block_ub, 0, 1,
                                            1, 0, 0)
                 with tik_instance.else_scope():
                     tik_instance.data_move(self.y[output_offset + (self.params_row - self.one_row_tail)], res_ub, 0, 1,
-                                           burst_len_sub_row_last, 0, 0)
+                                           len_burst_sub_row_last, 0, 0)
 
     # 'pylint:disable=E1136
     def small_indices_row(self, batch_i, block_id, is_last):
@@ -3888,7 +3888,7 @@ class GatherV2():
         indices_ub = self.buffers.get("indices_ub")
         params_ub = self.buffers.get("params_ub")
         res_ub = self.buffers.get("res_ub")
-        burst_len_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
         output_offset_base = batch_i * self.params_pre * self.indices_row + block_id * self.indices_num_each_core
         indices_value = tik_instance.Scalar(dtype=self.indices_dtype, name="indices_value", init_value=0)
         params_batch_diff = batch_i
@@ -3917,10 +3917,10 @@ class GatherV2():
                             res_ub[res_ub_offset + i].set_as(temp_ub_1[i])
 
             # copy result data from ub to gm
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
         with tik_instance.if_scope(tail_num > 0):
-            burst_len_res = ceil_value(tail_num * self.indices_row * self.params_row * self.params_dsize,
+            len_burst_res = ceil_value(tail_num * self.indices_row * self.params_row * self.params_dsize,
                                        constant.BLOCK_SIZE)
             output_offset = (output_offset_base + loop_num * self.row_num_once_ub) * self.params_row
             params_offset_base = params_batch_diff * self.params_pre * self.params_axis + \
@@ -3943,7 +3943,7 @@ class GatherV2():
                             res_ub[res_ub_offset + i].set_as(temp_ub_1[i])
 
             tail_elem = (tail_num * self.indices_row * self.params_row) % self.block_elem
-            with tik_instance.if_scope(tik.all(tail_elem != 0, burst_len_res > 1)):
+            with tik_instance.if_scope(tik.all(tail_elem != 0, len_burst_res > 1)):
                 block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ),
                                                name="block_ub",
                                                scope=tik.scope_ubuf)
@@ -3951,12 +3951,12 @@ class GatherV2():
                     block_ub[num_i].set_as(res_ub[tail_num * self.indices_row * self.params_row - self.block_elem +
                                                   num_i])
 
-                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res - 1, 0, 0)
+                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res - 1, 0, 0)
                 tik_instance.data_move(
                     self.y[output_offset + (tail_num * self.indices_row * self.params_row - self.block_elem)], block_ub,
                     0, 1, 1, 0, 0)
             with tik_instance.else_scope():
-                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     # 'pylint:disable=E1136
     def small_params_row(self, block_id, is_last):
@@ -3971,7 +3971,7 @@ class GatherV2():
         params_ub = self.buffers.get("params_ub")
         res_ub = self.buffers.get("res_ub")
         batch_base = block_id * self.params_batch_each_core
-        burst_len_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
+        len_burst_res = ceil_value(self.row_num_once_ub * self.params_row * self.params_dsize, constant.BLOCK_SIZE)
         output_offset_base = batch_base * self.params_pre * self.indices_row
         indices_value = tik_instance.Scalar(dtype=self.indices_dtype, name="indices_value", init_value=0)
         if self.cached_types.get("cached_types_params") != Constant.PARAMS_CACHED_UB:
@@ -4009,10 +4009,10 @@ class GatherV2():
                                 res_ub[res_ub_offset + i].set_as(temp_ub_1[i])
 
             # copy result data from ub to gm
-            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+            tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
         with tik_instance.if_scope(tail_num > 0):
-            burst_len_res = ceil_value(
+            len_burst_res = ceil_value(
                 tail_num * self.params_pre * self.indices_row * self.params_row * self.params_dsize,
                 constant.BLOCK_SIZE)
             output_offset = (output_offset_base + loop_num * self.row_num_once_ub) * self.params_row
@@ -4041,7 +4041,7 @@ class GatherV2():
                                 res_ub[res_ub_offset + i].set_as(temp_ub_1[i])
 
             tail_elem = (tail_num * self.params_pre * self.indices_row * self.params_row) % self.block_elem
-            with tik_instance.if_scope(tik.all(tail_elem != 0, burst_len_res > 1)):
+            with tik_instance.if_scope(tik.all(tail_elem != 0, len_burst_res > 1)):
                 block_ub = tik_instance.Tensor(self.params_dtype, (self.block_elem, ),
                                                name="block_ub",
                                                scope=tik.scope_ubuf)
@@ -4049,13 +4049,13 @@ class GatherV2():
                     block_ub[num_i].set_as(res_ub[tail_num * self.params_pre * self.indices_row * self.params_row -
                                                   self.block_elem + num_i])
 
-                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res - 1, 0, 0)
+                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res - 1, 0, 0)
                 tik_instance.data_move(
                     self.y[output_offset +
                            (tail_num * self.params_pre * self.indices_row * self.params_row - self.block_elem)],
                     block_ub, 0, 1, 1, 0, 0)
             with tik_instance.else_scope():
-                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, burst_len_res, 0, 0)
+                tik_instance.data_move(self.y[output_offset], res_ub, 0, 1, len_burst_res, 0, 0)
 
     def inner_loop_with_batch_dims(self, indices_loop_offset, batch_i, block_id, pre_i, is_last):
         """
