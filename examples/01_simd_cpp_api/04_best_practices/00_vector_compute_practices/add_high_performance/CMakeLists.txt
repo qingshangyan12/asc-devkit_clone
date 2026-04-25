@@ -18,7 +18,7 @@ find_package(ASC REQUIRED HINTS $ENV{ASCEND_INSTALL_PATH}/compiler/tikcpp/ascend
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(SCENARIO 0 CACHE STRING "Case type to compile (0-6)")
+set(SCENARIO_NUM 0 CACHE STRING "Case type to compile (0-6)")
 
 add_executable(demo
     add.asc
@@ -33,7 +33,7 @@ else()
 endif()
 
 target_compile_definitions(demo PRIVATE
-    SCENARIO=${SCENARIO}
+    SCENARIO=${SCENARIO_NUM}
     NPU_ARCH=${NPU_ARCH_ID}
 )
 
