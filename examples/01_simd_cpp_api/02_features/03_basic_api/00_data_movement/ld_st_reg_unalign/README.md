@@ -1,7 +1,21 @@
 # ld_st_reg_unalign样例
 
 ## 概述
-本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的非对齐数据搬运操作，该样例使用LoadUnAlign，StoreUnAlign，LoadUnAlignPre，StoreUnAlignPost接口。
+本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的非对齐数据搬运操作，该样例使用LoadUnAlign，StoreUnAlign，LoadUnAlignPre，StoreUnAlignPost接口。本样例支持两种搬运场景，通过环境变量选择场景。
+    <table>
+ 	  	 	<tr>
+ 	  	 		<td>scenarioNum</td>
+ 	  	 		<td>搬运场景</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>1</td>
+ 	  	 		<td>每次迭代手动更新UB地址</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>2</td>
+ 	  	 		<td>使用AddrReg存储UB地址的偏移量</td>
+ 	  	 	</tr>
+ 	  	 </table>
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -56,17 +70,18 @@
     
 - 样例执行
   ```bash
-  mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程
-  ./demo                                                                    # 执行编译生成的可执行程序，执行样例
+  SCENARIO=1
+  mkdir -p build && cd build;                                                   # 创建并进入build目录
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # 编译工程
+  ./demo                                                                        # 执行编译生成的可执行程序，执行样例
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -77,6 +92,7 @@
 | ------------| -----------------------------| ---------------------------------------------------|
 | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| `SCENARIO_NUM` | `1`、`2` | 场景编号：1=每次迭代手动更新UB地址，2=使用AddrReg存储UB地址的偏移量 |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。
