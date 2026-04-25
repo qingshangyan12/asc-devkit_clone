@@ -23,6 +23,14 @@
  	  	 		<td>4</td>
  	  	 		<td>非连续搬运(postUpdate模式)</td>
  	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>5</td>
+ 	  	 		<td>连续搬运(解压缩模式UNPACK搬入和压缩模式PACK搬出)</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>6</td>
+ 	  	 		<td>连续搬运(双搬入和双搬出模式)</td>
+ 	  	 	</tr>
  	  	 </table>
 
 ## 支持的产品
@@ -31,9 +39,12 @@
 ## 目录结构介绍
 ```
 ├── ld_st_reg_align
-│   ├── CMakeLists.txt                      // 编译工程文件
-│   └── README.md                           // 样例介绍
-│   └── ld_st_reg_align.asc                 // AscendC样例实现 & 调用样例
+│   ├── scripts
+│   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
+│   ├── CMakeLists.txt                 // 编译工程文件
+│   ├── data_utils.h                   // 数据读入写出函数
+│   ├── ld_st_reg_align.asc            // AscendC样例实现 & 调用样例
+│   └── README.md                      // 样例介绍
 ```
 
 ## 样例描述
@@ -85,6 +96,18 @@
     <td align="center">非连续搬运</td>
     <td align="center">开启</td>
   </tr>
+  <tr>
+    <td align="center">5</td>
+    <td align="center">CopySucceWithPackVF</td>
+    <td align="center">连续搬运</td>
+    <td align="center">开启</td>
+  </tr>
+  <tr>
+    <td align="center">6</td>
+    <td align="center">CopySucceDoubleRegVF</td>
+    <td align="center">连续搬运</td>
+    <td align="center">关闭</td>
+  </tr>
 </table>
 
   
@@ -112,22 +135,26 @@
     
 - 样例执行
   ```bash
-  SCENARIO=1
-  mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # 编译工程（默认npu模式）
-  ./demo                                                                    # 执行编译生成的可执行程序，执行样例
+  SCENARIO=1                                                                    # 执行场景1
+  python3 ../scripts/gen_data.py $SCENARIO                                      # 生成测试输入数据
+  mkdir -p build && cd build;                                                   # 创建并进入build目录
+  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程（默认npu模式）
+  ./demo                                                                        # 执行编译生成的可执行程序，执行样例
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
-  SCENARIO=1
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # cpu调试模式
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式或场景前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 数据生成说明
+  - 场景1-4：`gen_data.py` 生成输入数据和golden数据，golden数据与输入数据相同
+  - 场景5-6：数据生成逻辑尚未实现，运行 `gen_data.py` 会生成全零的golden数据，测试会失败
 
 - 编译选项说明
 
@@ -135,7 +162,7 @@
 | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
 | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-| `SCENARIO_NUM` | `1`、`2`、`3`、`4`　　　　　| 场景编号：1=连续搬运，2=连续搬运(postUpdate)，3=非连续搬运，4=非连续搬运(postUpdate) |
+| `SCENARIO_NUM` | `1`、`2`、`3`、`4`、`5`、`6` | 场景编号：1=连续搬运，2=连续搬运(postUpdate)，3=非连续搬运，4=非连续搬运(postUpdate)，5=连续搬运(解压缩搬入和压缩搬出)，6=连续搬运(双搬入和双搬出) |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。
