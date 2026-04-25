@@ -1,7 +1,5 @@
 # AI Core SIMD 编译<a name="ZH-CN_TOPIC_0000002429141954"></a>
 
-毕昇编译器是一款专为AI处理器设计的编译器，支持异构编程扩展，可以将用户编写的昇腾算子代码编译成二进制可执行文件和动态库等形式。毕昇编译器的可执行程序命名为bisheng，支持x86、aarch64等主机系统，并且原生支持设备侧AI Core架构指令集编译。通过使用毕昇编译器，用户可以更加高效地进行针对昇腾AI处理器的编程和开发工作。
-
 ## 入门示例<a name="section17595637204517"></a>
 
 以下是一个使用毕昇编译器编译静态Shape的add\_custom算子入门示例。该示例展示了如何编写源文件add\_custom.asc以及具体的编译命令。通过这个示例，您可以了解如何使用毕昇编译器进行算子编译。完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_add/basic_api_tque_add)。
