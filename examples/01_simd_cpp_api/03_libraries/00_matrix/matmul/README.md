@@ -19,12 +19,10 @@
 │   └── matmul.asc              // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例调用Matmul API对输入的A、B矩阵做矩阵乘和加bias偏置的计算，计算公式为：C = A * B + Bias。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 128, N = 2048, K = 1024。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulCustom</td></tr>

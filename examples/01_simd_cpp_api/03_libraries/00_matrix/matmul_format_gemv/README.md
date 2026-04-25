@@ -18,12 +18,10 @@
 │   └── matmul_format_gemv.asc  // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   调用Matmul API计算时，通过设置M=1和A矩阵的Format参数为CubeFormat::VECTOR来开启GEMV。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 1, N = 32, K = 256
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>

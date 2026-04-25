@@ -22,7 +22,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   将64个score值通过完整流水线排序后输出。一个Region Proposal由8个half元素组成，其中第5个元素（offset=4）为score域。
 
 - 样例规格：
@@ -36,7 +36,7 @@
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">region_proposal_sort_custom</td></tr>
 </table>
 
-- 样例实现：
+- 样例实现：  
   本样例实现的是Region Proposal排序完整流水线：
   1. **ProposalConcat**：将连续的16个score值合入16个Region Proposal的score域位置（offset=4），共4组，每组1次repeat
   2. **RpSort16**：对每组16个Region Proposal按score域从大到小排序，共4组
@@ -45,32 +45,54 @@
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
+### 编译选项说明
 
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+| 参数 | 说明 | 可选值 | 默认值 |
+|------|------|---------|--------|
+| CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+| CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2002 | dav-2002 |
 
-- 样例执行
+### 配置环境变量
+
+请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+
+- 默认路径，root用户安装CANN软件包
   ```bash
-  mkdir -p build && cd build;      # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
-  ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin  # 验证输出结果是否正确
+  source /usr/local/Ascend/cann/set_env.sh
   ```
-  执行结果如下，说明精度对比成功。
+
+- 默认路径，非root用户安装CANN软件包
   ```bash
-  test pass!
+  source $HOME/Ascend/cann/set_env.sh
   ```
+
+- 指定路径install_path，安装CANN软件包
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
+
+### 样例执行
+
+```bash
+mkdir -p build && cd build;      # 创建并进入build目录
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-2002 ..;make -j;    # 编译工程，默认npu模式
+python3 ../scripts/gen_data.py   # 生成测试输入数据
+./demo                           # 执行编译生成的可执行程序，执行样例
+python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin  # 验证输出结果是否正确
+```
+
+使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+示例如：
+```bash
+cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2002 ..;make -j; # cpu调试模式
+cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2002 ..;make -j; # NPU仿真模式
+```
+
+> **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+执行结果如下，说明精度对比成功。
+```bash
+test pass!
+```

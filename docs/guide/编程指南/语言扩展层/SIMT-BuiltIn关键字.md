@@ -76,9 +76,6 @@
 
 使用内存空间限定符\_\_ubuf\_\_来表示动、静态内存，静态内存的大小在编译期是确定的，动态内存的大小在核函数执行时确定。
 
->[!CAUTION]注意 
->当前版本暂未支持动、静态内存，请关注后续版本。
-
 -   静态内存通过数组分配：
 
     ```
@@ -630,7 +627,7 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 </th>
 </tr>
 </thead>
-<tbody><tr id="row2746162863719"><td class="cellrowborder" rowspan="9" valign="top" width="11.75%" headers="mcps1.2.8.1.1 "><p id="p9746728143715"><a name="p9746728143715"></a><a name="p9746728143715"></a>算术运算符</p>
+<tbody><tr id="row2746162863719"><td class="cellrowborder" rowspan="8" valign="top" width="11.75%" headers="mcps1.2.8.1.1 "><p id="p9746728143715"><a name="p9746728143715"></a><a name="p9746728143715"></a>算术运算符</p>
 <p id="p2074662843716"><a name="p2074662843716"></a><a name="p2074662843716"></a></p>
 <p id="p19746142873718"><a name="p19746142873718"></a><a name="p19746142873718"></a></p>
 </td>
@@ -723,19 +720,6 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 <td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="p774722819376"><a name="p774722819376"></a><a name="p774722819376"></a>√</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="p4747728123717"><a name="p4747728123717"></a><a name="p4747728123717"></a>x</p>
-</td>
-</tr>
-<tr id="row974712287378"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="p7747328193714"><a name="p7747328193714"></a><a name="p7747328193714"></a>+ (取正)</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="p19747172873712"><a name="p19747172873712"></a><a name="p19747172873712"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="p12747192820376"><a name="p12747192820376"></a><a name="p12747192820376"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="p974712281377"><a name="p974712281377"></a><a name="p974712281377"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="p974715286370"><a name="p974715286370"></a><a name="p974715286370"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="p15747152893710"><a name="p15747152893710"></a><a name="p15747152893710"></a>x</p>
 </td>
 </tr>
 <tr id="row874712286377"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="p974719284373"><a name="p974719284373"></a><a name="p974719284373"></a>- (取反)</p>
@@ -1069,4 +1053,3 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
         ```
         __simt_vf__ __launch_bounds__(512) inline void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
         ```
-

@@ -60,14 +60,12 @@
 - 算子实现：  
   本样例中实现了两种场景的broadcast算子，分别是[1, 48]到[96, 48]的广播和[96, 1]到[96, 96]的广播。
 
-  - Kernel实现
-
+  - Kernel实现  
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用BroadCast高阶API接口完成broadcast计算，得到最终结果，再搬出到外部存储上。
 
     broadcast算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm搬运至Local Memory，存储在xLocal中，Compute任务负责对xLocal执行broadcast计算，然后存储在yLocal中，CopyOut任务负责将输出数据从yLocal搬运至Global Memory上的输出Tensor yGm中。
 
-  - Tiling实现
-
+  - Tiling实现  
     broadcast算子的tiling实现流程如下：首先获取input和output的二维shape，然后将其与广播的轴、input/output tensor的维度填充到TilingData中。
 
   - 调用实现  
