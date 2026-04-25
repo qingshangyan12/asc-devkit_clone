@@ -22,10 +22,6 @@ def gen_golden_data_simple():
     cond[0, 0] = 0x00000001
     cond[0, 1] = 0xFFFFFFFF
 
-    print('=== cond 数据 ===')
-    print('cond[0] = 0x%08x, cond[1] = 0x%08x' % (cond[0, 0], cond[0, 1]))
-    print()
-
     cond_bytes = cond.flatten().view(np.uint8)
     src_bytes = cond_bytes[0:8]
     src_bits = []
@@ -43,11 +39,6 @@ def gen_golden_data_simple():
             mask_bit_in_byte = mask_bit_idx % 8
             if src_bit_val:
                 mask_bytes[mask_byte_idx] |= (1 << mask_bit_in_byte)
-
-    print('=== 下采样结果 ===')
-    print('src 64 bits: bit0=%d, bit32..63=%d..%d' % (src_bits[0], src_bits[32], src_bits[63]))
-    print('mask 256 bits: byte[0]=0x%02x, byte[16..31]=0x%02x..0x%02x' % (mask_bytes[0], mask_bytes[16], mask_bytes[31]))
-    print()
 
     golden = np.array(mask_bytes, dtype=np.uint8)
 
