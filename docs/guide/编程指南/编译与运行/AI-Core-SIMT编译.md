@@ -44,11 +44,11 @@ __global__ void kernel(int *var) {
   bisheng definition.o example.o -o program --npu-arch=dav-xxxx --enable-simt
   ```
 
-- 动态库编译
+- Ai Core SIMT动态库编译
 ```
 bisheng -shared example.asc -o libexample.so --npu-arch=dav-xxxx --enable-simt
 ```
-- 静态库编译
+- Ai Core SIMT静态库编译
 ```
 bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx --enable-simt
 ```
