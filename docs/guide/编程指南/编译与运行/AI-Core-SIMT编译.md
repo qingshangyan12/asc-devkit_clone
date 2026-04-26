@@ -55,9 +55,9 @@ bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx --enable-simt
 
 更多的编译选项用法可以参见《毕生编译器用户指南》。
   
-  ## 通过Ai Core SIMT CMake编译
+  ## 通过Ai Core SIMT CMake编译 
 
-以下是CMake脚本的示例及其核心步骤说明：
+以下是CMake脚本的示例及其核心步骤说明：[样例LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)
 
 ```cmake
 # 1、find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
@@ -68,7 +68,7 @@ project(kernel_samples LANGUAGES ASC)
 
 # 3、使用CMake接口编译可执行文件、动态库、静态库、二进制文件
 add_executable(demo
-    add_custom.asc
+    hello_world.asc
 )
 #.....
 target_compile_options(demo PRIVATE
