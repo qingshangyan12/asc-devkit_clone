@@ -153,7 +153,7 @@ Process 177943 stopped
 ### 解析异常算子dump文件
 通过环境变量开启算子异常时Dump出Core文件
 ```shell
-// aic_err_detail_dump: 导出Ai Core的内存存储、寄存器和调用栈信息
+# aic_err_detail_dump: 导出Ai Core的内存存储、寄存器和调用栈信息
 export ASCEND_DUMP_SCENE=aic_err_detail_dump
 # 指定异常算子Dump信息的存储路径，可配置为绝对路径或执行程序的相对路径。
 export ASCEND_DUMP_PATH=./
