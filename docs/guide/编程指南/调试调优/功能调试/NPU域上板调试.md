@@ -59,12 +59,27 @@ msSanitizer工具是基于AI处理器的异常检测工具，包含了单算子�
 
 具体使用方法请参考《算子开发工具用户指南》。
 
-**该功能仅在如下场景支持：**
+```shell
+// bisheng编译时 增加sanitizer命令行
+bisheng add_custom.asc  -o add_custom --sanitizer --lineinfo
 
--   通过[基于样例工程完成Kernel直调](../../附录/基于样例工程完成Kernel直调.md)方式调用算子。
+// 同时开启多种异常检测能力
+mssanitizer --tool=memcheck --tool=racecheck --tool=initcheck --tool=synccheck  ./add_custom
+```
+**内存异常报告解析**
 
--   通过[单算子API调用](../../附录/工程化算子开发/单算子API调用.md)方式调用算子。
--   间接调用单算子API\(aclnnxxx\)接口：Pytorch框架单算子直调的场景。
+内存检测异常报告会输出多种不同类型的异常信息，以下将对非法读写给出了简单的异常信息示例：
+```shell
+====== ERROR: illegal read of size 224  // 异常的基本信息,包含非法读写的类型以及被非法访问的字节数,非法读写包括read(非法读取)和write(非法写入)
+======    at 0x12c0c0015000 on GM in add_custom_kernel  // 异常发生的内存位置信息，包含发生的核函数名、地址空间与内存地址，此处的内存地址指一次内存访问中的首地址
+======    in block aiv(0) on device 0  // 异常代码对应Vector核的block索引
+======    code in pc current 0x77c (serialNo:10) // 当前异常发生的pc指针和调用api行为的序列号
+======    #0 ${ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/impl/dav_c220/kernel_operator_data_copy_impl.h:58:9  // 以下为异常发生代码的调用栈，包含文件名、行号和列号
+======    #1 ${ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/inner_interface/inner_kernel_operator_data_copy_intf.cppm:58:9
+======    #2 ${ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/inner_interface/inner_kernel_operator_data_copy_intf.cppm:443:5
+======    #3 illegal_read_and_write/add_custom.cpp:18:5
+```
+更多详细信息可以参考[《异常检测(msSanitizer)》](https://www.hiascend.com/document/detail/zh/mindstudio/830/ODtools/Operatordevelopmenttools/atlasopdev_16_0039.html)
 
 ## 使用msDebug工具进行算子调试<a name="section2072113416285"></a>
 
