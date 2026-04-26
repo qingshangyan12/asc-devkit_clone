@@ -8,8 +8,8 @@
 # 1、find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
 find_package(ASC)  
 
-# 2、指定项目支持的语言包括ASC和CXX，ASC表示支持使用毕昇编译器对Ascend C编程语言进行编译
-project(kernel_samples LANGUAGES ASC CXX)
+# 2、指定项目支持的语言包括ASC，ASC表示支持使用毕昇编译器对Ascend C编程语言进行编译
+project(kernel_samples LANGUAGES ASC)
 
 # 3、使用CMake接口编译可执行文件、动态库、静态库、二进制文件
 add_executable(demo
