@@ -8,7 +8,7 @@ bisheng可以通过-I <path>指定头文件按路径、-L <path> 指定链接库
 ```
 bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
 ```
-
+![ ](../../../figures/aicore_simt_comilation.png "Ai Core SIMT编译流程示意图")
 - Ai Core SIMT编译 [LINK]()
 ```
 // ----- simt_vec.asc -----
