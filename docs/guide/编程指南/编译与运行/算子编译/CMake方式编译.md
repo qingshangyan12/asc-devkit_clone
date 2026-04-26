@@ -4,7 +4,7 @@
 
 以下是CMake脚本的示例及其核心步骤说明：
 
-```
+```cmake
 # 1、find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
 find_package(ASC)  
 
@@ -25,51 +25,25 @@ target_compile_options(demo PRIVATE
 
 以下是动态库、静态库编译示例，同时展示如何将源文件切换为用语言ASC编译：
 
--   编译.cpp文件生成动态库
+-   编译.asc文件生成动态库
 
-    ```
-    # 将.cpp文件置为ASC属性，启用Ascend C语言进行编译
-    set_source_files_properties(
-        add_custom_base.cpp 
-        sub_custom_base.cpp
-        PROPERTIES LANGUAGE ASC
-    )
-    
-    add_library(kernel_lib SHARED
-        add_custom_base.cpp 
-        sub_custom_base.cpp
-    )
-    
-    target_compile_options(kernel_lib PRIVATE
-        $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-2201>
-    )
-    
-    add_executable(demo
-        main.cpp
-    )
-    target_link_libraries(demo PRIVATE
-        kernel_lib
+    ```cmake
+    # 3、使用CMake接口编译动态库
+    add_library(kernel_shared SHARED
+        cube.asc 
+        vector.asc
+        mix.asc
     )
     ```
 
 -   编译.asc文件生成静态库
 
-    ```
-    # .asc文件会默认启用Ascend C语言进行编译，不需要通过set_source_files_properties进行设置
+    ```cmake
+    # 3、使用CMake接口编译静态库
     add_library(kernel_lib STATIC
-        add_custom_base.asc 
-        sub_custom_base.asc
-    )
-    
-    target_compile_options(kernel_lib PRIVATE
-        $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-2201>
-    )
-    
-    add_executable(demo
-        main.cpp
-    )
-    target_link_libraries(demo PRIVATE
-        kernel_lib
+          cube.asc 
+          vector.asc
+          mix.asc
     )
     ```
     表1 常用的CMAKE配置变量说明
