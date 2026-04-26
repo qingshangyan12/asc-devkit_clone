@@ -1,53 +1,12 @@
-# ----------------------------------------------------------------------------
-# Copyright (c) 2026 Huawei Technologies Co., Ltd.
-# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
-# ----------------------------------------------------------------------------
-
-# =============================================================================
-# Function: pack_targets_and_files
-#
-# Packs targets and/or files into a flat tar.gz archive (no directory structure).
-# Optionally generates a SHA256 manifest file and includes it in the archive.
-#
-# Usage:
-#   pack_targets_and_files(
-#       OUTPUT <output.tar.gz>           # e.g., "cann-tsch-compat.tar.gz"
-#       [TARGETS target1 [target2 ...]]
-#       [FILES file1 [file2 ...]]
-#       [MANIFEST <manifest_filename>]   # e.g., "aicpu_compat_bin_hash.cfg"
-#       [TAR_ROOT_DIR <directory>]       # e.g., "aicpu_kernels_device" (optional, default: ".")
-#   )
-#
-# Examples:
-#   # With manifest
-#   pack_targets_and_files(
-#       OUTPUT cann-tsch-compat.tar.gz
-#       TARGETS app server
-#       FILES "LICENSE" "config/default.json"
-#       MANIFEST "aicpu_compat_bin_hash.cfg"
-#   )
-#
-#   # Without manifest
-#   pack_targets_and_files(
-#       OUTPUT cann-tsch-compat.tar.gz
-#       TARGETS app
-#       FILES "README.md"
-#   )
-#
-#   # With custom tar root directory
-#   pack_targets_and_files(
-#       OUTPUT aicpu_hcomm.tar.gz
-#       TARGETS ccl_kernel
-#       FILES ${CCL_KERNEL_TAR_LIBS}
-#       MANIFEST "bin_hash.cfg"
-#       TAR_ROOT_DIR "aicpu_kernels_device"
-#   )
-# =============================================================================
+# ----------------------------------------------------------------------------------------------------------
 set(_FUNC_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}")
 function(pack_targets_and_files)
     cmake_parse_arguments(ARG
