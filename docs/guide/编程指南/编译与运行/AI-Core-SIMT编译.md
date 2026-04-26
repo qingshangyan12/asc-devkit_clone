@@ -54,6 +54,29 @@ bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx --enable-simt
 ```
 
 更多的编译选项用法可以参见《毕生编译器用户指南》。
+  
+  ## 通过Ai Core SIMT CMake编译
+
+以下是CMake脚本的示例及其核心步骤说明：
+
+```cmake
+# 1、find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
+find_package(ASC)  
+
+# 2、指定项目支持的语言包括ASC，ASC表示支持使用毕昇编译器对Ascend C编程语言进行编译
+project(kernel_samples LANGUAGES ASC)
+
+# 3、使用CMake接口编译可执行文件、动态库、静态库、二进制文件
+add_executable(demo
+    add_custom.asc
+)
+#.....
+target_compile_options(demo PRIVATE
+    # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
+    # <COMPILE_LANGUAGE:ASC>:表明该编译选项仅对语言ASC生效
+    $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-2201 --enable-simt>    
+)
+```
 
 
 
