@@ -74,6 +74,7 @@ add_executable(demo
 target_compile_options(demo PRIVATE
     # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
     # <COMPILE_LANGUAGE:ASC>:表明该编译选项仅对语言ASC生效
+    # --enable-simt: 表明启动SIMT 方式编译
     $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-2201 --enable-simt>    
 )
 ```
