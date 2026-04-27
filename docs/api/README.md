@@ -1,7 +1,7 @@
 # Ascend C API列表<a name="ZH-CN_TOPIC_0000001917094304"></a>
 Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/C++语法和类库API进行编程。
 ## API分类总览<a name="section3119442205518"></a>
-下表展示了 Ascend C API 的核心分类，帮助开发者根据编程模型和功能需求快速定位所需API。
+下表展示了 Ascend C API 的总体分类，帮助开发者根据编程模型和功能需求快速定位所需API。
 <a name="table_api_classification"></a>
 <table><thead align="left"><tr id="row_header"><th class="cellrowborder" valign="top" width="18%" id="mcps1.1.3.1.1"><p id="p_header_1">API一级分类</p>
 </th>
@@ -4288,4 +4288,3 @@ kernel API中使用到的基础数据结构，比如GlobalTensor和LocalTensor�
 ## C API
 
 [C API列表](context/c_api/README.md)
-
