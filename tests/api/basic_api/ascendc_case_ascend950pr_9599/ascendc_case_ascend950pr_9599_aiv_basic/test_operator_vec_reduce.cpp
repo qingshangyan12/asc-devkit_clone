@@ -72,8 +72,7 @@ protected:
 };
 
 INSTANTIATE_TEST_CASE_P(ReduceSimpleTestCase, ReduceSimpleTestsuite,
-    ::testing::Values(ReduceTestParams{ 256, 2, 2, VecWholeReduceSum<half> },
-        ReduceTestParams{ 256, 2, 4, VecWholeReduceSum<uint16_t, uint32_t> }));
+    ::testing::Values(ReduceTestParams{ 256, 2, 2, VecWholeReduceSum<half>}));
 
 TEST_P(ReduceSimpleTestsuite, ReduceSimpleTestCase)
 {

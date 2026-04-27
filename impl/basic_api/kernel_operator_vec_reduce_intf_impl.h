@@ -85,7 +85,7 @@ __aicore__ inline void ReduceRepeatImpl(const LocalTensor<U>& dst, const LocalTe
         "Invalid reduceType for ReduceRepeat, only ReduceType::SUM, ReduceType::MAX and ReduceType::MIN are supported.");
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     if constexpr (reduceType != ReduceType::SUM){
-        static_assert(std::is_same_v<T,U>, 
+        static_assert(std::is_same_v<T, U>, 
             "ReduceRepeat for MAX/MIN only supports identical src type (T) and dst type (U) for current NPU_ARCH.");
     }
 #else
