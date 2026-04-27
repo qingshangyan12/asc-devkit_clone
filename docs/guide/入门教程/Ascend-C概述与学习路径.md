@@ -12,9 +12,9 @@ CANN作为昇腾NPU配套的全栈软件平台，采用分层架构设计，实�
 ## Ascend C简介
 为解决开发者高效编写可直接运行于 NPU 之上的高性能算子这一核心需求，Ascend C应运而生。Ascend C是CANN生态下面向昇腾AI处理器推出的专用算子开发语言，原生兼容C与C++ 标准规范。作为一门覆盖多场景的编程语言，Ascend C 秉持 **“开放芯片完备编程能力，支撑极致性能”** 的设计理念，并通过精心划分的多层级 API，让您可以根据项目需求、团队技能和性能目标，在开发效率与运行性能之间灵活权衡、取得最优平衡。更多背景可访问 [Ascend C 主页](https://www.hiascend.com/zh/ascend-c)。
 
-为帮助不同阶段的开发者平滑成长，Ascend C 构建了从高层封装到底层接口的多级 API 体系（选择建议见 [Ascend C 多级 API 选择指南](../../asc_how_to_choose_api.md)），其总体逻辑架构如下：
+为帮助不同阶段的开发者平滑成长，Ascend C 构建了从高层封装到底层接口的多级 API 体系（选择建议见 [Ascend C多级API选择指南](../../asc_how_to_choose_api.md)），其总体逻辑架构如下：
 
-<img src="docs/figures/architecture.png" alt="架构图" width="850px" height="580px">
+<img src="../figures/architecture.png" alt="架构图" width="850px" height="580px">
 
 - **语言扩展层 C API**：纯 C 接口，提供数组内存分配、基于指针的计算接口，延续业界熟悉的 C 编程体验，并完整开放芯片能力。Atlas A2/A3 已支持 SIMD 纯 C 接口；Ascend 950PR/Ascend 950DT 将引入类似业界的 SIMT 能力以及 SIMD/SIMT 混合编程能力。
 - **基础 API**：以单指令为抽象的 C++ 类库，一般基于 Tensor 编程，并逐步通过 Layout 完善 Tensor 编程体验。
