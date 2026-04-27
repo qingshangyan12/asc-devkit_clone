@@ -41,7 +41,7 @@
 - 算子实现：  
   计算逻辑是：Ascend C提供的矩阵乘计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储并进行分形转换，然后使用计算接口完成两个输入参数矩阵乘运算，得到最终结果，再搬出到外部存储上。  
 
-  Matmul算子的实现流程分为几个基本任务：CopyIn，Split，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入inputGM搬运到Local Memory A1/B1中，搬运过程中进行ND至NZ分形转换。Split调用LoadData接口将数据进一步搬运至接口所要求Local Memory A2/B2，Compute任务负责对数据进行矩阵乘运算，计算结果存储在Local Memory CO1中。CopyOut任务负责将输出数据从CO1搬运至Global Memory上的输出outputGm。
+  Matmul算子的实现流程分为几个基本任务：CopyIn，Split，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入inputGM搬运到Local Memory A1/B1中，搬运过程中进行ND至NZ分形转换。Split调用LoadData接口将数据进一步搬运至接口所要求Local Memory A2/B2，Compute任务负责对数据进行矩阵乘运算，计算结果存储在Local Memory CO1中。CopyOut任务负责将输出数据从CO1搬运至Global Memory上的输出outputGm。注：此处Ascend 950PR/Ascend 950DT版本通过SetLoadDataRepeatWithStride以及LoadDataWithStride完成Load3D搬运。
   ```
   // 使用Load3D将左矩阵从A1搬运至A2
   #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
@@ -49,13 +49,16 @@
                                                      dilationW, dilationH, 1, 0, fmRepeat, 0, (FM_T)(0));
   #else
       AscendC::LoadData3DParamsV2<FM_T> load3dParams(padList, H, W, 32, k, m, 0, 0, strideW, strideH, Kw, Kh,
-                                                     dilationW, dilationH, false, false, (FM_T)(0), false, false, false);
+                                                     dilationW, dilationH, false, false, (FM_T)(0), false, false,
+                                                     false);
+  #endif
+
   #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-      // 
-      AscendC::SetLoadDataRepeat({fmRepeat, 1, 1, 1});
-  #endif
-  #endif
+      AscendC::SetLoadDataRepeatWithStride({fmRepeat, 1, 1, 1});
+      AscendC::LoadDataWithStride(featureMapA2, featureMapA1, load3dParams);
+  #else
       AscendC::LoadData(featureMapA2, featureMapA1, load3dParams);
+  #endif
       // 使用Load2D将右矩阵从B1搬运至B2
       AscendC::LoadData2DParams load2dParams(0, weRepeat, 1, 0, 0, false, 0);
       AscendC::LoadData(weightB2, weightB1, load2dParams);
