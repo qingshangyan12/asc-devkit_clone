@@ -685,6 +685,18 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     endfunction()
 
     if(TARGET mc2_server)
+        set(MC2_SERVER_CCL_KERNEL_STUB_SRC
+            ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_ccl_kernel_stub.cc)
+        file(WRITE ${MC2_SERVER_CCL_KERNEL_STUB_SRC}
+            "extern \"C\" void __mc2_ccl_kernel_stub(void) {}\n")
+        add_library(mc2_server_ccl_kernel_stub SHARED
+            ${MC2_SERVER_CCL_KERNEL_STUB_SRC})
+        set_target_properties(mc2_server_ccl_kernel_stub PROPERTIES
+            OUTPUT_NAME ccl_kernel
+            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_link_stub)
+        target_link_options(mc2_server_ccl_kernel_stub PRIVATE
+            -Wl,-soname,libccl_kernel.so)
+
         target_compile_definitions(mc2_server PRIVATE
             $<TARGET_PROPERTY:ccl_kernel,COMPILE_DEFINITIONS>
         )
@@ -701,7 +713,7 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         target_link_libraries(mc2_server PRIVATE
             -Wl,--no-as-needed
             ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/libascend_hal.so
-            ${ASCEND_CANN_PACKAGE_PATH}/devlib/device/libccl_kernel.so
+            mc2_server_ccl_kernel_stub
             ${HCCL_C_SEC_LINK}
             ${HCCL_UNIFIED_DLOG_LINK}
             ccl_kernel_plf
