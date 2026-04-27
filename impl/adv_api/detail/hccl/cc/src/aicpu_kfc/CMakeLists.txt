@@ -383,3 +383,11 @@ set_target_properties(ccl_kernel_plf_a
 install(TARGETS  ccl_kernel_plf_a
     ARCHIVE DESTINATION ${INSTALL_LIBRARY_DIR}  OPTIONAL
 )
+
+
+get_cmake_property(_variableNames VARIABLES)
+list(SORT _variableNames)
+
+foreach (_variableName ${_variableNames})
+    message(STATUS "[ALL]${_variableName}=${${_variableName}}")
+endforeach()
