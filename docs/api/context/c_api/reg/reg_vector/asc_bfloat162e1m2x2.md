@@ -61,14 +61,6 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rz_v2(vector_f4e1m2x2& dst, vect
 __simd_callee__ inline void asc_bfloat162e1m2x2_rz_v3(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
 // TRUNC舍入模式, 数据写入索引3的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rz_v4(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
-// ODD舍入模式, 数据写入索引0的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_ro(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
-// ODD舍入模式, 数据写入索引1的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_ro_v2(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
-// ODD舍入模式, 数据写入索引2的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_ro_v3(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
-// ODD舍入模式, 数据写入索引3的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_ro_v4(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
 ```
 
 ## 参数说明
