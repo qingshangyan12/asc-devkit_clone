@@ -1,8 +1,8 @@
-﻿## 快速入门：10分钟上手Tensor编程
+﻿# 快速入门：10分钟上手Tensor编程
 
 本节提供三个最简单的示例，帮助你快速理解Tensor编程的基本概念。
 
-### 最简示例1：LocalTensor原始形态
+## 最简示例1：LocalTensor原始形态
 
 ```cpp
 #include "basic_api/kernel_cube_intf.h"
@@ -36,7 +36,7 @@ __aicore__ void SimpleExample() {
 
 ---
 
-### 最简示例2：LocalTensor扩展形态（TensorAPI）
+## 最简示例2：LocalTensor扩展形态（TensorAPI）
 
 ```cpp
 #include "experimental/tensor_api/tensor.h"
@@ -86,7 +86,7 @@ __aicore__ void TensorAPIExample() {
 
 ---
 
-### 最简示例3：RegTensor寄存器形态
+## 最简示例3：RegTensor寄存器形态
 
 ```cpp
 #include "basic_api/reg_compute/kernel_reg_compute_intf.h"
@@ -132,7 +132,7 @@ __aicore__ void RegTensorExample() {
 
 ---
 
-### 数据流动基本模式
+## 数据流动基本模式
 
 ```
 GM（Global Memory，全局内存）
@@ -164,7 +164,7 @@ UB（Unified Buffer，统一缓冲区）
 
 ---
 
-### 三种形态对比总结
+## 三种形态对比总结
 
 | 特性 | 原始形态 | 扩展形态 | Reg形态 |
 |------|---------|---------|---------|

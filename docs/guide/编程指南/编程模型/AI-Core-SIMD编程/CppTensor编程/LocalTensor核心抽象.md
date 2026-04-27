@@ -1,6 +1,6 @@
 ﻿LocalTensor是AscendC Tensor编程体系的核心数据抽象，支持两种模板形态。
 
-### 2.1 前置知识：模板特化机制
+# 前置知识：模板特化机制
 
 **什么是模板特化？**
 
@@ -56,7 +56,7 @@ struct TensorAttribute {};  // 没有数据成员，只传递类型
   优点：编译期静态，无性能开销，保持兼容
 ```
 
-### 2.2 前置知识：Layout布局抽象
+# 前置知识：Layout布局抽象
 
 **什么是Layout？**
 
@@ -111,7 +111,7 @@ Stride = (3, 1)      步长含义：
 - 原始形态：用户手动计算偏移量（容易出错，需要记住公式）
 - 扩展形态：Layout自动计算（坐标(1,2) → 自动得到偏移5）
 
-### 2.3 LocalTensor原始形态
+# LocalTensor原始形态
 
 **原始形态**（`basic_api/kernel_tensor.h`）：
 ```cpp
@@ -147,7 +147,7 @@ public:
 - 偏移量访问：`tensor(offset)`，用户需要手动计算偏移
 - ShapeInfo可选，仅用于记录，不参与索引计算
 
-### 2.4 LocalTensor特例化扩展形态
+# LocalTensor特例化扩展形态
 
 **扩展形态通过模板特化注入Layout能力**：
 
@@ -194,7 +194,7 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 - 坐标访问：`tensor[coord]`，Layout自动计算偏移量
 - 内置Shape和Stride，自动索引计算
 
-### 2.5两种形态对比示例
+# 两种形态对比示例
 
 **访问第(1,2)个元素的对比**：
 

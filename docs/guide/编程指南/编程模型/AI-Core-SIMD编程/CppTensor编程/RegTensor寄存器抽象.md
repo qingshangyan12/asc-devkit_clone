@@ -1,6 +1,6 @@
 ﻿RegTensor是Vector计算单元内部的寄存器数据抽象，用于在Reg寄存器中暂存数据，支持反复计算。
 
-### 5.1 什么是RegTensor？
+# 什么是RegTensor？
 
 **RegTensor定义**：Vector计算单元内部的矢量数据寄存器，用于暂存计算数据。
 
@@ -24,7 +24,7 @@ Reg（RegTensor） = 工作台（计算区，容量小，访问快）
 | **数据持久性** | 持久存储 | 暂存，计算后需搬回UB |
 | **适用场景** | 数据存储、搬运 | 反复计算、性能优化 |
 
-### 5.2 RegTensor结构定义
+# RegTensor结构定义
 
 **头文件引用**：
 ```cpp
@@ -90,7 +90,7 @@ using UnalignRegForStore = vector_align;  // 非对齐存储寄存器
 } // namespace AscendC
 ```
 
-### 5.3 RegTensor数据类型
+# RegTensor数据类型
 
 **RegTensor支持的类型映射**：
 
@@ -123,7 +123,7 @@ regData2.reg[0]  // 访问第一个寄存器
 regData2.reg[1]  // 访问第二个寄存器
 ```
 
-### 5.4 数据搬运接口
+# 数据搬运接口
 
 **LoadAlign（UB → Reg，对齐搬运）**：
 ```cpp
@@ -195,7 +195,7 @@ template <typename T, StoreDist dist, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg, MaskReg& mask);
 ```
 
-### 5.5 Vector计算接口
+# Vector计算接口
 
 **二元运算接口**：
 
@@ -241,7 +241,7 @@ enum class ReduceType {
 };
 ```
 
-### 5.6 Mask操作接口
+# Mask操作接口
 
 **CreateMask（创建Mask）**：
 ```cpp
@@ -288,7 +288,7 @@ enum class MaskMergeMode {
 };
 ```
 
-### 5.7 RegTensor使用场景
+# RegTensor使用场景
 
 **场景1：反复计算同一数据**
 
@@ -372,7 +372,7 @@ Reduce<ReduceType::MAX, half>(regResult, regData, mask);
 Reduce<ReduceType::MIN, half>(regResult, regData, mask);
 ```
 
-### 5.8 RegTensor与LocalTensor的关系
+# RegTensor与LocalTensor的关系
 
 **数据流对比**：
 
@@ -402,4 +402,3 @@ UB（LocalTensor） → Reg（RegTensor） → Vector计算单元 → Reg（RegT
 | **归约操作** | RegTensor | RegTensor支持归约接口 |
 
 ---
-
