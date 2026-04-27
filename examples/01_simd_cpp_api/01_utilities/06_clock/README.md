@@ -2,16 +2,20 @@
 
 ## 概述
 
-本样例基于gather计算，演示在```__simt_vf__```核函数中使用```clock()```接口实现时间戳打点方法，用于记录样例执行前后的时间戳并统计执行耗时。
+本样例基于gather计算，演示在```__simt_vf__```核函数中使用```clock()```接口实现时间戳打点方法，用于记录样例执行前后的时间戳并统计执行耗时。该接口适用于SIMD&SIMT混合编程场景或者SIMT编程场景。
 
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
 
+## 支持的CANN软件版本
+- \>= CANN 9.0.0-beta.2
+
+
 ## 目录结构
 
 ```
-├── 04_clock
+├── 06_clock
 │   ├── CMakeLists.txt         # cmake编译文件
 │   ├── gather.asc             # Ascend C样例实现gather调用样例
 |   └── README.md
@@ -21,7 +25,7 @@
 
 - 样例功能:
 
-  gather计算可参考[gather样例详情](../../02_features/03_simt/simt_gather/README.md)章节。
+  基于SIMT实现gather计算。
 
 ## 编译运行
 

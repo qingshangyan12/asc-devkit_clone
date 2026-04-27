@@ -25,7 +25,6 @@
   - 单Batch Matmul内计算遵循IterateBatch的约束条件；
   - 对于BSNGD、SBNGD、BNGS1S2 Layout格式，输入A、B矩阵多Batch数据总和应该小于L1 Buffer的大小；
 - 样例规格：  
-
     本样例中：BatchNum = 3, M = 32, N = 256, K = 64。
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="6" align="center">BatchMatmulCustom</td></tr>

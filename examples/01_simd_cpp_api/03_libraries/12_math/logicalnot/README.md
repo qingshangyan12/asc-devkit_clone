@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示了基于LogicalNot高阶API的算子实现。样例按元素进行取反操作，当输入的数据类型不是bool时，零被是被Flase，非零数据被视为True。
+本样例演示了基于LogicalNot高阶API的算子实现。样例按元素进行取反操作，当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
 
 ## 支持的产品
 
@@ -22,7 +22,7 @@
 ## 算子描述
 
 - 算子功能：  
-  按元素进行取反操作。当输入的数据类型不是bool时，零被是被Flase，非零数据被视为True。
+  按元素进行取反操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
 
   计算公式如下：
   $$
@@ -45,8 +45,7 @@
 - 算子实现：  
   本样例中实现的是固定shape为输入src[1024]，输出dst[1024]的logicalnot_custom算子。
 
-  - Kernel实现
-
+  - Kernel实现  
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用LogicalNot高阶API接口完成LogicalNot计算，得到最终结果，再搬出到外部存储上。
 
     logicalnot_custom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行LogicalNot计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。

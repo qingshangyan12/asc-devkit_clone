@@ -6,6 +6,10 @@
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
+
+## 支持的CANN软件版本
+- \>= CANN 9.0.0-beta.2
+
 ## 目录结构
 ```
 ├── simt_gather_and_simd_adds
@@ -16,8 +20,7 @@
 
 ## 样例描述
 
-- 样例功能：
-
+- 样例功能：  
   计算公式：
 
   ```
@@ -34,8 +37,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_and_adds_kernel</td></tr>
   </table>
 
-- 样例实现：
-
+- 样例实现：  
   Vector Core中SIMT单元和SIMD单元共享片上存储，可以使用片上存储完成SIMT和SIMD的混合编程。本例中样例输入index的shape为[8192]，可设置核数为8，每个核处理数据量为1024，设置线程数THREAD_COUNT为1024，每个线程处理1个数据元素，单个核只需调用1次simt_gather函数即可完成gather运算。
 
   > ⚠️ **注意** 当单核处理数据量大于设置的线程数时，需要切分数据到多个线程块，可使用asc_vf_call多次调用simt_gather函数启动多个线程块完成获取指定索引数据的操作。
@@ -75,7 +77,7 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -94,10 +96,29 @@
 
 - 样例执行
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..; make -j;            # 编译工程
-  ./demo                        # 执行样例
+  mkdir -p build && cd build;                                               # 创建并进入build目录
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（默认npu模式）
+  ./demo                                                                    # 执行样例
   ```
+
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+| 选项 | 可选值 | 说明 |
+|------|--------|------|
+| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```
   [Success] Case accuracy is verification passed.
@@ -108,19 +129,19 @@ CPU Debug功能支持对CPU执行过程中的运行状态进行调试，主要�
 
 - 样例执行
   ```bash
-  mkdir -p build && cd build;          # 创建并进入build目录
-  cmake -DRUN_MODE=cpu ..; make -j;    # 编译工程
-  ./demo                               # 执行样例
+  mkdir -p build && cd build;                                                        # 创建并进入build目录
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;      # 编译工程
+  ./demo                                                                             # 执行样例
   ```
   执行结果如下，说明精度对比成功。
   ```
   [Success] Case accuracy is verification passed.
   ```
 
-- 进入GDB模式调试
+- 进入GDB模式调试  
   在上述指令中"./demo"前加入"gdb --args"，再次执行指令即可进入GDB模式。调试时需要选择子进程进行调试。
   ```bash
   mkdir -p build && cd build;
-  cmake -DRUN_MODE=cpu ..; make -j;
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
   gdb --args ./demo
   ```

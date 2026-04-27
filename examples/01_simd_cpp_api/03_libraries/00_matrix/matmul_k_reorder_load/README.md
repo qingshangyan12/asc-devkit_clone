@@ -21,12 +21,10 @@
 │   └── matmul_k_reorder_load.asc              // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   本样例调用Matmul高阶API时，通过设置MatmulConfig参数enableKdimReorderLoad使能K轴错峰加载数据，该参数功能只支持MDL模板。  
 
-- 样例规格： 
-
+- 样例规格：  
     本样例中：M = 768, N = 2048, K = 6144。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

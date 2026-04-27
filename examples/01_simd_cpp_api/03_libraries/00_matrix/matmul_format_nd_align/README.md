@@ -17,12 +17,10 @@
 │   └── matmul_format_nd_align.asc              // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例调用Matmul API计算时，通过设置C矩阵的Format参数为CubeFormat::ND_ALIGN，使能矩阵乘输出的N方向32字节对齐功能，对输入的A、B矩阵做矩阵乘和加bias偏置。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 128, N = 7679, K = 128。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
