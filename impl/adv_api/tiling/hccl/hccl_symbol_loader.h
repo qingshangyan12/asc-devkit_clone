@@ -30,7 +30,7 @@ public:
     }
 
     template <typename FuncPtr>
-    FuncPtr Load(const std::string& soName, const std::string& funcName)
+    FuncPtr Load(const std::string& soName, const std::string& funcName, const std::string& pathName)
     {
         std::lock_guard<std::mutex> lock(mtx_);
 
@@ -42,7 +42,8 @@ public:
         }
 
         if (libMap_.find(soName) == libMap_.end()) {
-            libMap_[soName] = dlopen(soName.c_str(), RTLD_LAZY | RTLD_LOCAL);
+            std::string soPath = pathName + soName;
+            libMap_[soName] = dlopen(soPath.c_str(), RTLD_LAZY | RTLD_LOCAL);
         }
 
         if (libMap_[soName] == nullptr) {
