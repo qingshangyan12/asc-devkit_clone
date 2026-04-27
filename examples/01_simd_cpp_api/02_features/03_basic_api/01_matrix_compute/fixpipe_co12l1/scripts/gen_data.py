@@ -18,6 +18,7 @@ import struct
 import numpy as np
 np.random.seed(9)
 
+
 def extract_relu_params(relu_pre):
     relu_pre = int(relu_pre)
     relu_alpha_bits = (relu_pre >> 13) & 0xFFFFF  # 提取M2的20位[31:13]，0xFFFFF是20位掩码
@@ -27,6 +28,7 @@ def extract_relu_params(relu_pre):
     exponent_bias = 127 # 假设指数偏倚量为127，与float32一致
     relu_alpha = (-1) ** sign_bit * (1 + mantissa / 1024) * (2 ** (exponent - exponent_bias))
     return relu_alpha
+
 
 def extract_quant_params(quant_pre):
     """
@@ -52,12 +54,14 @@ def extract_quant_params(quant_pre):
     quant_alpha = (-1) ** sign_bit * (1 + mantissa / 1024) * (2 ** (exponent - exponent_bias))
     return quant_alpha, offset, sign, n, mode_control_bit
 
+
 def saturation(value, min_val, max_val, target_type):
     """
     将输入的浮点数进行饱和处理，并转换为目标类型
     """
     x_clamped = np.clip(value, min_val, max_val)
     return np.round(x_clamped).astype(target_type)
+
 
 def qf322b8_pre(data, quant_pre, relu_pre):
     """
@@ -79,6 +83,7 @@ def qf322b8_pre(data, quant_pre, relu_pre):
         return saturation(quant_data, -128, 127, np.int8)
     else:
         return saturation(quant_data, 0, 255, np.uint8)
+
 
 def pre_quant_relu(golden, dst_type, m, n, pre_quant_mode, pre_relu_mode):
     quant_scalar = 2
@@ -108,6 +113,7 @@ def pre_quant_relu(golden, dst_type, m, n, pre_quant_mode, pre_relu_mode):
         for j in range(n):
             quant_golden[i, j] = qf322b8_pre(golden[i, j], quant_tensor[j], relu_alpha)
     return quant_golden
+
 
 def gen_golden_data(scenarioNum=1, ascArch="dav-2201"):
     M = 128
@@ -168,7 +174,7 @@ def gen_golden_data(scenarioNum=1, ascArch="dav-2201"):
         golden_a2.tofile("./output/golden.bin")
     else:
         golden.tofile("./output/golden.bin")
-    
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
