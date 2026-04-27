@@ -108,12 +108,12 @@ enum KernelType {
     K_TYPE_AIV = 3,                 // v220-vec
     K_TYPE_MIX_AIC_MAIN = 4,        // v220 mix cube/vector 1:2
     K_TYPE_MIX_AIV_MAIN = 5,        // v220 mix vector/cube 1:2
-    K_TYPE_AIC_ROLLBACK = 6,        // v220-cube��aic rollback
-    K_TYPE_AIV_ROLLBACK = 7,        // v220-vec��aiv rollback
+    K_TYPE_AIC_ROLLBACK = 6,        //  v220-cube，aic rollback
+    K_TYPE_AIV_ROLLBACK = 7,        //  v220-vec，aiv rollback
     K_TYPE_MAX
 };
 
-enum BinaryMetaType { // ������TLV����
+enum BinaryMetaType { // 函数级TLV类型
     B_TYPE_BIN_VERSION_INFO = 0,
     B_TYPE_DEBUG_INFO = 1,
     B_TYPE_DYNAMIC_PARAM = 2,
@@ -121,32 +121,32 @@ enum BinaryMetaType { // ������TLV����
     B_TYPE_SK_INFO = 5
 };
 
-struct BaseTlv {  // TLVͷ������
+struct BaseTlv {  // TLV头部定义
     unsigned short type;
     unsigned short len;
 };
 
 struct BinaryMetaVersion {
     BaseTlv head;     // B_TYPE_BIN_VERSION = 0
-    uint32_t version;  // �汾��Ϣ'
+    uint32_t version;  // 版本信息'
 };
 
 struct BinaryMetaDebug {
     BaseTlv head;     // B_TYPE_DEBUG_INFO = 1
-    uint32_t debugBufSize;  // ������Ҫ���ڴ�ռ�
-    uint32_t debugOptions; // ���Կ��ؿ���
+    uint32_t debugBufSize;  // 调试需要的内存空间
+    uint32_t debugOptions; // 调试开关开启
 };
 
 struct BinaryMetaDynamicParam {
     BaseTlv head;
     uint16_t reserve;
-    uint16_t dynamicParamMode;  // ��̬������֧�ֶ���ָ�뷽ʽ���θ�kernel
+    uint16_t dynamicParamMode;  // 动态参数，支持二级指针方式传参给kernel
 };
 
 struct BinaryMetaOptionalParam {
     BaseTlv head;
-    uint16_t optionalInputMode; // ���ڿ�ѡ������Ҫռλ����
-    uint16_t optionalOutputMode; // ���ڿ�ѡ������Ҫռλ����
+    uint16_t optionalInputMode; // 对于可选输入需要占位发布
+    uint16_t optionalOutputMode; // 对于可选输入需要占位发布
 };
 
 struct BinaryMetaAscFeature {
@@ -154,7 +154,7 @@ struct BinaryMetaAscFeature {
     uint32_t feature; // PRINT = 1, FFTS = 2, L2CACHE = 3
 };
 
-enum FuncMetaType { // ������TLV����
+enum FuncMetaType { // 函数级TLV类型
     F_TYPE_KTYPE = 1, // kernel type tlv
     F_TYPE_CROSS_CORE_SYNC = 2, // cross core sync
     F_TYPE_MIX_TASK_RATION = 3, // MIX CORE TYPE
@@ -169,7 +169,7 @@ enum FuncMetaType { // ������TLV����
 
 struct FuncMetaDeterministic {
     BaseTlv head;
-    uint32_t deterministic; // ȷ���Լ���
+    uint32_t deterministic; // 确定性计算
 };
 
 struct FuncMetaFunctionEntry {
@@ -183,7 +183,7 @@ struct FuncMetaNumBlocks {
     uint32_t numBlocks; // numBlocks
 };
 
-enum CrossCoreSyncType { // ������TLV����
+enum CrossCoreSyncType { // 函数级TLV类型
     C_TYPE_USE_SYNC = 1, // use cross core sync
     C_TYPE_MAX
 };
