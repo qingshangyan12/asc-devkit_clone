@@ -130,7 +130,6 @@ set(include_list
     ${HCCL_BASE_DIR}/platform/ping_mesh
     ${HCCL_BASE_DIR}/platform/resource/socket
     ${HCCL_BASE_DIR}/platform/task
-    ${CANN_3RD_LIB_PATH}/hcomm_utils/${PRODUCT_SIDE}/include/legacy
     ${HCCL_BASE_DIR}/platform/typical
 
     ${HCCL_BASE_DIR}/framework/next/coll_comms/rank_pairs
@@ -149,7 +148,6 @@ set(include_list
 
 # 指定ccl_kernel_plf所需包含文件搜索路径
 if(BUILD_OPEN_PROJECT)
-    include(${HCCL_CC_DIR}/cmake/hcomm_utils.cmake)
     include(${HCCL_CC_DIR}/cmake/third_party/json.cmake)
     include(${HCCL_CC_DIR}/cmake/third_party/openssl.cmake)
     include(${HCCL_CC_DIR}/cmake/third_party/rdma-core.cmake)

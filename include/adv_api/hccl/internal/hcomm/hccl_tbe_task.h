@@ -7,7 +7,6 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-// todo: 这个文件夹是从test/ut/depends/hcomm-legacy目录复制过来的，但实际上在third_party/hcomm_utils/device(或host)/inlude/leagacy中也有？
 #ifndef HCCL_TBE_TASK_H
 #define HCCL_TBE_TASK_H
 
