@@ -187,6 +187,8 @@ target_include_directories(tiling_api PRIVATE
   ${ASCENDC_DIR}/include/utils/tiling/platform
   ${ASCENDC_DIR}/include/utils
   ${TOP_DIR}/runtime/pkg_inc
+  ${TOP_DIR}/runtime/include/external
+  ${TOP_DIR}/runtime/include/external/acl
   $<$<STREQUAL:${PRODUCT_SIDE},device>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/utils/stub>>
   $<$<STREQUAL:${PRODUCT_SIDE},device>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/utils/stub/common>>
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:$<BUILD_INTERFACE:${TOP_DIR}/metadef/inc/external>>
