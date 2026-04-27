@@ -4,7 +4,7 @@
 
 本样例在数据搬运场景下，基于DataCopyPad API实现非32字节对齐数据的搬运及填充功能。DataCopyPad API支持从Global Memory到Local Memory的非对齐数据搬运，并可在数据左侧或右侧填充指定数值，解决硬件要求的32字节对齐约束。
 
-数据搬运过程包括：Global Memory（GM）→VECIN队列（使用DataCopyPad进行非对齐搬运并填充）、VECIN→VECOUT（计算处理）、VECOUT队列→Global Memory（GM）。本样例支持通过编译参数切换不同场景，演示DataCopyPad的不同使用方式。
+数据搬运过程包括：Global Memory（GM）→VECIN队列（使用DataCopyPad进行非对齐搬运并填充）→VECOUT队列→Global Memory（GM）。本样例支持通过编译参数切换不同场景，演示DataCopyPad的不同使用方式。
 
 ## 支持的产品
 
@@ -34,28 +34,55 @@
 <tr><td>1</td><td>[1, 20]</td><td>[1, 32]</td><td>half</td><td>SetPadValue</td><td>右侧填充12个元素，填充值为1</td></tr>
 <tr><td>2</td><td>[32, 59]</td><td>[32, 64]</td><td>float</td><td>rightPadding</td><td>右侧填充5个元素，填充值为0</td></tr>
 <tr><td>3</td><td>[3, 24]</td><td>[1, 80]</td><td>half</td><td>Compact</td><td>Compact模式，最后一个数据块右侧填充16字节</td></tr>
+<tr><td>4</td><td>[1, 320]</td><td>[1, 576]</td><td>int8</td><td>LoopMode(Compact)</td><td>使用Duplicate清零UB，SetLoopModePara使能loop mode，Compact模式，每次内层循环搬运80B后填充16B(padValue=-1)，实现GM→UB非连续stride搬运</td></tr>
+<tr><td>5</td><td>[1, 320]</td><td>[1, 576]</td><td>int8</td><td>LoopMode(Normal)</td><td>使用Duplicate清零UB，SetLoopModePara使能loop mode，Normal模式，每个block搬运40B后填充24B(padValue=-1)，实现GM→UB非连续stride搬运</td></tr>
 </table>
 
 ### 场景详细说明
 
 **场景1：使用SetPadValue进行自定义填充**
-- 输入：[1, 20]个half元素（共20个）
-- 输出：[1, 32]个half元素（共32个）
+- 输入shape：[1, 20]
+- 输出shape：[1, 32]
+- 数据类型：half
 - 参数配置：isPad=false, leftPadding=0, rightPadding=12
 - 说明：使用SetPadValue设置填充值为1，右侧填充12个元素
 
 **场景2：使用rightPadding进行默认填充**
-- 输入：[32, 59]个float元素（共1888个）
-- 输出：[32, 64]个float元素（共2048个）
+- 输入shape：[32, 59]
+- 输出shape：[32, 64]
+- 数据类型：float
 - 参数配置：isPad=true, leftPadding=0, rightPadding=5
 - 说明：不使用SetPadValue，右侧填充5个元素，填充值为0
 
 **场景3：使用Compact模式进行数据搬运**
-- 输入：[3, 24]个half元素（共72个）
-- 输出：[1, 80]个half元素（共80个）
+- 输入shape：[3, 24]
+- 输出shape：[1, 80]
+- 数据类型：half
 - 参数配置：blockLen=48, blockCount=3, leftPadding=0, rightPadding=16, isPad=false
 - 说明：紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐。此处示例中，leftPadding为0，rightPadding为16，在最后一个数据块右侧填充16字节。目的操作数的总长度为160字节
 - 注意：Compact模式仅支持 Ascend 950PR/Ascend 950DT（dav-3510）
+
+**场景4：使用SetLoopModePara使能loop mode（Compact模式）**
+- 输入shape：[1, 320]
+- 输出shape：[1, 576]
+- 数据类型：int8
+- 参数配置：
+  - GM→UB：LoopModeParams{loop1Size=2, loop2Size=2, loop1SrcStride=80, loop1DstStride=128, loop2SrcStride=160, loop2DstStride=288}，DataCopyMVType::OUT_TO_UB
+  - DataCopyExtParams：BLOCK_COUNT=2, BLOCK_LEN=40（使用constexpr常量）
+  - DataCopyPadExtParams：isPad=true, leftPadding=0, rightPadding=0, padValue=-1
+- 说明：通过SetLoopModePara使能loop mode，使用Compact模式实现GM→UB的非连续stride数据搬运。搬运前先使用Duplicate清零UB buffer，Compact模式下每次内层循环搬运80B后填充16B使其96B对齐，padding值设为-1。UB→GM直接使用DataCopy连续搬出。SetLoopModePara需与ResetLoopModePara配合使用，搬运完成后必须调用ResetLoopModePara重置loop mode参数
+- 注意：SetLoopModePara仅支持 Ascend 950PR/Ascend 950DT（dav-3510）
+
+**场景5：使用SetLoopModePara使能loop mode（Normal模式）**
+- 输入shape：[1, 320]
+- 输出shape：[1, 576]
+- 数据类型：int8
+- 参数配置：
+  - GM→UB：LoopModeParams{loop1Size=2, loop2Size=2, loop1SrcStride=80, loop1DstStride=128, loop2SrcStride=160, loop2DstStride=288}，DataCopyMVType::OUT_TO_UB
+  - DataCopyExtParams：BLOCK_COUNT=2, BLOCK_LEN=40（使用constexpr常量）
+  - DataCopyPadExtParams：isPad=true, leftPadding=0, rightPadding=0, padValue=-1
+- 说明：通过SetLoopModePara使能loop mode，使用Normal模式实现GM→UB的非连续stride数据搬运。搬运前先使用Duplicate清零UB buffer，Normal模式下每个block搬运后都会填充24B使其64B对齐，padding值设为-1。UB→GM直接使用DataCopy连续搬出。SetLoopModePara需与ResetLoopModePara配合使用，搬运完成后必须调用ResetLoopModePara重置loop mode参数
+- 注意：SetLoopModePara仅支持 Ascend 950PR/Ascend 950DT（dav-3510）
 
 ## 编译运行
 
@@ -79,20 +106,19 @@
     
 - 样例执行
   ```bash
-  SCENARIO_NUM=1
+  SCENARIO_NUM=1  # 设置场景编号
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin -scenarioNum=$SCENARIO_NUM  # 验证输出结果是否正确
   ```
 
-  使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
   
-  示例如：
+  示例如下：
   ```bash
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU仿真模式
   ```
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
@@ -100,9 +126,9 @@
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品、dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`（默认）、`2`、`3` | 场景编号 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列、dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `1`（默认）、`2`、`3`、`4`、`5` | 场景编号：1（SetPadValue填充）、2（rightPadding）、3（Compact模式）、4（SetLoopModePara loop mode Compact）、5（SetLoopModePara loop mode Normal） |
 
 - 执行结果
 
@@ -110,3 +136,4 @@
   ```bash
   test pass!
   ```
+
