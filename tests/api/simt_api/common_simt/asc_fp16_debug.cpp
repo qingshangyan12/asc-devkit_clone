@@ -127,5 +127,15 @@ half2 __sqrtf(half2 x)
  	htmp2 = half(tmp2);
  	return {htmp1, htmp2};
 }
+
+half __hmax_nan(half x, half y)
+{
+    return half(0);
+}
+
+half __hmin_nan(half x, half y)
+{
+    return half(0);
+}
 #endif
 #endif

@@ -32,6 +32,9 @@ namespace {
     const float HALF_SUBNORMAL_THRESHOLD = std::pow(2, -14);
 }
 
+half __hmax_nan(half x, half y);
+half __hmin_nan(half x, half y);
+
 template<typename T, typename U>
 constexpr uint32_t GetRoundBitNum()
 {
