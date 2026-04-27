@@ -94,14 +94,17 @@
 #define ASCENDC_MATMUL_AICORE
 #endif
 
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
+#if (defined(__NPU_ARCH__) &&                                               \
+     ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) ||                   \
+      (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                   \
+      (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)))
 #ifndef ASCENDC_DUMP
 #define ASCENDC_DUMP 1
+#endif
 #endif
 
 #if defined(ASCENDC_DUMP) && (ASCENDC_DUMP == 0)
     #undef ASCENDC_DUMP
-#endif
 #endif
 
 namespace AscendC {
@@ -133,8 +136,12 @@ extern int32_t g_matmulCount;
 namespace AscendC {
 namespace Reg {
 } // namespace Reg
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+    ((__NPU_ARCH__ == 3113)))
 namespace MicroAPI = Reg;
+#endif
 } // namespace AscendC
+
 #endif // ASCENDC_KERNEL_MACROS_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_MACROS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

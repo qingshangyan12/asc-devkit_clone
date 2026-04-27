@@ -28,6 +28,10 @@
 #include "kernel_log.h"
 #include "kernel_macros.h"
 #include "kernel_operator_block_sync_intf.h"
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
+#endif
 #include "kernel_struct_data_copy.h"
 #include "kernel_tensor.h"
 #include "kernel_tensor_base.h"
@@ -914,7 +918,7 @@ __aicore__ inline void TPipe::ResetPool()
     }
 #else
     if ASCEND_IS_AIV {
-        buf[static_cast<int32_t>(Hardware::UB)].maxAddr = 0;
+        buf[static_cast<int32_t>(Hardware::UB)].maxAddr = GetDynamicMemStartPos<Hardware::UB>();
         buf[static_cast<int32_t>(Hardware::L1)].maxAddr = 0;
     } else {
         for (int32_t i = 0; i < static_cast<int32_t>(Hardware::MAX); i++, buf++) {

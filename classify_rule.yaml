@@ -30,6 +30,7 @@ asc-devkit:
       - impl/utils/**/*.h
       - impl/experimental/tensor_api/utils/*.h
       - impl/c_api/instr_impl/npu_arch_2201/utils_impl/**/*.h
+      - impl/c_api/instr_impl/npu_arch_3510/utils_impl/**/*.h
       - impl/basic_api/reg_compute/kernel_reg_compute_struct_intf_impl.h
       - impl/basic_api/reg_compute/kernel_reg_compute_common_intf_impl.h
       - impl/basic_api/reg_compute/kernel_reg_compute_intf_impl.h
@@ -40,13 +41,11 @@ asc-devkit:
       - impl/adv_api/detail/normalization/**/*.h
       - impl/adv_api/detail/common/common.h
       - impl/basic_api/dav_c100/kernel_operator_dump_tensor_impl.h
-      - impl/basic_api/dav_m310/kernel_operator_dump_tensor_impl.h
       - impl/basic_api/dav_m200/kernel_operator_dump_tensor_impl.h
       - impl/basic_api/dav_c220/kernel_operator_dump_tensor_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl/printf_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl.h
-      - impl/basic_api/**/*.h
-      - impl/adv_api/detail/**/*.h
+      - impl/basic_api/dav_c310/kernel_operator_determine_compute_sync_impl.h
   llt:
     ut_check: true
     st_check: false

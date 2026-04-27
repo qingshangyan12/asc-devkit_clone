@@ -34,7 +34,7 @@
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 编译、打包和部署自定义算子工程
 
-  运行此样例前，请参考[自定义算子工程样例](../custom_op/README.md)完成前期准备。
+  运行此样例前，请参考[自定义算子工程样例](../../../00_compilation/custom_op/README.md)完成前期准备。
 
 - 安装onnx
 
@@ -44,7 +44,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
 
     ```bash
@@ -86,6 +86,7 @@
   >   id：设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id
   >
   >   chip_id：芯片id，通过`npu-smi info -m`命令查出的Chip ID即为芯片id
+  >   - Ascend 950PR/Ascend 950DT
   >   - Atlas A3 训练系列产品 / Atlas A3 推理系列产品
   >
   >   基于同系列的AI处理器型号创建的算子工程，其基础功能（基于该工程进行算子开发、编译和部署）通用。

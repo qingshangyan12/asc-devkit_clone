@@ -10,6 +10,12 @@
 
 将uint32_t类型数据转为int16_t类型。
 
+溢出模式：
+- 非饱和模式：结果被截断至目标格式的数据宽度，且保留最低有效位（LSB）。
+- 饱和模式： 结果被限制在目标格式的可表示范围内。
+
+由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选取索引0或者索引1
+
 ## 函数原型
 
 ```cpp
@@ -50,7 +56,7 @@ PIPE_V
 ```cpp
 vector_uint32_t src;
 vector_int16_t dst;
-vector_bool mask = asc_create_mask_b16(PAT_ALL);
+vector_bool mask = asc_create_mask_b32(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_uint322int16(dst, src, mask);
 ```

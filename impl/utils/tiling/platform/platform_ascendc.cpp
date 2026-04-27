@@ -505,11 +505,11 @@ fe::PlatFormInfos* PlatformAscendCManager::PlatformAscendCInit(const char *custo
         socVersion = customSocVersion;
     }
 
-    fe::PlatformInfoManager::GeInstance().InitRuntimePlatformInfos(socVersion);
+    fe::PlatformInfoManager::Instance().InitRuntimePlatformInfos(socVersion);
     fe::OptionalInfos optionalInfos;
     static fe::PlatFormInfos gPlatformInfo;
-    fe::PlatformInfoManager::GeInstance().GetPlatformInfos(socVersion,
-        gPlatformInfo, optionalInfos);
+    int32_t deviceId = 0;
+    fe::PlatformInfoManager::Instance().GetRuntimePlatformInfosByDevice(deviceId, gPlatformInfo);
     std::string socVersionStr;
     const auto ret = gPlatformInfo.GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVersionStr);
     if (!ret) {

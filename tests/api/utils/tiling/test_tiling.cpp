@@ -375,6 +375,7 @@ TEST_F(TestTiling, TestTilingContextBuildWithConstValue)
                                 .AddAttr("intVecVecAttr", intVecVecAttr)
                                 .TilingData(param.get())
                                 .Workspace(ws_size)
+                                .AddPlatformInfo("Ascend910B")
                                 .BuildTilingContext();
     EXPECT_NE(holder, nullptr);
     gert::TilingContext *tilingContext = holder->GetContext<gert::TilingContext>();
@@ -754,4 +755,24 @@ TEST_F(TestTiling, TestPlatformCustomSocVersion)
 
     auto ret4 = platform_ascendc::PlatformAscendCManager::GetInstance("Ascend910B1");
     EXPECT_EQ(nullptr, ret4);
+}
+
+TEST_F(TestTiling, TestPlatformAscendCInitWithRuntimePlatformInfos)
+{
+    const char* customSocVersion = "Ascend910B1";
+    
+    MOCKER_CPP(&fe::PlatformInfoManager::InitRuntimePlatformInfos,
+        uint32_t(fe::PlatformInfoManager::*)(const std::string &))
+        .stubs()
+        .will(returnValue(0));
+    
+    MOCKER_CPP(&fe::PlatformInfoManager::GetRuntimePlatformInfosByDevice,
+        uint32_t(fe::PlatformInfoManager::*)(const uint32_t&, fe::PlatFormInfos&, bool))
+        .stubs()
+        .will(returnValue(0));
+    
+    auto ret = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit(customSocVersion);
+    EXPECT_NE(nullptr, ret);
+    
+    GlobalMockObject::verify();
 }
