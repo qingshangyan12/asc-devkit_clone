@@ -10,25 +10,25 @@ CANN作为昇腾NPU配套的全栈软件平台，采用分层架构设计，实�
 通过CANN提供的统一异构编程模型与运行时接口，CPU与NPU实现高效协同调度：CPU完成数据准备、任务拆解与调度后，将计算密集型算子任务卸载至NPU进行加速执行，执行完成后的计算结果由CPU回收，或根据业务需求开展进一步处理。这种协同机制贯穿算子、模型、应用全层级，有效实现计算性能与运行效率的最优平衡，为昇腾AI处理器的算力充分释放提供核心软件支撑。
 
 ## Ascend C简介
-为解决开发者高效编写可直接运行于 NPU 之上的高性能算子这一核心需求，Ascend C应运而生。Ascend C是CANN生态下面向昇腾AI处理器推出的专用算子开发语言，原生兼容C与C++ 标准规范。作为一门覆盖多场景的编程语言，Ascend C 秉持 **“开放芯片完备编程能力，支撑极致性能”** 的设计理念，并通过精心划分的多层级 API，让您可以根据项目需求、团队技能和性能目标，在开发效率与运行性能之间灵活权衡、取得最优平衡。更多背景可访问 [Ascend C 主页](https://www.hiascend.com/zh/ascend-c)。
+为解决开发者高效编写可直接运行于 NPU 之上的高性能算子这一核心需求，Ascend C应运而生。Ascend C是CANN生态下面向昇腾AI处理器推出的专用算子开发语言，原生兼容C与C++ 标准规范。作为一门覆盖多场景的编程语言，Ascend C秉持 **“开放芯片完备编程能力，支撑极致性能”** 的设计理念，并通过精心划分的多层级 API，让您可以根据项目需求、团队技能和性能目标，在开发效率与运行性能之间灵活权衡、取得最优平衡。更多背景可访问 [Ascend C主页](https://www.hiascend.com/zh/ascend-c)。
 
-为帮助不同阶段的开发者平滑成长，Ascend C 构建了从高层封装到底层接口的多级 API 体系（选择建议见 [Ascend C多级API选择指南](../../asc_how_to_choose_api.md)），其总体逻辑架构如下：
+为帮助不同阶段的开发者平滑成长，Ascend C构建了从高层封装到底层接口的多级 API 体系（选择建议见 [Ascend C多级API选择指南](../../asc_how_to_choose_api.md)），其总体逻辑架构如下：
 
-<img src="../figures/architecture.png" alt="架构图" width="850px" height="580px">
+<img src="../../figures/architecture.png" alt="架构图" width="850px" height="580px">
 
 - **语言扩展层 C API**：纯 C 接口，提供数组内存分配、基于指针的计算接口，延续业界熟悉的 C 编程体验，并完整开放芯片能力。Atlas A2/A3 已支持 SIMD 纯 C 接口；Ascend 950PR/Ascend 950DT 将引入类似业界的 SIMT 能力以及 SIMD/SIMT 混合编程能力。
 - **基础 API**：以单指令为抽象的 C++ 类库，一般基于 Tensor 编程，并逐步通过 Layout 完善 Tensor 编程体验。
 - **高阶 API**：对单核常见算法进行抽象与封装，提供开箱即用的公共算法实现。
 - **算子模板库**：基于模板提供算子的完整实现参考，降低 Tiling 开发复杂度，支持用户自定义扩展。
-- **Python 前端 PyAsc**：基于 Python 原生接口（参见 [PyAsc](https://gitcode.com/cann/pyasc)），提供芯片底层完备编程能力，并将逐步引入 Layout 化 Tensor 编程、SIMT 编程等，实现用 Python 开发高性能算子。
+- **Python 前端 PyAsc**：基于Python原生接口（参见 [PyAsc](https://gitcode.com/cann/pyasc)），提供芯片底层完备编程能力，并将逐步引入 Layout 化 Tensor 编程、SIMT 编程等，实现用Python开发高性能算子。
 
-纵观这一体系，Ascend C 为开发者铺设了一条清晰的成长路径——从“快速上手”到“深度调优”，再到“释放极限性能”。下面按 **初级、中级进阶、高级编程** 三个阶段展开介绍。
+纵观这一体系，Ascend C为开发者铺设了一条清晰的成长路径——从“快速上手”到“深度调优”，再到“释放极限性能”。下面按 **初级、中级进阶、高级编程** 三个阶段展开介绍。
 
 # Ascend C学习路径
 
 ## 初级阶段：快速入门，建立全局认知
 
-初级阶段的目标是让您在最短时间内跑通第一个算子，理解 Ascend C 的基本工作方式。
+初级阶段的目标是让您在最短时间内跑通第一个算子，理解 Ascend C的基本工作方式。
 
 学习路线建议如下：
 
@@ -46,11 +46,11 @@ CANN作为昇腾NPU配套的全栈软件平台，采用分层架构设计，实�
 
 - **编程模型深入**
    - [编程模型概述](../编程指南/编程模型)
-   - **SIMD 编程**：[Ascend C SIMD 编程模型](../编程指南/编程模型/AI-Core-SIMD编程)
+   - **SIMD 编程**：[Ascend CSIMD 编程模型](../编程指南/编程模型/AI-Core-SIMD编程)
         - [基于指针的 C 语言编程]
         - [基于 Tensor 的 C++ 编程]
         - [基于 Tpipe/Tque 框架编程]
-   - **SIMT 编程**：[Ascend C SIMT 编程模型](../编程指南/编程模型/AI-Core-SIMT编程)
+   - **SIMT 编程**：[Ascend CSIMT 编程模型](../编程指南/编程模型/AI-Core-SIMT编程)
    - [语言扩展概述](../编程指南/语言扩展层/)
 - **构建与运行**：[编译与运行](../编程指南/编译与运行)
 - **调试与调优**
@@ -59,8 +59,8 @@ CANN作为昇腾NPU配套的全栈软件平台，采用分层架构设计，实�
 - **算子部署**：以 PyTorch 框架为例完成部署
 - **实践巩固**
    - [算子实践参考](../算子实践参考/)
-        - Ascend C SIMD 算子实践（如 Add、Softmax、Matmul，覆盖设计、开发、功能、精度、性能、PyTorch 调试全流程）
-        - Ascend C SIMT 算子实践（如 Gather/Scatter，全流程）
+        - Ascend CSIMD 算子实践（如 Add、Softmax、Matmul，覆盖设计、开发、功能、精度、性能、PyTorch 调试全流程）
+        - Ascend CSIMT 算子实践（如 Gather/Scatter，全流程）
 
 ---
 
@@ -79,9 +79,9 @@ CANN作为昇腾NPU配套的全栈软件平台，采用分层架构设计，实�
    - [Aclnn 算子工程化开发] —— 面向框架集成与生产级交付。
    - [更多高级特性...]
 - [算子高级实践]
-   - Ascend C SIMD 高级实践
-   - Ascend C SIMT 高级实践
-   - [Ascend C 算子高性能实践样例仓](https://github.com/cann/cann-samples)
+   - Ascend CSIMD 高级实践
+   - Ascend CSIMT 高级实践
+   - [Ascend C算子高性能实践样例仓](https://github.com/cann/cann-samples)
 - [跨芯片兼容迁移指南](../兼容性迁移指南/) —— 让算子在多代昇腾处理器间无缝迁移。
 
 ---
@@ -89,7 +89,7 @@ CANN作为昇腾NPU配套的全栈软件平台，采用分层架构设计，实�
 ## 技术附录
 
 - [基本概念与术语](../编程指南/概念原理和术语/)
-- [Ascend C API 参考（含每个 API 的规格与约束）](../../api)
+- [Ascend CAPI 参考（含每个 API 的规格与约束）](../../api)
 - 支持的 AI 处理器及各自**关键特性、编程模型/API/样例**：
    - [Ascend 950PR / Ascend 950DT](../编程指南/附录/)
    - [Atlas A3 训练系列 / Atlas A3 推理系列](../编程指南/附录/)
