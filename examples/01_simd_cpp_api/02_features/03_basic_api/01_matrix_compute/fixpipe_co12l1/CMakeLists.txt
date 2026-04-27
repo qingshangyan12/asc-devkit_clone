@@ -25,16 +25,14 @@ target_link_libraries(demo PRIVATE)
 
 # 场景参数（通过命令行传入）
 # SCENARIO_NUM: 场景编号
-#   1 - 输出格式NZ，输出数据类型float（仅Ascend 950PR/Ascend 950DT支持）
-#   2 - 输出格式ND，输出数据类型float（仅Ascend 950PR/Ascend 950DT支持）
-#   3 - 输出格式DN，输出数据类型float（仅Ascend 950PR/Ascend 950DT支持）
-#   4 - 输出格式NZ，输出数据类型int8_t，使能Scalar量化（均支持）
-#   5 - 输出格式ND，输出数据类型int8_t，使能Scalar量化（仅Ascend 950PR/Ascend 950DT支持）
-#   6 - 输出格式ND，输出数据类型int8_t，使能Vector量化（仅Ascend 950PR/Ascend 950DT支持）
-#   7 - 输出格式ND，输出数据类型float，使能relu（仅Ascend 950PR/Ascend 950DT支持）
-set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-7)")
+#   1 - 输出格式Nz，输出到L1的数据类型为half（仅Ascend 950PR/Ascend 950DT支持）
+#   2 - 输出格式Nz，输出到L1的数据类型为int8_t，使能Scalar量化（均支持）
+#   3 - 输出格式Nz，输出到L1的数据类型为int8_t，使能Vector量化（均支持）
+#   4 - 输出格式Nz，输出到L1的数据类型为half，使能relu（仅Ascend 950PR/Ascend 950DT支持）
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-4)")
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+add_definitions(-DASC_ARCHITECTURES=${ASC_ARCHITECTURES})
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>

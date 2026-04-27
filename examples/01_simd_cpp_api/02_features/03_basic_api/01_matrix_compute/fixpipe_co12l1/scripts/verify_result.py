@@ -15,15 +15,24 @@ import sys
 import numpy as np
 
 
-# for float32
-relative_tol = 1e-6
-absolute_tol = 1e-9
-error_tol = 1e-4
+relative_tol = 1e-3
+absolute_tol = 1e-3
+error_tol = 1e-3
 
 
-def verify_result(output, golden):
-    output = np.fromfile(output, dtype=np.float32).reshape(-1)
-    golden = np.fromfile(golden, dtype=np.float32).reshape(-1)
+def verify_result(output, golden, scenarioNum, ascArch):
+    if (scenarioNum == "1") or (scenarioNum == "4"):
+        if ascArch == "dav-2201":
+            return -1
+        output = np.fromfile(output, dtype=np.float32).reshape(-1)
+        golden = np.fromfile(golden, dtype=np.float32).reshape(-1)
+    else:
+        if ascArch == "dav-2201":
+            output = np.fromfile(output, dtype=np.int8).reshape(-1)
+            golden = np.fromfile(golden, dtype=np.int8).reshape(-1)
+        else:
+            output = np.fromfile(output, dtype=np.int32).reshape(-1)
+            golden = np.fromfile(golden, dtype=np.int32).reshape(-1)
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=relative_tol,
@@ -46,8 +55,10 @@ def verify_result(output, golden):
 
 if __name__ == '__main__':
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
-        if not res:
+        res = verify_result(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+        if res == -1:
+            print("not supported!")
+        elif not res:
             raise ValueError("[ERROR] result error")
         else:
             print("test pass!")
