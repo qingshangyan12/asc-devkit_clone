@@ -450,9 +450,21 @@ add_dependencies(mc2_client mc2_compat)
 # libhcomm must precede mc2_compat: mc2_compat exports weak fallback wrappers
 # that must not preempt real HCOMM symbols during dynamic symbol binding.
 if(BUILD_OPEN_PROJECT)
+    set(MC2_CLIENT_HCOMM_STUB_SRC
+        ${CMAKE_CURRENT_BINARY_DIR}/mc2_client_hcomm_stub.cc)
+    file(WRITE ${MC2_CLIENT_HCOMM_STUB_SRC}
+        "extern \"C\" void __mc2_hcomm_stub(void) {}\n")
+    add_library(mc2_client_hcomm_stub SHARED
+        ${MC2_CLIENT_HCOMM_STUB_SRC})
+    set_target_properties(mc2_client_hcomm_stub PROPERTIES
+        OUTPUT_NAME hcomm
+        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_client_link_stub)
+    target_link_options(mc2_client_hcomm_stub PRIVATE
+        -Wl,-soname,libhcomm.so)
+
     target_link_libraries(mc2_client PRIVATE
         -Wl,--no-as-needed
-        hcomm
+        mc2_client_hcomm_stub
         mc2_compat
         acl_rt
         c_sec
