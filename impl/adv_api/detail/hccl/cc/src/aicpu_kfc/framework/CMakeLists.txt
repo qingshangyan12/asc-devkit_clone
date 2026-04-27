@@ -479,6 +479,7 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     )
 
     set(CCL_KERNEL_INCLUDE_LIST
+        ${HCCL_LOCAL_HEADER_DIRS}
         ${HCCL_HCOMM_HEADER_DIR}/hccl
         ${HCCL_BASE_DIR}/pub_inc
         ${TOP_DIR}/abl/atrace/inc/utrace

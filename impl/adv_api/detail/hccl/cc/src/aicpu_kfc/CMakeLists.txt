@@ -21,6 +21,7 @@ add_library(ccl_kernel_plf_a  STATIC)
 
 # 需要编译的文件list
 set(include_list
+    ${HCCL_LOCAL_HEADER_DIRS}
     ${HCCL_BASE_DIR}/pub_inc
     ${HCCL_BASE_DIR}/pub_inc/aicpu/
     ${HCCL_BASE_DIR}/pub_inc/inner

@@ -9,6 +9,7 @@
 # ----------------------------------------------------------------------------------------------------------
 if(BUILD_OPEN_PROJECT)
     set(INCLUDE_LIST
+        ${HCCL_LOCAL_HEADER_DIRS}
         ${HCCL_CC_INCLUDE_DIR}/hcomm
         ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
         ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
