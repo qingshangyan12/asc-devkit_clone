@@ -12,7 +12,7 @@ Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/
 </tr>
 </thead>
 <tbody>
-<tr id="row_simd_1"><td class="cellrowborder" rowspan="4" valign="top" headers="mcps1.1.3.1.1"><p id="p_simd">SIMD API</p>
+<tr id="row_simd_1"><td class="cellrowborder" rowspan="3" valign="top" headers="mcps1.1.3.1.1"><p id="p_simd">SIMD API</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_base"><a href="#section117632211201">基础API</a></p>
 </td>
@@ -26,12 +26,7 @@ Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/
 </tr>
 <tr id="row_simd_3"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_high_api"><a href="#section3317105813235">高阶 API</a></p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_high_api_desc">基于单核对常见算法进行抽象和封装，提供公共算法的实现。</p>
-</td>
-</tr>
-<tr id="row_simd_4"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_simd_utils"><a href="#section15221943104512">Utils API</a></p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_simd_utils_desc">SIMD侧公共接口，包含C++标准库、平台信息获取和Tiling相关API。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_high_api_desc">实现一些常用的计算算法，用于提高编程开发效率，通常会调用多种基础API实现。高阶API包括数学库、Matmul、Softmax等API。高阶API可以保证兼容性。</p>
 </td>
 </tr>
 <tr id="row_simt"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.1"><p id="p_simt"><a href="#section1416490133020">SIMT API</a></p>
@@ -52,26 +47,14 @@ Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_utils_none">-</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_utils_desc">通用工具类接口，包含Debug调测接口、运行时编译接口和CmakeModule接口。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_utils_desc">丰富的通用工具类，涵盖标准库（目前仅支持SIMD）、平台信息获取、运行时编译及日志输出等功能，支持开发者高效实现算子开发与性能优化。</p>
 </td>
 </tr>
 </tbody>
 </table>
 
-
-## API架构说明<a name="section3119442205518"></a>
-Ascend C编程类库API架构图如下所示，分为：
-
--   **基础数据结构**：kernel API中使用到的基础数据结构，比如GlobalTensor和LocalTensor。
--   **语言拓展层C API**：纯C接口，开放芯片完备编程能力，支持数组分配内存，一般基于指针编程，提供与业界一致的C语言编程体验。
--   **基础API**：实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。标注为ISASI（Instruction Set Architecture Special Interface，硬件体系结构相关的接口）类别的API，不能保证跨硬件版本兼容。
--   **高阶API**：实现一些常用的计算算法，用于提高编程开发效率，通常会调用多种基础API实现。高阶API包括数学库、Matmul、Softmax等API。高阶API可以保证兼容性。
--   **SIMT API**：单指令多线程API。以单条指令多个线程的形式来实现并行计算。SIMT编程主要用于向量计算，特别适合处理离散访问、复杂控制逻辑等场景。
--   **Utils API（公共辅助函数）**：丰富的通用工具类，涵盖标准库、平台信息获取、运行时编译及日志输出等功能，支持开发者高效实现算子开发与性能优化。
-
-![](context/figures/成长地图.png)
-
 ## 基础数据结构<a name="section3119442205518"></a>
+kernel API中使用到的基础数据结构，比如GlobalTensor和LocalTensor。
 
 **表 1**  基础数据结构列表
 
@@ -3943,7 +3926,7 @@ Ascend C编程类库API架构图如下所示，分为：
 
 ## Utils API<a name="section15221943104512"></a>
 
-**表 37**  C++标准库API列表（当前仅SIMD支持）
+**表 37**  C++标准库API列表（当前仅支持SIMD）
 
 <a name="table99801554584"></a>
 <table><thead align="left"><tr id="row179811554088"><th class="cellrowborder" valign="top" width="37.71%" id="mcps1.2.3.1.1"><p id="p298155413815"><a name="p298155413815"></a><a name="p298155413815"></a>接口名</p>
@@ -4115,7 +4098,7 @@ Ascend C编程类库API架构图如下所示，分为：
 </tbody>
 </table>
 
-**表 38**  平台信息获取API列表（当前仅SIMD支持）
+**表 38**  平台信息获取API列表
 
 <a name="table32991747162610"></a>
 <table><thead align="left"><tr id="row13299184712616"><th class="cellrowborder" valign="top" width="37.6%" id="mcps1.2.3.1.1"><p id="p15299104762613"><a name="p15299104762613"></a><a name="p15299104762613"></a>接口名</p>
@@ -4137,7 +4120,7 @@ Ascend C编程类库API架构图如下所示，分为：
 </tbody>
 </table>
 
-**表 39**  Tiling调测API列表（当前仅SIMD支持）
+**表 39**  Tiling调测API列表
 
 <a name="table2675125415261"></a>
 <table><thead align="left"><tr id="row1967612545262"><th class="cellrowborder" valign="top" width="37.419999999999995%" id="mcps1.2.3.1.1"><p id="p367695412260"><a name="p367695412260"></a><a name="p367695412260"></a>接口名</p>
@@ -4159,7 +4142,7 @@ Ascend C编程类库API架构图如下所示，分为：
 </tbody>
 </table>
 
-**表 40**  Tiling模板编程API列表（当前仅SIMD支持）
+**表 40**  Tiling模板编程API列表
 
 <a name="table2864441102011"></a>
 <table><thead align="left"><tr id="row4832193752110"><th class="cellrowborder" valign="top" width="37.44%" id="mcps1.2.3.1.1"><p id="p157001846132117"><a name="p157001846132117"></a><a name="p157001846132117"></a>接口名</p>
@@ -4234,7 +4217,7 @@ Ascend C编程类库API架构图如下所示，分为：
 </tbody>
 </table>
 
-**表 42**  log API列表（当前仅SIMD支持）
+**表 42**  log API列表
 
 <a name="table1514223372716"></a>
 <table><thead align="left"><tr id="row3142033112715"><th class="cellrowborder" valign="top" width="37.79%" id="mcps1.2.3.1.1"><p id="p181421633182714"><a name="p181421633182714"></a><a name="p181421633182714"></a>接口名</p>
