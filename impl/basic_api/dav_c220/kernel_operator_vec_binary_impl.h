@@ -762,8 +762,8 @@ template <typename T>
 __aicore__ inline void FusedMulAddImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t& count)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-            "FusedMulAdd, current api support dtype combination is src and dst both: half / float.");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "FusedMulAdd, current api support dtype combination is src and dst both: half / float."));
         set_mask_count();
         set_vector_mask(0, count);
         vmadd(dst, src0, src1, 1,
