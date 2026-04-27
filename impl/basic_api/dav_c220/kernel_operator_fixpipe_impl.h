@@ -141,9 +141,9 @@ template <typename T> struct FixpipeInfoParams {
             // If NZ2ND is enabled, it is the dst_D value in unit of element. Loop2_dst_stride
             dstStride = intriParams.dstStride;
             // If NZ2ND is enabled, n size could be unaligned
-            ASCENDC_ASSERT((intriParams.nz2ndParams.originalNSize != 0), {
-                KERNEL_LOG(KERNEL_ERROR, "If NZ2ND is enabled, originalNSize should be set.");
-            });
+            ASCENDC_DEBUG_ASSERT((intriParams.nz2ndParams.originalNSize != 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR, "If NZ2ND is enabled, originalNSize should be set.")
+            );
             n = intriParams.nz2ndParams.originalNSize;
         } else {
             // If NZ2ND is disabled, it is the destination stride between the start addresses of different bursts in
