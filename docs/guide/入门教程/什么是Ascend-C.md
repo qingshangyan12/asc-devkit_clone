@@ -1,61 +1,89 @@
-# 什么是Ascend C<a name="ZH-CN_TOPIC_0000002500621200"></a>
+# 什么是Ascend C
 
-Ascend C是CANN针对算子开发场景推出的编程语言，原生支持C和C++标准规范，兼具开发效率和运行性能。基于Ascend C编写的算子程序，通过编译器编译和运行时调度，运行在昇腾AI处理器上。使用Ascend C，开发者可以基于昇腾AI硬件，高效的实现自定义的创新算法。您可以通过[Ascend C主页](https://www.hiascend.com/zh/ascend-c)了解更详细的内容。
+Ascend C 是 CANN（Compute Architecture for Neural Networks）面向昇腾 AI 处理器推出的专用算子开发语言，原生兼容 C 与 C++ 标准规范。作为一门覆盖多场景的编程语言，Ascend C 秉持 **“开放芯片完备编程能力，支撑极致性能”** 的设计理念，并通过精心划分的多层级 API，让您可以根据项目需求、团队技能和性能目标，在开发效率与运行性能之间灵活权衡、取得最优平衡。更多背景可访问 [Ascend C 主页](https://www.hiascend.com/zh/ascend-c)。
 
-Ascend C提供多层级API，满足多维场景算子开发诉求。
+为帮助不同阶段的开发者平滑成长，Ascend C 构建了从高层封装到底层接口的多级 API 体系（选择建议见 [Ascend C 多级 API 选择指南](../../asc_how_to_choose_api.md)），其总体逻辑架构如下：
 
--   **语言扩展层 C API**：开放芯片完备编程能力，支持数组分配内存，一般基于指针编程，提供与业界一致的C语言编程体验。
--   **基础API**：基于Tensor进行编程的C++类库API，实现单指令级抽象，为底层算子开发提供灵活控制能力。
--   **高阶API**：封装单核公共算法，涵盖一些常见的计算算法（如卷积、矩阵运算等），显著降低复杂算法开发门槛。
--   **算子模板库**：基于模板提供算子完整实现参考，简化Tiling（切分算法）开发，支撑用户自定义扩展。
--   **Python前端：**[PyAsc编程语言](https://gitcode.com/cann/pyasc)基于Python原生接口，提供芯片底层完备编程能力，支持基于Python接口开发高性能Ascend C算子。
+<img src="docs/figures/architecture.png" alt="架构图" width="850px" height="580px">
 
-![](../figures/成长地图.png)
+- **语言扩展层 C API**：纯 C 接口，提供数组内存分配、基于指针的计算接口，延续业界熟悉的 C 编程体验，并完整开放芯片能力。Atlas A2/A3 已支持 SIMD 纯 C 接口；Ascend 950PR/Ascend 950DT 将引入类似业界的 SIMT 能力以及 SIMD/SIMT 混合编程能力。
+- **基础 API**：以单指令为抽象的 C++ 类库，一般基于 Tensor 编程，并逐步通过 Layout 完善 Tensor 编程体验。
+- **高阶 API**：对单核常见算法进行抽象与封装，提供开箱即用的公共算法实现。
+- **算子模板库**：基于模板提供算子的完整实现参考，降低 Tiling 开发复杂度，支持用户自定义扩展。
+- **Python 前端 PyAsc**：基于 Python 原生接口（参见 [PyAsc](https://gitcode.com/cann/pyasc)），提供芯片底层完备编程能力，并将逐步引入 Layout 化 Tensor 编程、SIMT 编程等，实现用 Python 开发高性能算子。
 
-## 快速入门<a name="zh-cn_topic_0000002484241782_section11489186191713"></a>
+纵观这一体系，Ascend C 为开发者铺设了一条清晰的成长路径——从“快速上手”到“深度调优”，再到“释放极限性能”。下面按 **初级、中级进阶、高级编程** 三个阶段展开介绍。
 
-[![](../figures/zh-cn_image_0000002533161249.png)](./快速入门/)
+---
 
-## 成长地图<a name="zh-cn_topic_0000002484241782_section181811514171911"></a>
+## 初级阶段：快速入门，建立全局认知
 
-<div style="position:relative;display:inline-block;max-width:992px;width:100%;">
-  <img src="../figures/zh-cn_image_0000002533161253.png" style="display:block;max-width:992px;width:100%;" />
-  <a href="环境准备.md" title="环境准备" style="position:absolute;left:17.3%;top:10.3%;width:9.3%;height:3.9%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md" title="SIMD编程模型" style="position:absolute;left:17.8%;top:26.9%;width:10.9%;height:4.1%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md" title="SIMT编程模型" style="position:absolute;left:30.4%;top:27.3%;width:11.9%;height:3.3%;display:block;border:2px solid transparent;"></a>
-  <a href="../算子实践参考/SIMD算子实现/矢量编程/概述.md" title="矢量编程" style="position:absolute;left:18.8%;top:47.6%;width:8.9%;height:3.5%;display:block;border:2px solid transparent;"></a>
-  <a href="../算子实践参考/SIMD算子实现/矩阵编程（高阶API）/基础知识.md" title="基于高阶API" style="position:absolute;left:29.7%;top:47.8%;width:9.0%;height:2.9%;display:block;border:2px solid transparent;"></a>
-  <a href="../算子实践参考/SIMD算子实现/矩阵编程（基础API）/分离模式.md" title="基于基础API" style="position:absolute;left:40.6%;top:48.0%;width:8.9%;height:3.4%;display:block;border:2px solid transparent;"></a>
-  <a href="../算子实践参考/SIMD算子实现/融合算子编程/CV融合/基础知识.md" title="融合算子编程" style="position:absolute;left:51.2%;top:48.2%;width:8.3%;height:2.7%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/编译与运行/AI-Core-SIMD编译/算子编译简介.md" title="算子编译" style="position:absolute;left:64.1%;top:48.2%;width:8.6%;height:3.4%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/编译与运行/算子运行.md" title="Kernel直调" style="position:absolute;left:79.8%;top:43.4%;width:12.1%;height:6.0%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/调试调优/功能调试/CPU域孪生调试.md" title="CPU域调试" style="position:absolute;left:17.9%;top:69.7%;width:8.0%;height:3.8%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/调试调优/功能调试/NPU域上板调试.md" title="prinf/DumpTensor" style="position:absolute;left:30.6%;top:70.1%;width:12.8%;height:3.1%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/调试调优/功能调试/NPU域上板调试.md#section931475414217" title="msSanitizer" style="position:absolute;left:45.9%;top:69.7%;width:11.1%;height:4.3%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/调试调优/功能调试/NPU域上板调试.md#section2072113416285" title="msDebug工具" style="position:absolute;left:58.1%;top:69.5%;width:10.9%;height:4.4%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/调试调优/性能调优.md" title="msProf工具" style="position:absolute;left:77.8%;top:65.5%;width:18.0%;height:3.5%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/编译与运行/算子运行.md" title="Kernel直调" style="position:absolute;left:19.2%;top:88.5%;width:9.3%;height:3.8%;display:block;border:2px solid transparent;"></a>
-  <a href="../编程指南/附录/AI框架算子适配/PyTorch框架.md" title="Pytorch框架" style="position:absolute;left:71.7%;top:87.1%;width:16.2%;height:6.4%;display:block;border:2px solid transparent;"></a>
-</div>
+初级阶段的目标是让您在最短时间内跑通第一个算子，理解 Ascend C 的基本工作方式。
 
-## 概念原理<a name="zh-cn_topic_0000002484241782_section126809373191"></a>
+学习路线建议如下：
 
-[![](../figures/zh-cn_image_0000002533161259.png)](../编程指南/概念原理和术语/)
+- **环境搭建**：从 [CANN 环境安装](./环境准备.md) 开始，准备好开发与运行环境。
+- **编程模型概览**：阅读 [异构系统与 SIMD/SIMT 编程模型介绍](./快速入门/异构系统与编程模型.md)，建立对昇腾 AI 处理器异构计算以及 SIMD、SIMT 两种执行模型的整体认识。
+- **动手实践**：
+   - [SIMD 算子快速入门](./快速入门/基于SIMD编程)
+   - [SIMT 算子快速入门](./快速入门/基于SIMT编程)
 
-## API参考<a name="zh-cn_topic_0000002484241782_section116808372193"></a>
+---
 
-[![](../figures/zh-cn_image_0000002533161263.png)](../../api)
+## 中级进阶：深入调优，掌握定制开发
 
-## 算子实践参考<a name="zh-cn_topic_0000002484241782_section16680133716195"></a>
+当您需要实现更复杂的算法、或者对性能有更高要求时，便可进入中级进阶阶段。这一阶段的核心是 **理解编程模型细节、掌握调优工具链，并能在多种编程范式间做出合理选择**。
 
-[![](../figures/zh-cn_image_0000002533161267.png)](../算子实践参考/)
+- **编程模型深入**
+   - [编程模型概述](../编程指南/编程模型)
+   - **SIMD 编程**：[Ascend C SIMD 编程模型](../编程指南/编程模型/AI-Core-SIMD编程)
+        - [基于指针的 C 语言编程]
+        - [基于 Tensor 的 C++ 编程]
+        - [基于 Tpipe/Tque 框架编程]
+   - **SIMT 编程**：[Ascend C SIMT 编程模型](../编程指南/编程模型/AI-Core-SIMT编程)
+   - [语言扩展概述](../编程指南/语言扩展层/)
+- **构建与运行**：[编译与运行](../编程指南/编译与运行)
+- **调试与调优**
+   - 功能调试：基本调试（print/DumpTensor）、仿真调试、上板调试
+   - 性能调试：上板性能测试、仿真性能测试
+- **算子部署**：以 PyTorch 框架为例完成部署
+- **实践巩固**
+   - [算子实践参考](../算子实践参考/)
+        - Ascend C SIMD 算子实践（如 Add、Softmax、Matmul，覆盖设计、开发、功能、精度、性能、PyTorch 调试全流程）
+        - Ascend C SIMT 算子实践（如 Gather/Scatter，全流程）
 
-Ascend C支持在如下AI处理器型号使用：
+---
 
--   Ascend 950PR/Ascend 950DT
--   Atlas A3 训练系列产品/Atlas A3 推理系列产品
--   Atlas A2 训练系列产品/Atlas A2 推理系列产品
+## 高级编程：挖掘极限，驾驭复杂场景
 
--   Atlas 200I/500 A2 推理产品
--   Atlas 推理系列产品
--   Atlas 训练系列产品
+高级编程面向对性能、灵活性有极致追求的场景，以及需要跨代芯片兼容、泛化场景下工程化落地的生产环境。您将接触到更底层的硬件特性、多核协同、混合编程等高阶技术。
+
+核心内容包括：
+
+- [编程模型高级特性]
+   - [SIMD & SIMT 混合编程] —— 在同一算子中融合两种模型，发挥两种编程模型的各自优势。
+- [硬件实现](../编程指南/硬件实现/) —— 理解芯片内部结构，为极致优化打下理论基础。
+- [高级特性](../编程指南/高级特性/)
+   - [通信编程] —— 实现核间高效数据交换。
+   - [Tiling AICPU 下沉] —— 将部分计算任务卸载至 AI CPU，提升整体吞吐。
+   - [Aclnn 算子工程化开发] —— 面向框架集成与生产级交付。
+   - [更多高级特性...]
+- [算子高级实践]
+   - Ascend C SIMD 高级实践
+   - Ascend C SIMT 高级实践
+   - [Ascend C 算子高性能实践样例仓](https://github.com/cann/cann-samples)
+- [跨芯片兼容迁移指南](../兼容性迁移指南/) —— 让算子在多代昇腾处理器间无缝迁移。
+
+---
+
+## 技术附录
+
+- [基本概念与术语](../编程指南/概念原理和术语/)
+- [Ascend C API 参考（含每个 API 的规格与约束）](../../api)
+- 支持的 AI 处理器及各自**关键特性、编程模型/API/样例**：
+   - [Ascend 950PR / Ascend 950DT](../编程指南/附录/)
+   - [Atlas A3 训练系列 / Atlas A3 推理系列](../编程指南/附录/)
+   - [Atlas A2 训练系列 / Atlas A2 推理系列](../编程指南/附录/)
+   - [Atlas 200I/500 A2 推理产品](../编程指南/附录/)
+   - [Atlas 推理系列产品](../编程指南/附录/)
+   - [Atlas 训练系列产品](../编程指南/附录/)
