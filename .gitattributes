@@ -2,3 +2,10 @@ docs/api/context/c_api/figures/*.png filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 docs/api/context/c_api/figures/asc_copy_gm2l1_dn2nz.png filter=lfs diff=lfs merge=lfs -text
 docs/api/context/c_api/figures/asc_copy_gm2l1_nd2nz.png filter=lfs diff=lfs merge=lfs -text
+docs/guide/figures/Nd2Nz/350/275/254/346/215/242/347/244/272/346/204/217/345/233/276-1/346/226/260.png filter=lfs diff=lfs merge=lfs -text
+docs/guide/figures/Nd2Nz/350/275/254/346/215/242/347/244/272/346/204/217/345/233/276-3/346/226/260.png filter=lfs diff=lfs merge=lfs -text
+docs/guide/figures/Nd2Nz/350/275/254/346/215/242/347/244/272/346/204/217/345/233/276-3/346/226/260.png filter=lfs diff=lfs merge=lfs -text
+docs/guide/figures/Nd2Nz/350/275/254/346/215/242/347/244/272/346/204/217/345/233/276-1/346/226/260.png filter=lfs diff=lfs merge=lfs -text
+docs/guide/figures/Nd2Nz/350/275/254/346/215/242/347/244/272/346/204/217/345/233/276-1/346/226/260.png filter=lfs diff=lfs merge=lfs -text
+docs/guide/figures/Nd2Nz/350/275/254/346/215/242/347/244/272/346/204/217/345/233/276-1/346/226/260.png filter=lfs diff=lfs merge=lfs -text
+docs/guide/figures/Nd2Nz/350/275/254/346/215/242/347/244/272/346/204/217/345/233/276-3/346/226/260.png filter=lfs diff=lfs merge=lfs -text
