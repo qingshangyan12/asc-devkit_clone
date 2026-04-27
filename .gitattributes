@@ -1,5 +1,3 @@
 docs/api/context/c_api/figures/*.png filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
-docs/api/context/c_api/figures/asc_copy_gm2l1_dn2nz.png filter=lfs diff=lfs merge=lfs -text
-docs/api/context/c_api/figures/asc_copy_gm2l1_nd2nz.png filter=lfs diff=lfs merge=lfs -text
 docs/api/c_api/figures/asc_copy_l12l0b_trans_*.png filter=lfs diff=lfs merge=lfs -text
