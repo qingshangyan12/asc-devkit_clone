@@ -24,27 +24,44 @@ def gen_golden_data(scenarioNum=1):
     场景1：输入[1, 20]，输出[1, 32]，使用SetPadValue填充
     场景2：输入[32, 59]，输出[32, 64]，rightPadding，不使用SetPadValue
     场景3：输入[3, 24]，输出[1, 80]，Compact模式
+    场景4：输入[1, 320]，输出[1, 576]，SetLoopModePara loop mode（Compact模式）
+    场景5：输入[1, 320]，输出[1, 576]，SetLoopModePara loop mode（Normal模式）
+    场景6：输入[16, 480]，输出[1, 8704]，SetLoopModePara loop mode（二维到一维，Compact模式）
     """
+    
     if scenarioNum == 1:
         src_rows = 1
         src_cols = 20
         dst_cols = 32
-        use_setpadvalue = True
         data_type = np.float16
     elif scenarioNum == 2:
         src_rows = 32
         src_cols = 59
         dst_cols = 64
-        use_setpadvalue = False
         data_type = np.float32
     elif scenarioNum == 3:
         src_rows = 3
         src_cols = 24
         dst_cols = 80
-        use_setpadvalue = False
         data_type = np.float16
-    
+    elif scenarioNum == 4:
+        src_rows = 1
+        src_cols = 320
+        dst_cols = 576 # Compact模式：320B数据 + 64B填充 + 192B随机值
+        data_type = np.int8
+    elif scenarioNum == 5:
+        src_rows = 1
+        src_cols = 320
+        dst_cols = 576 # Normal模式：320B数据 + 192B填充 + 32B外层循环间隔 + 32B未使用
+        data_type = np.int8
+    elif scenarioNum == 6:
+        src_rows = 16
+        src_cols = 480
+        dst_cols = 8704
+        data_type = np.int8
+        
     input_x = np.random.uniform(-10, 10, [src_rows, src_cols]).astype(data_type)
+    input_x_for_golden = input_x
 
     if scenarioNum == 1 or scenarioNum == 2:
         golden = np.zeros([src_rows, dst_cols], dtype=data_type)
@@ -52,7 +69,7 @@ def gen_golden_data(scenarioNum=1):
             for j in range(src_cols):
                 golden[i, j] = input_x[i, j]
         
-        if use_setpadvalue:
+        if scenarioNum == 1:
             for i in range(src_rows):
                 for j in range(src_cols, dst_cols):
                     golden[i, j] = 1
@@ -61,7 +78,66 @@ def gen_golden_data(scenarioNum=1):
         golden = np.zeros([dst_cols], dtype=data_type)
         input_flatten = input_x.flatten()
         golden[:72] = input_flatten
-        golden = golden.reshape(1,80)
+        golden = golden.reshape(1, 80)
+    
+    elif scenarioNum == 4:
+        # 场景4：Compact模式，每次内层循环搬运80B后填充16B使其96B对齐
+        # 先清零UB buffer，确保间隔区域值为0，padding值设为-1
+        golden = np.zeros([dst_cols], dtype=data_type)
+        input_flatten = input_x.flatten()
+        # 外层循环1（0-288）
+        golden[0:80] = input_flatten[0:80]
+        golden[80:96] = -1
+        golden[128:208] = input_flatten[80:160]
+        golden[208:224] = -1
+        # 外层循环2（288-576）
+        golden[288:368] = input_flatten[160:240]
+        golden[368:384] = -1
+        golden[416:496] = input_flatten[240:320]
+        golden[496:512] = -1
+        golden = golden.reshape(1, dst_cols)
+    
+    elif scenarioNum == 5:
+        # 场景5：Normal模式，每个block搬运后填充24B使其64B对齐
+        # 先清零UB buffer，确保间隔区域值为0，padding值设为-1
+        golden = np.zeros([dst_cols], dtype=data_type)
+        input_flatten = input_x.flatten()
+        # 外层循环1（0-256）
+        golden[0:40] = input_flatten[0:40]
+        golden[40:64] = -1
+        golden[64:104] = input_flatten[40:80]
+        golden[104:128] = -1
+        golden[128:168] = input_flatten[80:120]
+        golden[168:192] = -1
+        golden[192:232] = input_flatten[120:160]
+        golden[232:256] = -1
+        # 外层循环2（288-544）
+        golden[288:328] = input_flatten[160:200]
+        golden[328:352] = -1
+        golden[352:392] = input_flatten[200:240]
+        golden[392:416] = -1
+        golden[416:456] = input_flatten[240:280]
+        golden[456:480] = -1
+        golden[480:520] = input_flatten[280:320]
+        golden[520:544] = -1
+        golden = golden.reshape(1, dst_cols)
+    elif scenarioNum == 6:
+        # 场景6：二维到一维搬运，Compact模式
+        # 输入：16行×480字节 = 7680字节有效数据
+        # 输出：连续一维，8704字节（每行480字节分8个内层块，每块60B有效数据+4B填充，16行×544B=8704）
+        # 外层循环16次，每次搬运一行480B（8个内层块×60B）
+        # 内层循环8次，每次搬运60B+填充4B到64B对齐
+        
+        golden = np.zeros(dst_cols, dtype=input_x_for_golden.dtype)
+        # 外层循环：16 个块
+        for i in range(16):
+            base = i * 544
+            # 内层循环：每次搬运 60 个数据
+            for j in range(8):
+                data_start = base + j * 64
+                golden[data_start:data_start+60] = input_x_for_golden[i, j*60:j*60+60]
+                golden[data_start+60:data_start+64] = -1
+
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -71,6 +147,6 @@ def gen_golden_data(scenarioNum=1):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2, 3])
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2, 3, 4, 5, 6])
     args = parser.parse_args()
     gen_golden_data(args.scenarioNum)
