@@ -224,6 +224,7 @@ target_link_libraries(
           -Wl,--no-as-needed
           c_sec
           -Wl,--as-needed
+          $<$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>:acl_rt>
           $<$<STREQUAL:${PRODUCT_SIDE},host>:platform>
           $<$<STREQUAL:${PRODUCT_SIDE},host>:exe_graph>
           $<$<STREQUAL:${PRODUCT_SIDE},host>:register>
