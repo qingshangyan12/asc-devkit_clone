@@ -11,14 +11,14 @@
 madd（multiply-add），对源操作数执行逐元素乘法和加法。计算公式如下：
 
 $$
-dst_i = src0_i \times src1_i + dst_i
+dst_i = src0_i \times dst_i + src1_i
 $$
 
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_madd(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_madd(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
+__simd_callee__ inline void asc_madd(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
+__simd_callee__ inline void asc_madd(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 ```
 
 ## 参数说明
@@ -47,7 +47,7 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-vector_bool dst;
+vector_half dst;
 vector_half src0;
 vector_half src1;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);

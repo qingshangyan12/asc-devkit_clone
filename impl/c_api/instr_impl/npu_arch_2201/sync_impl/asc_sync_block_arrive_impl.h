@@ -20,11 +20,15 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, uint8_t mode, int64_t flagID)
+__aicore__ inline uint16_t GetfftsConfig(uint16_t flag_id)
 {
-    uint64_t config = 0x1ULL | (static_cast<uint64_t>(mode) << 4) | (static_cast<uint64_t>(flagID) << 8);
-    ffts_cross_core_sync(pipe, config);
+    constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
+    constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;
+    uint16_t mode = 0x02;
+    return (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));
 }
+
+#define asc_sync_block_arrive_impl(pipe, flag_id) ffts_cross_core_sync((pipe), (GetfftsConfig(flag_id)))
 
 #endif
 
@@ -32,4 +36,3 @@ __aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, uint8_t mode, int
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif  
-
