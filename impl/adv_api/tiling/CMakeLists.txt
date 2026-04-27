@@ -19,6 +19,8 @@ target_include_directories(
     $<BUILD_INTERFACE:${ASCENDC_DIR}/include>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/adv_api>>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/basic_api>>
+    $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/../../runtime/include/external>>
+    $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/../../runtime/include/external/acl>>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/../../asc/asc-devkit>>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/../../asc/asc-devkit/include>>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/../../asc/asc-devkit/include/utils>>
@@ -152,6 +154,10 @@ target_include_directories(tiling_api PRIVATE
   ${ASCENDC_DIR}/include/utils/tiling/platform
   ${ASCENDC_DIR}/include/utils
   ${TOP_DIR}/runtime/pkg_inc
+  $<$<BOOL:${BUILD_OPEN_PROJECT}>:${ASCENDC_DIR}/include>
+  $<$<BOOL:${BUILD_OPEN_PROJECT}>:${ASCENDC_DIR}/include/acl>
+  $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:${TOP_DIR}/runtime/include/external>
+  $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:${TOP_DIR}/runtime/include/external/acl>
   $<$<STREQUAL:${PRODUCT_SIDE},device>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/utils/stub>>
   $<$<STREQUAL:${PRODUCT_SIDE},device>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/utils/stub/common>>
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:$<BUILD_INTERFACE:${TOP_DIR}/metadef/inc/external>>

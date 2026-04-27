@@ -474,6 +474,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         ${ASCENDC_DIR}/tests/main.cpp
         ../common/platform_stub.cpp
         ../common/ascendc_platform_stub.cpp
+        ../../tools/utils/stub/acl_rt_stub.cpp
         ${ASCENDC_TILING_SRC_FILES}
         ${ASCENDC_TILING_TEST_SRC_FILES}
     )
