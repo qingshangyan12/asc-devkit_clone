@@ -14,10 +14,13 @@ DIM_R = 528  # 512 + 16
 TOTAL_LENGTH = DIM_A * DIM_R
 OUTPUT_COUNT = DIM_A
 
-# 文件路径
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-INPUT_DIR = os.path.join(SCRIPT_DIR, "..", "input")
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, "..", "output")
+# reduce_max/min 使用 1024 个输入值
+REDUCE_MAX_MIN_LENGTH = 1024
+
+# 文件路径: 使用当前工作目录，而不是脚本所在目录
+CWD = os.getcwd()
+INPUT_DIR = os.path.join(CWD, "input")
+OUTPUT_DIR = os.path.join(CWD, "output")
 
 def ensure_dirs():
     """确保输入输出目录存在"""
@@ -29,6 +32,14 @@ def generate_input_data():
     data = []
     for i in range(TOTAL_LENGTH):
         # 使用简单的模式填充
+        value = float(i % 256)
+        data.append(value)
+    return data
+
+def generate_input_data_max_min():
+    """生成 reduce_max/min 的输入数据: 1024个float"""
+    data = []
+    for i in range(REDUCE_MAX_MIN_LENGTH):
         value = float(i % 256)
         data.append(value)
     return data
@@ -51,43 +62,29 @@ def write_binary_file(filepath, data):
             f.write(struct.pack('f', value))
     print(f"Written: {filepath}")
 
-def compute_golden_max_proper(input_data):
-    """计算reduce_max的golden数据(正确方式): 每行的最大值和索引"""
-    golden = []
-    for row in range(DIM_A):
-        row_max = float('-inf')
-        row_max_idx = 0
-        for col in range(DIM_R):
-            idx = row * DIM_R + col
-            if input_data[idx] > row_max:
-                row_max = input_data[idx]
-                row_max_idx = col
-        golden.append(row_max)
-        golden.append(row_max_idx)  # 索引作为float存储，后面会转换
-    # 转换为 float32 数组后，将索引部分转换为 uint32 再转回 float32
-    golden_f32 = np.array(golden, dtype=np.float32)
-    # 索引在偶数位置(1, 3, 5...)，需要转换为uint32
-    for i in range(1, len(golden_f32), 2):
-        golden_f32[i] = float(int(golden_f32[i]))
-    return golden_f32
+def compute_golden_max(input_data):
+    """计算reduce_max的golden数据: [max_value, max_index]"""
+    data_array = np.array(input_data, dtype=np.float32)
+    max_idx = np.argmax(data_array)
+    max_val = data_array[max_idx]
+    
+    # golden: [max_value, max_index, pad, pad, ...] (8个float对齐)
+    golden = np.zeros(8, dtype=np.float32)
+    golden[0] = max_val
+    golden.view(np.uint32)[1] = max_idx
+    return golden
 
 def compute_golden_min(input_data):
-    """计算reduce_min的golden数据(正确方式): 每行的最小值和索引"""
-    golden = []
-    for row in range(DIM_A):
-        row_min = float('+inf')
-        row_min_idx = 0
-        for col in range(DIM_R):
-            idx = row * DIM_R + col
-            if input_data[idx] < row_min:
-                row_min = input_data[idx]
-                row_min_idx = col
-        golden.append(row_min)
-        golden.append(float(row_min_idx))
-    golden_f32 = np.array(golden, dtype=np.float32)
-    for i in range(1, len(golden_f32), 2):
-        golden_f32[i] = float(int(golden_f32[i]))
-    return golden_f32
+    """计算reduce_min的golden数据: [min_value, min_index]"""
+    data_array = np.array(input_data, dtype=np.float32)
+    min_idx = np.argmin(data_array)
+    min_val = data_array[min_idx]
+    
+    # golden: [min_value, min_index, pad, pad, ...] (8个float对齐)
+    golden = np.zeros(8, dtype=np.float32)
+    golden[0] = min_val
+    golden.view(np.uint32)[1] = min_idx
+    return golden
 
 def main():
     ensure_dirs()
@@ -125,72 +122,58 @@ def main():
     print(f"Total input elements: {TOTAL_LENGTH}")
     
     # ============================================
-    # 生成 reduce_max 数据: 20行，每行528个float -> 每行[max_value, max_index]
+    # 生成 reduce_max 数据: 1024个float -> [max_value, max_index]
     # ============================================
     print("\n" + "=" * 60)
-    print("Generating reduce_max data...")
+    print("Generating reduce_max data (1024 input elements)...")
     print("=" * 60)
     
-    golden_max = compute_golden_max_proper(input_data)
-    golden_max_path = os.path.join(OUTPUT_DIR, "reduce_max_golden.bin")
-    with open(golden_max_path, 'wb') as f:
-        golden_max.tofile(f)
-    print(f"  Golden: {golden_max_path}")
-    print(f"  Shape: {golden_max.shape}, layout: [v0, idx0, v1, idx1, ...]")
+    max_input = generate_input_data_max_min()
+    golden_max = compute_golden_max(max_input)
     
     # 生成reduce_max的输入文件
     reduce_max_input_path = os.path.join(INPUT_DIR, "reduce_max_input_x.bin")
-    with open(reduce_max_input_path, 'wb') as f:
-        for value in input_data:
-            f.write(struct.pack('f', value))
-    print(f"  Input:  {reduce_max_input_path}")
+    write_binary_file(reduce_max_input_path, max_input)
     
-    # 生成reduce_max的输出占位文件
+    # 生成reduce_max的golden和output文件
+    reduce_max_golden_path = os.path.join(OUTPUT_DIR, "reduce_max_golden.bin")
+    with open(reduce_max_golden_path, 'wb') as f:
+        golden_max.tofile(f)
+    print(f"  Golden: {reduce_max_golden_path}")
+    
     reduce_max_output_path = os.path.join(OUTPUT_DIR, "reduce_max_output.bin")
     with open(reduce_max_output_path, 'wb') as f:
         golden_max.tofile(f)
     print(f"  Output: {reduce_max_output_path}")
     
-    # 打印前3行的max结果
-    print("  First 3 rows results:")
-    for i in range(3):
-        max_val = golden_max[i * 2]
-        max_idx = int(golden_max[i * 2 + 1])
-        print(f"    Row {i}: max={max_val:.2f}, index={max_idx}")
+    print(f"  Max value: {golden_max[0]:.2f}, Max index: {golden_max.view(np.uint32)[1]}")
     
     # ============================================
-    # 生成 reduce_min 数据: 20行，每行528个float -> 每行[min_value, min_index]
+    # 生成 reduce_min 数据: 1024个float -> [min_value, min_index]
     # ============================================
     print("\n" + "=" * 60)
-    print("Generating reduce_min data...")
+    print("Generating reduce_min data (1024 input elements)...")
     print("=" * 60)
     
-    golden_min = compute_golden_min(input_data)
-    golden_min_path = os.path.join(OUTPUT_DIR, "reduce_min_golden.bin")
-    with open(golden_min_path, 'wb') as f:
-        golden_min.tofile(f)
-    print(f"  Golden: {golden_min_path}")
-    print(f"  Shape: {golden_min.shape}, layout: [v0, idx0, v1, idx1, ...]")
+    min_input = generate_input_data_max_min()
+    golden_min = compute_golden_min(min_input)
     
     # 生成reduce_min的输入文件
     reduce_min_input_path = os.path.join(INPUT_DIR, "reduce_min_input_x.bin")
-    with open(reduce_min_input_path, 'wb') as f:
-        for value in input_data:
-            f.write(struct.pack('f', value))
-    print(f"  Input:  {reduce_min_input_path}")
+    write_binary_file(reduce_min_input_path, min_input)
     
-    # 生成reduce_min的输出占位文件
+    # 生成reduce_min的golden和output文件
+    reduce_min_golden_path = os.path.join(OUTPUT_DIR, "reduce_min_golden.bin")
+    with open(reduce_min_golden_path, 'wb') as f:
+        golden_min.tofile(f)
+    print(f"  Golden: {reduce_min_golden_path}")
+    
     reduce_min_output_path = os.path.join(OUTPUT_DIR, "reduce_min_output.bin")
     with open(reduce_min_output_path, 'wb') as f:
         golden_min.tofile(f)
     print(f"  Output: {reduce_min_output_path}")
     
-    # 打印前3行的min结果
-    print("  First 3 rows results:")
-    for i in range(3):
-        min_val = golden_min[i * 2]
-        min_idx = int(golden_min[i * 2 + 1])
-        print(f"    Row {i}: min={min_val:.2f}, index={min_idx}")
+    print(f"  Min value: {golden_min[0]:.2f}, Min index: {golden_min.view(np.uint32)[1]}")
     
     print("\n" + "=" * 60)
     print("All reduce data generation completed!")
