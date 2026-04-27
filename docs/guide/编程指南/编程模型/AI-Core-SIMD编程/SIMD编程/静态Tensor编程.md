@@ -8,9 +8,9 @@
 
 ![](../../../../figures/图1-开发Ascend-C算子的基本流程.png)
 
->[!NOTE]说明 
->-   静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
->-   本节涉及的完整样例请参考[静态Tensor编程样例](https://gitee.com/ascend/samples/tree/master/operator/ascendc/0_introduction/23_static_tensor_programming_kernellaunch)。
+>[!NOTE]说明
+>-  静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
+>-  本节涉及的完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/04_resource_management/static_tensor_programming)。
 
 ## 编程范式<a name="section1486516584319"></a>
 
@@ -98,7 +98,7 @@
 
 ## 流水优化<a name="section121239188376"></a>
 
-在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitee.com/ascend/samples/tree/master/operator/ascendc/0_introduction/23_static_tensor_programming_kernellaunch)中的Double Buffer示例。
+在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/04_resource_management/static_tensor_programming)中的Double Buffer示例。
 
 ```
     // ping
@@ -878,4 +878,3 @@
 </tr>
 </tbody>
 </table>
-
