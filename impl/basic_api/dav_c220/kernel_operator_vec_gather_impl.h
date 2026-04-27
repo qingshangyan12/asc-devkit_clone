@@ -30,8 +30,8 @@ __aicore__ inline void GatherbImpl(__ubuf__ T* dst, __ubuf__ T* src, __ubuf__ ui
     const uint32_t srcLength, uint8_t repeatTime, const GatherRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, uint16_t, uint32_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-            "Gatherb, current api support dtype combination is src and dst both: uint16_t, uint32_t");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, uint16_t, uint32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "Gatherb, current api support dtype combination is src and dst both: uint16_t, uint32_t"));
         ResetMask();
         uint16_t dstRptStd = repeatParams.dstRepStride;
         uint8_t dstBlkStd = repeatParams.dstBlkStride;

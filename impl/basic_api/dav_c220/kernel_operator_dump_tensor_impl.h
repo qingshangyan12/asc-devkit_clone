@@ -110,12 +110,12 @@ __aicore__ inline void WriteDumpShapeInfo(const ShapeInfo &shapeInfo)
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
     uint32_t tlvSize = valueSize + DUMP_SHAPE_MESSAGE_TL_LEN;
     if (ptr->dumpOffset < tlvSize) {
-        ASCENDC_ASSERT((false), {
-            KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                 "Space not enough! need %u Bytes, current remained dump space is %u Bytes",
                 tlvSize,
-                ptr->dumpOffset);
-        });
+                ptr->dumpOffset)
+        );
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
         return;
@@ -151,8 +151,8 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& src, u
     uint32_t position = CheckValidPosition(src);
     // set the head struct value
     if (position == 0) {
-        ASCENDC_ASSERT((false),
-                   { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
+        ASCENDC_DEBUG_ASSERT((false),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"));
         return;
     }
 
@@ -168,12 +168,12 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& src, u
 
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
     if (ptr->dumpOffset < (padOffset + sizeof(DumpMessageHead))) {
-        ASCENDC_ASSERT((false), {
-            KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                 "Space not enough! need %u Bytes, current remained dump space is %u Bytes",
                 (padOffset + sizeof(DumpMessageHead)),
-                ptr->dumpOffset);
-        });
+                ptr->dumpOffset)
+        );
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
         return;
