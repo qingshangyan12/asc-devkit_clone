@@ -120,9 +120,6 @@ __aicore__ inline void BlockReduceSum(const LocalTensor<T>& dst, const LocalTens
 #endif
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype in BlockReduceSum, current api support dtype combination is "
-        "src and dst both: half / float.\n"));
     CheckBlockReduceParams<T>(dst, src, repeatTime, "BlockReduceSum");
     CheckMaskValue<PrimType, isSetMask>(mask, "BlockReduceSum");
 #endif
@@ -157,9 +154,6 @@ __aicore__ inline void BlockReduceMax(const LocalTensor<T>& dst, const LocalTens
 #endif
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype in BlockReduceMax, current api support dtype combination is "
-        "src and dst both: half / float.\n"));
     CheckBlockReduceParams<T>(dst, src, repeatTime, "BlockReduceMax");
     CheckMaskValue<PrimType, isSetMask>(mask, "BlockReduceMax");
 #endif
@@ -194,9 +188,6 @@ __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTens
 #endif
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype in BlockReduceMin, current api support dtype combination is "
-        "src and dst both: half / float.\n"));
     CheckBlockReduceParams<T>(dst, src, repeatTime, "BlockReduceMin");
     CheckMaskValue<PrimType, isSetMask>(mask, "BlockReduceMin");
 #endif
@@ -258,9 +249,6 @@ __aicore__ inline void BlockReduceSum(const LocalTensor<T>& dst, const LocalTens
 #endif
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype in BlockReduceSum, current api support dtype combination is "
-        "src and dst both: half / float.\n"));
     CheckBlockReduceParams<T>(dst, src, repeatTime, "BlockReduceSum");
     CheckMaskArray<PrimType, isSetMask>(mask, "BlockReduceSum");
 #endif
@@ -284,9 +272,6 @@ __aicore__ inline void BlockReduceMax(const LocalTensor<T>& dst, const LocalTens
 #endif
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype in BlockReduceMax, current api support dtype combination is "
-        "src and dst both: half / float.\n"));
     CheckBlockReduceParams<T>(dst, src, repeatTime, "BlockReduceMax");
     CheckMaskArray<PrimType, isSetMask>(mask, "BlockReduceMax");
 #endif
@@ -310,9 +295,6 @@ __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTens
 #endif
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype in BlockReduceMin, current api support dtype combination is "
-        "src and dst both: half / float.\n"));
     CheckBlockReduceParams<T>(dst, src, repeatTime, "BlockReduceMin");
     CheckMaskArray<PrimType, isSetMask>(mask, "BlockReduceMin");
 #endif
@@ -457,9 +439,6 @@ __aicore__ inline void WholeReduceSum(const LocalTensor<T>& dst, const LocalTens
 #endif
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype in WholeReduceSum, current api support dtype combination is "
-        "src and dst both: half / float.\n"));
     CheckWholeReduceCommonParams<T>(dst, src, repeatTime, "WholeReduceSum");
     CheckMaskArray<PrimType, isSetMask>(mask, "WholeReduceSum");
 #endif
@@ -497,12 +476,6 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckWholeReduceCommonParams<T>(dst, src, repeatTime, order, "WholeReduceMax");
     CheckMaskArray<PrimType, isSetMask>(mask, "WholeReduceMax");
-#endif
-#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113))
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
-        "WholeReduceMax, current api support dtype combination is src and dst both: half / float.\n"));
 #endif
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
@@ -549,11 +522,6 @@ __aicore__ inline void WholeReduceMinCommon(const LocalTensor<T>& dst, const Loc
     const int32_t srcRepStride, ReduceOrder order)
 {
     using PrimType = PrimT<T>;
-#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
-        "WholeReduceMin, current api support dtype combination is src and dst both: half / float.\n"));
-#endif
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
     (__NPU_ARCH__ == 5102) ||                        \
@@ -631,9 +599,6 @@ __aicore__ inline void WholeReduceSum(const LocalTensor<T>& dst, const LocalTens
 #endif
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype in WholeReduceSum, current api support dtype combination is "
-        "src and dst both: half / float.\n"));
     CheckWholeReduceCommonParams<T>(dst, src, repeatTime, "WholeReduceSum");
     CheckMaskValue<PrimType, isSetMask>(mask, "WholeReduceSum");
 #endif
@@ -660,12 +625,6 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckWholeReduceCommonParams<T>(dst, src, repeatTime, order, "WholeReduceMax");
     CheckMaskValue<PrimType, isSetMask>(mask, "WholeReduceMax");
-#endif
-#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113)
-    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
-        "WholeReduceMax, current api support dtype combination is src and dst both: half / float.\n"));
 #endif
 #if __NPU_ARCH__ == 2201
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMax");
