@@ -2,7 +2,7 @@
 
 # Ascend C
 
-<h4>Ascend C算子编程语言核心仓：提供语言扩展层C API和C++类库，支持异构编译和<<<>>>直调，实现芯片完备编程能力，助力极致性能开发</h4>
+<h4>基于C/C++构建多层级API，开放芯片完备编程能力，支撑实现极致性能</h4>
 
 [![community](https://img.shields.io/badge/docs-community-brightgreen.svg?style=flat)](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)
 [![repo](https://img.shields.io/badge/docs-repo-blue.svg?style=flat)](https://gitcode.com/cann/asc-devkit/tree/master/docs)
@@ -17,15 +17,15 @@
 ## 🔥Latest News
 [2026/03] v9.0.0-beta.2 版本关键特性
 ### 🚀 关键特性
-- Ascend 950PR支持SIMD编程模式，提供200+ [API接口](https://gitcode.com/cann/asc-devkit/tree/master/impl/basic_api/dav_c310)跨代兼容能力，可实现Atlas A2系列产品和Atlas A3系列产品算子平滑迁移。
-- Ascend 950PR新增基于Reg的编程方式，提供Reg数据搬运、基础算术、规约计算、同步控制等90+ [Reg编程接口](https://gitcode.com/cann/asc-devkit/tree/master/impl/basic_api/reg_compute/dav_c310)。
-- Atlas A2系列产品、Atlas A3系列产品、Ascend 950PR支持[语言扩展层纯C接口](https://gitcode.com/cann/asc-devkit/tree/master/include/c_api)，支持数组式内存分配与指针型计算接口，提供原生纯 C 编程体验。
-- Ascend 950PR支持SIMD与SIMT混合编程，提供约700个[SIMT API接口](https://gitcode.com/cann/asc-devkit/tree/master/include/simt_api)，包含warp、atomic、基本数学计算、类型转换等基础接口。
-- Ascend 950PR支持通信高阶API的CCU通信接口，提供基于CCU的[Allreduce，Allgather，Reducescatter，AlltoAll等主流通信原语](https://gitcode.com/cann/asc-devkit/tree/master/impl/adv_api/detail/hccl/impl/platform_v310)；Matmul高阶API新增支持[MXFP4/8低比特数据类型的矩阵运算](https://gitcode.com/cann/asc-devkit/blob/master/impl/adv_api/detail/matmul/mx_matmul_impl.h)，实现内存占用减半、算力吞吐倍增。
+- Ascend 950PR支持SIMD编程模式，提供200+ [API接口](./impl/basic_api/dav_3510)跨代兼容能力，可实现Atlas A2系列产品和Atlas A3系列产品算子平滑迁移。
+- Ascend 950PR新增基于Reg的编程方式，提供Reg数据搬运、基础算术、规约计算、同步控制等90+ [Reg编程接口](./impl/basic_api/reg_compute/dav_3510)。
+- Atlas A2系列产品、Atlas A3系列产品、Ascend 950PR支持[语言扩展层纯C接口](./include/c_api)，支持数组式内存分配与指针型计算接口，提供原生纯 C 编程体验。
+- Ascend 950PR支持SIMD与SIMT混合编程，提供约700个[SIMT API接口](./include/simt_api)，包含warp、atomic、基本数学计算、类型转换等基础接口。
+- Ascend 950PR支持通信高阶API的CCU通信接口，提供基于CCU的[Allreduce，Allgather，Reducescatter，AlltoAll等主流通信原语](./impl/adv_api/detail/hccl/impl/platform_v310)；Matmul高阶API新增支持[MXFP4/8低比特数据类型的矩阵运算](./impl/adv_api/detail/matmul/mx_matmul_impl.h)，实现内存占用减半、算力吞吐倍增。
 - Ascend 950PR新增及兼容支持样例共计约260个，包含SIMT样例、SIMD样例（框架类、基础API、高阶API、最佳实践等），并按照编程模型和样例类别对[样例目录结构进行调整](https://gitcode.com/cann/asc-devkit/pull/1223)，提升样例目录结构的易读性。
 - 融合编译与<<<>>>调用方式支持[CPU模式](https://gitcode.com/cann/asc-tools/pull/138)以及[SIM仿真模式](https://gitcode.com/cann/asc-devkit/blob/master/cmake/asc/asc_modules/CMakeASCInformation.cmake)。
 ### 📖 资料文档
-- 新增90+ [Reg编程接口API](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Reg%E7%9F%A2%E9%87%8F%E8%AE%A1%E7%AE%97.md)资料，Reg矢量计算API是面向RegBase架构开发的API，用户可通过该API直接对芯片中涉及Vector计算的寄存器进行操作，实现更大的灵活性和更好的性能。
+- 新增90+ [Reg编程接口API](./docs/api/context/Reg%E7%9F%A2%E9%87%8F%E8%AE%A1%E7%AE%97.md)资料，Reg矢量计算API是面向RegBase架构开发的API，用户可通过该API直接对芯片中涉及Vector计算的寄存器进行操作，实现更大的灵活性和更好的性能。
 - 新增SIMT[快速入门](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_map_10_0022.html)、[编程模型](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_10_10064.html)和[算子实现](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlasascendc_api_07_10293.html)介绍。
 - 新增SIMD与SIMT[混合编程模型](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_10_10052.html)、[算子实现](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_10_10039.html)、[性能优化](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_best_practices_10_10029.html)介绍。
 - 新增[SIMT API](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0427.html)资料章节。
@@ -172,27 +172,34 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 
 - 💡 关于 ASC 语言语法高亮、代码跳转的支持，如有任何建议或改进意见，欢迎社区开发者积极反馈！
 
-## 📖相关文档
+## 📖相关资源
 
-若您希望深入体验项目功能，扩展原有API或开发全新API、开发自定义算子，请访问如下文档获取详细教程。
-- API开发
+- **编程指南**
   | 文档  |  说明   |
   |---------|--------|
-  |[API列表](./docs/api/README.md)|Ascend C API列表。|
-  |[API贡献指南](./CONTRIBUTING.md)|介绍如何扩展或开发Ascend C API。|
+  |[Ascend C 编程指南](https://hiascend.com/document/redirect/CannCommunityOpdevAscendC)|基于昇腾AI硬件，使用Ascend C编写算子程序，开发自定义算子。|
+  |[Ascend C 实践参考](https://hiascend.com/document/redirect/CannCommunityAscendCBestPractice) | 基于已完成开发的Ascend C算子，介绍如何进一步优化算子性能。 |
+  |[Ascend C API列表](./docs/api/README.md)| Ascend C SIMD&SIMT API，包括语言扩展层C API、C++类库基础API和高阶API|
+  |[Ascend C 样例](./examples)| Ascend C API关键特性介绍样例，包括AICore SIMD&SIMT、AICPU等|
+  |[Ascend C 编程指南（鸿蒙）](https://gitcode.com/cann/cann-recipes-harmony-infer/blob/master/docs/ascendc_develop_guide.md)|基于麒麟AI硬件，使用Ascend C编写算子程序，开发自定义算子。|
 
-- 算子开发
+- **贡献指南**
   | 文档  |  说明   |
   |---------|--------|
-  |[Ascend C编程指南](https://hiascend.com/document/redirect/CannCommunityOpdevAscendC)|基于昇腾AI硬件，使用Ascend C编写算子程序，开发自定义算子。|
-  |[Ascend C最佳实践](https://hiascend.com/document/redirect/CannCommunityAscendCBestPractice) | 基于已完成开发的Ascend C算子，介绍如何进一步优化算子性能。 |
-  |[Ascend C编程指南（鸿蒙）](https://gitcode.com/cann/cann-recipes-harmony-infer/blob/master/docs/ascendc_develop_guide.md)|基于麒麟AI硬件，使用Ascend C编写算子程序，开发自定义算子。|
+  |[CANN 社区贡献指南](https://gitcode.com/cann/community)| CANN社区Issue、PR等通用处理流程|
+  |[ASC-DevKit贡献指南](./CONTRIBUTING.md) | Ascend C API、资料与样例等贡献指南|
 
-## 📌后续规划
+- **其他**
+  | 文档  |  说明   |
+  |---------|--------|
+  |[Ascend C Meetup材料](https://gitcode.com/cann/community/tree/master/events/meetup/slides/sig-ascendc)|Ascend C对外宣传的PPT材料，包括950新增特性等|
+  |[Ascend C Wiki](https://gitcode.com/cann/asc-devkit/wiki)|Ascend C技术宣传文章等|
+  |[CANN-Learning-Hub](https://gitcode.com/cann/cann-learning-hub/tree/master/tutorials/ascendc_operator_development)|Ascend C算子开发在线全流程教程|
+  |[Ascend C Ops Samples](https://gitcode.com/cann/cann-samples)|Ascend C 算子如何逐步实现高性能样例仓|
 
-- 基于Altas A2/A3发布语言扩展层纯C接口，提供基于数组分配内存能力，支持基于指针的计算接口，实现与业界类似的纯C编程体验；
-- Ascend 950PR/Ascend 950DT将支持SIMT编程、SIMD与SIMT混合编程，并通过Layout进一步强化Tensor编程能力；
-- 持续丰富语言扩展层C API(含SIMD、SIMT)和基础API的关键特性介绍，并基于融合编译与 <<<>>>调用完善样例；
+## 📌相关规划
+
+- [Ascend C Development Roadmap (2026 Q2)](https://gitcode.com/cann/asc-devkit/issues/316)；
 
 ## 📝相关信息
 

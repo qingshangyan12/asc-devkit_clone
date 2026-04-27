@@ -77,7 +77,7 @@
 
 - 样例功能  
   将矩阵乘的结果从CO1（L0C Buffer）搬运到GM（Global Memory），支持以下两种随路量化模式：
-  - Scalar量化：使用SetFixpipePreQuant接口设置Scalar量化参数。
+  - Scalar量化：使用SetFixpipePreQuantFlag接口设置Scalar量化参数。
   - Tensor量化：使用SetFixPipeConfig接口设置Tensor量化参数。  
   并支持与随路NZ2ND、relu激活能力组合。接口资料参考随路量化激活搬运。
 
@@ -198,21 +198,22 @@
   python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO ./output/output.bin ./output/golden.bin  # 验证输出结果是否正确
   ```
 
-  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
   
   示例如下：
   ```bash
-  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
   cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
-  | 参数 | 说明 | 可选值 | 默认值 |
-  |------|------|---------|--------|
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
-  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-2201 |
+
+  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
+  | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品 与 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `1`、`2`、`3`、`4`、`5`、`6`　　　　　| 场景编号：1=Scalar量化+relu激活+ND输出，2=Vector量化+NZ输出，3=Scalar量化+NZ输出，4=Vector量化+relu激活+ND输出，5=Scalar量化+ND输出，6=Vector量化+relu激活+NZ输出 |
 
 - 执行结果  
   执行结果如下，说明精度对比成功：
