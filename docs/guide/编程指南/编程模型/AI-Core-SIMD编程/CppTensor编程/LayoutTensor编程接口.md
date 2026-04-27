@@ -1,6 +1,6 @@
 ﻿LocalTensor扩展形态通过TensorAttribute特化，提供Layout抽象和Atom层封装。
 
-### 4.1 头文件引用
+# 头文件引用
 
 ```cpp
 // Tensor API主入口
@@ -11,7 +11,7 @@
 #include "experimental/tensor_api/algorithm/mad.h"   // Mad矩阵计算
 ```
 
-### 4.2 Layout创建
+# Layout创建
 
 **理解Layout**：Layout封装Shape（形状）和Stride（步长），自动计算坐标到偏移量的映射。
 
@@ -58,7 +58,7 @@ auto stride = MakeStride(32, 1);    // 步长：行优先（行步长32，列步
 auto layout = MakeLayout(shape, stride);
 ```
 
-### 4.3 格式详解：ND/NZ/ZN的区别与选择
+# 格式详解：ND/NZ/ZN的区别与选择
 
 **三种常见格式对比**：
 
@@ -166,7 +166,7 @@ GM（ND格式）
 - **NZ格式**：适合L1和L0，匹配Cube硬件设计
 - **格式转换**：DataCopy和Fixpipe自动处理，无需手动干预
 
-### 4.4 Pointer创建
+# Pointer创建
 
 **理解Pointer**：Pointer封装存储空间的指针，标记数据所在的存储层次（GM/L1/UB/L0等）。
 
@@ -196,7 +196,7 @@ auto l0CPtr = MakeL0CmemPtr<float>(l0CAddr); // L0C指针
 // 用途：矩阵乘加
 ```
 
-### 4.4 LocalTensor创建
+# LocalTensor创建
 
 **理解MakeTensor**：MakeTensor将Pointer和Layout组合，创建扩展形态的LocalTensor。
 
@@ -234,7 +234,7 @@ auto gmTensor = MakeTensor(
 // gmTensor指向输入数据或输出结果
 ```
 
-### 4.5 元素访问
+# 元素访问
 
 **坐标访问示例**：
 ```cpp
@@ -275,7 +275,7 @@ auto tileTensor = tensor(MakeCoord(0, 0), tile);
 auto value = tileTensor(MakeCoord(0, 0));  // 访问分块内(0,0)元素
 ```
 
-### 4.6 Copy搬运详解
+# Copy搬运详解
 
 **理解Copy**：扩展形态的数据搬运接口，封装底层DataCopy接口，通过Layout自动处理格式转换。
 
@@ -321,7 +321,7 @@ Copy(CopyGM2UB{}, dstTensor, srcTensor);
 // 4. 调用底层DataCopy
 ```
 
-### 4.7 Mad矩阵计算详解
+# Mad矩阵计算详解
 
 **理解Mad**：扩展形态的矩阵乘加接口，封装底层Mmad接口。
 

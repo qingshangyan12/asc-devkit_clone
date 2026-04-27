@@ -1,6 +1,6 @@
 ﻿LocalTensor原始形态提供基础的Tensor操作接口。
 
-### 3.1 头文件引用
+# 头文件引用
 
 ```cpp
 // 基础API主入口
@@ -13,7 +13,7 @@
 #include "basic_api/kernel_operator_mm_intf.h"         // 矩阵计算
 ```
 
-### 3.2 LocalTensor创建
+# LocalTensor创建
 
 **方式1：通过QueAlloc创建（推荐）**：
 ```cpp
@@ -51,7 +51,7 @@ auto l1Tensor = LocalTensor<half>((uint32_t)l1Buffer);
 l1Tensor.SetSize(1024);              // 必须手动设置大小
 ```
 
-### 3.3 元素访问
+# 元素访问
 
 **偏移量访问示例**：
 ```cpp
@@ -68,7 +68,7 @@ auto subTensor = l1Tensor[16];       // operator[](16)：创建从偏移16开始
 // 例如：原Tensor大小1024，子Tensor大小为1024-16=1008
 ```
 
-### 3.4 数据搬运（DataCopy）
+# 数据搬运（DataCopy）
 
 **理解DataCopy**：将数据从GM搬运到内部存储（UB或L1），是算子的第一步。
 
@@ -127,7 +127,7 @@ nzParams.dstNzMatrixStride = 256;// NZ矩阵总步长
 DataCopy(l1Tensor, gmTensor, nzParams);  // 执行搬运+格式转换
 ```
 
-### 3.5 Vector计算（Add/Mul等）
+# Vector计算（Add/Mul等）
 
 **理解Vector计算**：在UB上执行的向量操作，如加法、乘法、激活函数等。
 
@@ -193,7 +193,7 @@ params.src1RepStride = 8;
 Add(dstTensor, src0Tensor, src1Tensor, 0xFFFFFFFF, 4, params);
 ```
 
-### 3.6 Cube计算（LoadData/Mmad）
+# Cube计算（LoadData/Mmad）
 
 **理解Cube计算**：矩阵乘加操作，数据流为 L1 → L0A/B → L0C → GM/UB。
 
