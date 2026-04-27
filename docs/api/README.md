@@ -24,31 +24,31 @@ Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_c_api_desc">纯C接口，支持数组分配内存、基于指针的计算接口，提供与业界一致的C语言编程体验，并开放芯片完备编程能力。Atlas A2/A3支持SIMD的纯C接口；Ascend 950PR/Ascend 950DT将支持与业界类似的SIMT编程能力、SIMD/SIMT混合编程能力。</p>
 </td>
 </tr>
-<tr id="row_simd_3"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_high_api"><a href="section3317105813235">高阶 API</a></p>
+<tr id="row_simd_3"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_high_api"><a href="#section3317105813235">高阶 API</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_high_api_desc">基于单核对常见算法进行抽象和封装，提供公共算法的实现。</p>
 </td>
 </tr>
-<tr id="row_simd_4"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_simd_utils"><a href="section15221943104512">Utils API</a></p>
+<tr id="row_simd_4"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_simd_utils"><a href="#section15221943104512">Utils API</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_simd_utils_desc">SIMD侧公共接口，包含C++标准库、平台信息获取和Tiling相关API。</p>
 </td>
 </tr>
-<tr id="row_simt"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.1"><p id="p_simt"><a href="section1416490133020">SIMT API</a></p>
+<tr id="row_simt"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.1"><p id="p_simt"><a href="#section1416490133020">SIMT API</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_simt_none">-</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_simt_desc">对标业界，提供单指令多线程API。以单条指令多个线程的形式来实现并行计算。SIMT编程主要用于向量计算，特别适合处理离散访问、复杂控制逻辑等场景。</p>
 </td>
 </tr>
-<tr id="row_aicpu"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.1"><p id="p_aicpu"><a href="section06362251213">AI CPU API</a></p>
+<tr id="row_aicpu"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.1"><p id="p_aicpu"><a href="#section06362251213">AI CPU API</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_aicpu_none">-</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_aicpu_desc">提供核内的通用计算能力。</p>
 </td>
 </tr>
-<tr id="row_utils"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.1"><p id="p_utils"><a href="section15221943104512">Utils API</a></p>
+<tr id="row_utils"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.1"><p id="p_utils"><a href="#section15221943104512">Utils API</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_utils_none">-</p>
 </td>
