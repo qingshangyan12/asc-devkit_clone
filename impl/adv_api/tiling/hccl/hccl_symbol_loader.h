@@ -29,38 +29,6 @@ public:
         return instance;
     }
 
-    template <typename FuncPtr>
-    FuncPtr Load(const std::string& soName, const std::string& funcName)
-    {
-        std::lock_guard<std::mutex> lock(mtx_);
-
-        const std::string funcKey = soName + "::" + funcName;
-        const auto it = symbolMap_.find(funcKey);
-        if (it != symbolMap_.end()) {
-            TILING_LOG_DEBUG("Symbol %s in %s is already loaded.", funcName.c_str(), soName.c_str());
-            return reinterpret_cast<FuncPtr>(it->second);
-        }
-
-        if (libMap_.find(soName) == libMap_.end()) {
-            libMap_[soName] = dlopen(soName.c_str(), RTLD_LAZY | RTLD_LOCAL);
-        }
-
-        if (libMap_[soName] == nullptr) {
-            TILING_LOG_WARNING("Failed to open so %s.", soName.c_str());
-            return nullptr;
-        }
-
-        void* symbol = dlsym(libMap_[soName], funcName.c_str());
-        if (symbol == nullptr) {
-            TILING_LOG_WARNING("Failed to load symbol %s in so %s.", funcName.c_str(), soName.c_str());
-            return nullptr;
-        }
-
-        symbolMap_[funcKey] = symbol;
-        TILING_LOG_INFO("Symbol %s in %s is successfully loaded.", funcName.c_str(), soName.c_str());
-        return reinterpret_cast<FuncPtr>(symbol);
-    }
-
 private:
     std::unordered_map<std::string, void*> libMap_{};
     std::unordered_map<std::string, void*> symbolMap_{};
