@@ -629,7 +629,7 @@ main() {
 
   cd ${BUILD_DIR}
 
-  if [[ "${CI_MODE}" == "TRUE" ]]; then
+  if [[ "${CI_MODE}" == "TRUE" && "${PKG}" != "true"]]; then
     set_ci_mode
   fi
 
