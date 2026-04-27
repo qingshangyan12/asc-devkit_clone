@@ -16,6 +16,9 @@ import argparse
 import copy
 import struct
 import numpy as np
+import gen_data_f322s8
+import gen_data_s322f16
+import gen_data_s322s8
 np.random.seed(9)
 
 def extract_relu_params(relu_pre):
