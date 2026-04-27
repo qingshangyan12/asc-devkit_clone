@@ -572,19 +572,31 @@ set_ci_mode() {
 
   if [[ -n "$CHANGED_FILES" ]]; then
     log "[INFO] CI mode: processing changed files for CI mode."
-    # 调用 parse_changed_files.py 解析修改的文件
     local parse_script="${CURRENT_DIR}/scripts/util/parse_changed_files.py"
     if [[ ! -f "$parse_script" ]]; then
       log "[ERROR] CI mode: parse_changed_files.py not found at $parse_script"
       exit 1
     fi
 
-    SKIP_COMPILE_AND_TEST=$(python3 "$parse_script" "$CHANGED_FILES")
-    if [[ "${SKIP_COMPILE_AND_TEST}" == "TRUE" ]]; then
-      log "[INFO] CI mode: No need to compile and test."
-      exit 200
-    fi
-    log "[INFO] CI mode: need compile and test for CI mode."
+    CI_ACTION=$(python3 "$parse_script" "$CHANGED_FILES")
+    log "[INFO] CI mode: action = $CI_ACTION"
+
+    case "${CI_ACTION}" in
+      "SKIP")
+        log "[INFO] CI mode: Skip all (no compile and test, no package)."
+        exit 200
+        ;;
+      "PKG")
+        log "[INFO] CI mode: Trigger package build."
+        PKG="true"
+        ;;
+      "COMPILE")
+        log "[INFO] CI mode: Need compile and test."
+        ;;
+      *)
+        log "[WARN] CI mode: Unknown action '$CI_ACTION', fallback to compile."
+        ;;
+    esac
   fi
 }
 
