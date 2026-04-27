@@ -92,7 +92,8 @@ extern HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void *opArgs
  * @note This interface is used for MC2 compilation scenario to pre-allocate
  *       communication resources based on tiling information.
  */
-extern HcclResult HcclAllocComResourceByTiling(HcclComm comm, void *stream, void* mc2Tiling, void** opResCtx);
+extern HcclResult __attribute__((visibility("default")))
+HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void **opResCtx);
 
 #ifdef __cplusplus
 }

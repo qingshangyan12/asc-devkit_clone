@@ -166,8 +166,11 @@ HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void *opArgs, void 
 }
 
 
-HcclResult HcclAllocComResourceByTiling(HcclComm comm, void *stream, void* mc2Tiling, void** opResCtx)
+HcclResult __attribute__((visibility("default")))
+HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void **opResCtx)
 {
+    HCCL_RUN_INFO("[MC2_CLIENT_A5_AICPU] enter asc-devkit common HcclAllocComResourceByTiling, "
+        "comm[%p], stream[%p], tiling[%p].", comm, stream, mc2Tiling);
     HCCL_INFO("Start to run execute HcclAllocComResourceByTiling");
     // 记录开始时间，用于性能统计
     HcclUs startut = TIME_NOW();
