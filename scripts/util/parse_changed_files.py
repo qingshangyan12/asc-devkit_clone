@@ -19,7 +19,7 @@ def file_filter(path):
     """
     Determine if the file contains files that do not require compilation.
     """
-    key_words = ['.md', 'OWNERS', 'LICENSE', 'classify_rule.yaml', 'examples', 'docs']
+    key_words = ['.md', 'OWNERS', 'LICENSE', 'classify_rule.yaml', 'docs']
     for key_word in key_words:
         if key_word in path:
             return True
