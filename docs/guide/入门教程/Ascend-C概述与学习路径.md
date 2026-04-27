@@ -1,4 +1,4 @@
-# 什么是Ascend C
+# Ascend C概述
 
 Ascend C 是 CANN（Compute Architecture for Neural Networks）面向昇腾 AI 处理器推出的专用算子开发语言，原生兼容 C 与 C++ 标准规范。作为一门覆盖多场景的编程语言，Ascend C 秉持 **“开放芯片完备编程能力，支撑极致性能”** 的设计理念，并通过精心划分的多层级 API，让您可以根据项目需求、团队技能和性能目标，在开发效率与运行性能之间灵活权衡、取得最优平衡。更多背景可访问 [Ascend C 主页](https://www.hiascend.com/zh/ascend-c)。
 
@@ -14,7 +14,7 @@ Ascend C 是 CANN（Compute Architecture for Neural Networks）面向昇腾 AI �
 
 纵观这一体系，Ascend C 为开发者铺设了一条清晰的成长路径——从“快速上手”到“深度调优”，再到“释放极限性能”。下面按 **初级、中级进阶、高级编程** 三个阶段展开介绍。
 
----
+# Ascend C学习路径
 
 ## 初级阶段：快速入门，建立全局认知
 
