@@ -87,8 +87,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_bitsort](vector_compute/asc_bitsort.md) | Score和Index分别存储在src0和src1中，按Score进行排序（Score大的元素排前面），排序后的Score与其对应的Index一起以（Score，Index）的结构存储在dst中。 |
 | [asc_deq_int322half](vector_compute/asc_deq_int322half.md) | 对输入的int32_t类型的数据按元素做量化并转换为half类型 |
 | [asc_float2int16](vector_compute/asc_float2int16.md) | 将float类型数据转换为int16_t类型。 |
-| [asc_float2int32](vector_compute/asc_float2int32.md) | 将float类型数据转换为int16_t类型 |
-| [asc_float2int64](vector_compute/asc_float2int64.md) | 将float类型数据转换为int16_t类型 |
+| [asc_float2int32](vector_compute/asc_float2int32.md) | 将float类型数据转换为int32_t类型。 |
+| [asc_float2int64](vector_compute/asc_float2int64.md) | 将float类型数据转换为int64_t类型。 |
 | [asc_ge](vector_compute/asc_ge.md) | Ge（greater than or equal to），逐元素比较src0 >= src1是否成立，成立则输出结果为1，否则输出结果为0，每个元素的比较结果占一个bit。 |
 | [asc_ge_scalar](vector_compute/asc_ge_scalar.md) | 按元素判断src >= value是否成立，若成立则输出结果为1，否则为0。 |
 | [asc_gt_scalar](vector_compute/asc_gt_scalar.md) | src中的每个元素逐个与标量value比较大小，如果某个位置上的元素大于value，则输出结果dst上的对应比特位为1，否则为0。 |
@@ -116,7 +116,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_transto5hd](vector_compute/asc_transto5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
 | [asc_pair_reduce_sum](vector_compute/asc_pair_reduce_sum.md) | 对输入数据做归约操作，得到数据总和。 |
 | [asc_copy](vector_compute/asc_copy.md) | 将数据从Unified Buffer搬运到Unified Buffer。支持高维切分。 |
-
+| [asc_squeeze](vector_compute/asc_squeeze.md) | 通过比较掩码src1，将src0中的向量压缩成更短的向量，存储到dst中。 |
 
 ## 数据搬运
 
@@ -124,30 +124,50 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 | API名称                                                                   |   说明   |
 |-------------------------------------------------------------------------|-----------|
-| [asc_copy_l0c2gm](cube_datamove/asc_copy_l0c2gm.md)                     | 将L0C中的数据搬运到GM中。 |
+| [asc_copy_gm2l0a](cube_datamove/asc_copy_gm2l0a.md)                     | 将GM中的数据搬运到L0A中。 |
+| [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md)                     | 将GM中的数据搬运到L0B中。 | 
+| [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1)                     | 将GM中的数据搬运到L1中。|
+| <cann-filter npu_type = "950"> [asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)                     | 将GM中的数据padding后搬运到L1中。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1)                     | 将GM中的数据搬运到L1中。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz.md)                     | 将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。 </cann-filter> |
+| <cann-filter npu_type = "950"> [asc_copy_gm2l1_nd2nz](cube_datamove/asc_copy_gm2l1_nd2nz.md)                     | 将GM中的数据搬运到L1中，在此过程中执行ND->NZ/NHWC->NC1HWC0/NHWC->C1HWNC0操作。</cann-filter> |
+| [asc_copy_l12gm](cube_datamove/asc_copy_l12gm.md)                     | 将数据从L1搬运到GM。 |
+| [asc_copy_l0c2gm](cube_datamove/asc_copy_l0c2gm)                     | 将L0C中的数据搬运到GM中。 |
+| [asc_copy_l0c2ub](cube_datamove/asc_copy_l0c2ub.md)                     | 将L0C中的数据搬运到UB中。 |
 | [asc_copy_l0c2l1](cube_datamove/asc_copy_l0c2l1)                        | 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到GM中。 |
 | [asc_set_l13d_rpt](cube_datamove/asc_set_l13d_rpt.md)                   | 用于设置Load3Dv2接口的repeat参数。 |
 | [asc_fill_l0a](cube_datamove/asc_fill_l0a.md)                           | 将L0A Buffer的Local Memory初始化为某一具体数值。 |
 | [asc_fill_l0b](cube_datamove/asc_fill_l0b.md)                           | 将L0B Buffer的Local Memory初始化为某一具体数值。 |
 | [asc_fill_l1](cube_datamove/asc_fill_l1.md)                             | 将L1 Buffer的Local Memory初始化为某一具体数值。 |
-| [asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md)                 | 设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)的3D格式搬运接口在L1 Buffer的边界值。 |
+| [asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md)                 | 设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。 |
 | [asc_load_image_to_cbuf](cube_datamove/asc_load_image_to_cbuf.md)       | 将图像数据从Global Memory搬运到L1 Buffer。 |
-| [asc_copy_l12bt](cube_datamove/asc_copy_l12bt.md)                       | 将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias。 |
-| [asc_copy_l12fb](cube_datamove/asc_copy_l12fb.md)                       | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
-| [asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
-| [asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到l0b Buffer里。 |
+| [asc_copy_l12bt](cube_datamove/asc_copy_l12bt)                       | 将MMAD指令的Bias数据从L1 Buffer搬运到BiasTable Buffer中。 |
+| [asc_copy_l12fb](cube_datamove/asc_copy_l12fb)                       | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
+| [asc_copy_l12fb_v2](cube_datamove/asc_copy_l12fb_v2.md)                 | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
+| [asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
+|<cann-filter npu_type = "950"> [asc_copy_l12ub](cube_datamove/asc_copy_l12ub.md)                       | 将数据从L1 Buffer搬运到Unified Buffer中。</cann-filter> |
+| [asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |
+| [asc_copy_l12l0c](cube_datamove/asc_copy_l12l0c.md)                     | 将矩阵由L1 Buffer搬运到L0C Buffer中。 |
 | [asc_copy_l12l0b_sparse](cube_datamove/asc_copy_l12l0b_sparse.md)       | 用于搬运存放在L1 Buffer里的512B大小的稠密权重矩阵到L0B Buffer里，同时读取128B大小的索引矩阵用于稠密矩阵的稀疏化。 |
-| [asc_copy_l12l0b_trans](cube_datamove/asc_copy_l12l0b_trans.md)         | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |
+| [asc_copy_l12l0b_trans](cube_datamove/asc_copy_l12l0b_trans)         | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |
+| [asc_copy_l12l0a_trans](cube_datamove/asc_copy_l12l0a_trans.md)         | 该接口实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载。 |
 | [asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md)     | DataCopy（CO1->GM、CO1->A1）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。 |
 | [asc_set_l0c_copy_prequant](cube_datamove/asc_set_l0c_copy_prequant.md) | 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。 |
+| <cann-filter npu_type = "950"> [asc_copy_l12l0a_mx](cube_datamove/asc_copy_l12l0a_mx.md)         | 将Mx scale矩阵从L1 Buffer搬运到L0A Buffer。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_copy_l12l0b_mx](cube_datamove/asc_copy_l12l0b_mx.md)         | 将Mx scale矩阵从L1 Buffer搬运到L0B Buffer。</cann-filter> |
 | [copy_gm2l1](cube_datamove/copy_gm2l1.md)                               | 将数据从Global Memory搬运到 Level 1 cache。 |
 | [copy_gm2l1_nd2nz](cube_datamove/copy_gm2l1_nd2nz.md)                   | 将数据从Global Memory搬运到 Level 1 cache，支持在数据搬运时进行ND格式到NZ格式的转换。 |
 | [asc_set_l13d_padding](cube_datamove/asc_set_l13d_padding.md)           | 设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。 |
+| [asc_set_l13d_fmatrix](cube_datamove/asc_set_l13d_fmatrix.md)           | 设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从左矩阵获取FeatureMap的属性时使用该接口。 |
+| [asc_set_l13d_fmatrix_b](cube_datamove/asc_set_l13d_fmatrix_b.md)       | 设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从右矩阵获取FeatureMap的属性时使用该接口。|
+| [asc_set_l0c2gm_lrelu_alpha](cube_datamove/asc_set_l0c2gm_lrelu_alpha.md)         | 用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值。该值只支持half和float两种数据类型。 |
 | [asc_copy_ub2ub](vector_datamove/asc_copy_ub2ub.md) | 将数据从Unified Buffer搬运到Unified Buffer。 |
 | [asc_copy_gm2ub](vector_datamove/asc_copy_gm2ub.md)                     | 将数据从Global Memory搬运到 Unified Buffer。 |
 | [asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align)         | 提供数据非对齐搬运的功能，将数据从Global Memory搬运到 Unified Buffer，并支持8位/16位/32位数据类型搬运。 |
 | [asc_copy_ub2gm](vector_datamove/asc_copy_ub2gm.md)                     | 将数据从Unified Buffer搬运到 Global Memory。 |
 | [asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align)         | 将数据从Unified Buffer搬运到 Global Memory，支持8位/16位/32位分块拷贝操作。 |
+| [asc_set_copy_pad_val](vector_datamove/asc_set_copy_pad_val.md)         | 和asc_copy_gm2ub_align或asc_copy_ub2gm_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。 |
+| [asc_copy_ub2l1](vector_datamove/asc_copy_ub2l1.md)         | 将数据从Unified Buffer (UB) 搬运到 搬运到L1 Buffer。 |
 
 ## 标量操作
 
@@ -177,6 +197,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_mmad_sparse](cube_compute/asc_mmad_sparse.md) | 完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。 |
 | [asc_set_fp32_mode](cube_compute/asc_set_fp32_mode.md) | 用于设置Mmad计算开启FP32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据在参与Mmad计算之前不做舍入处理。 |
 | [asc_set_l0c2gm_config](cube_compute/asc_set_l0c2gm_config.md) | 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。 |
+| [asc_get_l0c2gm_relu](cube_compute/asc_get_l0c2gm_relu.md) | 数据搬运过程中进行随路量化时，通过调用该接口获取ReLU操作前矢量的起始地址。 |
+| [asc_get_l0c2gm_unitflag](cube_compute/asc_get_l0c2gm_unitflag.md) | 数据搬运过程中进行随路量化时，通过调用该接口获取unit_flag设置。 |
+| [asc_get_l0c2gm_prequant](cube_compute/asc_get_l0c2gm_prequant.md) | 数据搬运过程中进行随路量化时，通过调用该接口获取量化操作前矢量的起始地址。 |
 | [asc_enable_hf32](cube_compute/asc_enable_hf32.md) | 用于设置Mmad计算开启HF32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32。 |
 
 
@@ -186,6 +209,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 |   API名称   |   说明   |
 |----------|-----------|
+| <cann-filter npu_type = "950"> [asc_unlock](sync/asc_unlock.md)| 释放缓存。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_lock](sync/asc_lock.md)| 用于AI Core内部异步流水线同步的接口。</cann-filter> |
 | [asc_sync_notify](sync/asc_sync_notify.md)| 设置同步标志。 |
 | [asc_sync_wait](sync/asc_sync_wait.md)| 等待同步标志。 |
 | [asc_sync_pipe](sync/asc_sync_pipe.md)| 等待指定流水线操作完成。 |
@@ -196,7 +221,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sync_data_barrier](sync/asc_sync_data_barrier.md) | 用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。 |
 | [asc_sync_block_arrive](sync/asc_sync_block_arrive.md) | 该指令用于发送同步信息数据到核间同步寄存器，设置同步点。 |
 | [asc_sync_block_wait](sync/asc_sync_block_wait.md) | 和[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。 |
-
+| <cann-filter npu_type = "950"> [asc_sync_intra_wait](sync/asc_sync_intra_wait.md)| 等待核间同步寄存器同步标志。 </cann-filter> |
+| <cann-filter npu_type = "950"> [asc_sync_intra_arrive](sync/asc_sync_intra_arrive.md)| 向核间同步寄存器发送同步信号。 </cann-filter> |
+| <cann-filter npu_type = "950"> [asc_sync_inter_wait](sync/asc_sync_inter_wait.md)| 等待block内同步标志。 </cann-filter> |
 
 ## 系统变量
 
@@ -217,6 +244,17 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_get_program_counter](sys_var/asc_get_program_counter.md) | 获取程序计数器的指针，程序计数器用于记录当前程序执行的位置。 |
 | [asc_get_ffts_base_addr](sys_var/asc_get_ffts_base_addr.md) | 获取核间同步寄存器的基地址。 |
 | [asc_set_ffts_base_addr](sys_var/asc_set_ffts_base_addr.md) | 在[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)和[asc_sync_block_wait](sync/asc_sync_block_wait.md)之前使用，设置核间同步寄存器的基地址。 |
+| [asc_get_phy_stack_base](sys_var/asc_get_phy_stack_base.md) | 获取物理堆栈基地址。 |
+| [asc_get_smmu_tag_version](sys_var/asc_get_smmu_tag_version.md) | 获取SMMU（System Memory Management Unit）版本信息。 |
+| [asc_get_status](sys_var/asc_get_status.md) | 获取状态信息。 |
+| [asc_get_sys_virtual_base](sys_var/asc_get_sys_virtual_base.md) | 获取系统虚拟基地址。 |
+| [asc_get_vf_len](sys_var/asc_get_vf_len.md) | 获取Tensor位宽VL（Vector Length）的大小。 |
+| <cann-filter npu_type = "950"> [asc_set_gm2l1_nz_para](sys_var/asc_set_gm2l1_nz_para.md) | 设置MTE2_NZ_PARA寄存器的值。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_setl_l12l0_padding_val](sys_var/asc_setl_l12l0_padding_val.md) | 设置PADDING_B寄存器的值。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_set_l0c2gm_quant_post](sys_var/asc_set_l0c2gm_quant_post.md) | 设置QUANT_POST寄存器的值。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_set_l0c2gm_relu_alpha](sys_var/asc_set_l0c2gm_relu_alpha.md) | 设置RELU_ALPHA寄存器的值。</cann-filter> |
+| [asc_set_l0c2gm_channel_para](sys_var/asc_set_l0c2gm_channel_para.md) | 对通道步长参数的专用寄存器的比特位进行设置。 |
+| [asc_set_l3d_rpt_b](sys_var/asc_set_l3d_rpt_b.md) | 用于设置接口asc_copy_l12l0a、asc_copy_l12l0b的2D格式搬运的repeat参数。|
 
 
 ## 缓存控制
@@ -227,6 +265,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |----------|-----------|
 | [asc_datacache_preload](cache_ctrl/asc_datacache_preload.md)| 从源地址所在的特定GM地址预加载数据到Data Cache中。 |
 | [asc_dcci](cache_ctrl/asc_dcci.md) | 用于刷新Cache， 保证Cache的一致性。 |
+| <cann-filter npu_type = "950"> [asc_dci](cache_ctrl/asc_dci.md) | 数据缓存失效，使整个数据缓存无效化。</cann-filter>|
 | [asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md) | 获取ICache的Preload的状态。 |
 | [asc_icache_preload](cache_ctrl/asc_icache_preload.md) | 从指令所在DDR地址预加载数据到对应的cacheline中。 |
 
@@ -274,6 +313,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_loadalign](reg/reg_load/asc_loadalign/) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式。 |
+| [asc_loadalign_postupdate](reg/reg_load/asc_loadalign_postupdate.md) | 将数据从UB搬入MaskReg，使能post mod。 |
 | [asc_storealign](reg/reg_store/asc_storealign/) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。 |
 | [asc_gather](reg/reg_load/asc_gather.md) | 根据索引位置index将源操作数src按元素收集到目的操作数dst中。 |
 | [asc_gather_datablock](reg/reg_load/asc_gather_datablock.md) | 给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。 |
