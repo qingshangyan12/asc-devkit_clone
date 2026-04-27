@@ -52,7 +52,7 @@ Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_utils_none">-</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_utils_desc">丰富的通用工具类，涵盖标准库、平台信息获取、运行时编译及日志输出等功能，支持开发者高效实现算子开发与性能优化。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_utils_desc">通用工具类接口，包含Debug调测接口、运行时编译接口和CmakeModule接口。</p>
 </td>
 </tr>
 </tbody>
@@ -3943,7 +3943,7 @@ Ascend C编程类库API架构图如下所示，分为：
 
 ## Utils API<a name="section15221943104512"></a>
 
-**表 37**  C++标准库API列表
+**表 37**  C++标准库API列表（当前仅SIMD支持）
 
 <a name="table99801554584"></a>
 <table><thead align="left"><tr id="row179811554088"><th class="cellrowborder" valign="top" width="37.71%" id="mcps1.2.3.1.1"><p id="p298155413815"><a name="p298155413815"></a><a name="p298155413815"></a>接口名</p>
@@ -4115,7 +4115,7 @@ Ascend C编程类库API架构图如下所示，分为：
 </tbody>
 </table>
 
-**表 38**  平台信息获取API列表
+**表 38**  平台信息获取API列表（当前仅SIMD支持）
 
 <a name="table32991747162610"></a>
 <table><thead align="left"><tr id="row13299184712616"><th class="cellrowborder" valign="top" width="37.6%" id="mcps1.2.3.1.1"><p id="p15299104762613"><a name="p15299104762613"></a><a name="p15299104762613"></a>接口名</p>
@@ -4137,7 +4137,7 @@ Ascend C编程类库API架构图如下所示，分为：
 </tbody>
 </table>
 
-**表 39**  Tiling调测API列表
+**表 39**  Tiling调测API列表（当前仅SIMD支持）
 
 <a name="table2675125415261"></a>
 <table><thead align="left"><tr id="row1967612545262"><th class="cellrowborder" valign="top" width="37.419999999999995%" id="mcps1.2.3.1.1"><p id="p367695412260"><a name="p367695412260"></a><a name="p367695412260"></a>接口名</p>
@@ -4159,7 +4159,7 @@ Ascend C编程类库API架构图如下所示，分为：
 </tbody>
 </table>
 
-**表 40**  Tiling模板编程API列表
+**表 40**  Tiling模板编程API列表（当前仅SIMD支持）
 
 <a name="table2864441102011"></a>
 <table><thead align="left"><tr id="row4832193752110"><th class="cellrowborder" valign="top" width="37.44%" id="mcps1.2.3.1.1"><p id="p157001846132117"><a name="p157001846132117"></a><a name="p157001846132117"></a>接口名</p>
@@ -4234,7 +4234,7 @@ Ascend C编程类库API架构图如下所示，分为：
 </tbody>
 </table>
 
-**表 42**  log API列表
+**表 42**  log API列表（当前仅SIMD支持）
 
 <a name="table1514223372716"></a>
 <table><thead align="left"><tr id="row3142033112715"><th class="cellrowborder" valign="top" width="37.79%" id="mcps1.2.3.1.1"><p id="p181421633182714"><a name="p181421633182714"></a><a name="p181421633182714"></a>接口名</p>
