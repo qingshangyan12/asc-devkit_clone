@@ -16,3 +16,4 @@
 | 产品型号 |  npu-arch参数 |
 | ---- | ---- |
 | Ascend 950PR/Ascend 950DT | --npu-arch=dav-3510 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 | --npu-arch=dav-2201 |
