@@ -6,7 +6,7 @@
 
 注意：
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品仅支持输出格式为Nz，且不支持输出数据类型为float，必须量化为其他数据类型。
-- Ascend 950PR/Ascend 950DT不支持将数据从L1直接搬运到GM，因此，本样例中搬运到L1上的结果矩阵将作为输入再进行一次矩阵计算并将结果输出到GM上来完成结果校验。（Atlas A2/A3系列产品支持将数据从L1直接搬运到GM，本样例中选择直接搬出）
+- Ascend 950PR/Ascend 950DT不支持将数据从L1直接搬运到GM，因此，本样例中从L0C搬运到L1上的结果矩阵将作为下一次矩阵乘的输入，再进行一次矩阵计算并将结果输出到GM。（Atlas A2/A3系列产品支持将数据从L1直接搬运到GM，本样例中选择直接搬出）
 
 
 ## 支持的产品
@@ -65,11 +65,11 @@
 <table>
 <caption style="font-weight: normal;">
  	     <span style="font-weight: bold; font-size: 1.2em;">📌 表2：scenarioNum不同取值的含义</span>
-<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C数据类型</td><td align="center">L1数据类型</td><td align="center">输出格式</td><td align="center">是否使能量化</td><td align="center">是否使能ReLU</td></tr>
-<tr><td align="center">1</td><td align="center">float</td><td align="center">half</td><td align="center">Nz</td><td align="center">否(cast)</td><td align="center">否</td></tr>
-<tr><td align="center">2</td><td align="center">float</td><td align="center">int8_t</td><td align="center">Nz</td><td align="center">是(scalar)</td><td align="center">否</td></tr>
-<tr><td align="center">3</td><td align="center">float</td><td align="center">int8_t</td><td align="center">Nz</td><td align="center">是(vector)</td><td align="center">否</td></tr>
-<tr><td align="center">4</td><td align="center">float</td><td align="center">half</td><td align="center">Nz</td><td align="center">否</td><td align="center">是</td></tr>
+<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C数据类型</td><td align="center">L1数据类型</td><td align="center">输出格式</td><td align="center">是否使能量化</td><td align="center">是否使能ReLU</td><td align="center">支持产品型号</td></tr>
+<tr><td align="center">1</td><td align="center">float</td><td align="center">half</td><td align="center">Nz</td><td align="center">否(cast)</td><td align="center">否</td><td align="center">Ascend 950PR/Ascend 950DT</td></tr>
+<tr><td align="center">2</td><td align="center">float</td><td align="center">int8_t</td><td align="center">Nz</td><td align="center">是(scalar)</td><td align="center">否</td><td align="center">均支持</td></tr>
+<tr><td align="center">3</td><td align="center">float</td><td align="center">int8_t</td><td align="center">Nz</td><td align="center">是(vector)</td><td align="center">否</td><td align="center">均支持</td></tr>
+<tr><td align="center">4</td><td align="center">float</td><td align="center">half</td><td align="center">Nz</td><td align="center">否</td><td align="center">是</td><td align="center">Ascend 950PR/Ascend 950DT</td></tr>
 </table>
 
 **场景1：输出格式Nz，输出到L1数据类型为half（仅Ascend 950PR/Ascend 950DT）**
@@ -78,19 +78,19 @@
 - 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_Nz>` 将数据从CO1搬出到L1，输出为Nz格式
 - 说明：CO1数据为Nz格式直接输出到L1的Nz格式，数据保持原格式不变
 
-**场景2：输出格式Nz，输出到L1数据类型为int8_t，使能Scalar量化（均支持）**
+**场景2：输出格式Nz，输出到L1数据类型为int8_t，使能Scalar量化**
 - 输入：A [128, 128] half类型，ND格式；B [128, 128] half类型，ND格式
 - 输出：C [128, 128] int8_t类型，Nz格式
 - 实现：设置 `fixpipeParams.quantPre = QuantMode_t::QF322B8_PRE`，使用Scalar量化模式
 - 说明：将float类型数据量化为int8_t类型，整个C矩阵使用一个量化参数
 
-**场景3：输出格式Nz，输出到L1数据类型为int8_t使能Vector量化（均支持）**
+**场景3：输出格式Nz，输出到L1数据类型为int8_t，使能Vector量化**
 - 输入：A [128, 128] half类型，ND格式；B [128, 128] half类型，ND格式
 - 输出：C [128, 128] int8_t类型，Nz格式
 - 实现：设置 `fixpipeParams.quantPre = QuantMode_t::VQF322B8_PRE`，使用Vector量化模式，并通过quantAlphaTensor传入每列的量化参数
 - 说明：将float类型数据量化为int8_t类型，C矩阵的每一列对应一个量化参数，使用的量化参数需要从GM拷贝量化参数到L1
 
-**场景4：输出格式Nz，输出到L1数据类型为half使能ReLU（仅Ascend 950PR/Ascend 950DT）**
+**场景4：输出格式Nz，输出到L1数据类型为half，使能ReLU（仅Ascend 950PR/Ascend 950DT）**
 - 输入：A [128, 128] half类型，ND格式；B [128, 128] half类型，ND格式
 - 输出：C [128, 128] half类型，Nz格式
 - 实现：设置 `fixpipeParams.reluEn = true` 开启ReLU功能
@@ -125,7 +125,7 @@
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin $SCENARIO_NUM $ASC_ARCH # 验证输出结果是否正确
   ```
-    使用NPU仿真模式时，添加 `-DRUN_MODE=sim` 参数即可。
+    使用NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
