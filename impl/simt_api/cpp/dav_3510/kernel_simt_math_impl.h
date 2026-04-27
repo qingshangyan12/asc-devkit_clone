@@ -55,10 +55,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T AbsImpl(T x)
 {
     if constexpr (std::is_same_v<T, int32_t> || std::is_same_v<T, float> || std::is_same_v<T, int64_t>) {
         return abs(x);
-    } else if (x < 0) {
-        return -x;
-    } else {
-        return x;
+    } else if constexpr (std::is_same_v<T, half>) {
+        uint16_t bits = *reinterpret_cast<uint16_t*>(&x);
+        bits &= 0x7FFF;
+        return *reinterpret_cast<half*>(&bits);
+    } else if constexpr (std::is_same_v<T, float>){
+        return __fabsf(x);
     }
 }
 #endif
@@ -182,10 +184,33 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T MaxImpl(T x, T y)
                   std::is_same_v<T, int64_t> || std::is_same_v<T, uint8_t> || std::is_same_v<T, uint16_t> ||
                   std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>) {
         return max(x, y);
-    } else if (x > y) {
-        return x;
-    } else {
-        return y;
+    } else if constexpr (std::is_same_v<T, float>) {
+        if (IsNan(x)) {
+            return y;
+        } else if (IsNan(y)) {
+            return x;
+        }
+        return __fmaxf(x, y);
+    } else if constexpr (std::is_same_v<T, half>) {
+        if (IsNan(x)) {
+            return y;
+        } else if (IsNan(y)) {
+            return x;
+        }
+        if (x == (half)0 && y == (half)0) {
+            bool sign_bitx = reinterpret_cast<uint16_t&>(x) & 0x8000;
+            bool sign_bity = reinterpret_cast<uint16_t&>(y) & 0x8000;
+            if (sign_bitx) {
+                return y;
+            } else if (sign_bity) {
+                return x;
+            }
+        }
+        if (x > y) {
+            return x;
+        } else {
+            return y;
+        }
     }
 }
 #endif
@@ -204,10 +229,33 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T MinImpl(T x, T y)
                   std::is_same_v<T, int64_t> || std::is_same_v<T, uint8_t> || std::is_same_v<T, uint16_t> ||
                   std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>) {
         return min(x, y);
-    } else if (x < y) {
-        return x;
-    } else {
-        return y;
+    } else if constexpr (std::is_same_v<T, float>) {
+        if (IsNan(x)) {
+            return y;
+        } else if (IsNan(y)) {
+            return x;
+        }
+        return __fminf(x, y);
+    } else if constexpr (std::is_same_v<T, half>) {
+        if (IsNan(x)) {
+            return y;
+        } else if (IsNan(y)) {
+            return x;
+        }
+        if (x == (half)0 && y == (half)0) {
+            bool sign_bitx = reinterpret_cast<uint16_t&>(x) & 0x8000;
+            bool sign_bity = reinterpret_cast<uint16_t&>(y) & 0x8000;
+            if (sign_bitx) {
+                return x;
+            } else if (sign_bity) {
+                return y;
+            }
+        }
+        if (x < y) {
+            return x;
+        } else {
+            return y;
+        }
     }
 }
 #endif
