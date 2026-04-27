@@ -6,7 +6,7 @@ Batch Matmul是指批量处理Matmul计算的场景。该场景对外提供了[I
 
 Matmul单次计算的过程需要搬入和搬出数据，当进行多次Matmul计算且单次Matmul计算的输入shape较小时，搬运开销在整体耗时中占比较大。通过IterateBatch接口批量处理Matmul，可以有效提升带宽利用率。
 
-Batch Matmul当前支持4种Layout类型：[BSNGD](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/[IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateBatch.md).md)、[SBNGD](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/[IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateBatch.md).md)、[BNGS1S2](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/[IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateBatch.md).md)、[NORMAL](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/[IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateBatch.md).md)（BMNK的数据排布格式），相关数据排布格式请参考[IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateBatch.md)。
+Batch Matmul当前支持4种Layout类型：BSNGD、SBNGD、BNGS1S2、NORMAL（BMNK的数据排布格式），相关数据排布格式请参考[IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateBatch.md)。
 
 下图为NORMAL数据排布格式的Batch Matmul计算。整个Matmul计算一共包含4个矩阵乘操作：mat\_a1\*mat\_b1、mat\_a2\*mat\_b2、mat\_a3\*mat\_b3、mat\_a4\*mat\_b4，需要单核上计算四个singleCoreM \*singleCoreN。在该场景下，如果shape较小，可以将其视为Batch Matmul场景进行批量处理，以提升性能。一次IterateBatch可同时计算出mat\_c1 = mat\_a1 \* mat\_b1、mat\_c2 = mat\_a2 \* mat\_b2、mat\_c3 = mat\_a3 \* mat\_b3、mat\_c4 = mat\_a4 \* mat\_b4。
 
