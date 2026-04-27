@@ -23,6 +23,7 @@
 #include "kernel_macros.h"
 #include "kernel_tensor.h"
 #include "utils/kernel_utils_mode.h"
+#include "utils/common_types.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -31,6 +32,33 @@
 
 namespace AscendC {
 #pragma begin_pipe(V)
+
+template <ReduceType reduceType, typename T, typename U = T, bool isSetMask = true>
+__aicore__ inline void ReduceDataBlock(const LocalTensor<U>& dst, const LocalTensor<T>& src, const int32_t mask,
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <ReduceType reduceType, typename T, typename U = T, bool isSetMask = true>
+__aicore__ inline void ReduceDataBlock(const LocalTensor<U>& dst, const LocalTensor<T>& src, const uint64_t mask[],
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <ReduceType reduceType, typename T, typename U = T, bool isSetMask = true>
+__aicore__ inline void ReducePairElem(const LocalTensor<U>& dst, const LocalTensor<T>& src, const int32_t mask,
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <ReduceType reduceType, typename T, typename U = T, bool isSetMask = true>
+__aicore__ inline void ReducePairElem(const LocalTensor<U>& dst, const LocalTensor<T>& src, const uint64_t mask[],
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <ReduceType reduceType, typename T, typename U = T, bool isSetMask = true>
+__aicore__ inline void ReduceRepeat(const LocalTensor<U>& dst, const LocalTensor<T>& src, const int32_t mask,
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
+    ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
+
+template <ReduceType reduceType, typename T, typename U = T, bool isSetMask = true>
+__aicore__ inline void ReduceRepeat(const LocalTensor<U>& dst, const LocalTensor<T>& src, const uint64_t mask[],
+    const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
+    ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
+
 /* *************** BlockReduceMax /BlockReduceMin /BlockReduceSum PairReduceSum ********************* */
 /*
  * @ingroup BlockReduceSum
