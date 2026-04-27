@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -538,6 +538,9 @@ __aicore__ inline void TPipe::DestroyWithoutPipeAll()
     WaitFlag<HardEvent::M_MTE1>(2);
     ReleaseEventID<HardEvent::M_MTE1>(2);
 #endif
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102
+    Internal::g_bufId = 0;
+#endif
 }
 
 __aicore__ inline void TPipe::Destroy()
@@ -597,7 +600,9 @@ __aicore__ inline void InitShareBufStart(TPipe* tpipe, uint32_t mode, uint32_t* 
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0B)].maxAddr = 0;
     // v100 Shouldn't Use Bias Table
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::BIAS)].maxAddr = 0;
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+    Internal::g_sharedEvtId = Internal::g_bufId;
+#endif
     return;
 }
 
@@ -612,7 +617,9 @@ __aicore__ inline void InitShareBufEnd(TPipe* tpipe)
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::UB)].maxAddr =
         tpipe->g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::UB)];
 #endif
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+    Internal::g_bufId = Internal::g_sharedEvtId;
+#endif
     return;
 }
 
@@ -954,6 +961,9 @@ __aicore__ inline void TPipe::ReleaseMutexID(MutexID id)
 
 __aicore__ inline void TPipe::ResetPool()
 {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102
+    Internal::g_bufId = 0;
+#endif
     g_tpipeImpl.tscmBufferPtr_ = TOTAL_L1_SIZE;
     g_tpipeImpl.curBufSize_ = 0;
     auto buf = g_tpipeImpl.bufPool_;
