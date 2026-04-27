@@ -20,4 +20,4 @@
 | [ld_st_reg_unalign](./ld_st_reg_unalign)　　　　　　　　 | 本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的非对齐数据搬运操作　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
 | [gather_ld_reg](./gather_ld_reg)　　　　　　　　　　　　 | 本样例演示使用Gather接口实现离散数据搬入，包含高维Gather（源为LocalTensor）和Reg::GatherB（按DataBlock收集）两种场景　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　|
 | [scatter_st_reg](./scatter_st_reg)　　　　　　　　　　　 | 本样例演示使用Reg::Scatter接口实现离散数据搬出（按元素分散到UB）　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　|
-| [auxscalar](./auxscalar)　　　　　　　　　　　　　　　　 | 本样例演示使用AuxScalar方式从UB读取多个标量数据参与计算|
+| [auxscalar_reg](./auxscalar_reg)　　　　　　　　　　　　　　　　 | 本样例演示使用AuxScalar方式从UB读取多个标量数据参与计算|

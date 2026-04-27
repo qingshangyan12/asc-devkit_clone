@@ -1,4 +1,4 @@
-# auxscalar样例
+# auxscalar_reg样例
 
 ## 概述
 本样例基于RegBase编程范式实现AuxScalar方式从UB(Unified Buffer)读取多个标量数据，结合Adds进行向量与标量加法计算。
@@ -8,18 +8,19 @@
 
 ## 目录结构介绍
 ```
-├── auxscalar
+├── auxscalar_reg
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
-│   ├── auxscalar.asc                  // AscendC样例实现 & 调用样例
+│   ├── auxscalar_reg.asc              // AscendC样例实现 & 调用样例
 │   └── README.md                      // 样例介绍
 ```
 
 ## 样例描述
 - 样例功能：  
   从UB上读取4个标量数据，和向量x进行Adds计算。向量x shape为[1, 512]，通过for循环控制每个标量和128个连续的向量元素进行计算。  
+  - AuxScalar读取标量在VF函数内可以直接使用，在mainScalar（VF函数外）使用时需要加同步指令
   
   **AuxScalar + Adds模式**
   - 使用AuxScalar方式（`__ubuf__`指针下标访问，如`scalarAddr[0]`）从UB读取标量，结合Adds进行向量与标量加法
@@ -30,7 +31,7 @@
     <tr><td align="center">x</td><td align="center">[1, 512]</td><td align="center">half</td></tr>
     <tr><td align="center">scalar</td><td align="center">[1, 4]</td><td align="center">half</td></tr>
     <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 512]</td><td align="center">half</td></tr>
-    <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">auxscalar</td></tr>
+    <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">auxscalar_reg</td></tr>
     </table>
   - 样例实现：
     AuxScalarAddsVF函数内，通过`scalarAddr[i]`从UB读取第i个标量值，调用`Adds`进行向量加标量计算。
