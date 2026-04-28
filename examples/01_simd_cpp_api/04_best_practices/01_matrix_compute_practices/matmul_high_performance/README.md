@@ -8,10 +8,10 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── 05_matmul
-│   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
+├── matmul_high_performance
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── matmul.h                // 所有优化case的头文件定义
@@ -478,7 +478,7 @@ MTE2理论耗时：
 $$MTE2理论耗时 =\frac{HBM读入数据总量}{1.8TB/s} +\frac{L2Cache读入数据总量}{5TB/s} = 2672.44\mu s$$
 
 Case 8 MTE2耗时误差：
-$$MTE2耗时误差 = \frac{{3435.584\mu s} - {2672.44\mu s}}{{2672.44\mu s}} = 20.77\%$$
+$$MTE2耗时误差 = \frac{{3435.584\mu s} - {2672.44\mu s}}{{2672.44\mu s}} = 28.55\%$$
 
 当前MTE2耗时与理论值相差较大，因为实际芯片L2Cache大小为192MB，当前L2Cache切分策略较简单；另一方面当MTE2搬运场景为ND2NZ（GM数据Layout为ND，搬运到L1时需做ND→NZ格式转换）时，L2Cache带宽会降低。用户可进一步优化L2Cache切分策略以提高MTE2带宽。
 

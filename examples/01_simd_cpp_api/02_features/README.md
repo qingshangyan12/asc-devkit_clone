@@ -4,7 +4,7 @@
 
 基于Ascend C特性样例，介绍了Aclnn（ge入图）工程、LocalMemoryAllocator、Barrier单独内存申请分配等特性。
 
-## 算子开发样例
+## 样例列表
 
 | 目录名称  | 功能描述 |
 | --------- | --------- |
