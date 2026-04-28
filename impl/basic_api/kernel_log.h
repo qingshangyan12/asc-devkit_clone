@@ -142,13 +142,6 @@ __aicore__ inline uint64_t TransUBAddr(uint64_t addr);
         raise(SIGABRT);                                                                     \
     } while (0)
 
-enum KernelFuncType : uint8_t {
-    NONE_MODE,
-    MASK_COUNT_MODE,    // mask
-    MASK_BIT_MODE,      // mask[]
-    CALCOUNT_MODE       // calcount
-};
-
 enum class LogLevel : uint8_t {
     KERNEL_DEBUG = 0,
     KERNEL_INFO = 1,
@@ -282,6 +275,15 @@ inline std::string GenBlockStr()
 
 #endif
 
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
+enum KernelFuncType : uint8_t {
+    NONE_MODE,
+    MASK_COUNT_MODE,    // mask
+    MASK_BIT_MODE,      // mask[]
+    CALCOUNT_MODE       // calcount
+};
+#endif
+
 namespace AscendC {
 template <class... Args>
 __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args);
@@ -408,11 +410,14 @@ __aicore__ static __attribute__ ((noinline)) void AssertPrint(__gm__ const char*
 namespace AscendC{
 #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
 #define KERNEL_LOG_INTERNAL(level, format, ...) KERNEL_LOG_##level(format, ##__VA_ARGS__)
+#define ASCENDC_REPORT_CHECK_ERROR_INTERNAL(apiMsg, funcType) ASCENDC_REPORT_CHECK_ERROR(apiMsg, funcType)
 #define ASCENDC_DEBUG_ASSERT(...) ASCENDC_ASSERT(__VA_ARGS__)
 #define ASCENDC_DEBUG_WARNING(...) ASCENDC_ASSERT_WARNING(__VA_ARGS__)
 #else
 #ifdef ASCENDC_DEBUG
 #define KERNEL_LOG_INTERNAL(level, format, ...) format, ##__VA_ARGS__
+#define ASCENDC_REPORT_CHECK_ERROR_INTERNAL(apiMsg, funcType) \
+    "Failed to pass %s check, mode = %d.", apiMsg, static_cast<int>(funcType)
 #define ASCENDC_DEBUG_ASSERT(...) ASCENDC_DEBUG_ASSERT_IMPL(__VA_ARGS__)
 #define ASCENDC_DEBUG_WARNING(...) ASCENDC_DEBUG_WARNING_IMPL(__VA_ARGS__)
 #else
@@ -422,6 +427,19 @@ namespace AscendC{
 #endif
 #endif
 }
+
+#ifdef __CHECK_FEATURE_AT_PRECOMPILE
+#define ENABLE_FEATURE_FOR_COMPILE(f, val) auto __enable_feature_for_compile_##f = val
+#define ENABLE_FEATURE_FOR_TILING(expression, val) auto __enable_custom_tiling val = expression
+#define REGISTER_NONE_TILING auto __enable_no_register_custom_tiling ascendc_trigger_tiling_struct = default
+#else
+#define ENABLE_FEATURE_FOR_COMPILE(f, val)
+#define ENABLE_FEATURE_FOR_TILING(expression, val) TILING_STRUCT_SECTION_INIT(__COUNTER__, val)
+#define REGISTER_NONE_TILING
+#endif
+
+#define ENABLE_ASSERT() ENABLE_FEATURE_FOR_COMPILE(assert, 1)
+#define ENABLE_ASSERT_DUMP_SIZE() ENABLE_FEATURE_FOR_COMPILE(assertBufSize, 1024)
 
 #endif // ASCENDC_MODULE_KERNEL_LOG_INTF_H
 

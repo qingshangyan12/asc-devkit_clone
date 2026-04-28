@@ -187,7 +187,7 @@ bool CheckFuncLoadData3dv1(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 template <typename T, typename U>
 bool CheckFuncLoadData3dv2(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const LoadData3DParamsV2<U>& loadDataParams, const char* intriName)
+    const LoadData3DParamsV2<U>& loadDataParams, const __gm__ char* intriName)
 {
     check::LoadData3dv2ApiParams chkParams { static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())),
@@ -332,8 +332,8 @@ __aicore__ inline void CheckTensorAlign(const LocalTensor<T>& input, uint32_t al
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     int8_t tensorTpos = int8_t(input.GetPosition());
     uint64_t tensorAddr = (uint8_t*)(input.GetPhyAddr()) - (uint8_t*)(GetBaseAddrCpu(tensorTpos));
-    ASCENDC_ASSERT((tensorAddr % alignByte == 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check %s start address "
-        "alignment in %s, its start address must align with %uB.", tensorName, apiMsg, alignByte);});
+    ASCENDC_DEBUG_ASSERT((tensorAddr % alignByte == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s start address "
+        "alignment in %s, its start address must align with %uB.", tensorName, apiMsg, alignByte));
 #endif
 }
 

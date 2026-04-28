@@ -56,7 +56,7 @@ __aicore__ inline void DumpTensor(const LocalTensor<T> &input, uint32_t desc, ui
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
-    ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DumpTensor is not supported in cpu mode."));
 #endif
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     DumpTensorLocal2GMImpl(input, desc, dumpSize);
@@ -68,7 +68,7 @@ __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, u
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
-    ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DumpTensor is not supported in cpu mode."));
 #endif
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     DumpTensorGM2GMImpl(input, desc, dumpSize);
@@ -80,7 +80,7 @@ __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, u
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
-    ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DumpTensor is not supported in cpu mode."));
 #endif
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     DumpShapeImpl(shapeInfo);
@@ -93,7 +93,7 @@ __aicore__ inline void DumpTensor(const LocalTensor<T>& input, uint32_t desc, ui
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
-    ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DumpTensor is not supported in cpu mode."));
 #endif
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     DumpShapeImpl(shapeInfo);
@@ -107,13 +107,13 @@ __aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t ind
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
-    ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode.");});
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode."));
 #endif
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP)
     if (countOff > input.GetSize()) {
-        ASCENDC_ASSERT((false),
-            { KERNEL_LOG(KERNEL_ERROR, "tensor offset [%d] exceeds limit [%d]",
-                        countOff, input.GetSize()); });
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "tensor offset [%d] exceeds limit [%d]",
+                        countOff, input.GetSize()));
         return;
     }
     LocalTensor<T> tmp = input[countOff];
@@ -126,13 +126,13 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
-    ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode.");});
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode."));
 #endif
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP)
     if (countOff > input.GetSize()) {
-        ASCENDC_ASSERT((false),
-            { KERNEL_LOG(KERNEL_ERROR, "tensor offset [%d] exceeds limit [%d]",
-                        countOff, input.GetSize()); });
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "tensor offset [%d] exceeds limit [%d]",
+                        countOff, input.GetSize()));
         return;
     }
     GlobalTensor<T> tmp = input[countOff];

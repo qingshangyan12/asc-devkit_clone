@@ -604,8 +604,8 @@ __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& v
 #endif
 #if ASCENDC_CPU_DEBUG
     AscendC::g_isVdeq = true;
-    ASCENDC_ASSERT((SupportType<PrimT<T>, uint64_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in SetDeqScale, "
-        "current api support dtype combination is vdeq: uint64_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint64_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in SetDeqScale, "
+        "current api support dtype combination is vdeq: uint64_t"));
     CheckTensorAlign<T>(vdeq, ONE_BLK_SIZE, "vdeq", "SetDeqScale");
     CheckTensorPos<T>(vdeq, Hardware::UB, "vdeq", "VECIN / VECCALC / VECOUT", "SetDeqScale");
 #endif
@@ -633,10 +633,10 @@ __aicore__ inline void Truncate(const LocalTensor<T> &dst, const LocalTensor<T> 
     using PrimType = PrimT<T>;
     CheckTensorPos<T>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "Truncate");
     CheckTensorPos<T>(src, Hardware::UB, "src", "VECIN / VECCALC / VECOUT", "Truncate");
-    ASCENDC_ASSERT((count <= src.GetSize() && count <= dst.GetSize()), {
-        KERNEL_LOG(KERNEL_ERROR,
-                   "count is %u, which should not larger than tensor size of dst / src", count);
-    });
+    ASCENDC_DEBUG_ASSERT((count <= src.GetSize() && count <= dst.GetSize()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                   "count is %u, which should not larger than tensor size of dst / src", count)
+    );
     TruncateImpl<PrimType, roundMode>((__ubuf__ PrimType *)dst.GetPhyAddr(),(__ubuf__ PrimType *)src.GetPhyAddr(), count);
 }
 #endif

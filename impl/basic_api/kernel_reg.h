@@ -39,10 +39,10 @@ __aicore__ static inline void SetVectorMaskImpl(const uint64_t maskHigh, const u
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     if constexpr (sizeof(PrimT<T>) >= sizeof(int32_t)) {
-        ASCENDC_ASSERT((maskHigh == 0ULL), { KERNEL_LOG(KERNEL_ERROR, "maskHigh must be 0 for type b32 and b64"); });
+        ASCENDC_DEBUG_ASSERT((maskHigh == 0ULL), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "maskHigh must be 0 for type b32 and b64"));
     }
-    ASCENDC_ASSERT(((maskLow != 0ULL) || (maskHigh != 0ULL)),
-                   { KERNEL_LOG(KERNEL_ERROR, "maskLow and maskHigh can not be zero at the same time"); });
+    ASCENDC_DEBUG_ASSERT(((maskLow != 0ULL) || (maskHigh != 0ULL)),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "maskLow and maskHigh can not be zero at the same time"));
 #endif
 #endif
     if ASCEND_IS_NOT_AIC {

@@ -75,12 +75,12 @@ __aicore__ inline void GetUintDivMagicAndShiftImpl(T& magic, T& shift, T divisor
 
     if constexpr (std::is_same<T, uint32_t>::value) {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT(divisor <= ConstantsInternal::INT_32_MAX && divisor > 0, { KERNEL_LOG(KERNEL_ERROR, "divisor must not be greater than INT32_MAX"); });
+        ASCENDC_DEBUG_ASSERT(divisor <= ConstantsInternal::INT_32_MAX && divisor > 0, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "divisor must not be greater than INT32_MAX"));
 #endif
         magic = (1l << ConstantsInternal::BIT_32_LEN) * ((1l << shift) - divisor) / divisor + 1;
     } else if constexpr (std::is_same<T, uint64_t>::value) {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT(divisor <= ConstantsInternal::INT_64_MAX && divisor > 0, { KERNEL_LOG(KERNEL_ERROR, "divisor must not be greater than INT_64_MAX"); });
+        ASCENDC_DEBUG_ASSERT(divisor <= ConstantsInternal::INT_64_MAX && divisor > 0, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "divisor must not be greater than INT_64_MAX"));
 #endif
         uint64_t dividend = 0;
         if (shift < ConstantsInternal::BIT_64_LEN) {
@@ -160,8 +160,8 @@ __aicore__ inline half CastF322F16Impl(float valueIn)
         case RoundMode::CAST_ODD:
             return conv_f322f16o(valueIn);
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             return 0;
     }
 }
@@ -179,8 +179,8 @@ __aicore__ inline int32_t CastF322S32Impl(float valueIn)
         case RoundMode::CAST_RINT:
             return conv_f322s32r(valueIn);
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             return 0;
     }
 }
@@ -202,7 +202,7 @@ __aicore__ inline U CastImpl(T valueIn)
         return 0;
     }
 #else
-    ASCENDC_ASSERT((false), "Cast is not supported on current device");
+    ASCENDC_DEBUG_ASSERT((false), "Cast is not supported on current device");
     return 0;
 #endif
 }
@@ -217,7 +217,7 @@ __aicore__ inline U ScalarCastImpl(T valueIn)
     (__NPU_ARCH__ == 3510))
     return CastImpl<T, U, roundMode>(valueIn);
 #else
-    ASCENDC_ASSERT((false), "ScalarCast is not supported on current device");
+    ASCENDC_DEBUG_ASSERT((false), "ScalarCast is not supported on current device");
     return 0;
 #endif
 }
