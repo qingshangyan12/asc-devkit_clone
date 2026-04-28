@@ -84,6 +84,20 @@ foreach(product_type ${SIMT_PRODUCT_TYPE_LIST})
         TARGET ascendc_ut_simt_api_${product_type}
         TASK_NUM 1
     )
+    add_subdirectory(cooperative_groups)
+    add_dependencies(ascendc_ut_simt_api_${product_type} 
+        cg_thread_block
+        cg_thread_block_tile
+        cg_coalesced_group
+        cg_tiled_partition
+        cg_shuffle_functions
+        cg_vote_functions
+        cg_thread_block_fusion
+        cg_thread_block_tile_fusion
+        cg_coalesced_group_fusion
+        cg_shuffle_functions_fusion
+        cg_vote_functions_fusion
+    )
     add_subdirectory(math)
     add_dependencies(ascendc_ut_simt_api_${product_type} math)
     add_subdirectory(math_half)
