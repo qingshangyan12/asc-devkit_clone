@@ -27,10 +27,8 @@ def gen_golden_data_simple(scenario_num):
     if scenario_num == 1:
         golden = np.maximum(x, y)
     else:
-        golden = y
-        for i in range(total_length):
-            if x[i] > scalar:
-                golden[i] = x[i]
+        golden = y.copy()
+        golden[x > scalar] = x[x > scalar]
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     x.tofile('./input/input_x.bin')
