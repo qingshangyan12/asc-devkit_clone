@@ -27,15 +27,16 @@
 #ifndef LIB_MATH_ATAN_H
 #define LIB_MATH_ATAN_H
 
+#include "kernel_tensor.h"
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-
-#include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/atan/atan_common_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/math/atan/atan_3510_impl.h"
+#endif
 #endif
 
 namespace AscendC {
@@ -84,7 +85,10 @@ template <typename T, bool isReuseSource = false, const AtanConfig& config = def
 __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     AtanImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+#endif
 }
 
  /*!
@@ -118,7 +122,10 @@ template <typename T, bool isReuseSource = false, const AtanConfig& config = def
 __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const uint32_t calCount)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     AtanImpl<T, isReuseSource, config>(dstTensor, srcTensor, calCount);
+#endif
 }
 #else
  /*!
@@ -163,7 +170,10 @@ template <typename T, bool isReuseSource = false>
 __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     AtanImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+#endif
 }
 
  /*!
@@ -197,13 +207,15 @@ template <typename T, bool isReuseSource = false>
 __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const uint32_t calCount)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     AtanImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
+#endif
 }
 #endif
 #pragma end_pipe
 }  // namespace AscendC
 
-#endif
 #endif  // LIB_MATH_ATAN_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ATAN_H__)
