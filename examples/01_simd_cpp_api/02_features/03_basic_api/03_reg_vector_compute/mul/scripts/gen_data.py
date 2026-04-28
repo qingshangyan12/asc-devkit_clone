@@ -15,13 +15,12 @@
 import os
 import numpy as np
 
-def gen_golden_data_simple():
-    total_length = 256
+
+def gen_golden_data():
+    total_length = 1024
     data_type = np.float32
-    # 生成两个 [1, 256] 矩阵
     x = np.random.uniform(1, 2, [1, total_length]).astype(data_type)
     y = np.random.uniform(1, 2, [1, total_length]).astype(data_type)
-    # 计算逐元素乘法 z = x * y
     golden = x * y
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -29,5 +28,6 @@ def gen_golden_data_simple():
     y.tofile('./input/input_y.bin')
     golden.tofile('./output/golden.bin')
 
+
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    gen_golden_data()

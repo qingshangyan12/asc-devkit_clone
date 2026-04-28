@@ -16,15 +16,13 @@ TrianUpperMatmulPolicy（上三角模板策略）和TrianLowerMatmulPolicy（下
 │   └── matmul_triangle.asc     // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   使用上三角模板策略时，index为0、5、10、15的核，使用上三角模板策略进行三角矩阵计算；index为4、8、9、12、13、14的核，进行常规的矩阵乘计算；index为1、2、3、6、7、11的核不执行计算。  
   使用下三角模板策略时，index为0、5、10、15的核，使用下三角模板策略进行三角矩阵计算；index为1、2、3、6、7、11的核，进行常规的矩阵乘计算；index为4、8、9、12、13、14的核不执行计算。
 
   ![mm_triangle.png](../../../../../docs/api/context/figures/mm_triangle.png)
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 2558, N = 2045, K = 128。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

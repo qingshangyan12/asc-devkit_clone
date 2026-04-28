@@ -22,11 +22,10 @@
 
 ## 样例描述
 
-- 样例功能： 
+- 样例功能：  
   MatmulColumnMajorCustom样例调用Matmul API计算时，将列方向上的元素在内存连续的A、B、C矩阵的Format参数设置为CubeFormat::COLUMN_MAJOR，实现列优先排布的矩阵乘法。样例实现了对输入的A、B矩阵做矩阵乘、加bias偏置的功能。
 
 - 样例规格：  
-
     本样例中：M = 428, N = 479, K = 528。
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulColumnMajor</td></tr>

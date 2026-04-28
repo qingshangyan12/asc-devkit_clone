@@ -384,6 +384,24 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ float* address, float
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ float2* address, float2 val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ float4* address, float4 val);
+#else
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __isGlobal(const void* ptr);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __isUbuf(const void* ptr);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __isLocal(const void* ptr);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ size_t __cvta_generic_to_global(const void* ptr);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ size_t __cvta_generic_to_ubuf(const void* ptr);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ size_t __cvta_generic_to_local(const void* ptr);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ void* __cvta_global_to_generic(size_t rawbits);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ void* __cvta_ubuf_to_generic(size_t rawbits);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ void* __cvta_local_to_generic(size_t rawbits);
 #endif
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ int __mulhi(int x, int y);
@@ -423,6 +441,26 @@ static __SIMT_DEVICE_FUNCTIONS_DECL__ int __popc(unsigned long long x);
 static __SIMT_DEVICE_FUNCTIONS_DECL__ int __popc(unsigned long x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ float __saturatef(float x);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __sad(int x, int y, unsigned int z);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __usad(unsigned int x, unsigned int y, unsigned int z);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int __mul24(int x, int y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __umul24(unsigned int x, unsigned int y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ float __fdividef(float x, float y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int __hadd(int x, int y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int __rhadd(int x, int y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __uhadd(unsigned int x, unsigned int y);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __urhadd(unsigned int x, unsigned int y);
 
 #include "impl/simt_api/device_functions_impl.h"
 

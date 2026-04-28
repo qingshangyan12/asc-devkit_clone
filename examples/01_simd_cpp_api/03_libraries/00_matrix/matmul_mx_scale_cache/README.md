@@ -23,8 +23,7 @@
 
 ## 样例描述
 
-- 样例功能： 
-
+- 样例功能：  
   Matmul Tiling中的mxTypePara参数表示scale多倍缓存。其中：  
   - mxTypePara[0:7]表示 scaleA 与 A 矩阵在 K 方向载入数据量的比例系数scaleFactorKa。
   - mxTypePara[8:15]表示 scaleB 与 B 矩阵在 K 方向载入数据量的比例系数scaleFactorKb。
@@ -37,8 +36,7 @@
   - 对于scaleA矩阵，仅scaleA的K方向在L1上全载时，才允许使能M方向多倍缓存。
   - 对于scaleB矩阵，仅scaleB的K方向在L1上全载时，才允许使能N方向多倍缓存。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 32，N = 128，K = 128，scaleK = 4。其中scaleK为K整除32的结果4。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulMxTypeParaCustom</td></tr>
