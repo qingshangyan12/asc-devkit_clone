@@ -277,6 +277,13 @@ __aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args
     std::printf(fmt, args...);
 }
 
+template <typename... Args>
+inline __aicore__ void printf_impl_assert_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
+    const __gm__ char* __function, const __gm__ char* fmt, Args&&... args) {
+    std::printf(fmt, args...);
+    std::printf("[ASSERT] %s:%u: %s: Assertion `%s' failed.\n",  __file, __line, __function, __assertion);
+}
+
 template <class... Args>
 __aicore__ inline void scalar_printf_impl(DumpType debugType, __gm__ const char* fmt, Args&&... args) {}
 
