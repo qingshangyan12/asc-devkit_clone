@@ -18,7 +18,7 @@
 │   ├── set_atomic_add_multi_aic.h    // 多AIC核同步实现
 │   ├── set_atomic_add_multi_aiv.h    // 多AIV核同步实现
 │   ├── set_atomic_add_single_aiv.h   // 单AIV核同步实现
-│   ├── set_atomic_determine_compute.asc  // Ascend C算子实现 & 调用样例
+│   ├── set_atomic_determine_compute.asc  // Ascend C样例实现 & 调用样例
 ```
 
 ## 1. 确定性计算
@@ -171,31 +171,31 @@ if (GetBlockIdx == 0) {
    向GM搬运data3;    
 }
 ```
-由于当前未提供用于控制不同核之间执行顺序的硬件同步接口，因此确定性计算场景下的核间同步需通过软件方式实现。针对纯 Vector 算子、纯 Cube 算子及 Mix（同时包含 Vector 与 Cube 计算）算子三种场景，所采用的软件同步方案存在差异，具体如下表所示。
+由于当前未提供用于控制不同核之间执行顺序的硬件同步接口，因此确定性计算场景下的核间同步需通过软件方式实现。针对纯 Vector 样例、纯 Cube 样例及 Mix（同时包含 Vector 与 Cube 计算）样例三种场景，所采用的软件同步方案存在差异，具体如下表所示。
 
 <table border="1" style="text-align: left;">
   <tr>
-    <th style="padding: 8px;">算子类型</th>
+    <th style="padding: 8px;">样例类型</th>
     <th style="padding: 8px;">软件同步方案</th>
     <th style="padding: 8px;">说明</th>
   </tr>
   <tr>
-    <td style="padding: 8px;">纯Vector算子</td>
+    <td style="padding: 8px;">纯Vector样例</td>
     <td style="padding: 8px;">方案1：通过多对IBSet和IBWait接口组合，可实现多个AIV间的同步，可参考样例中SCENARIO_NUM=2的分支。</td>
     <td style="padding: 8px;">方案1支持指定部分AIV参与同步，并可控制各AIV的执行顺序。</td>
   </tr>
   <tr>
-    <td style="padding: 8px;">纯Vector算子</td>
+    <td style="padding: 8px;">纯Vector样例</td>
     <td style="padding: 8px;">方案2： 通过InitDetermineComputeWorkspace、NotifyNextBlock 和 WaitPreBlock三个接口配合使用，确保所有AIV核按照blockIdx升序顺序执行，可参考样例中SCENARIO_NUM=4的分支(待支持)。</td>
     <td style="padding: 8px;">方案2要求所有AIV必须参与同步，且执行顺序固定为blockIdx升序。</td>
   </tr>
   <tr>
-    <td style="padding: 8px;">纯Cube算子</td>
+    <td style="padding: 8px;">纯Cube样例</td>
     <td style="padding: 8px;">通过GM中的信号量实现核间同步，先建立一对核之间的同步，进而扩展至多个核之间的同步，可参考样例中SCENARIO_NUM=3的分支。</td>
     <td style="padding: 8px;">通过Scalar单元访问GM时，需考虑多核间数据一致性问题。<br>此处的"核"可以是AIV或者AIC。</td>
   </tr>
   <tr>
-    <td style="padding: 8px;">Mix算子</td>
+    <td style="padding: 8px;">Mix样例</td>
     <td style="padding: 8px;"></td>
     <td style="padding: 8px;"></td>
   </tr>
@@ -277,7 +277,7 @@ $$
 - **同步机制**：使用 PipeBarrier 确保每次原子操作完成后再执行下一次
 
 - **样例规格**：
-  <table border="1" align="center">
+  <table border="1">
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">SetAtomicAddSingleAiv</td></tr>
   <tr><td rowspan="5" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">src0</td><td align="center">[8]</td><td align="center">float32</td><td align="center">ND</td></tr>
@@ -292,7 +292,7 @@ $$
 这两个场景的核心逻辑相同，区别在于累加的数据分布在多个AIV核或AIC核上。相较于单个核场景，多核场景需要在AIV核间或AIC核间进行同步，因此输入新增了sync_buf参数，用于存储GM上核间同步信号量，其初始值必须为0。
 
 - **样例规格**：
-  <table border="1" align="center">
+  <table border="1">
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">SetAtomicAddMultiCore</td></tr>
   <tr><td rowspan="6" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">src0</td><td align="center">[8]</td><td align="center">float32</td><td align="center">ND</td></tr>
@@ -314,7 +314,7 @@ $$
 </table>
 
 ## 编译运行  
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
