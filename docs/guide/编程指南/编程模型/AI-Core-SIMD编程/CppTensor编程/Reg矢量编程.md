@@ -199,4 +199,3 @@ __aicore__ inline void Compute()
      inQueueY.FreeTensor(src1);
 }
 ```
-

@@ -1,0 +1,51 @@
+# SIMD编程概述
+
+SIMD编程是Ascend C的核心编程方式之一，它的特点xxx它包括xxx它擅长xxx使用xxx场景。
+
+---
+
+## Cube/Vector/Mix类型算子编程
+
+### AI Core抽象硬件架构（一张图同时体现Membase和Regbase）
+
+### Cube计算编程
+// 介绍什么是Cube算子编程，有哪些典型Cube算子，典型Cube算子编程范式是什么（数据搬入L1与L0A/B -> cube计算 -> 数据搬出L0C与L1或GM）。
+
+### Vector计算编程
+// 介绍什么是Vector算子编程，有哪些典型Vector算子，典型Cube算子编程范式是什么（数据搬入UB/Reg -> Vector计算 -> 数据搬出UB/Reg）。
+
+#### Membase Vector计算编程
+// 介绍概念、原理、应用场景
+
+#### Regbase Vector编程
+// 介绍介绍概念、原理、应用场景，核心特点，相较于Membase Vector计算编程的优势。
+
+#### 矢量编程类型对比与适用场景
+
+| 编程模型 | 访存单元 | 核心特点 | 典型适用场景 |
+| :--- | :--- | :--- | :--- |
+| **Membase矢量编程** | UB | xxx | xxx |
+| **Regbase矢量编程** | Reg | xxx | xxx|
+
+
+### Mix算子编程
+// 介绍什么是Mix算子编程，为什么要Mix算子编程，有哪些典型的Mix算子，典型的Mix算子编程范式是什么（数据搬入L1与L0A/B -> cube计算 -> UB -> reg(可选) -> Vector计算 -> 数据搬出UB）
+
+---
+
+## 编程范式解析
+
+### C 指针编程
+// 说明什么是C 指针编程，及其大致编程框架。
+* **优势**：xxx。
+* **参考**：xxx。
+
+### C++ Tensor编程
+// 说明什么是C++ Tensor编程，及其大致编程框架。
+* **注意**：xxx
+* **参考**：xxx
+
+### TPipe&TQue框架编程
+// 说明什么是TPipe&TQue编程，及其大致编程框架。
+* **优势**：xxx。
+* **参考**：xxx。

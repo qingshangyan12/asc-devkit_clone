@@ -186,4 +186,3 @@ __aicore__ inline void MatmulLeakyKernel<aType, bType, cType, biasType>::Process
     matmulObj.End();
 }
 ```
-

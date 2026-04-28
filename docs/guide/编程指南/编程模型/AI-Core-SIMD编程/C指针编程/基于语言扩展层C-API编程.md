@@ -359,4 +359,3 @@ __vector__ __global__ __aicore__ void add_custom(__gm__ float* x, __gm__ float* 
     asc_copy_ub2gm_align(zGm, (__ubuf__ float*)zLocal, BLK_NUM, burstLength, cacheMode2, srcStride, dstStride);
 }
 ```
-
