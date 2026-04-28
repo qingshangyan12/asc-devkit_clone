@@ -22,7 +22,6 @@
 #ifndef LIB_MATH_IS_INF_H
 #define LIB_MATH_IS_INF_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/math/isinf/is_inf_common_impl.h"
 
@@ -62,7 +61,6 @@ __aicore__ inline void IsInf(const LocalTensor<T>& dst, const LocalTensor<U>& sr
 }
 #pragma end_pipe
 }  // namespace AscendC
-#endif
 #endif  // LIB_MATH_IS_INF_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_IS_INF_H__)

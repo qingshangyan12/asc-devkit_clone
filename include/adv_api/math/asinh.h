@@ -21,15 +21,9 @@
 
 #ifndef LIB_MATH_ASINH_H
 #define LIB_MATH_ASINH_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/asinh/asinh_common_impl.h"
-#else
-#include "../../../impl/adv_api/detail/math/asinh/asinh_3510_impl.h"
-#endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 
 namespace AscendC {
 #pragma begin_pipe(V)
@@ -100,8 +94,6 @@ __aicore__ inline void Asinh(const LocalTensor<T>& dstTensor, const LocalTensor<
 }
 #pragma end_pipe
 }
-#endif
-#endif
 #endif // LIB_MATH_ASINH_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASINH_H__)

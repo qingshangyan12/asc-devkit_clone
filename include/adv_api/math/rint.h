@@ -22,7 +22,6 @@
 #ifndef LIB_MATH_RINT_H
 #define LIB_MATH_RINT_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/math/rint/rint_common_impl.h"
 
@@ -57,7 +56,6 @@ __aicore__ inline void Rint(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 #pragma end_pipe
 } // namespace AscendC
-#endif
 #endif // LIB_MATH_RINT_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_RINT_H__)
