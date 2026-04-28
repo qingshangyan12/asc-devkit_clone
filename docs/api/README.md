@@ -12,7 +12,7 @@ Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/
 </tr>
 </thead>
 <tbody>
-<tr id="row_simd_1"><td class="cellrowborder" rowspan="3" valign="top" headers="mcps1.1.3.1.1"><p id="p_simd">SIMD API</p>
+<tr id="row_simd_1"><td class="cellrowborder" rowspan="3" valign="top" headers="mcps1.1.3.1.1"><p id="p_simd"><a href="#section117632211201">SIMD API</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_base"><a href="#section117632211201">基础API</a></p>
 </td>
@@ -93,7 +93,8 @@ kernel API中使用到的基础数据结构，比如GlobalTensor和LocalTensor�
 </tbody>
 </table>
 
-## 基础API<a name="section117632211201"></a>
+## SIMD API
+### 基础API<a name="section117632211201"></a>
 
 **表 2**  标量计算API列表
 
@@ -1397,7 +1398,11 @@ kernel API中使用到的基础数据结构，比如GlobalTensor和LocalTensor�
 </tbody>
 </table>
 
-## 高阶API<a name="section3317105813235"></a>
+## C API
+
+[C API列表](context/c_api/README.md)
+
+### 高阶API<a name="section3317105813235"></a>
 
 **表 14**  数学计算API列表
 
@@ -4284,7 +4289,3 @@ kernel API中使用到的基础数据结构，比如GlobalTensor和LocalTensor�
 </tr>
 </tbody>
 </table>
-
-## C API
-
-[C API列表](context/c_api/README.md)
