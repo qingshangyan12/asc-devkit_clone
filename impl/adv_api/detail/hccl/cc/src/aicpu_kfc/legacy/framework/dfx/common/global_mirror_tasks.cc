@@ -37,6 +37,8 @@ u32 GlobalMirrorTasks::DevSize() const
 TaskInfoQueue *GlobalMirrorTasks::GetQueue(u32 devId, u32 streamId) const
 {
     if (devId >= DEVICE_MAX_NUM) {
+        HCCL_ERROR("YYYYYY asc dfx [GlobalMirrorTasks::GetQueue] devId[%u] out of range, streamId[%u]",
+            devId, streamId);
         HCCL_ERROR("GloablMirrorTasks::GetQueue devId[%u] out of range", devId);
         THROW<InternalException>(
             StringFormat("GloablMirrorTasks::GetQueue devId[%u] out of range", devId));
@@ -45,11 +47,16 @@ TaskInfoQueue *GlobalMirrorTasks::GetQueue(u32 devId, u32 streamId) const
     auto &devMap         = taskMaps_[devId];
     auto  streamIterator = devMap.find(streamId);
     if (streamIterator == devMap.end()) {
+        HCCL_ERROR("YYYYYY asc dfx [GlobalMirrorTasks::GetQueue] devId[%u], streamId(sqId)[%u] not found, "
+            "devMapSize[%llu]", devId, streamId, static_cast<unsigned long long>(devMap.size()));
         HCCL_ERROR("GloablMirrorTasks::GetQueue devId[%u] streamId(sqId)[%u] do not found", devId, streamId);
         THROW<InternalException>(
             StringFormat("GloablMirrorTasks::GetQueue devId[%u] streamId(sqId)[%u] do not found", devId, streamId));
     }
 
+    HCCL_INFO("YYYYYY asc dfx [GlobalMirrorTasks::GetQueue] success, devId[%u], streamId(sqId)[%u], queue[%p], "
+        "devMapSize[%llu]", devId, streamId, streamIterator->second.get(),
+        static_cast<unsigned long long>(devMap.size()));
     HCCL_INFO("[GlobalMirrorTasks][GetQueue]find devId[%u] streamId(sqId)[%u]", devId, streamId);
 
     return streamIterator->second.get();
@@ -94,10 +101,13 @@ void GlobalMirrorTasks::DestroyQueue(u32 devId, u32 streamId)
 
 std::shared_ptr<TaskInfo> GlobalMirrorTasks::GetTaskInfo(u32 devId, u32 streamId, u32 taskId) const
 {
+    HCCL_INFO("YYYYYY asc dfx [GlobalMirrorTasks::GetTaskInfo] start, devId[%u], streamId(sqId)[%u], "
+        "taskId(sqeId)[%u]", devId, streamId, taskId);
     TaskInfoQueue *queue = nullptr;
     try {
         queue = GetQueue(devId, streamId);
     }catch(HcclException &e){
+        HCCL_ERROR("YYYYYY asc dfx [GlobalMirrorTasks::GetTaskInfo] Hccl exception %s was caught.", e.what());
         return nullptr;
     }
 
@@ -107,9 +117,14 @@ std::shared_ptr<TaskInfo> GlobalMirrorTasks::GetTaskInfo(u32 devId, u32 streamId
 
     auto task = *queue->Find(FindTask);
     if (task == *queue->End()) {
+        HCCL_ERROR("YYYYYY asc dfx [GlobalMirrorTasks::GetTaskInfo] not found, devId[%u], streamId(sqId)[%u], "
+            "taskId(sqeId)[%u], queue[%p]", devId, streamId, taskId, queue);
         return nullptr;
     };
 
+    HCCL_INFO("YYYYYY asc dfx [GlobalMirrorTasks::GetTaskInfo] success, devId[%u], streamId(sqId)[%u], "
+        "taskId(sqeId)[%u], taskInfo[%p], dfxOpInfo[%p]", devId, streamId, taskId, (*task).get(),
+        (*task)->dfxOpInfo_.get());
     HCCL_INFO("[GlobalMirrorTasks][GetTaskInfo]find devId[%u] streamId(sqId)[%u] taskId(sqeId)[%u]", devId, streamId, taskId);
 
     return *task;
