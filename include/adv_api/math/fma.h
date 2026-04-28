@@ -22,6 +22,7 @@
 #ifndef LIB_MATH_FMA_H
 #define LIB_MATH_FMA_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/math/fma/fma_common_impl.h"
 
@@ -71,6 +72,7 @@ __aicore__ inline void Fma(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 
 #pragma end_pipe
 } // namespace AscendC
+#endif
 #endif // LIB_MATH_FMA_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_FMA_H__)

@@ -21,9 +21,14 @@
 #ifndef LIB_MATH_CLAMP_H
 #define LIB_MATH_CLAMP_H
 #include "kernel_tensor.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+#include "../../../impl/adv_api/detail/math/clamp/clamp_common_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/clamp/clamp_3510_impl.h"
+#endif
 #include "kernel_pop_stack_buffer.h"
  
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 namespace AscendC {
 /* !
  * \brief This function implements replaces numbers greater than scalar with scalar
@@ -110,6 +115,7 @@ __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTens
     ClampMinImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scalar, calCount);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 /* !
  * \brief This function implements replaces numbers greater than min with min and less than max with max
  * (e.g. Clamp(2, 5) means to replace numbers greater than 2 with 2 and less than 5 with 5). For details about the interface description, see
@@ -131,8 +137,10 @@ __aicore__ inline void Clamp(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 {
     ClampImpl<config, T, U, S>(dst, src, min, max, count);
 }
+#endif
 #pragma end_pipe
 } // namespace AscendC
+#endif
 #endif // LIB_MATH_CLAMP_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CLAMP_H__)

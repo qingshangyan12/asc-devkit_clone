@@ -21,6 +21,7 @@
 #ifndef LIB_MATH_DIGAMMA_H
 #define LIB_MATH_DIGAMMA_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 
 #include "kernel_tensor.h"
 #include "kernel_pop_stack_buffer.h"
@@ -75,6 +76,7 @@ __aicore__ inline void Digamma(const LocalTensor<T>& dstTensor, const LocalTenso
 #pragma end_pipe
 } // namespace AscendC
 
+#endif
 
 #endif // LIB_MATH_DIGAMMA_H
 
