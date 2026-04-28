@@ -81,6 +81,7 @@ HcclResult AicpuIndopProcess::AcquireAicpuCommMgr(const std::string &group, Coll
 
 HcclResult AicpuIndopProcess::AicpuIndOpThreadInit(ThreadMgrAicpuParam *param)
 {
+    HCCL_INFO("YYYYYY asc  run AicpuIndOpThreadInit, %p", param);
     CHK_PTR_NULL(param);
 
     std::string group = param->hcomId;
@@ -91,6 +92,7 @@ HcclResult AicpuIndopProcess::AicpuIndOpThreadInit(ThreadMgrAicpuParam *param)
         HCCL_ERROR("[AicpuIndopProcess][AicpuIndOpThreadInit]errNo[0x%016llx] Failed to init threads group[%s]",
         HCCL_ERROR_CODE(ret), group.c_str()), ret);
     AicpuReleaseCommMgrbyGroup(group);
+    HCCL_INFO("YYYYYY asc  end AicpuIndOpThreadInit, %p", param);
     return HCCL_SUCCESS;
 }
 
@@ -139,16 +141,18 @@ CollCommAicpuMgr *AicpuIndopProcess::AicpuGetCommMgrbyGroup(const std::string &g
 
 void AicpuIndopProcess::AicpuReleaseCommMgrbyGroup(const std::string &group)
 {
+    HCCL_INFO("YYYYYY asc  run AicpuReleaseCommMgrbyGroup, %s", group.c_str());
     ReadWriteLock rwlock(g_commAicpuInfo.commAicpuMgrMapMutex);
     rwlock.readLock();
     auto iter = g_commAicpuInfo.commMgrMap.find(group);
     if (iter == g_commAicpuInfo.commMgrMap.end()) {
         rwlock.readUnlock();
+        HCCL_INFO("YYYYYY asc  end AicpuReleaseCommMgrbyGroup, %s", group.c_str());
         return;
     }
     g_hcclComm = nullptr;
     iter->second->SetUsed(false);
-    rwlock.readUnlock();
+    HCCL_INFO("YYYYYY asc  end AicpuReleaseCommMgrbyGroup, %s", group.c_str());
 }
 
 ReadWriteLockBase& AicpuIndopProcess::AicpuGetCommMutex()
@@ -158,6 +162,7 @@ ReadWriteLockBase& AicpuIndopProcess::AicpuGetCommMutex()
 
 HcclResult AicpuIndopProcess::AicpuIndOpChannelInit(HcclChannelUrmaRes *commParam)
 {
+    HCCL_INFO("YYYYYY asc  run AicpuIndOpChannelInit, %p", commParam);
     CHK_PTR_NULL(commParam);
 
     HCCL_INFO("[AicpuIndopProcess][%s] commParam->channelList[%p], commParam->listNum[%u], commParam->uniqueIdAddr[%p], "
@@ -169,6 +174,7 @@ HcclResult AicpuIndopProcess::AicpuIndOpChannelInit(HcclChannelUrmaRes *commPara
     CHK_PRT_RET(collCommAicpuMgr == nullptr, HCCL_ERROR("%s collCommAicpuMgr is null, group[%s]", __func__, group.c_str()), HCCL_E_PTR);
 
     HcclResult ret = collCommAicpuMgr->AllocChannelResource(commParam);
+    HCCL_INFO("YYYYYY asc  run AllocChannelResource end");
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[AicpuIndopProcess][AicpuIndOpChannelInit]errNo[0x%016llx] Failed to init channels group[%s]",
         HCCL_ERROR_CODE(ret), group.c_str()), ret);
