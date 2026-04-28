@@ -43,9 +43,8 @@ EXAMPLE_LIST=(
     01_simd_cpp_api/00_introduction/02_matrix/matmul
     01_simd_cpp_api/00_introduction/03_fusion_operation/matmul_leakyrelu
     01_simd_cpp_api/01_utilities/03_cpudebug
+
     01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/batch_mmad
-    01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_co12c1_tensor_quantization_s322f16
-    01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_co12gm_tensor_quantization_s322f16
     01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0
     01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2
     01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/brcb
@@ -264,6 +263,9 @@ run_test_case() {
             ;;
         basic_api_memory_allocator_add)
             run_with_params "${code_path}" "${example_name}" "" "" "add" 2>&1 | tee "${log_path}/${case_name}.log"
+            ;;
+        fixpipe_l0c2gm)
+            run_with_params "${code_path}" "${example_name}" "-DSCENARIO_NUM=1" "-scenarioNum=1" "demo" "output/output.bin output/golden.bin" 2>&1 | tee "${log_path}/${case_name}.log"
             ;;
         batch_mmad)
             run_with_params "${code_path}" "${example_name}" "-DB_SIZE=4 -DM_SIZE=30 -DK_SIZE=40 -DN_SIZE=70" "-b=4 -m=30 -k=40 -n=70" 2>&1 | tee "${log_path}/${case_name}.log"
