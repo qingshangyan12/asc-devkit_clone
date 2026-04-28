@@ -676,7 +676,6 @@ main() {
   elif [ -n "$TEST_PART" ]; then
     build_test_part
   elif [ -n "${PKG}" ]; then
-    ENABLE_SIGN="true"
     mkdir -p ${BUILD_DEVICE_DIR}
     cd ${BUILD_DEVICE_DIR}
     CURRENT_CUSTOM_OPTION="${CUSTOM_OPTION}"
