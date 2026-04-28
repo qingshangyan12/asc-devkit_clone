@@ -22,11 +22,20 @@
 #ifndef LIB_MATH_LOGICAL_OR_H
 #define LIB_MATH_LOGICAL_OR_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/logical_or/logical_or_common_impl.h"
+#endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
+struct LogicalOrConfig {
+    bool isReuseSource;
+};
+constexpr LogicalOrConfig DEFAULT_LOGICAL_OR_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup LogicalOr
@@ -39,12 +48,13 @@ template <const LogicalOrConfig& config = DEFAULT_LOGICAL_OR_CONFIG, typename T,
 __aicore__ inline void LogicalOr(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
     const LocalTensor<U>& src1, const uint32_t count)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     LogicalOrImpl<config, T, U>(dst, src0, src1, count);
+#endif
 }
 
 #pragma end_pipe
 } // namespace AscendC
-#endif
 #endif // LIB_MATH_LOGICAL_OR_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_OR_H__)
