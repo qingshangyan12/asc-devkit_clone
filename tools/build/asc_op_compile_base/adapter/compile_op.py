@@ -1044,6 +1044,7 @@ def _update_compile_option(kernel_name: str, compile_options: list, extend_optio
     compile_options.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "impl"))
     compile_options.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "interface"))
     compile_options.append("-DASCENDC_DEBUG")
+    compile_options.append("--cce-long-call=true")
     if os.path.exists(cann_version_file_path):
         compile_options.append("-include" + cann_version_file_path)
     else:
