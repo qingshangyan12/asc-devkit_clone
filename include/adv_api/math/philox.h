@@ -20,11 +20,25 @@
 #ifndef LIB_MATH_PHILOX_H
 #define LIB_MATH_PHILOX_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/philox/philox_3510_impl.h"
+#endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
+constexpr uint16_t PHILOX_KEY_SIZE = 2;
+constexpr uint16_t PHILOX_COUNTER_SIZE = 4;
+using PhiloxKey = uint32_t[PHILOX_KEY_SIZE];
+using PhiloxCounter = uint32_t[PHILOX_COUNTER_SIZE];
+
+struct PhiloxRandomParams {
+    uint32_t stride;
+    uint32_t row;
+    uint32_t column;
+};
+#endif
 
 #pragma begin_pipe(V)
 
@@ -32,20 +46,23 @@ template <uint16_t Rounds = 7, typename T>
 __aicore__ inline void PhiloxRandom(
     const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey, const PhiloxCounter& philoxCounter, uint16_t count)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     PhiloxRandomImpl<Rounds>(dstLocal, philoxKey, philoxCounter, count);
+#endif
 }
 
 template <uint16_t Rounds = 7, typename T>
 __aicore__ inline void PhiloxRandom(const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey,
     const PhiloxCounter& philoxCounter, const PhiloxRandomParams& params)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     PhiloxRandomImpl<Rounds>(dstLocal, philoxKey, philoxCounter, params);
+#endif
 }
 
 #pragma end_pipe
 }  // namespace AscendC
 
-#endif
 #endif // LIB_MATH_PHILOX_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PHILOX_H__)
