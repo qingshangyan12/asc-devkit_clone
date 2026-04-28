@@ -27,16 +27,16 @@
 #include "kernel_tensor.h"
 
 namespace AscendC {
+namespace BroadcastInternal {
 template <typename T>
 __simd_vf__ inline void VfGenIndex(
     __ubuf__ T* indexUb, uint32_t sizeI0, uint32_t sizeI1, uint32_t sizeI2, uint32_t strideI0, uint32_t strideI1,
-    uint32_t strideI2, uint32_t offset)
+    uint32_t strideI2)
 {
     Reg::RegTensor<T> v0;
     Reg::RegTensor<T> v1;
     Reg::RegTensor<T> v2;
 
-    Reg::RegTensor<T> voffset;
     Reg::RegTensor<T> vr0;
 
     Reg::RegTensor<T> vd0;
@@ -79,22 +79,18 @@ __simd_vf__ inline void VfGenIndex(
     Reg::MulAddDst(vr0, vs1, vi1, p0);
     Reg::MulAddDst(vr0, vs0, vi0, p0);
 
-    Reg::Duplicate(voffset, (T)offset, p0);
-    Reg::Add(vr0, vr0, voffset, p0);
-
     Reg::StoreAlign(indexUb, vr0, p0);
 }
 
 template <typename T>
 __simd_vf__ inline void VfGenIndexForFourDim(
     __ubuf__ T* indexUb, uint32_t sizeI0, uint32_t sizeI1, uint32_t sizeI2, uint32_t sizeI3, uint32_t strideI0,
-    uint32_t strideI1, uint32_t strideI2, uint32_t strideI3, uint32_t offset)
+    uint32_t strideI1, uint32_t strideI2, uint32_t strideI3)
 {
     Reg::RegTensor<T> v0;
     Reg::RegTensor<T> v1;
     Reg::RegTensor<T> v2;
 
-    Reg::RegTensor<T> voffset;
     Reg::RegTensor<T> vr0;
 
     Reg::RegTensor<T> vd0;
@@ -147,83 +143,62 @@ __simd_vf__ inline void VfGenIndexForFourDim(
     Reg::MulAddDst(vr0, vs1, vi1, p0);
     Reg::MulAddDst(vr0, vs0, vi0, p0);
 
-    Reg::Duplicate(voffset, (T)offset, p0);
-    Reg::Add(vr0, vr0, voffset, p0);
-
     Reg::StoreAlign(indexUb, vr0, p0);
 }
 
 template <typename T>
 __simd_vf__ inline void VfGatherBrc(
-    __ubuf__ T* dstUb, __ubuf__ T* srcUb, __ubuf__ T* indexUb, uint16_t size0, uint16_t size1, uint16_t size2,
-    uint16_t srcStride0, uint16_t srcStride1, uint16_t srcStride2, uint32_t main, uint32_t tail)
+    __ubuf__ T* dstUb, __ubuf__ T* srcUb, __ubuf__ T* indexUb, uint16_t size1, uint16_t size2,
+    uint16_t srcStride1, uint16_t srcStride2, uint32_t main, uint32_t tail)
 {
     Reg::UnalignReg u0;
     Reg::RegTensor<T> vindex0;
     Reg::RegTensor<T> vindex;
-    Reg::RegTensor<T> vstride0;
     Reg::RegTensor<T> vstride1;
     Reg::RegTensor<T> vstride2;
-    Reg::RegTensor<T> vbase0;
     Reg::RegTensor<T> vbase1;
-    Reg::RegTensor<T> vbase2;
-    Reg::RegTensor<T> voffset0;
     Reg::RegTensor<T> voffset1;
     Reg::RegTensor<T> voffset2;
 
     Reg::RegTensor<T> vd0;
     Reg::RegTensor<T> vd1;
 
-    Reg::MaskReg pa;
-    Reg::MaskReg p0;
-    Reg::MaskReg p1;
-    pa = Reg::CreateMask<T>();
+    Reg::MaskReg pa = Reg::CreateMask<T>();
     uint32_t main1 = main;
     uint32_t tail1 = tail;
-    p0 = Reg::UpdateMask<T>(main);
-    p1 = Reg::UpdateMask<T>(tail);
-    Reg::Duplicate(vstride0, (T)srcStride0, pa);
     Reg::Duplicate(vstride1, (T)srcStride1, pa);
     Reg::Duplicate(vstride2, (T)srcStride2, pa);
     Reg::LoadAlign(vindex0, indexUb);
-    for (uint16_t i0 = 0; i0 < size0; ++i0) {
-        Reg::Muls(voffset0, vstride0, (T)i0, p0);
-        Reg::Add(vbase0, voffset0, vindex0, p0);
-        for (uint16_t i1 = 0; i1 < size1; ++i1) {
-            Reg::Muls(voffset1, vstride1, (T)i1, p0);
-            Reg::Add(vbase1, vbase0, voffset1, p0);
-            for (uint16_t i2 = 0; i2 < size2; ++i2) {
-                Reg::Muls(voffset2, vstride2, (T)i2, p0);
-                Reg::Add(vindex, vbase1, voffset2, p0);
-                Reg::Gather(vd0, srcUb, vindex, p0);
-                Reg::StoreUnAlign(dstUb, vd0, u0, main1);
-            }
-            Reg::Muls(voffset2, vstride2, (T)size2, p1);
-            Reg::Add(vindex, vbase1, voffset2, p1);
-            Reg::Gather(vd1, srcUb, vindex, p1);
-            Reg::StoreUnAlign(dstUb, vd1, u0, tail1);
+    for (uint16_t i1 = 0; i1 < size1; ++i1) {
+        Reg::Muls(voffset1, vstride1, (T)i1, pa);
+        Reg::Add(vbase1, vindex0, voffset1, pa);
+        for (uint16_t i2 = 0; i2 < size2; ++i2) {
+            Reg::Muls(voffset2, vstride2, (T)i2, pa);
+            Reg::Add(vindex, vbase1, voffset2, pa);
+            Reg::Gather(vd0, srcUb, vindex, pa);
+            Reg::StoreUnAlign(dstUb, vd0, u0, main1);
         }
+        Reg::Muls(voffset2, vstride2, (T)size2, pa);
+        Reg::Add(vindex, vbase1, voffset2, pa);
+        Reg::Gather(vd1, srcUb, vindex, pa);
+        Reg::StoreUnAlign(dstUb, vd1, u0, tail1);
     }
     Reg::StoreUnAlignPost(dstUb, u0, 0);
 }
 
 template <typename T>
 __simd_vf__ inline void VfGatherBrcForFourDim(
-    __ubuf__ T* dstUb, __ubuf__ T* srcUb, __ubuf__ T* indexUb, uint16_t size0, uint16_t size1, uint16_t size2,
-    uint16_t size3, uint16_t srcStride0, uint16_t srcStride1, uint16_t srcStride2, uint16_t srcStride3, uint32_t main,
-    uint32_t tail)
+    __ubuf__ T* dstUb, __ubuf__ T* srcUb, __ubuf__ T* indexUb, uint16_t size1, uint16_t size2, uint16_t size3,
+    uint16_t srcStride1, uint16_t srcStride2, uint16_t srcStride3, uint32_t main, uint32_t tail)
 {
     Reg::UnalignReg u0;
     Reg::RegTensor<T> vindex0;
     Reg::RegTensor<T> vindex;
-    Reg::RegTensor<T> vstride0;
     Reg::RegTensor<T> vstride1;
     Reg::RegTensor<T> vstride2;
     Reg::RegTensor<T> vstride3;
-    Reg::RegTensor<T> vbase0;
     Reg::RegTensor<T> vbase1;
     Reg::RegTensor<T> vbase2;
-    Reg::RegTensor<T> voffset0;
     Reg::RegTensor<T> voffset1;
     Reg::RegTensor<T> voffset2;
     Reg::RegTensor<T> voffset3;
@@ -239,45 +214,36 @@ __simd_vf__ inline void VfGatherBrcForFourDim(
     uint32_t tail1 = tail;
     p0 = Reg::UpdateMask<T>(main);
     p1 = Reg::UpdateMask<T>(tail);
-    Reg::Duplicate(vstride0, (T)srcStride0, pa);
     Reg::Duplicate(vstride1, (T)srcStride1, pa);
     Reg::Duplicate(vstride2, (T)srcStride2, pa);
     Reg::Duplicate(vstride3, (T)srcStride3, pa);
     Reg::LoadAlign(vindex0, indexUb);
-    for (uint16_t i0 = 0; i0 < size0; ++i0) {
-        Reg::Muls(voffset0, vstride0, (T)i0, p0);
-        Reg::Add(vbase0, voffset0, vindex0, p0);
-        for (uint16_t i1 = 0; i1 < size1; ++i1) {
-            Reg::Muls(voffset1, vstride1, (T)i1, p0);
-            Reg::Add(vbase1, vbase0, voffset1, p0);
-            for (uint16_t i2 = 0; i2 < size2; ++i2) {
-                Reg::Muls(voffset2, vstride2, (T)i2, p0);
-                Reg::Add(vbase2, vbase1, voffset2, p0);
-                for (uint16_t i3 = 0; i3 < size3; ++i3) {
-                    Reg::Muls(voffset3, vstride3, (T)i3, p0);
-                    Reg::Add(vindex, vbase2, voffset3, p0);
-                    Reg::Gather(vd0, srcUb, vindex, p0);
-                    Reg::StoreUnAlign(dstUb, vd0, u0, main1);
-                }
-                Reg::Muls(voffset3, vstride3, (T)size3, p1);
-                Reg::Add(vindex, vbase2, voffset3, p1);
-                Reg::Gather(vd1, srcUb, vindex, p1);
-                Reg::StoreUnAlign(dstUb, vd1, u0, tail1);
+    for (uint16_t i1 = 0; i1 < size1; ++i1) {
+        Reg::Muls(voffset1, vstride1, (T)i1, p0);
+        Reg::Add(vbase1, vindex0, voffset1, p0);
+        for (uint16_t i2 = 0; i2 < size2; ++i2) {
+            Reg::Muls(voffset2, vstride2, (T)i2, p0);
+            Reg::Add(vbase2, vbase1, voffset2, p0);
+            for (uint16_t i3 = 0; i3 < size3; ++i3) {
+                Reg::Muls(voffset3, vstride3, (T)i3, p0);
+                Reg::Add(vindex, vbase2, voffset3, p0);
+                Reg::Gather(vd0, srcUb, vindex, p0);
+                Reg::StoreUnAlign(dstUb, vd0, u0, main1);
             }
+            Reg::Muls(voffset3, vstride3, (T)size3, p1);
+            Reg::Add(vindex, vbase2, voffset3, p1);
+            Reg::Gather(vd1, srcUb, vindex, p1);
+            Reg::StoreUnAlign(dstUb, vd1, u0, tail1);
         }
     }
     Reg::StoreUnAlignPost(dstUb, u0, 0);
 }
 
 template <typename T>
-__aicore__ inline void GenGatherIndex(__ubuf__ T* indexUb, uint32_t* size, uint32_t* srcStride)
+__aicore__ inline void GenGatherIndex(__ubuf__ T* indexUb, const uint32_t* size, const uint32_t* srcStride)
 {
     constexpr uint32_t VF_LEN = GetVecLen() / sizeof(T);
     uint32_t sizeI[3];
-    uint32_t srcStrideI[3];
-    srcStrideI[0] = srcStride[0];
-    srcStrideI[1] = srcStride[1];
-    srcStrideI[2] = srcStride[2];
 
     if (size[2] * size[1] * size[0] < VF_LEN) {
         sizeI[0] = size[0];
@@ -287,29 +253,21 @@ __aicore__ inline void GenGatherIndex(__ubuf__ T* indexUb, uint32_t* size, uint3
         sizeI[0] = VF_LEN / (size[2] * size[1]);
         sizeI[1] = size[1];
         sizeI[2] = size[2];
-    } else if (size[2] < VF_LEN) {
+    } else {
         sizeI[0] = 1;
         sizeI[1] = VF_LEN / size[2];
         sizeI[2] = size[2];
-    } else {
-        sizeI[0] = 1;
-        sizeI[1] = 1;
-        sizeI[2] = VF_LEN;
     }
 
-    VfGenIndex<T>(indexUb, sizeI[0], sizeI[1], sizeI[2], srcStrideI[0], srcStrideI[1], srcStrideI[2], 0);
+    VfGenIndex<T>(indexUb, sizeI[0], sizeI[1], sizeI[2], srcStride[0], srcStride[1], srcStride[2]);
 }
 
 template <typename T>
-__aicore__ inline void GenGatherIndexForFourDim(__ubuf__ T* indexUb, uint32_t* size, uint32_t* srcStride)
+__aicore__ inline void GenGatherIndexForFourDim(
+    __ubuf__ T* indexUb, const uint32_t* size, const uint32_t* srcStride)
 {
     constexpr uint32_t VF_LEN = GetVecLen() / sizeof(T);
     uint32_t sizeI[4];
-    uint32_t srcStrideI[4];
-    srcStrideI[0] = srcStride[0];
-    srcStrideI[1] = srcStride[1];
-    srcStrideI[2] = srcStride[2];
-    srcStrideI[3] = srcStride[3];
 
     if (size[3] * size[2] * size[1] * size[0] < VF_LEN) {
         sizeI[0] = size[0];
@@ -326,28 +284,26 @@ __aicore__ inline void GenGatherIndexForFourDim(__ubuf__ T* indexUb, uint32_t* s
         sizeI[1] = VF_LEN / (size[3] * size[2]);
         sizeI[2] = size[2];
         sizeI[3] = size[3];
-    } else if (size[3] < VF_LEN) {
+    } else {
         sizeI[0] = 1;
         sizeI[1] = 1;
         sizeI[2] = VF_LEN / size[3];
         sizeI[3] = size[3];
-    } else {
-        sizeI[0] = 1;
-        sizeI[1] = 1;
-        sizeI[2] = 1;
-        sizeI[3] = VF_LEN;
     }
 
     VfGenIndexForFourDim<T>(
-        indexUb, sizeI[0], sizeI[1], sizeI[2], sizeI[3], srcStrideI[0], srcStrideI[1], srcStrideI[2], srcStrideI[3], 0);
+        indexUb, sizeI[0], sizeI[1], sizeI[2], sizeI[3], srcStride[0], srcStride[1], srcStride[2], srcStride[3]);
 }
 
 template <typename T>
-__aicore__ inline void GatherWrapper(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint32_t* size, uint32_t* srcStride)
+__aicore__ inline void GatherWrapper(
+    __ubuf__ T* dstUb, __ubuf__ T* srcUb, const uint32_t* size, const uint32_t* srcStride)
 {
     constexpr uint32_t VF_LEN = GetVecLen() / sizeof(T);
-    uint16_t sizeI[3];
-    uint16_t srcStrideI[3];
+    uint16_t sizeI1;
+    uint16_t sizeI2;
+    uint16_t srcStrideI1;
+    uint16_t srcStrideI2;
     uint32_t main;
     uint32_t tail;
     uint32_t vlTile0;
@@ -358,58 +314,49 @@ __aicore__ inline void GatherWrapper(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint3
         vlTile2 = size[2];
         vlTile1 = size[1];
         vlTile0 = VF_LEN / (vlTile2 * vlTile1);
-        sizeI[0] = 1;
-        sizeI[1] = 1;
-        sizeI[2] = static_cast<uint16_t>(size[0] / vlTile0);
-        srcStrideI[0] = 0;
-        srcStrideI[1] = 0;
-        srcStrideI[2] = static_cast<uint16_t>(srcStride[0] * vlTile0);
+        sizeI1 = 1;
+        sizeI2 = static_cast<uint16_t>(size[0] / vlTile0);
+        srcStrideI1 = 0;
+        srcStrideI2 = static_cast<uint16_t>(srcStride[0] * vlTile0);
         main = vlTile2 * vlTile1 * vlTile0;
-        tail = size[2] * size[1] * size[0] - sizeI[2] * main;
-    } else if (size[2] < VF_LEN) {
+        tail = size[2] * size[1] * size[0] - sizeI2 * main;
+    } else {
         vlTile2 = size[2];
         vlTile1 = VF_LEN / (vlTile2);
-        sizeI[0] = 1;
-        sizeI[1] = size[0];
-        sizeI[2] = size[1] / vlTile1;
-        srcStrideI[0] = 0;
-        srcStrideI[1] = static_cast<uint16_t>(srcStride[0]);
-        srcStrideI[2] = static_cast<uint16_t>(srcStride[1] * vlTile1);
+        sizeI1 = size[0];
+        sizeI2 = size[1] / vlTile1;
+        srcStrideI1 = static_cast<uint16_t>(srcStride[0]);
+        srcStrideI2 = static_cast<uint16_t>(srcStride[1] * vlTile1);
         main = vlTile2 * vlTile1;
-        tail = size[2] * size[1] - sizeI[2] * main;
-    } else {
-        vlTile2 = VF_LEN;
-        sizeI[0] = size[0];
-        sizeI[1] = size[1];
-        sizeI[2] = size[2] / vlTile2;
-        srcStrideI[0] = static_cast<uint16_t>(srcStride[0]);
-        srcStrideI[1] = static_cast<uint16_t>(srcStride[1]);
-        srcStrideI[2] = static_cast<uint16_t>(srcStride[2] * vlTile2);
-        main = vlTile2;
-        tail = size[2] - sizeI[2] * main;
+        tail = size[2] * size[1] - sizeI2 * main;
     }
-    LocalTensor<T> indexUb;
-    PopStackBuffer<T, TPosition::LCM>(indexUb);
+    using BrcIndexType = typename ExtractIndexTypeBySize<sizeof(T)>::T;
+    LocalTensor<BrcIndexType> indexUb;
+    PopStackBuffer<BrcIndexType, TPosition::LCM>(indexUb);
     if constexpr (sizeof(T) == sizeof(uint32_t)) {
         GenGatherIndex((__ubuf__ int32_t*)indexUb.GetPhyAddr(), size, srcStride);
         VfGatherBrc<uint32_t>(
-            (__ubuf__ uint32_t*)dstUb, (__ubuf__ uint32_t*)srcUb, (__ubuf__ uint32_t*)indexUb.GetPhyAddr(), sizeI[0],
-            sizeI[1], sizeI[2], srcStrideI[0], srcStrideI[1], srcStrideI[2], main, tail);
+            (__ubuf__ uint32_t*)dstUb, (__ubuf__ uint32_t*)srcUb, (__ubuf__ uint32_t*)indexUb.GetPhyAddr(), sizeI1,
+            sizeI2, srcStrideI1, srcStrideI2, main, tail);
     } else {
         GenGatherIndex((__ubuf__ int16_t*)indexUb.GetPhyAddr(), size, srcStride);
         VfGatherBrc<uint16_t>(
-            (__ubuf__ uint16_t*)dstUb, (__ubuf__ uint16_t*)srcUb, (__ubuf__ uint16_t*)indexUb.GetPhyAddr(), sizeI[0],
-            sizeI[1], sizeI[2], srcStrideI[0], srcStrideI[1], srcStrideI[2], main, tail);
+            (__ubuf__ uint16_t*)dstUb, (__ubuf__ uint16_t*)srcUb, (__ubuf__ uint16_t*)indexUb.GetPhyAddr(), sizeI1,
+            sizeI2, srcStrideI1, srcStrideI2, main, tail);
     }
 }
 
 template <typename T>
 __aicore__ inline void GatherWrapperForFourDim(
-    __ubuf__ T* dstUb, __ubuf__ T* srcUb, uint32_t* size, uint32_t* srcStride)
+    __ubuf__ T* dstUb, __ubuf__ T* srcUb, const uint32_t* size, const uint32_t* srcStride)
 {
     constexpr uint32_t VF_LEN = GetVecLen() / sizeof(T);
-    uint16_t sizeI[4];
-    uint16_t srcStrideI[4];
+    uint16_t sizeI1;
+    uint16_t sizeI2;
+    uint16_t sizeI3;
+    uint16_t srcStrideI1;
+    uint16_t srcStrideI2;
+    uint16_t srcStrideI3;
     uint32_t main;
     uint32_t tail;
     uint32_t vlTile0;
@@ -422,71 +369,53 @@ __aicore__ inline void GatherWrapperForFourDim(
         vlTile2 = size[2];
         vlTile1 = size[1];
         vlTile0 = VF_LEN / (vlTile3 * vlTile2 * vlTile1);
-        sizeI[0] = 1;
-        sizeI[1] = 1;
-        sizeI[2] = 1;
-        sizeI[3] = static_cast<uint16_t>(size[0] / vlTile0);
-        srcStrideI[0] = 0;
-        srcStrideI[1] = 0;
-        srcStrideI[2] = 0;
-        srcStrideI[3] = static_cast<uint16_t>(srcStride[0] * vlTile0);
+        sizeI1 = 1;
+        sizeI2 = 1;
+        sizeI3 = static_cast<uint16_t>(size[0] / vlTile0);
+        srcStrideI1 = 0;
+        srcStrideI2 = 0;
+        srcStrideI3 = static_cast<uint16_t>(srcStride[0] * vlTile0);
         main = vlTile3 * vlTile2 * vlTile1 * vlTile0;
-        tail = size[3] * size[2] * size[1] * size[0] - sizeI[3] * main;
+        tail = size[3] * size[2] * size[1] * size[0] - sizeI3 * main;
     } else if (size[3] * size[2] < VF_LEN) {
         vlTile3 = size[3];
         vlTile2 = size[2];
         vlTile1 = VF_LEN / (vlTile2 * vlTile3);
-        sizeI[0] = 1;
-        sizeI[1] = 1;
-        sizeI[2] = size[0];
-        sizeI[3] = static_cast<uint16_t>(size[1] / vlTile1);
-        srcStrideI[0] = 0;
-        srcStrideI[1] = 0;
-        srcStrideI[2] = static_cast<uint16_t>(srcStride[0]);
-        srcStrideI[3] = static_cast<uint16_t>(srcStride[1] * vlTile1);
+        sizeI1 = 1;
+        sizeI2 = size[0];
+        sizeI3 = static_cast<uint16_t>(size[1] / vlTile1);
+        srcStrideI1 = 0;
+        srcStrideI2 = static_cast<uint16_t>(srcStride[0]);
+        srcStrideI3 = static_cast<uint16_t>(srcStride[1] * vlTile1);
         main = vlTile3 * vlTile2 * vlTile1;
-        tail = size[3] * size[2] * size[1] - sizeI[3] * main;
-    } else if (size[3] < VF_LEN) {
+        tail = size[3] * size[2] * size[1] - sizeI3 * main;
+    } else {
         vlTile3 = size[3];
         vlTile2 = VF_LEN / vlTile3;
-        sizeI[0] = 1;
-        sizeI[1] = size[0];
-        ;
-        sizeI[2] = size[1];
-        sizeI[3] = static_cast<uint16_t>(size[2] / vlTile2);
-        srcStrideI[0] = 0;
-        srcStrideI[1] = static_cast<uint16_t>(srcStride[0]);
-        srcStrideI[2] = static_cast<uint16_t>(srcStride[1]);
-        srcStrideI[3] = static_cast<uint16_t>(srcStride[2] * vlTile2);
+        sizeI1 = size[0];
+        sizeI2 = size[1];
+        sizeI3 = static_cast<uint16_t>(size[2] / vlTile2);
+        srcStrideI1 = static_cast<uint16_t>(srcStride[0]);
+        srcStrideI2 = static_cast<uint16_t>(srcStride[1]);
+        srcStrideI3 = static_cast<uint16_t>(srcStride[2] * vlTile2);
         main = vlTile3 * vlTile2;
-        tail = size[3] * size[2] - sizeI[3] * main;
-    } else {
-        vlTile3 = VF_LEN;
-        sizeI[0] = size[0];
-        sizeI[1] = size[1];
-        sizeI[2] = size[2];
-        sizeI[3] = static_cast<uint16_t>(size[3] / vlTile3);
-        srcStrideI[0] = static_cast<uint16_t>(srcStride[0]);
-        srcStrideI[1] = static_cast<uint16_t>(srcStride[1]);
-        srcStrideI[2] = static_cast<uint16_t>(srcStride[2]);
-        srcStrideI[3] = static_cast<uint16_t>(srcStride[3] * vlTile3);
-        main = vlTile3;
-        tail = size[3] - sizeI[3] * main;
+        tail = size[3] * size[2] - sizeI3 * main;
     }
     LocalTensor<T> indexUb;
     PopStackBuffer<T, TPosition::LCM>(indexUb);
     if constexpr (sizeof(T) == sizeof(uint32_t)) {
         GenGatherIndexForFourDim((__ubuf__ int32_t*)indexUb.GetPhyAddr(), size, srcStride);
         VfGatherBrcForFourDim<uint32_t>(
-            (__ubuf__ uint32_t*)dstUb, (__ubuf__ uint32_t*)srcUb, (__ubuf__ uint32_t*)indexUb.GetPhyAddr(), sizeI[0],
-            sizeI[1], sizeI[2], sizeI[3], srcStrideI[0], srcStrideI[1], srcStrideI[2], srcStrideI[3], main, tail);
+            (__ubuf__ uint32_t*)dstUb, (__ubuf__ uint32_t*)srcUb, (__ubuf__ uint32_t*)indexUb.GetPhyAddr(), sizeI1,
+            sizeI2, sizeI3, srcStrideI1, srcStrideI2, srcStrideI3, main, tail);
     } else {
         GenGatherIndexForFourDim((__ubuf__ int16_t*)indexUb.GetPhyAddr(), size, srcStride);
         VfGatherBrcForFourDim<uint16_t>(
-            (__ubuf__ uint16_t*)dstUb, (__ubuf__ uint16_t*)srcUb, (__ubuf__ uint16_t*)indexUb.GetPhyAddr(), sizeI[0],
-            sizeI[1], sizeI[2], sizeI[3], srcStrideI[0], srcStrideI[1], srcStrideI[2], srcStrideI[3], main, tail);
+            (__ubuf__ uint16_t*)dstUb, (__ubuf__ uint16_t*)srcUb, (__ubuf__ uint16_t*)indexUb.GetPhyAddr(), sizeI1,
+            sizeI2, sizeI3, srcStrideI1, srcStrideI2, srcStrideI3, main, tail);
     }
 }
+} // namespace BroadcastInternal
 } // namespace AscendC
 #endif // IMPL_PAD_BROADCAST_BROADCAST_GATHER_C310_IMPL_H
 
