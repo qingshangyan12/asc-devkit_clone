@@ -130,6 +130,9 @@ struct SpmInfo {
     uint8_t spmBufType;
 };
 
+__BLOCK_LOCAL__ uint64_t g_tPipeOccupyEventPool[EVENT_NUM] = {};
+__BLOCK_LOCAL__ uint32_t g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::MAX)] = {};
+
 struct TPipeImpl {
     struct TEventPool eventPool_[EVENT_NUM];
     struct TPipeBufPool bufPool_[static_cast<uint8_t>(Hardware::MAX)];
@@ -196,10 +199,10 @@ __aicore__ inline void TPipeBase::InitShareBufStart(uint32_t mode, uint32_t* sha
 #if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     AuxShareBufStart(mode, shareLens, static_cast<uint8_t>(TShareBuf::ShareHard::UB), Hardware::UB, subBlockIdx);
 #endif
-    this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0A)].maxAddr = 0;
-    this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0B)].maxAddr = 0;
+    g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::L0A)] = 0;
+    g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::L0B)] = 0;
     // v100 Shouldn't Use Bias Table
-    this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::BIAS)].maxAddr = 0;
+    g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::BIAS)] = 0;
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     Internal::g_sharedEvtId = Internal::g_bufId;
 #endif
@@ -210,12 +213,12 @@ __aicore__ inline void TPipeBase::InitShareBufStart(uint32_t mode, uint32_t* sha
 __aicore__ inline void TPipeBase::InitShareBufEnd()
 {
     // debug methods need to be added.
-    this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr =
+    g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::L1)] =
         g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::L1)];
-    this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0C)].maxAddr =
+    g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::L0C)] =
         g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::L0C)];
 #if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
-    this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::UB)].maxAddr =
+    g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::UB)] =
         g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::UB)];
 #endif
 
@@ -232,7 +235,7 @@ __aicore__ inline void TPipeBase::AuxShareBufStart(uint32_t mode, uint32_t* shar
     uint8_t hardU8 = static_cast<uint8_t>(hard);
     if (unlikely(g_tpipeImpl.shareBufPool_.start[pos] == -1)) {  // The address has not been initialized.
         // Record the maximum allocated address.
-        g_tpipeImpl.shareBufPool_.start[pos] = this->g_tpipeImpl.bufPool_[hardU8].maxAddr;
+        g_tpipeImpl.shareBufPool_.start[pos] = g_tPipeAddrBufPool[hardU8];
         g_tpipeImpl.shareBufPool_.maxAddr[pos] = g_tpipeImpl.shareBufPool_.start[pos] + shareLens[pos];
         DEBUG_CODE(g_tpipeImpl.shareBufPool_.length[pos] = shareLens[pos]);
     } else {
@@ -240,12 +243,12 @@ __aicore__ inline void TPipeBase::AuxShareBufStart(uint32_t mode, uint32_t* shar
                                                                g_tpipeImpl.shareBufPool_.length[pos] :
                                                                shareLens[pos]);
         // Record the maximum allocated address.
-        g_tpipeImpl.shareBufPool_.maxAddr[pos] = this->g_tpipeImpl.bufPool_[hardU8].maxAddr;
-        g_tpipeImpl.bufPool_[hardU8].maxAddr = g_tpipeImpl.shareBufPool_.start[pos];  // Reset resource start position.
+        g_tpipeImpl.shareBufPool_.maxAddr[pos] = g_tPipeAddrBufPool[hardU8];
+        g_tPipeAddrBufPool[hardU8] = g_tpipeImpl.shareBufPool_.start[pos];  // Reset resource start position.
     }
 
     if (mode == 1 && subBlockIdx == 1) {
-        this->g_tpipeImpl.bufPool_[hardU8].maxAddr += shareLens[pos] / HALF_FACTOR;  // Reset resource start position.
+        g_tPipeAddrBufPool[hardU8] += shareLens[pos] / HALF_FACTOR;  // Reset resource start position.
     }
 
 #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
