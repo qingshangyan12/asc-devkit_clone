@@ -22,8 +22,7 @@
 
 ## 样例描述
 
-- 样例功能：
-
+- 样例功能：  
   本样例实现了Matmul、relu和随路量化功能。
   
   1、Matmul功能
@@ -34,8 +33,7 @@
 
   本样例通过设置Copy接口的参数实现了数据随路量化激活搬运，支持在L0C到GM数据搬运过程中通过vector量化将float类型转换为int8_t类型。
 
-- 样例规格：
-
+- 样例规格：  
   在核函数直调样例中，样例实现支持的shape为：M = 128, N = 128, K = 96。
   <table border="2" align="center">
   <caption>表1：样例规格表</caption>
@@ -72,8 +70,7 @@
     source ${install_path}/cann/set_env.sh
     ```
 
-- 软连接配置
-
+- 软连接配置  
   由于当前tensor_api样例只用于功能展示，相关源码未随标准CANN软件包发布。
   
   如需编译运行该样例，需要先将tensor_api相关源码通过软连接挂在到CANN安装路径下。

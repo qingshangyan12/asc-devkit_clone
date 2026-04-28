@@ -12,14 +12,15 @@
 ├── type_traits
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── type_traits.asc              // Ascend C算子实现 & 调用样例
+│   ├── type_traits.asc         // Ascend C算子实现 & 调用样例
+│   └── README.md               // 样例介绍
 ```
 
 ## 功能描述
 - type_traits类型特性接口，接口包括is_void/is_integral/is_floating_point/is_array/is_pointer/is_reference/is_const/remove_const/remove_volatile/remove_cv/remove_reference/remove_pointer/add_const/add_volatile/add_cv/add_pointer/add_lvalue_reference/add_rvalue_reference，可用于在程序编译时对类型的判断、增加、删除、转换等处理。
 
 - 算子实现：  
-  - kernel实现   
+  - kernel实现  
     Ascend C调用各接口，打印接口返回值和ascendc_assert判断。   
 
   - 调用实现  

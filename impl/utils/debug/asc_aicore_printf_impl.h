@@ -181,14 +181,67 @@ __aicore__ inline void scalar_printf_impl(DumpType debugType, __gm__ const char*
 }
 
 template <class... Args>
-__aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
+__aicore__ inline void print_common_head()
+{
+    __gm__ DebugBlockHeadInfo* blockInfo = get_block_info();
+    if (blockInfo == nullptr) {
+        return;
+    }
+    __gm__ DebugBlockWriteInfo* writeInfo = get_block_write_info(blockInfo);
+    if (writeInfo == nullptr || writeInfo->packIdx != 0) {
+        return;
+    }
+
+    uint64_t __ascendc_tStamp = 0;
+    uint64_t __ascendc_version = 0;
+    __gm__ char* __ascendc_versionStr = nullptr;
+    asc_debug_get_cann_vserion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
+    if (__ascendc_tStamp == 0) {
+        scalar_printf_impl(DumpType::DUMP_SCALAR, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
+    } else {
+        scalar_printf_impl(DumpType::DUMP_SCALAR, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
+    }
+}
+
+template <class... Args>
+__aicore__ inline void print_dump_head()
+{
+#ifdef __DAV_VEC__
+    scalar_printf_impl(DumpType::DUMP_SCALAR, "[AIV Block %u/%u] ", asc_debug_get_block_idx(), asc_debug_get_block_total_num());
+#else
+    scalar_printf_impl(DumpType::DUMP_SCALAR, "[AIC Block %u/%u] ", asc_debug_get_block_idx(), asc_debug_get_block_total_num());
+#endif
+}
+
+template <class... Args>
+__aicore__ inline void printf_impl_common(DumpType debugType, __gm__ const char* fmt, Args&&... args)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
-    enable_asc_diagnostics();
-    scalar_printf_impl(DumpType::DUMP_SCALAR, fmt, args...);
+#if !defined(__NPU_DEVICE__)
+    if (debugType != DumpType::DUMP_ASSERT) {
+        print_common_head();
+    }
+#endif
+    print_dump_head();
+    scalar_printf_impl(debugType, fmt, args...);
     set_ctrl(ctrlValue);
 }
+
+template <class... Args>
+__aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
+{
+    enable_asc_diagnostics();
+    printf_impl_common(DumpType::DUMP_SCALAR, fmt, args...);
+}
+
+template <class... Args>
+__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
+{
+    enable_asc_assert();
+    printf_impl_common(DumpType::DUMP_ASSERT, fmt, args...);
+}
+
 } // namespace __asc_aicore
 #else
 #include <cstdio>
@@ -200,6 +253,12 @@ enum class DumpType : uint8_t {
 
 template <class... Args>
 __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
+{
+    std::printf(fmt, args...);
+}
+
+template <class... Args>
+__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
 {
     std::printf(fmt, args...);
 }
@@ -221,64 +280,61 @@ __simd_callee__ constexpr uint32_t align_print_tlv_len(const uint32_t dataLen)
     return ((dataLen + (alignBytes - 1)) & ~(alignBytes - 1)) + alignBytes;
 }
 
-// __simd_callee__ inline void set_scalar_param_ubuf(
-//     __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint64_t scalar)
-// {
-//     __ubuf__ uint64_t* paramSlot = reinterpret_cast<__ubuf__ uint64_t*>(paramAddr) + paramIdx;
-//     *paramSlot = scalar;
-// }
+template <typename T>
+__simd_callee__ inline void set_scalar_param_vf(__ubuf__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
+{
+    set_scalar_param_vf_impl(paramAddr, paramIdx, scalar);
+}
 
-// __simd_callee__ inline void set_string_param_ubuf(
-//     __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, __gm__ const char* s, uint32_t& offset)
-// {
-//     __ubuf__ uint64_t* stringAddr = reinterpret_cast<__ubuf__ uint64_t*>(paramAddr) + paramIdx;
-//     __ubuf__ uint8_t* dstStrAddr = paramAddr + offset;
+__simd_callee__ inline void set_string_param_ubuf(
+    __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, __gm__ const char* s, uint32_t& offset)
+{
+    __ubuf__ uint64_t* stringAddr = reinterpret_cast<__ubuf__ uint64_t*>(paramAddr) + paramIdx;
+    __ubuf__ uint8_t* dstStrAddr = paramAddr + offset;
 
-//     // write string value offset
-//     *stringAddr = static_cast<uint64_t>(offset - sizeof(uint64_t) * paramIdx);
+    // write string value offset
+    *stringAddr = static_cast<uint64_t>(offset - sizeof(uint64_t) * paramIdx);
 
-//     // write string content: GM -> UBuf
-//     uint32_t strLen = get_cstring_len_simd(s);
-//     for (uint32_t i = 0; i < strLen; i++) {
-//         *(dstStrAddr + i) = *(s + i);
-//     }
-//     offset += strLen;
-// }
+    // write string content: GM -> UBuf
+    uint32_t strLen = get_cstring_len_vf(s);
+    for (uint32_t i = 0; i < strLen; i++) {
+        *(dstStrAddr + i) = *(s + i);
+    }
+    offset += strLen;
+}
 
-// __simd_callee__ inline void set_param_ubuf(
-//     __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset)
-// {
-//     return;
-// }
+__simd_callee__ inline void set_param_vf(__ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset)
+{
+    return;
+}
 
-// template <typename... Args>
-// __simd_callee__ inline void set_param_ubuf(
-//     __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, Args&&... args);
+template <typename... Args>
+__simd_callee__ inline void set_param_vf(
+    __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, Args&&... args);
 
-// template <typename... Args>
-// __simd_callee__ inline void set_param_ubuf_impl(
-//     __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset,
-//     __gm__ const char* s, Args&&... args)
-// {
-//     set_string_param_ubuf(paramAddr, paramIdx, s, offset);
-//     set_param_ubuf(paramAddr, paramIdx + 1, offset, args...);
-// }
 
-// template <typename T, typename... Args>
-// __simd_callee__ inline void set_param_ubuf_impl(
-//     __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, T scalar,
-//     Args&&... args)
-// {
-//     set_scalar_param_ubuf(paramAddr, paramIdx, static_cast<uint64_t>(scalar));
-//     set_param_ubuf(paramAddr, paramIdx + 1, offset, args...);
-// }
+template <typename... Args>
+__simd_callee__ inline void set_param_vf_impl(
+    __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, __ubuf__ const char* s, Args&&... args)
+{
+    set_string_param_vf(paramAddr, paramIdx, s, offset);
+    set_param_vf(paramAddr, paramIdx + 1, offset, args...);
+}
 
-// template <typename... Args>
-// __simd_callee__ inline void set_param_ubuf(
-//     __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, Args&&... args)
-// {
-//     set_param_ubuf_impl(paramAddr, paramIdx, offset, args...);
-// }
+template <typename T, typename... Args>
+__simd_callee__ inline void set_param_vf_impl(
+    __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, T scalar, Args&&... args)
+{
+    set_scalar_param_vf(paramAddr, paramIdx, static_cast<uint64_t>(scalar));
+    set_param_vf(paramAddr, paramIdx + 1, offset, args...);
+}
+
+template <typename... Args>
+__simd_callee__ inline void set_param_vf(
+    __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, Args&&... args)
+{
+    set_param_vf_impl(paramAddr, paramIdx, offset, args...);
+}
 
 __simd_callee__ inline uint32_t get_args_len_simd(uint32_t& argsNum)
 {
@@ -292,7 +348,7 @@ template <typename... Args>
 __simd_callee__ inline uint32_t get_args_len_simd_impl(uint32_t& argsNum, __ubuf__ const char* s, Args&&... args)
 {
     constexpr uint32_t paramSize = sizeof(uint64_t);
-    const uint32_t strLen = get_cstring_len_simd(s);
+    const uint32_t strLen = get_cstring_len_vf(s);
     argsNum += 1;
     return paramSize + strLen + get_args_len_simd(argsNum, args...);
 }
@@ -311,12 +367,27 @@ __simd_callee__ inline uint32_t get_args_len_simd(uint32_t& argsNum, Args&&... a
     return get_args_len_simd_impl(argsNum, args...);
 }
 
+template <typename T>
+__simd_callee__ inline void copy_ub2ub_vf(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t stride, uint32_t repeatTimes)
+{
+    vector_u8 srcReg;
+    vector_align ureg0;
+    vector_align ureg1;
+    constexpr auto postValue = 1;
+
+    vldas(ureg0, (__ubuf__ uint8_t*)srcAddr);
+    vldus(srcReg, ureg0, (__ubuf__ uint8_t*)srcAddr);
+    vstus(ureg0, repeatTimes * 2, srcReg, (__ubuf__ uint8_t*)dstAddr, POST_UPDATE);
+    vstas(ureg1, (__ubuf__ uint8_t*)dstAddr, 0, POST_UPDATE);
+}
+
 template <typename... Args>
 __simd_callee__ inline uint32_t get_print_tlv_len_simd(uint32_t& argsNum, __ubuf__ const char* fmt, Args&&... args)
 {
     constexpr uint32_t printInfoLen = sizeof(PrintTlv);
     const uint32_t argsLen = get_args_len_simd(argsNum, args...);
-    const uint32_t fmtLen = get_cstring_len_simd(fmt);
+    const uint32_t fmtLen = get_cstring_len_vf(fmt);
     return align_print_tlv_len(printInfoLen + argsLen + fmtLen);
 }
 
@@ -335,23 +406,20 @@ template <typename... Args>
 __simd_callee__ inline void set_print_tlv_data_ubuf(
     __ubuf__ PrintTlv* printTlv, __ubuf__ const char* fmt, Args&&... args)
 {
-    const uint32_t strLen = get_cstring_len_simd(fmt);
+    const uint32_t strLen = get_cstring_len_vf(fmt);
     __ubuf__ uint8_t* paramAddr = reinterpret_cast<__ubuf__ uint8_t*>(printTlv + 1);
     __ubuf__ uint8_t* fmtAddr = paramAddr + printTlv->fmtOffset - sizeof(uint64_t);
     __ubuf__ uint8_t* strParamAddr = reinterpret_cast<__ubuf__ uint8_t*>(fmtAddr) + strLen;
 
     // for循环由于-O2存在的优化问题，暂时使用2B一循环，1B会报错
-    for (uint32_t i = 0; i < 4; i+=2) {
-        *((__ubuf__ uint8_t*)printTlv + sizeof(PrintTlv) + 8 + i)= fmt[i];
-        *((__ubuf__ uint8_t*)printTlv + sizeof(PrintTlv) + 8 + i + 1)= fmt[i + 1];
+    for (uint32_t i = 0; i < strLen; i += 2) {
+        fmtAddr[i] = fmt[i];
+        fmtAddr[i + 1] = fmt[i + 1];
     }
 
-    // // copy fmt string: UB -> UB
-    // for (uint32_t i = 0; i < strLen; i++) {
-    //     *(fmtAddr + i) = *(reinterpret_cast<__gm__ const uint8_t*>(fmt) + i);
-    // }
-    // uint32_t strParamOffset = printTlv->fmtOffset + strLen;
-    // set_param_ubuf(paramAddr, 0, strParamOffset, args...);
+    // copy_ub2ub_vf();
+    uint32_t strParamOffset = printTlv->fmtOffset + strLen;
+    set_param_vf(paramAddr, 0, strParamOffset, args...);
 }
 
 template <class... Args>
@@ -362,13 +430,14 @@ __simd_callee__ inline void scalar_printf_impl(DumpType debugType, __ubuf__ cons
     uint32_t argsNum = 0;
     const uint32_t tlvLen = get_print_tlv_len_simd(argsNum, fmt, args...);
 
-    blockInfo->magic = 0xF0A00B0F;
-    blockInfo->writeLen = tlvLen;
-
     // construct PrintTlv TLV in BlockVFBufInfo.buffer (UBuf)
     __ubuf__ PrintTlv* printTlv = reinterpret_cast<__ubuf__ PrintTlv*>(blockInfo->buffer);
     set_print_tlv_info_ubuf(debugType, printTlv, tlvLen, argsNum);
     set_print_tlv_data_ubuf(printTlv, fmt, args...);
+
+    blockInfo->magic = 0xF0A00B0F;
+    blockInfo->writeLen += tlvLen;
+    blockInfo->pidx += 1;
 }
 
 template <class... Args>

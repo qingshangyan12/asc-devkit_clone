@@ -289,19 +289,6 @@ struct PrintTlv {
     uint64_t fmtOffset = 0U;            // offset of fmt string from the start of fmtOffset addr
 };
 
-// // %s
-// struct PrintfInfo {
-//     uint32_t printfType;
-//     uint32_t printfLength;
-//     uint32_t blockIdx = 0;
-//     uint32_t resv = 0;
-//     uint64_t fmtOffset = 0U;
-//     uint64_t Param[num] = 0U;
-//     char_t fmt[fmtLength];
-//     char_t paramStr1[param1Length];
-//     char_t paramStr2[param2Length];
-// };
-
 struct DumpTensorTlv {
     uint32_t type = static_cast<uint32_t>(DumpType::DUMP_TENSOR); // DumpType = DUMP_TENSOR
     uint32_t length = 0U;            // Length of (addr dataType desc bufferId position dumpSize dumpData align)

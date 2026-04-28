@@ -27,8 +27,6 @@
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
 #endif
 
-using vector_uint8_t = vector_u8;
-
 namespace __asc_aicore {
 
 template <AscendC::Hardware hardware, typename T, typename U>
@@ -232,12 +230,13 @@ __simd_callee__ inline void asc_dump_impl_reg(U& src, uint32_t desc, uint32_t du
     uint32_t alignDumpLen = align_up(dumpSize * sizeof(T), dataBlockSize);
     uint32_t tlvLen = sizeof(DumpTensorTlv) + alignDumpLen;
 
-    blockInfo->magic = 0xF0A00B0F;
-    blockInfo->writeLen = tlvLen;
-
     __ubuf__ DumpTensorTlv* dumpTlv = (__ubuf__ DumpTensorTlv*)blockInfo->buffer;
     set_dump_tlv_info_ubuf<hardware, T>(src, dumpTlv, alignDumpLen, desc, dumpSize);
     set_dump_tlv_data_reg<hardware, T>(src, dumpTlv, alignDumpLen, dumpSize);
+
+    blockInfo->magic = 0xF0A00B0F;
+    blockInfo->writeLen += tlvLen;
+    blockInfo->pidx += 1;
 }
 
 template <AscendC::Hardware hardware, typename T, typename U>
@@ -249,12 +248,13 @@ __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dumpSi
     uint32_t alignDumpLen = align_up(dumpSize * sizeof(T), dataBlockSize);
     uint32_t tlvLen = sizeof(DumpTensorTlv) + alignDumpLen;
 
-    blockInfo->magic = 0xF0A00B0F;
-    blockInfo->writeLen = tlvLen;
-
     __ubuf__ DumpTensorTlv* dumpTlv = (__ubuf__ DumpTensorTlv*)blockInfo->buffer;
     set_dump_tlv_info_ubuf<hardware, T>(src, dumpTlv, alignDumpLen, desc, dumpSize);
     set_dump_tlv_data_ubuf<hardware, T>(src, dumpTlv, alignDumpLen, dumpSize);
+
+    blockInfo->magic = 0xF0A00B0F;
+    blockInfo->writeLen += tlvLen;
+    blockInfo->pidx += 1;
 }
 
 template <typename T, typename U>
@@ -267,7 +267,6 @@ __simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dumpS
 // 内存数据dump
 template <typename T>
 __simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dumpSize) {
-    // 如下指令无法使用，且在simd_callee中不涉及：get_ctrl()，set_atomic_none(), set_ctrl()
     enable_asc_diagnostics();
     asc_dump_impl<AscendC::Hardware::UB, T>(input, desc, dumpSize);
 }

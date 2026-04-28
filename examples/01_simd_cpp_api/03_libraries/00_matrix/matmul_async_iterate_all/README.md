@@ -18,8 +18,7 @@
 │   └── matmul_async_iterate_all.asc              // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例实现调用IterateAll输出到GM的异步场景矩阵乘计算。
 
 - 样例规格： 
