@@ -1,5 +1,5 @@
 # Ascend C API列表<a name="ZH-CN_TOPIC_0000001917094304"></a>
-Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/C++语法和类库API进行编程。
+Ascend C 提供了一套层次化的 API 体系，涵盖了从底层 C 扩展到高阶 C++ 类库的完整能力。它支持开发者以标准 C/C++ 语法为基础，在 SIMD、SIMT 及 AI CPU 等多种计算模式下，灵活实现精细化的内存管理与高效的矢量/矩阵运算。
 ## API分类总览<a name="section3119442205518"></a>
 下表展示了 Ascend C API 的总体分类，帮助开发者根据编程模型和功能需求快速定位所需API。
 <a name="table_api_classification"></a>
@@ -16,12 +16,12 @@ Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_base"><a href="#section117632211201">基础API</a></p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_base_desc">单指令抽象的C++类库API，一般基于Tensor编程，逐步基于Layout完善Tensor编程能力。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_base_desc">实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。标注为ISASI（Instruction Set Architecture Special Interface，硬件体系结构相关的接口）类别的API，不能保证跨硬件版本兼容。</p>
 </td>
 </tr>
 <tr id="row_simd_2"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_c_api"><a href="context/c_api/README.md">C API</a></p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_c_api_desc">纯C接口，支持数组分配内存、基于指针的计算接口，提供与业界一致的C语言编程体验，并开放芯片完备编程能力。Atlas A2/A3支持SIMD的纯C接口；Ascend 950PR/Ascend 950DT将支持与业界类似的SIMT编程能力、SIMD/SIMT混合编程能力。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_c_api_desc">纯C接口，开放芯片完备编程能力，支持数组分配内存，一般基于指针编程，提供与业界一致的C语言编程体验。</p>
 </td>
 </tr>
 <tr id="row_simd_3"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_high_api"><a href="#section3317105813235">高阶 API</a></p>
@@ -40,7 +40,7 @@ Ascend C提供一组C语言扩展和C++类库API，开发者可以使用标准C/
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.3.1.2"><p id="p_aicpu_none">-</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_aicpu_desc">提供核内的通用计算能力。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.1.3.1.3"><p id="p_aicpu_desc">通常作为上述API的补充，主要承担非矩阵类、逻辑比较复杂的分支密集型计算。</p>
 </td>
 </tr>
 <tr id="row_utils"><td class="cellrowborder" valign="top" headers="mcps1.1.3.1.1"><p id="p_utils"><a href="#section15221943104512">Utils API</a></p>
