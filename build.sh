@@ -472,8 +472,9 @@ set_options() {
         ENABLE_SIGN="true"
         shift
         ;;
-    --sign-script=*)
-        shift
+    --sign-script)
+        CUSTOM_SIGN_SCRIPT="$(realpath $2)"
+        shift 2
         ;;
     --build-type)
       BUILD_TYPE="$2"
