@@ -28,8 +28,14 @@
 #endif
 #include "kernel_pop_stack_buffer.h"
  
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 namespace AscendC {
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
+struct ClampConfig {
+    bool isReuseSource;
+};
+constexpr ClampConfig DEFAULT_CLAMP_CONFIG = {false};
+#endif
+
 /* !
  * \brief This function implements replaces numbers greater than scalar with scalar
  * (e.g. ClampMax(2) means to replace numbers greater than 2 with 2 ). For details about the interface description, see
@@ -55,7 +61,10 @@ __aicore__ inline void ClampMax(const LocalTensor<T>& dstTensor, const LocalTens
     if ASCEND_IS_AIC {
         return;
     }
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     ClampMaxImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scalar, calCount);
+#endif
 }
  
 template <typename T, bool isReuseSource = false>
@@ -70,7 +79,10 @@ __aicore__ inline void ClampMax(const LocalTensor<T>& dstTensor, const LocalTens
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ret = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ret), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     ClampMaxImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scalar, calCount);
+#endif
 }
 
 /* !
@@ -97,7 +109,10 @@ __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTens
     if ASCEND_IS_AIC {
         return;
     }
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     ClampMinImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scalar, calCount);
+#endif
 }
  
 template <typename T, bool isReuseSource = false>
@@ -112,13 +127,16 @@ __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTens
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ret = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ret), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     ClampMinImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scalar, calCount);
+#endif
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 /* !
  * \brief This function implements replaces numbers greater than min with min and less than max with max
- * (e.g. Clamp(2, 5) means to replace numbers greater than 2 with 2 and less than 5 with 5). For details about the interface description, see
+ * (e.g. Clamp(2, 5) means to replace numbers greater than 2 with 2 and less than 5 with 5).
+ * For details about the interface description, see
  * https://pytorch.org/docs/stable/generated/torch.clamp.html.
  *
  * \param [out] dstTensor, output LocalTensor
@@ -135,12 +153,12 @@ template <const ClampConfig& config = DEFAULT_CLAMP_CONFIG, typename T, typename
 __aicore__ inline void Clamp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max,
     const uint32_t count)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     ClampImpl<config, T, U, S>(dst, src, min, max, count);
-}
 #endif
+}
 #pragma end_pipe
 } // namespace AscendC
-#endif
 #endif // LIB_MATH_CLAMP_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CLAMP_H__)
