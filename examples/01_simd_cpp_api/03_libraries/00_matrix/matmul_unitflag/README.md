@@ -20,8 +20,7 @@
 ```
 
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例调用Matmul API计算时，通过配置MatmulConfig中的enUnitFlag参数为true，使能MDL模板开启UnitFlag功能。Norm模板、IBShare模板默认使能UnitFlag功能，MDL模板默认不使能UnitFlag功能。
 
 - 约束条件
@@ -29,8 +28,7 @@
   - 使能UnitFlag功能时，不支持样例内同时存在L0C搬出到Global Memory和L1搬出到Global Memory的两种流水。
   - 使能UnitFlag功能时，若同时使能L0C累加功能，不支持多次Iterate计算，一次GetTensorC输出。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 1024, N = 4096, K = 1024。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

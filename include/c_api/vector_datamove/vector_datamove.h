@@ -27,17 +27,36 @@
 
 #endif
 
+//===========asc_set_copy_pad_val(int8/uint8/int16/uint16/half/bfloat16/int32/uint32/float)===========
+__aicore__ inline void asc_set_copy_pad_val(int8_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(int16_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(uint16_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(half pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(bfloat16_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(int32_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(float pad_value);
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
-    uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
+    uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
 __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src,
-    uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
+    uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size);
 
@@ -46,7 +65,7 @@ __aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src,
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint32_t size);
 
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src,
-    uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
+    uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src, uint32_t size);
 
@@ -199,25 +218,6 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__  uint64_t* dst, __ubuf__ uint
 
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint32_t size);
 
-//===========asc_set_copy_pad_val(int8/uint8/int16/uint16/half/bfloat16/int32/uint32/float)===========
-__aicore__ inline void asc_set_copy_pad_val(int8_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(int16_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(uint16_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(half pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(bfloat16_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(int32_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(float pad_value);
-
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 // ==========asc_copy_gm2ub_align(int8_t/uint8_t/fp8_e5m2_t/fp8_e4m3fn_t/hifloat8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
@@ -325,12 +325,6 @@ __aicore__ inline void asc_set_ndim_pad_value(int8_t pad_value);
 
 __aicore__ inline void asc_set_ndim_pad_value(uint8_t pad_value);
 
-__aicore__ inline void asc_set_ndim_pad_value(fp8_e8m0_t pad_value);
-
-__aicore__ inline void asc_set_ndim_pad_value(fp8_e5m2_t pad_value);
-
-__aicore__ inline void asc_set_ndim_pad_value(fp8_e4m3fn_t pad_value);
-
 __aicore__ inline void asc_set_ndim_pad_value(int16_t pad_value);
 
 __aicore__ inline void asc_set_ndim_pad_value(uint16_t pad_value);
@@ -407,7 +401,7 @@ __aicore__ inline void asc_ndim_copy_dci();
 
 //======asc_copy_ub2l1=======
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src,
-                                      uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
+                                      uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
@@ -415,42 +409,11 @@ __aicore__ inline void asc_copy_ub2l1_sync(__cbuf__ void* dst, __ubuf__ void* sr
 
 //======asc_copy_ub2ub=======
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
-                                      uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
+                                      uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
 __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size);
-    
-//===========asc_set_copy_pad_val(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float)===========
-__aicore__ inline void asc_set_copy_pad_val(int8_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(fp4x2_e2m1_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(fp4x2_e1m2_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(fp8_e8m0_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(fp8_e5m2_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(fp8_e4m3fn_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(hifloat8_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(int16_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(uint16_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(half pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(bfloat16_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(int32_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value);
-
-__aicore__ inline void asc_set_copy_pad_val(float pad_value);
 
 #endif
 

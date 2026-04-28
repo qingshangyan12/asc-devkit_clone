@@ -25,8 +25,7 @@
 ```
 ## 样例描述
 
-- 样例功能： 
-
+- 样例功能：  
   调用Matmul高阶API，实现批量处理3组Matmul计算，每组对BSNGD格式的A、B矩阵分别做矩阵乘和加bias偏置。
 
   BSNGD格式具体可参考[IterateBatch](../../../../../docs/api/context/IterateBatch.md)中对该数据排布的介绍。

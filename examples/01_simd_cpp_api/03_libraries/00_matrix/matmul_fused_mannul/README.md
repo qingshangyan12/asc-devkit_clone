@@ -25,11 +25,10 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   本样例在AIC核创建纯Cube模式的Matmul对象，实现Matmul计算，中间结果输出至GM。AIC核计算完成后，通过调用CrossCoreSetFlag和CrossCoreSetFlag接口手动控制核间同步，继续在AIV核对GM上的中间结果进行LeakyRelu的计算。
 
-- 样例规格：
-
+- 样例规格：  
   本样例中：M = 128, N = 128, K = 256
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
