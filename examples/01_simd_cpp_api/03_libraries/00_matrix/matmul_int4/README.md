@@ -22,8 +22,7 @@ A、B矩阵为int4b_t数据类型输入的Matmul样例。
 ```
 
 ## 样例描述
-- 样例功能：
-
+- 样例功能：  
   Matmul样例调用Matmul API计算时，通过Kernel侧设置左矩阵A、右矩阵B的数据类型参数为int4b_t，Host侧调用SetAType、SetBType接口设置左矩阵A、右矩阵B的数据类型为DT_INT4，实现int4数据类型输入的样例。
 
 - 约束条件
@@ -31,8 +30,7 @@ A、B矩阵为int4b_t数据类型输入的Matmul样例。
   - 左矩阵A为int4数据类型时，不支持转置。
   - int4数据类型输入的Matmul对象仅支持Norm、MDL、IBShare模板。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 256, N = 7680, K = 128。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

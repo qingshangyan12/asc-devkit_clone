@@ -20,12 +20,10 @@
 
 ## 样例描述
 
-- CPU Debug介绍：
-
+- CPU Debug介绍：  
   CPU Debug功能支持对CPU执行过程中的运行状态进行调试，主要通过GDB工具实现。GDB调试支持设置断点、查看寄存器和内存状态、单步执行、查看调用栈等常用调试操作。
 
-- 算子介绍：
-
+- 算子介绍：  
   Add算子具体功能描述可参考[Add算子详情](../../00_introduction/01_vector/basic_api_tque_add/README.md)章节。
 
 ## 编译运行
@@ -61,14 +59,12 @@
     | `CMAKE_ASC_RUN_MODE` | 指定为`cpu`, 开启CPU域编译 |
     | `CMAKE_ASC_ARCHITECTURES` | 指定NPU架构版本号，CMake会根据该值配置对应的CPU调试依赖库。<br>`dav-2201` 对应 Atlas A2/A3 系列，`dav-3510` 对应 Ascend 950PR/Ascend 950DT |
 
-- 执行结果
-
+- 执行结果  
   执行结果如下，说明执行成功。
   ```bash
   [Success] Case accuracy is verification passed.
   ```
-- 进入gdb模式调试
-
+- 进入gdb模式调试  
   编译生成的CPU域可执行程序支持通过gdb进行调试。gdb支持设置断点、查看寄存器和内存状态、单步执行、查看调用栈等常用调试操作。在上述指令中"./add"前加入"gdb --args"，再次执行指令即可进入gdb模式。
   ```bash
   gdb --args ./add
