@@ -1,0 +1,1 @@
+/home/developer/Ascend/cann-9.0.0/bin/bisheng CMakeFiles/cg_thread_block_fusion.dir/thread_block_fusion.asc.o -o cg_thread_block_fusion  -lm 

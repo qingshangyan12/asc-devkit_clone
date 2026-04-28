@@ -1,0 +1,7 @@
+/mnt/workspace/asc-devkit/tests/api/simt_api/cooperative_groups/fusion_compute_tests/build/CMakeFiles/rebuild_cache.dir
+/mnt/workspace/asc-devkit/tests/api/simt_api/cooperative_groups/fusion_compute_tests/build/CMakeFiles/edit_cache.dir
+/mnt/workspace/asc-devkit/tests/api/simt_api/cooperative_groups/fusion_compute_tests/build/CMakeFiles/cg_thread_block_tile_fusion.dir
+/mnt/workspace/asc-devkit/tests/api/simt_api/cooperative_groups/fusion_compute_tests/build/CMakeFiles/cg_vote_functions_fusion.dir
+/mnt/workspace/asc-devkit/tests/api/simt_api/cooperative_groups/fusion_compute_tests/build/CMakeFiles/cg_thread_block_fusion.dir
+/mnt/workspace/asc-devkit/tests/api/simt_api/cooperative_groups/fusion_compute_tests/build/CMakeFiles/cg_coalesced_group_fusion.dir
+/mnt/workspace/asc-devkit/tests/api/simt_api/cooperative_groups/fusion_compute_tests/build/CMakeFiles/cg_shuffle_functions_fusion.dir

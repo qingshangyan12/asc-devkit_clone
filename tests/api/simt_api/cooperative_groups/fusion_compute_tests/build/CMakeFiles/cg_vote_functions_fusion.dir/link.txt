@@ -1,0 +1,1 @@
+/home/developer/Ascend/cann-9.0.0/bin/bisheng CMakeFiles/cg_vote_functions_fusion.dir/vote_functions_fusion.asc.o -o cg_vote_functions_fusion  -lm 

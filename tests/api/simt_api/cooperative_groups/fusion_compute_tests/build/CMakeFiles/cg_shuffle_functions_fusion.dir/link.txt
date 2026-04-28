@@ -1,0 +1,1 @@
+/home/developer/Ascend/cann-9.0.0/bin/bisheng CMakeFiles/cg_shuffle_functions_fusion.dir/shuffle_functions_fusion.asc.o -o cg_shuffle_functions_fusion  -lm 
