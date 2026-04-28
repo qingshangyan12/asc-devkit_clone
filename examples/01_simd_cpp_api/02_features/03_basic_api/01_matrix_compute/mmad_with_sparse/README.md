@@ -74,20 +74,21 @@
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
-  使用NPU仿真或CPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`或`-DCMAKE_ASC_RUN_MODE=cpu`参数即可。
-  
-  示例如：
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例如下：
   ```bash
-  cmake .. -DCMAKE_ASC_RUN_MODE=sim;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=cpu ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
 
-  | 参数 | 可选值 | 默认值 | 说明 |
-  |------|--------|--------|------|
-  | CMAKE_ASC_RUN_MODE | npu、sim、cpu | npu | 运行模式 |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
 
 - 执行结果
 

@@ -1,4 +1,4 @@
-# load_data_l12l0_load2dv2样例
+# load_data_2dv2_l12l0样例
 
 ## 概述
 
@@ -8,7 +8,7 @@
 - L0B 数据排布为 **Zn 格式**
 - 支持转置功能，通过 `ifTranspose` 参数控制
 - 支持 int8_t、half、float 三种数据类型
-
+`
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 
