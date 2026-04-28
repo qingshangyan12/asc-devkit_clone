@@ -30,6 +30,7 @@
 #include "utils/kernel_utils_macros.h"
 #include "kernel_operator_swap_mem_intf.h"
 #include "kernel_operator_sys_var_intf.h"
+#include "kernel_tensor_base.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -99,6 +100,38 @@ __aicore__ inline AscendC::TPipe* GetTPipePtr()
 #endif
 
 namespace AscendC {
+template <HardEvent evt>
+__aicore__ inline TEventID AllocEventID()
+{
+    ASCENDC_DEBUG_ASSERT((evt < HardEvent::MAX),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal event %d", static_cast<int32_t>(evt)));
+    auto eventIndex = EventToIndex(evt);
+    auto lastId = sff0(Internal::g_occupyEventPool[eventIndex]);
+    ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
+            QUE_MAX_EVENT));
+    Internal::g_occupyEventPool[eventIndex] =
+        sbitset1(Internal::g_occupyEventPool[eventIndex], lastId);
+    return lastId;
+}
+
+template <HardEvent evt>
+__aicore__ inline void ReleaseEventID(TEventID id)
+{
+    ASCENDC_DEBUG_ASSERT((id >= 0 && id < QUE_MAX_EVENT),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %d, which should be larger than 0, and smaller than %d",
+            static_cast<int32_t>(id), QUE_MAX_EVENT));
+    ASCENDC_DEBUG_ASSERT((evt != HardEvent::MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "evt cannot be HardEvent::MAX"));
+    auto eventIndex = EventToIndex(evt);
+    Internal::g_occupyEventPool[eventIndex] = sbitset0(Internal::g_occupyEventPool[eventIndex], id);
+    return;
+}
+
+template <HardEvent evt> __aicore__ inline TEventID FetchEventID()
+{
+    return Internal::FetchEventIDImpl(evt);
+}
+
 template <typename T, MaskMode mode = MaskMode::NORMAL>
 __aicore__ static inline void SetVectorMask(const uint64_t maskHigh, const uint64_t maskLow)
 {
