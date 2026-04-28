@@ -27,10 +27,17 @@
 
 #ifndef LIB_MATH_ACOS_H
 #define LIB_MATH_ACOS_H
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || \
+    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "kernel_tensor.h"
 
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/acos/acos_common_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#include "../../../impl/adv_api/detail/math/acos/acos_3510_impl.h"
+#endif
 
 namespace AscendC {
 #pragma begin_pipe(V)
@@ -115,6 +122,7 @@ __aicore__ inline void Acos(const LocalTensor<T>& dstTensor, const LocalTensor<T
 
 #pragma end_pipe
 } // namespace AscendC
+#endif
 #endif // LIB_MATH_ACOS_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ACOS_H__)
