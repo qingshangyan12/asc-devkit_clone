@@ -76,9 +76,6 @@
 
 使用内存空间限定符\_\_ubuf\_\_来表示动、静态内存，静态内存的大小在编译期是确定的，动态内存的大小在核函数执行时确定。
 
->[!CAUTION]注意 
->当前版本暂未支持动、静态内存，请关注后续版本。
-
 -   静态内存通过数组分配：
 
     ```
@@ -109,11 +106,11 @@
 
 当前提供了以下仅在Device上可用的dim3结构的内置变量：
 
--   blockDim
+-   blockDim<a name="li076017381191"></a>
 
     内置全局变量，在核函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构，即启动VF时配置的dim3结构体实例值。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数。
 
--   gridDim
+-   gridDim<a name="li20760123812911"></a>
 
     内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。
 
@@ -630,7 +627,7 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 </th>
 </tr>
 </thead>
-<tbody><tr id="row2746162863719"><td class="cellrowborder" rowspan="9" valign="top" width="11.75%" headers="mcps1.2.8.1.1 "><p id="p9746728143715"><a name="p9746728143715"></a><a name="p9746728143715"></a>算术运算符</p>
+<tbody><tr id="row2746162863719"><td class="cellrowborder" rowspan="8" valign="top" width="11.75%" headers="mcps1.2.8.1.1 "><p id="p9746728143715"><a name="p9746728143715"></a><a name="p9746728143715"></a>算术运算符</p>
 <p id="p2074662843716"><a name="p2074662843716"></a><a name="p2074662843716"></a></p>
 <p id="p19746142873718"><a name="p19746142873718"></a><a name="p19746142873718"></a></p>
 </td>
@@ -723,19 +720,6 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 <td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="p774722819376"><a name="p774722819376"></a><a name="p774722819376"></a>√</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="p4747728123717"><a name="p4747728123717"></a><a name="p4747728123717"></a>x</p>
-</td>
-</tr>
-<tr id="row974712287378"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="p7747328193714"><a name="p7747328193714"></a><a name="p7747328193714"></a>+ (取正)</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="p19747172873712"><a name="p19747172873712"></a><a name="p19747172873712"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="p12747192820376"><a name="p12747192820376"></a><a name="p12747192820376"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="p974712281377"><a name="p974712281377"></a><a name="p974712281377"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="p974715286370"><a name="p974715286370"></a><a name="p974715286370"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="p15747152893710"><a name="p15747152893710"></a><a name="p15747152893710"></a>x</p>
 </td>
 </tr>
 <tr id="row874712286377"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="p974719284373"><a name="p974719284373"></a><a name="p974719284373"></a>- (取反)</p>
@@ -1026,7 +1010,9 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
 在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程和线程块驻留在AI处理器上，从而提升性能。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
--   \_\_launch\_bounds\_\_\(N\)是函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定SIMT VF启动的最大线程数。若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。参数N需要满足：
+-   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
+  
+    函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定SIMT VF启动的最大线程数。若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。参数N需要满足：
     -   N \>= dimx \* dimy \* dimz；dimx，dimy，dimz为表示线程的dim3结构体。
     -   N的取值范围为1到2048。
 
@@ -1069,4 +1055,3 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
         ```
         __simt_vf__ __launch_bounds__(512) inline void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
         ```
-

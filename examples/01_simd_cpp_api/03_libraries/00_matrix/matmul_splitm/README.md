@@ -15,12 +15,10 @@
 │   └── matmul_splitm.asc       // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   本样例实现是在AscendC分离模式，AIC:AIV=1:2的场景。本样例流程是调用Matmul高阶API，A矩阵和B矩阵同时使能IBShare参数，在AIC上将Iterate的中间结果输出至Unified Buffer，再在两个AIV上分别处理中间结果Unified Buffer的一半数据。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 127, N = 127, K = 63。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>

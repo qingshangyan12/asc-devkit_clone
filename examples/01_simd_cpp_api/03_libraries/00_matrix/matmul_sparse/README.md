@@ -19,13 +19,11 @@
 │   └── matmul_sparse.asc       // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例调用Matmul高阶API对输入的左矩阵A和4:2稠密化后的右矩阵B，进行矩阵乘和加bias偏置。   
   在计算执行前的数据准备阶段，通过真值数据生成脚本自行完成B矩阵的稠密化，并得到索引矩阵。在实现Matmul计算时，调用Matmul高阶API传入4:2稠密化后的B矩阵和索引矩阵，最终完成Sparse Matmul场景的矩阵乘计算。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 128, N = 7680, K = 64。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
