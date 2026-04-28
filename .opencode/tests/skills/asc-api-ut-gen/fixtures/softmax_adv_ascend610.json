@@ -1,0 +1,21 @@
+{
+  "api_type": "adv",
+  "api_name": "Softmax",
+  "chip": "ascend610",
+  "test_cases": [
+    {
+      "name": "Softmax_half_8x128",
+      "data_size": 1024,
+      "dtype": "half",
+      "input_count": 1,
+      "has_mask": false,
+      "additional_params": {
+        "height": 8,
+        "width": 128
+      }
+    }
+  ],
+  "kernel_params": {},
+  "custom_includes": [],
+  "output_dir": null
+}

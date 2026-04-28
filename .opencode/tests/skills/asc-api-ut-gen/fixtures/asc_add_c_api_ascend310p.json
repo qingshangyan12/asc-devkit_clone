@@ -1,0 +1,18 @@
+{
+  "api_type": "c_api",
+  "api_name": "asc_add",
+  "chip": "ascend310p",
+  "test_cases": [
+    {
+      "name": "asc_add_uint8_128",
+      "data_size": 128,
+      "dtype": "uint8_t",
+      "input_count": 2,
+      "has_mask": true,
+      "additional_params": {}
+    }
+  ],
+  "kernel_params": {},
+  "custom_includes": [],
+  "output_dir": null
+}
