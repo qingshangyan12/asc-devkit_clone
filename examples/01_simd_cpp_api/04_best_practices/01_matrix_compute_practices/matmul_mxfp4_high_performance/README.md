@@ -118,15 +118,23 @@ REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
 
 | 参数 | 值 |
 |------|----|
-| `M=N=K` | `8192 / 8192 / 8192` |
+| `M` | `8192` |
+| `N` | `8192` |
+| `K` | `8192` |
 | `singleCoreM` | `2048` |
 | `singleCoreN` | `1024` |
 | `singleCoreK` | `8192` |
-| `baseM=baseN=baseK` | `256` |
-| `stepKa=stepKb` | `2 / 2` |
-| `scaleFactorKa=scaleFactorKb (case1)` | `1 / 1` |
-| `scaleFactorKa=scaleFactorKb (case2)` | `4 / 4` |
-| 数据类型 | A/B: `fp4x2` (`0.5 Byte/elem`), scale: `fp8` (`1 Byte/elem`) |
+| `baseM` | `256` |
+| `baseN` | `256` |
+| `baseK` | `256` |
+| `stepKa` | `2` |
+| `stepKb` | `2` |
+| `scaleFactorKa (case1)` | `1` |
+| `scaleFactorKb (case1)` | `1` |
+| `scaleFactorKa (case2)` | `4` |
+| `scaleFactorKb (case2)` | `4` |
+| `数据类型` | A/B: `fp4x2` (`0.5 Byte/elem`) |
+| `数据类型` | scale: `fp8` (`1 Byte/elem`) |
 
 **说明**：
 
@@ -196,7 +204,10 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
 
 在本样例根目录下执行如下步骤，编译并执行样例：
 
-- **配置环境变量**
+> **注意事项**：本样例使用的 `en_dtypes` 库需要版本 `0.0.4` 及以上。
+
+### 配置环境变量
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -213,7 +224,8 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
     source ${install_path}/cann/set_env.sh
     ```
 
-- **样例执行**
+### 样例执行
+
   ```bash
   SCENARIO_NUM=2
   mkdir -p build && cd build;  # 创建并进入 build 目录
