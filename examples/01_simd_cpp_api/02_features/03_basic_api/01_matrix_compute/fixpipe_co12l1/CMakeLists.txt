@@ -42,7 +42,10 @@ endif()
 set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-4)")
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
-add_definitions(-DASC_ARCHITECTURES=${ASC_ARCHITECTURES})
+
+string(REGEX MATCH "([0-9]+)" ARCH_NUM "${CMAKE_ASC_ARCHITECTURES}")
+add_definitions(-DASC_ARCHITECTURES=${ARCH_NUM})
+message(STATUS "[INFO] ARCH_NUM is ${ARCH_NUM}")
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>

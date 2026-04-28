@@ -118,9 +118,9 @@
 
 - 样例执行
   ```bash
-  SCENARIO_NUM=2 ASC_ARCH=dav-2201 ASC_ARCH_NUM=2201
+  SCENARIO_NUM=2 ASC_ARCH=dav-2201
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH -D_ASC_ARCHITECTURES=$ASC_ARCH_NUM ..;make -j;    # 编译工程（默认dav-2201 NPU模式）
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH ..;make -j;    # 编译工程（默认dav-2201 NPU模式）
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM -ascArch=$ASC_ARCH  # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin $SCENARIO_NUM $ASC_ARCH # 验证输出结果是否正确
