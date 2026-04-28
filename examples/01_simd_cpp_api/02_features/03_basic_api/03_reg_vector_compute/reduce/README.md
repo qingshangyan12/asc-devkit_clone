@@ -1,8 +1,11 @@
 # reduce样例
 
 ## 概述
-本样例基于RegBase编程范式实现Reduce运算，主要调用Reduce接口（SUM模式）。
-- Reduce接口支持SUM/MAX/MIN归约模式，本样例以SUM模式为例
+本样例基于RegBase编程范式实现Reduce运算，支持多种归约模式：
+- SUM（求和）
+- MAX（求最大值及索引）
+- MIN（求最小值及索引）
+- BINARY（二分累加）
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -11,35 +14,44 @@
 ```
 ├── reduce
 │   ├── scripts
-│   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
+│   │   ├── gen_all_reduce_data.py    // 所有reduce核函数的测试数据生成脚本
+│   │   └── gen_data.py                // reduce_accumulate单独的数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
-│   ├── reduce.asc                     // AscendC样例实现 & 调用样例
+│   ├── reduce_accumulate.asc          // 累加器方式归约求和样例
+│   ├── reduce_iterator.asc            // 迭代器方式归约求和样例
+│   ├── reduce_binary.asc              // 二分累加归约求和样例
+│   ├── reduce_max.asc                 // 归约求最大值+索引样例
+│   ├── reduce_min.asc                 // 归约求最小值+索引样例
 │   └── README.md                      // 样例介绍
 ```
 
 ## 样例描述
-- 样例功能：
-  对输入向量做归约求和运算，向量shape为[1, 256]，数据类型为float，输出为归约求和结果。
-- 样例规格：
-  <table>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-  </tr>
-  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
-  </tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1]</td><td align="center">float</td></tr>
-  </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce</td></tr>
-  </table>
-- 样例实现：
-   ReduceSumVF函数内调用Reduce接口进行归约计算：
-   - 使用LoadAlign加载数据到寄存器
-   - 使用Reduce(ReduceType::SUM)对单个repeat内所有元素求和
-   - 使用Add累加多个repeat的局部和
-   - 使用StoreAlign将最终结果写回UB
-  - 调用实现
-    使用内核调用符<<<>>>调用核函数。
+
+### 1. reduce_accumulate.asc - 累加器方式归约求和
+- 样例功能：对输入向量做归约求和运算，向量shape为[1, 256]，数据类型为float
+- 核函数名：`reduce_accumulate`
+- 样例实现：使用累加器寄存器逐步累加多个repeat的结果
+
+### 2. reduce_iterator.asc - 迭代器方式归约求和
+- 样例功能：对输入向量做归约求和运算，向量shape为[64, 16]，数据类型为float
+- 核函数名：`reduce_iterator`
+- 样例实现：基于ReduceSumImpl实现，支持两级归约
+
+### 3. reduce_binary.asc - 二分累加归约求和
+- 样例功能：对输入向量做归约求和运算，向量shape为[64, 16]，数据类型为float
+- 核函数名：`reduce_binary`
+- 样例实现：使用Binary Halving算法，通过多次两两配对累加实现归约
+
+### 4. reduce_max.asc - 归约求最大值及索引
+- 样例功能：求输入向量的最大值及其对应的索引，向量shape为[64, 16]，数据类型为float
+- 核函数名：`reduce_max`
+- 样例实现：使用ReduceMaxWithIndexImpl，同时返回最大值和索引
+
+### 5. reduce_min.asc - 归约求最小值及索引
+- 样例功能：求输入向量的最小值及其对应的索引，向量shape为[64, 16]，数据类型为float
+- 核函数名：`reduce_min`
+- 样例实现：使用ReduceMinWithIndexImpl，同时返回最小值和索引
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
@@ -64,8 +76,12 @@
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（默认npu模式）
-  python3 ../scripts/gen_data.py                                            # 生成测试输入数据
-  ./demo                                                                    # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/gen_all_reduce_data.py                                 # 生成所有reduce核函数的测试数据
+  ./demo_reduce_accumulate    # 执行reduce_accumulate样例
+  ./demo_reduce_iterator      # 执行reduce_iterator样例
+  ./demo_reduce_binary        # 执行reduce_binary样例
+  ./demo_reduce_max           # 执行reduce_max样例
+  ./demo_reduce_min           # 执行reduce_min样例
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
