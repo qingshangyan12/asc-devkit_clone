@@ -21,15 +21,9 @@
 
 #ifndef LIB_MATH_TRUNC_H
 #define LIB_MATH_TRUNC_H
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-    __NPU_ARCH__ == 5102))
 #include "kernel_tensor.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/trunc/trunc_common_impl.h"
-#else
-#include "../../../impl/adv_api/detail/math/trunc/trunc_3510_impl.h"
-#endif
 
 namespace AscendC {
 #pragma begin_pipe(V)
@@ -108,7 +102,6 @@ __aicore__ inline void Trunc(const LocalTensor<T>& dstTensor, const LocalTensor<
 }
 #pragma end_pipe
 } // namespace AscendC
-#endif
 #endif // LIB_MATH_TRUNC_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRUNC_H__)

@@ -21,7 +21,6 @@
 
 #ifndef LIB_MATH_HYPOT_H
 #define LIB_MATH_HYPOT_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 
 #include "../../../impl/adv_api/detail/math/hypot/hypot_common_impl.h"
@@ -120,7 +119,6 @@ __aicore__ inline void Hypot(const LocalTensor<T>& dstTensor, const LocalTensor<
 }
 #pragma end_pipe
 }  // namespace AscendC
-#endif
 #endif  // LIB_MATH_HYPOT_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HYPOT_H__)

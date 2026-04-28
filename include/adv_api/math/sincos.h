@@ -22,7 +22,6 @@
 #ifndef LIB_MATH_SINCOS_H
 #define LIB_MATH_SINCOS_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/math/sincos/sincos_3510_impl.h"
 
@@ -60,7 +59,6 @@ __aicore__ inline void SinCos(const LocalTensor<T>& dst0, const LocalTensor<T>& 
 
 #pragma end_pipe
 } // namespace AscendC
-#endif
 #endif // LIB_MATH_SINCOS_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SINCOS_H__)

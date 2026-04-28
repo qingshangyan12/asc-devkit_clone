@@ -23,8 +23,6 @@
 #include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/math/log/log_common_impl.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 
 namespace AscendC {
 
@@ -41,11 +39,9 @@ __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>
     uint32_t calCount)
 {
     // Only for AI Vector Core.
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     if ASCEND_IS_AIC {
         return;
     }
-#endif
     LogImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 }
 
@@ -74,11 +70,9 @@ __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T
     const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
 {
     // Only for AI Vector Core.
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     if ASCEND_IS_AIC {
         return;
     }
-#endif
     Log2Impl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
@@ -142,11 +136,9 @@ __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<
     uint32_t calCount)
 {
     // Only for AI Vector Core.
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     if ASCEND_IS_AIC {
         return;
     }
-#endif
     Log10Impl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 }
 
@@ -165,7 +157,6 @@ __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<
 #pragma end_pipe
 }  // namespace AscendC
 
-#endif
 #endif  // LIB_MATH_LOG_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOG_H__)
