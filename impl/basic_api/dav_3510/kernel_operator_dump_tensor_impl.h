@@ -533,13 +533,6 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 #endif
 }
 
-__aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
-{
-}
-__aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
-{
-}
-
 __aicore__ inline void DumpL1TensorTransferByUB()
 {
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved);
