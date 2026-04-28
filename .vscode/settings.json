@@ -22,5 +22,6 @@
         "--background-index=0",
         "--clang-tidy=0"
     ],
-    "C_Cpp.intelliSenseEngine": "disabled"
+    "C_Cpp.intelliSenseEngine": "disables
+        "
 }
