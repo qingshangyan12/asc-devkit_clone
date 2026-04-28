@@ -31,6 +31,7 @@
 #include "kernel_struct_data_copy.h"
 #include "kernel_scalar_convert.h"
 #include "kernel_utils_base.h"
+#include "kernel_event.h"
 
 #if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1
 #define KFC_C310_SSBUF 1
@@ -40,6 +41,10 @@
 
 inline __gm__ void* g_sysFftsAddr = nullptr;
 namespace AscendC {
+namespace Internal {
+__BLOCK_LOCAL__ uint64_t g_tPipeOccupyEventPool[EVENT_NUM] = {};
+__BLOCK_LOCAL__ uint32_t g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::MAX)] = {};
+}
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 namespace Internal {
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
@@ -59,7 +64,7 @@ __BLOCK_LOCAL__ __inline__ uint64_t g_cmpMaskHigh;
 // g_deqScale will store the UB address of vdeq, and the data of vdeqInfo will be stored in vdeq
 __BLOCK_LOCAL__ __inline__ uint64_t g_deqScale;
 // manage the global id for get/rls buff.
-__BLOCK_LOCAL__ __inline__ uint32_t g_bufId;
+__BLOCK_LOCAL__ __inline__ uint32_t g_bufId = 0;
 __BLOCK_LOCAL__ __inline__ uint32_t g_sharedEvtId;
 // global variables g_aipp* are used to simulate the spr for SetAippFunctions and LoadImageToLocal, they will save
 // the configs and apply them to pre-process the input image in LoadImageToLocal function.
