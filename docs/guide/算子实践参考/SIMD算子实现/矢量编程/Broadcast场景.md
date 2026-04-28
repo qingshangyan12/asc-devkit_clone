@@ -1,11 +1,11 @@
 # Broadcast场景<a name="ZH-CN_TOPIC_0000002500548092"></a>
 
-在某些场景下，可能会存在两个输入shape不相同的情况。由于Add接口只支持对shape相同的输入进行计算，因此需要先对输入进行shape变换，再进行Add计算。本节将对满足Broadcast条件的输入在算子实现中的Broadcast处理进行介绍，其他场景可以参考本章节中提供的思路。
+在某些场景下，可能会存在两个输入shape不相同的情况。由于[Add](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Add.md)接口只支持对shape相同的输入进行计算，因此需要先对输入进行shape变换，再进行Add计算。本节将对满足Broadcast条件的输入在算子实现中的Broadcast处理进行介绍，其他场景可以参考本章节中提供的思路。
 
 >[!NOTE]注意 
 >Broadcast机制通过扩展较小维度的数据，使得不同shape的输入能够进行运算，从而避免了显式的复制操作，提高了计算效率。数据进行Broadcast需满足：两个输入的维度个数相同，并且仅在某一个维度上的长度不同，某一个输入在此维度的长度为1。比如：shape为\(32, 8\) 和 \(32, 1\) 的两个输入可以进行Broadcast，因为它们都是二维，且第一个维度大小相等，而不相等的维度中第二个输入的维度为1，满足条件。
 
-本节中将使用Broadcast接口，因此输入需满足该API相关约束。同时，由于硬件限制，该API的输入地址需满足32字节对齐。本节以输入维度为2、第二个轴（axis = 1）需要Broadcast为例进行说明。完整的样例代码请参见[输入Broadcast的Add算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/08_transpose/add_broadcast)。
+本节中将使用[Broadcast](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Broadcast.md)接口，因此输入需满足该API相关约束。同时，由于硬件限制，该API的输入地址需满足32字节对齐。本节以输入维度为2、第二个轴（axis = 1）需要Broadcast为例进行说明。完整的样例代码请参见[输入Broadcast的Add算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/08_tensor_transformation/add_broadcast)。
 
 ## Tiling实现<a name="zh-cn_topic_0000002201157446_section598962019342"></a>
 
@@ -100,9 +100,11 @@ __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData
     if (tiling.xLen > tiling.yLen) {
         longerInputPtr = x;
         shorterInputPtr = y;
+        this->shorterAxisLen = tiling.yLen;
     } else {
         longerInputPtr = y;
         shorterInputPtr = x;
+        this->shorterAxisLen = tiling.xLen;
     }
     this->coef = tiling.coef;
     if (tiling.isEvenCore) {
@@ -110,7 +112,7 @@ __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData
         this->tileLength = tiling.tileLength / BUFFER_NUM;
         this->lastTileLength = tiling.lastTileLength;
         xGm.SetGlobalBuffer((__gm__ T*)longerInputPtr + tiling.blockLength * AscendC::GetBlockIdx(), tiling.blockLength);
-        yGm.SetGlobalBuffer((__gm__ T*)shorterInputPtr + tiling.blockLength * AscendC::GetBlockIdx() / this->coef, tiling.blockLength / this->coef);
+        yGm.SetGlobalBuffer((__gm__ T*)shorterInputPtr, this->shorterAxisLen);
         zGm.SetGlobalBuffer((__gm__ T*)z + tiling.blockLength * AscendC::GetBlockIdx(), tiling.blockLength);
     } else {
         if (AscendC::GetBlockIdx() < tiling.formerNum) {
@@ -118,7 +120,7 @@ __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData
             this->tileLength = tiling.formerTileLength / BUFFER_NUM;
             this->lastTileLength = tiling.formerLastTileLength;
             xGm.SetGlobalBuffer((__gm__ T*)longerInputPtr + tiling.formerLength * AscendC::GetBlockIdx(), tiling.formerLength);
-            yGm.SetGlobalBuffer((__gm__ T*)shorterInputPtr + tiling.formerLength * AscendC::GetBlockIdx() / this->coef, tiling.formerLength / this->coef);
+            yGm.SetGlobalBuffer((__gm__ T*)shorterInputPtr, this->shorterAxisLen);
             zGm.SetGlobalBuffer((__gm__ T*)z + tiling.formerLength * AscendC::GetBlockIdx(), tiling.formerLength);
         } else {
             this->tileNum = tiling.tailTileNum;
@@ -126,8 +128,7 @@ __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData
             this->lastTileLength = tiling.tailLastTileLength;
             xGm.SetGlobalBuffer((__gm__ T*)longerInputPtr + tiling.formerLength * tiling.formerNum +
                 tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum), tiling.tailLength);
-            yGm.SetGlobalBuffer((__gm__ T*)shorterInputPtr + tiling.formerLength * tiling.formerNum / this->coef +
-            tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum) / this->coef, tiling.tailLength / this->coef);
+            yGm.SetGlobalBuffer((__gm__ T*)shorterInputPtr, this->shorterAxisLen);
             zGm.SetGlobalBuffer((__gm__ T*)z + tiling.formerLength * tiling.formerNum +
                 tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum), tiling.tailLength);
         }
@@ -135,11 +136,12 @@ __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData
     pipe->InitBuffer(inQueueX, BUFFER_NUM, this->tileLength * sizeof(T));
     pipe->InitBuffer(inQueueY, BUFFER_NUM, this->coef * sizeof(T));
     pipe->InitBuffer(outQueueZ, BUFFER_NUM, this->tileLength * sizeof(T));
-    pipe->InitBuffer(tmpBuf2, this->tileLength * sizeof(dataType));
+    pipe->InitBuffer(tmpBuf0, this->tileLength * sizeof(dataType));
+    pipe->InitBuffer(tmpBuf1, this->tileLength * sizeof(dataType));
 }
 ```
 
-由于数据是向coef对齐的，在数据拷贝的过程中可能会出现地址不满足32字节对齐的场景，因此CopyIn函数、CopyOut函数中使用DataCopyPad进行数据拷贝。
+由于数据是向coef对齐的，在数据拷贝的过程中可能会出现地址不满足32字节对齐的场景，因此CopyIn函数、CopyOut函数中使用[DataCopyPad](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DataCopyPad(ISASI).md)进行数据拷贝。
 
 CopyIn函数实现代码如下：
 
@@ -148,18 +150,11 @@ __aicore__ inline void CopyIn(int32_t progress)
 {
     AscendC::LocalTensor<T> xLocal = inQueueX.AllocTensor<T>();
     AscendC::LocalTensor<T> yLocal = inQueueY.AllocTensor<T>();
-    AscendC::DataCopyExtParams copyXParams = {1, (uint32_t)(this->tileLength * sizeof(T)), 0, 0, 0};
-    AscendC::DataCopyExtParams copyYParams = {1, (uint32_t)(this->tileLength * sizeof(T) / this->coef), 0, 0, 0};
+    AscendC::DataCopyExtParams copyParams = {1, (uint32_t)(this->tileLength * sizeof(T)), 0, 0, 0};
     AscendC::DataCopyPadExtParams<T> padParams = {false, 0, 0, 0};
-    if (progress == (this->tileNum * BUFFER_NUM - 1)) {
-        AscendC::DataCopyPad<T>(xLocal, xGm[(progress - LAST_TWO_TILE) * this->tileLength + this->lastTileLength],
-            copyXParams, padParams);
-        AscendC::DataCopyPad<T>(yLocal, yGm[((progress - LAST_TWO_TILE) * this->tileLength + this->lastTileLength) / this->coef],
-            copyYParams, padParams);
-    } else {
-        AscendC::DataCopyPad<T>(xLocal, xGm[progress * this->tileLength], copyXParams, padParams);
-        AscendC::DataCopyPad<T>(yLocal, yGm[progress * this->tileLength / this->coef], copyYParams, padParams);
-    }
+    AscendC::DataCopyPad<T>(xLocal, xGm[progress * this->tileLength], copyParams, padParams);
+    AscendC::DataCopyPad<T>(yLocal, yGm[(progress % BUFFER_NUM) * this->tileLength], copyParams,
+                                        padParams);
     inQueueX.EnQue(xLocal);
     inQueueY.EnQue(yLocal);
 }
@@ -172,11 +167,7 @@ __aicore__ inline void CopyOut(int32_t progress)
 {
     AscendC::LocalTensor<T> zLocal = outQueueZ.DeQue<T>();
     AscendC::DataCopyExtParams copyParams = {1, (uint32_t)(this->tileLength * sizeof(T)), 0, 0, 0};
-    if (progress == (this->tileNum * BUFFER_NUM - 1)) {
-        AscendC::DataCopyPad<T>(zGm[(progress - LAST_TWO_TILE) * this->tileLength + this->lastTileLength], zLocal, copyParams);
-    } else {
-        AscendC::DataCopyPad<T>(zGm[progress * this->tileLength], zLocal, copyParams);
-    }
+    AscendC::DataCopyPad<T>(zGm[progress * this->tileLength], zLocal, copyParams);
     outQueueZ.FreeTensor(zLocal);
 }
 ```

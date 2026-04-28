@@ -14,7 +14,7 @@
 ## 目录结构介绍
 
 ```
-├── 06_msSanitizer
+├── msSanitizer
 │   ├── scripts
 │   │   ├── gen_data.py             // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
@@ -48,8 +48,7 @@ z = x + y
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
 </table>
 
-- 算子实现：
-
+- 算子实现：  
   Add算子的数学表达式为：
 
   ```

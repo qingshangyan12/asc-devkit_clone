@@ -18,7 +18,7 @@
 ```
 
 ## 算子描述
-- 算子功能：
+- 算子功能：  
   本样例中实现的是[m, n, k]固定为[128, 128, 64]的稀疏矩阵乘算子，使用Ascend C基础Api MmadWithSparse接口实现。4选2 sparseMatmul是一种特殊的矩阵乘，要求一个连续的4个权重或激活值的组中，最多只有2个值为非零，其余2个强制为零，算子的数学表达式为：
   ```
   C = A * B
@@ -37,7 +37,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_with_sparse_custom</td></tr>
   </table>
 
-- 算子实现：
+- 算子实现：  
   算子实现流程分为以下步骤：
   - **CopyIn**: 将Global Memory上的输入数据搬运到Local Memory L1中，并把加载索引矩阵到L1中，其中Index分型与B矩阵分型必须为Zn分型，即GM上的B矩阵必须为转置，Index离线生成必须为Zn排布
   - **SplitB**: 使用LoadDataWithSparse将B矩阵和索引矩阵从L1搬运到L0B与内置索引buffer中
@@ -46,40 +46,55 @@
   - **CopyOut**: 将输出数据从L0C搬运至Global Memory上的输出GM中
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行算子。
+- 配置环境变量  
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，root用户安装CANN软件包
+    ```bash
+    source /usr/local/Ascend/cann/set_env.sh
+    ```
 
-### 1. 配置环境变量  
-请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，非root用户安装CANN软件包
+    ```bash
+    source $HOME/Ascend/cann/set_env.sh
+    ```
 
-- 默认路径，root用户安装CANN软件包
+  - 指定路径install_path，安装CANN软件包
+    ```bash
+    source ${install_path}/cann/set_env.sh
+    ```
+  
+- 样例执行
   ```bash
-  source /usr/local/Ascend/cann/set_env.sh
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake ..;make -j;    # 编译工程，默认npu模式
+  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  ./demo                           # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
-- 默认路径，非root用户安装CANN软件包
+  使用NPU仿真或CPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`或`-DCMAKE_ASC_RUN_MODE=cpu`参数即可。
+  
+  示例如：
   ```bash
-  source $HOME/Ascend/cann/set_env.sh
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim;make -j; # NPU仿真模式
   ```
 
-- 指定路径install_path，安装CANN软件包
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 参数 | 可选值 | 默认值 | 说明 |
+  |------|--------|--------|------|
+  | CMAKE_ASC_RUN_MODE | npu、sim、cpu | npu | 运行模式 |
+
+- 执行结果
+
+  执行结果如下，说明精度对比成功。
   ```bash
-  source ${install_path}/cann/set_env.sh
+  test pass!
   ```
-
-### 2. 样例执行
-```bash
-mkdir -p build && cd build;      # 创建并进入build目录
-cmake ..;make -j;                # 编译工程
-python3 ../scripts/gen_data.py   # 生成测试输入数据
-./demo                           # 执行编译生成的可执行程序，执行样例
-python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
-```
-
-### 3. 执行结果
-执行成功后，输出如下信息，说明精度对比成功。
-```bash
-test pass!
-```
 
 ## 数据生成与验证说明
 

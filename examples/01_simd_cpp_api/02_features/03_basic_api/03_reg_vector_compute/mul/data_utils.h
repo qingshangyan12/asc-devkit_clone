@@ -11,7 +11,7 @@
 
 /* !
  * \file data_utils.h
- * \brief
+ * \brief Mul样例的输入输出数据读写辅助工具，提供文件读取、写入功能
  */
 
 #ifndef DATA_UTILS_H

@@ -35,7 +35,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetWarpSizeImpl()
 }
 
 template <int32_t dim = 0>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetThreadNumImpl()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t GetThreadNumImpl()
 {
     if constexpr (dim == 0) {
         return blockDim.x;
@@ -48,7 +48,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetThreadNumImpl()
 }
 
 template <int32_t dim = 0>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetThreadIdxImpl()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t GetThreadIdxImpl()
 {
     static_assert((dim >= 0 && dim <= 2), "dim is out of range [0, 2]");
     if constexpr (dim == 0) {
@@ -61,12 +61,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetThreadIdxImpl()
     return 0;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetBlockIdxImpl()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t GetBlockIdxImpl()
 {
     return blockIdx.x;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetBlockNumImpl()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t GetBlockNumImpl()
 {
     return gridDim.x;
 }
