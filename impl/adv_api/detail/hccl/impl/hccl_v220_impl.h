@@ -7,7 +7,6 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
 /*!
  * \file hccl_v220_impl.h
  * \brief
@@ -15,6 +14,6 @@
 #ifndef IMPL_HCCL_HCCL_V220_IMPL_H
 #define IMPL_HCCL_HCCL_V220_IMPL_H
 
-#include "platform_v220/hccl_aicpu_def.h"
+#include "../common/hccl_aicpu_def.h"
 
 #endif
