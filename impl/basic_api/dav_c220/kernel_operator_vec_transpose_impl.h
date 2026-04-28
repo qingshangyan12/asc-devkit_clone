@@ -710,10 +710,10 @@ __aicore__ inline void GetTransposeParamCal(const TransposeParamsExt &transposeP
 template <typename T>
 __aicore__ inline void TransposeUB2UBImpl(__ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
-    ASCENDC_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
-    {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_NCHW2NHWC / "
+    ASCENDC_DEBUG_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
+    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_NCHW2NHWC / "
     "TRANSPOSE_NHWC2NCHW, current api support dtype combination is src and dst both: int8_t / uint8_t / int16_t"
-    " / uint16_t / half / int32_t / uint32_t / float");});
+    " / uint16_t / half / int32_t / uint32_t / float"));
 
     DataCopyUB2UBImpl(dst, src, intriParams);
 }
@@ -722,13 +722,13 @@ template <typename T>
 __aicore__ inline void Transpose4DImpl(const LocalTensor<T> &dst, const LocalTensor<T> &src,
     const LocalTensor<uint8_t> &sharedTmpBuffer, const TransposeParamsExt &transposeParams)
 {
-    ASCENDC_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
-    {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_NCHW2NHWC / "
+    ASCENDC_DEBUG_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
+    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_NCHW2NHWC / "
     "TRANSPOSE_NHWC2NCHW, current api support dtype combination is src and dst both: int8_t / uint8_t / int16_t"
-    " / uint16_t / half / int32_t / uint32_t / float");});
+    " / uint16_t / half / int32_t / uint32_t / float"));
 
     LocalTensor<T> stackBuffer = sharedTmpBuffer.ReinterpretCast<T>();
-    ASCENDC_ASSERT((sharedTmpBuffer.GetSize() > 0), { KERNEL_LOG(KERNEL_ERROR, "sharedTmpBuffer size must > 0!"); });
+    ASCENDC_DEBUG_ASSERT((sharedTmpBuffer.GetSize() > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "sharedTmpBuffer size must > 0!"));
 
     Transpose4dParams<T> params;
     GetTransposeParamCal(transposeParams, params);

@@ -30,8 +30,8 @@ namespace AscendC {
 __aicore__ inline void SetSysWorkspace(GM_ADDR workspace)
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    ASCENDC_ASSERT((workspace != nullptr),
-        { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((workspace != nullptr),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "workspace can not be nullptr"));
 #else
     if (g_sysWorkspaceReserved == nullptr) {
         g_sysWorkspaceReserved = workspace;
@@ -42,8 +42,8 @@ __aicore__ inline void SetSysWorkspace(GM_ADDR workspace)
 __aicore__ inline void SetSysWorkspaceForce(GM_ADDR workspace)
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    ASCENDC_ASSERT((workspace != nullptr),
-        { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((workspace != nullptr),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "workspace can not be nullptr"));
 #else
 #if defined(__NPU_DEVICE__)
     __set_kfc_workspace_addr(workspace);
@@ -56,8 +56,8 @@ __aicore__ inline void SetSysWorkspaceForce(GM_ADDR workspace)
 __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    ASCENDC_ASSERT((workspace != nullptr),
-        { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((workspace != nullptr),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "workspace can not be nullptr"));
     return workspace;
 #else
     (void)(workspace);

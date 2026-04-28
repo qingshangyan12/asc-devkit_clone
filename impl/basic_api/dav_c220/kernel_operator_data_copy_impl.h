@@ -22,6 +22,9 @@
 #include "kernel_operator_scm_data_copy_impl.h"
 #include "kernel_common.h"
 #include "kernel_process_lock.h"
+// #if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
+// #include "kernel_tpipe_impl.h"
+// #endif
 namespace AscendC {
 // DataCopyParams:    uint16_t blockCount, uint16_t blockLen
 // DataCopyExtParams: uint16_t blockCount, uint32_t blockLen
@@ -33,9 +36,9 @@ __aicore__ inline void CheckDataCopyPadParams(uint16_t blockCount, uint32_t bloc
     ASCENDC_CHECK_VALUE_RANGE(blockCount, 0, UINT12_MAX, "blockCount", "DataCopyPad");
     ASCENDC_CHECK_VALUE_RANGE(blockLen, 0, dataCopyPadBlkLenLimit, "blockLen", "DataCopyPad");
     if (isGMtoUB) {
-        ASCENDC_ASSERT((blockLen % sizeof(T) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to check blockLen value in "
-            "DataCopyPad from GM to VECIN / VECOUT, it must be divisible by %zu, current value is %lu.", sizeof(T),
-            blockLen); });
+        ASCENDC_DEBUG_ASSERT((blockLen % sizeof(T) == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check blockLen value in \
+            DataCopyPad from GM to VECIN / VECOUT, it must be divisible by %zu, current value is %lu.", sizeof(T),
+            blockLen));
     }
 #endif
 }
@@ -49,20 +52,20 @@ __aicore__ inline void CheckDataCopyParams(uint16_t blockCount, uint16_t blockLe
 
 __aicore__ inline void ValidateUbL1Address(uint64_t absUbAddr, uint64_t absL1Addr, uint32_t tensorSize)
 {
-    ASCENDC_ASSERT((absUbAddr < TOTAL_UB_SIZE), {
-        KERNEL_LOG(KERNEL_ERROR, "absUbAddr is 0x%lx, which should be in range of [0, %u)", absUbAddr, TOTAL_UB_SIZE);
-    });
-    ASCENDC_ASSERT((static_cast<uint64_t>(absUbAddr + tensorSize) < TOTAL_UB_SIZE), {
-        KERNEL_LOG(KERNEL_ERROR, "absUbAddr is 0x%lx, tensorSize is %u, which exceeds the limit of ub %d)", absUbAddr,
-            tensorSize, TOTAL_UB_SIZE);
-    });
-    ASCENDC_ASSERT((absL1Addr < TOTAL_L1_SIZE), {
-        KERNEL_LOG(KERNEL_ERROR, "absL1Addr is 0x%lx, which should be in range [0, %u)", absL1Addr, TOTAL_L1_SIZE);
-    });
-    ASCENDC_ASSERT((static_cast<uint64_t>(absL1Addr + tensorSize) < TOTAL_L1_SIZE), {
-        KERNEL_LOG(KERNEL_ERROR, "absL1Addr is 0x%lx, tensorSize is %u, which exceeds the limit of l1 %u)", absL1Addr,
-            tensorSize, TOTAL_L1_SIZE);
-    });
+    ASCENDC_DEBUG_ASSERT((absUbAddr < TOTAL_UB_SIZE),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "absUbAddr is 0x%lx, which should be in range of [0, %u)", absUbAddr, TOTAL_UB_SIZE)
+    );
+    ASCENDC_DEBUG_ASSERT((static_cast<uint64_t>(absUbAddr + tensorSize) < TOTAL_UB_SIZE),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "absUbAddr is 0x%lx, tensorSize is %u, which exceeds the limit of ub %d)", absUbAddr,
+            tensorSize, TOTAL_UB_SIZE)
+    );
+    ASCENDC_DEBUG_ASSERT((absL1Addr < TOTAL_L1_SIZE),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "absL1Addr is 0x%lx, which should be in range [0, %u)", absL1Addr, TOTAL_L1_SIZE)
+    );
+    ASCENDC_DEBUG_ASSERT((static_cast<uint64_t>(absL1Addr + tensorSize) < TOTAL_L1_SIZE),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "absL1Addr is 0x%lx, tensorSize is %u, which exceeds the limit of l1 %u)", absL1Addr,
+            tensorSize, TOTAL_L1_SIZE)
+    );
 }
 
 template <TPosition pos>
@@ -118,8 +121,8 @@ template <typename T>
 __aicore__ inline void DataCopyUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
-        ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
+        ASCENDC_DEBUG_ASSERT((dst != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dst ptr can not be nullptr"));
+        ASCENDC_DEBUG_ASSERT((src != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "src ptr can not be nullptr"));
         CheckDataCopyParams(intriParams.blockCount, intriParams.blockLen);
         ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, 
             "src address should be 32B aligned \n"));
@@ -151,11 +154,11 @@ template <typename T>
 __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
     // Add for TSCM AIV: Copy buffer into workspace, and send message to AIC
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
-    ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
-    ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((GetTPipePtr() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "tpipe ptr can not be nullptr"));
+    ASCENDC_DEBUG_ASSERT((dst != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dst ptr can not be nullptr"));
+    ASCENDC_DEBUG_ASSERT((src != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "src ptr can not be nullptr"));
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((GetKfcClient() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "kfc client ptr can not be nullptr"); });
+        ASCENDC_DEBUG_ASSERT((GetKfcClient() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "kfc client ptr can not be nullptr"));
         ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, 
             "src address should be 32B aligned \n"));
         // 1.获取GM的地址
@@ -163,9 +166,9 @@ __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const
         int32_t ubAddr = -1;
 #if ASCENDC_CPU_DEBUG
         uint64_t absSrc = (uint8_t*)src - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN));
-        ASCENDC_ASSERT((static_cast<uint64_t>(absSrc) >= 0 && static_cast<uint64_t>(absSrc) < TOTAL_UB_SIZE), {
-            KERNEL_LOG(KERNEL_ERROR, "abs src is 0x%lx, which should be in range of [0, %u)", absSrc, TOTAL_UB_SIZE);
-        });
+        ASCENDC_DEBUG_ASSERT((static_cast<uint64_t>(absSrc) >= 0 && static_cast<uint64_t>(absSrc) < TOTAL_UB_SIZE),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "abs src is 0x%lx, which should be in range of [0, %u)", absSrc, TOTAL_UB_SIZE)
+        );
         GM_ADDR gmAddr = (GetKfcClient()->ubStart) + static_cast<uint64_t>(absSrc);
 #else
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
@@ -181,11 +184,11 @@ __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const
         // 3.发送消息,从GM拷贝至L1
 #if ASCENDC_CPU_DEBUG
         uint8_t* aicBaseTSCMAddr = GetTPipePtr()->GetBaseAddr(int8_t(TPosition::TSCM));
-        ASCENDC_ASSERT((aicBaseTSCMAddr != nullptr),
-            { KERNEL_LOG(KERNEL_ERROR, "aicBaseTSCMAddr can not be nullptr"); });
+        ASCENDC_DEBUG_ASSERT((aicBaseTSCMAddr != nullptr),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "aicBaseTSCMAddr can not be nullptr"));
         uint64_t l1AddrDst = (uint8_t*)dst - (uint8_t*)aicBaseTSCMAddr;
-        ASCENDC_ASSERT((l1AddrDst < TOTAL_L1_SIZE), { KERNEL_LOG(KERNEL_ERROR,
-            "l1AddrDst is 0x%lx, which should be in range of [0, %u)", l1AddrDst, TOTAL_L1_SIZE); });
+        ASCENDC_DEBUG_ASSERT((l1AddrDst < TOTAL_L1_SIZE), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "l1AddrDst is 0x%lx, which should be in range of [0, %u)", l1AddrDst, TOTAL_L1_SIZE));
         ScmDataCopyMsg((__cbuf__ void*)l1AddrDst, (__gm__ void*)gmAddr, intriParams, ubAddr);
 #else
 #ifndef __NO_KFC_SERVER__
@@ -199,9 +202,9 @@ template <typename T>
 __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams)
 {
     // Add for TSCM AIV: Copy buffer into workspace, and send message to AIC
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
-    ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
-    ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((GetTPipePtr() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "tpipe ptr can not be nullptr"));
+    ASCENDC_DEBUG_ASSERT((dst != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dst ptr can not be nullptr"));
+    ASCENDC_DEBUG_ASSERT((src != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "src ptr can not be nullptr"));
     if ASCEND_IS_AIV {
         ASSERT(GetKfcClient() != nullptr);
         ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, 
@@ -213,10 +216,10 @@ __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, 
         uint64_t absUbAddr = (uint8_t*)src - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN));
         uint64_t absL1Addr = (uint8_t*)dst - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::TSCM));
         ValidateUbL1Address(absUbAddr, absL1Addr, tensorSize);
-        ASCENDC_ASSERT((absL1Addr % ONE_BLK_SIZE == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dst tensor address "
-            "alignment in DataCopy with Nd2NzParams from VECIN / VECOUT to TSCM, it should be 32B aligned");});
-        ASCENDC_ASSERT((intriParams.ndNum == 1), {KERNEL_LOG(KERNEL_ERROR,
-            "intriParams.ndNum is %hu, which can only be 1", intriParams.ndNum);});
+        ASCENDC_DEBUG_ASSERT((absL1Addr % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor address "
+            "alignment in DataCopy with Nd2NzParams from VECIN / VECOUT to TSCM, it should be 32B aligned"));
+        ASCENDC_DEBUG_ASSERT((intriParams.ndNum == 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "intriParams.ndNum is %hu, which can only be 1", intriParams.ndNum));
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
 #else
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
@@ -312,9 +315,9 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ T* dst, __gm__ T* src, co
     } else if (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE || sizeof(T) == B32_BYTE_SIZE){
         DataCopyGM2L1ND2NZImplBase(dst, src, intriParams);
     } else {
-        ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in DataCopy with Nd2NzParams, current "
+        ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in DataCopy with Nd2NzParams, current "
             "api support dtype combination is src and dst both: int4b_t / int8_t / uint8_t / int16_t / uint16_t / "
-            "half / bfloat16_t / int32_t / uint32_t / float");});
+            "half / bfloat16_t / int32_t / uint32_t / float"));
     }
 }
 
@@ -350,8 +353,8 @@ __aicore__ inline void CopyIntrinsicsImpl(__ubuf__ T* dst, __ubuf__ T* src, uint
         vcopy((__ubuf__ uint32_t*)dst, (__ubuf__ uint32_t*)src, repeatTime, repeatParams.dstStride,
             repeatParams.srcStride, repeatParams.dstRepeatSize, repeatParams.srcRepeatSize);
     } else {
-        ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Copy, current api support dtype "
-            "combination is src and dst both: int16_t / uint16_t / half / bfloat16_t / int32_t / uint32_t / float");});
+        ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Copy, current api support dtype "
+            "combination is src and dst both: int16_t / uint16_t / half / bfloat16_t / int32_t / uint32_t / float"));
     }
 }
 
@@ -456,9 +459,9 @@ __aicore__ inline void DataCopyPadGm2UBImpl(__ubuf__ T* dst, __gm__ T* src, cons
         copy_gm_to_ubuf_align_b32(dst, src, 0, intriParams.blockCount, intriParams.blockLen,
             (padParams.leftPadding << 1), (padParams.rightPadding << 1), intriParams.srcStride, intriParams.dstStride);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in DataCopyPad from GM to VECIN / "
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in DataCopyPad from GM to VECIN / "
             "VECOUT, current api support dtype combination is src and dst both: int8_t / uint8_t / half / bfloat16_t / "
-            "int16_t / uint16_t / float / int32_t / uint32_t / double / int64_t / uint64_t.");});
+            "int16_t / uint16_t / float / int32_t / uint32_t / double / int64_t / uint64_t."));
     }
 }
 
@@ -493,9 +496,9 @@ __aicore__ inline void DataCopyPadGm2UBImpl(__ubuf__ T* dst, __gm__ T* src, cons
         copy_gm_to_ubuf_align_b32(dst, src, 0, intriParams.blockCount, intriParams.blockLen,
             (padParams.leftPadding << 1), (padParams.rightPadding << 1), intriParams.srcStride, intriParams.dstStride);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in DataCopyPad from GM to VECIN / "
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in DataCopyPad from GM to VECIN / "
             "VECOUT, current api support dtype combination is src and dst both: int8_t / uint8_t / half / bfloat16_t / "
-            "int16_t / uint16_t / float / int32_t / uint32_t / double / int64_t / uint64_t.");});
+            "int16_t / uint16_t / float / int32_t / uint32_t / double / int64_t / uint64_t."));
     }
 }
 
@@ -534,9 +537,9 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
         copy_ubuf_to_gm_align_b32(dst, src, 0, intriParams.blockCount, intriParams.blockLen, static_cast<uint8_t>(0), static_cast<uint8_t>(0),
             static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride));
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in DataCopyPad from VECIN / VECOUT to"
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in DataCopyPad from VECIN / VECOUT to"
             " GM, current api support dtype combination is src and dst both: int8_t / uint8_t / half / bfloat16_t / "
-            "int16_t / uint16_t / float / int32_t / uint32_t / double / int64_t / uint64_t.");});
+            "int16_t / uint16_t / float / int32_t / uint32_t / double / int64_t / uint64_t."));
     }
 }
 
@@ -564,9 +567,9 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
         copy_ubuf_to_gm_align_b32(dst, src, 0, intriParams.blockCount, intriParams.blockLen, static_cast<uint8_t>(0), static_cast<uint8_t>(0),
             intriParams.srcStride, intriParams.dstStride);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in DataCopyPad from VECIN / VECOUT to"
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in DataCopyPad from VECIN / VECOUT to"
             " GM, current api support dtype combination is src and dst both: int8_t / uint8_t / half / bfloat16_t / "
-            "int16_t / uint16_t / float / int32_t / uint32_t / double / int64_t / uint64_t.");});
+            "int16_t / uint16_t / float / int32_t / uint32_t / double / int64_t / uint64_t."));
     }
 }
 
@@ -575,12 +578,12 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
     const Nd2NzParams& nd2nzParams)
 {
     // Add for TSCM AIV: Copy buffer into workspace, and send message to AIC
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
-    ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
-    ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((GetTPipePtr() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "tpipe ptr can not be nullptr"));
+    ASCENDC_DEBUG_ASSERT((dst != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dst ptr can not be nullptr"));
+    ASCENDC_DEBUG_ASSERT((src != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "src ptr can not be nullptr"));
     CheckDataCopyPadParams<T>(intriParams.blockCount, static_cast<uint32_t>(intriParams.blockLen), false);
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((GetKfcClient() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "kfc client ptr can not be nullptr"); });
+        ASCENDC_DEBUG_ASSERT((GetKfcClient() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "kfc client ptr can not be nullptr"));
         ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, 
             "Failed to check src tensor address alignment in DataCopyPad from VECIN / VECOUT to TSCM, it should be 32B "
             "aligned.\n"));
@@ -591,11 +594,11 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
         uint64_t absUbAddr = (uint8_t*)src - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN));
         uint64_t absL1Addr = (uint8_t*)dst - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::TSCM));
         ValidateUbL1Address(absUbAddr, absL1Addr, tensorSize);
-        ASCENDC_ASSERT((absL1Addr % ONE_BLK_SIZE == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dst tensor address "
-            "alignment in DataCopyPad from VECIN / VECOUT to TSCM, it should be 32B aligned");});
-        ASCENDC_ASSERT((nd2nzParams.ndNum == 1), {
-            KERNEL_LOG(KERNEL_ERROR, "nd2nzParams.ndNum is %hu, which can only be 1", nd2nzParams.ndNum);
-        });
+        ASCENDC_DEBUG_ASSERT((absL1Addr % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor address "
+            "alignment in DataCopyPad from VECIN / VECOUT to TSCM, it should be 32B aligned"));
+        ASCENDC_DEBUG_ASSERT((nd2nzParams.ndNum == 1),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "nd2nzParams.ndNum is %hu, which can only be 1", nd2nzParams.ndNum)
+        );
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
 #else
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
@@ -604,9 +607,9 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
         SetFlag<HardEvent::V_MTE3>(eventID);
         WaitFlag<HardEvent::V_MTE3>(eventID);
         // 2.进行对等拷贝ub->GM
-        ASCENDC_ASSERT((intriParams.blockCount != 0),
-                       { KERNEL_LOG(KERNEL_ERROR, "intriParams.blockCount can not be 0"); });
-        ASCENDC_ASSERT((intriParams.blockLen != 0), { KERNEL_LOG(KERNEL_ERROR, "intriParams.blockLen can not be 0"); });
+        ASCENDC_DEBUG_ASSERT((intriParams.blockCount != 0),
+                       KERNEL_LOG_INTERNAL(KERNEL_ERROR, "intriParams.blockCount can not be 0"));
+        ASCENDC_DEBUG_ASSERT((intriParams.blockLen != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "intriParams.blockLen can not be 0"));
         DataCopyPadUB2GMImpl((__gm__ T*)gmAddr, (__ubuf__ T*)src, intriParams);
 
 #if ASCENDC_CPU_DEBUG
@@ -624,12 +627,12 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
     const Nd2NzParams& nd2nzParams)
 {
     // Add for TSCM AIV: Copy buffer into workspace, and send message to AIC
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
-    ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
-    ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((GetTPipePtr() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "tpipe ptr can not be nullptr"));
+    ASCENDC_DEBUG_ASSERT((dst != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dst ptr can not be nullptr"));
+    ASCENDC_DEBUG_ASSERT((src != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "src ptr can not be nullptr"));
     CheckDataCopyPadParams<T>(intriParams.blockCount, intriParams.blockLen, false);
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((GetKfcClient() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "kfc client ptr can not be nullptr"); });
+        ASCENDC_DEBUG_ASSERT((GetKfcClient() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "kfc client ptr can not be nullptr"));
         ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, 
             "Failed to check src tensor address alignment in DataCopyPad from VECIN / VECOUT to TSCM, it should be 32B "
             "aligned.\n"));
@@ -640,11 +643,11 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
         uint64_t absUbAddr = (uint8_t*)src - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN));
         uint64_t absL1Addr = (uint8_t*)dst - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::TSCM));
         ValidateUbL1Address(absUbAddr, absL1Addr, tensorSize);
-        ASCENDC_ASSERT((absL1Addr % ONE_BLK_SIZE == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dst tensor address "
-            "alignment in DataCopyPad from VECIN / VECOUT to TSCM, it should be 32B aligned");});
-        ASCENDC_ASSERT((nd2nzParams.ndNum == 1), {
-            KERNEL_LOG(KERNEL_ERROR, "nd2nzParams.ndNum is %hu, which can only be 1", nd2nzParams.ndNum);
-        });
+        ASCENDC_DEBUG_ASSERT((absL1Addr % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor address "
+            "alignment in DataCopyPad from VECIN / VECOUT to TSCM, it should be 32B aligned"));
+        ASCENDC_DEBUG_ASSERT((nd2nzParams.ndNum == 1),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "nd2nzParams.ndNum is %hu, which can only be 1", nd2nzParams.ndNum)
+        );
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
 #else
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
@@ -653,9 +656,9 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
         SetFlag<HardEvent::V_MTE3>(eventID);
         WaitFlag<HardEvent::V_MTE3>(eventID);
         // 2.进行对等拷贝ub->GM
-        ASCENDC_ASSERT((intriParams.blockCount != 0),
-                       { KERNEL_LOG(KERNEL_ERROR, "intriParams.blockCount can not be 0"); });
-        ASCENDC_ASSERT((intriParams.blockLen != 0), { KERNEL_LOG(KERNEL_ERROR, "intriParams.blockLen can not be 0"); });
+        ASCENDC_DEBUG_ASSERT((intriParams.blockCount != 0),
+                       KERNEL_LOG_INTERNAL(KERNEL_ERROR, "intriParams.blockCount can not be 0"));
+        ASCENDC_DEBUG_ASSERT((intriParams.blockLen != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "intriParams.blockLen can not be 0"));
         DataCopyPadUB2GMImpl((__gm__ T*)gmAddr, (__ubuf__ T*)src, intriParams);
 
 #if ASCENDC_CPU_DEBUG
@@ -672,12 +675,12 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
 * */
 __aicore__ inline void ScmDataCopy(__gm__ void* kfcMsgPtr)
 {
-    ASCENDC_ASSERT((g_coreType == AIC), { KERNEL_LOG(KERNEL_ERROR, "core type must be AIC"); });
+    ASCENDC_DEBUG_ASSERT((g_coreType == AIC), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "core type must be AIC"));
     auto scmCopyParams = reinterpret_cast<__gm__ struct Gm2L1Params*>(kfcMsgPtr);
-    ASCENDC_ASSERT((reinterpret_cast<uint64_t>(scmCopyParams->dst) < TOTAL_L1_SIZE), {
-        KERNEL_LOG(KERNEL_ERROR, "dst ptr is %p, which should be less than total l1 size %u", scmCopyParams->dst,
-            TOTAL_L1_SIZE);
-    });
+    ASCENDC_DEBUG_ASSERT((reinterpret_cast<uint64_t>(scmCopyParams->dst) < TOTAL_L1_SIZE),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dst ptr is %p, which should be less than total l1 size %u", scmCopyParams->dst,
+            TOTAL_L1_SIZE)
+    );
     auto dst = reinterpret_cast<__cbuf__ void*>(scmCopyParams->dst);
     auto& intriParams = scmCopyParams->intri;
 #if ASCENDC_CPU_DEBUG
@@ -697,18 +700,18 @@ __aicore__ inline void ScmDataCopy(__gm__ void* kfcMsgPtr)
 
 __aicore__ inline void ScmDataCopyND2NZ(__gm__ void* kfcMsgPtr)
 {
-    ASCENDC_ASSERT((g_coreType == AIC), { KERNEL_LOG(KERNEL_ERROR, "core type must be AIC"); });
+    ASCENDC_DEBUG_ASSERT((g_coreType == AIC), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "core type must be AIC"));
     auto scmCopyParams = reinterpret_cast<__gm__ struct Gm2L1Nd2NzParams*>(kfcMsgPtr);
     auto& intriParams = scmCopyParams->intri;
     auto l1AddrDst = reinterpret_cast<__cbuf__ void*>(scmCopyParams->dst);
 #if ASCENDC_CPU_DEBUG
     uint8_t* aicBaseTSCMAddr = GetTPipePtr()->GetBaseAddr(int8_t(TPosition::TSCM));
-    ASCENDC_ASSERT((aicBaseTSCMAddr != nullptr), { KERNEL_LOG(KERNEL_ERROR, "aicBaseTSCMAddr can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((aicBaseTSCMAddr != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "aicBaseTSCMAddr can not be nullptr"));
     uint64_t l1AbsAddr = reinterpret_cast<uint64_t>(l1AddrDst);
     l1AddrDst = l1AbsAddr + reinterpret_cast<uint8_t*>(aicBaseTSCMAddr);
-    ASCENDC_ASSERT((l1AbsAddr < TOTAL_L1_SIZE), {
-        KERNEL_LOG(KERNEL_ERROR, "l1AbsAddr is 0x%lx, which should be in range of [0, %u)", l1AbsAddr, TOTAL_L1_SIZE);
-    });
+    ASCENDC_DEBUG_ASSERT((l1AbsAddr < TOTAL_L1_SIZE),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "l1AbsAddr is 0x%lx, which should be in range of [0, %u)", l1AbsAddr, TOTAL_L1_SIZE)
+    );
 #endif
 
     if (scmCopyParams->dataTypeLen == 2) {
@@ -720,10 +723,10 @@ __aicore__ inline void ScmDataCopyND2NZ(__gm__ void* kfcMsgPtr)
             intriParams.ndNum, intriParams.nValue, intriParams.dValue, intriParams.srcNdMatrixStride,
             intriParams.srcDValue, intriParams.dstNzC0Stride, intriParams.dstNzNStride, intriParams.dstNzMatrixStride);
     } else {
-        ASCENDC_ASSERT((scmCopyParams->dataTypeLen == 1), {
-            KERNEL_LOG(KERNEL_ERROR, "type len is %d bytes, which should only be 1/2/4 bytes",
-                scmCopyParams->dataTypeLen);
-        });
+        ASCENDC_DEBUG_ASSERT((scmCopyParams->dataTypeLen == 1),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "type len is %d bytes, which should only be 1/2/4 bytes",
+                scmCopyParams->dataTypeLen)
+        );
         copy_gm_to_cbuf_multi_nd2nz_b8((__cbuf__ int8_t*)l1AddrDst, (__gm__ int8_t*)scmCopyParams->src, 0,
             intriParams.ndNum, intriParams.nValue, intriParams.dValue, intriParams.srcNdMatrixStride,
             intriParams.srcDValue, intriParams.dstNzC0Stride, intriParams.dstNzNStride, intriParams.dstNzMatrixStride);
@@ -826,8 +829,8 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImpl(__gm__ T* dst, __ubuf__ T* src, co
 {
     ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "src address should be 32B aligned \n"));
-    ASCENDC_ASSERT((sizeof(T) == sizeof(int16_t) || sizeof(T) == sizeof(int32_t)),
-        {KERNEL_LOG(KERNEL_ERROR, "DataCopy NZ2ND only supports dtype B16 and B32");});
+    ASCENDC_DEBUG_ASSERT((sizeof(T) == sizeof(int16_t) || sizeof(T) == sizeof(int32_t)),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DataCopy NZ2ND only supports dtype B16 and B32"));
     const uint16_t ndNum = intriParams.ndNum;
     const uint16_t nValue = intriParams.nValue;
     const uint16_t dValue = intriParams.dValue;
@@ -837,10 +840,10 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImpl(__gm__ T* dst, __ubuf__ T* src, co
     const uint16_t dstNdMatrixStride = intriParams.dstNdMatrixStride;
 
     if (ndNum != 1 && nValue != 0) {
-        ASCENDC_ASSERT(((srcNdMatrixStride * BLOCK_CUBE * BLOCK_CUBE) % (nValue * sizeof(T)) == 0),
-            {KERNEL_LOG(KERNEL_ERROR,  "element num between nzMatrix head must be divisible by (nValue*sizeof(T))");});
+        ASCENDC_DEBUG_ASSERT(((srcNdMatrixStride * BLOCK_CUBE * BLOCK_CUBE) % (nValue * sizeof(T)) == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,  "element num between nzMatrix head must be divisible by (nValue*sizeof(T))"));
     }
-    ASCENDC_ASSERT((dValue % BLOCK_CUBE == 0), { KERNEL_LOG(KERNEL_ERROR,  "dValue must be divisible by 16"); });
+    ASCENDC_DEBUG_ASSERT((dValue % BLOCK_CUBE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,  "dValue must be divisible by 16"));
     for (uint16_t i = 0; i < ndNum; ++i) {
         DataCopyUB2GMNZ2NDImplBase(dst + i * dstNdMatrixStride, src + i * srcNdMatrixStride * BLOCK_CUBE * BLOCK_CUBE,
             nValue, dValue, srcNStride, dstDStride);
@@ -952,9 +955,9 @@ __aicore__ inline void DataCopyL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, const 
                     intriParams.dstStride, intriParams.srcStride, intriParams.unitFlag, QuantMode_t::VREQ8,
                     intriParams.reluPre, intriParams.channelSplit, intriParams.nz2ndEn);
             default:
-                ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in DataCopy from CO1 "
+                ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in DataCopy from CO1 "
                     "to A1 / B1, supported values are F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
-                    "VQF322B8_PRE / REQ8 / VREQ8.");});
+                    "VQF322B8_PRE / REQ8 / VREQ8."));
         }
     }
 }
@@ -963,12 +966,12 @@ template <typename T, typename U>
 __aicore__ inline void DataCopyL0C2GMImpl(__gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<Tuple<U, T>, Tuple<float, uint8_t>, Tuple<float, int8_t>, Tuple<float, half>,
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<U, T>, Tuple<float, uint8_t>, Tuple<float, int8_t>, Tuple<float, half>,
             Tuple<float, bfloat16_t>, Tuple<float, float>, Tuple<int32_t, uint8_t>, Tuple<int32_t, int8_t>,
-            Tuple<int32_t, half>, Tuple<int32_t, int16_t>, Tuple<int32_t, int32_t>>()), {KERNEL_LOG(KERNEL_ERROR,
+            Tuple<int32_t, half>, Tuple<int32_t, int16_t>, Tuple<int32_t, int32_t>>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in DataCopy from CO1 to GM, current api support dtype combination is src: float, "
             "dst: uint8_t / int8_t / half / bfloat16_t / float; src: int32_t, dst: uint8_t / int8_t / half / int16_t / "
-            "int32_t.");});
+            "int32_t."));
         switch (intriParams.quantPre) {
             case QuantMode_t::NoQuant:
                 return copy_matrix_cc_to_gm(dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize,
@@ -1007,9 +1010,9 @@ __aicore__ inline void DataCopyL0C2GMImpl(__gm__ T* dst, __cc__ U* src, const Da
                     intriParams.dstStride, intriParams.srcStride, intriParams.unitFlag, QuantMode_t::VREQ8,
                     intriParams.reluPre, intriParams.channelSplit, intriParams.nz2ndEn);
             default:
-                ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in DataCopy from CO1 "
+                ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in DataCopy from CO1 "
                     "to GM, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
-                    "VQF322B8_PRE / REQ8 / VREQ8.");});
+                    "VQF322B8_PRE / REQ8 / VREQ8."));
         }
     }
 }

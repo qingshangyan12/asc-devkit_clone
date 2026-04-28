@@ -149,9 +149,9 @@ template <typename T, typename U>
 __aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode,
     uint32_t count)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()), {
-        KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
-        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
+        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t"));
     if ASCEND_IS_AIC {
         return;
     }
@@ -202,9 +202,9 @@ template <typename T, typename U>
 __aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode,
     uint32_t count)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()), {
-        KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
-        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
+        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t"));
     if ASCEND_IS_AIC {
         return;
     }
@@ -236,9 +236,9 @@ template <typename T, typename U>
 __aicore__ inline void VselImpl(__ubuf__ T* dstLocal, __ubuf__ U* selMask, __ubuf__ T* src0Local, __ubuf__ T* src1Local,
     SELMODE selMode, const uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()), {
-        KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
-        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
+        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t"));
     if ASCEND_IS_AIV {
         VselIntrinsicsImplPre(selMask, selMode);
 
@@ -252,9 +252,9 @@ template <typename T, typename U>
 __aicore__ inline void VselImpl(__ubuf__ T* dstLocal, __ubuf__ U* selMask, __ubuf__ T* src0Local, __ubuf__ T* src1Local,
     SELMODE selMode, const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()), {
-        KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
-        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
+        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t"));
     if ASCEND_IS_AIV {
         VselIntrinsicsImplPre(selMask, selMode);
 
@@ -268,9 +268,9 @@ template <typename T, typename U>
 __aicore__ inline void VselImpl(__ubuf__ T* dstLocal, __ubuf__ U* selMask, __ubuf__ T* src0Local, T src1Local,
     SELMODE selMode, const uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()), {
-        KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
-        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
+        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t"));
     if ASCEND_IS_AIV {
         VselIntrinsicsImplPre(src1Local);
 
@@ -284,9 +284,9 @@ template <typename T, typename U>
 __aicore__ inline void VselImpl(__ubuf__ T* dstLocal, __ubuf__ U* selMask, __ubuf__ T* src0Local, T src1Local,
     SELMODE selMode, const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()), {
-        KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
-        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype combination is dst, "
+        "src0Local and src1Local are both: half / float, selMask:  uint8_t / uint16_t / uint32_t / uint64_t"));
     if ASCEND_IS_AIV {
         VselIntrinsicsImplPre(src1Local);
 

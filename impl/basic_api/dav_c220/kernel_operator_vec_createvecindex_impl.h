@@ -138,8 +138,8 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<T> &dst, const T &firstVal
 template <typename T>
 __aicore__ inline void CreateVecIndexCalc(LocalTensor<T> dst, const T &firstValue, uint32_t count)
 {
-    ASCENDC_ASSERT((SupportType<T, half, int16_t, float, int32_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check "
-        "dtype in CreateVecIndex, current api support dtype combination is dst: half / int16_t / float / int32_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, int16_t, float, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+        "dtype in CreateVecIndex, current api support dtype combination is dst: half / int16_t / float / int32_t"));
     // first block
     constexpr int32_t eleCntOfOneBlk = (ONE_BLK_SIZE / sizeof(T));
     if (count <= eleCntOfOneBlk) {

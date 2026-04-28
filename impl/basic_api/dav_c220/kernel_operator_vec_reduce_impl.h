@@ -502,54 +502,54 @@ __aicore__ inline void GetIndex(__ubuf__ T* sharedTmpBuffer, int32_t secondStart
     int32_t elementNumPerRep = ONE_REPEAT_BYTE_SIZE / sizeof(T);
     if (sizeof(T) == sizeof(half)) {
         fourthIndex = *reinterpret_cast<__ubuf__ uint16_t*>(sharedTmpBuffer + fourthStartPos + 1);
-        ASCENDC_ASSERT(((fourthIndex >= 0) && (fourthIndex < elementNumPerRep)), {
-            KERNEL_LOG(KERNEL_ERROR, "fourthIndex is %d, which should be in range [0, %d])", fourthIndex,
-                elementNumPerRep);
-        });
+        ASCENDC_DEBUG_ASSERT(((fourthIndex >= 0) && (fourthIndex < elementNumPerRep)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "fourthIndex is %d, which should be in range [0, %d])", fourthIndex,
+                elementNumPerRep)
+        );
         thirdIndex = *reinterpret_cast<__ubuf__ uint16_t*>(sharedTmpBuffer + thirdStartPos + fourthIndex + 1);
-        ASCENDC_ASSERT(((thirdIndex >= 0) && (thirdIndex < elementNumPerRep)), {
-            KERNEL_LOG(KERNEL_ERROR, "thirdIndex is %d, which should be in range [0, %d])", thirdIndex,
-                elementNumPerRep);
-        });
+        ASCENDC_DEBUG_ASSERT(((thirdIndex >= 0) && (thirdIndex < elementNumPerRep)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "thirdIndex is %d, which should be in range [0, %d])", thirdIndex,
+                elementNumPerRep)
+        );
         secondIndex = *reinterpret_cast<__ubuf__ uint16_t*>(sharedTmpBuffer + secondStartPos +
             elementNumPerRep * (fourthIndex / VREDUCE_PER_REP_OUTPUT) + thirdIndex + 1);
-        ASCENDC_ASSERT(((secondIndex >= 0) && (secondIndex < elementNumPerRep)), {
-            KERNEL_LOG(KERNEL_ERROR, "secondIndex is %d, which should be in range [0, %d])", secondIndex,
-                elementNumPerRep);
-        });
+        ASCENDC_DEBUG_ASSERT(((secondIndex >= 0) && (secondIndex < elementNumPerRep)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "secondIndex is %d, which should be in range [0, %d])", secondIndex,
+                elementNumPerRep)
+        );
         firstIndex = *reinterpret_cast<__ubuf__ uint16_t*>(sharedTmpBuffer +
             elementNumPerRep * (elementNumPerRep * (fourthIndex / VREDUCE_PER_REP_OUTPUT) + thirdIndex) /
             VREDUCE_PER_REP_OUTPUT +
             secondIndex + 1);
-        ASCENDC_ASSERT(((firstIndex >= 0) && (firstIndex < elementNumPerRep)), {
-            KERNEL_LOG(KERNEL_ERROR, "firstIndex is %d, which should be in range [0, %d])", firstIndex,
-                elementNumPerRep);
-        });
+        ASCENDC_DEBUG_ASSERT(((firstIndex >= 0) && (firstIndex < elementNumPerRep)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "firstIndex is %d, which should be in range [0, %d])", firstIndex,
+                elementNumPerRep)
+        );
     } else {
         fourthIndex = *reinterpret_cast<__ubuf__ uint32_t*>(sharedTmpBuffer + fourthStartPos + 1);
-        ASCENDC_ASSERT(((fourthIndex >= 0) && (fourthIndex < elementNumPerRep)), {
-            KERNEL_LOG(KERNEL_ERROR, "fourthIndex is %d, which should be in range [0, %d])", fourthIndex,
-                elementNumPerRep);
-        });
+        ASCENDC_DEBUG_ASSERT(((fourthIndex >= 0) && (fourthIndex < elementNumPerRep)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "fourthIndex is %d, which should be in range [0, %d])", fourthIndex,
+                elementNumPerRep)
+        );
         thirdIndex = *reinterpret_cast<__ubuf__ uint32_t*>(sharedTmpBuffer + thirdStartPos + fourthIndex + 1);
-        ASCENDC_ASSERT(((thirdIndex >= 0) && (thirdIndex < elementNumPerRep)), {
-            KERNEL_LOG(KERNEL_ERROR, "thirdIndex is %d, which should be in range [0, %d])", thirdIndex,
-                elementNumPerRep);
-        });
+        ASCENDC_DEBUG_ASSERT(((thirdIndex >= 0) && (thirdIndex < elementNumPerRep)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "thirdIndex is %d, which should be in range [0, %d])", thirdIndex,
+                elementNumPerRep)
+        );
         secondIndex = *reinterpret_cast<__ubuf__ uint32_t*>(sharedTmpBuffer + secondStartPos +
             elementNumPerRep * (fourthIndex / VREDUCE_PER_REP_OUTPUT) + thirdIndex + 1);
-        ASCENDC_ASSERT(((secondIndex >= 0) && (secondIndex < elementNumPerRep)), {
-            KERNEL_LOG(KERNEL_ERROR, "secondIndex is %d, which should be in range [0, %d])", secondIndex,
-                elementNumPerRep);
-        });
+        ASCENDC_DEBUG_ASSERT(((secondIndex >= 0) && (secondIndex < elementNumPerRep)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "secondIndex is %d, which should be in range [0, %d])", secondIndex,
+                elementNumPerRep)
+        );
         firstIndex = *reinterpret_cast<__ubuf__ uint32_t*>(sharedTmpBuffer +
             elementNumPerRep * (elementNumPerRep * (fourthIndex / VREDUCE_PER_REP_OUTPUT) + thirdIndex) /
             VREDUCE_PER_REP_OUTPUT +
             secondIndex + 1);
-        ASCENDC_ASSERT(((firstIndex >= 0) && (firstIndex < elementNumPerRep)), {
-            KERNEL_LOG(KERNEL_ERROR, "firstIndex is %d, which should be in range [0, %d])", firstIndex,
-                elementNumPerRep);
-        });
+        ASCENDC_DEBUG_ASSERT(((firstIndex >= 0) && (firstIndex < elementNumPerRep)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "firstIndex is %d, which should be in range [0, %d])", firstIndex,
+                elementNumPerRep)
+        );
     }
 }
 
