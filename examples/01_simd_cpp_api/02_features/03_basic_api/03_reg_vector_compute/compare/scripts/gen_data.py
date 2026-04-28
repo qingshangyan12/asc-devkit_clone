@@ -13,7 +13,7 @@
 
 
 import os
-import sys
+import argparse
 import numpy as np
 
 def gen_golden_data_simple(scenario_num):
@@ -38,5 +38,8 @@ def gen_golden_data_simple(scenario_num):
     golden.tofile('./output/golden.bin')
 
 if __name__ == "__main__":
-    scenario_num = int(sys.argv[1])
-    gen_golden_data_simple(scenario_num)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2],
+                        help='Scenario number: 1=Max(x,y), 2=Max(x,scalar)')
+    args = parser.parse_args()
+    gen_golden_data_simple(args.scenarioNum)
