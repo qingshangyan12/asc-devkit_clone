@@ -19,8 +19,7 @@ M/N方向预加载的Matmul样例，可以减少MET2间隙。在MTE2流水间隙
 ```
 ## 样例描述
 
-- 样例功能： 
-
+- 样例功能：  
   样例中实现了2种场景的样例，分别是Preload M方向流水并行，Preload N方向流水并行，通过MatmulConfig doMTE2Preload参数控制，即代码中的preloadMode取值为1时，M方向流水并行，代码中的preloadMode取值为2时，N方向流水并行。
 
 - 约束条件
@@ -30,8 +29,7 @@ M/N方向预加载的Matmul样例，可以减少MET2间隙。在MTE2流水间隙
   - M开启Double buffer 的条件是depthA1 = stepM * stepK * 2
   - N开启Double buffer 的条件是depthB1 = stepN * stepK * 2
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 128, N = 24576, K = 512。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>

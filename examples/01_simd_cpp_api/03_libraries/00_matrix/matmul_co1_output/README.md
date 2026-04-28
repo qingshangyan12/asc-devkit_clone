@@ -16,12 +16,10 @@
 │   └── matmul_co1_output.asc   // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例调用Matmul API对输入的A，B矩阵做矩阵乘和加bias偏置，将计算结果C矩阵保存在CO1位置，再调用基础API Fixpipe完成对结果从CO1到Global Memory的搬运。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 32, N = 256, K = 128。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>

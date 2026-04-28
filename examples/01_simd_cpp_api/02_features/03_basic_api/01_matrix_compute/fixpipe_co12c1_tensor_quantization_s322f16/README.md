@@ -21,8 +21,7 @@
 
 ## 样例描述
 
-- 样例功能
-
+- 样例功能  
   将Mmad矩阵乘结果通过Fixpipe从CO1（L0C Buffer）搬入C1(L1 Buffer)，并使能随路Tensor量化将int32_t类型数据量化为half类型。
 
 - 样例规格

@@ -21,12 +21,10 @@ L0缓存没有对外开关，由Matmul API内部根据用户配置的shape信息
 │   └── matmul_l0cache.asc      // Ascend C样例实现 & 调用样例
 ```
 ## 样例描述
-- 样例功能： 
-
+- 样例功能：  
   Matmul样例调用Matmul高阶API对输入的A，B矩阵做矩阵乘和加bias偏置，使能A矩阵的L0缓存，减少MTE1重复搬运，提升样例性能。
 
-- 样例规格： 
-
+- 样例规格：  
   本样例中：M = 2560, N = 2048, K = 128。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
