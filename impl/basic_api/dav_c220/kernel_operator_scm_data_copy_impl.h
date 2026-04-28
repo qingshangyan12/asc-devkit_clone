@@ -41,10 +41,11 @@ struct Gm2L1Nd2NzParams {
 __aicore__ inline void ScmDataCopyMsg(__cbuf__ void* dst, __gm__ void* src, const DataCopyParams& intriParams,
     int32_t ubAddr)
 {
-    ASSERT(g_coreType == AIV);
+    ASCENDC_DEBUG_ASSERT((g_coreType == AIV), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "DataCopy from GM/UB to L1 do not support on current device.\n"));
     ASCENDC_DEBUG_ASSERT((GetKfcClient() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "DataCopy Gm2L1 is software-emulated on this device and works with Matmul API. Use REGISTER_MATMUL_OBJ "
-        "to enable Matmul API first.\n"));
+        "DataCopy from GM/UB to L1 is software-emulated on this device and works with Matmul API. Use "
+        "REGISTER_MATMUL_OBJ to enable Matmul API first.\n"));
     auto msg = GetKfcClient()->AllocMessage();
     ASSERT(sizeof(msg->buffer) >= sizeof(struct Gm2L1Params));
 
@@ -63,10 +64,13 @@ __aicore__ inline void ScmDataCopyMsg(__cbuf__ void* dst, __gm__ void* src, cons
 __aicore__ inline void ScmDataCopyND2NZMsg(__cbuf__ void* dst, __gm__ void* src, const uint8_t dataTypeSize,
     const Nd2NzParams& intriParams, int32_t ubAddr)
 {
-    ASSERT(g_coreType == AIV);
-    ASSERT(dst != nullptr);
-    ASSERT(src != nullptr);
-    ASSERT(GetKfcClient() != nullptr);
+    ASCENDC_DEBUG_ASSERT((g_coreType == AIV), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "DataCopy from GM/UB to L1 with ND2NZ do not support on current device.\n"));
+    ASCENDC_DEBUG_ASSERT((dst != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dst ptr can not be nullptr.\n"));
+    ASCENDC_DEBUG_ASSERT((src != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "src ptr can not be nullptr.\n"));
+    ASCENDC_DEBUG_ASSERT((GetKfcClient() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "DataCopy from GM/UB to L1 with ND2NZ is software-emulated on this device and works with Matmul API. Use "
+        "REGISTER_MATMUL_OBJ to enable Matmul API first.\n"));
     auto msg = GetKfcClient()->AllocMessage();
     ASSERT(sizeof(msg->buffer) >= sizeof(struct Gm2L1Nd2NzParams));
 

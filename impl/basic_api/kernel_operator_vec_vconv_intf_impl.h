@@ -150,6 +150,7 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckCalcount(static_cast<int32_t>(count), "count", "Cast");
 #endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, true>(dst, src, "Cast", count);
