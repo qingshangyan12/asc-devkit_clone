@@ -178,10 +178,10 @@ __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const Loca
 
     CheckDataCopyParamsCommon(intriParams, apiName);
     ASCENDC_DEBUG_ASSERT((srcHwPos == Hardware::L1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor "
-        "route in %s, supported route is L1 -> BIAS, current src TPosition is %s.\n", apiName,
+        "route in %s, supported route is C1 -> C2, current src TPosition is %s.\n", apiName,
         GetTPositionName(srcPos)));
     ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::BIAS), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor "
-        "route in %s, supported route is L1 -> BIAS, current dst TPosition is %s.\n", apiName,
+        "route in %s, supported route is C1 -> C2, current dst TPosition is %s.\n", apiName,
         GetTPositionName(dstPos)));
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckTensorAlignment(dst, 64, "dst", apiName);
@@ -193,7 +193,7 @@ __aicore__ inline void CheckNd2NzParamsCommon(const Nd2NzParams& intriParams, co
     CheckValueRange<decltype(intriParams.nValue)>(intriParams.nValue, 0, 16384, "nValue", apiName);
     CheckValueRange<decltype(intriParams.dValue)>(intriParams.dValue, 0, 65535, "dValue", apiName);
     CheckValueRange<decltype(intriParams.srcNdMatrixStride)>(intriParams.srcNdMatrixStride, 0, 65535, "srcNdMatrixStride", apiName);
-    CheckValueRange<decltype(intriParams.srcDValue)>(intriParams.srcDValue, 1, 16384, "srcDValue", apiName);
+    CheckValueRange<decltype(intriParams.srcDValue)>(intriParams.srcDValue, 1, 65535, "srcDValue", apiName);
     CheckValueRange<decltype(intriParams.dstNzC0Stride)>(intriParams.dstNzC0Stride, 1, 16384, "dstNzC0Stride", apiName);
     CheckValueRange<decltype(intriParams.dstNzNStride)>(intriParams.dstNzNStride, 1, 16384, "dstNzNStride", apiName);
     CheckValueRange<decltype(intriParams.dstNzMatrixStride)>(intriParams.dstNzMatrixStride, 0, 65535, "dstNzMatrixStride", apiName);
@@ -225,10 +225,10 @@ __aicore__ inline void CheckUbToL1Route(const Hardware srcHwPos, const Hardware 
     const TPosition dstPos, const __gm__ char* apiName)
 {
     ASCENDC_DEBUG_ASSERT((srcHwPos == Hardware::UB), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor "
-        "route in %s, supported route is UB -> L1, current src TPosition is %s.\n", apiName,
+        "route in %s, supported route is VECIN/VECOUT -> TSCM, current src TPosition is %s.\n", apiName,
         GetTPositionName(srcPos)));
     ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::L1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor "
-        "route in %s, supported route is UB -> L1, current dst TPosition is %s.\n", apiName,
+        "route in %s, supported route is VECIN/VECOUT -> TSCM, current dst TPosition is %s.\n", apiName,
         GetTPositionName(dstPos)));
 }
 
@@ -309,11 +309,34 @@ __aicore__ inline void CheckDataCopyPadParamsCommon(const DataCopyExtParams& dat
     }
 }
 
+template <typename T, typename PadParamsT>
+__aicore__ inline void CheckDataCopyPadPaddingCommon(const PadParamsT& padParams, const __gm__ char* apiName)
+{
+    constexpr uint32_t padLimit = ONE_BLK_SIZE;
+    ASCENDC_DEBUG_ASSERT((static_cast<uint32_t>(padParams.leftPadding) * sizeof(PrimT<T>) <= padLimit),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check leftPadding value in %s, leftPadding bytes must be less "
+        "than or equal to %u, current bytes is %u.\n", apiName, padLimit,
+        static_cast<uint32_t>(padParams.leftPadding) * sizeof(PrimT<T>)));
+    ASCENDC_DEBUG_ASSERT((static_cast<uint32_t>(padParams.rightPadding) * sizeof(PrimT<T>) <= padLimit),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check rightPadding value in %s, rightPadding bytes must be less "
+        "than or equal to %u, current bytes is %u.\n", apiName, padLimit,
+        static_cast<uint32_t>(padParams.rightPadding) * sizeof(PrimT<T>)));
+    if constexpr (std::is_same_v<PadParamsT, DataCopyPadParams>) {
+        ASCENDC_DEBUG_ASSERT((padParams.paddingValue == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check paddingValue value in %s, DataCopyPadParams.paddingValue only supports 0.\n", apiName));
+    } else if constexpr (sizeof(PrimT<T>) == sizeof(uint64_t)) {
+        ASCENDC_DEBUG_ASSERT((padParams.paddingValue == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check paddingValue value in %s, when data type length is 64 bits, paddingValue only supports "
+            "0.\n", apiName));
+    }
+}
+
 template <typename T, typename ParamsT, typename PadParamsT>
 __aicore__ inline void CheckGmToLocalPadTensor(const LocalTensor<T>& dst, const ParamsT& dataCopyParams,
     const PadParamsT& padParams, const bool isGmToUb, const bool isValidDst, const __gm__ char* apiName)
 {
     CheckDataCopyPadParamsCommon<T>(dataCopyParams, isGmToUb, apiName);
+    CheckDataCopyPadPaddingCommon<T>(padParams, apiName);
     ASCENDC_DEBUG_ASSERT((isValidDst), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor route in %s, "
         "current dst TPosition is %s.\n", apiName, GetTPositionName(static_cast<TPosition>(dst.GetPosition()))));
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
@@ -340,6 +363,8 @@ __aicore__ inline void CheckPadUbToL1Tensor(const LocalTensor<T>& dst, const Loc
 
     CheckDataCopyPadParamsCommon<T>(dataCopyParams, false, apiName);
     CheckNd2NzParamsCommon(nd2nzParams, apiName);
+    ASCENDC_DEBUG_ASSERT((nd2nzParams.ndNum == 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check ndNum value in "
+        "%s, ndNum only supports 1, current value is %u.\n", apiName, nd2nzParams.ndNum));
     CheckUbToL1Route(srcHwPos, dstHwPos, srcPos, dstPos, apiName);
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
