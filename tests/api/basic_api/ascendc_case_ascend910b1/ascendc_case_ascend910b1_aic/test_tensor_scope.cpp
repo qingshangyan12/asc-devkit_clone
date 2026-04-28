@@ -120,7 +120,7 @@ void FixpipeChannelSplitDstTypeTest()
     fixpipeParams.dstNdStride = 0;
     fixpipeParams.isChannelSplit = true;
 
-    Fixpipe<half, float>(dstGlobal, srcLocal, fixpipeParams);
+    CheckFixpipeTensor<half, float, CFG_NZ>(dstGlobal, srcLocal, fixpipeParams, "Fixpipe");
 
     delete[] data0;
     delete[] data1;
@@ -405,7 +405,7 @@ TEST_P(CubeOpTestsuite, CubeOpTestCase)
     count++;
 }
 
-TEST_F(TensorScopeTest, FixpipeChannelSplitOnlySupportsFloatDst)
+TEST_F(TensorScopeTest, FixpipeChannelSplitOnlySupportsFloatSrcAndDst)
 {
     static int32_t count = 0;
     MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStub));
@@ -424,7 +424,8 @@ TEST_F(TensorScopeTest, FixpipeChannelSplitOnlySupportsFloatDst)
     streambuffer << resultFile.rdbuf();
     std::string resultString(streambuffer.str());
     std::string goldenStr =
-        "Failed to check isChannelSplit value in Fixpipe, isChannelSplit can be enabled only when dst are float.";
+        "Failed to check isChannelSplit value in Fixpipe, isChannelSplit can be enabled only when src and dst are "
+        "float.";
     resultFile.close();
 
     EXPECT_TRUE(resultString.find(goldenStr) != std::string::npos);
