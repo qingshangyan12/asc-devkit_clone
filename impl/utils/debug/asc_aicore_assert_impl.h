@@ -25,6 +25,14 @@ inline __aicore__ void __assert_fail(const __gm__ char* __assertion, const __gm_
     printf_impl_assert("[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", __file, __line, __function, __assertion);
     trap();
 }
+
+template <typename... Args>
+inline __aicore__ void __assert_fail_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
+    const __gm__ char* __function, const __gm__ char* fmt, Args&&... args) {
+    printf_impl_assert(fmt, args...);
+    printf_impl_assert("[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", __file, __line, __function, __assertion);
+    trap();
+}
 } // namespace __asc_aicore
 #endif
 
