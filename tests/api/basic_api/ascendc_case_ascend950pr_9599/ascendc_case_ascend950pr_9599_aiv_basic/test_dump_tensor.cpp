@@ -96,7 +96,6 @@ void DataDumpTensor(__gm__ uint8_t *dstGm, __gm__ uint8_t *srcGm, __gm__ uint8_t
     DataCopy(inputLocal, srcGlobal, copyParams);
     pipe_barrier(PIPE_ALL);
 
-    InitDump(false, workGm, dumpSize);
 }
 
 INSTANTIATE_TEST_CASE_P(TEST_DUMP_TENSOR, TestDumpTensorSuite,
@@ -160,12 +159,3 @@ TEST_F(TestDumpTensorSuite, InitDumpImplSkipsOutOfRangeCore)
     EXPECT_EQ(blockInfo[BLOCK_INFO_MAGIC_POS], 0U);
 }
 
-TEST_F(TestDumpTensorSuite, InitDumpNullStartAddrReturns)
-{
-    DumpTensorRuntimeGuard guard;
-    SetAivDumpEnv(1, 0, 0, 1);
-
-    InitDump(false, static_cast<__gm__ uint8_t*>(nullptr), DUMP_UINTSIZE);
-
-    EXPECT_EQ(AscendC::g_dumpWorkspaceReserved, nullptr);
-}

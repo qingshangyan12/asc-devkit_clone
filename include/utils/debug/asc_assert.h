@@ -43,7 +43,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 #define ASC_INTERNAL_ASSERT_IMPL(N, ...) ASC_INTERNAL_ASSERT_FUNC(N, __VA_ARGS__)
 #define ASC_INTERNAL_ASSERT_FUNC(N, ...) ASC_INTERNAL_ASSERT_##N(__VA_ARGS__)
 #define ASC_INTERNAL_ASSERT_1(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, (__PRETTY_FUNCTION__)))
-#define ASC_INTERNAL_ASSERT_2(expr, ...) ASC_INTERNAL_ASSERT_1(expr)
+#define ASC_INTERNAL_ASSERT_2(expr, fmt, ...) (static_cast<bool>(expr) ? void(0) : __assert_fail_msg(#expr, __FILE__, __LINE__, (__PRETTY_FUNCTION__), fmt, ##__VA_ARGS__))
 
 #undef assert
 #undef ascendc_assert

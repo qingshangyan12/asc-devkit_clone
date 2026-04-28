@@ -37,7 +37,6 @@ void DataPrintfCase(__gm__ uint8_t* srcGm, __gm__ uint8_t* workGm, __gm__ uint32
     GlobalTensor<uint8_t> srcGlobal;
     srcGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint8_t*>(srcGm), dataSize);
 
-    InitDump(false, workGm, dumpSize);
     PrintTimeStamp(0);
 
     const int32_t signedValue = -3;

@@ -689,13 +689,6 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 #endif
 }
 
-__aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
-{
-}
-__aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
-{
-}
-}  // namespace AscendC
 #endif
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
