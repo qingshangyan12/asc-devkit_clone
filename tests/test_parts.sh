@@ -107,6 +107,8 @@ basic_test_five_targets=(
 )
 
 arm_test_targets=(
+    ascendc_ut_aclrtc
     ascendc_ut_elf_tool
+    ascendc_ut_pack_kernel
     ascendc_ut_simt_api_ascend950pr_9599
 )
