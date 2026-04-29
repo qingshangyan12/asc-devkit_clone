@@ -209,7 +209,7 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
 2.  **设置A、B、C、Bias的内存逻辑位置、格式、数据类型以及是否转置的信息，设置scaleA、scaleB的内存逻辑位置、格式以及是否转置的信息。**
 
-    调用SetScaleAType、SetScaleBType接口，设置scaleA、scaleB的内存逻辑位置、格式以及是否转置。
+    调用[SetScaleAType](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetScaleAType.md)、[SetScaleBType](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetScaleBType.md)接口，设置scaleA、scaleB的内存逻辑位置、格式以及是否转置。
 
     ```
     cubeTiling.SetAType(AscendC::TPosition::GM, CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT8_E5M2, false);
@@ -222,7 +222,7 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
 3.  **使能MxMatmul场景**。
 
-    调用SetMadType接口，设置Tiling计算逻辑为MxMatmul场景。
+    调用[SetMadType](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetMadType.md)接口，设置Tiling计算逻辑为MxMatmul场景。
 
     ```
     cubetiling.SetMadType(MatrixMadType::MXMODE);
@@ -274,7 +274,7 @@ Kernel侧的关键步骤介绍如下：
     AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> mm; 
     ```
 
-    创建对象时需要传入A、scaleA、B、scaleB、C、Bias的参数类型信息， A、scaleA、B、scaleB类型信息通过[MatmulTypeWithScale](#zh-cn_topic_0000002270097206_table14759942142014)来定义，C、Bias类型信息通过MatmulType来定义，包括：内存逻辑位置、数据格式、数据类型、转置信息。同时，通过模板参数MatmulPolicy传入MatmulWithScalePolicy表明使能MxMatmul场景。
+    创建对象时需要传入A、scaleA、B、scaleB、C、Bias的参数类型信息， A、scaleA、B、scaleB类型信息通过[MatmulTypeWithScale](#zh-cn_topic_0000002270097206_table14759942142014)来定义，C、Bias类型信息通过[MatmulType](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Matmul使用说明.md)来定义，包括：内存逻辑位置、数据格式、数据类型、转置信息。同时，通过模板参数[MatmulPolicy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulPolicy.md)传入[MatmulWithScalePolicy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulPolicy.md)表明使能MxMatmul场景。
 
     ```
     template <TPosition POSITION, TPosition SCALE_POSITION, CubeFormat FORMAT, typename TYPE, bool ISTRANS = false, TPosition SRCPOS = TPosition::GM, CubeFormat SCALE_FORMAT = FORMAT, bool SCALE_ISTRANS = ISTRANS, TPosition SCALE_SRCPOS = SRCPOS>
@@ -294,7 +294,7 @@ Kernel侧的关键步骤介绍如下：
 
 3.  **设置左矩阵A、右矩阵B、左量化系数矩阵scaleA、右量化系数矩阵scaleB、Bias。**
 
-    通过SetTensorScaleA、SetTensorScaleB设置左量化系数矩阵scaleA、右量化系数矩阵scaleB。
+    通过[SetTensorScaleA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetTensorScaleA.md)、[SetTensorScaleB](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetTensorScaleB.md)设置左量化系数矩阵scaleA、右量化系数矩阵scaleB。
 
     ```
     mm.SetTensorA(gm_a, isTransposeA);    // 设置左矩阵A
@@ -305,7 +305,7 @@ Kernel侧的关键步骤介绍如下：
     ```
 
 4.  **完成矩阵乘操作。**
-    -   调用Iterate完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
+    -   调用[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Iterate.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
 
         ```
         while (mm.Iterate()) {   
@@ -313,7 +313,7 @@ Kernel侧的关键步骤介绍如下：
         }
         ```
 
-    -   调用IterateAll完成单核上所有数据的计算。IterateAll方式，无需循环迭代，使用比较简单。
+    -   调用[IterateAll](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateAll.md)完成单核上所有数据的计算。[IterateAll](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/IterateAll.md)方式，无需循环迭代，使用比较简单。
 
         ```
         mm.IterateAll(gm_c);
@@ -353,12 +353,12 @@ Kernel侧的关键步骤介绍如下：
 <p id="zh-cn_topic_0000002270097206_p145073401055"><a name="zh-cn_topic_0000002270097206_p145073401055"></a><a name="zh-cn_topic_0000002270097206_p145073401055"></a>针对<span id="zh-cn_topic_0000002270097206_ph185821514192716"><a name="zh-cn_topic_0000002270097206_ph185821514192716"></a><a name="zh-cn_topic_0000002270097206_ph185821514192716"></a>Ascend 950PR/Ascend 950DT</span>：</p>
 <p id="p28081820162716"><a name="p28081820162716"></a><a name="p28081820162716"></a>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM</p>
 <p id="p08081820132714"><a name="p08081820132714"></a><a name="p08081820132714"></a>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM</p>
-<p id="zh-cn_topic_0000002270097206_p274171193714"><a name="zh-cn_topic_0000002270097206_p274171193714"></a><a name="zh-cn_topic_0000002270097206_p274171193714"></a>注意：scaleA、scaleB矩阵设置为TPosition::TSCM时，对应的<a href="#zh-cn_topic_0000002270097206_p11226185115114">SCALE_FORMAT</a>仅支持CubeFormat::NZ。</p>
+<p id="zh-cn_topic_0000002270097206_p274171193714"><a name="zh-cn_topic_0000002270097206_p274171193714"></a><a name="zh-cn_topic_0000002270097206_p274171193714"></a>注意：scaleA、scaleB矩阵设置为TPosition::TSCM时，对应的SCALE_FORMAT参数仅支持CubeFormat::NZ。</p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000002270097206_row1175904217207"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p5537172115157"><a name="zh-cn_topic_0000002270097206_p5537172115157"></a><a name="zh-cn_topic_0000002270097206_p5537172115157"></a>FORMAT</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p6310416287"><a name="zh-cn_topic_0000002270097206_p6310416287"></a><a name="zh-cn_topic_0000002270097206_p6310416287"></a>数据的物理排布格式，详细介绍请参考<a href="../基础知识.md#zh-cn_topic_0000001622194138_section1453415011">数据格式</a>。</p>
+<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p6310416287"><a name="zh-cn_topic_0000002270097206_p6310416287"></a><a name="zh-cn_topic_0000002270097206_p6310416287"></a>数据的物理排布格式。</p>
 <p id="zh-cn_topic_0000002270097206_p1175934213209"><a name="zh-cn_topic_0000002270097206_p1175934213209"></a><a name="zh-cn_topic_0000002270097206_p1175934213209"></a>针对<span id="zh-cn_topic_0000002270097206_ph1712219180275"><a name="zh-cn_topic_0000002270097206_ph1712219180275"></a><a name="zh-cn_topic_0000002270097206_ph1712219180275"></a>Ascend 950PR/Ascend 950DT</span>：</p>
 <p id="p1638262618270"><a name="p1638262618270"></a><a name="p1638262618270"></a>A矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR</p>
 <p id="p183823268273"><a name="p183823268273"></a><a name="p183823268273"></a>B矩阵可设置为CubeFormat::ND，CubeFormat::NZ</p>
@@ -391,7 +391,7 @@ Kernel侧的关键步骤介绍如下：
 </tr>
 <tr id="zh-cn_topic_0000002270097206_row7921164017113"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p11226185115114"><a name="zh-cn_topic_0000002270097206_p11226185115114"></a><a name="zh-cn_topic_0000002270097206_p11226185115114"></a>SCALE_FORMAT</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p78145661612"><a name="zh-cn_topic_0000002270097206_p78145661612"></a><a name="zh-cn_topic_0000002270097206_p78145661612"></a>量化系数矩阵的物理排布格式，详细介绍请参考<a href="#zh-cn_topic_0000002270097206_fig107863142019">数据格式</a>。默认值为<a href="#zh-cn_topic_0000002270097206_p5537172115157">FORMAT</a>。</p>
+<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p78145661612"><a name="zh-cn_topic_0000002270097206_p78145661612"></a><a name="zh-cn_topic_0000002270097206_p78145661612"></a>量化系数矩阵的物理排布格式，详细介绍请参考<a href="#zh-cn_topic_0000002270097206_fig107863142019">数据格式</a>。默认值为FORMAT参数的取值。</p>
 <p id="zh-cn_topic_0000002270097206_p158141465164"><a name="zh-cn_topic_0000002270097206_p158141465164"></a><a name="zh-cn_topic_0000002270097206_p158141465164"></a>针对<span id="zh-cn_topic_0000002270097206_ph695882732713"><a name="zh-cn_topic_0000002270097206_ph695882732713"></a><a name="zh-cn_topic_0000002270097206_ph695882732713"></a>Ascend 950PR/Ascend 950DT</span>：</p>
 <p id="p15845121173011"><a name="p15845121173011"></a><a name="p15845121173011"></a>scaleA矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR</p>
 <p id="p884571116308"><a name="p884571116308"></a><a name="p884571116308"></a>scaleB矩阵可设置为CubeFormat::ND，CubeFormat::NZ</p>
@@ -402,7 +402,7 @@ Kernel侧的关键步骤介绍如下：
 </tr>
 <tr id="zh-cn_topic_0000002270097206_row0325310101910"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p19617394191"><a name="zh-cn_topic_0000002270097206_p19617394191"></a><a name="zh-cn_topic_0000002270097206_p19617394191"></a>SCALE_ISTRANS</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p22682252237"><a name="zh-cn_topic_0000002270097206_p22682252237"></a><a name="zh-cn_topic_0000002270097206_p22682252237"></a>是否开启使能scaleA、scaleB矩阵转置的功能。默认值为<a href="#zh-cn_topic_0000002270097206_p1475904232016">ISTRANS</a>。参数支持的取值如下：</p>
+<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p22682252237"><a name="zh-cn_topic_0000002270097206_p22682252237"></a><a name="zh-cn_topic_0000002270097206_p22682252237"></a>是否开启使能scaleA、scaleB矩阵转置的功能。默认值为ISTRANS参数的取值。参数支持的取值如下：</p>
 <p id="p1407842193011"><a name="p1407842193011"></a><a name="p1407842193011"></a>true：开启使能矩阵转置的功能。开启后，分别通过SetTensorScaleA和SetTensorScaleB中的isTransposeScaleA、isTransposeScaleB参数设置scaleA、scaleB矩阵是否转置。在Scale矩阵为ND格式的场景中，若设置scaleA、scaleB矩阵转置，Matmul会认为scaleA矩阵形状为[Ceil(K/64), M, 2]，scaleB矩阵形状为[N, Ceil(K/64), 2]。</p>
 <p id="p19408124217308"><a name="p19408124217308"></a><a name="p19408124217308"></a>false：不开启使能矩阵转置的功能。通过SetTensorScaleA和SetTensorScaleB不能设置scaleA、scaleB矩阵的转置情况。Matmul会认为scaleA矩阵形状为[M, Ceil(K/64), 2]，scaleB矩阵形状为[Ceil(K/64), N, 2]。</p>
 <p id="zh-cn_topic_0000002270097206_p1714645645816"><a name="zh-cn_topic_0000002270097206_p1714645645816"></a><a name="zh-cn_topic_0000002270097206_p1714645645816"></a>使用该参数的完整样例请参考<span id="zh-cn_topic_0000002270097206_ph176803703218"><a name="zh-cn_topic_0000002270097206_ph176803703218"></a><a name="zh-cn_topic_0000002270097206_ph176803703218"></a><a href="https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_mx_scalea_trans" target="_blank" rel="noopener noreferrer">scaleA转置scaleB不转置的的MxMatmul样例</a></span>、<span id="zh-cn_topic_0000002270097206_ph170939183211"><a name="zh-cn_topic_0000002270097206_ph170939183211"></a><a name="zh-cn_topic_0000002270097206_ph170939183211"></a><a href="https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_mx_scaleb_trans" target="_blank" rel="noopener noreferrer">scaleA不转置scaleB转置的的MxMatmul样例</a></span>。</p>
@@ -410,7 +410,7 @@ Kernel侧的关键步骤介绍如下：
 </tr>
 <tr id="zh-cn_topic_0000002270097206_row11254846161912"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p6158144912199"><a name="zh-cn_topic_0000002270097206_p6158144912199"></a><a name="zh-cn_topic_0000002270097206_p6158144912199"></a>SCALE_SRCPOS</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p642071011551"><a name="zh-cn_topic_0000002270097206_p642071011551"></a><a name="zh-cn_topic_0000002270097206_p642071011551"></a>scaleA、scaleB矩阵的<a href="#zh-cn_topic_0000002270097206_p9507104014512">SCALE_POSITION</a>参数设置为TPosition::TSCM时，需要通过本参数设置TSCM中矩阵数据来源的内存逻辑位置，默认值为<a href="#zh-cn_topic_0000002270097206_p54471329153612">SRCPOS</a>。</p>
+<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p642071011551"><a name="zh-cn_topic_0000002270097206_p642071011551"></a><a name="zh-cn_topic_0000002270097206_p642071011551"></a>scaleA、scaleB矩阵的SCALE_POSITION参数设置为TPosition::TSCM时，需要通过本参数设置TSCM中矩阵数据来源的内存逻辑位置，默认值为SRCPOS参数的取值。</p>
 <p id="zh-cn_topic_0000002270097206_p134201910115519"><a name="zh-cn_topic_0000002270097206_p134201910115519"></a><a name="zh-cn_topic_0000002270097206_p134201910115519"></a>针对<span id="zh-cn_topic_0000002270097206_ph2420111019559"><a name="zh-cn_topic_0000002270097206_ph2420111019559"></a><a name="zh-cn_topic_0000002270097206_ph2420111019559"></a>Ascend 950PR/Ascend 950DT</span>：</p>
 <p id="p138204923010"><a name="p138204923010"></a><a name="p138204923010"></a>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT</p>
 <p id="p68316492306"><a name="p68316492306"></a><a name="p68316492306"></a>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT</p>
@@ -421,14 +421,14 @@ Kernel侧的关键步骤介绍如下：
 
 ## 约束说明<a name="zh-cn_topic_0000002270097206_section14160134220363"></a>
 
--   MxMatmul场景仅支持Norm模板和MDL模板。
+-   MxMatmul场景仅支持[Norm模板](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)和[MDL模板](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)。
 
 -   在MxMatmul场景中，如果A与B矩阵的位置同时为GM，对singleKIn没有特殊限制，在这种情况下，若scaleA和scaleB的K方向大小（即Ceil\(singleKIn, 32\)）为奇数，用户需自行在scaleA和scaleB的K方向补0至偶数。例如，当singleKIn为30时，Ceil\(singleKIn, 32\)为1，用户需要自行在scaleA和scaleB的K方向补0，使K方向为偶数。对于其它A、B矩阵逻辑位置的组合情况，即A与B矩阵的位置不同时为GM，singleKIn以32个元素向上对齐后的数值必须是32的偶数倍。
 -   在MxMatmul场景中，当输入数据类型为fp4x2\_e2m1\_t/fp4x2\_e1m2\_t时，内轴必须为偶数。
 -   在MxMatmul场景中，通过将A矩阵和scaleA矩阵的数据格式设置为VECTOR，来开启[GEMV模式](矩阵向量乘.md)。在此模式下，A和scaleA矩阵仅支持内存逻辑位置为GM，并且均不支持转置。
 -   A矩阵、B矩阵为UB输入时，矩阵的内轴需要向上32字节对齐，例如，A矩阵的形状为\(M, K\)时，将K对齐到32字节；A矩阵的形状为\(K, M\)时，将M对齐到32字节。
 -   scaleA矩阵、scaleB矩阵为UB输入时，矩阵的内轴需要向上32字节对齐，例如，scaleA矩阵的形状为\(M, K/32\)时，将K/32对齐到32字节；scaleA矩阵的形状为\(K/32, M\)时，将M对齐到32字节。
--   当scaleA和scaleB矩阵以ND格式输入时，高阶API在内部实现格式转换时，需要占用UB临时空间。开发者需使用SetLocalWorkspace接口配置临时空间，临时空间大小（单位字节）的计算公式如下。
+-   当scaleA和scaleB矩阵以ND格式输入时，高阶API在内部实现格式转换时，需要占用UB临时空间。开发者需使用[SetLocalWorkspace](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetLocalWorkspace.md)接口配置临时空间，临时空间大小（单位字节）的计算公式如下。
 
     ```
     int32_t scaleATmpBuf = 0;
