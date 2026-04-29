@@ -48,6 +48,7 @@ PIPE_MTE1
 
 - dst_addr、src_addr的起始地址需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
+- 由于此接口实现了cube核与vector核间的数据搬运，所以仅支持在混合模式下调用。
 
 ## 调用示例
 
