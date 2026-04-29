@@ -7,6 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <vector>
@@ -120,6 +121,11 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
 {
     auto *param = AsOpenOpParam(opParam);
     CHK_PTR_NULL(param);
+    HCCL_INFO("YYYYYY asc mc2 [LaunchOpenOpParamDataImpl] file[%s:%d], opParamSize %zu, "
+              "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
+              __FILE__, __LINE__, opParam.size(), sizeof(ops_hccl::OpParam),
+              offsetof(ops_hccl::OpParam, varMemSize), static_cast<unsigned long long>(param->varMemSize),
+              static_cast<u32>(param->opType), param->algName);
     ops_hccl::AlgResourceCtxSerializable resCtx;
 
     char *ctx = static_cast<char *>(param->resCtx);

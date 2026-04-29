@@ -10,6 +10,7 @@
 #include "ins_v2_all_to_all_v_sole_executor.h"
 #include "ins_temp_all_to_all_v_mesh_1D.h"
 #include "ins_temp_dpu_alltoall_mesh.h"
+#include <cstddef>
 #ifndef AICPU_COMPILE
 #include "ccu_temp_all_to_all_mesh_1D.h"
 #include "ccu_temp_all_to_all_mesh2die.h"
@@ -62,6 +63,10 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     const OpParam &param, const AlgResourceCtxSerializable &resCtx)
 {
     HCCL_INFO("[InsV2AlltoAllVSoleExecutor][Orchestrate] Orchestrate Start");
+    HCCL_INFO("YYYYYY asc mc2 [InsV2AlltoAllVSoleExecutor][Orchestrate] file[%s:%d], "
+              "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
+              __FILE__, __LINE__, sizeof(OpParam), offsetof(OpParam, varMemSize),
+              static_cast<unsigned long long>(param.varMemSize), static_cast<u32>(param.opType), param.algName);
 
     // maxTmpMemSize_设定为cclIn的大小，op中将申请的HcclBuff全给了cclIn
     maxTmpMemSize_ = resCtx.cclMem.size;
