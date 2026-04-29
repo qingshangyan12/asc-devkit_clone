@@ -59,11 +59,8 @@ constexpr uint32_t TOPK_NORMAL_INNER_MAX_LEN = 4096;
 
 namespace AscendC {
 
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113))
-
 constexpr TopKConfig defaultTopKConfig = { TopKAlgo::MERGE_SORT, TopKOrder::UNSET, true };
-#endif
+
 }
 #endif
 
