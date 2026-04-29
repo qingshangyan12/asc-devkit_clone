@@ -439,13 +439,12 @@ template <HardEvent evt> __aicore__ inline TEventID TPipe::AllocEventID()
 {
     ASCENDC_ASSERT((evt < HardEvent::MAX),
                    { KERNEL_LOG(KERNEL_ERROR, "illegal event %d", static_cast<int32_t>(evt)); });
-    auto ptr = g_tPipeOccupyEventPool + EventToIndex(evt);
-    auto lastId = sff0(*ptr);
+    auto lastId = sff0(g_tPipeOccupyEventPool[EventToIndex(evt)]);
     ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), {
         KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT);
     });
-    *ptr = sbitset1(*ptr, lastId);
+    g_tPipeOccupyEventPool[EventToIndex(evt)] = sbitset1(g_tPipeOccupyEventPool[EventToIndex(evt)], lastId);
     return lastId;
 }
 
@@ -456,15 +455,13 @@ template <HardEvent evt> __aicore__ inline void TPipe::ReleaseEventID(TEventID i
             static_cast<int32_t>(id), QUE_MAX_EVENT);
     });
     ASCENDC_ASSERT((evt != HardEvent::MAX), { KERNEL_LOG(KERNEL_ERROR, "evt cannot be HardEvent::MAX"); });
-    auto ptr = g_tPipeOccupyEventPool + EventToIndex(evt);
-    *ptr = sbitset0(*ptr, id);
+    g_tPipeOccupyEventPool[EventToIndex(evt)] = sbitset0(g_tPipeOccupyEventPool[EventToIndex(evt)], id);
     return;
 }
 
 __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 {
-    auto ptr = g_tPipeOccupyEventPool + EventToIndex(evt);
-    auto lastId = sff0(*ptr);
+    auto lastId = sff0(g_tPipeOccupyEventPool[EventToIndex(evt)]);
     ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), {
         KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT);
@@ -474,8 +471,7 @@ __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 
 template <HardEvent evt> __aicore__ inline TEventID TPipe::FetchEventID()
 {
-    auto ptr = g_tPipeOccupyEventPool + EventToIndex(evt);
-    auto lastId = sff0(*ptr);
+    auto lastId = sff0(g_tPipeOccupyEventPool[EventToIndex(evt)]);
     ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), {
         KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT);
