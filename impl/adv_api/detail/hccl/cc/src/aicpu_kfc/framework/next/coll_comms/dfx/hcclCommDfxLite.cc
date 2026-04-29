@@ -40,16 +40,37 @@ HcclResult HcclCommDfxLite::Init(u32 deviceId, const std::string& commTag) {
 
 HcclResult HcclCommDfxLite::AddTaskInfoCallback(u32 streamId, u32 taskId, const Hccl::TaskParam &taskParam, u64 handle)
 {
+    if (mirrorTaskManagerLite_ == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [HcclCommDfxLite::AddTaskInfoCallback] mirrorTaskManagerLite is null, "
+            "commTag[%s], streamId[%u], taskId[%u].",
+            commTag_.c_str(), streamId, taskId);
+    }
     CHK_SMART_PTR_NULL(mirrorTaskManagerLite_);
     u32 remoteRankId = INVALID_UINT;
     if (handle != INVALID_U64) {
-        CHK_RET(GetChannelRemoteRankId(commTag_, handle, remoteRankId));
+        HcclResult ret = GetChannelRemoteRankId(commTag_, handle, remoteRankId);
+        if (ret != HCCL_SUCCESS) {
+            HCCL_ERROR("YYYYYY asc dfx [HcclCommDfxLite::AddTaskInfoCallback] GetChannelRemoteRankId failed, "
+                "commTag[%s], handle[%llu], ret[%d].",
+                commTag_.c_str(), static_cast<unsigned long long>(handle), ret);
+        }
+        CHK_RET(ret);
     }
     std::shared_ptr<Hccl::TaskInfo> taskInfo{nullptr};
+    std::shared_ptr<Hccl::DfxOpInfo> currDfxOpInfo = mirrorTaskManagerLite_->GetCurrDfxOpInfo();
+    if (currDfxOpInfo == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [HcclCommDfxLite::AddTaskInfoCallback] currDfxOpInfo is null, "
+            "commTag[%s], streamId[%u], taskId[%u], before make TaskInfo.", commTag_.c_str(), streamId, taskId);
+    }
     EXECEPTION_CATCH(taskInfo = std::make_shared<Hccl::TaskInfo>(streamId, taskId,
         remoteRankId, taskParam, mirrorTaskManagerLite_->GetCurrDfxOpInfo()), return HCCL_E_PTR);
+    if (taskInfo == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [HcclCommDfxLite::AddTaskInfoCallback] taskInfo is null after make_shared, "
+            "commTag[%s], streamId[%u], taskId[%u], before AddTaskInfo.",
+            commTag_.c_str(), streamId, taskId);
+    }
     EXECEPTION_CATCH(mirrorTaskManagerLite_->AddTaskInfo(taskInfo), return HCCL_E_PTR);
-    HCCL_INFO("[%s]taskInfo: %s", __func__, taskInfo->Describe().c_str());
+    HCCL_INFO("YYYYYY asc dfx [HcclCommDfxLite::AddTaskInfoCallback] taskInfo: %s", taskInfo->Describe().c_str());
     return HCCL_SUCCESS;
 }
 

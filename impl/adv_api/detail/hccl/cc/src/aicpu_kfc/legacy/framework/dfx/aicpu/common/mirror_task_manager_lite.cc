@@ -41,9 +41,14 @@ void MirrorTaskManagerLite::AddTaskInfo(std::shared_ptr<TaskInfo> taskInfo)
         "taskId[%u], taskDfxOpInfo[%p]", taskInfo->streamId_, taskInfo->taskId_, taskInfo->dfxOpInfo_.get());
 
     if (taskInfo->dfxOpInfo_ == nullptr) {
-        HCCL_INFO("YYYYYY asc dfx [MirrorTaskManagerLite::AddTaskInfo] task dfxOpInfo null, use currDfxOpInfo[%p]",
+        HCCL_ERROR("YYYYYY asc dfx [MirrorTaskManagerLite::AddTaskInfo] task dfxOpInfo null, use currDfxOpInfo[%p]",
             currDfxOpInfo_.get());
         taskInfo->dfxOpInfo_ = currDfxOpInfo_;
+        if (taskInfo->dfxOpInfo_ == nullptr) {
+            HCCL_ERROR("YYYYYY asc dfx [MirrorTaskManagerLite::AddTaskInfo] currDfxOpInfo is also null, "
+                "streamId[%u], taskId[%u], original add task path will keep null dfx info.",
+                taskInfo->streamId_, taskInfo->taskId_);
+        }
     }
 
     if (queueMap_.find(taskInfo->streamId_) == queueMap_.end()) {
@@ -55,6 +60,10 @@ void MirrorTaskManagerLite::AddTaskInfo(std::shared_ptr<TaskInfo> taskInfo)
             "queue[%p], queueMapSize[%llu]", taskInfo->streamId_, queueMap_[taskInfo->streamId_].get(),
             static_cast<unsigned long long>(queueMap_.size()));
     }
+    if (queueMap_[taskInfo->streamId_] == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [MirrorTaskManagerLite::AddTaskInfo] queue is null, streamId[%u], taskId[%u], "
+            "before queue access.", taskInfo->streamId_, taskInfo->taskId_);
+    }
 
     if (queueTaskNum[taskInfo->streamId_] == static_cast<u32>(queueMap_[taskInfo->streamId_]->Capacity())) {
         HCCL_INFO("YYYYYY asc dfx [MirrorTaskManagerLite::AddTaskInfo] queue full callback begin, "
@@ -62,6 +71,10 @@ void MirrorTaskManagerLite::AddTaskInfo(std::shared_ptr<TaskInfo> taskInfo)
             queueTaskNum[taskInfo->streamId_],
             static_cast<unsigned long long>(queueMap_[taskInfo->streamId_]->Capacity()),
             static_cast<int>(static_cast<bool>(fullyCallBack_)));
+        if (!fullyCallBack_) {
+            HCCL_ERROR("YYYYYY asc dfx [MirrorTaskManagerLite::AddTaskInfo] queue full but fullyCallBack is null, "
+                "streamId[%u], before callback.", taskInfo->streamId_);
+        }
         fullyCallBack_();
         queueTaskNum[taskInfo->streamId_] = 0;
         HCCL_INFO("YYYYYY asc dfx [MirrorTaskManagerLite::AddTaskInfo] queue full callback end, streamId[%u]",
@@ -91,19 +104,26 @@ bool MirrorTaskManagerLite::IsStaticGraphMode(const CollOperator &collOperator) 
 void MirrorTaskManagerLite::SetCurrDfxOpInfo(std::shared_ptr<DfxOpInfo> dfxOpInfo)
 {
     if (dfxOpInfo == nullptr) {
-        HCCL_ERROR("[MirrorTaskManagerLite][SetCurrDfxOpInfo]fail, dfxOpInfo is nullptr");
+        HCCL_ERROR("YYYYYY asc dfx [MirrorTaskManagerLite::SetCurrDfxOpInfo] dfxOpInfo is nullptr, this[%p]", this);
         return;
     }
     currDfxOpInfo_     = dfxOpInfo;
     isStaticGraphMode_ = IsStaticGraphMode(dfxOpInfo->op_);
     opMode_            = dfxOpInfo->op_.opMode;
-    HCCL_INFO("[MirrorTaskManagerLite][SetCurrDfxOpInfo] Succeed, currDfxOpInfo_[%p], this[%p] !", currDfxOpInfo_.get(), this);
+    HCCL_INFO("YYYYYY asc dfx [MirrorTaskManagerLite::SetCurrDfxOpInfo] succeed, currDfxOpInfo_[%p], this[%p]",
+        currDfxOpInfo_.get(), this);
     return;
 }
 
 std::shared_ptr<DfxOpInfo> MirrorTaskManagerLite::GetCurrDfxOpInfo() const
 {
-    HCCL_INFO("[MirrorTaskManagerLite][GetCurrDfxOpInfo] Succeed, currDfxOpInfo_[%p], this[%p] !", currDfxOpInfo_.get(), this);
+    if (currDfxOpInfo_ == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [MirrorTaskManagerLite::GetCurrDfxOpInfo] currDfxOpInfo is nullptr, this[%p]",
+            this);
+    } else {
+        HCCL_INFO("YYYYYY asc dfx [MirrorTaskManagerLite::GetCurrDfxOpInfo] succeed, currDfxOpInfo_[%p], this[%p]",
+            currDfxOpInfo_.get(), this);
+    }
     return currDfxOpInfo_;
 }
 

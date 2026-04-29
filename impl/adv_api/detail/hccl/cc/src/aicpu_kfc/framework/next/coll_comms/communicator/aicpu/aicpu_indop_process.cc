@@ -259,10 +259,22 @@ HcclResult AicpuIndopProcess::AicpuDfxOpInfoInit(HcclDfxOpInfo *aicpuDfxInfo, co
 {
     HCCL_INFO("YYYYYY asc dfx [AicpuDfxOpInfoInit] start, aicpuDfxInfo[%p], commTag[%s], g_hcclComm[%p]",
         aicpuDfxInfo, commTag.c_str(), g_hcclComm);
+    if (aicpuDfxInfo == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [AicpuDfxOpInfoInit] aicpuDfxInfo is null, commTag[%s].",
+            commTag.c_str());
+    }
     CHK_PTR_NULL(aicpuDfxInfo);
     // 获取device侧的通信域
+    if (g_hcclComm == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [AicpuDfxOpInfoInit] g_hcclComm is null, commTag[%s].",
+            commTag.c_str());
+    }
     CHK_PRT_RET(g_hcclComm == nullptr, HCCL_ERROR("%s g_hcclComm is null, commTag[%s]", __func__, commTag.c_str()), HCCL_E_PTR);
     CollCommAicpu* collComm = g_hcclComm->GetCollCommAicpu();
+    if (collComm == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [AicpuDfxOpInfoInit] collComm is null, commTag[%s], g_hcclComm[%p], "
+            "before CHK_PTR_NULL.", commTag.c_str(), g_hcclComm);
+    }
     CHK_PTR_NULL(collComm);
     HCCL_INFO("YYYYYY asc dfx [AicpuDfxOpInfoInit] got collComm[%p], identifier[%s]",
         collComm, collComm->GetIdentifier().c_str());
@@ -271,6 +283,10 @@ HcclResult AicpuIndopProcess::AicpuDfxOpInfoInit(HcclDfxOpInfo *aicpuDfxInfo, co
     std::shared_ptr<Hccl::DfxOpInfo> dfxOpInfoOnce = ConvertToDfxOpInfo(*aicpuDfxInfo);
     HCCL_INFO("YYYYYY asc dfx [AicpuDfxOpInfoInit] ConvertToDfxOpInfo end, dfxOpInfo[%p]",
         dfxOpInfoOnce.get());
+    if (dfxOpInfoOnce == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [AicpuDfxOpInfoInit] ConvertToDfxOpInfo returned null, commTag[%s].",
+            commTag.c_str());
+    }
     dfxOpInfoOnce->opIndex_ = collComm->UpdateIndex();
     dfxOpInfoOnce->comm_ = reinterpret_cast<void *>(collComm);
     dfxOpInfoOnce->isIndop_ = true;
@@ -288,8 +304,16 @@ HcclResult AicpuIndopProcess::AicpuDfxOpInfoInit(HcclDfxOpInfo *aicpuDfxInfo, co
 
     // 注册
     HcclCommDfxLite* hcclCommDfxLite = collComm->GetHcclCommDfxLite();
+    if (hcclCommDfxLite == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [AicpuDfxOpInfoInit] hcclCommDfxLite is null, commTag[%s], collComm[%p], "
+            "before SetCurrDfxOpInfo.", commTag.c_str(), collComm);
+    }
     CHK_PTR_NULL(hcclCommDfxLite);
     Hccl::MirrorTaskManagerLite* mirrorTaskMgrLite = hcclCommDfxLite->GetMirrorTaskManagerLite();
+    if (mirrorTaskMgrLite == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [AicpuDfxOpInfoInit] mirrorTaskMgrLite is null, commTag[%s], "
+            "hcclCommDfxLite[%p], before SetCurrDfxOpInfo.", commTag.c_str(), hcclCommDfxLite);
+    }
     CHK_PTR_NULL(mirrorTaskMgrLite);
     HCCL_INFO("YYYYYY asc dfx [AicpuDfxOpInfoInit] SetCurrDfxOpInfo begin, hcclCommDfxLite[%p], "
         "mirrorTaskMgrLite[%p], dfxOpInfo[%p]", hcclCommDfxLite, mirrorTaskMgrLite, dfxOpInfoOnce.get());
@@ -302,15 +326,36 @@ HcclResult AicpuIndopProcess::ProfilingReportDeviceOp(const std::string &group)
 {
     HCCL_INFO("ProfilingReportDeviceOp group:%s", group.c_str());
     // 获取device侧的通信域
+    if (g_hcclComm == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [ProfilingReportDeviceOp] g_hcclComm is null, group[%s].",
+            group.c_str());
+    }
     CHK_PTR_NULL(g_hcclComm);
     CollCommAicpu* collCommAicpu = g_hcclComm->GetCollCommAicpu();
+    if (collCommAicpu == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [ProfilingReportDeviceOp] collCommAicpu is null, group[%s], g_hcclComm[%p], "
+            "before profiling report.", group.c_str(), g_hcclComm);
+    }
     CHK_PTR_NULL(collCommAicpu);
     // 注册
     HcclCommDfxLite* hcclCommDfxLite = collCommAicpu->GetHcclCommDfxLite();
+    if (hcclCommDfxLite == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [ProfilingReportDeviceOp] hcclCommDfxLite is null, group[%s], "
+            "collCommAicpu[%p], before profiling report.", group.c_str(), collCommAicpu);
+    }
     CHK_PTR_NULL(hcclCommDfxLite);
     Hccl::MirrorTaskManagerLite* mirrorTaskMgrLite = hcclCommDfxLite->GetMirrorTaskManagerLite();
+    if (mirrorTaskMgrLite == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [ProfilingReportDeviceOp] mirrorTaskMgrLite is null, group[%s], "
+            "hcclCommDfxLite[%p], before profiling report.", group.c_str(), hcclCommDfxLite);
+    }
     CHK_PTR_NULL(mirrorTaskMgrLite);
     CHK_RET(AicpuIndopProcess::ReportAllTasks(group));
+    std::shared_ptr<Hccl::DfxOpInfo> currDfxOpInfo = mirrorTaskMgrLite->GetCurrDfxOpInfo();
+    if (currDfxOpInfo == nullptr) {
+        HCCL_ERROR("YYYYYY asc dfx [ProfilingReportDeviceOp] currDfxOpInfo is null, group[%s], before ReportHcclOpInfo.",
+            group.c_str());
+    }
     EXECEPTION_CATCH(Hccl::ProfilingHandlerLite::GetInstance().ReportHcclOpInfo(*mirrorTaskMgrLite->GetCurrDfxOpInfo()),
         return HCCL_E_INTERNAL);
     return HCCL_SUCCESS;
