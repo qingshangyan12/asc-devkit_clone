@@ -52,8 +52,8 @@ RegSyncVf函数内：
 1. LoadAlign和StoreAlign操作同一地址
 2. 读写入同一寄存器：读LoadAlign后写StoreAlign
 3. 硬件自动保证StoreAlign等待LoadAlign完成，不用加LocalMemBar
-    - 调用实现
-      使用内核调用符`<<<>>>`调用核函数，启动1个核。
+- 调用实现  
+  使用内核调用符`<<<>>>`调用核函数，启动1个核。
 
 ### 场景2：LocalMemBar（写读依赖）
 
@@ -64,7 +64,7 @@ RegSyncVf函数内：
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 8]</td><td align="center">float</td></tr>
-<tr><td rowspan="1" align="center">样例输出</td><td align="center">sum</td><td align="center">[1]</td><td align="center">float</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">sum</td><td align="center">[1, 1]</td><td align="center">float</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">reg_sync</td></tr>
 </table>
 
