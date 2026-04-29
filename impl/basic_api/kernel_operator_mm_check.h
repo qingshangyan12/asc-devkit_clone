@@ -164,6 +164,9 @@ __aicore__ inline void CheckFixpipeParamsV220Common(const FixpipeParamsV220& int
         CheckValueRange<uint16_t>(intriParams.srcNdStride, 1, VALUE_512, "srcNdStride", apiName);
         CheckValueRange<uint16_t>(intriParams.dstNdStride, 1, UINT16_MAX, "dstNdStride", apiName);
     }
+    ASCENDC_DEBUG_ASSERT((intriParams.unitFlag == 0 || intriParams.unitFlag == 2 || intriParams.unitFlag == 3),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check unitFlag value in %s, supported values are 0, 2, and 3.\n",
+        apiName));
 
     CheckFixpipeQuantPreCommon<T, U>(intriParams.quantPre, apiName);
 }
