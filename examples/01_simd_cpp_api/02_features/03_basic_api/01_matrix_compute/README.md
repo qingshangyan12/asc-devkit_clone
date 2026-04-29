@@ -17,6 +17,5 @@
 | [batch_mmad](./batch_mmad)                                                                 | 本样例介绍在输入为float数据类型并且左、右矩阵均不转置的场景下，带batch的矩阵乘法，其中从GM-->L1、L0C-->GM、L0C-->L1这三条通路分别采用了DataCopy ND2NZ和Fixpipe批量搬运数据，从L1-->L0A/L0B以及Mmad执行矩阵乘这两个步骤则是循环batch次，每次循环内只处理一对左、右矩阵 |
 | [mmad](./mmad)                                                                             | 本样例介绍了输入为ND格式，B4 / B8 / B16 / B32输入数据类型（具体以int4_t / int8_t / half / float为例），四种输入数据类型下的矩阵乘法，说明如何通过Mmad指令实现矩阵乘法计算（C = A x B + Bias） |
 | [mmad_unitflag](./mmad_unitflag)                                                                             | 本样例介绍了如何在调用Mmad指令时，使用unitFlag功能。 |
-| [mmad_with_bias](./mmad_with_bias)                                                         | 本样例介绍基于基础API Mmad实现带Bias的矩阵乘 |
-| [mmad_with_gemv](./mmad_with_gemv)                                                         | 本样例介绍了Gemv（M=1）模式下的矩阵乘法 |
+| [mmad_gemv](./mmad_gemv)                                                         | 本样例介绍了Gemv（M=1）模式下的矩阵乘法 |
 | [mmad_with_sparse](./mmad_with_sparse)                                                     | 本样例介绍基础API MmadWithSparse调用 |
