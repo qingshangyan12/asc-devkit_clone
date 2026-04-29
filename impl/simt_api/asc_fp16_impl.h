@@ -52,9 +52,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hfma(half x, half y, half z)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __habs(half x)
 {
-    uint16_t bits = *reinterpret_cast<uint16_t*>(&x);
-    bits &= 0x7FFF;
-    return *reinterpret_cast<half*>(&bits);
+    return abs(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __internal_is_positive_inf(half x)
