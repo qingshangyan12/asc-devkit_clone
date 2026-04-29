@@ -110,9 +110,6 @@ __aicore__ inline uint32_t GetdataCopyCount(uint32_t dataLen)
 }
 
 __aicore__ inline int64_t GetBlockNum();
-__aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
-{
-}
 
 template <typename T>
 __aicore__ inline uint32_t CheckValidPosition(const LocalTensor<T> &cachedData)
@@ -979,12 +976,6 @@ __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
 __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 {
     return;
-}
-__aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
-{
-}
-__aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
-{
 }
 }
 #endif
