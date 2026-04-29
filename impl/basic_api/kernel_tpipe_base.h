@@ -130,8 +130,8 @@ struct SpmInfo {
     uint8_t spmBufType;
 };
 
-__BLOCK_LOCAL__ uint64_t g_tPipeOccupyEventPool[EVENT_NUM] = {};
-__BLOCK_LOCAL__ uint32_t g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::MAX)] = {};
+__BLOCK_LOCAL__ uint64_t g_tPipeOccupyEventPool[EVENT_NUM];
+__BLOCK_LOCAL__ uint32_t g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::MAX)];
 
 struct TPipeImpl {
     struct TEventPool eventPool_[EVENT_NUM];
