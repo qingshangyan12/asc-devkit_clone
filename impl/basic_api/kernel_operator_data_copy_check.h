@@ -178,10 +178,10 @@ __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const Loca
 
     CheckDataCopyParamsCommon(intriParams, apiName);
     ASCENDC_DEBUG_ASSERT((srcHwPos == Hardware::L1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor "
-        "route in %s, supported route is L1 -> BIAS, current src TPosition is %s.\n", apiName,
+        "route in %s, supported route is C1 -> C2, current src TPosition is %s.\n", apiName,
         GetTPositionName(srcPos)));
     ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::BIAS), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor "
-        "route in %s, supported route is L1 -> BIAS, current dst TPosition is %s.\n", apiName,
+        "route in %s, supported route is C1 -> C2, current dst TPosition is %s.\n", apiName,
         GetTPositionName(dstPos)));
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckTensorAlignment(dst, 64, "dst", apiName);
@@ -193,7 +193,7 @@ __aicore__ inline void CheckNd2NzParamsCommon(const Nd2NzParams& intriParams, co
     CheckValueRange<decltype(intriParams.nValue)>(intriParams.nValue, 0, 16384, "nValue", apiName);
     CheckValueRange<decltype(intriParams.dValue)>(intriParams.dValue, 0, 65535, "dValue", apiName);
     CheckValueRange<decltype(intriParams.srcNdMatrixStride)>(intriParams.srcNdMatrixStride, 0, 65535, "srcNdMatrixStride", apiName);
-    CheckValueRange<decltype(intriParams.srcDValue)>(intriParams.srcDValue, 1, 16384, "srcDValue", apiName);
+    CheckValueRange<decltype(intriParams.srcDValue)>(intriParams.srcDValue, 1, 65535, "srcDValue", apiName);
     CheckValueRange<decltype(intriParams.dstNzC0Stride)>(intriParams.dstNzC0Stride, 1, 16384, "dstNzC0Stride", apiName);
     CheckValueRange<decltype(intriParams.dstNzNStride)>(intriParams.dstNzNStride, 1, 16384, "dstNzNStride", apiName);
     CheckValueRange<decltype(intriParams.dstNzMatrixStride)>(intriParams.dstNzMatrixStride, 0, 65535, "dstNzMatrixStride", apiName);
@@ -225,10 +225,10 @@ __aicore__ inline void CheckUbToL1Route(const Hardware srcHwPos, const Hardware 
     const TPosition dstPos, const __gm__ char* apiName)
 {
     ASCENDC_DEBUG_ASSERT((srcHwPos == Hardware::UB), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor "
-        "route in %s, supported route is UB -> L1, current src TPosition is %s.\n", apiName,
+        "route in %s, supported route is VECIN/VECOUT -> TSCM, current src TPosition is %s.\n", apiName,
         GetTPositionName(srcPos)));
     ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::L1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor "
-        "route in %s, supported route is UB -> L1, current dst TPosition is %s.\n", apiName,
+        "route in %s, supported route is VECIN/VECOUT -> TSCM, current dst TPosition is %s.\n", apiName,
         GetTPositionName(dstPos)));
 }
 
@@ -237,7 +237,7 @@ __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const Glob
     const Nd2NzParams& intriParams, const __gm__ char* apiName)
 {
     CheckNd2NzParamsCommon(intriParams, apiName);
-    CheckTensorPhyPosition<Hardware::L1, Hardware::UB>(dst, "dst", "A1 / B1 / C1 / VECIN", apiName);
+    CheckTensorPhyPosition<Hardware::L1, Hardware::UB>(dst, "dst", "A1 / B1 / VECIN", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
 }
 
@@ -290,7 +290,7 @@ __aicore__ inline void CheckDataCopyPadParamsCommon(const DataCopyParams& dataCo
         apiName);
     if (isGmToUb) {
         ASCENDC_DEBUG_ASSERT((dataCopyParams.blockLen % sizeof(PrimT<T>) == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-            "Failed to check blockLen value in %s, it must be divisible by %zu, current value is %u.\n", apiName,
+            "Failed to check blockLen value in %s, it must be divisible by %u, current value is %u.\n", apiName,
             sizeof(PrimT<T>), dataCopyParams.blockLen));
     }
 }
@@ -304,7 +304,7 @@ __aicore__ inline void CheckDataCopyPadParamsCommon(const DataCopyExtParams& dat
     CheckValueRange<uint32_t>(dataCopyParams.blockLen, 0, dataCopyPadBlkLenLimit, "blockLen", apiName);
     if (isGmToUb) {
         ASCENDC_DEBUG_ASSERT((dataCopyParams.blockLen % sizeof(PrimT<T>) == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-            "Failed to check blockLen value in %s, it must be divisible by %zu, current value is %u.\n", apiName,
+            "Failed to check blockLen value in %s, it must be divisible by %u, current value is %u.\n", apiName,
             sizeof(PrimT<T>), dataCopyParams.blockLen));
     }
 }
