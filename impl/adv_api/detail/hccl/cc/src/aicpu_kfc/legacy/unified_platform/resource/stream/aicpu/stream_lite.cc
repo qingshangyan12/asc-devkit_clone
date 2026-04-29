@@ -36,26 +36,6 @@ StreamLite::StreamLite(u32 id, u32 sqIds, u32 phyId, u32 cqIds, bool launchFlag)
     rtsq = std::make_unique<RtsqA5>(phyId, id, sqIds, launchFlag);
 }
 
-u32 StreamLite::GetId() const
-{
-    return id;
-}
-
-u32 StreamLite::GetSqId() const
-{
-    return sqId;
-}
-
-u32 StreamLite::GetCqId() const
-{
-    return cqId;
-}
-
-u32 StreamLite::GetDevPhyId() const
-{
-    return devPhyId;
-}
-
 RtsqBase *StreamLite::GetRtsq() const
 {
     return rtsq.get();
