@@ -69,9 +69,6 @@ __aicore__ inline uint8_t GetRelevantDumpCubeCoreIdx()
     }
 }
 
-__aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
-{
-}
 __aicore__ inline DataCopyParams GetDataCopyParamImpl(uint32_t offset)
 {
     DataCopyParams repeatParams;
@@ -531,13 +528,6 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 #ifdef ASCENDC_TIME_STAMP_ON  // 打点开关宏
     DumpTimeStampImpl(descId);
 #endif
-}
-
-__aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
-{
-}
-__aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
-{
 }
 
 __aicore__ inline void DumpL1TensorTransferByUB()

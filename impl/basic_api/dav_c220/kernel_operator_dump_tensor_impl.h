@@ -53,9 +53,6 @@ __aicore__ inline uint8_t GetDumpBlockIdx()
 
 
 __aicore__ inline int64_t GetBlockNum();
-__aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
-{
-}
 __aicore__ inline DataCopyParams GetDataCopyParamImpl(uint32_t offset)
 {
     DataCopyParams repeatParams;
@@ -697,12 +694,6 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 #endif
 }
 
-__aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
-{
-}
-__aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
-{
-}
 }  // namespace AscendC
 #endif
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__)

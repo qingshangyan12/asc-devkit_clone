@@ -95,8 +95,6 @@ void DataDumpTensor(__gm__ uint8_t *dstGm, __gm__ uint8_t *srcGm, __gm__ uint8_t
     DataCopyParams copyParams{1, dataSize * sizeof(T) / 32, 0, 0};
     DataCopy(inputLocal, srcGlobal, copyParams);
     pipe_barrier(PIPE_ALL);
-
-    InitDump(false, workGm, dumpSize);
 }
 
 INSTANTIATE_TEST_CASE_P(TEST_DUMP_TENSOR, TestDumpTensorSuite,
@@ -132,40 +130,4 @@ TEST_P(TestDumpTensorSuite, TestDumpTensorCases)
     block_idx = blockIdxTmp;
     sub_block_idx = subBlockIdxTmp;
     g_taskRation = taskRationTmp;
-}
-
-TEST_F(TestDumpTensorSuite, InitDumpImplNullWorkspaceReturns)
-{
-    DumpTensorRuntimeGuard guard;
-    SetAivDumpEnv(1, 0, 0, 1);
-
-    AscendC::g_dumpWorkspaceReserved = nullptr;
-    InitDumpImpl(false, DUMP_UINTSIZE);
-
-    EXPECT_EQ(AscendC::g_dumpWorkspaceReserved, nullptr);
-}
-
-TEST_F(TestDumpTensorSuite, InitDumpImplSkipsOutOfRangeCore)
-{
-    DumpTensorRuntimeGuard guard;
-    SetAivDumpEnv(1, 54, 0, 2);
-
-    std::vector<uint8_t> workGm(DUMP_UINTSIZE, 0);
-    AscendC::g_dumpWorkspaceReserved = workGm.data();
-    EXPECT_EQ(GetDumpBlockIdx(), DUMP_CORE_COUNT);
-
-    InitDumpImpl(false, DUMP_UINTSIZE);
-
-    auto* blockInfo = reinterpret_cast<uint32_t*>(workGm.data());
-    EXPECT_EQ(blockInfo[BLOCK_INFO_MAGIC_POS], 0U);
-}
-
-TEST_F(TestDumpTensorSuite, InitDumpNullStartAddrReturns)
-{
-    DumpTensorRuntimeGuard guard;
-    SetAivDumpEnv(1, 0, 0, 1);
-
-    InitDump(false, static_cast<__gm__ uint8_t*>(nullptr), DUMP_UINTSIZE);
-
-    EXPECT_EQ(AscendC::g_dumpWorkspaceReserved, nullptr);
 }
