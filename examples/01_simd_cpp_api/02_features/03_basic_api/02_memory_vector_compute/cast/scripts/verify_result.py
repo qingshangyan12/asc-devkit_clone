@@ -13,6 +13,7 @@
 
 
 import sys
+import os
 import numpy as np
 
 
@@ -22,7 +23,7 @@ ERROR_TOL = 1e-4
 
 
 def verify_result(output, golden):
-    output_type = np.int32
+    output_type = np.int8 if os.path.getsize(golden) == 256 else np.int32
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     different_element_results = np.isclose(output,
