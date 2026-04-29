@@ -38,6 +38,6 @@ def gen_golden_data_simple(scenarioNum=1):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2],
-                        help='Scenario number: 1=InPlaceExp, 2=SoftmaxPartial')
+                        help='Scenario number: 1=RegSync, 2=UbSync')
     args = parser.parse_args()
     gen_golden_data_simple(args.scenarioNum)
