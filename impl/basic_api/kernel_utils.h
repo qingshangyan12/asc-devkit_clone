@@ -59,7 +59,7 @@ __BLOCK_LOCAL__ __inline__ uint64_t g_cmpMaskHigh;
 // g_deqScale will store the UB address of vdeq, and the data of vdeqInfo will be stored in vdeq
 __BLOCK_LOCAL__ __inline__ uint64_t g_deqScale;
 // manage the global id for get/rls buff.
-__BLOCK_LOCAL__ __inline__ uint32_t g_bufId;
+__BLOCK_LOCAL__ __inline__ uint32_t g_bufId = {};
 __BLOCK_LOCAL__ __inline__ uint32_t g_sharedEvtId;
 // global variables g_aipp* are used to simulate the spr for SetAippFunctions and LoadImageToLocal, they will save
 // the configs and apply them to pre-process the input image in LoadImageToLocal function.
