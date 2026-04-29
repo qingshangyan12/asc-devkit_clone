@@ -44,9 +44,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hisinf(bfloat16_t x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __habs(bfloat16_t x)
 {
-    uint16_t bits = *reinterpret_cast<uint16_t*>(&x);
-    bits &= 0x7FFF;
-    return *reinterpret_cast<bfloat16_t*>(&bits);
+    return abs(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hfma(bfloat16_t x, bfloat16_t y, bfloat16_t z)
