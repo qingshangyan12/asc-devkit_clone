@@ -46,11 +46,11 @@
     __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/sort/topk/topk_3510_impl.h"
 #endif
+#endif // defined __NPU_ARCH__
 
 namespace AscendC {
 #pragma begin_pipe(V)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113)
+
 /*
  * @ingroup TopK
  * @brief Get the top k maximum or minimum values and their corresponding indices of the last dimension.
@@ -85,6 +85,8 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
     const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo,
     const bool isLargest = true)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+__NPU_ARCH__ == 3113)
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
         return;
@@ -124,6 +126,7 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
                 srcIndexLocal, finishLocal, tempBuffer, k, tilling, topKInfo, isLargest);
         }
     }
+#endif
 }
 
 /*
@@ -158,6 +161,8 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
     const LocalTensor<T>& srcLocal, const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal,
     const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+__NPU_ARCH__ == 3113)
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
         return;
@@ -213,8 +218,9 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
                 topKInfo, isLargest);
         }
     }
+#endif
 }
-#else
+
 /*
  * @ingroup TopK
  * @brief Get the top k maximum or minimum values and their corresponding indices of the last dimension.
@@ -249,6 +255,8 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
     const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo,
     const bool isLargest = true)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102 && __NPU_ARCH__ != 3003 && \
+    __NPU_ARCH__ != 3113)
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
         return;
@@ -264,6 +272,7 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
         TopKNSmall<T, isInitIndex, isHasfinish, isReuseSrc>(dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal,
             finishLocal, tmpLocal, k, tilling, topKInfo, isLargest);
     }
+#endif
 }
 
 /*
@@ -298,6 +307,8 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
     const LocalTensor<T>& srcLocal, const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal,
     const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102 && __NPU_ARCH__ != 3003 && \
+    __NPU_ARCH__ != 3113)
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
         return;
@@ -314,13 +325,11 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
         TopKNSmall<T, isInitIndex, isHasfinish, isReuseSrc>(
             dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest);
     }
-}
 #endif
+}
 
 #pragma end_pipe
 }  // namespace AscendC
-
-#endif
 
 #endif  // LIB_SORT_TOPK_H
 
