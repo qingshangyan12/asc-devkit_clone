@@ -26,9 +26,6 @@
                 -   [静态Tensor编程](编程指南/编程模型/AI-Core-SIMD编程/SIMD编程/静态Tensor编程.md)
                 -   [Reg矢量计算编程](编程指南/编程模型/AI-Core-SIMD编程/SIMD编程/Reg矢量计算编程.md)
                 -   [基于语言扩展层C API编程](编程指南/编程模型/AI-Core-SIMD编程/SIMD编程/基于语言扩展层C-API编程.md)
-
-            -   [SIMD与SIMT混合编程](编程指南/编程模型/AI-Core-SIMD编程/SIMD与SIMT混合编程.md)
-
         -   [AI Core SIMT编程](编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md)
             -   [抽象硬件架构](编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md)
             -   [线程架构](编程指南/编程模型/AI-Core-SIMT编程/线程架构.md)
@@ -292,6 +289,8 @@
             -   [NPU架构版本2201](编程指南/硬件实现/硬件约束/NPU架构版本2201.md)
         
     -   [高级AI-Core编程模型](./高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md)
+        -   [SIMD与SIMT混合编程](./高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md)
+
     -   [高级特性](./高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md)
         -   [Aclnn算子工程化开发](./高级编程/高级特性/Aclnn算子工程化开发/概述.md)
             -   [概述](./高级编程/高级特性/Aclnn算子工程化开发/概述.md)
