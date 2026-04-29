@@ -20,17 +20,6 @@ namespace Hccl {
 
 namespace { // make the definitions file-scoped
 
-inline HcclResult GetRtsqWithNullCheck(void *streamLiteVoidPtr, RtsqBase *&rtsqPtr)
-{
-    StreamLite *streamLitePtr = static_cast<StreamLite *>(streamLiteVoidPtr);
-    CHK_PTR_NULL(streamLitePtr);
-
-    rtsqPtr = streamLitePtr->GetRtsq();
-    CHK_PTR_NULL(rtsqPtr);
-
-    return HCCL_SUCCESS;
-}
-
 std::unordered_map<uint32_t, ReduceOp> mapU32ToReduceOp
     = {{0, ReduceOp::SUM}, {1, ReduceOp::PROD}, {2, ReduceOp::MAX}, {3, ReduceOp::MIN}};
 
@@ -56,8 +45,16 @@ inline HcclResult CheckDataTypeAndReduceOp(uint32_t dataType, uint32_t reduceOp)
 
 } // namespace
 
-IAicpuTsThread::IAicpuTsThread() : streamLiteVoidPtr_(nullptr)
+// 此处失败的原因只可能是内存分配失败，所以可以直接抛出标准异常
+IAicpuTsThread::IAicpuTsThread(uint32_t id, uint32_t sqIds, uint32_t phyId, uint32_t logicCqids)
 {
+    StreamLite *streamLitePtr = new StreamLite(id, sqIds, phyId, logicCqids, true);
+    if (streamLitePtr == nullptr) {
+        HCCL_ERROR("[IAicpuTsThread::%s] new StreamLite failed, id [%u], sqIds [%u], phyId [%u], logicCqids [%u]",
+                   __func__, id, sqIds, phyId, logicCqids);
+        throw std::bad_alloc();
+    }
+    streamLiteVoidPtr_        = static_cast<void *>(streamLitePtr);
 }
 
 IAicpuTsThread::~IAicpuTsThread()
@@ -69,23 +66,11 @@ IAicpuTsThread::~IAicpuTsThread()
     }
 }
 
-void IAicpuTsThread::StreamLiteInit(uint32_t id, uint32_t sqIds, uint32_t phyId, uint32_t logicCqids)
-{
-    StreamLite *streamLitePtr = new StreamLite(id, sqIds, phyId, logicCqids, true);
-    streamLiteVoidPtr_        = static_cast<void *>(streamLitePtr);
-}
-
 void IAicpuTsThread::LaunchTask() const
 {
-    RtsqBase *rtsqA5 = nullptr;
-    HcclResult ret = GetRtsqWithNullCheck(streamLiteVoidPtr_, rtsqA5);
-    if (ret != HCCL_SUCCESS) {
-        HCCL_ERROR("[IAicpuTsThread::%s] GetRtsqWithNullCheck FAILED.", __func__);
-        return;
-    }
-    
-    HCCL_INFO("[IAicpuTsThread::%s] Launch Task @ Stream id [%u]",
-        __func__,
+    RtsqBase *rtsqA5 = static_cast<StreamLite *>(streamLiteVoidPtr_)->GetRtsq();
+
+    HCCL_INFO("[IAicpuTsThread::%s] Launch Task at Stream id [%u]", __func__,
         static_cast<StreamLite *>(streamLiteVoidPtr_)->GetId());
 
     rtsqA5->LaunchTask();
@@ -99,14 +84,10 @@ HcclResult IAicpuTsThread::NotifyWait(uint32_t notifyId) const
 
 HcclResult IAicpuTsThread::NotifyWait(uint32_t notifyId, uint32_t timeout) const
 {
-    RtsqBase *rtsqA5 = nullptr;
-    CHK_RET(GetRtsqWithNullCheck(streamLiteVoidPtr_, rtsqA5));
-    
-    HCCL_INFO("[IAicpuTsThread::%s] @ Stream id [%u], notifyId [%u], timeout [%u]",
-        __func__,
-        static_cast<StreamLite *>(streamLiteVoidPtr_)->GetId(),
-        notifyId,
-        timeout);
+    RtsqBase *rtsqA5 = static_cast<StreamLite *>(streamLiteVoidPtr_)->GetRtsq();
+
+    HCCL_INFO("[IAicpuTsThread::%s] at Stream id [%u], notifyId [%u], timeout [%u]", __func__,
+        static_cast<StreamLite *>(streamLiteVoidPtr_)->GetId(), notifyId, timeout);
 
     rtsqA5->NotifyWait(notifyId, timeout);
 
@@ -115,13 +96,10 @@ HcclResult IAicpuTsThread::NotifyWait(uint32_t notifyId, uint32_t timeout) const
 
 HcclResult IAicpuTsThread::NotifyRecordLoc(uint32_t notifyId) const
 {
-    RtsqBase *rtsqA5 = nullptr;
-    CHK_RET(GetRtsqWithNullCheck(streamLiteVoidPtr_, rtsqA5));
+    RtsqBase *rtsqA5 = static_cast<StreamLite *>(streamLiteVoidPtr_)->GetRtsq();
 
-    HCCL_INFO("[IAicpuTsThread::%s] @ Stream id [%u], notifyId [%u]",
-        __func__,
-        static_cast<StreamLite *>(streamLiteVoidPtr_)->GetId(),
-        notifyId);
+    HCCL_INFO("[IAicpuTsThread::%s] at Stream id [%u], notifyId [%u]", __func__,
+        static_cast<StreamLite *>(streamLiteVoidPtr_)->GetId(), notifyId);
 
     rtsqA5->NotifyRecordLoc(notifyId);
 
@@ -135,20 +113,14 @@ HcclResult IAicpuTsThread::SdmaCopy(uint64_t dstAddr, uint64_t srcAddr, uint64_t
         return HCCL_E_PARA;
     }
 
-    RtsqBase *rtsqA5 = nullptr;
-    CHK_RET(GetRtsqWithNullCheck(streamLiteVoidPtr_, rtsqA5));
+    RtsqBase *rtsqA5 = static_cast<StreamLite *>(streamLiteVoidPtr_)->GetRtsq();
 
-    uint32_t partId           = 0; // partId will not be used
     uint32_t sizeByteNarrowed = static_cast<uint32_t>(sizeByte);
 
-    HCCL_INFO("[IAicpuTsThread::%s] @ Stream id [%u], dstAddr [%llx], srcAddr [%llx], sizeByteNarrowed [%u]",
-        __func__,
-        static_cast<StreamLite *>(streamLiteVoidPtr_)->GetId(),
-        dstAddr,
-        srcAddr,
-        sizeByteNarrowed);
+    HCCL_INFO("[IAicpuTsThread::%s] at Stream id [%u], dstAddr [%llx], srcAddr [%llx], sizeByteNarrowed [%u]", __func__,
+        static_cast<StreamLite *>(streamLiteVoidPtr_)->GetId(), dstAddr, srcAddr, sizeByteNarrowed);
 
-    rtsqA5->SdmaCopy(srcAddr, dstAddr, sizeByteNarrowed, partId);
+    rtsqA5->SdmaCopy(srcAddr, dstAddr, sizeByteNarrowed, 0);
 
     return HCCL_SUCCESS;
 }
@@ -161,46 +133,22 @@ HcclResult IAicpuTsThread::SdmaReduce(uint64_t dstAddr, uint64_t srcAddr, uint64
         return HCCL_E_PARA;
     }
 
-    RtsqBase *rtsqA5 = nullptr;
-    CHK_RET(GetRtsqWithNullCheck(streamLiteVoidPtr_, rtsqA5));
+    RtsqBase *rtsqA5 = static_cast<StreamLite *>(streamLiteVoidPtr_)->GetRtsq();
 
     CHK_RET(CheckDataTypeAndReduceOp(dataTypeRaw, reduceOpRaw));
     DataType dataType = mapU32ToDataType.at(dataTypeRaw);
     ReduceOp reduceOp = mapU32ToReduceOp.at(reduceOpRaw);
     ReduceIn reduceIn{dataType, reduceOp};
 
-    uint32_t partId           = 0; // partId will not be used
     uint32_t sizeByteNarrowed = static_cast<uint32_t>(sizeByte);
 
-    HCCL_INFO("[IAicpuTsThread::%s] @ Stream id [%u], dstAddr [%llx], srcAddr [%llx], sizeByteNarrowed [%u], dataType [%u][%s], reduceOp [%u][%s]",
-        __func__,
-        static_cast<StreamLite *>(streamLiteVoidPtr_)->GetId(),
-        dstAddr,
-        srcAddr,
-        sizeByteNarrowed,
-        dataTypeRaw,
-        dataType.Describe().c_str(), 
-        reduceOpRaw,
-        reduceOp.Describe().c_str());
+    HCCL_INFO("[IAicpuTsThread::%s] at Stream id [%u], dstAddr [%llx], srcAddr [%llx], sizeByteNarrowed [%u], dataType "
+              "[%u][%s], reduceOp [%u][%s]",
+        __func__, static_cast<StreamLite *>(streamLiteVoidPtr_)->GetId(), dstAddr, srcAddr, sizeByteNarrowed,
+        dataTypeRaw, dataType.Describe().c_str(), reduceOpRaw, reduceOp.Describe().c_str());
 
-    rtsqA5->SdmaReduce(srcAddr, dstAddr, sizeByteNarrowed, partId, reduceIn);
+    rtsqA5->SdmaReduce(srcAddr, dstAddr, sizeByteNarrowed, 0, reduceIn);
 
-    return HCCL_SUCCESS;
-}
-
-HcclResult IAicpuTsThread::GetStreamLitePtr(void **streamLitePtrPtr) const
-{
-    CHK_PTR_NULL(streamLitePtrPtr);
-    CHK_PTR_NULL(streamLiteVoidPtr_);
-    *streamLitePtrPtr = streamLiteVoidPtr_;
-    return HCCL_SUCCESS;
-}
-
-HcclResult IAicpuTsThread::GetSqId(uint32_t &sqId) const
-{
-    CHK_PTR_NULL(streamLiteVoidPtr_);
-    StreamLite *streamLitePtr = static_cast<StreamLite *>(streamLiteVoidPtr_);
-    sqId                      = streamLitePtr->GetSqId();
     return HCCL_SUCCESS;
 }
 } // namespace Hccl
