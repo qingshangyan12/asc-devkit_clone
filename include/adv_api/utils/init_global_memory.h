@@ -21,6 +21,7 @@
 #ifndef LIB_UTILS_INIT_GLOBAL_MEMORY_H
 #define LIB_UTILS_INIT_GLOBAL_MEMORY_H
 
+#include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v200_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
@@ -73,6 +74,12 @@ __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void Fill(GlobalTensor<T> &gmWorkspaceAddr, const uint64_t size, const T value)
 {
     InitGlobalMemoryImpl<T>(gmWorkspaceAddr, size, value);
+}
+#else
+template <typename T>
+__aicore__ inline __in_pipe__(V)
+    __out_pipe__(MTE3) void Fill(GlobalTensor<T> &gmWorkspaceAddr, const uint64_t size, const T value)
+{
 }
 #endif
 } // namespace AscendC
