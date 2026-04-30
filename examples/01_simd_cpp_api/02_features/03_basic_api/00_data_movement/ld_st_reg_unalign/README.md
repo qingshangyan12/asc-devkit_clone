@@ -1,21 +1,22 @@
 # ld_st_reg_unalign样例
 
 ## 概述
-本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的非对齐数据搬运操作，支持多种场景，通过编译参数选择场景。
-<table>
-	<tr>
-		<td>scenarioNum</td>
-		<td>场景类型</td>
-	</tr>
-	<tr>
-		<td>1</td>
-		<td>单核非对齐数据搬运：使用LoadUnAlign和StoreUnAlign进行非对齐地址的数据搬运</td>
-	</tr>
-	<tr>
-		<td>2</td>
-		<td>多核ReduceDataBlock计算：使用LoadUnAlign处理非对齐输入，ReduceDataBlock进行块内求和</td>
-	</tr>
-</table>
+本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的非对齐数据搬运操作，支持多种场景，通过环境变量选择场景。
+    <table>
+	 	<tr>
+	 		<td>scenarioNum</td>
+	 		<td>场景类型</td>
+	 	</tr>
+	 	<tr>
+	 		<td>1</td>
+	 		<td>单核非对齐数据搬运：使用LoadUnAlign和StoreUnAlign进行非对齐地址的数据搬运</td>
+	 	</tr>
+	 	<tr>
+	 		<td>2</td>
+	 		<td>多核非对齐场景计算及搬运：使用LoadUnAlign处理非对齐输入，ReduceDataBlock进行块内求和</td>
+	 	</tr>
+	 </table>
+
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -23,16 +24,19 @@
 ## 目录结构介绍
 ```
 ├── ld_st_reg_unalign
+│   ├── scripts
+│   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
+│   ├── data_utils.h                   // 数据读入写出函数
+│   ├── ld_st_reg_unalign.asc          // AscendC样例实现 & 调用样例
 │   └── README.md                      // 样例介绍
-│   └── ld_st_reg_unalign.asc          // AscendC样例实现 & 调用样例
 ```
 
 ## 样例描述
 
 ### 场景1：单核非对齐数据搬运
 - 样例功能：  
-  输入一个数据类型为float，数据量为1024的向量，在源操作数和目的操作数地址均非32B对齐的情况下，搬运128个数据。
+  输入shape为[1, 1024]的float类型矩阵，在源操作数和目的操作数地址均非32B对齐的情况下，搬运128个数据。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
@@ -50,7 +54,7 @@
    将UB上源操作数和目的操作数地址偏移一个元素（4 Byte）长度，使得起始地址非32B对齐，调用CopyVF从该地址开始搬运128个float数，写回UB(Unified Buffer)。
 
   - 调用实现  
-    使用内核调用符<<<>>>调用核函数。
+    使用内核调用符<<<>>>调用核函数，启动1个核。
 
 ### 场景2：多核ReduceDataBlock计算
 - 样例功能：  
@@ -66,7 +70,7 @@
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[14, 16]</td><td align="center">half</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_unalign_kernel</td></tr>
-  <tr><td rowspan="1" align="center">核数</td><td colspan="4" align="center">4（动态调整，避免尾核空闲）</td></tr>
+  <tr><td rowspan="1" align="center">核数</td><td colspan="4" align="center">4</td></tr>
   </table>
 - 样例实现：
   1. **数据搬入（整块连续）**：
@@ -75,14 +79,12 @@
      - 行1-3起始地址非32B对齐（510字节、1020字节、1530字节）
 
   2. **LoadUnAlign自然使用**：
-     - 所有行统一使用LoadUnAlignPre + LoadUnAlign
-     - LoadUnAlign可处理对齐地址（行0）和非对齐地址（行1-3）
-     - 无需区分地址是否对齐，代码统一简洁
+     - 所有行统一使用LoadUnAlignPre + LoadUnAlign处理对齐地址（行0）和非对齐地址（行1-3）
+     - 对齐地址用StoreAlign接口性能更好，当前仅为保证代码格式统一，用作样例演示，不作为极致性能参考
 
   3. **ReduceDataBlock计算**：
      - 每行255元素分2个VL块处理（128 + 127）
      - 每个VL块产生8个结果（每DataBlock求和）
-     - 使用真实Mask处理第2次VL块（127个元素）
 
   4. **StoreUnAlign连续存储**：
      - 使用带postUpdateStride的StoreUnAlign版本
@@ -90,19 +92,14 @@
      - 循环2次后自动偏移到dstAddr+16
      - StoreUnAlignPost处理最后的边界数据
 
-  5. **LocalMemBar屏障机制**：
-     - VF内屏障：确保第1次存储完成，避免第2次StoreUnAlign覆盖有效数据
-     - Kernel内屏障：确保当前行存储完成，避免下一行覆盖当前行的有效数据
+  5. **LocalMemBar保序**：
+     - VF内保序：确保第1次存储完成，避免第2次StoreUnAlign覆盖有效数据
+     - Kernel内保序：确保当前行存储完成，避免下一行覆盖当前行的有效数据
 
-  6. **多核切分公式**：
-     - 动态调整核数：`usedCoreNum = min(4, 14) = 4`
-     - 向上取整分配：`formerRowsPerCore = (14+3)/4 = 4`
-     - 核0-2各处理4行，核3处理2行（避免尾核空闲）
-
-  7. **输出紧凑布局**：
-     - 每行16个结果，紧凑连续排列
-     - 核0输出64个数（GM[0-63]），核3输出32个数（GM[192-223]）
-  
+  6. **输出布局**：
+     - 每行16个结果，数据连续排列
+     - 核0输出64个数（GM[0-63]），核3输出32个数（GM[192-223])
+   
   - 调用实现  
     使用内核调用符<<<>>>调用核函数，启动4个核。
 
@@ -125,43 +122,33 @@
     source ${install_path}/cann/set_env.sh
     ```
     
-- 样例执行（场景1）
+- 样例执行
   ```bash
-  mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程
-  ./demo                                                                    # 执行编译生成的可执行程序，执行样例
-  ```
-
-- 样例执行（场景2）
-  ```bash
-  mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DSCENARIO_NUM=2 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;     # 编译工程，选择场景2
-  ./demo                                                                    # 执行编译生成的可执行程序，执行样例
+  SCENARIO=1                                                                    # 设置场景编号
+  mkdir -p build && cd build;                                                   # 创建并进入build目录
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # 编译工程（默认npu模式）
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO                         # 生成测试输入数据
+  ./demo                                                                        # 执行编译生成的可执行程序，执行样例
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
-  # 场景1 CPU调试模式
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
-  
-  # 场景2 CPU调试模式
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DSCENARIO_NUM=2 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
-  
-  # 场景2 NPU仿真模式
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=2 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
+  SCENARIO=1
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # NPU仿真模式
   ```
 
-  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+  > **注意：** 切换编译模式或场景前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
 
-| 选项　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
-| ------------| -----------------------------| ---------------------------------------------------|
+| 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+| ----------------| -----------------------------| ---------------------------------------------------|
 | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-| `SCENARIO_NUM` | `1`（默认）、`2` | 场景编号：场景1单核数据搬运、场景2多核ReduceDataBlock |
+| `SCENARIO_NUM` | `1`、`2`　　　　　　　　　　| 场景编号：1=单核非对齐数据搬运，2=多核ReduceDataBlock |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。
