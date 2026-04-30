@@ -96,14 +96,14 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
 - 从掩码寄存器连续对齐搬出到UB的场景
   ```cpp
   // NORM搬出模式
-  __simd_callee__ inline void asc_storealign(__ubuf__ uint32_t *dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign(__ubuf__ uint16_t *dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t *dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign(__ubuf__ uint32_t* dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign(__ubuf__ uint16_t* dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst, vector_bool src)
   
   // PACK搬出模式
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t *dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t *dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t *dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t* dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t* dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst, vector_bool src)
   ```
 ## 参数说明
 
@@ -145,11 +145,11 @@ PIPE_V
   __ubuf__ half* src = (__ubuf__ half*)asc_get_phy_buf_addr(0);
   vector_bool mask = asc_create_mask_b16(PAT_ALL);
   uint32_t offset = 128;
-  asc_storealign(dst, src + offset, mask)
+  asc_storealign(dst, src + offset, mask);
   ```
 - 从掩码寄存器连续对齐搬出到UB的场景
   ```cpp
   __ubuf__ uint32_t* dst = (__ubuf__ uint32_t*)asc_get_phy_buf_addr(0);
   vector_bool src;
-  asc_storealign(dst, src)
+  asc_storealign(dst, src);
   ```

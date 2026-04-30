@@ -44,8 +44,6 @@ EXAMPLE_LIST=(
     01_simd_cpp_api/00_introduction/03_fusion_operation/matmul_leakyrelu
     01_simd_cpp_api/01_utilities/03_cpudebug
     01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/batch_mmad
-    01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_co12c1_tensor_quantization_s322f16
-    01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_co12gm_tensor_quantization_s322f16
     01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0
     01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2
     01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/brcb
@@ -250,7 +248,7 @@ run_test_case() {
         matmul_b8|matmul_ibshareB)
             run_with_params "${code_path}" "${example_name}" "-DDT_MODE=0" "0" 2>&1 | tee "${log_path}/${case_name}.log"
             ;;
-        hello_world_npu|add_dynamic|get_tpipe_ptr|group_barrier|acosh)
+        hello_world_npu|list_tensor_desc_input|get_tpipe_ptr|group_barrier|acosh)
             run_with_params "${code_path}" "${example_name}" "" "" "demo" "" 2>&1 | tee "${log_path}/${case_name}.log"
             ;;
         basic_api_tque_add)
