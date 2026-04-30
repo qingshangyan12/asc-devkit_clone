@@ -77,28 +77,16 @@ set(CONF_FILES
     ${CMAKE_SOURCE_DIR}/scripts/package/common/cfg/path.cfg
 )
 install(FILES ${CONF_FILES}
-    DESTINATION asc-devkit/conf COMPONENT asc-devkit
+    DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/conf COMPONENT asc-devkit
 )
 install(FILES ${PACKAGE_FILES}
    DESTINATION share/info/asc-devkit/script COMPONENT asc-devkit
-)
-install(FILES ${LATEST_MANGER_FILES}
-    DESTINATION latest_manager COMPONENT asc-devkit
-)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/package/latest_manager/scripts/
-    DESTINATION latest_manager COMPONENT asc-devkit
 )
 install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
     DESTINATION share/info/asc-devkit
     RENAME version.info
     COMPONENT asc-devkit
 )
-install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
-    DESTINATION .
-    RENAME version.info
-    COMPONENT asc-devkit
-)
-
 set(HCCL_CC_BUILD_DIR ${CMAKE_BINARY_DIR}/impl/adv_api/detail/hccl/cc)
 install(FILES "${HCCL_CC_BUILD_DIR}/src/libmc2_client.so" "${HCCL_CC_BUILD_DIR}/src/common/hcomm_dlsym/libmc2_compat.so"
     DESTINATION "hccl/lib64" COMPONENT asc-devkit OPTIONAL)
