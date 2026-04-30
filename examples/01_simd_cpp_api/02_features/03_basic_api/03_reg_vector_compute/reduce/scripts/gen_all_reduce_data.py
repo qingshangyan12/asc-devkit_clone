@@ -95,29 +95,17 @@ def main():
     # 生成golden数据
     golden_data = compute_golden(input_data)
     
-    # 写入输入文件
-    input_files = [
-        ("reduce_accumulate_input_x.bin", input_data),
-        ("reduce_binary_input_x.bin", input_data),
-        ("reduce_iterator_input_x.bin", input_data),
-    ]
+    # 生成reduce_sum的输入和golden文件
+    input_path = os.path.join(INPUT_DIR, "reduce_sum_input_x.bin")
+    write_binary_file(input_path, input_data)
     
-    for filename, data in input_files:
-        filepath = os.path.join(INPUT_DIR, filename)
-        write_binary_file(filepath, data)
+    golden_path = os.path.join(OUTPUT_DIR, "reduce_sum_golden.bin")
+    write_binary_file(golden_path, golden_data)
     
-    # 写入golden文件
-    golden_files = [
-        ("reduce_accumulate_golden.bin", golden_data),
-        ("reduce_binary_golden.bin", golden_data),
-        ("reduce_iterator_golden.bin", golden_data),
-    ]
+    print(f"  Input: {input_path}")
+    print(f"  Golden: {golden_path}")
     
-    for filename, data in golden_files:
-        filepath = os.path.join(OUTPUT_DIR, filename)
-        write_binary_file(filepath, data)
-    
-    print(f"\nGenerated {len(input_files)} input files and {len(golden_files)} golden files")
+    print(f"\nGenerated reduce_sum input and golden files")
     print(f"Input shape: ({DIM_A}, {DIM_R}), Output shape: ({OUTPUT_COUNT},)")
     print(f"Total input elements: {TOTAL_LENGTH}")
     
