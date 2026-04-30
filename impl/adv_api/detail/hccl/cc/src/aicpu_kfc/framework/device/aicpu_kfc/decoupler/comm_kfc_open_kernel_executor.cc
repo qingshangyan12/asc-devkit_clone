@@ -121,7 +121,7 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
 {
     auto *param = AsOpenOpParam(opParam);
     CHK_PTR_NULL(param);
-    HCCL_INFO("YYYYYY asc mc2 [LaunchOpenOpParamDataImpl] file[%s:%d], opParamSize %zu, "
+    HCCL_INFO("[MC2_OPEN_DIAG][LaunchOpenOpParamDataImpl] file[%s:%d], opParamSize %zu, "
               "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
               __FILE__, __LINE__, opParam.size(), sizeof(ops_hccl::OpParam),
               offsetof(ops_hccl::OpParam, varMemSize), static_cast<unsigned long long>(param->varMemSize),

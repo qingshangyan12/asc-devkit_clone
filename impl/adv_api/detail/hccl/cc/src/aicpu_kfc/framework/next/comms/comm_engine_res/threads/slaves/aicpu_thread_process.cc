@@ -8,7 +8,6 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "aicpu_thread_process.h"
-#include <iomanip>
 
 using namespace hccl;
 
@@ -86,15 +85,6 @@ HcclResult AicpuThreadProcess::ResumeThread(ThreadMgrAicpuParam *param,
     ThreadHandle *threadArray = static_cast<ThreadHandle*>(param->deviceHandle);
     for (u32 i = 0; i < threadNum; ++i) {
         std::string thdUniqueId(param->threadParam[i], THREAD_UNIQUE_ID_MAX_SIZE);
-        if (UNLIKELY(HcclCheckLogLevel(HCCL_LOG_INFO))) {
-            std::ostringstream oss;
-            oss << "threadParam[" << i << "] raw bytes: ";
-            for (u32 j = 0; j < THREAD_UNIQUE_ID_MAX_SIZE; ++j) {
-                oss << std::hex << std::setw(2) << std::setfill('0')
-                    << static_cast<unsigned int>(static_cast<unsigned char>(param->threadParam[i][j])) << " ";
-            }
-            HCCL_INFO("[HcclCommAicpu][%s] %s", __func__, oss.str().c_str());
-        }
         std::shared_ptr<AicpuTsThread> thread;
         EXECEPTION_CATCH((thread = std::make_shared<AicpuTsThread>(thdUniqueId)), return HCCL_E_PTR);
         u32 notifyNum = 0;

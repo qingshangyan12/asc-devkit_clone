@@ -137,11 +137,6 @@ void CommunicatorImplLite::UnfoldOp(HcclKernelParamLite *kernelParam)
         HCCL_INFO("CommunicatorImplLite::UnfoldOpBase DevType is DEV_TYPE_950.");
         insExecutor->ExecuteV82(*insQueue);
         profilingReporterLite->ReportAllTasks();
-        std::shared_ptr<DfxOpInfo> currDfxOpInfo = mirrorTaskMgrLite->GetCurrDfxOpInfo();
-        if (currDfxOpInfo == nullptr) {
-            HCCL_ERROR("YYYYYY asc dfx [CommunicatorImplLite::UnfoldOp] currDfxOpInfo is null, "
-                "before ReportHcclOpInfo.");
-        }
         ProfilingHandlerLite::GetInstance().ReportHcclOpInfo(*mirrorTaskMgrLite->GetCurrDfxOpInfo());
     } else if (devType == DevType::DEV_TYPE_910A2) {
         HCCL_INFO("CommunicatorImplLite::UnfoldOpBase DevType is DEV_TYPE_910A2.");

@@ -69,7 +69,7 @@ HcclResult LoadOpenOpParamData(uint64_t opParamKey, std::string &commName, std::
     const auto *begin = reinterpret_cast<const uint8_t *>(param);
     opParam.assign(begin, begin + opParamSize);
     commName.assign(param->commName);
-    HCCL_INFO("YYYYYY asc mc2 [LoadOpenOpParamData] file[%s:%d], key %#llx, sizeof(OpParam) %zu, "
+    HCCL_INFO("[MC2_OPEN_DIAG][LoadOpenOpParamData] file[%s:%d], key %#llx, sizeof(OpParam) %zu, "
               "varMemSizeOffset %zu, varMemSize %llu, opParamSize %zu.",
               __FILE__, __LINE__, static_cast<unsigned long long>(opParamKey), sizeof(ops_hccl::OpParam),
               offsetof(ops_hccl::OpParam, varMemSize), static_cast<unsigned long long>(param->varMemSize),

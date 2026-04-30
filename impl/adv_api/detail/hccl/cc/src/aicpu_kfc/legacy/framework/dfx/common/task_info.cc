@@ -23,10 +23,6 @@ TaskInfo::TaskInfo(u32 streamId, u32 taskId, u32 remoteRank, TaskParam taskParam
 
 std::string TaskInfo::Describe() const
 {
-    if (dfxOpInfo_ == nullptr) {
-        HCCL_ERROR("YYYYYY asc dfx [TaskInfo::Describe] dfxOpInfo is nullptr, streamId[%u], taskId[%u].",
-            streamId_, taskId_);
-    }
     return StringFormat("TaskInfo[streamId(sqId):[%u], taskId(sqeId):[%u], remoteRank:[%u], taskParam:[%s], dftOpInfo:[%s], isMaster[%d]]",
                         streamId_, taskId_, remoteRank_, taskParam_.Describe().c_str(), dfxOpInfo_->Describe().c_str(), isMaster_);
 }

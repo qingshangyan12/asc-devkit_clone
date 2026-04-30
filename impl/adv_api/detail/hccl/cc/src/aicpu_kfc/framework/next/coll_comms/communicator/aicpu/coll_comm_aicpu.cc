@@ -87,15 +87,6 @@ HcclResult CollCommAicpu::InitThreads(ThreadMgrAicpuParam *param)
     std::string hcomId(param->hcomId);
     for (u32 i = 0; i < threadNum; ++i) {
         std::string thdUniqueId(param->threadParam[i], THREAD_UNIQUE_ID_MAX_SIZE);
-        if (UNLIKELY(HcclCheckLogLevel(HCCL_LOG_INFO))) {
-            std::ostringstream oss;
-            oss << "threadParam[" << i << "] raw bytes: ";
-            for (u32 j = 0; j < THREAD_UNIQUE_ID_MAX_SIZE; ++j) {
-                oss << std::hex << std::setw(2) << std::setfill('0')
-                    << static_cast<unsigned int>(static_cast<unsigned char>(param->threadParam[i][j])) << " ";
-            }
-            HCCL_INFO("[CollCommAicpu][%s] %s", __func__, oss.str().c_str());
-        }
         std::shared_ptr<AicpuTsThread> thread;
         EXECEPTION_CATCH((thread = std::make_shared<AicpuTsThread>(thdUniqueId)), return HCCL_E_PTR);
         HcclResult ret = thread->Init();
@@ -253,15 +244,6 @@ HcclResult CollCommAicpu::NotifyAlloc(NotifyMgrAicpuParam *param)
     size_t notifySize = notifys_.size();
     HCCL_INFO("[CollCommAicpu][%s] comm identifier[%s], alloc notifys num[%u] begin, before notifySize[%u]",
         __func__, hcomId.c_str(), notifyNum, notifySize);
-    if (UNLIKELY(HcclCheckLogLevel(HCCL_LOG_INFO))) {
-        std::ostringstream oss;
-        oss << "notifyParam" << " raw bytes: ";
-        for (u32 i = 0; i < NOTIFY_UNIQUE_ID_MAX_SIZE; ++i) {
-            oss << std::hex << std::setw(2) << std::setfill('0')
-                << static_cast<unsigned int>(static_cast<unsigned char>(param->notifyParam[i])) << " ";
-        }
-        HCCL_INFO("[CollCommAicpu][%s] %s", __func__, oss.str().c_str());
-    }
     HcclResult ret = NotifyManager::ParseBinNotifys(notifysStr, notifys_);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("[CollCommAicpu][%s] comm identifier[%s], alloc notifys num[%u] failed %u",
