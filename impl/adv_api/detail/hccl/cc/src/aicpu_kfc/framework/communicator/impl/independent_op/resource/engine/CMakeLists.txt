@@ -7,20 +7,6 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-set(src_list
-    ${CMAKE_CURRENT_SOURCE_DIR}/comm_engine_res_manager.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/thread_manager.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_launch_manager.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/notify_manager.cc
-)
-
-if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
-    target_sources(ccl_kernel PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/notify_manager.cc
-        # ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_launch_manager.cc
-    )
-endif()
-
 if(TARGET mc2_server)
     add_mc2_server_ccl_object(mc2_server_indop_resource_engine
         ${CMAKE_CURRENT_SOURCE_DIR}/notify_manager.cc

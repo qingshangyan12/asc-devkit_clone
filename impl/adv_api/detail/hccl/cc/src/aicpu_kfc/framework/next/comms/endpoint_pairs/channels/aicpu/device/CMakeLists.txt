@@ -12,12 +12,6 @@ set(src_list
     aicpu_ts_urma_channel_kernel.cc
 )
 
-if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
-    target_sources(ccl_kernel PRIVATE
-        ${src_list}
-    )
-endif()
-
 if(TARGET mc2_server)
     add_mc2_server_ccl_object(mc2_server_next_channel_aicpu_device
         ${src_list}

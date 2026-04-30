@@ -20,7 +20,6 @@
 #include "mem_device_pub.h"
 #include "stream_pub.h"
 #include "local_notify.h"
-#include "comm_factory_pub.h"
 #include "coll_executor_base.h"
 #include "dispatcher.h"
 #include "coll_alg_param.h"

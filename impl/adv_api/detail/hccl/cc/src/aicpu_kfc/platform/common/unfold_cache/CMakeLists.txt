@@ -13,10 +13,6 @@ set(src_list
     op_unfold_key.cc
 )
 
-# target_sources(hccd PRIVATE
-#     ${src_list}
-# )
-
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}
 )

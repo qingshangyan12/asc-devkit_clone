@@ -25,7 +25,6 @@
 #include "sal_pub.h"
 #include "stream_lite.h"
 #include "task_info.h"
-#include "adapter_prof.h"
 #include "../../../../../legacy/framework/dfx/profiling/dlprof_function.h"
 
 namespace hccl {

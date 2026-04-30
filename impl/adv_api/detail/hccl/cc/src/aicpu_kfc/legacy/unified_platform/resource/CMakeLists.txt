@@ -8,7 +8,3 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 add_subdirectory(buffer)
-add_subdirectory(notify)
-add_subdirectory(connection)
-add_subdirectory(stream)
-add_subdirectory(transport)

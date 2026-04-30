@@ -18,10 +18,6 @@ set(src_list_extend
     dispatcher_aicpu.cc
 )
 
-# target_sources(hccd PRIVATE
-#     dispatcher.cc
-# )
-
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}
     ${src_list_extend}

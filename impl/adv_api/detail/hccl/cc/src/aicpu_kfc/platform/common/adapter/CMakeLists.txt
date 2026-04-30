@@ -17,14 +17,6 @@ set(src_list
     adapter_trace.cc
 )
 
-# target_sources(hccd   PRIVATE
-#     adapter_hal.cc
-#     adapter_hccp.cc
-#     adapter_rts.cc
-#     adapter_tdt.cc
-#     adapter_verbs.cc
-# )
-
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}
 )

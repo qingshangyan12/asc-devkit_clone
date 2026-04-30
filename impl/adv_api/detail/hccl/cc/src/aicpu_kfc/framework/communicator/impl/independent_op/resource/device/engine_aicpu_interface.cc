@@ -7,7 +7,6 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "channel_aicpu_interface.h"
 #include "adapter_rts.h"
 #include "aicpu_indop_process.h"
 #include "aicpu_thread_process.h"

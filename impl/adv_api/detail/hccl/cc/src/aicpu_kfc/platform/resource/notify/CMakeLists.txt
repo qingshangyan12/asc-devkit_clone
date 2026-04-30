@@ -27,7 +27,3 @@ target_sources(ccl_kernel_plf PRIVATE
 target_sources(ccl_kernel_plf_a  PRIVATE
     ${src_list}
 )
-
-# target_sources(hccd  PRIVATE
-#     ${src_list}
-# )

@@ -13,13 +13,6 @@ set(src_list
     transport.cc
 )
 
-# target_sources(hccd PRIVATE
-#     tcp_recv_task.cc
-#     tcp_send_thread_pool.cc
-#     transport_base.cc
-#     mem_name_repository.cc
-# )
-
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}
 )

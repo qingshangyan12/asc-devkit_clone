@@ -7,10 +7,4 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-set(src_list
-    endpoint_pair.cc
-    endpoint_pair_mgr.cc
-)
-
 add_subdirectory(channels)
-

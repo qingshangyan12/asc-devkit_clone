@@ -36,23 +36,6 @@ target_sources(ccl_kernel_plf_a  PRIVATE
     ${src_list}
 )
 
-# target_sources(hccd PRIVATE
-#     sal.cc
-#     log.cc
-#     dlra_function.cc
-#     mr_manager.cc
-#     externalinput.cc
-#     dlhal_function.cc
-#     hccl_ip_address.cc
-#     hccl_dl.cc
-#     device_capacity.cc
-#     workflow.cc
-#     dltdt_function.cc
-#     dlprof_func.cc
-#     dlibv_function.cc
-#     dlhns_function.cc
-# )
-
 add_subdirectory(adapter)
 add_subdirectory(misc)
 add_subdirectory(p2p_mgmt)

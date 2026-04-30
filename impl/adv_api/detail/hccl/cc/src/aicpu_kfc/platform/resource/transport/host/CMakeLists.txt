@@ -16,11 +16,6 @@ set(src_list
     transport_direct_npu.cc
 )
 
-# target_sources(hccd PRIVATE
-#     transport_tcp.cc
-#     transport_net.cc
-# )
-
 target_sources(ccl_kernel_plf PRIVATE
     ${src_list}
 )

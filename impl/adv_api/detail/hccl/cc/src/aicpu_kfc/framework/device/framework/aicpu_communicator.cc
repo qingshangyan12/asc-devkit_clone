@@ -26,7 +26,6 @@
 #include "aicpu_hccl_sqcqv1.h"
 #include "sal_pub.h"
 #include "externalinput_pub.h"
-#include "env_config.h"
 #include "config_log.h"
 #include "aicpu_one_side_service.h"
 #include "notify_manager.h"

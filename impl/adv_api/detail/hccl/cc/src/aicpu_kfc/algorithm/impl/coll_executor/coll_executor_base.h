@@ -10,11 +10,8 @@
 #ifndef HCCL_COLL_EXECUTOR_BASE_H
 #define HCCL_COLL_EXECUTOR_BASE_H
 
-#include "hccl_impl.h"
 #include "topo_matcher.h"
 #include "coll_alg_param.h"
-#include "executor_impl.h"
-#include "coll_alg_utils.h"
 #include "hccl_aiv.h"
 
 namespace hccl {
