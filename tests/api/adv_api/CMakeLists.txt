@@ -283,6 +283,7 @@ file(GLOB ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES
     select/selectwithbytesmask/test_operator_selectwithbytesmask.cpp
     index/arithprogression/test_operator_arithprogression.cpp
     reduce/sum/test_operator_sum.cpp
+    activation/reglu/test_operator_reglu.cpp
     activation/sigmoid/test_operator_vec_sigmoid.cpp
     filter/dropout/test_operator_dropout.cpp
     pad/broadcast/test_operator_broadcast_v200.cpp
@@ -450,6 +451,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend310p>:../common/tik_pv_wrapper.cpp>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},Kirin9030_AIV>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend310B1>:../common/k3_pvwrap.cpp>
@@ -466,6 +469,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_VEC__;__DAV_VEC__>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_CUBE__>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_VEC__>
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:__NPU_ARCH__=3003;__DAV_L300__;__DAV_L300_VEC__;__DAV_L300_VEC__>
+        $<$<STREQUAL:${product_type},Kirin9030_AIV>:__NPU_ARCH__=3113;__DAV_L311__;__DAV_L311_VEC__;__DAV_L311_VEC__>
         $<$<STREQUAL:${product_type},ascend310B1>:__NPU_ARCH__=3002;__DAV_M300__>
         __disable_kernel_type_autoinfer__=
     )
@@ -487,6 +492,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend610>:tikicpulib::ascend610>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:tikicpulib::ascend910B1>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:tikicpulib::ascend910B1>
+ 	    $<$<STREQUAL:${product_type},KirinX90_AIV>:tikicpulib::KirinX90>
+ 	    $<$<STREQUAL:${product_type},Kirin9030_AIV>:tikicpulib::Kirin9030>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:tikicpulib::ascend950pr_9599>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:tikicpulib::ascend950pr_9599>
         $<$<STREQUAL:${product_type},ascend310B1>:tikicpulib::ascend310B1>
@@ -551,6 +558,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3510>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:__NPU_ARCH__=3510>
         $<$<STREQUAL:${product_type},ascend310B1>:__NPU_ARCH__=3002>
+ 	    $<$<STREQUAL:${product_type},KirinX90_AIV>:__NPU_ARCH__=3003>
+ 	    $<$<STREQUAL:${product_type},Kirin9030_AIV>:__NPU_ARCH__=3113>
     )
 
     target_include_directories(ascendc_ut_adv_api_tiling_${product_type} PRIVATE
