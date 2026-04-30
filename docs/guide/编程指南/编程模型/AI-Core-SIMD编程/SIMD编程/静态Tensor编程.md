@@ -9,8 +9,8 @@
 ![](../../../../figures/图1-开发Ascend-C算子的基本流程.png)
 
 >[!NOTE]说明
->-  静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
->-  本节涉及的完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/add_high_performance)。
+>- 静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
+>- 本节涉及的完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/04_resource_management/static_tensor_programming)。
 
 ## 编程范式<a name="section1486516584319"></a>
 
@@ -63,42 +63,34 @@
 上述的同步逻辑在使用Pipe编程框架时，框架会使用EnQue/DeQue/AllocTensor/FreeTensor进行封装。您可以通过[编程模型设计原理](../../../概念原理和术语/编程模型设计原理.md)来了解应该如何在使用静态Tensor编程方式时手动进行同步控制。
 
 ```
-    AscendC::LocalTensor<half> xLocal(AscendC::TPosition::VECCALC, xAddr, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> yLocal(AscendC::TPosition::VECCALC, yAddr, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> zLocal(AscendC::TPosition::VECCALC, zAddr, MAX_DATA_COPY_LEN);
-
-    uint32_t totalBlocks = GetTotalBlocks();
-
-    for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
-        uint32_t startElement = loopIdx * dataCopyLen;
-        uint32_t remainElements = totalElementsPerCore - startElement;
-        uint32_t curLen = remainElements > dataCopyLen ? dataCopyLen : remainElements;
-
-        if (loopIdx != 0) {
+    AscendC::LocalTensor<float> xLocal(AscendC::TPosition::VECCALC, xAddr, TILE_LENGTH);
+    AscendC::LocalTensor<float> yLocal(AscendC::TPosition::VECCALC, yAddr, TILE_LENGTH);
+    AscendC::LocalTensor<float> zLocal(AscendC::TPosition::VECCALC, zAddr, TILE_LENGTH);
+    for (int i = 0; i < loopCount; i++) {
+        // dependency of PIPE_V & PIPE_MTE2 caused by xLocal/yLocal between 2 sequential loops
+        if (i != 0) {
             AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
         }
-
-        AscendC::DataCopy(xLocal, xGm[startElement], curLen);
-        AscendC::DataCopy(yLocal, yGm[startElement], curLen);
-
+        AscendC::DataCopy(xLocal, xGm[i * TILE_LENGTH], TILE_LENGTH);
+        AscendC::DataCopy(yLocal, yGm[i * TILE_LENGTH], TILE_LENGTH);
+        // dependency of PIPE_MTE2 & PIPE_V caused by xLocal/yLocal in one single loop
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-
-        if (loopIdx != 0) {
+        if (i != 0) {
+            // dependency of PIPE_MTE3 & PIPE_V caused by zLocal between 2 sequential loops
             AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
         }
-
-        AscendC::Add(zLocal, xLocal, yLocal, curLen);
-
-        if (loopIdx != (totalBlocks - 1)) {
+        AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
+        if (i != (loopCount - 1)) {
+            // dependency of PIPE_V & PIPE_MTE2 caused by xLocal/yLocal between 2 sequential loops
             AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
         }
+        // dependency of PIPE_V & PIPE_MTE3 caused by zLocal in one single loop
         AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-
-        AscendC::DataCopy(zGm[startElement], zLocal, curLen);
-
-        if (loopIdx != (totalBlocks - 1)) {
+        AscendC::DataCopy(zGm[i * TILE_LENGTH], zLocal, TILE_LENGTH);
+        if (i != (loopCount - 1)) {
+            // dependency of PIPE_MTE3 & PIPE_V caused by zLocal between 2 sequential loops
             AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
         }
     }
@@ -106,62 +98,44 @@
 
 ## 流水优化<a name="section121239188376"></a>
 
-在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/add_high_performance)中的Double Buffer示例。
+在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/04_resource_management/static_tensor_programming)中的Double Buffer示例。
 
 ```
     // ping
-    AscendC::LocalTensor<half> xPing(AscendC::TPosition::VECCALC, xAddrPing, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> yPing(AscendC::TPosition::VECCALC, yAddrPing, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> zPing(AscendC::TPosition::VECCALC, zAddrPing, MAX_DATA_COPY_LEN);
+    AscendC::LocalTensor<float> xLocalPing(AscendC::TPosition::VECCALC, xAddrPing, TILE_LENGTH);
+    AscendC::LocalTensor<float> yLocalPing(AscendC::TPosition::VECCALC, yAddrPing, TILE_LENGTH);
+    AscendC::LocalTensor<float> zLocalPing(AscendC::TPosition::VECCALC, zAddrPing, TILE_LENGTH);
     // pong
-    AscendC::LocalTensor<half> xPong(AscendC::TPosition::VECCALC, xAddrPong, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> yPong(AscendC::TPosition::VECCALC, yAddrPong, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> zPong(AscendC::TPosition::VECCALC, zAddrPong, MAX_DATA_COPY_LEN);
-
-    uint32_t totalBlocks = GetTotalBlocks();
+    AscendC::LocalTensor<float> xLocalPong(AscendC::TPosition::VECCALC, xAddrPong, TILE_LENGTH);
+    AscendC::LocalTensor<float> yLocalPong(AscendC::TPosition::VECCALC, yAddrPong, TILE_LENGTH);
+    AscendC::LocalTensor<float> zLocalPong(AscendC::TPosition::VECCALC, zAddrPong, TILE_LENGTH);
 
     // double buffer
-    AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
-    AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
-    AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
-    AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID1);
+    AscendC::SetFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID0);
+    AscendC::SetFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID1);
+    for (int i = 0; i < loopCount; i++) {
+        int32_t eventID = (i % 2 == 0 ? EVENT_ID0 : EVENT_ID1);
+        AscendC::LocalTensor<float> &xLocal = (i % 2 == 0 ? xLocalPing : xLocalPong);
+        AscendC::LocalTensor<float> &yLocal = (i % 2 == 0 ? yLocalPing : yLocalPong);
+        AscendC::LocalTensor<float> &zLocal = (i % 2 == 0 ? zLocalPing : zLocalPong);
+        // dependency of PIPE_MTE3 & PIPE_MTE2 caused by xLocal/yLocal between 2 sequential loops
+        AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(eventID);
+        AscendC::DataCopy(xLocal, xGm[i * TILE_LENGTH], TILE_LENGTH);
+        AscendC::DataCopy(yLocal, yGm[i * TILE_LENGTH], TILE_LENGTH);
 
-    for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
-        uint32_t startElement = loopIdx * dataCopyLen;
-        uint32_t remainElements = totalElementsPerCore - startElement;
-        uint32_t curLen = remainElements > dataCopyLen ? dataCopyLen : remainElements;
-
-        int32_t eventID = ((loopIdx & 1) == 0 ? EVENT_ID0 : EVENT_ID1);
-        AscendC::LocalTensor<half>& xLocal = ((loopIdx & 1) == 0 ? xPing : xPong);
-        AscendC::LocalTensor<half>& yLocal = ((loopIdx & 1) == 0 ? yPing : yPong);
-        AscendC::LocalTensor<half>& zLocal = ((loopIdx & 1) == 0 ? zPing : zPong);
-
-        AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(eventID);
-
-        AscendC::DataCopy(xLocal, xGm[startElement], curLen);
-        AscendC::DataCopy(yLocal, yGm[startElement], curLen);
-
+        // dependency of PIPE_MTE2 & PIPE_V caused by xLocal/yLocal in one single loop
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(eventID);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(eventID);
-
-        AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(eventID);
-
-        AscendC::Add(zLocal, xLocal, yLocal, curLen);
-
-        AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(eventID);
-
+        AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
+        // dependency of PIPE_V & PIPE_MTE3 caused by zLocal in one single loop
         AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(eventID);
         AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(eventID);
-
-        AscendC::DataCopy(zGm[startElement], zLocal, curLen);
-
-        AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(eventID);
+        AscendC::DataCopy(zGm[i * TILE_LENGTH], zLocal, TILE_LENGTH);
+        // dependency of PIPE_MTE3 & PIPE_MTE2 caused by zLocal between 2 sequential loops
+        AscendC::SetFlag<AscendC::HardEvent::MTE3_MTE2>(eventID);
     }
-
-    AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID1);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID1);
 ```
 
 以下为不使能DoubleBuffer和使能DoubleBuffer的流水示意图。多数情况下，采用DoubleBuffer能有效提升Vector的时间利用率，缩减算子执行时间，详细内容可参考[DoubleBuffer](../../../概念原理和术语/性能优化技术原理/DoubleBuffer.md)。
@@ -798,13 +772,6 @@
 <td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p99871335184114"><a name="p99871335184114"></a><a name="p99871335184114"></a>SetMaskCount、SetMaskNorm、SetVectorMask、ResetMask</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18988435204114"><a name="p18988435204114"></a><a name="p18988435204114"></a>-</p>
-</td>
-</tr>
-<tr id="row098783516418"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p139874354418"><a name="p139874354418"></a><a name="p139874354418"></a>基础API &gt; 矢量计算 &gt; 数据重排</p>
-</td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p99871335184115"><a name="p99871335184115"></a><a name="p99871335184115"></a>Interleave、DeInterleave</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18988435204115"><a name="p18988435204115"></a><a name="p18988435204115"></a>-</p>
 </td>
 </tr>
 <tr id="row1598863534117"><td class="cellrowborder" rowspan="6" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p1998811353419"><a name="p1998811353419"></a><a name="p1998811353419"></a>基础API &gt; 数据搬运 &gt; DataCopy</p>
