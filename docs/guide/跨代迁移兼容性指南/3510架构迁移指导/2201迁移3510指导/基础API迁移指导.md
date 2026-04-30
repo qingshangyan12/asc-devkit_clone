@@ -245,7 +245,7 @@
 
     **说明**：相较于2201架构版本，3510架构版本的Cube计算单元不支持int4b\_t。相关的基础API有LoadData、Mmad和LoadDataWithTranspose，这些接口不再支持int4b\_t。
 
-    **兼容方案**：算子侧通过编写CV融合算子在Vector Core进行int4b\_t到int8\_t的Cast转换，再通过UB搬运到L1后进行Mmad计算。图层面可以在该算子前增加Cast节点进行int4b\_t到int8\_t的转换。
+    **兼容方案**：算子侧通过编写CV融合算子在Vector Core进行int4b\_t到int8\_t的Cast转换，再通过UB搬运到L1后进行Mmad计算。图层面可以在该算子前增加Cast节点进行int4b\_t到int8\_t的转换。具体可参考[ int4b_t数据类型下Matmul兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_compatibility_guide/matmul_s4)。
 
     1.  在Vector Core进行int4b\_t到int8\_t的Cast转换，转换后的数据保存到新的GM空间中。
 
