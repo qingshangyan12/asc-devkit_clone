@@ -40,9 +40,19 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+enum class AtanAlgo { TAYLOR_EXPANSION = 0, POLYNOMIAL_APPROXIMATION };
+
+struct AtanConfig {
+    AtanAlgo algo = AtanAlgo::TAYLOR_EXPANSION;
+};
+
+constexpr AtanConfig defaultAtanConfig = {AtanAlgo::TAYLOR_EXPANSION};
+#endif
+
 #pragma begin_pipe(V)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
  /*!
  * \ingroup Atan
  * \brief compute Atan elementwisely

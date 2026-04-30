@@ -29,6 +29,13 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct LogicalAndConfig {
+    bool isReuseSource;
+};
+constexpr LogicalAndConfig DEFAULT_LOGICAL_AND_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup LogicalAnd
