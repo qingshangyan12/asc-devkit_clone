@@ -38,7 +38,7 @@ MxMatmul（Matrix Multiply with Scale）是一种**带量化缩放系数的矩�
 #### 计算公式
 
 $$
-C = (A \otimes \text{scaleA}) \times (B \otimes \text{scaleB})
+C = (\text{scaleA} \otimes A) \times (\text{scaleB} \otimes B)
 $$
 
 其中 $\otimes$ 表示广播乘（broadcast），左/右矩阵在左/右量化系数矩阵做乘积时，K 方向上每 32 个元素共享一个量化因子。
@@ -118,15 +118,23 @@ REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
 
 | 参数 | 值 |
 |------|----|
-| `M=N=K` | `8192 / 8192 / 8192` |
+| `M` | `8192` |
+| `N` | `8192` |
+| `K` | `8192` |
 | `singleCoreM` | `2048` |
 | `singleCoreN` | `1024` |
 | `singleCoreK` | `8192` |
-| `baseM=baseN=baseK` | `256` |
-| `stepKa=stepKb` | `2 / 2` |
-| `scaleFactorKa=scaleFactorKb (case1)` | `1 / 1` |
-| `scaleFactorKa=scaleFactorKb (case2)` | `4 / 4` |
-| 数据类型 | A/B: `fp4x2` (`0.5 Byte/elem`), scale: `fp8` (`1 Byte/elem`) |
+| `baseM` | `256` |
+| `baseN` | `256` |
+| `baseK` | `256` |
+| `stepKa` | `2` |
+| `stepKb` | `2` |
+| `scaleFactorKa (case1)` | `1` |
+| `scaleFactorKb (case1)` | `1` |
+| `scaleFactorKa (case2)` | `4` |
+| `scaleFactorKb (case2)` | `4` |
+| `数据类型` | A/B: `fp4x2` (`0.5 Byte/elem`) |
+| `数据类型` | scale: `fp8` (`1 Byte/elem`) |
 
 **说明**：
 
@@ -166,6 +174,8 @@ Case1/Case2 在 scale 侧的差异主要体现在“单次搬运粒度与搬运�
 | Case 1 | 750.219 | 32 | 749.13 | 660.15 | 0.881 | 258.354 | 0.345 | 437.64 | 0.584 | 753.906 | 0.982 | 33.257 | 0.044 |
 | Case 2 | 693.283 | 32 | 692.34 | 641.444 | 0.926 | 241.563 | 0.349 | 428.914 | 0.62 | 612.536 | 0.885 | 33.965 | 0.049 |
 
+可以看到，Case 2 已达到理论性能峰值的 `92.6%`（即表中的`aic_mac_ratio`）。
+
 ### Case 2 收益（相对 Case 1）
 
 两种场景均使用常量化 tiling + 模板常量化。Case 2 相对 Case 1 的收益主要来自 `mxTypePara` 带来的 scale 多搬运能力。
@@ -188,15 +198,20 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
 - Case 1 误差：`(660.150 - 635.5) / 635.5 = 3.88%`
 - Case 2 误差：`(641.444 - 635.5) / 635.5 = 0.94%`
 
-可以看到，Case 2 已达到理论性能峰值的 `99.06%`。
-
 ## 编译运行
 
-### 编译执行
+- 编译执行
 
 在本样例根目录下执行如下步骤，编译并执行样例：
 
-- **配置环境变量**
+> **注意事项**：本样例使用的 `en_dtypes` 库需要版本 `0.0.4`。安装命令为
+
+  ```bash
+  pip3 install en_dtypes==0.0.4
+  ```
+
+- 配置环境变量
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -213,7 +228,8 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
     source ${install_path}/cann/set_env.sh
     ```
 
-- **样例执行**
+- 样例执行
+
   ```bash
   SCENARIO_NUM=2
   mkdir -p build && cd build;  # 创建并进入 build 目录
@@ -245,7 +261,7 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
   test pass!
   ```
 
-### 性能分析
+## 性能分析
 
 使用 `msprof` 工具获取详细性能数据：
 

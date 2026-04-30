@@ -21,6 +21,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MM_BASE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_BASE_IMPL_H
 #include "kernel_tensor.h"
+#include "kernel_npu_debug.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_mm_impl.h"
@@ -96,10 +97,10 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
         ASCENDC_REPORT_CHECK_ERROR("LoadData with LoadData3DParamsV1", KernelFuncType::NONE_MODE);
     }
 #endif
-    ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
         "LoadData with LoadData3DParamsV1, current api support dtype combination is src and dst both: uint8_t / int8_t "
-        "/ half.");});
+        "/ half.\n"));
 
     if constexpr (defaultConfig.isSetFMatrix) {
         Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
@@ -161,9 +162,11 @@ template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D
 __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData3DParamsV2<U>& loadDataParams)
 {
-    ASCENDC_ASSERT(CheckFuncLoadData3dv2(dst, src, loadDataParams, "LoadData with LoadData3DParamsV2"), {
+#ifdef ASCENDC_CPU_DEBUG
+    if (!CheckFuncLoadData3dv2(dst, src, loadDataParams, "LoadData with LoadData3DParamsV2")) {
         ASCENDC_REPORT_CHECK_ERROR("LoadData with LoadData3DParamsV2", KernelFuncType::NONE_MODE);
-    });
+    }
+#endif
     if constexpr (defaultConfig.isSetFMatrix) {
         Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
     }
@@ -179,14 +182,14 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
         "/ half / int4b_t.");});
 #elif __NPU_ARCH__ == 2201
     if (dstScope == Hardware::L0A) {
-        ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, bfloat16_t, float, uint32_t, int32_t, int4b_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst position is "
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, bfloat16_t, float, uint32_t, int32_t, int4b_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst position is "
             "A2, current api support dtype combination is src and dst both: uint8_t / int8_t / half / bfloat16_t / "
-            "float / uint32_t / int32_t / int4b_t.");});
+            "float / uint32_t / int32_t / int4b_t.\n"));
     } else if (dstScope == Hardware::L0B) {
-        ASCENDC_ASSERT((SupportType<PrimT<T>, half, bfloat16_t, float, uint32_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR,
-            "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst position is B2, current api support "
-            "dtype combination is src and dst both: half / bfloat16_t / float / uint32_t / int32_t.");});
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, half, bfloat16_t, float, uint32_t, int32_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst position is B2, "
+            "current api support dtype combination is src and dst both: half / bfloat16_t / float / uint32_t / int32_t.\n"));
     }
 #elif __NPU_ARCH__ == 3510
     ASCENDC_ASSERT(loadDataParams.kExtension * sizeof(T) % ONE_BLK_SIZE == 0, {
@@ -514,15 +517,17 @@ template <typename T = int32_t, typename U = int8_t,
 __aicore__ inline void MmadSpImpl(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<U>& filter, const MmadParams& mmadParams)
 {
-    CheckTensorPos<T>(dst, Hardware::L0C, "dst", "CO1", "MmadWithSparse");
-    CheckTensorPos<U>(fm, Hardware::L0A, "fm", "A2", "MmadWithSparse");
-    CheckTensorPos<U>(filter, Hardware::L0B, "filter", "B2", "MmadWithSparse");
-    CheckTensorAlign<T>(dst, 1024, "dst", "MmadWithSparse");             // 1024B aligned
-    CheckTensorAlign<U>(fm, VALUE_512, "fm", "MmadWithSparse");           // 512B aligned
-    CheckTensorAlign<U>(filter, VALUE_512, "filter", "MmadWithSparse");   // 512B aligned
-    ASCENDC_CHECK_VALUE_RANGE(mmadParams.m, 0, UINT12_MAX, "m", "MmadWithSparse");
-    ASCENDC_CHECK_VALUE_RANGE(mmadParams.n, 0, UINT12_MAX, "n", "MmadWithSparse");
-    ASCENDC_CHECK_VALUE_RANGE(mmadParams.k, 0, UINT12_MAX, "k", "MmadWithSparse");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckTensorPhyPosition<Hardware::L0C>(dst, "dst", "CO1", "MmadWithSparse");
+    CheckTensorPhyPosition<Hardware::L0A>(fm, "fm", "A2", "MmadWithSparse");
+    CheckTensorPhyPosition<Hardware::L0B>(filter, "filter", "B2", "MmadWithSparse");
+    CheckTensorAlignment(dst, 1024, "dst", "MmadWithSparse");             // 1024B aligned
+    CheckTensorAlignment(fm, VALUE_512, "fm", "MmadWithSparse");           // 512B aligned
+    CheckTensorAlignment(filter, VALUE_512, "filter", "MmadWithSparse");   // 512B aligned
+    CheckValueRange<uint16_t>(mmadParams.m, 0, UINT12_MAX, "m", "MmadWithSparse with MmadParams");
+    CheckValueRange<uint16_t>(mmadParams.n, 0, UINT12_MAX, "n", "MmadWithSparse with MmadParams");
+    CheckValueRange<uint16_t>(mmadParams.k, 0, UINT12_MAX, "k", "MmadWithSparse with MmadParams");
+#endif
     MmadSpCal((__cc__ int32_t*)dst.GetPhyAddr(), (__ca__ int8_t*)fm.GetPhyAddr(),
         (__cb__ int8_t*)filter.GetPhyAddr(), mmadParams);
 }
@@ -533,12 +538,14 @@ template <typename T = int8_t, typename U = uint8_t,
 __aicore__ inline void LoadDataWithSparseImpl(const LocalTensor<T> &dst, const LocalTensor<T> &src,
     const LocalTensor<U> &idx, const LoadData2dParams &loadDataParam)
 {
-    CheckTensorPos<T>(dst, Hardware::L0B, "dst", "B2", "LoadDataWithSparse");
-    CheckTensorPos<T>(src, Hardware::L1, "src", "B1", "LoadDataWithSparse");
-    CheckTensorPos<U>(idx, Hardware::L1, "idx", "B1", "LoadDataWithSparse");
-    CheckTensorAlign<T>(dst, VALUE_512, "dst", "LoadDataWithSparse");        // 512B align
-    CheckTensorAlign<T>(src, ONE_BLK_SIZE, "src", "LoadDataWithSparse");     // 32B align
-    CheckTensorAlign<U>(idx, ONE_BLK_SIZE, "idx", "LoadDataWithSparse");    // 32B align
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckTensorPhyPosition<Hardware::L0B>(dst, "dst", "B2", "LoadDataWithSparse");
+    CheckTensorPhyPosition<Hardware::L1>(src, "src", "B1", "LoadDataWithSparse");
+    CheckTensorPhyPosition<Hardware::L1>(idx, "idx", "B1", "LoadDataWithSparse");
+    CheckTensorAlignment(dst, VALUE_512, "dst", "LoadDataWithSparse");        // 512B align
+    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "LoadDataWithSparse");     // 32B align
+    CheckTensorAlignment(idx, ONE_BLK_SIZE, "idx", "LoadDataWithSparse");    // 32B align
+#endif
     LoadDataWithSparseCal(dst, src, idx, loadDataParam);
 }
 #endif
