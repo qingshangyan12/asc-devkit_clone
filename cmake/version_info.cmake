@@ -84,8 +84,8 @@ parse_semantic_version(
 # 4. 生成 asc_devkit_version.h
 # -------------------------
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in
-    ${CPACK_CMAKE_BINARY_DIR}/scripts/package/asc-devkit/asc_devkit_version.h
+    ${CMAKE_BINARY_DIR}/cmake/version.h.in
+    ${CMAKE_BINARY_DIR}/scripts/package/asc-devkit/asc_devkit_version.h
     @ONLY
 )
 
