@@ -31,20 +31,20 @@
 ### 1. reduce_accumulate.asc - 累加方式归约求和
 - 样例功能：对输入向量做归约求和运算，向量shape为[20, 528]，数据类型为float
 - 核函数名：`reduce_accumulate`
-- 样例实现：每行数据按 repeat 切分加载，每个 repeat 经 Reduce<SUM> 二分归约后，通过向量加法顺序累加至同一累加器寄存器 (accReg)，最终写出归约结果。
-- 累加方式：repeat 内采用硬件 Reduce<SUM> 二分归约；repeat 间采用顺序累加，即逐个 repeat 将归约结果 Add 到累加器上
+- 样例实现：每行数据按 repeat 切分加载，每个 repeat 经 Reduce<SUM> 归约后，通过向量加法顺序累加至同一累加器寄存器 (accReg)，最终写出归约结果。
+- 累加方式：repeat 内采用硬件 Reduce<SUM> 二叉树归约；repeat 间采用顺序累加，即逐个 repeat 将归约结果 Add 到累加器上
 
 ### 2. reduce_iterator.asc - 迭代方式归约求和
 - 样例功能：对输入向量做归约求和运算，向量shape为[20, 528]，数据类型为float
 - 核函数名：`reduce_iterator`
 - 样例实现：采用两级归约策略——第一轮对每个 repeat 执行 Reduce<SUM> 并将中间结果非对齐写出到 UB 中转缓冲区 (workLocal)，第二轮对该缓冲区中的中间标量集合再执行一次 Reduce<SUM>，得到最终归约结果。
-- 累加方式：repeat 内为 ReduceSum 二分归约；repeat 间同样通过 ReduceSum 完成归约，本质上是两级二分归约
+- 累加方式：repeat 内为 ReduceSum 二叉树归约；repeat 间同样通过 ReduceSum 完成归约，本质上是两级二叉树归约
 
 ### 3. reduce_binary.asc - 二分累加归约求和
 - 样例功能：对输入向量做归约求和运算，向量shape为[20, 528]，数据类型为float
 - 核函数名：`reduce_binary`
-- 样例实现：使首先将尾部余数元素合并至主块使 repeat 数对齐到 2 的幂次（8），随后将 8 个 repeat 全部加载到寄存器，经 log₂(8)=3 轮两两配对向量加法（8→4→2→1） 折半聚合至单个 repeat，最终通过 Reduce<SUM> 二分归约为标量并写出
-- 累加方式：repeat 内最终由 Reduce<SUM> 二分归约完成；repeat 间采用二分折半配对累加
+- 样例实现：使首先将尾部余数元素合并至主块使 repeat 数对齐到 2 的幂次（8），随后将 8 个 repeat 全部加载到寄存器，经 log₂(8)=3 轮两两配对向量加法（8→4→2→1） 折半聚合至单个 repeat，最终通过 Reduce<SUM> 归约并写出
+- 累加方式：repeat 内最终由 Reduce<SUM> 二叉树归约完成；repeat 间采用二分折半配对累加
 
 ### 4. reduce_max.asc - 归约求最大值及索引
 - 样例功能：求输入向量的最大值及其对应的索引，向量shape为[1, 1024]，数据类型为float
