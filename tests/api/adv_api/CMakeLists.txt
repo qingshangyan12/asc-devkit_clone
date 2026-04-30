@@ -16,7 +16,7 @@ set(ASCENDC_ADV_API_INCLUDE ${ASCENDC_DIR}/include/adv_api)
 set(ASCENDC_ADV_API_IMPL ${ASCENDC_DIR}/impl/adv_api)
 set(ASCENDC_UTILS_INCLUDE ${ASCENDC_DIR}/include/utils)
 
-set(PRODUCT_TYPE_LIST_INIT ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend950pr_9599_AIC ascend950pr_9599_AIV ascend310B1)
+set(PRODUCT_TYPE_LIST_INIT ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend950pr_9599_AIC ascend950pr_9599_AIV ascend310B1 KirinX90_AIV Kirin9030_AIV)
 set(PRODUCT_TYPE_LIST ${PRODUCT_TYPE_LIST_INIT} CACHE STRING "Supported product types")
 
 set(ASCENDC_DEP_HEADER_DIR
@@ -233,30 +233,31 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
 
 # KirinX90 aiv test cases
 file(GLOB ASCENDC_TEST_KirinX90_AIV_CASE_SRC_PART_FILES
-    normalization/rmsnorm/test_operator_rmsnorm_l300.cpp
-    math\asin\test_operator_asin.cpp
-    math\acos\test_operator_acos.cpp
-    math\atan\test_operator_atan.cpp
-    math\cos\test_operator_cos.cpp
-    math\cosh\test_operator_cosh.cpp
-    math\erf\test_operator_erf.cpp
-    math\erfc\test_operator_erfc.cpp
-    math\floor\test_operator_floor.cpp
-    math\log\test_operator_log.cpp
-    math\sign\test_operator_sign.cpp
-    math\sin\test_operator_sin.cpp
-    math\tan\test_operator_tan.cpp
-    math\tanh\test_operator_tanh.cpp
-    select\selectwithbytesmask\test_operator_selectwithbytesmask.cpp
-    index\arithprogression\test_operator_arithprogression.cpp
-    reduce\sum\test_operator_sum.cpp
-    activation\gelu\test_operator_fast_gelu.cpp
-    activation\gelu\test_operator_gelu.cpp
-    activation\silu\test_operator_silu.cpp
-    activation\reglu\test_operator_reglu.cpp
-    activation\sigmoid\test_operator_vec_sigmoid.cpp
-    filter\dropout\test_operator_dropout.cpp
-    pad\broadcast\test_operator_broadcast_v200.cpp
+    math/asin/test_operator_asin.cpp
+    math/acos/test_operator_acos.cpp
+    math/atan/test_operator_atan.cpp
+    math/cos/test_operator_cos.cpp
+    math/cosh/test_operator_cosh.cpp
+    math/erf/test_operator_erf.cpp
+    math/erfc/test_operator_erfc.cpp
+    math/floor/test_operator_floor.cpp
+    math/log/test_operator_log.cpp
+    math/sign/test_operator_sign.cpp
+    math/sin/test_operator_sin.cpp
+    math/tan/test_operator_tan.cpp
+    math/tanh/test_operator_tanh.cpp
+    select/selectwithbytesmask/test_operator_selectwithbytesmask.cpp
+    index/arithprogression/test_operator_arithprogression.cpp
+    reduce/sum/test_operator_sum.cpp
+    activation/gelu/test_operator_gelu.cpp
+    activation/silu/test_operator_silu.cpp
+    activation/reglu/test_operator_reglu.cpp
+    activation/sigmoid/test_operator_vec_sigmoid.cpp
+    filter/dropout/test_operator_dropout.cpp
+    pad/broadcast/test_operator_broadcast_v200.cpp
+    matmul/test_matmul_shape_info.cpp
+    matmul/test_matmul_shape_info_left.cpp
+    matmul/test_matmul_l0c_buffer.cpp
 
 ) 
 
@@ -265,35 +266,33 @@ set(ASCENDC_TEST_KirinX90_AIV_CASE_SRC_FILES
 ) 
 
 # Kirin9030 aiv test cases
-file(GLOB ASCENDC_TEST_KirinX90_AIV_CASE_SRC_PART_FILES
-    normalization/rmsnorm/test_operator_rmsnorm_l300.cpp
-    math\asin\test_operator_asin.cpp
-    math\acos\test_operator_acos.cpp
-    math\atan\test_operator_atan.cpp
-    math\cos\test_operator_cos.cpp
-    math\cosh\test_operator_cosh.cpp
-    math\erf\test_operator_erf.cpp
-    math\erfc\test_operator_erfc.cpp
-    math\floor\test_operator_floor.cpp
-    math\log\test_operator_log.cpp
-    math\sign\test_operator_sign.cpp
-    math\sin\test_operator_sin.cpp
-    math\tan\test_operator_tan.cpp
-    math\tanh\test_operator_tanh.cpp
-    select\selectwithbytesmask\test_operator_selectwithbytesmask.cpp
-    index\arithprogression\test_operator_arithprogression.cpp
-    reduce\sum\test_operator_sum.cpp
-    activation\gelu\test_operator_fast_gelu.cpp
-    activation\gelu\test_operator_gelu.cpp
-    activation\silu\test_operator_silu.cpp
-    activation\reglu\test_operator_reglu.cpp
-    activation\sigmoid\test_operator_vec_sigmoid.cpp
-    filter\dropout\test_operator_dropout.cpp
-    pad\broadcast\test_operator_broadcast_v200.cpp
+file(GLOB ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES
+    math/asin/test_operator_asin.cpp
+    math/acos/test_operator_acos.cpp
+    math/atan/test_operator_atan.cpp
+    math/cos/test_operator_cos.cpp
+    math/cosh/test_operator_cosh.cpp
+    math/erf/test_operator_erf.cpp
+    math/erfc/test_operator_erfc.cpp
+    math/floor/test_operator_floor.cpp
+    math/log/test_operator_log.cpp
+    math/sign/test_operator_sign.cpp
+    math/sin/test_operator_sin.cpp
+    math/tan/test_operator_tan.cpp
+    math/tanh/test_operator_tanh.cpp
+    select/selectwithbytesmask/test_operator_selectwithbytesmask.cpp
+    index/arithprogression/test_operator_arithprogression.cpp
+    reduce/sum/test_operator_sum.cpp
+    activation/sigmoid/test_operator_vec_sigmoid.cpp
+    filter/dropout/test_operator_dropout.cpp
+    pad/broadcast/test_operator_broadcast_v200.cpp
+    matmul/test_matmul_shape_info.cpp
+    matmul/test_matmul_shape_info_left.cpp
+    matmul/test_matmul_l0c_buffer.cpp
 
 ) 
 
-set(ASCENDC_TEST_KirinX90_AIV_CASE_SRC_FILES
+set(ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_FILES
     ${ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES}
 ) 
 
