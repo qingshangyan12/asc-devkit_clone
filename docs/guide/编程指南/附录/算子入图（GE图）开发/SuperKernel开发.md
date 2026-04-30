@@ -3,10 +3,10 @@
 SuperKernel是一种算子的二进制融合技术，与源码融合不同，它聚焦于内核函数 \(Kernel\) 的二进制的调度方案，展开深度优化，于已编译的二进制代码基础上融合创建一个超级Kernel函数（SuperKernel），以调用子函数的方式调用多个其他内核函数，也就是子Kernel。相对于单算子下发，SuperKernel技术可以减少任务调度等待时间和调度开销，同时利用Task间隙资源进一步优化算子头开销。
 
 >[!NOTE]说明 
->-   SuperKernel仅适用于静态图场景。
->-   SuperKernel适用于如下型号：
->    -   Atlas A3 训练系列产品/Atlas A3 推理系列产品
->    -   Ascend 950PR/Ascend 950DT
+>- SuperKernel仅适用于静态图场景。
+>- SuperKernel适用于如下型号：
+>    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+>    - Ascend 950PR/Ascend 950DT
 
 ## 自定义算子支持SuperKernel<a name="section20981216853"></a>
 

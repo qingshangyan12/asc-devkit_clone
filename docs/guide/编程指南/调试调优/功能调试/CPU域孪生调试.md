@@ -37,15 +37,15 @@
 
 >[!NOTE]说明 
 >为了实现CPU域与NPU域代码归一，框架在CPU域中仅对部分acl接口进行适配，开发者在使用CPU域调测功能时，仅支持使用如下acl接口，并且不支持用户自行链接**ascendcl库**：
->-   有实际功能接口，支持CPU域调用
->    -   aclDataTypeSize、aclFloat16ToFloat、aclFloatToFloat16。
->    -   aclrtMalloc、aclrtFree、aclrtMallocHost、aclrtFreeHost、aclrtMemset、aclrtMemsetAsync、aclrtMemcpy、aclrtMemcpyAsync、aclrtMemcpy2d、aclrtMemcpy2dAsync、aclrtCreateContext、aclrtDestroyContext。
->-   无实际功能接口，打桩实现。
->    -   Profiling数据采集
+>- 有实际功能接口，支持CPU域调用
+>    - aclDataTypeSize、aclFloat16ToFloat、aclFloatToFloat16。
+>    - aclrtMalloc、aclrtFree、aclrtMallocHost、aclrtFreeHost、aclrtMemset、aclrtMemsetAsync、aclrtMemcpy、aclrtMemcpyAsync、aclrtMemcpy2d、aclrtMemcpy2dAsync、aclrtCreateContext、aclrtDestroyContext。
+>- 无实际功能接口，打桩实现。
+>    - Profiling数据采集
 >        aclprofInit、aclprofSetConfig、aclprofStart、aclprofStop、aclprofFinalize。
->    -   系统配置
+>    - 系统配置
 >        aclInit、aclFinalize、aclrtGetVersion。
->    -   运行时管理
+>    - 运行时管理
 >        aclrtSetDevice、aclrtResetDevice、aclrtCreateStream、aclrtCreateStreamWithConfig、aclrtDestroyStream、aclrtDestroyStreamForce、aclrtSynchronizeStream、aclrtCreateContext、aclrtDestroyContext。
 
 > [!CAUTION]注意
