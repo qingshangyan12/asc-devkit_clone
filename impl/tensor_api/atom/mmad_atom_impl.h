@@ -19,8 +19,8 @@
 * \file mmad_atom_impl.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_DETAIL_ATOM_MMAD_ATOM_IMPL_H
-#define IMPL_TENSOR_API_DETAIL_ATOM_MMAD_ATOM_IMPL_H
+#ifndef IMPL_TENSOR_API_ATOM_MMAD_ATOM_IMPL_H
+#define IMPL_TENSOR_API_ATOM_MMAD_ATOM_IMPL_H
 
 #include "impl/tensor_api/atom/cube/mmad.h"
 #include "impl/tensor_api/atom/mmad_traits_impl.h"
@@ -56,7 +56,7 @@ struct MmadAtom<MmadTraits<MmadOperation, Args...>> : MmadTraits<MmadOperation, 
 }
 }
 
-#endif // IMPL_TENSOR_API_DETAIL_ATOM_MMAD_ATOM_IMPL_H
+#endif // IMPL_TENSOR_API_ATOM_MMAD_ATOM_IMPL_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
