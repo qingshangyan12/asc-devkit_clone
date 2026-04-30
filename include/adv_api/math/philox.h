@@ -27,6 +27,18 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+constexpr uint16_t PHILOX_KEY_SIZE = 2;
+constexpr uint16_t PHILOX_COUNTER_SIZE = 4;
+using PhiloxKey = uint32_t[PHILOX_KEY_SIZE];
+using PhiloxCounter = uint32_t[PHILOX_COUNTER_SIZE];
+
+struct PhiloxRandomParams {
+    uint32_t stride;
+    uint32_t row;
+    uint32_t column;
+};
+#endif
 
 #pragma begin_pipe(V)
 

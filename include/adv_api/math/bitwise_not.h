@@ -29,6 +29,13 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct BitwiseNotConfig {
+    bool isReuseSource;
+};
+constexpr BitwiseNotConfig DEFAULT_BITWISE_NOT_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup BitwiseNot

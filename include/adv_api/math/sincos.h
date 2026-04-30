@@ -29,6 +29,13 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct SinCosConfig {
+    bool isReuseSource;
+};
+constexpr SinCosConfig DEFAULT_SINCOS_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup SinCos

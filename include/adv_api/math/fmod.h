@@ -36,7 +36,7 @@
 
 namespace AscendC {
 #pragma begin_pipe(V)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102))
 /*!
  * \ingroup Fmod
  * \brief compute Fmod elementwisely
