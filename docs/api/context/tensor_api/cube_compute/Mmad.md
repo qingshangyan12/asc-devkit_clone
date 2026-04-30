@@ -25,7 +25,7 @@ __aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Params& ...params
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
 | atomMmad | 输入 | [MmadAtom](../struct/atom/MmadAtom.md) 对象，封装了具体的矩阵乘加操作和traits配置。 |
-| params | 输入 | 矩阵乘加操作的参数，可变参数。通常包括：<br>- 目的张量C（计算结果矩阵，位于L0C）<br>- 源张量A（左矩阵，位于L0A）<br>- 源张量B（右矩阵，位于L0B）<br>- 参数（如defaultMmadParams）<br>- 可选：源张量Bias(偏置张量，位于L0C或者BiasTable Buffer) |
+| params | 输入 | 矩阵乘加操作的参数，可变参数。通常包括：<br>- 目的张量C（计算结果矩阵，位于L0C）<br>- 源张量A（左矩阵，位于L0A）<br>- 源张量B（右矩阵，位于L0B）<br>- 参数（如defaultMmadParams）<br>- 可选：源张量Bias（偏置张量，位于L0C或者BiasTable Buffer） |
 
 ## 返回值说明
 
@@ -59,4 +59,3 @@ Mmad(MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}, l0CTensor, l0ATens
 
 - [MmadAtom](../struct/atom/MmadAtom.md)
 - [MmadTraits](../struct/atom/MmadTraits.md)
-- [Mmad](./Mmad.md)
