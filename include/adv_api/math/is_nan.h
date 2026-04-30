@@ -29,6 +29,13 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct IsNanConfig {
+    bool isReuseSource;
+};
+constexpr IsNanConfig DEFAULT_IS_NAN_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup IsNan

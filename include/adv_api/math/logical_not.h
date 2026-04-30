@@ -29,6 +29,13 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct LogicalNotConfig {
+    bool isReuseSource;
+};
+constexpr LogicalNotConfig DEFAULT_LOGICAL_NOT_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup LogicalNot
