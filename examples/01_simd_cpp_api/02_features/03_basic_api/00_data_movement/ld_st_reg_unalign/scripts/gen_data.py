@@ -40,9 +40,9 @@ def gen_golden_data_scenario1():
 
 def gen_golden_data_scenario2():
     """
-    Scenario 2: Multi-core ReduceDataBlock
-    Input: 14x255 = 3570 half (float16) numbers
-    Output: 14x16 = 224 half numbers (sum of each DataBlock)
+    Scenario 2: Multi-core ReduceDataBlock MAX
+    Input: 14x255 = 3570 uint16 numbers
+    Output: 14x16 = 224 uint16 numbers (max of each DataBlock)
     Each row has 255 elements, split into DataBlocks of 16 elements each.
     The last DataBlock has 15 elements (255 = 15*16 + 15)
     """
@@ -53,11 +53,11 @@ def gen_golden_data_scenario2():
     
     # Generate random input data
     total_elements = total_rows * row_length
-    x = np.random.randn(total_elements).astype(np.float16)
+    x = np.random.randint(0, 1000, size=total_elements, dtype=np.uint16)
     x.tofile("./input/input_x.bin")
     
     # Compute golden output
-    golden = np.zeros(total_rows * results_per_row, dtype=np.float16)
+    golden = np.zeros(total_rows * results_per_row, dtype=np.uint16)
     
     for row in range(total_rows):
         row_start = row * row_length
@@ -65,12 +65,12 @@ def gen_golden_data_scenario2():
             block_start = row_start + block_idx * data_block_size
             block_end = min(block_start + data_block_size, row_start + row_length)
             
-            # Sum all elements in this DataBlock
-            block_sum = np.sum(x[block_start:block_end]).astype(np.float16)
-            golden[row * results_per_row + block_idx] = block_sum
+            # Max of all elements in this DataBlock
+            block_max = np.max(x[block_start:block_end]).astype(np.uint16)
+            golden[row * results_per_row + block_idx] = block_max
     
     golden.tofile("./output/golden.bin")
-    print(f"Scenario 2: Generated input_x.bin ({total_elements} half) and golden.bin ({len(golden)} half)")
+    print(f"Scenario 2: Generated input_x.bin ({total_elements} uint16) and golden.bin ({len(golden)} uint16)")
 
 
 if __name__ == "__main__":

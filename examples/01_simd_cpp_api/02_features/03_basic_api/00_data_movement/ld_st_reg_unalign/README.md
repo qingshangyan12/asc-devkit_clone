@@ -13,7 +13,7 @@
 	 	</tr>
 	 	<tr>
 	 		<td>2</td>
-	 		<td>多核非对齐场景计算及搬运：使用LoadUnAlign处理非对齐输入，ReduceDataBlock进行块内求和</td>
+	 		<td>多核非对齐场景计算及搬运：使用LoadUnAlign处理非对齐输入(uint16_t)，ReduceDataBlock(MAX)进行块内求最大值</td>
 	 	</tr>
 	 </table>
 
@@ -56,25 +56,25 @@
   - 调用实现  
     使用内核调用符<<<>>>调用核函数，启动1个核。
 
-### 场景2：多核ReduceDataBlock计算
+### 场景2：多核ReduceDataBlock(MAX)计算
 - 样例功能：  
-  输入shape为[14, 255]的half类型矩阵，展示LoadUnAlign处理非对齐输入的自然使用场景。使用ReduceDataBlock对每个DataBlock（16个half元素）求和，多核并行处理，StoreUnAlign连续存储结果。
+  输入shape为[14, 255]的uint16_t类型矩阵，展示LoadUnAlign处理非对齐输入的自然使用场景。使用ReduceDataBlock对每个DataBlock（16个uint16_t元素）求最大值，多核并行处理，StoreUnAlign连续存储结果。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
   </tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">x</td><td align="center">[14, 255]</td><td align="center">half</td></tr>
+  <tr><td align="center">x</td><td align="center">[14, 255]</td><td align="center">uint16_t</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[14, 16]</td><td align="center">half</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[14, 16]</td><td align="center">uint16_t</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_unalign_kernel</td></tr>
   <tr><td rowspan="1" align="center">核数</td><td colspan="4" align="center">4</td></tr>
   </table>
 - 样例实现：
   1. **数据搬入（整块连续）**：
-     - 14×255=3570个half作为连续整块搬入UB
+     - 14×255=3570个uint16_t作为连续整块搬入UB
      - UB紧密排列，每行间隔255个元素
      - 行1-3起始地址非32B对齐（510字节、1020字节、1530字节）
 
@@ -84,7 +84,7 @@
 
   3. **ReduceDataBlock计算**：
      - 每行255元素分2个VL块处理（128 + 127）
-     - 每个VL块产生8个结果（每DataBlock求和）
+     - 每个VL块产生8个结果（每DataBlock求最大值）
 
   4. **StoreUnAlign连续存储**：
      - 使用带postUpdateStride的StoreUnAlign版本
@@ -148,7 +148,7 @@
 | ----------------| -----------------------------| ---------------------------------------------------|
 | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-| `SCENARIO_NUM` | `1`、`2`　　　　　　　　　　| 场景编号：1=单核非对齐数据搬运，2=多核ReduceDataBlock |
+| `SCENARIO_NUM` | `1`、`2`　　　　　　　　　　| 场景编号：1=单核非对齐数据搬运，2=多核ReduceDataBlock(MAX) |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。
