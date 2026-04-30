@@ -87,6 +87,11 @@ install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
     RENAME version.info
     COMPONENT asc-devkit
 )
+set(HCCL_CC_BUILD_DIR ${CMAKE_BINARY_DIR}/impl/adv_api/detail/hccl/cc)
+install(FILES "${HCCL_CC_BUILD_DIR}/src/libmc2_client.so" "${HCCL_CC_BUILD_DIR}/src/common/hcomm_dlsym/libmc2_compat.so"
+    DESTINATION "hccl/lib64" COMPONENT asc-devkit OPTIONAL)
+install(FILES "${HCCL_CC_BUILD_DIR}/src/libmc2_server.json"
+    DESTINATION "hccl/built-in/data/op/aicpu" COMPONENT asc-devkit OPTIONAL)
 # ============= CPack =============
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
