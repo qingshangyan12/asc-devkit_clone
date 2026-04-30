@@ -205,12 +205,12 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
         uint16_t n = countBlks * BLOCK_CUBE;
         uint16_t m = (burstLen * ONE_BLK_SIZE / B32_BYTE_SIZE) / BLOCK_CUBE;
         bool nz2dnEn = true;
-        copy_matrix_cc_to_gm((__gm__ float *)(ptr->dumpAddr), (__cc__ float *)(src.GetPhyAddr()),
-            0, n, m, m * BLOCK_CUBE, m,
-            0, 0, static_cast<uint64_t>(QuantMode_t::NoQuant),
-            static_cast<uint8_t>(false), false, false,
-            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true,
-            false, false, false);
+        // copy_matrix_cc_to_gm((__gm__ float *)(ptr->dumpAddr), (__cc__ float *)(src.GetPhyAddr()),
+        //     0, n, m, m * BLOCK_CUBE, m,
+        //     0, 0, static_cast<uint64_t>(QuantMode_t::NoQuant),
+        //     static_cast<uint8_t>(false), false, false,
+        //     static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true,
+        //     false, false, false);
     }
     PipeBarrier<PIPE_ALL>();
     ptr->dumpOffset -= offset;
