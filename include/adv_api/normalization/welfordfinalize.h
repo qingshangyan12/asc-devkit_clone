@@ -24,7 +24,7 @@
 #include "kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/normalization/welfordfinalize/welfordfinalize_common_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/normalization/welfordfinalize/welfordfinalize_3510_impl.h"
@@ -33,7 +33,7 @@
 namespace AscendC
 {
 #pragma begin_pipe(V)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201))
 /*!
  * \brief Calculate the final mean and variance using the Welford algorithm.
  *
