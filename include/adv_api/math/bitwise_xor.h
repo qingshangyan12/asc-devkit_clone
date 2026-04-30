@@ -29,6 +29,13 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct BitwiseXorConfig {
+    bool isReuseSource;
+};
+constexpr BitwiseXorConfig DEFAULT_BITWISE_XOR_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup BitwiseXor
