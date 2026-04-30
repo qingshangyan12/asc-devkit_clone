@@ -210,7 +210,7 @@ namespace {
     thread_local CommDomainCacheManager g_cacheManager;
 }
 
-extern "C" unsigned int HcclLaunchAicpuKernel(OpParam *param)
+extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKernel(OpParam *param)
 {
     if (param == nullptr) {
         HCCL_ERROR("%s param is nullptr", __func__);

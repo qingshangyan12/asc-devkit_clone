@@ -20,6 +20,7 @@
 #include "ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #endif
 #include "topo_match_ubx.h"
+#include <cstddef>
 namespace ops_hccl {
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
@@ -63,7 +64,10 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
     const OpParam &param, const AlgResourceCtxSerializable &resCtx)
 {
-    HCCL_INFO("[InsV2AllGatherSoleExecutor][Orchestrate] Orchestrate Start");
+    HCCL_INFO("[MC2_OPEN_DIAG][InsV2AllGatherSoleExecutor][Orchestrate] Orchestrate Start, file[%s:%d], "
+              "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
+              __FILE__, __LINE__, sizeof(OpParam), offsetof(OpParam, varMemSize),
+              static_cast<unsigned long long>(param.varMemSize), static_cast<u32>(param.opType), param.algName);
     myRank_ = resCtx.topoInfo.userRank;
 
     threads_ = resCtx.threads;

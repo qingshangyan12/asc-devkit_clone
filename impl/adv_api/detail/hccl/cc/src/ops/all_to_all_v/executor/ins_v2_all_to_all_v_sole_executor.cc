@@ -62,8 +62,7 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
     const OpParam &param, const AlgResourceCtxSerializable &resCtx)
 {
-    HCCL_INFO("[InsV2AlltoAllVSoleExecutor][Orchestrate] Orchestrate Start");
-    HCCL_INFO("[MC2_OPEN_DIAG][InsV2AlltoAllVSoleExecutor][Orchestrate] file[%s:%d], "
+    HCCL_INFO("[MC2_OPEN_DIAG][InsV2AlltoAllVSoleExecutor][Orchestrate] Orchestrate Start, file[%s:%d], "
               "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
               __FILE__, __LINE__, sizeof(OpParam), offsetof(OpParam, varMemSize),
               static_cast<unsigned long long>(param.varMemSize), static_cast<u32>(param.opType), param.algName);

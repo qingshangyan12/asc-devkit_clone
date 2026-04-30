@@ -354,6 +354,8 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
     target_compile_options(mc2_server PRIVATE
         $<$<CONFIG:Debug>:-g>
         $<$<CONFIG:Release>:-O3>
+        -fvisibility=hidden
+        -fvisibility-inlines-hidden
         -fstack-protector-all
     )
 
@@ -361,7 +363,7 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
         -Wl,-z,relro
         -Wl,-z,now
         -Wl,-z,noexecstack
-        -Wl,-Bsymbolic-functions
+        -Wl,-Bsymbolic
         $<$<CONFIG:Release>:-s>
     )
 
