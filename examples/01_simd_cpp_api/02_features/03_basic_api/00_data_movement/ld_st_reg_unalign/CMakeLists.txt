@@ -18,6 +18,10 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-2)")
+
+add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+
 add_executable(demo
     ld_st_reg_unalign.asc
 )
