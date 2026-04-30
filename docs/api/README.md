@@ -1,5 +1,5 @@
 # Ascend C API列表<a name="ZH-CN_TOPIC_0000001917094304"></a>
-Ascend C 提供了一套层次化的 API 体系，涵盖了从底层 C 扩展到高阶 C++ 类库的完整能力。它支持开发者以标准 C/C++ 语法为基础，在 AI Core(SIMD/SIMT) 及 AI CPU 等多种编程模型下，灵活实现精细化的内存管理与高效的矢量/矩阵运算。
+Ascend C 提供了一套层次化的 API 体系，涵盖了从底层 C 扩展到高阶 C++ 类库的完整能力。它支持开发者以标准 C/C++ 语法为基础，在 AI Core（SIMD/SIMT） 及 AI CPU 等编程模型下，灵活实现精细化的内存管理与高效的矢量/矩阵运算。
 ## API分类总览<a name="section3119442205518"></a>
 下表展示了 Ascend C API 的总体分类，帮助开发者根据编程模型和功能需求快速定位所需API。
 <a name="table_api_classification"></a>
