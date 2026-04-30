@@ -29,6 +29,14 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct LogicalAndsConfig {
+    bool isReuseSource;
+    int8_t scalarTensorIndex;
+};
+constexpr LogicalAndsConfig DEFAULT_LOGICAL_ANDS_CONFIG = {false, 1};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup LogicalAnds

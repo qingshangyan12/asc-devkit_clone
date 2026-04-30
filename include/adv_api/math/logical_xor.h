@@ -28,6 +28,13 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct LogicalXorConfig {
+    bool isReuseSource;
+};
+constexpr LogicalXorConfig DEFAULT_LOGICAL_XOR_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup LogicalXor

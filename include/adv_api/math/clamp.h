@@ -29,6 +29,13 @@
 #include "kernel_pop_stack_buffer.h"
  
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct ClampConfig {
+    bool isReuseSource;
+};
+constexpr ClampConfig DEFAULT_CLAMP_CONFIG = {false};
+#endif
+
 /* !
  * \brief This function implements replaces numbers greater than scalar with scalar
  * (e.g. ClampMax(2) means to replace numbers greater than 2 with 2 ). For details about the interface description, see
@@ -122,7 +129,7 @@ __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTens
 #endif
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102))
 /* !
  * \brief This function implements replaces numbers greater than min with min and less than max with max
  * (e.g. Clamp(2, 5) means to replace numbers greater than 2 with 2 and less than 5 with 5). For details about the interface description, see

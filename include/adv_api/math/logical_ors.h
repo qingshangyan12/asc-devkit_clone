@@ -29,6 +29,14 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct LogicalOrsConfig {
+    bool isReuseSource;
+    int8_t scalarTensorIndex;
+};
+constexpr LogicalOrsConfig DEFAULT_LOGICAL_ORS_CONFIG = {false, 1};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup LogicalOrs

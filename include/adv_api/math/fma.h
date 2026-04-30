@@ -29,6 +29,13 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct FmaConfig {
+    bool isReuseSource;
+};
+constexpr FmaConfig DEFAULT_FMA_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup Fma
