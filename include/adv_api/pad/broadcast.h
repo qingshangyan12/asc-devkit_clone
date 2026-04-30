@@ -26,6 +26,21 @@
 #include "../../../impl/adv_api/detail/pad/broadcast/broadcast_common_impl.h"
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct BroadcastTiling {
+    uint32_t oriRank;
+    uint32_t rank;
+    uint32_t dstSize;
+    uint32_t srcSize;
+    uint32_t loopNum = 0;
+    uint32_t oriSrcShape[9];
+    uint32_t oriDstShape[9];
+    uint32_t dstShape[9];
+    uint32_t dstStride[9];
+    uint32_t srcStride[10];
+};
+#endif
+
 #pragma begin_pipe(V)
 /*
  * @ingroup Broadcast, now only support dim=1 or dim=2
@@ -58,8 +73,8 @@ __aicore__ inline void Broadcast(const LocalTensor<T>& dstLocal, const LocalTens
     BroadCast<T, dim, axis, isReuseSource>(dstLocal, srcLocal, dstShape, srcShape);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 /*
  * @ingroup GetBroadcastTilingInfo
  * @brief get broadcast tiling information
@@ -73,7 +88,10 @@ template <typename T, int constRank = -1, uint32_t* constDstShape = nullptr, uin
 __aicore__ inline void GetBroadcastTilingInfo(
     uint32_t rank, const uint32_t* dstShape, const uint32_t* srcShape, bool srcInnerPad, BroadcastTiling& tiling)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     GetBroadcastTilingInfoImpl<T, constRank, constDstShape, constSrcShape>(rank, dstShape, srcShape, srcInnerPad, tiling);
+#endif
 }
 
 /*
@@ -90,7 +108,10 @@ template <typename T, int constRank = -1, uint32_t* constDstShape = nullptr, uin
 __aicore__ inline void Broadcast(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t* dstShape,
     const uint32_t* srcShape, BroadcastTiling* tiling)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     BroadcastImpl<T, constRank, constDstShape, constSrcShape, constSrcInnerPad>(dst, src, dstShape, srcShape, tiling);
+#endif
 }
 #endif
 #pragma end_pipe
