@@ -29,6 +29,13 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct BitwiseAndConfig {
+    bool isReuseSource;
+};
+constexpr BitwiseAndConfig DEFAULT_BITWISE_AND_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup BitwiseAnd

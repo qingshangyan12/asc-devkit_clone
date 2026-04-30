@@ -29,6 +29,13 @@
 #endif
 
 namespace AscendC {
+#if !defined(__NPU_ARCH__)
+struct RintConfig {
+    bool isReuseSource;
+};
+constexpr RintConfig DEFAULT_RINT_CONFIG = {false};
+#endif
+
 #pragma begin_pipe(V)
 /*!
  * \ingroup Rint
