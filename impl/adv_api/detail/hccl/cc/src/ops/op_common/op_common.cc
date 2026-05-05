@@ -37,6 +37,7 @@
 #include "op_common.h"
 #include "dpu/kernel_launch.h"
 #include "hcomm_host_profiling_dl.h"
+#include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
 
@@ -976,6 +977,19 @@ HcclResult HcclGetChannelImpl(const u32 level, HcclComm comm, const OpParam &par
         channel.locationType = channelDescNew.remoteEndpoint.loc.locType;
         channel.notifyNum = channelDescNew.notifyNum;
         channel.handle = levelNChannels[idx];
+#ifndef AICPU_COMPILE
+        EndpointDesc localEndpoint = channelDescNew.localEndpoint;
+        using portSizeType = uint32_t;
+        const uint32_t portSizeTypeSize = sizeof(portSizeType);
+        portSizeType portSize = 0;
+        CHK_RET(HcclRankGraphGetEndpointInfo(comm, resCtxHost->topoInfo.userRank, &localEndpoint,
+            ENDPOINT_ATTR_BW_COEFF, portSizeTypeSize, static_cast<void*>(&portSize)));
+        channel.portGroupSize = portSize;
+        CHK_PRT_RET(portSize == 0,
+            HCCL_ERROR("[HcclGetChannelImpl] userRank [%d], portSize [%u] is 0.",
+                resCtxHost->topoInfo.userRank, portSize),
+            HcclResult::HCCL_E_INTERNAL);
+#endif
 
         void* remoteCclBufferAddr;
         uint64_t remoteCclBufferSize;

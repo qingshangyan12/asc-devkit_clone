@@ -29,4 +29,52 @@ u32 GetNHRStepNum(u32 rankSize)
 
     return nSteps;
 }
+
+HcclResult CalcDataSplitByPortGroupCommon(const u64 totalDataCount,
+                                          const u64 dataTypeSize,
+                                          const std::vector<ChannelInfo> &channels,
+                                          std::vector<u64> &elemCountOut,
+                                          std::vector<u64> &sizeOut,
+                                          std::vector<u64> &elemOffset,
+                                          const u32 channelsPerRank)
+{
+    elemCountOut.clear();
+    sizeOut.clear();
+    elemOffset.clear();
+
+    std::vector<u32> portGroups;
+    u32 totalPorts = 0;
+    u32 taskCount = (static_cast<u32>(channels.size()) > channelsPerRank) ? channelsPerRank :
+        static_cast<u32>(channels.size());
+    for (u32 i = 0; i < taskCount; i++) {
+        const auto &ch = channels[i];
+        portGroups.push_back(ch.portGroupSize);
+        totalPorts += ch.portGroupSize;
+        HCCL_INFO("[CalcDataSplitByPortGroup] ch.portGroupSize[%u], totalPorts[%u], channelsPerRank[%u]",
+            ch.portGroupSize, totalPorts, channelsPerRank);
+    }
+
+    u32 channelSize = portGroups.size();
+    u64 accumCount = 0;
+    u64 offset = 0;
+    for (u32 channelIdx = 0; channelIdx < channelSize; channelIdx++) {
+        u64 elemCount = 0;
+        if (channelIdx == channelSize - 1) {
+            elemCount = totalDataCount - accumCount;
+        } else {
+            CHK_PRT_RET(totalPorts == 0,
+                HCCL_ERROR("[CalcDataSplitByPortGroup] totalPorts [%u] is 0.", totalPorts),
+                HcclResult::HCCL_E_INTERNAL);
+            elemCount = static_cast<u64>((totalDataCount * portGroups[channelIdx]) / totalPorts);
+        }
+        elemOffset.push_back(offset);
+        elemCountOut.push_back(elemCount);
+        u64 elemSize = elemCount * dataTypeSize;
+        sizeOut.push_back(elemSize);
+        offset += elemSize;
+        accumCount += elemCount;
+    }
+
+    return HcclResult::HCCL_SUCCESS;
+}
 }
