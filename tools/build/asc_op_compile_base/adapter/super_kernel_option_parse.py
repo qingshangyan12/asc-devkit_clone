@@ -122,45 +122,84 @@ f"[Super Kernel] Invalid compile option: {self.key} option should be non-negativ
 def setup_super_kernel_option_parsers() -> ParserFactory:
     """init super kernel_validate"""
     factory = ParserFactory()
-    
+
     # register validation
     factory.register(CodeTextAlignParser('func-align'))
-    factory.register(EnumParser('preload-code', {
-                                                    'max': SuperKernelPreLoadMode.PreLoadByWhole,
-                                                    'none': SuperKernelPreLoadMode.PreloadNA,
-                                                    'per-func': SuperKernelPreLoadMode.PreloadByAdanvanceStep,
-                                                }))
-    factory.register(EnumParser('early-start', {
-                                                    '0': SuperKernelEarlyStartMode.EarlyStartDisable,
-                                                    '1': SuperKernelEarlyStartMode.EarlyStartEnableV2,
-                                                    '2': SuperKernelEarlyStartMode.EarlyStartV2DisableSubKernel,
-                                                }))
-    factory.register(EnumParser('stream-fusion', {
-                                                    '0': SuperKernelStreamFusionMode.StreamFusionDisable,
-                                                    '1': SuperKernelStreamFusionMode.StreamFusionEnable,
-                                                }))
-    factory.register(EnumParser('debug-dcci-all', {
-                                                    '0': SuperKernelDebugDcciAllMode.DebugDcciAllDisable,
-                                                    '1': SuperKernelDebugDcciAllMode.DebugDcciAllEnable,
-                                                }))
-    factory.register(EnumParser('debug-sync-all', {
-                                                    '0': SuperKernelDebugSyncAllMode.DebugSyncAllDisable,
-                                                    '1': SuperKernelDebugSyncAllMode.DebugSyncAllEnable,
-                                                })) 
+    factory.register(
+        EnumParser(
+            "preload-code",
+            {
+                "max": SuperKernelPreLoadMode.PreLoadByWhole,
+                "none": SuperKernelPreLoadMode.PreloadNA,
+                "per-func": SuperKernelPreLoadMode.PreloadByAdanvanceStep,
+                f"{SuperKernelPreLoadMode.PreLoadByWhole.value}": SuperKernelPreLoadMode.PreLoadByWhole,
+                f"{SuperKernelPreLoadMode.PreloadNA.value}": SuperKernelPreLoadMode.PreloadNA,
+                f"{SuperKernelPreLoadMode.PreloadByAdanvanceStep.value}": SuperKernelPreLoadMode.PreloadByAdanvanceStep,
+            },
+        )
+    )
+    factory.register(
+        EnumParser(
+            "early-start",
+            {
+                "0": SuperKernelEarlyStartMode.EarlyStartDisable,
+                "1": SuperKernelEarlyStartMode.EarlyStartEnableV2,
+                "2": SuperKernelEarlyStartMode.EarlyStartV2DisableSubKernel,
+            },
+        )
+    )
+    factory.register(
+        EnumParser(
+            "stream-fusion",
+            {
+                "0": SuperKernelStreamFusionMode.StreamFusionDisable,
+                "1": SuperKernelStreamFusionMode.StreamFusionEnable,
+            },
+        )
+    )
+    factory.register(
+        EnumParser(
+            "debug-dcci-all",
+            {
+                "0": SuperKernelDebugDcciAllMode.DebugDcciAllDisable,
+                "1": SuperKernelDebugDcciAllMode.DebugDcciAllEnable,
+            },
+        )
+    )
+    factory.register(
+        EnumParser(
+            "debug-sync-all",
+            {
+                "0": SuperKernelDebugSyncAllMode.DebugSyncAllDisable,
+                "1": SuperKernelDebugSyncAllMode.DebugSyncAllEnable,
+            },
+        )
+    )
 
-    factory.register(EnumParser('feed-sync-all', {
-                                                    '0': SuperKernelFeedSyncAllMode.FeedSyncAllDisable,
-                                                    '1': SuperKernelFeedSyncAllMode.FeedSyncAllEnable,
-                                                }))
-    factory.register(EnumParser('profiling', {
-                                                    '0': SuperKernelProfilingMode.ProfilingDisable,
-                                                    '1': SuperKernelProfilingMode.ProfilingEnable,
-                                                }))
+    factory.register(
+        EnumParser(
+            "feed-sync-all",
+            {
+                "0": SuperKernelFeedSyncAllMode.FeedSyncAllDisable,
+                "1": SuperKernelFeedSyncAllMode.FeedSyncAllEnable,
+            },
+        )
+    )
+    factory.register(
+        EnumParser(
+            "profiling",
+            {
+                "0": SuperKernelProfilingMode.ProfilingDisable,
+                "1": SuperKernelProfilingMode.ProfilingEnable,
+            },
+        )
+    )
     factory.register(NonEmptyParser('compile-options'))
     factory.register(NonEmptyParser('strict-scope-check'))
     factory.register(NonEmptyParser('dcci-before-kernel-start'))
     factory.register(NonEmptyParser('dcci-after-kernel-end'))
     factory.register(NonEmptyParser('dcci-disable-on-kernel'))
+    factory.register(NonEmptyParser('aggressive-opt-strategies'))
     factory.register(NumberParser('split-mode'))
     factory.register(BlockNumParser('debug-aic-num'))
     factory.register(BlockNumParser('debug-aiv-num'))
