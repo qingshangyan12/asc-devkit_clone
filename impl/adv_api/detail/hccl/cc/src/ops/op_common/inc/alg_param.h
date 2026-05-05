@@ -150,6 +150,8 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     bool Level0Nhr{false};
     bool Level1Nhr{false};
     bool is2DieFullMesh{false};
+    bool level0PcieMix{false};
+    bool level0BigClosRange{false};
     u32 topoInstDetailsOfLayerSize = 0;
     Level0MeshType level0MeshType;
     NetLayerDetails netLayerDetails;
@@ -180,6 +182,8 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream << Level0Nhr;
         binaryStream << Level1Nhr;
         binaryStream << is2DieFullMesh;
+        binaryStream << level0PcieMix;
+        binaryStream << level0BigClosRange;
         binaryStream << topoInstDetailsOfLayerSize;
         binaryStream << level0MeshType;
         binaryStream << netLayerDetails.netLayerNum;
@@ -224,6 +228,8 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream >> Level0Nhr;
         binaryStream >> Level1Nhr;
         binaryStream >> is2DieFullMesh;
+        binaryStream >> level0PcieMix;
+        binaryStream >> level0BigClosRange;
         binaryStream >> topoInstDetailsOfLayerSize;
         binaryStream >> level0MeshType;
         binaryStream >> netLayerDetails.netLayerNum;

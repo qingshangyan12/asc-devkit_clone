@@ -19,6 +19,7 @@
 
 namespace ops_hccl {
 
+constexpr u32 BIG_CLOS_RANGE = 8;
 constexpr s32 DEVICE_PER_MODULE_A2 = 8;
 enum class HcclNetLayer {
     HCCL_NetLayer_L0 = 0,
@@ -94,9 +95,10 @@ HcclResult ExtractTopoDetails(HcclComm comm, TopoInfoWithNetLayerDetails* topoIn
 
 HcclResult Is2DieFullMesh(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo);
 
+HcclResult IsLevel0PcieMix(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo);
+
 template<typename T>
 bool is_uniform(const std::vector<T>& vec);
 }
 
 #endif
-
