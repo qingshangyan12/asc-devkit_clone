@@ -261,11 +261,30 @@ create_mc2_runtime_one_softlink() {
     local install_path="$1"
     local src_rel_path="$2"
     local dst_rel_path="$3"
+    local required="${4:-true}"
     local src_path="${install_path}/${src_rel_path}"
     local dst_path="${install_path}/${dst_rel_path}"
     local dst_dir="$(dirname "${dst_path}")"
 
+    if [ -e "${dst_path}" ]; then
+        if [ -d "${dst_path}" ] && [ ! -L "${dst_path}" ]; then
+            log "ERROR" "MC2 runtime path ${dst_rel_path} is a directory, cannot create file softlink."
+            return 1
+        fi
+        log "INFO" "MC2 runtime path ${dst_rel_path} already exists, skip creating softlink."
+        return 0
+    fi
+
+    if [ -L "${dst_path}" ]; then
+        log "WARNING" "MC2 runtime softlink ${dst_rel_path} is broken, recreate it."
+        rm -f "${dst_path}"
+    fi
+
     if [ ! -e "${src_path}" ]; then
+        if [ "${required}" = "true" ]; then
+            log "ERROR" "MC2 runtime source ${src_rel_path} does not exist, cannot create ${dst_rel_path}."
+            return 1
+        fi
         log "WARNING" "MC2 runtime source ${src_rel_path} does not exist, skip creating ${dst_rel_path}."
         return 0
     fi
@@ -276,13 +295,12 @@ create_mc2_runtime_one_softlink() {
         return 1
     fi
 
-    rm -f "${dst_path}"
     create_softlink_by_relative_ln "$(dirname "${src_path}")" "${dst_dir}" "$(basename "${src_path}")" "$(basename "${dst_path}")"
     if [ $? -ne 0 ]; then
         log "ERROR" "failed to create MC2 runtime softlink ${dst_rel_path}."
         return 1
     fi
-    log "INFO" "create MC2 runtime softlink ${dst_rel_path} -> ${src_rel_path}."
+    log "WARNING" "MC2 runtime path ${dst_rel_path} was missing, created fallback softlink -> ${src_rel_path}."
     return 0
 }
 
@@ -292,13 +310,17 @@ create_mc2_runtime_softlink() {
         return
     fi
 
-    create_mc2_runtime_one_softlink "${install_path}" "hccl/lib64/libmc2_client.so" "${arch_linux_path}/lib64/libmc2_client.so"
+    create_mc2_runtime_one_softlink "${install_path}" "hccl/include/hccl/hccl.h" "${arch_linux_path}/include/hccl/hccl.h" "true"
     [ $? -ne 0 ] && return 1
-    create_mc2_runtime_one_softlink "${install_path}" "hccl/lib64/libmc2_compat.so" "${arch_linux_path}/lib64/libmc2_compat.so"
+    create_mc2_runtime_one_softlink "${install_path}" "hccl/include/hccl/hccl_mc2.h" "${arch_linux_path}/include/hccl/hccl_mc2.h" "true"
     [ $? -ne 0 ] && return 1
-    create_mc2_runtime_one_softlink "${install_path}" "hccl/Ascend/aicpu/mc2_server.tar.gz" "opp/built-in/op_impl/aicpu/kernel/mc2_server.tar.gz"
+    create_mc2_runtime_one_softlink "${install_path}" "hccl/lib64/libmc2_client.so" "${arch_linux_path}/lib64/libmc2_client.so" "true"
     [ $? -ne 0 ] && return 1
-    create_mc2_runtime_one_softlink "${install_path}" "hccl/built-in/data/op/aicpu/libmc2_server.json" "opp/built-in/op_impl/aicpu/config/libmc2_server.json"
+    create_mc2_runtime_one_softlink "${install_path}" "hccl/lib64/libmc2_compat.so" "${arch_linux_path}/lib64/libmc2_compat.so" "true"
+    [ $? -ne 0 ] && return 1
+    create_mc2_runtime_one_softlink "${install_path}" "hccl/Ascend/aicpu/mc2_server.tar.gz" "opp/built-in/op_impl/aicpu/kernel/mc2_server.tar.gz" "false"
+    [ $? -ne 0 ] && return 1
+    create_mc2_runtime_one_softlink "${install_path}" "hccl/built-in/data/op/aicpu/libmc2_server.json" "opp/built-in/op_impl/aicpu/config/libmc2_server.json" "true"
 }
 
 remove_mc2_runtime_one_softlink() {
@@ -318,6 +340,8 @@ remove_mc2_runtime_softlink() {
         return
     fi
 
+    remove_mc2_runtime_one_softlink "${install_path}" "${arch_linux_path}/include/hccl/hccl.h"
+    remove_mc2_runtime_one_softlink "${install_path}" "${arch_linux_path}/include/hccl/hccl_mc2.h"
     remove_mc2_runtime_one_softlink "${install_path}" "${arch_linux_path}/lib64/libmc2_client.so"
     remove_mc2_runtime_one_softlink "${install_path}" "${arch_linux_path}/lib64/libmc2_compat.so"
     remove_mc2_runtime_one_softlink "${install_path}" "opp/built-in/op_impl/aicpu/kernel/mc2_server.tar.gz"
