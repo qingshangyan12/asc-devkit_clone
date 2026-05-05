@@ -257,6 +257,73 @@ remove_stub_softlink() {
     })
 }
 
+create_mc2_runtime_one_softlink() {
+    local install_path="$1"
+    local src_rel_path="$2"
+    local dst_rel_path="$3"
+    local src_path="${install_path}/${src_rel_path}"
+    local dst_path="${install_path}/${dst_rel_path}"
+    local dst_dir="$(dirname "${dst_path}")"
+
+    if [ ! -e "${src_path}" ]; then
+        log "WARNING" "MC2 runtime source ${src_rel_path} does not exist, skip creating ${dst_rel_path}."
+        return 0
+    fi
+
+    mkdir -p "${dst_dir}"
+    if [ $? -ne 0 ]; then
+        log "ERROR" "failed to create MC2 runtime dir ${dst_dir}."
+        return 1
+    fi
+
+    rm -f "${dst_path}"
+    create_softlink_by_relative_ln "$(dirname "${src_path}")" "${dst_dir}" "$(basename "${src_path}")" "$(basename "${dst_path}")"
+    if [ $? -ne 0 ]; then
+        log "ERROR" "failed to create MC2 runtime softlink ${dst_rel_path}."
+        return 1
+    fi
+    log "INFO" "create MC2 runtime softlink ${dst_rel_path} -> ${src_rel_path}."
+    return 0
+}
+
+create_mc2_runtime_softlink() {
+    local install_path="$1"
+    if [ ! -d "$install_path" ]; then
+        return
+    fi
+
+    create_mc2_runtime_one_softlink "${install_path}" "hccl/lib64/libmc2_client.so" "${arch_linux_path}/lib64/libmc2_client.so"
+    [ $? -ne 0 ] && return 1
+    create_mc2_runtime_one_softlink "${install_path}" "hccl/lib64/libmc2_compat.so" "${arch_linux_path}/lib64/libmc2_compat.so"
+    [ $? -ne 0 ] && return 1
+    create_mc2_runtime_one_softlink "${install_path}" "hccl/Ascend/aicpu/mc2_server.tar.gz" "opp/built-in/op_impl/aicpu/kernel/mc2_server.tar.gz"
+    [ $? -ne 0 ] && return 1
+    create_mc2_runtime_one_softlink "${install_path}" "hccl/built-in/data/op/aicpu/libmc2_server.json" "opp/built-in/op_impl/aicpu/config/libmc2_server.json"
+}
+
+remove_mc2_runtime_one_softlink() {
+    local install_path="$1"
+    local dst_rel_path="$2"
+    local dst_path="${install_path}/${dst_rel_path}"
+
+    if [ -L "${dst_path}" ]; then
+        rm -f "${dst_path}"
+        log "INFO" "remove MC2 runtime softlink ${dst_rel_path}."
+    fi
+}
+
+remove_mc2_runtime_softlink() {
+    local install_path="$1"
+    if [ ! -d "$install_path" ]; then
+        return
+    fi
+
+    remove_mc2_runtime_one_softlink "${install_path}" "${arch_linux_path}/lib64/libmc2_client.so"
+    remove_mc2_runtime_one_softlink "${install_path}" "${arch_linux_path}/lib64/libmc2_compat.so"
+    remove_mc2_runtime_one_softlink "${install_path}" "opp/built-in/op_impl/aicpu/kernel/mc2_server.tar.gz"
+    remove_mc2_runtime_one_softlink "${install_path}" "opp/built-in/op_impl/aicpu/config/libmc2_server.json"
+}
+
 pkg_arch_name="$(get_pkg_arch_name)"
 
 create_compiler_atc_fwkacllib_softlink() {

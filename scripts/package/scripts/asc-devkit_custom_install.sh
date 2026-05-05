@@ -290,6 +290,10 @@ custom_install() {
 
     # create softlinks for stub libs in devlib/linux/${ARCH}
     create_stub_softlink "$common_parse_dir"
+    create_mc2_runtime_softlink "$common_parse_dir"
+    if [ $? -ne 0 ]; then
+        return 1
+    fi
 
     # hccl: 迁移用户自定义数据
     if [ "$hetero_arch" != "y" ]; then
