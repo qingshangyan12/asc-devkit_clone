@@ -1,0 +1,310 @@
+# AscendC → C++ instruction-level mapping
+# Agent knowledge base: maps each Reg::* call to its per-element C++ semantics.
+# The MaskReg parameter `mask` in all operations means "only lanes where mask[i]==1 participate".
+
+instructions:
+  # -------- Arithmetic (binary, tensor-tensor) --------
+  - ascendc: "Reg::Add(dst, src0, src1, mask)"
+    cpp: "dst[i] = src0[i] + src1[i]"
+
+  - ascendc: "Reg::Sub(dst, src0, src1, mask)"
+    cpp: "dst[i] = src0[i] - src1[i]"
+
+  - ascendc: "Reg::Mul(dst, src0, src1, mask)"
+    cpp: "dst[i] = src0[i] * src1[i]"
+
+  - ascendc: "Reg::Div(dst, src0, src1, mask)"
+    cpp: "dst[i] = src0[i] / src1[i]"
+
+  - ascendc: "Reg::Max(dst, src0, src1, mask)"
+    cpp: "dst[i] = max(src0[i], src1[i])"
+
+  - ascendc: "Reg::Min(dst, src0, src1, mask)"
+    cpp: "dst[i] = min(src0[i], src1[i])"
+
+  # -------- Arithmetic (binary, tensor-scalar) --------
+  - ascendc: "Reg::Adds(dst, src, scalar, mask)"
+    cpp: "dst[i] = src[i] + scalar"
+
+  - ascendc: "Reg::Muls(dst, src, scalar, mask)"
+    cpp: "dst[i] = src[i] * scalar"
+
+  - ascendc: "Reg::Maxs(dst, src, scalar, mask)"
+    cpp: "dst[i] = max(src[i], scalar)"
+
+  - ascendc: "Reg::Mins(dst, src, scalar, mask)"
+    cpp: "dst[i] = min(src[i], scalar)"
+
+  # -------- Unary --------
+  - ascendc: "Reg::Abs(dst, src, mask)"
+    cpp: "dst[i] = abs(src[i])"
+
+  - ascendc: "Reg::Neg(dst, src, mask)"
+    cpp: "dst[i] = -src[i]"
+
+  - ascendc: "Reg::Exp(dst, src, mask)"
+    cpp: "dst[i] = exp(src[i])"
+
+  - ascendc: "Reg::Ln(dst, src, mask)"
+    cpp: "dst[i] = log(src[i])"
+
+  - ascendc: "Reg::Not(dst, src, mask)"
+    cpp: "dst[i] = ~src[i]"
+
+  # -------- Fused / Ternary --------
+  - ascendc: "Reg::FusedMulDstAdd(src0, src1, src2, mask)"
+    cpp: "src0[i] = src1[i] * src2[i] + src0[i]"
+
+  - ascendc: "Reg::Axpy(dst, src, scalar, mask)"
+    cpp: "dst[i] = scalar * src[i] + dst[i]"
+
+  # -------- Bitwise --------
+  - ascendc: "Reg::And(dst, src0, src1, mask)"
+    cpp: "dst[i] = src0[i] & src1[i]"
+
+  - ascendc: "Reg::Or(dst, src0, src1, mask)"
+    cpp: "dst[i] = src0[i] | src1[i]"
+
+  - ascendc: "Reg::Xor(dst, src0, src1, mask)"
+    cpp: "dst[i] = src0[i] ^ src1[i]"
+
+  # -------- Selection --------
+  - ascendc: "Reg::Select(dst, a, b, sel_mask)"
+    cpp: "dst[i] = sel_mask[i] ? a[i] : b[i]"
+
+  # -------- Rounding via Truncate --------
+  - ascendc: "Reg::Truncate<T, RoundMode::CAST_CEIL>(dst, src, mask)"
+    cpp: "dst[i] = ceil(src[i])"
+
+  - ascendc: "Reg::Truncate<T, RoundMode::CAST_FLOOR>(dst, src, mask)"
+    cpp: "dst[i] = floor(src[i])"
+
+  - ascendc: "Reg::Truncate<T, RoundMode::CAST_ROUND>(dst, src, mask)"
+    cpp: "dst[i] = round(src[i])"
+
+  - ascendc: "Reg::Truncate<T, RoundMode::CAST_TRUNC>(dst, src, mask)"
+    cpp: "dst[i] = trunc(src[i])"
+
+  - ascendc: "Reg::Truncate<T, RoundMode::CAST_RINT>(dst, src, mask)"
+    cpp: "dst[i] = rint(src[i])"
+
+  # -------- Type conversion --------
+  - ascendc: "Reg::Cast<DstT, SrcT>(dst, src, trait)"
+    cpp: "dst[i] = static_cast<DstT>(src[i])"
+
+  # -------- Data movement --------
+  - ascendc: "Reg::LoadAlign(vreg, addr)"
+    cpp: "vreg = *addr (load vector from memory into register)"
+
+  - ascendc: "Reg::StoreAlign(addr, vreg, mask)"
+    cpp: "if mask[i] then addr[i] = vreg[i] (store with mask)"
+
+  - ascendc: "Reg::Duplicate(vreg, scalar)"
+    cpp: "vreg[i] = scalar (broadcast to all lanes)"
+
+  # -------- Mask creation --------
+  - ascendc: "Reg::UpdateMask<T>(n)"
+    cpp: "mask[i] = (i < n) (first n lanes active)"
+
+  - ascendc: "Reg::CreateMask<T, Reg::MaskPattern::ALL>()"
+    cpp: "mask[i] = 1 (all lanes active)"
+
+  # -------- Mask register operations --------
+  - ascendc: "Reg::MaskAnd(dst, a, b, mask)"
+    cpp: "dst[i] = a[i] & b[i] (per-lane AND of two masks)"
+
+  - ascendc: "Reg::MaskOr(dst, a, b, mask)"
+    cpp: "dst[i] = a[i] | b[i] (per-lane OR of two masks)"
+
+  - ascendc: "Reg::MaskXor(dst, a, b, mask)"
+    cpp: "dst[i] = a[i] ^ b[i] (per-lane XOR of two masks)"
+
+  - ascendc: "Reg::MaskPack(dst, src)"
+    cpp: "pack element-width mask bits to byte-width (T>1B only; no C++ equivalent)"
+
+  - ascendc: "Reg::MaskUnPack(dst, src)"
+    cpp: "unpack byte-width mask to element-width (T>1B only; no C++ equivalent)"
+
+  # -------- Comparison (output to MaskReg) --------
+  - ascendc: "Reg::Compare<T, CMPMODE::EQ>(result_mask, a, b, input_mask)"
+    cpp: "result_mask[i] = (a[i] == b[i])"
+
+  - ascendc: "Reg::Compare<T, CMPMODE::NE>(result_mask, a, b, input_mask)"
+    cpp: "result_mask[i] = (a[i] != b[i])"
+
+  - ascendc: "Reg::Compare<T, CMPMODE::LT>(result_mask, a, b, input_mask)"
+    cpp: "result_mask[i] = (a[i] < b[i])"
+
+  - ascendc: "Reg::Compare<T, CMPMODE::GT>(result_mask, a, b, input_mask)"
+    cpp: "result_mask[i] = (a[i] > b[i])"
+
+  - ascendc: "Reg::Compare<T, CMPMODE::LE>(result_mask, a, b, input_mask)"
+    cpp: "result_mask[i] = (a[i] <= b[i])"
+
+  - ascendc: "Reg::Compare<T, CMPMODE::GE>(result_mask, a, b, input_mask)"
+    cpp: "result_mask[i] = (a[i] >= b[i])"
+
+  - ascendc: "Reg::CompareScalar<T, CMPMODE::EQ>(result_mask, a, scalar, input_mask)"
+    cpp: "result_mask[i] = (a[i] == scalar)"
+
+  - ascendc: "Reg::CompareScalar<T, CMPMODE::NE>(result_mask, a, scalar, input_mask)"
+    cpp: "result_mask[i] = (a[i] != scalar)"
+
+  - ascendc: "Reg::CompareScalar<T, CMPMODE::LT>(result_mask, a, scalar, input_mask)"
+    cpp: "result_mask[i] = (a[i] < scalar)"
+
+  - ascendc: "Reg::CompareScalar<T, CMPMODE::GT>(result_mask, a, scalar, input_mask)"
+    cpp: "result_mask[i] = (a[i] > scalar)"
+
+  - ascendc: "Reg::CompareScalar<T, CMPMODE::LE>(result_mask, a, scalar, input_mask)"
+    cpp: "result_mask[i] = (a[i] <= scalar)"
+
+  - ascendc: "Reg::CompareScalar<T, CMPMODE::GE>(result_mask, a, scalar, input_mask)"
+    cpp: "result_mask[i] = (a[i] >= scalar)"
+
+# -------- Higher-level AscendC API → C++ --------
+# These use LocalTensor<T> and calCount instead of register + mask.
+high_level_api:
+  - ascendc: "Abs(dstTensor, srcTensor, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = abs(src[i])"
+
+  - ascendc: "Neg(dstTensor, srcTensor, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = -src[i]"
+
+  - ascendc: "Add(dstTensor, src0Tensor, src1Tensor, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = src0[i] + src1[i]"
+
+  - ascendc: "Sub(dstTensor, src0Tensor, src1Tensor, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = src0[i] - src1[i]"
+
+  - ascendc: "Mul(dstTensor, src0Tensor, src1Tensor, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = src0[i] * src1[i]"
+
+  - ascendc: "Div(dstTensor, src0Tensor, src1Tensor, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = src0[i] / src1[i]"
+
+  - ascendc: "Max(dstTensor, src0Tensor, src1Tensor, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = max(src0[i], src1[i])"
+
+  - ascendc: "Min(dstTensor, src0Tensor, src1Tensor, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = min(src0[i], src1[i])"
+
+  - ascendc: "Muls(dstTensor, srcTensor, scalar, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = src[i] * scalar"
+
+  - ascendc: "Adds(dstTensor, srcTensor, scalar, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = src[i] + scalar"
+
+  - ascendc: "Truncate<T, RoundMode::CAST_CEIL>(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = ceil(src[i])"
+
+  - ascendc: "Truncate<T, RoundMode::CAST_FLOOR>(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = floor(src[i])"
+
+  - ascendc: "Cast<DstT, SrcT>(dst, src, ...)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = static_cast<DstT>(src[i])"
+
+  - ascendc: "Where(dst, src0, src1, condition, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = condition[i] ? src0[i] : src1[i]"
+
+  - ascendc: "Axpy(dst, src, scalar, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = scalar * src[i] + dst[i]"
+
+  - ascendc: "Fma(dst, src0, src1, src2, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = src0[i] * src1[i] + src2[i]"
+
+  - ascendc: "LogicalAnd(dst, src0, src1, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = (src0[i] != 0) && (src1[i] != 0)"
+
+  - ascendc: "LogicalOr(dst, src0, src1, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = (src0[i] != 0) || (src1[i] != 0)"
+
+  - ascendc: "LogicalNot(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = (src[i] == 0)"
+
+  - ascendc: "IsFinite(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = isfinite(src[i])"
+
+  - ascendc: "IsInf(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = isinf(src[i])"
+
+  - ascendc: "IsNan(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = isnan(src[i])"
+
+  - ascendc: "Sign(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = (src[i]>0) ? 1 : ((src[i]<0) ? -1 : 0)"
+
+  - ascendc: "Pow(dst, src0, src1, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = pow(src0[i], src1[i])"
+
+  - ascendc: "Exp(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = exp(src[i])"
+
+  - ascendc: "Log(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = log(src[i])"
+
+  - ascendc: "Sin(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = sin(src[i])"
+
+  - ascendc: "Cos(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = cos(src[i])"
+
+  - ascendc: "Tan(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = tan(src[i])"
+
+  - ascendc: "Sinh(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = sinh(src[i])"
+
+  - ascendc: "Cosh(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = cosh(src[i])"
+
+  - ascendc: "Tanh(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = tanh(src[i])"
+
+  - ascendc: "Sqrt(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = sqrt(src[i])"
+
+  - ascendc: "BitwiseAnd(dst, src0, src1, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = src0[i] & src1[i]"
+
+  - ascendc: "BitwiseOr(dst, src0, src1, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = src0[i] | src1[i]"
+
+  - ascendc: "BitwiseXor(dst, src0, src1, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = src0[i] ^ src1[i]"
+
+  - ascendc: "BitwiseNot(dst, src, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = ~src[i]"
+
+  - ascendc: "ClampMin(dst, src, minVal, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = max(src[i], minVal)"
+
+  - ascendc: "ClampMax(dst, src, maxVal, calCount)"
+    cpp: "for (i=0; i<calCount; i++) dst[i] = min(src[i], maxVal)"
+
+# -------- Comparison mode enum mapping --------
+cmp_modes:
+  CMPMODE_EQ: "=="
+  CMPMODE_NE: "!="
+  CMPMODE_LT: "<"
+  CMPMODE_GT: ">"
+  CMPMODE_LE: "<="
+  CMPMODE_GE: ">="
+
+# -------- Round mode enum mapping --------
+round_modes:
+  CAST_CEIL: "ceil"
+  CAST_FLOOR: "floor"
+  CAST_ROUND: "round"
+  CAST_TRUNC: "trunc"
+  CAST_RINT: "rint"
+  CAST_NONE: "no rounding"
+
+# -------- Key auxiliary concepts (not instruction mappings, but critical) --------
+conventions:
+  - "MaskReg mask parameter in Reg:: operations: only lanes where mask[i]==1 execute"
+  - "LocalTensor<T> is a high-level view over __ubuf__; offset indexing like dst[offset] returns a sub-tensor"
+  - "PipeBarrier<PIPE_V>() waits for preceding vector ops to complete before subsequent ones (C++ has implicit ordering)"
+  - "Reg::RegTraitNumTwo: used for int64/uint64 on 3510+ — each element occupies two registers"
+  - "half precision: operations often cast half→float, compute on float, cast float→half for better accuracy"
+  - "Tiling: large tensors split into blocks based on buffer size; tail block uses smaller mask"
