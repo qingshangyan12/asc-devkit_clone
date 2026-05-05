@@ -13,7 +13,7 @@ set -e
 
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "full" "enable-sign" "sign-script"
+    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -30,7 +30,6 @@ USE_CXX11_ABI=0
 CMAKE_TOOLCHAIN_FILE_VAL=""
 CHANGED_FILES=""
 CI_MODE=FALSE
-FULL_MODE="false"  # 新增变量，用于控制是否全量构建
 ENABLE_SIGN="false"
 VERSION_INFO="8.5.0"
 CUSTOM_SIGN_SCRIPT="${CURRENT_DIR}/impl/adv_api/detail/hccl/cc/scripts/sign/community_sign_build.py"
@@ -464,10 +463,6 @@ set_options() {
       check_param_test_build_type
       shift
       ;;
-    --full)
-        FULL_MODE="true"
-        shift
-        ;;
     --enable-sign)
         ENABLE_SIGN="true"
         shift
@@ -690,18 +685,6 @@ main() {
   elif [ -n "$TEST_PART" ]; then
     build_test_part
   elif [ -n "${PKG}" ]; then
-    mkdir -p ${BUILD_DEVICE_DIR}
-    cd ${BUILD_DEVICE_DIR}
-    CURRENT_CUSTOM_OPTION="${CUSTOM_OPTION}"
-    DEVICE_C_COMPILER="${ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-gcc"
-    DEVICE_CXX_COMPILER="${ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-g++"
-    CUSTOM_OPTION="${CURRENT_CUSTOM_OPTION} -DFULL_MODE=ON -DDEVICE_MODE=ON -DKERNEL_MODE=ON -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=${DEVICE_C_COMPILER} -DCMAKE_CXX_COMPILER=${DEVICE_CXX_COMPILER} -DCUSTOM_SIGN_SCRIPT=${CUSTOM_SIGN_SCRIPT} -DENABLE_SIGN=${ENABLE_SIGN} -DVERSION_INFO=${VERSION_INFO}"
-    build_device
-    cd ${BUILD_DIR}
-    CUSTOM_OPTION="${CURRENT_CUSTOM_OPTION} -DPACKAGE_OPEN_PROJECT=ON -DKERNEL_MODE=OFF"
-    build_package
-    [ -n "${BUILD_DEVICE_DIR}" ] && rm -rf ${BUILD_DEVICE_DIR}
-  elif [ "${FULL_MODE}" == "true" ]; then
     mkdir -p ${BUILD_DEVICE_DIR}
     cd ${BUILD_DEVICE_DIR}
     CURRENT_CUSTOM_OPTION="${CUSTOM_OPTION}"
