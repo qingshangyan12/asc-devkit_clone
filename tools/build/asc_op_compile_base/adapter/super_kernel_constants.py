@@ -64,10 +64,10 @@ class SubOperatorType(enum.Enum):
 
 class SuperKernelPreLoadMode(enum.Enum):
     """preload Mode"""
-    PreLoadStepByStep = 0
-    PreLoadByWhole = 1
-    PreloadByAdanvanceStep = 2
-    PreloadNA = 3
+    PreLoadByWhole = 0
+    PreloadByAdanvanceStep = 1
+    PreloadNA = 2
+    PreLoadStepByStep = 3
 
 
 class SuperKernelDebugDcciAllMode(enum.Enum):
