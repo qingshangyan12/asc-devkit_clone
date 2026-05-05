@@ -129,6 +129,9 @@ def setup_super_kernel_option_parsers() -> ParserFactory:
                                                     'max': SuperKernelPreLoadMode.PreLoadByWhole,
                                                     'none': SuperKernelPreLoadMode.PreloadNA,
                                                     'per-func': SuperKernelPreLoadMode.PreloadByAdanvanceStep,
+                                                    f'{int(SuperKernelPreLoadMode.PreLoadByWhole)}': SuperKernelPreLoadMode.PreLoadByWhole,
+                                                    f'{int(SuperKernelPreLoadMode.PreloadNA)}': SuperKernelPreLoadMode.PreloadNA,
+                                                    f'{int(SuperKernelPreLoadMode.PreloadByAdanvanceStep)}': SuperKernelPreLoadMode.PreloadByAdanvanceStep,
                                                 }))
     factory.register(EnumParser('early-start', {
                                                     '0': SuperKernelEarlyStartMode.EarlyStartDisable,
@@ -161,6 +164,7 @@ def setup_super_kernel_option_parsers() -> ParserFactory:
     factory.register(NonEmptyParser('dcci-before-kernel-start'))
     factory.register(NonEmptyParser('dcci-after-kernel-end'))
     factory.register(NonEmptyParser('dcci-disable-on-kernel'))
+    factory.register(NonEmptyParser('aggressive-opt-strategies'))
     factory.register(NumberParser('split-mode'))
     factory.register(BlockNumParser('debug-aic-num'))
     factory.register(BlockNumParser('debug-aiv-num'))
