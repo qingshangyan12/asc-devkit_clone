@@ -158,7 +158,7 @@ private:
         AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2202)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         AscendC::LoadData2DParams loadL0AParams;
         loadL0AParams.repeatTimes = aSize * sizeof(fmap_T) / 512;
         loadL0AParams.srcStride = 1;
