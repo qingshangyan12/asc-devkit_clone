@@ -15,26 +15,65 @@
 #endif
 
 /*!
-* \file mmad.h
-* \brief
-*/
-#ifndef INCLUDE_TENSOR_API_ALGORITHM_MMAD_H
-#define INCLUDE_TENSOR_API_ALGORITHM_MMAD_H
-
-#include "impl/tensor_api/algorithm/mmad_impl.h"
+ * \file mmad.h
+ * \brief Defines Mmad algorithm for matrix multiply-add operations.
+ * \brief Provides high-level interface for Cube unit matrix computations.
+ * \brief Supports matrix multiplication with accumulation for AI Core acceleration.
+ * 
+ * \ingroup algorithm Level 0
+ */
 
 namespace AscendC {
 namespace Te {
 
+/*
+ * @ingroup mmad Level 0
+ * @brief Performs matrix multiply-add with compile-time traits.
+ * @brief Executes M = A * B + C (or M = A * B) using Cube unit.
+ * @brief Traits and atom parameters control matrix dimensions and data layout.
+ * @param [in] atomMmad MmadAtom defining matrix multiply parameters
+ * @param [in] params Input matrices (A, B) and optional accumulator (C)
+ * @return void (result stored in output tensor)
+ * @example
+ * // Example: Matrix multiply A * B
+ * auto mmadAtom = MakeMmad<MMAD>();
+ * Mmad(mmadAtom, tensorA, tensorB, tensorC);
+ */
 template <typename Tp, const Tp& traits, typename T, typename... Params>
 __aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Params& ...params);
 
+/*
+ * @ingroup mmad Level 0
+ * @brief Performs matrix multiply-add with runtime atom parameters.
+ * @brief Simplified version without compile-time traits specification.
+ * @brief Executes matrix multiplication using atom parameters provided at runtime.
+ * @param [in] atomMmad MmadAtom defining matrix multiply operation
+ * @param [in] params Input matrices and configuration parameters
+ * @return void
+ * @example
+ * // Example: Mmad with runtime atom
+ * Mmad(mmadAtom, tensorA, tensorB);
+ */
 template <typename T, typename... Params>
 __aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Params& ...params);
 
+/*
+ * @ingroup mmad Level 0
+ * @brief Creates an MmadAtom with specified traits.
+ * @brief Constructs atom operation for matrix multiply-add.
+ * @brief Traits define matrix dimensions (M, N, K) and data formats.
+ * @param [in] traits Mmad operation traits (dimensions, format, etc.)
+ * @return MmadAtom object with specified configuration
+ * @example
+ * // Example 1: Create Mmad atom for 16x16x16 matrix
+ * auto mmadAtom = MakeMmad<MMAD>(16, 16, 16);
+ * // Example 2: Create Mmad atom with NZ format
+ * auto mmadAtom = MakeMmad<MMAD_NZ>();
+ */
 template <typename... Args>
 __aicore__ inline auto MakeMmad(const Args& ...traits);
 
+}
 }
 }
 

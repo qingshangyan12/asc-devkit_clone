@@ -15,26 +15,51 @@
 #endif
 
 /*!
-* \file mmad_atom.h
-* \brief
-*/
-#ifndef INCLUDE_TENSOR_API_ATOM_CUBE_MMAD_ATOM_H
-#define INCLUDE_TENSOR_API_ATOM_CUBE_MMAD_ATOM_H
-
-#include "impl/tensor_api/atom/mmad_atom_impl.h"
+ * \file mmad_atom.h
+ * \brief Defines MmadAtom structure for matrix multiply-add operations.
+ * \brief MmadAtom encapsulates MMAD operation configuration and traits.
+ * \brief Provides atom-level abstraction for Cube unit matrix computations.
+ * 
+ * \ingroup atom Level 0
+ */
 
 namespace AscendC {
 namespace Te {
 
+/*
+ * @ingroup mmad_atom Level 0
+ * @brief Defines traits for MMAD operations.
+ * @brief Encapsulates matrix dimensions (M, N, K) and data formats.
+ * @brief Used for compile-time MMAD configuration.
+ */
 template <typename MmadOperation, typename... MmadOpArgs>
 struct MmadTraits;
 
+/*
+ * @ingroup mmad_atom Level 0
+ * @brief Base structure for MmadAtom.
+ * @brief Atom-level operation for matrix multiply-add.
+ * @brief Combines operation type with execution parameters.
+ */
 template <typename... Args>
 struct MmadAtom;
 
+/*
+ * @ingroup mmad_atom Level 0
+ * @brief MmadAtom with single operation type.
+ * @brief Defines atom for specific MMAD operation.
+ * @param [in] MmadOperation MMAD operation type
+ */
 template <typename MmadOperation>
 struct MmadAtom<MmadOperation>;
 
+/*
+ * @ingroup mmad_atom Level 0
+ * @brief MmadAtom constructed from MmadTraits.
+ * @brief Creates atom from traits specification.
+ * @brief Enables flexible MMAD operation configuration.
+ * @param [in] MmadTraits Traits defining matrix parameters
+ */
 template <typename MmadOperation, typename... Args>
 struct MmadAtom<MmadTraits<MmadOperation, Args...>>;
 

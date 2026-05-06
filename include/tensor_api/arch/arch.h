@@ -14,9 +14,19 @@
 #endif
 
 /*!
-* \file arch.h
-* \brief
-*/
+ * \file arch.h
+ * \brief Architecture-specific operations main entry point.
+ * \brief Provides hardware-specific implementations for Cube and Vector units.
+ * \brief Aggregates architecture-specific operation definitions.
+ * 
+ * \details
+ * Architecture composition:
+ * - arch/cube/mmad_op.h: Cube unit matrix operations
+ * - arch/cube/copy_op.h: Cube unit copy operations
+ * - arch/vector/copy_op.h: Vector unit copy operations
+ * 
+ * \ingroup arch Level 0
+ */
 #ifndef INCLUDE_TENSOR_API_ARCH_ARCH_H
 #define INCLUDE_TENSOR_API_ARCH_ARCH_H
 

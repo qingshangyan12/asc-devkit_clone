@@ -15,9 +15,24 @@
 #endif
 
 /*!
-* \file tensor.h
-* \brief
-*/
+ * \file tensor.h
+ * \brief Tensor API main entry point, includes all tensor-related modules.
+ * \brief This header aggregates core components: tensor types, layouts, algorithms, atoms, and utilities.
+ * \brief Provides unified interface for AI Core tensor operations.
+ * 
+ * \details
+ * Module composition:
+ * - tensor/local_tensor.h: Tensor data structures and construction
+ * - tensor/layout.h: Layout definitions (Shape, Stride, Coord)
+ * - tensor/pointer.h: Pointer types for memory access
+ * - algorithm/copy.h: Data copy operations
+ * - algorithm/mmad.h: Matrix multiply-add operations
+ * - arch/arch.h: Architecture-specific implementations
+ * - atom/atom.h: Atomic operation primitives
+ * - utils/utils.h: Utility functions and helpers
+ * 
+ * \ingroup tensor_api Level 0
+ */
 #ifndef INCLUDE_TENSOR_API_TENSOR_H
 #define INCLUDE_TENSOR_API_TENSOR_H
 

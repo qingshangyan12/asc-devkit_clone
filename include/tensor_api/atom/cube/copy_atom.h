@@ -15,26 +15,51 @@
 #endif
 
 /*!
-* \file copy_atom.h
-* \brief
-*/
-#ifndef INCLUDE_TENSOR_API_ATOM_CUBE_COPY_ATOM_H
-#define INCLUDE_TENSOR_API_ATOM_CUBE_COPY_ATOM_H
-
-#include "impl/tensor_api/atom/copy_atom_impl.h"
+ * \file copy_atom.h
+ * \brief Defines CopyAtom structure for copy operation parameters.
+ * \brief CopyAtom encapsulates copy operation configuration and traits.
+ * \brief Provides atom-level abstraction for data movement operations.
+ * 
+ * \ingroup atom Level 0
+ */
 
 namespace AscendC {
 namespace Te {
 
+/*
+ * @ingroup copy_atom Level 0
+ * @brief Defines traits for copy operations.
+ * @brief Encapsulates copy operation type and parameters.
+ * @brief Used for compile-time copy configuration.
+ */
 template <typename CopyOperation, typename... CopyOpArgs>
 struct CopyTraits;
 
+/*
+ * @ingroup copy_atom Level 0
+ * @brief Base structure for CopyAtom.
+ * @brief Atom-level operation for data copy.
+ * @brief Combines operation type with execution parameters.
+ */
 template <typename... Args>
 struct CopyAtom;
 
+/*
+ * @ingroup copy_atom Level 0
+ * @brief CopyAtom with single operation type.
+ * @brief Defines atom for specific copy operation (e.g., GM2UB).
+ * @param [in] CopyOperation Copy operation type
+ */
 template <typename CopyOperation>
 struct CopyAtom<CopyOperation>;
 
+/*
+ * @ingroup copy_atom Level 0
+ * @brief CopyAtom constructed from CopyTraits.
+ * @brief Creates atom from traits specification.
+ * @brief Enables flexible copy operation configuration.
+ * @param [in] CopyTraits Traits defining copy parameters
+ */
 template <typename... Args>
 struct CopyAtom<CopyTraits<Args...>>;
 

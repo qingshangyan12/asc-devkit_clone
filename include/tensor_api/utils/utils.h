@@ -10,19 +10,22 @@
 
 
 /*!
-* \file utils.h
-* \brief
-*/
-#ifndef INCLUDE_TENSOR_API_UTILS_UTILS_H
-#define INCLUDE_TENSOR_API_UTILS_UTILS_H
-
-#include "include/utils/base/sys_macros.h"
-#include "include/utils/base/sys_constants.h"
-#include "include/utils/common_types.h"
+ * \file utils.h
+ * \brief Defines utility types, enums, and parameter structures.
+ * \brief Provides common types and configuration for tensor operations.
+ * \brief Includes cache modes, MMAD types, and operation parameter structures.
+ * 
+ * \ingroup utils Level 0
+ */
 
 namespace AscendC { 
 namespace Te {
 
+/*
+ * @ingroup utils Level 0
+ * @brief Cache mode enumeration for memory operations.
+ * @brief Defines cache behavior for data access operations.
+ */
 enum class CacheMode : uint8_t {
     CACHE_MODE_NORMAL = 0,	 
     CACHE_MODE_DISABLE = 4,	    
@@ -30,8 +33,19 @@ enum class CacheMode : uint8_t {
     CACHE_MODE_PERSISTENT
 };
 
+/*
+ * @ingroup utils Level 0
+ * @brief MMAD type enumeration for matrix operations.
+ * @brief Defines matrix multiply-add operation variants.
+ */
 enum class MmadType : uint8_t { NORMAL = 0, MX = 1};
 
+/*
+ * @ingroup utils Level 0
+ * @brief MMAD trait structure for operation configuration.
+ * @brief Defines MMAD operation traits and behavior parameters.
+ * @brief Controls FM offset, K-direction alignment, C-matrix source, etc.
+ */
 struct MmadTrait {
     __aicore__ constexpr MmadTrait() {};
 
@@ -51,6 +65,17 @@ struct MmadTrait {
     MmadType mmadType = MmadType::NORMAL; 
 };
 
+/*
+ * @ingroup utils Level 0
+ * @brief MMAD parameters structure for matrix dimensions.
+ * @brief Defines matrix dimensions (M, N, K) for MMAD operations.
+ * @brief Parameters control matrix multiply-add execution.
+ * @param [in] m Matrix M dimension (rows of A matrix)
+ * @param [in] n Matrix N dimension (columns of B matrix)
+ * @param [in] k Matrix K dimension (columns of A / rows of B)
+ * @param [in] unitFlag Unit flag for operation mode
+ * @param [in] cmatrixInitVal Initial value for C matrix accumulation
+ */
 struct MmadParams {
     __aicore__ constexpr MmadParams() {};
 

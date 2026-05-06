@@ -15,9 +15,18 @@
 #endif
 
 /*!
-* \file atom.h
-* \brief
-*/
+ * \file atom.h
+ * \brief Atom operations main entry point, includes copy and mmad atoms.
+ * \brief Provides atom-level operation primitives for hardware acceleration.
+ * \brief Aggregates Cube and Vector atom operation definitions.
+ * 
+ * \details
+ * Atom composition:
+ * - atom/cube/copy_atom.h: Copy atoms for data movement
+ * - atom/cube/mmad_atom.h: MMAD atoms for matrix operations
+ * 
+ * \ingroup atom Level 0
+ */
 #ifndef INCLUDE_TENSOR_API_ATOM_ATOM_H
 #define INCLUDE_TENSOR_API_ATOM_ATOM_H
 

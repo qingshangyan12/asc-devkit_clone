@@ -16,18 +16,43 @@
 
 /*!
  * \file pointer.h
- * \brief
+ * \brief Defines pointer types and construction functions.
+ * \brief Provides memory pointer abstraction for different memory hierarchies.
+ * \brief Supports GM, UB, L1, L0A/B/C pointer types with address qualifiers.
+ * 
+ * \ingroup tensor Level 0
  */
-#ifndef INCLUDE_TENSOR_API_TENSOR_POINTER_H
-#define INCLUDE_TENSOR_API_TENSOR_POINTER_H
-
-#include "impl/tensor_api/tensor/pointer_pattern.h"
 
 namespace AscendC {
 namespace Te {
+
+/*
+ * @ingroup pointer Level 0
+ * @brief Creates a memory pointer with hardware type and traits.
+ * @brief Constructs pointer to specific memory location (GM, UB, L1, etc.).
+ * @brief Trait or type parameter specifies memory type and data type.
+ * @param [in] args Pointer construction arguments (address, offset, etc.)
+ * @return Memory pointer object
+ * @example
+ * // Example: Create GM pointer
+ * auto ptr = MakeMemPtr<GM, half>(address);
+ * // Example: Create UB pointer
+ * auto ptr = MakeMemPtr<UB, half>(bufferAddress);
+ */
 template <typename Hardware, typename TraitOrType, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args);
 
+/*
+ * @ingroup pointer Level 0
+ * @brief Creates a memory pointer with hardware type only.
+ * @brief Simplified pointer construction without trait specification.
+ * @brief Hardware parameter specifies memory hierarchy (GM, UB, L1, L0A/B/C).
+ * @param [in] args Pointer construction arguments
+ * @return Memory pointer object
+ * @example
+ * // Example: Create simple GM pointer
+ * auto ptr = MakeMemPtr<GM>(address);
+ */
 template <typename Hardware, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args);
 
