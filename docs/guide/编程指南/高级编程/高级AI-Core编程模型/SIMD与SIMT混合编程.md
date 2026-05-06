@@ -191,7 +191,7 @@ UB（即Unified Buffer）内存空间总大小为256KB，参考[图3](#fig184031
 
         定义SIMT VF核函数时，[\_\_launch\_bounds\_\_](../../语言扩展层/SIMT-BuiltIn关键字.md#li23861114618)\(thread\_num\)是可选配置，用于在编译期指定核函数启动的最大线程数，如果不配置thread\_num，thread\_num默认为1024。
 
-        SIMD与SIMT混合编程中SIMT VF核函数定义的[\_\_simt\_vf\_\_](../../语言扩展层/SIMD-BuiltIn关键字.md#li611618392141)、\_\_gm\_\_修饰符需要单独进行标识。关于SIMT VF函数编程的相关约束请参考[附录](../../附录/CPP标准支持/语法限制/函数.md)。
+        SIMD与SIMT混合编程中SIMT VF核函数定义的[\_\_simt\_vf\_\_](../../语言扩展层/SIMD-BuiltIn关键字.md#li611618392141)、\_\_gm\_\_修饰符需要单独进行标识。关于SIMT VF函数编程的相关约束请参考[函数约束](../../../技术附录/CPP标准支持/语法限制/函数.md)。
 
         ```
         __simt_vf__ __launch_bounds__(thread_num) inline void simt_vector_function(__ubuf__ float* input, …)
@@ -221,7 +221,7 @@ UB（即Unified Buffer）内存空间总大小为256KB，参考[图3](#fig184031
 
 -   <a name="li8828116155217"></a>SIMD与SIMT混合核函数调用方式：
 
-    1.  核函数的调用请参见[核函数](核函数.md)。执行配置由3个参数决定：
+    1.  核函数的调用请参见[核函数](../../编程模型/AI-Core-SIMD编程/核函数.md)。执行配置由3个参数决定：
         -   numBlocks：设置核函数启用的核数，通过<<<...\>\>\>的方式传入。
         -   dynUBufSize：用于指定动态内存大小。动态内存的申请方式请参见UB内存分配中的[动态内存](#li688923143920)。
         -   stream：类型为aclrtStream，用于维护异步操作的执行顺序，确保在device上按照程序中的代码调用顺序执行。

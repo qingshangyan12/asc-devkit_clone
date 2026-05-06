@@ -63,5 +63,4 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
         **图 2**  通过WaitPreTaskEnd实现并行示意图<a name="fig99271836191110"></a>  
         ![](../../../figures/通过WaitPreTaskEnd实现并行示意图.png "通过WaitPreTaskEnd实现并行示意图")
 
--   Tiling下沉场景，可以通过--op\_relocatable\_kernel\_binary编译选项，开启二进制复用优化，提升编译性能，具体可参考[LINK](../工程化算子开发/算子包编译/算子工程编译.md#li399118293270)。
-
+-   Tiling下沉场景，可以通过--op\_relocatable\_kernel\_binary编译选项，开启二进制复用优化，提升编译性能，具体可参考[LINK](../Aclnn算子工程化开发/算子包编译/算子工程编译.md)。

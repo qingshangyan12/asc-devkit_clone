@@ -1,6 +1,6 @@
 # Kernel侧算子实现<a name="ZH-CN_TOPIC_0000001684846321"></a>
 
-在[核函数](../../编程模型/AI-Core-SIMD编程/核函数.md)章节已经介绍了kernel侧算子核心的实现方法，本章节侧重于介绍接入CANN框架时编程模式和API的使用。
+在[核函数](../../../编程模型/AI-Core-SIMD编程/核函数.md)章节已经介绍了kernel侧算子核心的实现方法，本章节侧重于介绍接入CANN框架时编程模式和API的使用。
 
 ## 自动生成kernel侧算子实现模板<a name="section282118105913"></a>
 
@@ -136,4 +136,3 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
         ...
     }
     ```
-
