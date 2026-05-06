@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 namespace AscendC  {
 template<const auto &config>
 __aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetRankDim() {
+    ASCENDC_HCCL_API_ASSERT(hcclContext_ != nullptr, { return UINT32_MAX; },
+                            "Call GetRankDim failed, ensure InitV2 has been called!");
     return hcclContext_->rankSize;
 }
 
@@ -46,7 +48,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
                             { return HCCL_FAILED; },
                             "Call SetCcTiling failed, ensure Hccl::InitV2 func has been called successfully!");
     const uint32_t opType = (reinterpret_cast<Mc2CcTilingInner *>(tilingBaseAddr_ + offset))->opType;
-    ASCENDC_HCCL_API_ASSERT(opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL),
+    ASCENDC_HCCL_API_ASSERT(opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL),
                             { return HCCL_FAILED; }, "Call SetCcTiling failed, ensure cmdType is valid");
     ccOpTilingDataTable_[opType] = offset;
     for (uint8_t i = 0; i < HCCL_ALG_SUPPORT_NUM; i++) {

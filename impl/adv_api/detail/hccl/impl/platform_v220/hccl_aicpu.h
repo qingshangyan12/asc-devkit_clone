@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 /*!
  * \file hccl_aicpu.h
  * \brief
@@ -171,7 +172,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
         "Call SetCcTiling failed, ensure ccOpTilingData is not nullptr");
     const uint32_t opType = (static_cast<__gm__ Mc2CcTilingInner*>(ccOpTilingData))->opType;
     ASCENDC_HCCL_API_ASSERT(
-        opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
+        opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
         "Call SetCcTiling failed, ensure cmdType is valid");
     KERNEL_LOG(KERNEL_INFO, "CmdType = %d, ccOpTilingData = %lu ", opType, reinterpret_cast<uint64_t>(ccOpTilingData));
     ccOpTilingDataTable_[opType] = reinterpret_cast<uint64_t>(ccOpTilingData);
@@ -186,15 +187,16 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
         "Call SetCcTiling failed, ensure Hccl::InitV2 func has been called successfully!");
     const uint32_t opType = (reinterpret_cast<Mc2CcTilingInner*>(tilingBaseAddr_ + offset))->opType;
     ASCENDC_HCCL_API_ASSERT(
-        opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
+        opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
         "Call SetCcTiling failed, ensure cmdType is valid");
     ccOpTilingDataTable_[opType] = offset;
     return HCCL_SUCCESS;
 }
 
 template<const auto &config>
-__aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetRankDim()
-{
+__aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetRankDim() {
+    ASCENDC_HCCL_API_ASSERT(hcclContext_ != nullptr, { return UINT32_MAX; },
+                            "Call GetRankDim failed, ensure InitV2 or Init has been called!");
     return hcclContext_->rankNum;
 }
 

@@ -7,6 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+
 /*!
  * \file hccl_aicpu_impl.h
  * \brief
@@ -299,6 +300,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
                                     "Message amount exceeds the maximum value when finalize.");
         }
     }
+}
+
+template<const auto &config>
+__aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::GetRankId() {
+    ASCENDC_HCCL_API_ASSERT(hcclContext_ != nullptr, { return UINT32_MAX; },
+                            "Call GetRankDim failed, ensure InitV2 has been called!");
+    return hcclContext_->rankId;
 }
 
 template<const auto &config>
