@@ -24,6 +24,7 @@
 #if defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
 #include "impl/utils/debug/asc_aicore_assert_impl.h"
 #endif
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <string>
 #include <map>
@@ -343,7 +344,7 @@ __aicore__ static __attribute__ ((noinline)) void AssertPrint(__gm__ const char*
 #define ASC_WARNING_MSG__(prompt, expr, fmt, ...)                                                          \
     do {                                                                                                   \
         if (!(expr)) {                                                                                     \
-            AscendC::AssertPrint("%s[WARNING] [CANN_VERSION : %s][TimeStamp : %u] %s:%u: Assertion `%s' " fmt, prompt,\
+            __asc_aicore::printf_impl("%s[WARNING] [CANN_VERSION : %s][TimeStamp : %u] %s:%u: Assertion `%s' " fmt, prompt,\
             (__gm__ const char*)(ASC_DEVKIT_VERSION_STR), static_cast<uint64_t>(ASC_DEVKIT_TIMESTAMP),                 \
             __FILE__, __LINE__, #expr, ##__VA_ARGS__);                                                     \
         }                                                                                                  \
@@ -366,7 +367,7 @@ __aicore__ static __attribute__ ((noinline)) void AssertPrint(__gm__ const char*
 #define ASC_WARNING_MSG__(prompt, expr, fmt, ...)                                                                  \
     do {                                                                                                          \
         if (!(expr)) {                                                                                            \
-            AscendC::AssertPrint("%s[WARNING] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr, ##__VA_ARGS__); \
+            __asc_aicore::printf_impl("%s[WARNING] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr, ##__VA_ARGS__); \
         }                                                                                                         \
     } while (0)
 #endif
