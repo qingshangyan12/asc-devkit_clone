@@ -69,168 +69,98 @@ __aicore__ inline void mem_copy_ub_to_gm_impl(__gm__ T* dst, __ubuf__ T* src, co
 } // namespace __asc_aicore
 
 namespace __asc_simd_vf {
-__simd_callee__ constexpr uint32_t align_print_tlv_len(const uint32_t dataLen)
+template <AscendC::Hardware hardware, typename T, typename U>
+__simd_callee__ inline void set_dump_tlv_info_vf(U& src, __ubuf__ DumpTensorTlv* dumpTlv,
+    uint32_t alignDumpLen, uint32_t desc, uint32_t dumpSize, uint16_t blockIdx)
 {
-    constexpr uint32_t alignBytes = 8;
-    return ((dataLen + (alignBytes - 1)) & ~(alignBytes - 1)) + alignBytes;
-}
-
-template <typename T>
-__simd_callee__ inline void set_scalar_param_vf(__ubuf__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
-{
-    set_scalar_param_vf_impl(paramAddr, paramIdx, scalar);
-}
-
-__simd_callee__ inline void set_string_param_vf(
-    __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, __ubuf__ const char* s, uint32_t& offset)
-{
-    __ubuf__ uint64_t* stringAddr = reinterpret_cast<__ubuf__ uint64_t*>(paramAddr) + paramIdx;
-    __ubuf__ uint8_t* dstStrAddr = paramAddr + offset;
-
-    // write string value offset
-    *stringAddr = static_cast<uint64_t>(offset - sizeof(uint64_t) * paramIdx);
-
-    // write string content: GM -> UBuf
-    uint32_t strLen = get_cstring_len_vf(s);
-    for (uint32_t i = 0; i < strLen; i++) {
-        *(dstStrAddr + i) = *(s + i);
+    dumpTlv->type = static_cast<uint32_t>(DumpType::DUMP_TENSOR);
+    dumpTlv->length = sizeof(DumpTensorTlv) - sizeof(uint32_t[2]) + alignDumpLen;
+    dumpTlv->tensorAddr = 0U; // set in aicore
+    dumpTlv->dataType = static_cast<uint32_t>(get_dump_datatype<T>());
+    dumpTlv->desc = desc;
+    dumpTlv->blockIdx = blockIdx;  // set in aicore
+    dumpTlv->bufferId = static_cast<uint32_t>(0U);
+    dumpTlv->position = static_cast<uint16_t>(hardware);
+    dumpTlv->dim = static_cast<uint32_t>(0U);
+    for (uint32_t i = 0; i < 8; ++i) {
+        dumpTlv->shape[i] = static_cast<uint32_t>(0U);
     }
-    offset += strLen;
+    dumpTlv->resv1 = static_cast<uint32_t>(0U);
+    dumpTlv->dumpSize = dumpSize * sizeof(T);
 }
 
-__simd_callee__ inline void set_param_vf(__ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset)
+template <AscendC::Hardware hardware, typename T, typename U>
+__simd_callee__ inline void set_dump_tlv_data_vf(U& src, __ubuf__ DumpTensorTlv* dumpTlv,
+    uint32_t alignDumpLen, uint32_t dumpSize)
 {
-    (void)paramAddr;
-    (void)paramIdx;
-    (void)offset;
-    return;
-}
+    __ubuf__ T* dumpDstAddr = reinterpret_cast<__ubuf__ T*>(dumpTlv + 1);
 
-template <typename... Args>
-__simd_callee__ inline void set_param_vf(
-    __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, Args&&... args);
-
-template <typename... Args>
-__simd_callee__ inline void set_param_vf_impl(
-    __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, __ubuf__ const char* s, Args&&... args)
-{
-    set_string_param_vf(paramAddr, paramIdx, s, offset);
-    set_param_vf(paramAddr, paramIdx + 1, offset, args...);
-}
-
-template <typename T, typename... Args>
-__simd_callee__ inline void set_param_vf_impl(
-    __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, T scalar, Args&&... args)
-{
-    set_scalar_param_vf(paramAddr, paramIdx, scalar);
-    set_param_vf(paramAddr, paramIdx + 1, offset, args...);
-}
-
-template <typename... Args>
-__simd_callee__ inline void set_param_vf(
-    __ubuf__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, Args&&... args)
-{
-    set_param_vf_impl(paramAddr, paramIdx, offset, args...);
-}
-
-__simd_callee__ inline uint32_t get_args_len_vf(uint32_t& argsNum)
-{
-    (void)argsNum;
-    return 0;
-}
-
-template <typename... Args>
-__simd_callee__ inline uint32_t get_args_len_vf(uint32_t& argsNum, Args&&... args);
-
-template <typename... Args>
-__simd_callee__ inline uint32_t get_args_len_vf_impl(uint32_t& argsNum, __ubuf__ const char* s, Args&&... args)
-{
-    constexpr uint32_t paramSize = sizeof(uint64_t);
-    const uint32_t strLen = get_cstring_len_vf(s);
-    argsNum += 1;
-    return paramSize + strLen + get_args_len_vf(argsNum, args...);
-}
-
-template <typename T, typename... Args>
-__simd_callee__ inline uint32_t get_args_len_vf_impl(uint32_t& argsNum, T scalar, Args&&... args)
-{
-    constexpr uint32_t paramSize = sizeof(uint64_t);
-    argsNum += 1;
-    return paramSize + get_args_len_vf(argsNum, args...);
-}
-
-template <typename... Args>
-__simd_callee__ inline uint32_t get_args_len_vf(uint32_t& argsNum, Args&&... args)
-{
-    return get_args_len_vf_impl(argsNum, args...);
-}
-
-template <typename... Args>
-__simd_callee__ inline uint32_t get_print_tlv_len_simd(uint32_t& argsNum, __ubuf__ const char* fmt, Args&&... args)
-{
-    constexpr uint32_t printInfoLen = sizeof(PrintTlv);
-    const uint32_t argsLen = get_args_len_vf(argsNum, args...);
-    const uint32_t fmtLen = get_cstring_len_vf(fmt);
-    return align_print_tlv_len(printInfoLen + argsLen + fmtLen);
-}
-
-__simd_callee__ inline void set_print_tlv_info_vf(
-    DumpType debugType, __ubuf__ PrintTlv* printTlv, const uint32_t& tlvLen, const uint32_t& argsNum, uint16_t blockIdx)
-{
-    printTlv->type = static_cast<uint32_t>(debugType);
-    printTlv->length = tlvLen - sizeof(uint32_t[2]); // exclude type and length
-    printTlv->blockIdx = blockIdx;  // set in aicore
-    printTlv->resv = static_cast<uint32_t>(0U);
-    printTlv->fmtOffset = (argsNum + 1) * sizeof(uint64_t); // include fmt offset
-}
-
-__simd_callee__ inline void copy_fmt_to_ubuf(__ubuf__ uint8_t* dst, __ubuf__ const char* src, uint32_t len)
-{
-    // Workaround for -O2 optimization issue: copy byte-by-byte to avoid miscompilation
-    for (uint32_t i = 0; i < len; i += 2) {
-        dst[i] = src[i];
-        dst[i + 1] = src[i + 1];
+    // Scalar copy; performance optimization deferred
+    for (uint32_t i = 0; i < dumpSize; i++) {
+        dumpDstAddr[i] = src[i];
     }
 }
 
-template <typename... Args>
-__simd_callee__ inline void set_print_tlv_data_vf(
-    __ubuf__ PrintTlv* printTlv, __ubuf__ const char* fmt, Args&&... args)
+template <AscendC::Hardware hardware, typename T, typename U>
+__simd_callee__ inline void set_dump_tlv_data_reg(U& src, __ubuf__ DumpTensorTlv* dumpTlv,
+    uint32_t alignDumpLen, uint32_t dumpSize)
 {
-    const uint32_t strLen = get_cstring_len_vf(fmt);
-    __ubuf__ uint8_t* paramAddr = reinterpret_cast<__ubuf__ uint8_t*>(printTlv + 1);
-    __ubuf__ uint8_t* fmtAddr = paramAddr + printTlv->fmtOffset - sizeof(uint64_t);
+    __ubuf__ T* dumpDstAddr = reinterpret_cast<__ubuf__ T*>(dumpTlv + 1);
 
-    copy_fmt_to_ubuf(fmtAddr, fmt, strLen);
-
-    uint32_t strParamOffset = printTlv->fmtOffset + strLen;
-    set_param_vf(paramAddr, 0, strParamOffset, args...);
+    // Store interface supports unaligned transfer; dumpDstAddr is likely unaligned
+    uint32_t count = dumpTlv->dumpSize / sizeof(T);
+    Store(dumpDstAddr, src, count);
 }
 
-template <class... Args>
-__simd_callee__ inline void scalar_printf_impl(DumpType debugType, __ubuf__ const char* fmt, Args&&... args)
+template <AscendC::Hardware hardware, typename T, typename U>
+__simd_callee__ inline void asc_dump_impl_reg(U& src, uint32_t desc, uint32_t dumpSize)
 {
-    __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr(0);
+    __ubuf__ BlockVFBufInfo *blockInfo = get_printf_ubuf_addr(0);
+    
+    constexpr uint16_t dataBlockSize = 32;
+    uint32_t alignDumpLen = align_up(dumpSize * sizeof(T), dataBlockSize);
+    uint32_t tlvLen = sizeof(DumpTensorTlv) + alignDumpLen;
 
-    uint32_t argsNum = 0;
-    const uint32_t tlvLen = get_print_tlv_len_simd(argsNum, fmt, args...);
+    __ubuf__ DumpTensorTlv* dumpTlv =
+        (__ubuf__ DumpTensorTlv*)((__ubuf__ uint8_t*)(blockInfo->buffer) + blockInfo->writeLen);
+    set_dump_tlv_info_vf<hardware, T>(src, dumpTlv, alignDumpLen, desc, dumpSize, blockInfo->blockIdx);
+    set_dump_tlv_data_reg<hardware, T>(src, dumpTlv, alignDumpLen, dumpSize);
 
-    // construct PrintTlv TLV in BlockVFBufInfo.buffer (UBuf)
-    __ubuf__ PrintTlv* printTlv =
-        reinterpret_cast<__ubuf__ PrintTlv*>((__ubuf__ uint8_t*)(blockInfo->buffer) + blockInfo->writeLen);
-    set_print_tlv_info_vf(debugType, printTlv, tlvLen, argsNum, blockInfo->blockIdx);
-    set_print_tlv_data_vf(printTlv, fmt, args...);
-
-    blockInfo->magic = SIMD_VF_MAGIC_NUMBER;
+    blockInfo->magic = 0xF0A00B0F;
     blockInfo->writeLen += tlvLen;
     blockInfo->pidx += 1;
 }
 
-template <class... Args>
-__simd_callee__ inline void printf_impl(__ubuf__ const char* fmt, Args&&... args)
+template <AscendC::Hardware hardware, typename T, typename U>
+__simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dumpSize)
+{
+    __ubuf__ BlockVFBufInfo *blockInfo = get_printf_ubuf_addr(0);
+    
+    constexpr uint16_t dataBlockSize = 32;
+    uint32_t alignDumpLen = align_up(dumpSize * sizeof(T), dataBlockSize);
+    uint32_t tlvLen = sizeof(DumpTensorTlv) + alignDumpLen;
+
+    __ubuf__ DumpTensorTlv* dumpTlv =
+        (__ubuf__ DumpTensorTlv*)((__ubuf__ uint8_t*)(blockInfo->buffer) + blockInfo->writeLen);
+    set_dump_tlv_info_vf<hardware, T>(src, dumpTlv, alignDumpLen, desc, dumpSize, blockInfo->blockIdx);
+    set_dump_tlv_data_vf<hardware, T>(src, dumpTlv, alignDumpLen, dumpSize);
+
+    blockInfo->magic = 0xF0A00B0F;
+    blockInfo->writeLen += tlvLen;
+    blockInfo->pidx += 1;
+}
+
+template <typename T, typename U>
+__simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dumpSize)
 {
     enable_asc_diagnostics();
-    scalar_printf_impl(DumpType::DUMP_SCALAR, fmt, args...);
+    asc_dump_impl_reg<AscendC::Hardware::UB, T>(input, desc, dumpSize);
+}
+
+template <typename T>
+__simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dumpSize) {
+    enable_asc_diagnostics();
+    asc_dump_impl<AscendC::Hardware::UB, T>(input, desc, dumpSize);
 }
 } // namespace __asc_simd_vf
 
