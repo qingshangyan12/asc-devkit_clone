@@ -26,9 +26,9 @@
 #if ASCENDC_CPU_DEBUG
 #include "kernel_check.h"
 #endif
-
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_list_tensor_intf_impl.h"
-
+#endif
 namespace AscendC {
 
 class ListTensorDesc;
