@@ -50,6 +50,11 @@ basic_test_one_targets=(
     ascendc_ut_tiling_utils_ascend950pr_9599_AIV_MICRO
     ascendc_ut_tiling_utils_ascend950pr_9599_AIV_SIMT
     ascendc_ut_basic_api_ascend950pr_9599_AIV_FRAMEWORK
+    ascendc_run_all_header_checks
+    ascendc_run_all_header_checks_cpu
+    ascendc_run_all_header_checks_cpu_single
+    ascendc_run_all_header_checks_npu
+    ascendc_run_all_header_checks_npu_single
 )
 
 basic_test_two_targets=(
@@ -79,17 +84,19 @@ basic_test_three_targets=(
     ascendc_ut_tpl_tiling_debug
     ascendc_ut_tpl_tiling_release
     ascendc_ut_aicpu_api
-    ascendc_run_all_header_checks
 )
 
 basic_test_four_targets=(
     ascendc_ut_std_api_ascend910B1
     ascendc_ut_std_api_ascend950pr_9599
+    asc_opc_unittest
     ascendc_pyut_asc_compile_common
     ascendc_pyut_asc_op_compiler
     ascendc_pyut_aclrt_launch_kernel
     ascendc_pyut_compile_trace_log
-    asc_opc_unittest
+    generate_hidden_dat_file_ut
+    install_adapter_api_ut
+    run_all_tests_and_clean
     ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC
 )
 
