@@ -137,7 +137,7 @@ constexpr uint64_t INVALID_TILING_KEY = 0XFFFFFFFFFFFFFFFF;
     #undef ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
     #undef ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
 #endif
- 
+
 template<int dataTypeId>
 struct TypeFromId {
     using type = void;
