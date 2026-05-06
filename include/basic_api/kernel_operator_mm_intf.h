@@ -303,7 +303,7 @@ __aicore__ inline void Mmad(
  * MmadMx                                                                                           *
  * **************************************************************************************************/
 /*
- * @ingroup MmadMx
+ * @ingroup MmadMx 
  * @brief Matrix multiplication and addition in microscaling scenario
  * @param [out] dst output LocalTensor
  * @param [in] fm input LocalTensor
