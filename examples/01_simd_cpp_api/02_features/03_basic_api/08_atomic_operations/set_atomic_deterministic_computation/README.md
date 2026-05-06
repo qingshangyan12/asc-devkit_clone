@@ -3,6 +3,7 @@
 本样例首先介绍在数据搬运随路原子操作的场景下做确定性计算的必要性和具体实现方案，随后分别介绍在单个AIV核、多AIV核和多AIC核场景下如何运用上述方案。
 
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -304,15 +305,6 @@ $$
   <tr><td rowspan="1" align="center">核数(numBlocks)</td><td colspan="4" align="center">4</td></tr>
   </table>
 
-### 2.3 下一步开发计划
-当前存在以下待开发事项：
-<table>
-  <tr><th>事项</th><th>说明</th></tr>
-  <tr><td>Ascend 950PR/Ascend 950DT，待支持</td><td>SCENARIO_NUM=3时，多个AIC做原子操作确定性计算。当前AIC中向GM搬出数据时，调用DataCopy使用了L1-->GM数据通路，该数据通路在Ascend 950PR/Ascend 950DT上不支持。下一步整改计划：当前AIC中向GM搬出数据时，调用FixPipe使用L0C-->GM数据通路。</td></tr>
-  <tr><td rowspan="2">Tpipe编程方式转换为静态tensor编程方式</td><td>SCENARIO_NUM=1和3时，下一步计划整改为静态tensor编程方式。</td></tr>
-  <tr><td>SCENARIO_NUM=2时，多个AIV做原子操作确定性计算。由于IBSet和IBWait以及InitDetermineComputeWorkspace、NotifyNextBlock 和 WaitPreBlock，不支持静态tensor编程方式。</td></tr>
-</table>
-
 ## 编译运行  
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
@@ -336,11 +328,29 @@ $$
   ```bash
   SCENARIO_NUM=1 # 默认演示单个AIV核内的确定性计算
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake .. -DSCENARIO_NUM=${SCENARIO_NUM};make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=${SCENARIO_NUM};make -j;  # 编译工程
+  python3 ../scripts/gen_data.py --scenario_num=${SCENARIO_NUM}
   ./demo                        # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
+    使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  
+  示例如：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j  # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j  # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品、dav-3510 对应 Ascend 950PR/Ascend 950DT |
+- 执行结果
+
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
