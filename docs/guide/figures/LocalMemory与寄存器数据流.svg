@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 350" width="700" height="350">
+  <!-- 背景 -->
+  <rect width="700" height="350" fill="#f8f9fa"/>
+  
+  <!-- 标题 -->
+  <text x="350" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#333">LocalMemory与寄存器数据流</text>
+  
+  <!-- LocalMemory框 -->
+  <rect x="40" y="80" width="160" height="100" rx="5" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+  <text x="120" y="110" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#1976d2">LocalMemory</text>
+  <text x="120" y="135" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#666">(__ubuf__)</text>
+  <text x="120" y="160" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#666">UB Buffer</text>
+  
+  <!-- 寄存器框1 -->
+  <rect x="280" y="80" width="140" height="100" rx="5" fill="#fff3e0" stroke="#f57c00" stroke-width="2"/>
+  <text x="350" y="110" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#f57c00">寄存器</text>
+  <text x="350" y="135" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#666">(vector_half)</text>
+  <text x="350" y="160" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#666">src_reg</text>
+  
+  <!-- 寄存器框2 -->
+  <rect x="500" y="80" width="140" height="100" rx="5" fill="#fff3e0" stroke="#f57c00" stroke-width="2"/>
+  <text x="570" y="110" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#f57c00">寄存器</text>
+  <text x="570" y="135" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#666">(vector_half)</text>
+  <text x="570" y="160" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#666">dst_reg</text>
+  
+  <!-- Load箭头 -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50"/>
+    </marker>
+  </defs>
+  <line x1="200" y1="130" x2="270" y2="130" stroke="#4caf50" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <text x="235" y="70" font-family="Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle" fill="#4caf50">Load</text>
+  
+  <!-- Compute箭头 -->
+  <line x1="420" y1="130" x2="490" y2="130" stroke="#2196f3" stroke-width="3" marker-end="url(#arrowhead2)"/>
+  <defs>
+    <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2196f3"/>
+    </marker>
+  </defs>
+  <text x="455" y="70" font-family="Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle" fill="#2196f3">Compute</text>
+  
+  <!-- Store箭头（弧形） -->
+  <defs>
+    <marker id="arrowhead3" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9c27b0"/>
+    </marker>
+  </defs>
+  <path d="M 570 180 Q 570 260 120 260 Q 120 260 120 180" stroke="#9c27b0" stroke-width="3" fill="none" marker-end="url(#arrowhead3)"/>
+  <text x="350" y="250" font-family="Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle" fill="#9c27b0">Store</text>
+  
+  <!-- 说明文字 -->
+  <text x="120" y="300" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#666">① 数据存储空间</text>
+  <text x="350" y="300" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#666">② 计算单元工作台</text>
+  <text x="570" y="300" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#666">③ 结果暂存区</text>
+  
+  <!-- 底部说明 -->
+  <rect x="40" y="320" width="620" height="25" rx="3" fill="#fafafa" stroke="#ddd" stroke-width="1"/>
+  <text x="350" y="337" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#555">数据流动流程：LocalMemory → Load → 寄存器 → Compute → 寄存器 → Store → LocalMemory</text>
+</svg>
