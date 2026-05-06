@@ -88,6 +88,7 @@ protected:
 
 private:
     int64_t blockIdxBak_;
+    TPipe pipe_;
 };
 
 TEST_F(HcommCommonTestSuite, Aiv_Read)
@@ -100,7 +101,7 @@ TEST_F(HcommCommonTestSuite, Aiv_Read)
         hcomm.Read(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
     EXPECT_EQ(handleId, 0);
     int32_t ret = hcomm.Commit(handleId);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, -1); // 重复执行commit，报错
 }
 
 TEST_F(HcommCommonTestSuite, Aiv_Write)

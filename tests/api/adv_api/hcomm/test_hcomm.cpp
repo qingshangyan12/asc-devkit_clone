@@ -81,6 +81,7 @@ protected:
 
 private:
     int64_t blockIdxBak_;
+    TPipe pipe_;
 };
 
 TEST_F(HcommCommonTestSuite, Aiv_Read)
