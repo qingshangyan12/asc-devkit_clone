@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -460,42 +460,22 @@ __aicore__ inline bool TPipe::InitBufPool(T &bufPool, uint32_t len, U &shareBuf)
 
 template <HardEvent evt> __aicore__ inline TEventID TPipe::AllocEventID()
 {
-    ASCENDC_DEBUG_ASSERT((evt < HardEvent::MAX),
-                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal event %d", static_cast<int32_t>(evt)));
-    auto lastId = sff0(Internal::g_tPipeOccupyEventPool[EventToIndex(evt)]);
-    ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
-            QUE_MAX_EVENT));
-    Internal::g_tPipeOccupyEventPool[EventToIndex(evt)] = sbitset1(Internal::g_tPipeOccupyEventPool[EventToIndex(evt)], lastId);
-    return lastId;
+    return ::AscendC::AllocEventID<evt>();
 }
 
 template <HardEvent evt> __aicore__ inline void TPipe::ReleaseEventID(TEventID id)
 {
-    ASCENDC_DEBUG_ASSERT((id >= 0 && id < QUE_MAX_EVENT),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %d, which should be larger than 0, and smaller than %d",
-            static_cast<int32_t>(id), QUE_MAX_EVENT));
-    ASCENDC_DEBUG_ASSERT((evt != HardEvent::MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "evt cannot be HardEvent::MAX"));
-    Internal::g_tPipeOccupyEventPool[EventToIndex(evt)] = sbitset0(Internal::g_tPipeOccupyEventPool[EventToIndex(evt)], id);
-    return;
+    return ::AscendC::ReleaseEventID<evt>(id);
 }
 
 __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 {
-    auto lastId = sff0(Internal::g_tPipeOccupyEventPool[EventToIndex(evt)]);
-    ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
-            QUE_MAX_EVENT));
-    return lastId;
+    return ::AscendC::FetchEventID(evt);
 }
 
 template <HardEvent evt> __aicore__ inline TEventID TPipe::FetchEventID()
 {
-    auto lastId = sff0(Internal::g_tPipeOccupyEventPool[EventToIndex(evt)]);
-    ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
-            QUE_MAX_EVENT));
-    return lastId;
+    return ::AscendC::FetchEventID<evt>();
 }
 
 template <TPosition pos> __aicore__ inline uint64_t TPipe::GetQueueEndAddress()

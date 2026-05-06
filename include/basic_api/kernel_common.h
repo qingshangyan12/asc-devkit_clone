@@ -30,6 +30,7 @@
 #include "utils/kernel_utils_macros.h"
 #include "kernel_operator_swap_mem_intf.h"
 #include "kernel_operator_sys_var_intf.h"
+#include "kernel_tensor_base.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -101,6 +102,58 @@ __aicore__ inline AscendC::TPipe* GetTPipePtr()
 #endif
 
 namespace AscendC {
+template <HardEvent evt>
+__aicore__ inline TEventID AllocEventID()
+{
+    ASCENDC_ASSERT((evt < HardEvent::MAX),
+                   { KERNEL_LOG(KERNEL_ERROR, "illegal event %d", static_cast<int32_t>(evt)); });
+    auto eventIndex = EventToIndex(evt);
+    auto lastId = sff0(Internal::g_tPipeOccupyEventPool[eventIndex]);
+    ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), {
+        KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
+            QUE_MAX_EVENT);
+    });
+    Internal::g_tPipeOccupyEventPool[eventIndex] =
+        sbitset1(Internal::g_tPipeOccupyEventPool[eventIndex], lastId);
+    return lastId;
+}
+
+template <HardEvent evt>
+__aicore__ inline void ReleaseEventID(TEventID id)
+{
+    ASCENDC_ASSERT((id >= 0 && id < QUE_MAX_EVENT), {
+        KERNEL_LOG(KERNEL_ERROR, "current id is %d, which should be larger than 0, and smaller than %d",
+            static_cast<int32_t>(id), QUE_MAX_EVENT);
+    });
+    ASCENDC_ASSERT((evt != HardEvent::MAX), { KERNEL_LOG(KERNEL_ERROR, "evt cannot be HardEvent::MAX"); });
+    auto eventIndex = EventToIndex(evt);
+    Internal::g_tPipeOccupyEventPool[eventIndex] = sbitset0(Internal::g_tPipeOccupyEventPool[eventIndex], id);
+    return;
+}
+
+__aicore__ inline TEventID FetchEventID(HardEvent evt)
+{
+    auto eventIndex = EventToIndex(evt);
+    auto lastId = sff0(Internal::g_tPipeOccupyEventPool[eventIndex]);
+    ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), {
+        KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
+            QUE_MAX_EVENT);
+    });
+    return lastId;
+}
+
+template <HardEvent evt>
+__aicore__ inline TEventID FetchEventID()
+{
+    auto eventIndex = EventToIndex(evt);
+    auto lastId = sff0(Internal::g_tPipeOccupyEventPool[eventIndex]);
+    ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), {
+        KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
+            QUE_MAX_EVENT);
+    });
+    return lastId;
+}
+
 template <typename T, MaskMode mode = MaskMode::NORMAL>
 __aicore__ static inline void SetVectorMask(const uint64_t maskHigh, const uint64_t maskLow)
 {
