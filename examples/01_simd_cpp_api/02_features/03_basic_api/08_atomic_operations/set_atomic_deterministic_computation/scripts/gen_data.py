@@ -14,9 +14,66 @@
 
 import os
 import numpy as np
+import argparse
 
 
-def gen_golden_data():
+def gen_golden_data_aic(): 
+    input_type = np.dtype("float32")
+    output_type = input_type
+    sync_type = np.dtype("int32")
+    M = 16
+    N = 32
+    K = 16
+
+    os.system("mkdir -p input")
+    os.system("mkdir -p output")
+
+    x = 1.0
+    y = 1e16
+    z = -1e16
+
+    # 第一对: golden = 0
+    x1_gm = np.zeros([M, K], dtype=input_type)
+    x2_gm = np.zeros([K, N], dtype=input_type)
+    golden = np.matmul(x1_gm, x2_gm).astype(output_type)
+    x1_gm.tofile("./input/x1_gm.bin")
+    x2_gm.tofile("./input/x2_gm.bin")
+
+    # 第二对: golden = 1.0
+    x3_gm = np.ones([M, K], dtype=input_type)
+    x4_gm = np.full([K, N], x / K, dtype=input_type)
+    golden = np.matmul(x3_gm, x4_gm).astype(output_type)
+    x3_gm.tofile("./input/x3_gm.bin")
+    x4_gm.tofile("./input/x4_gm.bin")
+
+    # 第三对: golden = 1e16
+    x5_gm = np.ones([M, K], dtype=input_type)
+    x6_gm = np.full([K, N], y / K, dtype=input_type)
+    golden2 = np.matmul(x5_gm, x6_gm).astype(output_type)
+    x5_gm.tofile("./input/x5_gm.bin")
+    x6_gm.tofile("./input/x6_gm.bin")
+
+
+    # 第四对: golden = -1e16
+    x7_gm = np.ones([M, K], dtype=input_type)
+    x8_gm = np.full([K, N], z / K, dtype=input_type)
+    golden3 = np.matmul(x7_gm, x8_gm).astype(output_type)
+    x7_gm.tofile("./input/x7_gm.bin")
+    x8_gm.tofile("./input/x8_gm.bin")
+
+    # 证明浮点数累加不具备交换律
+    right = x + (y + z)
+
+    # 预期输出数据
+    golden = np.array([right] * M * N, dtype=output_type)
+    golden.tofile("./output/golden.bin")
+
+    # 用于核间同步，在多个核之间共享的gm，gm必须初始为0
+    input_sync = np.zeros(256, dtype=sync_type)
+    input_sync.tofile("./input/input_sync.bin")
+
+
+def gen_golden_data_aiv():
     x = 1.0
     y = 1e16
     z = -1e16
@@ -55,6 +112,14 @@ def gen_golden_data():
     input_gm.tofile("./input/input_gm.bin")
     input_sync.tofile("./input/input_sync.bin")
 
-    
+def gen_golden_data(scenario_num):
+    if scenario_num == '3':
+        gen_golden_data_aic()
+    else:
+        gen_golden_data_aiv()
+
 if __name__ == "__main__":
-    gen_golden_data()
+    parser = argparse.ArgumentParser(description='Generate golden data for atomic operations demo')
+    parser.add_argument('--scenario_num', type=str, default='1')
+    args = parser.parse_args()
+    gen_golden_data(args.scenario_num)
