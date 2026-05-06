@@ -74,8 +74,8 @@
 | size | 输入    | 搬运数据大小（字节）。                                                     |
 | n_burst | 输入    | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。                                   |
 | len_burst | 输入    | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。取值范围：[1, 65535]。            |
-| src_gap | 输入    | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。  |
-| dst_gap | 输入    | 目的操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
+| src_stride | 输入    | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。  |
+| dst_stride | 输入    | 目的操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
 
 ## 返回值说明
 
@@ -97,5 +97,14 @@ PIPE_MTE2
 //total_length指参与搬运的数据总长度。
 constexpr uint64_t total_length = 128;
 __cbuf__ half dst[total_length];
-asc_copy_gm2l1((__cbuf__ void*)dst, src, n_burst, len_burst, src_stride, dst_stride);
+__gm__ half src[total_length];
+// 连续搬运的数据块数量
+constexpr uint16_t n_burst = 1;
+// 连续搬运的数据块长度，此处为512个half元素
+constexpr uint16_t len_burst = 512 * sizeof(half) / 32;
+// 源操作数做连续搬运
+constexpr uint16_t src_stride = 0;
+// 目的操作数连续排布
+constexpr uint16_t dst_stride = 0;
+asc_copy_gm2l1((__cbuf__ void*)dst, (__gm__ void*)src, n_burst, len_burst, src_stride, dst_stride);
 ```
