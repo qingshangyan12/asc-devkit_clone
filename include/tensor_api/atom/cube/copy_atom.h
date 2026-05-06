@@ -1,23 +1,25 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
-
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
 #endif
 
-/*!
-* \file copy_atom.h
-* \brief
-*/
+/**
+ * @file copy_atom.h
+ * @brief CopyAtom for data movement operations.
+ * 
+ * @details
+ * Template structures for configuring copy operations between memory spaces.
+ */
 #ifndef INCLUDE_TENSOR_API_ATOM_CUBE_COPY_ATOM_H
 #define INCLUDE_TENSOR_API_ATOM_CUBE_COPY_ATOM_H
 
@@ -26,17 +28,33 @@
 namespace AscendC {
 namespace Te {
 
+/**
+ * @brief Copy traits for operation configuration.
+ * 
+ * @tparam CopyOperation Copy operation type (e.g., CopyL0C2GM)
+ * @tparam CopyOpArgs Additional traits (e.g., FixpipeTraitDefault)
+ * 
+ * @example
+ * CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>
+ */
 template <typename CopyOperation, typename... CopyOpArgs>
 struct CopyTraits;
 
+/**
+ * @brief Copy atom for data movement.
+ * 
+ * @details
+ * Encapsulates copy operation and traits for data transfer.
+ * 
+ * @tparam Args Operation and trait types
+ * 
+ * @example
+ * // Create CopyAtom for L0C to GM
+ * auto atom = CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{};
+ * atom.Call(dstTensor, srcTensor);
+ */
 template <typename... Args>
 struct CopyAtom;
-
-template <typename CopyOperation>
-struct CopyAtom<CopyOperation>;
-
-template <typename... Args>
-struct CopyAtom<CopyTraits<Args...>>;
 
 } // namespace Te
 } // namespace AscendC
