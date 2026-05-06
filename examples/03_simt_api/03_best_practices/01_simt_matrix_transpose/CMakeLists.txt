@@ -15,8 +15,14 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+set(SCENARIO_NUM "3" CACHE STRING "Case type to run (0-3)")
+
 add_executable(matrix_transpose
     matrix_transpose.asc
+)
+
+target_compile_definitions(matrix_transpose PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
 )
 
 # ======================================================================================
