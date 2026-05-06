@@ -191,22 +191,71 @@ __aicore__ inline void ReduceRepeatCommon(const LocalTensor<U>& dst, const Local
     const MaskType mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride, ReduceOrder order)
 {
+    using SrcPrimType = PrimT<T>;
+    using DstPrimType = PrimT<U>;
     static_assert((SupportEnum<reduceType, ReduceType::SUM, ReduceType::MAX, ReduceType::MIN>()),
         "Invalid reduceType for ReduceRepeat, only ReduceType::SUM, ReduceType::MAX and ReduceType::MIN are supported.");
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
-    static_assert((reduceType == ReduceType::SUM || Std::is_same_v<T, U>),
+    static_assert((reduceType == ReduceType::SUM || Std::is_same_v<SrcPrimType, DstPrimType>),
         "ReduceRepeat for MAX/MIN only supports identical src type (T) and dst type (U) for current NPU_ARCH.");
 #else
-    static_assert(Std::is_same_v<T, U>,
+    static_assert(Std::is_same_v<SrcPrimType, DstPrimType>,
         "ReduceRepeat only supports identical src type (T) and dst type (U) for current NPU_ARCH.");
 #endif
-    if constexpr (reduceType == ReduceType::SUM) {
-        // U is auto derived when __NPU_ARCH__ is 3510 / 5102 / 3003 / 3113
-        WholeReduceSum<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
-    } else if constexpr (reduceType == ReduceType::MAX) {
-        WholeReduceMax<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckWholeReduceCommonParams<T>(dst, src, repeatTime, order, "ReduceRepeat");
+    if constexpr (Std::is_same_v<MaskType, int32_t>) {
+        CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReduceRepeat");
     } else {
-        WholeReduceMin<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+        CheckMaskArray<SrcPrimType, isSetMask>(mask, "ReduceRepeat");
+    }
+#endif
+    if constexpr (reduceType == ReduceType::SUM) {
+#if ASCENDC_CPU_DEBUG
+        MaskSetter::Instance().SetMask(isSetMask);
+        if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride, "WholeReduceSum")) {
+            ASCENDC_REPORT_CHECK_ERROR("ReduceRepeat", 
+                (Std::is_same_v<MaskType, int32_t> ? KernelFuncType::MASK_COUNT_MODE : KernelFuncType::MASK_BIT_MODE));
+        }
+#endif
+        // DstPrimType is auto derived when __NPU_ARCH__ is 3510 / 5102 / 3003 / 3113
+        WholeReduceSumImpl<SrcPrimType, isSetMask>((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(),
+            mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    } else {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
+    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
+    (__NPU_ARCH__ == 5102) ||                        \
+    (__NPU_ARCH__ == 3003) ||                        \
+    (__NPU_ARCH__ == 3113) ||                        \
+    (__NPU_ARCH__ == 3510))
+        ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "ReduceRepeat");
+#elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
+        ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "ReduceRepeat");
+#endif
+#if ASCENDC_CPU_DEBUG
+        MaskSetter::Instance().SetMask(isSetMask);
+#if (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+        if (!CheckFunVecReduceOtherWhl(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
+            order, "WholeReduceMax")) {
+            ASCENDC_REPORT_CHECK_ERROR("ReduceRepeat", 
+                (Std::is_same_v<MaskType, int32_t> ? KernelFuncType::MASK_COUNT_MODE : KernelFuncType::MASK_BIT_MODE));
+        }
+#endif
+#if (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+        if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
+            "WholeReduceMax")) {
+            ASCENDC_REPORT_CHECK_ERROR("ReduceRepeat", 
+                (Std::is_same_v<MaskType, int32_t> ? KernelFuncType::MASK_COUNT_MODE : KernelFuncType::MASK_BIT_MODE));
+        }
+#endif
+#endif
+        if constexpr (reduceType == ReduceType::MAX) {
+            WholeReduceMaxImpl<SrcPrimType, isSetMask>((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(),
+                mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+        } else {
+            WholeReduceMinImpl<SrcPrimType, isSetMask>((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(),
+                mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+        }
     }
 }
 }  // namespace Internal
@@ -467,50 +516,21 @@ __aicore__ inline void RepeatReduceSum(const LocalTensor<T>& dst, const LocalTen
  * @param [in] srcRepStride src repeat stride
  */
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
-template <typename T, bool isSetMask, typename U>
+template <typename T, bool isSetMask = true, typename U = T>
 __aicore__ inline void WholeReduceSum(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecReduceInfo(dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceSum");
-#endif
-    using DstPrimType = PrimT<U>;
-    using SrcPrimType = PrimT<T>;
-    ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceSum");
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        "WholeReduceSum")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceSum", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
-    WholeReduceSumImpl<SrcPrimType, isSetMask, DstPrimType>((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(), mask,
-        repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    ReduceRepeat<ReduceType::SUM, T, U, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 #else
 // WholeReduceSum has been updated, please use ReduceRepeat instead.
-template <typename T, bool isSetMask>
+template <typename T, bool isSetMask = true>
 __aicore__ inline void WholeReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecReduceInfo(dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceSum");
-#endif
-    using PrimType = PrimT<T>;
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckWholeReduceCommonParams<T>(dst, src, repeatTime, "WholeReduceSum");
-    CheckMaskArray<PrimType, isSetMask>(mask, "WholeReduceSum");
-#endif
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride, "WholeReduceSum")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceSum", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
-    WholeReduceSumImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask,
-        repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    ReduceRepeat<ReduceType::SUM, T, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 #endif
 
@@ -526,217 +546,59 @@ __aicore__ inline void WholeReduceSum(const LocalTensor<T>& dst, const LocalTens
  * @param [in] srcBlkStride src block stride
  * @param [in] srcRepStride src repeat stride
  */
-template <typename T, bool isSetMask>
+template <typename T, bool isSetMask = true>
 __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
-    const int32_t srcRepStride, ReduceOrder order)
+    const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecReduceInfo(dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMax");
-#endif
-    using PrimType = PrimT<T>;
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckWholeReduceCommonParams<T>(dst, src, repeatTime, order, "WholeReduceMax");
-    CheckMaskArray<PrimType, isSetMask>(mask, "WholeReduceMax");
-#endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
-    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
-    (__NPU_ARCH__ == 5102) ||                        \
-    (__NPU_ARCH__ == 3003) ||                        \
-    (__NPU_ARCH__ == 3113) ||                        \
-    (__NPU_ARCH__ == 3510))
-    ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMax");
-#elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
-    ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "WholeReduceMax");
-#endif
-#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOtherWhl(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        order, "WholeReduceMax")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMax", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
-#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        "WholeReduceMax")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMax", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
-    WholeReduceMaxImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask,
-        repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
-}
-
-/*
- * @ingroup WholeReduceMin
- * @brief Index of the minimum value of all elements in each repeat
- * @param [out] dst output LocalTensor
- * @param [in] src input LocalTensor
- * @param [in] repeatTime repeat times
- * @param [in] mask[]/maskcount mask array/count
- * @param [in] dstRepStride dst repeat stride
- * @param [in] srcBlkStride src block stride
- * @param [in] srcRepStride src repeat stride
- */
-template <typename T, bool isSetMask, typename MaskType>
-__aicore__ inline void WholeReduceMinCommon(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    MaskType mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
-    const int32_t srcRepStride, ReduceOrder order)
-{
-    using PrimType = PrimT<T>;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
-    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
-    (__NPU_ARCH__ == 5102) ||                        \
-    (__NPU_ARCH__ == 3003) ||                        \
-    (__NPU_ARCH__ == 3113) ||                        \
-    (__NPU_ARCH__ == 3510))
-    ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMin");
-#elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
-    ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "WholeReduceMin");
-#endif
-#if ASCENDC_CPU_DEBUG && __NPU_ARCH__ == 3002
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        "WholeReduceMin")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMin", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
-    WholeReduceMinImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-        mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+    ReduceRepeat<ReduceType::MAX, T, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
 // WholeReduceMin has been updated, please use ReduceRepeat instead.
-template <typename T, bool isSetMask>
+template <typename T, bool isSetMask = true>
 __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
-    const int32_t srcRepStride, ReduceOrder order)
+    const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecReduceInfo(dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMin");
-#endif
-    using PrimType = PrimT<T>;
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckWholeReduceCommonParams<T>(dst, src, repeatTime, order, "WholeReduceMin");
-    CheckMaskArray<PrimType, isSetMask>(mask, "WholeReduceMin");
-#endif
-#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOtherWhl(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        order, "WholeReduceMin")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMin", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
-    WholeReduceMinCommon<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+    ReduceRepeat<ReduceType::MIN, T, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 // WholeReduceSum has been updated, please use ReduceRepeat instead.
-template <typename T, bool isSetMask, typename U>
+template <typename T, bool isSetMask = true, typename U = T>
 __aicore__ inline void WholeReduceSum(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecReduceInfo(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceSum");
-#endif
-    using DstPrimType = PrimT<U>;
-    using SrcPrimType = PrimT<T>;
-    ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceSum");
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        "WholeReduceSum")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceSum", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-    WholeReduceSumImpl<SrcPrimType, isSetMask, DstPrimType>((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(),
-        mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    ReduceRepeat<ReduceType::SUM, T, U, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 #else
 // WholeReduceSum has been updated, please use ReduceRepeat instead.
-template <typename T, bool isSetMask>
+template <typename T, bool isSetMask = true>
 __aicore__ inline void WholeReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecReduceInfo(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceSum");
-#endif
-    using PrimType = PrimT<T>;
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckWholeReduceCommonParams<T>(dst, src, repeatTime, "WholeReduceSum");
-    CheckMaskValue<PrimType, isSetMask>(mask, "WholeReduceSum");
-#endif
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride, "WholeReduceSum")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceSum", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-    WholeReduceSumImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-        mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+    ReduceRepeat<ReduceType::SUM, T, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 #endif
 
 // WholeReduceMax has been updated, please use ReduceRepeat instead.
-template <typename T, bool isSetMask>
+template <typename T, bool isSetMask = true>
 __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
-    const int32_t srcRepStride, ReduceOrder order)
+    const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecReduceInfo(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMax");
-#endif
-    using PrimType = PrimT<T>;
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckWholeReduceCommonParams<T>(dst, src, repeatTime, order, "WholeReduceMax");
-    CheckMaskValue<PrimType, isSetMask>(mask, "WholeReduceMax");
-#endif
-#if __NPU_ARCH__ == 2201
-    ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMax");
-#elif __NPU_ARCH__ == 2002
-    ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "WholeReduceMax");
-#endif
-#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOtherWhl(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        order, "WholeReduceMax")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMax", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        "WholeReduceMax")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMax", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
-    WholeReduceMaxImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-        mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+    ReduceRepeat<ReduceType::MAX, T, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
 // WholeReduceMin has been updated, please use ReduceRepeat instead.
-template <typename T, bool isSetMask>
+template <typename T, bool isSetMask = true>
 __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
-    const int32_t srcRepStride, ReduceOrder order)
+    const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecReduceInfo(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMin");
-#endif
-    using PrimType = PrimT<T>;
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckWholeReduceCommonParams<T>(dst, src, repeatTime, order, "WholeReduceMin");
-    CheckMaskValue<PrimType, isSetMask>(mask, "WholeReduceMin");
-#endif
-#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOtherWhl(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        order, "WholeReduceMin")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMin", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-    WholeReduceMinCommon<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+    ReduceRepeat<ReduceType::MIN, T, T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
 /* **************************************** Reduce Interface ****************************************** */
