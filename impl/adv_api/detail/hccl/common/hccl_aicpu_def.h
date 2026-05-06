@@ -7,6 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+
 /*!
  * \file hccl_aicpu_def.h
  * \brief
@@ -79,7 +80,7 @@ public:
 
     __aicore__ inline GM_ADDR GetWindowsOutAddr(uint32_t rankId);
 
-    __aicore__ inline uint32_t GetRankId() { return hcclContext_->rankId; };
+    __aicore__ inline uint32_t GetRankId();
 
     __aicore__ inline uint32_t GetRankDim();
 
