@@ -97,5 +97,14 @@ PIPE_MTE2
 //total_length指参与搬运的数据总长度。
 constexpr uint64_t total_length = 128;
 __cbuf__ half dst[total_length];
+__gm__ half src[total_length];
+// 连续搬运的数据块数量
+constexpr uint16_t n_burst = 1;
+// 连续搬运的数据块长度，此处为512个half元素
+constexpr uint16_t len_burst = 512 * sizeof(half) / 32;
+// 源操作数做连续搬运
+constexpr uint16_t = 0;
+// 目的操作数连续排布
+constexpr uint16_t = 0;
 asc_copy_gm2l1((__cbuf__ void*)dst, src, n_burst, burst_len, src_stride, dst_stride);
 ```
