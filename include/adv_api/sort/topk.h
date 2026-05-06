@@ -56,9 +56,6 @@ constexpr TopKConfig defaultTopKConfig = { TopKAlgo::MERGE_SORT, TopKOrder::UNSE
 
 namespace AscendC {
 #pragma begin_pipe(V)
-#if !defined(__NPU_ARCH__) || \
-    (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113))
 /*
  * @ingroup TopK
  * @brief Get the top k maximum or minimum values and their corresponding indices of the last dimension.
@@ -228,7 +225,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
     }
 #endif
 }
-#endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 /*
  * @ingroup TopK
@@ -268,7 +264,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
     CHECK_FUNC_HIGHLEVEL_API(TopK, (T, isInitIndex, isHasfinish, isReuseSrc, topkMode), (
         dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, tmpLocal, k, tilling, topKInfo, isLargest));
 
@@ -280,7 +275,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
         TopKNSmall<T, isInitIndex, isHasfinish, isReuseSrc>(dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal,
             finishLocal, tmpLocal, k, tilling, topKInfo, isLargest);
     }
-#endif
 }
 
 /*
@@ -320,7 +314,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
         return;
     }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
     CHECK_FUNC_HIGHLEVEL_API(TopK, (T, isInitIndex, isHasfinish, isReuseSrc, topkMode), (
         dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest));
 
@@ -332,7 +325,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
         TopKNSmall<T, isInitIndex, isHasfinish, isReuseSrc>(
             dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest);
     }
-#endif
 }
 #endif
 
