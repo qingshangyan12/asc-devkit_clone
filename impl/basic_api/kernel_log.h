@@ -24,6 +24,9 @@
 #if defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
 #include "impl/utils/debug/asc_aicore_assert_impl.h"
 #endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002)
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
+#endif
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <string>
 #include <map>
@@ -340,14 +343,18 @@ __aicore__ static __attribute__ ((noinline)) void AssertPrint(__gm__ const char*
             trap();                                                                                        \
         }                                                                                                  \
     } while (0)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002)
 #define ASC_WARNING_MSG__(prompt, expr, fmt, ...)                                                          \
     do {                                                                                                   \
         if (!(expr)) {                                                                                     \
-            AscendC::AssertPrint("%s[WARNING] [CANN_VERSION : %s][TimeStamp : %u] %s:%u: Assertion `%s' " fmt, prompt,\
+            __asc_aicore::printf_impl("%s[WARNING] [CANN_VERSION : %s][TimeStamp : %u] %s:%u: Assertion `%s' " fmt, prompt,\
             (__gm__ const char*)(ASC_DEVKIT_VERSION_STR), static_cast<uint64_t>(ASC_DEVKIT_TIMESTAMP),                 \
             __FILE__, __LINE__, #expr, ##__VA_ARGS__);                                                     \
         }                                                                                                  \
     } while (0)
+#else
+#define ASC_WARNING_MSG__(prompt, expr, fmt, ...) do {} while (0)
+#endif
 #else
 #define ASSERT_MSG(expr, fmt, ...)                                                                                \
     do {                                                                                                          \
@@ -363,12 +370,16 @@ __aicore__ static __attribute__ ((noinline)) void AssertPrint(__gm__ const char*
             trap();                                                                                               \
         }                                                                                                         \
     } while (0)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002)
 #define ASC_WARNING_MSG__(prompt, expr, fmt, ...)                                                                  \
     do {                                                                                                          \
         if (!(expr)) {                                                                                            \
-            AscendC::AssertPrint("%s[WARNING] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr, ##__VA_ARGS__); \
+            __asc_aicore::printf_impl("%s[WARNING] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr, ##__VA_ARGS__); \
         }                                                                                                         \
     } while (0)
+#else
+#define ASC_WARNING_MSG__(prompt, expr, fmt, ...) do {} while (0)
+#endif
 #endif
 #endif
 
