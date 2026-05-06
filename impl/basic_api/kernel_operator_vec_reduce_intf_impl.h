@@ -46,9 +46,12 @@
 #include "kernel_npu_debug.h"
 
 namespace AscendC {
+#pragma begin_pipe(V)
 
+namespace Internal {
 // Reduce base checks: dtype, repeatTime, position, src alignment
 // Shared by ReduceDataBlock and ReduceRepeat (both maskCount and maskBit overloads)
+// only support same src and dst type
 template <typename T>
 __aicore__ inline void CheckReduceBaseParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const int32_t repeatTime, const __gm__ char* apiName)
@@ -65,19 +68,19 @@ __aicore__ inline void CheckReduceBaseParams(const LocalTensor<T>& dst, const Lo
 
 // ReduceDataBlock common checks: dtype, repeatTime, position, alignment
 // Used by: ReduceDataBlock (both maskCount and maskBit overloads)
-template <typename T>
-__aicore__ inline void CheckReduceDataBlockParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+template <typename T, typename U = T>
+__aicore__ inline void CheckReduceDataBlockParams(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const int32_t repeatTime, const __gm__ char* apiName)
 {
     CheckReduceBaseParams<T>(dst, src, repeatTime, apiName);
-    using PrimType = PrimT<T>;
-    CheckTensorAlignment(dst, 8 * sizeof(PrimType), "dst", apiName);  // half: 16B, float: 32B
+    using DstPrimType = PrimT<U>;
+    CheckTensorAlignment(dst, 8 * sizeof(DstPrimType), "dst", apiName);  // half: 16B, float: 32B
 }
 
 // ReduceRepeat common checks: dtype, repeatTime, position, alignment (with order)
 // Used by: ReduceRepeat<MAX,MIN> (both maskCount and maskBit overloads)
-template <typename T>
-__aicore__ inline void CheckReduceRepeatCommonParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+template <typename T, typename U = T>
+__aicore__ inline void CheckReduceRepeatCommonParams(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const int32_t repeatTime, ReduceOrder order, const __gm__ char* apiName)
 {
 #if __NPU_ARCH__ == 3510
@@ -88,15 +91,22 @@ __aicore__ inline void CheckReduceRepeatCommonParams(const LocalTensor<T>& dst, 
 #else
     CheckReduceBaseParams<T>(dst, src, repeatTime, apiName);
 #endif
-    CheckValueRange<int>(static_cast<int>(order), 0, 3, "order", apiName);
-    using PrimType = PrimT<T>;
-    CheckTensorAlignment(dst, 2 * sizeof(PrimType), "dst", apiName);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                         \
+    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                         \
+    (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||                         \
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+        CheckValueRange<int>(static_cast<int>(order), 0, 3, "order", apiName);
+#elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
+        CheckValueRange<int>(static_cast<int>(order), 0, 1, "order", apiName);
+#endif
+    using DstPrimType = PrimT<U>;
+    CheckTensorAlignment(dst, 2 * sizeof(DstPrimType), "dst", apiName);
 }
 
 // ReduceRepeat common checks: dtype, repeatTime, position, alignment (without order)
 // Used by: ReduceRepeat<Sum> (both maskCount and maskBit overloads)
-template <typename T>
-__aicore__ inline void CheckReduceRepeatCommonParams(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+template <typename T, typename U = T>
+__aicore__ inline void CheckReduceRepeatCommonParams(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const int32_t repeatTime, const __gm__ char* apiName)
 {
 #if __NPU_ARCH__ == 3510
@@ -107,13 +117,11 @@ __aicore__ inline void CheckReduceRepeatCommonParams(const LocalTensor<T>& dst, 
 #else
     CheckReduceBaseParams<T>(dst, src, repeatTime, apiName);
 #endif
-    using PrimType = PrimT<T>;
-    CheckTensorAlignment(dst, sizeof(PrimType), "dst", apiName);
+    using DstPrimType = PrimT<U>;
+    CheckTensorAlignment(dst, sizeof(DstPrimType), "dst", apiName);
 }
 
-#pragma begin_pipe(V)
-
-namespace Internal {
+// interal common implementation for ReduceDataBlock, used for both maskCount and maskBit overloads, with same check logic
 template <ReduceType reduceType, typename T, typename U, bool isSetMask, typename MaskType>
 __aicore__ inline void ReduceDataBlockCommon(const LocalTensor<U>& dst, const LocalTensor<T>& src, const MaskType mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
@@ -125,7 +133,7 @@ __aicore__ inline void ReduceDataBlockCommon(const LocalTensor<U>& dst, const Lo
     static_assert(Std::is_same_v<SrcPrimType, DstPrimType>,
         "ReduceDataBlock only supports identical src type and dst type for current NPU_ARCH.");
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckReduceDataBlockParams<T>(dst, src, repeatTime, "ReduceDataBlock");
+    CheckReduceDataBlockParams<T, U>(dst, src, repeatTime, "ReduceDataBlock");
     if constexpr (Std::is_same_v<MaskType, int32_t>) {
         CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReduceDataBlock");
     } else {
@@ -153,6 +161,7 @@ __aicore__ inline void ReduceDataBlockCommon(const LocalTensor<U>& dst, const Lo
     }
 }
 
+// internal common implementation for ReducePairElem, used for both maskCount and maskBit overloads, with same check logic
 template <ReduceType reduceType, typename T, typename U, bool isSetMask, typename MaskType>
 __aicore__ inline void ReducePairElemCommon(const LocalTensor<U>& dst, const LocalTensor<T>& src, const MaskType mask,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
@@ -186,6 +195,52 @@ __aicore__ inline void ReducePairElemCommon(const LocalTensor<U>& dst, const Loc
         mask, dstRepStride, srcBlkStride, srcRepStride);
 }
 
+// internal check for ReduceRepeat with ReduceType::SUM, only used for sum since max/min has order param check
+template <typename T, typename U, bool isSetMask, typename MaskType>
+__aicore__ inline void ReduceRepeatSumCheck(const LocalTensor<U>& dst, const LocalTensor<T>& src,
+    const MaskType mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
+    const int32_t srcRepStride)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckReduceRepeatCommonParams<T, U>(dst, src, repeatTime, "ReduceRepeat");
+#endif
+#if ASCENDC_CPU_DEBUG
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride, "WholeReduceSum")) {
+        ASCENDC_REPORT_CHECK_ERROR("ReduceRepeat", 
+            (Std::is_same_v<MaskType, int32_t> ? KernelFuncType::MASK_COUNT_MODE : KernelFuncType::MASK_BIT_MODE));
+    }
+#endif
+}
+
+// internal check for ReduceRepeat with ReduceType::MAX/MIN, used for max/min since it has order param check
+template <typename T, typename U, bool isSetMask, typename MaskType>
+__aicore__ inline void ReduceRepeatMaxMinCheck(const LocalTensor<U>& dst, const LocalTensor<T>& src,
+    const MaskType mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
+    const int32_t srcRepStride, ReduceOrder order)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckReduceRepeatCommonParams<T, U>(dst, src, repeatTime, order, "ReduceRepeat");
+#endif
+#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFunVecReduceOtherWhl(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
+        order, "WholeReduceMax")) {
+        ASCENDC_REPORT_CHECK_ERROR("ReduceRepeat", 
+            (Std::is_same_v<MaskType, int32_t> ? KernelFuncType::MASK_COUNT_MODE : KernelFuncType::MASK_BIT_MODE));
+    }
+#endif
+#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
+        "WholeReduceMax")) {
+        ASCENDC_REPORT_CHECK_ERROR("ReduceRepeat", 
+            (Std::is_same_v<MaskType, int32_t> ? KernelFuncType::MASK_COUNT_MODE : KernelFuncType::MASK_BIT_MODE));
+    }
+#endif
+}
+
+// internal common implementation for ReduceRepeat, used for both maskCount and maskBit overloads, with same check logic
 template <ReduceType reduceType, typename T, typename U, bool isSetMask, typename MaskType>
 __aicore__ inline void ReduceRepeatCommon(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const MaskType mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
@@ -210,51 +265,12 @@ __aicore__ inline void ReduceRepeatCommon(const LocalTensor<U>& dst, const Local
     }
 #endif
     if constexpr (reduceType == ReduceType::SUM) {
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-        CheckReduceRepeatCommonParams<T>(dst, src, repeatTime, "ReduceRepeat");
-#endif
-#if ASCENDC_CPU_DEBUG
-        MaskSetter::Instance().SetMask(isSetMask);
-        if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride, "WholeReduceSum")) {
-            ASCENDC_REPORT_CHECK_ERROR("ReduceRepeat", 
-                (Std::is_same_v<MaskType, int32_t> ? KernelFuncType::MASK_COUNT_MODE : KernelFuncType::MASK_BIT_MODE));
-        }
-#endif
+        ReduceRepeatSumCheck(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
         // DstPrimType is auto derived when __NPU_ARCH__ is 3510 / 5102 / 3003 / 3113
         WholeReduceSumImpl<SrcPrimType, isSetMask>((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(),
             mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
     } else {
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-        CheckReduceRepeatCommonParams<T>(dst, src, repeatTime, order, "ReduceRepeat");
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
-(__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
-(__NPU_ARCH__ == 5102) ||                        \
-(__NPU_ARCH__ == 3003) ||                        \
-(__NPU_ARCH__ == 3113) ||                        \
-(__NPU_ARCH__ == 3510))
-        ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "ReduceRepeat");
-#elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
-        ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "ReduceRepeat");
-#endif
-#endif
-
-#if ASCENDC_CPU_DEBUG
-        MaskSetter::Instance().SetMask(isSetMask);
-#if (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
-        if (!CheckFunVecReduceOtherWhl(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-            order, "WholeReduceMax")) {
-            ASCENDC_REPORT_CHECK_ERROR("ReduceRepeat", 
-                (Std::is_same_v<MaskType, int32_t> ? KernelFuncType::MASK_COUNT_MODE : KernelFuncType::MASK_BIT_MODE));
-        }
-#endif
-#if (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-        if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-            "WholeReduceMax")) {
-            ASCENDC_REPORT_CHECK_ERROR("ReduceRepeat", 
-                (Std::is_same_v<MaskType, int32_t> ? KernelFuncType::MASK_COUNT_MODE : KernelFuncType::MASK_BIT_MODE));
-        }
-#endif
-#endif
+        ReduceRepeatMaxMinCheck(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
         if constexpr (reduceType == ReduceType::MAX) {
             WholeReduceMaxImpl<SrcPrimType, isSetMask>((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(),
                 mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
