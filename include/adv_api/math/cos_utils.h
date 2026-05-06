@@ -32,7 +32,7 @@ struct CosConfig {
 };
 
 #if !defined(__NPU_ARCH__)
-constexpr CosConfig defaultCosConfig = {CosAlgo::POLYNOMIAL_APPROXIMATION};
+constexpr CosConfig defaultCosConfig;
 #endif
 }; // namespace AscendC
 #endif // LIB_MATH_COS_UTILS_H
