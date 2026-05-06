@@ -13,7 +13,7 @@ if(TARGET intf_pub)
   return()
 endif()
 
-# intf_pub for c++11
+# intf_pub for c++11 
 add_library(intf_pub INTERFACE)
 target_compile_options(intf_pub INTERFACE
   -Wall
