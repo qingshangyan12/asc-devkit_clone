@@ -32,7 +32,7 @@ struct SinConfig {
 };
 
 #if !defined(__NPU_ARCH__)
-constexpr SinConfig defaultSinConfig = {SinAlgo::POLYNOMIAL_APPROXIMATION};
+constexpr SinConfig defaultSinConfig = { .algo = SinAlgo::POLYNOMIAL_APPROXIMATION};
 #endif
 }; // namespace AscendC
 #endif // LIB_MATH_SIN_UTILS_H
