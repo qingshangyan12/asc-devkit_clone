@@ -18,62 +18,47 @@ set(src_list
     reduce_scatter_aicpu_testcase.cc
 )
 
-add_executable(hccl_checker_ops_stest ${src_list})
+add_executable(${HCCL_CHECKER_TARGET} ${src_list})
 
-if (BUILD_OPEN_PROJECT)
-    target_include_directories(hccl_checker_ops_stest PUBLIC
-        # 第三方头文件
-        ${THIRD_PARTH_PATH}/gtest_shared/include
-        ${THIRD_PARTH_PATH}/gtest_shared/include
+target_include_directories(${HCCL_CHECKER_TARGET} PRIVATE
+    ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
+)
 
-        # HCCL仓头文件
-        ${HCCL_DEV_BASE}/src/ops/op_common/inc
+target_compile_options(${HCCL_CHECKER_TARGET} PRIVATE
+    -std=c++14
+    -Werror
+    -fno-common
+    -fno-strict-aliasing
+    -pipe
+    -O0
+    -g
+    -D_GLIBCXX_USE_CXX11_ABI=0
+)
 
-        # Ascend安装包头文件
-        ${ASCEND_HOME_PATH}/include
-        ${ASCEND_HOME_PATH}/pkg_inc
-        ${ASCEND_HOME_PATH}/pkg_inc/base
-        ${ASCEND_HOME_PATH}/hcomm/include/hccl
-        ${ASCEND_HOME_PATH}/include/hccl
-        ${ASCEND_HOME_PATH}/pkg_inc/hccl
-        ${ASCEND_HOME_PATH}/pkg_inc/hcomm/ccu
+target_compile_definitions(${HCCL_CHECKER_TARGET} PRIVATE
+    -DUT_TEST
+    -DAICPU_COMPILE
+)
 
-        # 本仓代码头文件
-        ${HCCL_DEV_BASE}/src/common
-        ${HCCL_DEV_BASE}/src/ops
-        ${HCCL_DEV_BASE}/src/ops/op_common
-        ${HCCL_DEV_BASE}/src/ops/op_common/inc
-        ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
+target_link_libraries(${HCCL_CHECKER_TARGET} PRIVATE
+    intf_llt_pub_basic
+    -Wl,--whole-archive
+    ${HCCL_CHECKER_SELECTOR_TARGET}
+    ${HCCL_CHECKER_EXECUTOR_TARGET}
+    -Wl,--no-whole-archive
+    -Wl,--start-group
+    ${HCCL_CHECKER_KERNEL_TARGET}
+    ${HCCL_CHECKER_SELECTOR_TARGET}
+    ${HCCL_CHECKER_EXECUTOR_TARGET}
+    ${HCCL_CHECKER_MODEL_PROXY_TARGET}
+    ${HCCL_CHECKER_VERIFIER_TARGET}
+    -Wl,--end-group
+    c_sec
+    pthread
+    dl
+)
 
-        ${UTILS_DIR}/sim_world
-        ${UTILS_DIR}/common/utils
-        ${UTILS_DIR}/common/exception
-        ${UTILS_DIR}/hccl_verifier
-        ${UTILS_DIR}/hccl_verifier/semantics_check
-        ${UTILS_DIR}/hccl_verifier/task_graph_generator
-        ${UTILS_DIR}/hccl_proxy
-        ${UTILS_DIR}/hccl_proxy/communicator
-        ${UTILS_DIR}/hccl_proxy/topo_model
-    )
-
-    target_link_libraries(hccl_checker_ops_stest PRIVATE
-        gtest
-        pthread
-        hccl-model-proxy
-        hccl-verifier
-        # 链接hccl库
-        ${ASCEND_HOME_PATH}/lib64/libhccl.so
-        -ldl
-    )
-
-    target_compile_options(hccl_checker_ops_stest PRIVATE
-        -std=c++14
-        -Werror
-        -fno-common
-        -fno-strict-aliasing
-        -pipe
-        -O0
-        -g
-        -D_GLIBCXX_USE_CXX11_ABI=0
-    )
-endif()
+run_llt_test(
+    TARGET ${HCCL_CHECKER_TARGET}
+    TASK_NUM 1
+)

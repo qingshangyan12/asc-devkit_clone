@@ -10,6 +10,7 @@
 
 target_sources(hccl-model-proxy PRIVATE
     aclrt_stub.cc
+    hccl_algorithm_stub.cc
     hccl_stub.cc
     hcclinner_stub.cc
     log_stub.cc

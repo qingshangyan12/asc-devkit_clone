@@ -8,28 +8,152 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
 
-cmake_minimum_required(VERSION 3.16.0)
-project(hccl_checker_ops_stest)
-set(HCCL_CC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../impl/adv_api/detail/hccl/cc)
-get_filename_component(HCCL_CC_DIR "${HCCL_CC_DIR}" ABSOLUTE)
-set(HCCL_CC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../include/adv_api/hccl/internal)
-get_filename_component(HCCL_CC_INCLUDE_DIR "${HCCL_CC_INCLUDE_DIR}" ABSOLUTE)
-set(TOP_DIR ${HCCL_CC_DIR}/..)
+set(HCCL_CHECKER_TARGET ascendc_ut_adv_api_hccl_cc_algorithm_ascend950pr_9599_AIC)
+set(HCCL_CHECKER_KERNEL_TARGET ascendc_ut_hccl_cc_algorithm_mc2_server)
+set(HCCL_CHECKER_MODEL_PROXY_TARGET ascendc_ut_hccl_cc_algorithm_model_proxy)
+set(HCCL_CHECKER_VERIFIER_TARGET ascendc_ut_hccl_cc_algorithm_verifier)
+set(HCCL_CHECKER_SELECTOR_TARGET ascendc_ut_hccl_cc_algorithm_selectors)
+set(HCCL_CHECKER_EXECUTOR_TARGET ascendc_ut_hccl_cc_algorithm_executors)
 
-if (BUILD_OPEN_PROJECT)
-    set(UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils/src)
-    set(TESTCASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/testcase)
-    set(ASCEND_HOME_PATH $ENV{ASCEND_HOME_PATH})
-    set(HCCL_DEV_BASE ${HCCL_CC_DIR})
-    set(THIRD_PARTH_PATH ${HCCL_DEV_BASE}/output/third_party)
-
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-        set(ASCEND_HOME_PATH "${ASCEND_HOME_PATH}/x86_64-linux")
-    else()
-        set(ASCEND_HOME_PATH "${ASCEND_HOME_PATH}/aarch64-linux")
-    endif()
-    message(STATUS "Final Ascend Path: ${ASCEND_HOME_PATH}")
+set(HCCL_CC_DIR ${ASCENDC_DIR}/impl/adv_api/detail/hccl/cc)
+set(HCCL_CC_SRC_DIR ${HCCL_CC_DIR}/src)
+set(HCCL_CC_INCLUDE_DIR ${ASCENDC_DIR}/include/adv_api/hccl/internal)
+set(HCCL_DEV_BASE ${HCCL_CC_DIR})
+set(HCCL_CHECKER_LOCAL_PKG_INC ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+    set(HCCL_CHECKER_CANN_ARCH_DIR ${ASCEND_CANN_PACKAGE_PATH}/x86_64-linux)
+else()
+    set(HCCL_CHECKER_CANN_ARCH_DIR ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux)
 endif()
+set(UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils/src)
+set(TESTCASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/testcase)
 
-add_subdirectory(testcase)
+set(HCCL_CHECKER_COMMON_INCLUDE_LIST
+    ${UT_COMMON_INCLUDE_LIST}
+    ${CANN_3RD_LIB_PATH}/gtest/include
+    ${ASCENDC_DIR}
+    ${HCCL_CC_INCLUDE_DIR}
+    ${HCCL_CC_INCLUDE_DIR}/hcomm
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
+    ${HCCL_CHECKER_LOCAL_PKG_INC}
+    ${HCCL_CHECKER_LOCAL_PKG_INC}/hccl
+    ${HCCL_CHECKER_LOCAL_PKG_INC}/hcomm/ccu
+    ${ASCEND_CANN_PACKAGE_PATH}/include
+    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/mmpa
+    ${HCCL_CHECKER_CANN_ARCH_DIR}/pkg_inc/runtime
+    ${HCCL_CHECKER_CANN_ARCH_DIR}/pkg_inc/runtime/runtime
+    ${HCCL_CC_SRC_DIR}/common
+    ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/pub_inc
+    ${HCCL_CC_SRC_DIR}/ops
+    ${HCCL_CC_SRC_DIR}/ops/op_common
+    ${HCCL_CC_SRC_DIR}/ops/op_common/inc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/executor
+    ${HCCL_CC_SRC_DIR}/ops/op_common/executor/channel
+    ${HCCL_CC_SRC_DIR}/ops/op_common/executor/registry
+    ${HCCL_CC_SRC_DIR}/ops/op_common/selector
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/registry
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/wrapper
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/aiv
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/op_common/topo
+    ${HCCL_CC_SRC_DIR}/ops/interface_graph_mode
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/executor
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/selector
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/aiv
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/broadcast
+    ${HCCL_CC_SRC_DIR}/ops/broadcast/executor
+    ${HCCL_CC_SRC_DIR}/ops/broadcast/selector
+    ${HCCL_CC_SRC_DIR}/ops/broadcast/template
+    ${HCCL_CC_SRC_DIR}/ops/broadcast/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/broadcast/template/aiv
+    ${HCCL_CC_SRC_DIR}/ops/broadcast/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/broadcast/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/scatter
+    ${HCCL_CC_SRC_DIR}/ops/scatter/algo
+    ${HCCL_CC_SRC_DIR}/ops/scatter/algo/template
+    ${HCCL_CC_SRC_DIR}/ops/scatter/executor
+    ${HCCL_CC_SRC_DIR}/ops/scatter/selector
+    ${HCCL_CC_SRC_DIR}/ops/scatter/template
+    ${HCCL_CC_SRC_DIR}/ops/scatter/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/scatter/template/aiv
+    ${HCCL_CC_SRC_DIR}/ops/scatter/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/scatter/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/all_gather
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/executor
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/selector
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/aiv
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/all_gather_v
+    ${HCCL_CC_SRC_DIR}/ops/all_gather_v/executor
+    ${HCCL_CC_SRC_DIR}/ops/all_gather_v/selector
+    ${HCCL_CC_SRC_DIR}/ops/all_gather_v/template
+    ${HCCL_CC_SRC_DIR}/ops/all_gather_v/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/all_gather_v/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/all_gather_v/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/executor
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/aiv
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/executor
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/selector
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aiv
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/send
+    ${HCCL_CC_SRC_DIR}/ops/send/executor
+    ${HCCL_CC_SRC_DIR}/ops/send/selector
+    ${HCCL_CC_SRC_DIR}/ops/send/template
+    ${HCCL_CC_SRC_DIR}/ops/recv
+    ${HCCL_CC_SRC_DIR}/ops/recv/executor
+    ${HCCL_CC_SRC_DIR}/ops/recv/selector
+    ${HCCL_CC_SRC_DIR}/ops/recv/template
+    ${HCCL_CC_SRC_DIR}/ops/reduce
+    ${HCCL_CC_SRC_DIR}/ops/reduce/executor
+    ${HCCL_CC_SRC_DIR}/ops/reduce/selector
+    ${HCCL_CC_SRC_DIR}/ops/reduce/template
+    ${HCCL_CC_SRC_DIR}/ops/reduce/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/reduce/template/aiv
+    ${HCCL_CC_SRC_DIR}/ops/reduce/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/reduce/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/batch_send_recv
+    ${HCCL_CC_SRC_DIR}/ops/batch_send_recv/executor
+    ${HCCL_CC_SRC_DIR}/ops/batch_send_recv/selector
+    ${UTILS_DIR}/sim_world
+    ${UTILS_DIR}/common/utils
+    ${UTILS_DIR}/common/exception
+    ${UTILS_DIR}/hccl_verifier
+    ${UTILS_DIR}/hccl_verifier/semantics_check
+    ${UTILS_DIR}/hccl_verifier/task_graph_generator
+    ${UTILS_DIR}/hccl_verifier/mem_conflict_check
+    ${UTILS_DIR}/hccl_verifier/singletask_check
+    ${UTILS_DIR}/hccl_proxy
+    ${UTILS_DIR}/hccl_proxy/communicator
+    ${UTILS_DIR}/hccl_proxy/topo_model
+)
+
 add_subdirectory(utils)
+add_subdirectory(testcase)

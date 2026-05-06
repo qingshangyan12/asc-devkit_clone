@@ -7,7 +7,8 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
-add_library(hccl-verifier SHARED "")
+add_library(hccl-verifier STATIC "")
+add_library(${HCCL_CHECKER_VERIFIER_TARGET} ALIAS hccl-verifier)
 target_sources(hccl-verifier PRIVATE
     checker.cc
     hccl_verifier.cc
@@ -31,30 +32,12 @@ target_compile_options(hccl-verifier PRIVATE
 
 message(STATUS "utils path= ${UTILS_DIR}")
 
-if (BUILD_OPEN_PROJECT)
-    target_include_directories(hccl-verifier PRIVATE
-        # Ascend安装包头文件
-        ${ASCEND_HOME_PATH}/include
-        ${ASCEND_HOME_PATH}/pkg_inc
-        ${ASCEND_HOME_PATH}/pkg_inc/base
-        ${ASCEND_HOME_PATH}/pkg_inc/runtime
-        ${ASCEND_HOME_PATH}/pkg_inc/profiling
-        ${ASCEND_HOME_PATH}/hcomm/include/hccl
-        ${ASCEND_HOME_PATH}/include/hccl
-        ${ASCEND_HOME_PATH}/pkg_inc/hccl
+target_compile_definitions(hccl-verifier PRIVATE
+    -DUT_TEST
+    -DAICPU_COMPILE
+)
 
-        # hccl-dev头文件
-        ${HCCL_DEV_BASE}/src/common
-
-        ${UTILS_DIR}/sim_world
-        ${UTILS_DIR}/hccl_proxy
-        ${UTILS_DIR}/hccl_verifier
-        ${UTILS_DIR}/pub_inc
-        ${UTILS_DIR}/common/exception
-        ${UTILS_DIR}/common/utils
-        ${UTILS_DIR}/hccl_verifier/task_graph_generator
-        ${UTILS_DIR}/hccl_verifier/semantics_check
-        ${UTILS_DIR}/hccl_verifier/mem_conflict_check
-        ${UTILS_DIR}/hccl_verifier/singletask_check
-    )
-endif()
+target_include_directories(hccl-verifier PUBLIC
+    ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
+    ${UTILS_DIR}/pub_inc
+)
