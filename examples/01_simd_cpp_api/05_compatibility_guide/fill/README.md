@@ -1,9 +1,9 @@
 # Fill兼容性样例
 ## 概述
-本样例展示 L0A Buffer 和 L0B Buffer 初始化值的端到端实现，通过编译时宏隔离实现不同架构的兼容性支持。
+本样例展示如何使用Fill接口对L0A Buffer和L0B Buffer进行初始化，通过编译时宏隔离实现不同架构的兼容性支持。
 
-- Atlas A2/A3 训练/推理系列产品直接初始化 L0A Buffer 和 L0B Buffer；
-- Ascend 950PR/950DT新架构不支持直接初始化，需要先初始化 L1 Buffer，再搬运到 L0A Buffer 和 L0B Buffer。
+- 在Atlas A2\A3 系列产品中，可以直接使用Fill接口进行L0A/L0B Buffer的初始化。
+- 但在Ascend 950PR/Ascend 950DT平台中，由于删除了L0A Buffer/L0B Buffer初始化的相关硬件指令，因此无法直接使用Fill接口进行L0A/L0B Buffer的初始化，需要借助L1 Buffer，先对L1中的Buffer初始化，再将该完成初始化的Buffer搬入L0A/L0B中，以此来间接完成L0A/L0B Buffer的初始化。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -18,7 +18,7 @@
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── fill.asc                // AscendC算子实现 & 调用样例
+│   └── fill.asc                // AscendC样例实现 & 调用样例
 ```
 
 ## 样例规格
@@ -32,11 +32,11 @@
 </table>
 
 ### 样例实现
-1. 首先初始化 L0A Buffer 和 L0B Buffer，不同结构方式不一样：
-  - Atlas A2/A3 训练/推理系列产品：调用`InitConstValue`接口直接初始化 L0A Buffer 和 L0B Buffer 为指定值（本样例初始化为1）。
-  - Ascend 950PR/950DT：使用`Fill`接口初始化 L1 Buffer 为指定值（本样例初始化为1），再通过`LoadData`接口搬运到 L0A Buffer 和 L0B Buffer。
-2. 调用`Mmad`接口进行矩阵乘计算。
-3. 通过`Fixpipe`接口将结果搬运到Global Memory。
+  1. 首先初始化 L0A Buffer 和 L0B Buffer，不同结构方式不一样：
+    - Atlas A2/A3 训练/推理系列产品：调用`Fill`接口直接初始化 L0A Buffer 和 L0B Buffer 为指定值（本样例初始化为1）。
+    - Ascend 950PR/950DT：使用`Fill`接口初始化 L1 Buffer 为指定值（本样例初始化为1），再通过`LoadData`接口搬运到 L0A Buffer 和 L0B Buffer。
+  2. 调用`Mmad`接口进行矩阵乘计算。
+  3. 通过`Fixpipe`接口将结果搬运到Global Memory。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
