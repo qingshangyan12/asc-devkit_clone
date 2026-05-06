@@ -16,7 +16,7 @@ bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <o
 
 - Ai Core SIMT编译 [LINK]()
 
-```s
+```
 // ----- simt_vec.asc -----
 __global__  simtKernel()
  
@@ -46,11 +46,11 @@ __global__ void kernel(int *var) {
 }
 ```
 
- ```
+```
   bisheng -dc definition.asc -o definition.o --npu-arch=dav-xxxx --enable-simt
   bisheng -dc example.asc -o example.o --npu-arch=dav-xxxx --enable-simt
   bisheng definition.o example.o -o program --npu-arch=dav-xxxx --enable-simt
-  ```
+```
 
 - Ai Core SIMT动态库编译
 
@@ -65,7 +65,8 @@ bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx --enable-simt
 ```
 
 更多的编译选项用法可以参见《毕生编译器用户指南》。
-  
+
+
 ## 通过Ai Core SIMT CMake编译
 
 以下是CMake脚本的示例及其核心步骤说明：[样例LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)
@@ -81,7 +82,8 @@ project(kernel_samples LANGUAGES ASC)
 add_executable(demo
     hello_world.asc
 )
-#.....
+
+# ......
 target_compile_options(demo PRIVATE
     # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
     # <COMPILE_LANGUAGE:ASC>:表明该编译选项仅对语言ASC生效
