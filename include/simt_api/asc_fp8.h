@@ -61,6 +61,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline __asc_fp8x2_storage_t
 __asc_cvt_float2_to_fp8x2(const float2 x, const __asc_saturation_t saturate,
                           const __asc_fp8_interpretation_t fp8_interpretation);
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __asc_cvt_e8m0float2_to_bfloat16x2_t(const e8m0float2 x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline e8m0float2 __asc_cvt_bfloat16x2_t_to_e8m0float2(const bfloat16x2_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __asc_cvt_e6m2float2_to_bfloat16x2_t(const e6m2float2 x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline e6m2float2 __asc_cvt_bfloat16x2_t_to_e6m2float2(const bfloat16x2_t x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __asc_cvt_rcpe6m2float2_to_bfloat16x2_t(const rcpe6m2float2 x);
+
 #include "impl/simt_api/asc_fp8_impl.h"
 
 #endif

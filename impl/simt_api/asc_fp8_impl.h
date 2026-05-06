@@ -103,6 +103,26 @@ __asc_cvt_float2_to_fp8x2(const float2 x, const __asc_saturation_t saturate,
     return res;
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __asc_cvt_e8m0float2_to_bfloat16x2_t(const e8m0float2 x) {
+    return _cvt_e8m0float2_to_bfloat16x2_t<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline e8m0float2 __asc_cvt_bfloat16x2_t_to_e8m0float2(const bfloat16x2_t x) {
+    return _cvt_bfloat16x2_t_to_e8m0float2<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __asc_cvt_e6m2float2_to_bfloat16x2_t(const e6m2float2 x) {
+    return _cvt_e6m2float2_to_bfloat16x2_t<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline e6m2float2 __asc_cvt_bfloat16x2_t_to_e6m2float2(const bfloat16x2_t x) {
+    return _cvt_bfloat16x2_t_to_e6m2float2<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __asc_cvt_rcpe6m2float2_to_bfloat16x2_t(const rcpe6m2float2 x) {
+    return _cvt_rcpe6m2float2_to_bfloat16x2_t<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
 #endif
 #endif  // IMPL_SIMT_API_ASC_FP8_IMPL_H
 
