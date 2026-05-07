@@ -10,7 +10,7 @@
 project(ascendc_reg_compute_tests)
 cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
-find_package(tikicpulib REQUIRED)
+find_cann_package(tikicpulib REQUIRED)
 
 set(MICRO_PRODUCT_TYPE_LIST_INIT ascend950pr_9599)
 set(MICRO_PRODUCT_TYPE_LIST ${MICRO_PRODUCT_TYPE_LIST_INIT} CACHE STRING "Supported product types")
