@@ -23,7 +23,7 @@ else()
     message(WARNING "tikcfw_headers target does not exist")
 endif()
 
-find_package(tikicpulib REQUIRED)
+find_cann_package(tikicpulib REQUIRED)
 if(tikicpulib_FOUND)
     message(STATUS "tikicpulib found, adding include directories")
     message(STATUS "tikicpulib cmake path: ${tikicpulib_DIR}")

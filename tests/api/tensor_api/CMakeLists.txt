@@ -10,7 +10,7 @@
 project(ascendc_tensor_api_tests)
 cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
-find_package(tikicpulib REQUIRED)
+find_cann_package(tikicpulib REQUIRED)
 
 set(ASCENDC_UT_PRODUCT_TYPE_LIST
     NPU_ARCH_2201_AIC

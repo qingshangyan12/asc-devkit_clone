@@ -10,7 +10,7 @@
 project(ascendc_basic_api_tests)
 cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
-find_package(tikicpulib REQUIRED)
+find_cann_package(tikicpulib REQUIRED)
 
 add_subdirectory(ascendc_header_checker)
 

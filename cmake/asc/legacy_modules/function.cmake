@@ -330,7 +330,7 @@ function(ascendc_library target_name target_type)
 
     # Generate host-side bin file based on device.o and host_stub.cpp
     if("${RUN_MODE}" STREQUAL "cpu")
-        find_package(tikicpulib REQUIRED)
+        find_cann_package(tikicpulib REQUIRED)
     endif()
     set_source_files_properties(${${device_target}_auto_gen_dir}/host_stub.cpp PROPERTIES GENERATED TRUE)
     add_library(${device_target}_host_stub_obj OBJECT
