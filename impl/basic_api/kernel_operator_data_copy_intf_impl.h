@@ -490,6 +490,23 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<U> 
     }
 }
 
+
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
+template <typename T, uint8_t subBlockId = 0>
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+{
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxDataCopyInfo(dst, src, repeatParams, "DataCopy");
+#endif
+    using PrimType = PrimT<T>;
+    ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, repeatParams));
+    CheckTensorAlign<T>(dst, ONE_BLK_SIZE, "dst", "DataCopy from A1 / B1 to VECIN / VECOUT");            // 32B align
+    CheckTensorAlign<T>(src, ONE_BLK_SIZE, "src", "DataCopy from A1 / B1 to VECIN / VECOUT");            // 32B align
+    DataCopyL12UBImpl<PrimType, subBlockId>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(),
+                                repeatParams);
+}
+#endif
+
 /*
  * @ingroup Copy Level 0
  * @brief datacopy from src to dst, applicable to vector data
@@ -831,6 +848,22 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
 #endif
     DataCopy(dst, src, repeatParams);
 }
+
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
+template <typename T, uint8_t subBlockId = 0>
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint32_t count)
+{
+    using PrimType = PrimT<T>;
+    ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
+        "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
+        "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
+        count); });
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
+    struct DataCopyParams repeatParams;
+    repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+    DataCopyL1ToUB<T, subBlockId>(dst, src, repeatParams);
+}
+#endif
 
 __aicore__ inline void CheckNz2NdParams(const Nz2NdParamsFull& params)
 {
