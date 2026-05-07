@@ -16,6 +16,46 @@ using namespace std;
 using namespace AscendC;
 
 namespace {
+constexpr int32_t K_ALIGN_64 = 64;
+constexpr int32_t MX_SCALE_C0_SIZE = 32;
+
+__aicore__ inline constexpr uint32_t AlignMxBufferSize(uint32_t value, uint32_t align)
+{
+    return (value + align - 1) / align * align;
+}
+
+__aicore__ inline constexpr uint32_t GetMxScaleKBlockCount(uint32_t k)
+{
+    return (k + K_ALIGN_64 - 1) / K_ALIGN_64 * 2;
+}
+
+__aicore__ inline constexpr uint32_t GetMxInputABufferSize(uint32_t m, uint32_t k)
+{
+    return AlignMxBufferSize(m, BLOCK_CUBE) * AlignMxBufferSize(k, K_ALIGN_64);
+}
+
+__aicore__ inline constexpr uint32_t GetMxInputBBufferSize(uint32_t k, uint32_t n)
+{
+    return AlignMxBufferSize(k, K_ALIGN_64) * AlignMxBufferSize(n, BLOCK_CUBE);
+}
+
+__aicore__ inline constexpr uint32_t GetMxOutputBufferSize(uint32_t m, uint32_t n)
+{
+    return AlignMxBufferSize(m, BLOCK_CUBE) * AlignMxBufferSize(n, BLOCK_CUBE);
+}
+
+__aicore__ inline constexpr uint32_t GetMxScaleMBufferSize(uint32_t m, uint32_t k)
+{
+    return AlignMxBufferSize(m, BLOCK_CUBE) *
+        AlignMxBufferSize(GetMxScaleKBlockCount(k), MX_SCALE_C0_SIZE);
+}
+
+__aicore__ inline constexpr uint32_t GetMxScaleNBufferSize(uint32_t n, uint32_t k)
+{
+    return AlignMxBufferSize(GetMxScaleKBlockCount(k), MX_SCALE_C0_SIZE) *
+        AlignMxBufferSize(n, BLOCK_CUBE);
+}
+
 class CustomMatmulScheduler {
 public:
     __aicore__ inline void Init(const TCubeTiling *__restrict cubeTiling, TPipe *tpipe) {}
@@ -79,11 +119,11 @@ TEST_F(TestMxMatmulImpl, test_mx_matmul_impl_scaleGm_OutputGm) {
     using C_T = typename C_TYPE_GM::T;
     typedef fp8_e8m0_t MX_T;
 
-    const int32_t left_data_size = tiling.M * tiling.Ka;
-    const int32_t left_scale_data_size = tiling.M * ((tiling.Ka + 31) / 32);
-    const int32_t right_data_size = tiling.Kb * tiling.N;
-    const int32_t right_scale_data_size = ((tiling.Kb + 31) / 32) * tiling.N;
-    const int32_t output_data_size = tiling.M * tiling.N;
+    const int32_t left_data_size = GetMxInputABufferSize(tiling.M, tiling.Ka);
+    const int32_t left_scale_data_size = GetMxScaleMBufferSize(tiling.M, tiling.Ka);
+    const int32_t right_data_size = GetMxInputBBufferSize(tiling.Kb, tiling.N);
+    const int32_t right_scale_data_size = GetMxScaleNBufferSize(tiling.N, tiling.Kb);
+    const int32_t output_data_size = GetMxOutputBufferSize(tiling.M, tiling.N);
 
     uint8_t left_global[left_data_size * sizeof(A_T)] = {0};
     uint8_t left_scale_global[left_scale_data_size * sizeof(MX_T)] = {0};
@@ -144,11 +184,11 @@ TEST_F(TestMxMatmulImpl, test_mx_matmul_impl_scaleUb_OutputUb) {
     using C_T = typename C_TYPE_UB::T;
     typedef fp8_e8m0_t MX_T;
 
-    const int32_t left_data_size = tiling.M * tiling.Ka;
-    const int32_t left_scale_data_size = tiling.M * ((tiling.Ka + 31) / 32);
-    const int32_t right_data_size = tiling.Kb * tiling.N;
-    const int32_t right_scale_data_size = ((tiling.Kb + 31) / 32) * tiling.N;
-    const int32_t output_data_size = tiling.M * tiling.N;
+    const int32_t left_data_size = GetMxInputABufferSize(tiling.M, tiling.Ka);
+    const int32_t left_scale_data_size = GetMxScaleMBufferSize(tiling.M, tiling.Ka);
+    const int32_t right_data_size = GetMxInputBBufferSize(tiling.Kb, tiling.N);
+    const int32_t right_scale_data_size = GetMxScaleNBufferSize(tiling.N, tiling.Kb);
+    const int32_t output_data_size = GetMxOutputBufferSize(tiling.M, tiling.N);
 
     uint8_t left_global[left_data_size * sizeof(A_T)] = {0};
     uint8_t left_scale_global[left_scale_data_size * sizeof(MX_T)] = {0};
