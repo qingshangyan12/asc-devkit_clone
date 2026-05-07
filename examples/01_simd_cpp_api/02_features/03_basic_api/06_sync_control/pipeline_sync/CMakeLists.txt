@@ -18,7 +18,17 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    pipe_barrier.asc
+    pipeline_sync.asc
+)
+
+set(SCENARIO_NUM 1 CACHE STRING "Scenario number: 1-PIPE_V, 2-PIPE_ALL")
+if(NOT SCENARIO_NUM MATCHES "(1|2)$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1 or 2, current value: ${SCENARIO_NUM}")
+endif()
+
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
 )
 
 target_compile_options(demo PRIVATE
