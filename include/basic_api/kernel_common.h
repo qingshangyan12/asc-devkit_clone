@@ -151,9 +151,9 @@ public:
     }
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline MutexID AllocMutexID()
 {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     MutexID id = static_cast<uint8_t>(sff0(Internal::g_bufId));
     Internal::g_bufId = sbitset1(Internal::g_bufId, id);
     ASCENDC_ASSERT((id <= MAX_MUTEXID), {
@@ -161,8 +161,10 @@ __aicore__ inline MutexID AllocMutexID()
                    static_cast<uint32_t>(MAX_MUTEXID));
     });
     return id;
-}
+#else
+    return 0;
 #endif
+}
 
 __aicore__ inline void ReleaseMutexID(MutexID id)
 {
