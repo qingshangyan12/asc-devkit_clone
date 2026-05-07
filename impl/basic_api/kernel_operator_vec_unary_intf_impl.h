@@ -148,12 +148,12 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
  * @param [in] intriParams.dstRepStride dst repeat stride
  * @param [in] intriParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask, const ExpConfig& config>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -166,31 +166,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 #endif
     ExpImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
-}
-template <typename T, bool isSetMask, const ExpConfig& config>
-__aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-{
-    using PrimType = PrimT<T>;
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
-        "Exp")) {
-        ASCENDC_REPORT_CHECK_ERROR("Exp", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecUnaryInfo<T, T, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Exp");
-#endif
-    ExpImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-        mask, repeatTime, repeatParams);
-}
 #else
-template <typename T, bool isSetMask>
-__aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-{
-    using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Exp", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<PrimType>(mask, "Exp");
@@ -207,12 +183,28 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 #endif
     ExpImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
+#endif
 }
-template <typename T, bool isSetMask>
+
+template <typename T, bool isSetMask, const ExpConfig& config>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if ASCENDC_CPU_DEBUG
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
+        "Exp")) {
+        ASCENDC_REPORT_CHECK_ERROR("Exp", KernelFuncType::MASK_COUNT_MODE);
+    }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, T, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Exp");
+#endif
+    ExpImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
+        mask, repeatTime, repeatParams);
+#else
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Exp", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<PrimType>(mask, "Exp");
@@ -229,8 +221,8 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 #endif
     ExpImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
-}
 #endif
+}
 
 /*
  * @ingroup Exp Level 2
@@ -239,11 +231,11 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, const ExpConfig& config>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Exp")) {
         ASCENDC_REPORT_CHECK_ERROR("Exp", KernelFuncType::CALCOUNT_MODE);
@@ -253,13 +245,8 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Exp", count);
 #endif
     ExpImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #else
-template <typename T>
-__aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
-{
-    using PrimType = PrimT<T>;
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Exp", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Exp");
 #endif
@@ -272,8 +259,8 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Exp", count);
 #endif
     ExpImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #endif
+}
 
 /* **************************************** Ln ****************************************** */
 /*
@@ -288,11 +275,12 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
  * @param [in] intriParams.dstRepStride dst repeat stride
  * @param [in] intriParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+
 template <typename T, bool isSetMask, const LnConfig& config>
 __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     using PrimType = PrimT<T>;
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -305,29 +293,7 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
 #endif
     LnImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
-}
-template <typename T, bool isSetMask, const LnConfig& config>
-__aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-{
-    using PrimType = PrimT<T>;
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams, "Ln")) {
-        ASCENDC_REPORT_CHECK_ERROR("Ln", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecUnaryInfo<T, T, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Ln");
-#endif
-    LnImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-        mask, repeatTime, repeatParams);
-}
 #else
-template <typename T, bool isSetMask>
-__aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-{
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Ln", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
@@ -344,12 +310,27 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
 #endif
     LnImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
+#endif
 }
-template <typename T, bool isSetMask>
+template <typename T, bool isSetMask, const LnConfig& config>
 __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if ASCENDC_CPU_DEBUG
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams, "Ln")) {
+        ASCENDC_REPORT_CHECK_ERROR("Ln", KernelFuncType::MASK_COUNT_MODE);
+    }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, T, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Ln");
+#endif
+    LnImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
+        mask, repeatTime, repeatParams);
+
+#else
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Ln", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<PrimType>(mask, "Ln");
@@ -365,8 +346,8 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
 #endif
     LnImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
-}
 #endif
+}
 
 /*
  * @ingroup Ln Level 2
@@ -375,11 +356,11 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, const LnConfig& config>
 __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Ln")) {
         ASCENDC_REPORT_CHECK_ERROR("Ln", KernelFuncType::CALCOUNT_MODE);
@@ -389,12 +370,7 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Ln", count);
 #endif
     LnImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #else
-template <typename T>
-__aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
-{
-    using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Ln", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Ln");
@@ -408,8 +384,8 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Ln", count);
 #endif
     LnImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #endif
+}
 
 /* **************************************** Abs ****************************************** */
 /*
@@ -495,7 +471,6 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     AbsImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /*
  * @ingroup Abs Level 2 for complex32/complex64, only support ascend950
  * @brief dst[i] = abs(src[i])
@@ -506,6 +481,7 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 template <typename T, typename U>
 __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t& count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalarDiffType(dst, src, static_cast<PrimT<U>>(0), count, "vabs")) {
         ASSERT(false && "check vabs instr failed");
@@ -515,8 +491,8 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Abs", count);
 #endif
     AbsImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<U>*)src.GetPhyAddr(), count);
-}
 #endif
+}
 
 /* **************************************** Reciprocal ****************************************** */
 /*
@@ -531,11 +507,11 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src,
  * @param [in] intriParams.dstRepStride dst repeat stride
  * @param [in] intriParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask, const ReciprocalConfig& config>
 __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     using PrimType = PrimT<T>;
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -549,30 +525,7 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 #endif
     ReciprocalImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
-}
-template <typename T, bool isSetMask, const ReciprocalConfig& config>
-__aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-{
-    using PrimType = PrimT<T>;
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
-        "Reciprocal")) {
-        ASCENDC_REPORT_CHECK_ERROR("Reciprocal", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecUnaryInfo<T, T, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Reciprocal");
-#endif
-    ReciprocalImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(),
-        (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
-}
 #else
-template <typename T, bool isSetMask>
-__aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-{
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Reciprocal", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
@@ -590,11 +543,27 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 #endif
     ReciprocalImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+#endif
 }
-template <typename T, bool isSetMask>
+template <typename T, bool isSetMask, const ReciprocalConfig& config>
 __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    using PrimType = PrimT<T>;
+#if ASCENDC_CPU_DEBUG
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
+        "Reciprocal")) {
+        ASCENDC_REPORT_CHECK_ERROR("Reciprocal", KernelFuncType::MASK_COUNT_MODE);
+    }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, T, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Reciprocal");
+#endif
+    ReciprocalImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(),
+        (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+#else
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Reciprocal", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
@@ -612,8 +581,8 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 #endif
     ReciprocalImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
-}
 #endif
+}
 
 /*
  * @ingroup Rec Level 2
@@ -622,12 +591,12 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, const ReciprocalConfig& config>
 __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Reciprocal")) {
         ASCENDC_REPORT_CHECK_ERROR("Reciprocal", KernelFuncType::CALCOUNT_MODE);
@@ -637,13 +606,7 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Reciprocal", count);
 #endif
     ReciprocalImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #else
-template <typename T>
-__aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const int32_t& count)
-{
-    using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Reciprocal", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Reciprocal");
@@ -657,8 +620,8 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Reciprocal", count);
 #endif
     ReciprocalImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #endif
+}
 
 /* **************************************** Rsqrt ****************************************** */
 /*
@@ -673,11 +636,11 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
  * @param [in] intriParams.dstRepStride dst repeat stride
  * @param [in] intriParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask, const RsqrtConfig& config>
 __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     using PrimType = PrimT<T>;
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -691,30 +654,7 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 #endif
     RsqrtImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
-}
-template <typename T, bool isSetMask, const RsqrtConfig& config>
-__aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-{
-    using PrimType = PrimT<T>;
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
-        "Rsqrt")) {
-        ASCENDC_REPORT_CHECK_ERROR("Rsqrt", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecUnaryInfo<T, T, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Rsqrt");
-#endif
-    RsqrtImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-        mask, repeatTime, repeatParams);
-}
 #else
-template <typename T, bool isSetMask>
-__aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-{
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Rsqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
@@ -732,12 +672,27 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 #endif
     RsqrtImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
+#endif
 }
-template <typename T, bool isSetMask>
+template <typename T, bool isSetMask, const RsqrtConfig& config>
 __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if ASCENDC_CPU_DEBUG
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
+        "Rsqrt")) {
+        ASCENDC_REPORT_CHECK_ERROR("Rsqrt", KernelFuncType::MASK_COUNT_MODE);
+    }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, T, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Rsqrt");
+#endif
+    RsqrtImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
+        mask, repeatTime, repeatParams);
+#else
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Rsqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<PrimType>(mask, "Rsqrt");
@@ -754,8 +709,8 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 #endif
     RsqrtImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
-}
 #endif
+}
 
 /*
  * @ingroup Rsqrt Level 2
@@ -764,11 +719,11 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, const RsqrtConfig& config>
 __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Rsqrt")) {
         ASCENDC_REPORT_CHECK_ERROR("Rsqrt", KernelFuncType::CALCOUNT_MODE);
@@ -778,12 +733,7 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Rsqrt", count);
 #endif
     RsqrtImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #else
-template <typename T>
-__aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
-{
-    using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Rsqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Rsqrt");
@@ -797,8 +747,8 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Rsqrt", count);
 #endif
     RsqrtImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #endif
+}
 
 /* **************************************** Sqrt ****************************************** */
 /*
@@ -813,11 +763,11 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
  * @param [in] intriParams.dstRepStride dst repeat stride
  * @param [in] intriParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask, const SqrtConfig& config>
 __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     using PrimType = PrimT<T>;
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -831,30 +781,7 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
 #endif
     SqrtImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
-}
-template <typename T, bool isSetMask, const SqrtConfig& config>
-__aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-{
-    using PrimType = PrimT<T>;
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
-        "Sqrt")) {
-        ASCENDC_REPORT_CHECK_ERROR("Sqrt", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecUnaryInfo<T, T, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Sqrt");
-#endif
-    SqrtImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-        mask, repeatTime, repeatParams);
-}
 #else
-template <typename T, bool isSetMask>
-__aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-{
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Sqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
@@ -872,12 +799,27 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
 #endif
     SqrtImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
+#endif
 }
-template <typename T, bool isSetMask>
+template <typename T, bool isSetMask, const SqrtConfig& config>
 __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if ASCENDC_CPU_DEBUG
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
+        "Sqrt")) {
+        ASCENDC_REPORT_CHECK_ERROR("Sqrt", KernelFuncType::MASK_COUNT_MODE);
+    }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, T, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Sqrt");
+#endif
+    SqrtImpl<PrimType, isSetMask, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
+        mask, repeatTime, repeatParams);
+#else
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Sqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<PrimType>(mask, "Sqrt");
@@ -894,8 +836,8 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
 #endif
     SqrtImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, repeatParams);
-}
 #endif
+}
 
 /*
  * @ingroup Sqrt Level 2
@@ -904,11 +846,11 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, const SqrtConfig& config>
 __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Sqrt")) {
         ASCENDC_REPORT_CHECK_ERROR("Sqrt", KernelFuncType::CALCOUNT_MODE);
@@ -918,12 +860,7 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Sqrt", count);
 #endif
     SqrtImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #else
-template <typename T>
-__aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
-{
-    using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Sqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Sqrt");
@@ -937,8 +874,8 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Sqrt", count);
 #endif
     SqrtImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #endif
+}
 
 /* **************************************** Not ****************************************** */
 /*
@@ -1024,7 +961,6 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     NotImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /* **************************************** Neg ****************************************** */
 /*
  * @ingroup Neg Level 2
@@ -1036,6 +972,7 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 template <typename T>
 __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     using PrimType = PrimT<T>;
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "vneg")) {
@@ -1043,8 +980,8 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     }
 #endif
     NegImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-}
 #endif
+}
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_UNARY_INTERFACE_IMPL_H
