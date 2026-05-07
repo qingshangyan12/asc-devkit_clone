@@ -16,7 +16,8 @@
 
 /*!
  * \file local_tensor.h
- * \brief
+ * \brief Defines LocalTensor type and MakeTensor construction function.
+ * \brief LocalTensor represents a tensor view on local memory (UB, L1, L0A/B/C).
  */
 #ifndef INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 #define INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H
@@ -24,10 +25,22 @@
 #include "impl/tensor_api/tensor/tuple_impl.h"
 #include "impl/tensor_api/tensor/local_tensor_impl.h"
 
-// tensor construction
 namespace AscendC {
 namespace Te {
 
+/*
+ * @brief Creates a LocalTensor from iterator and layout arguments.
+ * @brief Combines iterator (pointer to data in local memory) with layout specification.
+ * @param [in] iter Iterator pointing to data in local memory
+ * @param [in] args Layout arguments (Shape, Stride, or Layout object)
+ * @return LocalTensor with deduced types
+ * @example
+ * // Create tensor from UB pointer with shape
+ * __ubuf__ half* ptr;
+ * auto tensor = MakeTensor(ptr, MakeShape(128, 64));
+ * // Create tensor with explicit layout
+ * auto tensor = MakeTensor(ptr, MakeLayout(MakeShape(128, 64), MakeStride(64, 1)));
+ */
 template <typename Iterator, typename... Args>
 __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args);
 

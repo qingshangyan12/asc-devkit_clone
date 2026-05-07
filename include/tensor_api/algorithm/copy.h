@@ -15,9 +15,10 @@
 #endif
 
 /*!
-* \file copy.h
-* \brief
-*/
+ * \file copy.h
+ * \brief Defines Copy algorithm for data movement operations.
+ * \brief Provides high-level copy interface for transferring data between tensors.
+ */
 #ifndef INCLUDE_TENSOR_API_ALGORITHM_COPY_H
 #define INCLUDE_TENSOR_API_ALGORITHM_COPY_H
 
@@ -26,17 +27,45 @@
 namespace AscendC {
 namespace Te {
 
+/*
+ * @brief Performs copy operation with compile-time traits and atom operation.
+ * @brief Copies data from source tensor to destination tensor using specified atom.
+ * @param [in] atomCopy CopyAtom defining copy operation parameters
+ * @param [in] params Additional parameters (source, destination, etc.)
+ * @example
+ * auto copyAtom = MakeCopy<CopyGM2UB>();
+ * Copy(copyAtom, srcTensor, dstTensor);
+ */
 template <typename Tp, const Tp& traits, typename T, typename... Params>
 __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params);
 
+/*
+ * @brief Performs copy operation with runtime atom parameters.
+ * @brief Simplified version without compile-time traits specification.
+ * @param [in] atomCopy CopyAtom defining copy operation
+ * @param [in] params Additional parameters (source, destination, etc.)
+ * @example
+ * Copy(copyAtom, srcTensor, dstTensor);
+ */
 template <typename T, typename... Params>
 __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params);
 
+/*
+ * @brief Creates a CopyAtom with specified traits.
+ * @brief Constructs atom operation for copy with compile-time configuration.
+ * @param [in] traits Copy operation traits (type, stride, repeat parameters)
+ * @return CopyAtom object with specified configuration
+ * @example
+ * // Create GM to UB copy atom
+ * auto copyAtom = MakeCopy<CopyGM2UB>();
+ * // Create UB to GM copy atom
+ * auto copyAtom = MakeCopy<CopyUB2GM>();
+ */
 template <typename... Args>
 __aicore__ inline auto MakeCopy(const Args& ...traits);
 
-}
-}
+} // namespace Te
+} // namespace AscendC
 
 #endif // INCLUDE_TENSOR_API_ALGORITHM_COPY_H
 

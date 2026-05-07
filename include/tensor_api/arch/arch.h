@@ -14,9 +14,10 @@
 #endif
 
 /*!
-* \file arch.h
-* \brief
-*/
+ * \file arch.h
+ * \brief Architecture-specific operations main entry point.
+ * \brief Provides hardware-specific implementations for Cube and Vector units.
+ */
 #ifndef INCLUDE_TENSOR_API_ARCH_ARCH_H
 #define INCLUDE_TENSOR_API_ARCH_ARCH_H
 

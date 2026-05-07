@@ -16,7 +16,8 @@
 
 /*!
  * \file pointer.h
- * \brief
+ * \brief Defines pointer types and construction functions.
+ * \brief Provides memory pointer abstraction for different memory hierarchies.
  */
 #ifndef INCLUDE_TENSOR_API_TENSOR_POINTER_H
 #define INCLUDE_TENSOR_API_TENSOR_POINTER_H
@@ -25,9 +26,28 @@
 
 namespace AscendC {
 namespace Te {
+
+/*
+ * @brief Creates a memory pointer with hardware type and traits.
+ * @param [in] args Pointer construction arguments (address, offset, etc.)
+ * @return Memory pointer object
+ * @example
+ * // Create GM pointer
+ * auto ptr = MakeMemPtr<GM, half>(address);
+ * // Create UB pointer
+ * auto ptr = MakeMemPtr<UB, half>(bufferAddress);
+ */
 template <typename Hardware, typename TraitOrType, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args);
 
+/*
+ * @brief Creates a memory pointer with hardware type only.
+ * @param [in] args Pointer construction arguments
+ * @return Memory pointer object
+ * @example
+ * // Create simple GM pointer
+ * auto ptr = MakeMemPtr<GM>(address);
+ */
 template <typename Hardware, typename... Args>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args);
 

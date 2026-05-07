@@ -15,9 +15,10 @@
 #endif
 
 /*!
-* \file mmad_atom.h
-* \brief
-*/
+ * \file mmad_atom.h
+ * \brief Defines MmadAtom structure for matrix multiply-add operations.
+ * \brief MmadAtom encapsulates MMAD operation configuration and traits.
+ */
 #ifndef INCLUDE_TENSOR_API_ATOM_CUBE_MMAD_ATOM_H
 #define INCLUDE_TENSOR_API_ATOM_CUBE_MMAD_ATOM_H
 
@@ -26,15 +27,27 @@
 namespace AscendC {
 namespace Te {
 
+/*
+ * @brief Defines traits for MMAD operations.
+ */
 template <typename MmadOperation, typename... MmadOpArgs>
 struct MmadTraits;
 
+/*
+ * @brief Base structure for MmadAtom.
+ */
 template <typename... Args>
 struct MmadAtom;
 
+/*
+ * @brief MmadAtom with single operation type.
+ */
 template <typename MmadOperation>
 struct MmadAtom<MmadOperation>;
 
+/*
+ * @brief MmadAtom constructed from MmadTraits.
+ */
 template <typename MmadOperation, typename... Args>
 struct MmadAtom<MmadTraits<MmadOperation, Args...>>;
 

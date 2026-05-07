@@ -15,9 +15,10 @@
 #endif
 
 /*!
-* \file mmad.h
-* \brief
-*/
+ * \file mmad.h
+ * \brief Defines Mmad algorithm for matrix multiply-add operations.
+ * \brief Provides high-level interface for Cube unit matrix computations.
+ */
 #ifndef INCLUDE_TENSOR_API_ALGORITHM_MMAD_H
 #define INCLUDE_TENSOR_API_ALGORITHM_MMAD_H
 
@@ -26,17 +27,43 @@
 namespace AscendC {
 namespace Te {
 
+/*
+ * @brief Performs matrix multiply-add with compile-time traits.
+ * @brief Executes M = A * B + C (or M = A * B) using Cube unit.
+ * @param [in] atomMmad MmadAtom defining matrix multiply parameters
+ * @param [in] params Input matrices (A, B) and optional accumulator (C)
+ * @example
+ * auto mmadAtom = MakeMmad<MmadOperation>();
+ * Mmad(mmadAtom, tensorA, tensorB, tensorC);
+ */
 template <typename Tp, const Tp& traits, typename T, typename... Params>
 __aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Params& ...params);
 
+/*
+ * @brief Performs matrix multiply-add with runtime atom parameters.
+ * @brief Simplified version without compile-time traits specification.
+ * @param [in] atomMmad MmadAtom defining matrix multiply operation
+ * @param [in] params Input matrices and configuration parameters
+ * @example
+ * Mmad(mmadAtom, tensorA, tensorB);
+ */
 template <typename T, typename... Params>
 __aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Params& ...params);
 
+/*
+ * @brief Creates an MmadAtom with specified traits.
+ * @brief Constructs atom operation for matrix multiply-add.
+ * @param [in] traits Mmad operation traits (dimensions, format, etc.)
+ * @return MmadAtom object with specified configuration
+ * @example
+ * // Create MMAD atom for matrix multiply
+ * auto mmadAtom = MakeMmad<MmadOperation>();
+ */
 template <typename... Args>
 __aicore__ inline auto MakeMmad(const Args& ...traits);
 
-}
-}
+} // namespace Te
+} // namespace AscendC
 
 #endif // INCLUDE_TENSOR_API_ALGORITHM_MMAD_H
 
