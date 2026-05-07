@@ -2,7 +2,7 @@
 
 本节介绍CPU域调试的方法：CPU侧验证核函数，gdb调试、使用printf命令打印。当前SIMT编程场景不支持。
 
->[!NOTE]说明 
+>[!NOTE] 说明
 >CPU调测过程中，配置日志相关环境变量，可以记录程序的运行过程及异常信息，有助于开发者进行功能调测。
 >关于环境变量的使用约束以及详细说明，可参见《环境变量参考》中“辅助功能 \> 日志”章节。
 
@@ -171,4 +171,3 @@ quit
 printf("xLocal size: %d\n", xLocal.GetSize()); 
 printf("tileLength: %d\n", tileLength);
 ```
-
