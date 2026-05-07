@@ -1,0 +1,381 @@
+# Regbase API 完整样例
+
+## 1. 向量加法样例
+
+### 1.1 基本向量加法
+
+```cpp
+#include "c_api/asc_simd.h"
+
+constexpr uint32_t one_repeat_size = 128;  // VL / sizeof(half)
+uint32_t total_length = 512;
+
+__simd_vf__ inline void vector_add(__ubuf__ half* dst_addr, __ubuf__ half* src0_addr,
+                                    __ubuf__ half* src1_addr)
+{
+    vector_half src0, src1, dst;
+    vector_bool mask;
+    iter_reg addr_reg;
+    
+    uint32_t repeat_time = total_length / one_repeat_size;
+    
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        addr_reg = asc_create_iter_reg_b16(one_repeat_size);
+        mask = asc_create_mask_b16(PAT_ALL);
+        
+        asc_loadalign(src0, src0_addr, addr_reg);
+        asc_loadalign(src1, src1_addr, addr_reg);
+        asc_add(dst, src0, src1, mask);
+        asc_storealign(dst_addr, dst, addr_reg, mask);
+    }
+}
+```
+
+---
+
+## 2. 非对齐数据处理样例
+
+### 2.1 非对齐地址向量取反
+
+```cpp
+#include "c_api/asc_simd.h"
+
+constexpr uint32_t one_repeat_size = 256;  // VL / sizeof(int8_t)
+uint32_t total_length = 255;
+
+__simd_vf__ inline void unalign_neg(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr)
+{
+    vector_int8_t src, dst;
+    vector_load_unalign ureg0;
+    vector_store_unalign ureg1;
+    vector_bool mask;
+    
+    uint32_t repeat_time = (total_length + one_repeat_size - 1) / one_repeat_size;
+    
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        uint32_t remaining = total_length - i * one_repeat_size;
+        uint32_t count = (remaining > one_repeat_size) ? one_repeat_size : remaining;
+        
+        mask = asc_update_mask_b8(count);
+        
+        asc_loadunalign_pre(ureg0, src_addr + i * one_repeat_size);
+        asc_loadunalign(src, ureg0, src_addr + i * one_repeat_size);
+        
+        asc_neg(dst, src, mask);
+        
+        asc_storeunalign(dst_addr + i * one_repeat_size, ureg1, dst, one_repeat_size);
+        asc_storeunalign_post(dst_addr + i * one_repeat_size, ureg1, 0);
+    }
+}
+```
+
+---
+
+## 3. 交织数据处理样例
+
+### 3.1 解交织处理
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void deinterleave_example(__ubuf__ half* dst0_addr, __ubuf__ half* dst1_addr,
+                                              __ubuf__ half* src_addr)
+{
+    vector_half a, b;
+    vector_half result_a, result_b;
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
+    
+    // 解交织加载：分离a和b序列
+    asc_loadalign_deintlv(a, b, src_addr);
+    
+    // 分别处理
+    asc_mul(result_a, a, a, mask);  // a序列平方
+    asc_mul(result_b, b, b, mask);  // b序列平方
+    
+    // 分别存储
+    asc_storealign(dst0_addr, result_a, mask);
+    asc_storealign(dst1_addr, result_b, mask);
+}
+```
+
+---
+
+## 4. 归约运算样例
+
+### 4.1 求和归约
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void reduce_sum_example(__ubuf__ half* dst_addr, __ubuf__ half* src_addr)
+{
+    vector_half src;
+    vector_half sum_result;
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
+    
+    asc_loadalign(src, src_addr);
+    
+    // 全量归约求和，结果存入sum_result的第一个元素
+    asc_reduce_sum(sum_result, src, mask);
+    
+    // 存储结果（只需存储1个元素）
+    asc_storealign(dst_addr, sum_result, mask);
+}
+```
+
+### 4.2 DataBlock归约
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void datablock_reduce_example(__ubuf__ half* dst_addr, __ubuf__ half* src_addr)
+{
+    vector_half src;
+    vector_half sum_result;
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
+    
+    asc_loadalign(src, src_addr);
+    
+    // 每个DataBlock求和，结果依次存入sum_result
+    // 输入128个元素 → 输出4个元素（每32B一个结果）
+    asc_reduce_sum_datablock(sum_result, src, mask);
+    
+    asc_storealign(dst_addr, sum_result, mask);
+}
+```
+
+---
+
+## 5. Softmax样例
+
+### 5.1 Softmax计算
+
+```cpp
+#include "c_api/asc_simd.h"
+
+constexpr uint32_t length = 128;
+
+__simd_vf__ inline void softmax_example(__ubuf__ half* dst_addr, __ubuf__ half* src_addr)
+{
+    vector_half src;
+    vector_half exp_result;
+    vector_half sum_result;
+    vector_half denominator;
+    vector_half result;
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
+    
+    // 1. 加载输入
+    asc_loadalign(src, src_addr);
+    
+    // 2. 计算exp(x)
+    asc_exp(exp_result, src, mask);
+    
+    // 3. 归约求sum(exp(x))
+    asc_reduce_sum(sum_result, exp_result, mask);
+    
+    // 4. 广播sum作为分母
+    asc_duplicate(denominator, sum_result, mask);
+    
+    // 5. 计算 exp(x) / sum
+    asc_div(result, exp_result, denominator, mask);
+    
+    // 6. 存储结果
+    asc_storealign(dst_addr, result, mask);
+}
+```
+
+---
+
+## 6. ReLU样例
+
+### 6.1 ReLU激活
+
+```cpp
+#include "c_api/asc_simd.h"
+
+constexpr uint32_t length = 128;
+
+__simd_vf__ inline void relu_example(__ubuf__ half* dst_addr, __ubuf__ half* src_addr)
+{
+    vector_half src, dst;
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
+    
+    asc_loadalign(src, src_addr);
+    
+    asc_relu(dst, src, mask);
+    
+    asc_storealign(dst_addr, dst, mask);
+}
+```
+
+### 6.2 LeakyReLU激活
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void leaky_relu_example(__ubuf__ half* dst_addr, __ubuf__ half* src_addr)
+{
+    vector_half src, dst;
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
+    half alpha = 0.1;
+    
+    asc_loadalign(src, src_addr);
+    
+    asc_leakyrelu(dst, src, alpha, mask);
+    
+    asc_storealign(dst_addr, dst, mask);
+}
+```
+
+---
+
+## 7. 数据类型转换样例
+
+### 7.1 FP16 → FP32
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void half_to_float(__ubuf__ float* dst_addr, __ubuf__ half* src_addr)
+{
+    vector_half src;
+    vector_float dst;
+    
+    asc_loadalign(src, src_addr);
+    
+    asc_half2float(dst, src);
+    
+    asc_storealign(dst_addr, dst);
+}
+```
+
+### 7.2 FP32 → FP16
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void float_to_half(__ubuf__ half* dst_addr, __ubuf__ float* src_addr)
+{
+    vector_float src;
+    vector_half dst;
+    vector_bool mask = asc_create_mask_b32(PAT_ALL);
+    
+    asc_loadalign(src, src_addr);
+    
+    asc_float2half(dst, src, mask);
+    
+    asc_storealign(dst_addr, dst, mask);
+}
+```
+
+---
+
+## 8. 比较运算样例
+
+### 8.1 大于比较
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void greater_than_example(__ubuf__ half* src0_addr, __ubuf__ half* src1_addr)
+{
+    vector_half src0, src1;
+    vector_bool result, mask;
+    
+    mask = asc_create_mask_b16(PAT_ALL);
+    
+    asc_loadalign(src0, src0_addr);
+    asc_loadalign(src1, src1_addr);
+    
+    asc_gt(result, src0, src1, mask);
+    
+    // result为比较结果掩码
+}
+```
+
+---
+
+## 9. 数据压缩样例
+
+### 9.1 有效元素压缩
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void squeeze_example(__ubuf__ half* dst_addr, __ubuf__ half* src_addr)
+{
+    vector_half src, dst;
+    vector_bool mask;
+    
+    // 假设只有奇数位置元素有效
+    // 创建对应的掩码
+    
+    asc_loadalign(src, src_addr);
+    
+    asc_squeeze(dst, src, mask);  // 有效元素连续排列到dst
+    
+    asc_storealign(dst_addr, dst);
+}
+```
+
+---
+
+## 10. 上采样/下采样样例
+
+### 10.1 上采样
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void upsample_example(__ubuf__ half* dst_addr, __ubuf__ half* src_addr)
+{
+    vector_half dst;
+    
+    // 上采样加载：64元素 → 128元素（每个元素扩展为两个）
+    asc_loadalign_upsample(dst, src_addr);
+    
+    asc_storealign(dst_addr, dst);
+}
+```
+
+### 10.2 下采样
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void downsample_example(__ubuf__ half* dst_addr, __ubuf__ half* src_addr)
+{
+    vector_half dst;
+    
+    // 下采样加载：128元素 → 64元素
+    asc_loadalign_downsample(dst, src_addr);
+    
+    asc_storealign(dst_addr, dst);
+}
+```
+
+---
+
+## 11. 广播样例
+
+### 11.1 单值广播
+
+```cpp
+#include "c_api/asc_simd.h"
+
+__simd_vf__ inline void broadcast_example(__ubuf__ half* dst_addr, __ubuf__ half* src_addr)
+{
+    vector_half dst;
+    
+    // 广播加载：第一个元素广播到整个寄存器
+    asc_loadalign_brc(dst, src_addr);
+    // dst所有元素值都等于src_addr的第一个元素
+    
+    asc_storealign(dst_addr, dst);
+}
+```
+
+---
+
+**文档版本**: 1.0  
+**适用产品**: Ascend 950PR/Ascend 950DT
