@@ -82,7 +82,7 @@ CANN作为昇腾NPU配套的全栈软件平台，采用分层架构设计，实�
         - [算子入图开发](../编程指南/高级编程/高级特性/算子入图开发/概述.md)
 - **实践巩固**
    - [典型SIMD & SIMT混合算子开发](../算子实践参考/SIMD与SIMT混合算子实现/算子实现.md)
-   - [Ascend C算子高性能实践样例仓](https://github.com/cann/cann-samples)
+   - [Ascend C算子高性能实践样例仓](https://gitcode.com/cann/cann-samples)
 - **跨代迁移**
    - [跨代迁移兼容性指南](../跨代迁移兼容性指南/概述.md)
 
