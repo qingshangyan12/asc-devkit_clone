@@ -33,7 +33,12 @@ public:
     __aicore__ inline ~CustomCubeInBuffer() {}
     __aicore__ inline void Init(int32_t baseBlockSize, int32_t cacheNum)
     {
-        GetTPipePtr()->InitBuffer(qid_, 1, 16384);
+        (void)cacheNum;
+        int32_t bufferSize = baseBlockSize * AscendC::GetBitSize<SrcT>() / ONE_BYTE_BIT_SIZE;
+        if (bufferSize < 16384) {
+            bufferSize = 16384;
+        }
+        GetTPipePtr()->InitBuffer(qid_, 1, bufferSize);
     }
     __aicore__ inline void Destroy() {
         if (cacheProc_ > 0) {

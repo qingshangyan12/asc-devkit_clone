@@ -20,6 +20,21 @@ using namespace AscendC;
 
 static constexpr int K_ALIGN_64 = 64;
 
+__aicore__ inline constexpr uint32_t GetMxScaleKBlockCount(uint32_t k)
+{
+    return (k + K_ALIGN_64 - 1) / K_ALIGN_64 * 2;
+}
+
+__aicore__ inline constexpr uint32_t GetMxScaleMSize(uint32_t m, uint32_t k)
+{
+    return m * GetMxScaleKBlockCount(k);
+}
+
+__aicore__ inline constexpr uint32_t GetMxScaleNSize(uint32_t n, uint32_t k)
+{
+    return GetMxScaleKBlockCount(k) * n;
+}
+
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG>
 __aicore__ inline void main_kernel_matmul(GM_ADDR aGM, GM_ADDR amxGM, GM_ADDR bGM, GM_ADDR bmxGM, GM_ADDR cGM, GM_ADDR biasGM,
     TilingParamsMx &tilingParam, int32_t isTransposeAIn, int32_t isTransposeASIn, int32_t isTransposeBIn, int32_t isTransposeBSIn)
@@ -51,9 +66,9 @@ __aicore__ inline void main_kernel_matmul(GM_ADDR aGM, GM_ADDR amxGM, GM_ADDR bG
     GlobalTensor<BiasT> biasGlobal;
 
     aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ A_T*>(aGM), tiling.M * tiling.Ka);
-    amxGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ MX_T*>(amxGM), tiling.M * ((tiling.Ka + 63) / 64 * 2));
+    amxGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ MX_T*>(amxGM), GetMxScaleMSize(tiling.M, tiling.Ka));
     bGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ B_T*>(bGM), tiling.Kb * tiling.N);
-    bmxGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ MX_T*>(bmxGM), ((tiling.Kb + 63) / 64 * 2) * tiling.N);
+    bmxGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ MX_T*>(bmxGM), GetMxScaleNSize(tiling.N, tiling.Kb));
     cGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ C_T*>(cGM), tiling.M * tiling.N);
     biasGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ BiasT*>(biasGM), tiling.N);
 
@@ -92,8 +107,8 @@ __aicore__ inline void main_kernel_matmul(GM_ADDR aGM, GM_ADDR amxGM, GM_ADDR bG
     uint32_t scaleFactorKa = 1;
     uint32_t scaleFactorKb = 1;
     if (tiling.mxTypePara) { // MDL
-         uint32_t scaleFactorKa = tiling.mxTypePara & 0x0000007f;
-         uint32_t scaleFactorKb = (tiling.mxTypePara & 0x00007f00) >> 8U;
+        scaleFactorKa = tiling.mxTypePara & 0x0000007f;
+        scaleFactorKb = (tiling.mxTypePara & 0x00007f00) >> 8U;
     }
 
     int alignSingleCoreM = Ceil(tiling.singleCoreM, BLOCK_CUBE) * BLOCK_CUBE;
@@ -157,17 +172,19 @@ __aicore__ inline void main_kernel_matmul(GM_ADDR aGM, GM_ADDR amxGM, GM_ADDR bG
         mm.SetTensorA(gmA, isTransposeA);
     }
     if constexpr (A_TYPE::scalePosition == TPosition::VECOUT) {
-        pipe.InitBuffer(leftMatrixScale, 1, tiling.M * tiling.Ka / 32);
+        const uint32_t scaleASize = GetMxScaleMSize(tiling.M, tiling.Ka);
+        pipe.InitBuffer(leftMatrixScale, 1, scaleASize * sizeof(MX_T));
         bufferMxLeft = leftMatrixScale.AllocTensor<MX_T>();
-        DataCopy(bufferMxLeft, gmAMX, tiling.M * tiling.Ka / 32);
+        DataCopy(bufferMxLeft, gmAMX, scaleASize);
         pipe_barrier(PIPE_ALL);
         mm.SetTensorScaleA(bufferMxLeft, isTransposeAS);
     } else if constexpr (A_TYPE::scalePosition == TPosition::TSCM) {
         bufferMxLeft = qidMxA1.AllocTensor<MX_T>();
-        int blockLen = tiling.singleCoreK / 32 * BLOCK_CUBE * sizeof(MX_T) / ONE_BLK_SIZE;
-        uint64_t nburst = Ceil(alignSingleCoreM, BLOCK_CUBE);
-        uint64_t dstStride = (scaleFactorKa - 1) * alignSingleCoreK / 32 * BLOCK_CUBE / 32;
-        DataCopy(bufferMxLeft, gmAMX, {nburst, static_cast<uint64_t>(blockLen), 0, dstStride});
+        const uint16_t blockLen = static_cast<uint16_t>(
+            GetMxScaleKBlockCount(tiling.singleCoreK) * BLOCK_CUBE * sizeof(MX_T) / ONE_BLK_SIZE);
+        const uint16_t nburst = static_cast<uint16_t>(Ceil(alignSingleCoreM, BLOCK_CUBE));
+        const uint16_t dstStride = static_cast<uint16_t>((scaleFactorKa - 1) * alignSingleCoreK / 32 * BLOCK_CUBE / 32);
+        DataCopy(bufferMxLeft, gmAMX, {nburst, blockLen, 0, dstStride});
         pipe_barrier(PIPE_ALL);
         mm.SetTensorScaleA(bufferMxLeft, isTransposeAS);
     } else if constexpr (A_TYPE::scalePosition == TPosition::GM) {
@@ -197,17 +214,19 @@ __aicore__ inline void main_kernel_matmul(GM_ADDR aGM, GM_ADDR amxGM, GM_ADDR bG
         mm.SetTensorB(gmB, isTransposeB);
     }
     if constexpr (B_TYPE::scalePosition == TPosition::VECOUT) {
-        pipe.InitBuffer(rightMatrixScale, 1, tiling.Kb * tiling.N / 32);
+        const uint32_t scaleBSize = GetMxScaleNSize(tiling.N, tiling.Kb);
+        pipe.InitBuffer(rightMatrixScale, 1, scaleBSize * sizeof(MX_T));
         bufferMxRight = rightMatrixScale.AllocTensor<MX_T>();
-        DataCopy(bufferMxRight, gmBMX, tiling.Kb * tiling.N);
+        DataCopy(bufferMxRight, gmBMX, scaleBSize);
         pipe_barrier(PIPE_ALL);
         mm.SetTensorScaleB(bufferMxRight, isTransposeBS);
     } else if constexpr (B_TYPE::scalePosition == TPosition::TSCM) {
         bufferMxRight = qidMxB1.AllocTensor<MX_T>();
-        int blockLen = tiling.singleCoreK / 32 * BLOCK_CUBE * sizeof(MX_T) / ONE_BLK_SIZE;
-        uint64_t nburst = Ceil(alignSingleCoreM, BLOCK_CUBE);
-        uint64_t dstStride = (scaleFactorKb - 1) * alignSingleCoreK / 32 * BLOCK_CUBE / 32;
-        DataCopy(bufferMxRight, gmBMX, {nburst, static_cast<uint64_t>(blockLen), 0, dstStride});
+        const uint16_t blockLen = static_cast<uint16_t>(
+            GetMxScaleKBlockCount(tiling.singleCoreK) * BLOCK_CUBE * sizeof(MX_T) / ONE_BLK_SIZE);
+        const uint16_t nburst = static_cast<uint16_t>(Ceil(alignSingleCoreN, BLOCK_CUBE));
+        const uint16_t dstStride = static_cast<uint16_t>((scaleFactorKb - 1) * alignSingleCoreK / 32 * BLOCK_CUBE / 32);
+        DataCopy(bufferMxRight, gmBMX, {nburst, blockLen, 0, dstStride});
         pipe_barrier(PIPE_ALL);
         mm.SetTensorScaleB(bufferMxRight, isTransposeBS);
     } else if constexpr (B_TYPE::scalePosition == TPosition::GM) {
@@ -345,9 +364,9 @@ __aicore__ constexpr MatmulApiStaticTiling GetCustomMatmulApiTiling(const Matmul
     ##_##isTransposeB##_##isTransposeBS##_##CFG_Mode)                                            \
     {                                                                                                                  \
         const int32_t left_data_size = tilingParams.M_ * tilingParams.K_;                                              \
-        const int32_t left_scale_data_size = tilingParams.M_ * ((tilingParams.K_ + 63) / 64 * 2);                          \
+        const int32_t left_scale_data_size = GetMxScaleMSize(tilingParams.M_, tilingParams.K_);                          \
         const int32_t right_data_size = tilingParams.K_ * tilingParams.N_;                                             \
-        const int32_t right_scale_data_size = ((tilingParams.K_ + 63) / 64 * 2) * tilingParams.N_;                         \
+        const int32_t right_scale_data_size = GetMxScaleNSize(tilingParams.N_, tilingParams.K_);                         \
         const int32_t bias_data_size = tilingParams.N_;                                                                \
         const int32_t output_data_size = tilingParams.M_ * tilingParams.N_;                                            \
         uint8_t left_global[left_data_size * sizeof(A_DType)] = {0};                                                   \
@@ -388,9 +407,9 @@ __aicore__ constexpr MatmulApiStaticTiling GetCustomMatmulApiTiling(const Matmul
     ##_##isTransposeB##_##isTransposeBS##_##CFG_Mode##_##enTiling)                               \
     {                                                                                                                  \
         const int32_t left_data_size = tilingParams.M_ * tilingParams.K_;                                              \
-        const int32_t left_scale_data_size = tilingParams.M_ * ((tilingParams.K_ + 31) / 32);                          \
+        const int32_t left_scale_data_size = GetMxScaleMSize(tilingParams.M_, tilingParams.K_);                          \
         const int32_t right_data_size = tilingParams.K_ * tilingParams.N_;                                             \
-        const int32_t right_scale_data_size = ((tilingParams.K_ + 31) / 32) * tilingParams.N_;                         \
+        const int32_t right_scale_data_size = GetMxScaleNSize(tilingParams.N_, tilingParams.K_);                         \
         const int32_t bias_data_size = tilingParams.N_;                                                                \
         const int32_t output_data_size = tilingParams.M_ * tilingParams.N_;                                            \
         uint8_t left_global[left_data_size * sizeof(A_DType)] = {0};                                                   \

@@ -200,7 +200,7 @@ __aicore__ inline void main_kernel_matmul_channel_split(GM_ADDR aGM, GM_ADDR bGM
     LocalTensor<BiasT> bufferBias;
 
     if constexpr (A_TYPE::pos == TPosition::VECCALC) {
-        que.InitBuffer(leftMatrix, 1, tiling.M * tiling.Ka * 2);
+        que.InitBuffer(leftMatrix, 1, tiling.M * tiling.Ka * sizeof(A_T));
         bufferLeft = leftMatrix.AllocTensor<A_T>();
         DataCopy(bufferLeft, gmA, tiling.M * tiling.Ka);
         PipeBarrier<PIPE_ALL>();
@@ -210,7 +210,7 @@ __aicore__ inline void main_kernel_matmul_channel_split(GM_ADDR aGM, GM_ADDR bGM
     }
 
     if constexpr (B_TYPE::pos == TPosition::VECCALC) {
-        que.InitBuffer(rightMatrix, 1, tiling.Kb * tiling.N * 2);
+        que.InitBuffer(rightMatrix, 1, tiling.Kb * tiling.N * sizeof(B_T));
         bufferRight = rightMatrix.AllocTensor<B_T>();
         DataCopy(bufferRight, gmB, tiling.Kb * tiling.N);
         PipeBarrier<PIPE_ALL>();
@@ -220,7 +220,7 @@ __aicore__ inline void main_kernel_matmul_channel_split(GM_ADDR aGM, GM_ADDR bGM
     }
 
     if constexpr (BIAS_TYPE::pos == TPosition::VECCALC) {
-        que.InitBuffer(biasQue, 1, tiling.N * 4);
+        que.InitBuffer(biasQue, 1, tiling.N * sizeof(BiasT));
         bufferBias = biasQue.AllocTensor<BiasT>();
         DataCopy(bufferBias, gmBias, tiling.N);
         PipeBarrier<PIPE_ALL>();

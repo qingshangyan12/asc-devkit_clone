@@ -32,7 +32,12 @@ public:
     __aicore__ inline ~CustomCubeInBuffer() {}
     __aicore__ inline void Init(int32_t baseBlockSize, int32_t cacheNum)
     {
-        GetTPipePtr()->InitBuffer(qid_, 1, 16384);
+        (void)cacheNum;
+        int32_t bufferSize = baseBlockSize * AscendC::GetBitSize<SrcT>() / ONE_BYTE_BIT_SIZE;
+        if (bufferSize < 16384) {
+            bufferSize = 16384;
+        }
+        GetTPipePtr()->InitBuffer(qid_, 1, bufferSize);
     }
     __aicore__ inline void Destroy() {
         if (cacheProc_ > 0) {
@@ -217,8 +222,10 @@ public:
 
     void SetUBInput(bool isTransposeA = false, bool isTransposeB = false)
     {
-        pipe.InitBuffer(leftMatrix, 1, MATMUL_MODULE(MatmulShapeInfo)->GetOrgKa() * MATMUL_MODULE(MatmulShapeInfo)->GetOrgM());
-        pipe.InitBuffer(rightMatrix, 1, MATMUL_MODULE(MatmulShapeInfo)->GetOrgKb() * MATMUL_MODULE(MatmulShapeInfo)->GetOrgN());
+        pipe.InitBuffer(leftMatrix, 1, MATMUL_MODULE(MatmulShapeInfo)->GetOrgKa() *
+            MATMUL_MODULE(MatmulShapeInfo)->GetOrgM() * AscendC::GetBitSize<SrcT>() / ONE_BYTE_BIT_SIZE);
+        pipe.InitBuffer(rightMatrix, 1, MATMUL_MODULE(MatmulShapeInfo)->GetOrgKb() *
+            MATMUL_MODULE(MatmulShapeInfo)->GetOrgN() * AscendC::GetBitSize<SrcBT>() / ONE_BYTE_BIT_SIZE);
         LocalTensor<SrcT> fakeInputA;
         LocalTensor<SrcBT> fakeInputB;
         fakeInputA = leftMatrix.AllocTensor<SrcT>();
