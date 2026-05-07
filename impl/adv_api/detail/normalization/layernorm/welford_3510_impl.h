@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * This program is free software; you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -33,6 +33,7 @@
 #include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {
+namespace Internal {
 
 // Unified helper function for repeated WelfordUpdateImplForB16VF/B32VF core logic
 template <typename T, bool IsB16>
@@ -91,7 +92,7 @@ __simd_vf__ inline void WelfordUpdateImplForB16VF(
 
     if constexpr (config.isInplace) {
         uint32_t inPlaceLength = AlignUp(para.abLength - para.abComputeLength, 8);
-        uint16_t repeatInplace = static_cast<uint16_t>(CeilDivision(inPlaceLength, Internal::LAYERNORM_B32_VF_LEN));
+        uint16_t repeatInplace = static_cast<uint16_t>(CeilDivision(inPlaceLength, LAYERNORM_B32_VF_LEN));
         uint32_t dstOffset = para.abLength - inPlaceLength;
         WelfordUpdateImplInplaceCopy(
             preg, meanVreg, varVreg, outMean, outVar, inMean, inVar, para.abLength, inPlaceLength, repeatInplace,
@@ -144,7 +145,7 @@ __simd_vf__ inline void WelfordUpdateImplForB32VF(
 
     if constexpr (config.isInplace) {
         uint32_t inPlaceLength = AlignUp(para.abLength - para.abComputeLength, 8);
-        uint16_t repeatInplace = static_cast<uint16_t>(CeilDivision(inPlaceLength, Internal::LAYERNORM_B32_VF_LEN));
+        uint16_t repeatInplace = static_cast<uint16_t>(CeilDivision(inPlaceLength, LAYERNORM_B32_VF_LEN));
         uint32_t dstOffset = para.abLength - inPlaceLength;
         WelfordUpdateImplInplaceCopy(
             preg, meanVreg, varVreg, outMean, outVar, inMean, inVar, para.abLength, inPlaceLength, repeatInplace,
@@ -172,7 +173,7 @@ __aicore__ inline void WelfordUpdateImplForB16(
     __ubuf__ float* const inVar, const WelfordUpdateParam& para)
 {
     const uint16_t sregLowerB32 = static_cast<uint16_t>(GetVecLen() / sizeof(float)); // 64
-    const uint32_t sregLower = static_cast<uint32_t>(Internal::LAYERNORM_B16_VF_LEN);
+    const uint32_t sregLower = static_cast<uint32_t>(LAYERNORM_B16_VF_LEN);
     const uint32_t K = para.abComputeLength;
 
     WelfordUpdateImplForB16VF<T, config>(outMean, outVar, src, inMean, inVar, para, sregLowerB32, sregLower, K);
@@ -183,7 +184,7 @@ __aicore__ inline void WelfordUpdateImplForB32(
     __ubuf__ float* const outMean, __ubuf__ float* const outVar, __ubuf__ T* const src, __ubuf__ float* const inMean,
     __ubuf__ float* const inVar, const WelfordUpdateParam& para)
 {
-    const uint32_t sregLower = static_cast<uint32_t>(Internal::LAYERNORM_B32_VF_LEN);
+    const uint32_t sregLower = static_cast<uint32_t>(LAYERNORM_B32_VF_LEN);
     const uint32_t K = para.abComputeLength;
 
     WelfordUpdateImplForB32VF<T, config>(outMean, outVar, src, inMean, inVar, para, sregLower, K);
@@ -224,6 +225,33 @@ __aicore__ inline void WelfordUpdateImpl(
 {
     WelfordUpdateImpl<T, float, isReuseSource, config>(
         outputMean, outputVariance, inputMean, inputVariance, inputX, para);
+}
+
+} // namespace Internal
+
+// ==================== AscendC namespace deprecated wrappers ====================
+
+template <typename T, typename U = float, bool isReuseSource = false,
+    const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
+[[deprecated("use AscendC::Internal::WelfordUpdateImpl instead")]]
+__aicore__ inline void WelfordUpdateImpl(
+    const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean,
+    const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const WelfordUpdateParam& para)
+{
+    Internal::WelfordUpdateImpl<T, U, isReuseSource, config>(
+        outputMean, outputVariance, inputMean, inputVariance, inputX, para);
+}
+
+template <typename T, typename U = float, bool isReuseSource = false,
+    const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
+[[deprecated("use AscendC::Internal::WelfordUpdateImpl instead")]]
+__aicore__ inline void WelfordUpdateImpl(
+    const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean,
+    const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const WelfordUpdateParam& para)
+{
+    Internal::WelfordUpdateImpl<T, U, isReuseSource, config>(
+        outputMean, outputVariance, inputMean, inputVariance, inputX, sharedTmpBuffer, para);
 }
 
 } // namespace AscendC

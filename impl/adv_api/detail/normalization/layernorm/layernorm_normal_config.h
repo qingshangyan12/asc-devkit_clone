@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * This program is free software; you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -24,13 +24,24 @@
 #include "include/adv_api/normalization/layernorm_utils.h"
 
 namespace AscendC {
+namespace Internal {
 
 __aicore__ constexpr LayerNormConfig GetLayerNormNormalConfig()
 {
     return {.isNoBeta = false, .isNoGamma = false, .isOnlyOutput = false, .isOutputRstd = true};
 }
 
-constexpr LayerNormConfig LNCFG_NORM = GetLayerNormNormalConfig();
+constexpr LayerNormConfig LNCFG_NORM_IMPL = GetLayerNormNormalConfig();
+
+} // namespace Internal
+
+[[deprecated("use AscendC::Internal::GetLayerNormNormalConfig instead")]]
+__aicore__ constexpr LayerNormConfig GetLayerNormNormalConfig()
+{
+    return Internal::GetLayerNormNormalConfig();
+}
+
+constexpr LayerNormConfig LNCFG_NORM = Internal::LNCFG_NORM_IMPL;
 
 } // namespace AscendC
 #endif // IMPL_NORMALIZATION_LAYERNORM_LAYERNORM_NORMAL_CONFIG_H

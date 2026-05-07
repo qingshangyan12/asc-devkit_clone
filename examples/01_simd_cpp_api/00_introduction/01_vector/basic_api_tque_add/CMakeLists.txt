@@ -23,5 +23,8 @@ add_executable(add
 )
 
 target_compile_options(add PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
+    -Werror
+    -Wno-error=deprecated-declarations
+    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
 )

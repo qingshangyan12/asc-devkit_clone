@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * This program is free software; you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -34,6 +34,7 @@
 #include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {
+namespace Internal {
 
 template <typename T>
 __aicore__ inline void GetLayerNormOutput(
@@ -222,7 +223,7 @@ __aicore__ inline void LayerNormImpl(
 template <typename T>
 __aicore__ inline void ComputeMeanVariance(
     const LocalTensor<float>& outputMean, const LocalTensor<float>& variance, const LocalTensor<T>& src,
-    const LayerNormRstdTmpTensorParams<float>& params, const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
+    const LayerNormRstdTmpTensorParamsImpl<float>& params, const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
 {
     if constexpr (IsSameType<T, half>::value) {
         Cast<float, T>(params.tempTensorA, src, RoundMode::CAST_NONE, tiling.arCurLength);
@@ -282,7 +283,7 @@ __aicore__ inline void LayerNormCalMeanVarImpl(
         LayerNormPreProc<T>(inputX, stackBuffer, para);
     }
     // allocate temp buffer
-    LayerNormRstdTmpTensorParams<float> params;
+    LayerNormRstdTmpTensorParamsImpl<float> params;
     GetLayerNormRstdTensorInfo<isReuseSource>(stackBuffer, tiling, params);
 
     uint32_t inputOffset = 0;
@@ -540,6 +541,103 @@ __aicore__ inline void WelfordUpdateImpl(
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
 
     WelfordUpdateImpl<T, U, isReuseSource, config>(outMean, outVar, inMean, inVar, srcUb, stackTensor, para);
+}
+
+} // namespace Internal
+
+// ==================== AscendC namespace deprecated wrappers ====================
+
+template <typename T>
+[[deprecated("use AscendC::Internal::GetLayerNormOutput instead")]]
+__aicore__ inline void GetLayerNormOutput(
+    const LocalTensor<T>& output, const LocalTensor<float>& inputY, const LocalTensor<T>& gamma,
+    const LocalTensor<T>& beta, const LayerNormTiling& tiling, const LayerNormParams<float>& params)
+{
+    Internal::GetLayerNormOutput<T>(output, inputY, gamma, beta, tiling, params);
+}
+
+template <typename T>
+[[deprecated("use AscendC::Internal::LayerNormExe instead")]]
+__aicore__ inline void LayerNormExe(
+    const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta, const LocalTensor<T>& output,
+    const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance, const T epsilon,
+    const LayerNormTiling& tiling, const LayerNormParams<float>& params)
+{
+    Internal::LayerNormExe<T>(inputX, gamma, beta, output, outputMean, outputVariance, epsilon, tiling, params);
+}
+
+template <typename T>
+[[deprecated("use AscendC::Internal::LayerNormND instead")]]
+__aicore__ inline void LayerNormND(
+    const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta, const LocalTensor<T>& output,
+    const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance, const T epsilon, LayerNormTiling& tiling,
+    const LayerNormParams<float>& params)
+{
+    Internal::LayerNormND<T>(inputX, gamma, beta, output, outputMean, outputVariance, epsilon, tiling, params);
+}
+
+template <typename T, bool isReuseSource = false>
+[[deprecated("use AscendC::Internal::LayerNormImpl instead")]]
+__aicore__ inline void LayerNormImpl(
+    const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
+    const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, LayerNormTiling& tiling)
+{
+    Internal::LayerNormImpl<T, isReuseSource>(
+        output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling);
+}
+
+template <typename T, bool isReuseSource = false>
+[[deprecated("use AscendC::Internal::LayerNormImpl instead")]]
+__aicore__ inline void LayerNormImpl(
+    const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
+    const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta, const T epsilon,
+    LayerNormTiling& tiling)
+{
+    Internal::LayerNormImpl<T, isReuseSource>(
+        output, outputMean, outputVariance, inputX, gamma, beta, epsilon, tiling);
+}
+
+template <typename U, typename T, bool isReuseSource = false, const LayerNormConfig& config = LNCFG_NORM>
+[[deprecated("use AscendC::Internal::LayerNormImpl instead")]]
+__aicore__ inline void LayerNormImpl(
+    const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd,
+    const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon,
+    const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
+{
+    Internal::LayerNormImpl<U, T, isReuseSource, config>(
+        output, outputMean, outputRstd, inputX, gamma, beta, epsilon, para, tiling);
+}
+
+template <typename U, typename T, bool isReuseSource = false, const LayerNormConfig& config = LNCFG_NORM>
+[[deprecated("use AscendC::Internal::LayerNormImpl instead")]]
+__aicore__ inline void LayerNormImpl(
+    const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd,
+    const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
+{
+    Internal::LayerNormImpl<U, T, isReuseSource, config>(
+        output, outputMean, outputRstd, inputX, gamma, beta, epsilon, sharedTmpBuffer, para, tiling);
+}
+
+template <typename T, typename U, bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
+[[deprecated("use AscendC::Internal::WelfordUpdateImpl instead")]]
+__aicore__ inline void WelfordUpdateImpl(
+    const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean,
+    const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const WelfordUpdateParam& para)
+{
+    Internal::WelfordUpdateImpl<T, U, isReuseSource, config>(
+        outputMean, outputVariance, inputMean, inputVariance, inputX, sharedTmpBuffer, para);
+}
+
+template <typename T, typename U, bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
+[[deprecated("use AscendC::Internal::WelfordUpdateImpl instead")]]
+__aicore__ inline void WelfordUpdateImpl(
+    const LocalTensor<U>& outMean, const LocalTensor<U>& outVar, const LocalTensor<U>& inMean,
+    const LocalTensor<U>& inVar, const LocalTensor<T>& srcUb, const WelfordUpdateParam& para)
+{
+    Internal::WelfordUpdateImpl<T, U, isReuseSource, config>(outMean, outVar, inMean, inVar, srcUb, para);
 }
 
 } // namespace AscendC

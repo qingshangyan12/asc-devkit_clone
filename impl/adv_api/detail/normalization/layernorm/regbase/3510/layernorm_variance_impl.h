@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * This program is free software; you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -68,11 +68,10 @@ __simd_callee__ inline void CopyInFloatData(Reg::RegTensor<float>& reg, __ubuf__
         Reg::LoadAlign(reg, ub);
     }
 }
-} // namespace Internal
 
 template <typename T>
 __simd_callee__ inline void CalcHMean(
-    Reg::RegTensor<float>& outputMean, __ubuf__ T* inputX, Internal::LayerNormInternalPara& para)
+    Reg::RegTensor<float>& outputMean, __ubuf__ T* inputX, LayerNormInternalPara& para)
 {
     Reg::RegTensor<float> hDim;
     Reg::Duplicate(hDim, para.hDim);
@@ -84,14 +83,14 @@ __simd_callee__ inline void CalcHMean(
 
     for (uint32_t repeat = 0; repeat < para.hRepeatCtrl; ++repeat) {
         // Copy first block to sumResultH.
-        Internal::CopyInFloatData(sumResultH, inputX, hFloatAllMask);
+        CopyInFloatData(sumResultH, inputX, hFloatAllMask);
         // Calc x/H in first block
         Reg::Div(sumResultH, sumResultH, hDim, hFloatAllMask);
 
         for (uint32_t i = 1; i < para.hRepeatTimes; ++i) {
             Reg::RegTensor<float> inputMeanTempReg;
             // Copy new block to inputMeanTempReg.
-            Internal::CopyInFloatData(inputMeanTempReg, inputX + i * Internal::oneRegSize, hFloatAllMask);
+            CopyInFloatData(inputMeanTempReg, inputX + i * oneRegSize, hFloatAllMask);
             // Calc x/H in new block
             Reg::Div(inputMeanTempReg, inputMeanTempReg, hDim, hFloatAllMask);
             // Accumulate new data onto sumResultH
@@ -102,7 +101,7 @@ __simd_callee__ inline void CalcHMean(
     for (uint32_t tail = 0; tail < para.hTailCtrl; ++tail) {
         Reg::RegTensor<float> inputMeanTempReg;
         // Copy tail block to inputMeanTempReg.
-        Internal::CopyInFloatData(inputMeanTempReg, inputX + para.hTailOffset, hTailFloatMask);
+        CopyInFloatData(inputMeanTempReg, inputX + para.hTailOffset, hTailFloatMask);
 
         // Calc x/H in tail block
         Reg::Div(inputMeanTempReg, inputMeanTempReg, hDim, hTailFloatMask);
@@ -115,7 +114,7 @@ __simd_callee__ inline void CalcHMean(
 template <typename T>
 __simd_callee__ inline void CalcHVariance(
     Reg::RegTensor<float>& outputVariance, Reg::RegTensor<float>& meanReg, __ubuf__ T* inputX,
-    Internal::LayerNormInternalPara& para)
+    LayerNormInternalPara& para)
 {
     Reg::RegTensor<float> sumVarianceResultH;
     Reg::Duplicate(sumVarianceResultH, 0);
@@ -128,7 +127,7 @@ __simd_callee__ inline void CalcHVariance(
 
     for (uint32_t repeat = 0; repeat < para.hRepeatCtrl; ++repeat) {
         // Copy first block to sumVarianceResultH.
-        Internal::CopyInFloatData(sumVarianceResultH, inputX, hFloatAllMask);
+        CopyInFloatData(sumVarianceResultH, inputX, hFloatAllMask);
 
         // Calc x - mean in first block
         Reg::Sub(sumVarianceResultH, sumVarianceResultH, meanReg, hFloatAllMask);
@@ -140,7 +139,7 @@ __simd_callee__ inline void CalcHVariance(
         for (uint32_t i = 1; i < para.hRepeatTimes; ++i) {
             Reg::RegTensor<float> inputVarianceReg;
             // Copy new block to inputVarianceReg.
-            Internal::CopyInFloatData(inputVarianceReg, inputX + i * Internal::oneRegSize, hFloatAllMask);
+            CopyInFloatData(inputVarianceReg, inputX + i * oneRegSize, hFloatAllMask);
 
             // Calc x - mean in new block
             Reg::Sub(inputVarianceReg, inputVarianceReg, meanReg, hFloatAllMask);
@@ -156,7 +155,7 @@ __simd_callee__ inline void CalcHVariance(
     for (uint32_t tail = 0; tail < para.hTailCtrl; ++tail) {
         Reg::RegTensor<float> inputVarianceReg;
         // Copy tail block to inputVarianceReg.
-        Internal::CopyInFloatData(inputVarianceReg, inputX + para.hTailOffset, hTailFloatMask);
+        CopyInFloatData(inputVarianceReg, inputX + para.hTailOffset, hTailFloatMask);
 
         // Calc x - mean in tail block
         Reg::Sub(inputVarianceReg, inputVarianceReg, meanReg, hTailFloatMask);
@@ -202,7 +201,7 @@ __simd_callee__ inline void CalcHSingleBlockOutPut(
         Reg::Add(resultH, resultH, betaReg, hFloatMask);
 
         Reg::RegTensor<T> oriOutputH;
-        Reg::Cast<T, float, Internal::float2HalfCastTrait>(oriOutputH, resultH, hFloatMask);
+        Reg::Cast<T, float, float2HalfCastTrait>(oriOutputH, resultH, hFloatMask);
         Reg::StoreAlign<T, Reg::StoreDist::DIST_PACK_B32>(output, oriOutputH, hFloatMask);
     } else {
         Reg::LoadAlign(resultH, inputX);
@@ -228,7 +227,7 @@ __simd_callee__ inline void CalcHSingleBlockOutPut(
 template <typename T>
 __simd_callee__ inline void CalcHOutPut(
     __ubuf__ T* output, Reg::RegTensor<float>& meanReg, Reg::RegTensor<float>& varianceReg, __ubuf__ T* inputX,
-    __ubuf__ T* gamma, __ubuf__ T* beta, const T epsilon, Internal::LayerNormInternalPara& para)
+    __ubuf__ T* gamma, __ubuf__ T* beta, const T epsilon, LayerNormInternalPara& para)
 {
     Reg::MaskReg hFloatAllMask = Reg::CreateMask<float, Reg::MaskPattern::ALL>();
     Reg::RegTensor<float> sdReg; // The standard deviation.
@@ -240,8 +239,8 @@ __simd_callee__ inline void CalcHOutPut(
 
     for (uint32_t i = 0; i < para.hRepeatTimes; ++i) {
         CalcHSingleBlockOutPut(
-            output + i * Internal::oneRegSize, meanReg, varianceReg, inputX + i * Internal::oneRegSize,
-            gamma + i * Internal::oneRegSize, beta + i * Internal::oneRegSize, sdReg, hFloatAllMask);
+            output + i * oneRegSize, meanReg, varianceReg, inputX + i * oneRegSize,
+            gamma + i * oneRegSize, beta + i * oneRegSize, sdReg, hFloatAllMask);
     }
 
     for (uint32_t tail = 0; tail < para.hTailCtrl; ++tail) {
@@ -256,7 +255,7 @@ __simd_callee__ inline void CalcHOutPut(
 template <typename T>
 __simd_vf__ inline void LayerNormImplVf(
     __ubuf__ T* output, __ubuf__ T* outputMean, __ubuf__ T* outputVariance, __ubuf__ T* inputX, __ubuf__ T* gamma,
-    __ubuf__ T* beta, const T epsilon, Internal::LayerNormInternalPara para, LayerNormTiling tiling)
+    __ubuf__ T* beta, const T epsilon, LayerNormInternalPara para, LayerNormTiling tiling)
 {
     Reg::MaskReg floatLowestMask = Reg::CreateMask<float, Reg::MaskPattern::VL1>();
     Reg::MaskReg srcLowestMask = Reg::CreateMask<T, Reg::MaskPattern::VL1>();
@@ -276,7 +275,7 @@ __simd_vf__ inline void LayerNormImplVf(
 
             if constexpr (SupportType<T, half>()) {
                 Reg::RegTensor<T> oriTypeOutputMean;
-                Reg::Cast<T, float, Internal::float2HalfCastTrait>(oriTypeOutputMean, outputMeanReg, floatLowestMask);
+                Reg::Cast<T, float, float2HalfCastTrait>(oriTypeOutputMean, outputMeanReg, floatLowestMask);
                 Reg::StoreAlign<T, Reg::StoreDist::DIST_FIRST_ELEMENT_B16>(
                     outputMean + bIdx * sLength + sIdx, oriTypeOutputMean, srcLowestMask);
             } else {
@@ -291,7 +290,7 @@ __simd_vf__ inline void LayerNormImplVf(
 
             if constexpr (SupportType<T, half>()) {
                 Reg::RegTensor<T> oriTypeOutputVariance;
-                Reg::Cast<T, float, Internal::float2HalfCastTrait>(
+                Reg::Cast<T, float, float2HalfCastTrait>(
                     oriTypeOutputVariance, outputVarianceReg, floatLowestMask);
                 Reg::StoreAlign<T, Reg::StoreDist::DIST_FIRST_ELEMENT_B16>(
                     outputVariance + bIdx * sLength + sIdx, oriTypeOutputVariance, srcLowestMask);
@@ -316,8 +315,8 @@ __aicore__ inline void LayerNormImpl(
     static_assert(SupportType<T, half, float>(), "current data type is not supported on current device!");
     CHECK_FUNC_HIGHLEVEL_API(
         LayerNorm, (T), (output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling));
-    Internal::LayerNormInternalPara para{};
-    Internal::GetLayerNormInternalPara<T>(para, tiling);
+    LayerNormInternalPara para{};
+    GetLayerNormInternalPara<T>(para, tiling);
 
     LayerNormImplVf<T>(
         (__ubuf__ T*)output.GetPhyAddr(), (__ubuf__ T*)outputMean.GetPhyAddr(),
@@ -335,13 +334,39 @@ __aicore__ inline void LayerNormImpl(
     const LocalTensor<uint8_t> sharedTmpBuffer; // Not used, no need to alloc memory.
     CHECK_FUNC_HIGHLEVEL_API(
         LayerNorm, (T), (output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling));
-    Internal::LayerNormInternalPara para{};
-    Internal::GetLayerNormInternalPara<T>(para, tiling);
+    LayerNormInternalPara para{};
+    GetLayerNormInternalPara<T>(para, tiling);
 
     LayerNormImplVf<T>(
         (__ubuf__ T*)output.GetPhyAddr(), (__ubuf__ T*)outputMean.GetPhyAddr(),
         (__ubuf__ T*)outputVariance.GetPhyAddr(), (__ubuf__ T*)inputX.GetPhyAddr(), (__ubuf__ T*)gamma.GetPhyAddr(),
         (__ubuf__ T*)beta.GetPhyAddr(), epsilon, para, tiling);
+}
+
+} // namespace Internal
+
+// ==================== AscendC namespace deprecated wrappers ====================
+
+template <typename T, bool isReuseSource = false>
+[[deprecated("use AscendC::Internal::LayerNormImpl instead")]]
+__aicore__ inline void LayerNormImpl(
+    const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
+    const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, LayerNormTiling& tiling)
+{
+    Internal::LayerNormImpl<T, isReuseSource>(
+        output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling);
+}
+
+template <typename T, bool isReuseSource = false>
+[[deprecated("use AscendC::Internal::LayerNormImpl instead")]]
+__aicore__ inline void LayerNormImpl(
+    const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
+    const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta, const T epsilon,
+    LayerNormTiling& tiling)
+{
+    Internal::LayerNormImpl<T, isReuseSource>(
+        output, outputMean, outputVariance, inputX, gamma, beta, epsilon, tiling);
 }
 
 } // namespace AscendC
