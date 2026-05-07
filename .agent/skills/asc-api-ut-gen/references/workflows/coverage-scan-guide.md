@@ -62,8 +62,9 @@
 /asc-api-ut-gen coverage
     │
     ├─ Phase 0: 环境配置检查
-    │   ├─ 检查 CANN 路径和 asc-devkit 路径
-    │   └─ 未配置则询问用户
+    │   ├─ 检查 CANN 路径
+    │   ├─ 从当前 workspace 或 skill 所在仓推导 ASC_DEVKIT_PATH
+    │   └─ CANN 未配置则询问用户
     │
     ├─ Phase 1: API 接口扫描
     │   ├─ 遍历 include/ 目录
@@ -420,7 +421,7 @@ Grep: pattern="{APIName}" path="tests/api/{arch_dir}/"
 
 ### 12.1 扫描前检查
 
-- [ ] 已获取 CANN 包路径和 asc-devkit 代码仓路径
+- [ ] 已获取 CANN 包路径；ASC_DEVKIT_PATH 已从当前 workspace 或 skill 所在仓推导
 
 ### 12.2 API 提取检查
 

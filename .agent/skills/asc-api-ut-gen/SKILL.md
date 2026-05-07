@@ -57,30 +57,30 @@ description: AscendC API 单元测试技能。当用户需要为新 API 编写 U
 
 ## 2. 首次使用环境配置
 
-**核心原则：首次使用时，必须先获取并确认以下两个路径，否则禁止进入后续流程：**
+**核心原则：首次使用时，只需要确认 CANN 包安装路径。**
 
 1. **CANN 包安装路径** - 用于设置编译环境
-2. **asc-devkit 代码仓路径** - 用于定位 API 代码
+
+asc-devkit 仓路径不再向用户询问。本 skill 已位于 asc-devkit 仓内，`ASC_DEVKIT_PATH` 必须从当前 workspace 或本 skill 所在目录向上定位仓根；无法定位仓根时直接报错，不要求用户输入仓路径。
 
 ```
 /asc-api-ut-gen 调用
     │
-    ├─ 检查是否已获取环境路径
+    ├─ 检查是否已获取 CANN 包路径
     │   │
-    │   ├─ 未获取 → 必须先询问用户（使用 AskUserQuestion）
-    │   │           │
-    │   │           ├─ CANN 包安装路径
-    │   │           └─ asc-devkit 代码仓路径
+    │   ├─ 未获取 → 必须先询问用户（仅询问 CANN 包安装路径）
     │   │
     │   └─ 已获取 → 继续后续流程
     │
-    └─ 禁止跳过此步骤
+    └─ 从当前 workspace 或 skill 所在仓推导 ASC_DEVKIT_PATH
 ```
 
 **禁止行为：**
-- ❌ 在未获取环境路径时继续执行任何 API 分析
-- ❌ 假设默认路径
-- ❌ 使用缓存的路径而不重新确认
+- ❌ 向用户询问 asc-devkit 仓路径
+- ❌ 在 UT 生成阶段询问用户是否允许生成或写入 UT；用户触发本 skill 即代表授权进入生成流程
+- ❌ 在未获取 CANN 路径时声称构建、UT 或覆盖率验证已完成
+- ❌ 假设默认 CANN 路径
+- ❌ 使用缓存的 CANN 路径而不重新确认
 
 ---
 
@@ -98,9 +98,9 @@ description: AscendC API 单元测试技能。当用户需要为新 API 编写 U
 ┌─────────────────────────────────────────────────┐
 │  Phase 0: 首次使用环境配置（强制，不可跳过）      │
 │  • 检查是否已获取 CANN 包路径                     │
-│  • 检查是否已获取 asc-devkit 代码仓路径           │
-│  • 未获取则必须先询问用户                         │
-│  • 确认后保存路径供后续使用                       │
+│  • 从当前 workspace 或 skill 所在仓确定 ASC_DEVKIT_PATH │
+│  • 未获取 CANN 路径时只询问 CANN 包路径            │
+│  • 确认后保存 CANN 路径供后续使用                  │
 └─────────────────────────────────────────────────┘
     │
     ↓
@@ -129,6 +129,7 @@ description: AscendC API 单元测试技能。当用户需要为新 API 编写 U
 │  • 准备配置参数                                   │
 │  • 调用 ut_generator_cli.py 生成代码             │
 │  • 写入目标测试文件                               │
+│  • 不询问用户是否允许生成或写入 UT                 │
 └─────────────────────────────────────────────────┘
     │
     ↓
@@ -276,7 +277,11 @@ python scripts/ut_generator_cli.py --config ut_config.json --validate
 
 ## 7. 编译与执行命令
 
-执行策略必须以仓内当前 `build.sh` 和 `tests/test_parts.sh` 为准。`build.sh --<part>` 会读取 `tests/test_parts.sh` 中对应 target 列表并构建/运行这些 target；`--changed_file` 只判断是否跳过编译测试，不能替代 API UT 分组选择。
+执行策略必须以仓内当前 `build.sh`、`tests/test_parts.sh` 和 `tests/**/CMakeLists.txt` 为准。`build.sh --<part>` 会读取 `tests/test_parts.sh` 中对应 target 列表并构建/运行这些 target；`--changed_file` 只判断是否跳过编译测试，不能替代 API UT 分组选择。
+
+每次 API 相关修改都要先从 CMake 的 `add_subdirectory`、target 定义、产品列表和 source glob 确认受影响 target，再反查 `tests/test_parts.sh` 的 part；如果 CMake target 未纳入 build.sh 分片，要在报告中记录缺口。Tensor API 除外，不纳入当前 `asc-api-ut-gen` 的 UT 生成或覆盖闭环。
+
+Basic API 的 `impl/basic_api/**/*.h` 通常是 header-only 实现，会通过 `include/basic_api/*.h` 的公开入口被 NPU/CPU 多形态编译。只要修改会被公开头文件 include，尤其涉及 assert/log 宏、`SupportType`、条件编译、模板签名或跨架构公共路径，必须在对应功能 UT part 之外叠加 `--basic_test_three`，以覆盖 `ascendc_run_all_header_checks`。不要把 gtest 运行通过等同于 header checker 通过。
 
 ```bash
 # 设置环境
@@ -285,6 +290,7 @@ cd {ASC_DEVKIT_PATH}
 
 # 根据 API 类型、目标芯片、核心类型和修改文件选择所有受影响 test part
 bash build.sh --basic_test_two -j8    # 示例：多数 membase basic API
+bash build.sh --basic_test_three -j8  # 示例：Basic API public/header-only impl 编译检查
 bash build.sh --basic_test_five -j8   # 示例：C API / regbase / SIMT
 bash build.sh --adv_test -j8          # 示例：非 3510 Advanced API 或 adv 公共变更的一部分
 bash build.sh --adv_test_two -j8      # 示例：3510 Advanced API

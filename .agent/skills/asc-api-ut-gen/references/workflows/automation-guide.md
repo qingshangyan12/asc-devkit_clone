@@ -13,6 +13,7 @@
     ├─ Phase 2: 受影响 test part 选择
     │   ├─ 读取 build.sh 支持的 --*_test 参数
     │   ├─ 读取 tests/test_parts.sh 中每个 part 的 target 列表
+    │   ├─ 读取 tests/**/CMakeLists.txt 中 target、产品列表和 source glob
     │   ├─ 根据 API 类型、目标芯片、核心类型和修改文件选择所有受影响 part
     │   └─ 若不能可靠收敛，执行 bash build.sh -t -j8
     │
@@ -43,14 +44,37 @@
 ### 2.1 强制规则
 
 - 每次验证前先检查当前仓内 `build.sh` 与 `tests/test_parts.sh`，不要凭旧记忆使用固定 part。
-- 先确定测试可执行 target，再反查它位于哪个 `*_test_targets` 数组。
+- 先从 `tests/CMakeLists.txt`、`tests/api/CMakeLists.txt` 和相关子目录 `CMakeLists.txt` 确定测试可执行 target，再反查它位于哪个 `*_test_targets` 数组。
+- CMake 检查必须覆盖 `add_subdirectory`、`add_executable`、`add_custom_target`、`run_llt_test`、`run_python_llt_test`、产品列表和 `file(GLOB ...)` source glob；只看目录名不够。
+- `build.sh --<part>` 会把 `tests/test_parts.sh` 中的 target 传给 `cmake --build . --target ...`，并通过 `-DTEST_MOD=...` 传入 CMake；`run_llt_test` 会按 `TEST_MOD` 跳过未选中的 C++ target，Python target 则依赖 build.sh 显式列入 `--target`。
 - 一个 API 内容修改可能影响多个 target；必须运行所有命中的 build.sh part。
 - `bash build.sh --changed_file=<file>` 只触发 CI 跳过判断；它不会自动选择 API UT 分组，不能作为唯一验证命令。
 - `bash build.sh --basic_test_one` 只覆盖 `basic_test_one_targets`，不能作为所有 Basic API 的默认验证命令。
+- Basic API 的 `impl/basic_api/**/*.h` 若会被 `include/basic_api/*.h` 公开入口 include，必须按 header-only public surface 处理；涉及 assert/log 宏、`SupportType`、条件编译、模板签名或跨架构公共路径时，功能 UT part 之外必须叠加 `--basic_test_three`。
+- Tensor API 除外：`tests/api/tensor_api/` 和 `ascendc_ut_tensor_api_*` 不纳入当前 `asc-api-ut-gen` 的 UT 生成或覆盖闭环；如果改动只属于 Tensor API，报告该 skill 不覆盖，不要把它映射为本 skill 的目标。
 - 如果无法从 API 类型、目标芯片、核心类型或文件路径可靠收敛 part，执行 `bash build.sh -t -j8`，并在报告中说明原因。
-- 如果目标芯片或 target 在 `tests/test_parts.sh` 中未启用，必须记录缺口；不能声称该目标已由 build.sh part 验证。
+- 如果目标芯片或 target 在 CMake 中存在但没有纳入 `tests/test_parts.sh`，或在 `tests/test_parts.sh` 中被注释，必须记录 `CMake target 未纳入 build.sh 分片` 缺口；不能声称该目标已由 build.sh part 验证。
 
-### 2.2 当前 build.sh part 映射
+### 2.2 CMake 到 build.sh part 闭环
+
+本闭环来自当前 `tests/**/CMakeLists.txt` 与 `tests/test_parts.sh`。Tensor API 按本 skill 边界排除，不在下表展开。
+
+| CMake 入口 | CMake target | build.sh part | 备注 |
+|-----------|--------------|---------------|------|
+| `tests/api/adv_api/CMakeLists.txt` | `ascendc_ut_adv_api_kernel_*`, `ascendc_ut_adv_api_tiling_*` | `--adv_test`, `--adv_test_two` | 3510 kernel 和 3510 AIV tiling 在 `--adv_test_two`；3510 AIC tiling 在 `--adv_test`。公共 adv 变更通常两者都跑。 |
+| `tests/api/basic_api/CMakeLists.txt` | `ascendc_ut_basic_api_*` | `--basic_test_one`, `--basic_test_two`, `--basic_test_four` | 按产品 target 反查分片；`ascend610Lite`、`mc62cm12aa_*` Basic target 当前未启用或被注释时要记录缺口。 |
+| `tests/api/basic_api/ascendc_header_checker/CMakeLists.txt` | `ascendc_run_all_header_checks` | `--basic_test_three` | 覆盖 CPU/NPU、多头文件/单头文件编译检查；Basic API public/header-only impl 改动必须叠加。 |
+| `tests/api/c_api/CMakeLists.txt` | `ascendc_ut_c_api_ascend910B1_AIC`, `ascendc_ut_c_api_ascend910B1_AIV`, `ascendc_ut_c_api_ascend950pr_9599_AIC`, `ascendc_ut_c_api_ascend950pr_9599_AIV` | `--basic_test_five` | C API 公共逻辑影响 2201 和 3510 时确认四个 target 都执行。 |
+| `tests/api/reg_compute_api/CMakeLists.txt` | `ascendc_ut_reg_compute_ascend950pr_9599` | `--basic_test_five` | `mc62cm12aa` 目录和 test_parts 注释 target 不等于已验证，需记录未覆盖缺口。 |
+| `tests/api/simt_api/CMakeLists.txt` | `ascendc_ut_simt_api_ascend950pr_9599` | `--basic_test_five` | `mc62cm12aa` 目录和 test_parts 注释 target 不等于已验证，需记录未覆盖缺口。 |
+| `tests/api/utils/tiling/CMakeLists.txt` | `ascendc_ut_tiling_utils_*` | `--basic_test_one` | tiling utils 覆盖多产品、多 core type。 |
+| `tests/api/utils/tiling/CMakeLists.txt` | `ascendc_ut_tpl_tiling_debug`, `ascendc_ut_tpl_tiling_release` | `--basic_test_three` | template tiling debug/release 独立 target。 |
+| `tests/api/utils/std/CMakeLists.txt` | `ascendc_ut_std_api_ascend910B1`, `ascendc_ut_std_api_ascend950pr_9599` | `--basic_test_four` | std API 独立分片。 |
+| `tests/api/aicpu_api/CMakeLists.txt` | `ascendc_ut_aicpu_api` | `--basic_test_three` | AICPU API 独立于默认生成类型，但触达时必须验证。 |
+| `tests/tools/aclrtc/CMakeLists.txt`, `tests/tools/utils/CMakeLists.txt` | `ascendc_ut_aclrtc`, `ascendc_ut_asc_compile_base`, `ascendc_ut_asc_tikcpp_utest_opbuild`, `ascendc_ut_asc_runtime`, `ascendc_ut_elf_tool`, `ascendc_ut_pack_kernel` | `--basic_test_three` | API 编译、runtime、打包和工具链相关修改触达时纳入。 |
+| `tests/python/CMakeLists.txt` | `ascendc_pyut_asc_compile_common`, `ascendc_pyut_asc_op_compiler`, `ascendc_pyut_aclrt_launch_kernel`, `ascendc_pyut_compile_trace_log`, `asc_opc_unittest` | `--basic_test_four` | Python 编译工具链、asc_opc、aclr launch 相关修改触达时纳入。 |
+
+### 2.3 当前 build.sh part 映射
 
 本表来自当前 `tests/test_parts.sh`。更新脚本分组后必须同步更新本节。
 
@@ -62,24 +86,30 @@
 | membase Basic API：`ascend910`, `ascend310p`, `ascend610`, `ascend310B1`, `ascend910B1_AIC`, `ascend910B1_AIV`, `ascend910B1_AIV_MSTX`, `ascend950pr_9599_AIC` | `ascendc_ut_basic_api_*` 对应 target | `--basic_test_two` |
 | membase Basic API：`ascend950pr_9599_AIV_BASIC` | `ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC` | `--basic_test_four` |
 | membase Basic API：`ascend950pr_9599_AIV_FRAMEWORK` | `ascendc_ut_basic_api_ascend950pr_9599_AIV_FRAMEWORK` | `--basic_test_one` |
-| Basic API 公开头文件、公共 header checker 相关修改 | `ascendc_run_all_header_checks` | `--basic_test_three`，并叠加对应功能 UT part |
+| Basic API 公开头文件，或会被公开头文件 include 的 `impl/basic_api/**/*.h` header-only 实现修改 | `ascendc_run_all_header_checks` | `--basic_test_three`，并叠加对应功能 UT part |
 | Utils tiling/context/platform/stub 相关修改 | `ascendc_ut_tiling_utils_*` | `--basic_test_one` |
 | Utils template tiling 修改 | `ascendc_ut_tpl_tiling_debug`, `ascendc_ut_tpl_tiling_release` | `--basic_test_three` |
 | Utils std 修改 | `ascendc_ut_std_api_ascend910B1`, `ascendc_ut_std_api_ascend950pr_9599` | `--basic_test_four` |
 | C API，`ascend910B1` / `ascend950pr_9599`，AIC/AIV | `ascendc_ut_c_api_ascend910B1_AIC`, `ascendc_ut_c_api_ascend910B1_AIV`, `ascendc_ut_c_api_ascend950pr_9599_AIC`, `ascendc_ut_c_api_ascend950pr_9599_AIV` | `--basic_test_five` |
 | regbase API，`ascend950pr_9599` | `ascendc_ut_reg_compute_ascend950pr_9599` | `--basic_test_five` |
 | SIMT API，`ascend950pr_9599` | `ascendc_ut_simt_api_ascend950pr_9599` | `--basic_test_five` |
+| AICPU API | `ascendc_ut_aicpu_api` | `--basic_test_three` |
+| 工具链/API 编译、runtime、pack、aclrtc 相关修改 | `ascendc_ut_aclrtc`, `ascendc_ut_asc_compile_base`, `ascendc_ut_asc_tikcpp_utest_opbuild`, `ascendc_ut_asc_runtime`, `ascendc_ut_elf_tool`, `ascendc_ut_pack_kernel` | `--basic_test_three` |
+| Python 编译工具链、asc_opc、aclr launch 相关修改 | `ascendc_pyut_asc_compile_common`, `ascendc_pyut_asc_op_compiler`, `ascendc_pyut_aclrt_launch_kernel`, `ascendc_pyut_compile_trace_log`, `asc_opc_unittest` | `--basic_test_four` |
 
-`basic_test_three` 还包含 `aclrtc`、编译器、runtime、pack、aicpu 等非当前 skill 默认 API 类型 target。仅当 API 修改触达这些模块或 public header checker 时纳入；否则不要用它替代功能 UT part。
+`basic_test_three` 还包含 `aclrtc`、编译器、runtime、pack、aicpu 等非当前 skill 默认 API 类型 target。仅当 API 修改触达这些模块、public header checker，或会被公开头文件 include 的 Basic API header-only impl 时纳入；否则不要用它替代功能 UT part。
 
-### 2.3 公共或跨架构修改的加严策略
+### 2.4 公共或跨架构修改的加严策略
 
 - 修改 `include/adv_api/`、`impl/adv_api/detail/` 或 `impl/adv_api/tiling/` 的公共逻辑时，运行 `--adv_test` 和 `--adv_test_two`。
-- 修改 `include/basic_api/` 的公共头文件或 `impl/basic_api/` 中跨产品共享逻辑时，至少运行命中的 Basic API 功能 part；无法判定产品范围时运行 `--basic_test_one`、`--basic_test_two`、`--basic_test_four`，公开头文件变更再叠加 `--basic_test_three`。
+- 修改 `include/basic_api/` 的公共头文件或 `impl/basic_api/` 中跨产品共享逻辑时，至少运行命中的 Basic API 功能 part；无法判定产品范围时运行 `--basic_test_one`、`--basic_test_two`、`--basic_test_four`。如果修改的是公开头文件，或 `impl/basic_api/**/*.h` 会经公开头文件 include，叠加 `--basic_test_three`。
+- 修改 `impl/basic_api/**/*.h` 中的 assert/log 宏调用、`SupportType` dtype 检查、`#if __NPU_ARCH__` 条件编译、模板签名、公开 inline 函数或被 `kernel_*_intf_impl.h` 汇入的架构特定实现时，必须叠加 `--basic_test_three`；gtest target 通过不能替代 `ascendc_run_all_header_checks`。
 - 修改 `include/c_api/` 或 `impl/c_api/` 公共逻辑时，运行 `--basic_test_five`；若影响 2201 和 3510，确认四个 C API target 均在输出中执行。
 - 修改 `include/basic_api/reg_compute/` 或 `impl/basic_api/reg_compute/` 时，运行 `--basic_test_five`；若目标是 `mc62cm12aa`，当前 part 未启用对应 target，必须报告未覆盖原因。
 - 修改 `include/simt_api/` 或 `impl/simt_api/` 时，运行 `--basic_test_five`。
 - 修改 `include/utils/` 或 `impl/utils/` 时，按子目录选择 `--basic_test_one`、`--basic_test_three`、`--basic_test_four`；无法判定子类时三者都跑。
+- 修改 `tests/api/common/`、`tests/main.cpp`、`tests/cmake/func.cmake` 或会影响多类 API UT 的公共测试支撑时，按受影响 CMake 入口叠加所有相关 part；无法收敛时执行 `bash build.sh -t -j8`，并说明 Tensor API 属于当前 skill 排除范围。
+- 修改 `tests/**/CMakeLists.txt`、`tests/test_parts.sh` 或 `build.sh` 的 target/part 选择逻辑时，必须重新执行 2.2 闭环检查；发现 CMake target 未纳入 build.sh 分片时要记录缺口并更新本 guide。
 
 ---
 
@@ -98,6 +128,7 @@ cd {ASC_DEVKIT_PATH}
 
 # 5.3 根据 2.x 的映射逐个执行所有受影响 part
 bash build.sh --basic_test_two -j8
+bash build.sh --basic_test_three -j8
 bash build.sh --basic_test_five -j8
 
 # 无法可靠收敛 part 时执行全部测试

@@ -102,7 +102,7 @@
     │
     ├─ Phase 0: 环境确认
     │   ├─ 确认 CANN_PATH
-    │   ├─ 确认 ASC_DEVKIT_PATH
+    │   ├─ 从当前 workspace 或 skill 所在仓推导 ASC_DEVKIT_PATH
     │   └─ 确认 cov_report 目录存在
     │
     ├─ Phase 1: 定位报告页面
@@ -247,10 +247,12 @@ UT 补齐后，必须执行完整验证，不允许只改代码不验证。
 
 ### 8.2 最低验证要求
 
-1. 按 [自动化验证流程](automation-guide.md) 选择的所有受影响 build.sh part 编译/运行成功
-2. 对应 gtest 过滤运行通过，且过滤结果不是 `0 tests`
-3. 重新检查 `build/cov_report`
-4. 目标文件或目录下所有目标文件的 `Lines` 和 `Functions` 均达到 `95%`
+1. 按 [自动化验证流程](automation-guide.md) 从 `tests/**/CMakeLists.txt`、`tests/test_parts.sh` 和 `build.sh` 完成 target 到 part 闭环，Tensor API 除外
+2. 所有受影响 build.sh part 编译/运行成功；如果发现 `CMake target 未纳入 build.sh 分片`，必须记录缺口
+3. 对应 gtest 过滤运行通过，且过滤结果不是 `0 tests`
+4. 如果补齐目标是会被公开头文件 include 的 `impl/basic_api/**/*.h` header-only 实现，或修改涉及 assert/log 宏、`SupportType`、条件编译、模板签名，必须确认 `--basic_test_three` 中的 `ascendc_run_all_header_checks` 通过
+5. 重新检查 `build/cov_report`
+6. 目标文件或目录下所有目标文件的 `Lines` 和 `Functions` 均达到 `95%`
 
 ### 8.3 不达标时的处理
 
