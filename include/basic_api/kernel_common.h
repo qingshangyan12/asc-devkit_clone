@@ -47,7 +47,7 @@ class GlobalTensor;
 
 template <auto funcPtr, typename... Args> __aicore__ inline void asc_vf_call(Args &&... args)
 {
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) 
+#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510)
 #if ASCENDC_SIMD_VF_DEBUG == 1
     constexpr uint64_t RESERVED_UB_SIZE = 8 * 1024;
     uint64_t ascReservedAddr = get_shmem_sz() - RESERVED_UB_SIZE;
@@ -149,9 +149,9 @@ public:
     }
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline MutexID AllocMutexID()
 {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     MutexID id = static_cast<uint8_t>(sff0(Internal::g_bufId));
     Internal::g_bufId = sbitset1(Internal::g_bufId, id);
     ASCENDC_ASSERT((id <= MAX_MUTEXID), {
@@ -159,8 +159,10 @@ __aicore__ inline MutexID AllocMutexID()
                    static_cast<uint32_t>(MAX_MUTEXID));
     });
     return id;
-}
+#else
+    return 0;
 #endif
+}
 
 __aicore__ inline void ReleaseMutexID(MutexID id)
 {
