@@ -119,51 +119,48 @@ f"[Super Kernel] Invalid compile option: {self.key} option should be non-negativ
         return number
 
 
-def setup_super_kernel_option_parsers() -> ParserFactory:
-    """init super kernel_validate"""
+def setup_super_kernel_option_parsers_ge() -> ParserFactory:
+    """init super kernel_validate for ge backend"""
     factory = ParserFactory()
 
     # register validation
-    factory.register(CodeTextAlignParser("func-align"))
-    factory.register(EnumParser("preload-code", {
-        "max": SuperKernelPreLoadMode.PreLoadByWhole,
-        "per-func": SuperKernelPreLoadMode.PreloadByAdanvanceStep,
-        "none": SuperKernelPreLoadMode.PreloadNA,
-        f"{SuperKernelPreLoadMode.PreLoadByWhole.value}": SuperKernelPreLoadMode.PreLoadByWhole,
-        f"{SuperKernelPreLoadMode.PreloadByAdanvanceStep.value}": SuperKernelPreLoadMode.PreloadByAdanvanceStep,
-        f"{SuperKernelPreLoadMode.PreloadNA.value}": SuperKernelPreLoadMode.PreloadNA,
-    }))
-    factory.register(EnumParser("early-start", {
-        "0": SuperKernelEarlyStartMode.EarlyStartDisable,
-        "1": SuperKernelEarlyStartMode.EarlyStartEnableV2,
-        "2": SuperKernelEarlyStartMode.EarlyStartV2DisableSubKernel,
-    }))
-    factory.register(EnumParser("stream-fusion", {
-        "0": SuperKernelStreamFusionMode.StreamFusionDisable,
-        "1": SuperKernelStreamFusionMode.StreamFusionEnable,
-    }))
-    factory.register(EnumParser("debug-dcci-all", {
-        "0": SuperKernelDebugDcciAllMode.DebugDcciAllDisable,
-        "1": SuperKernelDebugDcciAllMode.DebugDcciAllEnable,
-    }))
-    factory.register(EnumParser("debug-sync-all", {
-        "0": SuperKernelDebugSyncAllMode.DebugSyncAllDisable,
-        "1": SuperKernelDebugSyncAllMode.DebugSyncAllEnable,
-    }))
-    factory.register(EnumParser("feed-sync-all", {
-        "0": SuperKernelFeedSyncAllMode.FeedSyncAllDisable,
-        "1": SuperKernelFeedSyncAllMode.FeedSyncAllEnable,
-    }))
-    factory.register(EnumParser("profiling", {
-        "0": SuperKernelProfilingMode.ProfilingDisable,
-        "1": SuperKernelProfilingMode.ProfilingEnable,
-    }))
+    factory.register(CodeTextAlignParser('func-align'))
+    factory.register(EnumParser('preload-code', {
+                                                    'max': SuperKernelPreLoadMode.PreLoadByWhole,
+                                                    'none': SuperKernelPreLoadMode.PreloadNA,
+                                                    'per-func': SuperKernelPreLoadMode.PreloadByAdanvanceStep,
+                                                }))
+    factory.register(EnumParser('early-start', {
+                                                    '0': SuperKernelEarlyStartMode.EarlyStartDisable,
+                                                    '1': SuperKernelEarlyStartMode.EarlyStartEnableV2,
+                                                    '2': SuperKernelEarlyStartMode.EarlyStartV2DisableSubKernel,
+                                                }))
+    factory.register(EnumParser('stream-fusion', {
+                                                    '0': SuperKernelStreamFusionMode.StreamFusionDisable,
+                                                    '1': SuperKernelStreamFusionMode.StreamFusionEnable,
+                                                }))
+    factory.register(EnumParser('debug-dcci-all', {
+                                                    '0': SuperKernelDebugDcciAllMode.DebugDcciAllDisable,
+                                                    '1': SuperKernelDebugDcciAllMode.DebugDcciAllEnable,
+                                                }))
+    factory.register(EnumParser('debug-sync-all', {
+                                                    '0': SuperKernelDebugSyncAllMode.DebugSyncAllDisable,
+                                                    '1': SuperKernelDebugSyncAllMode.DebugSyncAllEnable,
+                                                }))
+
+    factory.register(EnumParser('feed-sync-all', {
+                                                    '0': SuperKernelFeedSyncAllMode.FeedSyncAllDisable,
+                                                    '1': SuperKernelFeedSyncAllMode.FeedSyncAllEnable,
+                                                }))
+    factory.register(EnumParser('profiling', {
+                                                    '0': SuperKernelProfilingMode.ProfilingDisable,
+                                                    '1': SuperKernelProfilingMode.ProfilingEnable,
+                                                }))
     factory.register(NonEmptyParser('compile-options'))
     factory.register(NonEmptyParser('strict-scope-check'))
     factory.register(NonEmptyParser('dcci-before-kernel-start'))
     factory.register(NonEmptyParser('dcci-after-kernel-end'))
     factory.register(NonEmptyParser('dcci-disable-on-kernel'))
-    factory.register(NonEmptyParser('aggressive-opt-strategies'))
     factory.register(NumberParser('split-mode'))
     factory.register(BlockNumParser('debug-aic-num'))
     factory.register(BlockNumParser('debug-aiv-num'))
@@ -171,8 +168,41 @@ def setup_super_kernel_option_parsers() -> ParserFactory:
     return factory
 
 
-def parse_super_kernel_options(option_string: str, convert_underscore_to_hyphen: bool = False) -> bool:
-    factory = setup_super_kernel_option_parsers()
+def setup_super_kernel_option_parsers_aclgraph() -> ParserFactory:
+    """init super kernel_validate for aclgraph backend"""
+    factory = ParserFactory()
+
+    # register validation
+    factory.register(EnumParser("preload-code", {
+                "0": SuperKernelPreLoadMode.PreLoadByWhole,
+                "1": SuperKernelPreLoadMode.PreloadByAdanvanceStep,
+                "2": SuperKernelPreLoadMode.PreloadNA,
+            }))
+    factory.register(EnumParser("stream-fusion", {
+                "0": SuperKernelStreamFusionMode.StreamFusionDisable,
+                "1": SuperKernelStreamFusionMode.StreamFusionEnable,
+            }))
+    factory.register(EnumParser("debug-sync-all", {
+                "0": SuperKernelDebugSyncAllMode.DebugSyncAllDisable,
+                "1": SuperKernelDebugSyncAllMode.DebugSyncAllEnable,
+            }))
+    factory.register(NumberParser("split-mode"))
+    factory.register(BinaryParser("auto-op-parallel"))
+    factory.register(BinaryParser("debug-cross-core-sync-check"))
+    factory.register(BinaryParser("debug-op-exec-trace"))
+    factory.register(NonEmptyParser('dcci-before-kernel-start'))
+    factory.register(NonEmptyParser('dcci-after-kernel-end'))
+    factory.register(NonEmptyParser('dcci-disable-on-kernel'))
+    factory.register(NonEmptyParser('aggressive-opt-strategies'))
+
+    return factory
+
+
+def parse_super_kernel_options(option_string: str, is_aclgraph: bool = False) -> bool:
+    if is_aclgraph:
+        factory = setup_super_kernel_option_parsers_aclgraph()
+    else:
+        factory = setup_super_kernel_option_parsers_ge()
     if not option_string or not option_string.strip():
         return {}
     # Strip leading and trailing quotes, which may be introduced by json.dumps
@@ -185,7 +215,7 @@ def parse_super_kernel_options(option_string: str, convert_underscore_to_hyphen:
             AscendCLogLevel.LOG_WARNING)
             continue
         key, value = map(str.strip, pair.split('=', 1))
-        key = key.replace('_', '-') if convert_underscore_to_hyphen else key
+        key = key.replace('_', '-') if is_aclgraph else key
         if not key or not value:
             CommonUtility().ascendc_raise_python_err(ERR_CODE,
                 f"[Super Kernel] Invalid compile option: The key-value pair is missing for the option {pair}.")
