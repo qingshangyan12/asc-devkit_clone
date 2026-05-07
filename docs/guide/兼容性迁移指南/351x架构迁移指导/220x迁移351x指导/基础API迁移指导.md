@@ -161,7 +161,7 @@
     **兼容方案**：
 
     -   220x架构版本的接口参数boundaryValue设置为0时与351x架构版本等价。
-    -   如果需要在L1 Buffer上循环读取操作数，需要将对应的Load3D接口手动拆分成多条指令，手动绕回。
+    -   如果需要在L1 Buffer上循环读取操作数，需要将对应的Load3D接口手动拆分成多条指令，手动绕回。可参考[SetLoadDataBoundary兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_compatibility_guide/set_loaddata_boundary)。
 
     ![](../../../figures/ZN-88.png)
 
@@ -170,37 +170,30 @@
     1.  将矩阵A从GM搬运到L1 Buffer。
 
         ```
-        __aicore__ inline void CopyGmToA1Nd2Nz()
+        __aicore__ inline void CopyGmToA1Nd2Nz(AscendC::LocalTensor<T>& leftMatrix)
         {
-            AscendC::LocalTensor<T> leftMatrix = qidA1_.template AllocTensor<T>();
             AscendC::Nd2NzParams nd2nzParams;
             ...
-            AscendC::DataCopy(leftMatrix, aGlobal_, nd2nzParams);
-            ...
+            AscendC::DataCopy(leftMatrix, aGlobal, nd2nzParams);
         }
         ```
 
     2.  将矩阵B从GM搬运到L1 Buffer。
 
         ```
-        __aicore__ inline void CopyGmToB1Nd2Nz()
+        __aicore__ inline void CopyGmToB1Nd2Nz(AscendC::LocalTensor<U>& rightMatrix)
         {
-            AscendC::LocalTensor<U> rightMatrix = qidB1_.template AllocTensor<U>();
             AscendC::Nd2NzParams nd2nzParams;
             ...
-            AscendC::DataCopy(rightMatrix, bGlobal_, nd2nzParams);
-            ...
+            AscendC::DataCopy(rightMatrix, bGlobal, nd2nzParams);
         }
         ```
 
     3.  将矩阵A从L1 Buffer搬运到L0A Buffer。
 
         ```
-        __aicore__ inline void Load3DA1ToL0A()
+        __aicore__ inline void Load3DA1ToL0A(AscendC::LocalTensor<T>& leftMatrix, AscendC::LocalTensor<T>& a2)
         {
-            auto leftMatrix = qidA1_.template DeQue<T>();
-            AscendC::LocalTensor<T> a2 = qidA2_.AllocTensor<T>();
-            ...
             AscendC::LoadData3DParamsV2Pro loadData3dParamsPro;
             ...
             // 多次调用LoadData进行手动绕回
@@ -208,50 +201,47 @@
             AscendC::LocalTensor<T> a3 = a2[256];
             AscendC::LoadData(a3, leftMatrix, loadData3dParamsPro);
             AscendC::LocalTensor<T> a4 = a2[512];
-            AscendC::LoadData(a4,  leftMatrix, loadData3dParamsPro);
+            AscendC::LoadData(a4, leftMatrix, loadData3dParamsPro);
             AscendC::LocalTensor<T> a5 = a2[768];
-            AscendC::LoadData(a5,  leftMatrix, loadData3dParamsPro);
-            ...
+            AscendC::LoadData(a5, leftMatrix, loadData3dParamsPro);
         }
         ```
 
     4.  将矩阵B从L1 Buffer搬运到L0B Buffer。
 
         ```
-        __aicore__ inline void Load3DB1ToL0B()
+        __aicore__ inline void Load3DB1ToL0B(AscendC::LocalTensor<U>& rightMatrix, AscendC::LocalTensor<U>& b2)
         {
             ...
             AscendC::SetLoadDataRepeat({0, 1, 0, dstStride});
-            ...
+            AscendC::SetLoadDataRepeatWithStride({0, 1, 0, dstStride});
+            AscendC::SetLoadDataPaddingValue(0);
+            static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false, false};
+            AscendC::LoadDataWithStride<U, LOAD3D_CONFIG>(b2, rightMatrix, loadData3dParams);
         }
         ```
 
     5.  矩阵计算。
 
         ```
-        __aicore__ inline void Compute()
+        __aicore__ inline void Compute(AscendC::LocalTensor<T>& a2, AscendC::LocalTensor<U>& b2,
+                                    AscendC::LocalTensor<V>& co1Local)
         {
             AscendC::MmadParams mmadParams;
             ...
-            auto co1Local = qidCO1_.AllocTensor<V>();
-            auto a2 = qidA2_.DeQue<T>();
-            auto b2 = qidB2_.DeQue<U>();
             AscendC::Mmad(co1Local, a2, b2, mmadParams);
-            ...
         }
         ```
 
     6.  将矩阵C从L0C Buffer搬运到GM。
 
         ```
-        __aicore__ inline void CopyL0CToGm(const AscendC::GlobalTensor<S>& gm)
+        __aicore__ inline void CopyL0CToGm(AscendC::LocalTensor<V>& co1Local, const AscendC::GlobalTensor<S>& gm)
         {
-            auto co1Local = qidCO1_.DeQue<V>();
-            AscendC::FixpipeParamsV220 fixpipeParams(nLength, static_cast<uint16_t>(mLength),
-                                            AscendC::DivCeil(mLength, AscendC::BLOCK_CUBE) * AscendC::BLOCK_CUBE, static_cast<uint16_t>(nLength), 0);
+            AscendC::FixpipeParamsV220 fixpipeParams(N, static_cast<uint16_t>(M),
+                                            AscendC::DivCeil(M, AscendC::BLOCK_CUBE) * AscendC::BLOCK_CUBE, static_cast<uint16_t>(N), 0);
             ...
             AscendC::Fixpipe<S, V, AscendC::CFG_ROW_MAJOR>(gm, co1Local, fixpipeParams);
-            qidCO1_.FreeTensor(co1Local);
         }
         ```
 
