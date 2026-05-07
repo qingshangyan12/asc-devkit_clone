@@ -20,14 +20,14 @@
  * \brief Provides high-level copy interface for transferring data between tensors.
  * \brief Supports copy operations across different memory hierarchies (GM, UB, L1, L0A/B/C).
  * 
- * \ingroup algorithm Level 0
  */
+#ifndef INCLUDE_TENSOR_API_ALGORITHM_COPY_H
+#define INCLUDE_TENSOR_API_ALGORITHM_COPY_H
 
 namespace AscendC {
 namespace Te {
 
 /*
- * @ingroup copy Level 0
  * @brief Performs copy operation with compile-time traits and atom operation.
  * @brief Copies data from source tensor to destination tensor using specified atom.
  * @brief Traits and atom parameters control copy behavior (stride, repeat, etc.).
@@ -43,7 +43,6 @@ template <typename Tp, const Tp& traits, typename T, typename... Params>
 __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params);
 
 /*
- * @ingroup copy Level 0
  * @brief Performs copy operation with runtime atom parameters.
  * @brief Simplified version without compile-time traits specification.
  * @brief Copies data using atom operation parameters provided at runtime.
@@ -58,7 +57,6 @@ template <typename T, typename... Params>
 __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params);
 
 /*
- * @ingroup copy Level 0
  * @brief Creates a CopyAtom with specified traits.
  * @brief Constructs atom operation for copy with compile-time configuration.
  * @brief Traits define copy operation type (GM2UB, UB2L1, L12L0A, etc.).
@@ -73,9 +71,8 @@ __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params
 template <typename... Args>
 __aicore__ inline auto MakeCopy(const Args& ...traits);
 
-}
-}
-}
+} // namespace Te
+} // namespace AscendC
 
 #endif // INCLUDE_TENSOR_API_ALGORITHM_COPY_H
 

@@ -25,7 +25,6 @@
  * - arch/cube/copy_op.h: Cube unit copy operations
  * - arch/vector/copy_op.h: Vector unit copy operations
  * 
- * \ingroup arch Level 0
  */
 #ifndef INCLUDE_TENSOR_API_ARCH_ARCH_H
 #define INCLUDE_TENSOR_API_ARCH_ARCH_H

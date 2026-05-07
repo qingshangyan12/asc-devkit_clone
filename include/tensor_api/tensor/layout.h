@@ -20,15 +20,15 @@
  * \brief Layout describes tensor shape, stride, and coordinate mapping.
  * \brief Provides fundamental abstractions for tensor memory organization.
  * 
- * \ingroup tensor Level 0
  */
+#ifndef INCLUDE_TENSOR_API_TENSOR_LAYOUT_H
+#define INCLUDE_TENSOR_API_TENSOR_LAYOUT_H
 
 namespace AscendC {
 namespace Te {
 
 // layout construction
 /*
- * @ingroup layout Level 0
  * @brief Creates a Shape from dimension sizes.
  * @brief Shape defines tensor dimensions (e.g., 128x64 for 2D tensor).
  * @param [in] t Dimension sizes
@@ -41,7 +41,6 @@ template <typename... Ts>
 __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t);
 
 /*
- * @ingroup layout Level 0
  * @brief Creates a Stride from stride values.
  * @brief Stride defines memory offset between consecutive elements in each dimension.
  * @param [in] t Stride values for each dimension
@@ -54,7 +53,6 @@ template <typename... Ts>
 __aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t);
 
 /*
- * @ingroup layout Level 0
  * @brief Creates a Tile for block operations.
  * @brief Tile defines block dimensions for tiled tensor processing.
  * @param [in] t Tile dimensions
@@ -64,7 +62,6 @@ template <typename... Ts>
 __aicore__ inline constexpr Tile<Ts...>  MakeTile(const Ts&... t);
 
 /*
- * @ingroup layout Level 0
  * @brief Creates a Coord from coordinate values.
  * @brief Coord represents a position in tensor dimensions (e.g., row=1, col=2).
  * @param [in] t Coordinate values for each dimension
@@ -77,7 +74,6 @@ template <typename... Ts>
 __aicore__ inline constexpr Coord<Ts...> MakeCoord(const Ts&... t);
 
 /*
- * @ingroup layout Level 0
  * @brief Creates a Layout from shape and stride.
  * @brief Layout combines Shape and Stride to define tensor memory organization.
  * @brief Maps coordinates to memory offsets: offset = coord[i] * stride[i].
@@ -92,7 +88,6 @@ template <typename T, typename U>
 __aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride);
 
 /*
- * @ingroup layout Level 0
  * @brief Creates a Layout from shape with default stride.
  * @brief Automatically generates row-major stride (last dimension stride=1).
  * @param [in] shape Tensor shape dimensions
@@ -105,7 +100,6 @@ template <typename T>
 __aicore__ inline constexpr auto MakeLayout(const T& shape);
 
 /*
- * @ingroup layout Level 0
  * @brief Converts coordinate to linear index using shape and stride.
  * @brief Computes memory offset from multi-dimensional coordinate.
  * @brief Formula: index = sum(coord[i] * stride[i]).
@@ -121,7 +115,6 @@ template <typename T, typename Shape, typename Stride>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, const Stride& stride);
 
 /*
- * @ingroup layout Level 0
  * @brief Gets element at index I from tuple.
  * @brief Accesses single element from Shape, Stride, or Coord tuple.
  * @param [in] t Tuple object (Shape, Stride, Coord)
@@ -134,7 +127,6 @@ template <size_t I, typename Tuple, typename Enable>
 __aicore__ inline constexpr auto Get(Tuple&& t);
 
 /*
- * @ingroup layout Level 0
  * @brief Gets elements at multiple indices from tuple.
  * @brief Accesses multiple elements from Shape, Stride, or Coord.
  * @param [in] t Tuple object
@@ -144,7 +136,6 @@ template <size_t I0, size_t I1, size_t... Is, typename Tuple, typename Enable>
 __aicore__ inline constexpr auto Get(Tuple&& t);
 
 /*
- * @ingroup layout Level 0
  * @brief Gets all elements from tuple.
  * @brief Returns entire tuple contents.
  * @param [in] t Tuple object
@@ -154,7 +145,6 @@ template <typename Tuple, typename Enable>
 __aicore__ inline constexpr auto Get(Tuple&& t);
 
 /*
- * @ingroup layout Level 0
  * @brief Computes cosize of layout dimensions.
  * @brief Returns product of dimension sizes (total elements).
  * @param [in] layout Layout object
@@ -167,7 +157,6 @@ template <size_t... Is, typename LayoutType, typename Enable>
 __aicore__ inline constexpr auto Cosize(const LayoutType& layout);
 
 /*
- * @ingroup layout Level 0
  * @brief Returns rank (number of dimensions) of layout.
  * @brief Gets dimensionality of tensor layout.
  * @param [in] layout Layout object
@@ -180,7 +169,6 @@ template <size_t... Is, typename LayoutType, typename Enable>
 __aicore__ inline constexpr auto Rank(const LayoutType& layout);
 
 /*
- * @ingroup layout Level 0
  * @brief Selects subset of layout dimensions.
  * @brief Creates new layout from selected dimensions.
  * @param [in] layout Layout object
@@ -190,7 +178,6 @@ template <size_t... Is, typename LayoutType, typename Enable>
 __aicore__ inline constexpr auto Select(const LayoutType& layout);
 
 /*
- * @ingroup layout Level 0
  * @brief Gets dimension values from layout.
  * @brief Returns shape values for specified dimensions.
  * @param [in] layout Layout object
@@ -203,7 +190,6 @@ template <size_t... Is, typename LayoutType, typename Enable>
 __aicore__ inline constexpr auto Get(const LayoutType& layout);
 
 /*
- * @ingroup layout Level 0
  * @brief Computes size of layout dimensions.
  * @brief Returns product of specified dimension sizes.
  * @param [in] layout Layout object
@@ -216,7 +202,6 @@ template <size_t... Is, typename LayoutType, typename Enable>
 __aicore__ inline constexpr auto Size(const LayoutType& layout);
 
 /*
- * @ingroup layout Level 0
  * @brief Computes capacity of layout (maximum elements).
  * @brief Returns maximum number of elements that can be stored.
  * @param [in] layout Layout object
@@ -226,7 +211,6 @@ template <size_t... Is, typename LayoutType, typename Enable>
 __aicore__ inline constexpr auto Capacity(const LayoutType& layout);
 
 /*
- * @ingroup layout Level 0
  * @brief Creates a sliced tensor view from original tensor.
  * @brief Extracts sub-tensor specified by coordinate range.
  * @brief Provides view into tensor without copying data.
@@ -242,7 +226,6 @@ template <typename Tensor, typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info);
 
 /*
- * @ingroup layout Level 0
  * @brief Creates a frame layout for tiled processing.
  * @brief Frame layout defines block structure for tiled tensor operations.
  * @param [in] args Frame layout parameters (tile sizes, etc.)
@@ -253,7 +236,6 @@ template <typename LayoutPattern, typename TraitType,
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args);
 
 /*
- * @ingroup layout Level 0
  * @brief Creates a frame layout with integral constant parameters.
  * @brief Compile-time frame layout for tiled operations.
  * @param [in] args Integral constant tile parameters

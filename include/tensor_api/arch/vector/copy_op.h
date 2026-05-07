@@ -20,28 +20,26 @@
  * \brief Provides copy operation structures for Vector-specific data movement.
  * \brief Supports copy operations between GM, UB, L1.
  * 
- * \ingroup arch Level 0
  */
+#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H
+#define INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H
 
 namespace AscendC {
 namespace Te {
 
 /*
- * @ingroup copy_op Level 0
  * @brief Copy operation: Global Memory to Unified Buffer.
  * @brief Loads data from GM to UB for Vector processing.
  */
 struct CopyGM2UB;
 
 /*
- * @ingroup copy_op Level 0
  * @brief Copy operation: Unified Buffer to L1 Buffer.
  * @brief Transfers data from UB to L1 for Cube processing.
  */
 struct CopyUB2L1;
 
 /*
- * @ingroup copy_op Level 0
  * @brief Copy operation: Unified Buffer to Global Memory.
  * @brief Writes Vector computation results back to GM.
  */

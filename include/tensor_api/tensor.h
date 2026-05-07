@@ -31,7 +31,6 @@
  * - atom/atom.h: Atomic operation primitives
  * - utils/utils.h: Utility functions and helpers
  * 
- * \ingroup tensor_api Level 0
  */
 #ifndef INCLUDE_TENSOR_API_TENSOR_H
 #define INCLUDE_TENSOR_API_TENSOR_H
