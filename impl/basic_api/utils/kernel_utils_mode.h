@@ -61,11 +61,17 @@ enum class ReluMode{
 };
 
 union NotNumUnion {
+#if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
+    NotNumUnion() {}
+#endif
     float f;
     uint32_t i;
 };
 
 union HalfUnion {
+#if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
+    HalfUnion() {}
+#endif
     half f;
     uint16_t i;
 };
