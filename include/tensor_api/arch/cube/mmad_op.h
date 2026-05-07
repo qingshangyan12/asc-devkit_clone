@@ -19,19 +19,22 @@
  * \brief Defines Cube unit MMAD operation types.
  * \brief Provides MMAD operation structures for matrix multiply-add.
  * \brief Supports matrix operations on Cube compute unit.
+ * 
+ * \ingroup arch Level 0
  */
-#ifndef INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
-#define INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
+
 namespace AscendC {
 namespace Te {
 
 /*
+ * @ingroup mmad_op Level 0
  * @brief Default MMAD trait configuration.
  * @brief Defines default parameters for MMAD operations.
  */
 struct MmadTraitDefault;
 
 /*
+ * @ingroup mmad_op Level 0
  * @brief MMAD operation structure.
  * @brief Defines matrix multiply-add operation for Cube unit.
  * @brief Executes M = A * B + C using hardware acceleration.

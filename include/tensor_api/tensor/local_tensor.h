@@ -19,16 +19,16 @@
  * \brief Defines LocalTensor type and MakeTensor construction function.
  * \brief LocalTensor represents a tensor view on local memory (UB, L1, L0A/B/C).
  * \brief Provides unified tensor abstraction for hardware acceleration.
+ * 
+ * \ingroup tensor Level 0
  */
-#ifndef INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H 
-#define INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H 
 
-#include "impl/tensor_api/tensor/tuple_impl.h" 
-#include "impl/tensor_api/tensor/local_tensor_impl.h"
+// tensor construction
 namespace AscendC {
 namespace Te {
 
 /*
+ * @ingroup tensor Level 0
  * @brief Creates a LocalTensor from iterator and layout arguments.
  * @brief Combines iterator (pointer to data in local memory) with layout specification.
  * @brief Automatically deduces tensor type based on iterator and layout parameters.

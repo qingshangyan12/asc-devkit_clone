@@ -15,17 +15,14 @@
  * \brief Provides common types and configuration for tensor operations.
  * \brief Includes cache modes, MMAD types, and operation parameter structures.
  * 
+ * \ingroup utils Level 0
  */
-#ifndef INCLUDE_TENSOR_API_UTILS_UTILS_H	 
-#define INCLUDE_TENSOR_API_UTILS_UTILS_H	 
 
-#include "include/utils/base/sys_macros.h"	 
-#include "include/utils/base/sys_constants.h" 
-#include "include/utils/common_types.h"
 namespace AscendC { 
 namespace Te {
 
 /*
+ * @ingroup utils Level 0
  * @brief Cache mode enumeration for memory operations.
  * @brief Defines cache behavior for data access operations.
  */
@@ -37,12 +34,14 @@ enum class CacheMode : uint8_t {
 };
 
 /*
+ * @ingroup utils Level 0
  * @brief MMAD type enumeration for matrix operations.
  * @brief Defines matrix multiply-add operation variants.
  */
 enum class MmadType : uint8_t { NORMAL = 0, MX = 1};
 
 /*
+ * @ingroup utils Level 0
  * @brief MMAD trait structure for operation configuration.
  * @brief Defines MMAD operation traits and behavior parameters.
  * @brief Controls FM offset, K-direction alignment, C-matrix source, etc.
@@ -67,6 +66,7 @@ struct MmadTrait {
 };
 
 /*
+ * @ingroup utils Level 0
  * @brief MMAD parameters structure for matrix dimensions.
  * @brief Defines matrix dimensions (M, N, K) for MMAD operations.
  * @brief Parameters control matrix multiply-add execution.

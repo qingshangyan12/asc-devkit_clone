@@ -24,6 +24,8 @@
  * Atom composition:
  * - atom/cube/copy_atom.h: Copy atoms for data movement
  * - atom/cube/mmad_atom.h: MMAD atoms for matrix operations
+ * 
+ * \ingroup atom Level 0
  */
 #ifndef INCLUDE_TENSOR_API_ATOM_ATOM_H
 #define INCLUDE_TENSOR_API_ATOM_ATOM_H

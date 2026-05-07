@@ -19,67 +19,78 @@
  * \brief Defines Cube unit copy operation types.
  * \brief Provides copy operation structures for Cube-specific data movement.
  * \brief Supports copy operations between GM, L1, L0A/B/C, UB, FB, BT.
+ * 
+ * \ingroup arch Level 0
  */
-#ifndef INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
-#define INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
+
 namespace AscendC {
 namespace Te {
 
 /*
+ * @ingroup copy_op Level 0
  * @brief Copy operation: Global Memory to L1 Buffer.
  * @brief Transfers data from GM to L1 for Cube processing.
  */
 struct CopyGM2L1;
 
 /*
+ * @ingroup copy_op Level 0
  * @brief Copy operation: L1 Buffer to Unified Buffer.
  * @brief Transfers data from L1 to UB for Vector processing.
  */
 struct CopyL12UB;
 
 /*
+ * @ingroup copy_op Level 0
  * @brief Copy operation: L1 Buffer to L0B Buffer.
  * @brief Loads right matrix data to L0B for Cube MMAD.
  */
 struct CopyL12L0B;
 
 /*
+ * @ingroup copy_op Level 0
  * @brief Copy operation: L1 Buffer to L0A Buffer.
  * @brief Loads left matrix data to L0A for Cube MMAD.
  */
 struct CopyL12L0A;
 
 /*
+ * @ingroup copy_op Level 0
  * @brief Copy operation: L1 Buffer to FB (Fix Buffer).
  * @brief Specialized copy for FixPipe operations.
  */
 struct CopyL12FB;
 
 /*
+ * @ingroup copy_op Level 0
  * @brief Copy operation: L1 Buffer to BT (Bias Buffer).
  * @brief Loads bias data for accumulation operations.
  */
 struct CopyL12BT;
 
 /*
+ * @ingroup copy_op Level 0
  * @brief Copy operation: L0C Buffer to Global Memory.
  * @brief Writes Cube computation results back to GM.
  */
 struct CopyL0C2GM;
 
 /*
+ * @ingroup copy_op Level 0
  * @brief Copy operation: L0C Buffer to GM with additional parameters.
  * @brief Extended L0C to GM copy with configurable options.
  */
 struct CopyL0C2GMWith;
 
 /*
+ * @ingroup copy_op Level 0
  * @brief Copy operation: L0C Buffer to Unified Buffer.
  * @brief Transfers Cube results to UB for Vector processing.
  */
 struct CopyL0C2UB;
 
 /*
+ * @ingroup copy_op Level 0
  * @brief Copy operation: L0C Buffer to UB with additional parameters.
  * @brief Extended L0C to UB copy with configurable options.
  */
