@@ -1,8 +1,10 @@
-# asc-devkit OpenCode 配置
+# asc-devkit Agent 配置
 
-本目录维护 `asc-devkit` 仓内的本地 skill、安装脚本和 skill 级测试。它面向两类读者：
+`.agent` 维护 `asc-devkit` 仓内的本地 skill 和 skill 级测试。`.opencode`、`.claude`、`.codex` 是指向 `.agent` 的兼容软链，不是独立事实源。
 
-- 人类使用者：安装、卸载、查看 skill 能力和运行测试。
+本目录面向两类读者：
+
+- 人类使用者：查看 skill 能力和运行测试。
 - AI Agent：按仓内事实源维护 skill、引用 reference、生成或补齐 API UT。
 
 ## 给人类使用者
@@ -14,66 +16,68 @@
 | `asc-api-ut-gen` | 生成或补齐 `tests/api/` 下的 AscendC API UT | `skills/asc-api-ut-gen/SKILL.md` |
 | `asc-npu-arch` | 维护芯片、架构、`SocVersion`、`__NPU_ARCH__` 和 dtype 事实 | `skills/asc-npu-arch/SKILL.md` |
 
-当前 `.opencode` 不维护设计文档生成、API 实现生成、示例工程生成等 skill。
+当前 `.agent` 不维护设计文档生成、API 实现生成、示例工程生成等 skill。
 
-### 安装
+### 目录入口
 
-默认安装到 `${CODEX_HOME:-$HOME/.codex}/skills`：
-
-```bash
-bash .opencode/install-skills.sh
+```text
+.agent/                 # 唯一事实源
+.agent/skills/          # skill 源目录
+.agent/tests/           # skill 级测试
+.opencode -> .agent     # OpenCode 兼容入口
+.claude -> .agent       # Claude Code 兼容入口
+.codex -> .agent        # Codex 本地兼容入口
 ```
 
-显式安装目标：
+以后新增或修改 skill，只改 `.agent/skills`。
 
-```bash
-bash .opencode/install-skills.sh --codex
-bash .opencode/install-skills.sh --claude
-bash .opencode/install-skills.sh --all
+### 默认使用
+
+仓内默认不需要手动安装。客户端直接读取对应兼容入口即可：
+
+```text
+.opencode/skills -> .agent/skills
+.claude/skills -> .agent/skills
+.codex/skills -> .agent/skills
 ```
 
-安装方式是创建软链接，不复制 skill 内容。安装后重启对应工具，才能重新发现 `$asc-api-ut-gen` 和 `$asc-npu-arch`。
+以后新增或修改 skill，只改 `.agent/skills`。`.opencode`、`.claude`、`.codex` 不应维护独立内容。
 
-### 卸载
+> 当前 Codex 沙箱会把本仓 `.codex` 作为只读保留路径挂载；在这个运行环境里不能把 `.codex` 长期替换成软链，否则后续命令会因沙箱只读路径校验失败而无法启动。普通 checkout 或临时仓中没有这个限制。
 
-默认卸载 Codex 用户目录中的软链接：
+### 用户目录安装
 
-```bash
-bash .opencode/install-skills.sh --uninstall
+日常使用不需要安装；本仓不再维护用户目录安装脚本。如果某个客户端只读取 `${CODEX_HOME:-$HOME/.codex}/skills`，用户目录安装由客户端或用户环境自行管理，不作为本仓事实源的一部分。
+
+兼容软链损坏时，直接恢复仓内入口：
+
+```text
+.opencode -> .agent
+.claude -> .agent
+.codex -> .agent
 ```
-
-按目标卸载：
-
-```bash
-bash .opencode/install-skills.sh --uninstall --codex
-bash .opencode/install-skills.sh --uninstall --claude
-bash .opencode/install-skills.sh --uninstall --all
-```
-
-卸载只删除指向本仓 `.opencode/skills/<skill-name>` 的软链接。普通文件或目录不会被删除；同名软链接如果指向其他位置，需要显式加 `--force`。
 
 ### 测试
 
 运行全部 skill 测试：
 
 ```bash
-bash .opencode/tests/skills/run-all.sh
+bash .agent/tests/skills/run-all.sh
 ```
 
 单独测试：
 
 ```bash
-bash .opencode/tests/skills/asc-api-ut-gen/test.sh
-bash .opencode/tests/skills/asc-npu-arch/test.sh
-bash .opencode/tests/skills/install/test.sh
+bash .agent/tests/skills/asc-api-ut-gen/test.sh
+bash .agent/tests/skills/asc-npu-arch/test.sh
 ```
 
 ## 给 AI Agent
 
 ### 维护边界
 
-- `.opencode/skills` 是本仓 skill 的唯一事实来源。
-- 不直接编辑 `.claude/skills`；需要 Claude Code 兼容链接时，通过 `install-skills.sh --claude` 生成。
+- `.agent/skills` 是本仓 skill 的唯一事实来源。
+- 不直接编辑 `.opencode/skills`、`.claude/skills` 或 `.codex/skills`；它们都应通过软链访问 `.agent/skills`。
 - 不在本仓维护 `.agents/plugins`、`plugins/ascendc-api-generator` 或外部安装目录中的 skill 副本。
 - 当前 `asc-api-ut-gen` skill 忽略 Tensor API，不维护 `include/experimental/tensor_api/`、`impl/experimental/tensor_api/`、`tests/api/tensor_api/` 的生成规则。
 
@@ -92,8 +96,7 @@ bash .opencode/tests/skills/install/test.sh
 ### 修改规则
 
 - 修改 skill 正文、reference、脚本或测试后，至少运行相关 skill 的 `test.sh`。
-- 修改安装脚本后，运行 `bash .opencode/tests/skills/install/test.sh`。
-- 跨 skill 或通用事实变更后，运行 `bash .opencode/tests/skills/run-all.sh`。
+- 跨 skill 或通用事实变更后，运行 `bash .agent/tests/skills/run-all.sh`。
 - 新增 reference 时，同步更新对应 `references/README.md` 或 skill 的参考索引。
 - 新增芯片时，优先更新 `asc-npu-arch` 的结构化事实；只有 API 类型限制变化时，才更新 `asc-api-ut-gen` 的生成约束。
 
@@ -106,4 +109,3 @@ bash .opencode/tests/skills/install/test.sh
 3. 读取 `asc-api-ut-gen` 的 API guide、目录映射和工作流。
 4. 生成或修改 UT 后，报告 token 消耗、总耗时、当前覆盖率；无法获取时说明原因。
 5. 不声称未执行的构建、UT 或覆盖率验证已经通过。
-

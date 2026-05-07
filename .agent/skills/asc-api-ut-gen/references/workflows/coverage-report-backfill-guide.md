@@ -247,8 +247,8 @@ UT 补齐后，必须执行完整验证，不允许只改代码不验证。
 
 ### 8.2 最低验证要求
 
-1. 编译成功
-2. 对应 gtest 过滤运行通过
+1. 按 [自动化验证流程](automation-guide.md) 选择的所有受影响 build.sh part 编译/运行成功
+2. 对应 gtest 过滤运行通过，且过滤结果不是 `0 tests`
 3. 重新检查 `build/cov_report`
 4. 目标文件或目录下所有目标文件的 `Lines` 和 `Functions` 均达到 `95%`
 

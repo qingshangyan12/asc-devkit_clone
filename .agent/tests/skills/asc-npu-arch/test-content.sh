@@ -13,10 +13,10 @@ set -euo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${TEST_DIR}/../../../.." && pwd)"
-SKILL_FILE="${REPO_ROOT}/.opencode/skills/asc-npu-arch/SKILL.md"
-REFERENCE_FILE="${REPO_ROOT}/.opencode/skills/asc-npu-arch/references/npu-arch-guide.md"
-FACTS_FILE="${REPO_ROOT}/.opencode/skills/asc-npu-arch/references/npu-arch-facts.json"
-API_UT_FILE="${REPO_ROOT}/.opencode/skills/asc-api-ut-gen/SKILL.md"
+SKILL_FILE="${REPO_ROOT}/.agent/skills/asc-npu-arch/SKILL.md"
+REFERENCE_FILE="${REPO_ROOT}/.agent/skills/asc-npu-arch/references/npu-arch-guide.md"
+FACTS_FILE="${REPO_ROOT}/.agent/skills/asc-npu-arch/references/npu-arch-facts.json"
+API_UT_FILE="${REPO_ROOT}/.agent/skills/asc-api-ut-gen/SKILL.md"
 
 fail() {
     echo "[FAIL] $*" >&2

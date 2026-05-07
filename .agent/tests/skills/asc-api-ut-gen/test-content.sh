@@ -13,7 +13,7 @@ set -euo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${TEST_DIR}/../../../.." && pwd)"
-SKILL_DIR="${SKILL_DIR:-${REPO_ROOT}/.opencode/skills/asc-api-ut-gen}"
+SKILL_DIR="${SKILL_DIR:-${REPO_ROOT}/.agent/skills/asc-api-ut-gen}"
 SKILL_FILE="${SKILL_DIR}/SKILL.md"
 REFERENCES_DIR="${SKILL_DIR}/references"
 GENERATOR="${SKILL_DIR}/scripts/ut_generator.py"
@@ -174,5 +174,14 @@ done
 expect_fixed "$SKILL_FILE" "token 消耗、总耗时、当前覆盖率" "post generation metrics"
 expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "Token 消耗" "automation token report"
 expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "当前覆盖率" "automation coverage report"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "tests/test_parts.sh" "automation test part source"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "basic_test_five" "automation c/reg/simt part"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "adv_test_two" "automation adv 3510 part"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "ascendc_ut_c_api_ascend950pr_9599_AIV" "automation c api target"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "ascendc_ut_reg_compute_ascend950pr_9599" "automation regbase target"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "ascendc_ut_simt_api_ascend950pr_9599" "automation simt target"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "bash build.sh -t -j8" "automation full test fallback"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "0 tests" "automation gtest zero-test guard"
+expect_fixed "$SKILL_FILE" '`build.sh` 和 `tests/test_parts.sh`' "skill build strategy source"
 
 echo "[PASS] asc-api-ut-gen skill content validation passed"

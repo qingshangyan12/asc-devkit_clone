@@ -13,7 +13,7 @@ set -euo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${TEST_DIR}/../../../.." && pwd)"
-SKILL_DIR="${SKILL_DIR:-${REPO_ROOT}/.opencode/skills/asc-npu-arch}"
+SKILL_DIR="${SKILL_DIR:-${REPO_ROOT}/.agent/skills/asc-npu-arch}"
 SKILL_FILE="${SKILL_DIR}/SKILL.md"
 REFERENCE_FILE="${SKILL_DIR}/references/npu-arch-guide.md"
 FACTS_FILE="${SKILL_DIR}/references/npu-arch-facts.json"

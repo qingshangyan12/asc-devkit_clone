@@ -276,20 +276,26 @@ python scripts/ut_generator_cli.py --config ut_config.json --validate
 
 ## 7. 编译与执行命令
 
+执行策略必须以仓内当前 `build.sh` 和 `tests/test_parts.sh` 为准。`build.sh --<part>` 会读取 `tests/test_parts.sh` 中对应 target 列表并构建/运行这些 target；`--changed_file` 只判断是否跳过编译测试，不能替代 API UT 分组选择。
+
 ```bash
 # 设置环境
 source {CANN_PATH}/set_env.sh
 cd {ASC_DEVKIT_PATH}
 
-# 执行测试
-bash build.sh --basic_test_one -j8   # Basic API 分组一
-bash build.sh --adv_test -j8          # Advanced API
-bash build.sh -t                      # 全部测试
+# 根据 API 类型、目标芯片、核心类型和修改文件选择所有受影响 test part
+bash build.sh --basic_test_two -j8    # 示例：多数 membase basic API
+bash build.sh --basic_test_five -j8   # 示例：C API / regbase / SIMT
+bash build.sh --adv_test -j8          # 示例：非 3510 Advanced API 或 adv 公共变更的一部分
+bash build.sh --adv_test_two -j8      # 示例：3510 Advanced API
+bash build.sh -t -j8                  # 无法可靠收敛分组时执行全部测试
 
-# 单文件测试执行
+# 定位到实际可执行文件后，可追加 gtest filter 做问题复现；不能替代上面的 build.sh part
 cd {ASC_DEVKIT_PATH}/build/tests/api/basic_api
 ./ascendc_ut_basic_api_ascend910B1_AIV --gtest_filter="*Add*"
 ```
+
+详细选择表见 [自动化验证流程](references/workflows/automation-guide.md)。生成或补齐 UT 后，必须运行所有受影响的 part；如果 `tests/test_parts.sh` 未包含目标芯片/target，最终报告必须明确说明未覆盖原因，不能声称已验证。
 
 ---
 

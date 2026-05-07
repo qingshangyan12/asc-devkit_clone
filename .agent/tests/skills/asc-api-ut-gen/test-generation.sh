@@ -13,11 +13,11 @@ set -euo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${TEST_DIR}/../../../.." && pwd)"
-SKILL_DIR="${SKILL_DIR:-${REPO_ROOT}/.opencode/skills/asc-api-ut-gen}"
+SKILL_DIR="${SKILL_DIR:-${REPO_ROOT}/.agent/skills/asc-api-ut-gen}"
 CLI="${SKILL_DIR}/scripts/ut_generator_cli.py"
 FIXTURE_DIR="${TEST_DIR}/fixtures"
 GOLDEN_DIR="${TEST_DIR}/golden"
-ARCH_FACTS="${REPO_ROOT}/.opencode/skills/asc-npu-arch/references/npu-arch-facts.json"
+ARCH_FACTS="${REPO_ROOT}/.agent/skills/asc-npu-arch/references/npu-arch-facts.json"
 GENERATION_CONSTRAINTS="${SKILL_DIR}/references/foundations/generation-constraints.json"
 WORK_DIR="$(mktemp -d)"
 seen_api_types=""

@@ -13,7 +13,7 @@ set -euo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${TEST_DIR}/../../../.." && pwd)"
-SKILL_DIR="${SKILL_DIR:-${REPO_ROOT}/.opencode/skills/asc-api-ut-gen}"
+SKILL_DIR="${SKILL_DIR:-${REPO_ROOT}/.agent/skills/asc-api-ut-gen}"
 SKILL_FILE="${SKILL_DIR}/SKILL.md"
 REFERENCES_DIR="${SKILL_DIR}/references"
 SCRIPTS_DIR="${SKILL_DIR}/scripts"
