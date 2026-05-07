@@ -23,10 +23,7 @@
 #include "kernel_macros.h"
 #include "kernel_tensor.h"
 #include "kernel_struct_unary.h"
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "reg_compute/kernel_reg_compute_utils.h"
-#endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -82,21 +79,12 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
  * @param [in] repeatParams.dstRepStride dst repeat stride
  * @param [in] repeatParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask = true, const ExpConfig& config = DEFAULT_EXP_CONFIG>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 template <typename T, bool isSetMask = true, const ExpConfig& config = DEFAULT_EXP_CONFIG>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
-#else
-template <typename T, bool isSetMask = true>
-__aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
-template <typename T, bool isSetMask = true>
-__aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
-#endif
 
 /*
  * @ingroup Exp Level 2
@@ -105,13 +93,8 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
-#else
-template <typename T>
-__aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
-#endif
 
 /* **************************************** Ln ****************************************** */
 /*
@@ -126,21 +109,12 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
  * @param [in] repeatParams.dstRepStride dst repeat stride
  * @param [in] repeatParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask = true, const LnConfig& config = DEFAULT_LN_CONFIG>
 __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 template <typename T, bool isSetMask = true, const LnConfig& config = DEFAULT_LN_CONFIG>
 __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
-#else
-template <typename T, bool isSetMask = true>
-__aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
-template <typename T, bool isSetMask = true>
-__aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
-#endif
 
 /*
  * @ingroup Ln Level 2
@@ -149,13 +123,8 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, const LnConfig& config = DEFAULT_LN_CONFIG>
 __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
-#else
-template <typename T>
-__aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
-#endif
 
 /* **************************************** Abs ****************************************** */
 /*
