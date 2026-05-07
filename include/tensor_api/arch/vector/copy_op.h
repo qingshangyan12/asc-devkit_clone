@@ -15,17 +15,29 @@
 #endif
 
 /*!
-* \file copy_op.h
-* \brief
-*/
+ * \file copy_op.h
+ * \brief Defines Vector unit copy operation types.
+ * \brief Provides copy operation structures for Vector-specific data movement.
+ */
 #ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H
 #define INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H
 
 namespace AscendC {
 namespace Te {
 
+/*
+ * @brief Copy operation: Global Memory to Unified Buffer.
+ */
 struct CopyGM2UB;
+
+/*
+ * @brief Copy operation: Unified Buffer to L1 Buffer.
+ */
 struct CopyUB2L1;
+
+/*
+ * @brief Copy operation: Unified Buffer to Global Memory.
+ */
 struct CopyUB2GM;
 
 } // namespace Te

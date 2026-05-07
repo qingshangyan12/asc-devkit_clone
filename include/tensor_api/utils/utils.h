@@ -9,10 +9,16 @@
 */
 
 
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
+#endif
+
 /*!
-* \file utils.h
-* \brief
-*/
+ * \file utils.h
+ * \brief Defines utility types, enums, and parameter structures.
+ * \brief Provides common types and configuration for tensor operations.
+ */
 #ifndef INCLUDE_TENSOR_API_UTILS_UTILS_H
 #define INCLUDE_TENSOR_API_UTILS_UTILS_H
 
@@ -20,18 +26,27 @@
 #include "include/utils/base/sys_constants.h"
 #include "include/utils/common_types.h"
 
-namespace AscendC { 
+namespace AscendC {
 namespace Te {
 
+/*
+ * @brief Cache mode enumeration for memory operations.
+ */
 enum class CacheMode : uint8_t {
-    CACHE_MODE_NORMAL = 0,	 
-    CACHE_MODE_DISABLE = 4,	    
-    CACHE_MODE_LAST, 
+    CACHE_MODE_NORMAL = 0,
+    CACHE_MODE_DISABLE = 4,
+    CACHE_MODE_LAST,
     CACHE_MODE_PERSISTENT
 };
 
+/*
+ * @brief MMAD type enumeration for matrix operations.
+ */
 enum class MmadType : uint8_t { NORMAL = 0, MX = 1};
 
+/*
+ * @brief MMAD trait structure for operation configuration.
+ */
 struct MmadTrait {
     __aicore__ constexpr MmadTrait() {};
 
@@ -43,20 +58,23 @@ struct MmadTrait {
         disableGemv = disableGemvIn;
         mmadType = mmadTypeIn;
     };
-    
+
     int32_t fmOffset = 0;
     bool kDirectionAlign = false;
     bool cmatrixSource = false;
     bool disableGemv = true;
-    MmadType mmadType = MmadType::NORMAL; 
+    MmadType mmadType = MmadType::NORMAL;
 };
 
+/*
+ * @brief MMAD parameters structure for matrix dimensions.
+ */
 struct MmadParams {
     __aicore__ constexpr MmadParams() {};
 
-    __aicore__ constexpr MmadParams(uint16_t mIn, uint16_t nIn, uint16_t kIn, uint8_t unitFlagIn, bool cmatrixInitValIn) : 
+    __aicore__ constexpr MmadParams(uint16_t mIn, uint16_t nIn, uint16_t kIn, uint8_t unitFlagIn, bool cmatrixInitValIn) :
         m(mIn), n(nIn), k(kIn), unitFlag(unitFlagIn), cmatrixInitVal(cmatrixInitValIn){};
-    
+
     uint16_t m = 0;
     uint16_t n = 0;
     uint16_t k = 0;
@@ -64,17 +82,28 @@ struct MmadParams {
     bool cmatrixInitVal = false;
 };
 
+/*
+ * @brief Data copy trait structure.
+ */
 struct DataCopyTrait {};
 
+/*
+ * @brief Round mode enumeration.
+ */
 enum class RoundMode : uint8_t {DEFAULT = 0, HYBRID};
 
-
+/*
+ * @brief Dual destination mode enumeration.
+ */
 enum DualDstMode : uint8_t {
     DUAL_DST_DISABLE = 0,
     DUAL_DST_SPLIT_M,
     DUAL_DST_SPLIT_N
 };
 
+/*
+ * @brief Fixpipe trait structure.
+ */
 struct FixpipeTrait {
     __aicore__ constexpr FixpipeTrait() {}
 
@@ -87,14 +116,20 @@ struct FixpipeTrait {
     DualDstMode dualDstCtl = DUAL_DST_DISABLE;
 };
 
+/*
+ * @brief Fixpipe parameters structure.
+ */
 struct FixpipeParams {
-   __aicore__ constexpr FixpipeParams() {};
+    __aicore__ constexpr FixpipeParams() {};
 
-   __aicore__ constexpr FixpipeParams(uint8_t unitFlagIn) : unitFlag(unitFlagIn) {};
-    
+    __aicore__ constexpr FixpipeParams(uint8_t unitFlagIn) : unitFlag(unitFlagIn) {};
+
     uint8_t unitFlag = 0;
 };
 
+/*
+ * @brief Load data trait structure.
+ */
 struct LoadDataTrait {
     __aicore__ constexpr LoadDataTrait() {}
 
@@ -105,7 +140,12 @@ struct LoadDataTrait {
     bool transposed = false;
 };
 
-} // namespace Te 
+} // namespace Te
 } // namespace AscendC
 
 #endif // INCLUDE_TENSOR_API_UTILS_UTILS_H
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
+#endif

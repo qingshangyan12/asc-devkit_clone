@@ -15,9 +15,10 @@
 #endif
 
 /*!
-* \file tensor.h
-* \brief
-*/
+ * \file tensor.h
+ * \brief Tensor API main entry point, includes all tensor-related modules.
+ * \brief This header aggregates core components: tensor types, layouts, algorithms, atoms, and utilities.
+ */
 #ifndef INCLUDE_TENSOR_API_TENSOR_H
 #define INCLUDE_TENSOR_API_TENSOR_H
 

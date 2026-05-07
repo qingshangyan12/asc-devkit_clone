@@ -15,16 +15,24 @@
 #endif
 
 /*!
-* \file mmad_op.h
-* \brief
-*/
+ * \file mmad_op.h
+ * \brief Defines Cube unit MMAD operation types.
+ * \brief Provides MMAD operation structures for matrix multiply-add.
+ */
 #ifndef INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
 #define INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
 
 namespace AscendC {
 namespace Te {
 
+/*
+ * @brief Default MMAD trait configuration.
+ */
 struct MmadTraitDefault;
+
+/*
+ * @brief MMAD operation structure.
+ */
 struct MmadOperation;
 
 } // namespace Te

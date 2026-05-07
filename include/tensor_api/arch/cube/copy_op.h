@@ -15,24 +15,64 @@
 #endif
 
 /*!
-* \file copy_op.h
-* \brief
-*/
+ * \file copy_op.h
+ * \brief Defines Cube unit copy operation types.
+ * \brief Provides copy operation structures for Cube-specific data movement.
+ */
 #ifndef INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 #define INCLUDE_TENSOR_API_ARCH_CUBE_COPY_OP_H
 
 namespace AscendC {
 namespace Te {
 
+/*
+ * @brief Copy operation: Global Memory to L1 Buffer.
+ */
 struct CopyGM2L1;
+
+/*
+ * @brief Copy operation: L1 Buffer to Unified Buffer.
+ */
 struct CopyL12UB;
+
+/*
+ * @brief Copy operation: L1 Buffer to L0B Buffer.
+ */
 struct CopyL12L0B;
+
+/*
+ * @brief Copy operation: L1 Buffer to L0A Buffer.
+ */
 struct CopyL12L0A;
+
+/*
+ * @brief Copy operation: L1 Buffer to FB (Fix Buffer).
+ */
 struct CopyL12FB;
+
+/*
+ * @brief Copy operation: L1 Buffer to BT (Bias Buffer).
+ */
 struct CopyL12BT;
+
+/*
+ * @brief Copy operation: L0C Buffer to Global Memory.
+ */
 struct CopyL0C2GM;
+
+/*
+ * @brief Copy operation: L0C Buffer to GM with additional parameters.
+ */
 struct CopyL0C2GMWith;
+
+/*
+ * @brief Copy operation: L0C Buffer to Unified Buffer.
+ */
 struct CopyL0C2UB;
+
+/*
+ * @brief Copy operation: L0C Buffer to UB with additional parameters.
+ */
 struct CopyL0C2UBWith;
 
 } // namespace Te

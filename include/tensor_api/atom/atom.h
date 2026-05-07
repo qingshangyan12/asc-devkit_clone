@@ -15,9 +15,10 @@
 #endif
 
 /*!
-* \file atom.h
-* \brief
-*/
+ * \file atom.h
+ * \brief Atom operations main entry point, includes copy and mmad atoms.
+ * \brief Provides atom-level operation primitives for hardware acceleration.
+ */
 #ifndef INCLUDE_TENSOR_API_ATOM_ATOM_H
 #define INCLUDE_TENSOR_API_ATOM_ATOM_H
 

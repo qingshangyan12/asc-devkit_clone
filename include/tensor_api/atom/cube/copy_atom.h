@@ -15,9 +15,10 @@
 #endif
 
 /*!
-* \file copy_atom.h
-* \brief
-*/
+ * \file copy_atom.h
+ * \brief Defines CopyAtom structure for copy operation parameters.
+ * \brief CopyAtom encapsulates copy operation configuration and traits.
+ */
 #ifndef INCLUDE_TENSOR_API_ATOM_CUBE_COPY_ATOM_H
 #define INCLUDE_TENSOR_API_ATOM_CUBE_COPY_ATOM_H
 
@@ -26,15 +27,27 @@
 namespace AscendC {
 namespace Te {
 
+/*
+ * @brief Defines traits for copy operations.
+ */
 template <typename CopyOperation, typename... CopyOpArgs>
 struct CopyTraits;
 
+/*
+ * @brief Base structure for CopyAtom.
+ */
 template <typename... Args>
 struct CopyAtom;
 
+/*
+ * @brief CopyAtom with single operation type.
+ */
 template <typename CopyOperation>
 struct CopyAtom<CopyOperation>;
 
+/*
+ * @brief CopyAtom constructed from CopyTraits.
+ */
 template <typename... Args>
 struct CopyAtom<CopyTraits<Args...>>;
 
