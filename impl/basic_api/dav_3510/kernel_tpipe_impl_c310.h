@@ -771,6 +771,7 @@ __aicore__ inline void TPipe::DestroyWithoutPipeAll()
 __aicore__ inline void TPipe::Destroy()
 {
     DestroyWithoutPipeAll();
+    pipe_barrier(PIPE_ALL);
 }
 
 __aicore__ inline void TPipe::Reset()
