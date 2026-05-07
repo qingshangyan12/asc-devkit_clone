@@ -13,6 +13,7 @@
 
 
 import sys
+import argparse
 import numpy as np
 
 
@@ -20,55 +21,78 @@ RELATIVE_TOL = 1e-5
 ABSOLUTE_TOL = 1e-8
 ERROR_TOL = 1e-3
 
+RELATIVE_TOL_CUBE = 1e-5
+ABSOLUTE_TOL_CUBE = 1e-3
+ERROR_TOL_CUBE = 1e-3
 
-def verify_result(output_file, golden_file):
-    """
-    验证输出结果与真值是否一致
-    
-    参数：
-    - output_file: 输出数据文件路径
-    - golden_file: 真值数据文件路径
-    
-    返回：
-    - True: 验证通过
-    - False: 验证失败
-    """
-    output_type = np.float32
-    output = np.fromfile(output_file, dtype=output_type).reshape(-1)
-    golden = np.fromfile(golden_file, dtype=output_type).reshape(-1)
-    
+
+def verify_result_vector(output_file, golden_file):
+    output = np.fromfile(output_file, dtype=np.float32).reshape(-1)
+    golden = np.fromfile(golden_file, dtype=np.float32).reshape(-1)
+
     assert output.size >= golden.size, f"output size {output.size} < expected {golden.size}"
-    
+
     output = output[:golden.size]
-    
-    # 使用 isclose 进行逐元素比较
+
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=RELATIVE_TOL,
                                            atol=ABSOLUTE_TOL,
                                            equal_nan=True)
     different_element_indexes = np.where(different_element_results == False)[0]
-    
-    # 打印前100个不一致的元素
+
     for index in range(min(len(different_element_indexes), 100)):
         real_index = different_element_indexes[index]
         golden_data = golden[real_index]
         output_data = output[real_index]
         print("data index: %06d, expected: %-.9f, actual: %-.9f" %
               (real_index, golden_data, output_data))
-    
+
     error_ratio = float(different_element_indexes.size) / golden.size
     print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, ERROR_TOL))
     return error_ratio <= ERROR_TOL
 
 
+def verify_result_cube(output_file, golden_file):
+    output = np.fromfile(output_file, dtype=np.float32).reshape(-1)
+    golden = np.fromfile(golden_file, dtype=np.float32).reshape(-1)
+
+    assert output.size >= golden.size, f"output size {output.size} < expected {golden.size}"
+
+    output = output[:golden.size]
+
+    different_element_results = np.isclose(output,
+                                           golden,
+                                           rtol=RELATIVE_TOL_CUBE,
+                                           atol=ABSOLUTE_TOL_CUBE,
+                                           equal_nan=True)
+    different_element_indexes = np.where(different_element_results == False)[0]
+
+    for index in range(min(len(different_element_indexes), 100)):
+        real_index = different_element_indexes[index]
+        golden_data = golden[real_index]
+        output_data = output[real_index]
+        print("data index: %06d, expected: %-.9f, actual: %-.9f" %
+              (real_index, golden_data, output_data))
+
+    error_ratio = float(different_element_indexes.size) / golden.size
+    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, ERROR_TOL_CUBE))
+    return error_ratio <= ERROR_TOL_CUBE
+
+
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print("Usage: python3 verify_result.py output.bin golden.bin")
-        sys.exit(1)
-    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('output_file', help='Output file path')
+    parser.add_argument('golden_file', help='Golden file path')
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2], help='Scenario number')
+    args = parser.parse_args()
+
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
+        if args.scenarioNum == 1:
+            res = verify_result_vector(args.output_file, args.golden_file)
+        else:
+            res = verify_result_cube(args.output_file, args.golden_file)
+
         if not res:
             raise ValueError("[ERROR] result error")
         print("test pass!")

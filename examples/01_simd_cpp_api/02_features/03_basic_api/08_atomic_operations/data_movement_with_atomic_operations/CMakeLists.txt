@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -11,14 +11,22 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
+
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "CMAKE_ASC_ARCHITECTURES, e.g. dav-2201, dav-3510")
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-2)")
+
+if(NOT SCENARIO_NUM MATCHES "^[1-2]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1 or 2, but got ${SCENARIO_NUM}")
+endif()
+
+add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
 
 add_executable(demo
-    set_atomic_add.asc
+    data_movement_with_atomic_operations.asc
 )
 
 target_compile_options(demo PRIVATE
