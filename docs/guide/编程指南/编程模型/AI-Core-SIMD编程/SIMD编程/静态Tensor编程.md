@@ -800,7 +800,7 @@
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18988435204114"><a name="p18988435204114"></a><a name="p18988435204114"></a>-</p>
 </td>
 </tr>
-<tr id="row098783516417"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p139874354419"><a name="p139874354419"></a><a name="p139874354419"></a>基础API &gt; 矢量计算 &gt; 数据重排</p>
+<tr id="row098783516418"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p139874354419"><a name="p139874354419"></a><a name="p139874354419"></a>基础API &gt; 矢量计算 &gt; 数据重排</p>
 </td>
 <td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p99871335184114"><a name="p99871335184114"></a><a name="p99871335184114"></a>Interleave、DeInterleave</p>
 </td>
