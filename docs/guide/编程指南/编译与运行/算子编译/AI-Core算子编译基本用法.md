@@ -72,6 +72,14 @@ bisheng异构编译默认采用的是全程序编译模式，该模式要在单�
 ```shell
   bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
 ```
+![ ](../../../figures/aicore_simt_comilation.png "aicore simt编译流程示意图")
 
+## 基本编译命令汇总
+|编译方式|AI Core 编译命令| AI Core SIMT编译命令|
+|-|-|-|
+|异构编译| bisheng <source_file>.asc -o \<output_file\> --npu-arch=dav-\<npu architecture\> | bisheng <source_file>.asc -o <output_file> --npu-arch=dav-\<npu architecture\> **--enable-simt**|
+|独立编译|bisheng **-dc** <source_file>.asc -o \<output_file\>**.o** --npu-arch=dav-\<npu architecture\>| bisheng **-dc** <source_file>.asc -o <output_file>**.o** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
+|动态库编译|bisheng **-shared** <source_file>.asc -o \<output_file\>**.so** --npu-arch=dav-\<npu architecture\>| bisheng **-shared** <source_file>.asc -o <output_file>**.so** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
+|静态库编译|bisheng **-lib** <source_file>.asc -o \<output_file\>**.a** --npu-arch=dav-\<npu architecture\>| bisheng **-lib** <source_file>.asc -o <output_file>**.a** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
 
 更多的编译选项用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
