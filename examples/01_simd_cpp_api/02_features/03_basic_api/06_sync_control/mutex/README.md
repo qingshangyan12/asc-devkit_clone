@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示Mutex::Lock和Mutex::Unlock核内流水线同步接口的使用方法，通过锁定指定流水再释放流水来实现PIPE_MTE2、PIPE_V和PIPE_MTE3异步流水之间的同步依赖。样例实现数据搬入、加法计算、数据搬出三个任务，使用双缓冲和Mutex锁机制实现流水线同步控制。
+本样例演示Mutex::Lock、Mutex::Unlock、AllocMutexID和ReleaseMutexID核内流水线同步接口的使用方法。样例首先通过AllocMutexID从框架获取MutexID，然后使用Mutex::Lock和Mutex::Unlock锁定指定流水再释放流水来实现PIPE_MTE2、PIPE_V和PIPE_MTE3异步流水之间的同步依赖。样例实现数据搬入、加法计算、数据搬出三个任务，使用双缓冲和Mutex锁机制实现流水线同步控制，最后使用ReleaseMutexID释放MutexID。
 
 ## 支持的产品
 
@@ -23,7 +23,13 @@
 ## 样例描述
 
 - 样例功能：
-  基于Mutex::Lock和Mutex::Unlock实现核内异步流水之间的同步，其功能类似于CPU中的锁机制，通过锁定指定流水再释放流水来实现流水的同步依赖。样例使用双缓冲机制，在8轮循环中交替使用两个缓冲区，每轮循环中对搬入、计算、搬出三个任务分别加锁解锁。
+  本样例演示Mutex相关接口的完整使用流程：
+  1. 使用 `AllocMutexID()` 从框架获取两个MutexID（mutexId0和mutexId1）
+  2. 在8轮循环中使用双缓冲机制，交替使用两个缓冲区（mutexId0和mutexId1）
+  3. 每轮循环中分别对搬入（CopyIn）、计算（Compute）、搬出（CopyOut）三个任务加锁解锁
+  4. 使用结束后调用 `ReleaseMutexID()` 释放两个MutexID
+  
+  通过Mutex锁机制实现核内异步流水之间的同步，确保数据搬入、计算、搬出三个任务的正确执行顺序。
 
 - 样例规格：
   <table border="2">

@@ -36,6 +36,7 @@
 <tr><td>3</td><td>[3, 24]</td><td>[1, 80]</td><td>half</td><td>Compact填充</td><td>Compact模式，最后一个数据块右侧填充16字节（仅支持dav-3510）</td></tr>
 <tr><td>4</td><td>[1, 320]</td><td>[1, 576]</td><td>int8</td><td>LoopMode搬运（Compact）</td><td>SetLoopModePara使能loop mode，Compact模式，实现GM→UB非连续stride搬运（仅支持dav-3510）</td></tr>
 <tr><td>5</td><td>[1, 320]</td><td>[1, 576]</td><td>int8</td><td>LoopMode搬运（Normal）</td><td>SetLoopModePara使能loop mode，Normal模式，实现GM→UB非连续stride搬运（仅支持dav-3510）</td></tr>
+<tr><td>6</td><td>[2,4,3,128,126]</td><td>[512, 128]</td><td>int8</td><td>LoopMode搬运（Normal）</td><td>五维数据搬运，搬运[2,2,2,64,126]，每行补2字节padding到128字节（仅支持dav-3510）</td></tr>
 </table>
 
 ### 场景详细说明
@@ -92,6 +93,17 @@
 **图 3**  目的操作数Normal模式搬运场景示例 
 
 <img src="figure/datacopypad3.png">
+
+**场景6：使用SetLoopModePara使能loop mode（Normal模式）进行五维数据搬运 ----此场景仅在 Ascend 950PR/Ascend 950DT产品支持**
+- 输入shape：[2,4,3,128,126]，五维数据
+- 输出shape：[512, 128]，UB中连续存放
+- 数据类型：int8
+- 搬运规格：[2,2,2,64,126]，每个126字节补2字节padding到128字节
+- 参数配置：
+  - GM→UB：LoopModeParams{loop1Size=2, loop2Size=2, loop1SrcStride=128*126, loop1DstStride=64*128, loop2SrcStride=3*128*126, loop2DstStride=2*64*128}，DataCopyMVType::OUT_TO_UB
+  - DataCopyExtParams：blockCount=64, blockLen=126, srcStride=0, dstStride=0
+  - DataCopyPadExtParams：isPad=true, leftPadding=0, rightPadding=0, padValue=0
+  - 第0维使用for循环搬运2次
 
 ## 编译运行
 
