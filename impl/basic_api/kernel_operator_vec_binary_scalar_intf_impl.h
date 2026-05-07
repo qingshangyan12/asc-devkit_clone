@@ -1153,6 +1153,7 @@ template <typename T, bool isSetMask, const BinaryConfig &config, typename U, ty
 __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Adds")) {
@@ -1160,12 +1161,14 @@ __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     AddsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Adds")) {
@@ -1173,11 +1176,13 @@ __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     AddsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, const int32_t& count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Adds")) {
@@ -1205,6 +1210,7 @@ __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, const in
         AddsImpl<ActualT, isSetMask>((__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(), src1,
             count);
     }
+#endif
 }
 
 /* **************************************************************************************************
@@ -1241,6 +1247,7 @@ template <typename T, bool isSetMask, const BinaryConfig &config, typename U, ty
 __aicore__ inline void Muls(const U& dst, const S& src0, const V& src1, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Muls")) {
@@ -1248,12 +1255,14 @@ __aicore__ inline void Muls(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     MulsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Muls(const U& dst, const S& src0, const V& src1, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Muls")) {
@@ -1261,11 +1270,13 @@ __aicore__ inline void Muls(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     MulsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Muls(const U& dst, const S& src0, const V& src1, const int32_t& count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Muls")) {
@@ -1293,6 +1304,7 @@ __aicore__ inline void Muls(const U& dst, const S& src0, const V& src1, const in
         MulsImpl<ActualT, isSetMask>((__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
             src1, count);
     }
+#endif
 }
 
 /* **************************************************************************************************
@@ -1329,6 +1341,7 @@ template <typename T, bool isSetMask, const BinaryConfig &config, typename U, ty
 __aicore__ inline void Maxs(const U& dst, const S& src0, const V& src1, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Maxs")) {
@@ -1336,12 +1349,14 @@ __aicore__ inline void Maxs(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     MaxsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Maxs(const U& dst, const S& src0, const V& src1, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Maxs")) {
@@ -1349,11 +1364,13 @@ __aicore__ inline void Maxs(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     MaxsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Maxs(const U& dst, const S& src0, const V& src1, const int32_t& count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Maxs")) {
@@ -1381,6 +1398,7 @@ __aicore__ inline void Maxs(const U& dst, const S& src0, const V& src1, const in
         MaxsImpl<ActualT, isSetMask>((__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
             src1, count);
     }
+#endif
 }
 
 /* **************************************************************************************************
@@ -1418,6 +1436,7 @@ template <typename T, bool isSetMask, const BinaryConfig &config, typename U, ty
 __aicore__ inline void Mins(const U& dst, const S& src0, const V& src1, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Mins")) {
@@ -1425,12 +1444,14 @@ __aicore__ inline void Mins(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     MinsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Mins(const U& dst, const S& src0, const V& src1, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Mins")) {
@@ -1438,11 +1459,13 @@ __aicore__ inline void Mins(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     MinsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Mins(const U& dst, const S& src0, const V& src1, const int32_t& count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Mins")) {
@@ -1470,6 +1493,7 @@ __aicore__ inline void Mins(const U& dst, const S& src0, const V& src1, const in
         MinsImpl<ActualT, isSetMask>((__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
             src1, count);
     }
+#endif
 }
 
 /* **************************************************************************************************
@@ -1506,6 +1530,7 @@ template <typename T, bool isSetMask, const BinaryConfig &config, typename U, ty
 __aicore__ inline void Ands(const U& dst, const S& src0, const V& src1, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Ands")) {
@@ -1513,12 +1538,14 @@ __aicore__ inline void Ands(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     AndsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Ands(const U& dst, const S& src0, const V& src1, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Ands")) {
@@ -1526,11 +1553,13 @@ __aicore__ inline void Ands(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     AndsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Ands(const U& dst, const S& src0, const V& src1, const int32_t& count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Ands")) {
@@ -1557,6 +1586,7 @@ __aicore__ inline void Ands(const U& dst, const S& src0, const V& src1, const in
         AndsImpl<ActualT, isSetMask>((__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
             src1, count);
     }
+#endif
 }
 
 /* **************************************************************************************************
@@ -1593,6 +1623,7 @@ template <typename T, bool isSetMask, const BinaryConfig &config, typename U, ty
 __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Ors")) {
@@ -1600,12 +1631,14 @@ __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, uint64_t 
     }
 #endif
     OrsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Ors")) {
@@ -1613,11 +1646,13 @@ __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, uint64_t 
     }
 #endif
     OrsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, const int32_t& count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Ors")) {
@@ -1644,6 +1679,7 @@ __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, const int
         OrsImpl<ActualT, isSetMask>((__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
             src1, count);
     }
+#endif
 }
 
 /* **************************************************************************************************
@@ -1680,6 +1716,7 @@ template <typename T, bool isSetMask, const BinaryConfig &config, typename U, ty
 __aicore__ inline void Subs(const U& dst, const S& src0, const V& src1, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Subs")) {
@@ -1687,12 +1724,14 @@ __aicore__ inline void Subs(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     SubsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Subs(const U& dst, const S& src0, const V& src1, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Subs")) {
@@ -1700,11 +1739,13 @@ __aicore__ inline void Subs(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     SubsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Subs(const U& dst, const S& src0, const V& src1, const int32_t& count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Subs")) {
@@ -1732,6 +1773,7 @@ __aicore__ inline void Subs(const U& dst, const S& src0, const V& src1, const in
         SubsImpl<ActualT, isSetMask>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualT*)src0.GetPhyAddr(), src1, count);
     }
+#endif
 }
 
 /* **************************************************************************************************
@@ -1768,6 +1810,7 @@ template <typename T, bool isSetMask, const BinaryConfig &config, typename U, ty
 __aicore__ inline void Divs(const U& dst, const S& src0, const V& src1, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Divs")) {
@@ -1775,12 +1818,14 @@ __aicore__ inline void Divs(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     DivsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Divs(const U& dst, const S& src0, const V& src1, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Divs")) {
@@ -1788,11 +1833,13 @@ __aicore__ inline void Divs(const U& dst, const S& src0, const V& src1, uint64_t
     }
 #endif
     DivsCommon<isSetMask, config>(dst, src0, src1, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const BinaryConfig &config, typename U, typename S, typename V>
 __aicore__ inline void Divs(const U& dst, const S& src0, const V& src1, const int32_t& count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Divs")) {
@@ -1819,6 +1866,7 @@ __aicore__ inline void Divs(const U& dst, const S& src0, const V& src1, const in
         DivsImpl<ActualT, isSetMask>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualT*)src0.GetPhyAddr(), src1, count);
     }
+#endif
 }
 
 /* **************************************************************************************************
