@@ -16,6 +16,20 @@
 
 #include "include/utils/std/type_traits.h"
 
+using _m32    = Std::Int<-32>;
+using _m24    = Std::Int<-24>;
+using _m16    = Std::Int<-16>;
+using _m12    = Std::Int<-12>;
+using _m10    = Std::Int<-10>;
+using _m9     = Std::Int<-9>;
+using _m8     = Std::Int<-8>;
+using _m7     = Std::Int<-7>;
+using _m6     = Std::Int<-6>;
+using _m5     = Std::Int<-5>;
+using _m4     = Std::Int<-4>;
+using _m3     = Std::Int<-3>;
+using _m2     = Std::Int<-2>;
+using _m1     = Std::Int<-1>;
 using _0      = Std::Int<0>;
 using _1      = Std::Int<1>;
 using _2      = Std::Int<2>;
