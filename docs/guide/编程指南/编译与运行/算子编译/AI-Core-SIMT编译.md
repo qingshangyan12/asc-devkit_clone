@@ -3,13 +3,13 @@
 使用bisheng编译Ascend C SIMT源文件的基本命令是：
 
 ```shell
-bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
+  bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
 ```
 
-bisheng可以通过-I <path>指定头文件按路径、-L <path> 指定链接库路径、-l <library>指定需要链接的动态库或静态库、-D<macro>=<value>指定宏定义
+bisheng可以通过-I \<path\>指定头文件按路径、-L \<path\> 指定链接库路径、-l \<library\>指定需要链接的动态库或静态库、-D\<macro\>=\<value\>指定宏定义
 
 ```shell
-bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
+  bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
 ```
 
 ![ ](../../../figures/aicore_simt_comilation.png "Ai Core SIMT编译流程示意图")
@@ -17,14 +17,14 @@ bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <o
 - Ai Core SIMT编译 [LINK]()
 
 ```
-// ----- simt_vec.asc -----
-__global__  simtKernel()
- 
-bisheng  -c simt_vec.asc -o simt_vec.o --npu-arch=dav-xxxx --enable-simt
-bisheng  -c main.cpp   -o main.o
-bisheng  -x asc simt_vec.o  main.o -o main --npu-arch=dav-xxxx --enable-simt
-  或
-bisheng main.cpp simt_vec.asc -o main --npu-arch=dav-xxxx --enable-simt
+  // ----- simt_vec.asc -----
+  __global__  simtKernel()
+  
+  bisheng  -c simt_vec.asc -o simt_vec.o --npu-arch=dav-xxxx --enable-simt
+  bisheng  -c main.cpp   -o main.o
+  bisheng  -x asc simt_vec.o  main.o -o main --npu-arch=dav-xxxx --enable-simt
+    或
+  bisheng main.cpp simt_vec.asc -o main --npu-arch=dav-xxxx --enable-simt
 ```
 
 - Ai Core SIMT单独编译[LINK]()
@@ -33,17 +33,17 @@ bisheng main.cpp simt_vec.asc -o main --npu-arch=dav-xxxx --enable-simt
 下方示例中，definition.cu 定义了变量和函数，example.cu 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件
 
 ```
-// ------- definition.asc -------
-extern __gm__ int dev_var = 5;
-__aicore__ int device_function();
- 
-// ------- example.asc -------
-extern __aicore__ int device_varibale;
-__aicore__ int device_function();
-__global__ void kernel(int *var) {
-    dev_var = 0;
-    *var = device_function();
-}
+  // ------- definition.asc -------
+  extern __gm__ int dev_var = 5;
+  __aicore__ int device_function();
+  
+  // ------- example.asc -------
+  extern __aicore__ int device_varibale;
+  __aicore__ int device_function();
+  __global__ void kernel(int *var) {
+      dev_var = 0;
+      *var = device_function();
+  }
 ```
 
 ```
@@ -55,13 +55,13 @@ __global__ void kernel(int *var) {
 - Ai Core SIMT动态库编译
 
 ```
-bisheng -shared example.asc -o libexample.so --npu-arch=dav-xxxx --enable-simt
+  bisheng -shared example.asc -o libexample.so --npu-arch=dav-xxxx --enable-simt
 ```
 
 - Ai Core SIMT静态库编译
 
 ```
-bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx --enable-simt
+  bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx --enable-simt
 ```
 
 更多的编译选项用法可以参见《毕生编译器用户指南》。
