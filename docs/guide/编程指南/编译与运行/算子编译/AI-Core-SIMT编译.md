@@ -1,6 +1,6 @@
 # AI Core SIMT编译基本用法<a name="ZH-CN_TOPIC_0000002561936205"></a>
 
-使用bisheng编译Ascend C SIMT源文件的基本命令是：
+使用bisheng编译Ascend C SIMT源文件的基本命令（--enable-simt指定SIMT源码编译）是：
 
 ```shell
   bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
@@ -16,9 +16,9 @@ bisheng可以通过-I \<path\>指定头文件按路径、-L \<path\> 指定链�
 
 - AI Core SIMT编译 [LINK]()
 
-```
+```shell
   // ----- simt_vec.asc -----
-  __global__  simtKernel()
+  __global__ void simtKernel()
   
   bisheng  -c simt_vec.asc -o simt_vec.o --npu-arch=dav-xxxx --enable-simt
   bisheng  -c main.cpp   -o main.o
@@ -32,7 +32,7 @@ bisheng可以通过-I \<path\>指定头文件按路径、-L \<path\> 指定链�
  simt独立编译与aicore独立编译相同，需要在bisheng的命令行中增加-dc编译选项。
 下方示例中，definition.cu 定义了变量和函数，example.cu 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件
 
-```
+```shell
   // ------- definition.asc -------
   extern __gm__ int dev_var = 5;
   __aicore__ int device_function();
@@ -46,21 +46,21 @@ bisheng可以通过-I \<path\>指定头文件按路径、-L \<path\> 指定链�
   }
 ```
 
-```
+```shell
   bisheng -dc definition.asc -o definition.o --npu-arch=dav-xxxx --enable-simt
   bisheng -dc example.asc -o example.o --npu-arch=dav-xxxx --enable-simt
   bisheng definition.o example.o -o program --npu-arch=dav-xxxx --enable-simt
 ```
 
-- AI Core SIMT动态库编译
+- AI Core SIMT动态库编译[LINK]()
 
-```
+```shell
   bisheng -shared example.asc -o libexample.so --npu-arch=dav-xxxx --enable-simt
 ```
 
-- AI Core SIMT静态库编译
+- AI Core SIMT静态库编译[LINK]()
 
-```
+```shell
   bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx --enable-simt
 ```
 
@@ -88,6 +88,6 @@ target_compile_options(demo PRIVATE
     # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
     # <COMPILE_LANGUAGE:ASC>:表明该编译选项仅对语言ASC生效
     # --enable-simt: 表明启动SIMT 方式编译
-    $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-2201 --enable-simt>    
+    $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-xxxx --enable-simt>
 )
 ```

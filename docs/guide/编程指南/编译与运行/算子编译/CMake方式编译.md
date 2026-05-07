@@ -46,7 +46,7 @@ target_compile_options(demo PRIVATE
           mix.asc
     )
     ```
-    表1 常用的CMAKE配置变量说明
+表1 常用的CMAKE配置变量说明
     
 |  变量名称| 配置说明 |  
 |--|--|
