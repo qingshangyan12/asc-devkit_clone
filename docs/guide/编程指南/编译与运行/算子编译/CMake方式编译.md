@@ -19,7 +19,18 @@ add_executable(demo
 target_compile_options(demo PRIVATE
     # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
     # <COMPILE_LANGUAGE:ASC>:表明该编译选项仅对语言ASC生效
-    $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-2201>    
+    $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-3510>    
+)
+```
+
+针对AI Core SIMT的CMake编译在编译选项中增加`--enable-simt` [样例LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)
+
+```cmake
+target_compile_options(demo PRIVATE
+    # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
+    # <COMPILE_LANGUAGE:ASC>:表明该编译选项仅对语言ASC生效
+    # --enable-simt: 表明启动SIMT 方式编译
+    $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-3510 --enable-simt>
 )
 ```
 
