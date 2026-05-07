@@ -1,16 +1,20 @@
 # Fill兼容性样例
+
 ## 概述
+
 本样例展示如何使用Fill接口对L0A Buffer和L0B Buffer进行初始化，通过编译时宏隔离实现不同架构的兼容性支持。
 
 - 在Atlas A2\A3 系列产品中，可以直接使用Fill接口进行L0A/L0B Buffer的初始化。
 - 但在Ascend 950PR/Ascend 950DT平台中，由于删除了L0A Buffer/L0B Buffer初始化的相关硬件指令，因此无法直接使用Fill接口进行L0A/L0B Buffer的初始化，需要借助L1 Buffer，先对L1中的Buffer初始化，再将该完成初始化的Buffer搬入L0A/L0B中，以此来间接完成L0A/L0B Buffer的初始化。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── fill
 │   ├── scripts
@@ -22,6 +26,7 @@
 ```
 
 ## 样例规格
+
 <table>
 <caption>样例规格表</caption>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -32,6 +37,7 @@
 </table>
 
 ### 样例实现
+
   1. 首先初始化 L0A Buffer 和 L0B Buffer，不同结构方式不一样：
     - Atlas A2/A3 训练/推理系列产品：调用`Fill`接口直接初始化 L0A Buffer 和 L0B Buffer 为指定值（本样例初始化为1）。
     - Ascend 950PR/950DT：使用`Fill`接口初始化 L1 Buffer 为指定值（本样例初始化为1），再通过`LoadData`接口搬运到 L0A Buffer 和 L0B Buffer。
@@ -39,27 +45,33 @@
   3. 通过`Fixpipe`接口将结果搬运到Global Memory。
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 ### 配置环境变量
+
 请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
 
 - 默认路径，root用户安装CANN软件包
+
   ```bash
   source /usr/local/Ascend/cann/set_env.sh
   ```
 
 - 默认路径，非root用户安装CANN软件包
+
   ```bash
   source $HOME/Ascend/cann/set_env.sh
   ```
 
 - 指定路径install_path，安装CANN软件包
+
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
 ### 样例执行
+
 ```bash
 mkdir -p build && cd build;                                               # 创建并进入build目录
 cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                      # 编译工程（Atlas A2/A3系列产品）
@@ -71,12 +83,14 @@ python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验�
 使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
 
 示例：
+
 ```bash
 cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
 cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
 ```
 
 针对Ascend 950PR/950DT编译：
+
 ```bash
 cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（Ascend 950PR/950DT）
 ```
@@ -84,13 +98,16 @@ cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编�
 > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 ### 编译选项说明
+
 | 选项 | 可选值 | 说明 |
 |------|--------|------|
 | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201对应Atlas A2/A3系列，dav-3510对应Ascend 950PR/950DT |
 
 ### 执行结果
+
 执行结果如下，说明精度对比成功：
+
 ```bash
 test pass!
 ```
