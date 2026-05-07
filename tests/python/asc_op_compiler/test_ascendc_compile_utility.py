@@ -97,12 +97,26 @@ class TestCompileUtility(unittest.TestCase):
         res = parse_super_kernel_options('"early-start=1"')
         self.assertEqual(res, {'early-start': SuperKernelEarlyStartMode.EarlyStartEnableV2})
 
-    def test_parse_super_kernel_options_convert_underscore_to_hyphen(self):
-        res = parse_super_kernel_options("early_start=1", convert_underscore_to_hyphen=True)
-        self.assertEqual(res, {'early-start': SuperKernelEarlyStartMode.EarlyStartEnableV2})
+    def test_aclgraph_options_accept_underscore_keys(self):
+        aggressive_opt_strategies = "event_breaker_bypass=0,value_breaker_bypass=1,task_breaker_bypass=0"
+        res = parse_super_kernel_options(
+            f"stream_fusion=1:aggressive_opt_strategies={aggressive_opt_strategies}", is_aclgraph=True)
+        self.assertEqual(res["stream-fusion"], "1")
+        self.assertEqual(res["aggressive-opt-strategies"], aggressive_opt_strategies)
 
-    def test_parse_super_kernel_options_no_convert_underscore(self):
-        self.assertRaises(Exception, parse_super_kernel_options, "early_start=1", False)
+    def test_ge_options_reject_underscore_keys(self):
+        self.assertRaises(Exception, parse_super_kernel_options, "early_start=1")
+
+    def test_aclgraph_options_parse_numeric_preload_code(self):
+        expected_values = {
+            "0": SuperKernelPreLoadMode.PreLoadByWhole,
+            "1": SuperKernelPreLoadMode.PreloadByAdanvanceStep,
+            "2": SuperKernelPreLoadMode.PreloadNA,
+        }
+        for value, expected in expected_values.items():
+            with self.subTest(value=value):
+                res = parse_super_kernel_options(f"preload-code={value}", is_aclgraph=True)
+                self.assertEqual(res["preload-code"], expected)
 
     def test_check_func_align(self):
         self.assertRaises(Exception, check_func_align, "test")
