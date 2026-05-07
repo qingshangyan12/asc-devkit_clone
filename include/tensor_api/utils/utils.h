@@ -93,6 +93,8 @@ struct FixpipeParams {
    __aicore__ constexpr FixpipeParams(uint8_t unitFlagIn) : unitFlag(unitFlagIn) {};
     
     uint8_t unitFlag = 0;
+
+    bool subBlockId = false;
 };
 
 struct LoadDataTrait {
