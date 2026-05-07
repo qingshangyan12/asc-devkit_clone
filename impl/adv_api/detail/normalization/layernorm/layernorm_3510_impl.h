@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * This program is free software; you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -31,6 +31,8 @@
 #include "layernorm_3510_utils.h"
 
 namespace AscendC {
+namespace Internal {
+
 // Extracted helper for rLength <= 64, invoked via VF_CALL<>
 template <typename T, bool isOutputVariance = true, bool isCorrection = false>
 __simd_vf__ inline void ComputeMeanVariance64VF(
@@ -326,6 +328,31 @@ __aicore__ inline void LayerNormImpl(
 
     LayerNormImpl<U, T, isReuseSource, config>(
         output, outputMean, output1, inputX, gamma, beta, epsilon, sharedTmpBuffer, para, tiling);
+}
+} // namespace Internal
+
+// ==================== AscendC namespace deprecated wrappers ====================
+
+template <typename U, typename T, bool isReuseSource = false, const LayerNormConfig& config = LNCFG_NORM>
+[[deprecated("use AscendC::Internal::LayerNormImpl instead")]]
+__aicore__ inline void LayerNormImpl(
+    const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& output1,
+    const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
+{
+    Internal::LayerNormImpl<U, T, isReuseSource, config>(
+        output, outputMean, output1, inputX, gamma, beta, epsilon, sharedTmpBuffer, para, tiling);
+}
+
+template <typename U, typename T, bool isReuseSource = false, const LayerNormConfig& config = LNCFG_NORM>
+[[deprecated("use AscendC::Internal::LayerNormImpl instead")]]
+__aicore__ inline void LayerNormImpl(
+    const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& output1,
+    const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon,
+    const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
+{
+    Internal::LayerNormImpl<U, T, isReuseSource, config>(
+        output, outputMean, output1, inputX, gamma, beta, epsilon, para, tiling);
 }
 } // namespace AscendC
 #endif // IMPL_NORMALIZATION_LAYERNORM_LAYERNORM_C310_IMPL_H

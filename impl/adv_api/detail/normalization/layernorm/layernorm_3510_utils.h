@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * This program is free software; you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -31,7 +31,6 @@ namespace Internal {
 const uint16_t kLayernormFoldNum = 2;
 constexpr uint32_t LAYERNORM_B16_VF_LEN = GetVecLen() / sizeof(uint16_t);
 constexpr uint32_t LAYERNORM_B32_VF_LEN = GetVecLen() / sizeof(uint32_t);
-} // namespace Internal
 
 template <typename T>
 __simd_callee__ inline void LoadDataWithT(
@@ -382,7 +381,7 @@ __simd_callee__ inline void ReduceWorkBufferAndStore(
         } else { // general case
             uint16_t cur = dynamicHalfAddTimes;
             for (uint16_t k = 0; k < halfAddRepeatTimes; ++k) {
-                cur = cur / Internal::kLayernormFoldNum; // Fold
+                cur = cur / kLayernormFoldNum; // Fold
                 for (uint16_t i = 0; i < cur; ++i) {
                     Reg::LoadAlign(s0, workUb + i * sregLower);
                     Reg::LoadAlign(s1, workUb + (cur + i) * sregLower);
@@ -398,6 +397,73 @@ __simd_callee__ inline void ReduceWorkBufferAndStore(
         Muls(outReg, tmp, k2RRec, pregOne);
         Reg::StoreAlign<float, Reg::StoreDist::DIST_FIRST_ELEMENT_B32>((dstUb + j), outReg, pregOne);
     }
+}
+
+} // namespace Internal
+
+// ==================== AscendC namespace deprecated wrappers ====================
+
+template <typename T>
+[[deprecated("use AscendC::Internal::LoadDataWithT instead")]]
+__simd_callee__ inline void LoadDataWithT(
+    __ubuf__ T* src0, __ubuf__ T* src1, Reg::RegTensor<float>& dstReg0, Reg::RegTensor<float>& dstReg1,
+    Reg::MaskReg& dst0Preg, Reg::MaskReg& dst1Preg, uint32_t src0Offset, uint32_t src1Offset)
+{
+    Internal::LoadDataWithT<T>(src0, src1, dstReg0, dstReg1, dst0Preg, dst1Preg, src0Offset, src1Offset);
+}
+
+template <typename T>
+[[deprecated("use AscendC::Internal::LoadDataWithT instead")]]
+__simd_callee__ inline void LoadDataWithT(
+    __ubuf__ T* src, Reg::RegTensor<float>& dstReg, Reg::MaskReg& dstPreg, uint32_t srcOffset)
+{
+    Internal::LoadDataWithT<T>(src, dstReg, dstPreg, srcOffset);
+}
+
+[[deprecated("use AscendC::Internal::CalculateHalfAddRepeatTimes instead")]]
+__aicore__ inline uint16_t CalculateHalfAddRepeatTimes(uint32_t halfAddTimes)
+{
+    return Internal::CalculateHalfAddRepeatTimes(halfAddTimes);
+}
+
+template <typename T>
+[[deprecated("use AscendC::Internal::ComputeMeanUseY instead")]]
+__simd_callee__ inline void ComputeMeanUseY(
+    __ubuf__ T* const srcUb, __ubuf__ T* const workUbYOrigin, Reg::MaskReg& pregFull, Reg::MaskReg& pregOne,
+    Reg::MaskReg& pregLastCount, Reg::MaskReg& preg2, const uint32_t aLength, const uint32_t rLengthWithPadding,
+    const uint32_t rHeadLength, const uint32_t m, const uint16_t repeatTimes1, const uint16_t repeatTimes2,
+    const uint16_t repeatTimes3, const uint32_t mVL, const float k2Rec, const uint16_t sregLower)
+{
+    Internal::ComputeMeanUseY<T>(
+        srcUb, workUbYOrigin, pregFull, pregOne, pregLastCount, preg2, aLength, rLengthWithPadding,
+        rHeadLength, m, repeatTimes1, repeatTimes2, repeatTimes3, mVL, k2Rec, sregLower);
+}
+
+template <typename T>
+[[deprecated("use AscendC::Internal::ComputeVarianceUseY instead")]]
+__simd_callee__ inline void ComputeVarianceUseY(
+    __ubuf__ T* const srcUb, __ubuf__ T* const workUbYOrigin, __ubuf__ float* const meanUb, Reg::MaskReg& pregFull,
+    Reg::MaskReg& pregOne, Reg::MaskReg& pregLastCount, Reg::MaskReg& preg2, const uint32_t aLength,
+    const uint32_t rLengthWithPadding, const uint32_t rHeadLength, const uint32_t m, const uint16_t repeatTimes1,
+    const uint16_t repeatTimes2, const uint16_t repeatTimes3, const uint32_t mVL, const float k2Rec,
+    const uint16_t sregLower)
+{
+    Internal::ComputeVarianceUseY<T>(
+        srcUb, workUbYOrigin, meanUb, pregFull, pregOne, pregLastCount, preg2, aLength,
+        rLengthWithPadding, rHeadLength, m, repeatTimes1, repeatTimes2, repeatTimes3, mVL, k2Rec, sregLower);
+}
+
+template <typename T, uint16_t HalfAddTimes>
+[[deprecated("use AscendC::Internal::ReduceWorkBufferAndStore instead")]]
+__simd_callee__ inline void ReduceWorkBufferAndStore(
+    __ubuf__ T* const workUbYOrigin, __ubuf__ float* const dstUb, Reg::MaskReg& pregFull, Reg::MaskReg& pregOne,
+    Reg::MaskReg& pregLastCount, const uint32_t aLength, const uint32_t rLengthWithPadding,
+    const uint16_t halfAddRepeatTimes, const uint32_t lastCount, const float k2RRec, const uint16_t sregLower,
+    const uint16_t dynamicHalfAddTimes = 0)
+{
+    Internal::ReduceWorkBufferAndStore<T, HalfAddTimes>(
+        workUbYOrigin, dstUb, pregFull, pregOne, pregLastCount, aLength, rLengthWithPadding,
+        halfAddRepeatTimes, lastCount, k2RRec, sregLower, dynamicHalfAddTimes);
 }
 
 } // namespace AscendC
