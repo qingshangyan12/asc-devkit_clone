@@ -61,7 +61,6 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue
 template <typename T>
 __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /*
  * @ingroup Duplicate lowest position of src
  * @brief dst = dst[i] = src[0]
@@ -116,11 +115,13 @@ __aicore__ inline void DeInterleave(const LocalTensor<T>& dst0, const LocalTenso
 template <typename T>
 __aicore__ inline void DeInterleave(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1,
     const LocalTensor<T>& src, const int32_t srcCount);
-#endif
+
 } // namespace AscendC
 #pragma end_pipe
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_vec_duplicate_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_OPERATOR_VEC_DUPLICATE_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_DUPLICATE_INTF_H__)

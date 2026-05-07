@@ -131,7 +131,6 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue
     DuplicateImpl<T>((__ubuf__ T*)dst.GetPhyAddr(), scalarValue, count);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 /*
  * @ingroup Duplicate lowest position of src
  * @brief dst = dst[i] = src[0]
@@ -143,6 +142,7 @@ template <typename T>
 __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const int32_t& count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecDupInfo(dst, count, "Duplicate");
 #endif
@@ -154,6 +154,7 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>
     }
 #endif
     DuplicateImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -172,12 +173,14 @@ template <typename T>
 __aicore__ inline void Interleave(const LocalTensor<T> &dst0, const LocalTensor<T> &dst1,
     const LocalTensor<T> &src0, const LocalTensor<T> &src1, const int32_t count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     using PrimType = PrimT<T>;
     InterleaveImpl<PrimType>((__ubuf__ PrimType *)dst0.GetPhyAddr(),
         (__ubuf__ PrimType *)dst1.GetPhyAddr(),
         (__ubuf__ PrimType *)src0.GetPhyAddr(),
         (__ubuf__ PrimType *)src1.GetPhyAddr(),
         count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -196,12 +199,14 @@ template <typename T>
 __aicore__ inline void DeInterleave(const LocalTensor<T> &dst0, const LocalTensor<T> &dst1,
     const LocalTensor<T> &src0, const LocalTensor<T> &src1, const int32_t count)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     using PrimType = PrimT<T>;
     DeInterleaveImpl<PrimType>((__ubuf__ PrimType *)dst0.GetPhyAddr(),
         (__ubuf__ PrimType *)dst1.GetPhyAddr(),
         (__ubuf__ PrimType *)src0.GetPhyAddr(),
         (__ubuf__ PrimType *)src1.GetPhyAddr(),
         count);
+#endif
 }
 
 /*
@@ -216,13 +221,15 @@ template <typename T>
 __aicore__ inline void DeInterleave(const LocalTensor<T> &dst0, const LocalTensor<T> &dst1,
     const LocalTensor<T> &src, const int32_t srcCount)
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     using PrimType = PrimT<T>;
     DeInterleaveImpl<PrimType>((__ubuf__ PrimType *)dst0.GetPhyAddr(),
         (__ubuf__ PrimType *)dst1.GetPhyAddr(),
         (__ubuf__ PrimType *)src.GetPhyAddr(),
         srcCount);
-}
 #endif
+}
+
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_DUPLICATE_INTERFACE_IMPL_H
