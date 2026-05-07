@@ -101,7 +101,6 @@ private:
     TensorDescImpl<T> tensorDesc;
 };
 
-
 class ListTensorDesc {
 public:
     __aicore__ inline ListTensorDesc() {}
