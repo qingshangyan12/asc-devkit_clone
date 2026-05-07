@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 
-find_package(ASC REQUIRED HINTS $ENV{ASCEND_INSTALL_PATH}/compiler/tikcpp/ascendc_kernel_cmake)
+find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
@@ -22,7 +22,7 @@ add_executable(demo
     welford.asc
 )
 
-target_link_libraries(demo PRIVATE
+target_link_libraries(demo PRIVATE`
     tiling_api
     register
     platform
