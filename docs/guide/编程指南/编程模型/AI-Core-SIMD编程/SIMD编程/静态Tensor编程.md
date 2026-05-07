@@ -800,11 +800,11 @@
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18988435204114"><a name="p18988435204114"></a><a name="p18988435204114"></a>-</p>
 </td>
 </tr>
-<tr id="row098783516418"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p139874354419"><a name="p139874354419"></a><a name="p139874354419"></a>基础API &gt; 矢量计算 &gt; 数据重排</p>
+<tr id="row098783516418"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p139874354418"><a name="p139874354418"></a><a name="p139874354418"></a>基础API &gt; 矢量计算 &gt; 数据重排</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p99871335184114"><a name="p99871335184114"></a><a name="p99871335184114"></a>Interleave、DeInterleave</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p99871335184115"><a name="p99871335184115"></a><a name="p99871335184115"></a>Interleave、DeInterleave</p>
 </td>
-<td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18988435204114"><a name="p18988435204114"></a><a name="p18988435204114"></a>-</p>
+<td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18988435204115"><a name="p18988435204115"></a><a name="p18988435204115"></a>-</p>
 </td>
 </tr>
 <tr id="row1598863534117"><td class="cellrowborder" rowspan="6" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p1998811353419"><a name="p1998811353419"></a><a name="p1998811353419"></a>基础API &gt; 数据搬运 &gt; DataCopy</p>
