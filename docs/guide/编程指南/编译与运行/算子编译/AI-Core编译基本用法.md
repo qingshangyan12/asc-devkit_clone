@@ -1,4 +1,6 @@
 ## AI Core编译基本用法<a name="section229217121411"></a>
+当开发者完成一个Kernel核函数的编写后，并在Host侧通过<<<>>>方式完成核函数的启动调用，就需要进行算子源码编译与算子运行，接下来我们介绍通过bisheng编译器完成算子编译的基本用法。
+
 使用bisheng编译Ascend C 源文件的基本命令（--npu-arch=dav-<npu architecture> 指定AI处理器架构版本）是：
 ```shell
 bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture>
