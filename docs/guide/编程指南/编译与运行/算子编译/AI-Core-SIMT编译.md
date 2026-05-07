@@ -14,7 +14,7 @@ bisheng可以通过-I \<path\>指定头文件按路径、-L \<path\> 指定链�
 
 ![ ](../../../figures/aicore_simt_comilation.png "Ai Core SIMT编译流程示意图")
 
-- Ai Core SIMT编译 [LINK]()
+- AI Core SIMT编译 [LINK]()
 
 ```
   // ----- simt_vec.asc -----
@@ -27,7 +27,7 @@ bisheng可以通过-I \<path\>指定头文件按路径、-L \<path\> 指定链�
   bisheng main.cpp simt_vec.asc -o main --npu-arch=dav-xxxx --enable-simt
 ```
 
-- Ai Core SIMT单独编译[LINK]()
+- AI Core SIMT单独编译[LINK]()
 
  simt独立编译与aicore独立编译相同，需要在bisheng的命令行中增加-dc编译选项。
 下方示例中，definition.cu 定义了变量和函数，example.cu 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件
@@ -52,22 +52,22 @@ bisheng可以通过-I \<path\>指定头文件按路径、-L \<path\> 指定链�
   bisheng definition.o example.o -o program --npu-arch=dav-xxxx --enable-simt
 ```
 
-- Ai Core SIMT动态库编译
+- AI Core SIMT动态库编译
 
 ```
   bisheng -shared example.asc -o libexample.so --npu-arch=dav-xxxx --enable-simt
 ```
 
-- Ai Core SIMT静态库编译
+- AI Core SIMT静态库编译
 
 ```
   bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx --enable-simt
 ```
 
-更多的编译选项用法可以参见《毕生编译器用户指南》。
+更多的编译选项用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
 
 
-## 通过Ai Core SIMT CMake编译
+## 通过AI Core SIMT CMake编译
 
 以下是CMake脚本的示例及其核心步骤说明：[样例LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)
 
