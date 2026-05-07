@@ -24,3 +24,4 @@
 | [mergemode](./mergemode) | 本样例基于RegBase编程范式综合演示MaskMergeMode::MERGING + postUpdate + UpdateMask + ReduceMax |
 | [data_relayout](./data_relayout) | 本样例基于RegBase编程范式演示Interleave和Pack接口实现数据重排（Interleave交织 + Pack低位提取） |
 | [gather](./gather) | 本样例基于RegBase编程范式演示Gather接口（源操作数为寄存器）按索引收集元素，使用LoadAlign/StoreAlign的postUpdate模式 |
+| [loadalign_storealign](./loadalign_storealign) | 本样例基于RegBase编程范式实现Reg搬入搬出操作，主要调用LoadAlign接口和StoreAlign接口。 |
