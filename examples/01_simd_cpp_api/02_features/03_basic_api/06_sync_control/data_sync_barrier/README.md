@@ -60,6 +60,8 @@
     
 - 样例执行
   ```bash
+  cd ..
+  rm -rf build
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j;    # 编译工程
   python3 ../scripts/gen_data.py   # 生成测试输入数据

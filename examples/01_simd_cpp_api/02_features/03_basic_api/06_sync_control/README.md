@@ -11,8 +11,8 @@
 | 目录名称 | 功能描述 |
 |----------|----------|
 | [data_sync_barrier](./data_sync_barrier) | 基于DataSyncBarrier实现核内标量单元流水（PIPE_S）的同步，确保标量操作完成后再执行后续操作 |
-| [mutex](./mutex) | 基于Mutex::Lock和Mutex::Unlock实现核内异步流水之间的同步，通过锁定指定流水再释放流水来实现流水同步依赖 |
-| [pipe_barrier](./pipe_barrier) | 基于PipeBarrier实现核内多流水同步，完整展示PIPE_MTE2、PIPE_V、PIPE_MTE3三种流水的单流水同步及SetFlag/WaitFlag多流水同步 |
+| [mutex](./mutex) | 本样例演示Mutex::Lock、Mutex::Unlock、AllocMutexID和ReleaseMutexID核内流水线同步接口的使用方法 |
+| [pipeline_sync](./pipeline_sync) | 基于PipeBarrier和SetFlag/WaitFlag实现核内多流水同步，完整展示PIPE_MTE2、PIPE_V、PIPE_MTE3三种流水的单流水同步及SetFlag/WaitFlag多流水同步，支持Vector和Cube两种模式 |
 
 
 ### 核间同步
