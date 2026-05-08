@@ -85,7 +85,7 @@ uint16_t left_height = 16;
 uint16_t n_dim = 16;
 uint16_t right_width =16;
 uint8_t unit_flag = 0;
-bool disable_gemv = true;
+bool disable_gemv = false;
 bool c_matrix_source = false;
 bool c_matrix_init_val = true;
 // 函数调用
