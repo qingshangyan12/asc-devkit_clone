@@ -14,6 +14,7 @@ super kernel option_parse
 """
 
 from abc import ABC, abstractmethod
+from tbe.common.context import get_context
 from .ascendc_compile_base import CommonUtility, AscendCLogLevel
 from .super_kernel_constants import SuperKernelPreLoadMode, SuperKernelEarlyStartMode, \
     SuperKernelDebugDcciAllMode, SuperKernelDebugSyncAllMode, SuperKernelStreamFusionMode, \
@@ -34,6 +35,9 @@ class ParserFactory:
 
     def register(self, parser: OptionParser):
         self._parsers[parser.key] = parser
+
+    def get_parses(self) -> dict:
+        return self._parsers
 
     def get_parse_func(self, key: str) -> OptionParser:
         return self._parsers.get(key)
@@ -173,32 +177,16 @@ def setup_super_kernel_option_parsers_aclgraph() -> ParserFactory:
     factory = ParserFactory()
 
     # register validation
-    factory.register(EnumParser("preload-code", {
-                "0": SuperKernelPreLoadMode.PreLoadByWhole,
-                "1": SuperKernelPreLoadMode.PreloadByAdanvanceStep,
-                "2": SuperKernelPreLoadMode.PreloadNA,
-            }))
-    factory.register(EnumParser("stream-fusion", {
-                "0": SuperKernelStreamFusionMode.StreamFusionDisable,
-                "1": SuperKernelStreamFusionMode.StreamFusionEnable,
-            }))
-    factory.register(EnumParser("debug-sync-all", {
-                "0": SuperKernelDebugSyncAllMode.DebugSyncAllDisable,
-                "1": SuperKernelDebugSyncAllMode.DebugSyncAllEnable,
-            }))
-    factory.register(NumberParser("split-mode"))
-    factory.register(BinaryParser("auto-op-parallel"))
-    factory.register(BinaryParser("debug-cross-core-sync-check"))
-    factory.register(BinaryParser("debug-op-exec-trace"))
     factory.register(NonEmptyParser('dcci-before-kernel-start'))
     factory.register(NonEmptyParser('dcci-after-kernel-end'))
     factory.register(NonEmptyParser('dcci-disable-on-kernel'))
-    factory.register(NonEmptyParser('aggressive-opt-strategies'))
 
     return factory
 
 
-def parse_super_kernel_options(option_string: str, is_aclgraph: bool = False) -> bool:
+def parse_super_kernel_options(option_string: str) -> bool:
+    context = get_context()
+    is_aclgraph = context.get_addition("super_kernel_sub_combine") is True if context else False
     if is_aclgraph:
         factory = setup_super_kernel_option_parsers_aclgraph()
     else:
@@ -216,6 +204,10 @@ def parse_super_kernel_options(option_string: str, is_aclgraph: bool = False) ->
             continue
         key, value = map(str.strip, pair.split('=', 1))
         key = key.replace('_', '-') if is_aclgraph else key
+        if is_aclgraph and key not in factory.get_parses():
+            CommonUtility.print_compile_log("", f"Unsupported compile option for aclgraph backend: {key}.",
+            AscendCLogLevel.LOG_INFO)
+            continue
         if not key or not value:
             CommonUtility().ascendc_raise_python_err(ERR_CODE,
                 f"[Super Kernel] Invalid compile option: The key-value pair is missing for the option {pair}.")
