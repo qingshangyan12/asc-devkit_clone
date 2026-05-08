@@ -12,6 +12,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
 find_package(ASC REQUIRED)
 
@@ -21,12 +22,13 @@ add_executable(demo
     matmul.asc
 )
 
-include_directories(
-    $ENV{ASCEND_HOME_PATH}/aarch64-linux/asc/
-)
 
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+set(ASCEND_HOME $ENV{ASCEND_HOME_PATH})
+ 	 
+set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
+
+include_directories(
+    "${ASC_INCLUDE_DIR}"
 )
 
 target_link_libraries(demo PRIVATE
@@ -38,5 +40,5 @@ target_link_libraries(demo PRIVATE
 )
 
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
