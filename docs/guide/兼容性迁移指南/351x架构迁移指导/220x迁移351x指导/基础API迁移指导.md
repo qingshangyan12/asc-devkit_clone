@@ -1,10 +1,10 @@
 # 基础API迁移指导<a name="ZH-CN_TOPIC_0000002470508258"></a>
 
-本节针对351x架构芯片变更对基础API兼容性产生的影响进行说明，并提供基础API的兼容性适配方案。
+本节针对351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构芯片变更对基础API兼容性产生的影响进行说明，并提供基础API的兼容性适配方案。
 
 ## 矢量计算<a name="section7364115741514"></a>
 
--   **351x架构默认不支持Subnormal功能。**
+-   **351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构默认不支持Subnormal功能。**
 
     **说明**：SubNormal浮点数指的是指数位全为0、尾数不为0的浮点数，用于表示比最小正常数更小的值，避免“下溢为0”。351x版本默认不支持Subnormal，Subnormal浮点数在计算中被视为0。
 
@@ -156,11 +156,11 @@
 
 -   **不支持SetLoadDataBoundary接口。**
 
-    **说明**：351x架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置Load3D时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始读取数据。设置为0表示无边界，可以使用整个L1 Buffer。
+    **说明**：351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置Load3D时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始读取数据。设置为0表示无边界，可以使用整个L1 Buffer。
 
     **兼容方案**：
 
-    -   220x架构版本的接口参数boundaryValue设置为0时与351x架构版本等价。
+    -   220x（[NPU架构版本220x](../../../编程指南/硬件实现/架构规格/NPU架构版本220x.md)）架构版本的接口参数boundaryValue设置为0时与351x架构版本等价。
     -   如果需要在L1 Buffer上循环读取操作数，需要将对应的Load3D接口手动拆分成多条指令，手动绕回。
 
     ![](../../../figures/ZN-88.png)
@@ -259,7 +259,7 @@
 
 -   **Cube计算单元删除int4b\_t数据类型。**
 
-    **说明**：相较于220x架构版本，351x架构版本的Cube计算单元不支持int4b\_t。相关的基础API有LoadData、Mmad和LoadDataWithTranspose，这些接口不再支持int4b\_t。
+    **说明**：相较于220x（[NPU架构版本220x](../../../编程指南/硬件实现/架构规格/NPU架构版本220x.md)）架构版本，351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构版本的Cube计算单元不支持int4b\_t。相关的基础API有LoadData、Mmad和LoadDataWithTranspose，这些接口不再支持int4b\_t。
 
     **兼容方案**：算子侧通过编写CV融合算子在Vector Core进行int4b\_t到int8\_t的Cast转换，再通过UB搬运到L1后进行Mmad计算。图层面可以在该算子前增加Cast节点进行int4b\_t到int8\_t的转换。
 
@@ -459,7 +459,7 @@
 
 ## 系统变量访问<a name="section34615332215"></a>
 
--   **不支持CheckLocalMemoryIA，351x架构版本相关寄存器删除。**
+-   **不支持CheckLocalMemoryIA，351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构版本相关寄存器删除。**
 
     **说明**：CheckLocalMemoryIA监视设定范围内的UB读写行为，如果监视到有设定范围的读写行为则会出现EXCEPTION报错，未监视到设定范围的读写行为则不会报错。
 

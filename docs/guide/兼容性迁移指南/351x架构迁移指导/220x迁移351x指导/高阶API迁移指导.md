@@ -1,6 +1,6 @@
 # 高阶API迁移指导<a name="ZH-CN_TOPIC_0000002503588125"></a>
 
-Ascend C高阶API基本兼容351x架构与220x架构，部分API进行了扩展。当前351x架构不支持卷积计算类高阶API。
+Ascend C高阶API基本兼容351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构与220x（[NPU架构版本220x](../../../编程指南/硬件实现/架构规格/NPU架构版本220x.md)）架构，部分API进行了扩展。当前351x架构不支持卷积计算类高阶API。
 
 ## Matmul类高阶API<a name="section6925172655117"></a>
 
@@ -29,7 +29,7 @@ Ascend C高阶API基本兼容351x架构与220x架构，部分API进行了扩展�
     </td>
     <td class="cellrowborder" valign="top" width="21.47%" headers="mcps1.2.6.1.4 "><p id="p1634717893315"><a name="p1634717893315"></a><a name="p1634717893315"></a>int32_t、half</p>
     </td>
-    <td class="cellrowborder" valign="top" width="15.950000000000001%" headers="mcps1.2.6.1.5 "><p id="p1034788163317"><a name="p1034788163317"></a><a name="p1034788163317"></a>351x架构不支持。</p>
+    <td class="cellrowborder" valign="top" width="15.950000000000001%" headers="mcps1.2.6.1.5 "><p id="p1034788163317"><a name="p1034788163317"></a><a name="p1034788163317"></a>351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构不支持。</p>
     </td>
     </tr>
     <tr id="row2348108183316"><td class="cellrowborder" valign="top" width="20.849999999999998%" headers="mcps1.2.6.1.1 "><p id="p1534728183316"><a name="p1534728183316"></a><a name="p1534728183316"></a>fp8_e4m3fn_t、fp8_e5m2_t</p>
@@ -117,7 +117,7 @@ Ascend C高阶API基本兼容351x架构与220x架构，部分API进行了扩展�
 <tbody><tr id="row14118113119422"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p9188171317366"><a name="p9188171317366"></a><a name="p9188171317366"></a>Tanh、Asin、Sin、Acos、Cos、Log、Atan、Fmod</p>
 <p id="p950434551915"><a name="p950434551915"></a><a name="p950434551915"></a></p>
 </td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p15508125252615"><a name="p15508125252615"></a><a name="p15508125252615"></a>兼容220x架构。</p>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p15508125252615"><a name="p15508125252615"></a><a name="p15508125252615"></a>兼容220x（[NPU架构版本220x](../../../编程指南/硬件实现/架构规格/NPU架构版本220x.md)）架构。</p>
 <p id="p550845202613"><a name="p550845202613"></a><a name="p550845202613"></a>扩展支持算法配置，通过模板参数配置API使用的算法，从而提供高精度、高性能的算法选择。</p>
 </td>
 </tr>
@@ -388,7 +388,7 @@ Ascend C高阶API基本兼容351x架构与220x架构，部分API进行了扩展�
 </tr>
 <tr id="row18338107564"><td class="cellrowborder" valign="top" width="43.35%" headers="mcps1.2.3.1.1 "><p id="p63391571160"><a name="p63391571160"></a><a name="p63391571160"></a>BatchWrite、iterate、Query、InterHcclGroupSync、GetWindowsInAddr、GetWindowsOutAddr、GetRankId、GetRankDim、QueueBarrier、GetQueueNum</p>
 </td>
-<td class="cellrowborder" valign="top" width="56.65%" headers="mcps1.2.3.1.2 "><p id="p116241033113"><a name="p116241033113"></a><a name="p116241033113"></a>351x架构暂不支持。</p>
+<td class="cellrowborder" valign="top" width="56.65%" headers="mcps1.2.3.1.2 "><p id="p116241033113"><a name="p116241033113"></a><a name="p116241033113"></a>351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构暂不支持。</p>
 </td>
 </tr>
 <tr id="row1135194142018"><td class="cellrowborder" valign="top" width="43.35%" headers="mcps1.2.3.1.1 "><p id="p15351141142016"><a name="p15351141142016"></a><a name="p15351141142016"></a>SetReduceType、AlltoAllvWrite</p>
