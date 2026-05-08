@@ -29,7 +29,7 @@
 </tr>
 <tr id="row81091291898"><td class="cellrowborder" valign="top" width="18.01%" headers="mcps1.2.3.1.1 "><p id="p161091129692"><a name="p161091129692"></a><a name="p161091129692"></a>语言扩展层C API</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.99%" headers="mcps1.2.3.1.2 "><p id="p2109929795"><a name="p2109929795"></a><a name="p2109929795"></a>C API可分为兼容性和体系架构相关的，其中SIMD的C API相关兼容性待支持。</p>
+<td class="cellrowborder" valign="top" width="81.99%" headers="mcps1.2.3.1.2 "><p id="p2109929795"><a name="p2109929795"></a><a name="p2109929795"></a>SIMD & SIMT C API可分为兼容性API和体系架构相关API；当前SIMD的C API仅支持体系架构相关，暂未支持跨代兼容。</p>
 </td>
 </tr>
 <tr id="row510912292918"><td class="cellrowborder" valign="top" width="18.01%" headers="mcps1.2.3.1.1 "><p id="p171096296911"><a name="p171096296911"></a><a name="p171096296911"></a>编译器BuiltIn API</p>
