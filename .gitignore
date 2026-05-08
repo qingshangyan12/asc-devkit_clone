@@ -4,4 +4,3 @@ build_out
 output
 __pycache__/
 /examples/**/build/
-AGENTS.md
