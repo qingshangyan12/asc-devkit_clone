@@ -31,10 +31,6 @@
 
 在SIMD编程场景下使用。用于启动SIMD VF（Vector Function）子任务。
 
-> [!NOTE]说明 
->asc\_vf\_call启动SIMD VF子任务时，子任务函数不能是类的成员函数，推荐使用普通函数或类静态函数，且入口函数必须使用\_\_simd\_vf\_\_修饰宏。
->asc\_vf\_call启动SIMD VF子任务时，传递的参数只支持裸指针，常见基本数据类型。不支持传递结构体，数组等。
-
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```
