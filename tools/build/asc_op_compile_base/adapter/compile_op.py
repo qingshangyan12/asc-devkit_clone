@@ -1002,8 +1002,7 @@ def handle_sk_codegen_options(compile_info: CompileInfo, infered_info_from_ifile
         sp_info = get_context().get_addition("super_kernel_sub_info")
         if sp_info is not None:
             compile_info.super_kernel_info["sp_options"] = \
-                parse_super_kernel_options(sp_info.get("super_kernel_options", ""),
-                    is_aclgraph=get_context().get_addition("super_kernel_sub_combine") is True)
+                parse_super_kernel_options(sp_info.get("super_kernel_options", ""))
         else:
             compile_info.super_kernel_info["sp_options"] = {}
 
