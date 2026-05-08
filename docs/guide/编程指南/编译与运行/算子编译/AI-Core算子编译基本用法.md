@@ -75,7 +75,7 @@ bisheng异构编译默认采用的是全程序编译模式，该模式要在单�
 ![ ](../../../figures/aicore_simt_comilation.png "aicore simt编译流程示意图")
 
 ## 基本编译命令汇总
-|编译方式|AI Core 编译命令| AI Core SIMT编译命令|
+|编译方式|AI Core SIMD编译命令| AI Core SIMT编译命令|
 |-|-|-|
 |异构编译| bisheng <source_file>.asc -o \<output_file\> --npu-arch=dav-\<npu architecture\> | bisheng <source_file>.asc -o <output_file> --npu-arch=dav-\<npu architecture\> **--enable-simt**|
 |独立编译|bisheng **-dc** <source_file>.asc -o \<output_file\>**.o** --npu-arch=dav-\<npu architecture\>| bisheng **-dc** <source_file>.asc -o <output_file>**.o** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
