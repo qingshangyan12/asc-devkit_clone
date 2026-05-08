@@ -158,7 +158,7 @@ TEMPLATES = {
     # 版权声明
     # -------------------------------------------------------------------------
     'copyright': '''/**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This file is a part of the CANN Open Software.
  * Licensed under CANN Open Software License Agreement.
  */
@@ -189,7 +189,7 @@ ${TEST_CASE}
 ''',
 
     'aiv_kernel_class': '''
-template <typename ${TEMPLATE_PARAMS}>
+template <${TEMPLATE_PARAMS}>
 class Kernel${API_NAME} {
 public:
     __aicore__ inline Kernel${API_NAME}() {}
@@ -838,7 +838,7 @@ class AIVUTGenerator(UTGenerator):
             'COPYRIGHT': TEMPLATES['copyright'],
             'API_NAME': self.config.api_name,
             'API_NAME_UPPER': self.config.api_name.upper(),
-            'TEMPLATE_PARAMS': 'T, Src1T',
+            'TEMPLATE_PARAMS': 'typename T, typename Src1T',
             'API_CALL': f'{self.config.api_name}(dstLocal, src0Local, src1Local, dataSize);',
         }
 

@@ -61,8 +61,75 @@ assert_covered() {
     done
 }
 
-mapfile -t expected_api_types < <(python3 -c 'import json,sys; print("\n".join(json.load(open(sys.argv[1], encoding="utf-8"))["api_types"].keys()))' "$GENERATION_CONSTRAINTS")
-mapfile -t expected_chips < <(python3 -c 'import json,sys; print("\n".join(json.load(open(sys.argv[1], encoding="utf-8"))["chips"].keys()))' "$ARCH_FACTS")
+read_json_object_keys() {
+    local -n target="$1"
+    local file="$2"
+    local key="$3"
+    local label="$4"
+    local output
+
+    if ! output="$(python3 - "$file" "$key" "$label" <<'PY'
+import json
+import sys
+
+path, key, label = sys.argv[1:4]
+try:
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+except Exception as exc:
+    raise SystemExit(f"{label}: failed to read {path}: {exc}")
+
+if key not in data:
+    raise SystemExit(f"{label}: missing top-level object {key!r} in {path}")
+
+value = data[key]
+if not isinstance(value, dict):
+    raise SystemExit(
+        f"{label}: expected top-level {key!r} to be an object in {path}, "
+        f"got {type(value).__name__}"
+    )
+if not value:
+    raise SystemExit(f"{label}: top-level object {key!r} is empty in {path}")
+
+print("\n".join(value.keys()))
+PY
+    )"; then
+        fail "failed to read ${label} from ${file}:${key}"
+    fi
+
+    mapfile -t target <<< "$output"
+}
+
+join_words() {
+    local IFS=" "
+    printf '%s' "$*"
+}
+
+self_test_reference_key_reader() {
+    local generation_ref="${WORK_DIR}/self-generation-constraints.json"
+    local arch_ref="${WORK_DIR}/self-npu-arch-facts.json"
+    local -a self_api_types
+    local -a self_chips
+
+    cat > "$generation_ref" <<'JSON'
+{"api_types":{"aiv":{},"c_api":{}},"chips":"wrong-source"}
+JSON
+    cat > "$arch_ref" <<'JSON'
+{"chips":{"ascend910":{},"mc62cm12aa":{}},"api_types":"wrong-source"}
+JSON
+
+    read_json_object_keys self_api_types "$generation_ref" "api_types" "self-test API types"
+    read_json_object_keys self_chips "$arch_ref" "chips" "self-test chips"
+
+    [[ "$(join_words "${self_api_types[@]}")" == "aiv c_api" ]] || \
+        fail "self-test must read API types from generation-constraints api_types"
+    [[ "$(join_words "${self_chips[@]}")" == "ascend910 mc62cm12aa" ]] || \
+        fail "self-test must read chips from npu-arch-facts chips"
+}
+
+self_test_reference_key_reader
+read_json_object_keys expected_api_types "$GENERATION_CONSTRAINTS" "api_types" "generation constraints API types"
+read_json_object_keys expected_chips "$ARCH_FACTS" "chips" "npu arch chip facts"
 
 run_case() {
     local name="$1"
@@ -81,6 +148,9 @@ run_case() {
     seen_chips="$(mark_seen "$seen_chips" "$chip")"
 
     python3 "$CLI" --config "$fixture" --output "$actual" >/dev/null
+    if grep -Eq 'template <[^>]*,[[:space:]]*Src1T([,>])' "$actual"; then
+        fail "generated UT contains naked Src1T template parameter: $name"
+    fi
     diff -u "$golden" "$actual" || fail "generated UT differs from golden: $name"
 }
 
