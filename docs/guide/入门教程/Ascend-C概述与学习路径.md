@@ -21,8 +21,9 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 - **Python前端PyAsc**：基于Python原生接口（参见 [PyAsc](https://gitcode.com/cann/pyasc)），提供芯片底层完备编程能力，并将逐步引入Layout化Tensor编程、SIMT编程等，实现用Python开发高性能算子。
 
 > 💡 如何选择多级API，可参考 [Ascend C多级API选择指南](../../asc_how_to_choose_api.md)。
-> **说明**：Ascend C 支持在如下 AI 处理器型号使用：
-> 
+
+> [!NOTE]
+> Ascend C 支持在如下 AI 处理器型号使用：
 > - Atlas 350 加速卡
 > - Atlas A3 训练系列产品 / Atlas A3 推理系列产品
 > - Atlas A2 训练系列产品 / Atlas A2 推理系列产品
