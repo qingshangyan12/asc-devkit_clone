@@ -48,12 +48,10 @@ enum class HF32TransMode {
     NEAREST_EVEN
 };
 
-#if !defined(__NPU_ARCH__)
 struct Nd2NzParamsV2 {
     uint64_t lookupTable0 = 0;
     uint64_t lookupTable1 = 0;
 };
-#endif
 
 /* **************************************************************************************************
  * LoadData 2d                                             *
