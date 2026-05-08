@@ -221,7 +221,6 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 // ==========asc_copy_gm2l1==========
 //PAD_NONE
@@ -839,7 +838,6 @@ __aicore__ inline void asc_copy_gm2l0a(__ca__ int4b_t* dst, __gm__ int4b_t* src,
 __aicore__ inline void asc_copy_gm2l0a_sync(__ca__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat,
     uint16_t src_Stride, uint16_t dst_stride);
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 // ==========asc_l0c2l1_l0c2l1===========
 // half  float
@@ -2518,7 +2516,6 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint
 
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t m_start_position, uint32_t k_start_position,
                                         uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
-#endif
 
 #endif
 
