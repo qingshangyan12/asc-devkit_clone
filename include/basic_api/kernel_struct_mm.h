@@ -110,12 +110,10 @@ struct LoadData2dTransposeParams {
     uint8_t addrMode = 0;
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
 struct Nd2NzParamsV2 {
     uint64_t lookupTable0 = 0;
     uint64_t lookupTable1 = 0;
 };
-#endif
 
 struct LoadData2DMxParams {
     __aicore__ LoadData2DMxParams() {}
