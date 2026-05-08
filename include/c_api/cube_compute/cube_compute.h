@@ -29,7 +29,6 @@
 
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix,
     uint16_t left_height,  uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align,
@@ -126,7 +125,6 @@ __aicore__ inline uint64_t asc_get_l0c2gm_unitflag();
 
 __aicore__ inline uint64_t asc_get_l0c2gm_prequant();
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride);
 
@@ -264,7 +262,6 @@ __aicore__ inline void asc_mmad_sync(__cc__ int32_t* c_matrix, __ca__ int8_t* a_
                                      uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
                                      bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
 
-#endif
 
 #endif
 
