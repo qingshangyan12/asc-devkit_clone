@@ -48,6 +48,13 @@ enum class HF32TransMode {
     NEAREST_EVEN
 };
 
+#if !defined(__NPU_ARCH__)
+struct Nd2NzParamsV2 {
+    uint64_t lookupTable0 = 0;
+    uint64_t lookupTable1 = 0;
+};
+#endif
+
 /* **************************************************************************************************
  * LoadData 2d                                             *
  * ************************************************************************************************* */
@@ -103,14 +110,14 @@ __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>&
     const LoadData2DMxParams& loadMxDataParams);
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
 template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(const LocalTensor<T>& dst, const GlobalTensor<U>& src,
     const LoadData2DParamsV2& loadDataParams, const Nd2NzParamsV2& nd2nzParams)
 {
+    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
     LoadDataImpl(dst, src, loadDataParams, nd2nzParams);
+    #endif
 }
-#endif
 
 /* **************************************************************************************************
  * LoadData 3dv1                                             *
