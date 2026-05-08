@@ -156,11 +156,19 @@
 
 -   **不支持SetLoadDataBoundary接口。**
 
+<<<<<<< HEAD:docs/guide/跨代迁移兼容性指南/3510架构迁移指导/2201迁移3510指导/基础API迁移指导.md
     **说明**：3510架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置Load3D时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始读取数据。设置为0表示无边界，可以使用整个L1 Buffer。
 
     **兼容方案**：
 
     -   2201架构版本的接口参数boundaryValue设置为0时与3510架构版本等价。
+=======
+    **说明**：351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置Load3D时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始读取数据。设置为0表示无边界，可以使用整个L1 Buffer。
+
+    **兼容方案**：
+
+    -   220x（[NPU架构版本220x](../../../编程指南/硬件实现/架构规格/NPU架构版本220x.md)）架构版本的接口参数boundaryValue设置为0时与351x架构版本等价。
+>>>>>>> 351:docs/guide/兼容性迁移指南/351x架构迁移指导/220x迁移351x指导/基础API迁移指导.md
     -   如果需要在L1 Buffer上循环读取操作数，需要将对应的Load3D接口手动拆分成多条指令，手动绕回。
 
     ![](../../../figures/ZN-88.png)
@@ -259,7 +267,11 @@
 
 -   **Cube计算单元删除int4b\_t数据类型。**
 
+<<<<<<< HEAD:docs/guide/跨代迁移兼容性指南/3510架构迁移指导/2201迁移3510指导/基础API迁移指导.md
     **说明**：相较于2201架构版本，3510架构版本的Cube计算单元不支持int4b\_t。相关的基础API有LoadData、Mmad和LoadDataWithTranspose，这些接口不再支持int4b\_t。
+=======
+    **说明**：相较于220x（[NPU架构版本220x](../../../编程指南/硬件实现/架构规格/NPU架构版本220x.md)）架构版本，351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构版本的Cube计算单元不支持int4b\_t。相关的基础API有LoadData、Mmad和LoadDataWithTranspose，这些接口不再支持int4b\_t。
+>>>>>>> 351:docs/guide/兼容性迁移指南/351x架构迁移指导/220x迁移351x指导/基础API迁移指导.md
 
     **兼容方案**：算子侧通过编写CV融合算子在Vector Core进行int4b\_t到int8\_t的Cast转换，再通过UB搬运到L1后进行Mmad计算。图层面可以在该算子前增加Cast节点进行int4b\_t到int8\_t的转换。
 
@@ -459,7 +471,11 @@
 
 ## 系统变量访问<a name="section34615332215"></a>
 
+<<<<<<< HEAD:docs/guide/跨代迁移兼容性指南/3510架构迁移指导/2201迁移3510指导/基础API迁移指导.md
 -   **不支持CheckLocalMemoryIA，3510架构版本相关寄存器删除。**
+=======
+-   **不支持CheckLocalMemoryIA，351x（[NPU架构版本351x](../../../编程指南/硬件实现/架构规格/NPU架构版本351x.md)）架构版本相关寄存器删除。**
+>>>>>>> 351:docs/guide/兼容性迁移指南/351x架构迁移指导/220x迁移351x指导/基础API迁移指导.md
 
     **说明**：CheckLocalMemoryIA监视设定范围内的UB读写行为，如果监视到有设定范围的读写行为则会出现EXCEPTION报错，未监视到设定范围的读写行为则不会报错。
 
