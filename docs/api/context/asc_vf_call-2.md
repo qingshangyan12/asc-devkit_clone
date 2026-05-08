@@ -119,7 +119,7 @@ __simd_vf__ inline void AddVF(
     }
 }
 
-tempalte <typename T>
+template <typename T>
 __aicore__ inline void Compute()
 {
     AscendC::LocalTensor<T> dst = outQueueZ.AllocTensor<T>();
