@@ -42,26 +42,18 @@ __aicore__ inline void ringbuf_wait_rts_sync_impl()
 
 __aicore__ inline uint32_t asc_debug_get_core_idx_impl()
 {
-    constexpr uint32_t dumpCoreNums = 75;
-    return (get_coreid() & 0x00FF) % dumpCoreNums;
+    constexpr uint32_t dumpCoreNums = 108;
+    return get_coreid() % dumpCoreNums;
 }
 
 __aicore__ inline int64_t get_task_ration()
 {
-#if defined(__DAV_CUBE__)
-    return 1;
-#else // SPLIT_CORE_VEC(2201 is split)
     return get_subblockdim();
-#endif
 }
 
 __aicore__ inline uint64_t asc_debug_get_block_idx_impl()
 {
-#if defined(__DAV_VEC__)
-    return get_block_idx() * get_task_ration() + get_subblockid();
-#else // SPLIT_CORE_CUBE(2201 is split)
     return get_block_idx();
-#endif
 }
 
 template <typename T>
