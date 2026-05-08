@@ -173,7 +173,7 @@ AI CPU算子常用的编译选项说明如下：
 </tbody>
 </table>
 
-## 通过CMake编译<a name="section1121825118533"></a>
+## CMake方式编译<a name="section1121825118533"></a>
 
 项目中可以使用CMake来更简便地使用毕昇编译器编译AI CPU算子，生成可执行文件、动态库、静态库或二进制文件。
 
@@ -358,4 +358,3 @@ target_compile_options(demo PRIVATE
 </tr>
 </tbody>
 </table>
-
