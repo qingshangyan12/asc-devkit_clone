@@ -24,7 +24,6 @@
 #include "kernel_type.h"
 #include "utils/kernel_utils_constants.h"
 #endif
-
 #ifndef ASCENDC_TPL_KERNEL
 #include <iostream>
 #include <vector>
@@ -129,17 +128,39 @@ ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_UINT32, uint32_t);             // u32
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_UINT64, uint64_t);             // u64
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_DOUBLE, double);               // double
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_BOOL, bool);                   // bool
+#if defined(ASC_INNER_DATATYPE_ENABLE_COMPLEX64)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_COMPLEX64, complex64);         // complex64
+#endif
+#if defined(ASC_INNER_DATATYPE_ENABLE_BF16)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_BF16, bfloat16_t);             // bf16
+#endif
+#if defined(ASC_INNER_DATATYPE_ENABLE_INT4)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_INT4, AscendC::int4b_t);       // int4
+#endif
+#if defined(ASC_INNER_DATATYPE_ENABLE_UINT1)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_UINT1, AscendC::uint1b_t);     // u1
+#endif
+#if defined(ASC_INNER_DATATYPE_ENABLE_INT2)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_INT2, AscendC::int2b_t);       // int2
+#endif
+#if defined(ASC_INNER_DATATYPE_ENABLE_COMPLEX32)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_COMPLEX32, complex32);         // complex32
+#endif
+#if defined(ASC_INNER_DATATYPE_ENABLE_HIFLOAT8)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_HIFLOAT8, hifloat8_t);         // hif8 type
+#endif
+#if defined(ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_FLOAT8_E5M2, float8_e5m2_t);   // fp8_e5m2 type
+#endif
+#if defined(ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_FLOAT8_E4M3FN, float8_e4m3_t); // fp8_e4m3 type
+#endif
+#if defined(ASC_INNER_DATATYPE_ENABLE_FLOAT4_E2M1)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_FLOAT4_E2M1, float4_e2m1x2_t); // fp4_e2m1 type
+#endif
+#if defined(ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_FLOAT4_E1M2, float4_e1m2x2_t); // fp4_e1m2 type
+#endif
  
 #define ASCENDC_TPL_DTYPE_DECL(...)
 #define ASCENDC_TPL_DATATYPE_DECL(...)
