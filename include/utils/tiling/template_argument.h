@@ -108,6 +108,21 @@ constexpr uint64_t INVALID_TILING_KEY = 0XFFFFFFFFFFFFFFFF;
 #define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2
 #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
 #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
+
+#if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102 && __NPU_ARCH__ != 3510)
+using hifloat8_t = uint8_t;
+using float8_e5m2_t = uint8_t;
+using float8_e4m3_t = uint8_t;
+using float4_e2m1x2_t = uint8_t;
+using float4_e1m2x2_t = uint8_t;
+namespace AscendC {
+using int2b_t = IntegerSubType<INT2_BIT_NUM, true>;
+using uint1b_t = IntegerSubType<INT1_BIT_NUM, false>;
+}
+#endif
+#endif
+
 template<int dataTypeId>
 struct TypeFromId {
     using type = void;
