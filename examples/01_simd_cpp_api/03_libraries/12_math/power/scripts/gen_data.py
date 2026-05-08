@@ -16,9 +16,9 @@ import os
 import sys
 import torch
 import numpy as np
+import argparse
 
-
-def gen_golden_data_simple():
+def gen_golden_data_simple(scenario):
     dtype = np.float32
     np.random.seed(123321)
     src_type = dtype
@@ -31,7 +31,12 @@ def gen_golden_data_simple():
     src2_tmp = src2.astype(np.float32)
     src2_tensor = torch.from_numpy(src2_tmp)
 
-    golden = torch.pow(src1_tensor, src2_tensor).numpy()
+    if scenario == 0:
+        golden = torch.pow(src1_tensor, src2_tensor).numpy()
+    elif scenario == 1:
+        golden = torch.pow(src1_tensor, src2_tensor[0]).numpy()
+    elif scenario == 2:
+        golden = torch.pow(src1_tensor[0], src2_tensor).numpy()
     golden = golden.astype(src1.dtype)
 
     os.makedirs("input", exist_ok=True)
@@ -41,4 +46,7 @@ def gen_golden_data_simple():
     golden.tofile("./output/golden.bin")
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--scenario', type=int, choices=range(3), help='指定场景，取值0~2')
+    args = parser.parse_args()
+    gen_golden_data_simple(args.scenario if args.scenario else 0)

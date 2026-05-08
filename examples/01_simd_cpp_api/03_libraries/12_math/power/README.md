@@ -52,6 +52,15 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">power_custom</td></tr>
   </table>
 
+- 场景说明：
+  <table>
+  <caption>表2：SCENARIO参数说明</caption>
+  <tr><td align="center">SCENARIO</td><td align="center">底数</td><td align="center">指数</td><td align="center">说明</td></tr>
+  <tr><td align="center">0</td><td align="center">张量</td><td align="center">张量</td><td align="center">底数和指数都是张量</td></tr>
+  <tr><td align="center">1</td><td align="center">张量</td><td align="center">标量</td><td align="center">底数是张量，指数是标量</td></tr>
+  <tr><td align="center">2</td><td align="center">标量</td><td align="center">张量</td><td align="center">底数是标量，指数是张量</td></tr>
+  </table>
+
 - 样例实现：  
   本样例中实现的是固定shape为输入srcbase[1, 16]、srcexp[1, 16]，输出dst[1, 16]的power_custom样例。样例功能mode参数默认为0，即指数和底数都为张量。
 
@@ -93,9 +102,10 @@
 - 样例执行
 
   ```bash
+  SCENARIO=0
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO=$SCENARIO ..;make -j;    # 编译工程，默认npu模式
+  python3 ../scripts/gen_data.py --scenario $SCENARIO  # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   ```
 
@@ -116,6 +126,7 @@
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO` | `0`（默认）、`1`、`2` | 场景：0-张量对张量，1-张量对标量，2-标量对张量 |
 
 - 执行结果
 
