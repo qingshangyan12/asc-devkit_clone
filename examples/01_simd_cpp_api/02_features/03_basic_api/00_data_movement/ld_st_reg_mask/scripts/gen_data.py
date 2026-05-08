@@ -23,7 +23,7 @@ def gen_data():
     dst = np.zeros(1024, dtype=np.uint8)
     dst[0] = 2
     dst[248] = 2
-    dst[256:256 + 32] = 255
+    dst[256:] = 255
     return src, dst
 
 
