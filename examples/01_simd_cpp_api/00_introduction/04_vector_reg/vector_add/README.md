@@ -1,7 +1,7 @@
 # 基于RegBase编程add样例
 
 ## 概述
-本样例基于RegBase编程范式实现Add计算，样例仅支持单核运行。
+本样例基于RegBase编程接口实现Add计算，样例仅支持单核运行。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
