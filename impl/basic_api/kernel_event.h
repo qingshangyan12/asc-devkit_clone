@@ -671,7 +671,6 @@ __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdD
 }
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 #ifdef ASCENDC_CPU_DEBUG
 class BufIdTracker {
 public:
@@ -784,7 +783,11 @@ __aicore__ constexpr pipe_t GetPipe(Hardware src, Hardware dst, bool fwdDirect)
             return fwdDirect ? PIPE_MTE1 : PIPE_M;
         }
     } else if (src == Hardware::L0C) {
-        return fwdDirect ? PIPE_M : PIPE_FIX;
+        #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 1001) && (__NPU_ARCH__ != 2002)
+            return fwdDirect ? PIPE_M : PIPE_FIX;
+        #else
+            return fwdDirect ? PIPE_M : PIPE_MTE3;
+        #endif
     }
     return PIPE_S;
 }
@@ -811,7 +814,6 @@ __aicore__ constexpr bool IsUseBufId(Hardware src, Hardware dst)
 {
     return (src == Hardware::UB) || (dst == Hardware::UB);
 }
-#endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                       \
     (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||                       \
