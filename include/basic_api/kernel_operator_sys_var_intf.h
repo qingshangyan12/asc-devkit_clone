@@ -63,27 +63,16 @@ __aicore__ inline void ClearSpr();
 
 __aicore__ inline constexpr uint32_t GetUBSizeInBytes()
 {
-#if defined(__NPU_ARCH__) &&                                                                                    \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
-    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
-return TOTAL_UB_SIZE;
-#endif
+    return TOTAL_UB_SIZE;
 }
 
 __aicore__ inline constexpr uint32_t GetVecLen()
 {
-#if defined(__NPU_ARCH__) &&                                                                                    \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
-    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
-return VECTOR_REG_WIDTH;
-#endif
+    return VECTOR_REG_WIDTH;
 }
 
 __aicore__ inline uint32_t GetRuntimeUBSize()
 {
-#if defined(__NPU_ARCH__) &&                                                                                    \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
-    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return TOTAL_UB_SIZE;
 #else
@@ -101,12 +90,10 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
     return TOTAL_UB_SIZE;
 #endif
 #endif
-#endif
 }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-__aicore__ inline __ssbuf__ void* GetSsbufBaseAddr()
-{
+__aicore__ inline __ssbuf__ void* GetSsbufBaseAddr(){
 #if ASCENDC_CPU_DEBUG
     return reinterpret_cast<__ssbuf__ void*>(ConstDefiner::Instance().cpuSSbuf);
 #else
