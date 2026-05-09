@@ -14,12 +14,12 @@
 */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic_api/dav_m510/kernel_operator_mm_bitmode_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message("impl/basic_api/kernel_operator_mm_bitmode_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BITMODE_IMPL_H__
 #endif
-#ifndef ASCENDC_MODULE_OPERATOR_MM_BITMODE_IMPL_H
-#define ASCENDC_MODULE_OPERATOR_MM_BITMODE_IMPL_H
+#ifndef ASCENDC_MODULE_OPERATOR_MM_BITMODE_COMMON_IMPL_H
+#define ASCENDC_MODULE_OPERATOR_MM_BITMODE_COMMON_IMPL_H
 #include "kernel_struct_mm.h"
 
 namespace AscendC {
@@ -248,7 +248,7 @@ struct SetFMatrixBitModeConfig0 {
 };
 }  // namespace AscendC
 
-#endif  // ASCENDC_MODULE_OPERATOR_MM_BITMODE_IMPL_H
+#endif  // ASCENDC_MODULE_OPERATOR_MM_BITMODE_COMMON_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BITMODE_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BITMODE_IMPL_H__
