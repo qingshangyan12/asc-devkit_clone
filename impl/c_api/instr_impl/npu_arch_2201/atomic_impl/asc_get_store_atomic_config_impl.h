@@ -12,6 +12,7 @@
  * \file asc_get_store_atomic_config_impl.h
  * \brief
  */
+ 
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
