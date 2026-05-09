@@ -12,7 +12,6 @@
  * \file asc_get_store_atomic_config_impl.h
  * \brief
  */
- 
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
@@ -29,6 +28,7 @@
 __aicore__ inline void asc_get_store_atomic_config_impl(asc_store_atomic_config& config)
 {
     config.config = get_st_atomic_cfg();
+    
 }
 
 #endif
