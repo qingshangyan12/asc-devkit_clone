@@ -286,7 +286,7 @@
 
 -   \_\_simd\_vf\_\_
 
-    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用asc\_vf\_call调用SIMD VF入口函数，启动VF子任务。
+    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/asc_vf_call-2.md)调用SIMD VF入口函数，启动VF子任务。
 
     ```
     __simd_vf__ inline void KernelAdd(__ubuf__ float* x, __ubuf__ float* y, __ubuf__ float* z)
@@ -302,20 +302,20 @@
 
         ```
         __simd_vf__ inline void simd_adds(__ubuf__ float *output, __ubuf__ float *input,
-            uint32_t count, uint16_t one_repeat_size, uint16_t repeat_times)
+            uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
         {
-            AscendC::Reg::RegTensor<float> src_reg0;
-            AscendC::Reg::RegTensor<float> dst_reg0;
+            AscendC::Reg::RegTensor<float> srcReg;
+            AscendC::Reg::RegTensor<float> dstReg;
             // asc_update_mask() will be supported later.
             // init MaskReg with the count of all numbers.
-            AscendC::Reg::MaskReg mask_reg = AscendC::Reg::UpdateMask<float>(count);
-            for (uint16_t i = 0; i < repeat_times; i++) {
+            AscendC::Reg::MaskReg maskReg = AscendC::Reg::UpdateMask<float>(count);
+            for (uint16_t i = 0; i < repeatTimes; i++) {
                 // asc_load, asc_adds and asc_store will be supported later.
                 // load data from UB to RegTensor.
-                AscendC::Reg::LoadAlign(src_reg0, input + i * one_repeat_size);
-                AscendC::Reg::Adds(dst_reg0, src_reg0, 1.0f, mask_reg);
+                AscendC::Reg::LoadAlign(srcReg, input + i * oneRepeatSize);
+                AscendC::Reg::Adds(dstReg, srcReg, 1.0f, maskReg);
                 // store data from RegTensor to UB.
-                AscendC::Reg::StoreAlign(output + i * one_repeat_size, dst_reg0, mask_reg);
+                AscendC::Reg::StoreAlign(output + i * one_repeat_size, dstReg, maskReg);
             }
         }
         ```
@@ -419,7 +419,7 @@ __ubuf__ int * __gm__ ptr;
 ```
 
 >[!NOTE]说明 
->**重要：**不同地址空间指针的大小可能不同。例如，不能认为 sizeof\(\_\_gm\_\_ int \*\)总是等于sizeof\(\_\_ubuf\_\_ int \*\)，譬如编译器或许可能在某些系统上以32bit存储\_\_ubuf\_\_指针。
+>**重要**：不同地址空间指针的大小可能不同。例如，不能认为 sizeof\(\_\_gm\_\_ int \*\)总是等于sizeof\(\_\_ubuf\_\_ int \*\)，譬如编译器或许可能在某些系统上以32bit存储\_\_ubuf\_\_指针。
 
 -   **private地址空间**
 
@@ -543,7 +543,7 @@ __ubuf__ int * __gm__ ptr;
 
 ## SIMD与SIMT混合编程场景<a name="section952111671314"></a>
 
-SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_进行标识，通过在SIMD的\_\_aicore\_\_函数中使用asc\_vf\_call调用SIMT入口函数。被SIMT VF入口函数调用的函数使用\_\_simt\_callee\_\_进行标识。
+SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_进行标识，通过在SIMD的\_\_aicore\_\_函数中使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/asc_vf_call.md)调用SIMT入口函数。被SIMT VF入口函数调用的函数使用\_\_simt\_callee\_\_进行标识。
 
 -   \_\_simt\_vf\_\_ <a name="li611618392141"></a>
 
@@ -567,4 +567,3 @@ SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_�
     ```
 
 Ascend C为SIMT编程、SIMD与SIMT混合编程提供了布尔、整形、浮点型的标量数据类型和短向量数据类型，提供了用于表达线程块、线程网格三维信息的内置变量。 关于内置数据格式的详细说明请参见[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)，内置变量请参见[内置变量](SIMT-BuiltIn关键字.md#section13165113520576)。
-

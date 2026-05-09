@@ -29,6 +29,7 @@ adv_test_two_targets=(
     ascendc_ut_adv_api_kernel_ascend950pr_9599_AIC
     ascendc_ut_adv_api_kernel_ascend950pr_9599_AIV
     ascendc_ut_adv_api_tiling_ascend950pr_9599_AIV
+    ascendc_ut_adv_api_hccl_cc_algorithm_ascend950pr_9599_AIC
 )
 
 basic_test_one_targets=(
@@ -103,5 +104,10 @@ basic_test_five_targets=(
     ascendc_ut_tensor_api_NPU_ARCH_2201_AIV
     ascendc_ut_tensor_api_NPU_ARCH_3510_AIC
     ascendc_ut_tensor_api_NPU_ARCH_3510_AIV
+    ascendc_ut_simt_api_ascend950pr_9599
+)
+
+arm_test_targets=(
+    ascendc_ut_elf_tool
     ascendc_ut_simt_api_ascend950pr_9599
 )

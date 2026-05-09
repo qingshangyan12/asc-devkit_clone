@@ -20,12 +20,12 @@
 │   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── data_utils.h                // 数据读入写出函数
-│   └── batch_mmad.asc                    // Ascend C算子实现 & 调用样例
+│   └── batch_mmad.asc              // Ascend C样例实现 & 调用样例
 ```
 
 ## 算子描述
 
-### 1.batch mmad定义
+### batch mmad定义
 
 批量矩阵乘法（batch mmad）是普通矩阵乘法在批次维度（Batch Dimension） 上的扩展，核心逻辑是：对一个包含多个矩阵的批次数据，逐一对批次内的矩阵执行标准矩阵乘法，最终输出同批次数量的结果矩阵。
 
@@ -34,7 +34,39 @@ C[i]=A[i]×B[i]。
 
 需要注意的是不同批次的矩阵之间不会互相计算。
 
-### 2.矩阵批量搬入
+### 样例规格
+
+本样例中输入输出矩阵的规格，如下表1所示：
+
+<table border="2">
+<caption>表1：输入输出的规格</caption>
+  <tr>
+    <td >输入输出</td>
+    <td>数据类型</td>
+    <td>Shape</td>
+    <td>是否转置</td>
+  </tr>
+  <tr>
+    <td>输入矩阵A</td>
+    <td>float</td>
+    <td>[4, 30, 40]</td>
+    <td>false</td>
+  </tr>
+  <tr>
+    <td>输入矩阵B</td>
+    <td>float</td>
+    <td>[4, 40, 70]</td>
+    <td>false</td>
+  </tr>
+  <tr>
+    <td>输出矩阵C</td>
+    <td>float</td>
+    <td>[4, 30, 70]</td>
+    <td>-</td>
+  </tr>
+</table>
+
+### 矩阵批量搬入（GM->L1）
 
 根据batch mmad的定义可知，共计B对A、B矩阵进行矩阵乘法。数据从GM-->L1通路时，如下所示调用随路转换ND2NZ搬运接口时，通过配置`nd2nzA1Params.ndNum = B`，实现一次性搬入B对A、B矩阵。
 
@@ -62,30 +94,31 @@ nd2nzA1Params.dstNzNStride = 1;
 nd2nzA1Params.dstNzMatrixStride = aSizeAlignL0;
 ```
 
-### 3.mmad循环执行B次
+### L1->L0A/L0B搬运和矩阵乘Mmad循环执行B次
 
-由于mmad指令每次只能计算一对A、B矩阵矩阵乘的结果，因此Process()函数中在外层循环B次。
+for循环B次，每次从L1->L0A/L0B搬运每个batch的A、B矩阵，mmad指令每次计算一对A、B矩阵矩阵乘的结果
 
 ```cpp
-// 循环batchSize次，迭代计算batchSize对A、B矩阵的矩阵乘结果
-for (int32_t batchIndex = 0; batchIndex < batchSize; batchIndex++) {
+for (int32_t batchIndex = 0; batchIndex < B; batchIndex++) {
         SplitA(a1Local[batchIndex * aSizeAlignL0]);
         SplitBTranspose(b1Local[batchIndex * bSizeAlignL0]);
+        AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
+        AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
+
         Compute(batchIndex, c1Local);
+        AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
+        AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
 }
 ```
 
-for循环内部将每次计算得到的C[i]进行偏移后存储到输出tensor的相应位置，在最后一次迭代中将输出tensor放入输出队列中。
+for循环计算得到每个batch的矩阵计算结果，存储到L0C的相应位置上，待循环结束后将L0C上的完整结果搬出到GM。
 
 ```cpp
 AscendC::Mmad(c1Local[batchIndex * CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])],
-        a2Local, b2Local, mmadParams);
-if (batchIndex == B - 1) {
-        outQueueCO1.EnQue<float>(c1Local);
-} 
+              a2Local, b2Local, mmadParams);
 ```
 
-### 4.矩阵批量搬出
+### 矩阵批量搬出
 
 数据从L0C-->GM通路时，如下所示调用fixpipe搬运接口时，通过配置fixpipeParams.ndNum = B，实现一次性搬出B对C矩阵。注意的是L0C中的C矩阵是对齐后的，而搬出到GM的C矩阵是原始非对齐的shape。
 
@@ -106,7 +139,7 @@ fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape
 // 目的相邻ND矩阵起始地址之间的偏移，单位：element
 ```
 
-### 5.避免数据占用总内存超过存储空间限制
+### 避免数据占用总内存超过存储空间限制
 
 用户应该保证batch mmad整个过程中的数据所占总的内存不超过存储空间限制。
 用户可以通过PlatformAscendC类成员函数[GetCoreMemSize](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850alpha002/API/ascendcopapi/atlasascendc_api_07_1034.html)，获取获取硬件平台中L1、L0A、L0B、L0C存储空间的内存大小。
@@ -138,16 +171,32 @@ fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape
 - 样例执行
 
   ```bash
-  B=4 M=30 K=40 N=70
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake .. -DB_SIZE=$B -DM_SIZE=$M -DK_SIZE=$K -DN_SIZE=$N;make -j;    # 编译工程
-  python3 ../scripts/gen_data.py -b=$B -m=$M -k=$K -n=$N   # 生成测试输入数据
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j;    # 编译工程
+  python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品/Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
   执行结果如下，说明精度对比成功。
 
   ```bash
-  test pass
+  test pass!
   ```

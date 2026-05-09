@@ -73,7 +73,7 @@ Tiling参数如下：
 
 ## 设计优化方案<a name="section81265422311"></a>
 
-默认MIX模式下，用户在AIV侧发起消息，通过消息通信框架中转消息后，在AIC侧执行Matmul计算。基于这样的流程，用户使用Matmul高阶API编写算子代码时，可以使用REGIST\_MATMUL\_OBJ宏，无需区分AIV和AIC，但也因这套消息处理机制导致产生了额外的性能开销，如[图1 默认MIX模式的Matmul流程示意图](#fig0672118378)所示。
+默认MIX模式下，用户在AIV侧发起消息，通过消息通信框架中转消息后，在AIC侧执行Matmul计算。基于这样的流程，用户使用Matmul高阶API编写算子代码时，可以使用[REGIST\_MATMUL\_OBJ](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/REGIST_MATMUL_OBJ.md)宏，无需区分AIV和AIC，但也因这套消息处理机制导致产生了额外的性能开销，如[图1 默认MIX模式的Matmul流程示意图](#fig0672118378)所示。
 
 实现默认MIX模式的具体步骤如下：
 
@@ -109,7 +109,7 @@ Tiling参数如下：
 **图 2**  纯Cube模式的Matmul流程示意图<a name="fig20558182319127"></a>  
 ![](../../../figures/纯Cube模式的Matmul流程示意图.png "纯Cube模式的Matmul流程示意图")
 
-Matmul API使能纯Cube模式的完整样例请参考[Matmul API性能优化样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_perf)。使能纯Cube模式的主要步骤如下：
+Matmul API使能纯Cube模式的完整样例请参考[纯Cube模式的Matmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul)。使能纯Cube模式的主要步骤如下：
 
 1.  Kernel侧，在定义Matmul对象的代码中，包含matmul\_intf.h头文件前设置ASCENDC\_CUBE\_ONLY宏。
 
@@ -166,4 +166,3 @@ Matmul API使能纯Cube模式的完整样例请参考[Matmul API性能优化样�
 ## 总结<a name="section252011820413"></a>
 
 在只有矩阵计算，没有矢量计算的场景下，可以考虑使能纯Cube模式，优化Matmul计算中的消息通信性能开销，提升算子性能。
-

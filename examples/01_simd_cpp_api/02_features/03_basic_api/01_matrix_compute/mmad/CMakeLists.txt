@@ -10,7 +10,6 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 
 find_package(ASC REQUIRED)
@@ -22,8 +21,8 @@ add_executable(demo
 )
 
 set(SCENARIO_NUM "1" CACHE STRING "SCENARIO_NUM, e.g. 1 2 3 4")
-if(SCENARIO_NUM EQUAL 1 AND CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
-    message(FATAL_ERROR "When SCENARIO_NUM=1, only CMAKE_ASC_ARCHITECTURES=dav-2201 is supported.")
+if(SCENARIO_NUM EQUAL 4 AND CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
+    message(FATAL_ERROR "When SCENARIO_NUM=4, only CMAKE_ASC_ARCHITECTURES=dav-2201 is supported.")
 endif()
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")

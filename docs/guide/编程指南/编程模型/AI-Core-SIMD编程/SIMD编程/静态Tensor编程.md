@@ -8,14 +8,14 @@
 
 ![](../../../../figures/图1-开发Ascend-C算子的基本流程.png)
 
->[!NOTE]说明 
->-   静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
->-   本节涉及的完整样例请参考[静态Tensor编程样例](https://gitee.com/ascend/samples/tree/master/operator/ascendc/0_introduction/23_static_tensor_programming_kernellaunch)。
+>[!NOTE]说明
+>- 静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
+>- 本节涉及的完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/add_high_performance)。
 
 ## 编程范式<a name="section1486516584319"></a>
 
 -   AI Core包括多种内存单元，比如用于矢量计算的Unified Buffer和用于矩阵计算的L1 Buffer、L0A Buffer、L0B Buffer、L0C Buffer等内存资源。开发者完全自主管理AI Core上的所有内存资源，创建Tensor分配地址时管理内存大小、内存复用关系并确保分配的地址有效性。
--   AI Core包括多种指令流水类型，比如Vector/Cube/Scalar计算流水，MTE1、MTE2、MTE3搬运流水等，每条流水并行执行，它们之间的依赖关系通过同步事件来协调。开发者调用Ascend C提供的搬运或者计算类API编写算子并根据数据依赖关系插入对应的同步事件，以达成最优性能。
+-   AI Core包括多种[指令流水类型](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/同步控制简介.md)，比如Vector/Cube/Scalar计算流水，MTE1、MTE2、MTE3搬运流水等，每条流水并行执行，它们之间的依赖关系通过[同步事件](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetFlag-WaitFlag(ISASI).md)来协调。开发者调用Ascend C提供的搬运或者计算类API编写算子并根据数据依赖关系插入对应的同步事件，以达成最优性能。
 
 下图是一个典型矢量算子的示意图，开发者首先根据业务计算量进行数据分块处理，之后根据核内的数据依赖关系完成同步事件的插入：
 
@@ -25,11 +25,11 @@
 
 静态Tensor编程方式下，开发者可以使用两种方式创建Tensor：
 
--   通过LocalMemAllocator指定硬件位置进行Tensor分配。
+-   通过[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/LocalMemAllocator.md)指定硬件位置进行Tensor分配。
 
     LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，地址分配从0开始，根据调用次序依次向后进行线性分配，LocalMemAllocator只是一个简单的线性分配器，并不提供内存释放以及其它内存管理的能力。在不关注Bank冲突场景或者算子初始功能开发时，可以使用LocalMemAllocator简化算子编写，在后续性能优化时切换到使用LocalTensor进行地址分配的方式。
 
--   通过LocalTensor构造函数创建Tensor，极致性能场景推荐使用此方式。
+-   通过[LocalTensor构造函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/LocalTensor构造函数.md)创建Tensor，极致性能场景推荐使用此方式。
 
     开发者可以使用LocalTensor构造函数直接指定内存地址，实现内存的完全自主管理（本质上无需申请和释放内存）。使用时，需根据需求合理指定地址（不超过物理存储上限），并在保证功能正确的前提下进行内存复用。如果需要通过规避Bank冲突或者复用内存来获得极致性能时，推荐使用该方式。
 
@@ -48,7 +48,7 @@
 
 ## 同步管理<a name="section4338114663610"></a>
 
-根据前文介绍的硬件架构，AI Core内部异步并行计算存在多条流水（包括矢量计算、矩阵计算、数据搬入、数据搬出等），多条流水之间存在数据依赖时，需要插入对应的同步事件。静态Tensor编程方式下，开发者使用SetFlag/WaitFlag\(ISASI\)和PipeBarrier\(ISASI\)手动插入同步，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。另外由于需要使用SetFlag/WaitFlag/PipeBarrier底层同步接口（属于ISASI硬件体系结构相关的接口），无法保证跨硬件版本兼容。
+根据前文介绍的硬件架构，AI Core内部异步并行计算存在多条流水（包括矢量计算、矩阵计算、数据搬入、数据搬出等），多条流水之间存在数据依赖时，需要插入对应的同步事件。静态Tensor编程方式下，开发者使用[SetFlag/WaitFlag\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetFlag-WaitFlag(ISASI).md)和[PipeBarrier\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/PipeBarrier(ISASI).md)手动插入同步，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。另外由于需要使用SetFlag/WaitFlag/PipeBarrier底层同步接口（属于ISASI硬件体系结构相关的接口），无法保证跨硬件版本兼容。
 
 在同步依赖中，根据数据依赖和指令执行关系，存在两种依赖关系，即正向同步（循环内依赖）与反向同步（循环间依赖）：
 
@@ -63,34 +63,42 @@
 上述的同步逻辑在使用Pipe编程框架时，框架会使用EnQue/DeQue/AllocTensor/FreeTensor进行封装。您可以通过[编程模型设计原理](../../../概念原理和术语/编程模型设计原理.md)来了解应该如何在使用静态Tensor编程方式时手动进行同步控制。
 
 ```
-    AscendC::LocalTensor<float> xLocal(AscendC::TPosition::VECCALC, xAddr, TILE_LENGTH);
-    AscendC::LocalTensor<float> yLocal(AscendC::TPosition::VECCALC, yAddr, TILE_LENGTH);
-    AscendC::LocalTensor<float> zLocal(AscendC::TPosition::VECCALC, zAddr, TILE_LENGTH);
-    for (int i = 0; i < loopCount; i++) {
-        // dependency of PIPE_V & PIPE_MTE2 caused by xLocal/yLocal between 2 sequential loops
-        if (i != 0) {
+    AscendC::LocalTensor<half> xLocal(AscendC::TPosition::VECCALC, xAddr, MAX_DATA_COPY_LEN);
+    AscendC::LocalTensor<half> yLocal(AscendC::TPosition::VECCALC, yAddr, MAX_DATA_COPY_LEN);
+    AscendC::LocalTensor<half> zLocal(AscendC::TPosition::VECCALC, zAddr, MAX_DATA_COPY_LEN);
+
+    uint32_t totalBlocks = GetTotalBlocks();
+
+    for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
+        uint32_t startElement = loopIdx * dataCopyLen;
+        uint32_t remainElements = totalElementsPerCore - startElement;
+        uint32_t curLen = remainElements > dataCopyLen ? dataCopyLen : remainElements;
+
+        if (loopIdx != 0) {
             AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
         }
-        AscendC::DataCopy(xLocal, xGm[i * TILE_LENGTH], TILE_LENGTH);
-        AscendC::DataCopy(yLocal, yGm[i * TILE_LENGTH], TILE_LENGTH);
-        // dependency of PIPE_MTE2 & PIPE_V caused by xLocal/yLocal in one single loop
+
+        AscendC::DataCopy(xLocal, xGm[startElement], curLen);
+        AscendC::DataCopy(yLocal, yGm[startElement], curLen);
+
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-        if (i != 0) {
-            // dependency of PIPE_MTE3 & PIPE_V caused by zLocal between 2 sequential loops
+
+        if (loopIdx != 0) {
             AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
         }
-        AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
-        if (i != (loopCount - 1)) {
-            // dependency of PIPE_V & PIPE_MTE2 caused by xLocal/yLocal between 2 sequential loops
+
+        AscendC::Add(zLocal, xLocal, yLocal, curLen);
+
+        if (loopIdx != (totalBlocks - 1)) {
             AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
         }
-        // dependency of PIPE_V & PIPE_MTE3 caused by zLocal in one single loop
         AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-        AscendC::DataCopy(zGm[i * TILE_LENGTH], zLocal, TILE_LENGTH);
-        if (i != (loopCount - 1)) {
-            // dependency of PIPE_MTE3 & PIPE_V caused by zLocal between 2 sequential loops
+
+        AscendC::DataCopy(zGm[startElement], zLocal, curLen);
+
+        if (loopIdx != (totalBlocks - 1)) {
             AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
         }
     }
@@ -98,44 +106,62 @@
 
 ## 流水优化<a name="section121239188376"></a>
 
-在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitee.com/ascend/samples/tree/master/operator/ascendc/0_introduction/23_static_tensor_programming_kernellaunch)中的Double Buffer示例。
+在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/add_high_performance)中的Double Buffer示例。
 
 ```
     // ping
-    AscendC::LocalTensor<float> xLocalPing(AscendC::TPosition::VECCALC, xAddrPing, TILE_LENGTH);
-    AscendC::LocalTensor<float> yLocalPing(AscendC::TPosition::VECCALC, yAddrPing, TILE_LENGTH);
-    AscendC::LocalTensor<float> zLocalPing(AscendC::TPosition::VECCALC, zAddrPing, TILE_LENGTH);
+    AscendC::LocalTensor<half> xPing(AscendC::TPosition::VECCALC, xAddrPing, MAX_DATA_COPY_LEN);
+    AscendC::LocalTensor<half> yPing(AscendC::TPosition::VECCALC, yAddrPing, MAX_DATA_COPY_LEN);
+    AscendC::LocalTensor<half> zPing(AscendC::TPosition::VECCALC, zAddrPing, MAX_DATA_COPY_LEN);
     // pong
-    AscendC::LocalTensor<float> xLocalPong(AscendC::TPosition::VECCALC, xAddrPong, TILE_LENGTH);
-    AscendC::LocalTensor<float> yLocalPong(AscendC::TPosition::VECCALC, yAddrPong, TILE_LENGTH);
-    AscendC::LocalTensor<float> zLocalPong(AscendC::TPosition::VECCALC, zAddrPong, TILE_LENGTH);
+    AscendC::LocalTensor<half> xPong(AscendC::TPosition::VECCALC, xAddrPong, MAX_DATA_COPY_LEN);
+    AscendC::LocalTensor<half> yPong(AscendC::TPosition::VECCALC, yAddrPong, MAX_DATA_COPY_LEN);
+    AscendC::LocalTensor<half> zPong(AscendC::TPosition::VECCALC, zAddrPong, MAX_DATA_COPY_LEN);
+
+    uint32_t totalBlocks = GetTotalBlocks();
 
     // double buffer
-    AscendC::SetFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID0);
-    AscendC::SetFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID1);
-    for (int i = 0; i < loopCount; i++) {
-        int32_t eventID = (i % 2 == 0 ? EVENT_ID0 : EVENT_ID1);
-        AscendC::LocalTensor<float> &xLocal = (i % 2 == 0 ? xLocalPing : xLocalPong);
-        AscendC::LocalTensor<float> &yLocal = (i % 2 == 0 ? yLocalPing : yLocalPong);
-        AscendC::LocalTensor<float> &zLocal = (i % 2 == 0 ? zLocalPing : zLocalPong);
-        // dependency of PIPE_MTE3 & PIPE_MTE2 caused by xLocal/yLocal between 2 sequential loops
-        AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(eventID);
-        AscendC::DataCopy(xLocal, xGm[i * TILE_LENGTH], TILE_LENGTH);
-        AscendC::DataCopy(yLocal, yGm[i * TILE_LENGTH], TILE_LENGTH);
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
+    AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+    AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID1);
 
-        // dependency of PIPE_MTE2 & PIPE_V caused by xLocal/yLocal in one single loop
+    for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
+        uint32_t startElement = loopIdx * dataCopyLen;
+        uint32_t remainElements = totalElementsPerCore - startElement;
+        uint32_t curLen = remainElements > dataCopyLen ? dataCopyLen : remainElements;
+
+        int32_t eventID = ((loopIdx & 1) == 0 ? EVENT_ID0 : EVENT_ID1);
+        AscendC::LocalTensor<half>& xLocal = ((loopIdx & 1) == 0 ? xPing : xPong);
+        AscendC::LocalTensor<half>& yLocal = ((loopIdx & 1) == 0 ? yPing : yPong);
+        AscendC::LocalTensor<half>& zLocal = ((loopIdx & 1) == 0 ? zPing : zPong);
+
+        AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(eventID);
+
+        AscendC::DataCopy(xLocal, xGm[startElement], curLen);
+        AscendC::DataCopy(yLocal, yGm[startElement], curLen);
+
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(eventID);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(eventID);
-        AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
-        // dependency of PIPE_V & PIPE_MTE3 caused by zLocal in one single loop
+
+        AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(eventID);
+
+        AscendC::Add(zLocal, xLocal, yLocal, curLen);
+
+        AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(eventID);
+
         AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(eventID);
         AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(eventID);
-        AscendC::DataCopy(zGm[i * TILE_LENGTH], zLocal, TILE_LENGTH);
-        // dependency of PIPE_MTE3 & PIPE_MTE2 caused by zLocal between 2 sequential loops
-        AscendC::SetFlag<AscendC::HardEvent::MTE3_MTE2>(eventID);
+
+        AscendC::DataCopy(zGm[startElement], zLocal, curLen);
+
+        AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(eventID);
     }
-    AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID1);
+
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID1);
 ```
 
 以下为不使能DoubleBuffer和使能DoubleBuffer的流水示意图。多数情况下，采用DoubleBuffer能有效提升Vector的时间利用率，缩减算子执行时间，详细内容可参考[DoubleBuffer](../../../概念原理和术语/性能优化技术原理/DoubleBuffer.md)。
@@ -150,9 +176,9 @@
 
 -   开发者不能使用TPipe/TQue/TQueBind/TBufPool等框架接口，和上述框架接口混用可能会出现未定义行为。
 -   只能使用部分API。具体支持的API列表见[支持的API范围](#section2633193623711)。因为不在列表范围内的API内部依赖TPipe分配事件ID，可能会和开发者定义的事件ID产生冲突。
--   同步事件需要由开发者使用SetFlag/WaitFlag\(ISASI\)和PipeBarrier\(ISASI\)手动插入，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。
+-   同步事件需要由开发者使用[SetFlag/WaitFlag\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetFlag-WaitFlag(ISASI).md)和[PipeBarrier\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/PipeBarrier(ISASI).md)手动插入，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。
 -   由于需要使用SetFlag/WaitFlag/PipeBarrier底层同步接口（属于ISASI硬件体系结构相关的接口），无法保证算子跨硬件版本兼容。
--   Kernel入口处需要开发者手动调用InitSocState接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
+-   Kernel入口处需要开发者手动调用[InitSocState](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
 
 ## 支持的API范围<a name="section2633193623711"></a>
 
@@ -774,6 +800,13 @@
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18988435204114"><a name="p18988435204114"></a><a name="p18988435204114"></a>-</p>
 </td>
 </tr>
+<tr id="row098783516418"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p139874354418"><a name="p139874354418"></a><a name="p139874354418"></a>基础API &gt; 矢量计算 &gt; 数据重排</p>
+</td>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p99871335184115"><a name="p99871335184115"></a><a name="p99871335184115"></a>Interleave、DeInterleave</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18988435204115"><a name="p18988435204115"></a><a name="p18988435204115"></a>-</p>
+</td>
+</tr>
 <tr id="row1598863534117"><td class="cellrowborder" rowspan="6" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p1998811353419"><a name="p1998811353419"></a><a name="p1998811353419"></a>基础API &gt; 数据搬运 &gt; DataCopy</p>
 </td>
 <td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p398811358414"><a name="p398811358414"></a><a name="p398811358414"></a>基础数据搬运</p>
@@ -878,4 +911,3 @@
 </tr>
 </tbody>
 </table>
-

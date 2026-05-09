@@ -12,8 +12,8 @@
 ![](../../../figures/开发Ascend-C算子的基本流程.png "开发Ascend-C算子的基本流程")
 
 >[!NOTE]说明
->-   请点击[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_vector/basic_api_tque_add)获取样例代码。
->-   使用本教程只需要您具有一定的C/C++基础，在此基础上，如果您已经对Ascend C编程模型有一定的了解，您可以在实际操作的过程中加深对理论的理解；如果您还没有开始了解Ascend C编程模型，也无需担心，您可以先尝试跑通教程中的样例，参考教程最后的[指引](#zh-cn_topic_0000001565030288_section128349412384)进行进一步的学习。
+>- 请点击[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_vector/basic_api_tque_add)获取样例代码。
+>- 使用本教程只需要您具有一定的C/C++基础，在此基础上，如果您已经对Ascend C编程模型有一定的了解，您可以在实际操作的过程中加深对理论的理解；如果您还没有开始了解Ascend C编程模型，也无需担心，您可以先尝试跑通教程中的样例，参考教程最后的[指引](#zh-cn_topic_0000001565030288_section128349412384)进行进一步的学习。
 
 ## 环境准备<a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_section412999115218"></a>
 
@@ -23,7 +23,7 @@
 
 -   环境变量配置
 
-    安装CANN软件后，使用CANN运行用户进行编译、运行时，需要以CANN运行用户登录环境，执行**source $_\{INSTALL\_DIR\}_/set\_env.sh**命令设置环境变量。$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
+    安装CANN软件后，使用CANN运行用户进行编译、运行时，需要以CANN运行用户登录环境，执行source $_\{INSTALL\_DIR\}_/set\_env.sh命令设置环境变量。$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
 
 ## 算子分析<a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_section1242991675619"></a>
 
@@ -48,10 +48,10 @@
     -   根据对算子输入输出的分析，确定核函数有3个参数x，y，z；x，y为输入参数，z为输出参数。
 
 4.  确定算子实现所需接口。
-    -   实现涉及外部存储和内部存储间的数据搬运，查看Ascend C  API参考中的数据搬运接口，需要使用DataCopy来实现数据搬移。
-    -   本样例只涉及矢量计算的加法操作，查看Ascend C  API参考中的矢量计算接口Memory矢量计算，初步分析可使用Add接口Add实现x+y。
-    -   计算中使用到的Tensor数据结构，使用AllocTensor、FreeTensor进行申请和释放。
-    -   并行流水任务之间使用Queue队列完成同步，会使用到EnQue、DeQue等接口。
+    -   实现涉及外部存储和内部存储间的数据搬运，查看Ascend C  API参考中的数据搬运接口，需要使用[DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DataCopy.md)来实现数据搬移。
+    -   本样例只涉及矢量计算的加法操作，查看Ascend C  API参考中的矢量计算接口[Memory矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Memory矢量计算.md)，初步分析可使用Add接口[Add](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Add.md)实现x+y。
+    -   计算中使用到的Tensor数据结构，使用[AllocTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AllocTensor.md)、[FreeTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FreeTensor.md)进行申请和释放。
+    -   并行流水任务之间使用Queue队列完成同步，会使用到[EnQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/EnQue.md)、[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DeQue.md)等接口。
 
 通过以上分析，得到Ascend C  Add算子的设计规格如下：
 
@@ -146,7 +146,7 @@
     };
     ```
 
-2.  根据[核函数定义和调用](../../../编程指南/编程模型/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)中介绍的规则进行**核函数的定义，**并在核函数中调用算子类的Init和Process函数，算子类实现在后续步骤中介绍。
+2.  根据[核函数定义和调用](../../../编程指南/编程模型/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)中介绍的规则进行**核函数的定义**，并在核函数中调用算子类的Init和Process函数，算子类实现在后续步骤中介绍。
 
     ```
     __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData tiling)
@@ -166,7 +166,7 @@
 
     -   算子类的Init函数，完成内存初始化相关工作，Process函数完成算子实现的核心逻辑。
 
-3.  **根据矢量编程范式实现算子类**，本样例中定义KernelAdd算子类，其具体成员如下**：**
+3.  **根据矢量编程范式实现算子类**，本样例中定义KernelAdd算子类，其具体成员如下：
 
     ```
     class KernelAdd {
@@ -211,7 +211,7 @@
 
     每个核上处理的数据地址需要在起始地址上增加GetBlockIdx\(\) \* blockLength（每个block处理的数据长度）的偏移来获取。这样也就实现了多核并行计算的数据切分。
 
-    以输入x为例，x + blockLength \* GetBlockIdx\(\)即为单核处理程序中x在Global Memory上的内存偏移地址，获取偏移地址后，使用GlobalTensor类的SetGlobalBuffer接口设定该核上Global Memory的起始地址以及长度。具体示意图如下。
+    以输入x为例，x + blockLength \* GetBlockIdx\(\)即为单核处理程序中x在Global Memory上的内存偏移地址，获取偏移地址后，使用GlobalTensor类的[SetGlobalBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GlobalTensor.md)接口设定该核上Global Memory的起始地址以及长度。具体示意图如下。
 
     **图 3**  多核并行处理示意图<a name="zh-cn_topic_0000001565030288_fig744312161511"></a>  
     ![](../../../figures/多核并行处理示意图.png "多核并行处理示意图")
@@ -268,8 +268,8 @@
 
     1.  CopyIn函数实现。
 
-        1.  使用DataCopy接口将GlobalTensor数据拷贝到LocalTensor。
-        2.  使用EnQue将LocalTensor放入VecIn的Queue中。
+        1.  使用[DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DataCopy.md)接口将GlobalTensor数据拷贝到LocalTensor。
+        2.  使用[EnQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/EnQue.md)将LocalTensor放入VecIn的Queue中。
 
         ```
         __aicore__ inline void CopyIn( int32_t progress)
@@ -288,10 +288,10 @@
 
     2.  Compute函数实现。
 
-        1.  使用DeQue从VecIn中取出LocalTensor。
-        2.  使用Ascend C接口Add完成矢量计算。
-        3.  使用EnQue将计算结果LocalTensor放入到VecOut的Queue中。
-        4.  使用FreeTensor将释放不再使用的LocalTensor。
+        1.  使用[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DeQue.md)从VecIn中取出LocalTensor。
+        2.  使用Ascend C接口[Add](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Add.md)完成矢量计算。
+        3.  使用[EnQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/EnQue.md)将计算结果LocalTensor放入到VecOut的Queue中。
+        4.  使用[FreeTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FreeTensor.md)将释放不再使用的LocalTensor。
 
         ```
         __aicore__ inline void Compute(int32_t progress)
@@ -312,9 +312,9 @@
 
     3.  CopyOut函数实现。
 
-        1.  使用DeQue接口从VecOut的Queue中取出LocalTensor。
-        2.  使用DataCopy接口将LocalTensor拷贝到GlobalTensor上。
-        3.  使用FreeTensor将不再使用的LocalTensor进行回收。
+        1.  使用[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DeQue.md)接口从VecOut的Queue中取出LocalTensor。
+        2.  使用[DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DataCopy.md)接口将LocalTensor拷贝到GlobalTensor上。
+        3.  使用[FreeTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FreeTensor.md)将不再使用的LocalTensor进行回收。
 
         ```
          __aicore__ inline void CopyOut(int32_t progress)
@@ -403,7 +403,7 @@
     **图 5**  调用步骤<a name="zh-cn_topic_0000001565030288_fig1034911325594"></a>  
     ![](../../../figures/调用步骤.png "调用步骤")
 
-    如下示例中的acl API使用方法请参考《应用开发指南 \(C&C++\)》中的“Runtime API参考 > Stream管理”章节。
+    如下示例中的acl API使用方法请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
     ```
     std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y)
@@ -482,13 +482,13 @@
     ```
 
     >[!NOTE]说明 
-    >-   该样例仅支持如下型号：
-    >    -   Ascend 950PR/Ascend 950DT
-    >    -   Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    >    -   Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    >-   _-_-npu-arch用于指定NPU的架构版本，dav-后为架构版本号，请替换为您实际使用的架构版本号。各AI处理器型号对应的架构版本号请通过[AI处理器型号和\_\_NPU\_ARCH\_\_的对应关系](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
+    >- 该样例仅支持如下型号：
+    >    - Ascend 950PR/Ascend 950DT
+    >    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    >    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    >- _-_-npu-arch用于指定NPU的架构版本，dav-后为架构版本号，请替换为您实际使用的架构版本号。各AI处理器型号对应的架构版本号请通过[AI处理器型号和\_\_NPU\_ARCH\_\_的对应关系](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
 
 ## 接下来的引导<a name="zh-cn_topic_0000001565030288_section128349412384"></a>
 
-如果您对教程中的多核并行、流水编程等概念不了解，导致阅读过程有些吃力，可以参考[编程模型](../../../编程指南/编程模型/)学习基本概念，再来回顾本教程；如果您已经了解相关概念，并跑通了该样例，您可以参考[矢量编程](../../../算子实践参考/SIMD算子实现/矢量编程/)了解Ascend C矢量编程中的更多细节。
+如果您对教程中的多核并行、流水编程等概念不了解，导致阅读过程有些吃力，可以参考[编程模型](../../../编程指南/编程模型/编程模型.md)学习基本概念，再来回顾本教程；如果您已经了解相关概念，并跑通了该样例，您可以参考[矢量编程](../../../算子实践参考/SIMD算子实现/矢量编程/矢量编程.md)了解Ascend C矢量编程中的更多细节。
 

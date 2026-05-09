@@ -199,7 +199,7 @@ __global__ void add_custom(float* x, float* y, float* z, uint64_t total_length)
     **图 2**  调用步骤<a name="zh-cn_topic_0000001565030288_fig1034911325594"></a>  
     ![](../../../figures/调用步骤-1.png "调用步骤-1")
 
-    如下示例中的acl API使用方法请参考《应用开发指南 \(C&C++\)》中的“Runtime API参考 > Stream管理”章节。
+    如下示例中的acl API使用方法请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
     ```
     std::vector<float> add(std::vector<float>& x, std::vector<float>& y)
@@ -282,4 +282,4 @@ __global__ void add_custom(float* x, float* y, float* z, uint64_t total_length)
 
 ## 接下来的引导<a name="section2099191619557"></a>
 
-如果您想了解更多SIMT编程相关概念，可以参考[AI Core SIMT编程](../../../编程指南/编程模型/AI-Core-SIMT编程/)学习基本概念，再来回顾本教程；如果您已经了解相关概念，并跑通了该样例，您可以参考[SIMT算子实现](../../../算子实践参考/SIMT算子实现/)了解Ascend C  SIMT编程中的更多细节。
+如果您想了解更多SIMT编程相关概念，可以参考[AI Core SIMT编程](../../../编程指南/编程模型/AI-Core-SIMT编程/AI-Core-SIMT编程.md)学习基本概念，再来回顾本教程；如果您已经了解相关概念，并跑通了该样例，您可以参考[SIMT算子实现](../../../算子实践参考/SIMT算子实现/SIMT算子实现.md)了解Ascend C  SIMT编程中的更多细节。

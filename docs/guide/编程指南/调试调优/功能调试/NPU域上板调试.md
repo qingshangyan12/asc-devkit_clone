@@ -6,24 +6,24 @@ NPU域上板调试手段主要包含上板数据打印、msSanitizer内存异常
 
 printf主要用于打印标量和字符串信息，SIMT编程及SIMD编程均支持。
 
-printf示例如下，printf接口的使用说明和具体约束请参考printf。
+printf示例如下，printf接口的使用说明和具体约束请参考[printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/printf-147.md)。
 
 ```
 printf("fmt string %d", 0x123);
 ```
 
 >[!NOTE]说明 
->printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考printf。
+>printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/printf-147.md)。
 
 ## SIMD编程通过DumpTensor打印进行调试<a name="section16452184823718"></a>
 
 DumpTensor是SIMD编程场景独有的打印功能，用于NPU域上板打印指定Tensor的数据。
 
-**具体的使用方法如下：**
+**具体的使用方法如下**：
 
 在算子kernel侧实现代码中需要输出日志信息的地方调用DumpTensor接口打印相关内容。
 
-如下所示，srcLocal表示待打印的Tensor；5表示用户的自定义附加信息，比如当前的代码行号；dataLen表示元素个数。DumpTensor接口的使用说明和具体约束请参考DumpTensor。
+如下所示，srcLocal表示待打印的Tensor；5表示用户的自定义附加信息，比如当前的代码行号；dataLen表示元素个数。DumpTensor接口的使用说明和具体约束请参考[DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DumpTensor.md)。
 
 ```
 DumpTensor(srcLocal,5, dataLen);
@@ -46,7 +46,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 ```
 
 >[!NOTE]说明 
->DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考DumpTensor。
+>DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DumpTensor.md)。
 
 ## 使用msSanitizer工具进行异常检测<a name="section931475414217"></a>
 
@@ -57,9 +57,9 @@ msSanitizer工具是基于AI处理器的异常检测工具，包含了单算子�
 -   未初始化检测：工具可以协助用户定位由于内存未初始化可能导致的脏数据读取问题。
 -   同步检测：工具可以协助用户定位由于前序算子中的未配对同步指令导致的后续算子同步失败的问题。
 
-具体使用方法请参考《算子开发工具用户指南》。
+具体使用方法请参考[《算子开发工具用户指南》](https://hiascend.com/document/redirect/CannCommercialToolOpDev)。
 
-**该功能仅在如下场景支持：**
+**该功能仅在如下场景支持**：
 
 -   通过[基于样例工程完成Kernel直调](../../附录/基于样例工程完成Kernel直调.md)方式调用算子。
 
@@ -68,7 +68,7 @@ msSanitizer工具是基于AI处理器的异常检测工具，包含了单算子�
 
 ## 使用msDebug工具进行算子调试<a name="section2072113416285"></a>
 
-msDebug是一款面向昇腾设备的算子调试工具，用于调试NPU侧运行的算子程序，为算子开发人员提供调试手段，当前只支持SIMD编程场景的程序调试，暂不支持SIMT编程场景的程序调试。msDebug工具支持调试所有的昇腾算子，包含Ascend C算子（Vector、Cube以及融合算子）程序。具体功能包括断点设置、打印变量和内存、单步调试、中断运行、核切换、检查程序状态、调试信息展示、解析Core dump文件，用户可根据实际情况进行选择。具体使用方法请参考《算子开发工具用户指南》。
+msDebug是一款面向昇腾设备的算子调试工具，用于调试NPU侧运行的算子程序，为算子开发人员提供调试手段，当前只支持SIMD编程场景的程序调试，暂不支持SIMT编程场景的程序调试。msDebug工具支持调试所有的昇腾算子，包含Ascend C算子（Vector、Cube以及融合算子）程序。具体功能包括断点设置、打印变量和内存、单步调试、中断运行、核切换、检查程序状态、调试信息展示、解析Core dump文件，用户可根据实际情况进行选择。具体使用方法请参考[《算子开发工具用户指南》](https://hiascend.com/document/redirect/CannCommercialToolOpDev)。
 
 -   通过[基于样例工程完成Kernel直调](../../附录/基于样例工程完成Kernel直调.md)方式调用算子。
 

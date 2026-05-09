@@ -2,7 +2,7 @@
 
 # Ascend C
 
-<h4>Ascend C算子编程语言核心仓：提供语言扩展层C API和C++类库，支持异构编译和<<<>>>直调</h4>
+<h4>基于C/C++构建多层级API，开放芯片完备编程能力，支撑实现极致性能</h4>
 
 [![community](https://img.shields.io/badge/docs-community-brightgreen.svg?style=flat)](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)
 [![repo](https://img.shields.io/badge/docs-repo-blue.svg?style=flat)](https://gitcode.com/cann/asc-devkit/tree/master/docs)
@@ -179,7 +179,7 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
   |---------|--------|
   |[Ascend C 编程指南](https://hiascend.com/document/redirect/CannCommunityOpdevAscendC)|基于昇腾AI硬件，使用Ascend C编写算子程序，开发自定义算子。|
   |[Ascend C 实践参考](https://hiascend.com/document/redirect/CannCommunityAscendCBestPractice) | 基于已完成开发的Ascend C算子，介绍如何进一步优化算子性能。 |
-  |[Ascend C API列表](./docs/api/README.md)| Ascend C SIMD&SIMT API，包括语言扩展层C API、C++类库基础API和高阶API|
+  |[Ascend C API列表](https://hiascend.com/document/redirect/CannCommunityAscendCApi)| Ascend C SIMD&SIMT API，包括语言扩展层C API、C++类库基础API和高阶API|
   |[Ascend C 样例](./examples)| Ascend C API关键特性介绍样例，包括AICore SIMD&SIMT、AICPU等|
   |[Ascend C 编程指南（鸿蒙）](https://gitcode.com/cann/cann-recipes-harmony-infer/blob/master/docs/ascendc_develop_guide.md)|基于麒麟AI硬件，使用Ascend C编写算子程序，开发自定义算子。|
 

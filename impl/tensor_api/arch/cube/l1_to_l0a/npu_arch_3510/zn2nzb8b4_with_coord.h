@@ -89,8 +89,8 @@ private:
                   GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout) -
                   GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout) *
                   GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(dstLayout) - Std::get<0>(coord);
-        auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout) *
-                GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout) / FRACTAL_FIXED - mStartPosition;
+        auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout) *
+                GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(dstLayout) / FRACTAL_FIXED - mStartPosition;
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout) *
                 GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout) / C0_ELEMENT<DstType> - kStartPosition;
         // Zn -> Nz
@@ -115,7 +115,7 @@ private:
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0A_NPU_ARCH_3510_L12L0A_ZN2NZB8B4_WITH_COORD_H
+#endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0A_NPU_ARCH_3510_ZN2NZB8B4_WITH_COORD_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

@@ -26,6 +26,7 @@ sys.path.append(FRAMEWORK_PATH)
 
 from adapter.ascendc_common_utility import *
 from adapter.super_kernel_option_parse import *
+from tbe.common.context.op_context import OpContext
 
 
 class TestCompileUtility(unittest.TestCase):
@@ -81,6 +82,39 @@ class TestCompileUtility(unittest.TestCase):
         self.assertRaises(Exception, parse_super_kernel_options, "func-align:early-start=:")
         self.assertRaises(Exception, parse_super_kernel_options, "func-align:early-start=1:early-start=1")
         self.assertRaises(Exception, parse_super_kernel_options, "func-align:early-start=1:test=1")
+
+    def test_parse_super_kernel_options_none_and_empty(self):
+        # None should return {} without AttributeError
+        res = parse_super_kernel_options(None)
+        self.assertEqual(res, {})
+        # empty string should return {}
+        res = parse_super_kernel_options("")
+        self.assertEqual(res, {})
+        # whitespace-only string should return {}
+        res = parse_super_kernel_options("   ")
+        self.assertEqual(res, {})
+
+    def test_parse_super_kernel_options_strip_quotes(self):
+        res = parse_super_kernel_options('"early-start=1"')
+        self.assertEqual(res, {'early-start': SuperKernelEarlyStartMode.EarlyStartEnableV2})
+
+    def test_aclgraph_options_accept_dcci_underscore_keys(self):
+        with OpContext() as ctx:
+            ctx.add_addition("super_kernel_sub_combine", True)
+            res = parse_super_kernel_options(
+                "dcci_before_kernel_start=MatMul.*:stream_fusion=1:debug_sync_all=1")
+        self.assertEqual(res, {"dcci-before-kernel-start": "MatMul.*"})
+
+    def test_ge_options_reject_underscore_keys(self):
+        self.assertRaises(Exception, parse_super_kernel_options, "early_start=1")
+
+    def test_aclgraph_options_ignore_numeric_preload_code(self):
+        for value in ("0", "1", "2"):
+            with self.subTest(value=value):
+                with OpContext() as ctx:
+                    ctx.add_addition("super_kernel_sub_combine", True)
+                    res = parse_super_kernel_options(f"preload-code={value}")
+                self.assertEqual(res, {})
 
     def test_check_func_align(self):
         self.assertRaises(Exception, check_func_align, "test")
