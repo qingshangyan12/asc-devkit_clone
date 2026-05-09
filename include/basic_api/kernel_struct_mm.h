@@ -110,12 +110,10 @@ struct LoadData2dTransposeParams {
     uint8_t addrMode = 0;
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
 struct Nd2NzParamsV2 {
     uint64_t lookupTable0 = 0;
     uint64_t lookupTable1 = 0;
 };
-#endif
 
 struct LoadData2DMxParams {
     __aicore__ LoadData2DMxParams() {}
@@ -425,9 +423,8 @@ struct MmadParams {
     bool cmatrixSource = false;
     // Indicates the initial matrix, 1: the number in C matrix is 0, 0：use the real number in C matrix
     bool cmatrixInitVal = true;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+
     bool disableGemv = false;
-#endif
 };
 
 template <typename T>
@@ -493,7 +490,6 @@ struct LoadDataRepeatParam {
 };
 #endif // Turing versions
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct LoadDataRepeatParamWithStride {
     __aicore__ LoadDataRepeatParamWithStride() {}
 
@@ -510,7 +506,6 @@ struct LoadDataRepeatParamWithStride {
     uint8_t repeatMode = 0;
     uint16_t dstStride = 0;
 };
-#endif
 
 struct LoadImageToLocalParams {
     __aicore__ LoadImageToLocalParams() {}
