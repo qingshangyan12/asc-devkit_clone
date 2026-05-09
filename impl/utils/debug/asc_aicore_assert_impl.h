@@ -17,6 +17,7 @@
 #define IMPL_UTILS_DEBUG_ASC_AICORE_ASSERT_IMPL_H
 
 #ifndef ASCENDC_CPU_DEBUG
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 namespace __asc_aicore {
@@ -32,6 +33,20 @@ inline __aicore__ void __assert_fail_msg(const __gm__ char* __assertion, const _
     printf_impl_assert_msg(__assertion, __file, __line, __function, fmt, args...);
     trap();
 }
+#elif (__NPU_ARCH__ == 5102)
+namespace __asc_aicore {
+inline __aicore__ void __assert_fail(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
+    const __gm__ char* __function) {
+    trap();
+}
+
+template <typename... Args>
+inline __aicore__ void __assert_fail_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
+    const __gm__ char* __function, const __gm__ char* fmt, Args&&... args) {
+    trap();
+}
+#endif
+
 } // namespace __asc_aicore
 #endif
 
