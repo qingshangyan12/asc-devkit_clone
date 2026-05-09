@@ -6,6 +6,7 @@
 
 
 #include <gtest/gtest.h>
+#include <vector>
 #include "kernel_operator.h"
 
 using namespace std;
@@ -86,10 +87,23 @@ __aicore__ inline void main_Sub(uint8_t* dstGm, uint8_t* src0Gm,
 
 
 
+template <typename T, typename Src1T = T>
+void InitSubInputs(uint8_t* src0Gm, uint8_t* src1Gm, uint32_t dataSize) {
+    T* src0 = reinterpret_cast<T*>(src0Gm);
+    Src1T* src1 = reinterpret_cast<Src1T*>(src1Gm);
+    for (uint32_t i = 0; i < dataSize; i++) {
+        src0[i] = static_cast<T>(i % 256);
+        src1[i] = static_cast<Src1T>((i + 1) % 256);
+    }
+}
+
+
+
 struct SubTestParams {
     uint32_t data_size;
     uint32_t data_bit_size;
     void (*cal_func)(uint8_t*, uint8_t*, uint8_t*, uint32_t);
+    void (*init_func)(uint8_t*, uint8_t*, uint32_t);
 };
 
 
@@ -105,7 +119,7 @@ protected:
 
 INSTANTIATE_TEST_CASE_P(TEST_SUB, SubTestsuite,
     ::testing::Values(
-        SubTestParams { 128, 2, main_Sub<half> }
+        SubTestParams { 128, 2, main_Sub<half>, InitSubInputs<half> }
     ));
 
 
@@ -114,18 +128,15 @@ TEST_P(SubTestsuite, SubTestCase) {
     auto param = GetParam();
 
     // 分配 GM 内存
-    uint8_t dstGm[param.data_size * param.data_bit_size] = {0};
-    uint8_t src0Gm[param.data_size * param.data_bit_size] = {0};
-    uint8_t src1Gm[param.data_size * param.data_bit_size] = {0};
+    std::vector<uint8_t> dstGm(param.data_size * param.data_bit_size, 0);
+    std::vector<uint8_t> src0Gm(param.data_size * param.data_bit_size, 0);
+    std::vector<uint8_t> src1Gm(param.data_size * param.data_bit_size, 0);
 
     // 初始化输入数据
-    for (uint32_t i = 0; i < param.data_size; i++) {
-        src0Gm[i] = static_cast<uint8_t>(i % 256);
-        src1Gm[i] = static_cast<uint8_t>((i + 1) % 256);
-    }
+    param.init_func(src0Gm.data(), src1Gm.data(), param.data_size);
 
     // 执行测试
-    param.cal_func(dstGm, src0Gm, src1Gm, param.data_size);
+    param.cal_func(dstGm.data(), src0Gm.data(), src1Gm.data(), param.data_size);
 
     // 验证结果
     for (uint32_t i = 0; i < param.data_size; i++) {

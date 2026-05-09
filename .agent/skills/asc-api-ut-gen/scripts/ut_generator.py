@@ -26,7 +26,9 @@ import json
 import re
 from dataclasses import dataclass, field
 from enum import Enum
+from functools import lru_cache
 from pathlib import Path
+from string import Template
 from typing import List, Optional, Dict, Any
 
 
@@ -49,25 +51,71 @@ def _load_reference_json(path: Path) -> Dict[str, Any]:
         return json.load(f)
 
 
+_REFERENCE_LOAD_ERRORS: Dict[str, Exception] = {}
+
+
+@lru_cache(maxsize=None)
+def _load_reference_json_safe(name: str, path: Path) -> Dict[str, Any]:
+    """Load a structured reference without making module import fail."""
+    try:
+        data = _load_reference_json(path)
+    except Exception as exc:
+        _REFERENCE_LOAD_ERRORS[name] = exc
+        return {}
+
+    _REFERENCE_LOAD_ERRORS.pop(name, None)
+    return data
+
+
+def get_npu_arch_facts() -> Dict[str, Any]:
+    """Return NPU architecture facts from the structured reference."""
+    return _load_reference_json_safe("npu_arch_facts", NPU_ARCH_FACTS_PATH)
+
+
+def get_generation_constraints() -> Dict[str, Any]:
+    """Return UT generation constraints from the structured reference."""
+    return _load_reference_json_safe("generation_constraints", GENERATION_CONSTRAINTS_PATH)
+
+
+def ensure_reference_constraints_loaded() -> None:
+    """Raise a CLI-friendly error if structured references were unavailable."""
+    if not _REFERENCE_LOAD_ERRORS:
+        return
+
+    details = "; ".join(
+        f"{name}: {exc}" for name, exc in sorted(_REFERENCE_LOAD_ERRORS.items())
+    )
+    raise RuntimeError(f"failed to load structured references: {details}")
+
+
 def _enum_member_name(value: str) -> str:
     """Convert a reference value to a stable enum member name."""
     return re.sub(r"[^A-Z0-9]+", "_", value.upper()).strip("_")
 
 
-NPU_ARCH_FACTS = _load_reference_json(NPU_ARCH_FACTS_PATH)
-GENERATION_CONSTRAINTS = _load_reference_json(GENERATION_CONSTRAINTS_PATH)
-CHIP_FACTS = NPU_ARCH_FACTS["chips"]
-DTYPE_FACTS = NPU_ARCH_FACTS["dtypes"]
+def _enum_members_from_reference(
+    facts: Dict[str, Any], fallback: Dict[str, str]
+) -> Dict[str, str]:
+    """Build Enum members from a reference object, keeping import usable on failure."""
+    members = {
+        fact.get("enum_name", _enum_member_name(item_name)): item_name
+        for item_name, fact in facts.items()
+        if isinstance(fact, dict)
+    }
+    return members or fallback
 
 
-class ApiType(Enum):
-    """API 类型枚举"""
-    AIV = "aiv"           # Vector 核心基础 API
-    AIC = "aic"           # Cube 核心基础 API
-    C_API = "c_api"       # C API
-    ADV = "adv"           # 高阶 API
-    SIMT = "simt"         # SIMT API
-    REG_COMPUTE = "reg"   # Register Compute API
+NPU_ARCH_FACTS = get_npu_arch_facts()
+GENERATION_CONSTRAINTS = get_generation_constraints()
+CHIP_FACTS = NPU_ARCH_FACTS.get("chips", {})
+DTYPE_FACTS = NPU_ARCH_FACTS.get("dtypes", {})
+API_TYPE_FACTS = GENERATION_CONSTRAINTS.get("api_types", {})
+
+
+ApiType = Enum(
+    "ApiType",
+    _enum_members_from_reference(API_TYPE_FACTS, {"UNAVAILABLE": "unavailable"}),
+)
 
 
 API_TYPE_MAP = {api_type.value: api_type for api_type in ApiType}
@@ -77,10 +125,7 @@ API_RESTRICTIONS = GENERATION_CONSTRAINTS.get("api_restrictions", {})
 
 ChipArch = Enum(
     "ChipArch",
-    {
-        fact.get("enum_name", _enum_member_name(chip_name)): chip_name
-        for chip_name, fact in CHIP_FACTS.items()
-    },
+    _enum_members_from_reference(CHIP_FACTS, {"UNAVAILABLE": "unavailable"}),
 )
 CHIP_ARCH_BY_NAME = {chip.value: chip for chip in ChipArch}
 ARCH_DIR_MAP = dict(
@@ -170,6 +215,7 @@ TEMPLATES = {
     # -------------------------------------------------------------------------
     'aiv_basic': '''${COPYRIGHT}
 #include <gtest/gtest.h>
+#include <vector>
 #include "kernel_operator.h"
 
 using namespace std;
@@ -178,6 +224,8 @@ using namespace AscendC;
 ${KERNEL_CLASS}
 
 ${MAIN_FUNCTION}
+
+${INIT_FUNCTION}
 
 ${PARAM_STRUCT}
 
@@ -262,11 +310,24 @@ __aicore__ inline void main_${API_NAME}(uint8_t* dstGm, uint8_t* src0Gm,
 }
 ''',
 
+    'aiv_init_function': '''
+template <typename T, typename Src1T = T>
+void Init${API_NAME}Inputs(uint8_t* src0Gm, uint8_t* src1Gm, uint32_t dataSize) {
+    T* src0 = reinterpret_cast<T*>(src0Gm);
+    Src1T* src1 = reinterpret_cast<Src1T*>(src1Gm);
+    for (uint32_t i = 0; i < dataSize; i++) {
+        src0[i] = static_cast<T>(i % 256);
+        src1[i] = static_cast<Src1T>((i + 1) % 256);
+    }
+}
+''',
+
     'aiv_param_struct': '''
 struct ${API_NAME}TestParams {
     uint32_t data_size;
     uint32_t data_bit_size;
     void (*cal_func)(uint8_t*, uint8_t*, uint8_t*, uint32_t);
+    void (*init_func)(uint8_t*, uint8_t*, uint32_t);
 };
 ''',
 
@@ -291,18 +352,15 @@ TEST_P(${API_NAME}Testsuite, ${API_NAME}TestCase) {
     auto param = GetParam();
 
     // 分配 GM 内存
-    uint8_t dstGm[param.data_size * param.data_bit_size] = {0};
-    uint8_t src0Gm[param.data_size * param.data_bit_size] = {0};
-    uint8_t src1Gm[param.data_size * param.data_bit_size] = {0};
+    std::vector<uint8_t> dstGm(param.data_size * param.data_bit_size, 0);
+    std::vector<uint8_t> src0Gm(param.data_size * param.data_bit_size, 0);
+    std::vector<uint8_t> src1Gm(param.data_size * param.data_bit_size, 0);
 
     // 初始化输入数据
-    for (uint32_t i = 0; i < param.data_size; i++) {
-        src0Gm[i] = static_cast<uint8_t>(i % 256);
-        src1Gm[i] = static_cast<uint8_t>((i + 1) % 256);
-    }
+    param.init_func(src0Gm.data(), src1Gm.data(), param.data_size);
 
     // 执行测试
-    param.cal_func(dstGm, src0Gm, src1Gm, param.data_size);
+    param.cal_func(dstGm.data(), src0Gm.data(), src1Gm.data(), param.data_size);
 
     // 验证结果
     for (uint32_t i = 0; i < param.data_size; i++) {
@@ -731,9 +789,16 @@ public:
         __VEC_SCOPE__ {
             ${REG_COMPUTE_BODY}
         }
+        CopyOut();
     }
 
 private:
+    __aicore__ inline void CopyOut() {
+        for (uint32_t i = 0; i < nums; i++) {
+            dstGlobal.SetValue(i, src0Global.GetValue(i));
+        }
+    }
+
     GlobalTensor<T> dstGlobal;
     GlobalTensor<T> src0Global;
     GlobalTensor<Src1T> src1Global;
@@ -792,11 +857,8 @@ class UTGenerator:
         if not template:
             raise ValueError(f"Template not found: {template_name}")
 
-        result = template
-        for key, value in variables.items():
-            placeholder = f"${{{key}}}"
-            result = result.replace(placeholder, str(value))
-        return result
+        substitutions = {key: str(value) for key, value in variables.items()}
+        return Template(template).safe_substitute(substitutions)
 
     def get_test_dir(self) -> str:
         """获取测试目录路径"""
@@ -847,9 +909,10 @@ class AIVUTGenerator(UTGenerator):
         for tc in self.config.test_cases:
             dtype_info = DTYPE_MAP.get(tc.dtype, DTYPE_MAP["half"])
             func_name = f"main_{self.config.api_name}<{tc.dtype}>"
+            init_func_name = f"Init{self.config.api_name}Inputs<{tc.dtype}>"
             test_params.append(
                 f"{self.config.api_name}TestParams {{ {tc.data_size}, "
-                f"{dtype_info['size']}, {func_name} }}"
+                f"{dtype_info['size']}, {func_name}, {init_func_name} }}"
             )
         variables['TEST_PARAMS'] = ',\n        '.join(test_params)
 
@@ -859,6 +922,7 @@ class AIVUTGenerator(UTGenerator):
                 **variables,
                 'KERNEL_CLASS': self.render('aiv_kernel_class', variables),
                 'MAIN_FUNCTION': self.render('aiv_main_function', variables),
+                'INIT_FUNCTION': self.render('aiv_init_function', variables),
                 'PARAM_STRUCT': self.render('aiv_param_struct', variables),
                 'TEST_CLASS': self.render('aiv_test_class', variables),
                 'INSTANTIATION': self.render('aiv_instantiation', variables),
@@ -1005,6 +1069,8 @@ class RegComputeUTGenerator(UTGenerator):
 
 def create_generator(config: UTConfig) -> UTGenerator:
     """根据 API 类型创建对应的生成器"""
+    ensure_reference_constraints_loaded()
+
     generators = {
         ApiType.AIV: AIVUTGenerator,
         ApiType.AIC: AICUTGenerator,

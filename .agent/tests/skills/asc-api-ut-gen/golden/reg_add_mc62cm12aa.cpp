@@ -32,9 +32,16 @@ public:
         __VEC_SCOPE__ {
             // TODO: 实现寄存器级计算
         }
+        CopyOut();
     }
 
 private:
+    __aicore__ inline void CopyOut() {
+        for (uint32_t i = 0; i < nums; i++) {
+            dstGlobal.SetValue(i, src0Global.GetValue(i));
+        }
+    }
+
     GlobalTensor<T> dstGlobal;
     GlobalTensor<T> src0Global;
     GlobalTensor<Src1T> src1Global;

@@ -131,6 +131,45 @@ self_test_reference_key_reader
 read_json_object_keys expected_api_types "$GENERATION_CONSTRAINTS" "api_types" "generation constraints API types"
 read_json_object_keys expected_chips "$ARCH_FACTS" "chips" "npu arch chip facts"
 
+self_test_generator_helpers() {
+    python3 - "$SKILL_DIR" "$GENERATION_CONSTRAINTS" <<'PY'
+import json
+import sys
+
+skill_dir, constraints_path = sys.argv[1:3]
+sys.path.insert(0, f"{skill_dir}/scripts")
+
+from ut_generator import (  # noqa: E402
+    API_TYPE_CHOICES,
+    ApiType,
+    ChipArch,
+    TEMPLATES,
+    UTConfig,
+    UTGenerator,
+)
+from ut_generator_cli import default_kernel_params  # noqa: E402
+
+with open(constraints_path, encoding="utf-8") as f:
+    expected_api_types = list(json.load(f)["api_types"].keys())
+
+assert API_TYPE_CHOICES == expected_api_types
+assert default_kernel_params(ApiType.AIV.value) == {}
+assert default_kernel_params(ApiType.AIC.value) == {"m": 16, "k": 64, "n": 16}
+
+config = UTConfig(api_type=ApiType.AIV, api_name="Add", chip=ChipArch.ASCEND910B1)
+generator = UTGenerator(config)
+TEMPLATES["_self_template"] = "${A} ${B}"
+try:
+    rendered = generator.render("_self_template", {"A": "${B}", "B": "ok"})
+finally:
+    del TEMPLATES["_self_template"]
+
+assert rendered == "${B} ok"
+PY
+}
+
+self_test_generator_helpers
+
 run_case() {
     local name="$1"
     local fixture="${FIXTURE_DIR}/${name}.json"
@@ -150,6 +189,15 @@ run_case() {
     python3 "$CLI" --config "$fixture" --output "$actual" >/dev/null
     if grep -Eq 'template <[^>]*,[[:space:]]*Src1T([,>])' "$actual"; then
         fail "generated UT contains naked Src1T template parameter: $name"
+    fi
+    if [[ "$api_type" == "aiv" ]] && grep -Eq 'uint8_t (dstGm|src0Gm|src1Gm)\[[^]]*param\.data_size' "$actual"; then
+        fail "generated AIV UT must not allocate runtime-sized GM arrays on stack: $name"
+    fi
+    if [[ "$api_type" == "aiv" ]] && ! grep -Fq "param.init_func(src0Gm.data(), src1Gm.data(), param.data_size);" "$actual"; then
+        fail "generated AIV UT must initialize inputs through dtype-aware init function: $name"
+    fi
+    if [[ "$api_type" == "reg" ]] && ! grep -Fq "dstGlobal.SetValue(i, src0Global.GetValue(i));" "$actual"; then
+        fail "generated reg UT must write initialized data back to dst GM: $name"
     fi
     diff -u "$golden" "$actual" || fail "generated UT differs from golden: $name"
 }
@@ -179,9 +227,10 @@ grep -Fq "SIMT API only supports ascend950pr_9599" "$invalid_output" || \
 coverage_report="${WORK_DIR}/coverage.html"
 cat > "$coverage_report" <<'EOF'
 <html><body>
+<div>Lines: 1.0%</div>
 <table>
-<tr><td>Lines:</td><td>93.6%</td></tr>
-<tr><td>Functions:</td><td>91.2%</td></tr>
+<tr><td class="headerItem">Lines:</td><td class="headerCovTableEntryHi">93.6 %</td></tr>
+<tr><td class="headerItem">Functions:</td><td class="headerCovTableEntryHi">91.2 %</td></tr>
 </table>
 </body></html>
 EOF
@@ -210,6 +259,32 @@ assert report["elapsed_seconds"] >= 0
 assert report["current_coverage"]["status"] == "available"
 assert report["current_coverage"]["lines"] == 93.6
 assert report["current_coverage"]["functions"] == 91.2
+PY
+
+invalid_token_report_json="${WORK_DIR}/invalid-token-report.json"
+invalid_token_case="${WORK_DIR}/invalid_token_case.cpp"
+ASC_API_UT_PROMPT_TOKENS=abc \
+ASC_API_UT_COMPLETION_TOKENS=" 7 " \
+ASC_API_UT_TOTAL_TOKENS=bad \
+python3 "$CLI" \
+    --config "${FIXTURE_DIR}/add_aiv_ascend910b1.json" \
+    --output "$invalid_token_case" \
+    --report-json "$invalid_token_report_json" >/dev/null
+
+python3 - "$invalid_token_report_json" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as f:
+    report = json.load(f)
+
+token_usage = report["token_usage"]
+assert token_usage["source"] == "env"
+assert token_usage["prompt_tokens"] is None
+assert token_usage["completion_tokens"] == 7
+assert token_usage["total_tokens"] is None
+assert "ASC_API_UT_PROMPT_TOKENS" in token_usage["reason"]
+assert "ASC_API_UT_TOTAL_TOKENS" in token_usage["reason"]
 PY
 
 fixture_count=0

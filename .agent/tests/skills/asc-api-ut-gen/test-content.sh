@@ -137,7 +137,7 @@ if grep -Eq 'class Kernel\{ApiName\}|class Test\{ApiName\}CAPI|KERNEL_FIXPIPE' "
 fi
 
 for token in \
-    "class ApiType" \
+    "ApiType = Enum" \
     "ChipArch = Enum" \
     "class TestCase" \
     "class UTConfig" \

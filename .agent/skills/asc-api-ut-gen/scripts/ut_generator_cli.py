@@ -31,7 +31,7 @@ from ut_generator import (
     ApiType, ChipArch, TestCase, UTConfig,
     create_generator, DTYPE_MAP, GENERATOR_DTYPE_MAP, ARCH_DIR_MAP, NPU_ARCH_MAP,
     API_TYPE_MAP, API_TYPE_CHOICES, API_RESTRICTIONS,
-    CHIP_ARCH_BY_NAME, REFERENCE_CONSTRAINT_FILES
+    CHIP_ARCH_BY_NAME, REFERENCE_CONSTRAINT_FILES, ensure_reference_constraints_loaded
 )
 
 
@@ -58,13 +58,31 @@ def parse_coverage_report(report_path: Optional[str]) -> Dict[str, Any]:
     with open(report_path, "r", encoding="utf-8", errors="ignore") as f:
         content = f.read()
 
-    text = re.sub(r"<[^>]+>", " ", content)
-    text = re.sub(r"\s+", " ", text)
+    def normalize_html_text(fragment: str) -> str:
+        text = re.sub(r"<[^>]+>", " ", fragment)
+        return re.sub(r"\s+", " ", text).strip()
 
     def find_percent(label: str) -> Optional[float]:
-        match = re.search(rf"{label}[^0-9%]{{0,120}}([0-9]+(?:\.[0-9]+)?)\s*%", text, re.IGNORECASE)
+        label_re = re.escape(label)
+        header_pattern = re.compile(
+            rf'<td\b(?=[^>]*class=["\'][^"\']*\bheaderItem\b[^"\']*["\'])[^>]*>'
+            rf'\s*{label_re}:?\s*</td>\s*'
+            rf'<td\b(?=[^>]*class=["\'][^"\']*\bheaderCovTableEntry(?:Lo|Med|Hi)?\b[^"\']*["\'])[^>]*>'
+            rf'\s*([0-9]+(?:\.[0-9]+)?)\s*%',
+            re.IGNORECASE | re.DOTALL,
+        )
+        match = header_pattern.search(content)
         if match:
             return float(match.group(1))
+
+        for row in re.findall(r"<tr\b[^>]*>.*?</tr>", content, re.IGNORECASE | re.DOTALL):
+            row_text = normalize_html_text(row)
+            if not re.search(rf"(?:^|\s){label_re}\s*:", row_text, re.IGNORECASE):
+                continue
+            match = re.search(r"([0-9]+(?:\.[0-9]+)?)\s*%", row_text)
+            if match:
+                return float(match.group(1))
+
         return None
 
     lines = find_percent("Lines")
@@ -93,6 +111,21 @@ def get_token_usage(args: argparse.Namespace) -> Dict[str, Any]:
     completion = args.completion_tokens
     total = args.total_tokens
     source = "cli_args" if any(value is not None for value in [prompt, completion, total]) else None
+    reason = None
+
+    def parse_env_int(value: Optional[str], name: str, invalid: List[str]) -> Optional[int]:
+        if value is None:
+            return None
+
+        stripped = value.strip()
+        if not stripped:
+            return None
+
+        try:
+            return int(stripped)
+        except ValueError:
+            invalid.append(f"{name}={value!r}")
+            return None
 
     if source is None:
         env_prompt = os.getenv("ASC_API_UT_PROMPT_TOKENS")
@@ -100,9 +133,12 @@ def get_token_usage(args: argparse.Namespace) -> Dict[str, Any]:
         env_total = os.getenv("ASC_API_UT_TOTAL_TOKENS")
         if any(value is not None for value in [env_prompt, env_completion, env_total]):
             source = "env"
-            prompt = int(env_prompt) if env_prompt else None
-            completion = int(env_completion) if env_completion else None
-            total = int(env_total) if env_total else None
+            invalid_env = []
+            prompt = parse_env_int(env_prompt, "ASC_API_UT_PROMPT_TOKENS", invalid_env)
+            completion = parse_env_int(env_completion, "ASC_API_UT_COMPLETION_TOKENS", invalid_env)
+            total = parse_env_int(env_total, "ASC_API_UT_TOTAL_TOKENS", invalid_env)
+            if invalid_env:
+                reason = "忽略非法 token 环境变量: " + ", ".join(invalid_env)
 
     if total is None and prompt is not None and completion is not None:
         total = prompt + completion
@@ -121,7 +157,7 @@ def get_token_usage(args: argparse.Namespace) -> Dict[str, Any]:
         "completion_tokens": completion,
         "total_tokens": total,
         "source": source,
-        "reason": None
+        "reason": reason
     }
 
 
@@ -188,14 +224,17 @@ def create_default_config() -> Dict[str, Any]:
                 "additional_params": {}
             }
         ],
-        "kernel_params": {
-            "m": 16,
-            "k": 64,
-            "n": 16
-        },
+        "kernel_params": {},
         "custom_includes": [],
         "output_dir": None
     }
+
+
+def default_kernel_params(api_type: str) -> Dict[str, int]:
+    """Return default kernel params only for templates that consume them."""
+    if api_type == ApiType.AIC.value:
+        return {"m": 16, "k": 64, "n": 16}
+    return {}
 
 
 def validate_config(config: Dict[str, Any]) -> List[str]:
@@ -372,6 +411,12 @@ def main():
         print(json.dumps(template, indent=2, ensure_ascii=False))
         return 0
 
+    try:
+        ensure_reference_constraints_loaded()
+    except RuntimeError as exc:
+        print(f"结构化 reference 加载失败: {exc}", file=sys.stderr)
+        return 1
+
     # 列出支持的配置
     if args.list_supported:
         print("=== 结构化 reference 约束 ===")
@@ -430,7 +475,7 @@ def main():
             "api_name": args.api,
             "chip": args.chip,
             "test_cases": test_cases,
-            "kernel_params": {"m": 16, "k": 64, "n": 16},
+            "kernel_params": default_kernel_params(args.type),
             "custom_includes": [],
             "output_dir": args.output_dir
         }
