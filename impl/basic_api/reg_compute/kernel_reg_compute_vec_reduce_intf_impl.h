@@ -86,12 +86,20 @@ __simd_callee__ inline void ReduceMinWithDataBlock(U& dstReg, U srcReg, MaskReg 
 template <ReduceType type, typename T, MaskMergeMode mode, typename U>
 __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask)
 {
+    ReduceDataBlock<type, T, T, mode, U, U>(dstReg, srcReg, mask);
+}
+
+template <ReduceType type, typename T, typename U, MaskMergeMode mode, typename S, typename V>
+__simd_callee__ inline void ReduceDataBlock(S& dstReg, V srcReg, MaskReg mask)
+{
     if constexpr (type == ReduceType::SUM) {
-        ReduceSumWithDataBlockImpl<T, mode, U>(dstReg, srcReg, mask);
+        ReduceSumWithDataBlockImpl<T, U, mode, S, V>(dstReg, srcReg, mask);
     } else if constexpr (type == ReduceType::MAX) {
-        ReduceMaxWithDataBlockImpl<T, mode, U>(dstReg, srcReg, mask);
+        static_assert(std::is_same_v<S, V>, "ReduceDataBlock MAX requires same dst and src type. Use the single-type overload.");
+        ReduceMaxWithDataBlockImpl<T, mode, S>(dstReg, srcReg, mask);
     } else {
-        ReduceMinWithDataBlockImpl<T, mode, U>(dstReg, srcReg, mask);
+        static_assert(std::is_same_v<S, V>, "ReduceDataBlock MIN requires same dst and src type. Use the single-type overload.");
+        ReduceMinWithDataBlockImpl<T, mode, S>(dstReg, srcReg, mask);
     }
 }
 
