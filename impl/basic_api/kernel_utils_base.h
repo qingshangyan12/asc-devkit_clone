@@ -64,7 +64,7 @@ public:
             set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
         }
     #elif __NPU_ARCH__ == 3510
-        set_mask_norm();
+        g_counterModeFlag = false;
         Internal::g_deqValue = static_cast<half>(1);
         uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
         uint64_t val = 0x1000000000000008 | prevCtrl;
@@ -158,12 +158,20 @@ public:
 
     template <typename T> __aicore__ static inline void SetMaskCount()
     {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+        g_counterModeFlag = true;
+#else
         set_mask_count();
+#endif
     }
 
     template <typename T> __aicore__ static inline void SetMaskNorm()
     {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+        g_counterModeFlag = false;
+#else
         set_mask_norm();
+#endif
     }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||       \
