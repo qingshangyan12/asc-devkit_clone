@@ -1,0 +1,29 @@
+[
+  {
+    "rule_no": "1",
+    "rule_item_name": "StaticCheck_compliance_check",
+    "rule_name": "术语检查",
+    "rule_type": "规范性",
+    "rule_desc": "基于参考资料检查文档中的术语和产品名称是否满足以下规则：\n1、术语、专有名词需要和术语库中的英文定义、写法保持一致；\n2、产品名是否在固定名词范围内；\n3、如果整个句子的句首是单词（包含Markdown标题），则首字母大写（例如：Sentence caps），其他单词首字母不大写，并且专有名词和缩略语需遵循相应规范。",
+    "rule_level": "一般",
+    "reference_doc_path": "references\\术语和缩略语.md"
+  },
+  {
+    "rule_no": "2",
+    "rule_item_name": "StaticCheck_compliance_check",
+    "rule_name": "table规范",
+    "rule_type": "规范性",
+    "rule_desc": "Markdown和html语法中的表格不允许存在空白单元格，具体规则如下：\n1、如果是Markdown表格，按照“|”分隔单元格，检查每个单元格是否为空或者仅包含空格\n2、如果是HTML表格，遍历所有<td>元素，检查每个<td>元素的文本内容是否为空或者仅包含空格",
+    "rule_level": "提示",
+    "reference_doc_path": ""
+  },
+  {
+    "rule_no": "3",
+    "rule_item_name": "StaticCheck_compliance_check",
+    "rule_name": "安全合规检查",
+    "rule_type": "规范性",
+    "rule_desc": "避免使用领域敏感词（芯片名/最强/顶尖等）和个人隐私数据（如工号、IP、姓名、邮箱等），遵循华为规范",
+    "rule_level": "严重",
+    "reference_doc_path": "references\\敏感词和不规范用语（对内）.md"
+  }
+]

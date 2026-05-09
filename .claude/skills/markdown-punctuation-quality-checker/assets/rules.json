@@ -1,0 +1,74 @@
+[
+  {
+    "rule_no": "1",
+    "rule_item_name": "StaticCheck_punctuation_check",
+    "rule_name": "punctuation-check",
+    "rule_type": "规范性",
+    "rule_desc": "检查是否存在多余空格，规则如下：\n1、禁止出现多余空格。纯中文词语/句子间仅用1个空格分隔。\n2、中文标点（，。：？！）前不允许有空格。\n3、英文单词间仅1个空格；英文标点(.,:;)后仅 1 个空格；括号内侧无空格。\n4、代码、命令模块中的函数名与左括号间无空格（如print(a)而非print (a); acllnit()而非acllnit ()）。\n5、代码、命令模块中的参数间仅1个空格;参数名与等号间无空格(如func(epoch=10)而非func(epoch = 10))。\n6、代码按语言约定进行缩进与对齐（如Python用4个空格缩进，Java用4个空格或1个Tab）,同一代码块缩进量必须一致，禁止行尾多余空格（可通过\n编辑器 “删除行尾空格” 功能处理）。\n7、命令与参数间1个空格（如Is -1/home而非Is -1/home）；管道符（|）前后各1个空格（如cat log.txt | grep \"error\"而非cat log.txt|grep \"error\"）\n8、表格或结构化内容中文字前后无多余空格；数值/参数需紧凑呈现(如“2.0 版本” 而非“2 . 0 版本”)。\n9、变量名/文件名中间禁止空格（如 “model_config.json” 而非 “model config.json”; device_id而非device id）。\n10、路径与URL中整体无空格。\n11、英文单词、函数变量、函数名称、接口原型、目录和路径、参数、命令中间禁止出现多余空格。\n12、中文-中文间不加空格，中-英文混用间不加空格，中文-数字间不加空格。\n13、数字和单位之间禁止有多余空格",
+    "rule_level": "提示",
+    "reference_doc_path": ""
+  },
+  {
+    "rule_no": "2",
+    "rule_item_name": "StaticCheck_punctuation_check",
+    "rule_name": "punctuation-check",
+    "rule_type": "规范性",
+    "rule_desc": "检查是否缺少空格，规则如下：\n1、英文单词之间必须有空格，否则会被当作错误拼写。\n2、前一句子的句尾标点与下一个句子的首字母间有一个空格。【正例】：Wrong number! Please try again。\n3、带编号时，MSC、MS、slot等与数字或字母间有一个空格。【正例】：MSC1、MS1、slot3\n4、键盘组合快捷键在文本中出现时，“+”前后不留空格。【正例】：Ctrl+S\n5、英文标点与紧接的前一个英文单词之间没有空格。\n6、货币符号/代码与金额之间没有空格。【正例】：$3、CNY100\n7、短破折号en dash前后不留空格（作减号时除外），长破折号em dash前后加空格。【正例】：Value range:0-65536\n8、温度的数值和温度符号之间没有空格。【正例】：36℃\n9、“/”前后不加空格。\n10、±符号前后不加空格。【正例】：-48±20%\n11、大于/小于号(＞、＜、≥、≤)前后要加空格。【正例】：X ＞ Y ＞ Z\n12、对于圆括号，前半个括号与前面的单词有一空格，后半个括号与后接的词有一空格，括号内的首个字符及最后一个字符与括号间没有空格。【正例】：The user number (that is,MSISDN) is a numeric string of 13 characters.\n13、复合词中连字符前后不加空格，类似hot-and cold-rolled products结构的用法除外。\n14、表头单词和省略号之间不加空格。\n15、公式符号（=、~、<、>等）前后必须有空格。\n16、数值与单位符号中间不加空格。【正例】44.45mm\n17、软件包和版本号同时出现时，表达方式为：软件包名 + 空格 + 版本号。表示软件包名称和文件路径时除外。例如Nginx 1.14.2、nginx-1.14.2.tar.gz\n18、中英文混合场景，遵循中文习惯，一般不加空格。",
+    "rule_level": "提示",
+    "reference_doc_path": ""
+  },
+  {
+    "rule_no": "3",
+    "rule_item_name": "StaticCheck_punctuation_check",
+    "rule_name": "punctuation-check",
+    "rule_type": "规范性",
+    "rule_desc": "检查英文内容中是否使用了中文符号，规则如下：\n1、回显/代码示例/命令/参数的英文单词拼写中必须使用英文下划线（“_”）\n2、回显/代码示例/命令/参数的英文单词拼写中必须使用英文短横线（“-”），而不是中文中横线（“——”）\n3、回显/代码示例/命令等纯英文内容中不能包含中文标点符号（注释、字符串等例外）。例外场景：Linux回显信息中包含中文符号，如wget返回信息、命令/程序结果。",
+    "rule_level": "一般",
+    "reference_doc_path": ""
+  },
+  {
+    "rule_no": "4",
+    "rule_item_name": "StaticCheck_punctuation_check",
+    "rule_name": "punctuation-check",
+    "rule_type": "规范性",
+    "rule_desc": "禁止出现连续两个及以上标点符号。例外场景：成对标点符号后接结尾符号除外",
+    "rule_level": "严重",
+    "reference_doc_path": ""
+  },
+  {
+    "rule_no": "5",
+    "rule_item_name": "StaticCheck_punctuation_check",
+    "rule_name": "punctuation-check",
+    "rule_type": "规范性",
+    "rule_desc": "检查成对标点符号是否完整。\n例外场景：\n1.字符串中的使用半边小括号作为编号格式；\n2.回显里面的标点符号不成对；\n3.取值范围混合使用小括号和中括号，如“[0, 3)、[3, 6)、[6, 10)”",
+    "rule_level": "一般",
+    "reference_doc_path": ""
+  },
+  {
+    "rule_no": "6",
+    "rule_item_name": "StaticCheck_punctuation_check",
+    "rule_name": "punctuation-check",
+    "rule_type": "规范性",
+    "rule_desc": "检查段落里中英文标点符号是否混用，中文段落使用英文标点符号。例外场景：代码样例等英文段落除外",
+    "rule_level": "一般",
+    "reference_doc_path": ""
+  },
+  {
+    "rule_no": "7",
+    "rule_item_name": "StaticCheck_punctuation_check",
+    "rule_name": "punctuation-check",
+    "rule_type": "规范性",
+    "rule_desc": "检查路径符号是否使用错误，规则如下：1、分隔符错误。Windows中的反斜杠“\\\\”在代码中要转义成“\\\\\\\\”。【反例】C:\\\\Users\\\\name\\\\file.txt。Linux中要使用正斜杠“/”，例如：/home/name/file.txt。2、禁止分隔符混用，既有“\\\\”又有“/” 3、禁止分隔符重复，例如“//”或者“\\\\\\\\” 4、禁止路径中存在非法字符，非法字符有：<>:\"|?*+以及空格 5、检查相路径和绝对路径是否写法规范，统一小写",
+    "rule_level": "提示",
+    "reference_doc_path": ""
+  },
+  {
+    "rule_no": "8",
+    "rule_item_name": "StaticCheck_punctuation_check",
+    "rule_name": "punctuation-check",
+    "rule_type": "规范性",
+    "rule_desc": "检查正文中是否缺失标点符号。例如：句子末尾缺失句号等",
+    "rule_level": "一般",
+    "reference_doc_path": ""
+  }
+]

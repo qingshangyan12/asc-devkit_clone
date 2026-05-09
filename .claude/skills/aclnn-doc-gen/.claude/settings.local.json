@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node \"C:/Users/tzh19/.config/opencode/skills/aclnn-doc-gen/scripts/extract-call-example.js\" \"D:/work/canndoc-project/ops-nn/conv/convolution_forward\" \"aclnnConvolution\")"
+    ]
+  }
+}
