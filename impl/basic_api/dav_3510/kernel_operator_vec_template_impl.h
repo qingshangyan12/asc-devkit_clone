@@ -72,9 +72,7 @@ namespace AscendC {
 namespace Internal {
 __aicore__ inline bool IsCounterMode()
 {
-    // CTRL[56] as 1,for counter mask
-    constexpr uint32_t CTRL_COUNTER = 56;
-    return ((get_ctrl() >> CTRL_COUNTER) & 0x1) == 0x1;
+    return g_counterModeFlag;
 }
 
 template <bool isSetMask, bool isNormalMode, bool isMaskBitMode>
