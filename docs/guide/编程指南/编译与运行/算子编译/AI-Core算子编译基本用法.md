@@ -12,10 +12,10 @@ bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <o
 ```
 ![ ](../../../figures/aicore_compilation.png "aicore 编译流程示意图")
   
-- 异构编译 [LINK]()
+- 异构编译
 ```shell
   // ----- example.asc -----
-  //  指定核函数在Ai Core上执行
+  //  指定核函数在AI Core上执行
   __global__ __aicore__ kernel()
 
   bisheng  -c example.asc -o example.o --npu-arch=dav-xxxx  
@@ -25,7 +25,7 @@ bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <o
   bisheng main.cpp example.asc  -o main --npu-arch=dav-xxxx
 ```
 
-- 单独编译  [LINK]()
+- 单独编译
 
 bisheng异构编译默认采用的是全程序编译模式，该模式要在单个源文件X.asc中编译的设备程序，没有任何未解析的外部设备函数和变量引用。设备函数可以调用其他编译单元中定义的设备函数或访问其中定义的设备变量，但必须在bisheng命令行中指定  -dc 编译选项，才能启用不同编译单元间设备代码的链接功能。这种支持跨编译单元链接设备代码与符号的能力，被称为单独编译。
 
@@ -56,12 +56,12 @@ bisheng异构编译默认采用的是全程序编译模式，该模式要在单�
   bisheng definition.o example.o -o program
 ```
 
-- 动态库编译  [LINK]()
+- 动态库编译
 ```shell
   bisheng -shared example.asc -o libexample.so --npu-arch=dav-xxxx
 ```
 
--  静态库编译  [LINK]()
+-  静态库编译
 ```shell
   bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx
 ```
