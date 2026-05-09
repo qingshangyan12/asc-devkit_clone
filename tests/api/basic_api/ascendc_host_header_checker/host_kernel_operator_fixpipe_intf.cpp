@@ -9,3 +9,5 @@
 */
 
 #include "kernel_operator_fixpipe_intf.h"
+
+using AscendC::Fixpipe;
