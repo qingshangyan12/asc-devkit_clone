@@ -485,6 +485,8 @@ protected:
     }
     void TearDown()
     {
+        GlobalMockObject::verify();
+        GlobalMockObject::reset();
         SetGCoreType(0);
     }
 };
