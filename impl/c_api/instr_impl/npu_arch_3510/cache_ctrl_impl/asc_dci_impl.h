@@ -8,22 +8,25 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+/* !
+ * \file asc_dci_impl.h
+ * \brief
+ */
+
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_gm2ub_pad_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#warning "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_dci_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_ASC_SET_GM2UB_PAD_IMPL_H
-#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_ASC_SET_GM2UB_PAD_IMPL_H
+#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CACHE_CTRL_IMPL_ASC_DCI_IMPL_H
+#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CACHE_CTRL_IMPL_ASC_DCI_IMPL_H
 
-#include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
+#include "instr_impl/npu_arch_3510/utils_impl.h"
 
-__aicore__ inline void asc_set_gm2ub_pad_impl(uint32_t pad_val)
+__aicore__ inline void asc_dci_impl()
 {
-    if ASC_IS_AIV {
-        set_pad_val_outtoub(pad_val);
-    }
+    dci();
 }
 
 #endif
