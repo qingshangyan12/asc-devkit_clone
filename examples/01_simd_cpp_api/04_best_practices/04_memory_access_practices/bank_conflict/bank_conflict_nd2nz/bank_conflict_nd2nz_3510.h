@@ -1,0 +1,69 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. Please do not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+/* !
+ * \file bank_conflict_nd2nz_3510.h
+ * \brief Ascend 950 ND2NZ Regbase implementation for the bank conflict sample
+ */
+
+#ifndef BANK_CONFLICT_ND2NZ_3510_H
+#define BANK_CONFLICT_ND2NZ_3510_H
+
+#include "kernel_operator.h"
+
+#include <cstdint>
+
+namespace Nd2Nz3510 {
+// half 类型下 1 个 DataBlock/C0 固定为 32B，即 16 个 half 元素；该值不是可调 tiling 参数。
+constexpr uint32_t C0_ELEMS = 16;
+
+template <uint32_t tileH, uint32_t tileW, uint32_t vecLenHalf>
+__simd_vf__ inline void RegLoadStoreVF(__ubuf__ half* dstAddr, __ubuf__ half* srcAddr)
+{
+    static_assert(vecLenHalf > 0, "one vector instruction's half count must be greater than 0");
+    static_assert(tileW % C0_ELEMS == 0, "tileW must be a multiple of C0");
+    static_assert(vecLenHalf % C0_ELEMS == 0, "one vector instruction's half count must be a multiple of C0");
+    static_assert(tileW % vecLenHalf == 0, "tileW must be a multiple of one vector instruction's half count");
+
+    constexpr uint32_t dstNzC0Stride = (SCENARIO == 1) ? tileH : (tileH + 1);
+    constexpr uint32_t vecsPerRow = tileW / vecLenHalf;
+    constexpr uint32_t vecLenDbs = vecLenHalf / C0_ELEMS;
+
+    AscendC::Reg::RegTensor<half> reg;
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<half, AscendC::Reg::MaskPattern::ALL>();
+
+    for (uint16_t k = 0; k < vecsPerRow; ++k) {
+        const uint32_t dstColGroupOffset = k * vecLenDbs * dstNzC0Stride * C0_ELEMS;
+
+        for (uint16_t r = 0; r < tileH; ++r) {
+            AscendC::Reg::LoadAlign<half>(reg, srcAddr + r * tileW + k * vecLenHalf);
+
+            __ubuf__ half* dstRowAddr = dstAddr + dstColGroupOffset + r * C0_ELEMS;
+            AscendC::Reg::StoreAlign<half, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                dstRowAddr, reg, dstNzC0Stride, mask);
+        }
+    }
+}
+
+template <uint32_t tileH, uint32_t tileW, uint32_t vecLenHalf>
+__aicore__ inline void ComputeTileWithRegVF(
+    AscendC::LocalTensor<half>& ndBuf, AscendC::LocalTensor<half>& nzBuf, int32_t eventID)
+{
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(eventID);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(eventID);
+
+    RegLoadStoreVF<tileH, tileW, vecLenHalf>(
+        reinterpret_cast<__ubuf__ half*>(nzBuf.GetPhyAddr()),
+        reinterpret_cast<__ubuf__ half*>(ndBuf.GetPhyAddr()));
+
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(eventID);
+}
+} // namespace Nd2Nz3510
+
+#endif // BANK_CONFLICT_ND2NZ_3510_H
