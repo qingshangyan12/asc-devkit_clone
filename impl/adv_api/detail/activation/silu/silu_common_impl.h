@@ -45,7 +45,7 @@ __aicore__ inline void SiluCalcSimplified(
     Exp<T, false>(dstAddr, dstAddr, MASK_PLACEHOLDER, repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
-    Adds<T, false>(dstAddr, dstAddr, 1.0, MASK_PLACEHOLDER, repeatTimes, unaryParams);
+    Adds<T, false>(dstAddr, dstAddr, static_cast<T>(1.0), MASK_PLACEHOLDER, repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
     // silu(x) = x / x1

@@ -38,11 +38,11 @@ __aicore__ inline void BrcFirstBlockByAdds(
     for (uint32_t m = 0; m < repeat; m++) {
         for (uint32_t i = 0; i < params.oriBloop; i++) {
             Adds<float, false>(
-                dst[firstOffset + m * firstOffset], dst, 0, MASK_PLACEHOLDER, MAX_REPEAT_TIMES, addsUnaryParams);
+                dst[firstOffset + m * firstOffset], dst, static_cast<float>(0), MASK_PLACEHOLDER, MAX_REPEAT_TIMES, addsUnaryParams);
         }
         if (params.oriBTail) {
             Adds<float, false>(
-                dst[firstOffset + m * firstOffset], dst, 0, MASK_PLACEHOLDER, (uint8_t)params.oriBTail,
+                dst[firstOffset + m * firstOffset], dst, static_cast<float>(0), MASK_PLACEHOLDER, (uint8_t)params.oriBTail,
                 addsUnaryParams);
         }
     }
@@ -53,12 +53,12 @@ __aicore__ inline void BrcFirstBlockByAdds(
         for (uint32_t i = 0; i < params.oriBloop; i++) {
             Adds<float, false>(
                 dst[BASIC_BLOCK_LEN_V220 + m * BASIC_BLOCK_LEN_V220 + i * params.oriBTmpLoopOffset],
-                dst[i * params.oriBTmpLoopOffset], 0, MASK_PLACEHOLDER, MAX_REPEAT_TIMES, addsUnaryParams);
+                dst[i * params.oriBTmpLoopOffset], static_cast<float>(0), MASK_PLACEHOLDER, MAX_REPEAT_TIMES, addsUnaryParams);
         }
         if (params.oriBTail) {
             Adds<float, false>(
                 dst[BASIC_BLOCK_LEN_V220 + m * BASIC_BLOCK_LEN_V220 + params.oriBTmpTailOffset],
-                dst[params.oriBTmpTailOffset], 0, MASK_PLACEHOLDER, (uint8_t)params.oriBTail, addsUnaryParams);
+                dst[params.oriBTmpTailOffset], static_cast<float>(0), MASK_PLACEHOLDER, (uint8_t)params.oriBTail, addsUnaryParams);
         }
     }
     PipeBarrier<PIPE_V>();
