@@ -105,29 +105,49 @@ public:
     __aicore__ inline ~ListTensorDesc() {}
     __aicore__ inline ListTensorDesc(__gm__ void* data, uint32_t length = 0xffffffff, uint32_t shapeSize = 0xffffffff)
     {
+        #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
+            (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
+            (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
+            (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
         listTensorDesc.ListTensorDecode(data, length, shapeSize);
+        #endif
     }
     __aicore__ inline void Init(__gm__ void* data, uint32_t length = 0xffffffff, uint32_t shapeSize = 0xffffffff)
     {
+        #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
+            (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
+            (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
+            (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
         listTensorDesc.ListTensorDecode(data, length, shapeSize);
+        #endif
     }
     template<class T> __aicore__ inline void GetDesc(TensorDesc<T>& desc, uint32_t index)
     {
-        #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
+        #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
             (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
             (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
-            (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+            (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
         listTensorDesc.GetDesc(&desc.tensorDesc, index);
         #endif
     }
 
     template<class T> __aicore__ inline __gm__ T* GetDataPtr(uint32_t index)
     {
+        #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
+            (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
+            (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
+            (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
         return listTensorDesc.GetDataPtr<T>(index);
+        #endif
     }
     __aicore__ inline uint32_t GetSize()
     {
+        #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
+            (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
+            (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
+            (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
         return listTensorDesc.GetSize();
+        #endif
     }
 private:
      #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
