@@ -49,11 +49,10 @@ __aicore__ inline void AssembleHcclMsgExt(const AlltoAllVParamExt &param, uint32
 }
 
 __aicore__ inline void AssembleHcclMsg(const CommonPrepareParam &param, HcclTilingVersion ver, HcclHandle handle,
-                                       uint64_t tiling, __gm__ HcclMsg *dst, __gm__ ControlHcclMsg *controlMsgGM)
+                                       uint64_t tiling, __gm__ HcclMsg *dst, __gm__ ControlHcclMsg *controlMsgGM,
+                                       uint8_t &primitiveId, bool &isResetPrimitiveId)
 {
     HcclMsg tmp{};
-    static uint8_t primitiveId = 0U;
-    static bool isResetPrimitiveId = false;
     FlushDataCache(controlMsgGM);
     if (controlMsgGM->resetSeq > 0) {
         controlMsgGM->resetSeq = 0;
