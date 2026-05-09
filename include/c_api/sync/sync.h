@@ -53,13 +53,21 @@ __aicore__ inline void asc_sync();
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-#define asc_sync_intra_arrive(pipe, sync_id) set_intra_block((pipe), (sync_id))
-
-#define asc_sync_intra_wait(pipe, sync_id) wait_intra_block((pipe), (sync_id))
-
 #define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
 
 #define asc_sync_block_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
+
+#else
+
+#define asc_sync_inter_wait(pipe, flag_id) (void)0
+
+#define asc_sync_block_wait(pipe, flag_id) (void)0
+
+#endif
+
+#define asc_sync_intra_arrive(pipe, sync_id) set_intra_block((pipe), (sync_id))
+
+#define asc_sync_intra_wait(pipe, sync_id) wait_intra_block((pipe), (sync_id))
 
 enum ascMutexExecuteMode {
     ASC_LOCK_BLOCK = 0,    // Block the execution of the pipeline indicated by pipe (Default).
@@ -69,8 +77,6 @@ enum ascMutexExecuteMode {
 #define asc_lock(pipe, mutex_id, ...) asc_lock_impl((pipe), (mutex_id), (ASC_LOCK_BLOCK, ##__VA_ARGS__))
 
 #define asc_unlock(pipe, mutex_id, ...) asc_unlock_impl((pipe), (mutex_id), (ASC_LOCK_BLOCK, ##__VA_ARGS__))
-
-#endif
 
 #endif
 
