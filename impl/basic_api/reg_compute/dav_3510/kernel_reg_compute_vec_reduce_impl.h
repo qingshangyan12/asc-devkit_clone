@@ -240,16 +240,8 @@ __simd_callee__ inline void ReduceSumWithDataBlockImpl(S& dstReg, V srcReg, Mask
     using ActualSrcRegT = typename V::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualDstRegT>, "T type is not correct!");
     static_assert(std::is_same_v<U, DefaultType> || std::is_same_v<U, ActualSrcRegT>, "U type is not correct!");
-    if constexpr (std::is_same_v<ActualSrcRegT, int16_t>) {
-        static_assert(std::is_same_v<ActualDstRegT, int32_t>,
-                      "ReduceDataBlock SUM with int16_t src requires int32_t dst for precision");
-    }
-    if constexpr (std::is_same_v<ActualSrcRegT, uint16_t>) {
-        static_assert(std::is_same_v<ActualDstRegT, uint32_t>,
-                      "ReduceDataBlock SUM with uint16_t src requires uint32_t dst for precision");
-    }
     static_assert((SupportType<Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int16_t>,
-                  Tuple<uint32_t, uint16_t>, Tuple<uint32_t, uint32_t>,  Tuple<int32_t, int32_t>,
+                  Tuple<uint32_t, uint16_t>, Tuple<uint32_t, uint32_t>, Tuple<int32_t, int32_t>,
                   Tuple<half, half>, Tuple<float, float>>()),
                   "ReduceDataBlock unsupport this datatype on current device");
     static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
@@ -261,7 +253,14 @@ __simd_callee__ inline void ReduceSumWithDataBlockImpl(S& dstReg, V srcReg, Mask
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void ReduceSumWithDataBlockImpl(U& dstReg, U srcReg, MaskReg mask)
 {
-    ReduceSumWithDataBlockImpl<T, T, mode, U, U>(dstReg, srcReg, mask);
+    using ActualT = typename U::ActualT;
+    static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert((SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
+                  "ReduceDataBlock unsupport this datatype on current device");
+    static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
+                  "current ReduceDataBlock api only supported Mode ZEROING on current device!");
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vcgadd(dstReg, srcReg, mask, modeValue);
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
@@ -309,4 +308,3 @@ __simd_callee__ inline void PairReduceSumImpl(U& dstReg, U srcReg, MaskReg mask)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_REDUCE_IMPL__
 #endif
-
