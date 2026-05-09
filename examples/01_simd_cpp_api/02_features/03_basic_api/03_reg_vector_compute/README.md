@@ -24,3 +24,4 @@
 | [mergemode](./mergemode) | 本样例基于RegBase编程范式综合演示MaskMergeMode::MERGING + postUpdate + UpdateMask + ReduceMax |
 | [data_relayout](./data_relayout) | 本样例基于RegBase编程范式演示Interleave和Pack接口实现数据重排（Interleave交织 + Pack低位提取） |
 | [gather](./gather) | 本样例基于RegBase编程范式演示Gather接口（源操作数为寄存器）按索引收集元素，使用LoadAlign/StoreAlign的postUpdate模式 |
+| [trait](./trait)                 | 本样例基于RegBase编程范式实现Div运算，使用LoadAlign/StoreAlign的postUpdate模式，使用int64_t类型数据，演示单核情况下RegTensor位2倍宽数据处理性能优势       |
