@@ -1,8 +1,0 @@
-{
-  "permission": {
-      "external_directory": {
-      "/Users/zhizhang/HW/results/*": "allow"
-      }
-  }
-}
-
