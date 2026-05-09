@@ -9,8 +9,8 @@
 ![](../../../../figures/图1-开发Ascend-C算子的基本流程.png)
 
 >[!NOTE]说明
->-  静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
->-  本节涉及的完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/add_high_performance)。
+>- 静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
+>- 本节涉及的完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/add_high_performance)。
 
 ## 编程范式<a name="section1486516584319"></a>
 
@@ -798,6 +798,13 @@
 <td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p99871335184114"><a name="p99871335184114"></a><a name="p99871335184114"></a>SetMaskCount、SetMaskNorm、SetVectorMask、ResetMask</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18988435204114"><a name="p18988435204114"></a><a name="p18988435204114"></a>-</p>
+</td>
+</tr>
+<tr id="row098783516418"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p139874354418"><a name="p139874354418"></a><a name="p139874354418"></a>基础API &gt; 矢量计算 &gt; 数据重排</p>
+</td>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p99871335184115"><a name="p99871335184115"></a><a name="p99871335184115"></a>Interleave、DeInterleave</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18988435204115"><a name="p18988435204115"></a><a name="p18988435204115"></a>-</p>
 </td>
 </tr>
 <tr id="row1598863534117"><td class="cellrowborder" rowspan="6" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p1998811353419"><a name="p1998811353419"></a><a name="p1998811353419"></a>基础API &gt; 数据搬运 &gt; DataCopy</p>
