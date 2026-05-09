@@ -39,7 +39,7 @@ __aicore__ inline void DropOutBitModeInit(const LocalTensor<T>& sharedTmpBuffer)
 
     // reset cmp mask vsel mode 1, sharedTmpBuffer length need >= 256 Byte
     UnaryRepeatParams unaryParams;
-    Muls<int16_t, false>(stackBuffer, stackBuffer, 0, MASK_PLACEHOLDER, 1, unaryParams);
+    Muls<int16_t, false>(stackBuffer, stackBuffer, static_cast<int16_t>(0), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 
     SetCmpMask<int16_t>(stackBuffer);
