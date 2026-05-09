@@ -90,3 +90,5 @@ TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, ui
 TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, uint32_t, half);
 TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, uint32_t, uint32_t);
 TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix_bf16, bfloat16_t, bfloat16_t);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix_h, bfloat16_t, half);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix_ui, bfloat16_t, uint32_t);
