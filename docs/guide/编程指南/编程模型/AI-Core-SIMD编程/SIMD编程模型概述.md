@@ -1,6 +1,6 @@
 # SIMD编程模型概述<a name="ZH-CN_TOPIC_SIMD_OVERVIEW"></a>
 
-在[编程模型概述](../编程模型概述.md)中，我们已经了解了SIMD（Single Instruction Multiple Data）编程范式的定位——它面向昇腾AI Core的矢量计算和矩阵计算单元，采用"单指令处理多数据"的并行模式，是Ascend C最经典、最成熟的编程范式。本文将展开介绍SIMD编程的核心流程、支持的算子类型与能力范围、以及Ascend C提供的多种SIMD编程API，帮助开发者快速建立对SIMD编程体系的整体认知，并选择最适合自身业务场景的编程方式。
+在[编程模型概述](../编程模型概述.md)中，我们已经了解了SIMD（Single Instruction Multiple Data）编程模型的定位——它面向昇腾AI Core的矢量计算和矩阵计算单元，采用“单指令处理多数据的并行模式，是Ascend C最经典、最成熟的编程模型。本文将展开介绍SIMD编程的核心流程、支持的算子类型与能力范围、以及Ascend C提供的多种SIMD编程API，帮助开发者快速建立对SIMD编程体系的整体认知，并选择最适合自身业务场景的编程方式。
 
 ## SIMD核函数编程四步法<a name="section_simd_four_steps"></a>
 
@@ -8,11 +8,16 @@ SIMD核函数的开发过程可以归纳为**四个关键步骤**：内存分配
 
 ```mermaid
 flowchart TD
-    A["Step 1: 内存分配<br/>在AI Core内部存储上<br/>为输入输出分配空间"] --> B["Step 2: 数据搬入<br/>GM → Local Memory<br/>(UB/L1/L0A/L0B)"]
-    B -->|"SYNC 搬入完成"| C["Step 3: 计算执行<br/>Vector/Cube<br/>矢量计算/矩阵计算"]
-    C -->|"SYNC 计算完成"| D["Step 4: 数据搬出<br/>Local Memory → GM<br/>搬出完成后可能需要核间同步"]
+    subgraph Main_Pipeline [" "]
+        direction TB
+        A["Step 1: 内存分配<br/>在AI Core内部存储上<br/>为输入输出分配空间"] --> B["Step 2: 数据搬入<br/>GM → Local Memory<br/>(UB/L1/L0A/L0B)"]
+        B -->|"SYNC 搬入完成"| C["Step 3: 计算执行<br/>Vector/Cube<br/>矢量计算/矩阵计算"]
+        C -->|"SYNC 计算完成"| D["Step 4: 数据搬出<br/>Local Memory → GM<br/>搬出完成后可能需要核间同步"]
+        D -->|"SYNC 搬出完成"| B
+    end
 
     C --> E{"计算类型"}
+
     E -->|矢量计算| F["Vector算子<br/>向量运算（Add/Mul等）"]
     E -->|矩阵计算| G["Cube算子<br/>矩阵乘（MMAD等）"]
     E -->|融合计算| H["Mix算子<br/>矩阵+向量融合<br/>（MatMul+Activation等）"]
@@ -27,6 +32,8 @@ flowchart TD
     style G fill:#F3E5F5,stroke:#9C27B0,color:#1A1A1A
     style H fill:#F3E5F5,stroke:#9C27B0,color:#1A1A1A
     style SYNC_NOTE fill:#FFEBEE,stroke:#E53935,color:#1A1A1A
+    
+    style Main_Pipeline fill:none,stroke:none
 ```
 
 这四个步骤的具体含义如下：
@@ -37,7 +44,7 @@ flowchart TD
 
 - **Step 3 计算执行**：在Local Memory上执行具体的计算操作。根据算子类型的不同，计算可能由Vector单元（矢量计算）、Cube单元（矩阵计算）或两者协同（融合计算）完成。**计算执行完成后，同样需要插入同步事件，确保所有计算结果已写入Local Memory，然后才能启动数据搬出操作。**
 
-- **Step 4 数据搬出**：将计算结果从Local Memory搬回Global Memory（MTE3搬运流水线），**数据搬出完成后，同样插入同步实践，确保所有计算结果已搬回Global Memory，才能启动新一轮数据搬入操作；搬出完成后，如果涉及多核协作或需要保证后续核间数据一致性，还需要进行核间同步。**
+- **Step 4 数据搬出**：将计算结果从Local Memory搬回Global Memory（MTE3搬运流水线），**数据搬出完成后，同样插入同步事件，确保所有计算结果已搬回Global Memory，才能启动新一轮数据搬入操作；搬出完成后，如果涉及多核协作或需要保证后续核间数据一致性，还需要进行核间同步。**
 
 > **同步——SIMD编程的核心课题**
 >
@@ -48,7 +55,6 @@ flowchart TD
 > | 搬入完成 → 计算开始 | 确保输入数据搬入Local Memory后再进行计算 | `asc_sync_notify/wait`、`SetFlag/WaitFlag`、TQue的`EnQue/DeQue` |
 > | 计算完成 → 搬出开始 | 确保计算结果全部写入Local Memory后再进行数据搬出 | 同上 |
 > | 搬出完成 → 流水线循环 | 确保上次计算结果搬回Global Memory后再进行下一次数据的搬入 | 同上 |
-> | 核间搬出完成 → 多核协作 | 确保所有核的计算结果已写回GM | 核间同步原语 |
 >
 > 正确的同步控制是SIMD编程中**最容易出错**的环节——同步不足会导致数据竞争和计算错误，同步过多则会降低流水线并行度、影响性能。开发者需要根据所选编程API（C指针编程、C++ Tensor编程或TPipe/TQue框架编程）的不同同步管理方式，合理设计同步策略。
 
@@ -57,7 +63,7 @@ flowchart TD
 
 ## SIMD编程支持的能力范围<a name="section_capability_scope"></a>
 
-SIMD编程范式覆盖昇腾AI Core上的三大类算子，每一类算子对应不同的计算单元和数据通路，其编程流程也与"四步法"中的步骤紧密关联：
+SIMD编程模型覆盖昇腾AI Core上的三大类算子，每一类算子对应不同的计算单元和数据通路，其编程流程也与"四步法"中的步骤紧密关联：
 
 | 算子类型 | 计算单元 | 主要存储层次 | 典型场景 | 四步法要点 |
 |---------|---------|------------|---------|-----------|
@@ -67,7 +73,7 @@ SIMD编程范式覆盖昇腾AI Core上的三大类算子，每一类算子对应
 
 ### 矢量计算场景
 
-矢量计算是SIMD编程中最基础也最常用的场景，数据通路由Global Memory到Unified Buffer再到Vector计算单元构成。典型算子包括：
+矢量计算是SIMD编程中最基础且核心的场景。其典型数据链路遵循“搬入-计算-搬出”的闭环逻辑：数据从Global Memory搬运至Unified Buffer，经Vector计算单元处理后，最终写回Global Memory。典型算子包括：
 
 - **逐元素运算**：Add、Sub、Mul、Div等
 - **归约运算**：WholeReduceSum、BlockReduceMax等
@@ -123,7 +129,7 @@ C API提供纯C风格的接口，通过地址限定符（`__gm__`、`__ubuf__`�
 | 计算接口 | `asc_add`、`asc_copy_gm2ub`等C风格接口，参数为指针地址 |
 | 适用场景 | 追求极致性能、需要最精细控制、习惯C语言开发的场景 |
 
-C API是Ascend C SIMD编程中**最底层的接口**，适合对性能极度敏感或有C语言开发习惯的开发者。详细的C API编程说明请参考[C指针编程](C指针编程/C指针编程概述.md)章节。
+C API是Ascend C SIMD编程中**最底层的接口**，适合对性能极度敏感或有C语言开发习惯的开发者。详细的C API编程说明请参考[C指针编程](SIMD编程/基于语言扩展层C-API编程.md)章节。
 
 ### 基于Tensor的C++编程（基础API / Tensor API）
 
@@ -139,7 +145,7 @@ C API是Ascend C SIMD编程中**最底层的接口**，适合对性能极度敏�
 | 计算接口 | `Add`、`DataCopy`等C++接口，参数为`LocalTensor`对象 |
 | 适用场景 | 大多数算子开发场景，平衡开发效率与性能，需要灵活内存管理 |
 
-基于Tensor的编程方式可以进一步分为**静态Tensor编程**和**基于TPipe/TQue框架编程**两种路径。静态Tensor编程跳过TPipe框架的初始化开销，直接构造`LocalTensor`，适合追求极致性能的场景。详细的C++ Tensor编程说明请参考[C++ Tensor编程](C++-Tensor编程/C++-Tensor编程概述.md)章节。
+基于Tensor的编程方式可以进一步分为**静态Tensor编程**和**基于TPipe/TQue框架编程**两种路径。静态Tensor编程跳过TPipe框架的初始化开销，直接构造`LocalTensor`，适合追求极致性能的场景。详细的C++ Tensor编程说明请参考[C++ Tensor编程](SIMD编程/静态Tensor编程.md)章节。
 
 ### 基于TPipe/TQue框架编程
 
@@ -155,7 +161,7 @@ TPipe/TQue框架在C++ Tensor编程之上提供了更高层的抽象：通过`TP
 | 计算接口 | 与C++ Tensor编程相同的计算API |
 | 适用场景 | 快速开发、入门学习、算子功能验证，不希望深入理解同步机制的场景 |
 
-TPipe/TQue框架是开发效率最高的SIMD编程方式，特别适合初学者快速上手和功能验证。详细的TPipe/TQue编程说明请参考[TPipe&TQue框架编程](TPipe&TQue框架编程/TPipe-TQue概述.md)章节。
+TPipe/TQue框架是开发效率最高的SIMD编程方式，特别适合初学者快速上手和功能验证。详细的TPipe/TQue编程说明请参考[TPipe&TQue框架编程](SIMD编程/基于TPipe和TQue编程.md)章节。
 
 ### 三种编程方式的对比与选择
 
@@ -201,16 +207,16 @@ flowchart LR
 
 **Membase矢量计算的工作流程：**
 
-1. 将数据从Global Memory搬运到Unified Buffer
-2. 调用Membase计算API（如`Add`、`Mul`），这些API直接在UB上的LocalTensor之间操作
-3. 计算结果仍然存放在UB的LocalTensor中
-4. 将结果从UB搬运回Global Memory
+1. 将数据从Global Memory搬运到Unified Buffer。
+2. 调用Membase计算API（如`Add`、`Mul`），这些API直接在UB上的LocalTensor之间操作。
+3. 计算结果仍然存放在UB的LocalTensor中。
+4. 将结果从UB搬运回Global Memory。
 
 **特征：**
-- 数据在UB上完成计算，中间结果也在UB暂存
-- API参数为`LocalTensor`，无需开发者管理寄存器
-- 编程简洁，适合大多数矢量计算场景
-- 每次计算操作涉及UB的读/写，存在内存访问开销
+- 数据在UB上完成计算，中间结果也在UB暂存。
+- API参数为`LocalTensor`，无需开发者管理寄存器。
+- 编程简洁，适合大多数矢量计算场景。
+- 每次计算操作涉及UB的读/写，存在内存访问开销。
 
 ### Regbase矢量计算
 
@@ -219,7 +225,11 @@ flowchart LR
 ```mermaid
 flowchart LR
     GM2["Global Memory<br/>(GM)"] -->|"DataCopy<br/>搬入"| UB2["Unified Buffer<br/>(Local Memory)"]
-    UB2 <-->|"Load/Store<br/>搬运指令"| REG["VF Registers<br/>(RegTensor等)"]
+    
+    %% 拆分为两条单向线
+    UB2 -->|"Load<br/>搬入指令"| REG["VF Registers<br/>(RegTensor等)"]
+    REG -->|"Store<br/>搬出指令"| UB2
+    
     REG -->|"Reg API<br/>寄存器级计算"| VEC2["Vector<br/>计算单元"]
     VEC2 -->|"结果写回"| REG
     UB2 -->|"DataCopy<br/>搬出"| GM2
@@ -232,17 +242,17 @@ flowchart LR
 
 **Regbase矢量计算的工作流程：**
 
-1. 将数据从Global Memory搬运到Unified Buffer
-2. 通过`LoadAlign`/`LoadUnAlign`指令，将UB中的数据加载到Reg矢量计算寄存器（RegTensor）
-3. 在寄存器上调用Reg计算API（如`AscendC::Reg::Add`）完成计算
-4. 通过`StoreAlign`/`StoreUnAlign`指令，将计算结果从寄存器存回UB
-5. 将结果从UB搬运回Global Memory
+1. 将数据从Global Memory搬运到Unified Buffer。
+2. 通过`LoadAlign`/`LoadUnAlign`指令，将UB中的数据加载到Reg矢量计算寄存器（RegTensor）。
+3. 在寄存器上调用Reg计算API（如`AscendC::Reg::Add`）完成计算。
+4. 通过`StoreAlign`/`StoreUnAlign`指令，将计算结果从寄存器存回UB。
+5. 将结果从UB搬运回Global Memory。
 
 **特征：**
-- 数据在寄存器中完成计算，中间结果可暂存在寄存器中，**无需搬回UB**
-- API参数为`RegTensor`等寄存器对象，需开发者手动管理Load/Store
-- 寄存器容量有限（每次处理VL长度），需要数据切分和循环控制
-- 减少了UB读/写开销，适合对性能极度敏感的场景
+- 数据在寄存器中完成计算，中间结果可暂存在寄存器中，**无需搬回UB**。
+- API参数为`RegTensor`等寄存器对象，需开发者手动管理Load/Store。
+- 寄存器容量有限（每次处理VL长度），需要数据切分和循环控制。
+- 减少了UB读/写开销，适合对性能极度敏感的场景。
 
 ### Membase与Regbase的对比
 
@@ -263,26 +273,26 @@ flowchart LR
 > **选择建议：**
 >
 > **使用Membase的场景：**
-> - 简单的逐元素运算（Add、Mul、Sub等），单步计算即完成
-> - 算子开发初期，优先快速实现功能
-> - 数据访问模式规整，对中间结果暂存没有特殊需求
+> - 简单的逐元素运算（Add、Mul、Sub等），单步计算即完成。
+> - 算子开发初期，优先快速实现功能。
+> - 数据访问模式规整，对中间结果暂存没有特殊需求。
 >
 > **使用Regbase的场景：**
-> - 多步连续计算（如先Add再Mul再Relu），中间结果可暂存寄存器减少UB访问
-> - 追求极致性能的矢量计算，需要精细控制数据搬运
-> - 复杂的地址计算和循环模式，需要灵活的地址偏移管理
-> - 非对齐数据访问场景，需要使用`UnalignReg`处理非对齐地址
+> - 多步连续计算（如先Add再Mul再Relu），中间结果可暂存寄存器减少UB访问。
+> - 追求极致性能的矢量计算，需要精细控制数据搬运。
+> - 复杂的地址计算和循环模式，需要灵活的地址偏移管理。
+> - 非对齐数据访问场景，需要使用`UnalignReg`处理非对齐地址。
 
 无论选择Membase还是Regbase，两者可以灵活组合使用——例如在同一个算子中，部分操作使用Membase API（简单运算），部分使用Regbase API（复杂计算链），在开发效率和性能之间取得最优平衡。
 
 > [!NOTE]
 > 关于Membase矢量计算的详细编程说明，请参考：
-> - C指针方式：[基于指针的Membase矢量计算](C指针编程/基于指针的Membase矢量计算.md)
-> - C++ Tensor方式：[基础Tensor编程](C++-Tensor编程/基础Tensor编程.md)
+> - C指针方式：[基于指针的Membase矢量计算](C指针编程/基于指针的Membase矢量计算.md)。
+> - C++ Tensor方式：[基础Tensor编程](C++-Tensor编程/基础Tensor编程.md)。
 >
 > 关于Regbase矢量计算的详细编程说明，请参考：
-> - C指针方式：[基于指针的Regbase矢量计算](C指针编程/基于指针的Regbase矢量计算.md)
-> - C++ Tensor方式：[Regbase矢量计算](C++-Tensor编程/Regbase矢量计算.md)
+> - C指针方式：[基于指针的Regbase矢量计算](C指针编程/基于指针的Regbase矢量计算.md)。
+> - C++ Tensor方式：[Regbase矢量计算](C++-Tensor编程/Regbase矢量计算.md)。
 
 ## 后续章节导引<a name="section_next_chapters"></a>
 
