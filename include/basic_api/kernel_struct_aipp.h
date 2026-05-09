@@ -91,12 +91,16 @@ struct AippColorSpaceConvParams {
 };
 
 template <typename T> struct AippParams {
+#if defined(__NPU_ARCH__) &&                                                   \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) ||                       \
+     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     AippPaddingParams<T> paddingParams;
     AippSwapParams swapParams;
     AippSingleLineParams singleLineParams;
     AippDataTypeConvParams dtcParams;
     AippChannelPaddingParams<T> cPaddingParams;
     AippColorSpaceConvParams cscParams;
+#endif // (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002)
 };
 } // namespace AscendC
 #endif // ASCENDC_MODULE_STRUCT_AIPP_H

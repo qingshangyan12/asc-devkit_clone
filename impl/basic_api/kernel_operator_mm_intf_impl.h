@@ -77,6 +77,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     LoadDataImpl<Dst, Src, T>(dst, src, loadDataParams);
 }
 #endif
+
 /* **************************************************************************************************
  * LoadData 2dV2                                             *
  * ************************************************************************************************* */
@@ -248,6 +249,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     LoadDataImpl<Dst, Src, T>(dst, src, loadDataParams);
 }
 #endif
+
 /* **************************************************************************************************
  * LoadData 3dv2Pro                                             *
  * enhanced from v1, suitable for aicore > 200                                             *
@@ -519,6 +521,7 @@ __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const Fm
     SetFmatrixImpl(param, fmatrixMode);
 }
 #endif
+
 
 /* **************************************************************************************************
  * SetLoadDataBoundary                                             *

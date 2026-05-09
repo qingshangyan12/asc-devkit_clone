@@ -166,7 +166,7 @@ __aicore__ inline void CumSumLastDim(
     SetMaskCount();
     SetVectorMask<T>(0, cumSumInfo.outter * cumSumInfo.inner);
     Adds<T, false>(
-        dstTensor, tempBuffer2, 0, MASK_PLACEHOLDER, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+        dstTensor, tempBuffer2, static_cast<T>(0), MASK_PLACEHOLDER, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
     PipeBarrier<PIPE_V>();
     SetMaskNorm();
     ResetMask();
@@ -309,7 +309,7 @@ __aicore__ inline void CumSumLastDim(
     SetMaskCount();
     SetVectorMask<float>(0, cumSumInfo.outter * cumSumInfo.inner);
     Adds<float, false>(
-        dstTensor, tempBuffer2, 0, MASK_PLACEHOLDER, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+        dstTensor, tempBuffer2, static_cast<float>(0), MASK_PLACEHOLDER, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
     PipeBarrier<PIPE_V>();
     SetMaskNorm();
     ResetMask();
@@ -359,7 +359,7 @@ __aicore__ inline void CumSumFirstDim(
         SetMaskCount();
         SetVectorMask<T>(0, cumSumInfo.inner);
         Adds<T, false>(
-            dstTensor, srcTensor, 0, MASK_PLACEHOLDER, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+            dstTensor, srcTensor, static_cast<T>(0), MASK_PLACEHOLDER, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
         PipeBarrier<PIPE_V>();
         const BinaryRepeatParams binaryParams;
         for (uint32_t row = 1; row < cumSumInfo.outter; ++row) {
@@ -427,7 +427,7 @@ __aicore__ inline void CumSumImpl(
         SetMaskCount();
         SetVectorMask<T>(0, cumSumInfo.inner);
         Adds<T, false>(
-            lastRowTensor, dstTensor[(cumSumInfo.outter - 1) * cumSumInfo.inner], 0, MASK_PLACEHOLDER, 1,
+            lastRowTensor, dstTensor[(cumSumInfo.outter - 1) * cumSumInfo.inner], static_cast<T>(0), MASK_PLACEHOLDER, 1,
             {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
         PipeBarrier<PIPE_V>();
         SetMaskNorm();

@@ -630,7 +630,10 @@ __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &sr
 } // namespace AscendC
 #pragma end_pipe
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_vec_binary_scalar_intf_impl.h"
+#endif // __NPU_ARCH__
+
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_INTF_H__)

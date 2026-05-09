@@ -464,7 +464,9 @@ __aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode);
 
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_mm_intf_impl.h"
+#endif // __NPU_ARCH__
 
 #endif // ASCENDC_MODULE_OPERATOR_MM_INTERFACE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_H__)
