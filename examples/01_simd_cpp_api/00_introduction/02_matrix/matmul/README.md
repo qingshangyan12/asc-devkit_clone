@@ -1,8 +1,8 @@
-# Matmul样例
+# 基于静态Tensor编程实现Matmul计算
 
 ## 概述
 
-本样例使用Matmul高阶API实现矩阵乘计算。
+本样例基于静态Tensor编程范式实现多核矩阵乘计算。
 
 ## 支持的产品
 
@@ -24,39 +24,45 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   Matmul计算公式：
   $$
   C = A * B
   $$
-- 样例规格：
-  本样例参数M = 512, N = 1024, K = 512，输入规格如下表所示：
+- 样例规格：  
+  本样例参数M = 512, N = 1024, K = 512，调用4个核完成计算，输入规格如下表所示：
 <table>
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td></tr>
 <tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_custom</td></tr>
 </table>
 
 - 样例实现：
-  - 实现流程
-    - 通过GenerateTiling实现host侧的Tiling计算
-    - 通过CalcGMOffset完成分核计算
-<<<<<<< HEAD
-    - 通过Iterate接口完成矩阵乘计算
-=======
-    - 通过IterateAll接口完成矩阵乘计算
->>>>>>> a942c86d (update activation examples)
+  - 实现流程：
+    <table>
+    <tr><th align="left">步骤</th><th align="left">操作</th><th align="left">功能</th><th align="left">格式转换</th></tr>
+    <tr><td align="left">1</td><td align="left">常量化Tiling参数</td><td align="left">通过模板参数传入kernel</td><td align="left">不涉及</td></tr>
+    <tr><td align="left">2</td><td align="left">CopyInA、CopyInB</td><td align="left">将A矩阵和B矩阵数据从GM搬运到L1</td><td align="left">ND->NZ格式转换</td></tr>
+    <tr><td align="left">3</td><td align="left">DataLoadA、DataLoadB</td><td align="left">将数据从L1搬运到L0A和L0B</td><td align="left">L1->L0A: NZ->NZ<br>L1->L0B: NZ->ZN</td></tr>
+    <tr><td align="left">4</td><td align="left">Compute</td><td align="left">完成矩阵乘加计算</td><td align="left">矩阵乘结果为NZ格式</td></tr>
+    <tr><td align="left">5</td><td align="left">CopyOut</td><td align="left">将L0C中的计算结果搬运到GM</td><td align="left">NZ->ND格式转换</td></tr>
+    </table>
+  - 约束条件
 
-  - 调用实现
+    1. baseM/baseK/baseN满足16对齐
+    2. baseM/baseK/baseN能被singleCoreM/singleCoreK/singleCoreN整除
+    3. singleCoreM/singleCoreK/singleCoreN能被M/K/N整除，不支持非整切场景
+
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -82,10 +88,11 @@
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
-  使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
   ```
 
@@ -95,10 +102,10 @@
 
 | 选项 | 可选值 | 说明 |
 |------|--------|------|
-| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
+| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品/Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
