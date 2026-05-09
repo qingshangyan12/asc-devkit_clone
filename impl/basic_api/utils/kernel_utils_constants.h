@@ -43,9 +43,9 @@ const bool DEFAULT_REPEAT_STRIDE_MODE = 0;
 const bool STRIDE_SIZE_MODE = 0;
 const int32_t ONE_BYTE_BIT_SIZE = 8;
 const uint16_t MASK_ARRAY_SIZE = 4;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+
 const int32_t B32_BIT_SIZE = 32;
-#endif
+
 const uint32_t TOTAL_L0A_SIZE = 64 * 1024;
 const uint32_t TOTAL_L0B_SIZE = 64 * 1024;
 const uint32_t TMP_UB_SIZE = 8 * 1024;
@@ -79,21 +79,14 @@ constexpr uint32_t POWER_INT32_BITS = 32;
 constexpr uint32_t INT4_TWO = 2;
 constexpr uint32_t INT4_BIT_NUM = 4;
 
-#if (__NPU_ARCH__ == 5102)
 // int2b_t param
 constexpr uint32_t INT2_FOUR = 4;
 constexpr uint32_t INT1_EIGHT = 8;
 constexpr uint32_t INT2_BIT_NUM = 2;
 constexpr uint32_t INT1_BIT_NUM = 1;
-#endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 // int3b_t param
 constexpr uint32_t INT3_BIT_NUM = 3;
-// int2b_t param
-constexpr uint32_t INT2_FOUR = 4;
-constexpr uint32_t INT2_BIT_NUM = 2;
-#endif
 
 namespace ConstantsInternal {
 constexpr uint32_t ASCENDC_B4_TWO = 2;
@@ -106,6 +99,8 @@ constexpr float DEQ_SHIFT_RIGHT_17_BIT = 1.0 / DEQ_SHIFT_LEFT_17_BIT;
 constexpr int8_t ADDDEQRELU_MASK_MODE_ONE = 1;
 constexpr int8_t ADDDEQRELU_MASK_MODE_TWO = 2;
 
+const uint32_t VECTOR_REG_WIDTH = 256;
+
 #if (__NPU_ARCH__ == 5102)
 const int32_t TOTAL_VEC_LOCAL_SIZE = 248 * 1024;
 const uint32_t TOTAL_UB_SIZE = 248 * 1024;
@@ -114,7 +109,6 @@ const uint32_t TOTAL_L1_SIZE = 1024 * 1024;
 const uint32_t SINGLE_MSG_SIZE = 64;
 const uint32_t CACHE_LINE_SIZE = 64;
 const uint32_t TOTAL_L0C_SIZE = 256 * 1024;
-const uint32_t VECTOR_REG_WIDTH = 256;
 const uint32_t VECTOR_REG_WIDTH_2XVL = 512;
 const uint32_t ONE_BLOCK_SIZE = 32;
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
@@ -143,13 +137,11 @@ const uint32_t TOTAL_L1_SIZE = 1024 * 1024;
 const uint32_t SINGLE_MSG_SIZE = 64;
 const uint32_t CACHE_LINE_SIZE = 64;
 const uint32_t TOTAL_L0C_SIZE = 128 * 1024;
-const uint32_t VECTOR_REG_WIDTH = 256;
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
 const int32_t TOTAL_VEC_LOCAL_SIZE = 118 * 1024;
 const uint32_t TOTAL_UB_SIZE = 118 * 1024;
 const uint32_t TMP_UB_OFFSET = 118 * 1024;
 const uint32_t TOTAL_L1_SIZE = 1024 * 1024;
-const uint32_t VECTOR_REG_WIDTH = 256;
 const uint32_t ONE_BLOCK_SIZE = 32;
 const uint32_t TOTAL_L0C_SIZE = 128 * 1024;
 #elif (__NPU_ARCH__ == 3102)
@@ -160,7 +152,6 @@ const uint32_t TOTAL_L1_SIZE = 1024 * 1024;
 const uint32_t SINGLE_MSG_SIZE = 64;
 const uint32_t CACHE_LINE_SIZE = 64;
 const uint32_t TOTAL_L0C_SIZE = 128 * 1024;
-const uint32_t VECTOR_REG_WIDTH = 256;
 #elif (__NPU_ARCH__ == 3510)
 const int32_t TOTAL_VEC_LOCAL_SIZE = 248 * 1024;
 const uint32_t TOTAL_UB_SIZE = 248 * 1024;
@@ -169,7 +160,6 @@ const uint32_t TOTAL_L1_SIZE = 512 * 1024;
 const uint32_t SINGLE_MSG_SIZE = 64;
 const uint32_t CACHE_LINE_SIZE = 64;
 const uint32_t TOTAL_L0C_SIZE = 256 * 1024;
-const uint32_t VECTOR_REG_WIDTH = 256;
 const uint32_t VECTOR_REG_WIDTH_2XVL = 512;
 const uint32_t ONE_BLOCK_SIZE = 32;
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
@@ -178,7 +168,6 @@ const uint32_t TOTAL_UB_SIZE = 118 * 1024;
 const uint32_t TMP_UB_OFFSET = 118 * 1024;
 const uint32_t TOTAL_L1_SIZE = 512 * 1024;
 const uint32_t TOTAL_L0C_SIZE = 64 * 1024;
-const uint32_t VECTOR_REG_WIDTH = 256;
 const uint32_t ONE_BLOCK_SIZE = 32;
 #endif
 
@@ -448,13 +437,12 @@ template <> inline std::string ScalarToString(bfloat16_t scalarValue)
 template <typename T> uint64_t GetScalarBitcode(T scalarValue);
 // deq tensor ptr could not be passed by cce instructions, so pass ptr to model by this function
 void SetModelDeqTensor(void* deqTensor);
-#if __NPU_ARCH__ == 3002
+
 void SetEleSrcPara(uint64_t baseAddr);
-#endif
-#if __NPU_ARCH__ == 2002
+
 void SetVbiSrc0Param(half* vbiSrc0Ptr, int32_t vbiSrc0Size);
 void SetUnzipCompressedLen(uint32_t compressedLength);
-#endif
+
 void SetModelBiasTensor(void* biasTensor);
 void SetIndexMatrix(void* indexMatrix);
 

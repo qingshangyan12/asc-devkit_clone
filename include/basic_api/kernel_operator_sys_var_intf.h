@@ -55,17 +55,12 @@ __aicore__ inline void Trap();
 
 __aicore__ inline int64_t GetSystemCycle();
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <SpecialPurposeReg spr>
 __aicore__ inline int64_t GetSpr();
 
 template <SpecialPurposeReg spr>
 __aicore__ inline void ClearSpr();
-#endif
 
-#if defined(__NPU_ARCH__) &&                                                                                    \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
-     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
 __aicore__ inline constexpr uint32_t GetUBSizeInBytes()
 {
     return TOTAL_UB_SIZE;
@@ -96,8 +91,8 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 #endif
 #endif
 }
- 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) 
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr(){
 #if ASCENDC_CPU_DEBUG
     return reinterpret_cast<__ssbuf__ void*>(ConstDefiner::Instance().cpuSSbuf);
@@ -106,9 +101,12 @@ __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr(){
 #endif
 }
 #endif
-#endif
 } // namespace AscendC
+
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_sys_var_intf_impl.h"
+#endif // __NPU_ARCH__
+
 #endif // ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYS_VAR_INTF_H__)
