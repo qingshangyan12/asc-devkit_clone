@@ -27,7 +27,6 @@
 #include "kernel_check.h"
 #endif
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
-    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #include "../../impl/basic_api/kernel_operator_list_tensor_intf_impl.h"
@@ -42,7 +41,6 @@ public:
     __aicore__ inline void SetShapeAddr(uint64_t* shapePtr)
     {
         #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
-            (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
             (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
             (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
         tensorDesc.SetShapeAddr(shapePtr);
@@ -52,7 +50,6 @@ public:
     __aicore__ inline uint64_t GetDim()
     {
         #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
-            (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
             (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
             (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
         return tensorDesc.GetDim();
@@ -61,7 +58,6 @@ public:
     __aicore__ inline uint64_t GetIndex()
     {
         #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
-            (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
             (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
             (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
         return tensorDesc.GetIndex();
@@ -70,7 +66,6 @@ public:
     __aicore__ inline uint64_t GetShape(uint32_t offset)
     {
         #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
-            (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
             (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
             (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
         return tensorDesc.GetShape(offset);
@@ -79,7 +74,6 @@ public:
     __aicore__ inline __gm__ T* GetDataPtr()
     {
         #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
-            (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
             (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
             (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
         return tensorDesc.GetDataPtr();
@@ -89,7 +83,6 @@ public:
     __aicore__ inline GlobalTensor<T> GetDataObj()
     {
         #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
-            (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
             (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
             (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
         return tensorDesc.GetDataObj();
@@ -98,7 +91,12 @@ public:
 
     friend class ListTensorDesc;
 private:
+    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
+        (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
+        (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
+        (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     TensorDescImpl<T> tensorDesc;
+    #endif
 };
 
 class ListTensorDesc {
@@ -132,9 +130,12 @@ public:
         return listTensorDesc.GetSize();
     }
 private:
-#ifdef __NPU_ARCH__
+     #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
+        (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
+        (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
+        (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     ListTensorDescImpl<true> listTensorDesc;
-#endif
+    #endif
 };
 }
 #endif // ASCENDC_MODULE_OPERATOR_LIST_TENSOR_INTERFACE_H
