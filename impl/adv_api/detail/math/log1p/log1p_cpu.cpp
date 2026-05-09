@@ -35,7 +35,7 @@ void log1p_kernel(float *output, float x){
 
     if (r1 >= 2139095040u) {
         if ((int32_t)r1 >= -1082130431) {
-            float inf = u2f(0x7F8000000u);
+            float inf = u2f(0x7F800000u);
             result = fmaf(x, inf, inf);
         }
 
