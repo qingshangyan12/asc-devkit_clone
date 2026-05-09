@@ -11,17 +11,18 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(ASC_SOURCES
+add_executable(demo
     matmul_leakyrelu.asc
 )
 
-set(SHARED_LIBRARIES
+target_link_libraries(demo PRIVATE
     tiling_api
     register
     platform
@@ -29,11 +30,6 @@ set(SHARED_LIBRARIES
     dl
 )
 
-set(COMPILE_OPTIONS
+target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
-
-add_executable(demo ${ASC_SOURCES})
-
-target_link_libraries(demo PRIVATE ${SHARED_LIBRARIES})
-target_compile_options(demo PRIVATE ${COMPILE_OPTIONS})
