@@ -29,7 +29,10 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-获取当前系统cycle数，若换算成时间需要按照50MHz的频率，时间单位为us，换算公式为：time = \(cycle数/50\) us 。
+获取当前系统cycle数。  
+针对Ascend 950PR/Ascend 950DT，若换算成时间需要按照1GHz的频率，时间单位为us，换算公式为：time = \(cycle数/1000\) us 。  
+针对Atlas A3 训练系列产品，若换算成时间需要按照50MHz的频率，时间单位为us，换算公式为：time = \(cycle数/50\) us 。  
+针对Atlas A2 推理系列产品，若换算成时间需要按照50MHz的频率，时间单位为us，换算公式为：time = \(cycle数/50\) us 。  
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -79,4 +82,3 @@ __aicore__ inline int64_t GetSystemCycle()
     int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位，固定为50
     int64_t GetBlockNumTime = GetBlockNumCycle/CycleToTimeBase; // 执行Add指令所用时间，单位为us
     ```
-
