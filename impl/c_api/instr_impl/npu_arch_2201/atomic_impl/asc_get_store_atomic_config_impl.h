@@ -28,6 +28,7 @@
 __aicore__ inline void asc_get_store_atomic_config_impl(asc_store_atomic_config& config)
 {
     config.config = get_st_atomic_cfg();
+    
 }
 
 #endif
