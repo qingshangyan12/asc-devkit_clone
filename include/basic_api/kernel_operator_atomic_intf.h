@@ -26,8 +26,6 @@
 #include "stub_def.h"
 #endif
 
-
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510))
 namespace AscendC {
 template <typename T>
 __aicore__ inline T AtomicAdd(__gm__ T *address, T value);
@@ -45,7 +43,6 @@ template <typename T>
 __aicore__ inline T AtomicExch(__gm__ T *address, T value);
 } // namespace AscendC
 #include "../../impl/basic_api/kernel_operator_atomic_intf_impl.h"
-#endif
 #endif // ASCENDC_MODULE_OPERATOR_ATOMIC_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_ATOMIC_INTF_H__)
