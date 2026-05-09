@@ -77,36 +77,36 @@
 - 常规转置搬运
 
   ```cpp
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
   ```
 
 - 同步转置搬运
 
   ```cpp
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
-  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
+  __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
   ```
 
@@ -119,7 +119,7 @@
 | index_id | 输入 | 矩阵ID，搬运起始位置为源操作数中第几个分形。取值范围：[0, 65535]。 |
 |repeat | 输入 | 迭代次数。<br> 对于位宽为4的数据类型，每次迭代处理4个分形，每个分形为16*64*0.5B数据；<br> 对于位宽为8的数据类型，每次迭代处理2个分形，每个分形为16*32*1B数据；<br>对于位宽为16的数据类型，每次迭代处理1个分形，每个分形为16*16*2B数据；对于位宽为32的数据类型，每次迭代处理4个分形，每个分形为16*8*4B数据。取值范围：[1, 255]。 |
 | src_stride | 输入 | 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔。单位为单个分形512B。取值范围：[0, 65535]。 |
-| dst_stride | 输入 | 相邻迭代间，目的操作数前一个分形与后一个分形起始地址的间隔。单位为单个分形512B。取值范围：[0, 65535]。 |
+| dst_gap | 输入 | 相邻迭代间，目的操作数前一个分形与后一个分形起始地址的间隔。单位为单个分形512B。取值范围：[0, 65535]。 |
 | dst_frac_stride | 输入 | 每个迭代内目的操作数转置前一个分形结束地址与后一个分形起始地址的间隔。单位为512B。仅在数据位宽为4、8或32时有效。 |
 | src_frac_stride | 输入 | 每个迭代内源操作数转置前一个分形结束地址与后一个分形起始地址的间隔。单位为512B。仅在数据位宽为4、8或32时有效。 |
 
@@ -151,9 +151,9 @@ uint8_t nBlockSize = 32;
 uint8_t repeat = n / nBlockSize;
 uint16_t index_id = 0;
 uint16_t src_stride = 1;
-uint16_t dst_stride = 1;
+uint16_t dst_gap = 1;
 uint16_t dst_frac_stride = 15;
 uint16_t src_frac_stride = 8;
 
-asc_copy_l12l0b_trans(dst, src, index_id, repeat, src_stride, dst_stride, dst_frac_stride, src_frac_stride);
+asc_copy_l12l0b_trans(dst, src, index_id, repeat, src_stride, dst_gap, dst_frac_stride, src_frac_stride);
 ```
