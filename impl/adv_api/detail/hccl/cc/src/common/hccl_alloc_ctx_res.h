@@ -500,6 +500,10 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
 HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam,
     TopoInfoWithNetLayerDetails *topoInfo, void **resCtxOut)
 {
+    HCCL_INFO("YYYYYY asc resource [GetOpParamResCtx] start file[%s], comm[%p], algName[%s], "
+        "opType[%u], engine[%u], stream[%p], commName[%s], algTag[%s].",
+        __FILE__, comm, algName.c_str(), static_cast<u32>(opParam.opType),
+        static_cast<u32>(opParam.engine), opParam.stream, opParam.commName, opParam.algTag);
     std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
     CHK_PRT_RET(executor.get() == nullptr,
         HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
@@ -510,11 +514,26 @@ HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &
     ThreadHandle cpuTsThread{0};
     ThreadHandle exportedAicpuTsThread{0};
     if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
-        CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
-        CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
+        HcclResult ret = HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread);
+        HCCL_INFO("YYYYYY asc resource [GetOpParamResCtx] HcclThreadAcquireWithStream ret[%u], "
+            "comm[%p], stream[%p], cpuTsThread[0x%llx].", static_cast<u32>(ret), comm, opParam.stream, cpuTsThread);
+        CHK_RET(ret);
+        ret = HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread);
+        HCCL_INFO("YYYYYY asc resource [GetOpParamResCtx] HcclThreadExportToCommEngine ret[%u], "
+            "comm[%p], cpuTsThread[0x%llx], exportedAicpuTsThread[0x%llx].",
+            static_cast<u32>(ret), comm, cpuTsThread, exportedAicpuTsThread);
+        CHK_RET(ret);
     }
-    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+    HcclResult ret = HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused);
+    HCCL_INFO("YYYYYY asc resource [GetOpParamResCtx] HcclGetAlgRes ret[%u], resCtxOut[%p], "
+        "resCtx[%p], isResourceReused[%d].", static_cast<u32>(ret), resCtxOut,
+        (resCtxOut == nullptr ? nullptr : *resCtxOut), isResourceReused);
+    CHK_RET(ret);
     opParam.resCtx = *resCtxOut;
+    HCCL_INFO("YYYYYY asc resource [GetOpParamResCtx] end file[%s], algName[%s], opType[%u], "
+        "engine[%u], cpuTsThread[0x%llx], exportedAicpuTsThread[0x%llx], resCtx[%p].",
+        __FILE__, algName.c_str(), static_cast<u32>(opParam.opType), static_cast<u32>(opParam.engine),
+        cpuTsThread, exportedAicpuTsThread, opParam.resCtx);
     return HCCL_SUCCESS;
 }
 
