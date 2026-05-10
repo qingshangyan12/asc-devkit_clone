@@ -169,6 +169,8 @@ HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void *opArgs, void 
 HcclResult __attribute__((visibility("default")))
 HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void **opResCtx)
 {
+    HCCL_INFO("YYYYYY asc resource [HcclAllocComResourceByTiling] enter file[%s], comm[%p], "
+        "stream[%p], mc2Tiling[%p], opResCtx[%p].", __FILE__, comm, stream, mc2Tiling, opResCtx);
     HCCL_RUN_INFO("[MC2_CLIENT_A5_AICPU] enter asc-devkit common HcclAllocComResourceByTiling, "
         "comm[%p], stream[%p], tiling[%p].", comm, stream, mc2Tiling);
     HCCL_INFO("Start to run execute HcclAllocComResourceByTiling");
@@ -234,7 +236,9 @@ HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void 
         }
     }
 
-    // TODO:记录接口入口日志，包含所有关键参数信息
+    HCCL_INFO("YYYYYY asc resource [HcclAllocComResourceByTiling] parsed tiling file[%s], comm[%p], "
+        "stream[%p], mc2Tiling[%p], commName[%s], rankSize[%u], userRank[%u], tilingNum[%u], ctxTag[%s].",
+        __FILE__, comm, stream, mc2Tiling, commName, rankSize, userRank, tilingNum, ctxTag.c_str());
 
     // 检查userRank是否在有效范围内
     CHK_RET(HcomCheckUserRank(rankSize, userRank));
@@ -242,16 +246,29 @@ HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void 
     std::vector<OpParam> opParamVec(tilingNum);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         // TODO: 根据topoTag[i] 获取opParam[i]的参数
-        CHK_RET(GetOpParam(comm, stream, topoTag[i], static_cast<const Mc2CcTilingInner*>(ccTilingList[i]), opParamVec[i]));
+        HcclResult ret = GetOpParam(comm, stream, topoTag[i],
+            static_cast<const Mc2CcTilingInner*>(ccTilingList[i]), opParamVec[i]);
+        HCCL_INFO("YYYYYY asc resource [HcclAllocComResourceByTiling] GetOpParam ret[%u], "
+            "index[%u], topoTag[%s], opType[%u], engine[%u], algName[%s], algTag[%s], resCtx[%p].",
+            static_cast<u32>(ret), i, topoTag[i].c_str(), static_cast<u32>(opParamVec[i].opType),
+            static_cast<u32>(opParamVec[i].engine), opParamVec[i].algName, opParamVec[i].algTag,
+            opParamVec[i].resCtx);
+        CHK_RET(ret);
     }
 
     // TODO: 根据ctxTag 申请通信资源 ，并返回OpResCtx的地址
-    CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
+    HcclResult ret = HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx);
+    HCCL_INFO("YYYYYY asc resource [HcclAllocComResourceByTiling] HcclAllocOpResCtx ret[%u], "
+        "ctxTag[%s], opResCtx[%p], ctx[%p].", static_cast<u32>(ret), ctxTag.c_str(), opResCtx,
+        (opResCtx == nullptr ? nullptr : *opResCtx));
+    CHK_RET(ret);
 
     // 记录退出日志和性能统计信息
     CHK_RET(LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut));
 
     HCCL_INFO("End to run execute HcclAllocComResourceByTiling");
+    HCCL_INFO("YYYYYY asc resource [HcclAllocComResourceByTiling] exit file[%s], ctxTag[%s], "
+        "opResCtx[%p], ctx[%p].", __FILE__, ctxTag.c_str(), opResCtx, (opResCtx == nullptr ? nullptr : *opResCtx));
 
     return HCCL_SUCCESS;
 }
