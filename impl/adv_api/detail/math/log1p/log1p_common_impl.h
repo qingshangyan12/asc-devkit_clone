@@ -38,7 +38,10 @@ namespace AscendC {
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void Log1pImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
 {
-    CHECK_FUNC_HIGHLEVEL_API(Log1p, (T, isReuseSource), (dstTensor, srcTensor, calCount));
+    (void)dstTensor;
+    (void)srcTensor;
+    (void)calCount;
+    (void)isReuseSource;
 
 #if defined(__NPU_ARCH__) && \
     (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)

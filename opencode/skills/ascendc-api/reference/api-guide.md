@@ -103,7 +103,7 @@ AscendC::LocalTensor<float> xLocal = inQueueX.AllocTensor<float>();
 | C++ | AscendC 基础API | 说明 |
 |-----|----------------|------|
 | `dst[i] = s*a[i] + dst[i]` | `AscendC::Axpy(dst, a, s, n)` | 标量乘加 |
-| `dst[i] = a[i]*b[i] + c[i]` | `AscendC::Fma(dst, a, b, c, n)` | 融合乘加 |
+| `dst[i] = a[i]*b[i] + c[i]` | `AscendC::FusedMulDstAdd(dst, a, b, c, n)` | 融合乘加 |
 | `dst[i] = cond[i] ? a[i] : b[i]` | `AscendC::Where(dst, a, b, cond, n)` | 条件选择 |
 
 ---
