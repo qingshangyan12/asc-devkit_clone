@@ -7,6 +7,7 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+# Before running in sim mode, execute: ulimit -n 65535
 add_executable(demo
     log1p.asc
 )
