@@ -445,7 +445,19 @@ void AicpuKfcUtils::PrintAllHcclMsgArea(HcclMsgArea *hcclMsgArea, u32 rankSize, 
     }
     // recvMsgList暂不支持，不处理了
     for (uint32_t i = 0; i < HCCL_MSG_CNT; ++i) {
-        if (static_cast<HcclCMDType>(msg.sendMsgs[i].commType.msgType) != HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        if (!errorFlag &&
+            static_cast<HcclCMDType>(msg.sendMsgs[i].commType.msgType) != HcclCMDType::HCCL_CMD_ALLTOALLV) {
+            continue;
+        }
+        if (errorFlag) {
+            HCCL_LOG_BY_LEVEL(logLevel,
+                "YYYYYY asc server raw MsgExt[%u] valid[%llu] xor[%llu] send0[%llu] recv0[%llu] soff0[%llu] roff0[%llu]",
+                i, static_cast<unsigned long long>(msg.paramExtMsgList[i].valid),
+                static_cast<unsigned long long>(msg.paramExtMsgList[i].xorCheck),
+                static_cast<unsigned long long>(msg.paramExtMsgList[i].sendCounts[0]),
+                static_cast<unsigned long long>(msg.paramExtMsgList[i].recvCounts[0]),
+                static_cast<unsigned long long>(msg.paramExtMsgList[i].sendOffset[0]),
+                static_cast<unsigned long long>(msg.paramExtMsgList[i].recvOffset[0]));
             continue;
         }
         HCCL_LOG_BY_LEVEL(logLevel, "MsgExt[%d]: %s", i, GetMsgSimpleStr(rankSize, msg.paramExtMsgList[i]).c_str());

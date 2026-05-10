@@ -72,6 +72,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     } else {
         workingFlag_ = (GetBlockIdx() == config.blockId);
     }
+    KERNEL_LOG(KERNEL_INFO,
+               "YYYYYY asc client working flag blockIdx[%ld] coreType[%u] cfgType[%u] cfgBlock[%u] working[%d].",
+               GetBlockIdx(), static_cast<uint8_t>(g_coreType), static_cast<uint8_t>(config.type), config.blockId,
+               static_cast<int32_t>(workingFlag_));
 }
 
 template <const auto &config>
@@ -112,11 +116,19 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(uint16
                 curMsgPosition_[queId];
     }
 
+    FlushDataCache(hcclSendMsg);
+    KERNEL_LOG(KERNEL_INFO,
+               "YYYYYY asc client base wait start queId[%u] pos[%u] valid[%u] xor[%u] prepareType[%d] handle[%d].",
+               queId, curMsgPosition_[queId], hcclSendMsg->addMsg.v0Msg.valid,
+               hcclSendMsg->addMsg.v0Msg.xorCheck, static_cast<int32_t>(param.commType.prepareType), curHandleId_);
     do {
         HCCL_CHECK_RESTART(hcclMsgArea_, return);
         FlushDataCache(hcclSendMsg);
     } while (debugMode_ != HCCL_ONLY_COMPUTE && hcclSendMsg->addMsg.v0Msg.valid == HCCL_MSG_VALID_MASK);
-    KERNEL_LOG(KERNEL_INFO, "Hccl send msg[%u] is available now.", curMsgPosition_[queId]);
+    KERNEL_LOG(KERNEL_INFO,
+               "YYYYYY asc client base available queId[%u] pos[%u] valid[%u] xor[%u] prepareType[%d] handle[%d].",
+               queId, curMsgPosition_[queId], hcclSendMsg->addMsg.v0Msg.valid,
+               hcclSendMsg->addMsg.v0Msg.xorCheck, static_cast<int32_t>(param.commType.prepareType), curHandleId_);
     if (srcGroupID < 0) {
         uint64_t tiling = 0UL;
         if (param.commType.prepareType < HcclCMDType::HCCL_CMD_ALL) {
@@ -131,6 +143,10 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(uint16
         AssembleHcclMsg(param, srcGroupID, srcHandleID, hcclSendMsg);
     }
     FlushDataCache(reinterpret_cast<__gm__ void *>(hcclSendMsg));
+    KERNEL_LOG(KERNEL_INFO,
+               "YYYYYY asc client base flushed queId[%u] pos[%u] valid[%u] xor[%u] prepareType[%d] handle[%d].",
+               queId, curMsgPosition_[queId], hcclSendMsg->addMsg.v0Msg.valid,
+               hcclSendMsg->addMsg.v0Msg.xorCheck, static_cast<int32_t>(param.commType.prepareType), curHandleId_);
 }
 
 template<const auto &config>
@@ -141,11 +157,23 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(const 
         return;
     }
     __gm__ HcclMsgExt *hcclSendMsg = &(hcclMsgArea_->commMsg.singleMsg.paramExtMsgList[curMsgPosition_[0U]]);
+    FlushDataCache(hcclSendMsg);
+    KERNEL_LOG(KERNEL_INFO,
+               "YYYYYY asc client ext wait start pos[%u] valid[%llu] xor[%llu] send0[%llu] recv0[%llu] soff0[%llu] roff0[%llu].",
+               curMsgPosition_[0U], static_cast<unsigned long long>(hcclSendMsg->valid),
+               static_cast<unsigned long long>(hcclSendMsg->xorCheck),
+               static_cast<unsigned long long>(param.sendCounts[0]), static_cast<unsigned long long>(param.recvCounts[0]),
+               static_cast<unsigned long long>(param.sdispls[0]), static_cast<unsigned long long>(param.rdispls[0]));
     do {
         HCCL_CHECK_RESTART(hcclMsgArea_, return);
         FlushDataCache(hcclSendMsg);
     } while ((debugMode_ != HCCL_ONLY_COMPUTE) && (hcclSendMsg->valid == HCCL_MSG_VALID_MASK));
-    KERNEL_LOG(KERNEL_INFO, "Hccl send extMsg[%u] is available now.", curMsgPosition_[0U]);
+    KERNEL_LOG(KERNEL_INFO,
+               "YYYYYY asc client ext available pos[%u] valid[%llu] xor[%llu] send0[%llu] recv0[%llu] soff0[%llu] roff0[%llu].",
+               curMsgPosition_[0U], static_cast<unsigned long long>(hcclSendMsg->valid),
+               static_cast<unsigned long long>(hcclSendMsg->xorCheck),
+               static_cast<unsigned long long>(param.sendCounts[0]), static_cast<unsigned long long>(param.recvCounts[0]),
+               static_cast<unsigned long long>(param.sdispls[0]), static_cast<unsigned long long>(param.rdispls[0]));
     uint32_t rankNum = GetRankDim();
     AssembleHcclMsgExt(param, rankNum, hcclSendMsg);
     GlobalTensor<int64_t> globalHcclMsgArea;
@@ -156,6 +184,14 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(const 
         FlushDataCache(globalHcclMsgArea, (hcclSendMsg->recvOffset + i));
     }
     FlushDataCache(globalHcclMsgArea, hcclSendMsg->reserved);
+    KERNEL_LOG(KERNEL_INFO,
+               "YYYYYY asc client ext flushed pos[%u] valid[%llu] xor[%llu] send0[%llu] recv0[%llu] soff0[%llu] roff0[%llu].",
+               curMsgPosition_[0U], static_cast<unsigned long long>(hcclSendMsg->valid),
+               static_cast<unsigned long long>(hcclSendMsg->xorCheck),
+               static_cast<unsigned long long>(hcclSendMsg->sendCounts[0]),
+               static_cast<unsigned long long>(hcclSendMsg->recvCounts[0]),
+               static_cast<unsigned long long>(hcclSendMsg->sendOffset[0]),
+               static_cast<unsigned long long>(hcclSendMsg->recvOffset[0]));
 }
 
 template<const auto &config>
@@ -254,11 +290,21 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
     ASCENDC_HCCL_API_ASSERT(handleId < HCCL_MAX_HANDLE_ID, { return INVALID_HANDLE_ID; },
                             "Call Prepare[%d] failed, Prepare interface call num is[%d], expected no more than[%d].",
                             static_cast<int32_t>(param.commType.prepareType), handleId + 1, HCCL_MAX_HANDLE_ID);
+    KERNEL_LOG(KERNEL_INFO,
+               "YYYYYY asc client prepare start handle[%d] msgPos[%u] prepareType[%d] repeat[%u] commit[%d].",
+               handleId, curMsgPosition_[0U], static_cast<int32_t>(param.commType.prepareType), param.repeat,
+               static_cast<int32_t>(commit));
     if (param.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        KERNEL_LOG(KERNEL_INFO, "YYYYYY asc client prepare send ext handle[%d] msgPos[%u].", handleId,
+                   curMsgPosition_[0U]);
         SendMsgToServer(param.paramExt);
     }
     const uint16_t queId = (queueNum_ == 0U ? 0U : static_cast<uint16_t>(param.dataType));
+    KERNEL_LOG(KERNEL_INFO, "YYYYYY asc client prepare send base handle[%d] queId[%u] msgPos[%u].", handleId, queId,
+               curMsgPosition_[queId]);
     SendMsgToServer(queId, param);
+    KERNEL_LOG(KERNEL_INFO, "YYYYYY asc client prepare base done handle[%d] queId[%u] msgPos[%u].", handleId, queId,
+               curMsgPosition_[queId]);
     handleIdMsgPosition_[handleId] = curMsgPosition_[queId];
     handleIdRepeat_[handleId] = param.repeat;
     handleId2CmdType_[handleId] = static_cast<uint8_t>(param.commType.prepareType);
