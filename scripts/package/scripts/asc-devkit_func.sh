@@ -310,6 +310,14 @@ create_mc2_runtime_softlink() {
         return
     fi
 
+    if [ ! -e "${install_path}/hccl/include/hccl/hccl.h" ] && \
+       [ ! -e "${install_path}/hccl/lib64/libmc2_client.so" ] && \
+       [ ! -e "${install_path}/hccl/built-in/data/op/aicpu/libmc2_server.json" ] && \
+       [ ! -e "${install_path}/hccl/Ascend/aicpu/mc2_server.tar.gz" ]; then
+        log "INFO" "MC2 runtime artifacts do not exist, skip runtime softlinks."
+        return 0
+    fi
+
     create_mc2_runtime_one_softlink "${install_path}" "hccl/include/hccl/hccl.h" "${arch_linux_path}/include/hccl/hccl.h" "true"
     [ $? -ne 0 ] && return 1
     create_mc2_runtime_one_softlink "${install_path}" "hccl/include/hccl/hccl_mc2.h" "${arch_linux_path}/include/hccl/hccl_mc2.h" "true"
@@ -346,6 +354,39 @@ remove_mc2_runtime_softlink() {
     remove_mc2_runtime_one_softlink "${install_path}" "${arch_linux_path}/lib64/libmc2_compat.so"
     remove_mc2_runtime_one_softlink "${install_path}" "opp/built-in/op_impl/aicpu/kernel/mc2_server.tar.gz"
     remove_mc2_runtime_one_softlink "${install_path}" "opp/built-in/op_impl/aicpu/config/libmc2_server.json"
+}
+
+remove_mc2_runtime_one_artifact() {
+    local install_path="$1"
+    local rel_path="$2"
+    local file_path="${install_path}/${rel_path}"
+    local dir_path="$(dirname "${file_path}")"
+
+    if [ -f "${file_path}" ] || [ -L "${file_path}" ]; then
+        chmod u+w "${dir_path}" 2> /dev/null
+        rm -f "${file_path}"
+        log "INFO" "remove MC2 runtime artifact ${rel_path}."
+    fi
+}
+
+remove_mc2_runtime_artifacts() {
+    local install_path="$1"
+    if [ ! -d "$install_path" ]; then
+        return
+    fi
+
+    remove_mc2_runtime_one_artifact "${install_path}" "hccl/include/hccl/hccl.h"
+    remove_mc2_runtime_one_artifact "${install_path}" "hccl/include/hccl/hccl_mc2.h"
+    remove_mc2_runtime_one_artifact "${install_path}" "hccl/lib64/libmc2_client.so"
+    remove_mc2_runtime_one_artifact "${install_path}" "hccl/lib64/libmc2_compat.so"
+    remove_mc2_runtime_one_artifact "${install_path}" "hccl/built-in/data/op/aicpu/libmc2_server.json"
+    remove_mc2_runtime_one_artifact "${install_path}" "hccl/Ascend/aicpu/mc2_server.tar.gz"
+
+    remove_dir_recursive "${install_path}" "${install_path}/hccl/include/hccl"
+    remove_dir_recursive "${install_path}" "${install_path}/hccl/lib64"
+    remove_dir_recursive "${install_path}" "${install_path}/hccl/built-in/data/op/aicpu"
+    remove_dir_recursive "${install_path}" "${install_path}/hccl/Ascend/aicpu"
+    remove_dir_recursive "${install_path}" "${install_path}/hccl"
 }
 
 pkg_arch_name="$(get_pkg_arch_name)"

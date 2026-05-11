@@ -71,86 +71,70 @@
 
     **说明**：硬件删除L1 Buffer到GM的通路，无法将数据从L1 Buffer直接搬运到GM中。现有接口不支持L1 Buffer到GM的直接搬运。
 
-    **兼容方案**：对于纯Cube计算场景：在GM多分配一个单位矩阵，通过Mmad矩阵乘法计算输出到L0C Buffer，再从L0C Buffer通过Fixpipe搬运到GM。对于Vector和Cube计算融合场景，可以通过L1 Buffer搬运到UB，再搬运到GM。以下以纯Cube计算场景为例进行说明，介绍算子核心流程。
+    **兼容方案**：对于纯Cube计算场景：在GM多分配一个单位矩阵，通过Mmad矩阵乘法计算输出到L0C Buffer，再从L0C Buffer通过Fixpipe搬运到GM。对于Vector和Cube计算融合场景，可以通过L1 Buffer搬运到UB，再搬运到GM。以下以纯Cube计算场景为例进行说明，介绍算子核心流程，具体可参考[L1到GM搬运兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_compatibility_guide/data_copy_l1togm)。
 
     1.  将矩阵A从GM搬运到L1 Buffer。
 
         ```
-        __aicore__ inline void CopyGmToA1()
+        __aicore__ inline void CopyGmToL1A(AscendC::LocalTensor<T> a1Local)
         {
-            AscendC::LocalTensor<T> leftMatrix = inQueueA1.AllocTensor<T>();
-            AscendC::Nd2NzParams intriParams1{1, 64, 128, 0, 128, 64, 1, 0};
-            AscendC::DataCopy(leftMatrix, aGlobal, intriParams1);
-            inQueueA1.EnQue(leftMatrix);
+            AscendC::Nd2NzParams intriParams1{1, M, K, 0, K, M, 1, 0};
+            AscendC::DataCopy(a1Local, aGlobal, intriParams1);
         }
         ```
 
     2.  将矩阵B（矩阵B为单位矩阵）从GM搬运到L1 Buffer。
 
         ```
-        __aicore__ inline void CopyGmToB1()
+        __aicore__ inline void CopyGmToL1B(AscendC::LocalTensor<U> b1Local)
         {
-            AscendC::LocalTensor<U> rightMatrix = inQueueB1.AllocTensor<U>();
-            AscendC::Nd2NzParams intriParams2{1, 128, 128, 0, 128, 128, 1, 0};
-            AscendC::DataCopy(rightMatrix, bGlobal, intriParams2);
-            inQueueB1.EnQue(rightMatrix);
+            AscendC::Nd2NzParams intriParams2{1, K, N, 0, N, K, 1, 0};
+            AscendC::DataCopy(b1Local, bGlobal, intriParams2);
         }
         ```
 
     3.  将矩阵A从L1 Buffer搬运到L0A Buffer。
 
         ```
-        __aicore__ inline void Load2DA1ToL0A()
+        __aicore__ inline void Load2DL1AToL0A(AscendC::LocalTensor<T> a1Local, AscendC::LocalTensor<T> a2Local)
         {
-            AscendC::LocalTensor<T> a1 = inQueueA1.DeQue<T>();
-            AscendC::LocalTensor<T> a2 = inQueueA2.AllocTensor<T>();
             AscendC::LoadData2DParamsV2 loadDataParams;
             ...
-            AscendC::LoadData(a2, a1, loadDataParams);
-            ...
+            AscendC::LoadData(a2Local, a1Local, loadDataParams);
         }
         ```
 
     4.  将矩阵B从L1 Buffer搬运到L0B Buffer。
 
         ```
-        __aicore__ inline void Load2DA1ToL0B()
+        __aicore__ inline void Load2DL1BToL0B(AscendC::LocalTensor<U> b1Local, AscendC::LocalTensor<U> b2Local)
         {
-            AscendC::LocalTensor<U> b1 = inQueueB1.DeQue<U>();
-            AscendC::LocalTensor<U> b2 = inQueueB2.AllocTensor<U>();
-            ...
             AscendC::LoadData2DParamsV2 loadDataParams;
             ...
-            AscendC::LoadData(b2, b1, loadDataParams);
-            ...
+            AscendC::LoadData(b2Local, b1Local, loadDataParams);
         }
         ```
 
     5.  进行Mmad矩阵计算，结果输出到L0C Buffer。
 
         ```
-        __aicore__ inline void Compute()
+        __aicore__ inline void Compute(
+            AscendC::LocalTensor<S> co1Local, AscendC::LocalTensor<T> a2Local, AscendC::LocalTensor<U> b2Local)
         {
             AscendC::MmadParams mmadParams;
             ...
-            AscendC::LocalTensor<S> co1Local = inQueueCO1.AllocTensor<S>();
-            AscendC::LocalTensor<T> a2 = inQueueA2.DeQue<T>();
-            AscendC::LocalTensor<U> b2 = inQueueB2.DeQue<U>();
-            AscendC::Mmad(co1Local, a2, b2, mmadParams);
-            ...
+            AscendC::Mmad(co1Local, a2Local, b2Local, mmadParams);
         }
         ```
 
     6.  通过FixPipe将矩阵C从L0C Buffer拷贝到GM。
 
         ```
-        __aicore__ inline void CopyL0CToGm()
+        __aicore__ inline void CopyL0CToGm(AscendC::LocalTensor<S> co1Local)
         {
-            AscendC::LocalTensor<S> co1Local = inQueueCO1.DeQue<S>();
             AscendC::FixpipeParamsV220 fixpipeParams;
             ...
             AscendC::Fixpipe<S, S, AscendC::CFG_ROW_MAJOR>(cGlobal, co1Local, fixpipeParams);
-            ...
         }
         ```
 
@@ -425,35 +409,29 @@
 
 -   **3510架构版本删除L0A Buffer/L0B Buffer初始化的相关硬件指令。**
 
-    **说明**：InitConstValue将特定存储位置的LocalTensor初始化为某一具体数值，不支持直接初始化L0A Buffer、L0B Buffer。
+    **说明**：Fill接口将特定存储位置的LocalTensor初始化为某一具体数值，不支持直接初始化L0A Buffer、L0B Buffer。
 
-    **兼容方案**：先初始化L1 Buffer，再通过LoadData接口将L1 Buffer上的数据搬运到L0A Buffer、L0B Buffer。
+    **兼容方案**：先通过Fill接口初始化L1 Buffer，再通过LoadData接口将L1 Buffer上的数据搬运到L0A Buffer、L0B Buffer。具体代码可参考[Fill兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_compatibility_guide/fill)。
 
     以 GM -\> L1 Buffer -\> L0A Buffer的数据通路为例：
 
     1.  初始化L1 Buffer。
 
         ```
-        __aicore__ inline void InitConstA1()
+        __aicore__ inline void InitConstA1(AscendC::LocalTensor<T>& a1Local)
         {
-            AscendC::LocalTensor<T> leftMatrix = inQueueA1.AllocTensor<T>();
-            AscendC::InitConstValue(leftMatrix, {1, static_cast<uint16_t>(m * k * sizeof(T) / 32), 0, 1});
-            inQueueA1.EnQue(leftMatrix);
+            AscendC::Fill(a1Local, {1, static_cast<uint16_t>(M * K * sizeof(T) / 32), 0, 1});
         }
         ```
 
     2.  调用LoadData接口将L1 Buffer上的数据搬运到L0A Buffer。
 
         ```
-        __aicore__ inline void Load2DA1ToL0A()
+        __aicore__ inline void Load2DA1ToA2(AscendC::LocalTensor<T>& a1Local, AscendC::LocalTensor<T>& a2Local)
         {
-            AscendC::LocalTensor<T> a1 = inQueueA1.DeQue<T>();
-            AscendC::LocalTensor<T> a2 = inQueueA2.AllocTensor<T>();
             AscendC::LoadData2DParamsV2 loadDataParams;
             ...
-            AscendC::LoadData(a2, a1, loadDataParams);
-            inQueueA2.EnQue(a2);
-            inQueueA1.FreeTensor(a1);
+            AscendC::LoadData(a2Local, a1Local, loadDataParams);
         }
         ```
 
