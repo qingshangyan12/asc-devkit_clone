@@ -12,7 +12,7 @@ Ascend C编程模型中，并行编程范式核心要素是：一组并行计算
 以最简单的矢量编程范式为例，在调用上述接口时，实际上会给各执行单元下发一些指令，如下图所示：
 
 **图 1**  Vector编程范式指令队列示例<a name="fig27113275917"></a>  
-![](../../../../figures//Vector编程范式指令队列示例.png "Vector编程范式指令队列示例")
+![](../../../../figures/Vector编程范式指令队列示例.png "Vector编程范式指令队列示例")
 
 -   EnQue/DeQue的具体处理流程：
 
@@ -24,11 +24,11 @@ Ascend C编程模型中，并行编程范式核心要素是：一组并行计算
         -   DeQue调用会发射同步指令wait，等待数据写入完成
         -   wait需要等到set指令执行完成后才能执行否则阻塞
 
-    ![](../../../../figures//图1-AI-Core内部并行计算架构抽象示意图-28.png)
+    ![](../../../../figures/图1-AI-Core内部并行计算架构抽象示意图-28.png)
 
     由此可以看出，EnQue/DeQue主要解决了存在数据依赖时，并行执行单元的写后读同步控制问题。
 
-    ![](../../../../figures//Iterate_flase.png)
+    ![](../../../../figures/Iterate_flase.png)
 
 -   AllocTensor/FreeTensor的具体处理流程
 
@@ -40,10 +40,10 @@ Ascend C编程模型中，并行编程范式核心要素是：一组并行计算
         -   FreeTensor调用会发射同步指令set，通知内存释放，可以重复写
         -   wait需要等到set指令执行完成后才能执行否则阻塞
 
-    ![](../../../../figures//图1-AI-Core内部并行计算架构抽象示意图-29.png)
+    ![](../../../../figures/图1-AI-Core内部并行计算架构抽象示意图-29.png)
 
     由此可以看出，AllocTensor/FreeTensor主要解决了存在数据依赖时，并行执行单元的读后写同步控制问题。
 
-    ![](../../../../figures//Iterate_flase-30.png)
+    ![](../../../../figures/Iterate_flase-30.png)
 
 通过上文的详细说明，可以看出异步并行程序需要考虑复杂的同步控制，而Ascend C编程模型将这些流程进行了封装，通过EnQue/DeQue/AllocTensor/FreeTensor这种开发者熟悉的资源控制方式来体现，达到简化编程和易于理解的目的。
