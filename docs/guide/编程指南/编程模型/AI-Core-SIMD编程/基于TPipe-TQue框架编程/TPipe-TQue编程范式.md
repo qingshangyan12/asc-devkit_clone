@@ -13,9 +13,9 @@ Ascend C编程范式正是这样一种流水线式的编程范式，把算子核
 
 下文将从三种典型的算子类型出发，对这种基于TPipe和TQue的编程范式进行详细介绍。
 
--   [矢量编程范式](基于TPipe和TQue编程.md#section116515238815)
--   [矩阵编程范式](基于TPipe和TQue编程.md#section8213173433312)
--   [融合算子编程范式](基于TPipe和TQue编程.md#section57815481855)
+-   [矢量编程范式](./TPipe-TQue编程范式.md#section116515238815)
+-   [矩阵编程范式](./TPipe-TQue编程范式.md#section8213173433312)
+-   [融合算子编程范式](./TPipe-TQue编程范式.md#section57815481855)
 
 ## 矢量编程范式<a name="section116515238815"></a>
 
