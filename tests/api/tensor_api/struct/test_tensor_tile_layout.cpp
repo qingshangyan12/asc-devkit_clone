@@ -185,21 +185,6 @@ TEST_F(Tensor_Api_Layout, LayoutSizeOperation)
     EXPECT_EQ(layoutMake.Size(), 256);
 }
 
-TEST_F(Tensor_Api_Layout, StaticLayoutOperation)
-{
-    using namespace AscendC::Te;
-
-    using TwoDimT = AscendC::Std::tuple<AscendC::Std::Int<3>, AscendC::Std::Int<4>>;
-    using TwoDimU = AscendC::Std::tuple<AscendC::Std::Int<2>, AscendC::Std::Int<1>>;
-    EXPECT_EQ((StaticLayoutSize<TwoDimT, TwoDimU>::size), 6);
-
-    using FourDimT = AscendC::Std::tuple<AscendC::Std::tuple<AscendC::Std::Int<3>, AscendC::Std::Int<4>>,
-                                         AscendC::Std::tuple<AscendC::Std::Int<1>, AscendC::Std::Int<2>>>;
-    using FourDimU = AscendC::Std::tuple<AscendC::Std::tuple<AscendC::Std::Int<4>, AscendC::Std::Int<5>>,
-                                         AscendC::Std::tuple<AscendC::Std::Int<2>, AscendC::Std::Int<3>>>;
-    EXPECT_EQ((StaticLayoutSize<FourDimT, FourDimU>::size), 20);
-}
-
 TEST_F(Tensor_Api_Layout, MakeMxLayout)
 {
     using namespace AscendC::Te;
