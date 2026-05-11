@@ -12,7 +12,7 @@
 ![](../../../figures/开发Ascend-C算子的基本流程.png "开发Ascend-C算子的基本流程")
 
 >[!NOTE]说明
->-   请点击[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_vector/basic_api_tque_add)获取样例代码。
+>-   请点击[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_vector/basic_api_memory_allocator_add)获取样例代码。
 >-   使用本教程只需要您具有一定的C/C++基础，在此基础上，如果您已经对Ascend C编程模型有一定的了解，您可以在实际操作的过程中加深对理论的理解；如果您还没有开始了解Ascend C编程模型，也无需担心，您可以先尝试跑通教程中的样例，参考教程最后的[指引](#zh-cn_topic_0000001565030288_section128349412384)进行进一步的学习。
 
 ## 环境准备<a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_section412999115218"></a>
@@ -40,18 +40,18 @@
 2.  明确输入和输出。
     -   Add算子有两个输入：x与y，输出为z。
     -   本样例中算子输入支持的数据类型为float，算子输出的数据类型与输入数据类型相同。
-    -   算子输入支持的shape为（8，2048），输出shape与输入shape相同。
+    -   算子输入支持的shape为（1，4096），输出shape与输入shape相同。
     -   算子输入支持的[format](../../../编程指南/概念原理和术语/神经网络和算子/数据排布格式.md)为：ND。
 
 3.  确定核函数名称和参数。
     -   本样例中核函数命名为add\_custom。
-    -   根据对算子输入输出的分析，确定核函数有3个参数x，y，z；x，y为输入参数，z为输出参数。
+    -   根据对算子输入输出的分析，确定核函数有3个数据参数x，y，z；x，y为输入参数，z为输出参数。
 
 4.  确定算子实现所需接口。
     -   实现涉及外部存储和内部存储间的数据搬运，查看Ascend C  API参考中的数据搬运接口，需要使用[DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DataCopy.md)来实现数据搬移。
     -   本样例只涉及矢量计算的加法操作，查看Ascend C  API参考中的矢量计算接口[Memory矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Memory矢量计算.md)，初步分析可使用Add接口[Add](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Add.md)实现x+y。
-    -   计算中使用到的Tensor数据结构，使用[AllocTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AllocTensor.md)、[FreeTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FreeTensor.md)进行申请和释放。
-    -   并行流水任务之间使用Queue队列完成同步，会使用到[EnQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/EnQue.md)、[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DeQue.md)等接口。
+    -   计算中使用到的Tensor数据结构，通过静态Tensor编程方式创建LocalTensor。本样例使用[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/LocalMemAllocator.md)的[Alloc](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Alloc.md)接口为LocalTensor分配Unified Buffer内存。
+    -   静态Tensor编程方式需要开发者手动管理流水间同步，会使用到[SetFlag/WaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetFlag-WaitFlag(ISASI).md)等同步接口；Kernel入口处还需要调用[InitSocState](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/InitSocState.md)初始化全局状态寄存器。
 
 通过以上分析，得到Ascend C  Add算子的设计规格如下：
 
@@ -76,7 +76,7 @@
 </tr>
 <tr id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_row19489161331815"><td class="cellrowborder" valign="top" headers="mcps1.2.6.2.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p134891113131814"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p134891113131814"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p134891113131814"></a>x</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.6.2.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p1283525118245"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p1283525118245"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p1283525118245"></a>(8, 2048)</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.6.2.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p1283525118245"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p1283525118245"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p1283525118245"></a>(1, 4096)</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.6.2.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p12624946102416"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p12624946102416"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p12624946102416"></a>float</p>
 </td>
@@ -85,7 +85,7 @@
 </tr>
 <tr id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_row1348951391811"><td class="cellrowborder" valign="top" headers="mcps1.2.6.2.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p13489191311184"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p13489191311184"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p13489191311184"></a>y</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.6.2.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p18710686591"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p18710686591"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p18710686591"></a>(8, 2048)</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.6.2.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p18710686591"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p18710686591"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p18710686591"></a>(1, 4096)</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.6.2.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p76241246152416"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p76241246152416"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p76241246152416"></a>float</p>
 </td>
@@ -96,7 +96,7 @@
 </th>
 <td class="cellrowborder" valign="top" width="19.250000000000004%" headers="mcps1.2.6.5.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p34899136188"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p34899136188"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p34899136188"></a>z</p>
 </td>
-<td class="cellrowborder" valign="top" width="21.970000000000002%" headers="mcps1.2.6.5.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p13645129155915"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p13645129155915"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p13645129155915"></a>(8, 2048)</p>
+<td class="cellrowborder" valign="top" width="21.970000000000002%" headers="mcps1.2.6.5.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p13645129155915"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p13645129155915"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p13645129155915"></a>(1, 4096)</p>
 </td>
 <td class="cellrowborder" valign="top" width="21.610000000000003%" headers="mcps1.2.6.5.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p4624546192418"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p4624546192418"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p4624546192418"></a>float</p>
 </td>
@@ -116,15 +116,15 @@
 <tr id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_row9293141202412"><td class="cellrowborder" colspan="4" valign="top" headers="mcps1.2.6.7.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p2293241142412"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p2293241142412"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p2293241142412"></a>Add：矢量基础算术接口</p>
 </td>
 </tr>
-<tr id="zh-cn_topic_0000001565030288_row2463132420116"><td class="cellrowborder" colspan="4" valign="top" headers="mcps1.2.6.7.1 "><p id="zh-cn_topic_0000001565030288_p10878133151120"><a name="zh-cn_topic_0000001565030288_p10878133151120"></a><a name="zh-cn_topic_0000001565030288_p10878133151120"></a>AllocTensor、FreeTensor：内存管理接口</p>
+<tr id="zh-cn_topic_0000001565030288_row2463132420116"><td class="cellrowborder" colspan="4" valign="top" headers="mcps1.2.6.7.1 "><p id="zh-cn_topic_0000001565030288_p10878133151120"><a name="zh-cn_topic_0000001565030288_p10878133151120"></a><a name="zh-cn_topic_0000001565030288_p10878133151120"></a>LocalMemAllocator、Alloc：静态Tensor内存管理接口</p>
 </td>
 </tr>
-<tr id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_row1036344318916"><td class="cellrowborder" colspan="4" valign="top" headers="mcps1.2.6.7.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p4174848399"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p4174848399"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p4174848399"></a>EnQue、DeQue接口：Queue队列管理接口</p>
+<tr id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_row1036344318916"><td class="cellrowborder" colspan="4" valign="top" headers="mcps1.2.6.7.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p4174848399"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p4174848399"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p4174848399"></a>SetFlag、WaitFlag：同步控制接口</p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_row54819813236"><th class="firstcol" valign="top" id="mcps1.2.6.11.1"><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p74958142316"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p74958142316"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_zh-cn_topic_0229825559_zh-cn_topic_0229823837_zh-cn_topic_0211294710_p74958142316"></a>算子实现文件名称</p>
 </th>
-<td class="cellrowborder" colspan="4" valign="top" headers="mcps1.2.6.11.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p1180818388211"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p1180818388211"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p1180818388211"></a>add_custom.asc</p>
+<td class="cellrowborder" colspan="4" valign="top" headers="mcps1.2.6.11.1 "><p id="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p1180818388211"><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p1180818388211"></a><a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_p1180818388211"></a>add.asc</p>
 </td>
 </tr>
 </tbody>
@@ -132,201 +132,92 @@
 
 ## 核函数开发<a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_section822273613219"></a>
 
-完成环境准备和初步的算子分析后，即可开始Ascend C核函数的开发。开发之前请先从[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_vector/basic_api_tque_add)获取样例代码，以下样例代码在add\_custom.asc中实现。
+完成环境准备和初步的算子分析后，即可开始Ascend C核函数的开发。开发之前请先从[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_vector/basic_api_memory_allocator_add)获取样例代码，以下样例代码在add.asc中实现。
 
-本样例中使用多核并行计算，即把数据进行分片，分配到多个核上进行处理。Ascend C核函数是在一个核上的处理函数，所以只处理部分数据。分配方案是：假设共启用8个核，数据整体长度为8 \* 2048个元素，平均分配到8个核上运行，每个核上处理的数据大小为2048个元素。对于单核上的处理数据，也可以进行数据切块，实现对数据的流水并行处理。
+本样例使用1个Vector核处理4096个float元素，数据规模可以一次放入Unified Buffer，因此不做核间切分，也不需要额外的tiling参数。
 
-1.  根据分配方案设计一个结构体AddCustomTilingData，用于保存并行数据切分相关的参数。AddCustomTilingData定义了两个参数：totalLength、tileNum。totalLength指待处理的数据总大小为（8 \* 2048）个元素，tileNum指每个核需要计算的数据块个数。
+1.  根据样例规格定义常量。
 
     ```
-    struct AddCustomTilingData
-    {
-        uint32_t totalLength;
-        uint32_t tileNum;
-    };
+    #include <cstdint>
+    #include <cstddef>
+    #include "kernel_operator.h"
+
+    namespace {
+    constexpr uint32_t BLOCK_NUM = 1;
+    constexpr uint32_t DATA_LENGTH = 4096;
+    constexpr size_t DATA_BYTE_SIZE = DATA_LENGTH * sizeof(float);
+    constexpr int32_t DEVICE_ID = 0;
+    }
     ```
 
 2.  根据[核函数定义和调用](../../../编程指南/编程模型/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)中介绍的规则进行**核函数的定义**，并在核函数中调用算子类的Init和Process函数，算子类实现在后续步骤中介绍。
 
     ```
-    __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData tiling)
+    __global__ __vector__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z)
     {
-        KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);    // 设置Kernel类型为Vector核（用于矢量计算）
+        AscendC::InitSocState();
         KernelAdd op;
-        op.Init(x, y, z, tiling.totalLength, tiling.tileNum);
+        op.Init(x, y, z);
         op.Process();
     }
     ```
 
-    -   使用\_\_global\_\_函数类型限定符来标识它是一个核函数，可以被<<<\>\>\>调用；使用\_\_aicore\_\_函数类型限定符来标识该核函数在设备端AI Core上执行。指针入参变量需要增加变量类型限定符\_\_gm\_\_，表明该指针变量指向Global Memory上某处内存地址。为了统一表达，使用GM\_ADDR宏来修饰入参，GM\_ADDR宏定义如下：
+    -   使用\_\_global\_\_函数类型限定符来标识它是一个核函数，可以被<<<\>\>\>调用；使用\_\_vector\_\_函数类型限定符来标识该核函数在Vector核上执行。指针入参变量需要增加变量类型限定符\_\_gm\_\_，表明该指针变量指向Global Memory上某处内存地址。为了统一表达，使用GM\_ADDR宏来修饰入参，GM\_ADDR宏定义如下：
 
         ```
         #define GM_ADDR __gm__ uint8_t*
         ```
 
-    -   算子类的Init函数，完成内存初始化相关工作，Process函数完成算子实现的核心逻辑。
+    -   静态Tensor编程方式需要在Kernel入口处调用InitSocState接口初始化全局状态寄存器；算子类的Init函数完成GlobalTensor初始化，Process函数完成算子实现的核心逻辑。
 
-3.  **根据矢量编程范式实现算子类**，本样例中定义KernelAdd算子类，其具体成员如下：
+3.  **根据静态Tensor编程方式实现算子类**，本样例中定义KernelAdd算子类，其具体实现如下：
 
     ```
     class KernelAdd {
     public:
-        __aicore__ inline KernelAdd(){}
-        // 初始化函数，完成内存初始化相关操作
-        __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength, uint32_t tileNum){}
-        // 核心处理函数，实现算子逻辑，调用私有成员函数CopyIn、Compute、CopyOut完成矢量算子的三级流水操作
-        __aicore__ inline void Process(){}
-    
+        __aicore__ inline KernelAdd() = default;
+
+        __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z)
+        {
+            xGm.SetGlobalBuffer((__gm__ float *)x, DATA_LENGTH);
+            yGm.SetGlobalBuffer((__gm__ float *)y, DATA_LENGTH);
+            zGm.SetGlobalBuffer((__gm__ float *)z, DATA_LENGTH);
+        }
+
+        __aicore__ inline void Process()
+        {
+            AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+            AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, DATA_LENGTH>();
+            AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, DATA_LENGTH>();
+            AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, DATA_LENGTH>();
+
+            AscendC::DataCopy(xLocal, xGm, DATA_LENGTH);
+            AscendC::DataCopy(yLocal, yGm, DATA_LENGTH);
+            AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+            AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+
+            AscendC::Add(zLocal, xLocal, yLocal, DATA_LENGTH);
+            AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+            AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+
+            AscendC::DataCopy(zGm, zLocal, DATA_LENGTH);
+            AscendC::SetFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID0);
+            AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID0);
+        }
+
     private:
-        // 搬入函数，从Global Memory搬运数据至Local Memory，被核心Process函数调用
-        __aicore__ inline void CopyIn(int32_t progress){}
-        // 计算函数，完成两个输入参数相加，得到最终结果，被核心Process函数调用
-        __aicore__ inline void Compute(int32_t progress){}
-        // 搬出函数，将最终结果从Local Memory搬运到Global Memory上，被核心Process函数调用
-        __aicore__ inline void CopyOut(int32_t progress){}
-    
-    private:
-        AscendC::TPipe pipe;  // TPipe内存管理对象
-        AscendC::TQue<AscendC::TPosition::VECIN, BUFFER_NUM> inQueueX, inQueueY;  // 输入数据Queue队列管理对象，TPosition为VECIN
-        AscendC::TQue<AscendC::TPosition::VECOUT, BUFFER_NUM> outQueueZ;  // 输出数据Queue队列管理对象，TPosition为VECOUT
-        AscendC::GlobalTensor<float> xGm;  // 管理输入输出Global Memory内存地址的对象，其中xGm, yGm为输入，zGm为输出
+        AscendC::GlobalTensor<float> xGm;
         AscendC::GlobalTensor<float> yGm;
         AscendC::GlobalTensor<float> zGm;
-        uint32_t blockLength; // 每个核的计算数据长度
-        uint32_t tileNum; // 每个核需要计算的数据块个数
-        uint32_t tileLength; // 每个核内每个数据块的长度
     };
     ```
 
-    内部函数的调用关系示意图如下：
+    Init函数通过GlobalTensor类的[SetGlobalBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GlobalTensor.md)接口设置x、y、z在Global Memory上的起始地址以及长度。Process函数先通过LocalMemAllocator为x、y、z分别分配LocalTensor，再完成“搬入、计算、搬出”三个阶段。
 
-    **图 2**  核函数调用关系图<a name="zh-cn_topic_0000001565030288_fig8676257399"></a>  
-    ![](../../../figures/核函数调用关系图.png "核函数调用关系图")
-
-    由此可见除了Init函数完成初始化外，Process中完成了对**流水任务**“搬入、计算、搬出”的调用，开发者可以重点关注三个流水任务的实现。
-
-4.  初始化函数**Init**主要完成以下内容：设置输入输出Global Tensor的Global Memory内存地址，通过TPipe内存管理对象为输入输出Queue分配内存。
-
-    **上文我们介绍到，本样例将数据切分成8块，平均分配到8个核上运行，每个核上处理的数据大小为2048个元素。那么我们是如何实现这种切分的呢？**
-
-    每个核上处理的数据地址需要在起始地址上增加GetBlockIdx\(\) \* blockLength（每个block处理的数据长度）的偏移来获取。这样也就实现了多核并行计算的数据切分。
-
-    以输入x为例，x + blockLength \* GetBlockIdx\(\)即为单核处理程序中x在Global Memory上的内存偏移地址，获取偏移地址后，使用GlobalTensor类的[SetGlobalBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GlobalTensor.md)接口设定该核上Global Memory的起始地址以及长度。具体示意图如下。
-
-    **图 3**  多核并行处理示意图<a name="zh-cn_topic_0000001565030288_fig744312161511"></a>  
-    ![](../../../figures/多核并行处理示意图.png "多核并行处理示意图")
-
-    **上面已经实现了多核数据的切分，那么单核上的处理数据如何进行切分？**
-
-    对于单核上的处理数据，可以进行数据切块（Tiling），在本示例中，仅作为参考，将数据切分成8块（并不意味着8块就是性能最优）。切分后的每个数据块再次切分成2块，即可开启[double buffer](../../../编程指南/概念原理和术语/性能优化技术原理/DoubleBuffer.md)，实现流水线之间的并行。
-
-    这样单核上的数据（2048个数）被切分成16块，每块tileLength（128）个数据。TPipe为inQueueX分配了两块大小为tileLength \* sizeof\(float\)个字节的内存块，每个内存块能容纳tileLength（128）个float类型数据。数据切分示意图如下。
-
-    **图 4**  单核数据切分示意图<a name="zh-cn_topic_0000001565030288_fig184434221514"></a>  
-    ![](../../../figures/单核数据切分示意图.png "单核数据切分示意图")
-
-    具体的初始化函数代码如下：
-
-    ```
-    // Kernel侧所需头文件
-    #include "kernel_operator.h"
-    
-    constexpr int32_t BUFFER_NUM = 2;                                     // tensor num for each queue
-    
-    __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength, uint32_t tileNum)
-    {
-        
-         this->blockLength = totalLength / AscendC::GetBlockNum();     // length computed of each core
-         this->tileNum = tileNum;                                      // split data into 8 tiles for each core
-         this->tileLength = this->blockLength / tileNum / BUFFER_NUM;  // separate to 2 parts, due to double buffer
-         // get start index for current core, core parallel
-         xGm.SetGlobalBuffer((__gm__ float *)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
-         yGm.SetGlobalBuffer((__gm__ float *)y + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
-         zGm.SetGlobalBuffer((__gm__ float *)z + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
-         // pipe alloc memory to queue, the unit is Bytes
-         pipe.InitBuffer(inQueueX, BUFFER_NUM, this->tileLength * sizeof(float));
-         pipe.InitBuffer(inQueueY, BUFFER_NUM, this->tileLength * sizeof(float));
-         pipe.InitBuffer(outQueueZ, BUFFER_NUM, this->tileLength * sizeof(float));
-    }
-    ```
-
-5.  基于矢量编程范式，将核函数的实现分为3个基本任务：CopyIn，Compute，CopyOut。**Process**函数中通过如下方式调用这三个函数。
-
-    ```
-    __aicore__ inline void Process()
-    {
-        // loop count need to be doubled, due to double buffer
-        int32_t loopCount = this->tileNum * BUFFER_NUM;
-        // tiling strategy, pipeline parallel
-        for (int32_t i = 0; i < loopCount; i++) {
-            CopyIn(i);
-            Compute(i);
-            CopyOut(i);
-        }
-    }
-    ```
-
-    1.  CopyIn函数实现。
-
-        1.  使用[DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DataCopy.md)接口将GlobalTensor数据拷贝到LocalTensor。
-        2.  使用[EnQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/EnQue.md)将LocalTensor放入VecIn的Queue中。
-
-        ```
-        __aicore__ inline void CopyIn( int32_t progress)
-        {
-            // alloc tensor from queue memory
-            AscendC::LocalTensor<float> xLocal = inQueueX.AllocTensor<float>();
-            AscendC::LocalTensor<float> yLocal = inQueueY.AllocTensor<float>();
-            // copy progress_th tile from global tensor to local tensor
-            AscendC::DataCopy(xLocal, xGm[progress * this->tileLength], this->tileLength);
-            AscendC::DataCopy(yLocal, yGm[progress * this->tileLength], this->tileLength);
-            // enque input tensors to VECIN queue
-            inQueueX.EnQue(xLocal);
-            inQueueY.EnQue(yLocal);
-        }
-        ```
-
-    2.  Compute函数实现。
-
-        1.  使用[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DeQue.md)从VecIn中取出LocalTensor。
-        2.  使用Ascend C接口[Add](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Add.md)完成矢量计算。
-        3.  使用[EnQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/EnQue.md)将计算结果LocalTensor放入到VecOut的Queue中。
-        4.  使用[FreeTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FreeTensor.md)将释放不再使用的LocalTensor。
-
-        ```
-        __aicore__ inline void Compute(int32_t progress)
-        {
-            // deque input tensors from VECIN queue
-            AscendC::LocalTensor<float> xLocal = inQueueX.DeQue<float>();
-            AscendC::LocalTensor<float> yLocal = inQueueY.DeQue<float>();
-            AscendC::LocalTensor<float> zLocal = outQueueZ.AllocTensor<float>();
-            // call Add instr for computation
-            AscendC::Add(zLocal, xLocal, yLocal, this->tileLength);
-            // enque the output tensor to VECOUT queue
-            outQueueZ.EnQue<float>(zLocal);
-            // free input tensors for reuse
-            inQueueX.FreeTensor(xLocal);
-            inQueueY.FreeTensor(yLocal);
-        }
-        ```
-
-    3.  CopyOut函数实现。
-
-        1.  使用[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DeQue.md)接口从VecOut的Queue中取出LocalTensor。
-        2.  使用[DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DataCopy.md)接口将LocalTensor拷贝到GlobalTensor上。
-        3.  使用[FreeTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FreeTensor.md)将不再使用的LocalTensor进行回收。
-
-        ```
-         __aicore__ inline void CopyOut(int32_t progress)
-        {
-            // deque output tensor from VECOUT queue
-            AscendC::LocalTensor<float> zLocal = outQueueZ.DeQue<float>();
-            // copy progress_th tile from local tensor to global tensor
-            AscendC::DataCopy(zGm[progress * this->tileLength], zLocal, this->tileLength);
-            // free output tensor for reuse
-            outQueueZ.FreeTensor(zLocal);
-        }
-        ```
+    -   搬入阶段：使用[DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DataCopy.md)将x、y从Global Memory搬运到Local Memory，然后通过MTE2\_V事件保证搬入完成后再进入Vector计算。
+    -   计算阶段：使用[Add](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Add.md)完成矢量加法，然后通过V\_MTE3事件保证计算完成后再搬出。
+    -   搬出阶段：使用DataCopy将z从Local Memory搬运回Global Memory，并通过MTE3\_MTE2事件等待搬出完成。
 
 ## 核函数运行验证<a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_section136721210114419"></a>
 
@@ -339,62 +230,39 @@
     #include "acl/acl.h"
     // Kernel侧需要包含的头文件
     #include "kernel_operator.h"
+    // 文件读写工具头文件
+    #include "data_utils.h"
     // 核函数开发部分
     ...
     
-    __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData tiling)
+    __global__ __vector__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z)
     {
-        KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);    
+        AscendC::InitSocState();
         KernelAdd op;
-        op.Init(x, y, z, tiling.totalLength, tiling.tileNum);
+        op.Init(x, y, z);
         op.Process();
     }
     
     // 通过<<<...>>>内核调用符调用算子
-    std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y)
+    void KernelCall(aclrtStream stream)
     {
     ...
     }
     
-    
-    // 计算结果比对
-    uint32_t VerifyResult(std::vector<float> &output, std::vector<float> &golden)
-    {
-        auto printTensor = [](std::vector<float> &tensor, const char *name) {
-            constexpr size_t maxPrintSize = 20;
-            std::cout << name << ": ";
-            std::copy(tensor.begin(), tensor.begin() + std::min(tensor.size(), maxPrintSize),
-                std::ostream_iterator<float>(std::cout, " "));
-            if (tensor.size() > maxPrintSize) {
-                std::cout << "...";
-            }
-            std::cout << std::endl;
-        };
-        printTensor(output, "Output");
-        printTensor(golden, "Golden");
-        if (std::equal(golden.begin(), golden.end(), output.begin())) {
-            std::cout << "[Success] Case accuracy is verification passed." << std::endl;
-            return 0;
-        } else {
-            std::cout << "[Failed] Case accuracy is verification failed!" << std::endl;
-            return 1;
-        }
-        return 0;
-    }
-    
     // 算子验证主程序
-    int32_t main(int32_t argc, char *argv[])
+    int32_t main()
     {
-        constexpr uint32_t totalLength = 8 * 2048;
-        constexpr float valueX = 1.2f;
-        constexpr float valueY = 2.3f;
-        std::vector<float> x(totalLength, valueX);
-        std::vector<float> y(totalLength, valueY);
+        aclInit(nullptr);
+        aclrtSetDevice(DEVICE_ID);
+        aclrtStream stream = nullptr;
+        aclrtCreateStream(&stream);
     
-        std::vector<float> output = kernel_add(x, y);
+        KernelCall(stream);
     
-        std::vector<float> golden(totalLength, valueX + valueY);
-        return VerifyResult(output, golden);
+        aclrtDestroyStream(stream);
+        aclrtResetDevice(DEVICE_ID);
+        aclFinalize();
+        return 0;
     }
     ```
 
@@ -406,51 +274,51 @@
     如下示例中的acl API使用方法请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
     ```
-    std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y)
+    void KernelCall(aclrtStream stream)
     {
-        constexpr uint32_t numBlocks = 8;
-        uint32_t totalLength = x.size();
-        size_t totalByteSize = totalLength * sizeof(float);
-        int32_t deviceId = 0;
-        aclrtStream stream = nullptr;
-        AddCustomTilingData tiling = {/*totalLength:*/totalLength, /*tileNum:*/8};
-        uint8_t *xHost = reinterpret_cast<uint8_t *>(x.data());
-        uint8_t *yHost = reinterpret_cast<uint8_t *>(y.data());
-        uint8_t *zHost = nullptr;
-        uint8_t *xDevice = nullptr;
-        uint8_t *yDevice = nullptr;
-        uint8_t *zDevice = nullptr;
-    
-        // 初始化
-        aclInit(nullptr);
-        // 运行管理资源申请
-        aclrtSetDevice(deviceId);
-        aclrtCreateStream(&stream);
-        // 分配Host内存
-        aclrtMallocHost((void **)(&zHost), totalByteSize);
-        // 分配Device内存
-        aclrtMalloc((void **)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
-        aclrtMalloc((void **)&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
-        aclrtMalloc((void **)&zDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+        uint8_t *inputXHost = nullptr;
+        uint8_t *inputYHost = nullptr;
+        uint8_t *outputHost = nullptr;
+        uint8_t *inputXDevice = nullptr;
+        uint8_t *inputYDevice = nullptr;
+        uint8_t *outputDevice = nullptr;
+        size_t fileSize = DATA_BYTE_SIZE;
+
         // 将Host上的输入数据拷贝到Device侧
-        aclrtMemcpy(xDevice, totalByteSize, xHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
-        aclrtMemcpy(yDevice, totalByteSize, yHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
+        aclrtMallocHost((void **)(&inputXHost), DATA_BYTE_SIZE);
+        aclrtMallocHost((void **)(&inputYHost), DATA_BYTE_SIZE);
+        aclrtMallocHost((void **)(&outputHost), DATA_BYTE_SIZE);
+        aclrtMalloc((void **)(&inputXDevice), DATA_BYTE_SIZE, ACL_MEM_MALLOC_HUGE_FIRST);
+        aclrtMalloc((void **)(&inputYDevice), DATA_BYTE_SIZE, ACL_MEM_MALLOC_HUGE_FIRST);
+        aclrtMalloc((void **)(&outputDevice), DATA_BYTE_SIZE, ACL_MEM_MALLOC_HUGE_FIRST);
+
+        if (!ReadFile("./input/input_x.bin", fileSize, inputXHost, DATA_BYTE_SIZE) || fileSize != DATA_BYTE_SIZE) {
+            ERROR_LOG("failed to read input x");
+            return;
+        }
+        fileSize = DATA_BYTE_SIZE;
+        if (!ReadFile("./input/input_y.bin", fileSize, inputYHost, DATA_BYTE_SIZE) || fileSize != DATA_BYTE_SIZE) {
+            ERROR_LOG("failed to read input y");
+            return;
+        }
+        aclrtMemcpy(inputXDevice, DATA_BYTE_SIZE, inputXHost, DATA_BYTE_SIZE, ACL_MEMCPY_HOST_TO_DEVICE);
+        aclrtMemcpy(inputYDevice, DATA_BYTE_SIZE, inputYHost, DATA_BYTE_SIZE, ACL_MEMCPY_HOST_TO_DEVICE);
+
         // 用内核调用符<<<...>>>调用核函数完成指定的运算
-        add_custom<<<numBlocks, nullptr, stream>>>(xDevice, yDevice, zDevice, tiling);
+        add_custom<<<BLOCK_NUM, nullptr, stream>>>(inputXDevice, inputYDevice, outputDevice);
         aclrtSynchronizeStream(stream);
+
         // 将Device上的运算结果拷贝回Host
-        aclrtMemcpy(zHost, totalByteSize, zDevice, totalByteSize, ACL_MEMCPY_DEVICE_TO_HOST);
-        std::vector<float> z((float *)zHost, (float *)(zHost + totalByteSize));
+        aclrtMemcpy(outputHost, DATA_BYTE_SIZE, outputDevice, DATA_BYTE_SIZE, ACL_MEMCPY_DEVICE_TO_HOST);
+        WriteFile("./output/output.bin", outputHost, DATA_BYTE_SIZE);
+
         // 释放申请的资源
-        aclrtFree(xDevice);
-        aclrtFree(yDevice);
-        aclrtFree(zDevice);
-        aclrtFreeHost(zHost);
-        // 去初始化
-        aclrtDestroyStream(stream);
-        aclrtResetDevice(deviceId);
-        aclFinalize();
-        return z;
+        aclrtFree(outputDevice);
+        aclrtFree(inputYDevice);
+        aclrtFree(inputXDevice);
+        aclrtFreeHost(outputHost);
+        aclrtFreeHost(inputYHost);
+        aclrtFreeHost(inputXHost);
     }
     ```
 
@@ -458,18 +326,20 @@
 
     ```
     cmake_minimum_required(VERSION 3.16)
+    set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+    set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
     # find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
     find_package(ASC REQUIRED)
     # 指定项目支持的语言包括ASC和CXX，ASC表示支持使用毕昇编译器对Ascend C编程语言进行编译
     project(kernel_samples LANGUAGES ASC CXX)
     
-    add_executable(demo
-        add_custom.asc
+    add_executable(add
+        add.asc
     )
     
     # 通过编译选项设置NPU架构
-    target_compile_options(demo PRIVATE   
-       $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
+    target_compile_options(add PRIVATE
+       $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
     )
     ```
 
@@ -477,18 +347,74 @@
 
     ```
     mkdir -p build && cd build; 
-    cmake ..;make -j;
-    ./demo
+    cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
+    python3 ../scripts/gen_data.py
+    ./add
+    python3 ../scripts/verify_result.py output/output.bin output/golden.bin
     ```
 
-    >[!NOTE]说明 
+    执行结果如下，说明精度比对成功。
+
+    ```
+    test pass!
+    ```
+
+5.  NPU上板打印
+
+    这一步不是运行样例的必需步骤，主要用于排查算子精度问题。如果运行`verify_result.py`后发现比对不通过，需要进一步确认NPU侧数据是否符合预期，可以在`Process()`的数据搬入、计算、搬出等关键位置临时插入[DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DumpTensor.md)打印。
+
+    ```cpp
+    constexpr uint32_t DUMP_SIZE = 16;
+
+    // DataCopy搬入前：查看GlobalTensor上的输入。
+    AscendC::DumpTensor(xGm, 1, DUMP_SIZE);
+    AscendC::DumpTensor(yGm, 2, DUMP_SIZE);
+
+    // WaitFlag<AscendC::HardEvent::MTE2_V>之后：查看搬入后的LocalTensor。
+    AscendC::DumpTensor(xLocal, 3, DUMP_SIZE);
+    AscendC::DumpTensor(yLocal, 4, DUMP_SIZE);
+
+    // WaitFlag<AscendC::HardEvent::V_MTE3>之后：查看计算得到的LocalTensor。
+    AscendC::DumpTensor(zLocal, 5, DUMP_SIZE);
+
+    // WaitFlag<AscendC::HardEvent::MTE3_MTE2>之后：查看GlobalTensor上的输出。
+    AscendC::DumpTensor(zGm, 6, DUMP_SIZE);
+    ```
+
+    DumpTensor接口的第2个参数为自定义附加信息，可按调试习惯设置为行号或阶段编号，用于区分不同位置的打印结果。
+
+6.  NPU上板性能调优
+
+    样例精度比对通过后，如果需要进一步了解算子在NPU上的执行性能，可以使用`msprof op`采集上板性能数据。采集前请先去掉前一步临时插入的DumpTensor打印，或通过`ASCENDC_DUMP=0`关闭打印功能，避免打印开销影响性能数据。
+
+    在`build`目录下执行如下命令，采集当前样例的性能数据。
+
+    ```
+    msprof op ./add
+    ```
+
+    采集完成后，可查看生成结果目录中的文件，初步判断算子瓶颈。
+
+    ```
+    ├── ArithmeticUtilization.csv  # cube/vector指令cycle占比
+    ├── L2Cache.csv                # L2 Cache命中率
+    ├── Memory.csv                 # UB、L1和主存储器读写带宽速率
+    ├── MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+    ├── PipeUtilization.csv        # pipe类指令耗时和占比
+    ├── ResourceConflictRatio.csv  # UB bank conflict等资源冲突占比
+    └── visualize_data.bin         # MindStudio Insight呈现文件
+    ```
+
+    对于本样例，可以先关注`ArithmeticUtilization.csv`和`PipeUtilization.csv`，了解Vector计算与数据搬运的耗时占比；再结合`Memory.csv`、`MemoryUB.csv`、`L2Cache.csv`观察带宽和缓存命中情况。如果需要进一步做Roofline瓶颈分析或查看指令流水图，可参考[性能调优](../../../编程指南/调试调优/性能调优.md)。
+
+    >[!NOTE]说明
     >-   该样例仅支持如下型号：
     >    -   Ascend 950PR/Ascend 950DT
     >    -   Atlas A3 训练系列产品/Atlas A3 推理系列产品
     >    -   Atlas A2 训练系列产品/Atlas A2 推理系列产品
     >-   _-_-npu-arch用于指定NPU的架构版本，dav-后为架构版本号，请替换为您实际使用的架构版本号。各AI处理器型号对应的架构版本号请通过[AI处理器型号和\_\_NPU\_ARCH\_\_的对应关系](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
+    >-   使用CPU调试或NPU仿真模式时，可在cmake命令中添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数。
 
 ## 接下来的引导<a name="zh-cn_topic_0000001565030288_section128349412384"></a>
 
-如果您对教程中的多核并行、流水编程等概念不了解，导致阅读过程有些吃力，可以参考[编程模型](../../../编程指南/编程模型/)学习基本概念，再来回顾本教程；如果您已经了解相关概念，并跑通了该样例，您可以参考[矢量编程](../../../算子实践参考/SIMD算子实现/矢量编程/)了解Ascend C矢量编程中的更多细节。
-
+如果您对教程中的静态Tensor、同步事件等概念不了解，导致阅读过程有些吃力，可以参考[编程模型](../../../编程指南/编程模型/)学习基本概念，再来回顾本教程；如果您已经了解相关概念，并跑通了该样例，您可以参考[矢量编程](../../../算子实践参考/SIMD算子实现/矢量编程/)了解Ascend C矢量编程中的更多细节。
