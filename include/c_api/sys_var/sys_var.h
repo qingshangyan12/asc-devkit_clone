@@ -81,8 +81,6 @@ __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
 
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
 
-__aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
-
 __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config);
 
 __aicore__ inline void asc_set_l13d_padding(uint64_t config);
@@ -107,4 +105,3 @@ __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
 #endif    
-
