@@ -17,8 +17,8 @@ import numpy as np
 
 
 def gen_golden_data_simple():
-    input_x = np.random.uniform(1, 100, [8 * 9, 4096]).astype(np.float32)
-    input_y = np.random.uniform(1, 100, [8 * 9, 4096]).astype(np.float32)
+    input_x = np.random.uniform(1, 100, [1, 4096]).astype(np.float32)
+    input_y = np.random.uniform(1, 100, [1, 4096]).astype(np.float32)
     golden = (input_x + input_y).astype(np.float32)
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
