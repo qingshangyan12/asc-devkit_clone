@@ -30,16 +30,6 @@ constexpr size_t TWO_DIM_DEPTH = 2;
 constexpr size_t FOUR_DIM_DEPTH = 4;
 }
 
-template <typename T0, typename... Ts>
-__aicore__ inline constexpr auto GetMax(const T0& t0, const Ts&... ts)
-{
-    if constexpr (sizeof...(Ts) == 0) {
-        return t0;
-    } else {
-        return Std::max(t0, GetMax(ts...));
-    }
-}
-
 template <typename T, typename U, typename S>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
 
@@ -67,7 +57,7 @@ struct nesting_depth<Std::tuple<Args...>> {
 template <typename T>
 constexpr size_t nesting_depth_v = nesting_depth<T>::value;
 
-template <typename T, typename U>
+template <size_t Dim, typename T, typename U>
 struct IsStaticLayout {
 private:
     template<typename T1>
@@ -79,17 +69,9 @@ private:
     template <typename... Args>
     struct include_dynamic_type<Std::tuple<Args...>> : Std::bool_constant<(include_dynamic_type<Args>::value || ...)> {};
 
-    template <typename T1, typename U1>
-    struct has_same_tuple_shape : Std::bool_constant<!Std::is_tuple_v<T1> && !Std::is_tuple_v<U1>> {};
-
-    template <typename... Ts, typename... Us>
-    struct has_same_tuple_shape<Std::tuple<Ts...>, Std::tuple<Us...>>
-        : Std::bool_constant<(sizeof...(Ts) == sizeof...(Us)) &&
-            (has_same_tuple_shape<Ts, Us>::value && ...)> {};
-
-    __aicore__ inline static constexpr bool TestStaticLayout()
+    __aicore__ inline static constexpr auto TestStaticLayout()
     {
-        if constexpr (has_same_tuple_shape<T, U>::value &&
+        if constexpr (nesting_depth_v<T> == Dim && 
             !(include_dynamic_type<T>::value || include_dynamic_type<U>::value)) {
             return true;
         }
@@ -99,42 +81,47 @@ public:
     static constexpr bool value = TestStaticLayout();
 };
 
-template <typename T, typename U, bool IsStatic = IsStaticLayout<T, U>::value>
-struct StaticLayoutSize;
-
-template <typename T, typename U>
-struct StaticLayoutSize<T, U, true> {
+template<typename T, typename U>
+struct StaticLayoutSize {
 private:
-    template <typename ShapeType, typename StrideType>
-    __aicore__ inline static constexpr auto GetStaticLayoutSizeImpl()
+    __aicore__ inline static constexpr auto GetFourDimStaticLayoutSize() 
     {
-        if constexpr (Std::is_tuple_v<ShapeType>) {
-            static_assert(Std::tuple_size_v<ShapeType> == Std::tuple_size_v<StrideType>, "Mismatched ranks");
-            return GetStaticLayoutSizeTuple<ShapeType, StrideType>(Std::make_index_sequence<Std::tuple_size_v<ShapeType>>{});
+        using rowShapeType = typename Std::tuple_element<0, T>::type;
+        using colShapeType = typename Std::tuple_element<1, T>::type;
+        using rowStrideType = typename Std::tuple_element<0, U>::type;
+        using colStrideType = typename Std::tuple_element<1, U>::type;
+
+        using outterRowNumType = typename Std::tuple_element<1, rowShapeType>::type;
+        using outterRowStrideType = typename Std::tuple_element<1, rowStrideType>::type;
+        using outterColNumType = typename Std::tuple_element<1, colShapeType>::type;
+        using outterColStrideType = typename Std::tuple_element<1, colStrideType>::type;
+
+        return (outterRowNumType {} * outterRowStrideType {}) > (outterColNumType {} * outterColStrideType {}) ? 
+            (outterRowNumType {} * outterRowStrideType {}) : (outterColNumType {} * outterColStrideType {});
+    }
+
+    __aicore__ inline static constexpr auto GetTwoDimStaticLayoutSize() 
+    {
+        using rowNumType = typename Std::tuple_element<0, T>::type;
+        using colNumType = typename Std::tuple_element<1, T>::type;
+        using rowStrideType = typename Std::tuple_element<0, U>::type;
+        using colStrideType = typename Std::tuple_element<1, U>::type;
+
+        return (rowNumType {} * rowStrideType {}) > (colNumType {} * colStrideType {}) ? 
+            (rowNumType {} * rowStrideType {}) : (colNumType {} * colStrideType {});
+    }
+
+    __aicore__ inline static constexpr auto GetStaticLayoutSize() {
+        if constexpr (IsStaticLayout<LayoutInternal::FOUR_DIM_DEPTH, T, U>::value) {
+            return GetFourDimStaticLayoutSize();
+        } else if constexpr (IsStaticLayout<LayoutInternal::TWO_DIM_DEPTH, T, U>::value) {
+            return GetTwoDimStaticLayoutSize();
         } else {
-            return ShapeType {} * StrideType {};
+            return Std::Int<0>{};
         }
     }
-
-    template <typename ShapeType, typename StrideType, size_t... Is>
-    __aicore__ inline static constexpr auto GetStaticLayoutSizeTuple(Std::index_sequence<Is...>)
-    {
-        return GetMax(GetStaticLayoutSizeImpl<typename Std::tuple_element<Is, ShapeType>::type,
-            typename Std::tuple_element<Is, StrideType>::type>()...);
-    }
 public:
-    static constexpr size_t size = GetStaticLayoutSizeImpl<T, U>();
-};
-
-template <typename T, typename U>
-struct StaticLayoutSize<T, U, false> {};
-
-template <typename T, typename U, bool IsStatic = IsStaticLayout<T, U>::value>
-struct StaticLayoutSizeMember {};
-
-template <typename T, typename U>
-struct StaticLayoutSizeMember<T, U, true> {
-    static constexpr size_t size = StaticLayoutSize<T, U>::size;
+    static constexpr size_t size = GetStaticLayoutSize();
 };
 
 template <typename... Ts>
@@ -150,8 +137,10 @@ __aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t)
 }
 
 template <typename T, typename U>
-struct Layout : private Std::tuple<T, U>, public StaticLayoutSizeMember<T, U>
+struct Layout : private Std::tuple<T, U>
 {
+    static constexpr auto size = StaticLayoutSize<T, U>::size;
+
     __aicore__ inline constexpr Layout(const T& shape  = {}, const U& stride = {})
         : Std::tuple<T, U>(shape, stride)
     {
