@@ -126,7 +126,12 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(uint16
                 tiling = ccOpTilingDataTable_[static_cast<uint32_t>(param.commType.prepareType)];
             }
         }
-        AssembleHcclMsg(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
+        if (devType_ == HCCL_ASCEND950) {
+            AssembleHcclMsgWithGmPrimitiveId(param, curVersion_, curHandleId_, tiling, hcclSendMsg,
+                                             &hcclMsgArea_->controlMsg);
+        } else {
+            AssembleHcclMsg(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
+        }
     } else {
         AssembleHcclMsg(param, srcGroupID, srcHandleID, hcclSendMsg);
     }
