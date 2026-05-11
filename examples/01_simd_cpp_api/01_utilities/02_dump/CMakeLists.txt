@@ -27,6 +27,20 @@ target_link_libraries(demo PRIVATE
     m
 )
 
+target_compile_definitions(demo PRIVATE
+    ASCENDC_TIME_STAMP_ON=${DASCENDC_TIME_STAMP_ON}
+)
+
+target_compile_definitions(demo PRIVATE
+    ASCENDC_DUMP=1
+)
+
+# ======================================================================================
+# NPU 编译选项配置
+#
+# 说明：
+#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+# ======================================================================================
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
 )
