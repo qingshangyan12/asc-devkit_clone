@@ -1,476 +1,507 @@
-# C++ 代码到 AscendC 代码：Tensor 操作转换示例
+# 3510 RegBase API 开发示例
 
-本文档提供标准 C++ 代码到 AscendC 算子代码的完整转换示例，涵盖常见的 Tensor 操作场景。
+本文档提供 3510 架构下 RegBase 计算类 API 的开发示例，覆盖从简单一元运算到复杂组合计算的完整模式。
 
 ---
 
-## 示例 1：向量加法 (Vector Add)
+## 示例 1：简单一元运算 — Ceil
 
-### 标准 C++ 参考实现
+### 标准 C++ 参考
 
 ```cpp
-void vector_add(const float* x, const float* y, float* z, int n) {
+void ceil_kernel(const float* x, float* y, int n) {
     for (int i = 0; i < n; i++) {
-        z[i] = x[i] + y[i];
+        y[i] = std::ceil(x[i]);
     }
 }
 ```
 
-### AscendC 语言扩展层 C API（指针风格）
+### 3510 RegBase 实现
 
 ```cpp
-#include "c_api/asc_simd.h"
+#include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
+#include "../../common/check.h"
 
-__vector__ __global__ __aicore__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
+namespace AscendC {
+
+template <typename T, bool isReuseSource = false>
+__simd_vf__ inline void CeilCompute(
+    __ubuf__ T* dstUb, __ubuf__ T* srcUb, uint32_t calCount, const uint16_t repeatTimes)
 {
-    asc_init();
+    constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
+    Reg::RegTensor<T> srcReg;
+    Reg::RegTensor<T> dstReg;
+    Reg::MaskReg maskReg;
+    for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
+        maskReg = Reg::UpdateMask<T>(calCount);
+        Reg::LoadAlign<T>(srcReg, srcUb + i * repeatElm);
+        Reg::Truncate<T, RoundMode::CAST_CEIL>(dstReg, srcReg, maskReg);
+        Reg::StoreAlign<T>(dstUb + i * repeatElm, dstReg, maskReg);
+    }
+}
 
-    const uint32_t TILE_LENGTH = 256;
-    __ubuf__ float xLocal[TILE_LENGTH];
-    __ubuf__ float yLocal[TILE_LENGTH];
-    __ubuf__ float zLocal[TILE_LENGTH];
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void CeilImpl(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const uint32_t calCount)
+{
+    if ASCEND_IS_AIC { return; }
 
-    uint32_t blockLength = TOTAL_LENGTH / asc_get_block_num();
+    static_assert(SupportType<T, float, half>(),
+        "Ceil only support half/float data type on current device");
+    CheckTensorPosition(dstTensor, "dstTensor", "VECIN, VECOUT, VECCALC");
+    CheckTensorPosition(srcTensor, "srcTensor", "VECIN, VECOUT, VECCALC");
+    CheckCalCount(calCount, "calCount", srcTensor, "srcTensor", "Round");
+    CheckCalCount(calCount, "calCount", dstTensor, "dstTensor", "Round");
 
-    asc_copy_gm2ub_sync((__ubuf__ void*)xLocal,
-        (__gm__ void*)(x + asc_get_block_idx() * blockLength),
-        blockLength * sizeof(float));
-    asc_copy_gm2ub_sync((__ubuf__ void*)yLocal,
-        (__gm__ void*)(y + asc_get_block_idx() * blockLength),
-        blockLength * sizeof(float));
+    __ubuf__ T* srcUb = (__ubuf__ T*)srcTensor.GetPhyAddr();
+    __ubuf__ T* dstUb = (__ubuf__ T*)dstTensor.GetPhyAddr();
+    constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
+    uint16_t repeatTimes = static_cast<uint16_t>(CeilDivision(calCount, repeatElm));
 
-    asc_add_sync(zLocal, xLocal, yLocal, blockLength);
+    CeilCompute<T, isReuseSource>(dstUb, srcUb, calCount, repeatTimes);
+}
 
-    asc_copy_ub2gm_sync((__gm__ void*)(z + asc_get_block_idx() * blockLength),
-        (__ubuf__ void*)zLocal,
-        blockLength * sizeof(float));
+} // namespace AscendC
+```
+
+---
+
+## 示例 2：带标量的一元运算 — ClampMax / ClampMin
+
+### 标准 C++ 参考
+
+```cpp
+void clamp_max(const float* x, float* y, float maxVal, int n) {
+    for (int i = 0; i < n; i++) {
+        y[i] = std::min(x[i], maxVal);
+    }
+}
+
+void clamp_min(const float* x, float* y, float minVal, int n) {
+    for (int i = 0; i < n; i++) {
+        y[i] = std::max(x[i], minVal);
+    }
 }
 ```
 
-### AscendC 基础API（C++ Tensor 风格）
+### 3510 RegBase 实现
 
 ```cpp
-#include "kernel_operator.h"
+namespace AscendC {
 
-class KernelAdd {
-public:
-    __aicore__ inline KernelAdd() = default;
-    __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z,
-                                 uint32_t totalLength, uint32_t tileNum)
-    {
-        uint32_t blockLength = totalLength / AscendC::GetBlockNum();
-        uint32_t tileLength = blockLength / tileNum;
-        xGm.SetGlobalBuffer((__gm__ float*)x + AscendC::GetBlockIdx() * blockLength, blockLength);
-        yGm.SetGlobalBuffer((__gm__ float*)y + AscendC::GetBlockIdx() * blockLength, blockLength);
-        zGm.SetGlobalBuffer((__gm__ float*)z + AscendC::GetBlockIdx() * blockLength, blockLength);
-        this->tileNum = tileNum;
-        this->tileLength = tileLength;
+template <typename T, CLAMPMODE selMode, bool isReuseSource = false>
+__simd_vf__ inline void ClampCompute(
+    __ubuf__ T* dstUb, __ubuf__ T* srcUb, const T scalar,
+    uint32_t calCount, const uint16_t repeatTimes)
+{
+    constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
+    Reg::RegTensor<T> srcReg, dstReg;
+    Reg::MaskReg maskReg;
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        maskReg = Reg::UpdateMask<T>(calCount);
+        Reg::LoadAlign<T>(srcReg, srcUb + i * repeatElm);
+        if constexpr (selMode == CLAMPMODE::CLAMP_MAX) {
+            Reg::Mins(dstReg, srcReg, scalar, maskReg);
+        } else {
+            Reg::Maxs(dstReg, srcReg, scalar, maskReg);
+        }
+        Reg::StoreAlign<T>(dstUb + i * repeatElm, dstReg, maskReg);
     }
+}
 
-    __aicore__ inline void Process()
-    {
-        AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAlloc;
-        AscendC::LocalTensor<float> xLocal = ubAlloc.Alloc<float, TILE_LENGTH>();
-        AscendC::LocalTensor<float> yLocal = ubAlloc.Alloc<float, TILE_LENGTH>();
-        AscendC::LocalTensor<float> zLocal = ubAlloc.Alloc<float, TILE_LENGTH>();
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void ClampMaxImpl(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const T scalar, const uint32_t calCount)
+{
+    if ASCEND_IS_AIC { return; }
 
-        for (uint32_t i = 0; i < tileNum; i++) {
-            AscendC::DataCopy(xLocal, xGm[i * tileLength], tileLength);
-            AscendC::DataCopy(yLocal, yGm[i * tileLength], tileLength);
-            AscendC::Add(zLocal, xLocal, yLocal, tileLength);
-            AscendC::DataCopy(zGm[i * tileLength], zLocal, tileLength);
+    static_assert(SupportType<T, float, half>(),
+        "ClampMax only support half/float data type on current device");
+    CheckTensorPosition(dstTensor, "dstTensor", "VECIN, VECOUT, VECCALC");
+    CheckTensorPosition(srcTensor, "srcTensor", "VECIN, VECOUT, VECCALC");
+    CheckTensorPosition(sharedTmpBuffer, "sharedTmpBuffer", "VECIN, VECOUT, VECCALC");
+    CheckCalCount(calCount, "calCount", srcTensor, "srcTensor", "ClampMax");
+    CheckCalCount(calCount, "calCount", dstTensor, "dstTensor", "ClampMax");
+
+    __ubuf__ T* srcUb = (__ubuf__ T*)srcTensor.GetPhyAddr();
+    __ubuf__ T* dstUb = (__ubuf__ T*)dstTensor.GetPhyAddr();
+    constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
+    uint16_t repeatTimes = static_cast<uint16_t>(CeilDivision(calCount, repeatElm));
+    ClampCompute<T, CLAMPMODE::CLAMP_MAX, isReuseSource>(
+        dstUb, srcUb, scalar, calCount, repeatTimes);
+}
+
+} // namespace AscendC
+```
+
+---
+
+## 示例 3：二元运算 — 按位异或
+
+### 标准 C++ 参考
+
+```cpp
+void bitwise_xor(const int16_t* a, const int16_t* b, int16_t* c, int n) {
+    for (int i = 0; i < n; i++) {
+        c[i] = a[i] ^ b[i];
+    }
+}
+```
+
+### 3510 RegBase 实现
+
+```cpp
+#include "kernel_basic_intf.h"
+#include "../../api_check/kernel_api_check.h"
+
+namespace AscendC {
+namespace XorAPI {
+
+template <typename T>
+__simd_vf__ inline void XorCompute(
+    __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1,
+    uint32_t calCount, uint16_t repeatTimes)
+{
+    Reg::MaskReg mask;
+    Reg::RegTensor<T> dstVreg, src0Vreg, src1Vreg;
+    constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        mask = Reg::UpdateMask<T>(calCount);
+        Reg::LoadAlign(src0Vreg, src0 + i * oneRepSize);
+        Reg::LoadAlign(src1Vreg, src1 + i * oneRepSize);
+        Reg::Xor(dstVreg, src0Vreg, src1Vreg, mask);
+        Reg::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
+    }
+}
+
+} // namespace XorAPI
+
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void XorImpl(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor,
+    const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const uint32_t calCount)
+{
+    if ASCEND_IS_AIC { return; }
+
+    CHECK_FUNC_HIGHLEVEL_API(Xor, (T, isReuseSource),
+        (dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount));
+
+    static_assert(SupportType<T, uint16_t, int16_t>(),
+        "current data type is not supported on current device!");
+
+    __ubuf__ T* dst = (__ubuf__ T*)dstTensor.GetPhyAddr();
+    __ubuf__ T* src0 = (__ubuf__ T*)src0Tensor.GetPhyAddr();
+    __ubuf__ T* src1 = (__ubuf__ T*)src1Tensor.GetPhyAddr();
+    constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
+    uint16_t repeatTimes = CeilDivision(calCount, oneRepSize);
+    XorAPI::XorCompute<T>(dst, src0, src1, calCount, repeatTimes);
+}
+
+} // namespace AscendC
+```
+
+---
+
+## 示例 4：比较+选择组合 — Sign
+
+### 标准 C++ 参考
+
+```cpp
+void sign(const float* x, float* y, int n) {
+    for (int i = 0; i < n; i++) {
+        if (x[i] > 0)      y[i] = 1;
+        else if (x[i] < 0) y[i] = -1;
+        else               y[i] = 0;
+    }
+}
+```
+
+### 3510 RegBase 实现
+
+```cpp
+#include "kernel_basic_intf.h"
+#include "kernel_tensor.h"
+#include "../../common/check.h"
+
+namespace AscendC {
+namespace SignInternal {
+
+template <typename T, typename RegT, const Reg::RegTrait& trait = Reg::RegTraitNumOne>
+__simd_vf__ inline void SignCoreCompute(
+    __ubuf__ T* dstUb, __ubuf__ T* srcUb,
+    uint32_t calCount, uint16_t repeatTime, uint32_t vlSize)
+{
+    Reg::MaskReg signMask, cmpMask0, cmpMask1;
+    RegT brcZeroReg, brcOneReg, brcNegOneReg, srcReg, selReg0, selReg1;
+
+    // 广播常数寄存器
+    Reg::Duplicate(brcZeroReg, 0);
+    Reg::Duplicate(brcOneReg, 1);
+    Reg::Duplicate(brcNegOneReg, -1);
+
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        signMask = Reg::UpdateMask<T, trait>(calCount);
+        Reg::LoadAlign(srcReg, srcUb + i * vlSize);
+
+        // src < 0 → cmpMask0
+        Reg::CompareScalar<T, CMPMODE::LT>(cmpMask0, srcReg, 0, signMask);
+        // src > 0 → cmpMask1
+        Reg::CompareScalar<T, CMPMODE::GT>(cmpMask1, srcReg, 0, signMask);
+
+        // sel0 = cmpMask0 ? -1 : 0
+        Reg::Select(selReg0, brcNegOneReg, brcZeroReg, cmpMask0);
+        // sel1 = cmpMask1 ? 1 : sel0
+        Reg::Select(selReg1, brcOneReg, selReg0, cmpMask1);
+
+        Reg::StoreAlign(dstUb + i * vlSize, selReg1, signMask);
+    }
+}
+
+} // namespace SignInternal
+
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void SignCompute(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const uint32_t calCount)
+{
+    static_assert(SupportType<T, half, float, int64_t>(),
+        "Sign only support half/float/int64_t data type on current device!");
+    CheckTensorPosition(dstTensor, "dstTensor", "VECIN, VECOUT, VECCALC");
+    CheckTensorPosition(srcTensor, "srcTensor", "VECIN, VECOUT, VECCALC");
+    CheckCalCount(calCount, "calCount", srcTensor, "srcTensor", "Sign");
+    CheckCalCount(calCount, "calCount", dstTensor, "dstTensor", "Sign");
+
+    __ubuf__ T* dstUb = (__ubuf__ T*)dstTensor.GetPhyAddr();
+    __ubuf__ T* srcUb = (__ubuf__ T*)srcTensor.GetPhyAddr();
+
+    if constexpr (sizeof(T) == 8) {
+        using RegT = Reg::RegTensor<T, Reg::RegTraitNumTwo>;
+        constexpr int32_t vlSize = GetVecLen() / sizeof(T) * 2;
+        uint16_t repeatTime = CeilDivision(calCount, vlSize);
+        SignInternal::SignCoreCompute<T, RegT, Reg::RegTraitNumTwo>(
+            dstUb, srcUb, calCount, repeatTime, vlSize);
+    } else {
+        using RegT = Reg::RegTensor<T>;
+        constexpr int32_t vlSize = GetVecLen() / sizeof(T);
+        uint16_t repeatTime = CeilDivision(calCount, vlSize);
+        SignInternal::SignCoreCompute<T, RegT>(
+            dstUb, srcUb, calCount, repeatTime, vlSize);
+    }
+}
+
+} // namespace AscendC
+```
+
+本示例展示了：
+- `Duplicate` 创建常数寄存器
+- `CompareScalar` 产生条件掩码
+- `Select` 基于掩码的条件赋值
+- `sizeof(T) == 8` 的 64 位类型分支处理
+
+---
+
+## 示例 5：复杂组合运算 — Tan
+
+### 标准 C++ 参考
+
+```cpp
+void tan_kernel(const float* x, float* y, int n) {
+    for (int i = 0; i < n; i++) {
+        y[i] = std::tan(x[i]);
+    }
+}
+```
+
+### 3510 RegBase 实现（简化示意）
+
+Tan 的实现展示了 3510 下复杂的组合运算模式：先将输入归一化到 `(-pi/2, pi/2)`，再用多项式逼近计算 tan 值。核心包含：
+
+1. **除法性质等数值常量**：使用 Reg::Muls/Sub/Adds 组合实现 `x = x - round(x/PI) * PI`
+2. **多项式逼近**：`tan(x) ≈ x·P(x²) / ((pi/2-x)(pi/2+x)·Q(x²))`，其中 P、Q 为多项式
+3. **half→float 转换**：使用 `Reg::LoadDist::DIST_UNPACK_B16` 加载，`Reg::Cast` 转 float，计算完成后用 `Reg::Cast` 转回 half，`Reg::StoreDist::DIST_PACK_B32` 存回
+
+```cpp
+namespace AscendC {
+namespace TanInternal {
+
+constexpr Reg::CastTrait TAN_F162F32 = {
+    Reg::RegLayout::ZERO, Reg::SatMode::UNKNOWN,
+    Reg::MaskMergeMode::ZEROING, RoundMode::UNKNOWN};
+constexpr Reg::CastTrait TAN_F322F16 = {
+    Reg::RegLayout::ZERO, Reg::SatMode::SAT,
+    Reg::MaskMergeMode::ZEROING, RoundMode::CAST_RINT};
+
+// 归一化输入到 (-pi/2, pi/2)
+__simd_callee__ inline void TanRound(
+    Reg::RegTensor<float>& srcReg, Reg::RegTensor<float>& tmpReg,
+    Reg::RegTensor<float>& roundReg, Reg::RegTensor<float>& resReg,
+    Reg::RegTensor<float>& downReg1, Reg::RegTensor<float>& downReg2,
+    Reg::MaskReg mask)
+{
+    // k = round(x * invpi)
+    Reg::Muls(roundReg, srcReg, PI_INV, mask);
+    Reg::Truncate<float, RoundMode::CAST_RINT, Reg::MaskMergeMode::ZEROING>(
+        roundReg, roundReg, mask);
+
+    // x -= k * pi_0
+    Reg::Muls(tmpReg, roundReg, PI_V2, mask);
+    Reg::Sub(resReg, srcReg, tmpReg, mask);
+    // ... 后续 pi_1 ~ pi_4 的逐步精度补偿 ...
+}
+
+// 多项式逼近
+__simd_callee__ inline void TanPolyApprox(
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& tmpReg,
+    Reg::RegTensor<float>& roundReg, Reg::RegTensor<float>& resReg,
+    Reg::RegTensor<float>& downReg1, Reg::RegTensor<float>& downReg2,
+    Reg::MaskReg mask)
+{
+    Reg::Mul(roundReg, resReg, resReg, mask);       // x²
+    Reg::Muls(tmpReg, roundReg, R0, mask);           // R0 * x²
+    Reg::Adds(tmpReg, tmpReg, R1, mask);             // + R1
+    Reg::Mul(tmpReg, tmpReg, roundReg, mask);        // * x²
+    Reg::Adds(tmpReg, tmpReg, R2, mask);             // + R2
+    Reg::Mul(tmpReg, tmpReg, resReg, mask);          // * x → P(x)
+    // ... Q(x) 多项式 ...
+    Reg::Div(dstReg, tmpReg, roundReg, mask);        // dst = P/Q
+}
+
+template <typename T>
+__simd_vf__ inline void TanCompute(
+    __ubuf__ T* dstUb, __ubuf__ T* srcUb,
+    uint32_t calCount, uint16_t repeatTimes)
+{
+    constexpr uint32_t stride = GetVecLen() / sizeof(float);
+    Reg::MaskReg mask;
+    Reg::RegTensor<T> srcReg;
+    Reg::RegTensor<float> castReg, roundReg, tmpReg;
+    Reg::RegTensor<float> downReg1, downReg2, resReg, dstReg;
+
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        mask = Reg::UpdateMask<float>(calCount);
+        if constexpr (sizeof(T) == sizeof(half)) {
+            Reg::LoadAlign<T, Reg::LoadDist::DIST_UNPACK_B16>(
+                srcReg, srcUb + i * stride);
+            Reg::Cast<float, T, TAN_F162F32>(castReg, srcReg, mask);
+        } else {
+            Reg::LoadAlign(castReg, srcUb + i * stride);
+        }
+        TanRound(castReg, tmpReg, roundReg, resReg,
+                 downReg1, downReg2, mask);
+        TanPolyApprox(dstReg, tmpReg, roundReg, resReg,
+                      downReg1, downReg2, mask);
+        if constexpr (sizeof(T) == sizeof(half)) {
+            Reg::Cast<T, float, TAN_F322F16>(srcReg, dstReg, mask);
+            Reg::StoreAlign<T, Reg::StoreDist::DIST_PACK_B32>(
+                dstUb + i * stride, srcReg, mask);
+        } else {
+            Reg::StoreAlign(dstUb + i * stride, dstReg, mask);
         }
     }
-
-private:
-    AscendC::GlobalTensor<float> xGm, yGm, zGm;
-    uint32_t tileLength, tileNum;
-};
-
-__global__ __vector__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z,
-                                       AddCustomTilingData tiling)
-{
-    KernelAdd op;
-    op.Init(x, y, z, tiling.totalLength, tiling.tileNum);
-    op.Process();
 }
+
+} // namespace TanInternal
+
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void TanImpl(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const uint32_t calCount)
+{
+    if ASCEND_IS_AIC { return; }
+
+    CheckTensorPosition(dstTensor, "dstTensor", "VECIN, VECOUT, VECCALC");
+    CheckTensorPosition(srcTensor, "srcTensor", "VECIN, VECOUT, VECCALC");
+    CheckCalCount(calCount, "calCount", srcTensor, "srcTensor", "Tan");
+    CheckCalCount(calCount, "calCount", dstTensor, "dstTensor", "Tan");
+    static_assert(SupportType<T, half, float>(),
+        "current data type is not supported on current device!");
+
+    __ubuf__ T* dstUb = (__ubuf__ T*)dstTensor.GetPhyAddr();
+    __ubuf__ T* srcUb = (__ubuf__ T*)srcTensor.GetPhyAddr();
+    constexpr uint32_t stride = GetVecLen() / sizeof(float);
+    uint16_t repeatTimes = CeilDivision(calCount, stride);
+
+    TanInternal::TanCompute<T>(dstUb, srcUb, calCount, repeatTimes);
+}
+
+} // namespace AscendC
 ```
 
-### AscendC SIMT API（线程风格，Ascend 950）
-
-```cpp
-__global__ void add_custom(float* x, float* y, float* z, uint64_t totalLength)
-{
-    int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= totalLength) return;
-    z[idx] = x[idx] + y[idx];
-}
-```
+本示例展示了：
+- 多寄存器协作完成复杂算法
+- `__simd_callee__` 属性用于被 `__simd_vf__` 调用的辅助函数
+- `Reg::Cast` + `LoadDist::DIST_UNPACK_B16` / `StoreDist::DIST_PACK_B32` 处理 half 类型
+- 多项式逼近使用 `Reg::Mul` + `Reg::Adds` + `Reg::Muls` 组合
+- `Reg::Truncate<..., CAST_RINT>` 实现向偶数舍入
 
 ---
 
-## 示例 2：向量标量乘法 (Scalar Multiply)
+## 示例 6：带双发射流水优化的二元运算模板
 
-### 标准 C++ 参考实现
-
-```cpp
-void scalar_mul(const float* x, float* y, float alpha, int n) {
-    for (int i = 0; i < n; i++) {
-        y[i] = x[i] * alpha;
-    }
-}
-```
-
-### AscendC 基础API
+### 3510 RegBase 实现（通过模板实现 BitwiseAnd/Or/Xor 通用基础）
 
 ```cpp
-__aicore__ inline void ScalarMulKernel()
+template <auto func, typename T, typename RegT,
+          const Reg::RegTrait& Trait = Reg::RegTraitNumOne>
+__simd_vf__ inline void BitwiseTemplateImplVF(
+    __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1,
+    uint16_t repeatTime, uint32_t count,
+    uint32_t oneRepElm, uint32_t offset)
 {
-    // ... 初始化 xLocal, yLocal ...
-    for (uint32_t i = 0; i < loopCount; i++) {
-        AscendC::DataCopy(xLocal, xGm[i * tileLength], tileLength);
-        AscendC::Muls(yLocal, xLocal, alpha, tileLength);   // 核心运算
-        AscendC::DataCopy(yGm[i * tileLength], yLocal, tileLength);
+    RegT dstVreg, src0Vreg, src1Vreg;
+    Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        // 第一半
+        mask = Reg::UpdateMask<T, Trait>(count);
+        Reg::LoadAlign(src0Vreg, src0 + i * oneRepElm);
+        Reg::LoadAlign(src1Vreg, src1 + i * oneRepElm);
+        func(dstVreg, src0Vreg, src1Vreg, mask);
+        Reg::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
+
+        // 第二半（双发射）
+        mask = Reg::UpdateMask<T, Trait>(count);
+        Reg::LoadAlign(src0Vreg, src0 + i * oneRepElm + offset);
+        Reg::LoadAlign(src1Vreg, src1 + i * oneRepElm + offset);
+        func(dstVreg, src0Vreg, src1Vreg, mask);
+        Reg::StoreAlign(dst + i * oneRepElm + offset, dstVreg, mask);
     }
+    // 尾块
+    mask = Reg::UpdateMask<T, Trait>(count);
+    Reg::LoadAlign(src0Vreg, src0 + repeatTime * 2 * oneRepElm);
+    Reg::LoadAlign(src1Vreg, src1 + repeatTime * 2 * oneRepElm);
+    func(dstVreg, src0Vreg, src1Vreg, mask);
+    Reg::StoreAlign(dst + repeatTime * 2 * oneRepElm, dstVreg, mask);
 }
+
+// 调用方通过传函数指针实现不同运算
+// BitwiseAnd 调用:
+//   BitwiseTemplateImplVF<Reg::And, T, RegT>(...);
+// BitwiseOr 调用:
+//   BitwiseTemplateImplVF<Reg::Or, T, RegT>(...);
+// BitwiseXor 调用:
+//   BitwiseTemplateImplVF<Reg::Xor, T, RegT>(...);
 ```
 
-### AscendC C API
-
-```cpp
-asc_muls_sync(yLocal, xLocal, alpha, length);
-```
+本示例展示了：
+- `template<auto func>` 将 Reg API 作为模板参数传递
+- 双发射（unroll by 2）流水优化：每次循环处理两组数据
+- 尾块单独处理，不使用双发射
 
 ---
 
-## 示例 3：ReLU 激活函数
-
-### 标准 C++ 参考实现
-
-```cpp
-void relu(const float* x, float* y, int n) {
-    for (int i = 0; i < n; i++) {
-        y[i] = (x[i] > 0.0f) ? x[i] : 0.0f;
-    }
-}
-```
-
-### AscendC 基础API（使用 Relu 专用接口）
-
-```cpp
-#include "kernel_operator.h"
-
-__aicore__ inline void ReluKernel()
-{
-    // ... 初始化 ...
-    for (uint32_t i = 0; i < loopCount; i++) {
-        AscendC::DataCopy(xLocal, xGm[i * tileLength], tileLength);
-        AscendC::Relu(yLocal, xLocal, tileLength);   // 专用 ReLU API
-        AscendC::DataCopy(yGm[i * tileLength], yLocal, tileLength);
-    }
-}
-```
-
-### AscendC 基础API（使用通用条件选择 Where）
-
-```cpp
-// 等价实现：Where(condition ? a : b)
-AscendC::LocalTensor<float> zeroLocal = ubAlloc.Alloc<float, TILE_LENGTH>();
-AscendC::Muls(zeroLocal, zeroLocal, 0.0f, TILE_LENGTH);  // 全零Tensor
-AscendC::Where(yLocal, xLocal, zeroLocal, xLocal, TILE_LENGTH);
-```
-
-### AscendC C API
-
-```cpp
-asc_relu_sync(yLocal, xLocal, length);
-```
-
----
-
-## 示例 4：矩阵乘法 (MatMul)
-
-### 标准 C++ 参考实现
-
-```cpp
-void matmul(const float* A, const float* B, float* C, int M, int N, int K) {
-    for (int i = 0; i < M; i++) {
-        for (int j = 0; j < N; j++) {
-            float sum = 0.0f;
-            for (int k = 0; k < K; k++) {
-                sum += A[i * K + k] * B[k * N + j];
-            }
-            C[i * N + j] = sum;
-        }
-    }
-}
-```
-
-### AscendC 基础API（使用 Cube 单元）
-
-```cpp
-#include "kernel_operator.h"
-
-__aicore__ inline void MatmulKernel()
-{
-    // 使用 AscendC 的 Matmul 高阶 API
-    // A[NZ格式在UB], B[NZ格式在UB], C[结果在UB]
-    // 注意：矩阵乘需要将数据转换为 NZ 格式
-
-    AscendC::LocalTensor<float> aNz, bNz, cNz;
-
-    // 数据搬运 + NZ 格式转换
-    AscendC::DataCopyPad(aNz, aNd);   // ND → NZ
-    AscendC::DataCopyPad(bNz, bNd);   // ND → NZ
-
-    // Cube 矩阵乘法
-    AscendC::Matmul(cNz, aNz, bNz);
-
-    // NZ → ND 格式还原
-    AscendC::DataCopyPad(cNd, cNz);
-
-    // 注意：实际使用中需要根据 M, N, K 进行分块（Tiling）
-}
-```
-
-### NZ 格式要点
-
-```
-标准ND格式: A[M][K] 按行存储
-NZ格式:     将矩阵按照硬件Cube单元要求重排分块
-            需要 DataCopyPad 进行格式转换
-            搬运过程中自动完成，高效无额外开销
-```
-
----
-
-## 示例 5：规约求和 (Reduce Sum)
-
-### 标准 C++ 参考实现
-
-```cpp
-float reduce_sum(const float* x, int n) {
-    float sum = 0.0f;
-    for (int i = 0; i < n; i++) {
-        sum += x[i];
-    }
-    return sum;
-}
-```
-
-### AscendC 基础API
-
-```cpp
-__aicore__ inline void ReduceSumKernel()
-{
-    // ... 初始化 ...
-
-    // 方案1：使用 Reduce API
-    AscendC::ReduceSum<float>(sumScalar, xLocal, tileLength);
-
-    // 方案2：分步规约（大尺寸数据）
-    for (uint32_t i = 0; i < loopCount; i++) {
-        AscendC::DataCopy(xLocal, xGm[i * tileLength], tileLength);
-        AscendC::ReduceSum<float>(partialSum[i], xLocal, tileLength);
-    }
-    // 再对 partialSum[] 做最终规约
-}
-```
-
-### 规约策略
-
-```
-大尺寸数据规约：
-    1. 分块搬运到 UB
-    2. 每块内做 ReduceSum → 得到各块部分和
-    3. 对各块部分和做最终 ReduceSum → 得到总和
-```
-
----
-
-## 示例 6：Softmax
-
-### 标准 C++ 参考实现
-
-```cpp
-void softmax(const float* x, float* y, int n) {
-    // 1. 找最大值（数值稳定）
-    float maxVal = x[0];
-    for (int i = 1; i < n; i++) maxVal = std::max(maxVal, x[i]);
-
-    // 2. exp(x - maxVal) 并求和
-    float sum = 0.0f;
-    for (int i = 0; i < n; i++) {
-        y[i] = std::exp(x[i] - maxVal);
-        sum += y[i];
-    }
-
-    // 3. 归一化
-    for (int i = 0; i < n; i++) {
-        y[i] /= sum;
-    }
-}
-```
-
-### AscendC 基础API
-
-```cpp
-__aicore__ inline void SoftmaxKernel()
-{
-    AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAlloc;
-    AscendC::LocalTensor<float> xLocal = ubAlloc.Alloc<float, TILE_LENGTH>();
-    AscendC::LocalTensor<float> tmp = ubAlloc.Alloc<float, TILE_LENGTH>();
-    AscendC::LocalTensor<float> yLocal = ubAlloc.Alloc<float, TILE_LENGTH>();
-
-    // 1. 搬运数据
-    AscendC::DataCopy(xLocal, xGm, tileLength);
-
-    // 2. 找最大值
-    float maxVal;
-    AscendC::ReduceMax<float>(maxVal, xLocal, tileLength);
-
-    // 3. x - maxVal → tmp
-    AscendC::Adds(tmp, xLocal, -maxVal, tileLength);
-
-    // 4. exp → yLocal
-    AscendC::Exp(yLocal, tmp, tileLength);
-
-    // 5. 求和
-    float sum;
-    AscendC::ReduceSum<float>(sum, yLocal, tileLength);
-
-    // 6. 归一化：yLocal / sum
-    float invSum = 1.0f / sum;
-    AscendC::Muls(yLocal, yLocal, invSum, tileLength);
-
-    // 7. 写回 GM
-    AscendC::DataCopy(yGm, yLocal, tileLength);
-}
-```
-
----
-
-## 示例 7：向量归一化 (LayerNorm)
-
-### 标准 C++ 参考实现
-
-```cpp
-void layer_norm(const float* x, float* y, int n, float eps = 1e-5f) {
-    // 1. 求均值
-    float mean = 0.0f;
-    for (int i = 0; i < n; i++) mean += x[i];
-    mean /= n;
-
-    // 2. 求方差
-    float var = 0.0f;
-    for (int i = 0; i < n; i++) {
-        float diff = x[i] - mean;
-        var += diff * diff;
-    }
-    var = var / n + eps;
-
-    // 3. 归一化
-    float invStd = 1.0f / std::sqrt(var);
-    for (int i = 0; i < n; i++) {
-        y[i] = (x[i] - mean) * invStd;
-    }
-}
-```
-
-### AscendC 基础API
-
-```cpp
-__aicore__ inline void LayerNormKernel()
-{
-    AscendC::LocalTensor<float> xLocal = ubAlloc.Alloc<float, TILE_LENGTH>();
-    AscendC::LocalTensor<float> tmp1 = ubAlloc.Alloc<float, TILE_LENGTH>();
-    AscendC::LocalTensor<float> tmp2 = ubAlloc.Alloc<float, TILE_LENGTH>();
-
-    AscendC::DataCopy(xLocal, xGm, length);
-
-    // 1. 求均值
-    float mean;
-    AscendC::ReduceSum<float>(mean, xLocal, length);
-    mean /= (float)length;
-
-    // 2. x - mean, 平方，求方差
-    AscendC::Adds(tmp1, xLocal, -mean, length);     // tmp1 = x - mean
-    AscendC::Mul(tmp2, tmp1, tmp1, length);          // tmp2 = (x-mean)^2
-    float var;
-    AscendC::ReduceSum<float>(var, tmp2, length);
-    var = var / (float)length + eps;
-
-    // 3. 归一化: y = (x - mean) / sqrt(var)
-    float invStd = 1.0f / AscendC::Sqrt(var);
-    AscendC::Muls(yLocal, tmp1, invStd, length);     // 复用 tmp1
-
-    AscendC::DataCopy(yGm, yLocal, length);
-}
-```
-
----
-
-## 示例 8：GELU 激活函数
-
-### 标准 C++ 参考实现
-
-```cpp
-void gelu(const float* x, float* y, int n) {
-    const float c = std::sqrt(2.0f / M_PI);
-    for (int i = 0; i < n; i++) {
-        float v = x[i];
-        y[i] = 0.5f * v * (1.0f + std::tanh(c * (v + 0.044715f * v * v * v)));
-    }
-}
-```
-
-### AscendC 基础API
-
-```cpp
-__aicore__ inline void GeluKernel()
-{
-    const float C0 = 0.044715f;
-    const float C1 = 0.7978845608028654f;  // sqrt(2/PI)
-    const float C2 = 0.5f;
-
-    AscendC::LocalTensor<float> xLocal = ubAlloc.Alloc<float, TILE_LENGTH>();
-    AscendC::LocalTensor<float> t1 = ubAlloc.Alloc<float, TILE_LENGTH>();
-    AscendC::LocalTensor<float> t2 = ubAlloc.Alloc<float, TILE_LENGTH>();
-
-    AscendC::DataCopy(xLocal, xGm, length);
-
-    // t1 = x^3
-    AscendC::Mul(t1, xLocal, xLocal, length);
-    AscendC::Mul(t1, t1, xLocal, length);
-    // t1 = C0 * x^3
-    AscendC::Muls(t1, t1, C0, length);
-    // t1 = x + C0 * x^3
-    AscendC::Add(t1, t1, xLocal, length);
-    // t1 = C1 * (x + C0 * x^3)
-    AscendC::Muls(t1, t1, C1, length);
-    // t1 = tanh(...)
-    AscendC::Tanh(t1, t1, length);
-    // t1 = 1 + tanh(...)
-    AscendC::Adds(t1, t1, 1.0f, length);
-    // y = 0.5 * x * (1 + tanh(...))
-    AscendC::Mul(yLocal, xLocal, t1, length);
-    AscendC::Muls(yLocal, yLocal, C2, length);
-
-    AscendC::DataCopy(yGm, yLocal, length);
-}
-```
-
----
-
-## 关键转换规则总结
-
-| C++ 模式 | AscendC 基础API | AscendC C API |
-|----------|----------------|---------------|
-| `float* arr = new float[n]` | `LocalTensor<float> arr = ubAlloc.Alloc<float, n>()` | `__ubuf__ float arr[n]` |
-| `arr[i]` (标量访问) | `arr.GetValue(i)` / `arr.SetValue(i, val)` | `arr[i]` (C API 支持下标) |
-| `for(i) { a[i] + b[i] }` | `AscendC::Add(dst, a, b, n)` | `asc_add_sync(dst, a, b, n)` |
-| `memcpy(dst, src, n)` | `AscendC::DataCopy(dst, src, n)` | `asc_copy_gm2ub_sync(...)` |
-| `sum += a[i]` | `AscendC::ReduceSum<T>(result, a, n)` | `asc_reduce_sum_sync(...)` |
-| 需要同步控制 | `SetFlag`/`WaitFlag`/`PipeBarrier` | `_sync` 后缀函数自动同步 |
-
-> **核心原则**：AscendC 中**所有操作都是向量化的**——一次 API 调用即完成整个 Tile 的计算。不需要编写逐元素的 for 循环（那是 C++ 宿主代码的模式）。这是从 C++ 到 AscendC 编程思维转换的关键。
+## 完整模板总结
+
+| 模式 | 核心运算 | 示例 API |
+|------|---------|---------|
+| 一轮 Load-Compute-Store | `Truncate` | Ceil, Floor, Round |
+| 向量-标量运算 | `Mins / Maxs` | ClampMax, ClampMin |
+| 二元运算 | `Xor / And / Or` | BitwiseXor, BitwiseAnd, BitwiseOr |
+| Compare + Select 组合 | `CompareScalar` + `Select` | Sign |
+| 多寄存器多项式 | Mul/Adds/Muls/Sub/Div 组合 | Tan, Sin, Cos, Exp, Log |
+| Cast + 计算 + Uncast | `LoadAlign(DIST_UNPACK)` + `Cast` + 计算 + `Cast` + `StoreAlign(DIST_PACK)` | 所有需要 half→float→half 的 API |
+| 双发射模板 | 将 func 作为模板参数 + 2x unroll | Bitwise 系列 |

@@ -1,81 +1,208 @@
-# AscendC API 开发技能
+# AscendC 3510 RegBase 计算类 API 开发技能
 
 ## 概述
 
-本技能用于 AscendC 昇腾AI处理器算子程序开发。AscendC 是 CANN 推出的面向昇腾AI处理器的算子开发语言，原生支持 C/C++ 标准规范，提供多层级 API 接口以覆盖从快速验证到极致性能优化的全场景开发需求。
+本技能用于 AscendC 3510 架构下基于寄存器（Reg）操作的计算类 API 开发。核心模式为：输入 `LocalTensor`（UB 上的数据），通过 `GetPhyAddr()` 获取 UB 物理地址，使用 `Reg::LoadAlign` 将数据从 UB 加载到 `RegTensor` 寄存器，在寄存器上完成向量计算，再使用 `Reg::StoreAlign` 将结果从寄存器搬回 UB。
 
 ## 适用场景
 
-当用户需要以下任务时，应调用本技能：
+当用户需要在 3510 架构下开发以下类型的内部 API 实现时应调用本技能：
 
-1. 编写 AscendC 算子内核代码（`.asc` 文件）
-2. 将标准 C++ 代码转换为 AscendC API 调用
-3. 理解 AscendC 多层级 API 的选择与使用
-4. 编译、调试 AscendC 算子程序
-5. 优化 AscendC 算子的性能
-6. 了解 Ascend 950 硬件架构及其编程约束
+1. 逐元素数学运算（如 Round、Ceil、Floor、Sign、Clamp、Tan、Log、Exp、Sinh、Cosh 等）
+2. 逐元素位运算（如 BitwiseAnd、BitwiseOr、BitwiseXor、BitwiseNot）
+3. 逐元素逻辑运算（如 LogicalAnd、LogicalOr、LogicalXor）
+4. 寄存器级别的数值处理与类型转换
 
-## 核心概念
+## 核心编程模式
 
-### 多层级 API 体系
-
-AscendC 提供三层API，根据开发需求灵活选择：
-
-| API层级 | 语言 | 编程范式 | 同步管理 | 适用场景 |
-|---------|------|---------|---------|---------|
-| **语言扩展层 C API** | C | 指针 + 数组 `[]` | 自主管理 | 极致性能、C语言习惯 |
-| **基础API** | C++ | Tensor (LocalTensor) | 自主管理 | 极致性能、C++ Tensor习惯 |
-| **Tpipe/Tque 框架API** | C++ | Tensor (LocalTensor) | 框架自动 | 易用性优先、快速开发 |
-
-此外还有：
-- **高阶API**：封装通用单核算法的预置接口，快速算法验证
-- **算子模板库 (CATLASS/ATVOSS)**：典型算子的完整实现参考
-
-### 编程模式
-
-- **SIMD（单指令多数据）**：向量化计算，适合连续、规整的算子
-- **SIMT（单指令多线程）**：类CUDA编程，适合离散、不规则算子
-- **混合编程**：Ascend 950PR 支持 SIMD + SIMT 混合，同一算子内同时使用
-
-### 内存层次
+### 整体数据流
 
 ```
-GM (Global Memory / DDR)  ←→  UB (Unified Buffer / 片上缓存)  ←→  Reg (寄存器)
+LocalTensor<T> (UB数据) → GetPhyAddr() → __ubuf__ T* → Reg::LoadAlign → RegTensor (寄存器)
+                                                                               ↓
+                                                                        Reg::* 向量计算
+                                                                               ↓
+LocalTensor<T> (结果回UB) ← __ubuf__ T* ← Reg::StoreAlign ← RegTensor (结果)
 ```
 
-### 内核调用语法
+### 标准实现框架
 
 ```cpp
-kernel_name<<<blocks, threads, dyn_ubuf, stream>>>(args...);
+// ==================== 第 1 层：__aicore__ 入口函数 ====================
+// 职责：参数校验、UB 地址获取、循环参数计算、调用 __simd_vf__ 计算函数
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void XxxImpl(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const uint32_t calCount)
+{
+    // 架构门控：仅 3510 Vector Core 执行
+    if ASCEND_IS_AIC { return; }
+
+    // 类型校验
+    static_assert(SupportType<T, half, float>(), "...");
+    // 参数校验
+    CheckTensorPosition(dstTensor, "dstTensor", "VECIN, VECOUT, VECCALC");
+    CheckTensorPosition(srcTensor, "srcTensor", "VECIN, VECOUT, VECCALC");
+    CheckCalCount(calCount, "calCount", srcTensor, "srcTensor", "Xxx");
+    CheckCalCount(calCount, "calCount", dstTensor, "dstTensor", "Xxx");
+
+    // 获取 UB 物理地址
+    __ubuf__ T* srcUb = (__ubuf__ T*)srcTensor.GetPhyAddr();
+    __ubuf__ T* dstUb = (__ubuf__ T*)dstTensor.GetPhyAddr();
+
+    // 计算寄存器迭代参数
+    constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
+    uint16_t repeatTimes = static_cast<uint16_t>(CeilDivision(calCount, repeatElm));
+
+    // 调用寄存器级计算函数
+    XxxCompute<T, isReuseSource>(dstUb, srcUb, calCount, repeatTimes);
+}
+
+// ==================== 第 2 层：__simd_vf__ 寄存器计算函数 ====================
+// 职责：声明 RegTensor/掩码，循环 LoadAlign → 计算 → StoreAlign
+template <typename T, bool isReuseSource = false>
+__simd_vf__ inline void XxxCompute(
+    __ubuf__ T* dstUb, __ubuf__ T* srcUb, uint32_t calCount,
+    const uint16_t repeatTimes)
+{
+    constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
+    Reg::RegTensor<T> srcReg;
+    Reg::RegTensor<T> dstReg;
+    Reg::MaskReg maskReg;
+    for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
+        maskReg = Reg::UpdateMask<T>(calCount);           // 更新尾块掩码
+        Reg::LoadAlign<T>(srcReg, srcUb + i * repeatElm); // UB → Reg
+        Reg::XXX(dstReg, srcReg, maskReg);                // 寄存器计算
+        Reg::StoreAlign<T>(dstUb + i * repeatElm, dstReg, maskReg); // Reg → UB
+    }
+}
 ```
 
-## 开发流程
+### 二元运算模板模式
 
-1. **理解算法逻辑**：先用标准 C++ 写出参考实现
-2. **选择 API 层级**：参考 [API选择指南](docs/asc_how_to_choose_api.md)
-3. **编写内核代码**：在 `.asc` 文件中实现 `__global__` 内核函数
-4. **编写 Host 端代码**：在 `.cpp` 文件中实现数据准备和内核调用
-5. **编译运行**：使用 CMake + 毕昇编译器构建，在 NPU 或 CPU/SIM 仿真模式运行
-6. **调试优化**：基于 profiler 数据迭代优化
+对于二元位运算/逻辑运算，通用模板封装了双发射流水：
+
+```cpp
+template <auto func, typename T, typename RegT, const Reg::RegTrait& Trait>
+__simd_vf__ inline void BitwiseTemplateImplVF(
+    __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1,
+    uint16_t repeatTime, uint32_t count, uint32_t oneRepElm, uint32_t offset)
+{
+    RegT dstVreg, src0Vreg, src1Vreg;
+    Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        mask = Reg::UpdateMask<T, Trait>(count);
+        Reg::LoadAlign(src0Vreg, src0 + i * oneRepElm);
+        Reg::LoadAlign(src1Vreg, src1 + i * oneRepElm);
+        func(dstVreg, src0Vreg, src1Vreg, mask);
+        Reg::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
+        // 双发射 (unroll by 2)
+        mask = Reg::UpdateMask<T, Trait>(count);
+        Reg::LoadAlign(src0Vreg, src0 + i * oneRepElm + offset);
+        Reg::LoadAlign(src1Vreg, src1 + i * oneRepElm + offset);
+        func(dstVreg, src0Vreg, src1Vreg, mask);
+        Reg::StoreAlign(dst + i * oneRepElm + offset, dstVreg, mask);
+    }
+    // 尾块
+    mask = Reg::UpdateMask<T, Trait>(count);
+    Reg::LoadAlign(src0Vreg, src0 + repeatTime * 2 * oneRepElm);
+    Reg::LoadAlign(src1Vreg, src1 + repeatTime * 2 * oneRepElm);
+    func(dstVreg, src0Vreg, src1Vreg, mask);
+    Reg::StoreAlign(dst + repeatTime * 2 * oneRepElm, dstVreg, mask);
+}
+```
+
+## 关键概念
+
+### 头文件依赖
+
+```cpp
+#include "kernel_basic_intf.h"   // Reg::* API, Mask 定义
+#include "kernel_tensor.h"       // LocalTensor<T>, GetPhyAddr()
+#include "../../common/check.h"  // CheckTensorPosition(), CheckCalCount(), CeilDivision()
+```
+
+### 函数属性
+
+| 属性 | 含义 | 使用位置 |
+|------|------|---------|
+| `__aicore__` | 设备端入口函数 | 对外 `XxxImpl()` 接口 |
+| `__simd_vf__` | Vector 单元 SIMD 函数 | 内部 `XxxCompute()` 寄存器操作 |
+
+### 核心类型
+
+| 类型 | 说明 |
+|------|------|
+| `Reg::RegTensor<T>` | 寄存器向量，单次操作最多 `GetVecLen()/sizeof(T)` 个元素 |
+| `Reg::RegTensor<T, Reg::RegTraitNumTwo>` | 64 位数据的寄存器向量（占两个向量寄存器槽位） |
+| `Reg::MaskReg` | 掩码寄存器，位宽等于向量 lane 数，bit=1 表示该 lane 参与计算 |
+| `LocalTensor<T>` | UB 上的张量抽象，通过 `GetPhyAddr()` 获取 `__ubuf__ T*` 指针 |
+
+### 核心操作
+
+| 操作 | 方向 | 说明 |
+|------|------|------|
+| `Reg::LoadAlign<T>(reg, ubuf_ptr)` | UB → Reg | 从 UB 对齐加载到寄存器 |
+| `Reg::StoreAlign<T>(ubuf_ptr, reg, mask)` | Reg → UB | 从寄存器对齐存回 UB |
+| `Reg::UpdateMask<T>(count)` | — | 创建前 count 个元素有效的掩码 |
+| `Reg::Duplicate(reg, scalar)` | — | 将标量广播到寄存器所有 lane |
+
+### 向量长度与迭代
+
+```cpp
+constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);  // 每次迭代处理的元素数
+uint16_t repeatTimes = CeilDivision(calCount, repeatElm); // 迭代次数（向上取整）
+```
+
+- `GetVecLen()`: 返回 Vector 单元一次指令处理的最大字节数（典型值 64 或 128）
+- `repeatTimes` 包含尾块：最后一次迭代由 `UpdateMask(calCount)` 仅处理剩余元素
+
+### 64 位类型处理
+
+当 `sizeof(T) == 8` 时，每个元素占 8 字节，需要使用双倍向量寄存器空间：
+
+```cpp
+using RegT = Reg::RegTensor<T, Reg::RegTraitNumTwo>;           // 寄存器类型
+constexpr uint32_t vlSize = GetVecLen() / sizeof(T) * 2;       // 双倍元素数
+uint16_t repeatTime = CeilDivision(calCount, vlSize);
+```
+
+### 半精度浮点处理
+
+half（float16）加载/存储需要特殊的分布模式实现解包/打包：
+
+```cpp
+// 加载 half → 解包为 float 寄存器计算
+Reg::LoadAlign<half, Reg::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + offset);
+Reg::Cast<float, half, castTrait>(floatReg, srcReg, mask);
+// ... 使用 float 寄存器计算 ...
+Reg::Cast<half, float, castTrait>(srcReg, floatReg, mask);
+// 存回 half，打包
+Reg::StoreAlign<half, Reg::StoreDist::DIST_PACK_B32>(dstUb + offset, srcReg, mask);
+```
+
+### 类型转换 (CastTrait)
+
+```cpp
+constexpr Reg::CastTrait myCastTrait = {
+    Reg::RegLayout::ZERO,          // 寄存器布局
+    Reg::SatMode::UNKNOWN,         // 饱和模式
+    Reg::MaskMergeMode::ZEROING,   // 掩码合并模式
+    RoundMode::UNKNOWN             // 舍入模式
+};
+```
+
+### 架构门控
+
+```cpp
+if ASCEND_IS_AIC {
+    return;  // 仅在 AI Core 上执行，非 AIC 架构直接返回
+}
+```
 
 ## 知识库文件
 
-本技能附带以下知识库文件，开发时应根据需要查阅：
-
 | 文件 | 内容 |
 |------|------|
-| [reference/api-guide.md](reference/api-guide.md) | C++ 代码与 AscendC API 的完整对应关系 |
-| [reference/bisheng-guide.md](reference/bisheng-guide.md) | 毕昇编译器相关知识与约束 |
-| [reference/optimize-guide.md](reference/optimize-guide.md) | 性能优化注意事项与最佳实践 |
-| [reference/arch-guide.md](reference/arch-guide.md) | Ascend 950 硬件架构及编程应用 |
-| [examples/tensor-ops.md](examples/tensor-ops.md) | C++ 到 AscendC 的 Tensor 操作转换示例 |
-
-## 工作准则
-
-1. 在编写 AscendC 代码前，先查阅 `reference/` 下的相关知识库文件
-2. 新编写的内核代码优先参考 `examples/` 中的示例模式
-3. 注意 AscendC 的 API 命名约定（区分C API和C++ API）
-4. 保持对 API 层级的清晰认知：从高层级到低层级，控制粒度递增
-5. 涉及编译器问题时，查阅 `bisheng-guide.md`
-6. 涉及性能问题时，查阅 `optimize-guide.md`
-7. 涉及硬件特性利用时，查阅 `arch-guide.md`
+| [reference/api-guide.md](reference/api-guide.md) | Reg API 完整操作参考 |
+| [examples/tensor-ops.md](examples/tensor-ops.md) | 3510 RegBase API 开发示例 |

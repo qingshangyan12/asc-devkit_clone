@@ -1,278 +1,311 @@
-# C++ 代码与 AscendC 语言对应关系
+# 3510 RegBase API 参考
 
-本文档提供标准 C++ 代码与 AscendC API 的对应关系，帮助开发者将标准 C++ 算法逻辑转换为 AscendC 算子实现。
+本文档提供 3510 架构下 `Reg::*` 寄存器操作 API 的完整参考，用于开发 RegBase 计算类接口实现。
 
 ---
 
-## 1. 内存与数据容器
+## 1. 数据搬运
 
-### 标准 C++
+### LoadAlign — UB → Reg 对齐加载
 
 ```cpp
-#include <vector>
-std::vector<float> x(N);
-float* x = new float[N];
+// 基本加载
+Reg::LoadAlign<T>(reg, ubuf_ptr);
+
+// 带分布模式的加载（如 half 解包）
+Reg::LoadAlign<T, Reg::LoadDist::DIST_UNPACK_B16>(reg, ubuf_ptr);
 ```
 
-### AscendC 语言扩展层 C API（指针风格）
+### StoreAlign — Reg → UB 对齐存回
 
 ```cpp
-// 全局内存 (GM) 声明——由 Host 端分配
-// 内核参数：__gm__ float* x
+// 基本存回（带掩码控制）
+Reg::StoreAlign<T>(ubuf_ptr, reg, mask);
 
-// 统一缓冲区 (UB) 声明——片上内存
-__ubuf__ float xLocal[256];
-
-// UB 动态内存分配
-uint8_t ub_buf[256 * sizeof(float)];
-__ubuf__ float* xLocal = (__ubuf__ float*)ub_buf;
+// 带分布模式的存回（如 half 打包）
+Reg::StoreAlign<T, Reg::StoreDist::DIST_PACK_B32>(ubuf_ptr, reg, mask);
 ```
 
-### AscendC 基础 API（C++ Tensor 风格）
+### LoadDist / StoreDist 分布模式
+
+| 分布模式 | 方向 | 说明 |
+|---------|------|------|
+| `DIST_UNPACK_B16` | Load | 将 packed B16(2x half) 解包为 32bit lane |
+| `DIST_PACK_B32` | Store | 将 32bit lane 结果打包为 B16 |
+
+---
+
+## 2. 掩码 (Mask)
+
+### 创建与更新
 
 ```cpp
-// GM Tensor——由 GlobalTensor 封装指针
-AscendC::GlobalTensor<float> xGm;
-xGm.SetGlobalBuffer((__gm__ float*)x, dataSize);
+// 创建掩码寄存器对象
+Reg::MaskReg mask;
 
-// UB Tensor——通过 LocalMemoryAllocator 分配
-AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAlloc;
-AscendC::LocalTensor<float> xLocal = ubAlloc.Alloc<float, 256>();
+// 更新掩码 —— 仅前 count 个 lane 有效（用于尾块处理）
+mask = Reg::UpdateMask<T>(calCount);
+
+// 带 Trait 的更新（用于 64 位类型等场景）
+mask = Reg::UpdateMask<T, Trait>(calCount);
 ```
 
-### AscendC Tpipe/Tque 框架 API
+### 掩码合并模式 (MaskMergeMode)
+
+| 模式 | 说明 |
+|------|------|
+| `ZEROING` | 非掩码 lane 结果清零 |
+| (默认) | 非掩码 lane 保持原值 |
+
+---
+
+## 3. 算术运算
+
+### 二元向量运算
+
+| 操作 | 签名 | 说明 |
+|------|------|------|
+| `Reg::Add` | `Add(dst, src0, src1, mask)` | `dst = src0 + src1` |
+| `Reg::Sub` | `Sub(dst, src0, src1, mask)` | `dst = src0 - src1` |
+| `Reg::Mul` | `Mul(dst, src0, src1, mask)` | `dst = src0 * src1` |
+| `Reg::Div` | `Div(dst, src0, src1, mask)` | `dst = src0 / src1` |
+| `Reg::Max` | `Max(dst, src0, src1, mask)` | `dst = max(src0, src1)` |
+| `Reg::Min` | `Min(dst, src0, src1, mask)` | `dst = min(src0, src1)` |
+
+### 向量-标量运算
+
+| 操作 | 签名 | 说明 |
+|------|------|------|
+| `Reg::Adds` | `Adds(dst, src, scalar, mask)` | `dst = src + scalar` |
+| `Reg::Muls` | `Muls(dst, src, scalar, mask)` | `dst = src * scalar` |
+| `Reg::Maxs` | `Maxs(dst, src, scalar, mask)` | `dst = max(src, scalar)` |
+| `Reg::Mins` | `Mins(dst, src, scalar, mask)` | `dst = min(src, scalar)` |
+
+### 融合运算
+
+| 操作 | 签名 | 说明 |
+|------|------|------|
+| `Reg::Axpy` | `Axpy(dst, src, scalar, mask)` | `dst = dst + scalar * src` |
+| `Reg::Fma` | `Fma(dst, a, b, c, mask)` | `dst = a * b + c` |
+
+---
+
+## 4. 位运算
+
+| 操作 | 签名 | 说明 |
+|------|------|------|
+| `Reg::And` | `And(dst, src0, src1, mask)` | `dst = src0 & src1` |
+| `Reg::Or` | `Or(dst, src0, src1, mask)` | `dst = src0 \| src1` |
+| `Reg::Xor` | `Xor(dst, src0, src1, mask)` | `dst = src0 ^ src1` |
+| `Reg::Not` | `Not(dst, src, mask)` | `dst = ~src` |
+
+---
+
+## 5. 逻辑运算 (Mask)
+
+| 操作 | 签名 | 说明 |
+|------|------|------|
+| `Reg::MaskAnd` | `MaskAnd(dst, src0, src1, mask)` | 逻辑与 |
+| `Reg::MaskOr` | `MaskOr(dst, src0, src1, mask)` | 逻辑或 |
+| `Reg::MaskXor` | `MaskXor(dst, src0, src1, mask)` | 逻辑异或 |
+
+逻辑运算操作的是 `bool` 等效值（通常 `int8_t`/`uint8_t` 类型），结果非 0 即 1。
+
+---
+
+## 6. 一元数学运算
+
+| 操作 | 签名 | 说明 |
+|------|------|------|
+| `Reg::Abs` | `Abs(dst, src, mask)` | `dst = abs(src)` |
+| `Reg::Neg` | `Neg(dst, src, mask)` | `dst = -src` |
+| `Reg::Exp` | `Exp(dst, src, mask)` | `dst = exp(src)` |
+| `Reg::Log` | `Log(dst, src, mask)` | `dst = log(src)` |
+| `Reg::Sqrt` | `Sqrt(dst, src, mask)` | `dst = sqrt(src)` |
+| `Reg::Rsqrt` | `Rsqrt(dst, src, mask)` | `dst = 1/sqrt(src)` |
+
+### Truncate — 精度截断
 
 ```cpp
-// 声明队列缓冲区和管道
-AscendC::TQue<AscendC::QuePosition::VECIN, 1> inQueueX;
-AscendC::TPipe pipe;
-pipe.InitBuffer(inQueueX, 2, 256 * sizeof(float));
+Reg::Truncate<T, RoundMode>(dst, src, mask);
 
-// 从队列获取 Tensor
-AscendC::LocalTensor<float> xLocal = inQueueX.AllocTensor<float>();
+// 带 MaskMergeMode 的版本
+Reg::Truncate<T, RoundMode, MaskMergeMode::ZEROING>(dst, src, mask);
+```
+
+RoundMode 取值：
+
+| RoundMode | C++ 等效 | 说明 |
+|-----------|---------|------|
+| `CAST_RINT` | `std::rint(x)` | 向偶数舍入 |
+| `CAST_CEIL` | `std::ceil(x)` | 向上取整 |
+| `CAST_FLOOR` | `std::floor(x)` | 向下取整 |
+| `CAST_TRUNC` | `std::trunc(x)` | 向零取整 |
+| `CAST_ROUND` | `std::round(x)` | 四舍五入 |
+| `UNKNOWN` | — | 不指定舍入模式（用于 Cast） |
+
+---
+
+## 7. 比较运算
+
+### Compare — 向量比较
+
+```cpp
+Reg::Compare<T, CMPMODE>(dstMask, src0, src1, inputMask);
+```
+
+### CompareScalar — 向量-标量比较
+
+```cpp
+Reg::CompareScalar<T, CMPMODE>(dstMask, src, scalar, inputMask);
+```
+
+CMPMODE 取值：
+
+| CMPMODE | C++ 等效 | 说明 |
+|---------|---------|------|
+| `EQ` | `==` | 等于 |
+| `NE` | `!=` | 不等于 |
+| `LT` | `<` | 小于 |
+| `GT` | `>` | 大于 |
+| `LE` | `<=` | 小于等于 |
+| `GE` | `>=` | 大于等于 |
+
+---
+
+## 8. 选择运算
+
+### Select — 条件选择
+
+```cpp
+Reg::Select(dst, trueVal, falseVal, cmpMask);
+// dst[i] = cmpMask[i] ? trueVal[i] : falseVal[i]
+```
+
+常用于实现 `a > 0 ? 1 : (a < 0 ? -1 : 0)` 这样的符号提取逻辑。
+
+---
+
+## 9. 数据构造
+
+### Duplicate — 标量广播
+
+```cpp
+Reg::Duplicate(reg, scalarValue);
+// 将标量值广播到寄存器所有 lane
+```
+
+常用场景：创建全零、全一的常数寄存器。
+
+---
+
+## 10. 类型转换
+
+### Cast — 寄存器类型转换
+
+```cpp
+Reg::Cast<DstT, SrcT, CastTrait>(dstReg, srcReg, mask);
+```
+
+CastTrait 结构：
+
+```cpp
+struct Reg::CastTrait {
+    Reg::RegLayout layout;        // RegLayout::ZERO
+    Reg::SatMode satMode;         // SAT / UNKNOWN
+    Reg::MaskMergeMode mergeMode; // ZEROING
+    RoundMode roundMode;          // 用于溢出处理的舍入模式
+};
+```
+
+常用 CastTrait 示例：
+
+```cpp
+// half → float (解包后转换)
+constexpr Reg::CastTrait F16_2_F32 = {
+    Reg::RegLayout::ZERO, Reg::SatMode::UNKNOWN,
+    Reg::MaskMergeMode::ZEROING, RoundMode::UNKNOWN};
+
+// float → half (含饱和 + 舍入)
+constexpr Reg::CastTrait F32_2_F16 = {
+    Reg::RegLayout::ZERO, Reg::SatMode::SAT,
+    Reg::MaskMergeMode::ZEROING, RoundMode::CAST_RINT};
 ```
 
 ---
 
-## 2. 向量算术运算
+## 11. 寄存器类型与 Trait
 
-### 逐元素加法
-
-| 标准C++ | AscendC基础API | AscendC C API |
-|---------|---------------|---------------|
-| `for(i=0;i<n;i++) dst[i]=a[i]+b[i]` | `AscendC::Add(dst, a, b, n)` | `asc_add_sync(dst, a, b, n)` |
-
-### 二元运算对照表
-
-| C++ 逐元素操作 | AscendC 基础API | AscendC C API (sync) | AscendC Reg API |
-|--------------|----------------|---------------------|-----------------|
-| `dst[i] = a[i] + b[i]` | `AscendC::Add(dst, a, b, n)` | `asc_add_sync(dst, a, b, n)` | `Reg::Add(dst, a, b, mask)` |
-| `dst[i] = a[i] - b[i]` | `AscendC::Sub(dst, a, b, n)` | `asc_sub_sync(dst, a, b, n)` | `Reg::Sub(dst, a, b, mask)` |
-| `dst[i] = a[i] * b[i]` | `AscendC::Mul(dst, a, b, n)` | `asc_mul_sync(dst, a, b, n)` | `Reg::Mul(dst, a, b, mask)` |
-| `dst[i] = a[i] / b[i]` | `AscendC::Div(dst, a, b, n)` | `asc_div_sync(dst, a, b, n)` | `Reg::Div(dst, a, b, mask)` |
-| `dst[i] = max(a[i], b[i])` | `AscendC::Max(dst, a, b, n)` | `asc_max_sync(dst, a, b, n)` | `Reg::Max(dst, a, b, mask)` |
-| `dst[i] = min(a[i], b[i])` | `AscendC::Min(dst, a, b, n)` | `asc_min_sync(dst, a, b, n)` | `Reg::Min(dst, a, b, mask)` |
-
-### 标量运算对照表
-
-| C++ | AscendC 基础API | AscendC C API | AscendC Reg API |
-|-----|----------------|---------------|-----------------|
-| `dst[i] = a[i] + s` | `AscendC::Adds(dst, a, s, n)` | `asc_adds_sync(dst, a, s, n)` | `Reg::Adds(dst, src, s, mask)` |
-| `dst[i] = a[i] * s` | `AscendC::Muls(dst, a, s, n)` | `asc_muls_sync(dst, a, s, n)` | `Reg::Muls(dst, src, s, mask)` |
-| `dst[i] = max(a[i], s)` | `AscendC::ClampMin(dst, a, s, n)` | — | `Reg::Maxs(dst, src, s, mask)` |
-| `dst[i] = min(a[i], s)` | `AscendC::ClampMax(dst, a, s, n)` | — | `Reg::Mins(dst, src, s, mask)` |
-
----
-
-## 3. 一元运算对照表
-
-| C++ | AscendC 基础API | AscendC C API | 说明 |
-|-----|----------------|---------------|------|
-| `dst[i] = abs(a[i])` | `AscendC::Abs(dst, a, n)` | `asc_abs_sync(dst, a, n)` | 取绝对值 |
-| `dst[i] = -a[i]` | `AscendC::Neg(dst, a, n)` | `asc_neg_sync(dst, a, n)` | 取负 |
-| `dst[i] = exp(a[i])` | `AscendC::Exp(dst, a, n)` | `asc_exp_sync(dst, a, n)` | 指数运算 |
-| `dst[i] = log(a[i])` | `AscendC::Log(dst, a, n)` | `asc_log_sync(dst, a, n)` | 自然对数 |
-| `dst[i] = sqrt(a[i])` | `AscendC::Sqrt(dst, a, n)` | `asc_sqrt_sync(dst, a, n)` | 平方根 |
-| `dst[i] = sin(a[i])` | `AscendC::Sin(dst, a, n)` | `asc_sin_sync(dst, a, n)` | 正弦 |
-| `dst[i] = cos(a[i])` | `AscendC::Cos(dst, a, n)` | `asc_cos_sync(dst, a, n)` | 余弦 |
-
----
-
-## 4. 融合运算对照表
-
-| C++ | AscendC 基础API | 说明 |
-|-----|----------------|------|
-| `dst[i] = s*a[i] + dst[i]` | `AscendC::Axpy(dst, a, s, n)` | 标量乘加 |
-| `dst[i] = a[i]*b[i] + c[i]` | `AscendC::FusedMulDstAdd(dst, a, b, c, n)` | 融合乘加 |
-| `dst[i] = cond[i] ? a[i] : b[i]` | `AscendC::Where(dst, a, b, cond, n)` | 条件选择 |
-
----
-
-## 5. 比较运算对照表
-
-| C++ | AscendC 基础API |
-|-----|----------------|
-| `dst[i] = (a[i] == b[i])` | `AscendC::Compare<T, EQ>(dst, a, b, n)` |
-| `dst[i] = (a[i] != b[i])` | `AscendC::Compare<T, NE>(dst, a, b, n)` |
-| `dst[i] = (a[i] < b[i])` | `AscendC::Compare<T, LT>(dst, a, b, n)` |
-| `dst[i] = (a[i] > b[i])` | `AscendC::Compare<T, GT>(dst, a, b, n)` |
-| `dst[i] = (a[i] <= b[i])` | `AscendC::Compare<T, LE>(dst, a, b, n)` |
-| `dst[i] = (a[i] >= b[i])` | `AscendC::Compare<T, GE>(dst, a, b, n)` |
-
----
-
-## 6. 逻辑运算对照表
-
-| C++ | AscendC 基础API |
-|-----|----------------|
-| `dst[i] = (a[i] && b[i])` | `AscendC::LogicalAnd(dst, a, b, n)` |
-| `dst[i] = (a[i] \|\| b[i])` | `AscendC::LogicalOr(dst, a, b, n)` |
-| `dst[i] = !a[i]` | `AscendC::LogicalNot(dst, a, n)` |
-
----
-
-## 7. 位运算对照表
-
-| C++ | AscendC 基础API |
-|-----|----------------|
-| `dst[i] = a[i] & b[i]` | `AscendC::BitwiseAnd(dst, a, b, n)` |
-| `dst[i] = a[i] \| b[i]` | `AscendC::BitwiseOr(dst, a, b, n)` |
-| `dst[i] = a[i] ^ b[i]` | `AscendC::BitwiseXor(dst, a, b, n)` |
-| `dst[i] = ~a[i]` | `AscendC::BitwiseNot(dst, a, n)` |
-
----
-
-## 8. 类型转换
-
-| C++ | AscendC 基础API | AscendC C API |
-|-----|----------------|---------------|
-| `dst[i] = (T)(a[i])` | `AscendC::Cast<T>(dst, a, n)` | `asc_cast_sync(dst, a, n)` |
-| `dst[i] = ceil(a[i])` | `AscendC::Truncate<T, CAST_CEIL>(dst, a, n)` | — |
-| `dst[i] = floor(a[i])` | `AscendC::Truncate<T, CAST_FLOOR>(dst, a, n)` | — |
-| `dst[i] = round(a[i])` | `AscendC::Truncate<T, CAST_ROUND>(dst, a, n)` | — |
-
----
-
-## 9. 数据搬运
-
-### 标准 C++ 内存拷贝
+### RegTensor 声明
 
 ```cpp
-memcpy(dst, src, size);
+// 标准寄存器张量（T 为 half/float/int8_t/... 等）
+Reg::RegTensor<T> reg;
+
+// 64 位数据双寄存器槽位
+Reg::RegTensor<T, Reg::RegTraitNumTwo> regB64;
 ```
 
-### AscendC 数据搬运函数
+### RegTrait 常量
 
-| 操作 | AscendC 基础API | AscendC C API |
-|------|----------------|---------------|
-| GM→UB 拷贝 | `AscendC::DataCopy(ub, gm[offset], count)` | `asc_copy_gm2ub_sync(ub, gm, size)` |
-| UB→GM 拷贝 | `AscendC::DataCopy(gm[offset], ub, count)` | `asc_copy_ub2gm_sync(gm, ub, size)` |
-| UB→UB 拷贝 | `AscendC::DataCopy(dstUb, srcUb, count)` | — |
+| Trait | 用途 |
+|-------|------|
+| `Reg::RegTraitNumOne` (默认) | 标准数据类型 |
+| `Reg::RegTraitNumTwo` | 64 位类型（int64_t/uint64_t）需要双倍寄存器空间 |
 
-### 数据搬运注意
-
-- GM→UB 和 UB→GM 在 C API 中以 `_sync` 后缀函数执行，会在数据搬运完成后自动同步
-- 基础API 使用 `AscendC::DataCopy` 后需手动调用 `AscendC::SetFlag`/`AscendC::WaitFlag` 管理同步
-- 框架API (Tpipe) 则通过队列和管道自动管理搬运同步
-
----
-
-## 10. 规约运算
-
-| C++ 循环规约 | AscendC 基础API |
-|-------------|----------------|
-| `for(i=0;i<n;i++) r+=a[i]` | `AscendC::ReduceSum<T>(dst, src, n)` |
-| `for(i=0;i<n;i++) r=max(r,a[i])` | `AscendC::ReduceMax<T>(dst, src, n)` |
-| `for(i=0;i<n;i++) r=min(r,a[i])` | `AscendC::ReduceMin<T>(dst, src, n)` |
-
----
-
-## 11. 同步控制
-
-### 标准 C++（单线程，无需同步）
-
-无对应概念。
-
-### AscendC 同步机制
-
-| 同步需求 | 基础API | C API | 框架API |
-|---------|---------|-------|---------|
-| 等待数据搬运完成 | `AscendC::WaitFlag(pipe, event)` | `_sync` 后缀函数隐式 | 框架自动处理 |
-| 等待向量计算完成 | `AscendC::PipeBarrier<PIPE_V>()` | 流水线屏障 | 框架自动处理 |
-| 块间同步（跨核） | `AscendC::BlockBarrier()` | `asc_block_barrier()` | 手动调用 |
-
----
-
-## 12. 多核并行化
-
-### 标准 C++（OpenMP 风格）
+### 支持的数据类型
 
 ```cpp
-#pragma omp parallel for
-for (int i = 0; i < N; i++) { ... }
-```
-
-### AscendC 多核模式
-
-```cpp
-// 获取当前核ID和总核数
-uint32_t blockIdx = AscendC::GetBlockIdx();
-uint32_t blockNum = AscendC::GetBlockNum();
-
-// 每个核处理自己分片
-uint32_t blockLen = totalLen / blockNum;
-xGm.SetGlobalBuffer((__gm__ float*)x + blockIdx * blockLen, blockLen);
+SupportType<T, half, float>()           // 浮点类型
+SupportType<T, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t>()  // 整数类型
 ```
 
 ---
 
-## 13. 函数属性对照
+## 12. 快捷参考卡片
 
-| C++ | AscendC | 说明 |
-|-----|---------|------|
-| 普通函数 | `__aicore__` 函数 | 在AICore上执行的函数 |
-| 并行入口 | `__global__ __vector__` / `__global__` | 内核入口函数 |
-| 全局内存指针 | `__gm__` 修饰符 | 标识全局内存地址空间 |
-| 片上UB数组 | `__ubuf__` 修饰符 | 标识统一缓冲区地址空间 |
-
----
-
-## 14. 快捷参考卡片
-
-### 从 C++ for 循环到 AscendC 基础API 的转换
+### 最常见的代码模板
 
 ```cpp
-// C++
-for (int i = 0; i < N; i++) { dst[i] = OPERATION; }
-
-// AscendC 基础API
-AscendC::API_NAME(dstTensor, src0Tensor, src1Tensor, N);
+// 一元运算
+template <typename T>
+__simd_vf__ inline void UnaryCompute(
+    __ubuf__ T* dst, __ubuf__ T* src, uint32_t calCount, uint16_t repeatTimes)
+{
+    constexpr uint32_t vlSize = GetVecLen() / sizeof(T);
+    Reg::RegTensor<T> srcReg, dstReg;
+    Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        mask = Reg::UpdateMask<T>(calCount);
+        Reg::LoadAlign<T>(srcReg, src + i * vlSize);
+        Reg::XXX(dstReg, srcReg, mask);  // 替换 XXX 为具体运算
+        Reg::StoreAlign<T>(dst + i * vlSize, dstReg, mask);
+    }
+}
 ```
 
-### 从标量操作到向量操作
-
-AscendC 的 API 天然是**向量化**的——每次调用处理一组连续数据（通常由硬件并行执行），无需手动编写循环。这是 AscendC 与传统 C++ 最大的编程模型差异。
-
-### 常用数据类型
+### 64 位类型分支
 
 ```cpp
-// Tensor 数据类型 (基础API)
-AscendC::LocalTensor<T>      // UB 上的 Tensor
-AscendC::GlobalTensor<T>     // GM 上的 Tensor
-
-// C API 数据类型
-__ubuf__ float arr[256];     // UB 上的数组
-__gm__ float* gPtr;          // GM 上的指针
+if constexpr (sizeof(T) == 8) {
+    using RegT = Reg::RegTensor<T, Reg::RegTraitNumTwo>;
+    constexpr uint32_t vlSize = GetVecLen() / sizeof(T) * 2;
+    uint16_t repeatTime = CeilDivision(count, vlSize);
+    XxxCompute<T, RegT, Reg::RegTraitNumTwo>(dstUb, srcUb, count, repeatTime, vlSize);
+} else {
+    using RegT = Reg::RegTensor<T>;
+    constexpr uint32_t vlSize = GetVecLen() / sizeof(T);
+    uint16_t repeatTime = CeilDivision(count, vlSize);
+    XxxCompute<T, RegT>(dstUb, srcUb, count, repeatTime, vlSize);
+}
 ```
 
-### 常用头文件
+### 常用辅助宏与函数
 
 ```cpp
-#include "kernel_operator.h"              // 基础API（C++ Tensor）
-#include "c_api/asc_simd.h"               // 语言扩展层 C API
-#include "kernel_tpipe.h"                 // Tpipe/Tque 框架API
-#include "kernel_operator_vec_binary_intf.h"  // 向量二元运算
-#include "kernel_operator_vec_unary_intf.h"   // 向量一元运算
-#include "kernel_operator_data_copy_intf.h"   // 数据搬运
-#include "kernel_operator_vec_reduce_intf.h"  // 规约运算
+GetVecLen()                     // 单次向量运算字节数
+CeilDivision(a, b)              // 向上取整除法
+CheckTensorPosition(t, name, positions)  // 检查 tensor 位置合法
+CheckCalCount(count, name, tensor, tname, api) // 检查元素数有效
+SupportType<T, types...>()      // 类型是否受支持
 ```
