@@ -12,8 +12,8 @@
 ![](../../../figures/开发Ascend-C算子的基本流程.png "开发Ascend-C算子的基本流程")
 
 >[!NOTE]说明
->-  请点击[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_vector/basic_api_memory_allocator_add)获取样例代码。
->-  使用本教程只需要您具有一定的C/C++基础，在此基础上，如果您已经对Ascend C编程模型有一定的了解，您可以在实际操作的过程中加深对理论的理解；如果您还没有开始了解Ascend C编程模型，也无需担心，您可以先尝试跑通教程中的样例，参考教程最后的[指引](#zh-cn_topic_0000001565030288_section128349412384)进行进一步的学习。
+>- 请点击[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_vector/basic_api_memory_allocator_add)获取样例代码。
+>- 使用本教程只需要您具有一定的C/C++基础，在此基础上，如果您已经对Ascend C编程模型有一定的了解，您可以在实际操作的过程中加深对理论的理解；如果您还没有开始了解Ascend C编程模型，也无需担心，您可以先尝试跑通教程中的样例，参考教程最后的[指引](#zh-cn_topic_0000001565030288_section128349412384)进行进一步的学习。
 
 ## 环境准备<a name="zh-cn_topic_0000001565030288_zh-cn_topic_0000001552186366_section412999115218"></a>
 
@@ -407,13 +407,12 @@
 
     对于本样例，可以先关注`ArithmeticUtilization.csv`和`PipeUtilization.csv`，了解Vector计算与数据搬运的耗时占比；再结合`Memory.csv`、`MemoryUB.csv`、`L2Cache.csv`观察带宽和缓存命中情况。如果需要进一步做Roofline瓶颈分析或查看指令流水图，可参考[性能调优](../../../编程指南/调试调优/性能调优.md)。
 
-    >[!NOTE]说明
-    >-  该样例仅支持如下型号：
+    >[!NOTE]说明 	 
+    >- 该样例仅支持如下型号：
     >    - Ascend 950PR/Ascend 950DT
     >    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
     >    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
     >- _-_-npu-arch用于指定NPU的架构版本，dav-后为架构版本号，请替换为您实际使用的架构版本号。各AI处理器型号对应的架构版本号请通过[AI处理器型号和\_\_NPU\_ARCH\_\_的对应关系](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
-    >-   使用CPU调试或NPU仿真模式时，可在cmake命令中添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数。
 
 ## 接下来的引导<a name="zh-cn_topic_0000001565030288_section128349412384"></a>
 
