@@ -19,7 +19,6 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_H__
 #endif
 
-
 #ifndef ASCENDC_MODULE_CHECK_H
 #define ASCENDC_MODULE_CHECK_H
 
@@ -35,6 +34,8 @@
 #include "kernel_struct_gather.h"
 
 namespace AscendC {
+
+    // ffffffffffffffffff
 
 template <typename T>
 uint64_t GetLoadDataLocalLen(const uint64_t tensorSize)
