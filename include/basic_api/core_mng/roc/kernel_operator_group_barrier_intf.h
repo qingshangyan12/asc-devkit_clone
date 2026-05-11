@@ -21,9 +21,9 @@
 #ifndef ASCENDC_MODULE_OPERATOR_GROUP_BARRIER_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_GROUP_BARRIER_INTERFACE_H
 #include "kernel_tensor.h"
-#if __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "dav_c220/core_mng/roc/kernel_operator_cube_group_info.h"
-#elif __NPU_ARCH__ == 3510
+#elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
 #include "dav_3510/core_mng/roc/kernel_operator_cube_group_info.h"
 #endif
 namespace AscendC {

@@ -40,7 +40,7 @@ namespace AscendC {
  * @ingroup：SetNextTaskStart, WaitPreTaskEnd
  * @brief：In SuperKernel fusion mode, set wait flag between two operators
  */
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 1001) && (__NPU_ARCH__ != 2002)
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ != 1001) && (__NPU_ARCH__ != 2002)) || defined(__ASC_NPU_HOST__)
 template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX>
 #else
 template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3>
