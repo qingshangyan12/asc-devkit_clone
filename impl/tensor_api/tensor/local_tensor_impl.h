@@ -26,19 +26,22 @@
 #include "impl/tensor_api/tensor/layout_impl.h"
 #include "impl/tensor_api/tensor/engine_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
+#include "include/basic_api/kernel_tensor.h"
 
 namespace AscendC {
 namespace Te {
 
-// struct LocalTensor
 template <typename EngineType, typename LayoutType>
 struct TensorAttribute {};
 
 template <typename T>
-struct LocalTensor {};
+struct Tensor {};
+
+template <typename LocationType, typename TensorType>
+struct MakeTensorResult;
 
 template <typename EngineType, typename LayoutType>
-struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
+struct Tensor<TensorAttribute<EngineType, LayoutType>> {
     using iterator = typename EngineType::iterator;
     using valueType = typename EngineType::valueType;
     using elementType = typename EngineType::elementType;
@@ -47,14 +50,10 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     using engineType  = EngineType;
     using layoutType  = LayoutType;
 
-    __aicore__ inline constexpr LocalTensor() {}
-    __aicore__ inline constexpr LocalTensor(const EngineType& engine, const LayoutType& layout) : rep(layout, engine) {}
+    __aicore__ inline Tensor() {}
+    __aicore__ inline Tensor(const EngineType& engine, const LayoutType& layout) : rep(layout, engine) {}
 
     static constexpr int rank  = LayoutType::rank; // tuple size
-
-    __aicore__ inline constexpr decltype(auto) Tensor() const {
-        return *this;
-    }
 
     __aicore__ inline constexpr decltype(auto) Engine() const {
         return Std::get<1>(rep);
@@ -106,14 +105,20 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
         auto sliceEngine = Engine() + Layout()(coord);
  	    auto coordLayout = MakeCoordLayout(coord, Layout());
- 	    return TensorType<decltype(sliceEngine), decltype(coordLayout)>{sliceEngine, coordLayout};
+        using Location = GetMemLocation<decltype(sliceEngine)>;
+        using AttrTensor = TensorAttribute<decltype(sliceEngine), decltype(coordLayout)>;
+        using ResultTensor = typename MakeTensorResult<Location, AttrTensor>::type;
+        return ResultTensor{sliceEngine, coordLayout};
     }
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
         auto sliceEngine = Engine() + Layout()(coord);
  	    auto coordLayout = MakeCoordLayout(coord, Layout());
- 	    return TensorType<decltype(sliceEngine), decltype(coordLayout)>{sliceEngine, coordLayout};
+        using Location = GetMemLocation<decltype(sliceEngine)>;
+        using AttrTensor = TensorAttribute<decltype(sliceEngine), decltype(coordLayout)>;
+        using ResultTensor = typename MakeTensorResult<Location, AttrTensor>::type;
+        return ResultTensor{sliceEngine, coordLayout};
     }
 
     template <typename Coord0, typename Coord1, typename... Coords>
@@ -130,14 +135,20 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
   	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) {
         auto sliceEngine = Engine() + Layout()(coord);
  	    auto coordLayout = MakeSliceLayout(coord, Layout(), info);
- 	    return TensorType<decltype(sliceEngine), decltype(coordLayout)>{sliceEngine, coordLayout};
+        using Location = GetMemLocation<decltype(sliceEngine)>;
+        using AttrTensor = TensorAttribute<decltype(sliceEngine), decltype(coordLayout)>;
+        using ResultTensor = typename MakeTensorResult<Location, AttrTensor>::type;
+ 	    return ResultTensor{sliceEngine, coordLayout};
   	}
 
     template <typename Coord, typename Info>
   	__aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const{
         auto sliceEngine = Engine() + Layout()(coord);
  	    auto coordLayout = MakeSliceLayout(coord, Layout(), info);
- 	    return TensorType<decltype(sliceEngine), decltype(coordLayout)>{sliceEngine, coordLayout};
+        using Location = GetMemLocation<decltype(sliceEngine)>;
+        using AttrTensor = TensorAttribute<decltype(sliceEngine), decltype(coordLayout)>;
+        using ResultTensor = typename MakeTensorResult<Location, AttrTensor>::type;
+ 	    return ResultTensor{sliceEngine, coordLayout};
   	}
 
     template <typename... Layouts>
@@ -166,19 +177,51 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
 private:
     Std::tuple<layoutType, engineType> rep;
-
-    template <typename TensorEngine, typename TensorLayout>
-    using TensorType = LocalTensor<TensorAttribute<TensorEngine, TensorLayout>>;
 };
 
 template <typename T>
 struct IsAttrTensor : Std::false_type {};
 
-template <typename Engine, typename Layout>
-struct IsAttrTensor<LocalTensor<TensorAttribute<Engine,Layout>>> : Std::true_type {};
+template <template <typename> class TensorType, typename Engine, typename Layout>
+struct IsAttrTensor<TensorType<TensorAttribute<Engine, Layout>>> : Std::true_type {};
 
 template <typename T>
 constexpr bool IsAttrTensorV = IsAttrTensor<Std::remove_cvref_t<T>>::value;
+
+template <typename TensorType>
+struct MakeTensorResult<Location::GM, TensorType> {
+    using type = AscendC::GlobalTensor<TensorType>;
+};
+
+template <typename TensorType>
+struct MakeTensorResult<Location::UB, TensorType> {
+    using type = AscendC::LocalTensor<TensorType>;
+};
+
+template <typename TensorType>
+struct MakeTensorResult<Location::L1, TensorType> {
+    using type = AscendC::LocalTensor<TensorType>;
+};
+
+template <typename TensorType>
+struct MakeTensorResult<Location::L0A, TensorType> {
+    using type = AscendC::LocalTensor<TensorType>;
+};
+
+template <typename TensorType>
+struct MakeTensorResult<Location::L0B, TensorType> {
+    using type = AscendC::LocalTensor<TensorType>;
+};
+
+template <typename TensorType>
+struct MakeTensorResult<Location::L0C, TensorType> {
+    using type = AscendC::LocalTensor<TensorType>;
+};
+
+template <typename TensorType>
+struct MakeTensorResult<Location::FIXBUF, TensorType> {
+    using type = AscendC::LocalTensor<TensorType>;
+};
 
 // tensor construction
 template <typename T, typename = void>
@@ -194,9 +237,17 @@ template <typename Arg0, typename... Args>
         if constexpr (HasDereference<Arg0>::value) {
             using Engine = ViewEngine<Arg0>;
             if constexpr (sizeof...(Args) == 1 && (IsLayoutV<Args> && ...)) {
-                return LocalTensor<TensorAttribute<Engine, Args...>>{Engine{arg0}, args...};
+                using Layout = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
+                using AttrTensor = TensorAttribute<Engine, Layout>;
+                using Location = GetMemLocation<Engine>;
+                using ResultTensor = typename MakeTensorResult<Location, AttrTensor>::type;
+                return ResultTensor{Engine{arg0}, args...};
             } else {
-                return LocalTensor<TensorAttribute<Engine, decltype(MakeLayout(args...))>>{Engine{arg0}, MakeLayout(args...)};
+                using Layout = decltype(MakeLayout(args...));
+                using AttrTensor = TensorAttribute<Engine, Layout>;
+                using Location = GetMemLocation<Engine>;
+                using ResultTensor = typename MakeTensorResult<Location, AttrTensor>::type;
+                return ResultTensor{Engine{arg0}, MakeLayout(args...)};
             }
         }
     }
@@ -211,6 +262,33 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
 }
 
 } // namespace Te
+
+template <typename EngineType, typename LayoutType>
+struct GlobalTensor<Te::TensorAttribute<EngineType, LayoutType>>
+    : public Te::Tensor<Te::TensorAttribute<EngineType, LayoutType>>,
+      public AscendC::GlobalTensor<typename EngineType::valueType> {
+    using TensorBase = Te::Tensor<Te::TensorAttribute<EngineType, LayoutType>>;
+    using LegacyBase = AscendC::GlobalTensor<typename EngineType::valueType>;
+
+    using TensorBase::TensorBase;
+    using LegacyBase::LegacyBase;
+
+    __aicore__ inline GlobalTensor() = default;
+};
+
+template <typename EngineType, typename LayoutType>
+struct LocalTensor<Te::TensorAttribute<EngineType, LayoutType>>
+    : public Te::Tensor<Te::TensorAttribute<EngineType, LayoutType>>,
+      public AscendC::LocalTensor<typename EngineType::valueType> {
+    using TensorBase = Te::Tensor<Te::TensorAttribute<EngineType, LayoutType>>;
+    using LegacyBase = AscendC::LocalTensor<typename EngineType::valueType>;
+
+    using TensorBase::TensorBase;
+    using LegacyBase::LegacyBase;
+
+    __aicore__ inline LocalTensor() = default;
+};
+
 } // namespace AscendC
 
 #endif // IMPL_TENSOR_API_TENSOR_LOCAL_TENSOR_IMPL_H
