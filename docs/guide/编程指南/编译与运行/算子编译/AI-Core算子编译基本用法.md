@@ -28,16 +28,17 @@ bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接�
 
 - 单独编译
 
-bisheng异构编译默认采用的是全程序编译模式，该模式要在单个源文件X.asc中编译的设备程序没有任何未解析的外部设备函数和变量引用。设备函数可以调用其他编译单元中定义的设备函数或访问其中定义的设备变量，但必须在bisheng命令行中指定`-dc`编译选项，才能启用不同编译单元间设备代码的链接功能。这种支持跨编译单元链接设备代码与符号的能力，被称为单独编译。
+  bisheng异构编译默认采用的是全程序编译模式，该模式要在单个源文件X.asc中编译的设备程序没有任何未解析的外部设备函数和变量引用。设备函数可以调用其他编译单元中定义的设备函数或访问其中定义的设备变量，但必须在bisheng命令行中指定`-dc`编译选项，才能启用不同编译单元间设备代码的链接功能。这种支持跨编译单元链接设备代码与符号的能力，被称为单独编译。
 
-单独编译能实现更灵活的代码组织、缩短编译耗时，并生成体积更小的可执行文件；相较于全程序编译，它会增加一定的编译构建复杂度。此外，设备代码链接可能会影响程序性能，这也是该模式未被设为默认模式的原因。链接时优化（LTO）可有效降低单独编译带来的性能损耗。
-单独编译的强制要求：
-- 在一个编译单元中定义的非常量设备变量，在其他编译单元中引用时，必须使用extern关键字声明；
-- 所有常量设备变量，定义和跨单元引用时都必须使用extern关键字；
-- 所有Ascend C 源文件（.asc）都必须使用`-dc`选项编译。
+  单独编译能实现更灵活的代码组织、缩短编译耗时，并生成体积更小的可执行文件；相较于全程序编译，它会增加一定的编译构建复杂度。此外，设备代码链接可能会影响程序性能，这也是该模式未被设为默认模式的原因。链接时优化（LTO）可有效降低单独编译带来的性能损耗。
 
-下方示例中，definition.asc 定义了变量和函数，example.asc 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件
-```c++
+  单独编译的强制要求：
+  - 在一个编译单元中定义的非常量设备变量，在其他编译单元中引用时，必须使用extern关键字声明；
+  - 所有常量设备变量，定义和跨单元引用时都必须使用extern关键字；
+  - 所有Ascend C 源文件（.asc）都必须使用`-dc`选项编译。
+
+  下方示例中，definition.asc 定义了变量和函数，example.asc 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件
+  ```c++
   // ------- definition.asc -------
   extern __gm__ int dev_var = 5;
   __aicore__ int device_function();
@@ -49,23 +50,24 @@ bisheng异构编译默认采用的是全程序编译模式，该模式要在单�
     dev_var = 0;
     *var = device_function();
   }
-```
+  ```
 
-```shell
+  ```shell
   bisheng -dc definition.asc -o definition.o --npu-arch=dav-xxxx
   bisheng -dc example.asc -o example.o --npu-arch=dav-xxxx
   bisheng definition.o example.o -o program
-```
+  ```
 
 - 动态库编译
-```shell
+   ```shell
   bisheng -shared example.asc -o libexample.so --npu-arch=dav-xxxx
-```
+  ```
 
--  静态库编译
-```shell
+- 静态库编译
+  ```shell
   bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx
-```
+  ```
+
 ## AI Core SIMT编译
 
 使用bisheng编译Ascend C SIMT源文件的在AI Core编译的基本命令上增加`--enable-simt`, 示例如下：
@@ -85,7 +87,7 @@ SIMT编译：
 |静态库编译|bisheng **-lib** <source_file>.asc -o \<output_file\>**.a** --npu-arch=dav-\<npu architecture\>| bisheng **-lib** <source_file>.asc -o <output_file>**.a** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
 
 
-# 常用的编译选项<a name="ZH-CN_TOPIC_0000002462746461"></a>
+## 常用的编译选项<a name="ZH-CN_TOPIC_0000002462746461"></a>
 <a name="zh-cn_topic_0000001856506454_table2716123812212"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001856506454_row13875038172111"><th class="cellrowborder" valign="top" width="33.63636363636363%" id="mcps1.1.4.1.1"><p id="zh-cn_topic_0000001856506454_p38753382219"><a name="zh-cn_topic_0000001856506454_p38753382219"></a><a name="zh-cn_topic_0000001856506454_p38753382219"></a><strong id="zh-cn_topic_0000001856506454_b138752389214"><a name="zh-cn_topic_0000001856506454_b138752389214"></a><a name="zh-cn_topic_0000001856506454_b138752389214"></a>选项</strong></p>
 </th>
