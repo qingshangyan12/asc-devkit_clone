@@ -37,9 +37,13 @@ if (NOT DEFINED CMAKE_ASC_SOURCE_FILE_EXTENSIONS OR CMAKE_ASC_SOURCE_FILE_EXTENS
 endif()
 set(CMAKE_ASC_COMPILER_ENV_VAR "ASC")        # Name the language ASC
 
-# Default ASC language standard recorded by the language module (metadata only).
+# Default ASC language standard (currently C++17). DEFAULT records the module's
+# recommended standard; STANDARD falls back to it when user does not set one.
 if (NOT DEFINED CMAKE_ASC_STANDARD_DEFAULT OR CMAKE_ASC_STANDARD_DEFAULT STREQUAL "")
     set(CMAKE_ASC_STANDARD_DEFAULT "17")
+endif()
+if (NOT DEFINED CMAKE_ASC_STANDARD OR CMAKE_ASC_STANDARD STREQUAL "")
+    set(CMAKE_ASC_STANDARD "${CMAKE_ASC_STANDARD_DEFAULT}")
 endif()
 
 # Sequence for the first compilation: CMakeDetermineASCCompiler.cmake -> CMakeASCInformation.cmake
