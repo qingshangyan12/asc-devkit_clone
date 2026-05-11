@@ -1,17 +1,18 @@
 # AI Core编译基本用法<a name="section229217121411"></a>
-当开发者完成一个Kernel核函数的编写后，并在Host侧通过<<<\>\>\>方式完成核函数的启动调用，就需要进行算子源码编译与算子运行，接下来我们介绍通过bisheng编译器完成算子编译的基本用法。
+当开发者完成一个Kernel核函数的编写后，并在Host侧通过<<<\>\>\>方式完成核函数的启动调用后，就需要进行算子源码编译与算子运行，接下来我们介绍通过bisheng编译器完成算子编译的基本用法。
 
-使用bisheng编译Ascend C 源文件的基本命令（--npu-arch=dav-<npu architecture> 指定AI处理器架构版本）是：
+## AI Core SIMD编译
+使用bisheng编译Ascend C源文件的基本命令如下，其中--npu-arch=dav-用于指定AI处理器架构版本：
 ```shell
-bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture>
+  bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture>
 ```
 
-bisheng可以通过-I \<path\>指定头文件按路径、-L \<path\> 指定链接库路径、-l \<library\>指定需要链接的动态库或静态库、-D\<macro\>=\<value\>指定宏定义
+bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接库路径、-l \<library\>指定需要链接的动态库或静态库、-D\<macro\>=\<value\>指定宏定义，示例如下：
 ```shell
-bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <output_file> --npu-arch=dav-<npu architecture>
+  bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <output_file> --npu-arch=dav-<npu architecture>
 ```
 ![ ](../../../figures/aicore_compilation.png "aicore 编译流程示意图")
-  
+
 - 异构编译
 ```shell
   // ----- example.asc -----
@@ -27,13 +28,13 @@ bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <o
 
 - 单独编译
 
-bisheng异构编译默认采用的是全程序编译模式，该模式要在单个源文件X.asc中编译的设备程序，没有任何未解析的外部设备函数和变量引用。设备函数可以调用其他编译单元中定义的设备函数或访问其中定义的设备变量，但必须在bisheng命令行中指定  -dc 编译选项，才能启用不同编译单元间设备代码的链接功能。这种支持跨编译单元链接设备代码与符号的能力，被称为单独编译。
+bisheng异构编译默认采用的是全程序编译模式，该模式要在单个源文件X.asc中编译的设备程序没有任何未解析的外部设备函数和变量引用。设备函数可以调用其他编译单元中定义的设备函数或访问其中定义的设备变量，但必须在bisheng命令行中指定`-dc`编译选项，才能启用不同编译单元间设备代码的链接功能。这种支持跨编译单元链接设备代码与符号的能力，被称为单独编译。
 
-  单独编译能实现更灵活的代码组织、缩短编译耗时，并生成体积更小的可执行文件；相较于全程序编译，它会增加一定的编译构建复杂度。此外，设备代码链接可能会影响程序性能，这也是该模式未被设为默认模式的原因。链接时优化（LTO） 可有效降低单独编译带来的性能损耗。
+单独编译能实现更灵活的代码组织、缩短编译耗时，并生成体积更小的可执行文件；相较于全程序编译，它会增加一定的编译构建复杂度。此外，设备代码链接可能会影响程序性能，这也是该模式未被设为默认模式的原因。链接时优化（LTO）可有效降低单独编译带来的性能损耗。
 单独编译的强制要求：
-- 在一个编译单元中定义的非常量设备变量，在其他编译单元中引用时，必须使用 extern 关键字声明；
-- 所有常量设备变量，定义和跨单元引用时都必须使用 extern 关键字；
-- 所有Ascend C 源文件（.asc）都必须使用 -dc 选项编译。
+- 在一个编译单元中定义的非常量设备变量，在其他编译单元中引用时，必须使用extern关键字声明；
+- 所有常量设备变量，定义和跨单元引用时都必须使用extern关键字；
+- 所有Ascend C 源文件（.asc）都必须使用`-dc`选项编译。
 
 下方示例中，definition.asc 定义了变量和函数，example.asc 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件
 ```c++
@@ -65,13 +66,14 @@ bisheng异构编译默认采用的是全程序编译模式，该模式要在单�
 ```shell
   bisheng -lib example.asc -o libexample.a --npu-arch=dav-xxxx
 ```
-## AI Core SIMT 编译
+## AI Core SIMT编译
 
 使用bisheng编译Ascend C SIMT源文件的在AI Core编译的基本命令上增加`--enable-simt`, 示例如下：
 
 ```shell
   bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
 ```
+SIMT编译：
 ![ ](../../../figures/aicore_simt_comilation.png "aicore simt编译流程示意图")
 
 ## 基本编译命令汇总
@@ -82,14 +84,8 @@ bisheng异构编译默认采用的是全程序编译模式，该模式要在单�
 |动态库编译|bisheng **-shared** <source_file>.asc -o \<output_file\>**.so** --npu-arch=dav-\<npu architecture\>| bisheng **-shared** <source_file>.asc -o <output_file>**.so** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
 |静态库编译|bisheng **-lib** <source_file>.asc -o \<output_file\>**.a** --npu-arch=dav-\<npu architecture\>| bisheng **-lib** <source_file>.asc -o <output_file>**.a** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
 
-更多的编译选项用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
 
 # 常用的编译选项<a name="ZH-CN_TOPIC_0000002462746461"></a>
-
-## 常用的编译选项<a name="section229217121411"></a>
-
-常用的编译选项说明如下，全量的编译选项请参考《毕昇编译器用户指南》。
-
 <a name="zh-cn_topic_0000001856506454_table2716123812212"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001856506454_row13875038172111"><th class="cellrowborder" valign="top" width="33.63636363636363%" id="mcps1.1.4.1.1"><p id="zh-cn_topic_0000001856506454_p38753382219"><a name="zh-cn_topic_0000001856506454_p38753382219"></a><a name="zh-cn_topic_0000001856506454_p38753382219"></a><strong id="zh-cn_topic_0000001856506454_b138752389214"><a name="zh-cn_topic_0000001856506454_b138752389214"></a><a name="zh-cn_topic_0000001856506454_b138752389214"></a>选项</strong></p>
 </th>
@@ -110,7 +106,7 @@ bisheng异构编译默认采用的是全程序编译模式，该模式要在单�
 </td>
 <td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p106841658103918"><a name="p106841658103918"></a><a name="p106841658103918"></a>是</p>
 </td>
-<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p1268425803914"><a name="p1268425803914"></a><a name="p1268425803914"></a>编译时指定的<span id="ph17911124171120"><a name="ph17911124171120"></a><a name="ph17911124171120"></a>AI处理器</span>架构，取值为dav-&lt;arch-version&gt;，其中&lt;arch-version&gt;为NPU架构版本号，各产品型号对应的架构版本号请通过<a href="../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114">[对应关系表]()</a>进行查询。</p>
+<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p1268425803914"><a name="p1268425803914"></a><a name="p1268425803914"></a>编译时指定的<span id="ph17911124171120"><a name="ph17911124171120"></a><a name="ph17911124171120"></a>AI处理器</span>架构，取值为dav-&lt;arch-version&gt;，其中&lt;arch-version&gt;为NPU架构版本号，各产品型号对应的架构版本号请通过<a href="../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114">对应关系表</a>进行查询。</p>
 </td>
 </tr>
 <tr id="row15492131482712"><td class="cellrowborder" valign="top" width="33.63636363636363%" headers="mcps1.1.4.1.1 "><p id="p4492414142719"><a name="p4492414142719"></a><a name="p4492414142719"></a>--npu-soc</p>
@@ -148,6 +144,13 @@ bisheng异构编译默认采用的是全程序编译模式，该模式要在单�
 <td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p14244162712317"><a name="p14244162712317"></a><a name="p14244162712317"></a>否</p>
 </td>
 <td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p1824452712312"><a name="p1824452712312"></a><a name="p1824452712312"></a>编译生成目标文件。</p>
+</td>
+</tr>
+<tr id="row14244162782319"><td class="cellrowborder" valign="top" width="33.63636363636363%" headers="mcps1.1.4.1.1 "><p id="p12244627192312"><a name="p12244627192312"></a><a name="p12244627192312"></a>-dc</p>
+</td>
+<td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p14244162712317"><a name="p14244162712317"></a><a name="p14244162712317"></a>否</p>
+</td>
+<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p1824452712312"><a name="p1824452712312"></a><a name="p1824452712312"></a>编译生成relocatable目标文件。</p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000001856506454_row11875938112115"><td class="cellrowborder" valign="top" width="33.63636363636363%" headers="mcps1.1.4.1.1 "><p id="p3893173113412"><a name="p3893173113412"></a><a name="p3893173113412"></a>-shared，--shared</p>
@@ -210,6 +213,8 @@ bisheng异构编译默认采用的是全程序编译模式，该模式要在单�
 </tbody>
 </table>
 
+更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
+
 # CMake方式编译<a name="ZH-CN_TOPIC_0000002428982142"></a>
 
 项目中可以使用CMake来更简便地使用毕昇编译器编译Ascend C算子，生成可执行文件、动态库、静态库或二进制文件。
@@ -235,7 +240,7 @@ target_compile_options(demo PRIVATE
 )
 ```
 
-针对AI Core SIMT的CMake编译在编译选项中增加`--enable-simt` [样例LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)
+针对AI Core SIMT代码，则需要在编译选项中增加`--enable-simt`，示例如下，完整样例请参考：[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)
 
 ```cmake
 target_compile_options(demo PRIVATE
@@ -281,10 +286,10 @@ target_compile_options(demo PRIVATE
 内置编译宏开关列表如下：
 |  宏定义名称 | 宏定义描述 |设置方式| 约束说明 |
 |--|--|--|--|
-| ASCENDC_DUMP | ASCENDC_DUMP用于控制Dump开关，默认开关打开，开发者调用printf/DumpTensor/assert后会有信息打印（需要注意直调工程的kernel文件内存在host函数，如果在host函数内调用了printf接口，也会触发kernel内的printf相关初始化动作，进而影响kernel的执行性能)；设置为0后，表示开关关闭 | `-DASCENDC_DUMP=0` | ALL
-|  ASCENDC_DEBUG | ASCENDC_DEBUG用于控制Ascend C API的调测开关，默认开关关闭；增加该编译宏后，表示开关打开，此时接口内部的assert校验生效，校验不通过会有assert日志打屏。开启该功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用 | `-DASCENDC_DUMP=0` | Atlas 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品|
-|  ENABLE_CV_COMM_VIA_SSBUF | NABLE_CV_COMM_VIA_SSBUF用于控制是否使用SSBuffer以及UB到L1 Buffer的硬通道，在涉及CV通信（AIC和AIV）或使用数据搬运API时需关注此选项。开启该选项可以提高相关API的性能或拓展使用更多功能。默认开关关闭；设置为true后，表示开关打开 | `-DENABLE_CV_COMM_VIA_SSBUF=true` | 仅在Ascend 950PR/Ascend 950DT支持该选项。从其它硬件平台移植到此平台的算子，开关默认关闭以保持兼容性。在该平台新开发的算子，以下场景需要打开：使用矩阵计算Matmul高阶API，且使用SetTensorScaleA等接口，这些接口属于Ascend 950PR/Ascend 950DT新增的功能，其内部实现使用了SSBuffer；使用DataCopy接口从UB拷贝数据到L1 Buffer|
-|  NO_OVERLAP_IN_MULTI_REPEAT | 该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR/Ascend 950DT，使用基础API的高维切分计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项 | `-DNO_OVERLAP_IN_MULTI_REPEAT` | |
+| ASCENDC_DUMP | ASCENDC_DUMP用于控制Dump开关，默认开关打开，开发者调用printf/DumpTensor/assert后会有信息打印（需要注意直调工程的kernel文件内存在host函数，如果在host函数内调用了printf接口，也会触发kernel内的printf相关初始化动作，进而影响kernel的执行性能)；设置为0后，表示开关关闭。 | `-DASCENDC_DUMP=0` | -
+|  ASCENDC_DEBUG | ASCENDC_DEBUG用于控制Ascend C API的调测开关，默认开关关闭；增加该编译宏后，表示开关打开，此时接口内部的assert校验生效，校验不通过会有assert日志打屏。开启该功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。 | `-DASCENDC_DUMP=0` | Atlas 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品|
+|  ENABLE_CV_COMM_VIA_SSBUF | NABLE_CV_COMM_VIA_SSBUF用于控制是否使用SSBuffer以及UB到L1 Buffer的硬通道，在涉及CV通信（AIC和AIV）或使用数据搬运API时需关注此选项。开启该选项可以提高相关API的性能或拓展使用更多功能。默认开关关闭；设置为true后，表示开关打开。 | `-DENABLE_CV_COMM_VIA_SSBUF=true` | 仅在Ascend 950PR/Ascend 950DT支持该选项。从其它硬件平台移植到此平台的算子，开关默认关闭以保持兼容性。在该平台新开发的算子，以下场景需要打开：使用矩阵计算Matmul高阶API，且使用SetTensorScaleA等接口，这些接口属于Ascend 950PR/Ascend 950DT新增的功能，其内部实现使用了SSBuffer；使用DataCopy接口从UB拷贝数据到L1 Buffer。|
+|  NO_OVERLAP_IN_MULTI_REPEAT | 该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR/Ascend 950DT，使用基础API的高维切分计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项。 | `-DNO_OVERLAP_IN_MULTI_REPEAT` |-|
 
 
 ## 内置链接库<a name="section57020345148"></a>
@@ -349,5 +354,5 @@ target_compile_options(demo PRIVATE
 
 | 使用场景 |名称  | 动态库路径 |
 |--|--|--|
-| 使用高阶API相关的Tiling接口时需要同时链接。 |libtiling_api.a<br> libregister.so<br>libgraph_base.so | ${ASCEND_HOME_PATH}/lib64  |
+| 使用高阶API相关的Tiling接口时需要同时链接。 |libtiling_api.a</br> libregister.so</br> libgraph_base.so | ${ASCEND_HOME_PATH}/lib64  |
 | 使用PlatformAscendC相关硬件平台信息接口时需要链接。 | libplatform.so | ${ASCEND_HOME_PATH}/lib64 |
