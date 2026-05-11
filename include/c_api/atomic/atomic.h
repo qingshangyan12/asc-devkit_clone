@@ -36,7 +36,6 @@ __aicore__ inline void asc_set_atomic_add_int8();
 
 __aicore__ inline void asc_set_atomic_add_int16();
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 __aicore__ inline void asc_set_atomic_none();
 
@@ -70,15 +69,11 @@ __aicore__ inline void asc_set_atomic_min_int8();
 
 __aicore__ inline void asc_set_atomic_min_int16();
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-__aicore__ inline void asc_set_atomic_add_float16();
 
-__aicore__ inline void asc_set_atomic_max_float();
 
 __aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op);
 
-#endif
 
 #endif
 

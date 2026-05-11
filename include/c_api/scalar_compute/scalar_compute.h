@@ -34,7 +34,6 @@ __aicore__ inline int64_t asc_ffs(uint64_t value);
 
 __aicore__ inline int64_t asc_popc(uint64_t value);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 __aicore__ inline int64_t asc_clz(uint64_t value_in);
 
@@ -52,7 +51,6 @@ __aicore__ inline int32_t asc_float2int32_rn(float value);
 
 __aicore__ inline int32_t asc_float2int32_rna(float value);
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 __aicore__ inline void asc_store_dev(__gm__ int8_t* addr, int8_t value);
 
@@ -70,11 +68,8 @@ __aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value);
 
 __aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value);
 
-__aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx);
 
-__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx);
 
-#endif
 
 #endif
 

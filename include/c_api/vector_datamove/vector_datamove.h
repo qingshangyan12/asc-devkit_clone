@@ -46,7 +46,6 @@ __aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value);
 
 __aicore__ inline void asc_set_copy_pad_val(float pad_value);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
     uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
@@ -218,7 +217,6 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__  uint64_t* dst, __ubuf__ uint
 
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint32_t size);
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 // ==========asc_copy_gm2ub_align(int8_t/uint8_t/fp8_e5m2_t/fp8_e4m3fn_t/hifloat8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t n_burst, uint32_t len_burst,
@@ -411,11 +409,8 @@ __aicore__ inline void asc_copy_ub2l1_sync(__cbuf__ void* dst, __ubuf__ void* sr
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
                                       uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
-__aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
-__aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
-#endif
 
 #endif
 
