@@ -9,7 +9,10 @@
 # ----------------------------------------------------------------------------------------------------------
 add_compile_options(-Werror)
 
-add_subdirectory(aicpu_api)
+if (NOT DISABLE_AICPU)
+  add_subdirectory(aicpu_api)
+endif()
+
 add_subdirectory(adv_api)
 add_subdirectory(basic_api)
 add_subdirectory(c_api)
