@@ -24,10 +24,10 @@ def FastGelu(x):
 
 def gen_golden_data():
     groupNum = 8
-    m = 1024
+    m = 8192
     k = 1024
     n = 8192
-    groupList = np.array([128] * groupNum, dtype=np.int64)
+    groupList = np.array([1024] * groupNum, dtype=np.int64)
     x = np.random.randint(-10, 10, [m, k]).astype(np.int8)
     weight = np.random.randint(-10, 10, [groupNum, k, n]).astype(np.int8)
     scale = np.random.normal(0, 0.01, (groupNum, n)).astype(np.float32)
@@ -37,7 +37,7 @@ def gen_golden_data():
     perTokenScaleSplit = np.split(perTokenScale, index, axis=0)
     mmOuts = []
     for i in range(groupNum):
-        mm = np.matmul(xSplit[i].astype(np.int32), weight[i].astype(np.int32))
+        mm = np.matmul(xSplit[i].astype(np.float32), weight[i].astype(np.float32))
         mm = mm.astype(np.float32) * scale[i].astype(np.float32) * perTokenScaleSplit[i]
         mmOuts.append(mm)
     golden = np.concatenate(mmOuts, axis=0).astype(np.float16)
