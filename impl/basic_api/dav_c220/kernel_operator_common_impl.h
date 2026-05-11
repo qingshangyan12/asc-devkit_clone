@@ -23,6 +23,7 @@
 #include "kernel_utils.h"
 #include "kernel_tensor.h"
 #include "kernel_struct_mm.h"
+#include "kernel_struct_spr.h"
 namespace AscendC {
 
 [[deprecated(
@@ -148,6 +149,41 @@ __aicore__ static inline int64_t GetCtrlSprImpl()
     value = value >> startBit;
     value &= ((uint64_t(1) << (endBit - startBit + 1)) - 1);
     return value;
+}
+
+template <SaturationMode mode>
+__aicore__ inline int8_t CheckSaturationMode()
+{
+    // FLOAT => bit 48; CAST => bit 59
+    static_assert((mode == SaturationMode::FLOAT || mode == SaturationMode::CAST),
+        "mode only support FLOAT / CAST on current platform!");
+    if constexpr(mode == SaturationMode::FLOAT) {
+        return 48;
+    } else {
+        return 59;
+    }
+}
+
+template <SaturationMode mode>
+__aicore__ static inline void SetSaturationFlagImpl(bool enableSat)
+{
+    int8_t sprBit = CheckSaturationMode<mode>();
+    uint64_t mask = ((uint64_t(1) << 1) - 1) << sprBit;
+    mask = ~mask;
+    int64_t value = enableSat ? 0 : 1;    // bit=0 means saturate
+    int64_t setValue = get_ctrl() & mask;
+    setValue |= (value << sprBit);
+    set_ctrl(setValue);
+}
+
+template <SaturationMode mode>
+__aicore__ static inline bool GetSaturationFlagImpl()
+{
+    int8_t sprBit = CheckSaturationMode<mode>();
+    int64_t value = get_ctrl();
+    value = value >> sprBit;
+    value &= ((uint64_t(1) << 1) - 1);  // current value is bit value. value=0 means saturate=true
+    return !value;
 }
 
 } // namespace AscendC
