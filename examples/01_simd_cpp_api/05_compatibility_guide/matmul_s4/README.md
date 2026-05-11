@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示 int4b_t 矩阵乘计算的端到端实现，通过编译时宏隔离实现不同架构的兼容性支持。
+本样例演示 int4b_t 矩阵乘计算的端到端实现，通过编译时宏隔离不同硬件实现。
 - Atlas A2/A3 训练/推理系列产品支持int4b_t数据类型，可直接进行Matmul计算。
 - Ascend 950PR/950DT不支持int4b_t数据类型，需将int4x2解压为int8_t后再进行Matmul计算。
 
@@ -42,7 +42,6 @@
 
   - **Atlas A2/A3 训练/推理系列产品**：Cube计算单元支持int4b_t数据类型，可直接执行Matmul计算。
   - **Ascend 950PR/950DT**：Cube计算单元不支持int4b_t数据类型，需通过mix模式在Vector Core执行Unzip操作，将int4x2解压为int8_t后再进行Matmul计算。
-
 
 ## 编译运行
 
