@@ -19,7 +19,6 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_H__
 #endif
 
-
 #ifndef ASCENDC_MODULE_CHECK_H
 #define ASCENDC_MODULE_CHECK_H
 
@@ -50,6 +49,7 @@ uint64_t GetLoadDataLocalLen(const uint64_t tensorSize)
 #endif
     } else {
         return tensorSize * sizeof(PrimT<T>);
+
     }
 }
 
