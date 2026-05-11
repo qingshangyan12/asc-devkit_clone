@@ -57,7 +57,7 @@ __simd_vf__ inline void Log1pCompute(__ubuf__ T* dst, __ubuf__ T* src, uint32_t 
     Reg::RegTensor<float> srcReg, x1Reg, tReg, nln2Reg, pReg, resultReg, tmpFReg, specInfReg, negZeroReg;
     Reg::RegTensor<int32_t> r3Reg;
     Reg::RegTensor<uint32_t> r4Reg, tmpUReg;
-    Reg::MaskReg mask, fullMask, maskSpecial, maskZero, maskSpecialAndZero;
+    Reg::MaskReg mask, fullMask, maskSpecial, maskSpecialSub1, maskSpecialAndSub1, maskZero, maskSpecialAndZero;
 
     fullMask = Reg::CreateMask<float, Reg::MaskPattern::ALL>();
 
@@ -120,16 +120,19 @@ __simd_vf__ inline void Log1pCompute(__ubuf__ T* dst, __ubuf__ T* src, uint32_t 
         Reg::FusedMulDstAdd(tmpFReg, nln2Reg, resultReg, mask);
 
         Reg::CompareScalar<uint32_t, CMPMODE::GE>(maskSpecial, r1Reg, LOG1P_CONST_7F800000, mask);
+        Reg::CompareScalar<int32_t, CMPMODE::GE>(maskSpecialSub1, (Reg::RegTensor<int32_t>&)r1Reg,
+            2139095040, mask);
+        Reg::And(maskSpecialAndSub1, maskSpecial, maskSpecialSub1, fullMask);
 
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)specInfReg, LOG1P_CONST_7F800000);
-        Reg::FusedMulDstAdd(specInfReg, srcReg, specInfReg, maskSpecial);
+        Reg::FusedMulDstAdd(specInfReg, srcReg, specInfReg, maskSpecialAndSub1);
 
         Reg::CompareScalar<float, CMPMODE::EQ>(maskZero, srcReg, 0.0f, mask);
         Reg::And(maskSpecialAndZero, maskSpecial, maskZero, fullMask);
 
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)negZeroReg, LOG1P_CONST_80000000);
 
-        Reg::Select(tmpFReg, specInfReg, tmpFReg, maskSpecial);
+        Reg::Select(tmpFReg, specInfReg, tmpFReg, maskSpecialAndSub1);
         Reg::Select(tmpFReg, negZeroReg, tmpFReg, maskSpecialAndZero);
 
         Reg::StoreAlign(dst + i * oneRepSize, tmpFReg, mask);
