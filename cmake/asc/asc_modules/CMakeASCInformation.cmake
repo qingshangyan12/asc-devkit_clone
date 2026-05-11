@@ -19,9 +19,29 @@ endif()
 
 set(CMAKE_INCLUDE_FLAG_ASC "-I")
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(debug_compile_options "-O0 -g")
+# --- Per-config compile flags (CMAKE_ASC_FLAGS / _DEBUG / _RELEASE / _<CONFIG>) ---
+# *_INIT values are only used the first time the cache is populated; subsequent
+# configures keep whatever the user already has in cache.
+if(NOT DEFINED CMAKE_ASC_FLAGS_DEBUG_INIT)
+    set(CMAKE_ASC_FLAGS_DEBUG_INIT "-O0 -g")
 endif()
+if(NOT DEFINED CMAKE_ASC_FLAGS_RELEASE_INIT)
+    set(CMAKE_ASC_FLAGS_RELEASE_INIT "-O2")
+endif()
+if(NOT DEFINED CMAKE_ASC_FLAGS_RELWITHDEBINFO_INIT)
+    set(CMAKE_ASC_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
+endif()
+if(NOT DEFINED CMAKE_ASC_FLAGS_MINSIZEREL_INIT)
+    set(CMAKE_ASC_FLAGS_MINSIZEREL_INIT "-Os")
+endif()
+
+# CMake convention: $ENV{<LANG>FLAGS} seeds CMAKE_<LANG>_FLAGS_INIT. Mirror it.
+set(CMAKE_ASC_FLAGS_INIT "$ENV{ASCFLAGS} ${CMAKE_ASC_FLAGS_INIT}")
+
+# Materialize CMAKE_ASC_FLAGS and CMAKE_ASC_FLAGS_<CONFIG> as cache STRINGs.
+# The <FLAGS> placeholder in CMAKE_ASC_COMPILE_OBJECT will auto-merge the
+# active config's value into the compile command.
+cmake_initialize_per_config_variable(CMAKE_ASC_FLAGS "Flags used by the ASC compiler")
 
 # --- Resolve optional ASC tooling overrides (consumed by rules below) ---
 
@@ -78,7 +98,7 @@ endif()
 # CMAKE_ASC_COMPILER: bisheng
 if(NOT CMAKE_ASC_COMPILE_OBJECT)
     set(CMAKE_ASC_COMPILE_OBJECT "${_ASC_COMPILER_LAUNCHER_PREFIX}<CMAKE_ASC_COMPILER> <DEFINES> <INCLUDES> \
--fPIC ${debug_compile_options} <FLAGS> -o <OBJECT> -c --asc-aicore-lang <SOURCE>")
+-fPIC <FLAGS> -o <OBJECT> -c --asc-aicore-lang <SOURCE>")
 endif()
 
 # Create a static archive incrementally for large object file counts.
