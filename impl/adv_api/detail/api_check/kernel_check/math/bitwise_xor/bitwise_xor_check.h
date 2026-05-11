@@ -21,7 +21,7 @@
 
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_MATH_BITWISE_XOR_CHECK_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_MATH_BITWISE_XOR_CHECK_H_
-#include "bitwise_xor_check_c310.h"
+#include "bitwise_xor_check_3510.h"
 namespace AscendC {
 namespace HighLevelApiCheck {
 template <typename T, bool isReuseSource = false>

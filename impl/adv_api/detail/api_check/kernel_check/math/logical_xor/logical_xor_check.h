@@ -22,7 +22,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_MATH_LOGICAL_XOR_LOGICAL_XOR_CHECK_H
 #define IMPL_API_CHECK_KERNEL_CHECK_MATH_LOGICAL_XOR_LOGICAL_XOR_CHECK_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "logical_xor_check_c310.h"
+#include "logical_xor_check_3510.h"
 #endif
 
 namespace AscendC {

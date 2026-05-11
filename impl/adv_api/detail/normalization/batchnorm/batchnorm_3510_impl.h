@@ -9,7 +9,7 @@
  */
 
 /*!
- * \file batchnorm_check_c310.h
+ * \file batchnorm_3510_impl.h
  * \brief
  */
 
