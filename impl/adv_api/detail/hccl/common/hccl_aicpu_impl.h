@@ -126,7 +126,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(uint16
                 tiling = ccOpTilingDataTable_[static_cast<uint32_t>(param.commType.prepareType)];
             }
         }
-        AssembleHcclMsg(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
+        AssembleHcclMsg(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg, devType_);
     } else {
         AssembleHcclMsg(param, srcGroupID, srcHandleID, hcclSendMsg);
     }
