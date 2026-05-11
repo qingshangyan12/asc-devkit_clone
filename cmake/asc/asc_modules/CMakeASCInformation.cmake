@@ -26,13 +26,13 @@ if(NOT DEFINED CMAKE_ASC_FLAGS_DEBUG_INIT)
     set(CMAKE_ASC_FLAGS_DEBUG_INIT "-O0 -g")
 endif()
 if(NOT DEFINED CMAKE_ASC_FLAGS_RELEASE_INIT)
-    set(CMAKE_ASC_FLAGS_RELEASE_INIT "-O2")
+    set(CMAKE_ASC_FLAGS_RELEASE_INIT "-O3 -DNDEBUG")
 endif()
 if(NOT DEFINED CMAKE_ASC_FLAGS_RELWITHDEBINFO_INIT)
-    set(CMAKE_ASC_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
+    set(CMAKE_ASC_FLAGS_RELWITHDEBINFO_INIT "-O2 -g -DNDEBUG")
 endif()
 if(NOT DEFINED CMAKE_ASC_FLAGS_MINSIZEREL_INIT)
-    set(CMAKE_ASC_FLAGS_MINSIZEREL_INIT "-Os")
+    set(CMAKE_ASC_FLAGS_MINSIZEREL_INIT "-Os -DNDEBUG")
 endif()
 
 # CMake convention: $ENV{<LANG>FLAGS} seeds CMAKE_<LANG>_FLAGS_INIT. Mirror it.
@@ -42,6 +42,13 @@ set(CMAKE_ASC_FLAGS_INIT "$ENV{ASCFLAGS} ${CMAKE_ASC_FLAGS_INIT}")
 # The <FLAGS> placeholder in CMAKE_ASC_COMPILE_OBJECT will auto-merge the
 # active config's value into the compile command.
 cmake_initialize_per_config_variable(CMAKE_ASC_FLAGS "Flags used by the ASC compiler")
+
+# --- Feature switches that inject specific compiler flags ---
+option(CMAKE_ASC_ENABLE_SIMT
+    "Pass --enable-simt to bisheng so ASC sources are compiled with SIMT support" OFF)
+if(CMAKE_ASC_ENABLE_SIMT)
+    string(APPEND CMAKE_ASC_FLAGS " --enable-simt")
+endif()
 
 # --- Resolve optional ASC tooling overrides (consumed by rules below) ---
 
