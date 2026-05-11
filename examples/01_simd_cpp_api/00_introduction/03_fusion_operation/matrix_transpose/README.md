@@ -47,7 +47,7 @@ $$
 
 对矩阵转置这类二维规则计算，采用tile方式组织数据可以将大矩阵分解为若干局部子块，使每个block只处理一个局部区域，便于索引计算和线程协作。本样例中的2个kernel都基于同一套tile切分方式组织计算，便于比较不同kernel在相同切分方式下的访存行为差异。
 
-本样例采用SIMD与SIMT混合编程方式：核函数内部再通过 `asc_vf_call` 调用 `__simt_vf__` 函数。混合编程场景下外层只支持一维线程块布局，因此二维矩阵tile不能直接映射到二维 `blockIdx.x/blockIdx.y`，而是需要先展平到一维 `blockIdx.x`，再在SIMT VF函数内部还原出二维tile坐标。
+本样例采用SIMD与SIMT混合编程方式：外层 `__global__ __vector__` kernel内部通过 `asc_vf_call` 调用 `__simt_vf__` 函数。混合编程场景下只支持一维线程块布局，因此二维矩阵tile不能直接映射到二维 `blockIdx.x/blockIdx.y`，tile内线程也不能使用二维 `threadIdx.x/threadIdx.y` 布局。本样例将二维tile坐标展平到一维 `blockIdx.x`，再将tile内32×32个元素展平到一维 `threadIdx.x`，在SIMT VF函数内部分别还原出二维tile坐标和tile内局部坐标。
 
 本样例中子块tile大小取32×32，主要是因为SIMT执行模型中一个warp包含32个线程。同一warp的线程可处理tile中同一行的32个连续元素。这样在访问GM时，一个warp能够按行读取连续数据，有利于形成连续的全局访存模式。
 
@@ -56,14 +56,26 @@ $$
 - 将整个输入矩阵进行tile划分，每个tile大小固定是32×32，一个block对应处理输入矩阵中的一个大小为32×32的tile
 - 由于混合编程下外层kernel只支持一维线程块布局，因此外层kernel采用一维block切分，block数量为 `bn = grid_x * grid_y`
 - `grid_x = matrix_width / TILE_DIM`，`grid_y = matrix_height / TILE_DIM`
-- 每个一维 `blockIdx.x` 对应一个tile，并在SIMT函数内还原为二维tile坐标：
+- 每个一维 `blockIdx.x` 对应一个tile，并在SIMT VF函数内还原为二维tile坐标：
 
 ```cpp
 int block_x = blockIdx.x % grid_width;
 int block_y = blockIdx.x / grid_width;
 ```
 
-- **以一个block为例的映射关系**：
+**一维线程块与SIMT线程组织**：
+
+- SIMT VF函数内部同样采用一维线程块布局，通过 `asc_vf_call(..., dim3(THREAD_COUNT), ...)` 启动
+- `THREAD_COUNT = TILE_DIM * TILE_DIM = 1024`
+- `threadIdx.x` 范围为0-1023，每个线程处理tile内1个元素
+- tile内局部二维坐标由一维 `threadIdx.x` 还原：
+
+```cpp
+int tile_x = threadIdx.x % TILE_DIM;
+int tile_y = threadIdx.x / TILE_DIM;
+```
+
+**以一个block为例的映射关系**：
 
 下图给出了一个更直观的映射示意。左侧表示1024×1024的矩阵被划分为 32×32 个 tile。右侧表示其中一个block需要处理的一个tile，其大小为32×32。
 
@@ -76,16 +88,17 @@ int block_y = blockIdx.x / grid_width;
   - block_y = 2
   - blockIdx.x = block_y × grid_width + block_x = 2 × 32 + 1 = 65
 - 元素在tile内的局部坐标是(29,2)，对应：
-  - threadIdx.x = 29
-  - threadIdx.y = 2
+  - threadIdx.x = tile_y × TILE_DIM + tile_x = 2 × 32 + 29 = 93
 
 结合代码中的索引计算：
 
 ```cpp
 int block_x = blockIdx.x % grid_width;
 int block_y = blockIdx.x / grid_width;
-int x_index = block_x * TILE_DIM + threadIdx.x;
-int y_index = block_y * TILE_DIM + threadIdx.y;
+int tile_x = threadIdx.x % TILE_DIM;
+int tile_y = threadIdx.x / TILE_DIM;
+int x_index = block_x * TILE_DIM + tile_x;
+int y_index = block_y * TILE_DIM + tile_y;
 int index = x_index + width * y_index;
 ```
 
@@ -93,8 +106,10 @@ int index = x_index + width * y_index;
 
 - block_x = 65 % 32 = 1
 - block_y = 65 / 32 = 2
-- x_index = block_x × TILE_DIM + threadIdx.x = 1 × 32 + 29 = 61
-- y_index = block_y × TILE_DIM + threadIdx.y = 2 × 32 + 2 = 66
+- tile_x = 93 % 32 = 29
+- tile_y = 93 / 32 = 2
+- x_index = block_x × TILE_DIM + tile_x = 1 × 32 + 29 = 61
+- y_index = block_y × TILE_DIM + tile_y = 2 × 32 + 2 = 66
 
 因此，该线程在GM中处理的输入元素坐标就是：
 
@@ -109,7 +124,7 @@ int index = x_index + width * y_index;
 - 每个tile的大小TILE_DIM=32
 - 外层kernel采用一维block数量 `bn = (matrix_width/32) × (matrix_height/32)`，每个block处理一个tile
 - 二维tile坐标由一维 `blockIdx.x` 还原，不使用 `blockIdx.y`
-- SIMT VF函数内部的线程组织为 `dim3(32,32)`，每个线程处理tile内1个元素
+- SIMT VF函数内部的线程组织为 `dim3(1024)`，tile内局部坐标由一维 `threadIdx.x` 还原，不使用 `threadIdx.y`
 
 ### 性能指标说明
 
@@ -179,17 +194,20 @@ output[index_out] = input[index_in];
 **关键代码**：
 
 ```cpp
-tile[threadIdx.y][threadIdx.x] = input[index_in];
+int tile_x = threadIdx.x % TILE_DIM;
+int tile_y = threadIdx.x / TILE_DIM;
+
+tile[tile_y][tile_x] = input[index_in];
 asc_syncthreads();
 
 int block_x = blockIdx.x % grid_width;
 int block_y = blockIdx.x / grid_width;
 
-x_index = block_y * TILE_DIM + threadIdx.x;
-y_index = block_x * TILE_DIM + threadIdx.y;
+x_index = block_y * TILE_DIM + tile_x;
+y_index = block_x * TILE_DIM + tile_y;
 int index_out = x_index + y_index * height;
 
-output[index_out] = tile[threadIdx.x][threadIdx.y];
+output[index_out] = tile[tile_x][tile_y];
 ```
 
 **实现过程拆解**：
