@@ -609,3 +609,4 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         TASK_NUM 1
     )
 endforeach()
+add_subdirectory(hccl/cc)
