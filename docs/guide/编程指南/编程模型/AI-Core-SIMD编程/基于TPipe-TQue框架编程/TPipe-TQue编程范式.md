@@ -1,4 +1,4 @@
-# 基于TPipe和TQue编程<a name="ZH-CN_TOPIC_0000002465655445"></a>
+# TPipe和TQue编程范式<a name="ZH-CN_TOPIC_0000002465655445"></a>
 
 **编程范式描述了算子核函数实现的固定流程，基于编程范式进行编程，可以快速搭建算子实现的代码框架。**
 
@@ -186,4 +186,3 @@ __aicore__ inline void MatmulLeakyKernel<aType, bType, cType, biasType>::Process
     matmulObj.End();
 }
 ```
-
