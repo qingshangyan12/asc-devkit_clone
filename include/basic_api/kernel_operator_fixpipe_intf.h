@@ -55,11 +55,9 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &reluPre, const Loc
 template <typename T, bool setRelu = false>
 __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &preData, bool isUnitFlag = false);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride);
-#else
+
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride);
-#endif
 
 __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config);
 
