@@ -23,6 +23,8 @@
 #ifndef ASCENDC_MODULE_CHECK_H
 #define ASCENDC_MODULE_CHECK_H
 
+
+
 #if ASCENDC_CPU_DEBUG
 #include "utils/kernel_check_copy.h"
 #include "utils/kernel_check_vec_binary.h"
