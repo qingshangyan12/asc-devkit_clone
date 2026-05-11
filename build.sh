@@ -13,7 +13,7 @@ set -e
 
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
+    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script" "noaicpu"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -30,6 +30,7 @@ CMAKE_TOOLCHAIN_FILE_VAL=""
 CHANGED_FILES=""
 CI_MODE=FALSE
 ENABLE_SIGN="false"
+NO_AICPU="false"
 VERSION_INFO="8.5.0"
 CUSTOM_SIGN_SCRIPT="${CURRENT_DIR}/impl/adv_api/detail/hccl/cc/scripts/sign/community_sign_build.py"
 
@@ -116,6 +117,7 @@ usage() {
   echo "    --cov                Enable code coverage for unit tests"
   echo "    --asan               Enable ASAN (address Sanitizer)"
   echo "    --make_clean         Clean build artifacts"
+  echo "    --noaicpu            Disable AICPU build"
   echo "    --build-type=<TYPE>"
   echo "                         Specify build type (TYPE options: Release/Debug), Default:Release"
   echo "    -f, --changed_file   Set the changed files for CI mode, eg: -f change_file.txt"
@@ -478,6 +480,10 @@ set_options() {
       check_param_test_build_type
       shift 2
       ;;
+    --noaicpu)
+      NO_AICPU="true"
+      shift
+      ;;
     *)
       log "[ERROR] Undefined option: $1"
       usage
@@ -656,6 +662,10 @@ main() {
 
   if [ -n "${CANN_3RD_LIB_PATH}" ];then
     CUSTOM_OPTION="${CUSTOM_OPTION} -DCANN_3RD_LIB_PATH=${CANN_3RD_LIB_PATH}"
+  fi
+
+  if [ "${NO_AICPU}" == "true" ];then
+    CUSTOM_OPTION="${CUSTOM_OPTION} -DDISABLE_AICPU=ON"
   fi
 
   if [[ ! -d "${BUILD_DIR}" ]]; then
