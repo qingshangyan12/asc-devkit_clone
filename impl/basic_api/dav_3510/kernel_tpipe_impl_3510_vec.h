@@ -9,16 +9,16 @@
 */
 
 /*!
- * \file kernel_tpipe_impl_c310_vec.h
+ * \file kernel_tpipe_impl_3510_vec.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic_api/dav_3510/kernel_tpipe_impl_c310_vec.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message("impl/basic_api/dav_3510/kernel_tpipe_impl_3510_vec.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_C310_VEC_H__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_3510_VEC_H__
 #endif
-#ifndef ASCENDC_MODULE_TPIPE_IMPL_C310_VEC_H
-#define ASCENDC_MODULE_TPIPE_IMPL_C310_VEC_H
+#ifndef ASCENDC_MODULE_TPIPE_IMPL_3510_VEC_H
+#define ASCENDC_MODULE_TPIPE_IMPL_3510_VEC_H
 
 #include "kernel_macros.h"
 #include "common_types.h"
@@ -201,7 +201,7 @@ __aicore__ inline __sync_noalias__ void TQueBind<src, dst, depth, mask>::AllocTe
 {
     static_assert((depth == 0), "can not AllocTensor in place while tque's depth is non zero");
     auto buf = AllocBuffer();
-    // c310 aic depth=0 will use waitflag
+    // 3510 aic depth=0 will use waitflag
     if ASCEND_IS_AIC {
         WaitFlag<freeBufEvt>(reinterpret_cast<TBufType*>(buf)->freeBufEvtID);
     }
@@ -1497,8 +1497,8 @@ __aicore__ inline uint64_t TransUBAddr(uint64_t addr)
     return addr;
 }
 }
-#endif // ASCENDC_MODULE_TPIPE_IMPL_C310_VEC_H
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_C310_VEC_H__)
+#endif // ASCENDC_MODULE_TPIPE_IMPL_3510_VEC_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_3510_VEC_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_C310_VEC_H__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_3510_VEC_H__
 #endif
