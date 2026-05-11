@@ -19,55 +19,69 @@ endif()
 
 set(CMAKE_INCLUDE_FLAG_ASC "-I")
 
-# --- Per-config compile flags (CMAKE_ASC_FLAGS / _DEBUG / _RELEASE / _<CONFIG>) ---
-# *_INIT values are only used the first time the cache is populated; subsequent
-# configures keep whatever the user already has in cache.
+# CMAKE_BUILD_TYPE: ASC officially supports Debug | Release; other values fall through with a warning.
+if(CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release)$")
+    message(WARNING
+        "ASC: CMAKE_BUILD_TYPE='${CMAKE_BUILD_TYPE}' is not in the officially supported set (Debug | Release).")
+endif()
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release)
+
+# CMAKE_ASC_STANDARD: defaults to 17.
+if(CMAKE_ASC_STANDARD MATCHES "^[0-9]+$" AND CMAKE_ASC_STANDARD LESS 17)
+    message(WARNING
+        "ASC: CMAKE_ASC_STANDARD='${CMAKE_ASC_STANDARD}' is below the recommended C++17.")
+endif()
+
+# Per-config FLAGS default values; *_INIT only seeds cache on first configure.
 if(NOT DEFINED CMAKE_ASC_FLAGS_DEBUG_INIT)
     set(CMAKE_ASC_FLAGS_DEBUG_INIT "-O0 -g")
 endif()
 if(NOT DEFINED CMAKE_ASC_FLAGS_RELEASE_INIT)
-    set(CMAKE_ASC_FLAGS_RELEASE_INIT "-O2")
-endif()
-if(NOT DEFINED CMAKE_ASC_FLAGS_RELWITHDEBINFO_INIT)
-    set(CMAKE_ASC_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
-endif()
-if(NOT DEFINED CMAKE_ASC_FLAGS_MINSIZEREL_INIT)
-    set(CMAKE_ASC_FLAGS_MINSIZEREL_INIT "-Os")
+    set(CMAKE_ASC_FLAGS_RELEASE_INIT "-O3 -DNDEBUG")
 endif()
 
-# CMake convention: $ENV{<LANG>FLAGS} seeds CMAKE_<LANG>_FLAGS_INIT. Mirror it.
+# Inherit user-level flags from $ENV{ASCFLAGS}.
 set(CMAKE_ASC_FLAGS_INIT "$ENV{ASCFLAGS} ${CMAKE_ASC_FLAGS_INIT}")
 
 # Materialize CMAKE_ASC_FLAGS and CMAKE_ASC_FLAGS_<CONFIG> as cache STRINGs.
-# The <FLAGS> placeholder in CMAKE_ASC_COMPILE_OBJECT will auto-merge the
-# active config's value into the compile command.
 cmake_initialize_per_config_variable(CMAKE_ASC_FLAGS "Flags used by the ASC compiler")
 
-# --- Resolve optional ASC tooling overrides (consumed by rules below) ---
+# Auto-inject --npu-arch=<arch> for NPU mode
+if(CMAKE_ASC_ARCHITECTURES AND
+   (NOT CMAKE_ASC_RUN_MODE OR CMAKE_ASC_RUN_MODE STREQUAL "npu"))
+    string(APPEND CMAKE_ASC_FLAGS " --npu-arch=${CMAKE_ASC_ARCHITECTURES}")
+endif()
 
-# COMPILER_LAUNCHER: prefix for compile commands (e.g. ccache, wrapper script).
-# Empty string when unset → no prefix injected.
+# CMAKE_ASC_ENABLE_SIMT: when ON, inject --enable-simt into the compile rule.
+option(CMAKE_ASC_ENABLE_SIMT
+    "Pass --enable-simt to bisheng so ASC sources are compiled with SIMT support" OFF)
+set(_ASC_SIMT_FLAG "")
+if(CMAKE_ASC_ENABLE_SIMT)
+    set(_ASC_SIMT_FLAG " --enable-simt")
+endif()
+
+# CMAKE_ASC_COMPILER_LAUNCHER: prefix prepended to ASC compile commands (e.g. ccache).
 set(_ASC_COMPILER_LAUNCHER_PREFIX "")
 if(CMAKE_ASC_COMPILER_LAUNCHER)
     string(JOIN " " _ASC_COMPILER_LAUNCHER_PREFIX ${CMAKE_ASC_COMPILER_LAUNCHER})
     set(_ASC_COMPILER_LAUNCHER_PREFIX "${_ASC_COMPILER_LAUNCHER_PREFIX} ")
 endif()
 
-# LINKER_LAUNCHER: prefix for link commands.
+# CMAKE_ASC_LINKER_LAUNCHER: prefix prepended to ASC link commands.
 set(_ASC_LINKER_LAUNCHER_PREFIX "")
 if(CMAKE_ASC_LINKER_LAUNCHER)
     string(JOIN " " _ASC_LINKER_LAUNCHER_PREFIX ${CMAKE_ASC_LINKER_LAUNCHER})
     set(_ASC_LINKER_LAUNCHER_PREFIX "${_ASC_LINKER_LAUNCHER_PREFIX} ")
 endif()
 
-# COMPILER_AR: archive tool override; falls back to <CMAKE_AR> placeholder.
+# CMAKE_ASC_COMPILER_AR: archive tool for ASC static libraries; falls back to <CMAKE_AR>.
 if(CMAKE_ASC_COMPILER_AR)
     set(_ASC_AR_TOOL "${CMAKE_ASC_COMPILER_AR}")
 else()
     set(_ASC_AR_TOOL "<CMAKE_AR>")
 endif()
 
-# COMPILER_LINKER: link driver override; falls back to <CMAKE_ASC_COMPILER>.
+# CMAKE_ASC_COMPILER_LINKER: link driver for ASC targets; falls back to <CMAKE_ASC_COMPILER>.
 if(CMAKE_ASC_COMPILER_LINKER)
     set(_ASC_LINK_DRIVER "${CMAKE_ASC_COMPILER_LINKER}")
 else()
@@ -98,7 +112,7 @@ endif()
 # CMAKE_ASC_COMPILER: bisheng
 if(NOT CMAKE_ASC_COMPILE_OBJECT)
     set(CMAKE_ASC_COMPILE_OBJECT "${_ASC_COMPILER_LAUNCHER_PREFIX}<CMAKE_ASC_COMPILER> <DEFINES> <INCLUDES> \
--fPIC <FLAGS> -o <OBJECT> -c --asc-aicore-lang <SOURCE>")
+-fPIC${_ASC_SIMT_FLAG} <FLAGS> -o <OBJECT> -c --asc-aicore-lang <SOURCE>")
 endif()
 
 # Create a static archive incrementally for large object file counts.
@@ -113,9 +127,7 @@ if(NOT DEFINED CMAKE_ASC_ARCHIVE_FINISH)
     set(CMAKE_ASC_ARCHIVE_FINISH "<CMAKE_RANLIB> <TARGET>")
 endif()
 
-# when language is set to ASC, execute when add_executable.
-# FLAGS: -D
-# ASC_LINK_FLAGS: link options
+# Link rule for ASC executables (consumed by add_executable with ASC sources).
 if(NOT CMAKE_ASC_LINK_EXECUTABLE)
     set(CMAKE_ASC_LINK_EXECUTABLE "${_ASC_LINKER_LAUNCHER_PREFIX}${_ASC_LINK_DRIVER} <FLAGS> <CMAKE_ASC_LINK_FLAGS> \
 <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
