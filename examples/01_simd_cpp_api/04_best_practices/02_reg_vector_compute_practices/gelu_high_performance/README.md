@@ -20,7 +20,7 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   ├── gelu.asc                // Ascend C样例实现（包含2个优化case）
+│   ├── gelu.asc                // Ascend C样例实现
 ```
 
 ## 样例描述
@@ -206,8 +206,8 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 | 348.868 | 347.99 | 66.277 | 0.19 | 3.03 | 0.009 | 320.543 | 0.921 | 314.547 | 0.904 |
 
 **优化效果分析**：
-- 端到端耗时：**348.868μs**，相比Case 0耗时减少 **0.76%**，本样例为MTE2 bound，因此端到端收益不明显
-- 向量指令耗时：66.277μs，相比Case 0耗时减少 **55.2%**
+- 端到端耗时：**348.868μs**
+- 向量指令耗时：66.277μs
 
 ---
 
@@ -255,8 +255,8 @@ __simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float
 | 344.436 | 343.82 | 63.655 | 0.185 | 4.757 | 0.014 | 315.468 | 0.918 | 306.069 | 0.89 |
 
 **优化效果分析**：
-- 端到端耗时：**344.436μs**，相比Case 0耗时减少 **2.0%**，相比Case 1耗时减少 **1.3%**（MTE2 bound，端到端收益不明显）
-- 向量指令耗时：63.655μs，相比Case 0耗时减少 **56.9%**，相比Case 1耗时减少 **4.6%**
+- 端到端耗时：**344.436μs**，相比Case 1耗时减少 **1.3%**（MTE2 bound，端到端收益不明显）
+- 向量指令耗时：63.655μs，相比Case 1耗时减少 **4.6%**
 
 ---
 
@@ -266,10 +266,10 @@ __simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float
 
 下表为本样例在Ascend 950系列产品上运行的性能数据对比：
 
-| Case | 优化策略 | 核数 | tileLen | Task Duration(μs) | aiv_vec_time(μs) | 理论vector耗时(μs) | 端到端耗时相对Case 0 | vector耗时相对Case 0 |
+| Case | 优化策略 | 核数 | tileLen | Task Duration(μs) | aiv_vec_time(μs) | 理论vector耗时(μs) |
 |:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| 1 | 启用RegBase API | 64 | 8192 | 348.868 | 66.277 | NA | 1.01x | 2.23x |
-| 2 | 启用RegBase API和循环展开 | 64 | 8192 | 344.436 | 63.655 | NA | 1.02x | 2.32x |
+| 1 | 启用RegBase API | 64 | 8192 | 348.868 | 66.277 | NA |
+| 2 | 启用RegBase API和循环展开 | 64 | 8192 | 344.436 | 63.655 | NA |
 
 > **注意：** 该样例为MTE2 bound，性能瓶颈为数据搬运，下述分析主要针对vector耗时计算，方便用户分析使能RegBase API及循环展开的性能收益。Case 2相比Case 1，vector耗时减少 **4.6%**。
 
