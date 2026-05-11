@@ -137,18 +137,19 @@ protected:
     virtual void TearDown() {GlobalMockObject::verify();}
 };
 
-#define DUP_PARAMS_NORMAL_TEST(testCaseName, dataType, funcName)                                         \
-TEST_F(DuplicateTestsuite, testCaseName)                                                                   \
-{                                                                                                            \
-    InputParams inputParams{256,  256,  sizeof(PrimT<dataType>), 11, 22, 0, 3, 3, 3};                              \
-    uint8_t srcGm[inputParams.stackSize * inputParams.dataTypeSize] { 0x00 };                                \
-    uint8_t outputGm[inputParams.stackSize * inputParams.dataTypeSize] { 0x00 };                             \
-    DuplicateTest<dataType>(srcGm, outputGm, inputParams.stackSize, inputParams.dataSize,                   \
-        inputParams.maskCounter, inputParams.maskBitHigh, inputParams.maskBitLow,                            \
-        inputParams.repeatTimes, inputParams.dstBlockStride, inputParams.dstRepeatStride);                   \
-    EXPECT_EQ(outputGm[0], 0x00);                                                                            \
-    EXPECT_EQ(outputGm[1], 0x00);                                                                            \
-}                                                                                                            \
+#define DUP_PARAMS_NORMAL_TEST(testCaseName, dataType, funcName)                                                  \
+    TEST_F(DuplicateTestsuite, testCaseName)                                                                      \
+    {                                                                                                             \
+        InputParams inputParams{256, 256, sizeof(PrimT<dataType>), 11, 22, 0, 3, 3, 3};                           \
+        std::vector<uint8_t> srcGm(inputParams.stackSize * inputParams.dataTypeSize, 0x00);                       \
+        std::vector<uint8_t> outputGm(inputParams.stackSize * inputParams.dataTypeSize, 0x00);                    \
+        DuplicateTest<dataType>(                                                                                  \
+            srcGm.data(), outputGm.data(), inputParams.stackSize, inputParams.dataSize, inputParams.maskCounter,  \
+            inputParams.maskBitHigh, inputParams.maskBitLow, inputParams.repeatTimes, inputParams.dstBlockStride, \
+            inputParams.dstRepeatStride);                                                                         \
+        EXPECT_EQ(outputGm[0], 0x00);                                                                             \
+        EXPECT_EQ(outputGm[1], 0x00);                                                                             \
+    }
 
 DUP_PARAMS_NORMAL_TEST(DupTestSuite_check_Func_float, float, DuplicateImpl);
 DUP_PARAMS_NORMAL_TEST(DupTestSuite_check_Func_half, half, DuplicateImpl);
