@@ -23,8 +23,8 @@
 
 #include "kernel_reg_compute_common_intf.h"
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-           (__NPU_ARCH__ == 3113))
+#if (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+           (__NPU_ARCH__ == 3113))) || defined(__ASC_NPU_HOST__)
 #include "kernel_macros.h"
 #endif
 
