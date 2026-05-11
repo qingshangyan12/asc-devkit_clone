@@ -2,12 +2,11 @@
 
 ## 概述
 
-本样例以Gelu计算为例，介绍RegBase的向量性能调优方法，样例展示使能VF融合和循环展开之后的性能收益情况。
+本样例以Gelu计算为例，介绍RegBase矢量计算。
 
 **优化路径**：
-- Case 0: Gelu未使能VF融合能力（基准）
-- Case 1: 启用RegBase API和VF融合能力
-- Case 2: 启用RegBase API、VF融合能力和循环展开优化
+- Case 1: 使用RegBase API
+- Case 2: 使用RegBase API和循环展开优化
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -161,72 +160,11 @@ $$
 |aiv_mte3_time(μs)|mte3类型指令（UB->GM搬运类指令）耗时。|
 |aiv_mte3_ratio|mte3类型指令（UB->GM搬运类指令）的cycle数在total cycle数中的占用比。|
 
-### Case 0: Gelu未使能VF融合能力
+### Case 1: 启用RegBase API
 
-**实现方式**：参考 `KernelGelu::GeluCompute()` 函数实现
+**实现方式**：
 
-基准程序使用Ascend C基础API实现Gelu计算，包括Mul、Muls、Add、Exp、Adds、Div等向量指令。
-
-**关键代码**：
-```cpp
-__aicore__ inline void GeluCompute(
-        const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
-{
-    // yLocal = x * x = x²
-    AscendC::Mul(yLocal, xLocal, xLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x² * x = x³
-    AscendC::Mul(yLocal, yLocal, xLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x³ * 0.044715 = 0.044715 * x³
-    AscendC::Muls(yLocal, yLocal, COEFF_A, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x + 0.044715 * x³
-    AscendC::Add(yLocal, xLocal, yLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = -1.595769 * (x + 0.044715 * x³)
-    AscendC::Muls(yLocal, yLocal, COEFF_B, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = e^(-1.595769 * (x + 0.044715 * x³))
-    AscendC::Exp(yLocal, yLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = 1 + e^(-1.595769 * (x + 0.044715 * x³))
-    AscendC::Adds(yLocal, yLocal, (float)1.0, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x / (1 + e^(-1.595769 * (x + 0.044715 * x³)))
-    AscendC::Div(yLocal, xLocal, yLocal, n);
-}
-```
-
-**样例配置**：
-- 多核切分：M方向分2份，N方向32份，共计64份数据，分布到64core上计算
-- `tileLen = 8192` 为每次搬运和计算的数据元素个数
-
-**性能数据**：
-
-| Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| 351.525 | 350.64 | 147.895 | 0.422 | 9.513 | 0.027 | 320.283 | 0.913 | 303.647 | 0.866 |
-
-**优化效果分析**：
-- 端到端耗时：**351.525μs**
-- 向量指令耗时：147.895μs，占比 **42.2%**
-- 数据搬运耗时：320.283μs（读）+ 303.647μs（写），搬运占比超过 **90%**
-
-**原理说明**：
-- 计算流程按照公式(3)执行，包含8次向量运算，使用基础API进行向量计算
-- 每次向量计算内部会进行load -> compute -> store操作，每次计算数据均需要在Unified Buffer(UB)和Reg之间交互
-
-**下一步优化方向**：
-- 启用RegBase API和VF融合能力减少数据在UB和Reg之间的交互，在Reg内部完成最终计算结果的生成
-
----
-
-### Case 1: 启用RegBase API和VF融合能力
-
-**实现方式**：参考 `KernelGelu::GeluVfBasic()` 函数实现
-
-将基础API转换为RegBase API，使用寄存器级别的向量计算接口，减少数据在UB和Reg之间的交互。
+使用寄存器级别的向量计算接口，减少数据在UB和Reg之间的交互。
 
 **关键代码**：
 ```cpp
@@ -273,9 +211,9 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 
 ---
 
-### Case 2: 启用RegBase API、VF融合能力和循环展开优化
+### Case 2: 启用RegBase API、循环展开优化
 
-**实现方式**：参考 `KernelGelu::GeluVfBasic()` 函数实现，添加 `#pragma unroll 6` 循环展开优化
+**实现方式**：添加 `#pragma unroll 6` 循环展开优化
 
 在Case 1中由于Gelu计算依赖路径较长，使用循环展开优化，提高指令级并行度。
 
@@ -330,11 +268,10 @@ __simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float
 
 | Case | 优化策略 | 核数 | tileLen | Task Duration(μs) | aiv_vec_time(μs) | 理论vector耗时(μs) | 端到端耗时相对Case 0 | vector耗时相对Case 0 |
 |:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| 0 | Gelu未使能VF融合能力（基准） | 64 | 8192 | 351.525 | 147.895 | 139.02 | 1x | 1x |
-| 1 | 启用RegBase API和VF融合能力 | 64 | 8192 | 348.868 | 66.277 | NA | 1.01x | 2.23x |
-| 2 | 启用RegBase API、VF融合和循环展开 | 64 | 8192 | 344.436 | 63.655 | NA | 1.02x | 2.32x |
+| 1 | 启用RegBase API | 64 | 8192 | 348.868 | 66.277 | NA | 1.01x | 2.23x |
+| 2 | 启用RegBase API和循环展开 | 64 | 8192 | 344.436 | 63.655 | NA | 1.02x | 2.32x |
 
-> **注意：** 该样例为MTE2 bound，性能瓶颈为数据搬运，下述分析主要针对vector耗时计算，方便用户分析使能VF融合和循环展开的性能收益。Case 2相比Case 1，vector耗时减少 **4.6%**。
+> **注意：** 该样例为MTE2 bound，性能瓶颈为数据搬运，下述分析主要针对vector耗时计算，方便用户分析使能RegBase API及循环展开的性能收益。Case 2相比Case 1，vector耗时减少 **4.6%**。
 
 ### 理论性能分析
 
@@ -353,7 +290,7 @@ __simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float
 
 **理论vector耗时计算**：
 
-**Step 1: 计算Gelu计算流程的等效每cycle数据处理量（不考虑VF融合指令双发特性）**
+**Step 1: 计算Gelu计算流程的等效每cycle数据处理量（不考虑指令双发特性）**
 
 Gelu计算包含8条向量指令，各指令的并行度如下：
 - 6条线性运算指令（Mul×2、Muls×2、Add×1、Adds×1）：并行度256 bytes/cycle
@@ -375,7 +312,7 @@ $$
 P_{\text{bytes}} = \frac{256}{14} = \frac{128}{7} \approx 18.29 \text{ bytes/cycle}
 $$
 
-**Step 2: 计算理论vector耗时（不考虑VF融合指令双发特性）**
+**Step 2: 计算理论vector耗时（不考虑指令双发特性）**
 
 本样例在Ascend 950PR系列产品上运行，硬件参数：
 - 主频 $f = 1650 \text{ MHz} = 1.65 \times 10^9 \text{ Hz}$
@@ -394,9 +331,9 @@ $$
 T_{\text{theory}} = \frac{268435456}{\frac{128}{7} \times 1.65 \times 10^9 \times 64} = \frac{268435456 \times 7}{128 \times 1.056 \times 10^{11}} = \frac{1879048192}{1.35168 \times 10^{11}} \approx 139.02 \times 10^{-6} \text{ s} = 139.02 \text{ μs}
 $$
 
-**Step 3: 计算VF融合场景下理论vector耗时**
+**Step 3: 计算理论vector耗时**
 
-在VF融合场景下，vector指令具有双发特性，即常规计算指令并行度可以达到512 bytes/cycle，但是exp和div在双发场景下不能简单按照128 bytes/cycle进行估计。
+在RegBase场景下，vector指令具有双发特性，即常规计算指令并行度可以达到512 bytes/cycle，但是exp和div在双发场景下不能简单按照128 bytes/cycle进行估计。
 如下图所示，在time=0时刻，同时发射Exp和Mul指令，Mul只需要1个cycle执行完成，但是Exp需要4个cycle执行完成，在Exp执行期间，time=1时刻同时发射了Mul和Muls并行执行，并以此类推继续发射其它指令。
 
 ```
@@ -411,7 +348,7 @@ Adds:                 |<--->|
 Muls:                       |<--->|
 Adds:                       |<--->|
 ```
-因此在VF融合场景下，更多采用IPC(Instructions Per Cycle，每cycle指令发射数量)来衡量性能。
+因此在VF场景下，更多采用IPC(Instructions Per Cycle，每cycle指令发射数量)来衡量性能。
 
 case 1场景，单核vector计算指令数量：
 
@@ -448,7 +385,7 @@ IPC越高越好，理论极限接近2。
 
 **Case 2: 循环展开优化后的IPC分析**
 
-case 2场景，在VF融合基础上添加循环展开优化，单核vector计算指令数量保持不变：
+case 2场景，在RegBase接口基础上添加循环展开优化，单核vector计算指令数量保持不变：
 
 $$
 N_{\text{instr}} = N_{\text{VF}} \times N_{\text{loop}} \times N_{\text{op}} = 128 \times 128 \times 8 = 131072
@@ -473,7 +410,7 @@ $$
 - 循环展开优化提高了vector指令发射效率，使得更多的指令能够并行执行
 
 **IPC优化建议**：
-- 在VF融合场景下，IPC是衡量vector指令发射效率的重要指标
+- 在VF编程场景下，IPC是衡量vector指令发射效率的重要指标
 - 理想IPC极限接近2.0，大多数情况下达成1.4~1.5则表示取得较优性能
 - 当一个VF函数loop循环内包含的指令依赖链过长时，会导致执行队列中存放的循环次数太少，从而导致每cycle可以双发的指令数变少，导致性能下降。此时可以将过长的loop循环切分成多个，比如可以选择reduce结束，或者长latency指令的结束点（比如div、exp），将一个loop循环拆分成2~3个loop循环。本样例给出的示例loop循环较短，不适用于该优化项。
 
@@ -482,7 +419,7 @@ $$
 | 优化手段 | 核心原理 | 使用建议 |
 |:---|:---|:---|
 | 公式化简 | 减少计算步骤，降低计算开销 | 优先进行公式推导和化简 |
-| RegBase API + VF融合 | 寄存器级计算减少中间Load/Store，利用双发特性提升性能 | 使用asc_vf_call调用VF函数，利用双发特性提高IPC |
+| RegBase API | 寄存器级计算减少中间Load/Store，利用双发特性提升性能 | 使用asc_vf_call调用VF函数，利用双发特性提高IPC |
 | 循环展开 | 提高指令发射并行度 | 使用`#pragma unroll N`，N需根据实际调优 |
 
 ---
@@ -494,11 +431,8 @@ $$
 - 切换Case
 
   在 cmake 编译时通过 `-DSCENARIO_NUM=N` 指定要编译的 case，各 case 说明：
-  - `0`: Gelu未使能VF融合能力（需设置 `-DCMAKE_VF_MODE=false`）
-  - `1`: 启用RegBase API和VF融合能力
-  - `2`: 启用RegBase API、VF融合能力和循环展开优化
-
-  > **注意：** 编译器有VF自动融合的能力，默认会使能VF自动融合，本样例为方便对比分析性能，在case 0时需要关闭VF自动融合能力。
+  - `1`: 启用RegBase API
+  - `2`: 启用RegBase API和循环展开优化
 
 - 配置环境变量
 
@@ -521,10 +455,9 @@ $$
 - 样例执行
 
   ```bash
-  SCENARIO_NUM=0
-  CMAKE_VF_MODE=false
+  SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_VF_MODE=$CMAKE_VF_MODE;make -j;    # 编译工程，默认npu模式
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
@@ -534,7 +467,7 @@ $$
 
   示例如：
   ```bash
-  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_VF_MODE=$CMAKE_VF_MODE;make -j; # NPU仿真模式
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式或Case前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -545,8 +478,7 @@ $$
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `0`、`1`、`2`　　　　　| Case编号：0=Gelu未使能VF融合，1=启用RegBase API和VF融合，2=启用RegBase API、VF融合和循环展开 |
-  | `CMAKE_VF_MODE` | `true`、`false`　　　　　| VF融合模式：case 0时需设置为false关闭VF自动融合 |
+  | `SCENARIO_NUM` | `1`、`2`　　　　　| Case编号：1=启用RegBase API，2=启用RegBase API和循环展开 |
 
 - 执行结果
 
