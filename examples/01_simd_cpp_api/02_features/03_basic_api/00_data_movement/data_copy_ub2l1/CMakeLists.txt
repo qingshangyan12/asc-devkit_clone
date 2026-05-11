@@ -16,6 +16,13 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+set(ASCEND_HOME $ENV{ASCEND_HOME_PATH})
+set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
+
+include_directories(
+    "${ASC_INCLUDE_DIR}"
+)
+
 add_executable(demo
     data_copy_ub2l1.asc
 )
