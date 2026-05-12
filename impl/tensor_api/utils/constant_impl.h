@@ -89,6 +89,8 @@ namespace Location {
     struct L1 {};
     struct L0A {};
     struct L0B {};
+    struct L0ScaleA {};
+    struct L0ScaleB {};
     struct L0C {};
     struct BIAS {};
     struct FIXBUF {};
@@ -113,7 +115,8 @@ struct locationAttr {
     using type = Std::tuple<gmAttr, cbufAttr, caAttr, cbAttr, ccAttr, ubufAttr, fbufAttr, ssbufAttr, biasbufAttr>;
 
     using locationMap = TupleMap<Std::tuple<Location::GM, gmAttr>, Std::tuple<Location::L1, cbufAttr>, Std::tuple<Location::L0A, caAttr>,
-    Std::tuple<Location::L0B, cbAttr>, Std::tuple<Location::L0C, ccAttr>, Std::tuple<Location::UB, ubufAttr>, 
+    Std::tuple<Location::L0B, cbAttr>, Std::tuple<Location::L0ScaleA, caAttr>,
+    Std::tuple<Location::L0ScaleB, cbAttr>, Std::tuple<Location::L0C, ccAttr>, Std::tuple<Location::UB, ubufAttr>, 
     Std::tuple<Location::BIAS, biasbufAttr>, Std::tuple<Location::FIXBUF, fbufAttr>>;
 };
 
