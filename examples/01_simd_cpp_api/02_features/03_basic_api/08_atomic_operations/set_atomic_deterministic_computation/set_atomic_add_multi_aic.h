@@ -19,8 +19,9 @@
 
 class KernelSetAtomicAddMultiAIC {
 public:
+    // 数据长度常量（32字节对齐）
+    static constexpr int32_t DATA_LENGTH = 8;
     __aicore__ inline KernelSetAtomicAddMultiAIC() {}
-
     __aicore__ inline void Init(
         __gm__ uint8_t* src0Gm, __gm__ uint8_t* src1Gm, __gm__ uint8_t* src2Gm, __gm__ uint8_t* src3Gm,
         __gm__ uint8_t* src4Gm, __gm__ uint8_t* dstGm)
@@ -42,18 +43,18 @@ public:
 
         // 使用 LocalMemAllocator 进行内存分配
         AscendC::LocalMemAllocator<AscendC::Hardware::L1> ubAllocator;
-        AscendC::LocalTensor<float> src0Local = ubAllocator.Alloc<float, 8>();
-        AscendC::LocalTensor<float> src1Local = ubAllocator.Alloc<float, 8>();
-        AscendC::LocalTensor<float> src2Local = ubAllocator.Alloc<float, 8>();
-        AscendC::LocalTensor<float> src3Local = ubAllocator.Alloc<float, 8>();
+        AscendC::LocalTensor<float> src0Local = ubAllocator.Alloc<float, DATA_LENGTH>();
+        AscendC::LocalTensor<float> src1Local = ubAllocator.Alloc<float, DATA_LENGTH>();
+        AscendC::LocalTensor<float> src2Local = ubAllocator.Alloc<float, DATA_LENGTH>();
+        AscendC::LocalTensor<float> src3Local = ubAllocator.Alloc<float, DATA_LENGTH>();
 
         if (blockIdx == 0) {
-            AscendC::DataCopy(src0Local, src0Global, 8);
+            AscendC::DataCopy(src0Local, src0Global, DATA_LENGTH);
             AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(0);
 
             // 在原子累加之前，以 src0Local 初始化 GM
-            AscendC::DataCopy(dstGlobal, src0Local, 8);
+            AscendC::DataCopy(dstGlobal, src0Local, DATA_LENGTH);
 
             // 核 0 通知核 2，核 0 的 src0Local 初始化已完成
             // 在通知下一个核之前，等待当前核的任务完成
@@ -75,13 +76,13 @@ public:
             AscendC::SetFlag<AscendC::HardEvent::S_MTE2>(0);
             AscendC::WaitFlag<AscendC::HardEvent::S_MTE2>(0);
 
-            AscendC::DataCopy(src1Local, src1Global, 8);
+            AscendC::DataCopy(src1Local, src1Global, DATA_LENGTH);
             AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(0);
 
             AscendC::DisableDmaAtomic();
             AscendC::SetAtomicAdd<float>();
-            AscendC::DataCopy(dstGlobal, src1Local, 8);
+            AscendC::DataCopy(dstGlobal, src1Local, DATA_LENGTH);
             AscendC::DisableDmaAtomic();
         } else if (blockIdx == 2) {
             int32_t preblockIdx = 0;
@@ -98,13 +99,13 @@ public:
             AscendC::SetFlag<AscendC::HardEvent::S_MTE2>(0);
             AscendC::WaitFlag<AscendC::HardEvent::S_MTE2>(0);
 
-            AscendC::DataCopy(src2Local, src2Global, 8);
+            AscendC::DataCopy(src2Local, src2Global, DATA_LENGTH);
             AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(0);
 
             AscendC::DisableDmaAtomic();
             AscendC::SetAtomicAdd<float>();
-            AscendC::DataCopy(dstGlobal, src2Local, 8);
+            AscendC::DataCopy(dstGlobal, src2Local, DATA_LENGTH);
             AscendC::DisableDmaAtomic();
 
             // 在通知下一个核之前，等待当前核的任务完成
@@ -127,13 +128,13 @@ public:
             AscendC::SetFlag<AscendC::HardEvent::S_MTE2>(0);
             AscendC::WaitFlag<AscendC::HardEvent::S_MTE2>(0);
 
-            AscendC::DataCopy(src3Local, src3Global, 8);
+            AscendC::DataCopy(src3Local, src3Global, DATA_LENGTH);
             AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(0);
 
             AscendC::DisableDmaAtomic();
             AscendC::SetAtomicAdd<float>();
-            AscendC::DataCopy(dstGlobal, src3Local, 8);
+            AscendC::DataCopy(dstGlobal, src3Local, DATA_LENGTH);
             AscendC::DisableDmaAtomic();
 
             // 在通知下一个核之前，等待当前核的任务完成
@@ -146,5 +147,5 @@ public:
 private:
     AscendC::GlobalTensor<float> src0Global, src1Global, src2Global, src3Global, dstGlobal;
     AscendC::GlobalTensor<int32_t> src4Global;
-    int32_t blockIdx = -1;
+    int32_t blockIdx = 0;
 };

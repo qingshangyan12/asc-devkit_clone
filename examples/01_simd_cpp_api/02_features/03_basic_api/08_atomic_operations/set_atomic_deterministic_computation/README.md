@@ -306,18 +306,12 @@ $$
 
 ### 2.3 注意事项
 
-#### (1) Ascend 950PR/Ascend 950DT 兼容性限制
-
-当且仅当 `SCENARIO_NUM=3` 时，样例不支持 Ascend 950PR/Ascend 950DT。
+#### (1) Ascend 950PR/Ascend 950DT 兼容性限制：当且仅当 `SCENARIO_NUM=3` 时，样例不支持 Ascend 950PR/Ascend 950DT。
 
 `SCENARIO_NUM=3` 时，多个 AIC 做原子操作确定性计算。当前 AIC 中向 GM 搬出数据时，调用 `DataCopy` 使用了 L1-->GM 数据通路，该数据通路在 Ascend 950PR/Ascend 950DT 上不支持。
 
-#### (2) 静态 Tensor 编程方式限制
-
-当且仅当 `SCENARIO_NUM=2` 时，样例不支持静态 tensor 编程方式。
-
-`SCENARIO_NUM=2` 时，多个 AIV 做原子操作确定性计算。`IBSet` 和 `IBWait` 以及 `InitDetermineComputeWorkspace`、`NotifyNextBlock` 和 `WaitPreBlock`，不支持静态 tensor 编程方式。
-</table>
+#### (2) 静态 Tensor 编程方式限制：当且仅当 `SCENARIO_NUM=2` 时，样例不支持静态 tensor 编程方式。
+SCENARIO_NUM=2 时，多个 AIV 做原子操作确定性计算。`IBSet` 和 `IBWait` 以及 `InitDetermineComputeWorkspace`、`NotifyNextBlock` 和 `WaitPreBlock`，不支持静态 tensor 编程方式。
 
 ## 编译运行  
 在本样例根目录下执行如下步骤，编译并执行样例。
