@@ -4,6 +4,8 @@
 
 本样例在归约场景下，基于ReduceDataBlock实现类接口的多场景归约功能，对输入Tensor的每个datablock（32字节）内所有元素进行归约运算（求最大值、最小值或求和）。
 
+注：`ReduceDataBlock`为 CANN 9.1.0 重命名后的 API。CANN 9.0.0 及之前版本请使用`BlockReduceMax`，`BlockReduceMin`，`BlockReduceSum`。
+
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
