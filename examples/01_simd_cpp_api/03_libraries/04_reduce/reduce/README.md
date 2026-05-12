@@ -2,7 +2,9 @@
 
 ## 概述
 
-本样例介绍了调用ReduceRepeat<SUM>和ReduceDataBlock<SUM>高阶API实现reduce算子，实现了连续内存上数据元素的累加，返回累加结果的功能。
+本样例介绍了调用`ReduceRepeat<SUM>`和`ReduceDataBlock<SUM>`高阶API实现reduce算子，实现了连续内存上数据元素的累加，返回累加结果的功能。
+
+注：`ReduceRepeat`和`ReduceDataBlock`为 CANN 9.1.0 重命名后的 API。CANN 9.0.0 及之前版本请使用`WholeReduceSum`，`BlockReduceSum`。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -14,7 +16,7 @@
 
 ## 目录结构介绍
 
-```
+``` text
 ├── reduce
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
@@ -29,7 +31,7 @@
 - 算子功能：  
   ReduceCustom算子实现了连续内存上数据元素的累加，返回累加结果的功能。对应的数学表达式为：
 
-  ```
+  ```cpp
   z = sum(x)
   ```
 
@@ -77,6 +79,7 @@
 
 - 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -86,6 +89,7 @@
 - 样例执行
 
   在本样例目录下执行如下命令。
+
   ```bash
   mkdir -p build && cd build;
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # 默认npu模式
@@ -96,6 +100,7 @@
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
+
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
@@ -104,12 +109,14 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
+- 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
   执行结果如下，说明精度对比成功。
+  
   ```bash
   test pass!
   ```

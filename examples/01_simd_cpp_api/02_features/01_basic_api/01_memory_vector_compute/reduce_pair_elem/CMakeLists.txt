@@ -17,20 +17,8 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-# 场景参数（通过命令行传入）
-# SCENARIO_NUM: 场景编号
-#   1 - WholeReduceMax：每个repeat内求最大值，输入[1, 1024]，输出[1, 8]
-#   2 - WholeReduceMin：每个repeat内求最小值及索引，输入[1, 1024]，输出[1, 16]
-#   3 - WholeReduceSum：每个repeat内求和，输入float类型[1, 2048]，输出[1, 32]
-#   4 - RepeatReduceSum：累加模式求和，输入float类型[1, 2048]，输出[1, 32]
-#   5 - WholeReduceMin + GetReduceRepeatMaxMinSpr：求全局最小值及索引，输入[1, 1024]，输出[1, 16]
-#   6 - WholeReduceSum非对齐场景：对每行非对齐数据求和，输入float类型[13, 57]，输出[1, 13]
-set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-6)")
-
-add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
-
 add_executable(demo
-    whole_reduce_min_max_sum.asc
+    reduce_pair_elem.asc
 )
 
 target_compile_options(demo PRIVATE
