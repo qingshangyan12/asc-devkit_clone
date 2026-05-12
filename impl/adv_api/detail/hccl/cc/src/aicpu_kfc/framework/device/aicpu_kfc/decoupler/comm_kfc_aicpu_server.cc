@@ -437,11 +437,14 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
                   groupIdx_, msgPos, i, ret, runParam.size());
         CHK_RET(ret);
 
+        u64 Time1 = GetCurCpuTimestamp(false);
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        u64 Time2 = GetCurCpuTimestamp(false);
+        HCCL_RUN_INFO("[Orchestrate][Wait][%u] startTime: %llu, endTime: %llu, useTime: %llu", i, Time1, Time2, Time2 - Time1);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
@@ -451,6 +454,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenAicpuKernelServer(runParam);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        u64 Time3 = GetCurCpuTimestamp(false);
+        HCCL_RUN_INFO("[Orchestrate][launch][%u] startTime: %llu, endTime: %llu, useTime: %llu", i, Time2, Time3, Time3 - Time2);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
@@ -460,6 +465,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
         UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        u64 Time4 = GetCurCpuTimestamp(false);
+        HCCL_RUN_INFO("[Orchestrate][post][%u] startTime: %llu, endTime: %llu, useTime: %llu", i, Time3, Time4, Time4 - Time3);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterPost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);

@@ -40,7 +40,7 @@ HcclResult InsTempAlltoAllVMesh1D::CalcRes(HcclComm comm, const OpParam& param, 
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, level0Channels));
     resourceRequest.channels.push_back(level0Channels);
     u32 channelsPerRank = CalcChannelsPerRank(level0Channels);
-    resourceRequest.slaveThreadNum = ALLTOALLV_DIRECT_FULLMESH_CONCURRENT_SIZE * channelsPerRank;
+    resourceRequest.slaveThreadNum = std::min(ALLTOALLV_DIRECT_FULLMESH_CONCURRENT_SIZE, templateRankSize_ - 1) * channelsPerRank;
     for (u32 index = 0; index < resourceRequest.slaveThreadNum; index++) {
         resourceRequest.notifyNumPerThread.push_back(1);
     }
@@ -108,6 +108,15 @@ void InsTempAlltoAllVMesh1D::CalcCclBuffIdx(u32 remoteRank, u32 &myRankCclBuffId
         myRank_, remoteRank, myRankCclBuffIdx, remoteCclBuffIdx);
 }
 
+// #define NSEC_PER_SEC 1000000000U
+
+// inline u64 GetCurCpuTimestamp()
+// {
+//     struct timespec timestamp;
+//     (void)clock_gettime(CLOCK_MONOTONIC_RAW, &timestamp);
+//     return static_cast<u64>((timestamp.tv_sec * NSEC_PER_SEC) + (timestamp.tv_nsec));
+// }
+
 HcclResult InsTempAlltoAllVMesh1D::KernelRun(const OpParam& param,
     const TemplateDataParams& tempAlgParams,
     const TemplateResource& templateResource)
@@ -129,7 +138,11 @@ HcclResult InsTempAlltoAllVMesh1D::KernelRun(const OpParam& param,
         HCCL_ERROR("[InsTempAlltoAllVMesh1D][KernelRun] subCommRanks_ or myRank_ is error.");
         return HCCL_E_INTERNAL;
     }
+
+    // u64 StartTime = GetCurCpuTimestamp();
     CHK_RET(RunALLtoALL(templateResource.channels, templateResource.threads, tempAlgParams, myAlgRank));
+    // u64 EndTime = GetCurCpuTimestamp();
+    // HCCL_RUN_INFO("[KernelRun] startTime: %llu, endTime: %llu, useTime: %llu", StartTime, EndTime, EndTime - StartTime);
 
     HCCL_INFO("[InsTempAlltoAllVMesh1D][KernelRun] Run End");
     return HcclResult::HCCL_SUCCESS;
@@ -167,8 +180,10 @@ HcclResult InsTempAlltoAllVMesh1D::RunALLtoALL(
     std::vector<ThreadHandle> subThreads;
     if (threadNum_ > 1) {
         subThreads.assign(threads.begin() + 1, threads.end());
+        // HCCL_RUN_INFO("[RunALLtoALL] subThreads.size(): %llu", subThreads.size());
     }
     for (u32 roundIdx = 0; roundIdx < commLoops && remainRankSize > 0; roundIdx++) {
+        // u64 Time1 = GetCurCpuTimestamp();
         CalcCommRankSetForOneLoop(roundIdx, remainRankSize, commRanks); // 计算本轮通信rank
         // 如果是read模式，统一做前拷贝
         if (isDmaRead_) {
@@ -182,14 +197,22 @@ HcclResult InsTempAlltoAllVMesh1D::RunALLtoALL(
                 CHK_RET(PostSyncInterThreads(threads[0], subThreads, notifyIdxSubToMain_));
             }
         }
+        // u64 Time2 = GetCurCpuTimestamp();
+        // HCCL_RUN_INFO("[RunALLtoALL][%u][1] startTime: %llu, endTime: %llu, useTime: %llu", roundIdx, Time1, Time2, Time2 - Time1);
         if (threadNum_ > 1) {
             GetNotifyIdxMainToSub(notifyIdxMainToSub_);
             CHK_RET(PreSyncInterThreads(threads[0], subThreads, notifyIdxMainToSub_));
         }
+        // u64 TmpTime = GetCurCpuTimestamp();
+        // HCCL_RUN_INFO("[RunALLtoALL][%u][2] startTime: %llu, endTime: %llu, useTime: %llu", roundIdx, Time2, TmpTime, TmpTime - Time2);
         if (roundIdx == 0) {
             CHK_RET(LocalCopyForMyRank(tempAlgParams, threads[0], myAlgRank, 0)); // 在第1轮通信中用0号流做本卡数据拷贝
         }
+        // u64 Time3 = GetCurCpuTimestamp();
+        // HCCL_RUN_INFO("[RunALLtoALL][%u][3] startTime: %llu, endTime: %llu, useTime: %llu", roundIdx, TmpTime, Time3, Time3 - TmpTime);
         CHK_RET(RunSendRecvByLoop(commRanks, tempAlgParams, channels, threads));
+        // u64 TmpTime1 = GetCurCpuTimestamp();
+        // HCCL_RUN_INFO("[RunALLtoALL][%u][4] startTime: %llu, endTime: %llu, useTime: %llu", roundIdx, Time3, TmpTime1, TmpTime1 - Time3);
         if (threadNum_ > 1) {
             GetNotifyIdxSubToMain(notifyIdxSubToMain_);
             CHK_RET(PostSyncInterThreads(threads[0], subThreads, notifyIdxSubToMain_));
@@ -197,6 +220,8 @@ HcclResult InsTempAlltoAllVMesh1D::RunALLtoALL(
         remainRankSize -= commRanks.size();
         HCCL_DEBUG("[InsTempAlltoAllVMesh1D][RunALLtoALL] round[%u] finish, commRank size is [%zu], "
             "remainRankSize is [%u].", roundIdx, commRanks.size(), remainRankSize);
+        // u64 Time4 = GetCurCpuTimestamp();
+        // HCCL_RUN_INFO("[RunALLtoALL][%u][5] startTime: %llu, endTime: %llu, useTime: %llu", roundIdx, Time3, Time4, Time4 - Time3);
     }
     return HcclResult::HCCL_SUCCESS;
 }
