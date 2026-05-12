@@ -176,6 +176,9 @@ struct IsLayout<Layout<T, U, S>> : Std::true_type {};
 template <typename T>
 constexpr bool IsLayoutV = IsLayout<Std::remove_cvref_t<T>>::value;
 
+template <typename LayoutType>
+using EnableIfLayout = Std::enable_if_t<IsLayoutV<LayoutType>>;
+
 } // namespace Te
 } // namespace AscendC
 

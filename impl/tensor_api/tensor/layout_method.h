@@ -23,7 +23,6 @@
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_METHOD_H
 
 #include "impl/tensor_api/tensor/layout_definition.h"
-#include "impl/tensor_api/tensor/enable_if.h"
 
 namespace AscendC {
 namespace Te {
@@ -146,9 +145,6 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape) {
         return MakeLayout(shape, ComputeFlatStride(shape));
     }
 }
-
-template <typename LayoutType>
-using EnableIfLayout = Std::enable_if_t<IsLayoutV<LayoutType>>;
 
 template <size_t... Is, typename LayoutType,
     typename = EnableIfLayout<LayoutType>>

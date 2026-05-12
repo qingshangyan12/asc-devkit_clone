@@ -76,9 +76,6 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S
     }
 }
 
-template <typename LayoutType>
-using EnableIfLayout = Std::enable_if_t<IsLayoutV<LayoutType>>;
-
 template <typename T, typename LayoutType,
     typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout)
