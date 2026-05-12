@@ -47,15 +47,14 @@ $$
 
 对矩阵转置这类二维规则计算，采用tile方式组织数据可以将大矩阵分解为若干局部子块，使每个block只处理一个局部区域，便于索引计算和线程协作。本样例中的2个kernel都基于同一套tile切分方式组织计算，便于比较不同kernel在相同切分方式下的访存行为差异。
 
-本样例采用SIMD与SIMT混合编程方式：外层 `__global__ __vector__` kernel内部通过 `asc_vf_call` 调用 `__simt_vf__` 函数。混合编程场景下只支持一维线程块布局，因此二维矩阵tile不能直接映射到二维 `blockIdx.x/blockIdx.y`，tile内线程也不能使用二维 `threadIdx.x/threadIdx.y` 布局。本样例将二维tile坐标展平到一维 `blockIdx.x`，再将tile内32×32个元素展平到一维 `threadIdx.x`，在SIMT VF函数内部分别还原出二维tile坐标和tile内局部坐标。
+本样例采用SIMD与SIMT混合编程方式：核函数内部通过 `asc_vf_call` 调用 `__simt_vf__` 函数。混合编程场景下只支持一维线程块布局，因此二维矩阵tile不能直接映射到二维 `blockIdx.x/blockIdx.y`，tile内线程也不能使用二维 `threadIdx.x/threadIdx.y` 布局。本样例将二维tile坐标展平到一维 `blockIdx.x`，再将tile内32×32个元素展平到一维 `threadIdx.x`，在SIMT VF函数内部分别还原出二维tile坐标和tile内局部坐标。
 
 本样例中子块tile大小取32×32，主要是因为SIMT执行模型中一个warp包含32个线程。同一warp的线程可处理tile中同一行的32个连续元素。这样在访问GM时，一个warp能够按行读取连续数据，有利于形成连续的全局访存模式。
 
 **整体切分方式**：
 
 - 将整个输入矩阵进行tile划分，每个tile大小固定是32×32，一个block对应处理输入矩阵中的一个大小为32×32的tile
-- 由于混合编程下外层kernel只支持一维线程块布局，因此外层kernel采用一维block切分，block数量为 `bn = grid_x * grid_y`
-- `grid_x = matrix_width / TILE_DIM`，`grid_y = matrix_height / TILE_DIM`
+- 由于混合编程下核函数只支持一维线程块布局，因此采用一维block切分，block数量为 `bn = grid_x * grid_y`，其中 `grid_x = matrix_width / TILE_DIM`，`grid_y = matrix_height / TILE_DIM`
 - 每个一维 `blockIdx.x` 对应一个tile，并在SIMT VF函数内还原为二维tile坐标：
 
 ```cpp
@@ -169,13 +168,12 @@ output[index_out] = input[index_in];
 
 | Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      60.477      |    3.516    |     5801.925     |      3.357      |     0.955     |        0.147        |      0.041      |
+|      70.304      |    4.257    |     7024.463     |      4.115      |     0.967     |        0.131        |      0.030      |
 
 **性能分析**：
 
-- 从aiv_total_cycles看，naive transpose为5801.925 cycles。矩阵转置本身计算量很小，这里的主要开销来自访存模式变化
-- aiv_vec_ratio达到0.955，vec类指令占比很高；同时aiv_scalar_time占比较低，说明瓶颈主要集中在向量访存相关路径
-- 该版本GM读取仍然是连续读，但GM写回是跨行、非连续写，同一个warp的写请求难以高效合并，因此整体性能受限于写回访存模式
+- Case 0的Task Duration为70.304us，作为直接索引转置版本，是后续优化版本的对比基线
+- 该版本GM读取仍然是连续读，但GM写回是跨行、非连续写，同一个warp的写请求难以高效合并，因此整体耗时主要受限于写回访存模式
 
 **性能优化建议**：
 
@@ -218,23 +216,23 @@ output[index_out] = tile[tile_x][tile_y];
 4. 每个线程从UB中取数，一个warp会读取UB中tile的一列元素
 5. 把取出的值写回GM中的转置位置，一个warp会将读取UB的一列元素写入到GM输出中tile的一行。
 
-下图展示了Case 0的数据流，其中标红和标黄的元素展示了一个warp的线程在读取GM和写入GM时处理的元素。读取GM输入时，整个tile会按照GM的排布搬到UB，在写入GM输出时一个warp的线程会读取UB上的一列元素写回到其对应的转置后的位置。
+下图展示了Case 1的数据流，其中标红和标黄的元素展示了一个warp的线程在读取GM和写入GM时处理的元素。读取GM输入时，整个tile会按照GM的排布搬到UB，在写入GM输出时一个warp的线程会读取UB上的一列元素写回到其对应的转置后的位置。
 
 <img src="./figure/case1.png" width="60%">
 
-与Case 0不同的是，Case 0中线程是“直接把输入元素写到转置后的GM位置”，所以相邻线程会被打散到输出矩阵的不同行上，而Case 1中，线程先把数据放到UB里，把原来不连续的全局写访问转移到UB内的不连续读。因此，这一版的核心收益是：虽然增加了一次UB读写和一次同步，但换来了GM侧“读连续、写也连续”的访问模式，整体吞吐通常会明显好于Case 1。
+与Case 0不同的是，Case 0中线程是“直接把输入元素写到转置后的GM位置”，所以相邻线程会被打散到输出矩阵的不同行上，而Case 1中，线程先把数据放到UB里，把原来不连续的全局写访问转移到UB内的不连续读。因此，这一版的核心收益是：虽然增加了一次UB读写和一次同步，但换来了GM侧“读连续、写也连续”的访问模式，整体耗时通常会明显低于Case 0。
+
 **性能数据**：
 
 | Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      35.945      |    1.814    |     2993.315     |      1.646      |     0.910     |        0.156        |      0.083      |
+|      44.440      |    2.441    |     4027.577     |      2.295      |     0.941     |        0.134        |      0.054      |
 
 **优化效果分析**：
 
-- 相比Case 0的naive transpose，Task Duration从60.477us降低到35.945us，耗时下降约40.6%，整体性能提升约1.68倍
-- aiv_time从3.516us降低到1.814us，aiv_total_cycles从5801.925降低到2993.315，AI Vector Core侧执行开销下降约48.4%，说明GM访存合并带来了明显收益
-- aiv_vec_time从3.357us降低到1.646us，下降约51.0%，对应的是非连续GM写被转移到UB读之后，GM写回可以按连续行访问
-- Case 1仍然多出一次UB写、一次同步和一次转置方向的UB读，这部分额外开销主要来自UB中转和UB列方向访问
+- 相比Case 0的直接索引转置版本，Case 1的Task Duration从70.304us降低到44.440us，耗时下降约36.8%
+- 按Task Duration计算，Case 1整体约为Case 0的1.58倍性能，说明通过UB中转改善GM写回连续性后，端到端耗时有明显下降
+- Case 1仍然需要额外的UB读写和同步，因此优化后的Task Duration没有降到纯连续访存的理想水平；这部分耗时是UB中转换取GM访存合并带来的必要开销
 
 **性能优化建议**：
 
