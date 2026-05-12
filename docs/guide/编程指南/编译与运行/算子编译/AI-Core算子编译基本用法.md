@@ -1,8 +1,8 @@
 # AI Core编译基本用法<a name="section229217121411"></a>
-当开发者完成一个Kernel核函数的编写后，并在Host侧通过<<<\>\>\>方式完成核函数的启动调用后，就需要进行算子源码编译与算子运行，接下来我们介绍通过bisheng编译器完成算子编译的基本用法。
+当开发者完成一个Kernel核函数的编写，并在Host侧通过<<<\>\>\>方式完成核函数的启动调用后，就需要进行算子源码编译与算子运行，接下来我们介绍通过bisheng编译器完成算子编译的基本用法。
 
 ## AI Core SIMD编译
-使用bisheng编译Ascend C源文件的基本命令如下，其中--npu-arch=dav-用于指定AI处理器架构版本：
+使用bisheng编译Ascend C源文件的基本命令如下，其中--npu-arch=dav-\<npu architecture\>用于指定AI处理器架构版本：
 ```shell
   bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture>
 ```
@@ -11,10 +11,12 @@ bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接�
 ```shell
   bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <output_file> --npu-arch=dav-<npu architecture>
 ```
+
+AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMD代码分为Cube代码和Vector代码，需分别编译成Cube二进制和Vector二进制，先将Cube二进制和Vector二进制链接成Fatbin文件，再与Host二进制合并在一起。
 ![ ](../../../figures/aicore_compilation.png "aicore 编译流程示意图")
 
 - 异构编译
-```shell
+  ```shell
   // ----- example.asc -----
   //  指定核函数在AI Core上执行
   __global__ __aicore__ kernel()
@@ -24,7 +26,7 @@ bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接�
   bisheng  example.o  main.o -o main
   // 或
   bisheng main.cpp example.asc  -o main --npu-arch=dav-xxxx
-```
+  ```
 
 - 单独编译
 
@@ -70,12 +72,13 @@ bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接�
 
 ## AI Core SIMT编译
 
-使用bisheng编译Ascend C SIMT源文件的在AI Core编译的基本命令上增加`--enable-simt`, 示例如下：
+使用bisheng编译器编译Ascend C SIMT源文件时，需要在AI Core SIMD编译的基本命令上增加`--enable-simt`, 示例如下：
 
 ```shell
   bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
 ```
-SIMT编译：
+
+AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码编译成SIMT二进制，先将SIMT二进链接成Fatbin文件，再与Host二进制合并在一起。
 ![ ](../../../figures/aicore_simt_comilation.png "aicore simt编译流程示意图")
 
 ## 基本编译命令汇总
@@ -217,7 +220,7 @@ SIMT编译：
 
 更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
 
-# CMake方式编译<a name="ZH-CN_TOPIC_0000002428982142"></a>
+## CMake方式编译<a name="ZH-CN_TOPIC_0000002428982142"></a>
 
 项目中可以使用CMake来更简便地使用毕昇编译器编译Ascend C算子，生成可执行文件、动态库、静态库或二进制文件。
 
@@ -282,19 +285,37 @@ target_compile_options(demo PRIVATE
 |CMAKE_BUILD_TYPE  | 编译模式选项，可配置为：“Release”，Release版本，不包含调试信息，编译最终发布的版本。“Debug”，Debug版本，包含调试信息，便于开发者开发和调试。 |
 |CMAKE_INSTALL_PREFIX | 用于指定CMake执行install时，安装的路径前缀，执行install后编译产物（ascendc_library中指定的target以及对应的头文件）会安装在该路径下。默认路径为当前目录的out目录下。
 
-# 其他编译相关说明
+## 其他编译相关说明
 
-## 内置编译宏开关<a name="section57020345148"></a>
+### 内置编译宏开关<a name="section57020345148"></a>
+
 内置编译宏开关列表如下：
-|  宏定义名称 | 宏定义描述 |设置方式| 约束说明 |
-|--|--|--|--|
-| ASCENDC_DUMP | ASCENDC_DUMP用于控制Dump开关，默认开关打开，开发者调用printf/DumpTensor/assert后会有信息打印（需要注意直调工程的kernel文件内存在host函数，如果在host函数内调用了printf接口，也会触发kernel内的printf相关初始化动作，进而影响kernel的执行性能)；设置为0后，表示开关关闭。 | `-DASCENDC_DUMP=0` | -
-|  ASCENDC_DEBUG | ASCENDC_DEBUG用于控制Ascend C API的调测开关，默认开关关闭；增加该编译宏后，表示开关打开，此时接口内部的assert校验生效，校验不通过会有assert日志打屏。开启该功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。 | `-DASCENDC_DUMP=0` | Atlas 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品|
-|  ENABLE_CV_COMM_VIA_SSBUF | NABLE_CV_COMM_VIA_SSBUF用于控制是否使用SSBuffer以及UB到L1 Buffer的硬通道，在涉及CV通信（AIC和AIV）或使用数据搬运API时需关注此选项。开启该选项可以提高相关API的性能或拓展使用更多功能。默认开关关闭；设置为true后，表示开关打开。 | `-DENABLE_CV_COMM_VIA_SSBUF=true` | 仅在Ascend 950PR/Ascend 950DT支持该选项。从其它硬件平台移植到此平台的算子，开关默认关闭以保持兼容性。在该平台新开发的算子，以下场景需要打开：使用矩阵计算Matmul高阶API，且使用SetTensorScaleA等接口，这些接口属于Ascend 950PR/Ascend 950DT新增的功能，其内部实现使用了SSBuffer；使用DataCopy接口从UB拷贝数据到L1 Buffer。|
-|  NO_OVERLAP_IN_MULTI_REPEAT | 该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR/Ascend 950DT，使用基础API的高维切分计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项。 | `-DNO_OVERLAP_IN_MULTI_REPEAT` |-|
+ -   **ASCENDC\_DUMP** 用于控制Dump开关，默认开关打开，开发者调用printf/DumpTensor/assert后会有信息打印（需要注意直调工程的kernel文件内存在host函数，如果在host函数内调用了printf接口，也会触发kernel内的printf相关初始化动作，进而影响kernel的执行性能\)；设置为0后，表示开关关闭。示例如下：
+     ```shell
+     // 关闭所有算子的printf打印功能
+     bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DASCENDC_DUMP=0
+     ```
+ -   **ASCENDC\_DEBUG** 用于控制Ascend C API的调测开关，默认开关关闭；增加该编译宏后，表示开关打开，此时接口内部的assert校验生效，校验不通过会有assert日志打屏。开启该功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。示例如下：
+     ```shell
+     bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DASCENDC_DEBUG
+     ```
+     当前ASCENDC\_DEBUG功能支持的产品型号为：
+     Atlas 推理系列产品
+     Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+ -   **ENABLE\_CV\_COMM\_VIA\_SSBUF** 用于控制是否使用SSBuffer以及UB到L1 Buffer的硬通道，在涉及CV通信（AIC和AIV）或使用数据搬运API时需关注此选项。开启该选项可以提高相关API的性能或拓展使用更多功能。默认开关关闭；设置为true后，表示开关打开。示例如下：
+     ```shell
+     bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DENABLE_CV_COMM_VIA_SSBUF=true
+     ```
+     仅在Ascend 950PR/Ascend 950DT支持该选项。
+     -   从其它硬件平台移植到此平台的算子，开关默认关闭以保持兼容性。
+     -   在该平台新开发的算子，以下场景需要打开：使用矩阵计算Matmul高阶API，且使用SetTensorScaleA等接口，这些接口属于Ascend 950PR/Ascend 950DT新增的功能，其内部实现使用了SSBuffer；使用DataCopy接口从UB拷贝数据到L1 Buffer。
+
+ -   **NO\_OVERLAP\_IN\_MULTI\_REPEAT**
+  该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR/Ascend 950DT，使用基础API的高维切分计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项。
 
 
-## 内置链接库<a name="section57020345148"></a>
+### 内置链接库<a name="section57020345148"></a>
 
 毕昇编译器默认链接的库文件，列表如下：
 <a name="table201231542115513"></a>
@@ -352,7 +373,7 @@ target_compile_options(demo PRIVATE
 </tbody>
 </table>
 
-## 高阶API常用链接库 <a name="section57020345148"></a>
+### 高阶API常用链接库 <a name="section57020345148"></a>
 
 | 使用场景 |名称  | 动态库路径 |
 |--|--|--|
