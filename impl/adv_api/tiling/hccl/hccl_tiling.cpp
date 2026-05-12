@@ -61,11 +61,11 @@ void PrintMc2CcTiling(const Mc2CcTilingInner& tiling)
 
 uint32_t SetDevType(Mc2InitTilingInner* tilingInner)
 {
-    auto getSocVerFunc =
+    auto getSocVerFunc =	 
         HcclSymbolLoader::GetInstance().Load<void (*)(char*, uint32_t)>("libruntime.so", "rtGetSocVersion");
     ASCENDC_HOST_ASSERT(getSocVerFunc != nullptr, return EXIT_FAILURE, "Failed to get soc version.");
     char socVersion[50];
-    getSocVerFunc(socVersion, sizeof(socVersion));
+    getSocVerFunc(socVersion, sizeof(socVersion)); 
     std::string devType = std::string(socVersion);
     if (devType.find("Ascend910B") != std::string::npos) {
         tilingInner->devType = static_cast<uint8_t>(platform_ascendc::SocVersion::ASCEND910B);
