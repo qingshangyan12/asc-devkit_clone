@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+project = 'Ascend C API 参考'
+
 extensions = [
     'myst_parser',
     'sphinx_external_toc',
