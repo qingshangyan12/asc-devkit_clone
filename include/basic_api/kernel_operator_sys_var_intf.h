@@ -92,6 +92,7 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 #endif
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr(){
 #if ASCENDC_CPU_DEBUG
     return reinterpret_cast<__ssbuf__ void*>(ConstDefiner::Instance().cpuSSbuf);
@@ -99,6 +100,7 @@ __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr(){
     return (__ssbuf__ void*)0;
 #endif
 }
+#endif
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)
