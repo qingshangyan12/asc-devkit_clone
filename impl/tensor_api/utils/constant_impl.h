@@ -23,7 +23,6 @@
 #define IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
 
 #include "impl/tensor_api/utils/extra_impl.h"
-#include "impl/tensor_api/utils/map_impl.h"
 
 namespace AscendC {
 namespace Te {
