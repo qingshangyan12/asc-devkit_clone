@@ -4,7 +4,7 @@
 
 ## 入门示例<a name="section17595637204517"></a>
 
-以下是一个使用毕昇编译器编译静态Shape的add\_custom算子入门示例。该示例展示了如何编写源文件add\_custom.asc以及具体的编译命令。通过这个示例，您可以了解如何使用毕昇编译器进行算子编译。完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_vector/basic_api_tque_add)。
+以下是一个使用毕昇编译器编译静态Shape的add\_custom算子入门示例。该示例展示了如何编写源文件add\_custom.asc以及具体的编译命令。通过这个示例，您可以了解如何使用毕昇编译器进行算子编译。完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/01_vector/add_tpipe_tque)。
 
 1.  包含头文件。
 
@@ -64,31 +64,20 @@
     }
     
     // 通过<<<...>>>内核调用符调用算子
-    std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y)
-    {
-    ...
-    }
-    
-    
-    // 计算结果比对
-    uint32_t VerifyResult(std::vector<float> &output, std::vector<float> &golden)
-    {
-    ...
-    }
+    add_custom<<<numBlocks, nullptr, stream>>>(xDevice, yDevice, zDevice, tiling);
     
     // 算子验证主程序
-    int32_t main(int32_t argc, char *argv[])
+    int32_t main(int32_t argc, char* argv[])
     {
+        uint32_t numBlocks = 8;
         constexpr uint32_t totalLength = 8 * 2048;
-        constexpr float valueX = 1.2f;
-        constexpr float valueY = 2.3f;
-        std::vector<float> x(totalLength, valueX);
-        std::vector<float> y(totalLength, valueY);
-    
-        std::vector<float> output = kernel_add(x, y);
-    
-        std::vector<float> golden(totalLength, valueX + valueY);
-        return VerifyResult(output, golden);
+        size_t inputByteSize = totalLength * sizeof(float);
+        size_t outputByteSize = totalLength * sizeof(float);
+        AddCustomTilingData tiling = {totalLength, 8};
+
+        add_custom<<<numBlocks, nullptr, stream>>>(xDevice, yDevice, zDevice, tiling);
+
+        return 0;
     }
     ```
 
@@ -98,7 +87,7 @@
     -   --npu-arch=dav-2201：指定NPU的架构版本为dav-2201。dav-后为NPU架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
 
     ```
-    bisheng add_custom.asc -o demo --npu-arch=dav-2201
+    bisheng add.asc -o demo --npu-arch=dav-2201
     ```
 
 5.  执行可执行文件。
@@ -114,7 +103,7 @@
 -   编译生成可执行文件
 
     ```
-    # 1.编译hello_world.cpp为当前平台可执行文件 
+    # 1.编译add_custom.cpp为当前平台可执行文件 
     # bisheng [算子源文件] -o [输出产物名称] --npu-arch=[NPU架构版本号]，常见参数顺序与g++保持一致。
     bisheng -x asc add_custom.cpp -o add_custom --npu-arch=dav-xxxx
     ```
@@ -144,4 +133,3 @@
     ```
 
 在命令行编译场景下，可以按需链接需要的库文件，常见的库文件请参考[常用的链接库](通过CMake编译.md#table1632724817328)。编译时会默认链接[表2](通过CMake编译.md#table201231542115513)中列出的库文件。注意如下例外场景：在使用g++链接asc代码编译生成的静态库时，需要手动链接默认链接库。
-
