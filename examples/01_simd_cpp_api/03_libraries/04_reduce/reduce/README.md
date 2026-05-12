@@ -4,6 +4,8 @@
 
 本样例介绍了调用ReduceRepeat<SUM>和ReduceDataBlock<SUM>高阶API实现reduce算子，实现了连续内存上数据元素的累加，返回累加结果的功能。
 
+注：`ReduceRepeat`和`ReduceDataBlock`为 CANN 9.1.0 重命名后的 API。CANN 9.0.0 及之前版本请使用`WholeReduceSum`，`BlockReduceSum`。
+
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
