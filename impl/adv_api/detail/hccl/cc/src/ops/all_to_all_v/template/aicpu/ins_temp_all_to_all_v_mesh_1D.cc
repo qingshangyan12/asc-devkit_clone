@@ -108,6 +108,15 @@ void InsTempAlltoAllVMesh1D::CalcCclBuffIdx(u32 remoteRank, u32 &myRankCclBuffId
         myRank_, remoteRank, myRankCclBuffIdx, remoteCclBuffIdx);
 }
 
+#define NSEC_PER_SEC 1000000000U
+
+inline u64 GetCurCpuTimestamp()
+{
+    struct timespec timestamp;
+    (void)clock_gettime(CLOCK_MONOTONIC_RAW, &timestamp);
+    return static_cast<u64>((timestamp.tv_sec * NSEC_PER_SEC) + (timestamp.tv_nsec));
+}
+
 HcclResult InsTempAlltoAllVMesh1D::KernelRun(const OpParam& param,
     const TemplateDataParams& tempAlgParams,
     const TemplateResource& templateResource)
@@ -129,7 +138,11 @@ HcclResult InsTempAlltoAllVMesh1D::KernelRun(const OpParam& param,
         HCCL_ERROR("[InsTempAlltoAllVMesh1D][KernelRun] subCommRanks_ or myRank_ is error.");
         return HCCL_E_INTERNAL;
     }
+
+    u64 StartTime = GetCurCpuTimestamp();
     CHK_RET(RunALLtoALL(templateResource.channels, templateResource.threads, tempAlgParams, myAlgRank));
+    u64 EndTime = GetCurCpuTimestamp();
+    HCCL_RUN_INFO("[KernelRun] startTime: %llu, endTime: %llu, useTime: %llu", StartTime, EndTime, EndTime - StartTime);
 
     HCCL_INFO("[InsTempAlltoAllVMesh1D][KernelRun] Run End");
     return HcclResult::HCCL_SUCCESS;

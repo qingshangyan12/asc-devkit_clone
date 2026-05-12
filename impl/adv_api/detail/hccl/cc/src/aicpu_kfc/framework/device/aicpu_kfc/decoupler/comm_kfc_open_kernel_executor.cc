@@ -117,6 +117,15 @@ HcclResult RestoreVarDataIfNeeded(ops_hccl::OpParam &param, const ops_hccl::AlgR
 }
 }
 
+#define NSEC_PER_SEC 1000000000U
+
+inline u64 GetCurCpuTimestamp()
+{
+    struct timespec timestamp;
+    (void)clock_gettime(CLOCK_MONOTONIC_RAW, &timestamp);
+    return static_cast<u64>((timestamp.tv_sec * NSEC_PER_SEC) + (timestamp.tv_nsec));
+}
+
 HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
 {
     auto *param = AsOpenOpParam(opParam);
@@ -175,9 +184,13 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
 
     auto executor = ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
     CHK_SMART_PTR_NULL(executor);
+    u64 ExEndTime = GetCurCpuTimestamp();
 
     HcclResult ret = executor->Orchestrate(*param, resCtx);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
+
+    u64 OrEndTime = GetCurCpuTimestamp();
+    HCCL_RUN_INFO("[LaunchOpenOpParamDataImpl][Re] startTime: %llu, endTime: %llu, useTime: %llu", ExEndTime, OrEndTime, OrEndTime - ExEndTime);
 
     return HCCL_SUCCESS;
 }
