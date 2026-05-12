@@ -73,8 +73,7 @@ struct TransDataTo5HDParams {
           dstRepStride(dstRepStrideIn),
           srcRepStride(srcRepStrideIn)
     {}
-
-    // 联合体实现新旧成员名共享内存空间
+    
     union {
         bool enDstHighHalf = false;
         [[deprecated("NOTICE: dstHighHalf has been deprecated. Please use enDstHighHalf instead.")]]
