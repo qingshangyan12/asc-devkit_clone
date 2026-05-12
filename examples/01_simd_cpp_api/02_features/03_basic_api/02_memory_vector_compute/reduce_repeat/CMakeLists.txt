@@ -30,7 +30,7 @@ set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-6)")
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
 
 add_executable(demo
-    whole_reduce_min_max_sum.asc
+    reduce_repeat.asc
 )
 
 target_compile_options(demo PRIVATE

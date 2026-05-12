@@ -13,13 +13,13 @@
 ## 目录结构介绍
 
 ```
-├── pair_reduce_sum
+├── reduce_pair_elem
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── pair_reduce_sum.asc     // Ascend C 样例实现 & 调用
+│   └── reduce_pair_elem.asc     // Ascend C 样例实现 & 调用
 ```
 
 ## 样例描述
@@ -37,7 +37,7 @@
    <tr><td rowspan="2" align="center">样例输出</td></tr>
    <tr><td align="center">y</td><td align="center">[1, 64]</td><td align="center">half</td><td align="center">ND</td></tr>
 
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">pair_reduce_sum_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_pair_elem_custom</td></tr>
   </table>
 
 - 样例实现：  
