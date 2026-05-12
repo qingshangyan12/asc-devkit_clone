@@ -62,6 +62,7 @@ __aicore__ inline T AtomicExchImpl(__gm__ T *address, T value)
     return atomicExch(address, value);
 }
 } // namespace AscendC
+
 #endif // ASCENDC_MODULE_OPERATOR_ATOMIC_ADD_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_ATOMIC_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
