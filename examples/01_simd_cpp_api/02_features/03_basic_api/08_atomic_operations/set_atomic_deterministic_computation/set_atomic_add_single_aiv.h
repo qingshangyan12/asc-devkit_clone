@@ -16,10 +16,11 @@
 #include "acl/acl.h"
 #include "data_utils.h"
 #include "kernel_operator.h"
-const int32_t DATA_LENGTH = 8;
 
 class KernelSetAtomicAddSingleAIV {
 public:
+    // 数据长度常量（32字节对齐）
+    static constexpr int32_t DATA_LENGTH = 8;
     __aicore__ inline KernelSetAtomicAddSingleAIV() {}
     __aicore__ inline void Init(
         __gm__ uint8_t* src0Gm, __gm__ uint8_t* src1Gm, __gm__ uint8_t* src2Gm, __gm__ uint8_t* src3Gm,
