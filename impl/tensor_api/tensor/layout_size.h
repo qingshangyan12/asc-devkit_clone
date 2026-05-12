@@ -45,6 +45,7 @@ struct nesting_depth<Std::tuple<Args...>> {
 template <typename T>
 constexpr size_t NestingDepthV = nesting_depth<Std::remove_cvref_t<T>>::value;
 
+<<<<<<< HEAD
 template <size_t Dim, typename T, typename U>
 struct IsStaticLayout {
 private:
@@ -112,6 +113,8 @@ public:
     static constexpr size_t size = GetStaticLayoutSize();
 };
 
+=======
+>>>>>>> 7bf9c320561f002d8cb51296f7ea2ea0e6cd7a1d
 } // namespace Te
 } // namespace AscendC
 

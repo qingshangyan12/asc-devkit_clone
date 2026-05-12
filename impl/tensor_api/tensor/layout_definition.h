@@ -51,7 +51,10 @@ template <typename T, typename U, typename Info = DefaultInfo>
 struct Layout : private Std::tuple<T, U>
 {
 public:
+<<<<<<< HEAD
     static constexpr auto size = StaticLayoutSize<T, U>::size;
+=======
+>>>>>>> 7bf9c320561f002d8cb51296f7ea2ea0e6cd7a1d
     static constexpr auto depth = NestingDepthV<T>;
     static constexpr auto rank = Std::tuple_size_v<T>;
 

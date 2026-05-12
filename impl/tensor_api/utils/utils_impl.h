@@ -27,6 +27,10 @@
 #include "impl/tensor_api/utils/extra_impl.h"
 #include "impl/tensor_api/utils/macro_impl.h"
 #include "impl/tensor_api/utils/map_impl.h"
+<<<<<<< HEAD
+=======
+#include "impl/tensor_api/utils/location_impl.h"
+>>>>>>> 7bf9c320561f002d8cb51296f7ea2ea0e6cd7a1d
 
 #endif // IMPL_TENSOR_API_UTILS_UTILS_IMPL_H
 

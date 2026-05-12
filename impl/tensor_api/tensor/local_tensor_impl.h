@@ -140,6 +140,7 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
  	    return TensorType<decltype(sliceEngine), decltype(coordLayout)>{sliceEngine, coordLayout};
   	}
 
+<<<<<<< HEAD
     template <typename... Layouts>
     __aicore__ inline constexpr auto Compose(const Layouts&... layouts) {
         return MakeTensor(Data(), Layout().Compose(layouts...));
@@ -160,6 +161,8 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
         return MakeTensor(Data(), Layout().Tile(layouts...));
     }
 
+=======
+>>>>>>> 7bf9c320561f002d8cb51296f7ea2ea0e6cd7a1d
     __aicore__ inline constexpr void SetL2CacheHint(CacheMode mode) {
         Engine().SetCacheMode(mode);
     }
