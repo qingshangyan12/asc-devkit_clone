@@ -22,6 +22,7 @@
 #define INCLUDE_TENSOR_API_TENSOR_LAYOUT_H
 
 #include "impl/tensor_api/tensor/layout_impl.h"
+#include "impl/tensor_api/tensor/enable_if.h"
 
 namespace AscendC {
 namespace Te {
@@ -79,11 +80,11 @@ template <typename Tensor, typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info);
 
 template <typename LayoutPattern, typename TraitType,
-    Std::enable_if_t<!IsIntegralConstantV<TraitType>, int> Enable, typename... Args>
+    EnableIfNotIntegralConstant<TraitType> Enable, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args);
 
 template <typename LayoutPattern, typename IntType,
-    Std::enable_if_t<IsIntegralConstantV<IntType>, int> Enable, typename... Args>
+    EnableIfIntegralConstant<IntType> Enable, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args);
 
 } // namespace Te

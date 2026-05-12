@@ -27,6 +27,7 @@
 #include "impl/tensor_api/tensor/coord_index.h"
 #include "impl/tensor_api/tensor/layout_fractal.h"
 #include "impl/tensor_api/tensor/layout_frame.h"
+#include "impl/tensor_api/tensor/enable_if.h"
 
 namespace AscendC {
 namespace Te {
@@ -94,7 +95,7 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const Layou
     }
 }
 
-template <typename Coord, typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<IsLayoutV<DstLayoutType>, int> = 0>
+template <typename Coord, typename SrcLayoutType, typename DstLayoutType, EnableIfLayout<DstLayoutType> = 0>
 __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const SrcLayoutType& srcLayout, const DstLayoutType& dstLayout) 
 {
     static_assert(IsLayoutV<SrcLayoutType>, "SrcLayoutType must be Layout");

@@ -26,6 +26,7 @@
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/tensor/pointer_mem_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern_impl.h"
+#include "impl/tensor_api/tensor/enable_if.h"
 
 namespace AscendC {
 namespace Te {
@@ -43,15 +44,6 @@ struct IsPtrTrait<T, void_t<typename T::type>> : Std::true_type {};
 
 template <typename T>
 using MemPtrTraitT = typename Std::conditional<IsPtrTrait<T>::value, T, PtrTrait<T>>::type;
-
-template <typename... Args>
-using FirstArgT = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
-
-template <typename... Args>
-using EnableIfMemPtrIterator = Std::enable_if_t<IsMemPtrIterator<FirstArgT<Args...>>::value, int>;
-
-template <typename... Args>
-using EnableIfNotMemPtrIterator = Std::enable_if_t<!IsMemPtrIterator<FirstArgT<Args...>>::value, int>;
 
 template <typename Hardware, typename TraitOrType, typename... Args,
           EnableIfNotMemPtrIterator<Args...> = 0>

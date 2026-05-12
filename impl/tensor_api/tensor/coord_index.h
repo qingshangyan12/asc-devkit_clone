@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_TENSOR_COORD_INDEX_H
 
 #include "impl/tensor_api/tensor/layout_definition.h"
+#include "impl/tensor_api/tensor/enable_if.h"
 
 namespace AscendC {
 namespace Te {
@@ -77,7 +78,7 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S
 }
 
 template <typename T, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout)
 {
     return Crd2Idx(coord, layout.Shape(), layout.Stride());

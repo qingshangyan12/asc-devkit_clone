@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_METHOD_H
 
 #include "impl/tensor_api/tensor/layout_definition.h"
+#include "impl/tensor_api/tensor/enable_if.h"
 
 namespace AscendC {
 namespace Te {
@@ -147,28 +148,28 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape) {
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto GetShape(const LayoutType& layout)
 {
     return layout.template Shape<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto GetShape(LayoutType& layout)
 {
     return layout.template Shape<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto GetStride(const LayoutType& layout)
 {
     return layout.template Stride<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto GetStride(LayoutType& layout)
 {
     return layout.template Stride<Is...>();
@@ -196,7 +197,7 @@ struct CoshapeCompute {
 };
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto Coshape(const LayoutType& layout)
 {
     auto shape = GetShape<Is...>(layout);
@@ -206,42 +207,42 @@ __aicore__ inline constexpr auto Coshape(const LayoutType& layout)
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto Cosize(const LayoutType& layout)
 {
     return TupleSize(Coshape<Is...>(layout));
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto Rank(const LayoutType& layout)
 {
     return layout.template Rank<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto Select(const LayoutType& layout)
 {
     return MakeLayout(SelectTuple<Is...>(layout.Shape()), SelectTuple<Is...>(layout.Stride()));
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto Get(const LayoutType& layout)
 {
     return MakeLayout(GetTuple<Is...>(layout.Shape()), GetTuple<Is...>(layout.Stride()));
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto Size(const LayoutType& layout)
 {
     return layout.template Size<Is...>();
 }
 
 template <size_t... Is, typename LayoutType,
-    typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+    typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto Capacity(const LayoutType& layout)
 {
     return layout.Capacity();
