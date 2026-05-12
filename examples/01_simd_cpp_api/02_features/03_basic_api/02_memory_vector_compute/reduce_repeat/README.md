@@ -17,11 +17,11 @@
 ```
 ├── reduce_repeat
 │   ├── scripts
-│   │   ├── gen_data.py                    // 输入数据和真值数据生成脚本
+│   │   ├── gen_data.py                   // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py              // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt                    // 编译工程文件
 │   ├── data_utils.h                      // 数据读入写出函数
-│   └── reduce_repeat.asc      // Ascend C样例实现 & 调用样例
+│   └── reduce_repeat.asc                 // Ascend C样例实现 & 调用样例
 ```
 
 ## 场景详细说明
@@ -46,19 +46,13 @@
 - 实现：`ReduceRepeat<ReduceType::SUM, float>(dstLocal, srcLocal, mask=64, repeat=32, 1, 1, 8)`
 - 说明：每个repeat独立求和，共输出32个求和结果
 
-**场景4：ReduceRepeat<SUM>累加模式**
-- 输入：[1, 2048]个float元素，mask=64（float类型32位，mask范围为[1,64]），repeat=32（2048/64）
-- 输出：[1, 32]个float元素（累加模式）
-- 实现：先用 `Duplicate` 初始化dstLocal为0，再调用 `ReduceRepeat<ReduceType::SUM, float>(dstLocal, srcLocal, mask=64, repeat=32, dstBlkStride=0, 1, 1, 8)`
-- 说明：dstBlkStride=0表示将所有repeat的结果累加到同一位置，每个repeat结果依次存放
-
-**场景5：ReduceRepeat<MIN> + GetReduceRepeatMaxMinSpr**
+**场景4：ReduceRepeat<MIN> + GetReduceRepeatMaxMinSpr**
 - 输入：[1, 1024]个half元素，mask逐bit模式（uint64_t[2]全1），repeat=8（1024/128）
 - 输出：[1, 16]个half元素（仅前2个元素有效：全局最小值 + 全局最小值索引）
 - 实现：先调用 `ReduceRepeat<ReduceType::MIN, half>(dstLocal, srcLocal, mask=uint64_t[2]{-1,-1}, repeat=8, 1, 1, 8)`，再调用 `GetReduceRepeatMaxMinSpr<half>(val, idx)` 获取全局最小值及其索引，通过 `SetFlag<HardEvent::V_S>` / `WaitFlag<HardEvent::V_S>` 同步向量计算到标量计算
 - 说明：ReduceRepeat<MIN>对8个repeat分别求局部最小值，GetReduceRepeatMaxMinSpr从硬件寄存器中读取所有repeat中的全局最小值及其在源数据中的索引位置，结果写入dstLocal的前两个元素
 
-**场景6：ReduceRepeat<SUM>非对齐场景**
+**场景5：ReduceRepeat<SUM>非对齐场景**
 - 输入：[13, 57]个float元素（13行×57列，列数57×4字节=228字节，非32字节对齐）
 - 输出：[1, 13]个float元素（每行的求和结果）
 - 实现：使用 `DataCopyPad` 搬入非对齐数据，`ReduceRepeat<ReduceType::SUM, float>(dstLocal, srcLocal, mask=57, repeat=13, 1, 1, srcStride)` 对每行求和
@@ -76,7 +70,7 @@
 </table>
 
 <table border="2">
-<caption>表2：样例输入输出规格（场景2/5）</caption>
+<caption>表2：样例输入输出规格（场景2/4）</caption>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -85,7 +79,7 @@
 </table>
 
 <table border="2">
-<caption>表3：样例输入输出规格（场景3/4）</caption>
+<caption>表3：样例输入输出规格（场景3）</caption>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -94,7 +88,7 @@
 </table>
 
 <table border="2">
-<caption>表4：样例输入输出规格（场景6）</caption>
+<caption>表4：样例输入输出规格（场景5）</caption>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[13, 57]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -153,7 +147,7 @@
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品、dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`（默认）、`2`、`3`、`4`、`5`、`6` | 场景编号：1（ReduceRepeat<MAX>）、2（ReduceRepeat<MIN>）、3（ReduceRepeat<SUM>）、4（ReduceRepeat<SUM>累加模式）、5（ReduceRepeat<MIN>+GetReduceRepeatMaxMinSpr）、6（非对齐ReduceRepeat<SUM>） |
+  | `SCENARIO_NUM` | `1`（默认）、`2`、`3`、`4`、`5` | 场景编号：1（ReduceRepeat<MAX>）、2（ReduceRepeat<MIN>）、3（ReduceRepeat<SUM>）、4（ReduceRepeat<MIN>+GetReduceRepeatMaxMinSpr）、5（非对齐ReduceRepeat<SUM>） |
 
 - 执行结果
 

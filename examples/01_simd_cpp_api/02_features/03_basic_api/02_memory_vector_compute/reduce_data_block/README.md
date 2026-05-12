@@ -15,16 +15,16 @@
 ```
 ├── reduce_data_block
 │   ├── scripts
-│   │   ├── gen_data.py                    // 输入数据和真值数据生成脚本
+│   │   ├── gen_data.py                   // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py              // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt                    // 编译工程文件
 │   ├── data_utils.h                      // 数据读入写出函数
-│   └── reduce_data_block.asc      // Ascend C样例实现 & 调用样例
+│   └── reduce_data_block.asc             // Ascend C样例实现 & 调用样例
 ```
 
 ## 场景说明
 
-本样例通过编译参数 `SCENARIO_NUM` 选择不同的归约场景，所有场景数据格式为 ND，核函数名为 `block_reduce_custom`。
+本样例通过编译参数 `SCENARIO_NUM` 选择不同的归约场景，所有场景数据格式为 ND，核函数名为 `reduce_data_block_custom`。
 
 **场景1：ReduceDataBlock<MAX, half>**
 - 输入：[1, 256]个half元素，mask=128（256/sizeof(half)），repeat=2
@@ -52,7 +52,7 @@
 <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">half</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">block_reduce_custom</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_data_block_custom</td></tr>
 </table>
 
 <table border="2">
@@ -61,7 +61,7 @@
 <tr><td align="center">x</td><td align="center">[4, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">y</td><td align="center">[4, 8]</td><td align="center">half</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">block_reduce_custom</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_data_block_custom</td></tr>
 </table>
 
 <table border="2">
@@ -70,7 +70,7 @@
 <tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">block_reduce_custom</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_data_block_custom</td></tr>
 </table>
 
 ## 编译运行
