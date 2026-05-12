@@ -118,6 +118,8 @@ int index = x_index + width * y_index;
 | aiv_scalar_time(us) | 代表scalar类型指令（标量类运算指令）耗时。                                                    |
 |  aiv_scalar_ratio  | 代表scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。                      |
 
+除Task Duration外，本例中其余指标均展示的为所有block上性能指标的平均值。
+
 ### Case 0：矩阵复制版本
 
 **实现方式**：对应样例中copy_kernel()函数
@@ -195,10 +197,9 @@ output[index_out] = input[index_in];
 
 **性能分析**：
 
-- 与Case 0的copy基线相比，Task Duration从24.777us增加到60.477us，约为copy版本的2.44倍；aiv_time从1.054us增加到3.516us，约为copy版本的3.34倍
-- 从aiv_total_cycles看，naive transpose为5801.925 cycles，明显高于copy版本的1739.820 cycles，说明直接转置的主要开销来自访存模式变化，而不是计算量增加
-- aiv_vec_ratio达到0.955，vec类指令占比很高；同时aiv_scalar_time与copy版本接近，说明瓶颈主要集中在向量访存相关路径
-- 该版本GM读取仍然是连续读，但GM写回是跨行、非连续写，同一个warp的写请求难以高效合并，因此整体性能明显低于copy基线
+- 与Case 0的copy基线相比，Task Duration从24.777us增加到60.477us，约为copy版本的2.44倍
+- 直接索引转置本身计算量很小，但转置后的GM写回变为跨行、非连续访问，因此端到端耗时明显高于copy基线
+- 该版本GM读取仍然是连续读，但GM写回地址不连续，同一个warp的写请求难以高效合并，这是Task Duration上升的主要原因
 
 **性能优化建议**：
 
@@ -250,9 +251,8 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 **优化效果分析**：
 
 - 相比Case 1的naive transpose，Task Duration从60.477us降低到35.945us，耗时下降约40.6%，整体性能提升约1.68倍
-- aiv_time从3.516us降低到1.814us，aiv_total_cycles从5801.925降低到2993.315，AI Vector Core侧执行开销下降约48.4%，说明GM访存合并带来了明显收益
-- aiv_vec_time从3.357us降低到1.646us，下降约51.0%，对应的是非连续GM写被转移到UB读之后，GM写回可以按连续行访问
-- 与Case 0的copy基线相比，Case 2仍然多出一次UB写、一次同步和一次转置方向的UB读，因此Task Duration仍比copy高约45.1%；这部分差距主要来自UB中转和UB列方向访问的额外开销
+- Case 2通过UB中转把Case 1中的非连续GM写转移为UB侧访问，使GM读写都更接近连续访问，因此Task Duration明显降低
+- 与Case 0的copy基线相比，Case 2的Task Duration仍高约45.1%。这部分差距主要来自额外的UB读写、同步以及转置方向的UB访问开销
 
 **性能优化建议**：
 
@@ -328,9 +328,9 @@ case 3中对UB中的tile增加一列padding，由每行32个元素改为33个元
 **优化效果分析**：
 
 - 相比Case 2的transpose_coalesced_kernel，Task Duration从35.945us降低到26.725us，耗时下降约25.7%，整体性能提升约1.35倍
-- aiv_time从1.814us降低到1.224us，aiv_total_cycles从2993.315降低到2018.943，AI Vector Core侧执行开销下降约32.5%；aiv_vec_time也从1.646us降低到1.059us，说明padding主要改善了UB转置读阶段的冲突开销
-- 相比Case 1的naive transpose，Case 3的Task Duration下降约55.8%，整体性能提升约2.26倍；aiv_time下降约65.2%，说明“GM访存合并 + UB bank冲突降低”两步优化是叠加生效的
-- 与Case 0的copy基线相比，Case 3的Task Duration只高约7.9%，aiv_time高约16.1%，已经接近连续GM读写的基准水平。剩余差距主要来自UB中转、同步以及UB读写时仍然存在的少量bank冲突
+- Case 3在Case 2的基础上通过padding降低UB转置读阶段的bank冲突，因此端到端Task Duration继续下降
+- 相比Case 1的naive transpose，Case 3的Task Duration下降约55.8%，整体性能提升约2.26倍，说明“GM访存合并 + UB bank冲突降低”两步优化在端到端耗时上叠加生效
+- 与Case 0的copy基线相比，Case 3的Task Duration只高约7.9%，已经接近连续GM读写的基准水平。剩余差距主要来自UB中转、同步以及UB读写时仍然存在的少量bank冲突
 
 **性能优化建议**：
 
