@@ -100,8 +100,8 @@ TEST_P(Transdatato5HDTestSuite, Transdatato5HDTestCase)
 {
     auto param = GetParam();
     TransDataTo5HDParams transdatato5HDParams;
-    transdatato5HDParams.dstEnHighHalf = param.dstHigh;
-    transdatato5HDParams.srcEnHighHalf = param.srcHigh;
+    transdatato5HDParams.enDstHighHalf = param.dstHigh;
+    transdatato5HDParams.enSrcHighHalf = param.srcHigh;
     transdatato5HDParams.repeatTimes = param.repTimes;
     transdatato5HDParams.dstRepStride = param.dstRep;
     transdatato5HDParams.srcRepStride = param.srcRep;

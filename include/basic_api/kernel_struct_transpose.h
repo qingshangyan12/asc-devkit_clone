@@ -65,10 +65,10 @@ enum class TransposeType : uint8_t {
 struct TransDataTo5HDParams {
     constexpr __aicore__ TransDataTo5HDParams() = default;
 
-    constexpr __aicore__ TransDataTo5HDParams(const bool dstHighHalfIn, const bool srcHighHalfIn, const uint8_t repeatTimesIn,
+    constexpr __aicore__ TransDataTo5HDParams(const bool enDstHighHalfIn, const bool enSrcHighHalfIn, const uint8_t repeatTimesIn,
         const uint16_t dstRepStrideIn, const uint16_t srcRepStrideIn)
-        : dstEnHighHalf(dstHighHalfIn),
-          srcEnHighHalf(srcHighHalfIn),
+        : enDstHighHalf(enDstHighHalfIn),
+          enSrcHighHalf(enSrcHighHalfIn),
           repeatTimes(repeatTimesIn),
           dstRepStride(dstRepStrideIn),
           srcRepStride(srcRepStrideIn)
@@ -76,15 +76,15 @@ struct TransDataTo5HDParams {
 
     // 联合体实现新旧成员名共享内存空间
     union {
-        bool dstEnHighHalf = false;  // 新成员名
-        [[deprecated("NOTICE: dstHighHalf has been deprecated. Please use dstEnHighHalf instead.")]]
-        bool dstHighHalf;                // 旧成员名，已废弃
+        bool enDstHighHalf = false;
+        [[deprecated("NOTICE: dstHighHalf has been deprecated. Please use enDstHighHalf instead.")]]
+        bool dstHighHalf;                
     };
 
     union {
-        bool srcEnHighHalf = false;  // 新成员名
-        [[deprecated("NOTICE: srcHighHalf has been deprecated. Please use srcEnHighHalf instead.")]]
-        bool srcHighHalf;                // 旧成员名，已废弃
+        bool enSrcHighHalf = false;
+        [[deprecated("NOTICE: srcHighHalf has been deprecated. Please use enSrcHighHalf instead.")]]
+        bool srcHighHalf;                
     };
 
     uint8_t repeatTimes = 1;

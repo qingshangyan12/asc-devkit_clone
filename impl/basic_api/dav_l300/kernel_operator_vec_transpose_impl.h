@@ -66,13 +66,13 @@ template <typename T>
 __aicore__ inline void TransDataTo5HDB8IntrinsicsImpl(__ubuf__ T* dstList[16], __ubuf__ T* srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    if ((transDataTo5HDParams.dstEnHighHalf == false) && (transDataTo5HDParams.srcEnHighHalf == false)) {
+    if ((transDataTo5HDParams.enDstHighHalf == false) && (transDataTo5HDParams.enSrcHighHalf == false)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, false);
-    } else if ((transDataTo5HDParams.dstEnHighHalf == false) && (transDataTo5HDParams.srcEnHighHalf == true)) {
+    } else if ((transDataTo5HDParams.enDstHighHalf == false) && (transDataTo5HDParams.enSrcHighHalf == true)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, true);
-    } else if ((transDataTo5HDParams.dstEnHighHalf == true) && (transDataTo5HDParams.srcEnHighHalf == true)) {
+    } else if ((transDataTo5HDParams.enDstHighHalf == true) && (transDataTo5HDParams.enSrcHighHalf == true)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, true, true);
     } else {
@@ -97,13 +97,13 @@ template <typename T>
 __aicore__ inline void TransDataTo5HDB8IntrinsicsImpl(uint64_t dstList[16], uint64_t srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    if ((transDataTo5HDParams.dstEnHighHalf == false) && (transDataTo5HDParams.srcEnHighHalf == false)) {
+    if ((transDataTo5HDParams.enDstHighHalf == false) && (transDataTo5HDParams.enSrcHighHalf == false)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, false);
-    } else if ((transDataTo5HDParams.dstEnHighHalf == false) && (transDataTo5HDParams.srcEnHighHalf == true)) {
+    } else if ((transDataTo5HDParams.enDstHighHalf == false) && (transDataTo5HDParams.enSrcHighHalf == true)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, true);
-    } else if ((transDataTo5HDParams.dstEnHighHalf == true) && (transDataTo5HDParams.srcEnHighHalf == true)) {
+    } else if ((transDataTo5HDParams.enDstHighHalf == true) && (transDataTo5HDParams.enSrcHighHalf == true)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, true, true);
     } else {

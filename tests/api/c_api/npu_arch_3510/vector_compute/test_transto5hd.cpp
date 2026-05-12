@@ -21,15 +21,15 @@ protected:
 
 namespace {
 void scatter_vnchwconv_b8_stub_repeat(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride,
-                                      uint16_t src_stride, bool dst_en_high_half, bool src_en_high_half)
+                                      uint16_t src_stride, bool en_dst_high_half, bool en_src_high_half)
 {
     EXPECT_EQ(ub_addr8_t::VA0, dst);
     EXPECT_EQ(ub_addr8_t::VA2, src);
     EXPECT_EQ(repeat, static_cast<uint8_t>(2));
     EXPECT_EQ(dst_stride, static_cast<uint16_t>(3));
     EXPECT_EQ(src_stride, static_cast<uint16_t>(4));
-    EXPECT_EQ(dst_en_high_half, true);
-    EXPECT_EQ(src_en_high_half, false);
+    EXPECT_EQ(en_dst_high_half, true);
+    EXPECT_EQ(en_src_high_half, false);
 }
 
 void scatter_vnchwconv_b16_stub_repeat(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride,
@@ -58,14 +58,14 @@ TEST_F(TestTransto5HDCAPI, asc_transto5hd_b8_repeat_Succ)
     uint8_t repeat = 2;
     uint16_t dst_stride = 3;
     uint16_t src_stride = 4;
-    bool dst_en_high_half = true;
-    bool src_en_high_half = false;
+    bool en_dst_high_half = true;
+    bool en_src_high_half = false;
 
     MOCKER_CPP(scatter_vnchwconv_b8, void(ub_addr8_t, ub_addr8_t, uint8_t, uint16_t, uint16_t, bool, bool))
         .times(1)
         .will(invoke(scatter_vnchwconv_b8_stub_repeat));
 
-    asc_transto5hd_b8(ub_addr8_t::VA0, ub_addr8_t::VA2, repeat, dst_stride, src_stride, dst_en_high_half, src_en_high_half);
+    asc_transto5hd_b8(ub_addr8_t::VA0, ub_addr8_t::VA2, repeat, dst_stride, src_stride, en_dst_high_half, en_src_high_half);
     GlobalMockObject::verify();
 }
 
@@ -74,15 +74,15 @@ TEST_F(TestTransto5HDCAPI, asc_transto5hd_b8_repeat_sync_Succ)
     uint8_t repeat = 2;
     uint16_t dst_stride = 3;
     uint16_t src_stride = 4;
-    bool dst_en_high_half = true;
-    bool src_en_high_half = false;
+    bool en_dst_high_half = true;
+    bool en_src_high_half = false;
 
     MOCKER_CPP(scatter_vnchwconv_b8, void(ub_addr8_t, ub_addr8_t, uint8_t, uint16_t, uint16_t, bool, bool))
         .times(1)
         .will(invoke(scatter_vnchwconv_b8_stub_repeat));
 
-    asc_transto5hd_b8_sync(ub_addr8_t::VA0, ub_addr8_t::VA2, repeat, dst_stride, src_stride, dst_en_high_half,
-                           src_en_high_half);
+    asc_transto5hd_b8_sync(ub_addr8_t::VA0, ub_addr8_t::VA2, repeat, dst_stride, src_stride, en_dst_high_half,
+                           en_src_high_half);
     GlobalMockObject::verify();
 }
 

@@ -97,8 +97,8 @@ TEST_P(NchwconvTestsuite, NchwconvTestCase)
 {
     auto param = GetParam();
     TransDataTo5HDParams nchwconvParams;
-    nchwconvParams.dstEnHighHalf = param.dstHigh;
-    nchwconvParams.srcEnHighHalf = param.srcHigh;
+    nchwconvParams.enDstHighHalf = param.dstHigh;
+    nchwconvParams.enSrcHighHalf = param.srcHigh;
     nchwconvParams.repeatTimes = param.repTimes;
     nchwconvParams.dstRepStride = param.dstRep;
     nchwconvParams.srcRepStride = param.srcRep;
@@ -119,7 +119,7 @@ TEST_P(NchwconvTestsuite, NchwconvTestCase)
 //   1. (LocalTensor<T> (&dstList)[16], LocalTensor<T> (&srcList)[16], TransDataTo5HDParams)
 //   2. (uint64_t dstList[16], uint64_t srcList[16], TransDataTo5HDParams)
 //   3. (LocalTensor<uint64_t> &dst, LocalTensor<uint64_t> &src, TransDataTo5HDParams)
-// Validation: dtype, dstEnHighHalf/srcEnHighHalf (only valid for int8_t/uint8_t),
+// Validation: dtype, enDstHighHalf/enSrcHighHalf (only valid for int8_t/uint8_t),
 //             repeatTimes [0,255], position (UB), alignment (32B)
 // ============================================================
 
@@ -165,8 +165,8 @@ TEST_F(TestTransDataTo5HDNpuDebug, DstListPositionNotUbOverload1)
     }
 
     TransDataTo5HDParams params;
-    params.dstEnHighHalf = false;
-    params.srcEnHighHalf = false;
+    params.enDstHighHalf = false;
+    params.enSrcHighHalf = false;
     params.repeatTimes = 1;
     params.dstRepStride = 16;
     params.srcRepStride = 16;
@@ -196,8 +196,8 @@ TEST_F(TestTransDataTo5HDNpuDebug, SrcListPositionNotUbOverload1)
     }
 
     TransDataTo5HDParams params;
-    params.dstEnHighHalf = false;
-    params.srcEnHighHalf = false;
+    params.enDstHighHalf = false;
+    params.enSrcHighHalf = false;
     params.repeatTimes = 1;
     params.dstRepStride = 16;
     params.srcRepStride = 16;
@@ -206,7 +206,7 @@ TEST_F(TestTransDataTo5HDNpuDebug, SrcListPositionNotUbOverload1)
     TransDataTo5HD<half>(dstList, srcList, params);
 }
 
-// --- Overload 1: half type with dstEnHighHalf=true (only valid for int8_t/uint8_t) ---
+// --- Overload 1: half type with enDstHighHalf=true (only valid for int8_t/uint8_t) ---
 TEST_F(TestTransDataTo5HDNpuDebug, DstHighHalfInvalidForHalfOverload1)
 {
     TPipe tpipe;
@@ -227,8 +227,8 @@ TEST_F(TestTransDataTo5HDNpuDebug, DstHighHalfInvalidForHalfOverload1)
     }
 
     TransDataTo5HDParams params;
-    params.dstEnHighHalf = true;   // invalid for half
-    params.srcEnHighHalf = false;
+    params.enDstHighHalf = true;   // invalid for half
+    params.enSrcHighHalf = false;
     params.repeatTimes = 1;
     params.dstRepStride = 16;
     params.srcRepStride = 16;
@@ -237,7 +237,7 @@ TEST_F(TestTransDataTo5HDNpuDebug, DstHighHalfInvalidForHalfOverload1)
     TransDataTo5HD<half>(dstList, srcList, params);
 }
 
-// --- Overload 1: half type with srcEnHighHalf=true (only valid for int8_t/uint8_t) ---
+// --- Overload 1: half type with enSrcHighHalf=true (only valid for int8_t/uint8_t) ---
 TEST_F(TestTransDataTo5HDNpuDebug, SrcHighHalfInvalidForHalfOverload1)
 {
     TPipe tpipe;
@@ -258,8 +258,8 @@ TEST_F(TestTransDataTo5HDNpuDebug, SrcHighHalfInvalidForHalfOverload1)
     }
 
     TransDataTo5HDParams params;
-    params.dstEnHighHalf = false;
-    params.srcEnHighHalf = true;   // invalid for half
+    params.enDstHighHalf = false;
+    params.enSrcHighHalf = true;   // invalid for half
     params.repeatTimes = 1;
     params.dstRepStride = 16;
     params.srcRepStride = 16;

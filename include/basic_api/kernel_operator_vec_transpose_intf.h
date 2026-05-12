@@ -51,8 +51,8 @@ template <typename T> __aicore__ inline void Transpose(const LocalTensor<T>& dst
  * @brief NCHW to NC1HWC0 format
  * @param [out] dstList output LocalTensor list
  * @param [in] srcList input LocalTensor list
- * @param [in] nchwconvParams.dstEnHighHalf Specify dst data is stored in the upper half or lower half of the block
- * @param [in] nchwconvParams.srcEnHighHalf Specify src data is stored in the upper half or lower half of the block
+ * @param [in] nchwconvParams.enDstHighHalf Specify dst data is stored in the upper half or lower half of the block
+ * @param [in] nchwconvParams.enSrcHighHalf Specify src data is stored in the upper half or lower half of the block
  * @param [in] nchwconvParams.repeatTimes repeat times
  * @param [in] nchwconvParams.dstRepStride dst repeat stride
  * @param [in] nchwconvParams.srcRepStride src repeat stride
