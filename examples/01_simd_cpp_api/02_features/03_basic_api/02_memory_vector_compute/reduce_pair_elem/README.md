@@ -19,7 +19,7 @@
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── reduce_pair_elem.asc     // Ascend C 样例实现 & 调用
+│   └── reduce_pair_elem.asc    // Ascend C 样例实现 & 调用
 ```
 
 ## 样例描述
