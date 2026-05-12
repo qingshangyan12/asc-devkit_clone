@@ -117,6 +117,15 @@ HcclResult RestoreVarDataIfNeeded(ops_hccl::OpParam &param, const ops_hccl::AlgR
 }
 }
 
+#define NSEC_PER_SEC 1000000000U
+
+inline u64 GetCurCpuTimestamp()
+{
+    struct timespec timestamp;
+    (void)clock_gettime(CLOCK_MONOTONIC_RAW, &timestamp);
+    return static_cast<u64>((timestamp.tv_sec * NSEC_PER_SEC) + (timestamp.tv_nsec));
+}
+
 HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
 {
     auto *param = AsOpenOpParam(opParam);
@@ -128,9 +137,12 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
               static_cast<u32>(param->opType), param->algName);
     ops_hccl::AlgResourceCtxSerializable resCtx;
 
+    u64 startTime = GetCurCpuTimestamp();
     char *ctx = static_cast<char *>(param->resCtx);
     std::vector<char> seq(ctx, ctx + param->ctxSize);
     resCtx.DeSerialize(seq);
+    u64 deEndTime = GetCurCpuTimestamp();
+    HCCL_ERROR("[LaunchOpenOpParamDataImpl][De] startTime: %llu, endTime: %llu, useTime: %llu", startTime, deEndTime, deEndTime - startTime);
     HCCL_INFO("[MC2_OPEN_DIAG][Launch] opType %u, algName[%s], inputPtr %p, outputPtr %p, resCtx %p, ctxSize %llu, stream %p."
               "userRank %u, userRankSize %u, threadNum %zu, cclMemAddr %p, cclMemSize %llu.", 
               static_cast<u32>(param->opType), param->algName, param->inputPtr, param->outputPtr,
@@ -172,12 +184,19 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
               static_cast<unsigned long long>(outputBegin + outputBytes), isAllGather);
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
+    u64 ReEndTime = GetCurCpuTimestamp();
+    HCCL_ERROR("[LaunchOpenOpParamDataImpl][Re] startTime: %llu, endTime: %llu, useTime: %llu", deEndTime, ReEndTime, ReEndTime - deEndTime);
 
     auto executor = ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
     CHK_SMART_PTR_NULL(executor);
+    u64 ExEndTime = GetCurCpuTimestamp();
+    HCCL_ERROR("[LaunchOpenOpParamDataImpl][Re] startTime: %llu, endTime: %llu, useTime: %llu", ReEndTime, ExEndTime, ExEndTime - ReEndTime);
 
     HcclResult ret = executor->Orchestrate(*param, resCtx);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
+
+    u64 OrEndTime = GetCurCpuTimestamp();
+    HCCL_ERROR("[LaunchOpenOpParamDataImpl][Re] startTime: %llu, endTime: %llu, useTime: %llu", ExEndTime, OrEndTime, OrEndTime - ExEndTime);
 
     return HCCL_SUCCESS;
 }
