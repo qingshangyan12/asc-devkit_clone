@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍基于Ascend C SIMT编程方式的性能调优思路。样例包含2个kernel版本，从最基础的直接索引转置开始，再引入UB中转和全局访存合并，展示SIMT编程方式下矩阵转置的访存优化思路。
+本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程场景下的访存合并优化思路。样例包含2个kernel版本：先实现直接索引转置，再通过UB中转调整数据写回方式，使GM读写更接近连续访问，从而展示混合编程下矩阵转置的全局访存优化方法。
 
 **优化路径**：
 
@@ -138,6 +138,8 @@ int index = x_index + width * y_index;
 |    aiv_vec_ratio    | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。                             |
 | aiv_scalar_time(us) | 代表scalar类型指令（标量类运算指令）耗时。                                                    |
 |  aiv_scalar_ratio  | 代表scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。                      |
+
+除Task Duration外，本例中其余指标均展示的为所有block上性能指标的平均值。
 
 ### Case 0：直接索引转置版本
 
