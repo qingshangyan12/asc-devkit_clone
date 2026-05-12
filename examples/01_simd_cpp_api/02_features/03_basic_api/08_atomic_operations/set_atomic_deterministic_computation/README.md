@@ -304,13 +304,19 @@ $$
   <tr><td rowspan="1" align="center">核数(numBlocks)</td><td colspan="4" align="center">4</td></tr>
   </table>
 
-### 2.3 下一步开发计划
-当前存在以下待开发事项：
-<table>
-  <tr><th>事项</th><th>说明</th></tr>
-  <tr><td>Ascend 950PR/Ascend 950DT，待支持</td><td>SCENARIO_NUM=3时，多个AIC做原子操作确定性计算。当前AIC中向GM搬出数据时，调用DataCopy使用了L1-->GM数据通路，该数据通路在Ascend 950PR/Ascend 950DT上不支持。下一步整改计划：当前AIC中向GM搬出数据时，调用FixPipe使用L0C-->GM数据通路。</td></tr>
-  <tr><td rowspan="2">Tpipe编程方式转换为静态tensor编程方式</td><td>SCENARIO_NUM=1和3时，下一步计划整改为静态tensor编程方式。</td></tr>
-  <tr><td>SCENARIO_NUM=2时，多个AIV做原子操作确定性计算。由于IBSet和IBWait以及InitDetermineComputeWorkspace、NotifyNextBlock 和 WaitPreBlock，不支持静态tensor编程方式。</td></tr>
+### 2.3 注意事项
+
+#### (1) Ascend 950PR/Ascend 950DT 兼容性限制
+
+当且仅当 `SCENARIO_NUM=3` 时，样例不支持 Ascend 950PR/Ascend 950DT。
+
+`SCENARIO_NUM=3` 时，多个 AIC 做原子操作确定性计算。当前 AIC 中向 GM 搬出数据时，调用 `DataCopy` 使用了 L1-->GM 数据通路，该数据通路在 Ascend 950PR/Ascend 950DT 上不支持。
+
+#### (2) 静态 Tensor 编程方式限制
+
+当且仅当 `SCENARIO_NUM=2` 时，样例不支持静态 tensor 编程方式。
+
+`SCENARIO_NUM=2` 时，多个 AIV 做原子操作确定性计算。`IBSet` 和 `IBWait` 以及 `InitDetermineComputeWorkspace`、`NotifyNextBlock` 和 `WaitPreBlock`，不支持静态 tensor 编程方式。
 </table>
 
 ## 编译运行  
@@ -336,8 +342,8 @@ $$
   ```bash
   SCENARIO_NUM=1 # 默认演示单个AIV核内的确定性计算
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake .. -DSCENARIO_NUM=${SCENARIO_NUM};make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=${SCENARIO_NUM};make -j;  # 编译工程
+  python3 ../scripts/gen_data.py --scenario_num=${SCENARIO_NUM}
   ./demo                        # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
