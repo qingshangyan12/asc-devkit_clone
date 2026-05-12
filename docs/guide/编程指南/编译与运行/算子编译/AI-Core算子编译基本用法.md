@@ -12,7 +12,7 @@ bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接�
   bisheng example.asc -I <path_to_include> -L <path_to_library> -l <library> -o <output_file> --npu-arch=dav-<npu architecture>
 ```
 
-AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMD代码分为Cube代码和Vector代码，需分别编译成Cube二进制和Vector二进制，先将Cube二进制和Vector二进制链接成Fatbin文件，再与Host二进制合并在一起。
+AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMD代码分为Cube代码和Vector代码，需分别编译成Cube二进制和Vector二进制，先将Cube二进制和Vector二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
 ![ ](../../../figures/aicore_compilation.png "aicore 编译流程示意图")
 
 - 异构编译
@@ -78,7 +78,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
 ```
 
-AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码编译成SIMT二进制，先将SIMT二进链接成Fatbin文件，再与Host二进制合并在一起。
+AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码编译成SIMT二进制，先将SIMT二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
 ![ ](../../../figures/aicore_simt_comilation.png "aicore simt编译流程示意图")
 
 ## 基本编译命令汇总
