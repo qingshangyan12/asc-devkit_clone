@@ -1,3 +1,6 @@
+#include <cmath>
+#include <cstdio>
+
 static inline float erfcx(float x)
 {
     const float kThreshold = 10.055f;
@@ -43,4 +46,23 @@ static inline float erfcx(float x)
     }
 
     return result;
+}
+
+int main()
+{
+    const float testVals[] = {
+        0.0f, 0.125f, 0.5f, 1.0f, 2.0f, 2.6124971f
+    };
+    const int numTests = sizeof(testVals) / sizeof(testVals[0]);
+
+    std::printf("%-12s %s\n", "x", "erfcx(x)");
+    std::printf("----------------------------\n");
+
+    for (int i = 0; i < numTests; ++i) {
+        float x = testVals[i];
+        float y = erfcx(x);
+        std::printf("%-12.9g %.9g\n", static_cast<double>(x), static_cast<double>(y));
+    }
+
+    return 0;
 }
