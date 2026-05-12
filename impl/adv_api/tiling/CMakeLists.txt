@@ -187,6 +187,8 @@ target_include_directories(tiling_api PRIVATE
   ${ASCENDC_DIR}/include/utils/tiling/platform
   ${ASCENDC_DIR}/include/utils
   ${TOP_DIR}/runtime/pkg_inc
+  ${TOP_DIR}/runtime/include/external
+  ${TOP_DIR}/runtime/include/external/acl
   $<$<STREQUAL:${PRODUCT_SIDE},device>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/utils/stub>>
   $<$<STREQUAL:${PRODUCT_SIDE},device>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/utils/stub/common>>
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:$<BUILD_INTERFACE:${TOP_DIR}/metadef/inc/external>>
@@ -194,6 +196,8 @@ target_include_directories(tiling_api PRIVATE
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:$<BUILD_INTERFACE:${TOP_DIR}/ace/npuruntime/runtime/platform/inc>>
   $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${TOP_DIR}/ace/npuruntime/runtime/dfx/include/log/toolchain>>
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:$<BUILD_INTERFACE:${TOP_DIR}/metadef/pkg_inc>>
+  $<$<BOOL:${BUILD_OPEN_PROJECT}>:${ASCEND_CANN_PACKAGE_PATH}/include>
+  $<$<BOOL:${BUILD_OPEN_PROJECT}>:${ASCEND_CANN_PACKAGE_PATH}/include/acl>
 )
 
 target_compile_options(
@@ -222,6 +226,7 @@ target_link_libraries(
   PRIVATE $<BUILD_INTERFACE:intf_pub>
           $<BUILD_INTERFACE:slog_headers>
           -Wl,--no-as-needed
+          rt
           c_sec
           -Wl,--as-needed
           $<$<STREQUAL:${PRODUCT_SIDE},host>:platform>
