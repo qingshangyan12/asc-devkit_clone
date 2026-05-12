@@ -1,0 +1,57 @@
+数学计算
+====
+
+.. toctree::
+   :maxdepth: 2
+   :numbered:
+   :glob:
+
+   Tanh接口/index
+   Asin接口/index
+   Sin接口/index
+   Acos接口/index
+   Cos接口/index
+   Log接口/index
+   Atan接口/index
+   Power接口/index
+   Sinh接口/index
+   Cosh接口/index
+   Tan接口/index
+   Trunc接口/index
+   Frac接口/index
+   Erf接口/index
+   Erfc接口/index
+   Sign接口/index
+   Atanh接口/index
+   Asinh接口/index
+   Acosh接口/index
+   Floor接口/index
+   Ceil接口/index
+   Clamp接口/index
+   Round接口/index
+   Axpy接口/index
+   Exp接口/index
+   Lgamma接口/index
+   Digamma接口/index
+   Xor接口/index
+   CumSum接口/index
+   Fmod接口/index
+   IsFinite接口/index
+   Hypot接口/index
+   Fma接口/index
+   IsNan接口/index
+   IsInf接口/index
+   Rint接口/index
+   SinCos接口/index
+   LogicalNot接口/index
+   LogicalAnd接口/index
+   LogicalAnds接口/index
+   LogicalOr接口/index
+   LogicalOrs接口/index
+   LogicalXor接口/index
+   BitwiseNot接口/index
+   BitwiseAnd接口/index
+   BitwiseOr接口/index
+   BitwiseXor接口/index
+   Where接口/index
+   更多样例
