@@ -31,7 +31,6 @@
                 -   [TPipe-TQue编程范式](编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue编程范式.md)
                 -   [深入理解TPipe-TQue设计原理](编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/深入理解TPipe-TQue设计原理.md)
         -   [AI Core SIMT编程](编程指南/编程模型/AI-Core-SIMT编程/AI-Core-SIMT编程.md)
-            -   [概述](编程指南/编程模型/AI-Core-SIMT编程/概述.md)
             -   [抽象硬件架构](编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md)
             -   [线程架构](编程指南/编程模型/AI-Core-SIMT编程/线程架构.md)
             -   [内存层级](编程指南/编程模型/AI-Core-SIMT编程/内存层级.md)
