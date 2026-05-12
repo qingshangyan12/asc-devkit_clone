@@ -15,7 +15,9 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "CMAKE_ASC_ARCHITECTURES, e.g. dav-2201, dav-3510")
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu")
+
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "CMAKE_ASC_ARCHITECTURES, e.g. dav-2201")
 
 add_executable(demo
     set_atomic_deterministic_computation.asc
