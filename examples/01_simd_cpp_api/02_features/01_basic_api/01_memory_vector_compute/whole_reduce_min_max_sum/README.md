@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍归约类接口在多种场景下的使用方法，包括WholeReduceMax、WholeReduceMin、WholeReduceSum、RepeatReduceSum，以及WholeReduceMin配合GetReduceRepeatMaxMinSpr获取全局最小值及索引的使用方法。这些接口用于对LocalTensor中每个repeat内所有元素进行归约运算（求最大值、最小值或求和），归约结果存放到目的LocalTensor中。
+本样例介绍归约类接口在多种场景下的使用方法，包括ReduceRepeat，以及ReduceRepeat<MIN>配合GetReduceRepeatMaxMinSpr获取全局最小值及索引的使用方法。这些接口用于对LocalTensor中每个repeat内所有元素进行归约运算（求最大值、最小值或求和），归约结果存放到目的LocalTensor中。
 
 注：`GetReduceRepeatMaxMinSpr`为 CANN 9.0.0 重命名后的 API。CANN 8.5.0 及之前版本请使用`GetReduceMaxMinCount`。
 
@@ -30,41 +30,41 @@
 
 本样例通过编译参数 `SCENARIO_NUM` 选择不同的归约场景，所有场景数据格式为 ND，核函数名为 `reduce_custom`。
 
-**场景1：WholeReduceMax**
+**场景1：ReduceRepeat<MAX>**
 - 输入：[1, 1024]个half元素，mask=128，repeat=8（1024/128）
 - 输出：[1, 8]个half元素（8个最大值，不返回索引）
-- 实现：`WholeReduceMax<half>(dstLocal, srcLocal, mask=128, repeat=8, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_VALUE)`
+- 实现：`ReduceRepeat<ReduceType::MAX, half>(dstLocal, srcLocal, mask=128, repeat=8, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_VALUE)`
 - 说明：使用ORDER_ONLY_VALUE参数，只返回最大值不返回索引，输出存储顺序为[max0, max1, max2, ...]
 
-**场景2：WholeReduceMin**
+**场景2：ReduceRepeat<MIN>**
 - 输入：[1, 1024]个half元素，mask=128，repeat=8（1024/128）
 - 输出：[1, 16]个half元素（8个最小值 + 8个索引，交错存储）
-- 实现：`WholeReduceMin<half>(dstLocal, srcLocal, mask=128, repeat=8, 1, 1, 8)`
+- 实现：`ReduceRepeat<ReduceType::MIN, half>(dstLocal, srcLocal, mask=128, repeat=8, 1, 1, 8)`
 - 说明：使用默认order（ORDER_VALUE_INDEX），输出按 [min0, idx0, min1, idx1, ...] 交错存储
 
-**场景3：WholeReduceSum**
+**场景3：ReduceRepeat<SUM>**
 - 输入：[1, 2048]个float元素，mask=64（float类型32位，mask范围为[1,64]），repeat=32（2048/64）
 - 输出：[1, 32]个float元素（每个repeat的求和结果）
-- 实现：`WholeReduceSum<float>(dstLocal, srcLocal, mask=64, repeat=32, 1, 1, 8)`
+- 实现：`ReduceRepeat<ReduceType::SUM, float>(dstLocal, srcLocal, mask=64, repeat=32, 1, 1, 8)`
 - 说明：每个repeat独立求和，共输出32个求和结果
 
-**场景4：RepeatReduceSum**
+**场景4：ReduceRepeat<SUM>累加模式**
 - 输入：[1, 2048]个float元素，mask=64（float类型32位，mask范围为[1,64]），repeat=32（2048/64）
 - 输出：[1, 32]个float元素（累加模式）
-- 实现：先用 `Duplicate` 初始化dstLocal为0，再调用 `RepeatReduceSum<float>(dstLocal, srcLocal, repeat=32, mask=64, dstBlkStride=0, 1, 1, 8)`
+- 实现：先用 `Duplicate` 初始化dstLocal为0，再调用 `ReduceRepeat<ReduceType::SUM, float>(dstLocal, srcLocal, mask=64, repeat=32, dstBlkStride=0, 1, 1, 8)`
 - 说明：dstBlkStride=0表示将所有repeat的结果累加到同一位置，每个repeat结果依次存放
 
-**场景5：WholeReduceMin + GetReduceRepeatMaxMinSpr**
+**场景5：ReduceRepeat<MIN> + GetReduceRepeatMaxMinSpr**
 - 输入：[1, 1024]个half元素，mask逐bit模式（uint64_t[2]全1），repeat=8（1024/128）
 - 输出：[1, 16]个half元素（仅前2个元素有效：全局最小值 + 全局最小值索引）
-- 实现：先调用 `WholeReduceMin<half>(dstLocal, srcLocal, mask=uint64_t[2]{-1,-1}, repeat=8, 1, 1, 8)`，再调用 `GetReduceRepeatMaxMinSpr<half>(val, idx)` 获取全局最小值及其索引，通过 `SetFlag<HardEvent::V_S>` / `WaitFlag<HardEvent::V_S>` 同步向量计算到标量计算
-- 说明：WholeReduceMin对8个repeat分别求局部最小值，GetReduceRepeatMaxMinSpr从硬件寄存器中读取所有repeat中的全局最小值及其在源数据中的索引位置，结果写入dstLocal的前两个元素
+- 实现：先调用 `ReduceRepeat<ReduceType::MIN, half>(dstLocal, srcLocal, mask=uint64_t[2]{-1,-1}, repeat=8, 1, 1, 8)`，再调用 `GetReduceRepeatMaxMinSpr<half>(val, idx)` 获取全局最小值及其索引，通过 `SetFlag<HardEvent::V_S>` / `WaitFlag<HardEvent::V_S>` 同步向量计算到标量计算
+- 说明：ReduceRepeat<MIN>对8个repeat分别求局部最小值，GetReduceRepeatMaxMinSpr从硬件寄存器中读取所有repeat中的全局最小值及其在源数据中的索引位置，结果写入dstLocal的前两个元素
 
-**场景6：WholeReduceSum非对齐场景**
+**场景6：ReduceRepeat<SUM>非对齐场景**
 - 输入：[13, 57]个float元素（13行×57列，列数57×4字节=228字节，非32字节对齐）
 - 输出：[1, 13]个float元素（每行的求和结果）
-- 实现：使用 `DataCopyPad` 搬入非对齐数据，`WholeReduceSum<float>(dstLocal, srcLocal, mask=57, repeat=13, 1, 1, srcStride)` 对每行求和
-- 说明：演示非对齐数据场景下的归约操作。每行57个float元素（228字节），使用DataCopyPad搬运时按32字节对齐填充至232字节（58个float元素），WholeReduceSum的srcRepeatStride按对齐后的block数计算
+- 实现：使用 `DataCopyPad` 搬入非对齐数据，`ReduceRepeat<ReduceType::SUM, float>(dstLocal, srcLocal, mask=57, repeat=13, 1, 1, srcStride)` 对每行求和
+- 说明：演示非对齐数据场景下的归约操作。每行57个float元素（228字节），使用DataCopyPad搬运时按32字节对齐填充至232字节（58个float元素），ReduceRepeat<SUM>的srcRepeatStride按对齐后的block数计算
 
 ## 样例规格
 

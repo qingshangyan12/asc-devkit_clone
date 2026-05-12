@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍了调用WholeReduceSum和BlockReduceSum高阶API实现reduce算子，实现了连续内存上数据元素的累加，返回累加结果的功能。
+本样例介绍了调用ReduceRepeat<SUM>和ReduceDataBlock<SUM>高阶API实现reduce算子，实现了连续内存上数据元素的累加，返回累加结果的功能。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -51,15 +51,15 @@
 
     样例将一段连续的输入做累加，得到这段连续buffer内元素的和。
 
-      - 1、在小于256B时，ComputeKey = 1，采用WholeReduceSum一次性可以得到结果。
+      - 1、在小于256B时，ComputeKey = 1，采用ReduceRepeat<SUM>一次性可以得到结果。
 
-      - 2、长度在float输入(256B,2KB]，或者half输入(256B,4KB]时，ComputeKey = 2。由于同样长度的输入，BlockReduceSum比WholeReduceSum的执行速度更快，所以采用一条BlockReduceSum加一条WholeReduceSum的做法，得到更高的计算效率。
+      - 2、长度在float输入(256B,2KB]，或者half输入(256B,4KB]时，ComputeKey = 2。由于同样长度的输入，ReduceDataBlock<SUM>比ReduceRepeat<SUM>的执行速度更快，所以采用一条ReduceDataBlock<SUM>加一条ReduceRepeat<SUM>的做法，得到更高的计算效率。
 
-      - 3、长度在float输入(2KB,16KB]，或者half输入(4KB,32KB]时，ComputeKey = 3。由于一条WholeReduceSum的累加效率比使用两条BlockReduceSum的累加效率更高。所以采用两条WholeReduceSum（而不是两条BlockReduceSum+一条WholeReduceSum），得到这段buffer的累加和。
+      - 3、长度在float输入(2KB,16KB]，或者half输入(4KB,32KB]时，ComputeKey = 3。由于一条ReduceRepeat<SUM>的累加效率比使用两条ReduceDataBlock<SUM>的累加效率更高。所以采用两条ReduceRepeat<SUM>（而不是两条ReduceDataBlock<SUM>+一条ReduceRepeat<SUM>），得到这段buffer的累加和。
 
-      - 4、长度在float输入为10000时，ComputeKey = 4，对应WholeReduceSumImpl中的处理方法，在Counter模式下，采用WholeReduceSum指令，循环处理二维数据中的每一行，得到每一行的归约运行结果。
+      - 4、长度在float输入为10000时，ComputeKey = 4，对应WholeReduceSumImpl中的处理方法，在Counter模式下，采用ReduceRepeat<SUM>指令，循环处理二维数据中的每一行，得到每一行的归约运行结果。
 
-      - 5、长度在float输入为20000时，ComputeKey = 5，对应BinaryReduceSumImpl中的处理方法，在Counter模式下，先将运算数据一分为二，使用Add指令将两部分数据相加，循环往复，最后一条WholeReduceSum指令得到归约的运行结果。此种操作方式，相比较WholeReduceSum单指令操作的方式，在数据量较大，循环次数较多的场景下，性能更优。  
+      - 5、长度在float输入为20000时，ComputeKey = 5，对应BinaryReduceSumImpl中的处理方法，在Counter模式下，先将运算数据一分为二，使用Add指令将两部分数据相加，循环往复，最后一条ReduceRepeat<SUM>指令得到归约的运行结果。此种操作方式，相比较ReduceRepeat<SUM>单指令操作的方式，在数据量较大，循环次数较多的场景下，性能更优。  
       注意代码中使用了Counter模式。
 
   - Kernel实现  

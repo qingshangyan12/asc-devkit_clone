@@ -1,8 +1,8 @@
-# PairReduceSum样例
+# ReducePairElem<SUM>样例
 
 ## 概述
 
-本样例在归约场景下，基于接口PairReduceSum对数据（a1, a2, a3, a4, a5, a6...）的相邻两个元素求和为（a1+a2, a3+a4, a5+a6, ......），即对每个pair（偶数下标与奇数下标组成的相邻元素对）进行求和归约，输出元素个数为输入的一半。
+本样例在归约场景下，基于接口ReducePairElem<SUM>对数据（a1, a2, a3, a4, a5, a6...）的相邻两个元素求和为（a1+a2, a3+a4, a5+a6, ......），即对每个pair（偶数下标与奇数下标组成的相邻元素对）进行求和归约，输出元素个数为输入的一半。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -27,13 +27,13 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例中调用PairReduceSum接口，对输入元素中所有的相邻元素对执行求和计算。样例规格如下表所示：
+  本样例中调用ReducePairElem<SUM>接口，对输入元素中所有的相邻元素对执行求和计算。样例规格如下表所示：
 
   <table border="2">
-  <caption>表1：PairReduceSum样例规格</caption>
+  <caption>表1：ReducePairElem<SUM>样例规格</caption>
   <tr>
   <td rowspan="1" align="center">样例类型(OpType)</td>
-  <td colspan="4" align="center">PairReduceSum</td></tr>
+  <td colspan="4" align="center">ReducePairElem<SUM></td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
    <tr><td rowspan="2" align="center">样例输出</td></tr>
@@ -43,7 +43,7 @@
   </table>
 
 - 样例实现：  
-  本样例中实现的是固定shape为输入x[1, 128]，输出y[1, 64]的PairReduceSum样例。
+  本样例中实现的是固定shape为输入x[1, 128]，输出y[1, 64]的ReducePairElem<SUM>样例。
 
   Compute任务负责对srcLocal中每对相邻元素（偶数下标与奇数下标）求和，并将结果存储在dstLocal中。
 
