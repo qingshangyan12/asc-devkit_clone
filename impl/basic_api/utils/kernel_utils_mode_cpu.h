@@ -289,7 +289,7 @@ public:
     uint8_t* cpuL0BMx = nullptr;
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
     const std::map<Hardware, uint32_t> bufferInitLen = {
-        { Hardware::GM, 1024 * 1024 }, { Hardware::UB, 1024 * 128 },    { Hardware::L1, 1024 * 1024 },
+        { Hardware::GM, 1024 * 1024 }, { Hardware::UB, 1024 * 256 },    { Hardware::L1, 1024 * 1024 },
         { Hardware::L0A, 1024 * 64 },  { Hardware::L0B, 1024 * 64 },    { Hardware::L0C, 1024 * 256 },
         { Hardware::BIAS, 1024 * 64 }, { Hardware::FIXBUF, 1024 * 64 },
     };
@@ -313,7 +313,7 @@ public:
     };
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113))
     const std::map<Hardware, uint32_t> bufferInitLen = {
-        { Hardware::GM, 1024 * 1024 }, { Hardware::UB, TOTAL_UB_SIZE },   { Hardware::L1, TOTAL_L1_SIZE },
+        { Hardware::GM, 1024 * 1024 }, { Hardware::UB, 1024 * 128 },   { Hardware::L1, TOTAL_L1_SIZE },
         { Hardware::L0A, 1024 * 32 },  { Hardware::L0B, 1024 * 32 },   { Hardware::L0C, 1024 * 64 },
         { Hardware::BIAS, 1024 * 1 },  { Hardware::FIXBUF, 1024 * 6 },
     };
