@@ -239,7 +239,7 @@ add_executable(demo
 )
 #.....
 target_compile_options(demo PRIVATE
-    # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
+    # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号。
     # <COMPILE_LANGUAGE:ASC>:表明该编译选项仅对语言ASC生效
     $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-3510>
 )
@@ -249,7 +249,7 @@ target_compile_options(demo PRIVATE
 
 ```cmake
 target_compile_options(demo PRIVATE
-    # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
+    # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号。
     # <COMPILE_LANGUAGE:ASC>:表明该编译选项仅对语言ASC生效
     # --enable-simt: 表明启动SIMT 方式编译
     $<$<COMPILE_LANGUAGE:ASC>: --npu-arch=dav-3510 --enable-simt>
@@ -292,7 +292,7 @@ target_compile_options(demo PRIVATE
 内置编译宏开关列表如下：
  -   **ASCENDC\_DUMP** 用于控制Dump开关，默认开关打开，开发者调用printf/DumpTensor/assert后会有信息打印（需要注意直调工程的kernel文件内存在host函数，如果在host函数内调用了printf接口，也会触发kernel内的printf相关初始化动作，进而影响kernel的执行性能\)；设置为0后，表示开关关闭。示例如下：
      ```shell
-     // 关闭所有算子的printf打印功能
+     # 关闭所有算子的printf打印功能
      bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DASCENDC_DUMP=0
      ```
  -   **ASCENDC\_DEBUG** 用于控制Ascend C API的调测开关，默认开关关闭；增加该编译宏后，表示开关打开，此时接口内部的assert校验生效，校验不通过会有assert日志打屏。开启该功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。示例如下：
