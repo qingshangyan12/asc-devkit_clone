@@ -94,6 +94,35 @@ using GetAttributeLocation = typename LocationTypeCombo::locationType2Location::
 template <typename T>
 using GetAttributeElementType = typename LocationTypeCombo::locationType2Type::template Get<T>;
 
+template <typename T, typename = void>
+struct NormalizeAttrType {
+    using type = T;
+};
+
+template <typename T>
+struct NormalizeAttrType<T, void_t<GetAttributeElementType<T>>> {
+    using type = GetAttributeElementType<T>;
+};
+
+template <typename A, typename... BList>
+struct CheckAllSame;
+
+template <typename A, typename B, typename... RestB>
+struct CheckAllSame<A, B, RestB...> {
+    using NormalizedA = typename NormalizeAttrType<A>::type;
+    using NormalizedB = typename NormalizeAttrType<B>::type;
+    static constexpr bool value = Std::is_same_v<NormalizedA, NormalizedB> || CheckAllSame<A, RestB...>::value;
+};
+
+template <typename A>
+struct CheckAllSame<A> { static constexpr bool value = false; };
+
+template <typename A, typename... BList>
+constexpr bool IsOneOfAttrV = CheckAllSame<A, BList...>::value;
+
+template <typename DataType>
+inline constexpr bool IsB4Type = IsOneOfAttrV<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t>;
+
 } // namespace Te
 } // namespace AscendC
 

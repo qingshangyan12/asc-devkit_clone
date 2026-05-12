@@ -75,35 +75,6 @@ namespace Location {
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
 
-template <typename T, typename = void>
-struct NormalizeAttrType {
-    using type = T;
-};
-
-template <typename T>
-struct NormalizeAttrType<T, void_t<GetAttributeElementType<T>>> {
-    using type = GetAttributeElementType<T>;
-};
-
-template <typename A, typename... BList>
-struct CheckAllSame;
-
-template <typename A, typename B, typename... RestB>
-struct CheckAllSame<A, B, RestB...> {
-    using NormalizedA = typename NormalizeAttrType<A>::type;
-    using NormalizedB = typename NormalizeAttrType<B>::type;
-    static constexpr bool value = Std::is_same_v<NormalizedA, NormalizedB> || CheckAllSame<A, RestB...>::value;
-};
-
-template <typename A>
-struct CheckAllSame<A> { static constexpr bool value = false; };
-
-template <typename A, typename... BList>
-constexpr bool IsOneOfAttrV = CheckAllSame<A, BList...>::value;
-
-template <typename DataType>
-inline constexpr bool IsB4Type = IsOneOfAttrV<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t>;
-
 template<typename T = Std::ignore_t>
 __aicore__ inline constexpr size_t GetC0Size() {
     constexpr size_t c0Size = 32;
