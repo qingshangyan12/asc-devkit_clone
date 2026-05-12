@@ -32,6 +32,10 @@ __aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Params& ...params
 template <typename T, typename... Params>
 __aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Params& ...params);
 
+template <typename T, typename U, typename S, typename... Params>
+__aicore__ inline Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U> && IsAttrTensorV<S>, void>
+Mmad(const T& dst, const U& fm, const S& filter, const Params& ...params);
+
 template <typename... Args>
 __aicore__ inline auto MakeMmad(const Args& ...traits);
 

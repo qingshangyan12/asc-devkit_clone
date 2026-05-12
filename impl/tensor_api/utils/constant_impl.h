@@ -174,6 +174,9 @@ struct IsIntegralConstant<Std::Int<Value>> : Std::true_type {};
 template <typename T>
 constexpr bool IsIntegralConstantV = IsIntegralConstant<T>::value;
 
+template <typename T>
+using GetTensorLocation = typename Std::remove_cvref_t<T>::iterator::ptrPattern;
+
 } // namespace Te
 } // namespace AscendC
 

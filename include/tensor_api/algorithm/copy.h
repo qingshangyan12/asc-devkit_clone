@@ -32,6 +32,10 @@ __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params
 template <typename T, typename... Params>
 __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params);
 
+template <typename T, typename U, typename... Params>
+__aicore__ inline Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U>, void>
+Copy(const T& dst, const U& src, const Params& ...params);
+
 template <typename... Args>
 __aicore__ inline auto MakeCopy(const Args& ...traits);
 
