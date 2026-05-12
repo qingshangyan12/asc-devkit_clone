@@ -24,6 +24,7 @@
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_FRAME_H
 
 #include "impl/tensor_api/tensor/layout_pattern.h"
+#include "impl/tensor_api/tensor/enable_if.h"
 
 namespace AscendC {
 namespace Te {
@@ -70,7 +71,7 @@ template <typename T>
 constexpr bool IsFrameLayoutTraitV = IsFrameLayoutTrait<T>::value;
 
 template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>,
-    Std::enable_if_t<!IsIntegralConstantV<TraitType>, int> = 0, typename... Args>
+    EnableIfNotIntegralConstant<TraitType> = 0, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
     static_assert(IsFrameLayoutTraitV<TraitType>,
         "MakeFrameLayout<LayoutPattern, TraitType>(...) expects TraitType to define type and C0_ELEMENT.");
@@ -80,7 +81,7 @@ __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
 }
 
 template <typename LayoutPattern, typename IntType,
-    Std::enable_if_t<IsIntegralConstantV<IntType>, int> = 0, typename... Args>
+    EnableIfIntegralConstant<IntType> = 0, typename... Args>
 __aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args) {
     using LayoutMaker = typename LayoutFormatSet::template Get<LayoutPattern>;
     static_assert(!Std::is_same_v<LayoutMaker, EmptyValue>, "Unsupported layout pattern.");

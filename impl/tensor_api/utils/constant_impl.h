@@ -23,7 +23,6 @@
 #define IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
 
 #include "impl/tensor_api/utils/extra_impl.h"
-#include "impl/tensor_api/utils/map_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -74,53 +73,6 @@ namespace Location {
 
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
-
-template <typename T>
-struct locationAttr {
-    using gmAttr =          __gm__      T*;
-    using cbufAttr =        __cbuf__    T*;
-    using caAttr =          __ca__      T*;
-    using cbAttr =          __cb__      T*;
-    using ccAttr =          __cc__      T*;
-    using ubufAttr =        __ubuf__    T*;
-    using fbufAttr =        __fbuf__    T*;
-    using ssbufAttr =       __ssbuf__   T*;
-    using biasbufAttr =     __biasbuf__ T*;
-
-    using type = Std::tuple<gmAttr, cbufAttr, caAttr, cbAttr, ccAttr, ubufAttr, fbufAttr, ssbufAttr, biasbufAttr>;
-
-    using locationMap = TupleMap<Std::tuple<Location::GM, gmAttr>, Std::tuple<Location::L1, cbufAttr>, Std::tuple<Location::L0A, caAttr>,
-    Std::tuple<Location::L0B, cbAttr>, Std::tuple<Location::L0C, ccAttr>, Std::tuple<Location::UB, ubufAttr>, 
-    Std::tuple<Location::BIAS, biasbufAttr>, Std::tuple<Location::FIXBUF, fbufAttr>>;
-};
-
-template <typename A, typename ProcessedTuple>
-struct AllElementsSameAsA;
-
-template <typename A, typename First, typename... Rest>
-struct AllElementsSameAsA<A, Std::tuple<First, Rest...>> {
-    static constexpr bool value = Std::is_same_v<A, typename IterEle<First>::type> || AllElementsSameAsA<A, Std::tuple<Rest...>>::value;
-};
-
-template <typename A>
-struct AllElementsSameAsA<A, Std::tuple<>> { static constexpr bool value = false; };
-
-template <typename A, typename... BList>
-struct CheckAllSame;
-
-template <typename A, typename B, typename... RestB>
-struct CheckAllSame<A, B, RestB...> {
-    static constexpr bool value =  Std::is_same_v<A, B> || AllElementsSameAsA<A, typename locationAttr<B>::type>::value || CheckAllSame<A, RestB...>::value;
-};
-
-template <typename A>
-struct CheckAllSame<A> { static constexpr bool value = false; };
-
-template <typename A, typename... BList>
-constexpr bool IsOneOfAttrV = CheckAllSame<A, BList...>::value;
-
-template <typename DataType>
-inline constexpr bool IsB4Type = IsOneOfAttrV<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t>;
 
 template<typename T = Std::ignore_t>
 __aicore__ inline constexpr size_t GetC0Size() {
