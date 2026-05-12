@@ -19,6 +19,7 @@
 #include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "include/adv_api/hccl/internal/hccl_tiling_msg.h"
 #include "tiling/platform/platform_ascendc.h"
+#include "utils/tiling/platform/platform_ascendc_internal.h"
 #include "hccl_symbol_loader.h"
 
 using namespace std;

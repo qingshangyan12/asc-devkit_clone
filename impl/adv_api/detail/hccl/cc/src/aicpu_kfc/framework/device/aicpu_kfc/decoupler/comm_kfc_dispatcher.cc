@@ -121,7 +121,11 @@ HcclResult PrepareProcess(AscCommServerInfo &server, u32 &expectSeqNum)
         HCCL_INFO("Expect seq id %u but receive %u.", expectSeqNum, seqNum);
         ++(server.retryCnt);
     } else {
+        u64 startTime = GetCurCpuTimestamp(false);
         CHK_RET(server.serverIns.Orchestrate(server.msg, *(server.extMsg), server.msgPos));
+        u64 endTime = GetCurCpuTimestamp(false);
+        HCCL_ERROR("startTime: %llu, endTime: %llu, useTime: %llu", startTime, endTime, endTime - startTime);
+
         server.msgPos = (server.msgPos + 1U) % HCCL_MSG_CNT;
         ++expectSeqNum;
         server.retryCnt = 0;
