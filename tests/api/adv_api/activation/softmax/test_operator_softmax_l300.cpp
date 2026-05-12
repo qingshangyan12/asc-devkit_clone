@@ -92,15 +92,7 @@ private:
         AdjustSoftMaxRes<T1, T2, isDataFormatNZ>(srcLocal1, inmaxLocal, 9, (T1)1.0, alignSrcShape);
         SoftMax<T1, false, isBasicBlock>(srcLocal1, srcLocal1, tiling, unalignedSrcShape);
         AdjustSoftMaxRes<T1, T2, isDataFormatNZ>(srcLocal1, inmaxLocal, 9, (T1)1.0, unalignedSrcShape);
-        
 
-        if constexpr (sizeof(T1) == sizeof(T2)) {
-            AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-            AscendC::PopStackBuffer<uint8_t, AscendC::TPosition::LCM>(sharedTmpBuffer);
-            LogSoftMaxTiling logTiling;
-            LogSoftMax<T1, false, isDataFormatNZ>(srcLocal1, insumLocal, inmaxLocal, srcLocal1, sharedTmpBuffer, logTiling, alignSrcShape);
-            LogSoftMax<T1, false, isDataFormatNZ>(srcLocal1, insumLocal, inmaxLocal, srcLocal1, sharedTmpBuffer, logTiling, unalignedSrcShape);
-        }
 
         SoftmaxFlash<T1, false, isBasicBlock>(dstLocal, insumLocal, inmaxLocal, srcLocal1, expMaxTensor, insumLocal,
             inmaxLocal, tiling, false, alignSrcShape);
