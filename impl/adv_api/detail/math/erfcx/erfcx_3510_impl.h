@@ -26,6 +26,8 @@
 
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
+#include <cfloat>
+#include <cmath>
 
 namespace AscendC {
 namespace ERFCX {
@@ -117,7 +119,7 @@ __simd_vf__ inline void ErfcxCoreImpl(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint
         Reg::MaskReg fullMask = Reg::CreateMask<float, Reg::MaskPattern::ALL>();
 
         Reg::RegTensor<float> srcReg, axReg, resultReg;
-        Reg::RegTensor<float> tmpReg, tmp2Reg;
+        Reg::RegTensor<float> tmpReg, tmp2Reg, tmpFmaReg;
         Reg::MaskReg maskLo, maskHi;
         Reg::MaskReg maskNeg, maskNegNoInf, maskInf;
 
@@ -145,10 +147,12 @@ __simd_vf__ inline void ErfcxCoreImpl(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint
         Reg::Muls(tmpReg, tmpReg, -4.0f, maskLo);
         Reg::Add(tmpReg, tmpReg, axReg, maskLo);
         Reg::Neg(tmp2Reg, tReg, maskLo);
-        Reg::Fma(tmpReg, tmp2Reg, axReg, maskLo);
+        Reg::Mul(tmpFmaReg, tmp2Reg, axReg, maskLo);
+        Reg::Add(tmpReg, tmpReg, tmpFmaReg, maskLo);
 
         // t = fmaf(inv_ax_plus_4, residual_t, t)
-        Reg::Fma(tReg, invAxP4Reg, tmpReg, maskLo);
+        Reg::Mul(tmpFmaReg, invAxP4Reg, tmpReg, maskLo);
+        Reg::Add(tReg, tReg, tmpFmaReg, maskLo);
 
         // p(t)  polynomial evaluation
         Reg::RegTensor<float> pReg;
@@ -169,10 +173,12 @@ __simd_vf__ inline void ErfcxCoreImpl(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint
         Reg::Sub(tmpReg, tmpReg, qReg, maskLo);
 
         // result = fmaf(residual_q, inv_denom, q)
-        Reg::Fma(qReg, tmpReg, invDenomReg, maskLo);
+        Reg::Mul(tmpFmaReg, tmpReg, invDenomReg, maskLo);
+        Reg::Add(qReg, qReg, tmpFmaReg, maskLo);
 
         // Save low-path result into resultReg
-        Reg::Copy<float, Reg::MaskMergeMode::ZEROING>(resultReg, qReg, maskLo);
+        Reg::Duplicate(resultReg, 0.0f, fullMask);
+        Reg::Copy<float, Reg::MaskMergeMode::MERGING>(resultReg, qReg, maskLo);
 
         // ---- ax >= kThreshold: asymptotic expansion ----
         Reg::Not(maskHi, maskLo, fullMask);
@@ -203,13 +209,12 @@ __simd_vf__ inline void ErfcxCoreImpl(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint
         Reg::Mul(axSqReg, axReg, axReg, maskNeg);
         Reg::Exp(expReg, axSqReg, maskNeg);
 
-        // Check isinf(exp_term): compare bits with +inf
-        Reg::RegTensor<uint32_t>& expBits = (Reg::RegTensor<uint32_t>&)expReg;
-        Reg::CompareScalar<uint32_t, CMPMODE::EQ>(maskInf, expBits, U32_POS_INF, maskNeg);
+        // Check isinf(exp_term): compare with FLT_MAX to detect overflow
+        Reg::Compares<float, CMPMODE::GT>(maskInf, expReg, FLT_MAX, maskNeg);
 
         // maskInf: result = +inf
         Reg::RegTensor<float> infReg;
-        Reg::Duplicate((Reg::RegTensor<uint32_t>&)infReg, U32_POS_INF);
+        Reg::Duplicate(infReg, INFINITY, fullMask);
         Reg::Copy<float, Reg::MaskMergeMode::MERGING>(resultReg, infReg, maskInf);
 
         // maskNeg & !maskInf: result = 2 * exp_term - result

@@ -1,0 +1,78 @@
+[ascendc_acl_stub.cpp][check_interface:319]
+========================================
+  Erfcx API Test (single-core, dav-3510)
+========================================
+
+[Test 1] Normal positive values
+[TmSim]: Run in serial mode.
+toml_name_: 1982_cloud_config.toml
+[INFO] Config file [1982_cloud_config.toml] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0/x86_64-linux/simulator/dav_3510/lib/1982_cloud_config.toml
+[SUCCESS][CORE_0][pid 236917] exit success!
+  [PASS] Positive values [0..10] (16 elements)
+
+[Test 2] Small values near zero
+[TmSim]: Run in serial mode.
+toml_name_: 1982_cloud_config.toml
+[INFO] Config file [1982_cloud_config.toml] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0/x86_64-linux/simulator/dav_3510/lib/1982_cloud_config.toml
+[SUCCESS][CORE_0][pid 236922] exit success!
+  [PASS] Small values near zero (15 elements)
+
+[Test 3] Negative values
+[TmSim]: Run in serial mode.
+toml_name_: 1982_cloud_config.toml
+[INFO] Config file [1982_cloud_config.toml] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0/x86_64-linux/simulator/dav_3510/lib/1982_cloud_config.toml
+[SUCCESS][CORE_0][pid 236983] exit success!
+  [PASS] Negative values (13 elements)
+
+[Test 4] Large positive values (asymptotic)
+[TmSim]: Run in serial mode.
+toml_name_: 1982_cloud_config.toml
+[INFO] Config file [1982_cloud_config.toml] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0/x86_64-linux/simulator/dav_3510/lib/1982_cloud_config.toml
+[SUCCESS][CORE_0][pid 236987] exit success!
+  [PASS] Large positive values (13 elements)
+
+[Test 5] Large negative values (overflow)
+[TmSim]: Run in serial mode.
+toml_name_: 1982_cloud_config.toml
+[INFO] Config file [1982_cloud_config.toml] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0/x86_64-linux/simulator/dav_3510/lib/1982_cloud_config.toml
+[SUCCESS][CORE_0][pid 236988] exit success!
+  [PASS] Large negative values (6 elements)
+
+[Test 6] Special values
+[TmSim]: Run in serial mode.
+toml_name_: 1982_cloud_config.toml
+[INFO] Config file [1982_cloud_config.toml] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0/x86_64-linux/simulator/dav_3510/lib/1982_cloud_config.toml
+[SUCCESS][CORE_0][pid 236989] exit success!
+  [PASS] Special values (inf, -inf, nan, -1, +/-0) (6 elements)
+
+[Test 7] Values near threshold (10.055)
+[TmSim]: Run in serial mode.
+toml_name_: 1982_cloud_config.toml
+[INFO] Config file [1982_cloud_config.toml] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0/x86_64-linux/simulator/dav_3510/lib/1982_cloud_config.toml
+[SUCCESS][CORE_0][pid 237005] exit success!
+  [PASS] Values near threshold (10 elements)
+
+[Test 8] Edge / boundary values
+[TmSim]: Run in serial mode.
+toml_name_: 1982_cloud_config.toml
+[INFO] Config file [1982_cloud_config.toml] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0/x86_64-linux/simulator/dav_3510/lib/1982_cloud_config.toml
+[SUCCESS][CORE_0][pid 237006] exit success!
+  [PASS] Edge / boundary values (9 elements)
+
+[Test 9] Bulk random test (2048 elements)
+[TmSim]: Run in serial mode.
+toml_name_: 1982_cloud_config.toml
+[INFO] Config file [1982_cloud_config.toml] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0/x86_64-linux/simulator/dav_3510/lib/1982_cloud_config.toml
+[SUCCESS][CORE_0][pid 237007] exit success!
+  [PASS] Bulk random [-8, 16] (2048) (2048 elements)
+
+[Test 10] Monotonic sequence
+[TmSim]: Run in serial mode.
+toml_name_: 1982_cloud_config.toml
+[INFO] Config file [1982_cloud_config.toml] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0/x86_64-linux/simulator/dav_3510/lib/1982_cloud_config.toml
+[SUCCESS][CORE_0][pid 237195] exit success!
+  [PASS] Monotonic [-4, 12] (256) (256 elements)
+
+========================================
+  ALL TESTS PASSED
+========================================

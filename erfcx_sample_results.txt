@@ -1,0 +1,26 @@
+========================================
+  Erfcx API Test (single-core, dav-3510)
+========================================
+[Test 1] Normal positive values
+  [PASS] Positive values [0..10] (16 elements)
+[Test 2] Small values near zero
+  [PASS] Small values near zero (15 elements)
+[Test 3] Negative values
+  [PASS] Negative values (13 elements)
+[Test 4] Large positive values (asymptotic)
+  [PASS] Large positive values (13 elements)
+[Test 5] Large negative values (overflow)
+  [PASS] Large negative values (6 elements)
+[Test 6] Special values
+  [PASS] Special values (inf, -inf, nan, -1, +/-0) (6 elements)
+[Test 7] Values near threshold (10.055)
+  [PASS] Values near threshold (10 elements)
+[Test 8] Edge / boundary values
+  [PASS] Edge / boundary values (9 elements)
+[Test 9] Bulk random test (2048 elements)
+  [PASS] Bulk random [-8, 16] (2048) (2048 elements)
+[Test 10] Monotonic sequence
+  [PASS] Monotonic [-4, 12] (256) (256 elements)
+========================================
+  ALL TESTS PASSED
+========================================
