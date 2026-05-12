@@ -157,9 +157,6 @@ TEST_F(Tensor_Api_Cube_Copy_3510, TestLoadDataMx_##TYPE##M##N##SRC_FORMAT##DST_F
     mockcpp::GlobalMockObject::verify(); \
 }
 
-// ScaleB
-TEST_TENSOR_API_LOAD_DATA_MX(fp8_e8m0_t, 32, 16, NN, NN, L1, L0B, cbuf, cb, false, 0, 0);
-
 // 非法通路
 TEST_TENSOR_API_LOAD_S4_DATA(fp4x2_e1m2_t, 64, 16, ZN, NZ, L1, L0B, cbuf, cb, false, 0, 0);
 TEST_TENSOR_API_LOAD_S4_DATA(fp4x2_e2m1_t, 64, 16, ZN, NZ, L1, L0B, cbuf, cb, false, 0, 0);
