@@ -98,8 +98,8 @@ TEST_P(NchwconvTestsuite, NchwconvTestCase)
 {
     auto param = GetParam();
     TransDataTo5HDParams nchwconvParams;
-    nchwconvParams.dstHighHalf = param.dstHigh;
-    nchwconvParams.srcHighHalf = param.srcHigh;
+    nchwconvParams.dstEnHighHalf = param.dstHigh;
+    nchwconvParams.srcEnHighHalf = param.srcHigh;
     nchwconvParams.repeatTimes = param.repTimes;
     nchwconvParams.dstRepStride = param.dstRep;
     nchwconvParams.srcRepStride = param.srcRep;

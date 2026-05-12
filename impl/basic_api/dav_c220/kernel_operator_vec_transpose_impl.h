@@ -70,13 +70,13 @@ template <typename T>
 __aicore__ inline void TransDataTo5HDB8IntrinsicsImpl(__ubuf__ T* dstList[16], __ubuf__ T* srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    if ((transDataTo5HDParams.dstHighHalf == false) && (transDataTo5HDParams.srcHighHalf == false)) {
+    if ((transDataTo5HDParams.dstEnHighHalf == false) && (transDataTo5HDParams.srcEnHighHalf == false)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, false);
-    } else if ((transDataTo5HDParams.dstHighHalf == false) && (transDataTo5HDParams.srcHighHalf == true)) {
+    } else if ((transDataTo5HDParams.dstEnHighHalf == false) && (transDataTo5HDParams.srcEnHighHalf == true)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, true);
-    } else if ((transDataTo5HDParams.dstHighHalf == true) && (transDataTo5HDParams.srcHighHalf == true)) {
+    } else if ((transDataTo5HDParams.dstEnHighHalf == true) && (transDataTo5HDParams.srcEnHighHalf == true)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, true, true);
     } else {
@@ -156,13 +156,13 @@ template <typename T>
 __aicore__ inline void TransDataTo5HDB8IntrinsicsImpl(uint64_t dstList[16], uint64_t srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    if ((transDataTo5HDParams.dstHighHalf == false) && (transDataTo5HDParams.srcHighHalf == false)) {
+    if ((transDataTo5HDParams.dstEnHighHalf == false) && (transDataTo5HDParams.srcEnHighHalf == false)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, false);
-    } else if ((transDataTo5HDParams.dstHighHalf == false) && (transDataTo5HDParams.srcHighHalf == true)) {
+    } else if ((transDataTo5HDParams.dstEnHighHalf == false) && (transDataTo5HDParams.srcEnHighHalf == true)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, true);
-    } else if ((transDataTo5HDParams.dstHighHalf == true) && (transDataTo5HDParams.srcHighHalf == true)) {
+    } else if ((transDataTo5HDParams.dstEnHighHalf == true) && (transDataTo5HDParams.srcEnHighHalf == true)) {
         scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, true, true);
     } else {
@@ -331,12 +331,12 @@ __aicore__ inline void TransBroadCastForB8Cal(const LocalTensor<T> &dst, const L
     }
     params.transDataParams1.dstRepStride = params.transDataParams1.repeatTimes > 1 ? ONE_BLK_SIZE : 0;
     params.transDataParams1.srcRepStride = params.transDataParams1.repeatTimes > 1 ? (params.imageBlockNum) : 0;
-    params.transDataParams1.dstHighHalf = false;
-    params.transDataParams1.srcHighHalf = false;
+    params.transDataParams1.dstEnHighHalf = false;
+    params.transDataParams1.srcEnHighHalf = false;
     TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
     PipeBarrier<PIPE_V>();
-    params.transDataParams1.dstHighHalf = true;
-    params.transDataParams1.srcHighHalf = false;
+    params.transDataParams1.dstEnHighHalf = true;
+    params.transDataParams1.srcEnHighHalf = false;
     TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
     PipeBarrier<PIPE_V>();
 
@@ -348,12 +348,12 @@ __aicore__ inline void TransBroadCastForB8Cal(const LocalTensor<T> &dst, const L
     }
     params.transDataParams1.dstRepStride = params.transDataParams1.repeatTimes > 1 ? ONE_BLK_SIZE : 0;
     params.transDataParams1.srcRepStride = params.transDataParams1.repeatTimes > 1 ? (params.imageBlockNum) : 0;
-    params.transDataParams1.dstHighHalf = false;
-    params.transDataParams1.srcHighHalf = true;
+    params.transDataParams1.dstEnHighHalf = false;
+    params.transDataParams1.srcEnHighHalf = true;
     TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
     PipeBarrier<PIPE_V>();
-    params.transDataParams1.dstHighHalf = true;
-    params.transDataParams1.srcHighHalf = true;
+    params.transDataParams1.dstEnHighHalf = true;
+    params.transDataParams1.srcEnHighHalf = true;
     TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
 }
 
@@ -367,8 +367,8 @@ __aicore__ inline void TransFracForB8Cal(const LocalTensor<T> &dst, const LocalT
     for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
         params.srcList2[n] = (__ubuf__ T *)src[n * params.blockSize].GetPhyAddr();
     }
-    params.transDataParams2.dstHighHalf = false;
-    params.transDataParams2.srcHighHalf = false;
+    params.transDataParams2.dstEnHighHalf = false;
+    params.transDataParams2.srcEnHighHalf = false;
     TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
     PipeBarrier<PIPE_V>();
 
@@ -378,8 +378,8 @@ __aicore__ inline void TransFracForB8Cal(const LocalTensor<T> &dst, const LocalT
     for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
         params.srcList2[n] = (__ubuf__ T *)src[n * params.blockSize].GetPhyAddr();
     }
-    params.transDataParams2.dstHighHalf = false;
-    params.transDataParams2.srcHighHalf = true;
+    params.transDataParams2.dstEnHighHalf = false;
+    params.transDataParams2.srcEnHighHalf = true;
     TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
     PipeBarrier<PIPE_V>();
 
@@ -389,8 +389,8 @@ __aicore__ inline void TransFracForB8Cal(const LocalTensor<T> &dst, const LocalT
     for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
         params.srcList2[n] = (__ubuf__ T *)src[B8_TRANS_FRACTAL + n * params.blockSize].GetPhyAddr();
     }
-    params.transDataParams2.dstHighHalf = true;
-    params.transDataParams2.srcHighHalf = false;
+    params.transDataParams2.dstEnHighHalf = true;
+    params.transDataParams2.srcEnHighHalf = false;
     TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
     PipeBarrier<PIPE_V>();
 
@@ -400,8 +400,8 @@ __aicore__ inline void TransFracForB8Cal(const LocalTensor<T> &dst, const LocalT
     for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
         params.srcList2[n] = (__ubuf__ T *)src[B8_TRANS_FRACTAL + n * params.blockSize].GetPhyAddr();
     }
-    params.transDataParams2.dstHighHalf = true;
-    params.transDataParams2.srcHighHalf = true;
+    params.transDataParams2.dstEnHighHalf = true;
+    params.transDataParams2.srcEnHighHalf = true;
     TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
 }
 

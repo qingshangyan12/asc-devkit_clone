@@ -25,19 +25,19 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-// __aicore__ inline void asc_transto5hd_b8_impl(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
-#define asc_transto5hd_b8_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half)                 \
+// __aicore__ inline void asc_transto5hd_b8_impl(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_en_high_half, bool src_en_high_half)
+#define asc_transto5hd_b8_impl(dst, src, repeat, dst_stride, src_stride, dst_en_high_half, src_en_high_half)                 \
     do {                                                                                                               \
         if ASC_IS_AIV {                                                                                                \
-            scatter_vnchwconv_b8((dst), (src), (repeat), (dst_stride), (src_stride), (dst_high_half),                  \
-                                 (src_high_half));                                                                     \
+            scatter_vnchwconv_b8((dst), (src), (repeat), (dst_stride), (src_stride), (dst_en_high_half),                  \
+                                 (src_en_high_half));                                                                     \
         }                                                                                                              \
     } while (0)
 
-// __aicore__ inline void asc_transto5hd_b8_sync_impl(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
-#define asc_transto5hd_b8_sync_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half)            \
+// __aicore__ inline void asc_transto5hd_b8_sync_impl(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_en_high_half, bool src_en_high_half)
+#define asc_transto5hd_b8_sync_impl(dst, src, repeat, dst_stride, src_stride, dst_en_high_half, src_en_high_half)            \
     do {                                                                                                               \
-        asc_transto5hd_b8_impl((dst), (src), (repeat), (dst_stride), (src_stride), (dst_high_half), (src_high_half));  \
+        asc_transto5hd_b8_impl((dst), (src), (repeat), (dst_stride), (src_stride), (dst_en_high_half), (src_en_high_half));  \
         asc_sync_post_process();                                                                                       \
     } while (0)
 

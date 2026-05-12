@@ -67,15 +67,26 @@ struct TransDataTo5HDParams {
 
     constexpr __aicore__ TransDataTo5HDParams(const bool dstHighHalfIn, const bool srcHighHalfIn, const uint8_t repeatTimesIn,
         const uint16_t dstRepStrideIn, const uint16_t srcRepStrideIn)
-        : dstHighHalf(dstHighHalfIn),
-          srcHighHalf(srcHighHalfIn),
+        : dstEnHighHalf(dstHighHalfIn),
+          srcEnHighHalf(srcHighHalfIn),
           repeatTimes(repeatTimesIn),
           dstRepStride(dstRepStrideIn),
           srcRepStride(srcRepStrideIn)
     {}
 
-    bool dstHighHalf = false;
-    bool srcHighHalf = false;
+    // 联合体实现新旧成员名共享内存空间
+    union {
+        bool dstEnHighHalf = false;  // 新成员名
+        [[deprecated("NOTICE: dstHighHalf has been deprecated. Please use dstEnHighHalf instead.")]]
+        bool dstHighHalf;                // 旧成员名，已废弃
+    };
+
+    union {
+        bool srcEnHighHalf = false;  // 新成员名
+        [[deprecated("NOTICE: srcHighHalf has been deprecated. Please use srcEnHighHalf instead.")]]
+        bool srcHighHalf;                // 旧成员名，已废弃
+    };
+
     uint8_t repeatTimes = 1;
     uint16_t dstRepStride = 0;
     uint16_t srcRepStride = 0;
