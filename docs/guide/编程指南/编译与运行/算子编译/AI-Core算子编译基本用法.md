@@ -279,7 +279,7 @@ target_compile_options(demo PRIVATE
           mix.asc
     )
     ```
-表1 常用的CMAKE配置变量说明
+**表1 常用的CMAKE配置变量说明**
 |  变量名称| 配置说明 |
 |--|--|
 |CMAKE_BUILD_TYPE  | 编译模式选项，可配置为：“Release”，Release版本，不包含调试信息，编译最终发布的版本。“Debug”，Debug版本，包含调试信息，便于开发者开发和调试。 |
