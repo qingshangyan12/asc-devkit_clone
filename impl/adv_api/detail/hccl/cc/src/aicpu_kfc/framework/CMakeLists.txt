@@ -1020,7 +1020,7 @@ if(DEVICE_MODE AND KERNEL_MODE)
         -lpthread
     )
 
-    add_library(aicpu_custom SHARED)
+    add_library(aicpu_custom SHARED EXCLUDE_FROM_ALL)
     get_target_property(CCL_KERNEL_ALL_SOURCES ccl_kernel SOURCES)
     if(CCL_KERNEL_ALL_SOURCES)
         list(REMOVE_DUPLICATES CCL_KERNEL_ALL_SOURCES)
