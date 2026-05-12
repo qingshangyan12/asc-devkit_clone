@@ -23,7 +23,6 @@
 #define IMPL_TENSOR_API_TENSOR_COORD_INDEX_H
 
 #include "impl/tensor_api/tensor/layout_definition.h"
-#include "impl/tensor_api/tensor/enable_if.h"
 
 namespace AscendC {
 namespace Te {
