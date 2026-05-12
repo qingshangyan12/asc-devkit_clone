@@ -53,9 +53,19 @@ u64 InsTempAllGatherMesh1D::CalcScratchMultiple(BufferType inBuffType, BufferTyp
     return scratchMultiple;
 }
 
+// #define NSEC_PER_SEC 1000000000U
+
+// inline u64 GetCurCpuTimestamp()
+// {
+//     struct timespec timestamp;
+//     (void)clock_gettime(CLOCK_MONOTONIC_RAW, &timestamp);
+//     return static_cast<u64>((timestamp.tv_sec * NSEC_PER_SEC) + (timestamp.tv_nsec));
+// }
+
 HcclResult InsTempAllGatherMesh1D::KernelRun(const OpParam &param, const TemplateDataParams &tempAlgParams,
                                              const TemplateResource &templateResource)
 {
+    // u64 Time1 = GetCurCpuTimestamp();
     enableRemoteMemAccess_ = tempAlgParams.enableRemoteMemAccess;
     HCCL_INFO("[InsTempAllGatherMesh1D] Run start");
     if (tempAlgParams.sliceSize == 0 && tempAlgParams.tailSize ==0) {
@@ -63,6 +73,7 @@ HcclResult InsTempAllGatherMesh1D::KernelRun(const OpParam &param, const Templat
         return HCCL_SUCCESS;
     }
     threadNum_ = templateResource.threads.size();
+    HCCL_RUN_INFO("[RunALLtoALL] subThreads.size(): %llu", threadNum_);
     tempAlgParams_ = tempAlgParams;
     dataType_ = param.DataDes.dataType;
     HCCL_DEBUG("[InsTempAllGatherMesh1D] Rank [%d], get threadNum_[%d].", myRank_, threadNum_);
@@ -70,11 +81,15 @@ HcclResult InsTempAllGatherMesh1D::KernelRun(const OpParam &param, const Templat
     if (templateRankSize_ == 1) {
         return HcclResult::HCCL_SUCCESS;
     }
+    // u64 Time2 = GetCurCpuTimestamp();
+    // HCCL_RUN_INFO("[RunGather][1] startTime: %llu, endTime: %llu, useTime: %llu", Time1, Time2, Time2 - Time1);
     if (threadNum_ > 1) {
         std::vector<ThreadHandle> subThreads(templateResource.threads.begin() + 1, templateResource.threads.end());
         GetNotifyIdxMainToSub(notifyIdxMainToSub_);
         CHK_RET(PreSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxMainToSub_));
     }
+    // u64 Time3 = GetCurCpuTimestamp();
+    // HCCL_RUN_INFO("[RunGather][2] startTime: %llu, endTime: %llu, useTime: %llu", Time2, Time3, Time3 - Time2);
 
     CHK_RET(RunAllGatherMesh(templateResource.threads, templateResource.channels));
 
@@ -83,9 +98,13 @@ HcclResult InsTempAllGatherMesh1D::KernelRun(const OpParam &param, const Templat
         GetNotifyIdxSubToMain(notifyIdxSubToMain_);
         CHK_RET(PostSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxSubToMain_));
     }
+    // u64 Time4 = GetCurCpuTimestamp();
+    // HCCL_RUN_INFO("[RunGather][3] startTime: %llu, endTime: %llu, useTime: %llu", Time3, Time4, Time4 - Time3);
     if (opMode_ == OpMode::OPBASE) {
         CHK_RET(PostLocalCopy(templateResource.threads));
     }
+    // u64 Time5 = GetCurCpuTimestamp();
+    // HCCL_RUN_INFO("[RunGather][4] startTime: %llu, endTime: %llu, useTime: %llu", Time4, Time5, Time5 - Time4);
     HCCL_INFO("[InsTempAllGatherMesh1D] Run End");
     return HcclResult::HCCL_SUCCESS;
 }
