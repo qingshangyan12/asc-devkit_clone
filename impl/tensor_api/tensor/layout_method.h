@@ -147,6 +147,9 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape) {
     }
 }
 
+template <typename LayoutType>
+using EnableIfLayout = Std::enable_if_t<IsLayoutV<LayoutType>>;
+
 template <size_t... Is, typename LayoutType,
     typename = EnableIfLayout<LayoutType>>
 __aicore__ inline constexpr auto GetShape(const LayoutType& layout)

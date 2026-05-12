@@ -27,9 +27,6 @@
 namespace AscendC {
 namespace Te {
 
-template <typename LayoutType>
-using EnableIfLayout = Std::enable_if_t<IsLayoutV<LayoutType>>;
-
 template <typename TraitType>
 using EnableIfNotIntegralConstant = Std::enable_if_t<!IsIntegralConstantV<TraitType>, int>;
 
@@ -38,15 +35,6 @@ using EnableIfIntegralConstant = Std::enable_if_t<IsIntegralConstantV<IntType>, 
 
 template <typename Tuple>
 using EnableIfTuple = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>;
-
-template <typename... Args>
-using FirstArgT = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
-
-template <typename... Args>
-using EnableIfMemPtrIterator = Std::enable_if_t<IsMemPtrIterator<FirstArgT<Args...>>::value, int>;
-
-template <typename... Args>
-using EnableIfNotMemPtrIterator = Std::enable_if_t<!IsMemPtrIterator<FirstArgT<Args...>>::value, int>;
 
 } // namespace Te
 } // namespace AscendC
