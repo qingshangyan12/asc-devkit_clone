@@ -4,6 +4,8 @@
 
 本样例在归约场景下，基于接口ReducePairElem<SUM>对数据（a1, a2, a3, a4, a5, a6...）的相邻两个元素求和为（a1+a2, a3+a4, a5+a6, ......），即对每个pair（偶数下标与奇数下标组成的相邻元素对）进行求和归约，输出元素个数为输入的一半。
 
+注：`ReducePairElem`为 CANN 9.1.0 重命名后的 API。CANN 9.0.0 及之前版本请使用`PairReduceSum`。
+
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT

@@ -4,6 +4,7 @@
 
 本样例介绍归约类接口在多种场景下的使用方法，包括ReduceRepeat，以及ReduceRepeat<MIN>配合GetReduceRepeatMaxMinSpr获取全局最小值及索引的使用方法。这些接口用于对LocalTensor中每个repeat内所有元素进行归约运算（求最大值、最小值或求和），归约结果存放到目的LocalTensor中。
 
+注：`ReduceRepeat`为 CANN 9.1.0 重命名后的 API。CANN 9.0.0 及之前版本请使用`WholeReduceMax`，`WholeReduceMin`，`WholeReduceSum`。
 注：`GetReduceRepeatMaxMinSpr`为 CANN 9.0.0 重命名后的 API。CANN 8.5.0 及之前版本请使用`GetReduceMaxMinCount`。
 
 ## 支持的产品
