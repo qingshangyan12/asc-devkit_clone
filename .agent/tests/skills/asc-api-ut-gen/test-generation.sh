@@ -146,6 +146,8 @@ from ut_generator import (  # noqa: E402
     TEMPLATES,
     UTConfig,
     UTGenerator,
+    create_generator,
+    get_adv_profile_output_path,
 )
 from ut_generator_cli import default_kernel_params  # noqa: E402
 
@@ -165,10 +167,40 @@ finally:
     del TEMPLATES["_self_template"]
 
 assert rendered == "${B} ok"
+
+adv_profile = {
+    "source": "tests/api/adv_api/quantization/quantize/test_quantize_per_tensor.cpp",
+    "output": "tests/api/adv_api/quantization/quantize/test_quantize_per_tensor.cpp",
+}
+assert get_adv_profile_output_path("Quantize", {"adv_profile": adv_profile}).endswith(
+    adv_profile["output"]
+)
+
+adv_config = UTConfig(
+    api_type=ApiType.ADV,
+    api_name="Quantize",
+    chip=ChipArch.ASCEND910B1,
+    kernel_params={"adv_profile": adv_profile},
+)
+adv_code = create_generator(adv_config).generate()
+assert "QuantizeParams" in adv_code
+assert "Quantize<config>" in adv_code
+assert "main_Quantize<" not in adv_code
+
+try:
+    create_generator(UTConfig(api_type=ApiType.ADV, api_name="UnknownAdv", chip=ChipArch.ASCEND910B1)).generate()
+except ValueError as exc:
+    assert "cannot infer an executable high-level API UT signature" in str(exc)
+else:
+    raise AssertionError("unknown ADV API must fail closed instead of generating a non-executable skeleton")
 PY
 }
 
 self_test_generator_helpers
+
+if grep -Eq '"?(Softmax|Quantize|TopK|DropOut|dropout|quantize|softmax|topk)"?' "${SKILL_DIR}/scripts/ut_generator.py"; then
+    fail "ut_generator.py must not hard-code API-specific ADV profiles"
+fi
 
 run_case() {
     local name="$1"
@@ -176,12 +208,14 @@ run_case() {
     local golden="${GOLDEN_DIR}/${name}.cpp"
     local actual="${WORK_DIR}/${name}.cpp"
     local api_type
+    local api_name
     local chip
 
     [[ -f "$fixture" ]] || fail "missing fixture: $fixture"
     [[ -f "$golden" ]] || fail "missing golden: $golden"
 
     api_type="$(json_field "$fixture" "api_type")"
+    api_name="$(json_field "$fixture" "api_name")"
     chip="$(json_field "$fixture" "chip")"
     seen_api_types="$(mark_seen "$seen_api_types" "$api_type")"
     seen_chips="$(mark_seen "$seen_chips" "$chip")"
@@ -199,7 +233,75 @@ run_case() {
     if [[ "$api_type" == "reg" ]] && ! grep -Fq "dstGlobal.SetValue(i, src0Global.GetValue(i));" "$actual"; then
         fail "generated reg UT must write initialized data back to dst GM: $name"
     fi
+    if [[ "$api_type" == "adv" ]] && grep -Fq "main_${api_name}<" "$actual"; then
+        fail "generated adv UT must not reference an undefined main_${api_name} template: $name"
+    fi
+    if [[ "$api_type" == "adv" ]] && grep -Fq "TODO: 添加实际验证逻辑" "$actual"; then
+        fail "generated adv UT must not keep generic validation TODO: $name"
+    fi
     diff -u "$golden" "$actual" || fail "generated UT differs from golden: $name"
+}
+
+assert_contains() {
+    local file="$1"
+    local needle="$2"
+    local label="$3"
+
+    grep -Fq "$needle" "$file" || fail "missing ${label}: ${needle}"
+}
+
+assert_not_contains() {
+    local file="$1"
+    local needle="$2"
+    local label="$3"
+
+    if grep -Fq "$needle" "$file"; then
+        fail "unexpected ${label}: ${needle}"
+    fi
+}
+
+assert_adv_profile_output() {
+    local api="$1"
+    local source="$2"
+    local output="${3:-$2}"
+    shift 3
+    local actual="${WORK_DIR}/adv_${api}.cpp"
+    local config="${WORK_DIR}/adv_${api}.json"
+
+    python3 - "$config" "$api" "$source" "$output" <<'PY'
+import json
+import sys
+
+config_path, api_name, source, output = sys.argv[1:5]
+with open(config_path, "w", encoding="utf-8") as f:
+    json.dump(
+        {
+            "api_type": "adv",
+            "api_name": api_name,
+            "chip": "ascend910b1",
+            "test_cases": [],
+            "kernel_params": {
+                "adv_profile": {
+                    "source": source,
+                    "output": output,
+                }
+            },
+            "custom_includes": [],
+            "output_dir": None,
+        },
+        f,
+    )
+PY
+
+    python3 "$CLI" --config "$config" --output "$actual" >/dev/null
+    assert_not_contains "$actual" "TODO: 添加实际验证逻辑" "${api} generic validation TODO"
+    assert_not_contains "$actual" "${api}<T1, T2>(dstLocal, srcLocal, {height, width})" "${api} old generic call"
+    assert_not_contains "$actual" "main_${api}<" "${api} undefined old main wrapper"
+
+    while (($# > 0)); do
+        assert_contains "$actual" "$1" "${api} executable profile marker"
+        shift
+    done
 }
 
 supported_output="${WORK_DIR}/list-supported.txt"
@@ -223,6 +325,34 @@ if python3 "$CLI" --type simt --api vector_add --chip ascend910b1 --output - >"$
 fi
 grep -Fq "SIMT API only supports ascend950pr_9599" "$invalid_output" || \
     fail "SIMT rejection must use generation-constraints.json message"
+
+invalid_adv_output="${WORK_DIR}/invalid-adv.txt"
+if python3 "$CLI" --type adv --api UnknownAdv --chip ascend910b1 --output - >"$invalid_adv_output" 2>&1; then
+    fail "unknown ADV generation must fail closed instead of generating a non-executable skeleton"
+fi
+grep -Fq "cannot infer an executable high-level API UT signature" "$invalid_adv_output" || \
+    fail "unknown ADV rejection must explain executable profile requirement"
+
+assert_adv_profile_output \
+    Softmax \
+    "tests/api/adv_api/activation/softmax/test_operator_softmax_v220.cpp" \
+    "tests/api/adv_api/activation/softmax/test_operator_softmax_v220.cpp" \
+    "MainSoftmax" "SoftMaxShapeInfo"
+assert_adv_profile_output \
+    Quantize \
+    "tests/api/adv_api/quantization/quantize/test_quantize_per_tensor.cpp" \
+    "tests/api/adv_api/quantization/quantize/test_quantize_per_tensor.cpp" \
+    "QuantizeParams" "QuantizePolicy::PER_TENSOR" "sharedTmpBuffer"
+assert_adv_profile_output \
+    TopK \
+    "tests/api/adv_api/sort/topk/test_operator_topk.cpp" \
+    "tests/api/adv_api/sort/topk/test_operator_topk.cpp" \
+    "TopKInfo" "TopkTiling" "outputGmIndex"
+assert_adv_profile_output \
+    DropOut \
+    "tests/api/adv_api/filter/dropout/test_operator_dropout.cpp" \
+    "tests/api/adv_api/filter/dropout/test_operator_dropout.cpp" \
+    "DropOutShapeInfo" "maskLastAxis" "EXPECT_EQ"
 
 coverage_report="${WORK_DIR}/coverage.html"
 cat > "$coverage_report" <<'EOF'

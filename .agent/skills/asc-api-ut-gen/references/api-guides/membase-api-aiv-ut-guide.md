@@ -39,15 +39,20 @@ AIV (AI Vector) 核心专门用于向量计算：
 
 ### 2.2 架构适配
 
-不同架构对应不同的 impl 目录和测试目录：
+AIV UT 不在本 guide 中维护完整芯片映射表。芯片调用名、`__NPU_ARCH__`、`SocVersion` 和 `arch_dir`
+统一从 [`asc-npu-arch`](../../../asc-npu-arch/SKILL.md) 及
+[`npu-arch-facts.json`](../../../asc-npu-arch/references/npu-arch-facts.json) 获取。
 
-| impl 目录 | NPU_ARCH | 芯片名 | 测试目录 |
-|-----------|----------|--------|----------|
-| dav_c100 | 1001 | ascend910 | ascendc_case_ascend910_aiv |
-| dav_c220 | 2201 | ascend910b1 | ascendc_case_ascend910b1_aiv |
-| dav_m200 | 2002 | ascend310p, ascend610 | ascendc_case_ascend310p_aiv |
-| dav_m300 | 3002 | ascend310b1 | ascendc_case_ascend310b1_aiv |
-| dav_3510 | 3510 | ascend950pr_9599 | ascendc_case_ascend950pr_9599_aiv |
+AIV 场景只保留测试目录推导规则：
+
+```text
+tests/api/basic_api/${arch_dir}/${arch_dir}_aiv/
+```
+
+生成 UT 时还需要从目标 API 的实际 `impl/basic_api/dav_*` 实现文件和已有同类 UT 确认：
+- 目标 API 在该架构下是否存在实现；
+- 目标 API 是否有架构条件分支或特殊参数结构；
+- 目标架构已有 AIV UT 使用的目录、target 和编译宏模式。
 
 ### 2.3 数据类型支持
 
@@ -337,35 +342,11 @@ enum class BlockMode : uint8_t {
 
 ## 8. 常见问题
 
-### Q1: 编译报错找不到底层指令？
+AIV guide 只保留 AIV 特有约束。以下公共排障项统一查看 [常见问题与解决方案](../troubleshooting/faq.md)：
 
-**问题**：`undefined reference to 'vadd'`
-
-**解决**：
-- 检查 cce_stub.h 是否已声明该指令
-- 确认架构设置正确
-
-### Q2: TmpBuffer 大小如何确定？
-
-**问题**：API 签名中包含 sharedTmpBuffer 参数，如何确定大小？
-
-**解决**：
-1. 查看 API 头文件注释
-2. 从 impl 文件分析内部计算
-3. 参考现有测试文件
-
-### Q3: 枚举类使用错误？
-
-**问题**：编译报错枚举类未定义
-
-**解决**：
-```cpp
-// ❌ 错误: 枚举类需要使用完整路径
-RoundMode mode = CAST_RINT;  // 未指定枚举类
-
-// ✅ 正确
-RoundMode mode = RoundMode::CAST_RINT;
-```
+- [编译报错找不到底层指令](../troubleshooting/faq.md#7-编译报错找不到底层指令)
+- [TmpBuffer / workspace 大小与分支覆盖](../troubleshooting/faq.md#6-tmpbuffer--workspace-大小与分支覆盖)
+- [枚举类作用域错误](../troubleshooting/faq.md#10-枚举类作用域错误)
 
 ---
 

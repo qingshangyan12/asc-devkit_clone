@@ -248,31 +248,11 @@ __aicore__ void ProcessWithTmpBuffer(GM_ADDR x, GM_ADDR y, uint32_t dataSize) {
 
 ## 8. 常见问题
 
-### Q1: Buffer 数量超限怎么办？
+LocalTensor / TPipe 的公共排障项统一归档到 [常见问题与解决方案](../troubleshooting/faq.md)：
 
-**问题**：编译报错提示 Buffer 数量超过限制。
-
-**解决**：
-1. 检查一个 kernel 中所有 `InitBuffer` 调用的数量总和
-2. 优化内存复用，减少 Buffer 数量
-3. 使用 double buffer 需要两倍 Buffer 数量
-
-### Q2: 内存大小计算错误？
-
-**问题**：运行时出现内存访问越界。
-
-**解决**：
-1. 确保 `len` 参数考虑 32 字节对齐
-2. 使用 `count * sizeof(T)` 计算 len
-3. 对于需要临时空间的 API，参考同类 API 的测试代码
-
-### Q3: 混用自定义地址和自动分配？
-
-**问题**：内存冲突或数据损坏。
-
-**解决**：
-- **不建议混用**自定义地址 `InitBuffer` 与不指定地址的 `InitBuffer`
-- 统一使用一种分配方式
+- [数据对齐与内存大小计算](../troubleshooting/faq.md#8-数据对齐与内存大小计算)
+- [LocalTensor / TPipe Buffer 初始化问题](../troubleshooting/faq.md#9-localtensor--tpipe-buffer-初始化问题)
+- [TmpBuffer / workspace 大小与分支覆盖](../troubleshooting/faq.md#6-tmpbuffer--workspace-大小与分支覆盖)
 
 ---
 

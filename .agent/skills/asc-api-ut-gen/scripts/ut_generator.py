@@ -35,6 +35,7 @@ from typing import List, Optional, Dict, Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 SKILL_DIR = SCRIPT_DIR.parent
 SKILLS_DIR = SKILL_DIR.parent
+REPO_ROOT = SKILL_DIR.parents[2]
 NPU_ARCH_FACTS_PATH = SKILLS_DIR / "asc-npu-arch" / "references" / "npu-arch-facts.json"
 GENERATION_CONSTRAINTS_PATH = SKILL_DIR / "references" / "foundations" / "generation-constraints.json"
 REFERENCE_CONSTRAINT_FILES = {
@@ -192,6 +193,56 @@ class UTConfig:
     custom_includes: List[str] = field(default_factory=list)
     kernel_params: Dict[str, Any] = field(default_factory=dict)
     output_dir: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class AdvApiProfile:
+    """Executable high-level API UT profile backed by an existing same-category UT."""
+    source: str
+    output: str
+
+
+def normalize_adv_api_name(api_name: str) -> str:
+    """Normalize high-level API names for executable profile lookup."""
+    return re.sub(r"[^a-z0-9]+", "", api_name.lower())
+
+
+def _load_adv_profile_entry(api_name: str, raw_profile: Any) -> AdvApiProfile:
+    """Create an executable Adv profile from the explicit per-run config."""
+    if not isinstance(raw_profile, dict):
+        raise ValueError(f"invalid ADV profile for {api_name!r}: expected object")
+
+    source = raw_profile.get("source")
+    output = raw_profile.get("output", source)
+    if not isinstance(source, str) or not source:
+        raise ValueError(f"invalid ADV profile for {api_name!r}: missing source")
+    if not isinstance(output, str) or not output:
+        raise ValueError(f"invalid ADV profile for {api_name!r}: missing output")
+
+    return AdvApiProfile(source=source, output=output)
+
+
+def get_adv_api_profile(api_name: str, kernel_params: Dict[str, Any]) -> Optional[AdvApiProfile]:
+    """Return an executable high-level API profile explicitly supplied by this run."""
+    kernel_params = kernel_params or {}
+    profile = kernel_params.get("adv_profile", {})
+    if not profile:
+        return None
+    return _load_adv_profile_entry(normalize_adv_api_name(api_name), profile)
+
+
+def get_adv_profile_output_path(api_name: str, kernel_params: Dict[str, Any]) -> Optional[str]:
+    """Return the output path for an explicitly supplied high-level API profile."""
+    profile = get_adv_api_profile(api_name, kernel_params)
+    return profile.output if profile is not None else None
+
+
+def normalize_generated_cpp(code: str) -> str:
+    """Normalize generated C++ text without changing semantic content."""
+    normalized = "\n".join(line.rstrip() for line in code.splitlines())
+    if code.endswith("\n"):
+        normalized += "\n"
+    return normalized
 
 
 # =============================================================================
@@ -991,37 +1042,25 @@ class ADVUTGenerator(UTGenerator):
     """高阶 API 测试生成器"""
 
     def generate(self) -> str:
-        variables = {
-            'COPYRIGHT': TEMPLATES['copyright'],
-            'API_NAME': self.config.api_name,
-            'API_NAME_UPPER': self.config.api_name.upper(),
-            'API_CALL': f'{self.config.api_name}<T1, T2>(dstLocal, srcLocal, {{height, width}});',
-        }
-
-        # 生成测试参数
-        test_params = []
-        for tc in self.config.test_cases:
-            dtype_info = DTYPE_MAP.get(tc.dtype, DTYPE_MAP["half"])
-            func_name = f"main_{self.config.api_name}<{tc.dtype}>"
-            height = tc.additional_params.get('height', 8)
-            width = tc.additional_params.get('width', 128)
-            test_params.append(
-                f"{self.config.api_name}TestParams {{ {dtype_info['size']}, "
-                f"{height}, {width}, {func_name} }}"
+        profile = get_adv_api_profile(self.config.api_name, self.config.kernel_params)
+        if profile is None:
+            raise ValueError(
+                "AdvUTGenerator cannot infer an executable high-level API UT "
+                f"signature for {self.config.api_name!r}. Generic ADV skeleton "
+                "generation is disabled because high-level APIs require "
+                "API-specific params, workspace, multi-output handling, and "
+                "validation. Pass kernel_params.adv_profile with an explicit "
+                "same-category UT source or write an API-specific UT."
             )
-        variables['TEST_PARAMS'] = ',\n        '.join(test_params)
 
-        parts = [
-            self.render('adv_basic', {
-                **variables,
-                'KERNEL_CLASS': self.render('adv_kernel_class', variables),
-                'PARAM_STRUCT': self.render('adv_param_struct', variables),
-                'TEST_CLASS': self.render('adv_test_class', variables),
-                'INSTANTIATION': self.render('adv_instantiation', variables),
-                'TEST_CASE': self.render('adv_test_case', variables),
-            })
-        ]
-        return '\n'.join(parts)
+        source_path = REPO_ROOT / profile.source
+        if not source_path.is_file():
+            raise FileNotFoundError(
+                f"ADV executable profile for {self.config.api_name!r} points to "
+                f"a missing reference UT: {source_path}"
+            )
+
+        return normalize_generated_cpp(source_path.read_text(encoding="utf-8"))
 
 
 class SIMTUTGenerator(UTGenerator):

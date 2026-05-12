@@ -15,7 +15,12 @@
       }
     }
   ],
-  "kernel_params": {},
+  "kernel_params": {
+    "adv_profile": {
+      "source": "tests/api/adv_api/activation/softmax/test_operator_softmax_v220.cpp",
+      "output": "tests/api/adv_api/activation/softmax/test_operator_softmax_v220.cpp"
+    }
+  },
   "custom_includes": [],
   "output_dir": null
 }

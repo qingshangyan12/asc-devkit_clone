@@ -47,19 +47,24 @@ AIC (AI Cube) 核心专门用于矩阵计算：
 | **数据位置** | L0A, L0B, L0C (CO1), L1 |
 | **Tensor 类型** | `TQue<TPosition::A1/A2/B1/B2/CO1/CO2>` |
 
-### 2.2 架构适配
+### 2.3 架构适配
 
-不同架构对应不同的 impl 目录和测试目录：
+AIC UT 不在本 guide 中维护完整芯片映射表。芯片调用名、`__NPU_ARCH__`、`SocVersion` 和 `arch_dir`
+统一从 [`asc-npu-arch`](../../../asc-npu-arch/SKILL.md) 及
+[`npu-arch-facts.json`](../../../asc-npu-arch/references/npu-arch-facts.json) 获取。
 
-| impl 目录 | NPU_ARCH | 芯片名 | 测试目录 |
-|-----------|----------|--------|----------|
-| dav_c100 | 1001 | ascend910 | ascendc_case_ascend910_aic |
-| dav_c220 | 2201 | ascend910b1 | ascendc_case_ascend910b1_aic |
-| dav_m200 | 2002 | ascend310p, ascend610 | ascendc_case_ascend310p_aic |
-| dav_m300 | 3002 | ascend310b1 | ascendc_case_ascend310b1_aic |
-| dav_3510 | 3510 | ascend950pr_9599 | ascendc_case_ascend950pr_9599_aic |
+AIC 场景只保留测试目录推导规则：
 
-### 2.3 数据类型支持
+```text
+tests/api/basic_api/${arch_dir}/${arch_dir}_aic/
+```
+
+生成 UT 时还需要从目标 API 的实际 `impl/basic_api/dav_*` 实现文件和已有同类 UT 确认：
+- 目标 API 在该架构下是否存在实现；
+- 目标 API 是否有架构条件分支或特殊参数结构；
+- 目标架构已有 AIC UT 使用的目录、target 和编译宏模式。
+
+### 2.4 数据类型支持
 
 **必须从目标架构 impl 文件确认数据类型支持：**
 
@@ -432,32 +437,13 @@ params.mSize = m;
 
 ## 12. 常见问题
 
-### Q1: 参数结构初始化失败？
+AIC guide 只保留 AIC 特有约束。以下公共排障项统一查看 [常见问题与解决方案](../troubleshooting/faq.md)：
 
-**问题**：`no matching constructor for initialization of 'FixpipeParamsV220'`
-
-**解决**：使用成员赋值替代花括号初始化
-
-### Q2: 段错误/核心转储？
-
-**问题**：运行时崩溃
-
-**解决**：
-- 使用类封装避免直接调用底层
-- 参考同架构下已有成功测试模式
-- 检查 QuantMode 与类型组合是否正确
-
-### Q3: 核心类型设置错误？
-
-**问题**：测试执行失败，设备状态异常
-
-**解决**：确保 SetUp 中设置 `g_coreType = AIC_TYPE`，TearDown 中调用 `CheckSyncState()` 并恢复 `MIX_TYPE`
-
-### Q4: Buffer 初始化失败？
-
-**问题**：TQue 位置设置错误
-
-**解决**：确认使用正确的 TPosition（A1/A2/B1/B2/CO1 位置）
+- [参数结构初始化问题](../troubleshooting/faq.md#1-参数结构初始化问题)
+- [Mock/Stub 函数参数不匹配](../troubleshooting/faq.md#2-mockstub-函数参数不匹配)
+- [核心类型不匹配](../troubleshooting/faq.md#3-核心类型不匹配)
+- [QuantMode 与数据类型组合](../troubleshooting/faq.md#4-quantmode-与数据类型组合)
+- [LocalTensor / TPipe Buffer 初始化问题](../troubleshooting/faq.md#9-localtensor--tpipe-buffer-初始化问题)
 
 ---
 

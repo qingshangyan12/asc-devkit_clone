@@ -52,5 +52,5 @@
 - API 类型 guide 不重复维护编译命令、覆盖率流程和通用模板，统一链接到 `workflows/` 或 `foundations/`。
 - `workflows/` 只描述流程、命令、验证和报告，不维护单个 API 类型的参数细节。
 - `foundations/` 只维护跨 API 通用材料，不固化具体 API 的 dtype 支持范围。
-- 脚本可读取 `foundations/generation-constraints.json` 和 `../asc-npu-arch/references/npu-arch-facts.json`，不要解析 Markdown 表格或在脚本中复制芯片/dtype 表；通用模板可直接初始化的 dtype 也应从结构化 facts 派生。
+- 脚本可读取 `foundations/generation-constraints.json` 和 `../asc-npu-arch/references/npu-arch-facts.json`，不要解析 Markdown 表格或在脚本中复制芯片/dtype/API profile 表；通用模板可直接初始化的 dtype 也应从结构化 facts 派生。
 - 常见错误先沉淀到 `troubleshooting/faq.md`，稳定后再回链到对应 API guide 或 workflow。

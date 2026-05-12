@@ -169,22 +169,14 @@ regbase 的编译、执行、失败修复和验证报告统一按 [自动化验�
 **解决**：
 - 确认目标芯片是 ascend950pr_9599 或 mc62cm12aa
 - 使用正确的测试目录
+- 芯片与目录映射统一参考 [架构或测试目录不匹配](../troubleshooting/faq.md#5-架构或测试目录不匹配)
 
-### Q2: 测试目录错误？
+### Q2: 公共排障索引
 
-**问题**：测试文件放在错误目录
+regbase 测试目录和参考测试查找统一查看 [常见问题与解决方案](../troubleshooting/faq.md)：
 
-**解决**：
-- regbase 测试放在 `tests/api/reg_compute_api/` 目录
-- 不要放在 `tests/api/basic_api/` 目录
-
-### Q3: 参考测试找不到？
-
-**问题**：不知道如何编写测试
-
-**解决**：
-- 查看 `tests/api/reg_compute_api/` 下已有测试
-- 参考同类 API 的测试模式
+- [架构或测试目录不匹配](../troubleshooting/faq.md#5-架构或测试目录不匹配)
+- [参考测试找不到](../troubleshooting/faq.md#11-参考测试找不到)
 
 ---
 

@@ -172,7 +172,7 @@ asc-devkit 仓路径不再向用户询问。本 skill 已位于 asc-devkit 仓�
 /asc-api-ut-gen ascend910b1 membase Add aiv      # membase基础API AIV 测试
 /asc-api-ut-gen ascend910b1 membase Mmad aic     # membase基础API AIC 测试
 /asc-api-ut-gen ascend950pr_9599 regbase RegAdd  # regbase基础API 测试（仅支持 3510/5102）
-/asc-api-ut-gen ascend910b1 adv Softmax          # 高阶API 测试
+/asc-api-ut-gen ascend910b1 adv Softmax          # 高阶API，需按目标 API 分析并生成专属 UT
 /asc-api-ut-gen ascend950pr_9599 c asc_mmul      # C API 测试
 /asc-api-ut-gen ascend950pr_9599 simt vector_add # SIMT API 测试（仅支持 3510）
 /asc-api-ut-gen ascend910b1 utils check_align    # 工具类API 测试

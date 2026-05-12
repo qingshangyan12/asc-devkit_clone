@@ -31,7 +31,8 @@ from ut_generator import (
     ApiType, ChipArch, TestCase, UTConfig,
     create_generator, DTYPE_MAP, GENERATOR_DTYPE_MAP, ARCH_DIR_MAP, NPU_ARCH_MAP,
     API_TYPE_MAP, API_TYPE_CHOICES, API_RESTRICTIONS,
-    CHIP_ARCH_BY_NAME, REFERENCE_CONSTRAINT_FILES, ensure_reference_constraints_loaded
+    CHIP_ARCH_BY_NAME, REFERENCE_CONSTRAINT_FILES, ensure_reference_constraints_loaded,
+    get_adv_profile_output_path
 )
 
 
@@ -320,6 +321,9 @@ def get_output_path(config: UTConfig) -> str:
         npu_arch = NPU_ARCH_MAP[config.chip]
         return f"tests/api/c_api/npu_arch_{npu_arch}/vector_compute/test_{config.api_name.lower()}.cpp"
     elif config.api_type == ApiType.ADV:
+        profile_output = get_adv_profile_output_path(config.api_name, config.kernel_params)
+        if profile_output:
+            return profile_output
         return f"tests/api/adv_api/{config.api_name.lower()}/test_operator_{config.api_name.lower()}.cpp"
     elif config.api_type == ApiType.SIMT:
         return f"tests/api/simt_api/{base_dir}_simt/test_operator_simt_{config.api_name.lower()}.cpp"
@@ -445,6 +449,7 @@ def main():
         for api_type, restriction in API_RESTRICTIONS.items():
             allowed = ", ".join(restriction.get('allowed_chips', []))
             print(f"  - {api_type}: {allowed}")
+
         return 0
 
     # 从配置文件或命令行参数创建配置
