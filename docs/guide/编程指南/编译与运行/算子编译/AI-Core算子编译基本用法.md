@@ -39,7 +39,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   - 所有常量设备变量，定义和跨单元引用时都必须使用extern关键字；
   - 所有Ascend C 源文件（.asc）都必须使用`-dc`选项编译。
 
-  下方示例中，definition.asc 定义了变量和函数，example.asc 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件
+  下方示例中，definition.asc 定义了变量和函数，example.asc 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件。
   ```c++
   // ------- definition.asc -------
   extern __gm__ int dev_var = 5;
@@ -72,7 +72,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
 
 ## AI Core SIMT编译
 
-使用bisheng编译器编译Ascend C SIMT源文件时，需要在AI Core SIMD编译的基本命令上增加`--enable-simt`, 示例如下：
+使用bisheng编译器编译Ascend C SIMT源文件时，需要在AI Core SIMD编译的基本命令上增加`--enable-simt`，示例如下：
 
 ```shell
   bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
@@ -245,7 +245,7 @@ target_compile_options(demo PRIVATE
 )
 ```
 
-针对AI Core SIMT代码，则需要在编译选项中增加`--enable-simt`，示例如下，完整样例请参考：[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)
+编译AI Core SIMT代码时，需要在编译选项中增加`--enable-simt`，示例如下，完整样例请参考：[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)。
 
 ```cmake
 target_compile_options(demo PRIVATE
