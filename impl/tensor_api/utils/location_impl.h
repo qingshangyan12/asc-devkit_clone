@@ -92,6 +92,9 @@ template <typename T>
 using GetAttributeLocation = typename LocationTypeCombo::locationType2Location::template Get<T>;
 
 template <typename T>
+using GetTensorLocation = typename Std::remove_cvref_t<T>::iterator::ptrPattern;
+
+template <typename T>
 using GetAttributeElementType = typename LocationTypeCombo::locationType2Type::template Get<T>;
 
 } // namespace Te
