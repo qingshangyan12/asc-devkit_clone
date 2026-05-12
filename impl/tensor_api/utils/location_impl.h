@@ -88,11 +88,36 @@ struct LocationTypeCombo
     using locationType2Type = TupleMap<TENSOR_API_QUAL_LOC_PAIRS(TENSOR_API_GEN_BASE_MAP) Std::tuple<void, void>>;
 };
 
-template <typename T>
-using GetAttributeLocation = typename LocationTypeCombo::locationType2Location::template Get<T>;
+template <typename T, typename = void>
+struct AttributeLocation {
+    using type = typename LocationTypeCombo::locationType2Location::template Get<Std::remove_cvref_t<T>>;
+};
 
 template <typename T>
-using GetAttributeElementType = typename LocationTypeCombo::locationType2Type::template Get<T>;
+struct AttributeLocation<T, void_t<typename Std::remove_cvref_t<T>::ptrPattern>> {
+    using type = typename Std::remove_cvref_t<T>::ptrPattern;
+};
+
+template <typename T>
+struct AttributeLocation<T, void_t<typename Std::remove_cvref_t<T>::iterator::ptrPattern>> {
+    using type = typename Std::remove_cvref_t<T>::iterator::ptrPattern;
+};
+
+template <typename T>
+using GetAttributeLocation = typename AttributeLocation<T>::type;
+
+template <typename T, typename = void>
+struct AttributeElementType {
+    using type = typename LocationTypeCombo::locationType2Type::template Get<Std::remove_cvref_t<T>>;
+};
+
+template <typename T>
+struct AttributeElementType<T, void_t<typename Std::remove_cvref_t<T>::elementType>> {
+    using type = typename Std::remove_cvref_t<T>::elementType;
+};
+
+template <typename T>
+using GetAttributeElementType = typename AttributeElementType<T>::type;
 
 } // namespace Te
 } // namespace AscendC
