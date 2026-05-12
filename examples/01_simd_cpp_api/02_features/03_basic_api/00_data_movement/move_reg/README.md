@@ -1,7 +1,21 @@
 # move_reg样例
 
 ## 概述
-本样例基于RegBase编程范式演示验证从RegTensor(Reg矢量计算基本单元)中搬运数据到MaskReg（掩码寄存器），使用MaskGenWithRegTensor接口。
+本样例基于RegBase编程范式实现MaskReg相关操作，支持多种场景，通过环境变量选择场景。
+    <table>
+ 	<tr>
+ 		<td>scenarioNum</td>
+ 		<td>场景类型</td>
+ 	</tr>
+ 	<tr>
+ 		<td>1</td>
+ 		<td>MaskGenWithRegTensor下采样场景：从RegTensor提取数据填充到MaskReg</td>
+ 	</tr>
+ 	<tr>
+ 		<td>2</td>
+ 		<td>复合计算场景：使用LoadAlign实现MaskReg的搬入，再作为Select的掩码完成选择计算</td>
+ 	</tr>
+ </table>
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -18,6 +32,8 @@
 ```
 
 ## 样例描述
+
+### 场景1：MaskGenWithRegTensor下采样场景
 - 样例功能：  
   演示验证从regTensor中搬运数据到maskReg。输入64个int32类型的cond数据，使用MaskGenWithRegTensor&lt;int32, 0&gt;从condReg的前8字节提取64bit数据，按下采样模式（每4个mask bit对应1个src bit）填充到256bit的MaskReg，输出32字节（256bit）的mask数据到UB(Unified Buffer)。
 
@@ -27,7 +43,7 @@
     <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
     <tr><td align="center">cond</td><td align="center">[1, 64]</td><td align="center">int32</td></tr>
     <tr><td rowspan="1" align="center">样例输出</td><td align="center">maskOut</td><td align="center">[32]</td><td align="center">uint8</td></tr>
-    <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">move_reg</td></tr>
+    <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">move_reg_scenario_1</td></tr>
     </table>
   - 样例实现：
     MaskGenVF函数内：
@@ -42,6 +58,25 @@
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
 
+### 场景2：复合计算场景
+- 样例功能：  
+  对根据maskReg中的比特位，选择对应位置的xReg或yReg向量中的值，当mask的比特位为1时，选取src0中对应的元素；当mask的比特位为0时，选取src1中对应的元素。
+- 样例规格：
+  <table>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
+  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
+  <tr><td align="center">mask</td><td align="center">[1, 128]</td><td align="center">uint8</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">move_reg_scenario_2</td></tr>
+  </table>
+- 样例实现：  
+   SelectVF函数内，调用LoadAlign接口将掩码数据从UB搬入MaskReg，再传入Select接口进行计算，结果写回UB
+
+- 调用实现  
+  使用内核调用符<<<>>>调用核函数。
+    
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
@@ -63,9 +98,10 @@
     
 - 样例执行
   ```bash
-  mkdir -p build && cd build;                                                    # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                           # 编译工程（默认npu模式）
-  python3 ../scripts/gen_data.py                                                 # 生成测试输入数据
+  SCENARIO=1                                                                    # 设置场景编号
+  mkdir -p build && cd build;                                                   # 创建并进入build目录
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # 编译工程（默认npu模式）
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO                         # 生成测试输入数据
   ./demo                                                                        # 执行编译生成的可执行程序，执行样例
   ```
 
@@ -73,18 +109,19 @@
 
   示例如下：
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO ..;make -j; # NPU仿真模式
   ```
 
-  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+  > **注意：** 切换编译模式或场景前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
 
-| 选项 | 可选值 | 说明 |
-|------|--------|------|
-| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| 选项　　　　　　　　　　　| 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+| ---------------------------| -----------------------------| ---------------------------------------------------|
+| `CMAKE_ASC_RUN_MODE`　　　| `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| `SCENARIO_NUM` | `1`、`2` | 场景编号：1=MaskGenWithRegTensor下采样场景，2=复合计算场景 |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。
