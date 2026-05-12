@@ -92,8 +92,7 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 #endif
 }
 
-__aicore__ inline __ssbuf__ void* GetSsbufBaseAddr()
-{
+__aicore__ inline __ssbuf__ void* GetSsbufBaseAddr(){
 #if ASCENDC_CPU_DEBUG
     return reinterpret_cast<__ssbuf__ void*>(ConstDefiner::Instance().cpuSSbuf);
 #else

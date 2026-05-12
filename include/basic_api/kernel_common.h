@@ -131,20 +131,25 @@ public:
     template <pipe_t pipe>
     static __aicore__ inline void Lock(MutexID id)
     {
+        #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
         ASCENDC_ASSERT((id <= MAX_MUTEXID),
             { KERNEL_LOG(KERNEL_ERROR, "For Mutex::Lock current id is %u, max MutexID is %u", id, MAX_MUTEXID); });
         GetBufInternal<pipe, 0>(id);
+        #endif
     }
 
     template <pipe_t pipe>
     static __aicore__ inline void Unlock(MutexID id)
     {
+        #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
         ASCENDC_ASSERT((id <= MAX_MUTEXID),
             { KERNEL_LOG(KERNEL_ERROR, "For Mutex::Unlock current id is %u, max MutexID is %u", id, MAX_MUTEXID); });
         RlsBufInternal<pipe, 0>(id);
+        #endif
     }
 };
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline MutexID AllocMutexID()
 {
     MutexID id = static_cast<uint8_t>(sff0(Internal::g_bufId));
@@ -155,14 +160,17 @@ __aicore__ inline MutexID AllocMutexID()
     });
     return id;
 }
+#endif
 
 __aicore__ inline void ReleaseMutexID(MutexID id)
 {
+    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     ASCENDC_ASSERT((id < MAX_MUTEXID), {
         KERNEL_LOG(KERNEL_ERROR, "current id is %d, which should be larger than or equals to 0, and smaller than %d",
             static_cast<int32_t>(id), MAX_MUTEXID);
     });
     Internal::g_bufId = sbitset0(Internal::g_bufId, id);
+    #endif
 }
 
 __aicore__ inline void SetMaskCount()
