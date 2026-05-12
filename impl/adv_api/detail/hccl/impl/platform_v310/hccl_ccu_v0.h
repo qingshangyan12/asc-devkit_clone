@@ -132,7 +132,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
 {
     ASCENDC_HCCL_API_ASSERT(
         context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
-    hcclContext_ = (__gm__ HcclCombineOpParam*)context;
+    // 只有 alltoall 且 ccu的会走到这里，并设为true
+    bool isChangeToNew = false;
+    if (isChangeToNew) {
+        hcclContext_ = (__gm__ HcclApi::OpResCtx*)context;
+    } else {
+        hcclContext_ = (__gm__ HcclCombineOpParam*)context;
+    }
+
     // ensure hcclMsgArea 512B aligned
     uint64_t msgAddr = hcclContext_->workSpace;
     if (msgAddr & 0x1ff) {
@@ -141,8 +148,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient InitInner msgAddr:0x%llx, workSpaceSize:0x%llx", msgAddr, hcclContext_->workSpaceSize);
 
+    uint64_t xnAddr = isChangeToNew ? hcclContext_->xnAddr : reinterpret_cast<uint64_t>(hcclContext_->xnOffset);
+    uint64_t ckeAddr = isChangeToNew ? hcclContext_->ckeAddr : reinterpret_cast<uint64_t>(hcclContext_->ckeOffset);
 #ifndef ASCENDC_CPU_DEBUG
-    ASCENDC_ASSERT((reinterpret_cast<uintptr_t>(hcclContext_->xnOffset) % ALIGN_64_BYTE == 0), {
+    ASCENDC_ASSERT((reinterpret_cast<uintptr_t>(xnAddr) % ALIGN_64_BYTE == 0), {
         KERNEL_LOG(KERNEL_ERROR, "xnAddr is not 64-byte aligned!");
     });
 #endif
@@ -172,10 +181,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     }
 
     isInited_ = true;
+    uint64_t xnAddr = 
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx",
-        hcclContext_->rankId, hcclContext_->rankNum, hcclContext_->xnOffset, hcclContext_->ckeOffset,
-        reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt));
+        hcclContext_->rankId, hcclContext_->rankNum, xnAddr, ckeAddr, reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt));
 }
 
 template <const auto& config>
@@ -263,7 +272,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         ccuUsedXnNum_ = 11;
         CcuPrepareForAllToAll(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        ccuUsedXnNum_ = 10;
         FlushDataCache(&allToAllVParam_[handleId]);
         CcuPrepareForAllToAllV(&handleParamGM_[handleId], &allToAllVParam_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
