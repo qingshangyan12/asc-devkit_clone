@@ -264,7 +264,7 @@ file(GLOB ASCENDC_TEST_KirinX90_AIV_CASE_SRC_PART_FILES
     sort/sort/test_operator_radix_sort_l300.cpp
     sort/topk/test_operator_radix_topk_l311.cpp
     transpose/confusion_transpose/test_operator_confusion_transpose_l300.cpp
-    activation/geglu/test_operator_geglu_l300.cpp
+    activation/geglu/test_operator_geglu.cpp
     activation/swiglu/test_operator_swiglu_l300.cpp
     quantization/antiquant/test_ascend_antiquant_l300.cpp
     quantization/dequant/test_ascend_dequant_l300.cpp
@@ -308,7 +308,7 @@ file(GLOB ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES
     sort/sort/test_operator_radix_sort_l300.cpp
     sort/topk/test_operator_radix_topk_l311.cpp
     transpose/confusion_transpose/test_operator_confusion_transpose_l300.cpp
-    activation/geglu/test_operator_geglu_l300.cpp
+    activation/geglu/test_operator_geglu.cpp
     activation/swiglu/test_operator_swiglu_l300.cpp
     quantization/antiquant/test_ascend_antiquant_l300.cpp
     quantization/dequant/test_ascend_dequant_l300.cpp
