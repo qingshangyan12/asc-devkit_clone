@@ -20,6 +20,7 @@
 #include "include/adv_api/hccl/internal/hccl_tiling_msg.h"
 #include "tiling/platform/platform_ascendc.h"
 #include "hccl_symbol_loader.h"
+#include "acl/acl_base_rt.h"
 
 using namespace std;
 using namespace HcclApi;
@@ -61,12 +62,10 @@ void PrintMc2CcTiling(const Mc2CcTilingInner& tiling)
 
 uint32_t SetDevType(Mc2InitTilingInner* tilingInner)
 {
-    auto getSocVerFunc =
-        HcclSymbolLoader::GetInstance().Load<void (*)(char*, uint32_t)>("libruntime.so", "rtGetSocVersion");
-    ASCENDC_HOST_ASSERT(getSocVerFunc != nullptr, return EXIT_FAILURE, "Failed to get soc version.");
-    char socVersion[50];
-    getSocVerFunc(socVersion, sizeof(socVersion));
-    std::string devType = std::string(socVersion);
+    const char* socName = aclrtGetSocName();
+    ASCENDC_HOST_ASSERT(socName != nullptr, return EXIT_FAILURE, "Failed to get soc name.");
+    std::string devType = std::string(socName);
+    TILING_LOG_INFO("version %s.", devType.c_str());
     if (devType.find("Ascend910B") != std::string::npos) {
         tilingInner->devType = static_cast<uint8_t>(platform_ascendc::SocVersion::ASCEND910B);
     } else {
