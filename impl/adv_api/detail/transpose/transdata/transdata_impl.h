@@ -99,8 +99,8 @@ __aicore__ inline void C1Dhwn1n0c0ToC1C0Dhwn1n0(
     int32_t padHw = params.padHw;
 
     TransDataTo5HDParams transDataParams;
-    transDataParams.dstHighHalf = false;
-    transDataParams.srcHighHalf = false;
+    transDataParams.enDstHighHalf = false;
+    transDataParams.enSrcHighHalf = false;
     transDataParams.repeatTimes = d * padHw * n1;
     if (transDataParams.repeatTimes == 1) {
         transDataParams.srcRepStride = 0;
@@ -137,8 +137,8 @@ __aicore__ inline void C1c0dhwN1n0ToNcdhw(
     int32_t c = params.c;
 
     TransDataTo5HDParams transDataParams;
-    transDataParams.dstHighHalf = false;
-    transDataParams.srcHighHalf = false;
+    transDataParams.enDstHighHalf = false;
+    transDataParams.enSrcHighHalf = false;
     transDataParams.repeatTimes = c * d * padHw / n0;
     if (transDataParams.repeatTimes == 1) {
         transDataParams.srcRepStride = 0;
@@ -260,8 +260,8 @@ __aicore__ inline void TransDataImplNcdhwToFractal(
     // step1, NCDHW -> CDHW, N1, N0
     // Do n1 times Transpose to split axis N, and fill with 0 on padding data.
     TransDataTo5HDParams transDataParams;
-    transDataParams.dstHighHalf = false;
-    transDataParams.srcHighHalf = false;
+    transDataParams.enDstHighHalf = false;
+    transDataParams.enSrcHighHalf = false;
     transDataParams.repeatTimes = currAxis / elePerBlk;
     // if repeat = 1, start offset is auto incremental by stride.
     transDataParams.dstRepStride = transDataParams.repeatTimes == 1 ? 0 : n1 * n0;
@@ -367,8 +367,8 @@ __aicore__ inline void TransDataImplNcdhwTo6Hd(
     uint64_t dstLocalList[DEFAULT_TRANSDATA_5HD_LIST];
     uint64_t srcLocalList[DEFAULT_TRANSDATA_5HD_LIST];
     TransDataTo5HDParams transDataParams;
-    transDataParams.dstHighHalf = false;
-    transDataParams.srcHighHalf = false;
+    transDataParams.enDstHighHalf = false;
+    transDataParams.enSrcHighHalf = false;
     transDataParams.repeatTimes = axisPadHwd / elePerBlk;
     transDataParams.dstRepStride = transDataParams.repeatTimes == 1 ? 0 : c0;
     transDataParams.srcRepStride = transDataParams.repeatTimes == 1 ? 0 : 1;
@@ -436,8 +436,8 @@ __aicore__ inline void TransDataImpl6HdToNcdhw(
     int32_t axisPadHwc0 = padHw * c0;
     int32_t axisPadHwdc0 = padHw * c0 * d;
     TransDataTo5HDParams transDataParams;
-    transDataParams.dstHighHalf = false;
-    transDataParams.srcHighHalf = false;
+    transDataParams.enDstHighHalf = false;
+    transDataParams.enSrcHighHalf = false;
     transDataParams.repeatTimes = padHw * d / elePerBlk;
     transDataParams.srcRepStride = transDataParams.repeatTimes == 1 ? 0 : c0;
     transDataParams.dstRepStride = transDataParams.repeatTimes == 1 ? 0 : 1;

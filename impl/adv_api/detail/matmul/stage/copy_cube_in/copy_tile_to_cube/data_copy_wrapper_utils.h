@@ -151,8 +151,8 @@ __aicore__ inline void TransDataNDBMatrix(
             dstListOffset += c0Size_;
             srcListOffset += calcWidth;
         }
-        params.srcHighHalf = false;
-        params.dstHighHalf = false;
+        params.enSrcHighHalf = false;
+        params.enDstHighHalf = false;
         TransDataTo5HD<TransT>(dstLocalList, srcLocalList, params);
         PipeBarrier<PIPE_V>();
         srcListOffset = 0;
@@ -160,8 +160,8 @@ __aicore__ inline void TransDataNDBMatrix(
             srcLocalList[i] = (uint64_t)(src[srcOffset + srcListOffset + srcHighHalfOffset].GetPhyAddr());
             srcListOffset += calcWidth;
         }
-        params.srcHighHalf = false;
-        params.dstHighHalf = true;
+        params.enSrcHighHalf = false;
+        params.enDstHighHalf = true;
         TransDataTo5HD<TransT>(dstLocalList, srcLocalList, params);
         PipeBarrier<PIPE_V>();
         dstListOffset = 0;
@@ -172,8 +172,8 @@ __aicore__ inline void TransDataNDBMatrix(
             dstListOffset += c0Size_;
             srcListOffset += calcWidth;
         }
-        params.dstHighHalf = false;
-        params.srcHighHalf = true;
+        params.enDstHighHalf = false;
+        params.enSrcHighHalf = true;
         TransDataTo5HD<TransT>(dstLocalList, srcLocalList, params);
         PipeBarrier<PIPE_V>();
         srcListOffset = 0;
@@ -181,8 +181,8 @@ __aicore__ inline void TransDataNDBMatrix(
             srcLocalList[i] = (uint64_t)(src[srcOffset + srcListOffset + srcHighHalfOffset].GetPhyAddr());
             srcListOffset += calcWidth;
         }
-        params.dstHighHalf = true;
-        params.srcHighHalf = true;
+        params.enDstHighHalf = true;
+        params.enSrcHighHalf = true;
         TransDataTo5HD<TransT>(dstLocalList, srcLocalList, params);
         PipeBarrier<PIPE_V>();
         dstOffset += c0Size_ * c0Size_;
@@ -200,8 +200,8 @@ __aicore__ inline void TransDataNDBMatrix(
             dstListOffset += c0Size_;
             srcListOffset += calcWidth;
         }
-        params.dstHighHalf = false;
-        params.srcHighHalf = false;
+        params.enDstHighHalf = false;
+        params.enSrcHighHalf = false;
         TransDataTo5HD<TransT>(dstLocalList, srcLocalList, params);
         PipeBarrier<PIPE_V>();
         srcListOffset = 0;
@@ -209,8 +209,8 @@ __aicore__ inline void TransDataNDBMatrix(
             srcLocalList[i] = (uint64_t)(src[srcOffset + srcListOffset + srcHighHalfOffset].GetPhyAddr());
             srcListOffset += calcWidth;
         }
-        params.dstHighHalf = true;
-        params.srcHighHalf = false;
+        params.enDstHighHalf = true;
+        params.enSrcHighHalf = false;
         TransDataTo5HD<TransT>(dstLocalList, srcLocalList, params);
         PipeBarrier<PIPE_V>();
     }
@@ -247,8 +247,8 @@ __aicore__ inline void TransDataNZBMatrix(
             dstListOffset += c0Size_;
             srcListOffset += c0Size_;
         }
-        params.dstHighHalf = true;
-        params.srcHighHalf = true;
+        params.enDstHighHalf = true;
+        params.enSrcHighHalf = true;
         TransDataTo5HD<TransT>(dstLocalList, srcLocalList, params);
         PipeBarrier<PIPE_V>();
         srcListOffset = 0;
@@ -256,8 +256,8 @@ __aicore__ inline void TransDataNZBMatrix(
             srcLocalList[i] = (uint64_t)(src[srcOffset + srcListOffset].GetPhyAddr());
             srcListOffset += c0Size_;
         }
-        params.dstHighHalf = false;
-        params.srcHighHalf = true;
+        params.enDstHighHalf = false;
+        params.enSrcHighHalf = true;
         TransDataTo5HD<TransT>(dstLocalList, srcLocalList, params);
         PipeBarrier<PIPE_V>();
         dstListOffset = 0;
@@ -265,8 +265,8 @@ __aicore__ inline void TransDataNZBMatrix(
             dstLocalList[i] = (uint64_t)(dst[dstOffset + dstListOffset].GetPhyAddr());
             dstListOffset += c0Size_;
         }
-        params.dstHighHalf = false;
-        params.srcHighHalf = false;
+        params.enDstHighHalf = false;
+        params.enSrcHighHalf = false;
         TransDataTo5HD<TransT>(dstLocalList, srcLocalList, params);
         PipeBarrier<PIPE_V>();
         srcListOffset = 0;
@@ -274,8 +274,8 @@ __aicore__ inline void TransDataNZBMatrix(
             srcLocalList[i] = (uint64_t)(src[srcOffset + srcListOffset + srcHighHalfOffset].GetPhyAddr());
             srcListOffset += c0Size_;
         }
-        params.dstHighHalf = true;
-        params.srcHighHalf = false;
+        params.enDstHighHalf = true;
+        params.enSrcHighHalf = false;
         TransDataTo5HD<TransT>(dstLocalList, srcLocalList, params);
         PipeBarrier<PIPE_V>();
         dstOffset += c0Size_ * c0Size_;

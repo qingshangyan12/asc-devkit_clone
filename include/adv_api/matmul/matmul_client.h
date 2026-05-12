@@ -2595,8 +2595,8 @@ private:
         int32_t h1 = Ceil(h, h0);
         int32_t curH = h;
         TransDataTo5HDParams transDataParams;
-        transDataParams.dstHighHalf = false;
-        transDataParams.srcHighHalf = false;
+        transDataParams.enDstHighHalf = false;
+        transDataParams.enSrcHighHalf = false;
         transDataParams.repeatTimes = Ceil(w, w0);
         if (transDataParams.repeatTimes == 1) {
             transDataParams.srcRepStride = 0;

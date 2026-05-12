@@ -53,7 +53,7 @@
     **图 2**  输入数据类型位宽为32位时的转换规则<a name="fig186798494611"></a>  
     ![](figures/输入数据类型位宽为32位时的转换规则.png "输入数据类型位宽为32位时的转换规则")
 
--   当数据类型位宽为8位时，每个datablock包含32个数，指令内部会循环16次，每次循环都会分别从指定的16个datablock中的对应位置取值，组成半个datablock放入目的地址中，读取和存放是在datablock的高半部还是低半部由参数srcHighHalf和dstHighHalf决定。如下图所示：
+-   当数据类型位宽为8位时，每个datablock包含32个数，指令内部会循环16次，每次循环都会分别从指定的16个datablock中的对应位置取值，组成半个datablock放入目的地址中，读取和存放是在datablock的高半部还是低半部由参数enSrcHighHalf和enDstHighHalf决定。如下图所示：
 
     **图 3**  输入数据类型位宽为8位时的转换规则<a name="fig29071549185211"></a>  
     ![](figures/输入数据类型位宽为8位时的转换规则.png "输入数据类型位宽为8位时的转换规则")
@@ -180,7 +180,7 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 </th>
 </tr>
 </thead>
-<tbody><tr id="zh-cn_topic_0000001521260417_row12366124381914"><td class="cellrowborder" valign="top" width="16.38163816381638%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000001521260417_p1123715122013"><a name="zh-cn_topic_0000001521260417_p1123715122013"></a><a name="zh-cn_topic_0000001521260417_p1123715122013"></a>dstHighHalf</p>
+<tbody><tr id="zh-cn_topic_0000001521260417_row12366124381914"><td class="cellrowborder" valign="top" width="16.38163816381638%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000001521260417_p1123715122013"><a name="zh-cn_topic_0000001521260417_p1123715122013"></a><a name="zh-cn_topic_0000001521260417_p1123715122013"></a>enDstHighHalf</p>
 </td>
 <td class="cellrowborder" valign="top" width="19.731973197319732%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001521260417_p8237175162010"><a name="zh-cn_topic_0000001521260417_p8237175162010"></a><a name="zh-cn_topic_0000001521260417_p8237175162010"></a>输入</p>
 </td>
@@ -189,7 +189,7 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 </div>
 </td>
 </tr>
-<tr id="zh-cn_topic_0000001521260417_row53661243191916"><td class="cellrowborder" valign="top" width="16.38163816381638%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000001521260417_p19237165118201"><a name="zh-cn_topic_0000001521260417_p19237165118201"></a><a name="zh-cn_topic_0000001521260417_p19237165118201"></a>srcHighHalf</p>
+<tr id="zh-cn_topic_0000001521260417_row53661243191916"><td class="cellrowborder" valign="top" width="16.38163816381638%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000001521260417_p19237165118201"><a name="zh-cn_topic_0000001521260417_p19237165118201"></a><a name="zh-cn_topic_0000001521260417_p19237165118201"></a>enSrcHighHalf</p>
 </td>
 <td class="cellrowborder" valign="top" width="19.731973197319732%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001521260417_p132370516202"><a name="zh-cn_topic_0000001521260417_p132370516202"></a><a name="zh-cn_topic_0000001521260417_p132370516202"></a>输入</p>
 </td>
@@ -232,7 +232,7 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 -   操作数地址重叠约束请参考[通用地址重叠约束](通用说明和约束.md#section668772811100)。
 
 -   进行NCHW格式到NC1HWC0格式的转换时，一般用法是将srcList/dstList中的每个元素配置为每个HW平面的起点。
--   为了性能更优，数据类型位宽为8位时建议先固定dstHighHalf、srcHighHalf，在HW方向repeat后，再改变dstHighHalf、srcHighHalf。
+-   为了性能更优，数据类型位宽为8位时建议先固定enDstHighHalf、enSrcHighHalf，在HW方向repeat后，再改变enDstHighHalf、enSrcHighHalf。
 -   dst与src中的地址需要连续存放，详见调用示例。
 
 ## 返回值说明<a name="zh-cn_topic_0000001521260417_section640mcpsimp"></a>
@@ -276,8 +276,8 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
             AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
             AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
             AscendC::TransDataTo5HDParams transDataParams;
-            transDataParams.dstHighHalf = false;
-            transDataParams.srcHighHalf = false;
+            transDataParams.enDstHighHalf = false;
+            transDataParams.enSrcHighHalf = false;
             transDataParams.repeatTimes = 16;
             transDataParams.dstRepStride = 16;
             transDataParams.srcRepStride = 1;
@@ -689,9 +689,9 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
             }
             AscendC::TransDataTo5HDParams transDataParams;
             // 写入dstLocalList的高半位
-            transDataParams.dstHighHalf = 1;
+            transDataParams.enDstHighHalf = 1;
             // 从srcLocalList的高半位读取数据
-            transDataParams.srcHighHalf = 1;
+            transDataParams.enSrcHighHalf = 1;
             transDataParams.repeatTimes = 1;
             transDataParams.dstRepStride = 0;
             transDataParams.srcRepStride = 0;
@@ -845,8 +845,8 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
             AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
             AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
             AscendC::TransDataTo5HDParams transDataParams;
-            transDataParams.dstHighHalf = false;
-            transDataParams.srcHighHalf = false;
+            transDataParams.enDstHighHalf = false;
+            transDataParams.enSrcHighHalf = false;
             transDataParams.repeatTimes = 1;
             transDataParams.dstRepStride = 0;
             transDataParams.srcRepStride = 0;
@@ -1016,8 +1016,8 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
             AscendC::LocalTensor<int32_t> srcLocal = inQueueSrc.DeQue<int32_t>();
             AscendC::LocalTensor<int32_t> dstLocal = outQueueDst.AllocTensor<int32_t>();
             AscendC::TransDataTo5HDParams transDataParams;
-            transDataParams.dstHighHalf = false;
-            transDataParams.srcHighHalf = false;
+            transDataParams.enDstHighHalf = false;
+            transDataParams.enSrcHighHalf = false;
             transDataParams.repeatTimes = 1;
             transDataParams.dstRepStride = 0;
             transDataParams.srcRepStride = 0;
@@ -1110,4 +1110,3 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
       6 14 22 30 38 46 54 62 70 78 86 94 102 110 118 126
       7 15 23 31 39 47 55 63 71 79 87 95 103 111 119 127]
     ```
-

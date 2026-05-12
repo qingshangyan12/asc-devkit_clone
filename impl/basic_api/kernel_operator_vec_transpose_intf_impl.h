@@ -49,7 +49,7 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 
-// TransDataTo5HD common checks: dtype, dstHighHalf/srcHighHalf, repeatTimes
+// TransDataTo5HD common checks: dtype, enDstHighHalf/enSrcHighHalf, repeatTimes
 // Used by: all 3 TransDataTo5HD overloads
 template <typename T>
 __aicore__ inline void CheckTransDataTo5HDParams(const TransDataTo5HDParams& nchwconvParams)
@@ -58,14 +58,14 @@ __aicore__ inline void CheckTransDataTo5HDParams(const TransDataTo5HDParams& nch
     ASCENDC_DEBUG_ASSERT((SupportType<PrimType, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype is "
         "int8_t / uint8_t / int16_t / uint16_t / half / int32_t / uint32_t / float.\n"));
-    // dstHighHalf/srcHighHalf only valid for int8_t/uint8_t
+    // enDstHighHalf/enSrcHighHalf only valid for int8_t/uint8_t
     if constexpr (!SupportType<PrimType, int8_t, uint8_t>()) {
-        ASCENDC_DEBUG_ASSERT((nchwconvParams.dstHighHalf == false),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dstHighHalf in TransDataTo5HD with TransDataTo5HDParams, "
-            "dstHighHalf is only valid for int8_t / uint8_t dtype.\n"));
-        ASCENDC_DEBUG_ASSERT((nchwconvParams.srcHighHalf == false),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check srcHighHalf in TransDataTo5HD with TransDataTo5HDParams, "
-            "srcHighHalf is only valid for int8_t / uint8_t dtype.\n"));
+        ASCENDC_DEBUG_ASSERT((nchwconvParams.enDstHighHalf == false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check enDstHighHalf in TransDataTo5HD with TransDataTo5HDParams, "
+            "enDstHighHalf is only valid for int8_t / uint8_t dtype.\n"));
+        ASCENDC_DEBUG_ASSERT((nchwconvParams.enSrcHighHalf == false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check enSrcHighHalf in TransDataTo5HD with TransDataTo5HDParams, "
+            "enSrcHighHalf is only valid for int8_t / uint8_t dtype.\n"));
     }
     CheckValueRange<int32_t>(nchwconvParams.repeatTimes, 0, 255, "repeatTimes", "TransDataTo5HD with TransDataTo5HDParams");
 }
@@ -103,8 +103,8 @@ template <typename T> __aicore__ inline void Transpose(const LocalTensor<T>& dst
  * @brief NCHW to NC1HWC0 format
  * @param [out] dstList output LocalTensor list
  * @param [in] srcList input LocalTensor list
- * @param [in] nchwconvParams.dstHighHalf Specify dst data is stored in the upper half or lower half of the block
- * @param [in] nchwconvParams.srcHighHalf Specify src data is stored in the upper half or lower half of the block
+ * @param [in] nchwconvParams.enDstHighHalf Specify dst data is stored in the upper half or lower half of the block
+ * @param [in] nchwconvParams.enSrcHighHalf Specify src data is stored in the upper half or lower half of the block
  * @param [in] nchwconvParams.repeatTimes repeat times
  * @param [in] nchwconvParams.dstRepStride dst repeat stride
  * @param [in] nchwconvParams.srcRepStride src repeat stride
