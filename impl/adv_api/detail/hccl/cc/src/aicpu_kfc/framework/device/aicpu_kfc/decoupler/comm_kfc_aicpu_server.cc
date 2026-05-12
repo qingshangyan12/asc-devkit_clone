@@ -423,6 +423,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
 
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
+        u64 startTime = GetCurCpuTimestamp(false);
         const u32 turnIdx = i + 1U;
         UpdateProgress("LoopBegin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBegin] group %u, msgPos %u, repeatIdx %u, turnIdx %u, repeatCnt %u, "
@@ -442,6 +443,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        u64 WaitendTime = GetCurCpuTimestamp(false);
+        HCCL_ERROR("[Orchestrate][Wait][%u] startTime: %llu, endTime: %llu, useTime: %llu", i, startTime, WaitendTime, WaitendTime - startTime);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
@@ -451,6 +454,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenAicpuKernelServer(runParam);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        u64 LaunchendTime = GetCurCpuTimestamp(false);
+        HCCL_ERROR("[Orchestrate][launch][%u] startTime: %llu, endTime: %llu, useTime: %llu", i, WaitendTime, LaunchendTime, LaunchendTime - WaitendTime);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
@@ -467,6 +472,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
         UpdateProgress("LoopEnd", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopEnd] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
+        u64 endTime = GetCurCpuTimestamp(false);
+        HCCL_ERROR("[Orchestrate][Post][%u] startTime: %llu, endTime: %llu, useTime: %llu, totalUseTime: %llu", i, LaunchendTime, endTime, endTime - LaunchendTime, endTime - startTime);
+        printf("[Orchestrate][%u] startTime: %llu, endTime: %llu, useTime: %llu", i, startTime, endTime, endTime - startTime);
     }
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
