@@ -18,6 +18,8 @@
 #include "hccl_res_expt.h"
 #include "load_kernel.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "mc2_type.h"
+#include "ccu_assist_pub.h"
 
 #include <vector>
 
@@ -37,7 +39,7 @@ constexpr uint32_t MC2_TILING_VERSION = 2U;
 constexpr uint32_t MAX_HCOM_NUM = 3U;
 
 constexpr uint32_t INIT_TILING_VERSION = 100U;
-constexpr uint32_t MAX_CC_TILING_NUM = 8U;
+constexpr uint32_t MAX_OP_NUM = 8U;
 
 struct Mc2ServerCfg {
     uint32_t version;
@@ -51,7 +53,7 @@ struct Mc2ServerCfg {
 struct Mc2InitTilingInner {
     uint32_t version;
     uint32_t mc2HcommCnt;
-    uint32_t offset[MAX_CC_TILING_NUM];
+    uint32_t offset[MAX_OP_NUM];
     uint8_t debugMode;
     uint8_t preparePosition;
     uint16_t queueNum;
@@ -88,7 +90,46 @@ struct OpResCtx {
     uint64_t workSpaceSize;
     uint64_t rankId;
     uint64_t rankSize;
-    AlgInfo algInfo[MAX_CC_TILING_NUM];
+    AlgInfo algInfo[MAX_OP_NUM];
+
+    // for ccu
+    uint64_t xnAddr;  // xn寄存器起始地址
+    uint64_t ckeAddr;  // cke寄存器起始地址
+    uint64_t sprAddr;  // spr寄存器起始地址
+    uint64_t res[MAX_OP_NUM];  // MS地址，预留
+    uint64_t resCtx;  // 资源地址，用于资源下发时的处理
+    uint64_t opType[MAX_OP_NUM];
+    uint64_t algorithmType[MAX_OP_NUM];
+};
+
+enum AlgorithmType {
+    CcuAllGatherMesh1D = 0,
+    CcuAllGatherMeshMem2Mem1D,
+    CcuAllGatherMesh2D,
+    CcuReduceScatterMesh1D = 50,
+    CcuReduceScatterMeshMem2Mem1D,
+    CcuReduceScatterMesh2D,
+    CcuAllReduceMesh1D = 100,
+    CcuAllReduceMeshMem2Mem1D,
+    CcuAllReduceMesh2DOneShot,
+    CcuAlltoAllMesh1D = 150,
+    CcuAlltoAllVMesh1D,
+    CcuHalfAll2AllVMesh1D
+};
+
+static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
+    {"CcuAllGatherMesh1D", CcuAllGatherMesh1D},
+    {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
+    {"CcuAllGatherMesh2D", CcuAllGatherMesh2D},
+    {"CcuReduceScatterMesh1D", CcuReduceScatterMesh1D},
+    {"CcuReduceScatterMeshMem2Mem1D", CcuReduceScatterMeshMem2Mem1D},
+    {"CcuReduceScatterMesh2D", CcuReduceScatterMesh2D},
+    {"CcuAllReduceMesh1D", CcuAllReduceMesh1D},
+    {"CcuAllReduceMeshMem2Mem1D", CcuAllReduceMeshMem2Mem1D},
+    {"CcuAllReduceMesh2DOneShot", CcuAllReduceMesh2DOneShot},
+    {"CcuAlltoAllMesh1D", CcuAlltoAllMesh1D},
+    {"CcuAlltoAllVMesh1D", CcuAlltoAllVMesh1D},
+    {"CcuHalfAll2AllVMesh1D", CcuHalfAll2AllVMesh1D}
 };
 
 HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const aclrtStream stream)
@@ -121,7 +162,7 @@ HcclResult HcclGetTilingList(const void *mc2Tiling, const void *p[], uint32_t &c
     CHK_PRT_RET(cnt > MAX_HCOM_NUM, HCCL_ERROR("Invalid hcom tiling number %u.", cnt), HCCL_E_PARA);
 
     u64 serverCfgAddr = reinterpret_cast<u64>(versionPtr) + sizeof(Mc2ServerCfg);
-    for (uint32_t i = 0U; i < MAX_CC_TILING_NUM; ++i) {
+    for (uint32_t i = 0U; i < MAX_OP_NUM; ++i) {
         p[i] = reinterpret_cast<const void *>(reinterpret_cast<const u8 *>(mc2Tiling) + versionPtr[i]);
     }
     HCCL_INFO("HcclGetTilingList version[%u] cnt[%u]", version, cnt);
@@ -139,15 +180,62 @@ HcclResult CheckIsReduce(const Mc2CcTilingInner *ccTiling, bool *isReduce)
     return HCCL_SUCCESS;
 }
 
-HcclResult CheckCommEngine(const void *ccTilingList[], uint32_t tilingNum)
+
+HcclResult ObtainCommEngine(const void *ccTilingList[], uint32_t tilingNum, uint8_t &commEngine)
 {
+    commEngine = static_cast<uint8_t>(COMM_ENGINE_RESERVED);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
-        if (ccTiling->commEngine != static_cast<uint8_t>(COMM_ENGINE_AICPU)) {
+        if (commEngine == static_cast<uint8_t>(COMM_ENGINE_RESERVED)) {
+            commEngine = ccTiling->commEngine;
+        }
+        if (ccTiling->commEngine != commEngine) {
             HCCL_ERROR("Invalid commEngine %u.", ccTiling->commEngine);
             return HCCL_E_NOT_SUPPORT;
         }
     }
+    if (commEngine != static_cast<uint8_t>(COMM_ENGINE_AICPU) &&
+        commEngine != static_cast<uint8_t>(COMM_ENGINE_CCU)) {
+        HCCL_ERROR("Invalid commEngine %u.", commEngine);
+        return HCCL_E_NOT_SUPPORT;
+    }
+    return HCCL_SUCCESS;
+}
+
+// 构建 opResCtx 基础字段并获取 Token
+HcclResult CcuAllocV2(HcclComm comm, const std::string &ctxTag,
+    u32 rankSize, u32 userRank, OpResCtx &opResCtx)
+{
+    // 1. 分配workspace、comParam（XN）、comSync（CKE）
+    constexpr uint32_t comSyncNum = 2;
+    uint64_t comParamBufSize = Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_PARAM_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
+    uint64_t comSyncBufSize  = Hccl::CCU_TASK_NUM_MAX * comSyncNum * Hccl::CCU_ONE_PARAM_SIZE;
+
+    std::string tagWorkspace = ctxTag + "_ccu_workspace";
+    std::string tagComParam  = ctxTag + "_ccu_comParam";
+    std::string tagComSync   = ctxTag + "_ccu_comSync";
+
+    void *workspacePtr = nullptr;
+    void *comParamPtr  = nullptr;
+    void *comSyncPtr   = nullptr;
+
+    CHK_RET(HcclEngineCtxCreate(comm, tagWorkspace.c_str(), COMM_ENGINE_CCU,
+        Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
+    CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_CCU,
+        comParamBufSize, &comParamPtr));
+    CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_CCU,
+        comSyncBufSize, &comSyncPtr));
+
+    opResCtx.workSpace      = reinterpret_cast<uint64_t>(workspacePtr);
+    opResCtx.workSpaceSize  = Hccl::MC2_WORKSPACE_SIZE;
+    opResCtx.rankId         = userRank;
+    opResCtx.rankSize       = rankSize;
+    opResCtx.xnAddr        = reinterpret_cast<uint64_t>(comParamPtr);
+    opResCtx.ckeAddr       = reinterpret_cast<uint64_t>(comSyncPtr);
+
+    HCCL_INFO("[CcuAllocV2]workspace[%p], comParam[%p], comSync[%p]",
+        workspacePtr, comParamPtr, comSyncPtr);
+
     return HCCL_SUCCESS;
 }
 
@@ -538,6 +626,53 @@ HcclResult GetOpParam(HcclComm comm, void* stream, const std::string &tag, const
 
     void *resCtxSequence = nullptr;
     CHK_RET(GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence));
+    return HCCL_SUCCESS;
+}
+
+// CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
+HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[],
+    const void *ccTilingList[], uint32_t tilingNum, OpResCtx &opResCtx)
+{
+    for (uint32_t i = 0U; i < tilingNum; ++i) {
+        const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
+
+        // 构造OpParam并选择算法
+        OpParam opParam{};
+        CHK_RET(InitOpParamByTiling(comm, stream, topoTag[i], ccTiling, opParam));
+
+        std::string algName;
+        std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+        CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+        int result = sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
+        CHK_PRT_RET(result <= 0, HCCL_ERROR("failed to fill opParam.algName"), HCCL_E_INTERNAL);
+        HCCL_INFO("[CcuSelectAlg] prepared opParam, opType[%u], algName[%s], algTag[%s].",
+            static_cast<u32>(opParam.opType), opParam.algName, opParam.algTag);
+
+        // 将算法名称映射到AlgorithmType枚举
+        auto it = algorithmMap.find(algName);
+        if (it == algorithmMap.end()) {
+            HCCL_ERROR("[CcuSelectAlg] unknown algName[%s] for opType[%u]", algName.c_str(), ccTiling->opType);
+            return HCCL_E_NOT_SUPPORT;
+        }
+
+        // 将算子类型和算法枚举保存到opResCtx
+        opResCtx.opType[i] = ccTiling->opType;
+        opResCtx.algorithmType[i] = it->second;
+
+        HCCL_INFO("[CcuSelectAlg] ccTiling[%u]: opType[%u], algName[%s], algorithmType[%u]",
+            i, ccTiling->opType, algName.c_str(), opResCtx.algorithmType[i]);
+
+        // 资源准备（executor->CalcRes + GetAlgResCcu）
+        bool skipGetRes = false;
+        CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
+        if (skipGetRes) {
+            continue;
+        }
+
+        void *resCtxSequence = nullptr;
+        CHK_RET(GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence));
+    }
+
     return HCCL_SUCCESS;
 }
 
