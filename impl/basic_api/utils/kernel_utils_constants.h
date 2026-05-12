@@ -87,9 +87,6 @@ constexpr uint32_t INT1_BIT_NUM = 1;
 
 // int3b_t param
 constexpr uint32_t INT3_BIT_NUM = 3;
-// int2b_t param
-constexpr uint32_t INT2_FOUR = 4;
-constexpr uint32_t INT2_BIT_NUM = 2;
 
 namespace ConstantsInternal {
 constexpr uint32_t ASCENDC_B4_TWO = 2;
