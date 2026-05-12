@@ -77,7 +77,10 @@ template <int8_t startBit, int8_t endBit>
 __aicore__ static inline void ResetCtrlSpr();
 }  // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_common_intf_impl.h"
+#endif // __NPU_ARCH__
+
 #endif  // ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_H__)
