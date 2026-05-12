@@ -1,0 +1,12 @@
+.wy-nav-content {
+    max-width: 100%;
+}
+
+/* 修正折叠图标重复：保留第一个，隐藏后续多余的 */
+.wy-menu-vertical li a > button.toctree-expand ~ button.toctree-expand {
+    display: none;
+}
+
+.wy-menu-vertical a[name] button.toctree-expand {
+    display: none !important;
+}
