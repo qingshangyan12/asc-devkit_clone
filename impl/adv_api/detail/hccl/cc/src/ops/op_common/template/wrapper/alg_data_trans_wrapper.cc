@@ -465,6 +465,15 @@ bool IsContinuousSlice(const DataSlice &nxtSlice, const DataSlice &currSlice)
     return true;
 }
 
+// #define NSEC_PER_SEC 1000000000U
+
+// inline u64 GetCurCpuTimestamp()
+// {
+//     struct timespec timestamp;
+//     (void)clock_gettime(CLOCK_MONOTONIC_RAW, &timestamp);
+//     return static_cast<u64>((timestamp.tv_sec * NSEC_PER_SEC) + (timestamp.tv_nsec));
+// }
+
 HcclResult PreSyncInterThreads(const ThreadHandle &mainThread, const std::vector<ThreadHandle> &subThreads,
     const std::vector<u32> &notifyIdxMainToSub)
 {
@@ -482,14 +491,20 @@ HcclResult PreSyncInterThreads(const ThreadHandle &mainThread, const std::vector
         HcclResult::HCCL_E_INTERNAL);
     // 主thread向从thread发送record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        // u64 Time1 = GetCurCpuTimestamp();
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyRecordOnThread(mainThread, subThreads[tidx], notifyIdxMainToSub[tidx])));
+        // u64 Time2 = GetCurCpuTimestamp();
+        // HCCL_RUN_INFO("[Pre][Record][%u] startTime: %llu, endTime: %llu, useTime: %llu", tidx, Time1, Time2, Time2 - Time1);
     }
 
     // 从thread等待主thread的record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        // u64 Time1 = GetCurCpuTimestamp();
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyWaitOnThread(subThreads[tidx], notifyIdxMainToSub[tidx], CUSTOM_TIMEOUT)));
+        // u64 Time2 = GetCurCpuTimestamp();
+        // HCCL_RUN_INFO("[Pre][Wait][%u] startTime: %llu, endTime: %llu, useTime: %llu", tidx, Time1, Time2, Time2 - Time1);
     }
 
     return HcclResult::HCCL_SUCCESS;
@@ -512,14 +527,20 @@ HcclResult PostSyncInterThreads(const ThreadHandle &mainThread, const std::vecto
         HcclResult::HCCL_E_INTERNAL);
     // 主thread等待所有从thread的record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        // u64 Time1 = GetCurCpuTimestamp();
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyWaitOnThread(mainThread, notifyIdxSubToMain[tidx], CUSTOM_TIMEOUT)));
+        // u64 Time2 = GetCurCpuTimestamp();
+        // HCCL_RUN_INFO("[Post][Wait][%u] startTime: %llu, endTime: %llu, useTime: %llu", tidx, Time1, Time2, Time2 - Time1);
     }
 
     // 从thread向主thread发送record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        // u64 Time1 = GetCurCpuTimestamp();
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyRecordOnThread(subThreads[tidx], mainThread, notifyIdxSubToMain[tidx])));
+        // u64 Time2 = GetCurCpuTimestamp();
+        // HCCL_RUN_INFO("[Post][Record][%u] startTime: %llu, endTime: %llu, useTime: %llu", tidx, Time1, Time2, Time2 - Time1);
     }
 
     return HcclResult::HCCL_SUCCESS;
