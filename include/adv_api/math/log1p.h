@@ -21,10 +21,7 @@
 #ifndef LIB_MATH_LOG1P_H
 #define LIB_MATH_LOG1P_H
 #include "kernel_tensor.h"
-#include "../../../impl/adv_api/detail/math/log1p/log1p_common_impl.h"
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#include "../../../impl/adv_api/detail/math/log1p/log1p_3510_impl.h"
 
 namespace AscendC {
 
@@ -40,12 +37,9 @@ template <typename T, bool isReuseSource = false>
 __aicore__ inline void Log1p(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     uint32_t calCount)
 {
-    // Only for AI Vector Core.
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     if ASCEND_IS_AIC {
         return;
     }
-#endif
     Log1pImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 }
 
@@ -64,7 +58,6 @@ __aicore__ inline void Log1p(const LocalTensor<T>& dstTensor, const LocalTensor<
 #pragma end_pipe
 }  // namespace AscendC
 
-#endif
 #endif  // LIB_MATH_LOG1P_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOG1P_H__)

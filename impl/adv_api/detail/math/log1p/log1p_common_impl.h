@@ -21,42 +21,9 @@
 #endif
 #ifndef IMPL_MATH_LOG1P_LOG1P_COMMON_IMPL_H
 #define IMPL_MATH_LOG1P_LOG1P_COMMON_IMPL_H
-#include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
-#include "kernel_tiling/kernel_tiling.h"
-#include "../../common/check.h"
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#include "kernel_tensor.h"
 #include "log1p_3510_impl.h"
-#endif
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-
-namespace AscendC {
-template <typename T, bool isReuseSource = false>
-__aicore__ inline void Log1pImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
-{
-    (void)dstTensor;
-    (void)srcTensor;
-    (void)calCount;
-    (void)isReuseSource;
-
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-    Log1pAPI::Log1pCompute((__ubuf__ T*)dstTensor.GetPhyAddr(), (__ubuf__ T*)srcTensor.GetPhyAddr(), calCount);
-#else
-    const UnaryRepeatParams unaryParams;
-    SetMaskCount();
-    SetVectorMask<T, MaskMode::COUNTER>(0, calCount);
-    Ln<T, false>(dstTensor, srcTensor, MASK_PLACEHOLDER, 1, unaryParams);
-    SetMaskNorm();
-    SetVectorMask<half, MaskMode::NORMAL>(FULL_MASK, FULL_MASK);
-#endif
-}
-} // namespace AscendC
-#endif
 #endif // IMPL_MATH_LOG1P_LOG1P_COMMON_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG1P_LOG1P_COMMON_IMPL_H__)

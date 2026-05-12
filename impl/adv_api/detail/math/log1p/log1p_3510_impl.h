@@ -10,17 +10,19 @@
 
 /*!
  * \file log1p_3510_impl.h
- * \brief
+ * \brief Log1p for dav-3510 architecture.
+ *        y = log1p(x) = log(1 + x), float type only.
+ *        Entry (__aicore__) and implementation (__simd_vf__) in a single file.
  */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/adv_api/detail/math/log1p/log1p_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/log1p.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG1P_LOG1P_C310_IMPL_H__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG1P_LOG1P_3510_IMPL_H__
 #endif
-#ifndef IMPL_MATH_LOG1P_LOG1P_C310_IMPL_H
-#define IMPL_MATH_LOG1P_LOG1P_C310_IMPL_H
+#ifndef IMPL_MATH_LOG1P_LOG1P_3510_IMPL_H
+#define IMPL_MATH_LOG1P_LOG1P_3510_IMPL_H
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
 
@@ -58,6 +60,7 @@ __simd_vf__ inline void Log1pCompute(__ubuf__ T* dst, __ubuf__ T* src, uint32_t 
     Reg::RegTensor<int32_t> r3Reg;
     Reg::RegTensor<uint32_t> r4Reg, tmpUReg;
     Reg::MaskReg mask, fullMask, maskSpecial, maskSpecialSub1, maskSpecialAndSub1, maskZero, maskSpecialAndZero;
+    Reg::MaskReg maskNegOne, maskValid;
 
     fullMask = Reg::CreateMask<float, Reg::MaskPattern::ALL>();
 
@@ -69,65 +72,69 @@ __simd_vf__ inline void Log1pCompute(__ubuf__ T* dst, __ubuf__ T* src, uint32_t 
 
         Reg::RegTensor<uint32_t>& r1Reg = (Reg::RegTensor<uint32_t>&)srcReg;
 
-        Reg::Adds(x1Reg, srcReg, 1.0f, mask);
+        Reg::Compares<float, CMPMODE::LT>(maskNegOne, srcReg, -1.0f, mask);
+        Reg::Not(maskValid, maskNegOne, fullMask);
+        Reg::And(maskValid, maskValid, mask, fullMask);
+
+        Reg::Adds(x1Reg, srcReg, 1.0f, maskValid);
         Reg::RegTensor<int32_t>& r2IReg = (Reg::RegTensor<int32_t>&)x1Reg;
 
         Reg::Duplicate<uint32_t>(tmpUReg, LOG1P_CONST_3F400000);
-        Reg::Sub(r3Reg, r2IReg, (Reg::RegTensor<int32_t>&)tmpUReg, mask);
+        Reg::Sub(r3Reg, r2IReg, (Reg::RegTensor<int32_t>&)tmpUReg, maskValid);
 
         Reg::Duplicate<uint32_t>(tmpUReg, LOG1P_CONST_FF800000);
-        Reg::And(r4Reg, (Reg::RegTensor<uint32_t>&)r3Reg, tmpUReg, mask);
+        Reg::And(r4Reg, (Reg::RegTensor<uint32_t>&)r3Reg, tmpUReg, maskValid);
 
         Reg::RegTensor<uint32_t> f9UReg;
-        Reg::Sub(f9UReg, r1Reg, r4Reg, mask);
+        Reg::Sub(f9UReg, r1Reg, r4Reg, maskValid);
         Reg::RegTensor<float>& f9Reg = (Reg::RegTensor<float>&)f9UReg;
 
         Reg::RegTensor<uint32_t> f10UReg;
         Reg::Duplicate<uint32_t>(tmpUReg, LOG1P_CONST_40800000);
-        Reg::Sub(f10UReg, tmpUReg, r4Reg, mask);
+        Reg::Sub(f10UReg, tmpUReg, r4Reg, maskValid);
         Reg::RegTensor<float>& f10Reg = (Reg::RegTensor<float>&)f10UReg;
 
         Reg::Duplicate<float>(tReg, 0.25f);
         Reg::Duplicate<float>(tmpFReg, -1.0f);
-        Reg::FusedMulDstAdd(tReg, f10Reg, tmpFReg, mask);
-        Reg::Add(tReg, tReg, f9Reg, mask);
+        Reg::FusedMulDstAdd(tReg, f10Reg, tmpFReg, maskValid);
+        Reg::Add(tReg, tReg, f9Reg, maskValid);
 
-        Reg::Cast<float, int32_t, castTraitI32F32>(nln2Reg, (Reg::RegTensor<int32_t>&)r4Reg, mask);
-        Reg::Muls(nln2Reg, nln2Reg, 1.1920928955078125e-7f, mask);
+        Reg::Cast<float, int32_t, castTraitI32F32>(nln2Reg, (Reg::RegTensor<int32_t>&)r4Reg, maskValid);
+        Reg::Muls(nln2Reg, nln2Reg, 1.1920928955078125e-7f, maskValid);
 
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)pReg, LOG1P_POLY_C0);
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)tmpFReg, LOG1P_POLY_C1);
-        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, mask);
+        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, maskValid);
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)tmpFReg, LOG1P_POLY_C2);
-        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, mask);
+        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, maskValid);
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)tmpFReg, LOG1P_POLY_C3);
-        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, mask);
+        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, maskValid);
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)tmpFReg, LOG1P_POLY_C4);
-        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, mask);
+        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, maskValid);
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)tmpFReg, LOG1P_POLY_C5);
-        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, mask);
+        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, maskValid);
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)tmpFReg, LOG1P_POLY_C6);
-        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, mask);
+        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, maskValid);
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)tmpFReg, LOG1P_POLY_C7);
-        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, mask);
+        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, maskValid);
         Reg::Duplicate<float>(tmpFReg, -0.5f);
-        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, mask);
+        Reg::FusedMulDstAdd(pReg, tReg, tmpFReg, maskValid);
 
-        Reg::Mul(resultReg, tReg, pReg, mask);
-        Reg::FusedMulDstAdd(resultReg, tReg, tReg, mask);
+        Reg::Mul(resultReg, tReg, pReg, maskValid);
+        Reg::FusedMulDstAdd(resultReg, tReg, tReg, maskValid);
 
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)tmpFReg, LOG1P_LN2);
-        Reg::FusedMulDstAdd(tmpFReg, nln2Reg, resultReg, mask);
+        Reg::FusedMulDstAdd(tmpFReg, nln2Reg, resultReg, maskValid);
 
-        Reg::CompareScalar<uint32_t, CMPMODE::GE>(maskSpecial, r1Reg, LOG1P_CONST_7F800000, mask);
+        Reg::CompareScalar<uint32_t, CMPMODE::GE>(maskSpecial, r1Reg, LOG1P_CONST_7F800000, maskValid);
         Reg::CompareScalar<int32_t, CMPMODE::GE>(maskSpecialSub1, (Reg::RegTensor<int32_t>&)r1Reg,
-            2139095040, mask);
+            2139095040, maskValid);
         Reg::And(maskSpecialAndSub1, maskSpecial, maskSpecialSub1, fullMask);
 
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)specInfReg, LOG1P_CONST_7F800000);
         Reg::FusedMulDstAdd(specInfReg, srcReg, specInfReg, maskSpecialAndSub1);
 
-        Reg::CompareScalar<float, CMPMODE::EQ>(maskZero, srcReg, 0.0f, mask);
+        Reg::CompareScalar<float, CMPMODE::EQ>(maskZero, srcReg, 0.0f, maskValid);
         Reg::And(maskSpecialAndZero, maskSpecial, maskZero, fullMask);
 
         Reg::Duplicate((Reg::RegTensor<uint32_t>&)negZeroReg, LOG1P_CONST_80000000);
@@ -135,15 +142,43 @@ __simd_vf__ inline void Log1pCompute(__ubuf__ T* dst, __ubuf__ T* src, uint32_t 
         Reg::Select(tmpFReg, specInfReg, tmpFReg, maskSpecialAndSub1);
         Reg::Select(tmpFReg, negZeroReg, tmpFReg, maskSpecialAndZero);
 
+        Reg::Duplicate<float, Reg::MaskMergeMode::MERGING>(tmpFReg, -1.0f, maskNegOne);
+
         Reg::StoreAlign(dst + i * oneRepSize, tmpFReg, mask);
     }
 }
 
 } // namespace Log1pAPI
-} // namespace AscendC
-#endif // IMPL_MATH_LOG1P_LOG1P_C310_IMPL_H
 
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG1P_LOG1P_C310_IMPL_H__)
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void Log1pImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
+{
+    if ASCEND_IS_AIC {
+        return;
+    }
+
+    static_assert((std::is_same_v<T, float>), "Log1p only supports float on current device!");
+
+    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN / VECCALC / VECOUT", "LOG1P");
+    CheckTensorPos<T>(srcTensor, Hardware::UB, "srcTensor", "VECIN / VECCALC / VECOUT", "LOG1P");
+    ASCENDC_ASSERT((calCount <= srcTensor.GetSize()), {
+        KERNEL_LOG(KERNEL_ERROR,
+            "calCount is %u, which should not be larger than srcTensor length %u",
+            calCount, srcTensor.GetSize());
+    });
+    ASCENDC_ASSERT((calCount <= dstTensor.GetSize()), {
+        KERNEL_LOG(KERNEL_ERROR,
+            "calCount is %u, which should not be larger than dstTensor length %u",
+            calCount, dstTensor.GetSize());
+    });
+
+    Log1pAPI::Log1pCompute((__ubuf__ T*)dstTensor.GetPhyAddr(), (__ubuf__ T*)srcTensor.GetPhyAddr(), calCount);
+}
+
+} // namespace AscendC
+#endif // IMPL_MATH_LOG1P_LOG1P_3510_IMPL_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG1P_LOG1P_3510_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG1P_LOG1P_C310_IMPL_H__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOG1P_LOG1P_3510_IMPL_H__
 #endif
