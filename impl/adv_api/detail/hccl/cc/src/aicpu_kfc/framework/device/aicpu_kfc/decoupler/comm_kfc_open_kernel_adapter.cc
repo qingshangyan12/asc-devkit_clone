@@ -75,11 +75,12 @@ HcclResult LoadOpenOpParamData(uint64_t opParamKey, std::string &commName, std::
               offsetof(ops_hccl::OpParam, varMemSize), static_cast<unsigned long long>(param->varMemSize),
               opParamSize);
     HCCL_INFO("[MC2_OPEN_DIAG][Load] key %#llx, opParamSize %zu, commName[%s], opType %u, algName[%s], "
-              "inputSize %llu, outputSize %llu, varMemSize %llu, resCtx %p, ctxSize %llu.",
+              "inputSize %llu, outputSize %llu, varMemSize %llu, resCtx %p, ctxSize %llu, deviceType %u, engine %u",
               static_cast<unsigned long long>(opParamKey), opParamSize, commName.c_str(),
               static_cast<u32>(param->opType), param->algName, static_cast<unsigned long long>(param->inputSize),
               static_cast<unsigned long long>(param->outputSize), static_cast<unsigned long long>(param->varMemSize),
-              param->resCtx, static_cast<unsigned long long>(param->ctxSize));
+              param->resCtx, static_cast<unsigned long long>(param->ctxSize), static_cast<u32>(param->deviceType),
+              static_cast<u32>(param->engine));
     if (param->opType == HCCL_CMD_ALLTOALLV || param->opType == HCCL_CMD_ALLTOALL) {
         HCCL_INFO("[MC2_OPEN_DIAG][Load][AllToAllV] sendDataType %u, recvDataType %u, sendCounts %p, recvCounts %p, sdispls %p, rdispls %p.",
                 static_cast<u32>(param->all2AllVDataDes.sendType), static_cast<u32>(param->all2AllVDataDes.recvType),
