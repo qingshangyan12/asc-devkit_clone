@@ -782,7 +782,11 @@ __aicore__ constexpr pipe_t GetPipe(Hardware src, Hardware dst, bool fwdDirect)
             return fwdDirect ? PIPE_MTE1 : PIPE_M;
         }
     } else if (src == Hardware::L0C) {
-        return fwdDirect ? PIPE_M : PIPE_FIX;
+        #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 1001) && (__NPU_ARCH__ != 2002)
+            return fwdDirect ? PIPE_M : PIPE_FIX;
+        #else
+            return fwdDirect ? PIPE_M : PIPE_MTE3;
+        #endif
     }
     return PIPE_S;
 }
