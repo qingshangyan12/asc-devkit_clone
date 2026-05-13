@@ -15,7 +15,7 @@
 #include "hccl_exception.h"
 #include "exception_defination.h"
 
-namespace HcclSim {
+namespace Hccl {
 
 class TimeoutException : public HcclException {
 public:
@@ -23,5 +23,5 @@ public:
         : HcclException(ExceptionType::TIMEOUT_EXCEPTION, userDefinedMsg){};
 };
 
-} // namespace 
+} // namespace Hccl
 #endif

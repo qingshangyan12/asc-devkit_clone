@@ -16,7 +16,7 @@
 #include <vector>
 #include "exception_defination.h"
 
-namespace HcclSim {
+namespace Hccl {
 
 class HcclException : std::exception {
 public:

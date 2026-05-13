@@ -13,7 +13,7 @@
 
 #include "hccl_exception.h"
 
-namespace HcclSim {
+namespace Hccl {
 
 class NullPtrException : public HcclException {
 public:
@@ -21,5 +21,5 @@ public:
         : HcclException(ExceptionType::NULL_PTR_EXCEPTION, userDefinedMsg){};
 };
 
-}
+} // namespace Hccl
 #endif

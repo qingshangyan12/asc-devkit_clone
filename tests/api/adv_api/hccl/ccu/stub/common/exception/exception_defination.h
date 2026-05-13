@@ -16,7 +16,7 @@
 #include "enum_factory.h"
 #include "hccl_types.h"
 
-namespace HcclSim {
+namespace Hccl {
 MAKE_ENUM(ExceptionType, NULL_PTR_EXCEPTION, INVALID_PARAMS_EXCEPTION, TIMEOUT_EXCEPTION, DRV_API_EXCEPTION,
           NETWORK_API_EXCEPTION, RUNTIME_API_EXCEPTION, RESOURCES_NOT_EXIST_EXCEPTION, NOT_SUPPORT_EXCEPTION,
           INTERNAL_EXCEPTION, RMA_CONN_EXCEPTION, SOCKET_EXCEPTION, RES_UNPACKAGE_EXCEPTION,
@@ -28,6 +28,6 @@ public:
     static HcclResult GetErrorCode(const ExceptionType &type);
 };
 
-}
+} // namespace Hccl
 
 #endif

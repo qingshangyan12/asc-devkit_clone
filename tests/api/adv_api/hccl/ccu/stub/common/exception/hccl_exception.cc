@@ -13,7 +13,7 @@
 #include "exception_util.h"
 #include "null_ptr_exception.h"
 
-namespace HcclSim {
+namespace Hccl {
 const char *HcclException::what() const noexcept
 {
     return errorMsg.c_str();

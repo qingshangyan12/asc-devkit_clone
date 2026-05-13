@@ -13,7 +13,7 @@
 
 #include "hccl_exception.h"
 
-namespace HcclSim {
+namespace Hccl {
 
 class NotSupportException : public HcclException {
 public:

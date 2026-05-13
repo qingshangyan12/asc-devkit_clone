@@ -13,7 +13,7 @@
 
 #include "hccl_exception.h"
 
-namespace HcclSim {
+namespace Hccl {
 class InternalException : public HcclException {
 public:
     explicit InternalException(const std::string &userDefinedMsg)

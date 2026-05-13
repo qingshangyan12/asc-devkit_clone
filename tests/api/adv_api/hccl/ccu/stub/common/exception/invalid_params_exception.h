@@ -13,12 +13,12 @@
 
 #include "hccl_exception.h"
 
-namespace HcclSim {
+namespace Hccl {
 class InvalidParamsException : public HcclException {
 public:
     explicit InvalidParamsException(const std::string &userDefinedMsg)
         : HcclException(ExceptionType::INVALID_PARAMS_EXCEPTION, userDefinedMsg){};
 };
 
-} // namespace
+} // namespace Hccl
 #endif

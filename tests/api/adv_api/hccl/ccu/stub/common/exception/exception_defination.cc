@@ -10,7 +10,7 @@
 
 #include "exception_defination.h"
 
-namespace HcclSim {
+namespace Hccl {
 
 HcclResult ExceptionInfo::GetErrorCode(const ExceptionType &type)
 {
@@ -55,4 +55,4 @@ std::string ExceptionInfo::GetErrorMsg(const ExceptionType &type)
         {ExceptionType::SUSPENDING_EXCEPTION, "Suspending exception: "}};
     return errorMsgMap.at(type);
 }
-}
+} // namespace Hccl
