@@ -29,7 +29,6 @@
 #endif
 namespace AscendC {
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <int count = 1>
 __aicore__ inline void Nop()
 {
@@ -43,7 +42,6 @@ __aicore__ inline void Nop()
     }
     PipeBarrier<PIPE_ALL>();
 }
-#endif
 
 enum class EngineType : int32_t {
     AIC = 1,
