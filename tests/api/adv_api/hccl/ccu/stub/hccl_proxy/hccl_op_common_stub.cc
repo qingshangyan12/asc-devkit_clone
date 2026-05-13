@@ -11,6 +11,9 @@
 #include "alg_param.h"
 #include "hccl_types.h"
 #include "execute_selector.h"
+#include "coll_alg_v2_exec_registry.h"
+#include "executor_base.h"
+#include "executor_v2_base.h"
 #include <memory>
 #include <string>
 
@@ -74,6 +77,39 @@ HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* top
 }
 
 HcclResult SetCommEngine(OpParam& param)
+{
+    return HcclResult::HCCL_SUCCESS;
+}
+
+u32 GetExternalInputHcclAivOnlyMode()
+{
+    return 0;
+}
+
+HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algTag)
+{
+    return HcclResult::HCCL_SUCCESS;
+}
+
+HcclResult SingleRankProc(const OpParam& param)
+{
+    return HcclResult::HCCL_SUCCESS;
+}
+
+CollAlgExecRegistryV2& CollAlgExecRegistryV2::Instance()
+{
+    static CollAlgExecRegistryV2 instance;
+    return instance;
+}
+
+std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(HcclCMDType opType, const std::string& algTag)
+{
+    return nullptr;
+}
+
+HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor,
+    TopoInfoWithNetLayerDetails* topoInfo, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost,
+    void** resCtxDevice, bool& isSuspend)
 {
     return HcclResult::HCCL_SUCCESS;
 }
