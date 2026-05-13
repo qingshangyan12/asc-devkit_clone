@@ -51,7 +51,7 @@ enum HcclServerType : uint32_t {
 
 ## 约束说明<a name="zh-cn_topic_0000001962490173_zh-cn_topic_0000001339105488_section19165124931511"></a>
 
--   使用该接口前，算子需要先通过[MC2](MC2.md)接口注册该算子是通算融合算子，注册后即返回一个[OpMC2Def](OpMC2Def.md)结构。
+-   使用该接口前，算子需要先通过[MC2](../OpDef/MC2.md)接口注册该算子是通算融合算子，注册后即返回一个[OpMC2Def](OpMC2Def.md)结构。
 -   同时为特定AI处理器型号和所有AI处理器型号配置服务端类型时，特定AI处理器型号配置的优先级更高。
 
 ## 调用示例<a name="zh-cn_topic_0000001962490173_section163549032418"></a>

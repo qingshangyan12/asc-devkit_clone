@@ -202,7 +202,7 @@
 
 本样例的srcLocal和dstLocal均为int16\_t类型。
 
-更多样例可参考[LINK](更多样例-9.md)。
+更多样例可参考[LINK](../基础算术/更多样例-9.md)。
 
 -   tensor高维切分计算样例-mask连续模式
 

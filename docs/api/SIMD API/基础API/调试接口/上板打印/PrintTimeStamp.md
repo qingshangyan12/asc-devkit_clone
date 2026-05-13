@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-推荐使用[asc\_time\_stamp](asc_time_stamp.md)接口进行时间戳的获取，该接口同时适用于C语言和C++语言编程。
+推荐使用[asc\_time\_stamp](../../../../Utils API/调测接口/asc_time_stamp.md)接口进行时间戳的获取，该接口同时适用于C语言和C++语言编程。
 
 提供时间戳打点功能，用于在算子Kernel代码中标记关键执行点。调用后会打印如下信息：
 

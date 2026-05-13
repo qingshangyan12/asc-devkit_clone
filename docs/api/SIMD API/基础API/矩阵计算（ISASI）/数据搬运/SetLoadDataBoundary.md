@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-设置[Load3D](LoadData.md)时A1/B1边界值。
+设置[Load3D](LoadData/LoadData.md)时A1/B1边界值。
 
 如果Load3D指令在处理源操作数时，源操作数在A1/B1上的地址超出设置的边界，则会从A1/B1起始地址开始读取数据。
 

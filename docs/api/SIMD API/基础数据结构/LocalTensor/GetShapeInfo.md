@@ -63,7 +63,7 @@ __aicore__ inline ShapeInfo GetShapeInfo() const
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-LocalTensor的Shape信息，[ShapeInfo](ShapeInfo.md)结构体类型。
+LocalTensor的Shape信息，[ShapeInfo](../../其他数据类型/ShapeInfo.md)结构体类型。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

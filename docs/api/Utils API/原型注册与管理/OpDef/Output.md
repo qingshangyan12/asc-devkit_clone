@@ -33,7 +33,7 @@ OpParamDef &Output(const char *name)
 
 ## 返回值说明<a name="zh-cn_topic_0000001549347676_zh-cn_topic_0000001576870901_zh-cn_topic_0000001575944081_section25791320141317"></a>
 
-算子参数定义，OpParamDef实例，具体请参考[OpParamDef](OpParamDef.md)。
+算子参数定义，OpParamDef实例，具体请参考[OpParamDef](../OpParamDef/OpParamDef.md)。
 
 ## 约束说明<a name="zh-cn_topic_0000001549347676_zh-cn_topic_0000001576870901_zh-cn_topic_0000001575944081_section19165124931511"></a>
 

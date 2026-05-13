@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002000280001_zh-cn_topic_0000001960477980_section259105813316"></a>
 
-推荐使用[asc\_prof\_stop](asc_prof_stop.md)接口进行性能数据采集信号停止的设置，该接口同时适用于C语言和C++语言编程。
+推荐使用[asc\_prof\_stop](../../../../Utils API/调测接口/asc_prof_stop.md)接口进行性能数据采集信号停止的设置，该接口同时适用于C语言和C++语言编程。
 
 设置性能数据采集信号停止，和MetricsProfStart配合使用。使用工具进行算子上板调优时，可在kernel侧代码段前后分别调用MetricsProfStart和MetricsProfStop来指定需要调优的代码段范围。
 

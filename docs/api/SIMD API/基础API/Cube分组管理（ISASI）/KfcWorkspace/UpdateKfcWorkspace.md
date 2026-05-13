@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001526206862_section212607105720"></a>
 
-更新用于CubeResGroupHandle消息通信区的内存地址。用户使用[CubeResGroupHandle](CubeResGroupHandle构造函数.md)接口时，需要用此接口自主管理空间地址。
+更新用于CubeResGroupHandle消息通信区的内存地址。用户使用[CubeResGroupHandle](../CubeResGroupHandle/CubeResGroupHandle构造函数.md)接口时，需要用此接口自主管理空间地址。
 
 ## 函数原型<a name="section765814724715"></a>
 
@@ -86,7 +86,7 @@ __aicore__ inline void UpdateKfcWorkspace(uint32_t offset)
 
 ## 约束说明<a name="zh-cn_topic_0000001526206862_section65498832"></a>
 
-本接口不能和[CreateCubeResGroup](CreateCubeResGroup.md)接口同时使用。
+本接口不能和[CreateCubeResGroup](../CubeResGroupHandle/CreateCubeResGroup.md)接口同时使用。
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 

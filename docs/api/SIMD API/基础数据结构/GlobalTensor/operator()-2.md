@@ -51,7 +51,7 @@
 
 获取某个索引位置的元素的引用。
 
-与[LocalTensor](LocalTensor.md)的operator\(\)类似。
+与[LocalTensor](../LocalTensor/LocalTensor.md)的operator\(\)类似。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

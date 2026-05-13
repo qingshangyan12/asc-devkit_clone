@@ -79,7 +79,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling参数进行资源划分，Tiling参数的具体介绍请参考[Matmul Tiling侧接口](Matmul-Tiling侧接口.md)。
+Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling参数进行资源划分，Tiling参数的具体介绍请参考[Matmul Tiling侧接口](../Matmul Tiling侧接口/Matmul-Tiling侧接口.md)。
 
 开发者可以先通过[REGIST\_MATMUL\_OBJ](REGIST_MATMUL_OBJ.md)不传入Tiling参数对单个Matmul对象进行初始化，后续通过Init接口单独传入Tiling参数，对Matmul对象中的Tiling数据进行调整。比如，Tiling参数可变的场景下，可以通过多次调用Init来重新设置Tiling参数。
 

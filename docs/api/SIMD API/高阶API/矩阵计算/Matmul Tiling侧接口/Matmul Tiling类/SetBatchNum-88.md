@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-设置多Batch计算的最大Batch数，最大Batch数为A矩阵[batchA](SetBatchNum.md#table9646134355611)和B矩阵[batchB](SetBatchNum.md#table9646134355611)中的最大值。调用[IterateBatch](IterateBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置多Batch计算的Batch数。
+设置多Batch计算的最大Batch数，最大Batch数为A矩阵[batchA](SetBatchNum.md#table9646134355611)和B矩阵[batchB](SetBatchNum.md#table9646134355611)中的最大值。调用[IterateBatch](../../Matmul Kernel侧接口/IterateBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置多Batch计算的Batch数。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -39,7 +39,7 @@ int32_t SetBatchNum(int32_t batch)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-调用[IterateBatch](IterateBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置多Batch计算的Batch数。
+调用[IterateBatch](../../Matmul Kernel侧接口/IterateBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置多Batch计算的Batch数。
 
 ## 调用示例<a name="section1665082013318"></a>
 

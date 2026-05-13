@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001935420684_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section36583473819"></a>
 
-注册该算子是通算融合算子，调用该接口后会返回一个[OpMC2Def](OpMC2Def.md)结构，后续可通过该结构配置通信域名称。
+注册该算子是通算融合算子，调用该接口后会返回一个[OpMC2Def](../OpMC2Def/OpMC2Def.md)结构，后续可通过该结构配置通信域名称。
 
 ## 函数原型<a name="zh-cn_topic_0000001935420684_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
@@ -16,7 +16,7 @@ OpMC2Def &MC2(void)
 
 ## 返回值说明<a name="zh-cn_topic_0000001935420684_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section25791320141317"></a>
 
-[OpMC2Def](OpMC2Def.md)结构，后续可通过该结构配置通信域名称。
+[OpMC2Def](../OpMC2Def/OpMC2Def.md)结构，后续可通过该结构配置通信域名称。
 
 ## 约束说明<a name="zh-cn_topic_0000001935420684_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section19165124931511"></a>
 

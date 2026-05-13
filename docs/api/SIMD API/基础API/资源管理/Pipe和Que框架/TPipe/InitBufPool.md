@@ -62,10 +62,10 @@
 初始化TBufPool内存资源池。本接口适用于内存资源有限时，希望手动指定UB/L1内存资源复用的场景。本接口初始化后在整体内存资源中划分出一块子资源池。划分出的子资源池TBufPool，提供了如下方式进行资源管理：
 
 -   TPipe::InitBufPool的重载接口指定与其他TBufPool子资源池复用;
--   TBufPool::[InitBufPool](InitBufPool-55.md)接口对子资源池继续划分；
--   TBufPool::[InitBuffer](InitBuffer-56.md)接口分配Buffer；
+-   TBufPool::[InitBufPool](../TBufPool/InitBufPool-55.md)接口对子资源池继续划分；
+-   TBufPool::[InitBuffer](../TBufPool/InitBuffer-56.md)接口分配Buffer；
 
-关于TBufPool的具体介绍及资源划分图示请参考[TBufPool](TBufPool.md)。
+关于TBufPool的具体介绍及资源划分图示请参考[TBufPool](../TBufPool/TBufPool.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -139,7 +139,7 @@ __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len, U& shareBuf)
 
 -   新划分的资源池与被复用资源池的硬件属性需要一致，两者共享起始地址及长度；
 -   输入长度需要小于等于被复用资源池长度；
--   其他泛用约束参考[TBufPool](TBufPool.md)。
+-   其他泛用约束参考[TBufPool](../TBufPool/TBufPool.md)。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

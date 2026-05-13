@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section36583473819"></a>
 
-注册算子支持的AI处理器型号以及[OpAICoreConfig](OpAICoreConfig.md)信息。
+注册算子支持的AI处理器型号以及[OpAICoreConfig](../OpAICoreConfig/OpAICoreConfig.md)信息。
 
 ## 函数原型<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section13230182415108"></a>
 

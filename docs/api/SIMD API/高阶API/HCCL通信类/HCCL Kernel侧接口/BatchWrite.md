@@ -157,7 +157,7 @@ __aicore__ inline HcclHandle BatchWrite(GM_ADDR batchWriteInfo, uint32_t itemNum
 -   若HCCL对象的[config模板参数](HCCL模板参数.md#table884518212555)未指定下发通信任务的核，该接口只能在AIC核或者AIV核两者之一上调用。若HCCL对象的[config模板参数](HCCL模板参数.md#table884518212555)中指定了下发通信任务的核，则该接口可以在AIC核和AIV核上同时调用，接口内部会根据指定的核的类型，只在AIC核、AIV核二者之一下发该通信任务。
 -   一个通信域内，所有Prepare接口和InterHcclGroupSync接口的总调用次数不能超过63。
 -   对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，当前接口仅支持不同AI Server间的通信，同时通信任务信息中指定的目的卡号不能是本卡号。
--   通信任务信息写入batchWriteInfo前，必须通过调用[DataCacheCleanAndInvalid](DataCacheCleanAndInvalid.md)接口，保证预期的数据成功刷新到Global Memory上。
+-   通信任务信息写入batchWriteInfo前，必须通过调用[DataCacheCleanAndInvalid](../../../基础API/缓存控制/DataCacheCleanAndInvalid.md)接口，保证预期的数据成功刷新到Global Memory上。
 
 ## 调用示例<a name="section1665082013318"></a>
 
@@ -312,7 +312,7 @@ __aicore__ inline HcclHandle BatchWrite(GM_ADDR batchWriteInfo, uint32_t itemNum
     }
     ```
 
-    当通信数据量较大时，可以在Tiling流程中调用SetAicpuBlockDim、[SetCommBlockNum](SetCommBlockNum.md)、[SetQueueNum](SetQueueNum.md)接口，通过并发机制提升算子的性能。
+    当通信数据量较大时，可以在Tiling流程中调用SetAicpuBlockDim、[SetCommBlockNum](../HCCL Tiling侧接口/SetCommBlockNum.md)、[SetQueueNum](../HCCL Tiling侧接口/SetQueueNum.md)接口，通过并发机制提升算子的性能。
 
     在如下示例代码中，参与BatchWrite通信的核数为24，通信队列的数量为2，总的队列数=24\*2，即48；与此同时，服务端AI CPU的核数为4，这样每个AI CPU核只需要负责编排48/4即12个通信队列上的任务即可，提升了通信效率。
 

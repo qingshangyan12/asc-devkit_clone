@@ -35,7 +35,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     hccl.InitV2(contextGM, &tilingData);
     ```
 
-    当调用InitV2接口时，必须使用标准C++语法定义TilingData结构体的开发方式。如上示例代码中的tilingGM为host侧传入的、作为核函数入参的算子TilingData的GM地址，通过[GET\_TILING\_DATA\_WITH\_STRUCT](GET_TILING_DATA_WITH_STRUCT.md)获取TilingData。调用[InitV2](InitV2.md)初始化接口时，需要传入通信上下文信息，可以通过框架提供的获取通信上下文的接口[GetHcclContext](GetHcclContext.md)获取。
+    当调用InitV2接口时，必须使用标准C++语法定义TilingData结构体的开发方式。如上示例代码中的tilingGM为host侧传入的、作为核函数入参的算子TilingData的GM地址，通过[GET\_TILING\_DATA\_WITH\_STRUCT](../../../基础API/Kernel Tiling/GET_TILING_DATA_WITH_STRUCT.md)获取TilingData。调用[InitV2](InitV2.md)初始化接口时，需要传入通信上下文信息，可以通过框架提供的获取通信上下文的接口[GetHcclContext](../HCCL Context/GetHcclContext.md)获取。
 
 2.  设置对应通信算法的Tiling地址。
 
@@ -148,7 +148,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     // }
     
     // 调用核间同步接口，防止部分核执行较快退出，触发Hccl析构，影响执行较慢的核
-    // 开发者可根据实际的业务场景，选择调用[SyncAll](SyncAll.md)、[CrossCoreSetFlag(ISASI)](CrossCoreSetFlag(ISASI).md)、[CrossCoreWaitFlag(ISASI)](CrossCoreWaitFlag(ISASI).md)接口，保证全部核的任务完成后再退出执行
+    // 开发者可根据实际的业务场景，选择调用[SyncAll](../../../基础API/同步控制/核间同步/SyncAll.md)、[CrossCoreSetFlag(ISASI)](CrossCoreSetFlag(ISASI).md)、[CrossCoreWaitFlag(ISASI)](CrossCoreWaitFlag(ISASI).md)接口，保证全部核的任务完成后再退出执行
     ```
 
 6.  用户调用[Finalize](Finalize.md)接口，通知服务端后续无通信任务，执行结束后退出；客户端检测并等待最后一个通信任务执行结束。
@@ -263,5 +263,5 @@ extern "C" __global__ __aicore__ void reduce_scatter_custom(GM_ADDR xGM, GM_ADDR
 </tbody>
 </table>
 
-提示：调试含有HCCL高阶API的算子时，在算子编译工程中增加编译选项-DASCENDC\_DEBUG，可以使能异常场景拦截的能力，具体内容请参考并使用[assert接口](assert.md)。
+提示：调试含有HCCL高阶API的算子时，在算子编译工程中增加编译选项-DASCENDC\_DEBUG，可以使能异常场景拦截的能力，具体内容请参考并使用[assert接口](../../../基础API/调试接口/异常检测/assert.md)。
 

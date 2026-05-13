@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-Init主要用于对Conv3DBackpropFilter对象中的Tiling数据进行初始化，根据Tiling参数进行资源划分，Tiling参数的具体介绍请参考[Conv3DBackpropFilter Tiling侧接口](Conv3DBackpropFilter-Tiling侧接口.md)。
+Init主要用于对Conv3DBackpropFilter对象中的Tiling数据进行初始化，根据Tiling参数进行资源划分，Tiling参数的具体介绍请参考[Conv3DBackpropFilter Tiling侧接口](../Conv3DBackpropFilter Tiling侧接口/Conv3DBackpropFilter-Tiling侧接口.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

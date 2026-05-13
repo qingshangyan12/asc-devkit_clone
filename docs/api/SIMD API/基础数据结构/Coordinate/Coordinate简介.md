@@ -1,6 +1,6 @@
 # Coordinate简介<a name="ZH-CN_TOPIC_0000002400346593"></a>
 
-Coordinate本质上是一个元组（tuple），用于表示张量在不同维度的位置信息，即坐标值。Coordinate（坐标）和[Layout](Layout.md)（布局）、Index（内存位置索引）之间存在紧密的关联：
+Coordinate本质上是一个元组（tuple），用于表示张量在不同维度的位置信息，即坐标值。Coordinate（坐标）和[Layout](../Layout/Layout.md)（布局）、Index（内存位置索引）之间存在紧密的关联：
 
 -   从Coordinate到Index的转换：Layout定义了张量的形状和各维度的步长，根据这些信息和给定的Coordinate，可以计算出该坐标在内存中的位置索引。
 -   从Index到Coordinate的转换：基于Layout中定义的形状和步长信息，对于一个已知的内存位置索引，通过相应的计算可以得到该索引对应的Coordinate。

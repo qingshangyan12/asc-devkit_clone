@@ -123,7 +123,7 @@ bufOffset需满足32字节对齐的要求。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-获取到的[LocalTensor](LocalTensor.md)。
+获取到的[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor.md)。
 
 ## 调用示例<a name="section5725818154718"></a>
 

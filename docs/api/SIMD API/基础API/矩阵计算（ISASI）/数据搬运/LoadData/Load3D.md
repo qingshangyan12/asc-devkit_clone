@@ -474,7 +474,7 @@ Load3D用于完成image to column操作，将多维feature map转为二维矩阵
 -   操作数地址对齐要求请参见[通用地址对齐约束](通用说明和约束.md#section796754519912)。
 
 -   LoadData3DParamsV1 cSize特性的开启，需要保证A1/B1中的feature map为 4 channel对齐。
--   调用Load3Dv2/Load3Dv2Pro指令需要通过[SetLoadDataRepeat](SetLoadDataRepeat.md)接口配置dstStride，若不使能repeat模式，接口内repeat相关参数使用默认构造值。
+-   调用Load3Dv2/Load3Dv2Pro指令需要通过[SetLoadDataRepeat](../SetLoadDataRepeat.md)接口配置dstStride，若不使能repeat模式，接口内repeat相关参数使用默认构造值。
 
 ## Load3d数据格式说明<a name="section726316123184"></a>
 

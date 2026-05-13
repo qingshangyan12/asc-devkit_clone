@@ -325,9 +325,9 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
 -   Atlas A3 训练系列产品/Atlas A3 推理系列产品仅支持CTRL\[48\]比特位。
 -   Atlas A2 训练系列产品/Atlas A2 推理系列产品仅支持CTRL\[48\]比特位。
 -   Ascend 950PR/Ascend 950DT对于CTRL\[8:6\]和CTRL\[10:9\]的设置，已封装原子操作API，建议通过这些原子操作API进行配置。
-    -   [SetAtomicType](SetAtomicType.md)
-    -   [DisableDmaAtomic](DisableDmaAtomic.md)
-    -   [SetAtomicAdd](SetAtomicAdd.md)
+    -   [SetAtomicType](../原子操作/SetAtomicType.md)
+    -   [DisableDmaAtomic](../原子操作/DisableDmaAtomic.md)
+    -   [SetAtomicAdd](../原子操作/SetAtomicAdd.md)
     -   [SetAtomicMax](SetAtomicMax(ISASI).md)
     -   [SetAtomicMin](SetAtomicMin(ISASI).md)
 

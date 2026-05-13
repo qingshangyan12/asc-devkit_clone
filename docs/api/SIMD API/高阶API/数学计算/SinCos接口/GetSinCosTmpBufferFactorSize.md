@@ -80,7 +80,7 @@ void GetSinCosTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& ascen
 
 ## 调用示例<a name="section19206195105019"></a>
 
-完整的调用样例请参考[更多样例](更多样例-83.md)。
+完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
 ```
 uint32_t maxLivedNodeCount = 0;

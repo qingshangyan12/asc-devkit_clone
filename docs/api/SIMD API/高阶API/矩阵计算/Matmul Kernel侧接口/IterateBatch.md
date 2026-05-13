@@ -82,7 +82,7 @@
 
 实例化Matmul时，需要通过MatmulType设置输入输出的Layout格式，当前支持4种Layout类型：BSNGD、SBNGD、BNGS1S2、NORMAL（BMNK的数据排布格式使用NORMAL表示）。
 
-对于BSNGD、SBNGD、BNGS1S2 Layout格式，调用该接口之前需要在host Tiling实现中使用[SetALayout](SetALayout.md)、[SetBLayout](SetBLayout.md)、[SetCLayout](SetCLayout.md)、[SetBatchNum](SetBatchNum-88.md)设置A/B/C的Layout轴信息和最大BatchNum数；对于NORMAL  Layout格式则需使用[SetBatchInfoForNormal](SetBatchInfoForNormal.md)设置A/B/C的M/N/K轴信息和A/B矩阵的BatchNum数。
+对于BSNGD、SBNGD、BNGS1S2 Layout格式，调用该接口之前需要在host Tiling实现中使用[SetALayout](../Matmul Tiling侧接口/Matmul Tiling类/SetALayout.md)、[SetBLayout](../Matmul Tiling侧接口/Matmul Tiling类/SetBLayout.md)、[SetCLayout](../Matmul Tiling侧接口/Matmul Tiling类/SetCLayout.md)、[SetBatchNum](../Matmul Tiling侧接口/Matmul Tiling类/SetBatchNum-88.md)设置A/B/C的Layout轴信息和最大BatchNum数；对于NORMAL  Layout格式则需使用[SetBatchInfoForNormal](../Matmul Tiling侧接口/Matmul Tiling类/SetBatchInfoForNormal.md)设置A/B/C的M/N/K轴信息和A/B矩阵的BatchNum数。
 
 单个矩阵乘迭代顺序可通过tiling参数iterateOrder调整。
 

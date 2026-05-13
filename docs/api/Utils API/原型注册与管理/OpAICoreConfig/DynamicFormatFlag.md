@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001575453116_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_section36583473819"></a>
 
-标识是否根据[SetOpSelectFormat](SetOpSelectFormat.md)设置的函数自动推导算子输入输出支持的dtype和format。设置为“true”，则无需在原型注册时配置固定的dtype与format，会调用推导函数来推导算子输入输出支持的dtype和format。
+标识是否根据[SetOpSelectFormat](../OpAICoreDef/SetOpSelectFormat.md)设置的函数自动推导算子输入输出支持的dtype和format。设置为“true”，则无需在原型注册时配置固定的dtype与format，会调用推导函数来推导算子输入输出支持的dtype和format。
 
 ## 函数原型<a name="zh-cn_topic_0000001575453116_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
@@ -41,5 +41,5 @@ OpAICoreConfig类，请参考[OpAICoreConfig](OpAICoreConfig.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000001575453116_zh-cn_topic_0000001576875005_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-请参考[SetOpSelectFormat](SetOpSelectFormat.md)节调用示例。
+请参考[SetOpSelectFormat](../OpAICoreDef/SetOpSelectFormat.md)节调用示例。
 

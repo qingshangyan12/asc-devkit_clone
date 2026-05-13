@@ -98,7 +98,7 @@ __aicore__ inline void InitStartBufHandle(TBufHandle startBufhandle, uint8_t num
 
 -   TQue、TBuf类继承自TQueBind类，所以TQue、TBuf对象也可使用该接口。
 
--   该接口目前只提供给[自定义TBufPool](自定义TBufPool.md)初始化TQue、TBuf的内存块时使用。
+-   该接口目前只提供给[自定义TBufPool](../自定义TBufPool/自定义TBufPool.md)初始化TQue、TBuf的内存块时使用。
 -   当使用TBuf对象调用该接口时，入参num必须为1。
 
 ## 返回值说明<a name="section640mcpsimp"></a>

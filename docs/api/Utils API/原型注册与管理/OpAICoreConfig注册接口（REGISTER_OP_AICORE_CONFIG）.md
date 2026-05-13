@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001600307121_zh-cn_topic_0000001576870453_zh-cn_topic_0000001525424352_section36583473819"></a>
 
-不同的硬件形态算子原型定义不同的情况，可以通过新增[OpAICoreConfig](OpAICoreConfig.md)的方式，针对不同的AI处理器型号[注册差异化的算子原型](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子原型定义.md)。REGISTER\_OP\_AICORE\_CONFIG宏在不改变原有注册的基础上，允许单独新增文件来注册算子在不同硬件形态上的差异化信息。
+不同的硬件形态算子原型定义不同的情况，可以通过新增[OpAICoreConfig](OpAICoreConfig/OpAICoreConfig.md)的方式，针对不同的AI处理器型号[注册差异化的算子原型](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子原型定义.md)。REGISTER\_OP\_AICORE\_CONFIG宏在不改变原有注册的基础上，允许单独新增文件来注册算子在不同硬件形态上的差异化信息。
 
 使用该注册宏需要包含以下头文件：
 
@@ -58,7 +58,7 @@ REGISTER_OP_AICORE_CONFIG(opType, socVersion, opFunc)
 
 ## 约束说明<a name="zh-cn_topic_0000001600307121_zh-cn_topic_0000001576870453_zh-cn_topic_0000001525424352_section19165124931511"></a>
 
-若算子同时使用[AddConfig](AddConfig.md)注册算子支持的AI处理器型号以及OpAICoreConfig信息，且AI处理器型号相同时，通过AddConfig方式注册的配置优先级更高，会覆盖REGISTER\_OP\_AICORE\_CONFIG宏注册的OpAICoreConfig信息。
+若算子同时使用[AddConfig](OpAICoreDef/AddConfig.md)注册算子支持的AI处理器型号以及OpAICoreConfig信息，且AI处理器型号相同时，通过AddConfig方式注册的配置优先级更高，会覆盖REGISTER\_OP\_AICORE\_CONFIG宏注册的OpAICoreConfig信息。
 
 ## 调用示例<a name="zh-cn_topic_0000001600307121_zh-cn_topic_0000001576870453_zh-cn_topic_0000001575944081_section320753512363"></a>
 

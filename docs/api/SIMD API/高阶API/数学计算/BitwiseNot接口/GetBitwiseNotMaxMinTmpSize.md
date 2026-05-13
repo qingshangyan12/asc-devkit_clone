@@ -82,7 +82,7 @@ void GetBitwiseNotMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendc
 
 ## 调用示例<a name="section372473524513"></a>
 
-完整的调用样例请参考[更多样例](更多样例-83.md)。
+完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
 ```
 std::vector<int64_t> shape_vec = {1024};

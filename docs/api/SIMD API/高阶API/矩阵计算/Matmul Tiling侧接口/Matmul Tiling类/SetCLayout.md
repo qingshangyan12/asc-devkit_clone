@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-设置C矩阵的Layout轴信息，包括[B、S、N、G、D轴](IterateBatch.md)。对于BSNGD、SBNGD、BNGS1S2 Layout格式，调用[IterateBatch](IterateBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置C矩阵的Layout轴信息。
+设置C矩阵的Layout轴信息，包括[B、S、N、G、D轴](../../Matmul Kernel侧接口/IterateBatch.md)。对于BSNGD、SBNGD、BNGS1S2 Layout格式，调用[IterateBatch](../../Matmul Kernel侧接口/IterateBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置C矩阵的Layout轴信息。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -67,7 +67,7 @@ int32_t SetCLayout(int32_t b, int32_t s, int32_t n, int32_t g, int32_t d)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-对于BSNGD、SBNGD、BNGS1S2 Layout格式，调用[IterateBatch](IterateBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置C矩阵的Layout轴信息。
+对于BSNGD、SBNGD、BNGS1S2 Layout格式，调用[IterateBatch](../../Matmul Kernel侧接口/IterateBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置C矩阵的Layout轴信息。
 
 ## 调用示例<a name="section1665082013318"></a>
 

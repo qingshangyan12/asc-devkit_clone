@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-BatchMatmul Tiling调用[GetTiling](GetTiling.md)接口获取Tiling参数后，根据Tiling结构体信息获取L1 Buffer/Unified Buffer/L0C Buffer的使用大小。
+BatchMatmul Tiling调用[GetTiling](../Matmul Tiling类/GetTiling.md)接口获取Tiling参数后，根据Tiling结构体信息获取L1 Buffer/Unified Buffer/L0C Buffer的使用大小。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

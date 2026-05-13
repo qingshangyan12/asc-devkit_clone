@@ -129,7 +129,7 @@ __aicore__ inline void InitBufHandle(T* bufPool, uint32_t index, TBufHandle bufh
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   TQue、TBuf类继承自TQueBind类，所以TQue、TBuf对象也可使用该接口。
--   目前只提供给[自定义TBufPool](自定义TBufPool.md)初始化TQue、TBuf的内存块时使用。
+-   目前只提供给[自定义TBufPool](../自定义TBufPool/自定义TBufPool.md)初始化TQue、TBuf的内存块时使用。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

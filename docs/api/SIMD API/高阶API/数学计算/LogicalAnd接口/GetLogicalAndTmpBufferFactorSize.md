@@ -80,7 +80,7 @@ void GetLogicalAndTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& a
 
 ## 调用示例<a name="section9561108464"></a>
 
-完整的调用样例请参考[更多样例](更多样例-83.md)。
+完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
 ```
 uint32_t maxLivedNodeCount = 0;

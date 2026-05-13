@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-获取[RegTensor](RegTensor.md)位宽VL（Vector Length）的大小。
+获取[RegTensor](../Reg矢量计算/寄存器数据类型/RegTensor.md)位宽VL（Vector Length）的大小。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

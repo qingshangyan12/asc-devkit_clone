@@ -53,19 +53,19 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
--   用于[AddDeqRelu](AddDeqRelu.md)/[Cast](Cast.md)/[CastDeq](CastDequant.md)的s322f16场景
+-   用于[AddDeqRelu](../复合计算/AddDeqRelu.md)/[Cast](../类型转换/Cast.md)/[CastDeq](../复合计算/CastDequant.md)的s322f16场景
 
     ```
     __aicore__ inline void SetDeqScale(half scale)
     ```
 
--   用于[CastDeq](CastDequant.md)（isVecDeq=false）的场景
+-   用于[CastDeq](../复合计算/CastDequant.md)（isVecDeq=false）的场景
 
     ```
     __aicore__ inline void SetDeqScale(float scale, int16_t offset, bool signMode)
     ```
 
--   用于[CastDeq](CastDequant.md)（isVecDeq=true）的场景
+-   用于[CastDeq](../复合计算/CastDequant.md)（isVecDeq=true）的场景
 
     ```
     template <typename T>

@@ -1,6 +1,6 @@
 # TensorDesc简介<a name="ZH-CN_TOPIC_0000002306498702"></a>
 
-TensorDesc用于储存[ListTensorDesc](ListTensorDesc.md).GetDesc\(\)中根据index获取对应的Tensor描述信息。
+TensorDesc用于储存[ListTensorDesc](../ListTensorDesc.md).GetDesc\(\)中根据index获取对应的Tensor描述信息。
 
 ## 原型定义<a name="section10580930144614"></a>
 

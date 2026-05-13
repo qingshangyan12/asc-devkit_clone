@@ -118,7 +118,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   使用该同步接口时，需要按照如下规则[设置Kernel类型](设置Kernel类型.md)：
+-   使用该同步接口时，需要按照如下规则[设置Kernel类型](../../Kernel Tiling/设置Kernel类型.md)：
     -   在纯Vector/Cube场景下，需设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0。
     -   对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型。
 

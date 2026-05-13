@@ -77,7 +77,7 @@ __aicore__ inline int64_t GetBlockIdx()
 -   同时启动AIC和AIV的场景，在AIV、AIC上调用GetBlockIdx的取值范围不同：
     -   当AIC和AIV比例为1:2时，AIC上取值范围为\[0, numBlocks\)，AIV上取值范围为\[0, 2 \* numBlocks\)；
     -   当AIC和AIV比例为1:1时，AIC上取值范围为\[0, numBlocks\)，AIV上取值范围为\[0, numBlocks\)。
-    -   分离模式下，可以通过[GetTaskRatio](GetTaskRatio.md)获取AI Core上AIC与AIV的比例。
+    -   分离模式下，可以通过[GetTaskRatio](../工具函数/GetTaskRatio.md)获取AI Core上AIC与AIV的比例。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

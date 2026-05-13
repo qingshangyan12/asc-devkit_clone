@@ -43,7 +43,7 @@ OpParamDef &UnknownShapeFormat(std::vector<ge::Format> formats)
 
 ## 返回值说明<a name="zh-cn_topic_0000001549347680_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_section25791320141317"></a>
 
-OpDef算子定义，OpDef请参考[OpDef](OpDef.md)。
+OpDef算子定义，OpDef请参考[OpDef](../OpDef/OpDef.md)。
 
 ## 约束说明<a name="zh-cn_topic_0000001549347680_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_section19165124931511"></a>
 

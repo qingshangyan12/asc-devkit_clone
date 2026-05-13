@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-根据所选的低位模式或高位模式，将输入[MaskReg](MaskReg.md)的偶数位bit提取到输出MaskReg的低半部分或高半部分。
+根据所选的低位模式或高位模式，将输入[MaskReg](../寄存器数据类型/MaskReg.md)的偶数位bit提取到输出MaskReg的低半部分或高半部分。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

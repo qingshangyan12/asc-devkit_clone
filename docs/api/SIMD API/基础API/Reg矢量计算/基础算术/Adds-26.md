@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-矢量内每个元素与标量求和，计算公式如下，其中VL\_T表示矢量计算单元一个迭代能够处理的元素个数。VL\_T的取值参考[RegTensor](RegTensor.md)。
+矢量内每个元素与标量求和，计算公式如下，其中VL\_T表示矢量计算单元一个迭代能够处理的元素个数。VL\_T的取值参考[RegTensor](../寄存器数据类型/RegTensor.md)。
 
 ![](figures/zh-cn_formulaimage_0000002488831970.png)
 

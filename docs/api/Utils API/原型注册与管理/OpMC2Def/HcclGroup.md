@@ -34,7 +34,7 @@ OpMC2Def &HcclGroup(std::vector<const char *> value)
 
 ## 约束说明<a name="zh-cn_topic_0000001962490173_zh-cn_topic_0000001339105488_section19165124931511"></a>
 
-使用该接口前，算子需要先通过[MC2](MC2.md)接口注册该算子是通算融合算子，注册后即返回一个[OpMC2Def](OpMC2Def.md)结构。
+使用该接口前，算子需要先通过[MC2](../OpDef/MC2.md)接口注册该算子是通算融合算子，注册后即返回一个[OpMC2Def](OpMC2Def.md)结构。
 
 通信域名称必须先配置为REQUIRED String类型的属性，属性名即为通信域名称。
 

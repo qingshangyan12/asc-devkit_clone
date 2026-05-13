@@ -80,7 +80,7 @@
 
 -   需要指定源和目的位置
 
-    通过[TQueBind](TQueBind.md)绑定VECIN和VECOUT可实现VECIN和VECOUT内存复用，如下接口用于存在Vector计算的场景下实现复用，在出队时需要指定源和目的位置；不存在Vector计算的场景下可直接调用LocalTensor<T\> DeQue\(\)出队接口。
+    通过[TQueBind](../TQueBind/TQueBind.md)绑定VECIN和VECOUT可实现VECIN和VECOUT内存复用，如下接口用于存在Vector计算的场景下实现复用，在出队时需要指定源和目的位置；不存在Vector计算的场景下可直接调用LocalTensor<T\> DeQue\(\)出队接口。
 
     ```
     template <TPosition srcUserPos, TPosition dstUserPos, typename T>
@@ -144,7 +144,7 @@
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-non-inplace接口和指定源和目的位置的接口返回值为从队列中取出的[LocalTensor](LocalTensor.md)；inplace接口没有返回值。
+non-inplace接口和指定源和目的位置的接口返回值为从队列中取出的[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor.md)；inplace接口没有返回值。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

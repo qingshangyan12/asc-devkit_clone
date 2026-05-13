@@ -94,7 +94,7 @@ __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, Local
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   需要保证每个核调用该接口的次数相同。
--   gmWorkspace申请的空间最少要求为：blockNum \* 32Bytes；ubWorkspace申请的空间最少要求为：blockNum \* 32 + 32Bytes；其中blockNum为调用的核数，可调用[GetBlockNum](GetBlockNum.md)获取。
+-   gmWorkspace申请的空间最少要求为：blockNum \* 32Bytes；ubWorkspace申请的空间最少要求为：blockNum \* 32 + 32Bytes；其中blockNum为调用的核数，可调用[GetBlockNum](../../系统变量访问/GetBlockNum.md)获取。
 -   分离模式下，使用该接口进行多核同步时，仅对AIV核生效，WaitPreBlock和NotifyNextBlock之间仅支持插入矢量计算相关指令，对矩阵计算相关指令不生效。
 -   使用该接口进行多核控制时，算子调用时指定的逻辑numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
 

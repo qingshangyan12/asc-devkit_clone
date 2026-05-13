@@ -1,6 +1,6 @@
 # Conv3D Tiling使用说明<a name="ZH-CN_TOPIC_0000002135711917"></a>
 
-Ascend C提供一组Conv3D Tiling API，方便用户获取Conv3D正向算子Kernel计算时所需的Tiling参数。用户只需要传入Input/Weight/Bias/Output的Position位置、Format格式和DType数据类型及相关参数等信息，调用API接口，即可获取[Init](Init-101.md)中TConv3DApiTiling结构体中的相关参数。
+Ascend C提供一组Conv3D Tiling API，方便用户获取Conv3D正向算子Kernel计算时所需的Tiling参数。用户只需要传入Input/Weight/Bias/Output的Position位置、Format格式和DType数据类型及相关参数等信息，调用API接口，即可获取[Init](../Conv3D Kernel侧接口/Init-101.md)中TConv3DApiTiling结构体中的相关参数。
 
 Conv3D Tiling API提供Conv3D单核Tiling接口，用于Conv3D单核计算场景，获取Tiling参数的流程如下：
 

@@ -73,7 +73,7 @@ __aicore__ inline int64_t GetSubBlockNum()
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-不同Kernel类型下（通过[设置Kernel类型](设置Kernel类型.md)设置），在AIC和AIV上调用该接口的返回值如下：
+不同Kernel类型下（通过[设置Kernel类型](../Kernel Tiling/设置Kernel类型.md)设置），在AIC和AIV上调用该接口的返回值如下：
 
 **表 1**  返回值列表
 

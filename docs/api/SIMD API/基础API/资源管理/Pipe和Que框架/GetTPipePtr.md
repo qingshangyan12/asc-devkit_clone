@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-创建[TPipe](TPipe.md)对象时，对象初始化会设置全局唯一的TPipe指针。本接口用于获取该指针，获取该指针后，可进行[TPipe](TPipe.md)相关的操作。
+创建[TPipe](TPipe/TPipe.md)对象时，对象初始化会设置全局唯一的TPipe指针。本接口用于获取该指针，获取该指针后，可进行[TPipe](TPipe/TPipe.md)相关的操作。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

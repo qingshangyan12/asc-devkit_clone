@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001600467085_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section36583473819"></a>
 
-如果您需要在算子融合阶段进行算子参数校验，则可实现算子参数校验回调函数，并通过该接口进行注册。同时，需要将[NeedCheckSupportFlag](NeedCheckSupportFlag.md)参数配置为true，则算子编译和融合阶段会调用注册的算子参数校验函数进行相关信息的校验。
+如果您需要在算子融合阶段进行算子参数校验，则可实现算子参数校验回调函数，并通过该接口进行注册。同时，需要将[NeedCheckSupportFlag](../OpAICoreConfig/NeedCheckSupportFlag.md)参数配置为true，则算子编译和融合阶段会调用注册的算子参数校验函数进行相关信息的校验。
 
 若算子参数校验函数校验通过，则代表AI Core支持此算子参数，会选择AI Core上相应的算子执行；否则，会继续查询AI CPU算子库然后执行。
 

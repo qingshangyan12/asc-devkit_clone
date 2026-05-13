@@ -59,7 +59,7 @@
 
 -   对MaskReg操作：
 
-    将两个输入MaskReg的有效bits进行逻辑异或运算得到新的[MaskReg](MaskReg.md)。
+    将两个输入MaskReg的有效bits进行逻辑异或运算得到新的[MaskReg](../寄存器数据类型/MaskReg.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

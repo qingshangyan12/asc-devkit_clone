@@ -4,7 +4,7 @@
 
 标识是否在算子融合阶段调用算子参数校验函数进行data type与shape的校验。
 
--   若配置为"true"，框架会调用通过[SetCheckSupport](SetCheckSupport.md)设置的算子参数校验函数，检查算子是否支持指定输入，此场景下需要自行实现算子参数校验的回调函数。
+-   若配置为"true"，框架会调用通过[SetCheckSupport](../OpAICoreDef/SetCheckSupport.md)设置的算子参数校验函数，检查算子是否支持指定输入，此场景下需要自行实现算子参数校验的回调函数。
 -   若配置为"false"，表示不需要进行校验。
 
 ## 函数原型<a name="zh-cn_topic_0000001626211657_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_section13230182415108"></a>
@@ -44,5 +44,5 @@ OpAICoreConfig类，请参考[OpAICoreConfig](OpAICoreConfig.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000001626211657_zh-cn_topic_0000001576875005_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-请参考[SetCheckSupport](SetCheckSupport.md)节调用示例。
+请参考[SetCheckSupport](../OpAICoreDef/SetCheckSupport.md)节调用示例。
 

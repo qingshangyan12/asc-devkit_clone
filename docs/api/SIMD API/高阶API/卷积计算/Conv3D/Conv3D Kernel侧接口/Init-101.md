@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section4299173755913"></a>
 
-Init主要用于对Conv3D对象中的Tiling数据进行初始化，根据Tiling参数进行资源划分，同时获取用户声明的Pipe对象，完成内存分配。Tiling参数的具体介绍请参考[Conv3D Tiling](Conv3D-Tiling侧接口.md)。
+Init主要用于对Conv3D对象中的Tiling数据进行初始化，根据Tiling参数进行资源划分，同时获取用户声明的Pipe对象，完成内存分配。Tiling参数的具体介绍请参考[Conv3D Tiling](../Conv3D Tiling侧接口/Conv3D-Tiling侧接口.md)。
 
 ## 函数原型<a name="section079519516019"></a>
 

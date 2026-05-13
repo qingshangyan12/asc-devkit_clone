@@ -59,13 +59,13 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-开发者可以通过[TBufPool类](TBufPool.md)手动管理Unified Buffer、L1 Buffer物理内存。
+开发者可以通过[TBufPool类](../TBufPool/TBufPool.md)手动管理Unified Buffer、L1 Buffer物理内存。
 
 TBufPool类切分的内存块都是连续的，开发者可能有一些自定义的内存块分配需求，比如不连续内存块、内存块在不同TQue之间共享等，这时就需要开发者自定义一个TBufPool的实现。
 
 为了简化开发者的自定义实现，提供EXTERN\_IMPL\_BUFPOOL宏来辅助用户自定义TBufPool。使用自定义TBufPool功能时，需要注意：
 
--   自定义TBufPool之前，必须通过[TPipe::InitBufPool](InitBufPool.md)接口进行TBufPool内存资源池初始化。
+-   自定义TBufPool之前，必须通过[TPipe::InitBufPool](../TPipe/InitBufPool.md)接口进行TBufPool内存资源池初始化。
 -   自定义TBufPool需要开发者自行实现对TQue/TBuf内存块的分配、初始化、释放等操作。
 
 EXTERN\_IMPL\_BUFPOOL宏内部定义的函数Reset、Init、GetBufHandle、SetCurAddr、GetCurAddr、SetCurBufSize、GetCurBufSize接口参见后续章节描述。使用该宏后，即可使用上述接口完成自定义TBufPool功能。

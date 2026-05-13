@@ -84,7 +84,7 @@ void GetSinTmpBufferFactorSize(const SinConfig& config, const uint32_t typeSize,
 
 ## 调用示例<a name="section85671420193420"></a>
 
-完整的调用样例请参考[更多样例](更多样例-83.md)。
+完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
 ```
 uint32_t maxLiveNodeCount = 0;

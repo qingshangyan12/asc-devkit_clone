@@ -56,7 +56,7 @@ enum class DequantType {
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-本接口支持的同一系数的量化/反量化模式、向量的量化/反量化模式分别与Kernel侧接口[SetQuantScalar](SetQuantScalar.md)和[SetQuantVector](SetQuantVector.md)对应，本接口设置的量化/反量化模式必须与Kernel侧使用的接口保持一致。
+本接口支持的同一系数的量化/反量化模式、向量的量化/反量化模式分别与Kernel侧接口[SetQuantScalar](../../Matmul Kernel侧接口/SetQuantScalar.md)和[SetQuantVector](../../Matmul Kernel侧接口/SetQuantVector.md)对应，本接口设置的量化/反量化模式必须与Kernel侧使用的接口保持一致。
 
 ## 调用示例<a name="section1665082013318"></a>
 

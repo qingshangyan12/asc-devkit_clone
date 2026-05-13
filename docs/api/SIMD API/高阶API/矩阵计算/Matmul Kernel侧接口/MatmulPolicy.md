@@ -168,7 +168,7 @@
     -   只支持通过[IterateAll](IterateAll.md)接口获取Matmul的计算结果C矩阵。
     -   [stepM、stepKa、stepKb](TCubeTiling结构体.md#p139009583566)小于等于3，且满足：stepKa=stepKb=ceil\([singleCoreK](TCubeTiling结构体.md#p11899125875617)/baseK\)。
     -   A矩阵全载的基本块大小与B矩阵载入的基本块大小之和不超过L1 Buffer大小。
-    -   在使用[GetTiling](GetTiling.md)接口生成Tiling参数前，必须通过[SetMatmulConfigParams](SetMatmulConfigParams.md)接口将scheduleTypeIn参数设置为ScheduleType::N\_BUFFER\_33，以启用NBuffer33模板策略的Tiling生成逻辑。
+    -   在使用[GetTiling](../Matmul Tiling侧接口/Matmul Tiling类/GetTiling.md)接口生成Tiling参数前，必须通过[SetMatmulConfigParams](../Matmul Tiling侧接口/Matmul Tiling类/SetMatmulConfigParams.md)接口将scheduleTypeIn参数设置为ScheduleType::N\_BUFFER\_33，以启用NBuffer33模板策略的Tiling生成逻辑。
 
 -   MatmulWithScalePolicy：
     -   仅在Ascend 950PR/Ascend 950DT上支持。

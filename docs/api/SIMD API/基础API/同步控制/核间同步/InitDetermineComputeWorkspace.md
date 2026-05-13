@@ -93,7 +93,7 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   gmWorkspace申请的空间最少要求为：blockNum \* 32Bytes；ubWorkspace申请的空间最少要求为：blockNum \* 32 + 32Bytes；其中blockNum为调用的核数，可调用[GetBlockNum](GetBlockNum.md)获取。
+-   gmWorkspace申请的空间最少要求为：blockNum \* 32Bytes；ubWorkspace申请的空间最少要求为：blockNum \* 32 + 32Bytes；其中blockNum为调用的核数，可调用[GetBlockNum](../../系统变量访问/GetBlockNum.md)获取。
 -   使用该接口进行多核控制时，算子调用时指定的逻辑numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
 
 ## 调用示例<a name="section177231425115410"></a>

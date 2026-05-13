@@ -189,7 +189,7 @@
 -   **不支持源操作数与目的操作数地址重叠。**
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
 -   当前仅支持ND格式的输入，不支持其他格式。
--   对于mean，采用的方式为先求和再做除法，其求和时内部使用的底层相加方式与[Sum](Sum.md)、[ReduceSum](ReduceSum.md)以及[WholeReduceSum](WholeReduceSum.md)的内部的相加方式一致，采用二叉树方式，两两相加，可参考[Sum](Sum.md)。
+-   对于mean，采用的方式为先求和再做除法，其求和时内部使用的底层相加方式与[Sum](../Sum接口/Sum.md)、[ReduceSum](../../../基础API/Memory矢量计算/归约计算/ReduceSum.md)以及[WholeReduceSum](../../../基础API/Memory矢量计算/归约计算/WholeReduceSum.md)的内部的相加方式一致，采用二叉树方式，两两相加，可参考[Sum](../Sum接口/Sum.md)。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

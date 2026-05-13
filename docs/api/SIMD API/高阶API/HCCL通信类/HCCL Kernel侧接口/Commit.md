@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-非[细粒度通信](Iterate-99.md)时，每调用一次本接口，则通知服务端可以执行handleId对应的任务一次。[细粒度通信](Iterate-99.md)时，每调用一次本接口，则通知服务端可以执行handleId对应的[步长](SetStepSize.md)长度的子通信任务。
+非[细粒度通信](Iterate-99.md)时，每调用一次本接口，则通知服务端可以执行handleId对应的任务一次。[细粒度通信](Iterate-99.md)时，每调用一次本接口，则通知服务端可以执行handleId对应的[步长](../HCCL Tiling侧接口/SetStepSize.md)长度的子通信任务。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

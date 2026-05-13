@@ -82,7 +82,7 @@ void GetLogicalAndsMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascend
 
 ## 调用示例<a name="section372473524513"></a>
 
-完整的调用样例请参考[更多样例](更多样例-83.md)。
+完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
 ```
 // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数

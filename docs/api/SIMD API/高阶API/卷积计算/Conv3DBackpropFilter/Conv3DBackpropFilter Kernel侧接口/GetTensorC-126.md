@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-在完成Iterate操作后调用本接口，获取结果矩阵块，完成数据从L0C到GM的搬运。此接口与[Iterate](Iterate-111.md)接口配合使用，用于在Iterate执行迭代计算后，获取结果矩阵。
+在完成Iterate操作后调用本接口，获取结果矩阵块，完成数据从L0C到GM的搬运。此接口与[Iterate](../../Conv3DBackpropInput/Conv3DBackpropInput Kernel侧接口/Iterate-111.md)接口配合使用，用于在Iterate执行迭代计算后，获取结果矩阵。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

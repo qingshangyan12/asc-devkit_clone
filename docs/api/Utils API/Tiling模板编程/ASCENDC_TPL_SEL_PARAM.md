@@ -4,7 +4,7 @@
 
 Tiling模板编程时，开发者通过调用此接口自动生成并配置TilingKey。
 
-使用该接口需要包含定义模板参数和模板参数组合的头文件。详细内容请参考[Tiling模板编程](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/Host侧Tiling实现/Tiling模板编程.md)。
+使用该接口需要包含定义模板参数和模板参数组合的头文件。详细内容请参考[Tiling模板编程](Tiling模板编程.md)。
 
 ## 函数原型<a name="zh-cn_topic_0000001867289945_zh-cn_topic_0000001389787297_section13230182415108"></a>
 

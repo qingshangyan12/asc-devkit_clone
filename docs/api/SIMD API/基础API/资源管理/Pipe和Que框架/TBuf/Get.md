@@ -123,7 +123,7 @@ len的数值是Tensor中元素的个数，len\*sizeof\(T\)不能超过TBuf初始
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-获取到的[LocalTensor](LocalTensor.md)。
+获取到的[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor.md)。
 
 ## 调用示例<a name="section5725818154718"></a>
 

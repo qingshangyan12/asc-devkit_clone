@@ -82,7 +82,7 @@ __aicore__ inline constexpr Coord<Ts...> MakeCoord(Ts const&... t)
 
 ## 返回值说明<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section25791320141317"></a>
 
-Coord结构类型（[Std::tuple](容器函数.md)类型的别名）。
+Coord结构类型（[Std::tuple](../../../Utils API/C++标准库/容器函数/容器函数.md)类型的别名）。
 
 ## 约束说明<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section19165124931511"></a>
 

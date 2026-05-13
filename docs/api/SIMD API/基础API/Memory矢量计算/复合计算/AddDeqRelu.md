@@ -57,7 +57,7 @@ Deq的计算公式如下：
 
 ![](figures/zh-cn_formulaimage_0000001863112121.png)
 
-如上公式先除以2^17再乘以2^17用于防止x乘以DeqScale出现溢出情况；公式中DeqScale需要通过SetDeqScale进行设置，具体可参考[SetDeqScale](SetDeqScale.md)。
+如上公式先除以2^17再乘以2^17用于防止x乘以DeqScale出现溢出情况；公式中DeqScale需要通过SetDeqScale进行设置，具体可参考[SetDeqScale](../量化设置/SetDeqScale.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -82,7 +82,7 @@ Deq的计算公式如下：
         __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0, const LocalTensor<int32_t>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
         ```
 
-操作数使用[TensorTrait](TensorTrait.md)类型时，LocalTensor需要输入模板参数。提供支持操作数数据类型作为模板参数传入的接口如下：
+操作数使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait.md)类型时，LocalTensor需要输入模板参数。提供支持操作数数据类型作为模板参数传入的接口如下：
 
 -   tensor前n个数据计算
 
