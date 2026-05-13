@@ -50,9 +50,9 @@ private:
         auto srcLayout = src.Layout();
         uint16_t mStartPosition = 0;
         uint16_t kStartPosition = 0;
-        auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
-        auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
-        auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) >> 5;
+        auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
+        auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
+        auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) >> 5;
         auto dstStride = kStep;
         uint64_t mxDstAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.Data().Get())) >> 4;
         LoadCbufToL0MxScaleA3510::LoadData<trait>(mxDstAddr, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
