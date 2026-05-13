@@ -145,13 +145,16 @@ add_executable(${CCU_UT_TARGET}
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector/alltoall_auto_selector.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
     # Executor registry (for CollAlgExecRegistryV2)
+    ${HCCL_CC_SRC_DIR}/ops/op_common/executor/registry/coll_alg_exec_registry.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/executor_v2_base.cc
     # AICPU kernel launch
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/aicpu/kernel_launch.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/aicpu/dfx/task_exception_fun.cc
     # Topo infrastructure
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_base.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_host.cc
 )
 
 target_include_directories(${CCU_UT_TARGET} PRIVATE
