@@ -10,6 +10,7 @@
 
 #include "alg_param.h"
 #include "hccl_types.h"
+#include "execute_selector.h"
 #include <memory>
 #include <string>
 
@@ -55,6 +56,26 @@ void GetScatterOpInfo(const void* opInfo, char* output, size_t size)
 unsigned int HcclLaunchAicpuKernel(OpParam* param)
 {
     return 0;
+}
+
+bool CheckAsymmetricTopoSupport(HcclCMDType cmdType, const TopoInfoWithNetLayerDetails* topoInfo)
+{
+    return true;
+}
+
+ExecuteSelector::ExecuteSelector()
+{
+}
+
+HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* topoInfo, std::string& algName) const
+{
+    algName = "CcuAllReduceMesh1D";
+    return HcclResult::HCCL_SUCCESS;
+}
+
+HcclResult SetCommEngine(OpParam& param)
+{
+    return HcclResult::HCCL_SUCCESS;
 }
 
 }
