@@ -13,6 +13,19 @@
 #include <memory>
 #include <string>
 
+extern bool HcclCheckLogLevel(int logType, int moduleId);
+extern bool IsErrorToWarn();
+
+bool HcclCheckLogLevel(int logType, int moduleId)
+{
+    return false;
+}
+
+bool IsErrorToWarn()
+{
+    return false;
+}
+
 namespace ops_hccl {
 
 HcclResult HcomCheckDataType(HcclDataType dataType)
