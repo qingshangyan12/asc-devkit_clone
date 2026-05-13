@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ def gen_golden_data():
     m = 512
     n = 1024
     k = 512
-    x1_gm = np.random.randint(1, 10, [m, k]).astype(np.float16)
-    x2_gm = np.random.randint(1, 10, [k, n]).astype(np.float16)
-    golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(np.float32)
+    x1_gm = np.random.randint(-10, 10, [m, k]).astype(np.float16)
+    x2_gm = np.random.randint(-10, 10, [k, n]).astype(np.float16)
+    golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(np.float16)
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     x1_gm.tofile("./input/x1_gm.bin")
@@ -32,4 +32,3 @@ def gen_golden_data():
 
 if __name__ == "__main__":
     gen_golden_data()
-    
