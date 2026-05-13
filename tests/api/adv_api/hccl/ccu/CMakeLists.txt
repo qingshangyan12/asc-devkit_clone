@@ -16,7 +16,7 @@ set(HCCL_CC_INCLUDE_DIR ${ASCENDC_DIR}/include/adv_api/hccl/internal)
 set(HCCL_DEV_BASE ${HCCL_CC_DIR})
 set(HCCL_LOCAL_PKG_INC ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc)
 set(HCCL_ST_DIR ${ASCENDC_DIR}/tests/api/adv_api/hccl/cc/st/algorithm/utils/src)
-set(HCCL_ST_PROXY_DIR ${HCCL_ST_DIR}/hccl_proxy)
+set(HCCL_ST_PROXY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stub/hccl_proxy)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
     set(HCCL_CANN_ARCH_DIR ${ASCEND_CANN_PACKAGE_PATH}/x86_64-linux)
@@ -87,8 +87,8 @@ set(CCU_INCLUDE_LIST
     ${HCCL_ST_PROXY_DIR}/communicator
     ${HCCL_ST_PROXY_DIR}/topo_model
     ${HCCL_ST_DIR}/sim_world
-    ${HCCL_ST_DIR}/common/utils
-    ${HCCL_ST_DIR}/common/exception
+    ${CMAKE_CURRENT_SOURCE_DIR}/stub/common/utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/stub/common/exception
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
