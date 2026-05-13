@@ -114,10 +114,6 @@ inline constexpr bool IsSatisfiedPtnFormatV = IsSatisfiedPtnFormat<TensorType, T
 } // namespace Te
 } // namespace AscendC
 
-namespace AscendC {
-    
-}
-
 #endif // IMPL_TENSOR_API_ARCH_UTILS_IS_FORMAT_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
