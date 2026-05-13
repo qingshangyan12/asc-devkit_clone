@@ -14,6 +14,7 @@
 #include "coll_alg_v2_exec_registry.h"
 #include "executor_base.h"
 #include "executor_v2_base.h"
+#include "alg_env_config.h"
 #include <memory>
 #include <string>
 
@@ -81,9 +82,10 @@ HcclResult SetCommEngine(OpParam& param)
     return HcclResult::HCCL_SUCCESS;
 }
 
-u32 GetExternalInputHcclAivOnlyMode()
+const bool& GetExternalInputHcclAivOnlyMode()
 {
-    return 0;
+    static bool value = false;
+    return value;
 }
 
 HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algTag)
