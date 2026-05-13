@@ -133,6 +133,7 @@ add_executable(${CCU_UT_TARGET}
     ${HCCL_CC_SRC_DIR}/common/alg_env_config.cc
     ${HCCL_CC_SRC_DIR}/common/alg_type.cc
     # Real selector infrastructure
+    ${HCCL_CC_SRC_DIR}/ops/op_common/dlhcomm_function.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/op_common.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/selector/auto_selector_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/selector/selector_registry.cc
