@@ -21,7 +21,7 @@ uint32_t CommDomain::GetCommRankCount()
 NpuPos CommDomain::GetNpuPosByRankId(RankId rankId)
 {
     if (rankId2Pos_.count(rankId) == 0) {
-        THROW<InvalidParamsException>("[CommDomain::GetNpuPosByRankId] rankId[%u] is not in current comm domain", rankId);
+        Hccl::THROW<InvalidParamsException>("[CommDomain::GetNpuPosByRankId] rankId[%u] is not in current comm domain", rankId);
     }
     return rankId2Pos_[rankId];
 }

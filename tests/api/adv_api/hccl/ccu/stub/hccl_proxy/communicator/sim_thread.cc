@@ -73,7 +73,7 @@ std::string SimHcclThread::ToString() const
 uint32_t SimHcclThread::GetNotifyIdByIndex(uint32_t notifyIndex) const
 {
     if (notifyIndex >= notifys_.size()) {
-        THROW<InvalidParamsException>("[SimHcclThread::%s] notifyIndex[%u] out of bound", __func__, notifyIndex);
+        Hccl::THROW<InvalidParamsException>("[SimHcclThread::%s] notifyIndex[%u] out of bound", __func__, notifyIndex);
     }
     return notifys_[notifyIndex]->GetNotifyId();
 }

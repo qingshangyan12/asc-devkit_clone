@@ -26,7 +26,7 @@
     do {                                                                                                               \
         auto ret = (expr);                                                                                             \
         if (ret != HcclResult::HCCL_SUCCESS) {                                                                         \
-            THROW<EXCEPTION>(MSG);                                                                                     \
+            Hccl::THROW<EXCEPTION>(MSG);                                                                                     \
         }                                                                                                              \
     } while (0)
 
