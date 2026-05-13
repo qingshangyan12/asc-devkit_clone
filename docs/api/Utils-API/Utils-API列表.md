@@ -24,7 +24,7 @@
 <td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p1161313165264"><a name="p1161313165264"></a><a name="p1161313165264"></a>获取输入数据的绝对值。</p>
 </td>
 </tr>
-<tr id="row1711751919267"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p14905729172617"><a name="p14905729172617"></a><a name="p14905729172617"></a><a href="sqrt.md">sqrt</a></p>
+<tr id="row1711751919267"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p14905729172617"><a name="p14905729172617"></a><a name="p14905729172617"></a><a href="C++标准库/数学函数/sqrt1.md">sqrt</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p5117419162612"><a name="p5117419162612"></a><a name="p5117419162612"></a>计算输入数据的平方根。</p>
 </td>
