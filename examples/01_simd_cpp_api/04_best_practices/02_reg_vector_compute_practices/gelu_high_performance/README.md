@@ -2,11 +2,7 @@
 
 ## 概述
 
-本样例以Gelu计算为例，介绍RegBase矢量计算。
-
-**优化路径**：
-- Case 1: 使用RegBase API
-- Case 2: 使用RegBase API和循环展开优化
+本样例以Gelu计算为例，介绍RegBase矢量计算的开发过程。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -136,31 +132,12 @@ $$
 <table border="2">
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Gelu</td></tr>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">x</td><td align="center">[8192, 8192]</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[8192, 8192]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">x</td><td align="center">[8, 8192]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[8, 8192]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gelu_custom</td></tr>
 </table>
 
 ## 样例实现
-
-### 性能指标说明
-
-**表1 AI Core 性能指标字段说明表**
-
-| 字段名 | 字段含义 |
-|:---|:---|
-|Task Duration(μs)|Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。|
-|aiv_time(μs)|Task在AI Vector Core上的理论执行时间。|
-|aiv_vec_time(μs)|vec类型指令（向量类运算指令）耗时。|
-|aiv_vec_ratio|vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。|
-|aiv_scalar_time(μs)|scalar类型指令（标量类运算指令）耗时。|
-|aiv_scalar_ratio|scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。|
-|aiv_mte2_time(μs)|mte2类型指令（GM->UB搬运类指令）耗时。|
-|aiv_mte2_ratio|mte2类型指令（GM->UB搬运类指令）的cycle数在total cycle数中的占用比。|
-|aiv_mte3_time(μs)|mte3类型指令（UB->GM搬运类指令）耗时。|
-|aiv_mte3_ratio|mte3类型指令（UB->GM搬运类指令）的cycle数在total cycle数中的占用比。|
-
-### Case 1: 启用RegBase API
 
 **实现方式**：
 
@@ -191,89 +168,14 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 ```
 
 **样例配置**：
-- 多核切分：M方向分2份，N方向32份，共计64份数据，分布到64core上计算
-- `tileLen = 8192` 为每次搬运和计算的数据元素个数
+- 多核切分：共计8 * 8192个数据，分布到8个核上计算，单核计算8192个数据。（本例简化仅对多核进行说明，不代表实际多核切分优化逻辑）
 
-**优化手段**：
-- **RegBase API优势**：
+**RegBase API优势**：
   - 寄存器级别的数据访问，减少中间数据的Load/Store开销
   - 支持Hardware Loop优化，循环可被优化为硬件级向量循环
 
-**性能数据**：
 
-| Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| 348.868 | 347.99 | 66.277 | 0.19 | 3.03 | 0.009 | 320.543 | 0.921 | 314.547 | 0.904 |
-
-**优化效果分析**：
-- 端到端耗时：**348.868μs**
-- 向量指令耗时：66.277μs
-
----
-
-### Case 2: 启用RegBase API、循环展开优化
-
-**实现方式**：添加 `#pragma unroll 6` 循环展开优化
-
-在Case 1中由于Gelu计算依赖路径较长，使用循环展开优化，提高指令级并行度。
-
-**关键代码**：
-```cpp
-__simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
-    #pragma unroll 6  // 循环展开优化
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
-        // ……
-    }
-}
-```
-
-**样例配置**：
-- 多核切分：M方向分32份，N方向分2份，共计64份数据，分布到64core上计算
-- `tileLen = 8192` 为每次搬运和计算的数据元素个数
-
-**优化手段**：
-- **循环展开优化原理**：
-  - 通过 `#pragma unroll 6` 告诉编译器展开循环，每次展开6个迭代
-  - 提高指令级并行度，使更多VF指令能够连续发射
-
-- **循环展开收益分析**：
-  - 展开因子选择：`unroll 6` 为经验值，需要根据实际场景调优
-  - 展开过多：可能增加寄存器压力，导致性能劣化，同时代码大小也会增加
-  - 展开过少：优化效果不明显
-  - 建议：用户可以采用逐次尝试的方法，找到最优的循环展开次数
-
-**性能数据**：
-
-| Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| 344.436 | 343.82 | 63.655 | 0.185 | 4.757 | 0.014 | 315.468 | 0.918 | 306.069 | 0.89 |
-
-**优化效果分析**：
-- 端到端耗时：**344.436μs**，相比Case 1耗时减少 **1.3%**（MTE2 bound，端到端收益不明显）
-- 向量指令耗时：63.655μs，相比Case 1耗时减少 **4.6%**
-
----
-
-## 性能对比总结
-
-### Ascend 950PR性能对比
-
-下表为本样例在Ascend 950系列产品上运行的性能数据对比：
-
-| Case | 优化策略 | 核数 | tileLen | Task Duration(μs) | aiv_vec_time(μs) | 理论vector耗时(μs) |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| 1 | 启用RegBase API | 64 | 8192 | 348.868 | 66.277 | NA |
-| 2 | 启用RegBase API和循环展开 | 64 | 8192 | 344.436 | 63.655 | NA |
-
-> **注意：** 该样例为MTE2 bound，性能瓶颈为数据搬运，下述分析主要针对vector耗时计算，方便用户分析使能RegBase API及循环展开的性能收益。Case 2相比Case 1，vector耗时减少 **4.6%**。
-
-### 理论性能分析
+## 理论性能分析
 
 下表为本样例的vector计算指令的并行度：
 
@@ -287,51 +189,6 @@ __simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float
 | 6 | Exp | float | 64 |
 | 7 | Adds | float | 256 |
 | 8 | Div | float | 64 |
-
-**理论vector耗时计算**：
-
-**Step 1: 计算Gelu计算流程的等效每cycle数据处理量（不考虑指令双发特性）**
-
-Gelu计算包含8条向量指令，各指令的并行度如下：
-- 6条线性运算指令（Mul×2、Muls×2、Add×1、Adds×1）：并行度256 bytes/cycle
-- 2条非线性运算指令（Exp×1、Div×1）：并行度64 bytes/cycle
-
-处理1 byte数据需要的cycle数：
-- 线性运算指令：每条需要 1/256 cycles
-- 非线性运算指令：每条需要 1/64 cycles
-
-处理1 byte数据所需总cycle数：
-
-$$
-Cycles_{\text{per\_byte}} = 6 \times \frac{1}{256} + 2 \times \frac{1}{64} = \frac{6}{256} + \frac{2}{64} = \frac{14}{256}
-$$
-
-等效每cycle处理数据量：
-
-$$
-P_{\text{bytes}} = \frac{256}{14} = \frac{128}{7} \approx 18.29 \text{ bytes/cycle}
-$$
-
-**Step 2: 计算理论vector耗时（不考虑指令双发特性）**
-
-本样例在Ascend 950PR系列产品上运行，硬件参数：
-- 主频 $f = 1650 \text{ MHz} = 1.65 \times 10^9 \text{ Hz}$
-- AIV核数 $N_{\text{core}} = 64$
-- 数据shape $M = N = 8192$，总数据量 $D = M \times N \times 4 = 268435456 \text{ bytes}$
-
-理论vector耗时计算公式：
-
-$$
-T_{\text{theory}} = \frac{D}{P_{\text{bytes}} \times f \times N_{\text{core}}}
-$$
-
-代入数值：
-
-$$
-T_{\text{theory}} = \frac{268435456}{\frac{128}{7} \times 1.65 \times 10^9 \times 64} = \frac{268435456 \times 7}{128 \times 1.056 \times 10^{11}} = \frac{1879048192}{1.35168 \times 10^{11}} \approx 139.02 \times 10^{-6} \text{ s} = 139.02 \text{ μs}
-$$
-
-**Step 3: 计算理论vector耗时**
 
 在RegBase场景下，vector指令具有双发特性，即常规计算指令并行度可以达到512 bytes/cycle，但是exp和div在双发场景下不能简单按照128 bytes/cycle进行估计。
 如下图所示，在time=0时刻，同时发射Exp和Mul指令，Mul只需要1个cycle执行完成，但是Exp需要4个cycle执行完成，在Exp执行期间，time=1时刻同时发射了Mul和Muls并行执行，并以此类推继续发射其它指令。
@@ -348,91 +205,17 @@ Adds:                 |<--->|
 Muls:                       |<--->|
 Adds:                       |<--->|
 ```
-因此在VF场景下，更多采用IPC(Instructions Per Cycle，每cycle指令发射数量)来衡量性能。
+因此在VF场景下，更多采用IPC(Instructions Per Cycle，每cycle指令发射数量)来衡量性能。IPC越高越好，理论极限接近2。
 
-case 1场景，单核vector计算指令数量：
-
-$$
-N_{\text{instr}} = N_{\text{VF}} \times N_{\text{loop}} \times N_{\text{op}} = 128 \times 128 \times 8 = 131072
-$$
-
-式中：
-- $N_{\text{VF}} = 128$：VF函数调用次数
-- $N_{\text{loop}} = 128$：VF内部循环次数
-- $N_{\text{op}} = 8$：VF内计算指令数（Mul×2、Muls×2、Add×1、Adds×1、Exp×1、Div×1）
-
-vector计算的cycle数：
-
-$$
-Cycles_{\text{vec}} = T_{\text{vec}} \times f = 66.277 \text{ μs} \times 1650 \text{ MHz} = 109357
-$$
-
-式中：
-- $T_{\text{vec}} = 66.277 \text{ μs}$：实测vector计算耗时
-- $f = 1650 \text{ MHz}$：硬件主频
-
-IPC计算：
-
-$$
-IPC = \frac{N_{\text{instr}}}{Cycles_{\text{vec}}} = \frac{131072}{109357} \approx 1.20
-$$
-
-式中：
-- $N_{\text{instr}} = 131072$：单核vector计算指令数量
-- $Cycles_{\text{vec}} = 109357$：vector计算cycle数
-
-IPC越高越好，理论极限接近2。
-
-**Case 2: 循环展开优化后的IPC分析**
-
-case 2场景，在RegBase接口基础上添加循环展开优化，单核vector计算指令数量保持不变：
-
-$$
-N_{\text{instr}} = N_{\text{VF}} \times N_{\text{loop}} \times N_{\text{op}} = 128 \times 128 \times 8 = 131072
-$$
-
-式中各参数与Case 1相同，循环展开不影响总指令数量。
-
-vector计算的cycle数：
-
-$$
-Cycles_{\text{vec}} = T_{\text{vec}} \times f = 63.655 \text{ μs} \times 1650 \text{ MHz} = 105031
-$$
-
-IPC计算：
-
-$$
-IPC = \frac{N_{\text{instr}}}{Cycles_{\text{vec}}} = \frac{131072}{105031} \approx 1.25
-$$
-
-**循环展开对IPC的影响分析**：
-- Case 2的IPC为1.25，相比Case 1的IPC（1.20）提升了 **4.2%**
-- 循环展开优化提高了vector指令发射效率，使得更多的指令能够并行执行
 
 **IPC优化建议**：
 - 在VF编程场景下，IPC是衡量vector指令发射效率的重要指标
 - 理想IPC极限接近2.0，大多数情况下达成1.4~1.5则表示取得较优性能
-- 当一个VF函数loop循环内包含的指令依赖链过长时，会导致执行队列中存放的循环次数太少，从而导致每cycle可以双发的指令数变少，导致性能下降。此时可以将过长的loop循环切分成多个，比如可以选择reduce结束，或者长latency指令的结束点（比如div、exp），将一个loop循环拆分成2~3个loop循环。本样例给出的示例loop循环较短，不适用于该优化项。
-
-### 优化要点总结
-
-| 优化手段 | 核心原理 | 使用建议 |
-|:---|:---|:---|
-| 公式化简 | 减少计算步骤，降低计算开销 | 优先进行公式推导和化简 |
-| RegBase API | 寄存器级计算减少中间Load/Store，利用双发特性提升性能 | 使用asc_vf_call调用VF函数，利用双发特性提高IPC |
-| 循环展开 | 提高指令发射并行度 | 使用`#pragma unroll N`，N需根据实际调优 |
-
----
+- 当一个VF函数loop循环内包含的指令依赖链过长时，会导致执行队列中存放的循环次数太少，从而导致每cycle可以双发的指令数变少，导致性能下降。此时可以将过长的loop循环切分成多个，比如可以选择reduce结束，或者长latency指令的结束点（比如div、exp），将一个loop循环拆分成2~3个loop循环。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-
-- 切换Case
-
-  在 cmake 编译时通过 `-DSCENARIO_NUM=N` 指定要编译的 case，各 case 说明：
-  - `1`: 启用RegBase API
-  - `2`: 启用RegBase API和循环展开优化
 
 - 配置环境变量
 
@@ -455,9 +238,8 @@ $$
 - 样例执行
 
   ```bash
-  SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程，默认npu模式
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
@@ -467,7 +249,7 @@ $$
 
   示例如：
   ```bash
-  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU仿真模式
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式或Case前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -478,7 +260,6 @@ $$
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`、`2`　　　　　| Case编号：1=启用RegBase API，2=启用RegBase API和循环展开 |
 
 - 执行结果
 
