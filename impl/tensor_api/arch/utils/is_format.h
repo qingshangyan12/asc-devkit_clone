@@ -24,7 +24,7 @@
 
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
-#include "impl/tensor_api/tensor/local_tensor_impl.h"
+#include "impl/tensor_api/tensor/tensor_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -53,7 +53,7 @@ template <typename hPos, typename Pointer,
           typename StrideRows, typename StrideCols, 
           typename LayoutPattern>
 struct GetTypeFromNDimTrait<
-    LocalTensor<TensorAttribute<ViewEngine<HardwareMemPtr<hPos, Pointer>>,
+    Tensor<TensorAttribute<ViewEngine<HardwareMemPtr<hPos, Pointer>>,
         Layout<Shape<ShapeRows, ShapeCols>, Stride<StrideRows, StrideCols>, LayoutPattern>>>> {
     using ShapeRowTuple = typename ToTuple<ShapeRows>::type;
     using ShapeColTuple = typename ToTuple<ShapeCols>::type;
@@ -113,6 +113,10 @@ template <typename TensorType, typename TargetLayoutPtn>
 inline constexpr bool IsSatisfiedPtnFormatV = IsSatisfiedPtnFormat<TensorType, TargetLayoutPtn>::value;
 } // namespace Te
 } // namespace AscendC
+
+namespace AscendC {
+    
+}
 
 #endif // IMPL_TENSOR_API_ARCH_UTILS_IS_FORMAT_H
 
