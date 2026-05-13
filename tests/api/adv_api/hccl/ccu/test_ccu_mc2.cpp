@@ -12,7 +12,6 @@
 #include <vector>
 #include <unordered_map>
 
-#include "hccl_alloc_ctx_res.h"
 #include "hccl_mc2.h"
 
 namespace {
