@@ -2,19 +2,18 @@
 
 本示例展示了如何使用Ascend C编写一个简单的"Hello World"程序，包括核函数（设备侧实现的入口函数）的实现、调用流程以及编译运行的完整步骤。通过本示例，您可以快速了解Ascend C的基本开发流程。完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/00_quickstart/hello_world_npu)。
 
-代码文件hello\_world.asc包括核函数实现和主函数实现。
+代码文件 `hello_world.asc` 包括核函数实现和主函数实现。
 
 -   核函数实现：该核函数的核心逻辑是输出"Hello World!!!"字符串。
--   主函数实现：在主函数中，进行初始化环境、申请资源、通过<<<\>\>\>调用核函数以及释放资源等操作。完整的代码流程和逻辑可以通过代码注释查看。
+-   主函数实现：在主函数中，完成环境初始化、申请资源、通过 `<<<>>>` 调用核函数以及释放资源等操作。完整的代码流程和逻辑可以通过代码注释查看。
 
-```
+```cpp
 // Host侧应用程序需要包含的头文件
 #include "acl/acl.h"
 // Kernel侧需要包含的头文件
 #include "kernel_operator.h"
 __global__ __vector__ void hello_world()
 {
- 
     AscendC::printf("[Block (%lu/%lu)]: Hello World!!!\n", AscendC::GetBlockIdx(), AscendC::GetBlockNum());
 }
 
@@ -30,10 +29,10 @@ int32_t main(int argc, char const *argv[])
 
     // 设置参与计算的核数为8（核数可根据实际需求设置）
     constexpr uint32_t numBlocks = 8;
-    // 用内核调用符<<<>>>调用核函数
+    // 使用内核调用符<<<>>>调用核函数
     hello_world<<<numBlocks, nullptr, stream>>>();
     aclrtSynchronizeStream(stream);
-    // 资源释放和去初始化
+    // 释放资源并去初始化
     aclrtDestroyStream(stream);
     aclrtResetDevice(deviceId);
     aclFinalize();
@@ -41,14 +40,14 @@ int32_t main(int argc, char const *argv[])
 }
 ```
 
-完成代码实现后，可以通过两种方式，对上述代码进行编译：
+完成代码实现后，可以通过以下两种方式对上述代码进行编译：
 
->[!NOTE]说明 
->- 该样例仅支持如下型号：
+> [!NOTE] 说明
+> - 该样例仅支持如下型号：
 >    - Ascend 950PR/Ascend 950DT
 >    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 >    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
->- 编译命令中的--npu-arch用于指定NPU的架构版本，dav-后为架构版本号，请替换为您实际使用的架构版本号。各AI处理器型号对应的架构版本号请通过[AI处理器型号和\_\_NPU\_ARCH\_\_的对应关系](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
+> - 编译命令中的 `--npu-arch` 用于指定NPU的架构版本，`dav-` 后为架构版本号，请替换为您实际使用的架构版本号。各AI处理器型号对应的架构版本号请通过[AI处理器型号和\_\_NPU\_ARCH\_\_的对应关系](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
 
 -   **使用bisheng命令行进行编译**
 
@@ -84,7 +83,7 @@ int32_t main(int argc, char const *argv[])
     ./demo
     ```
 
-运行结果如下，本样例共调度8个核，打印了核号和"Hello World!!!"等信息。
+运行结果如下。本样例共调度8个核，打印了核号和"Hello World!!!"等信息。
 
 ```
 [Block (0/8)]: Hello World!!!
@@ -96,4 +95,3 @@ int32_t main(int argc, char const *argv[])
 [Block (6/8)]: Hello World!!!
 [Block (7/8)]: Hello World!!!
 ```
-

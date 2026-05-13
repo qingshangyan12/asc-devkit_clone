@@ -149,9 +149,8 @@
 2.  根据[核函数定义和调用](../../../编程指南/编程模型/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)中介绍的规则进行**核函数的定义**，并在核函数中调用算子类的Init和Process函数，算子类实现在后续步骤中介绍。
 
     ```
-    __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData tiling)
+    __global__ __vector__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData tiling)
     {
-        KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);    // 设置Kernel类型为Vector核（用于矢量计算）
         KernelAdd op;
         op.Init(x, y, z, tiling.totalLength, tiling.tileNum);
         op.Process();
@@ -342,9 +341,8 @@
     // 核函数开发部分
     ...
     
-    __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData tiling)
-    {
-        KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);    
+    __global__ __vector__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData tiling)
+    { 
         KernelAdd op;
         op.Init(x, y, z, tiling.totalLength, tiling.tileNum);
         op.Process();
