@@ -1,0 +1,1825 @@
+root: index
+entries:
+  - file: SIMD-API
+    entries:
+      - file: 通用说明和约束
+      - file: 基础数据结构
+        entries:
+          - file: LocalTensor
+            entries:
+              - file: LocalTensor简介
+              - file: LocalTensor构造函数
+              - file: SetValue
+              - file: GetValue
+              - file: operator
+              - file: operator()
+              - file: SetSize
+              - file: GetSize
+              - file: SetUserTag
+              - file: GetUserTag
+              - file: ReinterpretCast
+              - file: GetPhyAddr
+              - file: GetPosition
+              - file: GetLength
+              - file: SetShapeInfo
+              - file: GetShapeInfo
+              - file: SetAddrWithOffset
+              - file: SetBufferLen
+              - file: ToFile
+              - file: Print
+          - file: GlobalTensor
+            entries:
+              - file: GlobalTensor简介
+              - file: GlobalTensor构造函数
+              - file: SetGlobalBuffer
+              - file: GetPhyAddr-0
+              - file: GetValue-1
+              - file: operator()-2
+              - file: SetValue-3
+              - file: GetSize-4
+              - file: operator-5
+              - file: SetShapeInfo-6
+              - file: GetShapeInfo-7
+              - file: SetL2CacheHint
+              - file: ReinterpretCast-8
+          - file: Coordinate
+            entries:
+              - file: Coordinate简介
+              - file: MakeCoord
+              - file: Crd2Idx
+          - file: Layout
+            entries:
+              - file: Layout简介
+              - file: Layout构造函数
+              - file: layout-1
+              - file: 运算符重载
+              - file: GetShape
+              - file: GetStride
+              - file: MakeShape
+              - file: MakeStride
+              - file: MakeLayout
+              - file: is_layout
+          - file: TensorTrait
+            entries:
+              - file: TensorTrait简介
+              - file: TensorTrait构造函数
+              - file: GetLayout
+              - file: SetLayout
+              - file: MakeTensorTrait
+              - file: is_tensorTrait
+              - file: 更多样例
+          - file: 内置数据类型
+      - file: 基础API
+        entries:
+          - file: Memory数据搬运
+            entries:
+              - file: DataCopy
+                entries:
+                  - file: DataCopy简介
+                  - file: 基础数据搬运
+                  - file: 增强数据搬运
+                  - file: 切片数据搬运
+                  - file: 随路转换ND2NZ搬运
+                  - file: 随路转换NZ2ND搬运
+                  - file: 随路转换DN2NZ搬运（ISASI）
+                  - file: 随路量化激活搬运
+                  - file: 多维数据搬运（ISASI）
+              - file: DataCopyPad(ISASI)
+              - file: Copy
+              - file: SetPadValue(ISASI)
+              - file: SetLoopModePara
+              - file: ResetLoopModePara
+          - file: 矩阵计算（ISASI）
+            entries:
+              - file: 数据搬运
+                entries:
+                  - file: Fill
+                  - file: LoadData
+                    entries:
+                      - file: Load2D
+                      - file: Load2DMX
+                      - file: Load2DBitMode
+                      - file: Load3D
+                      - file: Load3DBitMode
+                  - file: LoadUnzipIndex
+                  - file: LoadDataUnzip
+                  - file: LoadDataWithTranspose
+                  - file: LoadDataWithSparse
+                  - file: SetFmatrix
+                  - file: SetFmatrixBitMode
+                  - file: SetLoadDataBoundary
+                  - file: SetLoadDataRepeat
+                  - file: SetLoadDataPaddingValue
+                  - file: Fixpipe
+                  - file: SetFixPipeConfig
+                  - file: SetFixpipeNz2ndFlag
+                  - file: SetFixpipePreQuantFlag
+                  - file: SetFixPipeClipRelu
+                  - file: SetFixPipeAddr
+                  - file: SetAippFunctions
+                  - file: LoadImageToLocal
+              - file: 矩阵计算
+                entries:
+                  - file: Mmad
+                  - file: MmadBitMode
+                  - file: MmadWithSparse
+                  - file: SetMMRowMajor
+                  - file: SetMMColumnMajor
+                  - file: SetHF32Mode
+                  - file: SetHF32TransMode
+                  - file: Conv2D（废弃）
+                  - file: Gemm（废弃）
+          - file: Memory矢量计算
+            entries:
+              - file: 基础算术
+                entries:
+                  - file: Exp
+                  - file: Ln
+                  - file: Abs
+                  - file: Reciprocal
+                  - file: Sqrt
+                  - file: Rsqrt
+                  - file: Relu
+                  - file: Neg(ISASI)
+                  - file: Add
+                  - file: Sub
+                  - file: Mul
+                  - file: Div
+                  - file: Max
+                  - file: Min
+                  - file: BilinearInterpolation(ISASI)
+                  - file: Prelu(ISASI)
+                  - file: Mull(ISASI)
+                  - file: Adds
+                  - file: Adds（灵活标量位置）
+                  - file: Muls
+                  - file: Muls（灵活标量位置）
+                  - file: Maxs
+                  - file: Maxs（灵活标量位置）
+                  - file: Mins
+                  - file: Mins（灵活标量位置）
+                  - file: Subs
+                  - file: Divs
+                  - file: LeakyRelu
+                  - file: 更多样例-9
+              - file: 逻辑计算
+                entries:
+                  - file: Not
+                  - file: And
+                  - file: Or
+                  - file: ShiftLeft
+                  - file: ShiftRight
+                  - file: Ands
+                  - file: Ors
+                  - file: ShiftLeft-10
+                  - file: ShiftRight-11
+              - file: 复合计算
+                entries:
+                  - file: Axpy
+                  - file: CastDequant
+                  - file: AddRelu
+                  - file: AddReluCast
+                  - file: AddDeqRelu
+                  - file: SubRelu
+                  - file: SubReluCast
+                  - file: MulAddDst
+                  - file: MulCast
+                  - file: FusedMulAdd
+                  - file: MulAddRelu
+                  - file: AbsSub(ISASI)
+                  - file: FusedExpSub(ISASI)
+                  - file: MulsCast(ISASI)
+              - file: 比较与选择
+                entries:
+                  - file: Compare
+                  - file: Compare（结果存入寄存器）
+                  - file: Compares
+                  - file: Compares（灵活标量位置）
+                  - file: GetCmpMask(ISASI)
+                  - file: SetCmpMask(ISASI)
+                  - file: Select
+                  - file: Select（灵活标量位置）
+                  - file: GatherMask
+              - file: 类型转换
+                entries:
+                  - file: Cast
+                  - file: Truncate(ISASI)
+              - file: 归约计算
+                entries:
+                  - file: ReduceMax
+                  - file: ReduceMin
+                  - file: ReduceSum
+                  - file: WholeReduceMax
+                  - file: WholeReduceMin
+                  - file: WholeReduceSum
+                  - file: BlockReduceMax
+                  - file: BlockReduceMin
+                  - file: BlockReduceSum
+                  - file: PairReduceSum
+                  - file: RepeatReduceSum
+                  - file: GetReduceRepeatSumSpr(ISASI)
+                  - file: GetReduceRepeatMaxMinSpr(ISASI)
+              - file: 数据转换
+                entries:
+                  - file: Transpose
+                  - file: TransDataTo5HD
+              - file: 数据填充
+                entries:
+                  - file: Duplicate
+                  - file: Brcb
+                  - file: CreateVecIndex
+                  - file: VectorPadding(ISASI)
+              - file: 排序组合（ISASI）
+                entries:
+                  - file: ProposalConcat
+                  - file: ProposalExtract
+                  - file: RpSort16
+                  - file: MrgSort4
+                  - file: Sort32
+                  - file: MrgSort
+                  - file: GetMrgSortResult
+              - file: 离散与聚合
+                entries:
+                  - file: Gather
+                  - file: Gatherb(ISASI)
+                  - file: Scatter(ISASI)
+              - file: 掩码操作
+                entries:
+                  - file: SetMaskCount
+                  - file: SetMaskNorm
+                  - file: SetVectorMask
+                  - file: ResetMask
+              - file: 量化设置
+                entries:
+                  - file: SetDeqScale
+              - file: 数据重排（ISASI）
+                entries:
+                  - file: Interleave
+                  - file: DeInterleave
+          - file: Reg矢量计算
+            entries:
+              - file: 寄存器数据类型
+                entries:
+                  - file: RegTensor
+                  - file: MaskReg
+                  - file: UnalignRegForLoad-UnalignRegForStore
+                  - file: AddrReg
+              - file: Reg数据搬运
+                entries:
+                  - file: 连续对齐搬入
+                  - file: 连续对齐搬出
+                  - file: 非连续对齐搬入
+                  - file: 非连续对齐搬出
+                  - file: 连续非对齐搬入
+                  - file: 连续非对齐搬出
+                  - file: MaskReg搬入
+                  - file: MaskReg搬出
+                  - file: Move
+              - file: MaskReg计算
+                entries:
+                  - file: Move-12
+                  - file: MaskInterleave
+                  - file: MaskDeInterleave
+                  - file: Select-13
+                  - file: Pack
+                  - file: UnPack
+                  - file: MoveMask
+              - file: 基础算术-14
+                entries:
+                  - file: Abs-15
+                  - file: Relu-16
+                  - file: Exp-17
+                  - file: Sqrt-18
+                  - file: Ln-19
+                  - file: Log
+                  - file: Log2
+                  - file: Log10
+                  - file: Neg
+                  - file: Add-20
+                  - file: Add（支持进位）
+                  - file: Sub-21
+                  - file: Mul-22
+                  - file: Div-23
+                  - file: Max-24
+                  - file: Min-25
+                  - file: Mull
+                  - file: AddC
+                  - file: Sub-26
+                  - file: SubC
+                  - file: Prelu
+                  - file: Adds-27
+                  - file: Muls-28
+                  - file: Maxs-29
+                  - file: Mins-30
+                  - file: LeakyRelu-31
+              - file: 逻辑计算-32
+                entries:
+                  - file: Not-33
+                  - file: And-34
+                  - file: Or-35
+                  - file: Xor
+                  - file: ShiftLeft-36
+                  - file: ShiftRight-37
+                  - file: ShiftLefts
+                  - file: ShiftRights
+              - file: 复合计算-38
+                entries:
+                  - file: Axpy-39
+                  - file: AbsSub
+                  - file: ExpSub
+                  - file: MulDstAdd
+                  - file: MulAddDst-40
+                  - file: MulsCast
+              - file: 比较与选择-41
+                entries:
+                  - file: Compare-42
+                  - file: Compares-43
+                  - file: Select-44
+                  - file: Squeeze
+              - file: 类型转换-45
+                entries:
+                  - file: Cast-46
+                  - file: Truncate
+              - file: 归约计算-47
+                entries:
+                  - file: Reduce
+                  - file: ReduceDataBlock
+                  - file: PairReduceElem
+              - file: 数据填充-48
+                entries:
+                  - file: Duplicate-49
+              - file: 离散与聚合-50
+                entries:
+                  - file: Gather-51
+                  - file: GatherB
+                  - file: Scatter
+                  - file: Gather（支持寄存器为源操作数）
+              - file: 数据重排
+                entries:
+                  - file: Interleave-52
+                  - file: DeInterleave-53
+              - file: 数据压缩
+                entries:
+                  - file: Unsqueeze
+                  - file: Pack-54
+                  - file: UnPack-55
+              - file: 直方图计算
+                entries:
+                  - file: Histograms
+              - file: 索引操作
+                entries:
+                  - file: Arange
+              - file: 同步控制
+                entries:
+                  - file: LocalMemBar
+              - file: 系统变量访问
+                entries:
+                  - file: GetSpr
+                  - file: ClearSpr
+              - file: 数据类型
+                entries:
+                  - file: PostLiteral
+                  - file: RegLayout
+                  - file: CastTrait
+                  - file: SatMode
+                  - file: MaskMergeMode
+                  - file: RoundMode
+          - file: 标量计算
+            entries:
+              - file: GetBitCount
+              - file: CountLeadingZero
+              - file: CountBitsCntSameAsSignBit
+              - file: GetSFFValue
+              - file: Cast（float转half-int32_t）
+              - file: Cast（float转bfloat16_t）
+              - file: Cast（bfloat16_t转float）
+              - file: Nop
+              - file: WriteGmByPassDCache(ISASI)
+              - file: ReadGmByPassDCache(ISASI)
+          - file: 资源管理
+            entries:
+              - file: Pipe和Que框架
+                entries:
+                  - file: TPipe
+                    entries:
+                      - file: TPipe简介
+                      - file: TPipe构造函数
+                      - file: Init
+                      - file: Destroy
+                      - file: InitBuffer
+                      - file: Reset
+                      - file: AllocEventID
+                      - file: ReleaseEventID
+                      - file: FetchEventID
+                      - file: GetBaseAddr
+                      - file: InitBufPool
+                      - file: InitSpmBuffer
+                      - file: WriteSpmBuffer
+                      - file: ReadSpmBuffer
+                  - file: GetTPipePtr
+                  - file: TBufPool
+                    entries:
+                      - file: TBufPool简介
+                      - file: TBufPool构造函数
+                      - file: InitBufPool-56
+                      - file: InitBuffer-57
+                      - file: Reset-58
+                  - file: 自定义TBufPool
+                    entries:
+                      - file: EXTERN_IMPL_BUFPOOL宏
+                      - file: Reset-59
+                      - file: Init-60
+                      - file: GetBufHandle
+                      - file: SetCurAddr
+                      - file: GetCurAddr
+                      - file: SetCurBufSize
+                      - file: GetCurBufSize
+                  - file: TQue
+                    entries:
+                      - file: TQue简介
+                      - file: AllocTensor
+                      - file: FreeTensor
+                      - file: EnQue
+                      - file: DeQue
+                      - file: VacantInQue
+                      - file: HasTensorInQue
+                      - file: GetTensorCountInQue
+                      - file: HasIdleBuffer
+                  - file: TSCM
+                    entries:
+                      - file: TSCM简介
+                      - file: AllocTensor-61
+                      - file: FreeTensor-62
+                      - file: EnQue-63
+                      - file: DeQue-64
+                  - file: TQueBind
+                    entries:
+                      - file: TQueBind简介
+                      - file: TQueBind构造函数
+                      - file: AllocTensor-65
+                      - file: FreeTensor-66
+                      - file: EnQue-67
+                      - file: DeQue-68
+                      - file: VacantInQue-69
+                      - file: HasTensorInQue-70
+                      - file: GetTensorCountInQue-71
+                      - file: HasIdleBuffer-72
+                      - file: FreeAllEvent
+                      - file: InitBufHandle
+                      - file: InitStartBufHandle
+                  - file: TBuf
+                    entries:
+                      - file: TBuf简介
+                      - file: TBuf构造函数
+                      - file: Get
+                      - file: GetWithOffset
+              - file: 临时空间管理
+                entries:
+                  - file: workspace-1
+                    entries:
+                      - file: GetSysWorkSpacePtr
+                      - file: SetSysWorkSpace
+                      - file: GetUserWorkspace
+                  - file: PopStackBuffer
+              - file: 内存管理
+                entries:
+                  - file: LocalMemAllocator
+                    entries:
+                      - file: LocalMemAllocator简介
+                      - file: LocalMemAllocator构造函数
+                      - file: GetCurAddr-73
+                      - file: Alloc
+          - file: 同步控制-74
+            entries:
+              - file: 核内同步
+                entries:
+                  - file: 同步控制简介
+                  - file: TQueSync
+                    entries:
+                      - file: 模板参数
+                      - file: SetFlag-WaitFlag
+                  - file: SetFlag-WaitFlag(ISASI)
+                  - file: PipeBarrier(ISASI)
+                  - file: DataSyncBarrier(ISASI)
+                  - file: Mutex（ISASI）
+                    entries:
+                      - file: 简介
+                      - file: Lock
+                      - file: Unlock
+                  - file: AllocMutexID-(ISASI)
+                  - file: ReleaseMutexID-(ISASI)
+              - file: 核间同步
+                entries:
+                  - file: IBSet
+                  - file: IBWait
+                  - file: SyncAll
+                  - file: CrossCoreSetFlag(ISASI)
+                  - file: CrossCoreWaitFlag(ISASI)
+                  - file: InitDetermineComputeWorkspace
+                  - file: NotifyNextBlock
+                  - file: WaitPreBlock
+              - file: 任务间同步
+                entries:
+                  - file: SetNextTaskStart
+                  - file: WaitPreTaskEnd
+          - file: 缓存控制
+            entries:
+              - file: DataCachePreload
+              - file: DataCacheCleanAndInvalid
+              - file: ICachePreLoad(ISASI)
+              - file: GetICachePreloadStatus(ISASI)
+          - file: 系统变量访问-75
+            entries:
+              - file: GetBlockNum
+              - file: GetBlockIdx
+              - file: GetDataBlockSizeInBytes
+              - file: GetArchVersion
+              - file: InitSocState
+              - file: GetProgramCounter(ISASI)
+              - file: GetSubBlockNum(ISASI)
+              - file: GetSubBlockIdx(ISASI)
+              - file: GetSystemCycle(ISASI)
+              - file: SetCtrlSpr(ISASI)
+              - file: GetCtrlSpr(ISASI)
+              - file: ResetCtrlSpr(ISASI)
+          - file: 原子操作
+            entries:
+              - file: SetAtomicAdd
+              - file: SetAtomicType
+              - file: DisableDmaAtomic
+              - file: SetAtomicMax(ISASI)
+              - file: SetAtomicMin(ISASI)
+              - file: SetStoreAtomicConfig(ISASI)
+              - file: GetStoreAtomicConfig(ISASI)
+              - file: AtomicAdd
+              - file: AtomicMin
+              - file: AtomicMax
+              - file: AtomicCas
+              - file: AtomicExch
+          - file: 调试接口
+            entries:
+              - file: 上板打印
+                entries:
+                  - file: DumpTensor
+                  - file: printf
+                  - file: DumpAccChkPoint
+                  - file: PrintTimeStamp
+              - file: 异常检测
+                entries:
+                  - file: ascendc_assert
+                  - file: assert
+                  - file: Trap
+                  - file: CheckLocalMemoryIA(ISASI)
+              - file: CPU孪生调试
+                entries:
+                  - file: GmAlloc
+                  - file: ICPU_RUN_KF
+                  - file: ICPU_SET_TILING_KEY
+                  - file: GmFree
+                  - file: SetKernelMode
+              - file: 性能统计
+                entries:
+                  - file: TRACE_START
+                  - file: TRACE_STOP
+                  - file: MetricsProfStart
+                  - file: MetricsProfStop
+                  - file: MarkStamp
+          - file: Cube分组管理（ISASI）
+            entries:
+              - file: CubeResGroupHandle
+                entries:
+                  - file: CubeResGroupHandle使用说明
+                  - file: CubeResGroupHandle构造函数
+                  - file: CreateCubeResGroup
+                  - file: AssignQueue
+                  - file: AllocMessage
+                  - file: PostMessage
+                  - file: PostFakeMsg
+                  - file: SetQuit
+                  - file: Wait
+                  - file: FreeMessage
+                  - file: SetSkipMsg
+              - file: GroupBarrier
+                entries:
+                  - file: GroupBarrier使用说明
+                  - file: GroupBarrier构造函数
+                  - file: Arrive
+                  - file: Wait-76
+                  - file: GetWorkspaceLen
+              - file: KfcWorkspace
+                entries:
+                  - file: 构造函数与析构函数
+                  - file: UpdateKfcWorkspace
+                  - file: GetKfcWorkspace
+          - file: 工具函数
+            entries:
+              - file: NumericLimits
+                entries:
+                  - file: 简介-77
+                  - file: Max-78
+                  - file: Lowest
+                  - file: Min-79
+                  - file: Infinity
+                  - file: NegativeInfinity
+                  - file: QuietNaN
+                  - file: SignalingNaN
+                  - file: DeNormMin
+              - file: Async
+              - file: GetTaskRatio
+              - file: GetUBSizeInBytes
+              - file: GetRuntimeUBSize
+              - file: GetVecLen
+              - file: CeilDivision
+              - file: GetSsbufBaseAddr
+          - file: Kernel-Tiling
+            entries:
+              - file: GET_TILING_DATA
+              - file: GET_TILING_DATA_WITH_STRUCT
+              - file: GET_TILING_DATA_MEMBER
+              - file: GET_TILING_DATA_PTR_WITH_STRUCT
+              - file: COPY_TILING_WITH_STRUCT
+              - file: COPY_TILING_WITH_ARRAY
+              - file: TILING_KEY_IS
+              - file: TILING_KEY_LIST
+              - file: REGISTER_TILING_DEFAULT
+              - file: REGISTER_TILING_FOR_TILINGKEY
+              - file: REGISTER_NONE_TILING
+              - file: 设置Kernel类型
+      - file: 高阶API
+        entries:
+          - file: 数学计算
+            entries:
+              - file: Tanh接口
+                entries:
+                  - file: Tanh
+                  - file: GetTanhMaxMinTmpSize
+                  - file: GetTanhTmpBufferFactorSize
+              - file: Asin接口
+                entries:
+                  - file: Asin
+                  - file: GetAsinMaxMinTmpSize
+                  - file: GetAsinTmpBufferFactorSize
+              - file: Sin接口
+                entries:
+                  - file: Sin
+                  - file: GetSinMaxMinTmpSize
+                  - file: GetSinTmpBufferFactorSize
+              - file: Acos接口
+                entries:
+                  - file: Acos
+                  - file: GetAcosMaxMinTmpSize
+                  - file: GetAcosTmpBufferFactorSize
+              - file: Cos接口
+                entries:
+                  - file: Cos
+                  - file: GetCosMaxMinTmpSize
+                  - file: GetCosTmpBufferFactorSize
+              - file: Log接口
+                entries:
+                  - file: Log-80
+                  - file: GetLogMaxMinTmpSize
+                  - file: GetLogTmpBufferFactorSize
+              - file: Atan接口
+                entries:
+                  - file: Atan
+                  - file: GetAtanMaxMinTmpSize
+                  - file: GetAtanTmpBufferFactorSize
+              - file: Power接口
+                entries:
+                  - file: Power
+                  - file: GetPowerMaxMinTmpSize
+                  - file: GetPowerTmpBufferFactorSize
+              - file: Sinh接口
+                entries:
+                  - file: Sinh
+                  - file: GetSinhMaxMinTmpSize
+                  - file: GetSinhTmpBufferFactorSize
+              - file: Cosh接口
+                entries:
+                  - file: Cosh
+                  - file: GetCoshMaxMinTmpSize
+                  - file: GetCoshTmpBufferFactorSize
+              - file: Tan接口
+                entries:
+                  - file: Tan
+                  - file: GetTanMaxMinTmpSize
+                  - file: GetTanTmpBufferFactorSize
+              - file: Trunc接口
+                entries:
+                  - file: Trunc
+                  - file: GetTruncMaxMinTmpSize
+                  - file: GetTruncTmpBufferFactorSize
+              - file: Frac接口
+                entries:
+                  - file: Frac
+                  - file: GetFracMaxMinTmpSize
+                  - file: GetFracTmpBufferFactorSize
+              - file: Erf接口
+                entries:
+                  - file: Erf
+                  - file: GetErfMaxMinTmpSize
+                  - file: GetErfTmpBufferFactorSize
+              - file: Erfc接口
+                entries:
+                  - file: Erfc
+                  - file: GetErfcMaxMinTmpSize
+                  - file: GetErfcTmpBufferFactorSize
+              - file: Sign接口
+                entries:
+                  - file: Sign
+                  - file: GetSignMaxMinTmpSize
+                  - file: GetSignTmpBufferFactorSize
+              - file: Atanh接口
+                entries:
+                  - file: Atanh
+                  - file: GetAtanhMaxMinTmpSize
+                  - file: GetAtanhTmpBufferFactorSize
+              - file: Asinh接口
+                entries:
+                  - file: Asinh
+                  - file: GetAsinhMaxMinTmpSize
+                  - file: GetAsinhTmpBufferFactorSize
+              - file: Acosh接口
+                entries:
+                  - file: Acosh
+                  - file: GetAcoshMaxMinTmpSize
+                  - file: GetAcoshTmpBufferFactorSize
+              - file: Floor接口
+                entries:
+                  - file: Floor
+                  - file: GetFloorMaxMinTmpSize
+                  - file: GetFloorTmpBufferFactorSize
+              - file: Ceil接口
+                entries:
+                  - file: Ceil
+                  - file: GetCeilMaxMinTmpSize
+                  - file: GetCeilTmpBufferFactorSize
+              - file: Clamp接口
+                entries:
+                  - file: Clamp
+                  - file: ClampMax
+                  - file: ClampMin
+                  - file: GetClampMaxMinTmpSize
+                  - file: GetClampTmpBufferFactorSize
+              - file: Round接口
+                entries:
+                  - file: Round
+                  - file: GetRoundMaxMinTmpSize
+                  - file: GetRoundTmpBufferFactorSize
+              - file: Axpy接口
+                entries:
+                  - file: Axpy-81
+                  - file: GetAxpyMaxMinTmpSize
+                  - file: GetAxpyTmpBufferFactorSize
+              - file: Exp接口
+                entries:
+                  - file: Exp-82
+                  - file: GetExpMaxMinTmpSize
+                  - file: GetExpTmpBufferFactorSize
+              - file: Lgamma接口
+                entries:
+                  - file: Lgamma
+                  - file: GetLgammaMaxMinTmpSize
+                  - file: GetLgammaTmpBufferFactorSize
+              - file: Digamma接口
+                entries:
+                  - file: Digamma
+                  - file: GetDigammaMaxMinTmpSize
+                  - file: GetDigammaTmpBufferFactorSize
+              - file: Xor接口
+                entries:
+                  - file: Xor-83
+                  - file: GetXorMaxMinTmpSize
+                  - file: GetXorTmpBufferFactorSize
+              - file: CumSum接口
+                entries:
+                  - file: CumSum
+                  - file: GetCumSumMaxMinTmpSize
+              - file: Fmod接口
+                entries:
+                  - file: Fmod
+                  - file: GetFmodMaxMinTmpSize
+                  - file: GetFmodTmpBufferFactorSize
+              - file: IsFinite接口
+                entries:
+                  - file: IsFinite
+              - file: Hypot接口
+                entries:
+                  - file: Hypot
+                  - file: GetHypotMaxMinTmpSize
+                  - file: GetHypotTmpBufferFactorSize
+              - file: Fma接口
+                entries:
+                  - file: Fma
+                  - file: GetFmaMaxMinTmpSize
+                  - file: GetFmaTmpBufferFactorSize
+              - file: IsNan接口
+                entries:
+                  - file: IsNan
+                  - file: GetIsNanMaxMinTmpSize
+                  - file: GetIsNanTmpBufferFactorSize
+              - file: IsInf接口
+                entries:
+                  - file: IsInf
+                  - file: GetIsInfMaxMinTmpSize
+                  - file: GetIsInfTmpBufferFactorSize
+              - file: Rint接口
+                entries:
+                  - file: Rint
+                  - file: GetRintMaxMinTmpSize
+                  - file: GetRintTmpBufferFactorSize
+              - file: SinCos接口
+                entries:
+                  - file: SinCos
+                  - file: GetSinCosMaxMinTmpSize
+                  - file: GetSinCosTmpBufferFactorSize
+              - file: LogicalNot接口
+                entries:
+                  - file: LogicalNot
+                  - file: GetLogicalNotMaxMinTmpSize
+                  - file: GetLogicalNotTmpBufferFactorSize
+              - file: LogicalAnd接口
+                entries:
+                  - file: LogicalAnd
+                  - file: GetLogicalAndMaxMinTmpSize
+                  - file: GetLogicalAndTmpBufferFactorSize
+              - file: LogicalAnds接口
+                entries:
+                  - file: LogicalAnds
+                  - file: GetLogicalAndsMaxMinTmpSize
+                  - file: GetLogicalAndsTmpBufferFactorSize
+              - file: LogicalOr接口
+                entries:
+                  - file: LogicalOr
+                  - file: GetLogicalOrMaxMinTmpSize
+                  - file: GetLogicalOrTmpBufferFactorSize
+              - file: LogicalOrs接口
+                entries:
+                  - file: LogicalOrs
+                  - file: GetLogicalOrsMaxMinTmpSize
+                  - file: GetLogicalOrsTmpBufferFactorSize
+              - file: LogicalXor接口
+                entries:
+                  - file: LogicalXor
+                  - file: GetLogicalXorMaxMinTmpSize
+                  - file: GetLogicalXorTmpBufferFactorSize
+              - file: BitwiseNot接口
+                entries:
+                  - file: BitwiseNot
+                  - file: GetBitwiseNotMaxMinTmpSize
+                  - file: GetBitwiseNotTmpBufferFactorSize
+              - file: BitwiseAnd接口
+                entries:
+                  - file: BitwiseAnd
+                  - file: GetBitwiseAndMaxMinTmpSize
+                  - file: GetBitwiseAndTmpBufferFactorSize
+              - file: BitwiseOr接口
+                entries:
+                  - file: BitwiseOr
+                  - file: GetBitwiseOrMaxMinTmpSize
+                  - file: GetBitwiseOrTmpBufferFactorSize
+              - file: BitwiseXor接口
+                entries:
+                  - file: BitwiseXor
+                  - file: GetBitwiseXorMaxMinTmpSize
+                  - file: GetBitwiseXorTmpBufferFactorSize
+              - file: Where接口
+                entries:
+                  - file: Where
+                  - file: GetWhereMaxMinTmpSize
+                  - file: GetWhereTmpBufferFactorSize
+              - file: 更多样例-84
+          - file: 矩阵计算-85
+            entries:
+              - file: Matmul-Kernel侧接口
+                entries:
+                  - file: Matmul使用说明
+                  - file: Matmul模板参数
+                  - file: MatmulConfig
+                  - file: MatmulCallBackFunc
+                  - file: MatmulPolicy
+                  - file: GetNormalConfig
+                  - file: GetMDLConfig
+                  - file: GetSpecialMDLConfig
+                  - file: GetIBShareNormConfig
+                  - file: GetBasicConfig
+                  - file: GetMMConfig
+                  - file: REGIST_MATMUL_OBJ
+                  - file: Init-86
+                  - file: SetTensorA
+                  - file: SetTensorB
+                  - file: SetTensorScaleA
+                  - file: SetTensorScaleB
+                  - file: SetBias
+                  - file: DisableBias
+                  - file: GetBatchTensorC
+                  - file: Iterate
+                  - file: GetTensorC
+                  - file: IterateAll
+                  - file: WaitIterateAll
+                  - file: IterateBatch
+                  - file: WaitIterateBatch
+                  - file: IterateNBatch
+                  - file: End
+                  - file: SetHF32
+                  - file: SetTail
+                  - file: SetBatchNum
+                  - file: SetQuantScalar
+                  - file: SetQuantVector
+                  - file: SetOrgShape
+                  - file: SetSingleShape
+                  - file: SetLocalWorkspace
+                  - file: SetWorkspace
+                  - file: SetAntiQuantScalar
+                  - file: SetAntiQuantVector
+                  - file: WaitGetTensorC
+                  - file: GetOffsetC
+                  - file: AsyncGetTensorC
+                  - file: SetSubBlockIdx
+                  - file: GetSubBlockIdx
+                  - file: SetUserDefInfo
+                  - file: SetSelfDefineData
+                  - file: GetMatmulApiTiling
+                  - file: ClearBias
+                  - file: GetBatchC
+                  - file: SetSparseIndex
+              - file: Matmul-Tiling侧接口
+                entries:
+                  - file: Matmul-Tiling类
+                    entries:
+                      - file: Matmul-Tiling类使用说明
+                      - file: Matmul-Tiling类构造函数
+                      - file: TCubeTiling结构体
+                      - file: SetAType
+                      - file: SetBType
+                      - file: SetScaleAType
+                      - file: SetScaleBType
+                      - file: SetCType
+                      - file: SetBiasType
+                      - file: SetSingleShape-87
+                      - file: SetShape
+                      - file: SetOrgShape-88
+                      - file: SetFixSplit
+                      - file: EnableMultiCoreSplitK
+                      - file: EnableBias
+                      - file: SetBufferSpace
+                      - file: SetTraverse
+                      - file: SetMadType
+                      - file: SetSplitRange
+                      - file: SetDoubleBuffer
+                      - file: GetBaseM
+                      - file: GetBaseN
+                      - file: GetBaseK
+                      - file: GetTiling
+                      - file: EnableL1BankConflictOptimise
+                      - file: SetDim
+                      - file: SetSingleRange
+                      - file: GetSingleShape
+                      - file: GetCoreNum
+                      - file: SetAlignSplit
+                      - file: SetDequantType
+                      - file: SetALayout
+                      - file: SetBLayout
+                      - file: SetCLayout
+                      - file: SetBatchNum-89
+                      - file: SetBatchInfoForNormal
+                      - file: SetMatmulConfigParams
+                      - file: SetBias-90
+                      - file: SetSplitK
+                      - file: SetSparse
+                  - file: 获取Matmul计算所需空间
+                    entries:
+                      - file: MultiCoreMatmulGetTmpBufSize
+                      - file: MultiCoreMatmulGetTmpBufSizeV2
+                      - file: BatchMatmulGetTmpBufSize
+                      - file: BatchMatmulGetTmpBufSizeV2
+                      - file: MatmulGetTmpBufSize
+                      - file: MatmulGetTmpBufSizeV2
+          - file: 激活函数
+            entries:
+              - file: SoftMax接口
+                entries:
+                  - file: SoftMax
+                  - file: SimpleSoftMax
+                  - file: SoftmaxFlash
+                  - file: SoftmaxGrad
+                  - file: SoftmaxFlashV2
+                  - file: SoftmaxFlashV3
+                  - file: SoftmaxGradFront
+                  - file: AdjustSoftMaxRes
+                  - file: SoftMax-Tiling使用说明
+                  - file: SoftMax-SimpleSoftMax-Tiling
+                  - file: SoftmaxFlash-Tiling接口
+                  - file: SoftmaxGrad-Tiling接口
+                  - file: SoftmaxFlashV2-Tiling接口
+                  - file: SoftmaxFlashV3-Tiling接口
+                  - file: IsBasicBlockInSoftMax
+              - file: LogSoftMax接口
+                entries:
+                  - file: LogSoftMax
+                  - file: LogSoftMax-Tiling
+              - file: Gelu接口
+                entries:
+                  - file: Gelu
+                  - file: FasterGelu
+                  - file: FasterGeluV2
+                  - file: GetGeluMaxMinTmpSize
+              - file: SwiGLU接口
+                entries:
+                  - file: SwiGLU
+                  - file: GetSwiGLUMaxMinTmpSize
+                  - file: GetSwiGLUTmpBufferFactorSize
+              - file: Silu接口
+                entries:
+                  - file: Silu
+                  - file: GetSiluTmpSize
+              - file: Swish接口
+                entries:
+                  - file: Swish
+                  - file: GetSwishTmpSize
+              - file: GeGLU接口
+                entries:
+                  - file: GeGLU
+                  - file: GetGeGLUMaxMinTmpSize
+                  - file: GetGeGLUTmpBufferFactorSize
+              - file: ReGlu接口
+                entries:
+                  - file: ReGlu
+                  - file: GetReGluMaxMinTmpSize
+              - file: Sigmoid接口
+                entries:
+                  - file: Sigmoid
+                  - file: GetSigmoidMaxMinTmpSize
+          - file: 归一化操作
+            entries:
+              - file: LayerNorm
+              - file: LayerNorm-Tiling
+              - file: LayerNormGrad
+              - file: LayerNormGrad-Tiling
+              - file: LayerNormGradBeta
+              - file: LayerNormGradBeta-Tiling
+              - file: RmsNorm
+              - file: RmsNorm-Tiling
+              - file: BatchNorm
+              - file: BatchNorm-Tiling
+              - file: DeepNorm
+              - file: DeepNorm-Tiling
+              - file: Normalize
+              - file: Normalize-Tiling
+              - file: WelfordUpdate
+              - file: WelfordUpdate-Tiling
+              - file: WelfordFinalize
+              - file: WelfordFinalize-Tiling
+              - file: GroupNorm
+              - file: GroupNorm-Tiling
+          - file: 量化操作
+            entries:
+              - file: AscendQuant
+              - file: GetAscendQuantMaxMinTmpSize
+              - file: GetAscendQuantTmpBufferFactorSize
+              - file: AscendDequant
+              - file: GetAscendDequantMaxMinTmpSize
+              - file: GetAscendDequantTmpBufferFactorSize
+              - file: AscendAntiQuant
+              - file: GetAscendAntiQuantMaxMinTmpSize
+              - file: GetAscendAntiQuantTmpBufferFactorSize
+              - file: Quantize
+              - file: GetQuantizeMaxMinTmpSize
+              - file: GetQuantizeTmpBufferFactorSize
+              - file: Dequantize
+              - file: GetDequantizeMaxMinTmpSize
+              - file: GetDequantizeTmpBufferFactorSize
+              - file: AntiQuantize
+              - file: GetAntiQuantizeMaxMinTmpSize
+              - file: GetAntiQuantizeTmpBufferFactorSize
+          - file: 归约操作
+            entries:
+              - file: Sum接口
+                entries:
+                  - file: Sum
+                  - file: GetSumMaxMinTmpSize
+              - file: Mean接口
+                entries:
+                  - file: Mean
+                  - file: GetMeanMaxMinTmpSize
+                  - file: GetMeanTmpBufferFactorSize
+              - file: ReduceXorSum接口
+                entries:
+                  - file: ReduceXorSum
+                  - file: GetReduceXorSumMaxMinTmpSize
+              - file: ReduceSum接口
+                entries:
+                  - file: ReduceSum-91
+                  - file: GetReduceSumMaxMinTmpSize
+              - file: ReduceMean接口
+                entries:
+                  - file: ReduceMean
+                  - file: GetReduceMeanMaxMinTmpSize
+              - file: ReduceMax接口
+                entries:
+                  - file: ReduceMax-92
+                  - file: GetReduceMaxMaxMinTmpSize
+              - file: ReduceMin接口
+                entries:
+                  - file: ReduceMin-93
+                  - file: GetReduceMinMaxMinTmpSize
+              - file: ReduceAny接口
+                entries:
+                  - file: ReduceAny
+                  - file: GetReduceAnyMaxMinTmpSize
+              - file: ReduceAll接口
+                entries:
+                  - file: ReduceAll
+                  - file: GetReduceAllMaxMinTmpSize
+              - file: ReduceProd接口
+                entries:
+                  - file: ReduceProd
+                  - file: GetReduceProdMaxMinTmpSize
+          - file: 排序操作
+            entries:
+              - file: TopK
+              - file: TopK-Tiling
+              - file: Concat
+              - file: GetConcatTmpSize
+              - file: Extract
+              - file: Sort
+              - file: GetSortTmpSize
+              - file: GetSortMaxMinTmpSize
+              - file: GetSortOffset
+              - file: GetSortLen
+              - file: MrgSort-94
+          - file: 索引计算
+            entries:
+              - file: Arange-95
+              - file: GetArangeMaxMinTmpSize
+          - file: 数据过滤
+            entries:
+              - file: Select-96
+              - file: GetSelectMaxMinTmpSize
+              - file: DropOut
+              - file: GetDropOutMaxMinTmpSize
+          - file: 张量变换
+            entries:
+              - file: Transpose-97
+              - file: Transpose-Tiling
+              - file: TransData
+              - file: GetTransDataMaxMinTmpSize
+              - file: Pad
+              - file: Pad-Tiling
+              - file: UnPad
+              - file: UnPad-Tiling
+              - file: Broadcast
+              - file: GetBroadCastMaxMinTmpSize
+              - file: Fill-98
+          - file: HCCL通信类
+            entries:
+              - file: HCCL-Kernel侧接口
+                entries:
+                  - file: HCCL使用说明
+                  - file: HCCL模板参数
+                  - file: InitV2
+                  - file: SetCcTilingV2
+                  - file: AllReduce
+                  - file: AllGather
+                  - file: ReduceScatter
+                  - file: AlltoAll
+                  - file: AlltoAllV
+                  - file: AlltoAllvWrite
+                  - file: BatchWrite
+                  - file: Commit
+                  - file: Wait-99
+                  - file: Iterate-100
+                  - file: Query
+                  - file: InterHcclGroupSync
+                  - file: Finalize
+                  - file: GetWindowsInAddr
+                  - file: GetWindowsOutAddr
+                  - file: GetRankId
+                  - file: GetRankDim
+                  - file: QueueBarrier
+                  - file: GetQueueNum
+                  - file: SetReduceDataTypeAbility（废弃）
+                  - file: Init（废弃）
+                  - file: SetCcTiling（废弃）
+              - file: HCCL-Tiling侧接口
+                entries:
+                  - file: HCCL-Tiling使用说明
+                  - file: TilingData结构体
+                  - file: HCCL-Tiling构造函数
+                  - file: GetTiling-101
+                  - file: SetOpType
+                  - file: SetGroupName
+                  - file: SetAlgConfig
+                  - file: SetReduceType
+                  - file: SetStepSize
+                  - file: SetSkipLocalRankCopy
+                  - file: SetSkipBufferWindowCopy
+                  - file: SetDebugMode
+                  - file: SetCommBlockNum
+                  - file: SetQueueNum
+                  - file: SetCommEngine
+                  - file: v1版本TilingData（废弃）
+                  - file: v2版本TilingData（废弃）
+              - file: HCCL-Context
+                entries:
+                  - file: HCCL-Context简介
+                  - file: SetHcclContext
+                  - file: GetHcclContext
+          - file: 卷积计算
+            entries:
+              - file: Conv3D
+                entries:
+                  - file: Conv3D-Kernel侧接口
+                    entries:
+                      - file: Conv3D使用说明
+                      - file: Conv3D模板参数
+                      - file: Init-102
+                      - file: SetInput
+                      - file: SetWeight
+                      - file: SetBias-103
+                      - file: SetSingleOutputShape
+                      - file: SetInputStartPosition
+                      - file: IterateAll-104
+                      - file: End-105
+                  - file: Conv3D-Tiling侧接口
+                    entries:
+                      - file: Conv3D-Tiling使用说明
+                      - file: Conv3D-Tiling构造函数
+                      - file: TConv3DApiTiling结构体
+                      - file: GetTiling-106
+                      - file: SetOrgWeightShape
+                      - file: SetOrgInputShape
+                      - file: SetSingleWeightShape
+                      - file: SetSingleOutputShape-107
+                      - file: SetInputType
+                      - file: SetWeightType
+                      - file: SetBiasType-108
+                      - file: SetOutputType
+                      - file: SetPadding
+                      - file: SetDilation
+                      - file: SetStride
+                      - file: SetGroups
+              - file: Conv3DBackpropInput
+                entries:
+                  - file: Conv3DBackpropInput-Kernel侧接口
+                    entries:
+                      - file: Conv3DBackpropInput使用说明
+                      - file: Init-109
+                      - file: SetGradOutput
+                      - file: SetWeight-110
+                      - file: SetSingleShape-111
+                      - file: SetStartPosition
+                      - file: Iterate-112
+                      - file: GetTensorC-113
+                      - file: End-114
+                  - file: Conv3DBackpropInput-Tiling侧接口
+                    entries:
+                      - file: Conv3DBackpropInput-Tiling使用说明
+                      - file: Conv3DBackpropInput-Tiling构造函数
+                      - file: TConv3DBackpropInputTiling结构体
+                      - file: GetTiling-115
+                      - file: SetWeightShape
+                      - file: SetInputShape
+                      - file: SetGradOutputShape
+                      - file: SetWeightType-116
+                      - file: SetInputType-117
+                      - file: SetGradOutputType
+                      - file: SetPadding-118
+                      - file: SetStride-119
+                      - file: SetDilation-120
+                      - file: SetOutputPadding
+              - file: Conv3DBackpropFilter
+                entries:
+                  - file: Conv3DBackpropFilter-Kernel侧接口
+                    entries:
+                      - file: Conv3DBackpropFilter使用说明
+                      - file: Init-121
+                      - file: SetInput-122
+                      - file: SetGradOutput-123
+                      - file: SetSingleShape-124
+                      - file: SetStartPosition-125
+                      - file: Iterate-126
+                      - file: GetTensorC-127
+                      - file: End-128
+                  - file: Conv3DBackpropFilter-Tiling侧接口
+                    entries:
+                      - file: Conv3DBackpropFilter-Tiling使用说明
+                      - file: Conv3DBackpropFilter-Tiling构造函数
+                      - file: TConv3DBpFilterTiling结构体
+                      - file: GetTiling-129
+                      - file: SetWeightShape-130
+                      - file: SetInputShape-131
+                      - file: SetGradOutputShape-132
+                      - file: SetWeightType-133
+                      - file: SetInputType-134
+                      - file: SetGradOutputType-135
+                      - file: SetPadding-136
+                      - file: SetStride-137
+                      - file: SetDilation-138
+          - file: 随机函数
+            entries:
+              - file: PhiloxRandom
+      - file: C-API
+      - file: 其他数据类型
+        entries:
+          - file: ShapeInfo
+          - file: ListTensorDesc
+          - file: TensorDesc
+            entries:
+              - file: TensorDesc简介
+              - file: 构造和析构函数
+              - file: SetShapeAddr
+              - file: GetDim
+              - file: GetIndex
+              - file: GetShape-139
+              - file: GetDataPtr
+              - file: GetDataObj
+          - file: UnaryRepeatParams
+          - file: BinaryRepeatParams
+          - file: complex32-complex64
+          - file: TPosition
+  - file: SIMT-API
+    entries:
+      - file: 简介-140
+      - file: 核函数定义
+        entries:
+          - file: asc_vf_call
+      - file: 同步函数
+        entries:
+          - file: asc_syncthreads
+          - file: asc_threadfence
+      - file: 数学函数
+        entries:
+          - file: tanf
+          - file: tanhf
+          - file: htanh
+          - file: h2tanh
+          - file: tanpif
+          - file: atanf
+          - file: atan2f
+          - file: atanhf
+          - file: expf
+          - file: hexp
+          - file: h2exp
+          - file: exp2f
+          - file: hexp2
+          - file: h2exp2
+          - file: exp10f
+          - file: hexp10
+          - file: h2exp10
+          - file: expm1f
+          - file: logf
+          - file: hlog
+          - file: h2log
+          - file: log2f
+          - file: hlog2
+          - file: h2log2
+          - file: log10f
+          - file: hlog10
+          - file: h2log10
+          - file: log1pf
+          - file: logbf
+          - file: ilogbf
+          - file: cosf
+          - file: hcos
+          - file: h2cos
+          - file: coshf
+          - file: cospif
+          - file: acosf
+          - file: acoshf
+          - file: sinf
+          - file: hsin
+          - file: h2sin
+          - file: sinhf
+          - file: sinpif
+          - file: asinf
+          - file: asinhf
+          - file: sincosf
+          - file: sincospif
+          - file: frexpf
+          - file: ldexpf
+          - file: sqrtf
+          - file: hsqrt
+          - file: h2sqrt
+          - file: rsqrtf
+          - file: hrsqrt
+          - file: h2rsqrt
+          - file: hrcp
+          - file: h2rcp
+          - file: hypotf
+          - file: rhypotf
+          - file: powf
+          - file: norm3df
+          - file: rnorm3df
+          - file: norm4df
+          - file: rnorm4df
+          - file: normf
+          - file: rnormf
+          - file: cbrtf
+          - file: rcbrtf
+          - file: erff
+          - file: erfcf
+          - file: erfinvf
+          - file: erfcinvf
+          - file: erfcxf
+          - file: tgammaf
+          - file: lgammaf
+          - file: cyl_bessel_i0f
+          - file: cyl_bessel_i1f
+          - file: normcdff
+          - file: normcdfinvf
+          - file: j0f
+          - file: j1f
+          - file: jnf
+          - file: y0f
+          - file: y1f
+          - file: ynf
+          - file: fabsf
+          - file: __habs
+          - file: fmaf
+          - file: __hfma
+          - file: fmaxf
+          - file: __hmax
+          - file: fminf
+          - file: __hmin
+          - file: fdimf
+          - file: remquof
+          - file: fmodf
+          - file: remainderf
+          - file: copysignf
+          - file: nearbyintf
+          - file: nextafterf
+          - file: scalbnf
+          - file: scalblnf
+      - file: 精度转换
+        entries:
+          - file: rintf
+          - file: hrint
+          - file: h2rint
+          - file: lrintf
+          - file: llrintf
+          - file: roundf
+          - file: lroundf
+          - file: llroundf
+          - file: floorf
+          - file: hfloor
+          - file: h2floor
+          - file: ceilf
+          - file: hceil
+          - file: h2ceil
+          - file: truncf
+          - file: htrunc
+          - file: h2trunc
+      - file: 比较函数
+        entries:
+          - file: isfinite-1
+          - file: isnan-1
+          - file: __hisnan
+          - file: isinf-1
+          - file: __hisinf
+      - file: Atmoic函数
+        entries:
+          - file: asc_atomic_add
+          - file: asc_atomic_sub
+          - file: asc_atomic_exch
+          - file: asc_atomic_max
+          - file: asc_atomic_min
+          - file: asc_atomic_inc
+          - file: asc_atomic_dec
+          - file: asc_atomic_cas
+          - file: asc_atomic_and
+          - file: asc_atomic_or
+          - file: asc_atomic_xor
+      - file: Warp函数
+        entries:
+          - file: asc_all
+          - file: asc_any
+          - file: asc_ballot
+          - file: asc_activemask
+          - file: asc_shfl
+          - file: asc_shfl_up
+          - file: asc_shfl_down
+          - file: asc_shfl_xor
+          - file: asc_reduce_add
+          - file: asc_reduce_max
+          - file: asc_reduce_min
+      - file: 类型转换-141
+        entries:
+          - file: __float2half
+          - file: __float2half_rn
+          - file: __float2half_rz
+          - file: __float2half_rd
+          - file: __float2half_ru
+          - file: __float2half_rna
+          - file: __float2half_ro
+          - file: __float2bfloat16
+          - file: __float2bfloat16_rn
+          - file: __float2bfloat16_rz
+          - file: __float2bfloat16_rd
+          - file: __float2bfloat16_ru
+          - file: __float2bfloat16_rna
+          - file: __float2uint_rn
+          - file: __float2uint_rz
+          - file: __float2uint_rd
+          - file: __float2uint_ru
+          - file: __float2uint_rna
+          - file: __float2int_rn
+          - file: __float2int_rz
+          - file: __float2int_rd
+          - file: __float2int_ru
+          - file: __float2int_rna
+          - file: __float2ull_rn
+          - file: __float2ull_rz
+          - file: __float2ull_rd
+          - file: __float2ull_ru
+          - file: __float2ull_rna
+          - file: __float2ll_rn
+          - file: __float2ll_rz
+          - file: __float2ll_rd
+          - file: __float2ll_ru
+          - file: __float2ll_rna
+          - file: __half2float
+          - file: __half2bfloat16_rn
+          - file: __half2bfloat16_rz
+          - file: __half2bfloat16_rd
+          - file: __half2bfloat16_ru
+          - file: __half2bfloat16_rna
+          - file: __half2uint_rn
+          - file: __half2uint_rz
+          - file: __half2uint_rd
+          - file: __half2uint_ru
+          - file: __half2uint_rna
+          - file: __half2int_rn
+          - file: __half2int_rz
+          - file: __half2int_rd
+          - file: __half2int_ru
+          - file: __half2int_rna
+          - file: __half2ull_rn
+          - file: __half2ull_rz
+          - file: __half2ull_rd
+          - file: __half2ull_ru
+          - file: __half2ull_rna
+          - file: __half2ll_rn
+          - file: __half2ll_rz
+          - file: __half2ll_rd
+          - file: __half2ll_ru
+          - file: __half2ll_rna
+          - file: __bfloat162half_rn
+          - file: __bfloat162half_rz
+          - file: __bfloat162half_rd
+          - file: __bfloat162half_ru
+          - file: __bfloat162half_rna
+          - file: __bfloat162float
+          - file: __bfloat162uint_rn
+          - file: __bfloat162uint_rz
+          - file: __bfloat162uint_rd
+          - file: __bfloat162uint_ru
+          - file: __bfloat162uint_rna
+          - file: __bfloat162int_rn
+          - file: __bfloat162int_rz
+          - file: __bfloat162int_rd
+          - file: __bfloat162int_ru
+          - file: __bfloat162int_rna
+          - file: __bfloat162ull_rn
+          - file: __bfloat162ull_rz
+          - file: __bfloat162ull_rd
+          - file: __bfloat162ull_ru
+          - file: __bfloat162ull_rna
+          - file: __bfloat162ll_rn
+          - file: __bfloat162ll_rz
+          - file: __bfloat162ll_rd
+          - file: __bfloat162ll_ru
+          - file: __bfloat162ll_rna
+          - file: __uint2float_rn
+          - file: __uint2float_rz
+          - file: __uint2float_rd
+          - file: __uint2float_ru
+          - file: __uint2float_rna
+          - file: __uint2half_rn
+          - file: __uint2half_rz
+          - file: __uint2half_rd
+          - file: __uint2half_ru
+          - file: __uint2half_rna
+          - file: __uint2bfloat16_rn
+          - file: __uint2bfloat16_rz
+          - file: __uint2bfloat16_rd
+          - file: __uint2bfloat16_ru
+          - file: __uint2bfloat16_rna
+          - file: __int2float_rn
+          - file: __int2float_rz
+          - file: __int2float_rd
+          - file: __int2float_ru
+          - file: __int2float_rna
+          - file: __int2half_rn
+          - file: __int2half_rz
+          - file: __int2half_rd
+          - file: __int2half_ru
+          - file: __int2half_rna
+          - file: __int2bfloat16_rn
+          - file: __int2bfloat16_rz
+          - file: __int2bfloat16_rd
+          - file: __int2bfloat16_ru
+          - file: __int2bfloat16_rna
+          - file: __ull2float_rn
+          - file: __ull2float_rz
+          - file: __ull2float_rd
+          - file: __ull2float_ru
+          - file: __ull2float_rna
+          - file: __ull2half_rn
+          - file: __ull2half_rz
+          - file: __ull2half_rd
+          - file: __ull2half_ru
+          - file: __ull2half_rna
+          - file: __ull2bfloat16_rn
+          - file: __ull2bfloat16_rz
+          - file: __ull2bfloat16_rd
+          - file: __ull2bfloat16_ru
+          - file: __ull2bfloat16_rna
+          - file: __ll2float_rn
+          - file: __ll2float_rz
+          - file: __ll2float_rd
+          - file: __ll2float_ru
+          - file: __ll2float_rna
+          - file: __ll2half_rn
+          - file: __ll2half_rz
+          - file: __ll2half_rd
+          - file: __ll2half_ru
+          - file: __ll2half_rna
+          - file: __ll2bfloat16_rn
+          - file: __ll2bfloat16_rz
+          - file: __ll2bfloat16_rd
+          - file: __ll2bfloat16_ru
+          - file: __ll2bfloat16_rna
+          - file: __int_as_float
+          - file: __uint_as_float
+          - file: __float_as_int
+          - file: __float_as_uint
+      - file: 向量类型构造函数
+        entries:
+          - file: make_int2
+          - file: make_int3
+          - file: make_int4
+          - file: make_uint2
+          - file: make_uint3
+          - file: make_uint4
+          - file: make_ulonglong2
+          - file: make_ulonglong3
+          - file: make_ulonglong4
+          - file: make_longlong2
+          - file: make_longlong3
+          - file: make_longlong4
+          - file: make_ulong2
+          - file: make_ulong3
+          - file: make_ulong4
+          - file: make_long2
+          - file: make_long3
+          - file: make_long4
+          - file: make_float2
+          - file: make_float3
+          - file: make_float4
+          - file: make_short2
+          - file: make_short3
+          - file: make_short4
+          - file: make_ushort2
+          - file: make_ushort3
+          - file: make_ushort4
+          - file: make_uchar2
+          - file: make_uchar3
+          - file: make_uchar4
+          - file: make_char2
+          - file: make_char3
+          - file: make_char4
+          - file: make_half2
+          - file: make_bfloat162
+      - file: 使能Cache-Hints的Load-Store函数
+        entries:
+          - file: asc_ldcg
+          - file: asc_ldca
+          - file: asc_stcg
+          - file: asc_stwt
+  - file: Utils-API
+    entries:
+      - file: C++标准库
+        entries:
+          - file: 算法
+            entries:
+              - file: max-1
+              - file: min-1
+          - file: 数学函数-142
+            entries:
+              - file: abs-1
+              - file: sqrt-1
+          - file: 容器函数
+            entries:
+              - file: tuple
+              - file: get-1
+              - file: make_tuple
+          - file: 类型特性
+            entries:
+              - file: is_convertible
+              - file: is_base_of
+              - file: is_same
+              - file: is_void
+              - file: is_integral
+              - file: is_floating_point
+              - file: is_array
+              - file: is_pointer
+              - file: is_reference
+              - file: is_const
+              - file: remove_const
+              - file: remove_volatile
+              - file: remove_cv
+              - file: remove_reference
+              - file: remove_pointer
+              - file: add_const
+              - file: add_volatile
+              - file: add_cv
+              - file: add_pointer
+              - file: add_lvalue_reference
+              - file: add_rvalue_reference
+              - file: enable_if
+              - file: conditional
+              - file: integral_constant
+          - file: 通用工具
+            entries:
+              - file: integer_sequence
+      - file: 平台信息获取
+        entries:
+          - file: PlatformAscendC
+            entries:
+              - file: PlatformAscendC简介
+              - file: 构造及析构函数
+              - file: GetCoreNum-143
+              - file: GetSocVersion
+              - file: GetCurNpuArch
+              - file: GetCoreNumAic
+              - file: GetCoreNumAiv
+              - file: GetCoreNumVector
+              - file: CalcTschBlockDim
+              - file: GetCoreMemSize
+              - file: GetCoreMemBw
+              - file: GetLibApiWorkSpaceSize
+              - file: GetResGroupBarrierWorkSpaceSize
+              - file: GetResCubeGroupWorkSpaceSize
+              - file: ReserveLocalMemory
+          - file: PlatformAscendCManager
+      - file: Tiling调测
+        entries:
+          - file: OpTilingRegistry
+            entries:
+              - file: 简介-144
+              - file: 构造和析构函数-145
+              - file: GetTilingFunc
+              - file: LoadTilingLibrary
+          - file: ContextBuilder
+            entries:
+              - file: 简介-146
+              - file: ContextBuilder构造函数
+              - file: KernelRunContextHolder结构定义
+              - file: Inputs
+              - file: Outputs
+              - file: BuildKernelRunContext
+              - file: NodeIoNum
+              - file: SetOpNameType
+              - file: IrInstanceNum
+              - file: AddInputTd
+              - file: AddOutputTd
+              - file: AddAttr
+              - file: CompileInfo
+              - file: PlatformInfo
+              - file: AddPlatformInfo
+              - file: TilingData
+              - file: Workspace
+              - file: BuildTilingContext
+      - file: Tiling模板编程
+        entries:
+          - file: 模板参数定义
+          - file: GET_TPL_TILING_KEY
+          - file: ASCENDC_TPL_SEL_PARAM
+      - file: RTC
+        entries:
+          - file: RTC简介
+          - file: aclrtcCompileProg
+          - file: aclrtcCreateProg
+          - file: aclrtcDestroyProg
+          - file: aclrtcGetBinData
+          - file: aclrtcGetBinDataSize
+          - file: aclrtcGetCompileLogSize
+          - file: aclrtcGetCompileLog
+          - file: RTC错误码
+      - file: log-1
+        entries:
+          - file: ASC_CPU_LOG
+      - file: 调测接口
+        entries:
+          - file: printf-147
+          - file: assert-148
+          - file: __trap
+  - file: AI-CPU-API
+    entries:
+      - file: printf-149
+      - file: assert-150
+      - file: DataStoreBarrier
+  - file: 附录
+    entries:
+      - file: 预留接口
