@@ -86,13 +86,11 @@ template <typename T>
 __aicore__ constexpr inline float Cast(const T& bVal);
 #endif
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T>
 __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value);
 
 template <typename T>
 __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr);
-#endif
 } // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_scalar_intf_impl.h"
