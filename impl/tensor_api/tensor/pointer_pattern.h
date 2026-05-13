@@ -44,7 +44,11 @@ struct IsPtrTrait<T, void_t<typename T::type>> : Std::true_type {};
 template <typename T>
 using MemPtrTraitT = typename Std::conditional<IsPtrTrait<T>::value, T, PtrTrait<T>>::type;
 
-template <typename Hardware, typename TraitOrType, typename... Args>
+ template <typename... Args>
+using FirstArgT = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
+
+template <typename Hardware, typename TraitOrType, typename... Args,
+        Std::enable_if_t<!IsMemPtrIterator<FirstArgT<Args...>>::value, int> = 0>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
     using Arg = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
@@ -52,7 +56,8 @@ __aicore__ inline constexpr auto MakeMemPtr(Args... args)
     return MakeLocationMemPtr<Hardware, MemPtrTraitT<TraitOrType>>(args...);
 }
 
-template <typename Hardware, typename... Args>
+template <typename Hardware, typename... Args,
+        Std::enable_if_t<IsMemPtrIterator<FirstArgT<Args...>>::value, int> = 0>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
     using Arg = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
