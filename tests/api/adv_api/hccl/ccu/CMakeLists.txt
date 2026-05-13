@@ -114,9 +114,16 @@ add_executable(${CCU_UT_TARGET}
     ${HCCL_ST_PROXY_DIR}/communicator/sim_channel_exchange_handler.cc
     ${HCCL_ST_PROXY_DIR}/communicator/sim_context_manager.cc
     ${HCCL_ST_PROXY_DIR}/topo_model/topo_model.cc
+    # Sim world stub files
+    ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/sim_world.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/sim_npu.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/sim_task.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/sim_task_queue.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/comm_domain.cc
     # Source under test
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
     # Real common infrastructure
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/exception/exception_defination.cc
     ${HCCL_CC_SRC_DIR}/common/utils.cc
     ${HCCL_CC_SRC_DIR}/common/log.cc
     ${HCCL_CC_SRC_DIR}/common/sal.cc
