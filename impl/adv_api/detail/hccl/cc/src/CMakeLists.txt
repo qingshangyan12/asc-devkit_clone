@@ -144,6 +144,11 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/selector
+
+    # aicpu_kfc legacy types for mc2_type.h and other legacy dependencies
+    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/legacy/common/types
+    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/legacy/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/pub_inc
 )
 
 if(BUILD_OPEN_PROJECT)

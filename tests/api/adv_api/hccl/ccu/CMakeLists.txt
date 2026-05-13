@@ -8,6 +8,8 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
 
+set(CCU_UT_TARGET ascendc_ut_adv_api_hccl_ccu_mc2)
+
 set(HCCL_CC_DIR ${ASCENDC_DIR}/impl/adv_api/detail/hccl/cc)
 set(HCCL_CC_SRC_DIR ${HCCL_CC_DIR}/src)
 set(HCCL_CC_INCLUDE_DIR ${ASCENDC_DIR}/include/adv_api/hccl/internal)
@@ -40,45 +42,12 @@ set(CCU_INCLUDE_LIST
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/mmpa
     ${HCCL_CANN_ARCH_DIR}/pkg_inc/runtime
     ${HCCL_CANN_ARCH_DIR}/pkg_inc/runtime/runtime
-    ${HCCL_CC_SRC_DIR}/common
-    ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym
-    ${HCCL_CC_SRC_DIR}/aicpu_kfc/pub_inc
-    ${HCCL_CC_SRC_DIR}/ops
-    ${HCCL_CC_SRC_DIR}/ops/op_common
-    ${HCCL_CC_SRC_DIR}/ops/op_common/inc
-    ${HCCL_CC_SRC_DIR}/ops/op_common/executor
-    ${HCCL_CC_SRC_DIR}/ops/op_common/executor/channel
-    ${HCCL_CC_SRC_DIR}/ops/op_common/executor/registry
-    ${HCCL_CC_SRC_DIR}/ops/op_common/selector
-    ${HCCL_CC_SRC_DIR}/ops/op_common/template
-    ${HCCL_CC_SRC_DIR}/ops/op_common/template/registry
-    ${HCCL_CC_SRC_DIR}/ops/op_common/template/aicpu
-    ${HCCL_CC_SRC_DIR}/ops/op_common/template/wrapper
-    ${HCCL_CC_SRC_DIR}/ops/op_common/template/aiv
-    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu
-    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/kernel
-    ${HCCL_CC_SRC_DIR}/ops/op_common/topo
-    ${HCCL_CC_SRC_DIR}/ops/all_gather
-    ${HCCL_CC_SRC_DIR}/ops/all_gather/selector
-    ${HCCL_CC_SRC_DIR}/ops/all_gather/template
-    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu
-    ${HCCL_CC_SRC_DIR}/ops/all_reduce
-    ${HCCL_CC_SRC_DIR}/ops/all_reduce/selector
-    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template
-    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/selector
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu
-    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v
-    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector
-    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template
-    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu
+    ${HCCL_CC_SRC_DIR}
     ${HCCL_ST_DIR}/hccl_proxy
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(ascendc_ut_adv_api_hccl_ccu_mc2
+add_executable(${CCU_UT_TARGET}
     test_ccu_mc2.cpp
     # CCU kernel stub and necessary external dependency stubs from existing st framework
     ${HCCL_ST_DIR}/hccl_proxy/hcomm_ccu_stub.cc
@@ -112,11 +81,11 @@ add_executable(ascendc_ut_adv_api_hccl_ccu_mc2
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_base.cc
 )
 
-target_include_directories(ascendc_ut_adv_api_hccl_ccu_mc2 PRIVATE
+target_include_directories(${CCU_UT_TARGET} PRIVATE
     ${CCU_INCLUDE_LIST}
 )
 
-target_compile_options(ascendc_ut_adv_api_hccl_ccu_mc2 PRIVATE
+target_compile_options(${CCU_UT_TARGET} PRIVATE
     -std=c++17
     -O0
     -g
@@ -126,12 +95,12 @@ target_compile_options(ascendc_ut_adv_api_hccl_ccu_mc2 PRIVATE
     -D_GLIBCXX_USE_CXX11_ABI=0
 )
 
-target_compile_definitions(ascendc_ut_adv_api_hccl_ccu_mc2 PRIVATE
+target_compile_definitions(${CCU_UT_TARGET} PRIVATE
     -DUT_TEST
     -DAICPU_COMPILE
 )
 
-target_link_libraries(ascendc_ut_adv_api_hccl_ccu_mc2 PRIVATE
+target_link_libraries(${CCU_UT_TARGET} PRIVATE
     intf_llt_pub_basic
     c_sec
     pthread
@@ -139,6 +108,6 @@ target_link_libraries(ascendc_ut_adv_api_hccl_ccu_mc2 PRIVATE
 )
 
 run_llt_test(
-    TARGET ascendc_ut_adv_api_hccl_ccu_mc2
+    TARGET ${CCU_UT_TARGET}
     TASK_NUM 1
 )
