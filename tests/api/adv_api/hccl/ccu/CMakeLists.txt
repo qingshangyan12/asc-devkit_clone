@@ -94,6 +94,7 @@ set(CCU_INCLUDE_LIST
 )
 
 add_executable(${CCU_UT_TARGET}
+    ${ASCENDC_DIR}/tests/main.cpp
     test_ccu_mc2.cpp
     # CCU kernel stub and necessary external dependency stubs from existing st framework
     # All stub files from st framework
@@ -181,8 +182,6 @@ target_link_libraries(${CCU_UT_TARGET} PRIVATE
     c_sec
     pthread
     dl
-    GTest::gtest
-    GTest::gtest_main
 )
 
 run_llt_test(
