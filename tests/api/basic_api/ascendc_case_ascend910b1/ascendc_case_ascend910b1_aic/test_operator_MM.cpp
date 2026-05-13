@@ -132,7 +132,7 @@ void MainCpuMmadBiasDemo(__gm__ uint8_t* __restrict__ featureGm, __gm__ uint8_t*
     if (quantMode == QuantMode_t::F322F16) {
         fixpipeParams.quantParams = { quantMode };
     } else {
-        fixpipeParams.quantParams = { quantMode, static_cast<float>(0.5) };
+        fixpipeParams.quantParams = { quantMode, static_cast<uint64_t>(0.5) };
     }
     fixpipeParams.reluEn = true;
     AscendC::Fixpipe(outputLocal, l0cOut, fixpipeParams);
