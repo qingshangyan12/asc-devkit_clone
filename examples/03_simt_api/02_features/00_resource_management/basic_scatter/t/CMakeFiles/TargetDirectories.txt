@@ -1,3 +1,0 @@
-/home/wly/asc-dev/asc-devkit/examples/03_simt_api/02_features/00_resource_management/basic_scatter/t/CMakeFiles/scatter.dir
-/home/wly/asc-dev/asc-devkit/examples/03_simt_api/02_features/00_resource_management/basic_scatter/t/CMakeFiles/edit_cache.dir
-/home/wly/asc-dev/asc-devkit/examples/03_simt_api/02_features/00_resource_management/basic_scatter/t/CMakeFiles/rebuild_cache.dir
