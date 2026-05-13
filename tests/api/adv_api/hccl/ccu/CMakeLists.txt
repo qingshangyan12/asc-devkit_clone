@@ -82,13 +82,14 @@ set(CCU_INCLUDE_LIST
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu
     
     ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/types
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/utils
     
     ${HCCL_ST_PROXY_DIR}
     ${HCCL_ST_PROXY_DIR}/communicator
     ${HCCL_ST_PROXY_DIR}/topo_model
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/common/utils
-    ${CMAKE_CURRENT_SOURCE_DIR}/stub/common/exception
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/exception
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 

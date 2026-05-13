@@ -64,7 +64,7 @@ LinkProtoStub SimChannel::GetLinkType() const
 uint32_t SimChannel::GetLocNotifyIdByIndex(uint32_t notifyIdx) const
 {
     if (notifyIdx >= locNotifys_.size()) {
-        Hccl::THROW<InvalidParamsException>("[SimChannel::%s] notifyIndex[%u] out of bound", __func__, notifyIdx);
+        Hccl::THROW<Hccl::InvalidParamsException>("[SimChannel::%s] notifyIndex[%u] out of bound", __func__, notifyIdx);
     }
     return locNotifys_[notifyIdx]->GetNotifyId();
 }
@@ -72,7 +72,7 @@ uint32_t SimChannel::GetLocNotifyIdByIndex(uint32_t notifyIdx) const
 uint32_t SimChannel::GetRmtNotifyIdByIndex(uint32_t notifyIdx) const
 {
     if (notifyIdx >= rmtNotifys_.size()) {
-        Hccl::THROW<InvalidParamsException>("[SimChannel::%s] notifyIndex[%u] out of bound", __func__, notifyIdx);
+        Hccl::THROW<Hccl::InvalidParamsException>("[SimChannel::%s] notifyIndex[%u] out of bound", __func__, notifyIdx);
     }
     return rmtNotifys_[notifyIdx]->GetNotifyId();
 }

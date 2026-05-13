@@ -74,7 +74,7 @@ void SimNpu::InitNotifyRes()
 uint64_t SimNpu::AllocMemory(BufferType bufferType, uint64_t len)
 {
     if (g_BufferType2Index.count(bufferType) == 0 || len > SIM_MEM_BLOCK_SIZE) {
-        Hccl::THROW<InvalidParamsException>("[SimNpu::AllocMemory] failed, bufferType[%s], len[%llu]", bufferType.Describe().c_str(), len);
+        Hccl::THROW<Hccl::InvalidParamsException>("[SimNpu::AllocMemory] failed, bufferType[%s], len[%llu]", bufferType.Describe().c_str(), len);
     }
     auto index = g_BufferType2Index[bufferType];
     MemBlock &memBlock = memLayout_[index];
@@ -85,7 +85,7 @@ uint64_t SimNpu::AllocMemory(BufferType bufferType, uint64_t len)
 MemBlock SimNpu::GetMemBlock(BufferType bufferType)
 {
     if (g_BufferType2Index.count(bufferType) == 0) {
-        Hccl::THROW<InvalidParamsException>("[SimNpu::GetMemBlock] failed, bufferType[%s]", bufferType.Describe().c_str());
+        Hccl::THROW<Hccl::InvalidParamsException>("[SimNpu::GetMemBlock] failed, bufferType[%s]", bufferType.Describe().c_str());
     }
     auto index = g_BufferType2Index[bufferType];
     return memLayout_[index];
@@ -141,7 +141,7 @@ void* SimNpu::AllocNotify()
 void SimNpu::ReleaseStream(void *stream)
 {
     if (stream == nullptr) {
-        Hccl::THROW<InvalidParamsException>("[SimNpu::ReleaseStream] stream is nullptr");
+        Hccl::THROW<Hccl::InvalidParamsException>("[SimNpu::ReleaseStream] stream is nullptr");
     }
     SimStream *simStream = reinterpret_cast<SimStream *>(stream);
     simStream->Release();
@@ -150,7 +150,7 @@ void SimNpu::ReleaseStream(void *stream)
 void SimNpu::ReleaseNotify(void *notify)
 {
     if (notify == nullptr) {
-        Hccl::THROW<InvalidParamsException>("[SimNpu::ReleaseNotify] notify is nullptr");
+        Hccl::THROW<Hccl::InvalidParamsException>("[SimNpu::ReleaseNotify] notify is nullptr");
     }
     SimNotify *simNotify = reinterpret_cast<SimNotify *>(notify);
     simNotify->Release();
