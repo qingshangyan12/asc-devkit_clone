@@ -32,7 +32,7 @@ void          HcclException::StoreBackTrace()
     int    size     = backtrace(array, BACKTRACE_DEPTH);
     callBackStrings = backtrace_symbols(array, size);
     if (callBackStrings == nullptr) {
-        std::string msg = StringFormat("[%s] callBackStrings Get nullptr", __func__);
+        std::string msg = Hccl::StringFormat("[%s] callBackStrings Get nullptr", __func__);
         THROW<NullPtrException>(msg);
     }
     for (auto i = 0; i < size; ++i) {

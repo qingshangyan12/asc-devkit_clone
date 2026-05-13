@@ -86,7 +86,7 @@ set(CCU_INCLUDE_LIST
     ${HCCL_ST_PROXY_DIR}
     ${HCCL_ST_PROXY_DIR}/communicator
     ${HCCL_ST_PROXY_DIR}/topo_model
-    ${HCCL_ST_DIR}/sim_world
+    ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/common/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/common/exception
     ${CMAKE_CURRENT_SOURCE_DIR}
