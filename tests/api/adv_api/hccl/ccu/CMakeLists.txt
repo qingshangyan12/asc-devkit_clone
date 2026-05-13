@@ -42,7 +42,46 @@ set(CCU_INCLUDE_LIST
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/mmpa
     ${HCCL_CANN_ARCH_DIR}/pkg_inc/runtime
     ${HCCL_CANN_ARCH_DIR}/pkg_inc/runtime/runtime
+    # Common source paths - must include subdirs for relative #include paths
     ${HCCL_CC_SRC_DIR}
+    ${HCCL_CC_SRC_DIR}/common
+    ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym
+    ${HCCL_CC_SRC_DIR}/ops
+    ${HCCL_CC_SRC_DIR}/ops/op_common
+    ${HCCL_CC_SRC_DIR}/ops/op_common/inc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/executor
+    ${HCCL_CC_SRC_DIR}/ops/op_common/executor/channel
+    ${HCCL_CC_SRC_DIR}/ops/op_common/executor/registry
+    ${HCCL_CC_SRC_DIR}/ops/op_common/selector
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/registry
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/aicpu
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/wrapper
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/aiv
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/op_common/topo
+    ${HCCL_CC_SRC_DIR}/ops/all_gather
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/selector
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/selector
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/selector
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu
+    
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/pub_inc
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/types
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common
+    
     ${HCCL_ST_DIR}/hccl_proxy
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
