@@ -181,6 +181,8 @@ target_link_libraries(${CCU_UT_TARGET} PRIVATE
     c_sec
     pthread
     dl
+    GTest::gtest
+    GTest::gtest_main
 )
 
 run_llt_test(
