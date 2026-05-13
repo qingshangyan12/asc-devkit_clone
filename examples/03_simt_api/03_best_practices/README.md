@@ -9,3 +9,4 @@
 | 目录名称  | 功能描述 |
 | --------- | --------- |
 | [00_simt_insert_hash_table](./00_simt_insert_hash_table/) | 样例基于Ascend C SIMT编程方式实现InsertHashTable算子，展示SIMT算子处理复杂业务逻辑能力。 |
+| [01_simt_data_cache_hint](./01_simt_data_cache_hint/) | 样例展示使用asc_ldcg和asc_stcg数据缓存提示函数优化查表计算性能。 |
