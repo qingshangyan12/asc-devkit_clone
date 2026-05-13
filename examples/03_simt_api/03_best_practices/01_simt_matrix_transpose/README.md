@@ -32,8 +32,8 @@
 <table>
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">MatrixTranspose</td></tr>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">input</td><td align="center">[1024,1024]</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[1024,1024]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">input</td><td align="center">[H,W]，默认[999,3737]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[W,H]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">copy_kernel / transpose_naive_kernel / transpose_coalesced_kernel / transpose_avoid_bank_conflicts_kernel</td></tr>
 </table>
 
@@ -52,9 +52,9 @@
 
 #### 1. 线程块布局
 
-- 本样例采用SIMT编程方式。当前样例仅支持方阵，且矩阵宽高需要是32的整数倍。
+- 本样例采用SIMT编程方式，支持任意二维矩阵shape，矩阵宽高不要求是32的整数倍。
 - 对矩阵转置这类二维规则计算，可以将大矩阵分解为若干局部tile子块，使每个block只处理一个局部区域，便于索引计算和线程协作。
-- 每个tile大小为32×32，一个block处理一个tile。grid配置为 `(matrix_width/32, matrix_height/32, 1)`。
+- 每个tile大小为32×32，一个block处理一个tile。grid配置为 `(ceil(matrix_width/32), ceil(matrix_height/32), 1)`，尾部不足32×32的tile通过kernel内边界判断处理。
 - block配置固定为 `(32, 32, 1)`，单个block总线程数为32×32=1024，每个线程只处理tile内1个元素。
 - `threadIdx.x`方向有32个线程，对应tile内的列索引；`threadIdx.y`方向有32个线程，对应tile内的行索引。
 
@@ -64,7 +64,7 @@ int y_index = blockIdx.y * TILE_DIM + threadIdx.y;
 int index = x_index + width * y_index;
 ```
 
-下图给出了一个更直观的映射示意。左侧表示1024×1024的矩阵被划分为32×32个tile。右侧表示其中一个block需要处理的一个tile，其大小为32×32。
+下图给出了一个更直观的映射示意。左侧表示矩阵被划分为若干32×32 tile，宽高不是32整数倍时最右侧或最下侧会出现partial tile。右侧表示其中一个block需要处理的一个完整tile，其大小为32×32。
 
 <img src="./figure/blockMapping.png" width="60%">
 
@@ -88,7 +88,7 @@ int index = x_index + width * y_index;
 
 如果继续代入一维地址公式，则有：
 
-- index = x_index + width × y_index = 61 + 1024 × 66
+- index = x_index + width × y_index
 
 ### 性能指标说明
 
@@ -122,6 +122,9 @@ int index = x_index + width * y_index;
 ```cpp
 int x_index = blockIdx.x * TILE_DIM + threadIdx.x;
 int y_index = blockIdx.y * TILE_DIM + threadIdx.y;
+if (x_index >= width || y_index >= height) {
+    return;
+}
 int index = x_index + width * y_index;
 
 output[index] = input[index];
@@ -131,11 +134,11 @@ output[index] = input[index];
 
 | Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      24.777      |    1.054    |     1739.820     |      0.889      |     0.847     |        0.153        |      0.141      |
+|      98.081      |    96.750    |     7834063     |      82.949      |     0.857     |        10.466        |      0.108      |
 
 **分析**：
 
-- Case 0的Task Duration为24.777us，作为连续GM读写场景的耗时基线
+- Case 0的Task Duration为98.081us，作为连续GM读写场景的耗时基线
 - 后续转置版本需要在完成坐标交换的同时尽量接近该基线
 
 ---
@@ -168,11 +171,11 @@ output[index_out] = input[index_in];
 
 | Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      60.477      |    3.516    |     5801.925     |      3.357      |     0.955     |        0.147        |      0.041      |
+|      202.608      |    201.100    |     18992047     |      189.610      |     0.943     |        8.771        |      0.044      |
 
 **分析**：
 
-- 与Case 0的copy基线相比，Task Duration从24.777us增加到60.477us，约为copy版本的2.44倍
+- 与Case 0的copy基线相比，Task Duration从98.081us增加到202.608us，约为copy版本的2.07倍
 - 直接索引转置本身计算量很小，但转置后的GM写回变为跨行、非连续访问，因此端到端耗时明显高于copy基线
 - 该版本GM读取仍然是连续读，但GM写回地址不连续，同一个Warp的写请求难以高效合并，这是Task Duration上升的主要原因
 
@@ -205,7 +208,9 @@ x_index = blockIdx.y * TILE_DIM + threadIdx.x;
 y_index = blockIdx.x * TILE_DIM + threadIdx.y;
 int index_out = x_index + y_index * height;
 
-output[index_out] = tile[threadIdx.x][threadIdx.y];
+if (x_index < height && y_index < width) {
+    output[index_out] = tile[threadIdx.x][threadIdx.y];
+}
 ```
 
 **优化手段**：
@@ -218,13 +223,13 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 | Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      35.945      |    1.814    |     2993.315     |      1.646      |     0.910     |        0.156        |      0.083      |
+|      134.563      |    132.940    |     11735059     |      120.498      |     0.906     |        9.782        |      0.074      |
 
 **分析**：
 
-- 相比Case 1的naive transpose，Task Duration从60.477us降低到35.945us，耗时下降约40.6%，整体性能提升约1.68倍
+- 相比Case 1的naive transpose，Task Duration从202.608us降低到134.563us，耗时下降约33.6%，整体性能提升约1.51倍
 - Case 2通过UB中转把Case 1中的非连续GM写转移为UB侧访问，使GM读写都更接近连续访问，因此Task Duration明显降低
-- 与Case 0的copy基线相比，Case 2的Task Duration仍高约45.1%。这部分差距主要来自额外的UB读写、同步以及转置方向的UB访问开销
+- 与Case 0的copy基线相比，Case 2的Task Duration仍高约37.2%。这部分差距主要来自额外的UB读写、同步以及转置方向的UB访问开销
 
 ---
 
@@ -290,14 +295,14 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 | Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      26.725      |    1.224    |     2018.943     |      1.059      |     0.869     |        0.152        |      0.121      |
+|      100.932      |    99.840    |     8123016     |      86.624      |     0.868     |        10.287        |      0.103      |
 
 **分析**：
 
-- 相比Case 2的transpose_coalesced_kernel，Task Duration从35.945us降低到26.725us，耗时下降约25.7%，整体性能提升约1.35倍
+- 相比Case 2的transpose_coalesced_kernel，Task Duration从134.563us降低到100.932us，耗时下降约25.0%，整体性能提升约1.33倍
 - Case 3在Case 2的基础上通过padding降低UB转置读阶段的bank冲突，因此端到端Task Duration继续下降
-- 相比Case 1的naive transpose，Case 3的Task Duration下降约55.8%，整体性能提升约2.26倍，说明“GM访存合并 + UB bank冲突降低”两步优化在端到端耗时上叠加生效
-- 与Case 0的copy基线相比，Case 3的Task Duration只高约7.9%，已经接近连续GM读写的基准水平。剩余差距主要来自UB中转、同步以及UB读写时仍然存在的少量bank冲突
+- 相比Case 1的naive transpose，Case 3的Task Duration下降约50.2%，整体性能提升约2.01倍，说明“GM访存合并 + UB bank冲突降低”两步优化在端到端耗时上叠加生效
+- 与Case 0的copy基线相比，Case 3的Task Duration只高约2.9%，已经接近连续GM读写的基准水平。剩余差距主要来自UB中转、同步以及UB读写时仍然存在的少量bank冲突
 
 ---
 
@@ -305,17 +310,19 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 ### Ascend 950PR/Ascend 950DT芯片性能数据
 
+以下性能数据基于默认输入shape `[999,3737]`，使用 `msprof ./matrix_transpose` 采集。
+
 **综合优化效果**：
 
-- 从Case 1直接索引转置到Case 3完整优化版本，Task Duration从60.477us降低到26.725us，耗时下降约55.8%，整体性能提升约2.26倍
-- Case 3相比Case 0 copy基线仅高约7.9%，说明通过GM访存合并和UB Bank冲突优化后，矩阵转置已经接近连续GM读写基线
+- 从Case 1直接索引转置到Case 3完整优化版本，Task Duration从202.608us降低到100.932us，耗时下降约50.2%，整体性能提升约2.01倍
+- Case 3相比Case 0 copy基线仅高约2.9%，说明通过GM访存合并和UB Bank冲突优化后，矩阵转置已经接近连续GM读写基线
 
 | Case version | Task Duration(us) | Task Duration相对Case 0 | 优化点                                |
 | ------------ | ----------------- | ----------------------- | ------------------------------------- |
-| Case 0       | 24.777            | **1x**            | 矩阵复制基线，GM连续读、连续写        |
-| Case 1       | 60.477            | **2.44x耗时**     | 直接索引转置，GM连续读、非连续写      |
-| Case 2       | 35.945            | **1.45x耗时**     | UB中转，全局访存合并                  |
-| Case 3       | 26.725            | **1.08x耗时**     | UB中转，全局访存合并，避免UB Bank冲突 |
+| Case 0       | 98.081            | **1x**            | 矩阵复制基线，GM连续读、连续写        |
+| Case 1       | 202.608           | **2.07x耗时**     | 直接索引转置，GM连续读、非连续写      |
+| Case 2       | 134.563           | **1.37x耗时**     | UB中转，全局访存合并                  |
+| Case 3       | 100.932           | **1.03x耗时**     | UB中转，全局访存合并，避免UB Bank冲突 |
 
 ## 调优建议
 
@@ -351,14 +358,23 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
   ```bash
   SCENARIO_NUM=3                       # 选择执行场景，可选0-3
   mkdir -p build && cd build;          # 创建并进入build目录
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j; # 编译工程
   ./matrix_transpose                   # 执行样例
+  ```
+
+  如需验证非32×32 tile对齐shape，可通过如下编译选项指定矩阵宽高：
+
+  ```bash
+  cmake -DSCENARIO_NUM=3 -DMATRIX_HEIGHT=999 -DMATRIX_WIDTH=3737 ..; make -j
+  ./matrix_transpose
   ```
 - 编译选项说明
 
-  | 选项             | 可选值      | 说明              |
-  | ---------------- | ----------- | ----------------- |
+  | 选项 | 可选值 | 说明 |
+  | ---- | ------ | ---- |
   | `SCENARIO_NUM` | `0`-`3` | 样例类型，默认为3 |
+  | `MATRIX_HEIGHT` | 正整数 | 输入矩阵高度H，默认为999 |
+  | `MATRIX_WIDTH` | 正整数 | 输入矩阵宽度W，默认为3737 |
 
   执行结果如下，说明精度对比成功。
 

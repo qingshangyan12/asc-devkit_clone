@@ -16,6 +16,8 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 set(SCENARIO_NUM "3" CACHE STRING "Case type to run (0-3)")
+set(MATRIX_HEIGHT "999" CACHE STRING "Input matrix height")
+set(MATRIX_WIDTH "3737" CACHE STRING "Input matrix width")
 
 add_executable(matrix_transpose
     matrix_transpose.asc
@@ -23,6 +25,8 @@ add_executable(matrix_transpose
 
 target_compile_definitions(matrix_transpose PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
+    MATRIX_HEIGHT=${MATRIX_HEIGHT}
+    MATRIX_WIDTH=${MATRIX_WIDTH}
 )
 
 # ======================================================================================
