@@ -79,6 +79,8 @@ set(CCU_INCLUDE_LIST
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu
     
     ${HCCL_CC_SRC_DIR}/aicpu_kfc/pub_inc
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/utils
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/exception
     ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/types
     ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common
     
