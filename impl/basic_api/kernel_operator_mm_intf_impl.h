@@ -413,7 +413,6 @@ __aicore__ inline void LoadDataWithSparse(const LocalTensor<T> &dst, const Local
     #endif
 }
 
-#if __NPU_ARCH__ == 2002
 template <typename T, typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type>
 __aicore__ inline void LoadUnzipIndex(const GlobalTensor<T>& src, uint32_t numOfIndexTabEntry)
 {
