@@ -16,8 +16,10 @@
 #include "executor_v2_base.h"
 #include "alg_env_config.h"
 #include "param_check.h"
+#include "sal.h"
 #include <memory>
 #include <string>
+#include <chrono>
 
 extern bool HcclCheckLogLevel(int logType, int moduleId);
 extern bool IsErrorToWarn();
@@ -39,12 +41,32 @@ extern "C" unsigned int HcclLaunchAicpuKernel(ops_hccl::OpParam* param)
 
 namespace ops_hccl {
 
+HcclResult HcclCheckTag(const char *tag)
+{
+    return HcclResult::HCCL_SUCCESS;
+}
+
+HcclResult CheckDataType(HcclDataType dataType, bool needReduce)
+{
+    return HcclResult::HCCL_SUCCESS;
+}
+
 HcclResult HcomCheckDataType(HcclDataType dataType)
 {
     return HcclResult::HCCL_SUCCESS;
 }
 
 HcclResult HcomCheckReductionOp(HcclReduceOp op)
+{
+    return HcclResult::HCCL_SUCCESS;
+}
+
+HcclResult HcomCheckUserRank(const u32 totalRanks, const u32 userRank)
+{
+    return HcclResult::HCCL_SUCCESS;
+}
+
+HcclResult LogHcclExit(const std::string &opName, const char *tag, HcclUs startut)
 {
     return HcclResult::HCCL_SUCCESS;
 }
