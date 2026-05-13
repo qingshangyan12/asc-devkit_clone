@@ -23,9 +23,38 @@
 #define IMPL_TENSOR_API_UTILS_UTILS_IMPL_H
 
 #include "include/tensor_api/utils/utils.h"
+#include "impl/tensor_api/utils/macro_impl.h"
+#include "impl/utils/std/type_traits/Int.h"
+
+namespace AscendC {
+namespace Te {
+using Std::Int;
+using Std::_0;
+using Std::_1;
+using Std::_2;
+using Std::_3;
+using Std::_4;
+using Std::_5;
+using Std::_6;
+using Std::_7;
+using Std::_8;
+using Std::_9;
+using Std::_10;
+using Std::_16;
+using Std::_24;
+using Std::_32;
+using Std::_64;
+using Std::_128;
+using Std::_256;
+using Std::_512;
+using Std::_1024;
+using Std::_2048;
+using Std::_4096;
+} // namespace Te
+} // namespace AscendC
+
 #include "impl/tensor_api/utils/constant_impl.h"
 #include "impl/tensor_api/utils/extra_impl.h"
-#include "impl/tensor_api/utils/macro_impl.h"
 #include "impl/tensor_api/utils/map_impl.h"
 #include "impl/tensor_api/utils/location_impl.h"
 
