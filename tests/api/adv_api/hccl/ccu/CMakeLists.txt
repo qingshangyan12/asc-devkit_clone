@@ -124,6 +124,7 @@ add_executable(${CCU_UT_TARGET}
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
     # Real common infrastructure
     ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/exception/exception_defination.cc
+    ${HCCL_CC_SRC_DIR}/common/param_check.cc
     ${HCCL_CC_SRC_DIR}/common/utils.cc
     ${HCCL_CC_SRC_DIR}/common/log.cc
     ${HCCL_CC_SRC_DIR}/common/sal.cc
@@ -145,6 +146,8 @@ add_executable(${CCU_UT_TARGET}
     # Executor registry (for CollAlgExecRegistryV2)
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/executor_v2_base.cc
+    # AICPU kernel launch
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/aicpu/kernel_launch.cc
     # Topo infrastructure
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_base.cc
