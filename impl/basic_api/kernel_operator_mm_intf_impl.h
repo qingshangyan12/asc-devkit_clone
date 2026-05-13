@@ -516,12 +516,14 @@ __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padL
     SetFmatrixImpl(l1H, l1W, padList, fmatrixMode);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+
 __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
 {
+	#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     SetFmatrixImpl(param, fmatrixMode);
+	#endif
 }
-#endif
+
 
 /* **************************************************************************************************
  * SetLoadDataBoundary                                             *
