@@ -1,7 +1,11 @@
 import sys
+import datetime
 from pathlib import Path
 
 project = 'Ascend C API 参考'
+current_year = datetime.datetime.now().year
+copyright = f'2025-{current_year}, Huawei Technologies Co., Ltd.'
+author = 'Huawei Technologies Co., Ltd.'
 
 extensions = [
     'myst_parser',
