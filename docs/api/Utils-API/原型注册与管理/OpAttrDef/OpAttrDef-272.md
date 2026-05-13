@@ -174,7 +174,7 @@ private:
 </td>
 <td class="cellrowborder" valign="top" width="20.1%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001656780128_p752117864811"><a name="zh-cn_topic_0000001656780128_p752117864811"></a><a name="zh-cn_topic_0000001656780128_p752117864811"></a>version：配置的版本号</p>
 </td>
-<td class="cellrowborder" valign="top" width="63.24999999999999%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001656780128_p252168154812"><a name="zh-cn_topic_0000001656780128_p252168154812"></a><a name="zh-cn_topic_0000001656780128_p252168154812"></a>新增可选属性时，为了保持原有单算子API(aclnnxxx)接口的兼容性，可以通过Version接口配置aclnn接口的版本号，版本号需要从1开始配，且应该连续配置（和<a href="Version.md">可选输入</a>统一编号）。配置后，自动生成的aclnn接口会携带版本号。高版本号的接口会包含低版本号接口的所有参数。</p>
+<td class="cellrowborder" valign="top" width="63.24999999999999%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001656780128_p252168154812"><a name="zh-cn_topic_0000001656780128_p252168154812"></a><a name="zh-cn_topic_0000001656780128_p252168154812"></a>新增可选属性时，为了保持原有单算子API(aclnnxxx)接口的兼容性，可以通过Version接口配置aclnn接口的版本号，版本号需要从1开始配，且应该连续配置（和<a href="../OpParamDef/Version.md">可选输入</a>统一编号）。配置后，自动生成的aclnn接口会携带版本号。高版本号的接口会包含低版本号接口的所有参数。</p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000001656780128_row430719366115"><td class="cellrowborder" valign="top" width="16.650000000000002%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000001656780128_p5182152013136"><a name="zh-cn_topic_0000001656780128_p5182152013136"></a><a name="zh-cn_topic_0000001656780128_p5182152013136"></a>GetName</p>

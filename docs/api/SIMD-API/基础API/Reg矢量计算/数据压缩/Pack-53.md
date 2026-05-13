@@ -114,13 +114,13 @@ __simd_callee__ inline void Pack(S& dstReg, V& srcReg)
 <tbody><tr id="row1835857145817"><td class="cellrowborder" valign="top" width="16.86%" headers="mcps1.2.3.1.1 "><p id="p5835457165816"><a name="p5835457165816"></a><a name="p5835457165816"></a>dstReg</p>
 </td>
 <td class="cellrowborder" valign="top" width="83.14%" headers="mcps1.2.3.1.2 "><p id="p168351657155818"><a name="p168351657155818"></a><a name="p168351657155818"></a>目的操作数。</p>
-<p id="p53716719234"><a name="p53716719234"></a><a name="p53716719234"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+<p id="p53716719234"><a name="p53716719234"></a><a name="p53716719234"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
 </td>
 </tr>
 <tr id="row18835145716587"><td class="cellrowborder" valign="top" width="16.86%" headers="mcps1.2.3.1.1 "><p id="p59747391278"><a name="p59747391278"></a><a name="p59747391278"></a>srcReg</p>
 </td>
 <td class="cellrowborder" valign="top" width="83.14%" headers="mcps1.2.3.1.2 "><p id="p53355414286"><a name="p53355414286"></a><a name="p53355414286"></a>源操作数。</p>
-<p id="p12137191052310"><a name="p12137191052310"></a><a name="p12137191052310"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+<p id="p12137191052310"><a name="p12137191052310"></a><a name="p12137191052310"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
 </td>
 </tr>
 </tbody>

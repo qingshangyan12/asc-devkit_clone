@@ -113,7 +113,7 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p212236122019"><a name="p212236122019"></a><a name="p212236122019"></a>目的操作数。</p>
-<p id="p2507123615484"><a name="p2507123615484"></a><a name="p2507123615484"></a><span id="ph950733612488"><a name="ph950733612488"></a><a name="ph950733612488"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+<p id="p2507123615484"><a name="p2507123615484"></a><a name="p2507123615484"></a><span id="ph950733612488"><a name="ph950733612488"></a><a name="ph950733612488"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
 </td>
 </tr>
 <tr id="row2137145181815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p6844125874315"><a name="p6844125874315"></a><a name="p6844125874315"></a>srcReg</p>
@@ -121,7 +121,7 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p14827161917207"><a name="p14827161917207"></a><a name="p14827161917207"></a>源操作数。</p>
-<p id="p7123111612517"><a name="p7123111612517"></a><a name="p7123111612517"></a><span id="ph1197863231916"><a name="ph1197863231916"></a><a name="ph1197863231916"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+<p id="p7123111612517"><a name="p7123111612517"></a><a name="p7123111612517"></a><span id="ph1197863231916"><a name="ph1197863231916"></a><a name="ph1197863231916"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
 <p id="p1484485824312"><a name="p1484485824312"></a><a name="p1484485824312"></a>数据类型需要与目的操作数保持一致。</p>
 </td>
 </tr>
@@ -130,7 +130,7 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p457515071618"><a name="p457515071618"></a><a name="p457515071618"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p193020233012"><a name="p193020233012"></a><a name="p193020233012"></a>数据索引。</p>
-<p id="p1728583820487"><a name="p1728583820487"></a><a name="p1728583820487"></a><span id="ph72855386487"><a name="ph72855386487"></a><a name="ph72855386487"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+<p id="p1728583820487"><a name="p1728583820487"></a><a name="p1728583820487"></a><span id="ph72855386487"><a name="ph72855386487"></a><a name="ph72855386487"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
 <p id="p104218390187"><a name="p104218390187"></a><a name="p104218390187"></a>数据类型的位宽需要与目的操作数的位宽保持一致。</p>
 <p id="p1396715519200"><a name="p1396715519200"></a><a name="p1396715519200"></a>srcReg为RegTensor类型，位宽是固定的VL，存储的元素个数固定。如果indexReg中索引值超出当前RegTensor中能存储的最大数据元素个数时，按照如下方式处理：设定当前RegTensor所能存储的最大数据元素个数为vlLength，indexReg中索引值为i，索引值更新为i % vlLength。</p>
 </td>

@@ -74,14 +74,14 @@ __aicore__ inline void InitV2(GM_ADDR context, const void *initTiling)
 </td>
 <td class="cellrowborder" valign="top" width="11.799999999999999%" headers="mcps1.2.4.1.2 "><p id="p33487148556"><a name="p33487148556"></a><a name="p33487148556"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p13481914175514"><a name="p13481914175514"></a><a name="p13481914175514"></a>通信上下文，包含rankDim，rankID等相关信息。通过框架提供的获取通信上下文的接口<a href="GetHcclContext.md">GetHcclContext</a>获取context。</p>
+<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p13481914175514"><a name="p13481914175514"></a><a name="p13481914175514"></a>通信上下文，包含rankDim，rankID等相关信息。通过框架提供的获取通信上下文的接口<a href="../HCCL-Context/GetHcclContext.md">GetHcclContext</a>获取context。</p>
 </td>
 </tr>
 <tr id="row71011416203015"><td class="cellrowborder" valign="top" width="17.77%" headers="mcps1.2.4.1.1 "><p id="p51015161301"><a name="p51015161301"></a><a name="p51015161301"></a>initTiling</p>
 </td>
 <td class="cellrowborder" valign="top" width="11.799999999999999%" headers="mcps1.2.4.1.2 "><p id="p121011916143010"><a name="p121011916143010"></a><a name="p121011916143010"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p7101111612301"><a name="p7101111612301"></a><a name="p7101111612301"></a>通信域初始化<a href="TilingData结构体.md#table4835205712588">Mc2InitTiling</a>的地址。<a href="TilingData结构体.md#table4835205712588">Mc2InitTiling</a>在Host侧计算得出，具体请参考<a href="TilingData结构体.md#table4835205712588">表1 Mc2InitTiling参数说明</a>，由框架传递到Kernel函数中使用。</p>
+<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p7101111612301"><a name="p7101111612301"></a><a name="p7101111612301"></a>通信域初始化<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table4835205712588">Mc2InitTiling</a>的地址。<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table4835205712588">Mc2InitTiling</a>在Host侧计算得出，具体请参考<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table4835205712588">表1 Mc2InitTiling参数说明</a>，由框架传递到Kernel函数中使用。</p>
 </td>
 </tr>
 </tbody>

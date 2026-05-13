@@ -25,7 +25,7 @@ void SetWeightType(const ConvCommonApi::TPosition pos, const ConvCommonApi::Conv
 </td>
 <td class="cellrowborder" valign="top" width="17.29%" headers="mcps1.1.4.1.2 "><p id="p1490423717324"><a name="p1490423717324"></a><a name="p1490423717324"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="58.46%" headers="mcps1.1.4.1.3 "><p id="p790416372325"><a name="p790416372325"></a><a name="p790416372325"></a><span>Weight在内存上的</span><a href="通用说明和约束.md#table07372185712">位置</a><span>。</span>当前仅支持TPosition::GM。</p>
+<td class="cellrowborder" valign="top" width="58.46%" headers="mcps1.1.4.1.3 "><p id="p790416372325"><a name="p790416372325"></a><a name="p790416372325"></a><span>Weight在内存上的</span><a href="../../../../通用说明和约束.md#table07372185712">位置</a><span>。</span>当前仅支持TPosition::GM。</p>
 </td>
 </tr>
 <tr id="row1690493714327"><td class="cellrowborder" valign="top" width="24.25%" headers="mcps1.1.4.1.1 "><p id="p2904173713326"><a name="p2904173713326"></a><a name="p2904173713326"></a><span>format</span></p>

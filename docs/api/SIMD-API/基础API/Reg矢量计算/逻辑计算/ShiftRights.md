@@ -123,7 +123,7 @@ __simd_callee__ inline void ShiftRights(S& dstReg, S& srcReg, U scalarValue, Mas
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p86271310162918"><a name="p86271310162918"></a><a name="p86271310162918"></a>目的操作数。</p>
-<p id="p66093533169"><a name="p66093533169"></a><a name="p66093533169"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+<p id="p66093533169"><a name="p66093533169"></a><a name="p66093533169"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
 </td>
 </tr>
 <tr id="row2137145181815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p6844125874315"><a name="p6844125874315"></a><a name="p6844125874315"></a>srcReg</p>
@@ -131,7 +131,7 @@ __simd_callee__ inline void ShiftRights(S& dstReg, S& srcReg, U scalarValue, Mas
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p172083541517"><a name="p172083541517"></a><a name="p172083541517"></a>源操作数。</p>
-<p id="p17716122843014"><a name="p17716122843014"></a><a name="p17716122843014"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+<p id="p17716122843014"><a name="p17716122843014"></a><a name="p17716122843014"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
 </td>
 </tr>
 <tr id="row891912431168"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p195756503168"><a name="p195756503168"></a><a name="p195756503168"></a>scalarValue</p>
@@ -147,7 +147,7 @@ __simd_callee__ inline void ShiftRights(S& dstReg, S& srcReg, U scalarValue, Mas
 </td>
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p484514581433"><a name="p484514581433"></a><a name="p484514581433"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1559991025517"><a name="p1559991025517"></a><a name="p1559991025517"></a><span id="ph17225102264715"><a name="ph17225102264715"></a><a name="ph17225102264715"></a>源操作数元素操作的有效指示，详细说明请参考<a href="MaskReg.md">MaskReg</a>。</span></p>
+<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1559991025517"><a name="p1559991025517"></a><a name="p1559991025517"></a><span id="ph17225102264715"><a name="ph17225102264715"></a><a name="ph17225102264715"></a>源操作数元素操作的有效指示，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">MaskReg</a>。</span></p>
 </td>
 </tr>
 </tbody>

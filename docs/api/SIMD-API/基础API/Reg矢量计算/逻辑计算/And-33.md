@@ -125,7 +125,7 @@
     <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p1826171205012"><a name="p1826171205012"></a><a name="p1826171205012"></a>输出</p>
     </td>
     <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p20261145015"><a name="p20261145015"></a><a name="p20261145015"></a>目的操作数。</p>
-    <p id="p22619115503"><a name="p22619115503"></a><a name="p22619115503"></a><span id="ph2261411508"><a name="ph2261411508"></a><a name="ph2261411508"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+    <p id="p22619115503"><a name="p22619115503"></a><a name="p22619115503"></a><span id="ph2261411508"><a name="ph2261411508"></a><a name="ph2261411508"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
     </td>
     </tr>
     <tr id="row626161145015"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p152610185010"><a name="p152610185010"></a><a name="p152610185010"></a>srcReg0</p>
@@ -133,7 +133,7 @@
     <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p122611118506"><a name="p122611118506"></a><a name="p122611118506"></a>输入</p>
     </td>
     <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p16264155017"><a name="p16264155017"></a><a name="p16264155017"></a>源操作数。</p>
-    <p id="p626151115013"><a name="p626151115013"></a><a name="p626151115013"></a><span id="ph18263113507"><a name="ph18263113507"></a><a name="ph18263113507"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+    <p id="p626151115013"><a name="p626151115013"></a><a name="p626151115013"></a><span id="ph18263113507"><a name="ph18263113507"></a><a name="ph18263113507"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
     <p id="p132651105015"><a name="p132651105015"></a><a name="p132651105015"></a>两个源操作数的数据类型需要与目的操作数保持一致。</p>
     </td>
     </tr>
@@ -142,7 +142,7 @@
     <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p7261815500"><a name="p7261815500"></a><a name="p7261815500"></a>输入</p>
     </td>
     <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1026171135019"><a name="p1026171135019"></a><a name="p1026171135019"></a>源操作数。</p>
-    <p id="p926116509"><a name="p926116509"></a><a name="p926116509"></a><span id="ph32691135015"><a name="ph32691135015"></a><a name="ph32691135015"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+    <p id="p926116509"><a name="p926116509"></a><a name="p926116509"></a><span id="ph32691135015"><a name="ph32691135015"></a><a name="ph32691135015"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
     <p id="p1261916506"><a name="p1261916506"></a><a name="p1261916506"></a>两个源操作数的数据类型需要与目的操作数保持一致。</p>
     </td>
     </tr>
@@ -150,7 +150,7 @@
     </td>
     <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p126171175011"><a name="p126171175011"></a><a name="p126171175011"></a>输入</p>
     </td>
-    <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p11261112501"><a name="p11261112501"></a><a name="p11261112501"></a>指示源操作数元素操作的有效性，详细说明请参考<a href="MaskReg.md">3.3.4.1.2-MaskReg</a>。</p>
+    <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p11261112501"><a name="p11261112501"></a><a name="p11261112501"></a>指示源操作数元素操作的有效性，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">3.3.4.1.2-MaskReg</a>。</p>
     </td>
     </tr>
     </tbody>

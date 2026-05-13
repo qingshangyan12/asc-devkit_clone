@@ -137,7 +137,7 @@ __simd_callee__ inline void Scatter(__ubuf__ T* baseAddr, S& srcReg, V& index, M
 </td>
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p484514581433"><a name="p484514581433"></a><a name="p484514581433"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1559991025517"><a name="p1559991025517"></a><a name="p1559991025517"></a>src element操作有效指示，详细说明请参考<a href="MaskReg.md">MaskReg</a>。</p>
+<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1559991025517"><a name="p1559991025517"></a><a name="p1559991025517"></a>src element操作有效指示，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">MaskReg</a>。</p>
 </td>
 </tr>
 </tbody>

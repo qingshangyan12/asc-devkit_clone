@@ -25,7 +25,7 @@ TCubeTiling结构体包含Matmul Tiling切分算法的相关参数，被传递�
 <td class="cellrowborder" valign="top" width="8.309999999999999%" headers="mcps1.2.4.1.2 "><p id="p1889915586561"><a name="p1889915586561"></a><a name="p1889915586561"></a>int</p>
 </td>
 <td class="cellrowborder" valign="top" width="76.61%" headers="mcps1.2.4.1.3 "><p id="p198991658115617"><a name="p198991658115617"></a><a name="p198991658115617"></a>A、B、C矩阵原始输入的shape大小，以元素为单位。M, Ka为A矩阵原始输入的Shape，Kb, N为B矩阵原始输入的Shape。</p>
-<a name="ul649113422368"></a><a name="ul649113422368"></a><ul id="ul649113422368"><li>大小约束<div class="p" id="p359955915916"><a name="p359955915916"></a><a name="p359955915916"></a>除<span id="ph166474141701"><a name="ph166474141701"></a><a name="ph166474141701"></a>Ascend 950PR/Ascend 950DT</span>外，下述场景需要使能MatmulConfig中的<a href="MatmulConfig.md#p13786349422">intrinsicsCheck</a>参数，以完成Matmul计算。<a name="ul11644191013411"></a><a name="ul11644191013411"></a><ul id="ul11644191013411"><li>若A矩阵为ND格式，不进行转置，Ka大于65535时需要使能intrinsicsCheck参数，M无大小限制；进行转置，M大于65535时需要使能intrinsicsCheck参数，Ka无大小限制。</li><li>若B矩阵为ND格式，不进行转置，N大于65535时需要使能intrinsicsCheck参数，Kb无大小限制；进行转置，Kb大于65535时需要使能intrinsicsCheck参数，N无大小限制。</li></ul>
+<a name="ul649113422368"></a><a name="ul649113422368"></a><ul id="ul649113422368"><li>大小约束<div class="p" id="p359955915916"><a name="p359955915916"></a><a name="p359955915916"></a>除<span id="ph166474141701"><a name="ph166474141701"></a><a name="ph166474141701"></a>Ascend 950PR/Ascend 950DT</span>外，下述场景需要使能MatmulConfig中的<a href="../../Matmul-Kernel侧接口/MatmulConfig.md#p13786349422">intrinsicsCheck</a>参数，以完成Matmul计算。<a name="ul11644191013411"></a><a name="ul11644191013411"></a><ul id="ul11644191013411"><li>若A矩阵为ND格式，不进行转置，Ka大于65535时需要使能intrinsicsCheck参数，M无大小限制；进行转置，M大于65535时需要使能intrinsicsCheck参数，Ka无大小限制。</li><li>若B矩阵为ND格式，不进行转置，N大于65535时需要使能intrinsicsCheck参数，Kb无大小限制；进行转置，Kb大于65535时需要使能intrinsicsCheck参数，N无大小限制。</li></ul>
 </div>
 </li><li>对齐约束<a name="ul1055914453710"></a><a name="ul1055914453710"></a><ul id="ul1055914453710"><li>若A矩阵以NZ格式输入，则M需要以16个元素对齐，Ka需要以C0_size对齐；若B矩阵以NZ格式输入，Kb需要以C0_size对齐，N需要以16个元素对齐。</li><li>若A、B矩阵为ND格式，无对齐约束。</li></ul>
 <p id="p182910378520"><a name="p182910378520"></a><a name="p182910378520"></a><strong id="b164651949135214"><a name="b164651949135214"></a><a name="b164651949135214"></a>注意：</strong>NZ格式的输入，float数据类型的C0_size为8，half/bfloat16_t数据类型的C0_size为16，int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t数据类型的C0_size为32，int4b_t/fp4x2_e2m1_t/fp4x2_e1m2_t数据类型的C0_size为64。</p>
@@ -46,7 +46,7 @@ TCubeTiling结构体包含Matmul Tiling切分算法的相关参数，被传递�
 <td class="cellrowborder" valign="top" width="8.309999999999999%" headers="mcps1.2.4.1.2 "><p id="p790045818567"><a name="p790045818567"></a><a name="p790045818567"></a>int</p>
 </td>
 <td class="cellrowborder" valign="top" width="76.61%" headers="mcps1.2.4.1.3 "><p id="p6650125471110"><a name="p6650125471110"></a><a name="p6650125471110"></a>A、B、C矩阵参与一次矩阵乘指令的shape大小，以元素为单位。</p>
-<p id="p7900105816569"><a name="p7900105816569"></a><a name="p7900105816569"></a>A、B、C矩阵参与一次矩阵乘的shape大小需要按分形对齐，其含义请参考<a href="Mmad.md">Mmad</a>中的数据格式说明。</p>
+<p id="p7900105816569"><a name="p7900105816569"></a><a name="p7900105816569"></a>A、B、C矩阵参与一次矩阵乘的shape大小需要按分形对齐，其含义请参考<a href="../../../../基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md">Mmad</a>中的数据格式说明。</p>
 <p id="p18764185218271"><a name="p18764185218271"></a><a name="p18764185218271"></a><strong id="b16145148296"><a name="b16145148296"></a><a name="b16145148296"></a>注意：</strong>该参数取值必须大于0。MxMatmul场景，baseK必须为64的倍数。</p>
 </td>
 </tr>

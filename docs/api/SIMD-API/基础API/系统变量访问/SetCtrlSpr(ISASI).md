@@ -158,7 +158,7 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
 <td class="cellrowborder" valign="top" width="27.73%" headers="mcps1.2.5.1.4 "><p id="p1595913426185"><a name="p1595913426185"></a><a name="p1595913426185"></a>配合使用的API：</p>
 <a name="ul11961542161817"></a><a name="ul11961542161817"></a><ul id="ul11961542161817"><li>矢量计算API</li><li>原子操作API</li><li>精度转换指令</li></ul>
 <p id="p1192712117193"><a name="p1192712117193"></a><a name="p1192712117193"></a>使用约束：</p>
-<a name="ul1092115147198"></a><a name="ul1092115147198"></a><ul id="ul1092115147198"><li>需要满足数据类型限制。</li><li>执行原子操作过程中，如果需要重新配置该控制位，需要调用<a href="DataCacheCleanAndInvalid.md">DataCacheCleanAndInvalid</a>先清除当前Cache Line状态并将当前数据写出，防止饱和模式变更影响当前数据。具体调用示例可参考<a href="#li31971525192313">原子操作中，half类型配置全局非饱和模式示例。</a></li></ul>
+<a name="ul1092115147198"></a><a name="ul1092115147198"></a><ul id="ul1092115147198"><li>需要满足数据类型限制。</li><li>执行原子操作过程中，如果需要重新配置该控制位，需要调用<a href="../缓存控制/DataCacheCleanAndInvalid.md">DataCacheCleanAndInvalid</a>先清除当前Cache Line状态并将当前数据写出，防止饱和模式变更影响当前数据。具体调用示例可参考<a href="#li31971525192313">原子操作中，half类型配置全局非饱和模式示例。</a></li></ul>
 </td>
 </tr>
 <tr id="row6608417152114"><td class="cellrowborder" valign="top" width="17.68%" headers="mcps1.2.5.1.1 "><p id="p4793193912113"><a name="p4793193912113"></a><a name="p4793193912113"></a>CTRL[50]</p>
@@ -204,7 +204,7 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
 </td>
 <td class="cellrowborder" valign="top" width="8.129999999999999%" headers="mcps1.2.5.1.3 "><p id="p45777114396"><a name="p45777114396"></a><a name="p45777114396"></a>1'b1</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.73%" headers="mcps1.2.5.1.4 "><p id="p2671143015297"><a name="p2671143015297"></a><a name="p2671143015297"></a><span>该控制位可与Reg矢量计算API </span><a href="Cast-45.md">Cast</a><span>配合使用，或与CTRL[48]、CTRL[59]</span><span>配合使用，具体配置信息参考</span><a href="#table231122118201">表6</a>。</p>
+<td class="cellrowborder" valign="top" width="27.73%" headers="mcps1.2.5.1.4 "><p id="p2671143015297"><a name="p2671143015297"></a><a name="p2671143015297"></a><span>该控制位可与Reg矢量计算API </span><a href="../Reg矢量计算/类型转换/Cast-45.md">Cast</a><span>配合使用，或与CTRL[48]、CTRL[59]</span><span>配合使用，具体配置信息参考</span><a href="#table231122118201">表6</a>。</p>
 </td>
 </tr>
 </tbody>

@@ -200,7 +200,7 @@
 <td class="cellrowborder" valign="top" width="10.46104610461046%" headers="mcps1.2.4.1.2 "><p id="p5978836185815"><a name="p5978836185815"></a><a name="p5978836185815"></a>hifloat8_t</p>
 </td>
 <td class="cellrowborder" valign="top" width="79.1079107910791%" headers="mcps1.2.4.1.3 "><p id="p1583714118115"><a name="p1583714118115"></a><a name="p1583714118115"></a>将src按照roundMode取整，以hifloat8_t格式（溢出默认按照饱和处理）存入dst中。</p>
-<p id="p9837194171118"><a name="p9837194171118"></a><a name="p9837194171118"></a>示例：输入1.75，CAST_ROUND模式输出2；CAST_HYBRID参考<a href="Cast-45.md#table1352142520363">表9</a>输出。</p>
+<p id="p9837194171118"><a name="p9837194171118"></a><a name="p9837194171118"></a>示例：输入1.75，CAST_ROUND模式输出2；CAST_HYBRID参考<a href="../../Reg矢量计算/类型转换/Cast-45.md#table1352142520363">表9</a>输出。</p>
 </td>
 </tr>
 <tr id="row125807343529"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p211613474584"><a name="p211613474584"></a><a name="p211613474584"></a>fp8_e4m3fn_t</p>
@@ -274,7 +274,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="79.1079107910791%" headers="mcps1.2.4.1.3 "><p id="p81878019399"><a name="p81878019399"></a><a name="p81878019399"></a>将src按照roundMode取整，以hifloat8_t格式（溢出默认按照饱和处理）存入dst中。</p>
 <p id="p41874016394"><a name="p41874016394"></a><a name="p41874016394"></a>示例：输入1.75，</p>
-<p id="p1918714014392"><a name="p1918714014392"></a><a name="p1918714014392"></a>CAST_ROUND模式输出2，CAST_HYBRID模式参考<a href="Cast-45.md#table1352142520363">表9</a>输出。</p>
+<p id="p1918714014392"><a name="p1918714014392"></a><a name="p1918714014392"></a>CAST_ROUND模式输出2，CAST_HYBRID模式参考<a href="../../Reg矢量计算/类型转换/Cast-45.md#table1352142520363">表9</a>输出。</p>
 </td>
 </tr>
 <tr id="row119737190554"><td class="cellrowborder" rowspan="2" valign="top" width="10.431043104310431%" headers="mcps1.2.4.1.1 "><p id="p286217619548"><a name="p286217619548"></a><a name="p286217619548"></a>bfloat16_t</p>
@@ -493,7 +493,7 @@
 </tr>
 <tr id="row196317472242"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p10631174742410"><a name="p10631174742410"></a><a name="p10631174742410"></a>half</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p0586519182516"><a name="p0586519182516"></a><a name="p0586519182516"></a>与<a href="SetDeqScale.md">SetDeqScale(half scale)</a>接口配合使用，输出src / 2<sup id="sup1655219427288"><a name="sup1655219427288"></a><a name="sup1655219427288"></a>17</sup> * scale * 2<sup id="sup1057615072914"><a name="sup1057615072914"></a><a name="sup1057615072914"></a>17</sup>。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p0586519182516"><a name="p0586519182516"></a><a name="p0586519182516"></a>与<a href="../量化设置/SetDeqScale.md">SetDeqScale(half scale)</a>接口配合使用，输出src / 2<sup id="sup1655219427288"><a name="sup1655219427288"></a><a name="sup1655219427288"></a>17</sup> * scale * 2<sup id="sup1057615072914"><a name="sup1057615072914"></a><a name="sup1057615072914"></a>17</sup>。</p>
 </td>
 </tr>
 <tr id="row9465174420424"><td class="cellrowborder" rowspan="2" valign="top" width="10.431043104310431%" headers="mcps1.2.4.1.1 "><p id="p238715344311"><a name="p238715344311"></a><a name="p238715344311"></a>int32_t</p>
@@ -723,7 +723,7 @@
 <tr id="row18835145716587"><td class="cellrowborder" valign="top" width="16.35%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a>isSetMask</p>
 </td>
 <td class="cellrowborder" valign="top" width="83.65%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000001429830437_p77520541653"><a name="zh-cn_topic_0000001429830437_p77520541653"></a><a name="zh-cn_topic_0000001429830437_p77520541653"></a>是否在接口内部设置mask。</p>
-<a name="zh-cn_topic_0000001429830437_ul1163765616511"></a><a name="zh-cn_topic_0000001429830437_ul1163765616511"></a><ul id="zh-cn_topic_0000001429830437_ul1163765616511"><li>true，表示在接口内部设置mask。</li><li>false，表示在接口外部设置mask，开发者需要使用<a href="SetVectorMask.md">SetVectorMask</a>接口设置mask值。这种模式下，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义。</li></ul>
+<a name="zh-cn_topic_0000001429830437_ul1163765616511"></a><a name="zh-cn_topic_0000001429830437_ul1163765616511"></a><ul id="zh-cn_topic_0000001429830437_ul1163765616511"><li>true，表示在接口内部设置mask。</li><li>false，表示在接口外部设置mask，开发者需要使用<a href="../掩码操作/SetVectorMask.md">SetVectorMask</a>接口设置mask值。这种模式下，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义。</li></ul>
 </td>
 </tr>
 </tbody>
@@ -745,7 +745,7 @@
 <td class="cellrowborder" valign="top" width="11.92%" headers="mcps1.2.4.1.2 "><p id="p755318134134"><a name="p755318134134"></a><a name="p755318134134"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.59%" headers="mcps1.2.4.1.3 "><p id="p358015811379"><a name="p358015811379"></a><a name="p358015811379"></a>目的操作数。</p>
-<p id="p5945720195112"><a name="p5945720195112"></a><a name="p5945720195112"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p5945720195112"><a name="p5945720195112"></a><a name="p5945720195112"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p184912374359"><a name="p184912374359"></a><a name="p184912374359"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -754,7 +754,7 @@
 <td class="cellrowborder" valign="top" width="11.92%" headers="mcps1.2.4.1.2 "><p id="p155310135134"><a name="p155310135134"></a><a name="p155310135134"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.59%" headers="mcps1.2.4.1.3 "><p id="p1743571233810"><a name="p1743571233810"></a><a name="p1743571233810"></a>源操作数。</p>
-<p id="p169251414143819"><a name="p169251414143819"></a><a name="p169251414143819"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_1"><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_1"><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_1"><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p169251414143819"><a name="p169251414143819"></a><a name="p169251414143819"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_1"><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_1"><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_1"><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p15798144016353"><a name="p15798144016353"></a><a name="p15798144016353"></a><span id="ph13451134110354"><a name="ph13451134110354"></a><a name="ph13451134110354"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -807,7 +807,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="11.92%" headers="mcps1.2.4.1.2 "><p id="p18554141331317"><a name="p18554141331317"></a><a name="p18554141331317"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.59%" headers="mcps1.2.4.1.3 "><p id="p455461351319"><a name="p455461351319"></a><a name="p455461351319"></a>控制操作数地址步长的参数，<a href="UnaryRepeatParams.md">UnaryRepeatParams</a>类型。包含操作数相邻迭代间的地址步长，操作数同一迭代内datablock的地址步长等参数。其中dstRepStride/srcRepStride∈[0,255]。</p>
+<td class="cellrowborder" valign="top" width="71.59%" headers="mcps1.2.4.1.3 "><p id="p455461351319"><a name="p455461351319"></a><a name="p455461351319"></a>控制操作数地址步长的参数，<a href="../../../其他数据类型/UnaryRepeatParams.md">UnaryRepeatParams</a>类型。包含操作数相邻迭代间的地址步长，操作数同一迭代内datablock的地址步长等参数。其中dstRepStride/srcRepStride∈[0,255]。</p>
 <p id="p1156819418442"><a name="p1156819418442"></a><a name="p1156819418442"></a>相邻迭代间的地址步长参数说明请参考<span id="zh-cn_topic_0000001487959374_ph18976413195617"><a name="zh-cn_topic_0000001487959374_ph18976413195617"></a><a name="zh-cn_topic_0000001487959374_ph18976413195617"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md" target="_blank" rel="noopener noreferrer">repeatStride</a></span>；同一迭代内DataBlock的地址步长参数说明请参考<span id="zh-cn_topic_0000001487959374_ph19976131385613"><a name="zh-cn_topic_0000001487959374_ph19976131385613"></a><a name="zh-cn_topic_0000001487959374_ph19976131385613"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md" target="_blank" rel="noopener noreferrer">dataBlockStride</a></span>。</p>
 </td>
 </tr>
@@ -976,7 +976,7 @@
 </tr>
 <tr id="row106267965619"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p136266916561"><a name="p136266916561"></a><a name="p136266916561"></a>half</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p13626189175610"><a name="p13626189175610"></a><a name="p13626189175610"></a>roundMode不生效，与<a href="SetDeqScale.md">SetDeqScale(half scale)</a>接口配合使用。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p13626189175610"><a name="p13626189175610"></a><a name="p13626189175610"></a>roundMode不生效，与<a href="../量化设置/SetDeqScale.md">SetDeqScale(half scale)</a>接口配合使用。</p>
 </td>
 </tr>
 </tbody>
@@ -1119,7 +1119,7 @@
 </tr>
 <tr id="row1484918498578"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p8849194995710"><a name="p8849194995710"></a><a name="p8849194995710"></a>half</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p0420916121616"><a name="p0420916121616"></a><a name="p0420916121616"></a>roundMode不生效，与<a href="SetDeqScale.md">SetDeqScale(half scale)</a>接口配合使用。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p0420916121616"><a name="p0420916121616"></a><a name="p0420916121616"></a>roundMode不生效，与<a href="../量化设置/SetDeqScale.md">SetDeqScale(half scale)</a>接口配合使用。</p>
 </td>
 </tr>
 <tr id="row6011210111"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p2121214119"><a name="p2121214119"></a><a name="p2121214119"></a>int64_t</p>
@@ -1279,7 +1279,7 @@
 </tr>
 <tr id="row5253162443515"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p2025312423518"><a name="p2025312423518"></a><a name="p2025312423518"></a>half</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p27112487167"><a name="p27112487167"></a><a name="p27112487167"></a>roundMode不生效，与<a href="SetDeqScale.md">SetDeqScale(half scale)</a>接口配合使用。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p27112487167"><a name="p27112487167"></a><a name="p27112487167"></a>roundMode不生效，与<a href="../量化设置/SetDeqScale.md">SetDeqScale(half scale)</a>接口配合使用。</p>
 </td>
 </tr>
 <tr id="row192533241352"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p6253132414356"><a name="p6253132414356"></a><a name="p6253132414356"></a>int64_t</p>
@@ -1709,7 +1709,7 @@
 </tr>
 <tr id="row157094428189"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p55931937195619"><a name="p55931937195619"></a><a name="p55931937195619"></a>half</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p10284143515396"><a name="p10284143515396"></a><a name="p10284143515396"></a>roundMode不生效，与<a href="SetDeqScale.md">SetDeqScale(half scale)</a>接口配合使用。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p10284143515396"><a name="p10284143515396"></a><a name="p10284143515396"></a>roundMode不生效，与<a href="../量化设置/SetDeqScale.md">SetDeqScale(half scale)</a>接口配合使用。</p>
 </td>
 </tr>
 <tr id="row33073445180"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p35933372561"><a name="p35933372561"></a><a name="p35933372561"></a>uint8_t</p>

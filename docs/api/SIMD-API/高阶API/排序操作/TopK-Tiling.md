@@ -85,7 +85,7 @@ bool TopKTilingFunc(const platform_ascendc::PlatformAscendC& ascendcPlatform, co
 </td>
 <td class="cellrowborder" valign="top" width="10.63%" headers="mcps1.2.4.1.2 "><p id="p73181356192211"><a name="p73181356192211"></a><a name="p73181356192211"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.5%" headers="mcps1.2.4.1.3 "><p id="p340161012618"><a name="p340161012618"></a><a name="p340161012618"></a>传入硬件平台的信息，PlatformAscendC定义请参见<a href="构造及析构函数.md">构造及析构函数</a>。</p>
+<td class="cellrowborder" valign="top" width="72.5%" headers="mcps1.2.4.1.3 "><p id="p340161012618"><a name="p340161012618"></a><a name="p340161012618"></a>传入硬件平台的信息，PlatformAscendC定义请参见<a href="../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md">构造及析构函数</a>。</p>
 </td>
 </tr>
 <tr id="row31417367406"><td class="cellrowborder" valign="top" width="16.869999999999997%" headers="mcps1.2.4.1.1 "><p id="p12604203117452"><a name="p12604203117452"></a><a name="p12604203117452"></a>inner</p>
@@ -208,7 +208,7 @@ enum class TopKOrder {
 </td>
 <td class="cellrowborder" valign="top" width="10.4%" headers="mcps1.2.4.1.2 "><p id="p1765115321057"><a name="p1765115321057"></a><a name="p1765115321057"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.71%" headers="mcps1.2.4.1.3 "><p id="p1465118324515"><a name="p1465118324515"></a><a name="p1465118324515"></a>传入硬件平台的信息，PlatformAscendC定义请参见<a href="构造及析构函数.md">构造及析构函数</a>。</p>
+<td class="cellrowborder" valign="top" width="72.71%" headers="mcps1.2.4.1.3 "><p id="p1465118324515"><a name="p1465118324515"></a><a name="p1465118324515"></a>传入硬件平台的信息，PlatformAscendC定义请参见<a href="../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md">构造及析构函数</a>。</p>
 </td>
 </tr>
 <tr id="row2406423535"><td class="cellrowborder" valign="top" width="16.89%" headers="mcps1.2.4.1.1 "><p id="p1239662315320"><a name="p1239662315320"></a><a name="p1239662315320"></a>inner</p>

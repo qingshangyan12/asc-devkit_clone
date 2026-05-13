@@ -106,7 +106,7 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 <td class="cellrowborder" valign="top" width="12.61126112611261%" headers="mcps1.2.4.1.2 "><p id="p179601218134912"><a name="p179601218134912"></a><a name="p179601218134912"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="73.75737573757377%" headers="mcps1.2.4.1.3 "><p id="p11806624101513"><a name="p11806624101513"></a><a name="p11806624101513"></a>目的操作数，存储经过排序后的数据。</p>
-<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p194546161418"><a name="p194546161418"></a><a name="p194546161418"></a><span id="ph443416246237"><a name="ph443416246237"></a><a name="ph443416246237"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -130,7 +130,7 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
     LocalTensor&lt;T&gt; src3; // 第三个已经排好序的队列
     LocalTensor&lt;T&gt; src4; // 第四个已经排好序的队列
 };</pre>
-<p id="p8114998103"><a name="p8114998103"></a><a name="p8114998103"></a>源操作数的数据类型与目的操作数保持一致。src1、src2、src3、src4类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。<span id="ph441646171420"><a name="ph441646171420"></a><a name="ph441646171420"></a>LocalTensor的起始地址需要8字节对齐。</span></p>
+<p id="p8114998103"><a name="p8114998103"></a><a name="p8114998103"></a>源操作数的数据类型与目的操作数保持一致。src1、src2、src3、src4类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。<span id="ph441646171420"><a name="ph441646171420"></a><a name="ph441646171420"></a>LocalTensor的起始地址需要8字节对齐。</span></p>
 </td>
 </tr>
 <tr id="row1096110183494"><td class="cellrowborder" valign="top" width="13.631363136313631%" headers="mcps1.2.4.1.1 "><p id="p139612184497"><a name="p139612184497"></a><a name="p139612184497"></a>params</p>

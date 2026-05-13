@@ -43,7 +43,7 @@ void GetLogicalOrsTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& a
 </td>
 <td class="cellrowborder" valign="top" width="13.19%" headers="mcps1.2.4.1.2 "><p id="p17658173455714"><a name="p17658173455714"></a><a name="p17658173455714"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.92%" headers="mcps1.2.4.1.3 "><p id="p765818345579"><a name="p765818345579"></a><a name="p765818345579"></a>输入的平台信息。PlatformAscendC的定义请参见<a href="构造及析构函数.md">构造及析构函数</a>。</p>
+<td class="cellrowborder" valign="top" width="69.92%" headers="mcps1.2.4.1.3 "><p id="p765818345579"><a name="p765818345579"></a><a name="p765818345579"></a>输入的平台信息。PlatformAscendC的定义请参见<a href="../../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md">构造及析构函数</a>。</p>
 </td>
 </tr>
 <tr id="row139791917184711"><td class="cellrowborder" valign="top" width="16.89%" headers="mcps1.2.4.1.1 "><p id="p697915173474"><a name="p697915173474"></a><a name="p697915173474"></a>typeSize</p>

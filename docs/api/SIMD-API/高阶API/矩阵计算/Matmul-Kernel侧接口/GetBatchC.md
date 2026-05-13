@@ -120,7 +120,7 @@ __aicore__ inline void GetBatchC(const LocalTensor<DstT>& c, uint32_t batchA, ui
 </td>
 <td class="cellrowborder" valign="top" width="15.15%" headers="mcps1.2.4.1.2 "><p id="p465110382303"><a name="p465110382303"></a><a name="p465110382303"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="67.2%" headers="mcps1.2.4.1.3 "><p id="p5147952143612"><a name="p5147952143612"></a><a name="p5147952143612"></a>C矩阵，用于保存矩阵分片。<span id="ph3475203310348"><a name="ph3475203310348"></a><a name="ph3475203310348"></a><span id="ph547518333348"><a name="ph547518333348"></a><a name="ph547518333348"></a><span id="ph1447593315341"><a name="ph1447593315341"></a><a name="ph1447593315341"></a>类型为<a href="LocalTensor.md">LocalTensor</a>。</span></span></span></p>
+<td class="cellrowborder" valign="top" width="67.2%" headers="mcps1.2.4.1.3 "><p id="p5147952143612"><a name="p5147952143612"></a><a name="p5147952143612"></a>C矩阵，用于保存矩阵分片。<span id="ph3475203310348"><a name="ph3475203310348"></a><a name="ph3475203310348"></a><span id="ph547518333348"><a name="ph547518333348"></a><a name="ph547518333348"></a><span id="ph1447593315341"><a name="ph1447593315341"></a><a name="ph1447593315341"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>。</span></span></span></p>
 </td>
 </tr>
 </tbody>

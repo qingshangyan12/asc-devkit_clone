@@ -74,7 +74,7 @@ __aicore__ inline void IterateAll(const AscendC::GlobalTensor<OutputT>& output, 
 </td>
 <td class="cellrowborder" valign="top" width="17.29%" headers="mcps1.1.4.1.2 "><p id="p484014217457"><a name="p484014217457"></a><a name="p484014217457"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="58.46%" headers="mcps1.1.4.1.3 "><p id="p1761464914415"><a name="p1761464914415"></a><a name="p1761464914415"></a>Output在GM上的地址。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="GlobalTensor.md">GlobalTensor</a>。</span></span></span>结果矩阵Output支持的数据类型为：half、bfloat16_t。</p>
+<td class="cellrowborder" valign="top" width="58.46%" headers="mcps1.1.4.1.3 "><p id="p1761464914415"><a name="p1761464914415"></a><a name="p1761464914415"></a>Output在GM上的地址。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="../../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>结果矩阵Output支持的数据类型为：half、bfloat16_t。</p>
 </td>
 </tr>
 <tr id="row4840526454"><td class="cellrowborder" valign="top" width="24.25%" headers="mcps1.1.4.1.1 "><p id="p5840102134513"><a name="p5840102134513"></a><a name="p5840102134513"></a>enPartialSum</p>

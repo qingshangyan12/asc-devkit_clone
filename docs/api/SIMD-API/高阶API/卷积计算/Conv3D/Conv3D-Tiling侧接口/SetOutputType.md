@@ -25,7 +25,7 @@ void SetOutputType(const ConvCommonApi::TPosition pos, const ConvCommonApi::Conv
 </td>
 <td class="cellrowborder" valign="top" width="17.29%" headers="mcps1.1.4.1.2 "><p id="p1311571673417"><a name="p1311571673417"></a><a name="p1311571673417"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="58.46%" headers="mcps1.1.4.1.3 "><p id="p19115131613346"><a name="p19115131613346"></a><a name="p19115131613346"></a><span>Output在内存上</span><span>的</span><a href="通用说明和约束.md#table07372185712">位置</a><span>。</span>当前仅支持TPosition::CO1。</p>
+<td class="cellrowborder" valign="top" width="58.46%" headers="mcps1.1.4.1.3 "><p id="p19115131613346"><a name="p19115131613346"></a><a name="p19115131613346"></a><span>Output在内存上</span><span>的</span><a href="../../../../通用说明和约束.md#table07372185712">位置</a><span>。</span>当前仅支持TPosition::CO1。</p>
 </td>
 </tr>
 <tr id="row1611551613343"><td class="cellrowborder" valign="top" width="24.25%" headers="mcps1.1.4.1.1 "><p id="p1011517165348"><a name="p1011517165348"></a><a name="p1011517165348"></a><span>format</span></p>

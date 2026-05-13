@@ -30,7 +30,7 @@ void GetFmaMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatfor
 </td>
 <td class="cellrowborder" valign="top" width="13.19%" headers="mcps1.2.4.1.2 "><p id="p521618329466"><a name="p521618329466"></a><a name="p521618329466"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.92%" headers="mcps1.2.4.1.3 "><p id="p8299155010420"><a name="p8299155010420"></a><a name="p8299155010420"></a>输入的平台信息。PlatformAscendC的定义请参见<a href="构造及析构函数.md">构造及析构函数</a>。</p>
+<td class="cellrowborder" valign="top" width="69.92%" headers="mcps1.2.4.1.3 "><p id="p8299155010420"><a name="p8299155010420"></a><a name="p8299155010420"></a>输入的平台信息。PlatformAscendC的定义请参见<a href="../../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md">构造及析构函数</a>。</p>
 </td>
 </tr>
 <tr id="row6795164815440"><td class="cellrowborder" valign="top" width="16.89%" headers="mcps1.2.4.1.1 "><p id="p1479624816448"><a name="p1479624816448"></a><a name="p1479624816448"></a>srcShape</p>

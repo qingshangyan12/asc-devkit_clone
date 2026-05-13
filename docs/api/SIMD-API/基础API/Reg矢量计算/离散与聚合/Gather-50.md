@@ -134,7 +134,7 @@
     <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p67614714221"><a name="p67614714221"></a><a name="p67614714221"></a>输出</p>
     </td>
     <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1761347162214"><a name="p1761347162214"></a><a name="p1761347162214"></a>目的操作数。</p>
-    <p id="p776114792213"><a name="p776114792213"></a><a name="p776114792213"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+    <p id="p776114792213"><a name="p776114792213"></a><a name="p776114792213"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
     <p id="p1876047182212"><a name="p1876047182212"></a><a name="p1876047182212"></a>T0数据类型需要与T1和T2数据类型配套使用。类型配套对应表详见约束说明。</p>
     <p id="p127654782211"><a name="p127654782211"></a><a name="p127654782211"></a>支持的数据类型详见<a href="Gather-50.md#table19126103352518">表5</a>。</p>
     </td>
@@ -154,7 +154,7 @@
     <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p6761247122219"><a name="p6761247122219"></a><a name="p6761247122219"></a>输入</p>
     </td>
     <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p27619472222"><a name="p27619472222"></a><a name="p27619472222"></a>dstReg中的每个元素在UB中相对于baseAddr的索引位置。地址偏移量要大于等于0。</p>
-    <p id="p3761247202218"><a name="p3761247202218"></a><a name="p3761247202218"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+    <p id="p3761247202218"><a name="p3761247202218"></a><a name="p3761247202218"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
     <p id="p47634772219"><a name="p47634772219"></a><a name="p47634772219"></a>T2数据类型需要与T0和T1数据类型配套使用。类型配套对应表详见约束说明。</p>
     <p id="p0358111061613"><a name="p0358111061613"></a><a name="p0358111061613"></a>支持的数据类型详见<a href="Gather-50.md#table19126103352518">表5</a>。</p>
     </td>
@@ -163,7 +163,7 @@
     </td>
     <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p1377247172219"><a name="p1377247172219"></a><a name="p1377247172219"></a>输入</p>
     </td>
-    <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p207784717228"><a name="p207784717228"></a><a name="p207784717228"></a>src element操作有效指示，详细说明请参考<a href="MaskReg.md">MaskReg</a>。</p>
+    <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p207784717228"><a name="p207784717228"></a><a name="p207784717228"></a>src element操作有效指示，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">MaskReg</a>。</p>
     </td>
     </tr>
     </tbody>
@@ -221,7 +221,7 @@
     <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p119701342314"><a name="p119701342314"></a><a name="p119701342314"></a>输出</p>
     </td>
     <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p212236122019"><a name="p212236122019"></a><a name="p212236122019"></a>目的操作数。</p>
-    <p id="p2507123615484"><a name="p2507123615484"></a><a name="p2507123615484"></a><span id="ph950733612488"><a name="ph950733612488"></a><a name="ph950733612488"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+    <p id="p2507123615484"><a name="p2507123615484"></a><a name="p2507123615484"></a><span id="ph950733612488"><a name="ph950733612488"></a><a name="ph950733612488"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
     </td>
     </tr>
     <tr id="row497613202314"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p99751332311"><a name="p99751332311"></a><a name="p99751332311"></a>srcReg</p>
@@ -229,7 +229,7 @@
     <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p139818138232"><a name="p139818138232"></a><a name="p139818138232"></a>输入</p>
     </td>
     <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p14827161917207"><a name="p14827161917207"></a><a name="p14827161917207"></a>源操作数。</p>
-    <p id="p7123111612517"><a name="p7123111612517"></a><a name="p7123111612517"></a><span id="ph1197863231916"><a name="ph1197863231916"></a><a name="ph1197863231916"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+    <p id="p7123111612517"><a name="p7123111612517"></a><a name="p7123111612517"></a><span id="ph1197863231916"><a name="ph1197863231916"></a><a name="ph1197863231916"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
     <p id="p16987134230"><a name="p16987134230"></a><a name="p16987134230"></a>数据类型需要与目的操作数保持一致。</p>
     </td>
     </tr>
@@ -238,7 +238,7 @@
     <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p19811362320"><a name="p19811362320"></a><a name="p19811362320"></a>输入</p>
     </td>
     <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6981713112315"><a name="p6981713112315"></a><a name="p6981713112315"></a>数据索引。</p>
-    <p id="p1728583820487"><a name="p1728583820487"></a><a name="p1728583820487"></a><span id="ph72855386487"><a name="ph72855386487"></a><a name="ph72855386487"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+    <p id="p1728583820487"><a name="p1728583820487"></a><a name="p1728583820487"></a><span id="ph72855386487"><a name="ph72855386487"></a><a name="ph72855386487"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
     <p id="p104218390187"><a name="p104218390187"></a><a name="p104218390187"></a>数据类型的位宽需要与目的操作数的位宽保持一致。</p>
     <p id="p1396715519200"><a name="p1396715519200"></a><a name="p1396715519200"></a>srcReg为RegTensor类型，位宽是固定的VL，存储的元素个数固定。如果indexReg中索引值超出当前RegTensor中能存储的最大数据元素个数时，按照如下方式处理：设定当前RegTensor所能存储的最大数据元素个数为vlLength，indexReg中索引值为i，索引值更新为i % vlLength。</p>
     </td>

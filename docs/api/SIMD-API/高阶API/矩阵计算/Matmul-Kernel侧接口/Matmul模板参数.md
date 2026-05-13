@@ -155,7 +155,7 @@ using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM
 </td>
 <td class="cellrowborder" valign="top" width="34.47%" headers="mcps1.2.4.1.2 "><p id="p1889915586561"><a name="p1889915586561"></a><a name="p1889915586561"></a>int32_t</p>
 </td>
-<td class="cellrowborder" valign="top" width="49.480000000000004%" headers="mcps1.2.4.1.3 "><p id="p174001310383"><a name="p174001310383"></a><a name="p174001310383"></a>与<a href="TCubeTiling结构体.md">TCubeTiling</a>结构体中各同名参数含义一致。本结构体中的参数是常量化后的常数值。</p>
+<td class="cellrowborder" valign="top" width="49.480000000000004%" headers="mcps1.2.4.1.3 "><p id="p174001310383"><a name="p174001310383"></a><a name="p174001310383"></a>与<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md">TCubeTiling</a>结构体中各同名参数含义一致。本结构体中的参数是常量化后的常数值。</p>
 </td>
 </tr>
 <tr id="row1550172063919"><td class="cellrowborder" valign="top" width="16.05%" headers="mcps1.2.4.1.1 "><p id="p160684603915"><a name="p160684603915"></a><a name="p160684603915"></a>cfg</p>

@@ -27,7 +27,7 @@ void SetGradOutputType(ConvCommonApi::TPosition pos, ConvCommonApi::ConvFormat f
 </td>
 <td class="cellrowborder" valign="top" width="12.02%" headers="mcps1.2.4.1.2 "><p id="p72631357201810"><a name="p72631357201810"></a><a name="p72631357201810"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p1746195213154"><a name="p1746195213154"></a><a name="p1746195213154"></a>GradOutput<span>在内存上的</span><a href="通用说明和约束.md#table07372185712">位置</a><span>。</span>当前仅支持TPosition::GM。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p1746195213154"><a name="p1746195213154"></a><a name="p1746195213154"></a>GradOutput<span>在内存上的</span><a href="../../../../通用说明和约束.md#table07372185712">位置</a><span>。</span>当前仅支持TPosition::GM。</p>
 </td>
 </tr>
 <tr id="row583721474811"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.4.1.1 "><p id="p48371814114818"><a name="p48371814114818"></a><a name="p48371814114818"></a>format</p>

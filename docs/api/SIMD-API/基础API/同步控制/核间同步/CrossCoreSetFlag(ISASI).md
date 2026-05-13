@@ -91,7 +91,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 </tr>
 <tr id="row168561422132317"><td class="cellrowborder" valign="top" width="18.8%" headers="mcps1.2.3.1.1 "><p id="p1162623072316"><a name="p1162623072316"></a><a name="p1162623072316"></a>pipe</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.2%" headers="mcps1.2.3.1.2 "><p id="p13626330102311"><a name="p13626330102311"></a><a name="p13626330102311"></a>设置这条指令所在的流水类型，流水类型可参考<a href="同步控制简介.md#section1272612276459">硬件流水类型</a>。</p>
+<td class="cellrowborder" valign="top" width="81.2%" headers="mcps1.2.3.1.2 "><p id="p13626330102311"><a name="p13626330102311"></a><a name="p13626330102311"></a>设置这条指令所在的流水类型，流水类型可参考<a href="../核内同步/同步控制简介.md#section1272612276459">硬件流水类型</a>。</p>
 <p id="p8834141517517"><a name="p8834141517517"></a><a name="p8834141517517"></a>特别地，PIPE_S流水类型仅<span id="ph1572119291978"><a name="ph1572119291978"></a><a name="ph1572119291978"></a>Ascend 950PR/Ascend 950DT</span>支持。</p>
 </td>
 </tr>

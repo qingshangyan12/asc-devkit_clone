@@ -107,7 +107,7 @@ __simd_callee__ inline void Min(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 <td class="cellrowborder" valign="top" width="10.059999999999999%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>目的操作数。</p>
-<p id="p66093533169"><a name="p66093533169"></a><a name="p66093533169"></a><span id="ph134278176129"><a name="ph134278176129"></a><a name="ph134278176129"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+<p id="p66093533169"><a name="p66093533169"></a><a name="p66093533169"></a><span id="ph134278176129"><a name="ph134278176129"></a><a name="ph134278176129"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
 </td>
 </tr>
 <tr id="row2137145181815"><td class="cellrowborder" valign="top" width="18.529999999999998%" headers="mcps1.2.4.1.1 "><p id="p19574165615129"><a name="p19574165615129"></a><a name="p19574165615129"></a>srcReg0</p>
@@ -115,7 +115,7 @@ __simd_callee__ inline void Min(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 <td class="cellrowborder" valign="top" width="10.059999999999999%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p172083541517"><a name="p172083541517"></a><a name="p172083541517"></a>源操作数。</p>
-<p id="p1218614353115"><a name="p1218614353115"></a><a name="p1218614353115"></a><span id="ph1418610363120"><a name="ph1418610363120"></a><a name="ph1418610363120"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+<p id="p1218614353115"><a name="p1218614353115"></a><a name="p1218614353115"></a><span id="ph1418610363120"><a name="ph1418610363120"></a><a name="ph1418610363120"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
 <p id="p1484485824312"><a name="p1484485824312"></a><a name="p1484485824312"></a>数据类型需要与目的操作数保持一致。</p>
 </td>
 </tr>
@@ -124,7 +124,7 @@ __simd_callee__ inline void Min(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 <td class="cellrowborder" valign="top" width="10.059999999999999%" headers="mcps1.2.4.1.2 "><p id="p151325484342"><a name="p151325484342"></a><a name="p151325484342"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p181326485341"><a name="p181326485341"></a><a name="p181326485341"></a>源操作数。</p>
-<p id="p102351851311"><a name="p102351851311"></a><a name="p102351851311"></a><span id="ph5235653311"><a name="ph5235653311"></a><a name="ph5235653311"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+<p id="p102351851311"><a name="p102351851311"></a><a name="p102351851311"></a><span id="ph5235653311"><a name="ph5235653311"></a><a name="ph5235653311"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
 <p id="p12132154853419"><a name="p12132154853419"></a><a name="p12132154853419"></a>数据类型需要与目的操作数保持一致。</p>
 </td>
 </tr>
@@ -132,7 +132,7 @@ __simd_callee__ inline void Min(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 </td>
 <td class="cellrowborder" valign="top" width="10.059999999999999%" headers="mcps1.2.4.1.2 "><p id="p484514581433"><a name="p484514581433"></a><a name="p484514581433"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p11541143920"><a name="p11541143920"></a><a name="p11541143920"></a><span id="ph15776181222"><a name="ph15776181222"></a><a name="ph15776181222"></a>源操作数元素操作的有效指示，详细说明请参考<a href="MaskReg.md">MaskReg</a>。</span></p>
+<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p11541143920"><a name="p11541143920"></a><a name="p11541143920"></a><span id="ph15776181222"><a name="ph15776181222"></a><a name="ph15776181222"></a>源操作数元素操作的有效指示，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">MaskReg</a>。</span></p>
 </td>
 </tr>
 </tbody>

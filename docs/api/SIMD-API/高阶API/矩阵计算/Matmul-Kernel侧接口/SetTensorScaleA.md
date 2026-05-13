@@ -88,14 +88,14 @@ __aicore__ inline void SetTensorScaleA(const LocalTensor<ScaleT>& leftMatrix, bo
 </td>
 <td class="cellrowborder" valign="top" width="12.02%" headers="mcps1.2.4.1.2 "><p id="p1030218179501"><a name="p1030218179501"></a><a name="p1030218179501"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p414110495266"><a name="p414110495266"></a><a name="p414110495266"></a>量化系数scaleA矩阵。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="GlobalTensor.md">GlobalTensor</a>。</span></span></span>支持的数据类型为：fp8_e8m0_t。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p414110495266"><a name="p414110495266"></a><a name="p414110495266"></a>量化系数scaleA矩阵。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>支持的数据类型为：fp8_e8m0_t。</p>
 </td>
 </tr>
 <tr id="row36481043185619"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.4.1.1 "><p id="p530231765010"><a name="p530231765010"></a><a name="p530231765010"></a>leftMatrix</p>
 </td>
 <td class="cellrowborder" valign="top" width="12.02%" headers="mcps1.2.4.1.2 "><p id="p43021717155017"><a name="p43021717155017"></a><a name="p43021717155017"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p793413532620"><a name="p793413532620"></a><a name="p793413532620"></a>量化系数scaleA矩阵。<span id="ph173308471594"><a name="ph173308471594"></a><a name="ph173308471594"></a><span id="ph9902231466"><a name="ph9902231466"></a><a name="ph9902231466"></a><span id="ph1782115034816"><a name="ph1782115034816"></a><a name="ph1782115034816"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为TSCM/VECOUT。</span></span></span>支持的数据类型为：fp8_e8m0_t。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p793413532620"><a name="p793413532620"></a><a name="p793413532620"></a>量化系数scaleA矩阵。<span id="ph173308471594"><a name="ph173308471594"></a><a name="ph173308471594"></a><span id="ph9902231466"><a name="ph9902231466"></a><a name="ph9902231466"></a><span id="ph1782115034816"><a name="ph1782115034816"></a><a name="ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为TSCM/VECOUT。</span></span></span>支持的数据类型为：fp8_e8m0_t。</p>
 </td>
 </tr>
 <tr id="row695181917284"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.4.1.1 "><p id="p5951519182811"><a name="p5951519182811"></a><a name="p5951519182811"></a>isTransposeScaleA</p>
@@ -107,7 +107,7 @@ __aicore__ inline void SetTensorScaleA(const LocalTensor<ScaleT>& leftMatrix, bo
 <a name="ul13519744790"></a><a name="ul13519744790"></a><ul id="ul13519744790"><li>false：默认值，scaleA矩阵不转置。</li><li>true：scaleA矩阵转置。</li></ul>
 <p id="p1588414992814"><a name="p1588414992814"></a><a name="p1588414992814"></a><strong id="b13223313151111"><a name="b13223313151111"></a><a name="b13223313151111"></a>注意：</strong></p>
 <a name="ul3220191814299"></a><a name="ul3220191814299"></a><ul id="ul3220191814299"><li>scaleA矩阵为NZ格式时，该参数只支持取值为false。</li><li>若scaleA矩阵的MatmulTypeWithScale参数中的SCALE_ISTRANS设置为true，除scaleA为NZ格式场景，该参数支持取值为true、false，即运行时scaleA矩阵可以转置和非转置交替使用。</li><li>若scaleA矩阵的MatmulTypeWithScale参数中的SCALE_ISTRANS设置为false，该参数只支持取值为false，若强行设置为true，精度会有异常。</li></ul>
-<p id="p1088464919280"><a name="p1088464919280"></a><a name="p1088464919280"></a>对于有Bias输入的场景，为了确保Tiling侧与Kernel侧<span id="ph456826193017"><a name="ph456826193017"></a><a name="ph456826193017"></a>L1 Buffer</span>空间计算大小保持一致及结果精度正确，该参数取值必须与Kernel侧定义A矩阵MatmulTypeWithScale的SCALE_ISTRANS参数以及Tiling侧SetScaleAType()接口的<a href="SetScaleAType.md#p2934103115919">isScaleTrans</a>参数保持一致，即有Bias输入的场景，上述三个参数必须同时设置为true或同时设置为false。</p>
+<p id="p1088464919280"><a name="p1088464919280"></a><a name="p1088464919280"></a>对于有Bias输入的场景，为了确保Tiling侧与Kernel侧<span id="ph456826193017"><a name="ph456826193017"></a><a name="ph456826193017"></a>L1 Buffer</span>空间计算大小保持一致及结果精度正确，该参数取值必须与Kernel侧定义A矩阵MatmulTypeWithScale的SCALE_ISTRANS参数以及Tiling侧SetScaleAType()接口的<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/SetScaleAType.md#p2934103115919">isScaleTrans</a>参数保持一致，即有Bias输入的场景，上述三个参数必须同时设置为true或同时设置为false。</p>
 </td>
 </tr>
 </tbody>

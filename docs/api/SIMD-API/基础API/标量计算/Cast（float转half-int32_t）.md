@@ -104,7 +104,7 @@ __aicore__ inline U Cast(T valueIn)
 };</pre>
 <p id="p16853152316196"><a name="p16853152316196"></a><a name="p16853152316196"></a>对于Cast，转换类型仅支持float转half(f322f16)与float转int32_t(f322s32)，相应支持的RoundMode如下：</p>
 <a name="ul155971413112618"></a><a name="ul155971413112618"></a><ul id="ul155971413112618"><li>f322f16：CAST_ODD；</li><li>f322s32：CAST_ROUND、CAST_CEIL、CAST_FLOOR、CAST_RINT。</li></ul>
-<p id="p685318232191"><a name="p685318232191"></a><a name="p685318232191"></a>Cast的精度转换规则具体可参考<a href="Cast.md#table235404962912">表1</a>。</p>
+<p id="p685318232191"><a name="p685318232191"></a><a name="p685318232191"></a>Cast的精度转换规则具体可参考<a href="../Memory矢量计算/类型转换/Cast.md#table235404962912">表1</a>。</p>
 </td>
 </tr>
 </tbody>

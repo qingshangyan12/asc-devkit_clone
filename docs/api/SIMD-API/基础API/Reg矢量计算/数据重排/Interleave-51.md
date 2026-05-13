@@ -101,7 +101,7 @@ __simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& sr
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>目的操作数。</p>
-<p id="p18220202613566"><a name="p18220202613566"></a><a name="p18220202613566"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+<p id="p18220202613566"><a name="p18220202613566"></a><a name="p18220202613566"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
 </td>
 </tr>
 <tr id="row2137145181815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p6844125874315"><a name="p6844125874315"></a><a name="p6844125874315"></a>srcReg0、srcReg1</p>
@@ -109,7 +109,7 @@ __simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& sr
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p9761550745"><a name="p9761550745"></a><a name="p9761550745"></a>源操作数。</p>
-<p id="p4630161515159"><a name="p4630161515159"></a><a name="p4630161515159"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+<p id="p4630161515159"><a name="p4630161515159"></a><a name="p4630161515159"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
 <p id="p1484485824312"><a name="p1484485824312"></a><a name="p1484485824312"></a>源操作数的数据类型需要与目的操作数保持一致。</p>
 </td>
 </tr>

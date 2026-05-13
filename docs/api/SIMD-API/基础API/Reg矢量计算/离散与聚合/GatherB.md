@@ -105,7 +105,7 @@ __simd_callee__ inline void GatherB(U& dstReg, __ubuf__ T* baseAddr, S& index, M
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>目的操作数。</p>
-<p id="p18220202613566"><a name="p18220202613566"></a><a name="p18220202613566"></a>类型为<a href="RegTensor.md">RegTensor</a></p>
+<p id="p18220202613566"><a name="p18220202613566"></a><a name="p18220202613566"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a></p>
 <p id="p15544114718408"><a name="p15544114718408"></a><a name="p15544114718408"></a><span id="ph8342353144014"><a name="ph8342353144014"></a><a name="ph8342353144014"></a>Ascend 950PR/Ascend 950DT</span>，dstReg/baseAddr支持的数据类型为：uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t/half/float/bfloat16_t/uint64_t/int64_t</p>
 </td>
 </tr>
@@ -123,7 +123,7 @@ __simd_callee__ inline void GatherB(U& dstReg, __ubuf__ T* baseAddr, S& index, M
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p457515071618"><a name="p457515071618"></a><a name="p457515071618"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p193020233012"><a name="p193020233012"></a><a name="p193020233012"></a>dstReg中的每个DataBlock在UB中相对于baseAddr的索引位置。索引位置要大于等于0且32B对齐。</p>
-<p id="p1855210208258"><a name="p1855210208258"></a><a name="p1855210208258"></a>类型为<a href="RegTensor.md">RegTensor</a></p>
+<p id="p1855210208258"><a name="p1855210208258"></a><a name="p1855210208258"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a></p>
 <p id="p36931438114113"><a name="p36931438114113"></a><a name="p36931438114113"></a><span id="ph1369393818412"><a name="ph1369393818412"></a><a name="ph1369393818412"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：uint32_t</p>
 </td>
 </tr>
@@ -131,7 +131,7 @@ __simd_callee__ inline void GatherB(U& dstReg, __ubuf__ T* baseAddr, S& index, M
 </td>
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p484514581433"><a name="p484514581433"></a><a name="p484514581433"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1559991025517"><a name="p1559991025517"></a><a name="p1559991025517"></a>src element操作有效指示，详细说明请参考<a href="MaskReg.md">MaskReg</a></p>
+<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1559991025517"><a name="p1559991025517"></a><a name="p1559991025517"></a>src element操作有效指示，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">MaskReg</a></p>
 </td>
 </tr>
 </tbody>

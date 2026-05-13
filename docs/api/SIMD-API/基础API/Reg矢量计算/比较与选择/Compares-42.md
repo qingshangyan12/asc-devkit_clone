@@ -119,7 +119,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p172083541517"><a name="p172083541517"></a><a name="p172083541517"></a>源操作数。</p>
-<p id="p5261335123513"><a name="p5261335123513"></a><a name="p5261335123513"></a><span id="ph15261035183514"><a name="ph15261035183514"></a><a name="ph15261035183514"></a>类型为<a href="RegTensor.md">RegTensor</a>。</span></p>
+<p id="p5261335123513"><a name="p5261335123513"></a><a name="p5261335123513"></a><span id="ph15261035183514"><a name="ph15261035183514"></a><a name="ph15261035183514"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</span></p>
 </td>
 </tr>
 <tr id="row944414143710"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p1059534613404"><a name="p1059534613404"></a><a name="p1059534613404"></a>scalarValue</p>
@@ -134,7 +134,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 </td>
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p484514581433"><a name="p484514581433"></a><a name="p484514581433"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p11541143920"><a name="p11541143920"></a><a name="p11541143920"></a><span id="ph15776181222"><a name="ph15776181222"></a><a name="ph15776181222"></a>源操作数元素操作的有效指示，详细说明请参考<a href="MaskReg.md">MaskReg</a>。</span></p>
+<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p11541143920"><a name="p11541143920"></a><a name="p11541143920"></a><span id="ph15776181222"><a name="ph15776181222"></a><a name="ph15776181222"></a>源操作数元素操作的有效指示，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">MaskReg</a>。</span></p>
 </td>
 </tr>
 </tbody>

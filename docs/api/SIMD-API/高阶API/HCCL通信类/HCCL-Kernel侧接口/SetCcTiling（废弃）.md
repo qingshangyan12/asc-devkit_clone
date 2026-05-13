@@ -77,7 +77,7 @@ __aicore__ inline int32_t SetCcTiling(__gm__ void *ccOpTilingData)
 </td>
 <td class="cellrowborder" valign="top" width="19.801980198019802%" headers="mcps1.2.4.1.2 "><p id="p1615434911249"><a name="p1615434911249"></a><a name="p1615434911249"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="64.2164216421642%" headers="mcps1.2.4.1.3 "><p id="p11154194915243"><a name="p11154194915243"></a><a name="p11154194915243"></a>通信算法的<a href="TilingData结构体.md#table678914014562">Mc2CcTiling</a>参数的地址。Mc2CcTiling在Host侧计算得出，具体请参考<a href="TilingData结构体.md#table678914014562">表2 Mc2CcTiling参数说明</a>，由框架传递到Kernel函数中使用。</p>
+<td class="cellrowborder" valign="top" width="64.2164216421642%" headers="mcps1.2.4.1.3 "><p id="p11154194915243"><a name="p11154194915243"></a><a name="p11154194915243"></a>通信算法的<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table678914014562">Mc2CcTiling</a>参数的地址。Mc2CcTiling在Host侧计算得出，具体请参考<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table678914014562">表2 Mc2CcTiling参数说明</a>，由框架传递到Kernel函数中使用。</p>
 </td>
 </tr>
 </tbody>

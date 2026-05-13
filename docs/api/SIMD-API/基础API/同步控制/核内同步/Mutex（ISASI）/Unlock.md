@@ -72,7 +72,7 @@ static __aicore__ inline void Unlock(MutexID id)
 <tbody><tr id="row865704865817"><td class="cellrowborder" valign="top" width="18.29%" headers="mcps1.2.3.1.1 "><p id="p8657048165815"><a name="p8657048165815"></a><a name="p8657048165815"></a>pipe</p>
 </td>
 <td class="cellrowborder" valign="top" width="81.71000000000001%" headers="mcps1.2.3.1.2 "><p id="p1465784819589"><a name="p1465784819589"></a><a name="p1465784819589"></a>模板参数，表示流水类别。</p>
-<p id="p66571048135814"><a name="p66571048135814"></a><a name="p66571048135814"></a>支持的流水参考<a href="同步控制简介.md#section1272612276459">硬件流水类型</a>。</p>
+<p id="p66571048135814"><a name="p66571048135814"></a><a name="p66571048135814"></a>支持的流水参考<a href="../同步控制简介.md#section1272612276459">硬件流水类型</a>。</p>
 </td>
 </tr>
 </tbody>
@@ -94,7 +94,7 @@ static __aicore__ inline void Unlock(MutexID id)
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p63110229572"><a name="p63110229572"></a><a name="p63110229572"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p9311822145713"><a name="p9311822145713"></a><a name="p9311822145713"></a>进行流水同步管理的MutexID。</p>
-<p id="p195452267225"><a name="p195452267225"></a><a name="p195452267225"></a>该id可通过用户自定义（范围为0-27）或者通过<a href="AllocMutexID-(ISASI).md">AllocMutexID/ReleaseMutexID</a>进行申请释放。</p>
+<p id="p195452267225"><a name="p195452267225"></a><a name="p195452267225"></a>该id可通过用户自定义（范围为0-27）或者通过<a href="../AllocMutexID-(ISASI).md">AllocMutexID/ReleaseMutexID</a>进行申请释放。</p>
 </td>
 </tr>
 </tbody>

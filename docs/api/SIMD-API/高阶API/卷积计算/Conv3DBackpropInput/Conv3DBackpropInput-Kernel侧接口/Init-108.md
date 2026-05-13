@@ -74,8 +74,8 @@ __aicore__ inline void Init(const TConv3DBackpropInputTiling *__restrict tiling)
 </td>
 <td class="cellrowborder" valign="top" width="11.799999999999999%" headers="mcps1.2.4.1.2 "><p id="p33487148556"><a name="p33487148556"></a><a name="p33487148556"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p13481914175514"><a name="p13481914175514"></a><a name="p13481914175514"></a>Conv3DBackpropInput对象的Tiling参数，TConv3DBackpropInputTiling结构体的定义请参见<a href="TConv3DBackpropInputTiling结构体.md">TConv3DBackpropInputTiling结构体</a>。</p>
-<p id="p246271553317"><a name="p246271553317"></a><a name="p246271553317"></a>Tiling参数可以通过Host侧<a href="GetTiling-114.md">GetTiling</a>接口获取，并传递到Kernel侧使用。</p>
+<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p13481914175514"><a name="p13481914175514"></a><a name="p13481914175514"></a>Conv3DBackpropInput对象的Tiling参数，TConv3DBackpropInputTiling结构体的定义请参见<a href="../Conv3DBackpropInput-Tiling侧接口/TConv3DBackpropInputTiling结构体.md">TConv3DBackpropInputTiling结构体</a>。</p>
+<p id="p246271553317"><a name="p246271553317"></a><a name="p246271553317"></a>Tiling参数可以通过Host侧<a href="../Conv3DBackpropInput-Tiling侧接口/GetTiling-114.md">GetTiling</a>接口获取，并传递到Kernel侧使用。</p>
 </td>
 </tr>
 </tbody>

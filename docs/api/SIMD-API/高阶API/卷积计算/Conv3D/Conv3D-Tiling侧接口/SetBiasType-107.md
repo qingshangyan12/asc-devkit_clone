@@ -25,7 +25,7 @@ void SetBiasType(const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFo
 </td>
 <td class="cellrowborder" valign="top" width="17.29%" headers="mcps1.1.4.1.2 "><p id="p431219363330"><a name="p431219363330"></a><a name="p431219363330"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="58.46%" headers="mcps1.1.4.1.3 "><p id="p83129369332"><a name="p83129369332"></a><a name="p83129369332"></a><span>Bias在内存上的</span><a href="通用说明和约束.md#table07372185712">位置</a><span>。</span>当前仅支持TPosition::GM。</p>
+<td class="cellrowborder" valign="top" width="58.46%" headers="mcps1.1.4.1.3 "><p id="p83129369332"><a name="p83129369332"></a><a name="p83129369332"></a><span>Bias在内存上的</span><a href="../../../../通用说明和约束.md#table07372185712">位置</a><span>。</span>当前仅支持TPosition::GM。</p>
 </td>
 </tr>
 <tr id="row15312133610337"><td class="cellrowborder" valign="top" width="24.25%" headers="mcps1.1.4.1.1 "><p id="p931233612337"><a name="p931233612337"></a><a name="p931233612337"></a><span>format</span></p>

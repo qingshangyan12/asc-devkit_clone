@@ -58,7 +58,7 @@ OpAICoreConfig(const char *soc)
 </tr>
 <tr id="row2060161415717"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.1.4.1.1 "><p id="p26019142078"><a name="p26019142078"></a><a name="p26019142078"></a><a href="DynamicFormatFlag.md">DynamicFormatFlag</a></p>
 </td>
-<td class="cellrowborder" valign="top" width="60.589999999999996%" headers="mcps1.1.4.1.2 "><p id="p145734149339"><a name="p145734149339"></a><a name="p145734149339"></a>标识是否根据<a href="SetOpSelectFormat.md">SetOpSelectFormat</a>设置的函数自动推导算子输入输出支持的dtype和format。</p>
+<td class="cellrowborder" valign="top" width="60.589999999999996%" headers="mcps1.1.4.1.2 "><p id="p145734149339"><a name="p145734149339"></a><a name="p145734149339"></a>标识是否根据<a href="../OpAICoreDef/SetOpSelectFormat.md">SetOpSelectFormat</a>设置的函数自动推导算子输入输出支持的dtype和format。</p>
 </td>
 <td class="cellrowborder" valign="top" width="21.32%" headers="mcps1.1.4.1.3 "><p id="p56015149714"><a name="p56015149714"></a><a name="p56015149714"></a>true</p>
 </td>

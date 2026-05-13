@@ -85,7 +85,7 @@ Ascend 950PR/Ascend 950DT，支持的数据类型为：half/bfloat16\_t/float。
 <td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="p1612015191181"><a name="p1612015191181"></a><a name="p1612015191181"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p712041910183"><a name="p712041910183"></a><a name="p712041910183"></a>目的操作数。</p>
-<p id="p5120319161813"><a name="p5120319161813"></a><a name="p5120319161813"></a><span id="ph612019197187"><a name="ph612019197187"></a><a name="ph612019197187"></a><span id="ph161201319191819"><a name="ph161201319191819"></a><a name="ph161201319191819"></a><span id="ph6120141911189"><a name="ph6120141911189"></a><a name="ph6120141911189"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p5120319161813"><a name="p5120319161813"></a><a name="p5120319161813"></a><span id="ph612019197187"><a name="ph612019197187"></a><a name="ph612019197187"></a><span id="ph161201319191819"><a name="ph161201319191819"></a><a name="ph161201319191819"></a><span id="ph6120141911189"><a name="ph6120141911189"></a><a name="ph6120141911189"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p1412011917189"><a name="p1412011917189"></a><a name="p1412011917189"></a><span id="ph71204195183"><a name="ph71204195183"></a><a name="ph71204195183"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>

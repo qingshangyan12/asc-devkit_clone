@@ -60,15 +60,15 @@
 </td>
 <td class="cellrowborder" valign="top" width="12.02%" headers="mcps1.2.4.1.2 "><p id="p893343112595"><a name="p893343112595"></a><a name="p893343112595"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p340161012618"><a name="p340161012618"></a><a name="p340161012618"></a>传入硬件平台的信息，PlatformAscendC定义请参见<a href="构造及析构函数.md">构造及析构函数</a>。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p340161012618"><a name="p340161012618"></a><a name="p340161012618"></a>传入硬件平台的信息，PlatformAscendC定义请参见<a href="../../../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md">构造及析构函数</a>。</p>
 </td>
 </tr>
 <tr id="row091441113482"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.4.1.1 "><p id="p991531119484"><a name="p991531119484"></a><a name="p991531119484"></a>platform</p>
 </td>
 <td class="cellrowborder" valign="top" width="12.02%" headers="mcps1.2.4.1.2 "><p id="p1291571113485"><a name="p1291571113485"></a><a name="p1291571113485"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p1391514115488"><a name="p1391514115488"></a><a name="p1391514115488"></a>传入硬件版本以及AI Core中各个硬件单元提供的内存大小。PlatformInfo构造时通过<a href="构造及析构函数.md">构造及析构函数</a>获取。</p>
-<p id="p581544910287"><a name="p581544910287"></a><a name="p581544910287"></a>PlatformInfo结构定义如下，socVersion通过<a href="GetSocVersion.md">GetSocVersion</a>获取并透传，各类硬件存储空间大小通过<a href="GetCoreMemSize.md">GetCoreMemSize</a>获取并透传。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p1391514115488"><a name="p1391514115488"></a><a name="p1391514115488"></a>传入硬件版本以及AI Core中各个硬件单元提供的内存大小。PlatformInfo构造时通过<a href="../../../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md">构造及析构函数</a>获取。</p>
+<p id="p581544910287"><a name="p581544910287"></a><a name="p581544910287"></a>PlatformInfo结构定义如下，socVersion通过<a href="../../../../../Utils-API/平台信息获取/PlatformAscendC/GetSocVersion.md">GetSocVersion</a>获取并透传，各类硬件存储空间大小通过<a href="../../../../../Utils-API/平台信息获取/PlatformAscendC/GetCoreMemSize.md">GetCoreMemSize</a>获取并透传。</p>
 <a name="screen99307017314"></a><a name="screen99307017314"></a><pre class="screen" codetype="Cpp" id="screen99307017314">struct PlatformInfo {
     platform_ascendc::SocVersion socVersion;
     uint64_t l1Size = 0;

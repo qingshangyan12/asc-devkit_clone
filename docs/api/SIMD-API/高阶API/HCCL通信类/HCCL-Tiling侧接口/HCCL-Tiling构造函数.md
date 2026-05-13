@@ -52,14 +52,14 @@ Mc2CcTilingConfig(const std::string &groupName, uint32_t opType, const std::stri
 </td>
 <td class="cellrowborder" valign="top" width="12.04%" headers="mcps1.2.4.1.2 "><p id="p1592143615116"><a name="p1592143615116"></a><a name="p1592143615116"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p69241958121317"><a name="p69241958121317"></a><a name="p69241958121317"></a>归约操作类型，仅对有归约操作的通信任务生效。uint32_t类型，取值详见<a href="HCCL使用说明.md#table2469980529">表2</a>。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p69241958121317"><a name="p69241958121317"></a><a name="p69241958121317"></a>归约操作类型，仅对有归约操作的通信任务生效。uint32_t类型，取值详见<a href="../HCCL-Kernel侧接口/HCCL使用说明.md#table2469980529">表2</a>。</p>
 </td>
 </tr>
 <tr id="row11811506587"><td class="cellrowborder" valign="top" width="14.97%" headers="mcps1.2.4.1.1 "><p id="p218115011581"><a name="p218115011581"></a><a name="p218115011581"></a>dstDataType</p>
 </td>
 <td class="cellrowborder" valign="top" width="12.04%" headers="mcps1.2.4.1.2 "><p id="p1618119502580"><a name="p1618119502580"></a><a name="p1618119502580"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p362492520517"><a name="p362492520517"></a><a name="p362492520517"></a>通信任务中输出数据的数据类型。uint8_t类型，该参数的取值范围请参考<a href="HCCL使用说明.md#table116710585514">表1</a>。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p362492520517"><a name="p362492520517"></a><a name="p362492520517"></a>通信任务中输出数据的数据类型。uint8_t类型，该参数的取值范围请参考<a href="../HCCL-Kernel侧接口/HCCL使用说明.md#table116710585514">表1</a>。</p>
 <p id="p645895003920"><a name="p645895003920"></a><a name="p645895003920"></a><span id="ph15985184838"><a name="ph15985184838"></a><a name="ph15985184838"></a>Ascend 950PR/Ascend 950DT</span>，不同通信任务支持的输出数据类型不同，具体为：</p>
 <a name="ul182971329105817"></a><a name="ul182971329105817"></a><ul id="ul182971329105817"><li>对于AllReduce、AllGather、AllToAll、AllToAllV、AllToAllVWrite通信任务：输出的数据类型必须与输入的数据类型一致。各通信任务支持的输入数据类型请参考<a href="#p562895445811">srcDataType</a>。</li><li>对于ReduceScatter通信任务，当输入的数据类型为int16_t、int32_t、half、float、bfloat16_t时，输出的数据类型必须与其一致；当输入的数据类型为int8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t时，输出的数据类型必须为half、bfloat16_t、float三者之一。</li></ul>
 <p id="p09613381216"><a name="p09613381216"></a><a name="p09613381216"></a><span id="ph496033141210"><a name="ph496033141210"></a><a name="ph496033141210"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_1"><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a>Atlas A3 推理系列产品</term></span>，该参数暂不支持，配置后不生效。</p>
@@ -70,7 +70,7 @@ Mc2CcTilingConfig(const std::string &groupName, uint32_t opType, const std::stri
 </td>
 <td class="cellrowborder" valign="top" width="12.04%" headers="mcps1.2.4.1.2 "><p id="p176282054115812"><a name="p176282054115812"></a><a name="p176282054115812"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p1461191113"><a name="p1461191113"></a><a name="p1461191113"></a>通信任务中输入数据的数据类型。uint8_t类型，该参数的取值范围请参考<a href="HCCL使用说明.md#table116710585514">表1</a>。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p1461191113"><a name="p1461191113"></a><a name="p1461191113"></a>通信任务中输入数据的数据类型。uint8_t类型，该参数的取值范围请参考<a href="../HCCL-Kernel侧接口/HCCL使用说明.md#table116710585514">表1</a>。</p>
 <p id="p14631313113"><a name="p14631313113"></a><a name="p14631313113"></a><span id="ph20611191313"><a name="ph20611191313"></a><a name="ph20611191313"></a>Ascend 950PR/Ascend 950DT</span>，不同通信任务支持的输入数据类型如下：</p>
 <a name="ul57135435587"></a><a name="ul57135435587"></a><ul id="ul57135435587"><li>AllReduce通信任务：支持的输入类型为int16_t、half、bfloat16_t、int32_t、float。</li><li>AllGather、AllToAll、AllToAllV、AllToAllVWrite通信任务：支持的输入类型为int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、double。</li><li>ReduceScatter通信任务：支持的输入类型为int8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、half、bfloat16_t、int32_t、float。</li></ul>
 <p id="p3427132311211"><a name="p3427132311211"></a><a name="p3427132311211"></a><span id="ph174278236122"><a name="ph174278236122"></a><a name="ph174278236122"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_2"><a name="zh-cn_topic_0000001312391781_term131434243115_2"></a><a name="zh-cn_topic_0000001312391781_term131434243115_2"></a>Atlas A3 推理系列产品</term></span>，该参数暂不支持，配置后不生效。</p>

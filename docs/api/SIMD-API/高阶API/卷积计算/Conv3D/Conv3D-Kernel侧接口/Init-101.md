@@ -72,8 +72,8 @@ __aicore__ inline void Init(const void* __restrict cubeTiling)
 </td>
 <td class="cellrowborder" valign="top" width="19.39%" headers="mcps1.1.4.1.2 "><p id="p112644172389"><a name="p112644172389"></a><a name="p112644172389"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="59.18%" headers="mcps1.1.4.1.3 "><p id="p88648241418"><a name="p88648241418"></a><a name="p88648241418"></a>Conv3D对象的Tiling参数，Tiling结构体定义请参见<a href="TConv3DApiTiling结构体.md">TConv3DApiTiling结构体</a>。</p>
-<p id="p5264151723816"><a name="p5264151723816"></a><a name="p5264151723816"></a>Tiling参数可以通过Host侧<a href="GetTiling-105.md">GetTiling</a>接口获取，并传递到Kernel侧使用。</p>
+<td class="cellrowborder" valign="top" width="59.18%" headers="mcps1.1.4.1.3 "><p id="p88648241418"><a name="p88648241418"></a><a name="p88648241418"></a>Conv3D对象的Tiling参数，Tiling结构体定义请参见<a href="../Conv3D-Tiling侧接口/TConv3DApiTiling结构体.md">TConv3DApiTiling结构体</a>。</p>
+<p id="p5264151723816"><a name="p5264151723816"></a><a name="p5264151723816"></a>Tiling参数可以通过Host侧<a href="../Conv3D-Tiling侧接口/GetTiling-105.md">GetTiling</a>接口获取，并传递到Kernel侧使用。</p>
 </td>
 </tr>
 </tbody>

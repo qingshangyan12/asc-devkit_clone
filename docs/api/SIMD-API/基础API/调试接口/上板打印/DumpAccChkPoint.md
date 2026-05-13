@@ -135,7 +135,7 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 </td>
 <td class="cellrowborder" valign="top" width="11.940000000000001%" headers="mcps1.2.4.1.2 "><p id="p1091852195615"><a name="p1091852195615"></a><a name="p1091852195615"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p280391985610"><a name="p280391985610"></a><a name="p280391985610"></a>偏移元素个数。偏移后的Tensor地址需要满足所在物理位置的对齐约束，具体参考<a href="通用说明和约束.md">通用说明和约束</a>。</p>
+<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p280391985610"><a name="p280391985610"></a><a name="p280391985610"></a>偏移元素个数。偏移后的Tensor地址需要满足所在物理位置的对齐约束，具体参考<a href="../../../通用说明和约束.md">通用说明和约束</a>。</p>
 </td>
 </tr>
 <tr id="row0376640163215"><td class="cellrowborder" valign="top" width="16.48%" headers="mcps1.2.4.1.1 "><p id="p437715407324"><a name="p437715407324"></a><a name="p437715407324"></a>dumpSize</p>

@@ -242,7 +242,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="10.059999999999999%" headers="mcps1.2.4.1.2 "><p id="p1265944005915"><a name="p1265944005915"></a><a name="p1265944005915"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1656164065914"><a name="p1656164065914"></a><a name="p1656164065914"></a>从VECIN/VECOUT-&gt;TSCM进行数据搬运时，可以进行ND到NZ的数据格式转换。nd2nzParams是用于控制数据格式转换的参数，Nd2NzParams类型，具体参数请参考<a href="随路转换ND2NZ搬运.md#table844881954715">表3</a>。</p>
+<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1656164065914"><a name="p1656164065914"></a><a name="p1656164065914"></a>从VECIN/VECOUT-&gt;TSCM进行数据搬运时，可以进行ND到NZ的数据格式转换。nd2nzParams是用于控制数据格式转换的参数，Nd2NzParams类型，具体参数请参考<a href="DataCopy/随路转换ND2NZ搬运.md#table844881954715">表3</a>。</p>
 <p id="p199142613277"><a name="p199142613277"></a><a name="p199142613277"></a><strong id="b15326524194316"><a name="b15326524194316"></a><a name="b15326524194316"></a>注意：Nd2NzParams的ndNum仅支持设置为1</strong>。</p>
 </td>
 </tr>

@@ -116,8 +116,8 @@ Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling�
 </td>
 <td class="cellrowborder" valign="top" width="11.799999999999999%" headers="mcps1.2.4.1.2 "><p id="p33487148556"><a name="p33487148556"></a><a name="p33487148556"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p13481914175514"><a name="p13481914175514"></a><a name="p13481914175514"></a>Matmul Tiling参数，TCubeTiling结构体定义请参见<a href="TCubeTiling结构体.md#table1563162142915">表1 TCubeTiling结构说明</a>。</p>
-<p id="p246271553317"><a name="p246271553317"></a><a name="p246271553317"></a>Tiling参数可以通过host侧<a href="GetTiling.md">GetTiling</a>接口获取，并传递到kernel侧使用。在kernel侧调用<a href="GET_TILING_DATA.md">GET_TILING_DATA</a>实现将Tiling参数搬运到AI Core内的栈空间中，本接口传入Tiling参数中TCubeTiling结构体的栈地址。</p>
+<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p13481914175514"><a name="p13481914175514"></a><a name="p13481914175514"></a>Matmul Tiling参数，TCubeTiling结构体定义请参见<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#table1563162142915">表1 TCubeTiling结构说明</a>。</p>
+<p id="p246271553317"><a name="p246271553317"></a><a name="p246271553317"></a>Tiling参数可以通过host侧<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/GetTiling.md">GetTiling</a>接口获取，并传递到kernel侧使用。在kernel侧调用<a href="../../../基础API/Kernel-Tiling/GET_TILING_DATA.md">GET_TILING_DATA</a>实现将Tiling参数搬运到AI Core内的栈空间中，本接口传入Tiling参数中TCubeTiling结构体的栈地址。</p>
 </td>
 </tr>
 <tr id="row1282014916166"><td class="cellrowborder" valign="top" width="17.77%" headers="mcps1.2.4.1.1 "><p id="p14807165981614"><a name="p14807165981614"></a><a name="p14807165981614"></a>tpipe</p>
@@ -145,8 +145,8 @@ Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling�
 </td>
 <td class="cellrowborder" valign="top" width="11.799999999999999%" headers="mcps1.2.4.1.2 "><p id="p336920583592"><a name="p336920583592"></a><a name="p336920583592"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p12369358125920"><a name="p12369358125920"></a><a name="p12369358125920"></a>Matmul Tiling参数，该参数指向gm上的一块内存地址，其中的数据类型是TCubeTiling结构体，TCubeTiling结构体定义请参见<a href="TCubeTiling结构体.md#table1563162142915">表1 TCubeTiling结构说明</a>。</p>
-<p id="p1012232793914"><a name="p1012232793914"></a><a name="p1012232793914"></a>Tiling参数可以通过host侧<a href="GetTiling.md">GetTiling</a>接口获取，并传递到kernel侧使用。在kernel侧调用<a href="GET_TILING_DATA_PTR_WITH_STRUCT.md">GET_TILING_DATA_PTR_WITH_STRUCT</a>获取gm上Tiling参数的指针，本接口传入Tiling参数中TCubeTiling结构体的GM地址。</p>
+<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p12369358125920"><a name="p12369358125920"></a><a name="p12369358125920"></a>Matmul Tiling参数，该参数指向gm上的一块内存地址，其中的数据类型是TCubeTiling结构体，TCubeTiling结构体定义请参见<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#table1563162142915">表1 TCubeTiling结构说明</a>。</p>
+<p id="p1012232793914"><a name="p1012232793914"></a><a name="p1012232793914"></a>Tiling参数可以通过host侧<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/GetTiling.md">GetTiling</a>接口获取，并传递到kernel侧使用。在kernel侧调用<a href="../../../基础API/Kernel-Tiling/GET_TILING_DATA_PTR_WITH_STRUCT.md">GET_TILING_DATA_PTR_WITH_STRUCT</a>获取gm上Tiling参数的指针，本接口传入Tiling参数中TCubeTiling结构体的GM地址。</p>
 </td>
 </tr>
 <tr id="row1636955817596"><td class="cellrowborder" valign="top" width="17.77%" headers="mcps1.2.4.1.1 "><p id="p183703589598"><a name="p183703589598"></a><a name="p183703589598"></a>tpipe</p>

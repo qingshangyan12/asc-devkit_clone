@@ -41,8 +41,8 @@ REGIST_MATMUL_OBJ(tpipe, workspace, ...)
 </td>
 <td class="cellrowborder" valign="top" width="12.02%" headers="mcps1.2.4.1.2 "><p id="p53822282215"><a name="p53822282215"></a><a name="p53822282215"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p438182211226"><a name="p438182211226"></a><a name="p438182211226"></a>可变参数，传入Matmul对象和与之对应的Tiling结构，要求Tiling结构的数据类型为<a href="TCubeTiling结构体.md#table1563162142915">TCubeTiling结构</a>。</p>
-<p id="p124601322113216"><a name="p124601322113216"></a><a name="p124601322113216"></a>Tiling参数可以通过Host侧<a href="GetTiling.md">GetTiling</a>接口获取，并传递到kernel侧使用。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p438182211226"><a name="p438182211226"></a><a name="p438182211226"></a>可变参数，传入Matmul对象和与之对应的Tiling结构，要求Tiling结构的数据类型为<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#table1563162142915">TCubeTiling结构</a>。</p>
+<p id="p124601322113216"><a name="p124601322113216"></a><a name="p124601322113216"></a>Tiling参数可以通过Host侧<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/GetTiling.md">GetTiling</a>接口获取，并传递到kernel侧使用。</p>
 </td>
 </tr>
 </tbody>

@@ -72,7 +72,7 @@ __aicore__ inline TensorTrait(const LayoutType& t = {})
 </td>
 <td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.1.4.1.2 "><p id="p1641874129"><a name="p1641874129"></a><a name="p1641874129"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="p14181041623"><a name="p14181041623"></a><a name="p14181041623"></a>输入的<a href="Layout.md">Layout</a>对象。输入的数据类型LayoutType，需满足<a href="Layout构造函数.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section19165124931511">约束说明</a>。</p>
+<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="p14181041623"><a name="p14181041623"></a><a name="p14181041623"></a>输入的<a href="../Layout/Layout.md">Layout</a>对象。输入的数据类型LayoutType，需满足<a href="../Layout/Layout构造函数.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section19165124931511">约束说明</a>。</p>
 </td>
 </tr>
 </tbody>

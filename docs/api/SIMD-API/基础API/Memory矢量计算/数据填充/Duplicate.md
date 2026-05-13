@@ -122,7 +122,7 @@
 <tr id="zh-cn_topic_0000001429830437_row18835145716587"><td class="cellrowborder" valign="top" width="16.36%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000001429830437_p1383515717581"><a name="zh-cn_topic_0000001429830437_p1383515717581"></a><a name="zh-cn_topic_0000001429830437_p1383515717581"></a>isSetMask</p>
 </td>
 <td class="cellrowborder" valign="top" width="83.64%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000001429830437_p77520541653"><a name="zh-cn_topic_0000001429830437_p77520541653"></a><a name="zh-cn_topic_0000001429830437_p77520541653"></a>是否在接口内部设置mask。</p>
-<a name="zh-cn_topic_0000001429830437_ul1163765616511"></a><a name="zh-cn_topic_0000001429830437_ul1163765616511"></a><ul id="zh-cn_topic_0000001429830437_ul1163765616511"><li>true，表示在接口内部设置mask。</li><li>false，表示在接口外部设置mask，开发者需要使用<a href="SetVectorMask.md">SetVectorMask</a>接口设置mask值。这种模式下，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义。</li></ul>
+<a name="zh-cn_topic_0000001429830437_ul1163765616511"></a><a name="zh-cn_topic_0000001429830437_ul1163765616511"></a><ul id="zh-cn_topic_0000001429830437_ul1163765616511"><li>true，表示在接口内部设置mask。</li><li>false，表示在接口外部设置mask，开发者需要使用<a href="../掩码操作/SetVectorMask.md">SetVectorMask</a>接口设置mask值。这种模式下，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义。</li></ul>
 </td>
 </tr>
 </tbody>
@@ -144,7 +144,7 @@
 <td class="cellrowborder" valign="top" width="14.471447144714473%" headers="mcps1.2.4.1.2 "><p id="p736835513915"><a name="p736835513915"></a><a name="p736835513915"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="69.14691469146915%" headers="mcps1.2.4.1.3 "><p id="p18777396499"><a name="p18777396499"></a><a name="p18777396499"></a>目的操作数。</p>
-<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p632555516496"><a name="p632555516496"></a><a name="p632555516496"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -159,7 +159,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="14.471447144714473%" headers="mcps1.2.4.1.2 "><p id="p783585415117"><a name="p783585415117"></a><a name="p783585415117"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.14691469146915%" headers="mcps1.2.4.1.3 "><p id="p17711183217"><a name="p17711183217"></a><a name="p17711183217"></a><span id="ph197123532916"><a name="ph197123532916"></a><a name="ph197123532916"></a><span id="ph199714359297"><a name="ph199714359297"></a><a name="ph199714359297"></a><span id="ph1697183512918"><a name="ph1697183512918"></a><a name="ph1697183512918"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<td class="cellrowborder" valign="top" width="69.14691469146915%" headers="mcps1.2.4.1.3 "><p id="p17711183217"><a name="p17711183217"></a><a name="p17711183217"></a><span id="ph197123532916"><a name="ph197123532916"></a><a name="ph197123532916"></a><span id="ph199714359297"><a name="ph199714359297"></a><a name="ph199714359297"></a><span id="ph1697183512918"><a name="ph1697183512918"></a><a name="ph1697183512918"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p1883513541411"><a name="p1883513541411"></a><a name="p1883513541411"></a>数据类型需与dst中元素的数据类型保持一致。</p>
 <p id="p184156281022"><a name="p184156281022"></a><a name="p184156281022"></a>当传入该参数时，会将src[0]复制多次并填充到向量中。</p>
 </td>

@@ -30,7 +30,7 @@ void GetSinCosMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlat
 </td>
 <td class="cellrowborder" valign="top" width="7.5200000000000005%" headers="mcps1.2.4.1.2 "><p id="p1791461032817"><a name="p1791461032817"></a><a name="p1791461032817"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.59%" headers="mcps1.2.4.1.3 "><p id="p189141210192817"><a name="p189141210192817"></a><a name="p189141210192817"></a>输入的平台信息。PlatformAscendC的定义请参见<a href="构造及析构函数.md">构造及析构函数</a>。</p>
+<td class="cellrowborder" valign="top" width="75.59%" headers="mcps1.2.4.1.3 "><p id="p189141210192817"><a name="p189141210192817"></a><a name="p189141210192817"></a>输入的平台信息。PlatformAscendC的定义请参见<a href="../../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md">构造及析构函数</a>。</p>
 </td>
 </tr>
 <tr id="row12299165018421"><td class="cellrowborder" valign="top" width="16.89%" headers="mcps1.2.4.1.1 "><p id="p189045212538"><a name="p189045212538"></a><a name="p189045212538"></a>srcShape</p>

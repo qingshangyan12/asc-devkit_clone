@@ -35,7 +35,7 @@ void UnPadTilingFunc(const ge::Shape srcShape, const uint32_t stackBufferSize, c
 </td>
 <td class="cellrowborder" valign="top" width="17.37%" headers="mcps1.2.4.1.2 "><p id="p252994216110"><a name="p252994216110"></a><a name="p252994216110"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="61.59%" headers="mcps1.2.4.1.3 "><p id="p189911313152618"><a name="p189911313152618"></a><a name="p189911313152618"></a>传入硬件平台的信息，PlatformAscendC定义请参见<a href="构造及析构函数.md">构造及析构函数</a>。</p>
+<td class="cellrowborder" valign="top" width="61.59%" headers="mcps1.2.4.1.3 "><p id="p189911313152618"><a name="p189911313152618"></a><a name="p189911313152618"></a>传入硬件平台的信息，PlatformAscendC定义请参见<a href="../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md">构造及析构函数</a>。</p>
 </td>
 </tr>
 <tr id="row42461942101815"><td class="cellrowborder" valign="top" width="21.04%" headers="mcps1.2.4.1.1 "><p id="p1655512222575"><a name="p1655512222575"></a><a name="p1655512222575"></a>srcShape</p>

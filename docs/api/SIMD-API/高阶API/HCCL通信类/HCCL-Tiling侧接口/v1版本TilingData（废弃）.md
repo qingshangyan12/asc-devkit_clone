@@ -23,7 +23,7 @@ AI CPU启动下发通信任务前，需获取固定的通信配置[Mc2Msg](#tabl
 <tbody><tr id="row1835857145817"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p122027792718"><a name="p122027792718"></a><a name="p122027792718"></a>preparePosition</p>
 </td>
 <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p386253782517"><a name="p386253782517"></a><a name="p386253782517"></a>设置服务端组装任务的方式，用户需要在Tiling中显式赋值，uint32_t类型，当前支持的取值如下：</p>
-<p id="p1919419451692"><a name="p1919419451692"></a><a name="p1919419451692"></a>1：AI CPU与AI Core通过通信任务机制实现消息传递和任务下发；由AI Core侧通过消息通知时设置为1，即算子中使用<a href="HCCL-Kernel侧接口.md">HCCL</a>时设置为1。</p>
+<p id="p1919419451692"><a name="p1919419451692"></a><a name="p1919419451692"></a>1：AI CPU与AI Core通过通信任务机制实现消息传递和任务下发；由AI Core侧通过消息通知时设置为1，即算子中使用<a href="../HCCL-Kernel侧接口/HCCL-Kernel侧接口.md">HCCL</a>时设置为1。</p>
 </td>
 </tr>
 <tr id="row18835145716587"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a>sendOff</p>

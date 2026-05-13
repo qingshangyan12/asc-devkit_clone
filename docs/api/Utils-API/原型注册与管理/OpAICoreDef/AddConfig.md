@@ -33,7 +33,7 @@ void AddConfig(const char *soc, OpAICoreConfig &aicore_config)
 </td>
 <td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.1.4.1.2 "><p id="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_p320343694214"><a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_p320343694214"></a><a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_p320343694214"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="zh-cn_topic_0000001575929572_p1087563416157"><a name="zh-cn_topic_0000001575929572_p1087563416157"></a><a name="zh-cn_topic_0000001575929572_p1087563416157"></a>AI Core配置信息请参考<a href="OpAICoreConfig.md">OpAICoreConfig</a>定义。</p>
+<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="zh-cn_topic_0000001575929572_p1087563416157"><a name="zh-cn_topic_0000001575929572_p1087563416157"></a><a name="zh-cn_topic_0000001575929572_p1087563416157"></a>AI Core配置信息请参考<a href="../OpAICoreConfig/OpAICoreConfig.md">OpAICoreConfig</a>定义。</p>
 </td>
 </tr>
 </tbody>
@@ -58,42 +58,42 @@ void AddConfig(const char *soc, OpAICoreConfig &aicore_config)
 </th>
 </tr>
 </thead>
-<tbody><tr id="row460191414720"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p136012142712"><a name="p136012142712"></a><a name="p136012142712"></a><a href="DynamicCompileStaticFlag.md">DynamicCompileStaticFlag</a></p>
+<tbody><tr id="row460191414720"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p136012142712"><a name="p136012142712"></a><a name="p136012142712"></a><a href="../OpAICoreConfig/DynamicCompileStaticFlag.md">DynamicCompileStaticFlag</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="60.589999999999996%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001575931912_p183604264191"><a name="zh-cn_topic_0000001575931912_p183604264191"></a><a name="zh-cn_topic_0000001575931912_p183604264191"></a>用于标识该算子实现是否支持入图时的静态Shape编译。</p>
 </td>
 <td class="cellrowborder" valign="top" width="21.32%" headers="mcps1.2.4.1.3 "><p id="p15601114777"><a name="p15601114777"></a><a name="p15601114777"></a>true</p>
 </td>
 </tr>
-<tr id="row2060161415717"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p26019142078"><a name="p26019142078"></a><a name="p26019142078"></a><a href="DynamicFormatFlag.md">DynamicFormatFlag</a></p>
+<tr id="row2060161415717"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p26019142078"><a name="p26019142078"></a><a name="p26019142078"></a><a href="../OpAICoreConfig/DynamicFormatFlag.md">DynamicFormatFlag</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="60.589999999999996%" headers="mcps1.2.4.1.2 "><p id="p145734149339"><a name="p145734149339"></a><a name="p145734149339"></a>标识是否根据<a href="SetOpSelectFormat.md">SetOpSelectFormat</a>设置的函数自动推导算子输入输出支持的dtype和format。</p>
 </td>
 <td class="cellrowborder" valign="top" width="21.32%" headers="mcps1.2.4.1.3 "><p id="p56015149714"><a name="p56015149714"></a><a name="p56015149714"></a>true</p>
 </td>
 </tr>
-<tr id="row9601014375"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p116011714075"><a name="p116011714075"></a><a name="p116011714075"></a><a href="DynamicRankSupportFlag.md">DynamicRankSupportFlag</a></p>
+<tr id="row9601014375"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p116011714075"><a name="p116011714075"></a><a name="p116011714075"></a><a href="../OpAICoreConfig/DynamicRankSupportFlag.md">DynamicRankSupportFlag</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="60.589999999999996%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001575612432_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_p10448657201310"><a name="zh-cn_topic_0000001575612432_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_p10448657201310"></a><a name="zh-cn_topic_0000001575612432_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_p10448657201310"></a>标识算子是否支持dynamicRanK（动态维度）。</p>
 </td>
 <td class="cellrowborder" valign="top" width="21.32%" headers="mcps1.2.4.1.3 "><p id="p66017146713"><a name="p66017146713"></a><a name="p66017146713"></a>true</p>
 </td>
 </tr>
-<tr id="row126011142077"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p2601101420710"><a name="p2601101420710"></a><a name="p2601101420710"></a><a href="DynamicShapeSupportFlag.md">DynamicShapeSupportFlag</a></p>
+<tr id="row126011142077"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p2601101420710"><a name="p2601101420710"></a><a name="p2601101420710"></a><a href="../OpAICoreConfig/DynamicShapeSupportFlag.md">DynamicShapeSupportFlag</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="60.589999999999996%" headers="mcps1.2.4.1.2 "><p id="p5890739574"><a name="p5890739574"></a><a name="p5890739574"></a>用于标识该算子是否支持入图时的动态Shape场景。</p>
 </td>
 <td class="cellrowborder" valign="top" width="21.32%" headers="mcps1.2.4.1.3 "><p id="p1160131416714"><a name="p1160131416714"></a><a name="p1160131416714"></a>true</p>
 </td>
 </tr>
-<tr id="row160116140712"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p16601914377"><a name="p16601914377"></a><a name="p16601914377"></a><a href="NeedCheckSupportFlag.md">NeedCheckSupportFlag</a></p>
+<tr id="row160116140712"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p16601914377"><a name="p16601914377"></a><a name="p16601914377"></a><a href="../OpAICoreConfig/NeedCheckSupportFlag.md">NeedCheckSupportFlag</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="60.589999999999996%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001626211657_p1114624162912"><a name="zh-cn_topic_0000001626211657_p1114624162912"></a><a name="zh-cn_topic_0000001626211657_p1114624162912"></a>标识是否在算子融合阶段调用算子参数校验函数进行data type与Shape的校验。</p>
 </td>
 <td class="cellrowborder" valign="top" width="21.32%" headers="mcps1.2.4.1.3 "><p id="p1360141410720"><a name="p1360141410720"></a><a name="p1360141410720"></a>false</p>
 </td>
 </tr>
-<tr id="row5601181415716"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p13601181417712"><a name="p13601181417712"></a><a name="p13601181417712"></a><a href="PrecisionReduceFlag.md">PrecisionReduceFlag</a></p>
+<tr id="row5601181415716"><td class="cellrowborder" valign="top" width="18.09%" headers="mcps1.2.4.1.1 "><p id="p13601181417712"><a name="p13601181417712"></a><a name="p13601181417712"></a><a href="../OpAICoreConfig/PrecisionReduceFlag.md">PrecisionReduceFlag</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="60.589999999999996%" headers="mcps1.2.4.1.2 "><p id="p957351413338"><a name="p957351413338"></a><a name="p957351413338"></a>此字段用于进行ATC模型转换或者进行网络调测时，控制算子的精度模式。</p>
 </td>

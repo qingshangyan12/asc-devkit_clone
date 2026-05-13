@@ -303,7 +303,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 </tr>
 <tr id="row972813351481"><td class="cellrowborder" valign="top" width="18.73%" headers="mcps1.2.3.1.1 "><p id="p207281035983"><a name="p207281035983"></a><a name="p207281035983"></a>fmatrixCtrl</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p1536115301231"><a name="p1536115301231"></a><a name="p1536115301231"></a>表示LoadData3DV2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与<a href="SetFmatrix.md">SetFmatrix</a>配合使用，当前只支持设置为false，默认值为false。</p>
+<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p1536115301231"><a name="p1536115301231"></a><a name="p1536115301231"></a>表示LoadData3DV2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与<a href="../SetFmatrix.md">SetFmatrix</a>配合使用，当前只支持设置为false，默认值为false。</p>
 <a name="ul10361163072314"></a><a name="ul10361163072314"></a><ul id="ul10361163072314"><li>true：从右矩阵中获取FeatureMap的属性描述；</li><li>false：从左矩阵中获取FeatureMap的属性描述。</li></ul>
 <p id="p43901629122614"><a name="p43901629122614"></a><a name="p43901629122614"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的fMatrixCtrl含义相同）</p>
 <p id="p0258155215115"><a name="p0258155215115"></a><a name="p0258155215115"></a>该参数是位域结构体的第十低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetFmatrixCtrl()函数设置其值，使用GetFmatrixCtrl()函数获取其值。</p>

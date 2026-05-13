@@ -57,14 +57,14 @@ int32_t SetDoubleBuffer(bool a, bool b, bool c, bool bias, bool transND2NZ = tru
 </td>
 <td class="cellrowborder" valign="top" width="12.02%" headers="mcps1.2.4.1.2 "><p id="p6312125595920"><a name="p6312125595920"></a><a name="p6312125595920"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p19312755155919"><a name="p19312755155919"></a><a name="p19312755155919"></a>设置是否需要<a href="随路转换ND2NZ搬运.md#fig128961542184620">ND2NZ</a>。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p19312755155919"><a name="p19312755155919"></a><a name="p19312755155919"></a>设置是否需要<a href="../../../../基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md#fig128961542184620">ND2NZ</a>。</p>
 </td>
 </tr>
 <tr id="row1745221511475"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.4.1.1 "><p id="p14312855105910"><a name="p14312855105910"></a><a name="p14312855105910"></a>transNZ2ND</p>
 </td>
 <td class="cellrowborder" valign="top" width="12.02%" headers="mcps1.2.4.1.2 "><p id="p63121655105913"><a name="p63121655105913"></a><a name="p63121655105913"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p9312155205911"><a name="p9312155205911"></a><a name="p9312155205911"></a>设置是否需要<a href="随路转换NZ2ND搬运.md#fig15851251122815">NZ2ND</a>。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p9312155205911"><a name="p9312155205911"></a><a name="p9312155205911"></a>设置是否需要<a href="../../../../基础API/Memory数据搬运/DataCopy/随路转换NZ2ND搬运.md#fig15851251122815">NZ2ND</a>。</p>
 </td>
 </tr>
 </tbody>

@@ -106,7 +106,7 @@ __simd_callee__ inline void Arange(S& dstReg, U scalarValue);
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>目的操作数。</p>
-<p id="p37015312238"><a name="p37015312238"></a><a name="p37015312238"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+<p id="p37015312238"><a name="p37015312238"></a><a name="p37015312238"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
 </td>
 </tr>
 <tr id="row2137145181815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p6844125874315"><a name="p6844125874315"></a><a name="p6844125874315"></a>scalarValue</p>

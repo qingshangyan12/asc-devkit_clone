@@ -25,7 +25,7 @@ void SetInputType(const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvF
 </td>
 <td class="cellrowborder" valign="top" width="17.29%" headers="mcps1.1.4.1.2 "><p id="p15371341173118"><a name="p15371341173118"></a><a name="p15371341173118"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="58.46%" headers="mcps1.1.4.1.3 "><p id="p125371441163113"><a name="p125371441163113"></a><a name="p125371441163113"></a><span>Input在内存上的</span><a href="通用说明和约束.md#table07372185712">位置</a>。当前仅支持TPosition::GM。</p>
+<td class="cellrowborder" valign="top" width="58.46%" headers="mcps1.1.4.1.3 "><p id="p125371441163113"><a name="p125371441163113"></a><a name="p125371441163113"></a><span>Input在内存上的</span><a href="../../../../通用说明和约束.md#table07372185712">位置</a>。当前仅支持TPosition::GM。</p>
 </td>
 </tr>
 <tr id="row10537641133113"><td class="cellrowborder" valign="top" width="24.25%" headers="mcps1.1.4.1.1 "><p id="p1953744113316"><a name="p1953744113316"></a><a name="p1953744113316"></a><span>format</span></p>

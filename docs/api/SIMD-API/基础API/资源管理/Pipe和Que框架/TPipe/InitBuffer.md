@@ -94,7 +94,7 @@
 </thead>
 <tbody><tr id="row14345472346"><td class="cellrowborder" valign="top" width="12.13%" headers="mcps1.2.3.1.1 "><p id="p149121233183416"><a name="p149121233183416"></a><a name="p149121233183416"></a>T</p>
 </td>
-<td class="cellrowborder" valign="top" width="87.87%" headers="mcps1.2.3.1.2 "><p id="p1034577203412"><a name="p1034577203412"></a><a name="p1034577203412"></a>队列的类型，支持取值<a href="TQue.md">TQue</a>、<a href="TQueBind.md">TQueBind</a>、<a href="TSCM.md">TSCM</a>。</p>
+<td class="cellrowborder" valign="top" width="87.87%" headers="mcps1.2.3.1.2 "><p id="p1034577203412"><a name="p1034577203412"></a><a name="p1034577203412"></a>队列的类型，支持取值<a href="../TQue/TQue.md">TQue</a>、<a href="../TQueBind/TQueBind.md">TQueBind</a>、<a href="../TSCM/TSCM.md">TSCM</a>。</p>
 </td>
 </tr>
 </tbody>
@@ -146,7 +146,7 @@
 </thead>
 <tbody><tr id="row20527115315514"><td class="cellrowborder" valign="top" width="12.13%" headers="mcps1.2.3.1.1 "><p id="p85273533517"><a name="p85273533517"></a><a name="p85273533517"></a>T</p>
 </td>
-<td class="cellrowborder" valign="top" width="87.87%" headers="mcps1.2.3.1.2 "><p id="p352719537516"><a name="p352719537516"></a><a name="p352719537516"></a>队列的类型，支持取值<a href="TQue.md">TQue</a>、<a href="TQueBind.md">TQueBind</a>。</p>
+<td class="cellrowborder" valign="top" width="87.87%" headers="mcps1.2.3.1.2 "><p id="p352719537516"><a name="p352719537516"></a><a name="p352719537516"></a>队列的类型，支持取值<a href="../TQue/TQue.md">TQue</a>、<a href="../TQueBind/TQueBind.md">TQueBind</a>。</p>
 </td>
 </tr>
 <tr id="row1865712321528"><td class="cellrowborder" valign="top" width="12.13%" headers="mcps1.2.3.1.1 "><p id="p15657123285218"><a name="p15657123285218"></a><a name="p15657123285218"></a>U</p>
@@ -213,7 +213,7 @@
 </thead>
 <tbody><tr id="row167376215416"><td class="cellrowborder" valign="top" width="12.34%" headers="mcps1.2.3.1.1 "><p id="p14568152324113"><a name="p14568152324113"></a><a name="p14568152324113"></a>bufPos</p>
 </td>
-<td class="cellrowborder" valign="top" width="87.66000000000001%" headers="mcps1.2.3.1.2 "><p id="p188271137124113"><a name="p188271137124113"></a><a name="p188271137124113"></a>TBuf所在的逻辑位置，<a href="TPosition.md">TPosition</a>类型。</p>
+<td class="cellrowborder" valign="top" width="87.66000000000001%" headers="mcps1.2.3.1.2 "><p id="p188271137124113"><a name="p188271137124113"></a><a name="p188271137124113"></a>TBuf所在的逻辑位置，<a href="../../../../其他数据类型/TPosition.md">TPosition</a>类型。</p>
 </td>
 </tr>
 </tbody>

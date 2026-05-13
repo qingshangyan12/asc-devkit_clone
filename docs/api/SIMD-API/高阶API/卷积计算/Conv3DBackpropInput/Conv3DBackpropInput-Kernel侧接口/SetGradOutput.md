@@ -74,7 +74,7 @@ __aicore__ inline void SetGradOutput(const AscendC::GlobalTensor<SrcT> &gradOutp
 </td>
 <td class="cellrowborder" valign="top" width="12.67%" headers="mcps1.2.4.1.2 "><p id="p33487148556"><a name="p33487148556"></a><a name="p33487148556"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.56%" headers="mcps1.2.4.1.3 "><p id="p65083189583"><a name="p65083189583"></a><a name="p65083189583"></a>GradOutput矩阵在Global Memory上的首地址。<span id="ph1854116191314"><a name="ph1854116191314"></a><a name="ph1854116191314"></a><span id="ph198541361131"><a name="ph198541361131"></a><a name="ph198541361131"></a><span id="ph13854665137"><a name="ph13854665137"></a><a name="ph13854665137"></a>类型为<a href="GlobalTensor.md">GlobalTensor</a>。</span></span></span>SrcT表示GradOutput矩阵的数据类型，当前支持的数据类型为：half、bfloat16_t。</p>
+<td class="cellrowborder" valign="top" width="69.56%" headers="mcps1.2.4.1.3 "><p id="p65083189583"><a name="p65083189583"></a><a name="p65083189583"></a>GradOutput矩阵在Global Memory上的首地址。<span id="ph1854116191314"><a name="ph1854116191314"></a><a name="ph1854116191314"></a><span id="ph198541361131"><a name="ph198541361131"></a><a name="ph198541361131"></a><span id="ph13854665137"><a name="ph13854665137"></a><a name="ph13854665137"></a>类型为<a href="../../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>SrcT表示GradOutput矩阵的数据类型，当前支持的数据类型为：half、bfloat16_t。</p>
 </td>
 </tr>
 </tbody>

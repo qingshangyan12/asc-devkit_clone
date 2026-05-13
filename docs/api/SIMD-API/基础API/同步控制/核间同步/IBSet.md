@@ -92,7 +92,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 </td>
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p3844958114318"><a name="p3844958114318"></a><a name="p3844958114318"></a>外部存储核状态的公共缓存，类型为GlobalTensor。GlobalTensor数据结构的定义请参考<a href="GlobalTensor.md">GlobalTensor</a>。</p>
+<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p3844958114318"><a name="p3844958114318"></a><a name="p3844958114318"></a>外部存储核状态的公共缓存，类型为GlobalTensor。GlobalTensor数据结构的定义请参考<a href="../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</p>
 </td>
 </tr>
 <tr id="row2137145181815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p6844125874315"><a name="p6844125874315"></a><a name="p6844125874315"></a>ubWorkspace</p>
@@ -100,7 +100,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p89581532195312"><a name="p89581532195312"></a><a name="p89581532195312"></a>存储当前核状态的公共缓存。</p>
-<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</p>
+<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</p>
 </td>
 </tr>
 <tr id="row19615183817191"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p1484519586432"><a name="p1484519586432"></a><a name="p1484519586432"></a>blockIdx</p>

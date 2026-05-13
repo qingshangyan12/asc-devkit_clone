@@ -87,8 +87,8 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask)
 <tr id="row9924958115617"><td class="cellrowborder" valign="top" width="18.58%" headers="mcps1.2.3.1.1 "><p id="p3925158115615"><a name="p3925158115615"></a><a name="p3925158115615"></a>trait</p>
 </td>
 <td class="cellrowborder" valign="top" width="81.42%" headers="mcps1.2.3.1.2 "><p id="p129251358135613"><a name="p129251358135613"></a><a name="p129251358135613"></a>类型转换模式结构体。</p>
-<p id="p1337682765714"><a name="p1337682765714"></a><a name="p1337682765714"></a>包括<a href="RegLayout.md">RegLayout</a>、<a href="SatMode.md">SatMode</a>、<a href="MaskMergeMode.md">MaskMergeMode</a>、<a href="RoundMode.md">RoundMode</a>。</p>
-<p id="p173031248202111"><a name="p173031248202111"></a><a name="p173031248202111"></a>使能SatMode生效需与<a href="SetCtrlSpr(ISASI).md">SetCtrlSpr(ISASI)</a>配合使用。</p>
+<p id="p1337682765714"><a name="p1337682765714"></a><a name="p1337682765714"></a>包括<a href="../数据类型/RegLayout.md">RegLayout</a>、<a href="../数据类型/SatMode.md">SatMode</a>、<a href="../数据类型/MaskMergeMode.md">MaskMergeMode</a>、<a href="../数据类型/RoundMode.md">RoundMode</a>。</p>
+<p id="p173031248202111"><a name="p173031248202111"></a><a name="p173031248202111"></a>使能SatMode生效需与<a href="../../系统变量访问/SetCtrlSpr(ISASI).md">SetCtrlSpr(ISASI)</a>配合使用。</p>
 </td>
 </tr>
 <tr id="row13956192410456"><td class="cellrowborder" valign="top" width="18.58%" headers="mcps1.2.3.1.1 "><p id="p1897872818010"><a name="p1897872818010"></a><a name="p1897872818010"></a>S</p>
@@ -120,7 +120,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask)
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>目的操作数。</p>
-<p id="p66093533169"><a name="p66093533169"></a><a name="p66093533169"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+<p id="p66093533169"><a name="p66093533169"></a><a name="p66093533169"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
 <p id="p164006149594"><a name="p164006149594"></a><a name="p164006149594"></a><span id="ph434701113253"><a name="ph434701113253"></a><a name="ph434701113253"></a>Ascend 950PR/Ascend 950DT</span>支持的数据类型参考<a href="#table17752925941">表3</a>、<a href="#table18665350162315">表4</a>、<a href="#table2536411175011">表5</a>、<a href="#table183851919811">表6</a>。</p>
 </td>
 </tr>
@@ -129,7 +129,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask)
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p172083541517"><a name="p172083541517"></a><a name="p172083541517"></a>源操作数。</p>
-<p id="p7123111612517"><a name="p7123111612517"></a><a name="p7123111612517"></a>类型为<a href="RegTensor.md">RegTensor</a>。</p>
+<p id="p7123111612517"><a name="p7123111612517"></a><a name="p7123111612517"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
 <p id="p288804212117"><a name="p288804212117"></a><a name="p288804212117"></a><span id="ph18889421413"><a name="ph18889421413"></a><a name="ph18889421413"></a>Ascend 950PR/Ascend 950DT</span>支持的数据类型参考<a href="#table17752925941">表3</a>、<a href="#table18665350162315">表4</a>、<a href="#table2536411175011">表5</a>、<a href="#table183851919811">表6</a>。</p>
 </td>
 </tr>
@@ -137,7 +137,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask)
 </td>
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p484514581433"><a name="p484514581433"></a><a name="p484514581433"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1337312597287"><a name="p1337312597287"></a><a name="p1337312597287"></a><span id="ph15776181222"><a name="ph15776181222"></a><a name="ph15776181222"></a>源操作数元素操作的有效指示，详细说明请参考<a href="MaskReg.md">MaskReg</a>。</span></p>
+<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p1337312597287"><a name="p1337312597287"></a><a name="p1337312597287"></a><span id="ph15776181222"><a name="ph15776181222"></a><a name="ph15776181222"></a>源操作数元素操作的有效指示，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">MaskReg</a>。</span></p>
 <p id="p162828912187"><a name="p162828912187"></a><a name="p162828912187"></a>注意：数据类型转换的mask会按照输入和输出类型中sizeof(dtype)较大的来筛选。</p>
 </td>
 </tr>

@@ -89,7 +89,7 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(const uint32_t basicM, const ui
 <td class="cellrowborder" valign="top" width="11.799999999999999%" headers="mcps1.2.4.1.2 "><p id="p2072611143247"><a name="p2072611143247"></a><a name="p2072611143247"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p57261114122414"><a name="p57261114122414"></a><a name="p57261114122414"></a>用于设置参数basicM。</p>
-<p id="p561173251510"><a name="p561173251510"></a><a name="p561173251510"></a><span id="ph108911580253"><a name="ph108911580253"></a><a name="ph108911580253"></a>与<a href="TCubeTiling结构体.md">TCubeTiling结构体</a>中的baseM参数含义相同，Matmul计算时base块M轴长度，以元素为单位。</span></p>
+<p id="p561173251510"><a name="p561173251510"></a><a name="p561173251510"></a><span id="ph108911580253"><a name="ph108911580253"></a><a name="ph108911580253"></a>与<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md">TCubeTiling结构体</a>中的baseM参数含义相同，Matmul计算时base块M轴长度，以元素为单位。</span></p>
 </td>
 </tr>
 <tr id="row3821161216246"><td class="cellrowborder" valign="top" width="17.77%" headers="mcps1.2.4.1.1 "><p id="p8821141219248"><a name="p8821141219248"></a><a name="p8821141219248"></a>basicN</p>
@@ -97,7 +97,7 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(const uint32_t basicM, const ui
 <td class="cellrowborder" valign="top" width="11.799999999999999%" headers="mcps1.2.4.1.2 "><p id="p1282141232419"><a name="p1282141232419"></a><a name="p1282141232419"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p98211612172418"><a name="p98211612172418"></a><a name="p98211612172418"></a>用于设置参数basicN。</p>
-<p id="p46111132121513"><a name="p46111132121513"></a><a name="p46111132121513"></a><span id="ph781319299267"><a name="ph781319299267"></a><a name="ph781319299267"></a>与<a href="TCubeTiling结构体.md">TCubeTiling结构体</a>中的baseN参数含义相同，Matmul计算时base块N轴长度，以元素为单位。</span></p>
+<p id="p46111132121513"><a name="p46111132121513"></a><a name="p46111132121513"></a><span id="ph781319299267"><a name="ph781319299267"></a><a name="ph781319299267"></a>与<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md">TCubeTiling结构体</a>中的baseN参数含义相同，Matmul计算时base块N轴长度，以元素为单位。</span></p>
 </td>
 </tr>
 <tr id="row156808105249"><td class="cellrowborder" valign="top" width="17.77%" headers="mcps1.2.4.1.1 "><p id="p3680151013243"><a name="p3680151013243"></a><a name="p3680151013243"></a>basicK</p>
@@ -105,7 +105,7 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(const uint32_t basicM, const ui
 <td class="cellrowborder" valign="top" width="11.799999999999999%" headers="mcps1.2.4.1.2 "><p id="p6680191019241"><a name="p6680191019241"></a><a name="p6680191019241"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p156801210162411"><a name="p156801210162411"></a><a name="p156801210162411"></a>用于设置参数basicK。</p>
-<p id="p11611932111512"><a name="p11611932111512"></a><a name="p11611932111512"></a><span id="ph186378112276"><a name="ph186378112276"></a><a name="ph186378112276"></a>与<a href="TCubeTiling结构体.md">TCubeTiling结构体</a>中的baseK参数含义相同，Matmul计算时base块K轴长度，以元素为单位。</span></p>
+<p id="p11611932111512"><a name="p11611932111512"></a><a name="p11611932111512"></a><span id="ph186378112276"><a name="ph186378112276"></a><a name="ph186378112276"></a>与<a href="../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md">TCubeTiling结构体</a>中的baseK参数含义相同，Matmul计算时base块K轴长度，以元素为单位。</span></p>
 </td>
 </tr>
 <tr id="row42461942101815"><td class="cellrowborder" valign="top" width="17.77%" headers="mcps1.2.4.1.1 "><p id="p163481714145518"><a name="p163481714145518"></a><a name="p163481714145518"></a>intrinsicsLimit</p>

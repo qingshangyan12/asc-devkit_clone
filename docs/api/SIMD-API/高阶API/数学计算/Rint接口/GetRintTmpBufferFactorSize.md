@@ -43,7 +43,7 @@ void GetRintTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& ascendc
 </td>
 <td class="cellrowborder" valign="top" width="13.19%" headers="mcps1.2.4.1.2 "><p id="p13958161181417"><a name="p13958161181417"></a><a name="p13958161181417"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.92%" headers="mcps1.2.4.1.3 "><p id="p129581515143"><a name="p129581515143"></a><a name="p129581515143"></a>输入的平台信息。PlatformAscendC的定义请参见<a href="构造及析构函数.md">构造及析构函数</a>。</p>
+<td class="cellrowborder" valign="top" width="69.92%" headers="mcps1.2.4.1.3 "><p id="p129581515143"><a name="p129581515143"></a><a name="p129581515143"></a>输入的平台信息。PlatformAscendC的定义请参见<a href="../../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md">构造及析构函数</a>。</p>
 </td>
 </tr>
 <tr id="row139791917184711"><td class="cellrowborder" valign="top" width="16.89%" headers="mcps1.2.4.1.1 "><p id="p697915173474"><a name="p697915173474"></a><a name="p697915173474"></a>typeSize</p>

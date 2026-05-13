@@ -107,7 +107,7 @@ __aicore__ inline CubeResGroupHandle<CubeMsgType> CreateCubeResGroup(KfcWorkspac
 </td>
 <td class="cellrowborder" valign="top" width="8.110000000000001%" headers="mcps1.2.4.1.2 "><p id="p13606163918914"><a name="p13606163918914"></a><a name="p13606163918914"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="78.92%" headers="mcps1.2.4.1.3 "><p id="p1560613391196"><a name="p1560613391196"></a><a name="p1560613391196"></a><a href="KfcWorkspace.md">KfcWorkspace</a>，用于维护消息队列空间。</p>
+<td class="cellrowborder" valign="top" width="78.92%" headers="mcps1.2.4.1.3 "><p id="p1560613391196"><a name="p1560613391196"></a><a name="p1560613391196"></a><a href="../KfcWorkspace/KfcWorkspace.md">KfcWorkspace</a>，用于维护消息队列空间。</p>
 </td>
 </tr>
 <tr id="row519512376588"><td class="cellrowborder" valign="top" width="12.97%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000001526206862_p223953193015"><a name="zh-cn_topic_0000001526206862_p223953193015"></a><a name="zh-cn_topic_0000001526206862_p223953193015"></a>blockStart</p>

@@ -30,7 +30,7 @@ bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform
 </td>
 <td class="cellrowborder" valign="top" width="13.19%" headers="mcps1.2.4.1.2 "><p id="p521618329466"><a name="p521618329466"></a><a name="p521618329466"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.92%" headers="mcps1.2.4.1.3 "><p id="p68691954161015"><a name="p68691954161015"></a><a name="p68691954161015"></a>传入硬件平台的信息，PlatformAscendC定义请参见<a href="构造及析构函数.md">构造及析构函数</a>。</p>
+<td class="cellrowborder" valign="top" width="69.92%" headers="mcps1.2.4.1.3 "><p id="p68691954161015"><a name="p68691954161015"></a><a name="p68691954161015"></a>传入硬件平台的信息，PlatformAscendC定义请参见<a href="../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md">构造及析构函数</a>。</p>
 </td>
 </tr>
 <tr id="row192692403617"><td class="cellrowborder" valign="top" width="16.89%" headers="mcps1.2.4.1.1 "><p id="p327132493617"><a name="p327132493617"></a><a name="p327132493617"></a>srcShape</p>

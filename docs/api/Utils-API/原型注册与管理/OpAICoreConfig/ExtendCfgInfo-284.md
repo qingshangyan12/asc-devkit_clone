@@ -53,7 +53,7 @@ ExtendCfgInfo支持的参数如下表：
 </thead>
 <tbody><tr id="row978453211250"><td class="cellrowborder" valign="top" width="16.919999999999998%" headers="mcps1.2.3.1.1 "><p id="p14784123216256"><a name="p14784123216256"></a><a name="p14784123216256"></a>aclnnSupport.value</p>
 </td>
-<td class="cellrowborder" valign="top" width="83.08%" headers="mcps1.2.3.1.2 "><a name="ul18784732192518"></a><a name="ul18784732192518"></a><ul id="ul18784732192518"><li>support_aclnn：此模式下，静态Shape场景中该算子通过模型下沉执行，动态Shape场景则在Host侧调用fallback函数下发算子。如果调用了<a href="EnableFallBack.md">EnableFallBack</a>则默认采用该模式。<pre class="screen" id="screen1478483215256"><a name="screen1478483215256"></a><a name="screen1478483215256"></a>// 如下为动态Shape场景的示例
+<td class="cellrowborder" valign="top" width="83.08%" headers="mcps1.2.3.1.2 "><a name="ul18784732192518"></a><a name="ul18784732192518"></a><ul id="ul18784732192518"><li>support_aclnn：此模式下，静态Shape场景中该算子通过模型下沉执行，动态Shape场景则在Host侧调用fallback函数下发算子。如果调用了<a href="../OpDef/EnableFallBack.md">EnableFallBack</a>则默认采用该模式。<pre class="screen" id="screen1478483215256"><a name="screen1478483215256"></a><a name="screen1478483215256"></a>// 如下为动态Shape场景的示例
 OpAICoreConfig aicore_config;
 aicore_config.DynamicShapeSupportFlag(true)   // 动态Shape场景需要设置DynamicShapeSupportFlag为true
              .ExtendCfgInfo("aclnnSupport.value", "support_aclnn");

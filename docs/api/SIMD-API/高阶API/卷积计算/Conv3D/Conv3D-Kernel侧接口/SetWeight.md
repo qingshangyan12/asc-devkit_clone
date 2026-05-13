@@ -72,7 +72,7 @@ __aicore__ inline void SetWeight(const AscendC::GlobalTensor<WeightT>& weight)
 </td>
 <td class="cellrowborder" valign="top" width="19.921992199219922%" headers="mcps1.1.4.1.2 "><p id="p1861414493418"><a name="p1861414493418"></a><a name="p1861414493418"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="63.53635363536353%" headers="mcps1.1.4.1.3 "><p id="p1761464914415"><a name="p1761464914415"></a><a name="p1761464914415"></a>Weight在Global Memory上的地址。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="GlobalTensor.md">GlobalTensor</a>。</span></span></span>权重矩阵Weight支持的数据类型为：half、bfloat16_t。</p>
+<td class="cellrowborder" valign="top" width="63.53635363536353%" headers="mcps1.1.4.1.3 "><p id="p1761464914415"><a name="p1761464914415"></a><a name="p1761464914415"></a>Weight在Global Memory上的地址。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="../../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>权重矩阵Weight支持的数据类型为：half、bfloat16_t。</p>
 </td>
 </tr>
 </tbody>

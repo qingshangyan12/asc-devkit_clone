@@ -88,7 +88,7 @@ __aicore__ inline int64_t GetSpr()
 </thead>
 <tbody><tr id="row19754201710212"><td class="cellrowborder" valign="top" width="17.89%" headers="mcps1.2.3.1.1 "><p id="p9754111713217"><a name="p9754111713217"></a><a name="p9754111713217"></a>AR</p>
 </td>
-<td class="cellrowborder" valign="top" width="82.11%" headers="mcps1.2.3.1.2 "><p id="p12754101719210"><a name="p12754101719210"></a><a name="p12754101719210"></a>一个特殊的地址寄存器，通常配合<a href="Squeeze.md">Squeeze</a>Reg矢量计算API一起使用，<a href="Squeeze.md">Squeeze</a>Reg矢量计算API会存储有效元素的总字节数到AR寄存器。</p>
+<td class="cellrowborder" valign="top" width="82.11%" headers="mcps1.2.3.1.2 "><p id="p12754101719210"><a name="p12754101719210"></a><a name="p12754101719210"></a>一个特殊的地址寄存器，通常配合<a href="../比较与选择/Squeeze.md">Squeeze</a>Reg矢量计算API一起使用，<a href="../比较与选择/Squeeze.md">Squeeze</a>Reg矢量计算API会存储有效元素的总字节数到AR寄存器。</p>
 </td>
 </tr>
 </tbody>

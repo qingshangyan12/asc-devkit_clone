@@ -52,7 +52,7 @@ void SetMatmulConfigParams(const MatmulConfigParams& configParams)
 <td class="cellrowborder" valign="top" width="9.19%" headers="mcps1.2.4.1.2 "><p id="p11369102020104"><a name="p11369102020104"></a><a name="p11369102020104"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p162831613101015"><a name="p162831613101015"></a><a name="p162831613101015"></a>配置Matmul数据搬运模式。参数取值如下：</p>
-<a name="ul9283191317107"></a><a name="ul9283191317107"></a><ul id="ul9283191317107"><li>ScheduleType::INNER_PRODUCT：默认模式，在K方向上做MTE1的循环搬运</li><li>ScheduleType::OUTER_PRODUCT：在M或N方向上做MTE1的循环搬运</li><li>ScheduleType::N_BUFFER_33：<a href="MatmulPolicy.md#li194081238103913">NBuffer33</a>模板的数据搬运模式，MTE2每次搬运A矩阵的1x3个基本块，直至A矩阵所有3x3个基本块全载在L1 Buffer中</li></ul>
+<a name="ul9283191317107"></a><a name="ul9283191317107"></a><ul id="ul9283191317107"><li>ScheduleType::INNER_PRODUCT：默认模式，在K方向上做MTE1的循环搬运</li><li>ScheduleType::OUTER_PRODUCT：在M或N方向上做MTE1的循环搬运</li><li>ScheduleType::N_BUFFER_33：<a href="../../Matmul-Kernel侧接口/MatmulPolicy.md#li194081238103913">NBuffer33</a>模板的数据搬运模式，MTE2每次搬运A矩阵的1x3个基本块，直至A矩阵所有3x3个基本块全载在L1 Buffer中</li></ul>
 </td>
 </tr>
 <tr id="row072884131011"><td class="cellrowborder" valign="top" width="17.82%" headers="mcps1.2.4.1.1 "><p id="p16283151311106"><a name="p16283151311106"></a><a name="p16283151311106"></a>traverseIn</p>
@@ -126,7 +126,7 @@ struct MatmulConfigParams
 <tr id="row1078074711194"><td class="cellrowborder" valign="top" width="16.61%" headers="mcps1.2.3.1.1 "><p id="p334033518217"><a name="p334033518217"></a><a name="p334033518217"></a>scheduleType</p>
 </td>
 <td class="cellrowborder" valign="top" width="83.39%" headers="mcps1.2.3.1.2 "><p id="p1993255310368"><a name="p1993255310368"></a><a name="p1993255310368"></a>配置Matmul数据搬运模式。参数取值如下：</p>
-<a name="ul1893214539369"></a><a name="ul1893214539369"></a><ul id="ul1893214539369"><li>ScheduleType::INNER_PRODUCT：默认模式，在K方向上做MTE1的循环搬运</li><li>ScheduleType::OUTER_PRODUCT：在M或N方向上做MTE1的循环搬运</li><li>ScheduleType::N_BUFFER_33：<a href="MatmulPolicy.md#li194081238103913">NBuffer33</a>模板的数据搬运模式，MTE2每次搬运A矩阵的1x3个基本块，直至A矩阵所有3x3个基本块全载在L1 Buffer中</li></ul>
+<a name="ul1893214539369"></a><a name="ul1893214539369"></a><ul id="ul1893214539369"><li>ScheduleType::INNER_PRODUCT：默认模式，在K方向上做MTE1的循环搬运</li><li>ScheduleType::OUTER_PRODUCT：在M或N方向上做MTE1的循环搬运</li><li>ScheduleType::N_BUFFER_33：<a href="../../Matmul-Kernel侧接口/MatmulPolicy.md#li194081238103913">NBuffer33</a>模板的数据搬运模式，MTE2每次搬运A矩阵的1x3个基本块，直至A矩阵所有3x3个基本块全载在L1 Buffer中</li></ul>
 </td>
 </tr>
 <tr id="row1761285762117"><td class="cellrowborder" valign="top" width="16.61%" headers="mcps1.2.3.1.1 "><p id="p6368183273219"><a name="p6368183273219"></a><a name="p6368183273219"></a>traverse</p>

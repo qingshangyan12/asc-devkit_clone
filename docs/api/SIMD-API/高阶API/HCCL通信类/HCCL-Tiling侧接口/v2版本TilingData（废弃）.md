@@ -133,7 +133,7 @@ AI CPU启动下发通信任务前，需获取固定的通信配置，如[表1](#
 </tr>
 <tr id="row1092475851319"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p59241258161310"><a name="p59241258161310"></a><a name="p59241258161310"></a>reduceType</p>
 </td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p69241958121317"><a name="p69241958121317"></a><a name="p69241958121317"></a>归约操作类型，仅对有归约操作的通信任务生效。uint32_t类型，取值详见<a href="HCCL使用说明.md#table2469980529">HcclReduceOp</a>参数说明。</p>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p69241958121317"><a name="p69241958121317"></a><a name="p69241958121317"></a>归约操作类型，仅对有归约操作的通信任务生效。uint32_t类型，取值详见<a href="../HCCL-Kernel侧接口/HCCL使用说明.md#table2469980529">HcclReduceOp</a>参数说明。</p>
 </td>
 </tr>
 </tbody>
