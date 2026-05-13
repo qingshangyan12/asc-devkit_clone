@@ -58,34 +58,16 @@
 
 ## 3. 扫描流程
 
-```
-/asc-api-ut-gen coverage
-    │
-    ├─ Phase 0: 环境配置检查
-    │   ├─ 检查 CANN 路径
-    │   ├─ 从当前 workspace 或 skill 所在仓推导 ASC_DEVKIT_PATH
-    │   └─ CANN 未配置则询问用户
-    │
-    ├─ Phase 1: API 接口扫描
-    │   ├─ 遍历 include/ 目录
-    │   ├─ 提取 API 声明（类名/函数名）
-    │   ├─ 识别架构条件编译
-    │   └─ 构建 API 清单
-    │
-    ├─ Phase 2: UT 文件扫描
-    │   ├─ 遍历 tests/api/ 目录
-    │   ├─ 提取测试文件中的 API 名
-    │   └─ 构建 UT 覆盖清单
-    │
-    ├─ Phase 3: 覆盖率分析
-    │   ├─ 按 API 类型分组
-    │   ├─ 按架构分组
-    │   └─ 计算覆盖率统计
-    │
-    └─ Phase 4: 输出报告
-        ├─ 生成缺失 API 列表
-        ├─ 生成覆盖率统计
-        └─ 可选：创建 UT 任务
+```mermaid
+flowchart TD
+    Start["/asc-api-ut-gen coverage"] --> Env["Phase 0 环境配置检查<br/>检查 CANN 路径<br/>从当前 workspace 或 skill 所在仓推导 ASC_DEVKIT_PATH"]
+    Env --> CannOk{"CANN 是否已配置？"}
+    CannOk -->|否| AskCann["询问用户 CANN 包安装路径"]
+    CannOk -->|是| ApiScan
+    AskCann --> ApiScan["Phase 1 API 接口扫描<br/>遍历 include/ 目录<br/>提取 API 声明，类名/函数名<br/>识别架构条件编译<br/>构建 API 清单"]
+    ApiScan --> UtScan["Phase 2 UT 文件扫描<br/>遍历 tests/api/ 目录<br/>提取测试文件中的 API 名<br/>构建 UT 覆盖清单"]
+    UtScan --> Analyze["Phase 3 覆盖率分析<br/>按 API 类型分组<br/>按架构分组<br/>计算覆盖率统计"]
+    Analyze --> Report["Phase 4 输出报告<br/>生成缺失 API 列表<br/>生成覆盖率统计<br/>可选创建 UT 任务"]
 ```
 
 ---
@@ -156,19 +138,13 @@ __attribute__((deprecated("Use NewFunc"))) void OldFunc(...);
 
 ### 5.3 过滤流程
 
-```
-读取 API 声明
-    │
-    ├─ Step 1: 检测声明行及前一行
-    │   ├─ [[deprecated]] 属性
-    │   └─ __attribute__((deprecated))
-    │
-    ├─ Step 2: 检测头文件级别 deprecated
-    │   └─ 文件开头的 deprecated typedef
-    │
-    └─ 结果判断
-        ├─ 有 deprecated 标记 → 跳过，不计入 UT 覆盖统计
-        └─ 无 deprecated 标记 → 纳入 UT 覆盖统计
+```mermaid
+flowchart TD
+    Read["读取 API 声明"] --> LineCheck["Step 1 检测声明行及前一行<br/>[[deprecated]] 属性<br/>__attribute__((deprecated))"]
+    LineCheck --> FileCheck["Step 2 检测头文件级别 deprecated<br/>文件开头的 deprecated typedef"]
+    FileCheck --> Deprecated{"是否存在 deprecated 标记？"}
+    Deprecated -->|是| Skip["跳过，不计入 UT 覆盖统计"]
+    Deprecated -->|否| Include["纳入 UT 覆盖统计"]
 ```
 
 ---
@@ -205,21 +181,13 @@ patterns = [
 
 ### 6.2 类扫描流程
 
-```
-扫描 adv_api 头文件
-    │
-    ├─ Step 1: 检测头文件级别 deprecated
-    │
-    ├─ Step 2: 定位类声明
-    │   ├─ 匹配 template class / class 声明
-    │   └─ 检测类级别的 deprecated 标记
-    │
-    ├─ Step 3: 确定类体范围
-    │
-    ├─ Step 4: 扫描类成员函数
-    │   └─ 检测每个函数的 deprecated 标记
-    │
-    └─ Step 5: 检测架构条件编译
+```mermaid
+flowchart TD
+    Start["扫描 adv_api 头文件"] --> FileDeprecated["Step 1 检测头文件级别 deprecated"]
+    FileDeprecated --> LocateClass["Step 2 定位类声明<br/>匹配 template class / class 声明<br/>检测类级别 deprecated 标记"]
+    LocateClass --> ClassBody["Step 3 确定类体范围"]
+    ClassBody --> MemberScan["Step 4 扫描类成员函数<br/>检测每个函数的 deprecated 标记"]
+    MemberScan --> ArchCheck["Step 5 检测架构条件编译"]
 ```
 
 ---
@@ -244,18 +212,15 @@ patterns = [
 
 **背景**：部分 API 虽然没有独立的测试文件，但其实际调用存在于其他测试文件中。
 
-```
-判定 API 缺失 UT 前：
-    │
-    ├─ Step 1: 精确匹配测试文件名
-    │
-    ├─ Step 2: 文件名模糊匹配
-    │
-    ├─ Step 3: 跨文件内容搜索（必须执行）
-    │   ├─ Grep: pattern="{APIName}" path="{TEST_DIR}"
-    │   └─ 有结果 → 标记为"已覆盖"
-    │
-    └─ Step 4: 生成最终判定
+```mermaid
+flowchart TD
+    Start["判定 API 缺失 UT 前"] --> Exact["Step 1 精确匹配测试文件名"]
+    Exact --> Fuzzy["Step 2 文件名模糊匹配"]
+    Fuzzy --> CrossFile["Step 3 跨文件内容搜索，必须执行<br/>Grep: pattern={APIName}, path={TEST_DIR}"]
+    CrossFile --> Found{"是否有搜索结果？"}
+    Found -->|是| Covered["标记为已覆盖"]
+    Found -->|否| Final["Step 4 生成最终判定"]
+    Covered --> Final
 ```
 
 **典型跨文件覆盖案例：**
@@ -275,15 +240,10 @@ patterns = [
 
 **规则 1：API 名称必须来源于头文件声明**
 
-```
-提取 API 清单时：
-    │
-    ├─ 必须从 include/ 目录的头文件中提取
-    │
-    └─ 禁止行为：
-        ├─ ❌ 从测试文件名反推 API 名称
-        ├─ ❌ 手动拼接或猜测 API 名称
-        └─ ❌ 使用未在头文件中声明的 API 名称
+```mermaid
+flowchart TD
+    Start["提取 API 清单时"] --> Header["必须从 include/ 目录的头文件中提取"]
+    Header --> Ban["禁止行为<br/>从测试文件名反推 API 名称<br/>手动拼接或猜测 API 名称<br/>使用未在头文件中声明的 API 名称"]
 ```
 
 **规则 2：跨文件内容检测必须在判定缺失前执行**

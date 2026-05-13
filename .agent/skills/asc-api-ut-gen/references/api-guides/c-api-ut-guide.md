@@ -54,9 +54,13 @@ C API 使用特定指针标记：
 |------|------|
 | `__ubuf__` | Unified Buffer 指针 |
 | `__gm__` | Global Memory 指针 |
+| `__cbuf__` | L1 / CBUF 指针 |
+| `__fbuf__` | FBUF 指针 |
 | `__ca__` | Cube A buffer 指针 |
 | `__cb__` | Cube B buffer 指针 |
 | `__cc__` | Cube C buffer 指针 |
+
+本表不是全集。生成 UT 时必须以目标 API 头文件中的真实指针空间标记为准；若出现未列出的标记或 typedef/结构体封装，继续读取 `include/c_api/**`、`impl/c_api/**` 和 `tests/api/c_api/stub/cce_stub.h`，不要按本表猜测或替换。
 
 ### 2.3 基本类型参数
 
@@ -90,13 +94,30 @@ C API 测试按已有同类 UT 设置 `g_coreType`，根据目标接口选择 AI
 
 ### 3.2 指针类型使用
 
-C API 必须使用目标函数声明中的指针空间标记，例如 `__ubuf__`、`__gm__`、`__ca__`、`__cb__`、`__cc__`。不要为了复用模板而替换指针空间。
+C API 必须使用目标函数声明中的指针空间标记，例如 `__ubuf__`、`__gm__`、`__cbuf__`、`__fbuf__`、`__ca__`、`__cb__`、`__cc__`。不要为了复用模板而替换指针空间；如果目标函数声明使用其他地址空间标记，必须先读取代码中的真实声明、impl 调用和底层 stub 签名。
 
 ### 3.3 Mock 函数验证
 
-Mock 函数签名必须与底层指令完全一致，并在 stub 中断言地址、count、stride、repeat 和标量参数。通用 gtest 骨架见 [测试模板参考](../foundations/test-templates.md)，mockcpp 写法以本 guide 和已有同类 C API UT 为准。
+Mock 函数签名必须与底层指令完全一致，并在 stub 中断言所有由目标 API 透传或计算出的参数。地址、count、stride、repeat 和标量参数只是常见示例；其他 attribute、attr、params、config、mode、flag、shape、layout、padding、dilation、filter、transpose 等属性也必须按目标函数声明、impl 调用和底层 stub 签名逐项补齐。通用 gtest 骨架见 [测试模板参考](../foundations/test-templates.md)，mockcpp 写法以本 guide 和已有同类 C API UT 为准。
 
-### 3.4 架构映射
+### 3.4 Attribute 与结构体参数
+
+不要在本 guide 固化 C API 的 attribute 字段全集。生成或补齐 UT 时，遇到以下任一情况，必须读取代码中的真实结构体定义和调用链：
+
+- 参数名或类型包含 `attribute`、`attr`、`attrs`、`params`、`param`、`config`、`mode`、`flag` 等语义。
+- API 入参、impl 局部变量或底层指令参数使用 `struct`、`union`、`enum`、`typedef` 或 `class` 承载属性。
+- impl 将多个散列入参打包成控制字、bit field、attribute 结构体或硬件指令参数。
+
+读取顺序：
+
+1. 目标 API 头文件：`include/c_api/**` 中的函数签名、重载和结构体声明。
+2. 目标架构 impl：`impl/c_api/**`、`impl/c_api/instr_impl/**` 中的真实字段赋值、默认值、条件编译和指令调用。
+3. 底层 stub：`tests/api/c_api/stub/cce_stub.h` 中的 mock/stub 函数签名。
+4. 已有同架构同类 UT：确认字段初始化、mockcpp 写法和断言习惯。
+
+结构体或 attribute 参数必须按真实字段逐项初始化、逐项断言；不能只验证本 guide 中列出的常见字段。结构体优先使用成员赋值，避免依赖聚合初始化顺序；字段无法从代码中确认时，必须记录缺口并停止补齐该字段，不要猜测。
+
+### 3.5 架构映射
 
 测试目录按 NPU_ARCH 组织：
 
@@ -159,7 +180,7 @@ C API 使用 [测试模板参考](../foundations/test-templates.md) 中的通用
 
 - `g_coreType` 使用 C API 测试已有模式设置为目标 AIC/AIV 类型。
 - Mock 函数签名必须与底层指令声明完全一致。
-- 指针地址、stride、repeat、count 等参数按目标函数签名逐项断言。
+- 指针地址、stride、repeat、count、attribute/结构体字段等参数按目标函数签名、impl 调用和底层 stub 签名逐项断言。
 
 ---
 
@@ -229,6 +250,8 @@ __aicore__ inline void asc_datablock_reduce_max(__ubuf__ half* dst, __ubuf__ hal
 | `*_repeat_stride` | `uint8_t` | 重复间步长 |
 | `value` | 按 API 声明确认 | 标量值 |
 
+本表不是 C API 参数全集。遇到 attribute、attr、params、config、mode 或结构体参数时，必须回到代码中的结构体定义、impl 字段赋值和底层 stub 签名，补齐所有字段的初始化与断言。
+
 ---
 
 ## 8. 指针类型标记详解
@@ -237,9 +260,13 @@ __aicore__ inline void asc_datablock_reduce_max(__ubuf__ half* dst, __ubuf__ hal
 |------|------|---------|
 | `__ubuf__` | Unified Buffer 指针 | 向量计算、数据搬运 |
 | `__gm__` | Global Memory 指针 | 全局内存访问 |
+| `__cbuf__` | L1 / CBUF 指针 | L1 与 L0/UB/GM 之间的数据搬运、Cube 数据搬运 |
+| `__fbuf__` | FBUF 指针 | `asc_copy_l12fb` 等 FBUF 相关数据搬运 |
 | `__ca__` | Cube A buffer 指针 | 矩阵乘法左矩阵 |
 | `__cb__` | Cube B buffer 指针 | 矩阵乘法右矩阵 |
 | `__cc__` | Cube C buffer 指针 | 矩阵乘法结果 |
+
+本表不是固定全集；它来自当前 C API 头文件和已有 UT 的常见地址空间标记。生成或补齐 UT 时必须先读取目标 API 声明；若参数类型通过 typedef、struct、union 或模板别名间接携带地址空间标记，也要继续读取代码中的真实定义，确保 mock/stub 签名、测试入参和断言中的指针空间完全一致。`__aicore__`、`__simd_callee__` 等函数限定符不是指针类型标记，不应放入指针空间表。
 
 **使用示例：**
 
@@ -249,6 +276,11 @@ __ubuf__ half* dst;
 __ubuf__ half* src0;
 __ubuf__ half* src1;
 asc_add(dst, src0, src1, count);
+
+// L1/CBUF 与 FBUF 数据搬运使用 __cbuf__, __fbuf__
+__cbuf__ void* l1;
+__fbuf__ void* fbuf;
+asc_copy_l12fb(fbuf, l1, size);
 
 // 矩阵计算使用 __ca__, __cb__, __cc__
 __ca__ half* a;
@@ -266,7 +298,8 @@ asc_mmad(c, a, b, m, n, k);
 **问题**：编译警告或运行时错误
 
 **解决**：
-- 使用正确的指针标记 (`__ubuf__`, `__gm__` 等)
+- 使用目标 API 声明中的正确指针标记，例如 `__ubuf__`、`__gm__`、`__cbuf__`、`__fbuf__`、`__ca__`、`__cb__`、`__cc__`
+- 若声明中出现未列出的标记或封装类型，读取头文件、impl 和 `cce_stub.h` 的真实签名
 - 参考已有测试中的指针使用方式
 
 ### Q2: 公共排障索引
@@ -284,13 +317,15 @@ C API 的 mock/stub 签名和架构目录问题统一查看 [常见问题与解�
 
 - [ ] 已读取 C API 头文件，了解函数签名
 - [ ] 已分析 impl 文件，了解底层指令调用
+- [ ] 已读取 attribute/params/config/mode 等结构体定义，并补齐所有真实字段
 - [ ] 已确认数据类型支持
 - [ ] 已参考同架构下已有测试
 
 ### 10.2 编写阶段
 
-- [ ] 使用正确的指针类型标记（`__ubuf__`, `__gm__` 等）
+- [ ] 使用目标 API 声明中的正确指针类型标记（如 `__ubuf__`、`__gm__`、`__cbuf__`、`__fbuf__`、`__ca__`、`__cb__`、`__cc__`）
 - [ ] Mock 函数签名正确
+- [ ] Stub 已逐项断言所有 attribute/结构体字段，不只断言常见参数
 - [ ] SetUp/TearDown 正确设置核心类型
 - [ ] 使用参数化测试覆盖分支
 

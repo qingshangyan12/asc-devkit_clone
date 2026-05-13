@@ -101,6 +101,15 @@ void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
 
 ## 分析流程
 
+```mermaid
+flowchart TD
+    LocateImpl["Step 1 定位 impl 文件<br/>从头文件找到通用或架构特定 impl"] --> ArchMacro
+    ArchMacro["Step 2 分析条件编译<br/>检查 __NPU_ARCH__、#if、#elif、#endif"] --> RuntimeBranch
+    RuntimeBranch["Step 3 分析模板和运行时分支<br/>检查 if constexpr、if、else、switch、case"] --> Constraint
+    Constraint["Step 4 分析约束条件<br/>检查 ASCENDC_ASSERT 和 ASCENDC_CHECK"] --> Matrix
+    Matrix["Step 5 生成分支覆盖矩阵"]
+```
+
 ### Step 1: 定位 impl 文件
 
 ```bash

@@ -40,6 +40,24 @@ expect_fixed() {
     grep -Fq -- "$text" "$file" || fail "missing content: ${label}"
 }
 
+reject_tree_pattern() {
+    local path="$1"
+    local pattern="$2"
+    local label="$3"
+
+    if grep -REnI \
+        --include='*.md' \
+        --include='*.py' \
+        --include='*.sh' \
+        --include='*.json' \
+        --exclude-dir='__pycache__' \
+        -- "$pattern" "$path"; then
+        fail "forbidden content: ${label}"
+    fi
+}
+
+reject_tree_pattern "$SKILL_DIR" 'z[0-9]{8}|/home/[^/]+/asc-devkit' "personal workspace path or employee id"
+
 expect_pattern "$SKILL_FILE" '^description:.*(当用户需要|触发).*' "description trigger condition"
 expect_pattern "$SKILL_FILE" '^description:.*(UT|单元测试|覆盖率).*' "description keywords"
 expect_fixed "$SKILL_FILE" "本技能使用 Python 脚本自动生成 UT 代码" "Python generator statement"
@@ -47,6 +65,7 @@ expect_fixed "$SKILL_FILE" "首次使用环境配置" "first-use environment gat
 expect_fixed "$SKILL_FILE" "CANN 包安装路径" "CANN package path requirement"
 expect_fixed "$SKILL_FILE" "asc-devkit 仓路径不再向用户询问" "asc-devkit repository path auto detection"
 expect_fixed "$SKILL_FILE" "当前 workspace 或本 skill 所在目录向上定位仓根" "asc-devkit repository root derivation"
+expect_fixed "$SKILL_FILE" "推导出的 \`ASC_DEVKIT_PATH\` 必须记录到执行日志中" "asc-devkit path derivation execution log"
 expect_fixed "$SKILL_FILE" "仅询问 CANN 包安装路径" "CANN-only environment question"
 expect_fixed "$SKILL_FILE" "不询问用户是否允许生成或写入 UT" "no generation permission question"
 expect_fixed "${REFERENCES_DIR}/workflows/coverage-scan-guide.md" "ASC_DEVKIT_PATH 已从当前 workspace 或 skill 所在仓推导" "coverage scan repo path derivation"
@@ -56,6 +75,18 @@ expect_fixed "$SKILL_FILE" "Git 扫描模式" "git scan mode"
 expect_fixed "$SKILL_FILE" "精确交互模式" "precise interaction mode"
 expect_fixed "$SKILL_FILE" "覆盖率扫描模式" "coverage scan mode"
 expect_fixed "$SKILL_FILE" "覆盖率报告补齐模式" "coverage report backfill mode"
+expect_fixed "$SKILL_FILE" '```mermaid' "workflow mermaid diagram"
+expect_fixed "$SKILL_FILE" "flowchart TD" "workflow flowchart"
+expect_fixed "$SKILL_FILE" "将推导出的 ASC_DEVKIT_PATH 记录到执行日志" "first-use environment mermaid log node"
+expect_fixed "$SKILL_FILE" "Step 3 调用生成脚本" "UT generation mermaid step"
+expect_fixed "$SKILL_FILE" "编译和测试通过？" "build/test loop decision"
+expect_fixed "$SKILL_FILE" "覆盖率达到阈值？" "coverage threshold loop decision"
+expect_fixed "$SKILL_FILE" "失败或覆盖率不足时必须进入图中的回路" "workflow loop requirement"
+expect_fixed "${REFERENCES_DIR}/foundations/branch-coverage-guide.md" "Step 5 生成分支覆盖矩阵" "branch coverage mermaid flow"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "TestOk" "automation mermaid test decision"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "达到最大重试次数？" "automation repair retry loop"
+expect_fixed "${REFERENCES_DIR}/workflows/coverage-scan-guide.md" "Step 3 跨文件内容搜索，必须执行" "coverage scan mermaid cross-file flow"
+expect_fixed "${REFERENCES_DIR}/workflows/coverage-report-backfill-guide.md" "覆盖率达到 95%？" "coverage report mermaid backfill loop"
 expect_fixed "$SKILL_FILE" "/asc-api-ut-gen <芯片版本> <API类型> <API名称> [核心类型]" "exact command format"
 expect_fixed "$SKILL_FILE" "build/cov_report" "coverage report path"
 
@@ -65,6 +96,17 @@ expect_fixed "$SKILL_FILE" "regbase基础API" "regbase API coverage"
 expect_fixed "$SKILL_FILE" "C API" "C API coverage"
 expect_fixed "$SKILL_FILE" "SIMT API" "SIMT API coverage"
 expect_fixed "$SKILL_FILE" "工具类API" "utils API coverage"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "Attribute 与结构体参数" "C API attribute struct section"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "必须读取代码中的真实结构体定义和调用链" "C API struct source rule"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "attribute、attr、params、config、mode" "C API attribute variants"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "\`__cbuf__\`" "C API cbuf pointer marker"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "\`__fbuf__\`" "C API fbuf pointer marker"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "本表不是固定全集" "C API pointer marker list not exhaustive"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "\`__aicore__\`、\`__simd_callee__\` 等函数限定符不是指针类型标记" "C API function qualifier is not pointer marker"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "impl/c_api/instr_impl/**" "C API impl struct source"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "底层 stub 签名" "C API stub signature source"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "不能只验证本 guide 中列出的常见字段" "C API no fixed attribute list"
+expect_fixed "${REFERENCES_DIR}/api-guides/c-api-ut-guide.md" "Stub 已逐项断言所有 attribute/结构体字段" "C API struct field assertion checklist"
 expect_fixed "$SKILL_FILE" "../asc-npu-arch/SKILL.md" "npu arch source link"
 expect_fixed "$SKILL_FILE" "统一事实来源" "single source statement"
 expect_fixed "$SKILL_FILE" "本 skill 不再单独维护完整芯片类型表" "chip table centralization"
@@ -179,6 +221,10 @@ expect_fixed "$SKILL_FILE" "token 消耗、总耗时、当前覆盖率" "post ge
 expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "Token 消耗" "automation token report"
 expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "当前覆盖率" "automation coverage report"
 expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "tests/test_parts.sh" "automation test part source"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "不能作为唯一事实来源" "automation reference is not sole source"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "不能只依赖当前 reference" "automation current scripts before reference"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "执行日志必须记录已查看的 \`build.sh\`、\`tests/test_parts.sh\` 和相关 \`CMakeLists.txt\` 路径" "automation checked scripts log"
+expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "按当前脚本/CMake 执行" "automation current script cmake priority"
 expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "basic_test_five" "automation c/reg/simt part"
 expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "header-only public surface" "automation header-only basic impl rule"
 expect_fixed "${REFERENCES_DIR}/workflows/automation-guide.md" "impl/basic_api/**/*.h" "automation basic impl header glob"

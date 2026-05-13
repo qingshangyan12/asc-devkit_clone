@@ -21,19 +21,19 @@
 
 ```bash
 # 扫描单个源码文件
-/asc-api-ut-gen cov-report /home/z00661976/asc-devkit/impl/basic_api/dav_3510/kernel_operator_fixpipe_impl.h
+/asc-api-ut-gen cov-report {ASC_DEVKIT_PATH}/impl/basic_api/dav_3510/kernel_operator_fixpipe_impl.h
 
 # 扫描单个源码目录
-/asc-api-ut-gen cov-report /home/z00661976/asc-devkit/impl/basic_api/dav_3510
+/asc-api-ut-gen cov-report {ASC_DEVKIT_PATH}/impl/basic_api/dav_3510
 
 # 指定阈值
-/asc-api-ut-gen cov-report /home/z00661976/asc-devkit/impl/basic_api/dav_3510 --threshold 95
+/asc-api-ut-gen cov-report {ASC_DEVKIT_PATH}/impl/basic_api/dav_3510 --threshold 95
 
 # 直接扫描 cov_report 下的 html 页面
-/asc-api-ut-gen cov-report /home/z00661976/asc-devkit/build/cov_report/home/z00661976/asc-devkit/impl/basic_api/dav_3510/index.html
+/asc-api-ut-gen cov-report {ASC_DEVKIT_PATH}/build/cov_report/{ASC_DEVKIT_PATH}/impl/basic_api/dav_3510/index.html
 
 # 指定报告目录
-/asc-api-ut-gen cov-report /home/z00661976/asc-devkit/impl/basic_api/dav_3510 --report-dir /home/z00661976/asc-devkit/build/cov_report
+/asc-api-ut-gen cov-report {ASC_DEVKIT_PATH}/impl/basic_api/dav_3510 --report-dir {ASC_DEVKIT_PATH}/build/cov_report
 ```
 
 ---
@@ -49,7 +49,7 @@
 典型实例：
 
 ```bash
-/home/z00661976/asc-devkit/build/cov_report
+{ASC_DEVKIT_PATH}/build/cov_report
 ```
 
 ### 3.2 源码路径到报告路径的映射
@@ -58,20 +58,20 @@
 
 ```text
 源码目录:
-/home/z00661976/asc-devkit/impl/basic_api/dav_3510
+{ASC_DEVKIT_PATH}/impl/basic_api/dav_3510
 
 对应报告:
-/home/z00661976/asc-devkit/build/cov_report/home/z00661976/asc-devkit/impl/basic_api/dav_3510/index.html
+{ASC_DEVKIT_PATH}/build/cov_report/{ASC_DEVKIT_PATH}/impl/basic_api/dav_3510/index.html
 ```
 
 **单文件扫描：**
 
 ```text
 源码文件:
-/home/z00661976/asc-devkit/impl/basic_api/dav_3510/kernel_operator_fixpipe_impl.h
+{ASC_DEVKIT_PATH}/impl/basic_api/dav_3510/kernel_operator_fixpipe_impl.h
 
 对应报告:
-/home/z00661976/asc-devkit/build/cov_report/home/z00661976/asc-devkit/impl/basic_api/dav_3510/kernel_operator_fixpipe_impl.h.gcov.html
+{ASC_DEVKIT_PATH}/build/cov_report/{ASC_DEVKIT_PATH}/impl/basic_api/dav_3510/kernel_operator_fixpipe_impl.h.gcov.html
 ```
 
 ### 3.3 架构桶页面
@@ -79,9 +79,9 @@
 对于按架构聚合的实现，也可直接使用 `npu_arch_xxx` 目录：
 
 ```text
-/home/z00661976/asc-devkit/build/cov_report/npu_arch_3510/index.html
-/home/z00661976/asc-devkit/build/cov_report/npu_arch_3510/vector_compute_impl/index.html
-/home/z00661976/asc-devkit/build/cov_report/npu_arch_3510/vector_compute_impl/asc_create_iter_reg_impl.h.gcov.html
+{ASC_DEVKIT_PATH}/build/cov_report/npu_arch_3510/index.html
+{ASC_DEVKIT_PATH}/build/cov_report/npu_arch_3510/vector_compute_impl/index.html
+{ASC_DEVKIT_PATH}/build/cov_report/npu_arch_3510/vector_compute_impl/asc_create_iter_reg_impl.h.gcov.html
 ```
 
 ### 3.4 找不到报告页面时的处理
@@ -97,44 +97,28 @@
 
 ## 4. 扫描流程
 
-```text
-/asc-api-ut-gen cov-report <target>
-    │
-    ├─ Phase 0: 环境确认
-    │   ├─ 确认 CANN_PATH
-    │   ├─ 从当前 workspace 或 skill 所在仓推导 ASC_DEVKIT_PATH
-    │   └─ 确认 cov_report 目录存在
-    │
-    ├─ Phase 1: 定位报告页面
-    │   ├─ target 是源码文件 → 定位 *.gcov.html
-    │   ├─ target 是源码目录 → 定位 index.html
-    │   └─ target 已是报告页面 → 直接使用
-    │
-    ├─ Phase 2: 读取覆盖率
-    │   ├─ 读取 Lines 百分比
-    │   ├─ 读取 Functions 百分比
-    │   └─ 识别低于阈值的文件
-    │
-    ├─ Phase 3: 分析未覆盖代码
-    │   ├─ 单文件: 提取 lineNoCov 行
-    │   ├─ 目录: 找出所有低于阈值的子文件
-    │   ├─ 打开源码和相关头文件
-    │   └─ 识别缺失的 API 调用路径/分支组合
-    │
-    ├─ Phase 4: 补齐 UT
-    │   ├─ 优先修改现有测试文件
-    │   ├─ 其次新增缺失测试文件
-    │   └─ 保证每个低覆盖 API 使用独立 session 分析
-    │
-    ├─ Phase 5: 编译与执行
-    │   ├─ 编译对应测试
-    │   ├─ 运行对应 gtest
-    │   └─ 失败则修复并重试
-    │
-    └─ Phase 6: 覆盖率复查
-        ├─ 重新读取 cov_report
-        ├─ 检查是否达到 95%
-        └─ 输出最终结果
+```mermaid
+flowchart TD
+    Start["/asc-api-ut-gen cov-report target"] --> Env["Phase 0 环境确认<br/>确认 CANN_PATH<br/>从当前 workspace 或 skill 所在仓推导 ASC_DEVKIT_PATH<br/>确认 cov_report 目录存在"]
+    Env --> Locate["Phase 1 定位报告页面"]
+    Locate --> TargetKind{"target 类型"}
+    TargetKind -->|源码文件| Gcov["定位 *.gcov.html"]
+    TargetKind -->|源码目录| Index["定位 index.html"]
+    TargetKind -->|报告页面| UseReport["直接使用"]
+    Gcov --> ReadCoverage
+    Index --> ReadCoverage
+    UseReport --> ReadCoverage
+    ReadCoverage["Phase 2 读取覆盖率<br/>读取 Lines 百分比<br/>读取 Functions 百分比<br/>识别低于阈值的文件"] --> NeedBackfill{"是否存在低于阈值的文件？"}
+    NeedBackfill -->|否| Final["输出最终结果"]
+    NeedBackfill -->|是| Analyze["Phase 3 分析未覆盖代码<br/>单文件提取 lineNoCov 行<br/>目录找出所有低于阈值的子文件<br/>打开源码和相关头文件<br/>识别缺失的 API 调用路径/分支组合"]
+    Analyze --> Backfill["Phase 4 补齐 UT<br/>优先修改现有测试文件<br/>其次新增缺失测试文件<br/>每个低覆盖 API 使用独立 session 分析"]
+    Backfill --> BuildRun["Phase 5 编译与执行<br/>编译对应测试<br/>运行对应 gtest"]
+    BuildRun --> BuildOk{"编译和 gtest 通过？"}
+    BuildOk -->|否| Fix["修复失败原因并重试"] --> Backfill
+    BuildOk -->|是| Recheck["Phase 6 覆盖率复查<br/>重新读取 cov_report<br/>检查是否达到 95%"]
+    Recheck --> CoverageOk{"覆盖率达到 95%？"}
+    CoverageOk -->|是| Final
+    CoverageOk -->|否| Analyze
 ```
 
 ---

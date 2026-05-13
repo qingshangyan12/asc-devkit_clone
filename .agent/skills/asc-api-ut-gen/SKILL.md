@@ -61,18 +61,16 @@ description: AscendC API 单元测试技能。当用户需要为新 API 编写 U
 
 1. **CANN 包安装路径** - 用于设置编译环境
 
-asc-devkit 仓路径不再向用户询问。本 skill 已位于 asc-devkit 仓内，`ASC_DEVKIT_PATH` 必须从当前 workspace 或本 skill 所在目录向上定位仓根；无法定位仓根时直接报错，不要求用户输入仓路径。
+asc-devkit 仓路径不再向用户询问。本 skill 已位于 asc-devkit 仓内，`ASC_DEVKIT_PATH` 必须从当前 workspace 或本 skill 所在目录向上定位仓根；推导出的 `ASC_DEVKIT_PATH` 必须记录到执行日志中；无法定位仓根时直接报错，不要求用户输入仓路径。
 
-```
-/asc-api-ut-gen 调用
-    │
-    ├─ 检查是否已获取 CANN 包路径
-    │   │
-    │   ├─ 未获取 → 必须先询问用户（仅询问 CANN 包安装路径）
-    │   │
-    │   └─ 已获取 → 继续后续流程
-    │
-    └─ 从当前 workspace 或 skill 所在仓推导 ASC_DEVKIT_PATH
+```mermaid
+flowchart TD
+    Start["/asc-api-ut-gen 调用"] --> CheckCann{"是否已获取 CANN 包路径？"}
+    CheckCann -->|否| AskCann["必须先询问用户<br/>仅询问 CANN 包安装路径"]
+    CheckCann -->|是| DeriveRepo
+    AskCann --> DeriveRepo["从当前 workspace 或 skill 所在仓推导 ASC_DEVKIT_PATH"]
+    DeriveRepo --> LogPath["将推导出的 ASC_DEVKIT_PATH 记录到执行日志"]
+    LogPath --> Continue["继续后续流程"]
 ```
 
 **禁止行为：**
@@ -86,66 +84,41 @@ asc-devkit 仓路径不再向用户询问。本 skill 已位于 asc-devkit 仓�
 
 ## 3. 工作流程概览
 
+```mermaid
+flowchart TD
+    Start["用户输入 /asc-api-ut-gen 参数"] --> Mode{"命令模式"}
+    Mode -->|无参数| GitMode["Git 扫描模式<br/>检测代码变更"]
+    Mode -->|coverage 参数| CoverageMode["覆盖率扫描模式"]
+    Mode -->|cov-report target 参数| CovReportMode["覆盖率报告补齐模式<br/>扫描 build/cov_report"]
+    Mode -->|有参数| ExactMode["精确交互模式"]
+
+    GitMode --> Env
+    CoverageMode --> Env
+    CovReportMode --> Env
+    ExactMode --> Env
+
+    Env["Phase 0 首次使用环境配置<br/>只询问 CANN 包路径<br/>推导并记录 ASC_DEVKIT_PATH"] --> Activate
+    Activate["Phase 1 环境激活<br/>source CANN_PATH/set_env.sh<br/>进入 asc-devkit 目录"] --> NeedGitScan{"是否为 Git 扫描模式？"}
+    NeedGitScan -->|是| GitScan["Phase 2 Git 状态扫描<br/>分析 include/impl/tests 目录修改<br/>生成 UT 任务列表"]
+    NeedGitScan -->|否| Analyze
+    GitScan --> Analyze
+
+    Analyze["Phase 3 API 分析<br/>定位头文件和 impl 文件<br/>分析分支覆盖"] --> Generate
+    Generate["Phase 4 UT 生成<br/>调用 ut_generator_cli.py<br/>写入目标测试文件<br/>不询问用户是否允许生成或写入 UT"] --> BuildTest
+    BuildTest["Phase 5-6 编译验证 + 测试执行"] --> BuildOk{"编译和测试通过？"}
+    BuildOk -->|否| FixBuild["分析错误并修复 UT、配置或期望值"]
+    FixBuild --> Generate
+    BuildOk -->|是| CoverageCheck
+
+    CoverageCheck["Phase 7 覆盖率确认与报告输出<br/>最终报告必须包含 token 消耗、总耗时、当前覆盖率"] --> NeedCoverage{"是否需要覆盖率阈值复查？"}
+    NeedCoverage -->|否| FinalReport["输出最终报告"]
+    NeedCoverage -->|是| CoverageOk{"覆盖率达到阈值？"}
+    CoverageOk -->|是| FinalReport
+    CoverageOk -->|否| Backfill["继续补齐低覆盖文件/目录的 UT"]
+    Backfill --> Generate
 ```
-用户输入 /asc-api-ut-gen [参数]
-    │
-    ├─ 无参数 → Git 扫描模式（检测代码变更）
-    ├─ coverage [参数] → 覆盖率扫描模式
-    ├─ cov-report <target> [参数] → 覆盖率报告补齐模式
-    └─ 有参数 → 精确交互模式
-         │
-         ↓
-┌─────────────────────────────────────────────────┐
-│  Phase 0: 首次使用环境配置（强制，不可跳过）      │
-│  • 检查是否已获取 CANN 包路径                     │
-│  • 从当前 workspace 或 skill 所在仓确定 ASC_DEVKIT_PATH │
-│  • 未获取 CANN 路径时只询问 CANN 包路径            │
-│  • 确认后保存 CANN 路径供后续使用                  │
-└─────────────────────────────────────────────────┘
-    │
-    ↓
-┌─────────────────────────────────────────────────┐
-│  Phase 1: 环境激活                               │
-│  • 执行 source {CANN_PATH}/set_env.sh           │
-│  • 进入 asc-devkit 目录                          │
-└─────────────────────────────────────────────────┘
-    │
-    ↓
-┌─────────────────────────────────────────────────┐
-│  Phase 2: Git 状态扫描（无参数模式）              │
-│  • 分析 include/impl/tests 目录修改              │
-│  • 生成 UT 任务列表                              │
-└─────────────────────────────────────────────────┘
-    │
-    ↓
-┌─────────────────────────────────────────────────┐
-│  Phase 3: API 分析                               │
-│  • 定位头文件和 impl 文件，分析分支覆盖           │
-└─────────────────────────────────────────────────┘
-    │
-    ↓
-┌─────────────────────────────────────────────────┐
-│  Phase 4: UT 生成（使用 Python 脚本）            │
-│  • 准备配置参数                                   │
-│  • 调用 ut_generator_cli.py 生成代码             │
-│  • 写入目标测试文件                               │
-│  • 不询问用户是否允许生成或写入 UT                 │
-└─────────────────────────────────────────────────┘
-    │
-    ↓
-┌─────────────────────────────────────────────────┐
-│  Phase 5-6: 编译验证 + 测试执行（自动）           │
-│  • 失败时自动分析错误并修复                       │
-└─────────────────────────────────────────────────┘
-    │
-    ↓
-┌─────────────────────────────────────────────────┐
-│  Phase 7: 覆盖率确认与报告输出                   │
-│  • cov-report 模式下扫描 build/cov_report       │
-│  • 对低于阈值的文件/目录继续补齐并回归验证        │
-│  • 最终报告必须包含 token 消耗、总耗时、当前覆盖率 │
-└─────────────────────────────────────────────────┘
-```
+
+失败或覆盖率不足时必须进入图中的回路：编译/测试失败回到修复和生成，覆盖率未达阈值回到补齐和验证；不能在未通过验证或未说明原因时直接输出最终报告。
 
 ---
 
@@ -203,44 +176,35 @@ asc-devkit 仓路径不再向用户询问。本 skill 已位于 asc-devkit 仓�
 
 **生成流程：**
 
+```mermaid
+flowchart TD
+    Analyze["Step 1 分析 API<br/>读取 API 头文件，确定 API 签名<br/>读取 impl 文件，分析分支覆盖<br/>参考现有测试文件结构"] --> Config
+    Config["Step 2 准备配置<br/>api_type: aiv/aic/c_api/adv/simt/reg<br/>api_name: API 名称<br/>chip: 目标芯片<br/>test_cases: 测试用例列表<br/>kernel_params: Kernel 参数，可选"] --> Invoke
+    Invoke["Step 3 调用生成脚本<br/>Bash 执行 CLI 或 Python 模块调用"] --> WriteFile
+    WriteFile["Step 4 写入文件<br/>将生成的代码写入目标测试文件"]
 ```
-Step 1: 分析 API
-    │
-    ├─ 读取 API 头文件，确定 API 签名
-    ├─ 读取 impl 文件，分析分支覆盖
-    └─ 参考现有测试文件结构
 
-Step 2: 准备配置
-    │
-    ├─ api_type: aiv/aic/c_api/adv/simt/reg
-    ├─ api_name: API 名称
-    ├─ chip: 目标芯片
-    ├─ test_cases: 测试用例列表
-    └─ kernel_params: Kernel 参数（可选）
+调用方式示例：
 
-Step 3: 调用生成脚本
-    │
-    ├─ 方式1: Bash 执行 CLI
-    │   python scripts/ut_generator_cli.py \
-    │       --type aiv \
-    │       --api Add \
-    │       --chip ascend910b1 \
-    │       --output tests/api/.../test_operator_add.cpp
-    │
-    └─ 方式2: Python 模块调用
-        from ut_generator import create_generator, UTConfig, TestCase, ApiType, ChipArch
+```bash
+python scripts/ut_generator_cli.py \
+    --type aiv \
+    --api Add \
+    --chip ascend910b1 \
+    --output tests/api/.../test_operator_add.cpp
+```
 
-        config = UTConfig(
-            api_type=ApiType.AIV,
-            api_name="Add",
-            chip=ChipArch.ASCEND910B1,
-            test_cases=[TestCase(...), ...]
-        )
-        generator = create_generator(config)
-        code = generator.generate()
+```python
+from ut_generator import create_generator, UTConfig, TestCase, ApiType, ChipArch
 
-Step 4: 写入文件
-    └─ 将生成的代码写入目标测试文件
+config = UTConfig(
+    api_type=ApiType.AIV,
+    api_name="Add",
+    chip=ChipArch.ASCEND910B1,
+    test_cases=[TestCase(...), ...]
+)
+generator = create_generator(config)
+code = generator.generate()
 ```
 
 ### 6.2 CLI 命令参考

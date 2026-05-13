@@ -4,35 +4,20 @@
 
 **生成 UT 文件后，必须自动执行以下验证流程：**
 
-```
-生成 UT 文件
-    │
-    ├─ Phase 1: 环境准备
-    │   └─ source {CANN_PATH}/set_env.sh
-    │
-    ├─ Phase 2: 受影响 test part 选择
-    │   ├─ 读取 build.sh 支持的 --*_test 参数
-    │   ├─ 读取 tests/test_parts.sh 中每个 part 的 target 列表
-    │   ├─ 读取 tests/**/CMakeLists.txt 中 target、产品列表和 source glob
-    │   ├─ 根据 API 类型、目标芯片、核心类型和修改文件选择所有受影响 part
-    │   └─ 若不能可靠收敛，执行 bash build.sh -t -j8
-    │
-    ├─ Phase 3: 编译与 part 级测试
-    │   ├─ cd {ASC_DEVKIT_PATH}
-    │   ├─ 逐个执行 bash build.sh --{SELECTED_PART} -j8
-    │   └─ 检查编译结果
-    │       ├─ 成功 → 进入 Phase 4
-    │       └─ 失败 → 分析错误 → 修复 UT → 重试 Phase 3
-    │
-    ├─ Phase 4: 可执行文件定向复现（可选但推荐）
-    │   ├─ 定位 build/tests/api/ 下实际测试可执行文件
-    │   ├─ ./可执行文件 --gtest_filter="*{API_NAME}*"
-    │   └─ 检查测试结果
-    │       ├─ 通过且测试数 > 0 → 进入 Phase 5
-    │       └─ 失败或 0 tests → 分析原因 → 修复 UT/过滤条件 → 重试 Phase 3
-    │
-    └─ Phase 5: 输出报告
-        └─ 输出最终验证报告（含 token、耗时、当前覆盖率）
+```mermaid
+flowchart TD
+    Generated["生成 UT 文件"] --> Env["Phase 1 环境准备<br/>source CANN_PATH/set_env.sh"]
+    Env --> SelectPart["Phase 2 受影响 test part 选择<br/>先读取当前仓 build.sh、tests/test_parts.sh 和相关 CMakeLists.txt<br/>读取 build.sh 的 --*_test 参数<br/>读取 tests/test_parts.sh 的 part target 列表<br/>读取 tests/**/CMakeLists.txt 的 target、产品列表和 source glob<br/>按 API 类型、芯片、核心类型和修改文件选择受影响 part"]
+    SelectPart --> CanNarrow{"能可靠收敛受影响 part？"}
+    CanNarrow -->|否| FullBuild["执行 bash build.sh -t -j8"]
+    CanNarrow -->|是| BuildPart
+    FullBuild --> BuildPart
+    BuildPart["Phase 3 编译与 part 级测试<br/>cd ASC_DEVKIT_PATH<br/>逐个执行 bash build.sh --SELECTED_PART -j8"] --> BuildOk{"编译通过？"}
+    BuildOk -->|否| FixBuild["分析错误并修复 UT"] --> BuildPart
+    BuildOk -->|是| Reproduce["Phase 4 可执行文件定向复现<br/>定位 build/tests/api/ 下实际测试可执行文件<br/>执行 gtest filter"]
+    Reproduce --> TestOk{"测试通过且测试数 > 0？"}
+    TestOk -->|否| FixTest["分析原因并修复 UT 或过滤条件"] --> BuildPart
+    TestOk -->|是| Report["Phase 5 输出最终验证报告<br/>含 token、耗时、当前覆盖率"]
 ```
 
 ---
@@ -41,10 +26,13 @@
 
 各 API 场景 guide 不再重复维护编译命令。生成 UT 后统一回到本节，根据 API 类型、目标芯片、核心类型和本地 `tests/test_parts.sh` 选择实际命令。
 
+本节表格只作为导航索引，不能作为唯一事实来源。每次选择 build.sh part 或 CMake target 前，必须先查看当前仓内对应脚本和 CMake 文件；若当前文件与本 reference 不一致，以当前文件为准，并在执行日志中记录已检查的脚本/CMake 路径和差异。
+
 ### 2.1 强制规则
 
-- 每次验证前先检查当前仓内 `build.sh` 与 `tests/test_parts.sh`，不要凭旧记忆使用固定 part。
-- 先从 `tests/CMakeLists.txt`、`tests/api/CMakeLists.txt` 和相关子目录 `CMakeLists.txt` 确定测试可执行 target，再反查它位于哪个 `*_test_targets` 数组。
+- 每次验证前必须先检查当前仓内 `build.sh` 与 `tests/test_parts.sh`，不能只依赖当前 reference、旧记忆或固定 part。
+- 每次验证前必须先查看 `tests/CMakeLists.txt`、`tests/api/CMakeLists.txt` 和相关子目录 `CMakeLists.txt`，确定测试可执行 target，再反查它位于哪个 `*_test_targets` 数组。
+- 执行日志必须记录已查看的 `build.sh`、`tests/test_parts.sh` 和相关 `CMakeLists.txt` 路径；若发现当前脚本/CMake 与本 reference 表格不一致，报告差异并按当前脚本/CMake 执行。
 - CMake 检查必须覆盖 `add_subdirectory`、`add_executable`、`add_custom_target`、`run_llt_test`、`run_python_llt_test`、产品列表和 `file(GLOB ...)` source glob；只看目录名不够。
 - `build.sh --<part>` 会把 `tests/test_parts.sh` 中的 target 传给 `cmake --build . --target ...`，并通过 `-DTEST_MOD=...` 传入 CMake；`run_llt_test` 会按 `TEST_MOD` 跳过未选中的 C++ target，Python target 则依赖 build.sh 显式列入 `--target`。
 - 一个 API 内容修改可能影响多个 target；必须运行所有命中的 build.sh part。
@@ -199,26 +187,16 @@ cd {ASC_DEVKIT_PATH}/build/tests/api/basic_api
 
 ### 5.1 自动修复流程
 
-```
-编译/测试失败
-    │
-    ├─ Step 1: 错误分析
-    │   ├─ 解析错误信息
-    │   ├─ 定位错误位置
-    │   └─ 确定错误类型
-    │
-    ├─ Step 2: 自动修复
-    │   ├─ 类型错误 → 修正数据类型
-    │   ├─ 参数错误 → 调整参数配置
-    │   ├─ 头文件缺失 → 添加 include
-    │   ├─ 约束违反 → 调整测试数据
-    │   └─ 结构初始化错误 → 改用成员赋值
-    │
-    ├─ Step 3: 重新验证
-    │   └─ 自动重新编译和测试
-    │
-    └─ Step 4: 达到最大重试次数
-        └─ 输出错误报告，请求用户介入
+```mermaid
+flowchart TD
+    Fail["编译/测试失败"] --> Analyze["Step 1 错误分析<br/>解析错误信息<br/>定位错误位置<br/>确定错误类型"]
+    Analyze --> Fix["Step 2 自动修复<br/>类型错误: 修正数据类型<br/>参数错误: 调整参数配置<br/>头文件缺失: 添加 include<br/>约束违反: 调整测试数据<br/>结构初始化错误: 改用成员赋值"]
+    Fix --> Retry["Step 3 重新验证<br/>自动重新编译和测试"]
+    Retry --> Pass{"验证通过？"}
+    Pass -->|是| Done["继续后续验证流程"]
+    Pass -->|否| Limit{"达到最大重试次数？"}
+    Limit -->|否| Analyze
+    Limit -->|是| ErrorReport["Step 4 输出错误报告<br/>请求用户介入"]
 ```
 
 ### 5.2 自动修复示例

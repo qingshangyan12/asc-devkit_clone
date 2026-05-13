@@ -43,8 +43,6 @@
 
 以后新增或修改 skill，只改 `.agent/skills`。`.opencode`、`.claude`、`.codex` 不应维护独立内容。
 
-> 当前 Codex 沙箱会把本仓 `.codex` 作为只读保留路径挂载；在这个运行环境里不能把 `.codex` 长期替换成软链，否则后续命令会因沙箱只读路径校验失败而无法启动。普通 checkout 或临时仓中没有这个限制。
-
 ### 用户目录安装
 
 日常使用不需要安装；本仓不再维护用户目录安装脚本。如果某个客户端只读取 `${CODEX_HOME:-$HOME/.codex}/skills`，用户目录安装由客户端或用户环境自行管理，不作为本仓事实源的一部分。
@@ -78,7 +76,7 @@ bash .agent/tests/skills/asc-npu-arch/test.sh
 
 - `.agent/skills` 是本仓 skill 的唯一事实来源。
 - 不直接编辑 `.opencode/skills`、`.claude/skills` 或 `.codex/skills`；它们都应通过软链访问 `.agent/skills`。
-- 不在本仓维护 `.agents/plugins`、`plugins/ascendc-api-generator` 或外部安装目录中的 skill 副本。
+- Codex 沙箱环境中，`.codex` 软链可能触发只读保留路径校验失败；普通 checkout 或临时仓不受此限制。
 - 当前 `asc-api-ut-gen` skill 忽略 Tensor API，不维护 `include/experimental/tensor_api/`、`impl/experimental/tensor_api/`、`tests/api/tensor_api/` 的生成规则。
 
 ### 事实源顺序
@@ -95,8 +93,8 @@ bash .agent/tests/skills/asc-npu-arch/test.sh
 
 ### 修改规则
 
-- 修改 skill 正文、reference、脚本或测试后，至少运行相关 skill 的 `test.sh`。
-- 跨 skill 或通用事实变更后，运行 `bash .agent/tests/skills/run-all.sh`。
+- 修改 skill 正文、reference、脚本或测试后，运行所有相关的 shell 测试脚本，并至少包含相关 skill 的 `test.sh`；确认执行正确后再交付。
+- 跨 skill 或通用事实变更后，运行 `bash .agent/tests/skills/run-all.sh`，确认执行正确后再交付。
 - 新增 reference 时，同步更新对应 `references/README.md` 或 skill 的参考索引。
 - 新增芯片时，优先更新 `asc-npu-arch` 的结构化事实；只有 API 类型限制变化时，才更新 `asc-api-ut-gen` 的生成约束。
 
