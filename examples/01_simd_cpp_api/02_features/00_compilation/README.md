@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍了自定义算子编译工程和静态Aclnn调用的实现方法。
+本样例介绍了自定义算子编译工程、静态Aclnn调用和使用xmake构建Ascend C算子的方法。
 
 ## 样例列表
 
@@ -11,3 +11,4 @@
 | [custom_op](./custom_op/) | 本样例介绍了自定义算子编译工程的实现方法，包括Add和LeakyRelu算子 |
 | [custom_op_static_lib](./custom_op_static_lib/) | 本样例介绍了静态Aclnn调用的实现方法 |
 | [parallel_ops_package](./parallel_ops_package/) | 本样例介绍了自定义算子多vender并行编译工程的实现方法，包括Add和LeakyRelu算子 |
+| [xmake_add](./xmake_add/) | 本样例介绍了使用xmake构建并运行Ascend C Add算子的方法 |
