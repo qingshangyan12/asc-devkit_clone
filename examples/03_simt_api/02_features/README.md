@@ -9,4 +9,3 @@
 | 目录名称  | 功能描述 |
 | --------- | --------- |
 | [00_resource_management](./00_resource_management/) | 展示SIMT资源管理相关的特性样例。 |
- |
