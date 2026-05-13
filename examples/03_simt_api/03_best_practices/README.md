@@ -9,3 +9,4 @@
 | 目录名称                                               | 功能描述                                                                                        |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
 | [01_simt_matrix_transpose](./01_simt_matrix_transpose/)   | 样例基于Ascend C SIMT编程方式实现MatrixTranspose算子，展示Ascend C SIMT编程方式的性能调优思路。 |
+| [02_simt_data_cache_hint](./02_simt_data_cache_hint)     | 样例基于Ascend C SIMT编程方式实现Sin算子，展示SIMT算子的缓存优化能力。                        |
