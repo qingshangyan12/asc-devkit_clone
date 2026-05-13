@@ -1205,7 +1205,7 @@ __aicore__ inline int8_t TPipe::AllocCrossSyncId()
     return syncId;
 }
 
-__aicore__ inline int8_t TPipe::AllocTscmBufId()
+__aicore__ inline TBufId TPipe::AllocTscmBufId()
 {
     return ::AscendC::AllocMutexID();
 }
