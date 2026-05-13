@@ -1,0 +1,540 @@
+[2026-05-13 17:26:01] Info: cmake config -DASCEND_CANN_PACKAGE_PATH=/home/jenkins/Ascend/cann-9.0.0 -DPACKAGE_OPEN_PROJECT=ON -DCANN_3RD_LIB_PATH=/data/chu/06_skip_error/asc-devkit_5293/build -DENABLE_BUILD_DEVICE=ON -DFULL_MODE=ON -DDEVICE_MODE=ON -DKERNEL_MODE=ON -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=/home/jenkins/Ascend/cann-9.0.0/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-gcc -DCMAKE_CXX_COMPILER=/home/jenkins/Ascend/cann-9.0.0/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-g++ -DCUSTOM_SIGN_SCRIPT=/data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/scripts/sign/community_sign_build.py -DENABLE_SIGN=false -DVERSION_INFO=8.5.0 .
+-- The C compiler identification is GNU 7.3.0
+-- The CXX compiler identification is GNU 7.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/jenkins/Ascend/cann-9.0.0/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/jenkins/Ascend/cann-9.0.0/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Initialization summary: Found ccache, TARGET_ARCH: aarch64
+-- compile project asc-devkit with library
+-- KERNEL_MODE=ON
+-- BUILD_OPEN_PROJECT=ON
+-- AARCH_MODE=
+-- TOOLCHAIN_DIR=/home/jenkins/Ascend/cann-9.0.0/toolkit/toolchain/hcc
+-- Stub library libascend_hal.so
+-- Stub library libslog.so
+-- Stub library libaicpu_sharder.so
+-- Stub library libruntime.so
+-- Stub library libacl_rt.so
+-- config.cmake KERNEL_MODE=ON BUILD_OPEN_PROJECT=ON
+-- open TOP_DIR = 
+-- Could NOT find json (missing: JSON_INCLUDE) 
+-- [ThirdParty] Downloading nlohmann_json from https://gitcode.com/cann-src-third-party/json/releases/download/v3.11.3/include.zip
+Build third party library rdma-core
+-- rdma-core source not found, starting download and setup...
+-- Downloading rdma-core-42.7.tar.gz...
+-- [download 1% complete]
+-- [download 2% complete]
+-- [download 3% complete]
+-- [download 4% complete]
+-- [download 5% complete]
+-- [download 6% complete]
+-- [download 7% complete]
+-- [download 8% complete]
+-- [download 9% complete]
+-- [download 10% complete]
+-- [download 11% complete]
+-- [download 12% complete]
+-- [download 13% complete]
+-- [download 14% complete]
+-- [download 15% complete]
+-- [download 16% complete]
+-- [download 17% complete]
+-- [download 18% complete]
+-- [download 19% complete]
+-- [download 20% complete]
+-- [download 21% complete]
+-- [download 22% complete]
+-- [download 23% complete]
+-- [download 24% complete]
+-- [download 25% complete]
+-- [download 26% complete]
+-- [download 27% complete]
+-- [download 28% complete]
+-- [download 29% complete]
+-- [download 30% complete]
+-- [download 31% complete]
+-- [download 32% complete]
+-- [download 33% complete]
+-- [download 34% complete]
+-- [download 35% complete]
+-- [download 36% complete]
+-- [download 37% complete]
+-- [download 38% complete]
+-- [download 39% complete]
+-- [download 40% complete]
+-- [download 41% complete]
+-- [download 42% complete]
+-- [download 43% complete]
+-- [download 44% complete]
+-- [download 45% complete]
+-- [download 46% complete]
+-- [download 47% complete]
+-- [download 48% complete]
+-- [download 49% complete]
+-- [download 50% complete]
+-- [download 51% complete]
+-- [download 52% complete]
+-- [download 53% complete]
+-- [download 54% complete]
+-- [download 55% complete]
+-- [download 56% complete]
+-- [download 57% complete]
+-- [download 58% complete]
+-- [download 59% complete]
+-- [download 60% complete]
+-- [download 61% complete]
+-- [download 62% complete]
+-- [download 63% complete]
+-- [download 64% complete]
+-- [download 65% complete]
+-- [download 66% complete]
+-- [download 67% complete]
+-- [download 68% complete]
+-- [download 69% complete]
+-- [download 70% complete]
+-- [download 71% complete]
+-- [download 72% complete]
+-- [download 73% complete]
+-- [download 74% complete]
+-- [download 75% complete]
+-- [download 76% complete]
+-- [download 77% complete]
+-- [download 78% complete]
+-- [download 79% complete]
+-- [download 80% complete]
+-- [download 81% complete]
+-- [download 82% complete]
+-- [download 83% complete]
+-- [download 84% complete]
+-- [download 85% complete]
+-- [download 86% complete]
+-- [download 87% complete]
+-- [download 88% complete]
+-- [download 89% complete]
+-- [download 90% complete]
+-- [download 91% complete]
+-- [download 92% complete]
+-- [download 93% complete]
+-- [download 94% complete]
+-- [download 95% complete]
+-- [download 96% complete]
+-- [download 97% complete]
+-- [download 98% complete]
+-- [download 99% complete]
+-- [download 100% complete]
+-- Downloading rdma-core-42.7.patch...
+-- [download 6% complete]
+-- [download 13% complete]
+-- [download 20% complete]
+-- [download 27% complete]
+-- [download 34% complete]
+-- [download 41% complete]
+-- [download 48% complete]
+-- [download 54% complete]
+-- [download 61% complete]
+-- [download 68% complete]
+-- [download 75% complete]
+-- [download 82% complete]
+-- [download 89% complete]
+-- [download 96% complete]
+-- [download 100% complete]
+-- Extracting rdma-core...
+-- Applying rdma-core patch...
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file CMakeLists.txt
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file buildlib/rdma_functions.cmake
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file buildlib/sanitize_static_lib.py
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file kernel-headers/rdma/hns-abi.h
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file kernel-headers/rdma/ib_user_verbs.h
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file libibverbs/cmd.c
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file libibverbs/cmd_cq.c
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file libibverbs/cmd_qp.c
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file libibverbs/cmd_srq.c
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file libibverbs/verbs.h
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/CMakeLists.txt
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u.c
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u.h
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u_abi.h
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u_ai.c
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u_ai.h
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u_buf.c
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u_db.c
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u_db.h
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u_hw_v2.c
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u_hw_v2.h
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hns_roce_u_verbs.c
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/hnsdv.h
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/libhns.map
+(Stripping trailing CRs from patch; use --binary to disable.)
+patching file providers/hns/rdma_lite_common.h
+-- The C compiler identification is GNU 7.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/jenkins/Ascend/cann-9.0.0/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Performing Test HAVE_NO_SPARSE
+-- Performing Test HAVE_NO_SPARSE - Success
+-- Performing Test HAVE_C_WARNINGS
+-- Performing Test HAVE_C_WARNINGS - Success
+-- Performing Test HAVE_C_WWRITE_STRINGS
+-- Performing Test HAVE_C_WWRITE_STRINGS - Success
+-- Performing Test HAVE_C_WFORMAT_2
+-- Performing Test HAVE_C_WFORMAT_2 - Success
+-- Performing Test HAVE_C_WCAST_FUNCTION
+-- Performing Test HAVE_C_WCAST_FUNCTION - Failed
+-- Performing Test HAVE_C_WFORMAT_NONLITERAL
+-- Performing Test HAVE_C_WFORMAT_NONLITERAL - Success
+-- Performing Test HAVE_C_WDATE_TIME
+-- Performing Test HAVE_C_WDATE_TIME - Success
+-- Performing Test HAVE_C_WORKING_SHADOW
+-- Performing Test HAVE_C_WORKING_SHADOW - Success
+-- Performing Test HAVE_C_WORKING_MISSING_FIELD_INITIALIZERS
+-- Performing Test HAVE_C_WORKING_MISSING_FIELD_INITIALIZERS - Success
+-- Performing Test HAVE_NO_STRICT_ALIASING
+-- Performing Test HAVE_NO_STRICT_ALIASING - Success
+-- Performing Test HAVE_NO_VAR_TRACKING_ASSIGNMENTS
+-- Performing Test HAVE_NO_VAR_TRACKING_ASSIGNMENTS - Success
+-- Performing Test HAVE_FUNC_ATTRIBUTE_IFUNC
+-- Performing Test HAVE_FUNC_ATTRIBUTE_IFUNC - Failed
+-- Performing Test HAVE_FUNC_ATTRIBUTE_SYMVER
+-- Performing Test HAVE_FUNC_ATTRIBUTE_SYMVER - Failed
+-- Performing Test HAS_CLOEXEC
+-- Performing Test HAS_CLOEXEC - Success
+-- Performing Test HAVE_FUNC_ATTRIBUTE_ALWAYS_INLINE
+-- Performing Test HAVE_FUNC_ATTRIBUTE_ALWAYS_INLINE - Success
+-- Performing Test HAVE_LONG_LONG_U64
+-- Performing Test HAVE_LONG_LONG_U64 - Success
+-- Performing Test HAVE_GLIBC_UAPI_COMPAT
+-- Performing Test HAVE_GLIBC_UAPI_COMPAT - Success
+-- Performing Test HAVE_WORKING_STRICT_ALIASING
+-- Performing Test HAVE_WORKING_STRICT_ALIASING - Success
+-- Performing Test HAVE_LARGE_FILES
+-- Performing Test HAVE_LARGE_FILES - Success
+-- Looking for stdatomic.h
+-- Looking for stdatomic.h - found
+-- Performing Test HAVE_TARGET_SSE
+-- Performing Test HAVE_TARGET_SSE - Success
+-- Performing Test SUPPORTS_AS_NEEDED
+-- Performing Test SUPPORTS_AS_NEEDED - Success
+-- Performing Test SUPPORTS_NO_UNDEFINED
+-- Performing Test SUPPORTS_NO_UNDEFINED - Success
+-- Performing Test _LDSYMVER_SUCCESS
+-- Performing Test _LDSYMVER_SUCCESS - Success
+-- Found LDSymVer: GNU  
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Found PkgConfig: /usr/bin/pkg-config (found version "0.29.1") 
+-- Could NOT find UDev (missing: LIBUDEV_LIBRARY) 
+-- Check size of long
+-- Check size of long - done
+-- Performing Test HAVE_COHERENT_DMA
+-- Performing Test HAVE_COHERENT_DMA - Success
+-- Could NOT find Systemd (missing: SYSTEMD_LIBRARIES LIBSYSTEMD_INCLUDE_DIRS) 
+-- Looking for valgrind/memcheck.h
+-- Looking for valgrind/memcheck.h - not found
+-- Looking for valgrind/drd.h
+-- Looking for valgrind/drd.h - not found
+-- Performing Test LIBC_HAS_LIBRT
+-- Performing Test LIBC_HAS_LIBRT - Success
+-- Performing Test HAVE_STATIC_ASSERT
+-- Performing Test HAVE_STATIC_ASSERT - Success
+-- Performing Test HAVE_C_WOLD_STYLE_DEFINITION
+-- Performing Test HAVE_C_WOLD_STYLE_DEFINITION - Success
+-- Performing Test HAVE_C_WREDUNDANT_DECLS
+-- Performing Test HAVE_C_WREDUNDANT_DECLS - Success
+-- Performing Test HAVE_GLIBC_GETRANDOM
+-- Performing Test HAVE_GLIBC_GETRANDOM - Success
+-- Performing Test HAVE_GLIBC_FXSTAT
+-- Performing Test HAVE_GLIBC_FXSTAT - Failed
+-- Performing Test HAVE_GLIBC_HWCAP_S390_PCI_MIO
+-- Performing Test HAVE_GLIBC_HWCAP_S390_PCI_MIO - Success
+-- Missing Optional Items:
+--  Compiler attribute ifunc NOT supported
+--  Compiler attribute symver NOT supported, can not use LTO
+--  Valgrind memcheck.h NOT enabled
+--  Valgrind drd.h NOT enabled
+--  neighbour resolution NOT enabled
+--  man pages NOT built
+--  cython NOT found (disabling pyverbs)
+--  libsystemd NOT found (disabling features)
+--  libudev NOT found (disabling features)
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build
+[ 20%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/vmw_pvrdma-abi.h
+[ 20%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/bnxt_re-abi.h
+[ 40%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/cxgb4-abi.h
+[ 40%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/efa-abi.h
+[ 40%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/hns-abi.h
+[ 60%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/ib_user_verbs.h
+[ 60%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/irdma-abi.h
+[ 60%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/mlx4-abi.h
+[ 80%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/mlx5-abi.h
+[ 80%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/mthca-abi.h
+[ 80%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/ocrdma-abi.h
+[100%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/qedr-abi.h
+[100%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/rdma_user_rxe.h
+[100%] Creating ABI wrapper /data/chu/06_skip_error/asc-devkit_5293/third_party/rdma-core-build/include/kernel-abi/siw-abi.h
+[100%] Building C object kernel-headers/CMakeFiles/kern-abi.dir/kern-abi.c.o
+[100%] Linking C static library libkern-abi.a
+[100%] Built target kern-abi
+-- open TOP_DIR = 
+-- HCCL_OPEN_CODE_BASE_DIR = /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../
+-- HCCL_BASE_DIR = /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../
+-- framework KERNEL_MODE=ON
+-- framework BUILD_OPEN_PROJECT=ON
+-- framework ASCEND_CANN_PACKAGE_PATH=/home/jenkins/Ascend/cann-9.0.0
+-- framework CMAKE_HOST_SYSTEM_PROCESSOR=aarch64
+-- Host is ARM64
+-- framework ASCEND_CANN_PACKAGE_ENV_PATH=/home/jenkins/Ascend/cann-9.0.0/aarch64-linux
+-- Detected +++VERSION_INFO: 8.5.0
+-- CMAKE_MODULE_PATH: /data/chu/06_skip_error/asc-devkit_5293/cmake/modules
+-- Found unified_dlog: /home/jenkins/Ascend/cann-9.0.0/pkg_inc  
+-- Variables in unified_dlog module:
+-- unified_dlog_INCLUDE_DIR="/home/jenkins/Ascend/cann-9.0.0/pkg_inc"
+-- unified_dlog_SHARED_LIBRARY="/home/jenkins/Ascend/cann-9.0.0/lib64/libunified_dlog.so"
+-- 
+ Properties for TARGET unified_dlog:
+   unified_dlog.INTERFACE_COMPILE_DEFINITIONS = "PROCESS_LOG"
+   unified_dlog.INTERFACE_LINK_LIBRARIES = "unified_dlog_headers"
+   unified_dlog.IMPORTED_LOCATION = "/home/jenkins/Ascend/cann-9.0.0/lib64/libunified_dlog.so"
+
+-- 
+ Properties for TARGET unified_dlog_headers:
+   unified_dlog_headers.INTERFACE_INCLUDE_DIRECTORIES = "/home/jenkins/Ascend/cann-9.0.0/pkg_inc;/home/jenkins/Ascend/cann-9.0.0/pkg_inc/base"
+
+-- Found securec: /home/jenkins/Ascend/cann-9.0.0/include  
+-- Found mmpa: /home/jenkins/Ascend/cann-9.0.0/include  
+-- Variables in mmpa module:
+-- mmpa_INCLUDE_DIR="/home/jenkins/Ascend/cann-9.0.0/include"
+-- mmpa_SHARED_LIBRARY="/home/jenkins/Ascend/cann-9.0.0/lib64/libmmpa.so"
+-- mmpa_STATIC_LIBRARY="/home/jenkins/Ascend/cann-9.0.0/lib64/libmmpa.a"
+-- 
+ Properties for TARGET mmpa:
+   mmpa.INTERFACE_LINK_LIBRARIES = "mmpa_headers"
+   mmpa.IMPORTED_LOCATION = "/home/jenkins/Ascend/cann-9.0.0/lib64/libmmpa.so"
+
+-- 
+ Properties for TARGET static_mmpa:
+   static_mmpa.INTERFACE_LINK_LIBRARIES = "mmpa_headers"
+   static_mmpa.IMPORTED_LOCATION = "/home/jenkins/Ascend/cann-9.0.0/lib64/libmmpa.a"
+
+-- 
+ Properties for TARGET mmpa_headers:
+   mmpa_headers.INTERFACE_INCLUDE_DIRECTORIES = "/home/jenkins/Ascend/cann-9.0.0/include;/home/jenkins/Ascend/cann-9.0.0/include/mmpa;/home/jenkins/Ascend/cann-9.0.0/include/mmpa/sub_inc"
+
+-- Found register library:/home/jenkins/Ascend/cann-9.0.0/aarch64-linux/lib64/libregister.so
+-- =======> /home/jenkins/Ascend/cann-9.0.0/lib64/libopp_registry.so..............
+-- Found opp_registry library:/home/jenkins/Ascend/cann-9.0.0/aarch64-linux/lib64/libopp_registry.so
+-- Found exe_graph library:/home/jenkins/Ascend/cann-9.0.0/aarch64-linux/lib64/libexe_graph.so
+-- Found error_manager library:/home/jenkins/Ascend/cann-9.0.0/aarch64-linux/lib64/liberror_manager.so
+-- Found metadef library:/home/jenkins/Ascend/cann-9.0.0/aarch64-linux/lib64/libmetadef.so
+-- Found graph library:/home/jenkins/Ascend/cann-9.0.0/aarch64-linux/lib64/libgraph.so
+-- Found graph_base library:/home/jenkins/Ascend/cann-9.0.0/aarch64-linux/lib64/libgraph_base.so
+-- Found rt2_registry library:/home/jenkins/Ascend/cann-9.0.0/aarch64-linux/lib64/librt2_registry.a
+-- Found platform: /home/jenkins/Ascend/cann-9.0.0/include  
+-- Variables in platform module:
+-- platform_INCLUDE_DIR="/home/jenkins/Ascend/cann-9.0.0/include"
+-- platform_SHARED_LIBRARY="/home/jenkins/Ascend/cann-9.0.0/lib64/libplatform.so"
+-- 
+ Properties for TARGET platform:
+   platform.INTERFACE_LINK_LIBRARIES = "platform_headers"
+   platform.IMPORTED_LOCATION = "/home/jenkins/Ascend/cann-9.0.0/lib64/libplatform.so"
+
+-- 
+ Properties for TARGET platform_headers:
+   platform_headers.INTERFACE_INCLUDE_DIRECTORIES = "/home/jenkins/Ascend/cann-9.0.0/include;/home/jenkins/Ascend/cann-9.0.0/include/platform"
+
+check_build_dependencies.py: WARNING: Check build dependency failed! Required runtime version is 9.1, but runtime version is 9.0.0.
+check_build_dependencies.py: WARNING: Check build dependency failed! Required metadef version is 9.1, but metadef version is 9.0.0.
+-- System processor: aarch64
+-- Detected architecture: ARM64
+-- CMAKE_INSTALL_PREFIX = /data/chu/06_skip_error/asc-devkit_5293/build_device/_CPack_Packages/makeself_staging
+-- CMAKE_SOURCE_DIR = /data/chu/06_skip_error/asc-devkit_5293
+-- CMAKE_CURRENT_SOURCE_DIR = /data/chu/06_skip_error/asc-devkit_5293
+-- CMAKE_BINARY_DIR = /data/chu/06_skip_error/asc-devkit_5293/build_device
+-- Downloading makeself from https://gitcode.com/cann-src-third-party/makeself/releases/download/release-2.5.0-patch1.0/makeself-release-2.5.0-patch1.tar.gz
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /data/chu/06_skip_error/asc-devkit_5293/build_device
+[2026-05-13 17:26:20] Info: build_device
+TARGET_LIST=mc2_server
+PKG_TARGET_LIST=generate_device_aicpu_package
+SIGN_TARGET_LIST=sign_mc2_server
+[2026-05-13 17:26:20] Info: build target:mc2_server
+[  0%] Generating stub/aicpu_sharder.c
+[  0%] Creating directories for 'third_party_json'
+[  0%] Building CXX object impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/hcomm_device_dlsym.cc.o
+[  0%] Building CXX object impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/hcomm_diag_dl.cc.o
+[  0%] Building CXX object impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/ccl_kernel_decoupler_open.dir/comm_kfc_open_kernel_adapter.cc.o
+[  0%] Building CXX object impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/CMakeFiles/mc2_server_kernel_entry.dir/mc2_server_kernel_entry.cc.o
+[  0%] Building CXX object impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/ccl_kernel_decoupler_open_exec.dir/comm_kfc_open_kernel_executor.cc.o
+[  0%] Building CXX object impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/mc2_server_decoupler.dir/comm_kfc_dispatcher.cc.o
+[  0%] Building CXX object impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/mc2_server_decoupler.dir/comm_kfc_aicpu_server.cc.o
+[  0%] Building CXX object impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/hcomm_primitives_dl.cc.o
+[  0%] Building CXX object impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/hcomm_device_profiling_dl.cc.o
+[  0%] Building CXX object impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/CMakeFiles/mc2_server_ccl_kernel_stub.dir/mc2_server_ccl_kernel_stub.cc.o
+[  0%] Building C object impl/adv_api/detail/hccl/cc/CMakeFiles/aicpu_sharder_stub_tmp.dir/stub/aicpu_sharder.c.o
+[  0%] Linking CXX shared library mc2_server_link_stub/libccl_kernel.so
+[  0%] Performing download step (download, verify and extract) for 'third_party_json'
+-- Downloading...
+   dst='/data/chu/06_skip_error/asc-devkit_5293/build/include.zip'
+   timeout='none'
+   inactivity timeout='none'
+-- Using src='https://gitcode.com/cann-src-third-party/json/releases/download/v3.11.3/include.zip'
+[  0%] Linking C shared library stub/libaicpu_sharder.so
+[  0%] Built target mc2_server_ccl_kernel_stub
+[  0%] Built target aicpu_sharder_stub_tmp
+-- verifying file...
+       file='/data/chu/06_skip_error/asc-devkit_5293/build/include.zip'
+-- Downloading... done
+-- extracting...
+     src='/data/chu/06_skip_error/asc-devkit_5293/build/include.zip'
+     dst='/data/chu/06_skip_error/asc-devkit_5293/build/json'
+-- extracting... [tar xfz]
+-- extracting... [analysis]
+-- extracting... [rename]
+-- extracting... [clean up]
+-- extracting... done
+[  0%] No update step for 'third_party_json'
+[  0%] No patch step for 'third_party_json'
+In file included from /home/jenkins/Ascend/cann-9.0.0/include/acl/acl_rt.h:17:0,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/hccl_res_dl.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/hcomm_device_profiling_dl.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/hcomm_device_profiling_dl.cc:10:
+/home/jenkins/Ascend/cann-9.0.0/include/acl/acl_base.h:15:10: fatal error: acl/acl_base_mdl.h: No such file or directory
+ #include "acl/acl_base_mdl.h"
+          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/build.make:118: impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/hcomm_device_profiling_dl.cc.o] Error 1
+make[3]: *** Waiting for unfinished jobs....
+[  6%] No configure step for 'third_party_json'
+[  6%] No build step for 'third_party_json'
+[  6%] No install step for 'third_party_json'
+In file included from /home/jenkins/Ascend/cann-9.0.0/include/acl/acl_rt.h:17:0,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hcomm_primitives.h:17,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/hcomm_primitives_dl.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/hcomm_primitives_dl.cc:10:
+/home/jenkins/Ascend/cann-9.0.0/include/acl/acl_base.h:15:10: fatal error: acl/acl_base_mdl.h: No such file or directory
+ #include "acl/acl_base_mdl.h"
+          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from /home/jenkins/Ascend/cann-9.0.0/include/acl/acl_rt.h:17:0,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/hccl_res_dl.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/hcomm_device_dlsym.cc:11:
+/home/jenkins/Ascend/cann-9.0.0/include/acl/acl_base.h:15:10: fatal error: acl/acl_base_mdl.h: No such file or directory
+ #include "acl/acl_base_mdl.h"
+          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/build.make:90: impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/hcomm_primitives_dl.cc.o] Error 1
+make[3]: *** [impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/build.make:76: impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/hcomm_device_dlsym.cc.o] Error 1
+[  6%] Completed 'third_party_json'
+In file included from /home/jenkins/Ascend/cann-9.0.0/include/acl/acl_rt.h:17:0,
+                 from /home/jenkins/Ascend/cann-9.0.0/include/acl/acl.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hccl/hccl_comm.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h:19,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_open_kernel_executor.cc:16:
+/home/jenkins/Ascend/cann-9.0.0/include/acl/acl_base.h:15:10: fatal error: acl/acl_base_mdl.h: No such file or directory
+ #include "acl/acl_base_mdl.h"
+          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/ccl_kernel_decoupler_open_exec.dir/build.make:76: impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/ccl_kernel_decoupler_open_exec.dir/comm_kfc_open_kernel_executor.cc.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:5756: impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/ccl_kernel_decoupler_open_exec.dir/all] Error 2
+make[2]: *** Waiting for unfinished jobs....
+[  6%] Built target third_party_json
+make[2]: *** [CMakeFiles/Makefile2:5426: impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/CMakeFiles/mc2_kernel_compat.dir/all] Error 2
+In file included from /home/jenkins/Ascend/cann-9.0.0/include/acl/acl_rt.h:17:0,
+                 from /home/jenkins/Ascend/cann-9.0.0/include/acl/acl.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hccl/hccl_comm.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h:19,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_open_kernel_adapter.cc:19:
+/home/jenkins/Ascend/cann-9.0.0/include/acl/acl_base.h:15:10: fatal error: acl/acl_base_mdl.h: No such file or directory
+ #include "acl/acl_base_mdl.h"
+          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/ccl_kernel_decoupler_open.dir/build.make:76: impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/ccl_kernel_decoupler_open.dir/comm_kfc_open_kernel_adapter.cc.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:5730: impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/ccl_kernel_decoupler_open.dir/all] Error 2
+In file included from /home/jenkins/Ascend/cann-9.0.0/include/acl/acl_rt.h:17:0,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hccl/hccl_rank_graph.h:15,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcom.h:21,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../pub_inc/hccl_common.h:25,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../framework/device/common/aicpu_hccl_def.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../framework/device/aicpu_kfc/common/aicpu_kfc_utils.h:15,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_dispatcher.cc:14:
+/home/jenkins/Ascend/cann-9.0.0/include/acl/acl_base.h:15:10: fatal error: acl/acl_base_mdl.h: No such file or directory
+ #include "acl/acl_base_mdl.h"
+          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from /home/jenkins/Ascend/cann-9.0.0/include/acl/acl_rt.h:17:0,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hccl/hccl_rank_graph.h:15,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcom.h:21,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../pub_inc/hccl_common.h:25,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../pub_inc/mem_device_pub.h:13,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../pub_inc/task_logic_info_pub.h:16,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../pub_inc/stream_pub.h:19,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../framework/device/inc/profiling_manager_device.h:13,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../framework/device/common/aicpu_hccl_common.h:13,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_aicpu_server.h:18,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_aicpu_server.cc:10:
+/home/jenkins/Ascend/cann-9.0.0/include/acl/acl_base.h:15:10: fatal error: acl/acl_base_mdl.h: No such file or directory
+ #include "acl/acl_base_mdl.h"
+          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from /home/jenkins/Ascend/cann-9.0.0/include/acl/acl_rt.h:17:0,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/hccl/hccl_rank_graph.h:15,
+                 from /data/chu/06_skip_error/asc-devkit_5293/include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcom.h:21,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../pub_inc/hccl_common.h:25,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/../framework/device/common/aicpu_hccl_def.h:14,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h:15,
+                 from /data/chu/06_skip_error/asc-devkit_5293/impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/mc2_server_kernel_entry.cc:13:
+/home/jenkins/Ascend/cann-9.0.0/include/acl/acl_base.h:15:10: fatal error: acl/acl_base_mdl.h: No such file or directory
+ #include "acl/acl_base_mdl.h"
+          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/mc2_server_decoupler.dir/build.make:90: impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/mc2_server_decoupler.dir/comm_kfc_dispatcher.cc.o] Error 1
+make[3]: *** Waiting for unfinished jobs....
+make[3]: *** [impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/mc2_server_decoupler.dir/build.make:76: impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/mc2_server_decoupler.dir/comm_kfc_aicpu_server.cc.o] Error 1
+make[3]: *** [impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/CMakeFiles/mc2_server_kernel_entry.dir/build.make:76: impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/CMakeFiles/mc2_server_kernel_entry.dir/mc2_server_kernel_entry.cc.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:5808: impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/CMakeFiles/mc2_server_decoupler.dir/all] Error 2
+make[2]: *** [CMakeFiles/Makefile2:5678: impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/CMakeFiles/mc2_server_kernel_entry.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:5353: impl/adv_api/detail/hccl/cc/src/CMakeFiles/mc2_server.dir/rule] Error 2
+make: *** [Makefile:345: mc2_server] Error 2
