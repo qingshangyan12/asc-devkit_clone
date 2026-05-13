@@ -12,7 +12,10 @@
 #include <vector>
 #include <unordered_map>
 
+#include "dtype_common.h"
+#include "base.h"
 #include "hccl_mc2.h"
+#include "hccl_alloc_ctx_res.h"
 
 namespace {
 

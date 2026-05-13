@@ -16,6 +16,7 @@ set(HCCL_CC_INCLUDE_DIR ${ASCENDC_DIR}/include/adv_api/hccl/internal)
 set(HCCL_DEV_BASE ${HCCL_CC_DIR})
 set(HCCL_LOCAL_PKG_INC ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc)
 set(HCCL_ST_DIR ${ASCENDC_DIR}/tests/api/adv_api/hccl/cc/st/algorithm/utils/src)
+set(HCCL_ST_PROXY_DIR ${HCCL_ST_DIR}/hccl_proxy)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
     set(HCCL_CANN_ARCH_DIR ${ASCEND_CANN_PACKAGE_PATH}/x86_64-linux)
@@ -40,6 +41,8 @@ set(CCU_INCLUDE_LIST
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/mmpa
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/profiling
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/toolchain
     ${HCCL_CANN_ARCH_DIR}/pkg_inc/runtime
     ${HCCL_CANN_ARCH_DIR}/pkg_inc/runtime/runtime
     # Common source paths - must include subdirs for relative #include paths
@@ -78,22 +81,38 @@ set(CCU_INCLUDE_LIST
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu
     
-    ${HCCL_CC_SRC_DIR}/aicpu_kfc/pub_inc
-    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/utils
-    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/exception
     ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/types
-    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common
     
-    ${HCCL_ST_DIR}/hccl_proxy
+    ${HCCL_ST_PROXY_DIR}
+    ${HCCL_ST_PROXY_DIR}/communicator
+    ${HCCL_ST_PROXY_DIR}/topo_model
+    ${HCCL_ST_DIR}/sim_world
+    ${HCCL_ST_DIR}/common/utils
+    ${HCCL_ST_DIR}/common/exception
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_executable(${CCU_UT_TARGET}
     test_ccu_mc2.cpp
     # CCU kernel stub and necessary external dependency stubs from existing st framework
-    ${HCCL_ST_DIR}/hccl_proxy/hcomm_ccu_stub.cc
-    ${HCCL_ST_DIR}/hccl_proxy/log_stub.cc
-    ${HCCL_ST_DIR}/hccl_proxy/mmpa_stub.cc
+    # All stub files from st framework
+    ${HCCL_ST_PROXY_DIR}/aclrt_stub.cc
+    ${HCCL_ST_PROXY_DIR}/hccl_algorithm_stub.cc
+    ${HCCL_ST_PROXY_DIR}/hccl_stub.cc
+    ${HCCL_ST_PROXY_DIR}/hcclinner_stub.cc
+    ${HCCL_ST_PROXY_DIR}/log_stub.cc
+    ${HCCL_ST_PROXY_DIR}/mmpa_stub.cc
+    ${HCCL_ST_PROXY_DIR}/error_manager_stub.cc
+    ${HCCL_ST_PROXY_DIR}/hcomm_ccu_stub.cc
+    ${HCCL_ST_PROXY_DIR}/hccl_profiling_dfx_stub.cc
+    ${HCCL_ST_PROXY_DIR}/communicator/sim_communicator.cc
+    ${HCCL_ST_PROXY_DIR}/communicator/sim_thread_manager.cc
+    ${HCCL_ST_PROXY_DIR}/communicator/sim_thread.cc
+    ${HCCL_ST_PROXY_DIR}/communicator/sim_channel.cc
+    ${HCCL_ST_PROXY_DIR}/communicator/sim_channel_manager.cc
+    ${HCCL_ST_PROXY_DIR}/communicator/sim_channel_exchange_handler.cc
+    ${HCCL_ST_PROXY_DIR}/communicator/sim_context_manager.cc
+    ${HCCL_ST_PROXY_DIR}/topo_model/topo_model.cc
     # Source under test
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
     # Real common infrastructure
