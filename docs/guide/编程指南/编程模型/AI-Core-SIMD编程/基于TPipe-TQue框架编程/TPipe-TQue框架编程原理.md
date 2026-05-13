@@ -6,14 +6,14 @@ Ascend C编程模型的核心架构，深度承袭了传统C/C++并发编程中*
 
 这种**阶段解耦、队列互联**的架构，将原本无序的异步并发控制转化为逻辑清晰、可顺序理解的数据流，从根本上规避了显式锁和复杂同步带来的心智负担，降低了并行程序的设计、调试与维护成本。
 
-面向AI Core的异构并行计算场景，Ascend C对经典队列管道思想进行了针对性适配与创新，构建了专属的**TPipe-TQue并行编程模型**。该模型由三大核心要素构成：**可并行执行的多阶段计算任务（Stage）**、**基于队列的跨阶段同步通信机制**，以及**开发者可显式控制的任务与硬件资源调度能力**。同时，它将底层的硬件同步指令、片上内存生命周期管理封装为`EnQue`/`DeQue`和`AllocTensor`/`FreeTensor`两组接口，形成了一套轻量、高可控、标准化的异构并行编程范式。
+面向AI Core的异构并行计算场景，Ascend C对经典队列流水线思想进行了适配与创新，构建了专属的**TPipe-TQue并行编程模型**。该模型由三大核心要素构成：可并行执行的处理阶段（Stage）、全局资源管理、跨阶段队列同步通信。同时，Ascend C将底层硬件同步指令与片上内存生命周期管理分别封装为`EnQue`/`DeQue`和`AllocTensor`/`FreeTensor`两组标准化接口，形成了一套轻量级、高可控、标准化的异构并行编程范式。
 
 ## TPipe-TQue框架核心定义与编程原理
 
-**TPipe**与**TQue**是支撑多Stage流水线并行运行的两大基础组件，二者职责分明、协同联动：
+**TPipe**与**TQue**是支撑多Stage流水线并行运行的两大基础组件，二者职责分明、紧密协同：
 
-- **[TPipe（管道资源管理器）](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TPipe.md)**：全局资源管控单元，统一管理片内队列内存、缓存及硬件事件资源。通过`AllocTensor`/`FreeTensor`内建的**读后写（Read‑After‑Write, RAW）同步**机制，保证内存复用安全，从根源上杜绝多任务间的数据覆盖冲突，为流水线提供底层资源安全保障。
-- **[TQue（任务队列）](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TQue)**：跨Stage的数据通信与同步载体，负责相邻Stage间的数据流转与**写后读（Write‑After‑Read, WAR）同步**。`EnQue`/`DeQue`操作在触发数据入队、出队的同时，会隐式调用硬件同步信号，强制约束上下游的执行顺序，确保上游写入完成后方可被下游读取，保障数据流的完整与正确。
+- **[TPipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TPipe.md)** 作为资源管理器，统一管理系统内存资源及用于同步的事件等；
+- **[TQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TQue.md)** 作为队列，负责完成Stage任务间的同步与通信。
 
 在TPipe-TQue模型下，完整的算子计算流程被拆分为若干独立、可并行调度的Stage，每个Stage都遵循一套标准化的四步编程范式：
 

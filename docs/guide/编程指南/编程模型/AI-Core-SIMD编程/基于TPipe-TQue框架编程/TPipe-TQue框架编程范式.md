@@ -2,7 +2,7 @@
 
 上一章阐述了TPipe‑TQue编程模型的底层设计原理：基于经典C/C++队列管道（Queue Pipeline）思想，将算子任务拆分为多级流水Stage，依靠TQue队列解决写后读数据依赖、依靠AllocTensor/FreeTensor解决读后写内存复用冲突，通过底层同步指令实现多单元异步并行的时序安全。
 
-本章将上述原理固化为可直接编码的标准化编程范式。上一章回答“为什么这样设计”，本章则聚焦“如何按此设计编写代码”。TPipe‑TQue编程范式的本质，是队列管道思想在AI Core上的工程化落地——它将流水线拆分、队列同步、内存生命周期管理、异步并行调度等复杂底层逻辑，封装为一套统一、固定的开发流程，帮助开发者快速编写规范、可流水且高性能的算子核函数。
+本章将上述原理固化为可直接编码的标准化编程范式。上一章回答**为什么这样设计**，本章则聚焦**如何按此设计编写代码**。TPipe‑TQue编程范式的本质，是队列管道思想在AI Core上的工程化落地——它将流水线拆分、队列同步、内存生命周期管理、异步并行调度等复杂底层逻辑，封装为一套统一、固定的开发流程，帮助开发者快速编写规范、可流水且高性能的算子核函数。
 
 该范式定义了算子核函数实现的标准化固定流程。开发者严格遵循此范式，无需手动编写底层同步逻辑，也不必独自处理数据依赖与时序阻塞，即可快速搭建稳定、高效的算子代码框架。
 
@@ -14,8 +14,8 @@
 ![](../../../../figures/流水线并行示意图.png "流水线并行示意图")
 
 结合上一章的阐述可总结出：Ascend C流水线体系由两大核心模块共同支撑：
-- **[TPipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TPipe.md)** 资源管理器：统一管理队列内存、片内缓存及事件资源，配合AllocTensor/FreeTensor实现读后写同步，保证内存复用安全，杜绝数据覆盖冲突；
-- **[TQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TQue.md)** 队列：承担Stage间的数据传递与写后读同步，通过EnQue/DeQue触发同步信号，确保上游写入完成后下游才开始读取。
+- **[TPipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TPipe.md)** 资源管理器：统一管理系统内存资源和用于同步的事件等；
+- **[TQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TQue.md)** 队列：完成Stage任务之间的同步和通信。
 
 基于这套机制，Ascend C固化了矢量、矩阵、融合三类算子的标准化流水线编程范式。下文将结合硬件特性与工程实例逐一展开。
 
