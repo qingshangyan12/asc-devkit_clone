@@ -15,8 +15,8 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-add_executable(gather
-    gather.asc
+add_executable(gather_1d
+    gather_1d.asc
 )
 
 # ======================================================================================
@@ -25,6 +25,13 @@ add_executable(gather
 # 说明：
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
-target_compile_options(gather PRIVATE
+target_compile_options(gather_1d PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510 --enable-simt>
+)
+
+target_link_libraries(gather_1d PRIVATE
+    m
+    platform
+    tiling_api
+    dl
 )
