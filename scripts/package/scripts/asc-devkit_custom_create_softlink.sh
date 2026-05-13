@@ -71,17 +71,15 @@ do_create_stub_softlink() {
         if [ ! -d "$install_path/$latest_dir/tools/ascendc_tools" ]; then
             mkdir -p "$install_path/$latest_dir/tools/ascendc_tools"
         fi
-        if [ ! -e "$install_path/$latest_dir/tools/ascendc_tools/ascendc_parse_dumpinfo.py" ] &&
-           [ -e "$install_path/$version_dir/tools/ascendc_tools/ascendc_parse_dumpinfo.py" ]; then
-            ln -sr "$install_path/$version_dir/tools/ascendc_tools/ascendc_parse_dumpinfo.py" \
-                   "$install_path/$latest_dir/tools/ascendc_tools/ascendc_parse_dumpinfo.py"
-        fi
     fi
     if [ ! -d "$install_path/$version_dir/compiler/bin" ]; then
         mkdir -p "$install_path/$version_dir/compiler/bin"
     fi
     if [ ! -d "$install_path/$latest_dir/compiler/bin" ]; then
         mkdir -p "$install_path/$latest_dir/compiler/bin"
+    fi
+    if [ ! -d "$install_path/$latest_dir/tools/opbuild" ]; then 
+        ln -sr "$install_path/$version_dir/tools/opbuild" "$install_path/$latest_dir/tools/opbuild" 
     fi
     if [ -e "$install_path/$version_dir/${arch_name}-linux/bin/asc_opc" ]; then
         if [ ! -L "$install_path/$version_dir/compiler/bin/asc_opc" ]; then 
@@ -119,3 +117,21 @@ create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PAT
 create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "asc_op_compile_base-*.dist-info"
 create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "asc_opc_tool"
 create_softlink_if_exists "$WHL_INSTALL_DIR_PATH" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "asc_opc_tool-*.dist-info"
+# hccl python whl 软链接
+create_softlink_if_exists "${WHL_INSTALL_DIR_PATH}" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "hccl"
+create_softlink_if_exists "${WHL_INSTALL_DIR_PATH}" "$WHL_SOFTLINK_INSTALL_DIR_PATH" "hccl-*.dist-info"
+
+python_dir_chmod_set() {
+    local dir="$1"
+    if [ ! -d "$dir" ]; then
+        return
+    fi
+    if [ $(id -u) -eq 0 ]; then
+        chmod 755 "$dir" > /dev/null 2>&1
+    else
+        chmod 750 "$dir" > /dev/null 2>&1
+    fi
+}
+
+python_dir_chmod_set "$WHL_SOFTLINK_INSTALL_DIR_PATH"
+python_dir_chmod_set "$(dirname $WHL_SOFTLINK_INSTALL_DIR_PATH)"

@@ -32,9 +32,6 @@ void vsts(vector_f8e8m0 src0, vector_f8e8m0 src1, __ubuf__ fp8_e8m0_t* base, int
 void vsts(vector_f4e2m1x2 src0, vector_f4e2m1x2 src1, __ubuf__ fp4x2_e2m1_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 
-void vcgadd(vector_u32 & dst, vector_u16 src, vector_bool pg, int32_t mode);
-void vcgadd(vector_s32 & dst, vector_s16 src, vector_bool pg, int32_t mode);
-
 using float8_e4m3_t = fp8_e4m3fn_t;
 using float8_e5m2_t = fp8_e5m2_t;
 using float4_e1m2x2_t = fp4x2_e1m2_t;
@@ -335,7 +332,7 @@ inline void load_gm_to_cbuf_2dv2_s4(__cbuf__ void *dst, __gm__ void *src, uint32
 
 // ==========copy_cbuf_to_ubuf===========
 inline void copy_cbuf_to_ubuf(__ubuf__ void *dst_addr, __cbuf__ void *src_addr, bool sub_blockid, 
-    uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap) {}
+    uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap) {}
 
 
 inline void create_cbuf_matrix_h(__cbuf__ bfloat16_t *dst, int64_t repeat, half value) {}

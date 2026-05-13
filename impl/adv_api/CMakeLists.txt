@@ -7,10 +7,6 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-
-set(ASCENDC_ADV_API_IMPL_DIR ${ASCENDC_IMPL_DIR}/adv_api)
-set(ASCENDC_ADV_API_CMAKE_DIR ${ASCENDC_ADV_API_IMPL_DIR}/cmake)
-
 add_compile_options(-Wno-error)
 
 # generate tiling_api.h softlink
@@ -25,32 +21,7 @@ if(NOT BUILD_OPEN_PROJECT)
                     DEPENDS ${CMAKE_BINARY_DIR}/tiling/tiling_api.h)
 endif()
 
-# generate kernel_tiling/kernel_tiling.h
-set(GEN_KERNEL_TILING_DATA_SCRIPT
-    ${ASCENDC_ADV_API_CMAKE_DIR}/scripts/gen_kernel_tiling_data_def.py)
-set(GENERATE_INSTALL_SCRIPT
-    ${ASCENDC_ADV_API_CMAKE_DIR}/scripts/generate_install_script.sh)
-set(TILING_DATA_DEF_DIR ${ASCENDC_INCLUDE_DIR}/adv_api)
-set(KERNEL_TILING_DIR ${PROJECT_BINARY_DIR})
-set(KERNEL_TILING_HEAD ${KERNEL_TILING_DIR}/kernel_tiling/kernel_tiling.h)
-
-if(NOT BUILD_OPEN_PROJECT)
-  add_custom_command(
-    OUTPUT ${KERNEL_TILING_HEAD}
-    COMMAND ${HI_PYTHON} ${GEN_KERNEL_TILING_DATA_SCRIPT} ${TILING_DATA_DEF_DIR}
-            ${KERNEL_TILING_HEAD}
-    COMMAND mkdir -p ${TOP_DIR}/atc/opcompiler/ascendc_compiler/api/kernel_tiling
-    COMMAND cp ${KERNEL_TILING_HEAD} ${TOP_DIR}/atc/opcompiler/ascendc_compiler/api/kernel_tiling
-    DEPENDS ${GEN_KERNEL_TILING_DATA_SCRIPT})
-else()
-  add_custom_command(
-    OUTPUT ${KERNEL_TILING_HEAD}
-    COMMAND ${HI_PYTHON} ${GEN_KERNEL_TILING_DATA_SCRIPT} ${TILING_DATA_DEF_DIR}
-            ${KERNEL_TILING_HEAD}
-    DEPENDS ${GEN_KERNEL_TILING_DATA_SCRIPT})
-endif()
-
-add_custom_target(gen_kernel_tiling ALL DEPENDS ${KERNEL_TILING_HEAD})
+include(gen_kernel_tiling.cmake)
 
 add_library(kernel_tiling_headers INTERFACE)
 add_dependencies(kernel_tiling_headers gen_kernel_tiling)
@@ -71,21 +42,15 @@ add_subdirectory(tiling)
 if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
   include(ExternalProject)
   ExternalProject_Add(device_tiling
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tiling
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake/device
     CONFIGURE_COMMAND ${CMAKE_COMMAND}
     -G ${CMAKE_GENERATOR}
+    -DCANN_3RD_LIB_PATH=${CANN_3RD_LIB_PATH}
     -DBUILD_OPEN_PROJECT=${BUILD_OPEN_PROJECT}
-    -DKERNEL_TILING_DIR=${KERNEL_TILING_DIR}
-    -DASCENDC_DIR=${ASCENDC_DIR}
     -DINSTALL_LIBRARY_DIR=${INSTALL_LIBRARY_DIR}/lib64/device
-    -DASCENDC_INCLUDE_DIR=${ASCENDC_INCLUDE_DIR}
-    -DASCENDC_ADV_API_CMAKE_DIR=${ASCENDC_ADV_API_CMAKE_DIR}
-    -DASCENDC_API_ADV_MULT_INSTALL_DIR=${ASCENDC_API_ADV_MULT_INSTALL_DIR}
     -DASCEND_CANN_PACKAGE_PATH=${ASCEND_CANN_PACKAGE_PATH}
     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     -DSYS_VERSION=${SYS_VERSION}
-    -DCMAKE_C_COMPILER_LAUNCHER=${CMAKE_C_COMPILER_LAUNCHER}
-    -DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}
     -DCMAKE_C_COMPILER=${ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-gcc
     -DCMAKE_CXX_COMPILER=${ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-g++
     -DPRODUCT_SIDE=device
@@ -95,53 +60,72 @@ endif()
 
 
 # copy include to asc impl
-install(
-  FILES ${KERNEL_TILING_HEAD}
-  DESTINATION
-    ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
-  OPTIONAL)
+if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
+  install(
+    FILES ${KERNEL_TILING_HEAD}
+    DESTINATION
+      ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
+    ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
 
-# copy detail to asc impl
-install(
-  DIRECTORY detail/
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail
-  OPTIONAL FILES_MATCHING
-  PATTERN "*.h"
-  PATTERN "CMakeLists.txt" EXCLUDE)
+  # copy detail to asc impl
+  install(
+    DIRECTORY detail/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail
+    ${INSTALL_OPTIONAL} COMPONENT asc-devkit FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "CMakeLists.txt" EXCLUDE)
 
-# copy tiling to asc impl
-install(
-  DIRECTORY tiling/
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/tiling
-  OPTIONAL FILES_MATCHING
-  PATTERN "*.h"
-  PATTERN "CMakeLists.txt" EXCLUDE)
+  # copy tiling to asc impl
+  install(
+    DIRECTORY tiling/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/tiling
+    ${INSTALL_OPTIONAL} COMPONENT asc-devkit FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "CMakeLists.txt" EXCLUDE)
 
-# cp include to asc include
-install(
-  DIRECTORY ${ASCENDC_INCLUDE_DIR}/adv_api/
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
-  OPTIONAL)
+  # cp include to asc include
+  install(
+    DIRECTORY ${ASCENDC_INCLUDE_DIR}/adv_api/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
+    ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
 
-# generate softlink
-configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/kernel_headers.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/kernel_headers.cmake @ONLY)
-install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/kernel_headers.cmake)
+  # generate softlink
+  configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/kernel_headers.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/kernel_headers.cmake @ONLY)
+  install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/kernel_headers.cmake)
 
-configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/kernel_impl.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/kernel_impl.cmake @ONLY)
-install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/kernel_impl.cmake)
+  configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/kernel_impl.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/kernel_impl.cmake @ONLY)
+  install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/kernel_impl.cmake)
 
-configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/kernel_directory.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/kernel_directory.cmake @ONLY)
-install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/kernel_directory.cmake)
+  configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/kernel_directory.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/kernel_directory.cmake @ONLY)
+  install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/kernel_directory.cmake)
 
-configure_file(
-    ${ASCENDC_ADV_API_CMAKE_DIR}/utils_headers.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/utils_headers.cmake
-    @ONLY
-)
-install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/utils_headers.cmake)
+  configure_file(
+      ${ASCENDC_ADV_API_CMAKE_DIR}/utils_headers.cmake
+      ${CMAKE_CURRENT_BINARY_DIR}/utils_headers.cmake
+      @ONLY
+  )
+  install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/utils_headers.cmake)
+endif()  
+
+if (ENABLE_BUILD_DEVICE)
+    add_subdirectory(detail/hccl/cc)
+
+    set(HCCL_CC_BUILD_DIR ${CMAKE_BINARY_DIR}/impl/adv_api/detail/hccl/cc)
+    install(FILES "${HCCL_CC_BUILD_DIR}/src/libmc2_client.so" "${HCCL_CC_BUILD_DIR}/src/common/hcomm_dlsym/libmc2_compat.so"
+        DESTINATION "hccl/lib64" COMPONENT asc-devkit OPTIONAL)
+    install(FILES "${HCCL_CC_BUILD_DIR}/src/libmc2_server.json"
+        DESTINATION "hccl/built-in/data/op/aicpu" COMPONENT asc-devkit OPTIONAL)
+
+    install_mc2_runtime_staging_link("hccl/include/hccl/hccl.h" "${CMAKE_SYSTEM_PROCESSOR}-linux/include/hccl/hccl.h" TRUE)
+    install_mc2_runtime_staging_link("hccl/include/hccl/hccl_mc2.h" "${CMAKE_SYSTEM_PROCESSOR}-linux/include/hccl/hccl_mc2.h" TRUE)
+    install_mc2_runtime_staging_link("hccl/lib64/libmc2_client.so" "${CMAKE_SYSTEM_PROCESSOR}-linux/lib64/libmc2_client.so" TRUE)
+    install_mc2_runtime_staging_link("hccl/lib64/libmc2_compat.so" "${CMAKE_SYSTEM_PROCESSOR}-linux/lib64/libmc2_compat.so" TRUE)
+    install_mc2_runtime_staging_link("hccl/built-in/data/op/aicpu/libmc2_server.json" "opp/built-in/op_impl/aicpu/config/libmc2_server.json" TRUE)
+    install_mc2_runtime_staging_link("hccl/Ascend/aicpu/mc2_server.tar.gz" "opp/built-in/op_impl/aicpu/kernel/mc2_server.tar.gz" FALSE)
+endif()
 
 if(NOT BUILD_OPEN_PROJECT)
   install_package(

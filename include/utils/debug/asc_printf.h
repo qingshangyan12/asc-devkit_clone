@@ -42,9 +42,10 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(cons
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
+#endif
 namespace __asc_aicore {
-template <class... Args>
-__aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args);
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
@@ -53,9 +54,13 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 } // namespace __asc_aicore
 #endif
 
-#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
-#include "impl/utils/debug/asc_aicore_printf_impl.h"
-#endif
+namespace __asc_simd_vf {
+template <class... Args>
+__simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args)
+{
+    printf_impl(fmt, args...);
+}
+}
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__)

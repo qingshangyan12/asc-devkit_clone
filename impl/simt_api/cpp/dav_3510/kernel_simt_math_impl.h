@@ -55,10 +55,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T AbsImpl(T x)
 {
     if constexpr (std::is_same_v<T, int32_t> || std::is_same_v<T, float> || std::is_same_v<T, int64_t>) {
         return abs(x);
-    } else if (x < 0) {
-        return -x;
-    } else {
-        return x;
+    } else if constexpr (std::is_same_v<T, half>) {
+        uint16_t bits = *reinterpret_cast<uint16_t*>(&x);
+        bits &= 0x7FFF;
+        return *reinterpret_cast<half*>(&bits);
     }
 }
 #endif
@@ -67,7 +67,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T AbsImpl(T x)
 template <typename T>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline T UMulHi(T dividend, T magic)
 {
-    static_assert(SupportType<T, uint32_t, uint64_t>(), "Input type T only supports uint32_t, uint64_t.");
+    static_assert(SupportTypeSimtInternel<T, uint32_t, uint64_t>, "Input type T only supports uint32_t, uint64_t.");
 
     if constexpr (std::is_same<T, uint32_t>::value) {
         return (static_cast<uint64_t>(dividend) * static_cast<uint64_t>(magic)) >> ConstantsInternal::FOUR_BYTE_LEN;
@@ -101,7 +101,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T UMulHi(T dividend, T magic)
 template <typename T>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline T UintDivImpl(T dividend, T magic, T shift)
 {
-    static_assert(SupportType<T, uint32_t, uint64_t>(), "Input type T only supports uint32_t, uint64_t.");
+    static_assert(SupportTypeSimtInternel<T, uint32_t, uint64_t>, "Input type T only supports uint32_t, uint64_t.");
 #ifdef ASCENDC_CPU_DEBUG
     if constexpr (std::is_same<T, uint32_t>::value) {
         ASCENDC_ASSERT(dividend <= ConstantsInternal::U32_MAX_VAL,
@@ -182,10 +182,20 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T MaxImpl(T x, T y)
                   std::is_same_v<T, int64_t> || std::is_same_v<T, uint8_t> || std::is_same_v<T, uint16_t> ||
                   std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>) {
         return max(x, y);
-    } else if (x > y) {
-        return x;
-    } else {
-        return y;
+    } else if constexpr (std::is_same_v<T, float>) {
+        if (IsNan(x)) {
+            return y;
+        } else if (IsNan(y)) {
+            return x;
+        }
+        return __fmaxf(x, y);
+    } else if constexpr (std::is_same_v<T, half>) {
+        if (IsNan(x)) {
+            return y;
+        } else if (IsNan(y)) {
+            return x;
+        }
+        return __hmax_nan(x, y);
     }
 }
 #endif
@@ -204,10 +214,20 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T MinImpl(T x, T y)
                   std::is_same_v<T, int64_t> || std::is_same_v<T, uint8_t> || std::is_same_v<T, uint16_t> ||
                   std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>) {
         return min(x, y);
-    } else if (x < y) {
-        return x;
-    } else {
-        return y;
+    } else if constexpr (std::is_same_v<T, float>) {
+        if (IsNan(x)) {
+            return y;
+        } else if (IsNan(y)) {
+            return x;
+        }
+        return __fminf(x, y);
+    } else if constexpr (std::is_same_v<T, half>) {
+        if (IsNan(x)) {
+            return y;
+        } else if (IsNan(y)) {
+            return x;
+        }
+        return __hmin_nan(x, y);
     }
 }
 #endif
@@ -596,15 +616,15 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ClzIntrinsics(uint8_t bitLen, T x,
 template <typename T>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ClzImpl(T x)
 {
-    static_assert(SupportType<T, int32_t, int64_t, uint32_t, uint64_t>(),
+    static_assert(SupportTypeSimtInternel<T, int32_t, int64_t, uint32_t, uint64_t>,
                   "Input type of Clz function only supports int32_t, uint32_t, int64_t, uint64_t.");
-    if constexpr (SupportType<T, uint32_t>()) {
+    if constexpr (SupportTypeSimtInternel<T, uint32_t>) {
         return ClzIntrinsics(ConstantsInternal::FOUR_BYTE_LEN, x, ConstantsInternal::ONE_UINT32);
-    } else if constexpr (SupportType<T, uint64_t>()) {
+    } else if constexpr (SupportTypeSimtInternel<T, uint64_t>) {
         return ClzIntrinsics(ConstantsInternal::EIGHT_BYTE_LEN, x, ConstantsInternal::ONE_UINT64);
-    } else if constexpr (SupportType<T, int32_t>()) {
+    } else if constexpr (SupportTypeSimtInternel<T, int32_t>) {
         return ClzIntrinsics(ConstantsInternal::FOUR_BYTE_LEN, x, ConstantsInternal::ONE_INT32);
-    } else if constexpr (SupportType<T, int64_t>()) {
+    } else if constexpr (SupportTypeSimtInternel<T, int64_t>) {
         return ClzIntrinsics(ConstantsInternal::EIGHT_BYTE_LEN, x, ConstantsInternal::ONE_INT64);
     }
 }
@@ -633,7 +653,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ClzIntrinsics(int64_t x)
 template <typename T>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ClzImpl(T x)
 {
-    static_assert(SupportType<T, int32_t, int64_t, uint32_t, uint64_t>(),
+    static_assert(SupportTypeSimtInternel<T, int32_t, int64_t, uint32_t, uint64_t>,
                   "Input type of Clz function only supports int32_t, uint32_t, int64_t, uint64_t.");
     return ClzIntrinsics(x);
 }

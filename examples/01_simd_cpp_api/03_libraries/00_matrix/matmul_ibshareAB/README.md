@@ -2,10 +2,11 @@
 
 ## 概述
 
-本样例介绍了调用Matmul高阶API实现开启IBShare功能的单算子。IBShare的功能是复用L1 Buffer上相同的A矩阵或者B矩阵数据，减少数据搬运开销。本样例为A矩阵和B矩阵同时复用场景。
+调开启IBShare功能，复用L1 Buffer上相同的A矩阵或者B矩阵数据的样例，本样例为A矩阵和B矩阵同时复用场景。开启功能可以减少数据搬运开销。
 
 ## 支持的产品
 
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 - Atlas 推理系列产品AI Core
@@ -19,46 +20,51 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_ibshareAB.asc            // Ascend C算子实现 & 调用样例
+│   └── matmul_ibshareAB.asc    // Ascend C样例实现 & 调用样例
 ```
 
-## 算子描述
+## 样例描述
 
-- 算子功能： 
+- 样例功能：  
+  调用Matmul高阶API时开启A、B矩阵的IBShare功能，计算过程中同一AIC对应的两个AIV在每次迭代时用到的A、B矩阵在L1 Buffer上的数据一致。
 
-  算子名中ABshare的含义为，Matmul计算的A矩阵与B矩阵同时使能类型信息MatmulType的参数IBShare；当A矩阵和B矩阵同时使能IBShare时，表示L1 Buffer上的A矩阵和B矩阵同时复用。  
-  matmul_ibshareAB算子的A矩阵与B矩阵均使能IBShare，不对k列进行切分计算，实现了算子性能提升。结合样例[matmul_no_ibshareAB](../matmul_no_ibshareAB)，对比两个算子的运行时间，计算matmul_ibshareAB算子的性能提升百分比。
+  A矩阵与B矩阵均使能IBShare时，不对k列进行切分计算；均未使能IBSHARE时，按照k列进行切分计算。通过对比两种场景的运行时间，可以得出该特性的性能提升。
+  使能AB矩阵ibshare场景的数据处理说明图示(A矩阵和B矩阵不切分处理)：![alt text](./pictures/matmul_ABshare.png)  
+  不使能AB矩阵ibshareAB场景的数据处理说明图示(A矩阵和B矩阵切分处理)：![alt text](./pictures/matmul_noABshare.png)  
 
-- 算子规格： 
 
+- 样例规格：  
+  本样例中：M = 128, N = 256, K = 384。
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
-  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">a</td><td align="center">128 * 384</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">b</td><td align="center">384 * 256</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">128 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_ABshare_custom</td></tr>
   </table>
 
-- 算子实现： 
+- 样例实现： 
 
-  本样例中实现的是[m, n, k]固定为[128, 256, 384]的matmul_ibshareAB算子。
+  - Kernel关键步骤  
+    - 创建Matmul对象：  
+        根据CMakeLists里的ENABLE_IBSHARE_AB编译选项，配置A、B矩阵IBSHARE参数为true或者false。
+        ```cpp
+        #if ENABLE_IBSHARE_AB == 1
+        constexpr bool isABshare = true;
+        #else
+        constexpr bool isABshare = false;
+        #endif
 
-  - Kernel实现  
-    matmul_ibshareAB算子的数学表达式为：
-    ```
-    C = A * B
-    ```
-    - A、B为源操作数，A为左矩阵，形状为\[M, K]；B为右矩阵，形状为\[K, N]。
-    - C为目的操作数，存放矩阵乘结果的矩阵，形状为\[M, N]。
-    其中A的形状为[128, 384]，B的形状为[384, 256]，C的形状为[128, 256]。
-
-    matmul_ibshareAB算子代码数据处理说明图示(A矩阵和B矩阵不切分处理)：  
-    ![alt text](./pictures/matmul_ABshare.png)  
+        Matmul<
+            MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, false, LayoutMode::NONE, isABshare>,
+            MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, isABshare>,
+            MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, CType>> matmulObj;
+        ```
 
 
   - 调用实现  
@@ -66,7 +72,7 @@
 
 ## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
@@ -84,15 +90,41 @@
     source ${install_path}/cann/set_env.sh
     ```
 
-- 样例执行  
+- 样例执行
+
+  - ENABLE_IBSHARE_AB ：是否开启AB矩阵ibshare功能，可以用于性能对比
+    - 0 : 不开启
+    - 1 : 开启
+
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
+  cmake -DENABLE_IBSHARE_AB=1 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j;             # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output_ABshare.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
-  执行结果如下，说明精度对比成功。
+
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例如：
+  ```bash
+  cmake -DENABLE_IBSHARE_AB=1 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
+  cmake -DENABLE_IBSHARE_AB=1 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 参数 | 说明 | 可选值 | 默认值 |
+  |------|------|---------|--------|
+  | ENABLE_IBSHARE_AB | 是否开启AB矩阵ibshare功能 | 0, 1 | 0 |
+  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-2201 |
+
+- 执行结果
+
+  执行结果如下，说明精度对比成功：
   ```bash
   test pass!
   ```

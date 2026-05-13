@@ -37,7 +37,7 @@ target_link_directories(acl_rtc PRIVATE
 target_link_libraries(acl_rtc PRIVATE
     $<BUILD_INTERFACE:intf_pub_cxx17>
     dl
-    c_sec_static
+    static_c_sec
 )
 
 target_compile_options(acl_rtc PRIVATE
@@ -61,11 +61,11 @@ target_link_options(acl_rtc PRIVATE
 )
 
 install(TARGETS acl_rtc
-    LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
-    ARCHIVE DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
-    RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR} OPTIONAL
+    LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}/lib64 ${INSTALL_OPTIONAL} COMPONENT asc-devkit
+    ARCHIVE DESTINATION ${INSTALL_LIBRARY_DIR}/lib64 ${INSTALL_OPTIONAL} COMPONENT asc-devkit
+    RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR}/lib64 ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/acl_rt_compile.h
-    DESTINATION ${INSTALL_LIBRARY_DIR}/acl
+    DESTINATION ${INSTALL_LIBRARY_DIR}/include/acl COMPONENT asc-devkit
 )

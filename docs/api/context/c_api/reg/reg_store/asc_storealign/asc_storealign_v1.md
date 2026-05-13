@@ -40,7 +40,8 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   __simd_callee__ inline void asc_storealign(__ubuf__  fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src, vector_bool mask)
   __simd_callee__ inline void asc_storealign(__ubuf__  fp4x2_e2m1_t* dst_align32b, vector_fp4x2_e2m1_t src, vector_bool mask)
   __simd_callee__ inline void asc_storealign(__ubuf__  fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src, vector_bool mask)
-  
+  __simd_callee__ inline void asc_storealign(__ubuf__  int4b_t* dst_align32b, vector_int4x2_t src, int32_t offset, vector_bool mask)
+
   // FIRST搬出模式
   __simd_callee__ inline void asc_storealign_1st(__ubuf__  int8_t* dst_align32b, vector_int8_t src)
   __simd_callee__ inline void asc_storealign_1st(__ubuf__  uint8_t* dst_align32b, vector_uint8_t src)
@@ -57,7 +58,8 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src)
   __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e2m1_t* dst_align32b, vector_fp4x2_e2m1_t src)
   __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src)
-  
+  __simd_callee__ inline void asc_storealign_1st(__ubuf__  int4b_t* dst_align32b, vector_int4x2_t src, int32_t offset)
+
   // PACK搬出模式
   __simd_callee__ inline void asc_storealign_pack(__ubuf__  int16_t* dst_align32b, vector_int16_t src, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack(__ubuf__  uint16_t* dst_align32b, vector_uint16_t src, vector_bool mask)
@@ -89,18 +91,19 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1)
   __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp4x2_e2m1_t* dst_align32b, vector_fp4x2_e2m1_t src0, vector_fp4x2_e2m1_t src1)
   __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src0, vector_fp4x2_e1m2_t src1)
+  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  int4b_t* dst_align32b, vector_int4x2_t src0, vector_int4x2_t src1, int32_t offset)
   ```
 - 从掩码寄存器连续对齐搬出到UB的场景
   ```cpp
   // NORM搬出模式
-  __simd_callee__ inline void asc_storealign(__ubuf__ uint32_t *dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign(__ubuf__ uint16_t *dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t *dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign(__ubuf__ uint32_t* dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign(__ubuf__ uint16_t* dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst, vector_bool src)
   
   // PACK搬出模式
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t *dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t *dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t *dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t* dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t* dst, vector_bool src)
+  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst, vector_bool src)
   ```
 ## 参数说明
 
@@ -142,11 +145,11 @@ PIPE_V
   __ubuf__ half* src = (__ubuf__ half*)asc_get_phy_buf_addr(0);
   vector_bool mask = asc_create_mask_b16(PAT_ALL);
   uint32_t offset = 128;
-  asc_storealign(dst, src + offset, mask)
+  asc_storealign(dst, src + offset, mask);
   ```
 - 从掩码寄存器连续对齐搬出到UB的场景
   ```cpp
   __ubuf__ uint32_t* dst = (__ubuf__ uint32_t*)asc_get_phy_buf_addr(0);
   vector_bool src;
-  asc_storealign(dst, src)
+  asc_storealign(dst, src);
   ```

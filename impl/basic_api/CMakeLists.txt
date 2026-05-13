@@ -47,28 +47,28 @@ target_include_directories(tikcfw_headers INTERFACE
 )
 
 install(FILES ${ASCENDC_INCLUDE_DIR}/kernel_operator.h
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include OPTIONAL
+  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
 
 if(BUILD_OPEN_PROJECT)
   install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/basic_api/op_frame
-    DESTINATION ${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api OPTIONAL
+    DESTINATION ${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api ${INSTALL_OPTIONAL} COMPONENT asc-devkit
   )
 endif()
 
 install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/basic_api
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include OPTIONAL
+  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
 install(DIRECTORY ${ASCENDC_IMPL_DIR}/basic_api
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
+  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
 
 install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/simt_api
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include OPTIONAL
+  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
 
 install(DIRECTORY ${ASCENDC_IMPL_DIR}/simt_api
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
+  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
 
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api")
@@ -241,7 +241,7 @@ install(CODE "file(CREATE_LINK ../../../../asc/impl/utils/common_types.h ${CMAKE
 
 # 3 tikcpp/tikcfw
 install(CODE "file(CREATE_LINK ../../ascendc/include/basic_api/impl ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/impl SYMBOLIC)")
-install(CODE "file(CREATE_LINK ../../ascendc/include/basic_api/interface ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/interface SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../../asc/include/interface ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/interface SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../ascendc/include/basic_api/op_frame ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/op_frame SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../ascendc/include/basic_api/kernel_operator.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/kernel_operator.h SYMBOLIC)")
 

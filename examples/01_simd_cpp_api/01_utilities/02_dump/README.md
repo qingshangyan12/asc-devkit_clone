@@ -21,15 +21,13 @@
 
 ## 样例描述
 
-- 样例功能：
-
-  样例基于矩阵乘计算为背景，演示asc_dump系列接口（含asc_dump_gm、asc_dump_ubuf、asc_dump_cbuf和asc_dump_l1buf）在NPU侧样例核函数中的使用方法，通过调用上述接口实现不同物理位置上的张量数据可视化。
+- 样例功能：  
+  样例基于矩阵乘计算为背景，演示asc_dump系列接口（含asc_dump_gm、asc_dump_cbuf和asc_dump_l1buf等）在NPU侧样例核函数中的使用方法，通过调用上述接口实现不同物理位置上的张量数据可视化。
 
   此外，该系列接口兼容AscendC::DumpTensor接口。但后续开发中，建议优先使用asc_dump系列接口；若需Dump指定偏移位置的数据，由于asc_dump系列暂不支持该能力，可继续使用DumpAccChkPoint接口。
 
 - 样例规格：
-  - Mmad样例：
-
+  - Mmad样例：  
     矩阵乘规格：M = 16, N = 16, K = 16，详细信息如下表：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Mmad</td></tr>
@@ -44,8 +42,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_custom</td></tr>
     </table>
 
-- 样例实现：
-
+- 样例实现：  
   1）.asc_dump系列接口的函数签名一样，仅函数名存在区分，这种区分用以表示要Dump的具体位置：
   ```cpp
   __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dumpSize);
@@ -78,9 +75,17 @@
 - 样例执行
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake ..;make -j;                # 编译工程
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                # 编译工程
   ./demo                           # 执行编译生成的可执行程序，执行样例
   ```
+
+- 编译选项说明
+
+| 选项 | 可选值 | 说明 |
+|------|--------|------|
+| `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
+- 执行结果
   执行结果如下，说明精度对比成功。
   ```bash
   [Success] Case accuracy is verification passed.

@@ -203,6 +203,10 @@ __aicore__ inline void CopyCbufToBt(uint64_t dst, __cbuf__ T* src, const uint16_
     if ASCEND_IS_AIC {
         if constexpr (std::is_same<T, bfloat16_t>::value || std::is_same<T, float>::value
                       || std::is_same<T, int32_t>::value || std::is_same<T, half>::value) {
+            if constexpr (sizeof(T) == 4) {
+                ASCENDC_DEBUG_ASSERT((blockLen % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "For float or int32_t types, blockLen must be even when DataCopy from L1 to BIAS."));
+            }
             copy_cbuf_to_bt(dst, src, static_cast<bool>(convControl), blockCount, blockLen, srcStride, dstStride);
         }
     }
@@ -1432,7 +1436,7 @@ template <typename T>
 __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams,
                                             const uint8_t cacheMode = 0)
 {
-    ASSERT(false && "unsupported data copy from gm to ubuf with pad in Ascend910");
+    ASSERT(false && "unsupported data copy from gm to ubuf with pad on current device");
 }
 
 __aicore__ inline void NdDmaDciImpl() {

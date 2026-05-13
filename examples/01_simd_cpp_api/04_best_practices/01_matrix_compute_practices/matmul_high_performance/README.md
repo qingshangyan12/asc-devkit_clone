@@ -8,10 +8,10 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── 05_matmul
-│   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
+├── matmul_high_performance
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── matmul.h                // 所有优化case的头文件定义
@@ -25,17 +25,38 @@
   - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]
 
 - 样例规格：
-  <table border="2" align="center">
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulCustom</td></tr>
-  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">[8192, 8192]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">[8192, 8192]</td><td align="center">float16</td><td align="center">ND</td><td align="center">true</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[8192, 8192]</td><td align="center">float16</td><td align="center">ND</td><td align="center">-</td></tr>
-  </table>
+
+<table>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+<tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
+<tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">true</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">-</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_custom</td></tr>
+</table>
 
 
 ## 样例实现
 
+### 类实现说明
+
+本样例通过三个独立的类实现不同的优化策略，每个类对应特定的Case版本。
+
+| 类名 | 对应Case | 实现特点 | 使用的核函数 | 优化特性 |
+|------|---------|---------|-------------|---------|
+| **MatmulKernel** | Case 0-5 | 基础实现，运行时Tiling | matmul_custom (isMdl=false)<br>matmul_custom_mdl (isMdl=true) | - Case 0: 单核基础版本<br>- Case 1: 单核Tiling优化<br>- Case 2: 多核切分 2x12<br>- Case 3: 多核切分 4x6<br>- Case 4: MDL模式<br>- Case 5: MDL模式下L1Cache优化 |
+| **MatmulKernelL2Cache** | Case 6 | L2Cache优化，运行时Tiling | matmul_custom_mdl_l2cache | - MDL模式<br>- L1Cache优化<br>- L2Cache优化 (A矩阵M轴切分) |
+| **MatmulKernelMdlL2CacheConstant** | Case 7-8 | 常量Tiling，编译期计算 | matmul_custom_mdl_l2cache_constant (useUnitFlag=false, Case7)<br>matmul_custom_mdl_l2cache_constant_unitflag (useUnitFlag=true, Case8) | - MDL模式<br>- L1Cache优化<br>- L2Cache优化<br>- 常量Tiling (编译期计算)<br>- Case 8: UnitFlag优化 |
+
+#### 1. Tiling机制特点
+
+- `MatmulKernel`和`MatmulKernelL2Cache`使用`TCubeTiling`类型，需要从GM内存拷贝完整的Tiling数据结构，Tiling参数在运行时由Scalar单元计算
+- `MatmulKernelMdlL2CacheConstant`使用自定义的`MatmulProblemShape`结构体，仅包含shape信息（M, N, K, singleCoreM等），Tiling参数已在编译期通过`CONSTANT_CFG`计算完成，运行时无需Scalar计算
+
+#### 2. Process方法计算流程特点
+- **计算流程**：`MatmulKernel`单次迭代，`MatmulKernelL2Cache`和`MatmulKernelMdlL2CacheConstant`循环2次（L2Cache优化，A矩阵M轴切分）
+
+---
 ### 性能指标说明
 
 | 指标 | 说明 |
@@ -55,6 +76,8 @@
 | aic_fixpipe_ratio | FixPipe的时间占比，反映结果写回的访存压力 |
 
 ---
+
+**说明**：以下各Case的性能变化分析以A2芯片（Ascend 910B1）性能数据为例。Ascend 950PR的性能调优数据请参考[下文](#ascend-950pr芯片性能数据)。
 
 ### Case 0: 单核基础版本 (SINGLE_CORE_BASIC)
 
@@ -98,9 +121,9 @@ tilingApi.SetFixSplit(128, 256, 64);
 ```
 
 **优化手段**：
-- **base块选择原则**：case0中Tiling中设置的base块为 [baseM, baseN, baseK] = [64, 64, 64]，**计算访存比**（即计算量与需要数据量的比值）低。针对当前shape较大的场景，基本块的选择原则为计算访存比最大，即在Cube计算量最大的情况下，访存的数据量最小。
+- **base块选择原则**：case0中Tiling中设置的base块为 [baseM, baseN, baseK] = [64, 64, 64]，**访存计算比**（即计算每cycle需要的数据量）高。针对当前shape较大的场景，基本块的选择原则为访存计算比最小，即在Cube计算量相同的情况下，需要访存的数据量最小。
 
-- **计算访存比分析**：在输入为fp16类型的情况下，Cube执行单元1 cycle能完成16 * 16 * 16次乘加运算。设置base块为[baseM, baseN, baseK] = [128, 256, 64]时，可以在满足搬出时GM地址512Byte对齐的同时，达到最大的计算访存比。Cube计算cycle数为(128 * 64 * 256) / (16 * 16 * 16) = 512cycle，访存计算比为(128 * 64 * 2 + 256 * 64 * 2) / 512cycle = **96byte / cycle**；设置base块为[baseM, baseN, baseK] = [64, 64, 64]时，Cube计算cycle数为(64 * 64 * 64) / (16 * 16 * 16) = 64cycle，计算访存比为(64 * 64 * 2 + 64 * 64 * 2) / 64cycle = **256byte / cycle**。[128, 256, 64]的base块方案的**访存计算比更低，同样的计算量，需要的数据量更小，所需带宽压力也就越低**
+- **访存计算比分析**：在输入为fp16类型的情况下，Cube执行单元1 cycle能完成16×16×16次乘加运算。设置base块为[baseM, baseN, baseK] = [128, 256, 64]时，可以在满足搬出时GM地址512Byte对齐的同时，达到最小的访存计算比。Cube计算cycle数为(128 × 64 × 256) / (16 × 16 × 16) = 512cycle，访存计算比为(128 × 64 × 2 + 256 × 64 × 2) / 512cycle = **96(byte / cycle)**；设置base块为[baseM, baseN, baseK] = [64, 64, 64]时，Cube计算cycle数为(64 × 64 × 64) / (16 × 16 × 16) = 64cycle，访存计算比为(64 × 64 × 2 + 64 × 64 * 2) / 64cycle = **256(byte / cycle)**。[128, 256, 64]的base块方案的**访存计算比更低，同样的计算量，需要的数据量更小，所需带宽压力也就越低**
 
 - 💡**推荐base块设置**：A2/A3 芯片L0A大小与L0B大小一致，为64KB，L0C大小为128KB，[baseM, baseN, baseK] = [128, 256, 64]时，能最大限度利用内存空间。`输入数据类型b16时，base块推荐[baseM, baseN, baseK] = [128, 256, 64]，输入数据类型b8时，base块推荐[baseM, baseN, baseK] = [128, 256, 128]。`
 
@@ -124,7 +147,9 @@ tilingApi.SetFixSplit(128, 256, 64);
 
 **核心实现**：
 - 多核并行计算，将8192×8192的矩阵乘法切分到24个核上并行执行
+- 切分策略：M方向2块，N方向12块，**singleM=4096，singleN=683，尾块tailN=679**
 - 搬运策略：GM上输入的A、B矩阵按baseM×baseK、baseK×baseN分块依次搬运到L1中，再从L1搬运到L0A/L0B，Cube单元对每次搬运的base块执行一次baseM×baseN×baseK大小的Matmul计算
+<img src="figure/2_12_split_core.png">
 
 **关键代码**：
 ```cpp
@@ -135,7 +160,6 @@ SetL1(tilingData);
 ```
 
 **优化手段**：
-- 切分策略：M方向2块，N方向12块，**singleM=4096，singleN=683，尾块tailN=679**
 - 均衡负载分配，尽量让每个核的计算量相近
 
 **性能数据**：
@@ -158,6 +182,8 @@ SetL1(tilingData);
 - 多核并行计算，将8192×8192的矩阵乘法切分到24个核上并行执行
 - 切分策略：对M、N均匀切分，M方向4块，N方向6块
 - 搬运策略：GM上输入的A、B矩阵按baseM×baseK、baseK×baseN分块依次搬运到L1中，再从L1搬运到L0A/L0B，Cube单元对每次搬运的base块执行一次baseM×baseN×baseK大小的Matmul计算
+
+<img src="figure/4_6_split_core.png">
 
 **关键代码**：
 ```cpp
@@ -253,12 +279,12 @@ tilingData.set_stepKa(8);
 - **L1 Cache Tiling参数优化**：手动调整depthA1和stepKa参数，充分利用L1缓存
   - 当前配置：depthA1=16, depthB1=8, baseM=128, baseN=256, baseK=64
   - L1 缓存占用计算：
-    
+
     A 矩阵：
-      depthA1 × baseM × baseK × sizeof(float16) = 16 × 128 × 64 × 2B = 262,144B = 256 KB
+      depthA1 × baseM × baseK × sizeof(half) = 16 × 128 × 64 × 2B = 262,144B = 256 KB
 
     B 矩阵：
-      depthB1 × baseN × baseK × sizeof(float16) = 8 × 256 × 64 × 2B = 262,144B = 256 KB
+      depthB1 × baseN × baseK × sizeof(half) = 8 × 256 × 64 × 2B = 262,144B = 256 KB
 
     总计256 KB + 256 KB = 512 KB
 
@@ -409,22 +435,96 @@ UnitFlag功能示意图：
 
 ## 性能对比总结
 
+### Atlas A2训练系列芯片性能数据
 **综合优化效果**：
 - 本样例cube利用率提升了**67.7%**(18.7% → 86.4%)，已达到芯片峰值算力的**86.4%**
 - 通过Case 0到Case 8的递进优化，样例耗时降幅达**99.47%**(759363.98μs → 4012.44μs)
 
+| Case version | Task Duration(μs) | 端到端耗时相对Case 0 | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------|------------------|----------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| Case 0 | 759363.98 | **1x** | 1 | 759363.46 | 141699.459 | 0.187 | 508787.509 | 0.67 | 162104.184 | 0.213 | 582515.828 | 0.767 | 34303.063 | 0.045 |
+| Case 1 | 249467.08 | **3.04x** | 1 | 249466.54 | 81477.188 | 0.327 | 63608.818 | 0.255 | 52003.703 | 0.208 | 195613.432 | 0.784 | 11313.746 | 0.045 |
+| Case 2 | 12541.22 | **60.55x** | 24 | 12537.56 | 3462.802 | 0.276 | 2987.47 | 0.238 | 2260.551 | 0.18 | 10177.798 | 0.812 | 875.439 | 0.07 |
+| Case 3 | 12283.84 | **61.82x** | 24 | 10870.96 | 3394.884 | 0.312 | 2656.33 | 0.244 | 2166.824 | 0.199 | 8616.671 | 0.793 | 488.829 | 0.045 |
+| Case 4 | 5039.86 | **150.67x** | 24 | 4487.89 | 3116.472 | 0.694 | 2073.97 | 0.462 | 2332.914 | 0.52 | 4051.458 | 0.903 | 44.749 | 0.01 |
+| Case 5 | 4156.76 | **182.68x** | 24 | 3925.61 | 3352.087 | 0.854 | 1464.492 | 0.373 | 2750.454 | 0.701 | 3778.555 | 0.963 | 47.853 | 0.012 |
+| Case 6 | 4088.36 | **185.74x** | 24 | 3786.26 | 3254.31 | 0.86 | 1753.463 | 0.463 | 2680.849 | 0.708 | 3625.42 | 0.958 | 47.398 | 0.013 |
+| Case 7 | 4053.44 | **187.34x** | 24 | 3665.12 | 3163.682 | 0.863 | 968.616 | 0.264 | 2609.617 | 0.712 | 3513.806 | 0.959 | 45.76 | 0.012 |
+| Case 8 | 4012.44 | **189.25x** | 24 | 3559.06 | 3076.396 | 0.864 | 1026.069 | 0.288 | 2533.512 | 0.712 | 3435.584 | 0.965 | 272.576 | 0.077 |
 
-| Case version | Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
-|------|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
-| Case 0 | 759363.98 | 1 | 759363.46 | 141699.459 | 0.187 | 508787.509 | 0.67 | 162104.184 | 0.213 | 582515.828 | 0.767 | 34303.063 | 0.045 |
-| Case 1 | 249467.08 | 1 | 249466.54 | 81477.188 | 0.327 | 63608.818 | 0.255 | 52003.703 | 0.208 | 195613.432 | 0.784 | 11313.746 | 0.045 |
-| Case 2 | 12541.22 | 24 | 12537.56 | 3462.802 | 0.276 | 2987.47 | 0.238 | 2260.551 | 0.18 | 10177.798 | 0.812 | 875.439 | 0.07 |
-| Case 3 | 12283.84 | 24 | 10870.96 | 3394.884 | 0.312 | 2656.33 | 0.244 | 2166.824 | 0.199 | 8616.671 | 0.793 | 488.829 | 0.045 |
-| Case 4 | 5039.86 | 24 | 4487.89 | 3116.472 | 0.694 | 2073.97 | 0.462 | 2332.914 | 0.52 | 4051.458 | 0.903 | 44.749 | 0.01 |
-| Case 5 | 4156.76 | 24 | 3925.61 | 3352.087 | 0.854 | 1464.492 | 0.373 | 2750.454 | 0.701 | 3778.555 | 0.963 | 47.853 | 0.012 |
-| Case 6 | 4088.36 | 24 | 3786.26 | 3254.31 | 0.86 | 1753.463 | 0.463 | 2680.849 | 0.708 | 3625.42 | 0.958 | 47.398 | 0.013 |
-| Case 7 | 4053.44 | 24 | 3665.12 | 3163.682 | 0.863 | 968.616 | 0.264 | 2609.617 | 0.712 | 3513.806 | 0.959 | 45.76 | 0.012 |
-| Case 8 | 4012.44 | 24 | 3559.06 | 3076.396 | 0.864 | 1026.069 | 0.288 | 2533.512 | 0.712 | 3435.584 | 0.965 | 272.576 | 0.077 |
+**理论性能对比**：
+
+Matmul理论性能评估的关键参数为：Cube计算性能和MTE2带宽。
+
+#### Cube计算性能分析
+
+样例参数：M=N=K=8192，baseM=128，baseN=256，baseK=64。本样例性能数据在Atlas A2训练系列产品上测试，该计算芯片主频为1.85GHz，每cycle处理16×16×16次乘加运算。
+
+Cube理论计算时间：
+$$cube\_time = \frac{M \times N \times K}{16 \times 16 \times 16 \times core\_num \times cube\_freq} = \frac{8192 \times 8192 \times 8192}{16 \times 16 \times 16 \times 24 \times 1850} = 3022.92\mu s$$
+
+Case 8 Cube计算耗时误差：
+$$误差 = \frac{aic\_mac\_time - cube\_time}{cube\_time} = \frac{{3076.396\mu s} - {3022.92\mu s}}{{3022.92\mu s}} = 1.77\%$$
+
+除去启动开销，已达成该芯片86%的峰值算力
+
+#### MTE2带宽分析
+
+读入数据总量：
+$$读入数据总量 = \left[\frac{N}{baseN} \times M \times K\right] + \left[\frac{M}{baseM} \times K \times N\right] \times dataType = (32 \times 8192 \times 8192) + (64 \times 8192 \times 8192) \times 2B = 12GB$$
+
+理想情况下假设L2Cache容量足够大，首次从HBM中载入数据，后续数据均从L2Cache中读取，L2Cache峰值带宽约为5TB/s，HBM带宽约为1.8TB/s。
+$$第一次从HBM读入的数据总量 = M \times K \times dataType + K \times N \times dataType = 256MB$$
+
+MTE2理论耗时：
+$$MTE2理论耗时 =\frac{HBM读入数据总量}{1.8TB/s} +\frac{L2Cache读入数据总量}{5TB/s} = 2672.44\mu s$$
+
+Case 8 MTE2耗时误差：
+$$MTE2耗时误差 = \frac{{3435.584\mu s} - {2672.44\mu s}}{{2672.44\mu s}} = 28.55\%$$
+
+当前MTE2耗时与理论值相差较大，因为实际芯片L2Cache大小为192MB，当前L2Cache切分策略较简单；另一方面当MTE2搬运场景为ND2NZ（GM数据Layout为ND，搬运到L1时需做ND→NZ格式转换）时，L2Cache带宽会降低。用户可进一步优化L2Cache切分策略以提高MTE2带宽。
+
+
+
+### Ascend 950PR芯片性能数据
+| Case version | Task Duration(μs) | 端到端耗时相对Case 0 | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
+|------|------------------|----------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
+| Case 0 | 1096626.431 | **1x** | 1 | 1096625.66 | 198351.65 | 0.181 | 583195.222 | 0.532 | 115705.132 | 0.106 | 960571.993 | 0.876 | 28615.988 | 0.026 |
+| Case 1 | 130560.475 | **8.40x** | 1 | 130559.56 | 88685.142 | 0.679 | 36462.067 | 0.279 | 22489.156 | 0.172 | 106793.342 | 0.818 | 4200.385 | 0.032 |
+| Case 2 | 4294.619 | **255.35x** | 32 | 4293.9 | 2788.781 | 0.649 | 1149.24 | 0.268 | 707.592 | 0.165 | 3540.645 | 0.825 | 141.876 | 0.033 |
+| Case 3 | 4332.557 | **253.11x** | 32 | 4331.82 | 2774.213 | 0.64 | 1143.276 | 0.264 | 703.896 | 0.162 | 3582.246 | 0.827 | 144.525 | 0.033 |
+| Case 4 | 2668.224 | **410.99x** | 32 | 2667.49 | 2571.074 | 0.964 | 1377.736 | 0.516 | 799.378 | 0.3 | 2531.912 | 0.949 | 33.864 | 0.013 |
+| Case 5 | 2591.366 | **423.18x** | 32 | 2590.51 | 2547.046 | 0.983 | 612.956 | 0.237 | 834.311 | 0.322 | 1926.358 | 0.744 | 35.44 | 0.014 |
+| Case 6 | 2589.888 | **423.43x** | 32 | 2589.18 | 2547.518 | 0.984 | 765.125 | 0.296 | 826.429 | 0.319 | 1879.029 | 0.726 | 33.261 | 0.013 |
+| Case 7 | 2589.09 | **423.55x** | 32 | 2588.38 | 2547.049 | 0.984 | 426.398 | 0.165 | 827.939 | 0.32 | 1895.165 | 0.732 | 33.648 | 0.013 |
+| Case 8 | 2558.155 | **428.68x** | 32 | 2557.49 | 2549.657 | 0.997 | 412.29 | 0.161 | 835.579 | 0.327 | 1900.322 | 0.743 | 213.789 | 0.084 |
+
+**理论性能对比**：
+#### Cube计算性能分析
+
+样例参数：M=N=K=8192，baseM=256，baseN=256，baseK=64。本样例性能数据在Ascend 950PR芯片上测试，该处理器主频为1.65GHz，每cycle处理16×16×16次乘加运算。
+
+Cube理论计算时间：
+$$cube\_time = \frac{M \times N \times K}{16 \times 16 \times 16 \times core\_num \times cube\_freq} = \frac{8192 \times 8192 \times 8192}{16 \times 16 \times 16 \times 32 \times 1650} = 2542\mu s$$
+
+Case 8 Cube计算耗时误差：
+$$误差 = \frac{aic\_mac\_time - cube\_time}{cube\_time} = \frac{{2549.657\mu s} - {2542\mu s}}{{2542\mu s}} = 0.30\%$$
+
+已达成该芯片99.7%的峰值算力
+#### MTE2带宽分析
+
+读入数据总量：
+$$读入数据总量 = \left[\frac{N}{baseN} \times M \times K\right] + \left[\frac{M}{baseM} \times K \times N\right] \times dataType = (32 \times 8192 \times 8192) + (32 \times 8192 \times 8192) \times 2B = 8GB$$
+
+理想情况下假设L2Cache容量足够大，首次从HBM中载入数据，后续数据均从L2Cache中读取，L2Cache峰值带宽约为5TB/s，HBM带宽约为1.6TB/s。
+$$第一次从HBM读入的数据总量 = M \times K \times dataType + K \times N \times dataType = 256MB$$
+
+MTE2理论耗时：
+$$MTE2理论耗时 =\frac{HBM读入数据总量}{1.6TB/s} +\frac{L2Cache读入数据总量}{5TB/s} = 1832.1\mu s$$
+
+Case 8 MTE2耗时误差：
+$$MTE2耗时误差 = \frac{{1900.322\mu s} - {1832.1\mu s}}{{1832.1\mu s}} = 3.72\%$$
+相比于Atlas A2训练系列芯片，Ascend 950PR芯片升级，数据搬运更为高效
 
 ## 调优建议
 
@@ -438,61 +538,66 @@ UnitFlag功能示意图：
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
+- 配置环境变量
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，root用户安装CANN软件包
+    ```bash
+    source /usr/local/Ascend/cann/set_env.sh
+    ```
 
-### 配置环境变量
-请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，非root用户安装CANN软件包
+    ```bash
+    source $HOME/Ascend/cann/set_env.sh
+    ```
 
-- 默认路径，root用户安装CANN软件包
+  - 指定路径install_path，安装CANN软件包
+    ```bash
+    source ${install_path}/cann/set_env.sh
+    ```
+
+- 样例执行
   ```bash
-  source /usr/local/Ascend/cann/set_env.sh
+  SCENARIO_NUM=0                       # 选择执行场景
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # 编译工程（默认npu模式）
+  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  ./demo                           # 执行
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
-- 默认路径，非root用户安装CANN软件包
+  使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例：
   ```bash
-  source $HOME/Ascend/cann/set_env.sh
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;   # NPU 仿真模式
   ```
 
-- 指定路径install_path，安装CANN软件包
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `SCENARIO_NUM` | `0`-`8` | 样例类型（0-8），默认为0 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
+  执行结果如下，说明精度对比成功。
   ```bash
-  source ${install_path}/cann/set_env.sh
+  test pass!
   ```
 
-### 样例执行
+## 性能分析
+
+使用 `msprof` 工具获取详细性能数据：
+
 ```bash
-mkdir -p build && cd build;    # 创建并进入build目录
-cmake ..;make -j;              # 编译工程
-python3 ../scripts/gen_data.py # 生成测试输入数据
-
-# 执行不同的优化case（通过参数指定case编号）
-./demo 0   # Case 0: 单核基础版本
-./demo 1   # Case 1: 单核Tiling优化
-./demo 2   # Case 2: 多核切分 2x12
-./demo 3   # Case 3: 多核切分 4x6
-./demo 4   # Case 4: 多核MDL版本
-./demo 5   # Case 5: 多核MDL + L1Cache
-./demo 6   # Case 6: 多核MDL + L1Cache + L2Cache
-./demo 7   # Case 7: 多核MDL + L1Cache + L2Cache + Constants Tiling
-./demo 8   # Case 8: 多核MDL + L1Cache + L2Cache + Constants Tiling + UnitFlag
-
-python3 ../scripts/verify_result.py output/output.bin output/golden.bin # 验证输出结果是否正确
+msprof ./demo   # 分析case 的性能
 ```
 
-执行结果如下，说明精度对比成功。
+当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
 ```bash
-test 0: Single Core Basic
-test pass!
-```
- ### 性能分析
-    
-  使用 `msprof` 工具获取详细性能数据：
-    
-  ```bash
-  msprof ./demo 7   # 分析case 7的性能
-  ```
-
-  当前目录下会生成OPPROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
-  ```bash
-OPPROF_xxxx_XXXXXX
+PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host
 └── mindstudio_profiler_log

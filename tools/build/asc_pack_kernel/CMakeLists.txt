@@ -2,7 +2,7 @@ add_executable(ascendc_pack_kernel ascendc_pack_kernel.c $<TARGET_OBJECTS:elf_to
 
 target_link_libraries(ascendc_pack_kernel PRIVATE
     $<BUILD_INTERFACE:intf_pub>
-    c_sec_static
+    static_c_sec
 )
 
 target_compile_options(ascendc_pack_kernel PRIVATE
@@ -27,7 +27,5 @@ else()
 endif()
 
 install(TARGETS ascendc_pack_kernel
-    LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
-    ARCHIVE DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
-    RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR} OPTIONAL
+    DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/bin ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )

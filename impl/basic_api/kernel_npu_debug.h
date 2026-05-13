@@ -12,6 +12,11 @@
  * \file kernel_npu_debug.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_npu_debug.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_mm_intf_impl.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_NPU_DEBUG_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_KERNEL_NPU_DEBUG_H
 #define ASCENDC_MODULE_OPERATOR_KERNEL_NPU_DEBUG_H
 
@@ -104,6 +109,19 @@ __aicore__ inline void CheckTensorAlignment(const LocalTensor<T>& inputTensor, u
     ASCENDC_DEBUG_ASSERT((tensorAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s tensor "
         "start address alignment in %s, its start address must align with %u bytes, current start address is %llu.\n",
         tensorName, apiName, alignBytes, static_cast<unsigned long long>(tensorAddr)));
+}
+
+__aicore__ inline void CheckAddrAlignment(uint64_t addr, Hardware phyPos, uint32_t alignBytes,
+    const __gm__ char* addrName, const __gm__ char* apiName)
+{
+    uint64_t checkAddr = addr;
+#ifdef ASCENDC_CPU_DEBUG
+    checkAddr = addr - reinterpret_cast<uint64_t>(
+        ConstDefiner::Instance().hardwareCpuBufferMap.at(phyPos));
+#endif
+    ASCENDC_DEBUG_ASSERT((checkAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s "
+        "address alignment in %s, its address must align with %u bytes, current address is %llu.\n",
+        addrName, apiName, alignBytes, static_cast<unsigned long long>(checkAddr)));
 }
 
 template <typename T>
@@ -210,3 +228,7 @@ __aicore__ inline void CheckVectorTensor(const __gm__ char* apiName, const Ts& .
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_OPERATOR_KERNEL_NPU_DEBUG_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_NPU_DEBUG_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_NPU_DEBUG_H__
+#endif

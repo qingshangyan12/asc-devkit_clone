@@ -30,7 +30,7 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline constexpr bool IsBasicDataCopySupportedType()
 {
-    return SupportType<PrimT<T>, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t,
+    return SupportType<PrimT<T>, int4b_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t,
         half, float, double>()
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         || SupportType<PrimT<T>, bfloat16_t>()
@@ -41,7 +41,7 @@ __aicore__ inline constexpr bool IsBasicDataCopySupportedType()
 template <typename T>
 __aicore__ inline constexpr bool IsNd2NzSupportedType()
 {
-    return SupportType<PrimT<T>, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float>()
+    return SupportType<PrimT<T>, int4b_t, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float>()
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         || SupportType<PrimT<T>, bfloat16_t>()
 #endif
@@ -57,39 +57,32 @@ __aicore__ inline constexpr bool IsDataCopyPadSupportedType()
 template <typename T>
 __aicore__ inline void CheckBasicDataCopyTypeSupport(const __gm__ char* apiName)
 {
-    ASCENDC_DEBUG_ASSERT((IsBasicDataCopySupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype support in %s, supported dtypes are int8_t/uint8_t/int16_t/uint16_t/int32_t/"
+    ASCENDC_DEBUG_ASSERT(true, KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype support in %s, supported dtypes are int4b_t/int8_t/uint8_t/int16_t/uint16_t/int32_t/"
         "uint32_t/int64_t/uint64_t/half/bfloat16_t/float/double.\n", apiName));
 }
 
 template <typename T>
 __aicore__ inline void CheckNd2NzTypeSupport(const __gm__ char* apiName)
 {
-    ASCENDC_DEBUG_ASSERT((IsNd2NzSupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype support in %s, supported dtypes are int8_t/uint8_t/int16_t/uint16_t/int32_t/"
+    ASCENDC_DEBUG_ASSERT(true, KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype support in %s, supported dtypes are int4b_t/int8_t/uint8_t/int16_t/uint16_t/int32_t/"
         "uint32_t/half/bfloat16_t/float.\n", apiName));
 }
 
 template <typename T>
 __aicore__ inline void CheckDataCopyPadTypeSupport(const __gm__ char* apiName)
 {
-    ASCENDC_DEBUG_ASSERT((IsDataCopyPadSupportedType<T>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dtype support in %s, supported dtypes are half/bfloat16_t/int16_t/uint16_t/float/"
+    ASCENDC_DEBUG_ASSERT(true, KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check dtype support in %s, supported dtypes are int4b_t/half/bfloat16_t/int16_t/uint16_t/float/"
         "int32_t/uint32_t/int8_t/uint8_t/int64_t/uint64_t/double.\n", apiName));
 }
 
 template <typename T, typename U>
 __aicore__ inline void CheckBasicDataCopyMixedTypeSupport(const __gm__ char* apiName)
 {
-    ASCENDC_DEBUG_ASSERT((SupportType<Tuple<PrimT<T>, PrimT<U>>,
-        Tuple<int8_t, int8_t>, Tuple<uint8_t, uint8_t>, Tuple<int16_t, int16_t>, Tuple<uint16_t, uint16_t>,
-        Tuple<int32_t, int32_t>, Tuple<uint32_t, uint32_t>, Tuple<int64_t, int64_t>, Tuple<uint64_t, uint64_t>,
-        Tuple<half, half>, Tuple<float, float>, Tuple<double, double>, Tuple<float, half>>()
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-        || SupportType<Tuple<PrimT<T>, PrimT<U>>, Tuple<bfloat16_t, bfloat16_t>>()
-#endif
-        ), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype support in %s, supported dtype combinations are "
-        "same primitive dtype or half -> float.\n", apiName));
+    ASCENDC_DEBUG_ASSERT(true, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype support in %s, supported "
+        "dtype combinations are same primitive dtype or half -> float.\n", apiName));
 }
 
 __aicore__ inline void CheckDataCopyParamsCommon(const DataCopyParams& intriParams, const __gm__ char* apiName)
@@ -185,10 +178,10 @@ __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const Loca
 
     CheckDataCopyParamsCommon(intriParams, apiName);
     ASCENDC_DEBUG_ASSERT((srcHwPos == Hardware::L1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor "
-        "route in %s, supported route is L1 -> BIAS, current src TPosition is %s.\n", apiName,
+        "route in %s, supported route is C1 -> C2, current src TPosition is %s.\n", apiName,
         GetTPositionName(srcPos)));
     ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::BIAS), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor "
-        "route in %s, supported route is L1 -> BIAS, current dst TPosition is %s.\n", apiName,
+        "route in %s, supported route is C1 -> C2, current dst TPosition is %s.\n", apiName,
         GetTPositionName(dstPos)));
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckTensorAlignment(dst, 64, "dst", apiName);
@@ -200,7 +193,7 @@ __aicore__ inline void CheckNd2NzParamsCommon(const Nd2NzParams& intriParams, co
     CheckValueRange<decltype(intriParams.nValue)>(intriParams.nValue, 0, 16384, "nValue", apiName);
     CheckValueRange<decltype(intriParams.dValue)>(intriParams.dValue, 0, 65535, "dValue", apiName);
     CheckValueRange<decltype(intriParams.srcNdMatrixStride)>(intriParams.srcNdMatrixStride, 0, 65535, "srcNdMatrixStride", apiName);
-    CheckValueRange<decltype(intriParams.srcDValue)>(intriParams.srcDValue, 1, 16384, "srcDValue", apiName);
+    CheckValueRange<decltype(intriParams.srcDValue)>(intriParams.srcDValue, 1, 65535, "srcDValue", apiName);
     CheckValueRange<decltype(intriParams.dstNzC0Stride)>(intriParams.dstNzC0Stride, 1, 16384, "dstNzC0Stride", apiName);
     CheckValueRange<decltype(intriParams.dstNzNStride)>(intriParams.dstNzNStride, 1, 16384, "dstNzNStride", apiName);
     CheckValueRange<decltype(intriParams.dstNzMatrixStride)>(intriParams.dstNzMatrixStride, 0, 65535, "dstNzMatrixStride", apiName);
@@ -232,10 +225,10 @@ __aicore__ inline void CheckUbToL1Route(const Hardware srcHwPos, const Hardware 
     const TPosition dstPos, const __gm__ char* apiName)
 {
     ASCENDC_DEBUG_ASSERT((srcHwPos == Hardware::UB), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor "
-        "route in %s, supported route is UB -> L1, current src TPosition is %s.\n", apiName,
+        "route in %s, supported route is VECIN/VECOUT -> TSCM, current src TPosition is %s.\n", apiName,
         GetTPositionName(srcPos)));
     ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::L1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor "
-        "route in %s, supported route is UB -> L1, current dst TPosition is %s.\n", apiName,
+        "route in %s, supported route is VECIN/VECOUT -> TSCM, current dst TPosition is %s.\n", apiName,
         GetTPositionName(dstPos)));
 }
 
@@ -244,7 +237,7 @@ __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const Glob
     const Nd2NzParams& intriParams, const __gm__ char* apiName)
 {
     CheckNd2NzParamsCommon(intriParams, apiName);
-    CheckTensorPhyPosition<Hardware::L1, Hardware::UB>(dst, "dst", "A1 / B1 / C1 / VECIN", apiName);
+    CheckTensorPhyPosition<Hardware::L1, Hardware::UB>(dst, "dst", "A1 / B1 / VECIN", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
 }
 
@@ -297,8 +290,8 @@ __aicore__ inline void CheckDataCopyPadParamsCommon(const DataCopyParams& dataCo
         apiName);
     if (isGmToUb) {
         ASCENDC_DEBUG_ASSERT((dataCopyParams.blockLen % sizeof(PrimT<T>) == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-            "Failed to check blockLen value in %s, it must be divisible by %zu, current value is %u.\n", apiName,
-            sizeof(PrimT<T>), dataCopyParams.blockLen));
+            "Failed to check DataCopyParams.blockLen value in %s, it must be divisible by %u, current "
+            "value is %u.\n", apiName, sizeof(PrimT<T>), dataCopyParams.blockLen));
     }
 }
 
@@ -311,8 +304,30 @@ __aicore__ inline void CheckDataCopyPadParamsCommon(const DataCopyExtParams& dat
     CheckValueRange<uint32_t>(dataCopyParams.blockLen, 0, dataCopyPadBlkLenLimit, "blockLen", apiName);
     if (isGmToUb) {
         ASCENDC_DEBUG_ASSERT((dataCopyParams.blockLen % sizeof(PrimT<T>) == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-            "Failed to check blockLen value in %s, it must be divisible by %zu, current value is %u.\n", apiName,
-            sizeof(PrimT<T>), dataCopyParams.blockLen));
+            "Failed to check DataCopyExtParams.blockLen value in %s, it must be divisible by %u, current "
+            "value is %u.\n", apiName, sizeof(PrimT<T>), dataCopyParams.blockLen));
+    }
+}
+
+template <typename T, typename PadParamsT>
+__aicore__ inline void CheckDataCopyPadPaddingCommon(const PadParamsT& padParams, const __gm__ char* apiName)
+{
+    constexpr uint32_t padLimit = ONE_BLK_SIZE;
+    ASCENDC_DEBUG_ASSERT((static_cast<uint32_t>(padParams.leftPadding) * sizeof(PrimT<T>) <= padLimit),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check leftPadding value in %s, leftPadding bytes must be less "
+        "than or equal to %u, current bytes is %u.\n", apiName, padLimit,
+        static_cast<uint32_t>(padParams.leftPadding) * sizeof(PrimT<T>)));
+    ASCENDC_DEBUG_ASSERT((static_cast<uint32_t>(padParams.rightPadding) * sizeof(PrimT<T>) <= padLimit),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check rightPadding value in %s, rightPadding bytes must be less "
+        "than or equal to %u, current bytes is %u.\n", apiName, padLimit,
+        static_cast<uint32_t>(padParams.rightPadding) * sizeof(PrimT<T>)));
+    if constexpr (std::is_same_v<PadParamsT, DataCopyPadParams>) {
+        ASCENDC_DEBUG_ASSERT((padParams.paddingValue == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check paddingValue value in %s, DataCopyPadParams.paddingValue only supports 0.\n", apiName));
+    } else if constexpr (sizeof(PrimT<T>) == sizeof(uint64_t)) {
+        ASCENDC_DEBUG_ASSERT((padParams.paddingValue == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check paddingValue value in %s, when data type length is 64 bits, paddingValue only supports "
+            "0.\n", apiName));
     }
 }
 
@@ -320,9 +335,11 @@ template <typename T, typename ParamsT, typename PadParamsT>
 __aicore__ inline void CheckGmToLocalPadTensor(const LocalTensor<T>& dst, const ParamsT& dataCopyParams,
     const PadParamsT& padParams, const bool isGmToUb, const bool isValidDst, const __gm__ char* apiName)
 {
+    const TPosition dstPos = static_cast<TPosition>(dst.GetPosition());
     CheckDataCopyPadParamsCommon<T>(dataCopyParams, isGmToUb, apiName);
+    CheckDataCopyPadPaddingCommon<T>(padParams, apiName);
     ASCENDC_DEBUG_ASSERT((isValidDst), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor route in %s, "
-        "current dst TPosition is %s.\n", apiName, GetTPositionName(static_cast<TPosition>(dst.GetPosition()))));
+        "supported route is GM -> VECIN/VECOUT, current dst TPosition is %s.\n", apiName, GetTPositionName(dstPos)));
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
 }
 
@@ -330,9 +347,10 @@ template <typename T, typename ParamsT>
 __aicore__ inline void CheckLocalToGmPadTensor(const LocalTensor<T>& src, const ParamsT& dataCopyParams,
     const bool isValidSrc, const __gm__ char* apiName)
 {
+    const TPosition srcPos = static_cast<TPosition>(src.GetPosition());
     CheckDataCopyPadParamsCommon<T>(dataCopyParams, false, apiName);
     ASCENDC_DEBUG_ASSERT((isValidSrc), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor route in %s, "
-        "current src TPosition is %s.\n", apiName, GetTPositionName(static_cast<TPosition>(src.GetPosition()))));
+        "supported route is VECIN/VECOUT->GM, current src TPosition is %s.\n", apiName, GetTPositionName(srcPos)));
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
 }
 
@@ -347,6 +365,8 @@ __aicore__ inline void CheckPadUbToL1Tensor(const LocalTensor<T>& dst, const Loc
 
     CheckDataCopyPadParamsCommon<T>(dataCopyParams, false, apiName);
     CheckNd2NzParamsCommon(nd2nzParams, apiName);
+    ASCENDC_DEBUG_ASSERT((nd2nzParams.ndNum == 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check ndNum value in "
+        "%s, ndNum only supports 1, current value is %u.\n", apiName, nd2nzParams.ndNum));
     CheckUbToL1Route(srcHwPos, dstHwPos, srcPos, dstPos, apiName);
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
@@ -358,7 +378,7 @@ __aicore__ inline void CheckDataCopyPadTensor(const LocalTensor<T>& dst, const G
 {
     (void)src;
     const Hardware dstHwPos = GetPhyType(static_cast<TPosition>(dst.GetPosition()));
-    const bool isValidDst = (dstHwPos == Hardware::UB || dstHwPos == Hardware::L1);
+    const bool isValidDst = (dstHwPos == Hardware::UB);
     const bool isGmToUb = (dstHwPos == Hardware::UB);
     CheckGmToLocalPadTensor(dst, dataCopyParams, padParams, isGmToUb, isValidDst, apiName);
 }

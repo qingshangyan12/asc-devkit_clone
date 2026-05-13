@@ -54,7 +54,3 @@ execute_process(
     RESULT_VARIABLE CHMOD_RESULT
     ERROR_VARIABLE CHMOD_ERROR
 )
-
-# 安装到目标位置
-install(DIRECTORY ${MAKESELF_PATH} 
-        DESTINATION .)

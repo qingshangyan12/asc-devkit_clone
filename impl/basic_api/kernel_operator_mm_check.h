@@ -103,30 +103,42 @@ __aicore__ inline void CheckFixpipeQuantPreWithWorkspaceCommon(const QuantMode_t
         "when cbufWorkspace is given, supported values are VDEQF16 / VQF322B8_PRE / VREQ8.\n", apiName));
 }
 
+__aicore__ inline void CheckFixpipeQuantPreValid(const QuantMode_t quantPre, const __gm__ char* apiName)
+{
+    ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::NoQuant || quantPre == QuantMode_t::F322F16 ||
+        quantPre == QuantMode_t::F322BF16 || quantPre == QuantMode_t::DEQF16 ||
+        quantPre == QuantMode_t::VDEQF16 || quantPre == QuantMode_t::QF322B8_PRE ||
+        quantPre == QuantMode_t::VQF322B8_PRE || quantPre == QuantMode_t::REQ8 ||
+        quantPre == QuantMode_t::VREQ8), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check quantPre value in %s, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / "
+        "VDEQF16 / QF322B8_PRE / VQF322B8_PRE / REQ8 / VREQ8.\n", apiName));
+}
+
 template <typename T, typename U>
 __aicore__ inline void CheckFixpipeQuantPreCommon(const QuantMode_t quantPre, const __gm__ char* apiName)
 {
-    if constexpr (IsSameType<U, float>::value && SupportType<T, int8_t, uint8_t>()) {
+    CheckFixpipeQuantPreValid(quantPre, apiName);
+    if constexpr (IsSameType<PrimT<U>, float>::value && SupportType<PrimT<T>, int8_t, uint8_t>()) {
         ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::QF322B8_PRE ||
             quantPre == QuantMode_t::VQF322B8_PRE), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check quantPre value in %s, when src is float and dst is int8_t / uint8_t, supported values "
             "are QF322B8_PRE and VQF322B8_PRE.\n", apiName));
-    } else if constexpr (IsSameType<U, float>::value && IsSameType<T, half>::value) {
+    } else if constexpr (IsSameType<PrimT<U>, float>::value && IsSameType<PrimT<T>, half>::value) {
         ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::F322F16), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check quantPre value in %s, when src is float and dst is half, supported value is F322F16.\n",
             apiName));
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    } else if constexpr (IsSameType<U, float>::value && IsSameType<T, bfloat16_t>::value) {
+    } else if constexpr (IsSameType<PrimT<U>, float>::value && IsSameType<PrimT<T>, bfloat16_t>::value) {
         ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::F322BF16), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check quantPre value in %s, when src is float and dst is bfloat16_t, supported value is "
             "F322BF16.\n", apiName));
 #endif
-    } else if constexpr (IsSameType<U, int32_t>::value && SupportType<T, int8_t, uint8_t>()) {
+    } else if constexpr (IsSameType<PrimT<U>, int32_t>::value && SupportType<PrimT<T>, int8_t, uint8_t>()) {
         ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::REQ8 ||
             quantPre == QuantMode_t::VREQ8), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check quantPre value in %s, when src is int32_t and dst is int8_t / uint8_t, supported values "
             "are REQ8 and VREQ8.\n", apiName));
-    } else if constexpr (IsSameType<U, int32_t>::value && IsSameType<T, half>::value) {
+    } else if constexpr (IsSameType<PrimT<U>, int32_t>::value && IsSameType<PrimT<T>, half>::value) {
         ASCENDC_DEBUG_ASSERT((quantPre == QuantMode_t::DEQF16 ||
             quantPre == QuantMode_t::VDEQF16), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check quantPre value in %s, when src is int32_t and dst is half, supported values are DEQF16 "
@@ -142,9 +154,12 @@ __aicore__ inline void CheckFixpipeParamsV220Common(const FixpipeParamsV220& int
             intriParams.nSize % 8 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check nSize value in %s, "
             "when isChannelSplit is true, its valid range is 1 ~ 4095 and must be divisible by 8, current value "
             "is %u.\n", apiName, intriParams.nSize));
-        ASCENDC_DEBUG_ASSERT((IsSameType<T, float>::value && IsSameType<U, float>::value),
+        ASCENDC_DEBUG_ASSERT((IsSameType<PrimT<T>, float>::value && IsSameType<PrimT<U>, float>::value),
             KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check isChannelSplit value in %s, isChannelSplit can be "
-            "enabled only when src and dst are both float.\n", apiName));
+            "enabled only when src and dst are float.\n", apiName));
+        ASCENDC_DEBUG_ASSERT((config.format != CO2Layout::ROW_MAJOR), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check isChannelSplit value in %s, isChannelSplit and NZ2ND cannot be enabled at the same "
+            "time.\n", apiName));
     } else if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         CheckValueRange<uint16_t>(intriParams.nSize, 1, UINT12_MAX, "nSize", apiName);
     } else {
@@ -160,10 +175,15 @@ __aicore__ inline void CheckFixpipeParamsV220Common(const FixpipeParamsV220& int
         "Failed to check dstStride value in %s, its valid range is 1 ~ 4294967295, current value is %u.\n", apiName,
         intriParams.dstStride));
 
+    ASCENDC_DEBUG_WARNING((intriParams.ndNum != 0), KERNEL_LOG_INTERNAL(KERNEL_WARN,
+        "FixpipeParamsV220.ndNum is 0 in %s, the instruction will not be executed.\n", apiName));
     if (intriParams.ndNum > 1) {
         CheckValueRange<uint16_t>(intriParams.srcNdStride, 1, VALUE_512, "srcNdStride", apiName);
         CheckValueRange<uint16_t>(intriParams.dstNdStride, 1, UINT16_MAX, "dstNdStride", apiName);
     }
+    ASCENDC_DEBUG_ASSERT((intriParams.unitFlag == 0 || intriParams.unitFlag == 2 || intriParams.unitFlag == 3),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check unitFlag value in %s, supported values are 0, 2, and 3.\n",
+        apiName));
 
     CheckFixpipeQuantPreCommon<T, U>(intriParams.quantPre, apiName);
 }
@@ -191,7 +211,7 @@ __aicore__ inline void CheckFixpipeTensor(const LocalTensor<T>& dst, const Local
     const uint32_t L0C_SRC_ALIGN = 16 * sizeof(float);
     CheckTensorAlignment(src, L0C_SRC_ALIGN, "src", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
-    CheckTensorPhyPosition<Hardware::L1, Hardware::UB>(dst, "dst", "L1 / UB", apiName);
+    CheckTensorPhyPosition<Hardware::L1, Hardware::UB>(dst, "dst", "A1", apiName);
 }
 
 template <typename T, typename U, const FixpipeConfig& config, typename S>
@@ -326,13 +346,67 @@ __aicore__ static inline void CheckLoadDataWithTranspose(const LocalTensor<T>& d
 __aicore__ static inline void CheckLoadData3dParams(const uint16_t srcHeight, const uint16_t srcWidth,
     const uint8_t srcWStride, const uint8_t srcHStride)
 {
-    ASCENDC_CHECK_VALUE_RANGE(srcHeight, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1H", "LoadData with LoadData3DParams");
-    ASCENDC_CHECK_VALUE_RANGE(srcWidth, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1W", "LoadData with LoadData3DParams");
-    ASCENDC_CHECK_VALUE_RANGE(srcWStride, MIN_LOAD3D_STRIDE, MAX_LOAD3D_STRIDE, "strideW",
-        "LoadData with LoadData3DParams");
-    ASCENDC_CHECK_VALUE_RANGE(srcHStride, MIN_LOAD3D_STRIDE, MAX_LOAD3D_STRIDE, "strideH",
-        "LoadData with LoadData3DParams");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckValueRange<uint16_t>(srcHeight, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1H", "LoadData with LoadData3DParams");
+    CheckValueRange<uint16_t>(srcWidth, MIN_LOAD3D_L1, MAX_LOAD3D_L1, "l1W", "LoadData with LoadData3DParams");
+    CheckValueRange<uint8_t>(srcWStride, static_cast<uint8_t>(MIN_LOAD3D_STRIDE),
+        static_cast<uint8_t>(MAX_LOAD3D_STRIDE), "strideW", "LoadData with LoadData3DParams");
+    CheckValueRange<uint8_t>(srcHStride, static_cast<uint8_t>(MIN_LOAD3D_STRIDE),
+        static_cast<uint8_t>(MAX_LOAD3D_STRIDE), "strideH", "LoadData with LoadData3DParams");
+#endif
 }
+
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+template <typename U>
+__aicore__ inline void CheckLoadData3dv1Params(const LoadData3DParamsV1<U>& loadDataParams)
+{
+    CheckValueRange<uint16_t>(loadDataParams.c1Index, static_cast<uint16_t>(MIN_LOAD3D_C1_IDX),
+        static_cast<uint16_t>(MAX_LOAD3D_C1_IDX), "c1Index", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint8_t>(loadDataParams.fetchFilterW, static_cast<uint8_t>(MIN_LOAD3D_FETCH_FILTER),
+        static_cast<uint8_t>(MAX_LOAD3D_FETCH_FILTER), "fetchFilterW", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint8_t>(loadDataParams.fetchFilterH, static_cast<uint8_t>(MIN_LOAD3D_FETCH_FILTER),
+        static_cast<uint8_t>(MAX_LOAD3D_FETCH_FILTER), "fetchFilterH", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int16_t>(loadDataParams.leftTopW, static_cast<int16_t>(MIN_LOAD3D_LEFT_TOP),
+        static_cast<int16_t>(MAX_LOAD3D_LEFT_TOP), "leftTopW", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<int16_t>(loadDataParams.leftTopH, static_cast<int16_t>(MIN_LOAD3D_LEFT_TOP),
+        static_cast<int16_t>(MAX_LOAD3D_LEFT_TOP), "leftTopH", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint8_t>(loadDataParams.filterW, static_cast<uint8_t>(MIN_LOAD3D_FILTER),
+        static_cast<uint8_t>(MAX_LOAD3D_FILTER), "filterW", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint8_t>(loadDataParams.filterH, static_cast<uint8_t>(MIN_LOAD3D_FILTER),
+        static_cast<uint8_t>(MAX_LOAD3D_FILTER), "filterH", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint8_t>(loadDataParams.dilationFilterW, static_cast<uint8_t>(MIN_LOAD3D_DILATION_FILTER),
+        static_cast<uint8_t>(MAX_LOAD3D_FILTER), "dilationFilterW", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint8_t>(loadDataParams.dilationFilterH, static_cast<uint8_t>(MIN_LOAD3D_DILATION_FILTER),
+        static_cast<uint8_t>(MAX_LOAD3D_FILTER), "dilationFilterH", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint8_t>(loadDataParams.jumpStride, static_cast<uint8_t>(MIN_LOAD3D_JUMP_STRIDE),
+        static_cast<uint8_t>(MAX_LOAD3D_JUMP_STRIDE), "jumpStride", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint8_t>(loadDataParams.repeatMode, 0, 1, "repeatMode", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint8_t>(loadDataParams.cSize, 0, 1, "cSize", "LoadData with LoadData3DParamsV1");
+    CheckValueRange<uint8_t>(loadDataParams.repeatTime, static_cast<uint8_t>(MIN_LOAD3D_REPEAT_TIMES),
+        static_cast<uint8_t>(MAX_LOAD3D_FILTER), "repeatTime", "LoadData with LoadData3DParamsV1");
+}
+
+template <typename U>
+__aicore__ inline void CheckLoadData3dv2Params(const LoadData3DParamsV2<U>& loadDataParams)
+{
+    CheckValueRange<uint16_t>(loadDataParams.kExtension, static_cast<uint16_t>(MIN_LOAD3D_EXTENSION),
+        static_cast<uint16_t>(MAX_LOAD3D_EXTENSION), "kExtension", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint16_t>(loadDataParams.mExtension, static_cast<uint16_t>(MIN_LOAD3D_EXTENSION),
+        static_cast<uint16_t>(MAX_LOAD3D_EXTENSION), "mExtension", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint16_t>(loadDataParams.kStartPt, static_cast<uint16_t>(MIN_LOAD3D_START_PT),
+        static_cast<uint16_t>(MAX_LOAD3D_START_PT), "kStartPt", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint16_t>(loadDataParams.mStartPt, static_cast<uint16_t>(MIN_LOAD3D_START_PT),
+        static_cast<uint16_t>(MAX_LOAD3D_START_PT), "mStartPt", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint8_t>(loadDataParams.filterW, static_cast<uint8_t>(MIN_LOAD3D_FILTER),
+        static_cast<uint8_t>(MAX_LOAD3D_FILTER), "filterW", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint8_t>(loadDataParams.filterH, static_cast<uint8_t>(MIN_LOAD3D_FILTER),
+        static_cast<uint8_t>(MAX_LOAD3D_FILTER), "filterH", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint8_t>(loadDataParams.dilationFilterW, static_cast<uint8_t>(MIN_LOAD3D_DILATION_FILTER),
+        static_cast<uint8_t>(MAX_LOAD3D_FILTER), "dilationFilterW", "LoadData with LoadData3DParamsV2");
+    CheckValueRange<uint8_t>(loadDataParams.dilationFilterH, static_cast<uint8_t>(MIN_LOAD3D_DILATION_FILTER),
+        static_cast<uint8_t>(MAX_LOAD3D_FILTER), "dilationFilterH", "LoadData with LoadData3DParamsV2");
+}
+#endif
 
 // check Load3dv2 ChannelSize
 template <typename T>

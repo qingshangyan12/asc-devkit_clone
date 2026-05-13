@@ -88,6 +88,8 @@ $$
 | left_height   | 输入    | 	左矩阵height ，取值范围为[0,4095]。      |
 | n_dim         | 输入    | 	左矩阵width、右矩阵height，取值范围为[0,4095]。      |
 | right_width   | 输入    | 	右矩阵width，取值范围为[0,4095]。      |
+| feat_offset   | 输入    |     保留参数。 |
+| smask_offset  | 输入    |     权重矩阵的偏移位。 |
 | unit_flag     | 输入    | 	unit_flag是一种asc_mmad接口和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于L0C Buffer累加的场景。取值说明如下： <br>&bull; 0：关闭unit_flag；<br>&bull; 1：保留值；<br>&bull; 2：使能unit_flag，硬件执行完指令后，不会关闭unit_flag功能；<br>&bull; 3：使能unit_flag，硬件执行完指令后，会关闭unit_flag功能。<br> 使能该功能时，矩阵计算的unit_flag在最后一个分形设置为3，其余分形计算设置为2即可。     |
 | k_direction_align  | 输入    | 当源操作数和目的操作数为float时，L0A和L0B中的矩阵在right_width方向上按ceil(right_width/16)*16方式都对齐到48，对于right_width=44，L0A/L0B中的所有12个分形都会被读取到Cube中，而对于right_width=36，只有L0A/L0B中的10个分形会被读取到Cube中。 |
 | is_weight_offset  | 输入    | 使能weight matrix offset。|
@@ -111,4 +113,21 @@ PIPE_M
 
 ## 调用示例
 
-无
+```cpp
+// total_length指参与搬运的数据总长度
+constexpr uint64_t total_length = 128;
+// 以下三个参数分别对应矩阵c,a,b的地址
+__cc__ int32_t c_matrix[total_length];
+__ca__ int8_t a_matrix[total_length];
+__cb__ int8_t b_matrix[total_length];
+// 其余入参均已默认数值传入
+uint16_t left_height = 16;
+uint16_t n_dim = 16;
+uint16_t right_width =16;
+uint8_t unit_flag = 0;
+bool disable_gemv = false;
+bool c_matrix_source = false;
+bool c_matrix_init_val = true;
+// 函数调用
+asc_mmad_sync(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source, c_matrix_init_val);
+```
