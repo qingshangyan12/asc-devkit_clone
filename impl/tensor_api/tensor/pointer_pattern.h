@@ -48,14 +48,14 @@ using MemPtrTraitT = typename Std::conditional<IsPtrTrait<T>::value, T, PtrTrait
 using FirstArgT = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
 
 template <typename Hardware, typename TraitOrType, typename... Args,
-        Std::enable_if_t<!IsMemPtrIterator<FirstArgT<Args...>>::value, int>>
+        Std::enable_if_t<!IsMemPtrIterator<FirstArgT<Args...>>::value, int> = 0>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
     return MakeLocationMemPtr<Hardware, MemPtrTraitT<TraitOrType>>(args...);
 }
 
 template <typename Hardware, typename... Args,
-        Std::enable_if_t<IsMemPtrIterator<FirstArgT<Args...>>::value, int>>
+        Std::enable_if_t<IsMemPtrIterator<FirstArgT<Args...>>::value, int> = 0>
 __aicore__ inline constexpr auto MakeMemPtr(Args... args)
 {
     return MakeHardwareMemPtr<Hardware>(args...);
