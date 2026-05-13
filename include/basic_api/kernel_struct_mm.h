@@ -491,7 +491,6 @@ struct LoadDataRepeatParam {
 };
 #endif // Turing versions
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct LoadDataRepeatParamWithStride {
     __aicore__ LoadDataRepeatParamWithStride() {}
 
@@ -508,7 +507,6 @@ struct LoadDataRepeatParamWithStride {
     uint8_t repeatMode = 0;
     uint16_t dstStride = 0;
 };
-#endif
 
 struct LoadImageToLocalParams {
     __aicore__ LoadImageToLocalParams() {}
