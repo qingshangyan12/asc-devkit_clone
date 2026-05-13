@@ -6,7 +6,8 @@
 
 ## 样例列表
 
-|  目录名称                                                   |  功能描述                                              |
-| ------------------------------------------------------------ | ---------------------------------------------------- |
-| [matmul_leakyrelu](./matmul_leakyrelu) | 基于高阶API实现Matmul矩阵乘与LeakyRelu激活函数计算融合 |
-| [simt_gather_and_simd_adds](./simt_gather_and_simd_adds) | 基于SIMT和SIMD实现Gather和Adds融合计算 |
+| 目录名称                                              | 功能描述                                               |
+| ----------------------------------------------------- | ------------------------------------------------------ |
+| [matmul_leakyrelu](./matmul_leakyrelu)                   | 基于高阶API实现Matmul矩阵乘与LeakyRelu激活函数计算融合 |
+| [simt_gather_and_simd_adds](./simt_gather_and_simd_adds) | 基于SIMT和SIMD实现Gather和Adds融合计算                 |
+|  [matrix_transpose](./matrix_transpose/) |  SIMD与SIMT混合编程下使用SIMT实现矩阵转置 |

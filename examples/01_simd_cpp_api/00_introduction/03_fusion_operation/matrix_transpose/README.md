@@ -2,81 +2,68 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程场景下的访存合并优化思路。样例包含2个kernel版本：先实现直接索引转置，再通过UB中转调整数据写回方式，使GM读写更接近连续访问，从而展示混合编程下矩阵转置的全局访存优化方法。
-
-**优化路径**：
-
-- Case 0：直接索引转置版本
-- Case 1：UB中转 + 全局访存合并实现转置
+本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程场景下的访存合并优化思路。样例包含2个kernel版本，从直接索引转置开始，再通过UB中转调整数据写回方式，使GM读写更接近连续访问，从而展示混合编程下矩阵转置的全局访存优化方法。
 
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
 
-## 支持的CANN软件版本
-
-- \> CANN 9.0.0
-
 ## 目录结构介绍
 
 ```text
 ├── matrix_transpose
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── matrix_transpose.asc   # 矩阵转置样例实现（包含2个case）
+│   ├── CMakeLists.txt         // 编译工程文件
+│   ├── matrix_transpose.asc   // 矩阵转置样例实现
 │   └── README.md
 ```
 
 ## 样例描述
 
-**样例功能**：
+- 计算公式：
 
-样例实现的功能是固定shape为1024×1024的矩阵转置
+  $$
+  output(x, y) = input(y, x)
+  $$
 
-矩阵转置的计算公式为：
+  - input为输入矩阵，形状为[H,W]，数据类型为float
+  - output为输出矩阵，形状为[W,H]，数据类型为float
+- 样例规格：
 
-$$
-output(x, y) = input(y, x)
-$$
-
-- input：输入矩阵，默认形状为[1024,1024]，数据类型为float
-- output：输出矩阵，形状为[1024,1024]，数据类型为float
+<table>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">MatrixTranspose</td></tr>
+<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">input</td><td align="center">[1024,1024]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[1024,1024]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">transpose_naive_kernel / transpose_coalesced_kernel</td></tr>
+</table>
 
 ## 样例实现
 
-### 计算映射与线程切分
+### Case实现说明
 
-对矩阵转置这类二维规则计算，采用tile方式组织数据可以将大矩阵分解为若干局部子块，使每个block只处理一个局部区域，便于索引计算和线程协作。本样例中的2个kernel都基于同一套tile切分方式组织计算，便于比较不同kernel在相同切分方式下的访存行为差异。
+本样例通过两个独立的kernel实现不同的访存策略，每个kernel对应特定的Case版本。
 
-本样例采用SIMD与SIMT混合编程方式：核函数内部通过 `asc_vf_call` 调用 `__simt_vf__` 函数。混合编程场景下只支持一维线程块布局，因此二维矩阵tile不能直接映射到二维 `blockIdx.x/blockIdx.y`，tile内线程也不能使用二维 `threadIdx.x/threadIdx.y` 布局。本样例将二维tile坐标展平到一维 `blockIdx.x`，再将tile内32×32个元素展平到一维 `threadIdx.x`，在SIMT VF函数内部分别还原出二维tile坐标和tile内局部坐标。
+| 实现单元                   | 对应Case | 实现特点                     | 使用的核函数               | 优化特性                                         |
+| -------------------------- | -------- | ---------------------------- | -------------------------- | ------------------------------------------------ |
+| **直接索引转置实现** | Case 0   | 直接按照转置公式计算输出坐标 | transpose_naive_kernel     | 直接索引转置版本<br />GM连续读、非连续写         |
+| **UB中转转置实现**   | Case 1   | 通过UB暂存tile并交换读写方向 | transpose_coalesced_kernel | UB中转实现全局访存合并<br />GM读写更接近连续访问 |
 
-本样例中子块tile大小取32×32，主要是因为SIMT执行模型中一个warp包含32个线程。同一warp的线程可处理tile中同一行的32个连续元素。这样在访问GM时，一个warp能够按行读取连续数据，有利于形成连续的全局访存模式。
+#### 1. 线程块布局
 
-**整体切分方式**：
-
-- 将整个输入矩阵进行tile划分，每个tile大小固定是32×32，一个block对应处理输入矩阵中的一个大小为32×32的tile
-- 由于混合编程下核函数只支持一维线程块布局，因此采用一维block切分，block数量为 `bn = grid_x * grid_y`，其中 `grid_x = matrix_width / TILE_DIM`，`grid_y = matrix_height / TILE_DIM`
-- 每个一维 `blockIdx.x` 对应一个tile，并在SIMT VF函数内还原为二维tile坐标：
+- 本样例采用SIMD与SIMT混合编程方式，核函数内部通过 `asc_vf_call` 调用 `__simt_vf__` 函数。当前样例仅支持方阵，且矩阵宽高需要是32的整数倍。
+- SIMD与SIMT混合编程场景下只支持一维线程块布局，因此二维矩阵tile不能直接映射到二维 `blockIdx.x/blockIdx.y`，tile内线程也不能使用二维 `threadIdx.x/threadIdx.y` 布局。
+- 本样例将二维tile坐标展平到一维 `blockIdx.x`，再将tile内32×32个元素展平到一维 `threadIdx.x`，在SIMT VF函数内部分别还原出二维tile坐标和tile内局部坐标。
+- 每个tile大小为32×32，一个block处理一个tile。block数量为 `bn = grid_x * grid_y`，其中 `grid_x = matrix_width / TILE_DIM`，`grid_y = matrix_height / TILE_DIM`。
 
 ```cpp
 int block_x = blockIdx.x % grid_width;
 int block_y = blockIdx.x / grid_width;
-```
 
-**一维线程块与SIMT线程组织**：
-
-- SIMT VF函数内部同样采用一维线程块布局，通过 `asc_vf_call(..., dim3(THREAD_COUNT), ...)` 启动
-- `THREAD_COUNT = TILE_DIM * TILE_DIM = 1024`
-- `threadIdx.x` 范围为0-1023，每个线程处理tile内1个元素
-- tile内局部二维坐标由一维 `threadIdx.x` 还原：
-
-```cpp
 int tile_x = threadIdx.x % TILE_DIM;
 int tile_y = threadIdx.x / TILE_DIM;
 ```
 
-**以一个block为例的映射关系**：
-
-下图给出了一个更直观的映射示意。左侧表示1024×1024的矩阵被划分为 32×32 个 tile。右侧表示其中一个block需要处理的一个tile，其大小为32×32。
+下图给出了一个更直观的映射示意。左侧表示1024×1024的矩阵被划分为32×32个tile。右侧表示其中一个block需要处理的一个tile，其大小为32×32。
 
 <img src="./figure/blockMapping.png" width="60%">
 
@@ -92,10 +79,6 @@ int tile_y = threadIdx.x / TILE_DIM;
 结合代码中的索引计算：
 
 ```cpp
-int block_x = blockIdx.x % grid_width;
-int block_y = blockIdx.x / grid_width;
-int tile_x = threadIdx.x % TILE_DIM;
-int tile_y = threadIdx.x / TILE_DIM;
 int x_index = block_x * TILE_DIM + tile_x;
 int y_index = block_y * TILE_DIM + tile_y;
 int index = x_index + width * y_index;
@@ -118,34 +101,30 @@ int index = x_index + width * y_index;
 
 - index = x_index + width × y_index = 61 + 1024 × 66
 
-为方便对比各个版本的性能差异，本样例的所有版本均采用完全一致的线程布局配置：
-
-- 每个tile的大小TILE_DIM=32
-- 外层kernel采用一维block数量 `bn = (matrix_width/32) × (matrix_height/32)`，每个block处理一个tile
-- 二维tile坐标由一维 `blockIdx.x` 还原，不使用 `blockIdx.y`
-- SIMT VF函数内部的线程组织为 `dim3(1024)`，tile内局部坐标由一维 `threadIdx.x` 还原，不使用 `threadIdx.y`
-
 ### 性能指标说明
 
-**表1 MatrixTranspose性能指标字段说明表**
-
-|       字段名       | 字段含义                                                                                      |
-| :-----------------: | :-------------------------------------------------------------------------------------------- |
-|  Task Duration(us)  | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。                    |
-|    aiv_time(us)    | Task在AI Vector Core上的理论执行时间，单位为us。                                              |
-|  aiv_total_cycles  | 该Task被分配到每个AI Vector Core计算单元上后，每个AI Vector Core计算单元上的执行的cycle总数。 |
-|  aiv_vec_time(us)  | vec类型指令（向量类运算指令）耗时，单位us。                                                   |
-|    aiv_vec_ratio    | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。                             |
-| aiv_scalar_time(us) | 代表scalar类型指令（标量类运算指令）耗时。                                                    |
-|  aiv_scalar_ratio  | 代表scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。                      |
+| 指标                | 说明                                                                                      |
+| ------------------- | ----------------------------------------------------------------------------------------- |
+| Task Duration(us)   | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间                  |
+| aiv_time(us)        | Task在AI Vector Core上的理论执行时间，单位为us                                            |
+| aiv_total_cycles    | 该Task被分配到每个AI Vector Core计算单元上后，每个AI Vector Core计算单元上的执行cycle总数 |
+| aiv_vec_time(us)    | vec类型指令（向量类运算指令）耗时，单位为us                                               |
+| aiv_vec_ratio       | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比                           |
+| aiv_scalar_time(us) | scalar类型指令（标量类运算指令）耗时，单位为us                                            |
+| aiv_scalar_ratio    | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比                        |
 
 除Task Duration外，本例中其余指标均展示的为所有block上性能指标的平均值。
 
-### Case 0：直接索引转置版本
+### Case 0: 直接索引转置版本
 
-**实现方式**：对应样例中transpose_naive_kernel()函数
+**样例目标**：实现基础的矩阵转置功能，作为后续优化版本的耗时对比基线
 
-该版本直接按照转置公式计算输出坐标，是最直接的transpose实现版本。
+**核心实现**：
+
+- 每个block处理一个32×32 tile
+- 每个SIMT线程处理tile内1个元素
+- 线程先按原坐标从GM读取输入元素，再计算该元素转置后的输出位置，并把数据直接写到转置后的GM地址
+- GM读取方向连续，GM写回方向不连续
 
 **关键代码**：
 
@@ -156,13 +135,7 @@ int index_out = y_index + height * x_index;
 output[index_out] = input[index_in];
 ```
 
-**实现过程拆解**：
-
-1. 线程先按原坐标读取输入元素
-2. 线程计算该元素转置后的输出位置
-3. 线程把数据直接写到转置后的GM地址
-
-下图展示了Case 0的数据流，其中标红展示了一个warp在读取GM和写入GM时处理的元素。对于同一个warp的线程会读取GM输入中tile的一行元素，写回到GM输出中tile的一列。在读取GM输入时，相邻线程访问的元素地址连续，为连续读，在写回到输出时，相邻线程却被拆散到输出矩阵的不同行上，为不连续写。因此，这一版的核心问题是转置后的写回地址不再连续，这通常会显著影响整体吞吐。
+下图展示了Case 0的数据流，其中标红展示了一个Warp在读取GM和写入GM时处理的元素。对于同一个Warp的线程会读取GM输入中tile的一行元素，写回到GM输出中tile的一列。在读取GM输入时，相邻线程访问的元素地址连续，为连续读，在写回到输出时，相邻线程却被拆散到输出矩阵的不同行上，为不连续写。因此，这一版的核心问题是转置后的写回地址不再连续，这通常会显著影响整体吞吐。
 
 <img src="./figure/case0.png" width="60%">
 
@@ -172,24 +145,23 @@ output[index_out] = input[index_in];
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
 |      70.304      |    4.257    |     7024.463     |      4.115      |     0.967     |        0.131        |      0.030      |
 
-**性能分析**：
+**分析**：
 
 - Case 0的Task Duration为70.304us，作为直接索引转置版本，是后续优化版本的对比基线
-- 该版本GM读取仍然是连续读，但GM写回是跨行、非连续写，同一个warp的写请求难以高效合并，因此整体耗时主要受限于写回访存模式
-
-**性能优化建议**：
-
-> ⚠️ **naive transpose通常受限于非连续写访存**
->
-> 可以使用UB中数据中转，把不连续的访问转移到UB内，保证GM读写的连续行从而提高性能
+- 该版本GM读取仍然是连续读，但GM写回是跨行、非连续写，同一个Warp的写请求难以高效合并，因此整体耗时主要受限于写回访存模式
 
 ---
 
-### Case 1：UB中转 + 全局访存合并的转置版本
+### Case 1: UB中转 + 全局访存合并的转置版本
 
-**实现方式**：参考transpose_coalesced_kernel()函数实现
+**优化目标**：通过UB中转调整转置写回方式，使GM读写更接近连续访问，降低端到端耗时
 
-该版本通过UB中转将GM的读写改为连续的访问模式，使得全局访存合并。
+**核心实现**：
+
+- 每个线程从GM读取tile中的1个元素，一个Warp会读取一个tile的一行元素
+- 按原坐标把元素写入UB中的tile，一个Warp会将读取的一行写入到UB中的tile的一行
+- 同步后，每个线程从UB中取数，一个Warp会读取UB中tile的一列元素
+- 将取出的值写回GM中的转置位置，一个Warp会将读取UB的一列元素写入到GM输出中tile的一行
 
 **关键代码**：
 
@@ -210,15 +182,13 @@ int index_out = x_index + y_index * height;
 output[index_out] = tile[tile_x][tile_y];
 ```
 
-**实现过程拆解**：
+**优化手段**：
 
-1. 每个线程从GM读取tile中的1个元素，一个warp会读取一个tile的一行元素
-2. 按原坐标把元素写入UB中的tile，一个warp会将读取的一行写入到UB中的tile的一行
-3. 同步，保证整个tile已经完整写入UB
-4. 每个线程从UB中取数，一个warp会读取UB中tile的一列元素
-5. 把取出的值写回GM中的转置位置，一个warp会将读取UB的一列元素写入到GM输出中tile的一行。
+- 使用UB作为tile中转区，把Case 0中的非连续GM写转移为UB侧访问
+- 调整输出tile的block坐标，使写回GM时同一个Warp更接近按行连续写入
+- 通过 `asc_syncthreads()` 保证整个tile写入UB后再执行转置方向读取
 
-下图展示了Case 1的数据流，其中标红和标黄的元素展示了一个warp的线程在读取GM和写入GM时处理的元素。读取GM输入时，整个tile会按照GM的排布搬到UB，在写入GM输出时一个warp的线程会读取UB上的一列元素写回到其对应的转置后的位置。
+下图展示了Case 1的数据流，其中标红和标黄的元素展示了一个Warp的线程在读取GM和写入GM时处理的元素。读取GM输入时，整个tile会按照GM的排布搬到UB，在写入GM输出时一个Warp的线程会读取UB上的一列元素写回到其对应的转置后的位置。
 
 <img src="./figure/case1.png" width="60%">
 
@@ -230,40 +200,41 @@ output[index_out] = tile[tile_x][tile_y];
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
 |      44.440      |    2.441    |     4027.577     |      2.295      |     0.941     |        0.134        |      0.054      |
 
-**优化效果分析**：
+**分析**：
 
 - 相比Case 0的直接索引转置版本，Case 1的Task Duration从70.304us降低到44.440us，耗时下降约36.8%
 - 按Task Duration计算，Case 1整体约为Case 0的1.58倍性能，说明通过UB中转改善GM写回连续性后，端到端耗时有明显下降
 - Case 1仍然需要额外的UB读写和同步，因此优化后的Task Duration没有降到纯连续访存的理想水平；这部分耗时是UB中转换取GM访存合并带来的必要开销
 
-**性能优化建议**：
-
-> 💡 **先解决全局访存合并，再处理UB bank conflict**
->
-> 在SIMT编程中，全局访存模式通常是第一层瓶颈，先让GM访问连续，再继续细化UB中的访问冲突。
-
 ---
+
+## 性能对比总结
+
+### Ascend 950PR芯片性能数据
+
+**综合优化效果**：
+
+- 通过Case 0到Case 1的访存合并优化，样例Task Duration从70.304us降低到44.440us，耗时下降约36.8%
+- Case 1相对Case 0性能提升约1.58倍，说明通过UB中转改善GM写回连续性后，端到端耗时有明显收益
+
+| Case version | Task Duration(us) | 端到端耗时相对Case 0 | 优化点                           |
+| ------------ | ----------------- | -------------------- | -------------------------------- |
+| Case 0       | 70.304            | **1x**         | 直接索引转置，GM连续读、非连续写 |
+| Case 1       | 44.440            | **1.58x**      | UB中转，全局访存合并             |
+
+## 调优建议
+
+1. **优先关注GM访存连续性**：矩阵转置计算量很小，端到端耗时主要受读写访存模式影响。
+2. **使用UB中转改善写回模式**：当直接转置导致GM非连续写时，可以将不连续访问转移到UB侧，换取GM侧连续读写。
+3. **注意同步开销**：UB中转需要同步保证tile数据完整，优化时需要同时关注访存收益与同步、UB读写开销之间的平衡。
+4. **遵循混合编程一维线程块布局**：SIMD与SIMT混合编程下只支持一维线程块布局，需要将二维tile坐标和tile内坐标手动展平与还原。
 
 ## 编译运行
 
-### 切换Case
+在本样例根目录下执行如下步骤，编译并执行样例。
 
-在 cmake 编译时通过 `-DSCENARIO_NUM=N` 指定要运行的 case：
-
-```bash
-cmake -DSCENARIO_NUM=0 ..   # 运行 case 0（可替换为0-1）
-```
-
-各 case 说明：
-
-- `0`：直接索引转置版本
-- `1`：UB中转 + 全局访存合并实现转置
-
-### 编译执行
-
-在本样例根目录下执行如下步骤，编译并执行算子。
-
-- 配置环境变量请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+- 配置环境变量
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
 
   - 默认路径，root用户安装CANN软件包
 
@@ -283,13 +254,43 @@ cmake -DSCENARIO_NUM=0 ..   # 运行 case 0（可替换为0-1）
 - 样例执行
 
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake -DSCENARIO_NUM=0 ..;    # 运行 case 0（可替换为0-1）
-  make -j;                      # 编译工程
-  ./demo                        # 执行样例
+  SCENARIO_NUM=0                       # 选择执行场景，可选0-1
+  mkdir -p build && cd build;          # 创建并进入build目录
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
+  ./demo                               # 执行样例
   ```
-  执行结果如下，说明精度对比成功：
+- 编译选项说明
+
+  | 选项             | 可选值      | 说明              |
+  | ---------------- | ----------- | ----------------- |
+  | `SCENARIO_NUM` | `0`-`1` | 样例类型，默认为0 |
+
+  执行结果如下，说明精度对比成功。
+
 
   ```text
   [Success] Case accuracy is verification passed.
   ```
+
+## 性能分析
+
+使用 `msprof` 工具获取详细性能数据：
+
+```bash
+msprof op ./demo   # 分析case的性能
+```
+
+会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+
+```text
+├──dump                       # 原始的性能数据，用户无需关注
+├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+├──L2Cache.csv                # L2 Cache命中率
+├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+├──OpBasicInfo.csv            # 算子基础信息
+├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+├──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
+└──visualize_data.bin         # MindStudio Insight呈现文件
+```
