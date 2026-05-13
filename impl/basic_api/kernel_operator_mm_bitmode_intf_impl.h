@@ -245,6 +245,7 @@ __aicore__ inline void SetFMatrixBitModeParams::SetPadList(const uint8_t padList
     config0BitMode.SetPadList(padList_);
 };
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline MmadBitModeParams::MmadBitModeParams()
 {
     config0 = 0;
@@ -311,6 +312,7 @@ __aicore__ inline bool MmadBitModeParams::GetCmatrixInitVal() const
 {
     return config0BitMode.GetCmatrixInitVal();
 };
+#endif
 }  // namespace AscendC
 
 #endif  // ASCENDC_MODULE_OPERATOR_MM_BITMODE_INTF_IMPL_H
