@@ -68,15 +68,16 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(const LocalTensor<T>& dst, 
     LoadDataImpl(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const Load2DBitModeParam& loadDataParams)
 {
+    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     CheckLoadData2dDatatype<T>();
     LoadDataImpl<Dst, Src, T>(dst, src, loadDataParams);
+    #endif
 }
-#endif
+
 /* **************************************************************************************************
  * LoadData 2dV2                                             *
  * ************************************************************************************************* */
@@ -105,15 +106,15 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     LoadDataImpl(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, typename U>
 __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
     const LocalTensor<fp8_e8m0_t>& srcMx, const LoadData2DParamsV2& loadDataParams,
     const LoadData2DMxParams& loadMxDataParams)
 {
+    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     LoadDataImpl(dst, src0, srcMx, loadDataParams, loadMxDataParams);
+    #endif
 }
-#endif
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
@@ -224,12 +225,12 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     LoadDataImpl<T, defaultConfig>(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, const IsResetLoad3dConfig &defaultConfig,
     typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
 __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData3DParamsV2<U>& loadDataParams)
 {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 #if ASCENDC_CPU_DEBUG
     CheckLoadData3dv2ChannelSize<T>(loadDataParams.channelSize);
     CheckLoadData3dParams(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.strideW, loadDataParams.strideH);
@@ -237,8 +238,8 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
         loadDataParams.mStartPt);
 #endif
     LoadDataWithStrideImpl<T, defaultConfig>(dst, src, loadDataParams);
-}
 #endif
+}
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <TPosition Dst, TPosition Src, typename T>
@@ -374,30 +375,33 @@ __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
 {
+    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     MmadImpl(dst, fm, filter, mmadParams);
+    #endif
 }
 
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
 {
+    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     MmadImpl(dst, fm, filter, bias, mmadParams);
+    #endif
 }
-#endif
 
-#if __NPU_ARCH__ == 2201
 template <typename T, typename U,
     typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type,
     typename Std::enable_if<Std::is_same<PrimT<U>, int8_t>::value, bool>::type>
 __aicore__ inline void MmadWithSparse(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<U>& filter, const MmadParams& mmadParams)
 {
+    #if __NPU_ARCH__ == 2201
     MmadSpImpl(dst, fm, filter, mmadParams);
+    #endif
 }
 
 template <typename T, typename U,
@@ -406,17 +410,19 @@ template <typename T, typename U,
 __aicore__ inline void LoadDataWithSparse(const LocalTensor<T> &dst, const LocalTensor<T> &src,
     const LocalTensor<U> &idx, const LoadData2dParams &loadDataParam)
 {
+    #if __NPU_ARCH__ == 2201
     LoadDataWithSparseImpl(dst, src, idx, loadDataParam);
+    #endif
 }
-#endif
 
 #if __NPU_ARCH__ == 2002
 template <typename T, typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type>
 __aicore__ inline void LoadUnzipIndex(const GlobalTensor<T>& src, uint32_t numOfIndexTabEntry)
 {
+    #if __NPU_ARCH__ == 2002
     LoadUnzipIndexImpl(src, numOfIndexTabEntry);
+    #endif
 }
-#endif
 
 /* **************************************************************************************************
  * BroadCastVecToMM                                             *
@@ -513,12 +519,12 @@ __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padL
     SetFmatrixImpl(l1H, l1W, padList, fmatrixMode);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
 {
+    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     SetFmatrixImpl(param, fmatrixMode);
+    #endif
 }
-#endif
 
 /* **************************************************************************************************
  * SetLoadDataBoundary                                             *
@@ -542,13 +548,13 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
     SetLoadDataRepeatImpl(repeatParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline void SetLoadDataRepeatWithStride(const LoadDataRepeatParamWithStride& repeatParams)
 {
+    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     ASCENDC_CHECK_VALUE_RANGE(repeatParams.repeatMode, 0, 1, "repeatMode", "SetLoadDataRepeat");
     SetLoadDataRepeatWithStrideImpl(repeatParams);
+    #endif
 }
-#endif
 
 /* **************************************************************************************************
  * LoadImageToLocal                                             *

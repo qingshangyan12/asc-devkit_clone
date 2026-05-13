@@ -303,19 +303,19 @@ __aicore__ inline void LoadData(const LocalTensor<bfloat16_t>& dst, const LocalT
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
 template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(const LocalTensor<T>& dst, const GlobalTensor<U>& src,
     const LoadData2DParamsV2& loadDataParams, const Nd2NzParamsV2& nd2nzParams)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
     if (dstScope == Hardware::L1) {
         LoadData2DGM2L1Cal((__cbuf__ T *)dst.GetPhyAddr(), (__gm__ U *)src.GetPhyAddr(), loadDataParams, nd2nzParams);
     } else {
         ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dst only support A1/B1"); });
     }
-}
 #endif
+}
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <TPosition Dst, TPosition Src, typename T>
