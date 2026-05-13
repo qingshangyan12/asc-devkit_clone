@@ -44,7 +44,7 @@ struct IsPtrTrait<T, void_t<typename T::type>> : Std::true_type {};
 template <typename T>
 using MemPtrTraitT = typename Std::conditional<IsPtrTrait<T>::value, T, PtrTrait<T>>::type;
 
- template <typename... Args>
+template <typename... Args>
 using FirstArgT = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
 
 template <typename Hardware, typename TraitOrType, typename... Args,
