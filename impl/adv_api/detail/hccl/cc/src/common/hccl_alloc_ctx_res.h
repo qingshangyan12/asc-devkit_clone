@@ -98,8 +98,8 @@ struct OpResCtx {
     uint64_t sprAddr;  // spr寄存器起始地址
     uint64_t res[MAX_OP_NUM];  // MS地址，预留
     uint64_t resCtx;  // 资源地址，用于资源下发时的处理
-    uint64_t opType[MAX_OP_NUM];
-    uint64_t algorithmType[MAX_OP_NUM];
+    uint32_t opType[MAX_OP_NUM];
+    uint32_t algorithmType[MAX_OP_NUM];
 };
 
 enum AlgorithmType {
