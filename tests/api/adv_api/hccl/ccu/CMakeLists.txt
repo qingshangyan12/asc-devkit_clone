@@ -115,47 +115,16 @@ add_executable(${CCU_UT_TARGET}
     ${HCCL_ST_PROXY_DIR}/communicator/sim_channel_exchange_handler.cc
     ${HCCL_ST_PROXY_DIR}/communicator/sim_context_manager.cc
     ${HCCL_ST_PROXY_DIR}/topo_model/topo_model.cc
+    ${HCCL_ST_PROXY_DIR}/hccl_op_common_stub.cc
     # Sim world stub files
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/sim_world.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/sim_npu.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/sim_task.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/sim_task_queue.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/comm_domain.cc
-    # Source under test
+    # Source under test (minimal impl dependencies)
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
-    # Real common infrastructure
     ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/exception/exception_defination.cc
-    ${HCCL_CC_SRC_DIR}/common/param_check.cc
-    ${HCCL_CC_SRC_DIR}/common/utils.cc
-    ${HCCL_CC_SRC_DIR}/common/log.cc
-    ${HCCL_CC_SRC_DIR}/common/sal.cc
-    ${HCCL_CC_SRC_DIR}/common/config_log.cc
-    ${HCCL_CC_SRC_DIR}/common/adapter_error_manager_pub.cc
-    ${HCCL_CC_SRC_DIR}/common/alg_env_config.cc
-    ${HCCL_CC_SRC_DIR}/common/alg_type.cc
-    # Real selector infrastructure
-    ${HCCL_CC_SRC_DIR}/ops/op_common/dlhcomm_function.cc
-    ${HCCL_CC_SRC_DIR}/ops/op_common/op_common.cc
-    ${HCCL_CC_SRC_DIR}/ops/op_common/selector/auto_selector_base.cc
-    ${HCCL_CC_SRC_DIR}/ops/op_common/selector/selector_registry.cc
-    ${HCCL_CC_SRC_DIR}/ops/op_common/selector/execute_selector.cc
-    # Per-op selectors (register CCU algorithm selection logic)
-    ${HCCL_CC_SRC_DIR}/ops/all_gather/selector/all_gather_auto_selector.cc
-    ${HCCL_CC_SRC_DIR}/ops/all_reduce/selector/all_reduce_auto_selector.cc
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc
-    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector/alltoall_auto_selector.cc
-    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
-    # Executor registry (for CollAlgExecRegistryV2)
-    ${HCCL_CC_SRC_DIR}/ops/op_common/executor/registry/coll_alg_exec_registry.cc
-    ${HCCL_CC_SRC_DIR}/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
-    ${HCCL_CC_SRC_DIR}/ops/op_common/executor/executor_v2_base.cc
-    # AICPU kernel launch
-    ${HCCL_CC_SRC_DIR}/ops/op_common/template/aicpu/kernel_launch.cc
-    ${HCCL_CC_SRC_DIR}/ops/op_common/template/aicpu/dfx/task_exception_fun.cc
-    # Topo infrastructure
-    ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo.cc
-    ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_base.cc
-    ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_host.cc
 )
 
 target_include_directories(${CCU_UT_TARGET} PRIVATE
