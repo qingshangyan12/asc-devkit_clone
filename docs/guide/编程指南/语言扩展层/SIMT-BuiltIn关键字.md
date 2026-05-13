@@ -112,19 +112,15 @@
 
 -   gridDim<a name="li20760123812911"></a>
 
-    内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。
-
-    -   gridDim.x是x维度上的线程块数量。
-    -   gridDim.y是y维度上的线程块数量，目前只能返回1。
-    -   gridDim.z是z维度上的线程块数量，目前只能返回1。
+    内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。各个维度上线程块关系需满足gridDim.x * gridDim.y * gridDim.z <= 65535。
 
 -   blockIdx<a name="li1676053814914"></a>
 
     内置全局变量，只能在核函数中使用，用于获取块索引。表示当前线程所在的线程块在整个网格中的位置坐标。
 
-    -   blockIdx.x的范围是0到gridDim.x - 1。
-    -   blockIdx.y的范围是0到gridDim.y - 1，目前只能返回0。
-    -   blockIdx.z的范围是0到gridDim.z - 1，目前只能返回0。
+    -   blockIdx.x的范围是[0, gridDim.x - 1]。
+    -   blockIdx.y的范围是[0, gridDim.y - 1]。
+    -   blockIdx.z的范围是[0, gridDim.z - 1]。
 
 -   threadIdx<a name="li7760123814919"></a>
 
