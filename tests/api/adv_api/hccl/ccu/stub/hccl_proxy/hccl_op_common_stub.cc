@@ -32,7 +32,7 @@ bool IsErrorToWarn()
     return false;
 }
 
-extern "C" unsigned int HcclLaunchAicpuKernel(OpParam* param)
+extern "C" unsigned int HcclLaunchAicpuKernel(ops_hccl::OpParam* param)
 {
     return 0;
 }
