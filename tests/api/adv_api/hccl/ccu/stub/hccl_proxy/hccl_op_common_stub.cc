@@ -15,6 +15,7 @@
 #include "executor_base.h"
 #include "executor_v2_base.h"
 #include "alg_env_config.h"
+#include "param_check.h"
 #include <memory>
 #include <string>
 
@@ -31,9 +32,19 @@ bool IsErrorToWarn()
     return false;
 }
 
+extern "C" unsigned int HcclLaunchAicpuKernel(OpParam* param)
+{
+    return 0;
+}
+
 namespace ops_hccl {
 
 HcclResult HcomCheckDataType(HcclDataType dataType)
+{
+    return HcclResult::HCCL_SUCCESS;
+}
+
+HcclResult HcomCheckReductionOp(HcclReduceOp op)
 {
     return HcclResult::HCCL_SUCCESS;
 }
@@ -57,11 +68,6 @@ void GetScatterOpInfo(const void* opInfo, char* output, size_t size)
 {
 }
 
-unsigned int HcclLaunchAicpuKernel(OpParam* param)
-{
-    return 0;
-}
-
 bool CheckAsymmetricTopoSupport(HcclCMDType cmdType, const TopoInfoWithNetLayerDetails* topoInfo)
 {
     return true;
@@ -82,7 +88,18 @@ HcclResult SetCommEngine(OpParam& param)
     return HcclResult::HCCL_SUCCESS;
 }
 
+HcclResult InitEnvConfig()
+{
+    return HcclResult::HCCL_SUCCESS;
+}
+
 const bool& GetExternalInputHcclAivOnlyMode()
+{
+    static bool value = false;
+    return value;
+}
+
+const bool& GetExternalInputHcclEnableEntryLog()
 {
     static bool value = false;
     return value;
