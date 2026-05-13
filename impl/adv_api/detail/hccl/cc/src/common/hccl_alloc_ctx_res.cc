@@ -11,6 +11,14 @@
 
 using namespace ops_hccl;
 
+std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
+    {HcclCMDType::HCCL_CMD_ALLGATHER, PrepareParamForAllGather},
+    {HcclCMDType::HCCL_CMD_ALLREDUCE, PrepareParamForAllReduce},
+    {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, PrepareParamForReduceScatter},
+    {HcclCMDType::HCCL_CMD_ALLTOALL, PrepareParamForAlltoAll},
+    {HcclCMDType::HCCL_CMD_ALLTOALLV, PrepareParamForAlltoAllV},
+};
+
 HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const aclrtStream stream)
 {   
     // 检查comm是否为空指针

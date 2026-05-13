@@ -164,14 +164,6 @@ HcclResult PrepareParamForAlltoAllV(HcclComm comm, const std::string &tag, const
 
 typedef HcclResult (*OpParamPrepareFunc)(HcclComm comm, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &param);
 
-std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
-    {HcclCMDType::HCCL_CMD_ALLGATHER, PrepareParamForAllGather},
-    {HcclCMDType::HCCL_CMD_ALLREDUCE, PrepareParamForAllReduce},
-    {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, PrepareParamForReduceScatter},
-    {HcclCMDType::HCCL_CMD_ALLTOALL, PrepareParamForAlltoAll},
-    {HcclCMDType::HCCL_CMD_ALLTOALLV, PrepareParamForAlltoAllV},
-};
-
 HcclResult PrepareOpParams(HcclComm comm,const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &opParam);
 
 HcclResult InitOpParamByTiling(HcclComm comm, void *stream, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &opParam);
