@@ -20,21 +20,21 @@ adv_test_targets=(
     ascendc_ut_adv_api_kernel_KirinX90_AIV
     ascendc_ut_adv_api_kernel_Kirin9030_AIV
     ascendc_ut_adv_api_tiling_ascend310p
-    ascendc_ut_adv_api_tiling_ascend610
     ascendc_ut_adv_api_tiling_ascend310B1
     ascendc_ut_adv_api_tiling_ascend910B1_AIC
     ascendc_ut_adv_api_tiling_ascend910B1_AIV
     ascendc_ut_adv_api_tiling_ascend950pr_9599_AIC
+    ascendc_ut_adv_api_tiling_ascend950pr_9599_AIV
 )
 
 adv_test_two_targets=(
-    ascendc_ut_adv_api_kernel_ascend950pr_9599_AIC
-    ascendc_ut_adv_api_kernel_ascend950pr_9599_AIV
-    ascendc_ut_adv_api_tiling_ascend950pr_9599_AIV
+    ascendc_ut_adv_api_tiling_ascend610
     ascendc_ut_adv_api_hccl_cc_algorithm_ascend950pr_9599_AIC
 )
 
 basic_test_one_targets=(
+    ascendc_ut_adv_api_kernel_ascend950pr_9599_AIC
+    ascendc_ut_adv_api_kernel_ascend950pr_9599_AIV
     ascendc_ut_tiling_utils_ascend910
     ascendc_ut_tiling_utils_ascend310p
     ascendc_ut_tiling_utils_ascend610
@@ -53,6 +53,8 @@ basic_test_one_targets=(
     ascendc_ut_tiling_utils_ascend950pr_9599_AIV_MICRO
     ascendc_ut_tiling_utils_ascend950pr_9599_AIV_SIMT
     ascendc_ut_basic_api_ascend950pr_9599_AIV_FRAMEWORK
+    ascendc_run_all_header_checks_npu
+    ascendc_run_all_header_checks_npu_single
 )
 
 basic_test_two_targets=(
@@ -83,6 +85,8 @@ basic_test_three_targets=(
     ascendc_ut_tpl_tiling_release
     ascendc_ut_aicpu_api
     ascendc_run_all_header_checks
+    ascendc_run_all_header_checks_cpu
+    ascendc_run_all_header_checks_cpu_single
 )
 
 basic_test_four_targets=(
@@ -92,6 +96,9 @@ basic_test_four_targets=(
     ascendc_pyut_asc_op_compiler
     ascendc_pyut_aclrt_launch_kernel
     ascendc_pyut_compile_trace_log
+    generate_hidden_dat_file_ut
+    install_adapter_api_ut
+    run_all_tests_and_clean
     asc_opc_unittest
     ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC
 )
@@ -110,6 +117,8 @@ basic_test_five_targets=(
 )
 
 arm_test_targets=(
+    ascendc_ut_aclrtc
     ascendc_ut_elf_tool
+    ascendc_ut_pack_kernel
     ascendc_ut_simt_api_ascend950pr_9599
 )
