@@ -14,6 +14,7 @@
 #include "sim_world.h"
 #include "sim_npu.h"
 #include "exception_util.h"
+#include "invalid_params_exception.h"
 
 using namespace std;
 

@@ -13,6 +13,7 @@
 #include "sim_world.h"
 #include "log.h"
 #include "exception_util.h"
+#include "invalid_params_exception.h"
 
 namespace HcclSim {
 uint32_t notifyIdGen = 0;
