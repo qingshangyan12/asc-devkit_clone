@@ -34,11 +34,14 @@
 ## 测试场景概览
 包含bank冲突、地址重叠等场景的验证和分析。构造场景用例的输入数据类型是float，输入数据长度是4096，以连续读写为例
 
-| case_num | 计算公式 | 场景描述 | src0_addr | src1_addr | dst_addr | 打点性能（越低越好） | 备注 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | dst = src0 * src1 | 无bank读读、读写冲突，地址不重叠 | 0 | 0x10100 | 0x20000 | 2528 |  |
-| 2 | dst = src0 * src1 | 有bank读读冲突（同一个bank），地址不重叠 | 0 | 0x4000 | 0x10000 | 4306 |  |
-| 3 | dst = src0 * src1 | 有bank读读冲突（同一个bank group），地址不重叠 | 0 | 0x10000 | 0x14100 | 4306 |  |
+| case_num | 计算公式 | 场景描述 | 有无bank冲突 | src0_addr | src1_addr | dst_addr | 打点性能（越低越好） | 备注 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | dst = src0 * src1 | src0/src1首地址在不同bank group，src0/src1/dst首地址在不同bank | 无bank读读、读写冲突 | 0 | 0x10100 | 0x20000 |  |  |
+| 2 | dst = src0 * src1 | src0/src1首地址在同一个bank | 有bank读读冲突 | 0 | 0x4000 | 0x10000 |  |  |
+| 3 | dst = src0 * src1 | src0/src1首地址在同一个bank group | 有bank读读冲突 | 0 | 0x10000 | 0x14100 |  |  |
+| 4 | dst = src0 * src1 | src0/dst首地址在同一个bank | 无bank读写冲突 | 0 | 0x10100 | 0x4000 |  |  |
+| 5 | dst = src0 * src1 | src0/dst首地址在同一个bank | 有bank读写冲突 | 0 | 0x10100 | 0x4000 |  |  |
+| 6 | src0 = src0 * src0 | src0/src1/dst首地址完全重叠 | 无bank读读、读写冲突 | 0 | 0 | 0 |  |  |
 
 每个case的具体分析过程，请参考下述各章节
 
