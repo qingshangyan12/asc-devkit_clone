@@ -363,10 +363,8 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue);
 __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W,
     const uint8_t padList[4], const FmatrixMode &fmatrixMode);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param,
     const FmatrixMode &fmatrixMode);
-#endif
 
 /* **************************************************************************************************
  * SetLoadDataBoundary                                             *
