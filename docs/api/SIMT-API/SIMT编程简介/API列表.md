@@ -3269,9 +3269,43 @@
 </tbody>
 </table>
 
+## 访存函数<a name="section1064618511375"></a>
+
+**表 24**  访存函数
+
+<a name="table9521192320230"></a>
+<table><thead align="left"><tr id="row16522132302312"><th class="cellrowborder" valign="top" width="40%" id="mcps1.2.3.1.1"><p id="p2522112322312"><a name="p2522112322312"></a><a name="p2522112322312"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="60%" id="mcps1.2.3.1.2"><p id="p1952216234238"><a name="p1952216234238"></a><a name="p1952216234238"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row1752242302320"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p68031330105213"><a name="p68031330105213"></a><a name="p68031330105213"></a><a href="../访存函数/asc_ldcg.md">asc_ldcg</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p2094931913815"><a name="p2094931913815"></a><a name="p2094931913815"></a>从L2 Cache加载缓存的数据，如果缓存命中，则直接返回数据。若未命中，则从<span id="ph4433133645514"><a name="ph4433133645514"></a><a name="ph4433133645514"></a>Global Memory</span>地址预加载数据缓存至L2 Cache，并返回数据。</p>
+</td>
+</tr>
+<tr id="row852232316239"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1352432816526"><a name="p1352432816526"></a><a name="p1352432816526"></a><a href="../访存函数/asc_ldca.md">asc_ldca</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p95231912151116"><a name="p95231912151116"></a><a name="p95231912151116"></a>首先从Data Cache加载缓存数据，若未命中，则尝试从L2 Cache加载。如果Data Cache和L2 Cache中均未找到所需数据，则从Global Memory中读取数据，然后将其缓存到L2 Cache和Data Cache中。</p>
+</td>
+</tr>
+<tr id="row12522112322317"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p13310182315219"><a name="p13310182315219"></a><a name="p13310182315219"></a><a href="../访存函数/asc_stcg.md">asc_stcg</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p10735143121114"><a name="p10735143121114"></a><a name="p10735143121114"></a>将指定数据存储到Global Memory的地址address中，并缓存到L2 Cache，但不缓存至Data Cache。</p>
+</td>
+</tr>
+<tr id="row1452212314235"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p2209172255013"><a name="p2209172255013"></a><a name="p2209172255013"></a><a href="../访存函数/asc_stwt.md">asc_stwt</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p19524191351212"><a name="p19524191351212"></a><a name="p19524191351212"></a>将指定数据存储到Global Memory的地址address中，并缓存至Data Cache和L2 Cache。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
 ## 地址空间谓词函数<a name="section97001946144014"></a>
 
-**表 24**  地址空间谓词函数
+**表 25**  地址空间谓词函数
 
 <a name="table22661153112118"></a>
 <table><thead align="left"><tr id="row1926617533219"><th class="cellrowborder" valign="top" width="40%" id="mcps1.2.3.1.1"><p id="p226710533217"><a name="p226710533217"></a><a name="p226710533217"></a>接口名</p>
@@ -3300,7 +3334,7 @@
 
 ## 地址空间转换函数<a name="section11840265418"></a>
 
-**表 25**  地址空间转换函数
+**表 26**  地址空间转换函数
 
 <a name="table1342852412222"></a>
 <table><thead align="left"><tr id="row04281324162215"><th class="cellrowborder" valign="top" width="40%" id="mcps1.2.3.1.1"><p id="p1642952411229"><a name="p1642952411229"></a><a name="p1642952411229"></a>接口名</p>
