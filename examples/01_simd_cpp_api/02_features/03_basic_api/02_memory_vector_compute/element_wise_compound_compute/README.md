@@ -63,8 +63,14 @@
 
   输入输出shape均为[1, 512]，format为ND，核函数名为`element_wise_compound_compute_custom`。
 
-- 样例实现：  
-  输入数据从Global Memory搬运至LocalTensor，根据SCENARIO_NUM编译参数执行对应的复合计算，结果再搬出到Global Memory。实现流程包含CopyIn、Compute、CopyOut三个任务，使用内核调用符`<<<>>>`调用核函数。
+- 样例实现：
+  - Kernel实现
+    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
+    - 根据场景调用不同的复合计算接口：场景1调用CastDequant实现反量化与类型转换融合、场景2调用AddRelu实现向量加法与ReLU激活融合、场景3调用Axpy实现标量乘法与向量加法融合
+    - 调用DataCopy基础API，将结果从UB（Unified Buffer）搬运至GM（Global Memory）
+
+- 调用实现  
+  使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行  
 
@@ -89,11 +95,11 @@
 - 样例执行
   ```bash
   SCENARIO_NUM=1
-  mkdir -p build && cd build
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;
-  python3 ../scripts/gen_data.py -scenario=$SCENARIO_NUM
-  ./demo
-  python3 ../scripts/verify_result.py -scenario=$SCENARIO_NUM output/output.bin output/golden.bin
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;    # 编译工程，默认npu模式
+  python3 ../scripts/gen_data.py -scenario=$SCENARIO_NUM  # 生成测试输入数据
+  ./demo                        # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash
