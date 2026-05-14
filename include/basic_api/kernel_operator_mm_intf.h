@@ -176,11 +176,9 @@ template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D
 __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData3DParamsV2<U>& loadDataParams);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 template <TPosition DstPos, TPosition SrcPos, typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const Load3DBitModeParam& loadDataParams);
-#endif
 
 /* **************************************************************************************************
  * LoadData 3dv2Pro                                             *
@@ -213,11 +211,9 @@ template <typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData3DParamsV2Pro& loadDataParams);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 template <TPosition DstPos, TPosition SrcPos, typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const Load2DBitModeParam& loadDataParams);
-#endif
 
 /* **************************************************************************************************
  * LoadDataWithTranspose                                             *
@@ -283,7 +279,6 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadParams& mmadParams);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams);
@@ -291,7 +286,6 @@ __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const LocalTensor<V>& bias, MmadBitModeParams& mmadParams);
-#endif
 
 template <typename T = int32_t, typename U = int8_t,
     typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true,

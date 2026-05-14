@@ -241,14 +241,15 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
 #endif
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const Load3DBitModeParam& loadDataParams)
 {
+    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     LoadDataImpl<Dst, Src, T>(dst, src, loadDataParams);
+    #endif
 }
-#endif
+
 /* **************************************************************************************************
  * LoadData 3dv2Pro                                             *
  * enhanced from v1, suitable for aicore > 200                                             *
@@ -375,21 +376,23 @@ __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
 {
+	#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     MmadImpl(dst, fm, filter, mmadParams);
+	#endif
 }
 
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
 {
+	#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     MmadImpl(dst, fm, filter, bias, mmadParams);
+	#endif
 }
-#endif
 
 template <typename T, typename U,
     typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type,
