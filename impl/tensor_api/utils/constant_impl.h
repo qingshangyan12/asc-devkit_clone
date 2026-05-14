@@ -96,6 +96,29 @@ namespace Location {
     struct SSBUF {};
 }
 
+template <typename T>
+struct IsHardware : Std::false_type {};
+
+#define TENSOR_API_LOCATION_TYPE(type) \
+template <> \
+struct IsHardware<Location::type> : Std::true_type {};
+
+TENSOR_API_LOCATION_TYPE(INVALID)
+TENSOR_API_LOCATION_TYPE(GM)
+TENSOR_API_LOCATION_TYPE(UB)
+TENSOR_API_LOCATION_TYPE(L1)
+TENSOR_API_LOCATION_TYPE(L0A)
+TENSOR_API_LOCATION_TYPE(L0B)
+TENSOR_API_LOCATION_TYPE(L0C)
+TENSOR_API_LOCATION_TYPE(BIAS)
+TENSOR_API_LOCATION_TYPE(FIXBUF)
+TENSOR_API_LOCATION_TYPE(SSBUF)
+
+#undef TENSOR_API_LOCATION_TYPE
+
+template <typename T>
+constexpr bool IsHardwareV = IsHardware<Std::remove_cvref_t<T>>::value;
+
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
 
