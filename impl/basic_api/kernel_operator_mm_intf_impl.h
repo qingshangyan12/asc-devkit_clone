@@ -375,21 +375,23 @@ __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
 {
+    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     MmadImpl(dst, fm, filter, mmadParams);
+#endif
 }
 
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     MmadImpl(dst, fm, filter, bias, mmadParams);
-}
 #endif
+}
 
 template <typename T, typename U,
     typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type,
