@@ -22,6 +22,7 @@
 
 #include "kernel_utils.h"
 #include "kernel_struct_aipp.h"
+#include "impl/utils/debug/asc_debug_utils.h"
 
 namespace AscendC {
 constexpr uint64_t MASK_PLACEHOLDER = 0;
@@ -633,6 +634,24 @@ __aicore__ inline void SetAippFunctionsImpl(__gm__ T* src0, AippInputFormat form
     SetAippFunctionsImpl(src0, reinterpret_cast<__gm__ T*>(0), format, config);
 }
 #endif // (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002)
+
+template <auto funcPtr, typename... Args> __aicore__ inline void AscVfCallImpl(Args &&... args)
+{
+#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510)
+    if (g_sysPrintFifoSpace != nullptr) {
+        constexpr uint64_t RESERVED_UB_SIZE = 8 * 1024;
+        uint64_t ascReservedAddr = get_shmem_sz() - RESERVED_UB_SIZE;
+        uint16_t blockIdx = asc_debug_get_block_idx();
+        get_printf_ubuf_addr_aicore(ascReservedAddr, blockIdx);
+    }
+    funcPtr(args...);
+    if (g_sysPrintFifoSpace != nullptr) {
+        // To avoid differences between -O0 and -O2, delete after the compiler resolves.
+        pipe_barrier(PIPE_ALL);
+        asc_vf_debug_ub2gm();
+    }
+#endif
+}
 
 } // namespace AscendC
 #endif // ASCENDC_KERNEL_REG_IMPL_H
