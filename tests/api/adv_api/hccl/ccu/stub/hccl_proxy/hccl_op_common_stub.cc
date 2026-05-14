@@ -21,6 +21,7 @@
 #include <string>
 #include <chrono>
 #include <cstdlib>
+#include <map>
 
 extern bool HcclCheckLogLevel(int logType, int moduleId);
 extern bool IsErrorToWarn();
@@ -136,8 +137,28 @@ ExecuteSelector::ExecuteSelector()
 
 HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* topoInfo, std::string& algName) const
 {
-    algName = "CcuAllReduceMesh1D";
-    return HcclResult::HCCL_SUCCESS;
+    static const std::map<HcclCMDType, std::string> ccuAlgMap = {
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuAllGatherMesh1D"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuReduceScatterMesh1D"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "CcuAllReduceMesh1D"},
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuAlltoAllMesh1D"},
+        {HcclCMDType::HCCL_CMD_ALLTOALLV, "CcuAlltoAllVMesh1D"},
+    };
+    static const std::map<HcclCMDType, std::string> aicpuAlgMap = {
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "InsAllGatherMesh"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "InsReduceScatterNHR"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "InsAllReduceNHR"},
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "InsAlltoAllMesh"},
+        {HcclCMDType::HCCL_CMD_ALLTOALLV, "InsAlltoAllvMesh"},
+    };
+
+    auto& algMap = (param.engine == COMM_ENGINE_CCU) ? ccuAlgMap : aicpuAlgMap;
+    auto it = algMap.find(param.opType);
+    if (it != algMap.end()) {
+        algName = it->second;
+        return HcclResult::HCCL_SUCCESS;
+    }
+    return HcclResult::HCCL_E_NOT_SUPPORT;
 }
 
 HcclResult SetCommEngine(OpParam& param)
