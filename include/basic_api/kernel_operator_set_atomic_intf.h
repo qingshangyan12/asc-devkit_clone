@@ -48,6 +48,7 @@ __aicore__ inline void SetAtomicMin();
 #if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_set_atomic_intf_impl.h"
 #endif // __NPU_ARCH__
+
 #endif // ASCENDC_MODULE_OPERATOR_SET_ATOMIC_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SET_ATOMIC_INTF_H__)
