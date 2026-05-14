@@ -60,7 +60,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="7.5200000000000005%" headers="mcps1.2.4.1.2 "><p id="p133351331174320"><a name="p133351331174320"></a><a name="p133351331174320"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.59%" headers="mcps1.2.4.1.3 "><p id="p193354319434"><a name="p193354319434"></a><a name="p193354319434"></a>是否只计算<a name="image44715855212"></a><a name="image44715855212"></a><span><img class="mathml" id="image44715855212" src="figures/zh-cn_formulaimage_0000001722356465.png"></span>，和kernel侧的SoftmaxGrad接口一致，默认false。</p>
+<td class="cellrowborder" valign="top" width="75.59%" headers="mcps1.2.4.1.3 "><p id="p193354319434"><a name="p193354319434"></a><a name="p193354319434"></a>是否只计算<a name="image44715855212"></a><a name="image44715855212"></a><span><img class="mathml" id="image44715855212" src="../../../../figures/zh-cn_formulaimage_0000001722356465.png"></span>，和kernel侧的SoftmaxGrad接口一致，默认false。</p>
 </td>
 </tr>
 <tr id="row491844913479"><td class="cellrowborder" valign="top" width="16.89%" headers="mcps1.2.4.1.1 "><p id="p109181249174717"><a name="p109181249174717"></a><a name="p109181249174717"></a>isReuseSource</p>
@@ -109,7 +109,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="7.5200000000000005%" headers="mcps1.2.4.1.2 "><p id="p691934984720"><a name="p691934984720"></a><a name="p691934984720"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.59%" headers="mcps1.2.4.1.3 "><p id="p181493213517"><a name="p181493213517"></a><a name="p181493213517"></a>是否只计算<a name="image1314643310284"></a><a name="image1314643310284"></a><span><img class="mathml" id="image1314643310284" src="figures/zh-cn_formulaimage_0000001723260621.png"></span>，和kernel侧的SoftmaxGrad接口一致，默认false。</p>
+<td class="cellrowborder" valign="top" width="75.59%" headers="mcps1.2.4.1.3 "><p id="p181493213517"><a name="p181493213517"></a><a name="p181493213517"></a>是否只计算<a name="image1314643310284"></a><a name="image1314643310284"></a><span><img class="mathml" id="image1314643310284" src="../../../../figures/zh-cn_formulaimage_0000001723260621.png"></span>，和kernel侧的SoftmaxGrad接口一致，默认false。</p>
 </td>
 </tr>
 <tr id="row1691912494475"><td class="cellrowborder" valign="top" width="16.89%" headers="mcps1.2.4.1.1 "><p id="p2091918491472"><a name="p2091918491472"></a><a name="p2091918491472"></a>softmaxGradTiling</p>
