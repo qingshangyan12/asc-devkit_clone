@@ -239,16 +239,19 @@ output[index_out] = tile[tile_x][tile_y];
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
 
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
+
   - 指定路径install_path，安装CANN软件包
 
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
+
 - 样例执行
 
   ```bash
@@ -257,6 +260,7 @@ output[index_out] = tile[tile_x][tile_y];
   cmake -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
   ./demo                               # 执行样例
   ```
+
 - 编译选项说明
 
   | 选项             | 可选值      | 说明              |
