@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef INS_TEMP_ALL_TO_ALL_V_MESH_1D_H
 #define INS_TEMP_ALL_TO_ALL_V_MESH_1D_H
 
@@ -20,8 +20,8 @@ const uint32_t ALLTOALLV_DIRECT_FULLMESH_CONCURRENT_SIZE = 16; // fullmesh最大
 
 class InsTempAlltoAllVMesh1D : public InsAlgTemplateBase {
 public:
-    explicit InsTempAlltoAllVMesh1D(const OpParam& param, const u32 rankId,
-        const std::vector<std::vector<u32>> &subCommRanks);
+    explicit InsTempAlltoAllVMesh1D(
+        const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks);
 
     ~InsTempAlltoAllVMesh1D() override;
 
@@ -33,40 +33,45 @@ public:
     }
 
     // 现在的RunAsync就是之前的GenExtIns
-    HcclResult KernelRun(const OpParam& param,
-                         const TemplateDataParams& tempAlgParams,
-                         const TemplateResource& templateResource) override;
-    HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-                        AlgResourceRequest& resourceRequest) override;
+    HcclResult KernelRun(
+        const OpParam& param, const TemplateDataParams& tempAlgParams,
+        const TemplateResource& templateResource) override;
+    HcclResult CalcRes(
+        HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+        AlgResourceRequest& resourceRequest) override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
 
-    void GetNotifyIdxMainToSub(std::vector<u32> &notifyIdxMianToSub) override;
-    void GetNotifyIdxSubToMain(std::vector<u32> &notifyIdxSubToMain) override;
+    void GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMianToSub) override;
+    void GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) override;
 
 private:
-    HcclResult RunALLtoALL(const std::map<u32, std::vector<ChannelInfo>> &channels,
-        const std::vector<ThreadHandle> &threads, const TemplateDataParams &tempAlgParams, const u32 myAlgRank);
-    HcclResult PreCopy(const std::vector<u32> &commRanks, const std::map<u32, std::vector<ChannelInfo>> &channels,
-        const std::vector<ThreadHandle> &threads, const TemplateDataParams &tempAlgParams, const u32 myAlgRank);
-    HcclResult PostCopy(const TemplateDataParams &tempAlgParams, const ThreadHandle &thread,
-        const u32 myRankCclBuffIdx, const u32 remoteRank, const u64 &recvSize,
-        const u64 &recvCount, const u64 &recvOffset) const;
-    HcclResult LocalCopyForMyRank(const TemplateDataParams &tempAlgParams,
-        const ThreadHandle &thread, const u32 myAlgRank, const u32 queIdx) const;
-    void CalcCommRankSetForOneLoop(const u32 roundIdx, const u32 remainRankSize, std::vector<u32> &commRanks) const;
+    HcclResult RunALLtoALL(
+        const std::map<u32, std::vector<ChannelInfo>>& channels, const std::vector<ThreadHandle>& threads,
+        const TemplateDataParams& tempAlgParams, const u32 myAlgRank);
+    HcclResult PreCopy(
+        const std::vector<u32>& commRanks, const std::map<u32, std::vector<ChannelInfo>>& channels,
+        const std::vector<ThreadHandle>& threads, const TemplateDataParams& tempAlgParams, const u32 myAlgRank);
+    HcclResult PostCopy(
+        const TemplateDataParams& tempAlgParams, const ThreadHandle& thread, const u32 myRankCclBuffIdx,
+        const u32 remoteRank, const u64& recvSize, const u64& recvCount, const u64& recvOffset) const;
+    HcclResult LocalCopyForMyRank(
+        const TemplateDataParams& tempAlgParams, const ThreadHandle& thread, const u32 myAlgRank,
+        const u32 queIdx) const;
+    void CalcCommRankSetForOneLoop(const u32 roundIdx, const u32 remainRankSize, std::vector<u32>& commRanks) const;
     u32 CalcCommLoops() const;
-    void CalcCclBuffIdx(u32 remoteRank, u32 &myRankCclBuffIdx, u32 &remoteCclBuffIdx) const;
-    HcclResult RunSendRecvByLoop(const std::vector<u32> &commRanks, const TemplateDataParams &tempAlgParams,
-        const std::map<u32, std::vector<ChannelInfo>> &channels, const std::vector<ThreadHandle> &threads);
-    HcclResult RunSendRecvByChannel(const TemplateDataParams &tempAlgParams,
-        const std::vector<ChannelInfo> &curChannels, const u32 remoteRank,
-        const std::vector<ThreadHandle> &threads, u32 &queIdx) const;
-    HcclResult RunSendRecv(const TemplateDataParams &tempAlgParams,
-        const SendRecvInfo &sendRecvInfo, const DataInfo &sendInfo, const DataInfo &recvInfo,
-        const ThreadHandle& thread, const u32 channelId) const;
-    HcclResult CalcDataSplitByPortGroup(const u64 totalDataCount, const u64 dataTypeSize,
-        const std::vector<ChannelInfo> &channels, std::vector<u64> &elemCountOut,
-        std::vector<u64> &sizeOut, std::vector<u64> &elemOffset) const;
+    void CalcCclBuffIdx(u32 remoteRank, u32& myRankCclBuffIdx, u32& remoteCclBuffIdx) const;
+    HcclResult RunSendRecvByLoop(
+        const std::vector<u32>& commRanks, const TemplateDataParams& tempAlgParams,
+        const std::map<u32, std::vector<ChannelInfo>>& channels, const std::vector<ThreadHandle>& threads);
+    HcclResult RunSendRecvByChannel(
+        const TemplateDataParams& tempAlgParams, const std::vector<ChannelInfo>& curChannels, const u32 remoteRank,
+        const std::vector<ThreadHandle>& threads, u32& queIdx) const;
+    HcclResult RunSendRecv(
+        const TemplateDataParams& tempAlgParams, const SendRecvInfo& sendRecvInfo, const DataInfo& sendInfo,
+        const DataInfo& recvInfo, const ThreadHandle& thread, const u32 channelId) const;
+    HcclResult CalcDataSplitByPortGroup(
+        const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
+        std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset) const;
 
     u64 dataTypeSize_{0};
     bool isDmaRead_{false};
@@ -80,6 +85,6 @@ private:
     std::vector<u64> recvOffsetSplit_;
 };
 
-} // namespace Hccl
+} // namespace ops_hccl
 
-#endif //INS_TEMP_ALL_TO_ALL_V_MESH_1D_H
+#endif // INS_TEMP_ALL_TO_ALL_V_MESH_1D_H

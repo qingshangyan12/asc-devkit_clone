@@ -1,38 +1,37 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
 
 namespace ops_hccl {
 using namespace hcomm;
 constexpr int OUTPUT_XN_ID = 1;
-constexpr int TOKEN_XN_ID  = 2;
-constexpr int CKE_IDX_0    = 0; // pre
-constexpr int CKE_IDX_1    = 1; // post
-constexpr int CKE_IDX_2    = 2;
-constexpr int CONST_ONE    = 1;
+constexpr int TOKEN_XN_ID = 2;
+constexpr int CKE_IDX_0 = 0; // pre
+constexpr int CKE_IDX_1 = 1; // post
+constexpr int CKE_IDX_2 = 2;
+constexpr int CONST_ONE = 1;
 
-CcuKernelAlltoAllVMesh1D::CcuKernelAlltoAllVMesh1D(const CcuKernelArg &arg)
-    : CcuKernelAlgBase(arg)
+CcuKernelAlltoAllVMesh1D::CcuKernelAlltoAllVMesh1D(const CcuKernelArg& arg) : CcuKernelAlgBase(arg)
 {
-    const CcuKernelArgAlltoAllVMesh1D *kernelArg
-        = dynamic_cast<const CcuKernelArgAlltoAllVMesh1D *>(&arg);
+    const CcuKernelArgAlltoAllVMesh1D* kernelArg = dynamic_cast<const CcuKernelArgAlltoAllVMesh1D*>(&arg);
     rankId_ = kernelArg->rankId_;
     rankSize_ = kernelArg->dimSize_;
     channels_ = kernelArg->channels;
     loadFromMem_ = kernelArg->loadFromMem_;
-    HCCL_INFO( "[CcuKernelAlltoAllVMesh1D] rankId_ = %d, rankSize_ = %d, loadFromMem_ = %d",rankId_, rankSize_, loadFromMem_);
+    HCCL_INFO(
+        "[CcuKernelAlltoAllVMesh1D] rankId_ = %d, rankSize_ = %d, loadFromMem_ = %d", rankId_, rankSize_, loadFromMem_);
 }
 
 HcclResult CcuKernelAlltoAllVMesh1D::InitResource()
-{   
+{
     HCCL_INFO("[CcuKernelAlltoAllVMesh1D] InitResource!");
     uint16_t channelIdx = 0;
     if (channels_.size() == 0) {
@@ -45,8 +44,7 @@ HcclResult CcuKernelAlltoAllVMesh1D::InitResource()
         if (id == rankId_) {
             output_.push_back(CreateVariable());
             token_.push_back(CreateVariable());
-        }
-        else { // 非本地，使用远端Variable
+        } else { // 非本地，使用远端Variable
             CcuRep::Variable outputVar, tokenVar;
             CHK_RET(CreateVariable(channels_[channelIdx], OUTPUT_XN_ID, &outputVar));
             output_.push_back(outputVar);
@@ -72,8 +70,8 @@ HcclResult CcuKernelAlltoAllVMesh1D::InitResource()
     a2avXnAddr_ = CreateVariable();
 
     // 前同步。交换信息，将本Rank load的in\out等地址信息写到所有对端的对应Variable中，并同步
-    selfBit_ = 1 << rankId_;  // 本rank的mask
-    allBit_  = (1 << rankSize_) - 1;  // 等待包含自身的全部对端
+    selfBit_ = 1 << rankId_;                                   // 本rank的mask
+    allBit_ = (1 << rankSize_) - 1;                            // 等待包含自身的全部对端
     allOtherBit_ = ((1 << rankSize_) - 1) & (~(1 << rankId_)); // 等待其他所有对端
 
     //  all2allv 数据搬运
@@ -108,20 +106,20 @@ void CcuKernelAlltoAllVMesh1D::PreSync()
         channelIdx++;
     }
 
-    for (auto &ch: channels_) {
+    for (auto& ch : channels_) {
         NotifyWait(ch, CKE_IDX_0, allBit);
     }
-    HCCL_INFO( "[CcuKernelAlltoAllVMesh1D] PreSync end");
+    HCCL_INFO("[CcuKernelAlltoAllVMesh1D] PreSync end");
 }
 
 void CcuKernelAlltoAllVMesh1D::PostSync()
 {
     HCCL_INFO("[CcuKernelAlltoAllVMesh1D] PostSync!");
-    for (auto &ch : channels_) {
+    for (auto& ch : channels_) {
         NotifyRecord(ch, CKE_IDX_1, 1 << CONST_ONE);
     }
 
-    for (auto &ch: channels_) {
+    for (auto& ch : channels_) {
         NotifyWait(ch, CKE_IDX_1, 1 << CONST_ONE);
     }
 }
@@ -182,27 +180,35 @@ void CcuKernelAlltoAllVMesh1D::DoAll2AllVMultiLoop()
     completedRankCount_ = 0;
     xnConst1_ = 1;
     u32 channelId = 0;
-    CCU_WHILE(completedRankCount_ != rankSize_) {  // 循环发送数据，直到所有对端数据都发送完成
-        for(uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {  // 循环发送所有对端数据
-            event_.SetMask(1 <<rankIdx);
+    CCU_WHILE(completedRankCount_ != rankSize_)
+    { // 循环发送数据，直到所有对端数据都发送完成
+        for (uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) { // 循环发送所有对端数据
+            event_.SetMask(1 << rankIdx);
             if (rankIdx == rankId_) {
                 continue;
             }
-            CCU_IF(sendRecvInfo_[rankIdx].loopNum == UINT64_MAX) { // 已经完成，直接置位完成信号
+            CCU_IF(sendRecvInfo_[rankIdx].loopNum == UINT64_MAX)
+            { // 已经完成，直接置位完成信号
                 RecordEvent(event_);
             }
-            CCU_IF(sendRecvInfo_[rankIdx].loopNum != UINT64_MAX) {  // 还没有完成，则继续循环
-                CCU_IF(sendRecvInfo_[rankIdx].loopNum == UINT64_MAX - 1) { // 最后一轮循环, 发送尾块数据
-                    CCU_IF(sendRecvInfo_[rankIdx].tailSize == 0) { // 尾块数据量为 0，则不需要发送尾块数据
+            CCU_IF(sendRecvInfo_[rankIdx].loopNum != UINT64_MAX)
+            {         // 还没有完成，则继续循环
+                CCU_IF(sendRecvInfo_[rankIdx].loopNum == UINT64_MAX - 1)
+                {     // 最后一轮循环, 发送尾块数据
+                    CCU_IF(sendRecvInfo_[rankIdx].tailSize == 0)
+                    { // 尾块数据量为 0，则不需要发送尾块数据
                         RecordEvent(event_);
                     }
-                    CCU_IF(sendRecvInfo_[rankIdx].tailSize != 0) { // 尾块数据量不为 0，则需要发送尾块数据
-                        WriteNb(channels_[channelId], dst_[rankIdx], src_[rankIdx], sendRecvInfo_[rankIdx].tailSize,
-                              event_);
+                    CCU_IF(sendRecvInfo_[rankIdx].tailSize != 0)
+                    { // 尾块数据量不为 0，则需要发送尾块数据
+                        WriteNb(
+                            channels_[channelId], dst_[rankIdx], src_[rankIdx], sendRecvInfo_[rankIdx].tailSize,
+                            event_);
                     }
-                    completedRankCount_ += xnConst1_;  // 之后一轮循环完成，更新已完成的rank数
+                    completedRankCount_ += xnConst1_; // 之后一轮循环完成，更新已完成的rank数
                 }
-                CCU_IF(sendRecvInfo_[rankIdx].loopNum != UINT64_MAX - 1) { // 未完成，则继续循环，发送整块数据
+                CCU_IF(sendRecvInfo_[rankIdx].loopNum != UINT64_MAX - 1)
+                { // 未完成，则继续循环，发送整块数据
                     WriteNb(channels_[channelId], dst_[rankIdx], src_[rankIdx], xnMaxTransportSize_, event_);
                     // 更新偏移
                     src_[rankIdx].addr += xnMaxTransportSize_;
@@ -210,41 +216,47 @@ void CcuKernelAlltoAllVMesh1D::DoAll2AllVMultiLoop()
                 }
                 sendRecvInfo_[rankIdx].loopNum += xnConst1_;
             }
-                channelId++;
+            channelId++;
         }
 
         event_.SetMask(1 << rankId_);
-        CCU_IF(sendRecvInfo_[rankId_].loopNum == UINT64_MAX) { // 已经完成，直接置位完成信号
-                RecordEvent(event_);
+        CCU_IF(sendRecvInfo_[rankId_].loopNum == UINT64_MAX)
+        { // 已经完成，直接置位完成信号
+            RecordEvent(event_);
         }
 
-        CCU_IF(sendRecvInfo_[rankId_].loopNum != UINT64_MAX) {  // 还没有完成，则继续循环
-                CCU_IF(sendRecvInfo_[rankId_].loopNum == UINT64_MAX - 1) { // 最后一轮循环, 发送尾块数据
-                    CCU_IF(sendRecvInfo_[rankId_].tailSize == 0) { // 尾块数据量为 0，则不需要发送尾块数据
-                        RecordEvent(event_);
-                    }
-                    CCU_IF(sendRecvInfo_[rankId_].tailSize != 0) { // 尾块数据量不为 0，则需要发送尾块数据
-                        if (loadFromMem_) {
-                            LocalCopyNb(myDst_, src_[rankId_], sendRecvInfo_[rankId_].tailSize, event_);
-                        } else {
-                            GroupCopy(myDst_, src_[rankId_], sendRecvInfo_[rankId_].tailGoSize);
-                            RecordEvent(event_);
-                        }
-                    }
-                    completedRankCount_ += xnConst1_;  // 之后一轮循环完成，更新已完成的rank数
+        CCU_IF(sendRecvInfo_[rankId_].loopNum != UINT64_MAX)
+        {         // 还没有完成，则继续循环
+            CCU_IF(sendRecvInfo_[rankId_].loopNum == UINT64_MAX - 1)
+            {     // 最后一轮循环, 发送尾块数据
+                CCU_IF(sendRecvInfo_[rankId_].tailSize == 0)
+                { // 尾块数据量为 0，则不需要发送尾块数据
+                    RecordEvent(event_);
                 }
-                CCU_IF(sendRecvInfo_[rankId_].loopNum != UINT64_MAX - 1) { // 未完成，则继续循环，发送整块数据
+                CCU_IF(sendRecvInfo_[rankId_].tailSize != 0)
+                { // 尾块数据量不为 0，则需要发送尾块数据
                     if (loadFromMem_) {
-                        LocalCopyNb(myDst_, src_[rankId_], xnMaxTransportSize_, event_);
+                        LocalCopyNb(myDst_, src_[rankId_], sendRecvInfo_[rankId_].tailSize, event_);
                     } else {
-                        GroupCopy(myDst_, src_[rankId_], xnMaxTransportGoSize_);
+                        GroupCopy(myDst_, src_[rankId_], sendRecvInfo_[rankId_].tailGoSize);
                         RecordEvent(event_);
                     }
-                    // 更新偏移
-                    src_[rankId_].addr += xnMaxTransportSize_;
-                    myDst_.addr += xnMaxTransportSize_;
                 }
-                sendRecvInfo_[rankId_].loopNum += xnConst1_;
+                completedRankCount_ += xnConst1_; // 之后一轮循环完成，更新已完成的rank数
+            }
+            CCU_IF(sendRecvInfo_[rankId_].loopNum != UINT64_MAX - 1)
+            { // 未完成，则继续循环，发送整块数据
+                if (loadFromMem_) {
+                    LocalCopyNb(myDst_, src_[rankId_], xnMaxTransportSize_, event_);
+                } else {
+                    GroupCopy(myDst_, src_[rankId_], xnMaxTransportGoSize_);
+                    RecordEvent(event_);
+                }
+                // 更新偏移
+                src_[rankId_].addr += xnMaxTransportSize_;
+                myDst_.addr += xnMaxTransportSize_;
+            }
+            sendRecvInfo_[rankId_].loopNum += xnConst1_;
         }
         // 等待本轮发送完成
         event_.SetMask(allBit_);
@@ -270,33 +282,33 @@ HcclResult CcuKernelAlltoAllVMesh1D::Algorithm()
     PostSync();
 
     HCCL_INFO("[AllToAllAlgo] AllToAllMesh1D end");
-    
+
     return HcclResult::HCCL_SUCCESS;
 }
 
-std::vector<uint64_t> CcuKernelAlltoAllVMesh1D::GeneArgs(const CcuTaskArg &arg)
+std::vector<uint64_t> CcuKernelAlltoAllVMesh1D::GeneArgs(const CcuTaskArg& arg)
 {
     HCCL_INFO("[CcuKernelAlltoAllVMesh1D] GeneArgs!");
-    const CcuTaskArgAlltoAllVMesh1D *taskArg
-        = dynamic_cast<const CcuTaskArgAlltoAllVMesh1D *>(&arg);
-    uint64_t inputAddr  = taskArg->inputAddr_;
+    const CcuTaskArgAlltoAllVMesh1D* taskArg = dynamic_cast<const CcuTaskArgAlltoAllVMesh1D*>(&arg);
+    uint64_t inputAddr = taskArg->inputAddr_;
     uint64_t outputAddr = taskArg->outputAddr_;
-    uint64_t tokenInfo  = taskArg->token_;
+    uint64_t tokenInfo = taskArg->token_;
 
     uint64_t srcOffset = taskArg->srcOffset_;
     uint64_t dstOffset = taskArg->dstOffset_;
 
-    HCCL_INFO("[AllToAllVAlgo] inputAddr[%llu], outputAddr[%llu],"
-              "srcOffset[%llu], dstOffset[%llu]",
-              inputAddr, outputAddr, srcOffset, dstOffset);
+    HCCL_INFO(
+        "[AllToAllVAlgo] inputAddr[%llu], outputAddr[%llu],"
+        "srcOffset[%llu], dstOffset[%llu]",
+        inputAddr, outputAddr, srcOffset, dstOffset);
     std::vector<uint64_t> processReturn = {inputAddr, outputAddr, tokenInfo, srcOffset, dstOffset};
 
     if (loadFromMem_) {
-        processReturn.push_back(0);  // 空地址占位，保证参数个数与load个数一致
+        processReturn.push_back(0); // 空地址占位，保证参数个数与load个数一致
         return processReturn;
     }
-    uint64_t xnMaxTransportSize   = UB_MAX_TRANS_SIZE;
-    auto     xnMaxTransportGoSize = CalGoSize(xnMaxTransportSize);
+    uint64_t xnMaxTransportSize = UB_MAX_TRANS_SIZE;
+    auto xnMaxTransportGoSize = CalGoSize(xnMaxTransportSize);
     for (auto val : xnMaxTransportGoSize) {
         processReturn.push_back(val);
     }
@@ -314,8 +326,9 @@ std::vector<uint64_t> CcuKernelAlltoAllVMesh1D::GeneArgs(const CcuTaskArg &arg)
         for (auto val : tailGoSize) {
             processReturn.push_back(val);
         }
-        HCCL_INFO("[AllToAllVAlgo] rankIdx[i] taskArg->sliceSize[%llu]," \
-            "taskArg->localSendRecvInfo.sendOffset[%llu]," \
+        HCCL_INFO(
+            "[AllToAllVAlgo] rankIdx[i] taskArg->sliceSize[%llu],"
+            "taskArg->localSendRecvInfo.sendOffset[%llu],"
             "taskArg->localSendRecvInfo.recvOffset[%llu]",
             taskArg->sliceSize_[i], taskArg->localSendRecvInfo_.sendOffset[i],
             taskArg->localSendRecvInfo_.recvOffset[i]);
@@ -324,11 +337,11 @@ std::vector<uint64_t> CcuKernelAlltoAllVMesh1D::GeneArgs(const CcuTaskArg &arg)
     return processReturn;
 }
 
-void CcuKernelAlltoAllVMesh1D::LoadAll2allSendRecvInfo(A2AsingleSendRecvInfo &sendRecvInfo)
+void CcuKernelAlltoAllVMesh1D::LoadAll2allSendRecvInfo(A2AsingleSendRecvInfo& sendRecvInfo)
 {
     HCCL_INFO("[CcuKernelAlltoAllVMesh1D] LoadAll2allSendRecvInfo!");
-    sendRecvInfo.tailSize   = CreateVariable();
-    sendRecvInfo.loopNum    = CreateVariable();
+    sendRecvInfo.tailSize = CreateVariable();
+    sendRecvInfo.loopNum = CreateVariable();
     sendRecvInfo.sendOffset = CreateVariable();
     sendRecvInfo.recvOffset = CreateVariable();
     sendRecvInfo.tailGoSize = CreateGroupOpSize();
@@ -356,4 +369,4 @@ void CcuKernelAlltoAllVMesh1D::LoadAll2allSendRecvInfo(A2AsingleSendRecvInfo &se
         Load(sendRecvInfo.tailGoSize);
     }
 }
-}
+} // namespace ops_hccl

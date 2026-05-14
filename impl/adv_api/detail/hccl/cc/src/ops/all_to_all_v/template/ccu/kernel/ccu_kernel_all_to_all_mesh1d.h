@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef HCCL_CCU_KERNEL_ALL_TO_ALL_MESH_1D_H
 #define HCCL_CCU_KERNEL_ALL_TO_ALL_MESH_1D_H
 
@@ -21,16 +21,12 @@ namespace ops_hccl {
 
 class CcuKernelArgAlltoAllMesh1D : public hcomm::CcuKernelArg {
 public:
-    explicit CcuKernelArgAlltoAllMesh1D(uint64_t dimSize, uint32_t rankId, bool loadFromMem, const OpParam& opParam,
-                                            const std::vector<std::vector<uint32_t>>& subCommRanks)
-        : dimSize_(dimSize),
-          rankId_(rankId),
-          loadFromMem_(loadFromMem),
-          opParam_(opParam),
-          subCommRanks_(subCommRanks)
+    explicit CcuKernelArgAlltoAllMesh1D(
+        uint64_t dimSize, uint32_t rankId, bool loadFromMem, const OpParam& opParam,
+        const std::vector<std::vector<uint32_t>>& subCommRanks)
+        : dimSize_(dimSize), rankId_(rankId), loadFromMem_(loadFromMem), opParam_(opParam), subCommRanks_(subCommRanks)
     {
-        HCCL_DEBUG("[CcuKernelArgAlltoAllMesh1D] dimSize: %lu, rankId: %u",
-                   dimSize_, rankId_);
+        HCCL_DEBUG("[CcuKernelArgAlltoAllMesh1D] dimSize: %lu, rankId: %u", dimSize_, rankId_);
     }
     hcomm::CcuKernelSignature GetKernelSignature() const override
     {
@@ -38,24 +34,32 @@ public:
         GenerateCcuKernelSignature(signature, "CcuKernelArgAlltoAllMesh1D", opParam_, subCommRanks_);
         return signature;
     }
-    uint64_t                                dimSize_;
-    uint32_t                                rankId_;
-    bool                                    loadFromMem_;
-    OpParam                                 opParam_;
-    std::vector<std::vector<uint32_t>>      subCommRanks_;
+    uint64_t dimSize_;
+    uint32_t rankId_;
+    bool loadFromMem_;
+    OpParam opParam_;
+    std::vector<std::vector<uint32_t>> subCommRanks_;
 };
 
 class CcuTaskArgAlltoAllMesh1D : public hcomm::CcuTaskArg {
 public:
-    explicit CcuTaskArgAlltoAllMesh1D(uint64_t inputAddr, uint64_t outputAddr, uint64_t sliceSize,
-        uint64_t token, uint64_t srcOffset, uint64_t dstOffset, uint64_t srcStride, bool loadFromMem) :
-        inputAddr_(inputAddr), outputAddr_(outputAddr), sliceSize_(sliceSize), token_(token), 
-        srcOffset_(srcOffset), dstOffset_(dstOffset), srcStride_(srcStride), loadFromMem_(loadFromMem)
+    explicit CcuTaskArgAlltoAllMesh1D(
+        uint64_t inputAddr, uint64_t outputAddr, uint64_t sliceSize, uint64_t token, uint64_t srcOffset,
+        uint64_t dstOffset, uint64_t srcStride, bool loadFromMem)
+        : inputAddr_(inputAddr),
+          outputAddr_(outputAddr),
+          sliceSize_(sliceSize),
+          token_(token),
+          srcOffset_(srcOffset),
+          dstOffset_(dstOffset),
+          srcStride_(srcStride),
+          loadFromMem_(loadFromMem)
     {
-        HCCL_DEBUG("[CcuTaskArgAlltoAllMesh1D] inputAddr: %lu, outputAddr: %lu, sliceSize: %lu, srcOffset: %lu, "
-                   "dstOffset: %lu, srcStride: %lu, loadFromMem: %lu, "
-                   "lastSliceSize: %lu, repeatNum: %lu",
-                   inputAddr_, outputAddr_, sliceSize_, srcOffset_, dstOffset_, srcStride_, loadFromMem_);
+        HCCL_DEBUG(
+            "[CcuTaskArgAlltoAllMesh1D] inputAddr: %lu, outputAddr: %lu, sliceSize: %lu, srcOffset: %lu, "
+            "dstOffset: %lu, srcStride: %lu, loadFromMem: %lu, "
+            "lastSliceSize: %lu, repeatNum: %lu",
+            inputAddr_, outputAddr_, sliceSize_, srcOffset_, dstOffset_, srcStride_, loadFromMem_);
     }
 
     uint64_t inputAddr_;
@@ -70,11 +74,11 @@ public:
 
 class CcuKernelAlltoAllMesh1D : public CcuKernelAlgBase {
 public:
-    CcuKernelAlltoAllMesh1D(const hcomm::CcuKernelArg &arg);
+    CcuKernelAlltoAllMesh1D(const hcomm::CcuKernelArg& arg);
     ~CcuKernelAlltoAllMesh1D() override {}
 
     HcclResult Algorithm() override;
-    std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
+    std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg& arg) override;
 
 private:
     uint64_t rankSize_{0};
@@ -91,11 +95,11 @@ private:
     hcomm::CcuRep::Variable srcOffset_;
     hcomm::CcuRep::Variable dstOffset_;
     GroupOpSize groupOpSize_;
-    hcomm::CcuRep::LocalAddr                   myDst_;
-    std::vector<hcomm::CcuRep::RemoteAddr>     dstAddr_;
-    std::vector<hcomm::CcuRep::LocalAddr>      srcAddr_;
-    std::vector<hcomm::CcuRep::Variable>       dstToken_;
-    std::vector<hcomm::CcuRep::Variable>       srcToken_;
+    hcomm::CcuRep::LocalAddr myDst_;
+    std::vector<hcomm::CcuRep::RemoteAddr> dstAddr_;
+    std::vector<hcomm::CcuRep::LocalAddr> srcAddr_;
+    std::vector<hcomm::CcuRep::Variable> dstToken_;
+    std::vector<hcomm::CcuRep::Variable> srcToken_;
     hcomm::CcuRep::CompletedEvent event_;
     hcomm::CcuRep::Variable flag_; // 用以判断是否是第一次重复
     bool loadFromMem_ = false;
@@ -107,5 +111,5 @@ private:
     void DoAlltoAll();
 };
 
-}// namespace ops_hccl
+} // namespace ops_hccl
 #endif // HCCL_CCU_KERNEL_ALL_TO_ALL_MESH_1D_H

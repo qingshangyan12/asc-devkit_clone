@@ -14,7 +14,7 @@
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/matmul/scheduler/base/scheduler_norm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/matmul/scheduler/base/scheduler_norm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_NORM_H__
 #endif
@@ -29,8 +29,8 @@ namespace AscendC {
 namespace Impl {
 namespace Detail {
 template <class A_TYPE, const auto& MM_CFG>
-constexpr bool isSingleLargeBMM = A_TYPE::layout == LayoutMode::NORMAL&& ToMatmulConfig(MM_CFG).batchMode
-                                  == BatchMode::SINGLE_LARGE_THAN_L1;
+constexpr bool isSingleLargeBMM =
+    A_TYPE::layout == LayoutMode::NORMAL && ToMatmulConfig(MM_CFG).batchMode == BatchMode::SINGLE_LARGE_THAN_L1;
 /*
     MatmulScheduler is considered entirely experimental.
     We retain the freedom to make incompatible changes, but do not guarantee the stability.

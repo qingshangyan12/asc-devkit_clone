@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ccu_kernel_scatter_mesh1d.h"
 #include "ccu_kernel_alg_base.h"
 
@@ -18,9 +18,9 @@ constexpr uint16_t TOKEN_XN_ID = 1;
 constexpr uint16_t POST_SYNC_ID = 2;
 constexpr uint16_t CKE_IDX_0 = 0;
 
-CcuKernelScatterMesh1D::CcuKernelScatterMesh1D(const CcuKernelArg &arg) : CcuKernelAlgBase(arg)
+CcuKernelScatterMesh1D::CcuKernelScatterMesh1D(const CcuKernelArg& arg) : CcuKernelAlgBase(arg)
 {
-    const CcuKernelArgScatterMesh1D *kernelArg = dynamic_cast<const CcuKernelArgScatterMesh1D *>(&arg);
+    const CcuKernelArgScatterMesh1D* kernelArg = dynamic_cast<const CcuKernelArgScatterMesh1D*>(&arg);
     rankId_ = kernelArg->rankId_;
     rankSize_ = kernelArg->dimSize_;
     channels_ = kernelArg->channels;
@@ -31,13 +31,10 @@ CcuKernelScatterMesh1D::CcuKernelScatterMesh1D(const CcuKernelArg &arg) : CcuKer
         outputDataType_ = dataType_;
         HCCL_DEBUG("[CcuKernelScatterMesh1D] outputDataType is [INVALID], set outputDataType to[%d]", outputDataType_);
     }
-    HCCL_INFO("[CcuKernelScatterMesh1D] Init, KernelArgs are rankId[%u], rankSize_[%u], dataType[%d], "
-              "outputDataType[%d], rootId[%u]",
-        rankId_,
-        rankSize_,
-        dataType_,
-        outputDataType_,
-        rootId_);
+    HCCL_INFO(
+        "[CcuKernelScatterMesh1D] Init, KernelArgs are rankId[%u], rankSize_[%u], dataType[%d], "
+        "outputDataType[%d], rootId[%u]",
+        rankId_, rankSize_, dataType_, outputDataType_, rootId_);
 }
 
 HcclResult CcuKernelScatterMesh1D::InitResource()
@@ -56,7 +53,8 @@ HcclResult CcuKernelScatterMesh1D::InitResource()
         } else {
             HCCL_DEBUG("[CcuKernelScatterMesh1D] MyRank[%u], PeerId[%u], ChannelId[%u]", rankId_, peerId, channelIdx);
             CcuRep::Variable outputVar, tokenVar;
-            CHK_RET(CreateVariable(channels_[channelIdx], OUTPUT_XN_ID, &outputVar));  // 获取channel中id=0的Var来传递output
+            CHK_RET(
+                CreateVariable(channels_[channelIdx], OUTPUT_XN_ID, &outputVar)); // 获取channel中id=0的Var来传递output
             output_.push_back(outputVar);
             CHK_RET(CreateVariable(channels_[channelIdx], TOKEN_XN_ID, &tokenVar));
             token_.push_back(tokenVar);
@@ -75,8 +73,8 @@ HcclResult CcuKernelScatterMesh1D::InitResource()
     flag_ = CreateVariable();
     flag_ = 0;
 
-    selfBit_ = 1 << rankId_;  // 仅rankid位为1，其他位为0，代表本端准备好了
-    allBit_ = ((1 << rankSize_) - 1) & (~(1 << rankId_));  // 仅rankid位为0，其他位为1，代表远端准备好了
+    selfBit_ = 1 << rankId_;                              // 仅rankid位为1，其他位为0，代表本端准备好了
+    allBit_ = ((1 << rankSize_) - 1) & (~(1 << rankId_)); // 仅rankid位为0，其他位为1，代表远端准备好了
     outputMem_.reserve(rankSize_);
     inputMem_.reserve(rankSize_);
     for (uint64_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
@@ -107,9 +105,9 @@ void CcuKernelScatterMesh1D::LoadArgs()
 void CcuKernelScatterMesh1D::PreSync()
 {
     uint32_t allBit = 1 << OUTPUT_XN_ID | 1 << TOKEN_XN_ID;
-    for (auto channel : channels_) {                                                           // 遍历所有通道
-        NotifyRecord(channel, CKE_IDX_0, OUTPUT_XN_ID, output_[rankId_], 1 << OUTPUT_XN_ID);  // 广播output地址
-        NotifyRecord(channel, CKE_IDX_0, TOKEN_XN_ID, token_[rankId_], 1 << TOKEN_XN_ID);     // 广播token
+    for (auto channel : channels_) {                                                         // 遍历所有通道
+        NotifyRecord(channel, CKE_IDX_0, OUTPUT_XN_ID, output_[rankId_], 1 << OUTPUT_XN_ID); // 广播output地址
+        NotifyRecord(channel, CKE_IDX_0, TOKEN_XN_ID, token_[rankId_], 1 << TOKEN_XN_ID);    // 广播token
     }
     for (auto channel : channels_) {
         NotifyWait(channel, CKE_IDX_0, allBit);
@@ -119,7 +117,7 @@ void CcuKernelScatterMesh1D::PreSync()
 
 void CcuKernelScatterMesh1D::PostSync()
 {
-    for (auto channel : channels_) {  // 通知所有通道操作完成
+    for (auto channel : channels_) { // 通知所有通道操作完成
         NotifyRecord(channel, CKE_IDX_0, 1 << POST_SYNC_ID);
     }
     for (auto channel : channels_) {
@@ -134,19 +132,19 @@ void CcuKernelScatterMesh1D::DoRepeatScatter()
     repeatNumAdd = 1;
     // 设置每张卡输入输出的起始地址
     for (uint64_t curId = 0; curId < rankSize_; curId++) {
-        inputMem_[curId].token = token_[curId];   // 设置每张卡的输入token
-        outputMem_[curId].token = token_[curId];  // 设置每张卡的输出token
+        inputMem_[curId].token = token_[curId];  // 设置每张卡的输入token
+        outputMem_[curId].token = token_[curId]; // 设置每张卡的输出token
 
-        inputMem_[curId].addr = input_;  // 设置每张卡的输入地址，以root的起始地址为基准
-        outputMem_[curId].addr = output_[curId];  // 设置每张卡的输出地址
+        inputMem_[curId].addr = input_;          // 设置每张卡的输入地址，以root的起始地址为基准
+        outputMem_[curId].addr = output_[curId]; // 设置每张卡的输出地址
         for (uint64_t i = 0; i < curId; i++) {
-            inputMem_[curId].addr += currentRankSliceInputOffset_;  // 每张卡加上偏移量
+            inputMem_[curId].addr += currentRankSliceInputOffset_; // 每张卡加上偏移量
             outputMem_[curId].addr += outputSliceStride_;
         }
     }
     if (rankId_ == rootId_) {
         CCU_WHILE(repeatNum_ != UINT64_MAX)
-        {  // 循环UINT64_MAX - repeatNum_次
+        { // 循环UINT64_MAX - repeatNum_次
             DoScatter();
             repeatNum_ += repeatNumAdd;
             flag_ = 1;
@@ -165,10 +163,10 @@ void CcuKernelScatterMesh1D::DoScatter()
     CCU_IF(flag_ != 0)
     {
         // 非第一轮执行时，src 和 dst 已经初始化，需要添加偏移量
-        for (auto &i : inputMem_) {
+        for (auto& i : inputMem_) {
             i.addr += inputRepeatStride_;
         }
-        for (auto &r : outputMem_) {
+        for (auto& r : outputMem_) {
             r.addr += outputRepeatStride_;
         }
     }
@@ -185,26 +183,19 @@ void CcuKernelScatterMesh1D::DoScatter()
     for (uint64_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
         event_.SetMask(1 << rankIdx);
         sliceSize = rankIdx == rankSize_ - 1 ? lastSliceSize_ : normalSliceSize_;
-        CCU_IF(sliceSize != 0) {
+        CCU_IF(sliceSize != 0)
+        {
             if (rankIdx == rankId_) {
                 // 如果输入输出地址不同，还需要进行一次本地搬运
-                CCU_IF(isInputOutputEqual_ == 0)
-                {
-                    LocalCopyNb(myOutput, inputMem_[rankIdx], sliceSize, event_);
-                }
+                CCU_IF(isInputOutputEqual_ == 0) { LocalCopyNb(myOutput, inputMem_[rankIdx], sliceSize, event_); }
                 // 如果输入输出地址相同，不进行本地搬运，只发送同步信号
-                CCU_IF(isInputOutputEqual_ != 0)
-                {
-                    RecordEvent(event_);
-                }
+                CCU_IF(isInputOutputEqual_ != 0) { RecordEvent(event_); }
             } else {
                 WriteNb(channels_[channelId], outputMem_[rankIdx], inputMem_[rankIdx], sliceSize, event_);
                 channelId++;
             }
         }
-        CCU_IF(sliceSize == 0) {
-            RecordEvent(event_);
-        }
+        CCU_IF(sliceSize == 0) { RecordEvent(event_); }
     }
 
     // 等待数据传输完成
@@ -232,9 +223,9 @@ HcclResult CcuKernelScatterMesh1D::Algorithm()
     return HcclResult::HCCL_SUCCESS;
 }
 
-std::vector<uint64_t> CcuKernelScatterMesh1D::GeneArgs(const CcuTaskArg &arg)
+std::vector<uint64_t> CcuKernelScatterMesh1D::GeneArgs(const CcuTaskArg& arg)
 {
-    const CcuTaskArgScatterMesh1D *taskArg = dynamic_cast<const CcuTaskArgScatterMesh1D *>(&arg);
+    const CcuTaskArgScatterMesh1D* taskArg = dynamic_cast<const CcuTaskArgScatterMesh1D*>(&arg);
     uint64_t inputAddr = taskArg->inputAddr_;
     uint64_t outputAddr = taskArg->outputAddr_;
     uint64_t tokenInfo = taskArg->token_;
@@ -247,33 +238,19 @@ std::vector<uint64_t> CcuKernelScatterMesh1D::GeneArgs(const CcuTaskArg &arg)
     uint64_t repeatNum = taskArg->repeatNum_;
     uint64_t isInputOutputEqual = taskArg->isInputOutputEqual_;
 
-    std::vector<uint64_t> taskArgs = {inputAddr,
-        outputAddr,
-        tokenInfo,
-        currentRankSliceInputOffset,
-        outputSliceStride,
-        inputRepeatStride,
-        outputRepeatStride,
-        normalSliceSize,
-        lastSliceSize,
-        repeatNum,
-        isInputOutputEqual};
+    std::vector<uint64_t> taskArgs = {
+        inputAddr,         outputAddr,        tokenInfo,          currentRankSliceInputOffset,
+        outputSliceStride, inputRepeatStride, outputRepeatStride, normalSliceSize,
+        lastSliceSize,     repeatNum,         isInputOutputEqual};
 
-    HCCL_INFO("[CcuKernelScatterMesh1D] TaskArgs: inputAddr[%llu], outputAddr[%llu], "
-              "currentRankSliceInputOffset[%llu], outputSliceStride[%llu], inputRepeatStride[%llu],"
-              "outputRepeatStride[%llu], normalSliceSize[%llu], lastSliceSize[%llu],"
-              "repeatNum[%llu], isInputOutputEqual[%llu]",
-        inputAddr,
-        outputAddr,
-        currentRankSliceInputOffset,
-        outputSliceStride,
-        inputRepeatStride,
-        outputRepeatStride,
-        normalSliceSize,
-        lastSliceSize,
-        repeatNum,
-        isInputOutputEqual);
+    HCCL_INFO(
+        "[CcuKernelScatterMesh1D] TaskArgs: inputAddr[%llu], outputAddr[%llu], "
+        "currentRankSliceInputOffset[%llu], outputSliceStride[%llu], inputRepeatStride[%llu],"
+        "outputRepeatStride[%llu], normalSliceSize[%llu], lastSliceSize[%llu],"
+        "repeatNum[%llu], isInputOutputEqual[%llu]",
+        inputAddr, outputAddr, currentRankSliceInputOffset, outputSliceStride, inputRepeatStride, outputRepeatStride,
+        normalSliceSize, lastSliceSize, repeatNum, isInputOutputEqual);
     return taskArgs;
 }
 
-}  // namespace ops_hccl
+} // namespace ops_hccl

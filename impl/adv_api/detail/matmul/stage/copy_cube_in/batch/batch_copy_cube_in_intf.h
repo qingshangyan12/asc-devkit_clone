@@ -1,20 +1,21 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
-* \file batch_copy_cube_in_intf.h
-* \brief
-*/
+ * \file batch_copy_cube_in_intf.h
+ * \brief
+ */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/adv_api/detail/matmul/stage/copy_cube_in/batch/batch_copy_cube_in_intf.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+        "impl/adv_api/detail/matmul/stage/copy_cube_in/batch/batch_copy_cube_in_intf.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_COPY_CUBE_IN_BATCH_BATCH_COPY_CUBE_IN_INTF_H__
 #endif
@@ -26,12 +27,11 @@ namespace AscendC {
 namespace Impl {
 namespace Detail {
 
-
-template <typename IMPL, const auto &MM_CFG, class INPUT_TYPE, typename = void>
-class BatchCopyCubeIn
-{
+template <typename IMPL, const auto& MM_CFG, class INPUT_TYPE, typename = void>
+class BatchCopyCubeIn {
     using TransT = typename INPUT_TYPE::TRANS_T;
     using SrcT = typename INPUT_TYPE::T;
+
 public:
     __aicore__ inline BatchCopyCubeIn() = default;
     __aicore__ inline ~BatchCopyCubeIn() = default;
@@ -51,8 +51,10 @@ public:
 
     __aicore__ inline LocalTensor<TransT> AllocTensor(int32_t iterIndex = 0) {}
 
-    __aicore__ inline void BatchLoad(LocalTensor<TransT>& dstTensor, const uint32_t matrixStride,
-                                     const int32_t outerIdx, const int32_t splitIdx, const int32_t splitSize) {}
+    __aicore__ inline void BatchLoad(
+        LocalTensor<TransT>& dstTensor, const uint32_t matrixStride, const int32_t outerIdx, const int32_t splitIdx,
+        const int32_t splitSize)
+    {}
 
     /**
      * @description: Load input data to L1
@@ -63,8 +65,8 @@ public:
      * @return: Tensor on L1
      */
     template <typename ScheduleContext = int>
-    __aicore__ inline LocalTensor<TransT> LoadData(int curRow, int curCol, int tileHeight, int tileWidth,
-                                                   const ScheduleContext& context = 0)
+    __aicore__ inline LocalTensor<TransT> LoadData(
+        int curRow, int curCol, int tileHeight, int tileWidth, const ScheduleContext& context = 0)
     {
         ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Matching error. This is an empty implementation."); });
         return LocalTensor<TransT>{};
@@ -77,14 +79,15 @@ public:
      * @param: curCol: The column index of the matrixA/B at current iterate
      * @return: void
      */
-    __aicore__ inline void ClearLoadData(const LocalTensor<TransT>& tensor = LocalTensor<TransT>{},
-        int32_t curRow = 0, int32_t curCol = 0) {}
+    __aicore__ inline void ClearLoadData(
+        const LocalTensor<TransT>& tensor = LocalTensor<TransT>{}, int32_t curRow = 0, int32_t curCol = 0)
+    {}
 
     /*
      * @description: Reset buffer status used in copy in
      * @return: void
-    */
-   __aicore__ inline void Reset() {}
+     */
+    __aicore__ inline void Reset() {}
 
     /**
      * @description: Destroy tensor on l1 at iterate end
@@ -95,9 +98,9 @@ public:
     __aicore__ inline void BatchDestroy() {}
 };
 
-}  // namespace Detail
-}  // namespace Impl
-}  // namespace AscendC
+} // namespace Detail
+} // namespace Impl
+} // namespace AscendC
 #endif // _BATCH_COPY_CUBE_IN_INTF_H_
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_COPY_CUBE_IN_BATCH_BATCH_COPY_CUBE_IN_INTF_H__)

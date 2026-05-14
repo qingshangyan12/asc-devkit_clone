@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/math/atan/atan_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/atan.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/math/atan/atan_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/atan.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ATAN_ATAN_C310_IMPL_H__
 #endif
@@ -265,15 +265,15 @@ __simd_vf__ inline void AtanPolynomialVFImpl(__ubuf__ T* dstUb, __ubuf__ T* srcU
         Reg::Select(vreg11, vreg11, vreg9, preg1);
 
         // y = taylor_expansion(x_con)
-        Reg::Mul(vreg12, vreg11, vreg11, preg0); // s_x = x_con*x_con
+        Reg::Mul(vreg12, vreg11, vreg11, preg0);            // s_x = x_con*x_con
         Reg::Duplicate(vreg7, a7, preg0);
-        Reg::MulAddDst(vreg7, vreg8, vreg12, preg0);      // y = a8*s_x + a7
-        Reg::FusedMulDstAdd(vreg7, vreg12, vreg6, preg0); // y = y*s_x + a6
-        Reg::FusedMulDstAdd(vreg7, vreg12, vreg5, preg0); // y = y*s_x + a5
-        Reg::FusedMulDstAdd(vreg7, vreg12, vreg4, preg0); // y = y*s_x + a4
-        Reg::FusedMulDstAdd(vreg7, vreg12, vreg3, preg0); // y = y*s_x + a3
-        Reg::FusedMulDstAdd(vreg7, vreg12, vreg2, preg0); // y = y*s_x + a2
-        Reg::FusedMulDstAdd(vreg7, vreg12, vreg1, preg0); // y = y*s_x + a1
+        Reg::MulAddDst(vreg7, vreg8, vreg12, preg0);        // y = a8*s_x + a7
+        Reg::FusedMulDstAdd(vreg7, vreg12, vreg6, preg0);   // y = y*s_x + a6
+        Reg::FusedMulDstAdd(vreg7, vreg12, vreg5, preg0);   // y = y*s_x + a5
+        Reg::FusedMulDstAdd(vreg7, vreg12, vreg4, preg0);   // y = y*s_x + a4
+        Reg::FusedMulDstAdd(vreg7, vreg12, vreg3, preg0);   // y = y*s_x + a3
+        Reg::FusedMulDstAdd(vreg7, vreg12, vreg2, preg0);   // y = y*s_x + a2
+        Reg::FusedMulDstAdd(vreg7, vreg12, vreg1, preg0);   // y = y*s_x + a1
 
         Reg::Mul(vreg12, vreg7, vreg12, preg0);             // tmp = (y*s_x)
         Reg::FusedMulDstAdd(vreg12, vreg11, vreg11, preg0); // y = (y*s_x) * x_con + x_con

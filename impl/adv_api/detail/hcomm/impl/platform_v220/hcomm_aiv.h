@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/hcomm/impl/platform_v220/hcomm_aiv.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/simplesoftmax.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/hcomm/impl/platform_v220/hcomm_aiv.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/simplesoftmax.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCOMM_AIV_H__
 #endif
@@ -122,11 +122,11 @@ __aicore__ inline void HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::PostSend(
     byte_4 |= ((~ownBit) << 7U) & (1U << 7U);                          // [7] owner_bit
     byte_4 |= 1U << 8U;                                                // [8:8] IBV_SEND_SIGNALED
 
-    *(__gm__ uint32_t*)(wqeAddr) = byte_4;         // Control set by local parameter see above lines
-    *(__gm__ uint32_t*)(wqeAddr + 4) = len;        // message size
-    *(__gm__ uint32_t*)(wqeAddr + 8) = 0;          // immtdata is always 0 till we provide poll CQ flow in AIV
-    *(__gm__ uint32_t*)(wqeAddr + 12) = 1U << 24U; // [120:127] num_sge = 1
-    *(__gm__ uint32_t*)(wqeAddr + 16) = 0;         // [128:151] start_sge_idx = 0;
+    *(__gm__ uint32_t*)(wqeAddr) = byte_4;                             // Control set by local parameter see above lines
+    *(__gm__ uint32_t*)(wqeAddr + 4) = len;                            // message size
+    *(__gm__ uint32_t*)(wqeAddr + 8) = 0;              // immtdata is always 0 till we provide poll CQ flow in AIV
+    *(__gm__ uint32_t*)(wqeAddr + 12) = 1U << 24U;     // [120:127] num_sge = 1
+    *(__gm__ uint32_t*)(wqeAddr + 16) = 0;             // [128:151] start_sge_idx = 0;
     *(__gm__ uint32_t*)(wqeAddr + 20) = channelPtr->remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey;
     *(__gm__ uint64_t*)(wqeAddr + 24) = (uint64_t)dst; // destination VA
 

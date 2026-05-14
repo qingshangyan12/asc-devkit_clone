@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "channel.h"
 #include "hccl_ccu_res.h"
 #include "ccu_assist_pub.h"
@@ -15,8 +15,8 @@
 
 namespace ops_hccl {
 
-CcuTempScatterMesh1D::CcuTempScatterMesh1D(const OpParam &param, const u32 rankId,
-                                                         const std::vector<std::vector<u32>> &subCommRanks)
+CcuTempScatterMesh1D::CcuTempScatterMesh1D(
+    const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
     : CcuAlgTemplateBase(param, rankId, subCommRanks)
 {
     HCCL_INFO("Start to run CcuTempScatterMesh1D");
@@ -29,7 +29,7 @@ CcuTempScatterMesh1D::CcuTempScatterMesh1D(const OpParam &param, const u32 rankI
     }
     auto itRoot = std::find(ranks.begin(), ranks.end(), param.root);
     if (itRoot != ranks.end()) {
-        subCommRootId_  = std::distance(ranks.begin(), itRoot);
+        subCommRootId_ = std::distance(ranks.begin(), itRoot);
     }
 }
 
@@ -40,47 +40,50 @@ void CcuTempScatterMesh1D::SetRoot(u32 root)
     HCCL_INFO("[CcuTempScatterMesh1D][SetRoot] myRank_ [%u], set root [%u] ", myRank_, root);
     std::vector<u32> ranks = subCommRanks_[0];
     std::string ranksStr = "";
-    for (auto r : ranks) { ranksStr += std::to_string(r) + " "; }
+    for (auto r : ranks) {
+        ranksStr += std::to_string(r) + " ";
+    }
     HCCL_INFO("[CcuTempScatterMesh1D][SetRoot] ranks = subCommRanks[0] is: %s", ranksStr.c_str());
     auto itRoot = std::find(ranks.begin(), ranks.end(), root);
     if (itRoot != ranks.end()) {
-        subCommRootId_  = std::distance(ranks.begin(), itRoot);
+        subCommRootId_ = std::distance(ranks.begin(), itRoot);
     }
 }
 
-HcclResult CcuTempScatterMesh1D::CalcRes(HcclComm comm, const OpParam &param, const TopoInfoWithNetLayerDetails *topoInfo,
-                                                AlgResourceRequest &resourceRequest)
+HcclResult CcuTempScatterMesh1D::CalcRes(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    AlgResourceRequest& resourceRequest)
 {
     // 不需要从流
     resourceRequest.notifyNumOnMainThread = 0;
     resourceRequest.slaveThreadNum = 0;
     // 多少个kernel
     resourceRequest.ccuKernelNum.push_back(1);
-    HCCL_DEBUG("[CcuTempScatterMesh1D::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
-               resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
+    HCCL_DEBUG(
+        "[CcuTempScatterMesh1D::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
+        resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
 
     // 创建每个kernel的ctxArg，放入kernelInfo, 然后将kernelinfo放入resourceRequest.ccuKernelInfos
     CcuKernelInfo kernelInfo;
 
-    kernelInfo.creator = [](const hcomm::CcuKernelArg &arg) {
-        return std::make_unique<CcuKernelScatterMesh1D>(arg);
-    };
+    kernelInfo.creator = [](const hcomm::CcuKernelArg& arg) { return std::make_unique<CcuKernelScatterMesh1D>(arg); };
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
-    kernelInfo.kernelArg = std::make_shared<CcuKernelArgScatterMesh1D>(subCommRanks_[0].size(), mySubCommRank_,
-                                                                              subCommRootId_, param, subCommRanks_);
+    kernelInfo.kernelArg = std::make_shared<CcuKernelArgScatterMesh1D>(
+        subCommRanks_[0].size(), mySubCommRank_, subCommRootId_, param, subCommRanks_);
     kernelInfo.channels = channelDescs;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
 
-    HCCL_DEBUG("[CcuTempScatterMesh1D::CalcRes] channelDescs.size()=%llu, dimsize=%llu, "
-               "ccuKernelInfos.size()=%llu",
-               channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
+    HCCL_DEBUG(
+        "[CcuTempScatterMesh1D::CalcRes] channelDescs.size()=%llu, dimsize=%llu, "
+        "ccuKernelInfos.size()=%llu",
+        channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
 
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult CcuTempScatterMesh1D::KernelRun(const OpParam &param, const TemplateDataParams &templateDataParams,
-                                                  TemplateResource& templateResource)
+HcclResult CcuTempScatterMesh1D::KernelRun(
+    const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
     if (templateDataParams.sliceSize == 0 && templateDataParams.tailSize == 0) {
         HCCL_INFO("[CcuTempScatterMesh1D] sliceSize is 0, no need do, just success.");
@@ -105,12 +108,13 @@ HcclResult CcuTempScatterMesh1D::KernelRun(const OpParam &param, const TemplateD
 
     HCCL_INFO("[CcuTempScatterMesh1D] create CcuTaskArgScatterMesh1D, normalSliceSize [%u]", normalSliceSize);
     std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgScatterMesh1D>(
-        inputAddr, outputAddr, token, inputSliceStride, outputSliceStride, inputRepeatStride, outputRepeatStride, normalSliceSize,
-        lastSliceSize, repeatNum, isInputOutputEqual);
+        inputAddr, outputAddr, token, inputSliceStride, outputSliceStride, inputRepeatStride, outputRepeatStride,
+        normalSliceSize, lastSliceSize, repeatNum, isInputOutputEqual);
 
-    void *taskArgPtr = static_cast<void *>(taskArg.get());
+    void* taskArgPtr = static_cast<void*>(taskArg.get());
 
-    CHK_RET(HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr));
+    CHK_RET(
+        HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr));
 
     HCCL_DEBUG("[CcuTempScatterMesh1D::KernelRun] end");
 
@@ -125,10 +129,7 @@ u64 CcuTempScatterMesh1D::CalcScratchMultiple(BufferType inBuffType, BufferType 
     return 0;
 }
 
-u64 CcuTempScatterMesh1D::GetThreadNum() const
-{
-    return 1;
-}
+u64 CcuTempScatterMesh1D::GetThreadNum() const { return 1; }
 
 HcclResult CcuTempScatterMesh1D::GetRes(AlgResourceRequest& resourceRequest) const
 {
@@ -137,4 +138,4 @@ HcclResult CcuTempScatterMesh1D::GetRes(AlgResourceRequest& resourceRequest) con
 
     return HCCL_SUCCESS;
 }
-}  // namespace ops_hccl
+} // namespace ops_hccl

@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ccu_kernel_scatter_nhr1d_mem2mem.h"
 #include "ccu_kernel_alg_base.h"
 
@@ -14,23 +14,23 @@ namespace ops_hccl {
 using namespace hcomm;
 
 // XN ID定义：用于标识不同类型的变量
-constexpr uint16_t SCRATCH_XN_ID = 1;  // Scratch缓冲区变量ID
-constexpr uint16_t TOKEN_XN_ID = 2;    // Token变量ID
+constexpr uint16_t SCRATCH_XN_ID = 1; // Scratch缓冲区变量ID
+constexpr uint16_t TOKEN_XN_ID = 2;   // Token变量ID
 constexpr uint16_t STEP_POST_SYNC_ID = 3;
 
 // CKE索引定义：用于标识不同类型的同步信号
-constexpr uint16_t CKE_IDX_0 = 0;  // 后同步
+constexpr uint16_t CKE_IDX_0 = 0; // 后同步
 
 // 轴ID定义
-constexpr uint16_t FST_AXIS_ID = 0;  // 第一个轴（die0）
-constexpr uint16_t SEC_AXIS_ID = 1;  // 第二个轴（die1）
+constexpr uint16_t FST_AXIS_ID = 0; // 第一个轴（die0）
+constexpr uint16_t SEC_AXIS_ID = 1; // 第二个轴（die1）
 
 // 每个CKE可以表示的rank数量（16个bit，每个bit代表一个rank）
 constexpr uint16_t RANK_NUM_PER_CKE = 16;
 
-CcuKernelScatterNHR1DMem2Mem::CcuKernelScatterNHR1DMem2Mem(const CcuKernelArg &arg) : CcuKernelAlgBase(arg)
+CcuKernelScatterNHR1DMem2Mem::CcuKernelScatterNHR1DMem2Mem(const CcuKernelArg& arg) : CcuKernelAlgBase(arg)
 {
-    const CcuKernelArgScatterNHRMem2Mem1D *kernelArg = dynamic_cast<const CcuKernelArgScatterNHRMem2Mem1D *>(&arg);
+    const CcuKernelArgScatterNHRMem2Mem1D* kernelArg = dynamic_cast<const CcuKernelArgScatterNHRMem2Mem1D*>(&arg);
     if (kernelArg == nullptr) {
         HCCL_ERROR("[CcuKernelScatterNHR1DMem2Mem] kernelArg is null");
         return;
@@ -47,24 +47,17 @@ CcuKernelScatterNHR1DMem2Mem::CcuKernelScatterNHR1DMem2Mem(const CcuKernelArg &a
     dataType_ = kernelArg->opParam_.DataDes.dataType;
 
     localSize_ = rank2ChannelIdx_.size();
-    myRankIdx_ = rank2ChannelIdx_.size();  // 本rank在rank2ChannelIdx中的索引（放在最后）
+    myRankIdx_ = rank2ChannelIdx_.size(); // 本rank在rank2ChannelIdx中的索引（放在最后）
     subCommRanks_ = kernelArg->subCommRanks_;
 
     // 计算signal数量：每个CKE有16个bit，可以表示16个rank
     signalNum_ = (dimSize_ + RANK_NUM_PER_CKE - 1) / RANK_NUM_PER_CKE;
 
-    HCCL_INFO("[CcuKernelScatterNHR1DMem2Mem] Init, KernelArgs are rankId[%u], dimSize_[%u], rootId[%u], axisId[%u], "
-              "axisSize[%u], dataType[%d], localSize_[%u], signalNum_[%u], stepInfoVector.size()[%lu], "
-              "rank2ChannelIdx.size()[%lu]",
-        rankId_,
-        dimSize_,
-        rootId_,
-        axisId_,
-        axisSize_,
-        dataType_,
-        localSize_,
-        signalNum_,
-        stepInfoVector_.size(),
+    HCCL_INFO(
+        "[CcuKernelScatterNHR1DMem2Mem] Init, KernelArgs are rankId[%u], dimSize_[%u], rootId[%u], axisId[%u], "
+        "axisSize[%u], dataType[%d], localSize_[%u], signalNum_[%u], stepInfoVector.size()[%lu], "
+        "rank2ChannelIdx.size()[%lu]",
+        rankId_, dimSize_, rootId_, axisId_, axisSize_, dataType_, localSize_, signalNum_, stepInfoVector_.size(),
         rank2ChannelIdx_.size());
 }
 
@@ -121,7 +114,7 @@ HcclResult CcuKernelScatterNHR1DMem2Mem::InitResource()
     dstMem_ = CreateLocalAddr();
     dstRemoteMem_ = CreateRemoteAddr();
 
-    event_ = CreateCompletedEvent();  // 创建完成事件
+    event_ = CreateCompletedEvent(); // 创建完成事件
 
     HCCL_INFO("[CcuKernelScatterNHR1DMem2Mem] InitResource finished");
     return HcclResult::HCCL_SUCCESS;
@@ -170,8 +163,8 @@ void CcuKernelScatterNHR1DMem2Mem::PreSync()
 void CcuKernelScatterNHR1DMem2Mem::DoScatterNHR()
 {
     // 初始化偏移量
-    curInputOffset_ = 0;    // input偏移
-    curScratchOffset_ = 0;  // scratch偏移
+    curInputOffset_ = 0;   // input偏移
+    curScratchOffset_ = 0; // scratch偏移
 
     // 为每个rank计算input偏移量
     // inputOffset_[i]存储rank i的input地址偏移量
@@ -189,7 +182,7 @@ void CcuKernelScatterNHR1DMem2Mem::DoScatterNHR()
     }
 
     // 执行NHR算法的每个步骤
-    for (auto &nhrStepInfo : stepInfoVector_) {
+    for (auto& nhrStepInfo : stepInfoVector_) {
         DoScatterNHRSingleStep(nhrStepInfo);
     }
 
@@ -229,8 +222,7 @@ void CcuKernelScatterNHR1DMem2Mem::DoScatterNHR()
                 if (rankId_ != dimSize_ - 1) {
                     srcMem_.addr += die0Size_;
                     dstMem_.addr += die0Size_;
-                }
-                else {
+                } else {
                     srcMem_.addr += die0TailSize_;
                     dstMem_.addr += die0TailSize_;
                 }
@@ -239,8 +231,7 @@ void CcuKernelScatterNHR1DMem2Mem::DoScatterNHR()
         // 如果是最后一张rank，处理尾块数据
         if (rankId_ != dimSize_ - 1) {
             cursliceSize_ = (axisId_ == 0) ? die0Size_ : die1Size_;
-        }
-        else {
+        } else {
             cursliceSize_ = (axisId_ == 0) ? die0TailSize_ : die1TailSize_;
         }
         {
@@ -254,21 +245,19 @@ void CcuKernelScatterNHR1DMem2Mem::DoScatterNHR()
                     if (rootId_ != 0 && rankId_ == 0) {
                         RecordEvent(event_);
                     } else {
-                        CCU_IF(isInputOutputEqual_ != 1) {
+                        CCU_IF(isInputOutputEqual_ != 1)
+                        {
                             if (rankId_ == rootId_) {
                                 DoLocalCopyNb(dstMem_, srcMem_, cursliceSize_, event_);
                             } else {
-                                CCU_IF(isSliceSizeZero_ != 1) {
+                                CCU_IF(isSliceSizeZero_ != 1)
+                                {
                                     DoLocalCopyNb(dstMem_, srcMem_, cursliceSize_, event_);
                                 }
-                                CCU_IF(isSliceSizeZero_ == 1) {
-                                    RecordEvent(event_);
-                                }
+                                CCU_IF(isSliceSizeZero_ == 1) { RecordEvent(event_); }
                             }
                         }
-                        CCU_IF(isInputOutputEqual_ == 1) {
-                            RecordEvent(event_);
-                        }
+                        CCU_IF(isInputOutputEqual_ == 1) { RecordEvent(event_); }
                     }
                 }
                 // 如果输出地址需要偏移，则非root数据已经在对应的位置，不需要搬运
@@ -288,8 +277,7 @@ void CcuKernelScatterNHR1DMem2Mem::DoScatterNHR()
                             // 如果input与output地址相同，跳过root的本地搬运
                             RecordEvent(event_);
                         }
-                    }
-                    else {
+                    } else {
                         RecordEvent(event_);
                     }
                 }
@@ -305,10 +293,10 @@ void CcuKernelScatterNHR1DMem2Mem::DoScatterNHR()
     }
 }
 
-void CcuKernelScatterNHR1DMem2Mem::DoScatterNHRSingleStep(const NHRStepInfo &nhrStepInfo)
+void CcuKernelScatterNHR1DMem2Mem::DoScatterNHRSingleStep(const NHRStepInfo& nhrStepInfo)
 {
-    const std::vector<u32> &sendSliceIdxList = nhrStepInfo.txSliceIdxs;
-    const std::vector<u32> &recvSliceIdxList = nhrStepInfo.rxSliceIdxs;
+    const std::vector<u32>& sendSliceIdxList = nhrStepInfo.txSliceIdxs;
+    const std::vector<u32>& recvSliceIdxList = nhrStepInfo.rxSliceIdxs;
 
     // 接收端：等待发送方发送数据
     if (recvSliceIdxList.size() != 0) {
@@ -319,8 +307,8 @@ void CcuKernelScatterNHR1DMem2Mem::DoScatterNHRSingleStep(const NHRStepInfo &nhr
         }
         u32 fromRankIdx = rank2ChannelIdx_[nhrStepInfo.fromRank];
         if (fromRankIdx >= channels_.size()) {
-            HCCL_ERROR("[CcuKernelScatterNHR1DMem2Mem] fromRankIdx[%u] >= channels.size()[%lu]",
-                fromRankIdx,
+            HCCL_ERROR(
+                "[CcuKernelScatterNHR1DMem2Mem] fromRankIdx[%u] >= channels.size()[%lu]", fromRankIdx,
                 channels_.size());
             return;
         }
@@ -347,7 +335,7 @@ void CcuKernelScatterNHR1DMem2Mem::DoScatterNHRSingleStep(const NHRStepInfo &nhr
         for (u32 i = 0; i < sendSliceIdxList.size(); i++) {
             u32 sendSliceIdx = sendSliceIdxList[i];
             bool isLastSlice = false;
-            if (sendSliceIdx == dimSize_ -1) {
+            if (sendSliceIdx == dimSize_ - 1) {
                 isLastSlice = true;
             }
             // 每16个slice需要等待一次（RANK_NUM_PER_CKE = 16）
@@ -379,16 +367,13 @@ void CcuKernelScatterNHR1DMem2Mem::DoScatterNHRSingleStep(const NHRStepInfo &nhr
         NotifyRecord(sendChannel, CKE_IDX_0, 1 << STEP_POST_SYNC_ID);
     }
 
-    HCCL_INFO("[DoScatterNHRSingleStep] rank %u step %u, toRank=%u, fromRank=%u, nSlice=%lu",
-        rankId_,
-        nhrStepInfo.step,
-        nhrStepInfo.toRank,
-        nhrStepInfo.fromRank,
-        sendSliceIdxList.size());
+    HCCL_INFO(
+        "[DoScatterNHRSingleStep] rank %u step %u, toRank=%u, fromRank=%u, nSlice=%lu", rankId_, nhrStepInfo.step,
+        nhrStepInfo.toRank, nhrStepInfo.fromRank, sendSliceIdxList.size());
 }
 
 void CcuKernelScatterNHR1DMem2Mem::DoSendRecvSlice(
-    const u32 &toRank, CcuRep::LocalAddr &src, CcuRep::RemoteAddr &dst, u32 signalIndex, bool isLastSlice)
+    const u32& toRank, CcuRep::LocalAddr& src, CcuRep::RemoteAddr& dst, u32 signalIndex, bool isLastSlice)
 {
     if (rank2ChannelIdx_.count(toRank) == 0) {
         HCCL_ERROR("[CcuKernelScatterNHR1DMem2Mem] toRank[%u] not found in rank2ChannelIdx", toRank);
@@ -400,8 +385,9 @@ void CcuKernelScatterNHR1DMem2Mem::DoSendRecvSlice(
         return;
     }
     ChannelHandle sendChannel = channels_[toRankIdx];
-    HCCL_INFO("[CcuKernelScatterNHR1DMem2Mem][DoSendRecvSlice]rankId[%u] toRank[%u] toRankIdx[%u] axisId[%u] isLastSlice[%d]",
-                rankId_, toRank, toRankIdx, axisId_, isLastSlice);
+    HCCL_INFO(
+        "[CcuKernelScatterNHR1DMem2Mem][DoSendRecvSlice]rankId[%u] toRank[%u] toRankIdx[%u] axisId[%u] isLastSlice[%d]",
+        rankId_, toRank, toRankIdx, axisId_, isLastSlice);
     // 处理重复操作
     CcuRep::Variable repeatNumAdd2 = CreateVariable();
     repeatNumAdd2 = 1;
@@ -427,10 +413,9 @@ void CcuKernelScatterNHR1DMem2Mem::DoSendRecvSlice(
                 if (isLastSlice) {
                     src.addr += die0TailSize_;
                     dst.addr += die0TailSize_;
-                }
-                else {
+                } else {
                     src.addr += die0Size_;
-                    dst.addr += die0Size_;  
+                    dst.addr += die0Size_;
                 }
             }
         }
@@ -449,31 +434,18 @@ void CcuKernelScatterNHR1DMem2Mem::DoSendRecvSlice(
 
 // 跳过搬运数据量为0的情况
 void CcuKernelScatterNHR1DMem2Mem::DoLocalCopyNb(
-    CcuRep::LocalAddr &dst, CcuRep::LocalAddr &src, CcuRep::Variable &sliceSize,
-    CcuRep::CompletedEvent &event_)
+    CcuRep::LocalAddr& dst, CcuRep::LocalAddr& src, CcuRep::Variable& sliceSize, CcuRep::CompletedEvent& event_)
 {
-    CCU_IF(sliceSize == 0)
-    {
-        RecordEvent(event_);
-    }
-    CCU_IF(sliceSize != 0)
-    {
-        LocalCopyNb(dst, src, sliceSize, event_);
-    }
+    CCU_IF(sliceSize == 0) { RecordEvent(event_); }
+    CCU_IF(sliceSize != 0) { LocalCopyNb(dst, src, sliceSize, event_); }
 }
 
 void CcuKernelScatterNHR1DMem2Mem::DoWriteNb(
-    ChannelHandle &sendChannel, CcuRep::RemoteAddr &dst,
-    CcuRep::LocalAddr &src, CcuRep::Variable &sliceSize, CcuRep::CompletedEvent &event_)
+    ChannelHandle& sendChannel, CcuRep::RemoteAddr& dst, CcuRep::LocalAddr& src, CcuRep::Variable& sliceSize,
+    CcuRep::CompletedEvent& event_)
 {
-    CCU_IF(sliceSize == 0)
-    {
-        RecordEvent(event_);
-    }
-    CCU_IF(sliceSize != 0)
-    {
-        WriteNb(sendChannel, dst, src, sliceSize, event_);
-    }
+    CCU_IF(sliceSize == 0) { RecordEvent(event_); }
+    CCU_IF(sliceSize != 0) { WriteNb(sendChannel, dst, src, sliceSize, event_); }
 }
 
 HcclResult CcuKernelScatterNHR1DMem2Mem::Algorithm()
@@ -490,9 +462,9 @@ HcclResult CcuKernelScatterNHR1DMem2Mem::Algorithm()
     return HcclResult::HCCL_SUCCESS;
 }
 
-std::vector<uint64_t> CcuKernelScatterNHR1DMem2Mem::GeneArgs(const CcuTaskArg &arg)
+std::vector<uint64_t> CcuKernelScatterNHR1DMem2Mem::GeneArgs(const CcuTaskArg& arg)
 {
-    const CcuTaskArgScatterNHRMem2Mem1D *taskArg = dynamic_cast<const CcuTaskArgScatterNHRMem2Mem1D *>(&arg);
+    const CcuTaskArgScatterNHRMem2Mem1D* taskArg = dynamic_cast<const CcuTaskArgScatterNHRMem2Mem1D*>(&arg);
     if (taskArg == nullptr) {
         HCCL_ERROR("[CcuKernelScatterNHR1DMem2Mem] taskArg is null");
         return {};
@@ -519,43 +491,19 @@ std::vector<uint64_t> CcuKernelScatterNHR1DMem2Mem::GeneArgs(const CcuTaskArg &a
     HCCL_INFO(
         "[CcuKernelScatterNHR1DMem2Mem] TaskArgs: rankId_[%u], inputAddr[%llu], outputAddr[%llu], scratchAddr[%llu], "
         "die0Size[%llu], die1Size[%llu], inputSliceStride[%llu], outputSliceStride[%llu], curScratchStride[%llu], "
-        "inputRepeatStride[%llu], outputRepeatStride[%llu], repeatNumVar[%llu], isOutputScratch[%llu], isInputOutputEqual[%llu], "
+        "inputRepeatStride[%llu], outputRepeatStride[%llu], repeatNumVar[%llu], isOutputScratch[%llu], "
+        "isInputOutputEqual[%llu], "
         "die0TailSize[%llu], die1TailSize[%llu], isSliceSizeZero[%llu]",
-        rankId_,
-        inputAddr,
-        outputAddr,
-        scratchAddr,
-        die0Size,
-        die1Size,
-        inputSliceStride,
-        outputSliceStride,
-        curScratchStride,
-        inputRepeatStride,
-        outputRepeatStride,
-        repeatNumVar,
-        isOutputScratch,
-        isInputOutputEqual,
-        die0TailSize,
-        die1TailSize,
-        isSliceSizeZero);
+        rankId_, inputAddr, outputAddr, scratchAddr, die0Size, die1Size, inputSliceStride, outputSliceStride,
+        curScratchStride, inputRepeatStride, outputRepeatStride, repeatNumVar, isOutputScratch, isInputOutputEqual,
+        die0TailSize, die1TailSize, isSliceSizeZero);
 
-    return {inputAddr,
-        outputAddr,
-        token,
-        scratchAddr,
-        die0Size,
-        die1Size,
-        inputSliceStride,
-        outputSliceStride,
-        curScratchStride,
-        inputRepeatStride,
-        outputRepeatStride,
-        repeatNumVar,
-        isOutputScratch,
-        isInputOutputEqual,
-        die0TailSize,
-        die1TailSize,
-        isSliceSizeZero};
+    return {inputAddr,         outputAddr,         token,
+            scratchAddr,       die0Size,           die1Size,
+            inputSliceStride,  outputSliceStride,  curScratchStride,
+            inputRepeatStride, outputRepeatStride, repeatNumVar,
+            isOutputScratch,   isInputOutputEqual, die0TailSize,
+            die1TailSize,      isSliceSizeZero};
 }
 
-}  // namespace ops_hccl
+} // namespace ops_hccl

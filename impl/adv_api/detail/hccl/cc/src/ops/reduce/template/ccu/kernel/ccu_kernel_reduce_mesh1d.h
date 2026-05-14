@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef HCCL_CCU_KERNEL_REDUCE_MESH_1D_H
 #define HCCL_CCU_KERNEL_REDUCE_MESH_1D_H
 
@@ -20,16 +20,14 @@ namespace ops_hccl {
 
 class CcuKernelArgReduceMesh1D : public hcomm::CcuKernelArg {
 public:
-    explicit CcuKernelArgReduceMesh1D(uint64_t dimSize, uint32_t rankId, uint32_t rootId, const OpParam& opParam,
-                                                    const std::vector<std::vector<uint32_t>>& subCommRanks)
-        : dimSize_(dimSize),
-          rankId_(rankId),
-          rootId_(rootId),
-          opParam_(opParam),
-          subCommRanks_(subCommRanks)
+    explicit CcuKernelArgReduceMesh1D(
+        uint64_t dimSize, uint32_t rankId, uint32_t rootId, const OpParam& opParam,
+        const std::vector<std::vector<uint32_t>>& subCommRanks)
+        : dimSize_(dimSize), rankId_(rankId), rootId_(rootId), opParam_(opParam), subCommRanks_(subCommRanks)
     {
-        HCCL_DEBUG("[CcuKernelArgReduceMesh1D] dimSize: %lu, rankId: %u, rootId: %u, reduceOp: %d, dataType: %d",
-                   dimSize_, rankId_, rootId_, opParam.reduceType, opParam.DataDes.dataType);
+        HCCL_DEBUG(
+            "[CcuKernelArgReduceMesh1D] dimSize: %lu, rankId: %u, rootId: %u, reduceOp: %d, dataType: %d", dimSize_,
+            rankId_, rootId_, opParam.reduceType, opParam.DataDes.dataType);
     }
 
     hcomm::CcuKernelSignature GetKernelSignature() const override
@@ -39,29 +37,37 @@ public:
         return signature;
     }
 
-    uint64_t                                dimSize_;
-    uint32_t                                rankId_;
-    uint32_t                                rootId_;
-    OpParam                                 opParam_;
-    std::vector<std::vector<uint32_t>>      subCommRanks_;
+    uint64_t dimSize_;
+    uint32_t rankId_;
+    uint32_t rootId_;
+    OpParam opParam_;
+    std::vector<std::vector<uint32_t>> subCommRanks_;
 };
 
 class CcuTaskArgReduceMesh1D : public hcomm::CcuTaskArg {
 public:
-    explicit CcuTaskArgReduceMesh1D(uint64_t inputAddr, uint64_t outputAddr, uint64_t token,
-                                    uint64_t inputSliceStride, uint64_t outputSliceStride, uint64_t repeatNum,
-                                    uint64_t inputRepeatStride, uint64_t outputRepeatStride, uint64_t normalSliceSize,
-                                    uint64_t lastSliceSize, uint64_t repeatNumVar)
-        : inputAddr_(inputAddr), outputAddr_(outputAddr), token_(token), inputSliceStride_(inputSliceStride),
-          outputSliceStride_(outputSliceStride), repeatNum_(repeatNum), inputRepeatStride_(inputRepeatStride),
-          outputRepeatStride_(outputRepeatStride), normalSliceSize_(normalSliceSize),
-          lastSliceSize_(lastSliceSize), repeatNumVar_(repeatNumVar)
+    explicit CcuTaskArgReduceMesh1D(
+        uint64_t inputAddr, uint64_t outputAddr, uint64_t token, uint64_t inputSliceStride, uint64_t outputSliceStride,
+        uint64_t repeatNum, uint64_t inputRepeatStride, uint64_t outputRepeatStride, uint64_t normalSliceSize,
+        uint64_t lastSliceSize, uint64_t repeatNumVar)
+        : inputAddr_(inputAddr),
+          outputAddr_(outputAddr),
+          token_(token),
+          inputSliceStride_(inputSliceStride),
+          outputSliceStride_(outputSliceStride),
+          repeatNum_(repeatNum),
+          inputRepeatStride_(inputRepeatStride),
+          outputRepeatStride_(outputRepeatStride),
+          normalSliceSize_(normalSliceSize),
+          lastSliceSize_(lastSliceSize),
+          repeatNumVar_(repeatNumVar)
     {
-        HCCL_DEBUG("[CcuTaskArgReduceMesh1D] inputAddr: %lu, outputAddr: %lu, inputSliceStride: %lu, "
-                   "outputSliceStride: %lu, repeatNum: %lu, inputRepeatStride: %lu, outputRepeatStride: %lu, "
-                   "normalSliceSize: %lu, lastSliceSize: %lu, repeatNumVar: %lu",
-                   inputAddr_, outputAddr_, inputSliceStride_, outputSliceStride_, repeatNum_,
-                   inputRepeatStride_, outputRepeatStride_, normalSliceSize_, lastSliceSize_, repeatNumVar_);
+        HCCL_DEBUG(
+            "[CcuTaskArgReduceMesh1D] inputAddr: %lu, outputAddr: %lu, inputSliceStride: %lu, "
+            "outputSliceStride: %lu, repeatNum: %lu, inputRepeatStride: %lu, outputRepeatStride: %lu, "
+            "normalSliceSize: %lu, lastSliceSize: %lu, repeatNumVar: %lu",
+            inputAddr_, outputAddr_, inputSliceStride_, outputSliceStride_, repeatNum_, inputRepeatStride_,
+            outputRepeatStride_, normalSliceSize_, lastSliceSize_, repeatNumVar_);
     }
 
     uint64_t inputAddr_;
@@ -79,11 +85,11 @@ public:
 
 class CcuKernelReduceMesh1D : public CcuKernelAlgBase {
 public:
-    CcuKernelReduceMesh1D(const hcomm::CcuKernelArg &arg);
+    CcuKernelReduceMesh1D(const hcomm::CcuKernelArg& arg);
     ~CcuKernelReduceMesh1D() override {}
 
     HcclResult Algorithm() override;
-    std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
+    std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg& arg) override;
 
 private:
     HcclResult InitResource();
@@ -102,26 +108,26 @@ private:
     std::vector<hcomm::CcuRep::Variable> input_; // 输入地址信息
     std::vector<hcomm::CcuRep::Variable> output_;
     std::vector<hcomm::CcuRep::Variable> token_;
-    hcomm::CcuRep::Variable              currentRankSliceInputOffset_;
-    hcomm::CcuRep::Variable              currentRankSliceOutputOffset_;
-    hcomm::CcuRep::Variable              repeatNum_;
-    hcomm::CcuRep::Variable              inputRepeatStride_;
-    hcomm::CcuRep::Variable              outputRepeatStride_;
-    hcomm::CcuRep::Variable              normalSliceSize_;
-    hcomm::CcuRep::Variable              lastSliceSize_;
-    hcomm::CcuRep::Variable              repeatNumVar_;
-    hcomm::CcuRep::Variable              flag_;
+    hcomm::CcuRep::Variable currentRankSliceInputOffset_;
+    hcomm::CcuRep::Variable currentRankSliceOutputOffset_;
+    hcomm::CcuRep::Variable repeatNum_;
+    hcomm::CcuRep::Variable inputRepeatStride_;
+    hcomm::CcuRep::Variable outputRepeatStride_;
+    hcomm::CcuRep::Variable normalSliceSize_;
+    hcomm::CcuRep::Variable lastSliceSize_;
+    hcomm::CcuRep::Variable repeatNumVar_;
+    hcomm::CcuRep::Variable flag_;
 
     GroupOpSize groupOpSize_;
 
     hcomm::CcuRep::Variable srcOffset_;
     hcomm::CcuRep::Variable dstOffset_;
 
-    hcomm::CcuRep::LocalAddr               dstAddr_;
+    hcomm::CcuRep::LocalAddr dstAddr_;
     std::vector<hcomm::CcuRep::RemoteAddr> inputAddr_;
 
     hcomm::CcuRep::CompletedEvent event_;
 };
 
-}// namespace ops_hccl
+} // namespace ops_hccl
 #endif // HCCLV2_CCU_KERNEL_REDUCE_MESH_1D_H

@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "alg_template_base.h"
 #include "ccu_kernel_all_to_all_v_mesh1d_multi_jetty.h"
 
@@ -14,23 +14,21 @@ namespace ops_hccl {
 using namespace hcomm;
 
 constexpr int OUTPUT_XN_ID = 0;
-constexpr int TOKEN_XN_ID  = 1;
-constexpr int POST_SYNC_ID  = 2;
-constexpr int CKE_IDX_0    = 0;
+constexpr int TOKEN_XN_ID = 1;
+constexpr int POST_SYNC_ID = 2;
+constexpr int CKE_IDX_0 = 0;
 
-CcuKernelAllToAllVMesh1DMultiJetty::CcuKernelAllToAllVMesh1DMultiJetty(const CcuKernelArg &arg)
-    : CcuKernelAlgBase(arg)
+CcuKernelAllToAllVMesh1DMultiJetty::CcuKernelAllToAllVMesh1DMultiJetty(const CcuKernelArg& arg) : CcuKernelAlgBase(arg)
 {
-    const CcuKernelArgAllToAllVMesh1DMultiJetty *kernelArg
-        = dynamic_cast<const CcuKernelArgAllToAllVMesh1DMultiJetty *>(&arg);
-    rankId_         = kernelArg->rankId_;
-    rankSize_       = kernelArg->dimSize_;
-    channels_       = kernelArg->channels;
-    jettyNums_      = kernelArg->jettyNums_;
-    
+    const CcuKernelArgAllToAllVMesh1DMultiJetty* kernelArg =
+        dynamic_cast<const CcuKernelArgAllToAllVMesh1DMultiJetty*>(&arg);
+    rankId_ = kernelArg->rankId_;
+    rankSize_ = kernelArg->dimSize_;
+    channels_ = kernelArg->channels;
+    jettyNums_ = kernelArg->jettyNums_;
+
     HCCL_INFO(
-        "[CcuKernelAllToAllVMesh1DMultiJetty] Init, KernelArgs are rankId[%u], rankSize_[%u]",
-        rankId_, rankSize_);
+        "[CcuKernelAllToAllVMesh1DMultiJetty] Init, KernelArgs are rankId[%u], rankSize_[%u]", rankId_, rankSize_);
 }
 
 HcclResult CcuKernelAllToAllVMesh1DMultiJetty::PreSync()
@@ -82,10 +80,9 @@ HcclResult CcuKernelAllToAllVMesh1DMultiJetty::InitResource()
         if (id == rankId_) {
             output_.push_back(CreateVariable());
             token_.push_back(CreateVariable());
-        }
-        else { // 非本地，使用远端Variable
-            HCCL_DEBUG("[CcuKernelAllToAllVMesh1DMultiJetty] MyRank[%u], PeerId[%u], ChannelId[%u]",
-                rankId_, id, channelIdx);
+        } else { // 非本地，使用远端Variable
+            HCCL_DEBUG(
+                "[CcuKernelAllToAllVMesh1DMultiJetty] MyRank[%u], PeerId[%u], ChannelId[%u]", rankId_, id, channelIdx);
             CcuRep::Variable outputVar, tokenVar;
             CHK_RET(CreateVariable(channels_[channelIdx], OUTPUT_XN_ID, &outputVar));
             output_.push_back(outputVar); // 获取channel中id=0的Var来传递output
@@ -133,7 +130,7 @@ HcclResult CcuKernelAllToAllVMesh1DMultiJetty::LoadArgs()
     Load(srcOffset_);
     Load(dstOffset_);
     Load(xnMaxTransportGoSize_);
-    
+
     // 恢复当前卡对所有卡的收发信息
     sendRecvInfo_.resize(rankSize_);
     for (uint64_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
@@ -177,49 +174,62 @@ HcclResult CcuKernelAllToAllVMesh1DMultiJetty::DoAll2AllVMultiLoop()
     completedRankCount_ = 0;
     xnConst1_ = 1;
     u32 channelIdx = 0;
-    CCU_WHILE(completedRankCount_ != rankSize_) {  // 循环发送数据，直到所有对端数据都发送完成
-        for(uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {  // 循环发送所有对端数据
+    CCU_WHILE(completedRankCount_ != rankSize_)
+    { // 循环发送数据，直到所有对端数据都发送完成
+        for (uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) { // 循环发送所有对端数据
             if (rankIdx == rankId_) {
                 continue;
             }
-            CCU_IF(sendRecvInfo_[rankIdx].loopNum == UINT64_MAX) { // 已经完成，直接置位完成信号
+            CCU_IF(sendRecvInfo_[rankIdx].loopNum == UINT64_MAX)
+            { // 已经完成，直接置位完成信号
                 eventList_[rankIdx].SetMask((1 << jettyNums_[rankIdx]) - 1);
                 CHK_RET(RecordEvent(eventList_[rankIdx]));
             }
-            CCU_IF(sendRecvInfo_[rankIdx].loopNum != UINT64_MAX) {
-                CCU_IF(sendRecvInfo_[rankIdx].loopNum != UINT64_MAX - jettyNums_[rankIdx]) {
-                    CHK_RET(DoAll2AllVBlock(rankIdx, channelIdx));  // 处理非最后一轮数据块
+            CCU_IF(sendRecvInfo_[rankIdx].loopNum != UINT64_MAX)
+            {
+                CCU_IF(sendRecvInfo_[rankIdx].loopNum != UINT64_MAX - jettyNums_[rankIdx])
+                {
+                    CHK_RET(DoAll2AllVBlock(rankIdx, channelIdx)); // 处理非最后一轮数据块
                 }
-                CCU_IF(sendRecvInfo_[rankIdx].loopNum == UINT64_MAX - jettyNums_[rankIdx]) {
-                    CHK_RET(DoAll2AllVLastBlock(rankIdx, channelIdx));  // 处理最后一轮数据块
+                CCU_IF(sendRecvInfo_[rankIdx].loopNum == UINT64_MAX - jettyNums_[rankIdx])
+                {
+                    CHK_RET(DoAll2AllVLastBlock(rankIdx, channelIdx)); // 处理最后一轮数据块
                 }
             }
             channelIdx++;
         }
-        CCU_IF(sendRecvInfo_[rankId_].loopNum == UINT64_MAX) { // 已经完成，直接置位完成信号
+        CCU_IF(sendRecvInfo_[rankId_].loopNum == UINT64_MAX)
+        { // 已经完成，直接置位完成信号
             eventList_[rankId_].SetMask((1 << jettyNums_[rankId_]) - 1);
             CHK_RET(RecordEvent(eventList_[rankId_]));
         }
 
-        CCU_IF(sendRecvInfo_[rankId_].loopNum != UINT64_MAX) {  // 还没有完成，则继续循环
-            CCU_IF(sendRecvInfo_[rankId_].loopNum == UINT64_MAX - jettyNums_[rankId_]) { // 本地ccu ms拷贝，jetty数量为1
-                CCU_IF(sendRecvInfo_[rankId_].lastTailSliceSize == 0) { // 尾块数据量为 0，则不需要发送尾块数据
+        CCU_IF(sendRecvInfo_[rankId_].loopNum != UINT64_MAX)
+        {         // 还没有完成，则继续循环
+            CCU_IF(sendRecvInfo_[rankId_].loopNum == UINT64_MAX - jettyNums_[rankId_])
+            {     // 本地ccu ms拷贝，jetty数量为1
+                CCU_IF(sendRecvInfo_[rankId_].lastTailSliceSize == 0)
+                { // 尾块数据量为 0，则不需要发送尾块数据
                     eventList_[rankId_].SetMask((1 << jettyNums_[rankId_]) - 1);
                     CHK_RET(RecordEvent(eventList_[rankId_]));
                 }
-                CCU_IF(sendRecvInfo_[rankId_].lastTailSliceSize != 0) { // 尾块数据量不为 0，则需要发送尾块数据
+                CCU_IF(sendRecvInfo_[rankId_].lastTailSliceSize != 0)
+                { // 尾块数据量不为 0，则需要发送尾块数据
                     CHK_RET(GroupCopy(myDst_, src_[rankId_], sendRecvInfo_[rankId_].tailGoSize));
                     eventList_[rankId_].SetMask((1 << jettyNums_[rankId_]) - 1);
                     CHK_RET(RecordEvent(eventList_[rankId_]));
                 }
-                completedRankCount_ += xnConst1_;  // 之后一轮循环完成，更新已完成的rank数
+                completedRankCount_ += xnConst1_; // 之后一轮循环完成，更新已完成的rank数
             }
-            CCU_IF(sendRecvInfo_[rankId_].loopNum != UINT64_MAX - jettyNums_[rankId_]) {
-                CCU_IF(sendRecvInfo_[rankId_].tailSliceSize == 0) { // 当前数据块为 0，则不需要发送数据
+            CCU_IF(sendRecvInfo_[rankId_].loopNum != UINT64_MAX - jettyNums_[rankId_])
+            {
+                CCU_IF(sendRecvInfo_[rankId_].tailSliceSize == 0)
+                { // 当前数据块为 0，则不需要发送数据
                     eventList_[rankId_].SetMask((1 << jettyNums_[rankId_]) - 1);
                     CHK_RET(RecordEvent(eventList_[rankId_]));
                 }
-                CCU_IF(sendRecvInfo_[rankId_].tailSliceSize != 0) { // 当前数据块不为 0，需要发送数据
+                CCU_IF(sendRecvInfo_[rankId_].tailSliceSize != 0)
+                { // 当前数据块不为 0，需要发送数据
                     CHK_RET(GroupCopy(myDst_, src_[rankId_], xnMaxTransportGoSize_));
                     eventList_[rankId_].SetMask((1 << jettyNums_[rankId_]) - 1);
                     CHK_RET(RecordEvent(eventList_[rankId_]));
@@ -231,7 +241,7 @@ HcclResult CcuKernelAllToAllVMesh1DMultiJetty::DoAll2AllVMultiLoop()
             sendRecvInfo_[rankId_].loopNum += xnConst1_;
         }
         // 等待本轮发送完成
-        for(uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
+        for (uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
             eventList_[rankIdx].SetMask((1 << jettyNums_[rankIdx]) - 1);
             CHK_RET(WaitEvent(eventList_[rankIdx]));
         }
@@ -241,32 +251,40 @@ HcclResult CcuKernelAllToAllVMesh1DMultiJetty::DoAll2AllVMultiLoop()
 
 HcclResult CcuKernelAllToAllVMesh1DMultiJetty::DoAll2AllVLastBlock(u32 rankIdx, u32 channelIdx)
 {
-    for(uint32_t i = 0; i < jettyNums_[rankIdx]; i++) {
-        CCU_IF(sendRecvInfo_[rankIdx].loopNum != UINT64_MAX - 1) { // 处理最后一轮数据块的切片数据（非尾片）
-            CCU_IF(sendRecvInfo_[rankIdx].lastSliceSize == 0) { // 切片数据量为 0，则不需要发送切片数据
+    for (uint32_t i = 0; i < jettyNums_[rankIdx]; i++) {
+        CCU_IF(sendRecvInfo_[rankIdx].loopNum != UINT64_MAX - 1)
+        {     // 处理最后一轮数据块的切片数据（非尾片）
+            CCU_IF(sendRecvInfo_[rankIdx].lastSliceSize == 0)
+            { // 切片数据量为 0，则不需要发送切片数据
                 eventList_[rankIdx].SetMask(1 << i);
                 CHK_RET(RecordEvent(eventList_[rankIdx]));
             }
-            CCU_IF(sendRecvInfo_[rankIdx].lastSliceSize != 0) { // 切片数据量不为 0，则需要发送切片数据
+            CCU_IF(sendRecvInfo_[rankIdx].lastSliceSize != 0)
+            { // 切片数据量不为 0，则需要发送切片数据
                 eventList_[rankIdx].SetMask(1 << i);
-                CHK_RET(WriteNb(channels_[channelIdx], remoteDst_[rankIdx], src_[rankIdx], sendRecvInfo_[rankIdx].lastSliceSize,
+                CHK_RET(WriteNb(
+                    channels_[channelIdx], remoteDst_[rankIdx], src_[rankIdx], sendRecvInfo_[rankIdx].lastSliceSize,
                     eventList_[rankIdx]));
                 // 更新偏移
                 src_[rankIdx].addr += sendRecvInfo_[rankIdx].lastSliceSize;
                 remoteDst_[rankIdx].addr += sendRecvInfo_[rankIdx].lastSliceSize;
             }
         }
-        CCU_IF(sendRecvInfo_[rankIdx].loopNum == UINT64_MAX - 1) { // 处理最后一轮数据块的尾片数据
-            CCU_IF(sendRecvInfo_[rankIdx].lastTailSliceSize == 0) { // 尾片数据量为 0，则不需要发送尾片数据
+        CCU_IF(sendRecvInfo_[rankIdx].loopNum == UINT64_MAX - 1)
+        {     // 处理最后一轮数据块的尾片数据
+            CCU_IF(sendRecvInfo_[rankIdx].lastTailSliceSize == 0)
+            { // 尾片数据量为 0，则不需要发送尾片数据
                 eventList_[rankIdx].SetMask(1 << i);
                 CHK_RET(RecordEvent(eventList_[rankIdx]));
             }
-            CCU_IF(sendRecvInfo_[rankIdx].lastTailSliceSize != 0) { // 尾片数据量不为 0，则需要发送尾片数据
+            CCU_IF(sendRecvInfo_[rankIdx].lastTailSliceSize != 0)
+            { // 尾片数据量不为 0，则需要发送尾片数据
                 eventList_[rankIdx].SetMask(1 << i);
-                CHK_RET(WriteNb(channels_[channelIdx], remoteDst_[rankIdx], src_[rankIdx], sendRecvInfo_[rankIdx].lastTailSliceSize,
+                CHK_RET(WriteNb(
+                    channels_[channelIdx], remoteDst_[rankIdx], src_[rankIdx], sendRecvInfo_[rankIdx].lastTailSliceSize,
                     eventList_[rankIdx]));
             }
-            completedRankCount_ += xnConst1_;  // 最后一轮数据块的尾片处理完成，更新已完成的rank数
+            completedRankCount_ += xnConst1_; // 最后一轮数据块的尾片处理完成，更新已完成的rank数
         }
         sendRecvInfo_[rankIdx].loopNum += xnConst1_; // 处理完一片数据，更新loopNum
     }
@@ -275,28 +293,34 @@ HcclResult CcuKernelAllToAllVMesh1DMultiJetty::DoAll2AllVLastBlock(u32 rankIdx, 
 
 HcclResult CcuKernelAllToAllVMesh1DMultiJetty::DoAll2AllVBlock(u32 rankIdx, u32 channelIdx)
 {
-    for(uint32_t i = 0; i < jettyNums_[rankIdx]; i++) {
+    for (uint32_t i = 0; i < jettyNums_[rankIdx]; i++) {
         if (i != jettyNums_[rankIdx] - 1) {
-            CCU_IF(sendRecvInfo_[rankIdx].sliceSize == 0) { // 切片数据量为 0，则不需要发送切片数据
+            CCU_IF(sendRecvInfo_[rankIdx].sliceSize == 0)
+            { // 切片数据量为 0，则不需要发送切片数据
                 eventList_[rankIdx].SetMask(1 << i);
                 CHK_RET(RecordEvent(eventList_[rankIdx]));
             }
-            CCU_IF(sendRecvInfo_[rankIdx].sliceSize != 0) { // 切片数据量不为 0，则需要发送切片数据
+            CCU_IF(sendRecvInfo_[rankIdx].sliceSize != 0)
+            { // 切片数据量不为 0，则需要发送切片数据
                 eventList_[rankIdx].SetMask(1 << i);
-                CHK_RET(WriteNb(channels_[channelIdx], remoteDst_[rankIdx], src_[rankIdx], sendRecvInfo_[rankIdx].sliceSize,
+                CHK_RET(WriteNb(
+                    channels_[channelIdx], remoteDst_[rankIdx], src_[rankIdx], sendRecvInfo_[rankIdx].sliceSize,
                     eventList_[rankIdx]));
                 // 更新偏移
                 src_[rankIdx].addr += sendRecvInfo_[rankIdx].sliceSize;
                 remoteDst_[rankIdx].addr += sendRecvInfo_[rankIdx].sliceSize;
             }
         } else {
-            CCU_IF(sendRecvInfo_[rankIdx].tailSliceSize == 0) { // 尾片数据量为 0，则不需要发送尾片数据
+            CCU_IF(sendRecvInfo_[rankIdx].tailSliceSize == 0)
+            { // 尾片数据量为 0，则不需要发送尾片数据
                 eventList_[rankIdx].SetMask(1 << i);
                 CHK_RET(RecordEvent(eventList_[rankIdx]));
             }
-            CCU_IF(sendRecvInfo_[rankIdx].tailSliceSize != 0) { // 尾片数据量不为 0，则需要发送尾片数据
+            CCU_IF(sendRecvInfo_[rankIdx].tailSliceSize != 0)
+            { // 尾片数据量不为 0，则需要发送尾片数据
                 eventList_[rankIdx].SetMask(1 << i);
-                CHK_RET(WriteNb(channels_[channelIdx], remoteDst_[rankIdx], src_[rankIdx], sendRecvInfo_[rankIdx].tailSliceSize,
+                CHK_RET(WriteNb(
+                    channels_[channelIdx], remoteDst_[rankIdx], src_[rankIdx], sendRecvInfo_[rankIdx].tailSliceSize,
                     eventList_[rankIdx]));
                 // 更新偏移
                 src_[rankIdx].addr += sendRecvInfo_[rankIdx].tailSliceSize;
@@ -323,23 +347,24 @@ HcclResult CcuKernelAllToAllVMesh1DMultiJetty::Algorithm()
     return HcclResult::HCCL_SUCCESS;
 }
 
-std::vector<uint64_t> CcuKernelAllToAllVMesh1DMultiJetty::GeneArgs(const CcuTaskArg &arg)
+std::vector<uint64_t> CcuKernelAllToAllVMesh1DMultiJetty::GeneArgs(const CcuTaskArg& arg)
 {
-    const CcuTaskArgAllToAllVMesh1DMultiJetty *taskArg = dynamic_cast<const CcuTaskArgAllToAllVMesh1DMultiJetty *>(&arg);
+    const CcuTaskArgAllToAllVMesh1DMultiJetty* taskArg = dynamic_cast<const CcuTaskArgAllToAllVMesh1DMultiJetty*>(&arg);
 
-    uint64_t inputAddr  = taskArg->inputAddr_;
+    uint64_t inputAddr = taskArg->inputAddr_;
     uint64_t outputAddr = taskArg->outputAddr_;
-    uint64_t tokenInfo  = taskArg->token_;
+    uint64_t tokenInfo = taskArg->token_;
     uint64_t srcOffset = taskArg->srcOffset_;
     uint64_t dstOffset = taskArg->dstOffset_;
 
-    HCCL_INFO("[AllToAllVAlgo] inputAddr[%llu], outputAddr[%llu],"
-              "srcOffset[%llu], dstOffset[%llu]",
-              inputAddr, outputAddr, srcOffset, dstOffset);
+    HCCL_INFO(
+        "[AllToAllVAlgo] inputAddr[%llu], outputAddr[%llu],"
+        "srcOffset[%llu], dstOffset[%llu]",
+        inputAddr, outputAddr, srcOffset, dstOffset);
     std::vector<uint64_t> processReturn = {inputAddr, outputAddr, tokenInfo, srcOffset, dstOffset};
 
-    uint64_t xnMaxTransportSize   = UB_MAX_TRANS_SIZE;
-    auto     xnMaxTransportGoSize = CalGoSize(xnMaxTransportSize); // 用于本地ccu ms拷贝
+    uint64_t xnMaxTransportSize = UB_MAX_TRANS_SIZE;
+    auto xnMaxTransportGoSize = CalGoSize(xnMaxTransportSize); // 用于本地ccu ms拷贝
     for (auto val : xnMaxTransportGoSize) {
         processReturn.push_back(val);
     }
@@ -350,7 +375,7 @@ std::vector<uint64_t> CcuKernelAllToAllVMesh1DMultiJetty::GeneArgs(const CcuTask
         uint64_t loopNum = UINT64_MAX - (taskArg->localSendRecvInfo_.sendLength[i] / blockSize + 1) * jettyNums_[i];
         uint64_t sliceSize = 0;
         uint64_t tailSliceSize = 0;
-        if(taskArg->localSendRecvInfo_.sendLength[i] >= blockSize) {
+        if (taskArg->localSendRecvInfo_.sendLength[i] >= blockSize) {
             // 切分blockSize大小的数据块
             sliceSize = blockSize / jettyNums_[i] / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN;
             tailSliceSize = blockSize - sliceSize * (jettyNums_[i] - 1);
@@ -382,30 +407,29 @@ std::vector<uint64_t> CcuKernelAllToAllVMesh1DMultiJetty::GeneArgs(const CcuTask
         for (auto val : tailGoSize) {
             processReturn.push_back(val);
         }
-        HCCL_INFO("[AllToAllVAlgo] rankIdx[%llu] " \
-            "taskArg->localSendRecvInfo.sendLength[%llu]," \
-            "taskArg->localSendRecvInfo.sendOffset[%llu]," \
-            "taskArg->localSendRecvInfo.recvLength[%llu]," \
-            "taskArg->localSendRecvInfo.recvOffset[%llu]", i,
-            taskArg->localSendRecvInfo_.sendLength[i],
-            taskArg->localSendRecvInfo_.sendOffset[i],
-            taskArg->localSendRecvInfo_.recvLength[i],
-            taskArg->localSendRecvInfo_.recvOffset[i]);
+        HCCL_INFO(
+            "[AllToAllVAlgo] rankIdx[%llu] "
+            "taskArg->localSendRecvInfo.sendLength[%llu],"
+            "taskArg->localSendRecvInfo.sendOffset[%llu],"
+            "taskArg->localSendRecvInfo.recvLength[%llu],"
+            "taskArg->localSendRecvInfo.recvOffset[%llu]",
+            i, taskArg->localSendRecvInfo_.sendLength[i], taskArg->localSendRecvInfo_.sendOffset[i],
+            taskArg->localSendRecvInfo_.recvLength[i], taskArg->localSendRecvInfo_.recvOffset[i]);
     }
 
     return processReturn;
 }
 
-HcclResult CcuKernelAllToAllVMesh1DMultiJetty::LoadAll2allSendRecvInfo(A2AsingleSendRecvInfo &sendRecvInfo)
+HcclResult CcuKernelAllToAllVMesh1DMultiJetty::LoadAll2allSendRecvInfo(A2AsingleSendRecvInfo& sendRecvInfo)
 {
-    sendRecvInfo.sliceSize          = CreateVariable();
-    sendRecvInfo.tailSliceSize      = CreateVariable();
-    sendRecvInfo.lastSliceSize      = CreateVariable();
-    sendRecvInfo.lastTailSliceSize  = CreateVariable();
-    sendRecvInfo.loopNum            = CreateVariable();
-    sendRecvInfo.sendOffset         = CreateVariable();
-    sendRecvInfo.recvOffset         = CreateVariable();
-    sendRecvInfo.tailGoSize         = CreateGroupOpSize();
+    sendRecvInfo.sliceSize = CreateVariable();
+    sendRecvInfo.tailSliceSize = CreateVariable();
+    sendRecvInfo.lastSliceSize = CreateVariable();
+    sendRecvInfo.lastTailSliceSize = CreateVariable();
+    sendRecvInfo.loopNum = CreateVariable();
+    sendRecvInfo.sendOffset = CreateVariable();
+    sendRecvInfo.recvOffset = CreateVariable();
+    sendRecvInfo.tailGoSize = CreateGroupOpSize();
 
     Load(sendRecvInfo.sliceSize);
     Load(sendRecvInfo.tailSliceSize);
@@ -417,4 +441,4 @@ HcclResult CcuKernelAllToAllVMesh1DMultiJetty::LoadAll2allSendRecvInfo(A2Asingle
     Load(sendRecvInfo.tailGoSize);
     return HcclResult::HCCL_SUCCESS;
 }
-}
+} // namespace ops_hccl

@@ -254,7 +254,7 @@ void GetWelfordUpdateMaxMinTmpSize(
         if (typeSizeT == sizeof(uint16_t)) {
             minValue = 0x3 * WEL_UP_REP_SIZE; // dispense 3 buffers
         } else if (isReuseSource) {
-            minValue = 1 * WEL_UP_REP_SIZE; // dispense 1 buffer
+            minValue = 1 * WEL_UP_REP_SIZE;   // dispense 1 buffer
         } else {
             minValue = 0x2 * WEL_UP_REP_SIZE; // dispense 2 buffers
         }

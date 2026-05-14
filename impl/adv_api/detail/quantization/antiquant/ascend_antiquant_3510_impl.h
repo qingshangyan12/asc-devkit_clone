@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/quantization/antiquant/ascend_antiquant_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/quantization/ascend_antiquant.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/quantization/antiquant/ascend_antiquant_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/quantization/ascend_antiquant.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_C310_IMPL_H__
 #endif
@@ -68,10 +68,10 @@ __simd_vf__ inline void CastScale(__ubuf__ OutputDataType* dst, __ubuf__ fp8_e8m
     Reg::RegTensor<uint16_t> bf16Nan;
     Reg::RegTensor<uint16_t> e8m0Zero;
     Reg::RegTensor<uint16_t> e8m0Nan;
-    Duplicate(bf16Zero, (uint16_t)0x0040); // if e8m0 = 0b00000000, bf16 is 0x0040
-    Duplicate(bf16Nan, (uint16_t)0x7fff);  // if e8m0 = 0b11111111, use 0x7fff as bf16 nan
+    Duplicate(bf16Zero, (uint16_t)0x0040);                              // if e8m0 = 0b00000000, bf16 is 0x0040
+    Duplicate(bf16Nan, (uint16_t)0x7fff);                               // if e8m0 = 0b11111111, use 0x7fff as bf16 nan
     Duplicate(e8m0Zero, 0);
-    Duplicate(e8m0Nan, (uint16_t)0x7f80); // if e8m0 = 0b11111111, after << 7 is 0x7f80
+    Duplicate(e8m0Nan, (uint16_t)0x7f80);                               // if e8m0 = 0b11111111, after << 7 is 0x7f80
     uint32_t sregLower = static_cast<uint32_t>(ANTIQUANT_B16_VF_LEN);
     uint32_t scaleCalCount = srcCalCount / ANTIQUANT_FP4_PERGROUP_SIZE; // perGroupSize = 32 default
     uint32_t sreg = static_cast<uint32_t>(scaleCalCount);
@@ -202,7 +202,7 @@ __simd_vf__ inline void AscendAntiQuantNoTranspose(
     Duplicate(bf16Zero, (uint16_t)0x0040); // if e8m0 = 0b00000000, bf16 is 0x0040
     Duplicate(bf16Nan, (uint16_t)0x7fff);  // if e8m0 = 0b11111111, use 0x7fff as bf16 nan
     Duplicate(e8m0Zero, 0);
-    Duplicate(e8m0Nan, (uint16_t)0x7f80); // if e8m0 = 0b11111111, after << 7 is 0x7f80
+    Duplicate(e8m0Nan, (uint16_t)0x7f80);  // if e8m0 = 0b11111111, after << 7 is 0x7f80
     uint16_t repeatTimes = CeilDivision(k, ANTIQUANT_FP4_PERGROUP_SIZE);
     for (uint16_t i = 0; i < repeatTimes; i++) {
         for (uint16_t j = 0; j < ANTIQUANT_FP4_PERGROUP_SIZE; j++) {
@@ -676,7 +676,7 @@ __simd_vf__ inline void PerchannelTransposeForB8(
             preg = Reg::UpdateMask<uint32_t>(sreg);
             Reg::LoadAlign<SrcType, Reg::LoadDist::DIST_UNPACK_B8>(vreg, src + i * K + j * sregLower);
             Reg::Cast<half, SrcType, layoutZMrgZ>(f16vreg, vreg,
-                                                  f16preg); // hif8->f16 or int8->f16
+                                                  f16preg);              // hif8->f16 or int8->f16
             Reg::Interleave(f16vreg, vregTmp, f16vreg, vregTmp);
             Reg::Cast<float, half, layoutZMrgZ>(f32vreg, f16vreg, preg); // f16->f32
 
@@ -761,7 +761,7 @@ __aicore__ inline void AntiQuantPerchannelImpl(
     if constexpr (isTranspose) { // src [n,k] offset [n,1]
         uint32_t n = (shapeInfo.offsetWidth == 0 ? offset.GetShapeInfo().shape[0] : shapeInfo.offsetWidth);
         AntiQuantPerchannelTranspose(dst, src, offset, scale, sharedTmpBuffer, k, n);
-    } else { // src [k,n] offset [1,n]
+    } else {          // src [k,n] offset [1,n]
         uint32_t n = (shapeInfo.offsetWidth == 0 ? offset.GetShapeInfo().shape[1] : shapeInfo.offsetWidth);
         if (n < 32) { // b8 input single line is not 32B aligned such as input n == 16
             ASCENDC_ASSERT((k % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "input calculate size must be 32B aligned!"); });
@@ -1098,8 +1098,8 @@ __aicore__ inline void CalculationMin(
     const uint32_t calCount, const uint32_t n, const uint32_t srcN, const uint32_t k)
 {
     // store FP16 result in second half of FP32 tmpTensor to avoid input FP16 being replaced
-    uint32_t srcFp16Pos = calCount / ANTIQUANT_TWO; // therefore start from (calCount / 2)th FP32 tmpTensor
-    uint32_t n1 = k / ANTIQUANT_SINGLE_N_SIZE;      // K = 64 * n1
+    uint32_t srcFp16Pos = calCount / ANTIQUANT_TWO;        // therefore start from (calCount / 2)th FP32 tmpTensor
+    uint32_t n1 = k / ANTIQUANT_SINGLE_N_SIZE;             // K = 64 * n1
     UnaryRepeatParams unaryParamsInt8Fp16;
     unaryParamsInt8Fp16.srcRepStride = ANTIQUANT_TWO * n1; // K(num) / 32(num per block)
     // one repeat calculate 64 int8 -> 64 fp16, 4 block
@@ -1717,7 +1717,7 @@ __simd_vf__ inline void AntiQuantPerGroupForColFp4VF(
     Duplicate(bf16Zero, (uint16_t)0x0040); // if e8m0 = 0b00000000, bf16 is 0x0040
     Duplicate(bf16Nan, (uint16_t)0x7fff);  // if e8m0 = 0b11111111, use 0x7fff as bf16 nan
     Duplicate(e8m0Zero, 0);
-    Duplicate(e8m0Nan, (uint16_t)0x7f80); // if e8m0 = 0b11111111, after << 7 is 0x7f80
+    Duplicate(e8m0Nan, (uint16_t)0x7f80);  // if e8m0 = 0b11111111, after << 7 is 0x7f80
     for (uint16_t i = 0; i < rowNum; ++i) {
         sreg = para.n;
         for (uint16_t j = 0; j < repeat; ++j) {
@@ -1778,7 +1778,7 @@ __simd_callee__ inline void AntiQuantPerGroupForRowFp4OneRow(
     Duplicate(bf16Zero, (uint16_t)0x0040); // if e8m0 = 0b00000000, bf16 is 0x0040
     Duplicate(bf16Nan, (uint16_t)0x7fff);  // if e8m0 = 0b11111111, use 0x7fff as bf16 nan
     Duplicate(e8m0Zero, 0);
-    Duplicate(e8m0Nan, (uint16_t)0x7f80); // if e8m0 = 0b11111111, after << 7 is 0x7f80
+    Duplicate(e8m0Nan, (uint16_t)0x7f80);  // if e8m0 = 0b11111111, after << 7 is 0x7f80
     for (uint16_t j = 0; j < repeat; ++j) {
         preg = Reg::UpdateMask<dstT>(n);
         // step1: load scale procedure

@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file topk_v200_impl.h
@@ -14,7 +14,8 @@
  */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/adv_api/detail/sort/topk/topk_v200_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/sort/topk.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+        "impl/adv_api/detail/sort/topk/topk_v200_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/sort/topk.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SORT_TOPK_TOPK_V200_IMPL_H__
 #endif
@@ -35,7 +36,7 @@
 namespace AscendC {
 #if ASCENDC_CPU_DEBUG
 template <typename T, bool isInitIndex = false, enum TopKMode topkMode = TopKMode::TOPK_NORMAL>
-void TopkInputCheck(const int32_t k, const TopKInfo &topKInfo)
+void TopkInputCheck(const int32_t k, const TopKInfo& topKInfo)
 {
     bool ans = (1 <= k) && (k <= topKInfo.n);
     ASCENDC_ASSERT(ans, {
@@ -46,30 +47,30 @@ void TopkInputCheck(const int32_t k, const TopKInfo &topKInfo)
         KERNEL_LOG(KERNEL_ERROR, "The value of n must be greater than or equal to 1 and less than or equal to inner.");
     });
     ans = (std::is_same<T, half>::value) || (std::is_same<T, float>::value);
-    ASCENDC_ASSERT(ans, {KERNEL_LOG(KERNEL_ERROR, "type must be half or float");});
+    ASCENDC_ASSERT(ans, { KERNEL_LOG(KERNEL_ERROR, "type must be half or float"); });
     ans = (topKInfo.inner % TOPK_INNER_ALIGN_LEN == 0);
-    ASCENDC_ASSERT(ans, {KERNEL_LOG(KERNEL_ERROR, "The value of inner must be an integer multiple of 32.");});
+    ASCENDC_ASSERT(ans, { KERNEL_LOG(KERNEL_ERROR, "The value of inner must be an integer multiple of 32."); });
 
     if ((sizeof(T) == sizeof(half)) && (!isInitIndex)) {
         ans = (topKInfo.inner <= TOPK_NORMAL_INNER_MAX_HALF_LEN);
-        ASCENDC_ASSERT(ans, {KERNEL_LOG(KERNEL_ERROR, "The maximum inner value is 2048.");});
+        ASCENDC_ASSERT(ans, { KERNEL_LOG(KERNEL_ERROR, "The maximum inner value is 2048."); });
     }
 
     if constexpr (topkMode == TopKMode::TOPK_NORMAL) {
         ans = (topKInfo.inner <= TOPK_NORMAL_INNER_MAX_LEN);
-        ASCENDC_ASSERT(ans, {KERNEL_LOG(KERNEL_ERROR, "The maximum value supported by inner is 4096.");});
+        ASCENDC_ASSERT(ans, { KERNEL_LOG(KERNEL_ERROR, "The maximum value supported by inner is 4096."); });
     }
     if constexpr (topkMode == TopKMode::TOPK_NSMALL) {
         ans = (topKInfo.inner == TOPK_NSMALL_INNER_LEN);
-        ASCENDC_ASSERT(ans, {KERNEL_LOG(KERNEL_ERROR, "The value of inner must be an equal 32.");});
+        ASCENDC_ASSERT(ans, { KERNEL_LOG(KERNEL_ERROR, "The value of inner must be an equal 32."); });
     }
 }
 #endif
 
 template <typename T, bool isInitIndex>
-__aicore__ inline void ProposalConcatValIdx(const LocalTensor<T> &srcLocal, const LocalTensor<T> &tmpLocal,
-    const TopkTiling &tilling, const TopKInfo &topKInfo, const bool isLargest, const int outterIdx,
-    const UnaryRepeatParams unaryParams)
+__aicore__ inline void ProposalConcatValIdx(
+    const LocalTensor<T>& srcLocal, const LocalTensor<T>& tmpLocal, const TopkTiling& tilling, const TopKInfo& topKInfo,
+    const bool isLargest, const int outterIdx, const UnaryRepeatParams unaryParams)
 {
     int offset = outterIdx * topKInfo.inner;
     // srcLocal -> Region Proposal
@@ -86,9 +87,9 @@ __aicore__ inline void ProposalConcatValIdx(const LocalTensor<T> &srcLocal, cons
 }
 
 template <typename T, bool isInitIndex>
-__aicore__ inline void TmpLocalSort16(const LocalTensor<T> &srcLocal, const LocalTensor<T> &tmpLocal,
-    const TopkTiling &tilling, const TopKInfo &topKInfo, const bool isLargest, const int outterIdx,
-    const UnaryRepeatParams unaryParams)
+__aicore__ inline void TmpLocalSort16(
+    const LocalTensor<T>& srcLocal, const LocalTensor<T>& tmpLocal, const TopkTiling& tilling, const TopKInfo& topKInfo,
+    const bool isLargest, const int outterIdx, const UnaryRepeatParams unaryParams)
 {
     // The number of inners is divided into inner/16 groups for sorting. Each iteration completes one group of 16
     // numbers of sorting.
@@ -102,7 +103,7 @@ __aicore__ inline void TmpLocalSort16(const LocalTensor<T> &srcLocal, const Loca
 
 template <typename T>
 __aicore__ inline void MrgSort4FourQueueSort(
-    const LocalTensor<T> &tmpLocal, const TopkTiling &tilling, const TopKInfo &topKInfo, uint16_t &z, int32_t &dstIdx)
+    const LocalTensor<T>& tmpLocal, const TopkTiling& tilling, const TopKInfo& topKInfo, uint16_t& z, int32_t& dstIdx)
 {
     int32_t mrgFourQueueCount = 0;
     uint16_t innerU16Type = static_cast<uint16_t>(topKInfo.inner);
@@ -113,7 +114,8 @@ __aicore__ inline void MrgSort4FourQueueSort(
         mrgFourQueueCount += 1;
         uint16_t elementLengths[MRG_SORT_ELEMENT_LEN] = {z, z, z, z};
         struct MrgSort4Info srcInfo(elementLengths, false, 0b1111, tilling.mrgSortRepeat / z);
-        struct MrgSortSrcList<T> srcList(src, src[z * tilling.mrgSortSrc1offset], src[z * tilling.mrgSortSrc2offset],
+        struct MrgSortSrcList<T> srcList(
+            src, src[z * tilling.mrgSortSrc1offset], src[z * tilling.mrgSortSrc2offset],
             src[z * tilling.mrgSortSrc3offset]);
         MrgSort4<T>(dst, srcList, srcInfo);
         PipeBarrier<PIPE_V>();
@@ -124,8 +126,9 @@ __aicore__ inline void MrgSort4FourQueueSort(
 }
 
 template <typename T>
-__aicore__ inline void MrgSort4TwoQueueSort(const LocalTensor<T> &tmpLocal, const TopkTiling &tilling,
-    const TopKInfo &topKInfo, const uint16_t z, int32_t &dstIdx)
+__aicore__ inline void MrgSort4TwoQueueSort(
+    const LocalTensor<T>& tmpLocal, const TopkTiling& tilling, const TopKInfo& topKInfo, const uint16_t z,
+    int32_t& dstIdx)
 {
     int32_t arrayCount = 0;
     if (z < topKInfo.inner) {
@@ -158,10 +161,10 @@ __aicore__ inline void MrgSort4TwoQueueSort(const LocalTensor<T> &tmpLocal, cons
 }
 
 template <typename T>
-__aicore__ inline void ProposalExtractValIdx(const LocalTensor<T> &dstValueLocal,
-    const LocalTensor<int32_t> &dstIndexLocal, const LocalTensor<T> &tmpLocal, const TopkTiling &tilling,
-    const int32_t dstIdx, const int32_t dstOffsetFourBytes, const int outterIdx, const TopKInfo &topKInfo,
-    const int32_t k, const UnaryRepeatParams unaryParams)
+__aicore__ inline void ProposalExtractValIdx(
+    const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& tmpLocal,
+    const TopkTiling& tilling, const int32_t dstIdx, const int32_t dstOffsetFourBytes, const int outterIdx,
+    const TopKInfo& topKInfo, const int32_t k, const UnaryRepeatParams unaryParams)
 {
     int32_t tmpLocalDstOffset = tilling.innerDataSize * dstIdx;
     int32_t tmpLocalSrcOffset = tilling.innerDataSize * (1 - dstIdx);
@@ -181,13 +184,9 @@ __aicore__ inline void ProposalExtractValIdx(const LocalTensor<T> &dstValueLocal
     if constexpr (sizeof(T) == sizeof(half)) {
         castOffset = topKInfo.inner;
         // half->float
-        LocalTensor<float> tempBufferFloat = tmpLocal[tmpLocalSrcOffset + castOffset].template
-                                             ReinterpretCast<float>();
-        Cast<float, half, false>(tempBufferFloat,
-            tmpLocal[tmpLocalSrcOffset],
-            RoundMode::CAST_NONE,
-            MASK_PLACEHOLDER,
-            1,
+        LocalTensor<float> tempBufferFloat = tmpLocal[tmpLocalSrcOffset + castOffset].template ReinterpretCast<float>();
+        Cast<float, half, false>(
+            tempBufferFloat, tmpLocal[tmpLocalSrcOffset], RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
             {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
         PipeBarrier<PIPE_V>();
     }
@@ -195,11 +194,8 @@ __aicore__ inline void ProposalExtractValIdx(const LocalTensor<T> &dstValueLocal
     // float -> int32_t
     LocalTensor<int32_t> tempBufferInt32 = tmpLocal[tmpOffset].template ReinterpretCast<int32_t>();
     LocalTensor<float> tempBufferFloat = tmpLocal[tmpOffset].template ReinterpretCast<float>();
-    Cast<int32_t, float, false>(tempBufferInt32,
-        tempBufferFloat,
-        RoundMode::CAST_ROUND,
-        MASK_PLACEHOLDER,
-        1,
+    Cast<int32_t, float, false>(
+        tempBufferInt32, tempBufferFloat, RoundMode::CAST_ROUND, MASK_PLACEHOLDER, 1,
         {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
     PipeBarrier<PIPE_V>();
     SetVectorMask<T, MaskMode::COUNTER>(0, k);
@@ -208,49 +204,41 @@ __aicore__ inline void ProposalExtractValIdx(const LocalTensor<T> &dstValueLocal
 }
 
 template <typename T, bool isInitIndex>
-__aicore__ inline void CastIdxTypeToValType(const LocalTensor<int32_t> &srcIndexLocal, const LocalTensor<T> &tmpLocal,
-    const TopkTiling &tilling, const TopKInfo &topKInfo, const int32_t mask, const int32_t addrOffset)
+__aicore__ inline void CastIdxTypeToValType(
+    const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<T>& tmpLocal, const TopkTiling& tilling,
+    const TopKInfo& topKInfo, const int32_t mask, const int32_t addrOffset)
 {
     SetVectorMask<T, MaskMode::COUNTER>(0, mask);
     LocalTensor<float> tempBufferFloat = tmpLocal[addrOffset].template ReinterpretCast<float>();
     if constexpr (!isInitIndex) {
         // int32_t -> float
         LocalTensor<int32_t> tempBufferInt32 = tmpLocal[addrOffset].template ReinterpretCast<int32_t>();
-        Cast<float, int32_t, false>(tempBufferFloat,
-            tempBufferInt32,
-            RoundMode::CAST_NONE,
-            MASK_PLACEHOLDER,
-            1,
+        Cast<float, int32_t, false>(
+            tempBufferFloat, tempBufferInt32, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
             {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
         PipeBarrier<PIPE_V>();
     } else {
         // int32_t -> float
-        Cast<float, int32_t, false>(tempBufferFloat,
-            srcIndexLocal,
-            RoundMode::CAST_NONE,
-            MASK_PLACEHOLDER,
-            1,
+        Cast<float, int32_t, false>(
+            tempBufferFloat, srcIndexLocal, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
             {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
         PipeBarrier<PIPE_V>();
     }
     if constexpr (sizeof(T) == sizeof(half)) {
         // float->half
         LocalTensor<half> tempBufferHalf = tmpLocal[addrOffset].template ReinterpretCast<half>();
-        Cast<half, float, false>(tempBufferHalf,
-            tempBufferFloat,
-            RoundMode::CAST_NONE,
-            MASK_PLACEHOLDER,
-            1,
+        Cast<half, float, false>(
+            tempBufferHalf, tempBufferFloat, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
             {1, 1, HALF_DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
         PipeBarrier<PIPE_V>();
     }
 }
 
 template <typename T, bool isInitIndex, bool isHasfinish>
-__aicore__ inline void TopKCompute(const LocalTensor<T> &dstValueLocal, const LocalTensor<int32_t> &dstIndexLocal,
-    const LocalTensor<T> &srcLocal, const LocalTensor<int32_t> &srcIndexLocal, const LocalTensor<bool> &finishLocal,
-    const LocalTensor<T> &tmpLocal, const int32_t k, const TopkTiling &tilling, const TopKInfo &topKInfo,
-    const bool isLargest)
+__aicore__ inline void TopKCompute(
+    const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
+    const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const LocalTensor<T>& tmpLocal,
+    const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest)
 {
     CastIdxTypeToValType<T, isInitIndex>(
         srcIndexLocal, tmpLocal, tilling, topKInfo, topKInfo.inner, tilling.srcIndexOffset);
@@ -270,11 +258,8 @@ __aicore__ inline void TopKCompute(const LocalTensor<T> &dstValueLocal, const Lo
             WaitFlag<HardEvent::V_S>(eventID);
             if (finishLocal.GetValue(j)) {
                 SetVectorMask<T, MaskMode::COUNTER>(0, k);
-                Duplicate<int32_t, false>(dstIndexLocal[dstOffsetFourBytes],
-                    static_cast<int32_t>(topKInfo.n),
-                    MASK_PLACEHOLDER,
-                    1,
-                    1,
+                Duplicate<int32_t, false>(
+                    dstIndexLocal[dstOffsetFourBytes], static_cast<int32_t>(topKInfo.n), MASK_PLACEHOLDER, 1, 1,
                     DEFAULT_REPEAT_STRIDE);
                 PipeBarrier<PIPE_V>();
             }
@@ -284,7 +269,7 @@ __aicore__ inline void TopKCompute(const LocalTensor<T> &dstValueLocal, const Lo
 
 template <typename T, bool isInitIndex>
 __aicore__ inline void ProposalConcatValIdxSmall(
-    const LocalTensor<T> &srcLocal, const LocalTensor<T> &tmpLocal, const TopkTiling &tilling, const bool isLargest)
+    const LocalTensor<T>& srcLocal, const LocalTensor<T>& tmpLocal, const TopkTiling& tilling, const bool isLargest)
 {
     if (!isLargest) {
         ProposalConcat<T>(tmpLocal, tmpLocal[tilling.innerDataSize], tilling.sortRepeat, 4);
@@ -296,36 +281,30 @@ __aicore__ inline void ProposalConcatValIdxSmall(
 }
 
 template <typename T>
-__aicore__ inline void CastIdxToInt(const LocalTensor<T> &tmpLocal, const TopkTiling &tilling)
+__aicore__ inline void CastIdxToInt(const LocalTensor<T>& tmpLocal, const TopkTiling& tilling)
 {
     SetVectorMask<T, MaskMode::COUNTER>(0, tilling.allDataSize);
     if constexpr (sizeof(T) == sizeof(half)) {
         // half->float
         LocalTensor<float> tempBufferFloat = tmpLocal[tilling.srcIndexOffset].template ReinterpretCast<float>();
-        Cast<float, half, false>(tempBufferFloat,
-            tmpLocal[tilling.topkNSmallSrcIndexOffset],
-            RoundMode::CAST_NONE,
-            MASK_PLACEHOLDER,
-            1,
+        Cast<float, half, false>(
+            tempBufferFloat, tmpLocal[tilling.topkNSmallSrcIndexOffset], RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
             {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
         PipeBarrier<PIPE_V>();
     }
     // float -> int32_t
     LocalTensor<int32_t> tempBufferInt32 = tmpLocal[tilling.srcIndexOffset].template ReinterpretCast<int32_t>();
     LocalTensor<float> tempBufferFloat = tmpLocal[tilling.srcIndexOffset].template ReinterpretCast<float>();
-    Cast<int32_t, float, false>(tempBufferInt32,
-        tempBufferFloat,
-        RoundMode::CAST_ROUND,
-        MASK_PLACEHOLDER,
-        1,
+    Cast<int32_t, float, false>(
+        tempBufferInt32, tempBufferFloat, RoundMode::CAST_ROUND, MASK_PLACEHOLDER, 1,
         {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
     PipeBarrier<PIPE_V>();
 }
 
 template <typename T>
-__aicore__ inline void TopKNSmallGetFloatTopKValue(const LocalTensor<T> &dstValueLocal,
-    const LocalTensor<int32_t> &dstIndexLocal, const LocalTensor<T> &tmpLocal, const TopkTiling &tilling,
-    const TopKInfo &topKInfo)
+__aicore__ inline void TopKNSmallGetFloatTopKValue(
+    const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& tmpLocal,
+    const TopkTiling& tilling, const TopKInfo& topKInfo)
 {
     LocalTensor<uint32_t> src1stackTensor = tmpLocal.template ReinterpretCast<uint32_t>();
     src1stackTensor.SetSize(DEFAULT_BLK_NUM);
@@ -344,18 +323,18 @@ __aicore__ inline void TopKNSmallGetFloatTopKValue(const LocalTensor<T> &dstValu
     SetVectorMask<float>(topKInfo.inner);
     struct GatherMaskParams gatherMaskParams(DEFAULT_BLK_STRIDE, topKInfo.outter, HALF_DEFAULT_REPEAT_STRIDE, 0);
     uint64_t rsvdCnt = 0;
-    GatherMask<float, uint32_t>(dstValueLocal, tmpLocal[tilling.innerDataSize], src1stackTensor,
-                                false, 0, gatherMaskParams, rsvdCnt);
+    GatherMask<float, uint32_t>(
+        dstValueLocal, tmpLocal[tilling.innerDataSize], src1stackTensor, false, 0, gatherMaskParams, rsvdCnt);
     LocalTensor<T> tempBuffer = dstIndexLocal.template ReinterpretCast<T>();
     struct GatherMaskParams gatherMaskParams2(DEFAULT_BLK_STRIDE, topKInfo.outter, HALF_DEFAULT_REPEAT_STRIDE, 0);
-    GatherMask<T, uint32_t>(tempBuffer, tmpLocal[tilling.srcIndexOffset], src1stackTensor,
-                            false, 0, gatherMaskParams2, rsvdCnt);
+    GatherMask<T, uint32_t>(
+        tempBuffer, tmpLocal[tilling.srcIndexOffset], src1stackTensor, false, 0, gatherMaskParams2, rsvdCnt);
 }
 
 template <typename T>
-__aicore__ inline void TopKNSmallGetHalfTopKValue(const LocalTensor<T> &dstValueLocal,
-    const LocalTensor<int32_t> &dstIndexLocal, const LocalTensor<T> &tmpLocal, const TopkTiling &tilling,
-    const TopKInfo &topKInfo)
+__aicore__ inline void TopKNSmallGetHalfTopKValue(
+    const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& tmpLocal,
+    const TopkTiling& tilling, const TopKInfo& topKInfo)
 {
     LocalTensor<uint16_t> src1stackTensor = tmpLocal.template ReinterpretCast<uint16_t>();
     src1stackTensor.SetSize(DEFAULT_BLK_NUM);
@@ -366,27 +345,28 @@ __aicore__ inline void TopKNSmallGetHalfTopKValue(const LocalTensor<T> &dstValue
     SetFlag<HardEvent::V_S>(eventID);
     WaitFlag<HardEvent::V_S>(eventID);
     SetVectorMask<T, MaskMode::COUNTER>(0, 2);
-    Duplicate<uint16_t, false>(src1stackTensor, static_cast<uint16_t>(tilling.vreduceValMask1), MASK_PLACEHOLDER, 1, 1, 
-        DEFAULT_REPEAT_STRIDE);
+    Duplicate<uint16_t, false>(
+        src1stackTensor, static_cast<uint16_t>(tilling.vreduceValMask1), MASK_PLACEHOLDER, 1, 1, DEFAULT_REPEAT_STRIDE);
     SetVectorMask<T, MaskMode::COUNTER>(0, 1);
-    Duplicate<uint16_t, false>(src1stackTensor, static_cast<uint16_t>(tilling.vreduceValMask0), MASK_PLACEHOLDER, 1, 1, 
-        DEFAULT_REPEAT_STRIDE);
+    Duplicate<uint16_t, false>(
+        src1stackTensor, static_cast<uint16_t>(tilling.vreduceValMask0), MASK_PLACEHOLDER, 1, 1, DEFAULT_REPEAT_STRIDE);
     PipeBarrier<PIPE_V>();
     SetMaskNorm();
     ResetMask();
     SetVectorMask<half>(topKInfo.inner);
     struct GatherMaskParams gatherMaskParams(DEFAULT_BLK_STRIDE, topKInfo.outter, ONE_FOURTH_DEFAULT_REPEAT_STRIDE, 0);
     uint64_t rsvdCnt = 0;
-    GatherMask<half, uint16_t>(dstValueLocal, tmpLocal[tilling.innerDataSize], src1stackTensor, false, 0, 
-        gatherMaskParams, rsvdCnt);
+    GatherMask<half, uint16_t>(
+        dstValueLocal, tmpLocal[tilling.innerDataSize], src1stackTensor, false, 0, gatherMaskParams, rsvdCnt);
     PipeBarrier<PIPE_V>();
     LocalTensor<uint32_t> indexStackTensor = tmpLocal.template ReinterpretCast<uint32_t>();
     SetMaskCount();
     SetVectorMask<T, MaskMode::COUNTER>(0, 2);
-    Duplicate<uint32_t, false>(indexStackTensor, static_cast<uint32_t>(0), MASK_PLACEHOLDER, 1, 1, 
-        DEFAULT_REPEAT_STRIDE);
+    Duplicate<uint32_t, false>(
+        indexStackTensor, static_cast<uint32_t>(0), MASK_PLACEHOLDER, 1, 1, DEFAULT_REPEAT_STRIDE);
     SetVectorMask<T, MaskMode::COUNTER>(0, 1);
-    Duplicate<uint32_t, false>(indexStackTensor, static_cast<uint32_t>(tilling.vreduceIdxMask0), MASK_PLACEHOLDER, 1, 1,
+    Duplicate<uint32_t, false>(
+        indexStackTensor, static_cast<uint32_t>(tilling.vreduceIdxMask0), MASK_PLACEHOLDER, 1, 1,
         DEFAULT_REPEAT_STRIDE);
     PipeBarrier<PIPE_V>();
     SetMaskNorm();
@@ -396,15 +376,14 @@ __aicore__ inline void TopKNSmallGetHalfTopKValue(const LocalTensor<T> &dstValue
     tempBuffer = dstIndexLocal.template ReinterpretCast<float>();
     src0Buffer = tmpLocal[tilling.srcIndexOffset].template ReinterpretCast<float>();
     struct GatherMaskParams gatherMaskParams2(DEFAULT_BLK_STRIDE, topKInfo.outter, HALF_DEFAULT_REPEAT_STRIDE, 0);
-    GatherMask<float, uint32_t>(tempBuffer, src0Buffer, indexStackTensor,
-                                false, 0, gatherMaskParams2, rsvdCnt);
+    GatherMask<float, uint32_t>(tempBuffer, src0Buffer, indexStackTensor, false, 0, gatherMaskParams2, rsvdCnt);
 }
 
 template <typename T, bool isInitIndex, bool isHasfinish>
-__aicore__ inline void TopKNSmallCompute(const LocalTensor<T> &dstValueLocal, const LocalTensor<int32_t> &dstIndexLocal,
-    const LocalTensor<T> &srcLocal, const LocalTensor<int32_t> &srcIndexLocal, const LocalTensor<bool> &finishLocal,
-    const LocalTensor<T> &tmpLocal, const int32_t k, const TopkTiling &tilling, const TopKInfo &topKInfo,
-    const bool isLargest)
+__aicore__ inline void TopKNSmallCompute(
+    const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
+    const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const LocalTensor<T>& tmpLocal,
+    const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest)
 {
     CastIdxTypeToValType<T, isInitIndex>(
         srcIndexLocal, tmpLocal, tilling, topKInfo, tilling.allDataSize, tilling.topkNSmallSrcIndexOffset);
@@ -437,20 +416,20 @@ __aicore__ inline void TopKNSmallCompute(const LocalTensor<T> &dstValueLocal, co
     }
 }
 
-__aicore__ inline void CopyData(LocalTensor<int32_t> indexLocalTmp, const TopKInfo &topKInfo)
+__aicore__ inline void CopyData(LocalTensor<int32_t> indexLocalTmp, const TopKInfo& topKInfo)
 {
     SetMaskNorm();
     ResetMask();
     SetVectorMask<int32_t>(topKInfo.inner);
     const UnaryRepeatParams unaryParams = {1, 1, 4, 0};
-    Adds<int32_t, false>(indexLocalTmp[topKInfo.inner], indexLocalTmp, 0, MASK_PLACEHOLDER, topKInfo.outter - 1, 
-        unaryParams);
+    Adds<int32_t, false>(
+        indexLocalTmp[topKInfo.inner], indexLocalTmp, 0, MASK_PLACEHOLDER, topKInfo.outter - 1, unaryParams);
     PipeBarrier<PIPE_V>();
 }
 
-}  // namespace AscendC
+} // namespace AscendC
 
-#endif  // IMPL_SORT_TOPK_TOPK_V200_IMPL_H
+#endif // IMPL_SORT_TOPK_TOPK_V200_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SORT_TOPK_TOPK_V200_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

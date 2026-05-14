@@ -14,7 +14,7 @@
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/api_check/kernel_check/utils/init_global_memory/init_global_memory_check_common.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/utils/init_global_memory.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/api_check/kernel_check/utils/init_global_memory/init_global_memory_check_common.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/utils/init_global_memory.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_INIT_GLOBAL_MEMORY_CHECK_COMMON_H__
 #endif

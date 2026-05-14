@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/utils/l0c2out_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -109,8 +109,9 @@ __aicore__ inline constexpr QuantMode_t GetQuantMode()
     constexpr bool isScalar = Std::is_same_v<S, uint64_t>;
 
     if constexpr (roundMode == RoundMode::HYBRID) {
-        static_assert((IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, hifloat8_t>),
-                      "Only when L0CType is float and output Type is hifloat8_t support RoundMode::HYBRID in Fixpipe");
+        static_assert(
+            (IsOneOfAttrV<srcType, float> && IsOneOfAttrV<dstType, hifloat8_t>),
+            "Only when L0CType is float and output Type is hifloat8_t support RoundMode::HYBRID in Fixpipe");
     }
     if constexpr (isTensor) {
         return GetVectorQuantMode<roundMode, dstType, srcType>();
@@ -121,18 +122,17 @@ __aicore__ inline constexpr QuantMode_t GetQuantMode()
     }
 }
 
-
 class SetRegisterInstr {
 public:
-    __aicore__ inline static void SetRegister(uint64_t quant, uint32_t ndNum, uint32_t dstNDStride,
-                                              uint32_t srcNDStride)
+    __aicore__ inline static void SetRegister(
+        uint64_t quant, uint32_t ndNum, uint32_t dstNDStride, uint32_t srcNDStride)
     {
         SetQuantPre(quant);
         SetLoop3Para<uint64_t>(ndNum, dstNDStride, srcNDStride);
     }
 
-    __aicore__ inline static void SetRegister(uint64_t quant, uint32_t dnNum, uint32_t dstDNStride,
-                                              uint32_t srcNZMatrixStride, uint32_t srcNZC0Stride)
+    __aicore__ inline static void SetRegister(
+        uint64_t quant, uint32_t dnNum, uint32_t dstDNStride, uint32_t srcNZMatrixStride, uint32_t srcNZC0Stride)
     {
         SetQuantPre(quant);
         SetLoop3Para<uint64_t>(dnNum, dstDNStride, srcNZMatrixStride);
@@ -140,10 +140,12 @@ public:
     }
 
     __aicore__ inline static void SetRegister(uint32_t ndNum, uint32_t dstNDStride, uint32_t srcNDStride)
-    { SetLoop3Para<uint64_t>(ndNum, dstNDStride, srcNDStride); }
+    {
+        SetLoop3Para<uint64_t>(ndNum, dstNDStride, srcNDStride);
+    }
 
-    __aicore__ inline static void SetRegister(uint32_t dnNum, uint32_t dstDNStride, uint32_t srcNZMatrixStride,
-                                              uint32_t srcNZC0Stride)
+    __aicore__ inline static void SetRegister(
+        uint32_t dnNum, uint32_t dstDNStride, uint32_t srcNZMatrixStride, uint32_t srcNZC0Stride)
     {
         SetLoop3Para<uint64_t>(dnNum, dstDNStride, srcNZMatrixStride);
         SetChannelPara<uint64_t>(srcNZC0Stride);
@@ -219,7 +221,6 @@ __aicore__ inline void InsertSync()
         asc_sync_pipe(PIPE_FIX);
     }
 }
-
 
 template <typename T, typename U>
 __aicore__ inline static void SetRegisterImpl(const T& /*dst*/, const U& /*src*/)

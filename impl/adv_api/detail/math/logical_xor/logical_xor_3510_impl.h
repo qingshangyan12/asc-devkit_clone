@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/math/logical_xor/logical_xor_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/logical_xor.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/math/logical_xor/logical_xor_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/logical_xor.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOGICAL_XOR_LOGICAL_XOR_C310_IMPL_H__
 #endif

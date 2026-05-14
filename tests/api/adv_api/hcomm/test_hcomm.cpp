@@ -70,14 +70,8 @@ Channel GetChannel()
 
 class HcommCommonTestSuite : public testing::Test {
 protected:
-    virtual void SetUp()
-    {
-        blockIdxBak_ = block_idx;
-    }
-    virtual void TearDown()
-    {
-        block_idx = blockIdxBak_;
-    }
+    virtual void SetUp() { blockIdxBak_ = block_idx; }
+    virtual void TearDown() { block_idx = blockIdxBak_; }
 
 private:
     int64_t blockIdxBak_;

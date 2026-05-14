@@ -1,24 +1,19 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include <algorithm>
 #include "nhr_base.h"
 
 namespace ops_hccl {
-NHRBase::NHRBase()
-    : AlgTemplateBase()
-{
-}
+NHRBase::NHRBase() : AlgTemplateBase() {}
 
-NHRBase::~NHRBase()
-{
-}
+NHRBase::~NHRBase() {}
 
 void NHRBase::GetRankMapping(const u32 rankSize, bool keepOrder)
 {
@@ -77,7 +72,7 @@ void NHRBase::GetRankMapping(const u32 rankSize, bool keepOrder)
     return;
 }
 
-void NHRBase::ReorderSequence(u32 start, u32 end, u32 len, std::vector<u32> &tree, std::vector<u32> &tmp) const
+void NHRBase::ReorderSequence(u32 start, u32 end, u32 len, std::vector<u32>& tree, std::vector<u32>& tmp) const
 {
     const u32 DIVIDE_TWO = 2;
 
@@ -101,4 +96,4 @@ u32 NHRBase::GetStepNumInterServer(u32 rankSize) const
 
     return nSteps;
 }
-}   // ~~ namespace ops_hccl
+} // namespace ops_hccl

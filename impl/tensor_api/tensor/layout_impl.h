@@ -1,15 +1,15 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/tensor/layout_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -48,13 +48,14 @@ struct DiffOp {
 };
 
 template <typename Coord, typename LayoutType>
-__aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const LayoutType& layout) 
+__aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const LayoutType& layout)
 {
     using ShapeType = Std::remove_cvref_t<decltype(layout.Shape())>;
     using CoordType = Std::remove_cvref_t<Coord>;
     static_assert(IsLayoutV<LayoutType> && Std::is_tuple_v<CoordType>, "LayoutType must be Layout");
-    static_assert(NestingDepthV<ShapeType> == NestingDepthV<CoordType> && 
-        Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>, 
+    static_assert(
+        NestingDepthV<ShapeType> == NestingDepthV<CoordType> &&
+            Std::tuple_size_v<ShapeType> == Std::tuple_size_v<CoordType>,
         "Shape and coord must have same tuple structure");
     auto coordShape = TransformTupleApply(layout.Shape(), coord, DiffOp{});
     using TraitType = GetLayoutTrait<LayoutType>;
@@ -63,21 +64,23 @@ __aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const Layou
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!IsLayoutV<SliceShape>, int> = 0>
-__aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape) 
+__aicore__ inline decltype(auto) MakeSliceLayout(
+    const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     static_assert(IsLayoutV<LayoutType>, "LayoutType must be Layout");
-    static_assert(Std::is_tuple_v<SliceShape>,"SliceShape must be a tuple");
+    static_assert(Std::is_tuple_v<SliceShape>, "SliceShape must be a tuple");
     static_assert(NestingDepthV<SliceShape> == TWO_DIM_DATA, "Only Support Two Dim SliceShape");
     using OriginShape = Std::remove_cvref_t<decltype(layout.Shape())>;
-    if constexpr (NestingDepthV<SliceShape> == NestingDepthV<OriginShape>	 
-        && Std::tuple_size_v<SliceShape> == Std::tuple_size_v<OriginShape>) {
+    if constexpr (
+        NestingDepthV<SliceShape> == NestingDepthV<OriginShape> &&
+        Std::tuple_size_v<SliceShape> == Std::tuple_size_v<OriginShape>) {
         auto srcRow = Std::get<0>(layout.Shape()) - Std::get<0>(coord);
         auto srcCol = Std::get<1>(layout.Shape()) - Std::get<1>(coord);
-        auto realRow = Std::min(srcRow, Std::get<0>(sliceShape));	 
+        auto realRow = Std::min(srcRow, Std::get<0>(sliceShape));
         auto realCol = Std::min(srcCol, Std::get<1>(sliceShape));
         using TraitType = GetLayoutTrait<LayoutType>;
         using PatternType = GetLayoutPattern<LayoutType>;
-        return MakePatternLayout<PatternType, TraitType>(MakeShape(realRow, realCol), layout.Stride());	 
+        return MakePatternLayout<PatternType, TraitType>(MakeShape(realRow, realCol), layout.Stride());
     } else {
         static_assert(NestingDepthV<OriginShape> == FOUR_DIM_DATA, "Only Support Four Dim Layout");
         auto innerRow = Std::get<0>(GetShape<0>(layout));
@@ -86,20 +89,22 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const Layou
         auto srcRow = innerRow * Std::get<1>(GetShape<0>(layout)) - Std::get<0>(coord);
         auto srcCol = innerCol * Std::get<1>(GetShape<1>(layout)) - Std::get<1>(coord);
 
-        auto realRow = Std::min(srcRow, Std::get<0>(sliceShape));	 
+        auto realRow = Std::min(srcRow, Std::get<0>(sliceShape));
         auto realCol = Std::min(srcCol, Std::get<1>(sliceShape));
         using TraitType = GetLayoutTrait<LayoutType>;
         using PatternType = GetLayoutPattern<LayoutType>;
-        return MakePatternLayout<PatternType, TraitType>(MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride());
+        return MakePatternLayout<PatternType, TraitType>(
+            MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol)), layout.Stride());
     }
 }
 
-template <typename Coord, typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<IsLayoutV<DstLayoutType>, int> = 0>
-__aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const SrcLayoutType& srcLayout, const DstLayoutType& dstLayout) 
+template <
+    typename Coord, typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<IsLayoutV<DstLayoutType>, int> = 0>
+__aicore__ inline decltype(auto) MakeSliceLayout(
+    const Coord& coord, const SrcLayoutType& srcLayout, const DstLayoutType& dstLayout)
 {
     static_assert(IsLayoutV<SrcLayoutType>, "SrcLayoutType must be Layout");
-    static_assert(SrcLayoutType::rank == DstLayoutType::rank,
-        "SrcLayout Rank must be equal to DstLayout Rank");
+    static_assert(SrcLayoutType::rank == DstLayoutType::rank, "SrcLayout Rank must be equal to DstLayout Rank");
 
     auto sliceLayout = MakeCoordLayout(coord, srcLayout);
     auto sliceShape = TransformTupleApply(sliceLayout.Shape(), dstLayout.Shape(), MinOp{});

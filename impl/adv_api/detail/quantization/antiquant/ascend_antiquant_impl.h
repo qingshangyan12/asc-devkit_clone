@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/quantization/antiquant/ascend_antiquant_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/quantization/ascend_antiquant.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/quantization/antiquant/ascend_antiquant_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/quantization/ascend_antiquant.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_IMPL_H__
 #endif
@@ -110,7 +110,7 @@ __aicore__ inline void AntiQuantOuterLoop(
 
         UnaryRepeatParams unaryParamsFP32ToDst; // FP32 -> BF16
         unaryParamsFP32ToDst.dstRepStride = HALF_DEFAULT_REPEAT_STRIDE;
-        UnaryRepeatParams unaryParamsToFP32; // FP16 -> FP32
+        UnaryRepeatParams unaryParamsToFP32;    // FP16 -> FP32
         unaryParamsToFP32.srcRepStride = HALF_DEFAULT_REPEAT_STRIDE;
 
         for (uint32_t i = 0; i < loopCount; i++) {

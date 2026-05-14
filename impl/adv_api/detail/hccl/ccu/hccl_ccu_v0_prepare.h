@@ -23,7 +23,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllToAllV(
     __gm__ CommonPrepareParamCcu* commParam, __gm__ AlltoAllVParamCcu* allToAllVParam)
 {
-    xnData_[0] = GetOpId(commParam); // ccu xn0
+    xnData_[0] = GetOpId(commParam);                    // ccu xn0
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * DATA_TYPE_MAP[commParam->dataType];
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
@@ -42,7 +42,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     __gm__ CommonPrepareParamCcu* commParam)
 {
     uint64_t dataSize = DATA_TYPE_MAP[commParam->dataType];
-    xnData_[0] = GetOpId(commParam); // ccu xn0
+    xnData_[0] = GetOpId(commParam);                    // ccu xn0
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
@@ -61,7 +61,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllToAllVWrite(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    xnData_[0] = GetOpId(commParam); // ccu xn0
+    xnData_[0] = GetOpId(commParam);                    // ccu xn0
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * DATA_TYPE_MAP[commParam->dataType];
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
@@ -90,7 +90,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduce(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    xnData_[0] = GetOpId(commParam); // ccu xn0
+    xnData_[0] = GetOpId(commParam);                    // ccu xn0
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * DATA_TYPE_MAP[commParam->dataType];
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2

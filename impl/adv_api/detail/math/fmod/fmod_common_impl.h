@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/math/fmod/fmod_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/fmod.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/math/fmod/fmod_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/fmod.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FMOD_FMOD_COMMON_IMPL_H__
 #endif
@@ -99,7 +99,7 @@ __aicore__ inline void FmodImpl(
         8; // The corresponding maxLiveNodeCount for half is 8, extra is 3 * 2 + trunc 2.
     uint32_t bufferSize = sharedTmpBuffer.GetSize();
     uint32_t stackSize =
-        bufferSize / sizeof(T) / maxLiveNodeCount / ONE_BLK_SIZE * ONE_BLK_SIZE; // divided by how many counts
+        bufferSize / sizeof(T) / maxLiveNodeCount / ONE_BLK_SIZE * ONE_BLK_SIZE;     // divided by how many counts
     CheckTmpBufferSize(stackSize, 0, bufferSize);
     stackSize = stackSize > src0Tensor.GetSize() ? src0Tensor.GetSize() : stackSize; // No more than localTensor
 

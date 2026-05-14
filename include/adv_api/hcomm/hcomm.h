@@ -82,7 +82,7 @@ public:
      */
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(HcommHandle handleId);
-    
+
     /*!
      * @class Hcomm
      * @brief Block Aicore and wait for the comm task of handleId to finish processing once.
@@ -93,6 +93,7 @@ public:
      */
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Wait(HcommHandle handleId);
+
 private:
     HcommImpl<commEngine, commProtocol> impl_;
 };

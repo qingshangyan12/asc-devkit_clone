@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/quantization/antiquant/ascend_antiquant_c220_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/quantization/ascend_antiquant.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/quantization/antiquant/ascend_antiquant_c220_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/quantization/ascend_antiquant.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_C220_IMPL_H__
 #endif
@@ -417,23 +417,23 @@ __aicore__ inline void CalcN64ByBrcb(
     GetAntiquantTensorInfo<DstType>(scale, stackBuffer, params);
 
     uint32_t n = K / ANTIQUANT_SINGLE_N_SIZE; // K = 64*n, means need n loop with each loop calculate 64*N
-    uint32_t numPerLoop = ANTIQUANT_SINGLE_N_SIZE * scaleEleNum; // scaleEle * 64
+    uint32_t numPerLoop = ANTIQUANT_SINGLE_N_SIZE * scaleEleNum;   // scaleEle * 64
 
-    UnaryRepeatParams unaryParamsSrc2Fp16; // int4 / int8 -> FP16
+    UnaryRepeatParams unaryParamsSrc2Fp16;                         // int4 / int8 -> FP16
     if constexpr (IsSameType<SrcType, int4b_t>::value) {
-        unaryParamsSrc2Fp16.srcRepStride = n;                 // 1 row = K(num) / 64(num per block) = n
-    } else {                                                  // int8_t
-        unaryParamsSrc2Fp16.srcRepStride = ANTIQUANT_TWO * n; // 1 row = K(num) / 32(num per block) = 2n
+        unaryParamsSrc2Fp16.srcRepStride = n;                      // 1 row = K(num) / 64(num per block) = n
+    } else {                                                       // int8_t
+        unaryParamsSrc2Fp16.srcRepStride = ANTIQUANT_TWO * n;      // 1 row = K(num) / 32(num per block) = 2n
     }
     unaryParamsSrc2Fp16.dstRepStride = HALF_DEFAULT_REPEAT_STRIDE; // stored continuous
     UnaryRepeatParams unaryParamsB16Fp32;                          // FP16 / BF16 -> FP32
     unaryParamsB16Fp32.srcRepStride = HALF_DEFAULT_REPEAT_STRIDE;  // continuous FP16 / BF16 to continuous FP32
 
-    BinaryRepeatParams binaryParams; // FP32 calculation
-    binaryParams.src1BlkStride = 0;  // same line for add and mul
-    binaryParams.src1RepStride = 1;  // one line for 64 num calculation
+    BinaryRepeatParams binaryParams;                               // FP32 calculation
+    binaryParams.src1BlkStride = 0;                                // same line for add and mul
+    binaryParams.src1RepStride = 1;                                // one line for 64 num calculation
 
-    UnaryRepeatParams unaryParamsFp322Dst; // FP32 -> half / bf16
+    UnaryRepeatParams unaryParamsFp322Dst;                         // FP32 -> half / bf16
     unaryParamsFp322Dst.dstRepStride = ANTIQUANT_SINGLE_N_SIZE * n / (ONE_BLK_SIZE / sizeof(DstType)); // 4 * n
 
     SetMaskCount();

@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file quantize.h
@@ -46,8 +46,9 @@ namespace AscendC {
  * \param [in] params: quantization parameter, see detail at QuantizeParams
  */
 template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void Quantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
-    const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
+__aicore__ inline void Quantize(
+    const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+    const QuantizeParams& params)
 {
     QuantizeImpl<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
 }
@@ -72,17 +73,18 @@ __aicore__ inline void Quantize(const LocalTensor<DstT>& dstTensor, const LocalT
  * \param [in] params: quantization parameter, see detail at QuantizeParams
  */
 template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void Quantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer, const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
+__aicore__ inline void Quantize(
+    const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
 {
     CheckTensorPosition(sharedTmpBuffer, "sharedTmpBuffer", "VECIN, VECOUT, VECCALC");
     QuantizeImpl<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
 }
 
 #pragma end_pipe
-}  // namespace AscendC
-#endif  // defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-#endif  // LIB_QUANTIZATION_QUANTIZE_H
+} // namespace AscendC
+#endif // defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#endif // LIB_QUANTIZATION_QUANTIZE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZE_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

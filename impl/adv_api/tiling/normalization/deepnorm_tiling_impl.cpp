@@ -23,8 +23,8 @@ constexpr uint32_t DEEPNORM_TWO_TIMES = 2;                       // normal const
 constexpr uint32_t DEEPNORM_MAX_REPEAT = 255;                    // uint8_t range [0, 255]
 constexpr float DEEPNORM_LAST_DIM_INIT_VALUE = 1.0;              // reciprocal base
 
-constexpr uint32_t BASIC_BLK_HLENGTH = 64; // basic block H must be 64
-constexpr uint32_t BASIC_BLK_BSLENGTH = 8; // basic block B*S must be divisible by 64
+constexpr uint32_t BASIC_BLK_HLENGTH = 64;                       // basic block H must be 64
+constexpr uint32_t BASIC_BLK_BSLENGTH = 8;                       // basic block B*S must be divisible by 64
 constexpr uint32_t DEEPNORM_HALF_SIZE = 2;
 constexpr uint32_t DEEPNORM_FLOAT_SIZE = 4;
 constexpr uint32_t DEEPNORM_SRC_DIM_NUM = 3;     // [B, S, H]
@@ -178,10 +178,10 @@ bool GetDeepNormTilingInfo(
     const uint32_t sLengthOri = static_cast<uint32_t>(shapeDimsOri[1]);
     const uint32_t originalHLength = static_cast<uint32_t>(shapeDimsOri[2]); // H before alignment
 
-    bool bsCheck = (bLength == bLengthOri) && (sLength == sLengthOri);     // check originb = b, origins = s
-    bool hAlign = (hLength * typeSize % ONE_BLK_SIZE) == 0;                // Hlength must align with 32 bytes
-    bool hCheckOri = (0u < originalHLength && originalHLength <= hLength); // oriHLength must be in range (0, Hlength]
-    bool basicblkOriH = !(isBasicBlock && originalHLength != hLength);     // when basicblock, it must be oriH = H
+    bool bsCheck = (bLength == bLengthOri) && (sLength == sLengthOri);       // check originb = b, origins = s
+    bool hAlign = (hLength * typeSize % ONE_BLK_SIZE) == 0;                  // Hlength must align with 32 bytes
+    bool hCheckOri = (0u < originalHLength && originalHLength <= hLength);   // oriHLength must be in range (0, Hlength]
+    bool basicblkOriH = !(isBasicBlock && originalHLength != hLength);       // when basicblock, it must be oriH = H
     bool hLengthCheck = (hLength <= DEEPNORM_MAX_REPEAT * 8); // one addimpl has uint8_t repeatStride = hLength / 8
 
     if (!(bsCheck && hAlign && hCheckOri && basicblkOriH && hLengthCheck)) {

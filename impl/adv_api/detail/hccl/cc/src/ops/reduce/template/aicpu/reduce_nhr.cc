@@ -1,23 +1,23 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "reduce_nhr.h"
 
 namespace ops_hccl {
-ReduceNHR::ReduceNHR(const OpParam &param,
-    const u32 rankId,  // 传通信域的rankId，userRank
-    const std::vector<std::vector<u32>> &subCommRanks)
+ReduceNHR::ReduceNHR(
+    const OpParam& param,
+    const u32 rankId, // 传通信域的rankId，userRank
+    const std::vector<std::vector<u32>>& subCommRanks)
     : InsAlgTemplateBase(param, rankId, subCommRanks)
 {}
 
-ReduceNHR::~ReduceNHR()
-{}
+ReduceNHR::~ReduceNHR() {}
 
 void ReduceNHR::SetRoot(u32 root) const
 {
@@ -26,7 +26,8 @@ void ReduceNHR::SetRoot(u32 root) const
 }
 
 HcclResult ReduceNHR::CalcRes(
-    HcclComm comm, const OpParam &param, const TopoInfoWithNetLayerDetails *topoInfo, AlgResourceRequest &resourceRequest)
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    AlgResourceRequest& resourceRequest)
 {
     u32 threadNum = 1;
     resourceRequest.slaveThreadNum = threadNum - 1;
@@ -36,12 +37,11 @@ HcclResult ReduceNHR::CalcRes(
     std::vector<HcclChannelDesc> level1Channels;
     CHK_RET(CalcChannelRequestNhr(comm, param, topoInfo, subCommRanks_, level1Channels));
     resourceRequest.channels.push_back(level1Channels);
-    HCCL_INFO("[ReduceMeshNHR][CalcRes]slaveThreadNum[%u] notifyNumPerThread[%u] notifyNumOnMainThread[%u]"
-              " level1Channels[%u] .",
-        resourceRequest.slaveThreadNum,
-        resourceRequest.notifyNumPerThread.size(),
-        resourceRequest.notifyNumOnMainThread,
-        level1Channels.size());
+    HCCL_INFO(
+        "[ReduceMeshNHR][CalcRes]slaveThreadNum[%u] notifyNumPerThread[%u] notifyNumOnMainThread[%u]"
+        " level1Channels[%u] .",
+        resourceRequest.slaveThreadNum, resourceRequest.notifyNumPerThread.size(),
+        resourceRequest.notifyNumOnMainThread, level1Channels.size());
     return HCCL_SUCCESS;
 }
 
@@ -53,7 +53,7 @@ u64 ReduceNHR::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType
 }
 
 HcclResult ReduceNHR::KernelRun(
-    const OpParam &param, const TemplateDataParams &tempAlgParams, const TemplateResource &templateResource)
+    const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
 {
     HCCL_INFO("[ReduceNHR] rank[%d] KernelRun start", myRank_);
     // 处理数据量为0的场景
@@ -68,23 +68,22 @@ HcclResult ReduceNHR::KernelRun(
     buffInfo_ = tempAlgParams.buffInfo;
 
     myIdx_ = getMyAlgRank();
-    CHK_PRT_RET(myIdx_ >= templateRankSize_,
-        HCCL_ERROR("[ReduceNHR] rank idx[%u] in virtRankMap is invalid, it should be less than rankSize[%u]",
-            myIdx_,
+    CHK_PRT_RET(
+        myIdx_ >= templateRankSize_,
+        HCCL_ERROR(
+            "[ReduceNHR] rank idx[%u] in virtRankMap is invalid, it should be less than rankSize[%u]", myIdx_,
             templateRankSize_),
         HcclResult::HCCL_E_INTERNAL);
     processSize_ = tempAlgParams.sliceSize;
     count_ = tempAlgParams.count;
     dataType_ = param.DataDes.dataType;
-    HCCL_INFO("[KernelRun] sliceSize: %u, count_: %u, typeSize: %u",
-        tempAlgParams.sliceSize,
-        count_,
+    HCCL_INFO(
+        "[KernelRun] sliceSize: %u, count_: %u, typeSize: %u", tempAlgParams.sliceSize, count_,
         DATATYPE_SIZE_TABLE[dataType_]);
 
-    const std::map<u32, std::vector<ChannelInfo>> &channels = templateResource.channels;
-    HCCL_DEBUG("[Kernel Run] myRank_[%u], channels.size():%u, channels first[%u]",
-        myRank_,
-        channels.size(),
+    const std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
+    HCCL_DEBUG(
+        "[Kernel Run] myRank_[%u], channels.size():%u, channels first[%u]", myRank_, channels.size(),
         channels.begin()->first);
 
     // 1. 切片
@@ -138,9 +137,9 @@ HcclResult ReduceNHR::CalcSlice(u64 dataSize)
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult ReduceNHR::PreCopy(const TemplateDataParams &tempAlgParams)
+HcclResult ReduceNHR::PreCopy(const TemplateDataParams& tempAlgParams)
 {
-    const BuffInfo &buffInfo = tempAlgParams.buffInfo;
+    const BuffInfo& buffInfo = tempAlgParams.buffInfo;
     const u64 sliceSize = tempAlgParams.sliceSize;
     // 单算子模式，需要先将数据拷贝到cclBuffer
     reduceInBuffType_ = BufferType::HCCL_BUFFER;
@@ -148,8 +147,8 @@ HcclResult ReduceNHR::PreCopy(const TemplateDataParams &tempAlgParams)
 
     if (buffInfo.inBuffType != BufferType::HCCL_BUFFER) {
         HCCL_INFO("[ReduceNHR][PreCopy] Opbase copy from userIn to scratchBuffer");
-        void *const src = static_cast<void *>(static_cast<u8 *>(buffInfo.inputPtr) + buffInfo.inBuffBaseOff);
-        void *const dst = static_cast<void *>(static_cast<u8 *>(buffInfo.hcclBuff.addr) + buffInfo.hcclBuffBaseOff);
+        void* const src = static_cast<void*>(static_cast<u8*>(buffInfo.inputPtr) + buffInfo.inBuffBaseOff);
+        void* const dst = static_cast<void*>(static_cast<u8*>(buffInfo.hcclBuff.addr) + buffInfo.hcclBuffBaseOff);
         CHK_RET(static_cast<HcclResult>(HcommLocalCopyOnThread(thread_, dst, src, sliceSize)));
         reduceInBuffBaseOff_ = buffInfo.hcclBuffBaseOff;
     } else {
@@ -162,7 +161,7 @@ HcclResult ReduceNHR::PreCopy(const TemplateDataParams &tempAlgParams)
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult ReduceNHR::RunReduce(const std::map<u32, std::vector<ChannelInfo>> &channels)
+HcclResult ReduceNHR::RunReduce(const std::map<u32, std::vector<ChannelInfo>>& channels)
 {
     HCCL_INFO("[ReduceNHR][RunReduce] start");
     std::vector<AicpuNHRStepInfo> stepInfoList;
@@ -170,16 +169,13 @@ HcclResult ReduceNHR::RunReduce(const std::map<u32, std::vector<ChannelInfo>> &c
 
     u64 dataTypeSize = DATATYPE_SIZE_TABLE[dataType_];
 
-    for (const auto &stepInfo : stepInfoList) {
-        HCCL_DEBUG("[ReduceNHR][RunReduce] step[%u], myRank[%u], toRank[%u], fromRank[%u], nSlices[%u].",
-            stepInfo.step,
-            stepInfo.myRank,
-            stepInfo.toRank,
-            stepInfo.fromRank,
-            stepInfo.nSlices);
+    for (const auto& stepInfo : stepInfoList) {
+        HCCL_DEBUG(
+            "[ReduceNHR][RunReduce] step[%u], myRank[%u], toRank[%u], fromRank[%u], nSlices[%u].", stepInfo.step,
+            stepInfo.myRank, stepInfo.toRank, stepInfo.fromRank, stepInfo.nSlices);
 
-        const ChannelInfo &channelRecv = channels.at(subCommRanks_.at(0).at(stepInfo.fromRank)).at(0);
-        const ChannelInfo &channelSend = channels.at(subCommRanks_.at(0).at(stepInfo.toRank)).at(0);
+        const ChannelInfo& channelRecv = channels.at(subCommRanks_.at(0).at(stepInfo.fromRank)).at(0);
+        const ChannelInfo& channelSend = channels.at(subCommRanks_.at(0).at(stepInfo.toRank)).at(0);
 
         std::vector<DataSlice> txSrcSlices;
         std::vector<DataSlice> txDstSlices;
@@ -204,15 +200,15 @@ HcclResult ReduceNHR::RunReduce(const std::map<u32, std::vector<ChannelInfo>> &c
         SendRecvReduceInfo sendRecvReduceInfo{
             {channelSend, channelRecv}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}, dataType_, reduceOp_};
 
-        CHK_PRT_RET(SendRecvWriteReduce(sendRecvReduceInfo, thread_),
-            HCCL_ERROR("[ReduceNHR] RunReduce SendRecvReduce failed"),
+        CHK_PRT_RET(
+            SendRecvWriteReduce(sendRecvReduceInfo, thread_), HCCL_ERROR("[ReduceNHR] RunReduce SendRecvReduce failed"),
             HcclResult::HCCL_E_INTERNAL);
     }
 
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult ReduceNHR::RunGather(const std::map<u32, std::vector<ChannelInfo>> &channels)
+HcclResult ReduceNHR::RunGather(const std::map<u32, std::vector<ChannelInfo>>& channels)
 {
     u64 dataTypeSize = DATATYPE_SIZE_TABLE[dataType_];
 
@@ -221,8 +217,8 @@ HcclResult ReduceNHR::RunGather(const std::map<u32, std::vector<ChannelInfo>> &c
         AicpuNHRStepInfo stepInfo;
         CHK_RET(GetStepInfo(step, nSteps, stepInfo));
 
-        const ChannelInfo &channelRecv = channels.at(subCommRanks_.at(0).at(stepInfo.fromRank)).at(0);
-        const ChannelInfo &channelSend = channels.at(subCommRanks_.at(0).at(stepInfo.toRank)).at(0);
+        const ChannelInfo& channelRecv = channels.at(subCommRanks_.at(0).at(stepInfo.fromRank)).at(0);
+        const ChannelInfo& channelSend = channels.at(subCommRanks_.at(0).at(stepInfo.toRank)).at(0);
 
         std::vector<DataSlice> txSrcSlices;
         std::vector<DataSlice> txDstSlices;
@@ -244,15 +240,15 @@ HcclResult ReduceNHR::RunGather(const std::map<u32, std::vector<ChannelInfo>> &c
         TxRxSlicesList sendRecvSlicesList({txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices});
 
         SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList);
-        CHK_PRT_RET(SendRecvWrite(sendRecvInfo, thread_),
-            HCCL_ERROR("[ReduceNHR] RunGather send/recv failed"),
+        CHK_PRT_RET(
+            SendRecvWrite(sendRecvInfo, thread_), HCCL_ERROR("[ReduceNHR] RunGather send/recv failed"),
             HcclResult::HCCL_E_INTERNAL);
     }
 
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult ReduceNHR::PostCopy(const TemplateDataParams &tempAlgParams) const
+HcclResult ReduceNHR::PostCopy(const TemplateDataParams& tempAlgParams) const
 {
     if (reduceOutBuffType_ == BufferType::HCCL_BUFFER) {
         HCCL_DEBUG("[ReduceNHR][PostCopy] skip postcopy rank[%d]", myRank_);
@@ -260,24 +256,24 @@ HcclResult ReduceNHR::PostCopy(const TemplateDataParams &tempAlgParams) const
         return HCCL_SUCCESS;
     }
     // PostCopy 仅在 OPBASE 并且在 root 上执行（root 收到完整结果后写回用户 out）
-    const BuffInfo &buffInfo = tempAlgParams.buffInfo;
+    const BuffInfo& buffInfo = tempAlgParams.buffInfo;
     if (myRank_ != root_) {
         HCCL_DEBUG("[ReduceNHR][PostCopy] not root, skip postcopy rank[%d]", myRank_);
         return HcclResult::HCCL_SUCCESS;
     }
 
     HCCL_INFO("[ReduceNHR][PostCopy] Opbase root copy from scratchBuffer to userOut");
-    void *const srcBasePtr =
+    void* const srcBasePtr =
         (reduceInBuffType_ == BufferType::HCCL_BUFFER) ? buffInfo.hcclBuff.addr : buffInfo.inputPtr;
-    void *const dstBasePtr = buffInfo.outputPtr;
-    void *const src = static_cast<void *>(static_cast<u8 *>(srcBasePtr) + reduceInBuffBaseOff_);
-    void *const dst = static_cast<void *>(static_cast<u8 *>(dstBasePtr) + reduceOutBuffBaseOff_);
+    void* const dstBasePtr = buffInfo.outputPtr;
+    void* const src = static_cast<void*>(static_cast<u8*>(srcBasePtr) + reduceInBuffBaseOff_);
+    void* const dst = static_cast<void*>(static_cast<u8*>(dstBasePtr) + reduceOutBuffBaseOff_);
     CHK_RET(static_cast<HcclResult>(HcommLocalCopyOnThread(thread_, dst, src, tempAlgParams.sliceSize)));
 
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult ReduceNHR::GetStepInfo(u32 step, u32 nSteps, AicpuNHRStepInfo &stepInfo) const
+HcclResult ReduceNHR::GetStepInfo(u32 step, u32 nSteps, AicpuNHRStepInfo& stepInfo) const
 {
     u32 rankIdx = myIdx_;
     stepInfo.txSliceIdxs.clear();
@@ -313,7 +309,7 @@ HcclResult ReduceNHR::GetStepInfo(u32 step, u32 nSteps, AicpuNHRStepInfo &stepIn
 }
 
 //  计算每轮收发的对端以及slice编号
-HcclResult ReduceNHR::GetStepInfoList(std::vector<AicpuNHRStepInfo> &stepInfoList) const
+HcclResult ReduceNHR::GetStepInfoList(std::vector<AicpuNHRStepInfo>& stepInfoList) const
 {
     // 将本 rank 号转换成算法使用的索引号
     u32 rankIdx = myIdx_;
@@ -333,7 +329,7 @@ HcclResult ReduceNHR::GetStepInfoList(std::vector<AicpuNHRStepInfo> &stepInfoLis
         u32 txSliceIdx = sendTo;
         u32 rxSliceIdx = rankIdx;
 
-        AicpuNHRStepInfo &currStepInfo = stepInfoList[step];
+        AicpuNHRStepInfo& currStepInfo = stepInfoList[step];
         currStepInfo.step = step;
         currStepInfo.myRank = rankIdx;
         currStepInfo.nSlices = nSlices;
@@ -355,7 +351,7 @@ HcclResult ReduceNHR::GetStepInfoList(std::vector<AicpuNHRStepInfo> &stepInfoLis
 }
 
 std::pair<std::vector<DataSlice>, std::vector<DataSlice>> ReduceNHR::getTxRxSlices(
-    const AicpuNHRStepInfo &stepInfo, const std::map<u32, std::vector<ChannelInfo>> &channels)
+    const AicpuNHRStepInfo& stepInfo, const std::map<u32, std::vector<ChannelInfo>>& channels)
 {
     std::vector<DataSlice> txSlices;
     std::vector<DataSlice> rxSlices;
@@ -369,22 +365,14 @@ std::pair<std::vector<DataSlice>, std::vector<DataSlice>> ReduceNHR::getTxRxSlic
         u64 txSize = sliceInfoVec_.at(txRank).at(0).size;
         u64 rxOffset = sliceInfoVec_.at(rxRank).at(0).offset + buffInfo_.hcclBuffBaseOff;
         u64 rxSize = sliceInfoVec_.at(rxRank).at(0).size;
-        void *const txAddr =
+        void* const txAddr =
             (txRank == myRank_) ? buffInfo_.hcclBuff.addr : channels.at(txRank).at(0).remoteCclMem.addr;
-        void *const rxAddr =
+        void* const rxAddr =
             (rxRank == myRank_) ? buffInfo_.hcclBuff.addr : channels.at(rxRank).at(0).remoteCclMem.addr;
-        HCCL_DEBUG("[getTxRxSlices] myRank:%u, i:%u, txRank:%u, txOffset:%u, txSize:%u, rxRank:%u,rxOffset:%u, "
-                   "rxSize:%u, txAddr:[%#llx], rxAddr:[%#llx]",
-            myRank_,
-            i,
-            txRank,
-            txOffset,
-            txSize,
-            rxRank,
-            rxOffset,
-            rxSize,
-            txAddr,
-            rxAddr);
+        HCCL_DEBUG(
+            "[getTxRxSlices] myRank:%u, i:%u, txRank:%u, txOffset:%u, txSize:%u, rxRank:%u,rxOffset:%u, "
+            "rxSize:%u, txAddr:[%#llx], rxAddr:[%#llx]",
+            myRank_, i, txRank, txOffset, txSize, rxRank, rxOffset, rxSize, txAddr, rxAddr);
 
         // 默认reduceInBuffType_为SCRATCH的场景
         txSlices.emplace_back(txAddr, txOffset, txSize, txSize / dataTypeSize);
@@ -402,15 +390,10 @@ u32 ReduceNHR::getMyAlgRank() const
     return static_cast<u32>(std::distance(subCommRanks_[0].begin(), iter));
 }
 
-void ReduceNHR::GetNotifyIdxMainToSub(std::vector<u32> &notifyIdxMainToSub)
-{}
+void ReduceNHR::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub) {}
 
-void ReduceNHR::GetNotifyIdxSubToMain(std::vector<u32> &notifyIdxSubToMain)
-{}
+void ReduceNHR::GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) {}
 
-u64 ReduceNHR::GetThreadNum() const
-{
-    return 1;
-}
+u64 ReduceNHR::GetThreadNum() const { return 1; }
 
-}  // namespace ops_hccl
+} // namespace ops_hccl

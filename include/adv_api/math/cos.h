@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file cos.h
@@ -43,13 +43,13 @@
 #define LIB_MATH_COS_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 
 #include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/cos/cos_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#elif defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "cos_utils.h"
 #include "../../../impl/adv_api/detail/math/cos/cos_3510_impl.h"
 #endif
@@ -57,8 +57,8 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 /*!
  * \ingroup Cos
  * \brief compute Cos elementwisely
@@ -75,9 +75,9 @@ namespace AscendC {
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template <typename T, bool isReuseSource = false, const CosConfig &config = defaultCosConfig>
-__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer)
+template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
+__aicore__ inline void Cos(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
     Cos<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, srcTensor.GetSize());
 }
@@ -98,9 +98,10 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template<typename T, bool isReuseSource = false, const CosConfig &config = defaultCosConfig>
-__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
+__aicore__ inline void Cos(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const uint32_t calCount)
 {
     CosImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
@@ -115,7 +116,7 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template <typename T, bool isReuseSource = false, const CosConfig &config = defaultCosConfig>
+template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
 __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Cos<T, isReuseSource, config>(dstTensor, srcTensor, srcTensor.GetSize());
@@ -132,9 +133,8 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template<typename T, bool isReuseSource = false, const CosConfig &config = defaultCosConfig>
-__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
+__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     CosImpl<T, isReuseSource, config>(dstTensor, srcTensor, calCount);
 }
@@ -156,8 +156,8 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * Input data valid range should be [-65504, 65504]
  */
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer)
+__aicore__ inline void Cos(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
     Cos<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcTensor.GetSize());
 }
@@ -179,8 +179,9 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * Input data valid range should be [-65504, 65504]
  */
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+__aicore__ inline void Cos(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const uint32_t calCount)
 {
     CosImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
@@ -213,19 +214,18 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * Input data valid range should be [-65504, 65504]
  */
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const uint32_t calCount)
+__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     CosImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 }
 #endif
 
 #pragma end_pipe
-}  // namespace AscendC
+} // namespace AscendC
 
 #endif
 
-#endif  // LIB_MATH_COS_H
+#endif // LIB_MATH_COS_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/npu_arch_3510/gm_to_l1/scaleb_nn2nn.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -71,9 +71,9 @@ private:
 
         uint8_t leftPaddingCnt = 0;
         uint8_t rightPaddingCnt = 0;
-        CopyGmToCbufAlignV2Base::CopyGmToCbufAlignV2((__cbuf__ half*)(dst.Data().Get()),
-                                                     (__gm__ half*)(src.Data().Get()), blockCount, blockLen,
-                                                     leftPaddingCnt, rightPaddingCnt, cacheMode, srcStride, dstStride);
+        CopyGmToCbufAlignV2Base::CopyGmToCbufAlignV2(
+            (__cbuf__ half*)(dst.Data().Get()), (__gm__ half*)(src.Data().Get()), blockCount, blockLen, leftPaddingCnt,
+            rightPaddingCnt, cacheMode, srcStride, dstStride);
     }
 };
 

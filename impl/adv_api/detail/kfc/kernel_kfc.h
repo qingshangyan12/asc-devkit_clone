@@ -78,7 +78,7 @@ public:
         if constexpr (MIX_NUM == 1) {
             mcgSyncSwitch = false;
         }
-        while (true) { // Get messages of each AIV core in polling mode.
+        while (true) {                           // Get messages of each AIV core in polling mode.
             TRACE_START(TraceId::KFC_SERVER_REV_MSG);
             if constexpr (enableHardPoll == 1) { // it's all sameAB
                 CrossCoreWaitFlag<KFC_INTRA_MODE, PIPE_S>(intraId);

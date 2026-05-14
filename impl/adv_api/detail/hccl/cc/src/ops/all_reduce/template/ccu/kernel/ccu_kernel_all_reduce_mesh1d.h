@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef HCCL_CCU_KERNEL_ALLREDUCE_MESH_1D_H
 #define HCCL_CCU_KERNEL_ALLREDUCE_MESH_1D_H
 
@@ -20,9 +20,11 @@
 namespace ops_hccl {
 class CcuKernelArgAllReduceMesh1D : public CcuKernelArg {
 public:
-    explicit CcuKernelArgAllReduceMesh1D(const std::vector<uint64_t> &dSize, uint32_t rId, const OpParam &opParam,
-        const std::vector<std::vector<uint32_t>> &tempVTopo) :
-            dimSize_(dSize), rankId_(rId), opParam_(opParam), tempVTopo_(tempVTopo) {}
+    explicit CcuKernelArgAllReduceMesh1D(
+        const std::vector<uint64_t>& dSize, uint32_t rId, const OpParam& opParam,
+        const std::vector<std::vector<uint32_t>>& tempVTopo)
+        : dimSize_(dSize), rankId_(rId), opParam_(opParam), tempVTopo_(tempVTopo)
+    {}
     CcuKernelSignature GetKernelSignature() const override
     {
         CcuKernelSignature signature;
@@ -37,9 +39,10 @@ public:
 
 class CcuTaskArgAllReduceMesh1D : public CcuTaskArg {
 public:
-    explicit CcuTaskArgAllReduceMesh1D(uint64_t inputAddr, uint64_t outputAddr, uint64_t sliceSize, uint64_t offSet,
-        uint64_t token) :
-        inputAddr_(inputAddr), outputAddr_(outputAddr), sliceSize_(sliceSize), offSet_(offSet), token_(token) {}
+    explicit CcuTaskArgAllReduceMesh1D(
+        uint64_t inputAddr, uint64_t outputAddr, uint64_t sliceSize, uint64_t offSet, uint64_t token)
+        : inputAddr_(inputAddr), outputAddr_(outputAddr), sliceSize_(sliceSize), offSet_(offSet), token_(token)
+    {}
 
     uint64_t inputAddr_;
     uint64_t outputAddr_;
@@ -50,14 +53,15 @@ public:
 
 class CcuKernelAllReduceMesh1D : public CcuKernelAlgBase {
 public:
-    CcuKernelAllReduceMesh1D(const hcomm::CcuKernelArg &arg);
+    CcuKernelAllReduceMesh1D(const hcomm::CcuKernelArg& arg);
     ~CcuKernelAllReduceMesh1D() override {}
 
     HcclResult Algorithm() override;
-    std::vector<uint64_t> GeneArgs(const CcuTaskArg &arg) override;
+    std::vector<uint64_t> GeneArgs(const CcuTaskArg& arg) override;
+
 private:
-    void RunBroadcast(std::vector<CcuRep::RemoteAddr> &dst, CcuRep::LocalAddr &src);
-    void RunReduce(CcuRep::LocalAddr &dst, std::vector<CcuRep::RemoteAddr> &src);
+    void RunBroadcast(std::vector<CcuRep::RemoteAddr>& dst, CcuRep::LocalAddr& src);
+    void RunReduce(CcuRep::LocalAddr& dst, std::vector<CcuRep::RemoteAddr>& src);
 
     uint64_t rankSize_{0};
     uint32_t rankId_{0};
@@ -72,6 +76,6 @@ private:
     GroupOpSize groupOpSizeV2_;
     std::vector<ChannelHandle> channels_;
 };
-}
+} // namespace ops_hccl
 
 #endif

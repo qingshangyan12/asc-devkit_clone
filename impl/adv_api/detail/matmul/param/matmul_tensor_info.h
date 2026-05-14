@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/matmul/param/matmul_tensor_info.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/matmul/param/matmul_tensor_info.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_PARAM_MATMUL_TENSOR_INFO_H__
 #endif
@@ -202,8 +202,8 @@ private:
 };
 
 template <const auto& MM_CFG, typename INPUT_TYPE>
-constexpr bool IsSparseMatmul = (INPUT_TYPE::TAG == InputTypeTag::B) && HasSparseIndex<INPUT_TYPE>() &&
-                                DoMatmulMDL(MM_CFG);
+constexpr bool IsSparseMatmul =
+    (INPUT_TYPE::TAG == InputTypeTag::B) && HasSparseIndex<INPUT_TYPE>() && DoMatmulMDL(MM_CFG);
 
 template <typename IMPL, const auto& MM_CFG, class INPUT_TYPE>
 class MatmulTensorInfo<

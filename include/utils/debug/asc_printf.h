@@ -60,7 +60,7 @@ __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args)
 {
     printf_impl(fmt, args...);
 }
-}
+} // namespace __asc_simd_vf
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__)

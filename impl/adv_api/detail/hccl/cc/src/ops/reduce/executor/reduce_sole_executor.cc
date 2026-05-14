@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "reduce_sole_executor.h"
 #include "../template/aicpu/reduce_mesh_1D.h"
 #include "../template/aicpu/reduce_nhr.h"
@@ -26,7 +26,7 @@ ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::ReduceSoleExecutor()
 
 template <typename AlgTopoMatch, typename AlgTemplate>
 HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::CalcAlgHierarchyInfo(
-    HcclComm comm, TopoInfoWithNetLayerDetails *topoInfo, AlgHierarchyInfoForAllLevel &algHierarchyInfo)
+    HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo)
 {
     // 使用topo match计算AlgHierarchyInfoForAllLevel
     AlgTopoMatch topoMatch;
@@ -35,11 +35,12 @@ HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::CalcAlgHierarchyInfo(
 }
 
 template <typename AlgTopoMatch, typename AlgTemplate>
-HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::CalcRes(HcclComm comm, const OpParam &param,
-    const TopoInfoWithNetLayerDetails *topoInfo, const AlgHierarchyInfoForAllLevel &algHierarchyInfo, AlgResourceRequest &resourceRequest)
+HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::CalcRes(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     // 构建template
-    const auto &topo = algHierarchyInfo.infos;
+    const auto& topo = algHierarchyInfo.infos;
     std::shared_ptr<AlgTemplate> algTemplate =
         std::make_shared<AlgTemplate>(param, topoInfo->userRank, algHierarchyInfo.infos[0]);
     // 调用计算资源的函数
@@ -49,7 +50,7 @@ HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::CalcRes(HcclComm comm,
 
 template <typename AlgTopoMatch, typename AlgTemplate>
 HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::Orchestrate(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx)
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[ReduceSoleExecutor][Orchestrate] Orchestrate Start channels: [%u]", resCtx.channels.size());
     // maxTmpMemSize_设定为cclIn的大小，op中将申请的HcclBuff全给了cclIn
@@ -66,7 +67,8 @@ HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::Orchestrate(
     dataSize_ = dataCount_ * dataTypeSize_;
 
     HcclResult ret = OrchestrateLoop(param, resCtx);
-    CHK_PRT_RET(ret != HCCL_SUCCESS,
+    CHK_PRT_RET(
+        ret != HCCL_SUCCESS,
         HCCL_ERROR(
             "[ReduceSoleExecutor][Orchestrate]errNo[0x%016llx] Reduce excutor kernel run failed", HCCL_ERROR_CODE(ret)),
         ret);
@@ -75,7 +77,7 @@ HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::Orchestrate(
 
 template <typename AlgTopoMatch, typename AlgTemplate>
 HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::OrchestrateLoop(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx)
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[ReduceSoleExecutor][OrchestrateLoop] Start");
     // 准备资源
@@ -121,14 +123,12 @@ HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::OrchestrateLoop(
     }
     // 单次循环处理的数据量大小
     u64 maxDataCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
-    HCCL_INFO("[ReduceSoleExecutor][OrchestrateOpbase] maxDataCountPerLoop[%llu], maxDataSizePerLoop[%llu], "
-              "transportBoundDataSize[%llu], templateScratchMultiplier[%llu]",
-        maxDataCountPerLoop,
-        maxDataSizePerLoop,
-        transportBoundDataSize,
-        templateScratchMultiplier);
-    CHK_PRT_RET(maxDataCountPerLoop == 0,
-        HCCL_ERROR("[ReduceSoleExecutor][OrchestrateOpbase] maxDataCountPerLoop is 0"),
+    HCCL_INFO(
+        "[ReduceSoleExecutor][OrchestrateOpbase] maxDataCountPerLoop[%llu], maxDataSizePerLoop[%llu], "
+        "transportBoundDataSize[%llu], templateScratchMultiplier[%llu]",
+        maxDataCountPerLoop, maxDataSizePerLoop, transportBoundDataSize, templateScratchMultiplier);
+    CHK_PRT_RET(
+        maxDataCountPerLoop == 0, HCCL_ERROR("[ReduceSoleExecutor][OrchestrateOpbase] maxDataCountPerLoop is 0"),
         HCCL_E_INTERNAL);
     // 计算loopTimes
     u64 loopTimes = dataCount_ / maxDataCountPerLoop + static_cast<u64>(dataCount_ % maxDataCountPerLoop != 0);
@@ -142,20 +142,17 @@ HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::OrchestrateLoop(
 
         tempAlgParams.sliceSize = currDataCount * dataTypeSize_;
         tempAlgParams.tailSize = tempAlgParams.sliceSize;
-        tempAlgParams.inputSliceStride = 0;           // 如果是输入，偏移是算子的output datasize
-        tempAlgParams.outputSliceStride = dataSize_;  // 如果是scratch buffer，偏移是单次循环处理的最大数据量
+        tempAlgParams.inputSliceStride = 0;          // 如果是输入，偏移是算子的output datasize
+        tempAlgParams.outputSliceStride = dataSize_; // 如果是scratch buffer，偏移是单次循环处理的最大数据量
 
-        HCCL_INFO("[ReduceSoleExecutor] loop [%u] tempAlgParams.inputSliceStride [%u],"
-                  "tempAlgParams.outputSliceStride [%u] tempAlgParams.sliceSize [%u]",
-            loop,
-            tempAlgParams.inputSliceStride,
-            tempAlgParams.outputSliceStride,
-            tempAlgParams.sliceSize);
-        HCCL_INFO("[ReduceSoleExecutor] loop [%u] tempAlgParams.buffInfo.inBuffBaseOff [%u],"
-                  "tempAlgParams.buffInfo.outBuffBaseOff [%u]",
-            loop,
-            tempAlgParams.buffInfo.inBuffBaseOff,
-            tempAlgParams.buffInfo.outBuffBaseOff);
+        HCCL_INFO(
+            "[ReduceSoleExecutor] loop [%u] tempAlgParams.inputSliceStride [%u],"
+            "tempAlgParams.outputSliceStride [%u] tempAlgParams.sliceSize [%u]",
+            loop, tempAlgParams.inputSliceStride, tempAlgParams.outputSliceStride, tempAlgParams.sliceSize);
+        HCCL_INFO(
+            "[ReduceSoleExecutor] loop [%u] tempAlgParams.buffInfo.inBuffBaseOff [%u],"
+            "tempAlgParams.buffInfo.outBuffBaseOff [%u]",
+            loop, tempAlgParams.buffInfo.inBuffBaseOff, tempAlgParams.buffInfo.outBuffBaseOff);
         // 不需要重复
         tempAlgParams.repeatNum = 1;
         tempAlgParams.inputRepeatStride = 0;
@@ -171,7 +168,8 @@ HcclResult ReduceSoleExecutor<AlgTopoMatch, AlgTemplate>::OrchestrateLoop(
 // 第二个参数是Reduce的template文件
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE, ReduceMesh1D, ReduceSoleExecutor, TopoMatch1D, ReduceMesh1D);
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE, ReduceNHR, ReduceSoleExecutor, TopoMatch1D, ReduceNHR);
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE, ReduceAicpuReduceNHR, ReduceSoleExecutor, TopoMatch1D, ReduceAicpuReduceNHR);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_REDUCE, ReduceAicpuReduceNHR, ReduceSoleExecutor, TopoMatch1D, ReduceAicpuReduceNHR);
 
 #ifndef AICPU_COMPILE
 REGISTER_EXEC_V2(
@@ -180,4 +178,4 @@ REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE, CcuReduceMesh1D, ReduceSoleExecut
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE, CcuReduceNHR1DMem2Mem, ReduceSoleExecutor, TopoMatch1D, CcuTempReduceNHR1DMem2Mem);
 #endif
-}  // namespace ops_hccl
+} // namespace ops_hccl

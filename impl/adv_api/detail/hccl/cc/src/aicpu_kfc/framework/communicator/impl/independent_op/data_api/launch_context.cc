@@ -1,17 +1,17 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "launch_context.h"
 #include "new/hccl_primitive_local.h"
 
-extern HcclResult CommTaskLaunch(ThreadHandle *threads, uint32_t threadNum); // host ffts+或aicpu stars使用"
-extern HcclResult CommTaskPrepare(char *key, uint32_t keyLen); // host ffts+使用
+extern HcclResult CommTaskLaunch(ThreadHandle* threads, uint32_t threadNum); // host ffts+或aicpu stars使用"
+extern HcclResult CommTaskPrepare(char* key, uint32_t keyLen);               // host ffts+使用
 
 void LaunchContext::AddThread(ThreadHandle thread)
 {
@@ -27,8 +27,9 @@ void LaunchContext::AddThread(ThreadHandle thread)
     }
 
     threadSet.insert(thread);
-    HCCL_INFO("[%s] AddThread end, launchTag[%s], launchMode[%d], thread[%lu].",
-        __func__, launchTag_.c_str(), static_cast<int32_t>(mode_), thread);
+    HCCL_INFO(
+        "[%s] AddThread end, launchTag[%s], launchMode[%d], thread[%lu].", __func__, launchTag_.c_str(),
+        static_cast<int32_t>(mode_), thread);
 }
 
 HcclResult LaunchContext::HandleEagerMode()
@@ -39,7 +40,7 @@ HcclResult LaunchContext::HandleEagerMode()
         return HCCL_SUCCESS;
     }
 
-    const auto &threadSet = it->second;
+    const auto& threadSet = it->second;
     if (threadSet.empty()) {
         HCCL_WARNING("[%s] launchTag[%s] has no threads.", __func__, launchTag_.c_str());
         return HCCL_SUCCESS;
@@ -47,12 +48,12 @@ HcclResult LaunchContext::HandleEagerMode()
 
     std::vector<ThreadHandle> threadVec(threadSet.begin(), threadSet.end());
     for (size_t i = 0; i < threadVec.size(); i++) {
-        HCCL_INFO("[%s] HandleEagerMode begin, launchTag[%s], launchMode[%d], thread[%lu].",
-            __func__, launchTag_.c_str(), static_cast<int32_t>(mode_), threadVec[i]);
+        HCCL_INFO(
+            "[%s] HandleEagerMode begin, launchTag[%s], launchMode[%d], thread[%lu].", __func__, launchTag_.c_str(),
+            static_cast<int32_t>(mode_), threadVec[i]);
     }
     return CommTaskLaunch(threadVec.data(), threadVec.size());
 }
-
 
 HcclResult LaunchContext::HandleClear()
 {
@@ -63,8 +64,8 @@ HcclResult LaunchContext::HandleClear()
     }
 
     launchModeMap_.erase(it);
-    HCCL_INFO("[%s] begin clear, launchTag[%s], launchMode[%d]",
-        __func__, launchTag_.c_str(), static_cast<int32_t>(mode_));
+    HCCL_INFO(
+        "[%s] begin clear, launchTag[%s], launchMode[%d]", __func__, launchTag_.c_str(), static_cast<int32_t>(mode_));
 
     DevType devType = DevType::DEV_TYPE_COUNT;
     hrtGetDeviceType(devType);
@@ -109,8 +110,9 @@ HcclResult LaunchContext::SetLaunchMode(const char* launchTag, HcommLaunchMode m
     // 统一处理 launchTag
     bool defaultTag = (launchTag == nullptr);
     launchTag_ = defaultTag ? "" : std::string(launchTag);
-    HCCL_INFO("[%s] SetLaunchMode begin, launchTag[%s], launchMode[%d].",
-        __func__, launchTag_.c_str(), static_cast<int32_t>(mode));
+    HCCL_INFO(
+        "[%s] SetLaunchMode begin, launchTag[%s], launchMode[%d].", __func__, launchTag_.c_str(),
+        static_cast<int32_t>(mode));
 
 #ifndef CCL_KERNEL_AICPU
     DevType devType = DevType::DEV_TYPE_COUNT;
@@ -143,4 +145,3 @@ HcclResult LaunchContext::SetLaunchMode(const char* launchTag, HcommLaunchMode m
             return HCCL_SUCCESS;
     }
 }
-

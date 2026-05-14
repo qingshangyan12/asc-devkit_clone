@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef HCCL_CCU_KERNEL_BROADCAST_NHR_1D_MEM2MEM_H
 #define HCCL_CCU_KERNEL_BROADCAST_NHR_1D_MEM2MEM_H
 
@@ -31,16 +31,15 @@ using NHRStepInfo = struct NHRStepInfo {
     std::vector<u32> txSliceIdxs;
     std::vector<u32> rxSliceIdxs;
 
-    NHRStepInfo() : nSlices(0)
-    {
-    }
+    NHRStepInfo() : nSlices(0) {}
 };
 
 class CcuKernelArgBroadcastNhr1DMem2Mem : public CcuKernelArg {
 public:
-    explicit CcuKernelArgBroadcastNhr1DMem2Mem(uint32_t rankId, uint32_t axisId, uint32_t axisSize, std::vector<uint32_t>& dimSize,
-                                                const std::vector<NHRStepInfo> stepInfoVector, const std::map<u32, u32> rank2ChannelIdx,
-                                                const OpParam& opParam, const std::vector<std::vector<uint32_t>>& subCommRanks)
+    explicit CcuKernelArgBroadcastNhr1DMem2Mem(
+        uint32_t rankId, uint32_t axisId, uint32_t axisSize, std::vector<uint32_t>& dimSize,
+        const std::vector<NHRStepInfo> stepInfoVector, const std::map<u32, u32> rank2ChannelIdx, const OpParam& opParam,
+        const std::vector<std::vector<uint32_t>>& subCommRanks)
         : rankId_(rankId),
           axisId_(axisId),
           axisSize_(axisSize),
@@ -49,8 +48,7 @@ public:
           rank2ChannelIdx_(rank2ChannelIdx),
           opParam_(opParam),
           subCommRanks_(subCommRanks)
-    {
-    }
+    {}
     CcuKernelSignature GetKernelSignature() const override
     {
         CcuKernelSignature signature;
@@ -58,25 +56,31 @@ public:
         return signature;
     }
 
-    uint32_t                                rankId_;
-    uint32_t                                axisId_;
-    uint32_t                                axisSize_;
-    std::vector<uint32_t>                   dimSize_;
-    std::vector<NHRStepInfo>                stepInfoVector_;
-    std::map<u32, u32>                      rank2ChannelIdx_;
-    OpParam                                 opParam_;
-    std::vector<std::vector<uint32_t>>      subCommRanks_;
+    uint32_t rankId_;
+    uint32_t axisId_;
+    uint32_t axisSize_;
+    std::vector<uint32_t> dimSize_;
+    std::vector<NHRStepInfo> stepInfoVector_;
+    std::map<u32, u32> rank2ChannelIdx_;
+    OpParam opParam_;
+    std::vector<std::vector<uint32_t>> subCommRanks_;
 };
 
 class CcuTaskArgBroadcastNhr1DMem2Mem : public CcuTaskArg {
 public:
-    explicit CcuTaskArgBroadcastNhr1DMem2Mem(uint64_t inputAddr, uint64_t outputAddr, uint64_t token,
-                                                uint64_t die0Size, uint64_t die1Size, uint64_t die0SliceSize, uint64_t die1SliceSize,
-                                                uint64_t die0LastSliceSize, uint64_t die1LastSliceSize)
-        : inputAddr_(inputAddr), outputAddr_(outputAddr), token_(token), die0Size_(die0Size), die1Size_(die1Size),
-        die0SliceSize_(die0SliceSize), die1SliceSize_(die1SliceSize), die0LastSliceSize_(die0LastSliceSize), die1LastSliceSize_(die1LastSliceSize)
-    {
-    }
+    explicit CcuTaskArgBroadcastNhr1DMem2Mem(
+        uint64_t inputAddr, uint64_t outputAddr, uint64_t token, uint64_t die0Size, uint64_t die1Size,
+        uint64_t die0SliceSize, uint64_t die1SliceSize, uint64_t die0LastSliceSize, uint64_t die1LastSliceSize)
+        : inputAddr_(inputAddr),
+          outputAddr_(outputAddr),
+          token_(token),
+          die0Size_(die0Size),
+          die1Size_(die1Size),
+          die0SliceSize_(die0SliceSize),
+          die1SliceSize_(die1SliceSize),
+          die0LastSliceSize_(die0LastSliceSize),
+          die1LastSliceSize_(die1LastSliceSize)
+    {}
 
     uint64_t inputAddr_;
     uint64_t outputAddr_;
@@ -91,11 +95,11 @@ public:
 
 class CcuKernelBroadcastNhr1DMem2Mem : public CcuKernelAlgBase {
 public:
-    CcuKernelBroadcastNhr1DMem2Mem(const CcuKernelArg &arg);
+    CcuKernelBroadcastNhr1DMem2Mem(const CcuKernelArg& arg);
     ~CcuKernelBroadcastNhr1DMem2Mem() override {}
 
     HcclResult Algorithm() override;
-    std::vector<uint64_t> GeneArgs(const CcuTaskArg &arg) override;
+    std::vector<uint64_t> GeneArgs(const CcuTaskArg& arg) override;
 
 private:
     HcclResult InitResources();
@@ -103,11 +107,11 @@ private:
     void PreSync();
     void LoadArgs();
     void DoScatterNHR();
-    void DoScatterNHRSingleStep(const NHRStepInfo &nhrStepInfo);
+    void DoScatterNHRSingleStep(const NHRStepInfo& nhrStepInfo);
     void DoAllGatherNHR();
-    void DoSendRecvSlice(const u32 &toRank, CcuRep::LocalAddr &src, CcuRep::RemoteAddr &dst,
-                         const u32 &sendSliceIdx, u32 signalIndex);
-    void DoAllGatherNHRSingleStep(const NHRStepInfo &nhrStepInfo);
+    void DoSendRecvSlice(
+        const u32& toRank, CcuRep::LocalAddr& src, CcuRep::RemoteAddr& dst, const u32& sendSliceIdx, u32 signalIndex);
+    void DoAllGatherNHRSingleStep(const NHRStepInfo& nhrStepInfo);
 
     // 构造函数
     uint32_t rankId_{0};
@@ -141,5 +145,5 @@ private:
     CcuRep::CompletedEvent event_;
 };
 
-}// namespace ops_hccl
+} // namespace ops_hccl
 #endif // HCCLV2_CCU_KERNEL_BROADCAST_NHR_1D_MEM2MEM_H

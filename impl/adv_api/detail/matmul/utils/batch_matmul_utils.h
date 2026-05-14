@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/matmul/utils/batch_matmul_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/matmul/utils/batch_matmul_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_BATCH_MATMUL_UTILS_H__
 #endif
@@ -36,14 +36,14 @@ constexpr bool IsBmmEnableScheduler =
      (A_TYPE::layout == LayoutMode::NORMAL && ToMatmulConfig(MM_CFG).batchMode == BatchMode::SINGLE_LARGE_THAN_L1));
 
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool IsBmmBatchScheduler = DoMatmulNorm(MM_CFG) &&
-                                     ((A_TYPE::layout != LayoutMode::NONE &&
-                                       ToMatmulConfig(MM_CFG).batchMode != BatchMode::SINGLE_LARGE_THAN_L1));
+constexpr bool IsBmmBatchScheduler =
+    DoMatmulNorm(MM_CFG) &&
+    ((A_TYPE::layout != LayoutMode::NONE && ToMatmulConfig(MM_CFG).batchMode != BatchMode::SINGLE_LARGE_THAN_L1));
 
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool IsBmmSingleScheduler = DoMatmulNorm(MM_CFG) &&
-                                      (A_TYPE::layout == LayoutMode::NORMAL &&
-                                       ToMatmulConfig(MM_CFG).batchMode == BatchMode::SINGLE_LARGE_THAN_L1);
+constexpr bool IsBmmSingleScheduler =
+    DoMatmulNorm(MM_CFG) &&
+    (A_TYPE::layout == LayoutMode::NORMAL && ToMatmulConfig(MM_CFG).batchMode == BatchMode::SINGLE_LARGE_THAN_L1);
 
 struct BatchOffsetInfo {
     int32_t modA;

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/npu_arch_3510/gm_to_l1/dn2nz.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -55,8 +55,7 @@ private:
         uint16_t srcRowShape = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
         uint32_t srcColShape = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
         auto srcColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-        uint16_t dstBColStride =
-            GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
+        uint16_t dstBColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
 
         uint16_t dnNum = 1;
         uint16_t nValue = srcRowShape;
@@ -78,8 +77,9 @@ private:
 
         uint8_t cacheMode = src.Engine().GetCacheMode();
 
-        CopyGmToCbufMultiDn2nzInstr::DataCopy(dst, src, dnNum, loop2DstStride, loop3DstStride, loop4DstStride,
-                                              loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, false);
+        CopyGmToCbufMultiDn2nzInstr::DataCopy(
+            dst, src, dnNum, loop2DstStride, loop3DstStride, loop4DstStride, loop1SrcStride, cacheMode, nValue, dValue,
+            loop4SrcStride, false);
     }
 };
 

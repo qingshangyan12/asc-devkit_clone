@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef HCCLV2_CCU_KERNEL_ALL_TO_ALL_MESH_2DIE_H_
 #define HCCLV2_CCU_KERNEL_ALL_TO_ALL_MESH_2DIE_H_
 
@@ -20,12 +20,18 @@ namespace ops_hccl {
 
 using RankId = u32;
 
-class CcuKernelArgAllToAllMesh2Die : public hcomm::CcuKernelArg{
+class CcuKernelArgAllToAllMesh2Die : public hcomm::CcuKernelArg {
 public:
-    CcuKernelArgAllToAllMesh2Die(uint64_t rankSize, uint32_t rankId, const OpParam &opParam,
-        const std::vector<std::vector<RankId>> &subCommRanks, bool withMyRank, const std::vector<RankId> &rankGroup)
-        : rankSize_(rankSize), rankId_(rankId), opParam_(opParam), subCommRanks_(subCommRanks), withMyRank_(withMyRank),
-          rankGroup_(rankGroup) {}
+    CcuKernelArgAllToAllMesh2Die(
+        uint64_t rankSize, uint32_t rankId, const OpParam& opParam,
+        const std::vector<std::vector<RankId>>& subCommRanks, bool withMyRank, const std::vector<RankId>& rankGroup)
+        : rankSize_(rankSize),
+          rankId_(rankId),
+          opParam_(opParam),
+          subCommRanks_(subCommRanks),
+          withMyRank_(withMyRank),
+          rankGroup_(rankGroup)
+    {}
     ~CcuKernelArgAllToAllMesh2Die() override {}
 
     hcomm::CcuKernelSignature GetKernelSignature() const override
@@ -45,10 +51,16 @@ public:
 
 class CcuTaskArgAllToAllMesh2Die : public hcomm::CcuTaskArg {
 public:
-    explicit CcuTaskArgAllToAllMesh2Die(uint64_t inputAddr, uint64_t outputAddr,
-        uint64_t token,  uint64_t sliceSize, uint64_t inputSliceStride, uint64_t outputSliceStride) :
-        inputAddr_(inputAddr), outputAddr_(outputAddr), token_(token), sliceSize_(sliceSize),
-        inputSliceStride_(inputSliceStride), outputSliceStride_(outputSliceStride){}
+    explicit CcuTaskArgAllToAllMesh2Die(
+        uint64_t inputAddr, uint64_t outputAddr, uint64_t token, uint64_t sliceSize, uint64_t inputSliceStride,
+        uint64_t outputSliceStride)
+        : inputAddr_(inputAddr),
+          outputAddr_(outputAddr),
+          token_(token),
+          sliceSize_(sliceSize),
+          inputSliceStride_(inputSliceStride),
+          outputSliceStride_(outputSliceStride)
+    {}
 
     uint64_t inputAddr_;
     uint64_t outputAddr_;
@@ -60,11 +72,11 @@ public:
 
 class CcuKernelAllToAllMesh2Die : public CcuKernelAlgBase {
 public:
-    CcuKernelAllToAllMesh2Die(const hcomm::CcuKernelArg &arg);
+    CcuKernelAllToAllMesh2Die(const hcomm::CcuKernelArg& arg);
     ~CcuKernelAllToAllMesh2Die() override {}
 
     HcclResult Algorithm() override;
-    std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
+    std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg& arg) override;
 
 private:
     HcclResult InitResources();
@@ -82,7 +94,7 @@ private:
     std::vector<hcomm::CcuRep::Variable> output_;
     std::vector<hcomm::CcuRep::Variable> token_;
     std::vector<ChannelHandle> channels_;
-    bool withMyRank_ = true;  // 发数据是否包含本rank
+    bool withMyRank_ = true; // 发数据是否包含本rank
     std::vector<RankId> rankGroup_;
     hcomm::CcuRep::Variable sliceSize_;
     hcomm::CcuRep::Variable inputSliceStride_;

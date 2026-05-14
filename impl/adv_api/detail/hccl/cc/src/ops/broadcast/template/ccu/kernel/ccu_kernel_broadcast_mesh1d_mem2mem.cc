@@ -1,36 +1,34 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ccu_kernel_broadcast_mesh1d_mem2mem.h"
 #include "ccu_kernel_alg_base.h"
 
 namespace ops_hccl {
 using namespace hcomm;
 
-constexpr int INPUT_XN_ID  = 0;
+constexpr int INPUT_XN_ID = 0;
 constexpr int OUTPUT_XN_ID = 1;
-constexpr int TOKEN_XN_ID  = 2;
-constexpr int CKE_IDX_0    = 0;
-constexpr int CKE_IDX_1    = 1;
-constexpr int CKE_IDX_3    = 3;
-constexpr int CKE_IDX_4    = 4;
+constexpr int TOKEN_XN_ID = 2;
+constexpr int CKE_IDX_0 = 0;
+constexpr int CKE_IDX_1 = 1;
+constexpr int CKE_IDX_3 = 3;
+constexpr int CKE_IDX_4 = 4;
 
-CcuKernelBroadcastMesh1DMem2Mem::CcuKernelBroadcastMesh1DMem2Mem(const CcuKernelArg &arg)
-    : CcuKernelAlgBase(arg)
+CcuKernelBroadcastMesh1DMem2Mem::CcuKernelBroadcastMesh1DMem2Mem(const CcuKernelArg& arg) : CcuKernelAlgBase(arg)
 {
-    const CcuKernelArgBroadcastMesh1DMem2Mem *kernelArg
-        = dynamic_cast<const CcuKernelArgBroadcastMesh1DMem2Mem *>(&arg);
-    rankId_         = kernelArg->rankId_;
-    rootId_         = kernelArg->rootId_;
-    rankSize_       = kernelArg->dimSize_;
-    channels_       = kernelArg->channels;
-    dataType_       = kernelArg->opParam_.DataDes.dataType;
+    const CcuKernelArgBroadcastMesh1DMem2Mem* kernelArg = dynamic_cast<const CcuKernelArgBroadcastMesh1DMem2Mem*>(&arg);
+    rankId_ = kernelArg->rankId_;
+    rootId_ = kernelArg->rootId_;
+    rankSize_ = kernelArg->dimSize_;
+    channels_ = kernelArg->channels;
+    dataType_ = kernelArg->opParam_.DataDes.dataType;
     outputDataType_ = kernelArg->opParam_.DataDes.outputType;
     if (outputDataType_ == HcclDataType::HCCL_DATA_TYPE_RESERVED) {
         outputDataType_ = dataType_;
@@ -38,7 +36,8 @@ CcuKernelBroadcastMesh1DMem2Mem::CcuKernelBroadcastMesh1DMem2Mem(const CcuKernel
             "[CcuKernelBroadcastMesh1DMem2Mem] outputDataType is [INVALID], set outputDataType to[%d]",
             outputDataType_);
     }
-    HCCL_INFO("[CcuKernelBroadcastMesh1DMem2Mem] Init, KernelArgs are rootId[%d] rankId[%u], rankSize_[%u], dataType[%d], "
+    HCCL_INFO(
+        "[CcuKernelBroadcastMesh1DMem2Mem] Init, KernelArgs are rootId[%d] rankId[%u], rankSize_[%u], dataType[%d], "
         "outputDataType[%d] channelsSize[%zu]",
         rootId_, rankId_, rankSize_, dataType_, outputDataType_, channels_.size());
 }
@@ -58,8 +57,8 @@ HcclResult CcuKernelBroadcastMesh1DMem2Mem::InitResource()
             output_.push_back(CreateVariable());
             token_.push_back(CreateVariable());
         } else {
-            HCCL_DEBUG("[CcuKernelBroadcastMesh1DMem2Mem] MyRank[%u], PeerId[%u], ChannelId[%u]",
-                       rankId_, peerId, channelIdx);
+            HCCL_DEBUG(
+                "[CcuKernelBroadcastMesh1DMem2Mem] MyRank[%u], PeerId[%u], ChannelId[%u]", rankId_, peerId, channelIdx);
             CcuRep::Variable inputVar, outputVar, tokenVar;
             CHK_RET(CreateVariable(channels_[channelIdx], INPUT_XN_ID, &inputVar));
             input_.push_back(inputVar);
@@ -70,16 +69,16 @@ HcclResult CcuKernelBroadcastMesh1DMem2Mem::InitResource()
             channelIdx++;
         }
     }
-    currentRankSliceInputOffset_  = CreateVariable();
+    currentRankSliceInputOffset_ = CreateVariable();
     currentRankSliceOutputOffset_ = CreateVariable();
-    inputRepeatStride_            = CreateVariable();
-    outputRepeatStride_           = CreateVariable();
-    normalSliceSize_              = CreateVariable();
-    lastSliceSize_                = CreateVariable();
-    allgatherOffset_              = CreateVariable();
-    repeatNumVar_                 = CreateVariable();
-    flag_                         = CreateVariable();
-    SliceOffset_                  = CreateVariable();
+    inputRepeatStride_ = CreateVariable();
+    outputRepeatStride_ = CreateVariable();
+    normalSliceSize_ = CreateVariable();
+    lastSliceSize_ = CreateVariable();
+    allgatherOffset_ = CreateVariable();
+    repeatNumVar_ = CreateVariable();
+    flag_ = CreateVariable();
+    SliceOffset_ = CreateVariable();
 
     scatterdstMem_.reserve(rankSize_);
     allgatherdstMem_.reserve(rankSize_);
@@ -121,7 +120,8 @@ void CcuKernelBroadcastMesh1DMem2Mem::PreSync()
     for (ChannelHandle channel : channels_) {
         HCCL_INFO("[CcuKernelBroadcastMesh1DMem2Mem] BroadcastMesh1D LocalPost begin");
         NotifyRecord(channel, CKE_IDX_0, INPUT_XN_ID, input_[rankId_], 1 << INPUT_XN_ID); // index = 1，传递input信息
-        NotifyRecord(channel, CKE_IDX_0, OUTPUT_XN_ID, output_[rankId_], 1 << OUTPUT_XN_ID); // index = 0，传递output信息
+        NotifyRecord(
+            channel, CKE_IDX_0, OUTPUT_XN_ID, output_[rankId_], 1 << OUTPUT_XN_ID); // index = 0，传递output信息
         NotifyRecord(channel, CKE_IDX_0, TOKEN_XN_ID, token_[rankId_], 1 << TOKEN_XN_ID); // index = 2，传递token信息
     }
     uint32_t allBit = 1 << INPUT_XN_ID | 1 << OUTPUT_XN_ID | 1 << TOKEN_XN_ID;
@@ -134,10 +134,10 @@ void CcuKernelBroadcastMesh1DMem2Mem::PreSync()
 
 void CcuKernelBroadcastMesh1DMem2Mem::PostSync(int CKE_id)
 {
-    for (auto &ch : channels_) {
+    for (auto& ch : channels_) {
         NotifyRecord(ch, CKE_IDX_0, 1 << CKE_id);
     }
-    for (auto &ch : channels_) {
+    for (auto& ch : channels_) {
         NotifyWait(ch, CKE_IDX_0, 1 << CKE_id);
     }
     HCCL_INFO("[CcuKernelBroadcastMesh1DMem2Mem] BroadcastMesh1D PostSync end");
@@ -149,8 +149,8 @@ void CcuKernelBroadcastMesh1DMem2Mem::DoRepeaScatterMem2Mem()
     if (rankId_ != rootId_) {
         return;
     }
-    HCCL_INFO("[CcuKernelBroadcastMesh1DMem2Mem][DoRepeaScatterMem2Mem]rankId[%u] rankSize[%u]",rankId_ , rankSize_);
-    std::vector<CcuRep::RemoteAddr> &dst = scatterdstMem_;
+    HCCL_INFO("[CcuKernelBroadcastMesh1DMem2Mem][DoRepeaScatterMem2Mem]rankId[%u] rankSize[%u]", rankId_, rankSize_);
+    std::vector<CcuRep::RemoteAddr>& dst = scatterdstMem_;
     for (uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
         if (rankIdx == 0) {
             SliceOffset_ = 0;
@@ -189,29 +189,26 @@ void CcuKernelBroadcastMesh1DMem2Mem::DoRepeaScatterMem2Mem()
     return;
 }
 
-void CcuKernelBroadcastMesh1DMem2Mem::DoScatter(const std::vector<CcuRep::RemoteAddr> &dst)
+void CcuKernelBroadcastMesh1DMem2Mem::DoScatter(const std::vector<CcuRep::RemoteAddr>& dst)
 {
     HCCL_INFO("[CcuKernelBroadcastMesh1DMem2Mem][DoScatter] DoScatter");
     uint64_t channelId = 0;
     for (uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
-        auto &sliceSize = (rankIdx + 1 == rankSize_) ? lastSliceSize_ : normalSliceSize_;
+        auto& sliceSize = (rankIdx + 1 == rankSize_) ? lastSliceSize_ : normalSliceSize_;
         event_.SetMask(1 << rankIdx);
         CCU_IF(sliceSize != 0)
         {
-            //rootid
+            // rootid
             if (rankIdx == rankId_) {
                 RecordEvent(event_);
             } else {
                 WriteNb(channels_[channelId], dst[rankIdx], scattersrcMem_[rankIdx], sliceSize, event_);
-                HCCL_INFO("[CcuKernelBroadcastMesh1DMem2Mem][DoScatter] channelsId[%llu] rankIdx[%u]",
-                            channelId, rankIdx);
+                HCCL_INFO(
+                    "[CcuKernelBroadcastMesh1DMem2Mem][DoScatter] channelsId[%llu] rankIdx[%u]", channelId, rankIdx);
                 channelId++;
             }
         }
-        CCU_IF(sliceSize == 0)
-        {
-            RecordEvent(event_);
-        }
+        CCU_IF(sliceSize == 0) { RecordEvent(event_); }
     }
 
     event_.SetMask((1 << rankSize_) - 1);
@@ -221,12 +218,12 @@ void CcuKernelBroadcastMesh1DMem2Mem::DoScatter(const std::vector<CcuRep::Remote
 
 void CcuKernelBroadcastMesh1DMem2Mem::DoRepeatAllGatherMem2Mem()
 {
-    CcuRep::LocalAddr              &src = myScatterDst_;
-    std::vector<CcuRep::RemoteAddr> &dst = allgatherdstMem_;
-    src.addr                            = output_[rankId_];
-    src.addr                           += currentRankSliceOutputOffset_;
-    src.addr                           += allgatherOffset_;
-    src.token                           = token_[rankId_];
+    CcuRep::LocalAddr& src = myScatterDst_;
+    std::vector<CcuRep::RemoteAddr>& dst = allgatherdstMem_;
+    src.addr = output_[rankId_];
+    src.addr += currentRankSliceOutputOffset_;
+    src.addr += allgatherOffset_;
+    src.token = token_[rankId_];
 
     for (uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
         if (rankIdx != rankId_) {
@@ -251,11 +248,11 @@ void CcuKernelBroadcastMesh1DMem2Mem::DoRepeatAllGatherMem2Mem()
     return;
 }
 
-void CcuKernelBroadcastMesh1DMem2Mem::DoAllGather(const CcuRep::LocalAddr             &src,
-                                                             const std::vector<CcuRep::RemoteAddr> &dst)
+void CcuKernelBroadcastMesh1DMem2Mem::DoAllGather(
+    const CcuRep::LocalAddr& src, const std::vector<CcuRep::RemoteAddr>& dst)
 {
     uint64_t channelId = 0;
-    auto    &sliceSize   = (rankId_ + 1 == rankSize_) ? lastSliceSize_ : normalSliceSize_;
+    auto& sliceSize = (rankId_ + 1 == rankSize_) ? lastSliceSize_ : normalSliceSize_;
     CCU_IF(sliceSize != 0)
     {
         for (uint64_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
@@ -281,7 +278,7 @@ HcclResult CcuKernelBroadcastMesh1DMem2Mem::Algorithm()
     PreSync();
 
     CcuRep::Variable repeatNumAdd = CreateVariable();
-    repeatNumAdd                  = 1;
+    repeatNumAdd = 1;
     flag_ = 0;
     CCU_WHILE(repeatNumVar_ != UINT64_MAX)
     {
@@ -298,22 +295,22 @@ HcclResult CcuKernelBroadcastMesh1DMem2Mem::Algorithm()
     return HCCL_SUCCESS;
 }
 
-std::vector<uint64_t> CcuKernelBroadcastMesh1DMem2Mem::GeneArgs(const CcuTaskArg &arg)
+std::vector<uint64_t> CcuKernelBroadcastMesh1DMem2Mem::GeneArgs(const CcuTaskArg& arg)
 {
-    const CcuTaskArgBroadcastMesh1DMem2Mem *taskArg = dynamic_cast<const CcuTaskArgBroadcastMesh1DMem2Mem *>(&arg);
-    uint64_t inputAddr  = taskArg->inputAddr_;
+    const CcuTaskArgBroadcastMesh1DMem2Mem* taskArg = dynamic_cast<const CcuTaskArgBroadcastMesh1DMem2Mem*>(&arg);
+    uint64_t inputAddr = taskArg->inputAddr_;
     uint64_t outputAddr = taskArg->outputAddr_;
-    uint64_t tokenInfo  = taskArg->token_;
+    uint64_t tokenInfo = taskArg->token_;
 
-    uint64_t              currentRankSliceInputOffset  = taskArg->inputSliceStride_ * rankId_;
-    uint64_t              currentRankSliceOutputOffset = taskArg->outputSliceStride_ * rankId_;
-    uint64_t              inputRepeatStride            = taskArg->inputRepeatStride_;
-    uint64_t              outputRepeatStride           = taskArg->outputRepeatStride_;
-    uint64_t              normalSliceSize              = taskArg->normalSliceSize_;
-    uint64_t              lastSliceSize                = taskArg->lastSliceSize_;
-    uint64_t              allgatherOffset              = taskArg->normalSliceSize_ * rankId_;
-    uint64_t              repeatNumVar                 = taskArg->repeatNumVar_;
-    std::vector<uint64_t> taskArgs                     = {
+    uint64_t currentRankSliceInputOffset = taskArg->inputSliceStride_ * rankId_;
+    uint64_t currentRankSliceOutputOffset = taskArg->outputSliceStride_ * rankId_;
+    uint64_t inputRepeatStride = taskArg->inputRepeatStride_;
+    uint64_t outputRepeatStride = taskArg->outputRepeatStride_;
+    uint64_t normalSliceSize = taskArg->normalSliceSize_;
+    uint64_t lastSliceSize = taskArg->lastSliceSize_;
+    uint64_t allgatherOffset = taskArg->normalSliceSize_ * rankId_;
+    uint64_t repeatNumVar = taskArg->repeatNumVar_;
+    std::vector<uint64_t> taskArgs = {
         inputAddr,
         outputAddr,
         tokenInfo,
@@ -327,12 +324,13 @@ std::vector<uint64_t> CcuKernelBroadcastMesh1DMem2Mem::GeneArgs(const CcuTaskArg
         repeatNumVar,
     };
 
-    HCCL_INFO("[CcuKernelBroadcastMesh1DMem2Mem] TaskArgs: inputAddr[%llx], outputAddr[%llx], "
-              "currentRankSliceInputOffset[%llu], "
-              "currentRankSliceOutputOffset[%llu], inputRepeatStride[%llu], outputRepeatStride[%llu], "
-              "normalSliceSize[%llu], lastSliceSize[%llu], allgatherSliceSize[%llu], repeatNumVar[%llu] ",
-              inputAddr, outputAddr, currentRankSliceInputOffset, currentRankSliceOutputOffset, inputRepeatStride,
-              outputRepeatStride, normalSliceSize, lastSliceSize, allgatherOffset, repeatNumVar);
+    HCCL_INFO(
+        "[CcuKernelBroadcastMesh1DMem2Mem] TaskArgs: inputAddr[%llx], outputAddr[%llx], "
+        "currentRankSliceInputOffset[%llu], "
+        "currentRankSliceOutputOffset[%llu], inputRepeatStride[%llu], outputRepeatStride[%llu], "
+        "normalSliceSize[%llu], lastSliceSize[%llu], allgatherSliceSize[%llu], repeatNumVar[%llu] ",
+        inputAddr, outputAddr, currentRankSliceInputOffset, currentRankSliceOutputOffset, inputRepeatStride,
+        outputRepeatStride, normalSliceSize, lastSliceSize, allgatherOffset, repeatNumVar);
     return taskArgs;
 }
 

@@ -36,7 +36,7 @@ constexpr int32_t SUCCESS = 0;
 class AscendcCodeHidden {
 public:
     AscendcCodeHidden(string srcDirPath, string resultFilePath)
-        : srcDirPath_(srcDirPath), resultFilePath_(resultFilePath) {};
+        : srcDirPath_(srcDirPath), resultFilePath_(resultFilePath){};
     ~AscendcCodeHidden();
 
     int32_t Init();
@@ -63,5 +63,5 @@ private:
     char fileData_[TEMP_BUFFER_SIZE];
 };
 
-}  // namespace CodeHidden
+} // namespace CodeHidden
 #endif

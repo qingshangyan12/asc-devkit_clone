@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/activation/softmax/membase/v220/softmax_common_impl/softmax_common_nd_reduce.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/softmax.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/activation/softmax/membase/v220/softmax_common_impl/softmax_common_nd_reduce.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/softmax.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_COMMON_ND_REDUCE_H__
 #endif
@@ -195,7 +195,7 @@ __aicore__ inline void NewReduceMaxLastNDImpl(
     } else {
         if (reduceParam.originalSrcK >= SOFTMAX_FLOAT_SPECIAL_BLOCKREDUCE_LEN) { // reduce axis length >= 512
             BigBlockReduceMax(tmpTensor, src, splitCount, reduceParam.originalSrcM, reduceParam.srcK);
-        } else if (reduceParam.originalSrcK >= HALF_REPEAT_SIZE) { // reduce axis length is [128, 512)
+        } else if (reduceParam.originalSrcK >= HALF_REPEAT_SIZE) {               // reduce axis length is [128, 512)
             Max<float, false>(
                 tmpTensor, src, src[FLOAT_REPEAT_SIZE], MASK_PLACEHOLDER, (uint8_t)(reduceParam.originalSrcM),
                 {1, 1, 1, DEFAULT_REPEAT_STRIDE, (uint8_t)srcRepeatStride, (uint8_t)srcRepeatStride});
@@ -308,7 +308,7 @@ __aicore__ inline void NewReduceSumLastNDImpl(
     } else {
         if (reduceParam.originalSrcK >= SOFTMAX_FLOAT_SPECIAL_BLOCKREDUCE_LEN) { // reduce axis length >= 512
             BigBlockReduceSum(tmpTensor, src, splitCount, reduceParam.originalSrcM, reduceParam.srcK);
-        } else if (reduceParam.originalSrcK >= HALF_REPEAT_SIZE) { // reduce axis length is [128, 512)
+        } else if (reduceParam.originalSrcK >= HALF_REPEAT_SIZE) {               // reduce axis length is [128, 512)
             Add<float, false>(
                 tmpTensor, src, src[FLOAT_REPEAT_SIZE], MASK_PLACEHOLDER, (uint8_t)(reduceParam.originalSrcM),
                 {1, 1, 1, DEFAULT_REPEAT_STRIDE, (uint8_t)srcRepeatStride, (uint8_t)srcRepeatStride});

@@ -1,24 +1,24 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include <numeric>
 #include "reduce_mesh_1D.h"
 
 namespace ops_hccl {
-ReduceMesh1D::ReduceMesh1D(const OpParam &param,
-    const u32 rankId,  // 传通信域的rankId，userRank
-    const std::vector<std::vector<u32>> &subCommRanks)
+ReduceMesh1D::ReduceMesh1D(
+    const OpParam& param,
+    const u32 rankId, // 传通信域的rankId，userRank
+    const std::vector<std::vector<u32>>& subCommRanks)
     : InsAlgTemplateBase(param, rankId, subCommRanks)
 {}
 
-ReduceMesh1D::~ReduceMesh1D()
-{}
+ReduceMesh1D::~ReduceMesh1D() {}
 
 void ReduceMesh1D::SetRoot(u32 root) const
 {
@@ -27,7 +27,8 @@ void ReduceMesh1D::SetRoot(u32 root) const
 }
 
 HcclResult ReduceMesh1D::CalcRes(
-    HcclComm comm, const OpParam &param, const TopoInfoWithNetLayerDetails *topoInfo, AlgResourceRequest &resourceRequest)
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    AlgResourceRequest& resourceRequest)
 {
     threadNum_ = templateRankSize_ > 1 ? templateRankSize_ : 1;
     resourceRequest.slaveThreadNum = threadNum_ - 1;
@@ -51,7 +52,7 @@ u64 ReduceMesh1D::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffT
 }
 
 HcclResult ReduceMesh1D::KernelRun(
-    const OpParam &param, const TemplateDataParams &tempAlgParams, const TemplateResource &templateResource)
+    const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
 {
     HCCL_INFO("[ReduceMesh1D] rank[%d] KernelRun start", myRank_);
     // 处理数据量为0的场景
@@ -62,16 +63,18 @@ HcclResult ReduceMesh1D::KernelRun(
 
     CHK_PRT_RET(root_ == UINT32_MAX, HCCL_ERROR("[ReduceMesh1D] root is invalid"), HcclResult::HCCL_E_INTERNAL);
 
-    const std::vector<ThreadHandle> &threads = templateResource.threads;
+    const std::vector<ThreadHandle>& threads = templateResource.threads;
     threadNum_ = templateRankSize_;
-    CHK_PRT_RET(threads.size() != threadNum_,
+    CHK_PRT_RET(
+        threads.size() != threadNum_,
         HCCL_ERROR("[ReduceMesh1D] resource threadNum[%u] is invalid, need[%u]", threads.size(), threadNum_),
         HcclResult::HCCL_E_INTERNAL);
 
     myIdx_ = GetAlgRank(myRank_);
-    CHK_PRT_RET(myIdx_ >= templateRankSize_,
-        HCCL_ERROR("[ReduceMesh1D] rank idx[%u] in virtRankMap is invalid, it should be less than rankSize[%u]",
-            myIdx_,
+    CHK_PRT_RET(
+        myIdx_ >= templateRankSize_,
+        HCCL_ERROR(
+            "[ReduceMesh1D] rank idx[%u] in virtRankMap is invalid, it should be less than rankSize[%u]", myIdx_,
             templateRankSize_),
         HcclResult::HCCL_E_INTERNAL);
     processSize_ = tempAlgParams.sliceSize;
@@ -84,18 +87,19 @@ HcclResult ReduceMesh1D::KernelRun(
     HCCL_INFO(
         "[KernelRun] sliceSize: %u, count_: %u, typeSize: %u", tempAlgParams.sliceSize, count_, SIZE_TABLE[dataType_]);
 
-    const std::map<u32, std::vector<ChannelInfo>> &channels = templateResource.channels;
+    const std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
     CHK_RET(RunReduce(channels, threads, tempAlgParams, param));
 
     HCCL_INFO("[ReduceMesh1D] rank[%d] KernelRun finished", myRank_);
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult ReduceMesh1D::RunReduce(const std::map<u32, std::vector<ChannelInfo>> &channels,
-    const std::vector<ThreadHandle> &threads, const TemplateDataParams &tempAlgParam, const OpParam &param)
+HcclResult ReduceMesh1D::RunReduce(
+    const std::map<u32, std::vector<ChannelInfo>>& channels, const std::vector<ThreadHandle>& threads,
+    const TemplateDataParams& tempAlgParam, const OpParam& param)
 {
     if (myRank_ == root_) {
-        const ThreadHandle &masterThread = threads.at(0);
+        const ThreadHandle& masterThread = threads.at(0);
         const std::vector<ThreadHandle> subThreads(threads.begin() + 1, threads.end());
         // 主从队列同步
         if (threads.size() > 1u) {
@@ -113,7 +117,7 @@ HcclResult ReduceMesh1D::RunReduce(const std::map<u32, std::vector<ChannelInfo>>
             // 启动任务并等待所有threads任务执行完成
             CHK_RET(static_cast<HcclResult>(HcommBatchModeEnd(param.algTag)));
             CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
-            for (const auto &thread : threads) {
+            for (const auto& thread : threads) {
                 CHK_RET(static_cast<HcclResult>(HcommThreadJoin(thread, CUSTOM_TIMEOUT)));
             }
         }
@@ -126,13 +130,14 @@ HcclResult ReduceMesh1D::RunReduce(const std::map<u32, std::vector<ChannelInfo>>
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult ReduceMesh1D::SendData(const TemplateDataParams &dataParams,
-    const std::map<u32, std::vector<ChannelInfo>> &channels, const std::vector<ThreadHandle> &threads)
+HcclResult ReduceMesh1D::SendData(
+    const TemplateDataParams& dataParams, const std::map<u32, std::vector<ChannelInfo>>& channels,
+    const std::vector<ThreadHandle>& threads)
 {
-    const BuffInfo &buffInfo = dataParams.buffInfo;
+    const BuffInfo& buffInfo = dataParams.buffInfo;
     DataSlice srcDataSlice(buffInfo.inputPtr, buffInfo.inBuffBaseOff, processSize_, count_);
 
-    const ChannelInfo &sendChannel = channels.at(root_).at(0);
+    const ChannelInfo& sendChannel = channels.at(root_).at(0);
     u64 dstOffset = buffInfo.hcclBuffBaseOff + processSize_ * myIdx_;
     if ((buffInfo.inBuffType == BufferType::HCCL_BUFFER || buffInfo.outBuffType == BufferType::HCCL_BUFFER) &&
         (myIdx_ == 0)) {
@@ -142,13 +147,10 @@ HcclResult ReduceMesh1D::SendData(const TemplateDataParams &dataParams,
         dstOffset = buffInfo.hcclBuffBaseOff + processSize_ * GetAlgRank(root_);
     }
     DataSlice dstDataSlice(sendChannel.remoteCclMem.addr, dstOffset, processSize_, count_);
-    HCCL_INFO("[SendData] %u from: %#llx offset[%u], to: %#llx, buffInfo.inBuffBaseOff:[%llu], "
-              "buffInfo.hcclBuffBaseOff:[%llu]",
-        myRank_,
-        buffInfo.inputPtr,
-        buffInfo.inBuffBaseOff,
-        sendChannel.remoteCclMem.addr,
-        buffInfo.inBuffBaseOff,
+    HCCL_INFO(
+        "[SendData] %u from: %#llx offset[%u], to: %#llx, buffInfo.inBuffBaseOff:[%llu], "
+        "buffInfo.hcclBuffBaseOff:[%llu]",
+        myRank_, buffInfo.inputPtr, buffInfo.inBuffBaseOff, sendChannel.remoteCclMem.addr, buffInfo.inBuffBaseOff,
         buffInfo.hcclBuffBaseOff);
     SlicesList sendSlicesList({srcDataSlice}, {dstDataSlice});
     DataInfo sendInfo(sendChannel, sendSlicesList);
@@ -159,10 +161,11 @@ HcclResult ReduceMesh1D::SendData(const TemplateDataParams &dataParams,
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult ReduceMesh1D::GatherData(const TemplateDataParams &dataParams,
-    const std::map<u32, std::vector<ChannelInfo>> &channels, const std::vector<ThreadHandle> &threads)
+HcclResult ReduceMesh1D::GatherData(
+    const TemplateDataParams& dataParams, const std::map<u32, std::vector<ChannelInfo>>& channels,
+    const std::vector<ThreadHandle>& threads)
 {
-    const BuffInfo &buffInfo = dataParams.buffInfo;
+    const BuffInfo& buffInfo = dataParams.buffInfo;
 
     // 主流将数据从inBuff拷贝到outBuff
     if (buffInfo.inBuffType != buffInfo.outBuffType) {
@@ -183,14 +186,13 @@ HcclResult ReduceMesh1D::GatherData(const TemplateDataParams &dataParams,
         if (idx == myIdx_) {
             continue;
         }
-        const ChannelInfo &channel = channels.at(subCommRanks_.at(0).at(idx)).at(0);
+        const ChannelInfo& channel = channels.at(subCommRanks_.at(0).at(idx)).at(0);
         const DataSlice srcDataSlice(
-            buffInfo.inBuffType == BufferType::INPUT
-                ? nullptr  // buffInfo.inBuffType == BufferType::INPUT无法获取其他rank的基地址
-                : channel.remoteCclMem.addr,  // buffInfo.inBuffType == BufferType::HCCL_BUFFER为对端的ccl buffer
-            buffInfo.inBuffBaseOff,
-            processSize_,
-            count_);
+            buffInfo.inBuffType == BufferType::INPUT ?
+                nullptr                    // buffInfo.inBuffType == BufferType::INPUT无法获取其他rank的基地址
+                :
+                channel.remoteCclMem.addr, // buffInfo.inBuffType == BufferType::HCCL_BUFFER为对端的ccl buffer
+            buffInfo.inBuffBaseOff, processSize_, count_);
         u64 dstOffset = buffInfo.hcclBuffBaseOff + processSize_ * idx;
         if ((buffInfo.inBuffType == BufferType::HCCL_BUFFER || buffInfo.outBuffType == BufferType::HCCL_BUFFER) &&
             (idx == 0)) {
@@ -202,8 +204,8 @@ HcclResult ReduceMesh1D::GatherData(const TemplateDataParams &dataParams,
         HCCL_INFO("[GatherData] %u from: %#llx, to: %#llx", myRank_, buffInfo.inputPtr, buffInfo.hcclBuff.addr);
         const SlicesList recvSlicesList({srcDataSlice}, {dstDataSlice});
         const DataInfo recvInfo(channel, recvSlicesList);
-        CHK_PRT_RET(RecvWrite(recvInfo, threads.at(queId)),
-            HCCL_ERROR("[ReduceMesh1D] Recv data failed"),
+        CHK_PRT_RET(
+            RecvWrite(recvInfo, threads.at(queId)), HCCL_ERROR("[ReduceMesh1D] Recv data failed"),
             HcclResult::HCCL_E_INTERNAL);
 
         queId++;
@@ -212,14 +214,14 @@ HcclResult ReduceMesh1D::GatherData(const TemplateDataParams &dataParams,
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult ReduceMesh1D::ReduceData(const TemplateDataParams &dataParams, const std::vector<ThreadHandle> &threads)
+HcclResult ReduceMesh1D::ReduceData(const TemplateDataParams& dataParams, const std::vector<ThreadHandle>& threads)
 {
     if (templateRankSize_ == 1u) {
         // 当rankSize为1时，数据已经拷贝至output，无需规约，直接返回
         return HcclResult::HCCL_SUCCESS;
     }
 
-    const BuffInfo &buffInfo = dataParams.buffInfo;
+    const BuffInfo& buffInfo = dataParams.buffInfo;
 
     DataSlice dstSlice(buffInfo.outputPtr, buffInfo.outBuffBaseOff, processSize_, count_);
 
@@ -251,7 +253,7 @@ u32 ReduceMesh1D::GetAlgRank(u32 rank) const
     return static_cast<u32>(std::distance(subCommRanks_[0].begin(), iter));
 }
 
-void ReduceMesh1D::GetNotifyIdxMainToSub(std::vector<u32> &notifyIdxMainToSub)
+void ReduceMesh1D::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub)
 {
     if (threadNum_ == 0) {
         threadNum_ = templateRankSize_ > 1 ? templateRankSize_ : 1;
@@ -260,7 +262,7 @@ void ReduceMesh1D::GetNotifyIdxMainToSub(std::vector<u32> &notifyIdxMainToSub)
     notifyIdxMainToSub = std::vector<u32>(slaveThreadNum, 0);
 }
 
-void ReduceMesh1D::GetNotifyIdxSubToMain(std::vector<u32> &notifyIdxSubToMain)
+void ReduceMesh1D::GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain)
 {
     if (threadNum_ == 0) {
         threadNum_ = templateRankSize_ > 1 ? templateRankSize_ : 1;
@@ -270,9 +272,6 @@ void ReduceMesh1D::GetNotifyIdxSubToMain(std::vector<u32> &notifyIdxSubToMain)
     std::iota(notifyIdxSubToMain.begin(), notifyIdxSubToMain.end(), 0);
 }
 
-u64 ReduceMesh1D::GetThreadNum() const
-{
-    return templateRankSize_;
-}
+u64 ReduceMesh1D::GetThreadNum() const { return templateRankSize_; }
 
-}  // namespace ops_hccl
+} // namespace ops_hccl

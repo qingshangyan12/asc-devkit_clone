@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "reduce_scatter_v_op.h"
 #include "op_common_ops.h"
 #include "topo_host.h"
@@ -17,11 +17,12 @@
 
 using namespace std;
 using namespace ops_hccl;
-extern "C" unsigned int LaunchAicpuKernel(OpParam *param);
+extern "C" unsigned int LaunchAicpuKernel(OpParam* param);
 
 // 代码入口
-HcclResult HcclReduceScatterV(void *sendBuf,  const void *sendCounts, const void *sendDispls, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
-    HcclReduceOp op, HcclComm comm, aclrtStream stream)
+HcclResult HcclReduceScatterV(
+    void* sendBuf, const void* sendCounts, const void* sendDispls, void* recvBuf, uint64_t recvCount,
+    HcclDataType dataType, HcclReduceOp op, HcclComm comm, aclrtStream stream)
 {
     if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen()) {
         return HcclReduceScatterVInner(sendBuf, sendCounts, sendDispls, recvBuf, recvCount, dataType, op, comm, stream);
@@ -33,15 +34,15 @@ HcclResult HcclReduceScatterV(void *sendBuf,  const void *sendCounts, const void
 
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CHK_RET(hrtGetDeviceType(deviceType));
-    // 非95设备转到老流程
-    #ifdef MACRO_DEV_TYPE_NEW
+// 非95设备转到老流程
+#ifdef MACRO_DEV_TYPE_NEW
     if (deviceType != DevType::DEV_TYPE_950) {
-    #else
+#else
     if (deviceType != DevType::DEV_TYPE_910_95) {
-    #endif
+#endif
         return HcclReduceScatterVInner(sendBuf, sendCounts, sendDispls, recvBuf, recvCount, dataType, op, comm, stream);
     }
-    HcclUs startut = TIME_NOW();// 走老流程的判断时间不统计在内
+    HcclUs startut = TIME_NOW(); // 走老流程的判断时间不统计在内
     // 入口的地方先解析环境变量，在初始化环境变量的时候需要设置为AICPU展开
     // A3是：export HCCL_OP_EXPANSION_MODE="AI_CPU"，A5的接口还没提供
     CHK_RET(InitEnvConfig());
@@ -53,9 +54,9 @@ HcclResult HcclReduceScatterV(void *sendBuf,  const void *sendCounts, const void
     CHK_RET(HcclGetRankSize(comm, &rankSize));
     // 校验sendCounts全部为0的情况
     const u64* sendCountsAddr = reinterpret_cast<const u64*>(sendCounts);
-    CHK_PRT_RET(std::all_of(sendCountsAddr, sendCountsAddr + rankSize, [](auto count) { return count == 0; }),
-            HCCL_WARNING("input all %u elements in sendCounts are 0, return success", rankSize),
-            HCCL_SUCCESS);
+    CHK_PRT_RET(
+        std::all_of(sendCountsAddr, sendCountsAddr + rankSize, [](auto count) { return count == 0; }),
+        HCCL_WARNING("input all %u elements in sendCounts are 0, return success", rankSize), HCCL_SUCCESS);
     u32 userRank = INVALID_VALUE_RANKID;
     CHK_RET(HcclGetRankId(comm, &userRank));
     char commName[COMM_INDENTIFIER_MAX_LENGTH];
@@ -67,27 +68,30 @@ HcclResult HcclReduceScatterV(void *sendBuf,  const void *sendCounts, const void
     CHK_RET(CheckDataType(dataType, true));
 
     /* 接口交互信息日志 */
-    CHK_RET(ReduceScatterVEntryLog(sendBuf, sendCounts, sendDispls, recvBuf, recvCount, dataType, op, stream, tag, "HcclReduceScatterV"));
+    CHK_RET(ReduceScatterVEntryLog(
+        sendBuf, sendCounts, sendDispls, recvBuf, recvCount, dataType, op, stream, tag, "HcclReduceScatterV"));
 
     // 初始化参数
-    CHK_RET_AND_PRINT_IDE(ReduceScatterVOutPlace(sendBuf, sendDispls, sendCounts, recvBuf, recvCount, dataType, op, comm, stream, tag),
-                          tag.c_str());
+    CHK_RET_AND_PRINT_IDE(
+        ReduceScatterVOutPlace(sendBuf, sendDispls, sendCounts, recvBuf, recvCount, dataType, op, comm, stream, tag),
+        tag.c_str());
 
     CHK_RET(LogHcclExit("ReduceScatterV", tag.c_str(), startut));
 
     return HCCL_SUCCESS;
 }
 
-
-HcclResult HcclReduceScatterVGraphMode(void *sendBuf,  const void *sendCounts, const void *sendDispls, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
-    HcclReduceOp op, const char* group, aclrtStream stream, const char* tag, void** streams, size_t streamCount, void* scratchMemAddr, uint64_t scratchMemSize)
+HcclResult HcclReduceScatterVGraphMode(
+    void* sendBuf, const void* sendCounts, const void* sendDispls, void* recvBuf, uint64_t recvCount,
+    HcclDataType dataType, HcclReduceOp op, const char* group, aclrtStream stream, const char* tag, void** streams,
+    size_t streamCount, void* scratchMemAddr, uint64_t scratchMemSize)
 {
     HCCL_INFO("Start to run execute HcclReduceScatterVGraphMode");
     // 根据group获取通信域
     HcclComm comm = nullptr;
     HCCL_INFO("[HcclReduceScatterVGraphMode] get group name: %s", group);
     HcomGetCommHandleByGroup(group, &comm);
-    HcclUs startut = TIME_NOW();// 走老流程的判断时间不统计在内
+    HcclUs startut = TIME_NOW(); // 走老流程的判断时间不统计在内
     // 入口的地方先解析环境变量，在初始化环境变量的时候需要设置为AICPU展开
     CHK_RET(InitEnvConfig());
     // 参数校验等工作;
@@ -97,9 +101,9 @@ HcclResult HcclReduceScatterVGraphMode(void *sendBuf,  const void *sendCounts, c
     CHK_RET(HcclGetRankSize(comm, &rankSize));
     // 校验sendCounts全部为0的情况
     const u64* sendCountsAddr = reinterpret_cast<const u64*>(sendCounts);
-    CHK_PRT_RET(std::all_of(sendCountsAddr, sendCountsAddr + rankSize, [](auto count) { return count == 0; }), 
-            HCCL_WARNING("input all %u elements in sendCounts are 0, return success", rankSize), 
-            HCCL_SUCCESS);  
+    CHK_PRT_RET(
+        std::all_of(sendCountsAddr, sendCountsAddr + rankSize, [](auto count) { return count == 0; }),
+        HCCL_WARNING("input all %u elements in sendCounts are 0, return success", rankSize), HCCL_SUCCESS);
     u32 userRank = INVALID_VALUE_RANKID;
     CHK_RET(HcclGetRankId(comm, &userRank));
     char commName[COMM_INDENTIFIER_MAX_LENGTH];
@@ -126,50 +130,59 @@ HcclResult HcclReduceScatterVGraphMode(void *sendBuf,  const void *sendCounts, c
     resPack.scratchMemSize = scratchMemSize;
 
     /* 接口交互信息日志 */
-    CHK_RET(ReduceScatterVEntryLog(sendBuf, sendCounts, sendDispls, recvBuf, recvCount, dataType, op, stream, opTag, "HcclReduceScatterVGraphMode"));
+    CHK_RET(ReduceScatterVEntryLog(
+        sendBuf, sendCounts, sendDispls, recvBuf, recvCount, dataType, op, stream, opTag,
+        "HcclReduceScatterVGraphMode"));
 
     // 执行
-    CHK_RET_AND_PRINT_IDE(ReduceScatterVOutPlaceGraphMode(sendBuf, sendDispls, sendCounts, recvBuf, recvCount, dataType, op, comm, stream, tag, resPack), opTag);
+    CHK_RET_AND_PRINT_IDE(
+        ReduceScatterVOutPlaceGraphMode(
+            sendBuf, sendDispls, sendCounts, recvBuf, recvCount, dataType, op, comm, stream, tag, resPack),
+        opTag);
 
     CHK_RET(LogHcclExit("HcclReduceScatterVGraphMode", opTag.c_str(), startut));
 
     return HCCL_SUCCESS;
 }
 
-
-
 namespace ops_hccl {
 HcclResult CheckReduceScatterVInputParam(
-    const HcclComm comm, const void *sendBuf, const void *recvBuf, uint64_t recvCount,
-    const void *sendCounts, const void *sendDispls, const aclrtStream stream)
+    const HcclComm comm, const void* sendBuf, const void* recvBuf, uint64_t recvCount, const void* sendCounts,
+    const void* sendDispls, const aclrtStream stream)
 {
     // 入参合法性校验
-    RPT_INPUT_ERR(stream == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
+    RPT_INPUT_ERR(
+        stream == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
         std::vector<std::string>({"HcclReduceScatterV", "nullptr", "stream", "non-null pointer"}));
     CHK_PTR_NULL(stream);
-    RPT_INPUT_ERR(comm == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
+    RPT_INPUT_ERR(
+        comm == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
         std::vector<std::string>({"HcclReduceScatterV", "nullptr", "comm", "non-null pointer"}));
     CHK_PTR_NULL(comm);
 
-    RPT_INPUT_ERR(sendCounts == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
+    RPT_INPUT_ERR(
+        sendCounts == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
         std::vector<std::string>({"HcclReduceScatterV", "nullptr", "sendCounts", "non-null pointer"}));
     CHK_PTR_NULL(sendCounts);
 
-    RPT_INPUT_ERR(sendDispls == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
+    RPT_INPUT_ERR(
+        sendDispls == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
         std::vector<std::string>({"HcclReduceScatterV", "nullptr", "sendDispls", "non-null pointer"}));
     CHK_PTR_NULL(sendDispls);
     if (UNLIKELY(recvCount > 0 && recvBuf == nullptr)) {
-        RPT_INPUT_ERR(true, "EI0003",\
-        std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
-        std::vector<std::string>({"HcclReduceScatterV", "nullptr", "recvBuf", "non-null pointer"}));
+        RPT_INPUT_ERR(
+            true, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
+            std::vector<std::string>({"HcclReduceScatterV", "nullptr", "recvBuf", "non-null pointer"}));
         CHK_PTR_NULL(recvBuf);
     }
 
     return HCCL_SUCCESS;
 }
 
-HcclResult PrepareReduceScatterVParam(void *sendBuf, const void *sendDispls, const void *sendCounts, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
-    HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string &tag, OpMode opMode, u32 userRankSize, u64 varMemSize, OpParam &param) 
+HcclResult PrepareReduceScatterVParam(
+    void* sendBuf, const void* sendDispls, const void* sendCounts, void* recvBuf, uint64_t recvCount,
+    HcclDataType dataType, HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string& tag, OpMode opMode,
+    u32 userRankSize, u64 varMemSize, OpParam& param)
 {
     u32 perDataSize = DATATYPE_SIZE_TABLE[dataType];
     u64 outputSize = recvCount * perDataSize;
@@ -195,7 +208,7 @@ HcclResult PrepareReduceScatterVParam(void *sendBuf, const void *sendDispls, con
     param.outputPtr = recvBuf;
     param.outputSize = outputSize;
     param.vDataDes.dataType = dataType;
-    const void *temp = sendCounts;
+    const void* temp = sendCounts;
     param.vDataDes.counts = const_cast<void*>(temp);
 
     HCCL_INFO("PrepareReduceScatterVParam: sendBuf:[%u]", sendBuf);
@@ -203,17 +216,17 @@ HcclResult PrepareReduceScatterVParam(void *sendBuf, const void *sendDispls, con
     HCCL_INFO("PrepareReduceScatterVParam: recvCount:[%u]", recvCount);
 
     // 参数准备
-    std::vector<u64> countsAndDispls(userRankSize*2);
+    std::vector<u64> countsAndDispls(userRankSize * 2);
     const u64* sendDisplsAddr = reinterpret_cast<const u64*>(sendDispls);
     const u64* sendCountsAddr = reinterpret_cast<const u64*>(sendCounts);
 
-    param.inputSize = (sendDisplsAddr[userRankSize-1] + sendCountsAddr[userRankSize-1]) * perDataSize;
+    param.inputSize = (sendDisplsAddr[userRankSize - 1] + sendCountsAddr[userRankSize - 1]) * perDataSize;
 
     std::copy(sendCountsAddr, sendCountsAddr + userRankSize, countsAndDispls.begin());
     std::copy(sendDisplsAddr, sendDisplsAddr + userRankSize, countsAndDispls.begin() + userRankSize);
     param.varMemSize = varMemSize;
 
-    for (u64 i=0; i < countsAndDispls.size();++i) {
+    for (u64 i = 0; i < countsAndDispls.size(); ++i) {
         HCCL_INFO("PrepareReduceScatterVParam: countsAndDispls[%u]:[%u]", i, countsAndDispls[i]);
     }
 
@@ -227,28 +240,35 @@ HcclResult PrepareReduceScatterVParam(void *sendBuf, const void *sendDispls, con
     return HCCL_SUCCESS;
 }
 
-HcclResult ReduceScatterVOutPlace(void *sendBuf, const void *sendDispls, const void *sendCounts, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
-    HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string &tag)
+HcclResult ReduceScatterVOutPlace(
+    void* sendBuf, const void* sendDispls, const void* sendCounts, void* recvBuf, uint64_t recvCount,
+    HcclDataType dataType, HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string& tag)
 {
     HCCL_INFO("Start to execute ReduceScatterVOutPlace");
-    CHK_RET(ReduceScatterVOutPlaceCommon(sendBuf, sendDispls, sendCounts, recvBuf, recvCount, dataType, op, comm, stream, tag, OpMode::OPBASE, ResPackGraphMode()));
+    CHK_RET(ReduceScatterVOutPlaceCommon(
+        sendBuf, sendDispls, sendCounts, recvBuf, recvCount, dataType, op, comm, stream, tag, OpMode::OPBASE,
+        ResPackGraphMode()));
     HCCL_INFO("Execute ReduceScatterVOutPlace success.");
     return HCCL_SUCCESS;
 }
 
-
-HcclResult ReduceScatterVOutPlaceGraphMode(void *sendBuf, const void *sendDispls, const void *sendCounts, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
-    HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string &tag, const ResPackGraphMode &resPack)
+HcclResult ReduceScatterVOutPlaceGraphMode(
+    void* sendBuf, const void* sendDispls, const void* sendCounts, void* recvBuf, uint64_t recvCount,
+    HcclDataType dataType, HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string& tag,
+    const ResPackGraphMode& resPack)
 {
     HCCL_INFO("Start to execute ReduceScatterVOutPlaceGraphMode");
-    CHK_RET(ReduceScatterVOutPlaceCommon(sendBuf, sendDispls, sendCounts, recvBuf, recvCount, dataType, op, comm, stream, tag, OpMode::OFFLOAD, resPack));
+    CHK_RET(ReduceScatterVOutPlaceCommon(
+        sendBuf, sendDispls, sendCounts, recvBuf, recvCount, dataType, op, comm, stream, tag, OpMode::OFFLOAD,
+        resPack));
     HCCL_INFO("Execute ReduceScatterVOutPlaceGraphMode success.");
     return HCCL_SUCCESS;
 }
 
-
-HcclResult ReduceScatterVOutPlaceCommon(void *sendBuf, const void *sendDispls, const void *sendCounts, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
-    HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string &tag, OpMode opMode, const ResPackGraphMode &resPack)
+HcclResult ReduceScatterVOutPlaceCommon(
+    void* sendBuf, const void* sendDispls, const void* sendCounts, void* recvBuf, uint64_t recvCount,
+    HcclDataType dataType, HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string& tag, OpMode opMode,
+    const ResPackGraphMode& resPack)
 {
     u32 userRankSize;
     CHK_RET(HcclGetRankSize(comm, &userRankSize));
@@ -269,16 +289,18 @@ HcclResult ReduceScatterVOutPlaceCommon(void *sendBuf, const void *sendDispls, c
             p->~OpParam();
             free(p);
         }
-     };
+    };
     std::unique_ptr<OpParam, decltype(deleter)> paramPtr(tmpParamPtr, deleter);
     OpParam& param = *paramPtr;
 
-    CHK_RET(PrepareReduceScatterVParam(sendBuf, sendDispls, sendCounts, recvBuf, recvCount, dataType, op, comm, stream, tag, opMode, userRankSize, varMemSize, param));
-    
+    CHK_RET(PrepareReduceScatterVParam(
+        sendBuf, sendDispls, sendCounts, recvBuf, recvCount, dataType, op, comm, stream, tag, opMode, userRankSize,
+        varMemSize, param));
+
     std::string algName;
     std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     CHK_RET(Selector(comm, param, topoInfo, algName));
-    
+
     if (userRankSize == 1) {
         HCCL_WARNING("[%s] ranksize == 1, enter SingleRankProc", __func__);
         CHK_RET(SingleRankProc(param));
@@ -288,8 +310,9 @@ HcclResult ReduceScatterVOutPlaceCommon(void *sendBuf, const void *sendDispls, c
     return HCCL_SUCCESS;
 }
 
-HcclResult ReduceScatterVEntryLog(void *sendBuf, const void *sendCounts, const void *sendDispls, void *recvBuf,
-    uint64_t recvCount, HcclDataType dataType, HcclReduceOp op, aclrtStream stream, const std::string &tag, const std::string &opName)
+HcclResult ReduceScatterVEntryLog(
+    void* sendBuf, const void* sendCounts, const void* sendDispls, void* recvBuf, uint64_t recvCount,
+    HcclDataType dataType, HcclReduceOp op, aclrtStream stream, const std::string& tag, const std::string& opName)
 {
     if (GetExternalInputHcclEnableEntryLog()) {
         s32 deviceLogicId = 0;
@@ -297,13 +320,16 @@ HcclResult ReduceScatterVEntryLog(void *sendBuf, const void *sendCounts, const v
         s32 streamId = 0;
         ACLCHECK(aclrtStreamGetId(stream, &streamId));
         char stackLogBuffer[LOG_TMPBUF_SIZE];
-        s32 ret = snprintf_s(stackLogBuffer, LOG_TMPBUF_SIZE, LOG_TMPBUF_SIZE - 1U,
-            "tag[%s], sendBuf[%p], sendCounts[%p], sendDispls[%p], recvBuf[%p], recvCount[%llu], dataType[%s], reduceOp[%s], streamId[%d], deviceLogicId[%d]",
-            tag.c_str(), sendBuf, sendCounts, sendDispls, recvBuf, recvCount, GetDataTypeEnumStr(dataType).c_str(), GetReduceOpEnumStr(op).c_str(), streamId, deviceLogicId);
+        s32 ret = snprintf_s(
+            stackLogBuffer, LOG_TMPBUF_SIZE, LOG_TMPBUF_SIZE - 1U,
+            "tag[%s], sendBuf[%p], sendCounts[%p], sendDispls[%p], recvBuf[%p], recvCount[%llu], dataType[%s], "
+            "reduceOp[%s], streamId[%d], deviceLogicId[%d]",
+            tag.c_str(), sendBuf, sendCounts, sendDispls, recvBuf, recvCount, GetDataTypeEnumStr(dataType).c_str(),
+            GetReduceOpEnumStr(op).c_str(), streamId, deviceLogicId);
         CHK_PRT_CONT(ret == -1, HCCL_WARNING("Failed to build log info, tag[%s].", tag.c_str()));
         std::string logInfo = "Entry-" + opName + ":" + std::string(stackLogBuffer);
         HCCL_RUN_INFO("%s", logInfo.c_str());
     }
     return HCCL_SUCCESS;
 }
-}
+} // namespace ops_hccl

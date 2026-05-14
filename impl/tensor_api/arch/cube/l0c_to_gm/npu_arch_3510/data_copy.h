@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l0c_to_gm/npu_arch_3510/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -33,8 +33,8 @@ namespace Te {
 struct CopyL0C2GMTrait {
     __aicore__ constexpr CopyL0C2GMTrait() {}
 
-    __aicore__ constexpr CopyL0C2GMTrait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn) :
-        roundMode(roundModeIn), enableRelu(enableReluIn), enableChannelSplit(enableChannelSplitIn)
+    __aicore__ constexpr CopyL0C2GMTrait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn)
+        : roundMode(roundModeIn), enableRelu(enableReluIn), enableChannelSplit(enableChannelSplitIn)
     {}
 
     RoundMode roundMode = RoundMode::DEFAULT;
@@ -95,8 +95,9 @@ private:
         uint8_t cacheMode = dst.Engine().GetCacheMode();
         bool isChannelSplit = trait.enableChannelSplit;
 
-        CopyMatrixCcToGmInstr::DataCopy<quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, cacheMode, reluEn,
-                                                        unitFlag, isChannelSplit, nz2ndEn, nz2dnEn);
+        CopyMatrixCcToGmInstr::DataCopy<quantPre, T, U>(
+            dst, src, nSize, mSize, srcStride, dstStride, cacheMode, reluEn, unitFlag, isChannelSplit, nz2ndEn,
+            nz2dnEn);
     }
 };
 
@@ -150,8 +151,9 @@ private:
 
         const uint8_t cacheMode = dst.Engine().GetCacheMode();
         const bool channelSplit = trait.enableChannelSplit;
-        return Std::make_tuple(nSize, mSize, srcStride, dstStride, cacheMode, reluEnable, unitFlag, channelSplit,
-                               nz2ndEnable, nz2dnEnable);
+        return Std::make_tuple(
+            nSize, mSize, srcStride, dstStride, cacheMode, reluEnable, unitFlag, channelSplit, nz2ndEnable,
+            nz2dnEnable);
     }
 
     template <typename T>
@@ -167,13 +169,16 @@ private:
     }
 
     template <QuantMode_t quantPre, typename T, typename U, typename ParamTuple, size_t... Is>
-    __aicore__ inline static void DataCopyWrapper(const T& dst, const U& src, const ParamTuple& paramTuple,
-                                                  Std::index_sequence<Is...>)
-    { CopyMatrixCcToGmInstr::DataCopy<quantPre>(dst, src, Std::get<Is>(paramTuple)...); }
+    __aicore__ inline static void DataCopyWrapper(
+        const T& dst, const U& src, const ParamTuple& paramTuple, Std::index_sequence<Is...>)
+    {
+        CopyMatrixCcToGmInstr::DataCopy<quantPre>(dst, src, Std::get<Is>(paramTuple)...);
+    }
 
     template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
-    __aicore__ inline static void ExecuteDataCopy(const T& dst, const U& src, const V& quant, uint16_t nIterNum,
-                                                  uint32_t calNSize, uint32_t tailNSize, const FixpipeParams& params)
+    __aicore__ inline static void ExecuteDataCopy(
+        const T& dst, const U& src, const V& quant, uint16_t nIterNum, uint32_t calNSize, uint32_t tailNSize,
+        const FixpipeParams& params)
     {
         const auto mainLoopParam = GenerateParams<trait, T, U, false>(dst, src, params);
 
@@ -184,8 +189,9 @@ private:
             const auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * CBURST_NUM_3510));
             const auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * MAIN_LOOP_N_SIZE_3510));
 
-            DataCopyWrapper<quantPre>(dst(dstCoord), src(srcCoord), mainLoopParam,
-                                      Std::make_index_sequence<Std::tuple_size_v<decltype(mainLoopParam)>>{});
+            DataCopyWrapper<quantPre>(
+                dst(dstCoord), src(srcCoord), mainLoopParam,
+                Std::make_index_sequence<Std::tuple_size_v<decltype(mainLoopParam)>>{});
         }
 
         if (tailNSize) {
@@ -197,8 +203,9 @@ private:
             const auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * CBURST_NUM_3510));
             const auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * MAIN_LOOP_N_SIZE_3510));
 
-            DataCopyWrapper<quantPre>(dst(dstCoord), src(srcCoord), tailParam,
-                                      Std::make_index_sequence<Std::tuple_size_v<decltype(tailParam)>>{});
+            DataCopyWrapper<quantPre>(
+                dst(dstCoord), src(srcCoord), tailParam,
+                Std::make_index_sequence<Std::tuple_size_v<decltype(tailParam)>>{});
         }
     }
 

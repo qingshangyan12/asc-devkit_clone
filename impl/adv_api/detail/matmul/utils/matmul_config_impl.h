@@ -1,19 +1,20 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file matmul_config_impl.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/adv_api/detail/matmul/utils/matmul_config_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+        "impl/adv_api/detail/matmul/utils/matmul_config_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MATMUL_CONFIG_IMPL_H__
 #endif
@@ -24,7 +25,8 @@
 #include "include/adv_api/matmul/matmul_config.h"
 
 template <typename ArgType>
-__aicore__ inline constexpr void GetMMConfigImpl(MatmulConfig& cfg, ArgType arg) {
+__aicore__ inline constexpr void GetMMConfigImpl(MatmulConfig& cfg, ArgType arg)
+{
     if constexpr (AscendC::IsSameType<ArgType, MatmulShapeParams>::value) {
         cfg.singleCoreM = arg.singleCoreM;
         cfg.singleCoreN = arg.singleCoreN;
@@ -63,7 +65,8 @@ __aicore__ inline constexpr void GetMMConfigImpl(MatmulConfig& cfg, ArgType arg)
 }
 
 template <typename T, typename... ArgTypes>
-__aicore__ inline constexpr void GetMMConfigImpl(MatmulConfig& cfg, T arg, ArgTypes&&... args) {
+__aicore__ inline constexpr void GetMMConfigImpl(MatmulConfig& cfg, T arg, ArgTypes&&... args)
+{
     GetMMConfigImpl(cfg, arg);
     GetMMConfigImpl(cfg, args...);
 }

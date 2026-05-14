@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ins_v2_all_gather_v_sole_executor.h"
 #include "topo_match_1d.h"
 #include "ins_temp_all_gather_v_mesh_1D.h"
@@ -22,7 +22,7 @@ InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AllGatherVSoleEx
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcAlgHierarchyInfo(
-    HcclComm comm, TopoInfoWithNetLayerDetails *topoInfo, AlgHierarchyInfoForAllLevel &algHierarchyInfo)
+    HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo)
 {
     // 使用topo match计算AlgHierarchyInfoForAllLevel
     AlgTopoMatch topoMatch;
@@ -31,8 +31,9 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcAlgHie
 }
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
-HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(HcclComm comm, const OpParam &param,
-    const TopoInfoWithNetLayerDetails *topoInfo, const AlgHierarchyInfoForAllLevel &algHierarchyInfo, AlgResourceRequest &resourceRequest)
+HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     // 构建template
     std::shared_ptr<InsAlgTemplate> algTemplate =
@@ -45,7 +46,7 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(Hc
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx)
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2AllGatherVSoleExecutor][Orchestrate] Orchestrate Start");
     maxTmpMemSize_ = resCtx.cclMem.size;
@@ -60,8 +61,10 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
     dataSize_ = dataCount_ * dataTypeSize_;
 
     HcclResult ret = OrchestrateLoop(param, resCtx);
-    CHK_PRT_RET(ret != HCCL_SUCCESS,
-        HCCL_ERROR("[InsV2AllGatherVSoleExecutor][Orchestrate]errNo[0x%016llx] All Gather V excutor kernel run failed",
+    CHK_PRT_RET(
+        ret != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "[InsV2AllGatherVSoleExecutor][Orchestrate]errNo[0x%016llx] All Gather V excutor kernel run failed",
             HCCL_ERROR_CODE(ret)),
         ret);
     return HCCL_SUCCESS;
@@ -69,7 +72,7 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx)
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2AllGatherVSoleExecutor][OrchestrateLoop] Start");
     u64 rankSize_ = resCtx.algHierarchyInfo.infos[0][0].size();
@@ -104,17 +107,14 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
 
     // 从零数组中获取counts和displs
     // 强制类型转换
-    const u64 *varData = reinterpret_cast<const u64 *>(param.varData);
+    const u64* varData = reinterpret_cast<const u64*>(param.varData);
     std::vector<u64> counts;
     counts.assign(varData, varData + rankSize_);
     tempAlgParams.allRankDispls.assign(varData + rankSize_, varData + rankSize_ + rankSize_);
-    HCCL_DEBUG("[InsV2AllGatherVSoleExecutor][OrchestrateLoop] Rank[%u], inputPtr[%#llx] outputPtr[%#llx], "
-               "cclAddr[%#llx], cclSize[%u]",
-        myRank_,
-        param.inputPtr,
-        param.outputPtr,
-        resCtx.cclMem.addr,
-        resCtx.cclMem.size);
+    HCCL_DEBUG(
+        "[InsV2AllGatherVSoleExecutor][OrchestrateLoop] Rank[%u], inputPtr[%#llx] outputPtr[%#llx], "
+        "cclAddr[%#llx], cclSize[%u]",
+        myRank_, param.inputPtr, param.outputPtr, resCtx.cclMem.addr, resCtx.cclMem.size);
     // 构建template
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
@@ -147,7 +147,10 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
         tempAlgParams.allRankSliceSize = {};
         for (u64 i = 0; i < rankSize_; i++) {
             tempAlgParams.allRankSliceSize.push_back(
-                ((allRankProcessedDataCount[i] < counts[i]) ? std::min(maxCountPerLoop, counts[i] - allRankProcessedDataCount[i]) : 0) * dataTypeSize_);
+                ((allRankProcessedDataCount[i] < counts[i]) ?
+                     std::min(maxCountPerLoop, counts[i] - allRankProcessedDataCount[i]) :
+                     0) *
+                dataTypeSize_);
             if (loop == 0) {
                 tempAlgParams.sliceSize = std::max(tempAlgParams.sliceSize, tempAlgParams.allRankSliceSize[i]);
             }
@@ -159,21 +162,18 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
         tempAlgParams.buffInfo.hcclBuffBaseOff = 0;
         tempAlgParams.tailSize = tempAlgParams.sliceSize;
         // 这里的stride当成传统意义上的sreide 间隔
-        tempAlgParams.inputSliceStride = dataSize_;  // 如果是输入，偏移是算子的output datasize
+        tempAlgParams.inputSliceStride = dataSize_; // 如果是输入，偏移是算子的output datasize
         tempAlgParams.outputSliceStride =
-            maxCountPerLoop * dataTypeSize_;  // 如果是scratchbuffer，偏移是单次循环处理的最大数据量
+            maxCountPerLoop * dataTypeSize_; // 如果是scratchbuffer，偏移是单次循环处理的最大数据量
 
-        HCCL_INFO("[InsV2AllGatherVSoleExecutor] loop [%u] tempAlgParams.inputSliceStride [%u],"
-                  "tempAlgParams.outputSliceStride [%u] tempAlgParams.sliceSize [%u]",
-            loop,
-            tempAlgParams.inputSliceStride,
-            tempAlgParams.outputSliceStride,
-            tempAlgParams.sliceSize);
-        HCCL_INFO("[InsV2AllGatherVSoleExecutor] loop [%u] tempAlgParams.buffInfo.inBuffBaseOff [%u],"
-                  "tempAlgParams.buffInfo.outBuffBaseOff [%u]",
-            loop,
-            tempAlgParams.buffInfo.inBuffBaseOff,
-            tempAlgParams.buffInfo.outBuffBaseOff);
+        HCCL_INFO(
+            "[InsV2AllGatherVSoleExecutor] loop [%u] tempAlgParams.inputSliceStride [%u],"
+            "tempAlgParams.outputSliceStride [%u] tempAlgParams.sliceSize [%u]",
+            loop, tempAlgParams.inputSliceStride, tempAlgParams.outputSliceStride, tempAlgParams.sliceSize);
+        HCCL_INFO(
+            "[InsV2AllGatherVSoleExecutor] loop [%u] tempAlgParams.buffInfo.inBuffBaseOff [%u],"
+            "tempAlgParams.buffInfo.outBuffBaseOff [%u]",
+            loop, tempAlgParams.buffInfo.inBuffBaseOff, tempAlgParams.buffInfo.outBuffBaseOff);
         // 不需要重复
         tempAlgParams.repeatNum = 1;
         tempAlgParams.inputRepeatStride = 0;
@@ -188,10 +188,12 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
     return HCCL_SUCCESS;
 }
 
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER_V, InsAllGatherVMesh1D, InsV2AllGatherVSoleExecutor, TopoMatch1D,
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLGATHER_V, InsAllGatherVMesh1D, InsV2AllGatherVSoleExecutor, TopoMatch1D,
     InsTempAllGatherVMesh1D);
 #ifndef AICPU_COMPILE
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER_V, CcuAllGatherVMesh1D, InsV2AllGatherVSoleExecutor, TopoMatch1D,
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLGATHER_V, CcuAllGatherVMesh1D, InsV2AllGatherVSoleExecutor, TopoMatch1D,
     CcuTempAllGatherVMesh1DMem2Mem);
 #endif
-}  // namespace ops_hccl
+} // namespace ops_hccl

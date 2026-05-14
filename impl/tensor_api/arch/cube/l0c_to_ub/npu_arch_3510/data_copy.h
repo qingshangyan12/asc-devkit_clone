@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l0c_to_ub/npu_arch_3510/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -33,10 +33,12 @@ namespace Te {
 struct CopyL0C2UBTrait {
     __aicore__ constexpr CopyL0C2UBTrait() {}
 
-    __aicore__ constexpr CopyL0C2UBTrait(RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn,
-                                         DualDstMode dualDstCtlIn) :
-        roundMode(roundModeIn), enableRelu(enableReluIn), enableChannelSplit(enableChannelSplitIn),
-        dualDstCtl(dualDstCtlIn)
+    __aicore__ constexpr CopyL0C2UBTrait(
+        RoundMode roundModeIn, bool enableReluIn, bool enableChannelSplitIn, DualDstMode dualDstCtlIn)
+        : roundMode(roundModeIn),
+          enableRelu(enableReluIn),
+          enableChannelSplit(enableChannelSplitIn),
+          dualDstCtl(dualDstCtlIn)
     {}
 
     RoundMode roundMode = RoundMode::DEFAULT;
@@ -105,8 +107,9 @@ private:
 
         uint8_t dualDstCtl = trait.dualDstCtl;
         bool subBlockId = false;
-        CopyMatrixCcToUbInstr::DataCopy<quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, dualDstCtl,
-                                                        reluEn, unitFlag, subBlockId, isChannelSplit, nz2ndEn, nz2dnEn);
+        CopyMatrixCcToUbInstr::DataCopy<quantPre, T, U>(
+            dst, src, nSize, mSize, srcStride, dstStride, dualDstCtl, reluEn, unitFlag, subBlockId, isChannelSplit,
+            nz2ndEn, nz2dnEn);
     }
 };
 
@@ -162,8 +165,9 @@ private:
         bool subBlockId = false;
         uint8_t dualDstCtl = trait.dualDstCtl;
 
-        return Std::make_tuple(nSize, mSize, srcStride, dstStride, dualDstCtl, reluEn, unitFlag, subBlockId,
-                               channelSplit, nz2ndEn, nz2dnEn);
+        return Std::make_tuple(
+            nSize, mSize, srcStride, dstStride, dualDstCtl, reluEn, unitFlag, subBlockId, channelSplit, nz2ndEn,
+            nz2dnEn);
     }
 
     template <typename T>
@@ -179,13 +183,16 @@ private:
     }
 
     template <QuantMode_t quantPre, typename T, typename U, typename ParamTuple, size_t... Is>
-    __aicore__ inline static void DataCopyWrapper(const T& dst, const U& src, const ParamTuple& paramTuple,
-                                                  Std::index_sequence<Is...>)
-    { CopyMatrixCcToUbInstr::DataCopy<quantPre>(dst, src, Std::get<Is>(paramTuple)...); }
+    __aicore__ inline static void DataCopyWrapper(
+        const T& dst, const U& src, const ParamTuple& paramTuple, Std::index_sequence<Is...>)
+    {
+        CopyMatrixCcToUbInstr::DataCopy<quantPre>(dst, src, Std::get<Is>(paramTuple)...);
+    }
 
     template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
-    __aicore__ inline static void ExecuteDataCopy(const T& dst, const U& src, const V& quant, uint16_t nIterNum,
-                                                  uint32_t calNSize, uint32_t tailNSize, const FixpipeParams& params)
+    __aicore__ inline static void ExecuteDataCopy(
+        const T& dst, const U& src, const V& quant, uint16_t nIterNum, uint32_t calNSize, uint32_t tailNSize,
+        const FixpipeParams& params)
     {
         const auto mainLoopParam = GenerateParams<trait, T, U, false>(dst, src, params);
 
@@ -196,8 +203,9 @@ private:
             const auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * CBURST_NUM_3510));
             const auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * MAIN_LOOP_N_SIZE_3510));
 
-            DataCopyWrapper<quantPre>(dst(dstCoord), src(srcCoord), mainLoopParam,
-                                      Std::make_index_sequence<Std::tuple_size_v<decltype(mainLoopParam)>>{});
+            DataCopyWrapper<quantPre>(
+                dst(dstCoord), src(srcCoord), mainLoopParam,
+                Std::make_index_sequence<Std::tuple_size_v<decltype(mainLoopParam)>>{});
         }
 
         if (tailNSize) {
@@ -209,8 +217,9 @@ private:
             const auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * CBURST_NUM_3510));
             const auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * MAIN_LOOP_N_SIZE_3510));
 
-            DataCopyWrapper<quantPre>(dst(dstCoord), src(srcCoord), tailParam,
-                                      Std::make_index_sequence<Std::tuple_size_v<decltype(tailParam)>>{});
+            DataCopyWrapper<quantPre>(
+                dst(dstCoord), src(srcCoord), tailParam,
+                Std::make_index_sequence<Std::tuple_size_v<decltype(tailParam)>>{});
         }
     }
 

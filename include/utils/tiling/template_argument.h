@@ -1,14 +1,14 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
- /*!
+/*!
  * \file template_argument.h
  * \brief
  */
@@ -60,8 +60,8 @@ constexpr uint32_t ASCENDC_TPL_SHARED_KERNEL_TYPE = 6;
 // index bias
 #define ASCENDC_TPL_INPUT_BIAS 100000000
 #define ASCENDC_TPL_OUTPUT_BIAS 900000000
-#define ASCENDC_TPL_INPUT(x) (ASCENDC_TPL_INPUT_BIAS+(x))
-#define ASCENDC_TPL_OUTPUT(x) (ASCENDC_TPL_OUTPUT_BIAS+(x))
+#define ASCENDC_TPL_INPUT(x) (ASCENDC_TPL_INPUT_BIAS + (x))
+#define ASCENDC_TPL_OUTPUT(x) (ASCENDC_TPL_OUTPUT_BIAS + (x))
 // int type
 #define ASCENDC_TPL_UI_RANGE 0
 #define ASCENDC_TPL_UI_LIST 1
@@ -73,79 +73,80 @@ constexpr size_t VAL_START = 2;
 constexpr uint64_t INVALID_TILING_KEY = 0XFFFFFFFFFFFFFFFF;
 
 #if defined(ASCENDC_TPL_PRE)
-#define ASCENDC_TPL_DTYPE_DECL(x, ...) @@ASCENDC_TPL_DTYPE_DECL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_DATATYPE_DECL(x, ...) @@ASCENDC_TPL_DATATYPE_DECL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_FORMAT_DECL(x, ...) @@ASCENDC_TPL_FORMAT_DECL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_UINT_DECL(x, ...) @@ASCENDC_TPL_UINT_DECL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_BOOL_DECL(x, ...) @@ASCENDC_TPL_BOOL_DECL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_KERNEL_TYPE_DECL(x, ...) @@ASCENDC_TPL_SHARED_KERNEL_TYPE_DECL_##x@@ = {__VA_ARGS__}
+#define ASCENDC_TPL_DTYPE_DECL(x, ...) @ @ASCENDC_TPL_DTYPE_DECL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_DATATYPE_DECL(x, ...) @ @ASCENDC_TPL_DATATYPE_DECL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_FORMAT_DECL(x, ...) @ @ASCENDC_TPL_FORMAT_DECL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_UINT_DECL(x, ...) @ @ASCENDC_TPL_UINT_DECL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_BOOL_DECL(x, ...) @ @ASCENDC_TPL_BOOL_DECL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_KERNEL_TYPE_DECL(x, ...) @ @ASCENDC_TPL_SHARED_KERNEL_TYPE_DECL_##x @ @ = {__VA_ARGS__}
 
-#define ASCENDC_TPL_DTYPE_SEL(x, ...) @@ASCENDC_TPL_DTYPE_SEL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_DATATYPE_SEL(x, ...) @@ASCENDC_TPL_DATATYPE_SEL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_FORMAT_SEL(x, ...) @@ASCENDC_TPL_FORMAT_SEL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_UINT_SEL(x, ...) @@ASCENDC_TPL_UINT_SEL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_BOOL_SEL(x, ...) @@ASCENDC_TPL_BOOL_SEL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_TILING_STRUCT_SEL(x, ...) @@ASCENDC_TPL_TILING_STRUCT_SEL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_KERNEL_TYPE_SEL(...) @@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_DETERMINISTIC_SEL(...) @@ASCENDC_TPL_DETERMINISTIC_SEL@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_SHARED_KERNEL_TYPE_SEL(x, ...) @@ASCENDC_TPL_SHARED_KERNEL_TYPE_SEL_##x@@ = {__VA_ARGS__}
+#define ASCENDC_TPL_DTYPE_SEL(x, ...) @ @ASCENDC_TPL_DTYPE_SEL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_DATATYPE_SEL(x, ...) @ @ASCENDC_TPL_DATATYPE_SEL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_FORMAT_SEL(x, ...) @ @ASCENDC_TPL_FORMAT_SEL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_UINT_SEL(x, ...) @ @ASCENDC_TPL_UINT_SEL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_BOOL_SEL(x, ...) @ @ASCENDC_TPL_BOOL_SEL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_TILING_STRUCT_SEL(x, ...) @ @ASCENDC_TPL_TILING_STRUCT_SEL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_KERNEL_TYPE_SEL(...) @ @ASCENDC_TPL_KERNEL_TYPE_SEL @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_DETERMINISTIC_SEL(...) @ @ASCENDC_TPL_DETERMINISTIC_SEL @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_SHARED_KERNEL_TYPE_SEL(x, ...) @ @ASCENDC_TPL_SHARED_KERNEL_TYPE_SEL_##x @ @ = {__VA_ARGS__}
 
-#define ASCENDC_TPL_ARGS_DECL(x, ...) @@ASCENDC_TPL_ARGS_DECL_##x@@ = {__VA_ARGS__}
-#define ASCENDC_TPL_ARGS_SEL(...) @@{__VA_ARGS__}
-#define ASCENDC_TPL_SEL(...) @@ASCENDC_TPL_LISTS@@ = {__VA_ARGS__}
+#define ASCENDC_TPL_ARGS_DECL(x, ...) @ @ASCENDC_TPL_ARGS_DECL_##x @ @ = {__VA_ARGS__}
+#define ASCENDC_TPL_ARGS_SEL(...) @ @{__VA_ARGS__}
+#define ASCENDC_TPL_SEL(...) @ @ASCENDC_TPL_LISTS @ @ = {__VA_ARGS__}
 
 #elif defined(ASCENDC_TPL_KERNEL)
 // check arch for native date type
 #define ASC_INNER_DATATYPE_ENABLE_INT4
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-    #define ASC_INNER_DATATYPE_ENABLE_BF16
+#define ASC_INNER_DATATYPE_ENABLE_BF16
 #endif
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
-    #define ASC_INNER_DATATYPE_ENABLE_BF16
-    #define ASC_INNER_DATATYPE_ENABLE_HIFLOAT8
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E2M1
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
+#define ASC_INNER_DATATYPE_ENABLE_BF16
+#define ASC_INNER_DATATYPE_ENABLE_HIFLOAT8
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E2M1
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
 #endif
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-    #define ASC_INNER_DATATYPE_ENABLE_BF16
-    #define ASC_INNER_DATATYPE_ENABLE_COMPLEX64
-    #define ASC_INNER_DATATYPE_ENABLE_COMPLEX32
-    #define ASC_INNER_DATATYPE_ENABLE_HIFLOAT8
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E2M1
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2
+#define ASC_INNER_DATATYPE_ENABLE_BF16
+#define ASC_INNER_DATATYPE_ENABLE_COMPLEX64
+#define ASC_INNER_DATATYPE_ENABLE_COMPLEX32
+#define ASC_INNER_DATATYPE_ENABLE_HIFLOAT8
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E2M1
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2
 #endif
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102
-    #define ASC_INNER_DATATYPE_ENABLE_BF16
-    #define ASC_INNER_DATATYPE_ENABLE_UINT1
-    #define ASC_INNER_DATATYPE_ENABLE_INT2
-    #define ASC_INNER_DATATYPE_ENABLE_COMPLEX64
-    #define ASC_INNER_DATATYPE_ENABLE_COMPLEX32
-    #define ASC_INNER_DATATYPE_ENABLE_HIFLOAT8
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E2M1
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2
+#define ASC_INNER_DATATYPE_ENABLE_BF16
+#define ASC_INNER_DATATYPE_ENABLE_UINT1
+#define ASC_INNER_DATATYPE_ENABLE_INT2
+#define ASC_INNER_DATATYPE_ENABLE_COMPLEX64
+#define ASC_INNER_DATATYPE_ENABLE_COMPLEX32
+#define ASC_INNER_DATATYPE_ENABLE_HIFLOAT8
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E2M1
+#define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2
 #endif
 // check feature for native data type
 #if defined(ASCENDC_CPU_DEBUG)
-    #undef ASC_INNER_DATATYPE_ENABLE_FLOAT4_E2M1
-    #undef ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2
-    #undef ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
-    #undef ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
+#undef ASC_INNER_DATATYPE_ENABLE_FLOAT4_E2M1
+#undef ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2
+#undef ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
+#undef ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
 #endif
- 
-template<int dataTypeId>
+
+template <int dataTypeId>
 struct TypeFromId {
     using type = void;
 };
-#define ASCENDC_TPL_TYPE_TRANS_DEFINE(id, r_type) template<> \
-     struct TypeFromId<id> {                                 \
-        using type = r_type;                                 \
-     }
+#define ASCENDC_TPL_TYPE_TRANS_DEFINE(id, r_type) \
+    template <>                                   \
+    struct TypeFromId<id> {                       \
+        using type = r_type;                      \
+    }
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_FLOAT, float);                 // float32
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_FLOAT16, half);                // half
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_INT8, int8_t);                 // int8
@@ -191,7 +192,7 @@ ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_FLOAT4_E2M1, float4_e2m1x2_t); // fp4_e2m1 type
 #if defined(ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2)
 ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_FLOAT4_E1M2, float4_e1m2x2_t); // fp4_e1m2 type
 #endif
- 
+
 #define ASCENDC_TPL_DTYPE_DECL(...)
 #define ASCENDC_TPL_DATATYPE_DECL(...)
 #define ASCENDC_TPL_FORMAT_DECL(...)
@@ -219,14 +220,17 @@ struct ParamStruct {
     uint8_t bitWidth;
     std::vector<uint64_t> vals;
     const char* macroType;
-    ParamStruct(const char* inName, uint32_t inParamType, uint8_t inBitWidth, std::vector<uint64_t> inVals,
-        const char* inMacroType): name(inName), paramType(inParamType), bitWidth(inBitWidth), vals(std::move(inVals)),macroType(inMacroType) {
-            #ifndef ASCENDC_DEBUG
-            if (inParamType == ASCENDC_TPL_UINT) {
-                ParseTplUintValue();
-            }
-            #endif
-        };
+    ParamStruct(
+        const char* inName, uint32_t inParamType, uint8_t inBitWidth, std::vector<uint64_t> inVals,
+        const char* inMacroType)
+        : name(inName), paramType(inParamType), bitWidth(inBitWidth), vals(std::move(inVals)), macroType(inMacroType)
+    {
+#ifndef ASCENDC_DEBUG
+        if (inParamType == ASCENDC_TPL_UINT) {
+            ParseTplUintValue();
+        }
+#endif
+    };
 
     void ParseTplUintValue()
     {
@@ -251,84 +255,101 @@ struct ParamStruct {
     };
 };
 using TilingDeclareParams = std::vector<ParamStruct>;
-using TilingSelectParams = std::vector<std::vector<ParamStruct>>;
+using TilingSelectParams = std::vector<std::vector<ParamStruct> >;
 
-#define ASCENDC_TPL_DTYPE_DECL(x, ...) ParamStruct{#x, ASCENDC_TPL_DTYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "DECL"}
-#define ASCENDC_TPL_DATATYPE_DECL(x, ...) ParamStruct{#x, ASCENDC_TPL_DTYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "DECL"}
-#define ASCENDC_TPL_FORMAT_DECL(x, ...) ParamStruct{#x, ASCENDC_TPL_FORMAT, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "DECL"}
-#define ASCENDC_TPL_UINT_DECL(x, bw, ...) ParamStruct{#x, ASCENDC_TPL_UINT, bw, {__VA_ARGS__}, "DECL"}
-#define ASCENDC_TPL_BOOL_DECL(x, ...) ParamStruct{#x, ASCENDC_TPL_BOOL, ASCENDC_TPL_1_BW, {__VA_ARGS__}, "DECL"}
-#define ASCENDC_TPL_KERNEL_TYPE_DECL(x, ...) ParamStruct{#x, ASCENDC_TPL_SHARED_KERNEL_TYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "DECL"}
-#define ASCENDC_TPL_ARGS_DECL(x, ...) static TilingDeclareParams g_tilingDeclareParams{ __VA_ARGS__ }
+#define ASCENDC_TPL_DTYPE_DECL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_DTYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "DECL" }
+#define ASCENDC_TPL_DATATYPE_DECL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_DTYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "DECL" }
+#define ASCENDC_TPL_FORMAT_DECL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_FORMAT, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "DECL" }
+#define ASCENDC_TPL_UINT_DECL(x, bw, ...) \
+    ParamStruct { #x, ASCENDC_TPL_UINT, bw, {__VA_ARGS__}, "DECL" }
+#define ASCENDC_TPL_BOOL_DECL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_BOOL, ASCENDC_TPL_1_BW, {__VA_ARGS__}, "DECL" }
+#define ASCENDC_TPL_KERNEL_TYPE_DECL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_SHARED_KERNEL_TYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "DECL" }
+#define ASCENDC_TPL_ARGS_DECL(x, ...) \
+    static TilingDeclareParams g_tilingDeclareParams { __VA_ARGS__ }
 
 #ifdef ASCENDC_DEBUG
-#define ASCENDC_TPL_DTYPE_SEL(x, ...) ParamStruct{#x, ASCENDC_TPL_DTYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "SEL"}
-#define ASCENDC_TPL_DATATYPE_SEL(x, ...) ParamStruct{#x, ASCENDC_TPL_DTYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "SEL"}
-#define ASCENDC_TPL_FORMAT_SEL(x, ...) ParamStruct{#x, ASCENDC_TPL_FORMAT, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "SEL"}
-#define ASCENDC_TPL_UINT_SEL(x, ...) ParamStruct{#x, ASCENDC_TPL_UINT, 0, {__VA_ARGS__}, "SEL"}
-#define ASCENDC_TPL_BOOL_SEL(x, ...) ParamStruct{#x, ASCENDC_TPL_BOOL, ASCENDC_TPL_1_BW, {__VA_ARGS__}, "SEL"}
+#define ASCENDC_TPL_DTYPE_SEL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_DTYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "SEL" }
+#define ASCENDC_TPL_DATATYPE_SEL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_DTYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "SEL" }
+#define ASCENDC_TPL_FORMAT_SEL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_FORMAT, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "SEL" }
+#define ASCENDC_TPL_UINT_SEL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_UINT, 0, {__VA_ARGS__}, "SEL" }
+#define ASCENDC_TPL_BOOL_SEL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_BOOL, ASCENDC_TPL_1_BW, {__VA_ARGS__}, "SEL" }
 #define ASCENDC_TPL_TILING_STRUCT_SEL(x, ...)
-#define ASCENDC_TPL_KERNEL_TYPE_SEL(...) ParamStruct{"kernel_type", ASCENDC_TPL_KERNEL_TYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "SEL"}
-#define ASCENDC_TPL_DETERMINISTIC_SEL(...) ParamStruct{"deterministic", ASCENDC_TPL_DETERMINISTIC, ASCENDC_TPL_1_BW, {__VA_ARGS__}, "SEL"}
-#define ASCENDC_TPL_SHARED_KERNEL_TYPE_SEL(x, ...) ParamStruct{#x, ASCENDC_TPL_SHARED_KERNEL_TYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "SEL"}
-#define ASCENDC_TPL_ARGS_SEL(...) { __VA_ARGS__}
-#define ASCENDC_TPL_SEL(...) static TilingSelectParams g_tilingSelectParams{ __VA_ARGS__ }
+#define ASCENDC_TPL_KERNEL_TYPE_SEL(...) \
+    ParamStruct { "kernel_type", ASCENDC_TPL_KERNEL_TYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "SEL" }
+#define ASCENDC_TPL_DETERMINISTIC_SEL(...) \
+    ParamStruct { "deterministic", ASCENDC_TPL_DETERMINISTIC, ASCENDC_TPL_1_BW, {__VA_ARGS__}, "SEL" }
+#define ASCENDC_TPL_SHARED_KERNEL_TYPE_SEL(x, ...) \
+    ParamStruct { #x, ASCENDC_TPL_SHARED_KERNEL_TYPE, ASCENDC_TPL_8_BW, {__VA_ARGS__}, "SEL" }
+#define ASCENDC_TPL_ARGS_SEL(...) \
+    {                             \
+        __VA_ARGS__               \
+    }
+#define ASCENDC_TPL_SEL(...) \
+    static TilingSelectParams g_tilingSelectParams { __VA_ARGS__ }
 #else
 #define ASCENDC_TPL_SEL(...)
 #endif
 
 #ifdef ASCENDC_DEBUG
 namespace AscendC {
-    uint64_t EncodeTilingKey(TilingDeclareParams declareParams,
-                             TilingSelectParams selectParamsVec,
-                             std::vector<uint64_t> tilingParams);
+uint64_t EncodeTilingKey(
+    TilingDeclareParams declareParams, TilingSelectParams selectParamsVec, std::vector<uint64_t> tilingParams);
 }
 
-#define GET_TPL_TILING_KEY(...) \
-    AscendC::EncodeTilingKey(g_tilingDeclareParams, g_tilingSelectParams, {__VA_ARGS__})
+#define GET_TPL_TILING_KEY(...) AscendC::EncodeTilingKey(g_tilingDeclareParams, g_tilingSelectParams, {__VA_ARGS__})
 #else
 namespace AscendC {
-    __attribute__((always_inline)) inline uint64_t FastEncodeTilingKeyDirect(
-        const TilingDeclareParams& declareParams,
-        std::initializer_list<uint64_t> args)
-    {
-        uint8_t totalBits = 0;
-        uint64_t tilingKey = 0;
-        const size_t minSize = std::min(declareParams.size(), args.size());
-        auto argIter = args.begin();
-        for (size_t i = 0; i < minSize; ++i, ++argIter) {
-            const auto& param = declareParams[i];
-            uint64_t encodeVal = *argIter;
-            if (param.paramType == ASCENDC_TPL_UINT){
-                auto iter = std::find(param.vals.cbegin(), param.vals.cend(), encodeVal);
-                if (iter == param.vals.cend()) {
-                    printf("[ERROR] ASCENDC_TPL_UINT_SEL %s value %lu does not exist in ASCENDC_TPL_UINT_DECL, "
-                        "please check it!\n", param.name, encodeVal);
-                    return INVALID_TILING_KEY;
-                }else{
-                    uint64_t index = iter - param.vals.cbegin();
-                    encodeVal = index;
-                }
+__attribute__((always_inline)) inline uint64_t FastEncodeTilingKeyDirect(
+    const TilingDeclareParams& declareParams, std::initializer_list<uint64_t> args)
+{
+    uint8_t totalBits = 0;
+    uint64_t tilingKey = 0;
+    const size_t minSize = std::min(declareParams.size(), args.size());
+    auto argIter = args.begin();
+    for (size_t i = 0; i < minSize; ++i, ++argIter) {
+        const auto& param = declareParams[i];
+        uint64_t encodeVal = *argIter;
+        if (param.paramType == ASCENDC_TPL_UINT) {
+            auto iter = std::find(param.vals.cbegin(), param.vals.cend(), encodeVal);
+            if (iter == param.vals.cend()) {
+                printf(
+                    "[ERROR] ASCENDC_TPL_UINT_SEL %s value %lu does not exist in ASCENDC_TPL_UINT_DECL, "
+                    "please check it!\n",
+                    param.name, encodeVal);
+                return INVALID_TILING_KEY;
+            } else {
+                uint64_t index = iter - param.vals.cbegin();
+                encodeVal = index;
             }
-            tilingKey |= (encodeVal << totalBits);
-            totalBits += param.bitWidth;
         }
-        if(totalBits > MAX_BITS_NUM){
-            printf("[ERROR] Tiling key bits %hhu exceed max bits %hhu, please check it!\n", totalBits, MAX_BITS_NUM);
-            return INVALID_TILING_KEY;
-        }
-        return tilingKey;
+        tilingKey |= (encodeVal << totalBits);
+        totalBits += param.bitWidth;
     }
+    if (totalBits > MAX_BITS_NUM) {
+        printf("[ERROR] Tiling key bits %hhu exceed max bits %hhu, please check it!\n", totalBits, MAX_BITS_NUM);
+        return INVALID_TILING_KEY;
+    }
+    return tilingKey;
 }
+} // namespace AscendC
 
-#define GET_TPL_TILING_KEY(...) \
-    AscendC::FastEncodeTilingKeyDirect(g_tilingDeclareParams, {__VA_ARGS__})
+#define GET_TPL_TILING_KEY(...) AscendC::FastEncodeTilingKeyDirect(g_tilingDeclareParams, {__VA_ARGS__})
 #endif
-#define ASCENDC_TPL_SEL_PARAM(context, ...)           \
-do {                                                  \
-    uint64_t key = GET_TPL_TILING_KEY(__VA_ARGS__); \
-    context->SetTilingKey(key);                       \
-} while(0)
+#define ASCENDC_TPL_SEL_PARAM(context, ...)             \
+    do {                                                \
+        uint64_t key = GET_TPL_TILING_KEY(__VA_ARGS__); \
+        context->SetTilingKey(key);                     \
+    } while (0)
 
 #endif // TEMPLATEDE_TILING
 

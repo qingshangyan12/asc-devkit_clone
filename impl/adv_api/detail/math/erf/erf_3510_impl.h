@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/math/erf/erf_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/erf.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/math/erf/erf_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/erf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ERF_ERF_C310_IMPL_H__
 #endif
@@ -147,7 +147,7 @@ __simd_callee__ inline void ErfSpecialCaseCompute(
     Reg::Duplicate(tmpF32Reg, LOG2_VALUE, mask);
     Reg::Log(tmpF32Reg, tmpF32Reg, mask);
     Reg::Mul(tmpF32Reg, tmpReg, tmpF32Reg, mask);
-    Reg::Exp(tmpF32Reg, tmpF32Reg, mask); // tmpF32Reg: f23
+    Reg::Exp(tmpF32Reg, tmpF32Reg, mask);                                     // tmpF32Reg: f23
     Reg::Duplicate(tmpU32Reg, ERF_R1, mask);
     Reg::Sub(tmpF32Reg1, (Reg::RegTensor<float>&)tmpU32Reg, tmpF32Reg, mask); // tmpF32Reg1: f25
 

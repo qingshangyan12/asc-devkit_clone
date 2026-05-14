@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/matmul/utils/matmul_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/matmul/utils/matmul_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MATMUL_UTILS_H__
 #endif
@@ -547,12 +547,12 @@ __aicore__ inline void CopyTiling(const __gm__ TCubeTiling* gmCubeTiling, TCubeT
 }
 #endif
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool isNormEnableScheduler = DoMatmulNorm(MM_CFG) && (A_TYPE::layout == LayoutMode::NONE) &&
-                                       !ToMatmulConfig(MM_CFG).intraBlockPartSum;
+constexpr bool isNormEnableScheduler =
+    DoMatmulNorm(MM_CFG) && (A_TYPE::layout == LayoutMode::NONE) && !ToMatmulConfig(MM_CFG).intraBlockPartSum;
 
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool isNormDisableScheduler = DoMatmulNorm(MM_CFG) && ((A_TYPE::layout != LayoutMode::NONE) ||
-                                                                 ToMatmulConfig(MM_CFG).intraBlockPartSum);
+constexpr bool isNormDisableScheduler =
+    DoMatmulNorm(MM_CFG) && ((A_TYPE::layout != LayoutMode::NONE) || ToMatmulConfig(MM_CFG).intraBlockPartSum);
 
 template <const auto& MM_CFG>
 constexpr bool IsBasicBlockEnable = DoMatmulBasicBlock(MM_CFG) || DoMatmulSpecialBasicBlock(MM_CFG);

@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file conv3d_bp_filter_tiling.h
@@ -22,10 +22,10 @@
 namespace ConvBackpropApi {
 class Conv3dBpFilterTiling : public Conv3dBpFilterTilingBase {
 public:
-    Conv3dBpFilterTiling() {};
+    Conv3dBpFilterTiling(){};
     explicit Conv3dBpFilterTiling(const platform_ascendc::PlatformAscendC& ascendcPlatform)
-        : Conv3dBpFilterTilingBase(ascendcPlatform) {};
-    explicit Conv3dBpFilterTiling(const PlatformInfo& platform) : Conv3dBpFilterTilingBase(platform) {};
+        : Conv3dBpFilterTilingBase(ascendcPlatform){};
+    explicit Conv3dBpFilterTiling(const PlatformInfo& platform) : Conv3dBpFilterTilingBase(platform){};
     ~Conv3dBpFilterTiling() override = default;
     int64_t GetTiling(optiling::Conv3DBackpropFilterTilingData& tiling) override;
     int64_t GetTiling(AscendC::tiling::Conv3DBackpropFilterTilingData& tiling) override;

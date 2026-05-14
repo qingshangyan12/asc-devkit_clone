@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/hcomm/common/hcomm_inner_def.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/simplesoftmax.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/hcomm/common/hcomm_inner_def.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/simplesoftmax.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCOMM_INNER_DEF_H__
 #endif
@@ -66,9 +66,9 @@ typedef struct {
             uint64_t headAddr; // sq_PI
             uint64_t tailAddr; // sq_CI
             uint8_t sl;
-            uint64_t dbVa; // 敲doorbell的地址
-            int8_t dbMode; // 0-hw/1-sw
-        } rdmaSqContext;   // 46 Bytes
+            uint64_t dbVa;     // 敲doorbell的地址
+            int8_t dbMode;     // 0-hw/1-sw
+        } rdmaSqContext;       // 46 Bytes
         int8_t reserve[128];
     } ctx;
 } SqContext;
@@ -93,7 +93,7 @@ typedef struct {
             uint64_t headAddr;
             uint64_t tailAddr; // cq_CI
             uint64_t dbVa;
-            int8_t dbMode; // 0-hw/1-sw
+            int8_t dbMode;     // 0-hw/1-sw
         } rdmaCqContext;
         int8_t reserve[128];
     } ctx;

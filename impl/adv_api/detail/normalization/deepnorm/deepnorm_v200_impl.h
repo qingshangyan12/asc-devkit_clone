@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/normalization/deepnorm/deepnorm_v200_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/normalization/layernorm.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/normalization/deepnorm/deepnorm_v200_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/normalization/layernorm.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZATION_DEEPNORM_DEEPNORM_V200_IMPL_H__
 #endif
@@ -31,7 +31,7 @@ namespace DeepNormAPI {
 constexpr uint32_t BASIC_BLOCK_HLENGTH = 64; // when isBasicBlock, H must be N * 64
 constexpr uint32_t BASIC_BLOCK_BSLENGTH = 8; // when isBasicBlock, B*S must be N * 8
 constexpr uint32_t FLOAT_PER_BLOCK = 8;
-constexpr uint8_t HALF_REPEAT_STRIDE = 4; // DEFAULT_REPEAT_STRIDE / sizeof(half)
+constexpr uint8_t HALF_REPEAT_STRIDE = 4;    // DEFAULT_REPEAT_STRIDE / sizeof(half)
 constexpr float SQRT_EXPONENT = -0.5;
 // use this function only when bsLength is 8 * n (n > 0)
 __aicore__ inline void DeepNormBasicBlockTransdata(

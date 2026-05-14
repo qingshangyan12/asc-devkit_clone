@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef HCCL_CCU_KERNEL_ALL_TO_ALL_V_MESH_1D_H
 #define HCCL_CCU_KERNEL_ALL_TO_ALL_V_MESH_1D_H
 
@@ -23,16 +23,12 @@ using namespace hcomm;
 
 class CcuKernelArgAlltoAllVMesh1D : public hcomm::CcuKernelArg {
 public:
-    explicit CcuKernelArgAlltoAllVMesh1D(uint64_t dimSize, uint32_t rankId, bool loadFromMem, const OpParam& opParam,
-                                            const std::vector<std::vector<uint32_t>>& subCommRanks)
-        : dimSize_(dimSize),
-          rankId_(rankId),
-          loadFromMem_(loadFromMem),
-          opParam_(opParam),
-          subCommRanks_(subCommRanks)
+    explicit CcuKernelArgAlltoAllVMesh1D(
+        uint64_t dimSize, uint32_t rankId, bool loadFromMem, const OpParam& opParam,
+        const std::vector<std::vector<uint32_t>>& subCommRanks)
+        : dimSize_(dimSize), rankId_(rankId), loadFromMem_(loadFromMem), opParam_(opParam), subCommRanks_(subCommRanks)
     {
-        HCCL_DEBUG("[CcuKernelArgAlltoAllVMesh1D] dimSize: %lu, rankId: %u",
-                   dimSize_, rankId_);
+        HCCL_DEBUG("[CcuKernelArgAlltoAllVMesh1D] dimSize: %lu, rankId: %u", dimSize_, rankId_);
     }
     hcomm::CcuKernelSignature GetKernelSignature() const override
     {
@@ -43,20 +39,27 @@ public:
     uint64_t dimSize_;
     uint32_t rankId_;
     OpParam opParam_;
-    std::vector<std::vector<uint32_t>>      subCommRanks_;
+    std::vector<std::vector<uint32_t>> subCommRanks_;
     bool loadFromMem_;
 };
 
 class CcuTaskArgAlltoAllVMesh1D : public hcomm::CcuTaskArg {
 public:
-    explicit CcuTaskArgAlltoAllVMesh1D(uint64_t inputAddr, uint64_t outputAddr, std::vector<uint64_t> sliceSize,
-        uint64_t token, uint64_t srcOffset, uint64_t dstOffset,const A2ASendRecvInfo& localSendRecvInfo) :
-        inputAddr_(inputAddr), outputAddr_(outputAddr), sliceSize_(sliceSize), token_(token), 
-        srcOffset_(srcOffset), dstOffset_(dstOffset), localSendRecvInfo_(localSendRecvInfo)
+    explicit CcuTaskArgAlltoAllVMesh1D(
+        uint64_t inputAddr, uint64_t outputAddr, std::vector<uint64_t> sliceSize, uint64_t token, uint64_t srcOffset,
+        uint64_t dstOffset, const A2ASendRecvInfo& localSendRecvInfo)
+        : inputAddr_(inputAddr),
+          outputAddr_(outputAddr),
+          sliceSize_(sliceSize),
+          token_(token),
+          srcOffset_(srcOffset),
+          dstOffset_(dstOffset),
+          localSendRecvInfo_(localSendRecvInfo)
     {
-        HCCL_DEBUG("[CcuTaskArgAlltoAllVMesh1D] inputAddr: %lu, outputAddr: %lu, sliceSize: %lu, "
-                   "srcOffset: %lu, dstOffset: %lu",
-                   inputAddr_, outputAddr_, sliceSize_, srcOffset_, dstOffset_);
+        HCCL_DEBUG(
+            "[CcuTaskArgAlltoAllVMesh1D] inputAddr: %lu, outputAddr: %lu, sliceSize: %lu, "
+            "srcOffset: %lu, dstOffset: %lu",
+            inputAddr_, outputAddr_, sliceSize_, srcOffset_, dstOffset_);
     }
 
     uint64_t inputAddr_;
@@ -70,11 +73,11 @@ public:
 
 class CcuKernelAlltoAllVMesh1D : public CcuKernelAlgBase {
 public:
-    CcuKernelAlltoAllVMesh1D(const hcomm::CcuKernelArg &arg);
+    CcuKernelAlltoAllVMesh1D(const hcomm::CcuKernelArg& arg);
     ~CcuKernelAlltoAllVMesh1D() override {}
 
     HcclResult Algorithm() override;
-    std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
+    std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg& arg) override;
 
 private:
     // a2a 对每个对端的发送接收信息
@@ -83,7 +86,7 @@ private:
         CcuRep::Variable loopNum;
         CcuRep::Variable sendOffset;
         CcuRep::Variable recvOffset;
-        GroupOpSize      tailGoSize;
+        GroupOpSize tailGoSize;
     };
 
     uint64_t rankSize_{0};
@@ -109,17 +112,17 @@ private:
     uint16_t selfBit_{0};
     uint16_t allBit_{0};
     uint16_t allOtherBit_{0};
-    hcomm::CcuRep::LocalAddr                   myDst_;
-    std::vector<hcomm::CcuRep::RemoteAddr>     dst_;
-    std::vector<hcomm::CcuRep::LocalAddr>      src_;
+    hcomm::CcuRep::LocalAddr myDst_;
+    std::vector<hcomm::CcuRep::RemoteAddr> dst_;
+    std::vector<hcomm::CcuRep::LocalAddr> src_;
     hcomm::CcuRep::CompletedEvent event_;
     hcomm::CcuRep::Variable flag_; // 用以判断是否是第一次重复
     hcomm::CcuRep::Variable xnConst1_;
     bool loadFromMem_ = false;
-    
+
     HcclResult InitResource();
     void CreateVariables();
-    void LoadAll2allSendRecvInfo(A2AsingleSendRecvInfo &sendRecvInfo);
+    void LoadAll2allSendRecvInfo(A2AsingleSendRecvInfo& sendRecvInfo);
     void LoadArgs();
     void PreSync();
     void PostSync();
@@ -127,5 +130,5 @@ private:
     void CalcGroupSrcDst();
 };
 
-}// namespace ops_hccl
+} // namespace ops_hccl
 #endif // HCCL_CCU_KERNEL_ALL_TO_ALL_MESH_1D_H

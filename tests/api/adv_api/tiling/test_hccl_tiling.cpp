@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include <gtest/gtest.h>
 #include "graph/tensor.h"
 #include <dlfcn.h>
@@ -76,8 +76,10 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_failed1)
     uint32_t reduceType = 1;
     Mc2CcTilingConfig ccTilingConfig(groupName, opType, algConfig, reduceType);
     EXPECT_NE(ccTilingConfig.SetOpType(static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)), EXIT_SUCCESS);
-    string value129 = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678";
-    string value128 = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567";
+    string value129 = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345"
+                      "678901234567890123456789012345678";
+    string value128 = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345"
+                      "67890123456789012345678901234567";
     EXPECT_NE(ccTilingConfig.SetGroupName(value129), EXIT_SUCCESS);
     EXPECT_EQ(ccTilingConfig.SetGroupName(value128), EXIT_SUCCESS);
     EXPECT_NE(ccTilingConfig.SetAlgConfig(value129), EXIT_SUCCESS);
@@ -121,7 +123,7 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_failed3)
 
 TEST_F(TestHcclTiling, Mc2CcTilingConfig_SetReduceType_ReduceOp)
 {
-    const char *groupName = "testGroup";
+    const char* groupName = "testGroup";
     uint32_t opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
     std::string algConfig = "ReduceScatter=level0:doublering";
     uint32_t reduceType = static_cast<uint32_t>(HcclReduceOp::HCCL_REDUCE_RESERVED);
@@ -143,7 +145,7 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_SetReduceType_ReduceOp)
 
 TEST_F(TestHcclTiling, Mc2CcTilingConfig_SetReduceType_NotReduceOp)
 {
-    const char *groupName = "testGroup";
+    const char* groupName = "testGroup";
     uint32_t opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
     std::string algConfig = "AllGather=level0:doublering";
     uint32_t reduceType = static_cast<uint32_t>(HcclReduceOp::HCCL_REDUCE_RESERVED);

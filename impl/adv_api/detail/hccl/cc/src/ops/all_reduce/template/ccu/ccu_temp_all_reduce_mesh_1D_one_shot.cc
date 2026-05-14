@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ccu_temp_all_reduce_mesh_1D_one_shot.h"
 #include "log.h"
 #include "channel.h"
@@ -16,8 +16,8 @@
 
 namespace ops_hccl {
 
-CcuTempAllReduceMesh1DOneShot::CcuTempAllReduceMesh1DOneShot(const OpParam& param, const u32 rankId,
-                                                             const std::vector<std::vector<u32>> &subCommRanks)
+CcuTempAllReduceMesh1DOneShot::CcuTempAllReduceMesh1DOneShot(
+    const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
     : CcuAlgTemplateBase(param, rankId, subCommRanks)
 {
     std::vector<u32> ranks = subCommRanks[0];
@@ -31,60 +31,60 @@ CcuTempAllReduceMesh1DOneShot::CcuTempAllReduceMesh1DOneShot(const OpParam& para
     dataType_ = param.DataDes.dataType;
 }
 
-CcuTempAllReduceMesh1DOneShot::~CcuTempAllReduceMesh1DOneShot()
-{
-}
+CcuTempAllReduceMesh1DOneShot::~CcuTempAllReduceMesh1DOneShot() {}
 
-HcclResult CcuTempAllReduceMesh1DOneShot::CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-                                                  AlgResourceRequest& resourceRequest)
+HcclResult CcuTempAllReduceMesh1DOneShot::CalcRes(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    AlgResourceRequest& resourceRequest)
 {
     // 不需要从流
     resourceRequest.notifyNumOnMainThread = 0;
     resourceRequest.slaveThreadNum = 0;
     // 多少个kernel
     resourceRequest.ccuKernelNum.push_back(1);
-    HCCL_DEBUG("[CcuTempAllReduceMesh1DOneShot::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
-               resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
+    HCCL_DEBUG(
+        "[CcuTempAllReduceMesh1DOneShot::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
+        resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
 
     // 创建每个kernel的ctxArg，放入kernelInfo, 然后将kernelinfo放入resourceRequest.ccuKernelInfos
     CcuKernelInfo kernelInfo;
-    kernelInfo.creator = [](const hcomm::CcuKernelArg &arg) {
-                            return std::make_unique<CcuKernelAllReduceMesh1DOneShot>(arg);
-                         };
+    kernelInfo.creator = [](const hcomm::CcuKernelArg& arg) {
+        return std::make_unique<CcuKernelAllReduceMesh1DOneShot>(arg);
+    };
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
-    kernelInfo.kernelArg = std::make_shared<CcuKernelArgAllReduceMesh1DOneShot>(subCommRanks_[0].size(),
-                                                                                mySubCommRank_,
-                                                                                param,
-                                                                                subCommRanks_);
+    kernelInfo.kernelArg = std::make_shared<CcuKernelArgAllReduceMesh1DOneShot>(
+        subCommRanks_[0].size(), mySubCommRank_, param, subCommRanks_);
     kernelInfo.channels = channelDescs;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
 
-    HCCL_DEBUG("[CcuTempAllReduceMesh1DOneShot::CalcRes] channelDescs.size()=%llu, dimsize=%llu, "
-               "ccuKernelInfos.size()=%llu",
-               channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
+    HCCL_DEBUG(
+        "[CcuTempAllReduceMesh1DOneShot::CalcRes] channelDescs.size()=%llu, dimsize=%llu, "
+        "ccuKernelInfos.size()=%llu",
+        channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
 
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult CcuTempAllReduceMesh1DOneShot::KernelRun(const OpParam& param,
-                                                    const TemplateDataParams& templateDataParams,
-                                                    TemplateResource& templateResource)
+HcclResult CcuTempAllReduceMesh1DOneShot::KernelRun(
+    const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
     buffInfo_ = templateDataParams.buffInfo;
-    HCCL_INFO("CcuTempAllReduceMesh1DOneShot KernelRun inputPtr(%p), inputSize(%d)", buffInfo_.inputPtr, buffInfo_.inputSize);
+    HCCL_INFO(
+        "CcuTempAllReduceMesh1DOneShot KernelRun inputPtr(%p), inputSize(%d)", buffInfo_.inputPtr, buffInfo_.inputSize);
     uint64_t inputAddr = PointerToAddr(buffInfo_.inputPtr) + buffInfo_.inBuffBaseOff;
     uint64_t outputAddr = PointerToAddr(buffInfo_.outputPtr) + buffInfo_.outBuffBaseOff;
     uint64_t token;
     CHK_RET(GetToken(buffInfo_, token));
     uint64_t sliceSize = templateDataParams.sliceSize;
 
-    std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgAllReduceMesh1DOneShot>(
-        inputAddr, outputAddr, sliceSize, token);
+    std::unique_ptr<hcomm::CcuTaskArg> taskArg =
+        std::make_unique<CcuTaskArgAllReduceMesh1DOneShot>(inputAddr, outputAddr, sliceSize, token);
 
     void* taskArgPtr = static_cast<void*>(taskArg.get());
 
-    CHK_RET(HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr));
+    CHK_RET(
+        HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr));
 
     HCCL_DEBUG("[CcuTempReduceScatterMeshMem2Mem1D::KernelRun] end");
 
@@ -98,4 +98,4 @@ u64 CcuTempAllReduceMesh1DOneShot::CalcScratchMultiple(BufferType inBuffType, Bu
     (void)outBuffType;
     return templateRankSize_;
 }
-} // namespace Hccl
+} // namespace ops_hccl

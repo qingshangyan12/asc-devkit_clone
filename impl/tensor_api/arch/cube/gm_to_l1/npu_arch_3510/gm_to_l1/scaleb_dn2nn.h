@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/npu_arch_3510/gm_to_l1/scaleb_dn2nn.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -54,10 +54,8 @@ private:
 
         auto srcRowShape = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
         uint32_t srcColShape = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-        uint16_t srcBColStride =
-            GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
-        uint16_t dstBColStride =
-            GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
+        uint16_t srcBColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
+        uint16_t dstBColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
 
         uint16_t dnNum = 1;
         uint16_t nValue = srcRowShape >> 1; // use b16 for DN2NZ, so nValue = srcRowShape / 2

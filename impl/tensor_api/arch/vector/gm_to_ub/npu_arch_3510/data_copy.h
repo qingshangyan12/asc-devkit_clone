@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/vector/gm_to_ub/npu_arch_3510/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -34,7 +34,9 @@ class DataCopyGM2UB3510 {
 public:
     template <const CopyGM2UBTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
-    { Execute<trait>(dst, src); }
+    {
+        Execute<trait>(dst, src);
+    }
 
 private:
     template <const CopyGM2UBTrait& trait, typename T, typename U>
@@ -69,17 +71,20 @@ private:
             srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) * sizeof(SRC_TYPE);
             dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) * sizeof(DST_TYPE);
 
-        } else if constexpr (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>) { // NZ format
+        } else if constexpr (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>) { // NZ
+                                                                                                               // format
             blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-            blockLen = GetTotalRowShape(srcLayout) * GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout) * sizeof(SRC_TYPE);
+            blockLen = GetTotalRowShape(srcLayout) * GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout) *
+                       sizeof(SRC_TYPE);
 
             srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) * sizeof(SRC_TYPE);
             dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) * sizeof(DST_TYPE);
         } else {
-            static_assert((IsSatisfiedPtnFormatV<U, NDExtLayoutPtn> && IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>) || 
-                          (IsSatisfiedPtnFormatV<U, DNExtLayoutPtn> && IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>) || 
-                          (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>),
-                          "Unsupported layout type combination for DataCopyGM2UB3510");
+            static_assert(
+                (IsSatisfiedPtnFormatV<U, NDExtLayoutPtn> && IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>) ||
+                    (IsSatisfiedPtnFormatV<U, DNExtLayoutPtn> && IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>) ||
+                    (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>),
+                "Unsupported layout type combination for DataCopyGM2UB3510");
         }
 
         if constexpr (IsB4Type<SRC_TYPE>) {
@@ -92,8 +97,8 @@ private:
             dstStride = dstStride >> 1;
         }
 
-        CopyGmToUbufAlignV2Instr::DataCopy(dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, srcStride,
-                                           dstStride, cacheMode);
+        CopyGmToUbufAlignV2Instr::DataCopy(
+            dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, srcStride, dstStride, cacheMode);
         // ND和DN场景，需要保证UB上申请的空间和tensor的stride满足32字节对齐，否则CopyGmToUbufAlignV2会有问题，无法正确加载数据，导致数据错误
     }
 };

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l1_to_ub/npu_arch_3510/instruction.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -33,13 +33,15 @@ class CopyCbufToUbufInstr {
 public:
     template <typename T, typename U, typename... Params>
     __aicore__ inline static void DataCopy(const T& dst, const U& src, const Params&... params)
-    { CopyCbufToUbuf(dst.Data().Get(), src.Data().Get(), params...); }
+    {
+        CopyCbufToUbuf(dst.Data().Get(), src.Data().Get(), params...);
+    }
 
 private:
     template <typename T>
-    __aicore__ inline static void CopyCbufToUbuf(__ubuf__ T* dst, __cbuf__ T* src, const uint16_t blockCount,
-                                                 const uint16_t blockLen, const uint16_t srcStride,
-                                                 const uint16_t dstStride)
+    __aicore__ inline static void CopyCbufToUbuf(
+        __ubuf__ T* dst, __cbuf__ T* src, const uint16_t blockCount, const uint16_t blockLen, const uint16_t srcStride,
+        const uint16_t dstStride)
     {
         if ASCEND_IS_AIV {
             return;

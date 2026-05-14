@@ -27,54 +27,30 @@
 #include "instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_add_int8_impl.h"
 #include "instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_add_int16_impl.h"
 
- // ==========asc_set_atomic_add_float16==========
-__aicore__ inline void asc_set_atomic_add_float16()
-{
-    asc_set_atomic_add_float16_impl();
-}
+// ==========asc_set_atomic_add_float16==========
+__aicore__ inline void asc_set_atomic_add_float16() { asc_set_atomic_add_float16_impl(); }
 
 // ==========asc_set_atomic_max_float==========
-__aicore__ inline void asc_set_atomic_max_float()
-{
-    asc_set_atomic_max_float_impl();
-}
+__aicore__ inline void asc_set_atomic_max_float() { asc_set_atomic_max_float_impl(); }
 //===========asc_set_atomic_bf16===========
-__aicore__ inline void asc_set_atomic_add_bfloat()
-{
-    asc_set_atomic_add_bfloat_impl();
-}
+__aicore__ inline void asc_set_atomic_add_bfloat() { asc_set_atomic_add_bfloat_impl(); }
 
 //===========asc_set_atomic_min_float===========
-__aicore__ inline void asc_set_atomic_min_float()
-{
-    asc_set_atomic_min_float_impl();
-}
+__aicore__ inline void asc_set_atomic_min_float() { asc_set_atomic_min_float_impl(); }
 
 // ==========asc_set_atomic_min_bfloat==========
-__aicore__ inline void asc_set_atomic_min_bfloat()
-{
-    asc_set_atomic_min_bfloat_impl();
-}
+__aicore__ inline void asc_set_atomic_min_bfloat() { asc_set_atomic_min_bfloat_impl(); }
 
 __aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op)
 {
     asc_set_store_atomic_config_v2_impl(type, op);
 }
 
-__aicore__ inline void asc_set_atomic_add_float()
-{
-    asc_set_atomic_add_float_impl();
-}
+__aicore__ inline void asc_set_atomic_add_float() { asc_set_atomic_add_float_impl(); }
 
-__aicore__ inline void asc_set_atomic_max_float16()
-{
-    asc_set_atomic_max_float16_impl();
-}
+__aicore__ inline void asc_set_atomic_max_float16() { asc_set_atomic_max_float16_impl(); }
 //===========asc_set_atomic_none===========
-__aicore__ inline void asc_set_atomic_none()
-{
-    asc_set_atomic_none_impl();
-}
+__aicore__ inline void asc_set_atomic_none() { asc_set_atomic_none_impl(); }
 
 //===========asc_get_store_atomic_config===========
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)
@@ -82,34 +58,19 @@ __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& conf
     asc_get_store_atomic_config_impl(config);
 }
 
- // ==========asc_set_atomic_max_bfloat==========
-__aicore__ inline void asc_set_atomic_max_bfloat()
-{
-    asc_set_atomic_max_bfloat_impl();
-}
+// ==========asc_set_atomic_max_bfloat==========
+__aicore__ inline void asc_set_atomic_max_bfloat() { asc_set_atomic_max_bfloat_impl(); }
 
 // ==========asc_set_atomic_min_float16==========
-__aicore__ inline void asc_set_atomic_min_float16()
-{
-    asc_set_atomic_min_float16_impl();
-}
+__aicore__ inline void asc_set_atomic_min_float16() { asc_set_atomic_min_float16_impl(); }
 
 // ==========asc_set_atomic_add_int==========
-__aicore__ inline void asc_set_atomic_add_int()
-{
-    asc_set_atomic_add_int_impl();
-}
+__aicore__ inline void asc_set_atomic_add_int() { asc_set_atomic_add_int_impl(); }
 
 // ==========asc_set_atomic_add_int8==========
-__aicore__ inline void asc_set_atomic_add_int8()
-{
-    asc_set_atomic_add_int8_impl();
-}
+__aicore__ inline void asc_set_atomic_add_int8() { asc_set_atomic_add_int8_impl(); }
 
 // ==========asc_set_atomic_add_int16==========
-__aicore__ inline void asc_set_atomic_add_int16()
-{
-    asc_set_atomic_add_int16_impl();
-}
+__aicore__ inline void asc_set_atomic_add_int16() { asc_set_atomic_add_int16_impl(); }
 
 #endif

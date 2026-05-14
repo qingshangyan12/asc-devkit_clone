@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/sort/sort/sort_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/sort/sort.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/sort/sort/sort_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/sort/sort.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SORT_SORT_SORT_IMPL_H__
 #endif
@@ -496,15 +496,15 @@ __simd_vf__ inline void UpdateValueAndIndexByLocalIndex(
                 (__ubuf__ uint32_t*)(currSortedIndex + 2 * i * GetVecLen() / sizeof(uint16_t)));
             GatherAndStoreB64Elements(
                 localOffset1, maskHighP0, (__ubuf__ uint32_t*)prevSortedIndex,
-                (__ubuf__
-                     uint32_t*)(currSortedIndex + 2 * i * GetVecLen() / sizeof(uint16_t) + GetVecLen() / sizeof(uint32_t)));
+                (__ubuf__ uint32_t*)(currSortedIndex + 2 * i * GetVecLen() / sizeof(uint16_t) +
+                                     GetVecLen() / sizeof(uint32_t)));
             GatherAndStoreB64Elements(
                 localOffset2, maskLowP1, (__ubuf__ uint32_t*)prevSortedIndex,
                 (__ubuf__ uint32_t*)(currSortedIndex + (2 * i + 1) * GetVecLen() / sizeof(uint16_t)));
             GatherAndStoreB64Elements(
                 localOffset3, maskHighP1, (__ubuf__ uint32_t*)prevSortedIndex,
-                (__ubuf__
-                     uint32_t*)(currSortedIndex + (2 * i + 1) * GetVecLen() / sizeof(uint16_t) + GetVecLen() / sizeof(uint32_t)));
+                (__ubuf__ uint32_t*)(currSortedIndex + (2 * i + 1) * GetVecLen() / sizeof(uint16_t) +
+                                     GetVecLen() / sizeof(uint32_t)));
         } else {
             RegTensor<uint32_t> vecIndex0;
             RegTensor<uint32_t> vecIndex1;
@@ -556,8 +556,8 @@ __simd_vf__ inline void UpdateValueAndIndexByLocalIndex(
                 (__ubuf__ uint32_t*)(currSortedIndex + i * GetVecLen() / sizeof(uint16_t)));
             GatherAndStoreB64Elements(
                 localOffset1, maskHigh, (__ubuf__ uint32_t*)prevSortedIndex,
-                (__ubuf__
-                     uint32_t*)(currSortedIndex + i * GetVecLen() / sizeof(uint16_t) + GetVecLen() / sizeof(uint32_t)));
+                (__ubuf__ uint32_t*)(currSortedIndex + i * GetVecLen() / sizeof(uint16_t) +
+                                     GetVecLen() / sizeof(uint32_t)));
         } else {
             RegTensor<uint32_t> indexU32P0;
             RegTensor<uint32_t> indexU32P1;

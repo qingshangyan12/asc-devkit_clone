@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/normalization/deepnorm/deepnorm_v220_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/normalization/layernorm.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/normalization/deepnorm/deepnorm_v220_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/normalization/layernorm.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZATION_DEEPNORM_DEEPNORM_V220_IMPL_H__
 #endif
@@ -32,7 +32,7 @@ namespace DeepNormAPI {
 constexpr uint32_t BASIC_BLOCK_HLENGTH = 64; // when isBasicBlock, H must be N * 64
 constexpr uint32_t BASIC_BLOCK_BSLENGTH = 8; // when isBasicBlock, B*S must be N * 8
 constexpr uint32_t FLOAT_PER_BLOCK = 8;
-constexpr uint8_t HALF_REPEAT_STRIDE = 4; // DEFAULT_REPEAT_STRIDE / sizeof(half)
+constexpr uint8_t HALF_REPEAT_STRIDE = 4;    // DEFAULT_REPEAT_STRIDE / sizeof(half)
 constexpr float SQRT_EXPONENT = -0.5;
 
 // brcb 1 num to 64 num. BasicBlock h is 64 * n, therefore always use the same 64 num.
@@ -42,7 +42,7 @@ __aicore__ inline void DeepNormBasicBlockVbrcb(
 {
     constexpr uint16_t brcbDstBlkStride = 8; // leave 8 blocks (64 num) space for one num
     constexpr uint16_t brcbDstRepStride = 64;
-    constexpr uint16_t addSrcBlkStride = 0; // in Adds, one block used 8 times
+    constexpr uint16_t addSrcBlkStride = 0;  // in Adds, one block used 8 times
     const uint8_t repeatTimes = bsLength / 8;
     SetMaskNorm();
     ResetMask();

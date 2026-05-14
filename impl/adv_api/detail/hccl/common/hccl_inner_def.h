@@ -149,12 +149,12 @@ constexpr uint64_t CCU_LOOP_COUNT_M2M_RE = 16; // AllReduce ReduceScatter
 constexpr uint64_t CCU_LOOP_COUNT_M2M_AG = 8;  // AllGather
 constexpr uint64_t CCU_LOOP_COUNT_ATAVW = 8;   // CCU cycle number, only for AlltoAllvWrite
 constexpr uint64_t ALIGN_64_BYTE = 64;
-constexpr uint64_t CCU_MEMSLICE_SIZE = 4096; // CCU MS size, MC2 is not aware of it
+constexpr uint64_t CCU_MEMSLICE_SIZE = 4096;   // CCU MS size, MC2 is not aware of it
 constexpr uint8_t CCU_MSG_CKE_INIT_VALUE = 0;
 constexpr uint8_t CCU_MSG_CKE_SET_VALUE = 1;
 
 struct CCUMsg {
-    GM_ADDR xnData; // Msg is converted to CCU register value
+    GM_ADDR xnData;        // Msg is converted to CCU register value
     GM_ADDR xnAddr;
     GM_ADDR commitCKEAddr; // The commit address corresponding to each msg
     GM_ADDR waitCKEAddr;   // The wait address corresponding to each Msg

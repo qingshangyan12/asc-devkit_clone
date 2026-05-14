@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/pad/broadcast/broadcast_gather_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/pad/broadcast.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/pad/broadcast/broadcast_gather_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/pad/broadcast.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_GATHER_C310_IMPL_H__
 #endif
@@ -81,8 +81,8 @@ __simd_vf__ inline void VfGenIndex(
 }
 
 __simd_vf__ inline void VfGenIndexB8(
-    __ubuf__ int16_t* indexUb, uint32_t sizeI0, uint32_t sizeI1, uint32_t sizeI2, uint32_t strideI0,
-    uint32_t strideI1, uint32_t strideI2)
+    __ubuf__ int16_t* indexUb, uint32_t sizeI0, uint32_t sizeI1, uint32_t sizeI2, uint32_t strideI0, uint32_t strideI1,
+    uint32_t strideI2)
 {
     constexpr uint32_t VF_LEN_HALF = GetVecLen() / sizeof(int16_t);
     Reg::RegTensor<int16_t> v0, v1, v2, v3;
@@ -200,8 +200,8 @@ __simd_vf__ inline void VfGenIndexForFourDim(
 
 template <typename T>
 __simd_vf__ inline void VfGatherBrc(
-    __ubuf__ T* dstUb, __ubuf__ T* srcUb, __ubuf__ T* indexUb, uint16_t size1, uint16_t size2,
-    uint16_t srcStride1, uint16_t srcStride2, uint32_t main, uint32_t tail)
+    __ubuf__ T* dstUb, __ubuf__ T* srcUb, __ubuf__ T* indexUb, uint16_t size1, uint16_t size2, uint16_t srcStride1,
+    uint16_t srcStride2, uint32_t main, uint32_t tail)
 {
     Reg::UnalignReg u0;
     Reg::RegTensor<T> vindex0;
@@ -355,16 +355,15 @@ __aicore__ inline void GenGatherIndex(__ubuf__ T* indexUb, const uint32_t* size,
     }
 
     if constexpr (sizeof(T) == sizeof(uint8_t)) {
-        VfGenIndexB8((__ubuf__ int16_t*)indexUb, sizeI[0], sizeI[1], sizeI[2], srcStride[0], srcStride[1],
-            srcStride[2]);
+        VfGenIndexB8(
+            (__ubuf__ int16_t*)indexUb, sizeI[0], sizeI[1], sizeI[2], srcStride[0], srcStride[1], srcStride[2]);
     } else {
         VfGenIndex<T>(indexUb, sizeI[0], sizeI[1], sizeI[2], srcStride[0], srcStride[1], srcStride[2]);
     }
 }
 
 template <typename T>
-__aicore__ inline void GenGatherIndexForFourDim(
-    __ubuf__ T* indexUb, const uint32_t* size, const uint32_t* srcStride)
+__aicore__ inline void GenGatherIndexForFourDim(__ubuf__ T* indexUb, const uint32_t* size, const uint32_t* srcStride)
 {
     constexpr uint32_t VF_LEN = GetVecLen() / sizeof(T);
     uint32_t sizeI[4];

@@ -23,109 +23,49 @@
 #include "instr_impl/npu_arch_3510/scalar_compute_impl/asc_set_nthbit_impl.h"
 
 // ==========asc_clz==========
-__aicore__ inline int64_t asc_clz(uint64_t value_in)
-{
-    return asc_clz_impl(value_in);
-}
+__aicore__ inline int64_t asc_clz(uint64_t value_in) { return asc_clz_impl(value_in); }
 
-__aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value)
-{
-    return asc_zero_bits_cnt_impl(value);
-}
+__aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value) { return asc_zero_bits_cnt_impl(value); }
 
-__aicore__ inline int64_t asc_ffs(uint64_t value)
-{
-    return asc_ffs_impl(value);
-}
+__aicore__ inline int64_t asc_ffs(uint64_t value) { return asc_ffs_impl(value); }
 
-__aicore__ inline int64_t asc_popc(uint64_t value)
-{
-    return asc_popc_impl(value);
-}
+__aicore__ inline int64_t asc_popc(uint64_t value) { return asc_popc_impl(value); }
 
-__aicore__ inline void asc_store_dev(__gm__ int8_t* addr, int8_t value)
-{
-    asc_store_dev_impl(addr, value);
-}
+__aicore__ inline void asc_store_dev(__gm__ int8_t* addr, int8_t value) { asc_store_dev_impl(addr, value); }
 
-__aicore__ inline void asc_store_dev(__gm__ uint8_t* addr, uint8_t value)
-{
-    asc_store_dev_impl(addr, value);
-}
+__aicore__ inline void asc_store_dev(__gm__ uint8_t* addr, uint8_t value) { asc_store_dev_impl(addr, value); }
 
-__aicore__ inline void asc_store_dev(__gm__ int16_t* addr, int16_t value)
-{
-    asc_store_dev_impl(addr, value);
-}
+__aicore__ inline void asc_store_dev(__gm__ int16_t* addr, int16_t value) { asc_store_dev_impl(addr, value); }
 
-__aicore__ inline void asc_store_dev(__gm__ uint16_t* addr, uint16_t value)
-{
-    asc_store_dev_impl(addr, value);
-}
+__aicore__ inline void asc_store_dev(__gm__ uint16_t* addr, uint16_t value) { asc_store_dev_impl(addr, value); }
 
-__aicore__ inline void asc_store_dev(__gm__ int32_t* addr, int32_t value)
-{
-    asc_store_dev_impl(addr, value);
-}
+__aicore__ inline void asc_store_dev(__gm__ int32_t* addr, int32_t value) { asc_store_dev_impl(addr, value); }
 
-__aicore__ inline void asc_store_dev(__gm__ uint32_t* addr, uint32_t value)
-{
-    asc_store_dev_impl(addr, value);
-}
+__aicore__ inline void asc_store_dev(__gm__ uint32_t* addr, uint32_t value) { asc_store_dev_impl(addr, value); }
 
-__aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value)
-{
-    asc_store_dev_impl(addr, value);
-}
+__aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value) { asc_store_dev_impl(addr, value); }
 
-__aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value)
-{
-    asc_store_dev_impl(addr, value);
-}
+__aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value) { asc_store_dev_impl(addr, value); }
 
 // ==========asc_float2int32 (rd/ru/rn/rna)==========
-__aicore__ inline int32_t asc_float2int32_rd(float value)
-{
-    return asc_float2int32_rd_impl(value);
-}
+__aicore__ inline int32_t asc_float2int32_rd(float value) { return asc_float2int32_rd_impl(value); }
 
-__aicore__ inline int32_t asc_float2int32_ru(float value)
-{
-    return asc_float2int32_ru_impl(value);
-}
+__aicore__ inline int32_t asc_float2int32_ru(float value) { return asc_float2int32_ru_impl(value); }
 
-__aicore__ inline int32_t asc_float2int32_rn(float value)
-{
-    return asc_float2int32_rn_impl(value);
-}
+__aicore__ inline int32_t asc_float2int32_rn(float value) { return asc_float2int32_rn_impl(value); }
 
-__aicore__ inline int32_t asc_float2int32_rna(float value)
-{
-    return asc_float2int32_rna_impl(value);
-}
+__aicore__ inline int32_t asc_float2int32_rna(float value) { return asc_float2int32_rna_impl(value); }
 
 //=============asc_sflbits============
-__aicore__ inline int64_t asc_sflbits(int64_t value)
-{
-    return asc_sflbits_impl(value);
-}
+__aicore__ inline int64_t asc_sflbits(int64_t value) { return asc_sflbits_impl(value); }
 
 //=============asc_ffz================
-__aicore__ inline int64_t asc_ffz(uint64_t value)
-{
-    return asc_ffz_impl(value);
-}
+__aicore__ inline int64_t asc_ffz(uint64_t value) { return asc_ffz_impl(value); }
 
 //=============asc_clear_nthbit================
-__aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx)
-{
-    return asc_clear_nthbit_impl(bits, idx);
-}
+__aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx) { return asc_clear_nthbit_impl(bits, idx); }
 
 //=============asc_set_nthbit================
-__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx)
-{
-    return asc_set_nthbit_impl(bits, idx);
-}
+__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx) { return asc_set_nthbit_impl(bits, idx); }
 
 #endif

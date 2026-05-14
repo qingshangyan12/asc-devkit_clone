@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <vector>
 #include <cstring>
@@ -24,15 +24,9 @@ protected:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
 
-    void SetUp() override 
-    {
-        AscendC::SetGCoreType(1);
-    }
+    void SetUp() override { AscendC::SetGCoreType(1); }
 
-    void TearDown() override 
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void TearDown() override { AscendC::SetGCoreType(0); }
 };
 
 namespace {
@@ -95,28 +89,29 @@ extern void set_loop1_stride_outtol1(uint64_t config);
 extern void set_loop2_stride_outtol1(uint64_t config);
 extern void set_loop_size_outtol1(uint64_t config);
 extern void set_pad_val_outtol1(uint64_t config);
-extern void copy_gm_to_cbuf_align_v2(half* dst, half* src, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
-                                     uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit,
-                                     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
-extern void copy_gm_to_cbuf_multi_nd2nz(half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride,
-                                        uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value,
-                                        uint64_t loop4_src_stride, bool smallc0_en);
-extern void copy_gm_to_cbuf_multi_dn2nz(half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride,
-                                        uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value,
-                                        uint64_t loop4_src_stride, bool smallc0_en);
+extern void copy_gm_to_cbuf_align_v2(
+    half* dst, half* src, uint8_t sid, uint32_t burst_num, uint32_t burst_len, uint8_t left_padding_count,
+    uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
+    uint32_t burst_dst_stride);
+extern void copy_gm_to_cbuf_multi_nd2nz(
+    half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
+    uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
+extern void copy_gm_to_cbuf_multi_dn2nz(
+    half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
+    uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 extern void set_mte2_nz_para(uint64_t para);
 
-#define CAPTURE_GM_TO_L1_DEFINITION(type)                                                                              \
-    void CaptureCopyGmToCbufAlignV2_##type(__cbuf__ type* dst, __gm__ type* src, uint8_t sid, uint32_t blockCount,     \
-                                           uint32_t blockLen, uint8_t leftPaddingCnt, uint8_t rightPaddingCnt,         \
-                                           bool dataSelectBit, uint8_t l2CacheCtl, uint64_t srcStride,                 \
-                                           uint32_t dstStride);                                                        \
-    void CaptureCopyGmToCbufMultiND2nz_##type(__cbuf__ type* dst, __gm__ type* src, uint8_t sid,                       \
-                                              uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,       \
-                                              uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);           \
-    void CaptureCopyGmToCbufMultiDN2nz_##type(__cbuf__ type* dst, __gm__ type* src, uint8_t sid,                       \
-                                              uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,       \
-                                              uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
+#define CAPTURE_GM_TO_L1_DEFINITION(type)                                                                            \
+    void CaptureCopyGmToCbufAlignV2_##type(                                                                          \
+        __cbuf__ type* dst, __gm__ type* src, uint8_t sid, uint32_t blockCount, uint32_t blockLen,                   \
+        uint8_t leftPaddingCnt, uint8_t rightPaddingCnt, bool dataSelectBit, uint8_t l2CacheCtl, uint64_t srcStride, \
+        uint32_t dstStride);                                                                                         \
+    void CaptureCopyGmToCbufMultiND2nz_##type(                                                                       \
+        __cbuf__ type* dst, __gm__ type* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,          \
+        uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);                             \
+    void CaptureCopyGmToCbufMultiDN2nz_##type(                                                                       \
+        __cbuf__ type* dst, __gm__ type* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,          \
+        uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
 CAPTURE_GM_TO_L1_DEFINITION(uint8_t);
 CAPTURE_GM_TO_L1_DEFINITION(half);
@@ -126,18 +121,22 @@ CAPTURE_GM_TO_L1_DEFINITION(uint32_t);
 
 void CaptureSetMTE2NzPara(uint64_t para);
 
-#define MOCKER_GM_TO_L1(type)                                                                                          \
-    MOCKER(copy_gm_to_cbuf_align_v2, void (*)(__cbuf__ type*, __gm__ type*, uint8_t, uint32_t, uint32_t, uint8_t,      \
-                                              uint8_t, bool, uint8_t, uint64_t, uint32_t))                             \
-        .stubs()                                                                                                       \
-        .will(invoke(CaptureCopyGmToCbufAlignV2_##type));                                                              \
-    MOCKER(copy_gm_to_cbuf_multi_nd2nz,                                                                                \
-           void (*)(__cbuf__ type*, __gm__ type*, uint8_t, uint64_t, uint8_t, uint16_t, uint32_t, uint64_t, bool))     \
-        .stubs()                                                                                                       \
-        .will(invoke(CaptureCopyGmToCbufMultiND2nz_##type));                                                           \
-    MOCKER(copy_gm_to_cbuf_multi_dn2nz,                                                                                \
-           void (*)(__cbuf__ type*, __gm__ type*, uint8_t, uint64_t, uint8_t, uint16_t, uint32_t, uint64_t, bool))     \
-        .stubs()                                                                                                       \
+#define MOCKER_GM_TO_L1(type)                                                                                      \
+    MOCKER(                                                                                                        \
+        copy_gm_to_cbuf_align_v2, void (*)(                                                                        \
+                                      __cbuf__ type*, __gm__ type*, uint8_t, uint32_t, uint32_t, uint8_t, uint8_t, \
+                                      bool, uint8_t, uint64_t, uint32_t))                                          \
+        .stubs()                                                                                                   \
+        .will(invoke(CaptureCopyGmToCbufAlignV2_##type));                                                          \
+    MOCKER(                                                                                                        \
+        copy_gm_to_cbuf_multi_nd2nz,                                                                               \
+        void (*)(__cbuf__ type*, __gm__ type*, uint8_t, uint64_t, uint8_t, uint16_t, uint32_t, uint64_t, bool))    \
+        .stubs()                                                                                                   \
+        .will(invoke(CaptureCopyGmToCbufMultiND2nz_##type));                                                       \
+    MOCKER(                                                                                                        \
+        copy_gm_to_cbuf_multi_dn2nz,                                                                               \
+        void (*)(__cbuf__ type*, __gm__ type*, uint8_t, uint64_t, uint8_t, uint16_t, uint32_t, uint64_t, bool))    \
+        .stubs()                                                                                                   \
         .will(invoke(CaptureCopyGmToCbufMultiDN2nz_##type))
 
 void ResetCapture();
@@ -183,8 +182,8 @@ private:
         using TT = Std::conditional_t<sizeof(T) == 2, uint16_t, CastT>;
         std::iota(reinterpret_cast<TT*>(src0Gm), reinterpret_cast<TT*>(src0Gm + GmSize), static_cast<TT>(1));
         std::fill(reinterpret_cast<TT*>(l1ABuf), reinterpret_cast<TT*>(l1ABuf + L1Size), static_cast<TT>(1));
-        std::fill(reinterpret_cast<TT*>(l1ABufGolden), reinterpret_cast<TT*>(l1ABufGolden + L1Size),
-                  static_cast<TT>(1));
+        std::fill(
+            reinterpret_cast<TT*>(l1ABufGolden), reinterpret_cast<TT*>(l1ABufGolden + L1Size), static_cast<TT>(1));
     }
 
 private:
@@ -197,54 +196,54 @@ private:
     int32_t tmpCoreType{0};
 };
 
-#define EXPECT_GM2L1_EQ()                                                                                              \
-    bool result = std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden);                                                   \
-    EXPECT_TRUE(result);                                                                                               \
-    if (gDebugPrint || !result) {                                                                                      \
-        PrintCaptureData();                                                                                            \
-        PrintTensor(gmA);                                                                                              \
-        PrintTensor(l1ATensor);                                                                                        \
-        PrintTensor(l1ATensorGolden);                                                                                  \
+#define EXPECT_GM2L1_EQ()                                            \
+    bool result = std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden); \
+    EXPECT_TRUE(result);                                             \
+    if (gDebugPrint || !result) {                                    \
+        PrintCaptureData();                                          \
+        PrintTensor(gmA);                                            \
+        PrintTensor(l1ATensor);                                      \
+        PrintTensor(l1ATensorGolden);                                \
     }
 
 #define TEST_GM2L1_CONCAT_IMPL_(a, b, c, d) a##_##b##_##c##_##index##_##d
 #define TEST_GM2L1_CONCAT_(a, b, c, d) TEST_GM2L1_CONCAT_IMPL_(a, b, c, d)
-#define TEST_GM2L1_INNER(type, name, gmALayout, l1ALayout, counter)                                                    \
-    TEST_F(TensorApiGm2L1, TEST_GM2L1_CONCAT_(CopyGm2L1Operation, name, type, counter))                                \
-    {                                                                                                                  \
-        using T = type;                                                                                                \
-        auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmALayout);                      \
-        auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1ALayout);                \
-        auto l1ATensorGolden = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);    \
-        auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                                \
-        InitializeData<T>();                                                                                           \
-        atomCopy.Call(l1ATensor, gmA);                                                                                 \
-        DataCopyGm2L1Sim(l1ATensorGolden, gmA);                                                                        \
-        EXPECT_GM2L1_EQ();                                                                                             \
+#define TEST_GM2L1_INNER(type, name, gmALayout, l1ALayout, counter)                                                 \
+    TEST_F(TensorApiGm2L1, TEST_GM2L1_CONCAT_(CopyGm2L1Operation, name, type, counter))                             \
+    {                                                                                                               \
+        using T = type;                                                                                             \
+        auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmALayout);                   \
+        auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1ALayout);             \
+        auto l1ATensorGolden = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout); \
+        auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                             \
+        InitializeData<T>();                                                                                        \
+        atomCopy.Call(l1ATensor, gmA);                                                                              \
+        DataCopyGm2L1Sim(l1ATensorGolden, gmA);                                                                     \
+        EXPECT_GM2L1_EQ();                                                                                          \
     }
-#define TEST_GM2L1_COORD_INNER(type, name, gmALayout, l1ALayout, makeCoord, counter)                                   \
-    TEST_F(TensorApiGm2L1, TEST_GM2L1_CONCAT_(CopyGm2L1OperationWithCoord, name, type, counter))                       \
-    {                                                                                                                  \
-        using T = type;                                                                                                \
-        auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmALayout);                      \
-        auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1ALayout);                \
-        auto l1ATensorGolden = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);    \
-        auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                                \
-        InitializeData<T>();                                                                                           \
-        auto coord = makeCoord;                                                                                        \
-        DataCopyGm2L1Sim(l1ATensorGolden, gmA, coord);                                                                 \
+#define TEST_GM2L1_COORD_INNER(type, name, gmALayout, l1ALayout, makeCoord, counter)                                \
+    TEST_F(TensorApiGm2L1, TEST_GM2L1_CONCAT_(CopyGm2L1OperationWithCoord, name, type, counter))                    \
+    {                                                                                                               \
+        using T = type;                                                                                             \
+        auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmALayout);                   \
+        auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1ALayout);             \
+        auto l1ATensorGolden = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout); \
+        auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                             \
+        InitializeData<T>();                                                                                        \
+        auto coord = makeCoord;                                                                                     \
+        DataCopyGm2L1Sim(l1ATensorGolden, gmA, coord);                                                              \
     }
 
 #define TEST_GM2L1(type, name, gmALayout, l1ALayout) TEST_GM2L1_INNER(type, name, gmALayout, l1ALayout, __COUNTER__)
 
-#define TEST_GM2L1_COORD(type, name, gmALayout, l1ALayout, makeCoord)                                                  \
+#define TEST_GM2L1_COORD(type, name, gmALayout, l1ALayout, makeCoord) \
     TEST_GM2L1_COORD_INNER(type, name, gmALayout, l1ALayout, makeCoord, __COUNTER__)
 
-#define MAKE_LAYOUT_FUNC(NAME)                                                                                         \
-    template <typename T>                                                                                              \
-    constexpr auto Make##NAME = [](auto row, auto col) {                                                               \
-        constexpr size_t C0 = IsB4Type<T> ? 64 : 32 / sizeof(T);                                                               \
-        return MakeFrameLayout<NAME##LayoutPtn, LayoutTraitDefault<T, C0>>(row, col);                                  \
+#define MAKE_LAYOUT_FUNC(NAME)                                                        \
+    template <typename T>                                                             \
+    constexpr auto Make##NAME = [](auto row, auto col) {                              \
+        constexpr size_t C0 = IsB4Type<T> ? 64 : 32 / sizeof(T);                      \
+        return MakeFrameLayout<NAME##LayoutPtn, LayoutTraitDefault<T, C0>>(row, col); \
     };
 
 MAKE_LAYOUT_FUNC(NDExt)
@@ -253,9 +252,9 @@ MAKE_LAYOUT_FUNC(NZ)
 MAKE_LAYOUT_FUNC(ZN)
 #undef MAKE_LAYOUT_FUNC
 
-#define MAKE_LAYOUT_FUNC(NAME)                                                                                         \
-    template <typename T>                                                                                              \
-    constexpr auto Make##NAME =                                                                                        \
+#define MAKE_LAYOUT_FUNC(NAME)  \
+    template <typename T>       \
+    constexpr auto Make##NAME = \
         [](auto row, auto col) { return MakeFrameLayout<NAME##LayoutPtn, LayoutTraitDefault<T, 2>>(row, col); };
 
 MAKE_LAYOUT_FUNC(ZZ)
@@ -2063,12 +2062,13 @@ void PrintCaptureData()
     }
 }
 
-extern void copy_gm_to_cbuf_multi_nd2nz(half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride,
-                                        uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value,
-                                        uint64_t loop4_src_stride, bool smallc0_en);
+extern void copy_gm_to_cbuf_multi_nd2nz(
+    half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
+    uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 template <typename T>
-void SimulateND2nzDataCopy(T* dst, T* src, uint64_t loop1SrcStride, uint16_t nValue, uint32_t dValue,
-                           uint64_t loop4SrcStride, bool enableSmallC0)
+void SimulateND2nzDataCopy(
+    T* dst, T* src, uint64_t loop1SrcStride, uint16_t nValue, uint32_t dValue, uint64_t loop4SrcStride,
+    bool enableSmallC0)
 {
     if (gGm2L1NzParaCaptures.empty()) {
         return;
@@ -2127,12 +2127,13 @@ void SimulateND2nzDataCopy(T* dst, T* src, uint64_t loop1SrcStride, uint16_t nVa
     }
 }
 
-extern void copy_gm_to_cbuf_multi_dn2nz(half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride,
-                                        uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value,
-                                        uint64_t loop4_src_stride, bool smallc0_en);
+extern void copy_gm_to_cbuf_multi_dn2nz(
+    half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
+    uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 template <typename T>
-void SimulateDN2nzDataCopy(T* dst, T* src, uint64_t loop1SrcStride, uint16_t nValue, uint32_t dValue,
-                           uint64_t loop4SrcStride, bool enableSmallC0)
+void SimulateDN2nzDataCopy(
+    T* dst, T* src, uint64_t loop1SrcStride, uint16_t nValue, uint32_t dValue, uint64_t loop4SrcStride,
+    bool enableSmallC0)
 {
     if (gGm2L1NzParaCaptures.empty()) {
         return;
@@ -2191,12 +2192,14 @@ void SimulateDN2nzDataCopy(T* dst, T* src, uint64_t loop1SrcStride, uint16_t nVa
     }
 }
 
-extern void copy_gm_to_cbuf_align_v2(half* dst, half* src, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
-                                     uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit,
-                                     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+extern void copy_gm_to_cbuf_align_v2(
+    half* dst, half* src, uint8_t sid, uint32_t burst_num, uint32_t burst_len, uint8_t left_padding_count,
+    uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
+    uint32_t burst_dst_stride);
 template <typename T>
-void SimulateAlignV2DataCopy(T* dst, T* src, uint32_t blockCount, uint32_t blockLen, uint8_t leftPaddingCnt,
-                             uint8_t rightPaddingCnt, bool dataSelectBit, uint64_t srcStride, uint32_t dstStride)
+void SimulateAlignV2DataCopy(
+    T* dst, T* src, uint32_t blockCount, uint32_t blockLen, uint8_t leftPaddingCnt, uint8_t rightPaddingCnt,
+    bool dataSelectBit, uint64_t srcStride, uint32_t dstStride)
 {
     bool isLPRPMode = (leftPaddingCnt > 0) || (rightPaddingCnt > 0);
     bool isCompactMode = (dstStride == blockLen);
@@ -2218,8 +2221,9 @@ void SimulateAlignV2DataCopy(T* dst, T* src, uint32_t blockCount, uint32_t block
 
             uint32_t rightPadOffset = leftPaddingCnt * sizeof(T) + blockLen;
             if (rightPaddingCnt > 0) {
-                std::fill(dstBurst + rightPadOffset, dstBurst + rightPadOffset + rightPaddingCnt * sizeof(T),
-                          0); // Padding with zeros
+                std::fill(
+                    dstBurst + rightPadOffset, dstBurst + rightPadOffset + rightPaddingCnt * sizeof(T),
+                    0); // Padding with zeros
             }
 
             uint32_t padOffset = leftPaddingCnt * sizeof(T) + blockLen + rightPaddingCnt * sizeof(T);
@@ -2266,56 +2270,56 @@ void CaptureSetMTE2NzPara(uint64_t para)
     gGm2L1NzParaCaptures.push_back(capture);
 }
 
-#define CAPTURE_GM_TO_L1_IMPL(type)                                                                                    \
-    void CaptureCopyGmToCbufAlignV2_##type(__cbuf__ type* dst, __gm__ type* src, uint8_t sid, uint32_t blockCount,     \
-                                           uint32_t blockLen, uint8_t leftPaddingCnt, uint8_t rightPaddingCnt,         \
-                                           bool dataSelectBit, uint8_t l2CacheCtl, uint64_t srcStride,                 \
-                                           uint32_t dstStride)                                                         \
-    {                                                                                                                  \
-        CopyGm2L1AlignV2Capture capture;                                                                               \
-        capture.dst = reinterpret_cast<void*>(dst);                                                                    \
-        capture.src = reinterpret_cast<void*>(src);                                                                    \
-        capture.blockCount = blockCount;                                                                               \
-        capture.blockLen = blockLen;                                                                                   \
-        capture.leftPaddingCnt = leftPaddingCnt;                                                                       \
-        capture.rightPaddingCnt = rightPaddingCnt;                                                                     \
-        capture.dataSelectBit = dataSelectBit;                                                                         \
-        capture.l2CacheCtl = l2CacheCtl;                                                                               \
-        capture.srcStride = srcStride;                                                                                 \
-        capture.dstStride = dstStride;                                                                                 \
-        gGm2L1AlignV2Captures.push_back(capture);                                                                      \
-        SimulateAlignV2DataCopy(dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, dataSelectBit,        \
-                                srcStride, dstStride);                                                                 \
-    }                                                                                                                  \
-    void CaptureCopyGmToCbufMultiND2nz_##type(__cbuf__ type* dst, __gm__ type* src, uint8_t sid,                       \
-                                              uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,       \
-                                              uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)            \
-    {                                                                                                                  \
-        CopyGm2L1ND2NzCapture capture;                                                                                 \
-        capture.dst = reinterpret_cast<void*>(dst);                                                                    \
-        capture.src = reinterpret_cast<void*>(src);                                                                    \
-        capture.loop1SrcStride = loop1_src_stride;                                                                     \
-        capture.nValue = n_value;                                                                                      \
-        capture.dValue = d_value;                                                                                      \
-        capture.loop4SrcStride = loop4_src_stride;                                                                     \
-        capture.enableSmallC0 = smallc0_en;                                                                            \
-        gGm2L1ND2NzCaptures.push_back(capture);                                                                        \
-        SimulateND2nzDataCopy(dst, src, loop1_src_stride, n_value, d_value, loop4_src_stride, smallc0_en);             \
-    }                                                                                                                  \
-    void CaptureCopyGmToCbufMultiDN2nz_##type(__cbuf__ type* dst, __gm__ type* src, uint8_t sid,                       \
-                                              uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,       \
-                                              uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)            \
-    {                                                                                                                  \
-        CopyGm2L1DN2NzCapture capture;                                                                                 \
-        capture.dst = reinterpret_cast<void*>(dst);                                                                    \
-        capture.src = reinterpret_cast<void*>(src);                                                                    \
-        capture.loop1SrcStride = loop1_src_stride;                                                                     \
-        capture.nValue = n_value;                                                                                      \
-        capture.dValue = d_value;                                                                                      \
-        capture.loop4SrcStride = loop4_src_stride;                                                                     \
-        capture.enableSmallC0 = smallc0_en;                                                                            \
-        gGm2L1DN2NzCaptures.push_back(capture);                                                                        \
-        SimulateDN2nzDataCopy(dst, src, loop1_src_stride, n_value, d_value, loop4_src_stride, smallc0_en);             \
+#define CAPTURE_GM_TO_L1_IMPL(type)                                                                                  \
+    void CaptureCopyGmToCbufAlignV2_##type(                                                                          \
+        __cbuf__ type* dst, __gm__ type* src, uint8_t sid, uint32_t blockCount, uint32_t blockLen,                   \
+        uint8_t leftPaddingCnt, uint8_t rightPaddingCnt, bool dataSelectBit, uint8_t l2CacheCtl, uint64_t srcStride, \
+        uint32_t dstStride)                                                                                          \
+    {                                                                                                                \
+        CopyGm2L1AlignV2Capture capture;                                                                             \
+        capture.dst = reinterpret_cast<void*>(dst);                                                                  \
+        capture.src = reinterpret_cast<void*>(src);                                                                  \
+        capture.blockCount = blockCount;                                                                             \
+        capture.blockLen = blockLen;                                                                                 \
+        capture.leftPaddingCnt = leftPaddingCnt;                                                                     \
+        capture.rightPaddingCnt = rightPaddingCnt;                                                                   \
+        capture.dataSelectBit = dataSelectBit;                                                                       \
+        capture.l2CacheCtl = l2CacheCtl;                                                                             \
+        capture.srcStride = srcStride;                                                                               \
+        capture.dstStride = dstStride;                                                                               \
+        gGm2L1AlignV2Captures.push_back(capture);                                                                    \
+        SimulateAlignV2DataCopy(                                                                                     \
+            dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, dataSelectBit, srcStride, dstStride);   \
+    }                                                                                                                \
+    void CaptureCopyGmToCbufMultiND2nz_##type(                                                                       \
+        __cbuf__ type* dst, __gm__ type* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,          \
+        uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)                              \
+    {                                                                                                                \
+        CopyGm2L1ND2NzCapture capture;                                                                               \
+        capture.dst = reinterpret_cast<void*>(dst);                                                                  \
+        capture.src = reinterpret_cast<void*>(src);                                                                  \
+        capture.loop1SrcStride = loop1_src_stride;                                                                   \
+        capture.nValue = n_value;                                                                                    \
+        capture.dValue = d_value;                                                                                    \
+        capture.loop4SrcStride = loop4_src_stride;                                                                   \
+        capture.enableSmallC0 = smallc0_en;                                                                          \
+        gGm2L1ND2NzCaptures.push_back(capture);                                                                      \
+        SimulateND2nzDataCopy(dst, src, loop1_src_stride, n_value, d_value, loop4_src_stride, smallc0_en);           \
+    }                                                                                                                \
+    void CaptureCopyGmToCbufMultiDN2nz_##type(                                                                       \
+        __cbuf__ type* dst, __gm__ type* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,          \
+        uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)                              \
+    {                                                                                                                \
+        CopyGm2L1DN2NzCapture capture;                                                                               \
+        capture.dst = reinterpret_cast<void*>(dst);                                                                  \
+        capture.src = reinterpret_cast<void*>(src);                                                                  \
+        capture.loop1SrcStride = loop1_src_stride;                                                                   \
+        capture.nValue = n_value;                                                                                    \
+        capture.dValue = d_value;                                                                                    \
+        capture.loop4SrcStride = loop4_src_stride;                                                                   \
+        capture.enableSmallC0 = smallc0_en;                                                                          \
+        gGm2L1DN2NzCaptures.push_back(capture);                                                                      \
+        SimulateDN2nzDataCopy(dst, src, loop1_src_stride, n_value, d_value, loop4_src_stride, smallc0_en);           \
     }
 
 CAPTURE_GM_TO_L1_IMPL(uint8_t);

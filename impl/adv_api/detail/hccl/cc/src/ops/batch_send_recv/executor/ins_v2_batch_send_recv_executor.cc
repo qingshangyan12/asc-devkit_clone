@@ -1,24 +1,21 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include <algorithm>
 #include "alg_data_trans_wrapper.h"
 #include "ins_v2_batch_send_recv_executor.h"
 
 namespace ops_hccl {
-InsV2BatchSendRecvExecutor::InsV2BatchSendRecvExecutor()
-{
-}
+InsV2BatchSendRecvExecutor::InsV2BatchSendRecvExecutor() {}
 
-HcclResult InsV2BatchSendRecvExecutor::CalcAlgHierarchyInfo(HcclComm comm,
-    TopoInfoWithNetLayerDetails* topoInfo,
-    AlgHierarchyInfoForAllLevel& algHierarchyInfo)
+HcclResult InsV2BatchSendRecvExecutor::CalcAlgHierarchyInfo(
+    HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo)
 {
     algHierarchyInfo.infos.resize(1);
     algHierarchyInfo.infos[0].resize(1);
@@ -28,9 +25,9 @@ HcclResult InsV2BatchSendRecvExecutor::CalcAlgHierarchyInfo(HcclComm comm,
     return HCCL_SUCCESS;
 }
 
-HcclResult InsV2BatchSendRecvExecutor::CalcRes(HcclComm comm, const OpParam& param,
-    const TopoInfoWithNetLayerDetails* topoInfo, const AlgHierarchyInfoForAllLevel& algHierarchyInfo,
-    AlgResourceRequest& resourceRequest)
+HcclResult InsV2BatchSendRecvExecutor::CalcRes(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     myRank_ = topoInfo->userRank;
     itemNum_ = param.batchSendRecvDataDes.itemNum;
@@ -46,11 +43,10 @@ HcclResult InsV2BatchSendRecvExecutor::CalcRes(HcclComm comm, const OpParam& par
     commTargetUserRankSet_.clear();
     for (u32 i = 0; i < itemNum_; i++) {
         commTargetUserRankSet_.insert((itemPtr_ + i)->remoteRank);
-        HCCL_DEBUG("[InsV2BatchSendRecvExecutor][CalcRes] insert remoteUserRank[%u] to Set ",
-            (itemPtr_ + i)->remoteRank);
+        HCCL_DEBUG(
+            "[InsV2BatchSendRecvExecutor][CalcRes] insert remoteUserRank[%u] to Set ", (itemPtr_ + i)->remoteRank);
     }
-    HCCL_DEBUG("[InsV2BatchSendRecvExecutor][CalcRes]commTargetUserRankSet_ size[%zu]",
-        commTargetUserRankSet_.size());
+    HCCL_DEBUG("[InsV2BatchSendRecvExecutor][CalcRes]commTargetUserRankSet_ size[%zu]", commTargetUserRankSet_.size());
 
     // 遍历remoteRank集合，如果在algHierarchyInfo中，则建链，否则报错
     std::vector<HcclChannelDesc> channelLevel0;
@@ -60,13 +56,15 @@ HcclResult InsV2BatchSendRecvExecutor::CalcRes(HcclComm comm, const OpParam& par
         }
         auto it = std::find(algHierarchyInfo.infos[0][0].begin(), algHierarchyInfo.infos[0][0].end(), remoteRank);
         if (it == algHierarchyInfo.infos[0][0].end()) {
-            HCCL_ERROR("[InsV2BatchSendRecvExecutor][CalcRes] task remoteRank[%u] has no direct link with myRank[%u]",
+            HCCL_ERROR(
+                "[InsV2BatchSendRecvExecutor][CalcRes] task remoteRank[%u] has no direct link with myRank[%u]",
                 remoteRank, myRank_);
             return HCCL_E_PARA;
         } else {
             std::vector<HcclChannelDesc> channelByRank;
             // 和同一个远端之间的send和recv在不同流上，所以需要申请2条channel
-            CHK_RET(CreateChannelRequestByRankId(comm, param, myRank_, remoteRank, channelByRank, channelNumPerRankPair_));
+            CHK_RET(
+                CreateChannelRequestByRankId(comm, param, myRank_, remoteRank, channelByRank, channelNumPerRankPair_));
             // 直接插入到channelLevel0末尾，同一个level的所有rank的所有channel都放在同一级vector中
             channelLevel0.insert(channelLevel0.end(), channelByRank.begin(), channelByRank.end());
         }
@@ -81,7 +79,7 @@ HcclResult InsV2BatchSendRecvExecutor::ProcessSelfSendRecvTasks(ThreadHandle& th
     while (!sendToSelfDeque_.empty() && !recvFromSelfDeque_.empty()) {
         if (sendToSelfDeque_.front()->count == recvFromSelfDeque_.front()->count &&
             sendToSelfDeque_.front()->dataType == recvFromSelfDeque_.front()->dataType) {
-            dataTypeSize_ =  DATATYPE_SIZE_TABLE[sendToSelfDeque_.front()->dataType];
+            dataTypeSize_ = DATATYPE_SIZE_TABLE[sendToSelfDeque_.front()->dataType];
             u64 dataSize = sendToSelfDeque_.front()->count * dataTypeSize_;
 
             void* inputDataPtr = sendToSelfDeque_.front()->buf;
@@ -89,24 +87,24 @@ HcclResult InsV2BatchSendRecvExecutor::ProcessSelfSendRecvTasks(ThreadHandle& th
             DataSlice srcSlice(inputDataPtr, 0, dataSize);
             DataSlice dstSlice(outputDataPtr, 0, dataSize);
             CHK_RET(LocalCopy(thread, srcSlice, dstSlice));
-            HCCL_DEBUG("[InsV2BatchSendRecvExecutor][ProcessSelfSendRecvTasks] inpuData[%p], outputData[%p], dataSize[%llu]",
+            HCCL_DEBUG(
+                "[InsV2BatchSendRecvExecutor][ProcessSelfSendRecvTasks] inpuData[%p], outputData[%p], dataSize[%llu]",
                 inputDataPtr, outputDataPtr, dataSize);
             sendToSelfDeque_.pop_front();
             recvFromSelfDeque_.pop_front();
         } else {
-            HCCL_ERROR("[InsV2BatchSendRecvExecutor][ProcessSelfSendRecvTasks] Send task and recv task to self : "\
-                "count or dataType is not equal, please check the task list.");
+            HCCL_ERROR("[InsV2BatchSendRecvExecutor][ProcessSelfSendRecvTasks] Send task and recv task to self : "
+                       "count or dataType is not equal, please check the task list.");
             return HCCL_E_PARA;
         }
     }
     return HCCL_SUCCESS;
 }
 
-bool InsV2BatchSendRecvExecutor::SortSendItems(const HcclSendRecvItem* a, const HcclSendRecvItem* b) const{
-    u32 aFlag = (a->remoteRank <= static_cast<uint32_t>(myRank_)) ?
-        (a->remoteRank + rankSize_) : a->remoteRank;
-    u32 bFlag = (b->remoteRank <= static_cast<uint32_t>(myRank_)) ?
-        (b->remoteRank + rankSize_) : b->remoteRank;
+bool InsV2BatchSendRecvExecutor::SortSendItems(const HcclSendRecvItem* a, const HcclSendRecvItem* b) const
+{
+    u32 aFlag = (a->remoteRank <= static_cast<uint32_t>(myRank_)) ? (a->remoteRank + rankSize_) : a->remoteRank;
+    u32 bFlag = (b->remoteRank <= static_cast<uint32_t>(myRank_)) ? (b->remoteRank + rankSize_) : b->remoteRank;
     if (aFlag != bFlag) {
         return aFlag > bFlag;
     } else if (a->count != b->count) {
@@ -115,11 +113,10 @@ bool InsV2BatchSendRecvExecutor::SortSendItems(const HcclSendRecvItem* a, const 
     return a->dataType > b->dataType;
 }
 
-bool InsV2BatchSendRecvExecutor::SortRecvItems(const HcclSendRecvItem* a, const HcclSendRecvItem* b) const{
-    u32 aFlag = (a->remoteRank < static_cast<uint32_t>(myRank_)) ?
-        (a->remoteRank + rankSize_) : a->remoteRank;
-    u32 bFlag = (b->remoteRank < static_cast<uint32_t>(myRank_)) ?
-        (b->remoteRank + rankSize_) : b->remoteRank;
+bool InsV2BatchSendRecvExecutor::SortRecvItems(const HcclSendRecvItem* a, const HcclSendRecvItem* b) const
+{
+    u32 aFlag = (a->remoteRank < static_cast<uint32_t>(myRank_)) ? (a->remoteRank + rankSize_) : a->remoteRank;
+    u32 bFlag = (b->remoteRank < static_cast<uint32_t>(myRank_)) ? (b->remoteRank + rankSize_) : b->remoteRank;
     if (aFlag != bFlag) {
         return aFlag < bFlag;
     } else if (a->count != b->count) {
@@ -128,23 +125,24 @@ bool InsV2BatchSendRecvExecutor::SortRecvItems(const HcclSendRecvItem* a, const 
     return a->dataType > b->dataType;
 }
 
-bool InsV2BatchSendRecvExecutor::SortSelfItems(const HcclSendRecvItem* a, const HcclSendRecvItem* b) const{
+bool InsV2BatchSendRecvExecutor::SortSelfItems(const HcclSendRecvItem* a, const HcclSendRecvItem* b) const
+{
     if (a->count != b->count) {
         return a->count > b->count;
     }
     return a->dataType > b->dataType;
 }
 
-HcclResult InsV2BatchSendRecvExecutor::GetPairWiseList(const HcclSendRecvItem *sendRecvInfo, u32 itemNum)
+HcclResult InsV2BatchSendRecvExecutor::GetPairWiseList(const HcclSendRecvItem* sendRecvInfo, u32 itemNum)
 {
     HCCL_INFO("[InsV2BatchSendRecvExecutor][GetPairWiseList] Start sort the batchSendRecv tasklist.");
     CHK_PTR_NULL(sendRecvInfo);
 
     for (u32 i = 0; i < itemNum; i++) {
-        HCCL_INFO("[InsV2BatchSendRecvExecutor][GetPairWiseList] index is %u, itemNum is %u,"\
+        HCCL_INFO(
+            "[InsV2BatchSendRecvExecutor][GetPairWiseList] index is %u, itemNum is %u,"
             "localRankID is %d, remoteRank is %u, sendRecvType is %u, rankSize is %u.",
-            i, itemNum, myRank_, sendRecvInfo->remoteRank,
-            static_cast<u32>(sendRecvInfo->sendRecvType), rankSize_);
+            i, itemNum, myRank_, sendRecvInfo->remoteRank, static_cast<u32>(sendRecvInfo->sendRecvType), rankSize_);
         CHK_PTR_NULL(sendRecvInfo->buf);
 
         if (sendRecvInfo->sendRecvType == HcclSendRecvType::HCCL_SEND) {
@@ -152,8 +150,10 @@ HcclResult InsV2BatchSendRecvExecutor::GetPairWiseList(const HcclSendRecvItem *s
         } else if (sendRecvInfo->sendRecvType == HcclSendRecvType::HCCL_RECV) {
             recvDeque_.push_back(sendRecvInfo);
         } else {
-            HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetPairWiseList] sendRecvType wrong sendrecvType is %d, "\
-                "rankID is %d, remoteRank is %u.", sendRecvInfo->sendRecvType, myRank_, sendRecvInfo->remoteRank);
+            HCCL_ERROR(
+                "[InsV2BatchSendRecvExecutor][GetPairWiseList] sendRecvType wrong sendrecvType is %d, "
+                "rankID is %d, remoteRank is %u.",
+                sendRecvInfo->sendRecvType, myRank_, sendRecvInfo->remoteRank);
             return HcclResult::HCCL_E_PARA;
         }
         sendRecvInfo++;
@@ -178,11 +178,11 @@ HcclResult InsV2BatchSendRecvExecutor::GetPairWiseList(const HcclSendRecvItem *s
 
     // 筛选自收发任务
     while ((!sendDeque_.empty() && sendDeque_.front()->remoteRank == static_cast<uint32_t>(myRank_)) &&
-        (!recvDeque_.empty() && recvDeque_.front()->remoteRank == static_cast<uint32_t>(myRank_))) {
-            sendToSelfDeque_.push_back(sendDeque_.front());
-            recvFromSelfDeque_.push_back(recvDeque_.front());
-            sendDeque_.pop_front();
-            recvDeque_.pop_front();
+           (!recvDeque_.empty() && recvDeque_.front()->remoteRank == static_cast<uint32_t>(myRank_))) {
+        sendToSelfDeque_.push_back(sendDeque_.front());
+        recvFromSelfDeque_.push_back(recvDeque_.front());
+        sendDeque_.pop_front();
+        recvDeque_.pop_front();
     }
     // 自收发任务按照收发长度大小排序
     auto selfDequeCompare = [this](const HcclSendRecvItem* a, const HcclSendRecvItem* b) {
@@ -195,8 +195,8 @@ HcclResult InsV2BatchSendRecvExecutor::GetPairWiseList(const HcclSendRecvItem *s
     // 如果自发自收任务没有完全匹配
     if ((!sendDeque_.empty() && sendDeque_.front()->remoteRank == static_cast<uint32_t>(myRank_)) ||
         (!recvDeque_.empty() && recvDeque_.front()->remoteRank == static_cast<uint32_t>(myRank_))) {
-            HCCL_ERROR("[InsV2BatchSendRecvExecutor] SendTask and Recv Task to rank itself do not match,"\
-            "please check the task list.");
+        HCCL_ERROR("[InsV2BatchSendRecvExecutor] SendTask and Recv Task to rank itself do not match,"
+                   "please check the task list.");
         return HCCL_E_PARA;
     }
     HCCL_INFO("[InsV2BatchSendRecvExecutor][GetPairWiseList] End sort the batchSendRecv tasklist.");
@@ -207,9 +207,10 @@ HcclResult InsV2BatchSendRecvExecutor::CalcSendSlices()
 {
     while (!sendDeque_.empty()) {
         const HcclSendRecvItem* sendItem = sendDeque_.front();
-        HCCL_INFO("[InsV2BatchSendRecvExecutor][CalcSendSlices] remoteRank[%u], buf[%p], count[%llu],"\
-            "dataType[%u], sendRecvType[%d].", sendItem->remoteRank, sendItem->buf,
-            sendItem->count, sendItem->dataType, sendItem->sendRecvType);
+        HCCL_INFO(
+            "[InsV2BatchSendRecvExecutor][CalcSendSlices] remoteRank[%u], buf[%p], count[%llu],"
+            "dataType[%u], sendRecvType[%d].",
+            sendItem->remoteRank, sendItem->buf, sendItem->count, sendItem->dataType, sendItem->sendRecvType);
         // 计算每轮搬运的最大数据量
         dataTypeSize_ = DATATYPE_SIZE_TABLE[sendItem->dataType];
         u64 maxCountPerLoop = maxTmpMemSize_ / dataTypeSize_;
@@ -218,13 +219,15 @@ HcclResult InsV2BatchSendRecvExecutor::CalcSendSlices()
 
         u64 curOffset = 0;
         u64 resDataCount = sendItem->count;
-        while(resDataCount > 0) {
+        while (resDataCount > 0) {
             // 判断本轮需搬运的数据量
             u64 transferCount = resDataCount > maxCountPerLoop ? maxCountPerLoop : resDataCount;
             u64 transferSize = transferCount * dataTypeSize_;
             curInputPtr = static_cast<u8*>(sendItem->buf) + curOffset;
             sendDataSilces_.emplace_back(static_cast<void*>(curInputPtr), transferSize, sendItem->remoteRank);
-            HCCL_DEBUG("[InsV2BatchSendRecvExecutor][CalcSendSlices] slice curOffset[%llu], slice size[%llu] curInputPtr [%p].",
+            HCCL_DEBUG(
+                "[InsV2BatchSendRecvExecutor][CalcSendSlices] slice curOffset[%llu], slice size[%llu] curInputPtr "
+                "[%p].",
                 curOffset, transferSize, curInputPtr);
             curOffset += transferSize;
             resDataCount -= transferCount;
@@ -238,9 +241,10 @@ HcclResult InsV2BatchSendRecvExecutor::CalcRecvSlices()
 {
     while (!recvDeque_.empty()) {
         const HcclSendRecvItem* recvItem = recvDeque_.front();
-        HCCL_INFO("[InsV2BatchSendRecvExecutor][CalcRecvSlices] remoteRank[%u], buf[%p], count[%llu],"\
-            "dataType[%u], sendRecvType[%d].", recvItem ->remoteRank, recvItem ->buf,
-            recvItem->count, recvItem->dataType, recvItem->sendRecvType);
+        HCCL_INFO(
+            "[InsV2BatchSendRecvExecutor][CalcRecvSlices] remoteRank[%u], buf[%p], count[%llu],"
+            "dataType[%u], sendRecvType[%d].",
+            recvItem->remoteRank, recvItem->buf, recvItem->count, recvItem->dataType, recvItem->sendRecvType);
         // 计算每轮搬运的最大数据量
         dataTypeSize_ = DATATYPE_SIZE_TABLE[recvItem->dataType];
         u64 maxCountPerLoop = maxTmpMemSize_ / dataTypeSize_;
@@ -249,13 +253,15 @@ HcclResult InsV2BatchSendRecvExecutor::CalcRecvSlices()
 
         u64 curOffset = 0;
         u64 resDataCount = recvItem->count;
-        while(resDataCount > 0) {
+        while (resDataCount > 0) {
             // 判断本轮需搬运的数据量
             u64 transferCount = resDataCount > maxCountPerLoop ? maxCountPerLoop : resDataCount;
             u64 transferSize = transferCount * dataTypeSize_;
             curOutputPtr = static_cast<u8*>(recvItem->buf) + curOffset;
             recvDataSilces_.emplace_back(static_cast<void*>(curOutputPtr), transferSize, recvItem->remoteRank);
-            HCCL_DEBUG("[InsV2BatchSendRecvExecutor][CalcRecvSlices] slice curOffset[%llu], slice size[%llu] curOutputPtr [%p].",
+            HCCL_DEBUG(
+                "[InsV2BatchSendRecvExecutor][CalcRecvSlices] slice curOffset[%llu], slice size[%llu] curOutputPtr "
+                "[%p].",
                 curOffset, transferSize, curOutputPtr);
             curOffset += transferSize;
             resDataCount -= transferCount;
@@ -269,12 +275,12 @@ HcclResult InsV2BatchSendRecvExecutor::GetSendChannel(u32 remoteRank, ChannelInf
 {
     auto it = remoteRankToChannelInfo_[0].find(remoteRank);
     if (it == remoteRankToChannelInfo_[0].end()) {
-        HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetSendChannel] Cannot find channel for remoteRank[%u]",
-            remoteRank);
+        HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetSendChannel] Cannot find channel for remoteRank[%u]", remoteRank);
         return HCCL_E_INTERNAL;
     }
     if (it->second.size() < channelNumPerRankPair_) {
-        HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetSendChannel] Channel number[%u] is less than expected number[2]",
+        HCCL_ERROR(
+            "[InsV2BatchSendRecvExecutor][GetSendChannel] Channel number[%u] is less than expected number[2]",
             it->second.size());
         return HCCL_E_INTERNAL;
     }
@@ -290,12 +296,12 @@ HcclResult InsV2BatchSendRecvExecutor::GetRecvChannel(u32 remoteRank, ChannelInf
 {
     auto it = remoteRankToChannelInfo_[0].find(remoteRank);
     if (it == remoteRankToChannelInfo_[0].end()) {
-        HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetRecvChannel] Cannot find channel for remoteRank[%u]",
-            remoteRank);
+        HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetRecvChannel] Cannot find channel for remoteRank[%u]", remoteRank);
         return HCCL_E_INTERNAL;
     }
     if (it->second.size() < channelNumPerRankPair_) {
-        HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetRecvChannel] Channel number[%u] is less than expected number[2]",
+        HCCL_ERROR(
+            "[InsV2BatchSendRecvExecutor][GetRecvChannel] Channel number[%u] is less than expected number[2]",
             it->second.size());
         return HCCL_E_INTERNAL;
     }
@@ -317,12 +323,16 @@ HcclResult InsV2BatchSendRecvExecutor::ProcessSendDataSlice(SendRecvSlice& sendS
     // 发送数据
     ChannelInfo sendChannel;
     CHK_RET(GetSendChannel(sendSlice.remoteRank_, sendChannel));
-    HCCL_DEBUG("[InsV2BatchSendRecvExecutor][ProcessSendDataSlice] myRank:[%u], remoteRank:[%u], "\
-        "send channel handle[0x%llx].", myRank_, sendSlice.remoteRank_, sendChannel.handle);
+    HCCL_DEBUG(
+        "[InsV2BatchSendRecvExecutor][ProcessSendDataSlice] myRank:[%u], remoteRank:[%u], "
+        "send channel handle[0x%llx].",
+        myRank_, sendSlice.remoteRank_, sendChannel.handle);
     SlicesList slices({}, {}); // read模式下发送端不感知数据信息，直接给一个空的
     DataInfo sendDataInfo(sendChannel, slices);
     SendRead(sendDataInfo, thread);
-    HCCL_DEBUG("[InsV2BatchSendRecvExecutor][ProcessSendDataSlice] Process a send task by read mode, CCLBuffer[%p], remoteRank[%u].",
+    HCCL_DEBUG(
+        "[InsV2BatchSendRecvExecutor][ProcessSendDataSlice] Process a send task by read mode, CCLBuffer[%p], "
+        "remoteRank[%u].",
         cclMem_.addr, sendSlice.remoteRank_);
     return HCCL_SUCCESS;
 }
@@ -332,8 +342,10 @@ HcclResult InsV2BatchSendRecvExecutor::ProcessRecvDataSlice(SendRecvSlice& recvS
     // 接收数据
     ChannelInfo recvChannel;
     CHK_RET(GetRecvChannel(recvSlice.remoteRank_, recvChannel));
-    HCCL_DEBUG("[InsV2BatchSendRecvExecutor][ProcessRecvDataSlice] myRank:[%u], remoteRank:[%u], "\
-        "recv channel handle[0x%llx].", myRank_, recvSlice.remoteRank_, recvChannel.handle);
+    HCCL_DEBUG(
+        "[InsV2BatchSendRecvExecutor][ProcessRecvDataSlice] myRank:[%u], remoteRank:[%u], "
+        "recv channel handle[0x%llx].",
+        myRank_, recvSlice.remoteRank_, recvChannel.handle);
 
     void* remoteCclBuffAddr = recvChannel.remoteCclMem.addr;
     DataSlice recvSrcDataSlice(remoteCclBuffAddr, 0, recvSlice.size_);
@@ -341,7 +353,9 @@ HcclResult InsV2BatchSendRecvExecutor::ProcessRecvDataSlice(SendRecvSlice& recvS
     SlicesList slices({recvSrcDataSlice}, {recvDstDataSlice});
     DataInfo recvDataInfo(recvChannel, slices);
     RecvRead(recvDataInfo, thread);
-    HCCL_DEBUG("[InsV2BatchSendRecvExecutor][ProcessRecvDataSlice] Process a recv task by read mode, outputBuffer[%p], remoteRank[%u].",
+    HCCL_DEBUG(
+        "[InsV2BatchSendRecvExecutor][ProcessRecvDataSlice] Process a recv task by read mode, outputBuffer[%p], "
+        "remoteRank[%u].",
         recvSlice.addr_, recvSlice.remoteRank_);
     return HCCL_SUCCESS;
 }
@@ -353,12 +367,12 @@ HcclResult InsV2BatchSendRecvExecutor::RunLoopSendRecv()
     std::vector<u32> notifyIdxMainToSub = {0};
     CHK_RET(PreSyncInterThreads(threads_[0], subThreads, notifyIdxMainToSub));
 
-    while(!sendDataSilces_.empty() || !recvDataSilces_.empty()) {
-        if(!sendDataSilces_.empty()) {
+    while (!sendDataSilces_.empty() || !recvDataSilces_.empty()) {
+        if (!sendDataSilces_.empty()) {
             CHK_RET(ProcessSendDataSlice(sendDataSilces_.front(), threads_[0]));
             sendDataSilces_.pop_front();
         }
-        if(!recvDataSilces_.empty()) {
+        if (!recvDataSilces_.empty()) {
             CHK_RET(ProcessRecvDataSlice(recvDataSilces_.front(), threads_[1]));
             recvDataSilces_.pop_front();
         }
@@ -372,8 +386,7 @@ HcclResult InsV2BatchSendRecvExecutor::RunLoopSendRecv()
     return HCCL_SUCCESS;
 }
 
-HcclResult InsV2BatchSendRecvExecutor::Orchestrate(const OpParam &param,
-    const AlgResourceCtxSerializable &resCtx)
+HcclResult InsV2BatchSendRecvExecutor::Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2BatchSendRecvExecutor][Orchestrate] Orchestrate Start.");
     // 给channels_和threads_赋值
@@ -381,8 +394,8 @@ HcclResult InsV2BatchSendRecvExecutor::Orchestrate(const OpParam &param,
     CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
     cclMem_ = resCtx.cclMem;
     maxTmpMemSize_ = std::min(resCtx.cclMem.size, UB_MAX_DATA_SIZE);
-    CHK_PRT_RET((maxTmpMemSize_ == 0),
-        HCCL_ERROR("[InsV2BatchSendRecvExecutor][Orchestrate] maxTmpMemSize equals to zero."),
+    CHK_PRT_RET(
+        (maxTmpMemSize_ == 0), HCCL_ERROR("[InsV2BatchSendRecvExecutor][Orchestrate] maxTmpMemSize equals to zero."),
         HCCL_E_PARA);
     myRank_ = resCtx.topoInfo.userRank;
     rankSize_ = resCtx.topoInfo.userRankSize;
@@ -404,4 +417,4 @@ HcclResult InsV2BatchSendRecvExecutor::Orchestrate(const OpParam &param,
 }
 
 REGISTER_EXECUTOR_IMPL(HcclCMDType::HCCL_CMD_BATCH_SEND_RECV, InsBatchSendRecv, InsV2BatchSendRecvExecutor);
-}
+} // namespace ops_hccl

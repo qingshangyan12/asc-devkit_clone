@@ -14,7 +14,7 @@
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/matmul/scheduler/iterator/k_loop/k_loop_mdl_base.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/matmul/scheduler/iterator/k_loop/k_loop_mdl_base.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_ITERATOR_K_LOOP_K_LOOP_MDL_BASE_H__
 #endif
@@ -367,9 +367,9 @@ protected:
     int32_t tailK_;
     int32_t tailStepKa_;
     int32_t tailStepKb_;
-    int32_t minStepK_;   // lesser value of stepKa and stepKb
-    int32_t baseSize_;   // kL1 base size, used for updating baseShape_
-    int32_t innerTailK_; // kL1 tail size of current outer loop, used for updating baseShape_
+    int32_t minStepK_;        // lesser value of stepKa and stepKb
+    int32_t baseSize_;        // kL1 base size, used for updating baseShape_
+    int32_t innerTailK_;      // kL1 tail size of current outer loop, used for updating baseShape_
 
     int32_t tileShapeA_;      // kaL1 length
     int32_t tileShapeB_;      // kbL1 length
@@ -378,18 +378,18 @@ protected:
     int32_t kaStepFactor_;    // indicates the coefficient of stepka and minStepK_
     int32_t kbStepFactor_;    // indicates the coefficient of stepkb and minStepK_
 
-    int32_t baseShape_;      // kL0 length
-    int32_t baseBlockShape_; // kL0 block num
+    int32_t baseShape_;       // kL0 length
+    int32_t baseBlockShape_;  // kL0 block num
 
-    int32_t kIter_;         // total iterations counts
-    int32_t outIter_;       // outer loop counts, greater value of outerKaIter_ and outerKbIter_;
-    int32_t innerIter_;     // inner loop counts
-    int32_t outerKaIter_;   // outer ka loop counts
-    int32_t outerKbIter_;   // outer kb loop counts
-    int32_t outerIdx_{0};   // current outer loop index
-    int32_t innerStartIdx_; // inner loop start index of current outer loop, used for indicating k's index
-                            // when load to L1 and calculating L1 offset when load to l0
-    int32_t innerIdx_{0};   // current inner loop index
+    int32_t kIter_;           // total iterations counts
+    int32_t outIter_;         // outer loop counts, greater value of outerKaIter_ and outerKbIter_;
+    int32_t innerIter_;       // inner loop counts
+    int32_t outerKaIter_;     // outer ka loop counts
+    int32_t outerKbIter_;     // outer kb loop counts
+    int32_t outerIdx_{0};     // current outer loop index
+    int32_t innerStartIdx_;   // inner loop start index of current outer loop, used for indicating k's index
+                              // when load to L1 and calculating L1 offset when load to l0
+    int32_t innerIdx_{0};     // current inner loop index
     bool isA1KFullLoad_, isB1KFullLoad_;
 
     constexpr static int32_t c0Size_ = AuxGetC0Size<typename A_TYPE::T>();

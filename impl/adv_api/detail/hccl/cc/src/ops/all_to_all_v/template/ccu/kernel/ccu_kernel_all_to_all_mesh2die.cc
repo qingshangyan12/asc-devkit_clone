@@ -1,26 +1,25 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ccu_kernel_all_to_all_mesh2die.h"
 
 namespace ops_hccl {
 
-constexpr int CKE_IDX_0   = 0;
+constexpr int CKE_IDX_0 = 0;
 
 constexpr int OUTPUT_XN_ID = 1;
 constexpr int TOKEN_XN_ID = 2;
 constexpr int POST_SYNC_ID = 3;
 
-CcuKernelAllToAllMesh2Die::CcuKernelAllToAllMesh2Die(const hcomm::CcuKernelArg &arg)
-    : CcuKernelAlgBase(arg)
+CcuKernelAllToAllMesh2Die::CcuKernelAllToAllMesh2Die(const hcomm::CcuKernelArg& arg) : CcuKernelAlgBase(arg)
 {
-    const CcuKernelArgAllToAllMesh2Die *kernelArg = dynamic_cast<const CcuKernelArgAllToAllMesh2Die *>(&arg);
+    const CcuKernelArgAllToAllMesh2Die* kernelArg = dynamic_cast<const CcuKernelArgAllToAllMesh2Die*>(&arg);
     if (kernelArg == nullptr) {
         HCCL_ERROR("[CcuKernelAllToAllMesh2Die] kernelArg ptr is null.");
         return;
@@ -56,13 +55,13 @@ HcclResult CcuKernelAllToAllMesh2Die::InitResources()
     output_.emplace_back(CreateVariable());
     token_.emplace_back(CreateVariable());
 
-    sliceSize_         = CreateVariable();
-    inputSliceStride_  = CreateVariable();
+    sliceSize_ = CreateVariable();
+    inputSliceStride_ = CreateVariable();
     outputoffset_ = CreateVariable();
-    groupOpSize_       = CreateGroupOpSize();
+    groupOpSize_ = CreateGroupOpSize();
 
     logicRankSize = withMyRank_ ? channels_.size() + 1 : channels_.size();
-    uint16_t logicId       = rankId_ % logicRankSize; // topo为 2 * n
+    uint16_t logicId = rankId_ % logicRankSize; // topo为 2 * n
     event_ = CreateCompletedEvent();
 
     return HcclResult::HCCL_SUCCESS;
@@ -88,7 +87,7 @@ void CcuKernelAllToAllMesh2Die::PreSync()
         NotifyRecord(channel, CKE_IDX_0, TOKEN_XN_ID, token_[virRankSize - 1], 1 << TOKEN_XN_ID);
     }
     uint32_t waitBits = (1 << OUTPUT_XN_ID) | (1 << TOKEN_XN_ID);
-    for (const ChannelHandle &channel : channels_) {
+    for (const ChannelHandle& channel : channels_) {
         NotifyWait(channel, CKE_IDX_0, waitBits);
     }
     return;
@@ -96,10 +95,10 @@ void CcuKernelAllToAllMesh2Die::PreSync()
 
 void CcuKernelAllToAllMesh2Die::PostSync()
 {
-    for (const auto &channel : channels_) {
+    for (const auto& channel : channels_) {
         NotifyRecord(channel, CKE_IDX_0, 1 << POST_SYNC_ID);
     }
-    for (const auto &channel : channels_) {
+    for (const auto& channel : channels_) {
         NotifyWait(channel, CKE_IDX_0, 1 << POST_SYNC_ID);
     }
     return;
@@ -136,14 +135,14 @@ void CcuKernelAllToAllMesh2Die::DoRepeatAllToAll()
 
         dst[r].addr = output_[r];
         dst[r].addr += outputoffset_;
-        for(uint64_t i = 0; i < dstRank; i++){
+        for (uint64_t i = 0; i < dstRank; i++) {
             src[r].addr += inputSliceStride_;
         }
     }
 
     hcomm::CcuRep::LocalAddr localSrc_ = CreateLocalAddr(); // for LocalCopy
     hcomm::CcuRep::LocalAddr localDst_ = CreateLocalAddr();
-    if(withMyRank_){
+    if (withMyRank_) {
         const u32 with_dstRank = CalcDstRank(logicRankSize - 1);
 
         localSrc_.token = token_[logicRankSize - 1];
@@ -152,7 +151,7 @@ void CcuKernelAllToAllMesh2Die::DoRepeatAllToAll()
         localDst_.token = token_[logicRankSize - 1];
         localDst_.addr = output_[logicRankSize - 1];
         localDst_.addr += outputoffset_;
-        for(uint64_t i = 0; i < with_dstRank; i++){
+        for (uint64_t i = 0; i < with_dstRank; i++) {
             localSrc_.addr += inputSliceStride_;
         }
     }
@@ -188,26 +187,27 @@ HcclResult CcuKernelAllToAllMesh2Die::Algorithm()
     return HcclResult::HCCL_SUCCESS;
 }
 
-std::vector<uint64_t> CcuKernelAllToAllMesh2Die::GeneArgs(const CcuTaskArg &arg)
+std::vector<uint64_t> CcuKernelAllToAllMesh2Die::GeneArgs(const CcuTaskArg& arg)
 {
-    const CcuTaskArgAllToAllMesh2Die *taskArg = dynamic_cast<const CcuTaskArgAllToAllMesh2Die *>(&arg);
+    const CcuTaskArgAllToAllMesh2Die* taskArg = dynamic_cast<const CcuTaskArgAllToAllMesh2Die*>(&arg);
     if (taskArg == nullptr) {
         HCCL_ERROR("[CcuKernelAllToAllMesh2Die] taskArg ptr is null. RankId[%u]", rankId_);
     }
-    uint64_t inputAddr         = taskArg->inputAddr_;
-    uint64_t outputAddr        = taskArg->outputAddr_;
-    uint64_t tokenInfo         = taskArg->token_;
-    uint64_t sliceSize         = taskArg->sliceSize_;
-    uint64_t inputSliceStride  = taskArg->inputSliceStride_;
+    uint64_t inputAddr = taskArg->inputAddr_;
+    uint64_t outputAddr = taskArg->outputAddr_;
+    uint64_t tokenInfo = taskArg->token_;
+    uint64_t sliceSize = taskArg->sliceSize_;
+    uint64_t inputSliceStride = taskArg->inputSliceStride_;
     uint64_t outputSliceStride = taskArg->outputSliceStride_ * rankId_;
     auto goSize = CalGoSize(sliceSize);
-    std::vector<uint64_t> taskArgs ={inputAddr, outputAddr, tokenInfo, sliceSize, inputSliceStride, outputSliceStride,
-            goSize[0],  goSize[1], goSize[2], goSize[3]};
-    HCCL_INFO("[CcuKernelAllToAllMesh2Die] inputAddr[%llu], outputAddr[%llu], sliceSize[%llu], "
-              "inputSliceStride[%llu], outputSliceStride[%llu].",
-              inputAddr, outputAddr, sliceSize, inputSliceStride, outputSliceStride);
+    std::vector<uint64_t> taskArgs = {inputAddr,         outputAddr, tokenInfo, sliceSize, inputSliceStride,
+                                      outputSliceStride, goSize[0],  goSize[1], goSize[2], goSize[3]};
+    HCCL_INFO(
+        "[CcuKernelAllToAllMesh2Die] inputAddr[%llu], outputAddr[%llu], sliceSize[%llu], "
+        "inputSliceStride[%llu], outputSliceStride[%llu].",
+        inputAddr, outputAddr, sliceSize, inputSliceStride, outputSliceStride);
 
     return taskArgs;
 }
 
-}// namespace ops_hccl
+} // namespace ops_hccl

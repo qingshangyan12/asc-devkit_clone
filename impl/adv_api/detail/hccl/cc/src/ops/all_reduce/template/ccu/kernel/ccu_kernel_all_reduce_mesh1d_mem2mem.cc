@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_all_reduce_mesh1d_mem2mem.h"
 #include "ccu_kernel_utils.h"
@@ -14,22 +14,20 @@
 
 namespace ops_hccl {
 using namespace hcomm;
-constexpr int INPUT_XN_ID   = 0;
-constexpr int OUTPUT_XN_ID  = 1;
+constexpr int INPUT_XN_ID = 0;
+constexpr int OUTPUT_XN_ID = 1;
 constexpr int SCRATCH_XN_ID = 2;
-constexpr int TOKEN_XN_ID   = 3;
-constexpr int POST_SYNC_ID   = 4;
-constexpr int CKE_IDX_0     = 0;
+constexpr int TOKEN_XN_ID = 3;
+constexpr int POST_SYNC_ID = 4;
+constexpr int CKE_IDX_0 = 0;
 
-CcuKernelAllReduceMeshMem2Mem1D::CcuKernelAllReduceMeshMem2Mem1D(const CcuKernelArg &arg)
-    : CcuKernelAlgBase(arg)
+CcuKernelAllReduceMeshMem2Mem1D::CcuKernelAllReduceMeshMem2Mem1D(const CcuKernelArg& arg) : CcuKernelAlgBase(arg)
 {
-    const CcuKernelArgAllReduceMeshMem2Mem1D *kernelArg
-        = dynamic_cast<const CcuKernelArgAllReduceMeshMem2Mem1D *>(&arg);
-    rankId_         = kernelArg->rankId_;
-    rankSize_       = kernelArg->dimSize_;
-    channels_       = kernelArg->channels;
-    dataType_       = kernelArg->opParam_.DataDes.dataType;
+    const CcuKernelArgAllReduceMeshMem2Mem1D* kernelArg = dynamic_cast<const CcuKernelArgAllReduceMeshMem2Mem1D*>(&arg);
+    rankId_ = kernelArg->rankId_;
+    rankSize_ = kernelArg->dimSize_;
+    channels_ = kernelArg->channels;
+    dataType_ = kernelArg->opParam_.DataDes.dataType;
     outputDataType_ = kernelArg->opParam_.DataDes.outputType;
     if (outputDataType_ == HcclDataType::HCCL_DATA_TYPE_RESERVED) {
         outputDataType_ = dataType_;
@@ -37,7 +35,7 @@ CcuKernelAllReduceMeshMem2Mem1D::CcuKernelAllReduceMeshMem2Mem1D(const CcuKernel
             "[CcuKernelAllReduceMeshMem2Mem1D] outputDataType is [HCCL_DATA_TYPE_RESERVED], set outputDataType to[%d]",
             outputDataType_);
     }
-    reduceOp_       = kernelArg->opParam_.reduceType;
+    reduceOp_ = kernelArg->opParam_.reduceType;
     HCCL_INFO(
         "[CcuKernelAllReduceMeshMem2Mem1D] Init, KernelArgs are rankId[%u], rankSize_[%u], dataType[%d], "
         "outputDataType[%d], reduceOp[%d]",
@@ -59,8 +57,9 @@ HcclResult CcuKernelAllReduceMeshMem2Mem1D::InitResource()
             scratch_.push_back(CreateVariable());
             token_.push_back(CreateVariable());
         } else {
-            HCCL_DEBUG("[CcuKernelAllReduceMeshMem2Mem1D] MyRank[%u], PeerId[%llu], ChannelId[%u]",
-                       rankId_, peerId, channelIdx);
+            HCCL_DEBUG(
+                "[CcuKernelAllReduceMeshMem2Mem1D] MyRank[%u], PeerId[%llu], ChannelId[%u]", rankId_, peerId,
+                channelIdx);
             CcuRep::Variable inputVar, scratchVar, tokenVar, outputVar;
             CreateVariable((channels_[channelIdx]), INPUT_XN_ID, &inputVar);
             CreateVariable((channels_[channelIdx]), OUTPUT_XN_ID, &outputVar);
@@ -73,17 +72,17 @@ HcclResult CcuKernelAllReduceMeshMem2Mem1D::InitResource()
             channelIdx++;
         }
     }
-    currentRankSliceInputOffset_  = CreateVariable();
+    currentRankSliceInputOffset_ = CreateVariable();
     currentRankSliceOutputOffset_ = CreateVariable();
-    normalSliceSize_              = CreateVariable();
-    lastSliceSize_                = CreateVariable();
-    mySliceSize_                  = CreateVariable();
-    sliceOffset_                  = CreateVariable();
-    isInputOutputEqual_           = CreateVariable();
-    locEvent_                     = CreateCompletedEvent();
-    srcMem_                       = CreateLocalAddr();
-    localDstMem_                  = CreateLocalAddr();
-    remoteDstMem_                 = CreateRemoteAddr();
+    normalSliceSize_ = CreateVariable();
+    lastSliceSize_ = CreateVariable();
+    mySliceSize_ = CreateVariable();
+    sliceOffset_ = CreateVariable();
+    isInputOutputEqual_ = CreateVariable();
+    locEvent_ = CreateCompletedEvent();
+    srcMem_ = CreateLocalAddr();
+    localDstMem_ = CreateLocalAddr();
+    remoteDstMem_ = CreateRemoteAddr();
     reduceScatterSrc_.reserve(rankSize_);
     for (uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
         reduceScatterSrc_.push_back(CreateRemoteAddr());
@@ -101,9 +100,9 @@ std::string CcuKernelAllReduceMeshMem2Mem1D::GetLoopBlockTag(std::string loopTyp
 {
     return loopType + LOOP_BLOCK_TAG + std::to_string(index);
 }
- 
-void CcuKernelAllReduceMeshMem2Mem1D::CreateReduceLoop(uint32_t size, HcclDataType dataType, HcclDataType outputDataType,
-    HcclReduceOp opType)
+
+void CcuKernelAllReduceMeshMem2Mem1D::CreateReduceLoop(
+    uint32_t size, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType)
 {
     constexpr uint32_t LOOP_NUM = 16;
     AllocGoResource(LOOP_NUM);
@@ -114,7 +113,7 @@ void CcuKernelAllReduceMeshMem2Mem1D::CreateReduceLoop(uint32_t size, HcclDataTy
     }
 
     uint32_t expansionNum = GetReduceExpansionNum(opType, dataType, outputDataType);
-    uint32_t usedBufNum   = size > expansionNum ? size : expansionNum;
+    uint32_t usedBufNum = size > expansionNum ? size : expansionNum;
 
     for (int32_t index = 0; index < 2; index++) { // 需要实例化2个Loop
         CcuRep::LocalAddr dst = CreateLocalAddr();
@@ -123,14 +122,15 @@ void CcuKernelAllReduceMeshMem2Mem1D::CreateReduceLoop(uint32_t size, HcclDataTy
         for (uint32_t i = 0; i < size; i++) {
             scratch.emplace_back(CreateLocalAddr());
         }
-        CcuRep::Variable            len = CreateVariable();
-        CcuRep::Variable            lenForExpansion = CreateVariable();
-        CcuRep::LoopBlock           lb(this, GetLoopBlockTag(loopType, index));
+        CcuRep::Variable len = CreateVariable();
+        CcuRep::Variable lenForExpansion = CreateVariable();
+        CcuRep::LoopBlock lb(this, GetLoopBlockTag(loopType, index));
         lb(dst, src, scratch, len, lenForExpansion);
 
-        std::vector<CcuRep::CcuBuf> bufs = {moRes.ccuBuf.begin() + index * moConfig.msInterleave,
-                                               moRes.ccuBuf.begin() + index * moConfig.msInterleave + usedBufNum};
-        CcuRep::CompletedEvent             e  = moRes.completedEvent[index];
+        std::vector<CcuRep::CcuBuf> bufs = {
+            moRes.ccuBuf.begin() + index * moConfig.msInterleave,
+            moRes.ccuBuf.begin() + index * moConfig.msInterleave + usedBufNum};
+        CcuRep::CompletedEvent e = moRes.completedEvent[index];
 
         for (uint32_t i = 0; i < size; i++) {
             e.SetMask(1 << i);
@@ -144,7 +144,7 @@ void CcuKernelAllReduceMeshMem2Mem1D::CreateReduceLoop(uint32_t size, HcclDataTy
         WaitEvent(e);
         e.SetMask(1);
         if (size > 1) {
-            LocalReduceNb(bufs, size, dataType, outputDataType, opType, len, e); 
+            LocalReduceNb(bufs, size, dataType, outputDataType, opType, len, e);
             WaitEvent(e);
         }
 
@@ -155,9 +155,9 @@ void CcuKernelAllReduceMeshMem2Mem1D::CreateReduceLoop(uint32_t size, HcclDataTy
     registeredLoop.insert(loopType);
 }
 
-void CcuKernelAllReduceMeshMem2Mem1D::ReduceLoopGroup(CcuRep::LocalAddr outDstOrg, CcuRep::LocalAddr srcOrg,
-    std::vector<CcuRep::LocalAddr> &scratchOrg, GroupOpSize goSize, HcclDataType dataType, HcclDataType outputDataType,
-    HcclReduceOp opType)
+void CcuKernelAllReduceMeshMem2Mem1D::ReduceLoopGroup(
+    CcuRep::LocalAddr outDstOrg, CcuRep::LocalAddr srcOrg, std::vector<CcuRep::LocalAddr>& scratchOrg,
+    GroupOpSize goSize, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType)
 {
     const uint32_t size = scratchOrg.size();
 
@@ -176,7 +176,7 @@ void CcuKernelAllReduceMeshMem2Mem1D::ReduceLoopGroup(CcuRep::LocalAddr outDstOr
     CreateReduceLoop(size, dataType, outputDataType, opType);
 
     std::string loopType = GetReduceTypeStr(dataType, opType);
-    uint32_t         expansionNum = GetReduceExpansionNum(opType, dataType, outputDataType);
+    uint32_t expansionNum = GetReduceExpansionNum(opType, dataType, outputDataType);
     CcuRep::Variable sliceSizeExpansion = CreateVariable();
 
     if (expansionNum != 1) {
@@ -186,14 +186,14 @@ void CcuKernelAllReduceMeshMem2Mem1D::ReduceLoopGroup(CcuRep::LocalAddr outDstOr
     }
 
     // m部分
-    CCU_IF(goSize.loopParam != 0)                   // goSize1
+    CCU_IF(goSize.loopParam != 0) // goSize1
     {
         CcuRep::Variable loopParam = CreateVariable();
         loopParam = ops_hccl::GetLoopParam(0, moConfig.memSlice * moConfig.loopCount, 0);
         loopParam += goSize.loopParam;
 
         CcuRep::Variable sliceSize = CreateVariable();
-        sliceSize          = moConfig.memSlice;
+        sliceSize = moConfig.memSlice;
         sliceSizeExpansion = moConfig.memSlice * expansionNum;
 
         auto lc = Loop(GetLoopBlockTag(loopType, 0))(dst, src, scratch, sliceSize, sliceSizeExpansion);
@@ -206,20 +206,20 @@ void CcuKernelAllReduceMeshMem2Mem1D::ReduceLoopGroup(CcuRep::LocalAddr outDstOr
         LoopGroup({lc}, {loopParam}, paraCfg, offsetCfg);
     }
 
-    CCU_IF(goSize.parallelParam != 0)               // goSize2
+    CCU_IF(goSize.parallelParam != 0) // goSize2
     {
         // p部分，加m的偏移
         for (uint32_t i = 0; i < size; i++) {
             scratch[i].addr += goSize.addrOffset;
         }
-        src.addr += goSize.addrOffset;              // goSize0
+        src.addr += goSize.addrOffset; // goSize0
         for (uint32_t i = 0; i < expansionNum; i++) {
             dst.addr += goSize.addrOffset;
         }
 
         sliceSizeExpansion = 0;
         for (uint32_t i = 0; i < expansionNum; i++) {
-            sliceSizeExpansion += goSize.residual;  // goSize3
+            sliceSizeExpansion += goSize.residual; // goSize3
         }
 
         auto lc0 = Loop(GetLoopBlockTag(loopType, 0))(dst, src, scratch, goSize.residual, sliceSizeExpansion);
@@ -234,7 +234,7 @@ void CcuKernelAllReduceMeshMem2Mem1D::ReduceLoopGroup(CcuRep::LocalAddr outDstOr
         }
 
         CcuRep::Variable sliceSize = CreateVariable();
-        sliceSize          = moConfig.memSlice;
+        sliceSize = moConfig.memSlice;
         sliceSizeExpansion = moConfig.memSlice * expansionNum;
 
         auto lc1 = Loop(GetLoopBlockTag(loopType, 1))(dst, src, scratch, sliceSize, sliceSizeExpansion);
@@ -268,7 +268,7 @@ void CcuKernelAllReduceMeshMem2Mem1D::LoadArgs()
 }
 
 void CcuKernelAllReduceMeshMem2Mem1D::PreSync()
-{   
+{
     HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] AllReduceMeshMem2Mem1D LocalPost begin");
     // 互换内存信息
     for (auto t : channels_) {
@@ -293,16 +293,16 @@ void CcuKernelAllReduceMeshMem2Mem1D::PostSync()
     for (auto t : channels_) {
         NotifyWait(t, CKE_IDX_0, 1 << POST_SYNC_ID);
     }
- 
+
     HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] AllReduceMeshMem2Mem1D AllReduce GroupWait end");
 }
 
-void CcuKernelAllReduceMeshMem2Mem1D::BcastLocToRmt(const CcuRep::Variable              &srcAddr,
-                                                               const std::vector<CcuRep::Variable> &dstAddr)
+void CcuKernelAllReduceMeshMem2Mem1D::BcastLocToRmt(
+    const CcuRep::Variable& srcAddr, const std::vector<CcuRep::Variable>& dstAddr)
 {
     if (dstAddr.size() != channels_.size() + 1) {
-         HCCL_ERROR("[ReduceRmtToLoc] srcAddr.size[%zu] != channels_ size[%zu] + 1", dstAddr.size(), channels_.size()); 
-         return;
+        HCCL_ERROR("[ReduceRmtToLoc] srcAddr.size[%zu] != channels_ size[%zu] + 1", dstAddr.size(), channels_.size());
+        return;
     }
     srcMem_.addr = srcAddr;
     srcMem_.addr += sliceOffset_;
@@ -326,8 +326,8 @@ void CcuKernelAllReduceMeshMem2Mem1D::BcastLocToRmt(const CcuRep::Variable      
     WaitEvent(locEvent_);
 }
 
-void CcuKernelAllReduceMeshMem2Mem1D::ReduceRmtToLoc(const std::vector<CcuRep::Variable> &srcAddr,
-                                                                const CcuRep::Variable              &dstAddr)
+void CcuKernelAllReduceMeshMem2Mem1D::ReduceRmtToLoc(
+    const std::vector<CcuRep::Variable>& srcAddr, const CcuRep::Variable& dstAddr)
 {
     if (srcAddr.size() != channels_.size() + 1) {
         HCCL_ERROR("[ReduceRmtToLoc] srcAddr.size[%zu] != channels_ size[%zu] +1", srcAddr.size(), channels_.size());
@@ -339,7 +339,7 @@ void CcuKernelAllReduceMeshMem2Mem1D::ReduceRmtToLoc(const std::vector<CcuRep::V
     localDstMem_.token = token_[rankId_];
 
     CcuRep::Variable scratchOffset = CreateVariable();
-    scratchOffset                  = 0;
+    scratchOffset = 0;
     for (uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
         reduceScatterSrc_[rankIdx].addr = srcAddr[rankIdx];
         reduceScatterSrc_[rankIdx].addr += sliceOffset_;
@@ -357,16 +357,17 @@ void CcuKernelAllReduceMeshMem2Mem1D::ReduceRmtToLoc(const std::vector<CcuRep::V
         if (rankIdx == rankId_) {
             RecordEvent(locEvent_);
         } else {
-            ReadNb(channels_[channelIdx], reduceScatterDst_[rankIdx], reduceScatterSrc_[rankIdx], sliceSize_, locEvent_);
+            ReadNb(
+                channels_[channelIdx], reduceScatterDst_[rankIdx], reduceScatterSrc_[rankIdx], sliceSize_, locEvent_);
             channelIdx++;
         }
     }
     locEvent_.SetMask((1 << rankSize_) - 1);
     WaitEvent(locEvent_);
-    CcuRep::LocalAddr  srcLoc = CreateLocalAddr();
+    CcuRep::LocalAddr srcLoc = CreateLocalAddr();
     srcLoc.addr = reduceScatterSrc_[rankId_].addr;
     srcLoc.token = reduceScatterSrc_[rankId_].token;
-    ReduceLoopGroup(localDstMem_, srcLoc, reduceScatterDst_,  localGoSize_, dataType_, outputDataType_, reduceOp_);
+    ReduceLoopGroup(localDstMem_, srcLoc, reduceScatterDst_, localGoSize_, dataType_, outputDataType_, reduceOp_);
 }
 
 void CcuKernelAllReduceMeshMem2Mem1D::DoRepeatAllReduce()
@@ -387,34 +388,30 @@ HcclResult CcuKernelAllReduceMeshMem2Mem1D::Algorithm()
     LoadArgs();
     PreSync();
 
-    CCU_IF(mySliceSize_ != 0)
-    {
-        DoRepeatAllReduce();
-    }
+    CCU_IF(mySliceSize_ != 0) { DoRepeatAllReduce(); }
     PostSync();
     HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] AllReduceMeshMem2Mem1D end");
     return HCCL_SUCCESS;
 }
 
-std::vector<uint64_t> CcuKernelAllReduceMeshMem2Mem1D::GeneArgs(const CcuTaskArg &arg)
+std::vector<uint64_t> CcuKernelAllReduceMeshMem2Mem1D::GeneArgs(const CcuTaskArg& arg)
 {
-    const CcuTaskArgAllReduceMeshMem2Mem1D *taskArg
-        = dynamic_cast<const CcuTaskArgAllReduceMeshMem2Mem1D *>(&arg);
+    const CcuTaskArgAllReduceMeshMem2Mem1D* taskArg = dynamic_cast<const CcuTaskArgAllReduceMeshMem2Mem1D*>(&arg);
     // 空指针校验
     if (taskArg == nullptr) {
         HCCL_ERROR("CcuKernelAllReduceMeshMem2Mem1D::taskArg ptr is null");
     }
-    uint64_t inputAddr                    = taskArg->inputAddr_;
-    uint64_t outputAddr                   = taskArg->outputAddr_;
-    uint64_t tokenInfo                    = taskArg->token_;
-    uint64_t scratchAddr                  = taskArg->scratchAddr_;
-    uint64_t currentRankSliceInputOffset  = taskArg->inputSliceStride_ * rankId_;
+    uint64_t inputAddr = taskArg->inputAddr_;
+    uint64_t outputAddr = taskArg->outputAddr_;
+    uint64_t tokenInfo = taskArg->token_;
+    uint64_t scratchAddr = taskArg->scratchAddr_;
+    uint64_t currentRankSliceInputOffset = taskArg->inputSliceStride_ * rankId_;
     uint64_t currentRankSliceOutputOffset = taskArg->outputSliceStride_ * rankId_;
-    uint64_t normalSliceSize              = taskArg->normalSliceSize_;
-    uint64_t lastSliceSize                = taskArg->lastSliceSize_;
-    uint64_t mySliceSize                  = taskArg->mySliceSize_;
-    uint64_t sliceOffset                  = taskArg->normalSliceSize_ * rankId_;
-    uint64_t isInputOutputEqual           = taskArg->isInputOutputEqual_;
+    uint64_t normalSliceSize = taskArg->normalSliceSize_;
+    uint64_t lastSliceSize = taskArg->lastSliceSize_;
+    uint64_t mySliceSize = taskArg->mySliceSize_;
+    uint64_t sliceOffset = taskArg->normalSliceSize_ * rankId_;
+    uint64_t isInputOutputEqual = taskArg->isInputOutputEqual_;
 
     std::vector<uint64_t> taskArgs = {
         inputAddr,
@@ -433,17 +430,18 @@ std::vector<uint64_t> CcuKernelAllReduceMeshMem2Mem1D::GeneArgs(const CcuTaskArg
     auto normalGoSize = CalGoSize(normalSliceSize);
     auto lastGoSize = CalGoSize(lastSliceSize);
 
-    if (rankId_ != rankSize_ - 1 ) {
+    if (rankId_ != rankSize_ - 1) {
         taskArgs.insert(taskArgs.end(), normalGoSize.begin(), normalGoSize.end());
     } else {
         taskArgs.insert(taskArgs.end(), lastGoSize.begin(), lastGoSize.end());
     }
 
-    HCCL_INFO("[CcuContextAllReduce1DMesh] TaskArgs: inputAddr[%llu], outputAddr[%llu], scratchAddr[%llu], "
-              "currentRankSliceInputOffset[%llu], currentRankSliceOutputOffset[%llu], normalSliceSize[%llu], "
-              "lastSliceSize[%llu], mySliceSize[%llu], sliceOffset[%llu], isInputOutputEqual[%llu]",
-              inputAddr, outputAddr, scratchAddr, currentRankSliceInputOffset, currentRankSliceOutputOffset,
-              normalSliceSize, lastSliceSize, mySliceSize, sliceOffset, isInputOutputEqual);
+    HCCL_INFO(
+        "[CcuContextAllReduce1DMesh] TaskArgs: inputAddr[%llu], outputAddr[%llu], scratchAddr[%llu], "
+        "currentRankSliceInputOffset[%llu], currentRankSliceOutputOffset[%llu], normalSliceSize[%llu], "
+        "lastSliceSize[%llu], mySliceSize[%llu], sliceOffset[%llu], isInputOutputEqual[%llu]",
+        inputAddr, outputAddr, scratchAddr, currentRankSliceInputOffset, currentRankSliceOutputOffset, normalSliceSize,
+        lastSliceSize, mySliceSize, sliceOffset, isInputOutputEqual);
 
     return taskArgs;
 }

@@ -95,9 +95,9 @@ void GetSortMaxMinTmpSize(
 
     int32_t mode = 2; // has extra both src and dst index.
     if (!config.hasSrcIndex && !config.hasDstIndex) {
-        mode = 1; // only has src/dst value.
+        mode = 1;     // only has src/dst value.
     } else if (!config.hasSrcIndex && config.hasDstIndex) {
-        mode = 0; // has extra dst Index.
+        mode = 0;     // has extra dst Index.
     }
 
     uint32_t requiredBuffer = inputSize * fixBufferRate + fixedBucketBuffer;

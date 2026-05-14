@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/quantization/antiquant/ascend_antiquant_l300_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/quantization/ascend_antiquant.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/quantization/antiquant/ascend_antiquant_l300_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/quantization/ascend_antiquant.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_L300_IMPL_H__
 #endif
@@ -355,7 +355,7 @@ __aicore__ inline void AntiQuantPerchannelImpl(
     if constexpr (isTranspose) { // src [n,k] offset [n,1]
         uint32_t n = (shapeInfo.offsetWidth == 0 ? offset.GetShapeInfo().shape[0] : shapeInfo.offsetWidth);
         AntiQuantPerchannelTranspose(dst, src, offset, scale, sharedTmpBuffer, k, n);
-    } else { // src [k,n] offset [1,n]
+    } else {          // src [k,n] offset [1,n]
         uint32_t n = (shapeInfo.offsetWidth == 0 ? offset.GetShapeInfo().shape[1] : shapeInfo.offsetWidth);
         if (n < 32) { // b8 input single line is not 32B aligned such as input n == 16
             if constexpr (SupportType<SrcType, int8_t>()) {
@@ -438,8 +438,8 @@ __aicore__ inline void CalculationMin(
     const uint32_t calCount, const uint32_t n, const uint32_t srcN, const uint32_t k)
 {
     // store FP16 result in second half of FP32 tmpTensor to avoid input FP16 being replaced
-    uint32_t srcFp16Pos = calCount / ANTIQUANT_TWO; // therefore start from (calCount / 2)th FP32 tmpTensor
-    uint32_t n1 = k / ANTIQUANT_SINGLE_N_SIZE;      // K = 64 * n1
+    uint32_t srcFp16Pos = calCount / ANTIQUANT_TWO;        // therefore start from (calCount / 2)th FP32 tmpTensor
+    uint32_t n1 = k / ANTIQUANT_SINGLE_N_SIZE;             // K = 64 * n1
     UnaryRepeatParams unaryParamsInt8Fp16;
     unaryParamsInt8Fp16.srcRepStride = ANTIQUANT_TWO * n1; // K(num) / 32(num per block)
     // one repeat calculate 64 int8 -> 64 fp16, 4 block

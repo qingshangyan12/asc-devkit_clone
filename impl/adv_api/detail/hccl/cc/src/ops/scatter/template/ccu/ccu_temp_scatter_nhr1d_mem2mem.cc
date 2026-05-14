@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "channel.h"
 #include "hccl_ccu_res.h"
 #include "ccu_assist_pub.h"
@@ -17,8 +17,8 @@
 
 namespace ops_hccl {
 
-CcuTempScatterNHR1DMem2Mem::CcuTempScatterNHR1DMem2Mem(const OpParam &param, const u32 rankId,
-                                                       const std::vector<std::vector<u32>> &subCommRanks)
+CcuTempScatterNHR1DMem2Mem::CcuTempScatterNHR1DMem2Mem(
+    const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
     : CcuAlgTemplateBase(param, rankId, subCommRanks)
 {
     std::vector<u32> ranks = subCommRanks[0];
@@ -30,7 +30,7 @@ CcuTempScatterNHR1DMem2Mem::CcuTempScatterNHR1DMem2Mem(const OpParam &param, con
     }
     auto itRoot = std::find(ranks.begin(), ranks.end(), param.root);
     if (itRoot != ranks.end()) {
-        subCommRootId_  = std::distance(ranks.begin(), itRoot);
+        subCommRootId_ = std::distance(ranks.begin(), itRoot);
     }
 }
 
@@ -41,11 +41,13 @@ void CcuTempScatterNHR1DMem2Mem::SetRoot(u32 root)
     HCCL_INFO("[CcuTempScatterNHR1DMem2Mem][SetRoot] myRank_ [%u], set root [%u] ", myRank_, root);
     std::vector<u32> ranks = subCommRanks_[0];
     std::string ranksStr = "";
-    for (auto r : ranks) { ranksStr += std::to_string(r) + " "; }
+    for (auto r : ranks) {
+        ranksStr += std::to_string(r) + " ";
+    }
     HCCL_INFO("[CcuTempScatterNHR1DMem2Mem][SetSubCommRoot] ranks = subCommRanks[0] is: %s", ranksStr.c_str());
     auto itRoot = std::find(ranks.begin(), ranks.end(), root);
     if (itRoot != ranks.end()) {
-        subCommRootId_  = std::distance(ranks.begin(), itRoot);
+        subCommRootId_ = std::distance(ranks.begin(), itRoot);
     }
 }
 
@@ -56,12 +58,12 @@ u64 CcuTempScatterNHR1DMem2Mem::CalcScratchMultiple(BufferType inBuffType, Buffe
     return subCommRanks_[0].size();
 }
 
-HcclResult CcuTempScatterNHR1DMem2Mem::GetDieNumFromChannelDescs(HcclComm comm, u32 &dieNum)
+HcclResult CcuTempScatterNHR1DMem2Mem::GetDieNumFromChannelDescs(HcclComm comm, u32& dieNum)
 {
     constexpr u32 LINK_NUM_1 = 2;
     constexpr u32 LINK_NUM_2 = 2;
     auto firstElement = rankIdToChannelDesc_.begin();
-    const std::vector<HcclChannelDesc> &firstVector = firstElement->second;
+    const std::vector<HcclChannelDesc>& firstVector = firstElement->second;
     if (firstVector.size() == 1) {
         dieNum = 1;
         return HcclResult::HCCL_SUCCESS;
@@ -73,23 +75,25 @@ HcclResult CcuTempScatterNHR1DMem2Mem::GetDieNumFromChannelDescs(HcclComm comm, 
         GetChannelDieId(comm, myRank_, firstVector[1], dieId1);
         if (dieId0 == dieId1) {
             dieNum = LINK_NUM_1;
-            HCCL_INFO("[CcuTempReduceScatterNHR1DMem2Mem::GetDieNumFromChannelDescs] 2 channels on the same die, dieNum = 1.");
+            HCCL_INFO("[CcuTempReduceScatterNHR1DMem2Mem::GetDieNumFromChannelDescs] 2 channels on the same die, "
+                      "dieNum = 1.");
         } else {
             dieNum = LINK_NUM_2;
-            HCCL_INFO("[CcuTempReduceScatterNHR1DMem2Mem::GetDieNumFromChannelDescs] 2 channels on 2 dies, dieNum = 2.");
+            HCCL_INFO(
+                "[CcuTempReduceScatterNHR1DMem2Mem::GetDieNumFromChannelDescs] 2 channels on 2 dies, dieNum = 2.");
         }
         return HcclResult::HCCL_SUCCESS;
     } else {
-        HCCL_ERROR("[CcuTempScatterNHR1DMem2Mem::CalcRes] get channelDescs fail: there are [] link to rank []",
-                   firstVector.size(), firstElement->first);
+        HCCL_ERROR(
+            "[CcuTempScatterNHR1DMem2Mem::CalcRes] get channelDescs fail: there are [] link to rank []",
+            firstVector.size(), firstElement->first);
         return HcclResult::HCCL_E_INTERNAL;
     }
 }
 
-HcclResult CcuTempScatterNHR1DMem2Mem::ProcessNHRStepInfo(HcclComm comm,
-                                                          std::vector<NHRStepInfo> &stepInfoVector,
-                                                          std::map<u32, u32> &rank2ChannelIdx, u32 enableDieNum,
-                                                          std::vector<std::vector<HcclChannelDesc>> &channelsPerDie)
+HcclResult CcuTempScatterNHR1DMem2Mem::ProcessNHRStepInfo(
+    HcclComm comm, std::vector<NHRStepInfo>& stepInfoVector, std::map<u32, u32>& rank2ChannelIdx, u32 enableDieNum,
+    std::vector<std::vector<HcclChannelDesc>>& channelsPerDie)
 {
     u32 nSteps = GetNHRStepNum(templateRankSize_);
     for (u32 step = 0; step < nSteps; step++) {
@@ -129,8 +133,9 @@ HcclResult CcuTempScatterNHR1DMem2Mem::ProcessNHRStepInfo(HcclComm comm,
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult CcuTempScatterNHR1DMem2Mem::CalcRes(HcclComm comm, const OpParam &param, const TopoInfoWithNetLayerDetails *topoInfo,
-                                               AlgResourceRequest &resourceRequest)
+HcclResult CcuTempScatterNHR1DMem2Mem::CalcRes(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    AlgResourceRequest& resourceRequest)
 {
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestNhr(comm, param, topoInfo, subCommRanks_, channelDescs));
@@ -150,8 +155,9 @@ HcclResult CcuTempScatterNHR1DMem2Mem::CalcRes(HcclComm comm, const OpParam &par
     resourceRequest.slaveThreadNum = 1;
     resourceRequest.ccuKernelNum.push_back(kernelNum);
     resourceRequest.notifyNumPerThread.assign(resourceRequest.slaveThreadNum, 1);
-    HCCL_DEBUG("[CcuTempScatterNHR1DMem2Mem::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
-               resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
+    HCCL_DEBUG(
+        "[CcuTempScatterNHR1DMem2Mem::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
+        resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
 
     // 2.将channelDescs分到2个die
     std::vector<std::vector<HcclChannelDesc>> channelsPerDie;
@@ -159,40 +165,40 @@ HcclResult CcuTempScatterNHR1DMem2Mem::CalcRes(HcclComm comm, const OpParam &par
     std::map<u32, u32> rank2ChannelIdx;
     std::vector<NHRStepInfo> stepInfoVector;
 
-    CHK_RET(ProcessNHRStepInfo(comm,  stepInfoVector, rank2ChannelIdx, enableDieNum, channelsPerDie));
+    CHK_RET(ProcessNHRStepInfo(comm, stepInfoVector, rank2ChannelIdx, enableDieNum, channelsPerDie));
 
     // 3.构造kernelInfo
     for (uint32_t kernelIdx = 0; kernelIdx < kernelNum; kernelIdx++) {
         // 创建每个kernel的ctxArg，放入kernelInfo, 然后将kernelinfo放入resourceRequest.ccuKernelInfos
         CcuKernelInfo kernelInfo;
 
-        kernelInfo.creator = [](const hcomm::CcuKernelArg &arg) {
+        kernelInfo.creator = [](const hcomm::CcuKernelArg& arg) {
             return std::make_unique<CcuKernelScatterNHR1DMem2Mem>(arg);
         };
         kernelInfo.kernelArg = std::make_shared<CcuKernelArgScatterNHRMem2Mem1D>(
             subCommRanks_[0].size(),
-            mySubCommRank_,  // 子通信域rankid
+            mySubCommRank_, // 子通信域rankid
             subCommRootId_, kernelIdx, enableDieNum, stepInfoVector, rank2ChannelIdx, param, subCommRanks_);
         kernelInfo.channels = channelsPerDie[kernelIdx];
         resourceRequest.ccuKernelInfos.push_back(kernelInfo);
     }
 
-    HCCL_DEBUG("[CcuTempScatterNHR1DMem2Mem::CalcRes] channelDescs.size()=%llu, dimsize=%llu, "
-               "ccuKernelInfos.size()=%llu",
-               channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
+    HCCL_DEBUG(
+        "[CcuTempScatterNHR1DMem2Mem::CalcRes] channelDescs.size()=%llu, dimsize=%llu, "
+        "ccuKernelInfos.size()=%llu",
+        channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
 
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult CcuTempScatterNHR1DMem2Mem::SplitDataFor2Dies(const OpParam &param,
-                                                         const TemplateDataParams &templateDataParams,
-                                                         uint64_t &die0Size, uint64_t &die1Size) const
+HcclResult CcuTempScatterNHR1DMem2Mem::SplitDataFor2Dies(
+    const OpParam& param, const TemplateDataParams& templateDataParams, uint64_t& die0Size, uint64_t& die1Size) const
 {
     constexpr uint64_t MULTIPLIER = 4;
     uint64_t typeSize = DataTypeSizeGet(param.DataDes.dataType);
     uint64_t dataCount = (templateDataParams.sliceSize / typeSize);
 
-    if (dataCount <= templateRankSize_ * MULTIPLIER) {  // 数据量极小，不划分die
+    if (dataCount <= templateRankSize_ * MULTIPLIER) { // 数据量极小，不划分die
         die0Size = dataCount * typeSize;
         die1Size = 0;
         return HcclResult::HCCL_SUCCESS;
@@ -205,8 +211,8 @@ HcclResult CcuTempScatterNHR1DMem2Mem::SplitDataFor2Dies(const OpParam &param,
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult CcuTempScatterNHR1DMem2Mem::KernelRun(const OpParam &param, const TemplateDataParams &templateDataParams,
-                                                 TemplateResource& templateResource)
+HcclResult CcuTempScatterNHR1DMem2Mem::KernelRun(
+    const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
     HCCL_INFO("[CcuTempScatterNHR1DMem2Mem] Template KernelRun start.");
     opMode_ = param.opMode;
@@ -243,19 +249,20 @@ HcclResult CcuTempScatterNHR1DMem2Mem::KernelRun(const OpParam &param, const Tem
 
     uint64_t die0TailSize = templateDataParams.tailSize / kernelNum;
     uint64_t die1TailSize = templateDataParams.tailSize - die0TailSize;
-    HCCL_INFO("[CcuTempScatterNHR1DMem2Mem] dimSize[%llu], inputAddr[%llu], outputAddr[%llu], scratchAddr[%llu],"
-              "sliceSize[%llu], die0Size[%llu], die1Size[%llu], inputSliceStride[%llu], outputSliceStride[%llu],"
-              "inputRepeatStride[%llu], outputRepeatStride[%llu], repeatNum[%llu], isOutputScratch[%llu], die0TailSize[%llu],"
-              "die1TailSize[%llu]",
-              templateRankSize_, inputAddr, outputAddr, scratchAddr, sliceSize, die0Size, die1Size, inputSliceStride,
-              outputSliceStride, inputRepeatStride, outputRepeatStride, repeatNum, isOutputScratch, isInputOutputEqual,
-              die0TailSize, die1TailSize);
+    HCCL_INFO(
+        "[CcuTempScatterNHR1DMem2Mem] dimSize[%llu], inputAddr[%llu], outputAddr[%llu], scratchAddr[%llu],"
+        "sliceSize[%llu], die0Size[%llu], die1Size[%llu], inputSliceStride[%llu], outputSliceStride[%llu],"
+        "inputRepeatStride[%llu], outputRepeatStride[%llu], repeatNum[%llu], isOutputScratch[%llu], die0TailSize[%llu],"
+        "die1TailSize[%llu]",
+        templateRankSize_, inputAddr, outputAddr, scratchAddr, sliceSize, die0Size, die1Size, inputSliceStride,
+        outputSliceStride, inputRepeatStride, outputRepeatStride, repeatNum, isOutputScratch, isInputOutputEqual,
+        die0TailSize, die1TailSize);
 
     // 前流同步
     if (kernelNum > 1) {
         std::vector<ThreadHandle> subThreads(templateResource.threads.begin() + 1, templateResource.threads.end());
         std::vector<u32> notifyIdxMainToSub(1, 0);
-        
+
         CHK_RET(PreSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxMainToSub));
     }
 
@@ -269,17 +276,17 @@ HcclResult CcuTempScatterNHR1DMem2Mem::KernelRun(const OpParam &param, const Tem
             outputSliceStride, inputRepeatStride, outputRepeatStride, repeatNum, isOutputScratch, isInputOutputEqual,
             die0TailSize, die1TailSize);
 
-        void *taskArgPtr = static_cast<void *>(taskArg.get());
+        void* taskArgPtr = static_cast<void*>(taskArg.get());
 
-        CHK_RET(HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[axisId],
-                                    templateResource.ccuKernels[axisId], taskArgPtr));
+        CHK_RET(HcclCcuKernelLaunch(
+            param.hcclComm, templateResource.threads[axisId], templateResource.ccuKernels[axisId], taskArgPtr));
     }
 
     // 后流同步
     if (kernelNum > 1) {
         std::vector<ThreadHandle> subThreads(templateResource.threads.begin() + 1, templateResource.threads.end());
         std::vector<u32> notifyIdxSubToMain(1, 0);
-        
+
         CHK_RET(PostSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxSubToMain));
     }
 
@@ -287,25 +294,25 @@ HcclResult CcuTempScatterNHR1DMem2Mem::KernelRun(const OpParam &param, const Tem
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult CcuTempScatterNHR1DMem2Mem::GetStepInfo(u32 step, u32 nSteps, NHRStepInfo &stepInfo)
+HcclResult CcuTempScatterNHR1DMem2Mem::GetStepInfo(u32 step, u32 nSteps, NHRStepInfo& stepInfo)
 {
     u32 virtRankIdx = mySubCommRank_;
     std::vector<u32> ranks = subCommRanks_[0];
     stepInfo.txSliceIdxs.clear();
     stepInfo.rxSliceIdxs.clear();
-    stepInfo.nSlices       = 0;
-    stepInfo.toRank        = templateRankSize_;
-    stepInfo.fromRank      = templateRankSize_;
-    stepInfo.step          = step;
-    stepInfo.myRank        = virtRankIdx;
-    uint32_t rootId        = subCommRootId_;
-    u32      deltaRoot     = (rootId + templateRankSize_ - virtRankIdx) % templateRankSize_;
-    u32      deltaRankPair = 1 << step;
+    stepInfo.nSlices = 0;
+    stepInfo.toRank = templateRankSize_;
+    stepInfo.fromRank = templateRankSize_;
+    stepInfo.step = step;
+    stepInfo.myRank = virtRankIdx;
+    uint32_t rootId = subCommRootId_;
+    u32 deltaRoot = (rootId + templateRankSize_ - virtRankIdx) % templateRankSize_;
+    u32 deltaRankPair = 1 << step;
     // 数据份数和数据编号增量
-    u32 nSlices         = (templateRankSize_ - 1 + (1 << step)) / (1 << (step + 1)); // 向上取整设计了下的
+    u32 nSlices = (templateRankSize_ - 1 + (1 << step)) / (1 << (step + 1)); // 向上取整设计了下的
     u32 deltaSliceIndex = 1 << (step + 1);
     // 是否为2的幂
-    u32  nRanks       = 0;
+    u32 nRanks = 0;
     bool isPowerOfTwo = (templateRankSize_ & (templateRankSize_ - 1)) == 0;
     if (!isPowerOfTwo && step == nSteps - 1) {
         nRanks = templateRankSize_ - deltaRankPair;
@@ -314,7 +321,7 @@ HcclResult CcuTempScatterNHR1DMem2Mem::GetStepInfo(u32 step, u32 nSteps, NHRStep
     }
 
     if (deltaRoot < nRanks) { // 需要发
-        u32 sendTo     = (virtRankIdx + templateRankSize_ - deltaRankPair) % templateRankSize_;
+        u32 sendTo = (virtRankIdx + templateRankSize_ - deltaRankPair) % templateRankSize_;
         u32 txSliceIdx = sendTo;
         for (u32 i = 0; i < nSlices; i++) {
             u32 targetTxSliceIdx = txSliceIdx;
@@ -324,7 +331,7 @@ HcclResult CcuTempScatterNHR1DMem2Mem::GetStepInfo(u32 step, u32 nSteps, NHRStep
         stepInfo.toRank = ranks[sendTo];
         stepInfo.nSlices = nSlices;
     } else if (deltaRoot >= deltaRankPair && deltaRoot < nRanks + deltaRankPair) { // 需要收
-        u32 recvFrom   = (virtRankIdx + deltaRankPair) % templateRankSize_;
+        u32 recvFrom = (virtRankIdx + deltaRankPair) % templateRankSize_;
         u32 rxSliceIdx = virtRankIdx;
         for (u32 i = 0; i < nSlices; i++) {
             u32 targetRxSliceIdx = rxSliceIdx;
@@ -332,7 +339,7 @@ HcclResult CcuTempScatterNHR1DMem2Mem::GetStepInfo(u32 step, u32 nSteps, NHRStep
             rxSliceIdx = (rxSliceIdx + templateRankSize_ - deltaSliceIndex) % templateRankSize_;
         }
         stepInfo.fromRank = ranks[recvFrom];
-        stepInfo.nSlices  = nSlices;
+        stepInfo.nSlices = nSlices;
     }
     return HcclResult::HCCL_SUCCESS;
 }
@@ -352,4 +359,4 @@ HcclResult CcuTempScatterNHR1DMem2Mem::GetRes(AlgResourceRequest& resourceReques
     return HCCL_SUCCESS;
 }
 
-}  // namespace ops_hccl
+} // namespace ops_hccl

@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/matmul/resource/cube_in_buffer/cube_in_buffer_normal.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/adv_api/detail/matmul/resource/cube_in_buffer/cube_in_buffer_normal.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_CUBE_IN_BUFFER_CUBE_IN_BUFFER_NORMAL_H__
 #endif
@@ -106,7 +106,7 @@ public:
         } else if (cacheProc_ == 0) {
             cacheHead_ = qidCache_.template AllocTensor<TransT>(); // To use que to insert events
         } else if (cacheProc_ >= cacheSize_) {
-            ASCENDC_ASSERT((false), { // Logically, it shouldn't be entered.
+            ASCENDC_ASSERT((false), {                              // Logically, it shouldn't be entered.
                 KERNEL_LOG(KERNEL_ERROR, "illegal branch");
             });
             qidCache_.FreeTensor(cacheHead_);

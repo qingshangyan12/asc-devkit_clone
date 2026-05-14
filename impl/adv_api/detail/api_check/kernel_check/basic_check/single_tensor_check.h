@@ -14,7 +14,7 @@
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/api_check/kernel_check/basic_check/single_tensor_check.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future.")
+        "impl/adv_api/detail/api_check/kernel_check/basic_check/single_tensor_check.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SINGLE_TENSOR_CHECK_H__
 #endif

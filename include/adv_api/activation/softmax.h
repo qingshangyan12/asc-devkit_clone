@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file softmax.h
@@ -24,8 +24,9 @@
 #include "kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "softmax_utils.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002 || \
+     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/activation/softmax/softmax_common.h"
 #include "../../../impl/adv_api/detail/activation/softmax/softmax_base_impl.h"
 #pragma begin_pipe(V)
@@ -46,18 +47,19 @@ namespace AscendC {
  *                           improve performance , but it is a reserved param when isDataFormatNZ = true
  * \param [in] isDataFormatNZ: if the data format of input srcTensor is NZ
  */
-template <typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
+template <
+    typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
     const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-__aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor,
-    const LocalTensor<T>& maxTensor, const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling,
-    const SoftMaxShapeInfo& softmaxShapeInfo = {})
+__aicore__ inline void SoftMax(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor,
+    const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
 {
     if ASCEND_IS_AIC {
         return;
     }
     TRACE_START(TraceId::SoftMax);
-    SoftMaxImpl<T, T, isReuseSource, isBasicBlock, isDataFormatNZ, config>(dstTensor, sumTensor, maxTensor, srcTensor, tiling,
-        softmaxShapeInfo);
+    SoftMaxImpl<T, T, isReuseSource, isBasicBlock, isDataFormatNZ, config>(
+        dstTensor, sumTensor, maxTensor, srcTensor, tiling, softmaxShapeInfo);
     TRACE_STOP(TraceId::SoftMax);
 }
 
@@ -75,18 +77,19 @@ __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTenso
  *                           improve performance, but it is a reserved param when isDataFormatNZ = true
  * \param [in] isDataFormatNZ: if the data format of input srcTensor is NZ
  */
-template <typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
+template <
+    typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
     const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-__aicore__ inline void SoftMax(const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor,
-    const LocalTensor<float>& maxTensor, const LocalTensor<half>& srcTensor, const SoftMaxTiling& tiling,
-    const SoftMaxShapeInfo& softmaxShapeInfo = {})
+__aicore__ inline void SoftMax(
+    const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
+    const LocalTensor<half>& srcTensor, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
 {
     if ASCEND_IS_AIC {
         return;
     }
     TRACE_START(TraceId::SoftMax);
-    SoftMaxImpl<half, float, isReuseSource, isBasicBlock, isDataFormatNZ, config>(dstTensor, sumTensor, maxTensor, srcTensor, tiling,
-        softmaxShapeInfo);
+    SoftMaxImpl<half, float, isReuseSource, isBasicBlock, isDataFormatNZ, config>(
+        dstTensor, sumTensor, maxTensor, srcTensor, tiling, softmaxShapeInfo);
     TRACE_STOP(TraceId::SoftMax);
 }
 
@@ -101,10 +104,12 @@ __aicore__ inline void SoftMax(const LocalTensor<half>& dstTensor, const LocalTe
  * \param [in] isReuseSource: reserved param
  * \param [in] isBasicBlock: reserved param
  */
-template <typename T, bool isReuseSource = false, bool isBasicBlock = false,
+template <
+    typename T, bool isReuseSource = false, bool isBasicBlock = false,
     const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-__aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+__aicore__ inline void SoftMax(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling,
+    const SoftMaxShapeInfo& softmaxShapeInfo = {})
 {
     if ASCEND_IS_AIC {
         return;
@@ -127,18 +132,19 @@ __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTenso
  * \param [in] isReuseSource: reserved param
  * \param [in] isBasicBlock: reserved param
  */
-template <typename T, bool isReuseSource = false, bool isBasicBlock = false,
+template <
+    typename T, bool isReuseSource = false, bool isBasicBlock = false,
     const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-__aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
-    const SoftMaxShapeInfo& softmaxShapeInfo = {})
+__aicore__ inline void SoftMax(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
 {
     if ASCEND_IS_AIC {
         return;
     }
     TRACE_START(TraceId::SoftMax);
-    SoftMaxImpl<T, isReuseSource, isBasicBlock, config>(dstTensor, srcTensor, sharedTmpBuffer, tiling,
-        softmaxShapeInfo);
+    SoftMaxImpl<T, isReuseSource, isBasicBlock, config>(
+        dstTensor, srcTensor, sharedTmpBuffer, tiling, softmaxShapeInfo);
     TRACE_STOP(TraceId::SoftMax);
 }
 
@@ -159,18 +165,20 @@ __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTenso
  *                           improve performance, but it is a reserved param when isDataFormatNZ = true
  * \param [in] isDataFormatNZ: if the data format of input srcTensor is NZ
  */
-template <typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
+template <
+    typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
     const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-__aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor,
-    const LocalTensor<T>& maxTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-    const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+__aicore__ inline void SoftMax(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor,
+    const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
+    const SoftMaxShapeInfo& softmaxShapeInfo = {})
 {
     if ASCEND_IS_AIC {
         return;
     }
     TRACE_START(TraceId::SoftMax);
-    SoftMaxImpl<T, T, isReuseSource, isBasicBlock, isDataFormatNZ,config>(dstTensor, sumTensor, maxTensor, srcTensor, sharedTmpBuffer,
-        tiling, softmaxShapeInfo);
+    SoftMaxImpl<T, T, isReuseSource, isBasicBlock, isDataFormatNZ, config>(
+        dstTensor, sumTensor, maxTensor, srcTensor, sharedTmpBuffer, tiling, softmaxShapeInfo);
     TRACE_STOP(TraceId::SoftMax);
 }
 
@@ -190,19 +198,20 @@ __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTenso
  *                           improve performance, but it is a reserved param when isDataFormatNZ = true
  * \param [in] isDataFormatNZ: if the data format of input srcTensor is NZ
  */
-template <typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
+template <
+    typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
     const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-__aicore__ inline void SoftMax(const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor,
-    const LocalTensor<float>& maxTensor, const LocalTensor<half>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
+__aicore__ inline void SoftMax(
+    const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
+    const LocalTensor<half>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
     const SoftMaxShapeInfo& softmaxShapeInfo = {})
 {
     if ASCEND_IS_AIC {
         return;
     }
     TRACE_START(TraceId::SoftMax);
-    SoftMaxImpl<half, float, isReuseSource, isBasicBlock, isDataFormatNZ, config>(dstTensor, sumTensor, maxTensor, srcTensor,
-        sharedTmpBuffer, tiling, softmaxShapeInfo);
+    SoftMaxImpl<half, float, isReuseSource, isBasicBlock, isDataFormatNZ, config>(
+        dstTensor, sumTensor, maxTensor, srcTensor, sharedTmpBuffer, tiling, softmaxShapeInfo);
     TRACE_STOP(TraceId::SoftMax);
 }
 
@@ -219,13 +228,15 @@ __aicore__ inline void SoftMax(const LocalTensor<half>& dstTensor, const LocalTe
  * \return if true means inmax result has the from value
  */
 template <typename T1, typename T2, bool isDataFormatNZ = false, uint8_t stepSizeMode = 0>
-__aicore__ inline bool AdjustSoftMaxRes(const LocalTensor<T1>& softMaxRes, const LocalTensor<T2>& maxTensor,
-    const uint32_t from, const T1 to, const SoftMaxShapeInfo& softmaxShapeInfo)
+__aicore__ inline bool AdjustSoftMaxRes(
+    const LocalTensor<T1>& softMaxRes, const LocalTensor<T2>& maxTensor, const uint32_t from, const T1 to,
+    const SoftMaxShapeInfo& softmaxShapeInfo)
 {
     if ASCEND_IS_AIC {
         return false;
     }
-    return AdjustSoftMaxResImpl<T1, T2, isDataFormatNZ, stepSizeMode>(softMaxRes, maxTensor, from, to, softmaxShapeInfo);
+    return AdjustSoftMaxResImpl<T1, T2, isDataFormatNZ, stepSizeMode>(
+        softMaxRes, maxTensor, from, to, softmaxShapeInfo);
 }
 } // namespace AscendC
 

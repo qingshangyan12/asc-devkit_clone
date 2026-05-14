@@ -1,20 +1,20 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "scatter_auto_selector.h"
 #include "selector_registry.h"
 
 namespace ops_hccl {
 
-SelectorStatus ScatterAutoSelector::SelectCcuMsAlgo(const TopoInfoWithNetLayerDetails *topoInfo, const OpParam &opParam,
-                                                    const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
-                                                    std::string &selectAlgName) const
+SelectorStatus ScatterAutoSelector::SelectCcuMsAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
     (void)topoInfo;
     (void)opParam;
@@ -24,12 +24,12 @@ SelectorStatus ScatterAutoSelector::SelectCcuMsAlgo(const TopoInfoWithNetLayerDe
     return SelectorStatus::NOT_MATCH;
 }
 
-SelectorStatus ScatterAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNetLayerDetails *topoInfo, const OpParam &opParam,
-                                                    const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
-                                                    std::string &selectAlgName) const
+SelectorStatus ScatterAutoSelector::SelectCcuScheduleAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
     (void)opParam;
-    (void)configAlgMap; 
+    (void)configAlgMap;
     HCCL_DEBUG("[ScatterAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
 
     if (topoInfo->topoLevelNums > 1) {
@@ -43,7 +43,8 @@ SelectorStatus ScatterAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNetL
                 selectAlgName = "CcuScatterParallelMesh1DNHR";
             }
         } else {
-            HCCL_WARNING("[Algo][SelectCcuScheduleAlgo] layer0Shape[%d] is not supported yet for ccu schedule mode.",
+            HCCL_WARNING(
+                "[Algo][SelectCcuScheduleAlgo] layer0Shape[%d] is not supported yet for ccu schedule mode.",
                 topoInfo->level0Topo);
             return SelectorStatus::NOT_MATCH;
         }
@@ -62,10 +63,14 @@ SelectorStatus ScatterAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNetL
                 selectAlgName = "CcuScatterParallelMesh1DNHR";
             }
         } else if (topoInfo->level0Topo == Level0Shape::CLOS) {
-            HCCL_WARNING("[Algo][ScatterAutoSelector] level0Topo[%d] is not supported yet for ccu_schedule mode.", topoInfo->level0Topo);
+            HCCL_WARNING(
+                "[Algo][ScatterAutoSelector] level0Topo[%d] is not supported yet for ccu_schedule mode.",
+                topoInfo->level0Topo);
             return SelectorStatus::NOT_MATCH;
         } else {
-            HCCL_WARNING("[Algo][ScatterAutoSelector] level0Topo[%d] is not supported yet for ccu_schedule mode.", topoInfo->level0Topo);
+            HCCL_WARNING(
+                "[Algo][ScatterAutoSelector] level0Topo[%d] is not supported yet for ccu_schedule mode.",
+                topoInfo->level0Topo);
             return SelectorStatus::NOT_MATCH;
         }
     }
@@ -73,12 +78,12 @@ SelectorStatus ScatterAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNetL
     return SelectorStatus::MATCH;
 }
 
-SelectorStatus ScatterAutoSelector::SelectAicpuAlgo(const TopoInfoWithNetLayerDetails *topoInfo, const OpParam &opParam,
-                                                    const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
-                                                    std::string &selectAlgName) const
+SelectorStatus ScatterAutoSelector::SelectAicpuAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
     (void)opParam;
-    (void)configAlgMap; 
+    (void)configAlgMap;
     HCCL_DEBUG("[ScatterAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
 
     if (topoInfo->topoLevelNums > 1) {
@@ -105,8 +110,7 @@ SelectorStatus ScatterAutoSelector::SelectAicpuAlgo(const TopoInfoWithNetLayerDe
             }
         } else if (topoInfo->level0Topo == Level0Shape::CLOS) {
             selectAlgName = "InsScatterMesh1D";
-        } 
-        else {
+        } else {
             HCCL_WARNING("[ScatterAutoSelector] topo not match for aicpu algo");
             return SelectorStatus::NOT_MATCH;
         }
@@ -116,9 +120,9 @@ SelectorStatus ScatterAutoSelector::SelectAicpuAlgo(const TopoInfoWithNetLayerDe
     return SelectorStatus::MATCH;
 }
 
-SelectorStatus ScatterAutoSelector::SelectAivAlgo(const TopoInfoWithNetLayerDetails *topoInfo, const OpParam &opParam,
-                                                  const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
-                                                  std::string &selectAlgName) const
+SelectorStatus ScatterAutoSelector::SelectAivAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
     (void)opParam;
     (void)configAlgMap;

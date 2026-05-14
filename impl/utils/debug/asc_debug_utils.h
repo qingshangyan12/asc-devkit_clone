@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file asc_debug_utils.h
@@ -41,16 +41,14 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src
 __aicore__ inline void enable_asc_diagnostics()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
-    static const struct AscTlv __asc_debug_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
-    {4, 4, 1};
+    static const struct AscTlv __asc_debug_meta_section__ __attribute__((used, section(".ascend.meta"))) = {4, 4, 1};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
 }
 
 __aicore__ inline void enable_asc_assert()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
-    static const struct AscTlv __asc_assert_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
-    {4, 4, 5};
+    static const struct AscTlv __asc_assert_meta_section__ __attribute__((used, section(".ascend.meta"))) = {4, 4, 5};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
 }
 
@@ -63,30 +61,15 @@ __aicore__ constexpr bool is_same_in_list()
     return std::is_same<T, U>::value;
 }
 
-__aicore__ inline void asc_entire_dcci(__gm__ uint64_t* ptr)
-{
-    asc_entire_dcci_impl(ptr);
-}
+__aicore__ inline void asc_entire_dcci(__gm__ uint64_t* ptr) { asc_entire_dcci_impl(ptr); }
 
-__aicore__ inline uint64_t asc_debug_get_system_cycle()
-{
-    return asc_debug_get_system_cycle_impl();
-}
+__aicore__ inline uint64_t asc_debug_get_system_cycle() { return asc_debug_get_system_cycle_impl(); }
 
-__aicore__ inline uint32_t asc_debug_get_core_idx()
-{
-    return asc_debug_get_core_idx_impl();
-}
+__aicore__ inline uint32_t asc_debug_get_core_idx() { return asc_debug_get_core_idx_impl(); }
 
-__aicore__ inline uint64_t asc_debug_get_block_idx()
-{
-    return asc_debug_get_block_idx_impl();
-}
+__aicore__ inline uint64_t asc_debug_get_block_idx() { return asc_debug_get_block_idx_impl(); }
 
-__aicore__ inline uint64_t asc_debug_get_block_num()
-{
-    return get_block_num();
-}
+__aicore__ inline uint64_t asc_debug_get_block_num() { return get_block_num(); }
 
 __aicore__ inline uint64_t asc_debug_get_block_total_num()
 {
@@ -97,10 +80,7 @@ __aicore__ inline uint64_t asc_debug_get_block_total_num()
 #endif
 }
 
-__aicore__ inline int64_t asc_debug_get_program_counter()
-{
-    return get_pc();
-}
+__aicore__ inline int64_t asc_debug_get_program_counter() { return get_pc(); }
 
 template <uint64_t timeoutCycle = 15 * 1000 * 1000> // 20ms * 15
 __aicore__ inline void ringbuf_wait_rts_sync()
@@ -125,20 +105,13 @@ __aicore__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
     return (a + b - 1) / b;
 }
 
-__aicore__ constexpr inline uint32_t align_up(uint32_t a, uint32_t b)
-{
-    return div_ceil(a, b) * b;
-}
+__aicore__ constexpr inline uint32_t align_up(uint32_t a, uint32_t b) { return div_ceil(a, b) * b; }
 
-__aicore__ inline void sync_all()
-{
-    sync_all_impl();
-}
+__aicore__ inline void sync_all() { sync_all_impl(); }
 
 __aicore__ inline void mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, const uint32_t& len)
 {
-    if (dst == nullptr || src == nullptr)
-    {
+    if (dst == nullptr || src == nullptr) {
         return;
     }
     for (uint32_t i = 0; i < len; i++) {
@@ -218,8 +191,8 @@ __aicore__ inline void ringbuf_skip_with_info(
     return;
 }
 
-__aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo,
-                                             const uint32_t& tlvLen)
+__aicore__ inline bool ringbuf_overflow_wait(
+    __gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo, const uint32_t& tlvLen)
 {
     constexpr uint32_t maxCounter = 15;
     uint32_t counter = 0;
@@ -257,8 +230,7 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
         }
         ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
     }
-    if (writeInfo->packIdx > 0 &&
-        writeInfo->bufOffset < readInfo->bufOffset &&
+    if (writeInfo->packIdx > 0 && writeInfo->bufOffset < readInfo->bufOffset &&
         writeInfo->bufOffset + tlvLen >= readInfo->bufOffset) {
         return ringbuf_overflow_wait(readInfo, writeInfo, tlvLen);
     }
