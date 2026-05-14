@@ -45,6 +45,7 @@ namespace ops_hccl {
 InsCollAlgBase::InsCollAlgBase() {}
 InsCollAlgBase::~InsCollAlgBase() {}
 std::string InsCollAlgBase::Describe() const { return "InsCollAlgBase"; }
+HcclResult InsCollAlgBase::FastLaunch(const OpParam& param, const CcuFastLaunchCtx* resCtx) { return HCCL_SUCCESS; }
 
 class MockInsCollAlgBase : public InsCollAlgBase {
 public:
