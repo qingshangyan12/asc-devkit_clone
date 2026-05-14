@@ -33,7 +33,7 @@ template <typename T, typename... Params>
 __aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Params& ...params);
 
 template <typename... Args>
-__aicore__ inline auto MakeMmad(const Args& ...traits);
+__aicore__ inline constexpr auto MakeMmad(const Args& ...traits);
 
 }
 }
