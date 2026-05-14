@@ -230,7 +230,7 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-SIMT编程场景当前不支持使用该接口。
+无
 
 ## 需要包含的头文件<a name="section7131139151810"></a>
 
@@ -250,6 +250,16 @@ SIMT编程场景当前不支持使用该接口。
 
 ## 调用示例<a name="section134121647154719"></a>
 
+-   SIMT编程场景：
+
+    ```
+    __global__ __launch_bounds__(1024) void kernel_asc_ldcg(float* dst, float* src)
+    {
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        dst[idx] = asc_ldcg(src + idx);
+    }
+    ```
+
 -   SIMD与SIMT混合编程场景：
 
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间。
@@ -261,4 +271,7 @@ SIMT编程场景当前不支持使用该接口。
         dst[idx] = asc_ldcg(src + idx);
     }
     ```
+
+
+
 
