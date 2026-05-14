@@ -375,23 +375,21 @@ __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
 {
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     MmadImpl(dst, fm, filter, mmadParams);
-#endif
 }
 
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     MmadImpl(dst, fm, filter, bias, mmadParams);
-#endif
 }
+#endif
 
 template <typename T, typename U,
     typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type,
@@ -519,12 +517,12 @@ __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padL
 }
 
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
 {
-	#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     SetFmatrixImpl(param, fmatrixMode);
-	#endif
 }
+#endif
 
 
 /* **************************************************************************************************
