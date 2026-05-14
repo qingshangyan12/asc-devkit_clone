@@ -191,7 +191,9 @@ private:
 
 }  // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_mm_bitmode_intf_impl.h"
+#endif // __NPU_ARCH__
 
 #endif // __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102
 #endif
