@@ -298,6 +298,34 @@ __aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint
 } // namespace __asc_aicore
 #endif
 
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+__aicore__ static __attribute__((noinline)) void AscVFDebugInitUb() {}
+__aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb() {}
+
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+__aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
+{
+    if (g_sysPrintFifoSpace != nullptr) {
+        constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
+        uint64_t ascReservedAddr = get_shmem_sz() - RESERVED_UB_SIZE;
+        uint16_t blockIdx = asc_debug_get_block_idx();
+        get_printf_ubuf_addr_aicore(ascReservedAddr, blockIdx);
+    }
+}
+
+__aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb()
+{
+    if (g_sysPrintFifoSpace != nullptr) {
+        // To avoid differences between -O0 and -O2, delete after the compiler resolves.
+        pipe_barrier(PIPE_ALL);
+        asc_vf_debug_ub2gm();
+    }
+}
+#else
+__aicore__ static __attribute__((noinline)) void AscVFDebugInitUb() {}
+__aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb() {}
+#endif
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__
