@@ -423,9 +423,8 @@ struct MmadParams {
     bool cmatrixSource = false;
     // Indicates the initial matrix, 1: the number in C matrix is 0, 0：use the real number in C matrix
     bool cmatrixInitVal = true;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+
     bool disableGemv = false;
-#endif
 };
 
 template <typename T>
