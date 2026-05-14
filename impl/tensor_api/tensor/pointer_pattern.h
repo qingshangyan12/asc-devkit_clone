@@ -44,13 +44,13 @@ struct IsPtrTrait<T, void_t<typename T::type>> : Std::true_type {};
 template <typename T>
 using MemPtrTraitT = typename Std::conditional<IsPtrTrait<T>::value, T, PtrTrait<T>>::type;
 
-template <typename Hardware, typename Arg0>
+template <typename Hardware, typename Arg>
 using EnableMakePtrByTrait =
-    Std::enable_if_t<IsHardwareV<Hardware> && !IsMemPtrIterator<Std::remove_cvref_t<Arg0>>::value, int>;
+    Std::enable_if_t<IsHardwareV<Hardware> && !IsMemPtrIterator<Std::remove_cvref_t<Arg>>::value, int>;
 
-template <typename Hardware, typename Arg0>
+template <typename Hardware, typename Arg>
 using EnableMakeHardwarePtr =
-    Std::enable_if_t<IsHardwareV<Hardware> && IsMemPtrIterator<Std::remove_cvref_t<Arg0>>::value, int>;
+    Std::enable_if_t<IsHardwareV<Hardware> && IsMemPtrIterator<Std::remove_cvref_t<Arg>>::value, int>;
 
 template <typename Iterator>
 using EnableMakePtrByIter =
