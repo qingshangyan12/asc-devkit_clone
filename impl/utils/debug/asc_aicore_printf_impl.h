@@ -181,81 +181,14 @@ __aicore__ inline void scalar_printf_impl(DumpType debugType, __gm__ const char*
 }
 
 template <class... Args>
-__aicore__ inline void print_common_head()
-{
-    __gm__ DebugBlockHeadInfo* blockInfo = get_block_info();
-    if (blockInfo == nullptr) {
-        return;
-    }
-    __gm__ DebugBlockWriteInfo* writeInfo = get_block_write_info(blockInfo);
-    if (writeInfo == nullptr || writeInfo->packIdx != 0) {
-        return;
-    }
-
-    uint64_t __ascendc_tStamp = 0;
-    uint64_t __ascendc_version = 0;
-    __gm__ char* __ascendc_versionStr = nullptr;
-    asc_debug_get_cann_vserion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
-    if (__ascendc_tStamp == 0) {
-        scalar_printf_impl(DumpType::DUMP_SCALAR, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
-    } else {
-        scalar_printf_impl(DumpType::DUMP_SCALAR, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
-    }
-}
-
-template <class... Args>
-__aicore__ inline void print_dump_head(DumpType debugType)
-{
-#ifdef __DAV_VEC__
-    scalar_printf_impl(debugType, "[AIV Block %u/%u] ", asc_debug_get_block_idx(), asc_debug_get_block_total_num());
-#else
-    scalar_printf_impl(debugType, "[AIC Block %u/%u] ", asc_debug_get_block_idx(), asc_debug_get_block_total_num());
-#endif
-}
-
-template <class... Args>
-__aicore__ inline void printf_impl_common(DumpType debugType, __gm__ const char* fmt, Args&&... args)
-{
-    uint64_t ctrlValue = get_ctrl();
-    set_atomic_none();
-#if !defined(__NPU_DEVICE__)
-    if (debugType != DumpType::DUMP_ASSERT) {
-        print_common_head();
-    }
-#endif
-    print_dump_head(debugType);
-    scalar_printf_impl(debugType, fmt, args...);
-    set_ctrl(ctrlValue);
-}
-
-template <class... Args>
 __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 {
-    enable_asc_diagnostics();
-    printf_impl_common(DumpType::DUMP_SCALAR, fmt, args...);
-}
-
-template <class... Args>
-__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
-{
-    enable_asc_assert();
-    printf_impl_common(DumpType::DUMP_ASSERT, fmt, args...);
-}
-
-template <typename... Args>
-inline __aicore__ void printf_impl_assert_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
-    const __gm__ char* __function, const __gm__ char* fmt, Args&&... args) {
     uint64_t ctrlValue = get_ctrl();
-
-    enable_asc_assert();
     set_atomic_none();
-    scalar_printf_impl(DumpType::DUMP_ASSERT, fmt, args...);
-    print_dump_head(DumpType::DUMP_ASSERT);
-    scalar_printf_impl(DumpType::DUMP_ASSERT, "[ASSERT] %s:%u: %s: Assertion `%s' failed.\n",
-                       __file, __line, __function, __assertion);
+    enable_asc_diagnostics();
+    scalar_printf_impl(DumpType::DUMP_SCALAR, fmt, args...);
     set_ctrl(ctrlValue);
 }
-
 } // namespace __asc_aicore
 #else
 #include <cstdio>
@@ -269,19 +202,6 @@ template <class... Args>
 __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 {
     std::printf(fmt, args...);
-}
-
-template <class... Args>
-__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
-{
-    std::printf(fmt, args...);
-}
-
-template <typename... Args>
-inline __aicore__ void printf_impl_assert_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
-    const __gm__ char* __function, const __gm__ char* fmt, Args&&... args) {
-    std::printf(fmt, args...);
-    std::printf("[ASSERT] %s:%u: %s: Assertion `%s' failed.\n",  __file, __line, __function, __assertion);
 }
 
 template <class... Args>
