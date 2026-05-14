@@ -25,6 +25,7 @@
 #include "impl/tensor_api/arch/utils/check_data_type_3510.h"
 #include "impl/tensor_api/arch/utils/check_format.h"
 #include "impl/tensor_api/arch/utils/is_format.h"
+#include "impl/tensor_api/arch/cube/utils/register_utils.h"
 
 namespace AscendC {
 namespace Te {
