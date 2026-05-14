@@ -20,7 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MM_BIT_MODE_STRUCT_H
 #define ASCENDC_MODULE_OPERATOR_MM_BIT_MODE_STRUCT_H
 #include "dav_3510/kernel_operator_mm_bitmode_impl.h"
-#include "kernel_operator_mm_bitmode_impl.h"
+#include "kernel_operator_mm_bitmode_common_impl.h"
 #endif  // ASCENDC_MODULE_OPERATOR_MM_BIT_MODE_STRUCT_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BITMODE_STRUCT_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
