@@ -28,6 +28,7 @@
   - input为输入矩阵，形状为[H,W]，数据类型为float
   - output为输出矩阵，形状为[W,H]，数据类型为float
 - 样例规格：
+
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">MatrixTranspose</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -49,13 +50,16 @@
 | Case 2 | 通过UB暂存tile并交换读写方向，GM读写更接近连续访问 | transpose_coalesced_kernel            | UB中转 + 全局访存合并实现转置           |
 | Case 3 | 在UB tile中增加padding降低bank冲突                 | transpose_avoid_bank_conflicts_kernel | UB中转 + 全局访存合并 + 避免UB Bank冲突 |
 
-#### 1. 线程块布局
+#### 线程块布局
 
-- 本样例采用SIMT编程方式。当前样例仅支持方阵，且矩阵宽高需要是32的整数倍。
+为方便对比各个版本的性能差异，本样例仅支持方阵，且矩阵宽高需要是32的整数倍，所有Case采用完全一致的线程块布局：
+
 - 对矩阵转置这类二维规则计算，可以将大矩阵分解为若干局部tile子块，使每个block只处理一个局部区域，便于索引计算和线程协作。
 - 每个tile大小为32×32，一个block处理一个tile。grid配置为 `(matrix_width/32, matrix_height/32, 1)`。
 - block配置固定为 `(32, 32, 1)`，单个block总线程数为32×32=1024，每个线程只处理tile内1个元素。
 - `threadIdx.x`方向有32个线程，对应tile内的列索引；`threadIdx.y`方向有32个线程，对应tile内的行索引。
+
+基于上述切分方式，`blockIdx`用于定位当前block负责的tile，`threadIdx`用于定位当前线程在tile内处理的元素。将tile坐标和tile内局部坐标相加，可以得到该元素在原矩阵中的全局坐标 `x_index`和 `y_index`；再按照行优先布局展开，即可得到GM中的线性索引 `index`。
 
 ```cpp
 int x_index = blockIdx.x * TILE_DIM + threadIdx.x;
@@ -257,11 +261,11 @@ UB中的bank划分如下图所示。UB总大小为256KB，可以看成前后两�
 
 远小于128KB，所以一个tile通常只会落在前128KB区域内。在本文分析里，可以把它近似看成只使用 `bank0~bank7`。
 
-case 2中UB的tile的前10行元素按照行优先存储的排布图如下，每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出，在访问UB时，32个线程会集中访问两个bank，也就是一个bank会有16个线程同时访问，产生大量的读冲突。
+case 2中UB的tile数组前10行元素按照行优先存储的排布图如下，为了展示方便这里只展示了前10行元素排布，其余行依次类推。每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出，在访问UB时，32个线程会集中访问两个bank，也就是一个bank会有16个线程同时访问，产生大量的读冲突。
 
 <img src="./figure/case2bank.png">
 
-case 3中对UB中的tile增加一列padding，由每行32个元素改为33个元素，其在UB上的排列如下图所示。由于每行有33个元素跨越5个bank存储，此时同一列的元素会被错开排布在不同的bank。case 3中在访问UB时，32个线程的访问会被分布到8个bank中，也就是一个bank会有4个线程同时访问，大大降低了冲突的规模。
+case 3中对UB中的tile数组增加一列padding，由每行32个元素改为33个元素，其在UB上的排列如下图所示。由于每行有33个元素跨越5个bank存储，此时同一列的元素会被错开排布在不同的bank。case 3中在访问UB时，32个线程的访问会被分布到8个bank中，也就是一个bank会有4个线程同时访问，大大降低了冲突的规模。
 
 <img src="./figure/case3bank.png">
 
@@ -302,7 +306,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 ## 性能对比总结
 
-### Ascend 950PR/Ascend 950DT芯片性能数据
+### Ascend 950PR性能数据
 
 **综合优化效果**：
 
