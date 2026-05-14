@@ -95,7 +95,7 @@ struct FixpipeInputParams {
     fixpipeParams.reluEn = enRelu;
 
 #define FIXPIPE_DEQ_SCALAR_RELU_FUNC(deqMode, deqScalar, enRelu, fixpipeParams) \
-    fixpipeParams.quantParams = { deqMode, deqScalar };                         \
+    fixpipeParams.quantParams = { deqMode, static_cast<uint64_t>(deqScalar) };                         \
     fixpipeParams.reluEn = enRelu;
 
 
