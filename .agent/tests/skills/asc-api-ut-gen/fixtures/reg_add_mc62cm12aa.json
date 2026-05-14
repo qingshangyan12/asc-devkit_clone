@@ -1,0 +1,18 @@
+{
+  "api_type": "reg",
+  "api_name": "RegAdd",
+  "chip": "mc62cm12aa",
+  "test_cases": [
+    {
+      "name": "RegAdd_half_256",
+      "data_size": 256,
+      "dtype": "half",
+      "input_count": 2,
+      "has_mask": false,
+      "additional_params": {}
+    }
+  ],
+  "kernel_params": {},
+  "custom_includes": [],
+  "output_dir": null
+}
