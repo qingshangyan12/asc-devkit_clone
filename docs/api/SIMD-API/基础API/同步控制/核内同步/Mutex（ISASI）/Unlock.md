@@ -108,7 +108,7 @@ static __aicore__ inline void Unlock(MutexID id)
 
 -   用户在使用Lock/Unlock时且自定义MutexID情况时，禁止同时使用[TQue](../../../资源管理/Pipe和Que框架/TQue/TQue.md)、[TQueBind](../../../资源管理/Pipe和Que框架/TQueBind/TQueBind.md)、[TBufPool](../../../资源管理/Pipe和Que框架/TBufPool/TBufPool.md)中的相关接口。
 -   对于同一个MutexID，必须按照Lock/Unlock配套使用，且指定的pipe也需相同，即当且只有完成一个流水的Lock/Unlock之后，才能进行其余流水的操作。
--   相同流水之间存在数据依赖的场景，这种情况建议使用[PipeBarrier](PipeBarrier(ISASI).md)接口。
+-   相同流水之间存在数据依赖的场景，这种情况建议使用[PipeBarrier](../PipeBarrier(ISASI).md)接口。
 
 ## 调用示例<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363"></a>
 

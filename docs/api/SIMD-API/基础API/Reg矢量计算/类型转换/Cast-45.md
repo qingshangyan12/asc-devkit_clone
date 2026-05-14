@@ -1269,7 +1269,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   该指令需配合[SetCtrlSpr\(ISASI\)](SetCtrlSpr(ISASI).md)  指令使用，通过设置寄存器的值控制Cast的饱和和非饱和模式。
+-   该指令需配合[SetCtrlSpr\(ISASI\)](../../系统变量访问/SetCtrlSpr(ISASI).md)  指令使用，通过设置寄存器的值控制Cast的饱和和非饱和模式。
 -   浮点数转整数：
     -   非饱和模式：输入数据超过输出类型最值时，结果被截断为目标格式的数据宽度，例如输入half值为257, 输出uint8\_t值为1，输入为+/-inf，则返回输出类型的对应最值，输入nan时，返回0。
     -   饱和模式：输入数据超过输出类型最值时，返回输出类型的对应最值，例如输入half值为257, 输出uint8值为255，输入half值为-inf，输出uint8\_t值为0，输入nan时，返回0。

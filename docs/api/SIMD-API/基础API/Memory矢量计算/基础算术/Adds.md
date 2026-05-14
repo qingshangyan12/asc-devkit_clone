@@ -240,8 +240,8 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   操作数地址对齐要求请参见[通用地址对齐约束](通用说明和约束.md#section796754519912)。
--   操作数地址重叠约束请参考[通用地址重叠约束](通用说明和约束.md#section668772811100)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
 
 -   针对Ascend 950PR/Ascend 950DT，int8\_t/uint8\_t/uint64\_t/int64\_t/complex32/complex64数据类型仅支持tensor前n个数据计算接口。
 

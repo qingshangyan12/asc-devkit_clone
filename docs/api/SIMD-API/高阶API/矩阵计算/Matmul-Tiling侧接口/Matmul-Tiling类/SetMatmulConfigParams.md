@@ -152,7 +152,7 @@ struct MatmulConfigParams
 ## 约束说明<a name="section951491643810"></a>
 
 -   本接口必须在[GetTiling](GetTiling.md)接口前调用。
--   若Matmul对象使用NBuffer33模板策略，即MatmulPolicy为[NBuffer33MatmulPolicy](MatmulPolicy.md#li194081238103913)，则在调用[GetTiling](GetTiling.md)接口生成Tiling参数前，必须通过本接口将scheduleTypeIn参数设置为ScheduleType::N\_BUFFER\_33，以启用NBuffer33模板策略的Tiling生成逻辑。
+-   若Matmul对象使用NBuffer33模板策略，即MatmulPolicy为[NBuffer33MatmulPolicy](../../Matmul-Kernel侧接口/MatmulPolicy.md#li194081238103913)，则在调用[GetTiling](GetTiling.md)接口生成Tiling参数前，必须通过本接口将scheduleTypeIn参数设置为ScheduleType::N\_BUFFER\_33，以启用NBuffer33模板策略的Tiling生成逻辑。
 
 ## 调用示例<a name="section1665082013318"></a>
 

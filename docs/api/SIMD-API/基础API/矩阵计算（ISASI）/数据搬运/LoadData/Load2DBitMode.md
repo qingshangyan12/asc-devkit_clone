@@ -349,7 +349,7 @@ Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   操作数地址对齐要求请参见[通用地址对齐约束](通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../../通用说明和约束.md#section796754519912)。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

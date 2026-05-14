@@ -137,7 +137,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
     -   对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型。
 
 -   避免flagId使用冲突：
-    -   [Matmul](REGIST_MATMUL_OBJ.md#section633mcpsimp)内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象数目，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象 ，此时flagId占用范围为\[0,7\]。
+    -   [Matmul](../../../高阶API/矩阵计算/Matmul-Kernel侧接口/REGIST_MATMUL_OBJ.md#section633mcpsimp)内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象数目，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象 ，此时flagId占用范围为\[0,7\]。
     -   [SyncAll](SyncAll.md)硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和[SyncAll](SyncAll.md)硬件同步接口接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
 
 -   同一flagId的计数器最多设置15次。

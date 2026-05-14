@@ -289,7 +289,7 @@ auto tmpBufferSize = (cSize  * 2 + 1)  * h0 * w0 * sizeof(type);</pre>
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   操作数地址对齐要求请参见[通用地址对齐约束](通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 -   普通转置接口支持src和dst复用。
 -   增强转置接口，transposeType为TRANSPOSE\_ND2ND\_B16时支持src和dst复用，transposeType为TRANSPOSE\_NCHW2NHWC、TRANSPOSE\_NHWC2NCHW时不支持src和dst复用。
 

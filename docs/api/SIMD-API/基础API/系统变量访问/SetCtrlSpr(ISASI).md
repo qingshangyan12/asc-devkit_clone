@@ -328,8 +328,8 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
     -   [SetAtomicType](../原子操作/SetAtomicType.md)
     -   [DisableDmaAtomic](../原子操作/DisableDmaAtomic.md)
     -   [SetAtomicAdd](../原子操作/SetAtomicAdd.md)
-    -   [SetAtomicMax](SetAtomicMax(ISASI).md)
-    -   [SetAtomicMin](SetAtomicMin(ISASI).md)
+    -   [SetAtomicMax](../原子操作/SetAtomicMax(ISASI).md)
+    -   [SetAtomicMin](../原子操作/SetAtomicMin(ISASI).md)
 
 ## 调用示例<a name="section11279242185011"></a>
 

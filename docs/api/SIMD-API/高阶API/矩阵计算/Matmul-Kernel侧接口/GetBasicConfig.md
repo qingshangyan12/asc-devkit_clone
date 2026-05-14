@@ -146,7 +146,7 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(const uint32_t basicM, const ui
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   使用本接口时，基本块大小baseM、baseN需满足：singleCoreM能被baseM整除，singleCoreN能被baseN整除。
--   本接口的参数basicM、basicN、basicK应与[TCubeTiling结构体](TCubeTiling结构体.md#p17899165811566)的baseM、baseN、baseK设置保持一致。
+-   本接口的参数basicM、basicN、basicK应与[TCubeTiling结构体](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#p17899165811566)的baseM、baseN、baseK设置保持一致。
 
 ## 调用示例<a name="section1665082013318"></a>
 
