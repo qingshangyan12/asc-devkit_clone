@@ -1,0 +1,18 @@
+{
+  "api_type": "simt",
+  "api_name": "VectorAdd",
+  "chip": "ascend950pr_9599",
+  "test_cases": [
+    {
+      "name": "VectorAdd_float_128",
+      "data_size": 128,
+      "dtype": "float",
+      "input_count": 2,
+      "has_mask": false,
+      "additional_params": {}
+    }
+  ],
+  "kernel_params": {},
+  "custom_includes": [],
+  "output_dir": null
+}
