@@ -48,18 +48,21 @@
 | Case 0 | 直接按照转置公式计算输出坐标，GM连续读、非连续写   | transpose_naive_kernel     | 直接索引转置版本      |
 | Case 1 | 通过UB暂存tile并交换读写方向，GM读写更接近连续访问 | transpose_coalesced_kernel | UB中转 + 全局访存合并 |
 
-#### 1. 线程块布局
+#### 线程块布局
 
-- 本样例采用SIMD与SIMT混合编程方式，核函数内部通过 `asc_vf_call` 调用 `__simt_vf__` 函数。当前样例仅支持方阵，且矩阵宽高需要是32的整数倍。
-- 本样例将二维tile坐标展平到一维 `blockIdx.x`，再将tile内32×32个元素展平到一维 `threadIdx.x`，在SIMT VF函数内部分别还原出二维tile坐标和tile内局部坐标。
+本样例采用SIMD与SIMT混合编程方式，核函数内部通过 `asc_vf_call` 调用 `__simt_vf__` 函数。为方便对比各个版本的性能差异，本样例仅支持方阵，且矩阵宽高需要是32的整数倍，所有Case采用完全一致的线程块布局：
+
+- 本样例将二维tile坐标展平到一维 `blockIdx.x`，并将tile内32×32个元素展平到一维 `threadIdx.x`。
 - 每个tile大小为32×32，一个block处理一个tile。block数量为 `bn = grid_x * grid_y`，其中 `grid_x = matrix_width / TILE_DIM`，`grid_y = matrix_height / TILE_DIM`。
 
-```cpp
-int block_x = blockIdx.x % grid_width;
-int block_y = blockIdx.x / grid_width;
+基于上述切分方式，`blockIdx.x`表示展平后的一维tile编号。通过对 `grid_width` 整除和取模，可以还原出当前block负责的二维tile坐标 `(block_row, block_col)`。`threadIdx.x`表示tile内展平后的一维元素编号，通过对 `TILE_DIM` 整除和取模，可以还原出线程在tile内处理元素的局部坐标 `(tile_row, tile_col)`。
 
-int tile_x = threadIdx.x % TILE_DIM;
-int tile_y = threadIdx.x / TILE_DIM;
+```cpp
+int block_row = blockIdx.x / grid_width;
+int block_col = blockIdx.x % grid_width;
+
+int tile_row = threadIdx.x / TILE_DIM;
+int tile_col = threadIdx.x % TILE_DIM;
 ```
 
 下图给出了一个更直观的映射示意。左侧表示1024×1024的矩阵被划分为32×32个tile。右侧表示其中一个block需要处理的一个tile，其大小为32×32。
@@ -68,37 +71,37 @@ int tile_y = threadIdx.x / TILE_DIM;
 
 以图中绿色元素为例，可以直接用kernel里的内置变量来推导它在GM中的input坐标。
 
-- tile坐标是(1,2)，对应：
-  - block_x = 1
-  - block_y = 2
-  - blockIdx.x = block_y × grid_width + block_x = 2 × 32 + 1 = 65
-- 元素在tile内的局部坐标是(29,2)，对应：
-  - threadIdx.x = tile_y × TILE_DIM + tile_x = 2 × 32 + 29 = 93
+- tile坐标是(2,1)，对应：
+  - block_row = 2
+  - block_col = 1
+  - blockIdx.x = block_row × grid_width + block_col = 2 × 32 + 1 = 65
+- 元素在tile内的局部坐标是(2,29)，对应：
+  - threadIdx.x = tile_row × TILE_DIM + tile_col = 2 × 32 + 29 = 93
 
 结合代码中的索引计算：
 
 ```cpp
-int x_index = block_x * TILE_DIM + tile_x;
-int y_index = block_y * TILE_DIM + tile_y;
-int index = x_index + width * y_index;
+int input_row = block_row * TILE_DIM + tile_row;
+int input_col = block_col * TILE_DIM + tile_col;
+int index_in = input_col + width * input_row;
 ```
 
 代入本例中的变量值：
 
-- block_x = 65 % 32 = 1
-- block_y = 65 / 32 = 2
-- tile_x = 93 % 32 = 29
-- tile_y = 93 / 32 = 2
-- x_index = block_x × TILE_DIM + tile_x = 1 × 32 + 29 = 61
-- y_index = block_y × TILE_DIM + tile_y = 2 × 32 + 2 = 66
+- block_row = 65 / 32 = 2
+- block_col = 65 % 32 = 1
+- tile_row = 93 / 32 = 2
+- tile_col = 93 % 32 = 29
+- input_row = block_row × TILE_DIM + tile_row = 2 × 32 + 2 = 66
+- input_col = block_col × TILE_DIM + tile_col = 1 × 32 + 29 = 61
 
 因此，该线程在GM中处理的输入元素坐标就是：
 
-- input[y_index,x_index] = input[66,61]
+- input[input_row,input_col] = input[66,61]
 
 如果继续代入一维地址公式，则有：
 
-- index = x_index + width × y_index = 61 + 1024 × 66
+- index_in = input_col + width × input_row = 61 + 1024 × 66
 
 ### 性能指标说明
 
@@ -132,8 +135,8 @@ int index = x_index + width * y_index;
 **关键代码**：
 
 ```cpp
-int index_in = x_index + width * y_index;
-int index_out = y_index + height * x_index;
+int index_in = input_col + width * input_row;
+int index_out = input_row + height * input_col;
 
 output[index_out] = input[index_in];
 ```
@@ -171,20 +174,20 @@ output[index_out] = input[index_in];
 **关键代码**：
 
 ```cpp
-int tile_x = threadIdx.x % TILE_DIM;
-int tile_y = threadIdx.x / TILE_DIM;
+int tile_row = threadIdx.x / TILE_DIM;
+int tile_col = threadIdx.x % TILE_DIM;
 
-tile[tile_y][tile_x] = input[index_in];
+tile[tile_row][tile_col] = input[index_in];
 asc_syncthreads();
 
-int block_x = blockIdx.x % grid_width;
-int block_y = blockIdx.x / grid_width;
+int block_row = blockIdx.x / grid_width;
+int block_col = blockIdx.x % grid_width;
 
-x_index = block_y * TILE_DIM + tile_x;
-y_index = block_x * TILE_DIM + tile_y;
-int index_out = x_index + y_index * height;
+int output_row = block_col * TILE_DIM + tile_row;
+int output_col = block_row * TILE_DIM + tile_col;
+int index_out = output_col + output_row * height;
 
-output[index_out] = tile[tile_x][tile_y];
+output[index_out] = tile[tile_col][tile_row];
 ```
 
 **优化手段**：
@@ -209,7 +212,7 @@ output[index_out] = tile[tile_x][tile_y];
 
 ## 性能对比总结
 
-### Ascend 950PR芯片性能数据
+### Ascend 950PR性能数据
 
 **综合优化效果**：
 
