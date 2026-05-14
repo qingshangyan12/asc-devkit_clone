@@ -154,7 +154,6 @@ private:
     };
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 class MmadBitModeParams {
 public:
     __aicore__ inline MmadBitModeParams();
@@ -187,7 +186,6 @@ private:
         struct MmadBitModeConfig0 config0BitMode;
     };
 };
-#endif
 }  // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_mm_bitmode_intf_impl.h"
