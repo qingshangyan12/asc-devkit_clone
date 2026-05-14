@@ -290,7 +290,6 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath) {
     EXPECT_NE(ctx->ckeAddr, 0U);
     EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuAllGatherMesh1D));
-    free(ctx);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AicpuPath) {
@@ -300,7 +299,6 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AicpuPath) {
     HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
     EXPECT_EQ(ret, HCCL_SUCCESS);
     ASSERT_NE(opResCtx, nullptr);
-    free(opResCtx);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_MultipleOps) {
@@ -315,7 +313,6 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_MultipleOps) {
     OpResCtx* ctx = static_cast<OpResCtx*>(opResCtx);
     EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(ctx->opType[1], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE));
-    free(ctx);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_NullComm) {
