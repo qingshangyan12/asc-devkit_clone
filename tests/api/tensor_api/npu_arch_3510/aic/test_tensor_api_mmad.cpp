@@ -61,3 +61,36 @@ protected:
 MMAD_INTERFACE_TEST(float, half, 16, 16, 16);
 MMAD_INTERFACE_TEST(float, float, 16, 16, 16);
 MMAD_INTERFACE_TEST(float, bfloat16_t, 16, 16, 16);
+
+TEST_F(Tensor_Api_Mmad, MmadInterface_float_hifloat8_t_16_16_16)
+{
+    using namespace AscendC::Te;
+    uint8_t a2Buf[256 * 256 * sizeof(hifloat8_t)] = {0};
+    uint8_t b2Buf[256 * 256 * sizeof(hifloat8_t)] = {0};
+    uint8_t c2Buf[256 * 256 * sizeof(float)] = {0};
+
+    auto a2Addr = reinterpret_cast<__ca__ hifloat8_t*>(a2Buf);
+    auto l0aTensor = MakeTensor(MakeMemPtr<Location::L0A>(a2Addr),
+                                MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<hifloat8_t>>(16, 16));
+
+    auto b2Addr = reinterpret_cast<__cb__ hifloat8_t*>(b2Buf);
+    auto l0bTensor = MakeTensor(MakeMemPtr<Location::L0B>(b2Addr),
+                                MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<hifloat8_t>>(16, 16));
+
+    auto c2Addr = reinterpret_cast<__cc__ float*>(c2Buf);
+    auto l0cTensor = MakeTensor(MakeMemPtr<Location::L0C>(c2Addr),
+                                MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<>>(16, 16));
+
+    MmadParams para;
+    para.m = 16;
+    para.n = 16;
+    para.k = 16;
+    para.unitFlag = 0;
+    para.cmatrixInitVal = true;
+
+    auto atom = MakeMmad(MmadOperation{}, MmadTraitDefault{}).with(para);
+    SetCtrl(45);
+    Mmad(atom, l0cTensor, l0aTensor, l0bTensor);
+    Mmad<MmadTraitDefault::TraitType, MmadTraitDefault::value>(atom, l0cTensor, l0aTensor, l0bTensor);
+    EXPECT_EQ(c2Addr[0], static_cast<float>(0));
+}
