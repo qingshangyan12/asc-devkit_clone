@@ -123,6 +123,7 @@ const char *aclrtGetSocName()
 
 HcclResult hrtGetDeviceType(DevType &devType)
 {
+    devType = DevType::DEV_TYPE_950;
     return HCCL_SUCCESS;
 }
 
