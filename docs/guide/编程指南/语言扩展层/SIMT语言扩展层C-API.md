@@ -10,6 +10,7 @@ SIMT编程基于AI Core的硬件能力实现，可以使用[asc\_vf\_call](https
 -   [Warp函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Warp函数.md)：提供对单个Warp内32个线程的数据进行处理的相关操作的一系列API接口。
 -   [类型转换](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/类型转换-141.md)：根据源操作数和目的操作数的数据类型进行精度转换。
 -   [向量类型构造函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/向量类型构造函数.md)：向量类型构造相关接口。
+-   [协作组]()：更细粒度地进行线程间的协作。
 -   专用函数：专用函数相关接口，包含[使能Cache Hints的Load/Store函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/使能Cache-Hints的Load-Store函数.md)相关接口。
 -   [调测接口](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/printf-147.md)：SIMT VF调试场景下使用的相关接口。
 
