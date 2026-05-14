@@ -16,6 +16,9 @@
 #include "base.h"
 #include "hccl_mc2.h"
 #include "hccl_alloc_ctx_res.h"
+#include "sim_communicator.h"
+#include "topo_model.h"
+#include "sim_common.h"
 
 namespace {
 
@@ -37,6 +40,18 @@ static void StubCleanup() {
     g_stubRankSize = 8;
     g_stubRankId = 0;
     g_stubDeviceType = DevType::DEV_TYPE_950;
+}
+
+static TopoMeta BuildTopoMeta(uint32_t rankSize) {
+    TopoMeta topoMeta;
+    SuperPodMeta superPod;
+    ServerMeta server;
+    for (uint32_t i = 0; i < rankSize; ++i) {
+        server.push_back(i);
+    }
+    superPod.push_back(server);
+    topoMeta.push_back(superPod);
+    return topoMeta;
 }
 
 struct Mc2TilingTestData {
@@ -70,12 +85,23 @@ static Mc2TilingTestData BuildMc2Tiling(uint32_t tilingNum, uint8_t commEngine,
 
 class CcuMc2TestSuite : public testing::Test {
 protected:
-    void SetUp() override { StubCleanup(); }
-    void TearDown() override { StubCleanup(); }
-    int dummyComm_ = 1;
-    int dummyStream_ = 1;
-    HcclComm comm_ = &dummyComm_;
-    aclrtStream stream_ = &dummyStream_;
+    void SetUp() override {
+        StubCleanup();
+        TopoMeta topoMeta = BuildTopoMeta(g_stubRankSize);
+        HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, g_stubRankId, &comm_);
+        int dummyStream = 1;
+        stream_ = &dummyStream;
+    }
+    void TearDown() override {
+        if (comm_ != nullptr) {
+            auto simComm = static_cast<HcclSim::SimCommunicator*>(comm_);
+            delete simComm;
+            comm_ = nullptr;
+        }
+        StubCleanup();
+    }
+    HcclComm comm_ = nullptr;
+    aclrtStream stream_ = nullptr;
 };
 
 TEST_F(CcuMc2TestSuite, CcuAllocV2_BasicFields) {
