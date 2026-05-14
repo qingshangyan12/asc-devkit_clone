@@ -191,7 +191,7 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
     }
     void* ctx = std::malloc(sizeof(AlgResourceCtxSerializable));
     if (ctx == nullptr) {
-        return HCCL_E_NO_MEM;
+        return HCCL_E_PTR;
     }
     *resCtxDevice = ctx;
     isSuspend = false;
