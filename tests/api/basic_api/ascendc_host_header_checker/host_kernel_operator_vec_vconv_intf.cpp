@@ -8,8 +8,15 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef VERIFY_SINGLE_HEADER
-#include "kernel_operator.h"
-#else
-#include "kernel_basic_intf.h"
-#endif
+#include "kernel_operator_vec_vconv_intf.h"
+
+
+//template <typename T, RoundMode roundMode>
+//__aicore__ inline void Truncate(const LocalTensor<T> &dst, const LocalTensor<T> &src,
+//    const uint32_t count);
+void HostTest_Truncate() {
+    AscendC::LocalTensor<float> dst;
+    AscendC::LocalTensor<float> src;
+    uint32_t count = 256;
+    AscendC::Truncate<float, AscendC::RoundMode::ROUND>(dst, src, count);
+}

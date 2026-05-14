@@ -8,16 +8,4 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef ASCENDC_HOST_CHECKER_H
-#define ASCENDC_HOST_CHECKER_H
-
-#define CHECK_VAR_EXISTS(var_name) \
-static_assert(sizeof(var_name) > 0, #var_name " is not defined")
-
-#define CHECK_FUNC_EXISTS(func_name) \
-static_assert(&func_name != nullptr, #func_name " is not defined")
-
-
-#endif
-
-
+#include "kernel_operator_limits_intf.h"
