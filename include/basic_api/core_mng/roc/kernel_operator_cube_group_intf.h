@@ -160,7 +160,6 @@ template <int groupID, class MatmulApiType, template <class, class> class CallBa
 __aicore__ inline CubeResGroupHandle<CubeMsgType> CreateCubeResGroup(
     KfcWorkspace &desc, uint8_t blockStart, uint8_t blockSize, uint8_t msgQueueSize, GM_ADDR tiling);
 }  // namespace AscendC
-#endif
 
 #endif
 
