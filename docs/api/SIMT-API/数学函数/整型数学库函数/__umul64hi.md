@@ -51,7 +51,7 @@
 
 获取输入uint64类型数据x和y乘积的高64位。
 
-![](../../../figures/zh-cn_formulaimage_0000002531050522.png)
+![](figures/zh-cn_formulaimage_0000002531050522.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

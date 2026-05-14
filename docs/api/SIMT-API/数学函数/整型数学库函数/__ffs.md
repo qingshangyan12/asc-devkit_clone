@@ -49,7 +49,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-从二进制输入数据的最低位开始，查找第一个值为1的比特位的位置，并返回该位置的索引，索引从1开始计数；如果二进制数据中没有1，则返回0。
+- 接口声明文件：`simt_api/device_functions.h`
+- 核心功能：从二进制输入数据的最低位开始，查找第一个值为1的比特位的位置，并返回该位置的索引，索引从1开始计数；如果二进制数据中没有1，则返回0。
+- 实现原理/公式：<TODO>
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -67,33 +69,23 @@ int __ffs(long x)
 
 ## 参数说明<a name="section0866173114710"></a>
 
-**表 1**  参数说明
-
-<a name="zh-cn_topic_0235751031_table33761356"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="18.54%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="11.16%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0235751031_p16609919"><a name="zh-cn_topic_0235751031_p16609919"></a><a name="zh-cn_topic_0235751031_p16609919"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="70.3%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0235751031_p59995477"><a name="zh-cn_topic_0235751031_p59995477"></a><a name="zh-cn_topic_0235751031_p59995477"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row42461942101815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p284425844311"><a name="p284425844311"></a><a name="p284425844311"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.16%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="70.3%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>源操作数。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| x | 输入 | 源操作数 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-数据二进制低位开始的第一个比特位为1的位置。
+返回输入数据二进制低位开始的第一个比特位为1的位置（从1开始计数）。当输入为0时返回0。特殊值如下：
 
--   当x=0时，返回0。
--   当x=1时，返回1。
+| 输入 | 返回值 |
+|---|---|
+| 0 | 0 |
+| 1 | 1 |
+| 2 | 2 |
+| 4 | 3 |
+| 8 | 4 |
+| 0x80000000（INT_MIN，最低有效位为1） | 32 |
+| -1（0xFFFFFFFF，所有位为1） | 1 |
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

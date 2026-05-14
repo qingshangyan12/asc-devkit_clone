@@ -51,7 +51,7 @@
 
 获取输入int32类型数据x和y乘积的高32位。
 
-![](../../../figures/zh-cn_formulaimage_0000002562010439.png)
+![](figures/zh-cn_formulaimage_0000002562010439.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

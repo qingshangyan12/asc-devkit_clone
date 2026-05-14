@@ -51,6 +51,8 @@
 
 将输入数据的位序反转，返回反转后的值。
 
+当输入的类型为`uint32_t`时，返回值的第`n`位对应输入数据的第`31-n`位；当输入的类型为`uint64_t`时，返回值的第`n`位对应输入数据的第`63-n`位。
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```
@@ -90,12 +92,49 @@ unsigned long __brev(unsigned long x)
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-输入数据的位反转值。当输入的类型为uint32\_t时，返回值的第n位对应输入数据的第31-n位；当输入的类型为uint64\_t时，返回值的第n位对应输入数据的第63-n位。
+返回输入数据的位反转值，特殊输入的返回值如下：
 
--   当x为0时，类型为uint32\_t时，返回值为0。
--   当x为0时，类型为uint64\_t时，返回值为0。
--   当x为1时，类型为uint32\_t时，返回值为2147483648。
--   当x为1时，类型为uint64\_t时，返回值为9223372036854775808。
+<a name="table185361531739"></a>
+<table><thead align="left"><tr id="row125361753939"><th class="cellrowborder" valign="top" width="50%" id="mcps1.3.3.1.1"><p id="p5536125317311"><a name="p5536125317311"></a><a name="p5536125317311"></a>输入</p>
+</th>
+<th class="cellrowborder" valign="top" width="50%" id="mcps1.3.3.1.2"><p id="p17536105310317"><a name="p17536105310317"></a><a name="p17536105310317"></a>返回值</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row14536165312311"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.1 "><p id="p9536205317318"><a name="p9536205317318"></a><a name="p9536205317318"></a>0（uint32_t）</p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.2 "><p id="p1653619534311"><a name="p1653619534311"></a><a name="p1653619534311"></a>0x00000000</p>
+</td>
+</tr>
+<tr id="row85369539315"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.1 "><p id="p1453617530317"><a name="p1453617530317"></a><a name="p1453617530317"></a>0（uint64_t）</p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.2 "><p id="p5536125317312"><a name="p5536125317312"></a><a name="p5536125317312"></a>0x0000000000000000</p>
+</td>
+</tr>
+<tr id="row1653617535311"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.1 "><p id="p2536155317310"><a name="p2536155317310"></a><a name="p2536155317310"></a>1（uint32_t）</p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.2 "><p id="p5536105314316"><a name="p5536105314316"></a><a name="p5536105314316"></a>0x80000000（位31反转至位0）</p>
+</td>
+</tr>
+<tr id="row205365532315"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.1 "><p id="p65365533310"><a name="p65365533310"></a><a name="p65365533310"></a>1（uint64_t）</p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.2 "><p id="p1153635313316"><a name="p1153635313316"></a><a name="p1153635313316"></a>0x8000000000000000（位63反转至位0）</p>
+</td>
+</tr>
+<tr id="row95361653173114"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.1 "><p id="p453655319312"><a name="p453655319312"></a><a name="p453655319312"></a>0xFFFFFFFF（uint32_t最大值）</p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.2 "><p id="p45363538312"><a name="p45363538312"></a><a name="p45363538312"></a>0xFFFFFFFF（反转后仍为自身）</p>
+</td>
+</tr>
+<tr id="row15536165317312"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.1 "><p id="p15361053231"><a name="p15361053231"></a><a name="p15361053231"></a>0xFFFFFFFFFFFFFFFF（uint64_t最大值）</p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.3.3.1.2 "><p id="p1653635373114"><a name="p1653635373114"></a><a name="p1653635373114"></a>0xFFFFFFFFFFFFFFFF（反转后仍为自身）</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+当输入的类型为`uint32_t`时，返回值的第`n`位对应输入数据的第`31-n`位；当输入的类型为`uint64_t`时，返回值的第`n`位对应输入数据的第`63-n`位。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
@@ -146,4 +185,3 @@ unsigned long __brev(unsigned long x)
         dst[idx] = __brev(x[idx]);
     }
     ```
-

@@ -49,9 +49,11 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-获取int32类型数据x和y的平均值，避免中间求和溢出。
+对两个输入数据执行向下取整的平均值运算，即将两数相加后除以2并向下取整，避免中间求和溢出。
 
-![](../../../figures/zh-cn_formulaimage_0000002555143760.png)
+该接口为多态函数，支持 `int`、`half`、`half2`、`bfloat16_t`、`bfloat16x2_t` 等多种数据类型。
+
+计算公式为：$\text{floor}\left(\frac{x + y}{2}\right)$，等价于位运算 $(x + y) \gg 1$。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -61,37 +63,22 @@ int __hadd(int x, int y)
 
 ## 参数说明<a name="section0866173114710"></a>
 
-**表 1**  参数说明
-
-<a name="zh-cn_topic_0235751031_table33761356"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="15.09%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="13.5%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0235751031_p16609919"><a name="zh-cn_topic_0235751031_p16609919"></a><a name="zh-cn_topic_0235751031_p16609919"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="71.41%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0235751031_p59995477"><a name="zh-cn_topic_0235751031_p59995477"></a><a name="zh-cn_topic_0235751031_p59995477"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row42461942101815"><td class="cellrowborder" valign="top" width="15.09%" headers="mcps1.2.4.1.1 "><p id="p284425844311"><a name="p284425844311"></a><a name="p284425844311"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.5%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p177051013181916"><a name="p177051013181916"></a><a name="p177051013181916"></a>源操作数。</p>
-</td>
-</tr>
-<tr id="row12148485594"><td class="cellrowborder" valign="top" width="15.09%" headers="mcps1.2.4.1.1 "><p id="p15214104814593"><a name="p15214104814593"></a><a name="p15214104814593"></a>y</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.5%" headers="mcps1.2.4.1.2 "><p id="p11214104885911"><a name="p11214104885911"></a><a name="p11214104885911"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p10214448165910"><a name="p10214448165910"></a><a name="p10214448165910"></a>源操作数。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| x | 输入 | 源操作数。 |
+| y | 输入 | 源操作数。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-输入数据的平均值。
+返回两个输入数据的平均值，即 floor((x + y) / 2)，特殊值行为如下：
+
+| 输入 | 非饱和模式返回值 | 饱和模式返回值 |
+|---|---|---|
+| +0 | +0 | +0 |
+| -0 | +0 | +0 |
+| nan | nan | +0 |
+| +Inf | +Inf | +65504 |
+| -Inf | -Inf | -65504 |
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

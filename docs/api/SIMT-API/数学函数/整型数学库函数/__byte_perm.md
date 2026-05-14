@@ -49,25 +49,15 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-由输入的两个4字节的uint32\_t类型数据组成一个8个字节的64比特位的整数，通过选择器s指定选取其中的4个字节，将这4个字节从低位到高位拼成一个uint32\_t类型的整数。具体实现逻辑如下：
+- 核心功能：由输入的两个 4 字节的 uint32_t 类型数据组成一个 8 字节的 64 比特位整数，通过选择器 s 指定选取其中的 4 个字节，将这 4 个字节从低位到高位拼成一个 uint32_t 类型的整数。
+- 实现原理：
+  通过选择器 s 的每 4 个比特（s[0:3]、s[4:7]、s[8:11]、s[12:15]）指定字节索引，从由 x 和 y 组成的 64 位整数中选取对应字节，最终将这 4 个选中的字节重新拼接为 uint32_t 结果。数学表达式为：
 
-```
-// 以下为C++表示的BytePerm(x, y, s)计算逻辑
-uint64_t tmp64 = ((uint64_t)y << 32) | x; // x,y拼接成uint64整数
+$$
+\text{result} = \bigoplus_{i=0}^{3} \left( \left( \frac{(x + 2^{32}y) \gg (s_{4i} \times 8)}{256^{s_{4i}}} \bmod 256 \right) \ll (8 \times i) \right)
+$$
 
-uint8_t selector0 = (s >> 0) & 0x7; // selector0取值范围在[0, 7]之间
-uint8_t selector1 = (s >> 4) & 0x7;
-uint8_t selector2 = (s >> 8) & 0x7;
-uint8_t selector3 = (s >> 12) & 0x7;
-
-uint8_t byte0 = (tmp64 >> (selector0 * 8)) & 0xFF; // 选取tmp64中的第selector0个字节
-uint8_t byte1 = (tmp64 >> (selector1 * 8)) & 0xFF;
-uint8_t byte2 = (tmp64 >> (selector2 * 8)) & 0xFF;
-uint8_t byte3 = (tmp64 >> (selector3 * 8)) & 0xFF;
-
-// result 为BytePerm返回值，其结果由对应字节按照顺序拼接而成
-uint32_t result = byte0 | (byte1 << 8) | (byte2 << 16) | (byte3 << 24);
-```
+其中 $s_{4i}$ 为选择器 s 的第 $i$ 个 4 比特字段（取值 0\~7），表示从 8 个字节中选取的字节位置。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -77,47 +67,26 @@ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s)
 
 ## 参数说明<a name="section0866173114710"></a>
 
-**表 1**  参数说明
-
-<a name="zh-cn_topic_0235751031_table33761356"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="15.09%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="13.5%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0235751031_p16609919"><a name="zh-cn_topic_0235751031_p16609919"></a><a name="zh-cn_topic_0235751031_p16609919"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="71.41%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0235751031_p59995477"><a name="zh-cn_topic_0235751031_p59995477"></a><a name="zh-cn_topic_0235751031_p59995477"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row42461942101815"><td class="cellrowborder" valign="top" width="15.09%" headers="mcps1.2.4.1.1 "><p id="p284425844311"><a name="p284425844311"></a><a name="p284425844311"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.5%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p177051013181916"><a name="p177051013181916"></a><a name="p177051013181916"></a>源操作数，uint32_t类型，与y拼接成64比特位的整数，该整数的[0:31]位为x。</p>
-</td>
-</tr>
-<tr id="row12148485594"><td class="cellrowborder" valign="top" width="15.09%" headers="mcps1.2.4.1.1 "><p id="p15214104814593"><a name="p15214104814593"></a><a name="p15214104814593"></a>y</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.5%" headers="mcps1.2.4.1.2 "><p id="p11214104885911"><a name="p11214104885911"></a><a name="p11214104885911"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p10214448165910"><a name="p10214448165910"></a><a name="p10214448165910"></a>源操作数，uint32_t类型，与x拼接成64比特位的整数，该整数的[32:63]位为y。</p>
-</td>
-</tr>
-<tr id="row796211210019"><td class="cellrowborder" valign="top" width="15.09%" headers="mcps1.2.4.1.1 "><p id="p396212804"><a name="p396212804"></a><a name="p396212804"></a>s</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.5%" headers="mcps1.2.4.1.2 "><p id="p17962820014"><a name="p17962820014"></a><a name="p17962820014"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p560443518107"><a name="p560443518107"></a><a name="p560443518107"></a>选择器，uint32_t类型，用于指定如何从x和y组成的8个字节64比特位的整数中提取4字节数据。具体为，s[0:3]、s[4:7]、s[8:11]、s[12:15]表示的数据指定选取的字节在8个字节整数中的索引值0到7。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| x | 输入 | 源操作数，与 y 拼接成64比特位的整数，该整数的 [0:31] 位为 x。 |
+| y | 输入 | 源操作数，与 x 拼接成64比特位的整数，该整数的 [32:63] 位为 y。 |
+| s | 输入 | 选择器，用于指定如何从 x 和 y 组成的8个字节64比特位的整数中提取4字节数据。具体为，s[0:3]、s[4:7]、s[8:11]、s[12:15] 表示的数据指定选取的字节在8个字节整数中的索引值0到7。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-通过选择器s选取出的uint32\_t类型的整数。
+通过选择器 s 从 x 和 y 拼接成的 64 位整数中选取 4 个字节并重新拼接为 uint32_t 类型的整数。normal 和 saturation 模式行为一致，无特殊值边界（如 NaN/Inf 等概念不适用于整型字节选择），示例如下：
 
--   当x为0，y为0，s为0时，返回值为0。
--   当x为1，y为1，s为1时，返回值为16843008。
+| 输入 (x, y, s) | 返回值 (十六进制) |
+|---|---|
+| (0x00000000, 0x00000000, 0x00000000) | 0x00000000 |
+| (0x00000001, 0x00000000, 0x00000001) | 0x01010100 |
+| (0x00000001, 0x00000001, 0x00000001) | 0x01010100 |
+| (0xFFFFFFFF, 0xFFFFFFFF, 0x76543210) | 0xFFFFFFFF |
+| (0x12345678, 0x9ABCDEF0, 0x11111111) | 0x56565656 |
+| (0x12345678, 0x9ABCDEF0, 0x77777777) | 0x9A9A9A9A |
+| (0x12345678, 0x9ABCDEF0, 0x00000000) | 0x78787878 |
+| (0x00010203, 0x04050607, 0x76543210) | 0x00010203 |
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

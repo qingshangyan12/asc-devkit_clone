@@ -49,7 +49,8 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-获取int32类型数据x和y的低24位乘积的低32位运算结果。x和y的高8位数据被忽略。
+- 核心功能：计算两个32位整数低24位的乘积，返回低32位结果。
+- 实现原理/公式：$result = (x \land 0xFFFFFF) \times (y \land 0xFFFFFF) \pmod{2^{32}}$，参数高8位被忽略。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -59,37 +60,20 @@ int __mul24(int x, int y)
 
 ## 参数说明<a name="section0866173114710"></a>
 
-**表 1**  参数说明
-
-<a name="zh-cn_topic_0235751031_table33761356"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="15.09%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="13.5%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0235751031_p16609919"><a name="zh-cn_topic_0235751031_p16609919"></a><a name="zh-cn_topic_0235751031_p16609919"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="71.41%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0235751031_p59995477"><a name="zh-cn_topic_0235751031_p59995477"></a><a name="zh-cn_topic_0235751031_p59995477"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row42461942101815"><td class="cellrowborder" valign="top" width="15.09%" headers="mcps1.2.4.1.1 "><p id="p284425844311"><a name="p284425844311"></a><a name="p284425844311"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.5%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p177051013181916"><a name="p177051013181916"></a><a name="p177051013181916"></a>源操作数。</p>
-</td>
-</tr>
-<tr id="row12148485594"><td class="cellrowborder" valign="top" width="15.09%" headers="mcps1.2.4.1.1 "><p id="p15214104814593"><a name="p15214104814593"></a><a name="p15214104814593"></a>y</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.5%" headers="mcps1.2.4.1.2 "><p id="p11214104885911"><a name="p11214104885911"></a><a name="p11214104885911"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p10214448165910"><a name="p10214448165910"></a><a name="p10214448165910"></a>源操作数。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| x | 输入 | 源操作数 |
+| y | 输入 | 源操作数 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-输入数据低24位乘积的低32位结果。
+返回两个输入低24位的乘积低32位结果。输入高8位被忽略，等效于 `(x & 0xFFFFFF) * (y & 0xFFFFFF) mod 2^32`。饱和模式与非饱和模式行为一致，无特殊边界值。
+
+| 输入 | 返回值 |
+|---|---|
+| x=0x80000000, y=1 (intmin, only low24=0) | 0 |
+| x=0xFFFFFF, y=0xFFFFFF (max24*max24) | 1 (溢出截断) |
+| x=0xFFFFFF, y=2 (max24*2) | 0xFFFFFFFE (-2) |
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
