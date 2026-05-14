@@ -38,41 +38,17 @@ HcclResult SimThreadMgr::CommEngineToNotifyLoadType(CommEngine engine, NotifyLoa
 HcclResult SimThreadMgr::HcclThreadAcquireWithStream(
     CommEngine engine, rtStream_t stream, uint32_t notifyNum, ThreadHandle *thread)
 {
-    NotifyLoadType notifyLoadType;
-    CHK_RET(CommEngineToNotifyLoadType(engine, notifyLoadType));
-
-    std::lock_guard<std::mutex> lock(mainThreadMutex_);
-    std::unique_ptr<SimHcclThread> handle = std::make_unique<SimHcclThread>(stream, notifyNum, notifyLoadType);
-    handle->SetCurRank(curRank_);
-    handle->SetCtxIndex(0);
-    CHK_RET(handle->Init());
-    mainThread_.emplace(stream, std::move(handle));
-
-    *thread = reinterpret_cast<ThreadHandle>(mainThread_[stream].get());
     return HCCL_SUCCESS;
 }
 
 HcclResult SimThreadMgr::HcclThreadAcquire(
     CommEngine engine, uint32_t threadNum, uint32_t notifyNumPerThread, ThreadHandle *threads)
 {
-    std::lock_guard<std::mutex> lock(threadMutex_);
-    for (uint32_t i = 0; i < threadNum; ++i) {
-        auto simThread = std::make_shared<SimHcclThread>(StreamType::STREAM_TYPE_RESERVED, notifyNumPerThread, NotifyLoadType::HOST_NOTIFY);
-        simThread->SetCurRank(curRank_);
-        simThread->SetCtxIndex(i + 1);
-        CHK_RET(simThread->Init());
-        threads_.push_back(simThread);
-
-        threads[i] = reinterpret_cast<ThreadHandle>(simThread.get());
-    }
     return HCCL_SUCCESS;
 }
 
 HcclResult SimThreadMgr::CommGetNotifyNumInThread(ThreadHandle thread, uint32_t *notifyNum)
 {
-    SimHcclThread* hcclThread = reinterpret_cast<SimHcclThread*>(thread);
-    CHK_PTR_NULL(hcclThread);
-    *notifyNum = hcclThread->GetNotifyNum();
     return HCCL_SUCCESS;
 }
 
