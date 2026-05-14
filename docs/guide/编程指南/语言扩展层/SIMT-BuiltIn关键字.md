@@ -133,16 +133,16 @@
     -   对于二维线程块，其线程ID为二维结构，其计算公式为：
 
         ```
-        threadID.x = blockIdx.x \* blockDim.x + threadIdx.x；
-        threadID.y = blockIdx.y \* blockDim.y + threadIdx.y；
+        threadID.x = blockIdx.x * blockDim.x + threadIdx.x；
+        threadID.y = blockIdx.y * blockDim.y + threadIdx.y；
         ```
 
     -   对于三维线程块，其线程ID为三维结构，其计算公式为：
 
         ```
-        threadID.x = blockIdx.x\* blockDim.x + threadIdx.x；
-        threadID.y = blockIdx.y \* blockDim.y + threadIdx.y；
-        threadID.z = blockIdx.z \* blockDim.z + threadIdx.z；
+        threadID.x = blockIdx.x * blockDim.x + threadIdx.x；
+        threadID.y = blockIdx.y * blockDim.y + threadIdx.y；
+        threadID.z = blockIdx.z * blockDim.z + threadIdx.z；
         ```
 
 当前提供了以下仅在Device上可用的int类型的内置变量：
