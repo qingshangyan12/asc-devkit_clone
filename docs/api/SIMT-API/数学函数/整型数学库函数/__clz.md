@@ -49,7 +49,10 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-从输入数据的二进制最高有效位开始，返回连续的前导零的位数。
+- 核心功能：计算输入整数二进制表示中从最高有效位开始连续的前导零的个数。
+- 实现原理/公式：
+  - 当输入为 0 时，返回值的位宽等于输入类型的位宽（例如 32 位输入返回 32，64 位输入返回 64）。
+  - 当输入非零时，返回值范围为 $[0, N-1]$，其中 $N$ 为类型位宽（32 或 64）。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -67,30 +70,26 @@ int __clz(long x)
 
 ## 参数说明<a name="section0866173114710"></a>
 
-**表 1**  参数说明
-
-<a name="zh-cn_topic_0235751031_table33761356"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="14.85%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="13.74%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0235751031_p16609919"><a name="zh-cn_topic_0235751031_p16609919"></a><a name="zh-cn_topic_0235751031_p16609919"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="71.41%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0235751031_p59995477"><a name="zh-cn_topic_0235751031_p59995477"></a><a name="zh-cn_topic_0235751031_p59995477"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row42461942101815"><td class="cellrowborder" valign="top" width="14.85%" headers="mcps1.2.4.1.1 "><p id="p284425844311"><a name="p284425844311"></a><a name="p284425844311"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.74%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>源操作数。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| x | 输入 | 源操作数。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-返回输入整数二进制表示中连续高位零的数量。
+返回输入整数二进制表示中从最高有效位开始连续的前导零的位数。当输入为 0 时，对于 32 位类型返回 32，对于 64 位类型返回 64。特殊值测试结果如下：
+
+| 输入 | 返回值 |
+|---|---|
+| 0（32 位） | 32 |
+| 0（64 位） | 64 |
+| 1（32 位） | 31 |
+| 1（64 位） | 63 |
+| -1（32 位） | 0 |
+| -1（64 位） | 0 |
+| int_max（32 位） | 1 |
+| int_min（32 位） | 0 |
+| ll_max（64 位） | 1 |
+| ll_min（64 位） | 0 |
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

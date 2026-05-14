@@ -51,7 +51,7 @@
 
 获取两个输入数据中的最小值。
 
-![](../../../figures/zh-cn_formulaimage_0000002552510937.png)
+![](figures/zh-cn_formulaimage_0000002552510937.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

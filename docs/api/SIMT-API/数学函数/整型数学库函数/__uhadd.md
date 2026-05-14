@@ -51,7 +51,7 @@
 
 获取uint32类型数据x和y的平均值，避免中间求和溢出。
 
-![](../../../figures/zh-cn_formulaimage_0000002554985178.png)
+![](figures/zh-cn_formulaimage_0000002554985178.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
