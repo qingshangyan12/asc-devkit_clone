@@ -136,6 +136,8 @@ private:
     uint8_t handleIdRepeat_[HCCL_MAX_HANDLE_ID] = {0U};
     uint8_t curMsgPosition_[MAX_QUE_NUM] = {0U};
     HcclHandle curHandleId_ = INVALID_HANDLE_ID;
+    uint8_t primitiveId_ = 0U;
+    bool isResetPrimitiveId_ = false;
 
     // Current msg position where Api write, starts from 0 and increases automatically, with a maximum of
     // HCCL_MSG_CNT-1. When HCCL_MSG_CNT is reached, take the remainder and recycling message area.
