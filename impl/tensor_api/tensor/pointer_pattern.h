@@ -61,10 +61,10 @@ __aicore__ inline constexpr auto MakeMemPtr(Args... args)
     return MakeHardwareMemPtr<Hardware>(args...);
 }
 
-template <typename Iterator>
+template <typename Iterator, Std::enable_if_t<IsMemPtrIterator<FirstArgT<Args...>>::value, int> = 0>
 __aicore__ inline constexpr auto MakeMemPtr(const Iterator& iter)
 {
-    using hardware = GetAttributeLocation<Iterator>;
+    using hardware = GetAttributeLocation<typename IterEle<Iterator>::type*>;
     return MakeMemPtr<hardware>(iter);
 }
 
