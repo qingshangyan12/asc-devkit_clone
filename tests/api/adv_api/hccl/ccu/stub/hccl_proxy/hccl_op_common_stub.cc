@@ -194,30 +194,27 @@ HcclResult SetCommEngine(OpParam& param)
     return HcclResult::HCCL_SUCCESS;
 }
 
-static struct {
-    bool ccuMSMode = false;
-    bool ccuSchedMode = false;
-    bool aicpuUnfold = false;
-} g_stubAlgEnvConfig;
-
 HcclResult InitEnvConfig()
 {
-    const char* envValue = std::getenv("HCCL_OP_EXPANSION_MODE");
-    g_stubAlgEnvConfig.ccuMSMode = false;
-    g_stubAlgEnvConfig.ccuSchedMode = false;
-    g_stubAlgEnvConfig.aicpuUnfold = false;
-
-    if (envValue != nullptr) {
-        std::string mode(envValue);
-        if (mode == "CCU_MS") {
-            g_stubAlgEnvConfig.ccuMSMode = true;
-        } else if (mode == "CCU_SCHED") {
-            g_stubAlgEnvConfig.ccuSchedMode = true;
-        } else if (mode == "AI_CPU") {
-            g_stubAlgEnvConfig.aicpuUnfold = true;
-        }
-    }
     return HcclResult::HCCL_SUCCESS;
+}
+
+static bool ReadEnvVarCcuMSMode()
+{
+    const char* envValue = std::getenv("HCCL_OP_EXPANSION_MODE");
+    return (envValue != nullptr && std::string(envValue) == "CCU_MS");
+}
+
+static bool ReadEnvVarCcuSchedMode()
+{
+    const char* envValue = std::getenv("HCCL_OP_EXPANSION_MODE");
+    return (envValue != nullptr && std::string(envValue) == "CCU_SCHED");
+}
+
+static bool ReadEnvVarAicpuUnfold()
+{
+    const char* envValue = std::getenv("HCCL_OP_EXPANSION_MODE");
+    return (envValue != nullptr && std::string(envValue) == "AI_CPU");
 }
 
 const bool& GetExternalInputHcclAivOnlyMode()
@@ -234,17 +231,23 @@ const bool& GetExternalInputHcclEnableEntryLog()
 
 const bool& GetExternalInputHcclCcuMSMode()
 {
-    return g_stubAlgEnvConfig.ccuMSMode;
+    static bool value = false;
+    value = ReadEnvVarCcuMSMode();
+    return value;
 }
 
 const bool& GetExternalInputHcclCcuSchedMode()
 {
-    return g_stubAlgEnvConfig.ccuSchedMode;
+    static bool value = false;
+    value = ReadEnvVarCcuSchedMode();
+    return value;
 }
 
 const bool& GetExternalInputHcclAicpuUnfold()
 {
-    return g_stubAlgEnvConfig.aicpuUnfold;
+    static bool value = false;
+    value = ReadEnvVarAicpuUnfold();
+    return value;
 }
 
 HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algTag)
