@@ -109,6 +109,12 @@ HcclResult LogHcclExit(const std::string &opName, const char *tag, HcclUs startu
 
 HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
 {
+    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        param.opExecuteConfig = OpExecuteConfig::CCU_MS;
+    } else {
+        param.opExecuteConfig = OpExecuteConfig::AICPU_TS;
+        param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+    }
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -178,6 +184,18 @@ const bool& GetExternalInputHcclAivOnlyMode()
 }
 
 const bool& GetExternalInputHcclEnableEntryLog()
+{
+    static bool value = false;
+    return value;
+}
+
+const bool& GetExternalInputHcclCcuMSMode()
+{
+    static bool value = false;
+    return value;
+}
+
+const bool& GetExternalInputHcclCcuSchedMode()
 {
     static bool value = false;
     return value;
