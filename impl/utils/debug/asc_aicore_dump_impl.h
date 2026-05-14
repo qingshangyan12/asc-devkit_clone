@@ -20,12 +20,17 @@
 #include "impl/utils/common_types.h"
 #include "impl/utils/debug/asc_debug_types.h"
 #include "impl/utils/debug/asc_debug_utils.h"
+#include "kernel_tensor.h"
 
 #if __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_dump_utils.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
+#elif __NPU_ARCH__ == 9201
+#include "impl/utils/debug/npu_arch_9201/asc_aicore_dump_utils.h"
 #endif
+
+using AscendC::ShapeInfo;
 
 namespace __asc_aicore {
 
@@ -97,6 +102,30 @@ __aicore__ inline void asc_dump_impl(U src, uint32_t desc, uint32_t dumpSize)
 
     __gm__ DebugBlockWriteInfo* writeInfo = get_block_write_info(blockInfo);
     update_write_info(writeInfo, tlvLen);
+}
+
+__aicore__ inline void asc_dump_shape_impl(const ShapeInfo &shapeInfo)
+{
+    __gm__ DebugBlockHeadInfo* block_info = get_block_info();
+    if (block_info == nullptr) {
+        return;
+    }
+    uint32_t tlvLen = sizeof(DumpShapeTlv);
+    if (!check_ringbuf_space(block_info, tlvLen)) {
+        return;
+    }
+    __gm__ DumpShapeTlv* shapeTlv = reinterpret_cast<__gm__ DumpShapeTlv*>(get_ringbuf_tlv_addr(block_info));
+    shapeTlv->type = static_cast<uint32_t>(DumpType::DUMP_SHAPE);
+    shapeTlv->length = tlv_len - sizeof(uint32_t[2]);
+    shapeTlv->dim = shapeInfo.shapeDim;
+    for (uint32_t i = 0; i < 8; ++i) {
+        shapeTlv->shape[i] = shapeInfo.shape[i];
+    }
+    shapeTlv->resv = static_cast<uint32_t>(0U);
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(shapeTlv));
+
+    __gm__ DebugBlockWriteInfo* write_info = get_block_write_info(block_info);
+    update_write_info(write_info, tlv_len);
 }
 
 template<typename T>
