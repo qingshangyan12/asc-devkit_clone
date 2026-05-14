@@ -22,6 +22,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_H
 
 #include "impl/tensor_api/arch/cube/mmad/mmad_routing.h"
+#include "impl/tensor_api/arch/cube/utils/register_utils.h"
 
 namespace AscendC {
 namespace Te {
