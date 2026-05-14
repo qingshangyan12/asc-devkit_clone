@@ -1,0 +1,11 @@
+{% extends "!layout.html" %}
+{%- block extrahead -%}
+{{ super() }}
+<script>var VERSION_950_HIDDEN = {{ version_filter_hidden|safe }};</script>
+{%- endblock -%}
+
+{%- block scripts -%}
+{{ super() }}
+{% include "download-button.html" %}
+{%- endblock -%}
+
