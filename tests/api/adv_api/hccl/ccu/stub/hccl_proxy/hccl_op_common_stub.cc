@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <chrono>
+#include <cstdlib>
 
 extern bool HcclCheckLogLevel(int logType, int moduleId);
 extern bool IsErrorToWarn();
@@ -40,6 +41,39 @@ extern "C" unsigned int HcclLaunchAicpuKernel(ops_hccl::OpParam* param)
 }
 
 namespace ops_hccl {
+
+InsCollAlgBase::InsCollAlgBase() {}
+InsCollAlgBase::~InsCollAlgBase() {}
+std::string InsCollAlgBase::Describe() const { return "InsCollAlgBase"; }
+
+class MockInsCollAlgBase : public InsCollAlgBase {
+public:
+    MockInsCollAlgBase() = default;
+    ~MockInsCollAlgBase() override = default;
+
+    std::string Describe() const override { return "MockInsCollAlgBase"; }
+
+    HcclResult CalcAlgHierarchyInfo(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo,
+                                    AlgHierarchyInfoForAllLevel& algHierarchyInfo) override
+    {
+        algHierarchyInfo.infos.resize(1);
+        algHierarchyInfo.infos[0].resize(1);
+        return HCCL_SUCCESS;
+    }
+
+    HcclResult CalcRes(HcclComm comm, const OpParam& param,
+                       const TopoInfoWithNetLayerDetails* topoInfo,
+                       const AlgHierarchyInfoForAllLevel& algHierarchyInfo,
+                       AlgResourceRequest& resourceRequest) override
+    {
+        return HCCL_SUCCESS;
+    }
+
+    HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override
+    {
+        return HCCL_SUCCESS;
+    }
+};
 
 HcclResult HcclCheckTag(const char *tag)
 {
@@ -145,13 +179,22 @@ CollAlgExecRegistryV2& CollAlgExecRegistryV2::Instance()
 
 std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(HcclCMDType opType, const std::string& algTag)
 {
-    return nullptr;
+    return std::make_unique<MockInsCollAlgBase>();
 }
 
 HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor,
     TopoInfoWithNetLayerDetails* topoInfo, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost,
     void** resCtxDevice, bool& isSuspend)
 {
+    if (resCtxDevice == nullptr) {
+        return HCCL_E_PTR;
+    }
+    void* ctx = std::malloc(sizeof(AlgResourceCtxSerializable));
+    if (ctx == nullptr) {
+        return HCCL_E_NO_MEM;
+    }
+    *resCtxDevice = ctx;
+    isSuspend = false;
     return HcclResult::HCCL_SUCCESS;
 }
 
