@@ -34,14 +34,16 @@
 ## 测试场景概览
 包含bank冲突、地址重叠等场景的验证和分析。构造场景用例的输入数据类型是float，输入数据长度是4096，以连续读写为例
 
-| case_num | 计算公式 | 场景描述 | 有无bank冲突 | src0_addr | src1_addr | dst_addr | 打点性能（越低越好） | 备注 |
+| case_num | 计算公式 | 场景描述 | 有无bank冲突 | src0_addr | src1_addr | dst_addr | 打点性能（越低越好，指令执行1000次的数值） | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | dst = src0 * src1 | src0/src1首地址在不同bank group，src0/src1/dst首地址在不同bank | 无bank读读、读写冲突 | 0 | 0x10100 | 0x20000 |  |  |
-| 2 | dst = src0 * src1 | src0/src1首地址在同一个bank | 有bank读读冲突 | 0 | 0x4000 | 0x10000 |  |  |
-| 3 | dst = src0 * src1 | src0/src1首地址在同一个bank group | 有bank读读冲突 | 0 | 0x10000 | 0x14100 |  |  |
-| 4 | dst = src0 * src1 | src0/dst首地址在同一个bank | 无bank读写冲突 | 0 | 0x10100 | 0x4000 |  |  |
-| 5 | dst = src0 * src1 | src0/dst首地址在同一个bank | 有bank读写冲突 | 0 | 0x10100 | 0x4000 |  |  |
-| 6 | src0 = src0 * src0 | src0/src1/dst首地址完全重叠 | 无bank读读、读写冲突 | 0 | 0 | 0 |  |  |
+| 1 | dst = src0 * src1 | src0/src1首地址在不同bank group，src0/src1/dst首地址在不同bank | 无bank读读、读写冲突 | 0 | 0x10100 | 0x20000 | 2418 |  |
+| 2 | dst = src0 * src1 | src0/src1首地址在同一个bank | 有bank读读冲突 | 0 | 0x4000 | 0x10000 | 4195 |  |
+| 3 | dst = src0 * src1 | src0/src1首地址在同一个bank group | 有bank读读冲突 | 0 | 0x10000 | 0x14100 | 4195 |  |
+| 4 | dst = src0 * src1 | src0/dst首地址在同一个bank | 无bank读写冲突 | 0 | 0x10100 | 0x4000 | 2501 | 待删除 |
+| 5 | dst = src0 * src1 | src0/dst首地址在同一个bank | 有bank读写冲突 | 0 | 0x10100 | 0x4000 | 2418 | 待删除，理论性能应该差 |
+| 6 | src0 = src0 * src0 | src0/src1/dst首地址完全重叠 | 无bank读读、读写冲突 | 0 | 0 | 0 | 2501 |  |
+| 7 | dst = src0 * src1 | src0/dst首地址不在同一个bank | 有bank读写冲突 | 0 | 0x10100 | 0x10120 | 3612 |  |
+| 8 | dst = src0 * src1 | src0/dst首地址在同一个bank | 无bank读写冲突 | 0 | 0x10100 | 0x10100 | 2501 |  |
 
 每个case的具体分析过程，请参考下述各章节
 
@@ -180,7 +182,9 @@
     - src0和src1地址完全重叠，硬件会自动优化，将src0的src1的两读会优化为一读，不会重复读取，故不存在读读冲突。
     - src0/src1读取的数据和dst写入的数据虽然地址重叠，但硬件可以将dst的写入延后一个repeat，进而跟src0的读数据错开，避免读写冲突。
 
-## case7 src0的单repeat内地址重叠场景
+## case7 src0/dst首地址不在同一个bank，有读写冲突场景分析
+
+## case8 src0/dst首地址在同一个bank，无读写冲突场景分析
 
 
 
