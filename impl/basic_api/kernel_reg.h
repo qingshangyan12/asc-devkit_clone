@@ -23,6 +23,8 @@
 #include "kernel_utils.h"
 #include "kernel_struct_aipp.h"
 
+extern __gm__ uint8_t* __gm__ g_sysPrintFifoSpace;
+
 namespace AscendC {
 constexpr uint64_t MASK_PLACEHOLDER = 0;
 constexpr uint64_t MASK_PLACEHOLDER_LIST[2] = {0, 0};
@@ -633,6 +635,44 @@ __aicore__ inline void SetAippFunctionsImpl(__gm__ T* src0, AippInputFormat form
     SetAippFunctionsImpl(src0, reinterpret_cast<__gm__ T*>(0), format, config);
 }
 #endif // (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002)
+
+#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) && \
+    (!defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG == 0) && \
+    defined(__DAV_VEC__)
+__aicore__ __attribute__((noinline)) void AscVFDebugInitUb()
+{
+    if (g_sysPrintFifoSpace != nullptr) {
+        constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
+        uint64_t ascReservedAddr = get_shmem_sz() - RESERVED_UB_SIZE;
+        uint16_t blockIdx = asc_debug_get_block_idx();
+        get_printf_ubuf_addr_aicore(ascReservedAddr, blockIdx);
+    }
+}
+
+__aicore__ __attribute__((noinline)) void AscVFDebugTransferUb()
+{
+    if (g_sysPrintFifoSpace != nullptr) {
+        // To avoid differences between -O0 and -O2, delete after the compiler resolves.
+        pipe_barrier(PIPE_ALL);
+        asc_vf_debug_ub2gm();
+    }
+}
+#endif
+
+template <auto funcPtr, typename... Args> __aicore__ inline void AscVFCallImpl(Args &&... args)
+{
+#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) && \
+    (!defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG == 0) && \
+    defined(__DAV_VEC__)
+    AscVFDebugInitUb();
+#endif
+    funcPtr(args...);
+#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) && \
+    (!defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG == 0) && \
+    defined(__DAV_VEC__)
+    AscVFDebugTransferUb();
+#endif
+}
 
 } // namespace AscendC
 #endif // ASCENDC_KERNEL_REG_IMPL_H
