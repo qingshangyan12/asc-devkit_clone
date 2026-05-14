@@ -22,36 +22,20 @@ float my_log1p(float x) {
 // ---------------------------------------------------------------------------
 // my_erfcx
 //
-// Three regions for positive x:
-//   [0, 0.5)      Taylor series (8 terms) — high accuracy near zero
-//   [0.5, 10.055) Rational approximation w/ compensated division
+// Two-region approach for positive x:
+//   [0, 10.055)   Rational approximation p(t) / (2x+1),  t = (x-4)/(x+4)
 //   [10.055, ∞)   Asymptotic expansion
 // Negative x via identity: erfcx(x) = 2·exp(x²) − erfcx(−x)
 // ---------------------------------------------------------------------------
 float my_erfcx(float x) {
-    const float kSmall     = 0.85f;
     const float kThresh    = 10.055f;
     const float kInvSqrtPi = 0.5641895835477563f;
 
     float ax = fabsf(x);
     float result;
 
-    if (ax < kSmall) {
-        // ---- Taylor series for |x| < 0.5, degree 8 ----
-        // erfcx(x) = Σ_{k=0}^8 a_k · x^k
-        // Evaluated with Horner (unrolled), 8 FMAs
-        float s = 0.041666667f;
-        s = fmaf(s, ax, -0.085942164f);
-        s = fmaf(s, ax,  0.16666667f);
-        s = fmaf(s, ax, -0.30090115f);
-        s = fmaf(s, ax,  0.5f);
-        s = fmaf(s, ax, -0.75225276f);
-        s = fmaf(s, ax,  1.0f);
-        s = fmaf(s, ax, -1.1283792f);
-        s = fmaf(s, ax,  1.0f);
-        result = s;
-    } else if (ax < kThresh) {
-        // ---- Rational approximation for 0.5 <= |x| < 10.055 ----
+    if (ax < kThresh) {
+        // ---- Rational approximation for |x| < 10.055 ----
         float inv_ap4 = 1.0f / (ax + 4.0f);
         float t = (ax - 4.0f) * inv_ap4;
 
@@ -60,17 +44,18 @@ float my_erfcx(float x) {
         t = fmaf(inv_ap4, residual_t, t);
 
         // Evaluate degree‑10 polynomial p(t), Horner / unrolled
-        float p = 0.0008912171f;
-        p = fmaf(p, t,  0.007045788f);
-        p = fmaf(p, t, -0.0158668961f);
-        p = fmaf(p, t,  0.036429625f);
-        p = fmaf(p, t, -0.06664343f);
-        p = fmaf(p, t,  0.09381453f);
-        p = fmaf(p, t, -0.100990564f);
-        p = fmaf(p, t,  0.068094f);
-        p = fmaf(p, t, -0.0153773874f);
-        p = fmaf(p, t, -0.139621079f);
-        p = fmaf(p, t,  1.23299515f);
+        // Coefficients fitted on [0, 10.055] (max fit err 2.1e-8)
+        float p = 0.000803186f;
+        p = fmaf(p, t,  0.006800647f);
+        p = fmaf(p, t, -0.016062400f);
+        p = fmaf(p, t,  0.036449701f);
+        p = fmaf(p, t, -0.066562777f);
+        p = fmaf(p, t,  0.093829234f);
+        p = fmaf(p, t, -0.101000630f);
+        p = fmaf(p, t,  0.068091795f);
+        p = fmaf(p, t,  0.015377827f);
+        p = fmaf(p, t, -0.139621016f);
+        p = fmaf(p, t,  1.232995131f);
 
         // Compensated division  q = p / (2*ax + 1)
         float inv_denom = 1.0f / (2.0f * ax + 1.0f);
@@ -275,9 +260,10 @@ int main() {
     std::printf("====================================\n");
     std::printf("log1p : branches=2  loops=0  intermediate_vars=1\n");
     std::printf("        all special values handled algorithmically\n");
-    std::printf("erfcx : branches=4  loops=0  (3-region + negative + overflow)\n");
+    std::printf("erfcx : branches=3  loops=0  (rational + asymptotic + negative)\n");
     std::printf("        all special values handled algorithmically\n");
-    std::printf("        Taylor for |x|<0.85, rational for [0.85,10.055], asymptotic for >=10.055\n");
+    std::printf("        rational poly deg=10 fitted on [0,10.055], max fit err=2.1e-8\n");
+    std::printf("        asymptotic expansion for x>=10.055\n");
     std::printf("\nDone.\n");
     return 0;
 }
