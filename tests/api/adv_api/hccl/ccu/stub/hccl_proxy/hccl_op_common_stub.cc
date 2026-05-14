@@ -90,9 +90,9 @@ void GetScatterOpInfo(const void* opInfo, char* output, size_t size)
 {
 }
 
-bool CheckAsymmetricTopoSupport(HcclCMDType cmdType, const TopoInfoWithNetLayerDetails* topoInfo)
+HcclResult CheckAsymmetricTopoSupport(HcclCMDType cmdType, const TopoInfoWithNetLayerDetails* topoInfo)
 {
-    return true;
+    return HCCL_SUCCESS;
 }
 
 ExecuteSelector::ExecuteSelector()
