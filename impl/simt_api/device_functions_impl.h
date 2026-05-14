@@ -31,6 +31,7 @@
 #define ASCRT_Z_OFFSET       2   // 2 : offset of z
 #define ASCRT_W_OFFSET       3   // 3 : offset of w
 
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rn(const float x) {
     return __cvt_float<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
