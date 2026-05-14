@@ -22,6 +22,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <map>
+#include <unordered_map>
 
 extern bool HcclCheckLogLevel(int logType, int moduleId);
 extern bool IsErrorToWarn();
@@ -109,8 +110,15 @@ HcclResult LogHcclExit(const std::string &opName, const char *tag, HcclUs startu
 
 HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
 {
-    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+    if (GetExternalInputHcclCcuMSMode()) {
         param.opExecuteConfig = OpExecuteConfig::CCU_MS;
+        param.engine = CommEngine::COMM_ENGINE_CCU;
+    } else if (GetExternalInputHcclCcuSchedMode()) {
+        param.opExecuteConfig = OpExecuteConfig::CCU_SCHED;
+        param.engine = CommEngine::COMM_ENGINE_CCU;
+    } else if (GetExternalInputHcclAicpuUnfold()) {
+        param.opExecuteConfig = OpExecuteConfig::AICPU_TS;
+        param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
     } else {
         param.opExecuteConfig = OpExecuteConfig::AICPU_TS;
         param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
@@ -169,11 +177,46 @@ HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* top
 
 HcclResult SetCommEngine(OpParam& param)
 {
+    static const std::unordered_map<OpExecuteConfig, CommEngine> ConfigToEngineMap = {
+        {OpExecuteConfig::HOSTCPU_TS, COMM_ENGINE_CPU_TS},
+        {OpExecuteConfig::AICPU_TS,   COMM_ENGINE_AICPU_TS},
+        {OpExecuteConfig::CCU_MS,     COMM_ENGINE_CCU},
+        {OpExecuteConfig::CCU_SCHED,  COMM_ENGINE_CCU},
+        {OpExecuteConfig::AICPU,      COMM_ENGINE_AICPU},
+        {OpExecuteConfig::HOSTCPU,    COMM_ENGINE_CPU},
+    };
+
+    auto it = ConfigToEngineMap.find(param.opExecuteConfig);
+    if (it != ConfigToEngineMap.end()) {
+        param.engine = it->second;
+        return HCCL_SUCCESS;
+    }
     return HcclResult::HCCL_SUCCESS;
 }
 
+static struct {
+    bool ccuMSMode = false;
+    bool ccuSchedMode = false;
+    bool aicpuUnfold = false;
+} g_stubAlgEnvConfig;
+
 HcclResult InitEnvConfig()
 {
+    const char* envValue = std::getenv("HCCL_OP_EXPANSION_MODE");
+    g_stubAlgEnvConfig.ccuMSMode = false;
+    g_stubAlgEnvConfig.ccuSchedMode = false;
+    g_stubAlgEnvConfig.aicpuUnfold = false;
+
+    if (envValue != nullptr) {
+        std::string mode(envValue);
+        if (mode == "CCU_MS") {
+            g_stubAlgEnvConfig.ccuMSMode = true;
+        } else if (mode == "CCU_SCHED") {
+            g_stubAlgEnvConfig.ccuSchedMode = true;
+        } else if (mode == "AI_CPU") {
+            g_stubAlgEnvConfig.aicpuUnfold = true;
+        }
+    }
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -191,14 +234,17 @@ const bool& GetExternalInputHcclEnableEntryLog()
 
 const bool& GetExternalInputHcclCcuMSMode()
 {
-    static bool value = false;
-    return value;
+    return g_stubAlgEnvConfig.ccuMSMode;
 }
 
 const bool& GetExternalInputHcclCcuSchedMode()
 {
-    static bool value = false;
-    return value;
+    return g_stubAlgEnvConfig.ccuSchedMode;
+}
+
+const bool& GetExternalInputHcclAicpuUnfold()
+{
+    return g_stubAlgEnvConfig.aicpuUnfold;
 }
 
 HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algTag)

@@ -11,6 +11,7 @@
 #include <cstring>
 #include <vector>
 #include <unordered_map>
+#include <cstdlib>
 
 #include "dtype_common.h"
 #include "base.h"
@@ -40,6 +41,17 @@ static void StubCleanup() {
     g_stubRankSize = 8;
     g_stubRankId = 0;
     g_stubDeviceType = DevType::DEV_TYPE_950;
+    unsetenv("HCCL_OP_EXPANSION_MODE");
+}
+
+static void SetCommEngineEnv(uint8_t commEngine) {
+    if (commEngine == COMM_ENGINE_CCU) {
+        setenv("HCCL_OP_EXPANSION_MODE", "CCU_MS", 1);
+    } else if (commEngine == COMM_ENGINE_AICPU) {
+        setenv("HCCL_OP_EXPANSION_MODE", "AI_CPU", 1);
+    } else {
+        unsetenv("HCCL_OP_EXPANSION_MODE");
+    }
 }
 
 static TopoMeta BuildTopoMeta(uint32_t rankSize) {
@@ -64,6 +76,7 @@ struct Mc2TilingTestData {
 
 static Mc2TilingTestData BuildMc2Tiling(uint32_t tilingNum, uint8_t commEngine,
     const uint32_t opTypes[], const uint8_t srcDataTypes[]) {
+    SetCommEngineEnv(commEngine);
     Mc2TilingTestData tiling{};
     tiling.version = MC2_TILING_VERSION;
     tiling.cnt = tilingNum;
@@ -124,6 +137,7 @@ TEST_F(CcuMc2TestSuite, CcuAllocV2_ThreeAddrsDistinct) {
 }
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather) {
+    SetCommEngineEnv(COMM_ENGINE_CCU);
     Mc2CcTilingInner ccTiling{};
     ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
     ccTiling.commEngine = COMM_ENGINE_CCU;
@@ -136,6 +150,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather) {
 }
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllReduce) {
+    SetCommEngineEnv(COMM_ENGINE_CCU);
     Mc2CcTilingInner ccTiling{};
     ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
     ccTiling.commEngine = COMM_ENGINE_CCU;
@@ -148,6 +163,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllReduce) {
 }
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatter) {
+    SetCommEngineEnv(COMM_ENGINE_CCU);
     Mc2CcTilingInner ccTiling{};
     ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
     ccTiling.commEngine = COMM_ENGINE_CCU;
@@ -160,6 +176,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatter) {
 }
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_AlltoAll) {
+    SetCommEngineEnv(COMM_ENGINE_CCU);
     Mc2CcTilingInner ccTiling{};
     ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL);
     ccTiling.commEngine = COMM_ENGINE_CCU;
@@ -172,6 +189,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AlltoAll) {
 }
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_MultipleTilings) {
+    SetCommEngineEnv(COMM_ENGINE_CCU);
     Mc2CcTilingInner ccTiling0{};
     ccTiling0.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
     ccTiling0.commEngine = COMM_ENGINE_CCU;
