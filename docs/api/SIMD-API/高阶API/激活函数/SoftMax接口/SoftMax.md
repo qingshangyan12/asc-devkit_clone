@@ -61,7 +61,7 @@
 
 将输入tensor\[m<sub>0</sub>, m<sub>1</sub>, ...m<sub>t</sub>, n\]（t大于等于0）的非尾轴长度相乘的结果看作m，则输入tensor的shape看作\[m, n\]。对输入tensor\[m, n\]按行做如下SoftMax计算：
 
-![](figures/zh-cn_formulaimage_0000001901417037.png)
+![](../../../../figures/zh-cn_formulaimage_0000001901417037.png)
 
 为方便理解，通过Python脚本实现的方式，表达其计算公式（以输入为ND格式为例）如下，其中src是源操作数（输入），dst、sum、max为目的操作数（输出）。
 
@@ -80,17 +80,17 @@ def softmax(src):
 当输入的数据排布格式不同时，内部的reduce过程会有所不同：当输入为ND格式时，内部的reduce过程按last轴进行；当输入为NZ格式时，内部的reduce过程按照last轴和first轴进行，reduce过程如下图所示：
 
 **图 1**  ND格式的reduce过程<a name="fig5210550552"></a>  
-![](figures/ND格式的reduce过程.png "ND格式的reduce过程")
+![](../../../../figures/ND格式的reduce过程.png "ND格式的reduce过程")
 
 **图 2**  NZ格式的reduce过程<a name="fig0172155842215"></a>  
-![](figures/NZ格式的reduce过程.png "NZ格式的reduce过程")
+![](../../../../figures/NZ格式的reduce过程.png "NZ格式的reduce过程")
 
 ## 实现原理<a name="section118311010576"></a>
 
 以float类型，ND格式，shape为\[m, k\]的输入Tensor为例，描述SoftMax高阶API内部算法框图，如下图所示。
 
 **图 3**  SoftMax算法框图<a name="fig03757321297"></a>  
-![](figures/SoftMax算法框图.png "SoftMax算法框图")
+![](../../../../figures/SoftMax算法框图.png "SoftMax算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
 

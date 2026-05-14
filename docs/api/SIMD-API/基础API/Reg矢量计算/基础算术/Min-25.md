@@ -51,7 +51,7 @@
 
 根据mask对源操作数srcReg0、srcReg1进行按元素求最小值操作，将结果写入目的操作数dstReg。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000001957631821.png)
+![](../../../../figures/zh-cn_formulaimage_0000001957631821.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

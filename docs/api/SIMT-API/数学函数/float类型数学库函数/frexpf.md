@@ -51,7 +51,7 @@
 
 将x转换为归一化\[1/2, 1\)的有符号数乘以2的积分幂。返回归一化的有符号数，指数存储在exp中。
 
-![](figures/zh-cn_formulaimage_0000002516816359.png)
+![](../../../figures/zh-cn_formulaimage_0000002516816359.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -51,7 +51,7 @@
 
 获取输入数据的反双曲正切值。
 
-![](figures/zh-cn_formulaimage_0000002484776374.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776374.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

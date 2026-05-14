@@ -261,16 +261,16 @@ struct NdDmaLoopInfo  {
 以下以2维的例子介绍几个典型使用场景。
 
 **图 1**  2D Padding场景<a name="fig10722115123919"></a>  
-![](figures/2D-Padding场景.png "2D-Padding场景")
+![](../../../../figures/2D-Padding场景.png "2D-Padding场景")
 
 **图 2**  2D Transpose场景<a name="fig104451143104510"></a>  
-![](figures/2D-Transpose场景.png "2D-Transpose场景")
+![](../../../../figures/2D-Transpose场景.png "2D-Transpose场景")
 
 **图 3**  2D BroadCast场景<a name="fig4654326132913"></a>  
-![](figures/2D-BroadCast场景.png "2D-BroadCast场景")
+![](../../../../figures/2D-BroadCast场景.png "2D-BroadCast场景")
 
 **图 4**  2D Slice场景<a name="fig13061435132915"></a>  
-![](figures/2D-Slice场景.png "2D-Slice场景")
+![](../../../../figures/2D-Slice场景.png "2D-Slice场景")
 
 ## 通路说明<a name="section631mcpsimp"></a>
 
@@ -307,7 +307,7 @@ struct NdDmaLoopInfo  {
 
 -   当每层循环的dstStride为升序序列，则不同循环间的地址空间不能交织或者重叠。以一个2D Padding场景为例，loopSrcStride、loopDstStride第二个维度的stride值最小是3，数据3不能落在维度1的循环中。
 
-    ![](figures/nddma_padding_2d.png)
+    ![](../../../../figures/nddma_padding_2d.png)
 
 -   该接口通过NDDMA进行数据搬运，对应的NDDMA Cache大小为32KB，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新缓存，否则多核场景下读写同一块GM地址可能会导致部分核读取数据错误。
 

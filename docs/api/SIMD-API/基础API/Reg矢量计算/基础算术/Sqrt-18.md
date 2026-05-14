@@ -51,7 +51,7 @@
 
 根据mask对输入数据srcReg进行平方根操作，将结果写入dstReg。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000001957665501.png)
+![](../../../../figures/zh-cn_formulaimage_0000001957665501.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

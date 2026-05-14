@@ -61,7 +61,7 @@
 
 按元素求和，计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002391514557.png)
+![](../../../../figures/zh-cn_formulaimage_0000002391514557.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

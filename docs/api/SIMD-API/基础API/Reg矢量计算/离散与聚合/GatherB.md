@@ -51,7 +51,7 @@
 
 给定源操作数在UB中的基地址和索引，GatherB指令根据索引位置将源操作数按DataBlock收集到结果寄存器张量中。每个DataBlock长度为32Byte。收集过程如下图所示：
 
-![](figures/DataCopyGatherB.png)
+![](../../../../figures/DataCopyGatherB.png)
 
 ## 定义原型<a name="section620mcpsimp"></a>
 

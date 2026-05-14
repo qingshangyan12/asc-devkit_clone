@@ -61,9 +61,9 @@
 
 按元素做双曲余弦函数计算，计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002218334509.png)
+![](../../../../figures/zh-cn_formulaimage_0000002218334509.png)
 
-![](figures/zh-cn_formulaimage_0000002222885545.png)
+![](../../../../figures/zh-cn_formulaimage_0000002222885545.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

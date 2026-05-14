@@ -51,7 +51,7 @@
 
 根据mask对源操作数srcReg0、srcReg1进行按元素相减操作，将结果写入目的操作数dstReg。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000001930509058.png)
+![](../../../../figures/zh-cn_formulaimage_0000001930509058.png)
 
 若srcReg0，srcReg1相减产生借位结果时，在MaskReg carry中对应位置每4bit的最低位写0，否则写1。
 

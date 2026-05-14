@@ -61,7 +61,7 @@
 
 源操作数src中每个元素与标量求积后和目的操作数dst中的对应元素相加，计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002357932516.png)
+![](../../../../figures/zh-cn_formulaimage_0000002357932516.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

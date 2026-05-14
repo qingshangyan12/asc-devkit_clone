@@ -65,13 +65,13 @@
 
 如下图所示，对shape为\(4, 32\)的二维矩阵进行排序，k设置为1，输出结果为\[\[32\] \[32\] \[32\] \[32\]\]。
 
-![](figures/nz-reduce-48.png)
+![](../../../figures/nz-reduce-48.png)
 
 -   **必备概念**
 
     基于如上样例，我们引入一些必备概念：行数称之为**外轴长度（outter）**，每行实际的元素个数称之为**内轴的实际长度（n）**。本接口要求输入的内轴长度为32的整数倍，所以当n不是32的整数倍时，需要开发者将其向上补齐到32的整数倍，补齐后的长度称之为**内轴长度（inner）**。比如，如下的样例中，每行的实际长度n为31，不是32的整数倍，向上补齐后得到inner为32，图中的padding代表补齐操作。n和inner的关系如下：当n是32的整数倍时，inner=n；否则，inner \> n。
 
-    ![](figures/nz-reduce-49.png)
+    ![](../../../figures/nz-reduce-49.png)
 
 -   **接口模式**
 
@@ -79,21 +79,21 @@
 
 -   **附加功能**：本接口支持开发者指定某些行的排序是无效排序。通过传入finishLocal参数值来控制，finishLocal对应行的值为true时，表示该行排序无效，此时排序后输出的dstIndexLocal的k个索引值会全部被置为无效索引n。
 
-    ![](figures/nz-reduce-50.png)
+    ![](../../../figures/nz-reduce-50.png)
 
 ## 实现原理<a name="section13229175017585"></a>
 
-TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算法，两种算法在执行速度、时间复杂度和算法稳定性上表现不同。MERGE\_SORT算法的时间复杂度是O\(![](figures/zh-cn_formulaimage_0000002108561704.png)\)，是一种稳定的排序算法，执行速度相对较慢；RADIX\_SELECT算法的时间复杂度是O\(n\)，通常不关心稳定性，执行速度较快。
+TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算法，两种算法在执行速度、时间复杂度和算法稳定性上表现不同。MERGE\_SORT算法的时间复杂度是O\(![](../../../figures/zh-cn_formulaimage_0000002108561704.png)\)，是一种稳定的排序算法，执行速度相对较慢；RADIX\_SELECT算法的时间复杂度是O\(n\)，通常不关心稳定性，执行速度较快。
 
 -   **MERGE\_SORT算法**
 
     以float类型，ND格式，shape为\[outter,  inner\]的输入Tensor为例，描述TopK高阶API内部算法框图，如下图所示。
 
     **图 1**  TopK算法框图<a name="fig19454111161219"></a>  
-    ![](figures/TopK算法框图.png "TopK算法框图")
+    ![](../../../figures/TopK算法框图.png "TopK算法框图")
 
     **图 2**  TopK算法框图<a name="fig22051712440"></a>  
-    ![](figures/TopK算法框图-51.png "TopK算法框图-51")
+    ![](../../../figures/TopK算法框图-51.png "TopK算法框图-51")
 
     根据TopKMode不同的模式选择，可分为两个分支。
 
@@ -177,7 +177,7 @@ TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算�
     该算法仅在Ascend 950PR/Ascend 950DT上支持。
 
     **图 3**  TopK算法框图<a name="fig1101844194019"></a>  
-    ![](figures/TopK算法框图-52.png "TopK算法框图-52")
+    ![](../../../figures/TopK算法框图-52.png "TopK算法框图-52")
 
     计算过程分为如下几步：
 

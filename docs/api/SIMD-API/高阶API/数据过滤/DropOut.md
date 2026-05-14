@@ -104,7 +104,7 @@
 以float类型，ND格式，shape为\[srcM, srcN\]的SrcTensor，shape为\[maskM, maskN\]的MaskTensor，比特模式场景为例，描述Dropout高阶API内部算法框图，如下图所示。
 
 **图 1**  Dropout算法框图<a name="fig144741562718"></a>  
-![](figures/Dropout算法框图.png "Dropout算法框图")
+![](../../../figures/Dropout算法框图.png "Dropout算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
 
@@ -113,7 +113,7 @@
 3.  Muls步骤：将输出数据每个元素除以keepProb。
 
 **图 2**  Dropout算法框图<a name="fig767314154518"></a>  
-![](figures/Dropout算法框图-55.png "Dropout算法框图-55")
+![](../../../figures/Dropout算法框图-55.png "Dropout算法框图-55")
 
 计算过程在Vector上进行，循环srcM次，每次对srcN个元素进行如下操作：
 

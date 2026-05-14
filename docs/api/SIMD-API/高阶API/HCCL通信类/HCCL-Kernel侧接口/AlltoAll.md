@@ -51,7 +51,7 @@
 
 集合通信AlltoAll的任务下发接口，返回该任务的标识handleId给用户。AlltoAll的功能为：每张卡向通信域内所有卡发送相同数据量的数据，并从所有卡接收相同数据量的数据。结合原型中的参数，描述接口功能，具体为，第j张卡接收到来自第i张卡的sendBuf中第j块数据，并将该数据存放到本卡recvBuf中第i块的位置。
 
-![](figures/allreduce-60.png)
+![](../../../../figures/allreduce-60.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -167,7 +167,7 @@ __aicore__ inline HcclHandle AlltoAll(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t
     4张卡执行AlltoAll通信任务。非多轮切分场景下，每张卡上的数据块和数据量一致，如下图中每张卡的A\\B\\C\\D数据块，数据量均为dataCount。
 
     **图 1**  非多轮切分场景下4卡AlltoAll通信<a name="fig247714503515"></a>  
-    ![](figures/非多轮切分场景下4卡AlltoAll通信.png "非多轮切分场景下4卡AlltoAll通信")
+    ![](../../../../figures/非多轮切分场景下4卡AlltoAll通信.png "非多轮切分场景下4卡AlltoAll通信")
 
     ```
     extern "C" __global__ __aicore__ void alltoall_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {
@@ -199,12 +199,12 @@ __aicore__ inline HcclHandle AlltoAll(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t
     使能多轮切分，等效处理上述非多轮切分示例的通信。在每张卡的数据均分成4块（A\\B\\C\\D）的基础上，将每一块继续切分若干块。本例中继续切分3块，如下图所示，被继续切分成的3块数据包括，2个数据量为tileLen的数据块，1个数据量为tailLen的尾块。切分后，需要分3轮进行AlltoAll通信任务，将等效上述非多轮切分的通信结果。
 
     **图 2**  3轮切分场景下4卡AlltoAll通信<a name="fig118912192116"></a>  
-    ![](figures/3轮切分场景下4卡AlltoAll通信.png "3轮切分场景下4卡AlltoAll通信")
+    ![](../../../../figures/3轮切分场景下4卡AlltoAll通信.png "3轮切分场景下4卡AlltoAll通信")
 
     具体实现为，第1轮通信，每个rank上0-0\\1-0\\2-0\\3-0数据块进行AlltoAll处理；同一个卡上，参与通信的相邻数据块的间隔为参数strideCount的取值。第2轮通信，每个rank上0-1\\1-1\\2-1\\3-1数据块进行AlltoAll处理。第3轮通信，每个rank上0-2\\1-2\\2-2\\3-2数据块进行AlltoAll处理。第1轮通信的图示及代码示例如下。
 
     **图 3**  第一轮4卡AlltoAll示意图<a name="fig1477775323516"></a>  
-    ![](figures/第一轮4卡AlltoAll示意图.png "第一轮4卡AlltoAll示意图")
+    ![](../../../../figures/第一轮4卡AlltoAll示意图.png "第一轮4卡AlltoAll示意图")
 
     ```
     extern "C" __global__ __aicore__ void alltoall_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {

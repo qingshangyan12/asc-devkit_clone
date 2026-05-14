@@ -154,7 +154,7 @@ Philox随机数生成的核心算法是一个基于记数的伪随机数生成�
 </table>
 
 **图 1**  PhiloxRandom示意图<a name="fig1045614325812"></a>  
-![](figures/PhiloxRandom示意图.png "PhiloxRandom示意图")
+![](../../../figures/PhiloxRandom示意图.png "PhiloxRandom示意图")
 
 上图是一个生成随机数的示意图。
 

@@ -61,7 +61,7 @@
 
 每对elements按位与运算，公式表达如下：
 
-![](figures/zh-cn_formulaimage_0000002391622457.png)
+![](../../../../figures/zh-cn_formulaimage_0000002391622457.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

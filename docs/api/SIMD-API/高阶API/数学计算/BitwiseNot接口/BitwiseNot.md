@@ -51,7 +51,7 @@
 
 逐比特对输入进行取反。
 
-![](figures/zh-cn_formulaimage_0000002477048097.png)
+![](../../../../figures/zh-cn_formulaimage_0000002477048097.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

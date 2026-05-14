@@ -61,7 +61,7 @@
 
 按元素求差，计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002391516989.png)
+![](../../../../figures/zh-cn_formulaimage_0000002391516989.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

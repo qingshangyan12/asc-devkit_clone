@@ -51,7 +51,7 @@
 
 对输入数据x、y、z，计算x与y相乘加上z的结果，并遵循CAST\_RINT模式对结果进行舍入处理。
 
-![](figures/zh-cn_formulaimage_0000002562204473.png)
+![](../../../../figures/zh-cn_formulaimage_0000002562204473.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

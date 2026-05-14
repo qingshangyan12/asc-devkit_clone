@@ -66,7 +66,7 @@ res_for_gamma(BSH) = (data_x - data_mean) * np.power((data_variance + EPSILON), 
 以float类型，ND格式，输入为inputDy\[B, S, H\], inputX\[B, S, H\], inputVariance\[B, S\], inputMean\[B, S\], inputGamma\[H\]为例，描述LayerNormGrad高阶API内部算法框图，如下图所示。
 
 **图 1**  LayerNormGrad算法框图<a name="fig386485443713"></a>  
-![](figures/LayerNormGrad算法框图.png "LayerNormGrad算法框图")
+![](../../../figures/LayerNormGrad算法框图.png "LayerNormGrad算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
 

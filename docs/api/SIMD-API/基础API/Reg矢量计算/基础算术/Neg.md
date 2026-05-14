@@ -51,7 +51,7 @@
 
 根据mask对输入数据srcReg进行取相反数操作，将结果写入dstReg。neg计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000001930468868.png)
+![](../../../../figures/zh-cn_formulaimage_0000001930468868.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

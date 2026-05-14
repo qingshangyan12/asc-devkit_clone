@@ -51,7 +51,7 @@
 
 源操作数矢量内每个元素与标量相比，如果比标量大，则取标量值，比标量小，则取源操作数。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002488832314.png)
+![](../../../../figures/zh-cn_formulaimage_0000002488832314.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

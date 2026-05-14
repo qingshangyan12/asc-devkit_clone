@@ -61,7 +61,7 @@
 
 矢量内每个元素与标量求积，计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002358498114.png)
+![](../../../../figures/zh-cn_formulaimage_0000002358498114.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

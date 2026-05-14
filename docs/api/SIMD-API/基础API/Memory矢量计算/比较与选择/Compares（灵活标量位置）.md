@@ -51,7 +51,7 @@
 
 提供灵活标量位置的接口，支持标量在前和标量在后两种场景。其中标量输入支持配置LocalTensor单点元素，计算公式如下，idx表示LocalTensor单点元素的位置系数。
 
-![](figures/zh-cn_formulaimage_0000002516303034.png)
+![](../../../../figures/zh-cn_formulaimage_0000002516303034.png)
 
 支持多种比较模式：
 

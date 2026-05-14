@@ -12,10 +12,10 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 当后续无通信任务时，调用[Finalize](Finalize.md)接口，通知服务端后续无通信任务，执行结束后退出，客户端检测并等待最后一个通信任务执行结束。以上介绍的AI Core下发HCCL通信任务的机制如下图所示。
 
 **图 1**  AI Core下发HCCL通信任务机制<a name="fig137781871132"></a>  
-![](figures/AI-Core下发HCCL通信任务机制.png "AI-Core下发HCCL通信任务机制")
+![](../../../../figures/AI-Core下发HCCL通信任务机制.png "AI-Core下发HCCL通信任务机制")
 
 **图 2** Ascend 950PR/Ascend 950DT  AI Core下发HCCL通信任务机制<a name="fig1188495685117"></a>  
-![](figures/Ascend-950PR-Ascend-950DT-AI-Core下发HCCL通信任务机制.png "Ascend-950PR-Ascend-950DT-AI-Core下发HCCL通信任务机制")
+![](../../../../figures/Ascend-950PR-Ascend-950DT-AI-Core下发HCCL通信任务机制.png "Ascend-950PR-Ascend-950DT-AI-Core下发HCCL通信任务机制")
 
 > [!CAUTION]注意 
 >对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，在AI CPU作为服务端的场景中，HCCL通信API的功能依赖开放AI CPU用户态下发调度任务，存在一定的安全风险，用户需要自行确保AI Core自定义算子的安全可靠，防止恶意攻击行为。
@@ -244,7 +244,7 @@ extern "C" __global__ __aicore__ void reduce_scatter_custom(GM_ADDR xGM, GM_ADDR
 ```
 
 **图 3**  ReduceScatter通信示例<a name="fig19780192164210"></a>  
-![](figures/ReduceScatter通信示例.png "ReduceScatter通信示例")
+![](../../../../figures/ReduceScatter通信示例.png "ReduceScatter通信示例")
 
 **表 3**  MC2\_BUFFER\_LOCATION参数说明
 

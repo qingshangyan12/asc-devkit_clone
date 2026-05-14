@@ -56,7 +56,7 @@
 例如，Warp内32个活跃线程调用asc\_shfl\_xor\(LaneId, 1, 16\)接口，每个线程的返回值为当前线程LaneId^1对应线程的var值。
 
 **图 1**  asc\_shfl\_xor结果示意图<a name="fig975917109517"></a>  
-![](figures/asc_shfl_xor结果示意图.png "asc_shfl_xor结果示意图")
+![](../../../figures/asc_shfl_xor结果示意图.png "asc_shfl_xor结果示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

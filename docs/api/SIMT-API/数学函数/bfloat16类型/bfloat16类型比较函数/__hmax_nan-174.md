@@ -51,7 +51,7 @@
 
 获取两个输入数据中的最大值。任一输入为nan时，结果为nan。
 
-![](figures/zh-cn_formulaimage_0000002573929855.png)
+![](../../../../figures/zh-cn_formulaimage_0000002573929855.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

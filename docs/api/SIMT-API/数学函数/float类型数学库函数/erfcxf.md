@@ -51,7 +51,7 @@
 
 获取输入数据的缩放互补误差函数值。
 
-![](figures/zh-cn_formulaimage_0000002484776420.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776420.png)
 
 ## 函数原型<a name="section1188715215306"></a>
 

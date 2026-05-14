@@ -51,7 +51,7 @@
 
 dstReg与srcReg0相乘后与srcReg1相加， 根据mask将计算结果写入dstReg。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002565399981.png)
+![](../../../../figures/zh-cn_formulaimage_0000002565399981.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

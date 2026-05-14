@@ -61,7 +61,7 @@
 
 按元素将src0和src1相乘并和dst相加，将最终结果存放进dst中。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002358065848.png)
+![](../../../../figures/zh-cn_formulaimage_0000002358065848.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

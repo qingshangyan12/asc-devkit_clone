@@ -51,7 +51,7 @@
 
 给定源操作数的寄存器张量和索引张量，以及结果操作数在UB中的基地址，Scatter指令将源操作数按元素根据索引位置分散到UB中。分散过程如下图所示：
 
-![](figures/DataCopyScatter.png)
+![](../../../../figures/DataCopyScatter.png)
 
 ## 定义原型<a name="section620mcpsimp"></a>
 

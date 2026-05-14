@@ -53,37 +53,37 @@
 
 本接口支持的数据格式转换场景包括以下四种，除维度顺序变换外，其中涉及到C轴和N轴的拆分，具体转换方式为，C轴拆分为C1轴、C0轴，N轴拆分为N1轴、N0轴。对于位宽为16的数据类型的数据，C0和N0固定为16，C1和N1的计算公式如下。
 
-![](figures/zh-cn_formulaimage_0000002355948405.png)
+![](../../../figures/zh-cn_formulaimage_0000002355948405.png)
 
-![](figures/zh-cn_formulaimage_0000002356028741.png)
+![](../../../figures/zh-cn_formulaimage_0000002356028741.png)
 
 -   场景1：NCDHW -\> NDC1HWC0
 
     输入Tensor \{shape:\[N, C, D, H, W\]\}，输出Tensor \{shape:\[N, D, C/16, H, W, 16\]\}。请注意，C0实际上等于16，为便于展示，下图中C0被设定为2。
 
     **图 1**  NCDHW格式转为NDC1HWC0格式示意图<a name="fig128260305283"></a>  
-    ![](figures/NCDHW格式转为NDC1HWC0格式示意图.png "NCDHW格式转为NDC1HWC0格式示意图")
+    ![](../../../figures/NCDHW格式转为NDC1HWC0格式示意图.png "NCDHW格式转为NDC1HWC0格式示意图")
 
 -   场景2：NDC1HWC0 -\> NCDHW
 
     输入Tensor \{shape:\[N, D, C/16, H, W, 16\]\}，输出Tensor \{shape:\[N, C, D, H, W\]\}。请注意，C0实际上等于16，为便于展示，下图中C0被设定为2。
 
     **图 2**  NDC1HWC0格式转为NCDHW格式示意图<a name="fig881811465288"></a>  
-    ![](figures/NDC1HWC0格式转为NCDHW格式示意图.png "NDC1HWC0格式转为NCDHW格式示意图")
+    ![](../../../figures/NDC1HWC0格式转为NCDHW格式示意图.png "NDC1HWC0格式转为NCDHW格式示意图")
 
 -   场景3：NCDHW -\> FRACTAL\_Z\_3D
 
     输入Tensor \{shape:\[N, C, D, H, W\]\}，输出Tensor \{shape:\[D, C/16, H, W, N/16, 16, 16\]\}。请注意，C0和N0实际上等于16，为便于展示，下图中C0和N0被设定为2。
 
     **图 3**  NCDHW格式转为FRACTAL\_Z\_3D格式示意图<a name="fig1654210353315"></a>  
-    ![](figures/NCDHW格式转为FRACTAL_Z_3D格式示意图.png "NCDHW格式转为FRACTAL_Z_3D格式示意图")
+    ![](../../../figures/NCDHW格式转为FRACTAL_Z_3D格式示意图.png "NCDHW格式转为FRACTAL_Z_3D格式示意图")
 
 -   场景4：FRACTAL\_Z\_3D -\> NCDHW
 
     输入Tensor \{shape:\[D, C/16, H, W, N/16, 16, 16\]\}，输出Tensor \{shape:\[N, C, D, H, W\]\}。请注意，C0和N0实际上等于16，为便于展示，下图中C0和N0被设定为2。
 
     **图 4**  FRACTAL\_Z\_3D格式转为NCDHW格式示意图<a name="fig11273144613317"></a>  
-    ![](figures/FRACTAL_Z_3D格式转为NCDHW格式示意图.png "FRACTAL_Z_3D格式转为NCDHW格式示意图")
+    ![](../../../figures/FRACTAL_Z_3D格式转为NCDHW格式示意图.png "FRACTAL_Z_3D格式转为NCDHW格式示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

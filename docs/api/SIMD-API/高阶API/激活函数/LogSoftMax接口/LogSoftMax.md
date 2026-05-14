@@ -51,9 +51,9 @@
 
 对输入tensor做LogSoftmax计算。计算公式如下 ：
 
-![](figures/zh-cn_formulaimage_0000002315199128.png)
+![](../../../../figures/zh-cn_formulaimage_0000002315199128.png)
 
-![](figures/zh-cn_formulaimage_0000001773726766.png)
+![](../../../../figures/zh-cn_formulaimage_0000001773726766.png)
 
 为方便理解，通过Python脚本实现的方式表达计算公式如下，其中src是源操作数（输入），dst、sum、max为目的操作数（输出）。
 
@@ -75,7 +75,7 @@ def log_softmax(src):
 以float类型，ND格式，shape为\[m, k\]的输入Tensor为例，描述LogSoftMax高阶API内部算法框图，如下图所示。
 
 **图 1**  LogSoftMax算法框图<a name="fig138551349173015"></a>  
-![](figures/LogSoftMax算法框图.png "LogSoftMax算法框图")
+![](../../../../figures/LogSoftMax算法框图.png "LogSoftMax算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
 

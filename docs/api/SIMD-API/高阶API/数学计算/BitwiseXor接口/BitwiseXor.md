@@ -51,7 +51,7 @@
 
 逐比特对两个输入进行异或操作。
 
-![](figures/zh-cn_formulaimage_0000002442051698.png)
+![](../../../../figures/zh-cn_formulaimage_0000002442051698.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

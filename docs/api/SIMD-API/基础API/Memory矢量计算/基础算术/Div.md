@@ -61,7 +61,7 @@
 
 按元素求商，公式表达如下：
 
-![](figures/zh-cn_formulaimage_0000002357881762.png)
+![](../../../../figures/zh-cn_formulaimage_0000002357881762.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

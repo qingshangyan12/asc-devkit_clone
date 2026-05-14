@@ -51,7 +51,7 @@
 
 集合通信算子AllReduce的任务下发接口，返回该任务的标识handleId给用户。AllReduce功能为：将通信域内所有节点的同名张量进行reduce操作后，再把结果发送到所有节点的输出buffer。
 
-![](figures/allreduce.png)
+![](../../../../figures/allreduce.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -144,7 +144,7 @@ __aicore__ inline HcclHandle AllReduce(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
 </table>
 
 **图 1**  AllReduce三轮切分通信示例<a name="fig5638165920312"></a>  
-![](figures/AllReduce三轮切分通信示例.png "AllReduce三轮切分通信示例")
+![](../../../../figures/AllReduce三轮切分通信示例.png "AllReduce三轮切分通信示例")
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -167,7 +167,7 @@ __aicore__ inline HcclHandle AllReduce(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
 
     **图 2**  非多轮切分场景下4卡AllReduce通信<a name="fig101532392516"></a>  
     
-    ![](figures/250902140829537_gai.png)
+    ![](../../../../figures/250902140829537_gai.png)
 
     ```
     extern "C" __global__ __aicore__ void all_reduce_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {
@@ -200,12 +200,12 @@ __aicore__ inline HcclHandle AllReduce(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
     使能多轮切分，等效处理上述非多轮切分示例的通信。如下图所示，每张卡的300个float16数据，被切分为2个首块数据，1个尾块数据。每个首块的数据量tileLen为128个float16数据，尾块的数据量tailLen为44个float16数据。在算子内部实现时，需要对切分后的数据分3轮进行AllReduce通信任务，将等效上述非多轮切分的通信结果。
 
     **图 3**  各卡数据切分示意图<a name="fig26821908496"></a>  
-    ![](figures/各卡数据切分示意图.png "各卡数据切分示意图")
+    ![](../../../../figures/各卡数据切分示意图.png "各卡数据切分示意图")
 
     具体实现为，第1轮通信，每个rank上0-0\\1-0\\2-0\\3-0数据块进行AllReduce处理。第2轮通信，每个rank上0-1\\1-1\\2-1\\3-1数据块进行AllReduce处理。第3轮通信，每个rank上0-2\\1-2\\2-2\\3-2数据块进行AllReduce处理，图示及代码示例如下。
 
     **图 4**  4卡AllReduce示意图<a name="fig1662341913515"></a>  
-    ![](figures/4卡AllReduce示意图.png "4卡AllReduce示意图")
+    ![](../../../../figures/4卡AllReduce示意图.png "4卡AllReduce示意图")
 
     ```
     extern "C" __global__ __aicore__ void all_reduce_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {

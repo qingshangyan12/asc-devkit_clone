@@ -57,11 +57,11 @@ score和index分别存储在src0和src1中，按score进行排序（score大的�
 
 -   当score为float，index为uint32\_t类型时，计算结果中index存储在高4Bytes，score存储在低4Bytes。
 
-    ![](figures/zh-cn_image_0000001487383566.png)
+    ![](../../../../figures/zh-cn_image_0000001487383566.png)
 
 -   当score为half，index为uint32\_t类型时，计算结果中index存储在高4Bytes，score存储在低2Bytes， 中间的2Bytes保留。
 
-    ![](figures/zh-cn_image_0000001538104137.png)
+    ![](../../../../figures/zh-cn_image_0000001538104137.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

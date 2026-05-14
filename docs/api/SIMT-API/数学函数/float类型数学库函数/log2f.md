@@ -51,7 +51,7 @@
 
 获取以2为底，输入数据的对数。
 
-![](figures/zh-cn_formulaimage_0000002484776380.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776380.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -56,7 +56,7 @@
 对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，BatchWrite通信必须在不同昇腾AI Server（通常是8卡或16卡的昇腾NPU设备组成的服务器形态的统称）之间进行。
 
 **图 1**  BatchWrite示意图<a name="fig5325133243120"></a>  
-![](figures/BatchWrite示意图.png "BatchWrite示意图")
+![](../../../../figures/BatchWrite示意图.png "BatchWrite示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

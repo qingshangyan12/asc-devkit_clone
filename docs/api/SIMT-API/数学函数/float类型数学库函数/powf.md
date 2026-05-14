@@ -51,7 +51,7 @@
 
 获取输入数据x的y次幂。
 
-![](figures/zh-cn_formulaimage_0000002516816365.png)
+![](../../../figures/zh-cn_formulaimage_0000002516816365.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

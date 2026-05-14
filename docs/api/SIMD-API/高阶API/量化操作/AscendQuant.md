@@ -63,14 +63,14 @@
 
 -   PER\_TENSOR量化：整个srcTensor对应一个量化参数，量化参数的shape为\[1\]。
 
-    ![](figures/zh-cn_formulaimage_0000001666705128.png)
+    ![](../../../figures/zh-cn_formulaimage_0000001666705128.png)
 
 -   PER\_CHANNEL量化：srcTensor的shape为\[m, n\], 每个channel维度对应一个量化参数，量化参数的shape为\[n\]。
 
-    ![](figures/zh-cn_formulaimage_0000001738671878.png)
+    ![](../../../figures/zh-cn_formulaimage_0000001738671878.png)
 
 -   PER\_TOKEN量化：srcTensor的每组token（token为n方向，共有m组token）中的元素共享一组scale和offset参数，srcTensor的shape为\[m, n\]时，scale和offset的shape为\[m, 1\]。offset是可选输入。
--   ![](figures/zh-cn_formulaimage_0000002292403429.png)
+-   ![](../../../figures/zh-cn_formulaimage_0000002292403429.png)
 -   PER\_GROUP量化：这里定义group的计算方向为k方向，srcTensor在k方向上每groupSize个元素共享一组scale和offset。srcTensor的shape为\[m, n\]时，如果kDim=0，表示k是m方向，scale和offset的shape为\[\(m + groupSize - 1\) / groupSize, n\]；如果kDim=1，表示k是n方向，scale和offset的shape为\[m，\(n + groupSize - 1\) / groupSize\]。offset是可选输入。
 
     根据输出数据类型的不同，当前PER\_GROUP分为两种场景：fp4x2\_e2m1\_t/fp4x2\_e1m2\_t场景（后续内容中简称为float4场景）和int8\_t/hifloat8\_t/fp8\_e5m2\_t/fp8\_e4m3fn\_t场景（后续内容中简称为b8场景）。
@@ -78,31 +78,31 @@
     -   fp4x2\_e2m1\_t/float4\_e1m2场景（float4场景）
         -   kDim = 0:****
 
-            ![](figures/zh-cn_formulaimage_0000002292493829.png)
+            ![](../../../figures/zh-cn_formulaimage_0000002292493829.png)
 
         -   kDim = 1:
 
-            ![](figures/zh-cn_formulaimage_0000002292493825.png)
+            ![](../../../figures/zh-cn_formulaimage_0000002292493825.png)
 
     -   int8\_t/hifloat8\_t/fp8\_e5m2\_t/fp8\_e4m3fn\_t场景（b8场景）
         -   kDim=0：
 
-            ![](figures/zh-cn_formulaimage_0000002292493833.png)
+            ![](../../../figures/zh-cn_formulaimage_0000002292493833.png)
 
         -   kDim=1：
 
-            ![](figures/zh-cn_formulaimage_0000002068601638.png)
+            ![](../../../figures/zh-cn_formulaimage_0000002068601638.png)
 
 ## 实现原理<a name="section13229175017585"></a>
 
 **图 1**  AscendQuant算法框图scale和offset都是scalar<a name="fig966236152318"></a>  
-![](figures/AscendQuant算法框图scale和offset都是scalar.png "AscendQuant算法框图scale和offset都是scalar")
+![](../../../figures/AscendQuant算法框图scale和offset都是scalar.png "AscendQuant算法框图scale和offset都是scalar")
 
 **图 2**  AscendQuant算法框图scale和offset都是Tensor<a name="fig2405134711019"></a>  
-![](figures/AscendQuant算法框图scale和offset都是Tensor.png "AscendQuant算法框图scale和offset都是Tensor")
+![](../../../figures/AscendQuant算法框图scale和offset都是Tensor.png "AscendQuant算法框图scale和offset都是Tensor")
 
 **图 3**  AscendQuant算法框图scale是Tensor&offset是Scalar<a name="fig6542182812108"></a>  
-![](figures/AscendQuant算法框图scale是Tensor-offset是Scalar.png "AscendQuant算法框图scale是Tensor-offset是Scalar")
+![](../../../figures/AscendQuant算法框图scale是Tensor-offset是Scalar.png "AscendQuant算法框图scale是Tensor-offset是Scalar")
 
 如上图所示是AscendQuant内部算法框图，计算过程大致描述为如下几步，均在Vector上进行：
 
@@ -113,10 +113,10 @@
 5.  精度转换：将Tmp2从half转换成int8\_t类型，得到output。
 
 **图 4**  AscendQuant算法框图PER\_TOKEN/PER\_GROUP场景scale和offset都是tensor<a name="fig841775615011"></a>  
-![](figures/AscendQuant算法框图PER_TOKEN-PER_GROUP场景scale和offset都是tensor.png "AscendQuant算法框图PER_TOKEN-PER_GROUP场景scale和offset都是tensor")
+![](../../../figures/AscendQuant算法框图PER_TOKEN-PER_GROUP场景scale和offset都是tensor.png "AscendQuant算法框图PER_TOKEN-PER_GROUP场景scale和offset都是tensor")
 
 **图 5**  AscendQuant算法框图PER\_TOKEN/PER\_GROUP场景scale是tensor&offset是scalar<a name="fig1452882415581"></a>  
-![](figures/AscendQuant算法框图PER_TOKEN-PER_GROUP场景scale是tensor-offset是scalar.png "AscendQuant算法框图PER_TOKEN-PER_GROUP场景scale是tensor-offset是scalar")
+![](../../../figures/AscendQuant算法框图PER_TOKEN-PER_GROUP场景scale是tensor-offset是scalar.png "AscendQuant算法框图PER_TOKEN-PER_GROUP场景scale是tensor-offset是scalar")
 
 PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 

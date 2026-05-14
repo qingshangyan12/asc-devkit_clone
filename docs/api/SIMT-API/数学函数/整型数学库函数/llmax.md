@@ -51,7 +51,7 @@
 
 获取两个输入数据中的最大值。
 
-![](figures/zh-cn_formulaimage_0000002521590972.png)
+![](../../../figures/zh-cn_formulaimage_0000002521590972.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

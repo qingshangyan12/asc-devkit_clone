@@ -51,7 +51,7 @@
 
 矢量内每个元素与标量求积，计算公式如下，其中VL\_T表示矢量计算单元一次迭代能够处理的元素个数。VL\_T的取值参考[RegTensor](../寄存器数据类型/RegTensor.md)。
 
-![](figures/zh-cn_formulaimage_0000002488832082.png)
+![](../../../../figures/zh-cn_formulaimage_0000002488832082.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

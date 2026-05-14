@@ -62,5 +62,5 @@ if (threadIdx.x % 2 == 0) {
 
 **图 1**  shfl结果示意图<a name="fig18290853142120"></a>  
 
-![](figures/coalesced_group_shfl.png)
+![](../../../figures/coalesced_group_shfl.png)
 

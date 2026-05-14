@@ -57,15 +57,15 @@
 
     -   当isVecDeq=false时，根据SetDeqScale设置的scale、offset、signMode，对输入做量化并进行精度转换。计算公式如下：
 
-        ![](figures/zh-cn_formulaimage_0000002358588082.png)
+        ![](../../../../figures/zh-cn_formulaimage_0000002358588082.png)
 
     -   当isVecDeq=true时，根据SetDeqScale设置的一段128B的UB上的16组量化参数scale<sub>0</sub>-scale<sub>15</sub>、offset<sub>0</sub>-offset<sub>15</sub>、signMode<sub>0</sub>-signMode<sub>15</sub>，以循环的方式对输入做量化并进行精度转换。计算公式如下：
 
-        ![](figures/zh-cn_formulaimage_0000002392388081.png)
+        ![](../../../../figures/zh-cn_formulaimage_0000002392388081.png)
 
 -   在输入类型为int32\_t的情况下，对int32\_t类型的输入做量化并进行精度转换，得到half类型的数据。使用该接口前需要调用[SetDeqScale](../量化设置/SetDeqScale.md)设置scale参数。
 
-    .![](figures/zh-cn_formulaimage_0000002534630339.png)
+    .![](../../../../figures/zh-cn_formulaimage_0000002534630339.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -208,7 +208,7 @@
 </table>
 
 **图 1**  halfBlock说明<a name="fig1084698268"></a>  
-![](figures/halfBlock说明.png "halfBlock说明")
+![](../../../../figures/halfBlock说明.png "halfBlock说明")
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

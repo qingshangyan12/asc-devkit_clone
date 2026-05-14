@@ -81,11 +81,11 @@
 
     -   当score为float，index为uint32类型时，计算结果中index存储在高4Bytes，score存储在低4Bytes。
 
-        ![](figures/zh-cn_image_0000002007005918.png)
+        ![](../../../figures/zh-cn_image_0000002007005918.png)
 
     -   当score为half，index为uint32类型时，计算结果中index存储在高4Bytes，score存储在低2Bytes， 中间的2Bytes保留。
 
-        ![](figures/zh-cn_image_0000002042886661.png)
+        ![](../../../figures/zh-cn_image_0000002042886661.png)
 
 -   排布方式二：Region Proposal排布
 
@@ -99,13 +99,13 @@
 
     如下图所示，总共包含16个Region Proposals。
 
-    ![](figures/zh-cn_image_0000002043918785.png)
+    ![](../../../figures/zh-cn_image_0000002043918785.png)
 
     对于数据类型float，每一个Region Proposal占32Bytes，Byte\[31:24\]是无效数据，Byte\[23:0\]包含6个float类型的元素，其中Byte\[23:20\]定义为label，Byte\[19:16\]定义为score，Byte\[15:12\]定义为y2，Byte\[11:8\]定义为x2，Byte\[7:4\]定义为y1，Byte\[3:0\]定义为x1。
 
     如下图所示，总共包含16个Region Proposals。
 
-    ![](figures/zh-cn_image_0000002043797849.png)
+    ![](../../../figures/zh-cn_image_0000002043797849.png)
 
 -   对应带模板参数SortConfig的函数原型
 
@@ -116,10 +116,10 @@
     当函数原型带有输出索引dstIndexTensor参数，需要输出排序结果数据分别对应的索引；若输入带有索引srcIndexTensor参数，则输出索引即为原输入的索引，若输入不带有索引，则对输入数据从0开始生成所需排序数量的索引，最终输出索引即为对应输入数据的索引。如下两幅图，分别为输入带有索引和输入不带索引的数据排序示意图。
 
     **图 1**  输入带有索引srcIndex的排序样例<a name="fig107141538111418"></a>  
-    ![](figures/输入带有索引srcIndex的排序样例.png "输入带有索引srcIndex的排序样例")
+    ![](../../../figures/输入带有索引srcIndex的排序样例.png "输入带有索引srcIndex的排序样例")
 
     **图 2**  输入不带索引srcIndex的排序样例<a name="fig138416151180"></a>  
-    ![](figures/输入不带索引srcIndex的排序样例.png "输入不带索引srcIndex的排序样例")
+    ![](../../../figures/输入不带索引srcIndex的排序样例.png "输入不带索引srcIndex的排序样例")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -56,7 +56,7 @@
 例如，Warp内32个活跃线程调用asc\_shfl\_up\(LaneId, 2, 16\)接口，每个线程的返回值为当前线程LaneId-2对应线程的var值，或者当前线程的var值。
 
 **图 1**  asc\_shfl\_up结果示意图<a name="fig147375361415"></a>  
-![](figures/asc_shfl_up结果示意图.png "asc_shfl_up结果示意图")
+![](../../../figures/asc_shfl_up结果示意图.png "asc_shfl_up结果示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -61,7 +61,7 @@
 
 获取小于或等于x的最小的整数值，即向负无穷取整操作。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002341752960.png)
+![](../../../../figures/zh-cn_formulaimage_0000002341752960.png)
 
 举例如下：
 

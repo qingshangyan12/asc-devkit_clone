@@ -51,7 +51,7 @@
 
 获取输入数据x的平方根。
 
-![](figures/zh-cn_formulaimage_0000002533480327.png)
+![](../../../../figures/zh-cn_formulaimage_0000002533480327.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

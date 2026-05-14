@@ -51,7 +51,7 @@
 
 获取输入数据各元素的三角函数余弦值。
 
-![](figures/zh-cn_formulaimage_0000002513329620.png)
+![](../../../../figures/zh-cn_formulaimage_0000002513329620.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

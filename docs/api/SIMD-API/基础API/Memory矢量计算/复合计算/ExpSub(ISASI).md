@@ -53,13 +53,13 @@ src0与src1相减，将差值作为指数计算自然常数e的幂次， 并将�
 
 源操作数数据类型为float类型时，计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002358072388.png)
+![](../../../../figures/zh-cn_formulaimage_0000002358072388.png)
 
 源操作数数据类型为half类型时，计算公式如下：
 
 针对Ascend 950PR/Ascend 950DT：
 
-![](figures/zh-cn_formulaimage_0000002391634117.png)
+![](../../../../figures/zh-cn_formulaimage_0000002391634117.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

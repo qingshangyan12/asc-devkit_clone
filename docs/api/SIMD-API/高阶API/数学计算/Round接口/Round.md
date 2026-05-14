@@ -51,7 +51,7 @@
 
 将输入的元素四舍五入到最接近的整数，计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002182893080.png)
+![](../../../../figures/zh-cn_formulaimage_0000002182893080.png)
 
 举例如下：
 

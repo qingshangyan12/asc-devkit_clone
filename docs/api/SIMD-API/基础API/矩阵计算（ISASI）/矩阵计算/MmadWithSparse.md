@@ -319,7 +319,7 @@ __aicore__ inline void MmadWithSparse(const LocalTensor<T>& dst, const LocalTens
 
 该索引矩阵用于A矩阵的稠密化，根据索引矩阵从MatrixA中的4个元素中选择2个元素参与计算，如下图所示：
 
-![](figures/绘图4-26.png)
+![](../../../../figures/绘图4-26.png)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

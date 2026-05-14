@@ -53,13 +53,13 @@
 
     给定源操作数在UB中的基地址和索引，Gather指令根据索引位置将源操作数按元素收集到结果寄存器张量中。收集过程如下图所示：
 
-    ![](figures/DataCopyGather.png)
+    ![](../../../../figures/DataCopyGather.png)
 
 -   收集RegTensor中的元素
 
     根据索引位置indexReg将源操作数srcReg按元素收集到结果dstReg中。收集过程如下图所示：
 
-    ![](figures/gather.png)
+    ![](../../../../figures/gather.png)
 
 ## 定义原型<a name="section620mcpsimp"></a>
 

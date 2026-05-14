@@ -226,13 +226,13 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg);
 </table>
 
 **图 1**  DIST\_NORM模式搬入<a name="fig16757125316916"></a>  
-![](figures/DIST_NORM模式搬入.png "DIST_NORM模式搬入")
+![](../../../../figures/DIST_NORM模式搬入.png "DIST_NORM模式搬入")
 
 **图 2**  DIST\_US模式搬入<a name="fig1982131214910"></a>  
-![](figures/DIST_US模式搬入.png "DIST_US模式搬入")
+![](../../../../figures/DIST_US模式搬入.png "DIST_US模式搬入")
 
 **图 3**  DIST\_DS模式搬入<a name="fig9402845095"></a>  
-![](figures/DIST_DS模式搬入.png "DIST_DS模式搬入")
+![](../../../../figures/DIST_DS模式搬入.png "DIST_DS模式搬入")
 
 **表 4**  MaskReg从RegTensor搬入参数说明
 
@@ -286,7 +286,7 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg);
 </table>
 
 **图 4**  Offset功能示意图<a name="fig115968013431"></a>  
-![](figures/Offset功能示意图.png "Offset功能示意图")
+![](../../../../figures/Offset功能示意图.png "Offset功能示意图")
 
 ## 返回值说明<a name="section1575141714439"></a>
 

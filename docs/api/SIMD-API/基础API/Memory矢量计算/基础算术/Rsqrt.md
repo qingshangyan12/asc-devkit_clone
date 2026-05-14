@@ -61,7 +61,7 @@
 
 按元素进行开方后取倒数的计算，公式如下：
 
-![](figures/zh-cn_formulaimage_0000002358272894.png)
+![](../../../../figures/zh-cn_formulaimage_0000002358272894.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

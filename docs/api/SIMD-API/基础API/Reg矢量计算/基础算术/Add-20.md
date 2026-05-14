@@ -51,7 +51,7 @@
 
 Add指令根据mask对源操作数srcReg0、srcReg1进行按元素求和操作，将结果写入目的操作数dstReg。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000001930508482.png)
+![](../../../../figures/zh-cn_formulaimage_0000001930508482.png)
 
 若srcReg0，srcReg1输入转换为uint32\_t类型相加时超出uint32\_t最大值，在carry（存放进位的MaskReg寄存器）中对应位置每4bit设置1，否则写0。
 

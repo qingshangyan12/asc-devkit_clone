@@ -51,7 +51,7 @@
 
 对前count个输入数据src0、src1按元素相乘操作，将结果写入dst0Local，溢出部分写入dst1Local。计算过程如下：
 
-![](figures/mull.png)
+![](../../../../figures/mull.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

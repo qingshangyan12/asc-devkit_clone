@@ -279,7 +279,7 @@ LoadData2DParamsV2结构体在不启用转置时，示意图如下，参数设�
 -   sid = 0，预留参数，配置为0即可。
 
 **图 1**  LoadData2DParamsV2结构体参数示例（以half数据类型，不启用转置为例）<a name="fig13901164574218"></a>  
-![](figures/LoadData2DParamsV2结构体参数示例（以half数据类型-不启用转置为例）.png "LoadData2DParamsV2结构体参数示例（以half数据类型-不启用转置为例）")
+![](../../../../../figures/LoadData2DParamsV2结构体参数示例（以half数据类型-不启用转置为例）.png "LoadData2DParamsV2结构体参数示例（以half数据类型-不启用转置为例）")
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

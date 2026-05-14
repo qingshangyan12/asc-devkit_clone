@@ -218,7 +218,7 @@ VECIN，VECCALC，VECOUT之间的搬运指令，支持mask操作和DataBlock间�
     -   通用的Counter模式：Mask代表**整个矢量计算参与计算的元素个数，迭代次数不生效**。
     -   Counter模式配合Copy高维切分计算API，Mask代表**每次Repeat中处理的元素个数，迭代次数生效。**示意图如下：
 
-        ![](figures/repeat-times-12.png)
+        ![](../../../figures/repeat-times-12.png)
 
 ## 调用示例<a name="section1227835243314"></a>
 

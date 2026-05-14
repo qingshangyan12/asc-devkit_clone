@@ -51,7 +51,7 @@
 
 获取输入x乘以2的exp次幂的结果。
 
-![](figures/zh-cn_formulaimage_0000002484776400.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776400.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

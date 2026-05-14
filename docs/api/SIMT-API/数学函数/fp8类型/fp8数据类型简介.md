@@ -58,14 +58,14 @@ SIMT编程支持3种fp8数据类型，分别是float8\_e4m3\_t、float8\_e5m2\_t
     下图是一个fp8\_e4m3fn\_t类型的示例，其符号位占用1位，指数占用4位，尾数占用3位，表示的结果为 \(-1\)^1 × 2^-3 × 2^-6。
 
     **图 1**  float8\_e4m3\_t示例图<a name="fig693644411325"></a>  
-    ![](figures/float8_e4m3_t示例图.png "float8_e4m3_t示例图")
+    ![](../../../figures/float8_e4m3_t示例图.png "float8_e4m3_t示例图")
 
 -   float8\_e5m2\_t
 
     下图是一个fp8\_e5m2\_t类型的示例，其符号位占用1位，指数占用5位，尾数占用2位，表示的结果为 \(-1\)^0 × \(2 - 0.25\) × 2^\(30 -15\)=1.75 × 2^15。
 
     **图 2**  float8\_e5m2\_t示例图<a name="fig4792151573316"></a>  
-    ![](figures/float8_e5m2_t示例图.png "float8_e5m2_t示例图")
+    ![](../../../figures/float8_e5m2_t示例图.png "float8_e5m2_t示例图")
 
 -   hifloat8\_t
 
@@ -74,9 +74,9 @@ SIMT编程支持3种fp8数据类型，分别是float8\_e4m3\_t、float8\_e5m2\_t
     hifloat8\_t类型根据点域的不同，有不同的编码方式，下面一一列出。
 
     **图 3**  S、E、M在不同点域D值下的bit位分布<a name="fig261021710100"></a>  
-    ![](figures/S-E-M在不同点域D值下的bit位分布-65.png "S-E-M在不同点域D值下的bit位分布-65")
+    ![](../../../figures/S-E-M在不同点域D值下的bit位分布-65.png "S-E-M在不同点域D值下的bit位分布-65")
 
     下图示例中，其符号位占用1位，指数占用2位，尾数占用3位，D字段为2比特b01，S<sub>v</sub>=1，E<sub>v</sub>=3，M<sub>v</sub>  = 2<sup>-1</sup>  + 2<sup>-2</sup>，表示的结果为14。下标v表示各部分的具体数值。
 
-    ![](figures/流水任务运行示意图-66.png)
+    ![](../../../figures/流水任务运行示意图-66.png)
 

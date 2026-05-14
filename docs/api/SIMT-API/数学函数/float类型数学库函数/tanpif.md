@@ -51,7 +51,7 @@
 
 获取输入数据与π相乘的正切值。
 
-![](figures/zh-cn_formulaimage_0000002516816327.png)
+![](../../../figures/zh-cn_formulaimage_0000002516816327.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

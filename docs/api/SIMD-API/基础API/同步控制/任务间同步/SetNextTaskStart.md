@@ -89,7 +89,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 **开发者需要自行保证调用此接口后的指令不会与后序算子互相干扰而导致精度问题，推荐在整个算子最后一条搬运指令后调用此接口。**
 
 **图 1**  通过SetNextTaskStart实现并行示意图<a name="fig37581010773"></a>  
-![](figures/通过SetNextTaskStart实现并行示意图.png "通过SetNextTaskStart实现并行示意图")
+![](../../../../figures/通过SetNextTaskStart实现并行示意图.png "通过SetNextTaskStart实现并行示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -51,7 +51,7 @@
 
 指定输入x，获取e的x次方减1。
 
-![](figures/zh-cn_formulaimage_0000002484776378.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776378.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

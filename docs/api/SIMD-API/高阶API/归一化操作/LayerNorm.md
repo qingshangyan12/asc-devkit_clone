@@ -57,21 +57,21 @@
 
     本接口实现了对shape大小为\[B，S，H\]输入数据的LayerNorm归一化，其计算公式如下，其中γ为缩放系数，β为平移系数，ε为防除零的权重系数：
 
-    ![](figures/zh-cn_formulaimage_0000001729631329.png)
+    ![](../../../figures/zh-cn_formulaimage_0000001729631329.png)
 
     其中，如下两个参数分别代表输入在H轴的均值和方差。
 
-    ![](figures/zh-cn_formulaimage_0000001729515829.png)
+    ![](../../../figures/zh-cn_formulaimage_0000001729515829.png)
 
 -   对shape为\[A，R\]的输入数据，输出归一化结果、均值、标准差的倒数或方差
 
     本接口实现了对shape为\[A，R\]输入数据的LayerNorm归一化，其计算公式如下，其中γ为缩放系数，β为平移系数，ε为防除零的权重系数：
 
-    ![](figures/zh-cn_formulaimage_0000002045806762.png)
+    ![](../../../figures/zh-cn_formulaimage_0000002045806762.png)
 
     其中，如下三个参数分别代表输入在R轴的均值，方差和标准差的倒数。
 
-    ![](figures/zh-cn_formulaimage_0000002081933649.png)
+    ![](../../../figures/zh-cn_formulaimage_0000002081933649.png)
 
 ## 实现原理<a name="section13229175017585"></a>
 
@@ -80,7 +80,7 @@
     以float类型，ND格式，输入为inputX\[B, S, H\]，gamma\[H\]和beta\[H\]为例，描述LayerNorm高阶API内部算法框图，如下图所示。
 
     **图 1**  LayerNorm算法框图<a name="fig465593873413"></a>  
-    ![](figures/LayerNorm算法框图.png "LayerNorm算法框图")
+    ![](../../../figures/LayerNorm算法框图.png "LayerNorm算法框图")
 
     计算过程分为如下几步，均在Vector上进行（下文中m指尾轴H的长度）：
 
@@ -95,7 +95,7 @@
 
     **图 2**  LayerNorm-Rstd版本算法框图<a name="fig125521522105515"></a>  
     
-    ![](figures/layernorm.png)
+    ![](../../../figures/layernorm.png)
 
     计算过程分为如下几步，均在Vector上进行，整体按照以A轴为最外层循环进行计算：
 

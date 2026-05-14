@@ -35,5 +35,5 @@ if (threadIdx.x % 2 == 0) {
 示例代码中的条件分支将一个warp中所有线程id是偶数的线程组成coalesced\_group协作组，组内各线程thread\_rank接口返回结果如下图所示。
 
 **图 1**  coalesced\_group\_rank<a name="fig788024554320"></a>  
-![](figures/coalesced_group_rank.png "coalesced_group_rank")
+![](../../../figures/coalesced_group_rank.png "coalesced_group_rank")
 

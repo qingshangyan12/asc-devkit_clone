@@ -61,9 +61,9 @@
 
 按元素做三角函数反正切运算，计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002183047940.png)
+![](../../../../figures/zh-cn_formulaimage_0000002183047940.png)
 
-![](figures/zh-cn_formulaimage_0000002227268389.png)
+![](../../../../figures/zh-cn_formulaimage_0000002227268389.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

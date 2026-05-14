@@ -233,12 +233,12 @@ ND2NZ转换示意图如下，样例中参数设置值和解释说明如下：
 -   dstNzMatrixStride = 96，表达dst中第x个ND矩阵的起点和第x+1个ND矩阵的起点的偏移，即A1和C1之间的距离，即为6个DataBlock，6 \* 16 = 96个元素。
 
 **图 1**  ND2NZ转换示意图（half数据类型）<a name="fig128961542184620"></a>  
-![](figures/ND2NZ转换示意图（half数据类型）.png "ND2NZ转换示意图（half数据类型）")
+![](../../../../figures/ND2NZ转换示意图（half数据类型）.png "ND2NZ转换示意图（half数据类型）")
 
 enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
 **图 2**  enableSmallC0开启模式下的ND2NZ转换示意图 （half数据类型）<a name="fig07641913195410"></a>  
-![](figures/enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）.png "enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）")
+![](../../../../figures/enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）.png "enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）")
 
 ## 返回值说明<a name="section446456163012"></a>
 

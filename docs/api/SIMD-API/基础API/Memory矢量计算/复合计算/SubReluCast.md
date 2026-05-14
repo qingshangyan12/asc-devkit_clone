@@ -51,7 +51,7 @@
 
 按元素求差，再进行Relu计算（结果和0对比取较大值），并根据源操作数和目的操作数Tensor的数据类型进行精度转换。计算公式如下，其中dstType表示目的操作数的数据类型：
 
-![](figures/zh-cn_formulaimage_0000002391545417.png)
+![](../../../../figures/zh-cn_formulaimage_0000002391545417.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

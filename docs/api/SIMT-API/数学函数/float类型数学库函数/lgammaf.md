@@ -51,7 +51,7 @@
 
 获取输入数据x伽马值的绝对值并求自然对数。
 
-![](figures/zh-cn_formulaimage_0000002484776424.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776424.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

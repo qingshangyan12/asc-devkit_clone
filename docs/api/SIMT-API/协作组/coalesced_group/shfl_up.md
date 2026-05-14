@@ -61,5 +61,5 @@ if (threadIdx.x % 2 == 0) {
 示例代码中的条件分支将一个warp中所有线程id是偶数的线程组成coalesced\_group协作组，组内各线程shfl\_up接口返回结果如下图所示。
 
 **图 1**  shfl\_up结果示意图<a name="fig206831456169"></a>  
-![](figures/shfl_up结果示意图.png "shfl_up结果示意图")
+![](../../../figures/shfl_up结果示意图.png "shfl_up结果示意图")
 

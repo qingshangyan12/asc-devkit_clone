@@ -55,7 +55,7 @@
 
     根据mask对输入数据srcReg0、srcReg1执行按位与\( & \)操作，将结果写入dstReg。计算公式如下：
 
-    ![](figures/zh-cn_formulaimage_0000002499005626.png)
+    ![](../../../../figures/zh-cn_formulaimage_0000002499005626.png)
 
 -   对MaskReg操作：
 

@@ -180,7 +180,7 @@ DN2NZ转换示意图如下，样例中参数设置值和解释说明如下（以
 -   dstNzNStride = 2，表达dst中第x个目的DN矩阵和第x+1个目的DN矩阵的起点的偏移，即A1与B1之间的间隔，即为2个DataBlock。
 -   dstNzMatrixStride = 64，表达dst中第x个目的ND矩阵和第x+1个目的ND矩阵的起点的偏移，即A1和C1之间的距离，即为4个DataBlock，4 \* 16 = 64个元素。
 
-![](figures/绘图1.png)
+![](../../../../figures/绘图1.png)
 
 ## 通路说明<a name="section631mcpsimp"></a>
 

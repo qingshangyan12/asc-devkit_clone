@@ -51,7 +51,7 @@
 
 根据指定的条件，从两个源操作数中选择元素，生成目标操作数。两个源操作数均可以是LocalTensor或标量。
 
-![](figures/zh-cn_formulaimage_0000002425808613.png)
+![](../../../../figures/zh-cn_formulaimage_0000002425808613.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

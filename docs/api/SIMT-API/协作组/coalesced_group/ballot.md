@@ -52,14 +52,14 @@ if (threadIdx.x % 2 == 0) {
 ```
 
 **图 1** <a name="fig1751813013364"></a>  
-![](figures/zh-cn_image_0000002571951568.png "zh-cn_image_0000002571951568")
+![](../../../figures/zh-cn_image_0000002571951568.png "zh-cn_image_0000002571951568")
 
 **图 2** <a name="fig847875110373"></a>  
-![](figures/zh-cn_image_0000002572111572.png "zh-cn_image_0000002572111572")
+![](../../../figures/zh-cn_image_0000002572111572.png "zh-cn_image_0000002572111572")
 
 **图 3** <a name="fig15791818133820"></a>  
-![](figures/zh-cn_image_0000002571952162.png "zh-cn_image_0000002571952162")
+![](../../../figures/zh-cn_image_0000002571952162.png "zh-cn_image_0000002571952162")
 
 **图 4** <a name="fig1743153019383"></a>  
-![](figures/zh-cn_image_0000002571952576.png "zh-cn_image_0000002571952576")
+![](../../../figures/zh-cn_image_0000002571952576.png "zh-cn_image_0000002571952576")
 

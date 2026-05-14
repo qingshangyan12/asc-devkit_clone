@@ -51,7 +51,7 @@
 
 将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中。交织排列方式如下图所示，其中每个方格代表一个元素：
 
-![](figures/Interleave.png)
+![](../../../../figures/Interleave.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

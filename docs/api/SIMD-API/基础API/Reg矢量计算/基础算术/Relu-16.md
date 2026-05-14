@@ -51,7 +51,7 @@
 
 根据mask对输入数据srcReg进行relu操作，将结果写入dstReg。relu计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002521151595.png)
+![](../../../../figures/zh-cn_formulaimage_0000002521151595.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

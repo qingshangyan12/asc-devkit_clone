@@ -63,7 +63,7 @@
 其中，模式4仅支持Ascend 950PR/Ascend 950DT。
 
 **图 1**  同步控制模式示意图<a name="fig37581010773"></a>  
-![](figures/同步控制模式示意图.png "同步控制模式示意图")
+![](../../../../figures/同步控制模式示意图.png "同步控制模式示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

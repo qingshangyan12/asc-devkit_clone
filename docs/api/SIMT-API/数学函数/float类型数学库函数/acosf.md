@@ -51,7 +51,7 @@
 
 获取输入数据的反余弦值。
 
-![](figures/zh-cn_formulaimage_0000002484776390.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776390.png)
 
 arcsin\(x\)为反正弦函数的计算。
 

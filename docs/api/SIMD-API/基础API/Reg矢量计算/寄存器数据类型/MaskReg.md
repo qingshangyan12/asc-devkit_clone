@@ -4,7 +4,7 @@
 
 MaskReg用于指示在计算过程中哪些元素参与计算，宽度为[RegTensor](RegTensor.md)的八分之一（VL/8）。
 
-![](figures/maskreg.png)
+![](../../../../figures/maskreg.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

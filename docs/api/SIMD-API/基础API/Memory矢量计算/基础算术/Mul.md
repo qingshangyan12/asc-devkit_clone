@@ -61,7 +61,7 @@
 
 按元素求积，公式表达如下：
 
-![](figures/zh-cn_formulaimage_0000002357879426.png)
+![](../../../../figures/zh-cn_formulaimage_0000002357879426.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

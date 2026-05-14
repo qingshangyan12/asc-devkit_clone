@@ -51,7 +51,7 @@
 
 获取由第一个输入x的数值部分和第二个输入y的符号部分拼接得到的浮点数。
 
-![](figures/zh-cn_formulaimage_0000002518941925.png)
+![](../../../figures/zh-cn_formulaimage_0000002518941925.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

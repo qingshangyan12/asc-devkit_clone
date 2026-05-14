@@ -51,7 +51,7 @@
 
 获取输入数据的三角函数双曲正切值。
 
-![](figures/zh-cn_formulaimage_0000002484776370.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776370.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

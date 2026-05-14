@@ -297,11 +297,11 @@ TConv3DApiTiling结构体包含Conv3D算子规格信息及Tiling切分算法的�
 </table>
 
 **图 1**  卷积3D正向MKN示意图<a name="fig1053275794620"></a>  
-![](figures/卷积3D正向MKN示意图.png "卷积3D正向MKN示意图")
+![](../../../../../figures/卷积3D正向MKN示意图.png "卷积3D正向MKN示意图")
 
 **图 2**  卷积3D正向MFirst示意图<a name="fig2054162614714"></a>  
-![](figures/卷积3D正向MFirst示意图.png "卷积3D正向MFirst示意图")
+![](../../../../../figures/卷积3D正向MFirst示意图.png "卷积3D正向MFirst示意图")
 
 **图 3**  卷积3D正向NFirst示意图<a name="fig1788889124818"></a>  
-![](figures/卷积3D正向NFirst示意图.png "卷积3D正向NFirst示意图")
+![](../../../../../figures/卷积3D正向NFirst示意图.png "卷积3D正向NFirst示意图")
 

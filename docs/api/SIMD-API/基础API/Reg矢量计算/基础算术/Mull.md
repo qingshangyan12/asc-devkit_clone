@@ -51,7 +51,7 @@
 
 根据mask对输入数据srcReg0、srcReg1按元素相乘操作，将结果写入dstReg0，溢出部分写入dstReg1。
 
-![](figures/mull-37.png)
+![](../../../../figures/mull-37.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

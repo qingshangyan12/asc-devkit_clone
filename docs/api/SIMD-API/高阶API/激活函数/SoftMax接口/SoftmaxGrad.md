@@ -51,7 +51,7 @@
 
 将输入tensor\[m<sub>0</sub>, m<sub>1</sub>, ...m<sub>t</sub>, n\]（t大于等于0）的非尾轴长度相乘的结果看作m，则输入tensor的shape看作\[m, n\]。对输入tensor\[m,n\]按行做grad反向计算，计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000001855883134.png)
+![](../../../../figures/zh-cn_formulaimage_0000001855883134.png)
 
 当输入shape为ND格式时，内部的reduce过程按last轴进行；当输入shape为NZ格式时，内部的reduce过程按照last轴和first轴进行，reduce过程可以参考[SoftMax](SoftMax.md)中的图示说明。
 
@@ -72,7 +72,7 @@ def softmax_grad(grad, src, isFront = None):
 以float类型，ND格式，shape为\[m,k\]的输入Tensor为例，描述SoftmaxGrad高阶API内部算法框图，如下图所示。
 
 **图 1**  SoftmaxGrad算法框图<a name="fig1590310503117"></a>  
-![](figures/SoftmaxGrad算法框图.png "SoftmaxGrad算法框图")
+![](../../../../figures/SoftmaxGrad算法框图.png "SoftmaxGrad算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
 

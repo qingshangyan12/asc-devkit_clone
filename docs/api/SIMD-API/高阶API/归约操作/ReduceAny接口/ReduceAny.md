@@ -54,10 +54,10 @@
 定义指定计算的维度（Reduce轴）为R轴，非指定维度（Normal轴）为A轴。如下图所示，对shape为\(2, 3\)的二维矩阵进行运算，指定在第一维求逻辑或，输出结果为\[1, 0, 1\]；指定在第二维求逻辑或，输出结果为\[1, 1\]。
 
 **图 1**  ReduceAny按第一个维度计算示例<a name="fig1757220381044"></a>  
-![](figures/ReduceAny按第一个维度计算示例.png "ReduceAny按第一个维度计算示例")
+![](../../../../figures/ReduceAny按第一个维度计算示例.png "ReduceAny按第一个维度计算示例")
 
 **图 2**  ReduceAny按最后一个维度计算示例<a name="fig197381580573"></a>  
-![](figures/ReduceAny按最后一个维度计算示例.png "ReduceAny按最后一个维度计算示例")
+![](../../../../figures/ReduceAny按最后一个维度计算示例.png "ReduceAny按最后一个维度计算示例")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

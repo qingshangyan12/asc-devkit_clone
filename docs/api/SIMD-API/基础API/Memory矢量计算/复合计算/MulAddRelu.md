@@ -51,7 +51,7 @@
 
 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002357906828.png)
+![](../../../../figures/zh-cn_formulaimage_0000002357906828.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -56,20 +56,20 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 如下图所示，切分数据的Reduce轴，假设切分后每块数据的形状为\[1, k\]，每块数据标号为1，2，3，…，n。
 
 **图 1**  Reduce轴切分示意图<a name="fig14767612174912"></a>  
-![](figures/Reduce轴切分示意图.png "Reduce轴切分示意图")
+![](../../../figures/Reduce轴切分示意图.png "Reduce轴切分示意图")
 
 本接口的计算公式如下。进行上述的数据切分后，分n次调用本接口，切分后的每块数据均完成如下公式的计算。
 
-![](figures/zh-cn_image_0000002186230593.png)
+![](../../../figures/zh-cn_image_0000002186230593.png)
 
-![](figures/zh-cn_image_0000002150833386.png)
+![](../../../figures/zh-cn_image_0000002150833386.png)
 
 上式中，x<sub>i</sub>、Meant<sub>i</sub>、M<sub>i</sub>的形状均为\[1, k\]，x<sub>i</sub>表示切分后的第i块数据，Meant<sub>i</sub>表示第i次调用本接口得到的前i块数据的均值，M<sub>i</sub>表示第i次调用本接口得到的前i块数据的方差中间结果（即为求方差而保存的中间计算结果，本节后续内容中写作方差中间结果）。其中，第一次调用本接口，即i=1时，公式中的Meant<sub>0</sub>和M<sub>0</sub>由用户定义为形状\[1, k\]、取值全0的数据。
 
 Meant<sub>n</sub>的计算过程示意如下图，调用n次本接口后，得到形状为\[1, k\]的Meant<sub>n</sub>和M<sub>n</sub>，Meant<sub>n</sub>和M<sub>n</sub>用于后续[WelfordFinalize](WelfordFinalize.md)接口的计算。
 
 **图 2**  均值Meant<sub>n</sub>计算过程示意图<a name="fig1241371913223"></a>  
-![](figures/均值Meantn计算过程示意图.png "均值Meantn计算过程示意图")
+![](../../../figures/均值Meantn计算过程示意图.png "均值Meantn计算过程示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -51,7 +51,7 @@
 
 根据输入x，获取e的x次方的计算结果。
 
-![](figures/zh-cn_formulaimage_0000002516816333.png)
+![](../../../figures/zh-cn_formulaimage_0000002516816333.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -22,7 +22,7 @@ enum class RegLayout {
 };
 ```
 
-![](figures/RegLayout.png)
+![](../../../../figures/RegLayout.png)
 
 如图所示，RegLayout::ZERO/RegLayout::ONE这2种模式仅在位宽比值1:2或2:1的情况下可以使用，例如float32转int16, 位宽比为2比1。例如，对于位宽为2:1的数据类型转换，可以通过RegLayout选定写入数据的位置。当选择RegLayout::ZERO时，数据写入索引为0的位置，当选择RegLayout::ONE时，数据写入索引为1的位置。
 

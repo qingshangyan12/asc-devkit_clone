@@ -82,7 +82,7 @@
 在AI Core内部，Scalar单元和DMA单元都可能对Global Memory进行访问。
 
 **图 1**  DataCache内存层次示意图<a name="fig1161014168448"></a>  
-![](figures/DataCache内存层次示意图.png "DataCache内存层次示意图")
+![](../../../figures/DataCache内存层次示意图.png "DataCache内存层次示意图")
 
 如上图所示：
 

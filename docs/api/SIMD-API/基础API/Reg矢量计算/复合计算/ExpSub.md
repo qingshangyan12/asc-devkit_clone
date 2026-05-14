@@ -51,9 +51,9 @@
 
 srcReg0与srcReg1相减，差值作为e的指数计算， 根据mask将计算结果写入dstReg。
 
-srcReg为float类型时：![](figures/zh-cn_formulaimage_0000002563310903.png)
+srcReg为float类型时：![](../../../../figures/zh-cn_formulaimage_0000002563310903.png)
 
-srcReg为half类型时：![](figures/zh-cn_formulaimage_0000002532471002.png)
+srcReg为half类型时：![](../../../../figures/zh-cn_formulaimage_0000002532471002.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -171,7 +171,7 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 
 srcReg为half类型时，Vector计算单元一次计算只处理最多VL/sizeof\(float\)个half元素，mask只有偶数位有效，参考下图：
 
-![](figures/3-3-4-6-3_约束说明.png)
+![](../../../../figures/3-3-4-6-3_约束说明.png)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

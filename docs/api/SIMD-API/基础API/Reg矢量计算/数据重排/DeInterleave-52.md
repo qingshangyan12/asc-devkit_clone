@@ -51,7 +51,7 @@
 
 给定源操作数寄存器张量srcReg0和srcReg1，将srcReg0和srcReg1中的元素解交织存入结果操作数dstReg0和dstReg1中。解交织排列方式如下图所示，其中每个方格代表一个元素：
 
-![](figures/DeInterleave-39.png)
+![](../../../../figures/DeInterleave-39.png)
 
 ## 定义原型<a name="section620mcpsimp"></a>
 

@@ -51,7 +51,7 @@
 
 给定一个输入的张量和一个地址偏移张量，本接口根据偏移地址按照DataBlock的粒度将输入张量收集到结果张量中。
 
-![](figures/repeat-times-36.png)
+![](../../../../figures/repeat-times-36.png)
 
 ## 函数原型<a name="section15660625202219"></a>
 

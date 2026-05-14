@@ -51,7 +51,7 @@
 
 获取输入数据与π相乘的余弦值。
 
-![](figures/zh-cn_formulaimage_0000002516816349.png)
+![](../../../figures/zh-cn_formulaimage_0000002516816349.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

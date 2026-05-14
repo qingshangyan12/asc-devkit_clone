@@ -487,19 +487,19 @@ Load3D用于完成image to column操作，将多维feature map转为二维矩阵
 对应的feature map格式如下图：
 
 **图 1**  feature map格式<a name="fig8137131714319"></a>  
-![](figures/feature-map格式.png "feature-map格式")
+![](../../../../../figures/feature-map格式.png "feature-map格式")
 
 对应的filter的格式如下图：
 
 其中n为filter的个数，可以看出维度排布为 \(Hk,Wk,Ci,n\)，但是需要注意的是下图的格式还需要根据Mmad中B矩阵的格式转换。
 
 **图 2**  filter的格式<a name="fig1395194710496"></a>  
-![](figures/filter的格式.png "filter的格式")
+![](../../../../../figures/filter的格式.png "filter的格式")
 
 实际操作中，由于存储空间或者计算能力限制，我们通常会将整个卷积计算分块，一次只搬运并计算一小块数据。
 
 **图 3**  卷积计算分块<a name="fig5278110624"></a>  
-![](figures/卷积计算分块.png "卷积计算分块")
+![](../../../../../figures/卷积计算分块.png "卷积计算分块")
 
 对于A2的feature map来说有两种方案，水平分块和垂直分块。分别对应参数中repeatMode的0和1。
 
@@ -508,12 +508,12 @@ Load3D用于完成image to column操作，将多维feature map转为二维矩阵
 repeatMode =0时，每次repeat会改变在filter窗口中读取数据点的位置，然后跳到下一个C0的位置。
 
 **图 4**  repeatMode = 0 时的filter窗口<a name="fig11710143294513"></a>  
-![](figures/repeatMode-0-时的filter窗口.png "repeatMode-0-时的filter窗口")
+![](../../../../../figures/repeatMode-0-时的filter窗口.png "repeatMode-0-时的filter窗口")
 
 repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个repeat在feature map中前进C0个元素。
 
 **图 5**  repeatMode = 1 时的filter窗口<a name="fig1648315981717"></a>  
-![](figures/repeatMode-1-时的filter窗口.png "repeatMode-1-时的filter窗口")
+![](../../../../../figures/repeatMode-1-时的filter窗口.png "repeatMode-1-时的filter窗口")
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

@@ -51,7 +51,7 @@
 
 获取输入数据的双曲余弦值。
 
-![](figures/zh-cn_formulaimage_0000002484776388.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776388.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

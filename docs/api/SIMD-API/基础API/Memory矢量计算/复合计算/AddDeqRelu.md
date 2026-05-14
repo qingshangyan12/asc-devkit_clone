@@ -51,11 +51,11 @@
 
 依次计算按元素求和、结果进行deq量化后再进行relu计算（结果和0对比取较大值）。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002391625201.png)
+![](../../../../figures/zh-cn_formulaimage_0000002391625201.png)
 
 Deq的计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000001863112121.png)
+![](../../../../figures/zh-cn_formulaimage_0000001863112121.png)
 
 如上公式先除以2^17再乘以2^17用于防止x乘以DeqScale出现溢出情况；公式中DeqScale需要通过SetDeqScale进行设置，具体可参考[SetDeqScale](../量化设置/SetDeqScale.md)。
 

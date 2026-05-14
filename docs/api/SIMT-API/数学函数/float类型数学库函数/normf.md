@@ -51,7 +51,7 @@
 
 获取输入数据a中前n个元素的平方和a\[0\]^2 + a\[1\]^2 +...+ a\[n-1\]^2的平方根。
 
-![](figures/zh-cn_formulaimage_0000002484776410.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776410.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

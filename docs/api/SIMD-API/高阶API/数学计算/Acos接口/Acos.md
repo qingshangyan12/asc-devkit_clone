@@ -61,9 +61,9 @@
 
 按元素做反余弦函数计算，计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002183047492.png)
+![](../../../../figures/zh-cn_formulaimage_0000002183047492.png)
 
-![](figures/zh-cn_formulaimage_0000002223323813.png)
+![](../../../../figures/zh-cn_formulaimage_0000002223323813.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

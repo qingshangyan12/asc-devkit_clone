@@ -51,7 +51,7 @@
 
 获取以e为底，输入数据的对数。
 
-![](figures/zh-cn_formulaimage_0000002576421047.png)
+![](../../../../figures/zh-cn_formulaimage_0000002576421047.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -51,7 +51,7 @@
 
 根据mask对输入数据srcReg0、srcReg1以及进位数据carrySrc进行按元素相加操作，将结果写入dstReg。如果srcReg0, srcReg1输入转换为uint32\_t类型，加上进位值carrySrc相加时超出uint32\_t最大值，在MaskReg carry中对应位置每4bit写1，否则写0。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002535717372.png)
+![](../../../../figures/zh-cn_formulaimage_0000002535717372.png)
 
 对carry的操作示例如下：
 

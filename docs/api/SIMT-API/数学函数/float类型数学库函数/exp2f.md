@@ -51,7 +51,7 @@
 
 指定输入x，获取2的x次方。
 
-![](figures/zh-cn_formulaimage_0000002484776376.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776376.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

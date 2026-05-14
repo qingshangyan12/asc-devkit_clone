@@ -61,9 +61,9 @@
 
 按元素做误差函数计算（也称为高斯误差函数，error function or Gauss error function）。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002327668200.png)
+![](../../../../figures/zh-cn_formulaimage_0000002327668200.png)
 
-![](figures/zh-cn_formulaimage_0000002188205638.png)
+![](../../../../figures/zh-cn_formulaimage_0000002188205638.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

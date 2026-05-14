@@ -80,7 +80,7 @@
 
 -   PER\_TOKEN场景 （按token量化）
 
-    ![](figures/zh-cn_formulaimage_0000002069677288.png)
+    ![](../../../figures/zh-cn_formulaimage_0000002069677288.png)
 
 -   PER\_GROUP场景 （按组量化）
 
@@ -117,16 +117,16 @@
 
         -   k为m方向，即公式中i轴为group的计算方向：（kDim=0同时isTranspose=False）或者（kDim=1同时isTranspose= True）
 
-            ![](figures/zh-cn_formulaimage_0000002106594713.png)
+            ![](../../../figures/zh-cn_formulaimage_0000002106594713.png)
 
         -   k为n方向，即公式中j轴为group的计算方向：（kDim=0同时isTranspose=True）或者（kDim=1同时isTranspose =False）
 
-            ![](figures/zh-cn_formulaimage_0000002106474749.png)
+            ![](../../../figures/zh-cn_formulaimage_0000002106474749.png)
 
 ## 实现原理<a name="section13229175017585"></a>
 
 **图 1**  AscendAntiQuant算法框图<a name="fig18399121215208"></a>  
-![](figures/AscendAntiQuant算法框图.png "AscendAntiQuant算法框图")
+![](../../../figures/AscendAntiQuant算法框图.png "AscendAntiQuant算法框图")
 
 如上图所示，为AscendAntiQuant的典型场景算法框图，计算过程分为如下几步，均在Vector上进行：
 
@@ -135,7 +135,7 @@
 3.  计算scale：当scale为向量时做Mul计算，当scale为scalar时做Muls计算。
 
 **图 2**  isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图<a name="fig20930182422019"></a>  
-![](figures/isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图.png "isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图")
+![](../../../figures/isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图.png "isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图")
 
 在Atlas A2 训练系列产品/Atlas A2 推理系列产品上，当输出为bfloat16时，计算过程分为如下几步：
 
@@ -147,7 +147,7 @@
 6.  dst精度转换：将tmp1转换为bf16类型。
 
 **图 3**  AscendAntiQuant PER\_TOKEN/PER\_GROUP算法框图<a name="fig585016572279"></a>  
-![](figures/AscendAntiQuant-PER_TOKEN-PER_GROUP算法框图.png "AscendAntiQuant-PER_TOKEN-PER_GROUP算法框图")
+![](../../../figures/AscendAntiQuant-PER_TOKEN-PER_GROUP算法框图.png "AscendAntiQuant-PER_TOKEN-PER_GROUP算法框图")
 
 PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
 

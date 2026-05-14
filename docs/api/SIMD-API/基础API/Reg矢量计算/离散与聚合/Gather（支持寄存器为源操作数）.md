@@ -52,7 +52,7 @@
 根据索引位置indexReg将源操作数srcReg按元素收集到结果dstReg中。收集过程如下图所示：
 
 **图 1**  Gather功能说明<a name="fig122102710193"></a>  
-![](figures/Gather功能说明.png "Gather功能说明")
+![](../../../../figures/Gather功能说明.png "Gather功能说明")
 
 ## 定义原型<a name="section620mcpsimp"></a>
 

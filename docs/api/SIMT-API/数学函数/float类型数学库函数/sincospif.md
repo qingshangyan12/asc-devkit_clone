@@ -51,7 +51,7 @@
 
 获取输入数据与π相乘的三角函数正弦值和余弦值。
 
-![](figures/zh-cn_formulaimage_0000002484776398.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776398.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

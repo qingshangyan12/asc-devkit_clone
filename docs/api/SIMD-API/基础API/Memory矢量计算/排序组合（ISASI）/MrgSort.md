@@ -55,11 +55,11 @@ MrgSort指令处理的数据一般是经过Sort32指令处理后的数据，也�
 
 -   数据类型为float，每个结构占据8Bytes。
 
-    ![](figures/zh-cn_image_0000001487548198.png)
+    ![](../../../../figures/zh-cn_image_0000001487548198.png)
 
 -   数据类型为half，每个结构也占据8Bytes，中间有2Bytes保留。
 
-    ![](figures/zh-cn_image_0000001538108293.png)
+    ![](../../../../figures/zh-cn_image_0000001538108293.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

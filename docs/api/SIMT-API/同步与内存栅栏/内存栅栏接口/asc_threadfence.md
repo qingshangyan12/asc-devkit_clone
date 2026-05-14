@@ -67,11 +67,11 @@
 
 下图展示了没有内存栅栏时可能出现的内存可见性问题：
 
-![](figures/threadface_内存可见性问题.png)
+![](../../../figures/threadface_内存可见性问题.png)
 
 通过使用asc\_threadfence\(\)接口，可解决上述内存可见性问题：
 
-![](figures/threadface_接口作用.png)
+![](../../../figures/threadface_接口作用.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

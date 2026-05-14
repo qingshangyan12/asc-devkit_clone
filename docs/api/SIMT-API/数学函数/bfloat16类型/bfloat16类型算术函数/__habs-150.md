@@ -51,7 +51,7 @@
 
 获取输入数据的绝对值。
 
-![](figures/zh-cn_formulaimage_0000002576421055.png)
+![](../../../../figures/zh-cn_formulaimage_0000002576421055.png)
 
 ## 函数原型<a name="section111357153618"></a>
 

@@ -51,7 +51,7 @@
 
 获取输入数据x的0阶第一类贝塞尔函数j0的值。
 
-![](figures/zh-cn_formulaimage_0000002484776430.png)
+![](../../../figures/zh-cn_formulaimage_0000002484776430.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

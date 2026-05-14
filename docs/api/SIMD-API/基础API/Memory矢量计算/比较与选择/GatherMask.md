@@ -264,7 +264,7 @@
     -   src1Pattern配置为用户自定义模式。src1RepeatStride = 0，src1Pattern相邻迭代间的间隔为0个datablock，所以第二次repeat仍从src1Pattern的首地址开始处理。
 
     **图 1**  Counter模式配置方式一示意图<a name="fig126588515614"></a>  
-    ![](figures/Counter模式配置方式一示意图.png "Counter模式配置方式一示意图")
+    ![](../../../../figures/Counter模式配置方式一示意图.png "Counter模式配置方式一示意图")
 
     下图为Counter模式配置方式二示意图：
 
@@ -275,7 +275,7 @@
     -   src1Pattern配置为用户自定义模式。src1RepeatStride = 0，src1Pattern相邻迭代间的间隔为0个datablock，所以第二次repeat仍从src1Pattern的首地址开始处理。
 
     **图 2**  Counter模式配置方式二示意图<a name="fig13219248171214"></a>  
-    ![](figures/Counter模式配置方式二示意图.png "Counter模式配置方式二示意图")
+    ![](../../../../figures/Counter模式配置方式二示意图.png "Counter模式配置方式二示意图")
 
 -   内置固定模式样例示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather)场景一。
 

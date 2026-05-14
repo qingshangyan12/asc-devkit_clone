@@ -199,11 +199,11 @@ A1-\>A2; B1-\>B2。
 下面通过一个具体的示例来解释LoadData2DMX结构体参数。假设A矩阵shape为（M，K），则ScaleA矩阵shape为（M，K/32），ScaleA数据类型为fp8\_e8m0\_t，ScaleA矩阵分形排布见[图1](#fig138710913432)。
 
 **图 1**  ScaleA在L0A的分形排布<a name="fig138710913432"></a>  
-![](figures/ScaleA在L0A的分形排布.png "ScaleA在L0A的分形排布")
+![](../../../../../figures/ScaleA在L0A的分形排布.png "ScaleA在L0A的分形排布")
 
 下图为ScaleA从L1搬运至L0A过程中的配置参数示意。每一行为32Byte，对应着[图1](#fig138710913432)中的一个分形。xStep为M维度分形的个数，如图中的xStep = M / 16 = 3，yStep为K维度32Byte的个数，如图中的yStep = K / 32 / 2 = 21，srcStride和dstStride同理，表示在K维度上32Byte的个数。
 
-![](figures/Nd2Nz转换示意图.png)
+![](../../../../../figures/Nd2Nz转换示意图.png)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

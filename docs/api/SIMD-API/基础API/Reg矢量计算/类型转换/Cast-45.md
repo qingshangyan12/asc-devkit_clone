@@ -1282,7 +1282,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask)
     -   对于bfloat16 to float4类型，输入bfloat16 inf或超出fp4x2\_e2m1\_t/fp4x2\_e1m2\_t数据最值范围时，会返回对应符号的fp4x2\_e2m1\_t/fp4x2\_e1m2\_t最值；输入nan时，fp4x2\_e2m1\_t/fp4x2\_e1m2\_t输出0。
     -   对于bfloat16\_t到fp4x2\_e2m1\_t/fp4x2\_e1m2\_t数据类型的转换，指令会以每2个元素为一对进行读写，mask有效位以偶数位为准，例如 10 00 00 00 10 10 00 10 等效于11 11 00 00 10 10 00 11。
 
-        ![](figures/3-3-4-8-1.png)
+        ![](../../../../figures/3-3-4-8-1.png)
 
     -   对于fp8\_e8m0\_t类型：
 

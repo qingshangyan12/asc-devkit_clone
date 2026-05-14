@@ -51,7 +51,7 @@
 
 根据mask对输入数据srcReg0、srcReg1执行按元素相除操作，将结果写入dstReg。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000001957629005.png)
+![](../../../../figures/zh-cn_formulaimage_0000001957629005.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
