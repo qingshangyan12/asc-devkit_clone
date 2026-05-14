@@ -23,9 +23,9 @@
 #define IMPL_TENSOR_API_UTILS_UTILS_IMPL_H
 
 #include "include/tensor_api/utils/utils.h"
+#include "impl/tensor_api/utils/macro_impl.h"
 #include "impl/tensor_api/utils/constant_impl.h"
 #include "impl/tensor_api/utils/extra_impl.h"
-#include "impl/tensor_api/utils/macro_impl.h"
 #include "impl/tensor_api/utils/map_impl.h"
 #include "impl/tensor_api/utils/location_impl.h"
 
