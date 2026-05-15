@@ -7,7 +7,7 @@ AI CPU是位于Device侧ARM64架构的处理器，其具备与AI Core相同的�
 
 本节介绍的AI CPU编程仅支持如下产品型号：
 
--   Ascend 950PR/Ascend 950DT
+-   Atlas 350 加速卡
 -   Atlas A3 训练系列产品/Atlas A3 推理系列产品
 -   Atlas A2 训练系列产品/Atlas A2 推理系列产品
 

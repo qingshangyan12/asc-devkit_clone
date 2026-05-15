@@ -149,7 +149,7 @@ MxMatmul的计算公式为：C = \(scaleA ⊗ A\) \* \(scaleB ⊗ B\) + Bias，�
 </td>
 <td class="cellrowborder" valign="top" width="17.72%" headers="mcps1.2.7.1.5 "><p id="zh-cn_topic_0000002270097206_p6777827162018"><a name="zh-cn_topic_0000002270097206_p6777827162018"></a><a name="zh-cn_topic_0000002270097206_p6777827162018"></a>float/half/bfloat16_t</p>
 </td>
-<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p355413382268"><a name="p355413382268"></a><a name="p355413382268"></a><span id="zh-cn_topic_0000002270097206_ph3777122762015"><a name="zh-cn_topic_0000002270097206_ph3777122762015"></a><a name="zh-cn_topic_0000002270097206_ph3777122762015"></a>Ascend 950PR/Ascend 950DT</span></p>
+<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p355413382268"><a name="p355413382268"></a><a name="p355413382268"></a><span id="zh-cn_topic_0000002270097206_ph3777122762015"><a name="zh-cn_topic_0000002270097206_ph3777122762015"></a><a name="zh-cn_topic_0000002270097206_ph3777122762015"></a>Atlas 350 加速卡</span></p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000002270097206_row11845153220193"><td class="cellrowborder" valign="top" width="10.41%" headers="mcps1.2.7.1.1 "><p id="zh-cn_topic_0000002270097206_p377742710204"><a name="zh-cn_topic_0000002270097206_p377742710204"></a><a name="zh-cn_topic_0000002270097206_p377742710204"></a>fp4x2_e2m1_t</p>
@@ -162,7 +162,7 @@ MxMatmul的计算公式为：C = \(scaleA ⊗ A\) \* \(scaleB ⊗ B\) + Bias，�
 </td>
 <td class="cellrowborder" valign="top" width="17.72%" headers="mcps1.2.7.1.5 "><p id="zh-cn_topic_0000002270097206_p57779278201"><a name="zh-cn_topic_0000002270097206_p57779278201"></a><a name="zh-cn_topic_0000002270097206_p57779278201"></a>float/half/bfloat16_t</p>
 </td>
-<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p15680154020265"><a name="p15680154020265"></a><a name="p15680154020265"></a><span id="zh-cn_topic_0000002270097206_ph1677719278204"><a name="zh-cn_topic_0000002270097206_ph1677719278204"></a><a name="zh-cn_topic_0000002270097206_ph1677719278204"></a>Ascend 950PR/Ascend 950DT</span></p>
+<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p15680154020265"><a name="p15680154020265"></a><a name="p15680154020265"></a><span id="zh-cn_topic_0000002270097206_ph1677719278204"><a name="zh-cn_topic_0000002270097206_ph1677719278204"></a><a name="zh-cn_topic_0000002270097206_ph1677719278204"></a>Atlas 350 加速卡</span></p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000002270097206_row0845173241915"><td class="cellrowborder" valign="top" width="10.41%" headers="mcps1.2.7.1.1 "><p id="zh-cn_topic_0000002270097206_p1677712716209"><a name="zh-cn_topic_0000002270097206_p1677712716209"></a><a name="zh-cn_topic_0000002270097206_p1677712716209"></a>fp8_e4m3fn_t</p>
@@ -175,7 +175,7 @@ MxMatmul的计算公式为：C = \(scaleA ⊗ A\) \* \(scaleB ⊗ B\) + Bias，�
 </td>
 <td class="cellrowborder" valign="top" width="17.72%" headers="mcps1.2.7.1.5 "><p id="zh-cn_topic_0000002270097206_p37781627172014"><a name="zh-cn_topic_0000002270097206_p37781627172014"></a><a name="zh-cn_topic_0000002270097206_p37781627172014"></a>float/half/bfloat16_t</p>
 </td>
-<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p16938423262"><a name="p16938423262"></a><a name="p16938423262"></a><span id="zh-cn_topic_0000002270097206_ph77781527182016"><a name="zh-cn_topic_0000002270097206_ph77781527182016"></a><a name="zh-cn_topic_0000002270097206_ph77781527182016"></a>Ascend 950PR/Ascend 950DT</span></p>
+<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p16938423262"><a name="p16938423262"></a><a name="p16938423262"></a><span id="zh-cn_topic_0000002270097206_ph77781527182016"><a name="zh-cn_topic_0000002270097206_ph77781527182016"></a><a name="zh-cn_topic_0000002270097206_ph77781527182016"></a>Atlas 350 加速卡</span></p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000002270097206_row178451932101918"><td class="cellrowborder" valign="top" width="10.41%" headers="mcps1.2.7.1.1 "><p id="zh-cn_topic_0000002270097206_p3778172722012"><a name="zh-cn_topic_0000002270097206_p3778172722012"></a><a name="zh-cn_topic_0000002270097206_p3778172722012"></a>fp8_e5m2_t</p>
@@ -188,7 +188,7 @@ MxMatmul的计算公式为：C = \(scaleA ⊗ A\) \* \(scaleB ⊗ B\) + Bias，�
 </td>
 <td class="cellrowborder" valign="top" width="17.72%" headers="mcps1.2.7.1.5 "><p id="zh-cn_topic_0000002270097206_p18778102710208"><a name="zh-cn_topic_0000002270097206_p18778102710208"></a><a name="zh-cn_topic_0000002270097206_p18778102710208"></a>float/half/bfloat16_t</p>
 </td>
-<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p1366354422615"><a name="p1366354422615"></a><a name="p1366354422615"></a><span id="zh-cn_topic_0000002270097206_ph1877832711205"><a name="zh-cn_topic_0000002270097206_ph1877832711205"></a><a name="zh-cn_topic_0000002270097206_ph1877832711205"></a>Ascend 950PR/Ascend 950DT</span></p>
+<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p1366354422615"><a name="p1366354422615"></a><a name="p1366354422615"></a><span id="zh-cn_topic_0000002270097206_ph1877832711205"><a name="zh-cn_topic_0000002270097206_ph1877832711205"></a><a name="zh-cn_topic_0000002270097206_ph1877832711205"></a>Atlas 350 加速卡</span></p>
 </td>
 </tr>
 </tbody>
@@ -341,7 +341,7 @@ Kernel侧的关键步骤介绍如下：
 <tbody><tr id="zh-cn_topic_0000002270097206_row207591442162020"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p57591442162010"><a name="zh-cn_topic_0000002270097206_p57591442162010"></a><a name="zh-cn_topic_0000002270097206_p57591442162010"></a>POSITION</p>
 </td>
 <td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p126441432182115"><a name="zh-cn_topic_0000002270097206_p126441432182115"></a><a name="zh-cn_topic_0000002270097206_p126441432182115"></a>左右矩阵的内存逻辑位置。</p>
-<p id="zh-cn_topic_0000002270097206_p11644432192117"><a name="zh-cn_topic_0000002270097206_p11644432192117"></a><a name="zh-cn_topic_0000002270097206_p11644432192117"></a>针对<span id="zh-cn_topic_0000002270097206_ph498220912720"><a name="zh-cn_topic_0000002270097206_ph498220912720"></a><a name="zh-cn_topic_0000002270097206_ph498220912720"></a>Ascend 950PR/Ascend 950DT</span>：</p>
+<p id="zh-cn_topic_0000002270097206_p11644432192117"><a name="zh-cn_topic_0000002270097206_p11644432192117"></a><a name="zh-cn_topic_0000002270097206_p11644432192117"></a>针对<span id="zh-cn_topic_0000002270097206_ph498220912720"><a name="zh-cn_topic_0000002270097206_ph498220912720"></a><a name="zh-cn_topic_0000002270097206_ph498220912720"></a>Atlas 350 加速卡</span>：</p>
 <p id="p199760149278"><a name="p199760149278"></a><a name="p199760149278"></a>A矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM</p>
 <p id="p1297671462717"><a name="p1297671462717"></a><a name="p1297671462717"></a>B矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM</p>
 <p id="zh-cn_topic_0000002270097206_p1267723333010"><a name="zh-cn_topic_0000002270097206_p1267723333010"></a><a name="zh-cn_topic_0000002270097206_p1267723333010"></a>注意：A、B矩阵设置为TPosition::TSCM时，对应的Format仅支持CubeFormat::NZ。</p>
@@ -350,7 +350,7 @@ Kernel侧的关键步骤介绍如下：
 <tr id="zh-cn_topic_0000002270097206_row13470153112518"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p9507104014512"><a name="zh-cn_topic_0000002270097206_p9507104014512"></a><a name="zh-cn_topic_0000002270097206_p9507104014512"></a>SCALE_POSITION</p>
 </td>
 <td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p3507174020512"><a name="zh-cn_topic_0000002270097206_p3507174020512"></a><a name="zh-cn_topic_0000002270097206_p3507174020512"></a>量化系数矩阵的内存逻辑位置。</p>
-<p id="zh-cn_topic_0000002270097206_p145073401055"><a name="zh-cn_topic_0000002270097206_p145073401055"></a><a name="zh-cn_topic_0000002270097206_p145073401055"></a>针对<span id="zh-cn_topic_0000002270097206_ph185821514192716"><a name="zh-cn_topic_0000002270097206_ph185821514192716"></a><a name="zh-cn_topic_0000002270097206_ph185821514192716"></a>Ascend 950PR/Ascend 950DT</span>：</p>
+<p id="zh-cn_topic_0000002270097206_p145073401055"><a name="zh-cn_topic_0000002270097206_p145073401055"></a><a name="zh-cn_topic_0000002270097206_p145073401055"></a>针对<span id="zh-cn_topic_0000002270097206_ph185821514192716"><a name="zh-cn_topic_0000002270097206_ph185821514192716"></a><a name="zh-cn_topic_0000002270097206_ph185821514192716"></a>Atlas 350 加速卡</span>：</p>
 <p id="p28081820162716"><a name="p28081820162716"></a><a name="p28081820162716"></a>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM</p>
 <p id="p08081820132714"><a name="p08081820132714"></a><a name="p08081820132714"></a>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM</p>
 <p id="zh-cn_topic_0000002270097206_p274171193714"><a name="zh-cn_topic_0000002270097206_p274171193714"></a><a name="zh-cn_topic_0000002270097206_p274171193714"></a>注意：scaleA、scaleB矩阵设置为TPosition::TSCM时，对应的SCALE_FORMAT参数仅支持CubeFormat::NZ。</p>
@@ -359,7 +359,7 @@ Kernel侧的关键步骤介绍如下：
 <tr id="zh-cn_topic_0000002270097206_row1175904217207"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p5537172115157"><a name="zh-cn_topic_0000002270097206_p5537172115157"></a><a name="zh-cn_topic_0000002270097206_p5537172115157"></a>FORMAT</p>
 </td>
 <td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p6310416287"><a name="zh-cn_topic_0000002270097206_p6310416287"></a><a name="zh-cn_topic_0000002270097206_p6310416287"></a>数据的物理排布格式。</p>
-<p id="zh-cn_topic_0000002270097206_p1175934213209"><a name="zh-cn_topic_0000002270097206_p1175934213209"></a><a name="zh-cn_topic_0000002270097206_p1175934213209"></a>针对<span id="zh-cn_topic_0000002270097206_ph1712219180275"><a name="zh-cn_topic_0000002270097206_ph1712219180275"></a><a name="zh-cn_topic_0000002270097206_ph1712219180275"></a>Ascend 950PR/Ascend 950DT</span>：</p>
+<p id="zh-cn_topic_0000002270097206_p1175934213209"><a name="zh-cn_topic_0000002270097206_p1175934213209"></a><a name="zh-cn_topic_0000002270097206_p1175934213209"></a>针对<span id="zh-cn_topic_0000002270097206_ph1712219180275"><a name="zh-cn_topic_0000002270097206_ph1712219180275"></a><a name="zh-cn_topic_0000002270097206_ph1712219180275"></a>Atlas 350 加速卡</span>：</p>
 <p id="p1638262618270"><a name="p1638262618270"></a><a name="p1638262618270"></a>A矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR</p>
 <p id="p183823268273"><a name="p183823268273"></a><a name="p183823268273"></a>B矩阵可设置为CubeFormat::ND，CubeFormat::NZ</p>
 <p id="zh-cn_topic_0000002270097206_p9185171813367"><a name="zh-cn_topic_0000002270097206_p9185171813367"></a><a name="zh-cn_topic_0000002270097206_p9185171813367"></a>注意：NZ排布格式，A/B的排布格式请参考<a href="../基础知识.md#zh-cn_topic_0000001622194138_section1453415011">数据格式</a>。</p>
@@ -368,7 +368,7 @@ Kernel侧的关键步骤介绍如下：
 <tr id="zh-cn_topic_0000002270097206_row167591242142019"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p675984214203"><a name="zh-cn_topic_0000002270097206_p675984214203"></a><a name="zh-cn_topic_0000002270097206_p675984214203"></a>TYPE</p>
 </td>
 <td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="p33861110112812"><a name="p33861110112812"></a><a name="p33861110112812"></a>数据类型。</p>
-<p id="zh-cn_topic_0000002270097206_p86091832163315"><a name="zh-cn_topic_0000002270097206_p86091832163315"></a><a name="zh-cn_topic_0000002270097206_p86091832163315"></a>针对<span id="zh-cn_topic_0000002270097206_ph11118321102719"><a name="zh-cn_topic_0000002270097206_ph11118321102719"></a><a name="zh-cn_topic_0000002270097206_ph11118321102719"></a>Ascend 950PR/Ascend 950DT</span>：</p>
+<p id="zh-cn_topic_0000002270097206_p86091832163315"><a name="zh-cn_topic_0000002270097206_p86091832163315"></a><a name="zh-cn_topic_0000002270097206_p86091832163315"></a>针对<span id="zh-cn_topic_0000002270097206_ph11118321102719"><a name="zh-cn_topic_0000002270097206_ph11118321102719"></a><a name="zh-cn_topic_0000002270097206_ph11118321102719"></a>Atlas 350 加速卡</span>：</p>
 <p id="p9107163120275"><a name="p9107163120275"></a><a name="p9107163120275"></a>A矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t</p>
 <p id="p161081731182712"><a name="p161081731182712"></a><a name="p161081731182712"></a>B矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t</p>
 <p id="zh-cn_topic_0000002270097206_p1732612596387"><a name="zh-cn_topic_0000002270097206_p1732612596387"></a><a name="zh-cn_topic_0000002270097206_p1732612596387"></a><strong id="zh-cn_topic_0000002270097206_b8326205913819"><a name="zh-cn_topic_0000002270097206_b8326205913819"></a><a name="zh-cn_topic_0000002270097206_b8326205913819"></a>注意：具体数据类型组合关系请参考</strong><a href="#zh-cn_topic_0000002270097206_table5383144710452">MxMatmul支持数据类型</a>。</p>
@@ -384,7 +384,7 @@ Kernel侧的关键步骤介绍如下：
 <tr id="zh-cn_topic_0000002270097206_row68812038163520"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p54471329153612"><a name="zh-cn_topic_0000002270097206_p54471329153612"></a><a name="zh-cn_topic_0000002270097206_p54471329153612"></a>SRCPOS</p>
 </td>
 <td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p204471629153618"><a name="zh-cn_topic_0000002270097206_p204471629153618"></a><a name="zh-cn_topic_0000002270097206_p204471629153618"></a>A/B矩阵的POSITION参数配置为TPosition::TSCM时，要设置TSCM中矩阵数据的来源的内存逻辑位置，默认为TPosition::GM。</p>
-<p id="zh-cn_topic_0000002270097206_p2231172914619"><a name="zh-cn_topic_0000002270097206_p2231172914619"></a><a name="zh-cn_topic_0000002270097206_p2231172914619"></a>针对<span id="zh-cn_topic_0000002270097206_ph1231182974620"><a name="zh-cn_topic_0000002270097206_ph1231182974620"></a><a name="zh-cn_topic_0000002270097206_ph1231182974620"></a>Ascend 950PR/Ascend 950DT</span>：</p>
+<p id="zh-cn_topic_0000002270097206_p2231172914619"><a name="zh-cn_topic_0000002270097206_p2231172914619"></a><a name="zh-cn_topic_0000002270097206_p2231172914619"></a>针对<span id="zh-cn_topic_0000002270097206_ph1231182974620"><a name="zh-cn_topic_0000002270097206_ph1231182974620"></a><a name="zh-cn_topic_0000002270097206_ph1231182974620"></a>Atlas 350 加速卡</span>：</p>
 <p id="p13320143342815"><a name="p13320143342815"></a><a name="p13320143342815"></a>A矩阵可设置为TPosition::GM，TPosition::VECOUT</p>
 <p id="p12320163310288"><a name="p12320163310288"></a><a name="p12320163310288"></a>B矩阵可设置为TPosition::GM，TPosition::VECOUT</p>
 </td>
@@ -392,7 +392,7 @@ Kernel侧的关键步骤介绍如下：
 <tr id="zh-cn_topic_0000002270097206_row7921164017113"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p11226185115114"><a name="zh-cn_topic_0000002270097206_p11226185115114"></a><a name="zh-cn_topic_0000002270097206_p11226185115114"></a>SCALE_FORMAT</p>
 </td>
 <td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p78145661612"><a name="zh-cn_topic_0000002270097206_p78145661612"></a><a name="zh-cn_topic_0000002270097206_p78145661612"></a>量化系数矩阵的物理排布格式，详细介绍请参考<a href="#zh-cn_topic_0000002270097206_fig107863142019">数据格式</a>。默认值为FORMAT参数的取值。</p>
-<p id="zh-cn_topic_0000002270097206_p158141465164"><a name="zh-cn_topic_0000002270097206_p158141465164"></a><a name="zh-cn_topic_0000002270097206_p158141465164"></a>针对<span id="zh-cn_topic_0000002270097206_ph695882732713"><a name="zh-cn_topic_0000002270097206_ph695882732713"></a><a name="zh-cn_topic_0000002270097206_ph695882732713"></a>Ascend 950PR/Ascend 950DT</span>：</p>
+<p id="zh-cn_topic_0000002270097206_p158141465164"><a name="zh-cn_topic_0000002270097206_p158141465164"></a><a name="zh-cn_topic_0000002270097206_p158141465164"></a>针对<span id="zh-cn_topic_0000002270097206_ph695882732713"><a name="zh-cn_topic_0000002270097206_ph695882732713"></a><a name="zh-cn_topic_0000002270097206_ph695882732713"></a>Atlas 350 加速卡</span>：</p>
 <p id="p15845121173011"><a name="p15845121173011"></a><a name="p15845121173011"></a>scaleA矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR</p>
 <p id="p884571116308"><a name="p884571116308"></a><a name="p884571116308"></a>scaleB矩阵可设置为CubeFormat::ND，CubeFormat::NZ</p>
 <p id="zh-cn_topic_0000002270097206_p7332111273413"><a name="zh-cn_topic_0000002270097206_p7332111273413"></a><a name="zh-cn_topic_0000002270097206_p7332111273413"></a>注意：</p>
@@ -410,7 +410,7 @@ Kernel侧的关键步骤介绍如下：
 <tr id="zh-cn_topic_0000002270097206_row11254846161912"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p6158144912199"><a name="zh-cn_topic_0000002270097206_p6158144912199"></a><a name="zh-cn_topic_0000002270097206_p6158144912199"></a>SCALE_SRCPOS</p>
 </td>
 <td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p642071011551"><a name="zh-cn_topic_0000002270097206_p642071011551"></a><a name="zh-cn_topic_0000002270097206_p642071011551"></a>scaleA、scaleB矩阵的SCALE_POSITION参数设置为TPosition::TSCM时，需要通过本参数设置TSCM中矩阵数据来源的内存逻辑位置，默认值为SRCPOS参数的取值。</p>
-<p id="zh-cn_topic_0000002270097206_p134201910115519"><a name="zh-cn_topic_0000002270097206_p134201910115519"></a><a name="zh-cn_topic_0000002270097206_p134201910115519"></a>针对<span id="zh-cn_topic_0000002270097206_ph2420111019559"><a name="zh-cn_topic_0000002270097206_ph2420111019559"></a><a name="zh-cn_topic_0000002270097206_ph2420111019559"></a>Ascend 950PR/Ascend 950DT</span>：</p>
+<p id="zh-cn_topic_0000002270097206_p134201910115519"><a name="zh-cn_topic_0000002270097206_p134201910115519"></a><a name="zh-cn_topic_0000002270097206_p134201910115519"></a>针对<span id="zh-cn_topic_0000002270097206_ph2420111019559"><a name="zh-cn_topic_0000002270097206_ph2420111019559"></a><a name="zh-cn_topic_0000002270097206_ph2420111019559"></a>Atlas 350 加速卡</span>：</p>
 <p id="p138204923010"><a name="p138204923010"></a><a name="p138204923010"></a>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT</p>
 <p id="p68316492306"><a name="p68316492306"></a><a name="p68316492306"></a>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT</p>
 </td>

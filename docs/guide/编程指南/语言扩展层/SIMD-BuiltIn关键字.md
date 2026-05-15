@@ -17,7 +17,7 @@
     </th>
     </tr>
     </thead>
-    <tbody><tr id="row1986372151716"><td class="cellrowborder" valign="top" width="49.59%" headers="mcps1.2.3.1.1 "><p id="p2864142161711"><a name="p2864142161711"></a><a name="p2864142161711"></a><span id="ph2272194216543"><a name="ph2272194216543"></a><a name="ph2272194216543"></a>Ascend 950PR/Ascend 950DT</span></p>
+    <tbody><tr id="row1986372151716"><td class="cellrowborder" valign="top" width="49.59%" headers="mcps1.2.3.1.1 "><p id="p2864142161711"><a name="p2864142161711"></a><a name="p2864142161711"></a><span id="ph2272194216543"><a name="ph2272194216543"></a><a name="ph2272194216543"></a>Atlas 350 加速卡</span></p>
     </td>
     <td class="cellrowborder" valign="top" width="50.41%" headers="mcps1.2.3.1.2 "><p id="p5880145213281"><a name="p5880145213281"></a><a name="p5880145213281"></a>3510</p>
     </td>

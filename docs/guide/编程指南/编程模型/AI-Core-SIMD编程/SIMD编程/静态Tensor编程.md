@@ -679,7 +679,7 @@
 </tbody>
 </table>
 
-**表 4**  针对Ascend 950PR/Ascend 950DT，支持的API范围
+**表 4**  针对Atlas 350 加速卡，支持的API范围
 
 <a name="table1798673512413"></a>
 <table><thead align="left"><tr id="row109864353413"><th class="cellrowborder" valign="top" width="29.630000000000003%" id="mcps1.2.4.1.1"><p id="p1098613524117"><a name="p1098613524117"></a><a name="p1098613524117"></a>接口分类</p>

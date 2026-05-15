@@ -8,7 +8,7 @@
 >- Tiling下沉功能仅支持如下产品型号：
 >    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 >    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
->    - Ascend 950PR/Ascend 950DT，暂不支持
+>    - Atlas 350 加速卡，暂不支持
 
 自定义算子使能Tiling下沉的步骤如下，完整样例请参考[Tiling下沉算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/00_compilation/custom_op)。
 
