@@ -42,31 +42,31 @@ using LayoutFormatSet = TupleMap<
     Std::tuple<ScaleBNDLayoutPtn, MakeScaleBNDFrameLayout>,
     Std::tuple<ScaleBDNLayoutPtn, MakeScaleBDNFrameLayout>>;
 
-using FormatTraitSet = TupleMap<
-    Std::tuple<NZLayoutPtn, LayoutTraitDefault>,
-    Std::tuple<NDLayoutPtn, LayoutTraitDefault>,
-    Std::tuple<DNLayoutPtn, LayoutTraitDefault>,
-    Std::tuple<NDExtLayoutPtn, LayoutTraitDefault>,
-    Std::tuple<DNExtLayoutPtn, LayoutTraitDefault>,
-    Std::tuple<NNLayoutPtn, LayoutTraitDefault>,
-    Std::tuple<ZZLayoutPtn, LayoutTraitDefault>,
-    Std::tuple<ZNLayoutPtn, LayoutTraitDefault>,
-    Std::tuple<ScaleANDLayoutPtn, LayoutTraitScale>,
-    Std::tuple<ScaleADNLayoutPtn, LayoutTraitScale>,
-    Std::tuple<ScaleBNDLayoutPtn, LayoutTraitScale>,
-    Std::tuple<ScaleBDNLayoutPtn, LayoutTraitScale>>;
+template <typename T, size_t C0>
+struct LayoutTrait {
+    using type = T;
+    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
+};
 
 template <typename T = uint16_t, size_t C0 = C0_ELEMENT<T>>
-struct LayoutTraitDefault {
-    using type = T;
-    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
-};
+using LayoutTraitDefault = LayoutTrait<T, C0>;
 
 template <typename T = fp8_e8m0_t, size_t C0 = 2 / sizeof(T)>
-struct LayoutTraitScale {
-    using type = T;
-    static constexpr auto C0_ELEMENT = Std::Int<C0>{};
-};
+using LayoutTraitScale = LayoutTraitDefault<T, C0>;
+
+using FormatTraitSet = TupleMap<
+    Std::tuple<NZLayoutPtn, LayoutTraitDefault<>>,
+    Std::tuple<NDLayoutPtn, LayoutTraitDefault<>>,
+    Std::tuple<DNLayoutPtn, LayoutTraitDefault<>>,
+    Std::tuple<NDExtLayoutPtn, LayoutTraitDefault<>>,
+    Std::tuple<DNExtLayoutPtn, LayoutTraitDefault<>>,
+    Std::tuple<NNLayoutPtn, LayoutTraitDefault<>>,
+    Std::tuple<ZZLayoutPtn, LayoutTraitDefault<>>,
+    Std::tuple<ZNLayoutPtn, LayoutTraitDefault<>>,
+    Std::tuple<ScaleANDLayoutPtn, LayoutTraitScale<>>,
+    Std::tuple<ScaleADNLayoutPtn, LayoutTraitScale<>>,
+    Std::tuple<ScaleBNDLayoutPtn, LayoutTraitScale<>>,
+    Std::tuple<ScaleBDNLayoutPtn, LayoutTraitScale<>>>;
 
 template <typename T, typename = void>
 struct IsFrameLayoutTrait : Std::false_type {};
