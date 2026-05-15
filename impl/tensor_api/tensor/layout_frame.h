@@ -100,7 +100,7 @@ __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) 
 
 template <typename LayoutPattern, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
-    using TraitType = typename LayoutTraitSet::template Get<LayoutPattern>;
+    using TraitType = typename FormatTraitSet::template Get<LayoutPattern>;
     static_assert(!Std::is_same_v<TraitType, EmptyValue>, "Unsupported layout pattern.");
     return MakeFrameLayout<LayoutPattern, TraitType>(args...);
 }
