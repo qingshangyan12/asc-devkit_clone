@@ -97,7 +97,7 @@ __aicore__ inline void AcoshCompute(
 
     // x^2 - 1
     Adds<float, false>(
-        tmpFloatBuffer2, tmpFloatBuffer2, static_cast<half>(ACOSH_NEG_ONE), MASK_PLACEHOLDER, 1, unaryParams);
+        tmpFloatBuffer2, tmpFloatBuffer2, static_cast<float>(ACOSH_NEG_ONE), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 
     // sqrt(x^2 - 1)
