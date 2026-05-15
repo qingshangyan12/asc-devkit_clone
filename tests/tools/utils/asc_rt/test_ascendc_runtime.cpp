@@ -234,6 +234,31 @@ typedef enum KernelType : unsigned int {
     K_TYPE_MAX
 } KernelTypeUt;
 
+typedef struct {
+    unsigned int ktype;
+} AscendCFunMetaKTypeUt;
+
+typedef struct {
+    unsigned short taskRation0;
+    unsigned short taskRation1;
+} AscendCFunMetaMixCoreTypeUt;
+
+rtError_t RtFunctionGetMetaInfoSuccessStub(const rtFuncHandle funcHandle, const rtFunctionMetaType type, void *data,
+    const uint32_t length)
+{
+    if (type == RT_FUNCTION_TYPE_KERNEL_TYPE) {
+        reinterpret_cast<AscendCFunMetaKTypeUt*>(data)->ktype = K_TYPE_AIV;
+        return 0;
+    }
+    if (type == RT_FUNCTION_TYPE_MIX_TASK_RATION) {
+        AscendCFunMetaMixCoreTypeUt* mixRation = reinterpret_cast<AscendCFunMetaMixCoreTypeUt*>(data);
+        mixRation->taskRation0 = 1;
+        mixRation->taskRation1 = 2;
+        return 0;
+    }
+    return 1;
+}
+
 uint32_t AscendCFunctionGetMetaInfoKtypeStubMax(void *funcHandle, unsigned int *curKernelType)
 {
     *curKernelType = K_TYPE_MAX;
@@ -391,18 +416,21 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_950) {
 TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtype) {
     void* funcHandle = nullptr;
     unsigned int kernelType = 5;
-    MOCKER(rtFunctionGetMetaInfo).stubs().will(returnValue(0));
+    MOCKER(rtFunctionGetMetaInfo).stubs().will(invoke(RtFunctionGetMetaInfoSuccessStub));
     uint32_t ret = AscendCFunctionGetMetaInfoKtype(funcHandle, &kernelType);
     EXPECT_EQ(ret, 0);
+    EXPECT_EQ(kernelType, K_TYPE_AIV);
 }
 
 TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoCoreRation) {
     void* funcHandle = nullptr;
     unsigned short aicRation;
     unsigned short aivRation;
-    MOCKER(rtFunctionGetMetaInfo).stubs().will(returnValue(0));
+    MOCKER(rtFunctionGetMetaInfo).stubs().will(invoke(RtFunctionGetMetaInfoSuccessStub));
     uint32_t ret = AscendCFunctionGetMetaInfoCoreRation(funcHandle, &aicRation, &aivRation);
     EXPECT_EQ(ret, 0);
+    EXPECT_EQ(aicRation, 1);
+    EXPECT_EQ(aivRation, 2);
 }
 
 TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtypeFailed) {
