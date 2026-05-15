@@ -31,7 +31,7 @@ struct SinConfig {
     SinAlgo algo = SinAlgo::POLYNOMIAL_APPROXIMATION;
 };
 
-#if !defined(__NPU_ARCH__)
+#if !defined(defaultSinConfig)
 constexpr SinConfig defaultSinConfig;
 #endif
 }; // namespace AscendC

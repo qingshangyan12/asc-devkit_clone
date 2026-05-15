@@ -29,7 +29,7 @@
 #include "kernel_pop_stack_buffer.h"
  
 namespace AscendC {
-#if !defined(__NPU_ARCH__)
+#if !defined(DEFAULT_CLAMP_CONFIG)
 struct ClampConfig {
     bool isReuseSource;
 };
@@ -148,7 +148,7 @@ template <const ClampConfig& config = DEFAULT_CLAMP_CONFIG, typename T, typename
 __aicore__ inline void Clamp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max,
     const uint32_t count)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     ClampImpl<config, T, U, S>(dst, src, min, max, count);
 #endif
 }
