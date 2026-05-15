@@ -114,7 +114,7 @@ __aicore__ inline void CosRound(
     /*
     k=round(x/π + 1/2), x0=x-kπ, x0 belongs to [-π, 0], (x0 + π/2) belongs to [-π/2, π/2]
     π=π_0+π_1+π_2+π_3+π_4 achieve final precision compensation.
-    Final solution�?
+    Final solution�?
     k = round(x * invpi + 1/2)
     x -= k * pi_0
     x -= k * pi_1
@@ -168,7 +168,7 @@ __aicore__ inline void SignCompute(
     // sign
     Add<float, false>(dstTensor, dstTensor, roundTensor, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
-    Adds<float, false>(dstTensor, dstTensor, 1, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(dstTensor, dstTensor, static_cast<float>(1), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 }
 
@@ -189,22 +189,22 @@ __aicore__ inline void CosPolynomialApproximation(
     // res_up = mul(x^2, 2.604926501e-6)
     Muls<float, false>(roundTensor, kpi, COS_RES_MULTI_SCA, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
-    Adds<float, false>(roundTensor, roundTensor, COS_RES_ADDICT_UP, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(roundTensor, roundTensor, static_cast<float>(COS_RES_ADDICT_UP), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
     // res_up = mul(res_up, x^2)
     Mul<float, false>(roundTensor, roundTensor, kpi, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
-    Adds<float, false>(roundTensor, roundTensor, COS_2ADDS, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(roundTensor, roundTensor, static_cast<float>(COS_2ADDS), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
     // res_up = mul(res_up, x^2)
     Mul<float, false>(roundTensor, roundTensor, kpi, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
-    Adds<float, false>(roundTensor, roundTensor, COS_3ADDS, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(roundTensor, roundTensor, static_cast<float>(COS_3ADDS), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
     // res_up = mul(res_up, x^2)
     Mul<float, false>(roundTensor, roundTensor, kpi, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
-    Adds<float, false>(roundTensor, roundTensor, 1.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(roundTensor, roundTensor, static_cast<float>(1.0), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
     // sin(x) = xP(x)
     Mul<float, false>(roundTensor, roundTensor, inputX, MASK_PLACEHOLDER, 1, binaryParams);
@@ -212,9 +212,9 @@ __aicore__ inline void CosPolynomialApproximation(
     Mul<float, false>(dstTensor, roundTensor, dstTensor, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
 
-    Mins<float, false>(dstTensor, dstTensor, 1.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Mins<float, false>(dstTensor, dstTensor, static_cast<float>(1.0), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
-    Maxs<float, false>(dstTensor, dstTensor, -1.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Maxs<float, false>(dstTensor, dstTensor, static_cast<float>(-1.0), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 }
 
