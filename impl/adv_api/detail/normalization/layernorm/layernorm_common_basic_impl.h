@@ -128,7 +128,7 @@ __aicore__ inline void BroadcastLastDim(
     LocalTensor<int16_t> maskLocal = src.ReinterpretCast<int16_t>();
 
     const UnaryRepeatParams unaryParams;
-    Muls<int16_t, false>(maskLocal, maskLocal, 0, MASK_PLACEHOLDER, 1, unaryParams);
+    Muls<int16_t, false>(maskLocal, maskLocal, static_cast<int16_t>(0), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 
     LocalTensor<uint16_t> maskLocalTmp = maskLocal.ReinterpretCast<uint16_t>();
