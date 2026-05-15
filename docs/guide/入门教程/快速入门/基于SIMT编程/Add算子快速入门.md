@@ -1,7 +1,6 @@
 # Add算子快让入门<a name="ZH-CN_TOPIC_0000002509977650"></a>
 
-本示例基于 Ascend C SIMT 实现经典 Add 算子，全面讲解设备侧核函数实现、主机侧调用逻辑，以及代码编译与运行的全流程。开始前请参考[环境准备](../../环境准备.md)安装所需的Toolkit包，完整样例请见 [Add](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/01_add)。
-
+本示例基于 Ascend C SIMT实现经典Add算子，全面讲解设备侧核函数实现、主机侧调用逻辑，以及代码编译与运行的全流程。开始前请参考[环境准备](../../环境准备.md)安装所需的Toolkit包，完整样例请见[Add](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/01_add)。
 
  - **Add 算子功能介绍**：
     Add算子的数学表达式为：
