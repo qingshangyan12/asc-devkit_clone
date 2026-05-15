@@ -147,6 +147,7 @@ struct FixpipeParamsV220 {
     bool isChannelSplit = false;
 };
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // 根据模板参数选结构体
 template <CO2Layout format>
 struct TransformParams {};
@@ -209,6 +210,7 @@ struct FixpipeParamsC310 : FixpipeParamsArch3510<format> {
                                 const uint16_t srcStrideIn, const uint32_t dstStrideIn)
         : FixpipeParamsArch3510<format>(nSizeIn, mSizeIn, srcStrideIn, dstStrideIn) {}
 };
+#endif
 
 using FixpipeParamsM300 = FixpipeParamsV220;
 using FixpipeParamsM310 = FixpipeParamsV220;
