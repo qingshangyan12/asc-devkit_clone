@@ -52,7 +52,7 @@ template <typename T = uint16_t, size_t C0 = C0_ELEMENT<T>>
 using LayoutTraitDefault = LayoutTrait<T, C0>;
 
 template <typename T = fp8_e8m0_t, size_t C0 = 2 / sizeof(T)>
-using LayoutTraitScale = LayoutTraitDefault<T, C0>;
+using LayoutTraitScale = LayoutTrait<T, C0>;
 
 using FormatTraitSet = TupleMap<
     Std::tuple<NZLayoutPtn, LayoutTraitDefault<>>,
