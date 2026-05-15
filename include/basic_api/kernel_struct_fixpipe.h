@@ -71,19 +71,11 @@ struct FixpipeConfig {
     {}
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#if (__NPU_ARCH__ == 5102)
 constexpr FixpipeConfig CFG_NZ_FIX = {CO2Layout::NZ, false, true};
-#endif
-constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ, false};
-constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR, false};
-constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR, false};
 
-#else
 constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ};
 constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR};
 constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};
-#endif
 
 struct FixpipeParamsV220 {
     __aicore__ FixpipeParamsV220() {}
@@ -147,7 +139,6 @@ struct FixpipeParamsV220 {
     bool isChannelSplit = false;
 };
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // 根据模板参数选结构体
 template <CO2Layout format>
 struct TransformParams {};
@@ -210,7 +201,6 @@ struct FixpipeParamsC310 : FixpipeParamsArch3510<format> {
                                 const uint16_t srcStrideIn, const uint32_t dstStrideIn)
         : FixpipeParamsArch3510<format>(nSizeIn, mSizeIn, srcStrideIn, dstStrideIn) {}
 };
-#endif
 
 using FixpipeParamsM300 = FixpipeParamsV220;
 using FixpipeParamsM310 = FixpipeParamsV220;
