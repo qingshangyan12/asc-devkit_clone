@@ -51,11 +51,9 @@ struct LayoutTrait {
 template <typename T = uint16_t, size_t C0 = C0_ELEMENT<T>>
 struct LayoutTraitDefault : LayoutTrait<T, C0> {};
 
-template <typename T = fp8_e8m0_t, size_t C0 = 2 / sizeof(T)>
-struct LayoutTraitScale : LayoutTrait<T, C0> {};
+struct LayoutTraitScale : LayoutTraitDefault<fp8_e8m0_t, 2 / sizeof(fp8_e8m0_t)> {};
 
-template <typename T = fp4x2_e2m1_t, size_t C0 = C0_ELEMENT<T>>
-struct LayoutTraitFP4 : LayoutTrait<T, C0> {};
+struct LayoutTraitFP4 : LayoutTraitDefault<fp4x2_e2m1_t, C0_ELEMENT<fp4x2_e2m1_t>> {};
 
 using FormatTraitSet = TupleMap<
     Std::tuple<NZLayoutPtn, LayoutTraitDefault<>>,
@@ -93,19 +91,26 @@ struct FrameLayoutTrait<T, true> {
 template <typename T>
 using FrameLayoutTraitT = typename FrameLayoutTrait<T>::type;
 
-template <typename LayoutPattern, typename TraitType,
+template <typename LayoutPattern, typename TraitType>
+struct GetTrait {
+    using type = TraitType;
+};
+
+template <typename LayoutPattern>
+struct GetTrait<LayoutPattern, LayoutTraitDefault<>> {
+    using type = typename FormatTraitSet::template Get<LayoutPattern>;
+};
+
+template <typename LayoutPattern, typename TraitType>
+using GetTraitT = typename GetTrait<LayoutPattern, TraitType>::type;
+
+template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>,
     Std::enable_if_t<IsFrameLayoutTraitV<TraitType>, int> = 0, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
+    using Trait = GetTraitT<LayoutPattern, TraitType>::type;
     using LayoutMaker = typename LayoutFormatSet::template Get<LayoutPattern>;
     static_assert(!Std::is_same_v<LayoutMaker, EmptyValue>, "Unsupported layout pattern.");
-    return LayoutMaker::template Make<TraitType>(args...);
-}
-
-template <typename LayoutPattern, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
-    using TraitType = typename FormatTraitSet::template Get<LayoutPattern>;
-    static_assert(!Std::is_same_v<TraitType, EmptyValue>, "Unsupported layout pattern.");
-    return MakeFrameLayout<LayoutPattern, TraitType>(args...);
+    return LayoutMaker::template Make<Trait>(args...);
 }
 
 template <typename LayoutPattern, typename IntTypeOrDataType,

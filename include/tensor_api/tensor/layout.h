@@ -82,9 +82,6 @@ template <typename LayoutPattern, typename TraitType,
     Std::enable_if_t<IsFrameLayoutTraitV<TraitType>, int> Enable, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
 
-template <typename LayoutPattern, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
-
 template <typename LayoutPattern, typename IntTypeOrDataType,
     Std::enable_if_t<!IsFrameLayoutTraitV<IntTypeOrDataType>, int> Enable, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
