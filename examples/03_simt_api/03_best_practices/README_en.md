@@ -10,3 +10,4 @@ Operator development practices based on Ascend C SIMT, demonstrating the applica
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
 | [01_simt_matrix_transpose](./01_simt_matrix_transpose)   | This example implements the MatrixTranspose operator based on Ascend C SIMT programming, demonstrating performance tuning strategies for Ascend C SIMT programming. |
 | [02_short_vector_add](./02_short_vector_add)            | This example implements the Add operator based on Ascend C SIMT programming, demonstrating performance tuning methods based on the short vector half2.                           |
+| [02_simt_aligned_type](./02_simt_aligned_type)          | This example, based on Ascend C SIMT programming, demonstrates the impact of struct type alignment on Global Memory access throughput. |
