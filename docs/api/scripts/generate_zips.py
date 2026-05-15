@@ -165,7 +165,7 @@ def build_src_zip(
 # ── main ──────────────────────────────────────────────────────────────
 
 def main():
-    src_root = Path(__file__).resolve().parent
+    src_root = Path(__file__).resolve().parent.parent
 
     html_dir = src_root / "_build" / "dirhtml"
     if not html_dir.is_dir():

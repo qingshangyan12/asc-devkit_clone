@@ -31,11 +31,13 @@ source_suffix = {
 }
 
 master_doc = 'index'
-exclude_patterns = ['_build', 'README.md.orig', 'figures', '*.py', 'context', '.git']
+exclude_patterns = ['_build', 'README.md.orig', 'figures', '*.py', 'context', '.git', 'scripts']
 
-templates_path = ['_templates']
+_project_root = Path(__file__).resolve().parent.parent
+templates_path = [str(_project_root / '_templates')]
 html_theme = 'pydata_sphinx_theme'
-html_static_path = ['_static']
+html_static_path = [str(_project_root / '_static')]
+external_toc_path = 'scripts/_toc.yml'
 
 version = '950'
 release = version
@@ -51,6 +53,7 @@ html_theme_options = {
     'footer_start': ['copyright'],
     'footer_end': [],
     'show_prev_next': False,
+    'back_to_top_button': False,
     'use_edit_page_button': False,
     'icon_links': [],
     'logo': {
@@ -77,8 +80,7 @@ html_context = {
 html_css_files = []
 html_js_files = []
 
-_context_dir = Path(__file__).resolve().parent
-with open(_context_dir / '_static' / 'version_filter.json', 'r', encoding='utf-8') as f:
+with open(_project_root / '_static' / 'version_filter.json', 'r', encoding='utf-8') as f:
     _filter_data = json.load(f)
 _hidden_keys = [k for k, v in _filter_data.items() if not v]
 
@@ -90,13 +92,14 @@ external_toc_exclude_missing = True
 def on_build_finished(app, exception):
     if exception is not None:
         return
-    context_dir = Path(__file__).resolve().parent
+    scripts_dir = Path(__file__).resolve().parent
+    project_root = scripts_dir.parent
 
-    scripts = ['generate_zips.py', '_verify_html.py']
-    for script in scripts:
+    post_scripts = ['generate_zips.py', '_verify_html.py']
+    for script in post_scripts:
         result = subprocess.run(
-            [sys.executable, str(context_dir / script)],
-            capture_output=True, text=True, cwd=str(context_dir),
+            [sys.executable, str(scripts_dir / script)],
+            capture_output=True, text=True, cwd=str(project_root),
         )
         if result.stdout:
             print(result.stdout)

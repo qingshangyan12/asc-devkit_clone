@@ -2,7 +2,7 @@ import yaml
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
-data = yaml.safe_load(open(BASE / "_toc.yml.new", encoding="utf-8"))
+data = yaml.safe_load(open(BASE / "_toc.yml", encoding="utf-8"))
 entries = data["entries"]
 
 for e in entries:

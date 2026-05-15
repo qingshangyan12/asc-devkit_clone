@@ -157,7 +157,7 @@
         var oldArticle = document.querySelector('.bd-article-container');
         if (!oldArticle) throw new Error('no article target');
         oldArticle.innerHTML = newArticle.innerHTML;
-        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
+        window.scrollTo(0, 0);
       });
   }
 

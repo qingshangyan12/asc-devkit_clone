@@ -3,11 +3,12 @@ import re
 import yaml
 from pathlib import Path
 
-BASE = Path(__file__).resolve().parent
+SCRIPTS_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPTS_DIR.parent
 
 
 def parse_readme_toc():
-    readme = BASE / "README.md"
+    readme = PROJECT_ROOT / "README.md"
     with open(readme, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
@@ -103,7 +104,7 @@ def main():
     show_structure(toc_entries)
     print(f"  ...")
 
-    toc_path = BASE / "_toc.yml.new"
+    toc_path = SCRIPTS_DIR / "_toc.yml"
     with open(toc_path, "w", encoding="utf-8") as f:
         yaml.dump(toc, f, allow_unicode=True, default_flow_style=False, sort_keys=False, width=200)
 
@@ -114,11 +115,11 @@ def main():
     json_data = [_compact(e) for e in toc_entries]
     json_str = json.dumps(json_data, ensure_ascii=False, separators=(',', ':'))
 
-    json_path = BASE / "_static" / "toc_data.json"
+    json_path = PROJECT_ROOT / "_static" / "toc_data.json"
     json_path.write_text(json_str, encoding="utf-8")
     print(f"Written to: {json_path} ({json_path.stat().st_size / 1024:.0f} KB)")
 
-    js_path = BASE / "_static" / "js"
+    js_path = PROJECT_ROOT / "_static" / "js"
     js_path.mkdir(parents=True, exist_ok=True)
     js_path = js_path / "toc-data.js"
     js_path.write_text("var TOC_DATA_EMBEDDED = " + json_str + ";", encoding="utf-8")

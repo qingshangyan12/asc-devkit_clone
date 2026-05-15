@@ -1,3 +1,19 @@
+/* ── 防抖：禁止 smooth scroll 及滚动条跳动 ── */
+html {
+    scroll-behavior: auto !important;
+    scrollbar-gutter: stable;
+}
+
+/* ── 消除页面过渡闪烁 ── */
+*, *::before, *::after {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+}
+
+html, body {
+    overscroll-behavior: none;
+}
+
 /* ── 内容区拉伸 ── */
 .bd-main .bd-content .bd-article-container {
     max-width: 100%;
@@ -254,7 +270,7 @@ nav.bd-links.bd-links--collapsed {
     font-size: .88em;
     font-weight: 500;
     text-decoration: none;
-    transition: transform .2s, box-shadow .2s;
+    visibility: visible !important;
 }
 
 .download-float-btn:hover {

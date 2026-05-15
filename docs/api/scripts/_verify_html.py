@@ -11,7 +11,7 @@ import re
 import sys
 from pathlib import Path
 
-SRC_ROOT = Path(__file__).resolve().parent
+SRC_ROOT = Path(__file__).resolve().parent.parent
 
 IMG_RE = re.compile(r'<img[^>]+src="([^"]+)"')
 RESIDUAL_MD_RE = re.compile(r'href="[^"]+\.md(?:#[^"]*)?"')
