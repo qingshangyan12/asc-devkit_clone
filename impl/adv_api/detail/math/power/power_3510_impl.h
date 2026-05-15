@@ -905,9 +905,13 @@ __aicore__ inline uint16_t GetMaxLoop(
     if constexpr (sizeof(T) == 1) {
         return sizeof(T) * BITS_PER_BYTE;
     } else {
-        LocalTensor<T> absTensor = dstTensor;
-        AscendC::Abs(absTensor, srcTensor, calCount);
-        AscendC::ReduceMax(dstTensor, absTensor, absTensor, calCount);
+        if constexpr (SupportType<T, int16_t, int32_t>()) {
+            LocalTensor<T> absTensor = dstTensor;
+            AscendC::Abs(absTensor, srcTensor, calCount);
+            AscendC::ReduceMax(dstTensor, absTensor, absTensor, calCount);
+        } else {
+            AscendC::ReduceMax(dstTensor, srcTensor, srcTensor, calCount);
+        }
         event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
         SetFlag<HardEvent::V_S>(eventIdVToS);
         WaitFlag<HardEvent::V_S>(eventIdVToS);
