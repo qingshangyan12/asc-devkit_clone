@@ -4,6 +4,8 @@
 
 本样例在确定性计算场景下，基于InitDetermineComputeWorkspace、WaitPreBlock和NotifyNextBlock三个接口实现核间顺序同步。**这三个接口必须组合使用**，能够确保多个AIV核严格按照blockIdx的升序顺序执行，适用于要求确定性计算的场景。本样例模拟8个核进行数据处理，使用确定性计算接口保证核间运行顺序，进行原子累加，确保计算结果的确定性。
 
+> **注意：** 本样例仅适用于基于TPipe和TQue的编程模式。
+
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
@@ -51,24 +53,28 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
+
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
   - 默认路径，非root用户安装CANN软件包
+
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
   - 指定路径install_path，安装CANN软件包
+
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
-    
+
 - 样例执行
+
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j;    # 编译工程
@@ -78,12 +84,14 @@
   ```
 
   使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如下：
+
   ```bash
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # CPU调试模式
   cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # NPU仿真模式
   ```
+
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
@@ -96,6 +104,7 @@
 - 执行结果
 
   执行结果如下，说明精度对比成功。
+
   ```bash
   test pass!
   ```
