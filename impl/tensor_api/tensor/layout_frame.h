@@ -54,6 +54,8 @@ struct LayoutTraitDefault : LayoutTrait<T, C0> {};
 template <typename T = fp8_e8m0_t, size_t C0 = 2 / sizeof(T)>
 struct LayoutTraitScale : LayoutTrait<T, C0> {};
 
+template <typename T = fp4x2_e2m1_t, size_t C0 = C0_ELEMENT<T>>
+struct LayoutTraitFP4 : LayoutTrait<T, C0> {};
 
 using FormatTraitSet = TupleMap<
     Std::tuple<NZLayoutPtn, LayoutTraitDefault<>>,
