@@ -31,7 +31,7 @@ struct CosConfig {
     CosAlgo algo = CosAlgo::POLYNOMIAL_APPROXIMATION;
 };
 
-#if !defined(defaultCosConfig)
+#if !defined(__NPU_ARCH__)
 constexpr CosConfig defaultCosConfig;
 #endif
 }; // namespace AscendC
