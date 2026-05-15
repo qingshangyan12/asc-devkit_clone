@@ -118,7 +118,7 @@ __aicore__ inline void BroadCastNZImpl(
     uint8_t repeat = srcM / DEFAULT_REPEAT_STRIDE;
     for (uint8_t i = 0; i < repeat; i++) {
         Muls<float, false>(
-            dst[i * B16_BYTE_SIZE * FLOAT_REPEAT_SIZE], src[i * B16_BYTE_SIZE * FLOAT_REPEAT_SIZE], 1.0,
+            dst[i * B16_BYTE_SIZE * FLOAT_REPEAT_SIZE], src[i * B16_BYTE_SIZE * FLOAT_REPEAT_SIZE], static_cast<float>(1.0),
             MASK_PLACEHOLDER, B16_BYTE_SIZE, {1, 0, DEFAULT_REPEAT_STRIDE, 0});
     }
     PipeBarrier<PIPE_V>();

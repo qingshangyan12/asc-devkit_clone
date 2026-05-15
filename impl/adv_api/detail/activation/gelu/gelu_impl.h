@@ -148,7 +148,7 @@ __aicore__ inline void FastGeluCalcSimplified(
     Exp<T, false>(stackBuffer, stackBuffer, MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
-    Adds<T, false>(stackBuffer, stackBuffer, 1.0, MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
+    Adds<T, false>(stackBuffer, stackBuffer, static_cast<T>(1.0), MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
     // fast_gelu(x) = x / x1
