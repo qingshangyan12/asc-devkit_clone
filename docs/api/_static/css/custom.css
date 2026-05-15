@@ -89,15 +89,25 @@ html, body {
 
 /* ── 版本筛选下拉 ── */
 .version-filter__container {
+    position: relative;
+    display: inline-flex;
     margin-left: .25em;
 }
 
 .version-filter__button {
+    display: inline-flex;
+    align-items: center;
+    gap: .35em;
     font-size: .85em;
     font-weight: 500;
     padding: .25em .75em;
-    border-color: var(--pst-color-border);
+    border: 1px solid var(--pst-color-border);
+    border-radius: .25rem;
+    background: transparent;
     color: var(--pst-color-text-base);
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.5;
 }
 
 .version-filter__button:hover {
@@ -105,10 +115,55 @@ html, body {
     color: var(--pst-color-secondary);
 }
 
+.version-filter__caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: .15em;
+    vertical-align: .255em;
+    border-top: .3em solid currentColor;
+    border-right: .3em solid transparent;
+    border-left: .3em solid transparent;
+}
+
+/* ── 下拉菜单 ── */
+.version-filter__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 2000;
+    display: none;
+    min-width: 10rem;
+    padding: .35rem 0;
+    margin: .125rem 0 0;
+    background-color: var(--pst-color-on-background, var(--bs-body-bg, #fff));
+    border: 1px solid var(--pst-color-border);
+    border-radius: .25rem;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+    list-style: none;
+}
+
+.version-filter__menu.show {
+    display: block;
+}
+
 .version-filter__menu-item {
+    display: block;
+    width: 100%;
+    padding: .3em 1em;
     font-size: .85em;
     font-weight: 500;
+    text-align: left;
+    border: none;
+    background: none;
+    color: var(--pst-color-text-base);
     cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.5;
+}
+
+.version-filter__menu-item:hover {
+    background-color: var(--pst-color-surface);
 }
 
 .version-filter__menu-item.active {
@@ -125,6 +180,10 @@ html[data-theme="dark"] .version-filter__button {
 html[data-theme="dark"] .version-filter__button:hover {
     border-color: var(--pst-color-secondary);
     color: var(--pst-color-secondary);
+}
+
+html[data-theme="dark"] .version-filter__menu {
+    background-color: var(--pst-color-on-background, var(--bs-body-bg, #1b1b1b));
 }
 
 /* ── 文章内容美化 ── */

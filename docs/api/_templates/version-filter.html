@@ -1,18 +1,17 @@
-<div class="version-filter__container dropdown">
+<div class="version-filter__container">
   <button
     type="button"
-    class="version-filter__button btn btn-sm dropdown-toggle"
+    class="version-filter__button"
     aria-haspopup="listbox"
     aria-label="版本切换"
   >
     <span class="version-filter__current">{{ current_version }}</span>
-    <span class="caret"></span>
+    <span class="version-filter__caret"></span>
   </button>
-  <div class="version-filter__menu dropdown-menu list-group-flush py-0"
-    role="listbox">
+  <div class="version-filter__menu" role="listbox">
     {% for slug, name in versions %}
     <button
-      class="version-filter__menu-item list-group-item list-group-item-action{% if slug == current_version %} active{% endif %}"
+      class="version-filter__menu-item{% if slug == current_version %} active{% endif %}"
       role="option"
       data-version="{{ slug }}"
       data-version-name="{{ name }}"
