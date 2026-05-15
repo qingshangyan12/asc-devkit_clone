@@ -26,7 +26,7 @@
 #include "../../../impl/adv_api/detail/pad/broadcast/broadcast_common_impl.h"
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__)
+#if !defined(BroadcastTiling)
 struct BroadcastTiling {
     uint32_t oriRank;
     uint32_t rank;
@@ -55,10 +55,7 @@ template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
 __aicore__ inline void Broadcast(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal,
     const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<uint8_t>& sharedTmpBuffer)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     BroadCast<T, dim, axis, isReuseSource>(dstLocal, srcLocal, dstShape, srcShape, sharedTmpBuffer);
-#endif
 }
 
 /*
@@ -73,10 +70,7 @@ template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
 __aicore__ inline void Broadcast(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal,
     const uint32_t dstShape[dim], const uint32_t srcShape[dim])
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     BroadCast<T, dim, axis, isReuseSource>(dstLocal, srcLocal, dstShape, srcShape);
-#endif
 }
 
 /*
