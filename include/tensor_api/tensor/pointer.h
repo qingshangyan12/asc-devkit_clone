@@ -26,14 +26,14 @@
 namespace AscendC {
 namespace Te {
 template <typename Hardware, typename TraitOrType, typename Arg0, typename... Args,
-    EnableMakePtrByTrait<Hardware, Arg0> = 0>
+    EnableMakePtrByTrait<Hardware, Arg0> Enable>
 __aicore__ inline constexpr auto MakeMemPtr(Arg0 arg0, Args... args);
 
 template <typename Hardware, typename Arg0, typename... Args,
-    EnableMakeHardwarePtr<Hardware, Arg0> = 0>
+    EnableMakeHardwarePtr<Hardware, Arg0> Enable>
 __aicore__ inline constexpr auto MakeMemPtr(Arg0 arg0, Args... args);
 
-template <typename Iterator, EnableMakePtrByIter<Iterator> = 0>
+template <typename Iterator, EnableMakePtrByIter<Iterator> Enable>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator& iter);
 
 
