@@ -1,10 +1,10 @@
 ## 引言
 
-AscendC是面向LocalTensor与GlobalTensor的编程范式，核心设计理念是将内存地址抽象为Tensor对象，开发者通过Tensor进行数据搬运、计算操作、同步管理。相比C指针编程的直接地址操作，Tensor编程隐藏内存地址细节，提供更高级的抽象层次，降低开发复杂度。
+Ascend C C++Tensor编程是面向LocalTensor与GlobalTensor的编程范式，核心设计理念是将内存地址抽象为Tensor对象，开发者通过Tensor进行数据搬运、计算操作、同步管理。相比C指针编程的直接地址操作，Tensor编程隐藏内存地址细节，提供更高级的抽象层次，降低开发复杂度。
 
-AscendC提供基础能力接口，支持LocalTensor/GlobalTensor定义、数据搬运、向量计算、矩阵乘、同步等核心功能。在此基础上，对LocalTensor进行扩展，引入Layout概念描述数据布局，实现类型安全、编译期确定的张量操作，并提供Copy/Mmad Atom、零开销切片等扩展能力。
+Ascend C提供基础能力接口，支持LocalTensor/GlobalTensor定义、数据搬运、向量计算、矩阵乘、同步等核心功能。在此基础上，对LocalTensor进行扩展，引入Layout概念描述数据布局，实现类型安全、编译期确定的张量操作，并提供Copy/Mmad Atom、零开销切片等扩展能力。
 
-本章旨在帮助开发者建立对AscendC编程范式的整体认知，理解Tensor编程的设计理念、基础能力与扩展能力、接口选择建议。全文遵循「设计理念—Tensor抽象—基础能力—扩展能力—接口选择」的递进逻辑展开。
+本章旨在帮助开发者建立对Ascend C编程范式的整体认知，理解Tensor编程的设计理念、基础能力与扩展能力、接口选择建议。全文遵循「设计理念—Tensor抽象—基础能力—扩展能力—接口选择」的递进逻辑展开。
 
 ## 设计理念：面向Tensor的编程抽象
 
@@ -29,13 +29,13 @@ Add(dstTensor, src0Tensor, src1Tensor);  // Tensor计算
 
 ## 接口体系：基础能力与扩展能力
 
-AscendC的Tensor编程分为基础能力与扩展能力两个层次，共同支撑算子开发：
+Ascend C的Tensor编程分为基础能力与扩展能力两个层次，共同支撑算子开发：
 
 ### 基础能力接口
 
-基础能力接口提供Tensor编程的核心功能：Tensor定义（LocalTensor对应片上存储，GlobalTensor对应全局存储）、数据搬运（DataCopy、Copy、DataCopyPad等）、向量计算（Add、Sub、Mul、Div、Reduce等）、矩阵乘（LoadData、Mmad、Fill等）、同步机制（PipeBarrier、SetFlag/WaitFlag等）、内存管理（TPipe、TQue队列管理）。
+基础能力接口提供Tensor编程的核心功能：Tensor定义（LocalTensor对应片上存储，GlobalTensor对应全局存储）、数据搬运（DataCopy、Copy、DataCopyPad等）、向量计算（Add、Sub、Mul、Div、Reduce等）、矩阵乘（LoadData、Mmad、Fill等）、同步机制（PipeBarrier、SetFlag/WaitFlag等）。
 
-**接口特点**：参数通过结构体传递，内存位置通过TPosition枚举表达，形状信息运行期设置，同步时机显式控制。
+**接口特点**：参数通过结构体传递，内存位置通过Hardware枚举直接表达物理位置，大小信息运行期设置，同步时机显式控制。
 
 ### LocalTensor扩展能力
 
@@ -47,7 +47,7 @@ AscendC的Tensor编程分为基础能力与扩展能力两个层次，共同支�
 
 ### Tensor定义
 
-**LocalTensor定义**：对应片上内存（UB、L1、L0A等），通过TPipe/TQue队列管理或显式地址构造。
+**LocalTensor定义**：对应片上内存（UB、L1、L0A等），通过LocalMemAllocator方式指定物理位置申请。
 
 ```cpp
 // LocalTensor定义示例
@@ -86,7 +86,7 @@ DataCopy(gmOut, zLocal, TILE_LENGTH);
 
 ### RegTensor：寄存器层计算
 
-> 📌 **提示**：RegTensor从**Ascend 950RT**开始支持，用于寄存器级精细控制与极致性能场景。
+> 📌 **提示**：RegTensor从**Ascend 950PR/Ascend 950DT**开始支持，用于寄存器级精细控制与极致性能场景。
 
 RegTensor是寄存器层Tensor抽象，Reg表示Register（寄存器），提供对Vector计算单元内部寄存器的直接操作能力。Vector计算单元只能访问寄存器，无法直接读写UB数据，因此需要先将UB数据加载到寄存器，计算完成后再将结果写回UB。
 
@@ -163,6 +163,6 @@ auto tensor = MakeTensor(l1Pointer, nzLayout);
 
 ## 小结
 
-本章阐述了AscendC编程范式的整体体系：AscendC是面向LocalTensor与GlobalTensor的编程范式，将内存地址抽象为Tensor对象，隐藏地址细节；基础能力接口提供Tensor定义、数据搬运、计算、同步等核心功能；扩展能力引入Layout概念，通过Shape和Stride编译期确定实现类型安全，支持平铺布局、层次化布局、分形布局等多种布局模式；开发者可根据场景选择基础能力或扩展能力，复杂场景可混合使用。
+本章阐述了Ascend C编程范式的整体体系：Ascend C是面向LocalTensor与GlobalTensor的编程范式，将内存地址抽象为Tensor对象，隐藏地址细节；基础能力接口提供Tensor定义、数据搬运、计算、同步等核心功能；扩展能力引入Layout概念，通过Shape和Stride编译期确定实现类型安全，支持平铺布局、层次化布局、分形布局等多种布局模式；开发者可根据场景选择基础能力或扩展能力，复杂场景可混合使用。
 
-后续章节将逐层深入、循序渐进地详解内存层级管理、数据搬运与计算接口、同步机制、编程示例，帮助开发者熟练掌握AscendC Tensor编程的核心能力。
+后续章节将逐层深入、循序渐进地详解内存层级管理、数据搬运与计算接口、同步机制、编程示例，帮助开发者熟练掌握Ascend C Tensor编程的核心能力。
