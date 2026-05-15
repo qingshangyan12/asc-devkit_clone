@@ -165,11 +165,85 @@ HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void *opArgs, void 
     return HCCL_SUCCESS;
 }
 
+// 公共逻辑：构造topoTag/ctxTag并校验ccTiling参数
+HcclResult BuildTagsAndValidate(const void *ccTilingList[], uint32_t tilingNum,
+    const char *commName, u32 rankSize, u32 userRank,
+    std::string topoTag[], std::string &ctxTag)
+{
+    for (uint32_t i = 0U; i < tilingNum; ++i) {
+        const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
+        topoTag[i] = std::to_string(ccTiling->opType) + "_" +
+            std::to_string(ccTiling->srcDataType) + "_" + std::string(commName);
+        CHK_RET(HcclCheckTag(topoTag[i].c_str()));
+        bool isReduce;
+        CHK_RET(CheckIsReduce(ccTiling, &isReduce));
+        CHK_RET(CheckDataType(static_cast<HcclDataType>(ccTiling->srcDataType), isReduce));
+
+        if (i == 0) {
+            ctxTag = std::string(ccTiling->groupName) + "_" + std::to_string(ccTiling->opType) +
+                "_" + std::string(ccTiling->algConfig) + "_" + std::to_string(ccTiling->commEngine);
+        } else {
+            ctxTag += "_" + std::to_string(ccTiling->opType) + "_" +
+                std::string(ccTiling->algConfig) + "_" + std::to_string(ccTiling->commEngine);
+        }
+    }
+    CHK_RET(HcomCheckUserRank(rankSize, userRank));
+    return HCCL_SUCCESS;
+}
+
+// AICPU引擎资源分配流程
+HcclResult AllocComResourceByTilingAicpu(HcclComm comm, void *stream, void *mc2Tiling,
+    const void *ccTilingList[], uint32_t tilingNum, const char *commName,
+    u32 rankSize, u32 userRank, void **opResCtx, std::string &ctxTag)
+{
+    std::string topoTag[MAX_OP_NUM];
+    CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
+
+    std::vector<OpParam> opParamVec(tilingNum);
+    for (uint32_t i = 0U; i < tilingNum; ++i) {
+        CHK_RET(GetOpParam(comm, stream, topoTag[i],
+            static_cast<const Mc2CcTilingInner*>(ccTilingList[i]), opParamVec[i]));
+    }
+
+    CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
+
+    return HCCL_SUCCESS;
+}
+
+// CCU引擎资源分配流程
+HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Tiling,
+    const void *ccTilingList[], uint32_t tilingNum, const char *commName,
+    u32 rankSize, u32 userRank, void **opResCtx, std::string &ctxTag)
+{
+    std::string topoTag[MAX_OP_NUM];
+    CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
+
+    // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
+    OpResCtx resCtx{};
+    CHK_RET(CcuAllocV2(comm, ctxTag, rankSize, userRank, resCtx));
+
+    // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
+    CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, resCtx));
+
+    // 申请OpResCtx硬件内存并写入
+    std::string tagOpResCtx = ctxTag + "_opResCtx";
+    uint64_t opResCtxSize = sizeof(OpResCtx);
+    if (HcclEngineCtxGet(comm, tagOpResCtx.c_str(), COMM_ENGINE_CCU, opResCtx, &opResCtxSize) == HCCL_SUCCESS) {
+        HCCL_INFO("HcclEngineCtxGet success, tagOpResCtx[%s], opResCtxAddr[%p], opResCtxSize[%u]",
+            tagOpResCtx.c_str(), *opResCtx, opResCtxSize);
+    } else {
+        CHK_RET(HcclEngineCtxCreate(comm, tagOpResCtx.c_str(), COMM_ENGINE_CCU, opResCtxSize, opResCtx));
+    }
+    aclError aclRet = aclrtMemcpy(*opResCtx, opResCtxSize, &resCtx, opResCtxSize, aclrtMemcpyKind(1));
+    CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
+
+    return HCCL_SUCCESS;
+}
 
 HcclResult __attribute__((visibility("default")))
 HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void **opResCtx)
 {
-    HCCL_RUN_INFO("[MC2_CLIENT_A5_AICPU] enter asc-devkit common HcclAllocComResourceByTiling, "
+    HCCL_RUN_INFO("[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
         "comm[%p], stream[%p], tiling[%p].", comm, stream, mc2Tiling);
     HCCL_INFO("Start to run execute HcclAllocComResourceByTiling");
     // 记录开始时间，用于性能统计
@@ -203,50 +277,26 @@ HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void 
     char commName[COMM_INDENTIFIER_MAX_LENGTH];
     CHK_RET(HcclGetCommName(comm, commName));
 
-    const void *ccTilingList[MAX_CC_TILING_NUM];
+    const void *ccTilingList[MAX_OP_NUM];
     uint32_t tilingNum;
     CHK_RET(HcclGetTilingList(mc2Tiling, ccTilingList, tilingNum));
 
     // 校验commengine
-    CHK_RET(CheckCommEngine(ccTilingList, tilingNum));
+    uint8_t commEngine;
+    CHK_RET(ObtainCommEngine(ccTilingList, tilingNum, commEngine));
 
-    // 构造操作标签，用于日志、错误追踪、topo资源管理
-    // topoTag = ccTilingList->opType + commName
-    // ctxTag = ccTilingList->groupName + "_" + ccTilingList[0]->opType + "_" + ccTilingList[0]->algConfig + "_" + ccTilingList[0]->commEngine
-    // ctxTag不再统一管理资源，而是根据每个资源opParam、WorkSpace、OpResCtx继续组成tag申请资源
-    std::string topoTag[MAX_CC_TILING_NUM];
+    // 根据commEngine类型分发到对应的资源分配流程
     std::string ctxTag;
-    for (uint32_t i = 0U; i < tilingNum; ++i) {
-        const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
-        topoTag[i] = std::to_string(ccTiling->opType) + "_" + std::to_string(ccTiling->srcDataType) + "_" + std::string(commName);
-        // 检查标签的合法性
-        CHK_RET(HcclCheckTag(topoTag[i].c_str()));
-        // 检查是否为reduce类型
-        bool isReduce;
-        CHK_RET(CheckIsReduce(ccTiling, &isReduce));
-        // 检查数据类型的合法性
-        CHK_RET(CheckDataType(static_cast<HcclDataType>(ccTiling->srcDataType), isReduce));
-
-        if (i == 0) {
-            ctxTag = std::string(ccTiling->groupName) + "_" + std::to_string(ccTiling->opType) + "_" + std::string(ccTiling->algConfig) + "_" + std::to_string(ccTiling->commEngine);
-        } else {
-            ctxTag += "_" + std::to_string(ccTiling->opType) + "_" + std::string(ccTiling->algConfig) + "_" + std::to_string(ccTiling->commEngine);
-        }
+    if (commEngine == static_cast<uint8_t>(COMM_ENGINE_AICPU)) {
+        CHK_RET(AllocComResourceByTilingAicpu(comm, stream, mc2Tiling,
+            ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
+    } else if (commEngine == static_cast<uint8_t>(COMM_ENGINE_CCU)) {
+        CHK_RET(AllocComResourceByTilingCcu(comm, stream, mc2Tiling,
+            ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
+    } else {
+        HCCL_ERROR("[%s] unsupported commEngine[%u]", __func__, commEngine);
+        return HCCL_E_NOT_SUPPORT;
     }
-
-    // TODO:记录接口入口日志，包含所有关键参数信息
-
-    // 检查userRank是否在有效范围内
-    CHK_RET(HcomCheckUserRank(rankSize, userRank));
-
-    std::vector<OpParam> opParamVec(tilingNum);
-    for (uint32_t i = 0U; i < tilingNum; ++i) {
-        // TODO: 根据topoTag[i] 获取opParam[i]的参数
-        CHK_RET(GetOpParam(comm, stream, topoTag[i], static_cast<const Mc2CcTilingInner*>(ccTilingList[i]), opParamVec[i]));
-    }
-
-    // TODO: 根据ctxTag 申请通信资源 ，并返回OpResCtx的地址
-    CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
 
     // 记录退出日志和性能统计信息
     CHK_RET(LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut));
