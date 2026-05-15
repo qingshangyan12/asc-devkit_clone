@@ -40,7 +40,7 @@ inline half __bfloat162half_rn(const bfloat16_t x)
 
 ## 约束说明
 
-SIMT编程场景当前不支持使用该接口。
+无
 
 ## 需要包含的头文件
 
@@ -73,4 +73,3 @@ SIMT编程场景当前不支持使用该接口。
         dst[idx] = __bfloat162half_rn(x[idx]);
     }
     ```
-
