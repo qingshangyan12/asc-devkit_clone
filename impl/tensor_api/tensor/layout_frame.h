@@ -49,10 +49,11 @@ struct LayoutTrait {
 };
 
 template <typename T = uint16_t, size_t C0 = C0_ELEMENT<T>>
-using LayoutTraitDefault = LayoutTrait<T, C0>;
+struct LayoutTraitDefault : LayoutTrait<T, C0> {};
 
 template <typename T = fp8_e8m0_t, size_t C0 = 2 / sizeof(T)>
-using LayoutTraitScale = LayoutTrait<T, C0>;
+struct LayoutTraitScale : LayoutTrait<T, C0> {};
+
 
 using FormatTraitSet = TupleMap<
     Std::tuple<NZLayoutPtn, LayoutTraitDefault<>>,
@@ -114,7 +115,7 @@ __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) 
 
 template <typename LayoutPattern, size_t C0Element, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
-  return MakeFrameLayout<LayoutPattern, Std::Int<C0Element>>(args...);
+    return MakeFrameLayout<LayoutPattern, Std::Int<C0Element>>(args...);
 }
 
 template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>>
