@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍了输入为ND格式，B8 / B16 / B32输入数据类型（具体以int8_t / half / float为例），左、右矩阵转置、不转置组合共 7 种矩阵乘法场景中使用 `Load2Dv2` 接口将矩阵数据从 L1 搬运到 L0A/L0B 的方法。
+本样例介绍了输入为ND格式，B8 / B16 / B32输入数据类型（具体以int8_t / half / float为例），左、右矩阵转置、不转置组合共 7 种矩阵乘法场景中使用 `LoadData` 接口配合LoadData2DParamsV2结构体参数(本样例中简称：`Load2Dv2`接口)将矩阵数据从 L1 搬运到 L0A/L0B 的方法。
 - 使用 `LoadData2DParamsV2` 参数结构体
 - L0A 数据排布为 **Nz 格式**
 - L0B 数据排布为 **Zn 格式**
@@ -126,19 +126,19 @@ GM(ND) -> L1(Nz) -> L0A(Nz)/L0B(Zn) -> L0C(Nz) -> GM(ND)
 - 输入A [40, 70]，int8_t类型，ND格式; B [50, 70]，int8_t类型，ND格式;
 - 输出C [40, 50]，int32_t类型，ND格式；
 - 实现：使用一次Load2DV2将A矩阵从L1搬运到L0A，使用一次Load2DV2将B矩阵从L1搬运到L0B;
-- 说明：L1->L0A不需要转置，通过配置mStep、kStep、srcStride、srcStride等参数完成A矩阵L1 -> L0A的搬运；同理，L1->L0B不需要转置，B矩阵通过配置Step、kStep、srcStride、srcStride等参数完成L1 -> L0B的搬运及大分型排布格式的变化。
+- 说明：L1->L0A不需要转置，通过配置mStep、kStep、srcStride、srcStride等参数完成A矩阵L1 -> L0A的搬运；同理，L1->L0B不需要转置，B矩阵通过配置Step、kStep、srcStride、srcStride等参数完成L1 -> L0B的搬运及大分形排布格式的变化。
 
 **场景2：输入int8_t数据类型，isAtranspose=True，isBtranspose=False**
 - 输入A [70, 40]，int8_t类型，ND格式; B [70, 50]，int8_t类型，ND格式;
 - 输出C [40, 50]，int32_t类型，ND格式;
 - 实现：使用一次Load2DV2将A矩阵从L1搬运到L0A，使用一次Load2DV2将B矩阵从L1搬运到L0B;
-- 说明：A矩阵调用一次Load2DV2指令，通过配置mStep、kStep、srcStride、srcStride，并配置ifTranspose为true，完成A矩阵从L1到L0A的搬运，搬运过程中会伴随转置；B矩阵调用一次Load2DV2指令，配置mStep、kStep、srcStride、srcStride，并配置ifTranspose为true，完成B矩阵从L1到L0B的搬运，搬运过程中会伴随转置。该场景m方向多搬多算脏数据分型，在L0C搬出到GM时，通过fixpipeParam.mSize = m来保证无效数据参与计算的结果不会被搬出。
+- 说明：A矩阵调用一次Load2DV2指令，通过配置mStep、kStep、srcStride、srcStride，并配置ifTranspose为true，完成A矩阵从L1到L0A的搬运，搬运过程中会伴随转置；B矩阵调用一次Load2DV2指令，配置mStep、kStep、srcStride、srcStride，并配置ifTranspose为true，完成B矩阵从L1到L0B的搬运，搬运过程中会伴随转置。该场景m方向多搬多算脏数据分形，在L0C搬出到GM时，通过fixpipeParam.mSize = m来保证无效数据参与计算的结果不会被搬出。
 
 **场景3：输入half数据类型，isAtranspose=False，isBtranspose=True**
 - 输入A [40, 70]，half类型，ND格式; B [50, 70]，half类型，ND格式;
 - 输出C [40, 50]，float类型，ND格式；
 - 实现：使用一次Load2DV2将A矩阵从L1搬运到L0A，使用一次Load2DV2将B矩阵从L1搬运到L0B;
-- 说明：L1->L0A不需要转置，通过配置mStep、kStep、srcStride、srcStride等参数完成A矩阵L1 -> L0A的搬运；同理，L1->L0B不需要转置，B矩阵通过配置Step、kStep、srcStride、srcStride等参数完成L1 -> L0B的搬运及大分型排布格式的变化。
+- 说明：L1->L0A不需要转置，通过配置mStep、kStep、srcStride、srcStride等参数完成A矩阵L1 -> L0A的搬运；同理，L1->L0B不需要转置，B矩阵通过配置Step、kStep、srcStride、srcStride等参数完成L1 -> L0B的搬运及大分形排布格式的变化。
 
 **场景4：输入half数据类型，isAtranspose=True，isBtranspose=False**
 - 输入A [70, 40]，half类型，ND格式; B [70, 50]，half类型，ND格式;
@@ -150,7 +150,7 @@ GM(ND) -> L1(Nz) -> L0A(Nz)/L0B(Zn) -> L0C(Nz) -> GM(ND)
 - 输入A [40, 70]，float类型，ND格式; B [50, 70]，float类型，ND格式;
 - 输出C [40, 50]，float类型，ND格式；
 - 实现：使用一次Load2DV2将A矩阵从L1搬运到L0A，使用一次Load2DV2将B矩阵从L1搬运到L0B;
-- 说明：L1->L0A不需要转置，通过配置mStep、kStep、srcStride、srcStride等参数完成A矩阵L1 -> L0A的搬运；同理，L1->L0B不需要转置，B矩阵通过配置Step、kStep、srcStride、srcStride等参数完成L1 -> L0B的搬运及大分型排布格式的变化。
+- 说明：L1->L0A不需要转置，通过配置mStep、kStep、srcStride、srcStride等参数完成A矩阵L1 -> L0A的搬运；同理，L1->L0B不需要转置，B矩阵通过配置Step、kStep、srcStride、srcStride等参数完成L1 -> L0B的搬运及大分形排布格式的变化。
 
 **场景6：输入float数据类型，isAtranspose=True，isBtranspose=False**
 - 输入A [70, 40]，float类型，ND格式; B [70, 50]，float类型，ND格式;
@@ -162,22 +162,22 @@ GM(ND) -> L1(Nz) -> L0A(Nz)/L0B(Zn) -> L0C(Nz) -> GM(ND)
 - 输入A [70, 40]，int8_t类型，ND格式; B [70, 50]，int8_t类型，ND格式;
 - 输出C [40, 50]，int32_t类型，ND格式;
 - 实现：使用for循环+Load2DV2将A矩阵从L1搬运到L0A，使用一次Load2DV2将B矩阵从L1搬运到L0B;
-- 说明：A矩阵沿k方向for循环，调用多次Load2DV2指令，一次从L1上搬运k轴方向上的2个分型 * m轴方向上的CeilDivision(k, fractalShape[1])个分型，通过配置mStep、kStep、srcStride、srcStride，并配置ifTranspose为true，完成A矩阵从L1到L0A的搬运，搬运过程中会伴随转置；B矩阵调用一次Load2DV2指令，配置mStep、kStep、srcStride、srcStride，并配置ifTranspose为true，完成B矩阵从L1到L0B的搬运，搬运过程中会伴随转置。该场景通过for循环配合dstStride参数在写入L0A时跳过转置时多读的m方向脏数据分型，使矩阵计算m方向没有多余脏数据分型参与计算。
+- 说明：A矩阵沿k方向for循环，调用多次Load2DV2指令，一次从L1上搬运k轴方向上的2个分形 * m轴方向上的CeilDivision(k, fractalShape[1])个分形，通过配置mStep、kStep、srcStride、srcStride，并配置ifTranspose为true，完成A矩阵从L1到L0A的搬运，搬运过程中会伴随转置；B矩阵调用一次Load2DV2指令，配置mStep、kStep、srcStride、srcStride，并配置ifTranspose为true，完成B矩阵从L1到L0B的搬运，搬运过程中会伴随转置。该场景通过for循环配合dstStride参数在写入L0A时跳过转置时多读的m方向脏数据分形，使矩阵计算m方向没有多余脏数据分形参与计算。
 
 为了方便描述，在此对后续常用概念给出定义：
  
-（1）fractalShape: 小分型的shape为[16, 32 / sizeof(T)]，其中T表示输入数据类型。本样例涉及到数据类型的分型相关信息如[表2](#表2)。
+（1）fractalShape: 小分形的shape为[16, 32 / sizeof(T)]，其中T表示输入数据类型。本样例涉及到数据类型的分形相关信息如[表2](#表2)。
 
-（2）fractalSize: 1个小分型包含的元素个数，具体可参考[表2](#表2)。
+（2）fractalSize: 1个小分形包含的元素个数，具体可参考[表2](#表2)。
 
 
-（3）fractalNum: 当从L1 -> L0A/L0B需要转置时，Load2DV2接口内部会按照小方块矩阵转置，对于B8和B32数据类型fractalShape分别为[16,32]和[16,8]，都需要两个连续的小分型合并为一个方块然后转置，因此该参数表示一个方块包含几个小分型，具体可参考[表2](#表2)。
+（3）fractalNum: 当从L1 -> L0A/L0B需要转置时，Load2DV2接口内部会按照小方块矩阵转置，对于B8和B32数据类型fractalShape分别为[16,32]和[16,8]，都需要两个连续的小分形合并为一个方块然后转置，因此该参数表示一个方块包含几个小分形，具体可参考[表2](#表2)。
 
 
 <a name="表2"></a>
 <table border="2">
 <caption style="font-weight: normal;">
-    <span style="font-weight: bold; font-size: 1.2em;">📌 表2：不同数据类型分型相关信息</span></caption>
+    <span style="font-weight: bold; font-size: 1.2em;">📌 表2：不同数据类型分形相关信息</span></caption>
   <tr>
     <td></td>
     <td align="center"><span style="font-weight: bold;">fractalShape</span></td>
@@ -313,7 +313,7 @@ GM(ND) -> L1(Nz) -> L0A(Nz)/L0B(Zn) -> L0C(Nz) -> GM(ND)
 </table>
 
 
-特别的，当scenarioNum=7时，A矩阵用for循环+Load2DV2实现L1->L0A的搬运，L0A仅写入有效数据向分型对齐后的数据，A、B矩阵在L1和L0上在高度和宽度方向上对齐的要求如[表5](#表5)、[表6](#表6)：
+特别的，当scenarioNum=7时，A矩阵用for循环+Load2DV2实现L1->L0A的搬运，L0A仅写入有效数据向分形对齐后的数据，A、B矩阵在L1和L0上在高度和宽度方向上对齐的要求如[表5](#表5)、[表6](#表6)：
 <a name="表5"></a>
 <table border="2">
 <caption style="font-weight: normal;">
@@ -366,7 +366,7 @@ GM(ND) -> L1(Nz) -> L0A(Nz)/L0B(Zn) -> L0C(Nz) -> GM(ND)
 A/B矩阵在L1上的数据排布格式为Nz，在L0A、L0B上分别为Nz、Zn。在L1->L0过程中调用Load2DV2接口完成数据搬运及格式变换。
 #### A矩阵 L1->L0A 不转置
 
-L1 -> L0A不转置时数据搬运，不存在大分型和小分型排布格式变化。该场景下，B8 / B16 / B32这3种数据类型使用Load2DV2接口参数配置基本相同，仅fractalShape有区别，可参考[表2](#表2)。以int8_t为例展示图示。<br>
+L1 -> L0A不转置时数据搬运，不存在大分形和小分形排布格式变化。该场景下，B8 / B16 / B32这3种数据类型使用Load2DV2接口参数配置基本相同，仅fractalShape有区别，可参考[表2](#表2)。以int8_t为例展示图示。<br>
 
 
 <p align="center">
@@ -399,10 +399,10 @@ AscendC::LoadData(a2Local, a1Local, loadDataParams);
 
 #### A矩阵 L1->L0A 转置
 
-L1->L0A时大分型排布格式变换，且小分型需要转置。以int8_t、half、float为例，按照数据类型，分小节分别介绍B8 / B16 / B32这3不同数据类型转置场景图示说明。
+L1->L0A时大分形排布格式变换，且小分形需要转置。以int8_t、half、float为例，按照数据类型，分小节分别介绍B8 / B16 / B32这3不同数据类型转置场景图示说明。
 
 ##### B8输入数据类型
-B8输入数据类型分型为16 * 32，L1->L0转置时会按照方型将row方向的2个16 * 32的分型拼成1个32 * 32的方型进行转置。本样例中以int8_t输入数据类型为例，m为40，若调用一次Load2DV2指令完成L1->L0A的搬运+转置，则在写入L0A上时m方向会多写1个分型的无效数据，矩阵计算Mmad在计算时m方向也多算1个分型的无效数据，在Fixpipe搬出时仅搬出有效数据即可；若调用for循环+Load2DV2指令完成L1->L0A的搬运+转置，在写入时可跳过m方向的无效数据分型。下面分别介绍这2种场景。<br>
+B8输入数据类型分形为16 * 32，L1->L0转置时会按照方型将row方向的2个16 * 32的分形拼成1个32 * 32的方型进行转置。本样例中以int8_t输入数据类型为例，m为40，若调用一次Load2DV2指令完成L1->L0A的搬运+转置，则在写入L0A上时m方向会多写1个分形的无效数据，矩阵计算Mmad在计算时m方向也多算1个分形的无效数据，在Fixpipe搬出时仅搬出有效数据即可；若调用for循环+Load2DV2指令完成L1->L0A的搬运+转置，在写入时可跳过m方向的无效数据分形。下面分别介绍这2种场景。<br>
 **调用一次Load2DV2**
 
 
@@ -418,7 +418,7 @@ B8输入数据类型分型为16 * 32，L1->L0转置时会按照方型将row方�
 </p>
 
 
-本样例m=40，如图2所示，在L1上mAlignL1 = CeilAlign(m, fractalShape[1])=64。mAlignL1 - m = 24 > 16，调用一次Load2DV2完成L1->L0A搬运时，m方向会搬运1个无效的分型，如图红框所示。该场景矩阵计算Mmad在计算时m方向也多算1个分型的无效数据，即 mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum)，在Fixpipe搬出时仅搬出有效数据(fixpipeParams.mSize = m)。
+本样例m=40，如图2所示，在L1上mAlignL1 = CeilAlign(m, fractalShape[1])=64。mAlignL1 - m = 24 > 16，调用一次Load2DV2完成L1->L0A搬运时，m方向会搬运1个无效的分形，如图红框所示。该场景矩阵计算Mmad在计算时m方向也多算1个分形的无效数据，即 mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum)，在Fixpipe搬出时仅搬出有效数据(fixpipeParams.mSize = m)。
 
 
 ```cpp
@@ -451,7 +451,7 @@ for循环调用多次Load2DV2完成L1->L0A搬运+转置的图示如下：
 </p>
 
 
-本样例m=40，如图3所示，在L1上mAlignL1 = CeilAlign(m, fractalShape[1])=64。mAlignL1 - m = 24 > 16，此时，沿k方向for循环，调用多次Load2DV2指令，一次从L1上搬运k轴方向上的2个分型 * m轴方向上的CeilDivision(k, fractalShape[1])个分型，如图红框所示。dstStride配置为m方向有效数据向小分型fractalShape[0]对齐，则在写入L0A时跳过转置时多读的m方向脏数据分型，使矩阵计算m方向没有多余脏数据分型参与计算。
+本样例m=40，如图3所示，在L1上mAlignL1 = CeilAlign(m, fractalShape[1])=64。mAlignL1 - m = 24 > 16，此时，沿k方向for循环，调用多次Load2DV2指令，一次从L1上搬运k轴方向上的2个分形 * m轴方向上的CeilDivision(k, fractalShape[1])个分形，如图红框所示。dstStride配置为m方向有效数据向小分形fractalShape[0]对齐，则在写入L0A时跳过转置时多读的m方向脏数据分形，使矩阵计算m方向没有多余脏数据分形参与计算。
 
 
 ```cpp
@@ -460,7 +460,7 @@ mAlignL1 = CeilAlign(m, fractalShape[1]);
 mAlignL0 = CeilAlign(m, fractalShape[0]);
 kaAlignL0 = CeilAlign(k, fractalShape[1]);
 // 输入为int8类型，A矩阵[k,m]转置输入，L1->L0A需要转置
-// for循环调用Load2DV2，以k轴方向做for循环，每次循环在L1的k方向搬运2个分型，在L0A上跳过m方向尾脏数据分型，m方向多搬运数据不超过1个分型
+// for循环调用Load2DV2，以k轴方向做for循环，每次循环在L1的k方向搬运2个分形，在L0A上跳过m方向尾脏数据分形，m方向多搬运数据不超过1个分形
 uint16_t L0ALoopNum = CeilDivision(kaAlignL0, fractalShape[0] * fractalNum);
 loadDataParams.mStep = INT8_M_STEP_ALIGN;
 loadDataParams.kStep = CeilDivision(mAlignL0, fractalShape[1]);
@@ -476,7 +476,7 @@ for (uint16_t loopIdx = 0; loopIdx < L0ALoopNum; ++loopIdx) {
 ```
 
 ##### B16输入数据类型
-B16输入数据类型分型为16 * 16，一个分型即一个方型，L1->L0转置时会按照小分型进行转置，调用一次Load2DV2即可完成L1->L0A数据搬运及转置。本样例以half为例，调用一次Load2DV2完成L1->L0A搬运+转置的图示如下：
+B16输入数据类型分形为16 * 16，一个分形即一个方型，L1->L0转置时会按照小分形进行转置，调用一次Load2DV2即可完成L1->L0A数据搬运及转置。本样例以half为例，调用一次Load2DV2完成L1->L0A搬运+转置的图示如下：
 
 
 <p align="center">
@@ -506,7 +506,7 @@ AscendC::LoadData(a2Local, a1Local, loadDataParams);
 
 
 ##### B32输入数据类型
-B32输入数据类型分型为16 * 8，L1->L0转置时会按照方型将col方向的2个16 * 8的分型拼成1个16 * 16的方型进行转置。本样例以float数据类型为例，调用一次Load2DV2完成L1->L0A搬运+转置的图示如下:
+B32输入数据类型分形为16 * 8，L1->L0转置时会按照方型将col方向的2个16 * 8的分形拼成1个16 * 16的方型进行转置。本样例以float数据类型为例，调用一次Load2DV2完成L1->L0A搬运+转置的图示如下:
 
 <p align="center">
   <img src="img/B32_A_l1_l0A_trans_load2dv2.png">
@@ -517,7 +517,7 @@ B32输入数据类型分型为16 * 8，L1->L0转置时会按照方型将col方�
 </p>
 
 
-本样例中m为40，由于转置时会将col方向2个分型拼成方型进行转置（kStep必须是2的倍数），L1上col方向（m方向）会多一个无效分型数据以满足指令要求。调用一次Load2DV2指令完成L1->L0A的搬运+转置，写入L0A上时k方向会多写1个分型的无效数据。由于L0A上排布格式为Nz，k方向多余的无效分型数据在尾部，在进行矩阵计算Mmad时配置k方向mmadParams.k = k即可仅让有效数据参与矩阵计算。
+本样例中m为40，由于转置时会将col方向2个分形拼成方型进行转置（kStep必须是2的倍数），L1上col方向（m方向）会多一个无效分形数据以满足指令要求。调用一次Load2DV2指令完成L1->L0A的搬运+转置，写入L0A上时k方向会多写1个分形的无效数据。由于L0A上排布格式为Nz，k方向多余的无效分形数据在尾部，在进行矩阵计算Mmad时配置k方向mmadParams.k = k即可仅让有效数据参与矩阵计算。
 
 
 ```cpp
@@ -538,7 +538,7 @@ AscendC::LoadData(a2Local, a1Local, loadDataParams);
 
 #### B矩阵 L1->L0B 不转置
 
-L1 -> L0B不转置时数据搬运，仅存在大分型格式变化。该场景下，B8 / B16 / B32这3种数据类型使用Load2DV2接口参数配置基本相同，仅fractalShape有区别，可参考[表2](#表2)。以float为例展示图示。<br>
+L1 -> L0B不转置时数据搬运，仅存在大分形格式变化。该场景下，B8 / B16 / B32这3种数据类型使用Load2DV2接口参数配置基本相同，仅fractalShape有区别，可参考[表2](#表2)。以float为例展示图示。<br>
 
 
 <p align="center">
@@ -571,10 +571,10 @@ AscendC::LoadData(b2Local, b1Local, loadDataParams);
 
 #### B矩阵 L1->L0B 转置
 
-L1->L0B时大分型排布格式变换，且小分型需要转置。以int8_t、half、float为例，按照数据类型，分小节分别介绍B8 / B16 / B32这3不同数据类型转置场景图示说明。
+L1->L0B时大分形排布格式变换，且小分形需要转置。以int8_t、half、float为例，按照数据类型，分小节分别介绍B8 / B16 / B32这3不同数据类型转置场景图示说明。
 
 ##### B8输入数据类型
-B8输入数据类型分型为16 * 32，L1->L0转置时会按照方型将row方向的2个16 * 32的分型拼成1个32 * 32的方型进行转置。本样例中以int8_t为例，调用一次Load2DV2指令完成L1->L0B的搬运+转置，如下图所示。
+B8输入数据类型分形为16 * 32，L1->L0转置时会按照方型将row方向的2个16 * 32的分形拼成1个32 * 32的方型进行转置。本样例中以int8_t为例，调用一次Load2DV2指令完成L1->L0B的搬运+转置，如下图所示。
 
 
 <p align="center">
@@ -586,7 +586,7 @@ B8输入数据类型分型为16 * 32，L1->L0转置时会按照方型将row方�
 </p>
 
 
-本样例中k=70，由于转置时会将row方向2个分型拼成方型进行转置（指令参数mStep必须是2的倍数），L1上row方向（k方向）会多一个无效分型数据以满足指令要求。调用一次Load2DV2指令完成L1->L0B的搬运+转置。
+本样例中k=70，由于转置时会将row方向2个分形拼成方型进行转置（指令参数mStep必须是2的倍数），L1上row方向（k方向）会多一个无效分形数据以满足指令要求。调用一次Load2DV2指令完成L1->L0B的搬运+转置。
 
 ```cpp
 kbAlignL1 = CeilAlign(k, fractalShape[0] * fractalNum);
@@ -604,7 +604,7 @@ AscendC::LoadData(b2Local, b1Local, loadDataParams);
 
 ##### B16输入数据类型
 
-B16输入数据类型分型为16*16，一个分型即一个方型，L1->L0转置时会按照小分型进行转置，调用一次Load2DV2即可完成L1->L0B数据搬运及转置。本样例以half为例，调用一次Load2DV2完成L1->L0B搬运+转置的图示如下：
+B16输入数据类型分形为16*16，一个分形即一个方型，L1->L0转置时会按照小分形进行转置，调用一次Load2DV2即可完成L1->L0B数据搬运及转置。本样例以half为例，调用一次Load2DV2完成L1->L0B搬运+转置的图示如下：
 
 
 <p align="center">
@@ -634,7 +634,7 @@ AscendC::LoadData(b2Local, b1Local, loadDataParams);
 ```
 
 ##### B32输入数据类型
-B32输入数据类型分型为16 * 8，L1->L0转置时会按照方型将col方向的2个16 * 8的分型拼成1个16 * 16的方型进行转置。本样例中以float为例，调用一次Load2DV2指令完成L1->L0B的搬运+转置，如下图所示。
+B32输入数据类型分形为16 * 8，L1->L0转置时会按照方型将col方向的2个16 * 8的分形拼成1个16 * 16的方型进行转置。本样例中以float为例，调用一次Load2DV2指令完成L1->L0B的搬运+转置，如下图所示。
 
 
 <p align="center">
@@ -646,7 +646,7 @@ B32输入数据类型分型为16 * 8，L1->L0转置时会按照方型将col方�
 </p>
 
 
-本样例中n=50，由于转置时会将col方向2个分型拼成方型进行转置（指令参数kStep必须是2的倍数），L1上col方向（n方向）会多一个无效分型数据以满足指令要求。调用一次Load2DV2指令完成L1->L0B的搬运+转置，写入L0B上时k方向会多写1个分型的无效数据。由于L0B上排布格式为Zn，k方向多余的无效分型数据在尾部，在进行矩阵计算Mmad时配置mmadParams.k = k即可仅让有效数据参与矩阵计算。
+本样例中n=50，由于转置时会将col方向2个分形拼成方型进行转置（指令参数kStep必须是2的倍数），L1上col方向（n方向）会多一个无效分形数据以满足指令要求。调用一次Load2DV2指令完成L1->L0B的搬运+转置，写入L0B上时k方向会多写1个分形的无效数据。由于L0B上排布格式为Zn，k方向多余的无效分形数据在尾部，在进行矩阵计算Mmad时配置mmadParams.k = k即可仅让有效数据参与矩阵计算。
 
 
 ```cpp
