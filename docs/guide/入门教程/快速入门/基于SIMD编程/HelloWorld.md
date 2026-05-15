@@ -21,7 +21,7 @@
   int main(int argc, char const* argv[])
   {
     aclrtSetDevice(0); // 运行管理资源申请。
-    // 1：使用内核调用符<<<>>>调用核函数。
+    // 1：使用内核调用符<<<numBlock, uBufDynSize, stream>>>调用核函数。
     // 2：numBlock：8表示参与计算的核数为8（核数可根据实际需求设置）。
     // 3：uBufDynSize: 0表示不设置UBuf的动态内存
     // 4：stream: nullptr表示使用默认stream。
