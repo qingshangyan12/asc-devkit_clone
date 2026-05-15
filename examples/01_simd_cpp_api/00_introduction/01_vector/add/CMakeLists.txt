@@ -21,6 +21,21 @@ add_executable(demo
     add.asc
 )
 
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+
+if(NOT DEFINED SCENARIO_NUM)
+    message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=1/2/3/4")
+endif()
+
+set(VALID_SCENARIOS 1 2 3 4)
+if(NOT SCENARIO_NUM IN_LIST VALID_SCENARIOS)
+    message(FATAL_ERROR "SCENARIO_NUM must be 1,2,3,4, got: ${SCENARIO_NUM}")
+endif()
+
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
+)
+
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
