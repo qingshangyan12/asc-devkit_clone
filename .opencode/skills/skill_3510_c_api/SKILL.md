@@ -18,11 +18,13 @@ description: 通过AscendC C API编程语言编写对应的测试样例, 测试�
 ## 重要限制
 
 - 注意函数标识符和变量类型的匹配
-- vector_int, vector_float 等类型仅在__simd_vf__中使用，为寄存器RegTensor的数据类型
-- __simd_vf__ 仅支持在vector core中执行
-- vector_bool类型用于在__simd_vf__中控制参与计算的元素位置
-- vector_bool类型采用正常的变量声明方式，使用方式参考[./examples/example.md](./examples/example.md)中的RegBase编程模板。
-- 3510架构对于Vector类型的运算，均需要搬入到寄存器中进行计算，计算完成后再搬出到GM。即数据通路为gm -> ub -> reg -> ub -> gm。
+- `vector_int`, `vector_float` 等类型仅在`__simd_vf__`中使用，为寄存器RegTensor的数据类型
+- `__simd_vf__` 仅支持在vector core中执行
+- `vector_bool` 类型用于在`__simd_vf__`中控制参与计算的元素位置
+- `vector_bool` 类型采用正常的变量声明方式，使用方式参考[./examples/example.md](./examples/example.md)中的RegBase编程模板
+- 3510架构对于Vector类型的运算，均需要搬入到寄存器中进行计算，计算完成后再搬出到GM。即数据通路为gm -> ub -> reg -> ub -> gm
+- 特殊数据类型如fp4和fp8,int4等，在Host侧没有定义，需手动进行编解码函数的编写，通过地址的方式传递到Device侧
+- UB中的数据需要加`__ubuf__`前缀声明
 
 ## 快速入门
 
@@ -54,8 +56,8 @@ __vector__ __global__ __aicore__ void kernel_name(__gm__ float* input, __gm__ fl
     asc_copy_gm2ub_sync(local_buf, input + asc_get_block_idx() * blockLength,
                         blockLength * sizeof(float));
 
-    // 步骤5：在 UB 中执行计算
-    asc_add_sync(local_buf, local_buf, local_buf, blockLength);
+    // 步骤5：调用__simd_vf__函数，在vf内搬入寄存器进行计算，计算完成后再搬出到UB
+    AddVF(local_buf, local_buf, local_buf, blockLength);
 
     // 步骤6：搬运结果 UB -> GM
     asc_copy_ub2gm_sync(output + asc_get_block_idx() * blockLength, local_buf,
@@ -132,40 +134,6 @@ NPU 具有多条独立的执行流水线：
 | `PIPE_FIX` | Fixpipe（量化、激活函数）                            |
 | `PIPE_ALL` | 所有流水线                                           |
 
-### 同步 vs 异步 API
-
-大多数 API 有三种变体：
-
-- **`asc_xxx(...)`** — 异步：发出指令但不等待完成。配合手动的 `asc_sync_notify`/`asc_sync_wait` 实现流水线级控制。
-- **`asc_xxx_sync(...)`** — 同步：自动插入同步操作，更简单但灵活性较低。
-- **高维切分** — 带跨步的数据访问，通过 `repeat`、`dataBlockStride` 和 `repeatStride` 参数控制。
-
-### 三种 API 模式
-
-1. **前 N 个数据计算**：从起始位置连续获取数据，通过 `count` 参数化。
-2. **高维切分计算**：受控的跨步访问，由 `repeatTime`（最大 255）、`dataBlockStride`、`repeatStride` 控制。
-3. **同步计算**：带 `_sync` 后缀的自动同步变体。
-
-### DataBlock 与 Repeat
-
-- 每条矢量指令每次迭代处理 **8 个 DataBlock**（每个 32B，共 256B）。
-- `repeatTime` 控制迭代次数（1-255）。
-- `dataBlockStride`：单次迭代内不同 DataBlock 之间的步长（1 = 连续）。
-- `repeatStride`：相邻迭代间相同 DataBlock 位置的步长（8 = 连续）。
-
-### 掩码操作
-
-按位控制哪些元素参与计算：
-- **16 位类型**：掩码使用 2 个 `uint64_t`（`mask[2]`）
-- **32 位类型**：掩码使用 1 个 `uint64_t`（`mask[0]`）
-- **64 位类型**：使用 `mask[0]` 的前 32 位
-
-计算前设置掩码：
-```c
-uint64_t mask[2] = {0xFFFFFFFFFFFFFFFFULL, 0xFFFFFFFFFFFFFFFFULL};
-asc_set_vector_mask(mask[1], mask[0]);
-```
-
 ### 内存分配
 
 UB 缓冲区必须使用编译期常量数组大小：
@@ -178,13 +146,6 @@ __ubuf__ float buf[SIZE];  // 正确
 // __ubuf__ float buf[rows][cols];      // 多维数组
 // __ubuf__ float* ptr = asc_get_phy_buf_addr(...); // 与数组方式混用
 ```
-
-### 地址重叠约束
-
-- **单次迭代内**：源操作数与目的操作数必须 100% 完全重叠（不支持部分重叠）。
-- **多次迭代间**：不支持前序迭代的目的操作数与后序迭代的源操作数重叠。
-  - 例外：对于 half/int32_t/float 类型的 `asc_add`、`asc_sub`、`asc_mul`，
-    当目的操作数与 `src1` 重叠，且 `src1RepStride` 或 `dstRepStride` 为 0 时，支持跨迭代重叠。
 
 ---
 
@@ -207,30 +168,7 @@ __ubuf__ float buf[SIZE];  // 正确
 
 ## 常用使用模式
 
-### 模式 1：简单同步计算（推荐初学者）
-
-```c
-asc_init();
-__ubuf__ float a[N], b[N], c[N];
-asc_copy_gm2ub_sync(a, gm_a + offset, N * sizeof(float));
-asc_copy_gm2ub_sync(b, gm_b + offset, N * sizeof(float));
-asc_add_sync(c, a, b, N);
-asc_copy_ub2gm_sync(gm_c + offset, c, N * sizeof(float));
-```
-
-### 模式 2：异步 + 手动同步
-
-```c
-asc_copy_gm2ub(ub_buf, gm_buf, size);             // PIPE_MTE2
-asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-asc_add(ub_dst, ub_src0, ub_src1, count);          // PIPE_V
-asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-asc_copy_ub2gm(gm_dst, ub_dst, size);              // PIPE_MTE3
-```
-
-### 模式 3：多核分块
+### 模式 1：多核分块
 
 ```c
 uint32_t blockLen = totalLen / asc_get_block_num();
@@ -238,7 +176,7 @@ uint32_t offset = asc_get_block_idx() * blockLen;
 // 每个核处理自己的数据分片
 ```
 
-### 模式 4：原子 GM 写入
+### 模式 2：原子 GM 写入
 
 ```c
 asc_copy_ub2gm(gm_dst, ub_src0, size);   // 普通写入
@@ -252,24 +190,24 @@ asc_set_atomic_none();                    // 关闭原子模式
 
 ## 支持的数据类型
 
-| C/C++ 类型   | 矢量类型别名           | NPU 类型    |
-|--------------|------------------------|-------------|
-| `half`       | `vector_half`           | `vector_f16`|
-| `float`      | `vector_float`          | `vector_f32`|
-| `bfloat16_t` | `vector_bfloat16_t`     | `vector_bf16`|
-| `int8_t`     | `vector_int8_t`         | `vector_s8` |
-| `int16_t`    | `vector_int16_t`        | `vector_s16`|
-| `int32_t`    | `vector_int32_t`        | `vector_s32`|
-| `int64_t`    | `vector_int64_t`        | `vector_s64`|
-| `uint8_t`    | `vector_uint8_t`        | `vector_u8` |
-| `uint16_t`   | `vector_uint16_t`       | `vector_u16`|
-| `uint32_t`   | `vector_uint32_t`       | `vector_u32`|
-| `fp8_e4m3`   | `vector_fp8_e4m3fn_t`  | `vector_f8e4m3`|
-| `fp8_e5m2`   | `vector_fp8_e5m2_t`    | `vector_f8e5m2`|
-| `int4x2_t`   | `vector_int4x2_t`       | `vector_s4x2`|
-| `fp4x2_e2m1` | `vector_fp4x2_e2m1_t`  | `vector_f4e2m1x2`|
-| `fp4x2_e1m2` | `vector_fp4x2_e1m2_t`  | `vector_f4e1m2x2`|
-| `hifloat8_t` | `vector_hifloat8_t`     | `vector_hif8`|
+| C/C++ 类型   | 寄存器Reg中矢量类型别名           |
+|--------------|------------------------|
+| `half`       | `vector_half`           |
+| `float`      | `vector_float`          |
+| `bfloat16_t` | `vector_bfloat16_t`     |
+| `int8_t`     | `vector_int8_t`         |
+| `int16_t`    | `vector_int16_t`        |
+| `int32_t`    | `vector_int32_t`        |
+| `int64_t`    | `vector_int64_t`        |
+| `uint8_t`    | `vector_uint8_t`        |
+| `uint16_t`   | `vector_uint16_t`       |
+| `uint32_t`   | `vector_uint32_t`       |
+| `fp8_e4m3`   | `vector_fp8_e4m3fn_t`  |
+| `fp8_e5m2`   | `vector_fp8_e5m2_t`    |
+| `int4x2_t`   | `vector_int4x2_t`       |
+| `fp4x2_e2m1` | `vector_fp4x2_e2m1_t`  |
+| `fp4x2_e1m2` | `vector_fp4x2_e1m2_t`  |
+| `hifloat8_t` | `vector_hifloat8_t`     |
 
 ---
 
