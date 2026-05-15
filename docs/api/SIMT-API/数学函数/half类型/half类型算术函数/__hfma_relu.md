@@ -40,11 +40,11 @@ x \* y + z的值，若结果为负数，置为0。本接口受全局饱和模式
 | --- | --- | --- | --- | --- |
 | ±inf | ±0 | — | nan | 0 |
 | ±0 | ±inf | — | nan | 0 |
-| x*y = inf | -inf | nan | 0 |  |
-| x*y = -inf | inf | nan | 0 |  |
-| x*y+z超出ASCRT_MAX_NORMAL_FP16 | inf | ASCRT_MAX_NORMAL_FP16 |  |  |
-| x*y+z小于ASCRT_MIN_NORMAL_FP16 | 0 | 0 |  |  |
-| x、y、z任意一个为nan | nan | 0 |  |  |
+| x*y = inf | x*y = inf |-inf | nan | 0 |
+| x*y = -inf | x*y = -inf |inf | nan | 0 |
+| x*y+z超出ASCRT_MAX_NORMAL_FP16 | - | - | inf | ASCRT_MAX_NORMAL_FP16 |
+| x*y+z小于ASCRT_MIN_NORMAL_FP16 | - | - | 0 | 0 |
+| x、y、z任意一个为nan |  x、y、z任意一个为nan | x、y、z任意一个为nan |nan | 0 |  |  |
 
 ## 约束说明
 
@@ -79,4 +79,3 @@ x \* y + z的值，若结果为负数，置为0。本接口受全局饱和模式
         dst[idx] = __hfma_relu(x[idx], y[idx], z[idx]);
     }
     ```
-

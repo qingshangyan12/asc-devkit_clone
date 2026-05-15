@@ -39,13 +39,13 @@ half __hadd(const half x, const half y)
 -   本接口受全局饱和模式影响，特殊值如下：
 
     | x值 | y值 | 非饱和模式返回值 | 饱和模式返回值 |
-| --- | --- | --- | --- |
-| 有限值 | ±inf | ±inf | ±ASCRT_MAX_NORMAL_FP16 |
-| ±inf | ±inf | ±inf | ±ASCRT_MAX_NORMAL_FP16 |
-| ±inf | ∓inf | nan | 0 |
-| ±0 | ±0 | ±0 | ±0 |
-| 有限值（包括±0） | -x | +0 | +0 |
-| x，y任意一个为nan | nan | 0 |  |
+    | --- | --- | --- | --- |
+    | 有限值 | ±inf | ±inf | ±ASCRT_MAX_NORMAL_FP16 |
+    | ±inf | ±inf | ±inf | ±ASCRT_MAX_NORMAL_FP16 |
+    | ±inf | ∓inf | nan | 0 |
+    | ±0 | ±0 | ±0 | ±0 |
+    | 有限值（包括±0） | -x | +0 | +0 |
+    | x，y任意一个为nan | x，y任意一个为nan | nan | 0 |
 
 ## 约束说明
 
@@ -80,4 +80,3 @@ half __hadd(const half x, const half y)
         dst[idx] = __hadd(x[idx], y[idx]);
     }
     ```
-

@@ -42,7 +42,7 @@ half __hsub(const half x, const half y)
 | ±inf | ±inf | nan | 0 |
 | ±inf | ∓inf | ±inf | ±ASCRT_MAX_NORMAL_FP16 |
 | 有限值（包括±0） | -x | +0 | +0 |
-| x，y任意一个为nan | nan | 0 |  |
+| x，y任意一个为nan |  x，y任意一个为nan |nan | 0 |  |
 
 ## 约束说明
 
@@ -77,4 +77,3 @@ half __hsub(const half x, const half y)
         dst[idx] = __hsub(x[idx], y[idx]);
     }
     ```
-
