@@ -104,7 +104,7 @@ struct GetTrait<LayoutPattern, LayoutTraitDefault<>> {
 template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>,
     Std::enable_if_t<IsFrameLayoutTraitV<TraitType>, int> = 0, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
-    using Trait = GetTrait<LayoutPattern, TraitType>::type;
+    using Trait = typename GetTrait<LayoutPattern, TraitType>::type;
     using LayoutMaker = typename LayoutFormatSet::template Get<LayoutPattern>;
     static_assert(!Std::is_same_v<LayoutMaker, EmptyValue>, "Unsupported layout pattern.");
     return LayoutMaker::template Make<Trait>(args...);
