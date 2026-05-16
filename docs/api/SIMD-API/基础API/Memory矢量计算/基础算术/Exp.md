@@ -59,11 +59,11 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件为：\#include "basic\_api/kernel\_operator\_vec\_unary\_intf.h"
+头文件引用路径为："basic\_api/kernel\_operator\_vec\_unary\_intf.h"
 
 Exp属于单目矢量类计算接口，负责将输入的tensor按元素取自然指数。计算公式如下：
 
-![](figures/zh-cn_formulaimage_0000002541827366.png)
+$dst_i = e^{src_i}$
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -87,7 +87,6 @@ Exp属于单目矢量类计算接口，负责将输入的tensor按元素取自�
         ```
         template <typename T, bool isSetMask = true>
         __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-        
         ```
 
 ## 参数说明<a name="section176711403104"></a>
