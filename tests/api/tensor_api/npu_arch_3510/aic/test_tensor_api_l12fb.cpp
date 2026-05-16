@@ -57,6 +57,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
     Copy(atom, dst, src);
+    Copy(dst, src);
 }
 
 } // namespace
@@ -67,11 +68,12 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12FBRoutesToCubeArchCopy)
 
     constexpr uint32_t m = 32;
     constexpr uint32_t n = 32;
-    __cbuf__ float src[m * n] = {0};
-    __fbuf__ float dst[m * n] = {0};
+    __cbuf__ uint64_t src[m * n] = {0};
+    __fbuf__ uint64_t dst[m * n] = {0};
 
-    auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
-    auto fbTensor = MakeTensorAt<Location::L1>(dst, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<uint64_t>>(m, n));
+    auto fbTensor =
+        MakeTensorAt<Location::FIXBUF>(dst, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<uint64_t>>(m, n));
 
     RunCopyCallPaths<CopyL12FB, CopyL12FBTraitDefault>(fbTensor, l1Tensor);
     RunCopyWithPaths<CopyL12FB, CopyL12FBTraitDefault>(fbTensor, l1Tensor);
@@ -135,10 +137,11 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
     { \
         using namespace AscendC::Te; \
         MOCKER_CPP(copy_cbuf_to_fbuf, void(__fbuf__ void*, __cbuf__ void*, uint16_t, uint16_t, uint16_t, uint16_t)) \
-            .times(1) \
+            .times(2) \
             .will(invoke(&copy_cbuf_to_fbuf_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, ND, fbuf, FIXBUF, ND) \
         Copy(CopyAtom<CopyTraits<CopyL12FB, CopyL12FBTraitDefault>>{}, dstTensor, srcTensor);\
+        Copy(dstTensor, srcTensor);\
         GlobalMockObject::verify(); \
     }
 

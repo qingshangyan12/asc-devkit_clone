@@ -57,6 +57,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
     Copy(atom, dst, src);
+    Copy(dst, src);
 }
 
 } // namespace
@@ -71,7 +72,7 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12BTRoutesToCubeArchCopy)
     __biasbuf__ float dst[m * n] = {0};
 
     auto l1Tensor = MakeTensorAt<Location::L1>(src, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
-    auto btTensor = MakeTensorAt<Location::L1>(dst, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto btTensor = MakeTensorAt<Location::BIAS>(dst, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
     RunCopyCallPaths<CopyL12BT, CopyL12BTTraitDefault>(btTensor, l1Tensor);
     RunCopyWithPaths<CopyL12BT, CopyL12BTTraitDefault>(btTensor, l1Tensor);
@@ -166,10 +167,11 @@ __aicore__ inline void copy_cbuf_to_bt_two_type_stub(uint64_t dst, __cbuf__ SRC_
     { \
         using namespace AscendC::Te; \
         MOCKER_CPP(copy_cbuf_to_bt, void(uint64_t, __cbuf__ DTYPE*, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
-            .times(1) \
+            .times(2) \
             .will(invoke(&copy_cbuf_to_bt_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, ND, biasbuf, BIAS, ND) \
         Copy(CopyAtom<CopyTraits<CopyL12BT, CopyL12BTTraitDefault>>{}, dstTensor, srcTensor);\
+        Copy(dstTensor, srcTensor);\
         GlobalMockObject::verify(); \
     }
 
@@ -182,10 +184,11 @@ DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 1, 64, 1, 64)
     { \
         using namespace AscendC::Te; \
         MOCKER_CPP(copy_cbuf_to_bt, void(uint64_t, __cbuf__ SRC_DTYPE*, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
-            .times(1) \
+            .times(2) \
             .will(invoke(&copy_cbuf_to_bt_two_type_stub<SRC_DTYPE, DST_DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR_TWO_TYPE(SRC_DTYPE, SRC_SIZE1, SRC_SIZE2, DST_DTYPE, DST_SIZE1, DST_SIZE2, cbuf, L1, ND, biasbuf, BIAS, ND) \
         Copy(CopyAtom<CopyTraits<CopyL12BT, CopyL12BTTraitDefault>>{}, dstTensor, srcTensor);\
+        Copy(dstTensor, srcTensor);\
         GlobalMockObject::verify(); \
     }
 

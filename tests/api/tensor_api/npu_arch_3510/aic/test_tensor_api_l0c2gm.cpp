@@ -108,6 +108,11 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2ND)
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
+    Copy(gmTensor, l0cTensor);
+    Copy(gmTensor, l0cTensor, FixpipeParams{});
+    uint64_t quant = 1;
+    Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, quant, FixpipeParams{});
+    Copy(gmTensor, l0cTensor, quant, FixpipeParams{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -126,6 +131,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2DN)
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
+    Copy(gmTensor, l0cTensor);
+    Copy(gmTensor, l0cTensor, FixpipeParams{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -144,6 +151,8 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NZNoChannelSplit)
 
     RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
+    Copy(gmTensor, l0cTensor);
+    Copy(gmTensor, l0cTensor, FixpipeParams{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -233,9 +242,11 @@ public:
                 auto gmTensorTile = Slice(gmTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
                 gm_addr_global = gmTensorTile.Data().Get();
                 Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor);
+                Copy(gmTensorTile, l0cTensor);
             } else {
                 gm_addr_global = gmC_;
                 Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor);
+                Copy(gmTensor, l0cTensor);
             }
         } else if constexpr (IS_TENSOR) {
             auto qIterator = MakeMemPtr<Location::L1>(qAddr);
@@ -245,9 +256,17 @@ public:
                 auto gmTensorTile = Slice(gmTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
                 gm_addr_global = gmTensorTile.Data().Get();
                 Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, qTensor);
+                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, qTensor,
+                     FixpipeParams{});
+                Copy(gmTensorTile, l0cTensor, qTensor);
+                Copy(gmTensorTile, l0cTensor, qTensor, FixpipeParams{});
             } else {
                 gm_addr_global = gmC_;
                 Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, qTensor);
+                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, qTensor,
+                     FixpipeParams{});
+                Copy(gmTensor, l0cTensor, qTensor);
+                Copy(gmTensor, l0cTensor, qTensor, FixpipeParams{});
             }
         } else {
             uint64_t quant = 1;
@@ -255,9 +274,17 @@ public:
                 auto gmTensorTile = Slice(gmTensor, MakeCoord(base, base), MakeShape(m - base, n - base));
                 gm_addr_global = gmTensorTile.Data().Get();
                 Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, quant);
+                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensorTile, l0cTensor, quant,
+                     FixpipeParams{});
+                Copy(gmTensorTile, l0cTensor, quant);
+                Copy(gmTensorTile, l0cTensor, quant, FixpipeParams{});
             } else {
                 gm_addr_global = gmC_;
                 Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, quant);
+                Copy(CopyAtom<CopyTraits<CopyL0C2GM, CopyL0C2GMTraitDefault>>{}, gmTensor, l0cTensor, quant,
+                     FixpipeParams{});
+                Copy(gmTensor, l0cTensor, quant);
+                Copy(gmTensor, l0cTensor, quant, FixpipeParams{});
             }
         }
     }
