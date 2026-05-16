@@ -38,10 +38,10 @@ fi
 
 # 示例列表
 EXAMPLE_LIST=(
-    01_simd_cpp_api/00_introduction/01_vector/basic_api_memory_allocator_add
-    01_simd_cpp_api/00_introduction/01_vector/basic_api_tque_add
-    01_simd_cpp_api/00_introduction/02_matrix/matmul
-    01_simd_cpp_api/00_introduction/03_fusion_operation/matmul_leakyrelu
+    01_simd_cpp_api/00_introduction/01_vector/add
+    01_simd_cpp_api/00_introduction/01_vector/add_tpipe_tque
+    01_simd_cpp_api/00_introduction/02_matrix/matmul_high_level_api
+    01_simd_cpp_api/00_introduction/03_fusion_operation/matmul_leakyrelu_high_level_api
     01_simd_cpp_api/01_utilities/03_cpudebug
     01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/batch_mmad
     01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0
@@ -52,7 +52,7 @@ EXAMPLE_LIST=(
     01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/mrg_sort
     01_simd_cpp_api/02_features/03_basic_api/04_resource_management/get_tpipe_ptr
     01_simd_cpp_api/02_features/03_basic_api/06_sync_control/group_barrier
-    01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/set_atomic_add
+    01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations
     01_simd_cpp_api/03_libraries/00_matrix/matmul_fused_mannul
     01_simd_cpp_api/03_libraries/00_matrix/matmul_a2b2_share
     01_simd_cpp_api/03_libraries/00_matrix/matmul_tscm

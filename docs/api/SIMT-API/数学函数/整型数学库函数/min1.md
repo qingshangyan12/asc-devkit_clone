@@ -1,0 +1,107 @@
+# min
+
+## 产品支持情况
+
+| 产品 | 是否支持 |
+| --- | --- |
+| Ascend 950PR/Ascend 950DT | √ |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
+| Atlas 200I/500 A2 推理产品 | x |
+| Atlas 推理系列产品AI Core | x |
+| Atlas 推理系列产品Vector Core | x |
+| Atlas 训练系列产品 | x |
+
+## 功能说明
+
+获取两个输入数据中的最小值。
+
+## 函数原型
+
+```
+long long min(long long x, long long y)
+```
+
+```
+long min(long x, long y)
+```
+
+```
+int min(int x, int y)
+```
+
+```
+short min(short x, short y)
+```
+
+```
+char min(char x, char y)
+```
+
+```
+unsigned long long min(unsigned long long x, unsigned long long y)
+```
+
+```
+unsigned long min(unsigned long x, unsigned long y)
+```
+
+```
+unsigned int min(unsigned int x, unsigned int y)
+```
+
+```
+unsigned short min(unsigned short x, unsigned short y)
+```
+
+```
+unsigned char min(unsigned char x, unsigned char y)
+```
+
+## 参数说明
+
+**表 1**  参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| x | 输入 | 源操作数。 |
+| y | 输入 | 源操作数。 |
+
+## 返回值说明
+
+输入数据中的最小值。
+
+## 约束说明
+
+无
+
+## 需要包含的头文件
+
+使用该接口需要包含"simt\_api/math\_functions.h"头文件。
+
+```
+#include "simt_api/math_functions.h"
+```
+
+## 调用示例
+
+-   SIMT编程场景：
+
+    ```
+    __global__ __launch_bounds__(1024) void KernelMin(long long* dst, long long* x, long long* y)
+    {
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        dst[idx] = min(x[idx], y[idx]);
+    }
+    ```
+
+-   SIMD与SIMT混合编程场景：
+
+    ```
+    __simt_vf__ __launch_bounds__(1024) inline void KernelMin(__gm__ long long* dst, __gm__ long long* x, __gm__ long long* y)
+    {
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        dst[idx] = min(x[idx], y[idx]);
+    }
+    ```
+

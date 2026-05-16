@@ -27,7 +27,7 @@
 
 unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。  
 本样例中，A矩阵shape为[128, 512]，B矩阵shape为[512, 256]，执行Mmad指令时，沿着K轴进行8次迭代循环，每次迭K长度为64。每次迭代中Mmad计算时，unitFlag的取值说明如表1所示：
-<table border="2" align="center">
+<table border="2">
 <caption>表1：unitFlag取值说明</caption>
   <tr>
     <td >unitFlag值</td>
@@ -74,7 +74,7 @@ unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能�
 - 样例执行
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DENABLE_UNITFLAG=0;make -j;    # 编译工程，默认npu模式
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DENABLE_UNITFLAG=1 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
@@ -84,8 +84,8 @@ unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能�
 
   示例如下：
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DENABLE_UNITFLAG=1 ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DENABLE_UNITFLAG=1 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -96,7 +96,7 @@ unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能�
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品/Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `ENABLE_UNITFLAG` | `0`（默认）、`1` | 是否开启unitFlag |
+  | `ENABLE_UNITFLAG` | `0`、`1`（默认） | 是否开启unitFlag |
 
 - 执行结果
 

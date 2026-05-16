@@ -24,6 +24,10 @@
         <block name="DevlibCommon"/>
     </block_info>
 
+    <block_info dependtree="false" dst_path="" block_conf_path="ascend">
+        <block name="AscHcclLib"/>
+    </block_info>
+
     <dir_info value="asc-devkit" install_mod="550">
         <path value="compiler" install_mod="750"/>
         <path value="compiler/bin" install_mod="750"/>
