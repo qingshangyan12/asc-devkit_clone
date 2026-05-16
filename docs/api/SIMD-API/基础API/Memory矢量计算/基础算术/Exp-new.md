@@ -67,6 +67,9 @@ $dst_i = e^{src_i}$
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
+<cann-filter npu-type="950">
+针对Ascend 950PR/Ascend 950DT系列场景，函数原型如下：
+
 - tensor前n个数据连续计算
 
     ```cpp
@@ -88,6 +91,35 @@ $dst_i = e^{src_i}$
         template <typename T, bool isSetMask = true>
         __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
+
+</cann-filter>
+
+<cann-filter npu-type="910b,A3">
+针对Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品场景，函数原型如下：
+
+- tensor前n个数据连续计算
+
+    ```cpp
+    template <typename T>
+    __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
+    ```
+
+- tensor高维切分计算
+    - mask逐bit模式
+
+        ```cpp
+        template <typename T, bool isSetMask = true>
+        __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        ```
+
+    - mask连续模式
+
+        ```cpp
+        template <typename T, bool isSetMask = true>
+        __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        ```
+
+</cann-filter>
 
 ## 参数说明<a name="section176711403104"></a>
 
