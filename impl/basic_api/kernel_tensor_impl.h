@@ -1168,7 +1168,7 @@ template <typename T> __aicore__ inline ShapeInfo LocalTensor<T>::GetShapeInfo()
 template <typename T> __aicore__ inline void
     GlobalTensor<T>::SetGlobalBuffer(__gm__ typename GlobalTensor<T>::PrimType* buffer, uint64_t bufferSize)
 {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
     this->oriAddress_ = buffer;
     // For the case GlobalTensor set through KFC message, origin cacheMode is lost.
     if (this->cacheMode_ == CacheMode::CACHE_MODE_NORMAL) {
@@ -1192,7 +1192,7 @@ template <typename T> __aicore__ inline void
 template <typename T>
 __aicore__ inline void GlobalTensor<T>::SetGlobalBuffer(__gm__ typename GlobalTensor<T>::PrimType* buffer)
 {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
     this->oriAddress_ = buffer;
     // For the case GlobalTensor set through KFC message, origin cacheMode is lost.
     if (this->cacheMode_ == CacheMode::CACHE_MODE_NORMAL) {
@@ -1218,7 +1218,7 @@ __aicore__ inline void GlobalTensor<T>::SetGlobalBuffer(__gm__ typename GlobalTe
 template <typename T> __aicore__ inline
     const __gm__ typename GlobalTensor<T>::PrimType* GlobalTensor<T>::GetPhyAddr() const
 {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
     return ExtractL2CacheGmAddr(this->address_);
 #else
     return this->address_;
@@ -1228,7 +1228,7 @@ template <typename T> __aicore__ inline
 template <typename T> __aicore__ inline
     __gm__ typename GlobalTensor<T>::PrimType* GlobalTensor<T>::GetPhyAddr(const uint64_t offset) const
 {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
     if constexpr (SupportType<PrimType, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         ASCENDC_DEBUG_ASSERT((offset % 2 == 0),
             KERNEL_LOG_INTERNAL(KERNEL_ERROR, "The offset for int4b_t GetPhyAddr should be an even num."));
@@ -1282,7 +1282,7 @@ __aicore__ inline uintptr_t GlobalTensor<T>::AlignPtr(__gm__ U* buffer) const
 template <typename T> __aicore__ inline __inout_pipe__(S)
     typename GlobalTensor<T>::PrimType GlobalTensor<T>::GetValue(const uint64_t offset)
 {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
     if constexpr (SupportType<PrimType, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         __gm__ uint8_t *addr =
             reinterpret_cast<__gm__ uint8_t *>(ExtractL2CacheGmAddr(this->address_)) + offset / INT4_TWO;
@@ -1331,7 +1331,7 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
 template <typename T> __aicore__ inline __inout_pipe__(S)
     typename GlobalTensor<T>::PrimType GlobalTensor<T>::GetValue(const uint64_t offset) const
 {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
     if constexpr (SupportType<PrimType, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         __gm__ uint8_t *addr =
             reinterpret_cast<__gm__ uint8_t *>(ExtractL2CacheGmAddr(this->address_)) + offset / INT4_TWO;
@@ -1384,7 +1384,7 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
 template <typename T> __aicore__ inline __inout_pipe__(S)
     __gm__ typename GlobalTensor<T>::PrimType& GlobalTensor<T>::operator()(const uint64_t offset)
 {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
     __gm__ PrimType* addr = ExtractL2CacheGmAddr(this->address_);
     return addr[offset];
 #else
@@ -1403,7 +1403,7 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
     __gm__ typename GlobalTensor<T>::PrimType& GlobalTensor<T>::operator()(const uint64_t offset) const
 
 {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
     __gm__ PrimType* addr = ExtractL2CacheGmAddr(this->address_);
     return addr[offset];
 #else
@@ -1419,7 +1419,7 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
 template <typename T> __aicore__ inline
     void GlobalTensor<T>::SetValue(const uint64_t offset, typename GlobalTensor<T>::PrimType value)
 {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
     if constexpr (SupportType<PrimType, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         __gm__ uint8_t *addr =
             reinterpret_cast<__gm__ uint8_t *>(ExtractL2CacheGmAddr(this->address_)) + offset / INT4_TWO;
@@ -1583,7 +1583,7 @@ template <typename T>
 template<CacheRwMode rwMode>
 __aicore__ inline void GlobalTensor<T>::SetL2CacheHint(CacheMode mode) {
     this->cacheMode_ = mode;
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
     this->address_ = L2CacheAlter<PrimType, rwMode>(this->address_, mode);
 #else
     if (mode == CacheMode::CACHE_MODE_NORMAL) {
@@ -1597,7 +1597,7 @@ __aicore__ inline void GlobalTensor<T>::SetL2CacheHint(CacheMode mode) {
 #endif
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201)
 template <typename T>
 template <typename U> __aicore__ inline GlobalTensor<U> GlobalTensor<T>::ReinterpretCast() const
 {
