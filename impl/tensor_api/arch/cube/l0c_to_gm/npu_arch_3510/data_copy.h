@@ -102,7 +102,7 @@ private:
         bool nz2ndEn = isNdFormat;
         bool nz2dnEn = isDnFormat;
 
-        uint8_t cacheMode = dst.Engine().GetCacheMode();
+        uint8_t cacheMode = dst.GetCacheMode();
         bool isChannelSplit = trait.enableChannelSplit;
 
         CopyMatrixCcToGmInstr::DataCopy<quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, cacheMode, reluEn,
@@ -168,7 +168,7 @@ private:
         constexpr bool nz2ndEnable = isNdFormat;
         constexpr bool nz2dnEnable = isDnFormat;
 
-        const uint8_t cacheMode = dst.Engine().GetCacheMode();
+        const uint8_t cacheMode = dst.GetCacheMode();
         const bool channelSplit = trait.enableChannelSplit;
         return Std::make_tuple(nSize, mSize, srcStride, dstStride, cacheMode, reluEnable, unitFlag, channelSplit,
                                nz2ndEnable, nz2dnEnable);

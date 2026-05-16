@@ -61,7 +61,7 @@ private:
         auto dstShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
         auto dstStrideRows = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
 
-        uint8_t cacheMode = src.Engine().GetCacheMode();
+        uint8_t cacheMode = src.GetCacheMode();
 
         // lprp mode, dst_stride % C0_SIZE should be 0
         // multi rows copy, dst non-contiguous case
