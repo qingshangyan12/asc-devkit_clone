@@ -133,14 +133,9 @@ private:
     using tag = Info;
 };
 
-struct DefaultPtn;
-
-template <typename T, size_t C0>
-struct LayoutTraitDefault;
-
 template <typename T>
 struct GetLayoutInfo {
-    using type = Std::tuple<DefaultPtn, LayoutTraitDefault<uint16_t, 32 / sizeof(uint16_t)>>;
+    using type = Std::tuple<EmptyValue, EmptyValue>;
 };
 
 template <typename T, typename U, typename LayoutPattern, typename TraitType>
