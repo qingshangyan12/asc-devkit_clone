@@ -204,6 +204,8 @@ struct CommKfcContext {
     CommKfcApiContext apiCtx;
 };
 
+constexpr uint32_t MAX_OP_NUM = 1;
+
 struct AlgInfo {
     uint64_t offset;
     uint64_t opParam;
@@ -215,6 +217,14 @@ struct OpResCtx {
     uint64_t rankId;
     uint64_t rankSize;
     AlgInfo algInfo[HCCL_ALG_MAX_NUM];
+
+    uint64_t xnAddr;    // Xn寄存器起始地址
+    uint64_t ckeAddr;   // CKE寄存器起始地址
+    uint64_t sprAddr;   // spr寄存器地址，预留
+    uint64_t res[MAX_OP_NUM]; // MS地址，预留
+    uint64_t resCtx;    //资源地址，用于资源下发时的处理
+    uint32_t opType[MAX_OP_NUM];
+    uint32_t algorithmType[MAX_OP_NUM];
 };
 }
 
