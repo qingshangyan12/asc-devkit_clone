@@ -92,7 +92,7 @@ private:
         bool nz2ndEn = IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>;
         bool nz2dnEn = IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>;
 
-        uint8_t cacheMode = dst.Engine().GetCacheMode();
+        uint8_t cacheMode = dst.GetCacheMode();
         bool isChannelSplit = trait.enableChannelSplit;
 
         CopyMatrixCcToGmInstr::DataCopy<quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, cacheMode, reluEn,
@@ -148,7 +148,7 @@ private:
         constexpr bool nz2ndEnable = IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>;
         constexpr bool nz2dnEnable = IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>;
 
-        const uint8_t cacheMode = dst.Engine().GetCacheMode();
+        const uint8_t cacheMode = dst.GetCacheMode();
         const bool channelSplit = trait.enableChannelSplit;
         return Std::make_tuple(nSize, mSize, srcStride, dstStride, cacheMode, reluEnable, unitFlag, channelSplit,
                                nz2ndEnable, nz2dnEnable);

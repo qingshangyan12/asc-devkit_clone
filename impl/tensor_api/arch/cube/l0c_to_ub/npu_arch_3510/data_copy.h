@@ -100,7 +100,6 @@ private:
         bool nz2ndEn = IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>;
         bool nz2dnEn = IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>;
 
-        uint8_t cacheMode = dst.Engine().GetCacheMode();
         bool isChannelSplit = trait.enableChannelSplit;
 
         uint8_t dualDstCtl = trait.dualDstCtl;
