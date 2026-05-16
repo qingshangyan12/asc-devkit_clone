@@ -9,7 +9,7 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 
 | 文件 | 路径模式 | 角色 |
 |------|---------|------|
-| TOP5 源文件 | `docs/api/TOP5/{ApiName}.md` | 产品化文档，包含 A2/A3 场景的接口描述、内部交叉引用链接 |
+| TOP5 源文件 | `docs/api/TOP5/{ApiName}.md` | 产品化文档，包含 A2/A3 系列产品的接口描述、内部交叉引用链接 |
 | Trunk 源文件 | `docs/api/SIMD-API/基础API/Memory矢量计算/{分类}/{ApiName}.md` | 主线文档，包含 950/全产品线内容、config 参数、完整样例代码 |
 
 ## 输出文件
@@ -43,7 +43,7 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 
 ```markdown
 <cann-filter npu-type="950">
-针对Ascend 950PR/Ascend 950DT系列场景，函数原型如下：
+针对Ascend 950PR/Ascend 950DT系列产品，函数原型如下：
 
 - tensor前n个数据连续计算
 
@@ -61,7 +61,7 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 </cann-filter>
 
 <cann-filter npu-type="910b,A3">
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品场景，函数原型如下：
+针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，函数原型如下：
 
 - tensor前n个数据连续计算
 
@@ -185,7 +185,7 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 
     <cann-filter npu-type="910b,A3">
 
-    针对Atlas A2/A3系列产品场景，示例如下：
+    针对Atlas A2/A3系列产品，示例如下：
 
     ```cpp
     // TOP5 或通用样例
@@ -195,7 +195,7 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 
     <cann-filter npu-type="950">
 
-    针对Ascend 950PR/Ascend 950DT系列场景，示例如下：
+    针对Ascend 950PR/Ascend 950DT系列产品，示例如下：
 
     ```cpp
     // Trunk 的 950 专属样例

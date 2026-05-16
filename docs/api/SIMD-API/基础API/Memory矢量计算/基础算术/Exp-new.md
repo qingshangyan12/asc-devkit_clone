@@ -68,7 +68,7 @@ $dst_i = e^{src_i}$
 ## 函数原型<a name="section620mcpsimp"></a>
 
 <cann-filter npu-type="950">
-针对Ascend 950PR/Ascend 950DT系列场景，函数原型如下：
+针对Ascend 950PR/Ascend 950DT系列产品，函数原型如下：
 
 - tensor前n个数据连续计算
 
@@ -95,7 +95,7 @@ $dst_i = e^{src_i}$
 </cann-filter>
 
 <cann-filter npu-type="910b,A3">
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品场景，函数原型如下：
+针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，函数原型如下：
 
 - tensor前n个数据连续计算
 
@@ -185,7 +185,7 @@ $dst_i = e^{src_i}$
 
     <cann-filter npu-type="950">
 
-    针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品场景，示例如下：
+    针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，示例如下：
 
     ```cpp
     AscendC::Exp(dstLocal, srcLocal, 512);
@@ -195,7 +195,7 @@ $dst_i = e^{src_i}$
 
     <cann-filter npu-type="910b,A3">
 
-    针对Ascend 950PR/Ascend 950DT系列场景，示例如下：
+    针对Ascend 950PR/Ascend 950DT系列产品，示例如下：
 
     ```cpp
     static constexpr ExpConfig config = { ExpAlgo::PRECISION_1ULP_FTZ_FALSE };
