@@ -13,8 +13,9 @@
 
 import json
 import re
-import yaml
 from pathlib import Path
+
+import yaml
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPTS_DIR.parent

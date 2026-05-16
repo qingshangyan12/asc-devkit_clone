@@ -11,8 +11,9 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-import yaml
 from pathlib import Path
+
+import yaml
 
 BASE = Path(__file__).resolve().parent
 with open(BASE / "_toc.yml", encoding="utf-8") as f:
