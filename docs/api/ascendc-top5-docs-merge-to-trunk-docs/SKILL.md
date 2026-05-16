@@ -90,19 +90,40 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 
 将 Trunk 的 **HTML 表格**（`<table>`）转换为 **Markdown 简易表格**（`| ... |`）。
 
-产品支持情况的 HTML 表格**不转换**，保持原样。
+以下情况**不转换**，保持 HTML `<table>` 格式：
+- 产品支持情况的 HTML 表格 — 整节保留 Trunk 原样。
+- **模板参数说明表（表 1）** — 因 `config` 等参数行包含 `<pre>` 多行代码块，Markdown 表格无法承载多行内容（换行会破坏表格行结构），必须使用 HTML `<table>` 格式以确保代码块正确渲染。
 
-#### 5.2 模板参数说明表（表 1）
+#### 5.2 模板参数说明表（表 1）— HTML 格式
+
+**整表使用 HTML `<table>` 格式**，不使用 Markdown 简易表格。
 
 | 参数 | 处理方式 |
 |------|---------|
 | T | 采用 TOP5 的描述文本 |
 | isSetMask | 采用 TOP5 的描述，保留 TOP5 的交叉引用链接（`SetVectorMask.md`、`掩码.md`） |
-| Trunk 独有参数（如 `config`） | 保留，用 `<cann-filter npu-type="950">` 包裹整行 |
+| Trunk 独有参数（如 `config`） | 保留，用 `<cann-filter npu-type="950">` 包裹 `<td>` 内的全部内容 |
 
-`config` 等产品专属参数行中的代码片段（如 `enum class` / `struct` 定义）使用 HTML `<pre>` 标签在表格中呈现多行代码样式。
+**config 行写法要点**：
+- `<cann-filter>` 标签直接包裹在 `<td>` 内所有内容的**外层**。
+- 代码片段使用 `<pre class="screen" codetype="Cpp">` 标签（沿用 Trunk 源文件的 `class` 和 `codetype` 属性），`<pre>` 内可正常换行。
+- 多段落使用 `<p>` 标签，列表使用 `<ul><li>` 标签。
+- 示例结构：
+  ```html
+  <tr><td class="cellrowborder" valign="top"><p>config</p></td>
+  <td class="cellrowborder" valign="top"><cann-filter npu-type="950">
+  <p>该参数仅支持Ascend 950PR/Ascend 950DT。</p>
+  <p>用于配置...，LnConfig类型，定义如下：</p>
+  <pre class="screen" codetype="Cpp">enum class LnAlgo {
+      INTRINSIC = 0,
+      ...
+  };</pre>
+  <p>取值说明：</p>
+  <ul><li>LnAlgo::INTRINSIC...</li></ul>
+  </cann-filter></td></tr>
+  ```
 
-#### 5.3 参数说明表（表 2）
+#### 5.3 参数说明表（表 2）— Markdown 格式
 
 各参数描述优先采用 **TOP5 的文本和内部交叉引用链接**：
 
@@ -200,7 +221,7 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 3. [ ] 公式已替换为 LaTeX 行内公式
 4. [ ] 头文件引用路径已包含
 5. [ ] 函数原型按 cann-filter 正确拆分（950 用 Trunk 签名，A2/A3 用 TOP5 签名）
-6. [ ] 参数表格已转为 Markdown 格式（产品支持情况除外）
+6. [ ] 参数表格已转为正确格式（表 1 用 HTML，表 2 用 Markdown，产品支持情况除外）
 7. [ ] 参数描述链接已统一为 TOP5 的内部引用
 8. [ ] Trunk 独有的模板参数（如 config）已保留并用 cann-filter 包裹
 9. [ ] 章节顺序正确（Trunk 顺序 + TOP5 新章节按逻辑位置插入）
