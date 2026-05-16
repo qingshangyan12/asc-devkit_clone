@@ -90,6 +90,7 @@
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 使用仿真模式编译
   # 在build目录执行以下内容
   ./c_api_add_example           # 执行样例
   ```

@@ -7,7 +7,22 @@
 
 ## RegBase编程模板
 
-3510架构下的RegBase编程，其处理的对象为RegTensor,即数据从GM搬运到UB,再从UB搬运到寄存器RegTensor,在寄存器中完成运算后,再将结果按原路搬回，使用时应注意函数和变量声明的标识符：
+3510架构下的RegBase编程，其处理的对象为RegTensor,即数据从GM搬运到UB,再从UB搬运到寄存器RegTensor,在寄存器中完成运算后,再将结果按原路搬回，使用时应注意函数和变量声明的标识符。
+
+Regbase下的变量说明：
+- 所有的`vector_xxx`类型的变量声明只能在`__simd_vf__`函数内
+- 所有的`vector_xxx`类型的变量，长度固定为256B, 根据后面的实际类型对该vector进行解释
+- `vector_xxx`类型变量的示例，如`vector_float`类型的变量，长度为256B, 即64个float类型的数据
+- `vector_xxx`类型变量的示例，如`vector_int8_t`类型的变量，长度为256B, 即256个int8_t类型的数据
+- 特殊数据类型为`vector_bool`，其长度固定为32B, 其中每个bit位控制`vector_xxx`类型的1B长度是否参与计算
+- 对于数据类型大于1B的`vector_xxx`类型的变量，vector_bool类型的变量中多个bit位对应一个元素，只有最低位生效
+- vector_bool类型的变量的示例，如`vector_bool`中前16 bit值为`0001 0001 0001 0000`，其控制`vector_float`类型的变量为前3个元素参与运算，第4个不参与
+- vector_bool类型的变量的示例，如`vector_bool`中前16 bit值为`00 01 00 01 00 01 00 00`，其控制`vector_half`类型的变量为前6个元素间隔参与运算，第7, 8个不参与
+- `asc_update_mask_b32(uint32_t remaining)` 函数用于根据剩余元素数量`remaining`生成一个`vector_bool`类型的变量，其前`remaining`个b32元素的控制位为`1`, 其余为`0`
+- `asc_update_mask_b32(uint32_t remaining)` 函数执行完成后，剩余元素数量`remaining`会减少`256 / sizeof(b32)`
+- `asc_update_mask_b32(uint32_t remaining)` 函数中，当remaining小于`256 / sizeof(b32)`时，控制前`remaining`个元素参与运算，剩余元素数量`remaining`会减少到`0`
+- `asc_update_mask_b32(uint32_t remaining)` 函数需被赋值给`vector_bool`类型的变量
+- `asc_update_mask_b32(uint32_t remaining)` 通常用于处理连续存储数据计算的场景，能适应不同长度的剩余元素数量
 
 ```cpp
 #include <cstdint>
@@ -124,44 +139,48 @@ std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y)
 
 ## Host 侧启动模板
 
-可复用的 Host 侧 kernel 启动模板：
+Host 侧直接调用kernel_add函数，并执行精度比对
 
 ```cpp
-template<typename KernelFunc, typename... Args>
-void launchKernel(KernelFunc kernel, uint32_t numBlocks,
-                  std::vector<uint8_t*>& hostBuffers,
-                  std::vector<size_t>& bufferSizes,
-                  std::vector<uint8_t**>& deviceBuffers)
+uint32_t VerifyResult(std::vector<float> &output, std::vector<float> &golden)
 {
-    int32_t deviceId = 0;
-    aclrtStream stream = nullptr;
-
-    aclInit(nullptr);
-    aclrtSetDevice(deviceId);
-    aclrtCreateStream(&stream);
-
-    // 分配 device 内存
-    for (size_t i = 0; i < hostBuffers.size(); ++i) {
-        aclrtMalloc((void**)deviceBuffers[i], bufferSizes[i],
-                    ACL_MEM_MALLOC_HUGE_FIRST);
-        aclrtMemcpy(*deviceBuffers[i], bufferSizes[i],
-                    hostBuffers[i], bufferSizes[i],
-                    (i < 2) ? ACL_MEMCPY_HOST_TO_DEVICE
-                            : ACL_MEMCPY_DEVICE_TO_HOST);
+    auto printTensor = [](std::vector<float> &tensor, const char *name) {
+        constexpr size_t maxPrintSize = 20;
+        std::cout << name << ": ";
+        std::copy(tensor.begin(), tensor.begin() + std::min(tensor.size(), maxPrintSize),
+            std::ostream_iterator<float>(std::cout, " "));
+        if (tensor.size() > maxPrintSize) {
+            std::cout << "...";
+        }
+        std::cout << std::endl;
+    };
+    printTensor(output, "Output");
+    printTensor(golden, "Golden");
+    if (std::equal(golden.begin(), golden.end(), output.begin())) {
+        std::cout << "[Success] Case accuracy is verification passed." << std::endl;
+        return 0;
+    } else {
+        std::cout << "[Failed] Case accuracy is verification failed!" << std::endl;
+        return 1;
     }
+}
 
-    // 启动 kernel
-    kernel<<<numBlocks, nullptr, stream>>>(/* device pointers */);
-    aclrtSynchronizeStream(stream);
+int32_t main(int32_t argc, char *argv[])
+{
+    constexpr uint32_t totalLength = NUM_BLOCKS * TILE_LENGTH;
+    std::vector<float> x(totalLength);
+    std::vector<float> y(totalLength);
 
-    // 读回输出
-    // ... 对输出缓冲区执行 aclrtMemcpy DEVICE_TO_HOST ...
-
-    // 清理
-    for (auto* db : deviceBuffers) { aclrtFree(*db); }
-    aclrtDestroyStream(stream);
-    aclrtResetDevice(deviceId);
-    aclFinalize();
+    for (uint32_t i = 0; i < totalLength; ++i) {
+        x[i] = i * 0.1f;
+        y[i] = i * 0.1f;
+    }
+    std::vector<float> output = kernel_add(x, y);
+    std::vector<float> golden(totalLength);
+    for (uint32_t i = 0; i < totalLength; ++i) {
+            golden[i] = x[i] + y[i];
+    }
+    return VerifyResult(output, golden);
 }
 ```
 
@@ -170,9 +189,6 @@ void launchKernel(KernelFunc kernel, uint32_t numBlocks,
 ## 编译注意事项
 
 - Kernel 源文件使用 `.asc` 扩展名。
-- 目标架构：`--npu-arch=dav-2201`（同时适用于 2201 和 3510 平台）。
+- 目标架构：`--npu-arch=dav-3510`（仅适用于 3510 平台）。
 - 项目语言必须包含 `ASC`。
-- Host 侧代码为标准 C++，链接 `libascendcl.so`（ACL 运行时）。
-- `asc_get_block_num()` 返回 2 的幂次（通常为 1、2、4 或 8）。
-- 所有 UB 数组大小必须为编译期常量（`constexpr`）。
-- 数据搬运大小应为 32 字节对齐。
+- UB上数据搬运大小应为 32 字节对齐。

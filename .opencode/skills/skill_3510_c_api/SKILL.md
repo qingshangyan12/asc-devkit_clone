@@ -25,6 +25,10 @@ description: 通过AscendC C API编程语言编写对应的测试样例, 测试�
 - 3510架构对于Vector类型的运算，均需要搬入到寄存器中进行计算，计算完成后再搬出到GM。即数据通路为gm -> ub -> reg -> ub -> gm
 - 特殊数据类型如fp4和fp8,int4等，在Host侧没有定义，需手动进行编解码函数的编写，通过地址的方式传递到Device侧
 - UB中的数据需要加`__ubuf__`前缀声明
+- 指令的使用文档请参考[../../../docs/api/c_api/](../../../docs/api/c_api/)其中3510的部分
+- 禁止随意揣测指令，必要时查阅文档确认
+- 编译时使用`cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;`在仿真模式下编译运行
+- 执行精度对比时，应将输入、输出、真值数据打印并存储为csv文件，如果存在精度问题，打印出现精度问题的元素的值和索引
 
 ## 快速入门
 
@@ -37,61 +41,114 @@ description: 通过AscendC C API编程语言编写对应的测试样例, 测试�
 单个头文件即可包含所有 C API 接口。也可以分别引入各类别头文件（如 `vector_compute.h`、`cube_datamove.h`、`sync.h`）。
 
 ### Kernel 函数结构
-
-典型的 C API Kernel 遵循以下模式：
-
-```c
-__vector__ __global__ __aicore__ void kernel_name(__gm__ float* input, __gm__ float* output)
+```cpp
+// 函数标识符及函数声明, __vector__ 表示运行在vector core中
+__vector__ __global__ __aicore__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 {
-    // 步骤1：初始化 NPU 状态
+    // 初始化
     asc_init();
 
-    // 步骤2：声明本地 UB 缓冲区（仅支持编译期常量大小）
-    __ubuf__ float local_buf[BUFFER_SIZE];
+    // 计算每个block处理的元素数量
+    uint32_t blockLength = TILE_LENGTH * NUM_BLOCKS / asc_get_block_num();
 
-    // 步骤3：计算每个 block 的工作量
-    uint32_t blockLength = total_size / asc_get_block_num();
+    // 计算当前block处理的元素起始地址
+    __gm__ float* xGm = x + get_block_idx() * blockLength;
+    __gm__ float* yGm = y + get_block_idx() * blockLength;
+    __gm__ float* zGm = z + get_block_idx() * blockLength;
 
-    // 步骤4：搬运数据 GM -> UB
-    asc_copy_gm2ub_sync(local_buf, input + asc_get_block_idx() * blockLength,
-                        blockLength * sizeof(float));
+    // 通过数组方式申请UB中的内存
+    __ubuf__ float xLocal[TILE_LENGTH];
+    __ubuf__ float yLocal[TILE_LENGTH];
+    __ubuf__ float zLocal[TILE_LENGTH];
 
-    // 步骤5：调用__simd_vf__函数，在vf内搬入寄存器进行计算，计算完成后再搬出到UB
-    AddVF(local_buf, local_buf, local_buf, blockLength);
+    // 配置相关参数，包括缓存模式、数据长度、步长等
+    const uint8_t cacheMode0 = static_cast<uint8_t>(((uint64_t)xGm) >> 60);
+    const uint8_t cacheMode1 = static_cast<uint8_t>(((uint64_t)yGm) >> 60);
+    const uint8_t cacheMode2 = static_cast<uint8_t>(((uint64_t)zGm) >> 60);
+    uint32_t burstLength = blockLength * 4;
+    uint64_t srcStride = 0;
+    uint32_t dstStride = 0;
 
-    // 步骤6：搬运结果 UB -> GM
-    asc_copy_ub2gm_sync(output + asc_get_block_idx() * blockLength, local_buf,
-                        blockLength * sizeof(float));
+    // 从GM拷贝数据到UB
+    asc_copy_gm2ub_align((__ubuf__ float*)xLocal, xGm, BLK_NUM, burstLength, 0, 0, true, cacheMode0, srcStride, dstStride);
+    asc_copy_gm2ub_align((__ubuf__ float*)yLocal, yGm, BLK_NUM, burstLength, 0, 0, true, cacheMode1, srcStride, dstStride);
+
+    // 同步指令，确保数据拷贝完成后再继续执行
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+
+    // 计算每个rep的元素数量
+    uint16_t mask_bit_size = 256;
+    uint16_t one_rep_size = mask_bit_size / sizeof(float);
+    uint16_t rep = (blockLength + one_rep_size - 1) / one_rep_size;
+    // 调用VF函数
+    AddVF(rep, one_rep_size, blockLength, (__ubuf__ float*)xLocal, (__ubuf__ float*)yLocal, (__ubuf__ float*)zLocal );
+
+    // 同步指令，确保VF函数执行后再继续执行
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+
+    // 从UB拷贝数据到GM 
+    asc_copy_ub2gm_align(zGm, (__ubuf__ float*)zLocal, BLK_NUM, burstLength, cacheMode2, srcStride, dstStride);
 }
 ```
 
-### Host 侧启动流程
+### Kernel 调用流程
+
+典型的 C API Kernel 调用遵循以下模式：
 
 ```c
-// 初始化 ACL 运行时
-aclInit(nullptr);
-aclrtSetDevice(0);
-aclrtCreateStream(&stream);
+std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y)
+{
+    // 步骤1：相关变量的声明，数据切分，设备Id选择
+    constexpr uint32_t numBlocks = NUM_BLOCKS;
+    uint32_t totalLength = x.size();
+    size_t totalByteSize = totalLength * sizeof(float);
+    int32_t deviceId = 0;
+    aclrtStream stream = nullptr;
 
-// 分配 device 内存
-aclrtMalloc(&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
-aclrtMalloc(&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+    // 步骤2：Host侧和Device侧存储数据的变量声明
+    uint8_t *xHost = reinterpret_cast<uint8_t *>(x.data());
+    uint8_t *yHost = reinterpret_cast<uint8_t *>(y.data());
+    uint8_t *zHost = nullptr;
+    float *xDevice = nullptr;
+    float *yDevice = nullptr;
+    float *zDevice = nullptr;
+    
+    // 步骤3：初始化ACL运行时和数据拷贝
+    aclInit(nullptr);
+    aclrtSetDevice(deviceId);
+    aclrtCreateStream(&stream);
 
-// 拷贝数据 host -> device
-aclrtMemcpy(xDevice, totalByteSize, xHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMallocHost((void **)(&zHost), totalByteSize);
+    aclrtMalloc((void **)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc((void **)&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc((void **)&zDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
 
-// 启动 kernel：<<<numBlocks, nullptr, stream>>>
-kernel_name<<<numBlocks, nullptr, stream>>>(xDevice, yDevice);
+    aclrtMemcpy((uint8_t*)xDevice, totalByteSize, xHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy((uint8_t*)yDevice, totalByteSize, yHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
 
-// 同步并回读
-aclrtSynchronizeStream(stream);
-aclrtMemcpy(zHost, totalByteSize, zDevice, totalByteSize, ACL_MEMCPY_DEVICE_TO_HOST);
+    // 步骤4：调用自定义kernel
+    add_custom<<<numBlocks, nullptr, stream>>>(xDevice, yDevice, zDevice);
 
-// 清理
-aclrtFree(xDevice);
-aclrtDestroyStream(stream);
-aclrtResetDevice(0);
-aclFinalize();
+    // 步骤5：同步并回读结果，将Host侧结果存储在zHost中
+    aclrtSynchronizeStream(stream);
+    aclrtMemcpy(zHost, totalByteSize, (uint8_t*)zDevice, totalByteSize, ACL_MEMCPY_DEVICE_TO_HOST);
+    std::vector<float> z((float *)zHost, (float *)(zHost + totalByteSize));
+
+    // 步骤6：资源释放，清理ACL运行时
+    aclrtFree(xDevice);
+    aclrtFree(yDevice);
+    aclrtFree(zDevice);
+    aclrtFreeHost(zHost);
+
+    aclrtDestroyStream(stream);
+    aclrtResetDevice(deviceId);
+    aclFinalize();
+
+    // 步骤7：返回结果z
+    return z;
+}
 ```
 
 ### CMakeLists.txt
@@ -118,21 +175,6 @@ target_compile_options(my_kernel PRIVATE
 | `__ca__`  | L0A Buffer（矩阵左操作数）| 512B    |
 | `__cb__`  | L0B Buffer（矩阵右操作数）| 512B    |
 | `__cc__`  | L0C Buffer（矩阵结果）   | 64B      |
-
-### 流水线类型
-
-NPU 具有多条独立的执行流水线：
-
-| 流水线     | 用途                                                |
-|------------|-----------------------------------------------------|
-| `PIPE_S`   | 标量流水线：指令分发、标量计算                        |
-| `PIPE_V`   | 矢量计算流水线                                       |
-| `PIPE_M`   | 矩阵计算流水线（Cube 单元）                          |
-| `PIPE_MTE1`| 数据搬运：L1->L0A/L0B、L1->UB、L0 初始化            |
-| `PIPE_MTE2`| 数据搬运：GM->L1、GM->L0A/L0B、GM->UB、L1 初始化    |
-| `PIPE_MTE3`| 数据搬运：UB->GM、UB->L1                             |
-| `PIPE_FIX` | Fixpipe（量化、激活函数）                            |
-| `PIPE_ALL` | 所有流水线                                           |
 
 ### 内存分配
 
