@@ -176,7 +176,7 @@ TEST_F(CooperativeGroupsTestsuite, DISABLED_CoalescedGroupShflFloatTest)
     EXPECT_FLOAT_EQ(result, 3.14f);
 }
 
-TEST_F(CooperativeGroupsTestsuite, DISABLED_CoalescedGroupShflHalfTest)
+TEST_F(CooperativeGroupsTestsuite, CoalescedGroupShflHalfTest)
 {
     coalesced_group cg(0xFFFFFFFF);
     half var = static_cast<half>(1.5);

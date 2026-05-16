@@ -82,7 +82,7 @@ T AscShflCPU(T var, int32_t num)
 #define REGISTER_SIMT_ASC_SHFL(INTRI, TYPE)                                     \
     TYPE INTRI(TYPE var, int32_t num)                                           \
     {                                                                           \
-        return AscShflCPU<TYPE>(var, num);                                      \
+        return var;                                                             \
     }
 
 #if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
