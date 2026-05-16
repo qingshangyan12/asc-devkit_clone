@@ -17,7 +17,7 @@ import numpy as np
 
 
 def gen_golden_data_simple():
-    input_x = np.random.uniform(-10, 10, [8192, 8192]).astype(np.float32)
+    input_x = np.random.uniform(-10, 10, [8, 8192]).astype(np.float32)
     # 公式
     # GELU(x) ≈ x / (1 + e^(-2 · √(2/π) · (x + 0.044715 · x³)))
     # 其中，-2 · √(2/π) ≈ -1.595769
