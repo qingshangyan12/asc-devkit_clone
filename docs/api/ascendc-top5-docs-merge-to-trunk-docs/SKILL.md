@@ -183,22 +183,22 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 
 - tensor前n个数据计算接口样例
 
-    <cann-filter npu-type="950">
-
-    针对Ascend 950PR/Ascend 950DT系列场景，示例如下：
-
-    ```cpp
-    // Trunk 的 950 专属样例
-    ```
-
-    </cann-filter>
-
     <cann-filter npu-type="910b,A3">
 
     针对Atlas A2/A3系列产品场景，示例如下：
 
     ```cpp
     // TOP5 或通用样例
+    ```
+
+    </cann-filter>
+
+    <cann-filter npu-type="950">
+
+    针对Ascend 950PR/Ascend 950DT系列场景，示例如下：
+
+    ```cpp
+    // Trunk 的 950 专属样例
     ```
 
     </cann-filter>
@@ -209,6 +209,8 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 - 仅产品专属样例用 `<cann-filter>` 包裹。
 - `<cann-filter>` 标签前后需有空行，标签内部不使用子列表（`- `），代码块保持 4 空格缩进。
 - 代码块添加 `cpp`/`bash` 语言标注。
+- **cann-filter 块顺序**：tensor前n个数据计算接口样例中，`npu-type="910b,A3"`（A2/A3 系列）在前，`npu-type="950"`（950 系列）在后。
+- **950 块样例只保留 config 版本调用**：不要同时写无 config 的默认调用和有 config 的调用。只展示 `static constexpr XxxConfig config = {...}; AscendC::Xxx<T, config>(...)` 即可，config 声明在前、调用在后。
 
 ---
 
@@ -230,3 +232,4 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 12. [ ] 调用示例中代码块渲染正确，cann-filter 标签不干扰 Markdown 解析
 13. [ ] 所有代码块已添加语言标注（`cpp`/`bash`）
 14. [ ] 无 `<cann-filter>` 标签与子列表嵌套导致的渲染问题
+15. [ ] tensor前n个数据计算接口样例的 cann-filter 块顺序：A2/A3 在前、950 在后，950 块只保留 config 版本调用（不重复调用）
