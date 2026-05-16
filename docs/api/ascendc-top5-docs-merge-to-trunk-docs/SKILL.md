@@ -1,6 +1,9 @@
-# Skill: MergeTOP5DocsToTrunk
+---
+name: ascendc-top5-docs-merge-to-trunk-docs
+description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来源的 API 文档合并为一份统一的 `xxx-new.md`，以 Trunk 为骨架，融合 TOP5 的内容增强。
+---
 
-将 TOP5（产品化文档）与 Trunk（主线文档）两个来源的 API 文档合并为一份统一的 `xxx-new.md`，以 Trunk 为骨架，融合 TOP5 的内容增强。
+# TOP5资料反合Trunk主线
 
 ## 输入文件
 
