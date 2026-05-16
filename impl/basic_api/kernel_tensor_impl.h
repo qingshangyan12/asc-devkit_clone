@@ -954,8 +954,11 @@ __aicore__ inline void LocalTensor<T>::SetBufferLen(uint32_t dataLen)
     if ASCEND_IS_AIV {
         this->address_.bufferAddr = set_ub_addr_upper_bound(this->address_.bufferAddr, dataLen * sizeof(T));
     }
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+    this->address_.bufferAddr = set_ub_addr_upper_bound(this->address_.bufferAddr, dataLen * sizeof(T));
 #endif
 }
+
 template <typename T> __aicore__ inline void LocalTensor<T>::SetUserTag(const TTagType tag)
 {
     auto ptr = reinterpret_cast<TBufType*>(this->address_.bufferHandle);
