@@ -1,3 +1,16 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
 import json
 import re
 import yaml
@@ -63,29 +76,6 @@ def remove_temp_keys(entries):
             remove_temp_keys(entry["entries"])
 
 
-def show_structure(entries, indent=0):
-    prefix = "  " * indent
-    for e in entries:
-        f = e.get("file", "(no file)")
-        t = e.get("title", "")
-        subs = len(e.get("entries", []))
-        label = f"{prefix}{f[:70]:70s}"
-        if t:
-            label += f"  [{t[:50]}]"
-        print(f"{label}  sub={subs}")
-        if subs:
-            show_structure(e["entries"], indent + 1)
-
-
-def count_entries(entries):
-    n = 0
-    for e in entries:
-        n += 1
-        if "entries" in e:
-            n += count_entries(e["entries"])
-    return n
-
-
 def main():
     toc_entries = parse_readme_toc()
 
@@ -98,32 +88,22 @@ def main():
 
     toc = {"root": "index", "entries": toc_entries}
 
-    total = count_entries(toc_entries)
-    print(f"Total entries: {total}")
-    print(f"Top-level: {len(toc_entries)}")
-    show_structure(toc_entries)
-    print(f"  ...")
-
     toc_path = SCRIPTS_DIR / "_toc.yml"
     with open(toc_path, "w", encoding="utf-8") as f:
         yaml.dump(toc, f, allow_unicode=True, default_flow_style=False, sort_keys=False, width=200)
 
     _unescape_yaml(toc_path)
 
-    print(f"\nWritten to: {toc_path}")
-
     json_data = [_compact(e) for e in toc_entries]
     json_str = json.dumps(json_data, ensure_ascii=False, separators=(',', ':'))
 
     json_path = PROJECT_ROOT / "_static" / "toc_data.json"
     json_path.write_text(json_str, encoding="utf-8")
-    print(f"Written to: {json_path} ({json_path.stat().st_size / 1024:.0f} KB)")
 
     js_path = PROJECT_ROOT / "_static" / "js"
     js_path.mkdir(parents=True, exist_ok=True)
     js_path = js_path / "toc-data.js"
     js_path.write_text("var TOC_DATA_EMBEDDED = " + json_str + ";", encoding="utf-8")
-    print(f"Written to: {js_path} ({js_path.stat().st_size / 1024:.0f} KB)")
 
 
 def _compact(entry):

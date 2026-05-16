@@ -1,3 +1,16 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
 """Post-build processing: fix .md links and generate download zips.
 
 1. Fix .md → .html links in built HTML files.
@@ -117,8 +130,6 @@ def load_950_supported_sources(json_path: Path, src_root: Path) -> set[Path]:
                     break
             else:
                 skipped += 1
-    if skipped:
-        print(f"[zip] skipped {skipped} JSON keys (no matching .md/.rst source)")
     return supported
 
 
@@ -174,34 +185,22 @@ def main():
     json_path = src_root / "_static" / "version_filter.json"
 
     if not html_dir.is_dir():
-        print(f"[zip] No build output directory found (_build/dirhtml or _build/html)")
         return
 
     files, fixed = fix_md_links(html_dir)
-    if fixed:
-        print(f"[md] {fixed} .md→.html link(s) fixed in {files} file(s)")
 
     all_sources = collect_all_sources(src_root)
 
     # ── 全量 zip: original files, no filtering ──
     all_zip = html_dir / "download_all.zip"
-    print(f"[zip] Building download_all.zip ({len(all_sources)} .md/.rst) ...")
     build_src_zip(all_zip, all_sources, src_root)
-    all_size_mb = all_zip.stat().st_size / 1024 / 1024 if all_zip.exists() else 0
-    print(f"[zip] download_all.zip  ({all_size_mb:.1f} MB)")
 
     # ── 950 zip: 950-only files + stripped product tables ──
     supported = load_950_supported_sources(json_path, src_root)
-    print(f"[zip] 950-supported source files: {len(supported)}")
 
     zip_950 = html_dir / "download_950.zip"
-    print("[zip] Building download_950.zip (950-only, tables filtered) ...")
     supported_list = sorted(supported)
     build_src_zip(zip_950, supported_list, src_root, filter_fn=filter_md_for_950)
-    size_mb = zip_950.stat().st_size / 1024 / 1024 if zip_950.exists() else 0
-    print(f"[zip] download_950.zip  ({size_mb:.1f} MB)")
-
-    print("[zip] Done.")
 
 
 if __name__ == "__main__":
