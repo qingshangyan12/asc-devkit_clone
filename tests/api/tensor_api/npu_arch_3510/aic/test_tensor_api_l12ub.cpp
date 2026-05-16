@@ -56,6 +56,7 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
     Copy(atom, dst, src);
+    Copy(dst, src);
 }
 
 } // namespace
