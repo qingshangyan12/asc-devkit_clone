@@ -28,6 +28,7 @@ using namespace HcclApi;
 
 namespace AscendC {
 namespace {
+
 void PrintMc2InitTiling(const Mc2InitTilingInner& tiling)
 {
     TILING_LOG_DEBUG("Mc2InitTiling msg begin.");
@@ -137,6 +138,9 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
     for (uint32_t i = 0; i < MAX_CC_TILING_NUM; i++) {
         tilingInner->offset[i] = 0;
     }
+    if (impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALL) && impl_.commEngine_ == 5) {
+        tilingInner->version = INIT_TILING_CCU_NEW_VERSION;
+    }
     ASCENDC_HOST_ASSERT(SetDevType(tilingInner) == EXIT_SUCCESS, return EXIT_FAILURE, "SetDevType failed.");
 
     TILING_LOG_DEBUG("Mc2InitTiling addr %#lx", impl_.initTilingAddr_);
@@ -182,7 +186,6 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2CcTiling& tiling)
     tilingInner->srcDataType = impl_.srcDataType_;
     tilingInner->dstDataType = impl_.dstDataType_;
     tilingInner->commEngine = impl_.commEngine_;
-
     uint64_t ccTilingAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&tiling));
     ASCENDC_HOST_ASSERT(
         UpdateMc2InitTiling(impl_.initTilingAddr_, ccTilingAddr) == EXIT_SUCCESS, return EXIT_FAILURE,
