@@ -76,7 +76,7 @@ private:
             dstStrideRows = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
         }
 
-        uint8_t cacheMode = src.Engine().GetCacheMode();
+        uint8_t cacheMode = src.GetCacheMode();
 
         // normal mode, dst_stride % C0_SIZE should be 0
         // compact mode, blockLen equals dstStride
