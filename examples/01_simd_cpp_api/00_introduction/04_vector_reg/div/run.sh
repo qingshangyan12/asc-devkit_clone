@@ -19,4 +19,8 @@ cp -r "${SCRIPT_DIR}/input" "${SCRIPT_DIR}/output" "${BUILD_DIR}/"
 
 (cd "${BUILD_DIR}" && ./demo)
 
-python3 "${SCRIPT_DIR}/scripts/verify_result.py" "${BUILD_DIR}/output/output.bin" "${BUILD_DIR}/output/golden.bin"
+python3 "${SCRIPT_DIR}/scripts/verify_result.py" \
+    "${BUILD_DIR}/output/output_int64min.bin" \
+    "${BUILD_DIR}/output/golden_int64min.bin" \
+    "${BUILD_DIR}/output/output_normal.bin" \
+    "${BUILD_DIR}/output/golden_normal.bin"
