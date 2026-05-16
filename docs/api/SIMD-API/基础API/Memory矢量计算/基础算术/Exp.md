@@ -57,7 +57,7 @@
 </tbody>
 </table>
 
-## 功能说明<a name="zh-cn_topic_0000002524346436_section106841136114319"></a>
+## 功能说明<a name="section618mcpsimp"></a>
 
 头文件为：\#include "basic\_api/kernel\_operator\_vec\_unary\_intf.h"
 
@@ -65,7 +65,7 @@ Exp属于单目矢量类计算接口，负责将输入的tensor按元素取自�
 
 ![](figures/zh-cn_formulaimage_0000002541827366.png)
 
-## 函数原型<a name="zh-cn_topic_0000002524346436_section82039854412"></a>
+## 函数原型<a name="section620mcpsimp"></a>
 
 -   tensor前n个数据连续计算
 
@@ -90,7 +90,7 @@ Exp属于单目矢量类计算接口，负责将输入的tensor按元素取自�
         
         ```
 
-## 参数说明<a name="zh-cn_topic_0000002524346436_section16128134420472"></a>
+## 参数说明<a name="section176711403104"></a>
 
 **表 1**  模板参数说明
 
@@ -183,21 +183,11 @@ Exp属于单目矢量类计算接口，负责将输入的tensor按元素取自�
 
 支持的数据类型为：half、float。
 
-## API映射关系<a name="zh-cn_topic_0000002524346436_section5469132317498"></a>
+## 返回值说明<a name="section14483414194"></a>
 
-与built-in接口映射关系：
+无
 
-Exp接口是在built-in接口（vexp）的基础上进行抽象封装实现的，其对应的底层built-in接口为:
-
-```
-// half数据类型输入
-void vexp(__ubuf__ half *dst, __ubuf__ half *src, uint8_t repeat, uint16_t dstBlockStride, uint16_t srcBlockStride, uint16_t dstRepeatStride, uint16_t srcRepeatStride);
-
-// float数据类型输入
-void vexp(__ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat, uint16_t dstBlockStride, uint16_t srcBlockStride, uint16_t dstRepeatStride, uint16_t srcRepeatStride);
-```
-
-## 约束说明<a name="zh-cn_topic_0000002524346436_section2045914466492"></a>
+## 约束说明<a name="section633mcpsimp"></a>
 
 -   操作数地址对齐要求请参见[Unified Buffer地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
 -   操作数地址重叠约束请参考[Unified Buffer地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
@@ -206,6 +196,6 @@ void vexp(__ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat, uint16_t dst
 
 -   注：float数据类型只支持寄存器非饱和模式，half数据类型默认是寄存器非饱和模式。寄存器的非饱和/饱和模式具体配置方式**待补充**。
 
-## 调用示例<a name="zh-cn_topic_0000002524346436_section088124295117"></a>
+## 调用示例<a name="section176061616102911"></a>
 
 完整样例请参考[单目矢量计算类API样例](https://gitcode.com/cann/asc-devkit/pull/873)。
