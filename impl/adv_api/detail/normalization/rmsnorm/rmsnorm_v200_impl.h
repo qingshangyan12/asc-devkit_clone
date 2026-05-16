@@ -50,7 +50,7 @@ __aicore__ inline void RmsNormBasicBlockBrc(
     UnaryRepeatParams unaryParams(1, 0, repStride, repStride);
     for (uint32_t i = 0; i < hLength / BASIC_BLK_HLENGTH; i++) {
         const uint32_t offset = i * BASIC_BLK_HLENGTH;
-        Adds<float, false>(dst[offset], dst, 0, MASK_PLACEHOLDER, 1, unaryParams);
+        Adds<float, false>(dst[offset], dst, static_cast<float>(0), MASK_PLACEHOLDER, 1, unaryParams);
     }
     PipeBarrier<PIPE_V>();
 }
