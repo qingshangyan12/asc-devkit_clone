@@ -85,8 +85,8 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>&
     const FixpipeParamsV220& intriParams);
 
 // L0C->GM deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config, typename S,
-    typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type>
+template <typename T, typename U, const FixpipeConfig& config, typename S = uint64_t,
+    typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsV220& intriParams);
 
