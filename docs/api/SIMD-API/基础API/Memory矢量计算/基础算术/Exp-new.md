@@ -73,7 +73,7 @@ $dst_i = e^{src_i}$
 - tensor前n个数据连续计算
 
     ```cpp
-    template <typename T>
+    template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
     __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
     ```
 
@@ -81,21 +81,21 @@ $dst_i = e^{src_i}$
     - mask逐bit模式
 
         ```cpp
-        template <typename T, bool isSetMask = true>
+        template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
         __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
     - mask连续模式
 
         ```cpp
-        template <typename T, bool isSetMask = true>
+        template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
         __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
 </cann-filter>
 
 <cann-filter npu-type="910b,A3">
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品场景，函数原型如下：
+针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品场景，函数原型如下：
 
 - tensor前n个数据连续计算
 
