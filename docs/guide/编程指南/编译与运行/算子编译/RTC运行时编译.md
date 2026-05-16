@@ -15,7 +15,7 @@ RTC是Ascend C运行时编译库，通过[aclrtc](https://gitcode.com/cann/asc-d
 3.  调用aclrtLaunchKernelWithConfig接口，启动对应算子的计算任务。
 
 
-如下是一个使用aclrtc接口编译并运行核函数printf打印的完整样例：
+如下是一个使用aclrtc接口编译并运行核函数printf打印的[完整样例](../../../../../examples/01_simd_cpp_api/02_features/06_aclrtc/rtc_hello_world/README.md)：
 
 
 ```c++
