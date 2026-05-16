@@ -238,14 +238,12 @@ Adds:                       |<--->|
 - 样例执行
 
   ```bash
-  mkdir -p build && cd build;      # 创建并进入build目录
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510;make -j;    # 编译工程，默认npu模式
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
-  ./demo                           # 执行编译生成的可执行程序，执行样例
+  mkdir -p build && cd build;                                               # 创建并进入build目录
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510;make -j;                      # 编译工程，默认npu模式
+  python3 ../scripts/gen_data.py                                            # 生成测试输入数据
+  ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
-
-  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
 
   示例如：
   ```bash
@@ -258,7 +256,6 @@ Adds:                       |<--->|
 
   | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
@@ -268,30 +265,3 @@ Adds:                       |<--->|
   error ratio: 0.0000, tolerance:0.0001
   test pass!
   ```
-
-### 性能分析
-
-使用 `msprof` 工具获取详细性能数据：
-
-```bash
-msprof ./demo   # 分析性能
-```
-
-当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
-
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
-
-查看具体的性能分析结果：
-```bash
-# 查看Task Duration 以及各项数据
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
-```
