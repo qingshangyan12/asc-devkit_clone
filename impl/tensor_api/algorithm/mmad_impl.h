@@ -27,29 +27,87 @@
 namespace AscendC {
 namespace Te {
 
-template <typename Tp, const Tp& traits, typename T, typename... Params>
-__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Params& ...params)
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter>
+__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter)
 {
-    atomMmad.template Call<traits>(params...);
+    atomMmad.template Call<traits>(dst, fm, filter);
 }
 
-template <typename T, typename... Params>
-__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Params& ...params)
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter>
+__aicore__ inline void Mmad(
+    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const MmadParams& params)
 {
-    atomMmad.Call(params...);
+    atomMmad.template Call<traits>(dst, fm, filter, params);
 }
 
-template <typename T, typename U, typename S,
-    Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U> && IsAttrTensorV<S>, int> = 0, typename... Params>
-__aicore__ inline void
-Mmad(const T& dst, const U& fm, const S& filter, const Params& ...params)
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter, typename Bias,
+    Std::enable_if_t<IsAttrTensorV<Bias>, int> = 0>
+__aicore__ inline void Mmad(
+    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias)
 {
-    MmadAtom<MmadOperation>{}.Call(dst, fm, filter, params...);
+    atomMmad.template Call<traits>(dst, fm, filter, bias);
 }
 
-template <typename... Args>
-__aicore__ inline constexpr auto MakeMmad(const Args& ...traits) {
-    return MmadAtom<MmadTraits<Args...>>{};
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter, typename Bias,
+    Std::enable_if_t<IsAttrTensorV<Bias>, int> = 0>
+__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter,
+    const Bias& bias, const MmadParams& params)
+{
+    atomMmad.template Call<traits>(dst, fm, filter, bias, params);
+}
+
+template <typename T, typename Dst, typename Fm, typename Filter>
+__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter)
+{
+    atomMmad.Call(dst, fm, filter);
+}
+
+template <typename T, typename Dst, typename Fm, typename Filter>
+__aicore__ inline void Mmad(
+    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const MmadParams& params)
+{
+    atomMmad.Call(dst, fm, filter, params);
+}
+
+template <typename T, typename Dst, typename Fm, typename Filter, typename Bias,
+    Std::enable_if_t<IsAttrTensorV<Bias>, int> = 0>
+__aicore__ inline void Mmad(
+    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias)
+{
+    atomMmad.Call(dst, fm, filter, bias);
+}
+
+template <typename T, typename Dst, typename Fm, typename Filter, typename Bias,
+    Std::enable_if_t<IsAttrTensorV<Bias>, int> = 0>
+__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter,
+    const Bias& bias, const MmadParams& params)
+{
+    atomMmad.Call(dst, fm, filter, bias, params);
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const MmadParams& params)
+{
+    MmadAtom<MmadOperation>{}.Call(dst, fm, filter, params);
+}
+
+template <typename T, typename U, typename S, typename V,
+    Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U> && IsAttrTensorV<S> && IsAttrTensorV<V>, int> = 0>
+__aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params)
+{
+    MmadAtom<MmadOperation>{}.Call(dst, fm, filter, bias, params);
+}
+
+template <typename MmadOperationType>
+__aicore__ inline constexpr auto MakeMmad(const MmadOperationType&)
+{
+    return MmadAtom<MmadTraits<MmadOperationType>>{};
+}
+
+template <typename MmadOperationType, typename Trait>
+__aicore__ inline constexpr auto MakeMmad(const MmadOperationType&, const Trait&)
+{
+    return MmadAtom<MmadTraits<MmadOperationType, Trait>>{};
 }
 
 }

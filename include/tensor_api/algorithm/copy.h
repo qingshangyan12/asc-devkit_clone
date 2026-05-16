@@ -26,19 +26,94 @@
 namespace AscendC {
 namespace Te {
 
-template <typename Tp, const Tp& traits, typename T, typename... Params>
-__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params);
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Src>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src);
 
-template <typename T, typename... Params>
-__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params);
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Src, typename Coord,
+    Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Coord>>, int> Enable>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src,
+    const Coord& coord);
 
-template <typename T, typename U, Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U>, int>,
-    typename... Params>
-__aicore__ inline void
-Copy(const T& dst, const U& src, const Params& ...params);
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Src>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src,
+    const FixpipeParams& params);
 
-template <typename... Args>
-__aicore__ inline constexpr auto MakeCopy(const Args& ...traits);
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Src>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src, uint64_t quant);
+
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Src, typename QuantTensor,
+    Std::enable_if_t<IsAttrTensorV<QuantTensor>, int> Enable>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src,
+    const QuantTensor& quantTensor);
+
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Src>
+__aicore__ inline void Copy(
+    const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src, uint64_t quant, const FixpipeParams& params);
+
+template <typename Tp, const Tp& traits, typename T, typename Dst, typename Src, typename QuantTensor,
+    Std::enable_if_t<IsAttrTensorV<QuantTensor>, int> Enable>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src,
+    const QuantTensor& quantTensor, const FixpipeParams& params);
+
+template <typename T, typename Dst, typename Src>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src);
+
+template <typename T, typename Dst, typename Src, typename Coord,
+    Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Coord>>, int> Enable>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src,
+    const Coord& coord);
+
+template <typename T, typename Dst, typename Src>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src,
+    const FixpipeParams& params);
+
+template <typename T, typename Dst, typename Src>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src, uint64_t quant);
+
+template <typename T, typename Dst, typename Src, typename QuantTensor,
+    Std::enable_if_t<IsAttrTensorV<QuantTensor>, int> Enable>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src,
+    const QuantTensor& quantTensor);
+
+template <typename T, typename Dst, typename Src>
+__aicore__ inline void Copy(
+    const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src, uint64_t quant, const FixpipeParams& params);
+
+template <typename T, typename Dst, typename Src, typename QuantTensor,
+    Std::enable_if_t<IsAttrTensorV<QuantTensor>, int> Enable>
+__aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Dst& dst, const Src& src,
+    const QuantTensor& quantTensor, const FixpipeParams& params);
+
+template <typename T, typename U>
+__aicore__ inline void Copy(const T& dst, const U& src);
+
+template <typename T, typename U, typename Coord,
+    Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U> &&
+    Std::is_tuple_v<Std::remove_cvref_t<Coord>>, int> Enable>
+__aicore__ inline void Copy(const T& dst, const U& src, const Coord& coord);
+
+template <typename T, typename U, Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U>, int> Enable>
+__aicore__ inline void Copy(const T& dst, const U& src, const FixpipeParams& params);
+
+template <typename T, typename U>
+__aicore__ inline void Copy(const T& dst, const U& src, uint64_t quant);
+
+template <typename T, typename U, typename QuantTensor,
+    Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U> && IsAttrTensorV<QuantTensor>, int> Enable>
+__aicore__ inline void Copy(const T& dst, const U& src, const QuantTensor& quantTensor);
+
+template <typename T, typename U>
+__aicore__ inline void Copy(const T& dst, const U& src, uint64_t quant, const FixpipeParams& params);
+
+template <typename T, typename U, typename QuantTensor,
+    Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U> && IsAttrTensorV<QuantTensor>, int> Enable>
+__aicore__ inline void Copy(const T& dst, const U& src, const QuantTensor& quantTensor, const FixpipeParams& params);
+
+template <typename CopyOperation>
+__aicore__ inline constexpr auto MakeCopy(const CopyOperation& copyOperation);
+
+template <typename CopyOperation, typename Trait>
+__aicore__ inline constexpr auto MakeCopy(const CopyOperation& copyOperation, const Trait& trait);
 
 }
 }
