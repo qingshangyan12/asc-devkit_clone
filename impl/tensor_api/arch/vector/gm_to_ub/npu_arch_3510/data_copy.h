@@ -46,7 +46,7 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
-        uint8_t cacheMode = src.Engine().GetCacheMode();
+        uint8_t cacheMode = src.GetCacheMode();
         constexpr uint8_t leftPaddingCnt = 0;
         constexpr uint8_t rightPaddingCnt = 0;
 

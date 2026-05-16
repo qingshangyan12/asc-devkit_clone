@@ -86,7 +86,7 @@ private:
         // loop4_dst_stride : dst_nz_matrix_stride * size_of_dst_type / C0_SIZE
         uint16_t loop4DstStride = static_cast<uint16_t>(dstNzMatrixStride / C0_ELEMENT<type>);
 
-        uint8_t cacheMode = src.Engine().GetCacheMode();
+        uint8_t cacheMode = src.GetCacheMode();
 
         CopyGmToCbufMultiNd2nzInstr::DataCopy(dst, src, ndNum, loop2DstStride, loop3DstStride, loop4DstStride,
                                               loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, false);
