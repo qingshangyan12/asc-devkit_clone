@@ -159,4 +159,54 @@ $dst_i = e^{src_i}$
 
 ## 调用示例<a name="section176061616102911"></a>
 
-完整样例请参考[单目矢量计算类API样例](https://gitcode.com/cann/asc-devkit/pull/873)。
+本样例的srcLocal和dstLocal均为half类型。
+
+- tensor高维切分计算样例-mask连续模式
+
+    ```cpp
+    uint64_t mask = 256 / sizeof(half);     
+    // repeatTime = 4, 128 elements one repeat, 512 elements total     
+    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat     
+    // dstRepStride, srcRepStride = 8, no gap between repeats     
+    AscendC::Exp(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 }); 
+    ```
+
+- tensor高维切分计算样例-mask逐bit模式
+
+    ```cpp
+    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    // repeatTime = 4, 128 elements one repeat, 512 elements total
+    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride, srcRepStride = 8, no gap between repeats
+    AscendC::Exp(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
+    ```
+
+- tensor前n个数据计算接口样例
+
+    <cann-filter npu-type="950">
+
+    针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品场景，示例如下：
+
+    ```cpp
+    AscendC::Exp(dstLocal, srcLocal, 512);
+    ```
+
+    </cann-filter>
+
+    <cann-filter npu-type="910b,A3">
+
+    针对Ascend 950PR/Ascend 950DT系列场景，示例如下：
+
+    ```cpp
+    static constexpr ExpConfig config = { ExpAlgo::PRECISION_1ULP_FTZ_FALSE };
+    AscendC::Exp<T, config>(dstLocal, srcLocal, 512);
+    ```
+
+    </cann-filter>
+
+结果示例如下：
+
+```bash
+输入数据srcLocal：[0.0 1.0 2.0 3.0 ...]
+输出数据dstLocal：[1.0 2.719 7.391 20.08 ...]
+```
