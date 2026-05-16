@@ -246,4 +246,3 @@ struct ExpConfig {
 输入数据srcLocal：[0.0 1.0 2.0 3.0 ...]
 输出数据dstLocal：[1.0 2.719 7.391 20.08 ...]
 ```
-
