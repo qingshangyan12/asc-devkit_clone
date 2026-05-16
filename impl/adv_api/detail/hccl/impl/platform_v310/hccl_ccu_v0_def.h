@@ -121,8 +121,11 @@ private:
     __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
-    __gm__ HcclCombineOpParam* hcclContext_;
+    // __gm__ HcclCombineOpParam* hcclOriginContext_;
+    // __gm__ HcclApi::OpResCtx *hcclNewContext_;
+    __gm__ void* hcclContext_;  // 可以先设为void吗？
     HcclHandle curHandleId_ = INVALID_HANDLE_ID;
+    bool newCcuFlag_ = false;
 
     uint8_t workingFlag_ = false;
     bool isInited_ = false;
