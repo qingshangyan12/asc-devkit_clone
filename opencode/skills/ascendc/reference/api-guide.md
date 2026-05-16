@@ -17,7 +17,7 @@ void APIComputeCPP(T* dst, T* src)
 };
 ```
 
-### AscendC 语言扩展层 C API（指针风格）
+### AscendC Reg API
 
 ```cpp
 // API层级，C++的入参变量对应UB的一个LocalTensor加载到寄存器的RegTensor，该LocalTensor为API入参LocalTensor<T> &src
