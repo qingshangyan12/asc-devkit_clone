@@ -23,4 +23,5 @@
 | [reduce_pair](./reduce_pair) | 本样例基于Reg编程接口实现PairReduceElem运算（SUM模式），对相邻奇偶元素对进行归约求和 |
 | [select](./select)　　　　　　 | 本样例基于Reg编程接口实现Select运算，根据掩码在两个向量之间选取元素　　　　|
 | [squeeze](./squeeze)　　　　　　 | 本样例基于Reg编程接口实现Squeeze运算，将向量压缩为标量　　　　|
+| [subnormal](./subnormal)                 | 本样例基于RegBase编程范式实现Div运算，使用LoadAlign/StoreAlign的postUpdate模式，演示subnormal模式开启或关闭情况下的行为差异       |
 | [truncate](./truncate)　　　　 | 本样例基于Reg编程接口实现Truncate运算，将浮点数截断到整数位　　　　　　　　　　　　　　 |
