@@ -93,90 +93,21 @@ $dst_i = e^{src_i}$
 
 **表 1**  模板参数说明
 
-<a name="zh-cn_topic_0000002524346436_table4835205712588"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="16.28%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="83.72%" id="mcps1.2.3.1.2"><p id="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p583535795817"><a name="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p583535795817"></a><a name="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p583535795817"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_row1835857145817"><td class="cellrowborder" valign="top" width="16.28%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p5835457165816"><a name="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p5835457165816"></a><a name="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p5835457165816"></a>T</p>
-</td>
-<td class="cellrowborder" valign="top" width="83.72%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p168351657155818"><a name="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p168351657155818"></a><a name="zh-cn_topic_0000002524346436_zh-cn_topic_0000001429830437_p168351657155818"></a>操作数数据类型。</p>
-<p id="zh-cn_topic_0000002524346436_p815762322517"><a name="zh-cn_topic_0000002524346436_p815762322517"></a><a name="zh-cn_topic_0000002524346436_p815762322517"></a>支持的数据类型为：half、float。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002524346436_row198991750115711"><td class="cellrowborder" valign="top" width="16.28%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002524346436_p1523033018174"><a name="zh-cn_topic_0000002524346436_p1523033018174"></a><a name="zh-cn_topic_0000002524346436_p1523033018174"></a>isSetMask</p>
-</td>
-<td class="cellrowborder" valign="top" width="83.72%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002524346436_p4230030161711"><a name="zh-cn_topic_0000002524346436_p4230030161711"></a><a name="zh-cn_topic_0000002524346436_p4230030161711"></a>是否在接口内部设置mask。</p>
-<a name="zh-cn_topic_0000002524346436_ul5426332122212"></a><a name="zh-cn_topic_0000002524346436_ul5426332122212"></a><ul id="zh-cn_topic_0000002524346436_ul5426332122212"><li>true，表示在接口内部设置mask。</li><li>false，表示在接口外部设置mask，开发者需要使用<a href="SetVectorMask.md#ZH-CN_TOPIC_0000002574024783">SetVectorMask</a>接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。</li></ul>
-<p id="zh-cn_topic_0000002524346436_p1477124811291"><a name="zh-cn_topic_0000002524346436_p1477124811291"></a><a name="zh-cn_topic_0000002524346436_p1477124811291"></a>具体使用方式可参考<a href="掩码.md#ZH-CN_TOPIC_0000002573904669">掩码</a>。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 描述 |
+|---|---|
+| T | 操作数数据类型。支持的数据类型为：half、float。 |
+| isSetMask | 是否在接口内部设置mask。- true，表示在接口内部设置mask。- false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
 
 **表 2**  参数说明
 
-<a name="zh-cn_topic_0000002524346436_table1055216132132"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002524346436_row105531513121315"><th class="cellrowborder" valign="top" width="16.49%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000002524346436_p5553171319138"><a name="zh-cn_topic_0000002524346436_p5553171319138"></a><a name="zh-cn_topic_0000002524346436_p5553171319138"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="11.93%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000002524346436_p5553151313131"><a name="zh-cn_topic_0000002524346436_p5553151313131"></a><a name="zh-cn_topic_0000002524346436_p5553151313131"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="71.58%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0000002524346436_p655316136139"><a name="zh-cn_topic_0000002524346436_p655316136139"></a><a name="zh-cn_topic_0000002524346436_p655316136139"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002524346436_row5553201314135"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002524346436_p8553813111314"><a name="zh-cn_topic_0000002524346436_p8553813111314"></a><a name="zh-cn_topic_0000002524346436_p8553813111314"></a>dst</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002524346436_p755318134134"><a name="zh-cn_topic_0000002524346436_p755318134134"></a><a name="zh-cn_topic_0000002524346436_p755318134134"></a>输出</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002524346436_p1515191511407"><a name="zh-cn_topic_0000002524346436_p1515191511407"></a><a name="zh-cn_topic_0000002524346436_p1515191511407"></a>目的操作数。</p>
-<p id="zh-cn_topic_0000002524346436_p16293124820611"><a name="zh-cn_topic_0000002524346436_p16293124820611"></a><a name="zh-cn_topic_0000002524346436_p16293124820611"></a>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。</p>
-<p id="zh-cn_topic_0000002524346436_p2510883711"><a name="zh-cn_topic_0000002524346436_p2510883711"></a><a name="zh-cn_topic_0000002524346436_p2510883711"></a>地址对齐约束参考<a href="Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912">地址对齐约束</a>。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002524346436_row6553613191315"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002524346436_p195531113161311"><a name="zh-cn_topic_0000002524346436_p195531113161311"></a><a name="zh-cn_topic_0000002524346436_p195531113161311"></a>src</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002524346436_p155310135134"><a name="zh-cn_topic_0000002524346436_p155310135134"></a><a name="zh-cn_topic_0000002524346436_p155310135134"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002524346436_p7218122944012"><a name="zh-cn_topic_0000002524346436_p7218122944012"></a><a name="zh-cn_topic_0000002524346436_p7218122944012"></a>源操作数。</p>
-<p id="zh-cn_topic_0000002524346436_p199691223474"><a name="zh-cn_topic_0000002524346436_p199691223474"></a><a name="zh-cn_topic_0000002524346436_p199691223474"></a>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。</p>
-<p id="zh-cn_topic_0000002524346436_p11743112042715"><a name="zh-cn_topic_0000002524346436_p11743112042715"></a><a name="zh-cn_topic_0000002524346436_p11743112042715"></a>地址对齐约束参考<a href="Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912">地址对齐约束</a>。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002524346436_row103840207421"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002524346436_p11183182720428"><a name="zh-cn_topic_0000002524346436_p11183182720428"></a><a name="zh-cn_topic_0000002524346436_p11183182720428"></a>count</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002524346436_p2183122716423"><a name="zh-cn_topic_0000002524346436_p2183122716423"></a><a name="zh-cn_topic_0000002524346436_p2183122716423"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002524346436_p20183172714422"><a name="zh-cn_topic_0000002524346436_p20183172714422"></a><a name="zh-cn_topic_0000002524346436_p20183172714422"></a>参与计算的元素个数。关于该参数的具体说明请参考<a href="连续计算.md#ZH-CN_TOPIC_0000002543264748">连续计算</a>。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002524346436_row16554713131317"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002524346436_p2554141321313"><a name="zh-cn_topic_0000002524346436_p2554141321313"></a><a name="zh-cn_topic_0000002524346436_p2554141321313"></a>mask[]/mask</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002524346436_p755431341319"><a name="zh-cn_topic_0000002524346436_p755431341319"></a><a name="zh-cn_topic_0000002524346436_p755431341319"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002524346436_p94543261085"><a name="zh-cn_topic_0000002524346436_p94543261085"></a><a name="zh-cn_topic_0000002524346436_p94543261085"></a>mask用于控制每次迭代内参与计算的元素。详细设置参考<a href="掩码.md#ZH-CN_TOPIC_0000002573904669">掩码</a>。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002524346436_row185542138131"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002524346436_p755471321311"><a name="zh-cn_topic_0000002524346436_p755471321311"></a><a name="zh-cn_topic_0000002524346436_p755471321311"></a>repeatTime</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002524346436_p135541313101314"><a name="zh-cn_topic_0000002524346436_p135541313101314"></a><a name="zh-cn_topic_0000002524346436_p135541313101314"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002524346436_p7237195001818"><a name="zh-cn_topic_0000002524346436_p7237195001818"></a><a name="zh-cn_topic_0000002524346436_p7237195001818"></a>重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。</p>
-<p id="zh-cn_topic_0000002524346436_p203197325715"><a name="zh-cn_topic_0000002524346436_p203197325715"></a><a name="zh-cn_topic_0000002524346436_p203197325715"></a>关于该参数的具体说明请参考<a href="高维切分.md#ZH-CN_TOPIC_0000002556644319">高维切分</a>。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002524346436_row195541813181310"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002524346436_p15554121320132"><a name="zh-cn_topic_0000002524346436_p15554121320132"></a><a name="zh-cn_topic_0000002524346436_p15554121320132"></a>repeatParams</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002524346436_p18554141331317"><a name="zh-cn_topic_0000002524346436_p18554141331317"></a><a name="zh-cn_topic_0000002524346436_p18554141331317"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002524346436_p136219291384"><a name="zh-cn_topic_0000002524346436_p136219291384"></a><a name="zh-cn_topic_0000002524346436_p136219291384"></a>控制操作数地址步长的参数。<a href="UnaryRepeatParams.md#ZH-CN_TOPIC_0000002525604434">UnaryRepeatParams</a>类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。</p>
-<p id="zh-cn_topic_0000002524346436_p13750151141414"><a name="zh-cn_topic_0000002524346436_p13750151141414"></a><a name="zh-cn_topic_0000002524346436_p13750151141414"></a>相邻迭代间的地址步长参数说明请参考<a href="高维切分.md#zh-cn_topic_0000002516372540_li072713185916">repeatStride</a>；同一迭代内DataBlock的地址步长参数说明请参考<a href="高维切分.md#zh-cn_topic_0000002516372540_zh-cn_topic_0000002267504656_zh-cn_topic_0000001764162593_li1481335103413">dataBlockStride</a>。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的操作数。类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。地址对齐约束参考[地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。 |
+| src | 输入 | 源操作数。类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。地址对齐约束参考[地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。 |
+| count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](连续计算.md#ZH-CN_TOPIC_0000002543264748)。 |
+| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
+| repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。关于该参数的具体说明请参考[高维切分](高维切分.md#ZH-CN_TOPIC_0000002556644319)。 |
+| repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](UnaryRepeatParams.md#ZH-CN_TOPIC_0000002525604434)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。相邻迭代间的地址步长参数说明请参考[repeatStride](高维切分.md#zh-cn_topic_0000002516372540_li072713185916)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](高维切分.md#zh-cn_topic_0000002516372540_zh-cn_topic_0000002267504656_zh-cn_topic_0000001764162593_li1481335103413)。 |
 
 ## 数据类型<a name="zh-cn_topic_0000002524346436_section4219135304818"></a>
 
