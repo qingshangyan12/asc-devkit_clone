@@ -37,6 +37,7 @@ constexpr uint32_t MC2_TILING_VERSION = 2U;
 constexpr uint32_t MAX_HCOM_NUM = 3U;
 
 constexpr uint32_t INIT_TILING_VERSION = 100U;
+constexpr uint32_t INIT_TILING_CCU_NEW_VERSION = 101U;
 constexpr uint32_t MAX_CC_TILING_NUM = 8U;
 
 struct Mc2ServerCfg {
@@ -49,7 +50,7 @@ struct Mc2ServerCfg {
 };
 
 struct Mc2InitTilingInner {
-    uint32_t version;
+    uint32_t version;   // ccu & alltoall (暂定version 为 原本的version + 1)
     uint32_t mc2HcommCnt;
     uint32_t offset[MAX_CC_TILING_NUM];
     uint8_t debugMode;
