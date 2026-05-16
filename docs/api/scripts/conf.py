@@ -105,19 +105,13 @@ external_toc_exclude_missing = True
 def on_build_finished(app, exception):
     if exception is not None:
         return
-    scripts_dir = Path(__file__).resolve().parent
-    project_root = scripts_dir.parent
-
-    post_scripts = ['generate_zips.py', '_verify_html.py']
-    for script in post_scripts:
-        result = subprocess.run(
-            [sys.executable, str(scripts_dir / script)],
-            capture_output=True, text=True, cwd=str(project_root),
+    _scripts_dir = _project_root / 'scripts'
+    _post_scripts = ['generate_zips.py', '_verify_html.py']
+    for _script in _post_scripts:
+        subprocess.run(
+            [sys.executable, str(_scripts_dir / _script)],
+            capture_output=True, cwd=str(_project_root),
         )
-        if result.stdout:
-            print(result.stdout)
-        if result.stderr:
-            print(result.stderr, file=sys.stderr)
 
 
 def setup(app):

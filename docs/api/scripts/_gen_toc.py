@@ -19,6 +19,18 @@ from pathlib import Path
 SCRIPTS_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPTS_DIR.parent
 
+_JAVASCRIPT_COPYRIGHT = (
+    "// ----------------------------------------------------------------------------------------------------------\n"
+    "// Copyright (c) 2026 Huawei Technologies Co., Ltd.\n"
+    "// This program is free software, you can redistribute it and/or modify it under the terms and conditions of\n"
+    "// CANN Open Software License Agreement Version 2.0 (the \"License\").\n"
+    "// Please refer to the License for details. You may not use this file except in compliance with the License.\n"
+    "// THIS SOFTWARE IS PROVIDED ON AN \"AS IS\" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,\n"
+    "// INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.\n"
+    "// See LICENSE in the root of the software repository for the full text of the License.\n"
+    "// ----------------------------------------------------------------------------------------------------------\n\n"
+)
+
 
 def parse_readme_toc():
     readme = PROJECT_ROOT / "README.md"
@@ -103,7 +115,7 @@ def main():
     js_path = PROJECT_ROOT / "_static" / "js"
     js_path.mkdir(parents=True, exist_ok=True)
     js_path = js_path / "toc-data.js"
-    js_path.write_text("var TOC_DATA_EMBEDDED = " + json_str + ";", encoding="utf-8")
+    js_path.write_text(_JAVASCRIPT_COPYRIGHT + "var TOC_DATA_EMBEDDED = " + json_str + ";", encoding="utf-8")
 
 
 def _compact(entry):

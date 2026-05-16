@@ -15,7 +15,8 @@ import yaml
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
-data = yaml.safe_load(open(BASE / "_toc.yml", encoding="utf-8"))
+with open(BASE / "_toc.yml", encoding="utf-8") as f:
+    data = yaml.safe_load(f)
 entries = data["entries"]
 
 for e in entries:
