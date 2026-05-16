@@ -112,24 +112,27 @@ def filter_md_for_950(content: str) -> str:
 
 # ── source-file mapping ───────────────────────────────────────────────
 
+def _find_source_file(rel_path: str, src_root: Path) -> Path | None:
+    for ext in (".md", ".rst"):
+        candidate = src_root / (rel_path + ext)
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def load_950_supported_sources(json_path: Path, src_root: Path) -> set[Path]:
-    """Load version_filter.json, return the set of source file paths supported by 950."""
     with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     supported: set[Path] = set()
-    skipped = 0
     for key, is_supported in data.items():
-        if is_supported:
-            html_name = urllib.parse.unquote(key)
-            rel_path = html_name.rsplit(".", 1)[0]
-            for ext in (".md", ".rst"):
-                candidate = src_root / (rel_path + ext)
-                if candidate.exists():
-                    supported.add(candidate)
-                    break
-            else:
-                skipped += 1
+        if not is_supported:
+            continue
+        html_name = urllib.parse.unquote(key)
+        rel_path = html_name.rsplit(".", 1)[0]
+        src_file = _find_source_file(rel_path, src_root)
+        if src_file:
+            supported.add(src_file)
     return supported
 
 
