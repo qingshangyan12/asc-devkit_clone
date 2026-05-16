@@ -20,7 +20,7 @@
 #define __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_DUMP_H__
 #endif
 
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201)
 #include "impl/utils/debug/asc_aicore_dump_impl.h"
 #endif
 

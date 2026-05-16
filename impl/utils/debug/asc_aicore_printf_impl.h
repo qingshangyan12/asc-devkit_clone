@@ -24,6 +24,8 @@
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_printf_utils.h"
+#elif __NPU_ARCH__ == 9201
+#include "impl/utils/debug/npu_arch_9201/asc_aicore_printf_utils.h"
 #endif
 
 namespace __asc_aicore {

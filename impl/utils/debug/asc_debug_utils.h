@@ -30,6 +30,8 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "impl/utils/debug/npu_arch_2201/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_debug_utils_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "impl/utils/debug/npu_arch_9201/asc_debug_utils_impl.h"
 #endif
 
 namespace __asc_aicore {
@@ -90,7 +92,7 @@ __aicore__ inline uint64_t asc_debug_get_block_num()
 
 __aicore__ inline uint64_t asc_debug_get_block_total_num()
 {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201)
     return asc_debug_get_block_num() * get_task_ration();
 #else
     return asc_debug_get_block_num();
