@@ -134,7 +134,7 @@ $dst_i = src0_i / src1_i$
 <table>
 <thead><tr><th>参数名</th><th>描述</th></tr></thead>
 <tbody>
-<tr><td>T</td><td>操作数数据类型。<br>支持的数据类型为：half、float。</td></tr>
+<tr><td>T</td><td>操作数数据类型。</td></tr>
 <tr><td>isSetMask</td><td>是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用<a href="SetVectorMask.md#ZH-CN_TOPIC_0000002574024783">SetVectorMask</a>接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考<a href="掩码.md#ZH-CN_TOPIC_0000002573904669">掩码</a>。</td></tr>
 <tr><td>config</td><td><cann-filter npu-type="950">
 <p>该参数仅支持Ascend 950PR/Ascend 950DT。</p>
@@ -171,7 +171,61 @@ struct DivConfig {
 
 ## 数据类型<a name="zh-cn_topic_0000002530007180_section4219135304818"></a>
 
-支持的数据类型为：half、float。
+<cann-filter npu-type="950">
+
+- 针对Ascend 950PR/Ascend 950DT系列产品
+    支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。
+
+</cann-filter>
+
+<cann-filter npu-type="A3">
+
+- 针对Atlas A3 训练系列产品、Atlas A3 推理系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="910b">
+
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="310b">
+
+- 针对Atlas 200I/500 A2 推理产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="310p">
+
+- 针对Atlas 推理系列产品 AI Core：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="910">
+
+- 针对Atlas 训练系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="x90">
+
+- 针对Kirin X90：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="9030">
+
+- 针对Kirin 9030：
+    支持的数据类型为：half、float。
+
+</cann-filter>
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -182,13 +236,15 @@ struct DivConfig {
 - 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
 - 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
 - 使用整个tensor参与计算接口符号重载时，运算量为目的LocalTensor的总长度。
-- 支持数据类型为：half/float。
 - 当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
+
+<cann-filter npu-type="950">
+
 - 针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t/complex32/complex64数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
 
-## 调用示例<a name="section642mcpsimp"></a>
+</cann-filter>
 
-更多样例可参考[LINK](更多样例-9.md)。
+## 调用示例<a name="section642mcpsimp"></a>
 
 - tensor高维切分计算样例-mask连续模式
 
@@ -220,8 +276,12 @@ struct DivConfig {
     针对Ascend 950PR/Ascend 950DT系列产品，示例如下：
 
     ```cpp
+    // Div 0ulp
     static constexpr DivConfig config = { DivAlgo::DIFF_COMPENSATION };
-    AscendC::Div<float, config>(dstLocal, src0Local, src1Local, 512);
+    Div<T, config>(dstLocalX, srcLocalX, srcLocalY, calCount);
+    // Div Subnormal
+    static constexpr DivConfig config = { DivAlgo::PRECISION_0ULP_FTZ_FALSE };
+    Div<T, config>(dstLocalX, srcLocalX, srcLocalY, calCount);
     ```
 
     </cann-filter>

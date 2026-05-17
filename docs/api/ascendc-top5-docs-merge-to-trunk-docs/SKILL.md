@@ -50,46 +50,29 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 - 避免大量重复代码（当 950 和 A2/A3 的某些重载签名完全一致时）
 - 读者一眼就能看到哪些接口是通用的，哪些是产品专属的
 
-#### 4.2 情况一：Trunk 和 TOP5 签名完全相同（大多数双目/单目接口）
+#### 4.2 情况一：所有重载签名完全相同（大多数双目/标量/部分单目接口）
 
-当两者所有重载签名一致（如 Add/Sub/Mul 等只有 `isSetMask`，没有 `config`），但仍需拆分为两个 cann-filter 块以保持结构统一：
+当 950（Trunk）和 910b,A3（TOP5）的所有重载签名完全一致（如 Add/Sub/Mul/Div/Max/Min 等只有 `isSetMask`，没有 `config`），**所有函数原型放在最外层，不包裹任何 `<cann-filter>`**：
 
 ```markdown
-<cann-filter npu-type="950">
-针对Ascend 950PR/Ascend 950DT系列产品，函数原型如下：
-
 - tensor前n个数据连续计算
 
     ```cpp
-    // 使用 Trunk 的签名（含 config 参数）
+    // 使用 TOP5 的签名
     ```
 
 - tensor高维切分计算
-    - mask逐bit模式 / mask连续模式
-
-        ```cpp
-        // 使用 Trunk 的签名
-        ```
-
-</cann-filter>
-
-<cann-filter npu-type="910b,A3">
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，函数原型如下：
-
-- tensor前n个数据连续计算
-
-    ```cpp
-    // 使用 TOP5 的签名（含 isSetMask 参数，无 config）
-    ```
-
-- tensor高维切分计算
-    - mask逐bit模式 / mask连续模式
+    - mask逐bit模式
 
         ```cpp
         // 使用 TOP5 的签名
         ```
 
-</cann-filter>
+    - mask连续模式
+
+        ```cpp
+        // 使用 TOP5 的签名
+        ```
 ```
 
 #### 4.3 情况二：Trunk 有产品专属重载（如 Abs 的复数重载）
@@ -123,9 +106,10 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 ```
 
 **关键规则**：
+- **共享重载不包裹任何 `<cann-filter>`**，放在函数原型段落的最外层。
+- **产品专属重载用 `<cann-filter>` 包裹**，紧跟在对应的共享重载后面。
 - `npu-type="950"` 块：使用 Trunk 的函数签名（含 `config` 模板参数或复数模板参数）。
 - `npu-type="910b,A3"` 块：使用 TOP5 的函数签名（含 `isSetMask` 模板参数，无 `config`）。
-- **共享重载不包裹任何 `<cann-filter>`**，放在函数原型段落的最前面/最后面。
 - **产品专属重载用 `<cann-filter>` 包裹**，紧跟在对应的共享重载后面。
 - 代码块添加 `cpp` 语言标注。
 
