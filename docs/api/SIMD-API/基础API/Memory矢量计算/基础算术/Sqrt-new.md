@@ -127,9 +127,9 @@ $dst_i = \sqrt{src_i}$
 
 | 参数名 | 描述 |
 |---|---|
-| T | 操作数数据类型。<br>支持的数据类型为：half、float。 |
+| T | 操作数数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
-| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，SqrtConfig类型，定义如下：<br><pre>enum class SqrtAlgo {<br>    INTRINSIC = 0,<br>    FAST_INVERSE,<br>    PRECISION_1ULP_FTZ_TRUE,<br>    PRECISION_0ULP_FTZ_FALSE,<br>    PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct SqrtConfig {<br>    SqrtAlgo algo = SqrtAlgo::INTRINSIC;<br>}</pre>通过SqrtConfig结构体的参数algo来配置精度计算模式。<br>algo取值如下：<br>&bull; SqrtAlgo::INTRINSIC、SqrtAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; SqrtAlgo::FAST_INVERSE、SqrtAlgo::PRECISION_0ULP_FTZ_FALSE，使用快速求逆算法得出结果。适用于输入值在[0, 85070596800837026223494223584045301760]范围内的计算。在该范围内，算法保证输出的最大精度误差为0 ulp；当输入值大于85070596800837026223494223584045301760时，输出为0。目前，该算法仅支持float数据类型，并在该模式下支持Subnormal数据计算。<br>&bull; SqrtAlgo::PRECISION_1ULP_FTZ_FALSE，仅支持half类型的Subnormal数据计算，此时最大精度误差为1 ulp。 </cann-filter>|
+| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，SqrtConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class SqrtAlgo {&#10;    INTRINSIC = 0,&#10;    FAST_INVERSE,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_0ULP_FTZ_FALSE,&#10;    PRECISION_1ULP_FTZ_FALSE,&#10;};&#10;struct SqrtConfig {&#10;    SqrtAlgo algo = SqrtAlgo::INTRINSIC;&#10;};</pre>通过SqrtConfig结构体的参数algo来配置精度计算模式。<br>algo取值如下：<br>&bull; SqrtAlgo::INTRINSIC、SqrtAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; SqrtAlgo::FAST_INVERSE、SqrtAlgo::PRECISION_0ULP_FTZ_FALSE，使用快速求逆算法得出结果。适用于输入值在[0, 85070596800837026223494223584045301760]范围内的计算。在该范围内，算法保证输出的最大精度误差为0 ulp；当输入值大于85070596800837026223494223584045301760时，输出为0。目前，该算法仅支持float数据类型，并在该模式下支持Subnormal数据计算。<br>&bull; SqrtAlgo::PRECISION_1ULP_FTZ_FALSE，仅支持half类型的Subnormal数据计算，此时最大精度误差为1 ulp。 </cann-filter>|
 
 **表 2**  参数说明
 
@@ -144,7 +144,61 @@ $dst_i = \sqrt{src_i}$
 
 ## 数据类型<a name="zh-cn_topic_0000002560905861_section4219135304818"></a>
 
-支持的数据类型为：half、float。
+<cann-filter npu-type="950">
+
+- 针对Ascend 950PR/Ascend 950DT系列产品
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="A3">
+
+- 针对Atlas A3 训练系列产品、Atlas A3 推理系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="910b">
+
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="310b">
+
+- 针对Atlas 200I/500 A2 推理产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="310p">
+
+- 针对Atlas 推理系列产品 AI Core：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="910">
+
+- 针对Atlas 训练系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="x90">
+
+- 针对Kirin X90：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="9030">
+
+- 针对Kirin 9030：
+    支持的数据类型为：half、float。
+
+</cann-filter>
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -154,15 +208,10 @@ $dst_i = \sqrt{src_i}$
 
 - 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
 - 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
-- 支持数据类型为：half/float。
 - 当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
 - 如果src中的数值为非正数，可能会产生未知结果。
 
 ## 调用示例<a name="section176061616102911"></a>
-
-本样例的srcLocal和dstLocal均为half类型。
-
-更多样例可参考[LINK](更多样例-9.md)。
 
 - tensor高维切分计算样例-mask连续模式
 

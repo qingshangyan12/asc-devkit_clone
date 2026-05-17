@@ -161,8 +161,6 @@ $dst_i = \ln(src_i)$
 
 ## 调用示例<a name="section176061616102911"></a>
 
-本样例的srcLocal和dstLocal均为half类型。
-
 - tensor高维切分计算样例-mask连续模式
 
     ```cpp
