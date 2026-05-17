@@ -126,51 +126,11 @@ $dst_i = \ln(src_i)$
 
 **表 1**  模板参数说明
 
-<a name="table443318472499"></a>
-<table><thead align="left"><tr><th class="cellrowborder" valign="top" width="16.35%"><p>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="83.65%"><p>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr><td class="cellrowborder" valign="top" width="16.35%"><p>T</p>
-</td>
-<td class="cellrowborder" valign="top" width="83.65%"><p>操作数数据类型。</p>
-<p>支持的数据类型为：half、float。</p>
-</td>
-</tr>
-<tr><td class="cellrowborder" valign="top" width="16.35%"><p>isSetMask</p>
-</td>
-<td class="cellrowborder" valign="top" width="83.65%"><p>是否在接口内部设置mask。</p>
-<ul>
-<li>true，表示在接口内部设置mask。</li>
-<li>false，表示在接口外部设置mask，开发者需要使用<a href="SetVectorMask.md#ZH-CN_TOPIC_0000002574024783">SetVectorMask</a>接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。</li>
-</ul>
-<p>具体使用方式可参考<a href="掩码.md#ZH-CN_TOPIC_0000002573904669">掩码</a>。</p>
-</td>
-</tr>
-<tr><td class="cellrowborder" valign="top" width="16.35%"><p>config</p>
-</td>
-<td class="cellrowborder" valign="top" width="83.65%"><cann-filter npu-type="950"><p>该参数仅支持Ascend 950PR/Ascend 950DT。</p>
-<p>用于配置Subnormal计算模式，LnConfig类型，定义如下：</p>
-<pre class="screen" codetype="Cpp">enum class LnAlgo {
-    INTRINSIC = 0,
-    PRECISION_1ULP_FTZ_TRUE,
-    PRECISION_1ULP_FTZ_FALSE,
-};
-struct LnConfig {
-    LnAlgo algo = LnAlgo::INTRINSIC;
-}</pre>
-<p>通过LnConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：</p>
-<ul>
-<li>LnAlgo::INTRINSIC、LnAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。</li>
-<li>LnAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。</li>
-</ul>
-<p>该参数默认值DEFAULT_LN_CONFIG的取值如下：</p>
-<pre class="screen" codetype="Cpp">constexpr LnConfig DEFAULT_LN_CONFIG = { LnAlgo::INTRINSIC };</pre>
-</cann-filter></td>
-</tr>
-</tbody></table>
+| 参数名 | 描述 |
+|---|---|
+| T | 操作数数据类型。 |
+| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，LnConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class LnAlgo {&#10;    INTRINSIC = 0,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_1ULP_FTZ_FALSE,&#10;};&#10;struct LnConfig {&#10;    LnAlgo algo = LnAlgo::INTRINSIC;&#10;};</pre>通过LnConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; LnAlgo::INTRINSIC、LnAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; LnAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_LN_CONFIG的取值如下：<br><pre class="screen" codetype="Cpp">constexpr LnConfig DEFAULT_LN_CONFIG = { LnAlgo::INTRINSIC };</pre></cann-filter> |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
 
 **表 2**  参数说明
 
@@ -197,14 +157,11 @@ struct LnConfig {
 
 - 操作数地址对齐要求请参见[地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
 - 操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
-- 支持数据类型为：half/float。
 - 当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
 
 ## 调用示例<a name="section176061616102911"></a>
 
 本样例的srcLocal和dstLocal均为half类型。
-
-更多样例可参考[LINK](更多样例-9.md)。
 
 - tensor高维切分计算样例-mask连续模式
 
@@ -230,7 +187,7 @@ struct LnConfig {
 
     <cann-filter npu-type="910b,A3">
 
-    针对Atlas A2/A3系列产品，示例如下：
+    针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，示例如下：
 
     ```cpp
     AscendC::Ln(dstLocal, srcLocal, 512);
@@ -249,9 +206,9 @@ struct LnConfig {
 
     </cann-filter>
 
-结果示例如下：
+    结果示例如下：
 
-```bash
-输入数据srcLocal：[1 2 3 4 ...]
-输出数据dstLocal：[0 0.6931 1.0986 1.3863 ...]
-```
+    ```bash
+    输入数据srcLocal：[1 2 3 4 ...]
+    输出数据dstLocal：[0 0.6931 1.0986 1.3863 ...]
+    ```

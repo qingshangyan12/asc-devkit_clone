@@ -137,15 +137,10 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 
 以下情况**不转换**，保持 HTML `<table>` 格式：
 - 产品支持情况的 HTML 表格 — 整节保留 Trunk 原样。
-- **模板参数说明表（表 1）** — 因 `config` 等参数行包含 `<pre>` 多行代码块，Markdown 表格无法承载多行内容（换行会破坏表格行结构），必须使用 HTML `<table>` 格式以确保代码块正确渲染。
 
-#### 5.2 模板参数说明表（表 1）
+#### 5.2 模板参数说明表（表 1）— 统一使用 Markdown 简易表格
 
-**格式选择规则**：
-- 若表中某行包含 `<pre>` 多行代码块（如 config 参数行含枚举定义）→ **整表使用 HTML `<table>` 格式**（Markdown 表格无法承载多行内容）。
-- 若表中无 `<pre>` 代码块 → **使用 Markdown 简易表格**（`| ... |`），更简洁易读。
-
-##### 5.2.1 当使用 Markdown 格式时
+**所有表 1 均使用 Markdown 简易表格**，包括含 config 等带 `<pre>` 代码块的参数行。不使用 HTML `<table>` 格式。
 
 | 参数 | 处理方式 |
 |------|---------|
@@ -154,31 +149,22 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 | Trunk 独有参数（如 `config`、`U`） | 保留，用 `<cann-filter npu-type="950">` 包裹整行内容 |
 | 参数行顺序 | T → 产品专属参数（用 cann-filter 包裹）→ isSetMask |
 
-**cann-filter 行内写法**（Markdown 表格中）：
+**cann-filter 行内写法**（Markdown 表格中，无 `<pre>` 代码块的简单参数）：
 ```markdown
 | <cann-filter npu-type="950">U | 源操作数数据类型。<br>Ascend 950PR/Ascend 950DT，支持的数据类型为：complex32、complex64；...</cann-filter> |
 ```
 
-##### 5.2.2 当使用 HTML 格式时（含 `<pre>` 代码块）
+**cann-filter 行内写法**（Markdown 表格中，含 `<pre>` 代码块的 config 参数）：
+```markdown
+| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，XxxConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class XxxAlgo {&#10;    INTRINSIC = 0,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_1ULP_FTZ_FALSE,&#10;};&#10;struct XxxConfig {&#10;    XxxAlgo algo = XxxAlgo::INTRINSIC;&#10;};</pre>通过XxxConfig结构体的参数algo来配置...。algo取值如下：<br>&bull; XxxAlgo::INTRINSIC、XxxAlgo::PRECISION_1ULP_FTZ_TRUE，...。<br>&bull; XxxAlgo::PRECISION_1ULP_FTZ_FALSE，...。<br>该参数的默认值DEFAULT_XXX_CONFIG的取值如下：<br><pre class="screen" codetype="Cpp">constexpr XxxConfig DEFAULT_XXX_CONFIG = { XxxAlgo::INTRINSIC };</pre></cann-filter> |
+```
 
-**config 行写法要点**：
-- `<cann-filter>` 标签直接包裹在 `<td>` 内所有内容的**外层**。
-- 代码片段使用 `<pre class="screen" codetype="Cpp">` 标签（沿用 Trunk 源文件的 `class` 和 `codetype` 属性），`<pre>` 内可正常换行。
-- 多段落使用 `<p>` 标签，列表使用 `<ul><li>` 标签。
-- 示例结构：
-  ```html
-  <tr><td class="cellrowborder" valign="top"><p>config</p></td>
-  <td class="cellrowborder" valign="top"><cann-filter npu-type="950">
-  <p>该参数仅支持Ascend 950PR/Ascend 950DT。</p>
-  <p>用于配置...，LnConfig类型，定义如下：</p>
-  <pre class="screen" codetype="Cpp">enum class LnAlgo {
-      INTRINSIC = 0,
-      ...
-  };</pre>
-  <p>取值说明：</p>
-  <ul><li>LnAlgo::INTRINSIC...</li></ul>
-  </cann-filter></td></tr>
-  ```
+**要点**：
+- `<cann-filter>` 标签从参数名列开始包裹，到描述列末尾结束，跨越整行。
+- **整行必须写在同一物理行**（Markdown 表格行不能跨行），否则会破坏表格结构。
+- `<pre>` 内的换行用 `&#10;`（HTML 换行实体）代替物理换行符，确保 `<pre>` 代码块渲染时正确换行。
+- 段落之间用 `<br>` 分隔，列表项用 `&bull;` 前缀 + `<br>` 分隔。
+- 不使用 `<p>`、`<ul><li>` 等 HTML 块级标签（Markdown 表格行内不支持块级元素换行）。
 
 #### 5.3 参数说明表（表 2）— Markdown 格式
 
@@ -342,7 +328,7 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 3. [ ] 公式已替换为 LaTeX 行内公式
 4. [ ] 头文件引用路径已包含
 5. [ ] 函数原型采用共享优先策略：共享重载放在最外层，产品专属重载用 cann-filter 包裹
-6. [ ] 参数表格格式正确：含 `<pre>` 代码块时用 HTML，否则用 Markdown
+6. [ ] 参数表格格式正确：表 1 统一使用 Markdown 简易表格（含 config 时用 `<pre>` + `<br>` 行内写法），表 2 使用 Markdown
 7. [ ] 模板参数表（表 1）中 T 描述简化为 `操作数数据类型。`（类型详情在数据类型章节展示），产品专属参数用 cann-filter 包裹
 8. [ ] 参数描述链接已统一为 TOP5 的内部引用
 9. [ ] Trunk 独有的模板参数（如 config、U）已保留并用 cann-filter 包裹
