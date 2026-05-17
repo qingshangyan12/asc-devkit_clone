@@ -67,9 +67,6 @@ $dst_i = src_i \times scalarValue$
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-<cann-filter npu-type="950">
-针对Ascend 950PR/Ascend 950DT系列产品，函数原型如下：
-
 - tensor前n个数据连续计算
 
     ```cpp
@@ -91,35 +88,6 @@ $dst_i = src_i \times scalarValue$
         template <typename T, bool isSetMask = true>
         __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
-
-</cann-filter>
-
-<cann-filter npu-type="910b,A3">
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，函数原型如下：
-
-- tensor前n个数据连续计算
-
-    ```cpp
-    template <typename T, bool isSetMask = true>
-    __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, const int32_t& count)
-    ```
-
-- tensor高维切分计算
-    - mask逐bit模式
-
-        ```cpp
-        template <typename T, bool isSetMask = true>
-        __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-        ```
-
-    - mask连续模式
-
-        ```cpp
-        template <typename T, bool isSetMask = true>
-        __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-        ```
-
-</cann-filter>
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -127,7 +95,7 @@ $dst_i = src_i \times scalarValue$
 
 | 参数名 | 描述 |
 |---|---|
-| T | 操作数数据类型。<br>支持的数据类型为：half、int16\_t、int32\_t、float。 |
+| T | 操作数数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK\_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
 
 **表 2**  参数说明
@@ -144,7 +112,30 @@ $dst_i = src_i \times scalarValue$
 
 ## 数据类型<a name="zh-cn_topic_0000002530007180_section4219135304818"></a>
 
-支持的数据类型为：half、int16\_t、int32\_t、float。
+<cann-filter npu-type="950">
+支持的数据类型为：half、bfloat16_t、int16_t、float、int32_t、uint64_t、int64_t、complex32、complex64。
+</cann-filter>
+<cann-filter npu-type="A3">
+支持的数据类型为：half、int16_t、float、int32_t。
+</cann-filter>
+<cann-filter npu-type="910b">
+支持的数据类型为：half、int16_t、float、int32_t。
+</cann-filter>
+<cann-filter npu-type="310b">
+支持的数据类型为：half、int16_t、float、int32_t。
+</cann-filter>
+<cann-filter npu-type="310p">
+支持的数据类型为：half、int16_t、float、int32_t。
+</cann-filter>
+<cann-filter npu-type="910">
+支持的数据类型为：half、float。
+</cann-filter>
+<cann-filter npu-type="x90">
+支持的数据类型为：half、int16_t、int32_t、float。
+</cann-filter>
+<cann-filter npu-type="9030">
+支持的数据类型为：half、int16_t、int32_t、float。
+</cann-filter>
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -154,13 +145,12 @@ $dst_i = src_i \times scalarValue$
 
 - 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
 - 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
-- 支持数据类型为：half/int16\_t/int32\_t/float。
 - 当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
+<cann-filter npu-type="950">
 - 针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t/complex32/complex64数据类型仅支持tensor前n个数据计算接口。
+</cann-filter>
 
 ## 调用示例<a name="section642mcpsimp"></a>
-
-更多样例可参考[LINK](更多样例-9.md)。
 
 - tensor高维切分计算样例-mask连续模式
 
@@ -180,27 +170,10 @@ $dst_i = src_i \times scalarValue$
 
 - tensor前n个数据计算接口样例
 
-    <cann-filter npu-type="910b,A3">
-
-    针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，示例如下：
-
     ```cpp
     int16_t scalar = 2;
     AscendC::Muls(dstLocal, srcLocal, scalar, 512);
     ```
-
-    </cann-filter>
-
-    <cann-filter npu-type="950">
-
-    针对Ascend 950PR/Ascend 950DT系列产品，示例如下：
-
-    ```cpp
-    int16_t scalar = 2;
-    AscendC::Muls(dstLocal, srcLocal, scalar, 512);
-    ```
-
-    </cann-filter>
 
 结果示例如下：
 
