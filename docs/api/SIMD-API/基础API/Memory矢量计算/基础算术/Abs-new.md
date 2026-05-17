@@ -67,15 +67,15 @@ $dst_i = |src_i|$
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-<cann-filter npu-type="950">
-针对Ascend 950PR/Ascend 950DT系列产品，函数原型如下：
-
 - tensor前n个数据连续计算
 
     ```cpp
     template <typename T>
     __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
     ```
+
+<cann-filter npu-type="950">
+针对Ascend 950PR/Ascend 950DT系列产品：
 
 - tensor前n个复数计算
 
@@ -84,32 +84,7 @@ $dst_i = |src_i|$
     __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t& count)
     ```
 
-- tensor高维切分计算
-    - mask逐bit模式
-
-        ```cpp
-        template <typename T, bool isSetMask = true>
-        __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-        ```
-
-    - mask连续模式
-
-        ```cpp
-        template <typename T, bool isSetMask = true>
-        __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
-        ```
-
 </cann-filter>
-
-<cann-filter npu-type="910b,A3">
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，函数原型如下：
-
-- tensor前n个数据连续计算
-
-    ```cpp
-    template <typename T>
-    __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
-    ```
 
 - tensor高维切分计算
     - mask逐bit模式
@@ -125,8 +100,6 @@ $dst_i = |src_i|$
         template <typename T, bool isSetMask = true>
         __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
-
-</cann-filter>
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -134,9 +107,9 @@ $dst_i = |src_i|$
 
 | 参数名 | 描述 |
 |---|---|
-| T | 操作数数据类型。<br>支持的数据类型为：half、float。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
+| T | 操作数数据类型。 |
 | <cann-filter npu-type="950">U | 源操作数数据类型。<br>Ascend 950PR/Ascend 950DT，支持的数据类型为：complex32、complex64；当U为complex32类型时，T必须是half类型；当U为complex64类型时，T必须是float类型。</cann-filter> |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
 
 **表 2**  参数说明
 
@@ -151,7 +124,61 @@ $dst_i = |src_i|$
 
 ## 数据类型<a name="zh-cn_topic_0000002529905698_section4219135304818"></a>
 
-支持的数据类型为：half、float。
+<cann-filter npu-type="950">
+
+- 针对Ascend 950PR/Ascend 950DT系列产品
+    支持的数据类型为：int8_t、int16_t、half、int32_t、float、int64_t。
+
+</cann-filter>
+
+<cann-filter npu-type="A3">
+
+- 针对Atlas A3 训练系列产品、Atlas A3 推理系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="910b">
+
+- 针对Atlas A2 训练系列产品、Atlas A2 推理系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="310b">
+
+- 针对Atlas 200I/500 A2 推理产品：
+    支持的数据类型为：int16_t、half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="310p">
+
+- 针对Atlas 推理系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="910">
+
+- 针对Atlas 训练系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="x90">
+
+- 针对Kirin X90：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="9030">
+
+- 针对Kirin 9030：
+    支持的数据类型为：half、float。
+
+</cann-filter>
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -163,11 +190,11 @@ $dst_i = |src_i|$
 - 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
 - 支持数据类型为：half/float。
 - 当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
+<cann-filter npu-type="Ascend 950PR/Ascend 950DT">
 - 针对Ascend 950PR/Ascend 950DT，int8\_t和int64\_t数据类型仅支持tensor前n个数据计算接口。
+</cann-filter>
 
 ## 调用示例<a name="section176061616102911"></a>
-
-更多样例可参考[LINK](更多样例-9.md)。
 
 - tensor高维切分计算样例-mask连续模式，srcLocal和dstLocal均为half类型
 
@@ -203,27 +230,11 @@ $dst_i = |src_i|$
     输出数据dstLocal：[0.0 1.0 2.0 3.0 ...]
     ```
 
-- tensor前n个数据计算接口样例
-
-    <cann-filter npu-type="910b,A3">
-
-    针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，示例如下：
+- tensor前n个数据计算接口样例，srcLocal和dstLocal均为half类型
 
     ```cpp
     AscendC::Abs(dstLocal, srcLocal, 512);
     ```
-
-    </cann-filter>
-
-    <cann-filter npu-type="950">
-
-    针对Ascend 950PR/Ascend 950DT系列产品，示例如下：
-
-    ```cpp
-    AscendC::Abs(dstLocal, srcLocal, 512);
-    ```
-
-    </cann-filter>
 
     结果示例如下：
 
@@ -232,11 +243,11 @@ $dst_i = |src_i|$
     输出数据dstLocal：[0.0 1.0 2.0 3.0 ...]
     ```
 
+<cann-filter npu-type="950">
+
+针对Ascend 950PR/Ascend 950DT系列产品：
+
 - tensor前n个复数计算接口样例
-
-    <cann-filter npu-type="950">
-
-    针对Ascend 950PR/Ascend 950DT系列产品，示例如下：
 
     ```cpp
     LocalTensor<complex64> srcLocal = inQueue.DeQue<complex64>();
@@ -244,11 +255,11 @@ $dst_i = |src_i|$
     AscendC::Abs(dstLocal, srcLocal, 512);
     ```
 
-    </cann-filter>
-
     结果示例如下：
 
     ```bash
     输入数据srcLocal：[1+2j  2-3j ...]
     输出数据dstLocal：[2.236 3.605 ...]
     ```
+
+</cann-filter>
