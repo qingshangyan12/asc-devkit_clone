@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic\_api/kernel\_operator\_vec\_unary\_intf.h"
+头文件引用路径为："basic_api/kernel_operator_vec_unary_intf.h"
 
 Exp属于单目矢量类计算接口，负责将输入的tensor按元素取自然指数。计算公式如下：
 
@@ -81,14 +81,14 @@ $dst_i = e^{src_i}$
     - mask逐bit模式
 
         ```cpp
-        template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
+        template <typename T, bool isSetMask = true, const ExpConfig& config = DEFAULT_EXP_CONFIG>
         __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
     - mask连续模式
 
         ```cpp
-        template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
+        template <typename T, bool isSetMask = true, const ExpConfig& config = DEFAULT_EXP_CONFIG>
         __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
@@ -127,7 +127,7 @@ $dst_i = e^{src_i}$
 
 | 参数名 | 描述 |
 |---|---|
-| T | 操作数数据类型。<br>支持的数据类型为：half、float。 |
+| T | 操作数数据类型。|
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
 | <cann-filter npu-type="950"><term>config</term> | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，ExpConfig类型，定义如下：<br><pre>enum class ExpAlgo {<br>    INTRINSIC = 0,<br>    PRECISION_1ULP_FTZ_TRUE,<br>    PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct ExpConfig {<br>    ExpAlgo algo = ExpAlgo::INTRINSIC;<br>}</pre>通过ExpConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; ExpAlgo::INTRINSIC、ExpAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; ExpAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_EXP_CONFIG的取值如下：<br><pre>constexpr ExpConfig DEFAULT_EXP_CONFIG = { ExpAlgo::INTRINSIC };</pre> </cann-filter>|
 
@@ -164,11 +164,11 @@ $dst_i = e^{src_i}$
 - tensor高维切分计算样例-mask连续模式
 
     ```cpp
-    uint64_t mask = 256 / sizeof(half);     
-    // repeatTime = 4, 128 elements one repeat, 512 elements total     
-    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat     
-    // dstRepStride, srcRepStride = 8, no gap between repeats     
-    AscendC::Exp(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 }); 
+    uint64_t mask = 256 / sizeof(half);
+    // repeatTime = 4, 128 elements one repeat, 512 elements total
+    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride, srcRepStride = 8, no gap between repeats
+    AscendC::Exp(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
     ```
 
 - tensor高维切分计算样例-mask逐bit模式
@@ -183,7 +183,7 @@ $dst_i = e^{src_i}$
 
 - tensor前n个数据计算接口样例
 
-    <cann-filter npu-type="950">
+    <cann-filter npu-type="910b,A3">
 
     针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，示例如下：
 
@@ -193,7 +193,7 @@ $dst_i = e^{src_i}$
 
     </cann-filter>
 
-    <cann-filter npu-type="910b,A3">
+    <cann-filter npu-type="950">
 
     针对Ascend 950PR/Ascend 950DT系列产品，示例如下：
 
@@ -204,9 +204,9 @@ $dst_i = e^{src_i}$
 
     </cann-filter>
 
-结果示例如下：
+    结果示例如下：
 
-```bash
-输入数据srcLocal：[0.0 1.0 2.0 3.0 ...]
-输出数据dstLocal：[1.0 2.719 7.391 20.08 ...]
-```
+    ```bash
+    输入数据srcLocal：[0.0 1.0 2.0 3.0 ...]
+    输出数据dstLocal：[1.0 2.719 7.391 20.08 ...]
+    ```

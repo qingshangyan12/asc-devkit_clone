@@ -273,8 +273,10 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 
 #### 8.2 样例结构
 
+本样例的srcLocal和dstLocal均为half类型。
+
 ```markdown
-- tensor高维切分计算样例-mask连续模式，srcLocal和dstLocal均为half类型
+- tensor高维切分计算样例-mask连续模式
 
     ```cpp
     // 通用样例代码（不分产品）
@@ -286,13 +288,13 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
     // 结果
     ```
 
-- tensor高维切分计算样例-mask逐bit模式，srcLocal和dstLocal均为half类型
+- tensor高维切分计算样例-mask逐bit模式
 
     ```cpp
     // 通用样例代码
     ```
 
-- tensor前n个数据计算接口样例，srcLocal和dstLocal均为half类型
+- tensor前n个数据计算接口样例
 
     ```cpp
     // 950 和 A2/A3 代码完全一致时，不包裹 filter
