@@ -188,15 +188,16 @@ $dst_i = |src_i|$
 
 - 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
 - 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
-- 支持数据类型为：half/float。
 - 当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
-<cann-filter npu-type="Ascend 950PR/Ascend 950DT">
+<cann-filter npu-type="950">
 - 针对Ascend 950PR/Ascend 950DT，int8\_t和int64\_t数据类型仅支持tensor前n个数据计算接口。
 </cann-filter>
 
 ## 调用示例<a name="section176061616102911"></a>
 
-- tensor高维切分计算样例-mask连续模式，srcLocal和dstLocal均为half类型
+本样例的srcLocal和dstLocal均为half类型。
+
+- tensor高维切分计算样例-mask连续模式
 
     ```cpp
     uint64_t mask = 256 / sizeof(half);
@@ -213,7 +214,7 @@ $dst_i = |src_i|$
     输出数据dstLocal：[0.0 1.0 2.0 3.0 ...]
     ```
 
-- tensor高维切分计算样例-mask逐bit模式，srcLocal和dstLocal均为half类型
+- tensor高维切分计算样例-mask逐bit模式
 
     ```cpp
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
@@ -230,7 +231,7 @@ $dst_i = |src_i|$
     输出数据dstLocal：[0.0 1.0 2.0 3.0 ...]
     ```
 
-- tensor前n个数据计算接口样例，srcLocal和dstLocal均为half类型
+- tensor前n个数据计算接口样例
 
     ```cpp
     AscendC::Abs(dstLocal, srcLocal, 512);

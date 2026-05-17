@@ -140,6 +140,8 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 
 #### 5.2 模板参数说明表（表 1）— 统一使用 Markdown 简易表格
 
+**模板参数在表格中的顺序，要跟所有模板参数同时出现的函数原型中的顺序保持一致**
+
 **所有表 1 均使用 Markdown 简易表格**，包括含 config 等带 `<pre>` 代码块的参数行。不使用 HTML `<table>` 格式。
 
 | 参数 | 处理方式 |
@@ -249,6 +251,7 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 - 保留 Trunk 的约束条目（地址对齐、地址重叠）。
 - **产品专属约束**（如"针对Ascend 950PR/Ascend 950DT，int8_t和int64_t数据类型仅支持tensor前n个数据计算接口"）用 `<cann-filter npu-type="950">` 包裹。
 - 丢弃 TOP5 中标注"**待补充**"的约束条目。
+- 丢弃 **不区分产品版本** 的 **支持数据类型为：** 的约束条目。
 - 链接统一使用 TOP5 的内部引用（`Unified-Buffer介绍.md`）。
 
 ### 8. 调用示例
@@ -312,7 +315,6 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 - **产品专属样例**用 `<cann-filter>` 包裹，**整个样例（含代码块和结果示例）都放在 filter 内**。
 - `<cann-filter>` 标签前后需有空行，标签内部不使用子列表（`- `），代码块保持 4 空格缩进。
 - 代码块添加 `cpp`/`bash` 语言标注。
-- **样例标题格式**：`- tensor{类型}计算{接口}样例{模式描述}，srcLocal和dstLocal均为{type}类型`
 - **cann-filter 块顺序**：当确实需要拆分同一类样例时，`npu-type="910b,A3"` 在前，`npu-type="950"` 在后。
 - **950 块样例只保留 config 版本调用**（针对有 config 参数的接口）：只展示 `static constexpr XxxConfig config = {...}; AscendC::Xxx<T, config>(...)` ，config 声明在前、调用在后。
 - 不保留 Trunk 的 `更多样例可参考[LINK](更多样例-x.md)。` 引用行。

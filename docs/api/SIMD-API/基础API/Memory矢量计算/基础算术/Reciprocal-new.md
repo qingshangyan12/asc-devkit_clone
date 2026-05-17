@@ -127,9 +127,9 @@ $dst_i = \frac{1}{src_i}$
 
 | 参数名 | 描述 |
 |---|---|
-| T | 操作数数据类型。<br>支持的数据类型为：half、float。 |
+| T | 操作数数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
-| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，ReciprocalConfig类型，定义如下：<br><pre>enum class ReciprocalAlgo {<br>    INTRINSIC = 0,<br>    PRECISION_1ULP_FTZ_TRUE,<br>    PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct ReciprocalConfig {<br>    ReciprocalAlgo algo = ReciprocalAlgo::INTRINSIC;<br>}</pre>通过ReciprocalConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; ReciprocalAlgo::INTRINSIC、ReciprocalAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; ReciprocalAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_RECIPROCAL_CONFIG取值如下：<br><pre>constexpr ReciprocalConfig DEFAULT_RECIPROCAL_CONFIG = { ReciprocalAlgo::INTRINSIC };</pre> </cann-filter>|
+| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，ReciprocalConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class ReciprocalAlgo {&#10;    INTRINSIC = 0,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_1ULP_FTZ_FALSE,&#10;};&#10;struct ReciprocalConfig {&#10;    ReciprocalAlgo algo = ReciprocalAlgo::INTRINSIC;&#10;};</pre>通过ReciprocalConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; ReciprocalAlgo::INTRINSIC、ReciprocalAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; ReciprocalAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_RECIPROCAL_CONFIG的取值如下：<br><pre class="screen" codetype="Cpp">constexpr ReciprocalConfig DEFAULT_RECIPROCAL_CONFIG = { ReciprocalAlgo::INTRINSIC };</pre></cann-filter> |
 
 **表 2**  参数说明
 
@@ -144,7 +144,61 @@ $dst_i = \frac{1}{src_i}$
 
 ## 数据类型<a name="zh-cn_topic_0000002560785673_section4219135304818"></a>
 
-支持的数据类型为：half、float。
+<cann-filter npu-type="950">
+
+- 针对Ascend 950PR/Ascend 950DT系列产品
+    支持的数据类型为：half、float、int64_t、uint64_t。
+
+</cann-filter>
+
+<cann-filter npu-type="A3">
+
+- 针对Atlas A3 训练系列产品、Atlas A3 推理系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="910b">
+
+- 针对Atlas A2 训练系列产品、Atlas A2 推理系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="310b">
+
+- 针对Atlas 200I/500 A2 推理产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="310p">
+
+- 针对Atlas 推理系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="910">
+
+- 针对Atlas 训练系列产品：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="x90">
+
+- 针对Kirin X90：
+    支持的数据类型为：half、float。
+
+</cann-filter>
+
+<cann-filter npu-type="9030">
+
+- 针对Kirin 9030：
+    支持的数据类型为：half、float。
+
+</cann-filter>
 
 ## 返回值说明<a name="section15227195416231"></a>
 
@@ -158,13 +212,13 @@ $dst_i = \frac{1}{src_i}$
 - 当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
 - 如果src中的数值为0，可能会产生未知结果。
 - 使用Reciprocal时，half的算子结果对比误差不满足双千分之一的要求，float的算子结果对比误差不满足双万分之一的要求，如果需要高精度，建议使用[Div](Div.md#ZH-CN_TOPIC_0000002573904709)替代实现。
+<cann-filter npu-type="950">
 - 针对Ascend 950PR/Ascend 950DT，int64\_t、uint64\_t数据类型仅支持tensor前n个数据计算接口。
+</cann-filter>
 
 ## 调用示例<a name="section176061616102911"></a>
 
 本样例的srcLocal和dstLocal均为half类型。
-
-更多样例可参考[LINK](更多样例-9.md)。
 
 - tensor高维切分计算样例-mask连续模式
 
@@ -209,9 +263,9 @@ $dst_i = \frac{1}{src_i}$
 
     </cann-filter>
 
-结果示例如下：
+    结果示例如下：
 
-```bash
-输入数据srcLocal: [-7.152 -7.24 1.771 ... -1.339 4.473]
-输出数据dstLocal: [-0.1396 -0.1382 0.5645 ... -0.748 0.2231]
-```
+    ```bash
+    输入数据srcLocal: [-7.152 -7.24 1.771 ... -1.339 4.473]
+    输出数据dstLocal: [-0.1396 -0.1382 0.5645 ... -0.748 0.2231]
+    ```
