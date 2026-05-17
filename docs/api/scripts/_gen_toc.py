@@ -40,7 +40,7 @@ def parse_readme_toc():
 
     root_entries = []
     stack = [(0, None)]
-    link_re = re.compile(r"^(\s*)-\s*\[(.+?)\]\((.+?)\)")
+    link_re = re.compile(r"^(\s*)-\s*\[(.+?)\]\((.+)\)")
 
     for line in lines:
         m = link_re.match(line)
