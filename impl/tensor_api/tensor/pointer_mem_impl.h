@@ -32,9 +32,6 @@ struct HardwareMemPtr : IterAdaptor<Pointer, HardwareMemPtr<PtrPattern, Pointer>
     using ptrPattern = PtrPattern;
 };
 
-template <typename T>
-using GetMemLocation = typename T::iterator::ptrPattern;
-
 // is hardware mem
 template <typename PtrPattern, typename Pointer, typename = void>
 struct IsHardwareMem : Std::false_type {};
@@ -48,6 +45,12 @@ struct IsHardwareMem<PtrPattern, Pointer, void_t<typename Pointer::iterator>>
 
 template <typename PtrPattern, typename Pointer>
 constexpr bool IsHardwareMemV = IsHardwareMem<PtrPattern, Pointer>::value;
+
+template <typename PtrPattern, typename Iterator>
+__aicore__ inline constexpr auto MakeLocationMemPtr(Iterator iter)
+{
+    return HardwareMemPtr<PtrPattern, Iterator>{iter};
+}
 } // namespace Te
 } // namespace AscendC
 

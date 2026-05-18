@@ -23,58 +23,32 @@
 #ifndef IMPL_TENSOR_API_TENSOR_POINTER_PATTERN_H
 #define IMPL_TENSOR_API_TENSOR_POINTER_PATTERN_H
 
-#include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/tensor/pointer_mem_impl.h"
-#include "impl/tensor_api/tensor/pointer_pattern_impl.h"
 
 namespace AscendC {
 namespace Te {
 
-template <typename T = uint16_t>
-struct PtrTrait {
-using type = T;
-};
-
-template <typename T, typename = void>
-struct IsPtrTrait : Std::false_type {};
-
 template <typename T>
-struct IsPtrTrait<T, void_t<typename T::type>> : Std::true_type {};
+using GetMemLocation = typename T::iterator::ptrPattern;
 
-template <typename T>
-using MemPtrTraitT = typename Std::conditional<IsPtrTrait<T>::value, T, PtrTrait<T>>::type;
-
-template <typename Hardware, typename Arg>
-using EnableMakePtrByTrait =
-    Std::enable_if_t<IsHardwareV<Hardware> && !IsMemPtrIterator<Std::remove_cvref_t<Arg>>::value, int>;
-
-template <typename Hardware, typename Arg>
-using EnableMakeHardwarePtr =
-    Std::enable_if_t<IsHardwareV<Hardware> && IsMemPtrIterator<Std::remove_cvref_t<Arg>>::value, int>;
+template <typename PtrPattern, typename Iterator>
+__aicore__ inline constexpr auto MakeMemPtr(Iterator iter)
+{
+    return MakeLocationMemPtr<PtrPattern, Iterator>(iter);
+}
 
 template <typename Iterator>
-using EnableMakePtrByIter =
-    Std::enable_if_t<IsMemPtrIterator<Std::remove_cvref_t<Iterator>>::value, int>;
-
-template <typename Hardware, typename TraitOrType, typename Arg0, typename... Args,
-    EnableMakePtrByTrait<Hardware, Arg0> = 0>
-__aicore__ inline constexpr auto MakeMemPtr(Arg0 arg0, Args... args)
+__aicore__ inline constexpr auto MakeMemPtr(Iterator iter)
 {
-    return MakeLocationMemPtr<Hardware, MemPtrTraitT<TraitOrType>>(arg0, args...);
+    using ptrPattern = GetAttributeLocation<typename IterEle<Iterator>::type*>;
+    return MakeMemPtr<ptrPattern, Iterator>(iter);
 }
 
-template <typename Hardware, typename Arg0, typename... Args,
-        EnableMakeHardwarePtr<Hardware, Arg0> = 0>
-__aicore__ inline constexpr auto MakeMemPtr(Arg0 arg0, Args... args)
+template <typename PtrPattern, typename DataType, typename Addrss>
+__aicore__ inline constexpr auto MakeMemPtr(Addrss addr)
 {
-    return MakeHardwareMemPtr<Hardware>(arg0, args...);
-}
-
-template <typename Iterator, EnableMakePtrByIter<Iterator> = 0>
-__aicore__ inline constexpr auto MakeMemPtr(Iterator& iter)
-{
-    using hardware = GetAttributeLocation<typename IterEle<Iterator>::type*>;
-    return MakeMemPtr<hardware>(iter);
+    using iterator = typename locationAttr<DataType>::locationMap::template Get<PtrPattern>;
+    return MakeMemPtr<PtrPattern, iterator>(reinterpret_cast<iterator>(asc_get_phy_buf_addr(0) + arg));
 }
 
 } // namespace Te
