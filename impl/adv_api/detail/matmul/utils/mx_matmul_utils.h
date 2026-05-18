@@ -79,7 +79,7 @@ struct GetMmDstType<fp4x2_e1m2_t> {
 
 template <>
 struct GetL0DataType<fp8_e5m2_t, true> {
-    using Type = AscendC::mx_fp8_e5m2_t;
+    using Type = AscendC::fp8_e5m2_t;
 };
 
 template <>
@@ -89,7 +89,7 @@ struct GetL0DataType<fp8_e5m2_t, false> {
 
 template <>
 struct GetL0DataType<fp8_e4m3fn_t, true> {
-    using Type = AscendC::mx_fp8_e4m3_t;
+    using Type = AscendC::fp8_e4m3fn_t;
 };
 
 template <>
