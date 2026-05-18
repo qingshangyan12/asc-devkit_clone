@@ -37,6 +37,11 @@ SAMPLES=(
     "asc_gt"
     "asc_not"
     "asc_madd"
+    "asc_shiftright"
+    "asc_deintlv"
+    "asc_intlv"
+    "asc_transpose"
+    "asc_add_scalar"
 )
 
 PASS=0

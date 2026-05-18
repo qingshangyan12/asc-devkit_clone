@@ -1,1 +1,0 @@
-/usr/local/Ascend/cann-9.0.0-beta.2/bin/bisheng  -Wl,-rpath,/usr/local/Ascend/cann-9.0.0-beta.2/tools/simulator/dav_3510/lib -Wl,-L/usr/local/Ascend/cann-9.0.0-beta.2/tools/simulator/dav_3510/lib -Wl,--disable-new-dtags CMakeFiles/c_api_madd_example.dir/c_api_madd.asc.o -o c_api_madd_example  -lruntime_camodel -lnpu_drv_camodel 
