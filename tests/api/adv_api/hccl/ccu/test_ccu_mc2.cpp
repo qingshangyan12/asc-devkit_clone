@@ -123,20 +123,20 @@ protected:
     aclrtStream stream_ = nullptr;
 };
 
-TEST_F(CcuMc2TestSuite, CcuAllocV2_BasicFields) {
+TEST_F(CcuMc2TestSuite, AllocCcuOpResCtx_BasicFields) {
     OpResCtx resCtx{};
     u32 rankSize = 8;
     u32 userRank = 3;
-    HcclResult ret = CcuAllocV2(comm_, "test_tag", rankSize, userRank, resCtx);
+    HcclResult ret = AllocCcuOpResCtx(comm_, "test_tag", rankSize, userRank, resCtx);
     EXPECT_EQ(ret, HCCL_SUCCESS);
     EXPECT_EQ(resCtx.rankId, userRank);
     EXPECT_EQ(resCtx.rankSize, rankSize);
     EXPECT_EQ(resCtx.workSpaceSize, Hccl::MC2_WORKSPACE_SIZE);
 }
 
-TEST_F(CcuMc2TestSuite, CcuAllocV2_ThreeAddrsDistinct) {
+TEST_F(CcuMc2TestSuite, AllocCcuOpResCtx_ThreeAddrsDistinct) {
     OpResCtx resCtx{};
-    EXPECT_EQ(CcuAllocV2(comm_, "tag", 4, 0, resCtx), HCCL_SUCCESS);
+    EXPECT_EQ(AllocCcuOpResCtx(comm_, "tag", 4, 0, resCtx), HCCL_SUCCESS);
     EXPECT_NE(resCtx.workSpace, resCtx.xnAddr);
     EXPECT_NE(resCtx.workSpace, resCtx.ckeAddr);
     EXPECT_NE(resCtx.xnAddr, resCtx.ckeAddr);
