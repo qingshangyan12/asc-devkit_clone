@@ -11,29 +11,29 @@
 #include "math/tan.h"
 
 __aicore__ void TestTan0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Tan<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Tan<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestTan1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Tan<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Tan<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestTan2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Tan<half>(dstTensor, srcTensor, calCount);
+    AscendC::Tan<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestTan3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Tan<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Tan<float>(dstTensor, srcTensor);
 }

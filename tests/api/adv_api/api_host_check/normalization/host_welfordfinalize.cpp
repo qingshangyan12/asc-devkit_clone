@@ -11,21 +11,21 @@
 
 __aicore__ void TestWelfordFinalize0() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::WelfordFinalize<half>(outputMean, outputVariance, inputMean, inputVariance, sharedTmpBuffer, para);
+    AscendC::WelfordFinalize<float>(outputMean, outputVariance, inputMean, inputVariance, sharedTmpBuffer, para);
 }
 
 __aicore__ void TestWelfordFinalize1() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::WelfordFinalize<half>(outputMean, outputVariance, inputMean, inputVariance, counts, sharedTmpBuffer, para);
+    AscendC::WelfordFinalize<float>(outputMean, outputVariance, inputMean, inputVariance, counts, sharedTmpBuffer, para);
 }
 
 __aicore__ void TestWelfordFinalize2() {
-    AscendC::WelfordFinalize<half>(outputMean, outputVariance, inputMean, inputVariance, para);
+    AscendC::WelfordFinalize<float>(outputMean, outputVariance, inputMean, inputVariance, para);
 }
 
 __aicore__ void TestWelfordFinalize3() {
     uint32_t calCount = 0;
-    AscendC::WelfordFinalize<half>(outputMean, outputVariance, inputMean, inputVariance, counts, para);
+    AscendC::WelfordFinalize<float>(outputMean, outputVariance, inputMean, inputVariance, counts, para);
 }
 

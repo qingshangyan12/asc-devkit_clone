@@ -11,29 +11,29 @@
 #include "math/sin.h"
 
 __aicore__ void TestSin0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Sin<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Sin<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestSin1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Sin<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Sin<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestSin2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Sin<half>(dstTensor, srcTensor, calCount);
+    AscendC::Sin<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestSin3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Sin<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Sin<float>(dstTensor, srcTensor);
 }

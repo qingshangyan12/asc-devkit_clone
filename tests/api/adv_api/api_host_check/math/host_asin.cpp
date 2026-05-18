@@ -10,30 +10,30 @@
 #include "math/asin.h"
 
 __aicore__ void TestAsin0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Asin<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Asin<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestAsin1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Asin<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Asin<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestAsin2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Asin<half>(dstTensor, srcTensor, calCount);
+    AscendC::Asin<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestAsin3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Asin<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Asin<float>(dstTensor, srcTensor);
 }
 

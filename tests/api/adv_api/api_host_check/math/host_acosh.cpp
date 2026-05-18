@@ -10,30 +10,30 @@
 #include "math/acosh.h"
 
 __aicore__ void TestAcosh0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Acosh<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Acosh<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestAcosh1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Acosh<half>(dstTensor, srcTensor, calCount);
+    AscendC::Acosh<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestAcosh2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Acosh<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Acosh<float>(dstTensor, srcTensor);
 }
 
 __aicore__ void TestAcosh3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Acosh<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Acosh<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 

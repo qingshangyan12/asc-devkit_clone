@@ -10,38 +10,37 @@
 #include "activation/swiglu.h"
 
 __aicore__ void TestSwiGLU0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
-    AscendC::SwiGLU<half>(dstTensor, srcTensor0, srcTensor1, scalarValue);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
+    float scalarValue = 0.0f;
+    AscendC::SwiGLU<float>(dstTensor, src0Tensor, src1Tensor, scalarValue);
 }
 
 __aicore__ void TestSwiGLU1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
+    float scalarValue = 0.0f;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::SwiGLU<half>(dstTensor, srcTensor0, srcTensor1, scalarValue, sharedTmpBuffer);
+    AscendC::SwiGLU<float>(dstTensor, src0Tensor, src1Tensor, scalarValue, sharedTmpBuffer);
 }
 
 __aicore__ void TestSwiGLU2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
+    float scalarValue = 0.0f;
     uint32_t calCount = 0;
-    AscendC::SwiGLU<half>(dstTensor, srcTensor0, srcTensor1, scalarValue, calCount);
+    AscendC::SwiGLU<float>(dstTensor, src0Tensor, src1Tensor, scalarValue, calCount);
 }
 
 __aicore__ void TestSwiGLU3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
+    float scalarValue = 0.0f;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::SwiGLU<half>(dstTensor, srcTensor0, srcTensor1, scalarValue, sharedTmpBuffer, calCount);
+    AscendC::SwiGLU<float>(dstTensor, src0Tensor, src1Tensor, scalarValue, sharedTmpBuffer, calCount);
 }
-

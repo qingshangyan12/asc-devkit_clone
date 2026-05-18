@@ -10,15 +10,15 @@
 #include "quantization/antiquantize.h"
 
 __aicore__ void TestAntiQuantize0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::AntiQuantize<half>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
+    AscendC::AntiQuantize<float>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
 }
 
 __aicore__ void TestAntiQuantize1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::AntiQuantize<half>(dstTensor, srcTensor, scale, offset, params);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::AntiQuantize<float>(dstTensor, srcTensor, scale, offset, params);
 }
 

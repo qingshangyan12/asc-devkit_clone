@@ -10,15 +10,15 @@
 #include "reduce/sum.h"
 
 __aicore__ void TestSum0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Sum<half>(dstTensor, srcTensor, sharedTmpBuffer, sumParams);
+    AscendC::Sum<float>(dstTensor, srcTensor, sharedTmpBuffer, sumParams);
 }
 
 __aicore__ void TestSum1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Sum<half>(dstTensor, srcTensor, sumParams);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Sum<float>(dstTensor, srcTensor, sumParams);
 }
 

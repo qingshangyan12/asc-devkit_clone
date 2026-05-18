@@ -10,21 +10,20 @@
 #include "activation/simplesoftmax.h"
 
 __aicore__ void TestSimpleSoftMax0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> inSumTensor;
-    AscendC::LocalTensor<half> inMaxTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::SoftMaxTiling tiling;
-    AscendC::SimpleSoftMax<half>(dstTensor, inSumTensor, inMaxTensor, srcTensor, tiling);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> inSumTensor;
+    AscendC::LocalTensor<float> inMaxTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SimpleSoftMax<float>(dstTensor, inSumTensor, inMaxTensor, srcTensor, tiling);
 }
 
 __aicore__ void TestSimpleSoftMax1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> inSumTensor;
-    AscendC::LocalTensor<half> inMaxTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> inSumTensor;
+    AscendC::LocalTensor<float> inMaxTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::SoftMaxTiling tiling;
-    AscendC::SimpleSoftMax<half>(dstTensor, inSumTensor, inMaxTensor, srcTensor, sharedTmpBuffer, tiling);
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SimpleSoftMax<float>(dstTensor, inSumTensor, inMaxTensor, srcTensor, sharedTmpBuffer, tiling);
 }
-

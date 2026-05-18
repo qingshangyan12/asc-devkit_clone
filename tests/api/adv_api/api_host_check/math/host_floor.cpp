@@ -10,17 +10,17 @@
 #include "math/floor.h"
 
 __aicore__ void TestFloor0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Floor<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Floor<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestFloor1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Floor<half>(dstTensor, srcTensor, calCount);
+    AscendC::Floor<float>(dstTensor, srcTensor, calCount);
 }
 

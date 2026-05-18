@@ -10,30 +10,30 @@
 #include "math/atan.h"
 
 __aicore__ void TestAtan0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Atan<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Atan<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestAtan1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Atan<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Atan<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestAtan2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Atan<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Atan<float>(dstTensor, srcTensor);
 }
 
 __aicore__ void TestAtan3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Atan<half>(dstTensor, srcTensor, calCount);
+    AscendC::Atan<float>(dstTensor, srcTensor, calCount);
 }
 

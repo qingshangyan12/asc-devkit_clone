@@ -11,10 +11,10 @@
 
 __aicore__ void TestBatchNorm0() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::BatchNorm<half>(output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling);
+    AscendC::BatchNorm<float>(output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling);
 }
 
 __aicore__ void TestBatchNorm1() {
-    AscendC::BatchNorm<half>(output, outputMean, outputVariance, inputX, gamma, beta, epsilon, tiling);
+    AscendC::BatchNorm<float>(output, outputMean, outputVariance, inputX, gamma, beta, epsilon, tiling);
 }
 

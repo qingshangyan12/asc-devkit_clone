@@ -10,10 +10,10 @@
 #include "math/axpy.h"
 
 __aicore__ void TestAxpy0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    half alpha;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    float alpha;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Axpy<half, half>(dstTensor, srcTensor, alpha, sharedTmpBuffer, calCount);
+    AscendC::Axpy<float, float>(dstTensor, srcTensor, alpha, sharedTmpBuffer, calCount);
 }

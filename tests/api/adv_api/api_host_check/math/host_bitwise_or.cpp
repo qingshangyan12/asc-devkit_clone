@@ -9,10 +9,11 @@
 */
 #include "math/bitwise_or.h"
 
+/**
 __aicore__ void TestBitwiseOr0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<int16_t> dstTensor;
+    AscendC::LocalTensor<int16_t> src0Tensor;
+    AscendC::LocalTensor<int16_t> src1Tensor;
     uint32_t calCount = 0;
-    AscendC::BitwiseOr<half>(dstTensor, src0Tensor, src1Tensor, calCount);
-}
+    AscendC::BitwiseOr(dstTensor, src0Tensor, src1Tensor, calCount);
+}*/

@@ -10,23 +10,23 @@
 #include "math/fma.h"
 
 __aicore__ void TestFma0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
-    AscendC::LocalTensor<half> src2Tensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
+    AscendC::LocalTensor<float> src2Tensor;
     uint32_t calCount = 0;
-    AscendC::Fma<half>(dstTensor, src0Tensor, src1Tensor, src2Tensor, sharedTmpBuffer, calCount);
+    AscendC::Fma<float>(dstTensor, src0Tensor, src1Tensor, src2Tensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestFma1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
-    AscendC::LocalTensor<half> src2Tensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
+    AscendC::LocalTensor<float> src2Tensor;
     uint32_t calCount = 0;
-    AscendC::Fma<half>(dstTensor, src0Tensor, src1Tensor, src2Tensor, calCount);
+    AscendC::Fma<float>(dstTensor, src0Tensor, src1Tensor, src2Tensor, calCount);
 }
 

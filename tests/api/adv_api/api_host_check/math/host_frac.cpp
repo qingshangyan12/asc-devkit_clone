@@ -10,30 +10,30 @@
 #include "math/frac.h"
 
 __aicore__ void TestFrac0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Frac<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Frac<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestFrac1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Frac<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Frac<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestFrac2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Frac<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Frac<float>(dstTensor, srcTensor);
 }
 
 __aicore__ void TestFrac3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Frac<half>(dstTensor, srcTensor, calCount);
+    AscendC::Frac<float>(dstTensor, srcTensor, calCount);
 }
 

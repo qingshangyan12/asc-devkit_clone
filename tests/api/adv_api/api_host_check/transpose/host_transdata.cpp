@@ -10,15 +10,15 @@
 #include "transpose/transdata.h"
 
 __aicore__ void TestTransData0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::TransData<half>(dstTensor, srcTensor, sharedTmpBuffer, params);
+    AscendC::TransData<float>(dstTensor, srcTensor, sharedTmpBuffer, params);
 }
 
 __aicore__ void TestTransData1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::TransData<half>(dstTensor, srcTensor, params);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::TransData<float>(dstTensor, srcTensor, params);
 }
 

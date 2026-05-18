@@ -10,14 +10,17 @@
 #include "activation/softmaxgrad.h"
 
 __aicore__ void TestSoftmaxGrad0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::SoftmaxGrad<half>(dstTensor, gradTensor, srcTensor, tiling);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> gradTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SoftmaxGrad<float>(dstTensor, gradTensor, srcTensor, tiling);
 }
 
 __aicore__ void TestSoftmaxGradFront1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::SoftmaxGradFront<half>(dstTensor, gradTensor, srcTensor, tiling);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> gradTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SoftmaxGradFront<float>(dstTensor, gradTensor, srcTensor, tiling);
 }
-

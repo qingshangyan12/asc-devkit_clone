@@ -10,8 +10,9 @@
 #include "index/arithprogression.h"
 
 __aicore__ void TestArange0() {
-    AscendC::LocalTensor<half> dstTensor;
-    uint32_t calCount = 0;
-    AscendC::Arange<half>(dst, firstValue, diffValue, count);
+    AscendC::LocalTensor<float> dst;
+    float firstValue = 0.0f;
+    float diffValue = 1.0f;
+    uint32_t count = 0;
+    AscendC::Arange<float>(dst, firstValue, diffValue, count);
 }
-

@@ -10,15 +10,20 @@
 #include "normalization/rmsnorm.h"
 
 __aicore__ void TestRmsNorm0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstLocal;
+    AscendC::LocalTensor<float> srcLocal;
+    AscendC::LocalTensor<float> gammaLocal;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::RmsNorm<half>(dstLocal, srcLocal, gammaLocal, sharedTmpBuffer, epsilon, tiling);
+    float epsilon = 0.0f;
+    AscendC::tiling::RmsNormTiling tiling;
+    AscendC::RmsNorm<float>(dstLocal, srcLocal, gammaLocal, sharedTmpBuffer, epsilon, tiling);
 }
 
 __aicore__ void TestRmsNorm1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::RmsNorm<half>(dstLocal, srcLocal, gammaLocal, epsilon, tiling);
+    AscendC::LocalTensor<float> dstLocal;
+    AscendC::LocalTensor<float> srcLocal;
+    AscendC::LocalTensor<float> gammaLocal;
+    float epsilon = 0.0f;
+    AscendC::tiling::RmsNormTiling tiling;
+    AscendC::RmsNorm<float>(dstLocal, srcLocal, gammaLocal, epsilon, tiling);
 }
-

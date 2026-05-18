@@ -10,9 +10,9 @@
 #include "utils/init_global_memory.h"
 
 __aicore__ void TestFill0() {
-    AscendC::GlobalTensor<half> gmWorkspaceAddr;
+    AscendC::GlobalTensor<float> gmWorkspaceAddr;
     uint64_t size = 0;
-    half value = 0;
-    AscendC::Fill<half>(gmWorkspaceAddr, size, value);
+    float value = 0;
+    AscendC::Fill<float>(gmWorkspaceAddr, size, value);
 }
 

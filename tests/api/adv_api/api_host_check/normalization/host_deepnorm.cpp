@@ -10,15 +10,15 @@
 #include "normalization/deepnorm.h"
 
 __aicore__ void TestDeepNorm0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::DeepNorm<half>(dstLocal, meanLocal, rstdLocal, srcLocal, gxLocal, betaLocal, gammaLocal, sharedTmpBuffer, alpha, epsilon, tiling);
+    AscendC::DeepNorm<float>(dstLocal, meanLocal, rstdLocal, srcLocal, gxLocal, betaLocal, gammaLocal, sharedTmpBuffer, alpha, epsilon, tiling);
 }
 
 __aicore__ void TestDeepNorm1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::DeepNorm<half>(dstLocal, meanLocal, rstdLocal, srcLocal, gxLocal, betaLocal, gammaLocal, alpha, epsilon, tiling);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::DeepNorm<float>(dstLocal, meanLocal, rstdLocal, srcLocal, gxLocal, betaLocal, gammaLocal, alpha, epsilon, tiling);
 }
 

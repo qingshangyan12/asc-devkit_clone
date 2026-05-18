@@ -10,15 +10,20 @@
 #include "filter/dropout.h"
 
 __aicore__ void TestDropOut0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstLocal;
+    AscendC::LocalTensor<float> srcLocal;
+    AscendC::LocalTensor<uint8_t> maskLocal;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::DropOut<half>(dstLocal, srcLocal, maskLocal, sharedTmpBuffer, keepProb, info);
+    float keepProb = 0.5f;
+    AscendC::DropOutShapeInfo info;
+    AscendC::DropOut<float>(dstLocal, srcLocal, maskLocal, sharedTmpBuffer, keepProb, info);
 }
 
 __aicore__ void TestDropOut1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::DropOut<half>(dstLocal, srcLocal, maskLocal, keepProb, info);
+    AscendC::LocalTensor<float> dstLocal;
+    AscendC::LocalTensor<float> srcLocal;
+    AscendC::LocalTensor<uint8_t> maskLocal;
+    float keepProb = 0.5f;
+    AscendC::DropOutShapeInfo info;
+    AscendC::DropOut<float>(dstLocal, srcLocal, maskLocal, keepProb, info);
 }
-

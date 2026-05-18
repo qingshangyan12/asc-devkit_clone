@@ -10,17 +10,17 @@
 #include "math/is_nan.h"
 
 __aicore__ void TestIsNan0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t count = 0;
-    AscendC::IsNan<half>(dstTensor, srcTensor, count);
+    AscendC::IsNan<float>(dstTensor, srcTensor, count);
 }
 
 __aicore__ void TestIsNan1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t count = 0;
-    AscendC::IsNan<half>(dstTensor, srcTensor, sharedTmpBuffer, count);
+    AscendC::IsNan<float>(dstTensor, srcTensor, sharedTmpBuffer, count);
 }
 

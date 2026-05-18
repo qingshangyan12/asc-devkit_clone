@@ -10,17 +10,17 @@
 #include "math/philox.h"
 
 __aicore__ void TestPhiloxRandom0() {
-    AscendC::LocalTensor<half> dstLocal;
+    AscendC::LocalTensor<float> dstLocal;
     AscendC::PhiloxKey philoxKey;
     AscendC::PhiloxCounter philoxCounter;
     uint16_t count = 0;
-    AscendC::PhiloxRandom<half>(dstLocal, philoxKey, philoxCounter, count);
+    AscendC::PhiloxRandom<float>(dstLocal, philoxKey, philoxCounter, count);
 }
 
 __aicore__ void TestPhiloxRandom1() {
-    AscendC::LocalTensor<half> dstLocal;
+    AscendC::LocalTensor<float> dstLocal;
     AscendC::PhiloxKey philoxKey;
     AscendC::PhiloxCounter philoxCounter;
     AscendC::PhiloxRandomParams params;
-    AscendC::PhiloxRandom<half>(dstLocal, philoxKey, philoxCounter, params);
+    AscendC::PhiloxRandom<float>(dstLocal, philoxKey, philoxCounter, params);
 }

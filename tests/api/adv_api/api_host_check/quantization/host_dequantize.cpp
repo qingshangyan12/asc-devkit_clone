@@ -10,15 +10,15 @@
 #include "quantization/dequantize.h"
 
 __aicore__ void TestDequantize0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Dequantize<half>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
+    AscendC::Dequantize<float>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
 }
 
 __aicore__ void TestDequantize1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Dequantize<half>(dstTensor, srcTensor, scale, offset, params);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Dequantize<float>(dstTensor, srcTensor, scale, offset, params);
 }
 

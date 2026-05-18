@@ -11,29 +11,29 @@
 #include "math/sinh.h"
 
 __aicore__ void TestSinh0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Sinh<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Sinh<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestSinh1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Sinh<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Sinh<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestSinh2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Sinh<half>(dstTensor, srcTensor, calCount);
+    AscendC::Sinh<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestSinh3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Sinh<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Sinh<float>(dstTensor, srcTensor);
 }

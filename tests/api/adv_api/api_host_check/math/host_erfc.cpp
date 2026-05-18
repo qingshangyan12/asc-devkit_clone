@@ -10,30 +10,30 @@
 #include "math/erfc.h"
 
 __aicore__ void TestErfc0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Erfc<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Erfc<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestErfc1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Erfc<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Erfc<float>(dstTensor, srcTensor);
 }
 
 __aicore__ void TestErfc2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Erfc<half>(dstTensor, srcTensor, calCount);
+    AscendC::Erfc<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestErfc3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Erfc<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Erfc<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 

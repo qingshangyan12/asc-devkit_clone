@@ -10,10 +10,10 @@
 #include "math/where.h"
 
 __aicore__ void TestWhere0() {
-    AscendC::LocalTensor<half> dstTensor;
-    half trueValue;
-    half falseValue;
-    AscendC::LocalTensor<uint8_t> condTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    float trueValue;
+    float falseValue;
+    AscendC::LocalTensor<uint64_t> condTensor;
     uint32_t calCount = 0;
-    AscendC::Where<half, half, uint8_t>(dstTensor, trueValue, falseValue, condTensor, calCount);
+    AscendC::Where<float, float, uint64_t>(dstTensor, trueValue, falseValue, condTensor, calCount);
 }

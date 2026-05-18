@@ -10,28 +10,28 @@
 #include "pad/pad.h"
 
 __aicore__ void TestPad0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Pad<half>(dstTensor, srcTensor, padParams, sharedTmpBuffer, tiling);
+    AscendC::Pad<float>(dstTensor, srcTensor, padParams, sharedTmpBuffer, tiling);
 }
 
 __aicore__ void TestPad1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Pad<half>(dstTensor, srcTensor, padParams, tiling);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Pad<float>(dstTensor, srcTensor, padParams, tiling);
 }
 
 __aicore__ void TestUnPad2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::UnPad<half>(dstTensor, srcTensor, unPadParams, sharedTmpBuffer, tiling);
+    AscendC::UnPad<float>(dstTensor, srcTensor, unPadParams, sharedTmpBuffer, tiling);
 }
 
 __aicore__ void TestUnPad3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::UnPad<half>(dstTensor, srcTensor, unPadParams, tiling);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::UnPad<float>(dstTensor, srcTensor, unPadParams, tiling);
 }
 

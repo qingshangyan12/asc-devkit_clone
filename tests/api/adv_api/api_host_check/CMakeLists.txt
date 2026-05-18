@@ -70,6 +70,7 @@ list(APPEND INC_FLAGS "-I${ASCENDC_DIR}/include/adv_api/")
 foreach(INC ${INCLUDE_PATHS})
     list(APPEND INC_FLAGS "-I${INC}")
 endforeach()
+list(APPEND INC_FLAGS "-I${ASCENDC_DIR}/include/adv_api/")
 message(STATUS "INC_FLAGS: ${INC_FLAGS}")
 
 # 函数: 为指定模式生成检查 targets

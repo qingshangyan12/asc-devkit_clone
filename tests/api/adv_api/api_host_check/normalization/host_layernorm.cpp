@@ -10,11 +10,27 @@
 #include "normalization/layernorm.h"
 
 __aicore__ void TestLayerNorm0() {
+    AscendC::LocalTensor<float> output;
+    AscendC::LocalTensor<float> outputMean;
+    AscendC::LocalTensor<float> outputVariance;
+    AscendC::LocalTensor<float> inputX;
+    AscendC::LocalTensor<float> gamma;
+    AscendC::LocalTensor<float> beta;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::LayerNorm<half>(output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling);
+    float epsilon = 0.0f;
+    AscendC::tiling::LayerNormTiling tiling;
+    AscendC::LayerNorm<float>(output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling);
 }
 
 __aicore__ void TestLayerNorm1() {
-    AscendC::LayerNorm<half>(output, outputMean, outputVariance, inputX, gamma, beta, epsilon, tiling);
+    AscendC::LocalTensor<float> output;
+    AscendC::LocalTensor<float> outputMean;
+    AscendC::LocalTensor<float> outputVariance;
+    AscendC::LocalTensor<float> inputX;
+    AscendC::LocalTensor<float> gamma;
+    AscendC::LocalTensor<float> beta;
+    float epsilon = 0.0f;
+    AscendC::tiling::LayerNormTiling tiling;
+    AscendC::LayerNorm<float>(output, outputMean, outputVariance, inputX, gamma, beta, epsilon, tiling);
 }
 

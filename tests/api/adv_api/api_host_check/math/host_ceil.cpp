@@ -10,17 +10,17 @@
 #include "math/ceil.h"
 
 __aicore__ void TestCeil0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Ceil<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Ceil<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestCeil1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Ceil<half>(dstTensor, srcTensor, calCount);
+    AscendC::Ceil<float>(dstTensor, srcTensor, calCount);
 }
 

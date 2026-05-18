@@ -10,15 +10,15 @@
 #include "transpose/confusion_transpose.h"
 
 __aicore__ void TestTranspose0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Transpose<half>(dst, src, sharedTmpBuffer, transposeType, tiling);
+    AscendC::Transpose<float>(dst, src, sharedTmpBuffer, transposeType, tiling);
 }
 
 __aicore__ void TestTranspose1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Transpose<half>(dst, src, transposeType, tiling);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Transpose<float>(dst, src, transposeType, tiling);
 }
 

@@ -10,20 +10,20 @@
 #include "select/selectwithbytesmask.h"
 
 __aicore__ void TestSelect0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Select<half>(dst, src0, src1Value, mask, sharedTmpBuffer, info);
+    AscendC::Select<float>(dst, src0, src1Value, mask, sharedTmpBuffer, info);
 }
 
 __aicore__ void TestSelect1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Select<half>(dst, src0Value, src1, mask, sharedTmpBuffer, info);
+    AscendC::Select<float>(dst, src0Value, src1, mask, sharedTmpBuffer, info);
 }
 

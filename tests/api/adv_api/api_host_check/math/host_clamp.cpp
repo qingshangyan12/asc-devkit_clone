@@ -10,44 +10,44 @@
 #include "math/clamp.h"
 
 __aicore__ void TestClampMax0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    half maxValue;
+    float maxValue;
     uint32_t calCount = 0;
-    AscendC::ClampMax<half>(dstTensor, srcTensor, sharedTmpBuffer, maxValue, calCount);
+    AscendC::ClampMax<float>(dstTensor, srcTensor, sharedTmpBuffer, maxValue, calCount);
 }
 
 __aicore__ void TestClampMax1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    half maxValue;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    float maxValue;
     uint32_t calCount = 0;
-    AscendC::ClampMax<half>(dstTensor, srcTensor, maxValue, calCount);
+    AscendC::ClampMax<float>(dstTensor, srcTensor, maxValue, calCount);
 }
 
 __aicore__ void TestClampMin0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    half minValue;
+    float minValue;
     uint32_t calCount = 0;
-    AscendC::ClampMin<half>(dstTensor, srcTensor, sharedTmpBuffer, minValue, calCount);
+    AscendC::ClampMin<float>(dstTensor, srcTensor, sharedTmpBuffer, minValue, calCount);
 }
 
 __aicore__ void TestClampMin1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    half minValue;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    float minValue;
     uint32_t calCount = 0;
-    AscendC::ClampMin<half>(dstTensor, srcTensor, minValue, calCount);
+    AscendC::ClampMin<float>(dstTensor, srcTensor, minValue, calCount);
 }
 
 __aicore__ void TestClamp0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    half minValue;
-    half maxValue;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    float minValue;
+    float maxValue;
     uint32_t calCount = 0;
-    AscendC::Clamp<half, half, half>(dstTensor, srcTensor, minValue, maxValue, calCount);
+    AscendC::Clamp<AscendC::DEFAULT_CLAMP_CONFIG, float, float, float>(dstTensor, srcTensor, minValue, maxValue, calCount);
 }

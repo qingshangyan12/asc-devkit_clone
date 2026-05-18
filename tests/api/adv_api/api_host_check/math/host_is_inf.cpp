@@ -10,17 +10,17 @@
 #include "math/is_inf.h"
 
 __aicore__ void TestIsInf0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t count = 0;
-    AscendC::IsInf<half>(dstTensor, srcTensor, count);
+    AscendC::IsInf<float>(dstTensor, srcTensor, count);
 }
 
 __aicore__ void TestIsInf1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t count = 0;
-    AscendC::IsInf<half>(dstTensor, srcTensor, sharedTmpBuffer, count);
+    AscendC::IsInf<float>(dstTensor, srcTensor, sharedTmpBuffer, count);
 }
 

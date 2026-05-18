@@ -10,19 +10,19 @@
 #include "math/sincos.h"
 
 __aicore__ void TestSinCos0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::LocalTensor<half> sinOutputTensor;
+    AscendC::LocalTensor<float> sinOutputTensor;
     uint32_t calCount = 0;
-    AscendC::SinCos<half>(dstTensor, srcTensor, sinOutputTensor, sharedTmpBuffer, calCount);
+    AscendC::SinCos<float>(dstTensor, srcTensor, sinOutputTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestSinCos1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> sinOutputTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> sinOutputTensor;
     uint32_t calCount = 0;
-    AscendC::SinCos<half>(dstTensor, srcTensor, sinOutputTensor, calCount);
+    AscendC::SinCos<float>(dstTensor, srcTensor, sinOutputTensor, calCount);
 }
 

@@ -11,29 +11,29 @@
 #include "math/cos.h"
 
 __aicore__ void TestCos0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Cos<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Cos<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestCos1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Cos<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Cos<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestCos2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Cos<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Cos<float>(dstTensor, srcTensor);
 }
 
 __aicore__ void TestCos3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Cos<half>(dstTensor, srcTensor, calCount);
+    AscendC::Cos<float>(dstTensor, srcTensor, calCount);
 }
