@@ -42,6 +42,11 @@ SAMPLES=(
     "asc_intlv"
     "asc_transpose"
     "asc_add_scalar"
+    "asc_le"
+    "asc_prelu"
+    "asc_reduce_sum"
+    "asc_ne"
+    "asc_pair_reduce_sum"
 )
 
 PASS=0
