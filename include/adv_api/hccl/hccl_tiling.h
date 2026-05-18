@@ -37,7 +37,9 @@ public:
     uint32_t SetGroupName(const std::string &groupName);
     uint32_t SetAlgConfig(const std::string &algConfig);
     uint32_t SetReduceType(uint32_t reduceType, uint8_t dstDataType = 0, uint8_t srcDataType = 0);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     uint32_t SetStepSize(uint8_t stepSize);
+#endif
     uint32_t SetSkipLocalRankCopy(uint8_t skipLocalRankCopy);
     uint32_t SetSkipBufferWindowCopy(uint8_t skipBufferWindowCopy);
     uint32_t SetDebugMode(uint8_t debugMode);
