@@ -159,12 +159,12 @@
 图2：float类型，A转置，K轴实际对齐与Mmad指令默认要求不一致
 </p>
 
-**场景4 int4b_t输入，int32_t输出，C矩阵初始值为0**
+**场景4 int4b_t输入，int32_t输出，C矩阵初始值为0，仅支持Atlas A3 训练系列产品/Atlas A3 推理系列产品/Atlas A2 训练系列产品/Atlas A2 推理系列产品**
 
 - 输入：A不转置 [30, 70] int4b_t类型，ND格式；B转置 [40, 70] int4b_t类型，ND格式；不带Bias
 - 输出：C [30, 40] int32_t类型，ND格式
 - 实现：使用`Mmad`实现矩阵乘法运算，通过参数：`mmadParams.cmatrixInitVal = true`，设置C矩阵初始值为0
-- 说明：该场景仅支持Atlas A3 训练系列产品/Atlas A3 推理系列产品/Atlas A2 训练系列产品/Atlas A2 推理系列产品，且不支持使用传入biasTensor的方式加Bias（场景3）。
+- 说明：该场景不支持使用传入biasTensor的方式加Bias（场景3）。
 
 ### 矩阵乘法（Mmad）
 
