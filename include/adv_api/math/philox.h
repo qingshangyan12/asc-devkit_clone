@@ -27,7 +27,7 @@
 #endif
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
 constexpr uint16_t PHILOX_KEY_SIZE = 2;
 constexpr uint16_t PHILOX_COUNTER_SIZE = 4;
 using PhiloxKey = uint32_t[PHILOX_KEY_SIZE];
