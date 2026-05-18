@@ -11,6 +11,11 @@ SAMPLES=(
     "asc_add"
     "asc_mul"
     "asc_relu"
+    "asc_sub"
+    "asc_neg"
+    "asc_max"
+    "asc_min"
+    "asc_div"
     "vconv/asc_e4m32float"
 )
 
