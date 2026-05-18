@@ -99,8 +99,6 @@ constexpr float DEQ_SHIFT_RIGHT_17_BIT = 1.0 / DEQ_SHIFT_LEFT_17_BIT;
 constexpr int8_t ADDDEQRELU_MASK_MODE_ONE = 1;
 constexpr int8_t ADDDEQRELU_MASK_MODE_TWO = 2;
 
-const uint32_t VECTOR_REG_WIDTH = 256;
-
 #if (__NPU_ARCH__ == 5102)
 const int32_t TOTAL_VEC_LOCAL_SIZE = 248 * 1024;
 const uint32_t TOTAL_UB_SIZE = 248 * 1024;
