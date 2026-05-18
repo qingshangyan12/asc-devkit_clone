@@ -1,7 +1,0 @@
-[info] Using valu table: V310_SIMD_82_OUT
-[info] [PERF] [0000001684] EXU instr_name RV_PLT type.B32 instr_id 4170 PC 10d0dd08 retire 1689 vloop_id 0 vloop_pc 0 ele_cnt 0 exu_id:1
-[info] [PERF] [0000001685] EXU instr_name RV_PLT type.B32 instr_id 4173 PC 10d0dd14 retire 1690 vloop_id 0 vloop_pc 0 ele_cnt 0 exu_id:0
-[info] [PERF] [0000001689] EXU instr_name RV_VCMIN type.F32 instr_id 4172 PC 10d0dd10 retire 1704 vloop_id 0 vloop_pc 0 ele_cnt 8 exu_id:0
-[info] [PERF] [0000001710] EXU instr_name RV_SEND instr_id 4175 PC 10d0dd1c retire 1711 vloop_id 0 vloop_pc 0 ele_cnt 0 exu_id:0
-[info] [PERF] [0000001710] EXU instr_name RV_SEND instr_id 4175 PC 10d0dd1c retire 1711 vloop_id 0 vloop_pc 0 ele_cnt 0 exu_id:1
-[info] ++++++++++++++++++++++core: 3, subcore: 2, start: 215, tick: 2219, kernelId: 0, blkID: 7, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

@@ -1,6 +1,0 @@
-[info] 1277 [Push Instr] name=WAIT_FLAG pc=0x10D0D760 id=3964
-[info] 1279 [Push Instr] name=MOV_SRC_TO_DST_ALIGNv2 pc=0x10D0D770 id=3976
-[info] 1783 [release wait_flag] instr.name=WAIT_FLAG            instr.pc=0x10D0D760 instr.id=3964
-[info] 1784 [pop Instr] name=MOV_SRC_TO_DST_ALIGNv2 pc=0x10D0D770 id=3976. queue.size=0
-[info] 2303 [RETIRE INSTR] instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10D0D770 instr.id=3976
-[info] ++++++++++++++++++++++core: 0, subcore: 1, start: 208, tick: 2306, kernelId: 0, blkID: 0, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

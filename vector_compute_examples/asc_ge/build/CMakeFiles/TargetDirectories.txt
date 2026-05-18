@@ -1,3 +1,0 @@
-/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_ge/build/CMakeFiles/c_api_ge_example.dir
-/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_ge/build/CMakeFiles/edit_cache.dir
-/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_ge/build/CMakeFiles/rebuild_cache.dir

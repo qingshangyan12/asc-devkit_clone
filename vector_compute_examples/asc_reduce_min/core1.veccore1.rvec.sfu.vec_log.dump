@@ -1,7 +1,0 @@
-[info] 772: instr pop, pc = 0x10d0d6e0, pc[17:2] = 0x0, name: MOVEMASK
-[info] 776: instr dispatch, pc = 0x10d0d6e0, ctrl: 0x1001000000000008, mask0: 0xffffffffffffffff, mask1: 0xffffffffffffffff
-[info] 781: instr retire, pc = 0x10d0d6e0, pc[17:2] = 0x0, name: MOVEMASK
-[info] 782: instr pop, pc = 0x10d0d6e8, pc[17:2] = 0x0, name: MOVEMASK
-[info] 786: instr dispatch, pc = 0x10d0d6e8, ctrl: 0x1001000000000008, mask0: 0xffffffffffffffff, mask1: 0xffffffffffffffff
-[info] 791: instr retire, pc = 0x10d0d6e8, pc[17:2] = 0x0, name: MOVEMASK
-[info] ++++++++++++++++++++++core: 1, subcore: 2, start: 211, tick: 2151, kernelId: 0, blkID: 3, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

@@ -1,3 +1,0 @@
-/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_reduce_min/build/CMakeFiles/c_api_reduce_min_example.dir
-/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_reduce_min/build/CMakeFiles/edit_cache.dir
-/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_reduce_min/build/CMakeFiles/rebuild_cache.dir

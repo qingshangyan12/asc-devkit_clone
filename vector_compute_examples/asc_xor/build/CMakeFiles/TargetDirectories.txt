@@ -1,3 +1,0 @@
-/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_xor/build/CMakeFiles/c_api_xor_example.dir
-/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_xor/build/CMakeFiles/edit_cache.dir
-/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_xor/build/CMakeFiles/rebuild_cache.dir
