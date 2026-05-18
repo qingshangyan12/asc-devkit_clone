@@ -9,7 +9,7 @@
 */
 #include "math/logical_not.h"
 
-void TestLogicalNot0() {
+__aicore__ void TestLogicalNot0() {
     AscendC::LocalTensor<uint8_t> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

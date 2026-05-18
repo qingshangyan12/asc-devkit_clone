@@ -9,7 +9,7 @@
 */
 #include "math/sign.h"
 
-void TestSign0() {
+__aicore__ void TestSign0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,21 +17,21 @@ void TestSign0() {
     AscendC::Sign<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestSign1() {
+__aicore__ void TestSign1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Sign<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestSign2() {
+__aicore__ void TestSign2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Sign<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestSign3() {
+__aicore__ void TestSign3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Sign<half>(dstTensor, srcTensor);

@@ -9,7 +9,7 @@
 */
 #include "activation/reglu.h"
 
-void TestReGlu0() {
+__aicore__ void TestReGlu0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -19,7 +19,7 @@ void TestReGlu0() {
     AscendC::ReGlu<half>(dstTensor, srcTensor0, srcTensor1, sharedTmpBuffer, calCount);
 }
 
-void TestReGlu1() {
+__aicore__ void TestReGlu1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;

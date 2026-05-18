@@ -9,7 +9,7 @@
 */
 #include "activation/silu.h"
 
-void TestSilu0() {
+__aicore__ void TestSilu0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

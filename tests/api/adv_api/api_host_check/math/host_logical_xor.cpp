@@ -9,7 +9,7 @@
 */
 #include "math/logical_xor.h"
 
-void TestLogicalXor0() {
+__aicore__ void TestLogicalXor0() {
     AscendC::LocalTensor<uint8_t> dstTensor;
     AscendC::LocalTensor<half> src0Tensor;
     AscendC::LocalTensor<half> src1Tensor;

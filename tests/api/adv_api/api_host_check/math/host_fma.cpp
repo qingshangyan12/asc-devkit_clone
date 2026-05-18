@@ -9,7 +9,7 @@
 */
 #include "math/fma.h"
 
-void TestFma0() {
+__aicore__ void TestFma0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -20,7 +20,7 @@ void TestFma0() {
     AscendC::Fma<half>(dstTensor, src0Tensor, src1Tensor, src2Tensor, sharedTmpBuffer, calCount);
 }
 
-void TestFma1() {
+__aicore__ void TestFma1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;

@@ -9,13 +9,13 @@
 */
 #include "activation/softmaxgrad.h"
 
-void TestSoftmaxGrad0() {
+__aicore__ void TestSoftmaxGrad0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::SoftmaxGrad<half>(dstTensor, gradTensor, srcTensor, tiling);
 }
 
-void TestSoftmaxGradFront1() {
+__aicore__ void TestSoftmaxGradFront1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::SoftmaxGradFront<half>(dstTensor, gradTensor, srcTensor, tiling);

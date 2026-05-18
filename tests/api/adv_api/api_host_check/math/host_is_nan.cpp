@@ -9,14 +9,14 @@
 */
 #include "math/is_nan.h"
 
-void TestIsNan0() {
+__aicore__ void TestIsNan0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t count = 0;
     AscendC::IsNan<half>(dstTensor, srcTensor, count);
 }
 
-void TestIsNan1() {
+__aicore__ void TestIsNan1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;

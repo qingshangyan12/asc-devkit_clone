@@ -9,12 +9,12 @@
 */
 #include "normalization/layernorm.h"
 
-void TestLayerNorm0() {
+__aicore__ void TestLayerNorm0() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::LayerNorm<half>(output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling);
 }
 
-void TestLayerNorm1() {
+__aicore__ void TestLayerNorm1() {
     AscendC::LayerNorm<half>(output, outputMean, outputVariance, inputX, gamma, beta, epsilon, tiling);
 }
 

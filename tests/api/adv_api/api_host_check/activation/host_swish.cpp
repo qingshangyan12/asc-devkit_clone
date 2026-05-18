@@ -9,7 +9,7 @@
 */
 #include "activation/swish.h"
 
-void TestSwish0() {
+__aicore__ void TestSwish0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

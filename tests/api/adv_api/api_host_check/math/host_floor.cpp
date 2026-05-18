@@ -9,7 +9,7 @@
 */
 #include "math/floor.h"
 
-void TestFloor0() {
+__aicore__ void TestFloor0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,7 +17,7 @@ void TestFloor0() {
     AscendC::Floor<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestFloor1() {
+__aicore__ void TestFloor1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

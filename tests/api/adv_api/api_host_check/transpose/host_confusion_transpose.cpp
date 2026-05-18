@@ -9,14 +9,14 @@
 */
 #include "transpose/confusion_transpose.h"
 
-void TestTranspose0() {
+__aicore__ void TestTranspose0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Transpose<half>(dst, src, sharedTmpBuffer, transposeType, tiling);
 }
 
-void TestTranspose1() {
+__aicore__ void TestTranspose1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Transpose<half>(dst, src, transposeType, tiling);

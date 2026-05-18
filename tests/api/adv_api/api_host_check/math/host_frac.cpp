@@ -9,7 +9,7 @@
 */
 #include "math/frac.h"
 
-void TestFrac0() {
+__aicore__ void TestFrac0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,20 +17,20 @@ void TestFrac0() {
     AscendC::Frac<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestFrac1() {
+__aicore__ void TestFrac1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Frac<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestFrac2() {
+__aicore__ void TestFrac2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Frac<half>(dstTensor, srcTensor);
 }
 
-void TestFrac3() {
+__aicore__ void TestFrac3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

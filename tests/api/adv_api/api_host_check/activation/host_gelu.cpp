@@ -9,7 +9,7 @@
 */
 #include "activation/gelu.h"
 
-void TestGelu0() {
+__aicore__ void TestGelu0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,14 +17,14 @@ void TestGelu0() {
     AscendC::Gelu<half>(dstLocal, srcLocal, sharedTmpBuffer, dataSize);
 }
 
-void TestGelu1() {
+__aicore__ void TestGelu1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Gelu<half>(dstLocal, srcLocal, dataSize);
 }
 
-void TestFasterGelu2() {
+__aicore__ void TestFasterGelu2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -32,14 +32,14 @@ void TestFasterGelu2() {
     AscendC::FasterGelu<half>(dstLocal, srcLocal, sharedTmpBuffer, dataSize);
 }
 
-void TestFasterGelu3() {
+__aicore__ void TestFasterGelu3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::FasterGelu<half>(dstLocal, srcLocal, dataSize);
 }
 
-void TestFasterGeluV24() {
+__aicore__ void TestFasterGeluV24() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -47,7 +47,7 @@ void TestFasterGeluV24() {
     AscendC::FasterGeluV2<half>(dstLocal, srcLocal, sharedTmpBuffer, dataSize);
 }
 
-void TestFasterGeluV25() {
+__aicore__ void TestFasterGeluV25() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

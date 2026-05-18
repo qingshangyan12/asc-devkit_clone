@@ -9,7 +9,7 @@
 */
 #include "math/hypot.h"
 
-void TestHypot0() {
+__aicore__ void TestHypot0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -18,7 +18,7 @@ void TestHypot0() {
     AscendC::Hypot<half>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer);
 }
 
-void TestHypot1() {
+__aicore__ void TestHypot1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -28,7 +28,7 @@ void TestHypot1() {
     AscendC::Hypot<half>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
 }
 
-void TestHypot2() {
+__aicore__ void TestHypot2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -36,7 +36,7 @@ void TestHypot2() {
     AscendC::Hypot<half>(dstTensor, src0Tensor, src1Tensor);
 }
 
-void TestHypot3() {
+__aicore__ void TestHypot3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;

@@ -9,7 +9,7 @@
 */
 #include "math/bitwise_not.h"
 
-void TestBitwiseNot0() {
+__aicore__ void TestBitwiseNot0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

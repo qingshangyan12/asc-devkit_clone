@@ -9,7 +9,7 @@
 */
 #include "math/cumsum.h"
 
-void TestCumSum0() {
+__aicore__ void TestCumSum0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> lastRowTensor;
     AscendC::LocalTensor<half> srcTensor;
@@ -18,7 +18,7 @@ void TestCumSum0() {
     AscendC::CumSum<half>(dstTensor, lastRowTensor, srcTensor, sharedTmpBuffer, cumSumInfo);
 }
 
-void TestCumSum1() {
+__aicore__ void TestCumSum1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> lastRowTensor;
     AscendC::LocalTensor<half> srcTensor;

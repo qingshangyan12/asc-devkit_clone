@@ -9,7 +9,7 @@
 */
 #include "math/bitwise_xor.h"
 
-void TestBitwiseXor0() {
+__aicore__ void TestBitwiseXor0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> src0Tensor;
     AscendC::LocalTensor<half> src1Tensor;

@@ -9,7 +9,7 @@
 */
 #include "math/asin.h"
 
-void TestAsin0() {
+__aicore__ void TestAsin0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,21 +17,21 @@ void TestAsin0() {
     AscendC::Asin<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestAsin1() {
+__aicore__ void TestAsin1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Asin<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestAsin2() {
+__aicore__ void TestAsin2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Asin<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestAsin3() {
+__aicore__ void TestAsin3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Asin<half>(dstTensor, srcTensor);

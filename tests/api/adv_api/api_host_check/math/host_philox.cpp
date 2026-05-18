@@ -9,7 +9,7 @@
 */
 #include "math/philox.h"
 
-void TestPhiloxRandom0() {
+__aicore__ void TestPhiloxRandom0() {
     AscendC::LocalTensor<half> dstLocal;
     AscendC::PhiloxKey philoxKey;
     AscendC::PhiloxCounter philoxCounter;
@@ -17,7 +17,7 @@ void TestPhiloxRandom0() {
     AscendC::PhiloxRandom<half>(dstLocal, philoxKey, philoxCounter, count);
 }
 
-void TestPhiloxRandom1() {
+__aicore__ void TestPhiloxRandom1() {
     AscendC::LocalTensor<half> dstLocal;
     AscendC::PhiloxKey philoxKey;
     AscendC::PhiloxCounter philoxCounter;

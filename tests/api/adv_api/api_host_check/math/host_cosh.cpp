@@ -9,14 +9,14 @@
 */
 #include "math/cosh.h"
 
-void TestCosh0() {
+__aicore__ void TestCosh0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Cosh<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestCosh1() {
+__aicore__ void TestCosh1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -24,14 +24,14 @@ void TestCosh1() {
     AscendC::Cosh<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestCosh2() {
+__aicore__ void TestCosh2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Cosh<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestCosh3() {
+__aicore__ void TestCosh3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Cosh<half>(dstTensor, srcTensor);

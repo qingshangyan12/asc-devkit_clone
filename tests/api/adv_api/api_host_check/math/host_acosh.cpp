@@ -9,27 +9,27 @@
 */
 #include "math/acosh.h"
 
-void TestAcosh0() {
+__aicore__ void TestAcosh0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Acosh<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestAcosh1() {
+__aicore__ void TestAcosh1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Acosh<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestAcosh2() {
+__aicore__ void TestAcosh2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Acosh<half>(dstTensor, srcTensor);
 }
 
-void TestAcosh3() {
+__aicore__ void TestAcosh3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;

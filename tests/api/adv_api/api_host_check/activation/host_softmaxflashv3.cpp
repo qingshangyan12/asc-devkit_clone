@@ -9,13 +9,13 @@
 */
 #include "activation/softmaxflashv3.h"
 
-void TestSoftmaxFlashV30() {
+__aicore__ void TestSoftmaxFlashV30() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::SoftmaxFlashV3<half>(dstTensor, meanTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inMeanTensor, inExpSumTensor, inMaxTensor, tiling, params);
 }
 
-void TestSoftmaxFlashV31() {
+__aicore__ void TestSoftmaxFlashV31() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;

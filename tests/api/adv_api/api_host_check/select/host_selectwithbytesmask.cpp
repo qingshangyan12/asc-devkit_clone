@@ -9,7 +9,7 @@
 */
 #include "select/selectwithbytesmask.h"
 
-void TestSelect0() {
+__aicore__ void TestSelect0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -18,7 +18,7 @@ void TestSelect0() {
     AscendC::Select<half>(dst, src0, src1Value, mask, sharedTmpBuffer, info);
 }
 
-void TestSelect1() {
+__aicore__ void TestSelect1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;

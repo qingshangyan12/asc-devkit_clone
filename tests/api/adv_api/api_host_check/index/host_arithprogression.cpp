@@ -9,7 +9,7 @@
 */
 #include "index/arithprogression.h"
 
-void TestArange0() {
+__aicore__ void TestArange0() {
     AscendC::LocalTensor<half> dstTensor;
     uint32_t calCount = 0;
     AscendC::Arange<half>(dst, firstValue, diffValue, count);

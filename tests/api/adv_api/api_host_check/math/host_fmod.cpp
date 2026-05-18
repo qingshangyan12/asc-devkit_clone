@@ -9,7 +9,7 @@
 */
 #include "math/fmod.h"
 
-void TestFmod0() {
+__aicore__ void TestFmod0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -19,7 +19,7 @@ void TestFmod0() {
     AscendC::Fmod<half>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
 }
 
-void TestFmod1() {
+__aicore__ void TestFmod1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -28,7 +28,7 @@ void TestFmod1() {
     AscendC::Fmod<half>(dstTensor, src0Tensor, src1Tensor, calCount);
 }
 
-void TestFmod2() {
+__aicore__ void TestFmod2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -37,7 +37,7 @@ void TestFmod2() {
     AscendC::Fmod<half>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer);
 }
 
-void TestFmod3() {
+__aicore__ void TestFmod3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;

@@ -9,7 +9,7 @@
 */
 #include "activation/sigmoid.h"
 
-void TestSigmoid0() {
+__aicore__ void TestSigmoid0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,21 +17,21 @@ void TestSigmoid0() {
     AscendC::Sigmoid<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestSigmoid1() {
+__aicore__ void TestSigmoid1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Sigmoid<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestSigmoid2() {
+__aicore__ void TestSigmoid2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Sigmoid<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestSigmoid3() {
+__aicore__ void TestSigmoid3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Sigmoid<half>(dstTensor, srcTensor);

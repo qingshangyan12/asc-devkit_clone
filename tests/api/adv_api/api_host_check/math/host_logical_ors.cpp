@@ -9,7 +9,7 @@
 */
 #include "math/logical_ors.h"
 
-void TestLogicalOrs0() {
+__aicore__ void TestLogicalOrs0() {
     AscendC::LocalTensor<uint8_t> dstTensor;
     half src0Value;
     half src1Value;

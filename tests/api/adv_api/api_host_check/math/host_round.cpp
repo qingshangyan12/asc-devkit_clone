@@ -9,7 +9,7 @@
 */
 #include "math/round.h"
 
-void TestRound0() {
+__aicore__ void TestRound0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,7 +17,7 @@ void TestRound0() {
     AscendC::Round<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestRound1() {
+__aicore__ void TestRound1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

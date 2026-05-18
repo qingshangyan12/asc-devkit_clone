@@ -9,42 +9,42 @@
 */
 #include "matmul/matmul.h"
 
-void TestMatmulImplInit0() {
+__aicore__ void TestMatmulImplInit0() {
     AscendC::MatmulImpl<MatmulImpl::MatmulConfig> obj;
     obj.Init(cubeTiling);
 }
 
-void TestMatmulImplSetTensorA1() {
+__aicore__ void TestMatmulImplSetTensorA1() {
     AscendC::MatmulImpl<MatmulImpl::MatmulConfig> obj;
     obj.SetTensorA(gm, isTransposeA);
 }
 
-void TestMatmulImplSetTensorB2() {
+__aicore__ void TestMatmulImplSetTensorB2() {
     AscendC::MatmulImpl<MatmulImpl::MatmulConfig> obj;
     obj.SetTensorB(gm, isTransposeB);
 }
 
-void TestMatmulImplSetBias3() {
+__aicore__ void TestMatmulImplSetBias3() {
     AscendC::MatmulImpl<MatmulImpl::MatmulConfig> obj;
     obj.SetBias(biasGlobal);
 }
 
-void TestMatmulImplIterate4() {
+__aicore__ void TestMatmulImplIterate4() {
     AscendC::MatmulImpl<MatmulImpl::MatmulConfig> obj;
     obj.Iterate();
 }
 
-void TestMatmulImplIterateAll5() {
+__aicore__ void TestMatmulImplIterateAll5() {
     AscendC::MatmulImpl<MatmulImpl::MatmulConfig> obj;
     obj.IterateAll(gm, enAtomic);
 }
 
-void TestMatmulImplGetTensorC6() {
+__aicore__ void TestMatmulImplGetTensorC6() {
     AscendC::MatmulImpl<MatmulImpl::MatmulConfig> obj;
     obj.GetTensorC(gm, enAtomic);
 }
 
-void TestMatmulImplEnd7() {
+__aicore__ void TestMatmulImplEnd7() {
     AscendC::MatmulImpl<MatmulImpl::MatmulConfig> obj;
     obj.End();
 }

@@ -10,14 +10,14 @@
 
 #include "math/cos.h"
 
-void TestCos0() {
+__aicore__ void TestCos0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Cos<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestCos1() {
+__aicore__ void TestCos1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -25,13 +25,13 @@ void TestCos1() {
     AscendC::Cos<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestCos2() {
+__aicore__ void TestCos2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Cos<half>(dstTensor, srcTensor);
 }
 
-void TestCos3() {
+__aicore__ void TestCos3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

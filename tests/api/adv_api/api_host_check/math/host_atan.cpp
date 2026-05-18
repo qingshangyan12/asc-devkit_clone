@@ -9,14 +9,14 @@
 */
 #include "math/atan.h"
 
-void TestAtan0() {
+__aicore__ void TestAtan0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Atan<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestAtan1() {
+__aicore__ void TestAtan1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -24,13 +24,13 @@ void TestAtan1() {
     AscendC::Atan<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestAtan2() {
+__aicore__ void TestAtan2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Atan<half>(dstTensor, srcTensor);
 }
 
-void TestAtan3() {
+__aicore__ void TestAtan3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

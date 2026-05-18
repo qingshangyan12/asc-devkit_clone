@@ -9,7 +9,7 @@
 */
 #include "math/axpy.h"
 
-void TestAxpy0() {
+__aicore__ void TestAxpy0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     half alpha;

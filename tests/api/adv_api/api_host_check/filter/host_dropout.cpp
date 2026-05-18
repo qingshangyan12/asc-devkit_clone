@@ -9,14 +9,14 @@
 */
 #include "filter/dropout.h"
 
-void TestDropOut0() {
+__aicore__ void TestDropOut0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::DropOut<half>(dstLocal, srcLocal, maskLocal, sharedTmpBuffer, keepProb, info);
 }
 
-void TestDropOut1() {
+__aicore__ void TestDropOut1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::DropOut<half>(dstLocal, srcLocal, maskLocal, keepProb, info);
