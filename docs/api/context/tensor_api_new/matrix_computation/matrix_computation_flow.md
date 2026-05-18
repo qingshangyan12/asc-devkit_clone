@@ -1,82 +1,83 @@
 # 矩阵计算流程
 
-## 产品支持情况
-
-| 产品 | 是否支持 |
-| :--- | :------: |
-| Ascend 950PR/Ascend 950DT | √ |
-
-## 头文件/库文件
-
-头文件为：
-
-```cpp
-#include "tensor_api/tensor.h"
-```
-
 ## 功能说明
 
-矩阵计算流程由数据搬运和矩阵乘加两部分组成。通常先将 Global Memory 中的输入矩阵搬运到 L1，再将左矩阵搬运到 L0A、右矩阵搬运到 L0B，然后调用 `Mmad` 将结果写入 L0C，最后将 L0C 结果搬运到 GM 或 UB。
+Tensor API矩阵计算流程由数据搬入、矩阵乘加和结果搬出三部分组成。典型流程为：先将Global Memory中的输入矩阵搬运到L1 Buffer，再将左矩阵搬运到L0A Buffer、右矩阵搬运到L0B Buffer，然后调用`Mmad`将结果写入L0C Buffer，最后将L0C Buffer中的结果搬运到Global Memory或Unified Buffer。
 
-典型流程如下。
+矩阵计算中的A、B、C含义如下：
 
-1. 使用 `MakeMemPtr` 标识 GM、L1、L0A、L0B、L0C 等存储位置。
-2. 使用 `MakeFrameLayout` 构造 ND、NZ、ZN 等布局。
-3. 使用 `MakeTensor` 构造张量。
-4. 使用 `Copy` 完成 GM 到 L1、L1 到 L0A、L1 到 L0B 的数据搬运。
-5. 使用 `Mmad` 完成矩阵乘加计算。
-6. 使用 `Copy` 完成 L0C 到 GM 或 L0C 到 UB 的结果搬运。
+| 矩阵 | 物理位置 | 逻辑维度 | 说明 |
+| :--- | :--- | :--- | :--- |
+| A | L0A Buffer | M * K | 左矩阵输入。 |
+| B | L0B Buffer | K * N | 右矩阵输入。 |
+| C | L0C Buffer | M * N | 矩阵乘加结果。 |
 
-## 函数原型
+## 典型流程
 
-```cpp
-template <typename T, typename U, typename S,
-    Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U> && IsAttrTensorV<S>, int>, typename... Params>
-__aicore__ inline void
-Mmad(const T& dst, const U& fm, const S& filter, const Params& ...params)
-```
-
-```cpp
-template <typename T, typename U, Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U>, int>,
-    typename... Params>
-__aicore__ inline void
-Copy(const T& dst, const U& src, const Params& ...params)
-```
-
-## 参数说明
-
-| 参数名 | 输入/输出 | 描述 |
-| :--- | :---: | :--- |
-| `dst` | 输出 | `Mmad` 的目的张量位于 L0C。`Copy` 的目的张量由搬运方向决定。 |
-| `fm` | 输入 | 左矩阵张量，存储位置为 L0A。 |
-| `filter` | 输入 | 右矩阵张量，存储位置为 L0B。 |
-| `src` | 输入 | `Copy` 的源张量。 |
-| `params` | 输入 | `MmadParams`、`FixpipeParams`、坐标、量化参数等可变参数。 |
-
-## 返回值说明
-
-`Copy` 和 `Mmad` 无返回值。
-
-## 约束说明
-
-- 矩阵计算的左矩阵必须位于 L0A，右矩阵必须位于 L0B，结果矩阵必须位于 L0C。
-- 普通矩阵计算中，左矩阵常用 `NZLayoutPtn`，右矩阵常用 `ZNLayoutPtn`，结果矩阵常用 `NZLayoutPtn`。
-- `MmadParams` 中的 `m`、`n`、`k` 需要与参与计算的矩阵尺寸一致。
-- 如果需要 bias 输入，bias 张量需要位于 BiasTable Buffer 或 L0C。
-- 计算结果搬出时，应根据目标数据类型选择 L0C 到 GM 或 L0C 到 UB 搬运，并传入符合要求的 `FixpipeParams`。
+1. 构造Global Memory、L1 Buffer、L0A Buffer、L0B Buffer、L0C Buffer对应的Tensor API张量。
+2. 调用`Copy`将A矩阵和B矩阵从Global Memory搬运到L1 Buffer。
+3. 调用`Copy`将A矩阵从L1 Buffer搬运到L0A Buffer，将B矩阵从L1 Buffer搬运到L0B Buffer。
+4. 调用`Mmad`完成`C = A * B`，结果写入L0C Buffer。
+5. 调用`Copy`将L0C Buffer中的结果搬出到Global Memory或Unified Buffer。
 
 ## 调用示例
 
 ```cpp
-using namespace AscendC::Te;
+#include "tensor_api/tensor.h"
 
-auto l0A = MakeTensor(MakeMemPtr<Location::L0A>(aAddr),
-    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<half>>(m, k));
-auto l0B = MakeTensor(MakeMemPtr<Location::L0B>(bAddr),
-    MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<half>>(k, n));
-auto l0C = MakeTensor(MakeMemPtr<Location::L0C>(cAddr),
-    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, 16>>(m, n));
+__aicore__ inline void MatrixComputationFlowExample(
+    __gm__ half* gmAAddr, __gm__ half* gmBAddr, __gm__ float* gmCAddr)
+{
+    using namespace AscendC::Te;
 
-MmadParams params(m, n, k, 0, true);
-Mmad(l0C, l0A, l0B, params);
+    constexpr uint16_t m = 16;
+    constexpr uint16_t n = 16;
+    constexpr uint16_t k = 16;
+
+    __cbuf__ half l1ABuf[m * k];
+    __cbuf__ half l1BBuf[k * n];
+    __ca__ half l0ABuf[m * k];
+    __cb__ half l0BBuf[k * n];
+    __cc__ float l0CBuf[m * n];
+
+    auto gmA = MakeTensor(
+        MakeMemPtr(gmAAddr),
+        MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<half>>(m, k));
+    auto gmB = MakeTensor(
+        MakeMemPtr(gmBAddr),
+        MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<half>>(k, n));
+    auto gmC = MakeTensor(
+        MakeMemPtr(gmCAddr),
+        MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
+
+    auto l1A = MakeTensor(
+        MakeMemPtr(l1ABuf),
+        MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<half>>(m, k));
+    auto l1B = MakeTensor(
+        MakeMemPtr(l1BBuf),
+        MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<half>>(k, n));
+    auto l0A = MakeTensor(
+        MakeMemPtr(l0ABuf),
+        MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<half>>(m, k));
+    auto l0B = MakeTensor(
+        MakeMemPtr(l0BBuf),
+        MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<half>>(k, n));
+    auto l0C = MakeTensor(
+        MakeMemPtr(l0CBuf),
+        MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, 16>>(m, n));
+
+    auto gm2L1Atom = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
+    auto l12L0AAtom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
+    auto l12L0BAtom = MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{});
+    auto mmadAtom = MakeMmad(MmadOperation{}, MmadTraitDefault{});
+    auto l0C2GMAtom = MakeCopy(CopyL0C2GM{}, CopyL0C2GMTraitDefault{});
+
+    Copy(gm2L1Atom, l1A, gmA);
+    Copy(gm2L1Atom, l1B, gmB);
+    Copy(l12L0AAtom, l0A, l1A);
+    Copy(l12L0BAtom, l0B, l1B);
+
+    Mmad(mmadAtom.with(MmadParams(m, n, k, 0, true)), l0C, l0A, l0B);
+    Copy(l0C2GMAtom.with(FixpipeParams{}), gmC, l0C);
+}
 ```
