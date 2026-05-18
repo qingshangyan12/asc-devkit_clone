@@ -49,36 +49,27 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
+头文件路径为："basic\_api/kernel\_operator\_scalar\_intf.h"
+
 float类型标量数据转换成bfloat16\_t类型标量数据。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline bfloat16_t Cast(const float& fVal)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  接口参数说明
+**表 2**  参数说明
 
-<a name="table18368155193919"></a>
-<table><thead align="left"><tr id="row1036805543911"><th class="cellrowborder" valign="top" width="16.38163816381638%" id="mcps1.2.4.1.1"><p id="p1836835511393"><a name="p1836835511393"></a><a name="p1836835511393"></a>参数名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="10.861086108610861%" id="mcps1.2.4.1.2"><p id="p10368255163915"><a name="p10368255163915"></a><a name="p10368255163915"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="72.75727572757276%" id="mcps1.2.4.1.3"><p id="p436875573911"><a name="p436875573911"></a><a name="p436875573911"></a>含义</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row23264162912"><td class="cellrowborder" valign="top" width="16.38163816381638%" headers="mcps1.2.4.1.1 "><p id="p941862411595"><a name="p941862411595"></a><a name="p941862411595"></a>fVal</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.861086108610861%" headers="mcps1.2.4.1.2 "><p id="p941792465918"><a name="p941792465918"></a><a name="p941792465918"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="72.75727572757276%" headers="mcps1.2.4.1.3 "><p id="p950834622215"><a name="p950834622215"></a><a name="p950834622215"></a>float类型标量数据。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数说明 | 输入/输出 | 描述 |
+| ------ | ------ | ------ |
+| fVal | 输入 | float类型标量数据。 |
+
+## 数据类型<a name="zh-cn_topic_0000002562041279_section4219135304818"></a>
+
+支持的数据类型如下：float。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -86,12 +77,19 @@ __aicore__ inline bfloat16_t Cast(const float& fVal)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+- float到bfloat16\_t转换采用[CAST\_RINT舍入](精度转换.md#zh-cn_topic_0000002568472166_table49591625315)。
+- 输入参数为立即数时，需要使用显示类型转换后输入，例如：
+
+    ```cpp
+    // 错误写法，AscendC暂不支持整数类型转bfloat16_t，编译报错
+    bfloat16_t x = AscendC::Cast(1);
+    // 正确写法
+    bfloat16_t x = AscendC::Cast((float)1);
+    ```
 
 ## 调用示例<a name="section19372434133520"></a>
 
+```cpp
+float m = 3.14159f;
+bfloat16_t n = AscendC::Cast(m);  // n = 3.140625  float到bfloat16_t进行了舍入
 ```
-float m = 3.0f;
-bfloat16_t n = AscendC::Cast(m);  // n = 3.0  bfloat16_t和 float指数和尾数表达不同，可以通过截断进行转换
-```
-
