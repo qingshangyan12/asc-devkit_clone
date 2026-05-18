@@ -6,7 +6,7 @@ The HCCL algorithm analyzer simulates HCCL algorithm execution in an offline env
 
 ## Principle Introduction
 
-![](../../../docs/figures/algorithm_analyzer/introduction-theory.png)
+![](../../../../../../../docs/figures/algorithm_analyzer/introduction-theory.png)
 
 **Key Points:**
 

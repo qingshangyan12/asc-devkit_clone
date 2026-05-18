@@ -297,7 +297,7 @@ UT testing uses gTest as testing framework, generally verifies interface compila
 ##### UT Coding
 ###### Kernel Side
 
-In UT directory [tests/api/adv_api/math](../tests/api/adv_api/math), add new directory `axpy`, file [test_operator_axpy.cpp](../tests/api/adv_api/math/axpy/test_operator_axpy.cpp). UT implementation mainly includes the following three parts:
+In UT directory [tests/api/adv_api/math](../../tests/api/adv_api/math), add new directory `axpy`, file [test_operator_axpy.cpp](../../tests/api/adv_api/math/axpy/test_operator_axpy.cpp). UT implementation mainly includes the following three parts:
 1. Include header files
     ```c++
     #include <gtest/gtest.h>
@@ -391,7 +391,7 @@ In UT directory [tests/api/adv_api/math](../tests/api/adv_api/math), add new dir
         ```
 ###### Tiling Side
 
-Tiling interface UT is currently unified in [tests/api/adv_api/tiling/test_tiling.cpp](../tests/api/adv_api/tiling/test_tiling.cpp) file. Add corresponding test function in this file.
+Tiling interface UT is currently unified in [tests/api/adv_api/tiling/test_tiling.cpp](../../tests/api/adv_api/tiling/test_tiling.cpp) file. Add corresponding test function in this file.
 ```c++
 TEST_F(TestTiling, TestAxpyTiling)
 {
@@ -406,7 +406,7 @@ TEST_F(TestTiling, TestAxpyTiling)
 }
 ```
 ##### Modify cmake file
-Before executing UT cases, need to modify [CMakeLists.txt](../tests/api/adv_api/CMakeLists.txt) file. Since Kernel side and Tiling side UT execution objects are different, need to add test files under different targets. Using Kernel side UT for Atlas A2 training series products/Atlas A2 inference series products as example, add UT test file path to case source file list `ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES`, that is add new file path `${ASCENDC_TESTS_DIR}/math/axpy/test_operator_axpy.cpp`. Same for Tiling side, need to add test file to `ASCENDC_TILING_TEST_SRC_FILES` list.
+Before executing UT cases, need to modify [CMakeLists.txt](../../tests/api/adv_api/CMakeLists.txt) file. Since Kernel side and Tiling side UT execution objects are different, need to add test files under different targets. Using Kernel side UT for Atlas A2 training series products/Atlas A2 inference series products as example, add UT test file path to case source file list `ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES`, that is add new file path `${ASCENDC_TESTS_DIR}/math/axpy/test_operator_axpy.cpp`. Same for Tiling side, need to add test file to `ASCENDC_TILING_TEST_SRC_FILES` list.
 ##### Execute UT
 - Execute all UT cases
   
@@ -416,11 +416,11 @@ Before executing UT cases, need to modify [CMakeLists.txt](../tests/api/adv_api/
   ```
 - Run only new UT cases
 
-  Open [tests/main_global.cpp](../tests/main_global.cpp) file, add the following code in the last line before return in main function. Use gTest filter to filter test cases based on unit test unit name.
+  Open [tests/main_global.cpp](../../tests/main_global.cpp) file, add the following code in the last line before return in main function. Use gTest filter to filter test cases based on unit test unit name.
     ```c++
     ::testing::GTEST_FLAG(filter) = "*Axpy*";
     ```
-  Modify [build.sh](../build.sh), change all to needed UT target. Using Kernel side Ascend 910B1 UT as example, target is ascendc_utest_ascend910B1_AIV.
+  Modify [build.sh](../../build.sh), change all to needed UT target. Using Kernel side Ascend 910B1 UT as example, target is ascendc_utest_ascend910B1_AIV.
   ```
   function build_test() {
     cmake_config
@@ -433,7 +433,7 @@ Before executing UT cases, need to modify [CMakeLists.txt](../tests/api/adv_api/
 After completing high-level API coding, test API functionality by implementing operator function and calling the API in the operator. Refer to the following steps.
 - Compile and install.
 
-  Compile and install new or modified API source code to environment. For specific method, refer to [Compile and Install](./quick_start.md#compile&install).
+  Compile and install new or modified API source code to environment. For specific method, refer to [Compile and Install](./quick_start_en.md#compile&install).
 - Create simple custom operator project and test.
 
   Custom develop operator, after creating simple custom operator project, test API functionality by calling single operator. For detailed content about operator development and simple custom operator project, refer to [Ascend C Programming Guide](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC).
