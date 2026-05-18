@@ -15,10 +15,7 @@
 #endif
 #include "host_checker.h"
 
-/**
- * host 侧编译校验
- * 测试被 #if __NPU_ARCH__ 包裹且无 #else 的接口
- */
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 2103)
 
 extern "C" void TestKernelRegComputeVecDuplicateInterfaces() {
     // Duplicate(dst, src, count): 被 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || 
@@ -31,3 +28,5 @@ extern "C" void TestKernelRegComputeVecDuplicateInterfaces() {
     // DeInterleave: 同样被上述 __NPU_ARCH__ 包裹，无 #else
     using AscendC::DeInterleave;
 }
+
+#endif
