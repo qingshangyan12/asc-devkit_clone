@@ -60,28 +60,6 @@ __aicore__ inline uint32_t HtoNL(uint32_t x)
         ((x & byte0Mask) << wordShift));
 }
 
-template <typename T>
-__aicore__ inline void Gm2Ub(
-    const AscendC::LocalTensor<T>& dstLocal, const AscendC::GlobalTensor<T>& srcGlobal, int32_t length)
-{
-    AscendC::DataCopyExtParams copyParams{1, (uint32_t)(length * sizeof(T)), 0, 0, 0};
-    AscendC::DataCopyPadExtParams<T> padParams{true, 0, (ONE_BLOCK_SIZE - sizeof(T)) / sizeof(T), 0};
-
-    PipeBarrier<PIPE_ALL>();
-    AscendC::DataCopyPad(dstLocal, srcGlobal, copyParams, padParams);
-    PipeBarrier<PIPE_ALL>();
-}
-
-template <typename T>
-__aicore__ inline void Ub2Gm(
-    const AscendC::GlobalTensor<T>& dstGlobal, const AscendC::LocalTensor<T>& srcLocal, int32_t length)
-{
-    AscendC::DataCopyExtParams copyParams{1, (uint32_t)(length * sizeof(T)), 0, 0, 0};
-    PipeBarrier<PIPE_ALL>();
-    AscendC::DataCopyPad(dstGlobal, srcLocal, copyParams);
-    PipeBarrier<PIPE_ALL>();
-}
-
 __aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::HcommImpl()
 {
     pipe_.InitBuffer(hcommBuf_, HCOMM_TMP_BUF_SIZE);

@@ -23,9 +23,9 @@
 #ifndef IMPL_ADV_API_DETAIL_HCOMM_IMPL_PLATFORM_V310_HCOMM_AIV_DEF_H
 #define IMPL_ADV_API_DETAIL_HCOMM_IMPL_PLATFORM_V310_HCOMM_AIV_DEF_H
 
+#include "../../common/hcomm_inner_def.h"
+
 namespace AscendC {
-constexpr int8_t HCOMM_INVALID_HANDLE_ID = -1;
-constexpr uint32_t HCOMM_MAX_HANDLE_ID = 1024;
 constexpr uint32_t HCOMM_TMP_BUF_SIZE = 224;
 constexpr uint32_t ROCE_SQ_DOORBELL_TYPE = 2;
 constexpr uint32_t ROCE_INIT_SQ_DB_SGIT_IDX = 1;

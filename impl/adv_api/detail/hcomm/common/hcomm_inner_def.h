@@ -27,6 +27,9 @@
 
 namespace AscendC {
 
+constexpr int8_t HCOMM_INVALID_HANDLE_ID = -1;
+constexpr uint32_t HCOMM_MAX_HANDLE_ID = 1024;
+
 typedef struct {
     uint32_t type; // 0 RDMA   1 URMA
     uint64_t addr;
@@ -229,6 +232,65 @@ typedef struct {
     uint32_t cqe6;
     uint32_t cqe7;
 } RoceCqeEntry;
+
+typedef struct {
+    uint32_t sqeBbIdx : 16;
+    uint32_t flag : 8;
+    uint32_t rsv0 : 3;
+    uint32_t nf : 1;
+    uint32_t tokenEn : 1;
+    uint32_t rmtJettyType : 2;
+    uint32_t owner : 1;
+    uint32_t targetHint : 8;
+    uint32_t opcode : 8;
+    uint32_t rsv1 : 6;
+    uint32_t inlineMsgLen : 10;
+    uint32_t tpId : 24;
+    uint32_t sgeNum : 8;
+    uint32_t rmtJettyOrSegId : 20;
+    uint32_t rsv2 : 12;
+    uint64_t rmtEidL;
+    uint64_t rmtEidH;
+    uint32_t rmtTokenValue;
+    uint32_t udfType : 8;
+    uint32_t reduceDataType : 4;
+    uint32_t reduceOpcode : 4;
+    uint32_t rsv3 : 16;
+    uint32_t rmtAddrLOrTokenId;
+    uint32_t rmtAddrHOrTokenValue;
+} HcommUrmaSqeCtx;
+
+typedef struct {
+    uint32_t len;
+    uint32_t tokenId;
+    uint64_t va;
+} HcommUrmaSgeCtx;
+
+typedef struct {
+    uint32_t sR : 1;
+    uint32_t isJetty : 1;
+    uint32_t owner : 1;
+    uint32_t inlineEn : 1;
+    uint32_t opcode : 3;
+    uint32_t fd : 1;
+    uint32_t rsv : 8;
+    uint32_t substatus : 8;
+    uint32_t status : 8;
+    uint32_t entryIdx : 16;
+    uint32_t localNumL : 16;
+    uint32_t localNumH : 4;
+    uint32_t rmtIdx : 20;
+    uint32_t rsv1 : 8;
+    uint32_t tpn : 24;
+    uint32_t rsv2 : 8;
+    uint32_t byteCnt;
+    uint32_t userDataL;
+    uint32_t userDataH;
+    uint32_t rmtEid[4];
+    uint32_t dataL;
+    uint32_t dataH;
+    uint32_t inlineData[3];
+} HcommUrmaJfcCqeCtx;
 
 typedef struct {
     union {
