@@ -30,7 +30,7 @@
   C = A * B
   $$
 - 样例规格：  
-  本样例参数M = 512, N = 1024, K = 512，调用4个核完成计算，输入规格如下表所示：
+  本样例参数M = 512, N = 1024, K = 512，将M维分成2块，调用2个核完成计算，输入规格如下表所示：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -42,14 +42,22 @@
 
 - 样例实现：
   - 实现流程
-    - 通过InitGMOffsets完成分核计算
+    - 通过InitGMOffsets沿M维分核，每个核处理M/2行
     - 通过DataCopy基础API，将数据从GM（Global Memory）搬运到L1（L1 Buffer）并完成ND到NZ的格式转换
     - 通过LoadData接口，将数据从L1（L1 Buffer）搬运到L0A（L0A Buffer）/L0B（L0B Buffer）
     - 通过Mmad接口完成矩阵乘计算
     - 通过Fixpipe接口，将结果从L0C（L0C Buffer）搬运回GM（Global Memory）
 
   - 调用实现  
-    使用内核调用符<<<>>>调用核函数。
+     使用内核调用符<<<>>>调用核函数。
+
+  - mmad计算实现说明：
+    本样例中mmad计算的完整流水线分为5个阶段，Process()函数内通过硬件事件（`SetFlag`/`WaitFlag`）同步各阶段：
+    - **多核分M（InitGMOffsets）**：将M维（512）沿M方向平分成2块，每块256行，分别由2个核运算。每个核通过`GetBlockIdx()`获取自身块号，计算A和C在GM中的偏移量（B矩阵完整共享）。
+    - **CopyIn（DataCopy）**：使用`DataCopy`接口将输入矩阵A和B从GM（Global Memory）搬运到L1（Local Memory）的A1/B1缓冲区，同时完成ND→NZ数据格式转换，使数据排布适配Cube单元的分形（16×16）访问要求。
+    - **DataLoad（LoadData）**：使用`LoadData`接口将数据从L1的A1/B1搬运到L0A/L0B的A2/B2缓冲区，同时完成格式转换——矩阵A从NZ→ZZ（非转置），矩阵B从NZ→ZN（转置），以满足Cube单元对输入矩阵的排布约束。
+    - **Compute（Mmad）**：调用`Mmad`指令在Cube单元上执行矩阵乘 C[256, 1024] = A[256, 512] × B[512, 1024]。`MmadParams`中的`cmatrixInitVal = true`表示初始化累加器为零。Cube内部以16×16分形为基本单位并行完成计算，结果以float32精度暂存在L0C的CO1缓冲区中。
+    - **CopyOut（Fixpipe）**：使用`Fixpipe`接口将计算结果从L0C的CO1缓冲区搬回GM，同时完成float32→half类型转换和NZ→ND格式转换，最终输出形状为[256, 1024]的half类型矩阵。
 
 ## 编译运行
 
