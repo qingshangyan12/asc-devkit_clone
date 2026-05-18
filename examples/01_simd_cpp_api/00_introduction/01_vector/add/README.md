@@ -108,5 +108,5 @@
 - 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass!
+  [Success] Case accuracy is verification passed.
   ```
