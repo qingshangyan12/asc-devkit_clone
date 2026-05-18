@@ -9,14 +9,14 @@
 */
 #include "math/is_inf.h"
 
-void TestIsInf0() {
+__aicore__ void TestIsInf0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t count = 0;
     AscendC::IsInf<half>(dstTensor, srcTensor, count);
 }
 
-void TestIsInf1() {
+__aicore__ void TestIsInf1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;

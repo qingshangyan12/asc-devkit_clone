@@ -9,14 +9,14 @@
 */
 #include "reduce/mean.h"
 
-void TestMean0() {
+__aicore__ void TestMean0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Mean<half>(dstTensor, srcTensor, sharedTmpBuffer, meanParams);
 }
 
-void TestMean1() {
+__aicore__ void TestMean1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Mean<half>(dstTensor, srcTensor, meanParams);

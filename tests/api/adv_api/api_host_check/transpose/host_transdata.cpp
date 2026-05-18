@@ -9,14 +9,14 @@
 */
 #include "transpose/transdata.h"
 
-void TestTransData0() {
+__aicore__ void TestTransData0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::TransData<half>(dstTensor, srcTensor, sharedTmpBuffer, params);
 }
 
-void TestTransData1() {
+__aicore__ void TestTransData1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::TransData<half>(dstTensor, srcTensor, params);

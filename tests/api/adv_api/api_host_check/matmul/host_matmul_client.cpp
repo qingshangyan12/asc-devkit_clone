@@ -9,42 +9,42 @@
 */
 #include "matmul/matmul_client.h"
 
-void TestMatmulClientInit0() {
+__aicore__ void TestMatmulClientInit0() {
     AscendC::MatmulClient<MatmulClient::MatmulConfig> obj;
     obj.Init(cubeTiling);
 }
 
-void TestMatmulClientSetTensorA1() {
+__aicore__ void TestMatmulClientSetTensorA1() {
     AscendC::MatmulClient<MatmulClient::MatmulConfig> obj;
     obj.SetTensorA(gm, isTransposeA);
 }
 
-void TestMatmulClientSetTensorB2() {
+__aicore__ void TestMatmulClientSetTensorB2() {
     AscendC::MatmulClient<MatmulClient::MatmulConfig> obj;
     obj.SetTensorB(gm, isTransposeB);
 }
 
-void TestMatmulClientSetBias3() {
+__aicore__ void TestMatmulClientSetBias3() {
     AscendC::MatmulClient<MatmulClient::MatmulConfig> obj;
     obj.SetBias(biasGlobal);
 }
 
-void TestMatmulClientIterate4() {
+__aicore__ void TestMatmulClientIterate4() {
     AscendC::MatmulClient<MatmulClient::MatmulConfig> obj;
     obj.Iterate();
 }
 
-void TestMatmulClientIterateAll5() {
+__aicore__ void TestMatmulClientIterateAll5() {
     AscendC::MatmulClient<MatmulClient::MatmulConfig> obj;
     obj.IterateAll(gm, enAtomic);
 }
 
-void TestMatmulClientGetTensorC6() {
+__aicore__ void TestMatmulClientGetTensorC6() {
     AscendC::MatmulClient<MatmulClient::MatmulConfig> obj;
     obj.GetTensorC(gm, enAtomic);
 }
 
-void TestMatmulClientEnd7() {
+__aicore__ void TestMatmulClientEnd7() {
     AscendC::MatmulClient<MatmulClient::MatmulConfig> obj;
     obj.End();
 }

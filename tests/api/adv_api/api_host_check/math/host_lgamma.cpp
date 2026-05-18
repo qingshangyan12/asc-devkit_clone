@@ -9,7 +9,7 @@
 */
 #include "math/lgamma.h"
 
-void TestLgamma0() {
+__aicore__ void TestLgamma0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,7 +17,7 @@ void TestLgamma0() {
     AscendC::Lgamma<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestLgamma1() {
+__aicore__ void TestLgamma1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

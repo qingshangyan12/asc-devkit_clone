@@ -9,7 +9,7 @@
 */
 #include "math/atanh.h"
 
-void TestAtanh0() {
+__aicore__ void TestAtanh0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,20 +17,20 @@ void TestAtanh0() {
     AscendC::Atanh<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestAtanh1() {
+__aicore__ void TestAtanh1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Atanh<half>(dstTensor, srcTensor);
 }
 
-void TestAtanh2() {
+__aicore__ void TestAtanh2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Atanh<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestAtanh3() {
+__aicore__ void TestAtanh3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

@@ -9,7 +9,7 @@
 */
 #include "math/erf.h"
 
-void TestErf0() {
+__aicore__ void TestErf0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,21 +17,21 @@ void TestErf0() {
     AscendC::Erf<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestErf1() {
+__aicore__ void TestErf1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Erf<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestErf2() {
+__aicore__ void TestErf2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Erf<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestErf3() {
+__aicore__ void TestErf3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Erf<half>(dstTensor, srcTensor);

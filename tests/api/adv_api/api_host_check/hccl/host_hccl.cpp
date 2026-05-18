@@ -9,42 +9,42 @@
 */
 #include "hccl/hccl.h"
 
-void TestHcclAllReduce0() {
+__aicore__ void TestHcclAllReduce0() {
     AscendC::Hccl<Hccl::MatmulConfig> obj;
     obj.AllReduce(sendBuf, recvBuf, count, dataType, op, repeat);
 }
 
-void TestHcclAllGather1() {
+__aicore__ void TestHcclAllGather1() {
     AscendC::Hccl<Hccl::MatmulConfig> obj;
     obj.AllGather(sendBuf, recvBuf, sendCount, dataType, strideCount, repeat);
 }
 
-void TestHcclReduceScatter2() {
+__aicore__ void TestHcclReduceScatter2() {
     AscendC::Hccl<Hccl::MatmulConfig> obj;
     obj.ReduceScatter(sendBuf, recvBuf, recvCount, dataType, op, strideCount, repeat);
 }
 
-void TestHcclInit3() {
+__aicore__ void TestHcclInit3() {
     AscendC::Hccl<Hccl::MatmulConfig> obj;
     obj.Init(context, initTiling);
 }
 
-void TestHcclCommit4() {
+__aicore__ void TestHcclCommit4() {
     AscendC::Hccl<Hccl::MatmulConfig> obj;
     obj.Commit(handleId);
 }
 
-void TestHcclWait5() {
+__aicore__ void TestHcclWait5() {
     AscendC::Hccl<Hccl::MatmulConfig> obj;
     obj.Wait(handleId);
 }
 
-void TestHcclFinalize6() {
+__aicore__ void TestHcclFinalize6() {
     AscendC::Hccl<Hccl::MatmulConfig> obj;
     obj.Finalize();
 }
 
-void TestHcclGetRankId7() {
+__aicore__ void TestHcclGetRankId7() {
     AscendC::Hccl<Hccl::MatmulConfig> obj;
     obj.GetRankId();
 }

@@ -9,27 +9,27 @@
 */
 #include "pad/pad.h"
 
-void TestPad0() {
+__aicore__ void TestPad0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Pad<half>(dstTensor, srcTensor, padParams, sharedTmpBuffer, tiling);
 }
 
-void TestPad1() {
+__aicore__ void TestPad1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Pad<half>(dstTensor, srcTensor, padParams, tiling);
 }
 
-void TestUnPad2() {
+__aicore__ void TestUnPad2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::UnPad<half>(dstTensor, srcTensor, unPadParams, sharedTmpBuffer, tiling);
 }
 
-void TestUnPad3() {
+__aicore__ void TestUnPad3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::UnPad<half>(dstTensor, srcTensor, unPadParams, tiling);

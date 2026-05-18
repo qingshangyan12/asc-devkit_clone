@@ -9,7 +9,7 @@
 */
 #include "math/rint.h"
 
-void TestRint0() {
+__aicore__ void TestRint0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,7 +17,7 @@ void TestRint0() {
     AscendC::Rint<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestRint1() {
+__aicore__ void TestRint1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

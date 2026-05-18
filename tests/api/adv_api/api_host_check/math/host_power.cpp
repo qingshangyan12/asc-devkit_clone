@@ -10,7 +10,7 @@
 
 #include "math/power.h"
 
-void TestPower0() {
+__aicore__ void TestPower0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> expTensor;
@@ -19,7 +19,7 @@ void TestPower0() {
     AscendC::Power<half>(dstTensor, srcTensor, expTensor, sharedTmpBuffer, calCount);
 }
 
-void TestPower1() {
+__aicore__ void TestPower1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> expTensor;
@@ -27,7 +27,7 @@ void TestPower1() {
     AscendC::Power<half>(dstTensor, srcTensor, expTensor, calCount);
 }
 
-void TestPower2() {
+__aicore__ void TestPower2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> expTensor;
@@ -35,14 +35,14 @@ void TestPower2() {
     AscendC::Power<half>(dstTensor, srcTensor, expTensor, sharedTmpBuffer);
 }
 
-void TestPower3() {
+__aicore__ void TestPower3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> expTensor;
     AscendC::Power<half>(dstTensor, srcTensor, expTensor);
 }
 
-void TestPower4() {
+__aicore__ void TestPower4() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     half expValue;
@@ -51,7 +51,7 @@ void TestPower4() {
     AscendC::Power<half>(dstTensor, srcTensor, expValue, sharedTmpBuffer, calCount);
 }
 
-void TestPower5() {
+__aicore__ void TestPower5() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     half expValue;
@@ -59,7 +59,7 @@ void TestPower5() {
     AscendC::Power<half>(dstTensor, srcTensor, expValue, calCount);
 }
 
-void TestPower6() {
+__aicore__ void TestPower6() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     half expValue;
@@ -67,14 +67,14 @@ void TestPower6() {
     AscendC::Power<half>(dstTensor, srcTensor, expValue, sharedTmpBuffer);
 }
 
-void TestPower7() {
+__aicore__ void TestPower7() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     half expValue;
     AscendC::Power<half>(dstTensor, srcTensor, expValue);
 }
 
-void TestPower8() {
+__aicore__ void TestPower8() {
     AscendC::LocalTensor<half> dstTensor;
     half srcValue;
     AscendC::LocalTensor<half> expTensor;
@@ -83,7 +83,7 @@ void TestPower8() {
     AscendC::Power<half>(dstTensor, srcValue, expTensor, sharedTmpBuffer, calCount);
 }
 
-void TestPower9() {
+__aicore__ void TestPower9() {
     AscendC::LocalTensor<half> dstTensor;
     half srcValue;
     AscendC::LocalTensor<half> expTensor;
@@ -91,7 +91,7 @@ void TestPower9() {
     AscendC::Power<half>(dstTensor, srcValue, expTensor, calCount);
 }
 
-void TestPower10() {
+__aicore__ void TestPower10() {
     AscendC::LocalTensor<half> dstTensor;
     half srcValue;
     AscendC::LocalTensor<half> expTensor;
@@ -99,7 +99,7 @@ void TestPower10() {
     AscendC::Power<half>(dstTensor, srcValue, expTensor, sharedTmpBuffer);
 }
 
-void TestPower11() {
+__aicore__ void TestPower11() {
     AscendC::LocalTensor<half> dstTensor;
     half srcValue;
     AscendC::LocalTensor<half> expTensor;

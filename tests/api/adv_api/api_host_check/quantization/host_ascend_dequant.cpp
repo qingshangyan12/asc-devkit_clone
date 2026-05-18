@@ -9,20 +9,20 @@
 */
 #include "quantization/ascend_dequant.h"
 
-void TestAscendDequant0() {
+__aicore__ void TestAscendDequant0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::AscendDequant<half>(dstTensor, srcTensor, deqScale, sharedTmpBuffer, params);
 }
 
-void TestAscendDequant1() {
+__aicore__ void TestAscendDequant1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::AscendDequant<half>(dstTensor, srcTensor, deqScale, params);
 }
 
-void TestAscendDequant2() {
+__aicore__ void TestAscendDequant2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -30,7 +30,7 @@ void TestAscendDequant2() {
     AscendC::AscendDequant<half>(dstTensor, srcTensor, deqScale, sharedTmpBuffer, calCount);
 }
 
-void TestAscendDequant3() {
+__aicore__ void TestAscendDequant3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

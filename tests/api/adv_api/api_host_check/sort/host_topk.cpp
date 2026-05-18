@@ -9,13 +9,13 @@
 */
 #include "sort/topk.h"
 
-void TestTopK0() {
+__aicore__ void TestTopK0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::TopK<half>(dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, tmpLocal, k, tiling, topKInfo);
 }
 
-void TestTopK1() {
+__aicore__ void TestTopK1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::TopK<half>(dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tiling, topKInfo);

@@ -9,22 +9,22 @@
 */
 #include "hcomm/hcomm.h"
 
-void TestHcommWrite0() {
+__aicore__ void TestHcommWrite0() {
     AscendC::Hcomm<Hcomm::MatmulConfig> obj;
     obj.Write(channelHandle, dst, src, len);
 }
 
-void TestHcommRead1() {
+__aicore__ void TestHcommRead1() {
     AscendC::Hcomm<Hcomm::MatmulConfig> obj;
     obj.Read(channelHandle, dst, src, len);
 }
 
-void TestHcommCommit2() {
+__aicore__ void TestHcommCommit2() {
     AscendC::Hcomm<Hcomm::MatmulConfig> obj;
     obj.Commit(handleId);
 }
 
-void TestHcommWait3() {
+__aicore__ void TestHcommWait3() {
     AscendC::Hcomm<Hcomm::MatmulConfig> obj;
     obj.Wait(handleId);
 }

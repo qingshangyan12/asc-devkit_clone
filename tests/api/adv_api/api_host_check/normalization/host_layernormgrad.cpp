@@ -9,12 +9,12 @@
 */
 #include "normalization/layernormgrad.h"
 
-void TestLayerNormGrad0() {
+__aicore__ void TestLayerNormGrad0() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::LayerNormGrad<half>(outputPdX, resForGamma, inputDy, inputX, inputVariance, inputMean, inputGamma, sharedTmpBuffer, epsilon, tiling);
 }
 
-void TestLayerNormGrad1() {
+__aicore__ void TestLayerNormGrad1() {
     AscendC::LayerNormGrad<half>(outputPdX, resForGamma, inputDy, inputX, inputVariance, inputMean, inputGamma, epsilon, tiling);
 }
 

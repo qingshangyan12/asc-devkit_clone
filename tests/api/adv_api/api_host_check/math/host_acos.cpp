@@ -9,7 +9,7 @@
 */
 #include "math/acos.h"
 
-void TestAcos0() {
+__aicore__ void TestAcos0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,20 +17,20 @@ void TestAcos0() {
     AscendC::Acos<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestAcos1() {
+__aicore__ void TestAcos1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Acos<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestAcos2() {
+__aicore__ void TestAcos2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Acos<half>(dstTensor, srcTensor);
 }
 
-void TestAcos3() {
+__aicore__ void TestAcos3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;

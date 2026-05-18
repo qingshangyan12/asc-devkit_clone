@@ -9,7 +9,7 @@
 */
 #include "reduce/reduce_xor_sum.h"
 
-void TestReduceXorSum0() {
+__aicore__ void TestReduceXorSum0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -19,7 +19,7 @@ void TestReduceXorSum0() {
     AscendC::ReduceXorSum<half>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
 }
 
-void TestReduceXorSum1() {
+__aicore__ void TestReduceXorSum1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;

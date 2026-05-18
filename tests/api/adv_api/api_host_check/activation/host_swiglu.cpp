@@ -9,7 +9,7 @@
 */
 #include "activation/swiglu.h"
 
-void TestSwiGLU0() {
+__aicore__ void TestSwiGLU0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -17,7 +17,7 @@ void TestSwiGLU0() {
     AscendC::SwiGLU<half>(dstTensor, srcTensor0, srcTensor1, scalarValue);
 }
 
-void TestSwiGLU1() {
+__aicore__ void TestSwiGLU1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -26,7 +26,7 @@ void TestSwiGLU1() {
     AscendC::SwiGLU<half>(dstTensor, srcTensor0, srcTensor1, scalarValue, sharedTmpBuffer);
 }
 
-void TestSwiGLU2() {
+__aicore__ void TestSwiGLU2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -35,7 +35,7 @@ void TestSwiGLU2() {
     AscendC::SwiGLU<half>(dstTensor, srcTensor0, srcTensor1, scalarValue, calCount);
 }
 
-void TestSwiGLU3() {
+__aicore__ void TestSwiGLU3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;

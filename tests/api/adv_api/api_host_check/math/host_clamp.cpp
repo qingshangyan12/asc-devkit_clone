@@ -9,7 +9,7 @@
 */
 #include "math/clamp.h"
 
-void TestClampMax0() {
+__aicore__ void TestClampMax0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -18,7 +18,7 @@ void TestClampMax0() {
     AscendC::ClampMax<half>(dstTensor, srcTensor, sharedTmpBuffer, maxValue, calCount);
 }
 
-void TestClampMax1() {
+__aicore__ void TestClampMax1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     half maxValue;
@@ -26,7 +26,7 @@ void TestClampMax1() {
     AscendC::ClampMax<half>(dstTensor, srcTensor, maxValue, calCount);
 }
 
-void TestClampMin0() {
+__aicore__ void TestClampMin0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -35,7 +35,7 @@ void TestClampMin0() {
     AscendC::ClampMin<half>(dstTensor, srcTensor, sharedTmpBuffer, minValue, calCount);
 }
 
-void TestClampMin1() {
+__aicore__ void TestClampMin1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     half minValue;
@@ -43,7 +43,7 @@ void TestClampMin1() {
     AscendC::ClampMin<half>(dstTensor, srcTensor, minValue, calCount);
 }
 
-void TestClamp0() {
+__aicore__ void TestClamp0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     half minValue;

@@ -9,7 +9,7 @@
 */
 #include "utils/init_global_memory.h"
 
-void TestFill0() {
+__aicore__ void TestFill0() {
     AscendC::Fill<half>(gmWorkspaceAddr, size, value);
 }
 

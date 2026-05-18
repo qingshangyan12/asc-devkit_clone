@@ -9,14 +9,14 @@
 */
 #include "pad/broadcast.h"
 
-void TestBroadcast0() {
+__aicore__ void TestBroadcast0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Broadcast<half>(dstLocal, srcLocal, dstShape, srcShape, sharedTmpBuffer);
 }
 
-void TestBroadcast1() {
+__aicore__ void TestBroadcast1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Broadcast<half>(dstLocal, srcLocal, dstShape, srcShape);

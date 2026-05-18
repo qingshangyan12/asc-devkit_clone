@@ -9,7 +9,7 @@
 */
 #include "math/sincos.h"
 
-void TestSinCos0() {
+__aicore__ void TestSinCos0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -18,7 +18,7 @@ void TestSinCos0() {
     AscendC::SinCos<half>(dstTensor, srcTensor, sinOutputTensor, sharedTmpBuffer, calCount);
 }
 
-void TestSinCos1() {
+__aicore__ void TestSinCos1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> sinOutputTensor;

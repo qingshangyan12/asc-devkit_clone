@@ -9,7 +9,7 @@
 */
 #include "math/erfc.h"
 
-void TestErfc0() {
+__aicore__ void TestErfc0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,20 +17,20 @@ void TestErfc0() {
     AscendC::Erfc<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestErfc1() {
+__aicore__ void TestErfc1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Erfc<half>(dstTensor, srcTensor);
 }
 
-void TestErfc2() {
+__aicore__ void TestErfc2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Erfc<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestErfc3() {
+__aicore__ void TestErfc3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;

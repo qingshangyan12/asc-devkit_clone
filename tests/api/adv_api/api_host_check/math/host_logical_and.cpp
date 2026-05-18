@@ -9,7 +9,7 @@
 */
 #include "math/logical_and.h"
 
-void TestLogicalAnd0() {
+__aicore__ void TestLogicalAnd0() {
     AscendC::LocalTensor<uint8_t> dstTensor;
     AscendC::LocalTensor<half> src0Tensor;
     AscendC::LocalTensor<half> src1Tensor;

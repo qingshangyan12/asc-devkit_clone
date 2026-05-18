@@ -10,14 +10,14 @@
 
 #include "math/exp.h"
 
-void TestExp0() {
+__aicore__ void TestExp0() {
     AscendC::LocalTensor<half> dstLocal;
     AscendC::LocalTensor<half> srcLocal;
     uint32_t calCount = 0;
     AscendC::Exp<half, 0>(dstLocal, srcLocal, calCount);
 }
 
-void TestExp1() {
+__aicore__ void TestExp1() {
     AscendC::LocalTensor<half> dstLocal;
     AscendC::LocalTensor<half> srcLocal;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;

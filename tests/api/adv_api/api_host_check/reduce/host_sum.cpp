@@ -9,14 +9,14 @@
 */
 #include "reduce/sum.h"
 
-void TestSum0() {
+__aicore__ void TestSum0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Sum<half>(dstTensor, srcTensor, sharedTmpBuffer, sumParams);
 }
 
-void TestSum1() {
+__aicore__ void TestSum1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Sum<half>(dstTensor, srcTensor, sumParams);

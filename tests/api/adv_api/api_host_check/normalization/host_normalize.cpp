@@ -9,12 +9,12 @@
 */
 #include "normalization/normalize.h"
 
-void TestNormalize0() {
+__aicore__ void TestNormalize0() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Normalize<half>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, para);
 }
 
-void TestNormalize1() {
+__aicore__ void TestNormalize1() {
     AscendC::Normalize<half>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta, epsilon, para);
 }
 

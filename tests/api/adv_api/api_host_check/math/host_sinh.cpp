@@ -10,7 +10,7 @@
 
 #include "math/sinh.h"
 
-void TestSinh0() {
+__aicore__ void TestSinh0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -18,21 +18,21 @@ void TestSinh0() {
     AscendC::Sinh<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestSinh1() {
+__aicore__ void TestSinh1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Sinh<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestSinh2() {
+__aicore__ void TestSinh2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Sinh<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestSinh3() {
+__aicore__ void TestSinh3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Sinh<half>(dstTensor, srcTensor);

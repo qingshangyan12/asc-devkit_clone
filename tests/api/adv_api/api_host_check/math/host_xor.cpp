@@ -9,7 +9,7 @@
 */
 #include "math/xor.h"
 
-void TestXor0() {
+__aicore__ void TestXor0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -19,7 +19,7 @@ void TestXor0() {
     AscendC::Xor<half>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
 }
 
-void TestXor1() {
+__aicore__ void TestXor1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -28,7 +28,7 @@ void TestXor1() {
     AscendC::Xor<half>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer);
 }
 
-void TestXor2() {
+__aicore__ void TestXor2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -37,7 +37,7 @@ void TestXor2() {
     AscendC::Xor<half>(dstTensor, src0Tensor, src1Tensor, calCount);
 }
 
-void TestXor3() {
+__aicore__ void TestXor3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;

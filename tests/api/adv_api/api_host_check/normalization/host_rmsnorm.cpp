@@ -9,14 +9,14 @@
 */
 #include "normalization/rmsnorm.h"
 
-void TestRmsNorm0() {
+__aicore__ void TestRmsNorm0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::RmsNorm<half>(dstLocal, srcLocal, gammaLocal, sharedTmpBuffer, epsilon, tiling);
 }
 
-void TestRmsNorm1() {
+__aicore__ void TestRmsNorm1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::RmsNorm<half>(dstLocal, srcLocal, gammaLocal, epsilon, tiling);

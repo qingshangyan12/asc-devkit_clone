@@ -9,14 +9,14 @@
 */
 #include "normalization/deepnorm.h"
 
-void TestDeepNorm0() {
+__aicore__ void TestDeepNorm0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::DeepNorm<half>(dstLocal, meanLocal, rstdLocal, srcLocal, gxLocal, betaLocal, gammaLocal, sharedTmpBuffer, alpha, epsilon, tiling);
 }
 
-void TestDeepNorm1() {
+__aicore__ void TestDeepNorm1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::DeepNorm<half>(dstLocal, meanLocal, rstdLocal, srcLocal, gxLocal, betaLocal, gammaLocal, alpha, epsilon, tiling);

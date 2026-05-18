@@ -9,7 +9,7 @@
 */
 #include "math/trunc.h"
 
-void TestTrunc0() {
+__aicore__ void TestTrunc0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,21 +17,21 @@ void TestTrunc0() {
     AscendC::Trunc<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestTrunc1() {
+__aicore__ void TestTrunc1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Trunc<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestTrunc2() {
+__aicore__ void TestTrunc2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Trunc<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestTrunc3() {
+__aicore__ void TestTrunc3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Trunc<half>(dstTensor, srcTensor);

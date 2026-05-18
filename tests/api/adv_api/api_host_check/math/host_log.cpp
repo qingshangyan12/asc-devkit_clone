@@ -10,20 +10,20 @@
 
 #include "math/log.h"
 
-void TestLog0() {
+__aicore__ void TestLog0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Log<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestLog1() {
+__aicore__ void TestLog1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Log<half>(dstTensor, srcTensor);
 }
 
-void TestLog2() {
+__aicore__ void TestLog2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -31,34 +31,34 @@ void TestLog2() {
     AscendC::Log2<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestLog3() {
+__aicore__ void TestLog3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Log2<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestLog4() {
+__aicore__ void TestLog4() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Log2<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestLog5() {
+__aicore__ void TestLog5() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Log2<half>(dstTensor, srcTensor);
 }
 
-void TestLog6() {
+__aicore__ void TestLog6() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Log10<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestLog7() {
+__aicore__ void TestLog7() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Log10<half>(dstTensor, srcTensor);

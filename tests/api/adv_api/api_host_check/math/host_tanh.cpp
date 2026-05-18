@@ -9,14 +9,14 @@
 */
 #include "math/tanh.h"
 
-void TestTanh0() {
+__aicore__ void TestTanh0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Tanh<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestTanh1() {
+__aicore__ void TestTanh1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -24,13 +24,13 @@ void TestTanh1() {
     AscendC::Tanh<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestTanh2() {
+__aicore__ void TestTanh2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Tanh<half>(dstTensor, srcTensor);
 }
 
-void TestTanh3() {
+__aicore__ void TestTanh3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

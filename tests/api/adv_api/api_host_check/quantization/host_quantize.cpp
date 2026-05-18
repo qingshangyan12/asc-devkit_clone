@@ -9,14 +9,14 @@
 */
 #include "quantization/quantize.h"
 
-void TestQuantize0() {
+__aicore__ void TestQuantize0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Quantize<half>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
 }
 
-void TestQuantize1() {
+__aicore__ void TestQuantize1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Quantize<half>(dstTensor, srcTensor, scale, offset, params);

@@ -9,21 +9,21 @@
 */
 #include "activation/softmax.h"
 
-void TestSoftMax0() {
+__aicore__ void TestSoftMax0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::SoftMaxTiling tiling;
     AscendC::SoftMax<half>(dstTensor, sumTensor, maxTensor, srcTensor, tiling);
 }
 
-void TestSoftMax1() {
+__aicore__ void TestSoftMax1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::SoftMaxTiling tiling;
     AscendC::SoftMax<half>(dstTensor, srcTensor, tiling);
 }
 
-void TestSoftMax2() {
+__aicore__ void TestSoftMax2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -31,7 +31,7 @@ void TestSoftMax2() {
     AscendC::SoftMax<half>(dstTensor, srcTensor, sharedTmpBuffer, tiling);
 }
 
-void TestSoftMax3() {
+__aicore__ void TestSoftMax3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -39,7 +39,7 @@ void TestSoftMax3() {
     AscendC::SoftMax<half>(dstTensor, sumTensor, maxTensor, srcTensor, sharedTmpBuffer, tiling);
 }
 
-void TestAdjustSoftMaxRes4() {
+__aicore__ void TestAdjustSoftMaxRes4() {
     uint32_t from;
     half to;
     AscendC::AdjustSoftMaxRes<half>(softMaxRes, maxTensor, from, to);

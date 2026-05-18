@@ -9,7 +9,7 @@
 */
 #include "math/where.h"
 
-void TestWhere0() {
+__aicore__ void TestWhere0() {
     AscendC::LocalTensor<half> dstTensor;
     half trueValue;
     half falseValue;

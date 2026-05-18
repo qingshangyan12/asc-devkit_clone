@@ -9,7 +9,7 @@
 */
 #include "math/digamma.h"
 
-void TestDigamma0() {
+__aicore__ void TestDigamma0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,7 +17,7 @@ void TestDigamma0() {
     AscendC::Digamma<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestDigamma1() {
+__aicore__ void TestDigamma1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

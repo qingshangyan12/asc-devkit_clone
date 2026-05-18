@@ -9,7 +9,7 @@
 */
 #include "math/ceil.h"
 
-void TestCeil0() {
+__aicore__ void TestCeil0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,7 +17,7 @@ void TestCeil0() {
     AscendC::Ceil<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestCeil1() {
+__aicore__ void TestCeil1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

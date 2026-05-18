@@ -9,7 +9,7 @@
 */
 #include "sort/sort.h"
 
-void TestSort0() {
+__aicore__ void TestSort0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,14 +17,14 @@ void TestSort0() {
     AscendC::Sort<half>(dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, sharedTmpBuffer, calCount);
 }
 
-void TestSort1() {
+__aicore__ void TestSort1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Sort<half>(dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, calCount);
 }
 
-void TestSort2() {
+__aicore__ void TestSort2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -32,7 +32,7 @@ void TestSort2() {
     AscendC::Sort<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestSort3() {
+__aicore__ void TestSort3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;

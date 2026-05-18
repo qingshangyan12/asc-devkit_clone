@@ -9,7 +9,7 @@
 */
 #include "activation/geglu.h"
 
-void TestGeGLU0() {
+__aicore__ void TestGeGLU0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -19,7 +19,7 @@ void TestGeGLU0() {
     AscendC::GeGLU<half>(dstTensor, srcTensor0, srcTensor1, sharedTmpBuffer, calCount);
 }
 
-void TestGeGLU1() {
+__aicore__ void TestGeGLU1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -28,7 +28,7 @@ void TestGeGLU1() {
     AscendC::GeGLU<half>(dstTensor, srcTensor0, srcTensor1, calCount);
 }
 
-void TestGeGLU2() {
+__aicore__ void TestGeGLU2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;
@@ -37,7 +37,7 @@ void TestGeGLU2() {
     AscendC::GeGLU<half>(dstTensor, srcTensor0, srcTensor1, sharedTmpBuffer);
 }
 
-void TestGeGLU3() {
+__aicore__ void TestGeGLU3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<half> src0Tensor;

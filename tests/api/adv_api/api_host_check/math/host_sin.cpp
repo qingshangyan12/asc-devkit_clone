@@ -10,7 +10,7 @@
 
 #include "math/sin.h"
 
-void TestSin0() {
+__aicore__ void TestSin0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -18,21 +18,21 @@ void TestSin0() {
     AscendC::Sin<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestSin1() {
+__aicore__ void TestSin1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Sin<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestSin2() {
+__aicore__ void TestSin2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Sin<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestSin3() {
+__aicore__ void TestSin3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Sin<half>(dstTensor, srcTensor);

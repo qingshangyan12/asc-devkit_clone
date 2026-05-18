@@ -9,7 +9,7 @@
 */
 #include "math/asinh.h"
 
-void TestAsinh0() {
+__aicore__ void TestAsinh0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,21 +17,21 @@ void TestAsinh0() {
     AscendC::Asinh<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestAsinh1() {
+__aicore__ void TestAsinh1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Asinh<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestAsinh2() {
+__aicore__ void TestAsinh2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Asinh<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestAsinh3() {
+__aicore__ void TestAsinh3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Asinh<half>(dstTensor, srcTensor);

@@ -9,46 +9,46 @@
 */
 #include "quantization/ascend_antiquant.h"
 
-void TestAscendAntiQuant0() {
+__aicore__ void TestAscendAntiQuant0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::AscendAntiQuant<half>(dst, src, offset, scale, sharedTmpBuffer, k, shapeInfo);
 }
 
-void TestAscendAntiQuant1() {
+__aicore__ void TestAscendAntiQuant1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::AscendAntiQuant<half>(dst, src, scale, sharedTmpBuffer, k, shapeInfo);
 }
 
-void TestAscendAntiQuant2() {
+__aicore__ void TestAscendAntiQuant2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::AscendAntiQuant<half>(dst, src, offset, scale, k, shapeInfo);
 }
 
-void TestAscendAntiQuant3() {
+__aicore__ void TestAscendAntiQuant3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::AscendAntiQuant<half>(dst, src, scaleValue, sharedTmpBuffer, k, shapeInfo);
 }
 
-void TestAscendAntiQuant4() {
+__aicore__ void TestAscendAntiQuant4() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::AscendAntiQuant<half>(dst, src, offset, scaleValue, k, shapeInfo);
 }
 
-void TestAscendAntiQuant5() {
+__aicore__ void TestAscendAntiQuant5() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::AscendAntiQuant<half>(dst, src, scaleTensor, offsetTensor, para);
 }
 
-void TestAscendAntiQuant6() {
+__aicore__ void TestAscendAntiQuant6() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;

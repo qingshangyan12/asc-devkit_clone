@@ -9,12 +9,12 @@
 */
 #include "normalization/groupnorm.h"
 
-void TestGroupNorm0() {
+__aicore__ void TestGroupNorm0() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::GroupNorm<half>(output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling);
 }
 
-void TestGroupNorm1() {
+__aicore__ void TestGroupNorm1() {
     AscendC::GroupNorm<half>(output, outputMean, outputVariance, inputX, gamma, beta, epsilon, tiling);
 }
 

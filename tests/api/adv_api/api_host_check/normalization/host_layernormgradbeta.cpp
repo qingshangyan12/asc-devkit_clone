@@ -9,12 +9,12 @@
 */
 #include "normalization/layernormgradbeta.h"
 
-void TestLayerNormGradBeta0() {
+__aicore__ void TestLayerNormGradBeta0() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::LayerNormGradBeta<half>(outputPdGamma, outputPdBeta, resForGamma, inputDy, sharedTmpBuffer, tiling);
 }
 
-void TestLayerNormGradBeta1() {
+__aicore__ void TestLayerNormGradBeta1() {
     AscendC::LayerNormGradBeta<half>(outputPdGamma, outputPdBeta, resForGamma, inputDy, tiling);
 }
 

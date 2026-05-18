@@ -9,14 +9,14 @@
 */
 #include "quantization/dequantize.h"
 
-void TestDequantize0() {
+__aicore__ void TestDequantize0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Dequantize<half>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
 }
 
-void TestDequantize1() {
+__aicore__ void TestDequantize1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Dequantize<half>(dstTensor, srcTensor, scale, offset, params);

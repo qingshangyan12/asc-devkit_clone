@@ -9,7 +9,7 @@
 */
 #include "quantization/ascend_quant.h"
 
-void TestAscendQuant0() {
+__aicore__ void TestAscendQuant0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -17,21 +17,21 @@ void TestAscendQuant0() {
     AscendC::AscendQuant<half>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset, calCount);
 }
 
-void TestAscendQuant1() {
+__aicore__ void TestAscendQuant1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::AscendQuant<half>(dstTensor, srcTensor, scale, offset, calCount);
 }
 
-void TestAscendQuant2() {
+__aicore__ void TestAscendQuant2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::AscendQuant<half>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset);
 }
 
-void TestAscendQuant3() {
+__aicore__ void TestAscendQuant3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::AscendQuant<half>(dstTensor, srcTensor, scale, offset);

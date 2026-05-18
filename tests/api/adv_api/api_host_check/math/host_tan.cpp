@@ -10,14 +10,14 @@
 
 #include "math/tan.h"
 
-void TestTan0() {
+__aicore__ void TestTan0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::Tan<half>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
-void TestTan1() {
+__aicore__ void TestTan1() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
@@ -25,14 +25,14 @@ void TestTan1() {
     AscendC::Tan<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-void TestTan2() {
+__aicore__ void TestTan2() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
     AscendC::Tan<half>(dstTensor, srcTensor, calCount);
 }
 
-void TestTan3() {
+__aicore__ void TestTan3() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::Tan<half>(dstTensor, srcTensor);

@@ -9,7 +9,7 @@
 */
 #include "math/is_finite.h"
 
-void TestIsFinite0() {
+__aicore__ void TestIsFinite0() {
     AscendC::LocalTensor<half> dstTensor;
     AscendC::LocalTensor<half> srcTensor;
     uint32_t calCount = 0;
