@@ -11,9 +11,8 @@
 
 __aicore__ void TestReGlu0() {
     AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<half> srcTensor0;
+    AscendC::LocalTensor<half> srcTensor1;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
     AscendC::ReGlu<half>(dstTensor, srcTensor0, srcTensor1, sharedTmpBuffer, calCount);
@@ -21,9 +20,8 @@ __aicore__ void TestReGlu0() {
 
 __aicore__ void TestReGlu1() {
     AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<half> srcTensor0;
+    AscendC::LocalTensor<half> srcTensor1;
     uint32_t calCount = 0;
     AscendC::ReGlu<half>(dstTensor, srcTensor0, srcTensor1, calCount);
 }
