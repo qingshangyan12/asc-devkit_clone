@@ -53,15 +53,15 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
--   bfloat16\_t类型转换为float类型
+- bfloat16\_t类型转换为float类型
 
-    ```
+    ```cpp
     __aicore__ inline float Cast(const bfloat16_t& bVal)
     ```
 
--   支持多种数据类型转换为float类型
+- 支持多种数据类型转换为float类型
 
-    ```
+    ```cpp
     template <typename T, typename U = float,
               typename = Std::enable_if_t<
               (Std::is_same<T, bfloat16_t>::value || Std::is_same<T, hifloat8_t>::value ||
@@ -130,7 +130,7 @@
 
 完整的算子样例参考：[Cast样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/12_math/cast)。
 
-```
+```cpp
 // 将srcLocal的第一个元素通过Cast转换成float类型，并将结果赋值给fValue
 float fValue = AscendC::Cast(srcLocal.GetValue(0));
 // 将标量fValue 填充到dstLocal的前 32 个位置
@@ -139,14 +139,14 @@ AscendC::Duplicate(dstLocal, fValue, 32);
 
 结果示例如下：
 
-```
+```cpp
 输入数据(srcLocal):
 [21.3750, 74.0000, 57.2500,  ...,  2.4062, 72.5000, 67.5000]
 输出数据(dstLocal):
 [21.375 21.375 21.375 ... 21.375 21.375 21.375]
 ```
 
-```
+```cpp
 // 如下是一个输入类型fp4x2_e1m2_t的示例：
 float fValue = AscendC::Cast<T, float>(srcLocal.GetValue(0));
 AscendC::Duplicate(dstLocal, fValue, bufferSize);
@@ -154,4 +154,3 @@ AscendC::Duplicate(dstLocal, fValue, bufferSize);
 // 输入数据(srcLocal)（二进制表达）: [0b10001111 0b10001111 0b10001111 ...]
 // 输出数据(dstLocal): [-1.75 -1.75 -1.75 ...]
 ```
-

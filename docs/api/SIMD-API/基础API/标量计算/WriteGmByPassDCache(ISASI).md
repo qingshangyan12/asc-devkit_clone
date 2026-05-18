@@ -129,4 +129,3 @@ int32_t value = AscendC::ReadGmByPassDCache<int32_t>(addr);
 AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();  // DDR，等待GM访问指令
 AscendC::WriteGmByPassDCache<int32_t>(reinterpret_cast<__gm__ int32_t *>(dstGm), value + ADD_VALUE);
 ```
-
