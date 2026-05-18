@@ -242,6 +242,14 @@ add2<half, half2><<<blockNum2, threadNumPerBlock, dynUbufSize, stream>>>(xDevice
   ```bash
   test pass!
   ```
+  
+- 编译选项说明
+
+  | 参数 | 说明           | 可选值                                             | 默认值 |
+  |------|--------------|-------------------------------------------------|--------|
+  | `SCENARIO_NUM` | `1`、 `2`、`3` | 1: half Add计算；<br/>2: half2 Add计算<br/>3: 启动核数减半 | `1` |
+  | `CMAKE_ASC_RUN_MODE` | 运行模式         | `npu`、`sim`                                     | `npu` |
+  | `CMAKE_ASC_ARCHITECTURES` | NPU 硬件架构     | `dav-3510`                                      | `dav-3510` |
 
 ## 性能数据获取
 
