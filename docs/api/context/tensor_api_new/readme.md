@@ -12,7 +12,7 @@ Tensor API 提供面向张量描述的数据搬运和矩阵计算接口。接口
 
 Tensor API 当前主要包含以下能力：
 
-- 数据搬运：使用 `Copy` 或 `MakeCopy` 构造的 `CopyAtom`，在 GM、L1、L0A、L0B、L0C、UB、BiasTable Buffer、Fixpipe Buffer 之间搬运数据。
+- 数据搬运：使用 `Copy` 或 `MakeCopy` 构造的 `CopyAtom`，在 GM、L1、L0A、L0B、L0ScaleA、L0ScaleB、L0C、UB、BiasTable Buffer、Fixpipe Buffer 之间搬运数据。
 - 矩阵计算：使用 `Mmad` 或 `MakeMmad` 构造的 `MmadAtom`，完成 L0A 与 L0B 输入、L0C 输出的矩阵乘加计算。
 - 张量基础结构：使用 `MakeMemPtr`、`MakeFrameLayout`、`MakeLayout`、`MakeTensor`、`Slice` 等接口描述内存位置、数据排布、形状、步长和切片。
 
@@ -23,6 +23,8 @@ Tensor API 当前主要包含以下能力：
 - [GM到L1数据搬运](data_movement/gm_to_l1_data_movement.md)
 - [L1到L0A数据搬运](data_movement/l1_to_l0a_data_movement.md)
 - [L1到L0B数据搬运](data_movement/l1_to_l0b_data_movement.md)
+- [L1到L0ScaleA数据搬运](data_movement/l1_to_l0scalea_data_movement.md)
+- [L1到L0ScaleB数据搬运](data_movement/l1_to_l0scaleb_data_movement.md)
 - [L1到BiasTable Buffer数据搬运](data_movement/l1_to_bias_table_buffer_data_movement.md)
 - [L1到Fixpipe Buffer数据搬运](data_movement/l1_to_fixpipe_buffer_data_movement.md)
 - [L1到UB数据搬运](data_movement/l1_to_ub_data_movement.md)
