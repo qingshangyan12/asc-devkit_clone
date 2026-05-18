@@ -9,11 +9,10 @@
 */
 #include "math/bitwise_xor.h"
 
-/**
 __aicore__ void TestBitwiseXor0() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> src0Tensor;
     AscendC::LocalTensor<float> src1Tensor;
     uint32_t calCount = 0;
-    AscendC::BitwiseXor<float>(dstTensor, src0Tensor, src1Tensor, calCount);
-}*/
+    AscendC::BitwiseXor<AscendC::DEFAULT_BITWISE_XOR_CONFIG, float>(dstTensor, src0Tensor, src1Tensor, calCount);
+}

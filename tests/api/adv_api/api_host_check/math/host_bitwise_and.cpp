@@ -8,11 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "math/bitwise_and.h"
-/**
+
 __aicore__ void TestBitwiseAnd0() {
     AscendC::LocalTensor<int16_t> dstTensor;
     AscendC::LocalTensor<int16_t> src0Tensor;
     AscendC::LocalTensor<int16_t> src1Tensor;
     uint32_t calCount = 0;
     AscendC::BitwiseAnd<AscendC::DEFAULT_BITWISE_AND_CONFIG, int16_t>(dstTensor, src0Tensor, src1Tensor, calCount);
-}*/
+}

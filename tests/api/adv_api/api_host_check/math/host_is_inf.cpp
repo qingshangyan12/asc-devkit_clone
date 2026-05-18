@@ -13,7 +13,7 @@ __aicore__ void TestIsInf0() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     uint32_t count = 0;
-    AscendC::IsInf<float>(dstTensor, srcTensor, count);
+    AscendC::IsInf<AscendC::DEFAULT_IS_INF_CONFIG, float>(dstTensor, srcTensor, count);
 }
 
 __aicore__ void TestIsInf1() {
@@ -21,6 +21,6 @@ __aicore__ void TestIsInf1() {
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t count = 0;
-    AscendC::IsInf<float>(dstTensor, srcTensor, sharedTmpBuffer, count);
+    AscendC::IsInf<AscendC::DEFAULT_IS_INF_CONFIG, float>(dstTensor, srcTensor, sharedTmpBuffer, count);
 }
 
