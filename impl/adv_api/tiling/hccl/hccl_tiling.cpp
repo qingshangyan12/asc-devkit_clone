@@ -235,11 +235,13 @@ uint32_t Mc2CcTilingConfig::SetReduceType(uint32_t reduceType, uint8_t dstDataTy
     return EXIT_SUCCESS;
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 uint32_t Mc2CcTilingConfig::SetStepSize(uint8_t stepSize)
 {
     impl_.stepSize_ = stepSize;
     return EXIT_SUCCESS;
 }
+#endif
 
 uint32_t Mc2CcTilingConfig::SetSkipLocalRankCopy(uint8_t skipLocalRankCopy)
 {
