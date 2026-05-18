@@ -31,7 +31,7 @@ extern "C" __global__ __aicore__ void TestSetAippFuncionsOnDevice() {
     AscendC::GlobalTensor<uint8_t> src0, src1;
     AscendC::AippInputFormat format;
     AscendC::AippParams<uint8_t> config;
-    AscendC::SetAippFunctions(src0, src1 format, config);
+    AscendC::SetAippFunctions(src0, src1, format, config);
 }
 
 extern "C" void TestSetAippFuncionsOnHost() {
