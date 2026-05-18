@@ -14,7 +14,7 @@
 ## 目录结构介绍
 
 ```
-├── leaky_relu_onnx_invocation
+├── onnx_plugin
 │   ├── CMakeLists.txt
 │   ├── leaky_relu.py
 │   └── main.cpp
