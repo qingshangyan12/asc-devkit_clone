@@ -68,7 +68,7 @@ __aicore__ inline void GeluCalcYGreaterThanZero(
     const UnaryRepeatParams unaryParams;
 
     // exp(min(y, 0)) to avoid overflow, keep exp negative
-    Mins<T, false>(tempTensorB, tempTensorA, 0, MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
+    Mins<T, false>(tempTensorB, tempTensorA, static_cast<T>(0), MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
     Exp<T, false>(tempTensorB, tempTensorB, MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
@@ -87,13 +87,13 @@ __aicore__ inline void GeluCalcYLessThanZero(
     Abs<T, false>(tempTensorA, tempTensorA, MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
-    Muls<T, false>(tempTensorA, tempTensorA, -1, MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
+    Muls<T, false>(tempTensorA, tempTensorA, static_cast<T>(-1), MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
     Exp<T, false>(tempTensorA, tempTensorA, MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
-    Adds<T, false>(tempTensorA, tempTensorA, 1, MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
+    Adds<T, false>(tempTensorA, tempTensorA, static_cast<T>(1), MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
     if constexpr (highPerformance) {
