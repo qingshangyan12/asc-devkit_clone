@@ -89,7 +89,7 @@ struct GetL0DataType<fp8_e5m2_t, false> {
 
 template <>
 struct GetL0DataType<fp8_e4m3fn_t, true> {
-    using Type = AscendC::mx_fp8_e4m3_t;
+    using Type = AscendC::fp8_e4m3_t;
 };
 
 template <>
