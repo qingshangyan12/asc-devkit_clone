@@ -90,6 +90,8 @@ namespace Location {
     struct L1 {};
     struct L0A {};
     struct L0B {};
+    struct L0ScaleA {};
+    struct L0ScaleB {};
     struct L0C {};
     struct BIAS {};
     struct FIXBUF {};
@@ -107,8 +109,8 @@ private:
 public:
     static constexpr bool value = IsUnqualifiedAnyOf<T,
         Location::INVALID, Location::GM, Location::UB, Location::L1,
-        Location::L0A, Location::L0B, Location::L0C, Location::BIAS,
-        Location::FIXBUF, Location::SSBUF>();
+        Location::L0A, Location::L0B, Location::L0ScaleA, Location::L0ScaleB,
+        Location::L0C, Location::BIAS, Location::FIXBUF, Location::SSBUF>();
 };
 
 template <typename T>
@@ -128,11 +130,13 @@ struct locationAttr {
     using fbufAttr =        __fbuf__    T*;
     using ssbufAttr =       __ssbuf__   T*;
     using biasbufAttr =     __biasbuf__ T*;
+    using noneAttr =                    T*;
 
     using type = Std::tuple<gmAttr, cbufAttr, caAttr, cbAttr, ccAttr, ubufAttr, fbufAttr, ssbufAttr, biasbufAttr>;
 
     using locationMap = TupleMap<Std::tuple<Location::GM, gmAttr>, Std::tuple<Location::L1, cbufAttr>, Std::tuple<Location::L0A, caAttr>,
-    Std::tuple<Location::L0B, cbAttr>, Std::tuple<Location::L0C, ccAttr>, Std::tuple<Location::UB, ubufAttr>, 
+    Std::tuple<Location::L0B, cbAttr>, Std::tuple<Location::L0ScaleA, noneAttr>,
+    Std::tuple<Location::L0ScaleB, noneAttr>, Std::tuple<Location::L0C, ccAttr>, Std::tuple<Location::UB, ubufAttr>, 
     Std::tuple<Location::BIAS, biasbufAttr>, Std::tuple<Location::FIXBUF, fbufAttr>>;
 };
 
@@ -160,6 +164,11 @@ struct CheckAllSame<A> { static constexpr bool value = false; };
 
 template <typename A, typename... BList>
 constexpr bool IsOneOfAttrV = CheckAllSame<A, BList...>::value;
+
+template <typename DataType>
+inline constexpr bool IsDataType = IsOneOfAttrV<Std::remove_cvref_t<DataType>, hifloat8_t, bfloat16_t, fp4x2_e1m2_t, fp4x2_e2m1_t, 
+                                                fp8_e5m2_t, fp8_e4m3fn_t, fp8_e8m0_t> || Std::is_integral_v<Std::remove_cvref_t<DataType>> 
+                                                || Std::is_floating_point_v<Std::remove_cvref_t<DataType>>;
 
 template <typename DataType>
 inline constexpr bool IsB4Type = IsOneOfAttrV<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t>;

@@ -47,6 +47,8 @@ using CopyDispatchSet = TupleMap<
     Std::tuple<Std::tuple<Location::UB, Location::L1>, CopyAtom<CopyL12UB>>,
     Std::tuple<Std::tuple<Location::L0A, Location::L1>, CopyAtom<CopyL12L0A>>,
     Std::tuple<Std::tuple<Location::L0B, Location::L1>, CopyAtom<CopyL12L0B>>,
+    Std::tuple<Std::tuple<Location::L0ScaleA, Location::L1>, CopyAtom<CopyL12L0ScaleA>>,
+    Std::tuple<Std::tuple<Location::L0ScaleB, Location::L1>, CopyAtom<CopyL12L0ScaleB>>,
     Std::tuple<Std::tuple<Location::BIAS, Location::L1>, CopyAtom<CopyL12BT>>,
     Std::tuple<Std::tuple<Location::FIXBUF, Location::L1>, CopyAtom<CopyL12FB>>,
     Std::tuple<Std::tuple<Location::GM, Location::L0C>, CopyAtom<CopyL0C2GM>>,
@@ -60,7 +62,7 @@ Copy(const T& dst, const U& src, const Params& ...params)
     using DstLocation = GetMemLocation<T>;
     using SrcLocation = GetMemLocation<U>;
     using CopyAtomType = typename CopyDispatchSet::template Get<Std::tuple<DstLocation, SrcLocation>>;
-    static_assert(!Std::is_same_v<CopyAtomType, EmptyValue>, "Unsupported Copy dst/src location combination.");
+    static_assert(!Std::is_same_v<CopyAtomType, Std::ignore_t>, "Unsupported Copy dst/src location combination.");
     CopyAtomType{}.Call(dst, src, params...);
 }
 
