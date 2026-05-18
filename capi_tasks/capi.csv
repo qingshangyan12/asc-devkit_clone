@@ -1,0 +1,112 @@
+接口名称,芯片
+asc_copy_l12gm,A3
+asc_copy_l12l0c,A3
+asc_copy_l0c2l1,A3
+asc_copy_l12l0a,A5
+asc_copy_l12l0b,A5
+asc_copy_l12l0b_trans,A5
+asc_copy_l12l0b_trans,A5
+asc_copy_gm2l1,A5
+asc_copy_gm2l1,A5
+asc_copy_l12fb_v2,A5
+asc_copy_l0c2l1,A5
+asc_copy_l0c2gm,A5
+asc_copy_l0c2ub,A5
+asc_copy_ub2l1,A5
+asc_copy_ub2ub,A5
+asc_ndim_copy_gm2ub,A5
+asc_ndim_copy_gm2ub,A5
+asc_ndim_copy_gm2ub,A5
+asc_fill_l0a,A3
+asc_fill_l0b,A3
+asc_fill_l1,A3/A5
+asc_fill_l1,A5
+asc_copy_l12l0a_trans,A3
+asc_copy_gm2l0a,A3
+asc_copy_gm2l0b,A3
+asc_copy_gm2l1,A3
+asc_squeeze,A3
+asc_clear_nthbit,A5
+asc_set_nthbit,A5
+asc_transto5hd_b32,A5
+asc_transto5hd_b8,A5
+asc_bitsort,A5
+asc_mrgsort4,A5
+asc_transpose,A5
+"asc_get_l0c2gm_relu
+asc_get_l0c2gm_unitflag
+asc_get_l0c2gm_prequant",A3
+asc_get_smmu_tag_version,A3/A5
+asc_get_phy_stack_base,A3/A5
+asc_get_status,A3/A5
+asc_get_sys_virtual_base,A3/A5
+asc_set_l13d_fmatrix,A3/A5
+asc_set_l13d_fmatrix_b,A3/A5
+asc_set_l0c2gm_lrelu_alpha,A3/A5
+asc_set_copy_pad_val,A3/A5
+asc_datacache_preload,A5
+asc_dcci,A3/A5
+asc_dci,A5
+asc_sync_data_barrier,A5
+asc_sync_block_arrive,A5
+asc_get_arch_ver,A5
+asc_get_core_id,A5
+asc_get_ffts_base_addr,A5
+asc_get_store_atomic_config,A5
+asc_get_vf_len,A5
+asc_ndim_copy_dci,A5
+asc_set_atomic_add_int16,A5
+asc_set_atomic_add_int32,A5
+asc_set_atomic_add_int8,A5
+asc_set_ffts_base_addr,A5
+asc_sync_intra_arrive,A5
+asc_set_l13d_rpt_b,A5
+asc_set_l13d_padding,A5
+asc_set_l12l0_padding_val,A5
+asc_set_l0c2gm_quant_post,A5
+asc_set_l0c2gm_relu_alpha,A5
+asc_set_va_reg,A5
+"// plds, 将offset固定在内部填0，用户自增基地址
+void asc_loadalign(vector_bool& dst, __ubuf__ T* src_allign32b);   // Norm
+void asc_loadalign_upsample(vector_bool& dst, __ubuf__ T* src_allign16b);   // upsample
+void asc_loadalign_downsample(vector_bool& dst, __ubuf__ T* src_allign64b);   // downsample",A5
+"// plds, 通过int32_t 传入偏移，用户可以通过自增基地址  或者 偏移的方式使能
+void asc_loadalign(vector_bool& dst, __ubuf__ T* src,  int32_t offset);   // Norm
+void asc_loadalign_upsample(vector_bool& dst, __ubuf__ T* src,  int32_t offset);   // Norm
+void asc_loadalign_downsample(vector_bool& dst, __ubuf__ T* src,  int32_t offset);   // Norm",A5
+"// plds, 通过int32_t 传入偏移，同时增加PostMode可以设置成硬件自动Post Update，用户不用自增地址以及偏移
+void asc_loadalign_postupdate(vector_bool& dst, __ubuf__ T* src,  int32_t offset);   // Norm
+void asc_loadalign_upsample_postupdate(vector_bool& dst, __ubuf__ T* src,  int32_t offset);   // Norm
+void asc_loadalign_downsample_postupdate(vector_bool& dst, __ubuf__ T* src,  int32_t offset);   // Norm",A5
+"// 使用pld 通过地址寄存器传入偏移，用户可以通过自增基地址 或者 偏移的方式使能
+void asc_loadalign(vector_bool &dst,  __ubuf__ float *src, iter_reg offset)  // Norm
+void asc_loadalign_upsample(vector_bool &dst,  __ubuf__ float *src, iter_reg offset)
+void asc_loadalign_downsample(vector_bool &dst,  __ubuf__ float *src, iter_reg offset)",A5
+"// 补充AR ，增加不update,  输入参数不边，外部自己控制
+void asc_loadunalign(vector_float &dst, vector_load_unalign src0,  __ubuf__ float *src1)"
+"// 使用 psts, 通过地址寄存器传入偏移,  用户可以选择更新偏移或者更新dst地址
+
+void asc_storealign(__ubuf__ float *dst,  vector_bool src,  iter_reg  offset,   vector_bool mask)
+void asc_storealign_pack(__ubuf__ float *dst,  vector_bool src,  iter_reg  offset,   vector_bool mask)   "
+"// 使用 psts, 偏移固定传入0， 由用户自行更新dst地址
+
+void asc_storealign(__ubuf__ float *dst,  vector_bool src,   vector_bool mask)
+void asc_storealign_pack(__ubuf__ float *dst,  vector_bool src,   vector_bool mask)  
+"
+"// 使用 psts, 通过int32_t 传入偏移,  用户可以选择更新偏移或者更新dst地址
+
+void asc_storealign(__ubuf__ float *dst,  vector_bool src,  int32_t  offset,   vector_bool mask)
+void asc_storealign_pack(__ubuf__ float *dst,  vector_bool src,  int32_t  offset,   vector_bool mask)   "
+"// 使用 psts, 通过int32_t 传入偏移，同时增加PostMode可以设置成硬件自动Post Update
+
+
+void asc_storealign_postupdate(__ubuf__ float *dst,  vector_bool src,  int32_t  offset,   vector_bool mask)
+void asc_storealign_pack_postupdate(__ubuf__ float *dst,  vector_bool src,  int32_t  offset,   vector_bool mask)   "
+"// vsurR
+void asc_storeunalign_postupdate(__ubuf__ float *dst, vector_store_unalign &src0, vector_float src1)"
+"// vstar
+void asc_storeunalign_post(__ubuf__ float  *dst, vector_store_unalign src0)"
+"void asc_copy(vector_bool & dst, vector_uint16_t src, int16_t part)
+void asc_copy(vector_bool & dst, vector_uint32_t src, int16_t part) ",A5
+void asc_gather(vector_half& dst, __ubuf__ float *src,  vector_uint32_t index, vector_bool mask)
+void asc_duplicate_scalar(vector_float & dst, float src)  //VBR

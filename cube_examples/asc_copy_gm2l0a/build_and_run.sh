@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BUILD_DIR="${SCRIPT_DIR}/build"
+echo "=== asc_copy_gm2l0a 一键编译运行 ==="
+mkdir -p "${BUILD_DIR}"
+cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -S "${SCRIPT_DIR}" -B "${BUILD_DIR}"
+make -j -C "${BUILD_DIR}"
+echo ""
+"${BUILD_DIR}/cube_asc_copy_gm2l0a_example"

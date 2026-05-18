@@ -1,0 +1,17 @@
+# Build output
+build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+autogen/
+
+# Verification output
+*.csv
+
+# Simulator artifacts
+*.dump
+*.toml
+core*
+stars*
+profile*

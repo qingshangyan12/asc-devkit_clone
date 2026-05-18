@@ -15,3 +15,10 @@ build_device/
 *.o
 *.log
 
+# Simulator artifacts
+*.dump
+*.toml
+core*
+stars*
+profile*
+
