@@ -17,7 +17,7 @@
 
 ## 算子描述
 - 算子功能：  
-  通过调用连续连续非对齐搬运接口，实现1024个float数的搬运，在搬运过程中涉及到两点优化，
+  通过调用连续非对齐搬运接口，实现1024个float数的搬运，在搬运过程中涉及到两点优化，
   1. 将LoadUnAlignPre提到循环外侧
   2. 将StoreUnAlignPost提到循环外侧
 - 算子规格：
@@ -33,7 +33,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">optimize_vf_continious_align_kernel</td></tr>
   </table>
 - 算子实现：  
-  通过调用连续连续非对齐搬运接口，实现1024个float数的搬运，在搬运过程中涉及到两点优化，
+  通过调用连续非对齐搬运接口，实现1024个float数的搬运，在搬运过程中涉及到两点优化，
   1. 将LoadUnAlignPre提到循环外侧
   2. 将StoreUnAlignPost提到循环外侧
   
