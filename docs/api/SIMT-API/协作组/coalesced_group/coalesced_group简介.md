@@ -5,12 +5,6 @@
 > [!CAUTION]注意 
 > 使用coalesced_group时需关注SIMT架构不支持独立线程调度。
 
-## 需要包含的头文件
-
-```c++
-#include <simt_api/cooperative_groups.h>
-```
-
 ## Public成员函数
 
 ```c++
