@@ -26,14 +26,14 @@
 namespace AscendC {
 namespace Te {
 
-template <typename PtrPattern, typename Iterator>
-__aicore__ inline constexpr auto MakeMemPtr(Iterator iter);
+// template <typename PtrPattern, typename Iterator>
+// __aicore__ inline constexpr auto MakeMemPtr(Iterator iter);
 
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeMemPtr(Iterator iter);
+// template <typename Iterator>
+// __aicore__ inline constexpr auto MakeMemPtr(Iterator iter);
 
-template <typename PtrPattern, typename DataType, typename Addrss>
-__aicore__ inline constexpr auto MakeMemPtr(Addrss addr);
+// template <typename PtrPattern, typename DataType, typename Addrss>
+// __aicore__ inline constexpr auto MakeMemPtr(Addrss addr);
 
 } // namespace Te
 } // namespace AscendC
