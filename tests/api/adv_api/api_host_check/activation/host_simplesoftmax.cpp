@@ -11,14 +11,20 @@
 
 __aicore__ void TestSimpleSoftMax0() {
     AscendC::LocalTensor<half> dstTensor;
+    AscendC::LocalTensor<half> inSumTensor;
+    AscendC::LocalTensor<half> inMaxTensor;
     AscendC::LocalTensor<half> srcTensor;
+    AscendC::SoftMaxTiling tiling;
     AscendC::SimpleSoftMax<half>(dstTensor, inSumTensor, inMaxTensor, srcTensor, tiling);
 }
 
 __aicore__ void TestSimpleSoftMax1() {
     AscendC::LocalTensor<half> dstTensor;
+    AscendC::LocalTensor<half> inSumTensor;
+    AscendC::LocalTensor<half> inMaxTensor;
     AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    AscendC::SoftMaxTiling tiling;
     AscendC::SimpleSoftMax<half>(dstTensor, inSumTensor, inMaxTensor, srcTensor, sharedTmpBuffer, tiling);
 }
 

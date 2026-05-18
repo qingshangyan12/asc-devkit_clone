@@ -10,47 +10,47 @@
 #include "activation/gelu.h"
 
 __aicore__ void TestGelu0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<half> dstLocal;
+    AscendC::LocalTensor<half> srcLocal;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    uint32_t calCount = 0;
+    uint32_t dataSize = 0;
     AscendC::Gelu<half>(dstLocal, srcLocal, sharedTmpBuffer, dataSize);
 }
 
 __aicore__ void TestGelu1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    uint32_t calCount = 0;
+    AscendC::LocalTensor<half> dstLocal;
+    AscendC::LocalTensor<half> srcLocal;
+    uint32_t dataSize = 0;
     AscendC::Gelu<half>(dstLocal, srcLocal, dataSize);
 }
 
 __aicore__ void TestFasterGelu2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<half> dstLocal;
+    AscendC::LocalTensor<half> srcLocal;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    uint32_t calCount = 0;
+    uint32_t dataSize = 0;
     AscendC::FasterGelu<half>(dstLocal, srcLocal, sharedTmpBuffer, dataSize);
 }
 
 __aicore__ void TestFasterGelu3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    uint32_t calCount = 0;
+    AscendC::LocalTensor<half> dstLocal;
+    AscendC::LocalTensor<half> srcLocal;
+    uint32_t dataSize = 0;
     AscendC::FasterGelu<half>(dstLocal, srcLocal, dataSize);
 }
 
 __aicore__ void TestFasterGeluV24() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<half> dstLocal;
+    AscendC::LocalTensor<half> srcLocal;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    uint32_t calCount = 0;
+    uint32_t dataSize = 0;
     AscendC::FasterGeluV2<half>(dstLocal, srcLocal, sharedTmpBuffer, dataSize);
 }
 
 __aicore__ void TestFasterGeluV25() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    uint32_t calCount = 0;
+    AscendC::LocalTensor<half> dstLocal;
+    AscendC::LocalTensor<half> srcLocal;
+    uint32_t dataSize = 0;
     AscendC::FasterGeluV2<half>(dstLocal, srcLocal, dataSize);
 }
 
