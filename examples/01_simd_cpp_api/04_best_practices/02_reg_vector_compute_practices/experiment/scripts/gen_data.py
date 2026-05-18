@@ -26,7 +26,7 @@ def gen_golden_data_sign():
     golden.tofile("./output/golden.bin")
 
 def gen_golden_data_atanh():
-    input_x = np.random.uniform(-10, 10, [8, 8192]).astype(np.float32)
+    input_x = np.random.uniform(-0.99, -0.001, [8, 8192]).astype(np.float32)
     golden = np.arctanh(input_x)
 
     os.makedirs("input", exist_ok=True)

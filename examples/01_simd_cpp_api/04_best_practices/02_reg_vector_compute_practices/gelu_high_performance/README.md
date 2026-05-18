@@ -205,13 +205,8 @@ Adds:                 |<--->|
 Muls:                       |<--->|
 Adds:                       |<--->|
 ```
-因此在VF场景下，更多采用IPC(Instructions Per Cycle，每cycle指令发射数量)来衡量性能。IPC越高越好，理论极限接近2。
 
-
-**IPC优化建议**：
-- 在VF编程场景下，IPC是衡量vector指令发射效率的重要指标
-- 理想IPC极限接近2.0，大多数情况下达成1.4~1.5则表示取得较优性能
-- 当一个VF函数loop循环内包含的指令依赖链过长时，会导致执行队列中存放的循环次数太少，从而导致每cycle可以双发的指令数变少，导致性能下降。此时可以将过长的loop循环切分成多个，比如可以选择reduce结束，或者长latency指令的结束点（比如div、exp），将一个loop循环拆分成2~3个loop循环。
+- 当一个VF函数loop循环内包含的指令依赖链过长时，可能导致每cycle可以双发的指令数变少，导致性能下降。此时可以将过长的loop循环切分成多个，比如可以选择reduce结束，或者长latency指令的结束点（比如div、exp），将一个loop循环拆分成2~3个loop循环。
 
 ## 编译运行
 
@@ -239,18 +234,11 @@ Adds:                       |<--->|
 
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510;make -j;                      # 编译工程，默认npu模式
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510;make -j;                      # 编译工程
   python3 ../scripts/gen_data.py                                            # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
-
-  示例如：
-  ```bash
-  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510;make -j; # NPU仿真模式
-  ```
-
-  > **注意：** 切换编译模式或Case前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
 
