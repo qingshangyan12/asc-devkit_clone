@@ -205,7 +205,8 @@ __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& 
 }
 
 // L0C->L1/UB deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S,
+    typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
 {
@@ -258,7 +259,8 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>&
 }
 
 // L0C->GM deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S,
+    typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type>
 __aicore__ inline void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
     const LocalTensor<uint64_t> &cbufWorkspace, const FixpipeParamsArch3510<config.format> &intriParams)
 {
