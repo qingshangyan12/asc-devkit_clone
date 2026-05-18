@@ -136,7 +136,7 @@ private:
         fixpipeParams.srcNdStride = 0;
         fixpipeParams.dstNdStride = 0;
 
-        Fixpipe(cGM, c1Local, fixpipeParams);
+        Fixpipe<TensorTrait<int32_t>, TensorTrait<int32_t>>(cGM, c1Local, fixpipeParams);
 
         outQueueCO1.FreeTensor(c1Local);
     }
