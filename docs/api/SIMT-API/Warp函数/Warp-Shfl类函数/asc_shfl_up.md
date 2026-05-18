@@ -110,11 +110,11 @@ Warp内指定线程的var值。
          int32_t laneId = idx % 32;
          int32_t value = laneId;
 
-         value += asc_shfl_up(value, 16, 31); // 16
-         value += asc_shfl_up(value, 8, 31);  // 8
-         value += asc_shfl_up(value, 4, 31);  // 4
-         value += asc_shfl_up(value, 2, 31);  // 2
-         value += asc_shfl_up(value, 1, 31);  // 1
+         value += asc_shfl_up(value, 16, 32);
+         value += asc_shfl_up(value, 8, 32);
+         value += asc_shfl_up(value, 4, 32);
+         value += asc_shfl_up(value, 2, 32);
+         value += asc_shfl_up(value, 1, 32);
 
          dst[idx] = value;
     }
@@ -143,11 +143,11 @@ Warp内指定线程的var值。
          int32_t laneId = idx % 32;
          int32_t value = laneId;
 
-         value += asc_shfl_up(value, 16, 31); // 16
-         value += asc_shfl_up(value, 8, 31);  // 8
-         value += asc_shfl_up(value, 4, 31);  // 4
-         value += asc_shfl_up(value, 2, 31);  // 2
-         value += asc_shfl_up(value, 1, 31);  // 1
+         value += asc_shfl_up(value, 16, 32);
+         value += asc_shfl_up(value, 8, 32);
+         value += asc_shfl_up(value, 4, 32);
+         value += asc_shfl_up(value, 2, 32);
+         value += asc_shfl_up(value, 1, 32);
 
          dst[idx] = value;
     }
