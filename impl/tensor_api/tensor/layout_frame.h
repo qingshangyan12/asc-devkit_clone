@@ -122,13 +122,6 @@ __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) 
     return LayoutMaker::template Make<Trait>(args...);
 }
 
-// template <typename LayoutPattern, typename IntTypeOrDataType,
-//     Std::enable_if_t<!IsFrameLayoutTraitV<IntTypeOrDataType>, int> = 0, typename... Args>
-// __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
-//     using TraitType = FrameLayoutTraitT<IntTypeOrDataType>;
-//     return MakeFrameLayout<LayoutPattern, TraitType>(args...);
-// }
-
 template <typename LayoutPattern, size_t C0Element, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
     return MakeFrameLayout<LayoutPattern, Std::Int<C0Element>>(args...);
