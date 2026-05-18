@@ -20,15 +20,15 @@
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 namespace __asc_aicore {
-inline __aicore__ void __assert_fail(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
-    const __gm__ char* __function) {
+static __attribute__((noinline)) __aicore__ void __assert_fail(const __gm__ char* __assertion,
+    const __gm__ char* __file, unsigned int __line, const __gm__ char* __function) {
     printf_impl_assert("[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", __file, __line, __function, __assertion);
     trap();
 }
 
 template <typename... Args>
-inline __aicore__ void __assert_fail_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
-    const __gm__ char* __function, const __gm__ char* fmt, Args&&... args) {
+static __attribute__((noinline)) __aicore__ void __assert_fail_msg(const __gm__ char* __assertion, const __gm__ 
+    char* __file, unsigned int __line, const __gm__ char* __function, const __gm__ char* fmt, Args&&... args) {
     printf_impl_assert_msg(__assertion, __file, __line, __function, fmt, args...);
     trap();
 }
