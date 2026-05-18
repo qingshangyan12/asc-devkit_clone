@@ -17,7 +17,7 @@ __aicore__ void TestFma0() {
     AscendC::LocalTensor<float> src1Tensor;
     AscendC::LocalTensor<float> src2Tensor;
     uint32_t calCount = 0;
-    AscendC::Fma<float>(dstTensor, src0Tensor, src1Tensor, src2Tensor, sharedTmpBuffer, calCount);
+    AscendC::Fma<AscendC::DEFAULT_FMA_CONFIG, float>(dstTensor, src0Tensor, src1Tensor, src2Tensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestFma1() {
@@ -27,6 +27,6 @@ __aicore__ void TestFma1() {
     AscendC::LocalTensor<float> src1Tensor;
     AscendC::LocalTensor<float> src2Tensor;
     uint32_t calCount = 0;
-    AscendC::Fma<float>(dstTensor, src0Tensor, src1Tensor, src2Tensor, calCount);
+    AscendC::Fma<AscendC::DEFAULT_FMA_CONFIG, float>(dstTensor, src0Tensor, src1Tensor, src2Tensor, calCount);
 }
 
