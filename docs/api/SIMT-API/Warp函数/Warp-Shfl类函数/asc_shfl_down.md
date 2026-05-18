@@ -91,7 +91,7 @@ Warp内指定线程的var值。
 -   SIMT编程场景：
 
     ```
-    __global___ __launch_bounds__(1024) void KernelShflDown(int32_t* dst)
+    __global__ __launch_bounds__(1024) void KernelShflDown(int32_t* dst)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         int32_t laneId = idx % 32;
@@ -108,11 +108,11 @@ Warp内指定线程的var值。
         int32_t laneId = idx % 32;
         int32_t value = laneId;
 
-        value += asc_shfl_down(value, 1, 31); // 1
-        value += asc_shfl_down(value, 2, 31); // 2
-        value += asc_shfl_down(value, 4, 31); // 4
-        value += asc_shfl_down(value, 8, 31); // 8
-        value += asc_shfl_down(value, 16, 31); // 16
+        value += asc_shfl_down(value, 16, 32);
+        value += asc_shfl_down(value, 8, 32);
+        value += asc_shfl_down(value, 4, 32);
+        value += asc_shfl_down(value, 2, 32);
+        value += asc_shfl_down(value, 1, 32);
 
         dst[idx] = value;
     }
@@ -139,11 +139,11 @@ Warp内指定线程的var值。
         int32_t laneId = idx % 32;
         int32_t value = laneId;
 
-        value += asc_shfl_down(value, 1, 31); // 1
-        value += asc_shfl_down(value, 2, 31); // 2
-        value += asc_shfl_down(value, 4, 31); // 4
-        value += asc_shfl_down(value, 8, 31); // 8
-        value += asc_shfl_down(value, 16, 31); // 16
+        value += asc_shfl_down(value, 16, 32);
+        value += asc_shfl_down(value, 8, 32);
+        value += asc_shfl_down(value, 4, 32);
+        value += asc_shfl_down(value, 2, 32);
+        value += asc_shfl_down(value, 1, 32);
 
         dst[idx] = value;
     }
