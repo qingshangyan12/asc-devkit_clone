@@ -32,6 +32,11 @@ SAMPLES=(
     "asc_shiftleft"
     "asc_ge"
     "asc_mul_scalar"
+    "asc_eq"
+    "asc_lt"
+    "asc_gt"
+    "asc_not"
+    "asc_madd"
 )
 
 PASS=0
