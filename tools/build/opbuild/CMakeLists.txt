@@ -43,6 +43,7 @@ target_link_libraries(op_build PRIVATE
   $<BUILD_INTERFACE:mmpa_headers>
   metadef_headers
   metadef
+  register
   opp_registry
   dl
   unified_dlog
