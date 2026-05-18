@@ -185,7 +185,7 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> 
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 // L0C->L1/UB
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const FixpipeParamsArch3510<config.format>& intriParams)
 {
@@ -205,7 +205,7 @@ __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& 
 }
 
 // L0C->L1/UB deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
 {
@@ -226,7 +226,7 @@ __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& 
 }
 
 // L0C->GM
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const FixpipeParamsArch3510<config.format>& intriParams)
 {
@@ -258,7 +258,7 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>&
 }
 
 // L0C->GM deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
     const LocalTensor<uint64_t> &cbufWorkspace, const FixpipeParamsArch3510<config.format> &intriParams)
 {
