@@ -57,7 +57,6 @@ SIMD架构不支持从全局内存GM直接加载数据到Reg矢量计算寄存�
 
 SIMD Reg矢量计算编程架构中，向量计算执行单元从寄存器读取数据，完成计算后将结果写回寄存器；向量搬运单元负责在Registers和Local Memory之间搬运数据。
 
-Reg矢量计算和Reg矢量搬运执行单元都属于Vector流水，但属于不同硬件执行单元，可以并行推进。并行带来性能空间，也带来顺序约束：当同一段UB数据被不同寄存器读写复用时，需要显式同步，避免写后读或写后写竞争。同步规则见[流水线同步控制](#section1633824511379)。
 
 **图 2**  SIMD Reg矢量计算编程架构<a name="fig116711840123520"></a>  
 ![](../../../../figures/SIMD-Reg矢量计算编程架构.png "SIMD-Reg矢量计算编程架构")
@@ -114,7 +113,7 @@ __aicore__ inline void Compute()
 
 ## Reg矢量计算寄存器<a name="section1910719438134"></a>
 
-Reg矢量计算API操作的基础对象是寄存器。它们在C++代码中表现为变量，编译后映射到硬件寄存器或相关控制资源。具体API请参考[Reg矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Reg矢量计算.md)。
+Reg矢量计算API操作的基础对象是寄存器。它们在C++代码中表现为变量，编译后映射到硬件寄存器或相关控制资源。具体API请参考[Reg矢量计算](https://gitcode.com/horming/asc-devkit/tree/master/docs/api/SIMD-API/%E5%9F%BA%E7%A1%80API/Reg%E7%9F%A2%E9%87%8F%E8%AE%A1%E7%AE%97。
 
 | 类型 | 作用 |
 | --- | --- |
