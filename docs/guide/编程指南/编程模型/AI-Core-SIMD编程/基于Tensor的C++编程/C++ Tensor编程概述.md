@@ -1,3 +1,4 @@
+# C++ Tensor编程概述
 ## 引言
 
 Ascend C C++Tensor编程是面向LocalTensor与GlobalTensor的编程范式，核心设计理念是将内存地址抽象为Tensor对象，开发者通过Tensor进行数据搬运、计算操作、同步管理。相比C指针编程的直接地址操作，Tensor编程隐藏内存地址细节，提供更高级的抽象层次，降低开发复杂度。
