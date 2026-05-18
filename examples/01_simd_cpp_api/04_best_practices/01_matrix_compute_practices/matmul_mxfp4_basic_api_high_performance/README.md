@@ -36,7 +36,7 @@ $$
 
 在MxMatmul中，K 方向每 32 个元素共享一个 scale。也就是说，scale 的数量远少于矩阵元素数量，但它会沿 K 方向广播到对应的一组 MxFP4 数据上，如图所示：
 
-  <img src="figure/MxMatmul.png"  width="80%">
+  <img src="figures/MxMatmul.png"  width="80%">
 
 ## 样例规格
 
@@ -63,11 +63,11 @@ $$
 
 - 四路输入的数据排布格式如下图所示：
 
-  <img src="figure/formatOfMx.png">
+  <img src="figures/formatOfMx.png">
 
 - 四路输入的搬运与计算如下图所示：
 
-  <img src="figure/InputOfMxMatmul.png">
+  <img src="figures/InputOfMxMatmul.png">
 
 ### 关键参数
 

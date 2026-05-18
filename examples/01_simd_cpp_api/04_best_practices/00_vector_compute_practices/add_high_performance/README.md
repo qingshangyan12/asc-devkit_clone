@@ -202,7 +202,7 @@ if (blockIdxM < remainderM) {
 
 - 本样例选择 `M` 方向切48份（`splitM=48, splitN=1`），而不是 `M` 切8、`N` 切6，核心目的是保持每个核处理的数据在GM上连续，从而在分块循环中用单条 `DataCopy` 搬运 `dataCopyLen`
 
-  <img src="figure/SplitCoreM.png" width="50%">
+  <img src="figures/SplitCoreM.png" width="50%">
 
 **性能优化建议**：
 > 💡 **充分利用多核并行，采用均匀切分策略**
@@ -331,7 +331,7 @@ UB内存分配（双缓冲）：
 - **Ping-Pong机制**：
   - Ping缓冲区进行计算时，Pong缓冲区进行数据搬运
   - 交替执行，实现计算与搬运的流水线并行，如下图所示  
-    <img src="figure/DoubleBuffer.png" width="50%">
+    <img src="figures/DoubleBuffer.png" width="50%">
 
 **性能优化建议**：
 > 💡 **使用双缓冲实现搬运与计算并行**
@@ -431,12 +431,12 @@ static constexpr uint32_t zAddrPongBC = zAddrPingBC + BANK_CONFLICT_DATA_COPY_LE
 针对Atlas A2/A3 系列产品，UB的大小为192KB，包含16个Bank Group，每个Bank Group包含3个Bank，每个Bank大小为4KB，由128行组成，每行长度为32B。
 
 未优化前的UB Bank内存布局（即case5）
-<img src="figure/UBBankConflict.png" width="100%">
+<img src="figures/UBBankConflict.png" width="100%">
 
 可以看到这样同时存在一个bank内的读写冲突，一个bankgroup内的读读冲突以及写写冲突。
 
 优化后的UB Bank内存布局（case6）
-<img src="figure/UBBankConflictResolution.png" width="100%">
+<img src="figures/UBBankConflictResolution.png" width="100%">
 
 由于vec指令一拍读取256B的数据（即同时读取8个block的数据），如上图xping、yping的起始地址正好错开了256B，有效消解了ub bank冲突。
 

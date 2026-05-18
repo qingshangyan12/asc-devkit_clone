@@ -545,7 +545,7 @@
 矩阵乘整体流程图如下所示：
 
 <p align="center">
-  <img src="img/cube.png" width="800">
+  <img src="figures/cube.png" width="800">
 </p>
 
 <p align="center">
@@ -560,7 +560,7 @@ B4 / B8 / B16 / B32输入，A矩阵从GM(ND)->L1(Nz)的搬运逻辑相似，按�
 ##### 2.1.1. A矩阵GM上输入为[m, k]
 A矩阵GM输入不转置([m, k])时，half输入数据排布转换如下图所示：
 <p align="center">
-  <img src="img/GM_L1_FP16_A_input_m_k_to_Nz.png" width="800">
+  <img src="figures/GM_L1_FP16_A_input_m_k_to_Nz.png" width="800">
 </p>
 
 <p align="center">
@@ -588,7 +588,7 @@ A矩阵GM输入不转置([m, k])时，half输入数据排布转换如下图所�
 
 A矩阵GM输入转置([k, m])时，float输入数据，L1上排布格式为Nz排布转换如下图所示:
 <p align="center">
-  <img src="img/GM_L1_FP32_A_transInput_k_m_to_Nz.png" width="800">
+  <img src="figures/GM_L1_FP32_A_transInput_k_m_to_Nz.png" width="800">
 </p>
 
 <p align="center">
@@ -613,7 +613,7 @@ A矩阵GM输入转置([k, m])时，float输入数据，L1上排布格式为Nz排
 
 A矩阵GM输入转置([k, m])时，float输入数据，L1上排布格式为Zz排布转换如下图所示:
 <p align="center">
-  <img src="img/GM_L1_FP32_A_inputTrans_k_m_to_Zz.png" width="800">
+  <img src="figures/GM_L1_FP32_A_inputTrans_k_m_to_Zz.png" width="800">
 </p>
 
 <p align="center">
@@ -640,7 +640,7 @@ B4 / B8 / B16 / B32输入，B矩阵从GM(ND)->L1(Nz)的搬运逻辑相似，按�
 
 B矩阵GM输入不转置([k, n])时，float输入数据，L1上排布格式为Nz排布转换如下图所示:
 <p align="center">
-  <img src="img/GM_L1_FP32_B_input_k_n_to_Nz.png" width="800">
+  <img src="figures/GM_L1_FP32_B_input_k_n_to_Nz.png" width="800">
 </p>
 
 <p align="center">
@@ -663,7 +663,7 @@ B矩阵GM输入不转置([k, n])时，float输入数据，L1上排布格式为Nz
 
 B矩阵GM输入不转置([k, n])时，float输入数据，L1上排布格式为Zz排布转换如下图所示:
 <p align="center">
-  <img src="img/GM_L1_FP32_B_input_k_n_to_Zz.png" width="800">
+  <img src="figures/GM_L1_FP32_B_input_k_n_to_Zz.png" width="800">
 </p>
 
 <p align="center">
@@ -686,7 +686,7 @@ B矩阵GM输入不转置([k, n])时，float输入数据，L1上排布格式为Zz
 ##### 2.2.2. B矩阵GM上输入为[n, k]
 B矩阵GM输入转置([n, k])时，half输入数据，L1排布转换如下图所示
 <p align="center">
-  <img src="img/GM_L1_FP16_B_transInput_n_k_to_Nz.png" width="800">
+  <img src="figures/GM_L1_FP16_B_transInput_n_k_to_Nz.png" width="800">
 </p>
 
 <p align="center">
@@ -718,7 +718,7 @@ L1 -> L0A不转置时仅大分形排布格式变换。该场景下，B4 / B8 / B
 
 调用`Load2D`接口图示如下：
 <p align="center">
-  <img src="img/L1_L0A_FP16_A_Load2D.png" width="800">
+  <img src="figures/L1_L0A_FP16_A_Load2D.png" width="800">
 </p>
 
 <p align="center">
@@ -747,7 +747,7 @@ L1 -> L0A不转置时仅大分形排布格式变换。该场景下，B4 / B8 / B
 
 调用`Load3DV2`接口如下所示：
 <p align="center">
-  <img src="img/L1_L0A_F16_A_Load3DV2.png" width="5000">
+  <img src="figures/L1_L0A_F16_A_Load3DV2.png" width="5000">
 </p>
 
 <p align="center">
@@ -794,7 +794,7 @@ L1->L0A时大分形排布格式变换，且小分形需要转置。该场景下�
 
 调用`LoadDataWithTranspose`接口如下所示：
 <p align="center">
-  <img src="img/L1_L0A_B8_A_trans_LoadDataWithTranspose.png">
+  <img src="figures/L1_L0A_B8_A_trans_LoadDataWithTranspose.png">
 </p>
 
 <p align="center">
@@ -835,7 +835,7 @@ L1->L0A时大分形排布格式变换，且小分形需要转置。该场景下�
 
 调用`Load2D`接口如下所示：
 <p align="center">
-  <img src="img/L1_L0A_F16_A_trans_Load2D.png">
+  <img src="figures/L1_L0A_F16_A_trans_Load2D.png">
 </p>
 
 <p align="center">
@@ -890,7 +890,7 @@ L1->L0A时大分形排布格式变换，且小分形需要转置。该场景下�
 `Load3D`的本质是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置，配置loadDataParams.enTranspose参数为true，在搬运过程中完成小分形转置。根据`Load3Dv2`指令完成img2col的过程，可知 img2col后A矩阵高度为ho * wo,根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为 CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ho * wo,ci * kh * kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。如图所示：
 
 <p align="center">
-  <img src="img/L1_L0A_FP16_A_trans_Load3DV2.png">
+  <img src="figures/L1_L0A_FP16_A_trans_Load3DV2.png">
 </p>
 
 <p align="center">
@@ -932,7 +932,7 @@ float的分形为[16, 8]，需要将2个[16, 8]的分形拼成1个方型进行�
 
 
 <p align="center">
-  <img src="img/A矩阵L1上为Nz和Zz的区别.png">
+  <img src="figures/A矩阵L1上为Nz和Zz的区别.png">
 </p>
 
 <p align="center">
@@ -944,7 +944,7 @@ float的分形为[16, 8]，需要将2个[16, 8]的分形拼成1个方型进行�
 如图14所示，调用`Load3DV2`指令时，在写入L0A之前会先分别将A矩阵高度和宽度轴向16、8对齐，在转置搬运过程中`Load3DV2`指令会自动填充虚拟数据保证按照方型转置，在写入L0A时虚拟数据的空间会被跳过，如图白色部分，保证最终写入到L0A的A矩阵是Zz排布。
 
 <p align="center">
-  <img src="img/L1_L0A_F32_A_trans_Load3DV2.png">
+  <img src="figures/L1_L0A_F32_A_trans_Load3DV2.png">
 </p>
 
 <p align="center">
@@ -987,7 +987,7 @@ float的分形为[16, 8]，需要将2个[16, 8]的分形拼成1个方型进行�
 如图15所示，当L1上的A矩阵满足Zz排布才能满足`LoadDataWithTranspose`指令要求两个连续分形合并为方块矩阵的要求。
 
 <p align="center">
-  <img src="img/L1_L0A_F32_A_trans_LoadDataWithTranspose.png">
+  <img src="figures/L1_L0A_F32_A_trans_LoadDataWithTranspose.png">
 </p>
 
 <p align="center">
@@ -1023,7 +1023,7 @@ B4 / B8 / B16 / B32这4种输入数据类型在B矩阵从L1搬运到L0B时，转
 L1 -> L0B不转置时仅大分形排布格式变换。该场景下，B4 / B8 / B16 / B32这4种数据类型均可使用`Load2D`接口实现数据搬运，参数配置基本相同，仅fractalShape有区别，可参考[表5](#表5)。以half为例展示图示。
 
 <p align="center">
-  <img src="img/L1_L0B_F16_B_Load2D.png">
+  <img src="figures/L1_L0B_F16_B_Load2D.png">
 </p>
 
 <p align="center">
@@ -1058,7 +1058,7 @@ L1->L0B转置时大分形排布格式变换，且小分形需要转置。该场�
 输入数据类型为int4_t/int8_t，且L1->L0B需要转置时，可使用的接口都是`LoadDataWithTranspose`，参数配置基本相似，仅fractalShape、fractalNum、fractalSize不同。可参考[表5](#表5)，本节以int8_t为例进行图示介绍
 
 <p align="center">
-  <img src="img/L1_L0B_B8_B_trans_LoadDataWithTranspose.png" width="800">
+  <img src="figures/L1_L0B_B8_B_trans_LoadDataWithTranspose.png" width="800">
 </p>
 
 <p align="center">
@@ -1087,7 +1087,7 @@ L1->L0B转置时大分形排布格式变换，且小分形需要转置。该场�
 
 **(1) 调用`Load2D`**
 <p align="center">
-  <img src="img/L1_L0B_FP16_B_trans_Load2D.png" width="800">
+  <img src="figures/L1_L0B_FP16_B_trans_Load2D.png" width="800">
 </p>
 
 <p align="center">
@@ -1131,7 +1131,7 @@ L1->L0B转置时大分形排布格式变换，且小分形需要转置。该场�
 
 
 <p align="center">
-  <img src="img/L1_L0B_FP16_B_trans_Load3DV2.png">
+  <img src="figures/L1_L0B_FP16_B_trans_Load3DV2.png">
 </p>
 
 <p align="center">
@@ -1172,7 +1172,7 @@ L1->L0B转置时大分形排布格式变换，且小分形需要转置。该场�
 
 对齐要求方面，在L1上B矩阵的k轴向fS[0] * fractalNum对齐、n轴向fS[1]对齐；在L0B上B矩阵的k轴向fS[0] * fractalNum对齐、n轴向fS[1]对齐。
 <p align="center">
-  <img src="img/L1_L0B_FP32_B_trans_Load3DV2.png">
+  <img src="figures/L1_L0B_FP32_B_trans_Load3DV2.png">
 </p>
 
 <p align="center">
@@ -1205,7 +1205,7 @@ L1->L0B转置时大分形排布格式变换，且小分形需要转置。该场�
 如图21所示，当L1上的B矩阵满足Zz排布才能满足`LoadDataWithTranspose`指令要求两个连续分形合并为方块矩阵的要求。
 
 <p align="center">
-  <img src="img/L1_L0B_FP32_B_trans_LoadDataWithTranspose.png" width="800">
+  <img src="figures/L1_L0B_FP32_B_trans_LoadDataWithTranspose.png" width="800">
 </p>
 
 <p align="center">
@@ -1250,7 +1250,7 @@ L1->L0B转置时大分形排布格式变换，且小分形需要转置。该场�
 如图22右边子图所示，如果设置mmadParams.n = CeilAlign(n, fractalShape[0] * fractalNum) = 96,此时会读入全部分形，虽然矩阵计算结果中包含了无效数据参与计算的结果，但是在`Fixpipe`指令搬出数据时通过设置fixpipeParams.nSize = n来保证无效数据参与计算的结果不会被搬出。m轴参数配置同理。
 
 <p align="center">
-  <img src="img/B_B8_read_invalid_data.png" width="1200">
+  <img src="figures/B_B8_read_invalid_data.png" width="1200">
 </p>
 
 <p align="center">
@@ -1266,7 +1266,7 @@ L1->L0B转置时大分形排布格式变换，且小分形需要转置。该场�
 
 
 <p align="center">
-  <img src="img/Mmad_FP32_A_trans_kDirectionAlign.png" width="1000">
+  <img src="figures/Mmad_FP32_A_trans_kDirectionAlign.png" width="1000">
 </p>
 
 <p align="center">

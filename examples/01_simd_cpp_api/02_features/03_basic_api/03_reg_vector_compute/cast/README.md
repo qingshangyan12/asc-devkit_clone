@@ -56,7 +56,7 @@
   - 计算：调用Cast接口，输入输出位宽比为1:2，所以从xReg的2\*N位置读取数据，类型转换后依次写入至yReg
   - 搬出：调用StoreAlign接口，常规搬出
   - 调用实现：使用内核调用符<<<>>>调用核函数。  
-  <img src="figure/reg_cast_1.png">
+  <img src="figures/reg_cast_1.png">
 
 **场景2：数据类型位宽大转小**
 - 样例功能：将float类型的数据转换成int16_t类型的数据。
@@ -79,7 +79,7 @@
   - 计算：调用Cast接口，输入输出位宽比为2:1，所以从xReg依次读取数据，类型转换后依次写入至yReg的2\*N位置，同时2\*N+1位置置0
   - 搬出：调用StoreAlign接口，采用压缩模式，仅搬出2\*N位置的数据
   - 调用实现：使用内核调用符<<<>>>调用核函数。  
-  <img src="figure/reg_cast_2.png">
+  <img src="figures/reg_cast_2.png">
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。

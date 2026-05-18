@@ -134,7 +134,7 @@
 ### 1. Cube与Vector融合计算场景
 #### 1.1 整体逻辑
 <p align="center">
-  <img src="img/融合场景_示意图.png" width="100%">
+  <img src="figures/融合场景_示意图.png" width="100%">
    </p>
 <p align="center">
 图1：Cube与Vector场景融合计算场景，整体计算逻辑示意图
@@ -162,7 +162,7 @@
         AscendC::CrossCoreSetFlag<2, PIPE_MTE3>(SYNC_AIV_AIC_FLAG);
 
 <p align="center">
-  <img src="img/融合场景_精度转换阶段.png" width="100%">
+  <img src="figures/融合场景_精度转换阶段.png" width="100%">
    </p>
 <p align="center">
 图2：精度转换阶段，模式2示意图
@@ -190,7 +190,7 @@ $$
         AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);  
 
 <p align="center">
-  <img src="img/融合场景_分块矩阵乘与原子累加阶段.png" width="100%">
+  <img src="figures/融合场景_分块矩阵乘与原子累加阶段.png" width="100%">
    </p>
 <p align="center">
 图3：分块矩阵乘与原子累加阶段，模式0示意图
@@ -210,7 +210,7 @@ $$
         ...
 
 <p align="center">
-  <img src="img/融合场景_LeakyRelu运算与结果回写阶段.png" width="100%">
+  <img src="figures/融合场景_LeakyRelu运算与结果回写阶段.png" width="100%">
    </p>
 <p align="center">
 图4：LeakyRelu运算与结果回写阶段，模式2示意图
@@ -221,7 +221,7 @@ $$
 本样例设置NUM\_BLOCKS为8(8个AI Core)，每一个AI Core内AIC:AIV配比为2，即本样例总共起了8个AIC和16个AIV，AIV的BlockIdx范围为0\~15。
 如下图5所示，本样例中模式0和模式1计算逻辑几乎相同，区别仅在于参与同步的AIV数目：模式0时，全部的16个AIV参与同步；模式1时，仅有第二个AI Core中的2个AIV(BlockIdx=2和3)参与同步。因此，下一节将详细介绍模式0的整体逻辑，模式1就不再详细介绍。
 <p align="center">
-  <img src="img/纯aiv_模式1和模式0的区别.png" width="100%">
+  <img src="figures/纯aiv_模式1和模式0的区别.png" width="100%">
 </p>
 <p align="center">
 图5：纯AIV场景，模式0计算逻辑示意图
@@ -256,7 +256,7 @@ $$
             return;
         }
 <p align="center">
-  <img src="img/纯aiv_模式0示意图.png" width="100%">
+  <img src="figures/纯aiv_模式0示意图.png" width="100%">
 </p>
 <p align="center">
 图6：纯AIV场景，模式0计算逻辑示意图

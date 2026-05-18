@@ -52,7 +52,7 @@ Compare接口一般与Select接口配合使用，该样例仅演示Compare和Sel
   - 调用Select接口，传入上一步比较结果maskReg选择：若maskReg比特位为1，则对应位置选择xReg的元素，否则选择yReg的元素
   - float数据类型的MaskReg格式为每4bits保存一个mask，所以Compare从xReg、yReg依次读取数据，比较后依次写入至MaskReg的4 * N的bit位置；Select根据MaskReg的4 * N的bit决定从xReg还是yReg选择数据。
   - 调用实现：使用内核调用符<<<>>>调用核函数。  
-  <img src="figure/compare.png">
+  <img src="figures/compare.png">
 
 **场景2：Compares**  
 - 样例功能：  

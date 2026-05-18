@@ -370,7 +370,7 @@ L1 -> L0A不转置时数据搬运，不存在大分形和小分形排布格式�
 
 
 <p align="center">
-  <img src="img/B8_A_l1_l0A_Load2dv2.png">
+  <img src="figures/B8_A_l1_l0A_Load2dv2.png">
 </p>
 
 <p align="center">
@@ -410,7 +410,7 @@ B8输入数据类型分形为16 * 32，L1->L0转置时会按照方型将row方�
 
 
 <p align="center">
-  <img src="img/B8_A_l1_l0A_trans_load2dv2.png">
+  <img src="figures/B8_A_l1_l0A_trans_load2dv2.png">
 </p>
 
 <p align="center">
@@ -443,7 +443,7 @@ AscendC::LoadData(a2Local, a1Local, loadDataParams);
 for循环调用多次Load2DV2完成L1->L0A搬运+转置的图示如下：
 
 <p align="center">
-  <img src="img/B8_A_l1_l0A_trans_for_load2dv2.png">
+  <img src="figures/B8_A_l1_l0A_trans_for_load2dv2.png">
 </p>
 
 <p align="center">
@@ -480,7 +480,7 @@ B16输入数据类型分形为16 * 16，一个分形即一个方型，L1->L0转�
 
 
 <p align="center">
-  <img src="img/B16_A_l1_l0A_trans_load2dv2.png">
+  <img src="figures/B16_A_l1_l0A_trans_load2dv2.png">
 </p>
 
 <p align="center">
@@ -509,7 +509,7 @@ AscendC::LoadData(a2Local, a1Local, loadDataParams);
 B32输入数据类型分形为16 * 8，L1->L0转置时会按照方型将col方向的2个16 * 8的分形拼成1个16 * 16的方型进行转置。本样例以float数据类型为例，调用一次Load2DV2完成L1->L0A搬运+转置的图示如下:
 
 <p align="center">
-  <img src="img/B32_A_l1_l0A_trans_load2dv2.png">
+  <img src="figures/B32_A_l1_l0A_trans_load2dv2.png">
 </p>
 
 <p align="center">
@@ -542,7 +542,7 @@ L1 -> L0B不转置时数据搬运，仅存在大分形格式变化。该场景�
 
 
 <p align="center">
-  <img src="img/B32_B_l1_l0B_load2dv2.png">
+  <img src="figures/B32_B_l1_l0B_load2dv2.png">
 </p>
 
 <p align="center">
@@ -578,7 +578,7 @@ B8输入数据类型分形为16 * 32，L1->L0转置时会按照方型将row方�
 
 
 <p align="center">
-  <img src="img/B8_B_l1_l0B_trans_load2dv2.png">
+  <img src="figures/B8_B_l1_l0B_trans_load2dv2.png">
 </p>
 
 <p align="center">
@@ -608,7 +608,7 @@ B16输入数据类型分形为16*16，一个分形即一个方型，L1->L0转置
 
 
 <p align="center">
-  <img src="img/B16_B_l1_l0B_trans_load2dv2.png">
+  <img src="figures/B16_B_l1_l0B_trans_load2dv2.png">
 </p>
 
 <p align="center">
@@ -638,7 +638,7 @@ B32输入数据类型分形为16 * 8，L1->L0转置时会按照方型将col方�
 
 
 <p align="center">
-  <img src="img/B32_B_l1_l0B_trans_load2dv2.png">
+  <img src="figures/B32_B_l1_l0B_trans_load2dv2.png">
 </p>
 
 <p align="center">
