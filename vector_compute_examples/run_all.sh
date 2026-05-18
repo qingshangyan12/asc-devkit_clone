@@ -17,6 +17,11 @@ SAMPLES=(
     "asc_min"
     "asc_div"
     "vconv/asc_e4m32float"
+    "asc_sqrt"
+    "asc_exp"
+    "asc_ln"
+    "asc_and"
+    "asc_or"
 )
 
 PASS=0
