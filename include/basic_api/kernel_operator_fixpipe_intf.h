@@ -91,45 +91,45 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>&
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsV220& intriParams);
 
 // L0C->L1/UB
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const FixpipeParamsM300& intriParams);
 
 // L0C->L1/UB deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
+template <typename T, typename U, const FixpipeConfig& config, typename S = uint64_t,
     typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM300& intriParams);
 
 // L0C->GM
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const FixpipeParamsM300& intriParams);
 
 // L0C->GM deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
+template <typename T, typename U, const FixpipeConfig& config, typename S = uint64_t,
     typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM300& intriParams);
 
 // L0C->L1/UB
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const FixpipeParamsM310& intriParams);
 
 // L0C->L1/UB deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
+template <typename T, typename U, const FixpipeConfig& config, typename S = uint64_t,
     typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM310& intriParams);
 
 // L0C->GM
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const FixpipeParamsM310& intriParams);
 
 // L0C->GM deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
+template <typename T, typename U, const FixpipeConfig& config, typename S = uint64_t,
     typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM310& intriParams);
