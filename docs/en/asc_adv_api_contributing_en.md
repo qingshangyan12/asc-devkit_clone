@@ -440,4 +440,4 @@ After completing high-level API coding, test API functionality by implementing o
 
 
 ## Merge Code
-When developers complete high-level API coding and testing, please refer to [Contribution Guide](../CONTRIBUTING.md) to merge code into this repository.
+When developers complete high-level API coding and testing, please refer to [Contribution Guide](../../CONTRIBUTING_en.md) to merge code into this repository.
