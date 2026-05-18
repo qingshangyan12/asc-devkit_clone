@@ -43,7 +43,8 @@
 | 5 | dst = src0 * src1 | src0/dst首地址不在同一个bank | 有bank读写冲突 | 0 | 0x10100 | 0x4020 | 3612 | vs case4，说明bank读写冲突 |
 | 6 | dst = src0 * src1 | src1/dst首地址在同一个bank | 无bank读写冲突 | 0 | 0x10100 | 0x10100 | 2501 | 作为case7的基线参照 |
 | 7 | dst = src0 * src1 | src1/dst首地址不在同一个bank | 有bank读写冲突 | 0 | 0x10100 | 0x10120 | 3612 | vs case6，说明bank读写冲突 |
-| 8 | dst = src0 * src1 | src0每次repeat读同一datablock(src0BlkStride=0, srcRepStride=1)，<br>src1和dst地址重叠 | 0 | 0x10100 | 0x10100 | 3778 | |
+| 8 | dst = src0 * src1 | src0每次repeat读同一datablock(src0BlkStride=0, srcRepStride=1)，<br>src1和dst首地址重叠 | 0 | 0x10100 | 0x10100 | 3778 | vs case9/case6，作为基线参照 |
+| 9 | dst = src0 * src1 | src0每次repeat读同一datablock(src0BlkStride=0, srcRepStride=8)，<br>src1和dst首地址重叠 | 0 | 0x10100 | 0x10100 | 2501 | |
 | 72 | src0 = src0 * src0 | src0/src1/dst首地址完全重叠 | 无bank读读、读写冲突 | 0 | 0 | 0 | 2501 |  |
 
 每个case的具体分析过程，请参考下述各章节
@@ -216,6 +217,32 @@
             | dst写bank 25-31-16 (bank group 8-15-0) | dst写bank 17-24 (bank group 1-8) | dst写bank 25-31-16 (bank group 8-15-0) | ... |
 
             理论分析结果：src1读取的数据和dst写入的数据，每次repeat都有相同datablock，会存在读写冲突。
+
+## case9 src0每次repeat读同一datablock(src0BlkStride=0, srcRepStride=8)，src1和dst地址重叠
+- src0的首地址是`0`，对应地址编码是 `0000 0000 0000 0000 0000`；故对应的`bank_id` = 0，`bank_group_id` = 0。
+- src1的首地址是`0x10100`，对应地址编码是 `0001 0000 0001 0000 0000`；故对应的`bank_id` = 1，`bank_group_id` = 8。
+- dst的首地址是`0x10100`，对应地址编码是 `0001 0000 0001 0000 0000`；故对应的`bank_id` = 1，`bank_group_id` = 8。
+
+- UB读写示例图如下：
+    ![case9](./figures/case9.jpg)
+    - 每次repeat，src0读取1个绿色数据块（32B），重复读取8次（src0BlkStride=0）；
+    - 每8个黄色数据块（32B），代表src1每次repeat读取的数据（256B）；
+    - 每8个蓝色数据块（32B），代表dst每次repeat写入的数据（256B）；
+    - 处理完所有数据，迭代次数repeat_times = 数据长度 * sizeof(float) / 每次读取的数据量 = 4096 * 4 / 256 = 64。
+
+- 分析结论
+    - src0和src1读取的数据，每次repeat都在不同的bank group，故不存在读读冲突。
+    - src0读取的数据和dst写入的数据，每隔1次repeat都会有相同的datablock，会存在读写冲突。
+        - UB读写过程示意
+            | 第1次repeat | 第2次repeat | 第3次repeat | 第4次repeat | ... |
+            | --- | --- | --- | --- | --- |
+            | src0读bank 0（bank group 0）| src0读bank 8（bank group 8） | src0读bank 0（bank group 0）| src0读bank 8（bank group 8） | ... |
+            | src1读bank 24-31 (bank group 8-15) | src1读bank 16-23 (bank group 0-7) | src1读bank 24-31 (bank group 8-15) | src1读bank 16-23 (bank group 0-7) | ... |
+            | dst写bank 24-31 (bank group 8-15) | dst写bank 16-23 (bank group 0-7) | dst写bank 24-31 (bank group 8-15) | dst写bank 16-23 (bank group 0-7) | ... |
+
+        理论分析结果：
+        - src0读取的数据和src1读取的数据，每次repeat都在不同的bank_group，故不存在读读冲突。
+        - 类比case6，硬件自动将dst的写入延后一个repeat，进而跟src1的数据读取错开，避免了读写冲突。
 
 ## case8 src0每次repeat读同一datablock(src0BlkStride=0, srcRepStride=1)，src1和dst地址重叠
 - src0的首地址是`0`，对应地址编码是 `0000 0000 0000 0000 0000`；故对应的`bank_id` = 0，`bank_group_id` = 0。
