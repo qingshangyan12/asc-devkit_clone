@@ -89,8 +89,8 @@ HcclResult ObtainCommEngine(const void *ccTilingList[], uint32_t tilingNum, uint
     return HCCL_SUCCESS;
 }
 
-// 构建 opResCtx 基础字段并获取 Token
-HcclResult CcuAllocV2(HcclComm comm, const std::string &ctxTag,
+// 构建 opResCtx 基础字段
+HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string &ctxTag,
     u32 rankSize, u32 userRank, OpResCtx &opResCtx)
 {
     // 1. 分配workspace、comParam（XN）、comSync（CKE）
@@ -120,7 +120,7 @@ HcclResult CcuAllocV2(HcclComm comm, const std::string &ctxTag,
     opResCtx.xnAddr        = reinterpret_cast<uint64_t>(comParamPtr);
     opResCtx.ckeAddr       = reinterpret_cast<uint64_t>(comSyncPtr);
 
-    HCCL_INFO("[CcuAllocV2]workspace[%p], comParam[%p], comSync[%p]",
+    HCCL_INFO("[AllocCcuOpResCtx]workspace[%p], comParam[%p], comSync[%p]",
         workspacePtr, comParamPtr, comSyncPtr);
 
     return HCCL_SUCCESS;

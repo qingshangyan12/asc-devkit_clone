@@ -21,6 +21,12 @@
 #include "topo_model.h"
 #include "sim_common.h"
 
+// CcuSelectAlgCheck的stub实现，测试中默认返回成功
+HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner *ccTiling, uint32_t tilingIndex)
+{
+    return HCCL_SUCCESS;
+}
+
 namespace {
 
 static u32 g_stubRankSize = 8;
@@ -332,6 +338,20 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_NullStream) {
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_NullTiling) {
     void* opResCtx = nullptr;
     EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, nullptr, &opResCtx), HCCL_E_PTR);
+}
+
+TEST_F(CcuMc2TestSuite, CcuSelectAlg_AicpuAlgNotSupported) {
+    // tiling标记为CCU引擎，但环境变量设为AICPU模式，
+    // 导致SelectAlgAndPrepareEngine选出AICPU算法名（如"InsAllGatherMesh"），
+    // 该算法名不在CCU的algorithmMap中，CcuSelectAlg应返回HCCL_E_NOT_SUPPORT
+    SetCommEngineEnv(COMM_ENGINE_AICPU);
+    Mc2CcTilingInner ccTiling{};
+    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    ccTiling.commEngine = COMM_ENGINE_CCU;
+    const void* ccTilingList[] = {&ccTiling};
+    std::string topoTag[] = {"tag0"};
+    OpResCtx resCtx{};
+    EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_E_NOT_SUPPORT);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_UnsupportedEngine) {

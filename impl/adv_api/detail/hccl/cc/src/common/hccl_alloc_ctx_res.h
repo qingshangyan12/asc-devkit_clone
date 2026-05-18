@@ -141,7 +141,7 @@ HcclResult CheckIsReduce(const Mc2CcTilingInner *ccTiling, bool *isReduce);
 HcclResult ObtainCommEngine(const void *ccTilingList[], uint32_t tilingNum, uint8_t &commEngine);
 
 // 构建 opResCtx 基础字段并获取 Token
-HcclResult CcuAllocV2(HcclComm comm, const std::string &ctxTag, u32 rankSize, u32 userRank, OpResCtx &opResCtx);
+HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string &ctxTag, u32 rankSize, u32 userRank, OpResCtx &opResCtx);
 
 HcclResult HcclAllocOpResCtx(HcclComm comm, const std::string &ctxTag, const std::vector<OpParam> &opParamVec, void* mc2Tiling, const void *ccTilingList[], void** opResCtxPtr);
 
