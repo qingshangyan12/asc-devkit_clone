@@ -1,0 +1,45 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+#include "pad/pad.h"
+
+__aicore__ void TestPad0() {
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::PadParams padParams;
+    AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    PadTiling tiling;
+    AscendC::Pad<float>(dstTensor, srcTensor, padParams, sharedTmpBuffer, tiling);
+}
+
+__aicore__ void TestPad1() {
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::PadParams padParams;
+    PadTiling tiling;
+    AscendC::Pad<float>(dstTensor, srcTensor, padParams, tiling);
+}
+
+__aicore__ void TestUnPad2() {
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::UnPadParams unPadParams;
+    AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    UnPadTiling tiling;
+    AscendC::UnPad<float>(dstTensor, srcTensor, unPadParams, sharedTmpBuffer, tiling);
+}
+
+__aicore__ void TestUnPad3() {
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::UnPadParams unPadParams;
+    UnPadTiling tiling;
+    AscendC::UnPad<float>(dstTensor, srcTensor, unPadParams, tiling);
+}
+
