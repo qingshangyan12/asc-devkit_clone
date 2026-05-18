@@ -75,7 +75,7 @@ The overall logical architecture diagram is shown below:
 - **Python Frontend PyAsc**: PyAsc provides complete low-level chip programming capabilities based on Python frontend, and will gradually improve Tensor programming capabilities based on Layout, adding SIMT programming and other capabilities for developing high-performance operators based on Python interfaces;
 
 ### How to Choose Multi-level API for Operator Development
-- **C/C++ language-based development**: See [Ascend C Multi-level API Selection Guide](./docs/asc_how_to_choose_api.md) for details
+- **C/C++ language-based development**: See [Ascend C Multi-level API Selection Guide](./docs/asc_how_to_choose_api_en.md) for details
 - **Python language-based development, supporting complete programming capabilities for ultimate performance**: Recommend Ascend C Python frontend [PyAsc](https://gitcode.com/cann/pyasc)
 - **Python language-based development, quick development verification, ease of use priority**: Recommend [PyPTO](https://gitcode.com/cann/pypto)
 
@@ -112,8 +112,8 @@ This repository mainly contains Ascend C programming API and necessary cmake bui
 
 To quickly experience project build and operator sample execution, access the following documentation for simple tutorials.
 
-- [Build and Compilation](docs/quick_start.md): Introduces environment setup, build execution, local verification, and other operations.
-- [Sample Execution](examples/README.md): Provides operator development samples and introduces end-to-end sample execution methods.
+- [Build and Compilation](docs/quick_start_en.md): Introduces environment setup, build execution, local verification, and other operations.
+- [Sample Execution](examples/README_en.md): Provides operator development samples and introduces end-to-end sample execution methods.
 
 ## 🧰 clangd/IDE Support
 
@@ -187,7 +187,7 @@ To quickly experience project build and operator sample execution, access the fo
   | Document | Description |
   |---------|--------|
   |[CANN Community Contribution Guide](https://gitcode.com/cann/community)| CANN community Issue, PR and other general processing procedures|
-  |[ASC-DevKit Contribution Guide](./CONTRIBUTING.md) | Ascend C API, documentation and samples contribution guide|
+  |[ASC-DevKit Contribution Guide](./CONTRIBUTING_en.md) | Ascend C API, documentation and samples contribution guide|
 
 - **Others**
   | Document | Description |
@@ -203,6 +203,6 @@ To quickly experience project build and operator sample execution, access the fo
 
 ## 📝 Related Information
 
-- [Contribution Guide](CONTRIBUTING.md)
-- [Security Statement](SECURITY.md)
+- [Contribution Guide](CONTRIBUTING_en.md)
+- [Security Statement](SECURITY_en.md)
 - [License](LICENSE)

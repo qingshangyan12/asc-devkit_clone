@@ -19,7 +19,7 @@ Ascend C high-level API development process mainly includes the following steps:
   - Single operator testing
 ---
 ## Custom Development of Brand-new API
-Below uses high-level API `Axpy` as an example to introduce how to develop a high-level API from scratch. This case removes some unnecessary code. You can view all code in the repository files [axpy.h](../include/adv_api/math/axpy.h), [axpy_tiling.h](../include/adv_api/math/axpy_tiling.h), [axpy_tiling_intf.h](../include/adv_api/math/axpy_tiling_intf.h), [axpy_common_impl.h](../impl/adv_api/detail/math/axpy/axpy_common_impl.h), [axpy_tiling_impl.cpp](../impl/adv_api/tiling/math/axpy_tiling_impl.cpp).
+Below uses high-level API `Axpy` as an example to introduce how to develop a high-level API from scratch. This case removes some unnecessary code. You can view all code in the repository files [axpy.h](../../include/adv_api/math/axpy.h), [axpy_tiling.h](../../include/adv_api/math/axpy_tiling.h), [axpy_tiling_intf.h](../../include/adv_api/math/axpy_tiling_intf.h), [axpy_common_impl.h](../../impl/adv_api/detail/math/axpy/axpy_common_impl.h), [axpy_tiling_impl.cpp](../../impl/adv_api/tiling/math/axpy_tiling_impl.cpp).
 ### Design API
 Axpy's function is to multiply each element in source operand `srcTensor` with a scalar, then add it with the corresponding element in destination operand `dstTensor`. The calculation formula is as follows.
 $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
@@ -69,7 +69,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 #### Write API External Interface
 - Kernel Side Interface
     
-    In the corresponding category directory under `include/adv_api/`, add new file [axpy.h](../include/adv_api/math/axpy.h). Based on the above analyzed and designed API function prototype, write external interface code. Function implementation calls AxpyImpl implementation.
+    In the corresponding category directory under `include/adv_api/`, add new file [axpy.h](../../include/adv_api/math/axpy.h). Based on the above analyzed and designed API function prototype, write external interface code. Function implementation calls AxpyImpl implementation.
     ```c++
     template <typename T, typename U, bool isReuseSource = false>
     __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue,
@@ -80,13 +80,13 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     ```
 - Tiling Side Interface
     
-    In the corresponding category directory under `include/adv_api/`, add new file [axpy_tiling.h](../include/adv_api/math/axpy_tiling.h). Based on the above analyzed and designed Tiling side interface, write function declaration.
+    In the corresponding category directory under `include/adv_api/`, add new file [axpy_tiling.h](../../include/adv_api/math/axpy_tiling.h). Based on the above analyzed and designed Tiling side interface, write function declaration.
     ```c++
     void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
     ```
 - Include header files in common files.
 
-    [include/adv_api/kernel_api.h](../include/adv_api/kernel_api.h) file includes all high-level API header files. Recommend including new API header files in this file, so when calling high-level APIs, only need to include `"kernel_api.h"`.
+    [include/adv_api/kernel_api.h](../../include/adv_api/kernel_api.h) file includes all high-level API header files. Recommend including new API header files in this file, so when calling high-level APIs, only need to include `"kernel_api.h"`.
     ```c++
     #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
     // ...
@@ -95,7 +95,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     #endif // __NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
     ```
     
-    [include/adv_api/tiling_api.h](../include/adv_api/tiling_api.h) file includes all high-level API Tiling interface header files. Recommend including new Tiling interface header files in this file, so when calling high-level API Tiling functions, only need to include `"tiling_api.h"`.
+    [include/adv_api/tiling_api.h](../../include/adv_api/tiling_api.h) file includes all high-level API Tiling interface header files. Recommend including new Tiling interface header files in this file, so when calling high-level API Tiling functions, only need to include `"tiling_api.h"`.
     ```c++
     #include "math/axpy_tiling.h"
     ```
@@ -103,7 +103,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 #### Write API Internal Implementation
 - Kernel Side Implementation
 
-    In Kernel interface implementation file path [impl/adv_api/detail](../impl/adv_api/detail) corresponding category directory (this case is `math`), add new `axpy` directory. In this directory, add new interface implementation file [axpy_common_impl.h](../impl/adv_api/detail/math/axpy/axpy_common_impl.h), then write interface implementation code in this implementation file.
+    In Kernel interface implementation file path [impl/adv_api/detail](../../impl/adv_api/detail) corresponding category directory (this case is `math`), add new `axpy` directory. In this directory, add new interface implementation file [axpy_common_impl.h](../../impl/adv_api/detail/math/axpy/axpy_common_impl.h), then write interface implementation code in this implementation file.
 
     First, include necessary header files.
     ```c++
@@ -201,7 +201,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     ```
 - Tiling Side Implementation
 
-    In Tiling interface implementation file path [impl/adv_api/tiling](../impl/adv_api/tiling) corresponding category directory (this case is `math`), add new interface implementation file [axpy_tiling_impl.cpp](../impl/adv_api/tiling/math/axpy_tiling_impl.cpp), then write interface implementation code in this implementation file.
+    In Tiling interface implementation file path [impl/adv_api/tiling](../../impl/adv_api/tiling) corresponding category directory (this case is `math`), add new interface implementation file [axpy_tiling_impl.cpp](../../impl/adv_api/tiling/math/axpy_tiling_impl.cpp), then write interface implementation code in this implementation file.
 
     First, include necessary header files.
     ```c++
@@ -267,7 +267,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
         return AXPY_ONE_REPEAT_BYTE_SIZE * (typeSize == sizeof(float) ? AXPY_FLOAT_CALC_PROC : AXPY_HALF_CALC_PROC);
     }
     ```
-    After writing Tiling side implementation file, need to include this file in [impl/adv_api/tiling/CMakeLists.txt](../impl/adv_api/tiling/CMakeLists.txt). Specifically: add file path `${CMAKE_CURRENT_SOURCE_DIR}/math/axpy_tiling_impl.cpp` in `add_library(tiling_api STATIC ...)` statement.
+    After writing Tiling side implementation file, need to include this file in [impl/adv_api/tiling/CMakeLists.txt](../../impl/adv_api/tiling/CMakeLists.txt). Specifically: add file path `${CMAKE_CURRENT_SOURCE_DIR}/math/axpy_tiling_impl.cpp` in `add_library(tiling_api STATIC ...)` statement.
 ## Advanced Development Based on Existing API
 If developers perform advanced feature development based on existing APIs in current repository, the design API process is the same as described above. When developing code, consider reloading existing function implementations or adding new code branches. Based on advanced feature algorithm function, determine needed basic APIs and complete coding. For example, if existing API does not support some data types, suppose Axpy does not support destination operand element as float type, then need to overload `AxpyIntrinsicsImpl` function to implement dstTensor data type as float function.
 ```c++

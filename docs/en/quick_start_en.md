@@ -142,7 +142,7 @@ CANN packages are divided into CANN toolkit package and CANN ops package.
     ```
 
     > [!IMPORTANT] Installation Instructions
-    > Some operator samples in [examples](../examples) depend on this package for compilation and running. To fully experience the sample compilation and running process, we recommend installing this package.
+    > Some operator samples in [examples](../../examples) depend on this package for compilation and running. To fully experience the sample compilation and running process, we recommend installing this package.
 
 | Parameter | Description |
 | :--- | :--- |
