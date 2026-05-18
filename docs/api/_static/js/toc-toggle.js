@@ -52,10 +52,15 @@
     return TOC_READY;
   }
 
-  function findSection(file) {
-    if (!TOC_DATA) return null;
-    for (var i = 0; i < TOC_DATA.length; i++) {
-      if (TOC_DATA[i].f === file) return TOC_DATA[i];
+  function findSection(file, entries) {
+    entries = entries || TOC_DATA;
+    if (!entries) return null;
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i].f === file) return entries[i];
+      if (entries[i].e && entries[i].e.length > 0) {
+        var found = findSection(file, entries[i].e);
+        if (found) return found;
+      }
     }
     return null;
   }
@@ -83,7 +88,7 @@
     return contentRoot + file + '.html';
   }
 
-  function buildTocUl(entries, depth) {
+  function buildTocUl(entries, depth, maxDepth) {
     depth = depth || 1;
     var ul = document.createElement('ul');
     ul.className = 'nav bd-sidenav';
@@ -102,9 +107,9 @@
       a.className = 'reference internal';
       if (isCurrentPage) a.classList.add('current');
       a.href = pageUrl(entry.f);
-      a.textContent = entry.t || entry.f;
+      a.textContent = (entry.t || entry.f).replace(/\\(.)/g, '$1');
 
-      if (entry.e && entry.e.length > 0) {
+      if (entry.e && entry.e.length > 0 && (!maxDepth || depth < maxDepth)) {
         li.classList.add('has-children');
         li.setAttribute('aria-expanded', String(isCurrentPage));
         var details = document.createElement('details');
@@ -118,7 +123,7 @@
         toggle.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
         summary.appendChild(toggle);
         details.appendChild(summary);
-        details.appendChild(buildTocUl(entry.e, depth + 1));
+        details.appendChild(buildTocUl(entry.e, depth + 1, maxDepth));
         li.appendChild(a);
         li.appendChild(details);
       } else {
@@ -167,6 +172,7 @@
         var oldArticle = document.querySelector('.bd-article-container');
         if (!oldArticle) throw new Error('no article target');
         oldArticle.innerHTML = newArticle.innerHTML;
+        populateContentToc();
         window.scrollTo(0, 0);
       });
   }
@@ -237,16 +243,66 @@
 
   function detectCurrentSection() {
     try {
-      var path = decodeURIComponent(window.location.pathname);
-      if (path.indexOf(getBuildRoot()) === 0)
-        path = path.substring(getBuildRoot().length);
-      var rel = path.replace(/(\/index)?\.html$/, '').replace(/\/+$/, '');
+      var rel;
+      if (typeof DOCUMENTATION_OPTIONS !== 'undefined' && DOCUMENTATION_OPTIONS.pagename) {
+        rel = DOCUMENTATION_OPTIONS.pagename;
+      } else {
+        var path = decodeURIComponent(window.location.pathname);
+        if (path.indexOf(getBuildRoot()) === 0)
+          path = path.substring(getBuildRoot().length);
+        rel = path.replace(/(\/index)?\.html$/, '').replace(/\/+$/, '');
+      }
       if (rel.indexOf('/') > 0) {
         var dir = rel.split('/')[0];
         CURRENT_SECTION = dir + '/' + dir;
       }
       CURRENT_PAGE = rel;
     } catch (e) {}
+  }
+
+  function populateContentToc() {
+    var tocWrapper = document.querySelector('.bd-article .toctree-wrapper.compound');
+    if (!tocWrapper) return;
+    loadToc().then(function () {
+      if (!TOC_DATA) { tocWrapper.style.display = 'none'; return; }
+      var pageFile = CURRENT_PAGE;
+      if (!pageFile) {
+        try {
+          if (typeof DOCUMENTATION_OPTIONS !== 'undefined' && DOCUMENTATION_OPTIONS.pagename) {
+            pageFile = DOCUMENTATION_OPTIONS.pagename;
+          } else {
+            var path2 = decodeURIComponent(window.location.pathname);
+            if (path2.indexOf(getBuildRoot()) === 0) path2 = path2.substring(getBuildRoot().length);
+            pageFile = path2.replace(/(\/index)?\.html$/, '').replace(/\/+$/, '');
+          }
+        } catch (e) {}
+      }
+      var node = findSection(pageFile);
+      if (!node || !node.e || !node.e.length) { tocWrapper.style.display = 'none'; return; }
+      while (tocWrapper.firstChild) tocWrapper.removeChild(tocWrapper.firstChild);
+      tocWrapper.appendChild(buildTocUl(node.e, 1, 1));
+      tocWrapper.style.display = '';
+      try { (window._versionFilter || {}).reapply(); } catch (e) {}
+    });
+  }
+
+  function handleContentTocClick(e) {
+    var link = e.target.closest('a.reference.internal, a.reference.external');
+    if (!link) return;
+    var li = link.closest('li');
+    if (!li || !li.classList.contains('has-children')) return;
+    var details = li.querySelector('details');
+    if (!details) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    if (details.hasAttribute('open')) {
+      details.removeAttribute('open');
+      li.setAttribute('aria-expanded', 'false');
+    } else {
+      details.setAttribute('open', 'open');
+      li.setAttribute('aria-expanded', 'true');
+    }
   }
 
   function init() {
@@ -264,6 +320,11 @@
       });
 
       sidebar.addEventListener('click', handleTocClick);
+
+      var article = document.querySelector('.bd-article');
+      if (article) article.addEventListener('click', handleContentTocClick);
+
+      populateContentToc();
     });
 
     window.addEventListener('popstate', function (e) {
@@ -272,12 +333,13 @@
         CURRENT_SECTION = e.state.s;
         CURRENT_PAGE = e.state.p;
         loadToc().then(function () {
-          rebuildSidebar(e.state.s);
-          highlightHeader(e.state.s);
-          loadPage(pageUrl(e.state.p)).then(function () {
-            try { (window._versionFilter || {}).reapply(); } catch (e) {}
-          }).catch(noop);
-        });
+        rebuildSidebar(e.state.s);
+        highlightHeader(e.state.s);
+        loadPage(pageUrl(e.state.p)).then(function () {
+          populateContentToc();
+          try { (window._versionFilter || {}).reapply(); } catch (e) {}
+        }).catch(noop);
+      });
       } else {
         window.location.reload();
       }

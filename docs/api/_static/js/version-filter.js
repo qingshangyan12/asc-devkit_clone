@@ -52,15 +52,24 @@
     return document.getElementById('pst-primary-sidebar');
   }
 
-  function showAllSidebarItems() {
+  function getVisibleContainers() {
+    var containers = [];
     var sidebar = getSidebar();
-    if (!sidebar) return;
-    sidebar.querySelectorAll('li[class^="toctree-l"]').forEach(function (li) {
-      li.style.display = '';
-    });
-    sidebar.querySelectorAll('details').forEach(function (d) {
-      d.style.display = '';
-      d.setAttribute('open', 'open');
+    if (sidebar) containers.push(sidebar);
+    var contentToc = document.querySelector('.bd-article .toctree-wrapper.compound');
+    if (contentToc) containers.push(contentToc);
+    return containers;
+  }
+
+  function showAllSidebarItems() {
+    getVisibleContainers().forEach(function (container) {
+      container.querySelectorAll('li[class^="toctree-l"]').forEach(function (li) {
+        li.style.display = '';
+      });
+      container.querySelectorAll('details').forEach(function (d) {
+        d.style.display = '';
+        d.setAttribute('open', 'open');
+      });
     });
   }
 
@@ -118,67 +127,60 @@
   function filterSidebarItems() {
     var hidden = window.VERSION_950_HIDDEN;
     if (!hidden || !hidden.length) return;
-    var sidebar = getSidebar();
-    if (!sidebar) return;
 
     var hiddenSet = {};
     for (var i = 0; i < hidden.length; i++) {
       try { hiddenSet[decodeURIComponent(hidden[i])] = true; } catch (e) { hiddenSet[hidden[i]] = true; }
     }
 
-    var allItems = sidebar.querySelectorAll('li[class^="toctree-l"]');
+    getVisibleContainers().forEach(function (container) {
+      var allItems = container.querySelectorAll('li[class^="toctree-l"]');
 
-    // Reset all items first
-    allItems.forEach(function (li) { li.style.display = ''; });
+      allItems.forEach(function (li) { li.style.display = ''; });
 
-    // Walk DOM bottom-up: hide li only if it's in hidden set AND has no visible children
-    // Use a reverse-order array to process children before parents
-    var itemsArray = [];
-    allItems.forEach(function (li) { itemsArray.push(li); });
-    itemsArray.reverse();
+      var itemsArray = [];
+      allItems.forEach(function (li) { itemsArray.push(li); });
+      itemsArray.reverse();
 
-    itemsArray.forEach(function (li) {
-      var href = getLinkHref(li);
-      if (!href || !hiddenSet[href]) return;
+      itemsArray.forEach(function (li) {
+        var href = getLinkHref(li);
+        if (!href || !hiddenSet[href]) return;
 
-      var children = li.querySelectorAll('li[class^="toctree-l"]');
-      if (children.length === 0) {
-        // Leaf item: hide directly
-        li.style.display = 'none';
-        return;
-      }
+        var children = li.querySelectorAll('li[class^="toctree-l"]');
+        if (children.length === 0) {
+          li.style.display = 'none';
+          return;
+        }
 
-      // Check if all children are hidden
-      var allChildrenHidden = true;
-      children.forEach(function (child) {
-        if (child.style.display !== 'none') {
-          allChildrenHidden = false;
+        var allChildrenHidden = true;
+        children.forEach(function (child) {
+          if (child.style.display !== 'none') {
+            allChildrenHidden = false;
+          }
+        });
+
+        if (allChildrenHidden) {
+          li.style.display = 'none';
         }
       });
 
-      if (allChildrenHidden) {
-        li.style.display = 'none';
-      }
-      // else: keep visible because children need to be accessible
-    });
-
-    // Handle details: open those with visible items, hide empty ones
-    sidebar.querySelectorAll('details').forEach(function (d) {
-      var lis = d.querySelectorAll('li[class^="toctree-l"]');
-      var hasVisible = false;
-      for (var j = 0; j < lis.length; j++) {
-        if (lis[j].style.display !== 'none') {
-          hasVisible = true;
-          break;
+      container.querySelectorAll('details').forEach(function (d) {
+        var lis = d.querySelectorAll('li[class^="toctree-l"]');
+        var hasVisible = false;
+        for (var j = 0; j < lis.length; j++) {
+          if (lis[j].style.display !== 'none') {
+            hasVisible = true;
+            break;
+          }
         }
-      }
-      if (hasVisible) {
-        d.setAttribute('open', 'open');
-        d.style.display = '';
-      } else {
-        d.removeAttribute('open');
-        d.style.display = 'none';
-      }
+        if (hasVisible) {
+          d.setAttribute('open', 'open');
+          d.style.display = '';
+        } else {
+          d.removeAttribute('open');
+          d.style.display = 'none';
+        }
+      });
     });
   }
 

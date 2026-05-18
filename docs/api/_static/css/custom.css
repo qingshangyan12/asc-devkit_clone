@@ -268,6 +268,64 @@ nav.bd-links.bd-links--collapsed {
     display: none;
 }
 
+/* ── 隐藏正文中 Sphinx 默认的扁平 toctree 列表，用 JS 动态注入树形结构 ── */
+.bd-article > section > ul.simple {
+    display: none;
+}
+.bd-article .toctree-wrapper.compound {
+    margin: 1em 0;
+}
+.bd-article .toctree-wrapper.compound ul.nav.bd-sidenav {
+    display: block;
+    padding-left: 0;
+    list-style: none;
+}
+.bd-article .toctree-wrapper.compound li.toctree-l1 {
+    list-style: none;
+}
+.bd-article .toctree-wrapper.compound a.reference {
+    text-decoration: none;
+    white-space: normal;
+    word-break: break-all;
+}
+.bd-article .toctree-wrapper.compound .toctree-l1.current > a.reference,
+.bd-article .toctree-wrapper.compound .toctree-l2.current > a.reference,
+.bd-article .toctree-wrapper.compound .toctree-l3.current > a.reference,
+.bd-article .toctree-wrapper.compound .toctree-l4.current > a.reference {
+    color: var(--pst-color-primary);
+    font-weight: 600;
+}
+.bd-article .toctree-wrapper.compound details > summary {
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+}
+.bd-article .toctree-wrapper.compound details > summary::-webkit-details-marker {
+    display: none;
+}
+.bd-article .toctree-wrapper.compound details > summary .toctree-toggle {
+    transition: transform .2s;
+    display: inline-block;
+}
+.bd-article .toctree-wrapper.compound details[open] > summary .toctree-toggle {
+    transform: rotate(0deg);
+}
+.bd-article .toctree-wrapper.compound details:not([open]) > summary .toctree-toggle {
+    transform: rotate(-90deg);
+}
+.bd-article .toctree-wrapper.compound .toctree-l2 {
+    padding-left: 1em;
+}
+.bd-article .toctree-wrapper.compound .toctree-l3 {
+    padding-left: 2em;
+}
+.bd-article .toctree-wrapper.compound .toctree-l4 {
+    padding-left: 3em;
+}
+.bd-article .toctree-wrapper.compound .toctree-l5 {
+    padding-left: 4em;
+}
+
 /* ── 侧边栏 toctree 美化 ── */
 
 /* 当前页高亮 */
