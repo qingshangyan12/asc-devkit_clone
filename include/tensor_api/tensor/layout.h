@@ -79,7 +79,7 @@ template <typename Tensor, typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info);
 
 template <typename LayoutPattern, typename TraitType = EmptyValue, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {;
+__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
 
 template <typename LayoutPattern, size_t C0Element, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
