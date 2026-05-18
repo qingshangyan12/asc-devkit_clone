@@ -43,7 +43,7 @@ from adapter.compile_op import _gen_kernel_func_declare_head, _compile_ascendc_c
     _compile_ascendc_cce_v200_with_kernel_type, _dynamic_kernel_list_to_json, \
     _compile_ascendc_cce_v200_with_kernel_type_for_dynamic, _gen_dynamic_json_for_v200, \
     _gen_static_json_for_mix_v200, _gen_static_json_for_no_mix_v200, _gen_non_mix_sub_json, _gen_mix_json_from_seperate_json, \
-    _gen_mix_sub_json, _update_compile_option, gen_meta_info_section
+    _gen_mix_sub_json, _update_compile_option, gen_meta_info_section, _match_regex, _get_dcci_disable_cap_bitmap
 from adapter.ascendc_compile_v220 import call_bisheng_v220, get_ktype_section_variable, decode_mode, v220_mode, v310_mode
 from adapter.ascendc_compile_dfx import DFXSectionGenerator
 from adapter.ascendc_compile_v200 import call_bisheng_v200_static
