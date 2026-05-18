@@ -1,0 +1,6 @@
+[info] 1185 start peek vf prefetch (ID:4101), peekFifo size: 1
+[info] [00001186] Tde send peek prefetch request: addr: 0x10d0dd00, reqid: 1
+[info] [00001560] VF (ID:004101) read pb big_falgs: 0x6, pb_slot: 0
+[info] [00001560] PFU: S2: 0x140 ,S3: 0x0, S65: 0x140
+[info] [00001560] PFU: S4: 0x160 ,S5: 0x0, S66: 0x160
+[info] ++++++++++++++++++++++core: 2, subcore: 2, start: 213, tick: 2250, kernelId: 0, blkID: 5, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

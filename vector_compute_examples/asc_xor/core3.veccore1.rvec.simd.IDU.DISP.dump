@@ -1,0 +1,24 @@
+[info] @1783 instr_name RV_VAG  instr_id 6270 PC 10d0e000 pipe RVECLP 
+[info] @1784 instr_name RV_SMOV  instr_id 6271 PC 10d0e004 pipe RVECSU 
+[info] @1785 instr_name RV_VLD type.NORAML instr_id 6273 PC 10d0e00c pipe RVECLD  DST_VREGS:[v_idx=0]
+[info] @1785 instr_name RV_VLD type.NORAML instr_id 6274 PC 10d0e010 pipe RVECLD  DST_VREGS:[v_idx=1]
+[info] @1785 instr_name RV_PLT type.B32 instr_id 6275 PC 10d0e014 pipe RVECEX  DST_PREGS:[v_idx=1]
+[info] @1785 instr_name RV_VXOR type.B32 instr_id 6276 PC 10d0e018 pipe RVECEX  SRC_VREGS:[v_idx=0][v_idx=1] SRC_PREGS:[v_idx=1] DST_VREGS:[v_idx=0]
+[info] @1785 instr_name RV_VST type.NORM_B32 instr_id 6277 PC 10d0e01c pipe RVECST  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1]
+[info] @1786 instr_name RV_VLD type.NORAML instr_id 6280 PC 10d0e00c pipe RVECLD  DST_VREGS:[v_idx=0]
+[info] @1786 instr_name RV_VLD type.NORAML instr_id 6281 PC 10d0e010 pipe RVECLD  DST_VREGS:[v_idx=1]
+[info] @1786 instr_name RV_PLT type.B32 instr_id 6282 PC 10d0e014 pipe RVECEX  DST_PREGS:[v_idx=1]
+[info] @1786 instr_name RV_VXOR type.B32 instr_id 6283 PC 10d0e018 pipe RVECEX  SRC_VREGS:[v_idx=0][v_idx=1] SRC_PREGS:[v_idx=1] DST_VREGS:[v_idx=0]
+[info] @1786 instr_name RV_VST type.NORM_B32 instr_id 6284 PC 10d0e01c pipe RVECST  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1]
+[info] @1787 instr_name RV_VLD type.NORAML instr_id 6285 PC 10d0e00c pipe RVECLD  DST_VREGS:[v_idx=0]
+[info] @1787 instr_name RV_VLD type.NORAML instr_id 6286 PC 10d0e010 pipe RVECLD  DST_VREGS:[v_idx=1]
+[info] @1787 instr_name RV_PLT type.B32 instr_id 6287 PC 10d0e014 pipe RVECEX  DST_PREGS:[v_idx=1]
+[info] @1787 instr_name RV_VXOR type.B32 instr_id 6288 PC 10d0e018 pipe RVECEX  SRC_VREGS:[v_idx=0][v_idx=1] SRC_PREGS:[v_idx=1] DST_VREGS:[v_idx=0]
+[info] @1787 instr_name RV_VST type.NORM_B32 instr_id 6289 PC 10d0e01c pipe RVECST  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1]
+[info] @1788 instr_name RV_VLD type.NORAML instr_id 6290 PC 10d0e00c pipe RVECLD  DST_VREGS:[v_idx=0]
+[info] @1788 instr_name RV_VLD type.NORAML instr_id 6291 PC 10d0e010 pipe RVECLD  DST_VREGS:[v_idx=1]
+[info] @1788 instr_name RV_PLT type.B32 instr_id 6292 PC 10d0e014 pipe RVECEX  DST_PREGS:[v_idx=1]
+[info] @1788 instr_name RV_VXOR type.B32 instr_id 6293 PC 10d0e018 pipe RVECEX  SRC_VREGS:[v_idx=0][v_idx=1] SRC_PREGS:[v_idx=1] DST_VREGS:[v_idx=0]
+[info] @1788 instr_name RV_VST type.NORM_B32 instr_id 6294 PC 10d0e01c pipe RVECST  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1]
+[info] @1791 instr_name RV_SEND  instr_id 6295 PC 10d0e020 pipe RVECSU 
+[info] ++++++++++++++++++++++core: 3, subcore: 2, start: 217, tick: 2404, kernelId: 0, blkID: 7, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

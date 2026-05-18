@@ -1,0 +1,20 @@
+[info] @1875 instr_name RV_VAG  instr_id 5764 PC 10d0df00 pipe RVECLP 
+[info] @1876 instr_name RV_SMOV  instr_id 5765 PC 10d0df04 pipe RVECSU 
+[info] @1877 instr_name RV_VLD type.NORAML instr_id 5767 PC 10d0df0c pipe RVECLD  DST_VREGS:[v_idx=0]
+[info] @1877 instr_name RV_PLT type.B32 instr_id 5768 PC 10d0df10 pipe RVECEX  DST_PREGS:[v_idx=1]
+[info] @1877 instr_name RV_VMULS type.F32 instr_id 5769 PC 10d0df14 pipe RVECEX  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1] DST_VREGS:[v_idx=0]
+[info] @1877 instr_name RV_VST type.NORM_B32 instr_id 5770 PC 10d0df18 pipe RVECST  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1]
+[info] @1878 instr_name RV_VLD type.NORAML instr_id 5771 PC 10d0df0c pipe RVECLD  DST_VREGS:[v_idx=0]
+[info] @1878 instr_name RV_PLT type.B32 instr_id 5772 PC 10d0df10 pipe RVECEX  DST_PREGS:[v_idx=1]
+[info] @1878 instr_name RV_VMULS type.F32 instr_id 5773 PC 10d0df14 pipe RVECEX  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1] DST_VREGS:[v_idx=0]
+[info] @1878 instr_name RV_VST type.NORM_B32 instr_id 5774 PC 10d0df18 pipe RVECST  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1]
+[info] @1879 instr_name RV_VLD type.NORAML instr_id 5775 PC 10d0df0c pipe RVECLD  DST_VREGS:[v_idx=0]
+[info] @1879 instr_name RV_PLT type.B32 instr_id 5776 PC 10d0df10 pipe RVECEX  DST_PREGS:[v_idx=1]
+[info] @1879 instr_name RV_VMULS type.F32 instr_id 5777 PC 10d0df14 pipe RVECEX  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1] DST_VREGS:[v_idx=0]
+[info] @1879 instr_name RV_VST type.NORM_B32 instr_id 5778 PC 10d0df18 pipe RVECST  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1]
+[info] @1880 instr_name RV_VLD type.NORAML instr_id 5779 PC 10d0df0c pipe RVECLD  DST_VREGS:[v_idx=0]
+[info] @1880 instr_name RV_PLT type.B32 instr_id 5780 PC 10d0df10 pipe RVECEX  DST_PREGS:[v_idx=1]
+[info] @1880 instr_name RV_VMULS type.F32 instr_id 5781 PC 10d0df14 pipe RVECEX  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1] DST_VREGS:[v_idx=0]
+[info] @1880 instr_name RV_VST type.NORM_B32 instr_id 5782 PC 10d0df18 pipe RVECST  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1]
+[info] @1881 instr_name RV_SEND  instr_id 5783 PC 10d0df1c pipe RVECSU 
+[info] ++++++++++++++++++++++core: 0, subcore: 2, start: 209, tick: 2392, kernelId: 0, blkID: 1, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

@@ -1,0 +1,228 @@
+[info] @211, send request: addr=0x10d0d640, size=16
+[info] @212, send request: addr=0x10d0d650, size=16
+[info] @213, send request: addr=0x10d0d660, size=16
+[info] 738 get_predict_pc, start_pc:0x10d0d640, pred_pc:0x10d0d650, pred_loc:0
+[info] 738 update_pred_info, start_pc:0x10d0d640, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @738 save instr to buffer: instr.name=MOV_XD_SPR instr.pc=0x10d0d640 instr.id=3588
+[info] @738 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d644 instr.id=3589
+[info] @738 save instr to buffer: instr.name=DC_PRELOAD_XN_IMM instr.pc=0x10d0d648 instr.id=3590
+[info] @738 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d64c instr.id=3591
+[info] @739, send request: addr=0x10d0d670, size=16
+[info] @739 send instr to CCU: instr.name=MOV_XD_SPR instr.pc=0x10d0d640 instr.id=3588
+[info] @739 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d644 instr.id=3589
+[info] 739 get_predict_pc, start_pc:0x10d0d650, pred_pc:0x10d0d660, pred_loc:0
+[info] 739 update_pred_info, start_pc:0x10d0d650, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @739 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d650 instr.id=3600
+[info] @739 save instr to buffer: instr.name=MOV_XD_SPR instr.pc=0x10d0d654 instr.id=3601
+[info] @739 save instr to buffer: instr.name=MOV_XD_SPR instr.pc=0x10d0d658 instr.id=3602
+[info] @739 save instr to buffer: instr.name=ADD instr.pc=0x10d0d65c instr.id=3603
+[info] @740, send request: addr=0x10d0d680, size=16
+[info] @740 send instr to CCU: instr.name=DC_PRELOAD_XN_IMM instr.pc=0x10d0d648 instr.id=3590
+[info] @740 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d64c instr.id=3591
+[info] 740 get_predict_pc, start_pc:0x10d0d660, pred_pc:0x10d0d670, pred_loc:0
+[info] 740 update_pred_info, start_pc:0x10d0d660, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @740 save instr to buffer: instr.name=MOV_XD_SPR instr.pc=0x10d0d660 instr.id=3608
+[info] @740 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d664 instr.id=3609
+[info] @740 save instr to buffer: instr.name=SHR instr.pc=0x10d0d668 instr.id=3610
+[info] @740 save instr to buffer: instr.name=AND instr.pc=0x10d0d66c instr.id=3611
+[info] @741, send request: addr=0x10d0d690, size=16
+[info] @741 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d650 instr.id=3600
+[info] @741 send instr to CCU: instr.name=MOV_XD_SPR instr.pc=0x10d0d654 instr.id=3601
+[info] 741 get_predict_pc, start_pc:0x10d0d670, pred_pc:0x10d0d680, pred_loc:0
+[info] 741 update_pred_info, start_pc:0x10d0d670, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @741 save instr to buffer: instr.name=ADD_IMM instr.pc=0x10d0d670 instr.id=3616
+[info] @741 save instr to buffer: instr.name=SHL instr.pc=0x10d0d674 instr.id=3617
+[info] @741 save instr to buffer: instr.name=ADD_IMM instr.pc=0x10d0d678 instr.id=3618
+[info] @741 save instr to buffer: instr.name=MADD instr.pc=0x10d0d67c instr.id=3619
+[info] @742, send request: addr=0x10d0d6a0, size=16
+[info] @742 send instr to CCU: instr.name=MOV_XD_SPR instr.pc=0x10d0d658 instr.id=3602
+[info] @742 send instr to CCU: instr.name=ADD instr.pc=0x10d0d65c instr.id=3603
+[info] 742 get_predict_pc, start_pc:0x10d0d680, pred_pc:0x10d0d690, pred_loc:0
+[info] 742 update_pred_info, start_pc:0x10d0d680, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @742 save instr to buffer: instr.name=ADD_IMM instr.pc=0x10d0d680 instr.id=3624
+[info] @742 save instr to buffer: instr.name=MOV_XD_SPR instr.pc=0x10d0d684 instr.id=3625
+[info] @742 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d688 instr.id=3626
+[info] @742 save instr to buffer: instr.name=LDP_XI_XJ_XN instr.pc=0x10d0d68c instr.id=3627
+[info] @743, send request: addr=0x10d0d6b0, size=16
+[info] @743 send instr to CCU: instr.name=MOV_XD_SPR instr.pc=0x10d0d660 instr.id=3608
+[info] @743 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d664 instr.id=3609
+[info] 743 get_predict_pc, start_pc:0x10d0d690, pred_pc:0x10d0d6a0, pred_loc:0
+[info] 743 update_pred_info, start_pc:0x10d0d690, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @743 save instr to buffer: instr.name=MOV_XD_SPR instr.pc=0x10d0d690 instr.id=3632
+[info] @743 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d694 instr.id=3633
+[info] @743 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d698 instr.id=3634
+[info] @743 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d69c instr.id=3635
+[info] @744, send request: addr=0x10d0d6c0, size=16
+[info] 744 get_predict_pc, start_pc:0x10d0d6a0, pred_pc:0x10d0d6b0, pred_loc:0
+[info] 744 update_pred_info, start_pc:0x10d0d6a0, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @744 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d6a0 instr.id=3640
+[info] @744 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d6a4 instr.id=3641
+[info] @744 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d6a8 instr.id=3642
+[info] @744 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d6ac instr.id=3643
+[info] @745, send request: addr=0x10d0d6d0, size=16
+[info] 745 get_predict_pc, start_pc:0x10d0d6b0, pred_pc:0x10d0d6c0, pred_loc:0
+[info] 745 update_pred_info, start_pc:0x10d0d6b0, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @745 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d6b0 instr.id=3648
+[info] @745 save instr to buffer: instr.name=SBITSET instr.pc=0x10d0d6b4 instr.id=3649
+[info] @745 save instr to buffer: instr.name=SBITSET instr.pc=0x10d0d6b8 instr.id=3650
+[info] @745 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d6bc instr.id=3651
+[info] @746, send request: addr=0x10d0d6e0, size=16
+[info] 746 get_predict_pc, start_pc:0x10d0d6c0, pred_pc:0x10d0d6d0, pred_loc:0
+[info] 746 update_pred_info, start_pc:0x10d0d6c0, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @746 save instr to buffer: instr.name=SBITSET instr.pc=0x10d0d6c0 instr.id=3656
+[info] @746 save instr to buffer: instr.name=MOV_SPR_XN instr.pc=0x10d0d6c4 instr.id=3657
+[info] @746 save instr to buffer: instr.name=MOV_XD_SPR instr.pc=0x10d0d6c8 instr.id=3658
+[info] @746 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d6cc instr.id=3659
+[info] @747, send request: addr=0x10d0d6f0, size=16
+[info] @747 send instr to CCU: instr.name=SHR instr.pc=0x10d0d668 instr.id=3610
+[info] @747 send instr to CCU: instr.name=AND instr.pc=0x10d0d66c instr.id=3611
+[info] 747 get_predict_pc, start_pc:0x10d0d6d0, pred_pc:0x10d0d6e0, pred_loc:0
+[info] 747 update_pred_info, start_pc:0x10d0d6d0, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @747 save instr to buffer: instr.name=SBITSET instr.pc=0x10d0d6d0 instr.id=3668
+[info] @747 save instr to buffer: instr.name=MOV_SPR_XN instr.pc=0x10d0d6d4 instr.id=3669
+[info] @747 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d6d8 instr.id=3670
+[info] @747 save instr to buffer: instr.name=NEG instr.pc=0x10d0d6dc instr.id=3671
+[info] @748, send request: addr=0x10d0d700, size=16
+[info] @748 send instr to CCU: instr.name=ADD_IMM instr.pc=0x10d0d670 instr.id=3616
+[info] @748 send instr to CCU: instr.name=SHL instr.pc=0x10d0d674 instr.id=3617
+[info] 748 get_predict_pc, start_pc:0x10d0d6e0, pred_pc:0x10d0d6f0, pred_loc:0
+[info] 748 update_pred_info, start_pc:0x10d0d6e0, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @748 save instr to buffer: instr.name=MOVEMASK instr.pc=0x10d0d6e0 instr.id=3684
+[info] @748 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d6e4 instr.id=3685
+[info] @748 save instr to buffer: instr.name=MOVEMASK instr.pc=0x10d0d6e8 instr.id=3686
+[info] @748 save instr to buffer: instr.name=MOV_XD_SPR instr.pc=0x10d0d6ec instr.id=3687
+[info] @749, send request: addr=0x10d0d710, size=16
+[info] @749 send instr to CCU: instr.name=ADD_IMM instr.pc=0x10d0d678 instr.id=3618
+[info] @749 send instr to CCU: instr.name=MADD instr.pc=0x10d0d67c instr.id=3619
+[info] 749 get_predict_pc, start_pc:0x10d0d6f0, pred_pc:0x10d0d700, pred_loc:0
+[info] 749 update_pred_info, start_pc:0x10d0d6f0, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @749 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d6f0 instr.id=3696
+[info] @749 save instr to buffer: instr.name=SHL instr.pc=0x10d0d6f4 instr.id=3697
+[info] @749 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d6f8 instr.id=3698
+[info] @749 save instr to buffer: instr.name=AND instr.pc=0x10d0d6fc instr.id=3699
+[info] @750 send instr to CCU: instr.name=ADD_IMM instr.pc=0x10d0d680 instr.id=3624
+[info] @750 send instr to CCU: instr.name=MOV_XD_SPR instr.pc=0x10d0d684 instr.id=3625
+[info] 750 get_predict_pc, start_pc:0x10d0d700, pred_pc:0x10d0d710, pred_loc:0
+[info] 750 update_pred_info, start_pc:0x10d0d700, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @750 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d700 instr.id=3708
+[info] @750 save instr to buffer: instr.name=ADD instr.pc=0x10d0d704 instr.id=3709
+[info] @750 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d708 instr.id=3710
+[info] @750 save instr to buffer: instr.name=AND instr.pc=0x10d0d70c instr.id=3711
+[info] @751 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d688 instr.id=3626
+[info] @751 send instr to CCU: instr.name=LDP_XI_XJ_XN instr.pc=0x10d0d68c instr.id=3627
+[info] 751 get_predict_pc, start_pc:0x10d0d710, pred_pc:0x10d0d720, pred_loc:0
+[info] 751 update_pred_info, start_pc:0x10d0d710, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @751 save instr to buffer: instr.name=OR instr.pc=0x10d0d710 instr.id=3720
+[info] @751 save instr to buffer: instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10d0d714 instr.id=3721
+[info] @751 save instr to buffer: instr.name=SET_FLAG instr.pc=0x10d0d718 instr.id=3722
+[info] 751 check_branch_instr_type, pc:0x10d0d718, id:3722, reg:0
+[info] @751 save instr to buffer: instr.name=WAIT_FLAG instr.pc=0x10d0d71c instr.id=3723
+[info] 751 check_branch_instr_type, pc:0x10d0d71c, id:3723, reg:0
+[info] @752 send instr to CCU: instr.name=MOV_XD_SPR instr.pc=0x10d0d690 instr.id=3632
+[info] @752 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d694 instr.id=3633
+[info] @753 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d698 instr.id=3634
+[info] @754 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d69c instr.id=3635
+[info] @757 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d6a0 instr.id=3640
+[info] @757 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d6a4 instr.id=3641
+[info] @758, send request: addr=0x10d0d720, size=16
+[info] @758 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d6a8 instr.id=3642
+[info] @759, send request: addr=0x10d0d730, size=16
+[info] @760, send request: addr=0x10d0d740, size=16
+[info] 760 get_predict_pc, start_pc:0x10d0d720, pred_pc:0x10d0d730, pred_loc:0
+[info] 760 update_pred_info, start_pc:0x10d0d720, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @760 save instr to buffer: instr.name=SHL instr.pc=0x10d0d720 instr.id=3880
+[info] @760 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d724 instr.id=3881
+[info] @760 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d728 instr.id=3882
+[info] @760 save instr to buffer: instr.name=INSERT_XD_XN instr.pc=0x10d0d72c instr.id=3883
+[info] 761 get_predict_pc, start_pc:0x10d0d730, pred_pc:0x10d0d740, pred_loc:0
+[info] 761 update_pred_info, start_pc:0x10d0d730, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @761 save instr to buffer: instr.name=ZEROEXT instr.pc=0x10d0d730 instr.id=3896
+[info] @761 save instr to buffer: instr.name=PUSH_PB instr.pc=0x10d0d734 instr.id=3897
+[info] @761 save instr to buffer: instr.name=MOV_XD_SPR instr.pc=0x10d0d738 instr.id=3898
+[info] @761 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d73c instr.id=3899
+[info] @762 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d6ac instr.id=3643
+[info] @762 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d6b0 instr.id=3648
+[info] 762 get_predict_pc, start_pc:0x10d0d740, pred_pc:0x10d0d750, pred_loc:0
+[info] 762 update_pred_info, start_pc:0x10d0d740, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @762 save instr to buffer: instr.name=NOP instr.pc=0x10d0d740 instr.id=3912
+[info] 762 check_branch_instr_type, pc:0x10d0d740, id:3912, reg:0
+[info] @762 save instr to buffer: instr.name=NOP instr.pc=0x10d0d744 instr.id=3913
+[info] 762 check_branch_instr_type, pc:0x10d0d744, id:3913, reg:0
+[info] @762 save instr to buffer: instr.name=SHL instr.pc=0x10d0d748 instr.id=3914
+[info] @762 save instr to buffer: instr.name=ADD instr.pc=0x10d0d74c instr.id=3915
+[info] @763 send instr to CCU: instr.name=SBITSET instr.pc=0x10d0d6b4 instr.id=3649
+[info] @763 send instr to CCU: instr.name=SBITSET instr.pc=0x10d0d6b8 instr.id=3650
+[info] @764 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d6bc instr.id=3651
+[info] @764 send instr to CCU: instr.name=SBITSET instr.pc=0x10d0d6c0 instr.id=3656
+[info] @765 send instr to CCU: instr.name=MOV_SPR_XN instr.pc=0x10d0d6c4 instr.id=3657
+[info] @765 send instr to CCU: instr.name=MOV_XD_SPR instr.pc=0x10d0d6c8 instr.id=3658
+[info] @766 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d6cc instr.id=3659
+[info] @766 send instr to CCU: instr.name=SBITSET instr.pc=0x10d0d6d0 instr.id=3668
+[info] @767, send request: addr=0x10d0d750, size=16
+[info] @767 send instr to CCU: instr.name=MOV_SPR_XN instr.pc=0x10d0d6d4 instr.id=3669
+[info] @767 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d6d8 instr.id=3670
+[info] @768, send request: addr=0x10d0d760, size=16
+[info] @768 send instr to CCU: instr.name=NEG instr.pc=0x10d0d6dc instr.id=3671
+[info] @768 send instr to CCU: instr.name=MOVEMASK instr.pc=0x10d0d6e0 instr.id=3684
+[info] @769, send request: addr=0x10d0d770, size=16
+[info] @769 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d6e4 instr.id=3685
+[info] 769 get_predict_pc, start_pc:0x10d0d750, pred_pc:0x10d0d760, pred_loc:0
+[info] 769 update_pred_info, start_pc:0x10d0d750, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @769 save instr to buffer: instr.name=VF instr.pc=0x10d0d750 instr.id=3989
+[info] @769 save instr to buffer: instr.name=ADD instr.pc=0x10d0d758 instr.id=3990
+[info] @769 save instr to buffer: instr.name=SET_FLAG instr.pc=0x10d0d75c instr.id=3991
+[info] 769 check_branch_instr_type, pc:0x10d0d75c, id:3991, reg:0
+[info] @770, send request: addr=0x10d0d780, size=16
+[info] @770 send instr to CCU: instr.name=MOVEMASK instr.pc=0x10d0d6e8 instr.id=3686
+[info] @770 send instr to CCU: instr.name=MOV_XD_SPR instr.pc=0x10d0d6ec instr.id=3687
+[info] 770 get_predict_pc, start_pc:0x10d0d760, pred_pc:0x10d0d770, pred_loc:0
+[info] 770 update_pred_info, start_pc:0x10d0d760, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @770 save instr to buffer: instr.name=WAIT_FLAG instr.pc=0x10d0d760 instr.id=4000
+[info] 770 check_branch_instr_type, pc:0x10d0d760, id:4000, reg:0
+[info] @770 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d764 instr.id=4001
+[info] @770 save instr to buffer: instr.name=MOVK instr.pc=0x10d0d768 instr.id=4002
+[info] @770 save instr to buffer: instr.name=OR instr.pc=0x10d0d76c instr.id=4003
+[info] @771, send request: addr=0x10d0d790, size=16
+[info] @771 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d6f0 instr.id=3696
+[info] @771 send instr to CCU: instr.name=SHL instr.pc=0x10d0d6f4 instr.id=3697
+[info] 771 get_predict_pc, start_pc:0x10d0d770, pred_pc:0x10d0d780, pred_loc:0
+[info] 771 update_pred_info, start_pc:0x10d0d770, instr_num:4, start_pos:0, pred_loc:0, end_pos:4
+[info] @771 save instr to buffer: instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10d0d770 instr.id=4012
+[info] @771 save instr to buffer: instr.name=MOV_XD_IMM instr.pc=0x10d0d774 instr.id=4013
+[info] @771 save instr to buffer: instr.name=DCCI instr.pc=0x10d0d778 instr.id=4014
+[info] 771 check_branch_instr_type, pc:0x10d0d778, id:4014, reg:0
+[info] @771 save instr to buffer: instr.name=END instr.pc=0x10d0d77c instr.id=4015
+[info] @772 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d6f8 instr.id=3698
+[info] @772 send instr to CCU: instr.name=AND instr.pc=0x10d0d6fc instr.id=3699
+[info] @773 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d700 instr.id=3708
+[info] @773 send instr to CCU: instr.name=ADD instr.pc=0x10d0d704 instr.id=3709
+[info] @774 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d708 instr.id=3710
+[info] @774 send instr to CCU: instr.name=AND instr.pc=0x10d0d70c instr.id=3711
+[info] @775 send instr to CCU: instr.name=OR instr.pc=0x10d0d710 instr.id=3720
+[info] @775 send instr to CCU: instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10d0d714 instr.id=3721
+[info] @776 send instr to CCU: instr.name=SET_FLAG instr.pc=0x10d0d718 instr.id=3722
+[info] @776 send instr to CCU: instr.name=WAIT_FLAG instr.pc=0x10d0d71c instr.id=3723
+[info] @777 send instr to CCU: instr.name=SHL instr.pc=0x10d0d720 instr.id=3880
+[info] @1145 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d724 instr.id=3881
+[info] @1145 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d728 instr.id=3882
+[info] @1146 send instr to CCU: instr.name=INSERT_XD_XN instr.pc=0x10d0d72c instr.id=3883
+[info] @1146 send instr to CCU: instr.name=ZEROEXT instr.pc=0x10d0d730 instr.id=3896
+[info] @1147 send instr to CCU: instr.name=PUSH_PB instr.pc=0x10d0d734 instr.id=3897
+[info] @1147 send instr to CCU: instr.name=MOV_XD_SPR instr.pc=0x10d0d738 instr.id=3898
+[info] @1148 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d73c instr.id=3899
+[info] @1148 send instr to CCU: instr.name=NOP instr.pc=0x10d0d740 instr.id=3912
+[info] @1149 send instr to CCU: instr.name=NOP instr.pc=0x10d0d744 instr.id=3913
+[info] @1149 send instr to CCU: instr.name=SHL instr.pc=0x10d0d748 instr.id=3914
+[info] @1150 send instr to CCU: instr.name=ADD instr.pc=0x10d0d74c instr.id=3915
+[info] @1150 send instr to CCU: instr.name=VF instr.pc=0x10d0d750 instr.id=3989
+[info] @1151 send instr to CCU: instr.name=ADD instr.pc=0x10d0d758 instr.id=3990
+[info] @1151 send instr to CCU: instr.name=SET_FLAG instr.pc=0x10d0d75c instr.id=3991
+[info] @1152 send instr to CCU: instr.name=WAIT_FLAG instr.pc=0x10d0d760 instr.id=4000
+[info] @1152 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d764 instr.id=4001
+[info] @1153 send instr to CCU: instr.name=MOVK instr.pc=0x10d0d768 instr.id=4002
+[info] @1153 send instr to CCU: instr.name=OR instr.pc=0x10d0d76c instr.id=4003
+[info] @1154 send instr to CCU: instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10d0d770 instr.id=4012
+[info] @1154 send instr to CCU: instr.name=MOV_XD_IMM instr.pc=0x10d0d774 instr.id=4013
+[info] @1155 send instr to CCU: instr.name=DCCI instr.pc=0x10d0d778 instr.id=4014
+[info] @1155 send instr to CCU: instr.name=END instr.pc=0x10d0d77c instr.id=4015
+[info] ++++++++++++++++++++++core: 1, subcore: 2, start: 211, tick: 2151, kernelId: 0, blkID: 3, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

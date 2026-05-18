@@ -1,0 +1,72 @@
+[info] [00000000] UpdatePiCfg pi_cfg_enable: 0, mix_mode: 0
+[info] [00000213] UpdatePiCfg pi_cfg_enable: 0, mix_mode: 0
+[info] [00001830] Start SIMD VF: start_pc: 0x10d0d900, instr_num: 12
+[info] [00001831] Pcg send fetch request: addr: 0x10d0d900, reqid: 2
+[info] [00001832] Pcg send fetch request: addr: 0x10d0d920, reqid: 3
+[info] [00001832] lock fetch req, reqid: 2
+[info] [00002283] unlock fetch req, reqid: 2
+[info] [00002284] Pcg send fetch request: addr: 0x10d0d900, reqid: 2
+[info] [00002285] Pcg send fetch request: addr: 0x10d0d920, reqid: 3
+[info] [00002290] IFU send instr to IDU: (PC: 0x10d0d900) RVECLP   : (Binary: 0xc200001d) (ID: 022920) RV_VAG, ssid: 1
+[info] [00002290] IFU send instr to IDU: (PC: 0x10d0d904) RVECLD   : (Binary: 0x00180018) (ID: 022921) RV_VLDI, ssid: 2
+[info] [00002290] IFU send instr to IDU: (PC: 0x10d0d908) RVECLD   : (Binary: 0x02200018) (ID: 022922) RV_VLDI, ssid: 3
+[info] [00002290] IFU send instr to IDU: (PC: 0x10d0d90c) RVECSU   : (Binary: 0xc230004d) (ID: 022923) RV_SMOV, ssid: 4
+[info] [00002291] IFU send instr to IDU: (PC: 0x10d0d910) RVECLP   : (Binary: 0xc2801b1e) (ID: 022924) RV_VLOOPv2, ssid: 5
+[info] [00002291] Hwlp (PC: 0x10d0d910) RVECLP   : (Binary: 0xc2801b1e) (ID: 022924) RV_VLOOPv2, instrNum: 6, layer: 0001, last: 1, iterNum: 4
+[info] [0000002291] [00002291] Hwlp end pc: 0x10d0d930
+[info] [0000002291] [00002291] Hwlp set to buffer mode, pc: 0x10d0d914
+[info] [00002292] DisPatch iterCntCyc_: 0, iterCnt_: 0
+[info] [00002292] IFU send instr to IDU: (PC: 0x10d0d914) RVECLD   : (Binary: 0x04380008) (ID: 022925) RV_VLD, ssid: 6
+[info] [00002292] DisPatch iterCntCyc_: 0, iterCnt_: 0
+[info] [00002292] IFU send instr to IDU: (PC: 0x10d0d918) RVECLD   : (Binary: 0x06400008) (ID: 022926) RV_VLD, ssid: 7
+[info] [00002292] DisPatch iterCntCyc_: 0, iterCnt_: 0
+[info] [00002292] IFU send instr to IDU: (PC: 0x10d0d91c) RVECEX   : (Binary: 0xa22c0150) (ID: 022927) RV_PLT Dtype: B32, ssid: 8
+[info] [00002292] DisPatch iterCntCyc_: 0, iterCnt_: 0
+[info] [00002292] IFU send instr to IDU: (PC: 0x10d0d920) RVECEX   : (Binary: 0x84246684) (ID: 022928) RV_VCMP_GE Dtype: S32, ssid: 9
+[info] [00002292] DisPatch iterCntCyc_: 0, iterCnt_: 0
+[info] [00002292] IFU send instr to IDU: (PC: 0x10d0d924) RVECEX   : (Binary: 0x84002952) (ID: 022929) RV_VSEL Dtype: B32, ssid: 10
+[info] [00002292] DisPatch iterCntCyc_: 0, iterCnt_: 0
+[info] [00002292] IFU send instr to IDU: (PC: 0x10d0d928) RVECST   : (Binary: 0x44480108) (ID: 022930) RV_VST, ssid: 11
+[info] [00002292] Pcg send fetch request: addr: 0x10d0d920, reqid: 4
+[info] [00002293] DisPatch iterCntCyc_: 0, iterCnt_: 1
+[info] [00002293] IFU send instr to IDU: (PC: 0x10d0d914) RVECLD   : (Binary: 0x04380008) (ID: 022931) RV_VLD, ssid: 12
+[info] [00002293] DisPatch iterCntCyc_: 0, iterCnt_: 1
+[info] [00002293] IFU send instr to IDU: (PC: 0x10d0d918) RVECLD   : (Binary: 0x06400008) (ID: 022932) RV_VLD, ssid: 13
+[info] [00002293] DisPatch iterCntCyc_: 0, iterCnt_: 1
+[info] [00002293] IFU send instr to IDU: (PC: 0x10d0d91c) RVECEX   : (Binary: 0xa22c0150) (ID: 022933) RV_PLT Dtype: B32, ssid: 14
+[info] [00002293] DisPatch iterCntCyc_: 0, iterCnt_: 1
+[info] [00002293] IFU send instr to IDU: (PC: 0x10d0d920) RVECEX   : (Binary: 0x84246684) (ID: 022934) RV_VCMP_GE Dtype: S32, ssid: 15
+[info] [00002293] DisPatch iterCntCyc_: 0, iterCnt_: 1
+[info] [00002293] IFU send instr to IDU: (PC: 0x10d0d924) RVECEX   : (Binary: 0x84002952) (ID: 022935) RV_VSEL Dtype: B32, ssid: 16
+[info] [00002293] DisPatch iterCntCyc_: 0, iterCnt_: 1
+[info] [00002293] IFU send instr to IDU: (PC: 0x10d0d928) RVECST   : (Binary: 0x44480108) (ID: 022936) RV_VST, ssid: 17
+[info] [00002293] Pcg send fetch request: addr: 0x10d0d940, reqid: 5
+[info] [00002294] DisPatch iterCntCyc_: 0, iterCnt_: 2
+[info] [00002294] IFU send instr to IDU: (PC: 0x10d0d914) RVECLD   : (Binary: 0x04380008) (ID: 022942) RV_VLD, ssid: 18
+[info] [00002294] DisPatch iterCntCyc_: 0, iterCnt_: 2
+[info] [00002294] IFU send instr to IDU: (PC: 0x10d0d918) RVECLD   : (Binary: 0x06400008) (ID: 022943) RV_VLD, ssid: 19
+[info] [00002294] DisPatch iterCntCyc_: 0, iterCnt_: 2
+[info] [00002294] IFU send instr to IDU: (PC: 0x10d0d91c) RVECEX   : (Binary: 0xa22c0150) (ID: 022944) RV_PLT Dtype: B32, ssid: 20
+[info] [00002294] DisPatch iterCntCyc_: 0, iterCnt_: 2
+[info] [00002294] IFU send instr to IDU: (PC: 0x10d0d920) RVECEX   : (Binary: 0x84246684) (ID: 022945) RV_VCMP_GE Dtype: S32, ssid: 21
+[info] [00002294] DisPatch iterCntCyc_: 0, iterCnt_: 2
+[info] [00002294] IFU send instr to IDU: (PC: 0x10d0d924) RVECEX   : (Binary: 0x84002952) (ID: 022946) RV_VSEL Dtype: B32, ssid: 22
+[info] [00002294] DisPatch iterCntCyc_: 0, iterCnt_: 2
+[info] [00002295] DisPatch iterCntCyc_: 0, iterCnt_: 2
+[info] [00002295] IFU send instr to IDU: (PC: 0x10d0d928) RVECST   : (Binary: 0x44480108) (ID: 022948) RV_VST, ssid: 23
+[info] [00002295] DisPatch iterCntCyc_: 1, iterCnt_: 3
+[info] [00002295] IFU send instr to IDU: (PC: 0x10d0d914) RVECLD   : (Binary: 0x04380008) (ID: 022949) RV_VLD, ssid: 24
+[info] [00002295] DisPatch iterCntCyc_: 1, iterCnt_: 3
+[info] [00002295] IFU send instr to IDU: (PC: 0x10d0d918) RVECLD   : (Binary: 0x06400008) (ID: 022950) RV_VLD, ssid: 25
+[info] [00002295] DisPatch iterCntCyc_: 1, iterCnt_: 3
+[info] [00002295] IFU send instr to IDU: (PC: 0x10d0d91c) RVECEX   : (Binary: 0xa22c0150) (ID: 022951) RV_PLT Dtype: B32, ssid: 26
+[info] [00002295] DisPatch iterCntCyc_: 1, iterCnt_: 3
+[info] [00002295] IFU send instr to IDU: (PC: 0x10d0d920) RVECEX   : (Binary: 0x84246684) (ID: 022952) RV_VCMP_GE Dtype: S32, ssid: 27
+[info] [00002295] DisPatch iterCntCyc_: 1, iterCnt_: 3
+[info] [00002296] DisPatch iterCntCyc_: 0, iterCnt_: 3
+[info] [00002296] IFU send instr to IDU: (PC: 0x10d0d924) RVECEX   : (Binary: 0x84002952) (ID: 022960) RV_VSEL Dtype: B32, ssid: 28
+[info] [00002296] DisPatch iterCntCyc_: 0, iterCnt_: 3
+[info] [00002296] IFU send instr to IDU: (PC: 0x10d0d928) RVECST   : (Binary: 0x44480108) (ID: 022961) RV_VST, ssid: 29
+[info] [00002296] Hwlp set to idle mode, pc: 0x10d0d930
+[info] [00002298] IFU send instr to IDU: (PC: 0x10d0d92c) RVECSU   : (Binary: 0xc0000017) (ID: 022974) RV_SEND, ssid: 30
+[info] ++++++++++++++++++++++core: 1, subcore: 2, start: 213, tick: 2916, kernelId: 0, blkID: 3, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

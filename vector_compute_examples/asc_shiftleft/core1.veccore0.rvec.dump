@@ -1,0 +1,11 @@
+[info] 1274 start peek vf prefetch (ID:6044), peekFifo size: 1
+[info] [00001275] Tde send peek prefetch request: addr: 0x10d0e000, reqid: 1
+[info] [00001821] VF (ID:006044) read pb big_falgs: 0xfe, pb_slot: 0
+[info] [00001821] PFU: S2: 0x100 ,S3: 0x0, S65: 0x100
+[info] [00001821] PFU: S4: 0x0 ,S5: 0x4, S66: 0x40000
+[info] [00001821] PFU: S6: 0x4 ,S7: 0x0, S67: 0x4
+[info] [00001821] PFU: S8: 0x100 ,S9: 0x0, S68: 0x100
+[info] [00001821] PFU: S10: 0x3c00 ,S11: 0x0, S69: 0x3c00
+[info] [00001821] PFU: S12: 0x4000 ,S13: 0x0, S70: 0x4000
+[info] [00001821] PFU: S14: 0x4400 ,S15: 0x0, S71: 0x4400
+[info] ++++++++++++++++++++++core: 1, subcore: 1, start: 211, tick: 2393, kernelId: 0, blkID: 2, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

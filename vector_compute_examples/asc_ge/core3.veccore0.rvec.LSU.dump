@@ -1,0 +1,94 @@
+[info] [PERF] [0000002265] [SEND_UB_RD.PORT_0] bytes_per_mask 1 req_id 1567 instr_name RV_VLDI instr_id 22857 PC 10d0d904
+[info] [PERF] [0000002265] LSU_I1 instr_name RV_VLDI instr_id 22857 req_id 1567 PC 10d0d904 Pipe:LDU0
+[info] [PERF] [0000002265] [SEND_UB_RD.PORT_1] bytes_per_mask 1 req_id 1568 instr_name RV_VLDI instr_id 22858 PC 10d0d908
+[info] [PERF] [0000002265] LSU_I1 instr_name RV_VLDI instr_id 22858 req_id 1568 PC 10d0d908 Pipe:LDU1
+[info] [PERF] [0000002266] [SEND_UB_RD.PORT_0] bytes_per_mask 1 req_id 1571 instr_name RV_VLD instr_id 22866 PC 10d0d914
+[info] [PERF] [0000002266] LSU_I1 instr_name RV_VLD instr_id 22866 req_id 1571 PC 10d0d914 Pipe:LDU0
+[info] [PERF] [0000002266] [SEND_UB_RD.PORT_1] bytes_per_mask 1 req_id 1572 instr_name RV_VLD instr_id 22867 PC 10d0d918
+[info] [PERF] [0000002266] LSU_I1 instr_name RV_VLD instr_id 22867 req_id 1572 PC 10d0d918 Pipe:LDU1
+[info] [PERF] [0000002267] [SEND_UB_RD.PORT_0] bytes_per_mask 1 req_id 1575 instr_name RV_VLD instr_id 22872 PC 10d0d914
+[info] [PERF] [0000002267] LSU_I1 instr_name RV_VLD instr_id 22872 req_id 1575 PC 10d0d914 Pipe:LDU0
+[info] [PERF] [0000002268] [SEND_UB_RD.PORT_0] bytes_per_mask 1 req_id 1579 instr_name RV_VLD instr_id 22873 PC 10d0d918
+[info] [PERF] [0000002268] LSU_I1 instr_name RV_VLD instr_id 22873 req_id 1579 PC 10d0d918 Pipe:LDU1
+[info] [PERF] [0000002268] [SEND_UB_RD.PORT_1] bytes_per_mask 1 req_id 1580 instr_name RV_VLD instr_id 22884 PC 10d0d914
+[info] [PERF] [0000002268] LSU_I1 instr_name RV_VLD instr_id 22884 req_id 1580 PC 10d0d914 Pipe:LDU0
+[info] [PERF] [0000002269] [SEND_UB_RD.PORT_0] bytes_per_mask 1 req_id 1583 instr_name RV_VLD instr_id 22885 PC 10d0d918
+[info] [PERF] [0000002269] LSU_I1 instr_name RV_VLD instr_id 22885 req_id 1583 PC 10d0d918 Pipe:LDU0
+[info] [PERF] [0000002269] [SEND_UB_RD.PORT_1] bytes_per_mask 1 req_id 1584 instr_name RV_VLD instr_id 22897 PC 10d0d914
+[info] [PERF] [0000002269] LSU_I1 instr_name RV_VLD instr_id 22897 req_id 1584 PC 10d0d914 Pipe:LDU1
+[info] [PERF] [0000002270] [SEND_UB_RD.PORT_0] bytes_per_mask 1 req_id 1587 instr_name RV_VLD instr_id 22898 PC 10d0d918
+[info] [PERF] [0000002270] LSU_I1 instr_name RV_VLD instr_id 22898 req_id 1587 PC 10d0d918 Pipe:LDU0
+[info] [PERF] [0000002270] SEND_RELEASE.LD instr_name RV_VLDI instr_id 22857 PC 10d0d904
+[info] [PERF] [0000002270] SEND_RELEASE.LD instr_name RV_VLDI instr_id 22858 PC 10d0d908
+[info] [PERF] [0000002271] SEND_RELEASE.LD instr_name RV_VLD instr_id 22866 PC 10d0d914
+[info] [PERF] [0000002272] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002272] LSU_RETIRE.LDU instr_name RV_VLDI instr_id 22857 PC 10d0d904
+[info] [PERF] [0000002272] LSU_RETIRE.LDU instr_name RV_VLDI instr_id 22858 PC 10d0d908
+[info] [PERF] [0000002272] SEND_RELEASE.LD instr_name RV_VLD instr_id 22872 PC 10d0d914
+[info] [PERF] [0000002272] SEND_RELEASE.LD instr_name RV_VLD instr_id 22867 PC 10d0d918
+[info] [PERF] [0000002273] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002273] LSU_RETIRE.LDU instr_name RV_VLD instr_id 22866 PC 10d0d914
+[info] [PERF] [0000002273] SEND_RELEASE.LD instr_name RV_VLD instr_id 22884 PC 10d0d914
+[info] [PERF] [0000002273] SEND_RELEASE.LD instr_name RV_VLD instr_id 22873 PC 10d0d918
+[info] [PERF] [0000002274] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002274] LSU_RETIRE.LDU instr_name RV_VLD instr_id 22872 PC 10d0d914
+[info] [PERF] [0000002274] LSU_RETIRE.LDU instr_name RV_VLD instr_id 22867 PC 10d0d918
+[info] [PERF] [0000002274] SEND_RELEASE.LD instr_name RV_VLD instr_id 22885 PC 10d0d918
+[info] [PERF] [0000002274] SEND_RELEASE.LD instr_name RV_VLD instr_id 22897 PC 10d0d914
+[info] [PERF] [0000002275] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002275] LSU_RETIRE.LDU instr_name RV_VLD instr_id 22884 PC 10d0d914
+[info] [PERF] [0000002275] LSU_RETIRE.LDU instr_name RV_VLD instr_id 22873 PC 10d0d918
+[info] [PERF] [0000002275] SEND_RELEASE.LD instr_name RV_VLD instr_id 22898 PC 10d0d918
+[info] [PERF] [0000002276] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002276] LSU_RETIRE.LDU instr_name RV_VLD instr_id 22885 PC 10d0d918
+[info] [PERF] [0000002276] LSU_RETIRE.LDU instr_name RV_VLD instr_id 22897 PC 10d0d914
+[info] [PERF] [0000002277] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002277] LSU_RETIRE.LDU instr_name RV_VLD instr_id 22898 PC 10d0d918
+[info] [PERF] [0000002278] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002279] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002279] [STU_IB_BUF.RECV] instr_name RV_VST instr_id 22871 PC 10d0d928 stu_ib_buf_cnt 1
+[info] [PERF] [0000002279] SEND_RELEASE.ST instr_name RV_VST instr_id 22871 PC 10d0d928
+[info] [PERF] [0000002280] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002280] [STU_IB_BUF.RECV] instr_name RV_VST instr_id 22877 PC 10d0d928 stu_ib_buf_cnt 2
+[info] [PERF] [0000002280] SEND_RELEASE.ST instr_name RV_VST instr_id 22877 PC 10d0d928
+[info] [PERF] [0000002281] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002281] [STU_IB_BUF.RECV] instr_name RV_VST instr_id 22896 PC 10d0d928 stu_ib_buf_cnt 3
+[info] [PERF] [0000002281] SEND_RELEASE.ST instr_name RV_VST instr_id 22896 PC 10d0d928
+[info] [PERF] [0000002282] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002283] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002284] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002284] [STU_IB_BUF.RECV] instr_name RV_VST instr_id 22909 PC 10d0d928 stu_ib_buf_cnt 4
+[info] [PERF] [0000002284] SEND_RELEASE.ST instr_name RV_VST instr_id 22909 PC 10d0d928
+[info] [PERF] [0000002284] [SEND_UB_WR] req_id 1589 is_dual_src false bytes_per_mask 4  instr_name RV_VST instr_id 22871 PC 10d0d928
+[info] [PERF] [0000002284] [STU_IB_BUF.ISSUE] instr_name RV_VST instr_id 22871 PC 10d0d928 stu_ib_buf_cnt 4 Pipe:STU
+[info] [PERF] [0000002285] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002285] [STU_IB_BUF.POP] instr_name RV_VST instr_id 22871 PC 10d0d928 stu_ib_buf_cnt 3 Pipe:STU
+[info] [PERF] [0000002285] [SEND_UB_WR] req_id 1591 is_dual_src false bytes_per_mask 4  instr_name RV_VST instr_id 22877 PC 10d0d928
+[info] [PERF] [0000002285] [STU_IB_BUF.ISSUE] instr_name RV_VST instr_id 22877 PC 10d0d928 stu_ib_buf_cnt 3 Pipe:STU
+[info] [PERF] [0000002286] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002286] [STU_IB_BUF.POP] instr_name RV_VST instr_id 22877 PC 10d0d928 stu_ib_buf_cnt 2 Pipe:STU
+[info] [PERF] [0000002286] LSU_RETIRE.STU instr_name RV_VST instr_id 22871 PC 10d0d928
+[info] [PERF] [0000002286] [SEND_UB_WR] req_id 1593 is_dual_src false bytes_per_mask 4  instr_name RV_VST instr_id 22896 PC 10d0d928
+[info] [PERF] [0000002286] [STU_IB_BUF.ISSUE] instr_name RV_VST instr_id 22896 PC 10d0d928 stu_ib_buf_cnt 2 Pipe:STU
+[info] [PERF] [0000002287] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002287] [STU_IB_BUF.POP] instr_name RV_VST instr_id 22896 PC 10d0d928 stu_ib_buf_cnt 1 Pipe:STU
+[info] [PERF] [0000002287] LSU_RETIRE.STU instr_name RV_VST instr_id 22877 PC 10d0d928
+[info] [PERF] [0000002288] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002288] [STALL.SEND] [STU], instr_id: 22918
+[info] [PERF] [0000002288] LSU_RETIRE.STU instr_name RV_VST instr_id 22896 PC 10d0d928
+[info] [PERF] [0000002289] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002289] [STALL.SEND] [STU], instr_id: 22918
+[info] [PERF] [0000002289] [SEND_UB_WR] req_id 1595 is_dual_src false bytes_per_mask 4  instr_name RV_VST instr_id 22909 PC 10d0d928
+[info] [PERF] [0000002289] [STU_IB_BUF.ISSUE] instr_name RV_VST instr_id 22909 PC 10d0d928 stu_ib_buf_cnt 1 Pipe:STU
+[info] [PERF] [0000002290] [STALL.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002290] [STU_IB_BUF.POP] instr_name RV_VST instr_id 22909 PC 10d0d928 stu_ib_buf_cnt 0 Pipe:STU
+[info] [PERF] [0000002290] [STALL.SEND] [STU], instr_id: 22918
+[info] [PERF] [0000002291] [GO.SEND] [LDU], instr_id: 22918
+[info] [PERF] [0000002291] LSU_I1 instr_name RV_SEND instr_id 22918 req_id 0 PC 10d0d92c Pipe:LDU0
+[info] [PERF] [0000002291] [STALL.SEND] [STU], instr_id: 22918
+[info] [PERF] [0000002291] LSU_RETIRE.STU instr_name RV_VST instr_id 22909 PC 10d0d928
+[info] [PERF] [0000002292] [GO.SEND] [STU], instr_id: 22918
+[info] [PERF] [0000002292] LSU_I1 instr_name RV_SEND instr_id 22918 PC 10d0d92c Pipe:STU
+[info] [PERF] [0000002292] LSU_RETIRE.LDU instr_name RV_SEND instr_id 22918 PC 10d0d92c
+[info] [PERF] [0000002292] LSU_RETIRE.STU instr_name RV_SEND instr_id 22918 PC 10d0d92c
+[info] ++++++++++++++++++++++core: 3, subcore: 1, start: 216, tick: 2861, kernelId: 0, blkID: 6, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

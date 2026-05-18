@@ -1,0 +1,17 @@
+[info] [0000000000] Core 3 Setting LOG.core_enable_mask=0xffffffff and STAT.core_enable_mask=0xffffffff, chip_idx=0
+[info] [0000000214] Core 3 subcore1 Simt Param
+[info] shmemSz 262144
+[info] stackBase_ 284217344
+[info] warpStackSz_ 8192
+[info] dvgStackBase_ 655360
+[info] dvgWarpStackSz_ 1024
+[info] [0000000214] Core 3 subcore 1 start pc 0x10d0d7d4 param base 0x1022c000
+[info] [0000000215] Core 3 subcore2 Simt Param
+[info] shmemSz 262144
+[info] stackBase_ 284217344
+[info] warpStackSz_ 8192
+[info] dvgStackBase_ 655360
+[info] dvgWarpStackSz_ 1024
+[info] [0000000215] Core 3 subcore 2 start pc 0x10d0d7d4 param base 0x1022c000
+[info] [0000002292] Core 3 subcore 2 block done.
+[info] [0000002369] Core 3 subcore 1 block done.

@@ -1,0 +1,22 @@
+[info] 0 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 0 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] [PERF] [0000001729] OOO_RECV instr_name RV_VLDI instr_id 4176 PC 10d0dd00
+[info] 1729 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 1729 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] [PERF] [0000001729] OOO_RECV instr_name RV_PLT instr_id 4178 PC 10d0dd08
+[info] [PERF] [0000001729] OOO_SEND instr_name RV_VLDI instr_id 4176 PC 10d0dd00
+[info] [PERF] [0000001729] OOO_SEND instr_name RV_PLT instr_id 4178 PC 10d0dd08
+[info] [PERF] [0000001730] OOO_RECV instr_name RV_VCMIN instr_id 4180 PC 10d0dd10
+[info] [PERF] [0000001730] OOO_RECV instr_name RV_PLT instr_id 4181 PC 10d0dd14
+[info] [PERF] [0000001730] OOO_RECV instr_name RV_VSTI instr_id 4182 PC 10d0dd18
+[info] [PERF] [0000001730] OOO_RECV instr_name RV_SEND instr_id 4183 PC 10d0dd1c
+[info] [PERF] [0000001730] OOO_RECV instr_name RV_SEND instr_id 4183 PC 10d0dd1c
+[info] [PERF] [0000001730] OOO_SEND instr_name RV_VCMIN instr_id 4180 PC 10d0dd10
+[info] [PERF] [0000001730] OOO_SEND instr_name RV_PLT instr_id 4181 PC 10d0dd14
+[info] [PERF] [0000001730] OOO_SEND instr_name RV_VSTI instr_id 4182 PC 10d0dd18
+[info] [PERF] [0000001730] OOO_SEND instr_name RV_SEND instr_id 4183 PC 10d0dd1c
+[info] [PERF] [0000001730] OOO_SEND instr_name RV_SEND instr_id 4183 PC 10d0dd1c
+[info] 1741 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:1) preg avail num:31 vreg avail num:67
+[info] 1771 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 1771 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] ++++++++++++++++++++++core: 2, subcore: 2, start: 213, tick: 2250, kernelId: 0, blkID: 5, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

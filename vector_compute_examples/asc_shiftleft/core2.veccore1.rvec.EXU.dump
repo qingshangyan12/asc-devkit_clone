@@ -1,0 +1,12 @@
+[info] Using valu table: V310_SIMD_82_OUT
+[info] [PERF] [0000001783] EXU instr_name RV_PLT type.B32 instr_id 6231 PC 10d0e014 retire 1788 vloop_id 1 vloop_pc 10d0e008 ele_cnt 0 exu_id:1
+[info] [PERF] [0000001784] EXU instr_name RV_PLT type.B32 instr_id 6246 PC 10d0e014 retire 1789 vloop_id 1 vloop_pc 10d0e008 ele_cnt 0 exu_id:0
+[info] [PERF] [0000001785] EXU instr_name RV_PLT type.B32 instr_id 6259 PC 10d0e014 retire 1790 vloop_id 1 vloop_pc 10d0e008 ele_cnt 0 exu_id:1
+[info] [PERF] [0000001786] EXU instr_name RV_PLT type.B32 instr_id 6267 PC 10d0e014 retire 1791 vloop_id 1 vloop_pc 10d0e008 ele_cnt 0 exu_id:0
+[info] [PERF] [0000001789] EXU instr_name RV_VSHL type.U32 instr_id 6232 PC 10d0e018 retire 1794 vloop_id 1 vloop_pc 10d0e008 ele_cnt 64 exu_id:1
+[info] [PERF] [0000001790] EXU instr_name RV_VSHL type.U32 instr_id 6247 PC 10d0e018 retire 1795 vloop_id 1 vloop_pc 10d0e008 ele_cnt 64 exu_id:0
+[info] [PERF] [0000001791] EXU instr_name RV_VSHL type.U32 instr_id 6260 PC 10d0e018 retire 1796 vloop_id 1 vloop_pc 10d0e008 ele_cnt 64 exu_id:1
+[info] [PERF] [0000001792] EXU instr_name RV_VSHL type.U32 instr_id 6268 PC 10d0e018 retire 1797 vloop_id 1 vloop_pc 10d0e008 ele_cnt 64 exu_id:0
+[info] [PERF] [0000001803] EXU instr_name RV_SEND instr_id 6279 PC 10d0e020 retire 1804 vloop_id 0 vloop_pc 0 ele_cnt 0 exu_id:0
+[info] [PERF] [0000001803] EXU instr_name RV_SEND instr_id 6279 PC 10d0e020 retire 1804 vloop_id 0 vloop_pc 0 ele_cnt 0 exu_id:1
+[info] ++++++++++++++++++++++core: 2, subcore: 2, start: 214, tick: 2384, kernelId: 0, blkID: 5, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

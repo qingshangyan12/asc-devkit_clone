@@ -1,0 +1,52 @@
+[info] [1729]: recv_mte_wr_cmd, port: mte1, addr: 0x13b33200, size:512, gid: 45495, cmdIdx:0, stbIdx:1, atomicStore:0
+[info] [1730]: send_aw_cmd, port: mte1, align_addr 0x13b33200, wr_len 512, addr: 0x13b33200, gid:45495, cmdIdx: 0, stbIdx:1, atomicLoad: 0, atomicStore: 0, retire_set: 0, axi_port: 0
+[info] [1730]: recv_mte_wr_cmd, port: mte1, addr: 0x13b33400, size:512, gid: 45498, cmdIdx:1, stbIdx:3, atomicStore:0
+[info] [1731]: send_aw_cmd, port: mte1, align_addr 0x13b33400, wr_len 512, addr: 0x13b33400, gid:45498, cmdIdx: 1, stbIdx:3, atomicLoad: 0, atomicStore: 0, retire_set: 1, axi_port: 0
+[info] [1731]: send_wr_cmd_rsp, port: mte1, addr: 0x13b33200, gid: 45495, stbIdx:1
+[info] [1732]: send_wr_cmd_rsp, port: mte1, addr: 0x13b33400, gid: 45498, stbIdx:3
+[info] 1733: bdwt_acculator, tnx_id: 0, size: 512
+[info] 1734: bdwt_acculator, tnx_id: 0, size: 512
+[info] [1755]: recv_wr_data, port: mte1, addr: 0x13b33200, size: 512 gid: 45495, stbidx: 1, retire_set: 0
+[info] [1759]: recv_wr_data, port: mte1, addr: 0x13b33400, size: 512 gid: 45498, stbidx: 3, retire_set: 1
+[info] [1759]:write_store_buf, port:mte1, addr:0x13b33200, gid: 45495, stbIdx:1, cycleCnt:4
+[info] [1763]:write_store_buf, port:mte1, addr:0x13b33400, gid: 45498, stbIdx:3, cycleCnt:4
+[info] [1830]: recv_mte_wr_cmd, port: mte2, addr: 0x13b33600, size:512, gid: 45570, cmdIdx:2, stbIdx:5, atomicStore:0
+[info] [1831]: send_aw_cmd, port: mte2, align_addr 0x13b33600, wr_len 512, addr: 0x13b33600, gid:45570, cmdIdx: 2, stbIdx:5, atomicLoad: 0, atomicStore: 0, retire_set: 0, axi_port: 0
+[info] [1831]: recv_mte_wr_cmd, port: mte2, addr: 0x13b33800, size:512, gid: 45571, cmdIdx:3, stbIdx:7, atomicStore:0
+[info] [1832]: send_aw_cmd, port: mte2, align_addr 0x13b33800, wr_len 512, addr: 0x13b33800, gid:45571, cmdIdx: 3, stbIdx:7, atomicLoad: 0, atomicStore: 0, retire_set: 1, axi_port: 0
+[info] [1832]: send_wr_cmd_rsp, port: mte2, addr: 0x13b33600, gid: 45570, stbIdx:5
+[info] [1833]: send_wr_cmd_rsp, port: mte2, addr: 0x13b33800, gid: 45571, stbIdx:7
+[info] 1834: bdwt_acculator, tnx_id: 0, size: 512
+[info] 1835: bdwt_acculator, tnx_id: 0, size: 512
+[info] [1856]: recv_wr_data, port: mte2, addr: 0x13b33600, size: 512 gid: 45570, stbidx: 5, retire_set: 0
+[info] [1860]: recv_wr_data, port: mte2, addr: 0x13b33800, size: 512 gid: 45571, stbidx: 7, retire_set: 1
+[info] [1860]:write_store_buf, port:mte2, addr:0x13b33600, gid: 45570, stbIdx:5, cycleCnt:4
+[info] [1864]:write_store_buf, port:mte2, addr:0x13b33800, gid: 45571, stbIdx:7, cycleCnt:4
+[info] [2073]: recv_wack, port: mte1, addr: 0x13b33200, gid: 45495, atomicLoad: 0, cbusy: 0
+[info] [2074]: push biu_tag_pool, gid: 45495, stbIdx:1,cmdIdx:0
+[info] [2074]: push biu_tag_pool, gid: 45495, idx:2
+[info] [2074]: ict_wr_data_ready, addr: 0x13b33200, gid: 45495, stbidx: 0
+[info] [2081]: send_wr_data, port: mte1, addr: 0x13b33200, size: 512,gid: 45495, stbidx: 1
+[info] [2113]: recv_brsp, port: mte1, addr: 0x13b33200, gid: 45495, cmdIdx: 0, instr_id: 7
+[info] [2128]: send_data_rsp, port: mte1, addr: 0x13b33200, gid: 45495
+[info] [2231]: recv_wack, port: mte1, addr: 0x13b33400, gid: 45498, atomicLoad: 0, cbusy: 0
+[info] [2232]: push biu_tag_pool, gid: 45498, stbIdx:3,cmdIdx:1
+[info] [2232]: push biu_tag_pool, gid: 45498, idx:4
+[info] [2232]: ict_wr_data_ready, addr: 0x13b33400, gid: 45498, stbidx: 2
+[info] [2239]: send_wr_data, port: mte1, addr: 0x13b33400, size: 512,gid: 45498, stbidx: 3
+[info] [2252]: recv_wack, port: mte2, addr: 0x13b33600, gid: 45570, atomicLoad: 0, cbusy: 0
+[info] [2253]: push biu_tag_pool, gid: 45570, stbIdx:5,cmdIdx:2
+[info] [2253]: push biu_tag_pool, gid: 45570, idx:6
+[info] [2253]: ict_wr_data_ready, addr: 0x13b33600, gid: 45570, stbidx: 4
+[info] [2260]: send_wr_data, port: mte2, addr: 0x13b33600, size: 512,gid: 45570, stbidx: 5
+[info] [2278]: recv_brsp, port: mte1, addr: 0x13b33400, gid: 45498, cmdIdx: 1, instr_id: 7
+[info] [2284]: recv_brsp, port: mte2, addr: 0x13b33600, gid: 45570, cmdIdx: 2, instr_id: 8
+[info] [2293]: send_data_rsp, port: mte1, addr: 0x13b33400, gid: 45498
+[info] [2299]: send_data_rsp, port: mte2, addr: 0x13b33600, gid: 45570
+[info] [2341]: recv_wack, port: mte2, addr: 0x13b33800, gid: 45571, atomicLoad: 0, cbusy: 0
+[info] [2342]: push biu_tag_pool, gid: 45571, stbIdx:7,cmdIdx:3
+[info] [2342]: push biu_tag_pool, gid: 45571, idx:8
+[info] [2342]: ict_wr_data_ready, addr: 0x13b33800, gid: 45571, stbidx: 6
+[info] [2349]: send_wr_data, port: mte2, addr: 0x13b33800, size: 512,gid: 45571, stbidx: 7
+[info] [2384]: recv_brsp, port: mte2, addr: 0x13b33800, gid: 45571, cmdIdx: 3, instr_id: 8
+[info] [2399]: send_data_rsp, port: mte2, addr: 0x13b33800, gid: 45571

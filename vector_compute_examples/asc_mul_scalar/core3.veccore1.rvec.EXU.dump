@@ -1,0 +1,12 @@
+[info] Using valu table: V310_SIMD_82_OUT
+[info] [PERF] [0000001778] EXU instr_name RV_PLT type.B32 instr_id 5688 PC 10d0df10 retire 1783 vloop_id 1 vloop_pc 10d0df08 ele_cnt 0 exu_id:1
+[info] [PERF] [0000001779] EXU instr_name RV_PLT type.B32 instr_id 5692 PC 10d0df10 retire 1784 vloop_id 1 vloop_pc 10d0df08 ele_cnt 0 exu_id:0
+[info] [PERF] [0000001780] EXU instr_name RV_PLT type.B32 instr_id 5696 PC 10d0df10 retire 1785 vloop_id 1 vloop_pc 10d0df08 ele_cnt 0 exu_id:1
+[info] [PERF] [0000001781] EXU instr_name RV_PLT type.B32 instr_id 5700 PC 10d0df10 retire 1786 vloop_id 1 vloop_pc 10d0df08 ele_cnt 0 exu_id:0
+[info] [PERF] [0000001783] EXU instr_name RV_VMULS type.F32 instr_id 5689 PC 10d0df14 retire 1790 vloop_id 1 vloop_pc 10d0df08 ele_cnt 64 exu_id:1
+[info] [PERF] [0000001784] EXU instr_name RV_VMULS type.F32 instr_id 5693 PC 10d0df14 retire 1791 vloop_id 1 vloop_pc 10d0df08 ele_cnt 64 exu_id:0
+[info] [PERF] [0000001785] EXU instr_name RV_VMULS type.F32 instr_id 5697 PC 10d0df14 retire 1792 vloop_id 1 vloop_pc 10d0df08 ele_cnt 64 exu_id:1
+[info] [PERF] [0000001786] EXU instr_name RV_VMULS type.F32 instr_id 5701 PC 10d0df14 retire 1793 vloop_id 1 vloop_pc 10d0df08 ele_cnt 64 exu_id:0
+[info] [PERF] [0000001799] EXU instr_name RV_SEND instr_id 5703 PC 10d0df1c retire 1800 vloop_id 0 vloop_pc 0 ele_cnt 0 exu_id:0
+[info] [PERF] [0000001799] EXU instr_name RV_SEND instr_id 5703 PC 10d0df1c retire 1800 vloop_id 0 vloop_pc 0 ele_cnt 0 exu_id:1
+[info] ++++++++++++++++++++++core: 3, subcore: 2, start: 215, tick: 2292, kernelId: 0, blkID: 7, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

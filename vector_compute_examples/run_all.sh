@@ -27,6 +27,11 @@ SAMPLES=(
     "asc_ln"
     "asc_and"
     "asc_or"
+    "asc_reduce_min"
+    "asc_xor"
+    "asc_shiftleft"
+    "asc_ge"
+    "asc_mul_scalar"
 )
 
 PASS=0

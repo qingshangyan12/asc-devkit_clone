@@ -1,0 +1,457 @@
+[info] 570: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 570: [D1 Stage] to I1 success. instr.name=MOV_XD_SPR instr.pc=0x10d0d7d4 instr.id=4808
+[info] 570: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 570: [D1 Stage] to I1 success. instr.name=MOVK instr.pc=0x10d0d7d8 instr.id=4809
+[info] 571: ccu decode scalar isa , isa_type:2,isa_latency:1.
+[info] 571: [D1 Stage] to I1 success. instr.name=DC_PRELOAD_XN_IMM instr.pc=0x10d0d7dc instr.id=4810
+[info] 571: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 571: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d7e0 instr.id=4811
+[info] 571: [ISSUE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d7d4 instr.id=4808
+[info] 571: [EXECUTE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d7d4 instr.id=4808
+[info] 571: [ISSUE INSTR] instr.name=MOVK instr.pc=0x10d0d7d8 instr.id=4809
+[info] 571: [EXECUTE INSTR] instr.name=MOVK instr.pc=0x10d0d7d8 instr.id=4809
+[info] 572: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 572: [D1 Stage] to I1 success. instr.name=MOVK instr.pc=0x10d0d7e4 instr.id=4812
+[info] 572: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 572: [D1 Stage] to I1 success. instr.name=MOV_XD_SPR instr.pc=0x10d0d7e8 instr.id=4813
+[info] 572: [ISSUE INSTR] instr.name=DC_PRELOAD_XN_IMM instr.pc=0x10d0d7dc instr.id=4810
+[info] 572: [ISSUE INSTR] general hazard failed.
+[info] 573: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 573: [ISSUE INSTR] instr.name=DC_PRELOAD_XN_IMM instr.pc=0x10d0d7dc instr.id=4810
+[info] 573: [ISSUE INSTR] general hazard failed.
+[info] 574: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 574: [ISSUE INSTR] instr.name=DC_PRELOAD_XN_IMM instr.pc=0x10d0d7dc instr.id=4810
+[info] 574: [ISSUE INSTR] general hazard failed.
+[info] 575: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 575: [ISSUE INSTR] instr.name=DC_PRELOAD_XN_IMM instr.pc=0x10d0d7dc instr.id=4810
+[info] 575: [EXECUTE INSTR] instr.name=DC_PRELOAD_XN_IMM instr.pc=0x10d0d7dc instr.id=4810
+[info] 575: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d7e0 instr.id=4811
+[info] 575: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d7e0 instr.id=4811
+[info] 576: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 576: [D1 Stage] to I1 success. instr.name=MOV_XD_SPR instr.pc=0x10d0d7ec instr.id=4814
+[info] 576: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 576: [D1 Stage] to I1 success. instr.name=ADD instr.pc=0x10d0d7f0 instr.id=4815
+[info] 576: [ISSUE INSTR] instr.name=MOVK instr.pc=0x10d0d7e4 instr.id=4812
+[info] 576: [EXECUTE INSTR] instr.name=MOVK instr.pc=0x10d0d7e4 instr.id=4812
+[info] 576: [ISSUE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d7e8 instr.id=4813
+[info] 576: [EXECUTE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d7e8 instr.id=4813
+[info] 577: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 577: [D1 Stage] to I1 success. instr.name=MOV_XD_SPR instr.pc=0x10d0d7f4 instr.id=4816
+[info] 577: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 577: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d7f8 instr.id=4817
+[info] 577: [ISSUE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d7ec instr.id=4814
+[info] 577: [EXECUTE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d7ec instr.id=4814
+[info] 577: [ISSUE INSTR] instr.name=ADD instr.pc=0x10d0d7f0 instr.id=4815
+[info] 577: [EXECUTE INSTR] instr.name=ADD instr.pc=0x10d0d7f0 instr.id=4815
+[info] 578: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 578: [D1 Stage] to I1 success. instr.name=SHR instr.pc=0x10d0d7fc instr.id=4818
+[info] 578: [ISSUE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d7f4 instr.id=4816
+[info] 578: [EXECUTE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d7f4 instr.id=4816
+[info] 578: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d7f8 instr.id=4817
+[info] 578: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d7f8 instr.id=4817
+[info] 579: [ISSUE INSTR] instr.name=SHR instr.pc=0x10d0d7fc instr.id=4818
+[info] 579: [EXECUTE INSTR] instr.name=SHR instr.pc=0x10d0d7fc instr.id=4818
+[info] 1054: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1054: [D1 Stage] to I1 success. instr.name=AND instr.pc=0x10d0d800 instr.id=4896
+[info] 1054: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1054: [D1 Stage] to I1 success. instr.name=ADD_IMM instr.pc=0x10d0d804 instr.id=4897
+[info] 1055: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1055: [D1 Stage] to I1 success. instr.name=SHL instr.pc=0x10d0d808 instr.id=4898
+[info] 1055: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1055: [D1 Stage] to I1 success. instr.name=ADD_IMM instr.pc=0x10d0d80c instr.id=4899
+[info] 1055: [ISSUE INSTR] instr.name=AND instr.pc=0x10d0d800 instr.id=4896
+[info] 1055: [EXECUTE INSTR] instr.name=AND instr.pc=0x10d0d800 instr.id=4896
+[info] 1055: [ISSUE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d804 instr.id=4897
+[info] 1055: [EXECUTE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d804 instr.id=4897
+[info] 1056: ccu decode scalar isa , isa_type:0,isa_latency:3.
+[info] 1056: [D1 Stage] to I1 success. instr.name=MADD instr.pc=0x10d0d810 instr.id=4900
+[info] 1056: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1056: [D1 Stage] to I1 success. instr.name=ADD_IMM instr.pc=0x10d0d814 instr.id=4901
+[info] 1056: [ISSUE INSTR] instr.name=SHL instr.pc=0x10d0d808 instr.id=4898
+[info] 1056: [EXECUTE INSTR] instr.name=SHL instr.pc=0x10d0d808 instr.id=4898
+[info] 1056: [ISSUE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d80c instr.id=4899
+[info] 1056: [EXECUTE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d80c instr.id=4899
+[info] 1057: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1057: [D1 Stage] to I1 success. instr.name=MOV_XD_SPR instr.pc=0x10d0d818 instr.id=4902
+[info] 1057: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1057: [D1 Stage] to I1 success. instr.name=MOVK instr.pc=0x10d0d81c instr.id=4903
+[info] 1057: [ISSUE INSTR] instr.name=MADD instr.pc=0x10d0d810 instr.id=4900
+[info] 1057: [EXECUTE INSTR] instr.name=MADD instr.pc=0x10d0d810 instr.id=4900
+[info] 1057: [ISSUE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d814 instr.id=4901
+[info] 1057: [ISSUE INSTR] general hazard failed.
+[info] 1058: ccu decode scalar isa , isa_type:2,isa_latency:1.
+[info] 1058: [D1 Stage] to I1 success. instr.name=LDP_XI_XJ_XN instr.pc=0x10d0d820 instr.id=4904
+[info] 1058: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1058: [ISSUE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d814 instr.id=4901
+[info] 1058: [ISSUE INSTR] general hazard failed.
+[info] 1059: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1059: [ISSUE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d814 instr.id=4901
+[info] 1059: [ISSUE INSTR] general hazard failed.
+[info] 1060: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1060: [ISSUE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d814 instr.id=4901
+[info] 1060: [EXECUTE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d814 instr.id=4901
+[info] 1060: [ISSUE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d818 instr.id=4902
+[info] 1060: [EXECUTE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d818 instr.id=4902
+[info] 1061: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1061: [D1 Stage] to I1 success. instr.name=MOV_XD_SPR instr.pc=0x10d0d824 instr.id=4905
+[info] 1061: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1061: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d828 instr.id=4906
+[info] 1061: [ISSUE INSTR] instr.name=MOVK instr.pc=0x10d0d81c instr.id=4903
+[info] 1061: [EXECUTE INSTR] instr.name=MOVK instr.pc=0x10d0d81c instr.id=4903
+[info] 1061: [ISSUE INSTR] instr.name=LDP_XI_XJ_XN instr.pc=0x10d0d820 instr.id=4904
+[info] 1061: [ISSUE INSTR] general hazard failed.
+[info] 1062: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1062: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d82c instr.id=4907
+[info] 1062: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1062: [ISSUE INSTR] instr.name=LDP_XI_XJ_XN instr.pc=0x10d0d820 instr.id=4904
+[info] 1062: [ISSUE INSTR] general hazard failed.
+[info] 1063: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1063: [ISSUE INSTR] instr.name=LDP_XI_XJ_XN instr.pc=0x10d0d820 instr.id=4904
+[info] 1063: [ISSUE INSTR] general hazard failed.
+[info] 1064: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1064: [ISSUE INSTR] instr.name=LDP_XI_XJ_XN instr.pc=0x10d0d820 instr.id=4904
+[info] 1064: [ISSUE INSTR] general hazard failed.
+[info] 1065: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1065: [ISSUE INSTR] instr.name=LDP_XI_XJ_XN instr.pc=0x10d0d820 instr.id=4904
+[info] 1065: [EXECUTE INSTR] instr.name=LDP_XI_XJ_XN instr.pc=0x10d0d820 instr.id=4904
+[info] 1065: [ISSUE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d824 instr.id=4905
+[info] 1065: [EXECUTE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d824 instr.id=4905
+[info] 1066: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1066: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d830 instr.id=4908
+[info] 1066: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1066: [D1 Stage] to I1 success. instr.name=MOVK instr.pc=0x10d0d834 instr.id=4909
+[info] 1066: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d828 instr.id=4906
+[info] 1066: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d828 instr.id=4906
+[info] 1066: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d82c instr.id=4907
+[info] 1066: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d82c instr.id=4907
+[info] 1067: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1067: [D1 Stage] to I1 success. instr.name=MOVK instr.pc=0x10d0d838 instr.id=4910
+[info] 1067: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1067: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d83c instr.id=4911
+[info] 1067: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d830 instr.id=4908
+[info] 1067: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d830 instr.id=4908
+[info] 1067: [ISSUE INSTR] instr.name=MOVK instr.pc=0x10d0d834 instr.id=4909
+[info] 1067: [EXECUTE INSTR] instr.name=MOVK instr.pc=0x10d0d834 instr.id=4909
+[info] 1068: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1068: [D1 Stage] to I1 success. instr.name=SBITSET instr.pc=0x10d0d840 instr.id=4912
+[info] 1068: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1068: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d844 instr.id=4913
+[info] 1068: [ISSUE INSTR] instr.name=MOVK instr.pc=0x10d0d838 instr.id=4910
+[info] 1068: [EXECUTE INSTR] instr.name=MOVK instr.pc=0x10d0d838 instr.id=4910
+[info] 1068: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d83c instr.id=4911
+[info] 1068: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d83c instr.id=4911
+[info] 1069: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1069: [D1 Stage] to I1 success. instr.name=SBITSET instr.pc=0x10d0d848 instr.id=4914
+[info] 1069: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1069: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d84c instr.id=4915
+[info] 1069: [ISSUE INSTR] instr.name=SBITSET instr.pc=0x10d0d840 instr.id=4912
+[info] 1069: [EXECUTE INSTR] instr.name=SBITSET instr.pc=0x10d0d840 instr.id=4912
+[info] 1069: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d844 instr.id=4913
+[info] 1069: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d844 instr.id=4913
+[info] 1070: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1070: [D1 Stage] to I1 success. instr.name=SBITSET instr.pc=0x10d0d850 instr.id=4916
+[info] 1070: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1070: [D1 Stage] to I1 success. instr.name=MOV_SPR_XN instr.pc=0x10d0d854 instr.id=4917
+[info] 1070: [ISSUE INSTR] instr.name=SBITSET instr.pc=0x10d0d848 instr.id=4914
+[info] 1070: [EXECUTE INSTR] instr.name=SBITSET instr.pc=0x10d0d848 instr.id=4914
+[info] 1070: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d84c instr.id=4915
+[info] 1070: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d84c instr.id=4915
+[info] 1071: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1071: [D1 Stage] to I1 success. instr.name=MOV_XD_SPR instr.pc=0x10d0d858 instr.id=4918
+[info] 1071: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1071: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d85c instr.id=4919
+[info] 1071: [ISSUE INSTR] instr.name=SBITSET instr.pc=0x10d0d850 instr.id=4916
+[info] 1071: [EXECUTE INSTR] instr.name=SBITSET instr.pc=0x10d0d850 instr.id=4916
+[info] 1071: [ISSUE INSTR] instr.name=MOV_SPR_XN instr.pc=0x10d0d854 instr.id=4917
+[info] 1072: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1072: [D1 Stage] to I1 success. instr.name=SBITSET instr.pc=0x10d0d860 instr.id=4920
+[info] 1072: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1072: [D1 Stage] to I1 success. instr.name=MOV_SPR_XN instr.pc=0x10d0d864 instr.id=4921
+[info] 1072: [ISSUE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d858 instr.id=4918
+[info] 1072: [EXECUTE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d858 instr.id=4918
+[info] 1072: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d85c instr.id=4919
+[info] 1072: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d85c instr.id=4919
+[info] 1073: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1073: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d868 instr.id=4922
+[info] 1073: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1073: [D1 Stage] to I1 success. instr.name=NEG instr.pc=0x10d0d86c instr.id=4923
+[info] 1073: [ISSUE INSTR] instr.name=SBITSET instr.pc=0x10d0d860 instr.id=4920
+[info] 1073: [EXECUTE INSTR] instr.name=SBITSET instr.pc=0x10d0d860 instr.id=4920
+[info] 1073: [ISSUE INSTR] instr.name=MOV_SPR_XN instr.pc=0x10d0d864 instr.id=4921
+[info] 1074: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1074: [D1 Stage] to I1 success. instr.name=MOV_XD_SPR instr.pc=0x10d0d870 instr.id=4924
+[info] 1074: [D1 Stage] to I1 success. instr.name=MOVEMASK instr.pc=0x10d0d874 instr.id=4925
+[info] 1074: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d868 instr.id=4922
+[info] 1074: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d868 instr.id=4922
+[info] 1074: [ISSUE INSTR] instr.name=NEG instr.pc=0x10d0d86c instr.id=4923
+[info] 1074: [EXECUTE INSTR] instr.name=NEG instr.pc=0x10d0d86c instr.id=4923
+[info] 1075: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1075: [D1 Stage] to I1 success. instr.name=SIGNEXT instr.pc=0x10d0d878 instr.id=4926
+[info] 1075: [D1 Stage] to I1 success. instr.name=MOVEMASK instr.pc=0x10d0d87c instr.id=4927
+[info] 1075: [ISSUE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d870 instr.id=4924
+[info] 1075: [EXECUTE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d870 instr.id=4924
+[info] 1075: [ISSUE INSTR] instr.name=MOVEMASK instr.pc=0x10d0d874 instr.id=4925
+[info] 1075 Pushing vec instr to vfqueue: instr pc:0x10d0d874.
+[info] 1076: ccu decode scalar isa , isa_type:1,isa_latency:6.
+[info] 1076: [D1 Stage] to I1 success. instr.name=DIV instr.pc=0x10d0d880 instr.id=4928
+[info] 1076: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1076: [D1 Stage] to I1 success. instr.name=SIGNEXT instr.pc=0x10d0d884 instr.id=4929
+[info] 1076: [ISSUE INSTR] instr.name=SIGNEXT instr.pc=0x10d0d878 instr.id=4926
+[info] 1076: [EXECUTE INSTR] instr.name=SIGNEXT instr.pc=0x10d0d878 instr.id=4926
+[info] 1076: [ISSUE INSTR] instr.name=MOVEMASK instr.pc=0x10d0d87c instr.id=4927
+[info] 1076 Pushing vec instr to vfqueue: instr pc:0x10d0d87c.
+[info] 1077: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1077: [D1 Stage] to I1 success. instr.name=MOV_XD_SPR instr.pc=0x10d0d888 instr.id=4930
+[info] 1077: ccu decode scalar isa , isa_type:0,isa_latency:2.
+[info] 1077: [D1 Stage] to I1 success. instr.name=MUL instr.pc=0x10d0d88c instr.id=4931
+[info] 1077: [ISSUE INSTR] instr.name=DIV instr.pc=0x10d0d880 instr.id=4928
+[info] 1077: [ISSUE INSTR] general hazard failed.
+[info] 1078: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1078: [ISSUE INSTR] instr.name=DIV instr.pc=0x10d0d880 instr.id=4928
+[info] 1078: [ISSUE INSTR] general hazard failed.
+[info] 1079: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1079: [ISSUE INSTR] instr.name=DIV instr.pc=0x10d0d880 instr.id=4928
+[info] 1079: [ISSUE INSTR] general hazard failed.
+[info] 1080: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1080: [ISSUE INSTR] instr.name=DIV instr.pc=0x10d0d880 instr.id=4928
+[info] 1080: [EXECUTE INSTR] instr.name=DIV instr.pc=0x10d0d880 instr.id=4928
+[info] 1080: [ISSUE INSTR] instr.name=SIGNEXT instr.pc=0x10d0d884 instr.id=4929
+[info] 1080: [ISSUE INSTR] general hazard failed.
+[info] 1081: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1081: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d890 instr.id=4932
+[info] 1081: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1081: [ISSUE INSTR] instr.name=SIGNEXT instr.pc=0x10d0d884 instr.id=4929
+[info] 1081: [ISSUE INSTR] general hazard failed.
+[info] 1082: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1082: [ISSUE INSTR] instr.name=SIGNEXT instr.pc=0x10d0d884 instr.id=4929
+[info] 1082: [ISSUE INSTR] general hazard failed.
+[info] 1083: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1083: [ISSUE INSTR] instr.name=SIGNEXT instr.pc=0x10d0d884 instr.id=4929
+[info] 1083: [ISSUE INSTR] general hazard failed.
+[info] 1084: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1084: [ISSUE INSTR] instr.name=SIGNEXT instr.pc=0x10d0d884 instr.id=4929
+[info] 1084: [ISSUE INSTR] general hazard failed.
+[info] 1085: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1085: [ISSUE INSTR] instr.name=SIGNEXT instr.pc=0x10d0d884 instr.id=4929
+[info] 1085: [ISSUE INSTR] general hazard failed.
+[info] 1086: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1086: [ISSUE INSTR] instr.name=SIGNEXT instr.pc=0x10d0d884 instr.id=4929
+[info] 1086: [EXECUTE INSTR] instr.name=SIGNEXT instr.pc=0x10d0d884 instr.id=4929
+[info] 1086: [ISSUE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d888 instr.id=4930
+[info] 1086: [EXECUTE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d888 instr.id=4930
+[info] @1087 PUAHQ instr completed. instr=(MOVEMASK 0x10d0d874 4925)
+[info] 1087: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1087: [D1 Stage] to I1 success. instr.name=ZEROEXT instr.pc=0x10d0d894 instr.id=4933
+[info] 1087: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1087: [D1 Stage] to I1 success. instr.name=SHL instr.pc=0x10d0d898 instr.id=4934
+[info] 1087: [ISSUE INSTR] instr.name=MUL instr.pc=0x10d0d88c instr.id=4931
+[info] 1087: [EXECUTE INSTR] instr.name=MUL instr.pc=0x10d0d88c instr.id=4931
+[info] 1087: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d890 instr.id=4932
+[info] 1087: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d890 instr.id=4932
+[info] 1088: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1088: [D1 Stage] to I1 success. instr.name=MOV_XD_XN instr.pc=0x10d0d89c instr.id=4935
+[info] 1088: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1088: [D1 Stage] to I1 success. instr.name=ADD instr.pc=0x10d0d8a0 instr.id=4936
+[info] 1088: [ISSUE INSTR] instr.name=ZEROEXT instr.pc=0x10d0d894 instr.id=4933
+[info] 1088: [ISSUE INSTR] general hazard failed.
+[info] 1089: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1089: [ISSUE INSTR] instr.name=ZEROEXT instr.pc=0x10d0d894 instr.id=4933
+[info] 1089: [EXECUTE INSTR] instr.name=ZEROEXT instr.pc=0x10d0d894 instr.id=4933
+[info] 1089: [ISSUE INSTR] instr.name=SHL instr.pc=0x10d0d898 instr.id=4934
+[info] 1089: [EXECUTE INSTR] instr.name=SHL instr.pc=0x10d0d898 instr.id=4934
+[info] 1090: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1090: [D1 Stage] to I1 success. instr.name=MOVK instr.pc=0x10d0d8a4 instr.id=4937
+[info] 1090: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1090: [D1 Stage] to I1 success. instr.name=SHL instr.pc=0x10d0d8a8 instr.id=4938
+[info] 1090: [ISSUE INSTR] instr.name=MOV_XD_XN instr.pc=0x10d0d89c instr.id=4935
+[info] 1090: [EXECUTE INSTR] instr.name=MOV_XD_XN instr.pc=0x10d0d89c instr.id=4935
+[info] 1090: [ISSUE INSTR] instr.name=ADD instr.pc=0x10d0d8a0 instr.id=4936
+[info] 1090: [EXECUTE INSTR] instr.name=ADD instr.pc=0x10d0d8a0 instr.id=4936
+[info] 1091: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1091: [D1 Stage] to I1 success. instr.name=AND instr.pc=0x10d0d8ac instr.id=4939
+[info] 1091: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1091: [D1 Stage] to I1 success. instr.name=AND instr.pc=0x10d0d8b0 instr.id=4940
+[info] 1091: [ISSUE INSTR] instr.name=MOVK instr.pc=0x10d0d8a4 instr.id=4937
+[info] 1091: [EXECUTE INSTR] instr.name=MOVK instr.pc=0x10d0d8a4 instr.id=4937
+[info] 1091: [ISSUE INSTR] instr.name=SHL instr.pc=0x10d0d8a8 instr.id=4938
+[info] 1091: [EXECUTE INSTR] instr.name=SHL instr.pc=0x10d0d8a8 instr.id=4938
+[info] 1092: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1092: [D1 Stage] to I1 success. instr.name=OR instr.pc=0x10d0d8b4 instr.id=4941
+[info] 1092: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1092: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d8b8 instr.id=4942
+[info] 1092: [ISSUE INSTR] instr.name=AND instr.pc=0x10d0d8ac instr.id=4939
+[info] 1092: [EXECUTE INSTR] instr.name=AND instr.pc=0x10d0d8ac instr.id=4939
+[info] 1092: [ISSUE INSTR] instr.name=AND instr.pc=0x10d0d8b0 instr.id=4940
+[info] 1092: [EXECUTE INSTR] instr.name=AND instr.pc=0x10d0d8b0 instr.id=4940
+[info] 1093: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1093: [D1 Stage] to I1 success. instr.name=MOVK instr.pc=0x10d0d8bc instr.id=4943
+[info] 1093: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1093: [D1 Stage] to I1 success. instr.name=OR instr.pc=0x10d0d8c0 instr.id=4944
+[info] 1093: [ISSUE INSTR] instr.name=OR instr.pc=0x10d0d8b4 instr.id=4941
+[info] 1093: [EXECUTE INSTR] instr.name=OR instr.pc=0x10d0d8b4 instr.id=4941
+[info] 1093: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d8b8 instr.id=4942
+[info] 1093: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d8b8 instr.id=4942
+[info] 1094: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1094: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d8c4 instr.id=4945
+[info] 1094: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1094: [D1 Stage] to I1 success. instr.name=MOVK instr.pc=0x10d0d8c8 instr.id=4946
+[info] 1094: [ISSUE INSTR] instr.name=MOVK instr.pc=0x10d0d8bc instr.id=4943
+[info] 1094: [EXECUTE INSTR] instr.name=MOVK instr.pc=0x10d0d8bc instr.id=4943
+[info] 1094: [ISSUE INSTR] instr.name=OR instr.pc=0x10d0d8c0 instr.id=4944
+[info] 1094: [EXECUTE INSTR] instr.name=OR instr.pc=0x10d0d8c0 instr.id=4944
+[info] 1095: [D1 Stage] to I1 success. instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10d0d8cc instr.id=4947
+[info] 1095: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1095: [D1 Stage] to I1 success. instr.name=SET_FLAG instr.pc=0x10d0d8d0 instr.id=4948
+[info] 1095: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d8c4 instr.id=4945
+[info] 1095: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d8c4 instr.id=4945
+[info] 1095: [ISSUE INSTR] instr.name=MOVK instr.pc=0x10d0d8c8 instr.id=4946
+[info] 1095: [EXECUTE INSTR] instr.name=MOVK instr.pc=0x10d0d8c8 instr.id=4946
+[info] 1096: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1096: [D1 Stage] to I1 success. instr.name=WAIT_FLAG instr.pc=0x10d0d8d4 instr.id=4949
+[info] 1096: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1096: [D1 Stage] to I1 success. instr.name=ADD_IMM instr.pc=0x10d0d8d8 instr.id=4950
+[info] 1096: [ISSUE INSTR] instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10d0d8cc instr.id=4947
+[info] 1096: [ISSUE INSTR] instr.name=SET_FLAG instr.pc=0x10d0d8d0 instr.id=4948
+[info] @1097 PUAHQ instr completed. instr=(MOVEMASK 0x10d0d87c 4927)
+[info] 1097: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1097: [D1 Stage] to I1 success. instr.name=ZEROEXT instr.pc=0x10d0d8dc instr.id=4951
+[info] 1097: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1097: [D1 Stage] to I1 success. instr.name=SHR instr.pc=0x10d0d8e0 instr.id=4952
+[info] 1097: [ISSUE INSTR] instr.name=WAIT_FLAG instr.pc=0x10d0d8d4 instr.id=4949
+[info] 1097: [ISSUE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d8d8 instr.id=4950
+[info] 1097: [EXECUTE INSTR] instr.name=ADD_IMM instr.pc=0x10d0d8d8 instr.id=4950
+[info] 1098: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1098: [D1 Stage] to I1 success. instr.name=ZEROEXT instr.pc=0x10d0d8e4 instr.id=4953
+[info] 1098: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1098: [D1 Stage] to I1 success. instr.name=SHL instr.pc=0x10d0d8e8 instr.id=4954
+[info] 1098: [ISSUE INSTR] instr.name=ZEROEXT instr.pc=0x10d0d8dc instr.id=4951
+[info] 1098: [EXECUTE INSTR] instr.name=ZEROEXT instr.pc=0x10d0d8dc instr.id=4951
+[info] 1098: [ISSUE INSTR] instr.name=SHR instr.pc=0x10d0d8e0 instr.id=4952
+[info] 1098: [EXECUTE INSTR] instr.name=SHR instr.pc=0x10d0d8e0 instr.id=4952
+[info] 1099: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1099: [D1 Stage] to I1 success. instr.name=INSERT_XD_XN instr.pc=0x10d0d8ec instr.id=4955
+[info] 1099: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1099: [D1 Stage] to I1 success. instr.name=SHL instr.pc=0x10d0d8f0 instr.id=4956
+[info] 1099: [ISSUE INSTR] instr.name=ZEROEXT instr.pc=0x10d0d8e4 instr.id=4953
+[info] 1099: [EXECUTE INSTR] instr.name=ZEROEXT instr.pc=0x10d0d8e4 instr.id=4953
+[info] 1099: [ISSUE INSTR] instr.name=SHL instr.pc=0x10d0d8e8 instr.id=4954
+[info] 1099: [EXECUTE INSTR] instr.name=SHL instr.pc=0x10d0d8e8 instr.id=4954
+[info] 1100: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1100: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d8f4 instr.id=4957
+[info] 1100: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1100: [D1 Stage] to I1 success. instr.name=INSERT_XD_XN instr.pc=0x10d0d8f8 instr.id=4958
+[info] 1100: [ISSUE INSTR] instr.name=INSERT_XD_XN instr.pc=0x10d0d8ec instr.id=4955
+[info] 1100: [EXECUTE INSTR] instr.name=INSERT_XD_XN instr.pc=0x10d0d8ec instr.id=4955
+[info] 1100: [ISSUE INSTR] instr.name=SHL instr.pc=0x10d0d8f0 instr.id=4956
+[info] 1100: [EXECUTE INSTR] instr.name=SHL instr.pc=0x10d0d8f0 instr.id=4956
+[info] 1101: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1101: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d8fc instr.id=4959
+[info] 1101: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1101: [D1 Stage] to I1 success. instr.name=MOVK instr.pc=0x10d0d900 instr.id=4960
+[info] 1101: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d8f4 instr.id=4957
+[info] 1101: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d8f4 instr.id=4957
+[info] 1101: [ISSUE INSTR] instr.name=INSERT_XD_XN instr.pc=0x10d0d8f8 instr.id=4958
+[info] 1101: [EXECUTE INSTR] instr.name=INSERT_XD_XN instr.pc=0x10d0d8f8 instr.id=4958
+[info] 1102: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1102: [D1 Stage] to I1 success. instr.name=INSERT_XD_XN instr.pc=0x10d0d904 instr.id=4961
+[info] 1102: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1102: [D1 Stage] to I1 success. instr.name=MOV_XD_XN instr.pc=0x10d0d908 instr.id=4962
+[info] 1102: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d8fc instr.id=4959
+[info] 1102: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d8fc instr.id=4959
+[info] 1102: [ISSUE INSTR] instr.name=MOVK instr.pc=0x10d0d900 instr.id=4960
+[info] 1102: [EXECUTE INSTR] instr.name=MOVK instr.pc=0x10d0d900 instr.id=4960
+[info] 1103: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1103: [D1 Stage] to I1 success. instr.name=SHL instr.pc=0x10d0d90c instr.id=4963
+[info] 1103: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1103: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d910 instr.id=4964
+[info] 1103: [ISSUE INSTR] instr.name=INSERT_XD_XN instr.pc=0x10d0d904 instr.id=4961
+[info] 1103: [EXECUTE INSTR] instr.name=INSERT_XD_XN instr.pc=0x10d0d904 instr.id=4961
+[info] 1103: [ISSUE INSTR] instr.name=MOV_XD_XN instr.pc=0x10d0d908 instr.id=4962
+[info] 1103: [EXECUTE INSTR] instr.name=MOV_XD_XN instr.pc=0x10d0d908 instr.id=4962
+[info] 1104: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1104: [D1 Stage] to I1 success. instr.name=MOVK instr.pc=0x10d0d914 instr.id=4965
+[info] 1104: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1104: [D1 Stage] to I1 success. instr.name=MOV_XD_XN instr.pc=0x10d0d918 instr.id=4966
+[info] 1104: [ISSUE INSTR] instr.name=SHL instr.pc=0x10d0d90c instr.id=4963
+[info] 1104: [EXECUTE INSTR] instr.name=SHL instr.pc=0x10d0d90c instr.id=4963
+[info] 1104: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d910 instr.id=4964
+[info] 1104: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d910 instr.id=4964
+[info] 1105: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1105: [D1 Stage] to I1 success. instr.name=INSERT_XD_XN instr.pc=0x10d0d91c instr.id=4967
+[info] 1105: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1105: [D1 Stage] to I1 success. instr.name=INSERT_XD_XN instr.pc=0x10d0d920 instr.id=4968
+[info] 1105: [ISSUE INSTR] instr.name=MOVK instr.pc=0x10d0d914 instr.id=4965
+[info] 1105: [EXECUTE INSTR] instr.name=MOVK instr.pc=0x10d0d914 instr.id=4965
+[info] 1105: [ISSUE INSTR] instr.name=MOV_XD_XN instr.pc=0x10d0d918 instr.id=4966
+[info] 1105: [EXECUTE INSTR] instr.name=MOV_XD_XN instr.pc=0x10d0d918 instr.id=4966
+[info] 1106: [D1 Stage] to I1 success. instr.name=PUSH_PB instr.pc=0x10d0d924 instr.id=4969
+[info] 1106: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1106: [D1 Stage] to I1 success. instr.name=MOV_XD_SPR instr.pc=0x10d0d928 instr.id=4970
+[info] 1106: [ISSUE INSTR] instr.name=INSERT_XD_XN instr.pc=0x10d0d91c instr.id=4967
+[info] 1106: [EXECUTE INSTR] instr.name=INSERT_XD_XN instr.pc=0x10d0d91c instr.id=4967
+[info] 1106: [ISSUE INSTR] instr.name=INSERT_XD_XN instr.pc=0x10d0d920 instr.id=4968
+[info] 1106: [EXECUTE INSTR] instr.name=INSERT_XD_XN instr.pc=0x10d0d920 instr.id=4968
+[info] 1107: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1107: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d92c instr.id=4971
+[info] 1107: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1107: [D1 Stage] to I1 success. instr.name=NOP instr.pc=0x10d0d930 instr.id=4972
+[info] 1107: [ISSUE INSTR] instr.name=PUSH_PB instr.pc=0x10d0d924 instr.id=4969
+[info] 1107: [ISSUE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d928 instr.id=4970
+[info] 1107: [EXECUTE INSTR] instr.name=MOV_XD_SPR instr.pc=0x10d0d928 instr.id=4970
+[info] 1108: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1108: [D1 Stage] to I1 success. instr.name=NOP instr.pc=0x10d0d934 instr.id=4973
+[info] 1108: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1108: [D1 Stage] to I1 success. instr.name=SHL instr.pc=0x10d0d938 instr.id=4974
+[info] 1108: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d92c instr.id=4971
+[info] 1108: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d92c instr.id=4971
+[info] 1108: [ISSUE INSTR] instr.name=NOP instr.pc=0x10d0d930 instr.id=4972
+[info] 1109: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1109: [D1 Stage] to I1 success. instr.name=ADD instr.pc=0x10d0d93c instr.id=4975
+[info] 1109: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1109: [D1 Stage] to I1 success. instr.name=VF instr.pc=0x10d0d940 instr.id=4977
+[info] 1109: [ISSUE INSTR] instr.name=NOP instr.pc=0x10d0d934 instr.id=4973
+[info] 1109: [ISSUE INSTR] instr.name=SHL instr.pc=0x10d0d938 instr.id=4974
+[info] 1109: [EXECUTE INSTR] instr.name=SHL instr.pc=0x10d0d938 instr.id=4974
+[info] 1110: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1110: [D1 Stage] to I1 success. instr.name=ADD instr.pc=0x10d0d948 instr.id=4978
+[info] 1110: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1110: [D1 Stage] to I1 success. instr.name=SET_FLAG instr.pc=0x10d0d94c instr.id=4979
+[info] 1110: [ISSUE INSTR] instr.name=ADD instr.pc=0x10d0d93c instr.id=4975
+[info] 1110: [EXECUTE INSTR] instr.name=ADD instr.pc=0x10d0d93c instr.id=4975
+[info] 1110: [ISSUE INSTR] instr.name=VF instr.pc=0x10d0d940 instr.id=4977
+[info] 1110 Pushing VF to peek_queue: pc:0x10d0d940, id:0x1371.
+[info] 1110 exec_vf_instr pc:0x10d0d940 instr id:4977, vpc:0x10d0df00, slot_id:0
+[info] 1110 PB.active_slot_id is updated to 0
+[info] 1111: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1111: [D1 Stage] to I1 success. instr.name=WAIT_FLAG instr.pc=0x10d0d950 instr.id=4980
+[info] 1111: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1111: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d954 instr.id=4981
+[info] 1111: [ISSUE INSTR] instr.name=ADD instr.pc=0x10d0d948 instr.id=4978
+[info] 1111: [EXECUTE INSTR] instr.name=ADD instr.pc=0x10d0d948 instr.id=4978
+[info] 1111: [ISSUE INSTR] instr.name=SET_FLAG instr.pc=0x10d0d94c instr.id=4979
+[info] 1112: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1112: [D1 Stage] to I1 success. instr.name=SBITSET instr.pc=0x10d0d958 instr.id=4982
+[info] 1112: [D1 Stage] to I1 success. instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10d0d95c instr.id=4983
+[info] 1112: [ISSUE INSTR] instr.name=WAIT_FLAG instr.pc=0x10d0d950 instr.id=4980
+[info] 1112: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d954 instr.id=4981
+[info] 1112: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d954 instr.id=4981
+[info] 1113: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1113: [D1 Stage] to I1 success. instr.name=MOV_XD_IMM instr.pc=0x10d0d960 instr.id=4984
+[info] 1113: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1113: [D1 Stage] to I1 success. instr.name=DCCI instr.pc=0x10d0d964 instr.id=4985
+[info] 1113: [ISSUE INSTR] instr.name=SBITSET instr.pc=0x10d0d958 instr.id=4982
+[info] 1113: [EXECUTE INSTR] instr.name=SBITSET instr.pc=0x10d0d958 instr.id=4982
+[info] 1113: [ISSUE INSTR] instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10d0d95c instr.id=4983
+[info] 1113: [ISSUE INSTR] general hazard failed.
+[info] 1114: ccu decode scalar isa , isa_type:0,isa_latency:1.
+[info] 1114: [D1 Stage] to I1 success. instr.name=END instr.pc=0x10d0d968 instr.id=4986
+[info] 1114: [ISSUE INSTR] instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10d0d95c instr.id=4983
+[info] 1114: [ISSUE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d960 instr.id=4984
+[info] 1114: [EXECUTE INSTR] instr.name=MOV_XD_IMM instr.pc=0x10d0d960 instr.id=4984
+[info] 1115: [ISSUE INSTR] instr.name=DCCI instr.pc=0x10d0d964 instr.id=4985
+[info] 1115: [ISSUE INSTR] instr.name=END instr.pc=0x10d0d968 instr.id=4986
+[info] 1115 exec_end! pc:0x10d0d968, subcore_id:1.
+[info] 1116: ccu send_endlabel_to_issque
+[info] 1661 Pushing vec instr to vfqueue: instr pc:0x10d0d940.
+[info] @1722 PUAHQ instr completed. instr=(VF 0x10d0d940 4977)
+[info] ++++++++++++++++++++++core: 0, subcore: 1, start: 208, tick: 2208, kernelId: 0, blkID: 0, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

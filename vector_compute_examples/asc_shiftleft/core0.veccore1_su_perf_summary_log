@@ -1,0 +1,336 @@
+----------------------------- AiCore SCALAR PMU PERF LOG -----------------------------
+
+==============================================================================
+kernal total ticks : 2087
+system total ticks : 2300
+PMU events for top-down analysis                                | Value 
+==============================================================================
+1   : CCU.scalar_veccore1_su_busy_cycle                          | 551
+2   : CCU.scalar_veccore1_su_issue_ldst_instr_num                | 3
+3   : CCU.scalar_veccore1_su_issue_exe_instr_num                 | 87
+4   : CCU.scalar_veccore1_su_issue_variable_instr_num            | 1
+5   : CCU.scalar_veccore1_su_issue_float_instr_num               | 0
+6   : CCU.scalar_veccore1_su_issue_jump_instr_num                | 0
+7   : CCU.scalar_veccore1_su_issue_pipe_instr_num                | 7
+8   : CCU.scalar_veccore1_su_issue_others_instr_num              | 8
+9   : CCU.scalar_veccore1_su_double_issue_cycle                  | 49
+10  : CCU.scalar_veccore1_su_single_issue_cycle                  | 8
+11  : CCU.scalar_veccore1_su_issue_branch_stall_cycle            | 0
+12  : CCU.scalar_veccore1_su_issue_icache_miss_cycle             | 444
+13  : CCU.scalar_veccore1_su_issue_ld_hazard_cycle               | 481
+14  : CCU.scalar_veccore1_su_issue_ld_miss_hazard_cycle          | 474
+15  : CCU.scalar_veccore1_su_issue_st_hazard_cycle               | 0
+16  : CCU.scalar_veccore1_su_div_hazard_cycle                    | 5
+17  : CCU.scalar_veccore1_su_issue_alu_hazard_cycle              | 6
+18  : CCU.scalar_veccore1_su_issue_ldst_stall_cycle              | 0
+19  : CCU.scalar_veccore1_su_issue_bar_all_stall_cycle           | 0
+20  : CCU.scalar_veccore1_su_issue_scalar_wait_sync_stall_cycle  | 0
+21  : CCU.scalar_veccore1_su_issue_wait_scalar_sync_stall_cycle  | 0
+22  : CCU.scalar_veccore1_su_end_dcci_busy_cycle                 | 3
+23  : CCU.scalar_veccore1_su_issue_mte1_payloadQ_stall_cycle     | 0
+24  : CCU.scalar_veccore1_su_issue_mte2_payloadQ_stall_cycle     | 0
+25  : CCU.scalar_veccore1_su_issue_mte3_payloadQ_stall_cycle     | 0
+26  : CCU.scalar_veccore1_su_issue_fixp_payloadQ_stall_cycle     | 0
+27  : CCU.scalar_veccore1_su_issue_cube_payloadQ_stall_cycle     | 0
+28  : CCU.scalar_veccore1_su_issue_vec_payloadQ_stall_cycle      | 0
+29  : CCU.scalar_veccore1_su_issue_mte1_eventQ_stall_cycle       | 0
+30  : CCU.scalar_veccore1_su_issue_mte2_eventQ_stall_cycle       | 0
+31  : CCU.scalar_veccore1_su_issue_mte3_eventQ_stall_cycle       | 0
+32  : CCU.scalar_veccore1_su_issue_fixp_eventQ_stall_cycle       | 0
+33  : CCU.scalar_veccore1_su_issue_cube_eventQ_stall_cycle       | 0
+34  : CCU.scalar_veccore1_su_issue_vec_eventQ_stall_cycle        | 0
+35  : CCU.scalar_veccore1_su_branch_instr_miss_counter           | 0
+36  : CCU.scalar_veccore1_su_branch_instr_predict_counter        | 0
+37  : CCU.scalar_veccore1_su_issue_lsu_mshr_full_cycle           | 0
+38  : CCU.scalar_veccore1_su_issue_lsu_evict_stall_cycle         | 0
+39  : CCU.scalar_veccore1_su_issue_lsu_stb_full_cycle            | 0
+40  : CCU.scalar_veccore1_su_issue_lsu_stb_drain_cycle           | 0
+41  : CCU.scalar_veccore1_su_issue_branch_reg_instr_num          | 0
+42  : CCU.scalar_veccore1_su_issue_branch_imm_instr_num          | 0
+43  : CCU.scalar_veccore1_su_icache_read_stall_cycle             | 0
+44  : CCU.scalar_veccore1_su_dcache_allocate_size(B)             | 64
+45  : CCU.scalar_veccore1_su_issue_dsb_stall_cycle               | 0
+
+++++++++++++++++++++++core: 0, subcore: 2, start: 213, tick: 2300, kernelId: 0, blkID: 1, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.
+
+
+----------------------------- AiCore SCALAR PMU PERF LOG -----------------------------
+
+==============================================================================
+kernal total ticks : 2176
+system total ticks : 2388
+PMU events for top-down analysis                                | Value 
+==============================================================================
+1   : CCU.scalar_veccore1_su_busy_cycle                          | 448
+2   : CCU.scalar_veccore1_su_issue_ldst_instr_num                | 3
+3   : CCU.scalar_veccore1_su_issue_exe_instr_num                 | 88
+4   : CCU.scalar_veccore1_su_issue_variable_instr_num            | 1
+5   : CCU.scalar_veccore1_su_issue_float_instr_num               | 0
+6   : CCU.scalar_veccore1_su_issue_jump_instr_num                | 0
+7   : CCU.scalar_veccore1_su_issue_pipe_instr_num                | 7
+8   : CCU.scalar_veccore1_su_issue_others_instr_num              | 8
+9   : CCU.scalar_veccore1_su_double_issue_cycle                  | 50
+10  : CCU.scalar_veccore1_su_single_issue_cycle                  | 7
+11  : CCU.scalar_veccore1_su_issue_branch_stall_cycle            | 0
+12  : CCU.scalar_veccore1_su_issue_icache_miss_cycle             | 943
+13  : CCU.scalar_veccore1_su_issue_ld_hazard_cycle               | 6
+14  : CCU.scalar_veccore1_su_issue_ld_miss_hazard_cycle          | 0
+15  : CCU.scalar_veccore1_su_issue_st_hazard_cycle               | 0
+16  : CCU.scalar_veccore1_su_div_hazard_cycle                    | 5
+17  : CCU.scalar_veccore1_su_issue_alu_hazard_cycle              | 6
+18  : CCU.scalar_veccore1_su_issue_ldst_stall_cycle              | 0
+19  : CCU.scalar_veccore1_su_issue_bar_all_stall_cycle           | 0
+20  : CCU.scalar_veccore1_su_issue_scalar_wait_sync_stall_cycle  | 0
+21  : CCU.scalar_veccore1_su_issue_wait_scalar_sync_stall_cycle  | 0
+22  : CCU.scalar_veccore1_su_end_dcci_busy_cycle                 | 3
+23  : CCU.scalar_veccore1_su_issue_mte1_payloadQ_stall_cycle     | 0
+24  : CCU.scalar_veccore1_su_issue_mte2_payloadQ_stall_cycle     | 0
+25  : CCU.scalar_veccore1_su_issue_mte3_payloadQ_stall_cycle     | 0
+26  : CCU.scalar_veccore1_su_issue_fixp_payloadQ_stall_cycle     | 0
+27  : CCU.scalar_veccore1_su_issue_cube_payloadQ_stall_cycle     | 0
+28  : CCU.scalar_veccore1_su_issue_vec_payloadQ_stall_cycle      | 0
+29  : CCU.scalar_veccore1_su_issue_mte1_eventQ_stall_cycle       | 0
+30  : CCU.scalar_veccore1_su_issue_mte2_eventQ_stall_cycle       | 0
+31  : CCU.scalar_veccore1_su_issue_mte3_eventQ_stall_cycle       | 0
+32  : CCU.scalar_veccore1_su_issue_fixp_eventQ_stall_cycle       | 0
+33  : CCU.scalar_veccore1_su_issue_cube_eventQ_stall_cycle       | 0
+34  : CCU.scalar_veccore1_su_issue_vec_eventQ_stall_cycle        | 0
+35  : CCU.scalar_veccore1_su_branch_instr_miss_counter           | 0
+36  : CCU.scalar_veccore1_su_branch_instr_predict_counter        | 0
+37  : CCU.scalar_veccore1_su_issue_lsu_mshr_full_cycle           | 0
+38  : CCU.scalar_veccore1_su_issue_lsu_evict_stall_cycle         | 0
+39  : CCU.scalar_veccore1_su_issue_lsu_stb_full_cycle            | 0
+40  : CCU.scalar_veccore1_su_issue_lsu_stb_drain_cycle           | 0
+41  : CCU.scalar_veccore1_su_issue_branch_reg_instr_num          | 0
+42  : CCU.scalar_veccore1_su_issue_branch_imm_instr_num          | 0
+43  : CCU.scalar_veccore1_su_icache_read_stall_cycle             | 0
+44  : CCU.scalar_veccore1_su_dcache_allocate_size(B)             | 64
+45  : CCU.scalar_veccore1_su_issue_dsb_stall_cycle               | 0
+
+++++++++++++++++++++++core: 0, subcore: 2, start: 212, tick: 2388, kernelId: 0, blkID: 1, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.
+
+
+----------------------------- AiCore SCALAR PMU PERF LOG -----------------------------
+
+==============================================================================
+kernal total ticks : 2185
+system total ticks : 2396
+PMU events for top-down analysis                                | Value 
+==============================================================================
+1   : CCU.scalar_veccore1_su_busy_cycle                          | 419
+2   : CCU.scalar_veccore1_su_issue_ldst_instr_num                | 3
+3   : CCU.scalar_veccore1_su_issue_exe_instr_num                 | 88
+4   : CCU.scalar_veccore1_su_issue_variable_instr_num            | 1
+5   : CCU.scalar_veccore1_su_issue_float_instr_num               | 0
+6   : CCU.scalar_veccore1_su_issue_jump_instr_num                | 0
+7   : CCU.scalar_veccore1_su_issue_pipe_instr_num                | 7
+8   : CCU.scalar_veccore1_su_issue_others_instr_num              | 8
+9   : CCU.scalar_veccore1_su_double_issue_cycle                  | 49
+10  : CCU.scalar_veccore1_su_single_issue_cycle                  | 9
+11  : CCU.scalar_veccore1_su_issue_branch_stall_cycle            | 0
+12  : CCU.scalar_veccore1_su_issue_icache_miss_cycle             | 936
+13  : CCU.scalar_veccore1_su_issue_ld_hazard_cycle               | 6
+14  : CCU.scalar_veccore1_su_issue_ld_miss_hazard_cycle          | 0
+15  : CCU.scalar_veccore1_su_issue_st_hazard_cycle               | 0
+16  : CCU.scalar_veccore1_su_div_hazard_cycle                    | 5
+17  : CCU.scalar_veccore1_su_issue_alu_hazard_cycle              | 5
+18  : CCU.scalar_veccore1_su_issue_ldst_stall_cycle              | 0
+19  : CCU.scalar_veccore1_su_issue_bar_all_stall_cycle           | 0
+20  : CCU.scalar_veccore1_su_issue_scalar_wait_sync_stall_cycle  | 0
+21  : CCU.scalar_veccore1_su_issue_wait_scalar_sync_stall_cycle  | 0
+22  : CCU.scalar_veccore1_su_end_dcci_busy_cycle                 | 3
+23  : CCU.scalar_veccore1_su_issue_mte1_payloadQ_stall_cycle     | 0
+24  : CCU.scalar_veccore1_su_issue_mte2_payloadQ_stall_cycle     | 0
+25  : CCU.scalar_veccore1_su_issue_mte3_payloadQ_stall_cycle     | 0
+26  : CCU.scalar_veccore1_su_issue_fixp_payloadQ_stall_cycle     | 0
+27  : CCU.scalar_veccore1_su_issue_cube_payloadQ_stall_cycle     | 0
+28  : CCU.scalar_veccore1_su_issue_vec_payloadQ_stall_cycle      | 0
+29  : CCU.scalar_veccore1_su_issue_mte1_eventQ_stall_cycle       | 0
+30  : CCU.scalar_veccore1_su_issue_mte2_eventQ_stall_cycle       | 0
+31  : CCU.scalar_veccore1_su_issue_mte3_eventQ_stall_cycle       | 0
+32  : CCU.scalar_veccore1_su_issue_fixp_eventQ_stall_cycle       | 0
+33  : CCU.scalar_veccore1_su_issue_cube_eventQ_stall_cycle       | 0
+34  : CCU.scalar_veccore1_su_issue_vec_eventQ_stall_cycle        | 0
+35  : CCU.scalar_veccore1_su_branch_instr_miss_counter           | 0
+36  : CCU.scalar_veccore1_su_branch_instr_predict_counter        | 0
+37  : CCU.scalar_veccore1_su_issue_lsu_mshr_full_cycle           | 0
+38  : CCU.scalar_veccore1_su_issue_lsu_evict_stall_cycle         | 0
+39  : CCU.scalar_veccore1_su_issue_lsu_stb_full_cycle            | 0
+40  : CCU.scalar_veccore1_su_issue_lsu_stb_drain_cycle           | 0
+41  : CCU.scalar_veccore1_su_issue_branch_reg_instr_num          | 0
+42  : CCU.scalar_veccore1_su_issue_branch_imm_instr_num          | 0
+43  : CCU.scalar_veccore1_su_icache_read_stall_cycle             | 0
+44  : CCU.scalar_veccore1_su_dcache_allocate_size(B)             | 64
+45  : CCU.scalar_veccore1_su_issue_dsb_stall_cycle               | 0
+
+++++++++++++++++++++++core: 0, subcore: 2, start: 211, tick: 2396, kernelId: 0, blkID: 1, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.
+
+
+----------------------------- AiCore SCALAR PMU PERF LOG -----------------------------
+
+==============================================================================
+kernal total ticks : 2287
+system total ticks : 2499
+PMU events for top-down analysis                                | Value 
+==============================================================================
+1   : CCU.scalar_veccore1_su_busy_cycle                          | 531
+2   : CCU.scalar_veccore1_su_issue_ldst_instr_num                | 3
+3   : CCU.scalar_veccore1_su_issue_exe_instr_num                 | 87
+4   : CCU.scalar_veccore1_su_issue_variable_instr_num            | 1
+5   : CCU.scalar_veccore1_su_issue_float_instr_num               | 0
+6   : CCU.scalar_veccore1_su_issue_jump_instr_num                | 0
+7   : CCU.scalar_veccore1_su_issue_pipe_instr_num                | 7
+8   : CCU.scalar_veccore1_su_issue_others_instr_num              | 8
+9   : CCU.scalar_veccore1_su_double_issue_cycle                  | 49
+10  : CCU.scalar_veccore1_su_single_issue_cycle                  | 8
+11  : CCU.scalar_veccore1_su_issue_branch_stall_cycle            | 0
+12  : CCU.scalar_veccore1_su_issue_icache_miss_cycle             | 592
+13  : CCU.scalar_veccore1_su_issue_ld_hazard_cycle               | 458
+14  : CCU.scalar_veccore1_su_issue_ld_miss_hazard_cycle          | 451
+15  : CCU.scalar_veccore1_su_issue_st_hazard_cycle               | 0
+16  : CCU.scalar_veccore1_su_div_hazard_cycle                    | 5
+17  : CCU.scalar_veccore1_su_issue_alu_hazard_cycle              | 6
+18  : CCU.scalar_veccore1_su_issue_ldst_stall_cycle              | 0
+19  : CCU.scalar_veccore1_su_issue_bar_all_stall_cycle           | 0
+20  : CCU.scalar_veccore1_su_issue_scalar_wait_sync_stall_cycle  | 0
+21  : CCU.scalar_veccore1_su_issue_wait_scalar_sync_stall_cycle  | 0
+22  : CCU.scalar_veccore1_su_end_dcci_busy_cycle                 | 3
+23  : CCU.scalar_veccore1_su_issue_mte1_payloadQ_stall_cycle     | 0
+24  : CCU.scalar_veccore1_su_issue_mte2_payloadQ_stall_cycle     | 0
+25  : CCU.scalar_veccore1_su_issue_mte3_payloadQ_stall_cycle     | 0
+26  : CCU.scalar_veccore1_su_issue_fixp_payloadQ_stall_cycle     | 0
+27  : CCU.scalar_veccore1_su_issue_cube_payloadQ_stall_cycle     | 0
+28  : CCU.scalar_veccore1_su_issue_vec_payloadQ_stall_cycle      | 0
+29  : CCU.scalar_veccore1_su_issue_mte1_eventQ_stall_cycle       | 0
+30  : CCU.scalar_veccore1_su_issue_mte2_eventQ_stall_cycle       | 0
+31  : CCU.scalar_veccore1_su_issue_mte3_eventQ_stall_cycle       | 0
+32  : CCU.scalar_veccore1_su_issue_fixp_eventQ_stall_cycle       | 0
+33  : CCU.scalar_veccore1_su_issue_cube_eventQ_stall_cycle       | 0
+34  : CCU.scalar_veccore1_su_issue_vec_eventQ_stall_cycle        | 0
+35  : CCU.scalar_veccore1_su_branch_instr_miss_counter           | 0
+36  : CCU.scalar_veccore1_su_branch_instr_predict_counter        | 0
+37  : CCU.scalar_veccore1_su_issue_lsu_mshr_full_cycle           | 0
+38  : CCU.scalar_veccore1_su_issue_lsu_evict_stall_cycle         | 0
+39  : CCU.scalar_veccore1_su_issue_lsu_stb_full_cycle            | 0
+40  : CCU.scalar_veccore1_su_issue_lsu_stb_drain_cycle           | 0
+41  : CCU.scalar_veccore1_su_issue_branch_reg_instr_num          | 0
+42  : CCU.scalar_veccore1_su_issue_branch_imm_instr_num          | 0
+43  : CCU.scalar_veccore1_su_icache_read_stall_cycle             | 0
+44  : CCU.scalar_veccore1_su_dcache_allocate_size(B)             | 64
+45  : CCU.scalar_veccore1_su_issue_dsb_stall_cycle               | 0
+
+++++++++++++++++++++++core: 0, subcore: 2, start: 212, tick: 2499, kernelId: 0, blkID: 1, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.
+
+
+----------------------------- AiCore SCALAR PMU PERF LOG -----------------------------
+
+==============================================================================
+kernal total ticks : 2112
+system total ticks : 2323
+PMU events for top-down analysis                                | Value 
+==============================================================================
+1   : CCU.scalar_veccore1_su_busy_cycle                          | 481
+2   : CCU.scalar_veccore1_su_issue_ldst_instr_num                | 3
+3   : CCU.scalar_veccore1_su_issue_exe_instr_num                 | 88
+4   : CCU.scalar_veccore1_su_issue_variable_instr_num            | 1
+5   : CCU.scalar_veccore1_su_issue_float_instr_num               | 0
+6   : CCU.scalar_veccore1_su_issue_jump_instr_num                | 0
+7   : CCU.scalar_veccore1_su_issue_pipe_instr_num                | 7
+8   : CCU.scalar_veccore1_su_issue_others_instr_num              | 8
+9   : CCU.scalar_veccore1_su_double_issue_cycle                  | 49
+10  : CCU.scalar_veccore1_su_single_issue_cycle                  | 9
+11  : CCU.scalar_veccore1_su_issue_branch_stall_cycle            | 0
+12  : CCU.scalar_veccore1_su_issue_icache_miss_cycle             | 700
+13  : CCU.scalar_veccore1_su_issue_ld_hazard_cycle               | 296
+14  : CCU.scalar_veccore1_su_issue_ld_miss_hazard_cycle          | 289
+15  : CCU.scalar_veccore1_su_issue_st_hazard_cycle               | 0
+16  : CCU.scalar_veccore1_su_div_hazard_cycle                    | 5
+17  : CCU.scalar_veccore1_su_issue_alu_hazard_cycle              | 6
+18  : CCU.scalar_veccore1_su_issue_ldst_stall_cycle              | 0
+19  : CCU.scalar_veccore1_su_issue_bar_all_stall_cycle           | 0
+20  : CCU.scalar_veccore1_su_issue_scalar_wait_sync_stall_cycle  | 0
+21  : CCU.scalar_veccore1_su_issue_wait_scalar_sync_stall_cycle  | 0
+22  : CCU.scalar_veccore1_su_end_dcci_busy_cycle                 | 3
+23  : CCU.scalar_veccore1_su_issue_mte1_payloadQ_stall_cycle     | 0
+24  : CCU.scalar_veccore1_su_issue_mte2_payloadQ_stall_cycle     | 0
+25  : CCU.scalar_veccore1_su_issue_mte3_payloadQ_stall_cycle     | 0
+26  : CCU.scalar_veccore1_su_issue_fixp_payloadQ_stall_cycle     | 0
+27  : CCU.scalar_veccore1_su_issue_cube_payloadQ_stall_cycle     | 0
+28  : CCU.scalar_veccore1_su_issue_vec_payloadQ_stall_cycle      | 0
+29  : CCU.scalar_veccore1_su_issue_mte1_eventQ_stall_cycle       | 0
+30  : CCU.scalar_veccore1_su_issue_mte2_eventQ_stall_cycle       | 0
+31  : CCU.scalar_veccore1_su_issue_mte3_eventQ_stall_cycle       | 0
+32  : CCU.scalar_veccore1_su_issue_fixp_eventQ_stall_cycle       | 0
+33  : CCU.scalar_veccore1_su_issue_cube_eventQ_stall_cycle       | 0
+34  : CCU.scalar_veccore1_su_issue_vec_eventQ_stall_cycle        | 0
+35  : CCU.scalar_veccore1_su_branch_instr_miss_counter           | 0
+36  : CCU.scalar_veccore1_su_branch_instr_predict_counter        | 0
+37  : CCU.scalar_veccore1_su_issue_lsu_mshr_full_cycle           | 0
+38  : CCU.scalar_veccore1_su_issue_lsu_evict_stall_cycle         | 0
+39  : CCU.scalar_veccore1_su_issue_lsu_stb_full_cycle            | 0
+40  : CCU.scalar_veccore1_su_issue_lsu_stb_drain_cycle           | 0
+41  : CCU.scalar_veccore1_su_issue_branch_reg_instr_num          | 0
+42  : CCU.scalar_veccore1_su_issue_branch_imm_instr_num          | 0
+43  : CCU.scalar_veccore1_su_icache_read_stall_cycle             | 0
+44  : CCU.scalar_veccore1_su_dcache_allocate_size(B)             | 64
+45  : CCU.scalar_veccore1_su_issue_dsb_stall_cycle               | 0
+
+++++++++++++++++++++++core: 0, subcore: 2, start: 211, tick: 2323, kernelId: 0, blkID: 1, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.
+
+
+----------------------------- AiCore SCALAR PMU PERF LOG -----------------------------
+
+==============================================================================
+kernal total ticks : 2165
+system total ticks : 2375
+PMU events for top-down analysis                                | Value 
+==============================================================================
+1   : CCU.scalar_veccore1_su_busy_cycle                          | 486
+2   : CCU.scalar_veccore1_su_issue_ldst_instr_num                | 3
+3   : CCU.scalar_veccore1_su_issue_exe_instr_num                 | 88
+4   : CCU.scalar_veccore1_su_issue_variable_instr_num            | 1
+5   : CCU.scalar_veccore1_su_issue_float_instr_num               | 0
+6   : CCU.scalar_veccore1_su_issue_jump_instr_num                | 0
+7   : CCU.scalar_veccore1_su_issue_pipe_instr_num                | 7
+8   : CCU.scalar_veccore1_su_issue_others_instr_num              | 8
+9   : CCU.scalar_veccore1_su_double_issue_cycle                  | 49
+10  : CCU.scalar_veccore1_su_single_issue_cycle                  | 9
+11  : CCU.scalar_veccore1_su_issue_branch_stall_cycle            | 0
+12  : CCU.scalar_veccore1_su_issue_icache_miss_cycle             | 973
+13  : CCU.scalar_veccore1_su_issue_ld_hazard_cycle               | 413
+14  : CCU.scalar_veccore1_su_issue_ld_miss_hazard_cycle          | 406
+15  : CCU.scalar_veccore1_su_issue_st_hazard_cycle               | 0
+16  : CCU.scalar_veccore1_su_div_hazard_cycle                    | 5
+17  : CCU.scalar_veccore1_su_issue_alu_hazard_cycle              | 6
+18  : CCU.scalar_veccore1_su_issue_ldst_stall_cycle              | 0
+19  : CCU.scalar_veccore1_su_issue_bar_all_stall_cycle           | 0
+20  : CCU.scalar_veccore1_su_issue_scalar_wait_sync_stall_cycle  | 0
+21  : CCU.scalar_veccore1_su_issue_wait_scalar_sync_stall_cycle  | 0
+22  : CCU.scalar_veccore1_su_end_dcci_busy_cycle                 | 3
+23  : CCU.scalar_veccore1_su_issue_mte1_payloadQ_stall_cycle     | 0
+24  : CCU.scalar_veccore1_su_issue_mte2_payloadQ_stall_cycle     | 0
+25  : CCU.scalar_veccore1_su_issue_mte3_payloadQ_stall_cycle     | 0
+26  : CCU.scalar_veccore1_su_issue_fixp_payloadQ_stall_cycle     | 0
+27  : CCU.scalar_veccore1_su_issue_cube_payloadQ_stall_cycle     | 0
+28  : CCU.scalar_veccore1_su_issue_vec_payloadQ_stall_cycle      | 0
+29  : CCU.scalar_veccore1_su_issue_mte1_eventQ_stall_cycle       | 0
+30  : CCU.scalar_veccore1_su_issue_mte2_eventQ_stall_cycle       | 0
+31  : CCU.scalar_veccore1_su_issue_mte3_eventQ_stall_cycle       | 0
+32  : CCU.scalar_veccore1_su_issue_fixp_eventQ_stall_cycle       | 0
+33  : CCU.scalar_veccore1_su_issue_cube_eventQ_stall_cycle       | 0
+34  : CCU.scalar_veccore1_su_issue_vec_eventQ_stall_cycle        | 0
+35  : CCU.scalar_veccore1_su_branch_instr_miss_counter           | 0
+36  : CCU.scalar_veccore1_su_branch_instr_predict_counter        | 0
+37  : CCU.scalar_veccore1_su_issue_lsu_mshr_full_cycle           | 0
+38  : CCU.scalar_veccore1_su_issue_lsu_evict_stall_cycle         | 0
+39  : CCU.scalar_veccore1_su_issue_lsu_stb_full_cycle            | 0
+40  : CCU.scalar_veccore1_su_issue_lsu_stb_drain_cycle           | 0
+41  : CCU.scalar_veccore1_su_issue_branch_reg_instr_num          | 0
+42  : CCU.scalar_veccore1_su_issue_branch_imm_instr_num          | 0
+43  : CCU.scalar_veccore1_su_icache_read_stall_cycle             | 0
+44  : CCU.scalar_veccore1_su_dcache_allocate_size(B)             | 64
+45  : CCU.scalar_veccore1_su_issue_dsb_stall_cycle               | 0
+
+++++++++++++++++++++++core: 0, subcore: 2, start: 210, tick: 2375, kernelId: 0, blkID: 1, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.
+
+

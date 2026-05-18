@@ -1,0 +1,16 @@
+[info] [00000000] UpdatePiCfg pi_cfg_enable: 0, mix_mode: 0
+[info] [00000212] UpdatePiCfg pi_cfg_enable: 0, mix_mode: 0
+[info] [00001686] Start SIMD VF: start_pc: 0x10d0dd00, instr_num: 8
+[info] [00001687] Pcg send fetch request: addr: 0x10d0dd00, reqid: 2
+[info] [00001688] lock fetch req, reqid: 2
+[info] [00001726] unlock fetch req, reqid: 2
+[info] [00001727] Pcg send fetch request: addr: 0x10d0dd00, reqid: 2
+[info] [00001733] IFU send instr to IDU: (PC: 0x10d0dd00) RVECLD   : (Binary: 0x00080018) (ID: 004184) RV_VLDI, ssid: 1
+[info] [00001733] IFU send instr to IDU: (PC: 0x10d0dd04) RVECSU   : (Binary: 0xc000110d) (ID: 004185) RV_SMOVI, ssid: 2
+[info] [00001733] IFU send instr to IDU: (PC: 0x10d0dd08) RVECEX   : (Binary: 0xa20c0150) (ID: 004186) RV_PLT Dtype: B32, ssid: 3
+[info] [00001733] IFU send instr to IDU: (PC: 0x10d0dd0c) RVECSU   : (Binary: 0xc000030d) (ID: 004187) RV_SMOVI, ssid: 4
+[info] [00001733] IFU send instr to IDU: (PC: 0x10d0dd10) RVECEX   : (Binary: 0x800007f4) (ID: 004188) RV_VCMIN Dtype: F32, ssid: 5
+[info] [00001733] IFU send instr to IDU: (PC: 0x10d0dd14) RVECEX   : (Binary: 0xa20c0150) (ID: 004189) RV_PLT Dtype: B32, ssid: 6
+[info] [00001734] IFU send instr to IDU: (PC: 0x10d0dd18) RVECST   : (Binary: 0x4010010a) (ID: 004190) RV_VSTI, ssid: 7
+[info] [00001734] IFU send instr to IDU: (PC: 0x10d0dd1c) RVECSU   : (Binary: 0xc0000017) (ID: 004191) RV_SEND, ssid: 8
+[info] ++++++++++++++++++++++core: 2, subcore: 1, start: 212, tick: 2192, kernelId: 0, blkID: 4, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

@@ -1,0 +1,21 @@
+[info] [0000001679] RV_VLDI, pc: 0x10d0dd00, id: 4168
+[info] Address 00000140 = [3f28f5c3]	Address 00000144 = [bf2b851f]	Address 00000148 = [3f2e147b]	Address 0000014c = [3f30a3d7]	
+       Address 00000150 = [bf333333]	Address 00000154 = [3f35c290]	Address 00000158 = [3f3851ec]	Address 0000015c = [bf3ae148]	
+       Address 00000160 = [00000000]	Address 00000164 = [00000000]	Address 00000168 = [00000000]	Address 0000016c = [00000000]	
+       Address 00000170 = [00000000]	Address 00000174 = [00000000]	Address 00000178 = [00000000]	Address 0000017c = [00000000]	
+       Address 00000180 = [00000000]	Address 00000184 = [00000000]	Address 00000188 = [00000000]	Address 0000018c = [00000000]	
+       Address 00000190 = [00000000]	Address 00000194 = [00000000]	Address 00000198 = [00000000]	Address 0000019c = [00000000]	
+       Address 000001a0 = [00000000]	Address 000001a4 = [00000000]	Address 000001a8 = [00000000]	Address 000001ac = [00000000]	
+       Address 000001b0 = [00000000]	Address 000001b4 = [00000000]	Address 000001b8 = [00000000]	Address 000001bc = [00000000]	
+       Address 000001c0 = [00000000]	Address 000001c4 = [00000000]	Address 000001c8 = [00000000]	Address 000001cc = [00000000]	
+       Address 000001d0 = [00000000]	Address 000001d4 = [00000000]	Address 000001d8 = [00000000]	Address 000001dc = [00000000]	
+       Address 000001e0 = [00000000]	Address 000001e4 = [00000000]	Address 000001e8 = [00000000]	Address 000001ec = [00000000]	
+       Address 000001f0 = [00000000]	Address 000001f4 = [00000000]	Address 000001f8 = [00000000]	Address 000001fc = [00000000]	
+       Address 00000200 = [00000000]	Address 00000204 = [00000000]	Address 00000208 = [00000000]	Address 0000020c = [00000000]	
+       Address 00000210 = [00000000]	Address 00000214 = [00000000]	Address 00000218 = [00000000]	Address 0000021c = [00000000]	
+       Address 00000220 = [00000000]	Address 00000224 = [00000000]	Address 00000228 = [00000000]	Address 0000022c = [00000000]	
+       Address 00000230 = [00000000]	Address 00000234 = [00000000]	Address 00000238 = [00000000]	Address 0000023c = [00000000]	
+[info] [0000002216] MOV_SRC_TO_DST_ALIGNv2, pc: 0x10d0d770, id: 4156
+[info] Address 00000160 = [bf3ae148]	Address 00000164 = [00000000]	Address 00000168 = [00000000]	Address 0000016c = [00000000]	
+       Address 00000170 = [00000000]	Address 00000174 = [00000000]	Address 00000178 = [00000000]	Address 0000017c = [00000000]	
+[info] ++++++++++++++++++++++core: 3, subcore: 2, start: 215, tick: 2219, kernelId: 0, blkID: 7, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

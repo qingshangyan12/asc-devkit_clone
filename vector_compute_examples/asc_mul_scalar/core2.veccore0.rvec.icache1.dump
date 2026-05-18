@@ -1,0 +1,29 @@
+[info] 1296 Icache create a req, pc:0x10d0df00, Id:1, warpId:0, setIdx:30, tagAddr:0x10d0d, type:3, vfId:5599
+[info] 1298 prefetch MISS req send to misq, pc:0x10d0df00,id:1, setIdx:30, allocate:1
+[info] 1299 Update missInfoBuf, pc:0x10d0df00, misqEntry:0, id:1
+[info] 1299 Allocate new Misq entry, pc:0x10d0df00, entryId:0, id:1, send to tagArb:1
+[info] 1300 Icache InvalidHitInfoBuf, req_addr:0x10d0df00, hitInfoAddr:0x0, tag_addr:0x0, setIdx:30, wayId:0
+[info] 1300 linefill update tagRam, pc:0x10d0df00, setIdx:30, wayId:0, pending:1, instrId:1, vfId:5599
+[info] 1300 send Read biu Req, addr:0x10d0df00, misqId:0, gid: 40421
+[info] 1812 recv Read biu Rsp, addr:0x10d0df00, misqId:0, gid: 40421
+[info] 1812 flush missInfoBuf, pc:0x10d0df00
+[info] 1812 rsp send to dataArb:1, req pc:0x10d0df00,type:1
+[info] 1813 finish linefill, req pc:0x10d0df00, setIdx:30, wayId:0, pend:0, misqId:0
+[info] 1825 Icache create a req, pc:0x10d0df00, Id:2, warpId:0, setIdx:30, tagAddr:0x10d0d, type:2, vfId:0
+[info] 1827 instr req lookup tag HIT, req pc:0x10d0df00, id:2, setIdx:30, wayId:0, vfId:0
+[info] 1827 update hit info buffer, pc:0x10d0df00, setIdx:30, wayId:0
+[info] 1828 send req back to ifu, pc:0x10d0df00, id:2.
+[info] 1833 match hit info buffer, id:3, pc:0x10d0df20, wayIdx:0
+[info] 1833 Icache create a req, pc:0x10d0df20, Id:3, warpId:0, setIdx:30, tagAddr:0x10d0d, type:2, vfId:0
+[info] 1834 match hit info buffer, id:4, pc:0x10d0df40, wayIdx:0
+[info] 1834 Icache create a req, pc:0x10d0df40, Id:4, warpId:0, setIdx:30, tagAddr:0x10d0d, type:2, vfId:0
+[info] 1835 match hit info buffer, id:5, pc:0x10d0df60, wayIdx:0
+[info] 1835 Icache create a req, pc:0x10d0df60, Id:5, warpId:0, setIdx:30, tagAddr:0x10d0d, type:2, vfId:0
+[info] 1835 instr req HIT hitInfoBuffer, req pc:0x10d0df20, id:3, setIdx:30, wayId:0, vfId:0
+[info] 1836 instr req HIT hitInfoBuffer, req pc:0x10d0df40, id:4, setIdx:30, wayId:0, vfId:0
+[info] 1836 send req back to ifu, pc:0x10d0df20, id:3.
+[info] 1837 instr req HIT hitInfoBuffer, req pc:0x10d0df60, id:5, setIdx:30, wayId:0, vfId:0
+[info] 1837 send req back to ifu, pc:0x10d0df40, id:4.
+[info] 1838 clear tagRam pendingBit!
+[info] 1838 send req back to ifu, pc:0x10d0df60, id:5.
+[info] ++++++++++++++++++++++core: 2, subcore: 1, start: 212, tick: 2431, kernelId: 0, blkID: 4, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

@@ -1,0 +1,69 @@
+[info] [PERF] [0000001749] [SEND_UB_RD.PORT_0] bytes_per_mask 1 req_id 1019 instr_name RV_VLD instr_id 5667 PC 10d0df0c
+[info] [PERF] [0000001749] LSU_I1 instr_name RV_VLD instr_id 5667 req_id 1019 PC 10d0df0c Pipe:LDU0
+[info] [PERF] [0000001750] [SEND_UB_RD.PORT_0] bytes_per_mask 1 req_id 1021 instr_name RV_VLD instr_id 5671 PC 10d0df0c
+[info] [PERF] [0000001750] LSU_I1 instr_name RV_VLD instr_id 5671 req_id 1021 PC 10d0df0c Pipe:LDU0
+[info] [PERF] [0000001751] [SEND_UB_RD.PORT_0] bytes_per_mask 1 req_id 1023 instr_name RV_VLD instr_id 5675 PC 10d0df0c
+[info] [PERF] [0000001751] LSU_I1 instr_name RV_VLD instr_id 5675 req_id 1023 PC 10d0df0c Pipe:LDU0
+[info] [PERF] [0000001752] [SEND_UB_RD.PORT_0] bytes_per_mask 1 req_id 1024 instr_name RV_VLD instr_id 5679 PC 10d0df0c
+[info] [PERF] [0000001752] LSU_I1 instr_name RV_VLD instr_id 5679 req_id 1024 PC 10d0df0c Pipe:LDU0
+[info] [PERF] [0000001753] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001754] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001754] SEND_RELEASE.LD instr_name RV_VLD instr_id 5667 PC 10d0df0c
+[info] [PERF] [0000001755] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001755] SEND_RELEASE.LD instr_name RV_VLD instr_id 5671 PC 10d0df0c
+[info] [PERF] [0000001756] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001756] LSU_RETIRE.LDU instr_name RV_VLD instr_id 5667 PC 10d0df0c
+[info] [PERF] [0000001756] SEND_RELEASE.LD instr_name RV_VLD instr_id 5675 PC 10d0df0c
+[info] [PERF] [0000001757] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001757] LSU_RETIRE.LDU instr_name RV_VLD instr_id 5671 PC 10d0df0c
+[info] [PERF] [0000001757] SEND_RELEASE.LD instr_name RV_VLD instr_id 5679 PC 10d0df0c
+[info] [PERF] [0000001758] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001758] LSU_RETIRE.LDU instr_name RV_VLD instr_id 5675 PC 10d0df0c
+[info] [PERF] [0000001759] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001759] LSU_RETIRE.LDU instr_name RV_VLD instr_id 5679 PC 10d0df0c
+[info] [PERF] [0000001760] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001761] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001761] [STU_IB_BUF.RECV] instr_name RV_VST instr_id 5670 PC 10d0df18 stu_ib_buf_cnt 1
+[info] [PERF] [0000001761] SEND_RELEASE.ST instr_name RV_VST instr_id 5670 PC 10d0df18
+[info] [PERF] [0000001762] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001762] [STU_IB_BUF.RECV] instr_name RV_VST instr_id 5674 PC 10d0df18 stu_ib_buf_cnt 2
+[info] [PERF] [0000001762] SEND_RELEASE.ST instr_name RV_VST instr_id 5674 PC 10d0df18
+[info] [PERF] [0000001763] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001763] [STU_IB_BUF.RECV] instr_name RV_VST instr_id 5678 PC 10d0df18 stu_ib_buf_cnt 3
+[info] [PERF] [0000001763] SEND_RELEASE.ST instr_name RV_VST instr_id 5678 PC 10d0df18
+[info] [PERF] [0000001764] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001764] [STU_IB_BUF.RECV] instr_name RV_VST instr_id 5682 PC 10d0df18 stu_ib_buf_cnt 4
+[info] [PERF] [0000001764] SEND_RELEASE.ST instr_name RV_VST instr_id 5682 PC 10d0df18
+[info] [PERF] [0000001765] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001766] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001766] [SEND_UB_WR] req_id 1037 is_dual_src false bytes_per_mask 4  instr_name RV_VST instr_id 5670 PC 10d0df18
+[info] [PERF] [0000001766] [STU_IB_BUF.ISSUE] instr_name RV_VST instr_id 5670 PC 10d0df18 stu_ib_buf_cnt 4 Pipe:STU
+[info] [PERF] [0000001767] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001767] [STU_IB_BUF.POP] instr_name RV_VST instr_id 5670 PC 10d0df18 stu_ib_buf_cnt 3 Pipe:STU
+[info] [PERF] [0000001767] [SEND_UB_WR] req_id 1038 is_dual_src false bytes_per_mask 4  instr_name RV_VST instr_id 5674 PC 10d0df18
+[info] [PERF] [0000001767] [STU_IB_BUF.ISSUE] instr_name RV_VST instr_id 5674 PC 10d0df18 stu_ib_buf_cnt 3 Pipe:STU
+[info] [PERF] [0000001768] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001768] [STU_IB_BUF.POP] instr_name RV_VST instr_id 5674 PC 10d0df18 stu_ib_buf_cnt 2 Pipe:STU
+[info] [PERF] [0000001768] [STALL.SEND] [STU], instr_id: 5683
+[info] [PERF] [0000001768] LSU_RETIRE.STU instr_name RV_VST instr_id 5670 PC 10d0df18
+[info] [PERF] [0000001768] [SEND_UB_WR] req_id 1039 is_dual_src false bytes_per_mask 4  instr_name RV_VST instr_id 5678 PC 10d0df18
+[info] [PERF] [0000001768] [STU_IB_BUF.ISSUE] instr_name RV_VST instr_id 5678 PC 10d0df18 stu_ib_buf_cnt 2 Pipe:STU
+[info] [PERF] [0000001769] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001769] [STU_IB_BUF.POP] instr_name RV_VST instr_id 5678 PC 10d0df18 stu_ib_buf_cnt 1 Pipe:STU
+[info] [PERF] [0000001769] [STALL.SEND] [STU], instr_id: 5683
+[info] [PERF] [0000001769] LSU_RETIRE.STU instr_name RV_VST instr_id 5674 PC 10d0df18
+[info] [PERF] [0000001769] [SEND_UB_WR] req_id 1040 is_dual_src false bytes_per_mask 4  instr_name RV_VST instr_id 5682 PC 10d0df18
+[info] [PERF] [0000001769] [STU_IB_BUF.ISSUE] instr_name RV_VST instr_id 5682 PC 10d0df18 stu_ib_buf_cnt 1 Pipe:STU
+[info] [PERF] [0000001770] [STALL.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001770] [STU_IB_BUF.POP] instr_name RV_VST instr_id 5682 PC 10d0df18 stu_ib_buf_cnt 0 Pipe:STU
+[info] [PERF] [0000001770] [STALL.SEND] [STU], instr_id: 5683
+[info] [PERF] [0000001770] LSU_RETIRE.STU instr_name RV_VST instr_id 5678 PC 10d0df18
+[info] [PERF] [0000001771] [GO.SEND] [LDU], instr_id: 5683
+[info] [PERF] [0000001771] LSU_I1 instr_name RV_SEND instr_id 5683 req_id 0 PC 10d0df1c Pipe:LDU0
+[info] [PERF] [0000001771] [STALL.SEND] [STU], instr_id: 5683
+[info] [PERF] [0000001771] LSU_RETIRE.STU instr_name RV_VST instr_id 5682 PC 10d0df18
+[info] [PERF] [0000001772] [GO.SEND] [STU], instr_id: 5683
+[info] [PERF] [0000001772] LSU_I1 instr_name RV_SEND instr_id 5683 PC 10d0df1c Pipe:STU
+[info] [PERF] [0000001772] LSU_RETIRE.LDU instr_name RV_SEND instr_id 5683 PC 10d0df1c
+[info] [PERF] [0000001772] LSU_RETIRE.STU instr_name RV_SEND instr_id 5683 PC 10d0df1c
+[info] ++++++++++++++++++++++core: 1, subcore: 1, start: 210, tick: 2256, kernelId: 0, blkID: 2, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

@@ -1,0 +1,17 @@
+[info] 1179 Icache create a req, pc:0x10d0dd00, Id:1, warpId:0, setIdx:26, tagAddr:0x10d0d, type:3, vfId:4149
+[info] 1181 prefetch MISS req send to misq, pc:0x10d0dd00,id:1, setIdx:26, allocate:1
+[info] 1182 Update missInfoBuf, pc:0x10d0dd00, misqEntry:0, id:1
+[info] 1182 Allocate new Misq entry, pc:0x10d0dd00, entryId:0, id:1, send to tagArb:1
+[info] 1183 Icache InvalidHitInfoBuf, req_addr:0x10d0dd00, hitInfoAddr:0x0, tag_addr:0x0, setIdx:26, wayId:0
+[info] 1183 linefill update tagRam, pc:0x10d0dd00, setIdx:26, wayId:0, pending:1, instrId:1, vfId:4149
+[info] 1183 send Read biu Req, addr:0x10d0dd00, misqId:0, gid: 36939
+[info] 1587 recv Read biu Rsp, addr:0x10d0dd00, misqId:0, gid: 36939
+[info] 1587 flush missInfoBuf, pc:0x10d0dd00
+[info] 1587 rsp send to dataArb:1, req pc:0x10d0dd00,type:1
+[info] 1588 finish linefill, req pc:0x10d0dd00, setIdx:26, wayId:0, pend:0, misqId:0
+[info] 1674 Icache create a req, pc:0x10d0dd00, Id:2, warpId:0, setIdx:26, tagAddr:0x10d0d, type:2, vfId:0
+[info] 1676 instr req lookup tag HIT, req pc:0x10d0dd00, id:2, setIdx:26, wayId:0, vfId:0
+[info] 1676 update hit info buffer, pc:0x10d0dd00, setIdx:26, wayId:0
+[info] 1677 send req back to ifu, pc:0x10d0dd00, id:2.
+[info] 1683 clear tagRam pendingBit!
+[info] ++++++++++++++++++++++core: 3, subcore: 2, start: 215, tick: 2219, kernelId: 0, blkID: 7, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

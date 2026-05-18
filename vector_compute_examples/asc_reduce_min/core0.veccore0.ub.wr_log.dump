@@ -1,0 +1,6 @@
+[info] [0000001717] MOV_SRC_TO_DST_ALIGNv2, pc: 0x10d0d714, id: 3677
+[info] Address 00000140 = [bdcccccd]	Address 00000144 = [3de147ae]	Address 00000148 = [3df5c290]	Address 0000014c = [c2c80000]	
+       Address 00000150 = [3e0f5c29]	Address 00000154 = [3e19999a]	Address 00000158 = [be23d70a]	Address 0000015c = [3e2e147b]	
+[info] [0000001739] RV_VSTI, pc: 0x10d0dd18, id: 4206
+[info] Address 00000160 = [c2c80000]	
+[info] ++++++++++++++++++++++core: 0, subcore: 1, start: 208, tick: 2306, kernelId: 0, blkID: 0, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

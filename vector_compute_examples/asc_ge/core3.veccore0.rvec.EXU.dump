@@ -1,0 +1,16 @@
+[info] Using valu table: V310_SIMD_82_OUT
+[info] [PERF] [0000002267] EXU instr_name RV_PLT type.B32 instr_id 22868 PC 10d0d91c retire 2272 vloop_id 1 vloop_pc 10d0d910 ele_cnt 0 exu_id:1
+[info] [PERF] [0000002268] EXU instr_name RV_PLT type.B32 instr_id 22874 PC 10d0d91c retire 2273 vloop_id 1 vloop_pc 10d0d910 ele_cnt 0 exu_id:1
+[info] [PERF] [0000002269] EXU instr_name RV_PLT type.B32 instr_id 22886 PC 10d0d91c retire 2274 vloop_id 1 vloop_pc 10d0d910 ele_cnt 0 exu_id:1
+[info] [PERF] [0000002271] EXU instr_name RV_PLT type.B32 instr_id 22899 PC 10d0d91c retire 2276 vloop_id 1 vloop_pc 10d0d910 ele_cnt 0 exu_id:1
+[info] [PERF] [0000002273] EXU instr_name RV_VCMP_GE type.S32 instr_id 22869 PC 10d0d920 retire 2278 vloop_id 1 vloop_pc 10d0d910 ele_cnt 64 exu_id:1
+[info] [PERF] [0000002274] EXU instr_name RV_VCMP_GE type.S32 instr_id 22875 PC 10d0d920 retire 2279 vloop_id 1 vloop_pc 10d0d910 ele_cnt 64 exu_id:0
+[info] [PERF] [0000002275] EXU instr_name RV_VSEL type.B32 instr_id 22870 PC 10d0d924 retire 2280 vloop_id 1 vloop_pc 10d0d910 ele_cnt 64 exu_id:0
+[info] [PERF] [0000002275] EXU instr_name RV_VCMP_GE type.S32 instr_id 22887 PC 10d0d920 retire 2280 vloop_id 1 vloop_pc 10d0d910 ele_cnt 64 exu_id:1
+[info] [PERF] [0000002276] EXU instr_name RV_VSEL type.B32 instr_id 22876 PC 10d0d924 retire 2281 vloop_id 1 vloop_pc 10d0d910 ele_cnt 64 exu_id:0
+[info] [PERF] [0000002277] EXU instr_name RV_VSEL type.B32 instr_id 22888 PC 10d0d924 retire 2282 vloop_id 1 vloop_pc 10d0d910 ele_cnt 64 exu_id:0
+[info] [PERF] [0000002278] EXU instr_name RV_VCMP_GE type.S32 instr_id 22900 PC 10d0d920 retire 2283 vloop_id 1 vloop_pc 10d0d910 ele_cnt 64 exu_id:0
+[info] [PERF] [0000002280] EXU instr_name RV_VSEL type.B32 instr_id 22908 PC 10d0d924 retire 2285 vloop_id 1 vloop_pc 10d0d910 ele_cnt 64 exu_id:0
+[info] [PERF] [0000002291] EXU instr_name RV_SEND instr_id 22918 PC 10d0d92c retire 2292 vloop_id 0 vloop_pc 0 ele_cnt 0 exu_id:0
+[info] [PERF] [0000002291] EXU instr_name RV_SEND instr_id 22918 PC 10d0d92c retire 2292 vloop_id 0 vloop_pc 0 ele_cnt 0 exu_id:1
+[info] ++++++++++++++++++++++core: 3, subcore: 1, start: 216, tick: 2861, kernelId: 0, blkID: 6, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

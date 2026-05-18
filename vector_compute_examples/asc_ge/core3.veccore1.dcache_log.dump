@@ -1,0 +1,1400 @@
+[info] 217: core_id:39, sys_va_base:0x0, stack_phy_base:0x2100000
+[info] 217: tag_way:0, tag_set:0, tag_addr:0x111e, buffer_addr:0x223c000
+[info] 217: tag_way:0, tag_set:1, tag_addr:0x111e, buffer_addr:0x223c040
+[info] 217: tag_way:0, tag_set:2, tag_addr:0x111e, buffer_addr:0x223c080
+[info] 217: tag_way:0, tag_set:3, tag_addr:0x111e, buffer_addr:0x223c0c0
+[info] 217: tag_way:0, tag_set:4, tag_addr:0x111e, buffer_addr:0x223c100
+[info] 217: tag_way:0, tag_set:5, tag_addr:0x111e, buffer_addr:0x223c140
+[info] 217: tag_way:0, tag_set:6, tag_addr:0x111e, buffer_addr:0x223c180
+[info] 217: tag_way:0, tag_set:7, tag_addr:0x111e, buffer_addr:0x223c1c0
+[info] 217: tag_way:0, tag_set:8, tag_addr:0x111e, buffer_addr:0x223c200
+[info] 217: tag_way:0, tag_set:9, tag_addr:0x111e, buffer_addr:0x223c240
+[info] 217: tag_way:0, tag_set:10, tag_addr:0x111e, buffer_addr:0x223c280
+[info] 217: tag_way:0, tag_set:11, tag_addr:0x111e, buffer_addr:0x223c2c0
+[info] 217: tag_way:0, tag_set:12, tag_addr:0x111e, buffer_addr:0x223c300
+[info] 217: tag_way:0, tag_set:13, tag_addr:0x111e, buffer_addr:0x223c340
+[info] 217: tag_way:0, tag_set:14, tag_addr:0x111e, buffer_addr:0x223c380
+[info] 217: tag_way:0, tag_set:15, tag_addr:0x111e, buffer_addr:0x223c3c0
+[info] 217: tag_way:0, tag_set:16, tag_addr:0x111e, buffer_addr:0x223c400
+[info] 217: tag_way:0, tag_set:17, tag_addr:0x111e, buffer_addr:0x223c440
+[info] 217: tag_way:0, tag_set:18, tag_addr:0x111e, buffer_addr:0x223c480
+[info] 217: tag_way:0, tag_set:19, tag_addr:0x111e, buffer_addr:0x223c4c0
+[info] 217: tag_way:0, tag_set:20, tag_addr:0x111e, buffer_addr:0x223c500
+[info] 217: tag_way:0, tag_set:21, tag_addr:0x111e, buffer_addr:0x223c540
+[info] 217: tag_way:0, tag_set:22, tag_addr:0x111e, buffer_addr:0x223c580
+[info] 217: tag_way:0, tag_set:23, tag_addr:0x111e, buffer_addr:0x223c5c0
+[info] 217: tag_way:0, tag_set:24, tag_addr:0x111e, buffer_addr:0x223c600
+[info] 217: tag_way:0, tag_set:25, tag_addr:0x111e, buffer_addr:0x223c640
+[info] 217: tag_way:0, tag_set:26, tag_addr:0x111e, buffer_addr:0x223c680
+[info] 217: tag_way:0, tag_set:27, tag_addr:0x111e, buffer_addr:0x223c6c0
+[info] 217: tag_way:0, tag_set:28, tag_addr:0x111e, buffer_addr:0x223c700
+[info] 217: tag_way:0, tag_set:29, tag_addr:0x111e, buffer_addr:0x223c740
+[info] 217: tag_way:0, tag_set:30, tag_addr:0x111e, buffer_addr:0x223c780
+[info] 217: tag_way:0, tag_set:31, tag_addr:0x111e, buffer_addr:0x223c7c0
+[info] 217: tag_way:0, tag_set:32, tag_addr:0x111e, buffer_addr:0x223c800
+[info] 217: tag_way:0, tag_set:33, tag_addr:0x111e, buffer_addr:0x223c840
+[info] 217: tag_way:0, tag_set:34, tag_addr:0x111e, buffer_addr:0x223c880
+[info] 217: tag_way:0, tag_set:35, tag_addr:0x111e, buffer_addr:0x223c8c0
+[info] 217: tag_way:0, tag_set:36, tag_addr:0x111e, buffer_addr:0x223c900
+[info] 217: tag_way:0, tag_set:37, tag_addr:0x111e, buffer_addr:0x223c940
+[info] 217: tag_way:0, tag_set:38, tag_addr:0x111e, buffer_addr:0x223c980
+[info] 217: tag_way:0, tag_set:39, tag_addr:0x111e, buffer_addr:0x223c9c0
+[info] 217: tag_way:0, tag_set:40, tag_addr:0x111e, buffer_addr:0x223ca00
+[info] 217: tag_way:0, tag_set:41, tag_addr:0x111e, buffer_addr:0x223ca40
+[info] 217: tag_way:0, tag_set:42, tag_addr:0x111e, buffer_addr:0x223ca80
+[info] 217: tag_way:0, tag_set:43, tag_addr:0x111e, buffer_addr:0x223cac0
+[info] 217: tag_way:0, tag_set:44, tag_addr:0x111e, buffer_addr:0x223cb00
+[info] 217: tag_way:0, tag_set:45, tag_addr:0x111e, buffer_addr:0x223cb40
+[info] 217: tag_way:0, tag_set:46, tag_addr:0x111e, buffer_addr:0x223cb80
+[info] 217: tag_way:0, tag_set:47, tag_addr:0x111e, buffer_addr:0x223cbc0
+[info] 217: tag_way:0, tag_set:48, tag_addr:0x111e, buffer_addr:0x223cc00
+[info] 217: tag_way:0, tag_set:49, tag_addr:0x111e, buffer_addr:0x223cc40
+[info] 217: tag_way:0, tag_set:50, tag_addr:0x111e, buffer_addr:0x223cc80
+[info] 217: tag_way:0, tag_set:51, tag_addr:0x111e, buffer_addr:0x223ccc0
+[info] 217: tag_way:0, tag_set:52, tag_addr:0x111e, buffer_addr:0x223cd00
+[info] 217: tag_way:0, tag_set:53, tag_addr:0x111e, buffer_addr:0x223cd40
+[info] 217: tag_way:0, tag_set:54, tag_addr:0x111e, buffer_addr:0x223cd80
+[info] 217: tag_way:0, tag_set:55, tag_addr:0x111e, buffer_addr:0x223cdc0
+[info] 217: tag_way:0, tag_set:56, tag_addr:0x111e, buffer_addr:0x223ce00
+[info] 217: tag_way:0, tag_set:57, tag_addr:0x111e, buffer_addr:0x223ce40
+[info] 217: tag_way:0, tag_set:58, tag_addr:0x111e, buffer_addr:0x223ce80
+[info] 217: tag_way:0, tag_set:59, tag_addr:0x111e, buffer_addr:0x223cec0
+[info] 217: tag_way:0, tag_set:60, tag_addr:0x111e, buffer_addr:0x223cf00
+[info] 217: tag_way:0, tag_set:61, tag_addr:0x111e, buffer_addr:0x223cf40
+[info] 217: tag_way:0, tag_set:62, tag_addr:0x111e, buffer_addr:0x223cf80
+[info] 217: tag_way:0, tag_set:63, tag_addr:0x111e, buffer_addr:0x223cfc0
+[info] 217: tag_way:0, tag_set:64, tag_addr:0x111e, buffer_addr:0x223d000
+[info] 217: tag_way:0, tag_set:65, tag_addr:0x111e, buffer_addr:0x223d040
+[info] 217: tag_way:0, tag_set:66, tag_addr:0x111e, buffer_addr:0x223d080
+[info] 217: tag_way:0, tag_set:67, tag_addr:0x111e, buffer_addr:0x223d0c0
+[info] 217: tag_way:0, tag_set:68, tag_addr:0x111e, buffer_addr:0x223d100
+[info] 217: tag_way:0, tag_set:69, tag_addr:0x111e, buffer_addr:0x223d140
+[info] 217: tag_way:0, tag_set:70, tag_addr:0x111e, buffer_addr:0x223d180
+[info] 217: tag_way:0, tag_set:71, tag_addr:0x111e, buffer_addr:0x223d1c0
+[info] 217: tag_way:0, tag_set:72, tag_addr:0x111e, buffer_addr:0x223d200
+[info] 217: tag_way:0, tag_set:73, tag_addr:0x111e, buffer_addr:0x223d240
+[info] 217: tag_way:0, tag_set:74, tag_addr:0x111e, buffer_addr:0x223d280
+[info] 217: tag_way:0, tag_set:75, tag_addr:0x111e, buffer_addr:0x223d2c0
+[info] 217: tag_way:0, tag_set:76, tag_addr:0x111e, buffer_addr:0x223d300
+[info] 217: tag_way:0, tag_set:77, tag_addr:0x111e, buffer_addr:0x223d340
+[info] 217: tag_way:0, tag_set:78, tag_addr:0x111e, buffer_addr:0x223d380
+[info] 217: tag_way:0, tag_set:79, tag_addr:0x111e, buffer_addr:0x223d3c0
+[info] 217: tag_way:0, tag_set:80, tag_addr:0x111e, buffer_addr:0x223d400
+[info] 217: tag_way:0, tag_set:81, tag_addr:0x111e, buffer_addr:0x223d440
+[info] 217: tag_way:0, tag_set:82, tag_addr:0x111e, buffer_addr:0x223d480
+[info] 217: tag_way:0, tag_set:83, tag_addr:0x111e, buffer_addr:0x223d4c0
+[info] 217: tag_way:0, tag_set:84, tag_addr:0x111e, buffer_addr:0x223d500
+[info] 217: tag_way:0, tag_set:85, tag_addr:0x111e, buffer_addr:0x223d540
+[info] 217: tag_way:0, tag_set:86, tag_addr:0x111e, buffer_addr:0x223d580
+[info] 217: tag_way:0, tag_set:87, tag_addr:0x111e, buffer_addr:0x223d5c0
+[info] 217: tag_way:0, tag_set:88, tag_addr:0x111e, buffer_addr:0x223d600
+[info] 217: tag_way:0, tag_set:89, tag_addr:0x111e, buffer_addr:0x223d640
+[info] 217: tag_way:0, tag_set:90, tag_addr:0x111e, buffer_addr:0x223d680
+[info] 217: tag_way:0, tag_set:91, tag_addr:0x111e, buffer_addr:0x223d6c0
+[info] 217: tag_way:0, tag_set:92, tag_addr:0x111e, buffer_addr:0x223d700
+[info] 217: tag_way:0, tag_set:93, tag_addr:0x111e, buffer_addr:0x223d740
+[info] 217: tag_way:0, tag_set:94, tag_addr:0x111e, buffer_addr:0x223d780
+[info] 217: tag_way:0, tag_set:95, tag_addr:0x111e, buffer_addr:0x223d7c0
+[info] 217: tag_way:0, tag_set:96, tag_addr:0x111e, buffer_addr:0x223d800
+[info] 217: tag_way:0, tag_set:97, tag_addr:0x111e, buffer_addr:0x223d840
+[info] 217: tag_way:0, tag_set:98, tag_addr:0x111e, buffer_addr:0x223d880
+[info] 217: tag_way:0, tag_set:99, tag_addr:0x111e, buffer_addr:0x223d8c0
+[info] 217: tag_way:0, tag_set:100, tag_addr:0x111e, buffer_addr:0x223d900
+[info] 217: tag_way:0, tag_set:101, tag_addr:0x111e, buffer_addr:0x223d940
+[info] 217: tag_way:0, tag_set:102, tag_addr:0x111e, buffer_addr:0x223d980
+[info] 217: tag_way:0, tag_set:103, tag_addr:0x111e, buffer_addr:0x223d9c0
+[info] 217: tag_way:0, tag_set:104, tag_addr:0x111e, buffer_addr:0x223da00
+[info] 217: tag_way:0, tag_set:105, tag_addr:0x111e, buffer_addr:0x223da40
+[info] 217: tag_way:0, tag_set:106, tag_addr:0x111e, buffer_addr:0x223da80
+[info] 217: tag_way:0, tag_set:107, tag_addr:0x111e, buffer_addr:0x223dac0
+[info] 217: tag_way:0, tag_set:108, tag_addr:0x111e, buffer_addr:0x223db00
+[info] 217: tag_way:0, tag_set:109, tag_addr:0x111e, buffer_addr:0x223db40
+[info] 217: tag_way:0, tag_set:110, tag_addr:0x111e, buffer_addr:0x223db80
+[info] 217: tag_way:0, tag_set:111, tag_addr:0x111e, buffer_addr:0x223dbc0
+[info] 217: tag_way:0, tag_set:112, tag_addr:0x111e, buffer_addr:0x223dc00
+[info] 217: tag_way:0, tag_set:113, tag_addr:0x111e, buffer_addr:0x223dc40
+[info] 217: tag_way:0, tag_set:114, tag_addr:0x111e, buffer_addr:0x223dc80
+[info] 217: tag_way:0, tag_set:115, tag_addr:0x111e, buffer_addr:0x223dcc0
+[info] 217: tag_way:0, tag_set:116, tag_addr:0x111e, buffer_addr:0x223dd00
+[info] 217: tag_way:0, tag_set:117, tag_addr:0x111e, buffer_addr:0x223dd40
+[info] 217: tag_way:0, tag_set:118, tag_addr:0x111e, buffer_addr:0x223dd80
+[info] 217: tag_way:0, tag_set:119, tag_addr:0x111e, buffer_addr:0x223ddc0
+[info] 217: tag_way:0, tag_set:120, tag_addr:0x111e, buffer_addr:0x223de00
+[info] 217: tag_way:0, tag_set:121, tag_addr:0x111e, buffer_addr:0x223de40
+[info] 217: tag_way:0, tag_set:122, tag_addr:0x111e, buffer_addr:0x223de80
+[info] 217: tag_way:0, tag_set:123, tag_addr:0x111e, buffer_addr:0x223dec0
+[info] 217: tag_way:0, tag_set:124, tag_addr:0x111e, buffer_addr:0x223df00
+[info] 217: tag_way:0, tag_set:125, tag_addr:0x111e, buffer_addr:0x223df40
+[info] 217: tag_way:0, tag_set:126, tag_addr:0x111e, buffer_addr:0x223df80
+[info] 217: tag_way:0, tag_set:127, tag_addr:0x111e, buffer_addr:0x223dfc0
+[info] 217: tag_way:1, tag_set:0, tag_addr:0x111f, buffer_addr:0x223e000
+[info] 217: tag_way:1, tag_set:1, tag_addr:0x111f, buffer_addr:0x223e040
+[info] 217: tag_way:1, tag_set:2, tag_addr:0x111f, buffer_addr:0x223e080
+[info] 217: tag_way:1, tag_set:3, tag_addr:0x111f, buffer_addr:0x223e0c0
+[info] 217: tag_way:1, tag_set:4, tag_addr:0x111f, buffer_addr:0x223e100
+[info] 217: tag_way:1, tag_set:5, tag_addr:0x111f, buffer_addr:0x223e140
+[info] 217: tag_way:1, tag_set:6, tag_addr:0x111f, buffer_addr:0x223e180
+[info] 217: tag_way:1, tag_set:7, tag_addr:0x111f, buffer_addr:0x223e1c0
+[info] 217: tag_way:1, tag_set:8, tag_addr:0x111f, buffer_addr:0x223e200
+[info] 217: tag_way:1, tag_set:9, tag_addr:0x111f, buffer_addr:0x223e240
+[info] 217: tag_way:1, tag_set:10, tag_addr:0x111f, buffer_addr:0x223e280
+[info] 217: tag_way:1, tag_set:11, tag_addr:0x111f, buffer_addr:0x223e2c0
+[info] 217: tag_way:1, tag_set:12, tag_addr:0x111f, buffer_addr:0x223e300
+[info] 217: tag_way:1, tag_set:13, tag_addr:0x111f, buffer_addr:0x223e340
+[info] 217: tag_way:1, tag_set:14, tag_addr:0x111f, buffer_addr:0x223e380
+[info] 217: tag_way:1, tag_set:15, tag_addr:0x111f, buffer_addr:0x223e3c0
+[info] 217: tag_way:1, tag_set:16, tag_addr:0x111f, buffer_addr:0x223e400
+[info] 217: tag_way:1, tag_set:17, tag_addr:0x111f, buffer_addr:0x223e440
+[info] 217: tag_way:1, tag_set:18, tag_addr:0x111f, buffer_addr:0x223e480
+[info] 217: tag_way:1, tag_set:19, tag_addr:0x111f, buffer_addr:0x223e4c0
+[info] 217: tag_way:1, tag_set:20, tag_addr:0x111f, buffer_addr:0x223e500
+[info] 217: tag_way:1, tag_set:21, tag_addr:0x111f, buffer_addr:0x223e540
+[info] 217: tag_way:1, tag_set:22, tag_addr:0x111f, buffer_addr:0x223e580
+[info] 217: tag_way:1, tag_set:23, tag_addr:0x111f, buffer_addr:0x223e5c0
+[info] 217: tag_way:1, tag_set:24, tag_addr:0x111f, buffer_addr:0x223e600
+[info] 217: tag_way:1, tag_set:25, tag_addr:0x111f, buffer_addr:0x223e640
+[info] 217: tag_way:1, tag_set:26, tag_addr:0x111f, buffer_addr:0x223e680
+[info] 217: tag_way:1, tag_set:27, tag_addr:0x111f, buffer_addr:0x223e6c0
+[info] 217: tag_way:1, tag_set:28, tag_addr:0x111f, buffer_addr:0x223e700
+[info] 217: tag_way:1, tag_set:29, tag_addr:0x111f, buffer_addr:0x223e740
+[info] 217: tag_way:1, tag_set:30, tag_addr:0x111f, buffer_addr:0x223e780
+[info] 217: tag_way:1, tag_set:31, tag_addr:0x111f, buffer_addr:0x223e7c0
+[info] 217: tag_way:1, tag_set:32, tag_addr:0x111f, buffer_addr:0x223e800
+[info] 217: tag_way:1, tag_set:33, tag_addr:0x111f, buffer_addr:0x223e840
+[info] 217: tag_way:1, tag_set:34, tag_addr:0x111f, buffer_addr:0x223e880
+[info] 217: tag_way:1, tag_set:35, tag_addr:0x111f, buffer_addr:0x223e8c0
+[info] 217: tag_way:1, tag_set:36, tag_addr:0x111f, buffer_addr:0x223e900
+[info] 217: tag_way:1, tag_set:37, tag_addr:0x111f, buffer_addr:0x223e940
+[info] 217: tag_way:1, tag_set:38, tag_addr:0x111f, buffer_addr:0x223e980
+[info] 217: tag_way:1, tag_set:39, tag_addr:0x111f, buffer_addr:0x223e9c0
+[info] 217: tag_way:1, tag_set:40, tag_addr:0x111f, buffer_addr:0x223ea00
+[info] 217: tag_way:1, tag_set:41, tag_addr:0x111f, buffer_addr:0x223ea40
+[info] 217: tag_way:1, tag_set:42, tag_addr:0x111f, buffer_addr:0x223ea80
+[info] 217: tag_way:1, tag_set:43, tag_addr:0x111f, buffer_addr:0x223eac0
+[info] 217: tag_way:1, tag_set:44, tag_addr:0x111f, buffer_addr:0x223eb00
+[info] 217: tag_way:1, tag_set:45, tag_addr:0x111f, buffer_addr:0x223eb40
+[info] 217: tag_way:1, tag_set:46, tag_addr:0x111f, buffer_addr:0x223eb80
+[info] 217: tag_way:1, tag_set:47, tag_addr:0x111f, buffer_addr:0x223ebc0
+[info] 217: tag_way:1, tag_set:48, tag_addr:0x111f, buffer_addr:0x223ec00
+[info] 217: tag_way:1, tag_set:49, tag_addr:0x111f, buffer_addr:0x223ec40
+[info] 217: tag_way:1, tag_set:50, tag_addr:0x111f, buffer_addr:0x223ec80
+[info] 217: tag_way:1, tag_set:51, tag_addr:0x111f, buffer_addr:0x223ecc0
+[info] 217: tag_way:1, tag_set:52, tag_addr:0x111f, buffer_addr:0x223ed00
+[info] 217: tag_way:1, tag_set:53, tag_addr:0x111f, buffer_addr:0x223ed40
+[info] 217: tag_way:1, tag_set:54, tag_addr:0x111f, buffer_addr:0x223ed80
+[info] 217: tag_way:1, tag_set:55, tag_addr:0x111f, buffer_addr:0x223edc0
+[info] 217: tag_way:1, tag_set:56, tag_addr:0x111f, buffer_addr:0x223ee00
+[info] 217: tag_way:1, tag_set:57, tag_addr:0x111f, buffer_addr:0x223ee40
+[info] 217: tag_way:1, tag_set:58, tag_addr:0x111f, buffer_addr:0x223ee80
+[info] 217: tag_way:1, tag_set:59, tag_addr:0x111f, buffer_addr:0x223eec0
+[info] 217: tag_way:1, tag_set:60, tag_addr:0x111f, buffer_addr:0x223ef00
+[info] 217: tag_way:1, tag_set:61, tag_addr:0x111f, buffer_addr:0x223ef40
+[info] 217: tag_way:1, tag_set:62, tag_addr:0x111f, buffer_addr:0x223ef80
+[info] 217: tag_way:1, tag_set:63, tag_addr:0x111f, buffer_addr:0x223efc0
+[info] 217: tag_way:1, tag_set:64, tag_addr:0x111f, buffer_addr:0x223f000
+[info] 217: tag_way:1, tag_set:65, tag_addr:0x111f, buffer_addr:0x223f040
+[info] 217: tag_way:1, tag_set:66, tag_addr:0x111f, buffer_addr:0x223f080
+[info] 217: tag_way:1, tag_set:67, tag_addr:0x111f, buffer_addr:0x223f0c0
+[info] 217: tag_way:1, tag_set:68, tag_addr:0x111f, buffer_addr:0x223f100
+[info] 217: tag_way:1, tag_set:69, tag_addr:0x111f, buffer_addr:0x223f140
+[info] 217: tag_way:1, tag_set:70, tag_addr:0x111f, buffer_addr:0x223f180
+[info] 217: tag_way:1, tag_set:71, tag_addr:0x111f, buffer_addr:0x223f1c0
+[info] 217: tag_way:1, tag_set:72, tag_addr:0x111f, buffer_addr:0x223f200
+[info] 217: tag_way:1, tag_set:73, tag_addr:0x111f, buffer_addr:0x223f240
+[info] 217: tag_way:1, tag_set:74, tag_addr:0x111f, buffer_addr:0x223f280
+[info] 217: tag_way:1, tag_set:75, tag_addr:0x111f, buffer_addr:0x223f2c0
+[info] 217: tag_way:1, tag_set:76, tag_addr:0x111f, buffer_addr:0x223f300
+[info] 217: tag_way:1, tag_set:77, tag_addr:0x111f, buffer_addr:0x223f340
+[info] 217: tag_way:1, tag_set:78, tag_addr:0x111f, buffer_addr:0x223f380
+[info] 217: tag_way:1, tag_set:79, tag_addr:0x111f, buffer_addr:0x223f3c0
+[info] 217: tag_way:1, tag_set:80, tag_addr:0x111f, buffer_addr:0x223f400
+[info] 217: tag_way:1, tag_set:81, tag_addr:0x111f, buffer_addr:0x223f440
+[info] 217: tag_way:1, tag_set:82, tag_addr:0x111f, buffer_addr:0x223f480
+[info] 217: tag_way:1, tag_set:83, tag_addr:0x111f, buffer_addr:0x223f4c0
+[info] 217: tag_way:1, tag_set:84, tag_addr:0x111f, buffer_addr:0x223f500
+[info] 217: tag_way:1, tag_set:85, tag_addr:0x111f, buffer_addr:0x223f540
+[info] 217: tag_way:1, tag_set:86, tag_addr:0x111f, buffer_addr:0x223f580
+[info] 217: tag_way:1, tag_set:87, tag_addr:0x111f, buffer_addr:0x223f5c0
+[info] 217: tag_way:1, tag_set:88, tag_addr:0x111f, buffer_addr:0x223f600
+[info] 217: tag_way:1, tag_set:89, tag_addr:0x111f, buffer_addr:0x223f640
+[info] 217: tag_way:1, tag_set:90, tag_addr:0x111f, buffer_addr:0x223f680
+[info] 217: tag_way:1, tag_set:91, tag_addr:0x111f, buffer_addr:0x223f6c0
+[info] 217: tag_way:1, tag_set:92, tag_addr:0x111f, buffer_addr:0x223f700
+[info] 217: tag_way:1, tag_set:93, tag_addr:0x111f, buffer_addr:0x223f740
+[info] 217: tag_way:1, tag_set:94, tag_addr:0x111f, buffer_addr:0x223f780
+[info] 217: tag_way:1, tag_set:95, tag_addr:0x111f, buffer_addr:0x223f7c0
+[info] 217: tag_way:1, tag_set:96, tag_addr:0x111f, buffer_addr:0x223f800
+[info] 217: tag_way:1, tag_set:97, tag_addr:0x111f, buffer_addr:0x223f840
+[info] 217: tag_way:1, tag_set:98, tag_addr:0x111f, buffer_addr:0x223f880
+[info] 217: tag_way:1, tag_set:99, tag_addr:0x111f, buffer_addr:0x223f8c0
+[info] 217: tag_way:1, tag_set:100, tag_addr:0x111f, buffer_addr:0x223f900
+[info] 217: tag_way:1, tag_set:101, tag_addr:0x111f, buffer_addr:0x223f940
+[info] 217: tag_way:1, tag_set:102, tag_addr:0x111f, buffer_addr:0x223f980
+[info] 217: tag_way:1, tag_set:103, tag_addr:0x111f, buffer_addr:0x223f9c0
+[info] 217: tag_way:1, tag_set:104, tag_addr:0x111f, buffer_addr:0x223fa00
+[info] 217: tag_way:1, tag_set:105, tag_addr:0x111f, buffer_addr:0x223fa40
+[info] 217: tag_way:1, tag_set:106, tag_addr:0x111f, buffer_addr:0x223fa80
+[info] 217: tag_way:1, tag_set:107, tag_addr:0x111f, buffer_addr:0x223fac0
+[info] 217: tag_way:1, tag_set:108, tag_addr:0x111f, buffer_addr:0x223fb00
+[info] 217: tag_way:1, tag_set:109, tag_addr:0x111f, buffer_addr:0x223fb40
+[info] 217: tag_way:1, tag_set:110, tag_addr:0x111f, buffer_addr:0x223fb80
+[info] 217: tag_way:1, tag_set:111, tag_addr:0x111f, buffer_addr:0x223fbc0
+[info] 217: tag_way:1, tag_set:112, tag_addr:0x111f, buffer_addr:0x223fc00
+[info] 217: tag_way:1, tag_set:113, tag_addr:0x111f, buffer_addr:0x223fc40
+[info] 217: tag_way:1, tag_set:114, tag_addr:0x111f, buffer_addr:0x223fc80
+[info] 217: tag_way:1, tag_set:115, tag_addr:0x111f, buffer_addr:0x223fcc0
+[info] 217: tag_way:1, tag_set:116, tag_addr:0x111f, buffer_addr:0x223fd00
+[info] 217: tag_way:1, tag_set:117, tag_addr:0x111f, buffer_addr:0x223fd40
+[info] 217: tag_way:1, tag_set:118, tag_addr:0x111f, buffer_addr:0x223fd80
+[info] 217: tag_way:1, tag_set:119, tag_addr:0x111f, buffer_addr:0x223fdc0
+[info] 217: tag_way:1, tag_set:120, tag_addr:0x111f, buffer_addr:0x223fe00
+[info] 217: tag_way:1, tag_set:121, tag_addr:0x111f, buffer_addr:0x223fe40
+[info] 217: tag_way:1, tag_set:122, tag_addr:0x111f, buffer_addr:0x223fe80
+[info] 217: tag_way:1, tag_set:123, tag_addr:0x111f, buffer_addr:0x223fec0
+[info] 217: tag_way:1, tag_set:124, tag_addr:0x111f, buffer_addr:0x223ff00
+[info] 217: tag_way:1, tag_set:125, tag_addr:0x111f, buffer_addr:0x223ff40
+[info] 217: tag_way:1, tag_set:126, tag_addr:0x111f, buffer_addr:0x223ff80
+[info] 217: tag_way:1, tag_set:127, tag_addr:0x111f, buffer_addr:0x223ffc0
+[info] 770: calc_req_addr. req pc:0x10d0d438, idx_addr:0x0, tag_addr:0x8116, aligned_addr_:0x1022c000, aligned47_0_addr_:0x1022c000, ofst_addr_:0x0 
+[info] 770: lookup_tag is MISS. req pc :0x10d0d438.
+[info] 770 add instr to dsbDdrMap, instr.id:17117.
+[info] 772: push req to mshr. req_addr:0x1022c000,mshr_main_entry_id:0,aligned_addr_:0x1022c000,mem: 1 
+[info] 772: mshr_req_create_rd_req. req_addr:0x1022c000,aligned_addr_:0x1022c000,mem: 1 
+[info] 773: send_rd_biu_req. req_id:28633,req_rd_addr:0x1022c000.
+[info] 785: calc_req_addr. req pc:0x10d0d47c, idx_addr:0x0, tag_addr:0x8116, aligned_addr_:0x1022c000, aligned47_0_addr_:0x1022c000, ofst_addr_:0x8 
+[info] 785: lookup_tag is MISS. req pc :0x10d0d47c.
+[info] 785 add instr to dsbDdrMap, instr.id:17219.
+[info] 786: calc_req_addr. req pc:0x10d0d488, idx_addr:0x0, tag_addr:0x8116, aligned_addr_:0x1022c000, aligned47_0_addr_:0x1022c000, ofst_addr_:0x0 
+[info] 786: lookup_tag is MISS. req pc :0x10d0d488.
+[info] 786 add instr to dsbDdrMap, instr.id:17243.
+[info] 787: push req to mshr. req_addr:0x1022c008,mshr_main_entry_id:0,aligned_addr_:0x1022c000,mem: 1 
+[info] 788: push req to mshr. req_addr:0x1022c000,mshr_main_entry_id:0,aligned_addr_:0x1022c000,mem: 1 
+[info] 805: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x0 
+[info] 805: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 805 add instr to dsbUbMap, instr.id:17403.
+[info] 806: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x0 
+[info] 806: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 806 add instr to dsbUbMap, instr.id:17405.
+[info] 807: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 808: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 812: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x4 
+[info] 812: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 812 add instr to dsbUbMap, instr.id:17515.
+[info] 813: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x4 
+[info] 813: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 813 add instr to dsbUbMap, instr.id:17517.
+[info] 814: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 815: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 819: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x8 
+[info] 819: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 819 add instr to dsbUbMap, instr.id:17587.
+[info] 820: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x8 
+[info] 820: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 820 add instr to dsbUbMap, instr.id:17589.
+[info] 821: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 822: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 826: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0xc 
+[info] 826: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 826 add instr to dsbUbMap, instr.id:17649.
+[info] 827: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0xc 
+[info] 827: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 827 add instr to dsbUbMap, instr.id:17651.
+[info] 828: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 829: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 833: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x10 
+[info] 833: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 833 add instr to dsbUbMap, instr.id:17703.
+[info] 834: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x10 
+[info] 834: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 834 add instr to dsbUbMap, instr.id:17705.
+[info] 835: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 836: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 839: create_write_data_to_ub_req.write_addr_is:0x2800
+[info] 839: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x2800,mem: 0 
+[info] 840: create_write_data_to_ub_req.write_addr_is:0x2900
+[info] 840: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x2900,mem: 0 
+[info] 840: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x14 
+[info] 840: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2814
+[info] 840: pipe_stall_M0.
+[info] 840 add instr to dsbUbMap, instr.id:17775.
+[info] 840: send_wr_ub_req. ll_req_id:1212,aligned_addr_: 0x2800
+[info] 841: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2814
+[info] 841: pipe_stall_M0.
+[info] 841: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x14 
+[info] 841: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2814
+[info] 841: pipe_stall_M0.
+[info] 841 add instr to dsbUbMap, instr.id:17777.
+[info] 841: send_wr_ub_req. ll_req_id:1214,aligned_addr_: 0x2900
+[info] 842: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2814
+[info] 842: pipe_stall_M0.
+[info] 843: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2814
+[info] 843: pipe_stall_M0.
+[info] 844: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2814
+[info] 844: pipe_stall_M0.
+[info] 845: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2814
+[info] 845: pipe_stall_M0.
+[info] 845: recv_wr_ub_rsp.rsp_id:1212,rsp_addr:0x2800.
+[info] 845: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 845: retire_stb_instr. isa_pc:0x10d0d500
+[info] 845: retire_stb_instr. isa_pc:0x10d0d500
+[info] 845: retire_stb_instr. isa_pc:0x10d0d500
+[info] 845: retire_stb_instr. isa_pc:0x10d0d500
+[info] 845: retire_stb_instr. isa_pc:0x10d0d500
+[info] 846: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 846: recv_wr_ub_rsp.rsp_id:1214,rsp_addr:0x2900.
+[info] 846: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 846: retire_stb_instr. isa_pc:0x10d0d508
+[info] 846: retire_stb_instr. isa_pc:0x10d0d508
+[info] 846: retire_stb_instr. isa_pc:0x10d0d508
+[info] 846: retire_stb_instr. isa_pc:0x10d0d508
+[info] 846: retire_stb_instr. isa_pc:0x10d0d508
+[info] 847: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 847: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x18 
+[info] 847: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 847 add instr to dsbUbMap, instr.id:17847.
+[info] 848: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x18 
+[info] 848: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 848 add instr to dsbUbMap, instr.id:17849.
+[info] 848: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 849: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 850: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 851: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 854: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x1c 
+[info] 854: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 854 add instr to dsbUbMap, instr.id:17919.
+[info] 855: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x1c 
+[info] 855: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 855 add instr to dsbUbMap, instr.id:17921.
+[info] 856: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 857: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 861: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x20 
+[info] 861: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 861 add instr to dsbUbMap, instr.id:17991.
+[info] 862: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x20 
+[info] 862: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 862 add instr to dsbUbMap, instr.id:17993.
+[info] 863: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 864: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 868: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x24 
+[info] 868: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 868 add instr to dsbUbMap, instr.id:18063.
+[info] 869: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x24 
+[info] 869: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 869 add instr to dsbUbMap, instr.id:18065.
+[info] 870: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 871: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 875: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x28 
+[info] 875: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 875 add instr to dsbUbMap, instr.id:18135.
+[info] 876: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x28 
+[info] 876: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 876 add instr to dsbUbMap, instr.id:18137.
+[info] 877: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:6,store_data:0x1
+[info] 878: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:6,store_data:0x0
+[info] 880: create_write_data_to_ub_req.write_addr_is:0x2800
+[info] 880: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x2800,mem: 0 
+[info] 881: create_write_data_to_ub_req.write_addr_is:0x2900
+[info] 881: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x2900,mem: 0 
+[info] 881: send_wr_ub_req. ll_req_id:1228,aligned_addr_: 0x2800
+[info] 882: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x2c 
+[info] 882: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x282c
+[info] 882: pipe_stall_M0.
+[info] 882 add instr to dsbUbMap, instr.id:18207.
+[info] 882: send_wr_ub_req. ll_req_id:1230,aligned_addr_: 0x2900
+[info] 883: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x282c
+[info] 883: pipe_stall_M0.
+[info] 883: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x2c 
+[info] 883: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x282c
+[info] 883: pipe_stall_M0.
+[info] 883 add instr to dsbUbMap, instr.id:18209.
+[info] 884: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x282c
+[info] 884: pipe_stall_M0.
+[info] 885: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x282c
+[info] 885: pipe_stall_M0.
+[info] 886: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x282c
+[info] 886: pipe_stall_M0.
+[info] 886: recv_wr_ub_rsp.rsp_id:1228,rsp_addr:0x2800.
+[info] 886: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 886: retire_stb_instr. isa_pc:0x10d0d500
+[info] 886: retire_stb_instr. isa_pc:0x10d0d500
+[info] 886: retire_stb_instr. isa_pc:0x10d0d500
+[info] 886: retire_stb_instr. isa_pc:0x10d0d500
+[info] 886: retire_stb_instr. isa_pc:0x10d0d500
+[info] 886: retire_stb_instr. isa_pc:0x10d0d500
+[info] 887: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 887: recv_wr_ub_rsp.rsp_id:1230,rsp_addr:0x2900.
+[info] 887: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 887: retire_stb_instr. isa_pc:0x10d0d508
+[info] 887: retire_stb_instr. isa_pc:0x10d0d508
+[info] 887: retire_stb_instr. isa_pc:0x10d0d508
+[info] 887: retire_stb_instr. isa_pc:0x10d0d508
+[info] 887: retire_stb_instr. isa_pc:0x10d0d508
+[info] 887: retire_stb_instr. isa_pc:0x10d0d508
+[info] 888: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 889: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x30 
+[info] 889: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 889 add instr to dsbUbMap, instr.id:18279.
+[info] 889: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 890: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x30 
+[info] 890: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 890 add instr to dsbUbMap, instr.id:18281.
+[info] 890: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 891: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 892: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 896: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x34 
+[info] 896: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 896 add instr to dsbUbMap, instr.id:18351.
+[info] 897: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x34 
+[info] 897: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 897 add instr to dsbUbMap, instr.id:18353.
+[info] 898: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 899: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 903: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x38 
+[info] 903: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 903 add instr to dsbUbMap, instr.id:18423.
+[info] 904: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x38 
+[info] 904: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 904 add instr to dsbUbMap, instr.id:18425.
+[info] 905: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 906: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 910: calc_req_addr. req pc:0x10d0d500, idx_addr:0x20, tag_addr:0x1, aligned_addr_:0x2800, aligned47_0_addr_:0x2800, ofst_addr_:0x3c 
+[info] 910: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 910 add instr to dsbUbMap, instr.id:18495.
+[info] 911: calc_req_addr. req pc:0x10d0d508, idx_addr:0x24, tag_addr:0x1, aligned_addr_:0x2900, aligned47_0_addr_:0x2900, ofst_addr_:0x3c 
+[info] 911: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 911 add instr to dsbUbMap, instr.id:18497.
+[info] 912: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2800,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 913: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2900,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 917: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x0 
+[info] 917: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 917 add instr to dsbUbMap, instr.id:18567.
+[info] 918: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x0 
+[info] 918: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 918 add instr to dsbUbMap, instr.id:18569.
+[info] 919: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:2,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 920: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:3,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 921: create_write_data_to_ub_req.write_addr_is:0x2800
+[info] 921: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x2800,mem: 0 
+[info] 922: create_write_data_to_ub_req.write_addr_is:0x2900
+[info] 922: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x2900,mem: 0 
+[info] 922: send_wr_ub_req. ll_req_id:1246,aligned_addr_: 0x2800
+[info] 923: send_wr_ub_req. ll_req_id:1248,aligned_addr_: 0x2900
+[info] 924: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x4 
+[info] 924: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 924 add instr to dsbUbMap, instr.id:18639.
+[info] 925: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x4 
+[info] 925: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 925 add instr to dsbUbMap, instr.id:18641.
+[info] 926: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:2,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 927: recv_wr_ub_rsp.rsp_id:1246,rsp_addr:0x2800.
+[info] 927: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 927: retire_stb_instr. isa_pc:0x10d0d500
+[info] 927: retire_stb_instr. isa_pc:0x10d0d500
+[info] 927: retire_stb_instr. isa_pc:0x10d0d500
+[info] 927: retire_stb_instr. isa_pc:0x10d0d500
+[info] 927: retire_stb_instr. isa_pc:0x10d0d500
+[info] 927: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:2,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 928: recv_wr_ub_rsp.rsp_id:1248,rsp_addr:0x2900.
+[info] 928: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 928: retire_stb_instr. isa_pc:0x10d0d508
+[info] 928: retire_stb_instr. isa_pc:0x10d0d508
+[info] 928: retire_stb_instr. isa_pc:0x10d0d508
+[info] 928: retire_stb_instr. isa_pc:0x10d0d508
+[info] 928: retire_stb_instr. isa_pc:0x10d0d508
+[info] 931: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x8 
+[info] 931: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 931 add instr to dsbUbMap, instr.id:18711.
+[info] 932: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x8 
+[info] 932: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 932 add instr to dsbUbMap, instr.id:18713.
+[info] 933: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 934: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 938: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0xc 
+[info] 938: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 938 add instr to dsbUbMap, instr.id:18783.
+[info] 939: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0xc 
+[info] 939: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 939 add instr to dsbUbMap, instr.id:18785.
+[info] 940: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 941: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 945: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x10 
+[info] 945: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 945 add instr to dsbUbMap, instr.id:18855.
+[info] 946: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x10 
+[info] 946: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 946 add instr to dsbUbMap, instr.id:18857.
+[info] 947: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 948: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 951: create_write_data_to_ub_req.write_addr_is:0x2840
+[info] 951: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x2840,mem: 0 
+[info] 952: create_write_data_to_ub_req.write_addr_is:0x2940
+[info] 952: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x2940,mem: 0 
+[info] 952: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x14 
+[info] 952: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2854
+[info] 952: pipe_stall_M0.
+[info] 952 add instr to dsbUbMap, instr.id:18927.
+[info] 952: send_wr_ub_req. ll_req_id:1260,aligned_addr_: 0x2840
+[info] 953: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2854
+[info] 953: pipe_stall_M0.
+[info] 953: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x14 
+[info] 953: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2854
+[info] 953: pipe_stall_M0.
+[info] 953 add instr to dsbUbMap, instr.id:18929.
+[info] 953: send_wr_ub_req. ll_req_id:1262,aligned_addr_: 0x2940
+[info] 954: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2854
+[info] 954: pipe_stall_M0.
+[info] 955: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2854
+[info] 955: pipe_stall_M0.
+[info] 956: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2854
+[info] 956: pipe_stall_M0.
+[info] 957: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2854
+[info] 957: pipe_stall_M0.
+[info] 957: recv_wr_ub_rsp.rsp_id:1260,rsp_addr:0x2840.
+[info] 957: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 957: retire_stb_instr. isa_pc:0x10d0d500
+[info] 957: retire_stb_instr. isa_pc:0x10d0d500
+[info] 957: retire_stb_instr. isa_pc:0x10d0d500
+[info] 957: retire_stb_instr. isa_pc:0x10d0d500
+[info] 957: retire_stb_instr. isa_pc:0x10d0d500
+[info] 958: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 958: recv_wr_ub_rsp.rsp_id:1262,rsp_addr:0x2940.
+[info] 958: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 958: retire_stb_instr. isa_pc:0x10d0d508
+[info] 958: retire_stb_instr. isa_pc:0x10d0d508
+[info] 958: retire_stb_instr. isa_pc:0x10d0d508
+[info] 958: retire_stb_instr. isa_pc:0x10d0d508
+[info] 958: retire_stb_instr. isa_pc:0x10d0d508
+[info] 959: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 959: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x18 
+[info] 959: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 959 add instr to dsbUbMap, instr.id:18999.
+[info] 960: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x18 
+[info] 960: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 960 add instr to dsbUbMap, instr.id:19001.
+[info] 960: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 961: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 962: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 963: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 966: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x1c 
+[info] 966: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 966 add instr to dsbUbMap, instr.id:19071.
+[info] 967: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x1c 
+[info] 967: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 967 add instr to dsbUbMap, instr.id:19073.
+[info] 968: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 969: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 973: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x20 
+[info] 973: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 973 add instr to dsbUbMap, instr.id:19143.
+[info] 974: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x20 
+[info] 974: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 974 add instr to dsbUbMap, instr.id:19145.
+[info] 975: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 976: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 980: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x24 
+[info] 980: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 980 add instr to dsbUbMap, instr.id:19215.
+[info] 981: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x24 
+[info] 981: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 981 add instr to dsbUbMap, instr.id:19217.
+[info] 982: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 983: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 987: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x28 
+[info] 987: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 987 add instr to dsbUbMap, instr.id:19287.
+[info] 988: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x28 
+[info] 988: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 988 add instr to dsbUbMap, instr.id:19289.
+[info] 989: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:6,store_data:0x1
+[info] 990: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:6,store_data:0x0
+[info] 992: create_write_data_to_ub_req.write_addr_is:0x2840
+[info] 992: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x2840,mem: 0 
+[info] 993: create_write_data_to_ub_req.write_addr_is:0x2940
+[info] 993: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x2940,mem: 0 
+[info] 993: send_wr_ub_req. ll_req_id:1276,aligned_addr_: 0x2840
+[info] 994: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x2c 
+[info] 994: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x286c
+[info] 994: pipe_stall_M0.
+[info] 994 add instr to dsbUbMap, instr.id:19359.
+[info] 994: send_wr_ub_req. ll_req_id:1278,aligned_addr_: 0x2940
+[info] 995: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x286c
+[info] 995: pipe_stall_M0.
+[info] 995: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x2c 
+[info] 995: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x286c
+[info] 995: pipe_stall_M0.
+[info] 995 add instr to dsbUbMap, instr.id:19361.
+[info] 996: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x286c
+[info] 996: pipe_stall_M0.
+[info] 997: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x286c
+[info] 997: pipe_stall_M0.
+[info] 998: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x286c
+[info] 998: pipe_stall_M0.
+[info] 998: recv_wr_ub_rsp.rsp_id:1276,rsp_addr:0x2840.
+[info] 998: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 998: retire_stb_instr. isa_pc:0x10d0d500
+[info] 998: retire_stb_instr. isa_pc:0x10d0d500
+[info] 998: retire_stb_instr. isa_pc:0x10d0d500
+[info] 998: retire_stb_instr. isa_pc:0x10d0d500
+[info] 998: retire_stb_instr. isa_pc:0x10d0d500
+[info] 998: retire_stb_instr. isa_pc:0x10d0d500
+[info] 999: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 999: recv_wr_ub_rsp.rsp_id:1278,rsp_addr:0x2940.
+[info] 999: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 999: retire_stb_instr. isa_pc:0x10d0d508
+[info] 999: retire_stb_instr. isa_pc:0x10d0d508
+[info] 999: retire_stb_instr. isa_pc:0x10d0d508
+[info] 999: retire_stb_instr. isa_pc:0x10d0d508
+[info] 999: retire_stb_instr. isa_pc:0x10d0d508
+[info] 999: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1000: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1001: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x30 
+[info] 1001: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1001 add instr to dsbUbMap, instr.id:19431.
+[info] 1001: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 1002: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x30 
+[info] 1002: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1002 add instr to dsbUbMap, instr.id:19433.
+[info] 1002: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 1003: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 1004: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 1008: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x34 
+[info] 1008: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1008 add instr to dsbUbMap, instr.id:19503.
+[info] 1009: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x34 
+[info] 1009: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1009 add instr to dsbUbMap, instr.id:19505.
+[info] 1010: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 1011: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 1015: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x38 
+[info] 1015: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1015 add instr to dsbUbMap, instr.id:19575.
+[info] 1016: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x38 
+[info] 1016: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1016 add instr to dsbUbMap, instr.id:19577.
+[info] 1017: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 1018: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 1022: calc_req_addr. req pc:0x10d0d500, idx_addr:0x21, tag_addr:0x1, aligned_addr_:0x2840, aligned47_0_addr_:0x2840, ofst_addr_:0x3c 
+[info] 1022: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1022 add instr to dsbUbMap, instr.id:19647.
+[info] 1023: calc_req_addr. req pc:0x10d0d508, idx_addr:0x25, tag_addr:0x1, aligned_addr_:0x2940, aligned47_0_addr_:0x2940, ofst_addr_:0x3c 
+[info] 1023: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1023 add instr to dsbUbMap, instr.id:19649.
+[info] 1024: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2840,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 1025: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2940,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 1029: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x0 
+[info] 1029: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1029 add instr to dsbUbMap, instr.id:19719.
+[info] 1030: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x0 
+[info] 1030: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1030 add instr to dsbUbMap, instr.id:19721.
+[info] 1031: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:2,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 1032: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:3,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 1033: create_write_data_to_ub_req.write_addr_is:0x2840
+[info] 1033: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x2840,mem: 0 
+[info] 1034: create_write_data_to_ub_req.write_addr_is:0x2940
+[info] 1034: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x2940,mem: 0 
+[info] 1034: send_wr_ub_req. ll_req_id:1294,aligned_addr_: 0x2840
+[info] 1035: send_wr_ub_req. ll_req_id:1296,aligned_addr_: 0x2940
+[info] 1036: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x4 
+[info] 1036: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1036 add instr to dsbUbMap, instr.id:19791.
+[info] 1037: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x4 
+[info] 1037: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1037 add instr to dsbUbMap, instr.id:19793.
+[info] 1038: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:2,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 1039: recv_wr_ub_rsp.rsp_id:1294,rsp_addr:0x2840.
+[info] 1039: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1039: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1039: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1039: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1039: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1039: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1039: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:2,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 1040: recv_wr_ub_rsp.rsp_id:1296,rsp_addr:0x2940.
+[info] 1040: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1040: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1040: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1040: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1040: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1040: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1043: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x8 
+[info] 1043: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1043 add instr to dsbUbMap, instr.id:19863.
+[info] 1044: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x8 
+[info] 1044: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1044 add instr to dsbUbMap, instr.id:19865.
+[info] 1045: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 1046: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 1050: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0xc 
+[info] 1050: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1050 add instr to dsbUbMap, instr.id:19935.
+[info] 1051: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0xc 
+[info] 1051: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1051 add instr to dsbUbMap, instr.id:19937.
+[info] 1052: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 1053: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 1057: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x10 
+[info] 1057: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1057 add instr to dsbUbMap, instr.id:20007.
+[info] 1058: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x10 
+[info] 1058: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1058 add instr to dsbUbMap, instr.id:20009.
+[info] 1059: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 1060: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 1063: create_write_data_to_ub_req.write_addr_is:0x2880
+[info] 1063: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x2880,mem: 0 
+[info] 1064: create_write_data_to_ub_req.write_addr_is:0x2980
+[info] 1064: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x2980,mem: 0 
+[info] 1064: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x14 
+[info] 1064: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2894
+[info] 1064: pipe_stall_M0.
+[info] 1064 add instr to dsbUbMap, instr.id:20079.
+[info] 1064: send_wr_ub_req. ll_req_id:1308,aligned_addr_: 0x2880
+[info] 1065: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2894
+[info] 1065: pipe_stall_M0.
+[info] 1065: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x14 
+[info] 1065: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2894
+[info] 1065: pipe_stall_M0.
+[info] 1065 add instr to dsbUbMap, instr.id:20081.
+[info] 1065: send_wr_ub_req. ll_req_id:1310,aligned_addr_: 0x2980
+[info] 1066: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2894
+[info] 1066: pipe_stall_M0.
+[info] 1067: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2894
+[info] 1067: pipe_stall_M0.
+[info] 1068: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2894
+[info] 1068: pipe_stall_M0.
+[info] 1069: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x2894
+[info] 1069: pipe_stall_M0.
+[info] 1069: recv_wr_ub_rsp.rsp_id:1308,rsp_addr:0x2880.
+[info] 1069: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1069: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1069: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1069: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1069: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1069: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1070: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1070: recv_wr_ub_rsp.rsp_id:1310,rsp_addr:0x2980.
+[info] 1070: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1070: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1070: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1070: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1070: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1070: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1071: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1071: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x18 
+[info] 1071: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1071 add instr to dsbUbMap, instr.id:20151.
+[info] 1072: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x18 
+[info] 1072: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1072 add instr to dsbUbMap, instr.id:20153.
+[info] 1072: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 1073: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 1074: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 1075: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 1078: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x1c 
+[info] 1078: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1078 add instr to dsbUbMap, instr.id:20223.
+[info] 1079: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x1c 
+[info] 1079: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1079 add instr to dsbUbMap, instr.id:20225.
+[info] 1080: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 1081: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 1085: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x20 
+[info] 1085: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1085 add instr to dsbUbMap, instr.id:20295.
+[info] 1086: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x20 
+[info] 1086: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1086 add instr to dsbUbMap, instr.id:20297.
+[info] 1087: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 1088: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 1092: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x24 
+[info] 1092: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1092 add instr to dsbUbMap, instr.id:20367.
+[info] 1093: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x24 
+[info] 1093: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1093 add instr to dsbUbMap, instr.id:20369.
+[info] 1094: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 1095: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 1099: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x28 
+[info] 1099: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1099 add instr to dsbUbMap, instr.id:20439.
+[info] 1100: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x28 
+[info] 1100: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1100 add instr to dsbUbMap, instr.id:20441.
+[info] 1101: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:6,store_data:0x1
+[info] 1102: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:6,store_data:0x0
+[info] 1104: create_write_data_to_ub_req.write_addr_is:0x2880
+[info] 1104: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x2880,mem: 0 
+[info] 1105: create_write_data_to_ub_req.write_addr_is:0x2980
+[info] 1105: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x2980,mem: 0 
+[info] 1105: send_wr_ub_req. ll_req_id:1324,aligned_addr_: 0x2880
+[info] 1106: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x2c 
+[info] 1106: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ac
+[info] 1106: pipe_stall_M0.
+[info] 1106 add instr to dsbUbMap, instr.id:20511.
+[info] 1106: send_wr_ub_req. ll_req_id:1326,aligned_addr_: 0x2980
+[info] 1107: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ac
+[info] 1107: pipe_stall_M0.
+[info] 1107: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x2c 
+[info] 1107: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ac
+[info] 1107: pipe_stall_M0.
+[info] 1107 add instr to dsbUbMap, instr.id:20513.
+[info] 1108: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ac
+[info] 1108: pipe_stall_M0.
+[info] 1109: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ac
+[info] 1109: pipe_stall_M0.
+[info] 1110: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ac
+[info] 1110: pipe_stall_M0.
+[info] 1110: recv_wr_ub_rsp.rsp_id:1324,rsp_addr:0x2880.
+[info] 1110: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1110: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1110: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1110: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1110: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1110: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1110: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1111: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1111: recv_wr_ub_rsp.rsp_id:1326,rsp_addr:0x2980.
+[info] 1111: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1111: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1111: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1111: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1111: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1111: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1111: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1112: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1113: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x30 
+[info] 1113: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1113 add instr to dsbUbMap, instr.id:20583.
+[info] 1113: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 1114: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x30 
+[info] 1114: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1114 add instr to dsbUbMap, instr.id:20585.
+[info] 1114: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 1115: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 1116: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 1120: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x34 
+[info] 1120: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1120 add instr to dsbUbMap, instr.id:20655.
+[info] 1121: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x34 
+[info] 1121: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1121 add instr to dsbUbMap, instr.id:20657.
+[info] 1122: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 1123: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 1127: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x38 
+[info] 1127: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1127 add instr to dsbUbMap, instr.id:20727.
+[info] 1128: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x38 
+[info] 1128: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1128 add instr to dsbUbMap, instr.id:20729.
+[info] 1129: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 1130: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 1134: calc_req_addr. req pc:0x10d0d500, idx_addr:0x22, tag_addr:0x1, aligned_addr_:0x2880, aligned47_0_addr_:0x2880, ofst_addr_:0x3c 
+[info] 1134: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1134 add instr to dsbUbMap, instr.id:20799.
+[info] 1135: calc_req_addr. req pc:0x10d0d508, idx_addr:0x26, tag_addr:0x1, aligned_addr_:0x2980, aligned47_0_addr_:0x2980, ofst_addr_:0x3c 
+[info] 1135: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1135 add instr to dsbUbMap, instr.id:20801.
+[info] 1136: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x2880,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 1137: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x2980,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 1141: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x0 
+[info] 1141: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1141 add instr to dsbUbMap, instr.id:20871.
+[info] 1142: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x0 
+[info] 1142: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1142 add instr to dsbUbMap, instr.id:20873.
+[info] 1143: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:2,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 1144: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:3,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 1145: create_write_data_to_ub_req.write_addr_is:0x2880
+[info] 1145: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x2880,mem: 0 
+[info] 1146: create_write_data_to_ub_req.write_addr_is:0x2980
+[info] 1146: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x2980,mem: 0 
+[info] 1146: send_wr_ub_req. ll_req_id:1342,aligned_addr_: 0x2880
+[info] 1147: send_wr_ub_req. ll_req_id:1344,aligned_addr_: 0x2980
+[info] 1148: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x4 
+[info] 1148: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1148 add instr to dsbUbMap, instr.id:20943.
+[info] 1149: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x4 
+[info] 1149: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1149 add instr to dsbUbMap, instr.id:20945.
+[info] 1150: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:2,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 1151: recv_wr_ub_rsp.rsp_id:1342,rsp_addr:0x2880.
+[info] 1151: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1151: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1151: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1151: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1151: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1151: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1151: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:2,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 1152: recv_wr_ub_rsp.rsp_id:1344,rsp_addr:0x2980.
+[info] 1152: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1152: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1152: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1152: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1152: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1152: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1155: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x8 
+[info] 1155: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1155 add instr to dsbUbMap, instr.id:21015.
+[info] 1156: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x8 
+[info] 1156: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1156 add instr to dsbUbMap, instr.id:21017.
+[info] 1157: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 1158: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 1162: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0xc 
+[info] 1162: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1162 add instr to dsbUbMap, instr.id:21087.
+[info] 1163: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0xc 
+[info] 1163: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1163 add instr to dsbUbMap, instr.id:21089.
+[info] 1164: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 1165: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 1169: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x10 
+[info] 1169: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1169 add instr to dsbUbMap, instr.id:21159.
+[info] 1170: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x10 
+[info] 1170: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1170 add instr to dsbUbMap, instr.id:21161.
+[info] 1171: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 1172: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 1175: create_write_data_to_ub_req.write_addr_is:0x28c0
+[info] 1175: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x28c0,mem: 0 
+[info] 1176: create_write_data_to_ub_req.write_addr_is:0x29c0
+[info] 1176: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x29c0,mem: 0 
+[info] 1176: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x14 
+[info] 1176: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28d4
+[info] 1176: pipe_stall_M0.
+[info] 1176 add instr to dsbUbMap, instr.id:21231.
+[info] 1176: send_wr_ub_req. ll_req_id:1356,aligned_addr_: 0x28c0
+[info] 1177: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28d4
+[info] 1177: pipe_stall_M0.
+[info] 1177: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x14 
+[info] 1177: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28d4
+[info] 1177: pipe_stall_M0.
+[info] 1177 add instr to dsbUbMap, instr.id:21233.
+[info] 1177: send_wr_ub_req. ll_req_id:1358,aligned_addr_: 0x29c0
+[info] 1178: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28d4
+[info] 1178: pipe_stall_M0.
+[info] 1179: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28d4
+[info] 1179: pipe_stall_M0.
+[info] 1180: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28d4
+[info] 1180: pipe_stall_M0.
+[info] 1181: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28d4
+[info] 1181: pipe_stall_M0.
+[info] 1181: recv_wr_ub_rsp.rsp_id:1356,rsp_addr:0x28c0.
+[info] 1181: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1181: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1181: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1181: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1181: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1181: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1182: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1182: recv_wr_ub_rsp.rsp_id:1358,rsp_addr:0x29c0.
+[info] 1182: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1182: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1182: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1182: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1182: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1182: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1183: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1183: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x18 
+[info] 1183: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1183 add instr to dsbUbMap, instr.id:21303.
+[info] 1184: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x18 
+[info] 1184: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1184 add instr to dsbUbMap, instr.id:21305.
+[info] 1184: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 1185: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 1186: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 1187: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 1190: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x1c 
+[info] 1190: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1190 add instr to dsbUbMap, instr.id:21375.
+[info] 1191: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x1c 
+[info] 1191: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1191 add instr to dsbUbMap, instr.id:21377.
+[info] 1192: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 1193: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 1197: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x20 
+[info] 1197: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1197 add instr to dsbUbMap, instr.id:21447.
+[info] 1198: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x20 
+[info] 1198: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1198 add instr to dsbUbMap, instr.id:21449.
+[info] 1199: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 1200: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 1204: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x24 
+[info] 1204: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1204 add instr to dsbUbMap, instr.id:21519.
+[info] 1205: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x24 
+[info] 1205: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1205 add instr to dsbUbMap, instr.id:21521.
+[info] 1206: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 1207: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 1211: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x28 
+[info] 1211: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1211 add instr to dsbUbMap, instr.id:21591.
+[info] 1212: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x28 
+[info] 1212: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1212 add instr to dsbUbMap, instr.id:21593.
+[info] 1213: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:6,store_data:0x1
+[info] 1214: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:6,store_data:0x0
+[info] 1216: create_write_data_to_ub_req.write_addr_is:0x28c0
+[info] 1216: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x28c0,mem: 0 
+[info] 1217: create_write_data_to_ub_req.write_addr_is:0x29c0
+[info] 1217: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x29c0,mem: 0 
+[info] 1217: send_wr_ub_req. ll_req_id:1372,aligned_addr_: 0x28c0
+[info] 1218: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x2c 
+[info] 1218: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ec
+[info] 1218: pipe_stall_M0.
+[info] 1218 add instr to dsbUbMap, instr.id:21663.
+[info] 1218: send_wr_ub_req. ll_req_id:1374,aligned_addr_: 0x29c0
+[info] 1219: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ec
+[info] 1219: pipe_stall_M0.
+[info] 1219: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x2c 
+[info] 1219: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ec
+[info] 1219: pipe_stall_M0.
+[info] 1219 add instr to dsbUbMap, instr.id:21665.
+[info] 1220: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ec
+[info] 1220: pipe_stall_M0.
+[info] 1221: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ec
+[info] 1221: pipe_stall_M0.
+[info] 1222: write_req_stall:1,stb_full:0,stb_forbid:1,evic_haz:0, req_addr:0x28ec
+[info] 1222: pipe_stall_M0.
+[info] 1222: recv_wr_ub_rsp.rsp_id:1372,rsp_addr:0x28c0.
+[info] 1222: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1222: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1222: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1222: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1222: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1222: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1222: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1223: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1223: recv_wr_ub_rsp.rsp_id:1374,rsp_addr:0x29c0.
+[info] 1223: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1223: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1223: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1223: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1223: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1223: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1223: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1224: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1225: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x30 
+[info] 1225: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1225 add instr to dsbUbMap, instr.id:21735.
+[info] 1225: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:1,store_data:0x1
+[info] 1226: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x30 
+[info] 1226: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1226 add instr to dsbUbMap, instr.id:21737.
+[info] 1226: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:1,store_data:0x0
+[info] 1227: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:2,store_data:0x1
+[info] 1228: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:2,store_data:0x0
+[info] 1232: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x34 
+[info] 1232: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1232 add instr to dsbUbMap, instr.id:21807.
+[info] 1233: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x34 
+[info] 1233: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1233 add instr to dsbUbMap, instr.id:21809.
+[info] 1234: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:3,store_data:0x1
+[info] 1235: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:3,store_data:0x0
+[info] 1239: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x38 
+[info] 1239: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1239 add instr to dsbUbMap, instr.id:21879.
+[info] 1240: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x38 
+[info] 1240: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1240 add instr to dsbUbMap, instr.id:21881.
+[info] 1241: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:4,store_data:0x1
+[info] 1242: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:4,store_data:0x0
+[info] 1246: calc_req_addr. req pc:0x10d0d500, idx_addr:0x23, tag_addr:0x1, aligned_addr_:0x28c0, aligned47_0_addr_:0x28c0, ofst_addr_:0x3c 
+[info] 1246: lookup_tag is MISS. req pc :0x10d0d500.
+[info] 1246 add instr to dsbUbMap, instr.id:21951.
+[info] 1247: calc_req_addr. req pc:0x10d0d508, idx_addr:0x27, tag_addr:0x1, aligned_addr_:0x29c0, aligned47_0_addr_:0x29c0, ofst_addr_:0x3c 
+[info] 1247: lookup_tag is MISS. req pc :0x10d0d508.
+[info] 1247 add instr to dsbUbMap, instr.id:21953.
+[info] 1248: push req to stb. req_pc:0x10d0d500,stb_main_entry_id:0,aligned47_0_addr_:0x28c0,mem: 0,stb_sub_entry_size:5,store_data:0x1
+[info] 1249: push req to stb. req_pc:0x10d0d508,stb_main_entry_id:1,aligned47_0_addr_:0x29c0,mem: 0,stb_sub_entry_size:5,store_data:0x0
+[info] 1257: create_write_data_to_ub_req.write_addr_is:0x28c0
+[info] 1257: stb_create_wr_req(NO_WR). req_pc:0x10d0d500,aligned47_0_addr_:0x28c0,mem: 0 
+[info] 1258: create_write_data_to_ub_req.write_addr_is:0x29c0
+[info] 1258: stb_create_wr_req(NO_WR). req_pc:0x10d0d508,aligned47_0_addr_:0x29c0,mem: 0 
+[info] 1258: send_wr_ub_req. ll_req_id:1388,aligned_addr_: 0x28c0
+[info] 1259: send_wr_ub_req. ll_req_id:1390,aligned_addr_: 0x29c0
+[info] 1263: recv_wr_ub_rsp.rsp_id:1388,rsp_addr:0x28c0.
+[info] 1263: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1263: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1263: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1263: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1263: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1263: retire_stb_instr. isa_pc:0x10d0d500
+[info] 1264: recv_wr_ub_rsp.rsp_id:1390,rsp_addr:0x29c0.
+[info] 1264: stb_write_data_to_ub(no_wr),stb_entry_id:0,cache_way_id:65535.
+[info] 1264: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1264: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1264: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1264: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1264: retire_stb_instr. isa_pc:0x10d0d508
+[info] 1299: recv_rd_biu_rsp(mshr). rsp_id:28633, aligned_addr: 0x1022c000, req addr:0x1022c000
+[info] 1299: refill data to cache_ram. way_id:2,tag_addr:0x8116,idx_addr: 0x0,mem:1, is_dirty:0.
+[info] 1299: retire_mshr_instr. isa_pc:0x10d0d438
+[info] 1299: retire_mshr_instr. isa_pc:0x10d0d47c
+[info] 1299: retire_mshr_instr. isa_pc:0x10d0d488
+[info] 1852: calc_req_addr. req pc:0x10d0d638, idx_addr:0x0, tag_addr:0x0, aligned_addr_:0x0, aligned47_0_addr_:0x0, ofst_addr_:0x0 
+[info] 1852 add instr to dsbDdrMap, instr.id:22790.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:0.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:1.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:2.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:3.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:4.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:5.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:6.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:7.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:8.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:9.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:10.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:11.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:12.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:13.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:14.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:15.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:16.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:17.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:18.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:19.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:20.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:21.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:22.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:23.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:24.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:25.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:26.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:27.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:28.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:29.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:30.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:31.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:32.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:33.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:34.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:35.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:36.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:37.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:38.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:39.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:40.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:41.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:42.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:43.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:44.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:45.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:46.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:47.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:48.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:49.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:50.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:51.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:52.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:53.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:54.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:55.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:56.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:57.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:58.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:59.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:60.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:61.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:62.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:63.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:64.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:65.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:66.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:67.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:68.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:69.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:70.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:71.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:72.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:73.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:74.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:75.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:76.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:77.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:78.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:79.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:80.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:81.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:82.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:83.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:84.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:85.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:86.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:87.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:88.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:89.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:90.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:91.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:92.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:93.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:94.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:95.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:96.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:97.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:98.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:99.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:100.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:101.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:102.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:103.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:104.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:105.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:106.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:107.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:108.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:109.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:110.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:111.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:112.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:113.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:114.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:115.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:116.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:117.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:118.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:119.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:120.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:121.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:122.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:123.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:124.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:125.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:126.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:0, idx:127.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:0.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:1.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:2.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:3.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:4.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:5.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:6.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:7.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:8.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:9.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:10.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:11.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:12.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:13.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:14.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:15.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:16.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:17.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:18.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:19.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:20.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:21.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:22.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:23.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:24.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:25.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:26.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:27.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:28.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:29.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:30.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:31.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:32.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:33.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:34.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:35.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:36.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:37.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:38.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:39.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:40.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:41.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:42.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:43.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:44.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:45.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:46.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:47.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:48.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:49.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:50.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:51.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:52.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:53.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:54.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:55.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:56.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:57.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:58.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:59.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:60.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:61.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:62.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:63.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:64.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:65.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:66.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:67.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:68.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:69.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:70.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:71.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:72.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:73.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:74.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:75.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:76.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:77.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:78.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:79.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:80.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:81.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:82.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:83.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:84.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:85.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:86.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:87.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:88.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:89.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:90.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:91.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:92.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:93.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:94.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:95.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:96.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:97.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:98.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:99.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:100.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:101.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:102.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:103.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:104.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:105.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:106.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:107.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:108.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:109.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:110.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:111.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:112.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:113.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:114.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:115.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:116.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:117.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:118.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:119.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:120.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:121.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:122.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:123.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:124.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:125.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:126.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:1, idx:127.
+[info] 1854: dcci_all_invalid. req_pc:0x10d0d638, req->mem:2.way_id:2, idx:0.
+[info] ++++++++++++++++++++++core: 3, subcore: 2, start: 217, tick: 2965, kernelId: 0, blkID: 7, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

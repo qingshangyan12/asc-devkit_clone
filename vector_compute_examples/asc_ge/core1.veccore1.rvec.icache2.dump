@@ -1,0 +1,33 @@
+[info] 1779 Icache create a req, pc:0x10d0d900, Id:1, warpId:0, setIdx:18, tagAddr:0x10d0d, type:3, vfId:22686
+[info] 1781 prefetch MISS req send to misq, pc:0x10d0d900,id:1, setIdx:18, allocate:1
+[info] 1782 Update missInfoBuf, pc:0x10d0d900, misqEntry:0, id:1
+[info] 1782 Allocate new Misq entry, pc:0x10d0d900, entryId:0, id:1, send to tagArb:1
+[info] 1783 Icache InvalidHitInfoBuf, req_addr:0x10d0d900, hitInfoAddr:0x0, tag_addr:0x0, setIdx:18, wayId:0
+[info] 1783 linefill update tagRam, pc:0x10d0d900, setIdx:18, wayId:0, pending:1, instrId:1, vfId:22686
+[info] 1783 send Read biu Req, addr:0x10d0d900, misqId:0, gid: 34996
+[info] 1832 fetch req match misq, pc:0x10d0d900, id:2, entry_id:0
+[info] 1832 lock new req, pc:0x10d0d900, id:2, addr:0x21a1b2
+[info] 1832 Icache create a req, pc:0x10d0d900, Id:2, warpId:0, setIdx:18, tagAddr:0x10d0d, type:2, vfId:0
+[info] 2282 recv Read biu Rsp, addr:0x10d0d900, misqId:0, gid: 34996
+[info] 2282 flush missInfoBuf, pc:0x10d0d900
+[info] 2282 rsp send to dataArb:1, req pc:0x10d0d900,type:1
+[info] 2283 finish linefill, req pc:0x10d0d900, setIdx:18, wayId:0, pend:0, misqId:0
+[info] 2283 unLock req, pc:0x10d0d900, id:2, addr:0x21a1b2
+[info] 2285 Icache create a req, pc:0x10d0d900, Id:2, warpId:0, setIdx:18, tagAddr:0x10d0d, type:2, vfId:0
+[info] 2286 Icache create a req, pc:0x10d0d920, Id:3, warpId:0, setIdx:18, tagAddr:0x10d0d, type:2, vfId:0
+[info] 2287 instr req lookup tag HIT, req pc:0x10d0d900, id:2, setIdx:18, wayId:0, vfId:0
+[info] 2287 update hit info buffer, pc:0x10d0d900, setIdx:18, wayId:0
+[info] 2288 instr req lookup tag HIT, req pc:0x10d0d920, id:3, setIdx:18, wayId:0, vfId:0
+[info] 2288 update hit info buffer, pc:0x10d0d920, setIdx:18, wayId:0
+[info] 2288 send req back to ifu, pc:0x10d0d900, id:2.
+[info] 2289 send req back to ifu, pc:0x10d0d920, id:3.
+[info] 2293 match hit info buffer, id:4, pc:0x10d0d920, wayIdx:0
+[info] 2293 Icache create a req, pc:0x10d0d920, Id:4, warpId:0, setIdx:18, tagAddr:0x10d0d, type:2, vfId:0
+[info] 2294 match hit info buffer, id:5, pc:0x10d0d940, wayIdx:0
+[info] 2294 Icache create a req, pc:0x10d0d940, Id:5, warpId:0, setIdx:18, tagAddr:0x10d0d, type:2, vfId:0
+[info] 2295 instr req HIT hitInfoBuffer, req pc:0x10d0d920, id:4, setIdx:18, wayId:0, vfId:0
+[info] 2296 instr req HIT hitInfoBuffer, req pc:0x10d0d940, id:5, setIdx:18, wayId:0, vfId:0
+[info] 2296 send req back to ifu, pc:0x10d0d920, id:4.
+[info] 2297 send req back to ifu, pc:0x10d0d940, id:5.
+[info] 2300 clear tagRam pendingBit!
+[info] ++++++++++++++++++++++core: 1, subcore: 2, start: 213, tick: 2916, kernelId: 0, blkID: 3, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

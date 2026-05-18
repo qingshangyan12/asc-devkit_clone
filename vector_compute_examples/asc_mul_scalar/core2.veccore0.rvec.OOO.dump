@@ -1,0 +1,50 @@
+[info] 0 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 0 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] [PERF] [0000001834] OOO_RECV instr_name RV_VLD instr_id 5747 PC 10d0df0c
+[info] 1834 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 1834 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] [PERF] [0000001834] OOO_RECV instr_name RV_PLT instr_id 5748 PC 10d0df10
+[info] [PERF] [0000001834] OOO_RECV instr_name RV_VMULS instr_id 5749 PC 10d0df14
+[info] [PERF] [0000001834] OOO_RECV instr_name RV_VST instr_id 5750 PC 10d0df18
+[info] [PERF] [0000001834] OOO_SEND instr_name RV_VLD instr_id 5747 PC 10d0df0c
+[info] [PERF] [0000001834] OOO_SEND instr_name RV_PLT instr_id 5748 PC 10d0df10
+[info] [PERF] [0000001834] OOO_SEND instr_name RV_VMULS instr_id 5749 PC 10d0df14
+[info] [PERF] [0000001834] OOO_SEND instr_name RV_VST instr_id 5750 PC 10d0df18
+[info] [PERF] [0000001835] OOO_RECV instr_name RV_VLD instr_id 5751 PC 10d0df0c
+[info] [PERF] [0000001835] OOO_RECV instr_name RV_PLT instr_id 5752 PC 10d0df10
+[info] [PERF] [0000001835] OOO_RECV instr_name RV_VMULS instr_id 5753 PC 10d0df14
+[info] [PERF] [0000001835] OOO_RECV instr_name RV_VST instr_id 5754 PC 10d0df18
+[info] [PERF] [0000001835] OOO_SEND instr_name RV_VLD instr_id 5751 PC 10d0df0c
+[info] [PERF] [0000001835] OOO_SEND instr_name RV_PLT instr_id 5752 PC 10d0df10
+[info] [PERF] [0000001835] OOO_SEND instr_name RV_VMULS instr_id 5753 PC 10d0df14
+[info] [PERF] [0000001835] OOO_SEND instr_name RV_VST instr_id 5754 PC 10d0df18
+[info] [PERF] [0000001836] OOO_RECV instr_name RV_VLD instr_id 5755 PC 10d0df0c
+[info] [PERF] [0000001836] OOO_RECV instr_name RV_PLT instr_id 5756 PC 10d0df10
+[info] [PERF] [0000001836] OOO_RECV instr_name RV_VMULS instr_id 5757 PC 10d0df14
+[info] [PERF] [0000001836] OOO_RECV instr_name RV_VST instr_id 5758 PC 10d0df18
+[info] [PERF] [0000001836] OOO_SEND instr_name RV_VLD instr_id 5755 PC 10d0df0c
+[info] [PERF] [0000001836] OOO_SEND instr_name RV_PLT instr_id 5756 PC 10d0df10
+[info] [PERF] [0000001836] OOO_SEND instr_name RV_VMULS instr_id 5757 PC 10d0df14
+[info] [PERF] [0000001836] OOO_SEND instr_name RV_VST instr_id 5758 PC 10d0df18
+[info] [PERF] [0000001837] OOO_RECV instr_name RV_VLD instr_id 5759 PC 10d0df0c
+[info] [PERF] [0000001837] OOO_RECV instr_name RV_PLT instr_id 5760 PC 10d0df10
+[info] [PERF] [0000001837] OOO_RECV instr_name RV_VMULS instr_id 5761 PC 10d0df14
+[info] [PERF] [0000001837] OOO_RECV instr_name RV_VST instr_id 5762 PC 10d0df18
+[info] [PERF] [0000001837] OOO_RECV instr_name RV_SEND instr_id 5763 PC 10d0df1c
+[info] [PERF] [0000001837] OOO_SEND instr_name RV_VLD instr_id 5759 PC 10d0df0c
+[info] [PERF] [0000001837] OOO_SEND instr_name RV_PLT instr_id 5760 PC 10d0df10
+[info] [PERF] [0000001837] OOO_SEND instr_name RV_VMULS instr_id 5761 PC 10d0df14
+[info] [PERF] [0000001837] OOO_SEND instr_name RV_VST instr_id 5762 PC 10d0df18
+[info] [PERF] [0000001837] OOO_SEND instr_name RV_SEND instr_id 5763 PC 10d0df1c
+[info] [PERF] [0000001838] OOO_RECV instr_name RV_SEND instr_id 5763 PC 10d0df1c
+[info] [PERF] [0000001838] OOO_SEND instr_name RV_SEND instr_id 5763 PC 10d0df1c
+[info] 1846 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:1) preg avail num:28 vreg avail num:61
+[info] 1847 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:1) preg avail num:28 vreg avail num:62
+[info] 1848 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:1) preg avail num:28 vreg avail num:63
+[info] 1849 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:1) preg avail num:28 vreg avail num:64
+[info] 1852 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:1) preg avail num:29 vreg avail num:65
+[info] 1853 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:1) preg avail num:30 vreg avail num:66
+[info] 1854 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:1) preg avail num:31 vreg avail num:67
+[info] 1871 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 1871 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] ++++++++++++++++++++++core: 2, subcore: 1, start: 212, tick: 2431, kernelId: 0, blkID: 4, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

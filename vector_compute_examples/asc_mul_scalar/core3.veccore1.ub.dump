@@ -1,0 +1,171 @@
+[info] [0000000000] PMU_EVT_REGISTER, c_stat_ub_ldu_busy, sub_core_id 2
+[info] [0000000000] PMU_EVT_REGISTER, c_stat_ub_stu_busy, sub_core_id 2
+[info] [0000000000] PMU_EVT_REGISTER, c_stat_ub_gsu_busy, sub_core_id 2
+[info] [0000000000] PMU_EVT_REGISTER, c_stat_ub_lsu_busy, sub_core_id 2
+[info] [0000000000] PMU_EVT_REGISTER, c_stat_ub_vec_busy, sub_core_id 2
+[info] [0000000000] PMU_EVT_REGISTER, c_stat_ldu_blocked, sub_core_id 2
+[info] [0000000000] PMU_EVT_REGISTER, c_stat_stu_blocked, sub_core_id 2
+[info] [0000000000] PMU_EVT_REGISTER, c_stat_ldu_grant_size, sub_core_id 2
+[info] [0000000000] PMU_EVT_REGISTER, c_stat_stu_grant_size, sub_core_id 2
+[info] [0000000000] PMU_EVT_REGISTER, c_stat_gsu_grant_size, sub_core_id 2
+[info] [0000001693] [UB_WR_REQ]          [MTE_W] req_id 977 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5220 PC 10d0d8cc
+[info] [0000001693] [ARB0]               [MTE_W] req_id 977 highest_prioriy=false size=128 scat_num=1 addr=0x1400(0:bank 0 bg 0)
+[info] [0000001693] [REQ_BREAK_DOWN]     [MTE_W] [MTE_W] req_id 977, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001694] [UB_WR_REQ]          [MTE_W] req_id 978 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5220 PC 10d0d8cc
+[info] [0000001694] [ARB0]               [MTE_W] req_id 978 highest_prioriy=false size=128 scat_num=1 addr=0x1480(0:bank 4 bg 4)
+[info] [0000001694] [REQ_BREAK_DOWN]     [MTE_W] [MTE_W] req_id 978, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001694] [ARB1]               [MTE_W] req_id 977 highest_prioriy=false size=128 scat_num=1 addr=0x1400(0:bank 0 bg 0)
+[info] [0000001695] [UB_WR_REQ]          [MTE_W] req_id 979 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5220 PC 10d0d8cc
+[info] [0000001695] [ARB0]               [MTE_W] req_id 979 highest_prioriy=false size=128 scat_num=1 addr=0x1500(0:bank 8 bg 0)
+[info] [0000001695] [REQ_BREAK_DOWN]     [MTE_W] [MTE_W] req_id 979, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001695] [ARB1]               [MTE_W] req_id 978 highest_prioriy=false size=128 scat_num=1 addr=0x1480(0:bank 4 bg 4)
+[info] [0000001695] [FINAL_GRANTED]      [MTE_W] [MTE_W] req_id 977, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001695] [UB_GRANT_STATS]     WR     MTE_W      MTE_W      req_id 977     , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001696] [UB_WR_DONE] [RSP]   [MTE_W] [MTE_W] req_id 977, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001696] [UB_WR_REQ]          [MTE_W] req_id 980 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5220 PC 10d0d8cc
+[info] [0000001696] [ARB0]               [MTE_W] req_id 980 highest_prioriy=false size=128 scat_num=1 addr=0x1580(0:bank 12 bg 4)
+[info] [0000001696] [REQ_BREAK_DOWN]     [MTE_W] [MTE_W] req_id 980, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001696] [ARB1]               [MTE_W] req_id 979 highest_prioriy=false size=128 scat_num=1 addr=0x1500(0:bank 8 bg 0)
+[info] [0000001696] [FINAL_GRANTED]      [MTE_W] [MTE_W] req_id 978, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001696] [UB_GRANT_STATS]     WR     MTE_W      MTE_W      req_id 978     , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001697] [UB_WR_DONE] [RSP]   [MTE_W] [MTE_W] req_id 978, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001697] [ARB1]               [MTE_W] req_id 980 highest_prioriy=false size=128 scat_num=1 addr=0x1580(0:bank 12 bg 4)
+[info] [0000001697] [FINAL_GRANTED]      [MTE_W] [MTE_W] req_id 979, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001697] [UB_GRANT_STATS]     WR     MTE_W      MTE_W      req_id 979     , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001698] [UB_WR_DONE] [RSP]   [MTE_W] [MTE_W] req_id 979, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001698] [FINAL_GRANTED]      [MTE_W] [MTE_W] req_id 980, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001698] [UB_GRANT_STATS]     WR     MTE_W      MTE_W      req_id 980     , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001699] [UB_WR_DONE] [RSP]   [MTE_W] [MTE_W] req_id 980, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001740] [UB_WR_REQ]          [MTE_W] req_id 1005 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5220 PC 10d0d8cc
+[info] [0000001740] [ARB0]               [MTE_W] req_id 1005 highest_prioriy=false size=128 scat_num=1 addr=0x1600(0:bank 0 bg 0)
+[info] [0000001740] [REQ_BREAK_DOWN]     [MTE_W] [MTE_W] req_id 1005, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001741] [UB_WR_REQ]          [MTE_W] req_id 1007 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5220 PC 10d0d8cc
+[info] [0000001741] [ARB0]               [MTE_W] req_id 1007 highest_prioriy=false size=128 scat_num=1 addr=0x1680(0:bank 4 bg 4)
+[info] [0000001741] [REQ_BREAK_DOWN]     [MTE_W] [MTE_W] req_id 1007, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001741] [ARB1]               [MTE_W] req_id 1005 highest_prioriy=false size=128 scat_num=1 addr=0x1600(0:bank 0 bg 0)
+[info] [0000001742] [UB_WR_REQ]          [MTE_W] req_id 1009 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5220 PC 10d0d8cc
+[info] [0000001742] [ARB0]               [MTE_W] req_id 1009 highest_prioriy=false size=128 scat_num=1 addr=0x1700(0:bank 8 bg 0)
+[info] [0000001742] [REQ_BREAK_DOWN]     [MTE_W] [MTE_W] req_id 1009, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001742] [ARB1]               [MTE_W] req_id 1007 highest_prioriy=false size=128 scat_num=1 addr=0x1680(0:bank 4 bg 4)
+[info] [0000001742] [FINAL_GRANTED]      [MTE_W] [MTE_W] req_id 1005, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001742] [UB_GRANT_STATS]     WR     MTE_W      MTE_W      req_id 1005    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001743] [UB_WR_DONE] [RSP]   [MTE_W] [MTE_W] req_id 1005, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001743] [UB_WR_REQ]          [MTE_W] req_id 1011 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5220 PC 10d0d8cc
+[info] [0000001743] [ARB0]               [MTE_W] req_id 1011 highest_prioriy=false size=128 scat_num=1 addr=0x1780(0:bank 12 bg 4)
+[info] [0000001743] [REQ_BREAK_DOWN]     [MTE_W] [MTE_W] req_id 1011, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001743] [ARB1]               [MTE_W] req_id 1009 highest_prioriy=false size=128 scat_num=1 addr=0x1700(0:bank 8 bg 0)
+[info] [0000001743] [FINAL_GRANTED]      [MTE_W] [MTE_W] req_id 1007, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001743] [UB_GRANT_STATS]     WR     MTE_W      MTE_W      req_id 1007    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001744] [UB_WR_DONE] [RSP]   [MTE_W] [MTE_W] req_id 1007, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001744] [ARB1]               [MTE_W] req_id 1011 highest_prioriy=false size=128 scat_num=1 addr=0x1780(0:bank 12 bg 4)
+[info] [0000001744] [FINAL_GRANTED]      [MTE_W] [MTE_W] req_id 1009, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001744] [UB_GRANT_STATS]     WR     MTE_W      MTE_W      req_id 1009    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001745] [UB_WR_DONE] [RSP]   [MTE_W] [MTE_W] req_id 1009, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001745] [FINAL_GRANTED]      [MTE_W] [MTE_W] req_id 1011, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001745] [UB_GRANT_STATS]     WR     MTE_W      MTE_W      req_id 1011    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001746] [UB_WR_DONE] [RSP]   [MTE_W] [MTE_W] req_id 1011, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001778] [UB_RD_REQ]          [VEC_LSU_R] req_id 1045 instr_name RV_VLD instr_id 5687 PC 10d0df0c
+[info] [0000001778] [VP_RECV]            [VEC_LSU_R] req_id 1045 highest_prioriy=false size=32 scat_num=8 addr=0x1400(0:bank 0 bg 0)0x1420(1:bank 1 bg 1)0x1440(2:bank 2 bg 2)0x1460(3:bank 3 bg 3)0x1480(4:bank 4 bg 4)0x14a0(5:bank 5 bg 5)0x14c0(6:bank 6 bg 6)0x14e0(7:bank 7 bg 7)
+[info] [0000001778] [REQ_BREAK_DOWN]     [VEC_LSU_R] [VEC_LSU_R] req_id 1045, uop_rw_cnt 8, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001778] [FINAL_GRANTED]      [VEC_LSU_R] [VEC_LSU_R] req_id 1045, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001778] [UB_GRANT_STATS]     RD     VEC_LSU_R  VEC_LSU_R  req_id 1045    , uop_size 32  , uop_cnt 8   , total 256 
+[info] [0000001778] [UB_RD_DONE]         [VEC_LSU_R] req_id 1045 expire_cyc:0000001780
+[info] [0000001779] [UB_RD_REQ]          [VEC_LSU_R] req_id 1046 instr_name RV_VLD instr_id 5691 PC 10d0df0c
+[info] [0000001779] [VP_RECV]            [VEC_LSU_R] req_id 1046 highest_prioriy=false size=32 scat_num=8 addr=0x1500(0:bank 8 bg 0)0x1520(1:bank 9 bg 1)0x1540(2:bank 10 bg 2)0x1560(3:bank 11 bg 3)0x1580(4:bank 12 bg 4)0x15a0(5:bank 13 bg 5)0x15c0(6:bank 14 bg 6)0x15e0(7:bank 15 bg 7)
+[info] [0000001779] [REQ_BREAK_DOWN]     [VEC_LSU_R] [VEC_LSU_R] req_id 1046, uop_rw_cnt 8, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001779] [FINAL_GRANTED]      [VEC_LSU_R] [VEC_LSU_R] req_id 1046, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001779] [UB_GRANT_STATS]     RD     VEC_LSU_R  VEC_LSU_R  req_id 1046    , uop_size 32  , uop_cnt 8   , total 256 
+[info] [0000001779] [UB_RD_DONE]         [VEC_LSU_R] req_id 1046 expire_cyc:0000001781
+[info] [0000001780] [UB_RD_REQ]          [VEC_LSU_R] req_id 1047 instr_name RV_VLD instr_id 5695 PC 10d0df0c
+[info] [0000001780] [VP_RECV]            [VEC_LSU_R] req_id 1047 highest_prioriy=false size=32 scat_num=8 addr=0x1600(0:bank 0 bg 0)0x1620(1:bank 1 bg 1)0x1640(2:bank 2 bg 2)0x1660(3:bank 3 bg 3)0x1680(4:bank 4 bg 4)0x16a0(5:bank 5 bg 5)0x16c0(6:bank 6 bg 6)0x16e0(7:bank 7 bg 7)
+[info] [0000001780] [REQ_BREAK_DOWN]     [VEC_LSU_R] [VEC_LSU_R] req_id 1047, uop_rw_cnt 8, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001780] [FINAL_GRANTED]      [VEC_LSU_R] [VEC_LSU_R] req_id 1047, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001780] [UB_GRANT_STATS]     RD     VEC_LSU_R  VEC_LSU_R  req_id 1047    , uop_size 32  , uop_cnt 8   , total 256 
+[info] [0000001780] [UB_RD_DONE]         [VEC_LSU_R] req_id 1047 expire_cyc:0000001782
+[info] [0000001781] [UB_RD_REQ]          [VEC_LSU_R] req_id 1048 instr_name RV_VLD instr_id 5699 PC 10d0df0c
+[info] [0000001781] [VP_RECV]            [VEC_LSU_R] req_id 1048 highest_prioriy=false size=32 scat_num=8 addr=0x1700(0:bank 8 bg 0)0x1720(1:bank 9 bg 1)0x1740(2:bank 10 bg 2)0x1760(3:bank 11 bg 3)0x1780(4:bank 12 bg 4)0x17a0(5:bank 13 bg 5)0x17c0(6:bank 14 bg 6)0x17e0(7:bank 15 bg 7)
+[info] [0000001781] [REQ_BREAK_DOWN]     [VEC_LSU_R] [VEC_LSU_R] req_id 1048, uop_rw_cnt 8, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001781] [FINAL_GRANTED]      [VEC_LSU_R] [VEC_LSU_R] req_id 1048, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001781] [UB_GRANT_STATS]     RD     VEC_LSU_R  VEC_LSU_R  req_id 1048    , uop_size 32  , uop_cnt 8   , total 256 
+[info] [0000001781] [UB_RD_DONE]         [VEC_LSU_R] req_id 1048 expire_cyc:0000001783
+[info] [0000001795] [UB_WR_REQ]          [VEC_LSU_W] req_id 1050 instr_name RV_VST instr_id 5690 PC 10d0df18
+[info] [0000001795] [VP_RECV]            [VEC_LSU_W] req_id 1050 highest_prioriy=false size=32 scat_num=8 addr=0x1400(0:bank 0 bg 0)0x1420(1:bank 1 bg 1)0x1440(2:bank 2 bg 2)0x1460(3:bank 3 bg 3)0x1480(4:bank 4 bg 4)0x14a0(5:bank 5 bg 5)0x14c0(6:bank 6 bg 6)0x14e0(7:bank 7 bg 7)
+[info] [0000001795] [REQ_BREAK_DOWN]     [VEC_LSU_W] [VEC_LSU_W] req_id 1050, uop_rw_cnt 8, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001795] [FINAL_GRANTED]      [VEC_LSU_W] [VEC_LSU_W] req_id 1050, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001795] [UB_GRANT_STATS]     WR     VEC_LSU_W  VEC_LSU_W  req_id 1050    , uop_size 32  , uop_cnt 8   , total 256 
+[info] [0000001795] [UB_WR_DONE]         [VEC_LSU_W] req_id 1050 expire_cyc:0000001796 partial_write:False, first_wr:False
+[info] [0000001796] [UB_WR_REQ]          [VEC_LSU_W] req_id 1052 instr_name RV_VST instr_id 5694 PC 10d0df18
+[info] [0000001796] [VP_RECV]            [VEC_LSU_W] req_id 1052 highest_prioriy=false size=32 scat_num=8 addr=0x1500(0:bank 8 bg 0)0x1520(1:bank 9 bg 1)0x1540(2:bank 10 bg 2)0x1560(3:bank 11 bg 3)0x1580(4:bank 12 bg 4)0x15a0(5:bank 13 bg 5)0x15c0(6:bank 14 bg 6)0x15e0(7:bank 15 bg 7)
+[info] [0000001796] [REQ_BREAK_DOWN]     [VEC_LSU_W] [VEC_LSU_W] req_id 1052, uop_rw_cnt 8, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001796] [FINAL_GRANTED]      [VEC_LSU_W] [VEC_LSU_W] req_id 1052, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001796] [UB_GRANT_STATS]     WR     VEC_LSU_W  VEC_LSU_W  req_id 1052    , uop_size 32  , uop_cnt 8   , total 256 
+[info] [0000001796] [UB_WR_DONE]         [VEC_LSU_W] req_id 1052 expire_cyc:0000001797 partial_write:False, first_wr:False
+[info] [0000001797] [UB_WR_REQ]          [VEC_LSU_W] req_id 1054 instr_name RV_VST instr_id 5698 PC 10d0df18
+[info] [0000001797] [VP_RECV]            [VEC_LSU_W] req_id 1054 highest_prioriy=false size=32 scat_num=8 addr=0x1600(0:bank 0 bg 0)0x1620(1:bank 1 bg 1)0x1640(2:bank 2 bg 2)0x1660(3:bank 3 bg 3)0x1680(4:bank 4 bg 4)0x16a0(5:bank 5 bg 5)0x16c0(6:bank 6 bg 6)0x16e0(7:bank 7 bg 7)
+[info] [0000001797] [REQ_BREAK_DOWN]     [VEC_LSU_W] [VEC_LSU_W] req_id 1054, uop_rw_cnt 8, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001797] [FINAL_GRANTED]      [VEC_LSU_W] [VEC_LSU_W] req_id 1054, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001797] [UB_GRANT_STATS]     WR     VEC_LSU_W  VEC_LSU_W  req_id 1054    , uop_size 32  , uop_cnt 8   , total 256 
+[info] [0000001797] [UB_WR_DONE]         [VEC_LSU_W] req_id 1054 expire_cyc:0000001798 partial_write:False, first_wr:False
+[info] [0000001798] [UB_WR_REQ]          [VEC_LSU_W] req_id 1056 instr_name RV_VST instr_id 5702 PC 10d0df18
+[info] [0000001798] [VP_RECV]            [VEC_LSU_W] req_id 1056 highest_prioriy=false size=32 scat_num=8 addr=0x1700(0:bank 8 bg 0)0x1720(1:bank 9 bg 1)0x1740(2:bank 10 bg 2)0x1760(3:bank 11 bg 3)0x1780(4:bank 12 bg 4)0x17a0(5:bank 13 bg 5)0x17c0(6:bank 14 bg 6)0x17e0(7:bank 15 bg 7)
+[info] [0000001798] [REQ_BREAK_DOWN]     [VEC_LSU_W] [VEC_LSU_W] req_id 1056, uop_rw_cnt 8, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001798] [FINAL_GRANTED]      [VEC_LSU_W] [VEC_LSU_W] req_id 1056, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001798] [UB_GRANT_STATS]     WR     VEC_LSU_W  VEC_LSU_W  req_id 1056    , uop_size 32  , uop_cnt 8   , total 256 
+[info] [0000001798] [UB_WR_DONE]         [VEC_LSU_W] req_id 1056 expire_cyc:0000001799 partial_write:False, first_wr:False
+[info] [0000001829] [UB_RD_REQ]          [MTE_R] req_id 1088 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5320 PC 10d0d95c
+[info] [0000001829] [ARB0]               [MTE_R] req_id 1088 highest_prioriy=false size=128 scat_num=1 addr=0x1400(0:bank 0 bg 0)
+[info] [0000001829] [REQ_BREAK_DOWN]     [MTE_R] [MTE_R] req_id 1088, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001830] [UB_RD_REQ]          [MTE_R] req_id 1090 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5320 PC 10d0d95c
+[info] [0000001830] [ARB0]               [MTE_R] req_id 1090 highest_prioriy=false size=128 scat_num=1 addr=0x1480(0:bank 4 bg 4)
+[info] [0000001830] [REQ_BREAK_DOWN]     [MTE_R] [MTE_R] req_id 1090, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001830] [ARB1]               [MTE_R] req_id 1088 highest_prioriy=false size=128 scat_num=1 addr=0x1400(0:bank 0 bg 0)
+[info] [0000001831] [UB_RD_REQ]          [MTE_R] req_id 1091 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5320 PC 10d0d95c
+[info] [0000001831] [ARB0]               [MTE_R] req_id 1091 highest_prioriy=false size=128 scat_num=1 addr=0x1500(0:bank 8 bg 0)
+[info] [0000001831] [REQ_BREAK_DOWN]     [MTE_R] [MTE_R] req_id 1091, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001831] [ARB1]               [MTE_R] req_id 1090 highest_prioriy=false size=128 scat_num=1 addr=0x1480(0:bank 4 bg 4)
+[info] [0000001831] [FINAL_GRANTED]      [MTE_R] [MTE_R] req_id 1088, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001831] [UB_GRANT_STATS]     RD     MTE_R      MTE_R      req_id 1088    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001832] [UB_RD_REQ]          [MTE_R] req_id 1092 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5320 PC 10d0d95c
+[info] [0000001832] [ARB0]               [MTE_R] req_id 1092 highest_prioriy=false size=128 scat_num=1 addr=0x1580(0:bank 12 bg 4)
+[info] [0000001832] [REQ_BREAK_DOWN]     [MTE_R] [MTE_R] req_id 1092, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001832] [ARB1]               [MTE_R] req_id 1091 highest_prioriy=false size=128 scat_num=1 addr=0x1500(0:bank 8 bg 0)
+[info] [0000001832] [FINAL_GRANTED]      [MTE_R] [MTE_R] req_id 1090, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001832] [UB_GRANT_STATS]     RD     MTE_R      MTE_R      req_id 1090    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001833] [UB_RD_REQ]          [MTE_R] req_id 1093 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5320 PC 10d0d95c
+[info] [0000001833] [ARB0]               [MTE_R] req_id 1093 highest_prioriy=false size=128 scat_num=1 addr=0x1600(0:bank 0 bg 0)
+[info] [0000001833] [REQ_BREAK_DOWN]     [MTE_R] [MTE_R] req_id 1093, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001833] [ARB1]               [MTE_R] req_id 1092 highest_prioriy=false size=128 scat_num=1 addr=0x1580(0:bank 12 bg 4)
+[info] [0000001833] [FINAL_GRANTED]      [MTE_R] [MTE_R] req_id 1091, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001833] [UB_GRANT_STATS]     RD     MTE_R      MTE_R      req_id 1091    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001834] [UB_RD_REQ]          [MTE_R] req_id 1094 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5320 PC 10d0d95c
+[info] [0000001834] [ARB0]               [MTE_R] req_id 1094 highest_prioriy=false size=128 scat_num=1 addr=0x1680(0:bank 4 bg 4)
+[info] [0000001834] [REQ_BREAK_DOWN]     [MTE_R] [MTE_R] req_id 1094, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001834] [ARB1]               [MTE_R] req_id 1093 highest_prioriy=false size=128 scat_num=1 addr=0x1600(0:bank 0 bg 0)
+[info] [0000001834] [FINAL_GRANTED]      [MTE_R] [MTE_R] req_id 1092, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001834] [UB_GRANT_STATS]     RD     MTE_R      MTE_R      req_id 1092    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001835] [UB_RD_DONE] [RSP]   [MTE_R] [MTE_R] req_id 1088, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001835] [UB_RD_REQ]          [MTE_R] req_id 1095 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5320 PC 10d0d95c
+[info] [0000001835] [ARB0]               [MTE_R] req_id 1095 highest_prioriy=false size=128 scat_num=1 addr=0x1700(0:bank 8 bg 0)
+[info] [0000001835] [REQ_BREAK_DOWN]     [MTE_R] [MTE_R] req_id 1095, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001835] [ARB1]               [MTE_R] req_id 1094 highest_prioriy=false size=128 scat_num=1 addr=0x1680(0:bank 4 bg 4)
+[info] [0000001835] [FINAL_GRANTED]      [MTE_R] [MTE_R] req_id 1093, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001835] [UB_GRANT_STATS]     RD     MTE_R      MTE_R      req_id 1093    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001836] [UB_RD_REQ]          [MTE_R] req_id 1097 instr_name MOV_SRC_TO_DST_ALIGNv2 instr_id 5320 PC 10d0d95c
+[info] [0000001836] [ARB0]               [MTE_R] req_id 1097 highest_prioriy=false size=128 scat_num=1 addr=0x1780(0:bank 12 bg 4)
+[info] [0000001836] [REQ_BREAK_DOWN]     [MTE_R] [MTE_R] req_id 1097, uop_rw_cnt 4, uop_rmw_wr_cnt 0, uop_size 32, is_partial=false, first_wr=false, dual_dst=false
+[info] [0000001836] [UB_RD_DONE] [RSP]   [MTE_R] [MTE_R] req_id 1090, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001836] [ARB1]               [MTE_R] req_id 1095 highest_prioriy=false size=128 scat_num=1 addr=0x1700(0:bank 8 bg 0)
+[info] [0000001836] [FINAL_GRANTED]      [MTE_R] [MTE_R] req_id 1094, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001836] [UB_GRANT_STATS]     RD     MTE_R      MTE_R      req_id 1094    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001837] [UB_RD_DONE] [RSP]   [MTE_R] [MTE_R] req_id 1091, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001837] [ARB1]               [MTE_R] req_id 1097 highest_prioriy=false size=128 scat_num=1 addr=0x1780(0:bank 12 bg 4)
+[info] [0000001837] [FINAL_GRANTED]      [MTE_R] [MTE_R] req_id 1095, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001837] [UB_GRANT_STATS]     RD     MTE_R      MTE_R      req_id 1095    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001838] [UB_RD_DONE] [RSP]   [MTE_R] [MTE_R] req_id 1092, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001838] [FINAL_GRANTED]      [MTE_R] [MTE_R] req_id 1097, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001838] [UB_GRANT_STATS]     RD     MTE_R      MTE_R      req_id 1097    , uop_size 32  , uop_cnt 4   , total 128 
+[info] [0000001839] [UB_RD_DONE] [RSP]   [MTE_R] [MTE_R] req_id 1093, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001840] [UB_RD_DONE] [RSP]   [MTE_R] [MTE_R] req_id 1094, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001841] [UB_RD_DONE] [RSP]   [MTE_R] [MTE_R] req_id 1095, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] [0000001842] [UB_RD_DONE] [RSP]   [MTE_R] [MTE_R] req_id 1097, uop_rw_cnt 0, uop_rmw_wr_cnt 0
+[info] ++++++++++++++++++++++core: 3, subcore: 2, start: 215, tick: 2292, kernelId: 0, blkID: 7, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

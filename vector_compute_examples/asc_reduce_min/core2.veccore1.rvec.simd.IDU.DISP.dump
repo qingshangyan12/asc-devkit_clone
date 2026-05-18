@@ -1,0 +1,9 @@
+[info] @1728 instr_name RV_VLDI type.NORAML instr_id 4176 PC 10d0dd00 pipe RVECLD  DST_VREGS:[v_idx=0]
+[info] @1728 instr_name RV_SMOVI  instr_id 4177 PC 10d0dd04 pipe RVECSU 
+[info] @1728 instr_name RV_PLT type.B32 instr_id 4178 PC 10d0dd08 pipe RVECEX  DST_PREGS:[v_idx=1]
+[info] @1729 instr_name RV_SMOVI  instr_id 4179 PC 10d0dd0c pipe RVECSU 
+[info] @1729 instr_name RV_VCMIN type.F32 instr_id 4180 PC 10d0dd10 pipe RVECEX  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1] DST_VREGS:[v_idx=0]
+[info] @1729 instr_name RV_PLT type.B32 instr_id 4181 PC 10d0dd14 pipe RVECEX  DST_PREGS:[v_idx=1]
+[info] @1729 instr_name RV_VSTI type.NORM_B32 instr_id 4182 PC 10d0dd18 pipe RVECST  SRC_VREGS:[v_idx=0] SRC_PREGS:[v_idx=1]
+[info] @1730 instr_name RV_SEND  instr_id 4183 PC 10d0dd1c pipe RVECSU 
+[info] ++++++++++++++++++++++core: 2, subcore: 2, start: 213, tick: 2250, kernelId: 0, blkID: 5, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

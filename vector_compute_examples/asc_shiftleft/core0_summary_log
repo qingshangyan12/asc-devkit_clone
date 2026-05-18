@@ -1,0 +1,34 @@
+----------------------------- AiCore Summary Log -----------------------------
+
+==============================================================================
+kernal total ticks : 2023
+system total ticks : 2232
+==============================================================================
+Trace_Name                                    | Total_Num 
+==============================================================================
+mte2_veccore0_su_busy_cycle                 | 566
+mte3_veccore0_su_busy_cycle                 | 452
+rvec_veccore0_busy_cycle                    | 77
+rvec_veccore0_simd_busy_cycle               | 58
+rvec_veccore0_simt_busy_cycle               | 0
+CCU.scalar_veccore0_su_busy_cycle           | 448
+rvec_veccore0_sfu_busy_cycle                | 19
+++++++++++++++++++++++core: 0, subcore: 1, start: 209, tick: 2232, kernelId: 0, blkID: 0, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.
+
+
+==============================================================================
+kernal total ticks : 2165
+system total ticks : 2375
+==============================================================================
+Trace_Name                                    | Total_Num 
+==============================================================================
+mte3_veccore1_su_busy_cycle                 | 577
+mte2_veccore1_su_busy_cycle                 | 573
+rvec_veccore1_busy_cycle                    | 77
+CCU.scalar_veccore1_su_busy_cycle           | 486
+rvec_veccore1_simd_busy_cycle               | 58
+rvec_veccore1_simt_busy_cycle               | 0
+rvec_veccore1_sfu_busy_cycle                | 19
+++++++++++++++++++++++core: 0, subcore: 2, start: 210, tick: 2375, kernelId: 0, blkID: 1, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.
+
+

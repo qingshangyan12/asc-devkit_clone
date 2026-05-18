@@ -1,0 +1,196 @@
+[info] 1274: MTE2 instr_id: 1, loop4_size: 1, loop3_size: 1, isa_para->burst_num: 1,burst = 1024, src_stride: 0, dst_stride: 0, pad: (0,0)
+[info] 1274: MOV_SRC_TO_DST_ALIGNv2, rd_uop_cnt = 2, wr_uop_cnt: 8, instr_id: 1
+[info] [00001274] (PC: 0x10d0d580) MTE2     : (Binary: 0x7492342a) (ID: 022385) MOV_SRC_TO_DST_ALIGNv2  Src:OUT, Dst:UB, XD:X9=0x1c00, XN:X3=0x13b2e200, XM:X8=0x400000800000010, XT:X10=0, Dtype:B32, Id:22385 id: 1
+[info] 1277: MTE2 instr_id: 2, loop4_size: 1, loop3_size: 1, isa_para->burst_num: 1,burst = 1024, src_stride: 0, dst_stride: 0, pad: (0,0)
+[info] 1277: MOV_SRC_TO_DST_ALIGNv2, rd_uop_cnt = 2, wr_uop_cnt: 8, instr_id: 2
+[info] [00001277] (PC: 0x10d0d58c) MTE2     : (Binary: 0x7486442a) (ID: 022388) MOV_SRC_TO_DST_ALIGNv2  Src:OUT, Dst:UB, XD:X3=0x2000, XN:X4=0x13b30400, XM:X8=0x400000800000010, XT:X10=0, Dtype:B32, Id:22388 id: 2
+[info] 1283: BRIF send_cmd, port: 2, addr: 0x13b2e200, size: 512, gid: 31022, retire_set: 0, instr_id: 1, req_id: 31022
+[info] 1284: BRIF send_cmd, port: 2, addr: 0x13b2e400, size: 512, gid: 31030, retire_set: 1, instr_id: 1, req_id: 31030
+[info] 1286: BRIF send_cmd, port: 2, addr: 0x13b30400, size: 512, gid: 31051, retire_set: 0, instr_id: 2, req_id: 31051
+[info] 1287: BRIF send_cmd, port: 2, addr: 0x13b30600, size: 512, gid: 31059, retire_set: 1, instr_id: 2, req_id: 31059
+[info] 1287: MOV_SRC_TO_DST_ALIGNv2, set_cmd_done
+[info] 1290: MTE2 instr_id: 3, loop4_size: 1, loop3_size: 1, isa_para->burst_num: 1,burst = 1024, src_stride: 0, dst_stride: 0, pad: (0,0)
+[info] 1290: MOV_SRC_TO_DST_ALIGNv2, rd_uop_cnt = 2, wr_uop_cnt: 8, instr_id: 3
+[info] [00001290] (PC: 0x10d0d580) MTE2     : (Binary: 0x7492342a) (ID: 022520) MOV_SRC_TO_DST_ALIGNv2  Src:OUT, Dst:UB, XD:X9=0x1c00, XN:X3=0x13b2de00, XM:X8=0x400000800000010, XT:X10=0, Dtype:B32, Id:22520 id: 3
+[info] 1293: MTE2 instr_id: 4, loop4_size: 1, loop3_size: 1, isa_para->burst_num: 1,burst = 1024, src_stride: 0, dst_stride: 0, pad: (0,0)
+[info] 1293: MOV_SRC_TO_DST_ALIGNv2, rd_uop_cnt = 2, wr_uop_cnt: 8, instr_id: 4
+[info] [00001293] (PC: 0x10d0d58c) MTE2     : (Binary: 0x7486442a) (ID: 022523) MOV_SRC_TO_DST_ALIGNv2  Src:OUT, Dst:UB, XD:X3=0x2000, XN:X4=0x13b30000, XM:X8=0x400000800000010, XT:X10=0, Dtype:B32, Id:22523 id: 4
+[info] 1299: BRIF send_cmd, port: 1, addr: 0x13b2de00, size: 512, gid: 31159, retire_set: 0, instr_id: 3, req_id: 31159
+[info] 1300: BRIF send_cmd, port: 1, addr: 0x13b2e000, size: 512, gid: 31168, retire_set: 1, instr_id: 3, req_id: 31168
+[info] 1302: BRIF send_cmd, port: 1, addr: 0x13b30000, size: 512, gid: 31184, retire_set: 0, instr_id: 4, req_id: 31184
+[info] 1303: BRIF send_cmd, port: 1, addr: 0x13b30200, size: 512, gid: 31193, retire_set: 1, instr_id: 4, req_id: 31193
+[info] 1303: MOV_SRC_TO_DST_ALIGNv2, set_cmd_done
+[info] 1729: BRIF recv_data, port: 2, addr: 0x13b2e400, size: 512, gid: 31030, retire_set: 0, instr_id: 1, req_id: 31030
+[info] 1737: core1.mte.UBWIF.veccore1 send_req, addr: 0x1c00, size: 128, tag_id: 0, instr_id: 1, req_id: 1393, retire_set: 0
+[info] 1738: core1.mte.UBWIF.veccore1 send_req, addr: 0x1c80, size: 128, tag_id: 0, instr_id: 1, req_id: 1394, retire_set: 0
+[info] 1739: core1.mte.UBWIF.veccore1 send_req, addr: 0x1d00, size: 128, tag_id: 0, instr_id: 1, req_id: 1395, retire_set: 0
+[info] 1740: core1.mte.UBWIF.veccore1 send_req, addr: 0x1d80, size: 128, tag_id: 0, instr_id: 1, req_id: 1396, retire_set: 0
+[info] 1742: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x1c00, size: 128, tag_id: 0, instr_id: 1, req_id: 1393, retire_set: 0
+[info] 1742: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x1c00, size: 128, tag_id: 0,instr_id: 1, req_id: 1393, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 0, ubrif_retry_sent_req_num_: 0
+[info] 1743: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x1c80, size: 128, tag_id: 0, instr_id: 1, req_id: 1394, retire_set: 0
+[info] 1743: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x1c80, size: 128, tag_id: 0,instr_id: 1, req_id: 1394, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1744: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x1d00, size: 128, tag_id: 0, instr_id: 1, req_id: 1395, retire_set: 0
+[info] 1744: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x1d00, size: 128, tag_id: 0,instr_id: 1, req_id: 1395, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1745: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x1d80, size: 128, tag_id: 0, instr_id: 1, req_id: 1396, retire_set: 0
+[info] 1745: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x1d80, size: 128, tag_id: 0,instr_id: 1, req_id: 1396, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1757: BRIF recv_data, port: 2, addr: 0x13b2e200, size: 512, gid: 31022, retire_set: 1, instr_id: 1, req_id: 31022
+[info] 1765: core1.mte.UBWIF.veccore1 send_req, addr: 0x1e00, size: 128, tag_id: 0, instr_id: 1, req_id: 1413, retire_set: 0
+[info] 1766: core1.mte.UBWIF.veccore1 send_req, addr: 0x1e80, size: 128, tag_id: 0, instr_id: 1, req_id: 1414, retire_set: 0
+[info] 1767: core1.mte.UBWIF.veccore1 send_req, addr: 0x1f00, size: 128, tag_id: 0, instr_id: 1, req_id: 1415, retire_set: 0
+[info] 1768: core1.mte.UBWIF.veccore1 send_req, addr: 0x1f80, size: 128, tag_id: 0, instr_id: 1, req_id: 1416, retire_set: 1
+[info] 1770: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x1e00, size: 128, tag_id: 0, instr_id: 1, req_id: 1413, retire_set: 0
+[info] 1770: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x1e00, size: 128, tag_id: 0,instr_id: 1, req_id: 1413, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 0, ubrif_retry_sent_req_num_: 0
+[info] 1771: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x1e80, size: 128, tag_id: 0, instr_id: 1, req_id: 1414, retire_set: 0
+[info] 1771: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x1e80, size: 128, tag_id: 0,instr_id: 1, req_id: 1414, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1772: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x1f00, size: 128, tag_id: 0, instr_id: 1, req_id: 1415, retire_set: 0
+[info] 1772: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x1f00, size: 128, tag_id: 0,instr_id: 1, req_id: 1415, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1773: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x1f80, size: 128, tag_id: 0, instr_id: 1, req_id: 1416, retire_set: 1
+[info] 1773: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x1f80, size: 128, tag_id: 0,instr_id: 1, req_id: 1416, retire_set: 1, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1774: BRIF recv_data, port: 1, addr: 0x13b30200, size: 512, gid: 31193, retire_set: 0, instr_id: 4, req_id: 31193
+[info] 1774: mte retire: instr_id: 1
+[info] 1776: early_retire sub_id: 0, thread_id: 2, pipe: 1, instr_id: 1
+[info] 1782: core1.mte.UBWIF.veccore0 send_req, addr: 0x2000, size: 128, tag_id: 0, instr_id: 4, req_id: 1425, retire_set: 0
+[info] 1783: END_LABEL instr_id: 5, subtask_id: 0
+[info] 1783: core1.mte.UBWIF.veccore0 send_req, addr: 0x2080, size: 128, tag_id: 0, instr_id: 4, req_id: 1426, retire_set: 0
+[info] 1784: core1.mte.UBWIF.veccore0 send_req, addr: 0x2100, size: 128, tag_id: 0, instr_id: 4, req_id: 1427, retire_set: 0
+[info] 1785: core1.mte.UBWIF.veccore0 send_req, addr: 0x2180, size: 128, tag_id: 0, instr_id: 4, req_id: 1428, retire_set: 0
+[info] 1786: mte retire: instr_id: 5
+[info] [00001786] (PC: 0x11111111) FLOWCTRL : (Binary: 0x00001e00) (ID: 022696) END_LABEL   id: 5
+[info] 1787: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x2000, size: 128, tag_id: 0, instr_id: 4, req_id: 1425, retire_set: 0
+[info] 1787: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x2000, size: 128, tag_id: 0,instr_id: 4, req_id: 1425, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 0, ubrif_retry_sent_req_num_: 0
+[info] 1788: BRIF recv_data, port: 2, addr: 0x13b30600, size: 512, gid: 31059, retire_set: 0, instr_id: 2, req_id: 31059
+[info] 1788: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x2080, size: 128, tag_id: 0, instr_id: 4, req_id: 1426, retire_set: 0
+[info] 1788: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x2080, size: 128, tag_id: 0,instr_id: 4, req_id: 1426, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1789: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x2100, size: 128, tag_id: 0, instr_id: 4, req_id: 1427, retire_set: 0
+[info] 1789: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x2100, size: 128, tag_id: 0,instr_id: 4, req_id: 1427, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1790: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x2180, size: 128, tag_id: 0, instr_id: 4, req_id: 1428, retire_set: 0
+[info] 1790: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x2180, size: 128, tag_id: 0,instr_id: 4, req_id: 1428, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1796: core1.mte.UBWIF.veccore1 send_req, addr: 0x2000, size: 128, tag_id: 0, instr_id: 2, req_id: 1431, retire_set: 0
+[info] 1797: BRIF recv_data, port: 2, addr: 0x13b30400, size: 512, gid: 31051, retire_set: 1, instr_id: 2, req_id: 31051
+[info] 1797: core1.mte.UBWIF.veccore1 send_req, addr: 0x2080, size: 128, tag_id: 0, instr_id: 2, req_id: 1434, retire_set: 0
+[info] 1798: core1.mte.UBWIF.veccore1 send_req, addr: 0x2100, size: 128, tag_id: 0, instr_id: 2, req_id: 1437, retire_set: 0
+[info] 1799: core1.mte.UBWIF.veccore1 send_req, addr: 0x2180, size: 128, tag_id: 0, instr_id: 2, req_id: 1439, retire_set: 0
+[info] 1801: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x2000, size: 128, tag_id: 0, instr_id: 2, req_id: 1431, retire_set: 0
+[info] 1801: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x2000, size: 128, tag_id: 0,instr_id: 2, req_id: 1431, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 0, ubrif_retry_sent_req_num_: 0
+[info] 1802: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x2080, size: 128, tag_id: 0, instr_id: 2, req_id: 1434, retire_set: 0
+[info] 1802: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x2080, size: 128, tag_id: 0,instr_id: 2, req_id: 1434, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1803: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x2100, size: 128, tag_id: 0, instr_id: 2, req_id: 1437, retire_set: 0
+[info] 1803: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x2100, size: 128, tag_id: 0,instr_id: 2, req_id: 1437, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1804: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x2180, size: 128, tag_id: 0, instr_id: 2, req_id: 1439, retire_set: 0
+[info] 1804: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x2180, size: 128, tag_id: 0,instr_id: 2, req_id: 1439, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1805: core1.mte.UBWIF.veccore1 send_req, addr: 0x2200, size: 128, tag_id: 0, instr_id: 2, req_id: 1453, retire_set: 0
+[info] 1806: core1.mte.UBWIF.veccore1 send_req, addr: 0x2280, size: 128, tag_id: 0, instr_id: 2, req_id: 1456, retire_set: 0
+[info] 1807: core1.mte.UBWIF.veccore1 send_req, addr: 0x2300, size: 128, tag_id: 0, instr_id: 2, req_id: 1460, retire_set: 0
+[info] 1808: BRIF recv_data, port: 1, addr: 0x13b2e000, size: 512, gid: 31168, retire_set: 0, instr_id: 3, req_id: 31168
+[info] 1808: core1.mte.UBWIF.veccore1 send_req, addr: 0x2380, size: 128, tag_id: 0, instr_id: 2, req_id: 1462, retire_set: 1
+[info] 1810: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x2200, size: 128, tag_id: 0, instr_id: 2, req_id: 1453, retire_set: 0
+[info] 1810: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x2200, size: 128, tag_id: 0,instr_id: 2, req_id: 1453, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 0, ubrif_retry_sent_req_num_: 0
+[info] 1811: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x2280, size: 128, tag_id: 0, instr_id: 2, req_id: 1456, retire_set: 0
+[info] 1811: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x2280, size: 128, tag_id: 0,instr_id: 2, req_id: 1456, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1812: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x2300, size: 128, tag_id: 0, instr_id: 2, req_id: 1460, retire_set: 0
+[info] 1812: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x2300, size: 128, tag_id: 0,instr_id: 2, req_id: 1460, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1813: core1.mte.UBWIF.veccore1 record_map_3, addr: 0x2380, size: 128, tag_id: 0, instr_id: 2, req_id: 1462, retire_set: 1
+[info] 1813: core1.mte.UBWIF.veccore1 recv_rsp, addr: 0x2380, size: 128, tag_id: 0,instr_id: 2, req_id: 1462, retire_set: 1, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1814: mte retire: instr_id: 2
+[info] 1816: early_retire sub_id: 0, thread_id: 2, pipe: 1, instr_id: 2
+[info] 1816: core1.mte.UBWIF.veccore0 send_req, addr: 0x1c00, size: 128, tag_id: 0, instr_id: 3, req_id: 1471, retire_set: 0
+[info] 1817: END_LABEL instr_id: 6, subtask_id: 0
+[info] 1817: core1.mte.UBWIF.veccore0 send_req, addr: 0x1c80, size: 128, tag_id: 0, instr_id: 3, req_id: 1474, retire_set: 0
+[info] 1818: BRIF recv_data, port: 1, addr: 0x13b2de00, size: 512, gid: 31159, retire_set: 1, instr_id: 3, req_id: 31159
+[info] 1818: early_retire sub_id: 0, thread_id: 2, pipe: 1, instr_id: 5
+[info] 1818: veccore1 END_LABEL retire instr_id: 5, sub_task_id: 0, end_pipe_cnt: 0
+[info] 1818: core1.mte.UBWIF.veccore0 send_req, addr: 0x1d00, size: 128, tag_id: 0, instr_id: 3, req_id: 1475, retire_set: 0
+[info] 1819: core1.mte.UBWIF.veccore0 send_req, addr: 0x1d80, size: 128, tag_id: 0, instr_id: 3, req_id: 1476, retire_set: 0
+[info] 1820: mte retire: instr_id: 6
+[info] [00001820] (PC: 0x11111111) FLOWCTRL : (Binary: 0x00001e00) (ID: 022728) END_LABEL   id: 6
+[info] 1821: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x1c00, size: 128, tag_id: 0, instr_id: 3, req_id: 1471, retire_set: 0
+[info] 1821: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x1c00, size: 128, tag_id: 0,instr_id: 3, req_id: 1471, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 0, ubrif_retry_sent_req_num_: 0
+[info] 1822: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x1c80, size: 128, tag_id: 0, instr_id: 3, req_id: 1474, retire_set: 0
+[info] 1822: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x1c80, size: 128, tag_id: 0,instr_id: 3, req_id: 1474, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1823: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x1d00, size: 128, tag_id: 0, instr_id: 3, req_id: 1475, retire_set: 0
+[info] 1823: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x1d00, size: 128, tag_id: 0,instr_id: 3, req_id: 1475, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1824: BRIF recv_data, port: 1, addr: 0x13b30000, size: 512, gid: 31184, retire_set: 1, instr_id: 4, req_id: 31184
+[info] 1824: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x1d80, size: 128, tag_id: 0, instr_id: 3, req_id: 1476, retire_set: 0
+[info] 1824: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x1d80, size: 128, tag_id: 0,instr_id: 3, req_id: 1476, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1826: core1.mte.UBWIF.veccore0 send_req, addr: 0x1e00, size: 128, tag_id: 0, instr_id: 3, req_id: 1483, retire_set: 0
+[info] 1827: core1.mte.UBWIF.veccore0 send_req, addr: 0x1e80, size: 128, tag_id: 0, instr_id: 3, req_id: 1487, retire_set: 0
+[info] 1828: core1.mte.UBWIF.veccore0 send_req, addr: 0x1f00, size: 128, tag_id: 0, instr_id: 3, req_id: 1489, retire_set: 0
+[info] 1829: core1.mte.UBWIF.veccore0 send_req, addr: 0x1f80, size: 128, tag_id: 0, instr_id: 3, req_id: 1492, retire_set: 1
+[info] 1831: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x1e00, size: 128, tag_id: 0, instr_id: 3, req_id: 1483, retire_set: 0
+[info] 1831: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x1e00, size: 128, tag_id: 0,instr_id: 3, req_id: 1483, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 0, ubrif_retry_sent_req_num_: 0
+[info] 1832: core1.mte.UBWIF.veccore0 send_req, addr: 0x2200, size: 128, tag_id: 0, instr_id: 4, req_id: 1497, retire_set: 0
+[info] 1832: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x1e80, size: 128, tag_id: 0, instr_id: 3, req_id: 1487, retire_set: 0
+[info] 1832: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x1e80, size: 128, tag_id: 0,instr_id: 3, req_id: 1487, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1833: core1.mte.UBWIF.veccore0 send_req, addr: 0x2280, size: 128, tag_id: 0, instr_id: 4, req_id: 1498, retire_set: 0
+[info] 1833: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x1f00, size: 128, tag_id: 0, instr_id: 3, req_id: 1489, retire_set: 0
+[info] 1833: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x1f00, size: 128, tag_id: 0,instr_id: 3, req_id: 1489, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1834: core1.mte.UBWIF.veccore0 send_req, addr: 0x2300, size: 128, tag_id: 0, instr_id: 4, req_id: 1499, retire_set: 0
+[info] 1834: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x1f80, size: 128, tag_id: 0, instr_id: 3, req_id: 1492, retire_set: 1
+[info] 1834: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x1f80, size: 128, tag_id: 0,instr_id: 3, req_id: 1492, retire_set: 1, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1835: core1.mte.UBWIF.veccore0 send_req, addr: 0x2380, size: 128, tag_id: 0, instr_id: 4, req_id: 1500, retire_set: 1
+[info] 1835: mte retire: instr_id: 3
+[info] 1837: early_retire sub_id: 0, thread_id: 1, pipe: 1, instr_id: 3
+[info] 1837: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x2200, size: 128, tag_id: 0, instr_id: 4, req_id: 1497, retire_set: 0
+[info] 1837: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x2200, size: 128, tag_id: 0,instr_id: 4, req_id: 1497, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 0, ubrif_retry_sent_req_num_: 0
+[info] 1838: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x2280, size: 128, tag_id: 0, instr_id: 4, req_id: 1498, retire_set: 0
+[info] 1838: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x2280, size: 128, tag_id: 0,instr_id: 4, req_id: 1498, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1839: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x2300, size: 128, tag_id: 0, instr_id: 4, req_id: 1499, retire_set: 0
+[info] 1839: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x2300, size: 128, tag_id: 0,instr_id: 4, req_id: 1499, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1840: core1.mte.UBWIF.veccore0 record_map_3, addr: 0x2380, size: 128, tag_id: 0, instr_id: 4, req_id: 1500, retire_set: 1
+[info] 1840: core1.mte.UBWIF.veccore0 recv_rsp, addr: 0x2380, size: 128, tag_id: 0,instr_id: 4, req_id: 1500, retire_set: 1, write_enable: 1, retmsg_fifo_cnt_: 0, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 1841: mte retire: instr_id: 4
+[info] 1843: early_retire sub_id: 0, thread_id: 1, pipe: 1, instr_id: 4
+[info] 1845: early_retire sub_id: 0, thread_id: 1, pipe: 1, instr_id: 6
+[info] 1845: veccore0 END_LABEL retire instr_id: 6, sub_task_id: 0, end_pipe_cnt: 0
+[info] 2233: MTE3 instr_id: 7, loop4_size: 1, loop3_size: 1, isa_para->burst_num: 1,burst = 1024, src_stride: 0, dst_stride: 0, pad: (0,0)
+[info] 2233: MOV_SRC_TO_DST_ALIGNv2, rd_uop_cnt: 8, wr_uop_cnt: 2, instr_id: 7
+[info] [00002233] (PC: 0x10d0d630) MTE3     : (Binary: 0x74c033a8) (ID: 022724) MOV_SRC_TO_DST_ALIGNv2  Src:UB, Dst:OUT, XD:X0=0x13b32200, XN:X3=0x2400, XM:X7=0x800000010, XT:X10=0, Dtype:B8, Id:22724 id: 7
+[info] 2239: BWIF recv_cmd_rsp, port:1, addr: 0x13b32200, size: 512, gid: 35233, retire_set: 0, instr_id: 7, req_id: 0
+[info] 2240: BWIF recv_cmd_rsp, port:1, addr: 0x13b32400, size: 512, gid: 35234, retire_set: 1, instr_id: 7, req_id: 0
+[info] 2255: core1.mte.UBRIF.veccore0 record_map_3, addr: 0x2400, size: 128, tag_id: 0, instr_id: 7, req_id: 1551, retire_set: 0
+[info] 2255: core1.mte.UBRIF.veccore0 recv_rsp, addr: 0x2400, size: 128, tag_id: 0,instr_id: 7, req_id: 1551, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 8, ack_uop_q_ size: 0, ubrif_retry_sent_req_num_: 0
+[info] 2256: core1.mte.UBRIF.veccore0 record_map_3, addr: 0x2480, size: 128, tag_id: 0, instr_id: 7, req_id: 1552, retire_set: 0
+[info] 2256: core1.mte.UBRIF.veccore0 recv_rsp, addr: 0x2480, size: 128, tag_id: 0,instr_id: 7, req_id: 1552, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 8, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2257: core1.mte.UBRIF.veccore0 record_map_3, addr: 0x2500, size: 128, tag_id: 0, instr_id: 7, req_id: 1553, retire_set: 0
+[info] 2257: core1.mte.UBRIF.veccore0 recv_rsp, addr: 0x2500, size: 128, tag_id: 0,instr_id: 7, req_id: 1553, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 7, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2258: core1.mte.UBRIF.veccore0 record_map_3, addr: 0x2580, size: 128, tag_id: 0, instr_id: 7, req_id: 1554, retire_set: 0
+[info] 2258: core1.mte.UBRIF.veccore0 recv_rsp, addr: 0x2580, size: 128, tag_id: 0,instr_id: 7, req_id: 1554, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 6, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2259: core1.mte.UBRIF.veccore0 record_map_3, addr: 0x2600, size: 128, tag_id: 0, instr_id: 7, req_id: 1556, retire_set: 0
+[info] 2259: core1.mte.UBRIF.veccore0 recv_rsp, addr: 0x2600, size: 128, tag_id: 0,instr_id: 7, req_id: 1556, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 5, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2260: core1.mte.UBRIF.veccore0 record_map_3, addr: 0x2680, size: 128, tag_id: 0, instr_id: 7, req_id: 1558, retire_set: 0
+[info] 2260: core1.mte.UBRIF.veccore0 recv_rsp, addr: 0x2680, size: 128, tag_id: 0,instr_id: 7, req_id: 1558, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 4, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2261: core1.mte.UBRIF.veccore0 record_map_3, addr: 0x2700, size: 128, tag_id: 0, instr_id: 7, req_id: 1560, retire_set: 0
+[info] 2261: core1.mte.UBRIF.veccore0 recv_rsp, addr: 0x2700, size: 128, tag_id: 0,instr_id: 7, req_id: 1560, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 3, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2261: BWIF send_data, port: 1, thread_id:1, addr: 0x13b32200, size: 512, gid: 35233, stbidx: 1, retire_set: 0, instr_id: 7.
+[info] 2262: core1.mte.UBRIF.veccore0 record_map_3, addr: 0x2780, size: 128, tag_id: 0, instr_id: 7, req_id: 1562, retire_set: 1
+[info] 2262: core1.mte.UBRIF.veccore0 recv_rsp, addr: 0x2780, size: 128, tag_id: 0,instr_id: 7, req_id: 1562, retire_set: 1, write_enable: 1, retmsg_fifo_cnt_: 2, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2265: BWIF send_data, port: 1, thread_id:1, addr: 0x13b32400, size: 512, gid: 35234, stbidx: 3, retire_set: 1, instr_id: 7.
+[info] 2339: MTE3 instr_id: 8, loop4_size: 1, loop3_size: 1, isa_para->burst_num: 1,burst = 1024, src_stride: 0, dst_stride: 0, pad: (0,0)
+[info] 2339: MOV_SRC_TO_DST_ALIGNv2, rd_uop_cnt: 8, wr_uop_cnt: 2, instr_id: 8
+[info] [00002339] (PC: 0x10d0d630) MTE3     : (Binary: 0x74c033a8) (ID: 022692) MOV_SRC_TO_DST_ALIGNv2  Src:UB, Dst:OUT, XD:X0=0x13b32600, XN:X3=0x2400, XM:X7=0x800000010, XT:X10=0, Dtype:B8, Id:22692 id: 8
+[info] 2345: BWIF recv_cmd_rsp, port:2, addr: 0x13b32600, size: 512, gid: 35241, retire_set: 0, instr_id: 8, req_id: 0
+[info] 2346: BWIF recv_cmd_rsp, port:2, addr: 0x13b32800, size: 512, gid: 35242, retire_set: 1, instr_id: 8, req_id: 0
+[info] 2361: core1.mte.UBRIF.veccore1 record_map_3, addr: 0x2400, size: 128, tag_id: 0, instr_id: 8, req_id: 1654, retire_set: 0
+[info] 2361: core1.mte.UBRIF.veccore1 recv_rsp, addr: 0x2400, size: 128, tag_id: 0,instr_id: 8, req_id: 1654, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 8, ack_uop_q_ size: 0, ubrif_retry_sent_req_num_: 0
+[info] 2362: core1.mte.UBRIF.veccore1 record_map_3, addr: 0x2480, size: 128, tag_id: 0, instr_id: 8, req_id: 1655, retire_set: 0
+[info] 2362: core1.mte.UBRIF.veccore1 recv_rsp, addr: 0x2480, size: 128, tag_id: 0,instr_id: 8, req_id: 1655, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 8, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2363: core1.mte.UBRIF.veccore1 record_map_3, addr: 0x2500, size: 128, tag_id: 0, instr_id: 8, req_id: 1656, retire_set: 0
+[info] 2363: core1.mte.UBRIF.veccore1 recv_rsp, addr: 0x2500, size: 128, tag_id: 0,instr_id: 8, req_id: 1656, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 7, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2364: core1.mte.UBRIF.veccore1 record_map_3, addr: 0x2580, size: 128, tag_id: 0, instr_id: 8, req_id: 1657, retire_set: 0
+[info] 2364: core1.mte.UBRIF.veccore1 recv_rsp, addr: 0x2580, size: 128, tag_id: 0,instr_id: 8, req_id: 1657, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 6, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2365: core1.mte.UBRIF.veccore1 record_map_3, addr: 0x2600, size: 128, tag_id: 0, instr_id: 8, req_id: 1659, retire_set: 0
+[info] 2365: core1.mte.UBRIF.veccore1 recv_rsp, addr: 0x2600, size: 128, tag_id: 0,instr_id: 8, req_id: 1659, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 5, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2366: core1.mte.UBRIF.veccore1 record_map_3, addr: 0x2680, size: 128, tag_id: 0, instr_id: 8, req_id: 1661, retire_set: 0
+[info] 2366: core1.mte.UBRIF.veccore1 recv_rsp, addr: 0x2680, size: 128, tag_id: 0,instr_id: 8, req_id: 1661, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 4, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2367: core1.mte.UBRIF.veccore1 record_map_3, addr: 0x2700, size: 128, tag_id: 0, instr_id: 8, req_id: 1664, retire_set: 0
+[info] 2367: core1.mte.UBRIF.veccore1 recv_rsp, addr: 0x2700, size: 128, tag_id: 0,instr_id: 8, req_id: 1664, retire_set: 0, write_enable: 1, retmsg_fifo_cnt_: 3, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2367: BWIF send_data, port: 2, thread_id:2, addr: 0x13b32600, size: 512, gid: 35241, stbidx: 5, retire_set: 0, instr_id: 8.
+[info] 2368: core1.mte.UBRIF.veccore1 record_map_3, addr: 0x2780, size: 128, tag_id: 0, instr_id: 8, req_id: 1667, retire_set: 1
+[info] 2368: core1.mte.UBRIF.veccore1 recv_rsp, addr: 0x2780, size: 128, tag_id: 0,instr_id: 8, req_id: 1667, retire_set: 1, write_enable: 1, retmsg_fifo_cnt_: 2, ack_uop_q_ size: 1, ubrif_retry_sent_req_num_: 0
+[info] 2371: BWIF send_data, port: 2, thread_id:2, addr: 0x13b32800, size: 512, gid: 35242, stbidx: 7, retire_set: 1, instr_id: 8.
+[info] 2628: BWIF recv_wr_data_rsp, port:1, addr: 0x13b32200, size: 512, gid: 35233, retire_set: 0, instr_id: 7, req_id: 0
+[info] 2788: mte retire: instr_id: 7
+[info] 2788: BWIF recv_wr_data_rsp, port:1, addr: 0x13b32400, size: 512, gid: 35234, retire_set: 1, instr_id: 7, req_id: 0
+[info] 2895: BWIF recv_wr_data_rsp, port:2, addr: 0x13b32600, size: 512, gid: 35241, retire_set: 0, instr_id: 8, req_id: 0
+[info] 2912: mte retire: instr_id: 8
+[info] 2912: BWIF recv_wr_data_rsp, port:2, addr: 0x13b32800, size: 512, gid: 35242, retire_set: 1, instr_id: 8, req_id: 0

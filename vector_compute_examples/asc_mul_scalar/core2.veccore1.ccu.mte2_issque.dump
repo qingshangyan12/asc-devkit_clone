@@ -1,0 +1,8 @@
+[info] 1156 [Push Instr] name=MOV_SRC_TO_DST_ALIGNv2 pc=0x10D0D8CC id=5070
+[info] 1157 [pop Instr] name=MOV_SRC_TO_DST_ALIGNv2 pc=0x10D0D8CC id=5070. queue.size=0
+[info] 1176 [Push Instr] name=END_LABEL pc=0x11111111 id=5154
+[info] 1177 [pop Instr] name=END_LABEL pc=0x11111111 id=5154. queue.size=0
+[info] 1717 [RETIRE INSTR] instr.name=MOV_SRC_TO_DST_ALIGNv2 instr.pc=0x10D0D8CC instr.id=5070
+[info] 1717 [release set_flag] name=SET_FLAG pc=0x10D0D8D0 id=5075
+[info] 1719 [RETIRE INSTR] instr.name=END_LABEL            instr.pc=0x11111111 instr.id=5154
+[info] ++++++++++++++++++++++core: 2, subcore: 2, start: 213, tick: 2290, kernelId: 0, blkID: 5, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

@@ -1,0 +1,271 @@
+[info] 729 [Push Instr] name=MOV_XD_SPR pc=0x10D0D868 id=5564
+[info] 729 [pop Instr] name=MOV_XD_SPR pc=0x10D0D868 id=5564. queue.size=0
+[info] 729 [Push Instr] name=MOVK pc=0x10D0D86C id=5565
+[info] 729 [pop Instr] name=MOVK pc=0x10D0D86C id=5565. queue.size=0
+[info] 733 [RETIRE INSTR] instr.name=MOV_XD_SPR           instr.pc=0x10D0D868 instr.id=5564
+[info] 733 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D86C instr.id=5565
+[info] 733 [Push Instr] name=DC_PRELOAD_XN_IMM pc=0x10D0D870 id=5574
+[info] 733 [pop Instr] name=DC_PRELOAD_XN_IMM pc=0x10D0D870 id=5574. queue.size=0
+[info] 733 [Push Instr] name=MOV_XD_IMM pc=0x10D0D874 id=5575
+[info] 733 [pop Instr] name=MOV_XD_IMM pc=0x10D0D874 id=5575. queue.size=0
+[info] 734 [Push Instr] name=MOVK pc=0x10D0D878 id=5576
+[info] 734 [pop Instr] name=MOVK pc=0x10D0D878 id=5576. queue.size=0
+[info] 734 [Push Instr] name=MOV_XD_SPR pc=0x10D0D87C id=5577
+[info] 734 [pop Instr] name=MOV_XD_SPR pc=0x10D0D87C id=5577. queue.size=0
+[info] 735 [Push Instr] name=MOV_XD_SPR pc=0x10D0D880 id=5586
+[info] 735 [pop Instr] name=MOV_XD_SPR pc=0x10D0D880 id=5586. queue.size=0
+[info] 735 [Push Instr] name=ADD pc=0x10D0D884 id=5587
+[info] 735 [pop Instr] name=ADD pc=0x10D0D884 id=5587. queue.size=0
+[info] 736 [Push Instr] name=MOV_XD_SPR pc=0x10D0D888 id=5588
+[info] 736 [pop Instr] name=MOV_XD_SPR pc=0x10D0D888 id=5588. queue.size=0
+[info] 736 [Push Instr] name=MOV_XD_IMM pc=0x10D0D88C id=5589
+[info] 736 [pop Instr] name=MOV_XD_IMM pc=0x10D0D88C id=5589. queue.size=0
+[info] 737 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D874 instr.id=5575
+[info] 737 [Push Instr] name=SHR pc=0x10D0D890 id=5598
+[info] 737 [pop Instr] name=SHR pc=0x10D0D890 id=5598. queue.size=0
+[info] 737 [Push Instr] name=AND pc=0x10D0D894 id=5599
+[info] 737 [pop Instr] name=AND pc=0x10D0D894 id=5599. queue.size=0
+[info] 738 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D878 instr.id=5576
+[info] 738 [RETIRE INSTR] instr.name=MOV_XD_SPR           instr.pc=0x10D0D87C instr.id=5577
+[info] 738 [Push Instr] name=ADD_IMM pc=0x10D0D898 id=5600
+[info] 738 [pop Instr] name=ADD_IMM pc=0x10D0D898 id=5600. queue.size=0
+[info] 738 [Push Instr] name=SHL pc=0x10D0D89C id=5601
+[info] 738 [pop Instr] name=SHL pc=0x10D0D89C id=5601. queue.size=0
+[info] 739 [RETIRE INSTR] instr.name=MOV_XD_SPR           instr.pc=0x10D0D880 instr.id=5586
+[info] 739 [RETIRE INSTR] instr.name=ADD                  instr.pc=0x10D0D884 instr.id=5587
+[info] 739 [Push Instr] name=ADD_IMM pc=0x10D0D8A0 id=5606
+[info] 739 [pop Instr] name=ADD_IMM pc=0x10D0D8A0 id=5606. queue.size=0
+[info] 740 [RETIRE INSTR] instr.name=MOV_XD_SPR           instr.pc=0x10D0D888 instr.id=5588
+[info] 740 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D88C instr.id=5589
+[info] 740 [Push Instr] name=MADD pc=0x10D0D8A4 id=5607
+[info] 740 [pop Instr] name=MADD pc=0x10D0D8A4 id=5607. queue.size=0
+[info] 741 [RETIRE INSTR] instr.name=SHR                  instr.pc=0x10D0D890 instr.id=5598
+[info] 741 [RETIRE INSTR] instr.name=AND                  instr.pc=0x10D0D894 instr.id=5599
+[info] 742 [RETIRE INSTR] instr.name=ADD_IMM              instr.pc=0x10D0D898 instr.id=5600
+[info] 742 [RETIRE INSTR] instr.name=SHL                  instr.pc=0x10D0D89C instr.id=5601
+[info] 743 [RETIRE INSTR] instr.name=ADD_IMM              instr.pc=0x10D0D8A0 instr.id=5606
+[info] 743 [Push Instr] name=ADD_IMM pc=0x10D0D8A8 id=5608
+[info] 743 [pop Instr] name=ADD_IMM pc=0x10D0D8A8 id=5608. queue.size=0
+[info] 743 [Push Instr] name=MOV_XD_SPR pc=0x10D0D8AC id=5609
+[info] 743 [pop Instr] name=MOV_XD_SPR pc=0x10D0D8AC id=5609. queue.size=0
+[info] 744 [Push Instr] name=MOVK pc=0x10D0D8B0 id=5610
+[info] 744 [pop Instr] name=MOVK pc=0x10D0D8B0 id=5610. queue.size=0
+[info] 745 [RETIRE INSTR] instr.name=MADD                 instr.pc=0x10D0D8A4 instr.id=5607
+[info] 747 [RETIRE INSTR] instr.name=ADD_IMM              instr.pc=0x10D0D8A8 instr.id=5608
+[info] 747 [RETIRE INSTR] instr.name=MOV_XD_SPR           instr.pc=0x10D0D8AC instr.id=5609
+[info] 748 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D8B0 instr.id=5610
+[info] 748 [Push Instr] name=LDP_XI_XJ_XN pc=0x10D0D8B4 id=5611
+[info] 748 [pop Instr] name=LDP_XI_XJ_XN pc=0x10D0D8B4 id=5611. queue.size=0
+[info] 748 [Push Instr] name=MOV_XD_IMM pc=0x10D0D8B8 id=5612
+[info] 748 [pop Instr] name=MOV_XD_IMM pc=0x10D0D8B8 id=5612. queue.size=0
+[info] 749 [Push Instr] name=MOV_XD_IMM pc=0x10D0D8BC id=5613
+[info] 749 [pop Instr] name=MOV_XD_IMM pc=0x10D0D8BC id=5613. queue.size=0
+[info] 749 [Push Instr] name=LD_XD_XN_IMM pc=0x10D0D8C0 id=5618
+[info] 749 [pop Instr] name=LD_XD_XN_IMM pc=0x10D0D8C0 id=5618. queue.size=0
+[info] 750 [Push Instr] name=MOV_XD_SPR pc=0x10D0D8C4 id=5619
+[info] 750 [pop Instr] name=MOV_XD_SPR pc=0x10D0D8C4 id=5619. queue.size=0
+[info] 750 [Push Instr] name=MOV_XD_IMM pc=0x10D0D8C8 id=5620
+[info] 750 [pop Instr] name=MOV_XD_IMM pc=0x10D0D8C8 id=5620. queue.size=0
+[info] 751 [Push Instr] name=MOVK pc=0x10D0D8CC id=5621
+[info] 751 [pop Instr] name=MOVK pc=0x10D0D8CC id=5621. queue.size=0
+[info] 751 [Push Instr] name=MOVK pc=0x10D0D8D0 id=5626
+[info] 751 [pop Instr] name=MOVK pc=0x10D0D8D0 id=5626. queue.size=0
+[info] 752 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D8B8 instr.id=5612
+[info] 752 [Push Instr] name=MOV_XD_IMM pc=0x10D0D8D4 id=5627
+[info] 752 [pop Instr] name=MOV_XD_IMM pc=0x10D0D8D4 id=5627. queue.size=0
+[info] 752 [Push Instr] name=SBITSET pc=0x10D0D8D8 id=5628
+[info] 752 [pop Instr] name=SBITSET pc=0x10D0D8D8 id=5628. queue.size=0
+[info] 753 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D8BC instr.id=5613
+[info] 753 [Push Instr] name=MOV_XD_IMM pc=0x10D0D8DC id=5629
+[info] 753 [pop Instr] name=MOV_XD_IMM pc=0x10D0D8DC id=5629. queue.size=0
+[info] 753 [Push Instr] name=SBITSET pc=0x10D0D8E0 id=5634
+[info] 753 [pop Instr] name=SBITSET pc=0x10D0D8E0 id=5634. queue.size=0
+[info] 754 [RETIRE INSTR] instr.name=MOV_XD_SPR           instr.pc=0x10D0D8C4 instr.id=5619
+[info] 754 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D8C8 instr.id=5620
+[info] 754 [Push Instr] name=MOV_XD_IMM pc=0x10D0D8E4 id=5635
+[info] 754 [pop Instr] name=MOV_XD_IMM pc=0x10D0D8E4 id=5635. queue.size=0
+[info] 754 [Push Instr] name=SBITSET pc=0x10D0D8E8 id=5636
+[info] 754 [pop Instr] name=SBITSET pc=0x10D0D8E8 id=5636. queue.size=0
+[info] 755 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D8CC instr.id=5621
+[info] 755 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D8D0 instr.id=5626
+[info] 756 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D8D4 instr.id=5627
+[info] 756 [RETIRE INSTR] instr.name=SBITSET              instr.pc=0x10D0D8D8 instr.id=5628
+[info] 756 [Push Instr] name=MOV_XD_SPR pc=0x10D0D8F0 id=5642
+[info] 756 [pop Instr] name=MOV_XD_SPR pc=0x10D0D8F0 id=5642. queue.size=0
+[info] 756 [Push Instr] name=MOV_XD_IMM pc=0x10D0D8F4 id=5643
+[info] 756 [pop Instr] name=MOV_XD_IMM pc=0x10D0D8F4 id=5643. queue.size=0
+[info] 757 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D8DC instr.id=5629
+[info] 757 [RETIRE INSTR] instr.name=SBITSET              instr.pc=0x10D0D8E0 instr.id=5634
+[info] 757 [Push Instr] name=SBITSET pc=0x10D0D8F8 id=5644
+[info] 757 [pop Instr] name=SBITSET pc=0x10D0D8F8 id=5644. queue.size=0
+[info] 758 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D8E4 instr.id=5635
+[info] 758 [RETIRE INSTR] instr.name=SBITSET              instr.pc=0x10D0D8E8 instr.id=5636
+[info] 758 [Push Instr] name=MOV_XD_IMM pc=0x10D0D900 id=5650
+[info] 758 [pop Instr] name=MOV_XD_IMM pc=0x10D0D900 id=5650. queue.size=0
+[info] 758 [Push Instr] name=NEG pc=0x10D0D904 id=5651
+[info] 758 [pop Instr] name=NEG pc=0x10D0D904 id=5651. queue.size=0
+[info] 759 [Push Instr] name=MOV_XD_SPR pc=0x10D0D908 id=5652
+[info] 759 [pop Instr] name=MOV_XD_SPR pc=0x10D0D908 id=5652. queue.size=0
+[info] 760 [RETIRE INSTR] instr.name=MOV_XD_SPR           instr.pc=0x10D0D8F0 instr.id=5642
+[info] 760 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D8F4 instr.id=5643
+[info] 760 [Push Instr] name=SIGNEXT pc=0x10D0D910 id=5658
+[info] 760 [pop Instr] name=SIGNEXT pc=0x10D0D910 id=5658. queue.size=0
+[info] 761 [RETIRE INSTR] instr.name=SBITSET              instr.pc=0x10D0D8F8 instr.id=5644
+[info] 762 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D900 instr.id=5650
+[info] 762 [RETIRE INSTR] instr.name=NEG                  instr.pc=0x10D0D904 instr.id=5651
+[info] 763 [RETIRE INSTR] instr.name=MOV_XD_SPR           instr.pc=0x10D0D908 instr.id=5652
+[info] 764 [RETIRE INSTR] instr.name=SIGNEXT              instr.pc=0x10D0D910 instr.id=5658
+[info] 764 [Push Instr] name=DIV pc=0x10D0D918 id=5660
+[info] 764 [pop Instr] name=DIV pc=0x10D0D918 id=5660. queue.size=0
+[info] 770 [RETIRE INSTR] instr.name=DIV                  instr.pc=0x10D0D918 instr.id=5660
+[info] 770 [Push Instr] name=SIGNEXT pc=0x10D0D91C id=5661
+[info] 770 [pop Instr] name=SIGNEXT pc=0x10D0D91C id=5661. queue.size=0
+[info] 770 [Push Instr] name=MOV_XD_SPR pc=0x10D0D920 id=5666
+[info] 770 [pop Instr] name=MOV_XD_SPR pc=0x10D0D920 id=5666. queue.size=0
+[info] 771 [Push Instr] name=MUL pc=0x10D0D924 id=5667
+[info] 771 [pop Instr] name=MUL pc=0x10D0D924 id=5667. queue.size=0
+[info] 771 [Push Instr] name=MOV_XD_IMM pc=0x10D0D928 id=5668
+[info] 771 [pop Instr] name=MOV_XD_IMM pc=0x10D0D928 id=5668. queue.size=0
+[info] 773 [Push Instr] name=ZEROEXT pc=0x10D0D92C id=5669
+[info] 773 [pop Instr] name=ZEROEXT pc=0x10D0D92C id=5669. queue.size=0
+[info] 773 [Push Instr] name=SHL pc=0x10D0D930 id=5674
+[info] 773 [pop Instr] name=SHL pc=0x10D0D930 id=5674. queue.size=0
+[info] 774 [RETIRE INSTR] instr.name=SIGNEXT              instr.pc=0x10D0D91C instr.id=5661
+[info] 774 [RETIRE INSTR] instr.name=MOV_XD_SPR           instr.pc=0x10D0D920 instr.id=5666
+[info] 774 [Push Instr] name=MOV_XD_XN pc=0x10D0D934 id=5675
+[info] 774 [pop Instr] name=MOV_XD_XN pc=0x10D0D934 id=5675. queue.size=0
+[info] 775 [RETIRE INSTR] instr.name=MUL                  instr.pc=0x10D0D924 instr.id=5667
+[info] 775 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D928 instr.id=5668
+[info] 777 [RETIRE INSTR] instr.name=ZEROEXT              instr.pc=0x10D0D92C instr.id=5669
+[info] 777 [RETIRE INSTR] instr.name=SHL                  instr.pc=0x10D0D930 instr.id=5674
+[info] 778 [RETIRE INSTR] instr.name=MOV_XD_XN            instr.pc=0x10D0D934 instr.id=5675
+[info] 1142 [RETIRE INSTR] instr.name=DC_PRELOAD_XN_IMM    instr.pc=0x10D0D870 instr.id=5574
+[info] 1143 [RETIRE INSTR] instr.name=LDP_XI_XJ_XN         instr.pc=0x10D0D8B4 instr.id=5611
+[info] 1144 [RETIRE INSTR] instr.name=LD_XD_XN_IMM         instr.pc=0x10D0D8C0 instr.id=5618
+[info] 1144 [Push Instr] name=ADD pc=0x10D0D938 id=5676
+[info] 1144 [pop Instr] name=ADD pc=0x10D0D938 id=5676. queue.size=0
+[info] 1144 [Push Instr] name=MOVK pc=0x10D0D93C id=5677
+[info] 1144 [pop Instr] name=MOVK pc=0x10D0D93C id=5677. queue.size=0
+[info] 1145 [Push Instr] name=SHL pc=0x10D0D940 id=5678
+[info] 1145 [pop Instr] name=SHL pc=0x10D0D940 id=5678. queue.size=0
+[info] 1145 [Push Instr] name=AND pc=0x10D0D944 id=5679
+[info] 1145 [pop Instr] name=AND pc=0x10D0D944 id=5679. queue.size=0
+[info] 1146 [Push Instr] name=AND pc=0x10D0D948 id=5680
+[info] 1146 [pop Instr] name=AND pc=0x10D0D948 id=5680. queue.size=0
+[info] 1146 [Push Instr] name=OR pc=0x10D0D94C id=5681
+[info] 1146 [pop Instr] name=OR pc=0x10D0D94C id=5681. queue.size=0
+[info] 1147 [Push Instr] name=MOV_XD_IMM pc=0x10D0D950 id=5702
+[info] 1147 [pop Instr] name=MOV_XD_IMM pc=0x10D0D950 id=5702. queue.size=0
+[info] 1147 [Push Instr] name=MOVK pc=0x10D0D954 id=5703
+[info] 1147 [pop Instr] name=MOVK pc=0x10D0D954 id=5703. queue.size=0
+[info] 1148 [RETIRE INSTR] instr.name=ADD                  instr.pc=0x10D0D938 instr.id=5676
+[info] 1148 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D93C instr.id=5677
+[info] 1148 [Push Instr] name=OR pc=0x10D0D958 id=5704
+[info] 1148 [pop Instr] name=OR pc=0x10D0D958 id=5704. queue.size=0
+[info] 1148 [Push Instr] name=MOV_XD_IMM pc=0x10D0D95C id=5705
+[info] 1148 [pop Instr] name=MOV_XD_IMM pc=0x10D0D95C id=5705. queue.size=0
+[info] 1149 [RETIRE INSTR] instr.name=SHL                  instr.pc=0x10D0D940 instr.id=5678
+[info] 1149 [RETIRE INSTR] instr.name=AND                  instr.pc=0x10D0D944 instr.id=5679
+[info] 1149 [Push Instr] name=MOVK pc=0x10D0D960 id=5710
+[info] 1149 [pop Instr] name=MOVK pc=0x10D0D960 id=5710. queue.size=0
+[info] 1149 [Push Instr] name=ADD pc=0x10D0D964 id=5711
+[info] 1149 [pop Instr] name=ADD pc=0x10D0D964 id=5711. queue.size=0
+[info] 1150 [RETIRE INSTR] instr.name=AND                  instr.pc=0x10D0D948 instr.id=5680
+[info] 1150 [RETIRE INSTR] instr.name=OR                   instr.pc=0x10D0D94C instr.id=5681
+[info] 1150 [Push Instr] name=MOV_XD_IMM pc=0x10D0D96C id=5713
+[info] 1150 [pop Instr] name=MOV_XD_IMM pc=0x10D0D96C id=5713. queue.size=0
+[info] 1151 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D950 instr.id=5702
+[info] 1151 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D954 instr.id=5703
+[info] 1151 [Push Instr] name=MOVK pc=0x10D0D970 id=5718
+[info] 1151 [pop Instr] name=MOVK pc=0x10D0D970 id=5718. queue.size=0
+[info] 1152 [RETIRE INSTR] instr.name=OR                   instr.pc=0x10D0D958 instr.id=5704
+[info] 1152 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D95C instr.id=5705
+[info] 1153 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D960 instr.id=5710
+[info] 1153 [RETIRE INSTR] instr.name=ADD                  instr.pc=0x10D0D964 instr.id=5711
+[info] 1153 [Push Instr] name=ADD_IMM pc=0x10D0D980 id=5758
+[info] 1153 [pop Instr] name=ADD_IMM pc=0x10D0D980 id=5758. queue.size=0
+[info] 1154 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D96C instr.id=5713
+[info] 1154 [Push Instr] name=ZEROEXT pc=0x10D0D984 id=5759
+[info] 1154 [pop Instr] name=ZEROEXT pc=0x10D0D984 id=5759. queue.size=0
+[info] 1154 [Push Instr] name=SHR pc=0x10D0D988 id=5760
+[info] 1154 [pop Instr] name=SHR pc=0x10D0D988 id=5760. queue.size=0
+[info] 1155 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D970 instr.id=5718
+[info] 1155 [Push Instr] name=ZEROEXT pc=0x10D0D98C id=5761
+[info] 1155 [pop Instr] name=ZEROEXT pc=0x10D0D98C id=5761. queue.size=0
+[info] 1155 [Push Instr] name=SHL pc=0x10D0D990 id=5770
+[info] 1155 [pop Instr] name=SHL pc=0x10D0D990 id=5770. queue.size=0
+[info] 1156 [Push Instr] name=INSERT_XD_XN pc=0x10D0D994 id=5771
+[info] 1156 [pop Instr] name=INSERT_XD_XN pc=0x10D0D994 id=5771. queue.size=0
+[info] 1156 [Push Instr] name=SHL pc=0x10D0D998 id=5772
+[info] 1156 [pop Instr] name=SHL pc=0x10D0D998 id=5772. queue.size=0
+[info] 1157 [RETIRE INSTR] instr.name=ADD_IMM              instr.pc=0x10D0D980 instr.id=5758
+[info] 1157 [Push Instr] name=MOV_XD_IMM pc=0x10D0D99C id=5773
+[info] 1157 [pop Instr] name=MOV_XD_IMM pc=0x10D0D99C id=5773. queue.size=0
+[info] 1157 [Push Instr] name=INSERT_XD_XN pc=0x10D0D9A0 id=5784
+[info] 1157 [pop Instr] name=INSERT_XD_XN pc=0x10D0D9A0 id=5784. queue.size=0
+[info] 1158 [RETIRE INSTR] instr.name=ZEROEXT              instr.pc=0x10D0D984 instr.id=5759
+[info] 1158 [RETIRE INSTR] instr.name=SHR                  instr.pc=0x10D0D988 instr.id=5760
+[info] 1158 [Push Instr] name=MOV_XD_IMM pc=0x10D0D9A4 id=5785
+[info] 1158 [pop Instr] name=MOV_XD_IMM pc=0x10D0D9A4 id=5785. queue.size=0
+[info] 1158 [Push Instr] name=MOVK pc=0x10D0D9A8 id=5786
+[info] 1158 [pop Instr] name=MOVK pc=0x10D0D9A8 id=5786. queue.size=0
+[info] 1159 [RETIRE INSTR] instr.name=ZEROEXT              instr.pc=0x10D0D98C instr.id=5761
+[info] 1159 [RETIRE INSTR] instr.name=SHL                  instr.pc=0x10D0D990 instr.id=5770
+[info] 1159 [Push Instr] name=INSERT_XD_XN pc=0x10D0D9AC id=5787
+[info] 1159 [pop Instr] name=INSERT_XD_XN pc=0x10D0D9AC id=5787. queue.size=0
+[info] 1159 [Push Instr] name=MOV_XD_IMM pc=0x10D0D9B0 id=5800
+[info] 1159 [pop Instr] name=MOV_XD_IMM pc=0x10D0D9B0 id=5800. queue.size=0
+[info] 1160 [RETIRE INSTR] instr.name=INSERT_XD_XN         instr.pc=0x10D0D994 instr.id=5771
+[info] 1160 [RETIRE INSTR] instr.name=SHL                  instr.pc=0x10D0D998 instr.id=5772
+[info] 1160 [Push Instr] name=MOVK pc=0x10D0D9B4 id=5801
+[info] 1160 [pop Instr] name=MOVK pc=0x10D0D9B4 id=5801. queue.size=0
+[info] 1160 [Push Instr] name=MOV_XD_XN pc=0x10D0D9B8 id=5802
+[info] 1160 [pop Instr] name=MOV_XD_XN pc=0x10D0D9B8 id=5802. queue.size=0
+[info] 1161 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D99C instr.id=5773
+[info] 1161 [RETIRE INSTR] instr.name=INSERT_XD_XN         instr.pc=0x10D0D9A0 instr.id=5784
+[info] 1161 [Push Instr] name=ZEROEXT pc=0x10D0D9BC id=5803
+[info] 1161 [pop Instr] name=ZEROEXT pc=0x10D0D9BC id=5803. queue.size=0
+[info] 1161 [Push Instr] name=SHL pc=0x10D0D9C0 id=5932
+[info] 1161 [pop Instr] name=SHL pc=0x10D0D9C0 id=5932. queue.size=0
+[info] 1162 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D9A4 instr.id=5785
+[info] 1162 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D9A8 instr.id=5786
+[info] 1162 [Push Instr] name=SHL pc=0x10D0D9C4 id=5933
+[info] 1162 [pop Instr] name=SHL pc=0x10D0D9C4 id=5933. queue.size=0
+[info] 1162 [Push Instr] name=INSERT_XD_XN pc=0x10D0D9C8 id=5934
+[info] 1162 [pop Instr] name=INSERT_XD_XN pc=0x10D0D9C8 id=5934. queue.size=0
+[info] 1163 [RETIRE INSTR] instr.name=INSERT_XD_XN         instr.pc=0x10D0D9AC instr.id=5787
+[info] 1163 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D9B0 instr.id=5800
+[info] 1163 [Push Instr] name=INSERT_XD_XN pc=0x10D0D9CC id=5935
+[info] 1163 [pop Instr] name=INSERT_XD_XN pc=0x10D0D9CC id=5935. queue.size=0
+[info] 1164 [RETIRE INSTR] instr.name=MOVK                 instr.pc=0x10D0D9B4 instr.id=5801
+[info] 1164 [RETIRE INSTR] instr.name=MOV_XD_XN            instr.pc=0x10D0D9B8 instr.id=5802
+[info] 1164 [Push Instr] name=MOV_XD_SPR pc=0x10D0D9D4 id=5937
+[info] 1164 [pop Instr] name=MOV_XD_SPR pc=0x10D0D9D4 id=5937. queue.size=0
+[info] 1165 [RETIRE INSTR] instr.name=ZEROEXT              instr.pc=0x10D0D9BC instr.id=5803
+[info] 1165 [RETIRE INSTR] instr.name=SHL                  instr.pc=0x10D0D9C0 instr.id=5932
+[info] 1165 [Push Instr] name=MOV_XD_IMM pc=0x10D0D9D8 id=5938
+[info] 1165 [pop Instr] name=MOV_XD_IMM pc=0x10D0D9D8 id=5938. queue.size=0
+[info] 1166 [RETIRE INSTR] instr.name=SHL                  instr.pc=0x10D0D9C4 instr.id=5933
+[info] 1166 [RETIRE INSTR] instr.name=INSERT_XD_XN         instr.pc=0x10D0D9C8 instr.id=5934
+[info] 1166 [Push Instr] name=SHL pc=0x10D0D9E4 id=5941
+[info] 1166 [pop Instr] name=SHL pc=0x10D0D9E4 id=5941. queue.size=0
+[info] 1167 [RETIRE INSTR] instr.name=INSERT_XD_XN         instr.pc=0x10D0D9CC instr.id=5935
+[info] 1167 [Push Instr] name=ADD pc=0x10D0D9E8 id=5942
+[info] 1167 [pop Instr] name=ADD pc=0x10D0D9E8 id=5942. queue.size=0
+[info] 1168 [RETIRE INSTR] instr.name=MOV_XD_SPR           instr.pc=0x10D0D9D4 instr.id=5937
+[info] 1168 [Push Instr] name=ADD pc=0x10D0D9F4 id=5949
+[info] 1168 [pop Instr] name=ADD pc=0x10D0D9F4 id=5949. queue.size=0
+[info] 1169 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0D9D8 instr.id=5938
+[info] 1170 [RETIRE INSTR] instr.name=SHL                  instr.pc=0x10D0D9E4 instr.id=5941
+[info] 1171 [RETIRE INSTR] instr.name=ADD                  instr.pc=0x10D0D9E8 instr.id=5942
+[info] 1172 [RETIRE INSTR] instr.name=ADD                  instr.pc=0x10D0D9F4 instr.id=5949
+[info] 1662 [Push Instr] name=MOV_XD_IMM pc=0x10D0DA00 id=6092
+[info] 1662 [pop Instr] name=MOV_XD_IMM pc=0x10D0DA00 id=6092. queue.size=0
+[info] 1662 [Push Instr] name=SBITSET pc=0x10D0DA04 id=6093
+[info] 1662 [pop Instr] name=SBITSET pc=0x10D0DA04 id=6093. queue.size=0
+[info] 1663 [Push Instr] name=MOV_XD_IMM pc=0x10D0DA0C id=6095
+[info] 1663 [pop Instr] name=MOV_XD_IMM pc=0x10D0DA0C id=6095. queue.size=0
+[info] 1666 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0DA00 instr.id=6092
+[info] 1666 [RETIRE INSTR] instr.name=SBITSET              instr.pc=0x10D0DA04 instr.id=6093
+[info] 1667 [RETIRE INSTR] instr.name=MOV_XD_IMM           instr.pc=0x10D0DA0C instr.id=6095
+[info] ++++++++++++++++++++++core: 0, subcore: 1, start: 210, tick: 2233, kernelId: 0, blkID: 0, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

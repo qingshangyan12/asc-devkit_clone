@@ -1,0 +1,55 @@
+[info] [0000001625] [LDQ] [ISU_RECV] instr_name RV_VLDI instr_id 4160 PC 10d0dd00 vf_instr_id 3989 pipe RVECLD  DST_VREGS:[v_idx=0,p_idx=0]
+[info] [0000001625] [SHQ] [ISU_RECV] instr_name RV_PLT instr_id 4162 PC 10d0dd08 vf_instr_id 3989 pipe RVECEX EXU1  DST_PREGS:[v_idx=1,p_idx=0]
+[info] [0000001625] [LDQ] [ISU_ISSUE] instr_name RV_VLDI instr_id 4160 PC 10d0dd00 vf_instr_id 3989 pipe RVECLD vloop_id 0 src_rdy 1625 dual_dst false
+[info] [0000001625] [SHQ] [ISU_ISSUE] instr_name RV_PLT instr_id 4162 PC 10d0dd08 vf_instr_id 3989 pipe RVECEX vloop_id 0 src_rdy 1625 dual_dst false
+[info] [0000001626] [LDQ] [ISU_RECV] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECLD 
+[info] [0000001626] [SHQ] [ISU_RECV] instr_name RV_VCMIN instr_id 4164 PC 10d0dd10 vf_instr_id 3989 pipe RVECEX EXU0  SRC_VREGS:[v_idx=0,p_idx=0] SRC_PREGS:[v_idx=1,p_idx=0] DST_VREGS:[v_idx=0,p_idx=1]
+[info] [0000001626] [SHQ] [ISU_RECV] instr_name RV_PLT instr_id 4165 PC 10d0dd14 vf_instr_id 3989 pipe RVECEX EXU0  DST_PREGS:[v_idx=1,p_idx=1]
+[info] [0000001626] [SHQ] [ISU_RECV] instr_name RV_VSTI instr_id 4166 PC 10d0dd18 vf_instr_id 3989 pipe RVECST  SRC_VREGS:[v_idx=0,p_idx=1] SRC_PREGS:[v_idx=1,p_idx=1]
+[info] [0000001626] [SHQ] [ISU_RECV] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST 
+[info] [0000001626] [EXQ1] [ISU_RECV] instr_name RV_PLT instr_id 4162 PC 10d0dd08 vf_instr_id 3989 pipe RVECEX EXU1  DST_PREGS:[v_idx=1,p_idx=0]
+[info] [0000001626] [LDQ] [ISU_ISSUE] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECLD vloop_id 0 src_rdy 1626 dual_dst false
+[info] [0000001626] [SHQ] [ISU_WAKEUP_BLOCK] instr_name RV_VCMIN instr_id 4164 PC 10d0dd10 REASON:SRC_NOT_READY_VREG
+[info] [0000001626] [SHQ] [ISU_WAKEUP_BLOCK] instr_name RV_VSTI instr_id 4166 PC 10d0dd18 REASON:SRC_NOT_READY_VREG
+[info] [0000001626] [SHQ] [ISU_WAKEUP_BLOCK] instr_name RV_SEND instr_id 4167 PC 10d0dd1c REASON:SEND_BARRIER
+[info] [0000001626] [SHQ] [ISU_ISSUE] instr_name RV_PLT instr_id 4165 PC 10d0dd14 vf_instr_id 3989 pipe RVECEX vloop_id 0 src_rdy 1626 dual_dst false
+[info] [0000001626] [EXQ1] [ISU_ISSUE] instr_name RV_PLT instr_id 4162 PC 10d0dd08 vf_instr_id 3989 pipe RVECEX vloop_id 0 src_rdy 1626 dual_dst false
+[info] [0000001626] isu_stat.post_issue=(ldq:0, stq:0, shq:1 exq:(0 ,0; 0 ,1))
+[info] [0000001627] [EXQ0] [ISU_RECV] instr_name RV_PLT instr_id 4165 PC 10d0dd14 vf_instr_id 3989 pipe RVECEX EXU0  DST_PREGS:[v_idx=1,p_idx=1]
+[info] [0000001627] [EXQ0] [ISU_ISSUE] instr_name RV_PLT instr_id 4165 PC 10d0dd14 vf_instr_id 3989 pipe RVECEX vloop_id 0 src_rdy 1627 dual_dst false
+[info] [0000001627] isu_stat.post_issue=(ldq:0, stq:0, shq:1 exq:(0 ,0; 1 ,0))
+[info] [0000001628] isu_stat.post_issue=(ldq:0, stq:0, shq:0 exq:(0 ,0; 0 ,0))
+[info] [0000001630] [SHQ] [ISU_WAKEUP_READY] instr_name RV_VCMIN instr_id 4164 PC 10d0dd10
+[info] [0000001630] [SHQ] [ISU_ISSUE] instr_name RV_VCMIN instr_id 4164 PC 10d0dd10 vf_instr_id 3989 pipe RVECEX vloop_id 0 src_rdy 1630 dual_dst false
+[info] [0000001631] [EXQ0] [ISU_RECV] instr_name RV_VCMIN instr_id 4164 PC 10d0dd10 vf_instr_id 3989 pipe RVECEX EXU0  SRC_VREGS:[v_idx=0,p_idx=0] SRC_PREGS:[v_idx=1,p_idx=0] DST_VREGS:[v_idx=0,p_idx=1]
+[info] [0000001631] [EXQ0] [ISU_ISSUE] instr_name RV_VCMIN instr_id 4164 PC 10d0dd10 vf_instr_id 3989 pipe RVECEX vloop_id 0 src_rdy 1631 dual_dst false
+[info] [0000001631] isu_stat.post_issue=(ldq:0, stq:0, shq:1 exq:(0 ,0; 1 ,0))
+[info] [0000001632] [EXQ1] [ISU_RETIRE] instr_name RV_PLT instr_id 4162 PC 10d0dd08 vf_instr_id 3989 pipe RVECEX EXU1
+[info] [0000001632] [LDQ] [ISU_RECV_RLS] instr_name RV_VLDI instr_id 4160 PC 10d0dd00 vf_instr_id 3989 pipe RVECLD
+[info] [0000001632] isu_stat.post_recv_rls=(ldq:1, stq:0, shq:0 exq:(0 ,0; 0 ,0))
+[info] [0000001632] isu_stat.post_issue=(ldq:0, stq:0, shq:0 exq:(0 ,0; 0 ,0))
+[info] [0000001633] [EXQ0] [ISU_RETIRE] instr_name RV_PLT instr_id 4165 PC 10d0dd14 vf_instr_id 3989 pipe RVECEX EXU0
+[info] [0000001634] [LDQ] [ISU_RETIRE] instr_name RV_VLDI instr_id 4160 PC 10d0dd00 vf_instr_id 3989 pipe RVECLD
+[info] [PERF] [0000001635] ISU_SCB_FREE_REG instr_name RV_VCMIN instr_id 4164 PC 10d0dd10 event:DEC_SRC reg_type:P v_idx:1 p_idx:0
+[info] [PERF] [0000001635] ISU_SCB_FREE_REG instr_name RV_VCMIN instr_id 4164 PC 10d0dd10 event:DEC_SRC reg_type:V v_idx:0 p_idx:0
+[info] [0000001645] [SHQ] [ISU_WAKEUP_READY] instr_name RV_VSTI instr_id 4166 PC 10d0dd18
+[info] [0000001645] [SHQ] [ISU_ISSUE] instr_name RV_VSTI instr_id 4166 PC 10d0dd18 vf_instr_id 3989 pipe RVECST vloop_id 0 src_rdy 1645 dual_dst false
+[info] [0000001647] [EXQ0] [ISU_RETIRE] instr_name RV_VCMIN instr_id 4164 PC 10d0dd10 vf_instr_id 3989 pipe RVECEX EXU0
+[info] [0000001647] [SHQ] [ISU_RECV_RLS] instr_name RV_VSTI instr_id 4166 PC 10d0dd18 vf_instr_id 3989 pipe RVECST
+[info] [0000001647] isu_stat.post_recv_rls=(ldq:0, stq:0, shq:1 exq:(0 ,0; 0 ,0))
+[info] [0000001649] [SHQ] [ISU_WAKEUP_READY] instr_name RV_SEND instr_id 4167 PC 10d0dd1c
+[info] [0000001649] [SHQ] [ISU_ISSUE] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST vloop_id 0 src_rdy 1626 dual_dst false
+[info] [0000001650] [EXQ0] [ISU_RECV] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST 
+[info] [0000001650] [EXQ1] [ISU_RECV] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST 
+[info] [0000001650] [EXQ0] [ISU_ISSUE] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST vloop_id 0 src_rdy 1650 dual_dst false
+[info] [0000001650] [EXQ1] [ISU_ISSUE] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST vloop_id 0 src_rdy 1650 dual_dst false
+[info] [0000001650] isu_stat.post_issue=(ldq:0, stq:0, shq:0 exq:(0 ,0; 1 ,1))
+[info] [0000001654] [SHQ] [ISU_RETIRE] instr_name RV_VSTI instr_id 4166 PC 10d0dd18 vf_instr_id 3989 pipe RVECST
+[info] [0000001654] [EXQ0] [ISU_RETIRE] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST
+[info] [0000001654] [EXQ1] [ISU_RETIRE] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST
+[info] [0000001655] [LDQ] [ISU_RETIRE] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECLD
+[info] [0000001655] [SHQ] [ISU_RETIRE] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST
+[info] [0000001658] isu_stat.post_issue=(ldq:1, stq:0, shq:1 exq:(0 ,0; 0 ,0))
+[info] [0000001659] [SHQ] [ISU_RETIRE] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST
+[info] [0000001659] [SHQ] [ISU_RETIRE] instr_name RV_SEND instr_id 4167 PC 10d0dd1c vf_instr_id 3989 pipe RVECST
+[info] ++++++++++++++++++++++core: 1, subcore: 2, start: 211, tick: 2151, kernelId: 0, blkID: 3, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

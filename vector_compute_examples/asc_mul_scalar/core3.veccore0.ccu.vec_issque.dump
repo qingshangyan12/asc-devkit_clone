@@ -1,0 +1,13 @@
+[info] 1249 [Push Instr] name=MOVEMASK pc=0x10D0D874 id=5380
+[info] 1249 [pop Instr] name=MOVEMASK pc=0x10D0D874 id=5380. queue.size=0
+[info] 1250 [Push Instr] name=MOVEMASK pc=0x10D0D87C id=5382
+[info] 1250 [pop Instr] name=MOVEMASK pc=0x10D0D87C id=5382. queue.size=0
+[info] 1261 [RETIRE INSTR] instr.name=MOVEMASK             instr.pc=0x10D0D874 instr.id=5380
+[info] 1271 [RETIRE INSTR] instr.name=MOVEMASK             instr.pc=0x10D0D87C instr.id=5382
+[info] 1271 [Push Instr] name=WAIT_FLAG pc=0x10D0D8D4 id=5424
+[info] 1284 [Push Instr] name=VF pc=0x10D0D940 id=5564
+[info] 1781 [release wait_flag] instr.name=WAIT_FLAG            instr.pc=0x10D0D8D4 instr.id=5424
+[info] 1782 [pop Instr] name=VF pc=0x10D0D940 id=5564. queue.size=0
+[info] 1843 [RETIRE INSTR] instr.name=VF                   instr.pc=0x10D0D940 instr.id=5564
+[info] 1843 [release set_flag] name=SET_FLAG pc=0x10D0D94C id=5566
+[info] ++++++++++++++++++++++core: 3, subcore: 1, start: 214, tick: 2369, kernelId: 0, blkID: 6, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

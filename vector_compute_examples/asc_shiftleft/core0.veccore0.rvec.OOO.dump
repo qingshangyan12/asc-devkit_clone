@@ -1,0 +1,58 @@
+[info] 0 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 0 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] [PERF] [0000001739] OOO_RECV instr_name RV_VLD instr_id 6167 PC 10d0e00c
+[info] 1739 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 1739 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] [PERF] [0000001739] OOO_RECV instr_name RV_VLD instr_id 6168 PC 10d0e010
+[info] [PERF] [0000001739] OOO_RECV instr_name RV_PLT instr_id 6169 PC 10d0e014
+[info] [PERF] [0000001739] OOO_RECV instr_name RV_VSHL instr_id 6170 PC 10d0e018
+[info] [PERF] [0000001739] OOO_RECV instr_name RV_VST instr_id 6171 PC 10d0e01c
+[info] [PERF] [0000001739] OOO_SEND instr_name RV_VLD instr_id 6167 PC 10d0e00c
+[info] [PERF] [0000001739] OOO_SEND instr_name RV_VLD instr_id 6168 PC 10d0e010
+[info] [PERF] [0000001739] OOO_SEND instr_name RV_PLT instr_id 6169 PC 10d0e014
+[info] [PERF] [0000001739] OOO_SEND instr_name RV_VSHL instr_id 6170 PC 10d0e018
+[info] [PERF] [0000001739] OOO_SEND instr_name RV_VST instr_id 6171 PC 10d0e01c
+[info] [PERF] [0000001740] OOO_RECV instr_name RV_VLD instr_id 6176 PC 10d0e00c
+[info] [PERF] [0000001740] OOO_RECV instr_name RV_VLD instr_id 6177 PC 10d0e010
+[info] [PERF] [0000001740] OOO_RECV instr_name RV_PLT instr_id 6178 PC 10d0e014
+[info] [PERF] [0000001740] OOO_RECV instr_name RV_VSHL instr_id 6179 PC 10d0e018
+[info] [PERF] [0000001740] OOO_RECV instr_name RV_VST instr_id 6180 PC 10d0e01c
+[info] [PERF] [0000001740] OOO_SEND instr_name RV_VLD instr_id 6176 PC 10d0e00c
+[info] [PERF] [0000001740] OOO_SEND instr_name RV_VLD instr_id 6177 PC 10d0e010
+[info] [PERF] [0000001740] OOO_SEND instr_name RV_PLT instr_id 6178 PC 10d0e014
+[info] [PERF] [0000001740] OOO_SEND instr_name RV_VSHL instr_id 6179 PC 10d0e018
+[info] [PERF] [0000001740] OOO_SEND instr_name RV_VST instr_id 6180 PC 10d0e01c
+[info] [PERF] [0000001741] OOO_RECV instr_name RV_VLD instr_id 6181 PC 10d0e00c
+[info] [PERF] [0000001741] OOO_RECV instr_name RV_VLD instr_id 6184 PC 10d0e010
+[info] [PERF] [0000001741] OOO_RECV instr_name RV_PLT instr_id 6185 PC 10d0e014
+[info] [PERF] [0000001741] OOO_RECV instr_name RV_VSHL instr_id 6186 PC 10d0e018
+[info] [PERF] [0000001741] OOO_RECV instr_name RV_VST instr_id 6187 PC 10d0e01c
+[info] [PERF] [0000001741] OOO_SEND instr_name RV_VLD instr_id 6181 PC 10d0e00c
+[info] [PERF] [0000001741] OOO_SEND instr_name RV_VLD instr_id 6184 PC 10d0e010
+[info] [PERF] [0000001741] OOO_SEND instr_name RV_PLT instr_id 6185 PC 10d0e014
+[info] [PERF] [0000001741] OOO_SEND instr_name RV_VSHL instr_id 6186 PC 10d0e018
+[info] [PERF] [0000001741] OOO_SEND instr_name RV_VST instr_id 6187 PC 10d0e01c
+[info] [PERF] [0000001742] OOO_RECV instr_name RV_VLD instr_id 6188 PC 10d0e00c
+[info] [PERF] [0000001742] OOO_RECV instr_name RV_VLD instr_id 6189 PC 10d0e010
+[info] [PERF] [0000001742] OOO_RECV instr_name RV_PLT instr_id 6190 PC 10d0e014
+[info] [PERF] [0000001742] OOO_RECV instr_name RV_VSHL instr_id 6191 PC 10d0e018
+[info] [PERF] [0000001742] OOO_RECV instr_name RV_VST instr_id 6192 PC 10d0e01c
+[info] [PERF] [0000001742] OOO_SEND instr_name RV_VLD instr_id 6188 PC 10d0e00c
+[info] [PERF] [0000001742] OOO_SEND instr_name RV_VLD instr_id 6189 PC 10d0e010
+[info] [PERF] [0000001742] OOO_SEND instr_name RV_PLT instr_id 6190 PC 10d0e014
+[info] [PERF] [0000001742] OOO_SEND instr_name RV_VSHL instr_id 6191 PC 10d0e018
+[info] [PERF] [0000001742] OOO_SEND instr_name RV_VST instr_id 6192 PC 10d0e01c
+[info] [PERF] [0000001745] OOO_RECV instr_name RV_SEND instr_id 6193 PC 10d0e020
+[info] [PERF] [0000001745] OOO_RECV instr_name RV_SEND instr_id 6193 PC 10d0e020
+[info] [PERF] [0000001745] OOO_SEND instr_name RV_SEND instr_id 6193 PC 10d0e020
+[info] [PERF] [0000001745] OOO_SEND instr_name RV_SEND instr_id 6193 PC 10d0e020
+[info] 1752 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:2) preg avail num:28 vreg avail num:58
+[info] 1753 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:2) preg avail num:28 vreg avail num:60
+[info] 1754 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:2) preg avail num:28 vreg avail num:62
+[info] 1755 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:1) preg avail num:28 vreg avail num:63
+[info] 1756 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:1) preg avail num:29 vreg avail num:64
+[info] 1757 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:1) preg avail num:30 vreg avail num:65
+[info] 1758 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:1) preg avail num:31 vreg avail num:66
+[info] 1775 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 1775 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] ++++++++++++++++++++++core: 0, subcore: 1, start: 209, tick: 2232, kernelId: 0, blkID: 0, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

@@ -1,0 +1,25 @@
+[info] [00001819] recv_gsu_instr master_id: gather, instr_id: 5723
+[info] [PERF] [0000001819] GSU_RECV instr_name RV_SEND instr_id 5723 PC 10d0df1c
+[info] [00001819] recv_gsu_instr master_id: scatter, instr_id: 5723
+[info] [PERF] [0000001819] GSU_RECV instr_name RV_SEND instr_id 5723 PC 10d0df1c
+[info] [PERF] [0000001819] [STALL.SEND] [GSU_GA], instr_id: 5723
+[info] [PERF] [0000001819] [STALL.SEND] [GSU_SC], instr_id: 5723
+[info] [PERF] [0000001820] [STALL.SEND] [GSU_GA], instr_id: 5723
+[info] [PERF] [0000001820] [STALL.SEND] [GSU_SC], instr_id: 5723
+[info] [PERF] [0000001821] [STALL.SEND] [GSU_GA], instr_id: 5723
+[info] [PERF] [0000001821] [STALL.SEND] [GSU_SC], instr_id: 5723
+[info] [PERF] [0000001822] [STALL.SEND] [GSU_GA], instr_id: 5723
+[info] [PERF] [0000001822] [STALL.SEND] [GSU_SC], instr_id: 5723
+[info] [PERF] [0000001823] [STALL.SEND] [GSU_GA], instr_id: 5723
+[info] [PERF] [0000001823] [STALL.SEND] [GSU_SC], instr_id: 5723
+[info] [PERF] [0000001824] [STALL.SEND] [GSU_GA], instr_id: 5723
+[info] [PERF] [0000001824] [STALL.SEND] [GSU_SC], instr_id: 5723
+[info] [PERF] [0000001825] [STALL.SEND] [GSU_GA], instr_id: 5723
+[info] [PERF] [0000001825] [STALL.SEND] [GSU_SC], instr_id: 5723
+[info] [PERF] [0000001826] [STALL.SEND] [GSU_GA], instr_id: 5723
+[info] [PERF] [0000001826] [STALL.SEND] [GSU_SC], instr_id: 5723
+[info] [PERF] [0000001827] [GO.SEND] [GSU_GA], instr_id: 5723
+[info] [PERF] [0000001827] [GO.SEND] [GSU_SC], instr_id: 5723
+[info] [PERF] [0000001828] GSU_RETIRE instr_name RV_SEND instr_id 5723 PC 10d0df1c
+[info] [PERF] [0000001828] GSU_RETIRE instr_name RV_SEND instr_id 5723 PC 10d0df1c
+[info] ++++++++++++++++++++++core: 1, subcore: 2, start: 211, tick: 2319, kernelId: 0, blkID: 3, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

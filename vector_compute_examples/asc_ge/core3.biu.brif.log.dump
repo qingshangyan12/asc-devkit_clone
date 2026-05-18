@@ -1,0 +1,134 @@
+[info] 229: send_rd_cmd, port: icache1, instr_id: 0, retire_set: 0, addr: 0x10d0d400, size: 512, gid: 24239, tag_id: 1, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 230: send_rd_cmd, port: icache2, instr_id: 0, retire_set: 0, addr: 0x10d0d400, size: 512, gid: 24248, tag_id: 3, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 232: bdwt_acculator, tag_id: 1, size: 512
+[info] 233: bdwt_acculator, tag_id: 3, size: 512
+[info] 594: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 24239, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 594: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 24239, addr: 0x10d0d400, size: 512, tag_id: 1, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 610: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 24239, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 610: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 24239, addr: 0x10d0d400, size: 512, tag_id: 1, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 620: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 24239, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 620: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 24239, addr: 0x10d0d400, size: 512, tag_id: 1, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 621: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 24248, tag_id: 3, instr_id: 0, retire_set: 0
+[info] 621: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 24248, addr: 0x10d0d400, size: 512, tag_id: 3, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 661: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 24248, tag_id: 3, instr_id: 0, retire_set: 0
+[info] 661: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 24248, addr: 0x10d0d400, size: 512, tag_id: 3, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 730: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 24248, tag_id: 3, instr_id: 0, retire_set: 0
+[info] 730: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 24248, addr: 0x10d0d400, size: 512, tag_id: 3, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 735: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 24239, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 735: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 24239, addr: 0x10d0d400, size: 512, tag_id: 1, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 736: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 24248, tag_id: 3, instr_id: 0, retire_set: 0
+[info] 736: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 24248, addr: 0x10d0d400, size: 512, tag_id: 3, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 757: push_biu_data, port:icache1 addr: 0x10d0d400, size: 512, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 759: push_biu_data, port:icache2 addr: 0x10d0d400, size: 512, tag_id: 3, instr_id: 0, retire_set: 0
+[info] 779: send_rd_cmd, port: icache1, instr_id: 0, retire_set: 0, addr: 0x1022c000, size: 64, gid: 28622, tag_id: 1, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 781: send_rd_cmd, port: icache2, instr_id: 0, retire_set: 0, addr: 0x1022c000, size: 64, gid: 28633, tag_id: 2, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 782: bdwt_acculator, tag_id: 1, size: 64
+[info] 784: bdwt_acculator, tag_id: 2, size: 64
+[info] 1261: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 28622, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 1261: recv_biu_data, tnx_cnt: 1, all_recved: 1, gid: 28622, addr: 0x1022c000, size: 64, tag_id: 1, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1271: push_biu_data, port:icache1 addr: 0x1022c000, size: 64, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 1288: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 28633, tag_id: 2, instr_id: 0, retire_set: 0
+[info] 1288: recv_biu_data, tnx_cnt: 1, all_recved: 1, gid: 28633, addr: 0x1022c000, size: 64, tag_id: 2, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1296: send_rd_cmd, port: icache1, instr_id: 0, retire_set: 0, addr: 0x10d0d600, size: 512, gid: 31060, tag_id: 3, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 1297: push_biu_data, port:icache2 addr: 0x1022c000, size: 64, tag_id: 2, instr_id: 0, retire_set: 0
+[info] 1299: bdwt_acculator, tag_id: 3, size: 512
+[info] 1305: send_rd_cmd, port: mte1, instr_id: 1, retire_set: 0, addr: 0x13b2ee00, size: 512, gid: 31151, tag_id: 1, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 1306: send_rd_cmd, port: mte1, instr_id: 1, retire_set: 1, addr: 0x13b2f000, size: 512, gid: 31160, tag_id: 5, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 1308: bdwt_acculator, tag_id: 1, size: 512
+[info] 1308: send_rd_cmd, port: mte1, instr_id: 2, retire_set: 0, addr: 0x13b31000, size: 512, gid: 31176, tag_id: 7, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 512
+[info] 1309: bdwt_acculator, tag_id: 5, size: 512
+[info] 1309: send_rd_cmd, port: mte1, instr_id: 2, retire_set: 1, addr: 0x13b31200, size: 512, gid: 31185, tag_id: 9, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 512
+[info] 1311: bdwt_acculator, tag_id: 7, size: 512
+[info] 1312: bdwt_acculator, tag_id: 9, size: 512
+[info] 1322: send_rd_cmd, port: icache2, instr_id: 0, retire_set: 0, addr: 0x10d0d600, size: 512, gid: 31273, tag_id: 11, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 1325: bdwt_acculator, tag_id: 11, size: 512
+[info] 1331: send_rd_cmd, port: mte2, instr_id: 3, retire_set: 0, addr: 0x13b2f200, size: 512, gid: 31362, tag_id: 13, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 1332: send_rd_cmd, port: mte2, instr_id: 3, retire_set: 1, addr: 0x13b2f400, size: 512, gid: 31371, tag_id: 15, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 1334: bdwt_acculator, tag_id: 13, size: 512
+[info] 1334: send_rd_cmd, port: mte2, instr_id: 4, retire_set: 0, addr: 0x13b31400, size: 512, gid: 31388, tag_id: 17, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 512
+[info] 1335: bdwt_acculator, tag_id: 15, size: 512
+[info] 1335: send_rd_cmd, port: mte2, instr_id: 4, retire_set: 1, addr: 0x13b31600, size: 512, gid: 31397, tag_id: 19, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 512
+[info] 1337: bdwt_acculator, tag_id: 17, size: 512
+[info] 1338: bdwt_acculator, tag_id: 19, size: 512
+[info] 1654: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31151, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 1654: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 31151, addr: 0x13b2ee00, size: 512, tag_id: 1, instr_id: 1, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1656: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31185, tag_id: 9, instr_id: 0, retire_set: 0
+[info] 1656: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 31185, addr: 0x13b31200, size: 512, tag_id: 9, instr_id: 2, aix_port: 0, retire_set: 1, cbusy: 0
+[info] 1659: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31151, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 1659: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 31151, addr: 0x13b2ee00, size: 512, tag_id: 1, instr_id: 1, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1659: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 31185, addr: 0x13b31200, size: 512, tag_id: 9, instr_id: 2, aix_port: 1, retire_set: 1, cbusy: 0
+[info] 1666: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31273, tag_id: 11, instr_id: 0, retire_set: 0
+[info] 1666: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 31273, addr: 0x10d0d600, size: 512, tag_id: 11, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1672: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31397, tag_id: 19, instr_id: 0, retire_set: 0
+[info] 1672: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 31397, addr: 0x13b31600, size: 512, tag_id: 19, instr_id: 4, aix_port: 0, retire_set: 1, cbusy: 0
+[info] 1672: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 31397, addr: 0x13b31600, size: 512, tag_id: 19, instr_id: 4, aix_port: 1, retire_set: 1, cbusy: 0
+[info] 1676: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31160, tag_id: 5, instr_id: 0, retire_set: 0
+[info] 1676: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 31160, addr: 0x13b2f000, size: 512, tag_id: 5, instr_id: 1, aix_port: 0, retire_set: 1, cbusy: 0
+[info] 1678: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 31160, addr: 0x13b2f000, size: 512, tag_id: 5, instr_id: 1, aix_port: 1, retire_set: 1, cbusy: 0
+[info] 1682: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31060, tag_id: 3, instr_id: 0, retire_set: 0
+[info] 1682: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 31060, addr: 0x10d0d600, size: 512, tag_id: 3, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1684: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 31397, addr: 0x13b31600, size: 512, tag_id: 19, instr_id: 4, aix_port: 1, retire_set: 1, cbusy: 0
+[info] 1689: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 31388, addr: 0x13b31400, size: 512, tag_id: 17, instr_id: 4, aix_port: 1, retire_set: 0, cbusy: 0
+[info] 1703: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 31151, addr: 0x13b2ee00, size: 512, tag_id: 1, instr_id: 1, aix_port: 1, retire_set: 0, cbusy: 0
+[info] 1718: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 31362, addr: 0x13b2f200, size: 512, tag_id: 13, instr_id: 3, aix_port: 1, retire_set: 0, cbusy: 0
+[info] 1731: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31176, tag_id: 7, instr_id: 0, retire_set: 0
+[info] 1731: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 31176, addr: 0x13b31000, size: 512, tag_id: 7, instr_id: 2, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1737: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 31388, addr: 0x13b31400, size: 512, tag_id: 17, instr_id: 4, aix_port: 1, retire_set: 0, cbusy: 0
+[info] 1743: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31160, tag_id: 5, instr_id: 0, retire_set: 0
+[info] 1743: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 31160, addr: 0x13b2f000, size: 512, tag_id: 5, instr_id: 1, aix_port: 0, retire_set: 1, cbusy: 0
+[info] 1744: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31371, tag_id: 15, instr_id: 0, retire_set: 0
+[info] 1744: recv_biu_data, tnx_cnt: 1, all_recved: 0, gid: 31371, addr: 0x13b2f400, size: 512, tag_id: 15, instr_id: 3, aix_port: 0, retire_set: 1, cbusy: 0
+[info] 1757: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31371, tag_id: 15, instr_id: 0, retire_set: 0
+[info] 1757: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 31371, addr: 0x13b2f400, size: 512, tag_id: 15, instr_id: 3, aix_port: 0, retire_set: 1, cbusy: 0
+[info] 1758: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31273, tag_id: 11, instr_id: 0, retire_set: 0
+[info] 1758: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 31273, addr: 0x10d0d600, size: 512, tag_id: 11, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1759: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31060, tag_id: 3, instr_id: 0, retire_set: 0
+[info] 1759: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 31060, addr: 0x10d0d600, size: 512, tag_id: 3, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1764: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31060, tag_id: 3, instr_id: 0, retire_set: 0
+[info] 1764: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 31060, addr: 0x10d0d600, size: 512, tag_id: 3, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1770: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 31176, addr: 0x13b31000, size: 512, tag_id: 7, instr_id: 2, aix_port: 1, retire_set: 0, cbusy: 0
+[info] 1771: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 31185, addr: 0x13b31200, size: 512, tag_id: 9, instr_id: 2, aix_port: 1, retire_set: 1, cbusy: 0
+[info] 1773: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31060, tag_id: 3, instr_id: 0, retire_set: 0
+[info] 1773: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 31060, addr: 0x10d0d600, size: 512, tag_id: 3, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1773: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 31151, addr: 0x13b2ee00, size: 512, tag_id: 1, instr_id: 1, aix_port: 1, retire_set: 0, cbusy: 0
+[info] 1776: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31362, tag_id: 13, instr_id: 0, retire_set: 0
+[info] 1776: recv_biu_data, tnx_cnt: 2, all_recved: 0, gid: 31362, addr: 0x13b2f200, size: 512, tag_id: 13, instr_id: 3, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1779: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 31371, addr: 0x13b2f400, size: 512, tag_id: 15, instr_id: 3, aix_port: 1, retire_set: 1, cbusy: 0
+[info] 1784: push_biu_data, port:mte1 addr: 0x13b2ee00, size: 512, tag_id: 1, instr_id: 1, retire_set: 0
+[info] 1791: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 31160, addr: 0x13b2f000, size: 512, tag_id: 5, instr_id: 1, aix_port: 1, retire_set: 1, cbusy: 0
+[info] 1793: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 31176, addr: 0x13b31000, size: 512, tag_id: 7, instr_id: 2, aix_port: 1, retire_set: 0, cbusy: 0
+[info] 1795: push_biu_data, port:icache1 addr: 0x10d0d600, size: 512, tag_id: 3, instr_id: 0, retire_set: 0
+[info] 1799: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31388, tag_id: 17, instr_id: 0, retire_set: 0
+[info] 1799: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 31388, addr: 0x13b31400, size: 512, tag_id: 17, instr_id: 4, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1801: push_biu_data, port:mte1 addr: 0x13b2f000, size: 512, tag_id: 5, instr_id: 1, retire_set: 1
+[info] 1802: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31273, tag_id: 11, instr_id: 0, retire_set: 0
+[info] 1802: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 31273, addr: 0x10d0d600, size: 512, tag_id: 11, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1804: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31176, tag_id: 7, instr_id: 0, retire_set: 0
+[info] 1804: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 31176, addr: 0x13b31000, size: 512, tag_id: 7, instr_id: 2, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1805: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31362, tag_id: 13, instr_id: 0, retire_set: 0
+[info] 1805: recv_biu_data, tnx_cnt: 3, all_recved: 0, gid: 31362, addr: 0x13b2f200, size: 512, tag_id: 13, instr_id: 3, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1808: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 31397, addr: 0x13b31600, size: 512, tag_id: 19, instr_id: 4, aix_port: 1, retire_set: 1, cbusy: 0
+[info] 1814: push_biu_data, port:mte1 addr: 0x13b31000, size: 512, tag_id: 7, instr_id: 2, retire_set: 0
+[info] 1815: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31185, tag_id: 9, instr_id: 0, retire_set: 0
+[info] 1815: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 31185, addr: 0x13b31200, size: 512, tag_id: 9, instr_id: 2, aix_port: 0, retire_set: 1, cbusy: 0
+[info] 1815: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 31362, addr: 0x13b2f200, size: 512, tag_id: 13, instr_id: 3, aix_port: 1, retire_set: 0, cbusy: 0
+[info] 1816: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 31273, tag_id: 11, instr_id: 0, retire_set: 0
+[info] 1816: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 31273, addr: 0x10d0d600, size: 512, tag_id: 11, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 1816: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 31388, addr: 0x13b31400, size: 512, tag_id: 17, instr_id: 4, aix_port: 1, retire_set: 0, cbusy: 0
+[info] 1817: push_biu_data, port:mte2 addr: 0x13b31600, size: 512, tag_id: 19, instr_id: 4, retire_set: 0
+[info] 1817: recv_biu_data, tnx_cnt: 4, all_recved: 1, gid: 31371, addr: 0x13b2f400, size: 512, tag_id: 15, instr_id: 3, aix_port: 1, retire_set: 1, cbusy: 0
+[info] 1818: send_rd_cmd, port: vicache0, instr_id: 0, retire_set: 0, addr: 0x10d0d900, size: 128, gid: 35150, tag_id: 1, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 1821: bdwt_acculator, tag_id: 1, size: 128
+[info] 1825: push_biu_data, port:mte1 addr: 0x13b31200, size: 512, tag_id: 9, instr_id: 2, retire_set: 1
+[info] 1828: push_biu_data, port:mte2 addr: 0x13b2f200, size: 512, tag_id: 13, instr_id: 3, retire_set: 0
+[info] 1832: push_biu_data, port:mte2 addr: 0x13b2f400, size: 512, tag_id: 15, instr_id: 3, retire_set: 1
+[info] 1836: push_biu_data, port:mte2 addr: 0x13b31400, size: 512, tag_id: 17, instr_id: 4, retire_set: 1
+[info] 1838: push_biu_data, port:icache2 addr: 0x10d0d600, size: 512, tag_id: 11, instr_id: 0, retire_set: 0
+[info] 1861: send_rd_cmd, port: vicache1, instr_id: 0, retire_set: 0, addr: 0x10d0d900, size: 128, gid: 35232, tag_id: 2, atomicLoad: 0, outof_order: 1, bandwith_cnt_: 0
+[info] 1864: bdwt_acculator, tag_id: 2, size: 128
+[info] 2244: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 35150, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 2244: recv_biu_data, tnx_cnt: 1, all_recved: 1, gid: 35150, addr: 0x10d0d900, size: 128, tag_id: 1, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 2250: push_biu_data, port:vicache0 addr: 0x10d0d900, size: 128, tag_id: 1, instr_id: 0, retire_set: 0
+[info] 2348: deintlv_recv_rd_cmd_rsp, tnx_cnt: 0, gid: 35232, tag_id: 2, instr_id: 0, retire_set: 0
+[info] 2348: recv_biu_data, tnx_cnt: 1, all_recved: 1, gid: 35232, addr: 0x10d0d900, size: 128, tag_id: 2, instr_id: 0, aix_port: 0, retire_set: 0, cbusy: 0
+[info] 2354: push_biu_data, port:vicache1 addr: 0x10d0d900, size: 128, tag_id: 2, instr_id: 0, retire_set: 0

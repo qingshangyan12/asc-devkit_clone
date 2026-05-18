@@ -1,0 +1,6 @@
+[info] [0000001737] 1737 get instr from idu success,instr pc:0x10d0dd1c
+[info] [0000001737] 1737 exec instr latency success, instr pc:0x10d0dd1c, latency:1, retire_time:1738.
+[info] [0000001737] 1737 exec instr to retire que success, instr pc:0x10d0dd1c
+[info] [0000001738] INSTR Retired. name=RV_SEND    id=4191   ssid=8        pc=0x10D0DD1C
+[info] [PERF] [0000001738] ASU instr_name RV_SEND instr_id 4191 PC 10d0dd1c recv 1737
+[info] ++++++++++++++++++++++core: 2, subcore: 1, start: 212, tick: 2192, kernelId: 0, blkID: 4, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

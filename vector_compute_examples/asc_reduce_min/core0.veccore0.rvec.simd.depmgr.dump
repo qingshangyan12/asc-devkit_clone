@@ -1,0 +1,179 @@
+[info] @1738 [RECORD INSTR]: instr.name=RV_VLDI instr.pc=0x10d0dd00 instr.idd=4200 #of of-instrs=1
+[info] @1738 [IFU_SREG_SCB]: name=RV_SMOVI pc=0x10d0dd04 id=4201, reg_idx=64
+[info] @1738 [RECORD INSTR]: instr.name=RV_SMOVI instr.pc=0x10d0dd04 instr.idd=4201 #of of-instrs=1
+[info] @1738 [RECORD INSTR]: instr.name=RV_PLT instr.pc=0x10d0dd08 instr.idd=4202 #of of-instrs=1
+[info] @1738 [IFU_SREG_SCB]: name=RV_SMOVI pc=0x10d0dd0c id=4203, reg_idx=64
+[info] @1738 [RECORD INSTR]: instr.name=RV_SMOVI instr.pc=0x10d0dd0c instr.idd=4203 #of of-instrs=1
+[info] @1738 [RECORD INSTR]: instr.name=RV_VCMIN instr.pc=0x10d0dd10 instr.idd=4204 #of of-instrs=1
+[info] @1738 [RECORD INSTR]: instr.name=RV_PLT instr.pc=0x10d0dd14 instr.idd=4205 #of of-instrs=1
+[info] @1739 [RECORD INSTR]: instr.name=RV_VSTI instr.pc=0x10d0dd18 instr.idd=4206 #of of-instrs=1
+[info] @1739 [RECORD INSTR]: instr.name=RV_SEND instr.pc=0x10d0dd1c instr.idd=4207 #of of-instrs=1
+[info] @1739 [RETIRE INSTR]: instr.name=RV_SMOVI instr.pc=0x10d0dd04 instr.id=4201 #of of-instrs=7
+[info] @1739 [IDU_SREG_SCB]: name=RV_SMOVI pc=0x10d0dd04 id=4201, reg_idx=64, latency= 1, valid_time=1740
+[info] @1740 [RETIRE INSTR]: instr.name=RV_SMOVI instr.pc=0x10d0dd0c instr.id=4203 #of of-instrs=6
+[info] @1740 [IDU_SREG_SCB]: name=RV_SMOVI pc=0x10d0dd0c id=4203, reg_idx=64, latency= 1, valid_time=1741
+[info] [0000001742] [LDU] record_unit_instr, name RV_VLDI, id 4200
+[info] [0000001743] [ASU] send done, name RV_SEND, id 4207
+[info] @1743 [RETIRE INSTR]: instr.name=RV_SEND instr.pc=0x10d0dd1c instr.id=4207 #of of-instrs=5
+[info] [0000001743] [EXU1] record_unit_instr, name RV_PLT, id 4202
+[info] [0000001743] [LDU] retire_unit_instr, name RV_VLDI, id 4200
+[info] [0000001743] [LDU] send can not go, with pipe latency 2
+[info] [0000001743] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001743] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001744] [EXU0] record_unit_instr, name RV_PLT, id 4205
+[info] [0000001744] [EXU0] send can not go, pending instr number:1
+[info] [0000001744] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001744] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001745] [EXU0] send can not go, pending instr number:1
+[info] [0000001745] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001745] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001746] [EXU0] send can not go, pending instr number:1
+[info] [0000001746] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001746] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001747] [EXU0] send can not go, pending instr number:1
+[info] [0000001747] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001747] [LDU] vf wait send, name RV_SEND, id 4207
+[info] @1748 [RETIRE INSTR]: instr.name=RV_PLT instr.pc=0x10d0dd08 instr.id=4202 #of of-instrs=4
+[info] [0000001748] [EXU1] retire_unit_instr, name RV_PLT, id 4202
+[info] [0000001748] [EXU0] record_unit_instr, name RV_VCMIN, id 4204
+[info] [0000001748] [EXU0] send can not go, pending instr number:2
+[info] [0000001748] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001748] [LDU] vf wait send, name RV_SEND, id 4207
+[info] @1749 [RETIRE INSTR]: instr.name=RV_PLT instr.pc=0x10d0dd14 instr.id=4205 #of of-instrs=3
+[info] [0000001749] [EXU0] retire_unit_instr, name RV_PLT, id 4205
+[info] [0000001749] [EXU0] send can not go, pending instr number:1
+[info] [0000001749] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001749] [LDU] vf wait send, name RV_SEND, id 4207
+[info] @1750 [RETIRE INSTR]: instr.name=RV_VLDI instr.pc=0x10d0dd00 instr.id=4200 #of of-instrs=2
+[info] [0000001750] [EXU0] send can not go, pending instr number:1
+[info] [0000001750] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001750] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001751] [EXU0] send can not go, pending instr number:1
+[info] [0000001751] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001751] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001752] [EXU0] send can not go, pending instr number:1
+[info] [0000001752] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001752] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001753] [EXU0] send can not go, pending instr number:1
+[info] [0000001753] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001753] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001754] [EXU0] send can not go, pending instr number:1
+[info] [0000001754] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001754] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001755] [EXU0] send can not go, pending instr number:1
+[info] [0000001755] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001755] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001756] [EXU0] send can not go, pending instr number:1
+[info] [0000001756] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001756] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001757] [EXU0] send can not go, pending instr number:1
+[info] [0000001757] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001757] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001758] [EXU0] send can not go, pending instr number:1
+[info] [0000001758] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001758] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001759] [EXU0] send can not go, pending instr number:1
+[info] [0000001759] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001759] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001760] [EXU0] send can not go, pending instr number:1
+[info] [0000001760] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001760] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001761] [EXU0] send can not go, pending instr number:1
+[info] [0000001761] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001761] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001762] [EXU0] send can not go, pending instr number:1
+[info] [0000001762] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001762] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001762] [STU] record_unit_instr, name RV_VSTI, id 4206
+[info] @1763 [RETIRE INSTR]: instr.name=RV_VCMIN instr.pc=0x10d0dd10 instr.id=4204 #of of-instrs=1
+[info] [0000001763] [EXU0] retire_unit_instr, name RV_VCMIN, id 4204
+[info] [0000001763] [STU] send can not go, pending instr number:1
+[info] [0000001763] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001763] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001764] [STU] send can not go, pending instr number:1
+[info] [0000001764] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001764] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001765] [STU] send can not go, pending instr number:1
+[info] [0000001765] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001765] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001766] [STU] send can not go, pending instr number:1
+[info] [0000001766] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001766] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001766] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001766] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001766] [STU] send can not go, with pipe latency 5
+[info] [0000001766] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001766] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001767] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001767] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001767] [STU] send can not go, pending instr number:1
+[info] [0000001767] [STU] send can not go, pending instr number:1
+[info] [0000001767] [STU] send can not go, pending instr number:1
+[info] [0000001767] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001767] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001767] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001767] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001767] [STU] send can not go, with pipe latency 5
+[info] [0000001768] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001768] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001768] [STU] send can not go, pending instr number:1
+[info] [0000001768] [STU] send can not go, pending instr number:1
+[info] [0000001768] [STU] send can not go, pending instr number:1
+[info] [0000001768] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001768] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001768] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001768] [LDU] vf wait send, name RV_SEND, id 4207
+[info] [0000001768] [STU] retire_unit_instr, name RV_VSTI, id 4206
+[info] [0000001768] [STU] send can not go, with pipe latency 5
+[info] [0000001769] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001769] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001769] send release
+[info] [0000001769] [EXU0] send done, name RV_SEND, id 4207
+[info] [0000001769] send release
+[info] [0000001769] [EXU1] send done, name RV_SEND, id 4207
+[info] [0000001769] send release
+[info] [0000001769] [LDU] send done, name RV_SEND, id 4207
+[info] [0000001769] [STU] vf wait send, name RV_SEND, id 4207
+[info] [0000001769] [STU] vf wait send, name RV_SEND, id 4207
+[info] [0000001769] [STU] vf wait send, name RV_SEND, id 4207
+[info] [0000001769] [STU] vf wait send, name RV_SEND, id 4207
+[info] [0000001769] [STU] send can not go, with pipe latency 5
+[info] @1770 [RETIRE INSTR]: instr.name=RV_VSTI instr.pc=0x10d0dd18 instr.id=4206 #of of-instrs=0
+[info] [0000001770] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001770] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001770] [STU] vf wait send, name RV_SEND, id 4207
+[info] [0000001770] [STU] vf wait send, name RV_SEND, id 4207
+[info] [0000001770] [STU] vf wait send, name RV_SEND, id 4207
+[info] [0000001770] [STU] vf wait send, name RV_SEND, id 4207
+[info] [0000001770] send release
+[info] [0000001770] [STU] send done, name RV_SEND, id 4207
+[info] [0000001771] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001771] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001771] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001771] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001771] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001771] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001772] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001772] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001772] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001772] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001772] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001772] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001773] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001773] [GSU_GA] send can not go, with pipe latency 9
+[info] [0000001773] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001773] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001773] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001773] [GSU_GA] vf wait send, name RV_SEND, id 4207
+[info] [0000001774] send release
+[info] [0000001774] [GSU_GA] send done, name RV_SEND, id 4207
+[info] [0000001774] send release
+[info] [0000001774] [GSU_SC] send done, name RV_SEND, id 4207
+[info] [0000001774] vf end by send, name RV_SEND, id 4207
+[info] [0000001774] vf end by send, name RV_SEND, id 4207
+[info] [0000001774] vf end by send, name RV_SEND, id 4207
+[info] [0000001774] vf end by send, name RV_SEND, id 4207
+[info] @1775 [RETIRE INSTR]: instr.name=RV_SEND instr.pc=0x10d0dd1c instr.id=4207 #of of-instrs=0
+[info] @1775 [RETIRE INSTR]: instr.name=RV_SEND instr.pc=0x10d0dd1c instr.id=4207 #of of-instrs=0
+[info] 1782 notify_vfend, vf completed!
+[info] ++++++++++++++++++++++core: 0, subcore: 1, start: 208, tick: 2306, kernelId: 0, blkID: 0, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

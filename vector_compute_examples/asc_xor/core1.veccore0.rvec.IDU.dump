@@ -1,0 +1,485 @@
+[info] @1833 set_next_vf_id, vf_id: 3
+[info] [PERF] [0000001841] IDU_DIS_BUF instr_name RV_VAG instr_id 6296 PC 10d0e000 DISPATCH_BUF_FULLNESS:1
+[info] [PERF] [0000001841] IDU_DIS_BUF instr_name RV_SMOV instr_id 6297 PC 10d0e004 DISPATCH_BUF_FULLNESS:2
+[info] 
+[info] @1841 IDU received instrs. received=2 total_num=2
+[info] @1841 Instrs Slot Before Dispatch:
+[info]           [0] instr, name=RV_VAG pipe=RVECLP, addr=10D0E000, id=6296, vf_id=3
+[info]           [1] instr, name=RV_SMOV pipe=RVECSU, addr=10D0E004, id=6297, vf_id=3
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] [PERF] [0000001841] IDU_DISPATCH instr_name RV_VAG instr_id 6296 PC 10d0e000 disp_win_left:1
+[info] @1841 instr blocked. instr.name=RV_SMOV instr.id=6297 instr.pc=10D0E004. Reason:VAG instr exclusive issue, slot:1
+[info] [PERF] [0000001841] IDU_BLOCK instr_name RV_SMOV instr_id 6297 PC 10d0e004 ldq:24 stq:0 shq:58 preg:32 vreg:68 REASON:VAG instr exclusive issue
+[info] @1841 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] instr, name=RV_SMOV pipe=RVECSU, addr=10D0E004, id=6297, vf_id=3
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1842 IDU received instrs. received=0 total_num=1
+[info] @1842 Instrs Slot Before Dispatch:
+[info]           [0] instr, name=RV_SMOV pipe=RVECSU, addr=10D0E004, id=6297, vf_id=3
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1842 instr send to ASU succeed: instr.name=RV_SMOV, , instr.id=6297, instr.pc=0x10D0E004, exu_ext=false isu=(ldq:24, stq:0, shq:58) ooo=(preg:32, vreg:68) iteration_info:0, vf_id:3
+[info] [PERF] [0000001842] IDU_DISPATCH instr_name RV_SMOV instr_id 6297 PC 10d0e004 disp_win_left:0
+[info] @1842 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] [PERF] [0000001843] IDU_DIS_BUF instr_name RV_VLD instr_id 6299 PC 10d0e00c DISPATCH_BUF_FULLNESS:1
+[info] [PERF] [0000001843] IDU_DIS_BUF instr_name RV_VLD instr_id 6300 PC 10d0e010 DISPATCH_BUF_FULLNESS:2
+[info] [PERF] [0000001843] IDU_DIS_BUF instr_name RV_PLT instr_id 6301 PC 10d0e014 DISPATCH_BUF_FULLNESS:3
+[info] [PERF] [0000001843] IDU_DIS_BUF instr_name RV_VXOR instr_id 6302 PC 10d0e018 DISPATCH_BUF_FULLNESS:4
+[info] [PERF] [0000001843] IDU_DIS_BUF instr_name RV_VST instr_id 6303 PC 10d0e01c DISPATCH_BUF_FULLNESS:5
+[info] 
+[info] @1843 IDU received instrs. received=5 total_num=5
+[info] @1843 Instrs Slot Before Dispatch:
+[info]           [0] instr, name=RV_VLD pipe=RVECLD, addr=10D0E00C, id=6299, vf_id=3
+[info]           [1] instr, name=RV_VLD pipe=RVECLD, addr=10D0E010, id=6300, vf_id=3
+[info]           [2] instr, name=RV_PLT pipe=RVECEX, addr=10D0E014, id=6301, vf_id=3
+[info]           [3] instr, name=RV_VXOR pipe=RVECEX, addr=10D0E018, id=6302, vf_id=3
+[info]           [4] instr, name=RV_VST pipe=RVECST, addr=10D0E01C, id=6303, vf_id=3
+[info]           [5] NULL
+[info] @1843 instr send to OOO: instr.name=RV_VLD, type.NORAML, instr.id=6299, instr.pc=0x10D0E00C, exu_ext=false isu=(ldq:24, stq:0, shq:58) ooo=(preg:32, vreg:68) iteration_info:1, vf_id:3
+[info] [PERF] [0000001843] IDU_DISPATCH instr_name RV_VLD instr_id 6299 PC 10d0e00c disp_win_left:4
+[info] @1843 instr send to OOO: instr.name=RV_VLD, type.NORAML, instr.id=6300, instr.pc=0x10D0E010, exu_ext=false isu=(ldq:23, stq:0, shq:58) ooo=(preg:32, vreg:67) iteration_info:1, vf_id:3
+[info] [PERF] [0000001843] IDU_DISPATCH instr_name RV_VLD instr_id 6300 PC 10d0e010 disp_win_left:3
+[info] @1843 instr send to OOO: instr.name=RV_PLT, type.B32, instr.id=6301, instr.pc=0x10D0E014, exu_ext=false isu=(ldq:22, stq:0, shq:58) ooo=(preg:32, vreg:66) iteration_info:1, vf_id:3
+[info] [PERF] [0000001843] IDU_DISPATCH instr_name RV_PLT instr_id 6301 PC 10d0e014 disp_win_left:2
+[info] @1843 instr send to OOO: instr.name=RV_VXOR, type.B32, instr.id=6302, instr.pc=0x10D0E018, exu_ext=false isu=(ldq:22, stq:0, shq:57) ooo=(preg:31, vreg:66) iteration_info:1, vf_id:3
+[info] [PERF] [0000001843] IDU_DISPATCH instr_name RV_VXOR instr_id 6302 PC 10d0e018 disp_win_left:1
+[info] @1843 instr send to OOO: instr.name=RV_VST, type.NORM_B32, instr.id=6303, instr.pc=0x10D0E01C, exu_ext=false isu=(ldq:22, stq:0, shq:56) ooo=(preg:31, vreg:65) iteration_info:1, vf_id:3
+[info] [PERF] [0000001843] IDU_DISPATCH instr_name RV_VST instr_id 6303 PC 10d0e01c disp_win_left:0
+[info] @1843 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] [PERF] [0000001844] IDU_DIS_BUF instr_name RV_VLD instr_id 6304 PC 10d0e00c DISPATCH_BUF_FULLNESS:1
+[info] [PERF] [0000001844] IDU_DIS_BUF instr_name RV_VLD instr_id 6305 PC 10d0e010 DISPATCH_BUF_FULLNESS:2
+[info] [PERF] [0000001844] IDU_DIS_BUF instr_name RV_PLT instr_id 6306 PC 10d0e014 DISPATCH_BUF_FULLNESS:3
+[info] [PERF] [0000001844] IDU_DIS_BUF instr_name RV_VXOR instr_id 6307 PC 10d0e018 DISPATCH_BUF_FULLNESS:4
+[info] [PERF] [0000001844] IDU_DIS_BUF instr_name RV_VST instr_id 6308 PC 10d0e01c DISPATCH_BUF_FULLNESS:5
+[info] [PERF] [0000001844] IDU_DIS_BUF instr_name RV_VLD instr_id 6309 PC 10d0e00c DISPATCH_BUF_FULLNESS:6
+[info] 
+[info] @1844 IDU received instrs. received=6 total_num=6
+[info] @1844 Instrs Slot Before Dispatch:
+[info]           [0] instr, name=RV_VLD pipe=RVECLD, addr=10D0E00C, id=6304, vf_id=3
+[info]           [1] instr, name=RV_VLD pipe=RVECLD, addr=10D0E010, id=6305, vf_id=3
+[info]           [2] instr, name=RV_PLT pipe=RVECEX, addr=10D0E014, id=6306, vf_id=3
+[info]           [3] instr, name=RV_VXOR pipe=RVECEX, addr=10D0E018, id=6307, vf_id=3
+[info]           [4] instr, name=RV_VST pipe=RVECST, addr=10D0E01C, id=6308, vf_id=3
+[info]           [5] instr, name=RV_VLD pipe=RVECLD, addr=10D0E00C, id=6309, vf_id=3
+[info] @1844 instr send to OOO: instr.name=RV_VLD, type.NORAML, instr.id=6304, instr.pc=0x10D0E00C, exu_ext=false isu=(ldq:22, stq:0, shq:55) ooo=(preg:31, vreg:65) iteration_info:2, vf_id:3
+[info] [PERF] [0000001844] IDU_DISPATCH instr_name RV_VLD instr_id 6304 PC 10d0e00c disp_win_left:5
+[info] @1844 instr send to OOO: instr.name=RV_VLD, type.NORAML, instr.id=6305, instr.pc=0x10D0E010, exu_ext=false isu=(ldq:21, stq:0, shq:55) ooo=(preg:31, vreg:64) iteration_info:2, vf_id:3
+[info] [PERF] [0000001844] IDU_DISPATCH instr_name RV_VLD instr_id 6305 PC 10d0e010 disp_win_left:4
+[info] @1844 instr send to OOO: instr.name=RV_PLT, type.B32, instr.id=6306, instr.pc=0x10D0E014, exu_ext=false isu=(ldq:20, stq:0, shq:55) ooo=(preg:31, vreg:63) iteration_info:2, vf_id:3
+[info] [PERF] [0000001844] IDU_DISPATCH instr_name RV_PLT instr_id 6306 PC 10d0e014 disp_win_left:3
+[info] @1844 instr send to OOO: instr.name=RV_VXOR, type.B32, instr.id=6307, instr.pc=0x10D0E018, exu_ext=false isu=(ldq:20, stq:0, shq:54) ooo=(preg:30, vreg:63) iteration_info:2, vf_id:3
+[info] [PERF] [0000001844] IDU_DISPATCH instr_name RV_VXOR instr_id 6307 PC 10d0e018 disp_win_left:2
+[info] @1844 instr send to OOO: instr.name=RV_VST, type.NORM_B32, instr.id=6308, instr.pc=0x10D0E01C, exu_ext=false isu=(ldq:20, stq:0, shq:53) ooo=(preg:30, vreg:62) iteration_info:2, vf_id:3
+[info] [PERF] [0000001844] IDU_DISPATCH instr_name RV_VST instr_id 6308 PC 10d0e01c disp_win_left:1
+[info] @1844 instr blocked. instr.name=RV_VLD instr.id=6309 instr.pc=10D0E00C. Reason:VEC dispatch number reached, slot:5
+[info] @1844 instr blocked. instr.name=RV_VLD instr.id=6309 instr.pc=10D0E00C. Reason:Vloop iteration change, slot:5
+[info] [PERF] [0000001844] IDU_BLOCK instr_name RV_VLD instr_id 6309 PC 10d0e00c ldq:20 stq:0 shq:52 preg:30 vreg:62 REASON:VEC dispatch number reached, Vloop iteration change
+[info] @1844 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] instr, name=RV_VLD pipe=RVECLD, addr=10D0E00C, id=6309, vf_id=3
+[info] [PERF] [0000001845] IDU_DIS_BUF instr_name RV_VLD instr_id 6310 PC 10d0e010 DISPATCH_BUF_FULLNESS:2
+[info] [PERF] [0000001845] IDU_DIS_BUF instr_name RV_PLT instr_id 6311 PC 10d0e014 DISPATCH_BUF_FULLNESS:3
+[info] [PERF] [0000001845] IDU_DIS_BUF instr_name RV_VXOR instr_id 6312 PC 10d0e018 DISPATCH_BUF_FULLNESS:4
+[info] [PERF] [0000001845] IDU_DIS_BUF instr_name RV_VST instr_id 6313 PC 10d0e01c DISPATCH_BUF_FULLNESS:5
+[info] [PERF] [0000001845] IDU_DIS_BUF instr_name RV_VLD instr_id 6314 PC 10d0e00c DISPATCH_BUF_FULLNESS:6
+[info] 
+[info] @1845 IDU received instrs. received=5 total_num=6
+[info] @1845 Instrs Slot Before Dispatch:
+[info]           [0] instr, name=RV_VLD pipe=RVECLD, addr=10D0E00C, id=6309, vf_id=3
+[info]           [1] instr, name=RV_VLD pipe=RVECLD, addr=10D0E010, id=6310, vf_id=3
+[info]           [2] instr, name=RV_PLT pipe=RVECEX, addr=10D0E014, id=6311, vf_id=3
+[info]           [3] instr, name=RV_VXOR pipe=RVECEX, addr=10D0E018, id=6312, vf_id=3
+[info]           [4] instr, name=RV_VST pipe=RVECST, addr=10D0E01C, id=6313, vf_id=3
+[info]           [5] instr, name=RV_VLD pipe=RVECLD, addr=10D0E00C, id=6314, vf_id=3
+[info] @1845 instr send to OOO: instr.name=RV_VLD, type.NORAML, instr.id=6309, instr.pc=0x10D0E00C, exu_ext=false isu=(ldq:20, stq:0, shq:52) ooo=(preg:30, vreg:62) iteration_info:3, vf_id:3
+[info] [PERF] [0000001845] IDU_DISPATCH instr_name RV_VLD instr_id 6309 PC 10d0e00c disp_win_left:5
+[info] @1845 instr send to OOO: instr.name=RV_VLD, type.NORAML, instr.id=6310, instr.pc=0x10D0E010, exu_ext=false isu=(ldq:19, stq:0, shq:52) ooo=(preg:30, vreg:61) iteration_info:3, vf_id:3
+[info] [PERF] [0000001845] IDU_DISPATCH instr_name RV_VLD instr_id 6310 PC 10d0e010 disp_win_left:4
+[info] @1845 instr send to OOO: instr.name=RV_PLT, type.B32, instr.id=6311, instr.pc=0x10D0E014, exu_ext=false isu=(ldq:18, stq:0, shq:52) ooo=(preg:30, vreg:60) iteration_info:3, vf_id:3
+[info] [PERF] [0000001845] IDU_DISPATCH instr_name RV_PLT instr_id 6311 PC 10d0e014 disp_win_left:3
+[info] @1845 instr send to OOO: instr.name=RV_VXOR, type.B32, instr.id=6312, instr.pc=0x10D0E018, exu_ext=false isu=(ldq:18, stq:0, shq:51) ooo=(preg:29, vreg:60) iteration_info:3, vf_id:3
+[info] [PERF] [0000001845] IDU_DISPATCH instr_name RV_VXOR instr_id 6312 PC 10d0e018 disp_win_left:2
+[info] @1845 instr send to OOO: instr.name=RV_VST, type.NORM_B32, instr.id=6313, instr.pc=0x10D0E01C, exu_ext=false isu=(ldq:18, stq:0, shq:50) ooo=(preg:29, vreg:59) iteration_info:3, vf_id:3
+[info] [PERF] [0000001845] IDU_DISPATCH instr_name RV_VST instr_id 6313 PC 10d0e01c disp_win_left:1
+[info] @1845 instr blocked. instr.name=RV_VLD instr.id=6314 instr.pc=10D0E00C. Reason:VEC dispatch number reached, slot:5
+[info] @1845 instr blocked. instr.name=RV_VLD instr.id=6314 instr.pc=10D0E00C. Reason:Vloop iteration change, slot:5
+[info] [PERF] [0000001845] IDU_BLOCK instr_name RV_VLD instr_id 6314 PC 10d0e00c ldq:18 stq:0 shq:49 preg:29 vreg:59 REASON:VEC dispatch number reached, Vloop iteration change
+[info] @1845 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] instr, name=RV_VLD pipe=RVECLD, addr=10D0E00C, id=6314, vf_id=3
+[info] [PERF] [0000001846] IDU_DIS_BUF instr_name RV_VLD instr_id 6315 PC 10d0e010 DISPATCH_BUF_FULLNESS:2
+[info] [PERF] [0000001846] IDU_DIS_BUF instr_name RV_PLT instr_id 6316 PC 10d0e014 DISPATCH_BUF_FULLNESS:3
+[info] [PERF] [0000001846] IDU_DIS_BUF instr_name RV_VXOR instr_id 6317 PC 10d0e018 DISPATCH_BUF_FULLNESS:4
+[info] [PERF] [0000001846] IDU_DIS_BUF instr_name RV_VST instr_id 6318 PC 10d0e01c DISPATCH_BUF_FULLNESS:5
+[info] 
+[info] @1846 IDU received instrs. received=4 total_num=5
+[info] @1846 Instrs Slot Before Dispatch:
+[info]           [0] instr, name=RV_VLD pipe=RVECLD, addr=10D0E00C, id=6314, vf_id=3
+[info]           [1] instr, name=RV_VLD pipe=RVECLD, addr=10D0E010, id=6315, vf_id=3
+[info]           [2] instr, name=RV_PLT pipe=RVECEX, addr=10D0E014, id=6316, vf_id=3
+[info]           [3] instr, name=RV_VXOR pipe=RVECEX, addr=10D0E018, id=6317, vf_id=3
+[info]           [4] instr, name=RV_VST pipe=RVECST, addr=10D0E01C, id=6318, vf_id=3
+[info]           [5] NULL
+[info] @1846 instr send to OOO: instr.name=RV_VLD, type.NORAML, instr.id=6314, instr.pc=0x10D0E00C, exu_ext=false isu=(ldq:18, stq:0, shq:49) ooo=(preg:29, vreg:59) iteration_info:4, vf_id:3
+[info] [PERF] [0000001846] IDU_DISPATCH instr_name RV_VLD instr_id 6314 PC 10d0e00c disp_win_left:4
+[info] @1846 instr send to OOO: instr.name=RV_VLD, type.NORAML, instr.id=6315, instr.pc=0x10D0E010, exu_ext=false isu=(ldq:17, stq:0, shq:49) ooo=(preg:29, vreg:58) iteration_info:4, vf_id:3
+[info] [PERF] [0000001846] IDU_DISPATCH instr_name RV_VLD instr_id 6315 PC 10d0e010 disp_win_left:3
+[info] @1846 instr send to OOO: instr.name=RV_PLT, type.B32, instr.id=6316, instr.pc=0x10D0E014, exu_ext=false isu=(ldq:16, stq:0, shq:49) ooo=(preg:29, vreg:57) iteration_info:4, vf_id:3
+[info] [PERF] [0000001846] IDU_DISPATCH instr_name RV_PLT instr_id 6316 PC 10d0e014 disp_win_left:2
+[info] @1846 instr send to OOO: instr.name=RV_VXOR, type.B32, instr.id=6317, instr.pc=0x10D0E018, exu_ext=false isu=(ldq:16, stq:0, shq:48) ooo=(preg:28, vreg:57) iteration_info:4, vf_id:3
+[info] [PERF] [0000001846] IDU_DISPATCH instr_name RV_VXOR instr_id 6317 PC 10d0e018 disp_win_left:1
+[info] @1846 instr send to OOO: instr.name=RV_VST, type.NORM_B32, instr.id=6318, instr.pc=0x10D0E01C, exu_ext=false isu=(ldq:16, stq:0, shq:47) ooo=(preg:28, vreg:56) iteration_info:4, vf_id:3
+[info] [PERF] [0000001846] IDU_DISPATCH instr_name RV_VST instr_id 6318 PC 10d0e01c disp_win_left:0
+[info] @1846 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1847 IDU received instrs. received=0 total_num=0
+[info] @1847 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1847 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1848 IDU received instrs. received=0 total_num=0
+[info] @1848 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1848 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] [PERF] [0000001849] IDU_DIS_BUF instr_name RV_SEND instr_id 6319 PC 10d0e020 DISPATCH_BUF_FULLNESS:1
+[info] 
+[info] @1849 IDU received instrs. received=1 total_num=1
+[info] @1849 Instrs Slot Before Dispatch:
+[info]           [0] instr, name=RV_SEND pipe=RVECSU, addr=10D0E020, id=6319, vf_id=3
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] [PERF] [0000001849] ISSUE.BAR_INSTR instr_name RV_SEND, instr_type , instr_id 6319, PC 10d0e020, PIPE RVECLD
+[info] [PERF] [0000001849] ISSUE.BAR_INSTR instr_name RV_SEND, instr_type , instr_id 6319, PC 10d0e020, PIPE RVECST
+[info] @1849 instr send to ASU succeed: instr.name=RV_SEND, , instr.id=6319, instr.pc=0x10D0E020, exu_ext=false isu=(ldq:15, stq:0, shq:48) ooo=(preg:28, vreg:56) iteration_info:0, vf_id:3
+[info] [PERF] [0000001849] ISSUE.BAR_INSTR instr_name RV_SEND, instr_type , instr_id 6319, PC 10d0e020, PIPE RVECSU
+[info] @1849 instr send to OOO: instr.name=RV_SEND, , instr.id=6319, instr.pc=0x10D0E020, exu_ext=false isu=(ldq:15, stq:0, shq:48) ooo=(preg:28, vreg:56) iteration_info:0, vf_id:3
+[info] [PERF] [0000001849] IDU_DISPATCH instr_name RV_SEND instr_id 6319 PC 10d0e020 disp_win_left:0
+[info] @1849 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1850 IDU received instrs. received=0 total_num=0
+[info] @1850 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1850 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1851 IDU received instrs. received=0 total_num=0
+[info] @1851 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1851 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1853 IDU received instrs. received=0 total_num=0
+[info] @1853 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1853 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1854 IDU received instrs. received=0 total_num=0
+[info] @1854 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1854 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1855 IDU received instrs. received=0 total_num=0
+[info] @1855 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1855 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1856 IDU received instrs. received=0 total_num=0
+[info] @1856 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1856 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1857 IDU received instrs. received=0 total_num=0
+[info] @1857 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1857 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1858 IDU received instrs. received=0 total_num=0
+[info] @1858 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1858 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1859 IDU received instrs. received=0 total_num=0
+[info] @1859 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1859 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1860 IDU received instrs. received=0 total_num=0
+[info] @1860 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1860 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1861 IDU received instrs. received=0 total_num=0
+[info] @1861 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1861 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1862 IDU received instrs. received=0 total_num=0
+[info] @1862 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1862 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1863 IDU received instrs. received=0 total_num=0
+[info] @1863 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1863 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1864 IDU received instrs. received=0 total_num=0
+[info] @1864 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1864 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1865 IDU received instrs. received=0 total_num=0
+[info] @1865 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1865 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] 
+[info] @1873 IDU received instrs. received=0 total_num=0
+[info] @1873 Instrs Slot Before Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1873 Instrs Slot After Dispatch:
+[info]           [0] NULL
+[info]           [1] NULL
+[info]           [2] NULL
+[info]           [3] NULL
+[info]           [4] NULL
+[info]           [5] NULL
+[info] @1880 release vf id: 3
+[info] @1880 before reset, ooo=(preg:31, vreg:66)
+[info] @1880 after reset, ooo=(preg:32, vreg:68)
+[info] ++++++++++++++++++++++core: 1, subcore: 1, start: 212, tick: 2394, kernelId: 0, blkID: 2, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

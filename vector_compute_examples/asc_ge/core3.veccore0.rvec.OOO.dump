@@ -1,0 +1,72 @@
+[info] 0 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 0 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] [PERF] [0000002263] OOO_RECV instr_name RV_VLDI instr_id 22857 PC 10d0d904
+[info] 2263 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 2263 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] [PERF] [0000002263] OOO_RECV instr_name RV_VLDI instr_id 22858 PC 10d0d908
+[info] [PERF] [0000002263] OOO_SEND instr_name RV_VLDI instr_id 22857 PC 10d0d904
+[info] [PERF] [0000002263] OOO_SEND instr_name RV_VLDI instr_id 22858 PC 10d0d908
+[info] [PERF] [0000002264] OOO_RECV instr_name RV_VLD instr_id 22866 PC 10d0d914
+[info] [PERF] [0000002264] OOO_RECV instr_name RV_VLD instr_id 22867 PC 10d0d918
+[info] [PERF] [0000002264] OOO_RECV instr_name RV_PLT instr_id 22868 PC 10d0d91c
+[info] [PERF] [0000002264] OOO_RECV instr_name RV_VCMP_GE instr_id 22869 PC 10d0d920
+[info] [PERF] [0000002264] OOO_RECV instr_name RV_VSEL instr_id 22870 PC 10d0d924
+[info] [PERF] [0000002264] OOO_SEND instr_name RV_VLD instr_id 22866 PC 10d0d914
+[info] [PERF] [0000002264] OOO_SEND instr_name RV_VLD instr_id 22867 PC 10d0d918
+[info] [PERF] [0000002264] OOO_SEND instr_name RV_PLT instr_id 22868 PC 10d0d91c
+[info] [PERF] [0000002264] OOO_SEND instr_name RV_VCMP_GE instr_id 22869 PC 10d0d920
+[info] [PERF] [0000002264] OOO_SEND instr_name RV_VSEL instr_id 22870 PC 10d0d924
+[info] [PERF] [0000002265] OOO_RECV instr_name RV_VST instr_id 22871 PC 10d0d928
+[info] [PERF] [0000002265] OOO_RECV instr_name RV_VLD instr_id 22872 PC 10d0d914
+[info] [PERF] [0000002265] OOO_RECV instr_name RV_VLD instr_id 22873 PC 10d0d918
+[info] [PERF] [0000002265] OOO_RECV instr_name RV_PLT instr_id 22874 PC 10d0d91c
+[info] [PERF] [0000002265] OOO_RECV instr_name RV_VCMP_GE instr_id 22875 PC 10d0d920
+[info] [PERF] [0000002265] OOO_SEND instr_name RV_VST instr_id 22871 PC 10d0d928
+[info] [PERF] [0000002265] OOO_SEND instr_name RV_VLD instr_id 22872 PC 10d0d914
+[info] [PERF] [0000002265] OOO_SEND instr_name RV_VLD instr_id 22873 PC 10d0d918
+[info] [PERF] [0000002265] OOO_SEND instr_name RV_PLT instr_id 22874 PC 10d0d91c
+[info] [PERF] [0000002265] OOO_SEND instr_name RV_VCMP_GE instr_id 22875 PC 10d0d920
+[info] [PERF] [0000002266] OOO_RECV instr_name RV_VSEL instr_id 22876 PC 10d0d924
+[info] [PERF] [0000002266] OOO_RECV instr_name RV_VST instr_id 22877 PC 10d0d928
+[info] [PERF] [0000002266] OOO_RECV instr_name RV_VLD instr_id 22884 PC 10d0d914
+[info] [PERF] [0000002266] OOO_RECV instr_name RV_VLD instr_id 22885 PC 10d0d918
+[info] [PERF] [0000002266] OOO_RECV instr_name RV_PLT instr_id 22886 PC 10d0d91c
+[info] [PERF] [0000002266] OOO_SEND instr_name RV_VSEL instr_id 22876 PC 10d0d924
+[info] [PERF] [0000002266] OOO_SEND instr_name RV_VST instr_id 22877 PC 10d0d928
+[info] [PERF] [0000002266] OOO_SEND instr_name RV_VLD instr_id 22884 PC 10d0d914
+[info] [PERF] [0000002266] OOO_SEND instr_name RV_VLD instr_id 22885 PC 10d0d918
+[info] [PERF] [0000002266] OOO_SEND instr_name RV_PLT instr_id 22886 PC 10d0d91c
+[info] [PERF] [0000002267] OOO_RECV instr_name RV_VCMP_GE instr_id 22887 PC 10d0d920
+[info] [PERF] [0000002267] OOO_RECV instr_name RV_VSEL instr_id 22888 PC 10d0d924
+[info] [PERF] [0000002267] OOO_RECV instr_name RV_VST instr_id 22896 PC 10d0d928
+[info] [PERF] [0000002267] OOO_RECV instr_name RV_VLD instr_id 22897 PC 10d0d914
+[info] [PERF] [0000002267] OOO_RECV instr_name RV_VLD instr_id 22898 PC 10d0d918
+[info] [PERF] [0000002267] OOO_SEND instr_name RV_VCMP_GE instr_id 22887 PC 10d0d920
+[info] [PERF] [0000002267] OOO_SEND instr_name RV_VSEL instr_id 22888 PC 10d0d924
+[info] [PERF] [0000002267] OOO_SEND instr_name RV_VST instr_id 22896 PC 10d0d928
+[info] [PERF] [0000002267] OOO_SEND instr_name RV_VLD instr_id 22897 PC 10d0d914
+[info] [PERF] [0000002267] OOO_SEND instr_name RV_VLD instr_id 22898 PC 10d0d918
+[info] [PERF] [0000002268] OOO_RECV instr_name RV_PLT instr_id 22899 PC 10d0d91c
+[info] [PERF] [0000002268] OOO_RECV instr_name RV_VCMP_GE instr_id 22900 PC 10d0d920
+[info] [PERF] [0000002268] OOO_RECV instr_name RV_VSEL instr_id 22908 PC 10d0d924
+[info] [PERF] [0000002268] OOO_RECV instr_name RV_VST instr_id 22909 PC 10d0d928
+[info] [PERF] [0000002268] OOO_SEND instr_name RV_PLT instr_id 22899 PC 10d0d91c
+[info] [PERF] [0000002268] OOO_SEND instr_name RV_VCMP_GE instr_id 22900 PC 10d0d920
+[info] [PERF] [0000002268] OOO_SEND instr_name RV_VSEL instr_id 22908 PC 10d0d924
+[info] [PERF] [0000002268] OOO_SEND instr_name RV_VST instr_id 22909 PC 10d0d928
+[info] [PERF] [0000002270] OOO_RECV instr_name RV_SEND instr_id 22918 PC 10d0d92c
+[info] [PERF] [0000002270] OOO_RECV instr_name RV_SEND instr_id 22918 PC 10d0d92c
+[info] [PERF] [0000002270] OOO_SEND instr_name RV_SEND instr_id 22918 PC 10d0d92c
+[info] [PERF] [0000002270] OOO_SEND instr_name RV_SEND instr_id 22918 PC 10d0d92c
+[info] 2277 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:2) preg avail num:24 vreg avail num:56
+[info] 2278 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:2) preg avail num:24 vreg avail num:58
+[info] 2279 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:2) preg avail num:25 vreg avail num:60
+[info] 2280 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:0) preg avail num:26 vreg avail num:60
+[info] 2281 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:0) preg avail num:27 vreg avail num:60
+[info] 2282 send_stat_to_idu, ooo_stat=(preg freed num:0, vreg freed num:1) preg avail num:27 vreg avail num:61
+[info] 2283 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:1) preg avail num:28 vreg avail num:62
+[info] 2284 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:1) preg avail num:29 vreg avail num:63
+[info] 2285 send_stat_to_idu, ooo_stat=(preg freed num:1, vreg freed num:1) preg avail num:30 vreg avail num:64
+[info] 2304 [REG_FREE_BUF.RESET], reg type:V, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] 2304 [REG_FREE_BUF.RESET], reg type:P, reg_free_buf_size:15, reg_cycle_free_num:5
+[info] ++++++++++++++++++++++core: 3, subcore: 1, start: 216, tick: 2861, kernelId: 0, blkID: 6, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.

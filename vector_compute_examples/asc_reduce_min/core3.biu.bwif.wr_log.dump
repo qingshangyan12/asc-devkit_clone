@@ -1,0 +1,6 @@
+[info] [0000002216] MOV_SRC_TO_DST_ALIGNv2, pc: 0x10d0d770, id: 4156
+[info] Address 13b2d8e0 = [bf3ae148]	Address 13b2d8e4 = [00000000]	Address 13b2d8e8 = [00000000]	Address 13b2d8ec = [00000000]	
+       Address 13b2d8f0 = [00000000]	Address 13b2d8f4 = [00000000]	Address 13b2d8f8 = [00000000]	Address 13b2d8fc = [00000000]	
+[info] [0000002367] MOV_SRC_TO_DST_ALIGNv2, pc: 0x10d0d770, id: 4132
+[info] Address 13b2d8c0 = [bf23d70a]	Address 13b2d8c4 = [00000000]	Address 13b2d8c8 = [00000000]	Address 13b2d8cc = [00000000]	
+       Address 13b2d8d0 = [00000000]	Address 13b2d8d4 = [00000000]	Address 13b2d8d8 = [00000000]	Address 13b2d8dc = [00000000]	

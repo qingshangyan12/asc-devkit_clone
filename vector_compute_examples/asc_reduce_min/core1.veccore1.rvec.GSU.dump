@@ -1,0 +1,25 @@
+[info] [00001650] recv_gsu_instr master_id: gather, instr_id: 4167
+[info] [PERF] [0000001650] GSU_RECV instr_name RV_SEND instr_id 4167 PC 10d0dd1c
+[info] [00001650] recv_gsu_instr master_id: scatter, instr_id: 4167
+[info] [PERF] [0000001650] GSU_RECV instr_name RV_SEND instr_id 4167 PC 10d0dd1c
+[info] [PERF] [0000001650] [STALL.SEND] [GSU_GA], instr_id: 4167
+[info] [PERF] [0000001650] [STALL.SEND] [GSU_SC], instr_id: 4167
+[info] [PERF] [0000001651] [STALL.SEND] [GSU_GA], instr_id: 4167
+[info] [PERF] [0000001651] [STALL.SEND] [GSU_SC], instr_id: 4167
+[info] [PERF] [0000001652] [STALL.SEND] [GSU_GA], instr_id: 4167
+[info] [PERF] [0000001652] [STALL.SEND] [GSU_SC], instr_id: 4167
+[info] [PERF] [0000001653] [STALL.SEND] [GSU_GA], instr_id: 4167
+[info] [PERF] [0000001653] [STALL.SEND] [GSU_SC], instr_id: 4167
+[info] [PERF] [0000001654] [STALL.SEND] [GSU_GA], instr_id: 4167
+[info] [PERF] [0000001654] [STALL.SEND] [GSU_SC], instr_id: 4167
+[info] [PERF] [0000001655] [STALL.SEND] [GSU_GA], instr_id: 4167
+[info] [PERF] [0000001655] [STALL.SEND] [GSU_SC], instr_id: 4167
+[info] [PERF] [0000001656] [STALL.SEND] [GSU_GA], instr_id: 4167
+[info] [PERF] [0000001656] [STALL.SEND] [GSU_SC], instr_id: 4167
+[info] [PERF] [0000001657] [STALL.SEND] [GSU_GA], instr_id: 4167
+[info] [PERF] [0000001657] [STALL.SEND] [GSU_SC], instr_id: 4167
+[info] [PERF] [0000001658] [GO.SEND] [GSU_GA], instr_id: 4167
+[info] [PERF] [0000001658] [GO.SEND] [GSU_SC], instr_id: 4167
+[info] [PERF] [0000001659] GSU_RETIRE instr_name RV_SEND instr_id 4167 PC 10d0dd1c
+[info] [PERF] [0000001659] GSU_RETIRE instr_name RV_SEND instr_id 4167 PC 10d0dd1c
+[info] ++++++++++++++++++++++core: 1, subcore: 2, start: 211, tick: 2151, kernelId: 0, blkID: 3, blkDim: 8, rtsqId: 1, streamId: 0, taskId: 0, subtaskId: 0, threadId: 0, done++++++++++++++++++++++.
