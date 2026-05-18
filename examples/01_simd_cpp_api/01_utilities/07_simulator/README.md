@@ -23,7 +23,7 @@
 ```
 
 ## 算子描述
-  MatmulLeakyRelu算子通过将矩阵乘加（Matmul）与LeakyRelu激活函数计算实现，具体功能描述可参考[MatmulLeakyRelu算子详情](../../00_introduction/03_fusion_operation/matmul_leakyrelu/README.md)章节。
+  MatmulLeakyRelu算子通过将矩阵乘加（Matmul）与LeakyRelu激活函数计算实现，具体功能描述可参考[MatmulLeakyRelu算子详情](../../00_introduction/03_fusion_operation/matmul_leakyrelu_basic_api/README.md)章节。
 
 
 ## 编译运行
@@ -60,7 +60,7 @@
     | 选项 | 说明 |
     |------|------|
     | `CMAKE_ASC_RUN_MODE` | 指定为`sim`, 开启NPU仿真模式 |
-    | `CMAKE_ASC_ARCHITECTURES` | 指定NPU架构版本号，CMake会根据该值配置对应的CPU调试依赖库。<br>`dav-2201` 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，`dav-3510` 对应 Ascend 950PR/Ascend 950DT |
+    | `CMAKE_ASC_ARCHITECTURES` | 指定NPU架构版本号。<br>`dav-2201` 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，`dav-3510` 对应 Ascend 950PR/Ascend 950DT |
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
