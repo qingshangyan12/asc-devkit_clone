@@ -10,30 +10,36 @@
 #include "quantization/ascend_dequant.h"
 
 __aicore__ void TestAscendDequant0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<int32_t> srcTensor;
+    AscendC::LocalTensor<float> deqScale;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::AscendDequant<half>(dstTensor, srcTensor, deqScale, sharedTmpBuffer, params);
+    AscendC::DequantParams params;
+    AscendC::AscendDequant<float, float>(dstTensor, srcTensor, deqScale, sharedTmpBuffer, params);
 }
 
 __aicore__ void TestAscendDequant1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::AscendDequant<half>(dstTensor, srcTensor, deqScale, params);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<int32_t> srcTensor;
+    AscendC::LocalTensor<float> deqScale;
+    AscendC::DequantParams params;
+    AscendC::AscendDequant<float, float>(dstTensor, srcTensor, deqScale, params);
 }
 
 __aicore__ void TestAscendDequant2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<int32_t> srcTensor;
+    AscendC::LocalTensor<float> deqScale;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::AscendDequant<half>(dstTensor, srcTensor, deqScale, sharedTmpBuffer, calCount);
+    AscendC::AscendDequant<float, float>(dstTensor, srcTensor, deqScale, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestAscendDequant3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<int32_t> srcTensor;
+    AscendC::LocalTensor<float> deqScale;
     uint32_t calCount = 0;
-    AscendC::AscendDequant<half>(dstTensor, srcTensor, deqScale, calCount);
+    AscendC::AscendDequant<float, float>(dstTensor, srcTensor, deqScale, calCount);
 }
 

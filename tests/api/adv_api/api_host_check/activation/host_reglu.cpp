@@ -10,19 +10,19 @@
 #include "activation/reglu.h"
 
 __aicore__ void TestReGlu0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor0;
-    AscendC::LocalTensor<half> srcTensor1;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor0;
+    AscendC::LocalTensor<float> srcTensor1;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::ReGlu<half>(dstTensor, srcTensor0, srcTensor1, sharedTmpBuffer, calCount);
+    AscendC::ReGlu<float>(dstTensor, srcTensor0, srcTensor1, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestReGlu1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor0;
-    AscendC::LocalTensor<half> srcTensor1;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor0;
+    AscendC::LocalTensor<float> srcTensor1;
     uint32_t calCount = 0;
-    AscendC::ReGlu<half>(dstTensor, srcTensor0, srcTensor1, calCount);
+    AscendC::ReGlu<float>(dstTensor, srcTensor0, srcTensor1, calCount);
 }
 

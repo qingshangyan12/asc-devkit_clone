@@ -11,97 +11,97 @@
 #include "math/power.h"
 
 __aicore__ void TestPower0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> expTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> expTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Power<half>(dstTensor, srcTensor, expTensor, sharedTmpBuffer, calCount);
+    AscendC::Power<float>(dstTensor, srcTensor, expTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestPower1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> expTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> expTensor;
     uint32_t calCount = 0;
-    AscendC::Power<half>(dstTensor, srcTensor, expTensor, calCount);
+    AscendC::Power<float>(dstTensor, srcTensor, expTensor, calCount);
 }
 
 __aicore__ void TestPower2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> expTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> expTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Power<half>(dstTensor, srcTensor, expTensor, sharedTmpBuffer);
+    AscendC::Power<float>(dstTensor, srcTensor, expTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestPower3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> expTensor;
-    AscendC::Power<half>(dstTensor, srcTensor, expTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> expTensor;
+    AscendC::Power<float>(dstTensor, srcTensor, expTensor);
 }
 
 __aicore__ void TestPower4() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    half expValue;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    float expValue;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Power<half>(dstTensor, srcTensor, expValue, sharedTmpBuffer, calCount);
+    AscendC::Power<float>(dstTensor, srcTensor, expValue, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestPower5() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    half expValue;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    float expValue;
     uint32_t calCount = 0;
-    AscendC::Power<half>(dstTensor, srcTensor, expValue, calCount);
+    AscendC::Power<float>(dstTensor, srcTensor, expValue, calCount);
 }
 
 __aicore__ void TestPower6() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    half expValue;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    float expValue;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Power<half>(dstTensor, srcTensor, expValue, sharedTmpBuffer);
+    AscendC::Power<float>(dstTensor, srcTensor, expValue, sharedTmpBuffer);
 }
 
 __aicore__ void TestPower7() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    half expValue;
-    AscendC::Power<half>(dstTensor, srcTensor, expValue);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    float expValue;
+    AscendC::Power<float>(dstTensor, srcTensor, expValue);
 }
 
 __aicore__ void TestPower8() {
-    AscendC::LocalTensor<half> dstTensor;
-    half srcValue;
-    AscendC::LocalTensor<half> expTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    float srcValue;
+    AscendC::LocalTensor<float> expTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Power<half>(dstTensor, srcValue, expTensor, sharedTmpBuffer, calCount);
+    AscendC::Power<float>(dstTensor, srcValue, expTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestPower9() {
-    AscendC::LocalTensor<half> dstTensor;
-    half srcValue;
-    AscendC::LocalTensor<half> expTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    float srcValue;
+    AscendC::LocalTensor<float> expTensor;
     uint32_t calCount = 0;
-    AscendC::Power<half>(dstTensor, srcValue, expTensor, calCount);
+    AscendC::Power<float>(dstTensor, srcValue, expTensor, calCount);
 }
 
 __aicore__ void TestPower10() {
-    AscendC::LocalTensor<half> dstTensor;
-    half srcValue;
-    AscendC::LocalTensor<half> expTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    float srcValue;
+    AscendC::LocalTensor<float> expTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Power<half>(dstTensor, srcValue, expTensor, sharedTmpBuffer);
+    AscendC::Power<float>(dstTensor, srcValue, expTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestPower11() {
-    AscendC::LocalTensor<half> dstTensor;
-    half srcValue;
-    AscendC::LocalTensor<half> expTensor;
-    AscendC::Power<half>(dstTensor, srcValue, expTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    float srcValue;
+    AscendC::LocalTensor<float> expTensor;
+    AscendC::Power<float>(dstTensor, srcValue, expTensor);
 }

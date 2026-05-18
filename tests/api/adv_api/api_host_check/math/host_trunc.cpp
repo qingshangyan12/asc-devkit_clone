@@ -10,30 +10,30 @@
 #include "math/trunc.h"
 
 __aicore__ void TestTrunc0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Trunc<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Trunc<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestTrunc1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Trunc<half>(dstTensor, srcTensor, calCount);
+    AscendC::Trunc<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestTrunc2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Trunc<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Trunc<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestTrunc3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Trunc<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Trunc<float>(dstTensor, srcTensor);
 }
 

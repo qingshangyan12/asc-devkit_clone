@@ -11,14 +11,31 @@
 
 __aicore__ void TestSoftmaxFlashV30() {
     AscendC::LocalTensor<half> dstTensor;
+    AscendC::LocalTensor<float> meanTensor;
+    AscendC::LocalTensor<float> expSumTensor;
+    AscendC::LocalTensor<float> maxTensor;
     AscendC::LocalTensor<half> srcTensor;
-    AscendC::SoftmaxFlashV3<half>(dstTensor, meanTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inMeanTensor, inExpSumTensor, inMaxTensor, tiling, params);
+    AscendC::LocalTensor<half> expMaxTensor;
+    AscendC::LocalTensor<float> inMeanTensor;
+    AscendC::LocalTensor<float> inExpSumTensor;
+    AscendC::LocalTensor<float> inMaxTensor;
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SoftMaxParams params;
+    AscendC::SoftmaxFlashV3<half, float>(dstTensor, meanTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inMeanTensor, inExpSumTensor, inMaxTensor, tiling, params);
 }
 
 __aicore__ void TestSoftmaxFlashV31() {
     AscendC::LocalTensor<half> dstTensor;
+    AscendC::LocalTensor<float> meanTensor;
+    AscendC::LocalTensor<float> expSumTensor;
+    AscendC::LocalTensor<float> maxTensor;
     AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<half> expMaxTensor;
+    AscendC::LocalTensor<float> inMeanTensor;
+    AscendC::LocalTensor<float> inExpSumTensor;
+    AscendC::LocalTensor<float> inMaxTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::SoftmaxFlashV3<half>(dstTensor, meanTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inMeanTensor, inExpSumTensor, inMaxTensor, sharedTmpBuffer, tiling, params);
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SoftMaxParams params;
+    AscendC::SoftmaxFlashV3<half, float>(dstTensor, meanTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inMeanTensor, inExpSumTensor, inMaxTensor, sharedTmpBuffer, tiling, params);
 }
-

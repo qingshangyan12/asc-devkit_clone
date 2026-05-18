@@ -10,30 +10,30 @@
 #include "math/sign.h"
 
 __aicore__ void TestSign0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Sign<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Sign<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestSign1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Sign<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Sign<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestSign2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Sign<half>(dstTensor, srcTensor, calCount);
+    AscendC::Sign<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestSign3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Sign<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Sign<float>(dstTensor, srcTensor);
 }
 

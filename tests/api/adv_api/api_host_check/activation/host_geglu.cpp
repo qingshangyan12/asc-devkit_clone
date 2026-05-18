@@ -10,38 +10,38 @@
 #include "activation/geglu.h"
 
 __aicore__ void TestGeGLU0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::GeGLU<half>(dstTensor, srcTensor0, srcTensor1, sharedTmpBuffer, calCount);
+    AscendC::GeGLU<float>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestGeGLU1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
     uint32_t calCount = 0;
-    AscendC::GeGLU<half>(dstTensor, srcTensor0, srcTensor1, calCount);
+    AscendC::GeGLU<float>(dstTensor, src0Tensor, src1Tensor, calCount);
 }
 
 __aicore__ void TestGeGLU2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::GeGLU<half>(dstTensor, srcTensor0, srcTensor1, sharedTmpBuffer);
+    AscendC::GeGLU<float>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestGeGLU3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
-    AscendC::GeGLU<half>(dstTensor, srcTensor0, srcTensor1);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
+    AscendC::GeGLU<float>(dstTensor, src0Tensor, src1Tensor);
 }
 

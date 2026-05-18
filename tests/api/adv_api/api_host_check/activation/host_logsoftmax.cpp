@@ -10,9 +10,12 @@
 #include "activation/logsoftmax.h"
 
 __aicore__ void TestLogSoftMax0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> sumTensor;
+    AscendC::LocalTensor<float> maxTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::LogSoftMax<half>(dst, sum, max, src, sharedTmpBuffer, tiling);
+    AscendC::tiling::LogSoftMaxTiling tiling;
+    AscendC::LogSoftMax<float>(dstTensor, sumTensor, maxTensor, srcTensor, sharedTmpBuffer, tiling);
 }
 

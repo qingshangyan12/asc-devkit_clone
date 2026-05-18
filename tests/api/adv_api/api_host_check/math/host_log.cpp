@@ -11,55 +11,55 @@
 #include "math/log.h"
 
 __aicore__ void TestLog0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Log<half>(dstTensor, srcTensor, calCount);
+    AscendC::Log<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestLog1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Log<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Log<float>(dstTensor, srcTensor);
 }
 
 __aicore__ void TestLog2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Log2<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Log2<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestLog3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Log2<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Log2<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestLog4() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Log2<half>(dstTensor, srcTensor, calCount);
+    AscendC::Log2<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestLog5() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Log2<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Log2<float>(dstTensor, srcTensor);
 }
 
 __aicore__ void TestLog6() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Log10<half>(dstTensor, srcTensor, calCount);
+    AscendC::Log10<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestLog7() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Log10<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Log10<float>(dstTensor, srcTensor);
 }

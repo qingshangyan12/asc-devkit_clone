@@ -10,9 +10,9 @@
 #include "activation/silu.h"
 
 __aicore__ void TestSilu0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Silu<half>(dstLocal, srcLocal, dataSize);
+    AscendC::Silu<float>(dstTensor, srcTensor, calCount);
 }
 

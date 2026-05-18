@@ -10,30 +10,30 @@
 #include "math/asinh.h"
 
 __aicore__ void TestAsinh0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Asinh<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Asinh<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestAsinh1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Asinh<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Asinh<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestAsinh2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Asinh<half>(dstTensor, srcTensor, calCount);
+    AscendC::Asinh<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestAsinh3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Asinh<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Asinh<float>(dstTensor, srcTensor);
 }
 

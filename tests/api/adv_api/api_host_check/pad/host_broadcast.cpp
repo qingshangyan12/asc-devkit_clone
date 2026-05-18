@@ -10,15 +10,15 @@
 #include "pad/broadcast.h"
 
 __aicore__ void TestBroadcast0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Broadcast<half>(dstLocal, srcLocal, dstShape, srcShape, sharedTmpBuffer);
+    AscendC::Broadcast<float>(dstLocal, srcLocal, dstShape, srcShape, sharedTmpBuffer);
 }
 
 __aicore__ void TestBroadcast1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Broadcast<half>(dstLocal, srcLocal, dstShape, srcShape);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Broadcast<float>(dstLocal, srcLocal, dstShape, srcShape);
 }
 

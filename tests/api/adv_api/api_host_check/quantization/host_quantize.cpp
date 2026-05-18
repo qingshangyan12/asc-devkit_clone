@@ -10,15 +10,15 @@
 #include "quantization/quantize.h"
 
 __aicore__ void TestQuantize0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Quantize<half>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
+    AscendC::Quantize<float>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
 }
 
 __aicore__ void TestQuantize1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Quantize<half>(dstTensor, srcTensor, scale, offset, params);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Quantize<float>(dstTensor, srcTensor, scale, offset, params);
 }
 

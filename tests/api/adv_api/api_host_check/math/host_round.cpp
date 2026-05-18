@@ -10,17 +10,17 @@
 #include "math/round.h"
 
 __aicore__ void TestRound0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Round<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Round<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestRound1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Round<half>(dstTensor, srcTensor, calCount);
+    AscendC::Round<float>(dstTensor, srcTensor, calCount);
 }
 

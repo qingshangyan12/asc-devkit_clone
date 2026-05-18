@@ -10,17 +10,17 @@
 #include "math/lgamma.h"
 
 __aicore__ void TestLgamma0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Lgamma<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Lgamma<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestLgamma1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Lgamma<half>(dstTensor, srcTensor, calCount);
+    AscendC::Lgamma<float>(dstTensor, srcTensor, calCount);
 }
 

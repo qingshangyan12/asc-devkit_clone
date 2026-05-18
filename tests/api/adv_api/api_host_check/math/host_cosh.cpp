@@ -10,30 +10,30 @@
 #include "math/cosh.h"
 
 __aicore__ void TestCosh0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Cosh<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Cosh<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestCosh1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Cosh<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Cosh<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestCosh2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Cosh<half>(dstTensor, srcTensor, calCount);
+    AscendC::Cosh<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestCosh3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Cosh<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Cosh<float>(dstTensor, srcTensor);
 }
 

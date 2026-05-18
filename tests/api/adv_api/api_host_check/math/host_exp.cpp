@@ -11,16 +11,16 @@
 #include "math/exp.h"
 
 __aicore__ void TestExp0() {
-    AscendC::LocalTensor<half> dstLocal;
-    AscendC::LocalTensor<half> srcLocal;
+    AscendC::LocalTensor<float> dstLocal;
+    AscendC::LocalTensor<float> srcLocal;
     uint32_t calCount = 0;
-    AscendC::Exp<half, 0>(dstLocal, srcLocal, calCount);
+    AscendC::Exp<float, 0>(dstLocal, srcLocal, calCount);
 }
 
 __aicore__ void TestExp1() {
-    AscendC::LocalTensor<half> dstLocal;
-    AscendC::LocalTensor<half> srcLocal;
+    AscendC::LocalTensor<float> dstLocal;
+    AscendC::LocalTensor<float> srcLocal;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Exp<half, 0>(dstLocal, srcLocal, sharedTmpBuffer, calCount);
+    AscendC::Exp<float, 0>(dstLocal, srcLocal, sharedTmpBuffer, calCount);
 }

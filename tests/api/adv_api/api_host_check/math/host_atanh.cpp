@@ -10,30 +10,30 @@
 #include "math/atanh.h"
 
 __aicore__ void TestAtanh0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Atanh<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Atanh<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestAtanh1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Atanh<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Atanh<float>(dstTensor, srcTensor);
 }
 
 __aicore__ void TestAtanh2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Atanh<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Atanh<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestAtanh3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Atanh<half>(dstTensor, srcTensor, calCount);
+    AscendC::Atanh<float>(dstTensor, srcTensor, calCount);
 }
 

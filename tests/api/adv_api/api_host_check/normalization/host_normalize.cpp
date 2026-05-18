@@ -11,10 +11,10 @@
 
 __aicore__ void TestNormalize0() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Normalize<half>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, para);
+    AscendC::Normalize<float>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, para);
 }
 
 __aicore__ void TestNormalize1() {
-    AscendC::Normalize<half>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta, epsilon, para);
+    AscendC::Normalize<float>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta, epsilon, para);
 }
 

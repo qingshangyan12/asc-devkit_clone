@@ -10,93 +10,93 @@
 #include "reduce/reduce.h"
 
 __aicore__ void TestReduceMean0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceMean<half>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    AscendC::ReduceMean<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceMean1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::ReduceMean<half>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::ReduceMean<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceMax2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceMax<half>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    AscendC::ReduceMax<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceMax3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::ReduceMax<half>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::ReduceMax<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceMin4() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceMin<half>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    AscendC::ReduceMin<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceMin5() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::ReduceMin<half>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::ReduceMin<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceSum6() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceSum<half>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    AscendC::ReduceSum<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceSum7() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::ReduceSum<half>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::ReduceSum<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceProd8() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceProd<half>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    AscendC::ReduceProd<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceProd9() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::ReduceProd<half>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::ReduceProd<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceAny10() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceAny<half>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    AscendC::ReduceAny<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceAny11() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::ReduceAny<half>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::ReduceAny<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceAll12() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceAll<half>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    AscendC::ReduceAll<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceAll13() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::ReduceAll<half>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::ReduceAll<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 

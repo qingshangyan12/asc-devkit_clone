@@ -10,15 +10,26 @@
 #include "activation/softmaxflashv2.h"
 
 __aicore__ void TestSoftmaxFlashV20() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::SoftmaxFlashV2<half>(dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, tiling);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> expSumTensor;
+    AscendC::LocalTensor<float> maxTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> expMaxTensor;
+    AscendC::LocalTensor<float> inExpSumTensor;
+    AscendC::LocalTensor<float> inMaxTensor;
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SoftmaxFlashV2<float>(dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, tiling);
 }
 
 __aicore__ void TestSoftmaxFlashV21() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> expSumTensor;
+    AscendC::LocalTensor<float> maxTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> expMaxTensor;
+    AscendC::LocalTensor<float> inExpSumTensor;
+    AscendC::LocalTensor<float> inMaxTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::SoftmaxFlashV2<half>(dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, sharedTmpBuffer, tiling);
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SoftmaxFlashV2<float>(dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, sharedTmpBuffer, tiling);
 }
-

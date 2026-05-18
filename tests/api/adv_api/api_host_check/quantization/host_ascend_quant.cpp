@@ -10,30 +10,30 @@
 #include "quantization/ascend_quant.h"
 
 __aicore__ void TestAscendQuant0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::AscendQuant<half>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset, calCount);
+    AscendC::AscendQuant<float>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset, calCount);
 }
 
 __aicore__ void TestAscendQuant1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::AscendQuant<half>(dstTensor, srcTensor, scale, offset, calCount);
+    AscendC::AscendQuant<float>(dstTensor, srcTensor, scale, offset, calCount);
 }
 
 __aicore__ void TestAscendQuant2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::AscendQuant<half>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset);
+    AscendC::AscendQuant<float>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset);
 }
 
 __aicore__ void TestAscendQuant3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::AscendQuant<half>(dstTensor, srcTensor, scale, offset);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::AscendQuant<float>(dstTensor, srcTensor, scale, offset);
 }
 

@@ -10,38 +10,44 @@
 #include "activation/softmax.h"
 
 __aicore__ void TestSoftMax0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::SoftMaxTiling tiling;
-    AscendC::SoftMax<half>(dstTensor, sumTensor, maxTensor, srcTensor, tiling);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> sumTensor;
+    AscendC::LocalTensor<float> maxTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SoftMax<float>(dstTensor, sumTensor, maxTensor, srcTensor, tiling);
 }
 
 __aicore__ void TestSoftMax1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::SoftMaxTiling tiling;
-    AscendC::SoftMax<half>(dstTensor, srcTensor, tiling);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SoftMax<float>(dstTensor, srcTensor, tiling);
 }
 
 __aicore__ void TestSoftMax2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::SoftMaxTiling tiling;
-    AscendC::SoftMax<half>(dstTensor, srcTensor, sharedTmpBuffer, tiling);
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SoftMax<float>(dstTensor, srcTensor, sharedTmpBuffer, tiling);
 }
 
 __aicore__ void TestSoftMax3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> sumTensor;
+    AscendC::LocalTensor<float> maxTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::SoftMaxTiling tiling;
-    AscendC::SoftMax<half>(dstTensor, sumTensor, maxTensor, srcTensor, sharedTmpBuffer, tiling);
+    AscendC::tiling::SoftMaxTiling tiling;
+    AscendC::SoftMax<float>(dstTensor, sumTensor, maxTensor, srcTensor, sharedTmpBuffer, tiling);
 }
 
 __aicore__ void TestAdjustSoftMaxRes4() {
-    uint32_t from;
-    half to;
-    AscendC::AdjustSoftMaxRes<half>(softMaxRes, maxTensor, from, to);
+    AscendC::LocalTensor<float> softMaxRes;
+    AscendC::LocalTensor<float> maxTensor;
+    uint32_t from = 0;
+    float to = 0.0f;
+    AscendC::SoftMaxShapeInfo softmaxShapeInfo;
+    AscendC::AdjustSoftMaxRes<float>(softMaxRes, maxTensor, from, to, softmaxShapeInfo);
 }
-

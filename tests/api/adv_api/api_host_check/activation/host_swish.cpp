@@ -10,9 +10,9 @@
 #include "activation/swish.h"
 
 __aicore__ void TestSwish0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    uint32_t calCount = 0;
-    AscendC::Swish<half>(dstLocal, srcLocal, dataSize, scalarValue);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    float scalarValue = 0.0f;
+    uint32_t dataSize = 0;
+    AscendC::Swish<float>(dstTensor, srcTensor, dataSize, scalarValue);
 }
-

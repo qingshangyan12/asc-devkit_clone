@@ -10,32 +10,32 @@
 #include "sort/sort.h"
 
 __aicore__ void TestSort0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Sort<half>(dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, sharedTmpBuffer, calCount);
+    AscendC::Sort<float>(dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestSort1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Sort<half>(dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, calCount);
+    AscendC::Sort<float>(dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, calCount);
 }
 
 __aicore__ void TestSort2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Sort<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Sort<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestSort3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Sort<half>(dstTensor, srcTensor, calCount);
+    AscendC::Sort<float>(dstTensor, srcTensor, calCount);
 }
 

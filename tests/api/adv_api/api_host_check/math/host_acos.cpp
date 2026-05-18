@@ -10,30 +10,30 @@
 #include "math/acos.h"
 
 __aicore__ void TestAcos0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Acos<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Acos<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestAcos1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Acos<half>(dstTensor, srcTensor, calCount);
+    AscendC::Acos<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestAcos2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Acos<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Acos<float>(dstTensor, srcTensor);
 }
 
 __aicore__ void TestAcos3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Acos<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Acos<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 

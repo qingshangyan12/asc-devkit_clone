@@ -10,17 +10,17 @@
 #include "math/rint.h"
 
 __aicore__ void TestRint0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Rint<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Rint<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestRint1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Rint<half>(dstTensor, srcTensor, calCount);
+    AscendC::Rint<float>(dstTensor, srcTensor, calCount);
 }
 

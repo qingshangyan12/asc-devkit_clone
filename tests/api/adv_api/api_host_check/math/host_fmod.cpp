@@ -10,38 +10,38 @@
 #include "math/fmod.h"
 
 __aicore__ void TestFmod0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
     uint32_t calCount = 0;
-    AscendC::Fmod<half>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
+    AscendC::Fmod<float>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestFmod1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
     uint32_t calCount = 0;
-    AscendC::Fmod<half>(dstTensor, src0Tensor, src1Tensor, calCount);
+    AscendC::Fmod<float>(dstTensor, src0Tensor, src1Tensor, calCount);
 }
 
 __aicore__ void TestFmod2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
-    AscendC::Fmod<half>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer);
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
+    AscendC::Fmod<float>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestFmod3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::LocalTensor<half> src0Tensor;
-    AscendC::LocalTensor<half> src1Tensor;
-    AscendC::Fmod<half>(dstTensor, src0Tensor, src1Tensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> src0Tensor;
+    AscendC::LocalTensor<float> src1Tensor;
+    AscendC::Fmod<float>(dstTensor, src0Tensor, src1Tensor);
 }
 

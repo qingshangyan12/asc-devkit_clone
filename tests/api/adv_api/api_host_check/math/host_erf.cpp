@@ -10,30 +10,30 @@
 #include "math/erf.h"
 
 __aicore__ void TestErf0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Erf<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Erf<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestErf1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Erf<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Erf<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestErf2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Erf<half>(dstTensor, srcTensor, calCount);
+    AscendC::Erf<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestErf3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Erf<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Erf<float>(dstTensor, srcTensor);
 }
 

@@ -10,30 +10,30 @@
 #include "activation/sigmoid.h"
 
 __aicore__ void TestSigmoid0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Sigmoid<half>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Sigmoid<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestSigmoid1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Sigmoid<half>(dstTensor, srcTensor, calCount);
+    AscendC::Sigmoid<float>(dstTensor, srcTensor, calCount);
 }
 
 __aicore__ void TestSigmoid2() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Sigmoid<half>(dstTensor, srcTensor, sharedTmpBuffer);
+    AscendC::Sigmoid<float>(dstTensor, srcTensor, sharedTmpBuffer);
 }
 
 __aicore__ void TestSigmoid3() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> srcTensor;
-    AscendC::Sigmoid<half>(dstTensor, srcTensor);
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> srcTensor;
+    AscendC::Sigmoid<float>(dstTensor, srcTensor);
 }
 

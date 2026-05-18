@@ -10,18 +10,18 @@
 #include "math/cumsum.h"
 
 __aicore__ void TestCumSum0() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> lastRowTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> lastRowTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::CumSumInfo cumSumInfo;
-    AscendC::CumSum<half>(dstTensor, lastRowTensor, srcTensor, sharedTmpBuffer, cumSumInfo);
+    AscendC::CumSum<float>(dstTensor, lastRowTensor, srcTensor, sharedTmpBuffer, cumSumInfo);
 }
 
 __aicore__ void TestCumSum1() {
-    AscendC::LocalTensor<half> dstTensor;
-    AscendC::LocalTensor<half> lastRowTensor;
-    AscendC::LocalTensor<half> srcTensor;
+    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<float> lastRowTensor;
+    AscendC::LocalTensor<float> srcTensor;
     AscendC::CumSumInfo cumSumInfo;
-    AscendC::CumSum<half>(dstTensor, lastRowTensor, srcTensor, cumSumInfo);
+    AscendC::CumSum<float>(dstTensor, lastRowTensor, srcTensor, cumSumInfo);
 }

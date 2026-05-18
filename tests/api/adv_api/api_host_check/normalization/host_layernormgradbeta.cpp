@@ -11,10 +11,10 @@
 
 __aicore__ void TestLayerNormGradBeta0() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::LayerNormGradBeta<half>(outputPdGamma, outputPdBeta, resForGamma, inputDy, sharedTmpBuffer, tiling);
+    AscendC::LayerNormGradBeta<float>(outputPdGamma, outputPdBeta, resForGamma, inputDy, sharedTmpBuffer, tiling);
 }
 
 __aicore__ void TestLayerNormGradBeta1() {
-    AscendC::LayerNormGradBeta<half>(outputPdGamma, outputPdBeta, resForGamma, inputDy, tiling);
+    AscendC::LayerNormGradBeta<float>(outputPdGamma, outputPdBeta, resForGamma, inputDy, tiling);
 }
 
