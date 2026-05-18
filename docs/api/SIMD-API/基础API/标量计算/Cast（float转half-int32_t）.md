@@ -4,19 +4,19 @@
 
 | 产品 | 是否支持 |
 | ---- | -------- |
-| <cann-filter npu_type = "950"><term>Ascend 950PR/Ascend 950DT<term>                  | √</cann-filter> |
-| <cann-filter npu_type = "A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品<term>   | √</cann-filter> |
-| <cann-filter npu_type = "910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "310b"><term>Atlas 200I/500 A2 推理产品<term> | x</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品AI Core<term> | √</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品Vector Core<term> | x</cann-filter> |
-| <cann-filter npu_type = "910"><term>Atlas 训练系列产品<term> | x</cann-filter> |
-| <cann-filter npu_type = "x90"><term>Kirin X90<term> | √</cann-filter> |
-| <cann-filter npu_type = "9030"><term>Kirin 9030<term> | √</cann-filter> |
+| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | √</cann-filter> |
+| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √</cann-filter> |
+| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √</cann-filter> |
+| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x</cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | √</cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x</cann-filter> |
+| <cann-filter npu-type = "910">Atlas 训练系列产品 | x</cann-filter> |
+| <cann-filter npu-type = "x90">Kirin X90 | √</cann-filter> |
+| <cann-filter npu-type = "9030">Kirin 9030 | √</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件为： \#include "basic\_api/kernel\_operator\_scalar\_intf.h"
+头文件路径为："basic\_api/kernel\_operator\_scalar\_intf.h"
 
 对标量的数据类型进行转换。
 
@@ -33,77 +33,56 @@ __aicore__ inline U Cast(T valueIn)
 
 **表 1**  模板参数说明
 
-<a name="table1017514222109"></a>
-<table><thead align="left"><tr id="row717622218103"><th class="cellrowborder" valign="top" width="18.59%" id="mcps1.2.3.1.1"><p id="p1117617228103"><a name="p1117617228103"></a><a name="p1117617228103"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="81.41000000000001%" id="mcps1.2.3.1.2"><p id="p14176192219101"><a name="p14176192219101"></a><a name="p14176192219101"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row171761322131011"><td class="cellrowborder" valign="top" width="18.59%" headers="mcps1.2.3.1.1 "><p id="p1270210223183"><a name="p1270210223183"></a><a name="p1270210223183"></a>T</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.41000000000001%" headers="mcps1.2.3.1.2 "><p id="p1986921081815"><a name="p1986921081815"></a><a name="p1986921081815"></a>valueIn的数据类型，支持float。</p>
-</td>
-</tr>
-<tr id="row1418573831814"><td class="cellrowborder" valign="top" width="18.59%" headers="mcps1.2.3.1.1 "><p id="p198026488183"><a name="p198026488183"></a><a name="p198026488183"></a>U</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.41000000000001%" headers="mcps1.2.3.1.2 "><p id="p02031955111811"><a name="p02031955111811"></a><a name="p02031955111811"></a>转换后的数据类型，支持half、int32_t。</p>
-</td>
-</tr>
-<tr id="row125538426187"><td class="cellrowborder" valign="top" width="18.59%" headers="mcps1.2.3.1.1 "><p id="p727181791914"><a name="p727181791914"></a><a name="p727181791914"></a>roundMode</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.41000000000001%" headers="mcps1.2.3.1.2 "><p id="p885382310199"><a name="p885382310199"></a><a name="p885382310199"></a>精度转换处理模式，类型是RoundMode。</p>
-<p id="p1885316233193"><a name="p1885316233193"></a><a name="p1885316233193"></a>RoundMode为枚举类型，用以控制精度转换处理模式，具体定义为：</p>
-<a name="screen1085382310197"></a><a name="screen1085382310197"></a><pre class="screen" codetype="Cpp" id="screen1085382310197">enum class RoundMode {
-    CAST_NONE = 0,  // 在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不取整
-    CAST_RINT,      // rint，四舍六入五成双取整
-    CAST_FLOOR,     // floor，向负无穷取整
-    CAST_CEIL,      // ceil，向正无穷取整
-    CAST_ROUND,     // round，四舍五入取整
-    CAST_TRUNC,     // trunc，向零取整
-    CAST_ODD,       // Von Neumann rounding，最近邻奇数舍入
-};</pre>
-<p id="p16853152316196"><a name="p16853152316196"></a><a name="p16853152316196"></a>对于Cast，转换类型仅支持float转half(f322f16)与float转int32_t(f322s32)，相应支持的RoundMode如下：</p>
-<a name="ul155971413112618"></a><a name="ul155971413112618"></a><ul id="ul155971413112618"><li>f322f16：CAST_ODD；</li><li>f322s32：CAST_ROUND、CAST_CEIL、CAST_FLOOR、CAST_RINT。</li></ul>
-<p id="p685318232191"><a name="p685318232191"></a><a name="p685318232191"></a>Cast的精度转换规则具体可参考<a href="../Memory矢量计算/类型转换/Cast.md#table235404962912">表1</a>。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数说明 | 描述 |
+| ------ | ------ |
+| T | valueIn的数据类型 |
+| U | 转换后的数据类型，支持half、int32_t。 |
+| roundMode | 精度转换处理模式，类型是RoundMode。<br> RoundMode为枚举类型，用以控制精度转换处理模式，参考[精度舍入模式](精度转换.md#zh-cn_topic_0000002568472166_table49591625315)</a>，可取值为:<br> &bull; CAST_NONE：在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不取整 <br>&bull; CAST_RINT：rint，四舍六入五成双取整<br>&bull; CAST_FLOOR：floor，向负无穷取整 <br>&bull; CAST_CEIL：ceil，向正无穷取整<br>&bull; CAST_ROUND:round，四舍五入取整<br>&bull; CAST_TRUNC：trunc，向零取整<br>&bull; CAST_ODD：Von Neumann rounding，最近邻奇数舍入|
 
 **表 2**  参数说明
 
-<a name="zh-cn_topic_0235751031_table33761356"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="18.54%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="10.05%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0235751031_p16609919"><a name="zh-cn_topic_0235751031_p16609919"></a><a name="zh-cn_topic_0235751031_p16609919"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="71.41%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0235751031_p59995477"><a name="zh-cn_topic_0235751031_p59995477"></a><a name="zh-cn_topic_0235751031_p59995477"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row42461942101815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p284425844311"><a name="p284425844311"></a><a name="p284425844311"></a>valueIn</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>被转换数据类型的标量。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数说明 | 输入/输出 | 描述 |
+| ------ | ------ | ------ |
+| valueIn | 输入 | 被转换数据类型的标量。 |
+
+## 数据类型<a name="zh-cn_topic_0000002531121342_section4219135304818"></a>
+
+支持的数据类型如下：
+
+- valueIn支持float
+- 返回值支持half、int32\_t。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-U类型的valueIn。
+转换后的U类型标量数据。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+- 支持的数据类型组合及对应支持的RoundMode
+
+    | valueIn | 返回值 | RoundMode |
+    | ------ | ------ | ------ |
+    | float | half | CAST_ODD |
+    | float | int32_t | CAST_ROUND |
+    | float | int32_t | CAST_CEIL |
+    | float | int32_t | CAST_FLOOR |
+    | float | int32_t | CAST_RINT |
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
-float valueIn = 2.5;
-// 输出数据valueOut：3， 2.5向上取整为3
-int32_t valueOut = AscendC::Cast<float, int32_t, AscendC::RoundMode::CAST_ROUND>(valueIn);
+```cpp
+float valueIn = 3.14159f;
+half halfOut = Cast<float, half, CAST_ODD>(valueIn);             // 返回3.142578
+
+valueIn = 1.5f;
+int32_t intRoundOut = Cast<float, int32_t, CAST_ROUND>(valueIn); // 使用CAST_ROUND模式，四舍五入返回2
+int32_t intCeilOut = Cast<float, int32_t, CAST_CEIL>(valueIn);   // 使用CAST_CEIL模式，向上取整返回2
+int32_t intFloorOut = Cast<float, int32_t, CAST_FLOOR>(valueIn); // 使用CAST_FLOOR模式，向下取整返回1
+int32_t intRintOut = Cast<float, int32_t, CAST_RINT>(valueIn);   // 使用CAST_RINT模式，1.5向临近偶数舍入返回2
+
+valueIn = 2.5f;
+intRoundOut = Cast<float, int32_t, CAST_ROUND>(valueIn); // 使用CAST_ROUND模式，四舍五入返回3
+intCeilOut = Cast<float, int32_t, CAST_CEIL>(valueIn);   // 使用CAST_CEIL模式，向上取整返回3
+intFloorOut = Cast<float, int32_t, CAST_FLOOR>(valueIn); // 使用CAST_FLOOR模式，向下取整返回2
+intRintOut = Cast<float, int32_t, CAST_RINT>(valueIn);   // 使用CAST_RINT模式，1.5向临近偶数舍入返回2
 ```
