@@ -10,7 +10,7 @@
 ## 目录结构介绍
 
 ```
-├── gelu_high_performance
+├── gelu_regbase
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │   │   └── verify_result.py    // 真值对比文件
@@ -145,15 +145,19 @@ $$
 
 **关键代码**：
 ```cpp
-__simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
+__simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t count, uint32_t loopNum)
 {
     constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
     AscendC::Reg::MaskReg mask;
     AscendC::Reg::RegTensor<float> xReg, yReg;
-
     for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
+        // Set mask according to count; count -= oneRepeatSize after execution;
+        mask = AscendC::Reg::UpdateMask<float>(count);
+
+        // Step1: Load data from unified buffer to register;
         AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
+
+        // Step2: Compute;
         AscendC::Reg::Mul(yReg, xReg, xReg, mask);
         AscendC::Reg::Mul(yReg, yReg, xReg, mask);
         AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
@@ -162,6 +166,8 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
         AscendC::Reg::Exp(yReg, yReg, mask);
         AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
         AscendC::Reg::Div(yReg, xReg, yReg, mask);
+
+        // Step3: Store data from register to unified buffer;
         AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
     }
 }
