@@ -37,7 +37,7 @@ For AddCustom operator introduction and other content, refer to [Operator Descri
 
 - Configure environment variables
 
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment. Ensure `ASCEND_HOME_PATH` points to the CANN installation root path for header files and library paths to take effect.
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit on the current environment. Ensure `ASCEND_HOME_PATH` points to the CANN installation root path for header files and library paths to take effect.
 
   - Default path, CANN package installed by root user
 

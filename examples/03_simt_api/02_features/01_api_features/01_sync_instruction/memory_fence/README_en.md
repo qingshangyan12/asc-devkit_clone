@@ -139,7 +139,7 @@ In the above process, multiple thread blocks need to read and write the same glo
 
 Follow the steps below in the sample root directory to compile and execute the operator.
 - Configure environment variables
-  Select the appropriate environment variable configuration command based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on your current environment.
+  Select the appropriate environment variable configuration command based on the [installation method](../../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit on your current environment.
   - Default path, CANN software package installed by root user
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

@@ -62,7 +62,7 @@ It is recommended to enable this parameter when the K-axis is large (K-axis shou
 ## Build and Run
 Execute the following steps in the root directory of this example to build and run the example.
 - Configure Environment Variables
-  Please select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on your current environment.
+  Please select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit on your current environment.
   - Default path, CANN package installed by root user
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

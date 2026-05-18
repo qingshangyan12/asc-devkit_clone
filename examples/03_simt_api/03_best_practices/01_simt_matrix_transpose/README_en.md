@@ -332,7 +332,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 Execute the following steps in the root directory of this example to build and run the example.
 
 - Configure environment variables
-  Select the corresponding command to configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development toolkit on the current environment.
+  Select the corresponding command to configure environment variables based on the [installation method](../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development toolkit on the current environment.
 
   - Default path, CANN software package installed by root user
 

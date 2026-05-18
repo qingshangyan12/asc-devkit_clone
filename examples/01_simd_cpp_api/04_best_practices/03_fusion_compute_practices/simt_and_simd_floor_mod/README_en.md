@@ -98,7 +98,7 @@ This sample uses the implementation of the floor_mod function operator as an exa
 
 Execute the following steps in the root directory of this sample to build and run the operator.
 - Configure environment variables  
-  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
+  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package in the current environment.
   - Default path, root user installed CANN software package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

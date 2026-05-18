@@ -100,7 +100,7 @@ All scenarios are based on the same matrix multiplication specification: [M, N, 
 
 Execute the following steps in the root directory of this example to build and run the example.
 - Configure Environment Variables
-  Please select the corresponding command to configure environment variables according to the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Please select the corresponding command to configure environment variables according to the [installation method](../../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on the current environment.
   - Default path, root user installed CANN software package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

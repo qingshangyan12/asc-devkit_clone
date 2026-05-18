@@ -598,7 +598,7 @@ Reasons why Ascend 950 series did not reach theoretical vector duration peak:
   - `6`: Double buffer + L2Cache bypass + Bank Conflict avoidance
 
 - Configure environment variables  
-  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
+  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package in the current environment.
   - Default path, root user installed CANN software package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

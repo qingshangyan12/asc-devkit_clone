@@ -54,7 +54,7 @@ Execute the following steps in the root directory of this sample to build and ru
 
 - Configure environment variables
 
-  Please select the corresponding command to configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Please select the corresponding command to configure environment variables based on the [installation method](../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on the current environment.
 
   - Default path, root user installed CANN package
 

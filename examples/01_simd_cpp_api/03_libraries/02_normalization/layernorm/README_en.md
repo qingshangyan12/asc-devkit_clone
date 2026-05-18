@@ -70,7 +70,7 @@ This example demonstrates how to continuously call three high-level APIs (LayerN
 
 Execute the following steps in the root directory of this example to build and run the example.
 - Configure Environment Variables  
-  Select the corresponding command to configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Select the corresponding command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on the current environment.
   - Default path, CANN software package installed by root user
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
