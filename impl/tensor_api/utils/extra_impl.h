@@ -31,6 +31,7 @@
 #include "utils/std/utility.h"
 #include "utils/std/algorithm.h"
 #include "utils/std/cmath.h"
+#include "utils/std/tuple/ignore.h"
 
 namespace AscendC {
 namespace Te {
