@@ -13,7 +13,7 @@ __aicore__ void TestIsNan0() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     uint32_t count = 0;
-    AscendC::IsNan<float>(dstTensor, srcTensor, count);
+    AscendC::IsNan<AscendC::DEFAULT_IS_NAN_CONFIG, float>(dstTensor, srcTensor, count);
 }
 
 __aicore__ void TestIsNan1() {
@@ -21,6 +21,6 @@ __aicore__ void TestIsNan1() {
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t count = 0;
-    AscendC::IsNan<float>(dstTensor, srcTensor, sharedTmpBuffer, count);
+    AscendC::IsNan<AscendC::DEFAULT_IS_NAN_CONFIG, float>(dstTensor, srcTensor, sharedTmpBuffer, count);
 }
 

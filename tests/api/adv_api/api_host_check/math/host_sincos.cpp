@@ -15,7 +15,7 @@ __aicore__ void TestSinCos0() {
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     AscendC::LocalTensor<float> sinOutputTensor;
     uint32_t calCount = 0;
-    AscendC::SinCos<float>(dstTensor, srcTensor, sinOutputTensor, sharedTmpBuffer, calCount);
+    AscendC::SinCos<AscendC::DEFAULT_SINCOS_CONFIG, float>(dstTensor, srcTensor, sinOutputTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestSinCos1() {
@@ -23,6 +23,6 @@ __aicore__ void TestSinCos1() {
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<float> sinOutputTensor;
     uint32_t calCount = 0;
-    AscendC::SinCos<float>(dstTensor, srcTensor, sinOutputTensor, calCount);
+    AscendC::SinCos<AscendC::DEFAULT_SINCOS_CONFIG, float>(dstTensor, srcTensor, sinOutputTensor, calCount);
 }
 

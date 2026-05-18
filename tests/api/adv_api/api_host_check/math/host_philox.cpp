@@ -14,7 +14,7 @@ __aicore__ void TestPhiloxRandom0() {
     AscendC::PhiloxKey philoxKey;
     AscendC::PhiloxCounter philoxCounter;
     uint16_t count = 0;
-    AscendC::PhiloxRandom<float>(dstLocal, philoxKey, philoxCounter, count);
+    AscendC::PhiloxRandom<7>(dstLocal, philoxKey, philoxCounter, count);
 }
 
 __aicore__ void TestPhiloxRandom1() {
@@ -22,5 +22,5 @@ __aicore__ void TestPhiloxRandom1() {
     AscendC::PhiloxKey philoxKey;
     AscendC::PhiloxCounter philoxCounter;
     AscendC::PhiloxRandomParams params;
-    AscendC::PhiloxRandom<float>(dstLocal, philoxKey, philoxCounter, params);
+    AscendC::PhiloxRandom<7>(dstLocal, philoxKey, philoxCounter, params);
 }

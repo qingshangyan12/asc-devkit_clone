@@ -14,13 +14,13 @@ __aicore__ void TestRint0() {
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Rint<float>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    AscendC::Rint<AscendC::DEFAULT_RINT_CONFIG>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestRint1() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::Rint<float>(dstTensor, srcTensor, calCount);
+    AscendC::Rint<AscendC::DEFAULT_RINT_CONFIG>(dstTensor, srcTensor, calCount);
 }
 

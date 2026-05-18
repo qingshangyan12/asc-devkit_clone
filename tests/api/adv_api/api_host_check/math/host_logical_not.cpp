@@ -10,8 +10,8 @@
 #include "math/logical_not.h"
 
 __aicore__ void TestLogicalNot0() {
-    AscendC::LocalTensor<uint64_t> dstTensor;
+    AscendC::LocalTensor<bool> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     uint32_t calCount = 0;
-    AscendC::LogicalNot<uint64_t, float>(dstTensor, srcTensor, calCount);
+    AscendC::LogicalNot<AscendC::DEFAULT_LOGICAL_NOT_CONFIG, bool, float>(dstTensor, srcTensor, calCount);
 }

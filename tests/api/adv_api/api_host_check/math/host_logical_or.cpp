@@ -10,9 +10,9 @@
 #include "math/logical_or.h"
 
 __aicore__ void TestLogicalOr0() {
-    AscendC::LocalTensor<uint64_t> dstTensor;
+    AscendC::LocalTensor<bool> dstTensor;
     AscendC::LocalTensor<float> src0Tensor;
     AscendC::LocalTensor<float> src1Tensor;
     uint32_t calCount = 0;
-    AscendC::LogicalOr<uint64_t, float>(dstTensor, src0Tensor, src1Tensor, calCount);
+    AscendC::LogicalOr<AscendC::DEFAULT_LOGICAL_OR_CONFIG, bool, float>(dstTensor, src0Tensor, src1Tensor, calCount);
 }

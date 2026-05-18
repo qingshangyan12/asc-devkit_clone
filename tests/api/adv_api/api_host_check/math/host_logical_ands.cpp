@@ -10,9 +10,9 @@
 #include "math/logical_ands.h"
 
 __aicore__ void TestLogicalAnds0() {
-    AscendC::LocalTensor<uint64_t> dstTensor;
-    float src0Value;
+    AscendC::LocalTensor<bool> dstTensor;
+    AscendC::LocalTensor<float> src0Tensor;
     float src1Value;
     uint32_t calCount = 0;
-    AscendC::LogicalAnds<uint64_t, float, float>(dstTensor, src0Value, src1Value, calCount);
+    AscendC::LogicalAnds<AscendC::DEFAULT_LOGICAL_ANDS_CONFIG, bool>(dstTensor, src0Tensor, src1Value, calCount);
 }
