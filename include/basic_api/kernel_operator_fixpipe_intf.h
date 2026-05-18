@@ -68,9 +68,6 @@ __aicore__ inline void SetFixPipeClipRelu(uint64_t config);
 template <typename T>
 __aicore__ inline void SetFixPipeAddr(const LocalTensor<T> &eleWiseData, uint16_t c0ChStride);
 
-#if defined(__NPU_ARCH__) &&                                                                            \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 ||    \
-     __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 // L0C->L1
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
@@ -92,53 +89,7 @@ template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, t
     typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsV220& intriParams);
-#endif
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
-// L0C->L1/UB
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-__aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
-    const FixpipeParamsM300& intriParams);
-
-// L0C->L1/UB deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
-    typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
-__aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
-    const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM300& intriParams);
-
-// L0C->GM
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-__aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
-    const FixpipeParamsM300& intriParams);
-
-// L0C->GM deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
-    typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
-__aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
-    const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM300& intriParams);
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3102
-// L0C->L1/UB
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-__aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
-    const FixpipeParamsM310& intriParams);
-
-// L0C->L1/UB deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
-    typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
-__aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
-    const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM310& intriParams);
-
-// L0C->GM
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-__aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
-    const FixpipeParamsM310& intriParams);
-
-// L0C->GM deq tensor quant
-template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
-    typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
-__aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
-    const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM310& intriParams);
-#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // L0C->L1
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
@@ -158,10 +109,11 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>&
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams);
-#endif
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_fixpipe_intf_impl.h"
+#endif // __NPU_ARCH__
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
