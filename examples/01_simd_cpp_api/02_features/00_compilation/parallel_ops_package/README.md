@@ -25,28 +25,28 @@
 
 ```
 ├── parallel_ops_package
-│   ├── CMakeLists.txt                                # 顶层编译工程文件（并行构建多个算子包）
+│   ├── CMakeLists.txt                                // 顶层编译工程文件（并行构建多个算子包）
 │   ├── add_custom
-│   │   ├── CMakeLists.txt                            # Add算子编译工程文件
-│   │   ├── add_custom_host.cpp                       # Add算子Host侧实现（含Tiling逻辑）
-│   │   ├── add_custom_kernel.cpp                     # Add算子Kernel侧实现
-│   │   └── add_custom_tiling.h                       # Add算子Tiling数据结构定义
+│   │   ├── CMakeLists.txt                            // Add算子编译工程文件
+│   │   ├── add_custom_host.cpp                       // Add算子Host侧实现（含Tiling逻辑）
+│   │   ├── add_custom_kernel.cpp                     // Add算子Kernel侧实现
+│   │   └── add_custom_tiling.h                       // Add算子Tiling数据结构定义
 │   └── leaky_relu_custom
-│       ├── CMakeLists.txt                            # LeakyRelu算子编译工程文件
+│       ├── CMakeLists.txt                            // LeakyRelu算子编译工程文件
 │       ├── framework
-│       │   ├── CMakeLists.txt                        # 框架适配编译工程文件
-│       │   └── onnx_plugin                           # ONNX框架适配插件
-│       │       ├── CMakeLists.txt                    # ONNX插件编译工程文件
-│       │       └── leaky_relu_custom_plugin.cc       # LeakyRelu自定义算子ONNX插件实现
+│       │   ├── CMakeLists.txt                        // 框架适配编译工程文件
+│       │   └── onnx_plugin                           // ONNX框架适配插件
+│       │       ├── CMakeLists.txt                    // ONNX插件编译工程文件
+│       │       └── leaky_relu_custom_plugin.cc       // LeakyRelu自定义算子ONNX插件实现
 │       ├── op_host
-│       │   ├── CMakeLists.txt                        # Host侧编译工程文件
-│       │   └── leaky_relu_custom                     # LeakyRelu算子Host实现
-│       │       └── leaky_relu_custom_host.cpp        # LeakyRelu算子Host侧实现（含Tiling逻辑）
+│       │   ├── CMakeLists.txt                        // Host侧编译工程文件
+│       │   └── leaky_relu_custom                     // LeakyRelu算子Host实现
+│       │       └── leaky_relu_custom_host.cpp        // LeakyRelu算子Host侧实现（含Tiling逻辑）
 │       └── op_kernel
-│           ├── CMakeLists.txt                        # Kernel侧编译工程文件
-│           └── leaky_relu_custom                     # LeakyRelu算子Kernel实现
-│               ├── leaky_relu_custom_kernel.cpp      # LeakyRelu算子Kernel侧实现
-│               └── leaky_relu_custom_tiling.h        # LeakyRelu算子Tiling数据结构定义
+│           ├── CMakeLists.txt                        // Kernel侧编译工程文件
+│           └── leaky_relu_custom                     // LeakyRelu算子Kernel实现
+│               ├── leaky_relu_custom_kernel.cpp      // LeakyRelu算子Kernel侧实现
+│               └── leaky_relu_custom_tiling.h        // LeakyRelu算子Tiling数据结构定义
 ```
 
 ## 样例描述
