@@ -16,21 +16,21 @@ This project supports three types of API development, each with dedicated contri
 High-level API abstracts and encapsulates common algorithms based on single-core, implementing commonly used computational algorithms to improve programming development efficiency. High-level API generally implements through calling multiple basic APIs. High-level API includes mathematical computation, matrix computation, activation function, and other APIs.
 
 - **Applicable Scenarios**: Abstraction and encapsulation of common algorithms, improving operator development efficiency
-- **Contribution Guide**: [docs/asc_adv_api_contributing_en.md](./docs/asc_adv_api_contributing_en.md)
+- **Contribution Guide**: [docs/en/asc_adv_api_contributing_en.md](./docs/en/asc_adv_api_contributing_en.md)
 
 ### 2. Basic API
 
 Basic API implements abstraction of hardware capabilities, opening chip capabilities, ensuring completeness and compatibility.
 
 - **Applicable Scenarios**: C++ language programming style scenarios
-- **Contribution Guide**: [docs/asc_basic_api_contributing_en.md](./docs/asc_basic_api_contributing_en.md)
+- **Contribution Guide**: [docs/en/asc_basic_api_contributing_en.md](./docs/en/asc_basic_api_contributing_en.md)
 
 ### 3. C API
 
 C API provides pure C style interfaces, conforming to C language operator development habits, opening complete chip programming capabilities, supporting array memory allocation, generally based on pointer programming. Provides industry-similar programming experience.
 
 - **Applicable Scenarios**: C language programming style scenarios
-- **Contribution Guide**: [docs/asc_c_api_contributing_en.md](./docs/asc_c_api_contributing_en.md)
+- **Contribution Guide**: [docs/en/asc_c_api_contributing_en.md](./docs/en/asc_c_api_contributing_en.md)
 
 ## Developer Contribution Scenarios
 
