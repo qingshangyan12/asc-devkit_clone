@@ -56,7 +56,7 @@ This sample demonstrates Matmul in a multi-core M-split scenario, where the inpu
 Execute the following steps in the root directory of this sample to compile and run the sample.
 
 - Configure Environment Variables
-  Select the corresponding environment variable configuration command based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on your current environment.
+  Select the corresponding environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit on your current environment.
   - Default path, root user installed CANN software package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

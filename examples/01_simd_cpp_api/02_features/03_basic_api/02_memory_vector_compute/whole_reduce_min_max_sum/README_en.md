@@ -106,7 +106,7 @@ This example selects different reduction scenarios through the compilation param
 
 Execute the following steps in the example root directory to build and run the example.
 - Configure Environment Variables
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development toolkit on your current environment.
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development toolkit on your current environment.
   - Default path, CANN package installed by root user
 
     ```bash

@@ -68,7 +68,7 @@ This example performs GELU (Gaussian Error Linear Unit) computation on input Ten
 
 Execute the following steps in the root directory of this example to build and run the example.
 - Configure Environment Variables  
-  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on your current environment.
+  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on your current environment.
   - Default path, root user installed CANN software package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

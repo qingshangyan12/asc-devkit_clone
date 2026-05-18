@@ -42,7 +42,7 @@ The sample script `test_add_custom_tiling_sink.py` consists of three key parts:
 
 - Configure Environment Variables
 
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development toolkit on your current environment.
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development toolkit on your current environment.
   - Default path, CANN package installed by root user
 
     ```bash

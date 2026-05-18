@@ -32,7 +32,7 @@ Execute the following steps in the sample root directory to build and run the op
 
 - Configure environment variables
 
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit on the current environment.
 
   - Default path, CANN package installed by root user
 

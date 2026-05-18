@@ -148,7 +148,7 @@ Users can use the PlatformAscendC class member function [GetCoreMemSize](https:/
 Execute the following steps in the root directory of this example to build and run the operator.
 
 - Configure Environment Variables
-  Please select the corresponding command to configure environment variables according to the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Please select the corresponding command to configure environment variables according to the [installation method](../../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on the current environment.
   - Default path, root user installed CANN software package
 
     ```bash

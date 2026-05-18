@@ -105,7 +105,7 @@ An asynchronous scenario refers to program execution where the next operation ca
 Execute the following steps in the sample root directory to compile and run the sample.
 
 - Configure Environment Variables
-  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package in your current environment.
+  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package in your current environment.
 
   - Default path, CANN package installed by root user
     ```bash

@@ -63,7 +63,7 @@ This example pads 2D Tensor row data to 32B alignment using the Pad high-level A
 Execute the following steps in the root directory of this example to build and run the example.
 
 - Configure Environment Variables
-  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on your current environment.
+  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on your current environment.
   - Default path, CANN software package installed by root user
 
     ```bash
