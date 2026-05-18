@@ -176,6 +176,11 @@ HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &
 
 HcclResult GetOpParam(HcclComm comm, void* stream, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &opParam);
 
+// 用户自定义校验函数，由用户提供实现（仅声明，不提供默认实现）。
+// 返回HCCL_SUCCESS表示CCU执行条件满足，否则表示不满足，将打印警告日志。
+// 参数：ccTiling - 特定的tiling对象，tilingIndex - 当前tiling索引
+HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner *ccTiling, uint32_t tilingIndex);
+
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
 HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[], const void *ccTilingList[], uint32_t tilingNum, OpResCtx &opResCtx);
 

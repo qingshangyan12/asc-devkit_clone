@@ -513,6 +513,12 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
 
+        // 用户自定义校验：若不满足条件则打印警告日志
+        if (CcuSelectAlgCheck(ccTiling, i) != HCCL_SUCCESS) {
+            HCCL_WARNING("[CcuSelectAlg] CcuSelectAlgCheck failed for ccTiling[%u], opType[%u], ret[%d]. "
+                "CCU execution condition not satisfied.", i, ccTiling->opType, checkRet);
+        }
+
         // 构造OpParam并选择算法
         OpParam opParam{};
         CHK_RET(InitOpParamByTiling(comm, stream, topoTag[i], ccTiling, opParam));
@@ -520,17 +526,18 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         std::string algName;
         std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
         CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+
+        // 若选择到AICPU算法（algName不在CCU algorithmMap中）则直接报错并退出
+        auto it = algorithmMap.find(algName);
+        if (it == algorithmMap.end()) {
+            HCCL_ERROR("[CcuSelectAlg] ccTiling[%u] selected nonCCU algorithm[%s] for opType[%u].", i, algName.c_str(), ccTiling->opType);
+            return HCCL_E_NOT_SUPPORT;
+        }
+
         int result = sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
         CHK_PRT_RET(result <= 0, HCCL_ERROR("failed to fill opParam.algName"), HCCL_E_INTERNAL);
         HCCL_INFO("[CcuSelectAlg] prepared opParam, opType[%u], algName[%s], algTag[%s].",
             static_cast<u32>(opParam.opType), opParam.algName, opParam.algTag);
-
-        // 将算法名称映射到AlgorithmType枚举
-        auto it = algorithmMap.find(algName);
-        if (it == algorithmMap.end()) {
-            HCCL_ERROR("[CcuSelectAlg] unknown algName[%s] for opType[%u]", algName.c_str(), ccTiling->opType);
-            return HCCL_E_NOT_SUPPORT;
-        }
 
         // 将算子类型和算法枚举保存到opResCtx
         opResCtx.opType[i] = ccTiling->opType;
