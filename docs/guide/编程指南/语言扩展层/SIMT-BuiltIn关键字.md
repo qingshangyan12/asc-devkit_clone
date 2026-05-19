@@ -168,6 +168,7 @@
 ## 运算符
 
 SIMT编程提供了一系列运算符，用于执行数学运算。以下是支持的运算符列表。
+
 **表 5**  算术运算符列表
 
 | 运算符    | bool | int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t | half/bfloat16_t/float | half2/bfloat16x2_t | hifloat8_t |
