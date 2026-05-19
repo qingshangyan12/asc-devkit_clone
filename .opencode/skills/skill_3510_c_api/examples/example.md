@@ -9,20 +9,13 @@
 
 3510架构下的RegBase编程，其处理的对象为RegTensor,即数据从GM搬运到UB,再从UB搬运到寄存器RegTensor,在寄存器中完成运算后,再将结果按原路搬回，使用时应注意函数和变量声明的标识符。
 
-Regbase下的变量说明：
-- 所有的`vector_xxx`类型的变量声明只能在`__simd_vf__`函数内
-- 所有的`vector_xxx`类型的变量，长度固定为256B, 根据后面的实际类型对该vector进行解释
-- `vector_xxx`类型变量的示例，如`vector_float`类型的变量，长度为256B, 即64个float类型的数据
-- `vector_xxx`类型变量的示例，如`vector_int8_t`类型的变量，长度为256B, 即256个int8_t类型的数据
-- 特殊数据类型为`vector_bool`，其长度固定为32B, 其中每个bit位控制`vector_xxx`类型的1B长度是否参与计算
-- 对于数据类型大于1B的`vector_xxx`类型的变量，vector_bool类型的变量中多个bit位对应一个元素，只有最低位生效
-- vector_bool类型的变量的示例，如`vector_bool`中前16 bit值为`0001 0001 0001 0000`，其控制`vector_float`类型的变量为前3个元素参与运算，第4个不参与
-- vector_bool类型的变量的示例，如`vector_bool`中前16 bit值为`00 01 00 01 00 01 00 00`，其控制`vector_half`类型的变量为前6个元素间隔参与运算，第7, 8个不参与
-- `asc_update_mask_b32(uint32_t remaining)` 函数用于根据剩余元素数量`remaining`生成一个`vector_bool`类型的变量，其前`remaining`个b32元素的控制位为`1`, 其余为`0`
-- `asc_update_mask_b32(uint32_t remaining)` 函数执行完成后，剩余元素数量`remaining`会减少`256 / sizeof(b32)`
-- `asc_update_mask_b32(uint32_t remaining)` 函数中，当remaining小于`256 / sizeof(b32)`时，控制前`remaining`个元素参与运算，剩余元素数量`remaining`会减少到`0`
-- `asc_update_mask_b32(uint32_t remaining)` 函数需被赋值给`vector_bool`类型的变量
-- `asc_update_mask_b32(uint32_t remaining)` 通常用于处理连续存储数据计算的场景，能适应不同长度的剩余元素数量
+Regbase下update_mask使用的详细说明：
+
+- `asc_update_mask_b32(uint32_t count)` 函数用于根据剩余元素数量`count`生成一个`vector_bool`类型的变量，其前`count`个b32元素的控制位为`1`, 其余为`0`
+- `asc_update_mask_b32(uint32_t count)` 函数执行完成后，剩余元素数量`count`会减少`256 / sizeof(b32)`
+- `asc_update_mask_b32(uint32_t count)` 函数中，当count小于`256 / sizeof(b32)`时，控制前`count`个元素参与运算，剩余元素数量`count`会减少到`0`
+- `asc_update_mask_b32(uint32_t count)` 函数需被赋值给`vector_bool`类型的变量
+- `asc_update_mask_b32(uint32_t count)` 通常用于处理连续存储数据计算的场景，能适应不同长度的剩余元素数量
 
 ```cpp
 #include <cstdint>
@@ -44,9 +37,9 @@ __simd_vf__ inline void AddVF(uint16_t rep, uint16_t one_rep_size, uint32_t bloc
     vector_float reg_src0;
     vector_float reg_src1;
     vector_float reg_dst;
-    uint32_t remaining = blockLength;
+    uint32_t count = blockLength;
     for (uint16_t i = 0; i < rep; ++i) {
-        vmask = asc_update_mask_b32(remaining);
+        vmask = asc_update_mask_b32(count);
         asc_loadalign(reg_src0, xLocal + i * one_rep_size);
         asc_loadalign(reg_src1, yLocal + i * one_rep_size);    
         asc_add(reg_dst, reg_src0, reg_src1, vmask);

@@ -20,6 +20,8 @@ description: 通过AscendC C API编程语言编写对应的测试样例, 测试�
 - 注意函数标识符和变量类型的匹配
 - `vector_int`, `vector_float` 等类型仅在`__simd_vf__`中使用，为寄存器RegTensor的数据类型
 - `__simd_vf__` 仅支持在vector core中执行
+- `__simd_vf__` 中不支持浮点数的除法，不支持static_cast<>()
+- `__simd_vf__` 内的标量应尽量使用常量，变量声明应在for循环外
 - `vector_bool` 类型用于在`__simd_vf__`中控制参与计算的元素位置
 - `vector_bool` 类型采用正常的变量声明方式，使用方式参考[./examples/example.md](./examples/example.md)中的RegBase编程模板
 - 3510架构对于Vector类型的运算，均需要搬入到寄存器中进行计算，计算完成后再搬出到GM。即数据通路为gm -> ub -> reg -> ub -> gm
@@ -31,6 +33,23 @@ description: 通过AscendC C API编程语言编写对应的测试样例, 测试�
 - 执行精度对比时，应将输入、输出、真值数据打印并存储为csv文件，如果存在精度问题，打印出现精度问题的元素的值和索引
 
 ## 快速入门
+
+### vector类型和vector_bool类型
+
+- **当存在输入输出位宽变化时，updatemask和ub上地址偏移的stride,也需对应变化**
+- **当输入输出位宽变化时，数据排列中可能存在空位填充为0，应灵活使用`asc_pack`，`asc_unpack`，`asc_interleave`等接口使数据紧密排列**
+- 所有的`vector_xxx`类型的变量声明只能在`__simd_vf__`函数内
+- 除了`vector_bool`外，所有`vector_xxx`类型固定为256B, 只根据具体类型，将该256B解释为该类型的vector
+- `vector_bool`固定为32B, 每个bit位控制`vector_xxx`类型中每个B是否参与运算，作为mask使用
+- `asc_update_mask`应被赋值给一个`vector_bool`类型的变量
+- `asc_update_mask(count)`，设置对应位宽的前count个元素参与vector的运算（不超过256B），在执行之后，count自减对应元素个数，最低为0
+
+示例：
+- `vector_xxx`类型变量的示例，如`vector_float`类型的变量，长度为256B, 即64个float类型的数据
+- `vector_xxx`类型变量的示例，如`vector_int8_t`类型的变量，长度为256B, 即256个int8_t类型的数据
+- 对于数据类型大于1B的`vector_xxx`类型的变量，vector_bool类型的变量中多个bit位对应一个元素，只有最低位生效
+- vector_bool类型的变量的示例，如`vector_bool`中前16 bit值为`0001 0001 0001 0000`，其控制`vector_float`类型的变量为前3个元素参与运算，第4个不参与
+- vector_bool类型的变量的示例，如`vector_bool`中前16 bit值为`00 01 00 01 00 01 00 00`，其控制`vector_half`类型的变量为前6个元素间隔参与运算，第7, 8个不参与
 
 ### 头文件引入
 
