@@ -78,7 +78,7 @@ __aicore__ inline void MmadWithSparse(const LocalTensor<T>& dst, const LocalTens
 </td>
 <td class="cellrowborder" valign="top" width="86.66%" headers="mcps1.2.3.1.2 "><p id="p14306152041916"><a name="p14306152041916"></a><a name="p14306152041916"></a>fm、filter的数据类型。</p>
 <a name="ul3987732122120"></a><a name="ul3987732122120"></a><ul id="ul3987732122120"><li>当dst、fm、filter为基础数据类型时， T必须为int32_t类型，U必须为int8_t类型，否则编译失败。</li></ul>
-<a name="ul17416131483320"></a><a name="ul17416131483320"></a><ul id="ul17416131483320"><li>当dst、fm、filter为<a href="../../../基础数据结构/TensorTrait/TensorTrait.md">TensorTrait</a>类型时，T的LiteType必须为int32_t类型，U的LiteType必须为int8_t类型，否则编译失败。</li></ul>
+<a name="ul17416131483320"></a><a name="ul17416131483320"></a><ul id="ul17416131483320"><li>当dst、fm、filter为<a href="../../数据结构/辅助数据结构/TensorTrait/TensorTrait.md">TensorTrait</a>类型时，T的LiteType必须为int32_t类型，U的LiteType必须为int8_t类型，否则编译失败。</li></ul>
 <p id="p882014184212"><a name="p882014184212"></a><a name="p882014184212"></a>最后两个模板参数仅用于上述数据类型检查，用户无需关注。</p>
 </td>
 </tr>
@@ -345,4 +345,3 @@ uint32 k = 64;
 uint32 n = 16;
 AscendC::MmadWithSparse(cLocal, a2Local, b2Local, { m, n, k, false, 0, false, false, false });
 ```
-

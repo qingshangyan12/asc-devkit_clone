@@ -72,7 +72,7 @@ __aicore__ inline void SetInput(const AscendC::GlobalTensor<InputT>& input)
 </td>
 <td class="cellrowborder" valign="top" width="17.461746174617463%" headers="mcps1.1.4.1.2 "><p id="p253811144111"><a name="p253811144111"></a><a name="p253811144111"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="65.99659965996601%" headers="mcps1.1.4.1.3 "><p id="p1153819119417"><a name="p1153819119417"></a><a name="p1153819119417"></a>Input在Global Memory上的首地址。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="../../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>特征矩阵Input支持的数据类型为：half、bfloat16_t。</p>
+<td class="cellrowborder" valign="top" width="65.99659965996601%" headers="mcps1.1.4.1.3 "><p id="p1153819119417"><a name="p1153819119417"></a><a name="p1153819119417"></a>Input在Global Memory上的首地址。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="../../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>特征矩阵Input支持的数据类型为：half、bfloat16_t。</p>
 </td>
 </tr>
 </tbody>
@@ -93,4 +93,3 @@ GlobalTensor<half> inputGm;
 inputGm.SetGlobalBuffer(reinterpret_cast<__gm__ half *>(input));
 conv3dApi.SetInput(inputGm);
 ```
-

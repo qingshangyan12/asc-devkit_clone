@@ -95,7 +95,7 @@ __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst)
 <td class="cellrowborder" valign="top" width="12.75%" headers="mcps1.2.4.1.2 "><p id="p1579635215228"><a name="p1579635215228"></a><a name="p1579635215228"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="77.17%" headers="mcps1.2.4.1.3 "><p id="p493112487441"><a name="p493112487441"></a><a name="p493112487441"></a><a href="Compare（结果存入寄存器）.md">Compare（结果存入寄存器）</a>指令的比较结果。</p>
-<p id="p17287403258"><a name="p17287403258"></a><a name="p17287403258"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p17287403258"><a name="p17287403258"></a><a name="p17287403258"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p635923282310"><a name="p635923282310"></a><a name="p635923282310"></a>LocalTensor的起始地址需要16字节对齐。</p>
 </td>
 </tr>
@@ -133,4 +133,3 @@ src0Local:   [1, 8, 16, ...256]
 src1Local:   [2, 10, 18, ...257]
 GetCmpMask结果：[256, 256, 256, 256, 256, 256, 256, 256]
 ```
-

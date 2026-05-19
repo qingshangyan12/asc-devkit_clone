@@ -82,7 +82,7 @@ Deq的计算公式如下：
         __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0, const LocalTensor<int32_t>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
         ```
 
-操作数使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait.md)类型时，LocalTensor需要输入模板参数。提供支持操作数数据类型作为模板参数传入的接口如下：
+操作数使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/TensorTrait.md)类型时，LocalTensor需要输入模板参数。提供支持操作数数据类型作为模板参数传入的接口如下：
 
 -   tensor前n个数据计算
 
@@ -160,7 +160,7 @@ Deq的计算公式如下：
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>目的操作数。</p>
-<p id="p5945720195112"><a name="p5945720195112"></a><a name="p5945720195112"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p5945720195112"><a name="p5945720195112"></a><a name="p5945720195112"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p194810265183"><a name="p194810265183"></a><a name="p194810265183"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -169,7 +169,7 @@ Deq的计算公式如下：
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p172083541517"><a name="p172083541517"></a><a name="p172083541517"></a>源操作数。</p>
-<p id="p680865810517"><a name="p680865810517"></a><a name="p680865810517"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_1"><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_1"><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_1"><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p680865810517"><a name="p680865810517"></a><a name="p680865810517"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_1"><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_1"><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_1"><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p179919280183"><a name="p179919280183"></a><a name="p179919280183"></a><span id="ph14791529121814"><a name="ph14791529121814"></a><a name="ph14791529121814"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -204,7 +204,7 @@ Deq的计算公式如下：
 </td>
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p165681410447"><a name="p165681410447"></a><a name="p165681410447"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001429830437_p12596185919348"><a name="zh-cn_topic_0000001429830437_p12596185919348"></a><a name="zh-cn_topic_0000001429830437_p12596185919348"></a>控制操作数地址步长的参数。<a href="../../../其他数据类型/BinaryRepeatParams.md">BinaryRepeatParams</a>类型，包含操作数相邻迭代间相同datablock的地址步长，操作数同一迭代内不同datablock的地址步长等参数。</p>
+<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001429830437_p12596185919348"><a name="zh-cn_topic_0000001429830437_p12596185919348"></a><a name="zh-cn_topic_0000001429830437_p12596185919348"></a>控制操作数地址步长的参数。<a href="../../数据结构/辅助数据结构/BinaryRepeatParams.md">BinaryRepeatParams</a>类型，包含操作数相邻迭代间相同datablock的地址步长，操作数同一迭代内不同datablock的地址步长等参数。</p>
 <p id="zh-cn_topic_0000001429830437_p1156819418442"><a name="zh-cn_topic_0000001429830437_p1156819418442"></a><a name="zh-cn_topic_0000001429830437_p1156819418442"></a>相邻迭代间的地址步长参数说明请参考<span id="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph18976413195617"><a name="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph18976413195617"></a><a name="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph18976413195617"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md" target="_blank" rel="noopener noreferrer">repeatStride</a></span>；同一迭代内DataBlock的地址步长参数说明请参考<span id="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph19976131385613"><a name="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph19976131385613"></a><a name="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph19976131385613"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md" target="_blank" rel="noopener noreferrer">dataBlockStride</a></span>。</p>
 </td>
 </tr>
@@ -263,4 +263,3 @@ Deq的计算公式如下：
 输入数据src1Local：[19 33 34 50 42  2 97 93 99 ...]
 输出数据dstLocal：[8.9 6.9 7.7 10.4 7.0 5.1 12.4 17.5 19.4 ...]
 ```
-

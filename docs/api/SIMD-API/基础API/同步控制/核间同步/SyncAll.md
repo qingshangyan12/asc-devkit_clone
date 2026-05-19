@@ -141,7 +141,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="12.591259125912593%" headers="mcps1.2.4.1.2 "><p id="p208511818357"><a name="p208511818357"></a><a name="p208511818357"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="73.74737473747375%" headers="mcps1.2.4.1.3 "><p id="p223862673213"><a name="p223862673213"></a><a name="p223862673213"></a>gmWorkspace为用户定义的全局Global空间，作为所有核共用的缓存，用于保存每个核的状态标记，类型为GlobalTensor，支持的数据类型为int32_t。GlobalTensor数据结构的定义请参考<a href="../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</p>
+<td class="cellrowborder" valign="top" width="73.74737473747375%" headers="mcps1.2.4.1.3 "><p id="p223862673213"><a name="p223862673213"></a><a name="p223862673213"></a>gmWorkspace为用户定义的全局Global空间，作为所有核共用的缓存，用于保存每个核的状态标记，类型为GlobalTensor，支持的数据类型为int32_t。GlobalTensor数据结构的定义请参考<a href="../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</p>
 <p id="p1585111181855"><a name="p1585111181855"></a><a name="p1585111181855"></a>所需空间大小和使用注意项参见<a href="#section633mcpsimp">约束说明</a>。</p>
 <p id="p377231420357"><a name="p377231420357"></a><a name="p377231420357"></a>硬同步接口不支持该参数。</p>
 </td>
@@ -151,7 +151,7 @@
 <td class="cellrowborder" valign="top" width="12.591259125912593%" headers="mcps1.2.4.1.2 "><p id="p1484911181458"><a name="p1484911181458"></a><a name="p1484911181458"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="73.74737473747375%" headers="mcps1.2.4.1.3 "><p id="p01242034135414"><a name="p01242034135414"></a><a name="p01242034135414"></a>ubWorkspace为用户定义的局部Local空间，每个核单独自用，用于标记当前核的状态。</p>
-<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT，支持的数据类型为int32_t。</p>
+<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT，支持的数据类型为int32_t。</p>
 <p id="p684819181755"><a name="p684819181755"></a><a name="p684819181755"></a>所需空间大小参见<a href="#section633mcpsimp">约束说明</a>。</p>
 <p id="p1139714285356"><a name="p1139714285356"></a><a name="p1139714285356"></a>硬同步接口不支持该参数。</p>
 </td>
@@ -213,4 +213,3 @@ AscendC::DataCopy(workGlobal[blockIdx * perBlockSize], dstLocal, perBlockSize);
 AscendC::SyncAll(syncGlobal, workLocal);
 ...
 ```
-

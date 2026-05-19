@@ -142,7 +142,7 @@
 <td class="cellrowborder" valign="top" width="10.07%" headers="mcps1.2.4.1.2 "><p id="p157511152112217"><a name="p157511152112217"></a><a name="p157511152112217"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p19784265526"><a name="p19784265526"></a><a name="p19784265526"></a>用于<a href="../复合计算/CastDequant.md">CastDequant</a>（isVecDeq=true）的场景，输入量化tensor，大小为128Byte。</p>
-<p id="p167301549113818"><a name="p167301549113818"></a><a name="p167301549113818"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p167301549113818"><a name="p167301549113818"></a><a name="p167301549113818"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p11840758205316"><a name="p11840758205316"></a><a name="p11840758205316"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -287,4 +287,3 @@ struct VdeqInfo {
     [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111]
     [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127]]
     ```
-

@@ -152,7 +152,7 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 <td class="cellrowborder" valign="top" width="19.72197219721972%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001521260417_p736835513915"><a name="zh-cn_topic_0000001521260417_p736835513915"></a><a name="zh-cn_topic_0000001521260417_p736835513915"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="63.8963896389639%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001521260417_p193689557393"><a name="zh-cn_topic_0000001521260417_p193689557393"></a><a name="zh-cn_topic_0000001521260417_p193689557393"></a>目的操作数地址序列。</p>
-<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>或者LocalTensor的地址值，LocalTensor支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32B对齐。支持的数据类型参考模板参数T说明。</p>
+<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>或者LocalTensor的地址值，LocalTensor支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32B对齐。支持的数据类型参考模板参数T说明。</p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000001521260417_row1836875519393"><td class="cellrowborder" valign="top" width="16.38163816381638%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000001521260417_p1725974393716"><a name="zh-cn_topic_0000001521260417_p1725974393716"></a><a name="zh-cn_topic_0000001521260417_p1725974393716"></a>srcList</p>
@@ -160,7 +160,7 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 <td class="cellrowborder" valign="top" width="19.72197219721972%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001521260417_p15369205520396"><a name="zh-cn_topic_0000001521260417_p15369205520396"></a><a name="zh-cn_topic_0000001521260417_p15369205520396"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="63.8963896389639%" headers="mcps1.2.4.1.3 "><p id="p15373145064814"><a name="p15373145064814"></a><a name="p15373145064814"></a>源操作数地址序列。</p>
-<p id="p1863116191547"><a name="p1863116191547"></a><a name="p1863116191547"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>或者LocalTensor的地址值，LocalTensor支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32B对齐。支持的数据类型参考模板参数T说明。</p>
+<p id="p1863116191547"><a name="p1863116191547"></a><a name="p1863116191547"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>或者LocalTensor的地址值，LocalTensor支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32B对齐。支持的数据类型参考模板参数T说明。</p>
 <p id="p1040515223286"><a name="p1040515223286"></a><a name="p1040515223286"></a>数据类型需要与dstList保持一致。</p>
 </td>
 </tr>
@@ -494,4 +494,3 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
      [ 6 14 22 30 38 46 54 62 70 78 86 94 102 110 118 126 ]
      [ 7 15 23 31 39 47 55 63 71 79 87 95 103 111 119 127 ]]
     ```
-
