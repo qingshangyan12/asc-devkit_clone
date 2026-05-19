@@ -20,6 +20,7 @@
 #include "simt_stub.h"
 #endif
 #include "utils/base/sys_macros.h"
+#include "simt_api/npu_arch_features.h"
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__

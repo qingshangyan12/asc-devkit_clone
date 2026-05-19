@@ -16,10 +16,10 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_FP8_H__
 #endif
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-
 #include "simt_api/asc_bf16.h"
 #include "simt_api/device_types.h"
+
+#ifdef __NPU_HAS_FP8__
 
 typedef enum __asc_fp8_interpretation_t {
     __ASC_E4M3,

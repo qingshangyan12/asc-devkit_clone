@@ -17,7 +17,7 @@
 #endif
 #include "simt_api/device_types.h"
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#ifdef __NPU_HAS_WARP__
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_all(int32_t predicate);
 
