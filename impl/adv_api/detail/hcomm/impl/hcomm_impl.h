@@ -31,32 +31,38 @@
 
 namespace AscendC {
 
-template <CommEngine commEngine, CommProtocol commProtocol>
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle Hcomm<commEngine, commProtocol>::Write(
-    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+template <CommProtocol commProtocol, CommEngine commEngine>
+__aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Init(uint8_t* buff, uint64_t len)
 {
-    return impl_.template Write<commit, commitPipe, reqPipe>(channelHandle, dst, src, len);
+    return impl_.Init(buff, len);
 }
 
-template <CommEngine commEngine, CommProtocol commProtocol>
+template <CommProtocol commProtocol, CommEngine commEngine>
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle Hcomm<commEngine, commProtocol>::Read(
-    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+__aicore__ inline HcommHandle Hcomm<commProtocol, commEngine>::WriteNbi(
+    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    return impl_.template Read<commit, commitPipe, reqPipe>(channelHandle, dst, src, len);
+    return impl_.template Write<commit, commitPipe, reqPipe>(channel, dst, src, len);
 }
 
-template <CommEngine commEngine, CommProtocol commProtocol>
+template <CommProtocol commProtocol, CommEngine commEngine>
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
+__aicore__ inline HcommHandle Hcomm<commProtocol, commEngine>::ReadNbi(
+    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
+{
+    return impl_.template Read<commit, commitPipe, reqPipe>(channel, dst, src, len);
+}
+
+template <CommProtocol commProtocol, CommEngine commEngine>
 template <pipe_t pipe>
-__aicore__ inline int32_t Hcomm<commEngine, commProtocol>::Commit(HcommHandle handleId)
+__aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Commit(HcommHandle handleId)
 {
     return impl_.template Commit<pipe>(handleId);
 }
 
-template <CommEngine commEngine, CommProtocol commProtocol>
+template <CommProtocol commProtocol, CommEngine commEngine>
 template <pipe_t pipe>
-__aicore__ inline int32_t Hcomm<commEngine, commProtocol>::Wait(HcommHandle handleId)
+__aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Wait(HcommHandle handleId)
 {
     return impl_.template Wait<pipe>(handleId);
 }

@@ -25,6 +25,35 @@
 
 namespace AscendC {
 
+__aicore__ inline uint32_t HtoNL(uint32_t x)
+{
+    constexpr uint32_t byte0Mask = 0x000000ffU;
+    constexpr uint32_t byte1Mask = 0x0000ff00U;
+    constexpr uint32_t byte2Mask = 0x00ff0000U;
+    constexpr uint32_t byte3Mask = 0xff000000U;
+    constexpr uint32_t byteShift = 8;
+    constexpr uint32_t wordShift = 24;
+
+    return (((x & byte3Mask) >> wordShift) | ((x & byte2Mask) >> byteShift) | ((x & byte1Mask) << byteShift) |
+        ((x & byte0Mask) << wordShift));
+}
+
+template<HardEvent event>
+__aicore__ inline void SyncAction()
+{
+    TEventID eventID = GetTPipePtr()->FetchEventID(event);
+    SetFlag<event>(eventID);
+    WaitFlag<event>(eventID);
+}
+
+__aicore__ inline uint8_t* AlignAddrTo32Bytes(uint8_t* buff)
+{
+    uintptr_t addr = reinterpret_cast<uintptr_t>(buff);
+    const uintptr_t alignment = 32;
+    uintptr_t alignedAddr = (addr + alignment - 1) & ~(alignment - 1);
+    return reinterpret_cast<uint8_t*>(alignedAddr);
+}
+
 __aicore__ inline void CacheWriteThrough(__gm__ uint8_t* sourceAddr, uint64_t length)
 {
     __gm__ uint8_t* start = (__gm__ uint8_t*)((uint64_t)sourceAddr / CACHE_LINE_SIZE * CACHE_LINE_SIZE);

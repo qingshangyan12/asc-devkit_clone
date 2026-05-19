@@ -19,7 +19,7 @@
 
 namespace AscendC {
 using HcommHandle = int32_t;
-using ChannelHandle = uint64_t;
+typedef uint64_t ChannelPtr;
 
 enum class CommEngine {
     AIV = 0,
@@ -32,6 +32,177 @@ enum class CommProtocol {
     URMA,
     SDMA,
 };
+
+typedef struct {
+    uint32_t version;
+    uint32_t magicWord;
+    uint32_t size;
+    uint32_t reserved;
+} CommAbiHeader;
+
+typedef enum {
+    PROTECTION_TYPE_INVALID = -1,
+    PROTECTION_TYPE_ROCE = 0,
+    PROTECTION_TYPE_UB = 1,
+} ProtectionType;
+
+typedef enum {
+    SQ_CONTEXT_TYPE_INVALID = -1,
+    SQ_CONTEXT_TYPE_UB_JFS = 0,
+    SQ_CONTEXT_TYPE_ROCE = 1,
+} SqContextType;
+
+typedef enum {
+    CQ_CONTEXT_TYPE_INVALID = -1,
+    CQ_CONTEXT_TYPE_UB_JFC = 0,
+    CQ_CONTEXT_TYPE_ROCE = 1,
+} CqContextType;
+
+typedef enum {
+    REGED_NOTIFY_INVALID = -1,
+    REGED_NOTIFY_IPC_RT = 0,
+    REGED_NOTIFY_IPC_MEM = 1,
+    REGED_NOTIFY_RMA_RT = 2,
+    REGED_NOTIFY_RMA_MEM = 3,
+} RegedNotifyType;
+
+typedef enum {
+    REGED_BUFFER_INVALID = -1,
+    REGED_BUFFER_IPC = 0,
+    REGED_BUFFER_RMA = 1,
+} RegedBufferType;
+
+typedef struct {
+    ProtectionType type;
+    union {
+        struct {
+            uint32_t lkey;
+            uint32_t rkey;
+        } roce;
+        struct {
+            uint32_t tokenId;
+            uint32_t tokenValue;
+        } ub;
+        uint8_t raws[24];
+    } memInfo;
+} ProtectionInfo; // 32B
+
+typedef struct {
+    RegedBufferType type;
+    union {
+        struct {
+            uint64_t addr;
+            uint64_t size;
+        } ipc;
+        struct {
+            uint64_t addr;
+            uint64_t size;
+            ProtectionInfo protectionInfo;
+        } rma;
+        uint8_t raws[56];
+    } bufferInfo;
+} RegedBufferEntity; // 64B
+
+typedef struct {
+    RegedNotifyType type;
+    union {
+        struct {
+            uint64_t addr;
+            uint32_t size;
+            int32_t notifyId;
+        } ipcRt;
+        struct {
+            uint64_t addr;
+            uint32_t size;
+        } ipcMem;
+        struct {
+            uint64_t addr;
+            uint32_t size;
+            int32_t notifyId;
+            ProtectionInfo protectionInfo;
+        } rmaRt;
+        struct {
+            uint64_t addr;
+            uint32_t size;
+            ProtectionInfo protectionInfo;
+        } rmaMem;
+        uint8_t raws[56];
+    } notifyInfo;
+} RegedNotifyEntity; // 64B
+
+typedef struct {
+    SqContextType type;
+    union {
+        struct {
+            uint64_t sqVa;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint64_t dbVa;
+            uint32_t jfsID;
+            uint32_t wqeSize;
+            uint32_t sqDepth;
+            uint32_t tpID;
+            uint8_t remoteEID[16];
+        } ubJfs;
+        struct {
+            uint64_t sqVa;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint64_t dbVa;
+            uint32_t qpn;
+            uint32_t wqeSize;
+            uint32_t depth;
+            int8_t dbMode;
+            uint8_t sl;
+        } roceSq;
+        uint8_t raws[120];
+    } contextInfo;
+} SqContext;
+
+typedef struct {
+    CqContextType type;
+    union {
+        struct {
+            uint64_t scqVa;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint64_t dbVa;
+            uint32_t jfcID;
+            uint32_t cqeSize;
+            uint32_t cqDepth;
+        } ubJfc;
+        struct {
+            uint64_t cqVa;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint64_t dbVa;
+            uint32_t cqn;
+            uint32_t cqeSize;
+            uint32_t cqDepth;
+            int8_t dbMode;
+        } roceCq;
+        uint8_t raws[120];
+    } contextInfo;
+} CqContext;
+
+typedef struct {
+    CommAbiHeader abiHeader;
+    CommEngine engine;
+    CommProtocol protocol;
+    uint32_t localNotifyNum;
+    uint32_t remoteNotifyNum;
+    uint32_t localBufferNum;
+    uint32_t remoteBufferNum;
+    uint32_t sqNum;
+    uint32_t cqNum;
+    RegedNotifyEntity *localNotifyAddr;
+    RegedNotifyEntity *remoteNotifyAddr;
+    RegedBufferEntity *localBufferAddr;
+    RegedBufferEntity *remoteBufferAddr;
+    SqContext *sqContextAddr;
+    CqContext *cqContextAddr;
+    uint8_t reserve[160];
+} ChannelEntity; // 256B
 
 } // namespace AscendC
 
