@@ -1,3 +1,0 @@
-/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/CMakeFiles/cube_mmad_example.dir
-/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/CMakeFiles/edit_cache.dir
-/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/CMakeFiles/rebuild_cache.dir

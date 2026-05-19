@@ -24,7 +24,7 @@ description: 通过AscendC C API编程语言编写Cube核（矩阵计算核心�
 - 数据通路为: GM -> L1 -> L0A/L0B -> Cube MMAD -> L0C -> GM（或 L0C -> L1 -> GM）
 - 矩阵数据在内存中以分形（fractal, NZ格式）存储，对每个维度需按分形大小对齐
 - 3510架构中，`asc_mmad` 的950专用重载版本使用 `disable_gemv` 参数替代 `k_direction_align` 参数
-- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;` 在仿真模式下编译运行（注：dav-3510 的 Cube C API 在 CANN 9.0.0-beta2 中尚未完整发布，dav-2201 提供了完整的 Cube C API，分形概念和数据流在两架构间一致）
+- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;` 在仿真模式下编译运行
 - 执行精度对比时，应将输入、输出、真值数据打印并存储为csv文件
 
 ---
