@@ -93,19 +93,30 @@ namespace AscendC {
  * @ingroup：SetNextTaskStart, WaitPreTaskEnd
  * @brief：In SuperKernel fusion mode, set wait flag between two operators
  */
-template<pipe_t AIV_PIPE, pipe_t AIC_PIPE>
+template<pipe_t AIV_PIPE, pipe_t AIC_PIPE, bool enableEarlyStartV3>
 __aicore__ inline void SetNextTaskStart()
 {
 #ifdef __ASCENDC_ENABLE_SET_NEXT_TASK_START
     SetNextTaskStartImpl<AIV_PIPE, AIC_PIPE>();
+    return;
 #endif
+    if constexpr (enableEarlyStartV3) {
+        SetNextTaskStartImpl<AIV_PIPE, AIC_PIPE, true>();
+        return;
+    }
 }
 
+template<bool enableEarlyStartV3>
 __aicore__ inline void WaitPreTaskEnd()
 {
 #ifdef __ASCENDC_ENABLE_WAIT_PRE_TASK_END
     WaitPreTaskEndImpl();
+    return;
 #endif
+    if constexpr (enableEarlyStartV3) {
+        WaitPreTaskEndImpl<-1, true>();
+        return;
+    }
 }
 
 __aicore__ inline void InitSocState()
