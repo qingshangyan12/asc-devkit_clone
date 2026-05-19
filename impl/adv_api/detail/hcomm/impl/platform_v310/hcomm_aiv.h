@@ -156,18 +156,38 @@ __aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Op
     return handleId;
 }
 
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Write(
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::WriteNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
+    (void)config;
     return Operate<commit, commitPipe, reqPipe>(channel, dst, src, len, static_cast<uint32_t>(HCOMM_OP_TYPE::WRITE));
 }
 
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Read(
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::ReadNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
+    (void)config;
     return Operate<commit, commitPipe, reqPipe>(channel, dst, src, len, static_cast<uint32_t>(HCOMM_OP_TYPE::READ));
+}
+
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::WriteWithNotifyNbi(
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
+{
+    (void)commit;
+    (void)commitPipe;
+    (void)reqPipe;
+    (void)config;
+    (void)channel;
+    (void)dst;
+    (void)src;
+    (void)len;
+    (void)notifyAddr;
+    (void)notifyVal;
+    KERNEL_LOG(KERNEL_ERROR, "Hcomm ROCE WriteWithNotifyNbi is not supported");
+    return HCOMM_INVALID_HANDLE_ID;
 }
 
 template <bool isWait>

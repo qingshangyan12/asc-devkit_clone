@@ -97,7 +97,7 @@ TEST_F(HcommCommonTestSuite, Aiv_Read)
     Hcomm hcomm;
     ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel);
     HcommHandle handleId =
-        hcomm.Read(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
+        hcomm.ReadNbi(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
     EXPECT_EQ(handleId, 0);
     int32_t ret = hcomm.Commit(handleId);
     EXPECT_EQ(ret, -1);
@@ -110,7 +110,7 @@ TEST_F(HcommCommonTestSuite, Aiv_Write)
     Hcomm hcomm;
     ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel);
     HcommHandle handleId =
-        hcomm.Write<false>(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
+        hcomm.WriteNbi<false>(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
     EXPECT_EQ(handleId, 0);
     int32_t ret = hcomm.Commit(handleId);
     EXPECT_EQ(ret, 0);

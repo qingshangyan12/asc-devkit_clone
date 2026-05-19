@@ -31,14 +31,24 @@ class HcommImpl {
 public:
     __aicore__ inline HcommImpl(){};
     __aicore__ inline ~HcommImpl(){};
-    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
+        auto const &config = URMA_DEFAULT_CFG>
+    __aicore__ inline HcommHandle WriteNbi(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
     {
         return -1;
     }
 
-    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
+        auto const &config = URMA_DEFAULT_CFG>
+    __aicore__ inline HcommHandle ReadNbi(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    {
+        return -1;
+    }
+
+    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
+        auto const &config = URMA_DEFAULT_CFG>
+    __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src,
+        uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
     {
         return -1;
     }

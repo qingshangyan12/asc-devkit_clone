@@ -33,19 +33,28 @@
 namespace AscendC {
 
 template <CommEngine commEngine, CommProtocol commProtocol>
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle Hcomm<commEngine, commProtocol>::Write(
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline HcommHandle Hcomm<commEngine, commProtocol>::WriteNbi(
     ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    return impl_.template Write<commit, commitPipe, reqPipe>(channelHandle, dst, src, len);
+    return impl_.template WriteNbi<commit, commitPipe, reqPipe, config>(channelHandle, dst, src, len);
 }
 
 template <CommEngine commEngine, CommProtocol commProtocol>
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle Hcomm<commEngine, commProtocol>::Read(
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline HcommHandle Hcomm<commEngine, commProtocol>::WriteWithNotifyNbi(
+    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
+{
+    return impl_.template WriteWithNotifyNbi<commit, commitPipe, reqPipe, config>(
+        channelHandle, dst, src, len, notifyAddr, notifyVal);
+}
+
+template <CommEngine commEngine, CommProtocol commProtocol>
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline HcommHandle Hcomm<commEngine, commProtocol>::ReadNbi(
     ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    return impl_.template Read<commit, commitPipe, reqPipe>(channelHandle, dst, src, len);
+    return impl_.template ReadNbi<commit, commitPipe, reqPipe, config>(channelHandle, dst, src, len);
 }
 
 template <CommEngine commEngine, CommProtocol commProtocol>

@@ -27,6 +27,26 @@
 
 namespace AscendC {
 
+#pragma pack(push, 1)
+struct UrmaWqeEntry {
+    uint32_t odr : 3;
+    uint32_t fence : 1;
+    uint32_t se : 1;
+    uint32_t cqe : 1;
+    uint32_t inlineEn : 1;
+    uint32_t udfFlag : 1;
+} __attribute__((packed));
+#pragma pack(pop)
+
+static constexpr UrmaWqeEntry URMA_DEFAULT_CFG = {
+    .odr        = 5,
+    .fence      = 1,
+    .se         = 0,
+    .cqe        = 1,
+    .inlineEn   = 0,
+    .udfFlag    = 0
+};
+
 constexpr int8_t HCOMM_INVALID_HANDLE_ID = -1;
 constexpr uint32_t HCOMM_MAX_HANDLE_ID = 1024;
 
@@ -265,6 +285,17 @@ typedef struct {
     uint32_t tokenId;
     uint64_t va;
 } HcommUrmaSgeCtx;
+
+typedef struct {
+    uint32_t notifyTokenId : 20;
+    uint32_t rsv : 12;
+    uint32_t notifyTokenValue;
+    uint32_t notifyAddrL;
+    uint32_t notifyAddrH;
+    uint32_t notifyDataL;
+    uint32_t notifyDataH;
+    uint32_t rsv2[2];
+} HcommUrmaNotifyCtx;
 
 typedef struct {
     uint32_t sR : 1;
