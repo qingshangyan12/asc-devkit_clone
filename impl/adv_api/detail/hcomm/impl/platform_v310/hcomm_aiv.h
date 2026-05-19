@@ -45,21 +45,6 @@ __aicore__ inline uint64_t GetDbValue(uint32_t qpn)
     return dbEntry.dw0.value;
 }
 
-__aicore__ inline uint32_t HtoNL(uint32_t x)
-{
-    constexpr uint32_t byte0Mask = 0x000000ffU;
-    constexpr uint32_t byte1Mask = 0x0000ff00U;
-    constexpr uint32_t byte2Mask = 0x00ff0000U;
-    constexpr uint32_t byte3Mask = 0xff000000U;
-
-    constexpr uint32_t byteShift = 8;
-    constexpr uint32_t wordShift = 24;
-
-    return (
-        ((x & byte3Mask) >> wordShift) | ((x & byte2Mask) >> byteShift) | ((x & byte1Mask) << byteShift) |
-        ((x & byte0Mask) << wordShift));
-}
-
 template <typename T>
 __aicore__ inline void Gm2Ub(
     const AscendC::LocalTensor<T>& dstLocal, const AscendC::GlobalTensor<T>& srcGlobal, int32_t length)
@@ -77,54 +62,81 @@ __aicore__ inline void Ub2Gm(
     const AscendC::GlobalTensor<T>& dstGlobal, const AscendC::LocalTensor<T>& srcLocal, int32_t length)
 {
     AscendC::DataCopyExtParams copyParams{1, (uint32_t)(length * sizeof(T)), 0, 0, 0};
-    PipeBarrier<PIPE_ALL>();
-    AscendC::DataCopyPad(dstGlobal, srcLocal, copyParams);
-    PipeBarrier<PIPE_ALL>();
+    SyncAction<HardEvent::S_MTE3>();
+    AscendC::DataCopyPad<T>(dstGlobal, srcLocal, copyParams);
+    SyncAction<HardEvent::MTE3_S>();
 }
 
-__aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::HcommImpl()
+__aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::KnockDoorBell(__gm__ ChannelEntity* chnlPtr,
+    uint32_t sqHead)
 {
-    pipe_.InitBuffer(hcommBuf_, HCOMM_TMP_BUF_SIZE);
-    wqeItem_ = hcommBuf_.Get<uint32_t>();
-    cqeItem_ = wqeItem_[16];
-    sqPI_ = cqeItem_[8];
-    sqCI_ = sqPI_[8];
-    cqCI_ = sqCI_[8];
-    doorBell_ = cqCI_[8];
+    GlobalTensor<uint8_t> dbGlobalTensor;
+    __gm__ uint8_t* doorBellAddr =
+        (__gm__ uint8_t*)(chnlPtr->sqContextAddr->contextInfo.roceSq.dbVa + (sqHead >> 8) & 0xff);
+    dbGlobalTensor.SetGlobalBuffer(doorBellAddr);
+
+    uint64_t dbValue = GetDbValue(chnlPtr->sqContextAddr->contextInfo.roceSq.qpn);
+    __ubuf__ uint32_t* dbUB = (__ubuf__ uint32_t*)(dbAddr_);
+    *(dbUB + 0) = (dbValue & 0xffffffff);
+    *(dbUB + 1) = (dbValue >> 32) | ((sqHead >> 8) & 0xff);
+#if defined(UT_TEST)
+    uint64_t utDbAddr = reinterpret_cast<uint64_t>(dbAddr_) -
+        (uint64_t)(GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(TPosition::VECOUT)));
+    LocalTensor<uint8_t> dbUBTensor = LocalTensor<uint8_t>(TPosition::VECOUT,
+        static_cast<uint32_t>(utDbAddr), HCOMM_MEM_BLOCK_SIZE);
+#else
+    LocalTensor<uint8_t> dbUBTensor = LocalTensor<uint8_t>(TPosition::VECOUT,
+        static_cast<uint32_t>(reinterpret_cast<uint64_t>(dbAddr_)), HCOMM_MEM_BLOCK_SIZE);
+#endif
+    // 此处想保证db写入为原子操作，穿刺中未验证操作正确性，是否需要换成SetAtomicAdd
+    set_atomic_add();
+    Ub2Gm<uint8_t>(dbGlobalTensor, dbUBTensor, sizeof(uint64_t));
+    SetAtomicNone();
 }
 
-__aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::~HcommImpl() {}
+__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Init(
+    __ubuf__ uint8_t *buff, uint32_t len)
+{
+    if (len < ROCE_UB_BUF_SIZE) {
+        return -1;
+    }
+    __ubuf__ uint8_t *alignedAddr = AlignAddrTo32Bytes(buff);
+    wqeAddr_ = alignedAddr;
+    cqeAddr_ = alignedAddr + ROCE_CQE_POS;
+    dbAddr_ = alignedAddr + ROCE_DB_POS;
+    return 0;
+}
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Operate(
-    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType)
+__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::PostSend(
+    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType)
 {
-    __gm__ Channel* channelPtr = (__gm__ Channel*)(channel);
-    auto sqPIAddr = (__gm__ uint32_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr);
-    GlobalTensor<uint32_t> sqPIGlobal;
-    sqPIGlobal.SetGlobalBuffer(sqPIAddr);
-    Gm2Ub(sqPI_, sqPIGlobal, 1);
-    uint32_t sqHead = sqPI_.GetValue(0);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = %u, sqHead = %u", opType, sqHead);
+    __gm__ ChannelEntity* chnlPtr = (__gm__ ChannelEntity*)(channel);
+    auto sqPIAddr = chnlPtr->sqContextAddr->contextInfo.roceSq.headAddr;
+    CacheWriteThrough((__gm__ uint8_t*)(sqPIAddr), sizeof(uint32_t));
+    uint32_t sqHead = *(__gm__ uint32_t*)(sqPIAddr);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: opType = %u, sqHead = %u\n", opType, sqHead);
 
-    auto sqCIAddr = (__gm__ uint32_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr);
-    GlobalTensor<uint32_t> sqCIGlobal;
-    sqCIGlobal.SetGlobalBuffer(sqCIAddr);
-    uint32_t sqDepth = channelPtr->sqContextAddr->ctx.rdmaSqContext.depth;
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: sqDepth = %u", sqDepth);
+    uint32_t sqDepth = chnlPtr->sqContextAddr->contextInfo.roceSq.depth;
+    KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: sqDepth = %u\n", sqDepth);
 
+    auto sqCIAddr = chnlPtr->sqContextAddr->contextInfo.roceSq.tailAddr;
 #if !defined(UT_TEST)
     while (1) {
-        Gm2Ub(sqCI_, sqCIGlobal, 1);
-        uint32_t sqTail = sqCI_.GetValue(0);
-        KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: sqTail = %u", sqTail);
+        CacheWriteThrough((__gm__ uint8_t*)(sqCIAddr), sizeof(uint32_t));
+        uint32_t sqTail = *(__gm__ uint32_t*)(sqCIAddr);
+        KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: sqTail = %u\n", sqTail);
         if (sqHead - sqTail < sqDepth - 1) {
-            break;
+            if (curHandleId_ >= 0) {
+                Wait(curHandleId_);
+            } else {
+                KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: sq is full, but no wqe in sq.\n");
+                return curHandleId_;
+            }
         }
     }
 #endif
-
-    __ubuf__ RoceWqeEntry* wqePtr = (__ubuf__ RoceWqeEntry*)(wqeItem_.GetPhyAddr());
+    __ubuf__ RoceWqeEntry* wqePtr = (__ubuf__ RoceWqeEntry*)(wqeAddr_);
     uint8_t owner = (sqHead & sqDepth) == 0 ? 0 : 1;
     wqePtr->ctrl.dw0.value = HtoNL(
         owner << HCOMM_WQE_OWNER_OFFSET | 2U << HCOMM_WQE_CTRLSL_OFFSET | 1U << HCOMM_WQE_CR_OFFSET |
@@ -141,77 +153,84 @@ __aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Op
     wqePtr->lastExtLen = 0;
     wqePtr->vaHigh32 = HtoNL(((uint64_t)dst + len) >> 32);
     wqePtr->vaLow32 = HtoNL(((uint64_t)dst + len) & 0xffffffff);
-    uint32_t rKey = channelPtr->remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey;
+    uint32_t rKey = chnlPtr->remoteBufferAddr->bufferInfo.rma.protectionInfo.memInfo.roce.rkey;
     wqePtr->rKey = HtoNL(rKey);
     wqePtr->rsvd1 = 0;
     wqePtr->data.bufAddrHigh32 = HtoNL((uint64_t)src >> 32);
     wqePtr->data.bufAddrLow32 = HtoNL((uint64_t)src & 0xffffffff);
     wqePtr->data.rLen = (uint32_t)len;
-    uint32_t lKey = channelPtr->localBufferAddr->pti.rdmaMemProtectionInfo.lkey;
+    uint32_t lKey = chnlPtr->localBufferAddr->bufferInfo.rma.protectionInfo.memInfo.roce.lkey;
     wqePtr->data.leKey = HtoNL(1 << 31 | lKey);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: make wqe ok");
+    KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: make wqe ok");
 
-    __gm__ uint8_t* sqBaseAddr = (__gm__ uint8_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.sqVa);
+    __gm__ uint8_t* sqBaseAddr = (__gm__ uint8_t*)(chnlPtr->sqContextAddr->contextInfo.roceSq.sqVa);
     uint32_t sqPIMask = sqDepth - 1;
-    uint32_t wqeSize = channelPtr->sqContextAddr->ctx.rdmaSqContext.wqeSize;
-    GlobalTensor<uint32_t> sqGlobal;
+    uint32_t wqeSize = chnlPtr->sqContextAddr->contextInfo.roceSq.wqeSize;
+    GlobalTensor<uint8_t> sqGlobal;
     auto sqAddr = sqBaseAddr + (sqHead & sqPIMask) * wqeSize;
-    sqGlobal.SetGlobalBuffer((__gm__ uint32_t*)(sqAddr));
-    PipeBarrier<PIPE_ALL>();
-    DataCopy(sqGlobal, wqeItem_, 16);
-    PipeBarrier<PIPE_ALL>();
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: set wqe to qp ok");
+    sqGlobal.SetGlobalBuffer((__gm__ uint8_t*)(sqAddr));
+
+#if defined(UT_TEST)
+    uint64_t utWqeAddr = reinterpret_cast<uint64_t>(wqeAddr_) -
+        (uint64_t)(GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(TPosition::VECOUT)));
+    LocalTensor<uint8_t> wqeUB = LocalTensor<uint8_t>(TPosition::VECOUT,
+        static_cast<uint32_t>(utWqeAddr), sizeof(RoceWqeEntry));
+#else
+    LocalTensor<uint8_t> wqeUB = LocalTensor<uint8_t>(TPosition::VECOUT,
+        static_cast<uint32_t>(reinterpret_cast<uint64_t>(wqeAddr_)), sizeof(RoceWqeEntry));
+#endif
+
+    SyncAction<HardEvent::S_MTE3>();
+    DataCopy(sqGlobal, wqeUB, sizeof(RoceWqeEntry));
+    SyncAction<HardEvent::MTE3_S>();
+    KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: set wqe to qp ok\n");
 
     HcommHandle handleId = ++curHandleId_;
     channelList_[handleId] = channel;
     sqHead++;
-    sqPI_.SetValue(0, sqHead);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: update PI in stack, sqHead = %u handleId = %d", sqHead, handleId);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: update PI in stack, sqHead = %u handleId = %d\n", sqHead, handleId);
 
     if constexpr (commit) {
-        Commit(handleId);
-        KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: Commit ok, handleId = %d", handleId);
+        KnockDoorBell(chnlPtr, sqHead);
+        handleCommitList_[handleId] = true;
+        KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: Commit ok, handleId = %d\n", handleId);
     }
-
-    Ub2Gm<uint32_t>(sqPIGlobal, sqPI_, 1);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: update PI to GM sqHead = %u handleId = %d", sqHead, handleId);
+    *(__gm__ uint32_t*)(sqPIAddr) = sqHead;
+    CacheWriteThrough((__gm__ uint8_t*)(sqPIAddr), sizeof(uint32_t));
+    KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: update PI to GM sqHead = %u handleId = %d", sqHead, handleId);
     return handleId;
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Write(
-    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
+__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Write(
+    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    return Operate<commit, commitPipe, reqPipe>(channel, dst, src, len, static_cast<uint32_t>(HCOMM_OP_TYPE::WRITE));
+    return PostSend<commit, commitPipe, reqPipe>(channel, dst, src, len, static_cast<uint32_t>(HCOMM_OP_TYPE::WRITE));
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Read(
-    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
+__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Read(
+    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    return Operate<commit, commitPipe, reqPipe>(channel, dst, src, len, static_cast<uint32_t>(HCOMM_OP_TYPE::READ));
+    return PostSend<commit, commitPipe, reqPipe>(channel, dst, src, len, static_cast<uint32_t>(HCOMM_OP_TYPE::READ));
 }
 
 template <bool isWait>
-__aicore__ inline bool HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::JudgeHandleId(HcommHandle handleId)
+__aicore__ inline bool HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::JudgeHandleId(HcommHandle handleId)
 {
     // 判断handleId是否合法
     if (handleId < 0 || handleId >= 1024) {
-        KERNEL_LOG(KERNEL_ERROR, "Judge HandleId failed without invalid handleId");
+        KERNEL_LOG(KERNEL_ERROR, "Judge HandleId failed without invalid handleId\n");
         return false;
     }
     if (channelList_[handleId] == 0) {
-        KERNEL_LOG(KERNEL_ERROR, "Judge HandleId failed without valid channel");
+        KERNEL_LOG(KERNEL_ERROR, "Judge HandleId failed without valid channel\n");
         return false;
     }
     if constexpr (isWait) {
         // Wait操作，拒绝对未进行Commit或者已进行Wait的handleId进行操作
         if (!handleCommitList_[handleId]) {
             KERNEL_LOG(KERNEL_ERROR, "Wait Judge HandleId failed without Commit");
-            return false;
-        }
-        if (handleWaitList_[handleId]) {
-            KERNEL_LOG(KERNEL_ERROR, "Wait Judge HandleId failed with already Wait");
             return false;
         }
     } else {
@@ -225,33 +244,20 @@ __aicore__ inline bool HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::JudgeHand
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Commit(HcommHandle handleId)
+__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit(HcommHandle handleId)
 {
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = Commit, handleId = %u", handleId);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Commit: handleId = %u\n", handleId);
     if (!JudgeHandleId<false>(handleId)) {
         return HCOMM_FAILED;
     }
-    ChannelHandle channel = channelList_[handleId];
-    __gm__ Channel* channelPtr = (__gm__ Channel*)(channel); // 获取channel
-    AscendC::GlobalTensor<uint32_t> sqPIGlobalTensor;
-    sqPIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr);
-    Gm2Ub(sqPI_, sqPIGlobalTensor, 1);
-    uint32_t sqHead = sqPI_.GetValue(0); // 获取当前channel对应的sq pi
+    ChannelPtr channel = channelList_[handleId];
+    __gm__ ChannelEntity* chnlPtr = (__gm__ ChannelEntity*)(channel);
+    auto sqPIAddr = chnlPtr->sqContextAddr->contextInfo.roceSq.headAddr;
+    CacheWriteThrough((__gm__ uint8_t*)(sqPIAddr), sizeof(uint32_t));
+    uint32_t sqHead = *(__gm__ uint32_t*)(sqPIAddr);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Commit: sqHead = %u\n", sqHead);
 
-    AscendC::GlobalTensor<uint32_t> dbGlobalTensor;
-    __gm__ uint32_t* doorBellAddr =
-        (__gm__ uint32_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.dbVa + (sqHead >> 8) & 0xff);
-    dbGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)doorBellAddr);
-
-    uint64_t dbValue = GetDbValue(channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn);
-    __ubuf__ uint32_t* dbUB = (__ubuf__ uint32_t*)(doorBell_.GetPhyAddr());
-    *(dbUB + 0) = (dbValue & 0xffffffff);
-    *(dbUB + 1) = (dbValue >> 32) | ((sqHead >> 8) & 0xff);
-
-    // 此处想保证db写入为原子操作，穿刺中未验证操作正确性，是否需要换成SetAtomicAdd
-    set_atomic_add();
-    Ub2Gm(dbGlobalTensor, doorBell_, 2);
-    SetAtomicNone();
+    KnockDoorBell(chnlPtr, sqHead);
 
     // 从当前handleId向前遍历更新handleCommitList_
     for (HcommHandle i = handleId; i >= 0; i--) {
@@ -259,7 +265,7 @@ __aicore__ inline int32_t HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Commit
             if (!handleCommitList_[i]) {
                 handleCommitList_[i] = true;
             } else {
-                break;
+                continue;
             }
         }
     }
@@ -267,67 +273,60 @@ __aicore__ inline int32_t HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Commit
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Wait(HcommHandle handleId)
+__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(HcommHandle handleId)
 {
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = Wait, handleId = %u", handleId);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Wait: opType = Wait, handleId = %u\n", handleId);
+    if (handleWaitList_[handleId]) {
+        return HCOMM_SUCCESS;
+    }
     if (!JudgeHandleId<true>(handleId)) {
         return HCOMM_FAILED;
     }
-    ChannelHandle channel = channelList_[handleId];
-    __gm__ Channel* channelPtr = (__gm__ Channel*)(channel); // 获取channel
-    auto sqCIAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr;
-    AscendC::GlobalTensor<uint32_t> sqCIGlobalTensor;
-    sqCIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)sqCIAddr); // 获取Sq CI对应的global tensor
-
-    auto cqCIAddr = channelPtr->cqContextAddr->ctx.rdmaCqContext.tailAddr;
-    AscendC::GlobalTensor<uint32_t> cqCIGlobalTensor;
-    cqCIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)cqCIAddr); // 获取Cq CI对应的global tensor
-
-    uint8_t owner;
+    ChannelPtr channel = channelList_[handleId];
+    __gm__ ChannelEntity* chnlPtr = (__gm__ ChannelEntity*)(channel); // 获取channel
+    auto sqCIAddr = chnlPtr->sqContextAddr->contextInfo.roceSq.tailAddr;
+    auto cqCIAddr = chnlPtr->cqContextAddr->contextInfo.roceCq.tailAddr;
+    uint32_t cqeSize = chnlPtr->cqContextAddr->contextInfo.roceCq.cqeSize;
+    uint32_t cqDepth = chnlPtr->cqContextAddr->contextInfo.roceCq.cqDepth;
+    uint32_t cqn = chnlPtr->cqContextAddr->contextInfo.roceCq.cqn;
     uint32_t cqTail;
-    uint32_t cqMask;
-    uint32_t cqeSize = channelPtr->cqContextAddr->ctx.rdmaCqContext.cqeSize;
-    uint32_t cqDepth = channelPtr->cqContextAddr->ctx.rdmaCqContext.cqDepth;
-    uint32_t cqn = channelPtr->cqContextAddr->ctx.rdmaCqContext.cqn;
-    __gm__ uint8_t* cqBaseBuf = (__gm__ uint8_t*)(channelPtr->cqContextAddr->ctx.rdmaCqContext.dbVa);
-
-    AscendC::GlobalTensor<uint32_t> cqeGlobalTensor;
-    __ubuf__ RoceCqeEntry* cqeUB = (__ubuf__ RoceCqeEntry*)(cqeItem_.GetPhyAddr());
-
+#if defined(UT_TEST)
+    uint64_t utCqeAddr = reinterpret_cast<uint64_t>(cqeAddr_) -
+        (uint64_t)(GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(TPosition::VECOUT)));
+    LocalTensor<uint8_t> cqeUB = LocalTensor<uint8_t>(TPosition::VECOUT,
+        static_cast<uint32_t>(utCqeAddr), sizeof(RoceCqeEntry));
+#else
+    LocalTensor<uint8_t> cqeUB = LocalTensor<uint8_t>(TPosition::VECOUT,
+        static_cast<uint32_t>(reinterpret_cast<uint64_t>(cqeAddr_)), sizeof(RoceCqeEntry));
+#endif
+    __ubuf__ RoceCqeEntry* cqeUBPtr = (__ubuf__ RoceCqeEntry*)(cqeAddr_);
+    CacheWriteThrough((__gm__ uint8_t*)(cqCIAddr), sizeof(uint32_t));
+    cqTail = *(__gm__ uint32_t*)(cqCIAddr);
+    __gm__ uint8_t* cqBaseBuf = (__gm__ uint8_t*)(chnlPtr->cqContextAddr->contextInfo.roceCq.dbVa);
+    auto cqeAddr = cqBaseBuf + ((HtoNL(cqTail) & cqDepth) * cqeSize);
+    AscendC::GlobalTensor<uint8_t> cqeGlobalTensor;
+    cqeGlobalTensor.SetGlobalBuffer((__gm__ uint8_t*)cqeAddr);
     do {
-        Gm2Ub(cqCI_, cqCIGlobalTensor, 1);
-        cqTail = cqCI_.GetValue(static_cast<uint32_t>(0));
-
-        owner = (HtoNL(cqTail) & (cqDepth + 1)) == 0 ? 0 : 1;
-        auto cqeAddr = cqBaseBuf + ((HtoNL(cqTail) & cqDepth) * cqeSize);
-        cqeGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)cqeAddr);
-
-        PipeBarrier<PIPE_ALL>();
-        DataCopy(cqeItem_, cqeGlobalTensor, 8);
-        PipeBarrier<PIPE_ALL>();
-
+        SyncAction<HardEvent::S_MTE2>();
+        DataCopy(cqeUB, cqeGlobalTensor, sizeof(RoceCqeEntry));
+        SyncAction<HardEvent::MTE2_S>();
 #if defined(UT_TEST)
         break;
 #else
-        if (((((cqeUB->cqe0) >> 31) & 0x1) == owner) && ((cqeUB->cqe0 & 0xfffff) == cqn)) {
+        uint8_t owner = (HtoNL(cqTail) & (cqDepth + 1)) == 0 ? 0 : 1;
+        if (((((cqeUBPtr->cqe0) >> 31) & 0x1) == owner) && ((cqeUBPtr->cqe0 & 0xfffff) == cqn)) {
             break;
         }
 #endif
     } while (1);
 
     cqTail = HtoNL(HtoNL(cqTail) + 1);
-    cqTail += 1;
-    cqCI_.SetValue(0, cqTail);
-
-    Ub2Gm(cqCIGlobalTensor, cqCI_, 1); // 更新 Cq CI 到 gm
-
-    Gm2Ub(sqCI_, sqCIGlobalTensor, 1);
-
-    uint32_t sqTail = sqCI_.GetValue(static_cast<uint32_t>(0));
+    CacheWriteThrough((__gm__ uint8_t*)(cqCIAddr), sizeof(uint32_t));
+    CacheWriteThrough((__gm__ uint8_t*)(sqCIAddr), sizeof(uint32_t));
+    uint32_t sqTail = *(__gm__ uint32_t*)(sqCIAddr);
     sqTail += 1;
-    sqCI_.SetValue(0, sqTail);
-
-    Ub2Gm(sqCIGlobalTensor, sqCI_, 1); // 更新 Sq CI 到 gm
+    *(__gm__ uint32_t*)(sqCIAddr) = sqTail;
+    CacheWriteThrough((__gm__ uint8_t*)(sqCIAddr), sizeof(uint32_t));
 
     // 从当前handleId向前遍历处理handleWaitList_
     for (HcommHandle i = handleId; i >= 0; i--) {
@@ -335,7 +334,7 @@ __aicore__ inline int32_t HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Wait(H
             if (!handleWaitList_[i]) {
                 handleWaitList_[i] = true;
             } else {
-                break;
+                continue;
             }
         }
     }

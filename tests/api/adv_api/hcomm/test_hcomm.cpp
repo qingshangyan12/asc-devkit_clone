@@ -18,50 +18,54 @@ using namespace AscendC;
 
 namespace {
 
-Channel GetChannel()
+ChannelEntity GetChannelEntity()
 {
-    Channel channel;
-    // 初始化类型
-    channel.type = 0; // RDMA
+    ChannelEntity channel;
 
     // 为 SQ 相关字段分配内存并设置
     channel.sqNum = 1;
     std::unique_ptr<SqContext> sqContext(new SqContext());
     channel.sqContextAddr = sqContext.get();
-    channel.sqContextAddr->type = 0; // RDMA
-    channel.sqContextAddr->ctx.rdmaSqContext.qpn = 1;
+    channel.sqContextAddr->contextInfo.roceSq.qpn = 1;
 
     // 分配实际内存
     uint8_t* sqBuffer = new uint8_t[10 * 10]; // 10个wqe，每个wqe大小为10
-    channel.sqContextAddr->ctx.rdmaSqContext.sqVa = reinterpret_cast<uint64_t>(sqBuffer);
-    channel.sqContextAddr->ctx.rdmaSqContext.wqeSize = 10;
-    channel.sqContextAddr->ctx.rdmaSqContext.depth = 10;
+    channel.sqContextAddr->contextInfo.roceSq.sqVa = reinterpret_cast<uint64_t>(sqBuffer);
+    channel.sqContextAddr->contextInfo.roceSq.wqeSize = 10;
+    channel.sqContextAddr->contextInfo.roceSq.depth = 10;
 
     // 分配head和tail内存
     uint32_t* head = new uint32_t(0);
     uint32_t* tail = new uint32_t(0);
-    channel.sqContextAddr->ctx.rdmaSqContext.headAddr = reinterpret_cast<uint64_t>(head);
-    channel.sqContextAddr->ctx.rdmaSqContext.tailAddr = reinterpret_cast<uint64_t>(tail);
+    channel.sqContextAddr->contextInfo.roceSq.headAddr = reinterpret_cast<uint64_t>(head);
+    channel.sqContextAddr->contextInfo.roceSq.tailAddr = reinterpret_cast<uint64_t>(tail);
 
-    channel.sqContextAddr->ctx.rdmaSqContext.sl = 1;
+    channel.sqContextAddr->contextInfo.roceSq.sl = 1;
 
     // 分配doorbell内存
     uint64_t* dbBuffer = new uint64_t(0);
-    channel.sqContextAddr->ctx.rdmaSqContext.dbVa = reinterpret_cast<uint64_t>(dbBuffer);
-    channel.sqContextAddr->ctx.rdmaSqContext.dbMode = 0;
+    channel.sqContextAddr->contextInfo.roceSq.dbVa = reinterpret_cast<uint64_t>(dbBuffer);
+    channel.sqContextAddr->contextInfo.roceSq.dbMode = 0;
+
+    std::unique_ptr<CqContext> cqContext(new CqContext());
+    channel.cqContextAddr = cqContext.get();
+    uint32_t* cqhead = new uint32_t(0);
+    uint32_t* cqtail = new uint32_t(0);
+    channel.cqContextAddr->contextInfo.roceCq.headAddr = reinterpret_cast<uint64_t>(cqhead);
+    channel.cqContextAddr->contextInfo.roceCq.tailAddr = reinterpret_cast<uint64_t>(cqtail);
 
     // 为 Buffer 相关字段分配内存并设置
     channel.remoteBufferNum = 1;
     std::unique_ptr<ProtectionInfo> remoteBuffer(new ProtectionInfo());
     channel.remoteBufferAddr = remoteBuffer.get();
-    channel.remoteBufferAddr->type = 0; // RDMA
-    channel.remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey = 123456;
+    channel.remoteBufferAddr->type = 1; // RDMA
+    channel.remoteBufferAddr->bufferInfo.rma.protectionInfo.memInfo.roce.rkey = 123456;
 
     channel.localBufferNum = 1;
     std::unique_ptr<ProtectionInfo> localBuffer(new ProtectionInfo());
     channel.localBufferAddr = localBuffer.get();
     channel.localBufferAddr->type = 0; // RDMA
-    channel.localBufferAddr->pti.rdmaMemProtectionInfo.lkey = 654321;
+    channel.localBufferAddr->bufferInfo.rma.protectionInfo.memInfo.roce.lkey = 654321;
 
     return channel;
 }
@@ -85,10 +89,10 @@ private:
 
 TEST_F(HcommCommonTestSuite, Aiv_Read)
 {
-    Channel channel = GetChannel();
+    ChannelEntity channel = GetChannelEntity();
 
     Hcomm hcomm;
-    ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel);
+    ChannelPtr channelHandle = reinterpret_cast<ChannelPtr>(&channel);
     HcommHandle handleId =
         hcomm.Read(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
     EXPECT_EQ(handleId, 0);
@@ -96,10 +100,10 @@ TEST_F(HcommCommonTestSuite, Aiv_Read)
 
 TEST_F(HcommCommonTestSuite, Aiv_Write)
 {
-    Channel channel = GetChannel();
+    ChannelEntity channel = GetChannelEntity();
 
     Hcomm hcomm;
-    ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel);
+    ChannelPtr channelHandle = reinterpret_cast<ChannelPtr>(&channel);
     HcommHandle handleId =
         hcomm.Write(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
     EXPECT_EQ(handleId, 0);
