@@ -15,15 +15,15 @@
 
 ```
 ├── custom_op_static_lib
+│   ├── CMakeLists.txt            // 顶层编译工程文件
 │   ├── app                       // 链接静态库并执行算子
-│   │   ├── CMakeLists.txt
-│   │   └── main.cpp
-│   ├── op                        // 编译打包生成自定义算子静态库
-│   │   ├── add_custom_host.cpp
-│   │   ├── add_custom_kernel.cpp
-│   │   ├── add_custom_tiling.h
-│   │   └── CMakeLists.txt
-│   └── CMakeLists.txt
+│   │   ├── CMakeLists.txt        // 应用侧编译工程文件
+│   │   └── main.cpp              // 算子调用主程序（aclnn方式执行AddCustom算子）
+│   └── op                        // 编译打包生成自定义算子静态库
+│       ├── CMakeLists.txt        // 算子静态库编译工程文件
+│       ├── add_custom_host.cpp   // Add算子Host侧实现（含Tiling逻辑）
+│       ├── add_custom_kernel.cpp // Add算子Kernel侧实现
+│       └── add_custom_tiling.h   // Add算子Tiling数据结构定义
 ```
 
 ## 代码实现介绍
