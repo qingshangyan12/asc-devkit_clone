@@ -68,27 +68,20 @@ __aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atom
 
 __aicore__ inline void CheckLocalMemoryIA(const CheckLocalMemoryIAParam& checkParams);
 
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 template <int8_t startBit, int8_t endBit>
 __aicore__ static inline void SetCtrlSpr(int64_t value);
 
 template <int8_t startBit, int8_t endBit>
 __aicore__ static inline int64_t GetCtrlSpr();
 
-#if (__NPU_ARCH__ != 2201)
 template <int8_t startBit, int8_t endBit>
 __aicore__ static inline void ResetCtrlSpr();
-#endif
-#endif
 
-#if (__NPU_ARCH__ == 2201)
 template <SaturationMode mode>
 __aicore__ inline void SetSaturationFlag(bool enableSat);
 
 template <SaturationMode mode>
 __aicore__ inline bool GetSaturationFlag();
-#endif
-
 }  // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_common_intf_impl.h"
