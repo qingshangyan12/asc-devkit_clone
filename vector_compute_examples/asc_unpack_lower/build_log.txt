@@ -1,0 +1,11 @@
+asc_unpack_lower 编译运行日志
+=====
+
+最终结果: 通过 (int8_t→int16_t, uint8_t→uint16_t, int16_t→int32_t)
+
+编译过程中遇到的问题与解决方案:
+1. asc_update_mask_b16/b32 参数必须为 uint32_t 左值引用 (lvalue): 
+   原代码中直接传递临时表达式 (三元运算符结果), 导致 "expects an lvalue"
+   编译错误。解决: 使用临时 uint32_t 变量存储参数值。
+
+2. __simd_vf__ 中写了废弃函数 (UnpackLowerVF_int8) 未调用, 不影响编译。

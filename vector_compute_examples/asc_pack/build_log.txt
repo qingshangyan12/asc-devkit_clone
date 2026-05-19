@@ -1,0 +1,24 @@
+asc_pack 编译运行日志
+=====
+
+最终结果: 编译通过, 但精度验证失败 (vpack/storealign 掩码交互问题)
+
+问题分析:
+1. asc_pack (vpack LOWER) 将 int16 → uint8 压缩时, 正确的语义应取每个 int16 的低 8 位。
+   但从输出结果看, asc_pack 似乎未正确执行压缩 (输出值等于输入值, 未截断到 8 位)。
+
+2. asc_storealign 对压缩后的 vector_uint8_t 输出到 __ubuf__ uint8_t* 目标时,
+   使用的掩码由 asc_update_mask_b16(remaining) 生成 (用于 int16 加载),
+   存储时改为 asc_update_mask_b8, 但掩码粒度与数据类型可能存在不匹配。
+   
+3. 首块 (前 256 字节) 数据正确 (由于输入值 < 256, 输入=输出), 
+   后续块输出值溢出为完整 int16 值, 疑似 asc_storealign 写满了
+   整个 256B vector (而非仅 128B 有效区), 产生越界覆盖。
+
+4. asc_pack_v2 (HIGHER) 测试中输出全为前次测试的残留数据,
+   说明当前 kernel 的 dst buffer 被完全污染。
+
+建议后续排查方向:
+- 确认 vpack LOWER/HIGHER 在 3510 仿真器上的实际语义
+- 使用更小的 TILE 和更简化的数据模式隔离问题
+- 尝试不依赖 asc_storealign 掩码的替代写入方案

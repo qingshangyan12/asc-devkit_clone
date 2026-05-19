@@ -47,6 +47,11 @@ SAMPLES=(
     "asc_reduce_sum"
     "asc_ne"
     "asc_pair_reduce_sum"
+    "asc_mull"
+    "asc_arange"
+    "asc_squeeze"
+    "asc_unpack_lower"
+    "asc_pack"
 )
 
 PASS=0

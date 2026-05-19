@@ -1,0 +1,18 @@
+asc_arange 编译运行日志
+=====
+
+最终结果: 通过 (int32_t 类型)
+
+编译过程中遇到的问题与解决方案:
+1. 模板在 __simd_vf__ 中的使用受限: __simd_vf__ 函数只能调用 __simd_callee__ 函数,
+   不能在 __simd_vf__ 内使用 C++ 模板 (if constexpr 分支产生多个函数调用导致后端报错)。
+   解决: 使用 per-type 专用 VF 函数, 避免模板。
+
+2. half/float 类型的 asc_arange 在仿真后端崩溃: "fatal error: error in backend: Unsupported Inst must be hoisted"
+   解决: 暂时仅测试 int32_t 类型。
+
+3. 缺少 PIPE_V→PIPE_MTE3 同步导致部分 block 输出错误:
+   arange kernel 没有 GM→UB 拷贝, 但 VF 操作在 PIPE_V, DMA 在 PIPE_MTE3,
+   需要 sync_notify/wait 确保 VF 完成后再 DMA 搬出。
+   解决: 在 ArangeVF 调用后添加 asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0)
+   和 asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0)。
