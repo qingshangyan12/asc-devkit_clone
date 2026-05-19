@@ -14,7 +14,7 @@
     代码文件 `add.asc` 包含 Host 端与 Device 端代码。
     - **基于C语言API实现示例**
         ```cpp
-        __vector__ __global__ __aicore__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
+        __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
         {
             asc_init();
 
@@ -42,32 +42,30 @@
 
     - **基于C++ Tensor实现示例**
         ```cpp
-        __vector__ __global__ __aicore__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
+        template <uint32_t blockLength>
+        __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
         {
+            AscendC::InitSocState();
+
+            AscendC::GlobalTensor<float> xGm, yGm, zGm;
+            xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
+            yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
+            zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
+
             AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-            AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, tileLength>();
-            AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, tileLength>();
-            AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, tileLength>();
+            AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
+            AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
+            AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, blockLength>();
 
-            for (uint32_t i = 0; i < loopCount; i++) {
-                int32_t eventID = (i % 2 == 0 ? EVENT_ID0 : EVENT_ID1);
-                AscendC::LocalTensor<float>& xLocal = (i % 2 == 0 ? xLocalPing : xLocalPong);
-                AscendC::LocalTensor<float>& yLocal = (i % 2 == 0 ? yLocalPing : yLocalPong);
-                AscendC::LocalTensor<float>& zLocal = (i % 2 == 0 ? zLocalPing : zLocalPong);
-                AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(eventID);
-                AscendC::DataCopy(xLocal, xGm[i * tileLength], tileLength);
-                AscendC::DataCopy(yLocal, yGm[i * tileLength], tileLength);
+            AscendC::DataCopy(xLocal, xGm, blockLength);
+            AscendC::DataCopy(yLocal, yGm, blockLength);
+            AscendC::PipeBarrier<PIPE_ALL>();
 
-                AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(eventID);
-                AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(eventID);
-                AscendC::Add(zLocal, xLocal, yLocal, tileLength);
-                AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(eventID);
-                AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(eventID);
-                AscendC::DataCopy(zGm[i * tileLength], zLocal, tileLength);
-                AscendC::SetFlag<AscendC::HardEvent::MTE3_MTE2>(eventID);
-            }
-            AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID0);
-            AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(EVENT_ID1);
+            AscendC::Add(zLocal, xLocal, yLocal, blockLength);
+            AscendC::PipeBarrier<PIPE_ALL>();
+
+            AscendC::DataCopy(zGm, zLocal, blockLength);
+            AscendC::PipeBarrier<PIPE_ALL>();
         }
         ```
  - **Host 端代码实现**：
@@ -80,7 +78,14 @@
         constexpr uint32_t numBlocks = 8;
         ...
         // Launch kernel <<<NumBlocks, Dynamic memory, Stream>>>
-        add_custom<<<numBlocks, 0, stream>>>();
+
+        // Example2: Launch add kernel which is implemented by SIMD C API
+        add_custom<<<numBlocks, 0>>>(xDevice, yDevice, zDevice);
+
+        // Example2: Launch add kernel which is implemented by C++ Basic API
+        // add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
+       
+        aclrtSynchronizeDevice();
         ...
     }
     ```
@@ -108,7 +113,7 @@
         $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
     )
     ```
-    编译并执行：
+    编译执行示例：
     ```
     mkdir -p build && cd build;   # 创建并进入build目录
     cmake ..;make -j;             # 编译工程

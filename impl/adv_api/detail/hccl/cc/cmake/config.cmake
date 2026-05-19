@@ -90,23 +90,14 @@ set(HOST_STUBS
 )
 endif()
 
-if (AARCH_MODE)
-    set(STUBS
-        ascend_hal
-        slog
-        aicpu_sharder
-        ${HOST_STUBS}
-    )
-else()
-    set(STUBS
-        ascend_hal
-        slog
-        aicpu_sharder
-        ${HOST_STUBS}
-        runtime
-        acl_rt
-    )
-endif()
+set(STUBS
+    ascend_hal
+    slog
+    aicpu_sharder
+    ${HOST_STUBS}
+    runtime
+    acl_rt
+)
 
 foreach(STUB ${STUBS})
     if(NOT TARGET ${STUB})
@@ -208,13 +199,12 @@ else()
     set(HCCL_UNIFIED_DLOG_LINK unified_dlog)
 endif()
 
-set(INSTALL_LIBRARY_DIR hccl/lib64)
-set(INSTALL_INCLUDE_DIR hccl/include)
-set(INSTALL_AICPU_KERNEL_JSON_DIR hccl/built-in/data/op/aicpu)
-set(INSTALL_DEVICE_TAR_DIR hccl/Ascend/aicpu)
-set(INSTALL_PKG_INCLUDE_DIR hccl/pkg_inc)
-set(INSTALL_CCL_KERNEL_JSON_DIR hccl/built-in/data/op/aicpu)
-set(INSTALL_DPU_KERNEL_JSON_DIR hcccl/built-in/data/op/dpu)
+set(INSTALL_LIBRARY_DIR ${CMAKE_SYSTEM_PROCESSOR}-linux/lib64)
+set(INSTALL_AICPU_KERNEL_JSON_DIR opp/built-in/op_impl/aicpu/config)
+set(INSTALL_DEVICE_TAR_DIR opp/built-in/op_impl/aicpu/kernel)
+set(INSTALL_PKG_INCLUDE_DIR ${CMAKE_SYSTEM_PROCESSOR}-linux/pkg_inc)
+set(INSTALL_CCL_KERNEL_JSON_DIR opp/built-in/op_impl/aicpu/config)
+set(INSTALL_DPU_KERNEL_JSON_DIR opp/built-in/op_impl/dpu/config)
 if (ENABLE_TEST)
     set(CMAKE_SKIP_RPATH FALSE)
 else ()
