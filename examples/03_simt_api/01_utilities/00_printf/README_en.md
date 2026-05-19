@@ -45,7 +45,7 @@ This example demonstrates how to use the `printf()` interface in SIMT programmin
 Execute the following steps in the root directory of this example to build and run the operator.
 
 - Configure environment variables
-  Please select the appropriate environment variable configuration command based on the [installation method](../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on your current environment.
+  Please select the appropriate environment variable configuration command based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on your current environment.
   - Default path, root user installation
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

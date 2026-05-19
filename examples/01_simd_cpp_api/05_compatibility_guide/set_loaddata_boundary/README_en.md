@@ -48,7 +48,7 @@
 
 - Configure environment variables
 
-  Please select the corresponding command to configure environment variables based on the [installation method](../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on the current environment.
+  Please select the corresponding command to configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
 
   - Default path, root user installed CANN package
 

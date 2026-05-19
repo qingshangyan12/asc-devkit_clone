@@ -89,7 +89,7 @@ The example supports switching between different scenarios via compilation param
 Execute the following steps in the example root directory to build and run the example.
 
 - Configure environment variables  
-  Select the appropriate command based on the [installation method](../../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development toolkit in your current environment.
+  Select the appropriate command based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development toolkit in your current environment.
   - Default path, CANN package installed by root user
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

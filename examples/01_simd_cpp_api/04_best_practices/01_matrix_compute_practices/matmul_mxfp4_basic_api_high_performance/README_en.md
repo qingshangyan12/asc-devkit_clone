@@ -482,7 +482,7 @@ pip3 install en_dtypes==0.0.4
 
 ### Configure Environment Variables
 
-Select the corresponding environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package in the current environment.
+Select the corresponding environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
 
 - Default path, root user installed CANN software package
   ```bash

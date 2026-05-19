@@ -211,7 +211,7 @@ Execute the following steps in the sample root directory to build and run the sa
 
 - Configure Environment Variables
 
-  Select the corresponding environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package in the current environment.
+  Select the corresponding environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
   - Default path, root user installed CANN software package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

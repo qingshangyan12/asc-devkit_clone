@@ -29,7 +29,7 @@ This sample implements type_traits type traits use cases using the Ascend C prog
 ## Build and Run
 Execute the following steps in the root directory of this sample to build and run the operator.
 - Configure Environment Variables
-  Please select the corresponding command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on the current environment.
+  Please select the corresponding command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   - Default path, root user installed CANN software package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

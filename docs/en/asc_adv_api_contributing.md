@@ -433,7 +433,7 @@ Before executing UT cases, need to modify [CMakeLists.txt](../../tests/api/adv_a
 After completing high-level API coding, test API functionality by implementing operator function and calling the API in the operator. Refer to the following steps.
 - Compile and install.
 
-  Compile and install new or modified API source code to environment. For specific method, refer to [Compile and Install](./quick_start_en.md#compile&install).
+  Compile and install new or modified API source code to environment. For specific method, refer to [Compile and Install](./quick_start.md#compile&install).
 - Create simple custom operator project and test.
 
   Custom develop operator, after creating simple custom operator project, test API functionality by calling single operator. For detailed content about operator development and simple custom operator project, refer to [Ascend C Programming Guide](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC).

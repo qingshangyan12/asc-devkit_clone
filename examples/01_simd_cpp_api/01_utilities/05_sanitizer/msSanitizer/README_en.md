@@ -178,7 +178,7 @@ This sample code is a correct implementation. Users can reproduce various anomal
 
 Execute the following steps in the sample root directory to build and run the operator.
 - Configure Environment Variables
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package in your current environment.
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package in your current environment.
   - Default path, CANN package installed by root user
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

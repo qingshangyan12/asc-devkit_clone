@@ -80,7 +80,7 @@ This sample implements element-wise power operations using the Power high-level 
 Execute the following steps in the sample root directory to compile and run the sample.
 
 - Configure Environment Variables  
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on your current environment.
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on your current environment.
   - Default path, CANN package installed by root user
 
     ```bash

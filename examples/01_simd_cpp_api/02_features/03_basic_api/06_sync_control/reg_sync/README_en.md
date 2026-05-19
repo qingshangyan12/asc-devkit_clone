@@ -87,7 +87,7 @@ Step 3 writes |x| to UB, and step 5 needs to read from the same UB address. Ther
 ## Build and Run
 Execute the following steps in the sample root directory to build and run the operator.
 - Configure Environment Variables  
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit on your current environment.
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on your current environment.
   - Default path, root user installed CANN package
 
     ```bash

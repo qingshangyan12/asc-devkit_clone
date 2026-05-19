@@ -65,7 +65,7 @@ This example implements element-wise logical AND operation using the LogicalAnd 
 Execute the following steps in the root directory of this example to build and run the operator.
 
 - Configure Environment Variables
-  Select the corresponding command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development toolkit on your current environment.
+  Select the corresponding command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development toolkit on your current environment.
   - Default path, CANN package installed by root user
 
     ```bash

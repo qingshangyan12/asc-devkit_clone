@@ -58,7 +58,7 @@ The Add operator implements the function of adding two values and returning the 
 
 Execute the following steps in the sample root directory to build and run the operator.
 - Configure Environment Variables  
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit on your current environment.
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on your current environment.
   - Default path, root user installed CANN package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

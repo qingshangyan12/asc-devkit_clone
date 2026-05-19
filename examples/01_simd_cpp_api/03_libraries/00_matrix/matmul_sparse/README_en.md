@@ -70,7 +70,7 @@ In this scenario, the input original left matrix A is a regular matrix, and the 
 ## Build and Run
 Execute the following steps in the root directory of this example to build and run the example.
 - Configure Environment Variables  
-  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit on your current environment.
+  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on your current environment.
   - Default path, CANN software package installed by root user
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

@@ -70,7 +70,7 @@ This example selects different scenarios through the compilation parameter `SCEN
 
 Execute the following steps in the root directory of this example to compile and run the example.
 - Configure Environment Variables
-  Select the appropriate environment variable configuration command based on the [installation method](../../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on the current environment.
+  Select the appropriate environment variable configuration command based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   - Default path, CANN software package installed by root user
 
     ```bash

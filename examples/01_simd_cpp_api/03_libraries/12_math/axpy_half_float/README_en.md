@@ -61,7 +61,7 @@ This sample implements the functionality of multiplying each element in the sour
 Execute the following steps in the root directory of this sample to build and run the sample.
 
 - Configure Environment Variables
-  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit package on your current environment.
+  Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on your current environment.
   - Default path, CANN software package installed by root user
 
     ```bash

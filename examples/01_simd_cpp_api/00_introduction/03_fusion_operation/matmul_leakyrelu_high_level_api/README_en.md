@@ -57,7 +57,7 @@ This sample uses high-level APIs to implement Matmul and LeakyRelu activation fu
 Execute the following steps in the root directory of this sample to compile and run the sample.
 
 - Configure Environment Variables
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit on the current environment.
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   - Default path, root user installed CANN software package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

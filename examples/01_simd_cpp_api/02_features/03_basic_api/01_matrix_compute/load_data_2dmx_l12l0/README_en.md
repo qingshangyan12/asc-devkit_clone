@@ -1240,7 +1240,7 @@ Note: fixpipeParams.srcStride unit is elements. It means the starting address of
 ## Build and Run
 Execute the following steps in the sample root directory to build and run the sample.
 - Configure environment variables
-  Select the corresponding command to configure environment variables based on the [installation method](../../../../../../docs/quick_start_en.md#prepare&install) of the CANN development kit on the current environment.
+  Select the corresponding command to configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   - Default path, root user installed CANN software package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh

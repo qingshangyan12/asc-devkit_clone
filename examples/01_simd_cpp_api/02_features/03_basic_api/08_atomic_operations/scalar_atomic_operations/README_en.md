@@ -52,7 +52,7 @@ This sample uses the compile parameter `SCENARIO_NUM` to switch between differen
 
 Execute the following steps in the root directory of this sample to build and run it.
 - Configure environment variables
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../../docs/en/quick_start_en.md#prepare&install) of the CANN development kit on your current environment.
+  Select the appropriate command to configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on your current environment.
   - Default path, CANN package installed by root user
 
     ```bash
