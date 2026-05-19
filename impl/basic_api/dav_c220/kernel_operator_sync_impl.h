@@ -127,6 +127,7 @@ __aicore__ inline uint16_t GetffstMsg(uint16_t mode, uint16_t flagId)
 template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX>
 __aicore__ inline void SetNextTaskStartImpl()
 {
+#if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V1) || defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
     if ASCEND_IS_AIC {
         ffts_cross_core_sync(AIC_PIPE, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
     }
@@ -134,7 +135,47 @@ __aicore__ inline void SetNextTaskStartImpl()
         ffts_cross_core_sync(AIV_PIPE, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
     }
     return;
+#elif defined(__ASCENDC_SUPERKERNEL_EARLY_START_V3)
+    if ASCEND_IS_AIC {
+        if (g_super_kernel_early_start_config & static_cast<uint32_t>(SkEarlyStartMask::AIC_TO_AIC_SET)) {
+            ffts_cross_core_sync(AIC_PIPE, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG)); // SET:C--->C
+        }
+    }
+    if ASCEND_IS_AIV {
+        if (g_super_kernel_early_start_config & static_cast<uint32_t>(SkEarlyStartMask::AIV_TO_AIV_SET)) {
+            ffts_cross_core_sync(AIV_PIPE, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL)); // SET: V--->V
+        }
+    }
+#endif
 }
+
+#if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V3)
+__aicore__ inline void WaitPreTaskEndV3Impl(uint32_t earlyStartConfig)
+{
+    if ASCEND_IS_AIC {
+        if (earlyStartConfig & static_cast<uint32_t>(SkEarlyStartMask::AIC_TO_AIC_WAIT)) {
+            wait_flag_dev(AscendC::SYNC_AIC_FLAG); // WAIT: C--->C
+        }
+        if (earlyStartConfig & static_cast<uint32_t>(SkEarlyStartMask::AIC_TO_AIV_SET)) {
+            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG)); // SET: C--->V
+        }
+        if (earlyStartConfig & static_cast<uint32_t>(SkEarlyStartMask::AIV_TO_AIC_WAIT)) {
+            wait_flag_dev(AscendC::SYNC_AIV_FLAG); // WAIT: V--->C
+        }
+    }
+    if ASCEND_IS_AIV {
+        if (earlyStartConfig & static_cast<uint32_t>(SkEarlyStartMask::AIV_TO_AIV_WAIT)) {
+            wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL); // WAIT: V--->V
+        }
+        if (earlyStartConfig & static_cast<uint32_t>(SkEarlyStartMask::AIV_TO_AIC_SET)) {
+            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG)); // SET: V--->C
+        }
+        if (earlyStartConfig & static_cast<uint32_t>(SkEarlyStartMask::AIC_TO_AIV_WAIT)) {
+            wait_flag_dev(AscendC::SYNC_AIC_AIV_FLAG); // WAIT: C--->V
+        }
+    }
+}
+#endif
 
 __aicore__ inline void WaitPreTaskEndV2Impl()
 {
@@ -214,7 +255,7 @@ __aicore__ inline void WaitPreTaskEndV2Impl()
 }
 
 // optimize if-else scalar cost, will be called only in superkernel.cpp
-template<int8_t earlyStartConfig = -1>
+template<int32_t earlyStartConfig = -1>
 __aicore__ inline void WaitPreTaskEndImpl()
 {
 #ifdef __ASCENDC_SUPERKERNEL_EARLY_START_V1
@@ -228,7 +269,6 @@ __aicore__ inline void WaitPreTaskEndImpl()
         ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
         wait_flag_dev(AscendC::SYNC_AIC_AIV_FLAG);
     }
-    return;
 #elif defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
     if constexpr (earlyStartConfig == -1) {
         WaitPreTaskEndV2Impl();
@@ -302,8 +342,14 @@ __aicore__ inline void WaitPreTaskEndImpl()
             wait_flag_dev(AscendC::SYNC_AIC_AIV_FLAG);
         }
     }
-    return;
+#elif defined(__ASCENDC_SUPERKERNEL_EARLY_START_V3)
+    if constexpr (earlyStartConfig == -1) {
+        WaitPreTaskEndV3Impl(g_super_kernel_early_start_config);
+    } else {
+        WaitPreTaskEndV3Impl(earlyStartConfig);
+    }
 #endif
+    return;
 }
 
 template <bool isAIVOnly = true> __aicore__ inline void SyncAllImpl()
