@@ -515,8 +515,8 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
 
         // 用户自定义校验：若不满足条件则打印警告日志
         if (CcuSelectAlgCheck(ccTiling, i) != HCCL_SUCCESS) {
-            HCCL_WARNING("[CcuSelectAlg] CcuSelectAlgCheck failed for ccTiling[%u], opType[%u], ret[%d]. "
-                "CCU execution condition not satisfied.", i, ccTiling->opType, checkRet);
+            HCCL_WARNING("[CcuSelectAlg] CcuSelectAlgCheck failed for ccTiling[%u], opType[%u]. "
+                "CCU execution condition not satisfied.", i, ccTiling->opType);
         }
 
         // 构造OpParam并选择算法

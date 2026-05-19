@@ -220,7 +220,7 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
 
     // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
     OpResCtx resCtx{};
-    CHK_RET(CcuAllocV2(comm, ctxTag, rankSize, userRank, resCtx));
+    CHK_RET(AllocCcuOpResCtx(comm, ctxTag, rankSize, userRank, resCtx));
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
     CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, resCtx));
