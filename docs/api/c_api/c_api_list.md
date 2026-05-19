@@ -347,7 +347,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_cumulative_histogram](reg/reg_vector/asc_cumulative_histogram.md) | 对直方图数据进行累计统计。 |
 | [asc_deintlv](reg/reg_vector/asc_deintlv.md) | 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。 |
 | [asc_div](reg/reg_vector/asc_div.md) | 按元素执行除法运算。 |
-| [asc_duplicate](reg/reg_vector/asc_duplicate.md) | 根据mask将源操作数src的最低位元素填充到目的操作数dst。 |
+| [asc_duplicate](reg/reg_vector/asc_duplicate.md) | 根据mask将源操作数src的最低位或最高位元素填充到目的操作数dst。 |
 | [asc_duplicate_scalar](reg/reg_vector/asc_duplicate_scalar.md) | 根据mask将value填充到目的操作数dst。 |
 | [asc_e1m2x22bfloat16](reg/reg_vector/asc_e1m2x22bfloat16.md) | 将fp4x2_e1m2_t类型转换为bfloat16_t类型。 |
 | [asc_e2m1x22bfloat16](reg/reg_vector/asc_e2m1x22bfloat16.md) | 将fp4x2_e2m1_t类型转换为bfloat16_t类型。 |

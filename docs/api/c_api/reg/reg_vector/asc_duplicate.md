@@ -8,13 +8,11 @@
 
 ## 功能说明
 
-根据mask将源操作数src的最低位元素填充到目的操作数dst。
+根据mask将源操作数src的最低位或最高位元素填充到目的操作数dst。
 
-计算公式如下：
+- asc_duplicate：填充源操作数src的最低位元素。
 
-$$
-dst_i = src_0
-$$
+- asc_duplicate_v2：填充源操作数src的最高位元素。
 
 ## 函数原型
 
@@ -30,6 +28,18 @@ __simd_callee__ inline void asc_duplicate(vector_bfloat16_t& dst, vector_bfloat1
 __simd_callee__ inline void asc_duplicate(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 __simd_callee__ inline void asc_duplicate(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 __simd_callee__ inline void asc_duplicate(vector_float& dst, vector_float src, vector_bool mask)
+
+__simd_callee__ inline void asc_duplicate_v2(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_v2(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_v2(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_v2(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_v2(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_v2(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_v2(vector_half& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_v2(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_v2(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_v2(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_v2(vector_float& dst, vector_float src, vector_bool mask)
 ```
 
 ## 参数说明

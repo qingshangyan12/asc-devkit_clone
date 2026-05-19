@@ -22,7 +22,7 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
-void cce_name##_##data_type##_Stub(data_type& dst, data_type src0,                              \
+void class_name##_##cce_name##_##data_type##_Stub(data_type& dst, data_type src0,               \
     vector_bool mask, int32_t pos, Literal mode) {}                                             \
 }                                                                                               \
                                                                                                 \
@@ -34,7 +34,7 @@ TEST_F(TestVectorCompute##class_name####data_type##CApi, c_api_name##_##data_typ
                                                                                                 \
     MOCKER_CPP(cce_name, void(data_type&, data_type, vector_bool, int32_t, Literal))            \
         .times(1)                                                                               \
-        .will(invoke(cce_name##_##data_type##_Stub));                                           \
+        .will(invoke(class_name##_##cce_name##_##data_type##_Stub));                            \
                                                                                                 \
     c_api_name(dst, src0, mask);                                                                \
     GlobalMockObject::verify();                                                                 \
@@ -51,3 +51,15 @@ TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate, vdup, vector_bfloat16_t
 TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate, vdup, vector_uint32_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate, vdup, vector_int32_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate, vdup, vector_float);
+
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_uint8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_int8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_fp8_e4m3fn_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_fp8_e5m2_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_uint16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_int16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_half);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_bfloat16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_uint32_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_int32_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdupv2, asc_duplicate_v2, vdup, vector_float);
