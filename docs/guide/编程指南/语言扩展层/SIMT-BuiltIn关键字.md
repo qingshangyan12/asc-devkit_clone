@@ -74,7 +74,7 @@
 
 -   blockDim<a name="li076017381191"></a>
 
-    内置全局变量，在核函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构，即启动VF时配置的dim3结构体实例值。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数。
+    内置全局变量，在核函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构，即启动核函数时配置的dim3结构体实例值。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数。
 
 -   blockIdx<a name="li1676053814914"></a>
 
@@ -256,7 +256,7 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 其中：
 
 -   blocks\_per\_grid：int或dim3类型，用于指定网格（grid）的维度与规模，blocks\_per\_grid.x \* blocks\_per\_grid.y \* blocks\_per\_grid.z等于启动的线程块总数。
--   threads\_per\_block：int或dim3类型，用于指定每个线程块（block）的维度与规模，threads\_per\_block.x \* threads\_per\_block.y \* threads\_per\_block.z等于每个线程块包含的线程数，需要小于等于\_\_launch\_bounds\_\_配置。
+-   threads\_per\_block：int或dim3类型，用于指定每个线程块的维度与规模，threads\_per\_block.x \* threads\_per\_block.y \* threads\_per\_block.z等于每个线程块包含的线程数，需要小于等于\_\_launch\_bounds\_\_配置。
 -   dyn\_ubuf\_size：size\_t类型，用于指定每个线程块动态分配的共享内存大小，单位为字节。这部分内存供数组使用，具体用法请参考[共享内存](../编程模型/AI-Core-SIMT编程/内存层级.md#共享内存unified-buffer)中的“动态申请”方式。
 -   stream：aclrtStream类型指针，指定关联的流，用于维护异步操作的执行顺序。
 
@@ -281,7 +281,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
 -   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
   
-    函数标记宏，在核函数上可选配置，用于在编译期指定核函数启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动VF任务的dim3线程数保持一致。
+    函数标记宏，在核函数上可选配置，用于在编译期指定核函数启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动核函数时的dim3线程数保持一致。
     
     **表 5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
 
