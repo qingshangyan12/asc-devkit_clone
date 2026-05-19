@@ -20,7 +20,7 @@
 
 对标量的数据类型进行转换。
 
-在使用该接口之前，用户需要先了解[内置数据类型](内置数据类型.md#ZH-CN_TOPIC_0000002603544909)和[精度转换](精度转换.md#ZH-CN_TOPIC_0000002603424969)。
+在使用该接口之前，用户需要先了解[内置数据类型](../数据结构/内置数据类型.md)和[精度转换](../数据结构/precision_conversion.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -37,7 +37,7 @@ __aicore__ inline U Cast(T valueIn)
 | ------ | ------ |
 | T | valueIn的数据类型 |
 | U | 转换后的数据类型，支持half、int32_t。 |
-| roundMode | 精度转换处理模式，类型是RoundMode。<br> RoundMode为枚举类型，用以控制精度转换处理模式，参考[精度舍入模式](精度转换.md#zh-cn_topic_0000002568472166_table49591625315)</a>，可取值为:<br> &bull; CAST_NONE：在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不取整 <br>&bull; CAST_RINT：rint，四舍六入五成双取整<br>&bull; CAST_FLOOR：floor，向负无穷取整 <br>&bull; CAST_CEIL：ceil，向正无穷取整<br>&bull; CAST_ROUND:round，四舍五入取整<br>&bull; CAST_TRUNC：trunc，向零取整<br>&bull; CAST_ODD：Von Neumann rounding，最近邻奇数舍入|
+| roundMode | 精度转换处理模式，类型是RoundMode。<br> RoundMode为枚举类型，用以控制精度转换处理模式，参考[精度舍入模式](../数据结构/precision_conversion.md#精度舍入模式)，可取值为:<br> &bull; CAST_NONE：在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不取整 <br>&bull; CAST_RINT：rint，四舍六入五成双取整<br>&bull; CAST_FLOOR：floor，向负无穷取整 <br>&bull; CAST_CEIL：ceil，向正无穷取整<br>&bull; CAST_ROUND:round，四舍五入取整<br>&bull; CAST_TRUNC：trunc，向零取整<br>&bull; CAST_ODD：Von Neumann rounding，最近邻奇数舍入|
 
 **表 2**  参数说明
 
