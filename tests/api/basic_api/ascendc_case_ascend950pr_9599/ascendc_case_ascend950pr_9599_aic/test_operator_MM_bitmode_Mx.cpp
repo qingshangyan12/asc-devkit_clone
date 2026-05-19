@@ -155,21 +155,68 @@ protected:
         }                                                                                                         \
     }
 
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, int32_t, int8_t, int8_t, int32_t, int32_t);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, half, int8_t, int8_t, int32_t, int32_t);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, bfloat16_t, int8_t, int8_t, int32_t, int32_t);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, int8_t, int8_t, int8_t, int32_t, int32_t);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, uint8_t, int8_t, int8_t, int32_t, int32_t);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, half, half, float, half);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, half, half, float, float);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, float, float, float, half);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, float, float, float, float);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, bfloat16_t, bfloat16_t, float, float);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, half, fp8_e5m2_t, fp8_e5m2_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e1m2_t, fp4x2_e1m2_t, float, float);
 VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(
-    TEST_MMAD_MX_BIAS_BITMODE, false, bfloat16_t, fp8_e4m3fn_t, fp8_e4m3fn_t, float, float);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, int8_t, fp8_e5m2_t, fp8_e4m3fn_t, float, float);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, uint8_t, fp8_e4m3fn_t, fp8_e5m2_t, float, float);
+    TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e1m2_t, fp4x2_e1m2_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e1m2_t, fp4x2_e1m2_t, float, half);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e1m2_t, fp4x2_e1m2_t, float, float);
 VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(
-    TEST_MMAD_MX_BIAS_BITMODE, false, fp8_e4m3fn_t, fp8_e4m3fn_t, fp8_e4m3fn_t, float, float);
-VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, hifloat8_t, hifloat8_t, hifloat8_t, float, float);
+    TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e1m2_t, fp4x2_e1m2_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e1m2_t, fp4x2_e1m2_t, float, half);
+
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e2m1_t, fp4x2_e1m2_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(
+    TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e2m1_t, fp4x2_e1m2_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e2m1_t, fp4x2_e1m2_t, float, half);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e2m1_t, fp4x2_e1m2_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(
+    TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e2m1_t, fp4x2_e1m2_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e2m1_t, fp4x2_e1m2_t, float, half);
+
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e1m2_t, fp4x2_e2m1_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(
+    TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e1m2_t, fp4x2_e2m1_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e1m2_t, fp4x2_e2m1_t, float, half);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e1m2_t, fp4x2_e2m1_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(
+    TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e1m2_t, fp4x2_e2m1_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e1m2_t, fp4x2_e2m1_t, float, half);
+
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e2m1_t, fp4x2_e2m1_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(
+    TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e2m1_t, fp4x2_e2m1_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp4x2_e2m1_t, fp4x2_e2m1_t, float, half);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e2m1_t, fp4x2_e2m1_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(
+    TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e2m1_t, fp4x2_e2m1_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp4x2_e2m1_t, fp4x2_e2m1_t, float, half);
+
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e4m3fn_t, fp8_e4m3fn_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(
+    TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e4m3fn_t, fp8_e4m3fn_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e4m3fn_t, fp8_e4m3fn_t, float, half);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e4m3fn_t, fp8_e4m3fn_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(
+    TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e4m3fn_t, fp8_e4m3fn_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e4m3fn_t, fp8_e4m3fn_t, float, half);
+
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e4m3fn_t, fp8_e5m2_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e4m3fn_t, fp8_e5m2_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e4m3fn_t, fp8_e5m2_t, float, half);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e4m3fn_t, fp8_e5m2_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e4m3fn_t, fp8_e5m2_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e4m3fn_t, fp8_e5m2_t, float, half);
+
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e5m2_t, fp8_e4m3fn_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e5m2_t, fp8_e4m3fn_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e5m2_t, fp8_e4m3fn_t, float, half);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e5m2_t, fp8_e4m3fn_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e5m2_t, fp8_e4m3fn_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e5m2_t, fp8_e4m3fn_t, float, half);
+
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e5m2_t, fp8_e5m2_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e5m2_t, fp8_e5m2_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, false, float, fp8_e5m2_t, fp8_e5m2_t, float, half);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e5m2_t, fp8_e5m2_t, float, float);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e5m2_t, fp8_e5m2_t, float, bfloat16_t);
+VEC_MMAD_MX_BIAS_BITMODE_TESTCASE(TEST_MMAD_MX_BIAS_BITMODE, true, float, fp8_e5m2_t, fp8_e5m2_t, float, half);
