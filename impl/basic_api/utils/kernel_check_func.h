@@ -471,6 +471,65 @@ bool CheckFunProposal(const LocalTensor<T>& dst, const MrgSortSrcList<T>& src, c
     return res;
 }
 
+template <typename T>
+bool CheckFunProposal(const LocalTensor<T>& dstLocal, const MrgSortSrcList<T>& srcLocal, const MrgSort4Info& params,
+    const char* intriName)
+{
+    check::VecProposalApiParams chkParams1 { static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dstLocal.GetPhyAddr())),
+        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(srcLocal.src1.GetPhyAddr())),
+        static_cast<uint8_t>(params.repeatTimes),
+        static_cast<uint32_t>(sizeof(T)),
+        static_cast<uint32_t>(sizeof(T)),
+        static_cast<uint64_t>(dstLocal.GetSize() * sizeof(T)),
+        static_cast<uint64_t>(srcLocal.src1.GetSize() * sizeof(T)),
+        static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstLocal.GetPosition()))),
+        static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcLocal.src1.GetPosition()))),
+        params.validBit,
+        params.elementLengths,
+        0 };
+    check::VecProposalApiParams chkParams2 { static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dstLocal.GetPhyAddr())),
+        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(srcLocal.src2.GetPhyAddr())),
+        static_cast<uint8_t>(params.repeatTimes),
+        static_cast<uint32_t>(sizeof(T)),
+        static_cast<uint32_t>(sizeof(T)),
+        static_cast<uint64_t>(dstLocal.GetSize() * sizeof(T)),
+        static_cast<uint64_t>(srcLocal.src2.GetSize() * sizeof(T)),
+        static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstLocal.GetPosition()))),
+        static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcLocal.src2.GetPosition()))),
+        params.validBit,
+        params.elementLengths,
+        1 };
+    check::VecProposalApiParams chkParams3 { static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dstLocal.GetPhyAddr())),
+        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(srcLocal.src3.GetPhyAddr())),
+        static_cast<uint8_t>(params.repeatTimes),
+        static_cast<uint32_t>(sizeof(T)),
+        static_cast<uint32_t>(sizeof(T)),
+        static_cast<uint64_t>(dstLocal.GetSize() * sizeof(T)),
+        static_cast<uint64_t>(srcLocal.src3.GetSize() * sizeof(T)),
+        static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstLocal.GetPosition()))),
+        static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcLocal.src3.GetPosition()))),
+        params.validBit,
+        params.elementLengths,
+        2 };
+    check::VecProposalApiParams chkParams4 { static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dstLocal.GetPhyAddr())),
+        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(srcLocal.src4.GetPhyAddr())),
+        static_cast<uint8_t>(params.repeatTimes),
+        static_cast<uint32_t>(sizeof(T)),
+        static_cast<uint32_t>(sizeof(T)),
+        static_cast<uint64_t>(dstLocal.GetSize() * sizeof(T)),
+        static_cast<uint64_t>(srcLocal.src4.GetSize() * sizeof(T)),
+        static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstLocal.GetPosition()))),
+        static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcLocal.src4.GetPosition()))),
+        params.validBit,
+        params.elementLengths,
+        3 };
+    bool res = CheckFunProposalImpl(chkParams1, intriName);
+    res = res && CheckFunProposalImpl(chkParams2, intriName);
+    res = res && CheckFunProposalImpl(chkParams3, intriName);
+    res = res && CheckFunProposalImpl(chkParams4, intriName);
+    return res;
+}
+
 template <typename T, typename U, bool isFullSort>
 bool CheckFuncSort(const LocalTensor<T>& dst, const LocalTensor<T>& concat, const LocalTensor<U>& index,
     const LocalTensor<T>& tmp, const int32_t repeatTime, const char* intriName)
