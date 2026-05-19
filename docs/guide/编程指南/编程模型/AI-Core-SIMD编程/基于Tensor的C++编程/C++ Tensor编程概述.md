@@ -91,7 +91,7 @@ Stride中的每个元素与Shape中的元素对应，表示该对应维度下，
 
 ### Tensor定义方式
 扩展能力的Tensor是通过对基础Tensor的特例化扩展实现，它通过MakeTensor函数创建，Shape和Stride可以在编译期确定。针对不同的应用场景提供多种种定义方式：
-**1. 定义连续的内存块的Tensor**
+- **1. 定义连续的内存块的Tensor**
 ```cpp
 // 1.1 定义动态Shape Tensor
 auto dynTensor = MakeTensor(pointer, MakeShape(m, n));
@@ -99,7 +99,7 @@ auto dynTensor = MakeTensor(pointer, MakeShape(m, n));
 auto staticTensor = MakeTensor(pointer, MakeShape(Std::Int<128>{}, Std::Int<64>{}));
 ```
 
-**2. 指定Stride定义任意排布的Tensor**
+- **2. 指定Stride定义任意排布的Tensor**
 ```cpp
 // 2.1 行优先排布的Tensor定义
 auto rowMajorTensor = MakeTensor(pointer, MakeLayout(MakeShape(m, n), MakeStride(n, Std::Int<1>{})));
@@ -107,13 +107,13 @@ auto rowMajorTensor = MakeTensor(pointer, MakeLayout(MakeShape(m, n), MakeStride
 auto colMajorTensor = MakeTensor(pointer, MakeLayout(MakeShape(m, n), MakeStride(Std::Int<1>{}, n)));
 ```
 
-**3. 通过层次化布局形式定义矩阵分型Tensor**
+- **3. 通过层次化布局形式定义矩阵分型Tensor**
 ```cpp
 // 3.1 针对(128, 64)的矩阵，内部为16 * 16的分型，可以通过层次化布局来定义对应的4维Tensor
 auto nzTensor = MakeTensor(pointer, MakeLayout(MakeShape((8, 16), (4, 16))));
 ```
 
-**4：通过特定的分形布局进行简化的定义** - Cube矩阵乘专用，自动生成Shape和Stride
+- **4：通过特定的分形布局进行简化的定义** - Cube矩阵乘专用，自动生成Shape和Stride
 ```cpp
 // 4.1 通过MakeFrameLayout，指定NZ Pattern直接指定NZ分型, 接口内部自动推到成4维分型
 auto tensor = MakeTensor(l0aPointer, MakeFrameLayout<NZLayoutPtn>(128, 64));
@@ -151,7 +151,7 @@ auto copyAtom = MakeCopy<CopyGM2UB>();
 Copy(copyAtom, gmTensor, ubTensor);
 ```
 
-// 4 CUBE计算: 提供了简化的Mamd接口，方便用户直接进行矩阵乘计算
+- **4 CUBE计算: 提供了简化的Mamd接口，方便用户直接进行矩阵乘计算**
 ```cpp
 Mmad(l0c, l0a, l0b, {m, n, k, false, iterK == 0});
 ```
