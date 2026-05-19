@@ -15,11 +15,11 @@ ClampMin将输入Tensor中小于scalar的元素替换为scalar，ClampMax将输�
 
 ```plain
 ├── clampmin
-│   ├── scripts
-│   │   └── gen_data.py   // 输入数据和真值数据生成脚本
+│   ├── clampmin.asc      // Ascend C样例实现 & 调用样例
 │   ├── CMakeLists.txt    // 编译工程文件
 │   ├── data_utils.h      // 数据读入写出函数
-│   └── clampmin.asc      // Ascend C样例实现 & 调用样例
+│   └── scripts
+│       └── gen_data.py   // 输入数据和真值数据生成脚本
 ```
 
 ## 样例描述

@@ -17,8 +17,8 @@
 ├── 15_simt_gather_with_ub
 │   ├── CMakeLists.txt         # cmake编译文件
 │   ├── gather_v1.asc          # Ascend C直接访问GM实现gather算子样例
-│   ├── gather_v2.asc          # Ascend C使用UB实现gather算子样例
-|   └── README.md
+│   └── gather_v2.asc          # Ascend C使用UB实现gather算子样例
+├── |   └── README.md
 ```
 
 ## 算子描述

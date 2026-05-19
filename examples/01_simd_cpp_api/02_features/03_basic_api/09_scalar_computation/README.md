@@ -6,6 +6,6 @@
 
 ## 样例列表
 
-| 目录名称 | 功能描述 |
-| ------- | -------- |
-| [gm_by_pass_dcache](./gm_by_pass_dcache)             | 本样例基于ReadGmByPassDcache和WriteGmByPassDcache接口，实现不经过DCache从GM读取和写入数据。 |
+| 目录名称 | 功能描述  | 支持的产品 |
+| ------- | --------  | --- |
+| [gm_by_pass_dcache](./gm_by_pass_dcache)             | 本样例基于ReadGmByPassDcache和WriteGmByPassDcache接口，实现不经过DCache从GM读取和写入数据。  | Ascend 950PR/Ascend 950DT |

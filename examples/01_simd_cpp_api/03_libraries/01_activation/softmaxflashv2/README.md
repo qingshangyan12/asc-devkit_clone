@@ -14,10 +14,10 @@
 
 ```
 ├── softmaxflashv2
-│   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── scripts
+│   │   └── gen_data.py         // 输入数据和真值数据生成脚本
 │   └── softmaxflashv2.asc      // Ascend C算子实现 & 调用样例
 ```
 
@@ -66,7 +66,7 @@
   本样例中实现的是固定shape为输入x [960, 960]，输出max[960, 8]、sum[960, 8]的softmaxflashv2样例。
 
   - Kernel实现  
-    核心计算步骤：将输入数据搬入后，调用 `AscendC::SoftmaxFlashV2(xLocal, sumLocal, maxLocal, xLocal, expmaxLocal, sharedTmpBuffer, softmaxTiling)` 完成 SoftmaxFlashV2 计算，再将结果搬出。
+    核心计算步骤：将输入数据搬入后，调用 `AscendC::SoftmaxFlashV2(xLocal, sumLocal, maxLocal, xLocal, expmaxLocal, sharedTmpBuffer, softmaxTiling)` 完成SoftmaxFlashV2计算，再将结果搬出。
 
   - Tiling实现  
     softmaxflashv2样例的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，对主核计算的shape调用SoftmaxFlashV2高阶API的tiling函数获取API所需tiling参数，尾核计算所需的高阶API的tiling由kernel侧自行计算。
@@ -102,7 +102,7 @@
   ./demo
   ```
 
-  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
@@ -116,8 +116,8 @@
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
 

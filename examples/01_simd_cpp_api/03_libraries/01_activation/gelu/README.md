@@ -4,7 +4,7 @@
 
 本样例在激活函数场景下，基于Gelu高阶API对输入Tensor按元素做GELU（Gaussian Error Linear Unit）计算。本样例使用float数据类型，输入Tensor元素个数为32，完成Gelu样例计算。
 
-> **进阶接口提示：** 除本样例使用的 `Gelu` 接口外，Ascend C 还提供了以下进阶 GELU 接口，调用方式与 `Gelu` 一致，只需替换函数名即可切换：
+> **进阶接口提示：** 除本样例使用的 `Gelu` 接口外，Ascend C 还提供了以下进阶GELU接口，调用方式与 `Gelu` 一致，只需替换函数名即可切换：
 > - **FasterGelu**：GELU 的加速版本，适用于对性能要求更高的场景。将 `gelu.asc` 中 `AscendC::Gelu` 替换为 `AscendC::FasterGelu`。
 > - **FasterGeluV2**：GELU 的进一步优化版本，能降低算力需求。将 `gelu.asc` 中 `AscendC::Gelu` 替换为 `AscendC::FasterGeluV2`。
 
@@ -18,12 +18,12 @@
 
 ```
 ├── gelu
-│   ├── scripts
-│   │   └── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── gelu.asc                // Ascend C算子实现 & 调用样例
 │   ├── README.md               // 样例说明文档
-│   └── gelu.asc                // Ascend C算子实现 & 调用样例
+│   └── scripts
+│       └── gen_data.py         // 输入数据和真值数据生成脚本
 ```
 
 ## 样例描述
@@ -92,7 +92,7 @@
   ./demo
   ```
 
-  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
@@ -105,8 +105,8 @@
 - 编译选项说明
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。
