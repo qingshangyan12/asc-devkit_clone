@@ -50,6 +50,7 @@
 - **支持的舍入模式**：CAST_RINT / CAST_FLOOR / CAST_CEIL / CAST_ROUND / CAST_TRUNC / CAST_NONE
 - **示例**：输入 $2^{12} + 2$，写成 half 的表示形式：$2^{12} \times (1 + 2^{-11})$，要求 $E_v = 12 + 15 = 27$，$M_c = 2^{-11}$
 
+  **图 2** int16转half
   ![int16转half](../../../figures/int16_to_half.png)
 
   由于 half 只有 10bit 尾数位，因此灰色部分要进行舍入：
@@ -176,6 +177,8 @@
 - **支持的舍入模式**：CAST_RINT / CAST_FLOOR / CAST_CEIL / CAST_ROUND / CAST_TRUNC / CAST_NONE
 - **示例**：输入 $2^{25} + 3$，写成 float 的表示形式：$2^{25} \times (1 + 2^{-24} + 2^{-25})$，要求 $E_v = 25 + 127 = 152$，$M_c = 2^{-24} + 2^{-25}$
 
+  **图 3** int32转float
+  
   ![int32转float](../../../figures/int32_to_float.png)
 
   由于 float 只有 23bit 尾数位，因此灰色部分要进行舍入：
@@ -212,6 +215,7 @@
 - **支持的舍入模式**：CAST_RINT / CAST_FLOOR / CAST_CEIL / CAST_ROUND / CAST_TRUNC / CAST_ODD
 - **示例**：输入 $0.5 + 2^{-12}$，写成 float 的表示形式：$2^{-1} \times (1 + 2^{-11})$，因此 $E_v = -1 + 127 = 126$，$M_c = 2^{-11}$
 
+  **图 4** float转half
   ![float转half](../../../figures/float_to_half.png)
 
   half 的指数位可以表示出 $2^{-1}$，$E_v = -1 + 15 = 14$，但 half 只有 10bit 尾数位，因此灰色部分要进行舍入：
@@ -230,6 +234,7 @@
 - **支持的舍入模式**：CAST_RINT / CAST_FLOOR / CAST_CEIL / CAST_ROUND / CAST_TRUNC
 - **示例**：输入 $0.5 + 2^{-9} + 2^{-11}$，写成 float 的表示形式：$2^{-1} \times (1 + 2^{-8} + 2^{-10})$，因此 $E_v = -1 + 127 = 126$，$M_c = 2^{-8} + 2^{-10}$
 
+  **图 5** float转bfloat16_t
   ![float转bfloat16_t](../../../figures/float_to_bfloat16_t.png)
 
   bfloat16_t 的指数位位数和 float 相同，有 $E_v = 126$，但 bfloat16_t 只有 7bit 尾数位，因此灰色部分要进行舍入：
@@ -292,6 +297,7 @@
 - **支持的舍入模式**：CAST_RINT / CAST_FLOOR / CAST_CEIL / CAST_ROUND / CAST_TRUNC
 - **示例**：输入 $2^{35} + 2^{12} + 2^{11}$，写成 float 的表示形式：$2^{35} \times (1 + 2^{-23} + 2^{-24})$，要求 $E_v = 35 + 127 = 162$，$M_c = 2^{-23} + 2^{-24}$
 
+  **图 6** int64_t转float
   ![int64_t转float](../../../figures/int64_t_to_float.png)
 
   由于 float 只有 23bit 尾数位，因此灰色部分要进行舍入：
