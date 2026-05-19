@@ -17,10 +17,10 @@ This sample implements gather and adds computation using SIMT and SIMD hybrid pr
 ```
 ├── gather_adds_simt_simd_hybrid
 │   ├── scripts
-│   │   ├── gen_data.py         # Input data and golden data generation script
-│   │   └── verify_result.py    # Golden data comparison file
-│   ├── CMakeLists.txt          # cmake build file
-│   ├── gather_and_adds.asc     # Ascend C sample implementation & invocation sample
+│   │   ├── gen_data.py         // Input data and golden data generation script
+│   │   └── verify_result.py    // Golden data comparison file
+│   ├── CMakeLists.txt          // cmake build file
+│   ├── gather_and_adds.asc     // Ascend C sample implementation & invocation sample
 │   └── README.md
 ```
 

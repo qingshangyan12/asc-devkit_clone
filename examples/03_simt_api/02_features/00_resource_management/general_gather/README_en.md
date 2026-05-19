@@ -13,9 +13,9 @@ This sample implements a Gather operator supporting generalized shapes using Asc
 ## Directory Structure
 ```text
 ├── general_gather
-│   ├── CMakeLists.txt         # cmake build file
-│   ├── gather_v2.asc          # SIMT implementation of gather_v2 call sample
-│   ├── gather.asc             # SIMT implementation of gather call sample
+│   ├── CMakeLists.txt         // cmake build file
+│   ├── gather_v2.asc          // SIMT implementation of gather_v2 call sample
+│   ├── gather.asc             // SIMT implementation of gather call sample
 │   └── README.md
 ```
 

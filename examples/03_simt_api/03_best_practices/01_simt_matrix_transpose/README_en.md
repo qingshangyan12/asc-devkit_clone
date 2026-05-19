@@ -12,6 +12,7 @@ This example uses matrix transpose to demonstrate memory access optimization str
 
 ```text
 ├── 01_simt_matrix_transpose
+│   ├── figures                // Image resources in the README
 │   ├── CMakeLists.txt         // Build project file
 │   ├── matrix_transpose.asc   // SIMT matrix transpose example implementation
 │   └── README.md
@@ -69,7 +70,7 @@ int index = x_index + width * y_index;
 
 The figure below shows a more intuitive mapping diagram. The left side shows a 1024x1024 matrix divided into 32x32 tiles. The right side shows one tile that one block needs to process, with a size of 32x32.
 
-<img src="./figure/blockMapping.png" width="60%">
+<img src="./figures/blockMapping.png" width="60%">
 
 Taking the green element in the figure as an example, you can directly use the built-in variables in the kernel to derive its input coordinates in GM.
 
@@ -156,7 +157,7 @@ output[index] = input[index];
 
 The figure below shows the data flow of Case 1, with red marking the elements processed by one Warp when reading GM and writing GM. Threads of the same Warp will read a row of elements from the GM input tile and write back to a column of the GM output tile. When reading GM input, adjacent threads access consecutive element addresses, which is sequential read. When writing back to output, adjacent threads are scattered to different rows of the output matrix, which is non-sequential write. Therefore, the core issue of this version is that the transposed write-back address is no longer sequential, which typically significantly affects overall throughput.
 
-<img src="./figure/case1.png" width="60%">
+<img src="./figures/case1.png" width="60%">
 
 **Key Code**:
 
@@ -194,7 +195,7 @@ output[index_out] = input[index_in];
 
 The figure below shows the data flow of Case 2, with red and yellow marked elements showing the elements processed by threads of one Warp when reading GM and writing GM. When reading GM input, the entire tile is moved to UB according to GM layout. When writing GM output, threads of one Warp will read one column of elements from UB and write back to their corresponding transposed positions.
 
-<img src="./figure/case2.png" width="60%">
+<img src="./figures/case2.png" width="60%">
 
 Unlike Case 1, in Case 1 threads "directly write input elements to the transposed GM position", so adjacent threads are scattered to different rows of the output matrix. In Case 2, threads first put data into UB, transferring the originally non-sequential global write access to non-sequential read within UB. Therefore, the core benefit of this version is: although one UB read/write and one synchronization are added, it achieves "sequential read and sequential write" access pattern on the GM side, and the overall time is usually significantly lower than Case 1.
 
@@ -246,7 +247,7 @@ Taking the UB division rule of Ascend 950PR/Ascend 950DT as an example, the foll
 
 The bank division in UB is shown in the figure below. The total UB size is 256KB, which can be viewed as two rows, each row 128KB. The first 128KB corresponds to bank0 to bank7, and the second 128KB corresponds to bank8 to bank15. bank0 and bank8 belong to the same group, bank1 and bank9 belong to the same group, and so on.
 
-<img src="./figure/bank结构示意图.png">
+<img src="./figures/bank结构示意图.png">
 
 For SIMT, the most critical issue is whether concurrent threads of the same Warp under the same UB access instruction will concentrate on accessing a few banks.
 
@@ -263,11 +264,11 @@ Much smaller than 128KB, so one tile usually only falls in the first 128KB area.
 
 In Case 2, the layout of the first 10 rows of the UB tile array according to row-major storage is shown below. For display convenience, only the first 10 rows of elements are shown here, and the rest follow the same pattern. Each row of 32 float data will be stored across exactly 4 banks, with the first element of each row marked in blue. In Case 2, threads of one Warp will read one column of elements from the tile and write back to GM output. When accessing UB, 32 threads will concentrate on accessing two banks, meaning one bank will have 16 threads accessing simultaneously, generating a large number of read conflicts.
 
-<img src="./figure/case2bank.png">
+<img src="./figures/case2bank.png">
 
 In Case 3, one column of padding is added to the tile array in UB, changing from 32 elements per row to 33 elements per row. Its layout in UB is shown below. Since each row has 33 elements stored across 5 banks, elements in the same column are staggered and distributed in different banks. In Case 3, when accessing UB, accesses from 32 threads will be distributed across 8 banks, meaning one bank will have 4 threads accessing simultaneously, greatly reducing the scale of conflicts.
 
-<img src="./figure/case3bank.png">
+<img src="./figures/case3bank.png">
 
 **Key Code**:
 

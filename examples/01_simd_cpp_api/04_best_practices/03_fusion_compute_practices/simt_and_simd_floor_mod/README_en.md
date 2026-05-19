@@ -16,8 +16,8 @@ This sample uses the implementation of the floor_mod function operator as an exa
 
 ```
 ├── 14_simt_and_simd_floor_mod
-│   ├── CMakeLists.txt         # cmake build file
-│   ├── floor_mod.asc    # Ascend C operator implementation & invocation sample
+│   ├── CMakeLists.txt         // cmake build file
+│   ├── floor_mod.asc          // Ascend C operator implementation & invocation sample
 |   └── README.md
 ```
 

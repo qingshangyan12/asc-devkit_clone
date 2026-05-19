@@ -13,9 +13,9 @@
 ## 目录结构
 ```text
 ├── general_gather
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── gather_v2.asc          # SIMT实现gather_v2调用样例
-│   ├── gather.asc             # SIMT实现gather调用样例
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── gather_v2.asc          // SIMT实现gather_v2调用样例
+│   ├── gather.asc             // SIMT实现gather调用样例
 │   └── README.md
 ```
 

@@ -17,9 +17,10 @@ The 2 scenarios correspond to reduction sum for small shape input and large shap
 
 ```text
 ├── memory_fence
-│   ├── sync_barrier.asc      # Scenario 1: Small shape reduction sample, demonstrating intra-thread-block synchronization usage of asc_syncthreads()
-│   ├── memory_fence.asc      # Scenario 2: Large shape reduction sample, demonstrating inter-thread-block coordination usage of asc_threadfence() and atomic counting
-│   ├── CMakeLists.txt        # Build project file
+│   ├── figures               // Image resources in the README
+│   ├── sync_barrier.asc      // Scenario 1: Small shape reduction sample, demonstrating intra-thread-block synchronization usage of asc_syncthreads()
+│   ├── memory_fence.asc      // Scenario 2: Large shape reduction sample, demonstrating inter-thread-block coordination usage of asc_threadfence() and atomic counting
+│   ├── CMakeLists.txt        // Build project file
 │   └── README.md
 ```
 
@@ -106,7 +107,7 @@ Each thread in a single thread block first reads one input element and obtains t
 Taking 128 elements (4 warps) as an example, the two-phase reduction process is shown in Figure 1:
 
 <p align="center">
-  <img src="./figure/两阶段归约求和.png" width="50%">
+  <img src="./figures/两阶段归约求和.png" width="50%">
    </p>
 <p align="center">
 Figure 1: Two-phase reduction process diagram
@@ -125,7 +126,7 @@ Each thread block first completes the above two-phase local reduction within the
 Taking 8 thread blocks as an example, the cross-thread-block coordination process is shown in Figure 2:
 
 <p align="center">
-  <img src="./figure/跨线程块协作.png" width="75%">
+  <img src="./figures/跨线程块协作.png" width="75%">
    </p>
 <p align="center">
 Figure 2: Cross-thread-block coordination process diagram

@@ -15,8 +15,8 @@
 
 ```
 ├── 00_printf
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── printf.asc             # Ascend C算子实现加printf打印的调用样例
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── printf.asc             // Ascend C算子实现加printf打印的调用样例
 |   └── README.md
 ```
 

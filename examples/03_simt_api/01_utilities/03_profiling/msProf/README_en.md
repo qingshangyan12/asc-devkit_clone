@@ -15,8 +15,8 @@ This example demonstrates how to collect on-board performance data using msProf 
 
 ```
 ├── msProf
-│   ├── CMakeLists.txt         # cmake build file
-│   ├── gather.asc             # SIMT implementation gather example
+│   ├── CMakeLists.txt         // cmake build file
+│   ├── gather.asc             // SIMT implementation gather example
 |   └── README.md
 ```
 

@@ -15,7 +15,7 @@ This example implements the Add operator based on Ascend C SIMT programming, imp
 
 ```
 ├── 01_add
-│   ├── add.asc             # SIMT implementation add invocation example
+│   ├── add.asc             // SIMT implementation add invocation example
 |   └── README.md
 ```
 

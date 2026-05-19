@@ -15,9 +15,9 @@ This sample implements a gather operator using SIMD and SIMT hybrid programming,
 
 ```
 ├── 15_simt_gather_with_ub
-│   ├── CMakeLists.txt         # cmake build file
-│   ├── gather_v1.asc          # Ascend C gather operator sample with direct GM access
-│   ├── gather_v2.asc          # Ascend C gather operator sample using UB
+│   ├── CMakeLists.txt         // cmake build file
+│   ├── gather_v1.asc          // Ascend C gather operator sample with direct GM access
+│   ├── gather_v2.asc          // Ascend C gather operator sample using UB
 |   └── README.md
 ```
 

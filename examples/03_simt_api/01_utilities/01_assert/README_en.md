@@ -15,8 +15,8 @@ This example demonstrates how to use the `assert()` interface in SIMT programmin
 
 ```
 ├── 01_assert
-│   ├── CMakeLists.txt         # cmake build file
-│   ├── assert.asc             # Ascend C operator implementation with assert assertion example
+│   ├── CMakeLists.txt         // cmake build file
+│   ├── assert.asc             // Ascend C operator implementation with assert assertion example
 |   └── README.md
 ```
 

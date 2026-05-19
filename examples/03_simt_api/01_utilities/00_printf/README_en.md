@@ -15,8 +15,8 @@ This example demonstrates how to use the `printf()` interface in SIMT programmin
 
 ```
 ├── 00_printf
-│   ├── CMakeLists.txt         # cmake build file
-│   ├── printf.asc             # Ascend C operator implementation with printf printing example
+│   ├── CMakeLists.txt         // cmake build file
+│   ├── printf.asc             // Ascend C operator implementation with printf printing example
 |   └── README.md
 ```
 

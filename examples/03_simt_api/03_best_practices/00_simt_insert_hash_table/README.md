@@ -15,8 +15,8 @@
 
 ```
 ├── 00_simt_insert_hash_table
-│   ├── CMakeLists.txt          # cmake编译文件
-│   ├── insert_hash_table.asc   # Ascend C算子实现 & 调用样例
+│   ├── CMakeLists.txt          // cmake编译文件
+│   ├── insert_hash_table.asc   // Ascend C算子实现 & 调用样例
 |   └── README.md
 ```
 

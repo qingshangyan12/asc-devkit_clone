@@ -15,7 +15,7 @@
 
 ```
 ├── 01_add
-│   ├── add.asc             # SIMT实现add调用样例
+│   ├── add.asc             // SIMT实现add调用样例
 |   └── README.md
 ```
 

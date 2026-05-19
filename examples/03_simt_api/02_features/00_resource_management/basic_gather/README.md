@@ -15,7 +15,7 @@
 
 ```
 ├── basic_gather
-│   ├── gather.asc             # SIMT实现gather调用样例
+│   ├── gather.asc             // SIMT实现gather调用样例
 |   └── README.md
 ```
 

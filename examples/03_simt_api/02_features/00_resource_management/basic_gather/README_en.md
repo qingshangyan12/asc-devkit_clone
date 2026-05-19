@@ -15,7 +15,7 @@ This sample implements a Gather operator for a simple scenario (fixed shape) usi
 
 ```
 ├── basic_gather
-│   ├── gather.asc             # SIMT implementation of gather call sample
+│   ├── gather.asc             // SIMT implementation of gather call sample
 |   └── README.md
 ```
 

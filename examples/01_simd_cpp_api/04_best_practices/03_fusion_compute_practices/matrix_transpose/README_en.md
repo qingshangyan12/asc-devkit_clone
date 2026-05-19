@@ -12,6 +12,7 @@ This sample uses matrix transposition as an example to introduce memory access c
 
 ```text
 ├── matrix_transpose
+│   ├── figures                // Image resources in the README
 │   ├── CMakeLists.txt         // Compilation project file
 │   ├── matrix_transpose.asc   // Matrix transposition sample implementation
 │   └── README.md

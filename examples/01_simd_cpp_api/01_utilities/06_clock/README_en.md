@@ -16,8 +16,8 @@ This sample demonstrates how to use the `clock()` interface in the `__simt_vf__`
 
 ```
 ├── 06_clock
-│   ├── CMakeLists.txt         # cmake build file
-│   ├── gather.asc             # Ascend C sample implementing gather call
+│   ├── CMakeLists.txt         // cmake build file
+│   ├── gather.asc             // Ascend C sample implementing gather call
 |   └── README.md
 ```
 

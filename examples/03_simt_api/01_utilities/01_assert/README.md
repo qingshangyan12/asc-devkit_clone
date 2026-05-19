@@ -15,8 +15,8 @@
 
 ```
 ├── 01_assert
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── assert.asc             # Ascend C算子实现加assert断言的调用样例
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── assert.asc             // Ascend C算子实现加assert断言的调用样例
 |   └── README.md
 ```
 

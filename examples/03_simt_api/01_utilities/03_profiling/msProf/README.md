@@ -15,8 +15,8 @@
 
 ```
 ├── msProf
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── gather.asc             # SIMT实现gather调用样例
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── gather.asc             // SIMT实现gather调用样例
 |   └── README.md
 ```
 

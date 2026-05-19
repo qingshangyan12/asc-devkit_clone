@@ -15,8 +15,8 @@ This example introduces the InsertHashTable operator and demonstrates operator i
 
 ```
 ├── 00_simt_insert_hash_table
-│   ├── CMakeLists.txt          # cmake build file
-│   ├── insert_hash_table.asc   # Ascend C operator implementation & invocation example
+│   ├── CMakeLists.txt          // cmake build file
+│   ├── insert_hash_table.asc   // Ascend C operator implementation & invocation example
 |   └── README.md
 ```
 

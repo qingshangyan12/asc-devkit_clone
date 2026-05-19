@@ -17,9 +17,10 @@
 
 ```text
 ├── memory_fence
-│   ├── sync_barrier.asc      # 场景1：小shape归约样例，展示 asc_syncthreads() 的线程块内同步用法
-│   ├── memory_fence.asc      # 场景2：大shape归约样例，展示 asc_threadfence() 与原子计数的线程块间协作用法
-│   ├── CMakeLists.txt        # 编译工程文件
+│   ├── figures               // README中的图片资源
+│   ├── sync_barrier.asc      // 场景1：小shape归约样例，展示 asc_syncthreads() 的线程块内同步用法
+│   ├── memory_fence.asc      // 场景2：大shape归约样例，展示 asc_threadfence() 与原子计数的线程块间协作用法
+│   ├── CMakeLists.txt        // 编译工程文件
 │   └── README.md
 ```
 
@@ -106,7 +107,7 @@
 以 128 个元素（4 个 warp）为例，两阶段归约过程如图 1 所示：
 
 <p align="center">
-  <img src="./figure/两阶段归约求和.png" width="50%">
+  <img src="./figures/两阶段归约求和.png" width="50%">
    </p>
 <p align="center">
 图1：两阶段归约过程示意图
@@ -125,7 +126,7 @@
 以 8 个线程块为例，跨线程块协作过程如图2所示：
 
 <p align="center">
-  <img src="./figure/跨线程块协作.png" width="75%">
+  <img src="./figures/跨线程块协作.png" width="75%">
    </p>
 <p align="center">
 图2：跨线程块协作过程示意图
