@@ -2,7 +2,6 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-**表 1**  产品支持情况
 | 产品 | 是否支持 |
 |------|----------|
 | <cann-filter npu_type = "950"><term>Ascend 950PR/Ascend 950DT<term> | √</cann-filter> |
@@ -17,7 +16,7 @@
 
 头文件路径为： "basic_api/kernel_operator_common_intf.h"。
 
-SetStoreAtomicConfig接口，功能是：获取原子操作使能位与原子操作类型的值，详细说明见[表1](SetStoreAtomicConfig(ISASI).md#zh-cn_topic_0235751031_table33761356)。
+GetStoreAtomicConfig接口，功能是：获取原子操作使能位与原子操作类型的值，详细说明见[表1](SetStoreAtomicConfig(ISASI).md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

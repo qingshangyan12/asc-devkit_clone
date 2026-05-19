@@ -2,7 +2,6 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-**表 1**  产品支持情况
 | 产品 | 是否支持 |
 |------|----------|
 | <cann-filter npu_type = "950"><term>Ascend 950PR/Ascend 950DT<term> | √</cann-filter> |

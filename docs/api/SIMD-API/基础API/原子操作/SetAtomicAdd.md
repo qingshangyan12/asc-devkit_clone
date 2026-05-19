@@ -1,8 +1,5 @@
 # SetAtomicAdd<a name="ZH-CN_TOPIC_0000001487536650"></a>
 
-
-
-**表 1**  产品支持情况
 | 产品 | 是否支持 |
 |------|----------|
 | <cann-filter npu_type = "950"><term>Ascend 950PR/Ascend 950DT<term> | √</cann-filter> |

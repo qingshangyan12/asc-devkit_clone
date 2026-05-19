@@ -2,7 +2,7 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-**表 1**  产品支持情况
+
 | 产品 | 是否支持 |
 |------|----------|
 | <cann-filter npu_type = "950"><term>Ascend 950PR/Ascend 950DT<term> | √</cann-filter> |
@@ -44,8 +44,6 @@ __aicore__ inline void SetAtomicMin()
 ## 流水类型
 
 PIPE_S
-
-##
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
