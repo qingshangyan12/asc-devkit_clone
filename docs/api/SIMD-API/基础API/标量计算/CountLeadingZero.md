@@ -27,7 +27,7 @@ int64_t leadingZeros = AscendC::CountLeadingZero(0x0100000000000020ULL); // 返�
 ```
 
 **图 1**  CountLeadingZero调用示意图<a name="fig1"></a>  
-![CountLeadingZero调用示意图](../../../figures/CountLeadingZero调用示意图.png "CountLeadingZero调用示意图")
+![CountLeadingZero调用示意图](../../../figures/CountLeadingZero.png "CountLeadingZero调用示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
