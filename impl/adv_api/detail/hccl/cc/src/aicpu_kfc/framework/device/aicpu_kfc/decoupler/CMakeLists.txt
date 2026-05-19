@@ -93,8 +93,6 @@ target_include_directories(ccl_kernel_decoupler PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
-    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
     $<TARGET_PROPERTY:ccl_kernel,INCLUDE_DIRECTORIES>
 )
 
@@ -116,8 +114,6 @@ target_include_directories(ccl_kernel_decoupler_open BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/common
     ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
-    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
     $<TARGET_PROPERTY:ccl_kernel,INCLUDE_DIRECTORIES>
 )
 
@@ -156,13 +152,6 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/registry
     ${OPEN_HCCL_SRC_ROOT}/common
     ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
-    ${ASCEND_CANN_PACKAGE_PATH}/include
-    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/acl
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/hccl
-    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
     ${HCCL_BASE_DIR}/pub_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
@@ -226,13 +215,6 @@ target_include_directories(ccl_kernel_decoupler_open_exec_impl BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aiv
-    ${ASCEND_CANN_PACKAGE_PATH}/include
-    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/acl
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/include/hccl
-    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
-    ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
     ${HCCL_BASE_DIR}/pub_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
@@ -265,8 +247,6 @@ if(TARGET mc2_server)
         ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
-        ${ASCEND_CANN_PACKAGE_PATH}/aarch64-linux/pkg_inc/base
         $<TARGET_PROPERTY:ccl_kernel,INCLUDE_DIRECTORIES>
     )
 
