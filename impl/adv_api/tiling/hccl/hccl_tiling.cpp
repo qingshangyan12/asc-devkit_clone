@@ -242,7 +242,7 @@ uint32_t Mc2CcTilingConfig::SetStepSize(uint8_t stepSize)
     impl_.stepSize_ = stepSize;
     return EXIT_SUCCESS;
 #else
-    HCCL_ERROR("Mc2CcTilingConfig::SetStepSize is not supported on current architecture");
+    TILING_LOG_ERROR("Mc2CcTilingConfig::SetStepSize is not supported on current architecture");
     return EXIT_FAILURE;
 #endif
 }
