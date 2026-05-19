@@ -15,9 +15,9 @@
 
 ```
 ├── leaky_relu_onnx_invocation
-│   ├── CMakeLists.txt           // 编译工程文件
-│   ├── leaky_relu.py            // 生成LeakyRelu ONNX模型的脚本
-│   └── main.cpp                 // 算子调用主程序（加载om模型执行LeakyRelu推理）
+│   ├── CMakeLists.txt
+│   ├── leaky_relu.py
+│   └── main.cpp
 ```
 
 ## 样例实现
