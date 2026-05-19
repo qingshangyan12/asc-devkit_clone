@@ -69,7 +69,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue)
                                fp8_e4m3fn_t, fp8_e8m0_t, uint16_t, int16_t, bfloat16_t, uint32_t, int32_t, float,
                                half, uint64_t, int64_t, complex32, complex64>()),
                   "current data type is not supported on current device!");
-    static_assert(std::is_convertible_v<U, ActualT>, "scalarValue data type could be converted to RegTensor data type");
+    static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
 
     if constexpr (IsSameType<ActualT, bool>::value) {
         vbr((RegTensor<int8_t> &)dstReg, (int8_t)scalarValue);
@@ -142,7 +142,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue, MaskReg& mas
                                fp8_e4m3fn_t, fp8_e8m0_t, uint16_t, int16_t, bfloat16_t, uint32_t, int32_t, float,
                                half, uint64_t, int64_t, complex32, complex64>()),
                   "current data type is not supported on current device!");
-    static_assert(std::is_convertible_v<U, ActualT>, "scalarValue data type could be converted to RegTensor data type");
+    static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     ASCENDC_ASSERT((mode != MaskMergeMode::UNKNOWN), { KERNEL_LOG(KERNEL_ERROR, "The MergeMode only support: MODE_MERGING, MODE_ZEROING."); });
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (IsSameType<ActualT, bool>::value) {

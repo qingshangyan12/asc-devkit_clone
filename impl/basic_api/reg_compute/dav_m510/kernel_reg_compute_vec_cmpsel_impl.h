@@ -166,7 +166,7 @@ __simd_callee__ inline void CompareScalarImpl(MaskReg& dst, U& srcReg, S scalarV
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t,
                   uint64_t, int64_t>(), "current data type is not supported on current device!");
-    static_assert(std::is_convertible_v<S, ActualT>, "scalarValue data type could be converted to RegTensor data type");
+    static_assert(Std::is_convertible<S, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     if constexpr (sizeof(ActualT) < 8) {
         if constexpr (mode == CMPMODE::EQ) {
             vcmps_eq(dst, srcReg, scalarValue, mask);

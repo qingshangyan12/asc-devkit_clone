@@ -161,7 +161,7 @@ __simd_callee__ inline void LeakyReluImpl(S& dstReg, S& srcReg, U scalarValue, M
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportType<ActualT, half, float>(), "current data type is not supported on current device!");
     static_assert(SupportType<U, half, float>(), "current scalarValue data type is not supported on current device!");
-    static_assert(std::is_convertible_v<U, ActualT>, "scalarValue data type could be converted to RegTensor data type");
+    static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
                   "current LeakyRelu api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
