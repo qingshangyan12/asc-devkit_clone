@@ -13,7 +13,7 @@
 
 ### 1. 高阶API
 
-高阶API基于单核对常见算法进行抽象和封装，实现了一些常用的计算算法，旨在提高编程开发效率。高阶API一般通过调用多种基础API实现。高阶API包数学计算、矩阵计算、激活函数等API。
+高阶API基于单核对常见算法进行抽象和封装，实现了一些常用的计算算法，旨在提高编程开发效率。高阶API一般通过调用多种基础API实现。高阶API包括数学计算、矩阵计算、激活函数等API。
 
 - **适用场景**：常见算法的抽象和封装，提高算子开发效率
 - **贡献指南**：[docs/asc_adv_api_contributing.md](./docs/asc_adv_api_contributing.md)
@@ -58,3 +58,21 @@ C API提供纯C风格的接口，符合C语言算子开发习惯，开放芯片�
   如果社区中他人遇到的问题您有合适的解决方法，欢迎您在Issue中发表评论交流，帮助他人解决问题和痛点，共同优化易用性。
 
   如果对应Issue需要进行代码修改，您可以在Issue评论框中输入“/assign”或“/assign @yourself”，将该Issue分配给您，跟踪协助解决问题。
+
+## 代码规范
+
+本项目有完整的代码贡献规范体系，请在开发前阅读相关指南。完整索引见 [docs/contributing/README.md](./docs/contributing/README.md)。
+
+| 文档 | 内容 |
+|------|------|
+| [code-style.md](./docs/contributing/code-style.md) | C++ 命名、include、header guard、namespace、宏、constexpr、格式化、代码注释规范 |
+| [api-design.md](./docs/contributing/api-design.md) | API 接口设计、模板参数、`__aicore__` 使用、Tiling 接口、弃用标注 |
+| [directory-structure.md](./docs/contributing/directory-structure.md) | 目录结构、文件命名后缀、架构目录、新增 API 操作清单 |
+| [examples.md](./docs/contributing/examples.md) | 示例目录结构、命名、文件组成、新增流程、npu-arch 编译选项 |
+| [testing.md](./docs/contributing/testing.md) | 测试框架、文件命名、UT 编写、Header Checker、覆盖率要求 |
+| [documentation.md](./docs/contributing/documentation.md) | API 文档组织、文档模板、写作规范引用 |
+| [experimental.md](./docs/contributing/experimental.md) | Experimental 定义、标记方式、转正流程、Breaking Change |
+
+## Experimental 特性
+
+新开发的实验性特性请放置于 experimental 目录下（即 `include/tensor_api/` 和 `impl/tensor_api/`），并在代码中明确标注为 experimental。完整规范见 [experimental.md](./docs/contributing/experimental.md)。
