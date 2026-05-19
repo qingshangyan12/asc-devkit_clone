@@ -13,12 +13,12 @@
 
 ```
 ├── matmul_mx
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   ├── matmul_mx.asc              // Ascend C样例实现 & 调用样例
+│   ├── CMakeLists.txt        // 编译工程文件
+│   ├── data_utils.h          // 数据读入写出函数
+│   ├── matmul_mx.asc         // Ascend C样例实现 & 调用样例
 │   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
+│       ├── gen_data.py       // 输入数据和真值数据生成脚本文件
+│       └── verify_result.py  // 真值对比文件
 ```
 
 ## 样例描述
