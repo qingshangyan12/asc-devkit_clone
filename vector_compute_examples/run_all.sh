@@ -52,6 +52,11 @@ SAMPLES=(
     "asc_squeeze"
     "asc_unpack_lower"
     "asc_pack"
+    "asc_addc"
+    "asc_duplicate"
+    "asc_ge_scalar"
+    "asc_ne_scalar"
+    "asc_shiftleft_scalar"
 )
 
 PASS=0

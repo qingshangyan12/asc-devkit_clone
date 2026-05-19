@@ -1,0 +1,182 @@
+=== asc_addc 一键编译运行 ===
+-- ASC Simulator enabled: /usr/local/Ascend/cann-9.0.0-beta.2/tools/simulator/dav_3510/lib
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/joey/code/joey/asc-devkit/vector_compute_examples/asc_addc/build
+make: Entering directory '/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_addc/build'
+make[1]: Entering directory '/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_addc/build'
+make[2]: Entering directory '/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_addc/build'
+Consolidate compiler generated dependencies of target c_api_addc_example
+make[2]: Leaving directory '/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_addc/build'
+make[2]: Entering directory '/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_addc/build'
+[ 50%] Building ASC object CMakeFiles/c_api_addc_example.dir/c_api_addc.asc.o
+[100%] Linking ASC executable c_api_addc_example
+make[2]: Leaving directory '/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_addc/build'
+[100%] Built target c_api_addc_example
+make[1]: Leaving directory '/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_addc/build'
+make: Leaving directory '/home/joey/code/joey/asc-devkit/vector_compute_examples/asc_addc/build'
+
+=== asc_addc 寄存器级带进位加法测试 ===
+模式: 多核 (8 blocks)
+
+[INFO] Config file is found, path is /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/simulator/dav_3510/lib/config_stars.json.
+[FuncCache]: size:0x20000, line_size:128, way_num:16, line_num:1024, idx_num:64
+             idx_lsb:7, idx_mask:0x3f, tag_lsb:13, tag_mask:0xffffffffffffffff, ofst_mask:0x7f
+
+[TmSim]: Run in serial mode.
+[INFO] Config file [config.json] from model dynamic library path. Path: /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/simulator/dav_3510/lib/config.json
+[INFO] AicWrapper attach AIC 0, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 1, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 2, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 3, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 4, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 5, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 6, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 7, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 8, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 9, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 10, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 11, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 12, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 13, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 14, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 15, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 16, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 17, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 18, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 19, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 20, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 21, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 22, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 23, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 24, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 25, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 26, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 27, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 28, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 29, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 30, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 31, num_vec_core=2, num_subcore=3
+[INFO] Chip 0 AIC / Scheduler / Soc periods: 200.0000 / 200.0000 / 105.0000
+[INFO] chip 0 die 0 device created
+================================================================================
+>>>>                                                                        
+>>>>                             " PEM MODEL "                                
+>>>>             Total no. of 1 chip(s) Model Init Success!                
+>>>>                                                                        
+================================================================================
+[INFO] Model Start Time: 2026-05-19 18:01:56
+[DRVSTUB_LOG] driver_api.c:556 sendSwapBuf:swapbuf_base_addr:10000000
+[DRVSTUB_LOG] driver_api.c:557 sendSwapBuf:sq:0 swapbuf_addr:10000000
+[DRVSTUB_LOG] driver_api.c:556 sendSwapBuf:swapbuf_base_addr:10000000
+[DRVSTUB_LOG] driver_api.c:557 sendSwapBuf:sq:1 swapbuf_addr:10000040
+[info] [0000000016] [block_start]           : AIV, task_id=0, core_id=0, block_id=0
+[info] [0000000016] [block_start]           : AIV, task_id=0, core_id=1, block_id=1
+[info] [0000000017] [block_start]           : AIV, task_id=0, core_id=2, block_id=2
+[info] [0000000018] [block_start]           : AIV, task_id=0, core_id=3, block_id=3
+[info] [0000000019] [block_start]           : AIV, task_id=0, core_id=4, block_id=4
+[info] [0000000020] [block_start]           : AIV, task_id=0, core_id=5, block_id=5
+[info] [0000000021] [block_start]           : AIV, task_id=0, core_id=6, block_id=6
+[info] [0000000022] [block_start]           : AIV, task_id=0, core_id=7, block_id=7
+[info] [0000002636] [block_end]             : AIV, task_id=0, core_id=5, block_id=5
+[info] [0000002675] [block_end]             : AIV, task_id=0, core_id=2, block_id=2
+[info] [0000002731] [block_end]             : AIV, task_id=0, core_id=1, block_id=1
+[info] [0000002760] [block_end]             : AIV, task_id=0, core_id=0, block_id=0
+[info] [0000002820] [block_end]             : AIV, task_id=0, core_id=4, block_id=4
+[info] [0000002852] [block_end]             : AIV, task_id=0, core_id=7, block_id=7
+[info] [0000002939] [block_end]             : AIV, task_id=0, core_id=3, block_id=3
+[info] [0000002967] [block_end]             : AIV, task_id=0, core_id=6, block_id=6
+[INFO] Model Stop Time: 2026-05-19 18:02:01
+Model RUN TIME: 4690.28 ms
+[INFO] Total tick: 2974
+[INFO] Model stopped successfully.
+  X        (2048 elements): 4294901760 4294901761 4294901762 4294901763 4294901764 4294901765 4294901766 4294901767 4294901768 4294901769 4294901770 4294901771 4294901772 4294901773 4294901774 4294901775 4294901776 4294901777 4294901778 4294901779 ...
+  Y        (2048 elements): 65535 65537 65539 65541 65543 65545 65547 65549 65551 65553 65555 65557 65559 65561 65563 65565 65567 65569 65571 65573 ...
+  CarryIn  (2048 elements): 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 ...
+  SumOut   (2048 elements): 0 2 5 9 11 14 18 20 23 27 29 32 36 38 41 45 47 50 54 56 ...
+  SumExp   (2048 elements): 0 2 5 9 11 14 18 20 23 27 29 32 36 38 41 45 47 50 54 56 ...
+  CoutOut  (2048 elements): 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ...
+  CoutExp  (2048 elements): 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ...
+  [CSV] 已保存到 addc_uint32_t.csv
+  [uint32_t] 通过
+
+[INFO] Config file is found, path is /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/simulator/dav_3510/lib/config_stars.json.
+[FuncCache]: size:0x20000, line_size:128, way_num:16, line_num:1024, idx_num:64
+             idx_lsb:7, idx_mask:0x3f, tag_lsb:13, tag_mask:0xffffffffffffffff, ofst_mask:0x7f
+
+[INFO] AicWrapper attach AIC 0, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 1, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 2, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 3, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 4, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 5, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 6, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 7, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 8, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 9, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 10, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 11, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 12, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 13, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 14, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 15, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 16, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 17, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 18, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 19, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 20, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 21, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 22, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 23, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 24, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 25, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 26, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 27, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 28, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 29, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 30, num_vec_core=2, num_subcore=3
+[INFO] AicWrapper attach AIC 31, num_vec_core=2, num_subcore=3
+[INFO] Chip 0 AIC / Scheduler / Soc periods: 200.0000 / 200.0000 / 105.0000
+[INFO] chip 0 die 0 device created
+================================================================================
+>>>>                                                                        
+>>>>                             " PEM MODEL "                                
+>>>>             Total no. of 1 chip(s) Model Init Success!                
+>>>>                                                                        
+================================================================================
+[INFO] Model Start Time: 2026-05-19 18:02:03
+[DRVSTUB_LOG] driver_api.c:556 sendSwapBuf:swapbuf_base_addr:10000000
+[DRVSTUB_LOG] driver_api.c:557 sendSwapBuf:sq:0 swapbuf_addr:10000000
+[DRVSTUB_LOG] driver_api.c:556 sendSwapBuf:swapbuf_base_addr:10000000
+[DRVSTUB_LOG] driver_api.c:557 sendSwapBuf:sq:1 swapbuf_addr:10000040
+[info] [0000000011] [block_start]           : AIV, task_id=0, core_id=0, block_id=0
+[info] [0000000011] [block_start]           : AIV, task_id=0, core_id=1, block_id=1
+[info] [0000000012] [block_start]           : AIV, task_id=0, core_id=2, block_id=2
+[info] [0000000013] [block_start]           : AIV, task_id=0, core_id=3, block_id=3
+[info] [0000000014] [block_start]           : AIV, task_id=0, core_id=4, block_id=4
+[info] [0000000015] [block_start]           : AIV, task_id=0, core_id=5, block_id=5
+[info] [0000000016] [block_start]           : AIV, task_id=0, core_id=6, block_id=6
+[info] [0000000017] [block_start]           : AIV, task_id=0, core_id=7, block_id=7
+[info] [0000002731] [block_end]             : AIV, task_id=0, core_id=7, block_id=7
+[info] [0000002738] [block_end]             : AIV, task_id=0, core_id=6, block_id=6
+[info] [0000002781] [block_end]             : AIV, task_id=0, core_id=2, block_id=2
+[info] [0000002809] [block_end]             : AIV, task_id=0, core_id=1, block_id=1
+[info] [0000002850] [block_end]             : AIV, task_id=0, core_id=5, block_id=5
+[info] [0000002853] [block_end]             : AIV, task_id=0, core_id=4, block_id=4
+[info] [0000002909] [block_end]             : AIV, task_id=0, core_id=0, block_id=0
+[info] [0000002940] [block_end]             : AIV, task_id=0, core_id=3, block_id=3
+[INFO] Model Stop Time: 2026-05-19 18:02:09
+Model RUN TIME: 5596.29 ms
+[INFO] Total tick: 2953
+[INFO] Model stopped successfully.
+  X        (2048 elements): 1000000000 1000000001 1000000002 1000000003 1000000004 1000000005 1000000006 1000000007 1000000008 1000000009 1000000010 1000000011 1000000012 1000000013 1000000014 1000000015 1000000016 1000000017 1000000018 1000000019 ...
+  Y        (2048 elements): 1000000000 1000000002 1000000004 1000000006 1000000008 1000000010 1000000012 1000000014 1000000016 1000000018 1000000020 1000000022 1000000024 1000000026 1000000028 1000000030 1000000032 1000000034 1000000036 1000000038 ...
+  CarryIn  (2048 elements): 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 ...
+  SumOut   (2048 elements): 2000000001 2000000003 2000000006 2000000009 2000000012 2000000016 2000000018 2000000021 2000000024 2000000027 2000000031 2000000033 2000000036 2000000039 2000000042 2000000046 2000000048 2000000051 2000000054 2000000057 ...
+  SumExp   (2048 elements): 2000000001 2000000003 2000000006 2000000009 2000000012 2000000016 2000000018 2000000021 2000000024 2000000027 2000000031 2000000033 2000000036 2000000039 2000000042 2000000046 2000000048 2000000051 2000000054 2000000057 ...
+  CoutOut  (2048 elements): 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ...
+  CoutExp  (2048 elements): 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ...
+  [CSV] 已保存到 addc_int32_t.csv
+  [int32_t] 通过
+
+[完成] asc_addc 示例测试结束。
