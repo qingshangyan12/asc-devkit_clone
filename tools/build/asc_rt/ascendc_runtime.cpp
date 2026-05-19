@@ -798,6 +798,7 @@ uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle)
     } else if (curKernelType == K_TYPE_AIC || curKernelType == K_TYPE_AIC_ROLLBACK) {
         return kernelTaskTypeMap.at(KERNEL_TYPE_AIC_ONLY);
     } else if (curKernelType == K_TYPE_AIV || curKernelType == K_TYPE_AIV_ROLLBACK) {
+
         return kernelTaskTypeMap.at(KERNEL_TYPE_AIV_ONLY);
     } else if (curKernelType == K_TYPE_AICORE) {
         return kernelTaskTypeMap.at(KERNEL_TYPE_AICORE);
