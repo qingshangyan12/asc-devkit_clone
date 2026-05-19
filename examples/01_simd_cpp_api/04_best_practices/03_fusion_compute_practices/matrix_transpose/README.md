@@ -162,9 +162,8 @@ output[index_out] = input[index_in];
 
 **核心实现**：
 
-- 每个线程从GM读取tile中的1个元素，一个Warp会读取一个tile的一行元素
-- 按原坐标把元素写入UB中的tile，一个Warp会将读取的一行写入到UB中的tile的一行
-- 同步后，每个线程从UB中取数，一个Warp会读取UB中tile的一列元素
+- 将输入数据的tile从GM搬运到UB上
+- 每个线程从UB中取数，一个Warp会读取UB中tile的一列元素
 - 将取出的值写回GM中的转置位置，一个Warp会将读取UB的一列元素写入到GM输出中tile的一行
 
 下图展示了Case 1的数据流，其中标红和标黄的元素展示了一个Warp的线程在读取GM和写入GM时处理的元素。读取GM输入时，整个tile会按照GM的排布搬到UB，在写入GM输出时一个Warp的线程会读取UB上的一列元素写回到其对应的转置后的位置。
@@ -176,20 +175,10 @@ output[index_out] = input[index_in];
 **关键代码**：
 
 ```cpp
-int tile_row = threadIdx.x / TILE_DIM;
-int tile_col = threadIdx.x % TILE_DIM;
+uint32_t tile_row = threadIdx.x / TILE_DIM;
+uint32_t tile_col = threadIdx.x % TILE_DIM;
 
-tile[tile_row][tile_col] = input[index_in];
-asc_syncthreads();
-
-int block_row = blockIdx.x / grid_width;
-int block_col = blockIdx.x % grid_width;
-
-int output_row = block_col * TILE_DIM + tile_row;
-int output_col = block_row * TILE_DIM + tile_col;
-int index_out = output_col + output_row * height;
-
-output[index_out] = tile[tile_col][tile_row];
+output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + tile_row];
 ```
 
 **优化手段**：
@@ -202,7 +191,7 @@ output[index_out] = tile[tile_col][tile_row];
 
 | Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      44.440      |    2.441    |     4027.577     |      2.295      |     0.941     |        0.134        |      0.054      |
+|      29.266      |    1.440    |     2376.663     |      0.925      |     0.644     |        0.148        |      0.100      |
 
 **分析**：
 
@@ -249,11 +238,13 @@ output[index_out] = tile[tile_col][tile_row];
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
+
   - 指定路径install_path，安装CANN软件包
 
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
+
 - 样例执行
 
   ```bash
@@ -262,6 +253,7 @@ output[index_out] = tile[tile_col][tile_row];
   cmake -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
   ./demo                               # 执行样例
   ```
+
 - 编译选项说明
 
   | 选项             | 可选值      | 说明              |
@@ -269,7 +261,6 @@ output[index_out] = tile[tile_col][tile_row];
   | `SCENARIO_NUM` | `0`-`1` | 样例类型，默认为0 |
 
   执行结果如下，说明精度对比成功。
-
 
   ```text
   [Success] Case accuracy is verification passed.
