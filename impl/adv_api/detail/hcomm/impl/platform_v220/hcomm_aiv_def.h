@@ -28,17 +28,17 @@ namespace AscendC {
 enum class HCOMM_OP_TYPE : uint32_t { WRITE = 3U, READ = 5U };
 
 template <>
-class HcommImpl<CommEngine::AIV, CommProtocol::ROCE> {
+class HcommImpl<CommProtocol::ROCE, CommEngine::AIV> {
 public:
     __aicore__ inline HcommImpl();
 
     __aicore__ inline ~HcommImpl();
 
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline HcommHandle Write(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline HcommHandle Read(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(HcommHandle handleId)
@@ -53,13 +53,12 @@ public:
     }
 
 private:
-    __aicore__ inline void PostSend(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead);
+    __aicore__ inline void PostSend(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead);
 
-    __aicore__ inline void doorBell(__gm__ Channel* channelPtr, uint64_t curHead);
+    __aicore__ inline void doorBell(__gm__ ChannelEntity* channelPtr, uint64_t curHead);
 
 private:
     HcommHandle curHandleId_ = static_cast<int8_t>(-1);
-    TPipe pipe_;
     LocalTensor<uint64_t> ubLocal_;
     LocalTensor<uint32_t> ubLocalHead_;
 };
