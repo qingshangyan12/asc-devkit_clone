@@ -13,12 +13,12 @@
 
 ```
 ├── matmul_basic_api_high_performance
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   ├── mmad.asc                // Ascend C样例实现
+│   ├── CMakeLists.txt        // 编译工程文件
+│   ├── data_utils.h          // 数据读入写出函数
+│   ├── mmad.asc              // Ascend C样例实现
 │   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
+│       ├── gen_data.py       // 输入数据和真值数据生成脚本文件
+│       └── verify_result.py  // 真值对比文件
 ```
 
 ## 样例描述
@@ -270,14 +270,14 @@ K循环 kBlockIdx = 0, 1, ..., kLoopCount-1:
   │  SetFlag(M_MTE1, mte1DBFlag)                 // 通知 L0 可覆盖
   │  mte1DBFlag ^= 1                             // 切换 L0 Ping/Pong
   │
-  │  // DataCopyIn 放在 Compute 之后，先 B 后 A
+  │                                              // DataCopyIn 放在 Compute 之后，先 B 后 A
   │  if (B大包末元素 && 还有B数据):
   │      WaitFlag(MTE1_MTE2, b1WriteIdx + 2)     // 等待 L1 B 缓冲区可写
-  │      DataCopyInB(下一个 B 大包)               // GM → L1（MTE2 指令）
+  │      DataCopyInB(下一个 B 大包)                   // GM → L1（MTE2 指令）
   │      SetFlag(MTE2_MTE1, b1WriteIdx + 2)      // 通知 L1 B 数据就绪
   │  if (A大包末元素 && 还有A数据):
   │      WaitFlag(MTE1_MTE2, a1WriteIdx)         // 等待 L1 A 缓冲区可写
-  │      DataCopyInA(下一个 A 大包)               // GM → L1（MTE2 指令）
+  │      DataCopyInA(下一个 A 大包)                   // GM → L1（MTE2 指令）
   │      SetFlag(MTE2_MTE1, a1WriteIdx)          // 通知 L1 A 数据就绪
   └─
 ```
