@@ -145,3 +145,22 @@ aclError aclmdlRICaptureThreadExchangeMode(aclmdlRICaptureMode *mode)
 {
     return 0;
 }
+
+aclError aclrtBinaryGetFunctionByEntry(const aclrtBinHandle binHandle, uint64_t entry,
+    aclrtFuncHandle *funcHandle)
+{
+    return 0;
+}
+
+aclError aclrtGetHardwareSyncAddr(void **addr)
+{
+    *addr = nullptr;
+    return 0;
+}
+
+typedef void (*aclrtStreamStateCallback)(aclrtStream stream, uint32_t state, void *arg);
+
+aclError aclrtRegStreamStateCallback(const char *streamName, aclrtStreamStateCallback callback, void *arg)
+{
+    return 0;
+}
