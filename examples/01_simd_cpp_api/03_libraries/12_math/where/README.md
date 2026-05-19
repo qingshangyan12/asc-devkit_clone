@@ -11,12 +11,12 @@
 ## 目录结构介绍
 
 ```plain
-└── where
-    ├── CMakeLists.txt          // 编译工程文件
-    ├── data_utils.h            // 数据读入写出函数
-    ├── scripts
-    │   └── gen_data.py         // 输入数据和真值数据生成脚本
-    └── where.asc               // Ascend C样例实现 & 调用样例
+├── where
+│   ├── CMakeLists.txt          // 编译工程文件
+│   ├── data_utils.h            // 数据读入写出函数
+│   ├── scripts
+│   │   └── gen_data.py         // 输入数据和真值数据生成脚本
+│   └── where.asc               // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述

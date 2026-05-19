@@ -13,10 +13,10 @@
 ## 目录结构介绍
 
 ```
-└── pybind
-    ├── add_custom.asc        // Ascend C样例实现 & pybind11注册
-    ├── add_custom_test.py    // PyTorch调用脚本
-    └── CMakeLists.txt        // 编译工程文件
+├── pybind
+│   ├── add_custom.asc        // Ascend C样例实现 & pybind11注册
+│   ├── add_custom_test.py    // PyTorch调用脚本
+│   └── CMakeLists.txt        // 编译工程文件
 ```
 
 ## 样例描述

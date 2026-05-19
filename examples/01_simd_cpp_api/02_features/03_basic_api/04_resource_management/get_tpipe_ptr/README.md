@@ -15,9 +15,9 @@
 ## 目录结构介绍
 
 ```
-└── get_tpipe_ptr
-    ├── CMakeLists.txt          // 编译工程文件
-    └── get_tpipe_ptr.asc       // Ascend C样例实现 & 调用样例
+├── get_tpipe_ptr
+│   ├── CMakeLists.txt          // 编译工程文件
+│   └── get_tpipe_ptr.asc       // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述

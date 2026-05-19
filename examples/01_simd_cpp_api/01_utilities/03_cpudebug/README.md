@@ -13,9 +13,9 @@
 ## 目录结构介绍
 
 ```
-└── 03_cpudebug
-    ├── add.asc                 // Ascend C算子实现 & 调用样例
-    └── CMakeLists.txt          // 编译工程文件
+├── 03_cpudebug
+│   ├── add.asc                 // Ascend C算子实现 & 调用样例
+│   └── CMakeLists.txt          // 编译工程文件
 ```
 
 ## 样例描述

@@ -13,10 +13,10 @@
 ## 目录结构介绍
 
 ```
-└── torch_library
-    ├── add_custom.asc           // 集成Profiling采集Shape信息
-    ├── add_custom_test.py       // PyTorch调用脚本
-    └── CMakeLists.txt           // 编译工程文件
+├── torch_library
+│   ├── add_custom.asc           // 集成Profiling采集Shape信息
+│   ├── add_custom_test.py       // PyTorch调用脚本
+│   └── CMakeLists.txt           // 编译工程文件
 ```
 
 ## 样例描述

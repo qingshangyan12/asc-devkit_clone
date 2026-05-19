@@ -20,12 +20,12 @@
 ## 目录结构介绍
 
 ```
-└── softmaxgrad
-    ├── CMakeLists.txt          // 编译工程文件（支持 -DUSE_FRONT_MODE）
-    ├── data_utils.h            // 数据读入写出函数
-    ├── scripts
-    │   └── gen_data.py         // 输入数据和真值数据生成脚本（支持两种模式）
-    └── softmaxgrad.asc         // Ascend C 样例实现 & 调用示例（两种模式合并）
+├── softmaxgrad
+│   ├── CMakeLists.txt          // 编译工程文件（支持 -DUSE_FRONT_MODE）
+│   ├── data_utils.h            // 数据读入写出函数
+│   ├── scripts
+│   │   └── gen_data.py         // 输入数据和真值数据生成脚本（支持两种模式）
+│   └── softmaxgrad.asc         // Ascend C 样例实现 & 调用示例（两种模式合并）
 ```
 
 ## 样例规格

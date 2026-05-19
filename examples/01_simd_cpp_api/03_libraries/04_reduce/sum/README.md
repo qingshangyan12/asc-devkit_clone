@@ -20,7 +20,7 @@
 ├── data_utils.h                      // 数据读写工具函数
 ├── scripts
 │   └── gen_data.py                   // 生成数据和真值数据的生成脚本
-└── sum.asc                           // Ascend C样例实例 & 主程序
+├── sum.asc                           // Ascend C样例实例 & 主程序
 ```
 
 ## 样例规格

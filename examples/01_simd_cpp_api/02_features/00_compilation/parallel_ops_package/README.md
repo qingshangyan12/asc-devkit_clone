@@ -47,7 +47,7 @@
 │           ├── leaky_relu_custom_kernel.cpp
 │           └── leaky_relu_custom_tiling.h
 ├── parallel_ops_package
-└── README.md
+├── README.md
 ```
 
 ## 样例描述
