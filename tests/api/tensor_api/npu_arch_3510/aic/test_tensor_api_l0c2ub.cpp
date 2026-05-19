@@ -73,7 +73,7 @@ void RunCopyWithParamPaths(const DstTensor& dst, const SrcTensor& src, const Par
     copiedAtom.Call(dst, src);
 
     Copy(copiedAtom, dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src, param);
+    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
 }
 
 } // namespace
@@ -92,11 +92,6 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2ND)
 
     RunCopyCallPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor, FixpipeParams{});
-    Copy(ubTensor, l0cTensor);
-    Copy(ubTensor, l0cTensor, FixpipeParams{});
-    uint64_t quant = 1;
-    Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, quant, FixpipeParams{});
-    Copy(ubTensor, l0cTensor, quant, FixpipeParams{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -134,8 +129,6 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2DN)
 
     RunCopyCallPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor, FixpipeParams{});
-    Copy(ubTensor, l0cTensor);
-    Copy(ubTensor, l0cTensor, FixpipeParams{});
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -172,8 +165,6 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2NZNoChannelSplit)
 
     RunCopyCallPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor);
     RunCopyWithParamPaths<CopyL0C2UB, CopyL0C2UBTraitDefault>(ubTensor, l0cTensor, FixpipeParams{});
-    Copy(ubTensor, l0cTensor);
-    Copy(ubTensor, l0cTensor, FixpipeParams{});
 
     EXPECT_EQ(dst[0], 0);
 }

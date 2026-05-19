@@ -26,46 +26,13 @@
 namespace AscendC {
 namespace Te {
 
-template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter>
-__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter);
-
-template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter>
-__aicore__ inline void Mmad(
-    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const MmadParams& params);
-
-template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter, typename Bias,
-    Std::enable_if_t<IsAttrTensorV<Bias>, int> Enable>
-__aicore__ inline void Mmad(
-    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias);
-
-template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter, typename Bias,
-    Std::enable_if_t<IsAttrTensorV<Bias>, int> Enable>
-__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter,
-    const Bias& bias, const MmadParams& params);
-
 template <typename T, typename Dst, typename Fm, typename Filter>
 __aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter);
-
-template <typename T, typename Dst, typename Fm, typename Filter>
-__aicore__ inline void Mmad(
-    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const MmadParams& params);
 
 template <typename T, typename Dst, typename Fm, typename Filter, typename Bias,
     Std::enable_if_t<IsAttrTensorV<Bias>, int> Enable>
 __aicore__ inline void Mmad(
     const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias);
-
-template <typename T, typename Dst, typename Fm, typename Filter, typename Bias,
-    Std::enable_if_t<IsAttrTensorV<Bias>, int> Enable>
-__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter,
-    const Bias& bias, const MmadParams& params);
-
-template <typename T, typename U, typename S>
-__aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const MmadParams& params);
-
-template <typename T, typename U, typename S, typename V,
-    Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U> && IsAttrTensorV<S> && IsAttrTensorV<V>, int> Enable>
-__aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params);
 
 template <typename MmadOperationType>
 __aicore__ inline constexpr auto MakeMmad(const MmadOperationType& operation);
