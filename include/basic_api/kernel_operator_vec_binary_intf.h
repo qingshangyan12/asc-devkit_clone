@@ -719,7 +719,11 @@ __aicore__ inline void FusedExpSub(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const uint32_t count);
 } // namespace AscendC
 #pragma end_pipe
+
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_vec_binary_intf_impl.h"
+#endif // __NPU_ARCH__
+
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_INTF_H__)
