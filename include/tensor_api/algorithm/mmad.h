@@ -26,52 +26,42 @@
 namespace AscendC {
 namespace Te {
 
-template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter>
-__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter);
-
-template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter>
+/**
+ * @brief Perform matrix multiplication with a preconstructed MmadAtom.
+ * @param atomMmad : Matrix multiplication atom object.
+ * @param dst : Destination tensor.
+ * @param fm : Left input tensor.
+ * @param filter : Right input tensor.
+ */
+template <typename AtomType, typename DstTensor, typename FmTensor, typename FilterTensor>
 __aicore__ inline void Mmad(
-    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const MmadParams& params);
+    const MmadAtom<AtomType>& atomMmad, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter);
 
-template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter, typename Bias,
-    Std::enable_if_t<IsAttrTensorV<Bias>, int> Enable>
+/**
+ * @brief Perform matrix multiplication with a preconstructed MmadAtom and a bias tensor.
+ * @param atomMmad : Matrix multiplication atom object.
+ * @param dst : Destination tensor.
+ * @param fm : Left input tensor.
+ * @param filter : Right input tensor.
+ * @param bias : Bias tensor.
+ */
+template <typename AtomType, typename DstTensor, typename FmTensor, typename FilterTensor, typename BiasTensor,
+    Std::enable_if_t<IsAttrTensorV<BiasTensor>, int> Enable>
 __aicore__ inline void Mmad(
-    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias);
+    const MmadAtom<AtomType>& atomMmad, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter,
+    const BiasTensor& bias);
 
-template <typename Tp, const Tp& traits, typename T, typename Dst, typename Fm, typename Filter, typename Bias,
-    Std::enable_if_t<IsAttrTensorV<Bias>, int> Enable>
-__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter,
-    const Bias& bias, const MmadParams& params);
-
-template <typename T, typename Dst, typename Fm, typename Filter>
-__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter);
-
-template <typename T, typename Dst, typename Fm, typename Filter>
-__aicore__ inline void Mmad(
-    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const MmadParams& params);
-
-template <typename T, typename Dst, typename Fm, typename Filter, typename Bias,
-    Std::enable_if_t<IsAttrTensorV<Bias>, int> Enable>
-__aicore__ inline void Mmad(
-    const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias);
-
-template <typename T, typename Dst, typename Fm, typename Filter, typename Bias,
-    Std::enable_if_t<IsAttrTensorV<Bias>, int> Enable>
-__aicore__ inline void Mmad(const MmadAtom<T>& atomMmad, const Dst& dst, const Fm& fm, const Filter& filter,
-    const Bias& bias, const MmadParams& params);
-
-template <typename T, typename U, typename S>
-__aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const MmadParams& params);
-
-template <typename T, typename U, typename S, typename V,
-    Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U> && IsAttrTensorV<S> && IsAttrTensorV<V>, int> Enable>
-__aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params);
-
+/**
+ * @brief Construct a MmadAtom from the matrix multiplication operation type.
+ */
 template <typename MmadOperationType>
-__aicore__ inline constexpr auto MakeMmad(const MmadOperationType& operation);
+__aicore__ inline constexpr auto MakeMmad();
 
-template <typename MmadOperationType, typename Trait>
-__aicore__ inline constexpr auto MakeMmad(const MmadOperationType& operation, const Trait& trait);
+/**
+ * @brief Construct a MmadAtom from the matrix multiplication operation type and trait type.
+ */
+template <typename MmadOperationType, typename MmadTraitType>
+__aicore__ inline constexpr auto MakeMmad();
 
 }
 }
