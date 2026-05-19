@@ -144,7 +144,7 @@
 <td class="cellrowborder" valign="top" width="14.471447144714473%" headers="mcps1.2.4.1.2 "><p id="p736835513915"><a name="p736835513915"></a><a name="p736835513915"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="69.14691469146915%" headers="mcps1.2.4.1.3 "><p id="p18777396499"><a name="p18777396499"></a><a name="p18777396499"></a>目的操作数。</p>
-<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p632555516496"><a name="p632555516496"></a><a name="p632555516496"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -159,7 +159,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="14.471447144714473%" headers="mcps1.2.4.1.2 "><p id="p783585415117"><a name="p783585415117"></a><a name="p783585415117"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.14691469146915%" headers="mcps1.2.4.1.3 "><p id="p17711183217"><a name="p17711183217"></a><a name="p17711183217"></a><span id="ph197123532916"><a name="ph197123532916"></a><a name="ph197123532916"></a><span id="ph199714359297"><a name="ph199714359297"></a><a name="ph199714359297"></a><span id="ph1697183512918"><a name="ph1697183512918"></a><a name="ph1697183512918"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<td class="cellrowborder" valign="top" width="69.14691469146915%" headers="mcps1.2.4.1.3 "><p id="p17711183217"><a name="p17711183217"></a><a name="p17711183217"></a><span id="ph197123532916"><a name="ph197123532916"></a><a name="ph197123532916"></a><span id="ph199714359297"><a name="ph199714359297"></a><a name="ph199714359297"></a><span id="ph1697183512918"><a name="ph1697183512918"></a><a name="ph1697183512918"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p1883513541411"><a name="p1883513541411"></a><a name="p1883513541411"></a>数据类型需与dst中元素的数据类型保持一致。</p>
 <p id="p184156281022"><a name="p184156281022"></a><a name="p184156281022"></a>当传入该参数时，会将src[0]复制多次并填充到向量中。</p>
 </td>
@@ -262,4 +262,3 @@ scalar: 18.0
 srcLocal: [18.0 1.0 2.0 ... 254.0 255.0]
 dstLocal: [18.0 18.0 18.0 ... 18.0 18.0]
 ```
-

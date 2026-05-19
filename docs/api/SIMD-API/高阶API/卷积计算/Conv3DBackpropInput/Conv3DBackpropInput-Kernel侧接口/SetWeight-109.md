@@ -74,7 +74,7 @@ __aicore__ inline void SetWeight(const AscendC::GlobalTensor<SrcT> &weight)
 </td>
 <td class="cellrowborder" valign="top" width="14.01%" headers="mcps1.2.4.1.2 "><p id="p33487148556"><a name="p33487148556"></a><a name="p33487148556"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="68.22%" headers="mcps1.2.4.1.3 "><p id="p1736304631410"><a name="p1736304631410"></a><a name="p1736304631410"></a>Weight矩阵在Global Memory上的首地址。<span id="ph1854116191314"><a name="ph1854116191314"></a><a name="ph1854116191314"></a><span id="ph198541361131"><a name="ph198541361131"></a><a name="ph198541361131"></a><span id="ph13854665137"><a name="ph13854665137"></a><a name="ph13854665137"></a>类型为<a href="../../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>SrcT表示Weight矩阵的数据类型，当前支持的数据类型为：half、bfloat16_t。</p>
+<td class="cellrowborder" valign="top" width="68.22%" headers="mcps1.2.4.1.3 "><p id="p1736304631410"><a name="p1736304631410"></a><a name="p1736304631410"></a>Weight矩阵在Global Memory上的首地址。<span id="ph1854116191314"><a name="ph1854116191314"></a><a name="ph1854116191314"></a><span id="ph198541361131"><a name="ph198541361131"></a><a name="ph198541361131"></a><span id="ph13854665137"><a name="ph13854665137"></a><a name="ph13854665137"></a>类型为<a href="../../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>SrcT表示Weight矩阵的数据类型，当前支持的数据类型为：half、bfloat16_t。</p>
 </td>
 </tr>
 </tbody>
@@ -97,4 +97,3 @@ ConvBackpropApi::Conv3DBackpropInput<weightDxType, inputSizeDxType, gradOutputDx
 // ...设置其它参数
 gradInput_.SetWeight(weightGm_[offsetB_]);
 ```
-

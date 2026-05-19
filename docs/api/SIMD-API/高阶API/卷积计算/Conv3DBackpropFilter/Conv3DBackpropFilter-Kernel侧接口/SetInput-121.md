@@ -74,7 +74,7 @@ __aicore__ inline void SetInput(const AscendC::GlobalTensor<SrcT> &input)
 </td>
 <td class="cellrowborder" valign="top" width="11.799999999999999%" headers="mcps1.2.4.1.2 "><p id="p33487148556"><a name="p33487148556"></a><a name="p33487148556"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p820415349110"><a name="p820415349110"></a><a name="p820415349110"></a>Input在Global Memory上的首地址。<span id="ph007358119"><a name="ph007358119"></a><a name="ph007358119"></a><span id="ph11013517112"><a name="ph11013517112"></a><a name="ph11013517112"></a><span id="ph13033512112"><a name="ph13033512112"></a><a name="ph13033512112"></a>类型为<a href="../../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>特征矩阵Input支持的数据类型SrcT为：half、bfloat16_t。</p>
+<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p820415349110"><a name="p820415349110"></a><a name="p820415349110"></a>Input在Global Memory上的首地址。<span id="ph007358119"><a name="ph007358119"></a><a name="ph007358119"></a><span id="ph11013517112"><a name="ph11013517112"></a><a name="ph11013517112"></a><span id="ph13033512112"><a name="ph13033512112"></a><a name="ph13033512112"></a>类型为<a href="../../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>特征矩阵Input支持的数据类型SrcT为：half、bfloat16_t。</p>
 </td>
 </tr>
 </tbody>
@@ -99,4 +99,3 @@ gradWeight_.Init(&(tilingData->dwTiling));
 gradWeight_.SetInput(inputGm_[offsetB_]);
 ...
 ```
-

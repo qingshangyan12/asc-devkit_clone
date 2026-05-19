@@ -72,7 +72,7 @@ __aicore__ inline void SetBias(const AscendC::GlobalTensor<BiasT>& bias)
 </td>
 <td class="cellrowborder" valign="top" width="19.921992199219922%" headers="mcps1.1.4.1.2 "><p id="p9894535204216"><a name="p9894535204216"></a><a name="p9894535204216"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="63.53635363536353%" headers="mcps1.1.4.1.3 "><p id="p188941435124215"><a name="p188941435124215"></a><a name="p188941435124215"></a>Bias在Global Memory上的地址。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="../../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>偏置矩阵Bias支持的数据类型为：half、bfloat16_t。</p>
+<td class="cellrowborder" valign="top" width="63.53635363536353%" headers="mcps1.1.4.1.3 "><p id="p188941435124215"><a name="p188941435124215"></a><a name="p188941435124215"></a>Bias在Global Memory上的地址。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="../../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>偏置矩阵Bias支持的数据类型为：half、bfloat16_t。</p>
 </td>
 </tr>
 </tbody>
@@ -95,4 +95,3 @@ if (biasFlag) {
     conv3dApi.SetBias(biasGm);
 }
 ```
-
