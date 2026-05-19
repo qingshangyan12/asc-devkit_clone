@@ -40,10 +40,10 @@
 
 - gridDim
 
-  内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。各个维度上线程块关系需满足gridDim.x * gridDim.y * gridDim.z <= 65535。
+  内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个（Thread Block）构成。各个维度上线程块关系需满足gridDim.x * gridDim.y * gridDim.z <= 65535。
 - blockDim
 
-  内置全局变量，在核函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构，即启动VF时配置的dim3结构体实例值。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数。
+  内置全局变量，在核函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构，即启动核函数时配置的dim3结构体实例值。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数。
 - blockIdx
 
   内置全局变量，只能在核函数中使用，用于获取块索引。表示当前线程所在的线程块在整个网格中的位置坐标。
@@ -256,7 +256,7 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 其中：
 
 - grid\_dim：int或dim3类型，用于指定网格（grid）的维度与规模，grid\_dim.x \* grid\_dim.y \* grid\_dim.z等于启动的线程块总数。
-- block\_dim：int或dim3类型，用于指定每个线程块（block）的维度与规模，block\_dim.x \* block\_dim.y \* block\_dim.z等于每个线程块包含的线程数。
+- block\_dim：int或dim3类型，用于指定每个线程块的维度与规模，block\_dim.x \* block\_dim.y \* block\_dim.z等于每个线程块包含的线程数。
 - dynamic\_mem\_size：size\_t类型，该参数指定除静态分配的内存外，本次调用为每个线程块动态分配的共享内存字节数。
 - stream：aclrtStream类型指针，指定关联的流，用于维护异步操作的执行顺序。
 
@@ -275,12 +275,12 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
 - \_\_launch\_bounds\_\_\(N\)
 
-  函数标记宏，在SIMT核函数可选配置，用于在编译期指定线程块（Thread Block）的最大线程数。若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。参数N需要满足：
+  函数标记宏，在SIMT核函数可选配置，用于在编译期指定线程块的最大线程数。若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。参数N需要满足：
 
   - N \>= dimx \* dimy \* dimz；dimx，dimy，dimz为表示线程的dim3结构体。
   - N的取值范围为[1,2048]。
 
-    最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动VF任务的dim3线程数保持一致。
+    最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动核函数时的dim3线程数保持一致。
 
     **表 10**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
 
