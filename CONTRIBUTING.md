@@ -58,3 +58,21 @@ C API提供纯C风格的接口，符合C语言算子开发习惯，开放芯片�
   如果社区中他人遇到的问题您有合适的解决方法，欢迎您在Issue中发表评论交流，帮助他人解决问题和痛点，共同优化易用性。
 
   如果对应Issue需要进行代码修改，您可以在Issue评论框中输入“/assign”或“/assign @yourself”，将该Issue分配给您，跟踪协助解决问题。
+
+## 代码规范
+
+本项目有完整的代码贡献规范体系，请在开发前阅读相关指南。完整索引见 [docs/contributing/README.md](./docs/contributing/README.md)。
+
+| 文档 | 内容 |
+|------|------|
+| [code-style.md](./docs/contributing/code-style.md) | C++ 命名、include、header guard、namespace、宏、constexpr、格式化 |
+| [api-design.md](./docs/contributing/api-design.md) | API 接口设计、模板参数、`__aicore__` 使用、Tiling 接口、弃用标注 |
+| [directory-structure.md](./docs/contributing/directory-structure.md) | 目录结构、文件命名后缀、架构目录、新增 API 操作清单 |
+| [examples.md](./docs/contributing/examples.md) | 示例目录结构、命名、文件组成、新增流程、npu-arch 编译选项 |
+| [testing.md](./docs/contributing/testing.md) | 测试框架、文件命名、UT 编写模式、Header Checker |
+| [documentation.md](./docs/contributing/documentation.md) | Doxygen 注释格式、参数标注、弃用标注模板 |
+| [experimental.md](./docs/contributing/experimental.md) | Experimental 特性开发、标记方式、转正流程 |
+
+## Experimental 特性
+
+新开发的实验性特性请放置于 experimental 目录下（即 `include/tensor_api/` 和 `impl/tensor_api/`），并在代码中明确标注为 experimental。完整规范见 [experimental.md](./docs/contributing/experimental.md)。
