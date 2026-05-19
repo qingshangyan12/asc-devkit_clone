@@ -27,6 +27,7 @@
 
 namespace AscendC {
 class Load2DBitModeParam {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 public:
     __aicore__ inline Load2DBitModeParam();
     __aicore__ inline Load2DBitModeParam(const LoadData2DParamsV2 &loadData2DParams_);
@@ -70,9 +71,11 @@ private:
         struct Load2DBitModeConfig1 config1BitMode;
     };
     bool ifTranspose = false;
+#endif
 };
 
 class Load3DBitModeParam {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 public:
     __aicore__ inline Load3DBitModeParam();
     template <typename T>
@@ -130,9 +133,11 @@ private:
         uint64_t config1;
         struct Load3DBitModeConfig1 config1BitMode;
     };
+#endif
 };
 
 class SetFMatrixBitModeParams {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 public:
     __aicore__ inline SetFMatrixBitModeParams();
     template <typename T>
@@ -152,10 +157,11 @@ private:
         uint64_t config0;
         struct SetFMatrixBitModeConfig0 config0BitMode;
     };
+#endif
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 class MmadBitModeParams {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 public:
     __aicore__ inline MmadBitModeParams();
     __aicore__ inline MmadBitModeParams(const MmadParams &mmadParams_);
@@ -186,13 +192,12 @@ private:
         uint64_t config0;
         struct MmadBitModeConfig0 config0BitMode;
     };
-};
 #endif
+};
 }  // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_mm_bitmode_intf_impl.h"
 
-#endif // __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102
 #endif
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BITMODE_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

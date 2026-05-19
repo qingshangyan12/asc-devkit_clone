@@ -95,7 +95,9 @@ __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr);
 #endif
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_scalar_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_OPERATOR_SCALAR_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SCALAR_INTF_H__)
