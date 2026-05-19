@@ -42,6 +42,10 @@ __aicore__ inline void asc_prof_start();
 
 __aicore__ inline void asc_prof_stop();
 
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+__aicore__ inline uint64_t clock(void);
+#endif
+
 #if __NPU_ARCH__ == 3510
 template<pipe_t pipe = PIPE_S>
 __aicore__ inline void asc_mark_stamp(uint16_t idx);
