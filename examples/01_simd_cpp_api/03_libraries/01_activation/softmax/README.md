@@ -18,11 +18,11 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
 
 ```
 ├── softmax
-│   ├── scripts
-│   │   └── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── README.md               // 样例说明文档
+│   ├── scripts
+│   │   └── gen_data.py         // 输入数据和真值数据生成脚本
 │   └── softmax.asc             // Ascend C样例实现 & 调用样例
 ```
 
@@ -30,7 +30,7 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
 
 - 样例功能：
 
-  本样例对输入 Tensor 按行做 SoftMax 计算，并使用 AdjustSoftMaxRes 对计算结果做后处理。当输入的 max 中存在指定的值（0xFF7FFFFF，即 float 类型的最大有限值）时，调整输出中对应位置的数据为自定义的值（0.0，即浮点数零）。该机制常用于注意力掩码（attention mask）场景，将无效位置的 softmax 输出置零。
+  本样例对输入Tensor按行做SoftMax计算，并使用AdjustSoftMaxRes对计算结果做后处理。当输入的max中存在指定的值（0xFF7FFFFF，即float类型的最大有限值）时，调整输出中对应位置的数据为自定义的值（0.0，即浮点数零）。该机制常用于注意力掩码（attention mask）场景，将无效位置的softmax输出置零。
 
 - 样例规格：
 
@@ -56,7 +56,7 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
   本样例中实现的是固定shape为输入x[32, 32]，输出y[32, 32]、max[32, 8]、sum[32, 8]的softmax样例。
 
   - Kernel实现  
-    核心计算步骤：将输入数据搬入后，调用 `AscendC::SoftMax` 完成 SoftMax 计算，再调用 `AscendC::AdjustSoftMaxRes` 对结果做后处理，最后将结果搬出。
+    核心计算步骤：将输入数据搬入后，调用 `AscendC::SoftMax` 完成SoftMax计算，再调用 `AscendC::AdjustSoftMaxRes` 对结果做后处理，最后将结果搬出。
 
   - Tiling实现  
     softmax样例的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，对主核计算的shape调用GetSoftMaxMinTmpSize获取API所需临时缓冲区大小，再调用SoftMax高阶API的tiling函数获取API所需tiling参数，尾核计算所需的高阶API的tiling由kernel侧自行计算。
@@ -92,7 +92,7 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
   ./demo
   ```
 
-  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
@@ -106,8 +106,8 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
 

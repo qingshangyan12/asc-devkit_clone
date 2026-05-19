@@ -17,7 +17,7 @@
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── matmul_leakyrelu.asc    // Ascend C算子实现与调用样例
-│   └── scripts                 // 数据生成与结果校验脚本目录
+│   └── scripts
 │       ├── gen_data.py         // 输入数据和真值数据生成脚本
 │       └── verify_result.py    // 真值比对脚本
 ```
@@ -52,7 +52,7 @@
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j
   python3 ../scripts/gen_data.py
-  msprof op simulator --soc-version=Ascend910B1 ./demo    # 通过msprof op simulator执行算子调优
+  msprof op simulator --soc-version=Ascend910B1 ./demo    // 通过msprof op simulator执行算子调优
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin
   ```
   请根据实际测试的 NPU 硬件架构选择对应的 `CMAKE_ASC_ARCHITECTURES` 参数
@@ -87,13 +87,13 @@ msprof op simulator --soc-version=<soc_version> ./demo
 命令完成后，会在当前目录下生成以 `OPPROF_{timestamp}_XXX` 命名的文件夹，产物结构如下：
 ```
 OPPROF_{timestamp}_XXX/
-├── dump                    # 原始性能数据，用户无需关注
+├── dump                    // 原始性能数据，用户无需关注
 └── simulator
-  ├── core0.cubecore0/     # 各核的仿真指令流水图文件
+  ├── core0.cubecore0/     // 各核的仿真指令流水图文件
   ├── core0.veccore0/
   ├── core0.veccore1/
-  ├── trace.json           # 仿真流水图和热点函数可视化呈现文件
-  └── visualize_data.bin   # MindStudio Insight 呈现文件
+  ├── trace.json           // 仿真流水图和热点函数可视化呈现文件
+  └── visualize_data.bin   // MindStudio Insight 呈现文件
 ```
 
 执行后可通过以下方式查看指令流水图：
