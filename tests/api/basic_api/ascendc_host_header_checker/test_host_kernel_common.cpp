@@ -23,9 +23,9 @@ using namespace AscendC;
 MutexID id = 1;
 using MutexAlias = Mutex;
 
-// 全局方法
-MutexID id1 = AllocMutexID();
-ReleaseMutexID(id1);
+ // 全局方法声明检查
+using AllocMutexIDFunc = MutexID(*)();
+using ReleaseMutexIDFunc = void(*)(MutexID);
 
 extern "C" __global__ __aicore__ void TestSetAippFuncionsOnDevice() {
     AscendC::GlobalTensor<uint8_t> src0, src1;

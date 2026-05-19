@@ -36,7 +36,7 @@ __simd_callee__ inline void AxpyImpl(S& dstReg, S& srcReg, const U scalarValue, 
                   "current Axpy data type is not supported on current device!");
     static_assert(SupportType<U, half, float, uint64_t, int64_t>(),
                   "current Axpy data type is not supported on current device!");
-    static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
+    static_assert(std::is_convertible_v<U, ActualT>, "scalarValue data type could be converted to RegTensor data type");
     static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
                   "current Axpy api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
