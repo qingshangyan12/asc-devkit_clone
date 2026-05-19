@@ -124,10 +124,10 @@ int index_in = input_col + width * input_row;
 
 **核心实现**：
 
-- 每个block处理一个32×32 tile
-- 每个SIMT线程处理tile内1个元素
-- 线程先按原坐标从GM读取输入元素，再计算该元素转置后的输出位置，并把数据直接写到转置后的GM地址
-- GM读取方向连续，GM写回方向不连续
+- 每个block处理一个32×32 tile。
+- 每个SIMT线程处理tile内1个元素。
+- 线程先按原坐标从GM读取输入元素，再计算该元素转置后的输出位置，并把数据直接写到转置后的GM地址。
+- GM读取方向连续，GM写回方向不连续。
 
 下图展示了Case 0的数据流，其中标红展示了一个Warp在读取GM和写入GM时处理的元素。对于同一个Warp的线程会读取GM输入中tile的一行元素，写回到GM输出中tile的一列。在读取GM输入时，相邻线程访问的元素地址连续，为连续读，在写回到输出时，相邻线程却被拆散到输出矩阵的不同行上，为不连续写。因此，这一版的核心问题是转置后的写回地址不再连续，这通常会显著影响整体吞吐。
 
@@ -150,8 +150,8 @@ output[index_out] = input[index_in];
 
 **分析**：
 
-- Case 0的Task Duration为70.304us，作为直接索引转置版本，是后续优化版本的对比基线
-- 该版本GM读取仍然是连续读，但GM写回是跨行、非连续写，同一个Warp的写请求难以高效合并，因此整体耗时主要受限于写回访存模式
+- Case 0的Task Duration为70.304us，作为直接索引转置版本，是后续优化版本的对比基线。
+- 该版本GM读取仍然是连续读，但GM写回是跨行、非连续写，同一个Warp的写请求难以高效合并，因此整体耗时主要受限于写回访存模式。
 
 ---
 
@@ -161,15 +161,15 @@ output[index_out] = input[index_in];
 
 **核心实现**：
 
-- 将输入数据的tile从GM搬运到UB上
-- 每个线程从UB中取数，一个Warp会读取UB中tile的一列元素
-- 将取出的值写回GM中的转置位置，一个Warp会将读取UB的一列元素写入到GM输出中tile的一行
+- 将输入数据的tile从GM搬运到UB上。
+- 每个线程从UB中取数，一个Warp会读取UB中tile的一列元素。
+- 将取出的值写回GM中的转置位置，一个Warp会将读取UB的一列元素写入到GM输出中tile的一行。
 
 下图展示了Case 1的数据流，其中标红和标黄的元素展示了一个Warp的线程在读取GM和写入GM时处理的元素。读取GM输入时，整个tile会按照GM的排布搬到UB，在写入GM输出时一个Warp的线程会读取UB上的一列元素写回到其对应的转置后的位置。
 
 <img src="./figures/case1.png" width="60%">
 
-与Case 0不同的是，Case 0中线程是“直接把输入元素写到转置后的GM位置”，所以相邻线程会被打散到输出矩阵的不同行上，而Case 1中，线程先把数据放到UB里，把原来不连续的全局写访问转移到UB内的不连续读。因此，这一版的核心收益是：虽然增加了一次UB读写和一次同步，但换来了GM侧“读连续、写也连续”的访问模式，整体耗时通常会明显低于Case 0。
+与Case 0不同的是，Case 0中线程是“直接把输入元素写到转置后的GM位置”，所以相邻线程会被打散到输出矩阵的不同行上，而Case 1中，核函数先通过 `asc_copy_gm2ub_align` 将输入tile按GM布局搬到UB，再由SIMT线程从UB中按转置方向读取并写回GM。因此，这一版的核心收益是：把原来不连续的GM写回转移为UB侧转置读取，换来GM侧“读连续、写也连续”的访问模式，整体耗时明显低于Case 0。
 
 **关键代码**：
 
@@ -182,9 +182,9 @@ output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + til
 
 **优化手段**：
 
-- 使用UB作为tile中转区，把Case 0中的非连续GM写转移为UB侧访问
-- 调整输出tile的block坐标，使写回GM时同一个Warp更接近按行连续写入
-- 通过 `asc_syncthreads()` 保证整个tile写入UB后再执行转置方向读取
+- 使用UB作为tile中转区，把Case 0中的非连续GM写转移为UB侧转置读取。
+- 调整输出tile的block坐标，使写回GM时同一个Warp更接近按行连续写入。
+- 通过 `asc_sync_notify()` / `asc_sync_wait()` 保证GM到UB的搬运完成后再启动SIMT VF处理。
 
 **性能数据**：
 
@@ -194,9 +194,9 @@ output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + til
 
 **分析**：
 
-- 相比Case 0的直接索引转置版本，Case 1的Task Duration从70.304us降低到44.440us，耗时下降约36.8%
-- 按Task Duration计算，Case 1整体约为Case 0的1.58倍性能，说明通过UB中转改善GM写回连续性后，端到端耗时有明显下降
-- Case 1仍然需要额外的UB读写和同步，因此优化后的Task Duration没有降到纯连续访存的理想水平；这部分耗时是UB中转换取GM访存合并带来的必要开销
+- 相比Case 0的直接索引转置版本，Case 1的Task Duration从70.304us降低到29.266us，耗时下降约58.4%。
+- 按Task Duration计算，Case 1整体约为Case 0的2.40倍性能，说明通过UB中转改善GM写回连续性后，端到端耗时有明显下降。
+- Case 1消除了Case 0中代价较高的非连续GM写回，但代码中仍存在GM到UB的tile搬运、流水同步以及SIMT线程对UB的转置方向读取，因此优化后的Task Duration仍不会等同于单纯连续GM读写的理想耗时。
 
 ---
 
@@ -206,19 +206,19 @@ output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + til
 
 **综合优化效果**：
 
-- 通过Case 0到Case 1的访存合并优化，样例Task Duration从70.304us降低到44.440us，耗时下降约36.8%
-- Case 1相对Case 0性能提升约1.58倍，说明通过UB中转改善GM写回连续性后，端到端耗时有明显收益
+- 通过Case 0到Case 1的访存合并优化，样例Task Duration从70.304us降低到29.266us，耗时下降约58.4%。
+- Case 1相对Case 0性能提升约2.40倍，说明通过UB中转改善GM写回连续性后，端到端耗时有明显收益。
 
 | Case version | Task Duration(us) | 端到端耗时相对Case 0 | 优化点                           |
 | ------------ | ----------------- | -------------------- | -------------------------------- |
 | Case 0       | 70.304            | **1x**         | 直接索引转置，GM连续读、非连续写 |
-| Case 1       | 44.440            | **1.58x**      | UB中转，全局访存合并             |
+| Case 1       | 29.266            | **2.40x**      | UB中转，全局访存合并             |
 
 ## 调优建议
 
 1. **优先关注GM访存连续性**：矩阵转置计算量很小，端到端耗时主要受读写访存模式影响。
 2. **使用UB中转改善写回模式**：当直接转置导致GM非连续写时，可以将不连续访问转移到UB侧，换取GM侧连续读写。
-3. **注意同步开销**：UB中转需要同步保证tile数据完整，优化时需要同时关注访存收益与同步、UB读写开销之间的平衡。
+3. **注意搬运与流水同步开销**：UB中转需要从GM搬运到UB，并通过流水同步保证tile数据可被SIMT线程读取，优化时需要同时关注GM访存收益、UB转置读和流水同步开销之间的平衡。
 
 ## 编译运行
 
@@ -232,6 +232,7 @@ output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + til
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
 
     ```bash

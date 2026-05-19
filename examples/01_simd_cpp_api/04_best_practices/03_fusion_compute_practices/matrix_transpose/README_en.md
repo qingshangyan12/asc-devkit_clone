@@ -124,10 +124,10 @@ Except for Task Duration, all other metrics in this example show the average of 
 
 **Core Implementation**:
 
-- Each block processes one 32×32 tile
-- Each SIMT thread processes 1 element within the tile
-- Thread first reads input element from GM by original coordinates, then calculates the output position after transposition for this element, and writes data directly to the transposed GM address
-- GM read direction is continuous, GM write-back direction is not continuous
+- Each block processes one 32×32 tile.
+- Each SIMT thread processes 1 element within the tile.
+- Thread first reads input element from GM by original coordinates, then calculates the output position after transposition for this element, and writes data directly to the transposed GM address.
+- GM read direction is continuous, GM write-back direction is not continuous.
 
 The figure below shows the data flow of Case 0, with red highlighting elements processed by one Warp when reading GM and writing GM. For threads in the same Warp, they read a row of elements in the tile from GM input and write back to a column of the tile in GM output. When reading GM input, element addresses accessed by adjacent threads are continuous, which is continuous read. When writing back to output, adjacent threads are scattered to different rows of the output matrix, which is non-continuous write. Therefore, the core issue of this version is that the write-back address after transposition is no longer continuous, which usually significantly affects overall throughput.
 
@@ -150,8 +150,8 @@ output[index_out] = input[index_in];
 
 **Analysis**:
 
-- Case 0's Task Duration is 70.304us, as the direct index transposition version, it serves as the comparison baseline for subsequent optimized versions
-- This version's GM read is still continuous read, but GM write-back is cross-row, non-continuous write. Write requests from the same Warp are difficult to efficiently merge, so overall latency is mainly limited by the write-back memory access pattern
+- Case 0's Task Duration is 70.304us, as the direct index transposition version, it serves as the comparison baseline for subsequent optimized versions.
+- This version's GM read is still continuous read, but GM write-back is cross-row, non-continuous write. Write requests from the same Warp are difficult to efficiently merge, so overall latency is mainly limited by the write-back memory access pattern.
 
 ---
 
@@ -161,53 +161,42 @@ output[index_out] = input[index_in];
 
 **Core Implementation**:
 
-- Each thread reads 1 element from tile in GM, one Warp reads one row of elements from a tile
-- Write elements to tile in UB by original coordinates, one Warp writes one read row to one row of tile in UB
-- After synchronization, each thread fetches data from UB, one Warp reads one column of elements from tile in UB
-- Write fetched values back to transposed position in GM, one Warp writes one read column of elements from UB to one row of tile in GM output
+- Move the input data tile from GM to UB.
+- Each thread fetches data from UB, and one Warp reads one column of elements from the tile in UB.
+- Write the fetched values back to the transposed position in GM, and one Warp writes the column of elements read from UB to one row of the tile in GM output.
 
 The figure below shows the data flow of Case 1, with red and yellow highlighted elements showing elements processed by one Warp's threads when reading GM and writing GM. When reading GM input, the entire tile is moved to UB according to GM layout. When writing GM output, one Warp's threads read one column of elements from UB and write back to their corresponding transposed positions.
 
 <img src="./figures/case1.png" width="60%">
 
-Unlike Case 0, in Case 0 threads "directly write input elements to transposed GM positions", so adjacent threads are scattered to different rows of the output matrix. In Case 1, threads first put data into UB, transferring the original non-continuous global write access to non-continuous read within UB. Therefore, the core benefit of this version is: although it adds one UB read/write and one synchronization, it gains a "read continuous, write also continuous" access pattern on the GM side, and overall latency is usually significantly lower than Case 0.
+Unlike Case 0, in Case 0 threads "directly write input elements to transposed GM positions", so adjacent threads are scattered to different rows of the output matrix. In Case 1, the kernel first uses `asc_copy_gm2ub_align` to move the input tile to UB according to the GM layout, and then SIMT threads read from UB in the transposed direction and write back to GM. Therefore, the core benefit of this version is that the original non-continuous GM write-back is transferred to transposed reads on the UB side, in exchange for a "read continuous, write also continuous" access pattern on the GM side, and the overall latency is significantly lower than Case 0.
 
 **Key Code**:
 
 ```cpp
-int tile_row = threadIdx.x / TILE_DIM;
-int tile_col = threadIdx.x % TILE_DIM;
+uint32_t tile_row = threadIdx.x / TILE_DIM;
+uint32_t tile_col = threadIdx.x % TILE_DIM;
 
-tile[tile_row][tile_col] = input[index_in];
-asc_syncthreads();
-
-int block_row = blockIdx.x / grid_width;
-int block_col = blockIdx.x % grid_width;
-
-int output_row = block_col * TILE_DIM + tile_row;
-int output_col = block_row * TILE_DIM + tile_col;
-int index_out = output_col + output_row * height;
-
-output[index_out] = tile[tile_col][tile_row];
+output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + tile_row];
 ```
 
 **Optimization Methods**:
 
-- Use UB as tile relay area, transfer non-continuous GM write in Case 0 to UB-side access
-- Adjust output tile block coordinates to make write-back to GM closer to row-continuous write for the same Warp
-- Use `asc_syncthreads()` to ensure the entire tile is written to UB before executing transposition-direction read
+- Use UB as tile relay area, transfer non-continuous GM write in Case 0 to transposed reads on the UB side.
+- Adjust output tile block coordinates to make write-back to GM closer to row-continuous write for the same Warp.
+- Use `asc_sync_notify()` / `asc_sync_wait()` to ensure the copy from GM to UB completes before starting SIMT VF processing.
 
 **Performance Data**:
 
 | Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      44.440      |    2.441    |     4027.577     |      2.295      |     0.941     |        0.134        |      0.054      |
+|      29.266      |    1.440    |     2376.663     |      0.925      |     0.644     |        0.148        |      0.100      |
 
 **Analysis**:
 
-- Compared to Case 0's direct index transposition version, Case 1's Task Duration decreased from 70.304us to 44.440us, a latency reduction of about 36.8%
-- Calculated by Task Duration, Case 1's overall performance is about 1.58x that of Case 0, indicating that after improving GM write-back continuity through UB relay, end-to-end latency has significant improvement
-- Case 1 still requires additional UB read/write and synchronization, so the optimized Task Duration did not drop to the ideal level of pure continuous memory access; this latency is the necessary overhead brought by UB relay in exchange for GM memory access coalescing
+- Compared to Case 0's direct index transposition version, Case 1's Task Duration decreased from 70.304us to 29.266us, a latency reduction of about 58.4%.
+- Calculated by Task Duration, Case 1's overall performance is about 2.40x that of Case 0, indicating that after improving GM write-back continuity through UB relay, end-to-end latency has significant improvement.
+- Case 1 eliminates the costly non-continuous GM write-back in Case 0, but the code still includes tile copy from GM to UB, pipeline synchronization, and transposed UB reads by SIMT threads, so the optimized Task Duration still will not match the ideal latency of purely continuous GM reads and writes.
 
 ---
 
@@ -217,19 +206,19 @@ output[index_out] = tile[tile_col][tile_row];
 
 **Overall Optimization Effect**:
 
-- Through memory access coalescing optimization from Case 0 to Case 1, sample Task Duration decreased from 70.304us to 44.440us, a latency reduction of about 36.8%
-- Case 1 achieves about 1.58x performance improvement relative to Case 0, indicating that after improving GM write-back continuity through UB relay, end-to-end latency has significant benefit
+- Through memory access coalescing optimization from Case 0 to Case 1, sample Task Duration decreased from 70.304us to 29.266us, a latency reduction of about 58.4%.
+- Case 1 achieves about 2.40x performance improvement relative to Case 0, indicating that after improving GM write-back continuity through UB relay, end-to-end latency has significant benefit.
 
 | Case version | Task Duration(us) | End-to-end Latency Relative to Case 0 | Optimization Point                           |
 | ------------ | ----------------- | -------------------- | -------------------------------- |
 | Case 0       | 70.304            | **1x**         | Direct index transposition, GM continuous read, non-continuous write |
-| Case 1       | 44.440            | **1.58x**      | UB relay, global memory access coalescing             |
+| Case 1       | 29.266            | **2.40x**      | UB relay, global memory access coalescing             |
 
 ## Tuning Suggestions
 
 1. **Prioritize GM Memory Access Continuity**: Matrix transposition has very small computation volume, end-to-end latency is mainly affected by read/write memory access patterns.
 2. **Use UB Relay to Improve Write-back Pattern**: When direct transposition causes GM non-continuous write, non-continuous access can be transferred to UB side in exchange for continuous read/write on GM side.
-3. **Note Synchronization Overhead**: UB relay requires synchronization to ensure tile data integrity. When optimizing, need to simultaneously consider the balance between memory access benefit and synchronization, UB read/write overhead.
+3. **Note Copy and Pipeline Synchronization Overhead**: UB relay requires moving data from GM to UB and pipeline synchronization to ensure the tile data can be read by SIMT threads. When optimizing, consider the balance among GM memory access benefit, transposed UB reads, and pipeline synchronization overhead.
 
 ## Compilation and Execution
 
