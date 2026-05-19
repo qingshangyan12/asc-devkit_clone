@@ -6,7 +6,7 @@
 
 ## 样例列表
 
-|  目录名称                                                   |  功能描述                                              |
-| ------------------------------------------------------------ | ---------------------------------------------------- |
-|[rtc_hello_world](./rtc_hello_world)| 本样例介绍了使用aclrtc接口实现HelloWorld核函数的调用。|
-|[rtc_template_add](./rtc_template_add)| 基于 Aclrtc 运行时编译 + LocalMemAllocator（静态 Tensor）实现 Add |
+|  目录名称                                                   |  功能描述                                               | 支持的产品 |
+| ------------------------------------------------------------ | ----------------------------------------------------  | --- |
+|[rtc_hello_world](./rtc_hello_world)| 本样例介绍了使用aclrtc接口实现HelloWorld核函数的调用。 | Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+|[rtc_template_add](./rtc_template_add)| 基于 Aclrtc 运行时编译 + LocalMemAllocator（静态 Tensor）实现 Add  | Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品 |

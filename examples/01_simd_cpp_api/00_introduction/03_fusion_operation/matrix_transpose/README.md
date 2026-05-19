@@ -13,8 +13,8 @@
 ```text
 ├── matrix_transpose
 │   ├── CMakeLists.txt         // 编译工程文件
-│   ├── matrix_transpose.asc   // 矩阵转置样例实现
 │   ├── figures                // 图示
+│   ├── matrix_transpose.asc   // 矩阵转置样例实现
 │   └── README.md
 ```
 
@@ -288,14 +288,14 @@ msprof op ./demo   # 分析case的性能
 会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
 
 ```text
-├──dump                       # 原始的性能数据，用户无需关注
-├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-├──L2Cache.csv                # L2 Cache命中率
-├──Memory.csv                 # UB，L1和主存储器读写带宽速率
-├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
-├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
-├──OpBasicInfo.csv            # 算子基础信息
-├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
-├──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
-└──visualize_data.bin         # MindStudio Insight呈现文件
+├──dump                       // 原始的性能数据，用户无需关注
+├──ArithmeticUtilization.csv  // cube/vector指令cycle占比
+├──L2Cache.csv                // L2 Cache命中率
+├──Memory.csv                 // UB，L1和主存储器读写带宽速率
+├──MemoryL0.csv               // L0A，L0B，和L0C读写带宽速率
+├──MemoryUB.csv               // Vector和Scalar到UB的读写带宽速率
+├──OpBasicInfo.csv            // 算子基础信息
+├──PipeUtilization.csv        // 采集计算单元和搬运单元耗时和占比
+├──ResourceConflictRatio.csv  // UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
+└──visualize_data.bin         // MindStudio Insight呈现文件
 ```
