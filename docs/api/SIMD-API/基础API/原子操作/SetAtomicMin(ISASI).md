@@ -2,7 +2,6 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-
 | 产品 | 是否支持 |
 |------|----------|
 | <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
@@ -66,7 +65,7 @@ PIPE_S
 
 </cann-filter>
 
-- 使用完后，建议通过[DisableDmaAtomic](DisableDmaAtomic.md#ZH-CN_TOPIC_0000002586300749)关闭原子最小操作，以免影响后续相关功能。
+- 使用完后，建议通过[DisableDmaAtomic](DisableDmaAtomic.md)关闭原子最小操作，以免影响后续相关功能。
 - 该指令执行前不会自动清零GM数据。开发者需根据算子逻辑判断是否清零，如需清零，请在执行前手动完成。
 - SetAtomicMin内部已集成与  [SetAtomicType](SetAtomicType.md)  相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用 SetAtomicType 接口。
 

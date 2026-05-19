@@ -121,7 +121,7 @@ PIPE_S
 
 ## 调用示例<a name="section177231425115410"></a>
 
-`SetAtomicAdd` 的调用示例如下：
+SetAtomicAdd的调用示例如下：
 
 ```cpp
 AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
