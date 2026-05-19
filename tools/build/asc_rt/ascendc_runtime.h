@@ -60,7 +60,6 @@ extern "C" int UnregisterAscendBinary(void *hdl);
 extern "C" void AscendProfRegister();
 extern "C" bool AscendCheckSoCVersion(const char *socVersion, char *errMsg);
 extern "C" uint32_t GetCoreNumForMixVectorCore(uint32_t *aiCoreNum, uint32_t *vectorCoreNum);
-//extern "C" int32_t AscendDevBinaryRegister(const void *fileBuf, size_t fileSize, void **handle);
 extern "C" int32_t AscendDevBinaryLazyRegister(const char* binBuf, size_t binSize, void** handle);
 extern "C" int32_t AscendGetFuncFromBinary(void* const binHandle, const char* kernelName, void** funcHandle);
 extern "C" int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
