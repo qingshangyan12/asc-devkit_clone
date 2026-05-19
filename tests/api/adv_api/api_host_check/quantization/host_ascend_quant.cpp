@@ -10,30 +10,38 @@
 #include "quantization/ascend_quant.h"
 
 __aicore__ void TestAscendQuant0() {
-    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<int8_t> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    float scale = 1.0f;
+    float offset = 0.0f;
     uint32_t calCount = 0;
     AscendC::AscendQuant<float>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset, calCount);
 }
 
 __aicore__ void TestAscendQuant1() {
-    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<int8_t> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
+    float scale = 1.0f;
+    float offset = 0.0f;
     uint32_t calCount = 0;
     AscendC::AscendQuant<float>(dstTensor, srcTensor, scale, offset, calCount);
 }
 
 __aicore__ void TestAscendQuant2() {
-    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<int8_t> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    float scale = 1.0f;
+    float offset = 0.0f;
     AscendC::AscendQuant<float>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset);
 }
 
 __aicore__ void TestAscendQuant3() {
-    AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<int8_t> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
+    float scale = 1.0f;
+    float offset = 0.0f;
     AscendC::AscendQuant<float>(dstTensor, srcTensor, scale, offset);
 }
 

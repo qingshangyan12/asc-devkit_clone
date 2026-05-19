@@ -10,11 +10,27 @@
 #include "normalization/groupnorm.h"
 
 __aicore__ void TestGroupNorm0() {
+    AscendC::LocalTensor<float> output;
+    AscendC::LocalTensor<float> outputMean;
+    AscendC::LocalTensor<float> outputVariance;
+    AscendC::LocalTensor<float> inputX;
+    AscendC::LocalTensor<float> gamma;
+    AscendC::LocalTensor<float> beta;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    float epsilon = 0.0f;
+    GroupNormTiling tiling;
     AscendC::GroupNorm<float>(output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling);
 }
 
 __aicore__ void TestGroupNorm1() {
+    AscendC::LocalTensor<float> output;
+    AscendC::LocalTensor<float> outputMean;
+    AscendC::LocalTensor<float> outputVariance;
+    AscendC::LocalTensor<float> inputX;
+    AscendC::LocalTensor<float> gamma;
+    AscendC::LocalTensor<float> beta;
+    float epsilon = 0.0f;
+    GroupNormTiling tiling;
     AscendC::GroupNorm<float>(output, outputMean, outputVariance, inputX, gamma, beta, epsilon, tiling);
 }
 

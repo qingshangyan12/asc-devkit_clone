@@ -11,17 +11,21 @@
 
 __aicore__ void TestSort0() {
     AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<uint32_t> dstIndexTensor;
     AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<uint32_t> srcIndexTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::Sort<float>(dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, sharedTmpBuffer, calCount);
+    AscendC::Sort<float, uint32_t>(dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestSort1() {
     AscendC::LocalTensor<float> dstTensor;
+    AscendC::LocalTensor<uint32_t> dstIndexTensor;
     AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<uint32_t> srcIndexTensor;
     uint32_t calCount = 0;
-    AscendC::Sort<float>(dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, calCount);
+    AscendC::Sort<float, uint32_t>(dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, calCount);
 }
 
 __aicore__ void TestSort2() {

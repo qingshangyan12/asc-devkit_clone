@@ -10,14 +10,27 @@
 #include "sort/topk.h"
 
 __aicore__ void TestTopK0() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> dstValueLocal;
+    AscendC::LocalTensor<int32_t> dstIndexLocal;
+    AscendC::LocalTensor<float> srcLocal;
+    AscendC::LocalTensor<int32_t> srcIndexLocal;
+    AscendC::LocalTensor<bool> finishLocal;
+    AscendC::LocalTensor<uint8_t> tmpLocal;
+    int32_t k = 0;
+    TopkTiling tiling;
+    AscendC::TopKInfo topKInfo;
     AscendC::TopK<float>(dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, tmpLocal, k, tiling, topKInfo);
 }
 
 __aicore__ void TestTopK1() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> dstValueLocal;
+    AscendC::LocalTensor<int32_t> dstIndexLocal;
+    AscendC::LocalTensor<float> srcLocal;
+    AscendC::LocalTensor<int32_t> srcIndexLocal;
+    AscendC::LocalTensor<bool> finishLocal;
+    int32_t k = 0;
+    TopkTiling tiling;
+    AscendC::TopKInfo topKInfo;
     AscendC::TopK<float>(dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tiling, topKInfo);
 }
 

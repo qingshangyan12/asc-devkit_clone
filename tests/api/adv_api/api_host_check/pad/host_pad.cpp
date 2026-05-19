@@ -12,26 +12,34 @@
 __aicore__ void TestPad0() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
+    AscendC::PadParams padParams;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    PadTiling tiling;
     AscendC::Pad<float>(dstTensor, srcTensor, padParams, sharedTmpBuffer, tiling);
 }
 
 __aicore__ void TestPad1() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
+    AscendC::PadParams padParams;
+    PadTiling tiling;
     AscendC::Pad<float>(dstTensor, srcTensor, padParams, tiling);
 }
 
 __aicore__ void TestUnPad2() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
+    AscendC::UnPadParams unPadParams;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    UnPadTiling tiling;
     AscendC::UnPad<float>(dstTensor, srcTensor, unPadParams, sharedTmpBuffer, tiling);
 }
 
 __aicore__ void TestUnPad3() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
+    AscendC::UnPadParams unPadParams;
+    UnPadTiling tiling;
     AscendC::UnPad<float>(dstTensor, srcTensor, unPadParams, tiling);
 }
 

@@ -10,11 +10,21 @@
 #include "normalization/layernormgradbeta.h"
 
 __aicore__ void TestLayerNormGradBeta0() {
+    AscendC::LocalTensor<float> outputPdGamma;
+    AscendC::LocalTensor<float> outputPdBeta;
+    AscendC::LocalTensor<float> resForGamma;
+    AscendC::LocalTensor<float> inputDy;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    LayerNormGradBetaTiling tiling;
     AscendC::LayerNormGradBeta<float>(outputPdGamma, outputPdBeta, resForGamma, inputDy, sharedTmpBuffer, tiling);
 }
 
 __aicore__ void TestLayerNormGradBeta1() {
+    AscendC::LocalTensor<float> outputPdGamma;
+    AscendC::LocalTensor<float> outputPdBeta;
+    AscendC::LocalTensor<float> resForGamma;
+    AscendC::LocalTensor<float> inputDy;
+    LayerNormGradBetaTiling tiling;
     AscendC::LayerNormGradBeta<float>(outputPdGamma, outputPdBeta, resForGamma, inputDy, tiling);
 }
 

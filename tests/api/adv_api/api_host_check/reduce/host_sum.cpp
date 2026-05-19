@@ -13,12 +13,14 @@ __aicore__ void TestSum0() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    AscendC::SumParams sumParams;
     AscendC::Sum<float>(dstTensor, srcTensor, sharedTmpBuffer, sumParams);
 }
 
 __aicore__ void TestSum1() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
+    AscendC::SumParams sumParams;
     AscendC::Sum<float>(dstTensor, srcTensor, sumParams);
 }
 

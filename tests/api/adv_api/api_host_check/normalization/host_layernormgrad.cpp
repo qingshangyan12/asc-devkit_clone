@@ -10,11 +10,29 @@
 #include "normalization/layernormgrad.h"
 
 __aicore__ void TestLayerNormGrad0() {
+    AscendC::LocalTensor<float> outputPdX;
+    AscendC::LocalTensor<float> resForGamma;
+    AscendC::LocalTensor<float> inputDy;
+    AscendC::LocalTensor<float> inputX;
+    AscendC::LocalTensor<float> inputVariance;
+    AscendC::LocalTensor<float> inputMean;
+    AscendC::LocalTensor<float> inputGamma;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    float epsilon = 0.0f;
+    LayerNormGradTiling tiling;
     AscendC::LayerNormGrad<float>(outputPdX, resForGamma, inputDy, inputX, inputVariance, inputMean, inputGamma, sharedTmpBuffer, epsilon, tiling);
 }
 
 __aicore__ void TestLayerNormGrad1() {
+    AscendC::LocalTensor<float> outputPdX;
+    AscendC::LocalTensor<float> resForGamma;
+    AscendC::LocalTensor<float> inputDy;
+    AscendC::LocalTensor<float> inputX;
+    AscendC::LocalTensor<float> inputVariance;
+    AscendC::LocalTensor<float> inputMean;
+    AscendC::LocalTensor<float> inputGamma;
+    float epsilon = 0.0f;
+    LayerNormGradTiling tiling;
     AscendC::LayerNormGrad<float>(outputPdX, resForGamma, inputDy, inputX, inputVariance, inputMean, inputGamma, epsilon, tiling);
 }
 

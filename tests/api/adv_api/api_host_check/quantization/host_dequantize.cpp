@@ -11,14 +11,22 @@
 
 __aicore__ void TestDequantize0() {
     AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<int32_t> srcTensor;
+    float scale = 1.0f;
+    float offset = 0.0f;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Dequantize<float>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
+    AscendC::DequantizeParams params;
+    static constexpr AscendC::DequantizeConfig config = {AscendC::DequantizePolicy::PER_TENSOR, false, 1};
+    AscendC::Dequantize<config, float, int32_t, float, float>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
 }
 
 __aicore__ void TestDequantize1() {
     AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
-    AscendC::Dequantize<float>(dstTensor, srcTensor, scale, offset, params);
+    AscendC::LocalTensor<int32_t> srcTensor;
+    float scale = 1.0f;
+    float offset = 0.0f;
+    AscendC::DequantizeParams params;
+    static constexpr AscendC::DequantizeConfig config = {AscendC::DequantizePolicy::PER_TENSOR, false, 1};
+    AscendC::Dequantize<config, float, int32_t, float, float>(dstTensor, srcTensor, scale, offset, params);
 }
 

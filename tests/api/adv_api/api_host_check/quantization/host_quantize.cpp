@@ -10,15 +10,23 @@
 #include "quantization/quantize.h"
 
 __aicore__ void TestQuantize0() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
-    AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Quantize<float>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
+    AscendC::LocalTensor<int8_t> dstTensor;
+    AscendC::LocalTensor<half> srcTensor;
+    half scale = half(1.0f);
+    half offset = half(0.0f);
+    AscendC::QuantizeParams params;
+    static constexpr AscendC::QuantizeConfig config = {AscendC::QuantizePolicy::PER_TENSOR, false, AscendC::RoundMode::CAST_RINT, 1};
+    AscendC::Quantize<config>(dstTensor, srcTensor, scale, offset, params);
 }
 
 __aicore__ void TestQuantize1() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
-    AscendC::Quantize<float>(dstTensor, srcTensor, scale, offset, params);
+    AscendC::LocalTensor<int8_t> dstTensor;
+    AscendC::LocalTensor<half> srcTensor;
+    half scale = half(1.0f);
+    half offset = half(0.0f);
+    AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    AscendC::QuantizeParams params;
+    static constexpr AscendC::QuantizeConfig config = {AscendC::QuantizePolicy::PER_TENSOR, false, AscendC::RoundMode::CAST_RINT, 1};
+    AscendC::Quantize<config>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset, params);
 }
 

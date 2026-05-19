@@ -8,17 +8,26 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "transpose/transdata.h"
+#include "kernel_struct_data_copy.h"
 
 __aicore__ void TestTransData0() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<half> dstTensor;
+    AscendC::LocalTensor<half> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::TransData<float>(dstTensor, srcTensor, sharedTmpBuffer, params);
+    AscendC::Layout srcLayout = AscendC::MakeLayout(AscendC::MakeShape(1, 1, 1, 1, 1), AscendC::MakeStride());
+    AscendC::Layout dstLayout = AscendC::MakeLayout(AscendC::MakeShape(1, 1, 1, 1, 1, 1, 1), AscendC::MakeStride());
+    AscendC::TransDataParams<decltype(srcLayout), decltype(dstLayout)> params = {srcLayout, dstLayout};
+    static constexpr AscendC::TransDataConfig config = {AscendC::DataFormat::NCDHW, AscendC::DataFormat::FRACTAL_Z_3D};
+    AscendC::TransData<config>(dstTensor, srcTensor, sharedTmpBuffer, params);
 }
 
 __aicore__ void TestTransData1() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
-    AscendC::TransData<float>(dstTensor, srcTensor, params);
+    AscendC::LocalTensor<half> dstTensor;
+    AscendC::LocalTensor<half> srcTensor;
+    AscendC::Layout srcLayout = AscendC::MakeLayout(AscendC::MakeShape(1, 1, 1, 1, 1), AscendC::MakeStride());
+    AscendC::Layout dstLayout = AscendC::MakeLayout(AscendC::MakeShape(1, 1, 1, 1, 1, 1, 1), AscendC::MakeStride());
+    AscendC::TransDataParams<decltype(srcLayout), decltype(dstLayout)> params = {srcLayout, dstLayout};
+    static constexpr AscendC::TransDataConfig config = {AscendC::DataFormat::NCDHW, AscendC::DataFormat::FRACTAL_Z_3D};
+    AscendC::TransData<config>(dstTensor, srcTensor, params);
 }
 

@@ -13,90 +13,118 @@ __aicore__ void TestReduceMean0() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceMean<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceMean<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceMean1() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
-    AscendC::ReduceMean<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceMean<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceMax2() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceMax<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceMax<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceMax3() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
-    AscendC::ReduceMax<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceMax<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceMin4() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceMin<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceMin<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceMin5() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
-    AscendC::ReduceMin<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceMin<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceSum6() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceSum<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceSum<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceSum7() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
-    AscendC::ReduceSum<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceSum<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceProd8() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceProd<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceProd<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceProd9() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
-    AscendC::ReduceProd<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceProd<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceAny10() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceAny<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceAny<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceAny11() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
-    AscendC::ReduceAny<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceAny<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceAll12() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::ReduceAll<float>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceAll<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 }
 
 __aicore__ void TestReduceAll13() {
     AscendC::LocalTensor<float> dstTensor;
     AscendC::LocalTensor<float> srcTensor;
-    AscendC::ReduceAll<float>(dstTensor, srcTensor, srcShape, srcInnerPad);
+    uint32_t srcShape[2] = {0, 0};
+    bool srcInnerPad = false;
+    AscendC::ReduceAll<float, AscendC::Pattern::Reduce::AR>(dstTensor, srcTensor, srcShape, srcInnerPad);
 }
 

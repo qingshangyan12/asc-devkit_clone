@@ -10,15 +10,23 @@
 #include "quantization/antiquantize.h"
 
 __aicore__ void TestAntiQuantize0() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<half> dstTensor;
+    AscendC::LocalTensor<int8_t> srcTensor;
+    half scale = half(1.0f);
+    half offset = half(0.0f);
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::AntiQuantize<float>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
+    AscendC::AntiQuantizeParams params;
+    static constexpr AscendC::AntiQuantizeConfig config = {AscendC::AntiQuantizePolicy::PER_TENSOR, true, 1};
+    AscendC::AntiQuantize<config>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
 }
 
 __aicore__ void TestAntiQuantize1() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
-    AscendC::AntiQuantize<float>(dstTensor, srcTensor, scale, offset, params);
+    AscendC::LocalTensor<half> dstTensor;
+    AscendC::LocalTensor<int8_t> srcTensor;
+    half scale = half(1.0f);
+    half offset = half(0.0f);
+    AscendC::AntiQuantizeParams params;
+    static constexpr AscendC::AntiQuantizeConfig config = {AscendC::AntiQuantizePolicy::PER_TENSOR, true, 1};
+    AscendC::AntiQuantize<config>(dstTensor, srcTensor, scale, offset, params);
 }
 

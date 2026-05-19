@@ -10,21 +10,19 @@
 #include "reduce/reduce_xor_sum.h"
 
 __aicore__ void TestReduceXorSum0() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
-    AscendC::LocalTensor<float> src0Tensor;
-    AscendC::LocalTensor<float> src1Tensor;
+    AscendC::LocalTensor<int16_t> dstTensor;
+    AscendC::LocalTensor<int16_t> src0Tensor;
+    AscendC::LocalTensor<int16_t> src1Tensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
     uint32_t calCount = 0;
-    AscendC::ReduceXorSum<float>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
+    AscendC::ReduceXorSum<int16_t>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
 }
 
 __aicore__ void TestReduceXorSum1() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
-    AscendC::LocalTensor<float> src0Tensor;
-    AscendC::LocalTensor<float> src1Tensor;
+    AscendC::LocalTensor<int16_t> dstTensor;
+    AscendC::LocalTensor<int16_t> src0Tensor;
+    AscendC::LocalTensor<int16_t> src1Tensor;
     uint32_t calCount = 0;
-    AscendC::ReduceXorSum<float>(dstTensor, src0Tensor, src1Tensor, calCount);
+    AscendC::ReduceXorSum<int16_t>(dstTensor, src0Tensor, src1Tensor, calCount);
 }
 

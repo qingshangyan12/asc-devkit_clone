@@ -10,15 +10,31 @@
 #include "normalization/deepnorm.h"
 
 __aicore__ void TestDeepNorm0() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> dstLocal;
+    AscendC::LocalTensor<float> meanLocal;
+    AscendC::LocalTensor<float> rstdLocal;
+    AscendC::LocalTensor<float> srcLocal;
+    AscendC::LocalTensor<float> gxLocal;
+    AscendC::LocalTensor<float> betaLocal;
+    AscendC::LocalTensor<float> gammaLocal;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
+    float alpha = 1.0f;
+    float epsilon = 0.0f;
+    DeepNormTiling tiling;
     AscendC::DeepNorm<float>(dstLocal, meanLocal, rstdLocal, srcLocal, gxLocal, betaLocal, gammaLocal, sharedTmpBuffer, alpha, epsilon, tiling);
 }
 
 __aicore__ void TestDeepNorm1() {
-    AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
+    AscendC::LocalTensor<float> dstLocal;
+    AscendC::LocalTensor<float> meanLocal;
+    AscendC::LocalTensor<float> rstdLocal;
+    AscendC::LocalTensor<float> srcLocal;
+    AscendC::LocalTensor<float> gxLocal;
+    AscendC::LocalTensor<float> betaLocal;
+    AscendC::LocalTensor<float> gammaLocal;
+    float alpha = 1.0f;
+    float epsilon = 0.0f;
+    DeepNormTiling tiling;
     AscendC::DeepNorm<float>(dstLocal, meanLocal, rstdLocal, srcLocal, gxLocal, betaLocal, gammaLocal, alpha, epsilon, tiling);
 }
 

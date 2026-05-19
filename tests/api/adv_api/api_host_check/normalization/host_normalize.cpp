@@ -10,11 +10,29 @@
 #include "normalization/normalize.h"
 
 __aicore__ void TestNormalize0() {
+    AscendC::LocalTensor<float> output;
+    AscendC::LocalTensor<float> outputRstd;
+    AscendC::LocalTensor<float> inputMean;
+    AscendC::LocalTensor<float> inputVariance;
+    AscendC::LocalTensor<float> inputX;
+    AscendC::LocalTensor<float> gamma;
+    AscendC::LocalTensor<float> beta;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Normalize<float>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, para);
+    float epsilon = 0.0f;
+    AscendC::NormalizePara para;
+    AscendC::Normalize<float, float>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, para);
 }
 
 __aicore__ void TestNormalize1() {
-    AscendC::Normalize<float>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta, epsilon, para);
+    AscendC::LocalTensor<float> output;
+    AscendC::LocalTensor<float> outputRstd;
+    AscendC::LocalTensor<float> inputMean;
+    AscendC::LocalTensor<float> inputVariance;
+    AscendC::LocalTensor<float> inputX;
+    AscendC::LocalTensor<float> gamma;
+    AscendC::LocalTensor<float> beta;
+    float epsilon = 0.0f;
+    AscendC::NormalizePara para;
+    AscendC::Normalize<float, float>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta, epsilon, para);
 }
 

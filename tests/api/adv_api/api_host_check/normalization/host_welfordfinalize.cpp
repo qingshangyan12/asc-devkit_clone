@@ -10,22 +10,42 @@
 #include "normalization/welfordfinalize.h"
 
 __aicore__ void TestWelfordFinalize0() {
+    AscendC::LocalTensor<float> outputMean;
+    AscendC::LocalTensor<float> outputVariance;
+    AscendC::LocalTensor<float> inputMean;
+    AscendC::LocalTensor<float> inputVariance;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::WelfordFinalize<float>(outputMean, outputVariance, inputMean, inputVariance, sharedTmpBuffer, para);
+    AscendC::WelfordFinalizePara para;
+    AscendC::WelfordFinalize(outputMean, outputVariance, inputMean, inputVariance, sharedTmpBuffer, para);
 }
 
 __aicore__ void TestWelfordFinalize1() {
+    AscendC::LocalTensor<float> outputMean;
+    AscendC::LocalTensor<float> outputVariance;
+    AscendC::LocalTensor<float> inputMean;
+    AscendC::LocalTensor<float> inputVariance;
+    AscendC::LocalTensor<int32_t> counts;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    uint32_t calCount = 0;
-    AscendC::WelfordFinalize<float>(outputMean, outputVariance, inputMean, inputVariance, counts, sharedTmpBuffer, para);
+    AscendC::WelfordFinalizePara para;
+    AscendC::WelfordFinalize(outputMean, outputVariance, inputMean, inputVariance, counts, sharedTmpBuffer, para);
 }
 
 __aicore__ void TestWelfordFinalize2() {
-    AscendC::WelfordFinalize<float>(outputMean, outputVariance, inputMean, inputVariance, para);
+    AscendC::LocalTensor<float> outputMean;
+    AscendC::LocalTensor<float> outputVariance;
+    AscendC::LocalTensor<float> inputMean;
+    AscendC::LocalTensor<float> inputVariance;
+    AscendC::WelfordFinalizePara para;
+    AscendC::WelfordFinalize(outputMean, outputVariance, inputMean, inputVariance, para);
 }
 
 __aicore__ void TestWelfordFinalize3() {
-    uint32_t calCount = 0;
-    AscendC::WelfordFinalize<float>(outputMean, outputVariance, inputMean, inputVariance, counts, para);
+    AscendC::LocalTensor<float> outputMean;
+    AscendC::LocalTensor<float> outputVariance;
+    AscendC::LocalTensor<float> inputMean;
+    AscendC::LocalTensor<float> inputVariance;
+    AscendC::LocalTensor<int32_t> counts;
+    AscendC::WelfordFinalizePara para;
+    AscendC::WelfordFinalize(outputMean, outputVariance, inputMean, inputVariance, counts, para);
 }
 

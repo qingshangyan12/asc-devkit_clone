@@ -11,19 +11,21 @@
 
 __aicore__ void TestSelect0() {
     AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
     AscendC::LocalTensor<float> src0Tensor;
-    AscendC::LocalTensor<float> src1Tensor;
+    float src1Value = 0.0f;
+    AscendC::LocalTensor<uint8_t> maskTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Select<float>(dst, src0, src1Value, mask, sharedTmpBuffer, info);
+    AscendC::SelectWithBytesMaskShapeInfo info;
+    AscendC::Select<float, uint8_t>(dstTensor, src0Tensor, src1Value, maskTensor, sharedTmpBuffer, info);
 }
 
 __aicore__ void TestSelect1() {
     AscendC::LocalTensor<float> dstTensor;
-    AscendC::LocalTensor<float> srcTensor;
-    AscendC::LocalTensor<float> src0Tensor;
+    float src0Value = 0.0f;
     AscendC::LocalTensor<float> src1Tensor;
+    AscendC::LocalTensor<uint8_t> maskTensor;
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer;
-    AscendC::Select<float>(dst, src0Value, src1, mask, sharedTmpBuffer, info);
+    AscendC::SelectWithBytesMaskShapeInfo info;
+    AscendC::Select<float, uint8_t>(dstTensor, src0Value, src1Tensor, maskTensor, sharedTmpBuffer, info);
 }
 

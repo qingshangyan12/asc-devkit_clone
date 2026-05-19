@@ -11,9 +11,9 @@
 
 __aicore__ void TestWhere0() {
     AscendC::LocalTensor<float> dstTensor;
-    float trueValue;
-    float falseValue;
-    AscendC::LocalTensor<uint64_t> condTensor;
+    float trueValue = 1.0f;
+    float falseValue = 0.0f;
+    AscendC::LocalTensor<bool> condTensor;
     uint32_t calCount = 0;
-    AscendC::Where<float, float, uint64_t>(dstTensor, trueValue, falseValue, condTensor, calCount);
+    AscendC::Where<float, float, float, bool>(dstTensor, trueValue, falseValue, condTensor, calCount);
 }
