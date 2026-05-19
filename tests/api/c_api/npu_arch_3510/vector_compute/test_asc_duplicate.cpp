@@ -51,3 +51,15 @@ TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate, vdup, vector_bfloat16_t
 TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate, vdup, vector_uint32_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate, vdup, vector_int32_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate, vdup, vector_float);
+
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_uint8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_int8_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_fp8_e4m3fn_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_fp8_e5m2_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_uint16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_int16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_half);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_bfloat16_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_uint32_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_int32_t);
+TEST_VECTOR_COMPUTE_DUPLICATE_INSTR(Vdup, asc_duplicate_v2, vdup, vector_float);
