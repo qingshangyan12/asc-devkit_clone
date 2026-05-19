@@ -179,6 +179,7 @@ HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void 
     CHK_RET(hrtGetDeviceType(deviceType));
     
     // 检查设备类型是否支持新流程，950或910_95支持新流程，其他设备走老流程
+    // 960暂时无对应类型
     if (deviceType != DevType::DEV_TYPE_950) {
         HCCL_ERROR("[%s] invalid deviceType[%u]", __func__, deviceType);
         return HCCL_E_NOT_SUPPORT;
