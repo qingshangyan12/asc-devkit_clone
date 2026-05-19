@@ -1,0 +1,1 @@
+/usr/local/Ascend/cann-9.0.0-beta.2/bin/bisheng  -Wl,-rpath,/usr/local/Ascend/cann-9.0.0-beta.2/tools/simulator/dav_2201/lib -Wl,-L/usr/local/Ascend/cann-9.0.0-beta.2/tools/simulator/dav_2201/lib -Wl,--disable-new-dtags CMakeFiles/cube_mmad_example.dir/cube_mmad_example.asc.o -o cube_mmad_example  -lruntime_camodel -lnpu_drv_camodel 
