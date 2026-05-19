@@ -12,6 +12,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import sys
+import argparse
 import numpy as np
 
 
@@ -38,19 +39,11 @@ def verify_result(scenario_num, output_file, golden_file):
 
 
 if __name__ == "__main__":
-    scenario_num = 1
-    output_file = "output/output.bin"
-    golden_file = "output/golden.bin"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 7))
+    parser.add_argument("output", type=str, nargs="?", default="output/output.bin")
+    parser.add_argument("golden", type=str, nargs="?", default="output/golden.bin")
+    args = parser.parse_args()
 
-    if len(sys.argv) > 1:
-        args = sys.argv[1:]
-        for arg in args:
-            if "scenarioNum" in arg:
-                scenario_num = int(arg.split("=")[1])
-            elif arg.endswith(".bin"):
-                if "output" in arg:
-                    output_file = arg
-                elif "golden" in arg:
-                    golden_file = arg
-
-    verify_result(scenario_num, output_file, golden_file)
+    if not verify_result(args.scenarioNum, args.output, args.golden):
+        sys.exit(1)
