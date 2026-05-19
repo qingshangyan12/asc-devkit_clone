@@ -84,6 +84,7 @@ Shape用于表达Tensor形状，Stride则用于区分不同的排布：
 - Stride((1, 4), (2, 12))
 
 ![层次化Layout表达](层次化Layout表达.png)
+
 图中展示了两层矩阵：内层矩阵为内部用灰色线包裹的矩阵，外层矩阵为将内层矩阵视为一个元素时黑色线包裹的矩阵。
 Shape的第一个元素描述行方向的形状，(2，3)表示内层矩阵和外层矩阵的行数分别为2和3；Shape的第二个元素描述的是列方向上的形状，(2，4)表示内存矩阵和外层矩阵的列数分别为2和4。
 Stride中的每个元素与Shape中的元素对应，表示该对应维度下，相邻元素首地址在内存地址上的间隔，图片中用箭头表示了每个维度相邻元素的首地址间隔。
@@ -121,21 +122,24 @@ auto tensor = MakeTensor(l0aPointer, MakeFrameLayout<NZLayoutPtn>(128, 64));
 ### Tensor使用方式
 扩展能力Tensor引入Layout抽象成为"自描述数据容器"，实现编译期自动推导操作参数、类型安全校验和零开销切片，开发者只需定义Tensor即可自动推断后续搬运、计算参数，无需手动传递。
 
-**元素访问** - 自动索引计算
+- **1. 对元素进行访问, 自动索引计算**
 ```cpp
-//  1. 对元素进行访问, 自动索引计算
 auto tensor = MakeTensor(pointer, MakeShape(128, 64));
 auto element = tensor[MakeCoord(32, 16)];  // 访问第32行第16列
 auto element = tensor(32, 16);              // 简化写法
+```
 
-// 2. 进行切片操作
+- **2. 进行切片操作**
+```cpp
 auto tensor = MakeTensor(pointer, MakeShape(1024, 512));
 // 切片：从(0,0)位置取128×64块
 auto slice = tensor.Slice(MakeCoord(0, 0), MakeShape(128, 64));
 // 动态切片：分块处理场景
 auto slice = tensor.Slice(MakeCoord(i * 64, j * 32), MakeShape(64, 32));
+```
 
-// 3. 提供简化的搬运和CUBE计算接口，无需复杂的参数计算
+- **3. 提供简化的搬运接口，无需复杂的参数计算**
+```cpp
 auto gmTensor = MakeTensor(gmPtr, MakeShape(128, 64));
 auto ubTensor = MakeTensor(ubPtr, MakeShape(128, 64));
 
@@ -145,8 +149,11 @@ Copy(gmTensor, ubTensor);
 // 3.2 搬运: 通过自定义搬运Op, 进行定制化的搬运处理
 auto copyAtom = MakeCopy<CopyGM2UB>();
 Copy(copyAtom, gmTensor, ubTensor);
+```
 
-// 4 CUBE计算: 
+// 4 CUBE计算: 提供了简化的Mamd接口，方便用户直接进行矩阵乘计算
+```cpp
+Mmad(l0c, l0a, l0b, {m, n, k, false, iterK == 0});
 ```
 
 ## 接口选择建议
