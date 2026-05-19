@@ -414,7 +414,6 @@ template <typename T>
 __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                           const LocalTensor<T>& src1, const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /* **************************************************************************************************
  * ShiftLeft                                             *
  * ************************************************************************************************* */
@@ -444,7 +443,6 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
 template <typename T, typename U>
 __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<U>& src1, const int32_t& count);
-#endif
 
 /* **************************************************************************************************
  * AddRelu                                             *
@@ -667,7 +665,6 @@ template <typename T>
 __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                const LocalTensor<T>& src1, const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /* **************************************************************************************************
  * Prelu                                             *
  * ************************************************************************************************* */
@@ -740,7 +737,6 @@ template <typename T, typename U>
 __aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
     const LocalTensor<U> &src1, const uint32_t count);
 
-#endif
 }  // namespace AscendC
 #pragma end_pipe
 #include "../../impl/basic_api/kernel_operator_vec_binary_intf_impl.h"
