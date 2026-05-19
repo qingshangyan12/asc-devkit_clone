@@ -15,9 +15,15 @@
 
 ```
 ├── custom_op_static_lib
-│   ├── CMakeLists.txt            // 顶层编译工程文件
 │   ├── app                       // 链接静态库并执行算子
+│   │   ├── CMakeLists.txt
+│   │   └── main.cpp
+│   ├── CMakeLists.txt
 │   └── op                        // 编译打包生成自定义算子静态库
+│       ├── add_custom_host.cpp
+│       ├── add_custom_kernel.cpp
+│       ├── add_custom_tiling.h
+│       └── CMakeLists.txt
 ```
 
 ## 代码实现介绍

@@ -17,8 +17,8 @@
 ```
 ├── 06_clock
 │   ├── CMakeLists.txt         # cmake编译文件
-│   ├── gather.asc             # Ascend C样例实现gather调用样例
-|   └── README.md
+│   └── gather.asc             # Ascend C样例实现gather调用样例
+├── |   └── README.md
 ```
 
 ## 样例描述
