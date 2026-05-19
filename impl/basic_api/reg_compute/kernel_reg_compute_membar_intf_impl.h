@@ -39,6 +39,7 @@
 #endif
 #endif
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 2103)
 namespace AscendC { 
 namespace Reg {
 
@@ -50,6 +51,7 @@ __simd_callee__ inline void LocalMemBar()
 
 } // namespace Reg 
 } // namespace AscendC
+#endif
 
 #endif // ASCENDC_KERNEL_REG_COMPUTE_MEMBAR_INTERFACE_IMPL_H
 

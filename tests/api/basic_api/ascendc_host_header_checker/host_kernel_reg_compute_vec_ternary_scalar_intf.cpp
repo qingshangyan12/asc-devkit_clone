@@ -18,8 +18,7 @@
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 2103)
 
 extern "C" void TestKernelRegComputeVecTernaryScalarInterfaces() {
-    // Axpy 接口
-    using AscendC::Axpy;
+    using AscendC::Reg::Axpy;
 }
 
 #endif

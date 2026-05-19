@@ -18,15 +18,9 @@
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 2103)
 
 extern "C" void TestKernelRegComputeVecDuplicateInterfaces() {
-    // Duplicate(dst, src, count): 被 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || 
-    // (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) 包裹，无 #else
-    using AscendC::Duplicate;
-
-    // Interleave: 同样被上述 __NPU_ARCH__ 包裹，无 #else
-    using AscendC::Interleave;
-
-    // DeInterleave: 同样被上述 __NPU_ARCH__ 包裹，无 #else
-    using AscendC::DeInterleave;
+    using AscendC::Reg::Duplicate;
+    using AscendC::Reg::Interleave;
+    using AscendC::Reg::DeInterleave;
 }
 
 #endif

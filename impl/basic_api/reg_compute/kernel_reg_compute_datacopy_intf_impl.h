@@ -36,6 +36,7 @@
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_datacopy_store_impl.h"
 #endif
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 2103)
 namespace AscendC {
 namespace Reg {
 // vld
@@ -484,6 +485,7 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 
 }  // namespace Reg
 }  // namespace AscendC
+#endif
 #endif  // ASCENDC_KERNEL_REG_COMPUTE_DATACOPY_INTERFACE_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_DATACOPY_INTF_IMPL__)

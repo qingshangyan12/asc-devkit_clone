@@ -32,6 +32,7 @@
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_maskreg_impl.h"
 #endif
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 2103)
 namespace AscendC {
 namespace Reg {
 template <typename T, const RegTrait& regTrait>
@@ -166,6 +167,7 @@ __simd_callee__ inline MaskReg MoveMask()
 }
 } // namespace Reg
 } // namespace AscendC
+#endif
 
 #endif // ASCENDC_MODULE_REG_COMPUTE_MASKREG_INTERFACE_IMPL_H
 

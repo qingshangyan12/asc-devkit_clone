@@ -35,6 +35,9 @@
 #include "../../impl/basic_api/reg_compute/dav_l311/kernel_reg_compute_datatype_impl.h"
 #endif
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 2103) || \
+    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || !defined(__NPU_ARCH__)
+
 namespace AscendC {
 namespace Reg {
 
@@ -64,8 +67,12 @@ struct RegTensor {
 
 } // namespace Reg
 } // namespace AscendC
+#endif
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_struct_intf_impl.h"
+#endif // __NPU_ARCH__
+
 #endif // ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_STRUCT_INTF_H__)
