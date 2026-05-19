@@ -19,7 +19,6 @@ import subprocess
 import math
 import threading
 from contextlib import contextmanager
-from asc_op_compile_base.common.context import get_context
 from .super_kernel_utility import get_soc_spec, \
     CommonUtility, AscendCLogLevel, CompileStage
 from .super_kernel_constants import SuperKernelEarlyStartMode, SubOperatorType, \
@@ -789,12 +788,8 @@ f"""else {{
     def gen_early_start_complement_func(self, core_type, condition_code, gen_set_flag: bool, sub_block: bool = True):
         vector_call_func_block = f"if {core_type} {{\n"
         vector_call_func_block += f"    if ({condition_code}) {{\n"
-        context = get_context()
-        is_sub_combine = context is not None and context.get_addition("super_kernel_sub_combine") is True
         if gen_set_flag:
-            if is_sub_combine:
-                vector_call_func_block += f"        AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();\n"
-            elif self.early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartEnableV1.value:
+            if self.early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartEnableV1.value:
                 vector_call_func_block += f"        AscendC::SetNextTaskStart();\n"
             else:
                 if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, \
@@ -806,10 +801,7 @@ f"""else {{
                 else:
                     vector_call_func_block += f"        AscendC::SetNextTaskStart();\n"
         else:
-            if is_sub_combine:
-                vector_call_func_block += f"        AscendC::WaitPreTaskEnd<true>();\n"
-            else:
-                vector_call_func_block += f"        AscendC::WaitPreTaskEndImpl<__placehoder__earlay_config__>();\n"
+            vector_call_func_block += f"        AscendC::WaitPreTaskEndImpl<__placehoder__earlay_config__>();\n"
         vector_call_func_block += "    }\n"
         vector_call_func_block += "}\n\n"
         return vector_call_func_block
