@@ -5,6 +5,7 @@ Key directory structure is as follows:
 ```
 ├── zh                             # Chinese documentation directory
 │   ├── api                        # API documentation directory
+│   ├── contributing               # Code contribution standards directory (code style, API design, directory structure, testing, etc.)
 │   ├── figures                    # Image directory
 │   ├── guide                      # Ascend C operator develop guide
 │   ├── vitepress                      # docs build directory
@@ -31,6 +32,7 @@ To help developers quickly familiarize with this project, corresponding document
 | [C API Contribution Guide](./en/asc_c_api_contributing.md) | Users developing customized APIs based on Ascend C open source repository. | Introduces how to extend or develop Ascend C C API. C API provides pure C style interfaces, conforming to C language operator development habits, opening complete chip programming capabilities. |
 | [Documentation Contribution Guide](./en/asc_doc_contributing.md) | Developers improving existing Ascend C documentation. | Introduces the writing and contribution specifications for each chapter of Ascend C documentation. |
 | [Documentation Design Rules](./en/asc_doc_design_rules.md) | Developers improving existing Ascend C documentation. | Introduces the Ascend C documentation architecture and overall design principles. |
+| [Code Contribution Standards](./zh/contributing/README.md) | Developers contributing code to Ascend C. | Index of contribution standards: code style, API design, directory structure, examples, testing, documentation, Experimental features (Chinese only). |
 
 
 ## Appendix

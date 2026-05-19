@@ -411,3 +411,8 @@ ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
 ```
 
 ---
+
+## Related Standards
+
+- [code-style.md](../zh/contributing/code-style.md) — General coding standards
+- [api-design.md](../zh/contributing/api-design.md) — Interface design conventions

@@ -456,3 +456,8 @@ static_assert(SupportType<T, half, float, int16_t, int32_t>(),
 ```
 
 ---
+
+## Related Standards
+
+- [code-style.md](../zh/contributing/code-style.md) — General coding standards
+- [api-design.md](../zh/contributing/api-design.md) — Interface design conventions

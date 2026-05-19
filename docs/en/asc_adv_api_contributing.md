@@ -441,3 +441,8 @@ After completing high-level API coding, test API functionality by implementing o
 
 ## Merge Code
 When developers complete high-level API coding and testing, please refer to [Contribution Guide](../../CONTRIBUTING_en.md) to merge code into this repository.
+
+## Related Standards
+
+- [code-style.md](../zh/contributing/code-style.md) — General coding standards
+- [api-design.md](../zh/contributing/api-design.md) — Interface design conventions

@@ -441,3 +441,10 @@ TEST_F(TestTiling, TestAxpyTiling)
 
 ## 合入代码
 当开发者完成高阶API的编码和测试后，请参考[贡献指南](../../CONTRIBUTING.md)将代码合入本仓库。
+
+---
+
+## 相关规范
+
+- [code-style.md](./contributing/code-style.md) — 通用编码规范
+- [api-design.md](./contributing/api-design.md) — 接口设计约定
