@@ -24,10 +24,13 @@ KADC 2026（Kunpeng Ascend Developer Conference 2026）是华为鲲鹏与昇腾�
 ### 目录结构
 
 ```
-├── demo/               案例目录
-│   ├── simt/           simt案例
-│   └── xxx/            xxx案例
-├── xxx/
+├── demo/                                               案例目录
+│   ├── gelu_regbase/                                   RegBase矢量编程案例
+│   ├── mx_mmad_practice/                               mxfp4/fp8低精度矩阵乘案例
+│   └── simt/                                           simt案例
+├── experiment/                                         体验提交目录
+│   ├── regbase_experiment/                             RegBase矢量编程进阶体验案例
+│   └── regbase_experiment_username/                    用户自定义提交目录
 └── xxx/
 
 ```
