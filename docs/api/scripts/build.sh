@@ -1,5 +1,6 @@
+#!/bin/bash
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -8,27 +9,16 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+set -euo pipefail
+cd "$(dirname "$0")/.."
 
-cmake_minimum_required(VERSION 3.16)
+echo -e "\033[36m==> 1/3 生成 TOC ...\033[0m"
+python3 scripts/_gen_toc.py
 
-set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
+echo -e "\033[36m==> 2/3 清理缓存 ...\033[0m"
+rm -rf _build
 
-find_package(ASC REQUIRED)
+echo -e "\033[36m==> 3/3 构建 HTML（自动后处理） ...\033[0m"
+sphinx-build -b html -c scripts . _build/html
 
-project(kernel_samples LANGUAGES ASC CXX)
-
-add_executable(demo
-    printf.asc
-)
-
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-    dl
-)
-
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-)
+echo -e "\033[32mDone! 打开 _build/html/index.html 查看。\033[0m"

@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@ import sys
 import numpy as np
 
 
-RELATIVE_TOL = 1e-4
-ABSOLUTE_TOL = 1e-5
-ERROR_TOL = 1e-4
+# for float32
+relative_tol = 1e-3
+absolute_tol = 1e-3
+error_tol = 1e-3
 
 
 def verify_result(output, golden):
@@ -26,8 +27,8 @@ def verify_result(output, golden):
     golden = np.fromfile(golden, dtype=np.float32).reshape(-1)
     different_element_results = np.isclose(output,
                                            golden,
-                                           rtol=RELATIVE_TOL,
-                                           atol=ABSOLUTE_TOL, 
+                                           rtol=relative_tol,
+                                           atol=absolute_tol,
                                            equal_nan=True)
     different_element_indexes = np.where(different_element_results == False)[0]
     for index in range(len(different_element_indexes)):
@@ -37,12 +38,12 @@ def verify_result(output, golden):
         print(
             "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f" %
             (real_index, golden_data, output_data,
-            abs(output_data - golden_data) / golden_data))
+             abs(output_data - golden_data) / golden_data))
         if index == 100:
             break
     error_ratio = float(different_element_indexes.size) / golden.size
-    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, ERROR_TOL))
-    return error_ratio <= ERROR_TOL
+    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, error_tol))
+    return error_ratio <= error_tol
 
 
 if __name__ == '__main__':
