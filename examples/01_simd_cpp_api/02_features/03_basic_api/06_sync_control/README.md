@@ -15,7 +15,7 @@
 
 ### 核间同步
 
-| 目录名称 | 功能描述 |
+| 目录名称 | 功能描述  | 支持的产品 |
 |----------|---------- | --- |
 | [cross_core_set_wait_flag](./cross_core_set_wait_flag) | 基于CrossCoreSetFlag和CrossCoreWaitFlag实现核间同步，支持全核同步、单AI Core内AIV同步、AIC与AIV同步三种模式  | Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [group_barrier](./group_barrier) | 基于GroupBarrier实现两组存在依赖关系的AIV之间的同步，A组AIV计算完成后，B组AIV依赖该结果进行后续计算  | Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
@@ -25,12 +25,12 @@
 
 ### 任务间同步
 
-| 目录名称 | 功能描述 |
+| 目录名称 | 功能描述  | 支持的产品 |
 |----------|---------- | --- |
 | [task_sync](./task_sync) | 基于WaitPreTaskEnd和SetNextTaskStart实现Superkernel子kernel并行，配合使用可最大化子kernel间并行度，提升整体性能  | Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 
 ### RegBase同步
 
-| 目录名称 | 功能描述 |
+| 目录名称 | 功能描述  | 支持的产品 |
 |----------|---------- | --- |
 | [reg_sync](./reg_sync) | 演示Reg编程接口下UB读写操作的同步，包括寄存器保序特性（优化读写之间的同步指令）和LocalMemBar接口保序两种场景  | Ascend 950PR/Ascend 950DT |
