@@ -2,6 +2,12 @@
 
 本文档面向参考`demo/simt/basic_scatter`进行SIMT样例开发与性能调优的任务。开始前请先确认当前环境已经安装CANN开发套件，并能正常编译、运行`basic_scatter`样例。
 
+开始本文档中的开发任务前，需要先按照`demo/simt/SIMT样例运行操作指导.md`完成已有样例的基本验证，确保初始代码、CANN环境、编译工具链和设备访问均正常。至少需要完成：
+
+- `demo/simt/basic_scatter`样例编译运行通过。
+- `demo/simt/matrix_transpose`的`SCENARIO_NUM=0`到`3`四个case均编译运行通过。
+- 运行输出中包含`[Success] Case accuracy is verification passed.`。
+
 ## 任务概览
 
 本次包含三个开发任务：

@@ -6,8 +6,7 @@
 
 - 仓库地址：`https://gitcode.com/cann/asc-devkit.git`
 - 分支：`exp/kadc`
-- 本次验证提交：`a894b8c8c75e71fe0076e8218f4912c7260eed0a`
-- 本地目录：`/home/wly/asc-devkit-exp-kadc-run`
+- 仓代码根路径：`<asc-devkit代码仓根路径>`
 - CANN 环境脚本：`/usr/local/Ascend/cann/set_env.sh`
 
 `demo/simt` 下包含两个样例：
@@ -19,22 +18,24 @@
 
 ## 2. 下载代码
 
-进入工作目录：
+进入工作目录。这里的`<代码存放目录>`表示用户自选的代码存放目录：
 
 ```bash
-cd /home/wly
+export WORK_DIR="<代码存放目录>"
+cd ${WORK_DIR}
 ```
 
 克隆 `exp/kadc` 分支：
 
 ```bash
-git clone --branch exp/kadc --single-branch https://gitcode.com/cann/asc-devkit.git /home/wly/asc-devkit-exp-kadc-run
+git clone --branch exp/kadc --single-branch https://gitcode.com/cann/asc-devkit.git asc-devkit
 ```
 
 确认分支和提交：
 
 ```bash
-cd /home/wly/asc-devkit-exp-kadc-run
+cd asc-devkit
+export ASC_DEVKIT_ROOT="$(pwd)"
 git rev-parse --abbrev-ref HEAD
 git rev-parse HEAD
 ```
@@ -61,9 +62,10 @@ demo/simt/matrix_transpose
 
 ## 3. 配置 CANN 环境
 
-每次打开新终端后，先执行：
+每次打开新终端后，先设置仓代码根路径并配置CANN环境：
 
 ```bash
+export ASC_DEVKIT_ROOT="<asc-devkit代码仓根路径>"
 source /usr/local/Ascend/cann/set_env.sh
 ```
 
@@ -84,7 +86,7 @@ which cmake
 进入样例目录：
 
 ```bash
-cd /home/wly/asc-devkit-exp-kadc-run/demo/simt/basic_scatter
+cd ${ASC_DEVKIT_ROOT}/demo/simt/basic_scatter
 ```
 
 创建并进入构建目录：
@@ -141,7 +143,7 @@ make -j
 进入样例目录：
 
 ```bash
-cd /home/wly/asc-devkit-exp-kadc-run/demo/simt/matrix_transpose
+cd ${ASC_DEVKIT_ROOT}/demo/simt/matrix_transpose
 ```
 
 该样例通过编译参数 `SCENARIO_NUM` 选择不同场景：
@@ -215,7 +217,7 @@ Running case 3: transpose_avoid_bank_conflicts...
 
 ```bash
 source /usr/local/Ascend/cann/set_env.sh
-cd /home/wly/asc-devkit-exp-kadc-run/demo/simt/matrix_transpose
+cd ${ASC_DEVKIT_ROOT}/demo/simt/matrix_transpose
 
 for s in 0 1 2 3; do
   echo "=== build matrix_transpose SCENARIO_NUM=${s} ==="
@@ -233,7 +235,7 @@ done
 建议每个case单独输出到独立目录，避免性能数据互相覆盖：
 
 ```bash
-cd /home/wly/asc-devkit-exp-kadc-run/demo/simt/matrix_transpose
+cd ${ASC_DEVKIT_ROOT}/demo/simt/matrix_transpose
 
 for s in 0 1 2 3; do
   echo "=== profile matrix_transpose case ${s} ==="
@@ -249,7 +251,7 @@ done
 如果采集后没有自动生成可读summary，可执行解析和导出：
 
 ```bash
-cd /home/wly/asc-devkit-exp-kadc-run/demo/simt/matrix_transpose
+cd ${ASC_DEVKIT_ROOT}/demo/simt/matrix_transpose
 
 for s in 0 1 2 3; do
   echo "=== export matrix_transpose case ${s} ==="
@@ -261,7 +263,7 @@ done
 查看导出的CSV文件：
 
 ```bash
-find /home/wly/asc-devkit-exp-kadc-run/demo/simt/matrix_transpose/prof_case_* -name "*.csv" | sort
+find ${ASC_DEVKIT_ROOT}/demo/simt/matrix_transpose/prof_case_* -name "*.csv" | sort
 ```
 
 ### 6.4 端到端耗时采集
@@ -269,7 +271,7 @@ find /home/wly/asc-devkit-exp-kadc-run/demo/simt/matrix_transpose/prof_case_* -n
 `msprof`用于查看Runtime API、Task和AI Core侧性能数据；端到端耗时可以用 `/usr/bin/time` 补充记录：
 
 ```bash
-cd /home/wly/asc-devkit-exp-kadc-run/demo/simt/matrix_transpose
+cd ${ASC_DEVKIT_ROOT}/demo/simt/matrix_transpose
 
 for s in 0 1 2 3; do
   echo "=== e2e matrix_transpose case ${s} ==="
@@ -303,8 +305,9 @@ done
 
 ```bash
 source /usr/local/Ascend/cann/set_env.sh
+cd ${ASC_DEVKIT_ROOT}
 
-cd /home/wly/asc-devkit-exp-kadc-run/demo/simt/basic_scatter
+cd ${ASC_DEVKIT_ROOT}/demo/simt/basic_scatter
 mkdir -p build
 cd build
 cmake ..
@@ -312,7 +315,7 @@ make -j
 ./scatter
 ./scatter 8 32
 
-cd /home/wly/asc-devkit-exp-kadc-run/demo/simt/matrix_transpose
+cd ${ASC_DEVKIT_ROOT}/demo/simt/matrix_transpose
 for s in 0 1 2 3; do
   echo "=== matrix_transpose SCENARIO_NUM=${s} ==="
   mkdir -p build_case_${s}
