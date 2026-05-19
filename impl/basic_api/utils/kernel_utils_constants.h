@@ -722,6 +722,20 @@ constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_MIX = 0b0110;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIC = 0b1000;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIV = 0b1001;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX = 0b1010;
+#elif defined(__ASCENDC_SUPERKERNEL_EARLY_START_V3)
+enum class SkEarlyStartMask : uint8_t {
+    DEFAULT = 0U,
+    // aic task que
+    AIC_TO_AIC_SET = 1U << 0,
+    AIC_TO_AIC_WAIT = 1U << 1,
+    AIC_TO_AIV_SET = 1U << 2,
+    AIV_TO_AIC_WAIT = 1U << 3,
+    // aiv task que
+    AIV_TO_AIV_SET = 1U << 4,
+    AIV_TO_AIV_WAIT = 1U << 5,
+    AIV_TO_AIC_SET = 1U << 6,
+    AIC_TO_AIV_WAIT = 1U << 7,
+};
 #endif
 
 #if defined(__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__)
