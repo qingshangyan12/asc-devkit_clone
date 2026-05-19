@@ -58,6 +58,15 @@ static const std::unordered_set<char> ASCEND_SUPPORT_FORMAT = {'d', 'i', 'f', 'F
 
 static bool g_profEnable;
 
+// 以下枚举值对应 runtime 层原枚举定义，用于替换注释掉的旧接口中的 RT_* 宏
+constexpr uint32_t RT_STREAM_PRIORITY_DEFAULT_VAL = 0U;      // 原枚举: RT_STREAM_PRIORITY_DEFAULT = 0U (stream.h)
+constexpr uint32_t RT_STREAM_FAST_LAUNCH_VAL = 0x200U;       // 原枚举: RT_STREAM_FAST_LAUNCH = 0x200U (stream.h)
+constexpr uint32_t RT_STREAM_FAST_SYNC_VAL = 0x400U;          // 原枚举: RT_STREAM_FAST_SYNC = 0x400U (stream.h)
+constexpr uint32_t RT_EVENT_WITH_FLAG_VAL = 0x01U;            // 原枚举: RT_EVENT_WITH_FLAG = RT_EVENT_DDSYNC_NS = 0x01U (event.h)
+constexpr uint32_t RT_ERROR_NONE_VAL = 0U;                    // 原枚举: RT_ERROR_NONE = 0 (base.h)
+constexpr uint32_t RT_FUNCTION_TYPE_KERNEL_TYPE_VAL = 1U;     // 原枚举: RT_FUNCTION_TYPE_KERNEL_TYPE = 1U (elf_base.h)
+constexpr uint32_t RT_FUNCTION_TYPE_MIX_TASK_RATION_VAL = 3U; // 原枚举: RT_FUNCTION_TYPE_MIX_TASK_RATION = 3U (elf_base.h)
+
 namespace {
 constexpr int16_t SIZE_VAL_TWO = 2;
 constexpr size_t ASCENDC_KERNEL_ID = 69;
@@ -266,7 +275,7 @@ uint32_t RegisterAscendBinary(const char *fileBuf, size_t fileSize, uint32_t typ
         default:
             magic = ACL_RT_BINARY_MAGIC_ELF_AICORE;
     }
-    
+
     aclrtBinaryLoadOption magicLoadOption;
     magicLoadOption.type = ACL_RT_BINARY_LOAD_OPT_MAGIC;
     magicLoadOption.value.magic = magic;
@@ -293,7 +302,7 @@ uint32_t RegisterAscendBinary(const char *fileBuf, size_t fileSize, uint32_t typ
     binary.version = 0;
     binary.data = fileBuf;
     binary.length = fileSize;
-    
+
     return rtRegisterAllKernel(&binary, handle);
 }
 
@@ -335,7 +344,7 @@ uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t num
     const rtStream_t stream)
 {
     aclrtFuncHandle funcHandle;
-    ASCENDC_ASSERT_RTOK_RETVAL(GetFuncHandleByEntry(handle, key, &funcHandle));
+    ASCENDC_ASSERT_RTOK_RETVAL(aclrtBinaryGetFunctionByEntry(handle, key, &funcHandle));
     return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, (void *)args, size, nullptr, 0);
 }
 
@@ -600,11 +609,11 @@ void AscendCDestroyStreamCallBack(rtStream_t stream, const bool isCreate)
             g_ascStreamMap[stream].stream,
             g_ascStreamMap[stream].eventA,
             g_ascStreamMap[stream].eventB);
-        OP_CHECK_NO_RETURN(aclrtDestroyStream(g_ascStreamMap[stream].stream) == RT_ERROR_NONE,
+        OP_CHECK_NO_RETURN(aclrtDestroyStream(g_ascStreamMap[stream].stream) == RT_ERROR_NONE_VAL,
             ASCENDLOGE("Destroy stream %p failed.", g_ascStreamMap[stream].stream));
-        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventA) == RT_ERROR_NONE,
+        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventA) == RT_ERROR_NONE_VAL,
             ASCENDLOGE("Destroy event %p failed.", g_ascStreamMap[stream].eventA));
-        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventB) == RT_ERROR_NONE,
+        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventB) == RT_ERROR_NONE_VAL,
             ASCENDLOGE("Destroy event %p failed.", g_ascStreamMap[stream].eventB));
         g_ascStreamMap.erase(stream);
         ASCENDLOGI("after g_ascStreamMap.size() is %zu.", g_ascStreamMap.size());
@@ -709,12 +718,12 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
         *evtB = g_ascStreamMap[mainStream].eventB;
         ASCENDLOGI("find main stream is %p, subStream %p, eventA %p, eventB %p", mainStream, *subStream, *evtA, *evtB);
     } else {
-        CHECK_COND(aclrtCreateStreamWithConfig(subStream, RT_STREAM_PRIORITY_DEFAULT,
-                                           RT_STREAM_FAST_LAUNCH | RT_STREAM_FAST_SYNC) == RT_ERROR_NONE,
+        CHECK_COND(aclrtCreateStreamWithConfig(subStream, RT_STREAM_PRIORITY_DEFAULT_VAL,
+                                           RT_STREAM_FAST_LAUNCH_VAL | RT_STREAM_FAST_SYNC_VAL) == RT_ERROR_NONE_VAL,
                    ASCENDC_ERR_RUNTIME_ERROR, "create stream %p failed.", subStream);
-        CHECK_COND(aclrtCreateEventExWithFlag(evtA, RT_EVENT_WITH_FLAG) == RT_ERROR_NONE,
+        CHECK_COND(aclrtCreateEventExWithFlag(evtA, RT_EVENT_WITH_FLAG_VAL) == RT_ERROR_NONE_VAL,
                    ASCENDC_ERR_RUNTIME_ERROR, "create event %p failed.", evtA);
-        CHECK_COND(aclrtCreateEventExWithFlag(evtB, RT_EVENT_WITH_FLAG) == RT_ERROR_NONE,
+        CHECK_COND(aclrtCreateEventExWithFlag(evtB, RT_EVENT_WITH_FLAG_VAL) == RT_ERROR_NONE_VAL,
                    ASCENDC_ERR_RUNTIME_ERROR, "create event %p failed.", evtB);
         g_ascStreamMap[mainStream] = {*subStream, *evtA, *evtB};
     }
@@ -751,12 +760,12 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
         *evtB = g_ascStreamMap[mainStream].eventB;
         ASCENDLOGI("find main stream is %p, subStream %p, eventA %p, eventB %p", mainStream, *subStream, *evtA, *evtB);
     } else {
-        CHECK_COND(aclrtCreateStreamWithConfig(subStream, RT_STREAM_PRIORITY_DEFAULT,
-                                           RT_STREAM_FAST_LAUNCH | RT_STREAM_FAST_SYNC) == RT_ERROR_NONE,
+        CHECK_COND(aclrtCreateStreamWithConfig(subStream, RT_STREAM_PRIORITY_DEFAULT_VAL,
+                                           RT_STREAM_FAST_LAUNCH_VAL | RT_STREAM_FAST_SYNC_VAL) == RT_ERROR_NONE_VAL,
                    ASCENDC_ERR_RUNTIME_ERROR, "create stream %p failed.", subStream);
-        CHECK_COND(aclrtCreateEventExWithFlag(evtA, RT_EVENT_WITH_FLAG) == RT_ERROR_NONE,
+        CHECK_COND(aclrtCreateEventExWithFlag(evtA, RT_EVENT_WITH_FLAG_VAL) == RT_ERROR_NONE_VAL,
                    ASCENDC_ERR_RUNTIME_ERROR, "create event %p failed.", evtA);
-        CHECK_COND(aclrtCreateEventExWithFlag(evtB, RT_EVENT_WITH_FLAG) == RT_ERROR_NONE,
+        CHECK_COND(aclrtCreateEventExWithFlag(evtB, RT_EVENT_WITH_FLAG_VAL) == RT_ERROR_NONE_VAL,
                    ASCENDC_ERR_RUNTIME_ERROR, "create event %p failed.", evtB);
         g_ascStreamMap[mainStream] = {*subStream, *evtA, *evtB};
     }
@@ -849,7 +858,7 @@ typedef struct {
 uint32_t AscendCFunctionGetMetaInfoKtype(const rtFuncHandle funcHandle, unsigned int *kernelType)
 {
     uint64_t data;
-    const rtError_t rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_KERNEL_TYPE, &data, sizeof(unsigned int));
+    const rtError_t rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_KERNEL_TYPE_VAL, &data, sizeof(unsigned int));
     if (rtErr != 0) {
         ASCENDLOGE(" get function meta info ktype failed, runtime result = %d\n", rtErr);
         return rtErr;
@@ -863,7 +872,7 @@ uint32_t AscendCFunctionGetMetaInfoCoreRation(const rtFuncHandle funcHandle, uns
     unsigned short *aivRation)
 {
     uint64_t data;
-    const rtError_t rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_MIX_TASK_RATION, &data,
+    const rtError_t rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_MIX_TASK_RATION_VAL, &data,
         sizeof(unsigned int));
     if (rtErr != 0) {
         ASCENDLOGE(" get function meta info core ration failed, runtime result = %d\n", rtErr);
