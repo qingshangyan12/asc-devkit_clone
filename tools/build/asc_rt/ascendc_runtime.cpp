@@ -22,6 +22,7 @@
 #include <string>
 #include <cstring>
 
+#include "rt_external_base.h"
 #include "rt_external_kernel.h"
 #include "acl_rt.h"
 #include "ascendc_tool_log.h"
@@ -64,8 +65,6 @@ constexpr uint32_t RT_STREAM_FAST_LAUNCH_VAL = 0x200U;       // 原枚举: RT_ST
 constexpr uint32_t RT_STREAM_FAST_SYNC_VAL = 0x400U;          // 原枚举: RT_STREAM_FAST_SYNC = 0x400U (stream.h)
 constexpr uint32_t RT_EVENT_WITH_FLAG_VAL = 0x01U;            // 原枚举: RT_EVENT_WITH_FLAG = RT_EVENT_DDSYNC_NS = 0x01U (event.h)
 constexpr uint32_t RT_ERROR_NONE_VAL = 0U;                    // 原枚举: RT_ERROR_NONE = 0 (base.h)
-constexpr uint32_t RT_FUNCTION_TYPE_KERNEL_TYPE_VAL = 1U;     // 原枚举: RT_FUNCTION_TYPE_KERNEL_TYPE = 1U (elf_base.h)
-constexpr uint32_t RT_FUNCTION_TYPE_MIX_TASK_RATION_VAL = 3U; // 原枚举: RT_FUNCTION_TYPE_MIX_TASK_RATION = 3U (elf_base.h)
 
 namespace {
 constexpr int16_t SIZE_VAL_TWO = 2;
@@ -739,6 +738,12 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
 }
 */
 
+void StreamStateCallback(aclrtStream stream, aclrtStreamState state, void *args)
+{
+    const char *sampleName = args == nullptr ? "stream_failure_mode" : static_cast<const char *>(args);
+    INFO_LOG("Stream state callback from %s: stream=%p state=%d", sampleName, stream, static_cast<int32_t>(state));
+}
+
 static uint32_t AscendCExecutorGetStreamAndEvent(
     const rtStream_t stream, rtStream_t *subStream, rtEvent_t *evtA, rtEvent_t *evtB,
     std::shared_ptr<std::mutex> &streamLckPtr)
@@ -774,7 +779,7 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
     if (g_ascendCRegistedCallBack) {
         return ASCENDC_SUCCESS;
     }
-    ASCENDC_ASSERT_RTOK_RETVAL(aclrtRegStreamStateCallback("AscendCDestroySteam", AscendCDestroyStreamCallBack, nullptr));
+    ASCENDC_ASSERT_RTOK_RETVAL(aclrtRegStreamStateCallback("AscendCDestroySteam", StreamStateCallback, nullptr));
 
     g_ascendCRegistedCallBack = true;
     return ASCENDC_SUCCESS;
@@ -858,7 +863,7 @@ typedef struct {
 uint32_t AscendCFunctionGetMetaInfoKtype(const rtFuncHandle funcHandle, unsigned int *kernelType)
 {
     uint64_t data;
-    const rtError_t rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_KERNEL_TYPE_VAL, &data, sizeof(unsigned int));
+    const rtError_t rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_KERNEL_TYPE, &data, sizeof(unsigned int));
     if (rtErr != 0) {
         ASCENDLOGE(" get function meta info ktype failed, runtime result = %d\n", rtErr);
         return rtErr;
@@ -872,7 +877,7 @@ uint32_t AscendCFunctionGetMetaInfoCoreRation(const rtFuncHandle funcHandle, uns
     unsigned short *aivRation)
 {
     uint64_t data;
-    const rtError_t rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_MIX_TASK_RATION_VAL, &data,
+    const rtError_t rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_MIX_TASK_RATION, &data,
         sizeof(unsigned int));
     if (rtErr != 0) {
         ASCENDLOGE(" get function meta info core ration failed, runtime result = %d\n", rtErr);
