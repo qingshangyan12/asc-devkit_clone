@@ -18,6 +18,8 @@
 
 MX 矩阵计算是 Tensor API 中通过 `MmadTrait::mmadType` 选择的矩阵计算模式，用于低精度 MX 数据类型的矩阵乘加。该模式仍以 L0A 为左矩阵、L0B 为右矩阵、L0C 为结果矩阵，调用入口与普通 `Mmad` 一致。
 
+MX 计算通常需要先准备低精度矩阵数据和 ScaleA/ScaleB 数据。当这些数据位于 Global Memory 时，可先通过 GM 到 L1 的 `Copy` 搬入 L1 Buffer，再通过 L1 到 L0A/L0B 的 `Copy` 搬入矩阵计算输入位置。GM 到 L1 的 Scale 数据搬入支持 A 矩阵相关 scale 和 B 矩阵相关 scale，详细 Layout 组合可参考 [GM到L1数据搬运](../data_movement/gm_to_l1_data_movement.md)。
+
 ## 函数原型
 
 - 自动使用默认矩阵计算原子对象。
@@ -63,7 +65,8 @@ MX 矩阵计算是 Tensor API 中通过 `MmadTrait::mmadType` 选择的矩阵计
 - 目的张量必须位于 L0C，左矩阵必须位于 L0A，右矩阵必须位于 L0B。
 - 支持的数据类型组合包括 `float = fp4x2_e2m1_t * fp4x2_e2m1_t`、`float = fp4x2_e2m1_t * fp4x2_e1m2_t`、`float = fp4x2_e1m2_t * fp4x2_e2m1_t`、`float = fp4x2_e1m2_t * fp4x2_e1m2_t`、`float = fp8_e4m3fn_t * fp8_e4m3fn_t`、`float = fp8_e4m3fn_t * fp8_e5m2_t`、`float = fp8_e5m2_t * fp8_e4m3fn_t`、`float = fp8_e5m2_t * fp8_e5m2_t`。
 - 带 bias 场景中，bias 位于 BiasTable Buffer 或 L0C 时，bias 数据类型需要为 `float`。
-- MX 计算通常需要配合 ScaleA 或 ScaleB 数据搬运流程准备 scale 数据，ScaleA 搬运可参考 [L1到L0A数据搬运](../data_movement/l1_to_l0a_data_movement.md)，ScaleB 搬运可参考 [L1到L0B数据搬运](../data_movement/l1_to_l0b_data_movement.md)。
+- MX 计算通常需要配合 ScaleA 或 ScaleB 数据搬运流程准备 scale 数据。Scale 数据位于 GM 时，先通过 GM 到 L1 的 `Copy` 搬入 L1；后续 ScaleA 搬运可参考 [L1到L0A数据搬运](../data_movement/l1_to_l0a_data_movement.md)，ScaleB 搬运可参考 [L1到L0B数据搬运](../data_movement/l1_to_l0b_data_movement.md)。
+- GM 到 L1 的 ScaleA 数据搬入支持 `ScaleANDLayoutPtn/ScaleADNLayoutPtn/ZZLayoutPtn` 到 `ZZLayoutPtn`；ScaleB 数据搬入支持 `ScaleBNDLayoutPtn/ScaleBDNLayoutPtn/NNLayoutPtn` 到 `NNLayoutPtn`。
 - `m`、`n`、`k` 的取值和张量布局需要满足底层 MX 矩阵计算指令约束。
 
 ## 调用示例
@@ -71,12 +74,37 @@ MX 矩阵计算是 Tensor API 中通过 `MmadTrait::mmadType` 选择的矩阵计
 ```cpp
 using namespace AscendC::Te;
 
-auto l0A = MakeTensor(MakeMemPtr<Location::L0A>(aAddr),
+auto gmA = MakeTensor(MakeMemPtr<Location::GM>(gmAAddr),
+    MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<fp8_e4m3fn_t>>(m, k));
+auto gmB = MakeTensor(MakeMemPtr<Location::GM>(gmBAddr),
+    MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<fp8_e5m2_t>>(k, n));
+auto gmScaleA = MakeTensor(MakeMemPtr<Location::GM>(gmScaleAAddr),
+    MakeFrameLayout<ScaleANDLayoutPtn, LayoutTraitDefault<fp8_e8m0_t>>(m, k));
+auto gmScaleB = MakeTensor(MakeMemPtr<Location::GM>(gmScaleBAddr),
+    MakeFrameLayout<ScaleBNDLayoutPtn, LayoutTraitDefault<fp8_e8m0_t>>(k, n));
+
+auto l1A = MakeTensor(MakeMemPtr<Location::L1>(l1AAddr),
     MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<fp8_e4m3fn_t>>(m, k));
-auto l0B = MakeTensor(MakeMemPtr<Location::L0B>(bAddr),
+auto l1B = MakeTensor(MakeMemPtr<Location::L1>(l1BAddr),
     MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<fp8_e5m2_t>>(k, n));
-auto l0C = MakeTensor(MakeMemPtr<Location::L0C>(cAddr),
+auto l1ScaleA = MakeTensor(MakeMemPtr<Location::L1>(l1ScaleAAddr),
+    MakeFrameLayout<ZZLayoutPtn, LayoutTraitDefault<fp8_e8m0_t>>(m, k));
+auto l1ScaleB = MakeTensor(MakeMemPtr<Location::L1>(l1ScaleBAddr),
+    MakeFrameLayout<NNLayoutPtn, LayoutTraitDefault<fp8_e8m0_t>>(k, n));
+
+auto l0A = MakeTensor(MakeMemPtr<Location::L0A>(l0aAddr),
+    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<fp8_e4m3fn_t>>(m, k));
+auto l0B = MakeTensor(MakeMemPtr<Location::L0B>(l0bAddr),
+    MakeFrameLayout<ZNLayoutPtn, LayoutTraitDefault<fp8_e5m2_t>>(k, n));
+auto l0C = MakeTensor(MakeMemPtr<Location::L0C>(l0cAddr),
     MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, 16>>(m, n));
+
+Copy(l1A, gmA);
+Copy(l1B, gmB);
+Copy(l1ScaleA, gmScaleA);
+Copy(l1ScaleB, gmScaleB);
+Copy(l0A, l1A);
+Copy(l0B, l1B);
 
 MmadParams params(m, n, k, 0, true);
 MmadTrait trait(0, false, false, true, MmadType::MX);
