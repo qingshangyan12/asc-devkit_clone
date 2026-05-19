@@ -42,15 +42,14 @@ UB 18 位地址编码遵循如下规则：
 | case | 计算公式 | 场景描述 | bank 冲突情况 | src0 首地址 | src1 首地址 | dst 首地址 | 打点性能 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | dst = src0 * src1 | src0/src1/dst 首地址分布在不同 bank group 的不同 bank | 无读读、读写冲突 | 0 | 0x10100 | 0x20000 | 2418 | 基线性能参照 |
-| 2 | dst = src0 * src1 | src0/src1 首地址在同一个 bank | 有读读冲突 | 0 | 0x4000 | 0x10000 | 4195 | 验证同 bank 读读冲突 |
-| 3 | dst = src0 * src1 | src0/src1 首地址在同一个 bank group | 有读读冲突 | 0 | 0x10000 | 0x14100 | 4195 | 验证同 bank group 读读冲突 |
+| 2 | dst = src0 * src1 | src0/src1 首地址在同一个 bank | **有读读冲突** | 0 | 0x4000 | 0x10000 | 4195 | 验证同 bank 读读冲突 |
+| 3 | dst = src0 * src1 | src0/src1 首地址在同一个 bank group | **有读读冲突** | 0 | 0x10000 | 0x14100 | 4195 | 验证同 bank group 读读冲突 |
 | 4 | dst = src0 * src1 | src0/dst 首地址在同一个 bank | 无读写冲突（硬件优化） | 0 | 0x10100 | 0x4000 | 2501 | 作为 case 5 的基线参照 |
-| 5 | dst = src0 * src1 | src0/dst 首地址不在同一个 bank | 有读写冲突 | 0 | 0x10100 | 0x4020 | 3612 | 对比 case 4，验证读写冲突 |
+| 5 | dst = src0 * src1 | src0/dst 首地址不在同一个 bank | **有读写冲突** | 0 | 0x10100 | 0x4020 | 3612 | 对比 case 4，验证读写冲突 |
 | 6 | dst = src0 * src1 | src1/dst 首地址在同一个 bank | 无读写冲突（硬件优化） | 0 | 0x10100 | 0x10100 | 2501 | 作为 case 7 的基线参照 |
-| 7 | dst = src0 * src1 | src1/dst 首地址不在同一个 bank | 有读写冲突 | 0 | 0x10100 | 0x10120 | 3612 | 对比 case 6，验证读写冲突 |
-| 8 | dst = src0 * src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=1），<br>src1/dst 首地址重叠 | 有读读冲突 | 0 | 0x10100 | 0x10100 | 3778 | 对比 case 9/case 6，验证 src0RepStride 影响 |
+| 7 | dst = src0 * src1 | src1/dst 首地址不在同一个 bank | **有读写冲突** | 0 | 0x10100 | 0x10120 | 3612 | 对比 case 6，验证读写冲突 |
+| 8 | dst = src0 * src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=1），<br>src1/dst 首地址重叠 | **有读读冲突** | 0 | 0x10100 | 0x10100 | 3778 | 对比 case 9/case 6，验证 src0RepStride 影响 |
 | 9 | dst = src0 * src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=8），<br>src1/dst 首地址重叠 | 无读读、读写冲突 | 0 | 0x10100 | 0x10100 | 2501 | 对比 case 8，验证 src0RepStride=8 消除冲突 |
-| 72 | src0 = src0 * src0 | src0/src1/dst 首地址完全重叠 | 无读读、读写冲突 | 0 | 0 | 0 | 2501 | 验证完全地址重叠场景 |
 
 各 case 的详细分析见下文对应章节。
 
@@ -360,30 +359,6 @@ UB 18 位地址编码遵循如下规则：
 - dst 写入延后 1 个 repeat，不与 src1 产生读写冲突。
 
 > **对比 case 8**：case 8 的 `src0RepStride=1` 导致 src0 按步长 1 递增遍历 bank group（bg 0, 1, 2, 3, ...），与 src1 的 bank group 范围频繁重叠；case 9 的 `src0RepStride=8` 使 src0 在 bg 0 和 8 之间交替，恰好与 src1 错开。可以有效消除读读冲突。
-
-## Case 72：src0/src1/dst 地址完全重叠——无冲突
-
-> **特殊配置**：Mul 指令三个操作数均使用同一 tensor（`Mul(xLocal, xLocal, xLocal, ...)`），即 `src0 = src0 * src0`。
-
-### 地址解码
-
-| 操作数 | 首地址 | 18 位二进制（BANK DEPTH BG WIDTH） | bank_id | bank_group_id | 全局 bank 编号 |
-| --- | --- | --- | --- | --- | --- |
-| src0 | `0x0` | `00 0000000 0000 00000` | 0 | 0 | 0 |
-| src1 | `0x0` | `00 0000000 0000 00000` | 0 | 0 | 0 |
-| dst | `0x0` | `00 0000000 0000 00000` | 0 | 0 | 0 |
-
-### UB 读写示意
-
-![case72](./figures/old-case6.jpg)
-
-- 每 8 个绿色数据块（32B）代表 src0、src1 每次 repeat 读取的数据（256B）以及 dst 每次 repeat 写入的数据（256B），三者地址完全重叠；
-- 处理完所有数据所需迭代次数：`repeat_times = 4096 × 4 ÷ 256 = 64`。
-
-### 分析结论
-
-- 第1次repeat：src0（bank_id=0, bg 0-7）与 src1（bank_id=0, bg 0-7）：两者地址完全重叠，硬件自动优化为单次读取（合并两读为一读），后续 repeat 依次类推，**无读读冲突**。
-- 第1次repeat：src0/src1 读取（bank_id=0, bg 0-7）与 dst 写入（bank_id=0, bg 0-7）：三者地址完全重叠，硬件自动将 dst 写入延后 1 个 repeat，使读写操作错开，后续 repeat 依次类推，**无读写冲突**。
 
 ## 总结
 
