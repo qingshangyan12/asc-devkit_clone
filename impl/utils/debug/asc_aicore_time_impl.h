@@ -69,6 +69,16 @@ __aicore__ inline void asc_prof_stop()
 #endif
 }
 
+__aicore__ inline uint64_t clock_impl(void)
+{
+    return static_cast<uint64_t>(get_sys_cnt());
+}
+
+__aicore__ inline uint64_t clock(void)
+{
+    return clock_impl();
+}
+
 #if __NPU_ARCH__ == 3510
 template<pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
