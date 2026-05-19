@@ -23,11 +23,11 @@
 extern "C" void TestKernelRegComputeVecDuplicateInterfaces() {
     // Duplicate(dst, src, count): 被 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || 
     // (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) 包裹，无 #else
-    using AscendC::Duplicate;
+    using AscendC::Reg::Duplicate;
 
     // Interleave: 同样被上述 __NPU_ARCH__ 包裹，无 #else
-    using AscendC::Interleave;
+    using AscendC::Reg::Interleave;
 
     // DeInterleave: 同样被上述 __NPU_ARCH__ 包裹，无 #else
-    using AscendC::DeInterleave;
+    using AscendC::Reg::DeInterleave;
 }

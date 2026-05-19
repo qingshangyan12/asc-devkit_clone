@@ -22,14 +22,14 @@
 
 extern "C" void TestKernelRegComputeVecFusedInterfaces() {
     // MulsCast 接口
-    using AscendC::MulsCast;
+    using AscendC::Reg::MulsCast;
 
     // AbsSub 接口
-    using AscendC::AbsSub;
+    using AscendC::Reg::AbsSub;
 
     // ExpSub 接口
-    using AscendC::ExpSub;
+    using AscendC::Reg::ExpSub;
 
     // MulDstAdd 接口
-    using AscendC::MulDstAdd;
+    using AscendC::Reg::MulDstAdd;
 }

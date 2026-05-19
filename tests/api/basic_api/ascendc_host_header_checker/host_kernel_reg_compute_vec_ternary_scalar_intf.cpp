@@ -22,5 +22,5 @@
 
 extern "C" void TestKernelRegComputeVecTernaryScalarInterfaces() {
     // Axpy 接口
-    using AscendC::Axpy;
+    using AscendC::Reg::Axpy;
 }
