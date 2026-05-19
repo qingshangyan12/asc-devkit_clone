@@ -740,8 +740,9 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
 
 void StreamStateCallback(aclrtStream stream, aclrtStreamState state, void *args)
 {
-    const char *sampleName = args == nullptr ? "stream_failure_mode" : static_cast<const char *>(args);
-    INFO_LOG("Stream state callback from %s: stream=%p state=%d", sampleName, stream, static_cast<int32_t>(state));
+    (void)stream;
+    (void)state;
+    (void)args;
 }
 
 static uint32_t AscendCExecutorGetStreamAndEvent(
