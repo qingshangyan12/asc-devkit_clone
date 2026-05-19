@@ -158,8 +158,6 @@ aclError aclrtGetHardwareSyncAddr(void **addr)
     return 0;
 }
 
-typedef void (*aclrtStreamStateCallback)(aclrtStream stream, uint32_t state, void *arg);
-
 aclError aclrtRegStreamStateCallback(const char *streamName, aclrtStreamStateCallback callback, void *arg)
 {
     return 0;
