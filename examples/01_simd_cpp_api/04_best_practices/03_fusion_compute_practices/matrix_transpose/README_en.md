@@ -67,7 +67,7 @@ int tile_col = threadIdx.x % TILE_DIM;
 
 The figure below shows a more intuitive mapping schematic. The left side shows a 1024×1024 matrix divided into 32×32 tiles. The right side shows one tile that one block needs to process, with size 32×32.
 
-<img src="./figure/blockMapping.png" width="60%">
+<img src="./figures/blockMapping.png" width="60%">
 
 Taking the green element in the figure as an example, you can directly use the built-in variables in the kernel to derive its input coordinates in GM.
 
@@ -130,7 +130,7 @@ Except for Task Duration, all other metrics in this example show the average of 
 
 The figure below shows the data flow of Case 0, with red highlighting elements processed by one Warp when reading GM and writing GM. For threads in the same Warp, they read a row of elements in the tile from GM input and write back to a column of the tile in GM output. When reading GM input, element addresses accessed by adjacent threads are continuous, which is continuous read. When writing back to output, adjacent threads are scattered to different rows of the output matrix, which is non-continuous write. Therefore, the core issue of this version is that the write-back address after transposition is no longer continuous, which usually significantly affects overall throughput.
 
-<img src="./figure/case0.png" width="60%">
+<img src="./figures/case0.png" width="60%">
 
 **Key Code**:
 
@@ -167,7 +167,7 @@ output[index_out] = input[index_in];
 
 The figure below shows the data flow of Case 1, with red and yellow highlighted elements showing elements processed by one Warp's threads when reading GM and writing GM. When reading GM input, the entire tile is moved to UB according to GM layout. When writing GM output, one Warp's threads read one column of elements from UB and write back to their corresponding transposed positions.
 
-<img src="./figure/case1.png" width="60%">
+<img src="./figures/case1.png" width="60%">
 
 Unlike Case 0, in Case 0 threads "directly write input elements to transposed GM positions", so adjacent threads are scattered to different rows of the output matrix. In Case 1, threads first put data into UB, transferring the original non-continuous global write access to non-continuous read within UB. Therefore, the core benefit of this version is: although it adds one UB read/write and one synchronization, it gains a "read continuous, write also continuous" access pattern on the GM side, and overall latency is usually significantly lower than Case 0.
 
