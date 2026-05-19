@@ -32,7 +32,6 @@
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_binary_scalar_impl.h"
 #endif
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 2103)
 namespace AscendC {
 namespace Reg {
 template <typename T, typename U, MaskMergeMode mode, typename S>
@@ -78,7 +77,6 @@ __simd_callee__ inline void LeakyRelu(S& dstReg, S& srcReg, U scalarValue, MaskR
 }
 } // namespace Reg
 } // namespace AscendC
-#endif
 
 #endif // ASCENDC_KERNEL_REG_COMPUTE_VEC_BINARY_SCALAR_INTERFACE_IMPL_H
 

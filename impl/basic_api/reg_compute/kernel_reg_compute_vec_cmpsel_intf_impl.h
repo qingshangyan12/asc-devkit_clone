@@ -32,7 +32,6 @@
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_cmpsel_impl.h"
 #endif
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 2103)
 namespace AscendC {
 namespace Reg {
 template <typename T, CMPMODE mode, typename U>
@@ -59,7 +58,6 @@ __simd_callee__ inline void Select(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 }
 } // namespace Reg
 } // namespace AscendC
-#endif
 
 #endif // ASCENDC_KERNEL_REG_COMPUTE_VEC_CMPSEL_INTERFACE_IMPL_H
 
