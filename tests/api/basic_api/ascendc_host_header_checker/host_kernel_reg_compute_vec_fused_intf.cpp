@@ -15,7 +15,10 @@
 #endif
 #include "host_checker.h"
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 2103)
+/**
+ * host 侧编译校验
+ * 测试被 #if defined(__NPU_ARCH__) 包裹且无 #else 的接口
+ */
 
 extern "C" void TestKernelRegComputeVecFusedInterfaces() {
     // MulsCast 接口
@@ -30,5 +33,3 @@ extern "C" void TestKernelRegComputeVecFusedInterfaces() {
     // MulDstAdd 接口
     using AscendC::MulDstAdd;
 }
-
-#endif
