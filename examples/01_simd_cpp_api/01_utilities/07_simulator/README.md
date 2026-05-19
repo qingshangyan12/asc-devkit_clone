@@ -14,16 +14,16 @@
 
 ```
 ├── 07_simulator
-│   ├── CMakeLists.txt          # 编译工程文件
-│   ├── data_utils.h            # 数据读入写出函数
-│   ├── matmul_leakyrelu.asc    # Ascend C算子实现与调用样例
-│   └── scripts
-│       ├── gen_data.py         # 输入数据和真值数据生成脚本
-│       └── verify_result.py    # 真值比对脚本
+│   ├── CMakeLists.txt          // 编译工程文件
+│   ├── data_utils.h            // 数据读入写出函数
+│   ├── matmul_leakyrelu.asc    // Ascend C算子实现与调用样例
+│   └── scripts                 // 数据生成与结果校验脚本目录
+│       ├── gen_data.py         // 输入数据和真值数据生成脚本
+│       └── verify_result.py    // 真值比对脚本
 ```
 
 ## 算子描述
-  MatmulLeakyRelu算子通过将矩阵乘加（Matmul）与LeakyRelu激活函数计算实现，具体功能描述可参考[MatmulLeakyRelu算子详情](../../00_introduction/03_fusion_operation/matmul_leakyrelu/README.md)章节。
+  MatmulLeakyRelu算子通过将矩阵乘加（Matmul）与LeakyRelu激活函数计算实现，具体功能描述可参考[MatmulLeakyRelu算子详情](../../00_introduction/03_fusion_operation/matmul_leakyrelu_basic_api/README.md)章节。
 
 
 ## 编译运行

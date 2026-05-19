@@ -125,7 +125,7 @@ if(PRODUCT_SIDE STREQUAL "host")
     )
 
     install(TARGETS mc2_compat
-        LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
+        DESTINATION "${CMAKE_SYSTEM_PROCESSOR}-linux/lib64" COMPONENT asc-devkit
     )
 
     target_sources(mc2_compat PRIVATE
@@ -166,8 +166,4 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
     target_link_directories(mc2_kernel_compat PRIVATE
  	    ${ASCEND_CANN_PACKAGE_PATH}/devlib/device
  	)
-
-    install(TARGETS mc2_kernel_compat
-        LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR} OPTIONAL
-    )
 endif()

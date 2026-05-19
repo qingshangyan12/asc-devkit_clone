@@ -43,6 +43,7 @@ if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
   include(ExternalProject)
   ExternalProject_Add(device_tiling
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake/device
+    BINARY_DIR ${CMAKE_BINARY_DIR}/device_build
     CONFIGURE_COMMAND ${CMAKE_COMMAND}
     -G ${CMAKE_GENERATOR}
     -DCANN_3RD_LIB_PATH=${CANN_3RD_LIB_PATH}
@@ -54,6 +55,9 @@ if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
     -DCMAKE_C_COMPILER=${ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-gcc
     -DCMAKE_CXX_COMPILER=${ASCEND_CANN_PACKAGE_PATH}/toolkit/toolchain/hcc/bin/aarch64-target-linux-gnu-g++
     -DPRODUCT_SIDE=device
+    -DCUSTOM_SIGN_SCRIPT=${CUSTOM_SIGN_SCRIPT}
+    -DENABLE_SIGN=${ENABLE_SIGN}
+    -DVERSION_INFO=${VERSION_INFO}
     <SOURCE_DIR>
     BUILD_ALWAYS 1)
 endif()
@@ -110,21 +114,8 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
   install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/utils_headers.cmake COMPONENT asc-devkit)
 endif()  
 
-if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
+if (BUILD_OPEN_PROJECT)
     add_subdirectory(detail/hccl/cc)
-
-    set(HCCL_CC_BUILD_DIR ${CMAKE_BINARY_DIR}/impl/adv_api/detail/hccl/cc)
-    install(FILES "${HCCL_CC_BUILD_DIR}/src/libmc2_client.so" "${HCCL_CC_BUILD_DIR}/src/common/hcomm_dlsym/libmc2_compat.so"
-        DESTINATION "hccl/lib64" COMPONENT asc-devkit OPTIONAL)
-    install(FILES "${HCCL_CC_BUILD_DIR}/src/libmc2_server.json"
-        DESTINATION "hccl/built-in/data/op/aicpu" COMPONENT asc-devkit OPTIONAL)
-
-    install_mc2_runtime_staging_link("hccl/include/hccl/hccl.h" "${CMAKE_SYSTEM_PROCESSOR}-linux/include/hccl/hccl.h" TRUE)
-    install_mc2_runtime_staging_link("hccl/include/hccl/hccl_mc2.h" "${CMAKE_SYSTEM_PROCESSOR}-linux/include/hccl/hccl_mc2.h" TRUE)
-    install_mc2_runtime_staging_link("hccl/lib64/libmc2_client.so" "${CMAKE_SYSTEM_PROCESSOR}-linux/lib64/libmc2_client.so" TRUE)
-    install_mc2_runtime_staging_link("hccl/lib64/libmc2_compat.so" "${CMAKE_SYSTEM_PROCESSOR}-linux/lib64/libmc2_compat.so" TRUE)
-    install_mc2_runtime_staging_link("hccl/built-in/data/op/aicpu/libmc2_server.json" "opp/built-in/op_impl/aicpu/config/libmc2_server.json" TRUE)
-    install_mc2_runtime_staging_link("hccl/Ascend/aicpu/mc2_server.tar.gz" "opp/built-in/op_impl/aicpu/kernel/mc2_server.tar.gz" FALSE)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)
