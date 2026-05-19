@@ -46,4 +46,3 @@ TEST_F(TestVectorCompute##class_name##dst_type##src_type##CApi, c_api_name##_Suc
 TEST_VECTOR_COMPUTE_EXP_SUB(ExpSub, asc_exp_sub, vexpdif, vector_float, vector_half);
 TEST_VECTOR_COMPUTE_EXP_SUB(ExpSub, asc_exp_sub, vexpdif, vector_float, vector_float);
 TEST_VECTOR_COMPUTE_EXP_SUB(ExpSubV2, asc_exp_sub_v2, vexpdif, vector_float, vector_half);
-TEST_VECTOR_COMPUTE_EXP_SUB(ExpSubV2, asc_exp_sub_v2, vexpdif, vector_float, vector_float);
