@@ -37,7 +37,7 @@ __aicore__ inline int64_t GetBitCount(uint64_t valueIn)
 
 **表 2**  参数说明
 
-| 参数名 | 输入/输出 | 描述 |
+| 参数名称 | 输入/输出 | 描述 |
 | ------ | ----- | ----- |
 | valueIn | 输入 | 被统计的二进制数字。 |
 
