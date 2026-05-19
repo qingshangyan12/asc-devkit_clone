@@ -16,6 +16,7 @@
 ├── matmul_gelu_high_performance
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── figure                  // 图示目录
 │   ├── mmad_gelu.asc           // Ascend C样例实现
 │   └── scripts
 │       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
