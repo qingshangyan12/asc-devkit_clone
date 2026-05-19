@@ -727,6 +727,7 @@ constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX = 0b1010;
 // early-start mask For super kernel early start V3
 // |  24bits  |   4bits  |   4bits  |
 // | reserved | aivqueue | aicqueue |
+namespace Internal {
 // aic task que
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIC_SET = 1U << 0;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIC_WAIT = 1U << 1;
@@ -737,6 +738,7 @@ constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIV_SET = 1U << 
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIV_WAIT = 1U << 5;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIC_SET = 1U << 6;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_WAIT = 1U << 7;
+} // namespace Internal
 
 #if defined(__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__)
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_superKernelAutoSyncAllConfigGmBaseAddr;

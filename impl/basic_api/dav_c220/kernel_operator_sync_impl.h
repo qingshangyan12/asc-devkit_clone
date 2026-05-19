@@ -128,12 +128,12 @@ template<pipe_t AIV_PIPE, pipe_t AIC_PIPE>
 __aicore__ inline void SetNextTaskStartV3Impl(uint32_t earlyStartConfig)
 {
     if ASCEND_IS_AIC {
-        if (earlyStartConfig & ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIC_SET) {
+        if (earlyStartConfig & Internal::ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIC_SET) {
             ffts_cross_core_sync(AIC_PIPE, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG)); // SET:C--->C
         }
     }
     if ASCEND_IS_AIV {
-        if (earlyStartConfig & ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIV_SET) {
+        if (earlyStartConfig & Internal::ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIV_SET) {
             ffts_cross_core_sync(AIV_PIPE, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL)); // SET: V--->V
         }
     }
@@ -237,24 +237,24 @@ __aicore__ inline void WaitPreTaskEndV2Impl()
 __aicore__ inline void WaitPreTaskEndV3Impl(uint32_t earlyStartConfig)
 {
     if ASCEND_IS_AIC {
-        if (earlyStartConfig & ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIC_WAIT) {
+        if (earlyStartConfig & Internal::ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIC_WAIT) {
             wait_flag_dev(AscendC::SYNC_AIC_FLAG); // WAIT: C--->C
         }
-        if (earlyStartConfig & ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_SET) {
+        if (earlyStartConfig & Internal::ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_SET) {
             ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG)); // SET: C--->V
         }
-        if (earlyStartConfig & ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIC_WAIT) {
+        if (earlyStartConfig & Internal::ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIC_WAIT) {
             wait_flag_dev(AscendC::SYNC_AIV_FLAG); // WAIT: V--->C
         }
     }
     if ASCEND_IS_AIV {
-        if (earlyStartConfig & ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIV_WAIT) {
+        if (earlyStartConfig & Internal::ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIV_WAIT) {
             wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL); // WAIT: V--->V
         }
-        if (earlyStartConfig & ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIC_SET) {
+        if (earlyStartConfig & Internal::ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIC_SET) {
             ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG)); // SET: V--->C
         }
-        if (earlyStartConfig & ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_WAIT) {
+        if (earlyStartConfig & Internal::ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_WAIT) {
             wait_flag_dev(AscendC::SYNC_AIC_AIV_FLAG); // WAIT: C--->V
         }
     }
