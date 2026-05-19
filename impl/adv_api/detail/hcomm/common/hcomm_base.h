@@ -26,19 +26,21 @@
 #include "hcomm_inner_def.h"
 
 namespace AscendC {
-template <CommEngine commEngine, CommProtocol commProtocol>
+template <CommProtocol commProtocol, CommEngine commEngine>
 class HcommImpl {
 public:
-    __aicore__ inline HcommImpl(){};
-    __aicore__ inline ~HcommImpl(){};
+    __aicore__ inline HcommImpl(){}
+    __aicore__ inline ~HcommImpl(){}
+    __aicore__ inline int32_t Init(__ubuf__ uint8_t *buff, uint32_t len){return -1;}
+
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    __aicore__ inline HcommHandle Write(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
     {
         return -1;
     }
 
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    __aicore__ inline HcommHandle Read(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
     {
         return -1;
     }
