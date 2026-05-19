@@ -35,9 +35,18 @@ namespace AscendC {
  * comm task.
  * @tparam commProtocol: The communication protocol to use, ROCE supported as default.
  */
-template <CommEngine commEngine = CommEngine::AIV, CommProtocol commProtocol = CommProtocol::ROCE>
+template <CommProtocol commProtocol = CommProtocol::ROCE, CommEngine commEngine = CommEngine::AIV>
 class Hcomm {
 public:
+    /*!
+     * @class Hcomm
+     * @brief The task Init interface of the point-to-point communication operator
+     * @param [in] buff: The UB buffer address that user pre-allocated on UB buffer.
+     * @param [in] dst: The UB buffer size that user pre-allocated on UB buffer.
+     * @return 0 indicates success and -1 indicates failure.
+     * @note Must be called before other hcomm interface.
+     */
+    __aicore__ inline int32_t Init(__ubuf__ uint8_t *buff, uint32_t len);
     /*!
      * @class Hcomm
      * @brief The task launching interface of the Write point-to-point communication operator, returns the identifier
@@ -45,15 +54,15 @@ public:
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
      * @tparam commitPipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
-     * @param [in] channelHandle: The handle of the communication channel.
+     * @param [in] channel: The GM address of the communication channel.
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
      * @param [in] len: The length of the data to write, using byte as the basic unit.
      * @return The identifier(handleId) of Write task. HandleId >= 0 when successful, otherwise return -1.
-     * @note Must be called after channel initialization.
+     * @note Must be called after Init called successfully.
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline HcommHandle WriteNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     /*!
      * @class Hcomm
@@ -62,15 +71,15 @@ public:
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
      * @tparam commitPipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
-     * @param [in] channelHandle: The handle of the communication channel.
+     * @param [in] channel: The GM address of the communication channel.
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
      * @param [in] len: The length of the data to read, using byte as the basic unit.
      * @return The identifier(handleId) of Read task. HandleId >= 0 when successful, otherwise return -1.
-     * @note Must be called after channel initialization.
+     * @note Must be called after Init called successfully.
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline HcommHandle ReadNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     /*!
      * @class Hcomm
@@ -94,7 +103,7 @@ public:
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Wait(HcommHandle handleId);
 private:
-    HcommImpl<commEngine, commProtocol> impl_;
+    HcommImpl<commProtocol, commEngine> impl_;
 };
 } // namespace AscendC
 
