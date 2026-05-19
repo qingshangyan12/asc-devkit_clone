@@ -411,3 +411,8 @@ ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
 ```
 
 ---
+
+## 相关规范
+
+- [code-style.md](./contributing/code-style.md) — 通用编码规范
+- [api-design.md](./contributing/api-design.md) — 接口设计约定
