@@ -8,8 +8,5 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef VERIFY_SINGLE_HEADER
-#include "kernel_operator.h"
-#else
 #include "kernel_basic_intf.h"
-#endif
+
