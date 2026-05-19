@@ -41,7 +41,7 @@ void RunCopyCallPaths(const DstTensor& dst, const SrcTensor& src)
 {
     using namespace AscendC::Te;
 
-    auto atom = MakeCopy(CopyOp{}, Trait{});
+    auto atom = MakeCopy<CopyOp, Trait>();
     atom.Call(dst, src);
 
     CopyAtom<CopyTraits<CopyOp, Trait>>{}.Call(dst, src);
@@ -56,7 +56,6 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
     auto atom = CopyAtom<CopyTraits<CopyOp, Trait>>{}.with();
     atom.Call(dst, src);
     Copy(atom, dst, src);
-    Copy(dst, src);
 }
 
 } // namespace
