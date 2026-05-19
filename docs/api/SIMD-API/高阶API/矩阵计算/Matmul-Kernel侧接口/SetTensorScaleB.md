@@ -88,14 +88,14 @@ __aicore__ inline void SetTensorScaleB(const LocalTensor<ScaleT>& rightMatrix, b
 </td>
 <td class="cellrowborder" valign="top" width="12.02%" headers="mcps1.2.4.1.2 "><p id="p1030218179501"><a name="p1030218179501"></a><a name="p1030218179501"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p7473102142610"><a name="p7473102142610"></a><a name="p7473102142610"></a>量化系数scaleB矩阵。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>支持的数据类型为：fp8_e8m0_t。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p7473102142610"><a name="p7473102142610"></a><a name="p7473102142610"></a>量化系数scaleB矩阵。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</span></span></span>支持的数据类型为：fp8_e8m0_t。</p>
 </td>
 </tr>
 <tr id="row36481043185619"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.4.1.1 "><p id="p530231765010"><a name="p530231765010"></a><a name="p530231765010"></a>rightMatrix</p>
 </td>
 <td class="cellrowborder" valign="top" width="12.02%" headers="mcps1.2.4.1.2 "><p id="p43021717155017"><a name="p43021717155017"></a><a name="p43021717155017"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p1833918962614"><a name="p1833918962614"></a><a name="p1833918962614"></a>量化系数scaleB矩阵。<span id="ph173308471594"><a name="ph173308471594"></a><a name="ph173308471594"></a><span id="ph9902231466"><a name="ph9902231466"></a><a name="ph9902231466"></a><span id="ph1782115034816"><a name="ph1782115034816"></a><a name="ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为TSCM/VECOUT。</span></span></span>支持的数据类型为：fp8_e8m0_t。</p>
+<td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p1833918962614"><a name="p1833918962614"></a><a name="p1833918962614"></a>量化系数scaleB矩阵。<span id="ph173308471594"><a name="ph173308471594"></a><a name="ph173308471594"></a><span id="ph9902231466"><a name="ph9902231466"></a><a name="ph9902231466"></a><span id="ph1782115034816"><a name="ph1782115034816"></a><a name="ph1782115034816"></a>类型为<a href="../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为TSCM/VECOUT。</span></span></span>支持的数据类型为：fp8_e8m0_t。</p>
 </td>
 </tr>
 <tr id="row282328183019"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.4.1.1 "><p id="p1382478123015"><a name="p1382478123015"></a><a name="p1382478123015"></a>isTransposeScaleB</p>
@@ -136,4 +136,3 @@ if (tiling.isBias) {
 mm.IterateAll(gm_c);
 mm.End();
 ```
-

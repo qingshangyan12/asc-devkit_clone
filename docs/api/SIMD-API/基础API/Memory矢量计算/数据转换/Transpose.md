@@ -134,7 +134,7 @@
 <td class="cellrowborder" valign="top" width="10.65106510651065%" headers="mcps1.2.4.1.2 "><p id="p736835513915"><a name="p736835513915"></a><a name="p736835513915"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="72.42724272427242%" headers="mcps1.2.4.1.3 "><p id="p12944655134717"><a name="p12944655134717"></a><a name="p12944655134717"></a>目的操作数。</p>
-<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p632555516496"><a name="p632555516496"></a><a name="p632555516496"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -143,7 +143,7 @@
 <td class="cellrowborder" valign="top" width="10.65106510651065%" headers="mcps1.2.4.1.2 "><p id="p15369205520396"><a name="p15369205520396"></a><a name="p15369205520396"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="72.42724272427242%" headers="mcps1.2.4.1.3 "><p id="p1491311164811"><a name="p1491311164811"></a><a name="p1491311164811"></a>源操作数。</p>
-<p id="p1750601284810"><a name="p1750601284810"></a><a name="p1750601284810"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_1"><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_1"><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_1"><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p1750601284810"><a name="p1750601284810"></a><a name="p1750601284810"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_1"><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_1"><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_1"><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p98282011175715"><a name="p98282011175715"></a><a name="p98282011175715"></a><span id="ph1082813111575"><a name="ph1082813111575"></a><a name="ph1082813111575"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 <p id="p19196125422"><a name="p19196125422"></a><a name="p19196125422"></a>数据类型需要与dst保持一致。</p>
 </td>
@@ -384,4 +384,3 @@ auto tmpBufferSize = (cSize  * 2 + 1)  * h0 * w0 * sizeof(type);</pre>
     transposeParams.transposeType = transposeType; 
     AscendC::Transpose(dstLocal, srcLocal, stackBuffer, transposeParams);
     ```
-
