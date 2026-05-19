@@ -50,76 +50,179 @@ static constexpr UrmaWqeEntry URMA_DEFAULT_CFG = {
 constexpr int8_t HCOMM_INVALID_HANDLE_ID = -1;
 constexpr uint32_t HCOMM_MAX_HANDLE_ID = 1024;
 
+typedef uint64_t ChannelPtr;
+
+typedef enum {
+    PROTECTION_TYPE_INVALID = -1,
+    PROTECTION_TYPE_ROCE = 0,
+    PROTECTION_TYPE_UB = 1,
+} ProtectionType;
+
+typedef enum {
+    SQ_CONTEXT_TYPE_INVALID = -1,
+    SQ_CONTEXT_TYPE_UB_JFS = 0,
+    SQ_CONTEXT_TYPE_ROCE = 1,
+} SqContextType;
+
+typedef enum {
+    CQ_CONTEXT_TYPE_INVALID = -1,
+    CQ_CONTEXT_TYPE_UB_JFC = 0,
+    CQ_CONTEXT_TYPE_ROCE = 1,
+} CqContextType;
+
+typedef enum {
+    REGED_NOTIFY_INVALID = -1,
+    REGED_NOTIFY_IPC_RT = 0,
+    REGED_NOTIFY_IPC_MEM = 1,
+    REGED_NOTIFY_RMA_RT = 2,
+    REGED_NOTIFY_RMA_MEM = 3,
+} RegedNotifyType;
+
+typedef enum {
+    REGED_BUFFER_INVALID = -1,
+    REGED_BUFFER_IPC = 0,
+    REGED_BUFFER_RMA = 1,
+} RegedBufferType;
+
 typedef struct {
-    uint32_t type; // 0 RDMA   1 URMA
-    uint64_t addr;
-    uint64_t length;
+    uint32_t version;
+    uint32_t magicWord;
+    uint32_t size;
+    uint32_t reserved;
+} CommAbiHeader;
+
+typedef union {
+    struct {
+        uint32_t lkey;
+        uint32_t rkey;
+    } roce;
+    struct {
+        uint32_t tokenId;
+        uint32_t tokenValue;
+    } ub;
+    uint8_t raws[24];
+    struct {
+        uint32_t lkey;
+        uint32_t rkey;
+    } rdmaMemProtectionInfo;
+    struct {
+        uint32_t tokenID;
+        uint32_t tokenValue;
+    } urmaMemProtectionInfo;
+} HcommProtectionInfoData;
+
+typedef struct {
+    ProtectionType type;
     union {
-        struct {
-            uint32_t lkey;
-            uint32_t rkey;
-        } rdmaMemProtectionInfo;
-        struct {
-            uint32_t tokenID;
-            uint32_t tokenValue;
-        } urmaMemProtectionInfo;
-        int8_t reserve[32];
-    } pti;
+        HcommProtectionInfoData memInfo;
+        HcommProtectionInfoData pti;
+    };
 } ProtectionInfo;
 
-typedef struct {
-    uint32_t type;
-    union {
-        struct {
-            uint32_t jfsID;
-            uint64_t sqVa;
-            uint32_t wqeSize;
-            uint32_t sqDepth;
-            uint32_t tpID;
-            uint64_t headAddr;
-            uint64_t tailAddr;
-            uint8_t remoteEID[16];
-            uint64_t dbVa;
-        } jfsContext; // 48+16=64Bytes
-        struct {
-            uint32_t qpn;
-            uint64_t sqVa;     // sq的基地址，wqe后续往这个地址放
-            uint32_t wqeSize;  // 单个wqe的size
-            uint32_t depth;    // sq队列长度
-            uint64_t headAddr; // sq_PI
-            uint64_t tailAddr; // sq_CI
-            uint8_t sl;
-            uint64_t dbVa; // 敲doorbell的地址
-            int8_t dbMode; // 0-hw/1-sw
-        } rdmaSqContext;   // 46 Bytes
-        int8_t reserve[128];
-    } ctx;
-} SqContext;
+typedef union {
+    struct {
+        uint64_t sqVa;
+        uint64_t headAddr;
+        uint64_t tailAddr;
+        uint64_t dbVa;
+        uint32_t jfsID;
+        uint32_t wqeSize;
+        uint32_t sqDepth;
+        uint32_t tpID;
+        uint8_t remoteEID[16];
+    } ubJfs;
+    struct {
+        uint64_t sqVa;
+        uint64_t headAddr;
+        uint64_t tailAddr;
+        uint64_t dbVa;
+        uint32_t qpn;
+        uint32_t wqeSize;
+        uint32_t depth;
+        int8_t dbMode;
+        uint8_t sl;
+    } roceSq;
+    uint8_t raws[120];
+    struct {
+        uint32_t jfsID;
+        uint64_t sqVa;
+        uint32_t wqeSize;
+        uint32_t sqDepth;
+        uint32_t tpID;
+        uint64_t headAddr;
+        uint64_t tailAddr;
+        uint8_t remoteEID[16];
+        uint64_t dbVa;
+    } jfsContext;
+    struct {
+        uint32_t qpn;
+        uint64_t sqVa;
+        uint32_t wqeSize;
+        uint32_t depth;
+        uint64_t headAddr;
+        uint64_t tailAddr;
+        uint8_t sl;
+        uint64_t dbVa;
+        int8_t dbMode;
+    } rdmaSqContext;
+} HcommSqContextInfo;
 
 typedef struct {
-    uint32_t type;
+    SqContextType type;
     union {
-        struct {
-            uint32_t jfcID;
-            uint64_t scqVa;
-            uint32_t cqeSize;
-            uint32_t cqDepth;
-            uint64_t headAddr;
-            uint64_t tailAddr;
-            uint64_t dbVa;
-        } jfcContext;
-        struct {
-            uint32_t cqn;
-            uint64_t cqVa;
-            uint32_t cqeSize;
-            uint32_t cqDepth;
-            uint64_t headAddr;
-            uint64_t tailAddr; // cq_CI
-            uint64_t dbVa;
-            int8_t dbMode; // 0-hw/1-sw
-        } rdmaCqContext;
-        int8_t reserve[128];
-    } ctx;
+        HcommSqContextInfo contextInfo;
+        HcommSqContextInfo ctx;
+    };
+} SqContext;
+
+typedef union {
+    struct {
+        uint64_t scqVa;
+        uint64_t headAddr;
+        uint64_t tailAddr;
+        uint64_t dbVa;
+        uint32_t jfcID;
+        uint32_t cqeSize;
+        uint32_t cqDepth;
+    } ubJfc;
+    struct {
+        uint64_t cqVa;
+        uint64_t headAddr;
+        uint64_t tailAddr;
+        uint64_t dbVa;
+        uint32_t cqn;
+        uint32_t cqeSize;
+        uint32_t cqDepth;
+        int8_t dbMode;
+    } roceCq;
+    uint8_t raws[120];
+    struct {
+        uint32_t jfcID;
+        uint64_t scqVa;
+        uint32_t cqeSize;
+        uint32_t cqDepth;
+        uint64_t headAddr;
+        uint64_t tailAddr;
+        uint64_t dbVa;
+    } jfcContext;
+    struct {
+        uint32_t cqn;
+        uint64_t cqVa;
+        uint32_t cqeSize;
+        uint32_t cqDepth;
+        uint64_t headAddr;
+        uint64_t tailAddr;
+        uint64_t dbVa;
+        int8_t dbMode;
+    } rdmaCqContext;
+} HcommCqContextInfo;
+
+typedef struct {
+    CqContextType type;
+    union {
+        HcommCqContextInfo contextInfo;
+        HcommCqContextInfo ctx;
+    };
 } CqContext;
 
 typedef struct {
@@ -139,6 +242,68 @@ typedef struct {
         int8_t reserve[64];
     };
 } Notify;
+
+typedef struct {
+    RegedBufferType type;
+    union {
+        struct {
+            uint64_t addr;
+            uint64_t size;
+        } ipc;
+        struct {
+            uint64_t addr;
+            uint64_t size;
+            ProtectionInfo protectionInfo;
+        } rma;
+        uint8_t raws[56];
+    } bufferInfo;
+} RegedBufferEntity;
+
+typedef struct {
+    RegedNotifyType type;
+    union {
+        struct {
+            uint64_t addr;
+            uint32_t size;
+            int32_t notifyId;
+        } ipcRt;
+        struct {
+            uint64_t addr;
+            uint32_t size;
+        } ipcMem;
+        struct {
+            uint64_t addr;
+            uint32_t size;
+            int32_t notifyId;
+            ProtectionInfo protectionInfo;
+        } rmaRt;
+        struct {
+            uint64_t addr;
+            uint32_t size;
+            ProtectionInfo protectionInfo;
+        } rmaMem;
+        uint8_t raws[56];
+    } notifyInfo;
+} RegedNotifyEntity;
+
+typedef struct {
+    CommAbiHeader abiHeader;
+    int32_t engine;
+    int32_t protocol;
+    uint32_t localNotifyNum;
+    uint32_t remoteNotifyNum;
+    uint32_t localBufferNum;
+    uint32_t remoteBufferNum;
+    uint32_t sqNum;
+    uint32_t cqNum;
+    RegedNotifyEntity* localNotifyAddr;
+    RegedNotifyEntity* remoteNotifyAddr;
+    RegedBufferEntity* localBufferAddr;
+    RegedBufferEntity* remoteBufferAddr;
+    SqContext* sqContextAddr;
+    CqContext* cqContextAddr;
+    uint8_t reserve[160];
+} ChannelEntity;
 
 // AIV直驱RoCE，无需考虑notify
 // write with notify的语义，地址是GM地址

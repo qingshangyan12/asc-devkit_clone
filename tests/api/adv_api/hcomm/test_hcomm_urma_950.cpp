@@ -27,7 +27,7 @@ public:
         : sqBuffer_(URMA_SQ_DEPTH * HCOMM_URMA_MAX_SQE_BB_NUM * URMA_WQE_SIZE, 0),
           cqBuffer_(URMA_SQ_DEPTH * HCOMM_URMA_MAX_SQE_BB_NUM * URMA_CQE_SIZE, 0)
     {
-        channel_.engine = COMM_ENGINE_AIV;
+        channel_.engine = 4;
         channel_.sqNum = 1;
         channel_.cqNum = 1;
         channel_.remoteBufferNum = 1;
@@ -37,7 +37,7 @@ public:
         channel_.remoteBufferAddr = &remoteBuffer_;
         channel_.localBufferAddr = &localBuffer_;
 
-        sqCtx_.type = SQ_CONTEXT_TYPE_UB_JFS;
+        sqCtx_.type = AscendC::SQ_CONTEXT_TYPE_UB_JFS;
         sqCtx_.contextInfo.ubJfs.sqVa = reinterpret_cast<uint64_t>(sqBuffer_.data());
         sqCtx_.contextInfo.ubJfs.headAddr = reinterpret_cast<uint64_t>(&sqHead_);
         sqCtx_.contextInfo.ubJfs.tailAddr = reinterpret_cast<uint64_t>(&sqTail_);
@@ -47,7 +47,7 @@ public:
         sqCtx_.contextInfo.ubJfs.sqDepth = URMA_SQ_DEPTH;
         sqCtx_.contextInfo.ubJfs.tpID = 1;
 
-        cqCtx_.type = CQ_CONTEXT_TYPE_UB_JFC;
+        cqCtx_.type = AscendC::CQ_CONTEXT_TYPE_UB_JFC;
         cqCtx_.contextInfo.ubJfc.scqVa = reinterpret_cast<uint64_t>(cqBuffer_.data());
         cqCtx_.contextInfo.ubJfc.headAddr = reinterpret_cast<uint64_t>(&cqHead_);
         cqCtx_.contextInfo.ubJfc.tailAddr = reinterpret_cast<uint64_t>(&cqTail_);
@@ -56,17 +56,17 @@ public:
         cqCtx_.contextInfo.ubJfc.cqeSize = URMA_CQE_SIZE;
         cqCtx_.contextInfo.ubJfc.cqDepth = URMA_SQ_DEPTH * HCOMM_URMA_MAX_SQE_BB_NUM;
 
-        remoteBuffer_.type = REGED_BUFFER_RMA;
+        remoteBuffer_.type = AscendC::REGED_BUFFER_RMA;
         remoteBuffer_.bufferInfo.rma.addr = 0x1000;
         remoteBuffer_.bufferInfo.rma.size = 0x1000;
-        remoteBuffer_.bufferInfo.rma.protectionInfo.type = PROTECTION_TYPE_UB;
+        remoteBuffer_.bufferInfo.rma.protectionInfo.type = AscendC::PROTECTION_TYPE_UB;
         remoteBuffer_.bufferInfo.rma.protectionInfo.memInfo.ub.tokenId = 0x123456;
         remoteBuffer_.bufferInfo.rma.protectionInfo.memInfo.ub.tokenValue = 0x654321;
 
-        localBuffer_.type = REGED_BUFFER_RMA;
+        localBuffer_.type = AscendC::REGED_BUFFER_RMA;
         localBuffer_.bufferInfo.rma.addr = 0x2000;
         localBuffer_.bufferInfo.rma.size = 0x1000;
-        localBuffer_.bufferInfo.rma.protectionInfo.type = PROTECTION_TYPE_UB;
+        localBuffer_.bufferInfo.rma.protectionInfo.type = AscendC::PROTECTION_TYPE_UB;
         localBuffer_.bufferInfo.rma.protectionInfo.memInfo.ub.tokenId = 0x111111;
         localBuffer_.bufferInfo.rma.protectionInfo.memInfo.ub.tokenValue = 0x222222;
     }
@@ -83,11 +83,11 @@ public:
     }
 
 private:
-    ChannelEntity channel_ = {};
-    SqContext sqCtx_ = {};
-    CqContext cqCtx_ = {};
-    RegedBufferEntity remoteBuffer_ = {};
-    RegedBufferEntity localBuffer_ = {};
+    AscendC::ChannelEntity channel_ = {};
+    AscendC::SqContext sqCtx_ = {};
+    AscendC::CqContext cqCtx_ = {};
+    AscendC::RegedBufferEntity remoteBuffer_ = {};
+    AscendC::RegedBufferEntity localBuffer_ = {};
     std::vector<uint8_t> sqBuffer_;
     std::vector<uint8_t> cqBuffer_;
     uint32_t sqHead_ = 0;

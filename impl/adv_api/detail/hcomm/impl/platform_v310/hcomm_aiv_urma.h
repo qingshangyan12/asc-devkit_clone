@@ -25,9 +25,6 @@
 
 #include "hcomm_aiv_urma_def.h"
 
-#include "hcomm/hcomm_res_defs.h"
-#include "hcomm/hcomm_res_entity_defs.h"
-
 #include "../../common/hcomm_inner_def.h"
 #include "../../common/hcomm_utils.h"
 
