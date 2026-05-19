@@ -1087,6 +1087,14 @@ Idx Name                              Size     VMA              Type
                     "kernel_name": "op1", 'stream_id': 15, 'task_type': 'dynamic'}, 100, op_options, compile_log_path)
                 res = tmp.gen_early_start_complement_func("ASCEND_IS_AIV", "block_idx < blockDim", True)
                 self.assertIn("AscendC::SetNextTaskStart();", res)
+                mock_context = mock.Mock()
+                mock_context.get_addition.return_value = True
+                with mock.patch('asc_op_compile_base.asc_op_compiler.super_kernel_sub_op_infos.get_context', \
+                    return_value=mock_context):
+                    set_res = tmp.gen_early_start_complement_func("ASCEND_IS_AIV", "block_idx < blockDim", True)
+                    wait_res = tmp.gen_early_start_complement_func("ASCEND_IS_AIV", "block_idx < blockDim", False)
+                    self.assertIn("AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();", set_res)
+                    self.assertIn("AscendC::WaitPreTaskEnd<true>();", wait_res)
 
     def test_get_task_type(self):
         op_options = {'split-mode': 4, 'stream-fusion': SuperKernelStreamFusionMode.StreamFusionEnable}
