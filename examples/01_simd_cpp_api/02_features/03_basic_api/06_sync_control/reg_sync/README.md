@@ -24,13 +24,13 @@
 ## 目录结构介绍
 
 ```
-├── reg_sync
-│   ├── scripts
-│   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
-│   ├── CMakeLists.txt                 // 编译工程文件
-│   ├── data_utils.h                   // 数据读入写出函数
-│   ├── reg_sync.asc                   // AscendC算子实现 & 调用样例
-│   └── README.md                      // 样例介绍
+└── reg_sync
+    ├── CMakeLists.txt                 // 编译工程文件
+    ├── data_utils.h                   // 数据读入写出函数
+    ├── README.md                      // 样例介绍
+    ├── reg_sync.asc                   // AscendC算子实现 & 调用样例
+    └── scripts
+        └── gen_data.py                // 输入数据和真值数据生成脚本
 ```
 
 ## 样例描述

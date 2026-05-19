@@ -13,10 +13,10 @@
 ## 目录结构介绍
 
 ```
-├── tensorflow_custom
-│   ├── CMakeLists.txt
-│   ├── custom_assign_add_custom.cc
-│   └── run_add_custom_tf.py
+└── tensorflow_custom
+    ├── CMakeLists.txt
+    ├── custom_assign_add_custom.cc
+    └── run_add_custom_tf.py
 ```
 
 ## 代码实现介绍

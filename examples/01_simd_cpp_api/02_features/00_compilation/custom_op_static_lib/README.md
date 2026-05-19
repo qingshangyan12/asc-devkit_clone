@@ -14,16 +14,16 @@
 ## 目录结构介绍
 
 ```
-├── custom_op_static_lib
-│   ├── app                       // 链接静态库并执行算子
-│   │   ├── CMakeLists.txt
-│   │   └── main.cpp
-│   ├── op                        // 编译打包生成自定义算子静态库
-│   │   ├── add_custom_host.cpp
-│   │   ├── add_custom_kernel.cpp
-│   │   ├── add_custom_tiling.h
-│   │   └── CMakeLists.txt
-│   └── CMakeLists.txt
+└── custom_op_static_lib
+    ├── app                       // 链接静态库并执行算子
+    │   ├── CMakeLists.txt
+    │   └── main.cpp
+    ├── CMakeLists.txt
+    └── op                        // 编译打包生成自定义算子静态库
+        ├── add_custom_host.cpp
+        ├── add_custom_kernel.cpp
+        ├── add_custom_tiling.h
+        └── CMakeLists.txt
 ```
 
 ## 代码实现介绍

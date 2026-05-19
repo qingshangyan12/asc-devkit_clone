@@ -14,10 +14,10 @@
 ## 目录结构介绍
 
 ```
-├── leaky_relu_onnx_invocation
-│   ├── CMakeLists.txt
-│   ├── leaky_relu.py
-│   └── main.cpp
+└── leaky_relu_onnx_invocation
+    ├── CMakeLists.txt
+    ├── leaky_relu.py
+    └── main.cpp
 ```
 
 ## 样例实现

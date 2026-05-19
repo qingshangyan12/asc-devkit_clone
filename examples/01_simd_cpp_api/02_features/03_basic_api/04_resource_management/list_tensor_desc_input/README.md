@@ -13,9 +13,9 @@
 ## 目录结构介绍
 
 ```
-├── list_tensor_desc_input
-│   ├── CMakeLists.txt              // 编译工程文件
-│   └── list_tensor_desc_input.asc  // Ascend C样例实现 & 调用样例
+└── list_tensor_desc_input
+    ├── CMakeLists.txt              // 编译工程文件
+    └── list_tensor_desc_input.asc  // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述

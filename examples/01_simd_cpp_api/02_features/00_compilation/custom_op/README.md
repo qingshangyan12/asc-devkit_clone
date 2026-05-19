@@ -28,7 +28,6 @@
 │       ├── CMakeLists.txt
 │       └── tensorflow_add_custom_plugin.cc
 ├── op_host
-│   ├── CMakeLists.txt
 │   ├── add_custom
 │   │   └── add_custom_host.cpp
 │   ├── add_custom_template
@@ -37,10 +36,10 @@
 │   │   ├── add_custom_tiling_sink.cpp
 │   │   ├── add_custom_tiling_sink_tiling.cpp
 │   │   └── add_custom_tiling_sink_tiling.h
+│   ├── CMakeLists.txt
 │   └── leaky_relu_custom
 │       └── leaky_relu_custom_host.cpp
 └── op_kernel
-    ├── CMakeLists.txt
     ├── add_custom
     │   ├── add_custom_kernel.cpp
     │   └── add_custom_tiling.h
@@ -51,6 +50,7 @@
     ├── add_custom_tiling_sink
     │   ├── add_custom_tiling_sink_kernel.cpp
     │   └── add_custom_tiling_sink_tiling_struct.h
+    ├── CMakeLists.txt
     └── leaky_relu_custom
         ├── leaky_relu_custom_kernel.cpp
         └── leaky_relu_custom_tiling.h

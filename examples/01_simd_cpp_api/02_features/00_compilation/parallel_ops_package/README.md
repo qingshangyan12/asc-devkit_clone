@@ -24,30 +24,30 @@
 ## 目录结构
 
 ```text
-parallel_ops_package
-├── CMakeLists.txt
-├── README.md
 ├── add_custom
-│   ├── CMakeLists.txt
 │   ├── add_custom_host.cpp
 │   ├── add_custom_kernel.cpp
-│   └── add_custom_tiling.h
-└── leaky_relu_custom
-    ├── CMakeLists.txt
-    ├── framework
-    │   ├── CMakeLists.txt
-    │   └── onnx_plugin
-    │       ├── CMakeLists.txt
-    │       └── leaky_relu_custom_plugin.cc
-    ├── op_host
-    │   ├── CMakeLists.txt
-    │   └── leaky_relu_custom
-    │       └── leaky_relu_custom_host.cpp
-    └── op_kernel
-        ├── CMakeLists.txt
-        └── leaky_relu_custom
-            ├── leaky_relu_custom_kernel.cpp
-            └── leaky_relu_custom_tiling.h
+│   ├── add_custom_tiling.h
+│   └── CMakeLists.txt
+├── CMakeLists.txt
+├── leaky_relu_custom
+│   ├── CMakeLists.txt
+│   ├── framework
+│   │   ├── CMakeLists.txt
+│   │   └── onnx_plugin
+│   │       ├── CMakeLists.txt
+│   │       └── leaky_relu_custom_plugin.cc
+│   ├── op_host
+│   │   ├── CMakeLists.txt
+│   │   └── leaky_relu_custom
+│   │       └── leaky_relu_custom_host.cpp
+│   └── op_kernel
+│       ├── CMakeLists.txt
+│       └── leaky_relu_custom
+│           ├── leaky_relu_custom_kernel.cpp
+│           └── leaky_relu_custom_tiling.h
+├── parallel_ops_package
+└── README.md
 ```
 
 ## 样例描述

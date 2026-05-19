@@ -16,9 +16,9 @@
 ## 目录结构介绍
 
 ```
-├── aclnn_invocation
-│   ├── CMakeLists.txt
-│   └── main.cpp
+└── aclnn_invocation
+    ├── CMakeLists.txt
+    └── main.cpp
 ```
 
 ## 代码实现介绍

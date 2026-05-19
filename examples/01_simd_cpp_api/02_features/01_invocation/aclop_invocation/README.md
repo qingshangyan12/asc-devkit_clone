@@ -16,10 +16,10 @@
 ## 目录结构介绍
 
 ```
-├── aclop_invocation
-│   ├── add_custom.json
-│   ├── CMakeLists.txt
-│   └── main.cpp
+└── aclop_invocation
+    ├── add_custom.json
+    ├── CMakeLists.txt
+    └── main.cpp
 ```
 
 ## 代码实现简介

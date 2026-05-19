@@ -13,10 +13,10 @@
 ## 目录结构介绍
 
 ```
-├── 02_dump
-│   ├── CMakeLists.txt         // 编译工程文件
-│   ├── half.hpp               // 数据类型依赖文件
-│   └── mmad_custom_dump.asc   // Ascend C样例实现 & 调用样例
+└── 02_dump
+    ├── CMakeLists.txt         // 编译工程文件
+    ├── half.hpp               // 数据类型依赖文件
+    └── mmad_custom_dump.asc   // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述

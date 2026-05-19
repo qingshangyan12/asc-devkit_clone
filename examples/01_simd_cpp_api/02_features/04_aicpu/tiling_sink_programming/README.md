@@ -13,8 +13,8 @@
 ## 目录结构介绍
 
 ```
-├── tiling_sink_programming
-│   └── test_add_custom_tiling_sink.py
+└── tiling_sink_programming
+    └── test_add_custom_tiling_sink.py
 ```
 
 ## 代码实现介绍
