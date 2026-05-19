@@ -20,7 +20,7 @@ DisableDmaAtomic原子操作接口，功能是：关闭数据搬运随路原子�
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void DisableDmaAtomic()
 ```
 

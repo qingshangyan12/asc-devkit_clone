@@ -4,13 +4,13 @@
 
 | 产品 | 是否支持 |
 |------|----------|
-| <cann-filter npu_type = "950"><term>Ascend 950PR/Ascend 950DT<term> | √</cann-filter> |
-| <cann-filter npu_type = "A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "310b"><term>Atlas 200I/500 A2 推理产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品 AI Core<term> | x</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品 Vector Core<term> | x</cann-filter> |
-| <cann-filter npu_type = "910"><term>Atlas 训练系列产品<term> | x</cann-filter> |
+| <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
+| <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √</cann-filter> |
+| <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √</cann-filter> |
+| <cann-filter npu-type="310b"><term>Atlas 200I/500 A2 推理产品</term> | √</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 AI Core</term> | x</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 Vector Core</term> | x</cann-filter> |
+| <cann-filter npu-type="910"><term>Atlas 训练系列产品</term> | x</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -20,7 +20,7 @@ SetStoreAtomicConfig接口，功能是：设置原子操作使能位与原子操
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <AtomicDtype type, AtomicOp op>
 __aicore__ inline void SetStoreAtomicConfig()
 ```
@@ -52,7 +52,7 @@ PIPE_S
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```cpp
 // 设置原子操作为求和操作，支持的数据类型为half
 AscendC::SetStoreAtomicConfig<AscendC::AtomicDtype::ATOMIC_F16, AscendC::AtomicOp::ATOMIC_SUM>();
 ```

@@ -4,13 +4,13 @@
 
 | 产品 | 是否支持 |
 |------|----------|
-| <cann-filter npu_type = "950"><term>Ascend 950PR/Ascend 950DT<term> | √</cann-filter> |
-| <cann-filter npu_type = "A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "310b"><term>Atlas 200I/500 A2 推理产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品 AI Core<term> | x</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品 Vector Core<term> | x</cann-filter> |
-| <cann-filter npu_type = "910"><term>Atlas 训练系列产品<term> | x</cann-filter> |
+| <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
+| <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √</cann-filter> |
+| <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √</cann-filter> |
+| <cann-filter npu-type="310b"><term>Atlas 200I/500 A2 推理产品</term> | √</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 AI Core</term> | x</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 Vector Core</term> | x</cann-filter> |
+| <cann-filter npu-type="910"><term>Atlas 训练系列产品</term> | x</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -20,7 +20,7 @@ GetStoreAtomicConfig接口，功能是：获取原子操作使能位与原子操
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atomicOp)
 ```
 
@@ -32,6 +32,10 @@ __aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atom
 |--------|-----------|------|
 | atomicType | 输出 | 原子操作使能位。<br>0：无原子操作<br>1：使能原子操作，进行原子操作的数据类型为float<br>2：使能原子操作，进行原子操作的数据类型为half<br>3：使能原子操作，进行原子操作的数据类型为int16_t<br>4：使能原子操作，进行原子操作的数据类型为int32_t<br>5：使能原子操作，进行原子操作的数据类型为int8_t<br>6：使能原子操作，进行原子操作的数据类型为bfloat16_t |
 | atomicOp | 输出 | 原子操作类型。<br>0：求和操作 |
+
+## 数据类型
+
+无
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -47,7 +51,7 @@ PIPE_S
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```cpp
 AscendC::SetStoreAtomicConfig<AscendC::AtomicDtype::ATOMIC_F16, AscendC::AtomicOp::ATOMIC_SUM>();
 uint16_t type = 0;       // 原子操作使能位
 uint16_t op = 0;         // 原子操作类型

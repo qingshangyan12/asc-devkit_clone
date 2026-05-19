@@ -4,13 +4,13 @@
 
 | 产品 | 是否支持 |
 |------|----------|
-| <cann-filter npu_type = "950"><term>Ascend 950PR/Ascend 950DT<term> | √</cann-filter> |
-| <cann-filter npu_type = "A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "310b"><term>Atlas 200I/500 A2 推理产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品 AI Core<term> | √</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品 Vector Core<term> | x</cann-filter> |
-| <cann-filter npu_type = "910"><term>Atlas 训练系列产品<term> | x</cann-filter> |
+| <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
+| <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √</cann-filter> |
+| <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √</cann-filter> |
+| <cann-filter npu-type="310b"><term>Atlas 200I/500 A2 推理产品</term> | √</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 AI Core</term> | √</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 Vector Core</term> | x</cann-filter> |
+| <cann-filter npu-type="910"><term>Atlas 训练系列产品</term> | x</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -20,7 +20,7 @@ SetAtomicType原子操作接口，功能是：通过设置模板参数来设定�
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void SetAtomicType()
 ```
@@ -28,15 +28,16 @@ __aicore__ inline void SetAtomicType()
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表 1**  模板参数说明
+
 | 参数名 | 描述 |
 |--------|------|
 | T | 设定原子操作不同的数据类型。 |
 
 ## 数据类型
 
-<cann-filter npu-type="910b">
+<cann-filter npu-type="950">
 
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为int8_t/int16_t/half/bfloat16_t/int32_t/float。
+- Ascend 950PR/Ascend 950DT，支持的数据类型为int8_t/int16_t/half/bfloat16_t/int32_t/float。
 
 </cann-filter>
 
@@ -46,21 +47,21 @@ __aicore__ inline void SetAtomicType()
 
 </cann-filter>
 
-<cann-filter npu-type="310p">
+<cann-filter npu-type="910b">
 
-- Atlas 推理系列产品AI Core，支持的数据类型为int16_t/half/float。
-
-</cann-filter>
-
-<cann-filter npu-type="950">
-
-- Ascend 950PR/Ascend 950DT，支持的数据类型为int8_t/int16_t/half/bfloat16_t/int32_t/float。
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为int8_t/int16_t/half/bfloat16_t/int32_t/float。
 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
 - Atlas 200I/500 A2 推理产品，支持的数据类型为int16_t/half/int32_t/float。
+
+</cann-filter>
+
+<cann-filter npu-type="310p">
+
+- Atlas 推理系列产品AI Core，支持的数据类型为int16_t/half/float。
 
 </cann-filter>
 
@@ -74,8 +75,8 @@ PIPE_S
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   [SetAtomicAdd](SetAtomicAdd.md)、[SetAtomicMax](SetAtomicMax(ISASI).md)、[SetAtomicMin](SetAtomicMin(ISASI).md)内部已集成与SetAtomicType相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用SetAtomicType接口。
--   使用完成后，建议使用DisableDmaAtomic清空原子操作的状态，以免影响后续相关指令功能。
+- [SetAtomicAdd](SetAtomicAdd.md)、[SetAtomicMax](SetAtomicMax(ISASI).md)、[SetAtomicMin](SetAtomicMin(ISASI).md)内部已集成与SetAtomicType相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用SetAtomicType接口。
+- 使用完成后，建议使用DisableDmaAtomic清空原子操作的状态，以免影响后续相关指令功能。
 
 ## 调用示例<a name="section177231425115410"></a>
 

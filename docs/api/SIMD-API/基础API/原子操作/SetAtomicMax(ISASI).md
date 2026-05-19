@@ -4,13 +4,13 @@
 
 | 产品 | 是否支持 |
 |------|----------|
-| <cann-filter npu_type = "950"><term>Ascend 950PR/Ascend 950DT<term> | √</cann-filter> |
-| <cann-filter npu_type = "A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "310b"><term>Atlas 200I/500 A2 推理产品<term> | x</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品 AI Core<term> | x</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品 Vector Core<term> | x</cann-filter> |
-| <cann-filter npu_type = "910"><term>Atlas 训练系列产品<term> | x</cann-filter> |
+| <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
+| <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √</cann-filter> |
+| <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √</cann-filter> |
+| <cann-filter npu-type="310b"><term>Atlas 200I/500 A2 推理产品</term> | x</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 AI Core</term> | x</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 Vector Core</term> | x</cann-filter> |
+| <cann-filter npu-type="910"><term>Atlas 训练系列产品</term> | x</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -20,7 +20,7 @@ SetAtomicMax是原子操作接口，功能是：设置后续搬运到GM的数据
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void SetAtomicMax() 
 ```
@@ -28,6 +28,7 @@ __aicore__ inline void SetAtomicMax()
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表 1**  模板参数说明
+
 | 参数名 | 描述 |
 |--------|------|
 | T | 设定不同的原子最大操作数据类型。 |
@@ -46,9 +47,9 @@ PIPE_S
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-<cann-filter npu-type="910b">
+<cann-filter npu-type="950">
 
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer->GM。
+- Ascend 950PR/Ascend 950DT，支持的数据通路为UB/L0C Buffer->GM。
 
 </cann-filter>
 
@@ -58,21 +59,21 @@ PIPE_S
 
 </cann-filter>
 
-<cann-filter npu-type="950">
+<cann-filter npu-type="910b">
 
-- Ascend 950PR/Ascend 950DT，支持的数据通路为UB/L0C Buffer->GM。
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer->GM。
 
 </cann-filter>
 
--   使用完后，建议通过[DisableDmaAtomic](DisableDmaAtomic.md)关闭原子最大操作，以免影响后续相关功能。
--   该指令执行前不会自动清零GM数据。开发者需根据算子逻辑判断是否清零，如需清零，请在执行前手动完成。
--   SetAtomicMax内部已集成与  [SetAtomicType](SetAtomicType.md)  相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用 SetAtomicType 接口。
+- 使用完后，建议通过[DisableDmaAtomic](DisableDmaAtomic.md)关闭原子最大操作，以免影响后续相关功能。
+- 该指令执行前不会自动清零GM数据。开发者需根据算子逻辑判断是否清零，如需清零，请在执行前手动完成。
+- SetAtomicMax内部已集成与  [SetAtomicType](SetAtomicType.md)  相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用 SetAtomicType 接口。
 
 ## 调用示例<a name="section177231425115410"></a>
 
 完整使用样例请参见[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations)。
 
-```
+```cpp
 #include "kernel_operator.h"
 
 constexpr uint32_t SIZE = 256;

@@ -2,13 +2,13 @@
 
 | 产品 | 是否支持 |
 |------|----------|
-| <cann-filter npu_type = "950"><term>Ascend 950PR/Ascend 950DT<term> | √</cann-filter> |
-| <cann-filter npu_type = "A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "310b"><term>Atlas 200I/500 A2 推理产品<term> | √</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品 AI Core<term> | √</cann-filter> |
-| <cann-filter npu_type = "310p"><term>Atlas 推理系列产品 Vector Core<term> | x</cann-filter> |
-| <cann-filter npu_type = "910"><term>Atlas 训练系列产品<term> | √</cann-filter> |
+| <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
+| <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √</cann-filter> |
+| <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √</cann-filter> |
+| <cann-filter npu-type="310b"><term>Atlas 200I/500 A2 推理产品</term> | √</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 AI Core</term> | √</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 Vector Core</term> | x</cann-filter> |
+| <cann-filter npu-type="910"><term>Atlas 训练系列产品</term> | √</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -18,7 +18,7 @@ SetAtomicAdd是原子操作接口，功能是：对后续目的地址为GM的数
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void SetAtomicAdd()
 ```
@@ -26,15 +26,16 @@ __aicore__ inline void SetAtomicAdd()
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表 1**  模板参数说明
+
 | 参数名 | 描述 |
 |--------|------|
 | T | 设定不同的原子累加操作数据类型。 |
 
 ## 数据类型
 
-<cann-filter npu-type="910b">
+<cann-filter npu-type="950">
 
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为int8_t/int16_t/half/bfloat16_t/int32_t/float。
+- Ascend 950PR/Ascend 950DT，支持的数据类型为int8_t/int16_t/half/bfloat16_t/int32_t/float。
 
 </cann-filter>
 
@@ -44,9 +45,15 @@ __aicore__ inline void SetAtomicAdd()
 
 </cann-filter>
 
-<cann-filter npu-type="910">
+<cann-filter npu-type="910b">
 
-- Atlas 训练系列产品，支持的数据类型为float。
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为int8_t/int16_t/half/bfloat16_t/int32_t/float。
+
+</cann-filter>
+
+<cann-filter npu-type="310b">
+
+- Atlas 200I/500 A2 推理产品，支持的数据类型为int16_t/half/int32_t/float。
 
 </cann-filter>
 
@@ -56,15 +63,9 @@ __aicore__ inline void SetAtomicAdd()
 
 </cann-filter>
 
-<cann-filter npu-type="950">
+<cann-filter npu-type="910">
 
-- Ascend 950PR/Ascend 950DT，支持的数据类型为int8_t/int16_t/half/bfloat16_t/int32_t/float。
-
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
-- Atlas 200I/500 A2 推理产品，支持的数据类型为int16_t/half/int32_t/float。
+- Atlas 训练系列产品，支持的数据类型为float。
 
 </cann-filter>
 
@@ -78,45 +79,45 @@ PIPE_S
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-<cann-filter npu_type = "910b">
+<cann-filter npu-type="950">
 
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据通路为UB/L0C/L1-\>GM。
+- Ascend 950PR/Ascend 950DT，支持的数据通路为UB/L0C Buffer-\>GM。
  
 </cann-filter>
 
-<cann-filter npu_type = "A3">
+<cann-filter npu-type="A3">
 
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据通路为UB/L0C/L1-\>GM。
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer-\>GM。
  
 </cann-filter>
 
-<cann-filter npu_type = "910">
+<cann-filter npu-type="910b">
 
-- Atlas 训练系列产品，支持的数据通路为UB-\>GM。
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer-\>GM。
  
 </cann-filter>
 
-<cann-filter npu_type = "310p">
+<cann-filter npu-type="310b">
+
+- Atlas 200I/500 A2 推理产品，支持的数据通路为UB/L0C Buffer/L1 Buffer-\>GM。
+ 
+</cann-filter>
+
+<cann-filter npu-type="310p">
 
 - Atlas 推理系列产品AI Core，支持的数据通路为UB-\>GM。
  
 </cann-filter>
 
-<cann-filter npu_type = "950">
+<cann-filter npu-type="910">
 
-- Ascend 950PR/Ascend 950DT，支持的数据通路为UB/L0C-\>GM。
+- Atlas 训练系列产品，支持的数据通路为UB-\>GM。
  
 </cann-filter>
 
-<cann-filter npu_type = "310b">
-
-- Atlas 200I/500 A2 推理产品，支持的数据通路为UB/L0C/L1-\>GM。
- 
-</cann-filter>
-
--   累加操作完成后，建议通过[DisableDmaAtomic](DisableDmaAtomic.md)关闭原子累加，以免影响后续相关指令功能。
--   该指令执行前不会自动清零GM数据。开发者需根据算子逻辑判断是否清零，如需清零，请在执行前手动完成。
--   SetAtomicAdd内部已集成与  [SetAtomicType](SetAtomicType.md)  相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用 SetAtomicType 接口。
+- 累加操作完成后，建议通过[DisableDmaAtomic](DisableDmaAtomic.md)关闭原子累加，以免影响后续相关指令功能。
+- 该指令执行前不会自动清零GM数据。开发者需根据算子逻辑判断是否清零，如需清零，请在执行前手动完成。
+- SetAtomicAdd内部已集成与  [SetAtomicType](SetAtomicType.md)  相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用 SetAtomicType 接口。
 
 ## 调用示例<a name="section177231425115410"></a>
 
