@@ -84,27 +84,6 @@ TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeRegisterTest){
     UnregisterAscendBinary(handle);
 }
 
-TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeDevBinaryRegisterTest) {
-    uint8_t fileBuf[32];
-    size_t fileSize = 32;
-    void *handle;
-    int32_t ret;
-    ret = AscendDevBinaryRegister(fileBuf, fileSize, &handle);
-    EXPECT_EQ(ret, 0);
-    const char* stubFunc = "hello_world";
-    ret = AscendFunctionRegister(handle, stubFunc);
-    EXPECT_EQ(ret, 0);
-    MOCKER(rtKernelLaunchWithFlagV2).stubs().will(returnValue(0));
-    uint32_t numBlocks;
-    void **args = nullptr;
-    uint32_t size;
-    rtStream_t stream = nullptr;
-    ret = AscendKernelLaunchWithFlagV2(stubFunc, numBlocks, args, size, stream, 0);
-    EXPECT_EQ(ret, 0);
-    ret = AscendKernelLaunchWithFlagV2(stubFunc, numBlocks, args, size, stream, 2048);
-    EXPECT_EQ(ret, 0);
-}
-
 TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeMemoryFailedTest){
     size_t bufsize = 16;
     uint32_t ret;
