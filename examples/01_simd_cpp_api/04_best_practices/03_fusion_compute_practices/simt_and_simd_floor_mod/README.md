@@ -16,9 +16,8 @@
 
 ```
 ├── 14_simt_and_simd_floor_mod
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── floor_mod.asc    # Ascend C算子实现 & 调用样例
-|   └── README.md
+│   ├── CMakeLists.txt         // cmake编译文件
+│   └── floor_mod.asc    // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述

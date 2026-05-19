@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例在神经网络反向传播场景下，基于 `SoftmaxGrad` 或 `SoftmaxGradFront` 高阶 API 实现 softmax 梯度计算。
+本样例在神经网络反向传播场景下，基于 `SoftmaxGrad` 或 `SoftmaxGradFront` 高阶API实现softmax梯度计算。
 
 - **SoftmaxGrad**：对输入 tensor `[m, n]` 按行做完整的 softmax 梯度反向计算，计算公式为 `(grad - sum(grad * src)) * src`。
 - **SoftmaxGradFront**：仅计算 softmax 梯度的前半部分，计算公式为 `sum(grad * src)`，输出每行的求和结果。该接口常用于 FlashAttention 等需要中间梯度结果的场景。
@@ -21,10 +21,10 @@
 
 ```
 ├── softmaxgrad
-│   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本（支持两种模式）
 │   ├── CMakeLists.txt          // 编译工程文件（支持 -DUSE_FRONT_MODE）
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── scripts
+│   │   └── gen_data.py         // 输入数据和真值数据生成脚本（支持两种模式）
 │   └── softmaxgrad.asc         // Ascend C 样例实现 & 调用示例（两种模式合并）
 ```
 
@@ -44,10 +44,10 @@
 - 样例实现:  
 本样例实现的是固定 shape 的样例，输入 x `[960, 960]`，y `[960, 960]`，分核进行计算。
 
-  - Tiling 实现  
-    按照行数进行分核，使用平均分配法按核数向上对齐分配，确定主核和尾核的计算行数。根据 reduce 轴长度查询 SLICE_TABLE 确定每次循环处理的行数，调用 `GetSoftMaxGradMinTmpSize` 和 `SoftMaxGradTilingFunc` 获取 API 所需的 Tiling 参数。
+  - Tiling实现
+    按照行数进行分核，使用平均分配法按核数向上对齐分配，确定主核和尾核的计算行数。根据reduce轴长度查询SLICE_TABLE确定每次循环处理的行数，调用 `GetSoftMaxGradMinTmpSize` 和 `SoftMaxGradTilingFunc` 获取API所需的Tiling参数。
 
-  - Kernel 实现  
+  - Kernel实现
     核心计算步骤：将输入数据搬入后，调用对应的 SoftmaxGrad/SoftmaxGradFront API 完成梯度计算，再将结果搬出。
 
     SoftmaxGrad 模式调用方式：
@@ -103,7 +103,7 @@
    ./demo
    ```
 
-  使用 CPU 调试或 NPU 仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
@@ -119,8 +119,8 @@
    <table>
    <caption>表3：编译选项说明</caption>
    <tr><td align="center">选项</td><td align="center">可选值</td><td align="center">说明</td></tr>
-   <tr><td align="center">CMAKE_ASC_RUN_MODE</td><td align="center">npu（默认）、cpu、sim</td><td align="center">运行模式：NPU 运行、CPU调试、NPU仿真</td></tr>
-   <tr><td align="center">CMAKE_ASC_ARCHITECTURES</td><td align="center">dav-2201（默认）、dav-3510</td><td align="center">NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT</td></tr>
+   <tr><td align="center">CMAKE_ASC_RUN_MODE</td><td align="center">npu（默认）、cpu、sim</td><td align="center">运行模式：NPU运行、CPU调试、NPU仿真</td></tr>
+   <tr><td align="center">CMAKE_ASC_ARCHITECTURES</td><td align="center">dav-2201（默认）、dav-3510</td><td align="center">NPU架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT</td></tr>
    <tr><td align="center">USE_FRONT_MODE</td><td align="center">OFF（默认）、ON</td><td align="center">样例模式：OFF 为 SoftmaxGrad，ON 为 SoftmaxGradFront</td></tr>
    </table>
    </div>
