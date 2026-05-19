@@ -145,7 +145,6 @@ target_compile_options(${CCU_UT_TARGET} PRIVATE
 target_compile_definitions(${CCU_UT_TARGET} PRIVATE
     -DUT_TEST
     -DAICPU_COMPILE
-    -DASCENDC_CPU_DEBUG
 )
 
 target_link_libraries(${CCU_UT_TARGET} PRIVATE
