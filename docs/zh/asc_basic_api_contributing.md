@@ -454,5 +454,3 @@ static_assert(SupportType<T, half, float, int16_t, int32_t>(),
     #error "Unsupported NPU architecture"
 #endif
 ```
-
----

@@ -409,5 +409,3 @@ ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
 
 #endif
 ```
-
----

@@ -65,3 +65,19 @@ This project includes five core Ascend C documents (Getting Started Tutorial, Pr
   If you have appropriate solutions for problems encountered by others in the community, you are welcome to comment and communicate in the Issue to help others solve problems and pain points, jointly improving usability.
 
   If the corresponding Issue requires code modification, you can enter "/assign" or "/assign @yourself" in the Issue comment box to assign the Issue to yourself, tracking assistance in solving the problem.
+
+## Code Standards
+
+This project has a complete code contribution standards system. Please read the relevant guides before development. For the complete index, see [docs/contributing/README.md](./docs/zh/contributing/README.md).
+
+| Document | Content |
+|----------|---------|
+| [code-style.md](./docs/zh/contributing/code-style.md) | C++ naming, include, header guard, namespace, macros, constexpr, formatting, code comment standards |
+| [api-design.md](./docs/zh/contributing/api-design.md) | API interface design, template parameters, `__aicore__` usage, Tiling interface, deprecation annotation |
+| [directory-structure.md](./docs/zh/contributing/directory-structure.md) | Directory structure, file naming suffixes, architecture directories, new API operation checklist |
+| [testing.md](./docs/zh/contributing/testing.md) | Testing framework, file naming, UT writing, Header Checker, coverage requirements |
+| [experimental.md](./docs/zh/contributing/experimental.md) | Experimental definition, marking methods, promotion process, Breaking Change |
+
+## Experimental Features
+
+Newly developed experimental features should be placed in the experimental directory (i.e., `include/tensor_api/` and `impl/tensor_api/`), and explicitly marked as experimental in the code. For the complete specification, see [experimental.md](./docs/zh/contributing/experimental.md).
