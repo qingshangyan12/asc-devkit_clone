@@ -25,16 +25,16 @@
 namespace AscendC {
 
 
-template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX>
+template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool enableEarlyStartV3 = false>
 __aicore__ inline void SetNextTaskStartImpl()
 {
-    return;
+    ASCENDC_REPORT_NOT_SUPPORT(false, "SetNextTaskStart");
 }
 
-template<int8_t earlyStartConfig = -1>
+template<int8_t earlyStartConfig = -1, bool enableEarlyStartV3 = false>
 __aicore__ inline void WaitPreTaskEndImpl()
 {
-    return;
+    ASCENDC_REPORT_NOT_SUPPORT(false, "WaitPreTaskEnd");
 }
 
 template<bool isAIVOnly = true>
