@@ -1,0 +1,15 @@
+# Build artifacts
+build/
+*.csv
+*.log
+
+# Core dump files
+core*
+*.dump
+*.vcd
+_summary_log
+
+# Editor
+*.swp
+*.swo
+*~
