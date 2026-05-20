@@ -334,6 +334,7 @@ public:
         this->AICore().AddConfig("ascend950", aicConfig);
         this->MC2().HcclGroup({"group2", "group1"});
         this->MC2().HcclServerType(HcclServerType::CCU, "ascend950");
+        this->MC2().HcclServerType(HcclServerType::CCU, "ascend_undefined_soc");
         this->EnableFallBack();
     }
 };
@@ -393,6 +394,7 @@ public:
         config_b.Input("x3").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
         config_b.Output("y1").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
         this->AICore().AddConfig("ascend910b", config_b);
+        this->AICore().AddConfig("ascend_undefined_soc", config_b);
     }
 };
 OP_ADD(SocVersionTest1);
