@@ -1,13 +1,26 @@
 # shfl_xor
 
+## 产品支持情况
+
+| 产品 | 是否支持 |
+| --- | --- |
+| Ascend 950PR/Ascend 950DT | √ |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
+| Atlas 200I/500 A2 推理产品 | x |
+| Atlas 推理系列产品AI Core | x |
+| Atlas 推理系列产品Vector Core | x |
+| Atlas 训练系列产品 | x |
+
 ## 功能说明
 
-协作组内线程的数据交换，获取协作组内当前线程向后偏移delta的线程输入的var值。
+将当前线程的rank与`lane_mask`进行按位异或运算得到的rank，获取该rank的线程输入的`var`值。
 
 ## 函数原型
 
-```C++
-T shfl_xor(T var, int delta) const
+```c++
+template <typename T>
+T shfl_xor(T var, unsigned int lane_mask) const
 ```
 
 ## 参数说明
@@ -16,12 +29,12 @@ T shfl_xor(T var, int delta) const
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| var | 输入 | 线程用于交换的输入操作数。 |
-| delta | 输入 | 与当前线程rank做异或运算的操作数。 |
+| var | 输入 | 线程用于交换的输入操作数。支持的数据类型为：half、int32_t、uint32_t、float、half2、int64_t、uint64_t。 |
+| lane_mask | 输入 | 与当前线程rank做异或运算的操作数。 |
 
 ## 返回值说明
 
-协作组内指定线程的var值。
+`thread_block_tile`组内指定线程的`var`值。
 
 ## 约束说明
 

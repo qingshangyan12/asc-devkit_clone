@@ -1,9 +1,20 @@
 # any
 
+## 产品支持情况
+
+| 产品 | 是否支持 |
+| --- | --- |
+| Ascend 950PR/Ascend 950DT | √ |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
+| Atlas 200I/500 A2 推理产品 | x |
+| Atlas 推理系列产品AI Core | x |
+| Atlas 推理系列产品Vector Core | x |
+| Atlas 训练系列产品 | x |
+
 ## 功能说明
 
-判断协作组内是否有线程的输入不为0。
-组内活跃线程执行本接口时，对组内所有活跃线程的输入操作数`predicate`进行判断，所有线程的`predicate`均为0，返回0，否则返回1。组内所有活跃线程返回相同的结果。
+判断`thread_block_tile`组内是否有线程的输入不为0。
 
 ## 函数原型
 
@@ -21,7 +32,7 @@ int any(int predicate) const
 
 ## 返回值说明
 
-协作组内所有活跃线程的输入均为0，返回0，否则返回1。
+`thread_block_tile`组内所有活跃线程的输入均为0，返回0，否则返回1。
 
 ## 约束说明
 
