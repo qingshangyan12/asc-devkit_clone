@@ -4,9 +4,9 @@
 
 This example set introduces typical usage of different features of matrix computation APIs, providing corresponding end-to-end implementations. The naming of examples in the directory follows the pattern "API_name_path", as shown below:
 
-1. **load_data_**: Examples starting with "load_data_" introduce relevant APIs for L1 Buffer -> L0 Buffer.
-2. **mmad_**: Examples starting with "mmad_" introduce the matrix multiplication Mmad API.
-3. **fixpipe_**: Examples starting with "fixpipe_" introduce relevant APIs for L0C Buffer → GM/L1 Buffer/UB.
+1. **load_data**: Examples starting with "load_data" introduce relevant APIs for L1 Buffer -> L0 Buffer.
+2. **mmad**: Examples starting with "mmad" introduce the matrix multiplication Mmad API.
+3. **fixpipe**: Examples starting with "fixpipe" introduce relevant APIs for L0C Buffer → Global Memory/L1 Buffer/Unified Buffer.
 
 ## Example List
 
