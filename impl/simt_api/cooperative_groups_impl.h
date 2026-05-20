@@ -41,7 +41,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __fns_internal(unsigned int m
         temp_offset = 1;
     } else if (offset < 0) {
         temp_mask = __brev(mask);
-        base = 31 - base;
+        base = warpSize - 1 - base;
         temp_offset = -offset;
     }
 
@@ -62,7 +62,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __fns_internal(unsigned int m
         }
     }
     if (offset < 0) {
-        return 31 - total;
+        return warpSize - 1 - total;
     } else {
         return total;
     }
@@ -157,7 +157,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int thread_block::size() { return
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline dim3 thread_block::group_dim() { return dim_threads(); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ thread_group thread_block::create_tiled_group(unsigned int tile_size) const
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_group thread_block::create_tiled_group(unsigned int tile_size) const
 {
     const bool pow2 = ((tile_size & (tile_size - 1)) == 0);
     if (tile_size == 0 || tile_size > warpSize || !pow2) {
@@ -190,7 +190,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int coalesced_group::_packLanes(u
 {
     unsigned int member_pack = 0;
     unsigned int member_rank = 0;
-    for (int bit_idx = 0; bit_idx < 32; bit_idx++) {
+    for (int bit_idx = 0; bit_idx < warpSize; bit_idx++) {
         unsigned int lane_bit = _tiled_info.mask & (1U << bit_idx);
         if (lane_bit) {
             if (laneMask & lane_bit) {
@@ -216,7 +216,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline coalesced_group coalesced_group::create_ti
     if (_tiled_info.is_tiled) {
         unsigned int base_offset = (thread_rank() & (~(tile_size - 1)));
         unsigned int mask_length = min(static_cast<unsigned int>(num_threads()) - base_offset, tile_size);
-        unsigned int mask = static_cast<unsigned int>(-1) >> (32 - mask_length);
+        unsigned int mask = static_cast<unsigned int>(-1) >> (warpSize - mask_length);
         mask <<= (laneid() & ~(tile_size - 1));
         coalesced_group coalesced_tile = coalesced_group(mask);
         coalesced_tile._tiled_info.is_tiled = true;
@@ -228,7 +228,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline coalesced_group coalesced_group::create_ti
         unsigned int member_rank = 0;
         int seen_lanes = (thread_rank() / tile_size) * tile_size;
 
-        for (unsigned int bit_idx = 0; bit_idx < 32; bit_idx++) {
+        for (unsigned int bit_idx = 0; bit_idx < warpSize; bit_idx++) {
             unsigned int lane_bit = _tiled_info.mask & (1U << bit_idx);
             if (lane_bit) {
                 if (seen_lanes <= 0 && member_rank < tile_size) {
