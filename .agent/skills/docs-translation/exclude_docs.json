@@ -1,0 +1,59 @@
+{
+    "mapping": [
+        {
+            "repoName": "pypto",
+            "publicRepo": "https://gitcode.com/cann/pypto",
+            "excludeDocsPaths": ["docs"]
+        },
+        {
+            "repoName": "hccl",
+            "publicRepo": "https://gitcode.com/cann/hccl",
+            "excludeDocsPaths": ["docs"]
+        },
+        {
+            "repoName": "amct",
+            "publicRepo": "https://gitcode.com/cann/amct",
+            "excludeDocsPaths": ["docs"]
+        },
+        {
+            "repoName": "ge",
+            "publicRepo": "https://gitcode.com/cann/ge",
+            "excludeDocsPaths": ["docs/dflow_api", "docs/graph_engine_api", "docs/llm_datadist_api"]
+        },
+        {
+            "repoName": "metadef",
+            "publicRepo": "https://gitcode.com/cann/metadef",
+            "excludeDocsPaths": ["docs/api"]
+        },
+        {
+            "repoName": "hixl",
+            "publicRepo": "https://gitcode.com/cann/hixl",
+            "excludeDocsPaths": ["docs/cpp", "docs/python"]
+        },
+        {
+            "repoName": "hcomm",
+            "publicRepo": "https://gitcode.com/cann/hcomm",
+            "excludeDocsPaths": ["docs"]
+        },
+        {
+            "repoName": "tensorflow",
+            "publicRepo": "https://gitcode.com/cann/tensorflow",
+            "excludeDocsPaths": ["docs"]
+        },
+        {
+            "repoName": "asc-devkit",
+            "publicRepo": "https://gitcode.com/cann/asc-devkit",
+            "excludeDocsPaths": ["docs/api", "docs/guide"]
+        },
+        {
+            "repoName": "opbase",
+            "publicRepo": "https://gitcode.com/cann/opbase",
+            "excludeDocsPaths": ["docs"]
+        },
+        {
+            "repoName": "runtime",
+            "publicRepo": "https://gitcode.com/cann/runtime",
+            "excludeDocsPaths": ["docs"]
+        }
+    ]
+}

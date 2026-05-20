@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to register custom operators using pybind11, based on the Add operator.
+This sample demonstrates how to register a custom operator using pybind11 based on the Add operator.
 
 ## Supported Products
 
@@ -15,23 +15,23 @@ This sample demonstrates how to register custom operators using pybind11, based 
 ```
 ├── pybind
 │   ├── CMakeLists.txt        // Build project file
-│   ├── add_custom_test.py    // PyTorch invocation script
-│   └── add_custom.asc        // Ascend C sample implementation & pybind11 registration
+│   ├── add_custom.asc        // Ascend C operator implementation and pybind11 registration
+│   └── add_custom_test.py    // PyTorch invocation script
 ```
 
 ## Sample Description
 
-- Sample functionality:
+- Sample Functionality:
 
-  The Add computation formula is:
+  Add calculation formula:
 
   ```
   z = x + y
   ```
 
-- Sample specifications:
+- Sample Specifications:
   <table border="2" align="center">
-  <caption>Table 1: AddCustom Sample Specification Description</caption>
+  <caption>Table 1: AddCustom Sample Specifications</caption>
   <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">AddCustom</td></tr>
   </tr>
   <tr><td rowspan="3" align="center">Sample Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -44,13 +44,13 @@ This sample demonstrates how to register custom operators using pybind11, based 
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">add_custom</td></tr>
   </table>
 
-- Custom sample registration:
+- Custom Sample Registration:
 
   This sample defines a namespace named `ascendc_ops` in `add_custom.asc` and registers the `ascendc_add` function within it.
 
-  pybind11 enables PyTorch framework to invoke sample kernel programs, achieving integration and deployment of Ascend C samples in the PyTorch framework.
+  pybind11 enables PyTorch framework to invoke sample Kernel programs, achieving integration and deployment of Ascend C samples in the PyTorch framework.
 
-  `add_custom.asc` uses the `pybind11` library to wrap C++ code into a Python module. The implementation defines a pybind11 module named `m`, which contains a function named `ascendc_add`. This function is identical to `ascendc_ops::ascendc_add` and is used to convert the C++ function into a Python function. For example:
+  `add_custom.asc` uses the `pybind11` library to wrap C++ code into a Python module. The implementation defines a pybind11 module named `m` containing a function named `ascendc_add`. This function is the same as `ascendc_ops::ascendc_add` and converts the C++ function to a Python function. For example:
 
   ```c++
   PYBIND11_MODULE(ascendc_ops, m)
@@ -60,47 +60,47 @@ This sample demonstrates how to register custom operators using pybind11, based 
   }
   ```
 
-  In the `ascendc_add` function, the current NPU stream is obtained via `c10_npu::getCurrentNPUStream()`, and the custom kernel function `add_custom` is invoked using the kernel launch operator `<<<>>>` to execute the sample on the NPU.
+  In the `ascendc_add` function, the current NPU stream is obtained through the `c10_npu::getCurrentNPUStream()` function, and the custom Kernel function `add_custom` is called through the kernel launcher `<<<>>>` to execute the sample on the NPU.
 
-- Python test script
+- Python Test Script
 
-  In the `add_custom_test.py` invocation script, import the custom module `import ascendc_ops`, call the registered `ascendc_add` function, and verify the numerical correctness of the custom sample by comparing the NPU output with the CPU standard addition result.
+  In the `add_custom_test.py` invocation script, import the custom module `import ascendc_ops`, call the registered `ascendc_add` function, and verify the numerical correctness of the custom sample by comparing NPU output with CPU standard addition results.
 
 ## Build and Run
 
-- Install PyTorch and Ascend Extension for PyTorch plugin
+- Install PyTorch and Ascend Extension for PyTorch Plugin
 
-  Refer to the installation instructions from the [pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch) open source repository or [Ascend Extension for PyTorch Ascend Community](https://hiascend.com/document/redirect/Pytorch-index), select a supported `Python` version matching release, and complete the installation of `torch` and `torch-npu`.
+  Refer to the [pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch) open source repository or [Ascend Extension for PyTorch Community](https://hiascend.com/document/redirect/Pytorch-index) installation instructions to select a supported `Python` version release and complete the installation of `torch` and `torch-npu`.
 
-- Install prerequisite dependencies
+- Install Prerequisites
 
   ```bash
   pip3 install pybind11 expecttest
   ```
 
-- Configure environment variables
+- Configure Environment Variables
 
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on your current environment.
-  - Default path, CANN package installed by root user
+  Select the appropriate command based on the CANN development kit [installation method](../../../../../../docs/en/quick_start.md#prepare&install) on your current environment.
+  - Default path, root user installed CANN package
 
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
-  - Default path, CANN package installed by non-root user
+  - Default path, non-root user installed CANN package
 
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - Specified path install_path, CANN package installed
+  - Specified path install_path, installed CANN package
 
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
 
-- Execute the sample
-  Execute the following steps in the root directory of this sample to run it.
+- Run Sample
+  Execute the following steps in the sample root directory to run this sample.
 
   ```bash
   mkdir -p build && cd build;      # Create and enter build directory
@@ -108,15 +108,15 @@ This sample demonstrates how to register custom operators using pybind11, based 
   python3 ../add_custom_test.py    # Execute sample
   ```
 
-- Build option description
+- Build Options
 
   | Option | Available Values | Description |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU Architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
 
-- Execution result
+- Execution Result
 
-  The following result indicates successful accuracy comparison:
+  The following output indicates successful accuracy comparison:
 
   ```bash
   Ran 1 test in **s

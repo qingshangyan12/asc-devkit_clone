@@ -1,7 +1,8 @@
-# CrossCoreSetFlag and CrossCoreWaitFlag Cross-Core Synchronization Example
+# CrossCoreSetFlag and CrossCoreWaitFlag Inter-Core Synchronization Example
 
 ## Overview
-This example first introduces the three synchronization modes supported by the cross-core synchronization interfaces CrossCoreSetFlag and CrossCoreWaitFlag (see table below), then demonstrates the specific usage of these three synchronization modes in two actual scenarios: pure Vector computation and Cube-Vector fusion computation.
+
+This example first introduces the three synchronization modes supported by the inter-core synchronization interfaces CrossCoreSetFlag and CrossCoreWaitFlag (see the table below). It then demonstrates the specific usage of these three synchronization modes in pure Vector computation scenarios and Cube-Vector fusion computation scenarios.
 <table border="1" align="center">
   <tr bgcolor="lightgray">
     <td>Synchronization Control Mode</td>
@@ -9,21 +10,21 @@ This example first introduces the three synchronization modes supported by the c
   </tr>
   <tr>
     <td rowspan="2">mode 0</td>
-    <td>For AIC scenarios, synchronizes all AIC cores. Instructions after CrossCoreWaitFlag will not execute until all AIC cores have executed CrossCoreSetFlag.</td>
+    <td>For AIC scenarios, synchronize all AIC cores. Instructions after CrossCoreWaitFlag execute only when all AIC cores have reached CrossCoreSetFlag.</td>
   </tr>
   <tr>
-    <td>For AIV scenarios, synchronizes all AIV cores. Instructions after CrossCoreWaitFlag will not execute until all AIV cores have executed CrossCoreSetFlag.</td>
+    <td>For AIV scenarios, synchronize all AIV cores. Instructions after CrossCoreWaitFlag execute only when all AIV cores have reached CrossCoreSetFlag.</td>
   </tr>
   <tr>
     <td>mode 1</td>
-    <td>Within a single AI Core, synchronization control between AIV cores. Instructions after CrossCoreWaitFlag will execute only when both AIV cores have executed CrossCoreSetFlag.</td>
+    <td>Synchronization control between AIV cores within a single AI Core. Instructions after CrossCoreWaitFlag execute only when both AIV cores have run CrossCoreSetFlag.</td>
   </tr>
   <tr>
     <td rowspan="2">mode 2</td>
-    <td>After an AIC core executes CrossCoreSetFlag, instructions after CrossCoreWaitFlag on both AIVs will continue executing.</td>
+    <td>After an AIC core executes CrossCoreSetFlag, instructions after CrossCoreWaitFlag on two AIV cores continue to execute.</td>
   </tr>
   <tr>
-    <td>After both AIVs execute CrossCoreSetFlag, instructions after CrossCoreWaitFlag on the AIC can execute.</td>
+    <td>After both AIV cores execute CrossCoreSetFlag, instructions after CrossCoreWaitFlag on the AIC core can execute.</td>
   </tr>
 </table>
 
@@ -38,10 +39,11 @@ This example first introduces the three synchronization modes supported by the c
 ```
 ├── cross_core_set_wait_flag
 │   ├── scripts
-│   │   ├── gen_data.py         // Script to generate input data and golden data
-│   │   └── verify_result.py    // Script to verify output data matches golden data
+│   │   ├── gen_data.py         // Input data and golden data generation script
+│   │   └── verify_result.py    // Verification script for comparing output data with golden data
 │   ├── CMakeLists.txt          // Build project file
 │   ├── data_utils.h            // Data read/write functions
+│   ├── figures                 // Diagrams
 │   ├── cross_core_set_wait_flag.h   // Ascend C example implementation
 │   └── cross_core_set_wait_flag.asc // Invocation example and result verification
 ```
@@ -50,26 +52,26 @@ This example first introduces the three synchronization modes supported by the c
 <table border="1" style="text-align: center;">
   <tr>
     <td>SCENARIO_NUM Value</td>
-    <td>Scenario</td>
+    <td>Business Scenario</td>
     <td>Synchronization Mode Used</td>
   </tr>
   <tr>
     <td>0</td>
-    <td>Pure Vector Computation Scenario (16 AIVs)</td>
+    <td>Pure Vector computation scenario (16 AIV cores)</td>
     <td>mode 0 (AIV full-core synchronization)</td>
   </tr>
   <tr>
     <td>1</td>
-    <td>Pure Vector Computation Scenario (2 AIVs)</td>
+    <td>Pure Vector computation scenario (2 AIV cores)</td>
     <td>mode 1</td>
   </tr>
   <tr>
     <td>2</td>
-    <td>Cube-Vector Fusion Computation Scenario</td>
+    <td>Cube-Vector fusion computation scenario</td>
     <td>mode 2 (AIC waits for AIV), mode 2 (AIV waits for AIC), mode 0 (AIC full-core synchronization)</td>
   </tr>
 </table>
-This example controls execution branches via SCENARIO_NUM, where different values correspond to different scenarios and synchronization modes. As shown in the table above, when SCENARIO_NUM takes different values, it demonstrates the specific usage of three synchronization modes in pure Vector computation scenarios and Cube-Vector fusion computation scenarios.
+This example uses SCENARIO_NUM to control execution branches. Different values of this variable correspond to different business scenarios and synchronization modes. As shown in the table above, different SCENARIO_NUM values demonstrate the specific usage of three synchronization modes in pure Vector computation and Cube-Vector fusion computation scenarios.
 
 ### Computation Formula and Example Specifications
 
@@ -80,11 +82,11 @@ This example controls execution branches via SCENARIO_NUM, where different value
   $$
   - x is the input vector, all values are 1
   - i is the BlockIdx of each AIV (range 0-15)
-  - z is the accumulated result of all AIV computations
+  - z is the accumulated result from all AIV cores
 
 - Example Specifications:
   <table border="1" align="center">
-  <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">CrossCoreSetFlagMode0</td></tr>
+  <tr><td rowspan="1" align="center">Example Type(OpType)</td><td colspan="4" align="center">CrossCoreSetFlagMode0</td></tr>
   <tr><td rowspan="2" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[32]</td><td align="center">float32</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">z</td><td align="center">[32]</td><td align="center">float32</td><td align="center">ND</td></tr>
@@ -97,12 +99,12 @@ This example controls execution branches via SCENARIO_NUM, where different value
   z = (x \times 2) + (x \times 3)
   $$
   - x is the input vector, all values are 1
-  - Only AIVs with BlockIdx=2 and 3 participate in computation
-  - z is the accumulated result of these two AIV computations
+  - Only AIV cores with BlockIdx=2 and 3 participate in computation
+  - z is the accumulated result from these two AIV cores
 
 - Example Specifications:
   <table border="1" align="center">
-  <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">CrossCoreSetFlagMode1</td></tr>
+  <tr><td rowspan="1" align="center">Example Type(OpType)</td><td colspan="4" align="center">CrossCoreSetFlagMode1</td></tr>
   <tr><td rowspan="2" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[32]</td><td align="center">float32</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">z</td><td align="center">[32]</td><td align="center">float32</td><td align="center">ND</td></tr>
@@ -114,38 +116,43 @@ This example controls execution branches via SCENARIO_NUM, where different value
   $$
   C = \text{LeakyRelu}(Cast(A) \times Cast(B))
   $$
-  - A is the left matrix with shape [M, K], data type uint8
-  - B is the right matrix with shape [K, N], data type uint8
+  - A is the left matrix, shape [M, K], data type uint8
+  - B is the right matrix, shape [K, N], data type uint8
   - First convert A and B data types from uint8 to half
   - Then execute matrix multiplication: A × B
   - Finally execute LeakyRelu operation on the result
-  - C is the final result with shape [M, N], data type float32
+  - C is the final result, shape [M, N], data type float32
 
 - Example Specifications:
   <table border="1" align="center">
-  <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">CrossCoreSetFlagMode2</td></tr>
+  <tr><td rowspan="1" align="center">Example Type(OpType)</td><td colspan="5" align="center">CrossCoreSetFlagMode2</td></tr>
   <tr><td rowspan="3" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
   <tr><td align="center">a</td><td align="center">[32, 32]</td><td align="center">uint8</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">b</td><td align="center">[32, 64]</td><td align="center">uint8</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">c</td><td align="center">[32, 64]</td><td align="center">float32</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">mmad_custom</td></tr>
   </table>
+
 ## Example Implementation
+
 ### 1. Cube-Vector Fusion Computation Scenario
+
 #### 1.1 Overall Logic
 <p align="center">
-  <img src="img/融合场景_示意图.png" width="100%">
-   </p>
+  <img src="figures/融合场景_示意图.png" width="100%">
+</p>
 <p align="center">
-Figure 1: Schematic diagram of overall computation logic for Cube-Vector fusion computation scenario
+Figure 1: Cube-Vector fusion computation scenario, overall computation logic diagram
 </p>
 
-This example focuses on the fusion operator (configured with `__mix__(1,2)`) scenario, where each AI Core has 1 AIC and 2 AIVs. The logical core count is configured as numBlocks = 8, corresponding to 8 AICs and 16 AIVs. As shown in Figure 1, the overall computation logic is divided into three core phases: precision conversion phase, blocked matrix multiplication and atomic accumulation phase, and LeakyRelu operation and result write-back phase.
-#### 1.2 Precision Conversion Phase (Mode 2, AIC waits for AIV within a single AI Core)
-Since the left and right matrix data types on GM are uint8, which do not meet the mmad instruction's input data type requirements, the data on GM must first be moved to AIV for precision conversion before blocked matrix multiplication can be performed on AIC. Therefore,
-within each AI Core, one AIC must wait for the other 2 AIVs in that AI Core to complete data precision conversion before starting the blocked matrix multiplication computation.
-Specifically: The left matrix (A matrix) data in GM is split into 8 parts along the K axis and distributed to AIVs with even BlockIdx for uint8 to half precision conversion; the right matrix (B matrix) data in GM is split into 8 parts along the K axis and distributed to AIVs with odd BlockIdx for uint8 to half precision conversion. As shown in Figure 2, according to the above description, cross-core synchronization mode 2 is required.
-The code segment corresponding to the above description is as follows:
+This example addresses the fusion operator scenario (configured with __mix__(1,2)). Each AI Core contains 1 AIC and 2 AIV cores. Configure logical core count numBlocks = 8, corresponding to 8 AIC cores and 16 AIV cores. Figure 1 shows that the overall computation logic consists of three core phases: precision conversion phase, block matrix multiplication and atomic accumulation phase, and LeakyRelu operation and result write-back phase.
+
+#### 1.2 Precision Conversion Phase (Mode 2, AIC waits for AIV within single AI Core)
+Since the left and right matrices on GM have uint8 data type, which does not meet the mmad instruction requirements for input data type, you must first move data from GM to AIV for precision conversion before performing block matrix multiplication in AIC. Therefore, within each AI Core, one AIC must wait for the other two AIV cores in the same AI Core to complete data precision conversion before starting block matrix multiplication.
+
+Specifically: Split the left matrix (A matrix) data in GM along the K axis into 8 parts, distribute to AIV cores with even BlockIdx for uint8 to half precision conversion. Split the right matrix (B matrix) data in GM along the K axis into 8 parts, distribute to AIV cores with odd BlockIdx for uint8 to half precision conversion. As shown in Figure 2, use inter-core synchronization mode 2 according to the above description.
+
+The corresponding code segment:
 
         if (blockIdx % 2 == 0) {
             ...
@@ -158,23 +165,25 @@ The code segment corresponding to the above description is as follows:
             ...
             AscendC::DataCopy(BVectorGM, castBLocal, B_BLOCKS_LENGTH);
         }
-        // Mode 2, within each AICore, one AIC waits for 2 AIVs
+        // Mode 2, within each AICore, one AIC waits for 2 AIV cores
         AscendC::CrossCoreSetFlag<2, PIPE_MTE3>(SYNC_AIV_AIC_FLAG);
 
 <p align="center">
-  <img src="img/融合场景_精度转换阶段.png" width="100%">
-   </p>
+  <img src="figures/融合场景_精度转换阶段.png" width="100%">
+</p>
 <p align="center">
-Figure 2: Precision conversion phase, mode 2 schematic diagram
+Figure 2: Precision conversion phase, mode 2 diagram
 </p>
 
-#### 1.3 Blocked Matrix Multiplication and Atomic Accumulation Phase (Mode 0, AIC full-core synchronization)
-After each AIC executes blocked matrix multiplication computation, it enables the atomic accumulation mechanism, moves computation results to the same GM region, and accumulates the blocked matrix multiplication results from 8 AICs on GM to obtain the complete C matrix. To obtain the correct C matrix, it is necessary to wait for all 8 AICs to complete blocked matrix multiplication computation and move results to GM via FixPipe. As shown in Figure 3, according to the above description, cross-core synchronization mode 0 (AIC full-core synchronization) is required. The code segment corresponding to the above description is as follows:
+#### 1.3 Block Matrix Multiplication and Atomic Accumulation Phase (Mode 0, AIC Full-Core Synchronization)
+Each AIC executes block matrix multiplication, then enables atomic accumulation mechanism. Move computation results to the same GM region, accumulate results from 8 AIC cores' block matrix multiplication on GM, and finally obtain the complete C matrix. To obtain the correct C matrix, you must wait for all 8 AIC cores to complete block matrix multiplication and move results to GM through FixPipe. As shown in Figure 3, use inter-core synchronization mode 0 (AIC full-core synchronization) according to the above description.
+
+The corresponding code segment:
 $$
 C = \sum_{i=1}^{8} A_i \cdot B_i
 $$
 
-        // Mode 2, within each AICore, AIC waits for 2 AIVs
+        // Mode 2, within each AICore, AIC waits for 2 AIV cores
         AscendC::CrossCoreWaitFlag(SYNC_AIV_AIC_FLAG);
 
         CopyIn(a1Local, b1Local);
@@ -182,71 +191,80 @@ $$
         SplitBTranspose(b1Local, b2Local);
         Compute(a2Local, b2Local, c1Local);
         CopyOut(c1Local);
-        // Mode 0, 8 AICs in 8 AICores synchronize
+        // Mode 0, synchronize 8 AIC cores within 8 AICores
         AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);  
         AscendC::CrossCoreWaitFlag(SYNC_AIC_FLAG);  
 
-        // Mode 2, within each AICore, 2 AIVs wait for AIC
+        // Mode 2, within each AICore, 2 AIV cores wait for AIC
         AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);  
 
 <p align="center">
-  <img src="img/融合场景_分块矩阵乘与原子累加阶段.png" width="100%">
-   </p>
+  <img src="figures/融合场景_分块矩阵乘与原子累加阶段.png" width="100%">
+</p>
 <p align="center">
-Figure 3: Blocked matrix multiplication and atomic accumulation phase, mode 0 schematic diagram
+Figure 3: Block matrix multiplication and atomic accumulation phase, mode 0 diagram
 </p>
 
 #### 1.4 LeakyRelu and Result Write-back Phase (Mode 2, AIV waits for AIC)
-Within each AI Core, 2 AIVs must wait for the AIC to complete blocked matrix multiplication and atomic accumulation operations before performing LeakyRelu operation on C matrix blocks.
-Specifically, the accumulated C matrix is split into 16 parts along the M axis and distributed to 16 AIVs for LeakyRelu operation. As shown in Figure 4, according to the above description, cross-core synchronization mode 2 (2 AIVs wait for 1 AIC within a single AI Core) is required. The code segment corresponding to the above description is as follows:
+Within each AI Core, the 2 AIV cores must wait for the AIC to complete block matrix multiplication and atomic accumulation before performing LeakyRelu operation on the C matrix blocks.
 
-        // Mode 2, within each AICore, 2 AIVs wait for AIC
+Specifically, split the accumulated C matrix along the M axis into 16 parts, distribute to 16 AIV cores for LeakyRelu operation respectively. As shown in Figure 4, use inter-core synchronization mode 2 (2 AIV cores wait for one AIC within a single AI Core) according to the above description.
+
+The corresponding code segment:
+
+        // Mode 2, within each AICore, 2 AIV cores wait for AIC
         AscendC::CrossCoreWaitFlag(SYNC_AIC_AIV_FLAG);
 
-        // Perform LeakyRelu operation
+        // Execute LeakyRelu operation
         float alpha = 0.001;
         ...
         AscendC::LeakyRelu(reluCLocal, cLocal, alpha, C_AIV_BLOCKS_LENGTH);
         ...
 
 <p align="center">
-  <img src="img/融合场景_LeakyRelu运算与结果回写阶段.png" width="100%">
-   </p>
+  <img src="figures/融合场景_LeakyRelu运算与结果回写阶段.png" width="100%">
+</p>
 <p align="center">
-Figure 4: LeakyRelu operation and result write-back phase, mode 2 schematic diagram
+Figure 4: LeakyRelu operation and result write-back phase, mode 2 diagram
 </p>
 
 ### 2. Pure Vector Computation Scenario
-#### 2.1 Comparison of Mode 0 and Mode 1
-This example sets NUM\_BLOCKS to 8 (8 AI Cores), with an AIC:AIV ratio of 2 within each AI Core, meaning this example runs a total of 8 AICs and 16 AIVs, with AIV BlockIdx ranging from 0\~15.
-As shown in Figure 5 below, the computation logic for mode 0 and mode 1 in this example is nearly identical, with the only difference being the number of AIVs participating in synchronization: for mode 0, all 16 AIVs participate in synchronization; for mode 1, only 2 AIVs (BlockIdx=2 and 3) in the second AI Core participate in synchronization. Therefore, the next section will describe the overall logic of mode 0 in detail, and mode 1 will not be described in detail.
+
+#### 2.1 Comparison between Mode 0 and Mode 1
+This example sets NUM_BLOCKS to 8 (8 AI Cores). Each AI Core has AIC:AIV ratio of 2, meaning the example runs 8 AIC cores and 16 AIV cores total. AIV BlockIdx ranges from 0 to 15.
+
+As shown in Figure 5, the computation logic for mode 0 and mode 1 is almost identical. The difference lies in the number of AIV cores participating in synchronization: for mode 0, all 16 AIV cores participate in synchronization; for mode 1, only 2 AIV cores (BlockIdx=2 and 3) in the second AI Core participate in synchronization. Therefore, the next section describes the overall logic of mode 0 in detail, and mode 1 is not described in detail.
+
 <p align="center">
-  <img src="img/纯aiv_模式1和模式0的区别.png" width="100%">
+  <img src="figures/纯aiv_模式1和模式0的区别.png" width="100%">
 </p>
 <p align="center">
-Figure 5: Pure AIV scenario, mode 0 computation logic schematic diagram
+Figure 5: Pure AIV scenario, mode 0 computation logic diagram
 </p>
 
 #### 2.2 Overall Logic of Mode 0
-The GM used in this example is divided into 2 blocks: one for storing input data (initialDataGm), and one for storing the accumulated results of all AIVs (atomicResultGm).
-As shown in Figure 6 below, the overall logic of mode 0 consists of the following steps:
-(1) Each AIV moves data (all 1s) from initialDataGm to UB, which is a PIPE\_MTE2 pipeline operation.
+The GM used in this example consists of two blocks: one for storing input data (initialDataGm), and one for storing accumulated results from all AIV cores (atomicResultGm).
 
-(2) Each AIV performs vector computation on UB data: multiplies by the BlockIdx corresponding to each core via Muls instruction, which is a PIPE\_V pipeline operation.
+As shown in Figure 6, the overall logic of mode 0 includes the following steps:
 
-(3) The code segment corresponding to step 3 is as follows. atomicResultGm is used to store the accumulated results after all 16 AIVs have completed moving. By calling the CrossCoreSetFlag and CrossCoreWaitFlag interfaces, synchronization control is implemented: instructions after CrossCoreWaitFlag can only execute after all 16 AIVs have completed the PIPE_MTE3 move instruction.
+(1) Each AIV moves data with all values of 1 from initialDataGm to UB. This is the PIPE_MTE2 pipeline operation.
 
-         // Enable atomic accumulation for UB to GM move: data moved to atomicResult is accumulated with original value and overwrites the original value
+(2) Each AIV performs vector computation on UB data: multiply by the corresponding BlockIdx of each core through Muls instruction. This is the PIPE_V pipeline operation.
+
+(3) Step 3 corresponding code segment is as follows. atomicResultGm stores the accumulated result after all 16 AIV cores complete data movement. Call CrossCoreSetFlag and CrossCoreWaitFlag interfaces to implement synchronization control: ensure all 16 AIV cores complete PIPE_MTE3 movement instructions before executing instructions after CrossCoreWaitFlag.
+
+         // Enable atomic accumulation for UB to GM movement: moved data to atomicResult accumulates with original value and overwrites
         AscendC::SetAtomicAdd<float>(); 
-        // DataCopy is a PIPE_MTE3 pipeline operation
+        // DataCopy is PIPE_MTE3 pipeline operation
         AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);   
-        // When this AIV completes the preceding PIPE_MTE3 (DataCopy) pipeline operation, notify other AIV cores that this AIV has completed
+        // When this AIV completes preceding PIPE_MTE3 (DataCopy) pipeline operation, notify other AIV cores that this AIV has completed
         AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);  
-        // Block this AIV from continuing to execute instructions until all other AIVs have completed PIPE_MTE3 pipeline operations, then unblock and continue execution.
+        // Block this AIV from continuing to execute instructions until all other AIV cores complete PIPE_MTE3 pipeline operation, then unblock and continue
         AscendC::CrossCoreWaitFlag(0); 
 
-After the above synchronization completes, atomicResultGm now contains the accumulated value of vector computation results from 16 AIVs. At this point, data is moved from atomicResultGm to a specific AIV, and DumpTensor is used to print the data to verify whether the accumulated result meets expectations. Finally, the result from that AIV is moved out to atomicResultGm.
-If the synchronization in the previous step is inserted incorrectly, the data moved from atomicResultGm to the AIV may be the accumulated value of vector computation results from only some AIVs, resulting in inaccurate printed and written results to atomicResultGm.
+After the above synchronization completes, atomicResultGm now contains the accumulated result from all 16 AIV cores' vector computation. At this point, move data from atomicResultGm to a certain AIV, use DumpTensor to print data, check whether the accumulated result meets expectations, and finally move the result from this AIV back to atomicResultGm.
+
+If the synchronization insertion in the previous step is incorrect, the data moved from atomicResultGm to AIV may be the accumulated result from only some AIV cores' vector computation, causing inaccurate printed results and results written back to atomicResultGm.
 
         if (AscendC::GetBlockIdx() == 0) {
             AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);   // PIPE_MTE2
@@ -256,15 +274,16 @@ If the synchronization in the previous step is inserted incorrectly, the data mo
             return;
         }
 <p align="center">
-  <img src="img/纯aiv_模式0示意图.png" width="100%">
+  <img src="figures/纯aiv_模式0示意图.png" width="100%">
 </p>
 <p align="center">
-Figure 6: Pure AIV scenario, mode 0 computation logic schematic diagram
+Figure 6: Pure AIV scenario, mode 0 computation logic diagram
 </p>
 
 ### 3. Notes
+
 #### 3.1 Cube-Vector Fusion Computation Scenario
-(1) In the Cube-Vector fusion computation scenario, the fusion operator (configured with `__mix__(1,2)`) requires using ASCEND_IS_AIV/ASCEND_IS_AIC to isolate AIV and AIC core code.
+(1) In the Cube-Vector fusion computation scenario, the fusion operator (configured with __mix__(1,2)) requires code isolation between AIV and AIC cores using ASCEND_IS_AIV/ASCEND_IS_AIC.
 ```
 KernelMmad op;
 if ASCEND_IS_AIC {
@@ -276,40 +295,41 @@ if ASCEND_IS_AIV {
     op.ProcessAIV();
 }
 ```
-(2) GetBlockIdx (get the index of the current core) has different value ranges for AIC and AIV. Its values are related to the logical core count set by the operator and the ratio of AIC to AIV in an AI Core. In this example, NUM_BLOCKS=8 is set, and the ratio of AIC to AIV is 1:2, so the value ranges of GetBlockIdx for AIC and AIV are 0-7 and 0-15 respectively.
+(2) GetBlockIdx (obtain current core index) has different value ranges for AIC and AIV. Its values depend on the logical core count set for the operator and the AIC-to-AIV ratio in one AI Core. In this example, NUM_BLOCKS=8 and AIC-to-AIV ratio is 1:2, so GetBlockIdx ranges are 0-7 for AIC and 0-15 for AIV.
 
-(3) The example uses the static tensor programming paradigm and requires manual insertion of intra-core synchronization. Additionally, in the static tensor programming mode, developers must manually call the InitSocState() interface to initialize global state registers.
+(3) The example uses static tensor programming paradigm and requires manual insertion of intra-core synchronization. Additionally, in static Tensor programming mode, developers must manually call the InitSocState() interface to initialize global state registers.
 
 #### 3.2 Pure Vector Computation Scenario
-(1) When using CrossCoreSetFlag and CrossCoreWaitFlag cross-core synchronization interfaces, even in pure Vector computation scenarios, the kernel function cannot use the `__vector__` modifier.
-In this example, the kernel function uses the `__mix__(1,2)` modifier, but in pure Vector scenarios, since only vector computation is executed, the ASCEND_IS_AIV macro must be used to ensure the program runs only on AIV cores, otherwise the program will hang.
+(1) When using CrossCoreSetFlag and CrossCoreWaitFlag inter-core synchronization interfaces, even in pure Vector computation scenarios, the kernel function cannot use the __vector__ modifier.
+
+This example kernel function uses __mix__(1,2) modifier. However, in pure Vector scenarios, since only vector computation executes, you must use the ASCEND_IS_AIV macro to ensure the program runs only on AIV cores. Otherwise, the program will hang.
 ```
 if ASCEND_IS_AIV {
         op.Init(x, z, dataLength);
         op.Process();
 }
 ```
- (2) Mode 1 requires that the 2 AIVs participating in synchronization must belong to the same AI Core, otherwise the program will hang. In this example, the two AIVs participating in synchronization have GetBlockIdx=2 and 3, both belonging to the 2nd AI Core (index starting from 1); if GetBlockIdx is changed to 3 and 4 (belonging to two different AI Cores), the program will hang.
+(2) Mode 1 requires that the two AIV cores participating in synchronization must belong to the same AI Core. Otherwise, the program will hang. In this example, the two AIV cores participating in synchronization have GetBlockIdx=2 and 3, both belonging to the second AI Core (index starting from 1). If you change GetBlockIdx to 3 and 4 (belonging to two different AI Cores), the program will hang.
 
- (3) The example uses the static tensor programming paradigm and requires manual insertion of intra-core synchronization. Additionally, in the static tensor programming mode, developers must manually call the InitSocState() interface to initialize global state registers.
+(3) The example uses static tensor programming paradigm and requires manual insertion of intra-core synchronization. Additionally, in static Tensor programming mode, developers must manually call the InitSocState() interface to initialize global state registers.
 
 ## Build and Run
 
-Execute the following steps in the root directory of this example to build and run the example.
+Execute the following steps in the example root directory to build and run the example.
 
 - Configure Environment Variables  
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development toolkit on your current environment.
-  - Default path, CANN package installed by root user
+  Select the appropriate command based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on your current environment.
+  - Default path, root user installs CANN package
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
-  - Default path, CANN package installed by non-root user
+  - Default path, non-root user installs CANN package
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - Custom path install_path, CANN package installed
+  - Specified path install_path, install CANN package
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
@@ -324,26 +344,26 @@ Execute the following steps in the root directory of this example to build and r
   python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin  # Verify output correctness
   ```
 
-  To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+  For CPU debug or NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
   
-  Examples:
+  Example:
   ```bash
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU debug mode
   cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU simulation mode
   ```
-  > **Note:** Before switching build modes, clean the cmake cache by running `rm CMakeCache.txt` in the build directory and re-running cmake.
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory and re-run cmake.
 
-- Build Options Description
+- Build Option Description
 
   | Option | Available Values | Description |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU run, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `0` (default), `1`, `2` | Scenario number: 0 (Pure Vector mode 0), 1 (Pure Vector mode 1), 2 (Cube+Vector fusion) |
+  | `SCENARIO_NUM` | `0` (default), `1`, `2` | Scenario number: 0 (pure Vector mode 0), 1 (pure Vector mode 1), 2 (Cube+Vector fusion) |
 
 - Execution Result
 
-  The following output indicates successful precision comparison.
+  The following output indicates successful accuracy verification.
   ```bash
   test pass!
   ```

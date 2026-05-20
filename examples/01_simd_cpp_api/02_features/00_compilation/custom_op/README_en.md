@@ -7,7 +7,6 @@ This sample demonstrates the workflow of building, packaging into a custom opera
 ## Supported Products
 
 This sample supports the following product models:
-
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 Training Series Products/Atlas A3 Inference Series Products
 - Atlas A2 Training Series Products/Atlas A2 Inference Series Products
@@ -19,58 +18,39 @@ This sample supports the following product models:
 ## Directory Structure
 
 ```
-├── CMakeLists.txt
-├── framework
-│   ├── CMakeLists.txt
-│   ├── onnx_plugin
-│   │   ├── CMakeLists.txt
-│   │   └── leaky_relu_custom_plugin.cc
-│   └── tf_plugin
-│       ├── CMakeLists.txt
-│       └── tensorflow_add_custom_plugin.cc
-├── op_host
-│   ├── CMakeLists.txt
-│   ├── add_custom
-│   │   └── add_custom_host.cpp
-│   ├── add_custom_template
-│   │   └── add_custom_template.cpp
-│   ├── add_custom_tiling_sink
-│   │   ├── add_custom_tiling_sink.cpp
-│   │   ├── add_custom_tiling_sink_tiling.cpp
-│   │   └── add_custom_tiling_sink_tiling.h
-│   └── leaky_relu_custom
-│       └── leaky_relu_custom_host.cpp
-└── op_kernel
-    ├── CMakeLists.txt
-    ├── add_custom
-    │   ├── add_custom_kernel.cpp
-    │   └── add_custom_tiling.h
-    ├── add_custom_template
-    │   ├── add_custom_template.cpp
-    │   ├── add_custom_template_tiling.h
-    │   └── tiling_key_add_custom_template.h
-    ├── add_custom_tiling_sink
-    │   ├── add_custom_tiling_sink_kernel.cpp
-    │   └── add_custom_tiling_sink_tiling_struct.h
-    └── leaky_relu_custom
-        ├── leaky_relu_custom_kernel.cpp
-        └── leaky_relu_custom_tiling.h
+├── custom_op
+│   ├── CMakeLists.txt               // Top-level build project file
+│   ├── framework                    // Framework adapter plugin directory
+│   │   ├── CMakeLists.txt           // Framework adapter build project file
+│   │   ├── onnx_plugin              // ONNX framework adapter plugin
+│   │   └── tf_plugin                // TensorFlow framework adapter plugin
+│   ├── op_host                      // Host-side operator implementation directory
+│   │   ├── CMakeLists.txt           // Host-side build project file
+│   │   ├── add_custom               // Add operator Host implementation
+│   │   ├── add_custom_template      // Add template operator Host implementation
+│   │   ├── add_custom_tiling_sink   // Add Tiling sink operator Host implementation
+│   │   └── leaky_relu_custom        // LeakyRelu operator Host implementation
+│   └── op_kernel                    // Kernel-side operator implementation directory
+│       ├── CMakeLists.txt           // Kernel-side build project file
+│       ├── add_custom               // Add operator Kernel implementation
+│       ├── add_custom_template      // Add template operator Kernel implementation
+│       ├── add_custom_tiling_sink   // Add Tiling sink operator Kernel implementation
+│       └── leaky_relu_custom        // LeakyRelu operator Kernel implementation
 ```
 
 ## Sample Description
 
-The Add computation formula is:
+Add calculation formula:
 
 ```
 z = x + y
 ```
 
-AddCustomTilingSink, AddCustomTemplate, and Add have the same kernel function. Specifically:
+AddCustomTilingSink and AddCustomTemplate have the same kernel function as Add. Specifically:
+  - AddCustomTemplate demonstrates Tiling template programming. Added template parameters include input data type, shape, and so on. Based on template parameters, the sample implementation logic is simplified or unified. Developers can define required information in template parameters, such as input and output data types and other extension parameters.
+  - AddCustomTilingSink demonstrates the Tiling sink scenario. It registers the Tiling function to both host and device for execution through `DEVICE_IMPL_OP_OPTILING`.
 
-- AddCustomTemplate demonstrates Tiling template programming with template parameters including input data type, shape, etc. Based on template parameters, the sample implementation logic is simplified or unified. Developers can define required information in template parameters, such as input and output data types and other extended parameters.
-- AddCustomTilingSink demonstrates the Tiling sinking scenario, where the Tiling function is registered to both host and device for execution through `DEVICE_IMPL_OP_OPTILING`.
-
-The LeakyRelu computation formula is:
+LeakyRelu calculation formula:
 
 $$
 y=
@@ -79,15 +59,13 @@ x, \quad x\geq 0\\
 a*x, \quad x<0
 \end{cases}
 $$
-
 Where a is a scalar value.
 
-## Sample Specification Description
+## Sample Specifications
 
 - Add
-
   <table border="2" align="center">
-  <caption>Table 1: Add Sample Specification Description</caption>
+  <caption>Table 1: Add Sample Specifications</caption>
   <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">Add</td></tr>
   <tr><td rowspan="3" align="center">Sample Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
@@ -99,18 +77,18 @@ Where a is a scalar value.
 - AddCustomTemplate
 
   <table border="2" align="center">
-  <caption>Table 2: AddCustomTemplate Sample Specification Description</caption>
+  <caption>Table 2: AddCustomTemplate Sample Specifications</caption>
   <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">Add</td></tr>
   <tr><td rowspan="3" align="center">Sample Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td align="center">y</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Sample Output</td><td align="center">z</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">add_template_custom</td></tr>
+  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">add_custom_template</td></tr>
   <tr><td rowspan="6" align="center">Template Parameters</td><td colspan="4" align="center">template&lt;typename D_T_X, typename D_T_Y, typename D_T_Z, int TILE_NUM, int IS_SPLIT&gt;</td>
       <tr><td>D_T_X</td><td colspan="1">typename</td><td colspan="2">Data type (half, float)</td></tr>
       <tr><td>D_T_Y</td><td colspan="1">typename</td><td colspan="2">Data type (half, float)</td></tr>
       <tr><td>D_T_Z</td><td colspan="1">typename</td><td colspan="2">Data type (half, float)</td></tr>
-      <tr><td>TILE_NUM</td><td colspan="1">int</td><td colspan="2">Tile count</td></tr>
+      <tr><td>TILE_NUM</td><td colspan="1">int</td><td colspan="2">Number of tiles</td></tr>
       <tr><td>IS_SPLIT</td><td colspan="1">int</td><td colspan="2">Whether to split</td></tr>
   </tr>
   </table>
@@ -118,7 +96,7 @@ Where a is a scalar value.
 - LeakyRelu
 
   <table border="2" align="center">
-  <caption>Table 3: LeakyRelu Sample Specification Description</caption>
+  <caption>Table 3: LeakyRelu Sample Specifications</caption>
   <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">LeakyRelu</td></tr>
   <tr><td rowspan="3" align="center">Sample Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[8, 200, 1024]</td><td align="center">float</td><td align="center">ND</td></tr>
@@ -127,75 +105,63 @@ Where a is a scalar value.
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">leaky_relu_custom</td></tr>
   </table>
 
-## Code Implementation Description
+## Code Implementation Introduction
 
-- Add
+- Add</br>
+  - Kernel Implementation:</br>
+    Implemented based on the Ascend C vector computation interface `Add`.</br>
 
-  - Kernel implementation:
+  - Tiling Implementation:</br>
+    TilingData parameter design. The `AddCustomTilingData` parameters are essentially related to parallel data splitting. This sample uses two tiling parameters: `totalLength` and `tileNum`. `totalLength` indicates the data size to compute, and `tileNum` indicates the number of data blocks per core.</br>
 
-    Implemented based on the vector computation interface `Add` provided by Ascend C.
-
-  - Tiling implementation:
-
-    TilingData parameter design. The `AddCustomTilingData` parameter is essentially related to parallel data splitting. This sample uses two tiling parameters: `totalLength` and `tileNum`. `totalLength` is the size of data to be computed, and `tileNum` is the number of data blocks to be computed on each core.
-
-- AddCustomTemplate
-
-  - Kernel implementation:
-
+- AddCustomTemplate</br>
+  - Kernel Implementation:</br>
     Same as Add.
+  - Tiling Template Design:</br>
+    This sample uses five template parameters. `D_T_X`, `D_T_Y`, and `D_T_Z` are the data types of input x, input y, and output z respectively. `TILE_NUM` is the number of data blocks per core. `IS_SPLIT` indicates whether to enable data block computation. When `IS_SPLIT` is 0, `TILE_NUM` is invalid. Template parameter combination replaces traditional TilingKey.
 
-  - Tiling template design:
+  - TilingData Parameter Design:</br>
+    This sample uses one tiling parameter. `totalLength` indicates the total data size to compute across all cores.</br>
 
-    This sample uses five template parameters. `D_T_X`, `D_T_Y`, and `D_T_Z` are the data types for input x, input y, and output z respectively. `TILE_NUM` is the number of data blocks to be computed on each core. `IS_SPLIT` indicates whether to enable data block computation. When `IS_SPLIT` is 0, `TILE_NUM` is invalid. Template parameters replace the traditional TilingKey.
 
-  - TilingData parameter design:
+- AddCustomTilingSink</br>
+  - Kernel Implementation:</br>
+    Same functionality as Add. The kernel forces the sample to run in AIC and AIV mixed scenario through the `KERNEL_TASK_TYPE_DEFAULT` interface, satisfying the Tiling sink operator condition. All Tiling function logic is implemented separately in `add_custom_tiling_sink_tiling.cpp` and registered as a sink Tiling function through the `DEVICE_IMPL_OP_OPTILING` interface.</br>
 
-    This sample uses one tiling parameter. `totalLength` is the total amount of data to be computed across all cores.
+- LeakyRelu</br>
+  - Kernel Implementation:</br>
+    Implemented based on the high-level API interface `LeakyRelu`.</br>
 
-- AddCustomTilingSink
+  - Tiling Implementation:</br>
+    TilingData parameter design. The `LeakyReluCustomTilingData` parameters are essentially related to parallel data splitting. This sample uses three tiling parameters: `totalLength`, `tileNum`, and `negativeSlope`. `totalLength` and `tileNum` are similar to the Add sample. `negativeSlope` represents the negative half-axis slope coefficient of LeakyRelu, passed as a computation parameter to the kernel side.</br>
 
-  - Kernel implementation:
-
-    Same functionality as Add. The kernel specifies the sample to run in AIC and AIV hybrid scenario through the `KERNEL_TASK_TYPE_DEFAULT` interface to satisfy the Tiling sinking operator condition. All Tiling function logic is implemented separately in `add_custom_tiling_sink_tiling.cpp` and the sinking Tiling function is registered through the `DEVICE_IMPL_OP_OPTILING` interface.
-
-- LeakyRelu
-
-  - Kernel implementation:
-
-    Implemented based on the high-level API interface `LeakyRelu`.
-
-  - Tiling implementation:
-
-    TilingData parameter design. The `LeakyReluCustomTilingData` parameter is essentially related to parallel data splitting. This sample uses three tiling parameters: `totalLength`, `tileNum`, and `negativeSlope`. `totalLength` and `tileNum` are similar to the Add sample. `negativeSlope` represents the negative axis slope coefficient of LeakyRelu, passed to the kernel side as a computation parameter.
 
 ## Build and Run
 
 Execute the following steps in the sample root directory to build, package, and deploy the custom sample package.
 
-- Configure environment variables
+- Configure Environment Variables
 
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
-
-  - Default path, CANN package installed by root user
+  Select the appropriate command based on the CANN development kit [installation method](../../../../../docs/en/quick_start.md#prepare&install) on your current environment.
+  - Default path, root user installed CANN package
 
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
-  - Default path, CANN package installed by non-root user
+  - Default path, non-root user installed CANN package
 
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - Specified path install_path, CANN package installed
+  - Specified path install_path, installed CANN package
 
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
 
-- Build, package, and deploy sample
+- Build, Package, and Deploy Sample
 
   ```bash
   mkdir -p build && cd build
@@ -209,13 +175,13 @@ Execute the following steps in the sample root directory to build, package, and 
   SUCCESS
   ```
 
-## Build Cache Acceleration (Optional)
+## Cache Build Acceleration (Optional)
 
 This sample supports accelerating repeated builds through ccache, providing both local cache and distributed cache modes.
 
 ### Prerequisites
 
-- `ccache` installed, `ccache >= 4.6.1` recommended
+- `ccache` installed, recommend using `ccache >= 4.6.1`
 
   ```bash
   apt install ccache
@@ -230,9 +196,9 @@ This sample supports accelerating repeated builds through ccache, providing both
 
 ### Local Cache
 
-After enabling `-DENABLE_CCACHE=ON`, `cmake` will connect `ccache` to the build process. When source code, build commands, compiler, and build directory path are identical, repeated builds can directly reuse local cache results.
+After enabling `-DENABLE_CCACHE=ON`, `cmake` connects `ccache` to the build process. When source code, build commands, compiler, and build directory path are identical, repeated builds can directly reuse local cache results.
 
-Enable through cmake parameter without modifying CMakeLists.txt:
+Enable through cmake parameters without modifying CMakeLists.txt:
 
 ```bash
 mkdir -p build && cd build
@@ -243,7 +209,7 @@ Verify whether local cache is effective as follows:
 
 ```bash
 ccache -Cz
-# First build: write cache
+# First build: write to cache
 rm -rf build && mkdir -p build && cd build
 cmake -DENABLE_CCACHE=ON .. && make -j binary package
 cd ..
@@ -253,12 +219,12 @@ rm -rf build && mkdir -p build && cd build
 cmake -DENABLE_CCACHE=ON .. && make -j binary package
 ```
 
-After each build, view cache hit statistics through `ccache --show-stats -v`. You will see the local cache hit rate `Local storage Hits` significantly increase in the second build.
+After each build, view cache hit statistics through `ccache --show-stats -v`. You can see that the second build's local cache hit rate `Local storage Hits` increases significantly.
 
-To clear local cache, operate as follows:
+To clear the local cache, operate as follows:
 
 ```bash
-# Clear statistics only, without deleting cache content
+# Clear statistics only, do not delete cache content
 ccache -z
 
 # Clear local cache content
@@ -270,23 +236,23 @@ ccache -Cz
 
 ### Distributed Cache (ccache + Redis)
 
-Suitable for multi-machine shared cache scenarios: Machine A compiles and pushes results to Redis, Machine B can hit cache from Redis under the same source code, compilation options, and toolchain version, reducing repeated compilation.
+Suitable for multi-machine shared cache scenarios: Machine A compiles and pushes results to Redis, Machine B can hit cache from Redis under the same source code, same compilation options, and same toolchain version, reducing repeated compilation.
 
-In distributed scenarios, `ccache` uses each machine's local cache as the first-level cache and Redis as the shared second-level cache. When Machine A compiles for the first time, it calls the actual compiler and writes results to both local cache and Redis. When Machine B compiles again under the same source code, compilation commands, compiler, and build directory path, it can directly hit the shared cache from Redis, reducing repeated compilation execution. If compilers on two machines have different paths but identical content, it is recommended to set `compiler_check=content`.
+In distributed scenarios, `ccache` uses each machine's local cache as the primary cache and Redis as the shared secondary cache. When Machine A compiles for the first time, it calls the actual compiler and writes results to both local cache and Redis. When Machine B compiles again under the same source code, same build commands, same compiler, and same build directory path, it can directly hit the shared cache from Redis, reducing repeated execution of build actions. If the compiler paths of two machines differ but content is identical, recommend setting `compiler_check=content`.
+
 
 For more `ccache` configuration and cache behavior details, refer to the [ccache official documentation](https://ccache.dev/documentation.html).
 
-Network requirements:
+Network Requirements:
 
 - Machine A: First compilation machine, writes cache to Redis, IP is `<A_IP>`
 - Machine B: Second compilation machine, verifies shared cache hit from Redis, IP is `<B_IP>`
 - Machine C: Redis server, stores shared cache data, IP is `<C_IP>`
-- Machines A, B, and C must be on the same network. Both A and B machines must be able to access `C_IP:6379`
+- A, B, C machines must be on the same network. Both A and B machines must be able to access `C_IP:6379`
 
-It is recommended that Machine A and Machine B use the same source code content, compilation commands, compiler versions, and maintain consistent source code paths and build directory paths. Otherwise, cache misses may occur.
+Recommend that Machine A and Machine B use the same source code content, same build commands, same version of compiler, and maintain consistent source code path and build directory path. Otherwise, cache may not be hit.
 
 **1. Machine C: Deploy Redis Service**
-
 ```bash
 apt install redis-server
 # Start Redis service
@@ -295,27 +261,25 @@ redis-server --daemonize yes --bind 0.0.0.0 --port 6379 --requirepass <PASSWORD>
 redis-cli -h <C_IP> -p 6379 -a <PASSWORD> ping
 ```
 
-> Note: The above configuration is for controlled test environments only. For shared or production environments, it is recommended to enable access control, authentication, and network isolation.
+> Note: The above configuration is for controlled test environments only. For shared or production environments, recommend enabling access control, authentication, and network isolation.
 
 **2. Machine A / Machine B: Configure ccache**
-
 ```bash
 apt install redis-tools
 # Verify Redis connection
 redis-cli -h <C_IP> -p 6379 -a <PASSWORD> ping
-# Configure Redis as secondary storage with password authentication
+# Configure Redis as secondary storage with password authentication format
 # Format: redis://default:<PASSWORD>@<C_IP>:6379
 ccache --set-config=secondary_storage=redis://default:<PASSWORD>@<C_IP>:6379
-# Configure compiler content check to avoid cache misses due to path differences
+# Configure compiler content verification to avoid cache misses due to path differences
 ccache --set-config=compiler_check=content
 ```
 
 **3. Machine A / Machine B: Execute Build**
-
 ```bash
 ccache -Cz
 rm -rf build && mkdir -p build && cd build
 cmake -DENABLE_CCACHE=ON .. && make -j binary package
 ```
 
-Machine A's build will write to local cache and Redis. Machine B's local cache is empty and can read shared cache from Redis. After Machine A builds, execute the build on Machine B and compare the two `ccache --show-stats -v` results. You will see the remote cache hit rate `Remote storage Hits` significantly increase on Machine B.
+Machine A build writes to local cache and Redis. Machine B local cache is empty and can read shared cache from Redis. After Machine A builds, execute build on Machine B. Compare the two `ccache --show-stats -v` results to see that the remote cache hit rate `Remote storage Hits` on Machine B increases significantly.

@@ -1,10 +1,9 @@
-# Tensor API Sample Introduction
+# tensor_api Example Introduction
 
 ## Overview
 
-This sample demonstrates the implementation workflow and examples of developing samples using TENSOR_API.
+This example demonstrates the implementation process and examples of using TENSOR_API for example development.
 
-## Sample List
+## Example List
 
-| Directory Name | Description |
-| -------------- | ----------- |
+No examples available.

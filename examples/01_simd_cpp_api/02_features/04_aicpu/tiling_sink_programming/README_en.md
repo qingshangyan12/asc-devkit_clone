@@ -1,8 +1,8 @@
-# Custom Operator Tiling Sink Graph Mode Invocation Sample
+# Custom Operator Tiling Sink Graph Mode Invocation Example
 
 ## Overview
 
-This sample demonstrates how to invoke custom operators in PyTorch graph mode based on a sample custom operator project, and optimize scheduling performance by enabling Tiling sink to the device side.
+This example demonstrates calling custom operators in PyTorch graph mode based on a sample custom operator project. It enables Tiling sink to device side execution to optimize scheduling performance.
 
 ## Supported Products
 
@@ -14,25 +14,25 @@ This sample demonstrates how to invoke custom operators in PyTorch graph mode ba
 
 ```
 ├── tiling_sink_programming
-│   └── test_add_custom_tiling_sink.py
+│   └── test_add_custom_tiling_sink.py   // PyTorch graph mode Tiling sink invocation test script
 ```
 
-## Code Implementation
+## Code Implementation Introduction
 
-The sample script `test_add_custom_tiling_sink.py` consists of three key parts:
-1. Register a custom operator in PyTorch and provide placeholder implementations for Meta/CPU/PrivateUse1 to ensure it can be incorporated into the graph.
-2. Register an FX to GE converter that maps `add_custom_tiling_sink` to the GE-side custom operator `AddCustomTilingSink`.
-3. Enable graph mode execution via `torch.compile` and enable the `tiling_schedule_optimize` configuration.
+The example script `test_add_custom_tiling_sink.py` contains three key parts:
+1. Register custom operator in PyTorch and provide placeholder implementations for Meta/CPU/PrivateUse1 to ensure graph entry capability.
+2. Register FX to GE converter, mapping `add_custom_tiling_sink` to GE side custom operator `AddCustomTilingSink`.
+3. Enable graph mode execution through `torch.compile` and enable `tiling_schedule_optimize` configuration.
 
 ## Build and Run
 
 - Install PyTorch and Ascend Extension for PyTorch Plugin
 
-  Refer to the installation instructions in the [pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch) open-source repository or [Ascend Extension for PyTorch Ascend Community](https://hiascend.com/document/redirect/Pytorch-index) to select a supported `Python` version and complete the installation of `torch` and `torch-npu`.
+  Refer to the installation instructions from [pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch) open source repository or [Ascend Extension for PyTorch Community](https://hiascend.com/document/redirect/Pytorch-index). Select a supported `Python` version and corresponding release version to complete `torch` and `torch-npu` installation.
 
 - Build, Package, and Deploy Custom Operator Project
 
-  Before running this sample, navigate to the [custom operator project sample](../../00_compilation/custom_op/) directory to complete the build, packaging, and deployment.
+  Before running this example, first enter the [custom operator project example](../../00_compilation/custom_op/) directory to complete build, packaging, and deployment.
 
 - Install Prerequisites
 
@@ -42,34 +42,34 @@ The sample script `test_add_custom_tiling_sink.py` consists of three key parts:
 
 - Configure Environment Variables
 
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development toolkit on your current environment.
-  - Default path, CANN package installed by root user
+  Select the appropriate command based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on your current environment.
+  - Default path, root user installs CANN package
 
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
-  - Default path, CANN package installed by non-root user
+  - Default path, non-root user installs CANN package
 
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - Specified path install_path, CANN package installed
+  - Specified path install_path, install CANN package
 
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
 
-- Run the Sample
+- Example Execution
 
-  Execute the following steps in the root directory of this sample to run the sample.
+  Execute the following steps in the example root directory to run the example.
 
   ```bash
   python3 test_add_custom_tiling_sink.py
   ```
 
-  The following output indicates successful accuracy verification:
+  The following output indicates successful accuracy verification.
 
   ```bash
   Ran 1 test in **s
