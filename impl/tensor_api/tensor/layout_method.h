@@ -34,7 +34,7 @@ struct HasZeroIntegralConstant : Std::bool_constant<
 template <typename T, typename... Ts>
 __aicore__ inline constexpr Shape<T, Ts...> MakeShape(const T& t, const Ts&... ts)
 {
-    static_assert(!HasZeroIntegralConstant<Ts...>::value,
+    static_assert(!HasZeroIntegralConstant<T, Ts...>::value,
         "MakeShape does not accept Int<0> arguments.");
     return {t, ts...};
 }
