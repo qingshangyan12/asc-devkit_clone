@@ -4,11 +4,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="${SCRIPT_DIR}/build_and_run.log"
 echo "=== 000_cube_tests build_and_run_all $(date) ===" > "$LOG_FILE"
 
-source ~/Ascend/ascend-toolkit/set_env.sh 2>/dev/null || true
-
-SL="/home/jinhu/Ascend/cann-9.0.0-beta.2/x86_64-linux/simulator/dav-3510/lib"
-[ ! -d "$SL" ] && SL="/home/jinhu/Ascend/cann-9.1.0-beta.1/x86_64-linux/simulator/dav-3510/lib"
-
 P=0; F=0; S=0
 
 run_test() {
@@ -26,16 +21,15 @@ run_test() {
     [ -z "$exe" ] && echo "[SKIP] $n (no binary)" | tee -a "$LOG_FILE" && S=$((S+1)) && return
 
     local run_out="$d/build/run.log"
-    (cd "$d/build" && LD_LIBRARY_PATH="${SL}:${LD_LIBRARY_PATH}" "$exe" > "$run_out" 2>&1) || true
-    local csv="$d/build/${n}.csv"
-    [ -f "$csv" ] && cp "$csv" "$d/" 2>/dev/null
+    (cd "$d/build" && "$exe" > "$run_out" 2>&1) || true
+    local csv=$(find "$d/build" -name "*.csv" ! -name "run.log" | head -1)
+    [ -f "$csv" ] && cp "$d/build"/*.csv "$d/" 2>/dev/null
 
-    if grep -q "^PASS" "$d/${n}.csv" 2>/dev/null; then
+    if grep -q "^PASS" "$d"/*.csv 2>/dev/null; then
         echo "[PASS] $n" | tee -a "$LOG_FILE"; P=$((P+1))
     else
         echo "[FAIL] $n" | tee -a "$LOG_FILE"; F=$((F+1))
         echo "  stdout:"; cat "$run_out" 2>/dev/null
-        echo "  csv: $(cat "$d/${n}.csv" 2>/dev/null)"
     fi
 }
 

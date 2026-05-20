@@ -548,3 +548,16 @@ target_compile_options(cube_example PRIVATE
 
 完整的 API 参考请参见 [../../../docs/api/c_api/cube_compute/](../../../docs/api/c_api/cube_compute/) 和 [../../../docs/api/c_api/cube_datamove/](../../../docs/api/c_api/cube_datamove/)。
 完整的可运行示例请参见 [examples/cube_example.md](examples/cube_example.md)。
+
+
+# 测试方法
+1. 不同类型api测试方法
+
+    | api类型 | 对应头文件           | 测试方法                              |
+    |-------|-----------------|-----------------------------------|
+    | 搬运类   | cube_datamove.h | 测试搬入搬出后的数据是否一致，无需计算，只要搬入和搬出然后比较数据 |
+    | 计算类   | cube_compute.h  | 测试和cpu计算真值是否一致                    |
+2. 测试完备性  
+    对于接口所覆盖的数据类型和不同的重载版本均要覆盖
+3. 对于当前CANN版本不支持的数据类型，总结并保存到测试报告中，并把对应的测试用例标记出来
+4. 用例可读性：测试用例代码要清晰明了，关键时候把每一步对应的含义注释清楚，调用接口处，可以把对应的接口签名注释出来。
