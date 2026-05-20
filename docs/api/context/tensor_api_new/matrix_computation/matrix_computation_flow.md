@@ -1,5 +1,10 @@
 # 矩阵计算流程
 
+矩阵计算流程包含基础计算链路和具体 Mmad 调用说明。基础链路可参考以下文档：
+
+- [普通矩阵计算流程](normal_matrix_compute_flow.md)
+- [4选2稀疏矩阵计算流程](sparse_4to2_matrix_compute_flow.md)
+
 ## 产品支持情况
 
 | 产品 | 是否支持 |

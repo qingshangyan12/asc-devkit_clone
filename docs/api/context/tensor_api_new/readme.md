@@ -16,8 +16,9 @@ Tensor API 当前主要包含以下能力：
 - 矩阵计算：使用 `Mmad` 或 `MakeMmad` 构造的 `MmadAtom`，完成 L0A 与 L0B 输入、L0C 输出的矩阵乘加计算。
 - 张量基础结构：使用 `MakeMemPtr`、`MakeFrameLayout`、`MakeLayout`、`MakeTensor`、`Slice` 等接口描述内存位置、数据排布、形状、步长和切片。
 
-## 文档索 引
+## 文档索引
 
+- [目录导览](directory_guide.md)
 - [tensor_api_list](tensor_api_list.md)
 - [数据搬运导览](data_movement/data_movement_overview.md)
 - [GM到L1数据搬运](data_movement/gm_to_l1_data_movement.md)
@@ -28,6 +29,9 @@ Tensor API 当前主要包含以下能力：
 - [L1到UB数据搬运](data_movement/l1_to_ub_data_movement.md)
 - [L0C到GM数据搬运](data_movement/l0c_to_gm_data_movement.md)
 - [L0C到UB数据搬运](data_movement/l0c_to_ub_data_movement.md)
+- [矩阵计算概述](matrix_computation/overview.md)
+- [矩阵计算单元](matrix_computation/matrix_compute_unit.md)
 - [矩阵计算流程](matrix_computation/matrix_computation_flow.md)
+- [矩阵计算分形介绍](matrix_computation/fractal_format_overview.md)
 - [普通矩阵计算](matrix_computation/normal_matrix_computation.md)
 - [MX矩阵计算](matrix_computation/mx_matrix_computation.md)
