@@ -61,13 +61,13 @@
 
 头文件路径为: "basic_api/kernel_operator_block_sync_intf.h"
 
-SetFlag/WaitFlag接口用于多流水间的同步：如下[图1](#zh-cn_topic_0000002511125384_fig58242463299)所示，同一核内不同流水线之间的同步指令，具有数据依赖的不同流水指令之间需要插入此同步。
+SetFlag/WaitFlag接口用于多流水间的同步：如下图1所示，同一核内不同流水线之间的同步指令，具有数据依赖的不同流水指令之间需要插入此同步。
 
 - SetFlag：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。SetFlag 只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。
 - WaitFlag：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
 
 **图 1**  SetFlag/WaitFlag接口功能示意图<a name="zh-cn_topic_0000002511125384_fig58242463299"></a>  
-![](../../../../figures/setflag_waitflag.png "SetFlag-WaitFlag接口")
+![](../../../../figures/setflag_waitflag_multi_pipeline_sync.png "SetFlag_WaitFlag_多流水同步示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -92,7 +92,12 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先执行、目标流水中的指令后执行。例如MTE2\_V，代表PIPE\_MTE2为源流水，PIPE\_V为目标流水，标识从PIPE\_MTE2到PIPE\_V的同步，PIPE\_V等待PIPE\_MTE2。由于芯片代际间的差异，不同芯片上的事件会存在差异。
 
 <cann-filter npu-type="910b">
+
 Atlas A2/A3系列产品支持的HardEvent枚举值情况见[所有合法的核内同步组合](核内同步能力概述.md#zh-cn_topic_0000002542725361_table13753342164113)。
+
+</cann-filter>
+
+
 
 ## 数据类型
 

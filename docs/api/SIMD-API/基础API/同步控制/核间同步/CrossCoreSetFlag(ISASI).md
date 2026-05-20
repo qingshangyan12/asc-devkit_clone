@@ -76,7 +76,7 @@
 每个模式的具体执行逻辑与细节可以参考[关键特性说明](关键特性说明-64.md#ZH-CN_TOPIC_0000002586300741)。
 
 **图 1**  同步控制模式示意图<a name="fig37581010773"></a>  
-![](../../../../figures/同步控制模式示意图.png "同步控制模式示意图")
+![](../../../../figures/sync_control_mode_diagram.png "同步控制模式示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -144,7 +144,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 
         针对同一flagId在核AIV 1-1上分别用于模式2与模式1同步的需求，可采用添加反向同步的方案。
     **图 1**  错误示范\(前序同步未完成时，AIV的同一个flagId切换模式\)<a name="zh-cn_topic_0000002515548548_fig195023213613"></a>  
-![](figures/2-8-3-3-6.png)
+![](../../../../figures/flag_id_switch_mode_error.png)
 
     （2）对于不同的核，可以直接将同一flagId用于不同的核间同步模式，具体包括以下2种场景：
 

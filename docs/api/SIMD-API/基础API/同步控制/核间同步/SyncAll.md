@@ -119,7 +119,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 | 参数名 | 描述 |
 | --- | --- |
 | isAIVOnly | 控制SyncAll作用于纯Vector算子或融合（Cube和Vector融合）算子。可选值：<br>&bull; **true**（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。<br>&bull; **false**：融合算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。 |
-| config | 控制SyncAll函数的行为，在多个AI Core之间进行流水线同步时，指定哪些管道（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个管道用于"发送触发信号"。<br>&bull; **waitPipe**：指定哪个管道用于"接收等待信号"。<br>默认为SyncAllConfig DEFAULT_SYNC_ALL_CONFIG= {PIPE_ALL, PIPE_ALL}，使用全部管道来进行触发和等待行为。<br>该参数仅支持如下型号：<br>Ascend 950PR/Ascend 950DT |
+| <cann-filter npu-type="950"> config | 该参数仅支持如下型号:Ascend 950PR/Ascend 950DT。<br>控制SyncAll函数的行为，在多个AI Core之间进行流水线同步时，指定哪些管道（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个管道用于"发送触发信号"。<br>&bull; **waitPipe**：指定哪个管道用于"接收等待信号"。<br>默认为SyncAllConfig DEFAULT_SYNC_ALL_CONFIG= {PIPE_ALL, PIPE_ALL}，使用全部管道来进行触发和等待行为。</cann-filter> |
 
 **表 2**  参数说明
 

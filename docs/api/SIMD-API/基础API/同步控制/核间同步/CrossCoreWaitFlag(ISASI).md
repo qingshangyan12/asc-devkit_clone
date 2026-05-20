@@ -106,7 +106,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
         如图1所示，AIC 1的flagId 0同时用于进行模式2 \(AIV执行CrossCoreSetFlag\)和模式0\(所有AIC\)的核间同步。AIC 1在调用CrossCoreWaitFlag的时候，读取flagId=0的计数器，此时该计数器的值变化可能是由于模式0或模式2同步完成。AIC 1感知不到具体是哪个模式，只能感知到计数器值变化，能够解除阻塞。
 
         **图 1**  错误示范\(连续使用CrossWaitFlag等待不同模式\)<a name="zh-cn_topic_0000002547028479_fig208671330144620"></a>  
-        ![](figures/2-8-3-4-6.png)
+        ![](../../../../figures/cross_wait_flag_multi_mode_error.png)
 
 -   使用该接口模式0时，建议开启batchmode模式，使算子独占全部所需核资源，否则可能因满足以下条件导致死锁：
 
