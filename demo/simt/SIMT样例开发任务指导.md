@@ -13,7 +13,7 @@
 本次包含三个开发任务：
 
 - 任务一：参考`basic_scatter`实现一维Gather算子，理解“按索引离散读取、连续写输出”的SIMT实现方式。
-- 任务二：参考`basic_scatter`将SIMT编程样例改造成SIMD与SIMT混合编程样例，理解SIMT编程和混合编程的差异。
+- 任务二：参考`basic_scatter`将SIMT编程样例改造成SIMD&SIMT混合编程样例，理解SIMT编程和SIMD&SIMT混合编程的差异。
 - 任务三：改写Scatter算子为固定shape版本，只支持`input_length = 2048`、`output_length = 4096`，并通过调整`blockDim`、`gridDim`观察性能变化。
 
 每个用户都需要新建自己的样例路径，不要直接修改公共的`basic_scatter`目录，也不要复用其他用户已经创建的样例路径。建议使用“样例名_姓名拼音”的方式命名各自任务代码路径，例如：
@@ -131,13 +131,13 @@ make -j
 - 输出包含`[Success] Case accuracy is verification passed.`。
 - `README.md`说明Gather功能、输入输出规格、编译运行方式和预期输出。
 
-## 任务二：将basic_scatter demo改造成混合编程方式
+## 任务二：将basic_scatter demo改造成SIMD&SIMT混合编程
 
 ### 任务目标
 
-参考`basic_scatter`样例，将样例改造成SIMD与SIMT混合编程风格。该任务的重点不是改变Scatter算法，而是理解SIMT编程和SIMD&SIMT混合编程的差异。
+参考`basic_scatter`样例，将样例改造成SIMD&SIMT混合编程。该任务的重点不是改变Scatter算法，而是理解SIMT编程和SIMD&SIMT混合编程的差异。
 
-建议先复制`basic_scatter`作为起点，再在新目录中进行混合编程改造，避免直接修改原始样例。
+建议先复制`basic_scatter`作为起点，再在新目录中进行SIMD&SIMT混合编程改造，避免直接修改原始样例。
 
 ```bash
 cd demo/simt
@@ -145,7 +145,7 @@ cp -r basic_scatter mixed_scatter_<姓名拼音>
 cd mixed_scatter_<姓名拼音>
 ```
 
-当前`basic_scatter`使用的是SIMT编程方式：
+当前`basic_scatter`使用的是SIMT编程：
 
 ```cpp
 __global__ __launch_bounds__(MAX_THREAD_COUNT) void scatter_custom(...)
@@ -153,28 +153,28 @@ __global__ __launch_bounds__(MAX_THREAD_COUNT) void scatter_custom(...)
 scatter_custom<<<numBlocks, thread_num_per_block, dyn_ubuf_size, stream>>>(...);
 ```
 
-混合编程方式中，SIMT逻辑通常拆为两层：
+SIMD&SIMT混合编程中，SIMT逻辑通常拆为两层：
 
 - `__simt_vf__`函数：承载SIMT线程级计算逻辑。
-- `__global__ __vector__`混合编程入口函数：作为Device侧入口，通过`asc_vf_call`调用SIMT VF。
+- `__global__ __vector__` SIMD&SIMT混合编程入口函数：作为Device侧入口，通过`asc_vf_call`调用SIMT VF。
 
 ### 改造思路
 
 1. 保留Host侧ACL流程、输入输出数据构造和结果校验。
 2. 将原`scatter_custom`中的线程级计算逻辑移动到SIMT VF函数中。
 3. 为Global Memory指针参数增加`__gm__`修饰。
-4. 新增混合编程入口核函数，在入口核函数中通过`asc_vf_call`调用SIMT VF。
-5. 调整Host侧Kernel launch参数。SIMT编程使用4段启动参数；混合编程入口使用3段启动参数：
+4. 新增SIMD&SIMT混合编程入口核函数，在入口核函数中通过`asc_vf_call`调用SIMT VF。
+5. 调整Host侧Kernel launch参数。SIMT编程使用4段启动参数；SIMD&SIMT混合编程入口使用3段启动参数：
 
 ```cpp
 // SIMT编程入口
 scatter_custom<<<numBlocks, thread_num_per_block, dyn_ubuf_size, stream>>>(...);
 
-// 混合编程入口
+// SIMD&SIMT混合编程入口
 scatter_custom<<<numBlocks, dyn_ubuf_size, stream>>>(...);
 ```
 
-6. 调整CMake编译选项。SIMT编程样例中使用`--enable-simt`；改为混合编程形态后，通常需要从ASC编译选项中移除`--enable-simt`。
+6. 调整CMake编译选项。SIMT编程样例中使用`--enable-simt`；改为SIMD&SIMT混合编程后，通常需要从ASC编译选项中移除`--enable-simt`。
 
 ### 代码骨架参考
 
@@ -215,7 +215,7 @@ __global__ __vector__ void scatter_custom(
 
 建议每完成一个小步骤就编译一次：
 
-1. 只增加头文件和空的混合编程入口，确认编译器能识别相关关键字。
+1. 只增加头文件和空的SIMD&SIMT混合编程入口，确认编译器能识别相关关键字。
 2. 移动原SIMT计算逻辑到`__simt_vf__`函数，确认编译通过。
 3. 改Host侧Kernel launch参数，确认程序能够启动。
 4. 运行默认用例，确认结果校验通过。
@@ -226,7 +226,7 @@ __global__ __vector__ void scatter_custom(
 - 编译通过。
 - 运行结果和原`basic_scatter`一致。
 - 输出包含`[Success] Case accuracy is verification passed.`。
-- 文档说明纯SIMT直调和混合编程入口的差异。
+- 文档说明SIMT编程和SIMD&SIMT混合编程入口的差异。
 
 ## 任务三：固定shape scatter性能调优
 
@@ -400,7 +400,7 @@ msprof op --help
 
 ## 对外资料链接
 
-- Ascend C SIMD与SIMT混合编程：<https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_10_10052.html>
+- Ascend C SIMD&SIMT混合编程：<https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_10_10052.html>
 - Ascend C SIMT线程架构：<https://www.hiascend.com/document/detail/zh/canncommercial/900/programug/Ascendcopdevg/atlas_ascendc_10_10065.html>
 - Ascend C SIMT内存层级和`launch_bounds`相关说明：<https://www.hiascend.com/document/detail/zh/canncommercial/900/programug/Ascendcopdevg/atlas_ascendc_10_10066.html>
 - SIMT语言扩展层C API：<https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_10_10056.html>
