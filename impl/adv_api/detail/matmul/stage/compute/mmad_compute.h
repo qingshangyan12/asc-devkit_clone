@@ -73,7 +73,11 @@ public:
                 mmadParams.disableGemv = true;
             }
 #endif
-            Mmad(cMatrix, l0A, l0B, mmadParams);
+            if constexpr (HasScalePosition<A_TYPE>::value) {
+                MmadMx(cMatrix, l0A, l0B, mmadParams);
+            } else {
+                Mmad(cMatrix, l0A, l0B, mmadParams);
+            }
         }
 
         if ((mmadM / ALIGN_NUM) * (mmadN / ALIGN_NUM) < LIMIT_MNSIZE) { // add pipe_M required by aicore

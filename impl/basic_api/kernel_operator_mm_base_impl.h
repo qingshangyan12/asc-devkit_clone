@@ -568,7 +568,8 @@ __aicore__ inline void MmadMxImpl(
         cmatrixSource = false;
     } else {
         ASCENDC_ASSERT((false), {
-            KERNEL_LOG(KERNEL_ERROR, "Failed to check bias tensor position in Mmad, supported positions are CO1 or C2");
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check bias tensor position in MmadMx, supported positions are CO1 or C2");
         });
     }
     MmadCal(
