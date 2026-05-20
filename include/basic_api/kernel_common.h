@@ -67,7 +67,18 @@ template <auto funcPtr, typename... Args> __aicore__ inline void asc_vf_call(Arg
 #if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V1) || defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
 #endif
+#endif
 
+#ifdef ASCENDC_DEBUG
+#ifdef SPLIT_CORE_CUBE
+__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_cubeTPipePtr == nullptr;
+#elif defined(SPLIT_CORE_VEC)
+__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_vecTPipePtr == nullptr;
+#else
+__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr == nullptr;
+#endif
+__BLOCK_LOCAL__ __inline__ uint64_t g_lastTpipeInitPos = 0;
+#else // end ASCENDC_DEBUG
 #ifdef SPLIT_CORE_CUBE
 __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_cubeTPipePtr;
 #elif defined(SPLIT_CORE_VEC)
@@ -75,9 +86,7 @@ __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_vecTPipePtr;
 #else
 __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 #endif
-#else
-__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
-#endif
+#endif // end ASCENDC_DEBUG
 
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
 __BLOCK_LOCAL__ __inline__ uint64_t g_maskCount;
@@ -97,14 +106,10 @@ __aicore__ AscendC::TPipe* GetTPipePtr();
 #else
 __aicore__ inline AscendC::TPipe* GetTPipePtr()
 {
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
 #ifdef SPLIT_CORE_CUBE
     return g_cubeTPipePtr;
 #elif defined(SPLIT_CORE_VEC)
     return g_vecTPipePtr;
-#else
-    return g_tPipePtr;
-#endif
 #else
     return g_tPipePtr;
 #endif
