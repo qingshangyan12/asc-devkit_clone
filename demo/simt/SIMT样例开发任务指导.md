@@ -13,8 +13,8 @@
 本次包含三个开发任务：
 
 - 任务一：参考`basic_scatter`实现一维Gather算子，理解“按索引离散读取、连续写输出”的SIMT实现方式。
-- 任务二：参考`basic_scatter`将纯SIMT直调样例改造成SIMD与SIMT混合编程样例，理解纯SIMT入口和混合编程入口的差异。
-- 任务三：改写Scatter算子为固定shape版本，只支持`input_length = 2048`、`output_length = 4096`，并通过调整`blockDim`、`gridDim`、`__launch_bounds__`等参数观察性能变化。
+- 任务二：参考`basic_scatter`将SIMT编程样例改造成SIMD与SIMT混合编程样例，理解SIMT编程和混合编程的差异。
+- 任务三：改写Scatter算子为固定shape版本，只支持`input_length = 2048`、`output_length = 4096`，并通过调整`blockDim`、`gridDim`观察性能变化。
 
 每个用户都需要新建自己的样例路径，不要直接修改公共的`basic_scatter`目录，也不要复用其他用户已经创建的样例路径。建议使用“样例名_姓名拼音”的方式命名各自任务代码路径，例如：
 
@@ -131,11 +131,11 @@ make -j
 - 输出包含`[Success] Case accuracy is verification passed.`。
 - `README.md`说明Gather功能、输入输出规格、编译运行方式和预期输出。
 
-## 任务二：参考basic_scatter将纯SIMT改造成混合编程
+## 任务二：将basic_scatter demo改造成混合编程方式
 
 ### 任务目标
 
-参考`basic_scatter`的纯SIMT直调实现，将样例改造成SIMD与SIMT混合编程风格。该任务的重点不是改变Scatter算法，而是理解纯SIMT入口和混合编程入口的差异。
+参考`basic_scatter`样例，将样例改造成SIMD与SIMT混合编程风格。该任务的重点不是改变Scatter算法，而是理解SIMT编程和SIMD&SIMT混合编程的差异。
 
 建议先复制`basic_scatter`作为起点，再在新目录中进行混合编程改造，避免直接修改原始样例。
 
@@ -145,7 +145,7 @@ cp -r basic_scatter mixed_scatter_<姓名拼音>
 cd mixed_scatter_<姓名拼音>
 ```
 
-当前`basic_scatter`使用的是纯SIMT直调形式：
+当前`basic_scatter`使用的是SIMT编程方式：
 
 ```cpp
 __global__ __launch_bounds__(MAX_THREAD_COUNT) void scatter_custom(...)
@@ -153,7 +153,7 @@ __global__ __launch_bounds__(MAX_THREAD_COUNT) void scatter_custom(...)
 scatter_custom<<<numBlocks, thread_num_per_block, dyn_ubuf_size, stream>>>(...);
 ```
 
-混合编程形态中，SIMT逻辑通常拆为两层：
+混合编程方式中，SIMT逻辑通常拆为两层：
 
 - `__simt_vf__`函数：承载SIMT线程级计算逻辑。
 - `__global__ __vector__`混合编程入口函数：作为Device侧入口，通过`asc_vf_call`调用SIMT VF。
@@ -164,25 +164,23 @@ scatter_custom<<<numBlocks, thread_num_per_block, dyn_ubuf_size, stream>>>(...);
 2. 将原`scatter_custom`中的线程级计算逻辑移动到SIMT VF函数中。
 3. 为Global Memory指针参数增加`__gm__`修饰。
 4. 新增混合编程入口核函数，在入口核函数中通过`asc_vf_call`调用SIMT VF。
-5. 调整Host侧Kernel launch参数。纯SIMT直调使用4段启动参数；混合编程入口使用3段启动参数：
+5. 调整Host侧Kernel launch参数。SIMT编程使用4段启动参数；混合编程入口使用3段启动参数：
 
 ```cpp
-// 纯SIMT直调
+// SIMT编程入口
 scatter_custom<<<numBlocks, thread_num_per_block, dyn_ubuf_size, stream>>>(...);
 
 // 混合编程入口
 scatter_custom<<<numBlocks, dyn_ubuf_size, stream>>>(...);
 ```
 
-6. 调整CMake编译选项。纯SIMT直调样例中使用`--enable-simt`；改为混合编程形态后，通常需要从ASC编译选项中移除`--enable-simt`。
+6. 调整CMake编译选项。SIMT编程样例中使用`--enable-simt`；改为混合编程形态后，通常需要从ASC编译选项中移除`--enable-simt`。
 
 ### 代码骨架参考
 
 以下骨架用于说明改造方向，实际参数列表以样例代码为准。
 
 ```cpp
-#include "kernel_operator.h"
-#include "simt_api/asc_simt.h"
 
 template <typename type_data, typename type_idx>
 __simt_vf__ __launch_bounds__(MAX_THREAD_COUNT) inline void simt_scatter_custom_kernel(
@@ -196,10 +194,7 @@ __simt_vf__ __launch_bounds__(MAX_THREAD_COUNT) inline void simt_scatter_custom_
     uint32_t stride = gridDim.x * blockDim.x;
 
     for (uint32_t i = begin; i < input_length; i += stride) {
-        type_idx scatter_index = index[i];
-        if (scatter_index >= 0 && static_cast<uint32_t>(scatter_index) < output_length) {
-            output[static_cast<uint32_t>(scatter_index)] = input[i];
-        }
+        //TODO
     }
 }
 
@@ -237,7 +232,7 @@ __global__ __vector__ void scatter_custom(
 
 ### 任务目标
 
-改写当前Scatter算子，只支持固定shape，并围绕`blockDim`、`gridDim`、`__launch_bounds__`等参数进行性能调试。固定shape定义如下：
+改写当前Scatter算子，只支持固定shape，并围绕`blockDim`、`gridDim`两个参数进行性能调试。固定shape定义如下：
 
 ```text
 input_length = 2048
@@ -264,22 +259,15 @@ cd fixed_shape_scatter_<姓名拼音>
 - Host侧始终构造`input_length = 2048`、`output_length = 4096`的测试数据。
 - 保留`index`无重复生成逻辑，避免多个线程写同一输出位置导致校验不稳定。
 - 保留CPU Golden校验。
-- 输出日志打印固定shape、`gridDim`、`blockDim`和`launch_bounds`配置。
+- 输出日志打印固定shape、`gridDim`和`blockDim`配置。
 
 ### 性能调试参数
 
 建议将待调参数集中为常量或CMake宏，便于多次编译对比：
 
 ```cpp
-constexpr uint32_t LAUNCH_BOUND = 256;
 constexpr uint32_t THREAD_NUM_PER_BLOCK = 256;
 constexpr uint32_t GRID_DIM = 8;
-```
-
-核函数定义：
-
-```cpp
-__global__ __launch_bounds__(LAUNCH_BOUND) void scatter_custom(...)
 ```
 
 Kernel启动：
@@ -290,13 +278,13 @@ scatter_custom<<<GRID_DIM, THREAD_NUM_PER_BLOCK, dyn_ubuf_size, stream>>>(...);
 
 建议先测试以下组合：
 
-| 轮次 | `__launch_bounds__` | `blockDim` | `gridDim` | 说明 |
-|---|---:|---:|---:|---|
-| 1 | 128 | 128 | 16 | 较小线程块，寄存器压力较低 |
-| 2 | 256 | 256 | 8 | 常用起点 |
-| 3 | 512 | 512 | 4 | 更大线程块，检查吞吐和寄存器压力 |
-| 4 | 1024 | 1024 | 2 | 线程块更大，观察是否收益下降 |
-| 5 | 2048 | 2048 | 1 | 单Block覆盖全部输入元素 |
+| 轮次 | `blockDim` | `gridDim` | 说明 |
+|---|---:|---:|---|
+| 1 | 128 | 16 | 较小线程块，观察基础并行性能 |
+| 2 | 256 | 8 | 常用起点 |
+| 3 | 512 | 4 | 更大线程块，检查吞吐变化 |
+| 4 | 1024 | 2 | 线程块更大，观察是否收益下降 |
+| 5 | 2048 | 1 | 单Block覆盖全部输入元素 |
 
 注意：SIMT线程总数为`gridDim * blockDim`。对于固定输入长度2048，线程总数等于或略大于2048即可覆盖所有元素；如果使用grid-stride循环，线程总数小于2048也能覆盖，但单线程会处理多个元素。
 
@@ -304,13 +292,13 @@ scatter_custom<<<GRID_DIM, THREAD_NUM_PER_BLOCK, dyn_ubuf_size, stream>>>(...);
 
 每次调整参数后，记录编译、运行和msprof结果。建议使用如下表格：
 
-| 轮次 | `__launch_bounds__` | `blockDim` | `gridDim` | 端到端耗时 | Kernel耗时 | 校验结果 | 备注 |
-|---|---:|---:|---:|---:|---:|---|---|
-| 1 | 128 | 128 | 16 | 待填写 | 待填写 | pass/fail |  |
-| 2 | 256 | 256 | 8 | 待填写 | 待填写 | pass/fail |  |
-| 3 | 512 | 512 | 4 | 待填写 | 待填写 | pass/fail |  |
-| 4 | 1024 | 1024 | 2 | 待填写 | 待填写 | pass/fail |  |
-| 5 | 2048 | 2048 | 1 | 待填写 | 待填写 | pass/fail |  |
+| 轮次 | `blockDim` | `gridDim` | 端到端耗时 | Kernel耗时 | 校验结果 | 备注 |
+|---|---:|---:|---:|---:|---|---|
+| 1 | 128 | 16 | 待填写 | 待填写 | pass/fail |  |
+| 2 | 256 | 8 | 待填写 | 待填写 | pass/fail |  |
+| 3 | 512 | 4 | 待填写 | 待填写 | pass/fail |  |
+| 4 | 1024 | 2 | 待填写 | 待填写 | pass/fail |  |
+| 5 | 2048 | 1 | 待填写 | 待填写 | pass/fail |  |
 
 性能比较时先保证所有轮次校验通过，再比较耗时。若校验失败，该轮性能数据不作为有效结论。
 
@@ -404,8 +392,7 @@ msprof op --help
 ### 调优建议
 
 - 先固定shape和数据生成逻辑，不要同时调整功能和性能参数。
-- 每次只调整一个变量，例如只改`blockDim`，保持`gridDim`和`launch_bounds`不变。
-- `__launch_bounds__`应不小于实际启动的`blockDim`。
+- 每次只调整一个变量，例如只改`blockDim`并保持`gridDim`不变，或只改`gridDim`并保持`blockDim`不变。
 - 线程数过少会导致单线程处理多个元素，可能降低并行度。
 - 线程数过多可能增加调度开销，且线程块越大，每个线程可用寄存器可能越少。
 - Scatter是离散写场景，性能可能主要受Global Memory写入模式、Data Cache命中和写冲突影响；本任务通过无重复index避免写冲突干扰。
