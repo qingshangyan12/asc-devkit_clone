@@ -20,6 +20,7 @@
 ## 算子描述
 - 算子功能：  
   在进行非对齐数据搬运时，使用nddma搬运减少搬运指令的条数
+
 - 算子规格：
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="3" align="center">AIC算子</td></tr>
