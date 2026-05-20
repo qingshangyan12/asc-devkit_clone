@@ -115,7 +115,7 @@ $dst_i = src0_i + src1_i$
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](高维切分.md#ZH-CN_TOPIC_0000002556644319)。 |
 | repeatParams | 输入 | 控制操作数地址步长的参数。[BinaryRepeatParams](BinaryRepeatParams.md#ZH-CN_TOPIC_0000002556764281)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](高维切分.md#zh-cn_topic_0000002516372540_li072713185916)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](高维切分.md#zh-cn_topic_0000002516372540_zh-cn_topic_0000002267504656_zh-cn_topic_0000001764162593_li1481335103413)。 |
 
-## 数据类型<a name="zh-cn_topic_0000002530007180_section4219135304818"></a>
+## 数据类型
 
 <cann-filter npu-type="950">
 
