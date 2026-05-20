@@ -2,9 +2,9 @@
 
 ## Overview
 
-This example demonstrates how to obtain the global TPipe pointer using the GetTPipePtr interface and perform TPipe-related operations through that pointer.
+This example uses the GetTPipePtr interface to obtain a global TPipe pointer and perform TPipe-related operations through that pointer.
 
-> **Note:** This example only applies to the programming model based on TPipe and TQue.
+> **Note:** This example applies only to programming models based on TPipe and TQue.
 
 ## Supported Products
 
@@ -16,30 +16,30 @@ This example demonstrates how to obtain the global TPipe pointer using the GetTP
 
 ```
 ├── get_tpipe_ptr
-│   ├── CMakeLists.txt          // Build configuration file
+│   ├── CMakeLists.txt          // Build project file
 │   └── get_tpipe_ptr.asc       // Ascend C example implementation & invocation example
 ```
 
 ## Example Description
 
-- Example functionality
+- Example Functionality
 
-  When creating a TPipe object, the object initialization sets a globally unique TPipe pointer. This example calls the GetTPipePtr interface to obtain this pointer, allowing the kernel function to perform TPipe-related operations without explicitly passing the TPipe pointer. The following code snippets demonstrate examples of calling and not calling the GetTPipePtr interface.
+  When creating a TPipe object, the object initialization sets a globally unique TPipe pointer. This example calls the GetTPipePtr interface to obtain that pointer. The kernel function can perform TPipe-related operations without explicitly passing the TPipe pointer. The following shows code snippets with and without calling the GetTPipePtr interface.
 
-  **Calling the GetTPipePtr interface**
+  **Calling GetTPipePtr Interface**
 
   ```cpp
   class KernelAdd {
       // No TPipe member variable
 
-      __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength, uint32_t tileNum)
+      __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, uint32_t totalLength, uint32_t tileNum)
       {
-          // Call GetTPipePtr to get TPipe pointer and use it
+          // Call GetTPipePtr to obtain TPipe pointer and use it
           GetTPipePtr()->InitBuffer(inQueueX, BUFFER_NUM, this->tileLength * sizeof(float));
       }
   };
 
-  __global__ __vector__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData tiling)
+  __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AddCustomTilingData tiling)
   {
       // No need to explicitly pass TPipe pointer
       KernelAdd op;
@@ -48,22 +48,22 @@ This example demonstrates how to obtain the global TPipe pointer using the GetTP
   }
   ```
 
-  **Not calling the GetTPipePtr interface (kernel function explicitly passes TPipe pointer)**
+  **Not Calling GetTPipePtr Interface (Explicitly Passing TPipe Pointer to Kernel Function)**
 
   ```cpp
   class KernelAdd {
       AscendC::TPipe* pipe;  // Requires TPipe pointer member variable
 
-      __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength, uint32_t tileNum, AscendC::TPipe* pipeIn)
+      __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, uint32_t totalLength, uint32_t tileNum, AscendC::TPipe* pipeIn)
       {
           pipe = pipeIn;
           pipe->InitBuffer(inQueueX, BUFFER_NUM, this->tileLength * sizeof(float));
       }
   };
 
-  __global__ __vector__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, AddCustomTilingData tiling)
+  __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AddCustomTilingData tiling)
   {
-      // Need to explicitly pass TPipe pointer
+      // Must explicitly pass TPipe pointer
       AscendC::TPipe pipe;
       KernelAdd op;
       op.Init(x, y, z, tiling.totalLength, tiling.tileNum, &pipe);
@@ -71,7 +71,7 @@ This example demonstrates how to obtain the global TPipe pointer using the GetTP
   }
   ```
 
-- Example specifications
+- Example Specifications
 
   <table>
     <tr>
@@ -102,85 +102,82 @@ This example demonstrates how to obtain the global TPipe pointer using the GetTP
       <td align="center">ND</td>
     </tr>
     <tr>
-      <td align="center">Kernel Name</td>
+      <td align="center">Kernel Function Name</td>
       <td colspan="4" align="center">get_tpipe_ptr_custom</td>
     </tr>
   </table>
 
-- Example implementation
+- Example Implementation
 
-  - Kernel implementation
+  - Kernel Implementation
 
-    - Calls the GetTPipePtr interface to obtain the global TPipe pointer.
+    - Call the GetTPipePtr interface to obtain the global TPipe pointer.
 
-    - Calls the TPipe::InitBuffer interface to allocate memory space for TQue.
+    - Call the TPipe::InitBuffer interface to allocate memory space for TQue.
 
-    - Calls the DataCopy basic API to transfer data from GM (Global Memory) to UB (Unified Buffer).
+    - Call the DataCopy basic API to move data from GM (Global Memory) to UB (Unified Buffer).
 
-    - Calls the Add interface to perform addition operation on two input tensors.
+    - Call the Add interface to perform addition on two input tensors.
 
-    - Calls the DataCopy basic API to transfer the computation result from UB (Unified Buffer) to GM (Global Memory).
+    - Call the DataCopy basic API to move computation results from UB (Unified Buffer) to GM (Global Memory).
 
-  - Invocation implementation
+  - Invocation Implementation
 
-    Uses the kernel call operator <<<>>> to invoke the kernel function.
+    Use the kernel invocation operator `<<<>>>` to call the kernel function.
 
 ## Build and Run
 
-Execute the following steps in the root directory of this example to build and run the example.
+Execute the following steps in the example root directory to build and run the example.
 
-- Configure environment variables
+- Configure Environment Variables
 
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on your current environment.
-
-  - Default path, CANN package installed by root user
+  Select the appropriate command based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on your current environment.
+  - Default path, root user installs CANN package
 
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
-  - Default path, CANN package installed by non-root user
+  - Default path, non-root user installs CANN package
 
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - Specified path install_path, CANN package installed
+  - Specified path install_path, install CANN package
 
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
 
-- Execute the example
+- Example Execution
 
   ```bash
   mkdir -p build && cd build;      # Create and enter build directory
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # Build project, default npu mode
-  ./demo                           # Execute the compiled executable to run the example
+  ./demo                           # Execute the compiled executable program
   ```
 
-  When using CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
-  Examples:
-
+  For CPU debug or NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+  
+  Example:
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # CPU debug mode
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU simulation mode
   ```
 
-  > **Note:** Before switching build modes, you need to clear the cmake cache. You can execute `rm CMakeCache.txt` in the build directory and then run cmake again.
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory and re-run cmake.
 
-- Build options description
+- Build Option Description
 
-  | Parameter | Description | Possible Values | Default Value |
+  | Parameter | Description | Options | Default |
   |------|------|---------|--------|
   | CMAKE_ASC_RUN_MODE | Run mode | npu, cpu, sim | npu |
   | CMAKE_ASC_ARCHITECTURES | NPU hardware architecture | dav-2201, dav-3510 | dav-2201 |
 
-- Execution result
+- Execution Result
 
-  The following execution result indicates successful precision comparison:
-
+  The following output indicates successful accuracy verification:
   ```bash
   [Success] Case accuracy is verification passed.
   ```

@@ -1,8 +1,8 @@
-# torch.library Invocation Integrated Profiling for Shape Information Reporting
+# torch.library Invocation Integration Profiling Shape Information Reporting
 
 ## Overview
 
-This sample demonstrates how to report operator Shape information during Profiling performance data collection based on the torch.library invocation method, assisting users in operator performance analysis.
+This sample demonstrates how to report operator Shape information during Profiling data collection based on the torch.library invocation method, helping users perform operator performance analysis.
 
 ## Supported Products
 
@@ -16,14 +16,14 @@ This sample demonstrates how to report operator Shape information during Profili
 ├── torch_library
 │   ├── CMakeLists.txt           // Build project file
 │   ├── add_custom_test.py       // PyTorch invocation script
-│   ├── add_custom.asc           // Integrated Profiling for Shape information collection
+│   ├── add_custom.asc           // Integrated Profiling Shape information collection
 ```
 
 ## Sample Description
 
-- Sample Function
+- Sample Functionality
 
-  Using Add computation as an example, the computation formula is:
+  Using Add computation as an example, the calculation formula is:
 
   ```
   z = x + y
@@ -32,7 +32,7 @@ This sample demonstrates how to report operator Shape information during Profili
 - Sample Specifications
 
   <table border="2" align="center">
-  <caption>Table 1: AddCustom Sample Specifications Description</caption>
+  <caption>Table 1: AddCustom Sample Specifications</caption>
   <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">AddCustom</td></tr>
   </tr>
   <tr><td rowspan="3" align="center">Sample Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -49,7 +49,7 @@ This sample demonstrates how to report operator Shape information during Profili
 
   This sample defines a namespace named `ascendc_ops` in `add_custom.asc` and registers the `ascendc_add` function within it. It calls `aclprofRangePushEx` and `aclprofRangePop` before and after `<<<>>>` to report Shape information to Profiling.
 
-  Sample information reporting requires constructing an `aclprofEventAttributes` structure containing version, size, type, and tensor information. The `messageType` is fixed to MESSAGE_TYPE_TENSOR_INFO type as 0, and `aclprofTensorInfo` is the tensor information to be reported. The `opNameId` and `opTypeId` fields are obtained by converting the sample name and sample type through the `aclprofStr2Id` interface. Each data packet has a maximum `tensorNum` of 5; if exceeding 5, please split into multiple packets for reporting. `tensors` is the `aclprofTensor` structure, obtained from the sample's `at::Tensor`.
+  Sample information reporting requires constructing an `aclprofEventAttributes` structure containing version, size, type, and tensor information. The `messageType` is fixed to MESSAGE_TYPE_TENSOR_INFO type as 0, and `aclprofTensorInfo` is the reported tensor information. The `opNameId` and `opTypeId` fields are obtained by converting sample name and sample type through the `aclprofStr2Id` interface. Each data packet `tensorNum` cannot exceed 5; if exceeding 5, split into multiple packets for reporting. `tensors` is an `aclprofTensor` structure obtained from the sample's `at::Tensor`.
 
 - Python Test Script
 
@@ -59,7 +59,7 @@ This sample demonstrates how to report operator Shape information during Profili
 
 - Install PyTorch and Ascend Extension for PyTorch Plugin
 
-  Please refer to the installation instructions from the [pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch) open source repository or [Ascend Extension for PyTorch Ascend Community](https://hiascend.com/document/redirect/Pytorch-index), select the supported `Python` version matching release, and complete the installation of `torch` and `torch-npu`.
+  Refer to the [pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch) open source repository or [Ascend Extension for PyTorch Community](https://hiascend.com/document/redirect/Pytorch-index) installation instructions to select a supported `Python` version release and complete the installation of `torch` and `torch-npu`.
 
 - Install Prerequisites
 
@@ -69,26 +69,26 @@ This sample demonstrates how to report operator Shape information during Profili
 
 - Configure Environment Variables
 
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package in your current environment.
-  - Default path, CANN package installed by root user
+  Select the appropriate command based on the CANN development kit [installation method](../../../../../docs/en/quick_start.md#prepare&install) on your current environment.
+  - Default path, root user installed CANN package
 
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
-  - Default path, CANN package installed by non-root user
+  - Default path, non-root user installed CANN package
 
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - Specified path install_path, CANN package installed
+  - Specified path install_path, installed CANN package
 
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
 
-- Sample Execution
+- Run Sample
 
   Execute the following steps in the sample root directory to run this sample.
 
@@ -98,14 +98,14 @@ This sample demonstrates how to report operator Shape information during Profili
   msprof --application="python3 ../add_custom_test.py" --output="../result"
   ```
 
-- Build Options Description
+- Build Options
 
 | Option | Available Values | Description |
-|--------|------------------|-------------|
-| `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU Architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products; dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+|------|--------|------|
+| `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
 
 - Execution Result
-  The execution result is shown below, indicating successful data reporting, where DIR_NAME and PATH are the output file name and data storage directory respectively.
+  The following output indicates successful data reporting, where DIR_NAME and PATH are the output file name and data storage directory respectively.
 
   ```bash
   [INFO] Query all data in ${DIR_NAME} done.
