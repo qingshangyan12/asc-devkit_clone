@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic\_api/kernel\_operator\_vec\_unary\_intf.h"
+头文件引用路径为："basic_api/kernel_operator_vec_unary_intf.h"
 
 Rsqrt属于单目矢量类计算接口，负责将输入的tensor按元素进行开方后取倒数运算。计算公式如下：
 
@@ -68,7 +68,7 @@ $dst_i = \frac{1}{\sqrt{src_i}}$
 ## 函数原型<a name="section620mcpsimp"></a>
 
 <cann-filter npu-type="950">
-针对Ascend 950PR/Ascend 950DT系列产品，函数原型如下：
+以下原型仅支持Ascend 950PR/Ascend 950DT系列产品
 
 - tensor前n个数据连续计算
 
@@ -94,8 +94,35 @@ $dst_i = \frac{1}{\sqrt{src_i}}$
 
 </cann-filter>
 
-<cann-filter npu-type="910b,A3">
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，函数原型如下：
+以下原型支持
+
+<cann-filter npu-type="A3">
+Atlas A3 训练系列产品、Atlas A3 推理系列产品
+</cann-filter>
+
+<cann-filter npu-type="910b">
+Atlas A2 训练系列产品、Atlas A2 推理系列产品
+</cann-filter>
+
+<cann-filter npu-type="310b">
+Atlas 200I/500 A2 推理产品
+</cann-filter>
+
+<cann-filter npu-type="310p">
+Atlas 推理系列产品
+</cann-filter>
+
+<cann-filter npu-type="910">
+Atlas 训练系列产品
+</cann-filter>
+
+<cann-filter npu-type="x90">
+Kirin X90
+</cann-filter>
+
+<cann-filter npu-type="9030">
+Kirin 9030
+</cann-filter>
 
 - tensor前n个数据连续计算
 
@@ -119,17 +146,15 @@ $dst_i = \frac{1}{\sqrt{src_i}}$
         __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
-</cann-filter>
-
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表 1**  模板参数说明
 
 | 参数名 | 描述 |
 |---|---|
-| T | 操作数数据类型。 |
+| T | 操作数数据类型。|
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
-| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，RsqrtConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class RsqrtAlgo {&#10;    INTRINSIC = 0,&#10;    FAST_INVERSE,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_0ULP_FTZ_FALSE,&#10;    PRECISION_1ULP_FTZ_FALSE,&#10;};&#10;struct RsqrtConfig {&#10;    RsqrtAlgo algo = RsqrtAlgo::INTRINSIC;&#10;};</pre>通过RsqrtConfig结构体的参数algo来配置精度计算模式。<br>algo取值如下：<br>&bull; RsqrtAlgo::INTRINSIC、RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; RsqrtAlgo::FAST_INVERSE、RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE，使用快速求逆算法得出结果。适用于输入值在[0, 85070596800837026223494223584045301760]范围内的计算。在该范围内，算法保证输出的最大精度误差为0 ulp；当输入值大于85070596800837026223494223584045301760时，输出为inf。目前，该算法支持float数据类型，并在该模式下支持Subnormal数据计算。<br>&bull; RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE，仅支持half类型的Subnormal数据计算，此时最大精度误差为1 ulp。<br>该参数的默认值DEFAULT_RSQRT_CONFIG取值如下：<br><pre class="screen" codetype="Cpp">constexpr RsqrtConfig DEFAULT_RSQRT_CONFIG = { RsqrtAlgo::INTRINSIC };</pre></cann-filter>|
+| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，RsqrtConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class RsqrtAlgo {&#10;    INTRINSIC = 0,&#10;    FAST_INVERSE,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_0ULP_FTZ_FALSE,&#10;    PRECISION_1ULP_FTZ_FALSE,&#10;};&#10;struct RsqrtConfig {&#10;    RsqrtAlgo algo = RsqrtAlgo::INTRINSIC;&#10;};</pre>通过RsqrtConfig结构体的参数algo来配置精度计算模式。algo取值如下：<br>&bull; RsqrtAlgo::INTRINSIC、RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; RsqrtAlgo::FAST_INVERSE、RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE，使用快速求逆算法得出结果。适用于输入值在[0, 85070596800837026223494223584045301760]范围内的计算。在该范围内，算法保证输出的最大精度误差为0 ulp；当输入值大于85070596800837026223494223584045301760时，输出为inf。目前，该算法支持float数据类型，并在该模式下支持Subnormal数据计算。<br>&bull; RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE，仅支持half类型的Subnormal数据计算，此时最大精度误差为1 ulp。<br>该参数的默认值DEFAULT_RSQRT_CONFIG的取值如下：<br><pre class="screen" codetype="Cpp">constexpr RsqrtConfig DEFAULT_RSQRT_CONFIG = { RsqrtAlgo::INTRINSIC };</pre></cann-filter> |
 
 **表 2**  参数说明
 
@@ -142,63 +167,9 @@ $dst_i = \frac{1}{\sqrt{src_i}}$
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](高维切分.md#ZH-CN_TOPIC_0000002556644319)。 |
 | repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](UnaryRepeatParams.md#ZH-CN_TOPIC_0000002525604434)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](高维切分.md#zh-cn_topic_0000002516372540_li072713185916)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](高维切分.md#zh-cn_topic_0000002516372540_zh-cn_topic_0000002267504656_zh-cn_topic_0000001764162593_li1481335103413)。 |
 
-## 数据类型<a name="zh-cn_topic_0000002529905914_section4219135304818"></a>
+## 数据类型
 
-<cann-filter npu-type="950">
-
-- 针对Ascend 950PR/Ascend 950DT系列产品
-    支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
-- 针对Atlas A3 训练系列产品、Atlas A3 推理系列产品：
-    支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：
-    支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
-- 针对Atlas 200I/500 A2 推理产品：
-    支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
-- 针对Atlas 推理系列产品 AI Core：
-    支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="910">
-
-- 针对Atlas 训练系列产品：
-    支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="x90">
-
-- 针对Kirin X90：
-    支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="9030">
-
-- 针对Kirin 9030：
-    支持的数据类型为：half、float。
-
-</cann-filter>
+支持的数据类型为：half、float。
 
 ## 返回值说明<a name="section42373919454"></a>
 
@@ -251,19 +222,15 @@ $dst_i = \frac{1}{\sqrt{src_i}}$
     针对Ascend 950PR/Ascend 950DT系列产品，示例如下：
 
     ```cpp
-    // Rsqrt 0ulp
     static constexpr RsqrtConfig config = { RsqrtAlgo::FAST_INVERSE };
-    Rsqrt<T, config>(dstLocal, srcLocal, 512);
-    // Rsqrt Subnormal
-    static constexpr RsqrtConfig config = { RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE };
-    Rsqrt<T, config>(dstLocal, srcLocal, 512);
+    AscendC::Rsqrt<T, config>(dstLocal, srcLocal, 512);
     ```
 
     </cann-filter>
 
-结果示例如下：
+    结果示例如下：
 
-```bash
-输入数据srcLocal：[0.8335 2.2 2.672 ... 2.312 5.36]
-输出数据dstLocal：[1.094 0.676 0.6113 ... 0.6562 0.4316]
-```
+    ```bash
+    输入数据srcLocal：[0.8335 2.2 2.672 ... 2.312 5.36]
+    输出数据dstLocal：[1.094 0.676 0.6113 ... 0.6562 0.4316]
+    ```

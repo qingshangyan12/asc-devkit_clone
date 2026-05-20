@@ -154,7 +154,7 @@ Kirin 9030
 |---|---|
 | T | 操作数数据类型。|
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
-| <cann-filter npu-type="950"><term>config</term> | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，ExpConfig类型，定义如下：<br><pre>enum class ExpAlgo {<br>    INTRINSIC = 0,<br>    PRECISION_1ULP_FTZ_TRUE,<br>    PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct ExpConfig {<br>    ExpAlgo algo = ExpAlgo::INTRINSIC;<br>}</pre>通过ExpConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; ExpAlgo::INTRINSIC、ExpAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; ExpAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_EXP_CONFIG的取值如下：<br><pre>constexpr ExpConfig DEFAULT_EXP_CONFIG = { ExpAlgo::INTRINSIC };</pre> </cann-filter>|
+| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，ExpConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class ExpAlgo {&#10;    INTRINSIC = 0,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_1ULP_FTZ_FALSE,&#10;};&#10;struct ExpConfig {&#10;    ExpAlgo algo = ExpAlgo::INTRINSIC;&#10;};</pre>通过ExpConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; ExpAlgo::INTRINSIC、ExpAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; ExpAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_EXP_CONFIG的取值如下：<br><pre class="screen" codetype="Cpp">constexpr ExpConfig DEFAULT_EXP_CONFIG = { ExpAlgo::INTRINSIC };</pre></cann-filter> |
 
 **表 2**  参数说明
 

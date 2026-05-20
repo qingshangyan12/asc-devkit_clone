@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic\_api/kernel\_operator\_vec\_unary\_intf.h"
+头文件引用路径为："basic_api/kernel_operator_vec_unary_intf.h"
 
 Relu属于单目矢量类计算接口，负责将输入的tensor按元素做ReLU（Rectified Linear Unit）计算。
 
@@ -67,7 +67,7 @@ Relu属于单目矢量类计算接口，负责将输入的tensor按元素做ReLU
 
 Relu接口计算公式如下：
 
-$dst_i = max(0, src_i)$
+$dst_i = \max(0, src_i)$
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -113,7 +113,7 @@ $dst_i = max(0, src_i)$
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](高维切分.md#ZH-CN_TOPIC_0000002556644319)。 |
 | repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](UnaryRepeatParams.md#ZH-CN_TOPIC_0000002525604434)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](高维切分.md#zh-cn_topic_0000002516372540_li072713185916)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](高维切分.md#zh-cn_topic_0000002516372540_zh-cn_topic_0000002267504656_zh-cn_topic_0000001764162593_li1481335103413)。 |
 
-## 数据类型<a name="zh-cn_topic_0000002560905871_section4219135304818"></a>
+## 数据类型
 
 <cann-filter npu-type="950">
 
@@ -124,49 +124,49 @@ $dst_i = max(0, src_i)$
 
 <cann-filter npu-type="A3">
 
-- 针对Atlas A3 训练系列产品、Atlas A3 推理系列产品：
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品
     支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品
     支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
-- 针对Atlas 200I/500 A2 推理产品：
+- 针对Atlas 200I/500 A2 推理产品
     支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="310p">
 
-- 针对Atlas 推理系列产品 AI Core：
+- 针对Atlas 推理系列产品
     支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="910">
 
-- 针对Atlas 训练系列产品：
+- 针对Atlas 训练系列产品
     支持的数据类型为：half。
 
 </cann-filter>
 
 <cann-filter npu-type="x90">
 
-- 针对Kirin X90：
+- 针对Kirin X90
     支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="9030">
 
-- 针对Kirin 9030：
+- 针对Kirin 9030
     支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
