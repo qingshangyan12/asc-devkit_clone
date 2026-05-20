@@ -29,6 +29,16 @@
   ```
   z = x + y
   ```
+  该样例完成两组同形状数据的逐元素相加，并将结果写回输出张量。样例输入是 `x` 和 `y` 两个 `float` 类型张量，形状都是 `[8, 2048]`，输出 `z` 的形状与输入一致。核函数启动 8 个核并行计算，每个核负责处理其中一段连续数据。
+
+- 处理流程：
+  1. `add_custom` 作为核入口接收 `totalLength`，并调用 `KernelAdd` 完成初始化和执行。
+  2. `KernelAdd::Init` 通过 `GetBlockNum()` 计算当前 block 的数据长度，通过 `GetBlockIdx()` 计算当前核在 GM 中对应的数据起点。
+  3. `CopyIn` 阶段使用 `DataCopy` 把输入数据从 GM 搬到 UB。
+  4. `Compute` 阶段通过 `DeQue` 取出输入张量，在 UB 中执行 `Add`。
+  5. `CopyOut` 阶段把结果从 UB 写回当前核负责的 GM 分片。
+- 队列说明：
+  本样例使用 `TPipe` 和 `TQue` 演示基础的队列式编程方式。`EnQue` 用于将已经搬到 UB 的 `LocalTensor` 入队，`DeQue` 用于在后续阶段从队列中取出张量继续处理。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
@@ -41,10 +51,13 @@
 
 - 样例实现：
   - Kernel实现  
-    使用TPipe和TQue管理内存和同步，完成对输入数据的向量加法操作。
+    `add.asc` 中的核函数入口 `add_custom` 接收 `totalLength`，然后在 `KernelAdd::Init` 里根据 `GetBlockNum()` 计算每个核要处理的 `blockLength`，再用 `GetBlockIdx()` 计算当前核在 GM 中对应的数据起点。之后，`CopyIn` 负责把输入数据搬到 UB 并入队，`Compute` 负责出队后执行 `Add`，`CopyOut` 负责把结果写回 GM。
 
-  - 调用实现  
-    使用内核调用符<<<>>>调用核函数。
+  - 核入口实现
+    `add_custom` 负责完成运行状态初始化，并驱动 `KernelAdd` 执行整条处理链路。
+
+  - 调用实现
+    使用内核调用符`<<<>>>`调用核函数。调用时运行时参数传入Device侧x、y、z张量地址和总数据长度`totalLength`。
 
 ## 编译运行
 
