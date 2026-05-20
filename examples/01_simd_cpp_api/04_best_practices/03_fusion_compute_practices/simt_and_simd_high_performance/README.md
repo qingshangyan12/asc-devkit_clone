@@ -1,14 +1,356 @@
-Device_id	Task Type	Task Duration(us)	Block Num	aiv_time(us)	aiv_vec_time(us)	aiv_vec_ratio	aiv_scalar_time(us)	aiv_scalar_ratio	aiv_mte2_time(us)	aiv_mte2_ratio	aiv_mte3_time(us)	aiv_mte3_ratio
-case0	AI_VECTOR_CORE	867.222	64	866.52	863.175	0.996	0.921	0.001	0.005	0	0.003	0
-case1	AI_VECTOR_CORE	525.153	64	524.49	512.752	0.978	3.65	0.007	254.159	0.485	69.789	0.133
-case2	AI_VECTOR_CORE	542.492	64	541.87	507.571	0.937	3.29	0.006	534.293	0.986	41.851	0.077
-case3	AI_VECTOR_CORE	474.75	64	473.89	413.965	0.874	5.134	0.011	402.507	0.849	95.755	0.202
-case4	AI_VECTOR_CORE	457.424	64	456.75	319.111	0.699	3.71	0.008	436.736	0.956	108.452	0.237
+# SIMT与SIMD混合FloorMod高性能优化样例
 
-												
-Device_id	Task Type	Task Duration(us)	Block Num	aiv_time(us)	aiv_vec_time(us)	aiv_vec_ratio	aiv_scalar_time(us)	aiv_scalar_ratio	aiv_mte2_time(us)	aiv_mte2_ratio	aiv_mte3_time(us)	aiv_mte3_ratio
-case0	AI_VECTOR_CORE	1273.883	32	1273.09	1270.099	0.998	0.85	0.001	0.005	0	0.002	0
-case1	AI_VECTOR_CORE	1021.105	32	1020.34	1014.416	0.994	6.554	0.006	388.837	0.381	87.066	0.085
-case2	AI_VECTOR_CORE	1064.185	32	1063.37	1009.988	0.95	5.706	0.005	1055.314	0.992	80.831	0.076
-case3	AI_VECTOR_CORE	819.442	32	818.7	813.076	0.993	9.355	0.011	427.62	0.522	91.4	0.112
-case4	AI_VECTOR_CORE	639.365	32	638.65	631.681	0.989	5.856	0.009	341.141	0.534	82.385	0.129
+## 概述
+
+本样例以FloorMod计算为例，介绍 SIMD 与 SIMT 混合编程场景下的性能调优方法。样例展示直接使用 SIMT 访问 GM、使用 SIMD RegBase 计算、使用 SIMT 访问 UB 但线程映射不连续，以及调整线程映射实现 Warp 内访存合并后的性能差异。
+
+**优化路径**：
+
+- Case 0: SIMT直接访问GM，全部使用 SIMT 线程直接访问 GM，作为不经过 UB 中转的对照组。
+- Case 1: SIMD RegBase，使用 SIMD 向量指令在寄存器中完成 FloorMod 计算。
+- Case 2: SIMT非连续访问，使用 MTE2 将 GM 连续搬运到 UB 后，SIMT 每个线程处理一段连续元素，但 Warp 内相邻线程访问不连续。
+- Case 3: SIMT连续访问，使用 MTE2 将 GM 连续搬运到 UB 后，调整 SIMT 线程映射，使 Warp 内相邻线程访问连续地址。
+
+## 支持的产品
+
+- Ascend 950PR/Ascend 950DT
+
+## 目录结构介绍
+
+```
+├── simt_and_simd_high_performance
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py    // 真值对比脚本
+│   ├── CMakeLists.txt          // 编译工程文件
+│   ├── data_utils.h            // 数据读入写出函数
+│   ├── floor_mod.asc           // Ascend C样例实现
+│   ├── msprof.md               // 性能数据与优化过程分析
+│   └── README.md               // 样例说明
+```
+
+## 样例描述
+
+**样例功能**：
+
+FloorMod 计算公式如下：
+
+```cpp
+rem = self % other;
+out = (rem != 0 && ((rem < 0) != (other < 0))) ? rem + other : rem;
+```
+
+**样例规格**：
+
+<table border="2">
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">FloorMod</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">self</td><td align="center">[8192, 8192]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td align="center">other</td><td align="center">[8192, 8192]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[8192, 8192]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">floor_mod</td></tr>
+</table>
+
+## 样例实现
+
+### 性能指标说明
+
+| 字段名 | 字段含义 |
+|:---|:---|
+| Task Duration(μs) | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。 |
+| aiv_time(μs) | Task在AI Vector Core上的理论执行时间。 |
+| aiv_vec_time(μs) | vec类型指令耗时。SIMT VF调用中的线程计算也体现在该类统计中。 |
+| aiv_vec_ratio | vec类型指令cycle数在total cycle数中的占用比。 |
+| aiv_scalar_time(μs) | scalar类型指令耗时。 |
+| aiv_scalar_ratio | scalar类型指令cycle数在total cycle数中的占用比。 |
+| aiv_mte2_time(μs) | mte2类型指令耗时，主要对应 GM 到 UB 的搬运。 |
+| aiv_mte2_ratio | mte2类型指令cycle数在total cycle数中的占用比。 |
+| aiv_mte3_time(μs) | mte3类型指令耗时，主要对应 UB 到 GM 的搬运。 |
+| aiv_mte3_ratio | mte3类型指令cycle数在total cycle数中的占用比。 |
+
+### Case 0: SIMT直接访问GM
+
+**实现方式**：参考 `floor_mod_simt_gm_contiguous()` 函数实现。
+
+该实现不申请动态 UB，不通过 MTE2/MTE3 做 GM 与 UB 之间的数据搬运，而是由 SIMT 线程直接从 GM 读取 `self` 和 `other`，计算后直接写回 GM。
+
+**关键代码**：
+
+```cpp
+__simt_vf__ inline void floor_mod_simt_gm_contiguous(
+    __gm__ T* self, __gm__ T* other, __gm__ T* out, uint32_t input_total_length)
+{
+    for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < input_total_length;
+         index += static_cast<uint32_t>(blockDim.x)) {
+        T otherValue = other[index];
+        const auto rem = self[index] % otherValue;
+        bool signs_differ = ((rem < 0) != (otherValue < 0));
+        out[index] = (signs_differ && (rem != 0)) ? rem + otherValue : rem;
+    }
+}
+```
+
+**性能数据**：
+
+| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | SIMT直接访问GM | 64 | 867.222 | 863.175 | 0.996 | 0.005 | 0.000 | 0.003 | 0.000 |
+
+**性能数据分析**：
+
+- 该 case 的 `aiv_mte2_time` 和 `aiv_mte3_time` 接近 0，说明数据读写没有走 MTE DataCopy 的 GM->UB/UB->GM 搬运路径。
+- `Task Duration` 为 **867.222μs**，其中 `aiv_vec_time` 为 **863.175μs**，`aiv_vec_ratio` 达到 **0.996**，说明耗时主要集中在 SIMT 内部的 GM 读写和 FloorMod 计算路径上。
+
+**原理说明**：
+
+SIMT 线程直接访问 GM 时，每个线程在计算过程中都需要从 GM 读取 `self`、`other`，并将结果写回 GM，访问效率低，且数据搬运与计算耦合在同一段 SIMT 线程中，无法并行搬运和计算流水。
+
+本样例的输入、输出在 GM 上是连续排布的二维 ND 数据，适合使用连续块搬运。后续 SIMD/RegBase 实现中的 GM->UB 和 UB->GM 搬运使用 DataCopy 完成，搬运由 MTE 执行，可以按较大的连续数据块把 GM 数据搬入 UB，再将 UB 中结果连续写回 GM。相比 SIMT 线程逐元素直接访问 GM，这种方式更容易发挥连续搬运带宽，也能并行化数据搬运和计算流水。
+
+**下一步优化方向**：
+
+当前 case 作为纯 SIMT 直接访问 GM 的基准 case，用于展示纯 SIMT 实现时的性能表现；下一步将引入 SIMD/RegBase 实现，使用连续 DataCopy 完成 GM->UB 和 UB->GM 搬运，展示纯SIMD实现时的性能表现。
+
+### Case 1: SIMD RegBase计算
+
+**实现方式**：参考 `floor_mod_int_simd()` 函数实现。
+
+该实现使用 RegBase API 将 UB 数据加载到寄存器，执行 `Div`、`Mul`、`Sub`、`Compare`、`Select` 等向量指令，最后再写回 UB。计算和搬运过程均通过SIMD实现。
+
+**关键代码**：
+
+```cpp
+AscendC::Reg::Div(divValue, input1Value, input2Value, preg);
+AscendC::Reg::Mul(mulValue, input2Value, divValue, preg);
+AscendC::Reg::Sub(subValue, input1Value, mulValue, preg);
+AscendC::Reg::Compare<T, AscendC::CMPMODE::NE>(cmpValue, input2Value, zeroValue, preg);
+AscendC::Reg::Select(modValue, subValue, defaultValue, cmpValue);
+AscendC::Reg::Add(addValue, modValue, input2Value, preg);
+AscendC::Reg::Compare<T, AscendC::CMPMODE::NE>(negValue, modValue, zeroValue, preg);
+AscendC::Reg::And(input2SignValue, input2Value, signValue, preg);
+AscendC::Reg::And(modSignValue, modValue, signValue, preg);
+AscendC::Reg::Compare<T, AscendC::CMPMODE::NE>(signNegValue, modSignValue, input2SignValue, preg);
+AscendC::Reg::MaskAnd(resMaskValue, signNegValue, negValue, preg);
+AscendC::Reg::Select(resValue, addValue, modValue, resMaskValue);
+```
+
+**性能数据**：
+
+| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | SIMD RegBase | 64 | 525.153 | 512.752 | 0.978 | 254.159 | 0.485 | 69.789 | 0.133 |
+
+**性能数据分析**：
+
+- 相比 case0，case1 引入连续 DataCopy 完成 GM->UB/UB->GM 搬运，`Task Duration` 从 **867.222μs** 降到 **525.153μs**，端到端耗时下降 **39.4%**。
+- `Task Duration` 为 **525.153μs**，其中 `aiv_vec_time` 为 **512.752μs**，`aiv_vec_ratio` 达到 **0.978**，说明耗时主要集中在 RegBase 向量计算路径上。
+- `aiv_mte2_ratio` 为 **0.485**，`aiv_mte3_ratio` 为 **0.133**，搬运耗时可以与计算过程形成一定重叠；当前主要瓶颈不是 GM 搬运过程，而是 FloorMod 计算本身的向量指令执行。
+
+**原理说明**：
+
+FloorMod 计算不仅包含取余，还需要根据余数和除数的符号关系做条件修正。使用 SIMD RegBase 实现时，分支判断不能直接写成普通 `if/else`，需要拆成 `Compare`、`And`、`MaskAnd`、`Select` 等多条向量指令来表达条件逻辑。同时，`Div`、`Mul`、`Sub`、符号判断和最终选择之间存在较长的数据依赖链，且后续指令需要等待前序结果，因此导致 `aiv_vec_ratio` 较高，表现为 Vec bound。
+
+相比SIMD，SIMT 更适合处理这类带分支判断的逐元素计算，可以在线程内部直接使用 `%` 和条件语句完成 FloorMod 修正，减少用向量掩码指令拼接分支逻辑带来的额外计算链路。
+
+**下一步优化方向**：
+
+当前 case 作为 SIMD RegBase 计算的基准 case，用于展示纯 SIMD 实现时的性能表现；下一步将在保留连续 DataCopy 搬运方式的基础上，使用 SIMT 优化 Vector 计算部分。
+
+### Case 2: SIMT非连续访问UB
+
+**实现方式**：参考 `floor_mod_simt_non_contiguous()` 函数实现。
+
+该实现先通过 MTE2 将 GM 中的 `self` 和 `other` 连续搬运到 UB，然后调用 SIMT VF。每个线程处理一段连续的 8 个元素，同一个 Warp 内相邻线程访问的地址并不连续：
+
+**关键代码**：
+```cpp
+constexpr uint32_t elems_per_thread = TILE_LENGTH / THREAD_COUNT;
+uint32_t tid = threadIdx.x;
+for (uint32_t i = 0; i < elems_per_thread; i++) {
+    uint32_t index = tid * elems_per_thread + i;
+    ...
+}
+```
+**性能数据**：
+
+| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|
+| 2 | SIMT非连续访问UB | 64 | 542.492 | 507.571 | 0.937 | 534.293 | 0.986 | 41.851 | 0.077 |
+
+**性能数据分析**：
+
+- 相比 case0，case2 使用 MTE DataCopy 完成 GM->UB/UB->GM 连续搬运，`Task Duration` 从 **867.222μs** 降到 **542.492μs**，端到端耗时下降 **37.4%**，说明引入 UB 中转后，直接 GM 访问带来的开销被明显缓解。
+- 相比 case1，case2 的 `aiv_vec_time` 从 **512.752μs** 降到 **507.571μs**，下降 **1.0%**，说明使用 SIMT 表达 FloorMod 的逐元素计算后，计算侧有一定收益。
+- 但 case2 的 `Task Duration` 比 case1 增加 **3.3%**，端到端没有取得优化收益。主要原因是 `aiv_mte2_time` 从 case1 的 **254.159μs** 增加到 **534.293μs**，增加 **110.2%**；`aiv_mte2_ratio` 也达到 **0.986**，说明当前瓶颈从 case1 的 Vec bound 转移到了 MTE2/UB 访问竞争。
+
+**原理说明**：
+
+case2 的索引方式为 `index = tid * elems_per_thread + i`，其中 `elems_per_thread = 8`。从单个线程看，它会连续处理 8 个元素；但 SIMT **访存合并**关注的是同一条访存指令上 Warp 内相邻线程访问的地址是否连续。一个Warp内的相邻线程通常同时发起GM访问请求。若这些线程访问的GM地址连续，硬件可以将访问请求合并，从而提高GM带宽利用率；若相邻线程访问的GM地址跨行或离散分布，则难以形成访存合并。
+
+![](./figures/访存合并.png)
+
+case1 的 SIMD RegBase 计算在寄存器中完成，数据从 UB 加载到寄存器后，计算阶段对 UB 的持续访问较少，MTE2 连续搬运受到的干扰较小。case2 虽然用 SIMT 改善了 FloorMod 的计算表达，但非连续 UB 访问把 MTE2 搬运时间显著拉长，导致端到端性能反而比纯 SIMD RegBase 实现更差。
+
+**下一步优化方向**：
+
+下一步将在保留 MTE DataCopy 连续搬运和 SIMT 计算表达的基础上，调整线程到数据的映射关系，把“每个线程处理一整段连续数据”改成“同一轮迭代中 Warp 内相邻线程访问连续元素”。
+
+### Case 3: SIMT连续访问UB
+
+**实现方式**：参考 `floor_mod_simt_contiguous()` 函数实现。
+
+该实现同样先使用 MTE2 将 GM 数据连续搬到 UB，但改变 SIMT 线程映射方式，让同一个 Warp 内相邻线程访问相邻元素：
+
+**关键代码**：
+```cpp
+for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < input_total_length;
+     index += static_cast<uint32_t>(blockDim.x)) {
+    T otherValue = other[index];
+    const auto rem = self[index] % otherValue;
+    bool signs_differ = ((rem < 0) != (otherValue < 0));
+    out[index] = (signs_differ && (rem != 0)) ? rem + otherValue : rem;
+}
+```
+
+**性能数据**：
+
+| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|
+| 3 | SIMT连续访问UB | 64 | **457.402** | **319.948** | 0.701 | 437.758 | 0.959 | 110.623 | 0.242 |
+
+**性能数据分析**：
+
+- 相比 case2，case3 仍然使用 MTE DataCopy 完成 GM->UB/UB->GM 连续搬运，但把线程映射调整为 Warp 内相邻线程访问相邻元素，`Task Duration` 从 **542.492μs** 降到 **457.402μs**，端到端耗时下降 **15.7%**。
+- 相比 case1，case3 的 `Task Duration` 下降 **12.9%**；
+- `aiv_vec_time` 从 case2 的 **507.571μs** 降到 **319.948μs**，下降 **37.0%**，说明连续访问显著减少了 SIMT 非连续 UB 访问带来的 DCache/UB 访问开销，计算侧效率明显提升。
+- `aiv_mte2_time` 从 case2 的 **534.293μs** 降到 **437.758μs**，下降 **18.1%**，说明连续访问已经缓解了 SIMT 计算阶段对 MTE2 的 UB 资源干扰；但 `aiv_mte2_ratio` 仍达到 **0.959**，说明当前主要瓶颈已经转移到 MTE2 搬运通路。
+
+## 性能对比总结
+
+### Ascend 950PR性能对比
+
+下表为本样例在Ascend 950系列产品上运行的性能数据对比：
+
+| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio | 主要瓶颈 |
+|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|:---|
+| 0 | SIMT直接访问GM | 64 | 867.222 | 863.175 | 0.996 | 0.005 | 0.000 | 0.003 | 0.000 | SIMT直接访问GM |
+| 1 | SIMD RegBase | 64 | 525.153 | 512.752 | 0.978 | 254.159 | 0.485 | 69.789 | 0.133 | Vec bound |
+| 2 | SIMT非连续访问UB | 64 | 542.492 | 507.571 | 0.937 | 534.293 | 0.986 | 41.851 | 0.077 | MTE2/UB访问竞争 |
+| 3 | SIMT连续访问UB | 64 | **457.402** | **319.948** | 0.701 | 437.758 | 0.959 | 110.623 | 0.242 | MTE2 bound |
+
+> 注：case0 不经过 MTE2/MTE3，profile 中主要耗时体现在 SIMT VF 对 GM 的访问与计算统计中。
+
+### 优化要点总结
+
+| 优化手段 | 核心原理 | 样例体现 |
+|:---|:---|:---|
+| 使用 UB 中转 | SIMT 直接访问 GM 时，访问粒度和缓存路径可能导致带宽利用率低；先用 MTE2 连续搬入 UB，再由 SIMT 访问 UB，可提升访问效率 | case3 相比 case0 端到端耗时下降 47.3% |
+| 使用 SIMT 处理分支判断 | 对带条件修正的逐元素计算，SIMD RegBase 需要用多条 Compare/Select/Mask 指令表达分支，依赖链较长；SIMT 可在线程内直接表达 `%` 和条件判断，减少向量掩码拼接分支逻辑的开销 | case2 相比 case1 的 `aiv_vec_time` 下降 1.0%；在连续访问后，case3 相比 case2 的 `aiv_vec_time` 下降 37.0% |
+| 调整线程映射实现访存合并 | 同一 Warp 内相邻线程在同一条访存指令上访问连续地址，通常比“单个线程内部连续”更重要 | case3 将 `tid*8+i` 改为 `tid+i*1024` 形态，相比case2端到端耗时下降15.7% |
+
+---
+
+## 编译运行
+
+在本样例根目录下执行如下步骤，编译并执行样例。
+
+- 切换Case
+
+  在 cmake 编译时通过 `-DSCENARIO_NUM=N` 指定要编译的 case，各 case 说明：
+  - `0`: SIMT直接访问GM
+  - `1`: SIMD RegBase
+  - `2`: SIMT非连续访问
+  - `3`: SIMT连续访问
+
+  示例：
+  ```bash
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=3
+  ```
+
+- 配置环境变量
+
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，root用户安装CANN软件包
+    ```bash
+    source /usr/local/Ascend/cann/set_env.sh
+    ```
+
+  - 默认路径，非root用户安装CANN软件包
+    ```bash
+    source $HOME/Ascend/cann/set_env.sh
+    ```
+
+  - 指定路径install_path，安装CANN软件包
+    ```bash
+    source ${install_path}/cann/set_env.sh
+    ```
+
+- 样例执行
+
+  ```bash
+  mkdir -p build
+  cd build
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=3
+  make -j
+  python3 ../scripts/gen_data.py
+  ./demo
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin
+  ```
+
+  如果需要在 NPU 环境运行，请显式改成 `-DCMAKE_ASC_RUN_MODE=npu`。
+
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |:---|:---|:---|
+  | `CMAKE_ASC_RUN_MODE` | `sim`（默认）、`npu`、`cpu` | 运行模式：NPU 仿真、NPU 运行、CPU 调试 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构，对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `0`、`1`、`2`、`3` | Case 编号：0=SIMT直接访问GM，1=SIMD RegBase，2=SIMT非连续访问，3=SIMT连续访问 |
+
+- 执行结果
+
+  正常情况下，结果校验应输出如下信息：
+  ```bash
+  error ratio: 0.0000, tolerance:0.0001
+  test pass!
+  ```
+
+### 性能分析
+
+使用 `msprof` 工具获取详细性能数据。
+
+```bash
+msprof ./demo   # 分析性能
+```
+
+当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
+
+```bash
+PROF_xxxx_XXXXXX
+├── device_{id}
+└── host
+└── mindstudio_profiler_log
+└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
+    ├── msprof_*.json
+    ├── xx_*.csv
+    └── README.txt
+```
+
+查看具体的性能分析结果：
+```bash
+# 查看Task Duration 以及各项数据
+cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+```
+
+## 附录：BLOCK_DIM=32补充数据
+
+下表为相同样例在 `BLOCK_DIM=32` 下的补充测试数据。此时每个 core 处理的数据量从 128 个 tile 增加到 256 个 tile，SIMT 计算窗口更长，MTE2 更容易被计算阶段覆盖，因此可以更直观地展示连续访问对端到端耗时的优化效果。
+
+| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio | Bound情况 |
+|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|:---|
+| 0 | SIMT直接访问GM | 32 | 1273.883 | 1270.099 | 0.998 | 0.005 | 0.000 | 0.002 | 0.000 | SIMT直接GM访问 |
+| 1 | SIMD RegBase | 32 | 1021.105 | 1014.416 | 0.994 | 388.837 | 0.381 | 87.066 | 0.085 | Vec bound |
+| 2 | SIMT非连续访问UB | 32 | 1064.185 | 1009.988 | 0.950 | 1055.314 | 0.992 | 80.831 | 0.076 | MTE2/UB访问竞争 |
+| 3 | SIMT连续访问UB | 32 | **639.365** | **631.681** | 0.989 | 341.141 | 0.534 | 82.385 | 0.129 | Vec bound |
+
+32 核场景下，case3 的 `aiv_vec_ratio` 提升到 **0.989**，`aiv_mte2_ratio` 降到 **0.534**。这是因为单 core 处理的数据量增加后，SIMT 计算窗口变长，MTE2 更容易被计算阶段覆盖，64 核下暴露出来的 MTE2 bound 被弱化，case3 的瓶颈转为 Vec bound。case2 仍然表现为 MTE2/UB 访问竞争，说明非连续 SIMT 访问 UB 会持续影响搬运流水。
