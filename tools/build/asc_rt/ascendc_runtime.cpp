@@ -61,10 +61,9 @@ static bool g_profEnable;
 
 // 以下枚举值对应 runtime 层原枚举定义，用于替换注释掉的旧接口中的 RT_* 宏
 constexpr uint32_t RT_STREAM_PRIORITY_DEFAULT_VAL = 0U;      // 原枚举: RT_STREAM_PRIORITY_DEFAULT = 0U (stream.h)
-constexpr uint32_t RT_STREAM_FAST_LAUNCH_VAL = 0x200U;       // 原枚举: RT_STREAM_FAST_LAUNCH = 0x200U (stream.h)
-constexpr uint32_t RT_STREAM_FAST_SYNC_VAL = 0x400U;          // 原枚举: RT_STREAM_FAST_SYNC = 0x400U (stream.h)
-constexpr uint32_t RT_EVENT_WITH_FLAG_VAL = 0x01U;            // 原枚举: RT_EVENT_WITH_FLAG = RT_EVENT_DDSYNC_NS = 0x01U (event.h)
-constexpr uint32_t RT_ERROR_NONE_VAL = 0U;                    // 原枚举: RT_ERROR_NONE = 0 (base.h)
+constexpr uint32_t RT_STREAM_FAST_LAUNCH_VAL = 0x200U;       // 原枚举: RT_STREAM_FAST_LAUNCH = 0x200U (stream.h) // #define ACL_STREAM_FAST_LAUNCH      0x00000001U
+constexpr uint32_t RT_STREAM_FAST_SYNC_VAL = 0x400U;          // 原枚举: RT_STREAM_FAST_SYNC = 0x400U (stream.h) // #define ACL_STREAM_FAST_SYNC        0x00000002U
+constexpr uint32_t RT_EVENT_WITH_FLAG_VAL = 0x01U;            // 原枚举: RT_EVENT_WITH_FLAG = RT_EVENT_DDSYNC_NS = 0x01U (event.h) // #define ACL_EVENT_SYNC 0x00000001U
 
 namespace {
 constexpr int16_t SIZE_VAL_TWO = 2;
@@ -558,9 +557,26 @@ static uint32_t AscendCExecutorVectorCoreLaunchKernel(void* binHandle, const uin
 
 void StreamStateCallback(aclrtStream stream, aclrtStreamState state, void *args)
 {
-    (void)stream;
-    (void)state;
     (void)args;
+    if (state == ACL_RT_STREAM_STATE_CREATE_POST) {
+        return;
+    }
+    if (g_ascStreamMap.find(stream) != g_ascStreamMap.end()) {
+        ASCENDLOGI("start callback main stream is %p, subStream %p, eventA %p, eventB %p",
+            stream,
+            g_ascStreamMap[stream].stream,
+            g_ascStreamMap[stream].eventA,
+            g_ascStreamMap[stream].eventB);
+        OP_CHECK_NO_RETURN(aclrtDestroyStream(g_ascStreamMap[stream].stream) == RT_ERROR_NONE,
+            ASCENDLOGE("Destroy stream %p failed.", g_ascStreamMap[stream].stream));
+        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventA) == RT_ERROR_NONE,
+            ASCENDLOGE("Destroy event %p failed.", g_ascStreamMap[stream].eventA));
+        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventB) == RT_ERROR_NONE,
+            ASCENDLOGE("Destroy event %p failed.", g_ascStreamMap[stream].eventB));
+        g_ascStreamMap.erase(stream);
+        ASCENDLOGI("after g_ascStreamMap.size() is %zu.", g_ascStreamMap.size());
+    }
+    return;
 }
 
 static uint32_t AscendCExecutorGetStreamAndEvent(

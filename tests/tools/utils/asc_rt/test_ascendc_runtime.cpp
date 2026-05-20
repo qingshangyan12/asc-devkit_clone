@@ -126,6 +126,7 @@ extern "C" void AscendCDestroyStreamCallBack(rtStream_t stream, const bool isCre
 extern std::unordered_map<const void *, AscendCStreamForVectorCore> g_ascStreamMap;
 extern "C" uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t numBlocks, void **args, uint32_t size,
     const rtStream_t stream);
+extern "C" void StreamStateCallback(aclrtStream stream, aclrtStreamState state, void *args);
 
 
 TEST_F(TEST_ASCENDC_RUNTIME, LaunchVectorCore){
@@ -141,6 +142,18 @@ TEST_F(TEST_ASCENDC_RUNTIME, LaunchVectorCore){
     EXPECT_EQ(ret, 0);
     ret = LaunchAscendKernelForVectorCore(opType, handle, 0, args, 0, stream, true, 1, 1, 0);
     EXPECT_EQ(ret, 0);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, StreamStateCallbackTest){
+    void *stream = nullptr;
+    void *args = nullptr;
+    aclrtStreamState stateCreate = ACL_RT_STREAM_STATE_CREATE_POST;
+    aclrtStreamState stateDestroy = ACL_RT_STREAM_STATE_DESTROY_POST;
+    AscendCStreamForVectorCore streamForVectorCore;
+    StreamStateCallback(stream, stateCreate, args);
+    g_ascStreamMap[stream] = streamForVectorCore;
+    StreamStateCallback(stream, stateDestroy, args);
+    EXPECT_EQ(g_ascStreamMap.find(stream), g_ascStreamMap.cend());
 }
 
 const char *fake_rtGetSocVersion()
