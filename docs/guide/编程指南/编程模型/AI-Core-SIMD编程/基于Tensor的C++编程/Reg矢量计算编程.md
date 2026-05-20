@@ -269,31 +269,33 @@ __aicore__ inline void Compute()
 | `oneRepeatSize` | 单轮向量寄存器可处理的元素数，即`VL / sizeof(T)` |
 | `repeatTimes` | 循环轮数，即`count / oneRepeatSize` |
 
-## 开发检查清单<a name="section_checklist"></a>
+## 特性描述<a name="features_list"></a>
 
-将计算片段使用Regbase开发前，建议逐项确认：
+### 对齐搬运
 
-1. 该计算片段确实位于性能关键路径。
-2. 中间结果存在明显的UB反复读写，改用寄存器驻留有收益。
-3. 数据可以按`VL`切分，尾块可以用`MaskReg`表达。
-4. `__aicore__`与`__simd_vf__`的职责边界清晰，没有跨域误调用。
 
-## 常见误区<a name="section_common_pitfalls"></a>
 
-| 误区 | 影响 | 建议 |
-| --- | --- | --- |
-| 只因为“更底层”就改用Regbase | 代码复杂度上升，但性能未必提升 | 先明确场景，再决定是否采用Regbase |
-| 把`__aicore__`逻辑写进VF函数 | 编译失败或职责混乱 | VF只承载寄存器级计算 |
+### 非对齐搬运
 
-## 快速回顾<a name="section_summary"></a>
 
-Reg矢量计算API的核心思想是：**把性能关键路径中的短生命周期中间结果留在寄存器中，让开发者显式控制UB与寄存器之间的数据流动。**
 
-实际开发时可以记住以下路径：
+### PostUpate
 
-```text
-LocalTensor -> GetPhyAddr -> asc_vf_call -> __simd_vf__
-             -> Load -> Reg Compute -> Store -> LocalTensor
-```
 
-从使用者角度看，Regbase不是Membase的替代品，而是面向热点片段的精细化工具。先用Membase建立正确、清晰的算子结构，再将最值得优化的内层循环下沉到Regbase，通常是更稳妥的工程路径。
+
+### VF融合
+
+
+
+### 指令并行
+
+
+
+### 硬件循环
+
+
+
+### MergeMode
+
+
+
