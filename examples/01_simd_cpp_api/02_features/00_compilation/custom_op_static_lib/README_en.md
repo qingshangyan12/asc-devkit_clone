@@ -2,12 +2,11 @@
 
 ## Overview
 
-This sample uses `AddCustom` as an example to demonstrate how to build, package, and link a custom operator static library, and execute the operator through aclnn.
+This sample demonstrates how to build, package, and link a custom operator static library using `AddCustom` as an example, and execute the operator through the aclnn method.
 
 ## Supported Products
 
 This sample supports the following product models:
-
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 Training Series Products/Atlas A3 Inference Series Products
 - Atlas A2 Training Series Products/Atlas A2 Inference Series Products
@@ -16,48 +15,41 @@ This sample supports the following product models:
 
 ```
 ├── custom_op_static_lib
+│   ├── CMakeLists.txt            // Top-level build project file
 │   ├── app                       // Link static library and execute operator
-│   │   ├── CMakeLists.txt
-│   │   └── main.cpp
-│   ├── op                        // Build and package to generate custom operator static library
-│   │   ├── add_custom_host.cpp
-│   │   ├── add_custom_kernel.cpp
-│   │   ├── add_custom_tiling.h
-│   │   └── CMakeLists.txt
-│   └── CMakeLists.txt
+│   └── op                        // Build and package to generate custom operator static library
 ```
 
-## Code Implementation Description
+## Code Implementation Introduction
 
-In this sample, the `op` directory is responsible for building and packaging the custom operator static library. The generated static library path is `./build/customize-install/lib/lib${package_name}.a`. The `app` directory imports the static library through `find_package(${package_name})`, compiles `main.cpp` to generate `execute_add_op`, calls `aclnnAddCustom`, and verifies the result.
+In this sample, the `op` directory builds and packages to generate a custom operator static library. The generated static library path is `./build/customize-install/lib/lib${package_name}.a`. The `app` directory imports the static library through `find_package(${package_name})`, builds `main.cpp` to generate `execute_add_op`, calls `aclnnAddCustom`, and verifies the result.
 
-For AddCustom operator introduction and other content, refer to [Operator Description](../custom_op/README.md).
+For information about the AddCustom operator, see the [Operator Description](../custom_op/README_en.md).
 
 ## Build and Run
 
-- Configure environment variables
+- Configure Environment Variables
 
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment. Ensure `ASCEND_HOME_PATH` points to the CANN installation root path for header files and library paths to take effect.
-
-  - Default path, CANN package installed by root user
+  Select the appropriate command based on the CANN development kit [installation method](../../../../../docs/en/quick_start.md#prepare&install) on your current environment. Ensure `ASCEND_HOME_PATH` points to the CANN installation root path so that header files and library paths take effect.
+  - Default path, root user installed CANN package
 
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
-  - Default path, CANN package installed by non-root user
+  - Default path, non-root user installed CANN package
 
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - Specified path install_path, CANN package installed
+  - Specified path install_path, installed CANN package
 
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
 
-- Sample execution
+- Run Sample
 
   Execute the following steps in the sample root directory to run this sample.
 
