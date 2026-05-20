@@ -10,7 +10,7 @@
 
 在前置的资料中可以学习到AscendC向量编程为Membase矢量接口，即操作数据对象为LocalTensor，实际物理位置为Unified Buffer（UB）。新增Regbase矢量接口并不是替代Membase，而是面向不同开发层次需求。
 
-| 维度 | 基础API（Membase） | Reg矢量计算API（Regbase） |
+| 维度 | 基础API - Membase | 基础API - Regbase(Reg矢量计算API) |
 | --- | --- | --- |
 | 编程对象 | `LocalTensor` | `RegTensor`等寄存器对象 |
 | 数据位置 | UB中的本地张量 | 向量寄存器 |
