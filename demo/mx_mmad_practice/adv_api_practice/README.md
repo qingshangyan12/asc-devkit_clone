@@ -63,6 +63,8 @@
 | `baseN` | | Cube 计算基本块 N 维度大小 |
 | `usedCoreNum` |  | 使用核数 |
 
+- 参数如下图所示：
+  <img src="figure/Tiling.png">
 
 ## 编译运行
 
