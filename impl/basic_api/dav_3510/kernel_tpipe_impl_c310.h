@@ -452,7 +452,7 @@ __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 
 template <HardEvent evt> __aicore__ inline TEventID TPipe::FetchEventID()
 {
-    return ::AscendC::FetchEventID<evt>();
+    return ::AscendC::FetchEventID(evt);
 }
 
 // NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
@@ -903,7 +903,7 @@ __aicore__ inline void TPipe::ResetPool()
         }
     }
 #endif
-    auto evt = Internal::g_tPipeOccupyEventPool;
+    auto evt = Internal::g_occupyEventPool;
     for (int32_t i = 0; i < EVENT_NUM; i++, evt++) {
         *evt = 0;
     }
