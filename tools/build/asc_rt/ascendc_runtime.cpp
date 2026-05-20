@@ -502,29 +502,6 @@ static inline uint32_t AscendCExecutorPreportProfiling(
         }                                     \
     } while (false)
 
-void AscendCDestroyStreamCallBack(rtStream_t stream, const bool isCreate)
-{
-    if (isCreate) {
-        return;
-    }
-    if (g_ascStreamMap.find(stream) != g_ascStreamMap.end()) {
-        ASCENDLOGI("start callback main stream is %p, subStream %p, eventA %p, eventB %p",
-            stream,
-            g_ascStreamMap[stream].stream,
-            g_ascStreamMap[stream].eventA,
-            g_ascStreamMap[stream].eventB);
-        OP_CHECK_NO_RETURN(aclrtDestroyStream(g_ascStreamMap[stream].stream) == RT_ERROR_NONE,
-            ASCENDLOGE("Destroy stream %p failed.", g_ascStreamMap[stream].stream));
-        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventA) == RT_ERROR_NONE,
-            ASCENDLOGE("Destroy event %p failed.", g_ascStreamMap[stream].eventA));
-        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventB) == RT_ERROR_NONE,
-            ASCENDLOGE("Destroy event %p failed.", g_ascStreamMap[stream].eventB));
-        g_ascStreamMap.erase(stream);
-        ASCENDLOGI("after g_ascStreamMap.size() is %zu.", g_ascStreamMap.size());
-    }
-    return;
-}
-
 static uint32_t AscendCExecutorLaunchKernel(void* binHandle, const uint64_t tilingKey, const uint32_t numBlocks,
     void** args, uint32_t size, const rtStream_t stream)
 {

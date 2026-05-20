@@ -122,27 +122,11 @@ typedef struct {
 
 extern "C" uint32_t LaunchAscendKernelForVectorCore(const char *opType, void *handle, const uint64_t key, void **args, uint32_t size,
     const void *stream, bool enableProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks, uint32_t aivNumBlocksOffset);
-extern "C" void AscendCDestroyStreamCallBack(rtStream_t stream, const bool isCreate);
 extern std::unordered_map<const void *, AscendCStreamForVectorCore> g_ascStreamMap;
 extern "C" uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t numBlocks, void **args, uint32_t size,
     const rtStream_t stream);
 extern "C" void StreamStateCallback(aclrtStream stream, aclrtStreamState state, void *args);
 
-
-TEST_F(TEST_ASCENDC_RUNTIME, LaunchVectorCore){
-    const char* opType = "AddCustom";
-    void * handle = nullptr;
-    void **args = nullptr;
-    void *stream = nullptr;
-    AscendCStreamForVectorCore streamForVectorCore;
-    AscendCDestroyStreamCallBack(stream, true);
-    g_ascStreamMap[stream] = streamForVectorCore;
-    AscendCDestroyStreamCallBack(stream, false);
-    uint32_t ret = LaunchAscendKernelForVectorCore(opType, handle, 0, args, 0, stream, false, 1, 1, 0);
-    EXPECT_EQ(ret, 0);
-    ret = LaunchAscendKernelForVectorCore(opType, handle, 0, args, 0, stream, true, 1, 1, 0);
-    EXPECT_EQ(ret, 0);
-}
 
 TEST_F(TEST_ASCENDC_RUNTIME, StreamStateCallbackTest){
     void *stream = nullptr;
