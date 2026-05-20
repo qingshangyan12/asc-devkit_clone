@@ -13,19 +13,19 @@ case2	545.457	64	544.77	503.459	0.924	3.383	0.006	537.388	0.986	43.056	0.079
 case3	458.838	64	458.07	305.655	0.667	3.267	0.007	444.485	0.97	108.877	0.238
 case4	471.095	64	470.25	405.567	0.862	5.287	0.011	403.068	0.857	99.05	0.211
 case5	459.97	64	459.17	310.356	0.676	18.683	0.041	446.217	0.972	107.044	0.233
-case0：simt gm stride：全部使用 SIMT 直接访问 GM，不经过 GM->UB/UB->GM DataCopy（新增对照组，本文历史 msprof 数据暂未覆盖）											
-case1：simd Regbase											
-case2：simt：每个线程处理一段连续元素（非连续访问）											
+case0：simt 直接访问 GM：全部使用 SIMT 直接访问 GM，不经过 GM->UB/UB->GM DataCopy（新增对照组，本文历史 msprof 数据暂未覆盖）
+case1：simd Regbase
+case2：simt：每个线程处理一段连续元素（非连续访问）
 case3：simt：每轮 warp 内相邻线程访问连续元素（连续访问）
-case4：simt：分阶段 block-based，2 阶段每阶段各处理 4096 元素，减少单阶段 DCache 压力（对 case2 的优化）
-case5：simt stride-based + TILE_LENGTH=9216，最大化 UB 利用率以提升 MTE2 单次搬移吞吐（对原 case4/当前 case3 的历史优化尝试，因无收益不在样例中展示）
+case4：simt：分阶段非连续访问，2 阶段每阶段各处理 4096 元素，减少单阶段 DCache 压力（对 case2 的优化）
+case5：simt 连续访问 + TILE_LENGTH=9216，最大化 UB 利用率以提升 MTE2 单次搬移吞吐（对原 case4/当前 case3 的历史优化尝试，因无收益不在样例中展示）
 
 
 ---
 
 # FloorMod 算子四个样例 Case 与历史 Case4/Case5 性能分析报告
 
-> 当前样例的 `SCENARIO_NUM` 为 case0~case3。本文中的 case4/case5 仅保留历史 msprof 分析：case4 是对 case2 非连续访问的分阶段优化，case5 是对原 case4（当前 case3 stride 方案）的 MaxTile 尝试；两者均不在当前样例实现中展示。
+> 当前样例的 `SCENARIO_NUM` 为 case0~case3。本文中的 case4/case5 仅保留历史 msprof 分析：case4 是对 case2 非连续访问的分阶段优化，case5 是对原 case4（当前 case3 连续访问方案）的 MaxTile 尝试；两者均不在当前样例实现中展示。
 
 ## 一、测试场景说明
 
@@ -33,17 +33,17 @@ case5：simt stride-based + TILE_LENGTH=9216，最大化 UB 利用率以提升 M
 
 | Case | 实现方式 | 核心函数 | 内存访问特征 |
 |---|---|---|---|
-| case0 | SIMT-GM-Stride | `floor_mod_simt_gm_stride` | 全部使用 SIMT 线程直接读写 GM，不经过 GM→UB `DataCopy`，作为 GM 直接访问对照组 |
+| case0 | SIMT直接访问GM | `floor_mod_simt_gm_contiguous` | 全部使用 SIMT 线程直接读写 GM，不经过 GM→UB `DataCopy`，作为 GM 直接访问对照组 |
 | case1 | 纯 SIMD（RegTensor 向量指令） | `floor_mod_int_simd` | MTE2 DataCopy 整块搬移，Vector 引擎用 RegTensor 操作 UB→寄存器→计算→寄存器→UB |
-| case2 | SIMT block-based | `floor_mod_simt_block` | 每线程处理 `tid*8` 起始的连续 8 元素，**warp 内相邻线程地址间隔 8 元素 → 非 coalesced** |
-| case3 | SIMT stride-based | `floor_mod_simt_stride` | 每线程跨步 1024，**warp 内相邻线程地址间隔 1 元素 → coalesced** |
+| case2 | SIMT非连续访问 | `floor_mod_simt_non_contiguous` | 每线程处理 `tid*8` 起始的连续 8 元素，**warp 内相邻线程地址间隔 8 元素 → 非 coalesced** |
+| case3 | SIMT连续访问 | `floor_mod_simt_contiguous` | 每线程跨步 1024，**warp 内相邻线程地址间隔 1 元素 → coalesced** |
 
 ### 历史对照项
 
 | Case | 实现方式 | 核心函数 | 结论 |
 |---|---|---|---|
-| case4 | SIMT staged block-based | `floor_mod_simt_block_range` | 对 case2 非连续访问的分阶段优化，实测有效但当前样例不展示 |
-| case5 | SIMT stride-based MaxTile | `floor_mod_simt_stride` (同 case3) + TILE_LENGTH=9216 | 对原 case4（当前 case3 stride 方案）的 MaxTile 尝试。实测与 case3 基本持平，remainder tile 还引入额外 scalar 开销，因此不在当前样例中展示 |
+| case4 | SIMT分阶段非连续访问 | `floor_mod_simt_non_contiguous_range` | 对 case2 非连续访问的分阶段优化，实测有效但当前样例不展示 |
+| case5 | SIMT连续访问 MaxTile | `floor_mod_simt_contiguous` (同 case3) + TILE_LENGTH=9216 | 对原 case4（当前 case3 连续访问方案）的 MaxTile 尝试。实测与 case3 基本持平，remainder tile 还引入额外 scalar 开销，因此不在当前样例中展示 |
 
 ### 三层编译/运行配置
 
@@ -112,9 +112,9 @@ case5：simt stride-based + TILE_LENGTH=9216，最大化 UB 利用率以提升 M
 
 ## 三、各 Case 瓶颈根因分析
 
-### Case0（SIMT-GM-Stride）—— 纯 SIMT GM 访问对照组
+### Case0（SIMT直接访问GM）—— 纯 SIMT GM 访问对照组
 
-`floor_mod_simt_gm_stride` 不申请动态 UB，不经过 MTE2/MTE3 的 GM→UB→GM 搬移流水，而是由 SIMT 线程直接从 GM 读取 `self/other` 并直接写回 GM。它用于对照 case3 的“GM→UB DataCopy 后再由 SIMT 读写 UB”模式。
+`floor_mod_simt_gm_contiguous` 不申请动态 UB，不经过 MTE2/MTE3 的 GM→UB→GM 搬移流水，而是由 SIMT 线程直接从 GM 读取 `self/other` 并直接写回 GM。它用于对照 case3 的“GM→UB DataCopy 后再由 SIMT 读写 UB”模式。
 
 当前历史 msprof 数据暂未覆盖 case0，因此后续性能排名不包含该新增对照组。
 
@@ -135,7 +135,7 @@ DataCopy(UB→Reg) → Div → Mul → Sub → Compare(NE) → Select
 
 **优势**：SIMD 使用 RegTensor，数据从 UB Load 到寄存器后计算完全在寄存器内完成，不占用 UB 带宽。这为 Double Buffer 场景下 MTE2 与 Vector 的并行留下了充足的 UB 带宽余量。
 
-### Case2（SIMT block-based）—— 非 Coalesced 访存 + UB 带宽争抢
+### Case2（SIMT非连续访问）—— 非 Coalesced 访存 + UB 带宽争抢
 
 **访问模式**：
 ```cpp
@@ -147,7 +147,7 @@ index = tid * elems_per_thread + i;  // tid∈[0,1023], i∈[0,7]
 
 **关键问题——UB 带宽争抢**：SIMT 线程直接通过 `__ubuf__` 指针读写 UB。在 Double Buffer 场景下，即使 MTE2 和 SIMT Compute 访问不同的逻辑 buffer（ping vs pong），物理 UB 的 bank/port 资源是共享的。case2 的非 coalesced 访存模式产生大量离散的 UB 事务，与 MTE2 的连续写入形成带宽竞争，导致 MTE2 效率下降。
 
-### Case3（SIMT stride-based）—— Coalesced 访存，计算效率最高
+### Case3（SIMT连续访问）—— Coalesced 访存，计算效率最高
 
 **访问模式**：
 ```cpp
@@ -229,7 +229,7 @@ Double Buffer 使 MTE2、Compute、MTE3 可以并行。此时总时间 ≈ **max
 
 #### SIMD vs SIMT 的 UB 访问模式差异
 
-| 维度 | case1 (SIMD) | case2 (SIMT block) |
+| 维度 | case1 (SIMD) | case2 (SIMT 非连续访问) |
 |---|---|---|
 | Compute 期间 UB 访问 | RegTensor：DataCopy 一次性 Load 到寄存器，**计算全程不访问 UB** | SIMT 线程通过 `__ubuf__*` 指针**直接读写 UB**，每个线程每条指令都可能产生 UB 事务 |
 | UB 事务特征 | 无（计算在寄存器内） | 1024 线程 × 非 coalesced 地址 → **大量离散 UB 事务** |
@@ -291,43 +291,43 @@ L2 Bypass 将 case1 的 MTE2 时间大幅削减 43%（L2 延迟被消除），�
 
 | 排名 | Case | 最优 Task Duration | 相对基线提速 |
 |---|---|---|---|
-| 🥇 | case3 (SIMT stride) | **458.8 us** | **35.2%** |
+| 🥇 | case3 (SIMT 连续访问) | **458.8 us** | **35.2%** |
 | 🥈 | case4 (SIMT staged) | 471.1 us | 33.5% |
 | 🥉 | case1 (SIMD) | 527.3 us | 25.6% |
-| 4 | case2 (SIMT block) | 545.5 us | 21.9% |
+| 4 | case2 (SIMT 非连续访问) | 545.5 us | 21.9% |
 
-> 表中 case4 为历史对照数据，不在当前样例中展示。历史 case5（SIMT stride MaxTile）实测为 460.0 us，与 case3 基本持平且没有收益，因此不纳入当前样例排名。
+> 表中 case4 为历史对照数据，不在当前样例中展示。历史 case5（SIMT 连续访问 MaxTile）实测为 460.0 us，与 case3 基本持平且没有收益，因此不纳入当前样例排名。
 
 #### BLOCK_DIM=32（每 core 256 tiles，瓶颈反转为 Vec，含历史 case4）
 
 | 排名 | Case | Task Duration | 相对 case2 提速 |
 |---|---|---|---|
-| 🥇 | **case3 (SIMT stride)** | **616.1 us** | **41.9%** |
+| 🥇 | **case3 (SIMT 连续访问)** | **616.1 us** | **41.9%** |
 | 🥈 | case4 (SIMT staged) | 819.8 us | 22.7% |
 | 🥉 | case1 (SIMD) | 1021.4 us | 3.7% |
-| 4 | case2 (SIMT block) | 1060.6 us | 基线 |
+| 4 | case2 (SIMT 非连续访问) | 1060.6 us | 基线 |
 
 **排名顺序与 BLOCK_DIM=64 完全一致（case3 > case4 > case1 > case2），但 case3 对 case4 的领先从 2.7% 暴增至 33.1%。BLOCK_DIM=32 解除了 MTE2 瓶颈，case3 的真实计算优势完整暴露。**
 
 ### 关键结论
 
-1. **case3（SIMT stride）在所有 BLOCK_DIM 配置下均为最优**。Coalesced 访存 + 单次 VF 调用 = 不可超越的基线。
+1. **case3（SIMT 连续访问）在所有 BLOCK_DIM 配置下均为最优**。Coalesced 访存 + 单次 VF 调用 = 不可超越的基线。
 
 2. **瓶颈决定优化效果的"可见度"**：BLOCK_DIM=64 时 MTE2 瓶颈遮蔽了 case3 的计算优势（端到端仅领先 2.7%），BLOCK_DIM=32 解除 MTE2 瓶颈后，case3 对 case4 的 33% vec 优势完整转化为端到端优势。
 
-3. **case4 的 vec_time 始终比 case3 慢 ~33%**——来自 stride=4（非完美 coalesced）和双倍 VF 调用开销。这是结构性差距，与数据量无关。
+3. **case4 的 vec_time 始终比 case3 慢 ~33%**——来自相邻线程地址间隔为 4（非完美 coalesced）和双倍 VF 调用开销。这是结构性差距，与数据量无关。
 
 4. **case5（增大 TILE_LENGTH）无效**：MTE2 在 32KB burst 已达峰值带宽，12.5% 增量不足以触发带宽台阶，remainder tile 的 scalar 开销反而侵蚀了任何微小的收益。
 
-5. **SIMT block-based（case2）在所有配置下均最差**。非 coalesced 访存同时伤害 Vec 和 MTE2。
+5. **SIMT 非连续访问（case2）在所有配置下均最差**。非 coalesced 访存同时伤害 Vec 和 MTE2。
 
 6. **调优策略**：在核数充足时 case3 一骑绝尘；若需较少核数（BLOCK_DIM≤32），case3 的优势反而更大（MTE2 瓶颈消除）。
 
 ### 进一步优化方向
 
 - **case3 当前已是最优**。如仍有性能压力，唯一突破方向是改变 vec/mte2 比例——Vec 引擎协助 MTE2 或算子融合。
-- **case4 可通过增加 STAGE_COUNT 逼近 case3**：STAGE_COUNT=8 时 stride=1，理论上等价于 case3 的 coalesced，但 8× VF 调用开销可能抵消收益。
-- **case2 应优先改为 case3 的 stride 访问模式**，非 coalesced 访存的惩罚在单核负载增加时急剧放大。
+- **case4 可通过增加 STAGE_COUNT 逼近 case3**：STAGE_COUNT=8 时相邻线程地址间隔为 1，理论上等价于 case3 的 coalesced，但 8× VF 调用开销可能抵消收益。
+- **case2 应优先改为 case3 的连续访问模式**，非 coalesced 访存的惩罚在单核负载增加时急剧放大。
 
 ---
 
@@ -335,7 +335,7 @@ L2 Bypass 将 case1 的 MTE2 时间大幅削减 43%（L2 延迟被消除），�
 
 ### 8.1 Case4 vs Case2 的性能变化
 
-Case4 是 case2（SIMT block-based）的直接改进版，仅在 DB+L2Bypass 配置下有数据。对比如下：
+Case4 是 case2（SIMT 非连续访问）的直接改进版，仅在 DB+L2Bypass 配置下有数据。对比如下：
 
 | 指标 | case2 (DB+L2Bypass) | case4 (DB+L2Bypass) | 变化 |
 |---|---|---|---|
@@ -355,7 +355,7 @@ case2: 单次 asc_vf_call 处理整个 TILE (8192 元素)
 ┌─────────────────────────────────────────────────────┐
 │ 每个线程处理 8 个连续元素 (elems_per_thread = 8)      │
 │ Thread N: [N*8, N*8+7]                             │
-│ 相邻线程 stride = 8                                  │
+│ 相邻线程地址间隔 = 8                                │
 │                                                     │
 │ DCache 工作集 = 3 数组 × 8192 × 4B = 96KB           │
 │ DCache 容量    = MIN_SIMT_DCACHE_BYTES = 32KB       │
@@ -374,7 +374,7 @@ SIMT 访问 UB 数据时，需经过 SIMT DCache。case2 的单次 VF 调用要�
 // case4: 分 STAGE_COUNT=2 阶段
 for (stage = 0; stage < 2; stage++) {
     // 每阶段只处理 4096 元素 (TILE_LENGTH/2)
-    asc_vf_call<floor_mod_simt_block_range<T>>(
+    asc_vf_call<floor_mod_simt_non_contiguous_range<T>>(
         dim3(THREAD_COUNT), input1Addr, input2Addr, dstAddr, offset, curLen);
     AscendC::DataSyncBarrier<AscendC::MemDsbT::UB>();  // 阶段间同步
     offset += curLen;
@@ -386,7 +386,7 @@ case4 Stage 0: 处理前半段 [0, 4096)
 ┌─────────────────────────────────────────────────────┐
 │ 每个线程处理 4 个连续元素 (elems_per_thread = 4)      │
 │ Thread N: [N*4, N*4+3]                             │
-│ 相邻线程 stride = 4  (case2 的一半)                  │
+│ 相邻线程地址间隔 = 4  (case2 的一半)                │
 │                                                     │
 │ DCache 工作集 = 3 数组 × 4096 × 4B = 48KB           │
 │ → 48KB vs 32KB，仍然过载但 miss 率显著下降            │
@@ -408,7 +408,7 @@ case4 Stage 1: 处理后半段 [4096, 8192)
   │      └─→ DCache miss 率下降
   │           └─→ vec_time ↓19.5% (503.5 → 405.6 us)
   │
-  ├─→ ② stride 减半 (8 → 4)
+  ├─→ ② 相邻线程地址间隔减半 (8 → 4)
   │      └─→ warp 内访存跨度减半 (256→128 元素)
   │           └─→ cache line 利用率提升，进一步减少 miss
   │
@@ -429,68 +429,68 @@ case4 的 mte3_time 从 case2 的 43.1us 增加到 99.1us。原因：
 
 ### 8.5 Case4 与 Case3 的对比
 
-| 维度 | case3 (stride-based) | case4 (staged block) |
+| 维度 | case3 (连续访问) | case4 (分阶段非连续访问) |
 |---|---|---|
 | vec_time | **305.7 us** ✅ | 405.6 us |
 | mte2_time | 444.5 us | **403.1 us** ✅ |
 | mte3_time | 108.9 us | **99.1 us** ✅ |
-| 访存模式 | stride=1, 完美 coalesced | stride=4, 部分 coalesced |
-| DCache 效率 | 最优（连续访问，cache line 充分利用） | 中等（stride 4，仍有跨行浪费） |
+| 访存模式 | 相邻线程地址间隔=1，完美 coalesced | 相邻线程地址间隔=4，部分 coalesced |
+| DCache 效率 | 最优（连续访问，cache line 充分利用） | 中等（地址间隔 4，仍有跨行浪费） |
 | 额外开销 | 无 | 2 次 VF 调用 + 1 次 barrier |
 
-case4 在 MTE2 和 MTE3 方面略优于 case3（403.1 vs 444.5, 99.1 vs 108.9），但 vec_time 差距更大（405.6 vs 305.7），因此总体仍落后 2.7%。case3 的 stride=1 完美 coalesced 访存仍是不可替代的优势。
+case4 在 MTE2 和 MTE3 方面略优于 case3（403.1 vs 444.5, 99.1 vs 108.9），但 vec_time 差距更大（405.6 vs 305.7），因此总体仍落后 2.7%。case3 的相邻线程地址间隔为 1，可实现完美 coalesced 访存，这是不可替代的优势。
 
 ### 8.5.1 本质：case4 与 case3 解决的是同一个问题
 
 虽然 case3 和 case4 在代码层面改动方式截然不同，但两者的优化目标高度一致——**提升访存局部性、降低 DCache 压力**。case4 可以理解为从 case2 到 case3 的"中间态"：
 
 ```
-优化路径：降低"等效 stride"以改善 DCache 效率
+优化路径：降低“等效相邻线程地址间隔”以改善 DCache 效率
 
-case2: stride=8, 单次 VF, DCache 工作集 96KB — 基线，最差
+case2: 相邻线程地址间隔=8，单次 VF，DCache 工作集 96KB — 基线，最差
   │
-  ├─ case4 的路线：保持 block-based 索引公式不变
-  │    通过分阶段缩小每线程处理量，间接降低 stride
+  ├─ case4 的路线：保持非连续访问索引公式不变
+  │    通过分阶段缩小每线程处理量，间接降低相邻线程地址间隔
   │    ↓
-  │  case4: stride=4, 2次 VF, DCache 工作集 48KB/阶段 — 中间态
+  │  case4: 相邻线程地址间隔=4，2次 VF，DCache 工作集 48KB/阶段 — 中间态
   │    │
   │    └─ 继续增加 STAGE_COUNT...
-  │       STAGE_COUNT=8 → stride=1, 8次 VF, 每线程 1 元素 — 到达 case3 的 stride
+  │       STAGE_COUNT=8 → 相邻线程地址间隔=1，8次 VF，每线程 1 元素 — 到达 case3 的连续访问形态
   │
   └─ case3 的路线：改变索引公式
        从 `tid*8+i` 换为 `tid + i*1024`，从根上消除非连续
        ↓
-     case3: stride=1, 单次 VF, 完美 coalesced — 最优
+     case3: 相邻线程地址间隔=1，单次 VF，完美 coalesced — 最优
 ```
 
 | 对比维度 | case3 的策略 | case4 的策略 |
 |---|---|---|
-| **手段** | 换索引公式，让相邻线程访问相邻地址 | 保持 block-based 索引，分阶段让每线程处理更少元素 |
-| **stride 变化** | 8 → 1（一步到位） | 8 → 4（走了一半） |
+| **手段** | 换索引公式，让相邻线程访问相邻地址 | 保持非连续访问索引，分阶段让每线程处理更少元素 |
+| **地址间隔变化** | 8 → 1（一步到位） | 8 → 4（走了一半） |
 | **DCache 改善机制** | 同一 warp 32 线程访问连续 32 元素 → 最少 cache line | 每阶段工作集减半 → 减少 capacity miss |
 | **额外代价** | 无 | 多次 VF 调用 + barrier |
 | **效果** | 最优（458.8us） | 次优（471.1us，仅慢 2.7%） |
 
-两条路线殊途同归，case3 是从算法层面根治，case4 是从工程层面缓解。如果沿 case4 的思路把 `STAGE_COUNT` 推到 8，理论上 stride 也能降到 1，等同于用 8 次 VF 调用的开销模拟 case3 的 coalesced 效果——那就是从 case2 坐"站站停"的慢车最终到达 case3 这个终点站。
+两条路线殊途同归，case3 是从算法层面根治，case4 是从工程层面缓解。如果沿 case4 的思路把 `STAGE_COUNT` 推到 8，理论上相邻线程地址间隔也能降到 1，等同于用 8 次 VF 调用的开销模拟 case3 的 coalesced 效果。
 
 ### 8.6 参数调优启示
 
 `STAGE_COUNT` 是一个可调参数，存在权衡：
 
-| STAGE_COUNT | 单阶段元素数 | elems_per_thread | stride | DCache 工作集 | VF 调用开销 |
+| STAGE_COUNT | 单阶段元素数 | elems_per_thread | 相邻线程地址间隔 | DCache 工作集 | VF 调用开销 |
 |---|---|---|---|---|---|
 | 1 (=case2) | 8192 | 8 | 8 | 96KB | 最小 |
 | **2 (=case4)** | **4096** | **4** | **4** | **48KB** | **中等** |
 | 4 | 2048 | 2 | 2 | 24KB | 较高 |
-| 8 | 1024 | 1 | 1 (=case3 的 stride!) | 12KB | 最高 |
+| 8 | 1024 | 1 | 1 (=case3 的连续访问形态) | 12KB | 最高 |
 
-理论上 STAGE_COUNT=8 可使 stride 降为 1（等同于 case3 的 coalesced 效果），但 8 次 VF 调用 + 7 次 barrier 的开销可能抵消收益。实验验证才能确定最优值。
+理论上 STAGE_COUNT=8 可使相邻线程地址间隔降为 1（等同于 case3 的 coalesced 效果），但 8 次 VF 调用 + 7 次 barrier 的开销可能抵消收益。实验验证才能确定最优值。
 
 ---
 
 ## 九、Case5：增大 TILE_LENGTH —— 实测无效与根因分析
 
-Case5 是原 case4（当前 case3 stride 方案）的 MaxTile 尝试，仅作为历史对照保留，不在当前样例实现中展示。
+Case5 是原 case4（当前 case3 连续访问方案）的 MaxTile 尝试，仅作为历史对照保留，不在当前样例实现中展示。
 
 ### 9.1 实测数据
 
@@ -548,8 +548,8 @@ case5: vec/mte2 ≈ 310.4 / 446.2 = 0.696  ← 几乎相同
 | Case | Task Duration(us) | vec_time(us) | vec_ratio | scalar(us) | mte2_time(us) | mte2_ratio | mte3_time(us) | mte3_ratio |
 |---|---|---|---|---|---|---|---|---|
 | case1 (SIMD) | 1021.4 | 1015.0 | 0.995 | 6.0 | 329.1 | 0.322 | 83.2 | 0.082 |
-| case2 (SIMT block) | 1060.6 | 1005.7 | 0.949 | 5.9 | 1051.6 | 0.992 | 81.3 | 0.077 |
-| case3 (SIMT stride) | **616.1** | **609.2** | **0.990** | 5.8 | **309.0** | **0.502** | 89.5 | 0.145 |
+| case2 (SIMT 非连续访问) | 1060.6 | 1005.7 | 0.949 | 5.9 | 1051.6 | 0.992 | 81.3 | 0.077 |
+| case3 (SIMT 连续访问) | **616.1** | **609.2** | **0.990** | 5.8 | **309.0** | **0.502** | 89.5 | 0.145 |
 | case4 (SIMT staged) | 819.8 | 813.4 | 0.993 | 9.7 | 421.4 | 0.514 | 87.2 | 0.106 |
 
 ### 10.3 核心发现：排名保持不变，但差距被放大
@@ -601,7 +601,7 @@ BLOCK_DIM=32:  手铐解开（MTE2 不再阻塞）
 
 这个 ~33% 的差距来自 case4 相对 case3 的两个结构性劣势：
 
-**① stride=4 vs stride=1**：case4 每线程 stride=4，warp 内 32 线程访问不连续（跨 128 元素），DCache line 利用率低于 case3 的 stride=1（跨 32 元素完美 coalesced）。
+**① 地址间隔 4 vs 地址间隔 1**：case4 每线程对应的相邻线程地址间隔为 4，warp 内 32 线程访问不连续（跨 128 元素），DCache line 利用率低于 case3 的地址间隔 1（跨 32 元素完美 coalesced）。
 
 **② 双倍 VF 调用 + barrier 开销**：case4 每 tile 执行 2 次 `asc_vf_call` + 1 次 `DataSyncBarrier`，256 tiles 共 512 次 VF 调用；case3 仅 256 次。每次 VF 调用有固定的启动/同步开销。
 
