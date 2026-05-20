@@ -59,12 +59,6 @@ static const std::unordered_set<char> ASCEND_SUPPORT_FORMAT = {'d', 'i', 'f', 'F
 
 static bool g_profEnable;
 
-// 以下枚举值对应 runtime 层原枚举定义，用于替换注释掉的旧接口中的 RT_* 宏
-constexpr uint32_t RT_STREAM_PRIORITY_DEFAULT_VAL = 0U;      // 原枚举: RT_STREAM_PRIORITY_DEFAULT = 0U (stream.h)
-constexpr uint32_t RT_STREAM_FAST_LAUNCH_VAL = 0x200U;       // 原枚举: RT_STREAM_FAST_LAUNCH = 0x200U (stream.h) // #define ACL_STREAM_FAST_LAUNCH      0x00000001U
-constexpr uint32_t RT_STREAM_FAST_SYNC_VAL = 0x400U;          // 原枚举: RT_STREAM_FAST_SYNC = 0x400U (stream.h) // #define ACL_STREAM_FAST_SYNC        0x00000002U
-constexpr uint32_t RT_EVENT_WITH_FLAG_VAL = 0x01U;            // 原枚举: RT_EVENT_WITH_FLAG = RT_EVENT_DDSYNC_NS = 0x01U (event.h) // #define ACL_EVENT_SYNC 0x00000001U
-
 namespace {
 constexpr int16_t SIZE_VAL_TWO = 2;
 constexpr size_t ASCENDC_KERNEL_ID = 69;
@@ -560,6 +554,7 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
     const rtStream_t stream, rtStream_t *subStream, rtEvent_t *evtA, rtEvent_t *evtB,
     std::shared_ptr<std::mutex> &streamLckPtr)
 {
+    const uint32_t RT_STREAM_PRIORITY_DEFAULT_VAL = 0U;      // RT_STREAM_PRIORITY_DEFAULT = 0U
     const std::lock_guard<std::mutex> lock(g_ascStreamMtx);
     rtStream_t mainStream = stream;
     if (stream == nullptr) {
@@ -578,11 +573,11 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
         ASCENDLOGI("find main stream is %p, subStream %p, eventA %p, eventB %p", mainStream, *subStream, *evtA, *evtB);
     } else {
         CHECK_COND(aclrtCreateStreamWithConfig(subStream, RT_STREAM_PRIORITY_DEFAULT_VAL,
-                                           RT_STREAM_FAST_LAUNCH_VAL | RT_STREAM_FAST_SYNC_VAL) == RT_ERROR_NONE,
+                                           ACL_STREAM_FAST_LAUNCH | ACL_STREAM_FAST_SYNC) == RT_ERROR_NONE,
                    ASCENDC_ERR_RUNTIME_ERROR, "create stream %p failed.", subStream);
-        CHECK_COND(aclrtCreateEventExWithFlag(evtA, RT_EVENT_WITH_FLAG_VAL) == RT_ERROR_NONE,
+        CHECK_COND(aclrtCreateEventExWithFlag(evtA, ACL_EVENT_SYNC) == RT_ERROR_NONE,
                    ASCENDC_ERR_RUNTIME_ERROR, "create event %p failed.", evtA);
-        CHECK_COND(aclrtCreateEventExWithFlag(evtB, RT_EVENT_WITH_FLAG_VAL) == RT_ERROR_NONE,
+        CHECK_COND(aclrtCreateEventExWithFlag(evtB, ACL_EVENT_SYNC) == RT_ERROR_NONE,
                    ASCENDC_ERR_RUNTIME_ERROR, "create event %p failed.", evtB);
         g_ascStreamMap[mainStream] = {*subStream, *evtA, *evtB};
     }
