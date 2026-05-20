@@ -6,20 +6,14 @@
 | ----------- |:----:|
 | Ascend 950PR/Ascend 950DT | √ |
 
-## 头文件/库文件
-
-头文件为：
-
-```cpp
-#include "tensor_api/tensor.h"
-```
-
 ## 功能说明
 
-`GetShape` 用于从 Layout 中提取 Shape 部分：
+头文件为：#include "tensor_api/tensor.h"
 
-- **不指定模板参数 `Is...`**：返回完整的 Shape 元组。
-- **指定模板参数 `Is...`**：返回 Shape 中对应索引的子结构。单个索引返回对应维度值或子 tuple；多个索引返回由它们组成的新 tuple。
+`GetShape`用于从Layout中提取Shape部分：
+
+- **不指定模板参数Is...**：返回完整的Shape元组。
+- **指定模板参数Is...**：返回Shape中对应索引的子结构。单个索引返回对应维度值或子tuple；多个索引返回由它们组成的新tuple。
 
 ## 函数原型
 
@@ -49,11 +43,11 @@ __aicore__ inline constexpr auto GetShape(Layout<ShapeType, StrideType>& layout)
 
 ## 返回值说明
 
-返回描述张量形状的 Shape 对象（或其子结构）。类型与模板参数 `Is...` 的指定方式相关。
+返回描述张量形状的Shape对象（或其子结构）。类型与模板参数`Is...`的指定方式相关。
 
 ## 约束说明
 
-- Is...必须在 Shape 底层 tuple 的有效范围内。
+- Is...必须在Shape底层tuple的有效范围内。
 
 ## 调用示例
 

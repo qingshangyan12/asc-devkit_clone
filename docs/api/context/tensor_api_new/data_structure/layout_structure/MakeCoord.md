@@ -2,11 +2,13 @@
 
 ## 产品支持情况
 
-| 产品     | 是否支持 |
-| ----------- |:----:|
-|Ascend 950PR/Ascend 950DT|√|
+| 产品 | 是否支持 |
+| ----------- | :----: |
+| Ascend 950PR/Ascend 950DT | 支持 |
 
 ## 功能说明
+
+头文件为：#include "tensor_api/tensor.h"
 
 构造Coord对象，用于定义张量的坐标。
 
@@ -19,9 +21,17 @@ __aicore__ inline constexpr Coord<Ts...> MakeCoord(const Ts&... t)
 
 ## 参数说明
 
+**表1** 模板参数类型说明
+
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| t | 输入 | 各维度的坐标，可变参数。 |
+| `Ts...` | 输入 | 可变模板参数，表示各维坐标的数据类型。支持`size_t`、`int`等整数类型，以及`Std::Int`类型。 |
+
+**表2** 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|--------|-----------|------|
+| `t` | 输入 | 各维度的坐标，可变参数。 |
 
 ## 返回值说明
 
@@ -29,13 +39,8 @@ __aicore__ inline constexpr Coord<Ts...> MakeCoord(const Ts&... t)
 
 ## 约束说明
 
+- 各维度的坐标值需为非负整数。
 - 参数数量必须与对应的Shape维度数量一致。
-- 各参数必须为非负整数。
-- 坐标值必须在对应Shape维度的有效范围内。
-- 支持的数据类型包括：size_t、int等整数类型或者Std::Int类型。
-
-## 理论性能说明
-
 
 ## 调用示例
 
@@ -49,7 +54,10 @@ auto coord1 = AscendC::Std::get<1>(coord); // coord1 = 10
 auto coord2 = AscendC::Std::get<2>(coord); // coord2 = 15
 
 // 使用Std::Int类型创建一个3维张量的坐标
-auto coordInt = AscendC::Te::MakeCoord(AscendC::Std::Int<5>{}, AscendC::Std::Int<10>{}, AscendC::Std::Int<15>{});
+auto coordInt = AscendC::Te::MakeCoord(
+    AscendC::Std::Int<5>{},
+    AscendC::Std::Int<10>{},
+    AscendC::Std::Int<15>{});
 
 // 获取各维度的坐标
 auto coordInt0 = AscendC::Std::get<0>(coordInt); // coordInt0 = 5

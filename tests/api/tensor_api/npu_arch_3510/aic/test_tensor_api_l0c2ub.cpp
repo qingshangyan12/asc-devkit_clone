@@ -73,7 +73,7 @@ void RunCopyWithParamPaths(const DstTensor& dst, const SrcTensor& src, const Par
     copiedAtom.Call(dst, src);
 
     Copy(copiedAtom, dst, src);
-    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}, dst, src, param);
+    Copy(CopyAtom<CopyTraits<CopyOp, Trait>>{}.with(param), dst, src);
 }
 
 } // namespace
