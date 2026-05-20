@@ -32,7 +32,7 @@ struct HasZeroIntegralConstant : Std::bool_constant<
     (... || Std::is_same_v<Std::remove_cvref_t<Ts>, Std::Int<0>>)> {};
 
 template <typename... Ts>
-__aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t)
+__aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... ts)
 {
     static_assert(sizeof...(Ts) > 0, "MakeShape requires at least one argument.");
     static_assert(!HasZeroIntegralConstant<Ts...>::value,
@@ -41,24 +41,24 @@ __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t)
 }
 
 template <typename... Ts>
-__aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t)
-{    
-    static_assert(sizeof...(Ts) > 0, "MakeShape requires at least one argument.");
-    return {t...};
+__aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... ts)
+{
+    static_assert(sizeof...(Ts) > 0, "MakeStride requires at least one argument.");
+    return {ts...};
 }
 
 template <typename... Ts>
 __aicore__ inline constexpr Tile<Ts...> MakeTile(const Ts&... ts)
 {
-    static_assert(sizeof...(Ts) > 0, "MakeShape requires at least one argument.");
-    return {t...};
+    static_assert(sizeof...(Ts) > 0, "MakeTile requires at least one argument.");
+    return {ts...};
 }
 
 template <typename... Ts>
-__aicore__ inline constexpr Coord<Ts...> MakeCoord(const Ts&... t)
+__aicore__ inline constexpr Coord<Ts...> MakeCoord(const Ts&... ts)
 {
-    static_assert(sizeof...(Ts) > 0, "MakeShape requires at least one argument.");
-    return {t...};
+    static_assert(sizeof...(Ts) > 0, "MakeCoord requires at least one argument.");
+    return {ts...};
 }
 
 template <typename T, typename U>
