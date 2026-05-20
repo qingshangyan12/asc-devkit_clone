@@ -513,11 +513,11 @@ void AscendCDestroyStreamCallBack(rtStream_t stream, const bool isCreate)
             g_ascStreamMap[stream].stream,
             g_ascStreamMap[stream].eventA,
             g_ascStreamMap[stream].eventB);
-        OP_CHECK_NO_RETURN(aclrtDestroyStream(g_ascStreamMap[stream].stream) == RT_ERROR_NONE_VAL,
+        OP_CHECK_NO_RETURN(aclrtDestroyStream(g_ascStreamMap[stream].stream) == RT_ERROR_NONE,
             ASCENDLOGE("Destroy stream %p failed.", g_ascStreamMap[stream].stream));
-        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventA) == RT_ERROR_NONE_VAL,
+        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventA) == RT_ERROR_NONE,
             ASCENDLOGE("Destroy event %p failed.", g_ascStreamMap[stream].eventA));
-        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventB) == RT_ERROR_NONE_VAL,
+        OP_CHECK_NO_RETURN(aclrtDestroyEvent(g_ascStreamMap[stream].eventB) == RT_ERROR_NONE,
             ASCENDLOGE("Destroy event %p failed.", g_ascStreamMap[stream].eventB));
         g_ascStreamMap.erase(stream);
         ASCENDLOGI("after g_ascStreamMap.size() is %zu.", g_ascStreamMap.size());
@@ -601,11 +601,11 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
         ASCENDLOGI("find main stream is %p, subStream %p, eventA %p, eventB %p", mainStream, *subStream, *evtA, *evtB);
     } else {
         CHECK_COND(aclrtCreateStreamWithConfig(subStream, RT_STREAM_PRIORITY_DEFAULT_VAL,
-                                           RT_STREAM_FAST_LAUNCH_VAL | RT_STREAM_FAST_SYNC_VAL) == RT_ERROR_NONE_VAL,
+                                           RT_STREAM_FAST_LAUNCH_VAL | RT_STREAM_FAST_SYNC_VAL) == RT_ERROR_NONE,
                    ASCENDC_ERR_RUNTIME_ERROR, "create stream %p failed.", subStream);
-        CHECK_COND(aclrtCreateEventExWithFlag(evtA, RT_EVENT_WITH_FLAG_VAL) == RT_ERROR_NONE_VAL,
+        CHECK_COND(aclrtCreateEventExWithFlag(evtA, RT_EVENT_WITH_FLAG_VAL) == RT_ERROR_NONE,
                    ASCENDC_ERR_RUNTIME_ERROR, "create event %p failed.", evtA);
-        CHECK_COND(aclrtCreateEventExWithFlag(evtB, RT_EVENT_WITH_FLAG_VAL) == RT_ERROR_NONE_VAL,
+        CHECK_COND(aclrtCreateEventExWithFlag(evtB, RT_EVENT_WITH_FLAG_VAL) == RT_ERROR_NONE,
                    ASCENDC_ERR_RUNTIME_ERROR, "create event %p failed.", evtB);
         g_ascStreamMap[mainStream] = {*subStream, *evtA, *evtB};
     }
