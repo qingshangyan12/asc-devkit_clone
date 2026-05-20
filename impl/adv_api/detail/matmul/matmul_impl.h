@@ -69,11 +69,6 @@ public:
         ASCENDC_ASSERT((!ToMatmulConfig(MM_CFG).isPartialOutput), {
             KERNEL_LOG(KERNEL_ERROR, "IterateAll is not supported for PartialOutput.");
         });
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
-        GlobalTensor<uint64_t> global;
-        global.SetGlobalBuffer((__gm__ uint64_t*)0);
-        DataCacheCleanAndInvalid<uint64_t, CacheLine::ENTIRE_DATA_CACHE>(global);
-#endif
         const auto tiling = MATMUL_MODULE(MatmulShapeTiling)->GetTiling();
         while (BASE_MODULE::Iterate()) {
             BASE_MODULE::GetTensorC(gm, enAtomic);
