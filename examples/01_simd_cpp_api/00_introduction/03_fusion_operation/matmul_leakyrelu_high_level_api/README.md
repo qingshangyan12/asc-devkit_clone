@@ -30,7 +30,7 @@
   C = A * B + Bias
   C = C > 0 ? C : C * 0.001
   ```
-  样例参数M = 512，K = 512，N = 1024，样例规格如下表所示：
+  样例参数M = 256，K = 64，N = 256，使用2个Cube核按M方向分核完成计算，每个Cube核负责输出矩阵C中128行、N方向全部256列的结果。样例规格如下表所示：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">MatmulLeakyRelu</td></tr>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
