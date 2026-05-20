@@ -1,10 +1,13 @@
 # Fusion Compute Practices Sample Introduction
+
 ## Overview
-Operator samples implemented using SIMT and SIMD hybrid programming, introducing SIMT-based flexible branch logic implementation, as well as high-performance Matmul fusion operator implementation and performance optimization methods using UB to improve discrete memory access efficiency.
- 
+
+This directory provides best-practice samples for fusion compute, covering QuantGroupMatmul grouped quantized matrix multiplication, Cube-Vector fusion for Matmul+GELU, and high-performance optimization based on SIMT and SIMD hybrid programming.
+
 ## Sample List
+
 | Directory Name | Description | Supported Products |
 | ------------------------------------------------------------ | ---------------------------------------------------- | --- |
-| [grouped_matmul](./grouped_matmul) |  This sample introduces high-performance implementation of QuantGroupMatmul operator on NPU, supporting grouped quantization matrix multiplication and Gelu activation computation. | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
-| [simt_and_simd_floor_mod](./simt_and_simd_floor_mod) |  Operator sample implemented using SIMT and SIMD hybrid programming, introducing SIMT-based flexible branch logic implementation. | Ascend 950PR/Ascend 950DT |
-| [simt_gather_with_ub](./simt_gather_with_ub) |  This sample uses the Gather operator as an example to demonstrate performance optimization using UB to improve discrete memory access efficiency in SIMD and SIMT hybrid programming mode | Ascend 950PR/Ascend 950DT |
+| [grouped_matmul](./grouped_matmul) | Introduces a high-performance QuantGroupMatmul implementation, supporting grouped quantized matrix multiplication and GELU activation. | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [matmul_gelu_high_performance](./matmul_gelu_high_performance) | Demonstrates a high-performance Cube-Vector fusion implementation that runs Matmul and GELU activation in parallel on the same AI Core. | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [simt_and_simd_high_performance](./simt_and_simd_high_performance) | Uses FloorMod as an example to demonstrate performance tuning in SIMT and SIMD hybrid programming scenarios. | Ascend 950PR/Ascend 950DT |
