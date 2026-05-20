@@ -10,9 +10,12 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_ASC_RUN_MODE "sim" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_RUN_MODE "sim" CACHE STRING "Run mode: npu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
-set(SCENARIO_NUM "0" CACHE STRING "Scenario: 0=SIMT-GM-Stride, 1=SIMD, 2=SIMT-Block, 3=SIMT-Stride")
+set(SCENARIO_NUM "0" CACHE STRING "Scenario: 0=SIMT-DirectGM, 1=SIMD, 2=SIMT-NonContiguous, 3=SIMT-Contiguous")
+if (NOT SCENARIO_NUM MATCHES "^[0-3]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 0, 1, 2 or 3")
+endif()
 
 find_package(ASC REQUIRED)
 
@@ -22,7 +25,7 @@ add_executable(demo
     floor_mod.asc
 )
 
-message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM} (0=SIMT-GM-Stride, 1=SIMD, 2=SIMT-Block, 3=SIMT-Stride)")
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM} (0=SIMT-DirectGM, 1=SIMD, 2=SIMT-NonContiguous, 3=SIMT-Contiguous)")
 
 target_compile_definitions(demo PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
