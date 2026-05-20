@@ -153,19 +153,19 @@ Kirin 9030
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。|
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。 |
 | <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，RsqrtConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class RsqrtAlgo {&#10;    INTRINSIC = 0,&#10;    FAST_INVERSE,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_0ULP_FTZ_FALSE,&#10;    PRECISION_1ULP_FTZ_FALSE,&#10;};&#10;struct RsqrtConfig {&#10;    RsqrtAlgo algo = RsqrtAlgo::INTRINSIC;&#10;};</pre>通过RsqrtConfig结构体的参数algo来配置精度计算模式。algo取值如下：<br>&bull; RsqrtAlgo::INTRINSIC、RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; RsqrtAlgo::FAST_INVERSE、RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE，使用快速求逆算法得出结果。适用于输入值在[0, 85070596800837026223494223584045301760]范围内的计算。在该范围内，算法保证输出的最大精度误差为0 ulp；当输入值大于85070596800837026223494223584045301760时，输出为inf。目前，该算法支持float数据类型，并在该模式下支持Subnormal数据计算。<br>&bull; RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE，仅支持half类型的Subnormal数据计算，此时最大精度误差为1 ulp。<br>该参数的默认值DEFAULT_RSQRT_CONFIG的取值如下：<br><pre class="screen" codetype="Cpp">constexpr RsqrtConfig DEFAULT_RSQRT_CONFIG = { RsqrtAlgo::INTRINSIC };</pre></cann-filter> |
 
 **表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。 |
-| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。 |
-| count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](连续计算.md#ZH-CN_TOPIC_0000002543264748)。 |
-| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
-| repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](高维切分.md#ZH-CN_TOPIC_0000002556644319)。 |
-| repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](UnaryRepeatParams.md#ZH-CN_TOPIC_0000002525604434)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](高维切分.md#zh-cn_topic_0000002516372540_li072713185916)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](高维切分.md#zh-cn_topic_0000002516372540_zh-cn_topic_0000002267504656_zh-cn_topic_0000001764162593_li1481335103413)。 |
+| dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。 |
+| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。 |
+| count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
+| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码.md)。 |
+| repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](../SIMD计算说明/高维切分.md)。 |
+| repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](../../../其他数据类型/UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 
 ## 数据类型
 
@@ -177,11 +177,11 @@ Kirin 9030
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
-- 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 - 当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
 - 如果src中的数值为非正数，可能会产生未知结果。
-- 使用Rsqrt时，half的算子结果对比误差不满足双千分之一的要求，float的算子结果对比误差不满足双万分之一的要求，如果需要高精度，建议使用[Div](Div.md#ZH-CN_TOPIC_0000002573904709)和[Sqrt](Sqrt.md#ZH-CN_TOPIC_0000002543424440)替代实现。
+- 使用Rsqrt时，half的算子结果对比误差不满足双千分之一的要求，float的算子结果对比误差不满足双万分之一的要求，如果需要高精度，建议使用[Div](Div.md)和[Sqrt](Sqrt.md)替代实现。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
