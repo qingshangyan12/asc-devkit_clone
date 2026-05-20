@@ -20,28 +20,18 @@
 
 ## 函数原型
 
-- 自动根据张量位置分发。
+```cpp
+template <typename AtomType, typename DstTensor, typename SrcTensor>
+__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
+```
 
-    ```cpp
-    template <typename T, typename U, Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U>, int>,
-        typename... Params>
-    __aicore__ inline void
-    Copy(const T& dst, const U& src, const Params& ...params)
-    ```
+```cpp
+template <typename CopyOperationType>
+__aicore__ inline constexpr auto MakeCopy()
 
-- 显式指定 `CopyGM2L1`。
-
-    ```cpp
-    template <typename T, typename... Params>
-    __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params)
-    ```
-
-- 构造 `CopyGM2L1` 原子对象。
-
-    ```cpp
-    template <typename... Args>
-    __aicore__ inline constexpr auto MakeCopy(const Args& ...traits)
-    ```
+template <typename CopyOperationType, typename CopyTraitType>
+__aicore__ inline constexpr auto MakeCopy()
+```
 
 ## 参数说明
 
@@ -49,9 +39,8 @@
 | :--- | :---: | :--- |
 | `dst` | 输出 | 目的张量，存储位置为 `Location::L1`。 |
 | `src` | 输入 | 源张量，存储位置为 `Location::GM`。 |
-| `params` | 输入 | 可变参数。当前 GM 到 L1 搬运通常不需要额外运行时参数。 |
-| `atomCopy` | 输入 | 搬运原子对象，显式调用时使用 `CopyAtom<CopyTraits<CopyGM2L1, CopyGM2L1TraitDefault>>` 或 `MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{})`。 |
-| `traits` | 输入 | `MakeCopy` 的构造参数，GM 到 L1 搬运使用 `CopyGM2L1` 和 `CopyGM2L1TraitDefault`。 |
+| `atomCopy` | 输入 | 搬运原子对象，可由 `MakeCopy<CopyGM2L1>()` 或 `MakeCopy<CopyGM2L1, CopyGM2L1TraitDefault>()` 构造。 |
+| `traits` | 输入 | `MakeCopy` 的模板参数，GM 到 L1 搬运使用 `CopyGM2L1` 和 `CopyGM2L1TraitDefault`。 |
 
 ## 返回值说明
 
@@ -70,13 +59,11 @@
 ```cpp
 using namespace AscendC::Te;
 
-auto gmA = MakeTensor(MakeMemPtr<Location::GM>(gmAddr),
+auto gmA = MakeTensor(MakeMemPtr<Location::GM, float>(gmAddr),
     MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
-auto l1A = MakeTensor(MakeMemPtr<Location::L1>(l1Addr),
+auto l1A = MakeTensor(MakeMemPtr<Location::L1, float>(l1Addr),
     MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
-Copy(l1A, gmA);
-
-auto atom = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
+auto atom = MakeCopy<CopyGM2L1>();
 Copy(atom, l1A, gmA);
 ```
