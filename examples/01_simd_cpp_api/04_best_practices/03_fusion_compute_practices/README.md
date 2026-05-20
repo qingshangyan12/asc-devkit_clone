@@ -1,11 +1,13 @@
 # Fusion Compute Practices样例介绍
+
 ## 概述
-基于SIMT与SIMD混合编程方式实现的算子样例，介绍基于SIMT灵活实现分支判断逻辑，以及Matmul融合算子的高性能实现和使用UB提升离散内存访问效率的性能优化方式。
- 
+
+本目录提供融合计算相关的最佳实践样例，覆盖QuantGroupMatmul分组量化矩阵乘、Matmul+GELU的Cube-Vector融合实现，以及SIMT与SIMD混合编程的高性能优化方法。
+
 ## 样例列表
-|  目录名称                                                   |  功能描述                                              |
+
+| 目录名称 | 功能描述 |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| [grouped_matmul](./grouped_matmul) | 本样例介绍QuantGroupMatmul算子在NPU上高性能实现，支持分组量化矩阵乘与Gelu激活计算。 |
-| [matmul_gelu_high_performance](./matmul_gelu_high_performance) | 本样例展示Cube-Vector融合的高性能实现，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。 |
-| [simt_and_simd_floor_mod](./simt_and_simd_floor_mod) | 基于SIMT与SIMD混合编程方式实现的算子样例，介绍基于SIMT灵活实现分支判断逻辑。 |
-| [simt_gather_with_ub](./simt_gather_with_ub) | 本样例以Gather算子为示例，展示了在SIMD与SIMT混合编程模式下使用UB提升离散内存访问效率的性能优化方式 |
+| [grouped_matmul](./grouped_matmul) | 介绍QuantGroupMatmul算子的高性能实现，支持分组量化矩阵乘与GELU激活计算。 |
+| [matmul_gelu_high_performance](./matmul_gelu_high_performance) | 展示Cube-Vector融合的高性能实现，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。 |
+| [simt_and_simd_high_performance](./simt_and_simd_high_performance) | 以FloorMod计算为例，展示SIMT与SIMD混合编程场景下的性能调优方法。 |
