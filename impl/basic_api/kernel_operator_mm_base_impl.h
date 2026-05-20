@@ -547,7 +547,7 @@ __aicore__ inline void MmadMxImpl(
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckMmadTensorCommon(dst, fm, filter, mmadParams, "MmadMx");
 #endif
-    MmadCal(
+    MmadMxCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
         mmadParams);
 }
@@ -568,10 +568,11 @@ __aicore__ inline void MmadMxImpl(
         cmatrixSource = false;
     } else {
         ASCENDC_ASSERT((false), {
-            KERNEL_LOG(KERNEL_ERROR, "Failed to check bias tensor position in Mmad, supported positions are CO1 or C2");
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check bias tensor position in MmadMx, supported positions are CO1 or C2");
         });
     }
-    MmadCal(
+    MmadMxCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
         (uint64_t)bias.GetPhyAddr(), mmadParams, cmatrixSource);
 }
@@ -593,7 +594,7 @@ __aicore__ inline void MmadMxImpl(
 }
 
 template <typename T, typename U, typename S, typename V>
-__aicore__ inline void MmadMx(
+__aicore__ inline void MmadMxImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadBitModeParams& mmadParams)
 {

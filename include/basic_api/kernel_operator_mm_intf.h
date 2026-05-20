@@ -299,6 +299,25 @@ __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     MmadBitModeParams& mmadParams);
 
+/* **************************************************************************************************
+ * MmadMx                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup MmadMx
+ * @brief Matrix multiplication and addition in microscaling scenario
+ * @param [out] dst output LocalTensor
+ * @param [in] fm input LocalTensor
+ * @param [in] filter input LocalTensor
+ * @param [in] mmadParams.m Left matrix row number
+ * @param [in] mmadParams.n right matrix column number
+ * @param [in] mmadParams.k Left matrix column number m
+ * @param [in] mmadParams.unitFlag whether enable unit flag
+ * @param [in] mmadParams.kDirectionAlign is the indicator for alignment in L0A/L0B in the K direction
+ * @param [in] mmadParams.cmatrixSource indicates the C matrix source, 1: the C matrix is in bias table buffer, 0: the C
+ * matrix is in L0C
+ * @param [in] mmadParams.cmatrixInitVal indicates the initial matrix, 1: the number in C matrix is 0, 0：use the real
+ * number in C matrix
+ */
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams);
