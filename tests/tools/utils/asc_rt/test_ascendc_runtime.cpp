@@ -148,7 +148,7 @@ TEST_F(TEST_ASCENDC_RUNTIME, StreamStateCallbackTest){
     void *stream = nullptr;
     void *args = nullptr;
     aclrtStreamState stateCreate = ACL_RT_STREAM_STATE_CREATE_POST;
-    aclrtStreamState stateDestroy = ACL_RT_STREAM_STATE_DESTROY_POST;
+    aclrtStreamState stateDestroy = ACL_RT_STREAM_STATE_DESTROY_PRE;
     AscendCStreamForVectorCore streamForVectorCore;
     StreamStateCallback(stream, stateCreate, args);
     g_ascStreamMap[stream] = streamForVectorCore;
