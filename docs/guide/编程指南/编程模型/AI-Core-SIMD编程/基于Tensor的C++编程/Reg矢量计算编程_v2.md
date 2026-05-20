@@ -4,7 +4,7 @@
 
 本文介绍如何在AscendC中使用Reg矢量计算API编写寄存器级向量计算代码。该能力面向已经熟悉基础AscendC编程模型的开发者，适用于需要进一步减少UB读写、压缩关键路径访存开销、并愿意显式管理寄存器Load/Compute/Store流程的高性能场景。 
 
-·如果熟悉CUDA kernel、CUTLASS/CuTe中的register fragment，或者CPU侧AVX-512、Arm SVE等SIMD intrinsics，可以将Reg矢量计算理解为AscendC中更贴近硬件的向量寄存器编程方式：数据从UB加载到寄存器，在寄存器内完成计算，再写回UB。
+·Reg矢量计算理解为AscendC中更贴近硬件的向量寄存器编程方式：数据从UB加载到寄存器，在寄存器内完成计算，再写回UB。
 
 ## 适用场景<a name="section1825793122916"></a>
 
