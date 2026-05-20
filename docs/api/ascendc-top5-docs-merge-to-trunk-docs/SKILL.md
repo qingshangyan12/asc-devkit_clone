@@ -25,6 +25,7 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 - **标题 anchor 沿用 Trunk**：所有 `## ` 级别标题后的 `<a name="...">` 使用 Trunk 源文件的值。
 - **`# ` 一级标题 anchor 也沿用 Trunk**。
 - TOP5 独有的新章节（Trunk 中不存在的），其 anchor 保留 TOP5 原值。
+- **例外**：`## 数据类型` 标题后**不添加** `<a name="...">` 锚点。
 
 ### 2. 产品支持情况
 
@@ -50,49 +51,28 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 - 避免大量重复代码（当 950 和 A2/A3 的某些重载签名完全一致时）
 - 读者一眼就能看到哪些接口是通用的，哪些是产品专属的
 
-#### 4.2 情况一：所有重载签名完全相同（大多数双目/标量/部分单目接口）
+#### 4.2 情况一：部分函数原型仅支持特定产品型号（参考 Abs-new.md）
 
-当 950（Trunk）和 910b,A3（TOP5）的所有重载签名完全一致（如 Add/Sub/Mul/Div/Max/Min 等只有 `isSetMask`，没有 `config`），**所有函数原型放在最外层，不包裹任何 `<cann-filter>`**：
+大部分重载签名在 950（Trunk）和 910b,A3（TOP5）之间完全一致，但存在少量**产品专属重载**（如 950 的复数重载）。采用**共享优先**结构：
 
-```markdown
-- tensor前n个数据连续计算
-
-    ```cpp
-    // 使用 TOP5 的签名
-    ```
-
-- tensor高维切分计算
-    - mask逐bit模式
-
-        ```cpp
-        // 使用 TOP5 的签名
-        ```
-
-    - mask连续模式
-
-        ```cpp
-        // 使用 TOP5 的签名
-        ```
-```
-
-#### 4.3 情况二：Trunk 有产品专属重载（如 Abs 的复数重载）
-
-当 Trunk 包含 TOP5 没有的产品专属重载（如 950 的 `tensor前n个复数计算`），采用共享优先结构：
+- 共享重载放在最外层，不包裹任何 `<cann-filter>`
+- 产品专属重载用 `<cann-filter>` 包裹，紧跟在对应的共享重载后面
 
 ```markdown
 - tensor前n个数据连续计算
 
     ```cpp
-    // 950 和 A2/A3 签名完全一致，放在最外层
+    // 950 和 A2/A3 签名完全一致，放在最外层（使用 TOP5 的签名）
     ```
 
 <cann-filter npu-type="950">
-针对Ascend 950PR/Ascend 950DT系列产品：
 
 - tensor前n个复数计算
 
     ```cpp
-    // 仅 950 支持的复数重载（Trunk 签名）
+    // 该函数原型，仅支持Ascend 950PR/Ascend 950DT系列产品
+    template <typename T, typename U>
+    __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t& count)
     ```
 
 </cann-filter>
@@ -101,16 +81,86 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
     - mask逐bit模式 / mask连续模式
 
         ```cpp
-        // 950 和 A2/A3 签名完全一致，放在最外层
+        // 950 和 A2/A3 签名完全一致，放在最外层（使用 TOP5 的签名）
         ```
 ```
 
+**特殊子情况**：当所有重载签名完全相同（即没有产品专属重载，如 Add/Sub/Mul/Div/Max/Min 等只有 `isSetMask`，没有 `config`），所有函数原型放在最外层，不包裹任何 `<cann-filter>`。
+
+#### 4.3 情况二：所有函数原型区分产品型号（参考 Exp-new.md）
+
+当 950 的所有重载签名都包含产品专属参数（如 `config`），与 910b,A3 的签名**全部不同**时，所有函数原型按产品分别用 `<cann-filter>` 包裹：
+
+```markdown
+<cann-filter npu-type="950">
+以下原型仅支持Ascend 950PR/Ascend 950DT系列产品
+
+- tensor前n个数据连续计算
+
+    ```cpp
+    // 950 签名（含 config 模板参数）
+    ```
+
+- tensor高维切分计算
+    - mask逐bit模式 / mask连续模式
+
+        ```cpp
+        // 950 签名（含 config 模板参数）
+        ```
+
+</cann-filter>
+
+以下原型支持
+
+<cann-filter npu-type="A3">
+Atlas A3 训练系列产品、Atlas A3 推理系列产品
+</cann-filter>
+
+<cann-filter npu-type="910b">
+Atlas A2 训练系列产品、Atlas A2 推理系列产品
+</cann-filter>
+
+<cann-filter npu-type="310b">
+Atlas 200I/500 A2 推理产品
+</cann-filter>
+
+<cann-filter npu-type="310p">
+Atlas 推理系列产品
+</cann-filter>
+
+<cann-filter npu-type="910">
+Atlas 训练系列产品
+</cann-filter>
+
+<cann-filter npu-type="x90">
+Kirin X90
+</cann-filter>
+
+<cann-filter npu-type="9030">
+Kirin 9030
+</cann-filter>
+
+- tensor前n个数据连续计算
+
+    ```cpp
+    // A2/A3 签名（含 isSetMask，无 config）
+    ```
+
+- tensor高维切分计算
+    - mask逐bit模式 / mask连续模式
+
+        ```cpp
+        // A2/A3 签名（含 isSetMask，无 config）
+        ```
+
+</cann-filter>
+```
+
 **关键规则**：
-- **共享重载不包裹任何 `<cann-filter>`**，放在函数原型段落的最外层。
-- **产品专属重载用 `<cann-filter>` 包裹**，紧跟在对应的共享重载后面。
+- **情况一**中，共享重载不包裹 `<cann-filter>`，产品专属重载用 `<cann-filter>` 包裹。
+- **情况二**中，所有函数原型按产品用 `<cann-filter>` 包裹，`npu-type="950"` 块在前，`npu-type="910b,A3"` 块在后。
 - `npu-type="950"` 块：使用 Trunk 的函数签名（含 `config` 模板参数或复数模板参数）。
 - `npu-type="910b,A3"` 块：使用 TOP5 的函数签名（含 `isSetMask` 模板参数，无 `config`）。
-- **产品专属重载用 `<cann-filter>` 包裹**，紧跟在对应的共享重载后面。
 - 代码块添加 `cpp` 语言标注。
 
 ### 5. 参数说明
@@ -177,7 +227,7 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 功能说明            ← TOP5 文本 + 公式/头文件改造
 函数原型            ← 合并，共享优先 + cann-filter 隔离产品专属重载
 参数说明            ← 合并，表格格式按 <pre> 有无决定 HTML/Markdown
-数据类型            ← 合并，不同产品支持类型不同时按产品 cann-filter 拆分
+数据类型            ← 合并，根据产品支持类型是否相同决定是否按产品 cann-filter 拆分
 返回值说明          ← Trunk 独有章节
 约束说明            ← 合并，产品专属约束用 cann-filter 包裹
 调用示例            ← 合并，共享代码不包裹 filter，产品专属样例用 cann-filter
@@ -189,12 +239,27 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 
 ### 6.1 数据类型章节
 
-** 严格 从 Trunk 的 T 参数描述中提取各产品的数据类型列表，按产品区分 **
+- `## 数据类型` 标题后**不添加** `<a name="...">` 锚点。
+- 严格从 Trunk 的 T 参数描述中提取各产品的数据类型列表。
+- 根据各产品支持的数据类型是否相同，选择不同写法：
 
-- 从 Trunk 的 T 参数描述中提取各产品的类型列表。
-- 按产品分别用 `<cann-filter>` 包裹，每个产品一个块：
+#### 写法一：所有产品支持的数据类型完全相同
+
+直接写一句话描述，不使用 `<cann-filter>` 拆分。参考 Exp-new.md：
 
 ```markdown
+## 数据类型
+
+支持的数据类型为：half、float。
+```
+
+#### 写法二：不同产品支持的数据类型不同
+
+按产品分别用 `<cann-filter>` 包裹，每个产品一个块。参考 Abs-new.md：
+
+```markdown
+## 数据类型
+
 <cann-filter npu-type="950">
 
 - 针对Ascend 950PR/Ascend 950DT系列产品
@@ -307,23 +372,22 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 
 完成合并后，逐项检查：
 
-1. [ ] 标题 anchor 全部沿用 Trunk（新章节保留 TOP5 的）
+1. [ ] 标题 anchor 全部沿用 Trunk（新章节保留 TOP5 的），但 `## 数据类型` 标题后不添加锚点
 2. [ ] 产品支持情况表格完整保留 Trunk 版本
 3. [ ] 公式已替换为 LaTeX 行内公式
 4. [ ] 头文件引用路径已包含
-5. [ ] 函数原型采用共享优先策略：共享重载放在最外层，产品专属重载用 cann-filter 包裹
+5. [ ] 函数原型策略正确：情况一（部分产品专属重载，参考 Abs-new.md）共享优先 + cann-filter 隔离；情况二（所有原型区分产品，参考 Exp-new.md）全部按产品 cann-filter 包裹
 6. [ ] 参数表格格式正确：表 1 统一使用 Markdown 简易表格（含 config 时用 `<pre>` + `<br>` 行内写法），表 2 使用 Markdown
 7. [ ] 模板参数表（表 1）中 T 描述简化为 `操作数数据类型。`（类型详情在数据类型章节展示），产品专属参数用 cann-filter 包裹
 8. [ ] 参数描述链接已统一为 TOP5 的内部引用
 9. [ ] Trunk 独有的模板参数（如 config、U）已保留并用 cann-filter 包裹
 10. [ ] 章节顺序正确（Trunk 顺序 + TOP5 新章节按逻辑位置插入）
 11. [ ] API映射关系章节已丢弃
-12. [ ] 数据类型章节，要遵循 Trunk 的 T 参数描述中提取各产品的数据类型列表，按产品区分
+12. [ ] 数据类型章节：标题后无锚点；数据类型从 Trunk 的 T 参数描述中提取；所有产品类型相同时一句话描述，不同时按产品 cann-filter 拆分
 13. [ ] 约束说明无"待补充"条目，产品专属约束用 cann-filter 包裹
 14. [ ] 调用示例采用共享优先策略：代码完全一致的样例不包裹 filter，产品专属样例用 cann-filter 包裹（含结果示例）
 15. [ ] 所有代码块已添加语言标注（`cpp`/`bash`）
 16. [ ] 无 `<cann-filter>` 标签与子列表嵌套导致的渲染问题
-17. [ ] 数据类型章节：始终按产品 cann-filter 拆分，即使所有产品支持的类型完全相同，也要逐产品列出
-18. [ ] 不保留 `更多样例可参考[LINK]` 引用行
-19. [ ] 约束说明中丢弃不区分产品版本的"支持数据类型为：xxx"约束条目
-20. [ ] 模板参数表（表 1）中参数顺序，要跟所有模板参数同时出现的函数原型（比如tensor高维切分计算函数原型）中的顺序保持一致。有的是：T → 产品专属参数（cann-filter）→ isSetMask；有的是：T → isSetMask → 产品专属参数（cann-filter）；
+17. [ ] 不保留 `更多样例可参考[LINK]` 引用行
+18. [ ] 约束说明中丢弃不区分产品版本的"支持数据类型为：xxx"约束条目
+19. [ ] 模板参数表（表 1）中参数顺序，要跟所有模板参数同时出现的函数原型（比如tensor高维切分计算函数原型）中的顺序保持一致。有的是：T → 产品专属参数（cann-filter）→ isSetMask；有的是：T → isSetMask → 产品专属参数（cann-filter）；
