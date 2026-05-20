@@ -22,6 +22,33 @@ protected:
     void TearDown() {}
 };
 
+class SimtDimGuard {
+public:
+    SimtDimGuard(cce::dim3 blockDimVal, cce::dim3 threadIdxVal, cce::dim3 blockIdxVal = cce::dim3(0u, 0u, 0u),
+        cce::dim3 gridDimVal = cce::dim3(1u, 1u, 1u))
+        : oldBlockDim_(blockDim), oldThreadIdx_(threadIdx), oldBlockIdx_(blockIdx), oldGridDim_(gridDim)
+    {
+        blockDim = blockDimVal;
+        threadIdx = threadIdxVal;
+        blockIdx = blockIdxVal;
+        gridDim = gridDimVal;
+    }
+
+    ~SimtDimGuard()
+    {
+        blockDim = oldBlockDim_;
+        threadIdx = oldThreadIdx_;
+        blockIdx = oldBlockIdx_;
+        gridDim = oldGridDim_;
+    }
+
+private:
+    cce::dim3 oldBlockDim_;
+    cce::dim3 oldThreadIdx_;
+    cce::dim3 oldBlockIdx_;
+    cce::dim3 oldGridDim_;
+};
+
 TEST_F(CooperativeGroupsTestsuite, GroupTypeTest)
 {
     EXPECT_EQ(static_cast<unsigned int>(group_type::thread_block_type), 0u);
@@ -64,10 +91,29 @@ TEST_F(CooperativeGroupsTestsuite, ThreadBlockGroupIndexTest)
     EXPECT_GE(gi.x, 0u);
 }
 
+TEST_F(CooperativeGroupsTestsuite, ThreadBlockGroupIndex3DTest)
+{
+    SimtDimGuard guard(cce::dim3(8u, 4u, 2u), cce::dim3(0u, 0u, 0u), cce::dim3(3u, 2u, 1u),
+        cce::dim3(4u, 3u, 2u));
+    dim3 gi = thread_block::group_index();
+    EXPECT_EQ(gi.x, 3u);
+    EXPECT_EQ(gi.y, 2u);
+    EXPECT_EQ(gi.z, 1u);
+}
+
 TEST_F(CooperativeGroupsTestsuite, ThreadBlockThreadIndexTest)
 {
     dim3 ti = thread_block::thread_index();
     EXPECT_GE(ti.x, 0u);
+}
+
+TEST_F(CooperativeGroupsTestsuite, ThreadBlockThreadIndex3DTest)
+{
+    SimtDimGuard guard(cce::dim3(8u, 4u, 2u), cce::dim3(7u, 3u, 1u));
+    dim3 ti = thread_block::thread_index();
+    EXPECT_EQ(ti.x, 7u);
+    EXPECT_EQ(ti.y, 3u);
+    EXPECT_EQ(ti.z, 1u);
 }
 
 TEST_F(CooperativeGroupsTestsuite, ThreadBlockDimThreadsTest)
@@ -76,10 +122,26 @@ TEST_F(CooperativeGroupsTestsuite, ThreadBlockDimThreadsTest)
     EXPECT_GT(dt.x, 0u);
 }
 
+TEST_F(CooperativeGroupsTestsuite, ThreadBlockDimThreads3DTest)
+{
+    SimtDimGuard guard(cce::dim3(8u, 4u, 2u), cce::dim3(0u, 0u, 0u));
+    dim3 dt = thread_block::dim_threads();
+    EXPECT_EQ(dt.x, 8u);
+    EXPECT_EQ(dt.y, 4u);
+    EXPECT_EQ(dt.z, 2u);
+}
+
 TEST_F(CooperativeGroupsTestsuite, ThreadBlockNumThreadsTest)
 {
     unsigned int nt = thread_block::num_threads();
     EXPECT_GT(nt, 0u);
+}
+
+TEST_F(CooperativeGroupsTestsuite, ThreadBlockNumThreads3DTest)
+{
+    SimtDimGuard guard(cce::dim3(8u, 4u, 2u), cce::dim3(0u, 0u, 0u));
+    EXPECT_EQ(thread_block::num_threads(), 64u);
+    EXPECT_EQ(thread_block::size(), 64u);
 }
 
 TEST_F(CooperativeGroupsTestsuite, ThreadBlockSizeTest)
@@ -88,10 +150,25 @@ TEST_F(CooperativeGroupsTestsuite, ThreadBlockSizeTest)
     EXPECT_EQ(s, thread_block::num_threads());
 }
 
+TEST_F(CooperativeGroupsTestsuite, ThreadBlockThreadRank3DTest)
+{
+    SimtDimGuard guard(cce::dim3(8u, 4u, 2u), cce::dim3(7u, 3u, 1u));
+    EXPECT_EQ(thread_block::thread_rank(), 7u + 3u * 8u + 1u * 8u * 4u);
+}
+
 TEST_F(CooperativeGroupsTestsuite, ThreadBlockGroupDimTest)
 {
     dim3 gd = thread_block::group_dim();
     EXPECT_EQ(gd.x, thread_block::dim_threads().x);
+}
+
+TEST_F(CooperativeGroupsTestsuite, ThreadBlockGroupDim3DTest)
+{
+    SimtDimGuard guard(cce::dim3(8u, 4u, 2u), cce::dim3(0u, 0u, 0u));
+    dim3 gd = thread_block::group_dim();
+    EXPECT_EQ(gd.x, 8u);
+    EXPECT_EQ(gd.y, 4u);
+    EXPECT_EQ(gd.z, 2u);
 }
 
 TEST_F(CooperativeGroupsTestsuite, CoalescedGroupConstructorTest)
@@ -111,6 +188,15 @@ TEST_F(CooperativeGroupsTestsuite, CoalescedGroupConstructorPartialMaskTest)
     EXPECT_EQ(cg.meta_group_rank(), 0ull);
 }
 
+TEST_F(CooperativeGroupsTestsuite, CoalescedGroupConstructorSparseMaskTest)
+{
+    coalesced_group cg(0x00000055);
+    EXPECT_EQ(cg.num_threads(), 4ull);
+    EXPECT_EQ(cg.size(), 4ull);
+    EXPECT_EQ(cg.meta_group_size(), 1ull);
+    EXPECT_EQ(cg.meta_group_rank(), 0ull);
+}
+
 TEST_F(CooperativeGroupsTestsuite, CoalescedGroupSyncTest)
 {
     coalesced_group cg(0xFFFFFFFF);
@@ -122,6 +208,23 @@ TEST_F(CooperativeGroupsTestsuite, CoalescedGroupThreadRankTest)
     coalesced_group cg(0xFFFFFFFF);
     unsigned long long rank = cg.thread_rank();
     EXPECT_GE(rank, 0ull);
+}
+
+TEST_F(CooperativeGroupsTestsuite, CoalescedGroupThreadRankUsesMaskAndLaneMaskTest)
+{
+    coalesced_group cg(0x00000055);
+    EXPECT_EQ(cg.thread_rank(), static_cast<unsigned long long>(__popc(0x00000055 & lanemask_lt())));
+}
+
+TEST_F(CooperativeGroupsTestsuite, CoalescedGroupPackLanesTest)
+{
+    coalesced_group cg(0x00000055);
+    EXPECT_EQ(cg._packLanes(0x00000000), 0x0u);
+    EXPECT_EQ(cg._packLanes(0x00000001), 0x1u);
+    EXPECT_EQ(cg._packLanes(0x00000004), 0x2u);
+    EXPECT_EQ(cg._packLanes(0x00000010), 0x4u);
+    EXPECT_EQ(cg._packLanes(0x00000040), 0x8u);
+    EXPECT_EQ(cg._packLanes(0x00000055), 0xFu);
 }
 
 TEST_F(CooperativeGroupsTestsuite, CoalescedGroupMetaGroupSizeRankTest)
@@ -296,12 +399,24 @@ TEST_F(CooperativeGroupsTestsuite, ThreadBlockTileBaseNumThreadsSizeTest)
     EXPECT_EQ(thread_block_tile_base<4>::size(), 4ull);
     EXPECT_EQ(thread_block_tile_base<2>::num_threads(), 2ull);
     EXPECT_EQ(thread_block_tile_base<2>::size(), 2ull);
+    EXPECT_EQ(thread_block_tile_base<1>::num_threads(), 1ull);
+    EXPECT_EQ(thread_block_tile_base<1>::size(), 1ull);
 }
 
 TEST_F(CooperativeGroupsTestsuite, ThreadBlockTileBaseThreadRankTest)
 {
     unsigned long long rank = thread_block_tile_base<32>::thread_rank();
     EXPECT_GE(rank, 0ull);
+}
+
+TEST_F(CooperativeGroupsTestsuite, ThreadBlockTileBaseBuildMaskTest)
+{
+    EXPECT_EQ(thread_block_tile_base<32>::build_mask(), 0xFFFFFFFFu);
+    EXPECT_EQ(thread_block_tile_base<16>::build_mask(), 0x0000FFFFu);
+    EXPECT_EQ(thread_block_tile_base<8>::build_mask(), 0x000000FFu);
+    EXPECT_EQ(thread_block_tile_base<4>::build_mask(), 0x0000000Fu);
+    EXPECT_EQ(thread_block_tile_base<2>::build_mask(), 0x00000003u);
+    EXPECT_EQ(thread_block_tile_base<1>::build_mask(), 0x00000001u);
 }
 
 TEST_F(CooperativeGroupsTestsuite, ThreadBlockTileBaseSyncTest)
@@ -378,6 +493,24 @@ TEST_F(CooperativeGroupsTestsuite, TiledPartitionThreadBlockSize4Test)
     EXPECT_EQ(tile.num_threads(), 4ull);
 }
 
+TEST_F(CooperativeGroupsTestsuite, TiledPartitionThreadBlockSize1Test)
+{
+    thread_block tb = this_thread_block();
+    auto tile = tiled_partition<1>(tb);
+    EXPECT_EQ(tile.size(), 1ull);
+    EXPECT_EQ(tile.num_threads(), 1ull);
+    EXPECT_EQ(tile.thread_rank(), 0ull);
+}
+
+TEST_F(CooperativeGroupsTestsuite, TiledPartitionThreadBlockSize2Test)
+{
+    thread_block tb = this_thread_block();
+    auto tile = tiled_partition<2>(tb);
+    EXPECT_EQ(tile.size(), 2ull);
+    EXPECT_EQ(tile.num_threads(), 2ull);
+    EXPECT_LT(tile.thread_rank(), tile.size());
+}
+
 TEST_F(CooperativeGroupsTestsuite, TiledPartitionThreadBlockSize8Test)
 {
     thread_block tb = this_thread_block();
@@ -419,11 +552,54 @@ TEST_F(CooperativeGroupsTestsuite, TiledPartitionThreadGroupTest)
     EXPECT_EQ(tg.get_type(), group_type::coalesced_group_type);
 }
 
+TEST_F(CooperativeGroupsTestsuite, TiledPartitionThreadGroupMetadataTest)
+{
+    SimtDimGuard guard(cce::dim3(10u, 1u, 1u), cce::dim3(9u, 0u, 0u));
+    thread_block tb = this_thread_block();
+    thread_group tg = tiled_partition(tb, 4);
+    EXPECT_EQ(tg.get_type(), group_type::coalesced_group_type);
+    EXPECT_TRUE(tg._tiled_info.is_tiled);
+    EXPECT_EQ(tg._tiled_info.num_threads, 2u);
+    EXPECT_EQ(tg._tiled_info.meta_group_rank, 2u);
+    EXPECT_EQ(tg._tiled_info.meta_group_size, 3u);
+    EXPECT_EQ(tg.size(), 2ull);
+    EXPECT_EQ(tg.num_threads(), 2ull);
+}
+
 TEST_F(CooperativeGroupsTestsuite, TiledPartitionCoalescedGroupTest)
 {
     coalesced_group cg(0x0000FFFF);
     coalesced_group result = tiled_partition(cg, 4);
     EXPECT_EQ(result.get_type(), group_type::coalesced_group_type);
+}
+
+TEST_F(CooperativeGroupsTestsuite, TiledPartitionCoalescedGroupNoSplitWhenTileIsLargeEnoughTest)
+{
+    coalesced_group cg(0x0000000F);
+    coalesced_group result = tiled_partition(cg, 8);
+    EXPECT_EQ(result.get_type(), group_type::coalesced_group_type);
+    EXPECT_EQ(result.num_threads(), 4ull);
+    EXPECT_EQ(result.size(), 4ull);
+    EXPECT_EQ(result.meta_group_rank(), 0ull);
+    EXPECT_EQ(result.meta_group_size(), 1ull);
+}
+
+TEST_F(CooperativeGroupsTestsuite, TiledPartitionAlreadyTiledCoalescedGroupTest)
+{
+    SimtDimGuard guard(cce::dim3(6u, 1u, 1u), cce::dim3(5u, 0u, 0u));
+    thread_block tb = this_thread_block();
+    thread_group parent = tiled_partition(tb, 8);
+
+    EXPECT_EQ(parent.get_type(), group_type::coalesced_group_type);
+    EXPECT_TRUE(parent._tiled_info.is_tiled);
+    EXPECT_EQ(parent.num_threads(), 6ull);
+
+    thread_group result = tiled_partition(parent, 4);
+    EXPECT_EQ(result.get_type(), group_type::coalesced_group_type);
+    EXPECT_TRUE(result._tiled_info.is_tiled);
+    EXPECT_EQ(result.num_threads(), 2ull);
+    EXPECT_EQ(result._tiled_info.meta_group_rank, 1u);
+    EXPECT_EQ(result._tiled_info.meta_group_size, 1u);
 }
 
 TEST_F(CooperativeGroupsTestsuite, SupportTypeSimtInternelTest)
@@ -504,6 +680,16 @@ TEST_F(CooperativeGroupsTestsuite, ThreadGroupBaseClassThreadBlockTest)
     EXPECT_GE(tg.thread_rank(), 0ull);
     EXPECT_LT(tg.thread_rank(), tg.size());
     EXPECT_EQ(tg.get_type(), group_type::thread_block_type);
+}
+
+TEST_F(CooperativeGroupsTestsuite, ThreadGroupBaseClassTiledGroupDefaultDispatchTest)
+{
+    thread_group tg(group_type::tiled_group_type);
+    EXPECT_EQ(tg.get_type(), group_type::tiled_group_type);
+    EXPECT_EQ(tg.size(), 0ull);
+    EXPECT_EQ(tg.num_threads(), 0ull);
+    EXPECT_EQ(tg.thread_rank(), 0ull);
+    tg.sync();
 }
 
 TEST_F(CooperativeGroupsTestsuite, ThreadGroupBaseClassSyncFromThreadBlockTest)
@@ -618,6 +804,16 @@ TEST_F(CooperativeGroupsTestsuite, ThreadBlockTileConstructorTest)
     EXPECT_EQ(tile4.num_threads(), 4ull);
 }
 
+TEST_F(CooperativeGroupsTestsuite, ThreadBlockTileImplVoidConstructorCopiesMetadataTest)
+{
+    thread_block_tile_impl<4, void> tile4(2u, 8u);
+    EXPECT_EQ(tile4.get_type(), group_type::tiled_group_type);
+    EXPECT_EQ(tile4.size(), 4ull);
+    EXPECT_EQ(tile4.num_threads(), 4ull);
+    EXPECT_EQ(tile4.meta_group_rank(), 2u);
+    EXPECT_EQ(tile4.meta_group_size(), 8u);
+}
+
 TEST_F(CooperativeGroupsTestsuite, ThreadBlockTileFromThreadBlockTest)
 {
     thread_block tb = this_thread_block();
@@ -694,6 +890,16 @@ TEST_F(CooperativeGroupsTestsuite, TiledPartitionFromThreadBlockTileTest)
     EXPECT_GE(tile4.thread_rank(), 0ull);
 }
 
+TEST_F(CooperativeGroupsTestsuite, TiledPartitionFromThreadBlockTileSize2Test)
+{
+    thread_block tb = this_thread_block();
+    auto tile8 = tiled_partition<8>(tb);
+    auto tile2 = tiled_partition<2>(tile8);
+    EXPECT_EQ(tile2.size(), 2ull);
+    EXPECT_EQ(tile2.num_threads(), 2ull);
+    EXPECT_LT(tile2.thread_rank(), tile2.size());
+}
+
 TEST_F(CooperativeGroupsTestsuite, MultiLevelTiledPartitionMetaGroupInfoTest)
 {
     thread_block tb = this_thread_block();
@@ -728,6 +934,15 @@ TEST_F(CooperativeGroupsTestsuite, ThreadBlockTileMetaGroupRankSizeFromBlockTest
     unsigned int meta_size = tile4.meta_group_size();
     EXPECT_EQ(meta_rank, thread_block::thread_rank() / 4);
     EXPECT_EQ(meta_size, (thread_block::size() + 3) / 4);
+}
+
+TEST_F(CooperativeGroupsTestsuite, ThreadBlockTileMetaGroupRankSizeFromBlock3DTest)
+{
+    SimtDimGuard guard(cce::dim3(8u, 4u, 2u), cce::dim3(7u, 3u, 1u));
+    thread_block tb = this_thread_block();
+    auto tile4 = tiled_partition<4>(tb);
+    EXPECT_EQ(tile4.meta_group_rank(), thread_block::thread_rank() / 4);
+    EXPECT_EQ(tile4.meta_group_size(), (thread_block::size() + 3) / 4);
 }
 
 TEST_F(CooperativeGroupsTestsuite, DISABLED_ThreadGroupTiledPartitionFromCoalescedGroupTest)
