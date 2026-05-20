@@ -55,7 +55,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <uint8_t modeId = 0, pipe_t pipe = PIPE_S>
 __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 ```
@@ -79,6 +79,14 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 无
 
+## 数据类型
+
+无
+
+## 流水类型
+
+PIPE_S
+
 ## 约束说明<a name="section633mcpsimp"></a>
 
 <cann-filter npu-type="950">
@@ -96,11 +104,11 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 -   接口使用模式0、1、2，需要避免flagId使用冲突：
     - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象数目，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul 最多支持定义 4 个对象 ，此时 flagId占用范围为\[0,7\]。
 
-    - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
+    - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
 
 -   flagId相关的约束：
     -   对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取到最低位4bit为准。
-    -   每个flagId有个对应计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag.md#ZH-CN_TOPIC_0000002555780806)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到核间同步\(CrossCoreSetFlag\)全部完成后，会将对应CrossCoreWaitFlag的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](关键特性说明-64.md#ZH-CN_TOPIC_0000002586300741)。flagId的对应的计数器计数范围为0-15。如果计数器的值超出该范围，则会异常报错，中断流程。
+    -   每个flagId有个对应计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag.md#ZH-CN_TOPIC_0000002555780806)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到核间同步\(CrossCoreSetFlag\)全部完成后，会将对应CrossCoreWaitFlag的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。flagId对应的计数器计数范围为0-15。如果计数器的值超出该范围，则会异常报错，中断流程。
     -   模式0、1、2下，如果多个模式同时共用同一个flagId，CrossCoreWaitFlag无法分辨具体是哪一个模式，会与预期不符合。
 
         如图1所示，AIC 1的flagId 0同时用于进行模式2 \(AIV执行CrossCoreSetFlag\)和模式0\(所有AIC\)的核间同步。AIC 1在调用CrossCoreWaitFlag的时候，读取flagId=0的计数器，此时该计数器的值变化可能是由于模式0或模式2同步完成。AIC 1感知不到具体是哪个模式，只能感知到计数器值变化，能够解除阻塞。

@@ -57,7 +57,7 @@ WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDeter
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)
 ```
 
@@ -71,6 +71,14 @@ __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, Local
 | ubWorkspace | 输入 | 临时空间，用于操作gmWorkspace，类型为LocalTensor。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
+
+无
+
+## 数据类型
+
+无
+
+## 流水类型
 
 无
 

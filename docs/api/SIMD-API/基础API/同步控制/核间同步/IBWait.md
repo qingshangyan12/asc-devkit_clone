@@ -57,7 +57,7 @@ IBWait是核间同步控制接口，其功能：当不同核之间操作同一�
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <bool isAIVOnly = true>
 __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx, int32_t eventID)
 ```
@@ -80,6 +80,14 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 | eventID | 输入 | 用来控制当前核的set、wait事件。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
+
+无
+
+## 数据类型
+
+无
+
+## 流水类型
 
 无
 

@@ -55,7 +55,7 @@ InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)
 ```
 
@@ -111,4 +111,4 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
     }
 ```
 
-详细请参考[sequential\_block\_sync示例](https://gitcode.com/GRJ_XIDUO/asc-devkit_5206/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/sequential_block_sync)。
+详细请参考[sequential\_block\_sync示例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/sequential_block_sync)。

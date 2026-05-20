@@ -87,8 +87,8 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
     用于多个核之间的同步控制，支持以下同步场景：
 
-    1.  纯Vector算子的全核同步，可参考[CrossCoreSetFlag的模式0](关键特性说明-64.md#ZH-CN_TOPIC_0000002586300741)。
-    2.  融合算子的全核同步，一次性实现三个核间同步能力（参考[CrossCoreSetFlag的关键特性说明](关键特性说明-64.md#ZH-CN_TOPIC_0000002586300741)）：首先完成单个AI Core内，AIC与所有AIV同步（AIC等AIV）；接着完成多个AI Core间，所有AIC的同步；最后完成单个AI Core内，所有AIV与AIC同步（AIV等AIC）。
+    1.  纯Vector算子的全核同步，可参考[CrossCoreSetFlag的模式0](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。
+    2.  融合算子的全核同步，一次性实现三个核间同步能力（参考[CrossCoreSetFlag的关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)）：首先完成单个AI Core内，AIC与所有AIV同步（AIC等AIV）；接着完成多个AI Core间，所有AIC的同步；最后完成单个AI Core内，所有AIV与AIC同步（AIV等AIC）。
 
 -   软件同步接口：
 
@@ -100,17 +100,27 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
 -   软同步
 
-    ```
+    ```cpp
     template <bool isAIVOnly = true>
     __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0)
     ```
 
 -   硬同步
 
+    ```cpp
+    template <bool isAIVOnly = true>
+    __aicore__ inline void SyncAll()
+    ```
+    <cann-filter npu-type="950">
+
+    以下函数原型仅支持Ascend 950PR/Ascend 950DT型号。
+
     ```
     template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
     __aicore__ inline void SyncAll()
     ```
+
+    </cann-filter>
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -119,7 +129,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 | 参数名 | 描述 |
 | --- | --- |
 | isAIVOnly | 控制SyncAll作用于纯Vector算子或融合（Cube和Vector融合）算子。可选值：<br>&bull; **true**（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。<br>&bull; **false**：融合算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。 |
-| <cann-filter npu-type="950"> config | 该参数仅支持如下型号:Ascend 950PR/Ascend 950DT。<br>控制SyncAll函数的行为，在多个AI Core之间进行流水线同步时，指定哪些管道（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个管道用于"发送触发信号"。<br>&bull; **waitPipe**：指定哪个管道用于"接收等待信号"。<br>默认为SyncAllConfig DEFAULT_SYNC_ALL_CONFIG= {PIPE_ALL, PIPE_ALL}，使用全部管道来进行触发和等待行为。</cann-filter> |
+| <cann-filter npu-type="950"> config | 该参数仅在Ascend 950PR/Ascend 950DT上支持。<br>控制SyncAll函数的行为，在多个AI Core之间进行流水线同步时，指定哪些管道（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个管道用于"发送触发信号"。<br>&bull; **waitPipe**：指定哪个管道用于"接收等待信号"。<br>默认为SyncAllConfig DEFAULT_SYNC_ALL_CONFIG= {PIPE_ALL, PIPE_ALL}，使用全部管道来进行触发和等待行为。</cann-filter> |
 
 **表 2**  参数说明
 
@@ -133,6 +143,14 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
 无
 
+## 数据类型
+
+无
+
+## 流水类型
+
+无
+
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   gmWorkspace缓存申请的空间大小要求大于等于核数\*32Bytes，并且缓存的值需要初始化为0。目前常见的有两种初始化方式：
@@ -142,7 +160,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 -   ubWorkspace申请的空间大小要求大于等于核数\*32Bytes。
 -   针对Ascend 950PR/Ascend 950DT，对于软同步接口，连续使用（Polling）该接口，用于进行多核同步，会造成Bus被长期占用，导致其他核无法访问该GM，导致多核读同一GM出现卡死现象，若需要Polling，建议在该使用接口间，增加Nop指令，指令量建议为800个，一般为需要同步的核数 \* 200。
 -   使用该接口进行多核控制时，算子调用时指定的逻辑numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
--   SyncAll硬件同步接口内部实现中使用了[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
+-   SyncAll硬件同步接口内部实现中使用了[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
 -   在分离模式下，建议使用硬同步接口而非软同步接口。软同步接口仅适用于纯Vector场景，且性能较低。使用硬同步接口时，需根据场景设置Kernel类型：
     -   在纯Vector/Cube场景下，需设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0。
     -   对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型。

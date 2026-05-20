@@ -71,7 +71,7 @@ SetFlag/WaitFlag接口用于多流水间的同步：如下图1所示，同一核
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <HardEvent event>
 __aicore__ inline void SetFlag(int32_t eventID)
 template <HardEvent event>
@@ -85,19 +85,11 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | event | 输入 | 模板参数。<br>同步事件，数据类型为HardEvent。详细内容参考下文中的同步类型说明。 |
-| eventID | 输入 | 事件ID。数据类型为int32_t类型。其定义如下：<br>在基于TPipe和TQue编程场景中，eventID需要通过[AllocEventID](../../资源管理/Pipe和Que框架/TPipe/AllocEventID.md)或者[FetchEventID](../../资源管理/Pipe和Que框架/TPipe/FetchEventID.md)来获取。<br><cann-filter npu-type="950"><br>- Ascend 950PR/Ascend 950DT，数据范围为：0-7</cann-filter><cann-filter npu-type="A3"><br>- Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7</cann-filter><cann-filter npu-type="910b"><br>- Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7</cann-filter><cann-filter npu-type="310p"><br>- Atlas 推理系列产品AI Core，数据范围为：0-7</cann-filter><cann-filter npu-type="910"><br>- Atlas 训练系列产品，数据范围为：0-3</cann-filter> |
+| eventID | 输入 | 事件ID。数据类型为int32_t类型。其定义如下：<br>在基于TPipe和TQue编程场景中，eventID需要通过[AllocEventID](../../资源管理/Pipe和Que框架/TPipe/AllocEventID.md)或者[FetchEventID](../../资源管理/Pipe和Que框架/TPipe/FetchEventID.md)来获取。<cann-filter npu-type="950"><br>&bull; Ascend 950PR/Ascend 950DT，数据范围为：0-7</cann-filter><cann-filter npu-type="A3"><br>&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7</cann-filter><cann-filter npu-type="910b"><br>&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7</cann-filter><cann-filter npu-type="310p"><br>&bull; Atlas 推理系列产品AI Core，数据范围为：0-7</cann-filter><cann-filter npu-type="910"><br>&bull; Atlas 训练系列产品，数据范围为：0-3</cann-filter> |
 
 同一核内的不同流水之间，在存在数据访问依赖时，需要根据数据访问的先后顺序，插入对应的同步事件。HardEvent用来表示对应的同步事件。
 
 HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先执行、目标流水中的指令后执行。例如MTE2\_V，代表PIPE\_MTE2为源流水，PIPE\_V为目标流水，标识从PIPE\_MTE2到PIPE\_V的同步，PIPE\_V等待PIPE\_MTE2。由于芯片代际间的差异，不同芯片上的事件会存在差异。
-
-<cann-filter npu-type="910b">
-
-Atlas A2/A3系列产品支持的HardEvent枚举值情况见[所有合法的核内同步组合](核内同步能力概述.md#zh-cn_topic_0000002542725361_table13753342164113)。
-
-</cann-filter>
-
-
 
 ## 数据类型
 
@@ -123,4 +115,15 @@ PIPE_S
 
 ## 调用示例<a name="section837496171220"></a>
 
-原来的样例被人移动了，找不到了。
+```cpp
+    AscendC::DataCopy(src1Local, src1Global[i * tileLength], tileLength);
+    AscendC::DataCopy(src0Local, src0Global[i * tileLength], tileLength);
+    
+    // 循环内依赖：先“DataCopy(PIPE_MTE2)写src0Local”，后 “Maxs和Mins（PIPE_V）读src0Local”
+    // 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+
+    AscendC::Maxs(tmpTensor1, src0Local, inputVal, tileLength);
+    AscendC::Mins(tmpTensor2, src0Local, inputVal, tileLength);
+```
