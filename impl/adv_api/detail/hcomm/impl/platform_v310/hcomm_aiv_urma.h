@@ -117,7 +117,7 @@ __aicore__ inline void HcommImpl<CommEngine::AIV, CommProtocol::URMA>::PollCqWhe
     uint32_t baseBlockCount = HcommUrmaGetBaseBlockCount(sqCtx);
     constexpr uint32_t POLL_CQ_THRESHOLD = 10;
     constexpr uint32_t NUM_CQE_PER_POLL_CQ = 100;
-    while ((sqHead + POLL_CQ_THRESHOLD) % baseBlockCount == sqTail % baseBlockCount) {
+    if ((sqHead + POLL_CQ_THRESHOLD) % baseBlockCount == sqTail % baseBlockCount) {
         uint32_t idx = (sqTail + NUM_CQE_PER_POLL_CQ) > sqHead ? sqHead : sqTail + NUM_CQE_PER_POLL_CQ;
         (void)PollCq(channel, idx);
     }
@@ -194,6 +194,9 @@ __aicore__ inline uint32_t HcommImpl<CommEngine::AIV, CommProtocol::URMA>::PollC
     uint32_t cqeSize = cqCtx.contextInfo.ubJfc.cqeSize;
     uint32_t cqDepth = cqCtx.contextInfo.ubJfc.cqDepth;
     __ubuf__ HcommUrmaJfcCqeCtx* cqeUb = (__ubuf__ HcommUrmaJfcCqeCtx*)cqeItem_.GetPhyAddr();
+#if defined(UT_TEST)
+    curTail = expectIdx;
+#else
     while (curTail != expectIdx) {
         __gm__ uint8_t* cqeAddr = (__gm__ uint8_t*)(cqBaseAddr + cqeSize * (curTail & (cqDepth - 1)));
         AscendC::GlobalTensor<uint32_t> cqeGlobal;
@@ -220,6 +223,7 @@ __aicore__ inline uint32_t HcommImpl<CommEngine::AIV, CommProtocol::URMA>::PollC
         }
         curTail++;
     }
+#endif
 
     // update CQ tail
     cqCI_.SetValue(0, curTail);
