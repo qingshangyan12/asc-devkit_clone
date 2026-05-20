@@ -59,9 +59,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic_api/kernel_operator_vec_unary_intf.h"
+头文件引用路径为："basic_api/kernel_operator_vec_binary_scalar_intf.h"
 
-Not属于单目矢量类计算接口，对元素做按位取反。计算公式如下：
+Not属于双目标量类计算接口，对元素做按位取反。计算公式如下：
 
 $dst_i = \sim src_i$
 

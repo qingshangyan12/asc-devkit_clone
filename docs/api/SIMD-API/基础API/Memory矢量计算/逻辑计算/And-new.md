@@ -59,9 +59,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic_api/kernel_operator_vec_binary_intf.h"
+头文件引用路径为："basic_api/kernel_operator_vec_binary_scalar_intf.h"
 
-And属于双目矢量类计算接口，对元素做按位与运算。计算公式如下：
+And属于双目标量类计算接口，对元素做按位与运算。计算公式如下：
 
 $dst_i = src0_i \& src1_i$
 
