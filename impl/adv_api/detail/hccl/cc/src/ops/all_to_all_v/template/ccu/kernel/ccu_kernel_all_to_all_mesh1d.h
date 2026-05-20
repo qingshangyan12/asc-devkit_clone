@@ -16,6 +16,7 @@
 #include "ccu_kernel.h"
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
+#include "ccu_func.hpp"
 
 namespace ops_hccl {
 

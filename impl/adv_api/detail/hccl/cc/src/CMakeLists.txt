@@ -15,6 +15,7 @@ set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu_new
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/common/hcomm_dlsym
@@ -137,6 +138,47 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/selector
 )
 
+<<<<<<< HEAD
+=======
+list(APPEND INCLUDE_LIST
+    ${ASCEND_CANN_PACKAGE_PATH}/include
+    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
+
+    # hcomm头文件
+    ${ASCEND_CANN_PACKAGE_PATH}/include/hccl
+    ${ASCEND_CANN_PACKAGE_PATH}/include/hcomm
+
+    # runtime头文件
+    ${ASCEND_CANN_PACKAGE_PATH}/include/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/base/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/driver/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/dump/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/external/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/platform/
+
+    # driver头文件
+    ${ASCEND_CANN_PACKAGE_PATH}/include/driver/
+
+    # mmpa头文件
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/mmpa/
+
+    # driver头文件
+    ${ASCEND_CANN_PACKAGE_PATH}/include/driver/
+
+    # 包间接口
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/hccl
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/hcomm/ccu
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/hcomm/ccu_new
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/runtime/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/profiling/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/dump/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/trace/
+)
+>>>>>>> fccd13ab (debug)
 
 if(PRODUCT_SIDE STREQUAL "device")
     add_library(mc2_server SHARED
