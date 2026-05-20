@@ -71,6 +71,8 @@
 | `scaleFactorKb` |  | GM->L1搬运中，scaleB 相对 B 的 K 方向搬运比例 |
 | `usedCoreNum` |  | 使用核数 |
 
+- 部分参数如下图所示：
+  <img src="figure/Tiling.png">
 
 本样例通过两组不同的tiling参数演示不同的性能：
 - 场景1：M=K=N=7168，使用16核，单核处理 1792 x 7168 x 1792，baseM/K/N 取 128，stepK取1，scaleFactorKa取1
