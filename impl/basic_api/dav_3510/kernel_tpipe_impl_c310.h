@@ -447,7 +447,7 @@ template <HardEvent evt> __aicore__ inline void TPipe::ReleaseEventID(TEventID i
 
 __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 {
-    return ::AscendC::FetchEventID(evt);
+    return ::AscendC::ReleaseEventID<evt>(id);
 }
 
 template <HardEvent evt> __aicore__ inline TEventID TPipe::FetchEventID()
@@ -903,7 +903,7 @@ __aicore__ inline void TPipe::ResetPool()
         }
     }
 #endif
-    auto evt = Internal::g_tPipeOccupyEventPool;
+    auto evt = Internal::g_occupyEventPool;
     for (int32_t i = 0; i < EVENT_NUM; i++, evt++) {
         *evt = 0;
     }
