@@ -113,11 +113,11 @@ description: 将 TOP5（产品化文档）与 Trunk（主线文档）两个来�
 以下原型支持
 
 <cann-filter npu-type="A3">
-Atlas A3 训练系列产品、Atlas A3 推理系列产品
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
 </cann-filter>
 
 <cann-filter npu-type="910b">
-Atlas A2 训练系列产品、Atlas A2 推理系列产品
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
 </cann-filter>
 
 <cann-filter npu-type="310b">
@@ -269,7 +269,7 @@ Markdown 表格中同一单元格的多个段落用 `<br>` 分隔，列表项用
 
 <cann-filter npu-type="A3">
 
-- 针对Atlas A3 训练系列产品、Atlas A3 推理系列产品：
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：
     支持的数据类型为：half、float。
 
 </cann-filter>

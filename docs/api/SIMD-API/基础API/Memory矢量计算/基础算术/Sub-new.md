@@ -126,7 +126,7 @@ $dst_i = src0_i - src1_i$
 
 <cann-filter npu-type="A3">
 
-- 针对Atlas A3 训练系列产品、Atlas A3 推理系列产品：
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：
     支持的数据类型为：half、int16_t、int32_t、float。
 
 </cann-filter>

@@ -133,14 +133,14 @@ $dst_i = |src_i|$
 
 <cann-filter npu-type="A3">
 
-- 针对Atlas A3 训练系列产品、Atlas A3 推理系列产品：
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：
     支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
-- 针对Atlas A2 训练系列产品、Atlas A2 推理系列产品：
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：
     支持的数据类型为：half、float。
 
 </cann-filter>
