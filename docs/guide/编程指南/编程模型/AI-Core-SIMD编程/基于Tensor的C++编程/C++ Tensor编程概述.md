@@ -86,11 +86,11 @@ Shape用于表达Tensor形状，Stride则用于区分不同的排布：
 ![层次化Layout表达](层次化Layout表达.png)
 
 图中展示了两层矩阵：内层矩阵为内部用灰色线包裹的矩阵，外层矩阵为将内层矩阵视为一个元素时黑色线包裹的矩阵。
-Shape的第一个元素描述行方向的形状，(2，3)表示内层矩阵和外层矩阵的行数分别为2和3；Shape的第二个元素描述的是列方向上的形状，(2，4)表示内存矩阵和外层矩阵的列数分别为2和4。
+Shape的第一个元素描述行方向的形状，(2，3)表示内层矩阵和外层矩阵的行数分别为2和3；Shape的第二个元素描述的是列方向上的形状，(2，4)表示内层矩阵和外层矩阵的列数分别为2和4。
 Stride中的每个元素与Shape中的元素对应，表示该对应维度下，相邻元素首地址在内存地址上的间隔，图片中用箭头表示了每个维度相邻元素的首地址间隔。
 
 ### Tensor定义方式
-扩展能力的Tensor是通过对基础Tensor的特例化扩展实现，它通过MakeTensor函数创建，Shape和Stride可以在编译期确定。针对不同的应用场景提供多种种定义方式：
+扩展能力的Tensor是通过对基础Tensor的特例化扩展实现，它通过MakeTensor函数创建，Shape和Stride可以在编译期确定。针对不同的应用场景提供多种定义方式：
 - **1. 定义连续的内存块的Tensor**
 ```cpp
 // 1.1 定义动态Shape Tensor
@@ -107,15 +107,15 @@ auto rowMajorTensor = MakeTensor(pointer, MakeLayout(MakeShape(m, n), MakeStride
 auto colMajorTensor = MakeTensor(pointer, MakeLayout(MakeShape(m, n), MakeStride(Std::Int<1>{}, n)));
 ```
 
-- **3. 通过层次化布局形式定义矩阵分型Tensor**
+- **3. 通过层次化布局形式定义矩阵分形Tensor**
 ```cpp
-// 3.1 针对(128, 64)的矩阵，内部为16 * 16的分型，可以通过层次化布局来定义对应的4维Tensor
+// 3.1 针对(128, 64)的矩阵，内部为16 * 16的分形，可以通过层次化布局来定义对应的4维Tensor
 auto nzTensor = MakeTensor(pointer, MakeLayout(MakeShape((8, 16), (4, 16))));
 ```
 
 - **4：通过特定的分形布局进行简化的定义** - Cube矩阵乘专用，自动生成Shape和Stride
 ```cpp
-// 4.1 通过MakeFrameLayout，指定NZ Pattern直接指定NZ分型, 接口内部自动推到成4维分型
+// 4.1 通过MakeFrameLayout，指定NZ Pattern直接指定NZ分形, 接口内部自动推导成4维分形
 auto tensor = MakeTensor(l0aPointer, MakeFrameLayout<NZLayoutPtn>(128, 64));
 ```
 
@@ -151,7 +151,7 @@ auto copyAtom = MakeCopy<CopyGM2UB>();
 Copy(copyAtom, gmTensor, ubTensor);
 ```
 
-- **4 CUBE计算: 提供了简化的Mamd接口，方便用户直接进行矩阵乘计算**
+- **4 CUBE计算: 提供了简化的Mmad接口，方便用户直接进行矩阵乘计算**
 ```cpp
 Mmad(l0c, l0a, l0b, {m, n, k, false, iterK == 0});
 ```
