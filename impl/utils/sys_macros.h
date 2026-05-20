@@ -27,6 +27,12 @@ using float8_e5m2_t = fp8_e5m2_t;
 using float8_e8m0_t = fp8_e8m0_t;
 #endif
 
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+#define __ASC_DEBUG_CODE(x) x
+#else
+#define __ASC_DEBUG_CODE(x)
+#endif
+
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
 // For ascc preprocess: __global__ should not be replaced
 #ifdef __ASCC_PRE__
