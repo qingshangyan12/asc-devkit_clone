@@ -1,8 +1,11 @@
 # Fusion Compute Practices Sample Introduction
+
 ## Overview
-Operator samples implemented using SIMT and SIMD hybrid programming, introducing SIMT-based flexible branch logic implementation, as well as high-performance Matmul fusion operator implementation and performance optimization methods using UB to improve discrete memory access efficiency.
- 
+
+This directory provides best-practice samples for fusion compute, covering QuantGroupMatmul grouped quantized matrix multiplication, Cube-Vector fusion for Matmul+GELU, and high-performance optimization based on SIMT and SIMD hybrid programming.
+
 ## Sample List
+
 | Directory Name | Description | Supported Products |
 | ------------------------------------------------------------ | ---------------------------------------------------- | --- |
 | [grouped_matmul](./grouped_matmul) |  This sample introduces high-performance implementation of QuantGroupMatmul operator on NPU, supporting grouped quantization matrix multiplication and Gelu activation computation. | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
