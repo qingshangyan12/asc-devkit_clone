@@ -946,7 +946,7 @@ __aicore__ inline void TPipe::ResetPool()
     for (int32_t i = 0; i < static_cast<int32_t>(Hardware::MAX); i++, buf++) {
         *buf = 0;
     }
-    auto evt = Internal::g_tPipeOccupyEventPool;
+    auto evt = Internal::g_occupyEventPool;
     for (int32_t i = 0; i < EVENT_NUM; i++, evt++) {
         *evt = 0;
     }

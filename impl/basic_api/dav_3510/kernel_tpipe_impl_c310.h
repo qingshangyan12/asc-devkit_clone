@@ -903,7 +903,7 @@ __aicore__ inline void TPipe::ResetPool()
         }
     }
 #endif
-    auto evt = Internal::g_tPipeOccupyEventPool;
+    auto evt = Internal::g_occupyEventPool;
     for (int32_t i = 0; i < EVENT_NUM; i++, evt++) {
         *evt = 0;
     }
