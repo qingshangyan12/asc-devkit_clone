@@ -1,1 +1,42 @@
-{}
+{
+    "supportInfo": {
+        "simplifiedKeyMode": 1,
+        "simplifiedKey": [
+            "Add/d=0,p=0/1,29/,/1,29/0"
+        ],
+        "staticKey": "6c48e1ce5b6b60d68f4c9bd22d21969ea7f65fe489e08d0a3ff357e5f920549f",
+        "inputs": [
+            {
+                "name": "x1",
+                "index": 0,
+                "dtype": "float16",
+                "format": "FRACTAL_NZ",
+                "shape": [
+                    -2
+                ]
+            },
+            null
+        ],
+        "outputs": [
+            {
+                "name": "x1",
+                "index": 0,
+                "dtype": "float16",
+                "format": "FRACTAL_NZ",
+                "shape": [
+                    -2
+                ]
+            }
+        ],
+        "attrs": [
+            {
+                "name": "adj_x1",
+                "dtype": "bool",
+                "value": false,
+                "mode": "value"
+            },
+            null
+        ],
+        "op_debug_config": null
+    }
+}
