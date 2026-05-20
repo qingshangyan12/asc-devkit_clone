@@ -15,6 +15,7 @@ set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu_new
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/common/hcomm_dlsym
@@ -166,6 +167,7 @@ list(APPEND INCLUDE_LIST
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/hccl
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/hcomm/ccu
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/hcomm/ccu_new
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu/
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/runtime/

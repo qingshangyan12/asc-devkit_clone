@@ -174,13 +174,13 @@ void CcuKernelAlltoAllMesh1D::DoAlltoAll()
     }
 }
 
-ccu::Func CcuKernelAlltoAllMesh1D(hcomm::CcuRep::Variable inputAddr, hcomm::CcuRep::Variable outputAddr, hcomm::CcuRep::Variable tokenInfo,
+ccu::Func CcuKernelAlltoAllMesh1D([](hcomm::CcuRep::Variable inputAddr, hcomm::CcuRep::Variable outputAddr, hcomm::CcuRep::Variable tokenInfo,
                                   hcomm::CcuRep::Variable srcStride, hcomm::CcuRep::Variable srcOffset, hcomm::CcuRep::Variable dstOffset,
                                   hcomm::CcuRep::Variable sliceSize, hcomm::CcuRep::Variable goSize1, hcomm::CcuRep::Variable goSize2,
                                   hcomm::CcuRep::Variable goSize3, hcomm::CcuRep::Variable goSize4) {
     CcuKernelAlltoAllMesh1D::Algorithm(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
                                        sliceSize, goSize1, goSize2, goSize3, goSize4);
-}
+});
 
 HcclResult CcuKernelAlltoAllMesh1D::Algorithm(hcomm::CcuRep::Variable inputAddr, hcomm::CcuRep::Variable outputAddr, hcomm::CcuRep::Variable tokenInfo,
                                               hcomm::CcuRep::Variable srcStride, hcomm::CcuRep::Variable srcOffset, hcomm::CcuRep::Variable dstOffset,
