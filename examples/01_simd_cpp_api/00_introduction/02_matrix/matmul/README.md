@@ -30,7 +30,7 @@
   C = A * B
   $$
 - 样例规格：  
-  本样例参数M = 512, N = 1024, K = 512，调用4个核完成计算，输入规格如下表所示：
+  本样例参数M = 256, N = 256, K = 64，调用2个核完成计算，每个核负责M轴方向128行、N轴方向256列的输出块，输入规格如下表所示：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -42,9 +42,9 @@
 
 - 样例实现：
   - 实现流程
-    - 通过InitGMOffsets完成分核计算
+    - 通过核号获取M轴方向的分核索引，并据此设置A矩阵和C矩阵的GM地址偏移
     - 通过DataCopy基础API，将数据从GM（Global Memory）搬运到L1（L1 Buffer）并完成ND到NZ的格式转换
-    - 通过LoadData接口，将数据从L1（L1 Buffer）搬运到L0A（L0A Buffer）/L0B（L0B Buffer）
+    - 通过LoadData接口，将数据从L1（L1 Buffer）搬运到L0A（L0A Buffer）/L0B（L0B Buffer）；dav-2201架构使用LoadData2DParams参数，dav-3510架构使用LoadData2DParamsV2参数
     - 通过Mmad接口完成矩阵乘计算
     - 通过Fixpipe接口，将结果从L0C（L0C Buffer）搬运回GM（Global Memory）
 
@@ -94,7 +94,7 @@
 
 | 选项 | 可选值 | 说明 |
 |------|--------|------|
-| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
+| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果  
