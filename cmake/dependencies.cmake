@@ -21,6 +21,7 @@ find_cann_package(mmpa REQUIRED)
 find_cann_package(metadef REQUIRED)
 find_cann_package(platform REQUIRED)
 find_cann_package(error_manager REQUIRED)
+find_cann_package(acl_rt REQUIRED)
 
 if(ENABLE_TEST)
   find_cann_package(graph REQUIRED)

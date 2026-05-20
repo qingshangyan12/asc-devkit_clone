@@ -31,6 +31,7 @@ set(ASCENDC_INCLUDE_DIR ${ASCENDC_DIR}/include)
 set(ASCENDC_IMPL_DIR ${ASCENDC_DIR}/impl)
 
 if(BUILD_OPEN_PROJECT)
+  include(cmake/dependencies.cmake)
   include(cmake/config.cmake)
   include(cmake/func.cmake)
   set(INSTALL_LIBRARY_DIR ${CMAKE_SYSTEM_PROCESSOR}-linux)
@@ -40,7 +41,6 @@ add_subdirectory(impl)
 
 if(BUILD_OPEN_PROJECT)
   include(cmake/intf_pub_linux.cmake)
-  include(cmake/dependencies.cmake)
 endif()
 
 add_subdirectory(tools)
