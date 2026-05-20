@@ -83,5 +83,6 @@ struct integral_constant;
 #include "impl/utils/std/type_traits/remove_reference.h"
 #include "impl/utils/std/type_traits/remove_volatile.h"
 #include "impl/utils/std/type_traits/is_one_of.h"
+#include "impl/utils/std/type_traits/Int.h"
 
 #endif // AICORE_UTILS_STD_TYPE_TRAITS_H
