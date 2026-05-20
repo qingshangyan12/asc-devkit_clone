@@ -2,7 +2,7 @@
 
 ## Overview
 
-Vector computation samples based on Ascend C, introducing two different memory and synchronization management mechanisms.
+introducing two different memory and synchronization management mechanisms.
 
 ## Sample List
 
