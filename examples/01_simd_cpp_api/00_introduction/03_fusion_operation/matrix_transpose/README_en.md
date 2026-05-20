@@ -1,8 +1,8 @@
-# MatrixTranspose Sample
+# MatrixTranspose Example
 
 ## Overview
 
-This sample uses matrix transposition as an example to introduce memory access coalescing optimization strategies in Ascend C SIMD and SIMT hybrid programming scenarios. The sample contains 2 kernel versions, starting from direct index transposition, then adjusting data write-back patterns through UB relay to make GM read/write closer to continuous access, thereby demonstrating global memory access optimization methods for matrix transposition in hybrid programming.
+This example uses matrix transpose to demonstrate memory access coalescing optimization in Ascend C SIMD and SIMT hybrid programming scenarios. The example contains 2 kernel versions, starting from direct index transpose, then adjusting the data write-back method through UB transfer to make GM read/write access closer to continuous access, demonstrating the global memory access optimization method for matrix transpose in hybrid programming.
 
 ## Supported Products
 
@@ -12,12 +12,13 @@ This sample uses matrix transposition as an example to introduce memory access c
 
 ```text
 ├── matrix_transpose
-│   ├── CMakeLists.txt         // Compilation project file
-│   ├── matrix_transpose.asc   // Matrix transposition sample implementation
+│   ├── CMakeLists.txt         // Build project file
+│   ├── matrix_transpose.asc   // Matrix transpose example implementation
+│   ├── figures                // Figures
 │   └── README.md
 ```
 
-## Sample Description
+## Example Description
 
 - Computation Formula:
 
@@ -27,35 +28,34 @@ This sample uses matrix transposition as an example to introduce memory access c
 
   - input is the input matrix with shape [H,W] and data type float
   - output is the output matrix with shape [W,H] and data type float
-
-- Sample Specifications:
+- Example Specifications:
   <table>
-  <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">MatrixTranspose</td></tr>
-  <tr><td rowspan="2" align="center">Sample Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td rowspan="1" align="center">Example Type(OpType)</td><td colspan="4" align="center">MatrixTranspose</td></tr>
+  <tr><td rowspan="2" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">input</td><td align="center">[1024,1024]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Sample Output</td><td align="center">output</td><td align="center">[1024,1024]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Example Output</td><td align="center">output</td><td align="center">[1024,1024]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">transpose_naive_kernel / transpose_coalesced_kernel</td></tr>
   </table>
 
-## Sample Implementation
+## Example Implementation
 
 ### Case Implementation Description
 
-This sample implements different memory access strategies through two independent kernels, each kernel corresponding to a specific Case version.
+This example implements different memory access strategies through two independent kernels, with each kernel corresponding to a specific Case version.
 
-| Case   | Implementation Characteristics                                           | Kernel Function Used               | Optimization Feature              |
-| ------ | -------------------------------------------------- | -------------------------- | --------------------- |
-| Case 0 | Direct output coordinate calculation based on transpose formula, GM continuous read, non-continuous write   | transpose_naive_kernel     | Direct index transposition version      |
-| Case 1 | Use UB to temporarily store tile and swap read/write directions, GM read/write closer to continuous access | transpose_coalesced_kernel | UB relay + global memory access coalescing |
+| Case   | Implementation Feature                                         | Kernel Function Used          | Optimization Feature              |
+| ------ | ------------------------------------------------------------ | ----------------------------- | --------------------------------- |
+| Case 0 | Calculate output coordinates directly according to transpose formula, GM continuous read, non-continuous write | transpose_naive_kernel     | Direct index transpose version      |
+| Case 1 | Transfer through UB temporary storage and adjust read/write direction, GM read/write closer to continuous access | transpose_coalesced_kernel | UB transfer + global memory access coalescing |
 
 #### Thread Block Layout
 
-This sample uses SIMD and SIMT hybrid programming, with kernel functions calling `__simt_vf__` functions internally through `asc_vf_call`. To facilitate comparison of performance differences between versions, this sample only supports square matrices, and matrix width and height need to be integer multiples of 32. All Cases use exactly the same thread block layout:
+This example uses SIMD and SIMT hybrid programming, with kernel functions calling `__simt_vf__` functions through `asc_vf_call` internally. To facilitate comparison of performance differences between versions, this example only supports square matrices, and the matrix width and height must be multiples of 32. All Cases use the same thread block layout:
 
-- This sample flattens 2D tile coordinates to 1D `blockIdx.x`, and flattens 32×32 elements within a tile to 1D `threadIdx.x`.
-- Each tile size is 32×32, one block processes one tile. Number of blocks is `bn = grid_x * grid_y`, where `grid_x = matrix_width / TILE_DIM`, `grid_y = matrix_height / TILE_DIM`.
+- This example flattens 2D tile coordinates to 1D `blockIdx.x`, and flattens 32×32 elements within a tile to 1D `threadIdx.x`.
+- Each tile size is 32×32, and one block processes one tile. The number of blocks is `bn = grid_x * grid_y`, where `grid_x = matrix_width / TILE_DIM`, `grid_y = matrix_height / TILE_DIM`.
 
-Based on the above partitioning, `blockIdx.x` represents the flattened 1D tile number. By integer division and modulo of `grid_width`, you can restore the 2D tile coordinates `(block_row, block_col)` that the current block is responsible for. `threadIdx.x` represents the flattened 1D element number within the tile. By integer division and modulo of `TILE_DIM`, you can restore the local coordinates `(tile_row, tile_col)` of the element that the thread processes within the tile.
+Based on the above partitioning method, `blockIdx.x` represents the flattened 1D tile number. By dividing and taking modulo of `grid_width`, you can restore the 2D tile coordinates `(block_row, block_col)` that the current block is responsible for. `threadIdx.x` represents the flattened 1D element number within the tile. By dividing and taking modulo of `TILE_DIM`, you can restore the local coordinates `(tile_row, tile_col)` of the element processed by the thread within the tile.
 
 ```cpp
 int block_row = blockIdx.x / grid_width;
@@ -65,20 +65,20 @@ int tile_row = threadIdx.x / TILE_DIM;
 int tile_col = threadIdx.x % TILE_DIM;
 ```
 
-The figure below shows a more intuitive mapping schematic. The left side shows a 1024×1024 matrix divided into 32×32 tiles. The right side shows one tile that one block needs to process, with size 32×32.
+The figure below shows a more intuitive mapping. The left side shows a 1024×1024 matrix divided into 32×32 tiles. The right side shows one tile that one block needs to process, with a size of 32×32.
 
-<img src="./figure/blockMapping.png" width="60%">
+<img src="./figures/blockMapping.png" width="60%">
 
-Taking the green element in the figure as an example, you can directly use the built-in variables in the kernel to derive its input coordinates in GM.
+Take the green element in the figure as an example. You can directly use built-in variables in the kernel to derive its input coordinates in GM.
 
-- Tile coordinates are (2,1), corresponding to:
+- The tile coordinates are (2,1), corresponding to:
   - block_row = 2
   - block_col = 1
   - blockIdx.x = block_row × grid_width + block_col = 2 × 32 + 1 = 65
-- Element's local coordinates within the tile are (2,29), corresponding to:
+- The local coordinates of the element in the tile are (2,29), corresponding to:
   - threadIdx.x = tile_row × TILE_DIM + tile_col = 2 × 32 + 29 = 93
 
-Combining the index calculation in the code:
+Combine with the index calculation in the code:
 
 ```cpp
 int input_row = block_row * TILE_DIM + tile_row;
@@ -86,7 +86,7 @@ int input_col = block_col * TILE_DIM + tile_col;
 int index_in = input_col + width * input_row;
 ```
 
-Substituting the variable values in this example:
+Substitute the variable values in this example:
 
 - block_row = 65 / 32 = 2
 - block_col = 65 % 32 = 1
@@ -99,7 +99,7 @@ Therefore, the input element coordinates processed by this thread in GM are:
 
 - input[input_row,input_col] = input[66,61]
 
-If continuing to substitute the 1D address formula:
+If you continue to substitute into the 1D address formula, you get:
 
 - index_in = input_col + width × input_row = 61 + 1024 × 66
 
@@ -107,30 +107,30 @@ If continuing to substitute the 1D address formula:
 
 | Metric                | Description                                                                                      |
 | ------------------- | ----------------------------------------------------------------------------------------- |
-| Task Duration(us)   | Task total latency, including time to schedule to accelerator, execution time on accelerator, and response end time                  |
-| aiv_time(us)        | Task theoretical execution time on AI Vector Core, unit is us                                            |
-| aiv_total_cycles    | After this Task is assigned to each AI Vector Core computation unit, the total execution cycles on each AI Vector Core computation unit |
-| aiv_vec_time(us)    | vec type instruction (vector computation instruction) latency, unit is us                                               |
-| aiv_vec_ratio       | Ratio of vec type instruction (vector computation instruction) cycles in total cycles                           |
-| aiv_scalar_time(us) | scalar type instruction (scalar computation instruction) latency, unit is us                                            |
-| aiv_scalar_ratio    | Ratio of scalar type instruction (scalar computation instruction) cycles in total cycles                        |
+| Task Duration(us)   | Overall task time, including time scheduled to the accelerator, execution time on the accelerator, and response end time                  |
+| aiv_time(us)        | Theoretical execution time of the Task on AI Vector Core, in us                                            |
+| aiv_total_cycles    | After the Task is assigned to each AI Vector Core compute unit, the total execution cycles on each AI Vector Core compute unit |
+| aiv_vec_time(us)    | vec type instruction (vector computation instruction) time, in us                                               |
+| aiv_vec_ratio       | The ratio of vec type instruction (vector computation instruction) cycles in total cycles                           |
+| aiv_scalar_time(us) | scalar type instruction (scalar computation instruction) time, in us                                            |
+| aiv_scalar_ratio    | The ratio of scalar type instruction (scalar computation instruction) cycles in total cycles                        |
 
-Except for Task Duration, all other metrics in this example show the average of performance metrics across all blocks.
+Except for Task Duration, all other metrics in this example show the average value of performance metrics across all blocks.
 
-### Case 0: Direct Index Transposition Version
+### Case 0: Direct Index Transpose Version
 
-**Sample Objective**: Implement basic matrix transposition functionality as the latency comparison baseline for subsequent optimized versions
+**Example Goal**: Implement basic matrix transpose function as the time-consuming baseline for subsequent optimized versions
 
 **Core Implementation**:
 
 - Each block processes one 32×32 tile
-- Each SIMT thread processes 1 element within the tile
-- Thread first reads input element from GM by original coordinates, then calculates the output position after transposition for this element, and writes data directly to the transposed GM address
+- Each SIMT thread processes 1 element in the tile
+- The thread first reads the input element from GM according to the original coordinates, then calculates the output position after transpose of this element, and writes the data directly to the transposed GM address
 - GM read direction is continuous, GM write-back direction is not continuous
 
-The figure below shows the data flow of Case 0, with red highlighting elements processed by one Warp when reading GM and writing GM. For threads in the same Warp, they read a row of elements in the tile from GM input and write back to a column of the tile in GM output. When reading GM input, element addresses accessed by adjacent threads are continuous, which is continuous read. When writing back to output, adjacent threads are scattered to different rows of the output matrix, which is non-continuous write. Therefore, the core issue of this version is that the write-back address after transposition is no longer continuous, which usually significantly affects overall throughput.
+The figure below shows the data flow of Case 0, with red marking showing the elements processed by one Warp when reading GM and writing GM. For threads in the same Warp, they will read one row of elements of the tile in the GM input, and write back to one column of the tile in the GM output. When reading GM input, the element addresses accessed by adjacent threads are continuous, which is continuous read. When writing back to output, adjacent threads are scattered to different rows of the output matrix, which is non-continuous write. Therefore, the core issue of this version is that the write-back address after transpose is no longer continuous, which usually significantly affects overall throughput.
 
-<img src="./figure/case0.png" width="60%">
+<img src="./figures/case0.png" width="60%">
 
 **Key Code**:
 
@@ -149,27 +149,27 @@ output[index_out] = input[index_in];
 
 **Analysis**:
 
-- Case 0's Task Duration is 70.304us, as the direct index transposition version, it serves as the comparison baseline for subsequent optimized versions
-- This version's GM read is still continuous read, but GM write-back is cross-row, non-continuous write. Write requests from the same Warp are difficult to efficiently merge, so overall latency is mainly limited by the write-back memory access pattern
+- Case 0 has a Task Duration of 70.304us, as a direct index transpose version, which is the comparison baseline for subsequent optimized versions
+- This version has continuous GM read, but GM write-back is cross-row, non-continuous write, and write requests from the same Warp are difficult to efficiently coalesce, so the overall time consumption is mainly limited by the write-back memory access pattern
 
 ---
 
-### Case 1: UB Relay + Global Memory Access Coalescing Transposition Version
+### Case 1: UB Transfer + Global Memory Access Coalescing Transpose Version
 
-**Optimization Objective**: Adjust transposition write-back pattern through UB relay to make GM read/write closer to continuous access, reduce end-to-end latency
+**Optimization Goal**: Adjust transpose write-back method through UB transfer to make GM read/write closer to continuous access, reducing end-to-end time consumption
 
 **Core Implementation**:
 
-- Each thread reads 1 element from tile in GM, one Warp reads one row of elements from a tile
-- Write elements to tile in UB by original coordinates, one Warp writes one read row to one row of tile in UB
-- After synchronization, each thread fetches data from UB, one Warp reads one column of elements from tile in UB
-- Write fetched values back to transposed position in GM, one Warp writes one read column of elements from UB to one row of tile in GM output
+- Each thread reads 1 element from the tile in GM, and one Warp reads one row of elements in the tile
+- Write the element to the tile in UB according to the original coordinates, and one Warp writes the read row to one row of the tile in UB
+- After synchronization, each thread fetches data from UB, and one Warp reads one column of elements in the tile from UB
+- Write the fetched value back to the transposed position in GM, and one Warp writes the read column of elements from UB to one row of the tile in the GM output
 
-The figure below shows the data flow of Case 1, with red and yellow highlighted elements showing elements processed by one Warp's threads when reading GM and writing GM. When reading GM input, the entire tile is moved to UB according to GM layout. When writing GM output, one Warp's threads read one column of elements from UB and write back to their corresponding transposed positions.
+The figure below shows the data flow of Case 1, with red and yellow marked elements showing the elements processed by a Warp's threads when reading GM and writing GM. When reading GM input, the entire tile is transferred to UB according to GM layout. When writing GM output, a Warp's threads read one column of elements from UB and write back to their corresponding transposed positions.
 
-<img src="./figure/case1.png" width="60%">
+<img src="./figures/case1.png" width="60%">
 
-Unlike Case 0, in Case 0 threads "directly write input elements to transposed GM positions", so adjacent threads are scattered to different rows of the output matrix. In Case 1, threads first put data into UB, transferring the original non-continuous global write access to non-continuous read within UB. Therefore, the core benefit of this version is: although it adds one UB read/write and one synchronization, it gains a "read continuous, write also continuous" access pattern on the GM side, and overall latency is usually significantly lower than Case 0.
+Different from Case 0, in Case 0, threads "directly write input elements to transposed GM positions", so adjacent threads are scattered to different rows of the output matrix. In Case 1, threads first put data into UB, transferring the originally non-continuous global write access to non-continuous read within UB. Therefore, the core benefit of this version is: although one UB read/write and one synchronization are added, it exchanges for a "read continuous, write also continuous" access pattern on the GM side, and the overall time consumption is usually significantly lower than Case 0.
 
 **Key Code**:
 
@@ -192,9 +192,9 @@ output[index_out] = tile[tile_col][tile_row];
 
 **Optimization Methods**:
 
-- Use UB as tile relay area, transfer non-continuous GM write in Case 0 to UB-side access
-- Adjust output tile block coordinates to make write-back to GM closer to row-continuous write for the same Warp
-- Use `asc_syncthreads()` to ensure the entire tile is written to UB before executing transposition-direction read
+- Use UB as tile transfer area to transfer the non-continuous GM write in Case 0 to UB side access
+- Adjust the block coordinates of the output tile to make the same Warp closer to row-continuous write when writing back to GM
+- Ensure the entire tile is written to UB before executing transpose direction read through `asc_syncthreads()`
 
 **Performance Data**:
 
@@ -204,9 +204,9 @@ output[index_out] = tile[tile_col][tile_row];
 
 **Analysis**:
 
-- Compared to Case 0's direct index transposition version, Case 1's Task Duration decreased from 70.304us to 44.440us, a latency reduction of about 36.8%
-- Calculated by Task Duration, Case 1's overall performance is about 1.58x that of Case 0, indicating that after improving GM write-back continuity through UB relay, end-to-end latency has significant improvement
-- Case 1 still requires additional UB read/write and synchronization, so the optimized Task Duration did not drop to the ideal level of pure continuous memory access; this latency is the necessary overhead brought by UB relay in exchange for GM memory access coalescing
+- Compared with the direct index transpose version of Case 0, the Task Duration of Case 1 decreased from 70.304us to 44.440us, with a time consumption reduction of about 36.8%
+- Calculated by Task Duration, Case 1 overall has about 1.58x performance of Case 0, indicating that after improving GM write-back continuity through UB transfer, the end-to-end time consumption has significant improvement
+- Case 1 still requires additional UB read/write and synchronization, so the optimized Task Duration has not dropped to the ideal level of pure continuous memory access; this part of time consumption is the necessary overhead brought by UB transfer in exchange for GM memory access coalescing
 
 ---
 
@@ -216,61 +216,61 @@ output[index_out] = tile[tile_col][tile_row];
 
 **Overall Optimization Effect**:
 
-- Through memory access coalescing optimization from Case 0 to Case 1, sample Task Duration decreased from 70.304us to 44.440us, a latency reduction of about 36.8%
-- Case 1 achieves about 1.58x performance improvement relative to Case 0, indicating that after improving GM write-back continuity through UB relay, end-to-end latency has significant benefit
+- Through memory access coalescing optimization from Case 0 to Case 1, the example Task Duration decreased from 70.304us to 44.440us, with a time consumption reduction of about 36.8%
+- Case 1 has about 1.58x performance improvement relative to Case 0, indicating that after improving GM write-back continuity through UB transfer, the end-to-end time consumption has significant benefit
 
-| Case version | Task Duration(us) | End-to-end Latency Relative to Case 0 | Optimization Point                           |
+| Case version | Task Duration(us) | End-to-end time relative to Case 0 | Optimization Point                           |
 | ------------ | ----------------- | -------------------- | -------------------------------- |
-| Case 0       | 70.304            | **1x**         | Direct index transposition, GM continuous read, non-continuous write |
-| Case 1       | 44.440            | **1.58x**      | UB relay, global memory access coalescing             |
+| Case 0       | 70.304            | **1x**         | Direct index transpose, GM continuous read, non-continuous write |
+| Case 1       | 44.440            | **1.58x**      | UB transfer, global memory access coalescing             |
 
 ## Tuning Suggestions
 
-1. **Prioritize GM Memory Access Continuity**: Matrix transposition has very small computation volume, end-to-end latency is mainly affected by read/write memory access patterns.
-2. **Use UB Relay to Improve Write-back Pattern**: When direct transposition causes GM non-continuous write, non-continuous access can be transferred to UB side in exchange for continuous read/write on GM side.
-3. **Note Synchronization Overhead**: UB relay requires synchronization to ensure tile data integrity. When optimizing, need to simultaneously consider the balance between memory access benefit and synchronization, UB read/write overhead.
+1. **Prioritize GM Memory Access Continuity**: Matrix transpose has very small computation amount, and end-to-end time consumption is mainly affected by read/write memory access patterns.
+2. **Use UB Transfer to Improve Write-back Pattern**: When direct transpose causes non-continuous GM write, you can transfer non-continuous access to the UB side in exchange for continuous GM read/write.
+3. **Pay Attention to Synchronization Overhead**: UB transfer requires synchronization to ensure tile data integrity. When optimizing, you need to pay attention to the balance between memory access benefit and synchronization and UB read/write overhead.
 
-## Compilation and Execution
+## Build and Run
 
-Execute the following steps in the root directory of this sample to compile and run the sample.
+Execute the following steps in the root directory of this example to build and run the example.
 
 - Configure Environment Variables
-  Select the appropriate command to configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Select the corresponding environment variable configuration command based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
 
-  - Default path, root user installed CANN software package
+  - Default path, root user installs CANN software package
 
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
-  - Default path, non-root user installed CANN software package
+  - Default path, non-root user installs CANN software package
 
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - Specified path install_path, installed CANN software package
+  - Specified path install_path, install CANN software package
 
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
 
-- Sample Execution
+- Example Execution
 
   ```bash
-  SCENARIO_NUM=0                       # Select execution scenario, options 0-1
+  SCENARIO_NUM=0                       # Select execution scenario, available options 0-1
   mkdir -p build && cd build;          # Create and enter build directory
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Compile project
-  ./demo                               # Execute sample
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build project
+  ./demo                               # Execute example
   ```
 
-- Compilation Options Description
+- Build Options
 
   | Option             | Available Values      | Description              |
   | ---------------- | ----------- | ----------------- |
-  | `SCENARIO_NUM` | `0`-`1` | Sample type, default is 0 |
+  | `SCENARIO_NUM` | `0`-`1` | Example type, default is 0 |
 
-  The execution result is as follows, indicating that the accuracy comparison passed.
+  The execution result is shown below, indicating that the accuracy comparison passed.
 
 
   ```text
@@ -285,17 +285,17 @@ Use the `msprof` tool to obtain detailed performance data:
 msprof op ./demo   # Analyze case performance
 ```
 
-A folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+A folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure example is as follows:
 
 ```text
-├──dump                       # Raw performance data, users do not need to focus on
+├──dump                       # Raw performance data, users do not need to pay attention
 ├──ArithmeticUtilization.csv  # cube/vector instruction cycle ratio
 ├──L2Cache.csv                # L2 Cache hit rate
 ├──Memory.csv                 # UB, L1 and main memory read/write bandwidth rate
 ├──MemoryL0.csv               # L0A, L0B, and L0C read/write bandwidth rate
 ├──MemoryUB.csv               # Vector and Scalar to UB read/write bandwidth rate
 ├──OpBasicInfo.csv            # Operator basic information
-├──PipeUtilization.csv        # Collection of computation unit and transfer unit latency and ratio
-├──ResourceConflictRatio.csv  # Ratio of bank group, bank conflict and resource conflict on UB in all instructions
+├──PipeUtilization.csv        # Collect compute unit and transfer unit time consumption and ratio
+├──ResourceConflictRatio.csv  # The ratio of bank group, bank conflict and resource conflict on UB in all instructions
 └──visualize_data.bin         # MindStudio Insight presentation file
 ```
