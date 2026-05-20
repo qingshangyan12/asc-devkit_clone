@@ -16,12 +16,12 @@
 - 任务二：参考`basic_scatter`将SIMT编程样例改造成SIMD&SIMT混合编程样例，理解SIMT编程和SIMD&SIMT混合编程的差异。
 - 任务三：改写Scatter算子为固定shape版本，只支持`input_length = 2048`、`output_length = 4096`，并通过调整`blockDim`、`gridDim`观察性能变化。
 
-每个用户都需要新建自己的样例路径，不要直接修改公共的`basic_scatter`目录，也不要复用其他用户已经创建的样例路径。建议使用“样例名_姓名拼音”的方式命名各自任务代码路径，例如：
+每个用户都需要在`/home/wly/asc-devkit-exp-kadc-run/experiment/simt_experiment/`下新建自己的样例路径，不要直接修改公共的`demo/simt/basic_scatter`目录，也不要复用其他用户已经创建的样例路径。建议使用“样例名_姓名拼音”的方式命名各自任务代码路径，例如：
 
 ```text
-demo/simt/basic_gather_zhangsan
-demo/simt/mixed_scatter_zhangsan
-demo/simt/fixed_shape_scatter_zhangsan
+experiment/simt_experiment/basic_gather_zhangsan
+experiment/simt_experiment/mixed_scatter_zhangsan
+experiment/simt_experiment/fixed_shape_scatter_zhangsan
 ```
 
 后续命令中的`<姓名拼音>`请替换为自己的姓名拼音或团队约定的唯一标识。
@@ -51,7 +51,7 @@ Gather适合用于查表、稀疏数据读取、索引选择、Embedding类访�
 ### 建议目录
 
 ```text
-demo/simt/basic_gather_<姓名拼音>
+experiment/simt_experiment/basic_gather_<姓名拼音>
 |-- CMakeLists.txt
 |-- gather.asc
 `-- README.md
@@ -60,9 +60,9 @@ demo/simt/basic_gather_<姓名拼音>
 可以先复制`basic_scatter`作为起点，再按Gather语义改写。
 
 ```bash
-cd demo/simt
-cp -r basic_scatter basic_gather_<姓名拼音>
-cd basic_gather_<姓名拼音>
+mkdir -p experiment/simt_experiment
+cp -r demo/simt/basic_scatter experiment/simt_experiment/basic_gather_<姓名拼音>
+cd experiment/simt_experiment/basic_gather_<姓名拼音>
 mv scatter.asc gather.asc
 ```
 
@@ -115,7 +115,7 @@ __global__ __launch_bounds__(MAX_THREAD_COUNT) void gather_custom(
 编译运行命令：
 
 ```bash
-cd demo/simt/basic_gather_<姓名拼音>
+cd experiment/simt_experiment/basic_gather_<姓名拼音>
 source /usr/local/Ascend/cann/set_env.sh
 mkdir -p build
 cd build
@@ -140,9 +140,9 @@ make -j
 建议先复制`basic_scatter`作为起点，再在新目录中进行SIMD&SIMT混合编程改造，避免直接修改原始样例。
 
 ```bash
-cd demo/simt
-cp -r basic_scatter mixed_scatter_<姓名拼音>
-cd mixed_scatter_<姓名拼音>
+mkdir -p experiment/simt_experiment
+cp -r demo/simt/basic_scatter experiment/simt_experiment/mixed_scatter_<姓名拼音>
+cd experiment/simt_experiment/mixed_scatter_<姓名拼音>
 ```
 
 当前`basic_scatter`使用的是SIMT编程：
@@ -246,9 +246,9 @@ output_length = 4096
 建议先复制`basic_scatter`作为起点，再在新目录中进行固定shape和性能调优改写，避免直接修改原始样例。
 
 ```bash
-cd demo/simt
-cp -r basic_scatter fixed_shape_scatter_<姓名拼音>
-cd fixed_shape_scatter_<姓名拼音>
+mkdir -p experiment/simt_experiment
+cp -r demo/simt/basic_scatter experiment/simt_experiment/fixed_shape_scatter_<姓名拼音>
+cd experiment/simt_experiment/fixed_shape_scatter_<姓名拼音>
 ```
 
 改写要求：
@@ -290,52 +290,29 @@ scatter_custom<<<GRID_DIM, THREAD_NUM_PER_BLOCK, dyn_ubuf_size, stream>>>(...);
 
 ### 性能记录表
 
-每次调整参数后，记录编译、运行和msprof结果。建议使用如下表格：
+每次调整参数后，记录编译、运行和msprof结果。性能查看主要通过msprof导出的`task_duration`数据进行对比，建议使用如下表格：
 
-| 轮次 | `blockDim` | `gridDim` | 端到端耗时 | Kernel耗时 | 校验结果 | 备注 |
-|---|---:|---:|---:|---:|---|---|
-| 1 | 128 | 16 | 待填写 | 待填写 | pass/fail |  |
-| 2 | 256 | 8 | 待填写 | 待填写 | pass/fail |  |
-| 3 | 512 | 4 | 待填写 | 待填写 | pass/fail |  |
-| 4 | 1024 | 2 | 待填写 | 待填写 | pass/fail |  |
-| 5 | 2048 | 1 | 待填写 | 待填写 | pass/fail |  |
+| 轮次 | `blockDim` | `gridDim` | `task_duration` | 校验结果 | 备注 |
+|---|---:|---:|---:|---|---|
+| 1 | 128 | 16 | 待填写 | pass/fail |  |
+| 2 | 256 | 8 | 待填写 | pass/fail |  |
+| 3 | 512 | 4 | 待填写 | pass/fail |  |
+| 4 | 1024 | 2 | 待填写 | pass/fail |  |
+| 5 | 2048 | 1 | 待填写 | pass/fail |  |
 
-性能比较时先保证所有轮次校验通过，再比较耗时。若校验失败，该轮性能数据不作为有效结论。
-
-### 端到端性能数据查看方法
-
-端到端性能表示从Host侧发起任务到结果拷回并完成校验前后的整体耗时，通常包含ACL初始化、内存申请、Host到Device拷贝、Kernel执行、Device到Host拷贝、同步和释放资源等开销。
-
-最简单的方法是在程序外使用`time`：
-
-```bash
-cd demo/simt/fixed_shape_scatter_<姓名拼音>/build
-/usr/bin/time -f "elapsed=%e sec" ./scatter
-```
-
-更推荐在代码中使用`std::chrono`分别统计以下阶段：
-
-- ACL初始化与Stream创建耗时。
-- Device内存申请耗时。
-- Host到Device拷贝耗时。
-- Kernel launch加`aclrtSynchronizeStream`耗时。
-- Device到Host拷贝耗时。
-- 结果校验耗时。
-- 总耗时。
-
-统计Kernel耗时时，必须在Kernel launch之后调用`aclrtSynchronizeStream(stream)`，否则Host侧计时只会统计异步下发开销。
+性能比较时先保证所有轮次校验通过，再比较`task_duration`。若校验失败，该轮性能数据不作为有效结论。
 
 ### msprof基本使用方法
 
 执行Profiling前先确认普通运行可以通过：
 
 ```bash
-cd demo/simt/fixed_shape_scatter_<姓名拼音>/build
+cd experiment/simt_experiment/fixed_shape_scatter_<姓名拼音>/build
 source /usr/local/Ascend/cann/set_env.sh
 ./scatter
 ```
 
-使用msprof采集端到端Profiling数据：
+使用msprof采集Profiling数据：
 
 ```bash
 msprof --output=./prof_scatter ./scatter
@@ -367,9 +344,8 @@ msprof --export=on --output=./prof_scatter --summary-format=csv
 查看结果时重点关注：
 
 - `summary`目录下的CSV文件。
-- Kernel或Task相关条目的耗时。
-- Runtime API中`aclrtMemcpy`、Kernel launch、`aclrtSynchronizeStream`等接口耗时。
-- Host侧总耗时与Device侧Kernel耗时的差距。
+- Task相关条目的`task_duration`。
+- 不同`blockDim`、`gridDim`组合下`task_duration`的变化。
 
 通常可以按如下方式查找导出的CSV：
 
@@ -387,7 +363,7 @@ msprof op --help
 
 如果命令能正常显示帮助信息，再按帮助中的参数格式采集当前样例。如果提示`msopprof does not exist or permission denied`，说明当前环境缺少`msopprof`组件或权限不足，需要先补齐CANN算子开发工具组件或修复权限。
 
-在当前样例调试中，如果`msprof op`不可用，可以先使用普通`msprof --output=... ./scatter`方式采集端到端和Kernel任务性能数据。
+在当前样例调试中，如果`msprof op`不可用，可以先使用普通`msprof --output=... ./scatter`方式采集Task性能数据，并重点对比`task_duration`。
 
 ### 调优建议
 
