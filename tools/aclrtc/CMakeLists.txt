@@ -14,12 +14,13 @@ add_library(acl_rtc SHARED
 )
 
 if(BUILD_OPEN_PROJECT)
+    find_cann_package(acl_rt REQUIRED)
     target_include_directories(acl_rtc PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${ASCEND_CANN_PACKAGE_PATH}/include
-        ${ASCEND_CANN_PACKAGE_PATH}/include/acl
-        ${ASCEND_CANN_PACKAGE_PATH}/include/pkg_inc/base/
         ${CCEC_PATH}/../include
+    )
+    target_link_libraries(acl_rtc PRIVATE
+        acl_rt
     )
 else()
     target_include_directories(acl_rtc PRIVATE
