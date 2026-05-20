@@ -47,8 +47,8 @@ __aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t)
     return {t...};
 }
 
-template <typename T, typename... Ts>
-__aicore__ inline constexpr Tile<T, Ts...> MakeTile(const T& t, const Ts&... ts)
+template <typename... Ts>
+__aicore__ inline constexpr Tile<Ts...> MakeTile(const Ts&... ts)
 {
     static_assert(sizeof...(Ts) > 0, "MakeShape requires at least one argument.");
     return {t...};
