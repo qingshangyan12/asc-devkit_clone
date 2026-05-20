@@ -25,29 +25,87 @@
 ## 样例描述
 
 - 样例功能：
-  Matmul计算公式：
+  本样例使用Ascend C Matmul高阶API实现矩阵乘法。Matmul高阶API会封装矩阵计算过程中的数据搬运、Cube计算调度、基础流水同步等细节，开发者主要需要完成矩阵规格配置、tiling生成、输入输出Tensor设置和结果写回。
+
+  矩阵乘法的计算公式如下：
   $$
   C = A * B
   $$
+  其中，A矩阵形状为`[M, K]`，B矩阵形状为`[K, N]`，输出C矩阵形状为`[M, N]`。C矩阵中每个元素`C[m, n]`都是A矩阵第`m`行与B矩阵第`n`列在K轴方向逐元素相乘后累加得到的结果。
+
 - 样例规格：
-  本样例参数M = 512, N = 1024, K = 512，输入规格如下表所示：
-<table>
-<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
-<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td></tr>
-<tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
-</table>
+  本样例参数`M = 512, N = 1024, K = 512`。代码中A矩阵K轴使用`Ka`表示，B矩阵K轴使用`Kb`表示，本样例`Ka = Kb = K = 512`。输入A、B矩阵均为`half`类型、`ND`格式，输出C矩阵为`float`类型、`ND`格式。输入输出规格如下表所示：
+  <table>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
+  </table>
+
+  样例固定按2个Cube核生成tiling：
+  - `GenerateTiling`中调用`tilingApi.SetDim(2)`，表示本样例希望使用2个Cube核参与计算。
+  - `SetAType`、`SetBType`、`SetCType`设置Host侧tiling看到的矩阵位置、格式和数据类型，这些配置需要和Kernel侧`MatmulType`模板参数保持一致。
+  - `tilingApi.GetTiling(tilingData)`根据矩阵形状、数据类型、核数和平台资源生成`TCubeTiling`，其中包含`usedCoreNum`、`singleCoreM/N/K`、`baseM/N/K`等参数。
+  - Host侧读取`reinterpret_cast<TCubeTiling*>(tilingBuf)->usedCoreNum`作为`numBlocks`，并用`matmul_custom<<<numBlocks, nullptr, stream>>>`启动核函数。
+  - 在本样例规格下，tiling结果会把`M = 512`按2个核均分，每个核处理`singleCoreM = M / 2 = 256`，`singleCoreN = N = 1024`，`singleCoreKa = singleCoreKb = K = 512`。
 
 - 样例实现：
-  - 实现流程
-    - 通过GenerateTiling实现host侧的Tiling计算
-    - 通过CalcGMOffset完成分核计算
-    - 通过IterateAll接口完成矩阵乘计算
+  - Host侧执行流程
+    - 通过`PlatformAscendCManager::GetInstance()`获取当前平台信息，后续用于创建tiling对象和查询系统workspace大小。
+    - 根据矩阵规格计算输入输出文件大小：
+      - A矩阵大小为`512 * 512 * sizeof(uint16_t)`，对应`half`类型输入。
+      - B矩阵大小为`512 * 1024 * sizeof(uint16_t)`，对应`half`类型输入。
+      - C矩阵大小为`512 * 1024 * sizeof(float)`，对应`float`类型输出。
+    - 申请tiling缓存`tilingBuf`，调用`GenerateTiling`在Host侧生成`TCubeTiling`数据。tiling数据描述了矩阵如何切分到2个核、每个核处理多大的M/N/K块、Matmul高阶API需要多少内部资源等信息。
+    - 从tiling数据中读取`usedCoreNum`作为核函数启动核数`numBlocks`。本样例中该值为2。
+    - 调用`aclInit`、`aclrtSetDevice`、`aclrtCreateStream`初始化ACL运行环境、Device和Stream。
+    - 申请A、B、C矩阵的Host侧和Device侧内存，通过`ReadFile`读取输入文件，再通过`aclrtMemcpy`将A、B矩阵从Host侧拷贝到Device侧。
+    - 申请`workspaceDevice`。Matmul高阶API内部可能需要系统workspace，本样例通过`ascendcPlatform->GetLibApiWorkSpaceSize()`获取系统workspace大小，Kernel侧通过`GetSysWorkSpacePtr()`获取该空间。
+    - 将Host侧生成的tiling数据拷贝到Device侧`tilingDevice`，供Kernel侧读取。本样例先把普通Host内存`tilingBuf`拷贝到页锁定Host内存`tilingHost`，再从`tilingHost`拷贝到Device侧GM中的`tilingDevice`。
+    - 使用`matmul_custom<<<numBlocks, nullptr, stream>>>`启动核函数。执行完成后通过`aclrtSynchronizeStream`等待Stream上的任务完成。
+    - 将Device侧输出C矩阵拷贝回Host侧，并通过`WriteFile`写入`output/output.bin`。
+
+  - Tiling生成流程
+    - `GenerateTiling`中固定设置矩阵规格：`M = 512`、`N = 1024`、`K = 512`。
+    - 创建`matmul_tiling::MultiCoreMatmulTiling`对象`tilingApi`，用于生成多核Matmul所需的tiling参数。
+    - `SetDim(2)`表示多核Matmul tiling计算时可使用2个Cube核。纯Cube矩阵计算场景下，`GetTiling`会在该核数约束内生成实际使用核数`usedCoreNum`。
+    - `SetAType`、`SetBType`、`SetCType`分别设置A、B、C矩阵的数据来源位置、数据格式和数据类型。本样例A/B/C都在GM中，格式均为ND，A/B为`float16`且不转置，C为`float`。这些信息需要和Kernel侧`MatmulType`模板参数、`SetTensorA`/`SetTensorB`的转置参数保持一致。
+    - `SetOrgShape(M, N, K)`设置原始完整矩阵形状，`SetShape(M, N, K)`设置本次实际参与Matmul计算的`m/n/k`。本样例计算完整矩阵乘，没有局部矩阵或脏数据列，因此两者都设置为`M/N/K`。
+    - `EnableBias(false)`表示本样例不带bias。
+    - `SetBufferSpace(-1, -1, -1)`设置Matmul可使用的L1/L0C/UB空间大小。传入`-1`表示使用当前AI处理器对应buffer的默认大小，由tiling接口据此选择base块和搬运策略。
+    - `GetTiling(tilingData)`生成最终tiling结果。如果返回`-1`表示tiling计算失败，tiling结果不可继续使用。
+    - `SaveToBuffer`将Host侧`TCubeTiling`序列化到`tilingBuf`，后续拷贝到Device侧GM。Kernel侧通过`CopyTiling`从Device侧tiling地址读取`TCubeTiling`。
+
+  - Kernel侧整体思路
+    - `matmul_custom`是一个`__global__ __aicore__`核函数，运行在AI Core上。
+    - Kernel侧先通过`CopyTiling`从Device侧GM中的`tilingGm`拷贝tiling数据到局部变量`tiling`。Kernel侧不能直接访问Host指针，因此需要从GM读取`TCubeTiling`。
+    - 创建`GlobalTensor`对象`aGlobal`、`bGlobal`、`cGlobal`，分别表示GM中的A、B、C矩阵。`GlobalTensor`只描述GM上的地址和元素个数，真正的数据搬运、L1/L0切分由Matmul高阶API结合tiling完成。
+    - 创建高阶API对象`mm`。`MatmulType`模板参数描述A/B/C矩阵在Kernel侧的位置、格式和数据类型，本样例均为GM、ND格式，A/B为`half`，C为`float`。
+    - 通过`REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling)`注册Matmul对象。注册时会把`TPipe`、系统workspace、Matmul对象和对应`TCubeTiling`交给Matmul高阶API内部使用，用于管理数据搬运、Cube计算调度以及必要的内部同步资源。
+    - 如果`GetBlockIdx() >= tiling.usedCoreNum`，说明当前核号超过有效计算核数，直接返回。这样可以避免无效核参与计算。
+    - 调用`mm.SetOrgShape(tiling.M, tiling.N, tiling.Ka, tiling.Kb)`设置原始完整矩阵形状，单位为元素。该接口需要在`SetTensorA`、`SetTensorB`之前调用。
+    - 调用`mm.SetTensorA(aGlobal[GetBlockIdx() * tiling.Ka * tiling.singleCoreM], false)`设置当前核要读取的A矩阵起始地址。第0个核从A矩阵第0行开始读取，第1个核从A矩阵第256行开始读取。第二个参数`false`表示不转置。
+    - 调用`mm.SetTensorB(bGlobal[0], false)`设置B矩阵起始地址。两个核都需要完整的B矩阵参与计算，所以B矩阵地址都从首地址开始，第二个参数`false`表示不转置。
+    - 调用`mm.IterateAll(cGlobal[GetBlockIdx() * tiling.singleCoreM * tiling.N])`执行当前核负责的全部Matmul计算，并将结果写回C矩阵对应偏移位置。未显式指定模板参数时使用默认同步模式，接口返回时当前`IterateAll`计算已完成。
+    - 调用`mm.End()`结束当前Matmul对象的使用并释放内部计算资源。后续如果还有其他Matmul对象，调用`End`可避免多个Matmul对象之间的资源冲突。
+
+  - 分核和地址偏移说明
+    - 本样例固定2核，tiling结果按M轴切分：`M = 512`、`singleCoreM = 256`，因此输出C矩阵被分成上下两块。
+    - `GetBlockIdx()`表示当前核号。第0个核处理C矩阵第0到255行，第1个核处理C矩阵第256到511行。
+    - A矩阵形状为`[512, 512]`，每一行长度为`tiling.Ka = 512`，所以A矩阵偏移为`GetBlockIdx() * tiling.Ka * tiling.singleCoreM`。
+    - B矩阵形状为`[512, 1024]`，对应代码中的`[Kb, N]`。两个核分别计算C矩阵的不同行，但每个输出元素都需要完整K轴累加，因此两个核都从`bGlobal[0]`读取完整B矩阵。
+    - C矩阵形状为`[512, 1024]`，每一行长度为`tiling.N = 1024`，所以C矩阵写回偏移为`GetBlockIdx() * tiling.singleCoreM * tiling.N`。
+    - 由于M轴正好被2个核均分，没有不足`singleCoreM`的最后一块，因此代码中没有尾块变量，也没有调用`SetTail`。
+
+  - 高阶API和基础API样例的区别
+    - 基础API样例需要开发者显式写`DataCopy`、`LoadData`、`Mmad`、`Fixpipe`和流水同步。
+    - 本样例使用Matmul高阶API后，开发者主要关注矩阵形状、数据类型、tiling和Tensor地址设置。
+    - `IterateAll`内部会按照tiling配置完成当前核负责区域的完整矩阵乘流程，因此代码更短，也更适合作为入门理解高阶矩阵API的样例。
 
   - 调用实现
-    使用内核调用符<<<>>>调用核函数。
+    使用内核调用符`<<<>>>`调用核函数。调用时`numBlocks`来自tiling结果中的`usedCoreNum`，运行时参数依次传入Device侧A矩阵地址、B矩阵地址、C矩阵地址、workspace地址和tiling地址。
 
 ## 编译运行
 
