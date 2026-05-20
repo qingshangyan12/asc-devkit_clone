@@ -21,13 +21,6 @@ add_executable(demo
     vector_add.asc
 )
 
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-)
-
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
     $<$<COMPILE_LANGUAGE:ASC>:--cce-simd-vf-fusion=false>
