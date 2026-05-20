@@ -547,12 +547,9 @@ __aicore__ inline void MmadMxImpl(
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckMmadTensorCommon(dst, fm, filter, mmadParams, "MmadMx");
 #endif
-    < < < < < < < HEAD MmadMxCal(
-=======
-MmadCal(
->>>>>>> b90f1d0b5... feat: MmadMx for 3510
-                      (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(),
-                      (__cb__ PrimT<S>*)filter.GetPhyAddr(), mmadParams);
+    MmadMxCal(
+        (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
+        mmadParams);
 }
 
 template <typename T, typename U, typename S, typename V>
