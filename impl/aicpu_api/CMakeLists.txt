@@ -28,7 +28,6 @@ target_compile_options(aicpu_api PRIVATE
 
 if(BUILD_OPEN_PROJECT)
     target_include_directories(aicpu_api PRIVATE
-        ${ASCEND_CANN_PACKAGE_PATH}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/../../include
     )
 else()
