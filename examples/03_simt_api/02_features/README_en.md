@@ -10,3 +10,4 @@ This document presents feature samples based on Ascend C SIMT, demonstrating var
 |----------------------------------------------------|--------------------|
 | [00_resource_management](./00_resource_management/) | Samples demonstrating SIMT resource management related features. |
 | [01_api_features](./01_api_features/)       | Samples demonstrating API-related features in SIMT. |
+| [06_compile](./06_compile/)                 | Samples demonstrating SIMT compile-related features. |
