@@ -10,7 +10,7 @@
 
 /* !
  * \file data_utils.h
- * \brief 数据工具头文件，提供文件读写等基础功能
+ * \brief Utility functions for reading and writing binary files
  */
 
 #ifndef DATA_UTILS_H
