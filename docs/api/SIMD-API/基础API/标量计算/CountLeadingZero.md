@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic\_api/kernel\_operator\_scalar\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_scalar_intf.h"`。
 
 统计uint64\_t类型数值的二进制表示中前导0的数量（二进制表示中最高有效位到第一个'1'的'0'的数量，输入为0时返回64）。
 
