@@ -157,14 +157,14 @@ void CcuKernelKfcServer::GenCircularQueue()
             CCU_BREAK;
         }
 
-        auto opFunc = Func(opAddr);
-        opFunc.SetInArg(param[HBM_PARAM_IDX_1]);
-        opFunc.SetInArg(param[HBM_PARAM_IDX_2]);
-        opFunc.SetInArg(token);
-        for (uint32_t i = HBM_PARAM_IDX_3; i < CCU_PARAM_NUM_PER_DIE; ++i) {
-            opFunc.SetInArg(param[i]);
+        hcomm::CcuRep::Variable opType;
+        opType = param[HBM_PARAM_IDX_0];    
+        CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
+            ccu::callFunc<CcuKernelAlltoAllMesh1D>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2],token, 
+                param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5],
+                param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
+                param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10]);
         }
-        opFunc.AppendToContext();
 
         MissionPostSync();
 
