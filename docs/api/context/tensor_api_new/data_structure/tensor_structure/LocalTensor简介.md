@@ -308,8 +308,8 @@ struct LocalTensor<EngineType, LayoutType>
   // 创建L1内存指针
   constexpr int tileNum = 32;
   __cbuf__ half data[tileNum];
-  auto l1Ptr = MakeL1memPtr<half>(data);
-  auto nzLayout = MakeNzLayout<half>(32, 32); // 创建Nz布局
+  auto l1Ptr = MakeMemPtr(data);
+  auto nzLayout = MakeFrameLayout<NZLayoutPtn, half>(32, 32); // 创建Nz布局
   auto tensor = MakeTensor(l1Ptr, nzLayout);  // 创建张量
   auto coord = MakeCoord(5, 10);              // 访问元素 
   auto value = tensor[coord];
@@ -322,22 +322,17 @@ struct LocalTensor<EngineType, LayoutType>
   // 示例2：分块操作
   // 创建张量1
   auto bigTensor = MakeTensor(
-      MakeL1memPtr<half>(data),
-      MakeNzLayout<half>(64, 64));
+      MakeMemPtr(data),
+      MakeFrameLayout<NZLayoutPtn, half>(64, 64));
   // 创建张量2
   auto smallTensor = MakeTensor(
-      MakeL1memPtr<half>(data),
-      MakeNzLayout<half>(32, 32));
-  // 从张量1中提取分块
-  auto coord = MakeCoord(16, 16);
-  auto tileTensor = bigTensor(coord, smallTensor);
-  // 访问分块元素
-  auto tileValue = tileTensor(MakeCoord(0, 0));
+      MakeMemPtr(data),
+      MakeFrameLayout<NZLayoutPtn, half>(32, 32));
   
   // 示例3：多维张量操作
   // 创建多维张量
   auto multiDimTensor = MakeTensor(
-      MakeL1memPtr<half>(data),
+      MakeMemPtr<half>(data),
       MakeLayout(MakeShape(8, 8, 8)));
   // 访问多维元素
   auto value = multiDimTensor(2, 3, 4);
@@ -347,19 +342,8 @@ struct LocalTensor<EngineType, LayoutType>
   
   // 示例4：GM内存张量
   auto gmTensor = MakeTensor(         // 创建GM内存张量
-      MakeGMmemPtr<half>(gmAddr),     // 省略gmAddr初始化
-      MakeDNLayout<half>(128, 128));
+      MakeMemPtr<half>(gmAddr),     // 省略gmAddr初始化
+      MakeFrameLayout<NDExtLayoutPtn>(128, 128));
   auto gmValue = gmTensor(10, 20);    // 访问GM数据
   
-  // 示例5：张量视图组合
-  // 创建原始张量
-  auto originalTensor = MakeTensor(
-      MakeL1memPtr<half>(data),
-      MakeNzLayout<half>(64, 64));
-  // 创建组合视图
-  auto composedTensor = originalTensor.Compose(
-      MakeShape(16, 16),
-      MakeShape(4, 4));
-  // 组合视图仍然访问原始数据
-  auto composedValue = composedTensor(1, 1);
   ```
