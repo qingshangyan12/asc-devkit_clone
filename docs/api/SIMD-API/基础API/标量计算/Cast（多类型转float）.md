@@ -35,7 +35,7 @@
  
 </cann-filter>
 
-bfloat16\_t类型转换为float类型
+bfloat16\_t类型转换为float类型：
 
 ```cpp
 __aicore__ inline float Cast(const bfloat16_t& bVal)
@@ -46,7 +46,7 @@ __aicore__ inline float Cast(const bfloat16_t& bVal)
 <cann-filter npu-type = "950">
 以下函数原型仅支持Ascend 950PR/Ascend 950DT：
 
-支持多种数据类型转换为float类型
+支持多种数据类型转换为float类型：
 
 ```cpp
 template <typename T, typename U = float,
@@ -68,8 +68,8 @@ __aicore__ constexpr inline U Cast(T bVal)
 
 | 参数名 | 描述 |
 | ------ | ------ |
-| T | 操作数数据类型。<br><cann-filter npu-type = "950"> fp4x2_e1m2_t和fp4x2_e2m1_t类型为了满足1byte数据大小，构造时由两个四位标量数据拼接生成。转换时，被转换的是fp4x2_e1m2_t和fp4x2_e2m1_t标量数据中低位4bit的值，即[0:3]位。</cann-filter> |
-| U | 返回值数据类型，仅支持float。 |
+| T | 操作数数据类型。 |
+| U | 返回值数据类型。 |
 
 </cann-filter>
 
@@ -87,6 +87,8 @@ __aicore__ constexpr inline U Cast(T bVal)
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持bfloat16_t。</cann-filter>
   - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持bfloat16_t。</cann-filter>
 
+- <cann-filter npu-type = "950">fp4x2_e1m2_t和fp4x2_e2m1_t类型为了满足1byte数据大小，构造时由两个四位标量数据拼接生成。转换时，被转换的是fp4x2_e1m2_t和fp4x2_e2m1_t标量数据中低位4bit的值，即[0:3]位。</cann-filter>
+
 - 支持的返回值数据类型为float。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
@@ -95,7 +97,7 @@ __aicore__ constexpr inline U Cast(T bVal)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 输入参数为立即数时，需要使用显示类型转化，例如：
+输入参数为立即数时，需要使用显示类型转化，例如：
 
 ```cpp
 // 错误写法，AscendC暂不支持整数类型转float，编译报错
@@ -103,8 +105,6 @@ float x = AscendC::Cast(1);
 // 正确写法
 float x = AscendC::Cast((bfloat16_t)1);
 ```
-
-- <cann-filter npu-type = "950"> fp4x2_e1m2_t和fp4x2_e2m1_t类型为了满足1byte数据大小，构造时由两个四位标量数据拼接生成。转换时，被转换的是fp4x2_e1m2_t和fp4x2_e2m1_t标量数据中低位4bit的值，即[0:3]位。</cann-filter> 
 
 ## 调用示例<a name="section19372434133520"></a>
 
