@@ -30,10 +30,3 @@ set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 target_compile_options(gather_1d PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
 )
-
-target_link_libraries(gather_1d PRIVATE
-    m
-    platform
-    tiling_api
-    dl
-)
