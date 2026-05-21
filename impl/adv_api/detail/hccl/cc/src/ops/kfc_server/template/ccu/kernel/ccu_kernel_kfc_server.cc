@@ -49,37 +49,11 @@ HcclResult CcuKernelKfcServer::InitResource()
 
 HcclResult CcuKernelKfcServer::Algorithm()
 {
-    GenOpSelector();
+    //DONE:删除CcuKernelKfcServer::GenOpSelector()    
     GenCircularQueue();
     return HcclResult::HCCL_SUCCESS;
 }
 
-void CcuKernelKfcServer::GenOpSelector()
-{
-    if (algoTemplateInfo_.empty()) {
-        HCCL_ERROR("[CcuKernelKfcServer] GenOpSelector Failed: Empty AlgoTemplateInfo");
-        return;
-    }
-
-    {
-        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(GetDieId()) + "_" + std::to_string(missionIndex);
-        CcuRep::FuncBlock selectorFunc(this, funcName);
-
-        CcuRep::Variable opCode = CreateVariable();
-        selectorFunc.DefineInArg(opCode);
-
-        CcuRep::Variable opAddr = CreateVariable();
-        selectorFunc.DefineOutArg(opAddr);
-        opAddr = INVALID_U64;
-
-        for (auto entry : algoTemplateInfo_) {
-            CCU_IF(opCode == entry.first)
-            {
-                opAddr = entry.second;
-            }
-        }
-    }
-}
 
 void CcuKernelKfcServer::GenCircularQueue()
 {
@@ -123,7 +97,7 @@ void CcuKernelKfcServer::GenCircularQueue()
 
     array<CcuRep::Variable, CCU_PARAM_NUM_PER_DIE> param;
     for (uint32_t i = 0; i < CCU_PARAM_NUM_PER_DIE; ++i) {
-        param[i] = CreateContinuousVariable();
+        param[i] = ccu::Array<CcuRep::Variable> vars(10);       // TODO：需要确定这里的个数
     }
 
     CCU_WHILE(repeatCond == 0)
@@ -146,7 +120,8 @@ void CcuKernelKfcServer::GenCircularQueue()
             CCU_BREAK;
         }
 
-        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(GetDieId()) + "_" + std::to_string(missionIndex);
+        const uint32_t getDieId = DIE0_ID;      // TODO：GetDieId()函数的替换待HCCL方提供
+        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(getDieId) + "_" + std::to_string(missionIndex);
         auto selectFunc = Func(funcName);
         selectFunc.SetInArg(param[HBM_PARAM_IDX_0]);
         selectFunc.SetOutArg(opAddr);
@@ -157,14 +132,12 @@ void CcuKernelKfcServer::GenCircularQueue()
             CCU_BREAK;
         }
 
-        auto opFunc = Func(opAddr);
-        opFunc.SetInArg(param[HBM_PARAM_IDX_1]);
-        opFunc.SetInArg(param[HBM_PARAM_IDX_2]);
-        opFunc.SetInArg(token);
-        for (uint32_t i = HBM_PARAM_IDX_3; i < CCU_PARAM_NUM_PER_DIE; ++i) {
-            opFunc.SetInArg(param[i]);
+        hcomm::CcuRep::Variable opType;
+        opType = param[HBM_PARAM_IDX_0];
+        //vector<hcomm::CcuRep::Variable> args, hcomm::CcuRep::Variable token   
+        CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
+            ccu::callFunc<CcuKernelAlltoAllMesh1D>(args, token);
         }
-        opFunc.AppendToContext();
 
         MissionPostSync();
 
@@ -184,38 +157,40 @@ void CcuKernelKfcServer::GenCircularQueue()
 
 void CcuKernelKfcServer::WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::Variable &turnStartSig)
 {
+    const uint32_t getDieId = DIE0_ID;          // TODO：GetDieId()函数的替换待HCCL方提供
     if (dieNum_ == SINGLE_DIE) {
         CCU_WHILE(turnStartSig != 1)
         {
-            LoadVariable(hbmSigAddr, turnStartSig);
+            Load(hbmSigAddr, turnStartSig);
         }
         turnStartSig = 0;
-        StoreVariable(turnStartSig, hbmSigAddr);
+        Store(turnStartSig, hbmSigAddr);
     } else {
-        if (GetDieId() == DIE0_ID) {
+        if (getDieId == DIE0_ID) {
             CCU_WHILE(turnStartSig != 1)
             {
-                LoadVariable(hbmSigAddr, turnStartSig);
+                Load(hbmSigAddr, turnStartSig);
             }
             turnStartSig = 0;
-            StoreVariable(turnStartSig, hbmSigAddr);
-            LocalCtxPost(importDieSig, 1);
-        } else if (GetDieId() == DIE1_ID) {
-            LocalWait(exportDieSig, 1);
+            Store(turnStartSig, hbmSigAddr);
+            EventRecord(importDieSig, 1);
+        } else if (getDieId == DIE1_ID) {
+            EventWait(exportDieSig, 1);
         }
     }
 }
 
 void CcuKernelKfcServer::SetTurnEndSig(const CcuRep::Variable &hbmSigAddr, const CcuRep::Variable &turnEndSig)
 {
+    const uint32_t getDieId = DIE0_ID;          // TODO：GetDieId()函数的替换待HCCL方提供
     if (dieNum_ == SINGLE_DIE) {
-        StoreVariable(turnEndSig, hbmSigAddr);
+        Store(turnEndSig, hbmSigAddr);
     } else {
-        if (GetDieId() == DIE0_ID) {
-            LocalWait(exportDieSig, 1);
-            StoreVariable(turnEndSig, hbmSigAddr);
-        } else if (GetDieId() == DIE1_ID) {
-            LocalCtxPost(importDieSig, 1);
+        if (getDieId == DIE0_ID) {
+            EventWait(exportDieSig, 1);
+            Store(turnEndSig, hbmSigAddr);
+        } else if (getDieId == DIE1_ID) {
+            EventRecord(importDieSig, 1);
         }
     }
 }
@@ -226,10 +201,11 @@ void CcuKernelKfcServer::LoadFuncParamFromMemory(CcuRep::Variable &paramAddr, ar
     doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
     CcuRep::Variable addr = CreateVariable();
     addr = paramAddr;
-    if (dieNum_ == DOUBLE_DIE && GetDieId() == DIE1_ID) {
+    const uint32_t getDieId = DIE0_ID;          // TODO：GetDieId()函数的替换待HCCL方提供
+    if (dieNum_ == DOUBLE_DIE && getDieId == DIE1_ID) {
         addr += doubleDie;
     }
-    LoadVariable(addr, param[0], CCU_PARAM_NUM_PER_DIE);
+    Load(addr, param[0], CCU_PARAM_NUM_PER_DIE);
 }
 
 void CcuKernelKfcServer::MissionPreSync(CcuRep::Variable &func)
@@ -239,10 +215,10 @@ void CcuKernelKfcServer::MissionPreSync(CcuRep::Variable &func)
     }
     if (missionIndex == 0) {
         for (uint32_t i = 0; i < missionNum - 1; ++i) {
-            LocalCtxPostVar(func, importMissionVar[i], importMissionSig[i]);
+            LocalCtxPostVar(func, importMissionVar[i], importMissionSig[i]);    // TODO：这里怎么改
         }
     } else {
-        LocalWait(exportMissoinSig[0]);
+        EventWait(exportMissoinSig[0]);
         func = exportMissionVar[0];
     }
 }
@@ -254,10 +230,10 @@ void CcuKernelKfcServer::MissionPostSync()
     }
     if (missionIndex == 0) {
         for (uint32_t i = 0; i < missionNum - 1; ++i) {
-            LocalWait(exportMissoinSig[i]);
+            EventWait(exportMissoinSig[i]);
         }
     } else {
-        LocalCtxPost(importMissionSig[0]);
+        EventRecord(importMissionSig[0]);
     }
 }
 
