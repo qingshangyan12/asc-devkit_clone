@@ -41,7 +41,7 @@
 **场景3：BlockReduceSum<float>**
 - 输入：[1, 128]个float元素，mask=64（256/sizeof(float)），repeat=2
 - 输出：[1, 16]个float元素（对应16个datablock各自的求和结果）
-- 实现：`BlockReduceSum<float>(dstLocal, srcLocal, repeat=2, mask=8, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
+- 实现：`BlockReduceSum<float>(dstLocal, srcLocal, repeat=2, mask=64, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
 - 说明：对每个datablock内所有元素求和，源操作数相加采用二叉树方式两两相加，一个datablock处理32字节即8个float元素，128个元素共16个datablock，输出16个求和结果
 
 ## 样例规格
@@ -76,7 +76,7 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
 
@@ -95,7 +95,7 @@
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
-    
+
 - 样例执行
 
   ```bash
@@ -108,8 +108,8 @@
   ```
 
   使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
-  
-  示例如：
+
+  示例如下：
 
   ```bash
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
