@@ -3,43 +3,16 @@
 ## 概述
 
 本样例基于ReduceMax/ReduceMin/ReduceSum接口实现归约计算，支持以下6种场景（scenario）：
-    <table>
- 	  	 	<tr>
- 	  	 		<td>scenarioNum</td>
- 	  	 		<td>场景</td>
-          <td>描述</td>
- 	  	 	</tr>
- 	  	 	<tr>
- 	  	 		<td>1</td>
- 	  	 		<td>ReduceMax前n个数据计算</td>
-          <td>从输入tensor的前n个数据中找出最大值及最大值对应的索引位置</td>
- 	  	 	</tr>
- 	  	 	<tr>
- 	  	 		<td>2</td>
- 	  	 		<td>ReduceMax高维切分计算</td>
-          <td>从所有输入数据中找出最大值及最大值对应的索引位置，使用mask控制每次迭代内参与计算的元素</td>
- 	  	 	</tr>
-        <tr>
- 	  	 		<td>3</td>
- 	  	 		<td>ReduceMin前n个数据计算</td>
-          <td>从输入tensor的前n个数据中找出最小值及最小值对应的索引位置</td>
- 	  	 	</tr>
-        <tr>
- 	  	 		<td>4</td>
- 	  	 		<td>ReduceMin高维切分计算</td>
-          <td>从所有输入数据中找出最小值及最小值对应的索引位置，使用mask控制每次迭代内参与计算的元素</td>
- 	  	 	</tr>
-        <tr>
- 	  	 		<td>5</td>
- 	  	 		<td>ReduceSum前n个数据计算</td>
-          <td>对输入tensor的前n个数据求和</td>
- 	  	 	</tr>
-        <tr>
- 	  	 		<td>6</td>
- 	  	 		<td>ReduceSum高维切分计算</td>
-          <td>对所有输入数据求和，使用mask控制每次迭代内参与计算的元素</td>
- 	  	 	</tr>
- 	  	 </table>
+
+<table border="2">
+<tr><td align="center">scenarioNum</td><td align="center">场景</td><td align="center">描述</td></tr>
+<tr><td align="center">1</td><td align="center">ReduceMax前n个数据计算</td><td align="center">从输入Tensor的前n个数据中找出最大值及最大值对应的索引位置</td></tr>
+<tr><td align="center">2</td><td align="center">ReduceMax高维切分计算</td><td align="center">从所有输入数据中找出最大值及最大值对应的索引位置，使用mask控制每次迭代内参与计算的元素</td></tr>
+<tr><td align="center">3</td><td align="center">ReduceMin前n个数据计算</td><td align="center">从输入Tensor的前n个数据中找出最小值及最小值对应的索引位置</td></tr>
+<tr><td align="center">4</td><td align="center">ReduceMin高维切分计算</td><td align="center">从所有输入数据中找出最小值及最小值对应的索引位置，使用mask控制每次迭代内参与计算的元素</td></tr>
+<tr><td align="center">5</td><td align="center">ReduceSum前n个数据计算</td><td align="center">对输入Tensor的前n个数据求和</td></tr>
+<tr><td align="center">6</td><td align="center">ReduceSum高维切分计算</td><td align="center">对所有输入数据求和，使用mask控制每次迭代内参与计算的元素</td></tr>
+</table>
 
 ## 支持的产品
 
@@ -62,82 +35,67 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例基于ReduceMax/ReduceMin/ReduceSum接口实现归约计算，包含前n个数据计算接口和tensor高维切分计算接口。接口资料参考[ReduceMax](../../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax.md)/[ReduceMin](../../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMin.md)/[ReduceSum](../../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum.md)。
+  本样例基于ReduceMax/ReduceMin/ReduceSum接口实现归约计算，包含前n个数据计算接口和Tensor高维切分计算接口。接口资料参考[ReduceMax](../../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax.md)/[ReduceMin](../../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMin.md)/[ReduceSum](../../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum.md)。
 
 - 样例规格：  
-  不同场景的输入输出规格如下表所示：
+  <table border="2">
+  <caption>表1：样例输入输出规格（场景1：ReduceMax前n个数据计算）</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ReduceMax</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 288]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_computation_custom</td></tr>
+  </table>
 
-  <table border="2" align="center">
-  <tr>
-    <th align="center">scenarioNum</th>
-    <th align="center">样例场景</th>
-    <th align="center">输入name</th>
-    <th align="center">输入shape</th>
-    <th align="center">输入data type</th>
-    <th align="center">输出name</th>
-    <th align="center">输出shape</th>
-    <th align="center">输出data type</th>
-  </tr>
-  <tr>
-    <td align="center">1</td>
-    <td align="center">ReduceMax前n个数据计算</td>
-    <td align="center">x</td>
-    <td align="center">[1, 288]</td>
-    <td align="center">half</td>
-    <td align="center">y</td>
-    <td align="center">[1, 16]</td>
-    <td align="center">half</td>
-  </tr>
-  <tr>
-    <td align="center">2</td>
-    <td align="center">ReduceMax高维切分计算</td>
-    <td align="center">x</td>
-    <td align="center">[1, 512]</td>
-    <td align="center">half</td>
-    <td align="center">y</td>
-    <td align="center">[1, 16]</td>
-    <td align="center">half</td>
-  </tr>
-  <tr>
-    <td align="center">3</td>
-    <td align="center">ReduceMin前n个数据计算</td>
-    <td align="center">x</td>
-    <td align="center">[1, 288]</td>
-    <td align="center">half</td>
-    <td align="center">y</td>
-    <td align="center">[1, 16]</td>
-    <td align="center">half</td>
-  </tr>
-  <tr>
-    <td align="center">4</td>
-    <td align="center">ReduceMin高维切分计算</td>
-    <td align="center">x</td>
-    <td align="center">[1, 512]</td>
-    <td align="center">half</td>
-    <td align="center">y</td>
-    <td align="center">[1, 16]</td>
-    <td align="center">half</td>
-  </tr>
-  <tr>
-    <td align="center">5</td>
-    <td align="center">ReduceSum前n个数据计算</td>
-    <td align="center">x</td>
-    <td align="center">[1, 288]</td>
-    <td align="center">half</td>
-    <td align="center">y</td>
-    <td align="center">[1, 16]</td>
-    <td align="center">half</td>
-  </tr>
-  <tr>
-    <td align="center">6</td>
-    <td align="center">ReduceSum高维切分计算</td>
-    <td align="center">x</td>
-    <td align="center">[8320]</td>
-    <td align="center">half</td>
-    <td align="center">y</td>
-    <td align="center">[1, 16]</td>
-    <td align="center">half</td>
-  </tr>
+  <table border="2">
+  <caption>表2：样例输入输出规格（场景2：ReduceMax高维切分计算）</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ReduceMax</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_computation_custom</td></tr>
+  </table>
+
+  <table border="2">
+  <caption>表3：样例输入输出规格（场景3：ReduceMin前n个数据计算）</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ReduceMin</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 288]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_computation_custom</td></tr>
+  </table>
+
+  <table border="2">
+  <caption>表4：样例输入输出规格（场景4：ReduceMin高维切分计算）</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ReduceMin</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_computation_custom</td></tr>
+  </table>
+
+  <table border="2">
+  <caption>表5：样例输入输出规格（场景5：ReduceSum前n个数据计算）</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ReduceSum</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 288]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_computation_custom</td></tr>
+  </table>
+
+  <table border="2">
+  <caption>表6：样例输入输出规格（场景6：ReduceSum高维切分计算）</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ReduceSum</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 8320]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_computation_custom</td></tr>
   </table>
 
 - 样例实现：

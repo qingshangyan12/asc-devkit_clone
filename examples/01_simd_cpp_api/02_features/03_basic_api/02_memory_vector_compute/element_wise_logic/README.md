@@ -52,7 +52,8 @@
   - 输入src1: [512 511 510 ... 1]
   - 输出dst: [1 0 3 ... 0]
 
-**场景2：Ors矢量与标量或操作（标量在前）** ----此场景仅在 Ascend 950PR/Ascend 950DT产品支持**
+**场景2：Ors矢量与标量或操作（标量在前）**
+- 此场景仅在 Ascend 950PR/Ascend 950DT 产品支持。
 - 输入shape：src0=[1, 512]（取src0Local[0]作为标量），src1=[1, 512]（矢量）
 - 输出shape：dst=[1, 512]
 - 数据类型：uint16
@@ -70,7 +71,8 @@
   - 输入src1: [1 2 3 ... 512]
   - 输出dst: [1 3 3 5 5 .. 513]
 
-**场景3：ShiftLeft左移操作（tensor形式）** ----此场景仅在 Ascend 950PR/Ascend 950DT产品支持**
+**场景3：ShiftLeft左移操作（tensor形式）**
+- 此场景仅在 Ascend 950PR/Ascend 950DT 产品支持。
 - 输入shape：src0=[1, 512]（待移位数据，uint16），src1=[1, 512]（左移位数，int16）
 - 输出shape：dst=[1, 512]
 - 数据类型：uint16
@@ -102,6 +104,51 @@
 - 示例：
   - 输入src0: [1 2 3 4 5 ... 512]
   - 输出dst: [0 0 0 1 1 1 1 2 2 2 ... 128]
+
+## 样例规格
+
+<table border="2">
+<caption>表1：样例输入输出规格（场景1：And）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">And</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 512]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[1, 512]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 512]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">logic_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表2：样例输入输出规格（场景2：Ors）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Ors</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 512]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[1, 512]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 512]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">logic_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表3：样例输入输出规格（场景3：ShiftLeft）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ShiftLeft</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 512]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[1, 512]</td><td align="center">int16_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 512]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">logic_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表4：样例输入输出规格（场景4：ShiftRight）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ShiftRight</td></tr>
+<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 512]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 512]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">logic_custom</td></tr>
+</table>
 
 ## 编译运行
 
