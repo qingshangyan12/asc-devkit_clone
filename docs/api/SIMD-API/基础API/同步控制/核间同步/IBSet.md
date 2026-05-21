@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为:"basic\_api/kernel\_operator\_block\_sync\_intf.h"
+头文件路径为:"basic_api/kernel_operator_block_sync_intf.h"
 
 IBSet是核间同步控制接口，其功能：当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。
 
@@ -79,11 +79,11 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 | blockIdx | 输入 | 表示等待核的idx号，取值范围：[0, 核数-1]。 |
 | eventID | 输入 | 用来控制当前核的set、wait事件。 |
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 数据类型
 
 无
 
-## 数据类型
+## 返回值说明<a name="section640mcpsimp"></a>
 
 无
 
@@ -93,18 +93,18 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   gmWorkspace申请的空间最少要求为：核数 \* 32Bytes \* eventID\_max + blockIdx\_max \* 32Bytes + 32Bytes。（eventID\_max和blockIdx\_max分别指eventID、blockIdx的最大值 ）；注意：如果是AIVOnly模式，核数 = GetBlockNum\(\)；如果是MIX模式，核数 = GetBlockNum\(\) \* 2。
--   ubWorkspace申请的空间最少要求为：32Bytes。
--   使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
--   IBSet和IBWait配对使用时，除了ubWorkspace其余所有参数都必须相同，否则程序会在IBWait处卡死。
--   分离模式下，使用该接口进行两个核间的同步时，仅对AIV核生效。
--   IBSet接口的gmWorkspace缓存的值需要初始化为0。
+- gmWorkspace申请的空间最少要求为：核数 \* 32Bytes \* eventID\_max + blockIdx\_max \* 32Bytes + 32Bytes。（eventID\_max和blockIdx\_max分别指eventID、blockIdx的最大值 ）；注意：如果是AIVOnly模式，核数 = GetBlockNum\(\)；如果是MIX模式，核数 = GetBlockNum\(\) \* 2。
+- ubWorkspace申请的空间最少要求为：32Bytes。
+- 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
+- IBSet和IBWait配对使用时，除了ubWorkspace其余所有参数都必须相同，否则程序会在IBWait处卡死。
+- 分离模式下，使用该接口进行两个核间的同步时，仅对AIV核生效。
+- IBSet接口的gmWorkspace缓存的值需要初始化为0。
 
 ## 调用示例<a name="section177231425115410"></a>
 
-本示例实现功能为使用2个核进行数据处理，每个核均是处理256个half类型数据。核0实现x+y的操作，并将结果放入z的前半部分，核1将核0的计算结果放入x，之后与y相加，结果存入z的后半部分，因此多个核之间需要进行数据同步。如需运行，请参考[IBSet与IBWait核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/ib_set_wait)实现完整的代码。
+本示例实现功能为使用2个核进行数据处理，每个核均是处理256个half类型数据。核0实现x+y的操作，并将结果放入z的前半部分，核1将核0的计算结果放入x，之后与y相加，结果存入z的后半部分，因此多个核之间需要进行数据同步。
 
-```
+```cpp
 // sync_gm为外部存储核状态的公共缓存，类型为GlobalTensor；sync_buf为存储当前核状态的公共缓存，类型为LocalTensor
 int32_t blockIdx = AscendC::GetBlockIdx(); // 获取当前核
 if (blockIdx == 1) { // 在核1设置IBWait，将阻塞指令执行直到核0操作完成
@@ -115,3 +115,5 @@ if (blockIdx == 0) { // 在核0设置IBSet，当核0的操作完成后再执行�
     AscendC::IBSet(sync_gm, sync_buf, 0, 0);
 }
 ```
+
+详细请参考[IBSet与IBWait核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/ib_set_wait)。

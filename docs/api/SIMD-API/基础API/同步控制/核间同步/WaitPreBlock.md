@@ -49,7 +49,11 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-通过读GM地址中的值，确认是否需要继续等待，当GM的值满足当前核的等待条件时，该核即可往下执行，进行下一步操作。使用接口前，请确保已经调用[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md)接口，初始化共享内存。
+头文件路径为: "basic_api/kernel_operator_determine_compute_sync_intf.h"
+
+WaitPreBlock和NotifyNextBlock是核间同步控制接口，其功能：NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。
+
+WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md#)接口配合使用，这三个接口组合使用能够确保多个AIV核严格按照blockIdx的升序顺序执行，适用于要求确定性计算的场景，确定性计算的具体含义请参考[原子操作-确定性计算](../../原子操作/关键特性说明.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -66,11 +70,11 @@ __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTen
 | gmWorkspace | 输入 | 临时空间，通过读取gmWorkspace，判断当前核是否可以继续往下执行，类型为GlobalTensor。 |
 | ubWorkspace | 输入 | 临时空间，用于操作gmWorkspace，类型为LocalTensor。 |
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 数据类型
 
 无
 
-## 数据类型
+## 返回值说明<a name="section640mcpsimp"></a>
 
 无
 
@@ -80,12 +84,12 @@ __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTen
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   要实现确定性计算，需要保证每个核调用NotifyNextBlock/WaitPreBlock接口的次数相同。如果调用了NotifyNextBlock没有与之配对的WaitPreBlock的，会导致非确定性计算、输出结果可能不符合预期；如果调用了WaitPreBlock没有与之配对的NotifyNextBlock，会导致程序卡死。
--   使用接口前，请确保已经调用[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md#ZH-CN_TOPIC_0000002555780810)接口，初始化共享内存。
+- 要实现确定性计算，需要保证每个核调用NotifyNextBlock/WaitPreBlock接口的次数相同。如果调用了NotifyNextBlock没有与之配对的WaitPreBlock的，会导致非确定性计算、输出结果可能不符合预期；如果调用了WaitPreBlock没有与之配对的NotifyNextBlock，会导致程序卡死。
+- 使用接口前，请确保已经调用[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md)接口，初始化共享内存。
 
--   gmWorkspace申请的空间最少要求为：[GetBlockNum\(\)](GetBlockNum.md#ZH-CN_TOPIC_0000002555780818)  \* 32Bytes；ubWorkspace申请的空间最少要求为：[GetBlockNum\(\)](GetBlockNum.md#ZH-CN_TOPIC_0000002555780818)  \* 32 + 32Bytes。
--   使用该接口进行多核同步时，仅对AIV核生效，WaitPreBlock和NotifyNextBlock之间仅支持插入矢量计算相关指令，对矩阵计算相关指令不生效。
--   使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
+- gmWorkspace申请的空间最少要求为：**GetBlockNum()**  \* 32Bytes；ubWorkspace申请的空间最少要求为：**GetBlockNum()**  \* 32 + 32Bytes。
+- 使用该接口进行多核同步时，仅对AIV核生效，WaitPreBlock和NotifyNextBlock之间仅支持插入矢量计算相关指令，对矩阵计算相关指令不生效。
+- 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
 
 ## 调用示例<a name="section177231425115410"></a>
 

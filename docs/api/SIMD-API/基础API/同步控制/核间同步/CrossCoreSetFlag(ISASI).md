@@ -51,25 +51,25 @@
 
 头文件路径为: "basic_api/kernel_operator_block_sync_intf.h"。
 
-在核间同步场景中，CrossCoreSetFlag接口和[CrossCoreWaitFlag](CrossCoreWaitFlag.md#ZH-CN_TOPIC_0000002555780806)接口配对工作，使用时需传入核间同步的标记ID(flagId)，每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。
+在核间同步场景中，CrossCoreSetFlag接口和[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)接口配对工作，使用时需传入核间同步的标记ID(flagId)，每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。
 
--   CrossCoreSetFlag
+- CrossCoreSetFlag
 
     AI Core中的AIC/AIV在完成本核前置位的pipe流水任务后，调用该接口，向调度模块上报本核任务已完成。调度模块收集所有参与核的上报信息，作为全局完成标志。
 
--   CrossCoreWaitFlag
+- CrossCoreWaitFlag
 
     用于阻塞本核后续指令的下发（已下发指令可正常执行），直至调度模块确认所有应调用CrossCoreSetFlag的核均已上报完成，随即解除阻塞，允许该核继续下发指令。
 
 同步控制分为以下几种模式，如[图1](#fig37581010773)所示：
 
--   模式0：AI Core核间的同步控制。对于AIC场景，同步所有的AIC核，直到所有的AIC核都执行到CrossCoreSetFlag时，CrossCoreWaitFlag后续的指令才会执行；对于AIV场景，同步所有的AIV核，直到所有的AIV核都执行到CrossCoreSetFlag时，CrossCoreWaitFlag后续的指令才会执行。
--   模式1：AI Core内部，AIV核之间的同步控制。如果两个AIV核都运行了CrossCoreSetFlag，CrossCoreWaitFlag后续的指令才会执行。
--   模式2：AI Core内部，AIC与AIV之间的同步控制。在AIC核执行CrossCoreSetFlag之后， 两个AIV上CrossCoreWaitFlag后续的指令才会继续执行；两个AIV都执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
+- 模式0：AI Core核间的同步控制。对于AIC场景，同步所有的AIC核，直到所有的AIC核都执行到CrossCoreSetFlag时，CrossCoreWaitFlag后续的指令才会执行；对于AIV场景，同步所有的AIV核，直到所有的AIV核都执行到CrossCoreSetFlag时，CrossCoreWaitFlag后续的指令才会执行。
+- 模式1：AI Core内部，AIV核之间的同步控制。如果两个AIV核都运行了CrossCoreSetFlag，CrossCoreWaitFlag后续的指令才会执行。
+- 模式2：AI Core内部，AIC与AIV之间的同步控制。在AIC核执行CrossCoreSetFlag之后， 两个AIV上CrossCoreWaitFlag后续的指令才会继续执行；两个AIV都执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
 
 <cann-filter npu-type="950">
 
--   模式4：模式4仅支持Ascend 950PR/Ascend 950DT。AI Core内部，AIC与AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。比如，在AIC核执行CrossCoreSetFlag之后， AIV0上CrossCoreWaitFlag后续的指令才会继续执行；AIV0执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
+- 模式4：模式4仅支持Ascend 950PR/Ascend 950DT。AI Core内部，AIC与AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。比如，在AIC核执行CrossCoreSetFlag之后， AIV0上CrossCoreWaitFlag后续的指令才会继续执行；AIV0执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
 
 </cann-filter>
 
@@ -100,11 +100,11 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 | --- | --- | --- |
 | flagId | 输入 | 核间同步的标记。<br><cann-filter npu-type="950">1. Ascend 950PR/Ascend 950DT，取值范围如下：<br>&nbsp;&nbsp;&bull; AIV0发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 0-10的操作。<br>&nbsp;&nbsp;&bull; AIV1发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 16-26的操作。<br>&nbsp;&nbsp;&bull; AIC发起的flagId 0-10的CrossCoreSetFlag操作对应AIV0 CrossCoreWaitFlag中flagId 0-10的操作。<br>&nbsp;&nbsp;&bull; AIC发起的flagId 16-26的CrossCoreSetFlag操作对应AIV1 CrossCoreWaitFlag中flagId 0-10的操作。</cann-filter><br><cann-filter npu-type="A3">2. Atlas A3 训练系列产品/Atlas A3 推理系列产品，取值范围是0-10。</cann-filter><br><cann-filter npu-type="910b">3. Atlas A2 训练系列产品/Atlas A2 推理系列产品，取值范围是0-10。</cann-filter> |
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 数据类型
 
 无
 
-## 数据类型
+## 返回值说明<a name="section640mcpsimp"></a>
 
 无
 
@@ -114,9 +114,9 @@ PIPE_S
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   使用该同步接口时，需要按照如下规则[设置Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)：
-    -   在纯Vector/Cube场景下，需设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0。
-    -   对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型，不同模式支持和函数修饰符和Kernel类型请参照表3。
+- 使用该同步接口时，需要按照如下规则[设置Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)：
+    - 在纯Vector/Cube场景下，需设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0。
+    - 对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型，不同模式支持和函数修饰符和Kernel类型请参照表3。
 
         **表 3**  模式与支持的Kernel类型配置
 
@@ -126,23 +126,23 @@ PIPE_S
         | 1 | \_\_mix\_\_(1, 1)，\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_1， KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
         | 2 | \_\_mix\_\_(1, 1)，\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_1， KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
 
--   接口使用模式0、1、2，需要避免flagId使用冲突：
+- 接口使用模式0、1、2，需要避免flagId使用冲突：
     - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象数目，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul 最多支持定义 4 个对象 ，此时 flagId占用范围为\[0,7\]。
 
     - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
 
--   用户需要确保配套使用CrossCoreSetFlag和CrossCoreWaitFlag，否则会出现未定义行为。
+- 用户需要确保配套使用CrossCoreSetFlag和CrossCoreWaitFlag，否则会出现未定义行为。
 - <cann-filter npu-type="950">流水类型为PIPE_ALL/PIPE_S时，仅在Ascend 950PR/Ascend 950DT上支持。</cann-filter>
 
--   一个核连续发出的CrossCoreSetFlag，硬件不保证执行顺序。例如AIV依次发射CrossCoreSetFlag<0，PIPE\_V\>\(0\)，CrossCoreSetFlag<0，PIPE\_V\>\(1\)，实际的执行顺序可能是flagId=1的先执行
+- 一个核连续发出的CrossCoreSetFlag，硬件不保证执行顺序。例如AIV依次发射CrossCoreSetFlag<0，PIPE\_V\>\(0\)，CrossCoreSetFlag<0，PIPE\_V\>\(1\)，实际的执行顺序可能是flagId=1的先执行
 
--   flagId相关的约束：
-    -   对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取到最低位4bit为准。
-    -   每个flagId都对应一个计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag.md#ZH-CN_TOPIC_0000002555780806)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到所有参与同步的核（具体包含哪些核与设置的核间同步模式有关\)完成（调用了CrossCoreSetFlag）同步后，会将与设置的flagId对应的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。每一个计数器计数范围为0-15。如果调用CrossCoreWaitFlag的次数过多，计数器的值超出该范围，则会异常报错，中断流程。
+- flagId相关的约束：
+    - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取到最低位4bit为准。
+    - 每个flagId都对应一个计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到所有参与同步的核（具体包含哪些核与设置的核间同步模式有关）完成（调用了CrossCoreSetFlag）同步后，会将与设置的flagId对应的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。每一个计数器计数范围为0-15。如果调用CrossCoreWaitFlag的次数过多，计数器的值超出该范围，则会异常报错，中断流程。
 
--   模式0、1、2下，同一个flagId用于不同核间同步模式的约束：
+- 模式0、1、2下，同一个flagId用于不同核间同步模式的约束：
 
-    -   对于同一个核上的操作，若需将同一flagId用于不同的核间同步模式，必须在模式切换前确保前一个模式下的所有同步操作已完成——即与该flagId关联的CrossCoreSetFlag调用及其配对的CrossCoreWaitFlag调用均执行完毕。否则，未完成的同步操作可能导致系统出现未定义行为。
+    - 对于同一个核上的操作，若需将同一flagId用于不同的核间同步模式，必须在模式切换前确保前一个模式下的所有同步操作已完成——即与该flagId关联的CrossCoreSetFlag调用及其配对的CrossCoreWaitFlag调用均执行完毕。否则，未完成的同步操作可能导致系统出现未定义行为。
 
         图1展示了一个违反上述约束的场景。
 
@@ -156,15 +156,15 @@ PIPE_S
 
     （2）对于不同的核，可以直接将同一flagId用于不同的核间同步模式，具体包括以下2种场景：
 
-    -   多个AI Core之间，使用flagId=0同步所有的AIC（模式0）；单个AI Core内，使用flagId=0同步所有AIV（模式1）。
-    -   单个AI Core内，使用flagId=0同步所有AIV（模式1）；另一个AI Core内，使用flagId=0同步AIC与所有AIV（模式2）。
+    - 多个AI Core之间，使用flagId=0同步所有的AIC（模式0）；单个AI Core内，使用flagId=0同步所有AIV（模式1）。
+    - 单个AI Core内，使用flagId=0同步所有AIV（模式1）；另一个AI Core内，使用flagId=0同步AIC与所有AIV（模式2）。
 
--   使用该接口模式0时，建议开启batchmode模式，使算子独占全部所需核资源，否则可能因满足以下条件导致死锁：
+- 使用该接口模式0时，建议开启batchmode模式，使算子独占全部所需核资源，否则可能因满足以下条件导致死锁：
 
-    -   多流并发场景（≥2条执行流）。
-    -   ≥2个算子并发执行。
-    -   所有并发算子的核数总和超过物理核数。
-    -   ≥2个并发算子使用了核间同步功能。
+    - 多流并发场景（≥2条执行流）。
+    - ≥2个算子并发执行。
+    - 所有并发算子的核数总和超过物理核数。
+    - ≥2个并发算子使用了核间同步功能。
 
     具体而言，在多流场景下，某条流的核间同步算子虽分配到n个物理核，但可能仅有n-m个核先被调度执行，而其余m个核因被其他流的核间同步算子抢占而尚未启动。先启动的n-m个核执行到核间同步时等待剩余m核完成，而剩余m核因被其他流的核间同步算子占用而无法释放，形成死锁。
 

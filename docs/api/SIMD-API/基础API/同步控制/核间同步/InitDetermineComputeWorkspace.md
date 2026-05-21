@@ -82,12 +82,11 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- gmWorkspace申请的空间最少要求为：[GetBlockNum\(\)](GetBlockNum.md#ZH-CN_TOPIC_0000002555780818)  \* 32Bytes；ubWorkspace申请的空间最少要求为：[GetBlockNum\(\)](GetBlockNum.md#ZH-CN_TOPIC_0000002555780818)\* 32 + 32Bytes。
+- gmWorkspace申请的空间最少要求为：**GetBlockNum()**  \* 32Bytes；ubWorkspace申请的空间最少要求为：**GetBlockNum()**\* 32 + 32Bytes。
 - 与IBSet/SyncAll不同，该接口输入参数gmWorkspace缓存的值不需要初始化为0。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
 
 ## 调用示例<a name="section177231425115410"></a>
-
 
 ```cpp
     // 初始化GM共享内存的同步状态，必须在核函数开始时首先调用
