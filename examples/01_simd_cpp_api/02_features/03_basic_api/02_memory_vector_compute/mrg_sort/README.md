@@ -41,13 +41,14 @@
 **场景3：32条队列多轮归并排序**
 - 输入：1024个float元素（score） + 1024个uint32元素（index）
 - 输出：[1, 2048]个float元素（1024*2个排序结果）
-- 实现：Sort32 repeat=32，将1024个元素分为32组分别降序排序；第一轮MrgSort repeatTimes=8，每4条队列合并为1条，得到8条有序队列；第二轮MrgSort repeatTimes=2，每4条队列合并为1条，得到2条有序队列；第三轮MrgSort2将2条队列合并为1条全局有序队列
+- 实现：Sort32 repeat=32，将1024个元素分为32组分别降序排序；第一轮MrgSort repeatTimes=8，每4条队列合并为1条，得到8条有序队列；第二轮MrgSort repeatTimes=2，每4条队列合并为1条，得到2条有序队列；第三轮MrgSort将2条队列合并为1条全局有序队列
 - 说明：演示多路归并排序场景，通过多轮归并将32条有序队列合并为1条全局有序队列
 
 ## 样例规格
 
 <table border="2">
 <caption>表1：样例输入输出规格（场景1）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">MrgSort</td></tr>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td align="center">y</td><td align="center">[1, 128]</td><td align="center">uint32</td><td align="center">ND</td></tr>
@@ -57,6 +58,7 @@
 
 <table border="2">
 <caption>表2：样例输入输出规格（场景2）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">MrgSort</td></tr>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 96]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td align="center">y</td><td align="center">[1, 96]</td><td align="center">uint32</td><td align="center">ND</td></tr>
@@ -66,6 +68,7 @@
 
 <table border="2">
 <caption>表3：样例输入输出规格（场景3）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">MrgSort</td></tr>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">uint32</td><td align="center">ND</td></tr>
