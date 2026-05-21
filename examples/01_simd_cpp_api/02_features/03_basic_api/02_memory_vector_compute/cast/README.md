@@ -25,11 +25,11 @@
 ## 样例描述
 
 - 样例功能：  
-  CastCustom样例根据源操作数和目的操作数Tensor的数据类型进行精度转换。
+  Cast样例根据源操作数和目的操作数Tensor的数据类型进行精度转换。
 - 样例规格：  
-  <table>
-  <caption>表1：样例规格</caption>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> cast </td></tr>
+  <table border="2">
+  <caption>表1：样例输入输出规格</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Cast</td></tr>
 
   <tr><td rowspan="3" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -41,7 +41,7 @@
   </table>
 
 - 场景说明：  
-  <table>
+  <table border="2">
   <caption>表2：SCENARIO_NUM参数说明</caption>
   <tr><td align="center">SCENARIO_NUM</td><td align="center">输入类型</td><td align="center">输出类型</td><td align="center">说明</td></tr>
   <tr><td align="center">0</td><td align="center">half</td><td align="center">int4b_t</td><td align="center">half转int4b_t</td></tr>
@@ -49,7 +49,7 @@
   </table>
 
 - 样例实现：  
-  本样例中实现的是固定shape为输入x[1, 512]，输出y[1, 512]的CastCustom样例，支持half到int32_t和half到int4b_t两种转换场景。
+  本样例中实现的是固定shape为输入x[1, 512]，输出y[1, 512]的Cast样例，支持half到int32_t和half到int4b_t两种转换场景。
 
   - Kernel实现  
     - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
@@ -94,9 +94,9 @@
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
-  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
   
-  示例如：
+  示例如下：
 
   ```bash
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
@@ -110,7 +110,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`（默认）、`1` | 场景：0 对应half转int4b_t，1 对应half转int32_t |
 
 - 执行结果

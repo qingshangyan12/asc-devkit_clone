@@ -26,7 +26,19 @@
 
 - 样例规格：
   <table border="2">
-  <caption>表1：样例规格对照表</caption>
+  <caption>表1：样例输入输出规格</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ElementWiseCompoundCompute</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">src0</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">src1</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">dst</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">element_wise_compound_compute_custom</td></tr>
+  </table>
+
+- 场景说明：
+  <table border="2">
+  <caption>表2：场景配置对照表</caption>
   <tr>
     <th align="left">场景编号(SCENARIO_NUM)</th>
     <th align="left">接口名称</th>
@@ -52,8 +64,6 @@
     <td align="left">half</td>
   </tr>
   </table>
-
-  输入输出shape均为[1, 512]，format为ND，核函数名为`element_wise_compound_compute_custom`。
 
 - 样例实现：
   - Kernel实现

@@ -39,9 +39,9 @@
 
   | 场景编号 | 场景名称 | 输入shape | 输出shape | 数据类型 | 输入格式 | 输出格式 | 转置类型 |
   |------|--------|------|------|--------|------|------|------|
-  | 1 | 普通转置 | [16,16] | [16,16] | half | ND | ND | / |
-  | 2 | 增强转置 | [3,3,2,8] | [3,2,8,3] | half | NCHW | NHWC | TRANSPOSE_NCHW2NHWC |
-  | 3 | 5HD格式转换 | [2,32,16,16] | [2,2,16,16,16] | half | NCHW | NC1HWC0 | / |
+  | 1 | 普通转置 | [16, 16] | [16, 16] | half | ND | ND | / |
+  | 2 | 增强转置 | [3, 3, 2, 8] | [3, 2, 8, 3] | half | NCHW | NHWC | TRANSPOSE_NCHW2NHWC |
+  | 3 | 5HD格式转换 | [2, 32, 16, 16] | [2, 2, 16, 16, 16] | half | NCHW | NC1HWC0 | / |
 
 - 数据格式说明：  
   卷积神经网络的特征图（Feature Map）通常用四维数组保存，即4D，4D格式解释如下：
@@ -52,14 +52,46 @@
 
   由于数据只能线性存储，因此这四个维度有对应的顺序，不同深度学习框架会按照不同的顺序存储特征图数据，比如在TensorFlow中，排列顺序为[Batch, Height, Width, Channels]，即NHWC。
 
-  5HD格式（NC1HWC0）是昇腾NPU特有的数据排布格式，其中：
-    - N：Batch数量。
-    - C1：C1 = ceil(C / C0)。如果结果不整除，向下取整。
-    - H：Height，特征图高度。
-    - W：Width，特征图宽度。
-    - C0：等于AI Core中矩阵计算单元的大小，如果是数据类型的位宽为32位或者16位，则C0=16；如果数据类型的位宽为8位，则C0=32。本样例为16。
+	  5HD格式（NC1HWC0）是昇腾NPU特有的数据排布格式，其中：
+	    - N：Batch数量。
+	    - C1：C1 = ceil(C / C0)。如果结果不整除，向下取整。
+	    - H：Height，特征图高度。
+	    - W：Width，特征图宽度。
+	    - C0：等于AI Core中矩阵计算单元的大小，如果是数据类型的位宽为32位或者16位，则C0=16；如果数据类型的位宽为8位，则C0=32。本样例为16。
 
-    NHWC/NCHW -> NC1HWC0的转换过程为：将数据在C维度进行分割，变成C1份NHWC0/NC0HW，再将C1份NHWC0/NC0HW在内存中连续排列成NC1HWC0。
+	    NHWC/NCHW -> NC1HWC0的转换过程为：将数据在C维度进行分割，变成C1份NHWC0/NC0HW，再将C1份NHWC0/NC0HW在内存中连续排列成NC1HWC0。
+
+## 样例规格
+
+<table border="2">
+<caption>表1：样例输入输出规格（场景1：普通转置）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Transpose</td></tr>
+<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">[16, 16]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">z</td><td align="center">[16, 16]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">transpose_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表2：样例输入输出规格（场景2：增强转置）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Transpose</td></tr>
+<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">[3, 3, 2, 8]</td><td align="center">half</td><td align="center">NCHW</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">z</td><td align="center">[3, 2, 8, 3]</td><td align="center">half</td><td align="center">NHWC</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">transpose_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表3：样例输入输出规格（场景3：5HD格式转换）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">TransDataTo5HD</td></tr>
+<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">[2, 32, 16, 16]</td><td align="center">half</td><td align="center">NCHW</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">z</td><td align="center">[2, 2, 16, 16, 16]</td><td align="center">half</td><td align="center">NC1HWC0</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">transpose_custom</td></tr>
+</table>
 
 ## 编译运行
 
@@ -114,6 +146,4 @@
   ```bash
   test pass!
   ```
-
-
 

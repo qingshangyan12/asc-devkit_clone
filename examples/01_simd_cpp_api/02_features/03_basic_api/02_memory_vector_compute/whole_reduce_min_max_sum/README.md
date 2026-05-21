@@ -41,13 +41,13 @@
 - 说明：使用默认order（ORDER_VALUE_INDEX），输出按 [min0, idx0, min1, idx1, ...] 交错存储
 
 **场景3：WholeReduceSum**
-- 输入：[1, 2048]个float元素，mask=64（float类型32位，mask范围为[1,64]），repeat=32（2048/64）
+- 输入：[1, 2048]个float元素，mask=64（float类型32位，mask范围为[1, 64]），repeat=32（2048/64）
 - 输出：[1, 32]个float元素（每个repeat的求和结果）
 - 实现：`WholeReduceSum<float>(dstLocal, srcLocal, mask=64, repeat=32, 1, 1, 8)`
 - 说明：每个repeat独立求和，共输出32个求和结果
 
 **场景4：RepeatReduceSum**
-- 输入：[1, 2048]个float元素，mask=64（float类型32位，mask范围为[1,64]），repeat=32（2048/64）
+- 输入：[1, 2048]个float元素，mask=64（float类型32位，mask范围为[1, 64]），repeat=32（2048/64）
 - 输出：[1, 32]个float元素（累加模式）
 - 实现：先用 `Duplicate` 初始化dstLocal为0，再调用 `RepeatReduceSum<float>(dstLocal, srcLocal, repeat=32, mask=64, dstBlkStride=0, 1, 1, 8)`
 - 说明：dstBlkStride=0表示将所有repeat的结果累加到同一位置，每个repeat结果依次存放
@@ -68,6 +68,7 @@
 
 <table border="2">
 <caption>表1：样例输入输出规格（场景1）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">WholeReduceMax</td></tr>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -77,6 +78,7 @@
 
 <table border="2">
 <caption>表2：样例输入输出规格（场景2/5）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">WholeReduceMin</td></tr>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -86,6 +88,7 @@
 
 <table border="2">
 <caption>表3：样例输入输出规格（场景3/4）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">WholeReduceSum/RepeatReduceSum</td></tr>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -95,6 +98,7 @@
 
 <table border="2">
 <caption>表4：样例输入输出规格（场景6）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">WholeReduceSum</td></tr>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[13, 57]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
