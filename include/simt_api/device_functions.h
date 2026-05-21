@@ -730,6 +730,14 @@ static __SIMT_DEVICE_FUNCTIONS_DECL__ int32_t laneid();
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ int32_t lanemask_eq();
 
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int32_t lanemask_le();
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int32_t lanemask_lt();
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int32_t lanemask_ge();
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int32_t lanemask_gt();
+
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_dcci_entire(__gm__ void* dst);
 #else
