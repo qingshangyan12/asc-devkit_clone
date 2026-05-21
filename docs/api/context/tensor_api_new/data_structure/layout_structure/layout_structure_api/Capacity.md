@@ -24,8 +24,6 @@ Capacity用于计算 Layout 所需的实际内存容量。
 
 ## 函数原型
 
-- 自由函数形式。
-
     ```cpp
     template <size_t... Is, typename Shape, typename Stride>
     __aicore__ inline constexpr auto Capacity(const Layout<Shape, Stride>& layout)
