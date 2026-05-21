@@ -16,7 +16,7 @@
 
 头文件路径为："basic_api/kernel_operator_set_atomic_intf.h"
 
-SetAtomicMin原子操作接口，功能是：设置后续从UB/L0C/L1搬运到GM的数据是否执行原子比较，将待拷贝的内容和GM已有内容进行比较，将最小值写入GM。SetAtomicMin接口可通过设置模板参数来设定不同的数据类型。
+设置后续从UB/L0C/L1搬运到GM的数据是否执行原子比较，将待拷贝的内容和GM已有内容进行比较，将最小值写入GM。SetAtomicMin接口可通过设置模板参数来设定不同的数据类型。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

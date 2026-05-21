@@ -51,7 +51,7 @@
 
 头文件路径为: "basic_api/kernel_operator_determine_compute_sync_intf.h"
 
-InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初始化配置接口，其功能：初始化GM共享内存的值，完成初始化后才可以调用[WaitPreBlock](WaitPreBlock.md)和[NotifyNextBlock](NotifyNextBlock.md)。以上三个接口共同完成基于核间顺序执行的确定性计算，确定性计算的具体含义请参考[原子操作-确定性计算](../../原子操作/关键特性说明.md)。
+InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初始化配置接口，能够初始化GM共享内存的值，完成初始化后才可以调用[WaitPreBlock](WaitPreBlock.md)和[NotifyNextBlock](NotifyNextBlock.md)。以上三个接口共同完成基于核间顺序执行的确定性计算，确定性计算的具体含义请参考[原子操作-确定性计算](../../原子操作/关键特性说明.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

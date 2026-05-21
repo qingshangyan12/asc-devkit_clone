@@ -51,7 +51,7 @@
 
 头文件路径为: "basic_api/kernel_operator_determine_compute_sync_intf.h"
 
-WaitPreBlock和NotifyNextBlock是核间同步控制接口，其功能：NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。
+WaitPreBlock和NotifyNextBlock是核间同步控制接口。NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。
 
 WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md#)接口配合使用，这三个接口组合使用能够确保多个AIV核严格按照blockIdx的升序顺序执行，适用于要求确定性计算的场景，确定性计算的具体含义请参考[原子操作-确定性计算](../../原子操作/关键特性说明.md)。
 

@@ -16,7 +16,7 @@
 
 头文件路径为："basic_api/kernel_operator_set_atomic_intf.h"。
 
-SetAtomicType原子操作接口，功能是：通过设置模板参数来设定原子操作不同的数据类型。
+通过设置模板参数来设定原子操作不同的数据类型。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

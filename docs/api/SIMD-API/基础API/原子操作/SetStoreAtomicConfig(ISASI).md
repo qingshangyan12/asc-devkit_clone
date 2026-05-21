@@ -16,7 +16,7 @@
 
 头文件路径为："basic_api/kernel_operator_common_intf.h"。
 
-SetStoreAtomicConfig接口，功能是：设置原子操作使能位与原子操作类型。
+设置原子操作使能位与原子操作类型。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
