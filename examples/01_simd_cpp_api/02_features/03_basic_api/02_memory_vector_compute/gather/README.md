@@ -69,6 +69,51 @@
     ```
 - 参数：用户输入的srcOffset是每个datablock在源操作数中对应的地址偏移，repeatTime=1表示重复迭代次数，params={1,8}
 
+## 样例规格
+
+<table border="2">
+<caption>表1：样例输入输出规格（场景1：内置固定模式）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">GatherMask</td></tr>
+<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">z</td><td align="center">[1, 256]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表2：样例输入输出规格（场景2：用户自定义模式）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">GatherMask</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+<tr><td align="center">y</td><td align="center">[1, 32]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">z</td><td align="center">[1, 256]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表3：样例输入输出规格（场景3：张量偏移模式）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Gather</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td align="center">y</td><td align="center">[1, 128]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">z</td><td align="center">[1, 128]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表4：样例输入输出规格（场景4：DataBlock偏移模式）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Gatherb</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td align="center">y</td><td align="center">[1, 8]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">z</td><td align="center">[1, 128]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_custom</td></tr>
+</table>
+
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。

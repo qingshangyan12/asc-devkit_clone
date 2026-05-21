@@ -28,20 +28,20 @@
   本样例展示了使用Brcb API实现广播复制功能，每次从输入Tensor中取8个元素，分别填充到输出Tensor的8个DataBlock（每个DataBlock为32字节）中，每个元素对应一个DataBlock。Brcb API适用于需要将少量数据广播到大量位置的场景，例如常量填充、掩码生成等。通过repeatTime参数控制迭代次数，通过dstBlkStride和dstRepStride参数控制DataBlock间的地址步长。所用API详细介绍请参考[Brcb API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0089.html)。
 
 - 样例规格：  
-  <table border="2" align="center">
+  <table border="2">
   <caption>表1：样例输入输出规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Brcb</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[1,16]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 16]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">样例输出</td></tr>
-  <tr><td align="center">y</td><td align="center">[1,256]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">brcb_custom</td></tr>
   </table>
 
 - 样例实现：  
-  本样例中实现的是固定shape为输入x[1,16]，输出y[1,256]的Brcb广播复制样例。
+  本样例中实现的是固定shape为输入x[1, 16]，输出y[1, 256]的Brcb广播复制样例。
 
   - Kernel实现  
     - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
