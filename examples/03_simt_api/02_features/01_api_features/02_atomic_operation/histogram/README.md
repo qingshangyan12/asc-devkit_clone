@@ -3,7 +3,7 @@
 ## 概述
 
 本样例展示了如何利用 Ascend C 的SIMT的`asc_atomic_add`接口，高效统计输入字节序列中每个字节值的出现频率。功能示意如下图：</br>
-</br><img src="figures/introduction.png" alt="intro" style="width: 50%; height: auto;"></br>
+<img src="figures/introduction.png" alt="intro" style="width: 50%; height: auto;">
 
 ## 支持的产品
 
@@ -68,7 +68,7 @@ Warp对局部直方图中每个桶的计数是在UB中通过`asc_atomic_add`进�
 整体流程：从GM中获取到局部直方图的数据，每个ThreadBlock负责对所有的局部直方图中的一个桶进行求和，每个线程会将局部直方图中对应桶的计数写入UB中，然后在UB中完成归约求和，最后结果写入GM。
 流程图如下：下图以Block0为例，Block0负责计算索引为0的桶的计数，即bin[0]。该Block中的每个线程将对应局部直方图的bin[0]，写入UB。例如，线程0会把局部直方图0中bin[0]写入到UB的索引为0的位置，线程1会把局部直方图1中bin[0]写入到UB的索引为1的位置，以此类推。最后UB中存储每个局部直方图的bin[0]的计数，然后对UB上的数据进行规约求和，得到总的bin[0]，最后将结果写回GM。
 
-<img src="figures/merge_his.png" alt="merge_his" style="width: 50%; height: auto;"></br>
+<img src="figures/merge_his.png" alt="merge_his" style="width: 50%; height: auto;">
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
@@ -100,6 +100,7 @@ Warp对局部直方图中每个桶的计数是在UB中通过`asc_atomic_add`进�
   ```
 
   编译选项说明
+
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |

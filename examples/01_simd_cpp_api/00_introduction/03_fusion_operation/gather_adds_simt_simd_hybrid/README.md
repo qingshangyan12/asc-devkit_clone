@@ -11,6 +11,7 @@
 - \>= CANN 9.0.0-beta.2
 
 ## 目录结构介绍
+
 ```text
 ├── gather_adds_simt_simd_hybrid
 │   ├── scripts
@@ -95,6 +96,7 @@
     ```
 
 - 样例执行
+
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（默认npu模式）
@@ -106,6 +108,7 @@
   使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
+
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```

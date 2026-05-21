@@ -115,6 +115,7 @@
     ```
     
 - 样例执行
+
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # 编译工程
@@ -124,6 +125,7 @@
   使用 NPU仿真 模式时，添加 `-DRUN_MODE=sim` 和 `-DSOC_VERSION=${SOC_VERSION}` 参数即可。其中，`${SOC_VERSION}` 为实际NPU型号，可通过 `npu-smi info` 命令进行查询，如 `Ascend950PR_9599`。
 
   示例如下：
+
   ```bash
   cmake -DRUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSOC_VERSION=${SOC_VERSION} ..; make -j;   # NPU仿真模式
   ```

@@ -157,6 +157,7 @@
     ```
 
 - 样例执行
+
   ```bash
   SCENARIO_NUM=1                # 取值为1、2
   mkdir -p build && cd build;   # 创建并进入build目录
@@ -165,6 +166,7 @@
   ```
 
   编译选项说明
+
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
