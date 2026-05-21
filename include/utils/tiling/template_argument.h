@@ -96,6 +96,7 @@ constexpr uint64_t INVALID_TILING_KEY = 0XFFFFFFFFFFFFFFFF;
 
 #elif defined(ASCENDC_TPL_KERNEL)
 // check arch for native date type
+
 #define ASC_INNER_DATATYPE_ENABLE_INT4
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
     #define ASC_INNER_DATATYPE_ENABLE_BF16
@@ -108,6 +109,7 @@ constexpr uint64_t INVALID_TILING_KEY = 0XFFFFFFFFFFFFFFFF;
     #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
     #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
 #endif
+
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     #define ASC_INNER_DATATYPE_ENABLE_BF16
     #define ASC_INNER_DATATYPE_ENABLE_COMPLEX64
@@ -137,7 +139,7 @@ constexpr uint64_t INVALID_TILING_KEY = 0XFFFFFFFFFFFFFFFF;
     #undef ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
     #undef ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
 #endif
- 
+
 template<int dataTypeId>
 struct TypeFromId {
     using type = void;
