@@ -83,7 +83,7 @@ struct Layout : private Std::tuple<T, U>
 |--------|------|
 | ShapeType | Std::tuple结构类型，用于定义数据的逻辑形状，例如二维矩阵的行数和列数或多维张量的各维度大小。 |
 | StrideType | Std::tuple结构类型，用于定义各维度在内存中的步长，即同维度相邻元素在内存中的间隔（单位为元素），与 Shape 的维度信息一一对应。 |
-| Info | 可选模板参数，默认为Std::ignore_t。当 Layout 由MakeFrameLayout或MakePatternLayout构造时，该参数携带布局模式（LayoutPattern）和布局特征（LayoutTrait），如 ND / NZ / ZN / DN / ZNZ 排布模式及数据类型。通过GetLayoutPattern 和 GetLayoutTrait 可在编译期提取 Info 中的类型信息。 |
+| Info | 可选模板参数，默认为Std::ignore_t。当 Layout 由MakeFrameLayout或MakePatternLayout构造时，该参数携带布局模式（LayoutPattern）和布局特征（LayoutTrait），如 ND / NZ / ZN / DN / ZNZ 排布模式及数据类型。 |
 
 ## 成员函数
 
