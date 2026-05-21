@@ -93,7 +93,7 @@
         ...
         constexpr uint32_t numBlocks = 8;
         ...
-        // Launch kernel <<<NumBlocks, Block, Dynamic memory, Stream>>>
+        // Launch kernel <<<NumBlocks, Dynamic memory, Stream>>>
         // numBlocks : Number of Blocks
         // 0 : No dynamic memory required in this sample
         // nullptr : Use default stream

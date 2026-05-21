@@ -25,22 +25,13 @@
     ```cpp
     int main(int argc, char const* argv[])
     {
-        aclrtSetDevice(0); // 运行管理资源申请。
-        // 1. 使用内核调用符<<<numBlock, dynUBufSize, stream>>>调用核函数。
-        // 2. numBlock：8表示参与计算的核数为8（核数可根据实际需求设置）。
-        // 3. dynUBufSize: 0表示不使用Unified Buffer的动态内存。
-        // 4. stream: nullptr表示使用默认stream。
-        // Configure kernel launch parameters
-        uint32_t block_num            = 48; // Number of thread blocks (Grid size)
-        uint32_t thread_num_per_block = 256; // Number of threads per block (Block size)
-        uint32_t dyn_ubuf_size        = 0;  // 
-
-        // Launch kernel <<<NumBlocks, Block, Dynamic memory, Stream>>>
+        aclrtSetDevice(0); 
+        // Launch kernel <<<NumBlocks, Dynamic memory, Stream>>>
         // 8 : Number of Blocks
         // 0 : No dynamic memory required in this sample
         // nullptr : Use default stream
         hello_world<<<8, 0, nullptr>>>();
-        aclrtSynchronizeDevice(); // 等待核函数执行完成
+        aclrtSynchronizeDevice(); 
         return 0;
     }
     ```
