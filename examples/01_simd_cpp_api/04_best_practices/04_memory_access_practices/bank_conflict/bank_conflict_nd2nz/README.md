@@ -74,7 +74,7 @@ rowSplit ↓      ┌───────┬───────┬───�
 | `vecLenHalf` | 128 | tiling 参数：单条向量指令一次处理的 half 元素数 |
 | `tileC0Cols` | 8 | 派生参数：单次搬运 tile  D 方向 C0 列数，等于 `tileW / C0_ELEMS` |
 | `dstNzNStride` | 1 | 单次搬运 UB 内 N 方向步长，以 DataBlock 为单位 |
-| `dstNzC0Stride` | case1 = 144 / case2 = 145 | 单次搬运 UB 内相邻 C0 列起始位置的间距，以 DataBlock 为单位。对应 `Copy()` 接口 `CopyRepeatParams` 中的 `dstStride` —— 同一迭代内 datablock 的地址步长。本样例通过切换 144 / 145 来对比 bank 冲突场景。 |
+| `dstNzC0Stride` | case1 = 144 / case2 = 145 | 单次搬运 UB 内相邻 C0 列起始位置的间距，以 DataBlock 为单位。对应 `Copy()` 接口 `CopyRepeatParams` 中的 `dstStride` —— 同一迭代内 DataBlock 的地址步长。本样例通过切换 144 / 145 来对比 bank 冲突场景。 |
 | `vecLenDbs` | 8 | 派生参数：单条向量指令一次处理的 DataBlock 数，等于 `vecLenHalf / C0_ELEMS` |
 
 
@@ -159,7 +159,7 @@ for (uint32_t k = 0; k < tileW / vecLenHalf; ++k) {
 }
 ```
 
-一拍取的 8 个 datablock 数据在 NZ 矩阵中的排布如下图所示，非尾块中原本相邻的两个 datablock 在 NZ 排布中起始地址需间隔 `144 * 32B`：
+一拍取的 8 个 DataBlock 数据在 NZ 矩阵中的排布如下图所示，非尾块中原本相邻的两个 DataBlock 在 NZ 排布中起始地址需间隔 `144 * 32B`：
 
 **图：Case 1 紧凑排放下 ND 到 NZ 示意图**
 
@@ -193,7 +193,7 @@ UB 的 16 个 bank group 各自可以并行接收写入；地址按 32B 一块�
   DataBlock 7 → 第1008 个 32B 块  → bank group 0   ◀ 同一 bank group
 ```
 
-下图中蓝色部分表示一拍从 NDBUF 中读取数据，红色部分表示一拍写入 NZBUF 的数据，可以看到 8 个 datablock 全部落入同一个 bank group：
+下图中蓝色部分表示一拍从 NDBUF 中读取数据，红色部分表示一拍写入 NZBUF 的数据，可以看到 8 个 DataBlock 全部落入同一个 bank group：
 
 **图：Atlas A2/A3 Case 1 的 UB bank group 冲突示意图**
 
@@ -330,7 +330,7 @@ for (uint16_t k = 0; k < vecsPerRow; ++k) {
 }
 ```
 
-一拍取的 8 个 datablock 数据在 NZ 矩阵中的排布如下图所示，非尾块中原本相邻的两个 datablock 在 NZ 排布中起始地址需间隔 `144 * 32B`：
+一拍取的 8 个 DataBlock 数据在 NZ 矩阵中的排布如下图所示，非尾块中原本相邻的两个 DataBlock 在 NZ 排布中起始地址需间隔 `144 * 32B`：
 
 **图：Case 1 紧凑排放下 ND 到 NZ 的示意图**
 
@@ -539,10 +539,9 @@ $$
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
-  使用 CPU 调试 或 NPU 仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim`：
+  使用 NPU 仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim`：
 
   ```bash
-  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;   # CPU 调试模式
   cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # NPU 仿真模式
   ```
 
@@ -552,7 +551,7 @@ $$
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU 调试、NPU 仿真 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU 仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：`dav-2201` 对应 Atlas A2/A3 训练/推理系列，`dav-3510` 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`（默认）、`2` | bank 冲突场景编号 |
 
