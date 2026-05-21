@@ -77,12 +77,62 @@
 
   样例可通过编译参数 `SCENARIO_NUM` 来切换不同的场景，参数详见下表：
 
-  | 场景编号 | 场景名称 | src0 shape |src0数据类型 | src1 shape | src1数据类型 | selMask shape |selMask数据类型 | dst shape | dst数据类型 |
+  | 场景编号 | 场景名称 | src0 shape | src0数据类型 | src1 shape | src1数据类型 | selMask shape | selMask数据类型 | dst shape | dst数据类型 |
   |------|------|------|------|------|------|------|------|------|------|
-  | 1 | Select | [1, 256] | float | [1, 256] | float | [1, 8]有效位数限制 | uint8_t |[1, 256] | float |
-  | 2 | Select（标量） | [1, 256] | float | 标量 | float | [1, 32] | uint8_t |[1, 256] | float |
-  | 3 | Select（selMask无有效位数据限制） | [1, 256] | float | [1, 256] | float | [1, 32] | uint8_t |[1, 256] | float |
-  | 4 | Select（灵活标量位置） | [1, 256] | float | 标量 | float | [1, 32] | uint8_t |[1, 256] | float |
+  | 1 | Select | [1, 256] | float | [1, 256] | float | [1, 8]有效位数限制 | uint8_t | [1, 256] | float |
+  | 2 | Select（标量） | [1, 256] | float | [1, 8]（首元素作为标量） | float | [1, 32] | uint8_t | [1, 256] | float |
+  | 3 | Select（selMask无有效位数据限制） | [1, 256] | float | [1, 256] | float | [1, 32] | uint8_t | [1, 256] | float |
+  | 4 | Select（灵活标量位置） | [1, 256] | float | [1, 8]（首元素作为标量） | float | [1, 32] | uint8_t | [1, 256] | float |
+
+## 样例规格
+
+<table border="2">
+<caption>表1：样例输入输出规格（场景1：Select）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Select</td></tr>
+<tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">selMask</td><td align="center">[1, 8]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">select_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表2：样例输入输出规格（场景2：Select标量）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Select</td></tr>
+<tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[1, 8]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">selMask</td><td align="center">[1, 32]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">select_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表3：样例输入输出规格（场景3：Select selMask无有效位数据限制）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Select</td></tr>
+<tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">selMask</td><td align="center">[1, 32]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">select_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表4：样例输入输出规格（场景4：Select灵活标量位置）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Select</td></tr>
+<tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[1, 8]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">selMask</td><td align="center">[1, 32]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+<tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">dst</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">select_custom</td></tr>
+</table>
 
 ## 编译运行
 
