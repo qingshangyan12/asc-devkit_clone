@@ -116,6 +116,9 @@ endif()
 
 if (BUILD_OPEN_PROJECT)
     add_subdirectory(detail/hccl/cc)
+    if(TARGET mc2_client)
+        target_compile_definitions(mc2_client PRIVATE ops_hccl=mc2_ops_hccl)
+    endif()
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)
