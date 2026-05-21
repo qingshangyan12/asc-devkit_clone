@@ -24,7 +24,9 @@ if(NOT SCENARIO_NUM MATCHES "^[1-4]$")
 endif()
 
 if(SCENARIO_NUM STREQUAL "2" OR SCENARIO_NUM STREQUAL "3")
-    set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510" FORCE)
+    if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
+        message(FATAL_ERROR "When SCENARIO_NUM = ${SCENARIO_NUM}, CMAKE_ASC_ARCHITECTURES must be dav-3510, but got ${CMAKE_ASC_ARCHITECTURES}")
+    endif()
     message(STATUS "Scenario ${SCENARIO_NUM} requires dav-3510 architecture")
 endif()
 
