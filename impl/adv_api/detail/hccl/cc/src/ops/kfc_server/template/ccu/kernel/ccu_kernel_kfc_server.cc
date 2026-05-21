@@ -62,7 +62,7 @@ void CcuKernelKfcServer::GenOpSelector()
     }
 
     {
-        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(GetDieId()) + "_" + std::to_string(missionIndex);
+        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(GetDieId()) + "_" + std::to_string(missionIndex_);
         CcuRep::FuncBlock selectorFunc(this, funcName);
 
         CcuRep::Variable opCode = CreateVariable();
@@ -146,7 +146,7 @@ void CcuKernelKfcServer::GenCircularQueue()
             CCU_BREAK;
         }
 
-        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(GetDieId()) + "_" + std::to_string(missionIndex);
+        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(GetDieId()) + "_" + std::to_string(missionIndex_);
         auto selectFunc = Func(funcName);
         selectFunc.SetInArg(param[HBM_PARAM_IDX_0]);
         selectFunc.SetOutArg(opAddr);
@@ -234,11 +234,11 @@ void CcuKernelKfcServer::LoadFuncParamFromMemory(CcuRep::Variable &paramAddr, ar
 
 void CcuKernelKfcServer::MissionPreSync(CcuRep::Variable &func)
 {
-    if (missionNum == 1) {
+    if (missionNum_ == 1) {
         return;
     }
-    if (missionIndex == 0) {
-        for (uint32_t i = 0; i < missionNum - 1; ++i) {
+    if (missionIndex_ == 0) {
+        for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
             LocalCtxPostVar(func, importMissionVar[i], importMissionSig[i]);
         }
     } else {
@@ -249,11 +249,11 @@ void CcuKernelKfcServer::MissionPreSync(CcuRep::Variable &func)
 
 void CcuKernelKfcServer::MissionPostSync()
 {
-    if (missionNum == 1) {
+    if (missionNum_ == 1) {
         return;
     }
-    if (missionIndex == 0) {
-        for (uint32_t i = 0; i < missionNum - 1; ++i) {
+    if (missionIndex_ == 0) {
+        for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
             LocalWait(exportMissoinSig[i]);
         }
     } else {
@@ -264,7 +264,9 @@ void CcuKernelKfcServer::MissionPostSync()
 std::vector<uint64_t> CcuKernelKfcServer::GeneArgs(const CcuTaskArg &arg)
 {
     const CcuTaskArgKfcServer *taskArg = dynamic_cast<const CcuTaskArgKfcServer *>(&arg);
-    return {taskArg->inputAddr_, taskArg->outputAddr_};
+    uint64_t tokenInfo = taskArg->token_;
+    return {tokenInfo, taskArg->waitAddr_, taskArg->recordAddr_,
+            taskArg->paramAddr_, taskArg->dieNum_, taskArg->missionNum_, taskArg->missionIndex_};
 }
 
 }

@@ -20,12 +20,16 @@
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
 #include "../ccu_temp_kfc_server.h"
+#include "types/mc2_type.h"
 
 namespace ops_hccl {
 
 using namespace hcomm;
 
-constexpr uint32_t CCU_PARAM_NUM_PER_DIE = 32;
+// constexpr uint32_t CCU_PARAM_NUM_PER_DIE = 32;
+// constexpr uint32_t CCU_PARAM_NUM_MAX     = CCU_PARAM_NUM_PER_DIE * 2;
+// constexpr uint32_t CCU_ONE_PARAM_SIZE    = 8;
+// constexpr uint32_t CCU_TASK_NUM_MAX      = 64;
 
 class CcuKernelArgKfcServer : public hcomm::CcuKernelArg {
 public:
@@ -54,14 +58,29 @@ public:
 
 class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {
 public:
-    explicit CcuTaskArgKfcServer(uint64_t inputAddr, uint64_t outputAddr) :
-        inputAddr_(inputAddr), outputAddr_(outputAddr)
+    explicit CcuTaskArgKfcServer(uint64_t waitAddr, uint64_t recordAddr,
+                                uint64_t paramAddr, uint32_t dieNum
+                                uint32_t missionNum, uint32_t missionIndex) :
+        waitAddr_(waitAddr), recordAddr_(recordAddr), paramAddr_(paramAddr),
+        dieNum_(dieNum), missionNum_(missionNum), missionIndex_(missionIndex)
     {
-        HCCL_DEBUG("[CcuTaskArgKfcServer] inputAddr: %lu, outputAddr: %lu", inputAddr_, outputAddr_);
+        HCCL_DEBUG("[CcuTaskArgKfcServer] waitAddr: %lu, recordAddr: %lu, paramAddr: %lu, dieNum: %lu,",
+                   "missionNum %lu, missionIndex %lu", waitAddr_, recordAddr_, paramAddr_, dieNum_,
+                   missionNum_, missionIndex_);
     }
 
-    uint64_t inputAddr_;
-    uint64_t outputAddr_;
+    // HBM上的每轮开始信号的首地址
+    uint64_t waitAddr_{0};
+    // HBM上的每轮完成信号的首地址
+    uint64_t recordAddr_{0};
+    // HBM上的算子执行参数首地址
+    uint64_t paramAddr_{0};
+    // Die数量，用于判断单双Die，默认为1即单Die
+    uint32_t dieNum_{1};
+
+    uint32_t missionNum_{1};
+    uint32_t missionIndex_{0};
+
 };
 
 class CcuKernelKfcServer : public CcuKernelAlgBase {
@@ -85,13 +104,6 @@ private:
     uint32_t rankId_{0};
     std::vector<ChannelHandle> channels_;
     bool loadFromMem_ = false;
-
-    uint64_t waitAddr_{0};
-    uint64_t recordAddr_{0};
-    uint64_t paramAddr_{0};
-    uint32_t dieNum_{1};
-    uint32_t missionNum{1};
-    uint32_t missionIndex{0};
 
     CcuRep::MaskSignal exportDieSig;
     CcuRep::MaskSignal importDieSig;
