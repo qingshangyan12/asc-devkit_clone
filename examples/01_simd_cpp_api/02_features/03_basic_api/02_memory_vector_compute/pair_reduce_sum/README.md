@@ -28,14 +28,12 @@
   本样例中调用PairReduceSum接口，对输入元素中所有的相邻元素对执行求和计算。样例规格如下表所示：
 
   <table border="2">
-  <caption>表1：PairReduceSum样例规格</caption>
-  <tr>
-  <td rowspan="1" align="center">样例类型(OpType)</td>
-  <td colspan="4" align="center">PairReduceSum</td></tr>
+  <caption>表1：样例输入输出规格</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">PairReduceSum</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
-   <tr><td rowspan="2" align="center">样例输出</td></tr>
-   <tr><td align="center">y</td><td align="center">[1, 64]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 64]</td><td align="center">half</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">pair_reduce_sum_custom</td></tr>
   </table>
