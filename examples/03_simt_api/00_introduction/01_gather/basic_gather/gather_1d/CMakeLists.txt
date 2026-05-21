@@ -28,10 +28,3 @@ add_executable(gather_1d
 target_compile_options(gather_1d PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510 --enable-simt>
 )
-
-target_link_libraries(gather_1d PRIVATE
-    m
-    platform
-    tiling_api
-    dl
-)
