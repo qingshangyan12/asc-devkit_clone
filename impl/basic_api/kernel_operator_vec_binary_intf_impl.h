@@ -399,8 +399,8 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
-    uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0, const LocalTensor<T> &src1,
+    uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)

@@ -13,3 +13,14 @@
 #else
 #include "kernel_basic_intf.h"
 #endif
+#include "host_checker.h"
+
+extern "C" void TestVecBinaryInft() {
+    using AscendC::Exp;
+    using AscendC::Ln;
+    using AscendC::Abs;
+    using AscendC::Reciprocal;
+    using AscendC::Rsqrt;
+    using AscendC::Sqrt;
+    using AscendC::Neg;
+}
