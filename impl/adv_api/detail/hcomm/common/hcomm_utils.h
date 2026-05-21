@@ -23,6 +23,8 @@
 #ifndef IMPL_ADV_API_DETAIL_HCOMM_COMMON_HCOMM_UTIL_H
 #define IMPL_ADV_API_DETAIL_HCOMM_COMMON_HCOMM_UTIL_H
 
+#include "hcomm_inner_def.h"
+
 namespace AscendC {
 
 template <typename T>
@@ -45,6 +47,27 @@ __aicore__ inline void Ub2Gm(
     PipeBarrier<PIPE_ALL>();
     AscendC::DataCopyPad(dstGlobal, srcLocal, copyParams);
     PipeBarrier<PIPE_ALL>();
+}
+
+__aicore__ inline int32_t HcommFindBufferIdx(
+    __gm__ RegedBufferEntity* bufferAddr, uint32_t bufferNum, GM_ADDR addr, uint64_t len)
+{
+    if (bufferAddr == nullptr) {
+        return HCOMM_INVALID_HANDLE_ID;
+    }
+    uint64_t targetAddr = reinterpret_cast<uint64_t>(addr);
+    for (uint32_t i = 0; i < bufferNum; i++) {
+        uint64_t baseAddr = bufferAddr[i].bufferInfo.rma.addr;
+        uint64_t bufferSize = bufferAddr[i].bufferInfo.rma.size;
+        if (targetAddr < baseAddr) {
+            continue;
+        }
+        uint64_t offset = targetAddr - baseAddr;
+        if (offset <= bufferSize && len <= bufferSize - offset) {
+            return static_cast<int32_t>(i);
+        }
+    }
+    return HCOMM_INVALID_HANDLE_ID;
 }
 
 __aicore__ inline void CacheWriteThrough(__gm__ uint8_t* sourceAddr, uint64_t length)

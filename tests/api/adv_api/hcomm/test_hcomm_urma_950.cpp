@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <array>
 #include <gtest/gtest.h>
 #include <vector>
 #define private public
@@ -20,6 +21,7 @@ namespace {
 constexpr uint32_t URMA_SQ_DEPTH = 10;
 constexpr uint32_t URMA_WQE_SIZE = 64;
 constexpr uint32_t URMA_CQE_SIZE = 64;
+constexpr uint32_t URMA_BUFFER_NUM = 2;
 
 class UrmaChannelResource {
 public:
@@ -30,12 +32,12 @@ public:
         channel_.engine = 4;
         channel_.sqNum = 1;
         channel_.cqNum = 1;
-        channel_.remoteBufferNum = 1;
-        channel_.localBufferNum = 1;
+        channel_.remoteBufferNum = URMA_BUFFER_NUM;
+        channel_.localBufferNum = URMA_BUFFER_NUM;
         channel_.sqContextAddr = &sqCtx_;
         channel_.cqContextAddr = &cqCtx_;
-        channel_.remoteBufferAddr = &remoteBuffer_;
-        channel_.localBufferAddr = &localBuffer_;
+        channel_.remoteBufferAddr = remoteBuffers_.data();
+        channel_.localBufferAddr = localBuffers_.data();
 
         sqCtx_.type = AscendC::SQ_CONTEXT_TYPE_UB_JFS;
         sqCtx_.contextInfo.ubJfs.sqVa = reinterpret_cast<uint64_t>(sqBuffer_.data());
@@ -56,19 +58,10 @@ public:
         cqCtx_.contextInfo.ubJfc.cqeSize = URMA_CQE_SIZE;
         cqCtx_.contextInfo.ubJfc.cqDepth = URMA_SQ_DEPTH * HCOMM_URMA_MAX_SQE_BB_NUM;
 
-        remoteBuffer_.type = AscendC::REGED_BUFFER_RMA;
-        remoteBuffer_.bufferInfo.rma.addr = 0x1000;
-        remoteBuffer_.bufferInfo.rma.size = 0x1000;
-        remoteBuffer_.bufferInfo.rma.protectionInfo.type = AscendC::PROTECTION_TYPE_UB;
-        remoteBuffer_.bufferInfo.rma.protectionInfo.memInfo.ub.tokenId = 0x123456;
-        remoteBuffer_.bufferInfo.rma.protectionInfo.memInfo.ub.tokenValue = 0x654321;
-
-        localBuffer_.type = AscendC::REGED_BUFFER_RMA;
-        localBuffer_.bufferInfo.rma.addr = 0x2000;
-        localBuffer_.bufferInfo.rma.size = 0x1000;
-        localBuffer_.bufferInfo.rma.protectionInfo.type = AscendC::PROTECTION_TYPE_UB;
-        localBuffer_.bufferInfo.rma.protectionInfo.memInfo.ub.tokenId = 0x111111;
-        localBuffer_.bufferInfo.rma.protectionInfo.memInfo.ub.tokenValue = 0x222222;
+        InitBuffer(remoteBuffers_[0], 0x1000, 0x1000, 0x123456, 0x654321);
+        InitBuffer(remoteBuffers_[1], 0x3000, 0x1000, 0x223456, 0x754321);
+        InitBuffer(localBuffers_[0], 0x2000, 0x1000, 0x111111, 0x222222);
+        InitBuffer(localBuffers_[1], 0x5000, 0x1000, 0x333333, 0x444444);
     }
 
     AscendC::ChannelHandle GetHandle()
@@ -83,11 +76,23 @@ public:
     }
 
 private:
+    void InitBuffer(AscendC::RegedBufferEntity& buffer, uint64_t addr, uint64_t size, uint32_t tokenId,
+        uint32_t tokenValue)
+    {
+        buffer.type = AscendC::REGED_BUFFER_RMA;
+        buffer.bufferInfo.rma.addr = addr;
+        buffer.bufferInfo.rma.size = size;
+        buffer.bufferInfo.rma.protectionInfo.type = AscendC::PROTECTION_TYPE_UB;
+        buffer.bufferInfo.rma.protectionInfo.memInfo.ub.tokenId = tokenId;
+        buffer.bufferInfo.rma.protectionInfo.memInfo.ub.tokenValue = tokenValue;
+    }
+
+private:
     AscendC::ChannelEntity channel_ = {};
     AscendC::SqContext sqCtx_ = {};
     AscendC::CqContext cqCtx_ = {};
-    AscendC::RegedBufferEntity remoteBuffer_ = {};
-    AscendC::RegedBufferEntity localBuffer_ = {};
+    std::array<AscendC::RegedBufferEntity, URMA_BUFFER_NUM> remoteBuffers_ = {};
+    std::array<AscendC::RegedBufferEntity, URMA_BUFFER_NUM> localBuffers_ = {};
     std::vector<uint8_t> sqBuffer_;
     std::vector<uint8_t> cqBuffer_;
     uint32_t sqHead_ = 0;
@@ -122,7 +127,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Read)
 
     AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
     AscendC::HcommHandle handleId =
-        hcomm.ReadNbi(channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
+        hcomm.ReadNbi(channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x5008), reinterpret_cast<GM_ADDR>(0x3008), 8);
     EXPECT_EQ(handleId, 0);
     int32_t ret = hcomm.Commit(handleId);
     EXPECT_EQ(ret, -1);
@@ -133,8 +138,8 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Write)
     UrmaChannelResource channel;
 
     AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
-    AscendC::HcommHandle handleId =
-        hcomm.WriteNbi<false>(channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
+    AscendC::HcommHandle handleId = hcomm.WriteNbi<false>(
+        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8);
     EXPECT_EQ(handleId, 0);
     int32_t ret = hcomm.Commit(handleId);
     EXPECT_EQ(ret, 0);
@@ -149,7 +154,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify)
 
     AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
     AscendC::HcommHandle handleId = hcomm.WriteWithNotifyNbi<false>(channel.GetHandle(),
-        reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1, reinterpret_cast<GM_ADDR>(0x33), 1);
+        reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8, reinterpret_cast<GM_ADDR>(0x33), 1);
     EXPECT_EQ(handleId, 0);
     int32_t ret = hcomm.Commit(handleId);
     EXPECT_EQ(ret, 0);

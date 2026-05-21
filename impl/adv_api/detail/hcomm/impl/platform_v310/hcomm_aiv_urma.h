@@ -87,8 +87,7 @@ __aicore__ inline void HcommUrmaFillSqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __g
     }
 }
 
-__aicore__ inline void HcommUrmaFillSgeCtx(
-    __ubuf__ HcommUrmaSgeCtx* sgeCtx, uint64_t messageLen, __gm__ uint8_t* src)
+__aicore__ inline void HcommUrmaFillSgeCtx(__ubuf__ HcommUrmaSgeCtx* sgeCtx, uint64_t messageLen, __gm__ uint8_t* src)
 {
     sgeCtx->len = static_cast<uint32_t>(messageLen);
     sgeCtx->va = reinterpret_cast<uint64_t>(src);
@@ -131,6 +130,17 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Po
     (void)reqPipe;
 
     __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;
+    int32_t remoteIdx =
+        HcommFindBufferIdx(channelPtr->remoteBufferAddr, channelPtr->remoteBufferNum, dst, len);
+    if (remoteIdx == HCOMM_INVALID_HANDLE_ID) {
+        KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA PostSend failed with invalid remote buffer");
+        return HCOMM_INVALID_HANDLE_ID;
+    }
+    int32_t localIdx = HcommFindBufferIdx(channelPtr->localBufferAddr, channelPtr->localBufferNum, src, len);
+    if (localIdx == HCOMM_INVALID_HANDLE_ID) {
+        KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA PostSend failed with invalid local buffer");
+        return HCOMM_INVALID_HANDLE_ID;
+    }
     auto sqCtx = channelPtr->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     AscendC::GlobalTensor<uint32_t> sqPIGlobal;
     sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
@@ -142,7 +152,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Po
 
     // write SQE
     __ubuf__ HcommUrmaSqeCtx* sqeCtx = (__ubuf__ HcommUrmaSqeCtx*)wqeItem_.GetPhyAddr();
-    auto remoteMemInfo = channelPtr->remoteBufferAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    auto remoteMemInfo = channelPtr->remoteBufferAddr[remoteIdx];
     HcommUrmaFillSqeCtx<opCode, config>(
         sqeCtx, (__gm__ uint8_t*)dst, sqCtx, remoteMemInfo, sqHead, notifyAddr, notifyVal);
 
