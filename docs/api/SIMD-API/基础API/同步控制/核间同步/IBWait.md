@@ -79,15 +79,7 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 | blockIdx | 输入 | 表示等待核的idx号，取值范围：[0, 核数-1]。 |
 | eventID | 输入 | 用来控制当前核的set、wait事件。 |
 
-## 数据类型
-
-无
-
 ## 返回值说明<a name="section640mcpsimp"></a>
-
-无
-
-## 流水类型
 
 无
 
@@ -102,4 +94,4 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 
 ## 调用示例<a name="section177231425115410"></a>
 
-调用样例请参考[调用示例](IBSet.md#section177231425115410)。
+完整样例请参考[调用示例](IBSet.md#section177231425115410)。

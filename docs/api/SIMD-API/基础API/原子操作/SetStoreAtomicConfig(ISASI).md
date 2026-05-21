@@ -42,10 +42,6 @@ __aicore__ inline void SetStoreAtomicConfig()
 
 无
 
-## 流水类型
-
-PIPE_S
-
 ## 约束说明<a name="section633mcpsimp"></a>
 
 无

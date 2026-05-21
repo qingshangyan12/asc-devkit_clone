@@ -70,15 +70,7 @@ __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTen
 | gmWorkspace | 输入 | 临时空间，通过读取gmWorkspace，判断当前核是否可以继续往下执行，类型为GlobalTensor。 |
 | ubWorkspace | 输入 | 临时空间，用于操作gmWorkspace，类型为LocalTensor。 |
 
-## 数据类型
-
-无
-
 ## 返回值说明<a name="section640mcpsimp"></a>
-
-无
-
-## 流水类型
 
 无
 
@@ -93,4 +85,4 @@ __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTen
 
 ## 调用示例<a name="section177231425115410"></a>
 
-请参考[调用示例](InitDetermineComputeWorkspace.md#section177231425115410)。
+完整样例请参考[调用示例](InitDetermineComputeWorkspace.md#section177231425115410)。

@@ -81,17 +81,9 @@ __aicore__ inline void PipeBarrier()
 | -------- | -------- |
 | pipe | 模板参数，表示阻塞的流水类别。<br>支持的流水参考[硬件流水类型](核内同步能力概述.md#zh-cn_topic_0000002542725361_section1272612276459)，其中不支持PIPE_S。<br>如果不关注流水类别，希望阻塞所有流水，可以传入PIPE_ALL。 |
 
-## 数据类型
-
-无
-
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
-
-## 流水类型
-
-PIPE_S
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

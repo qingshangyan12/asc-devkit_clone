@@ -69,10 +69,6 @@ __aicore__ inline void SetAtomicType()
 
 无
 
-## 流水类型
-
-PIPE_S
-
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - [SetAtomicAdd](SetAtomicAdd.md)、[SetAtomicMax](SetAtomicMax(ISASI).md)、[SetAtomicMin](SetAtomicMin(ISASI).md)内部已集成与SetAtomicType相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用SetAtomicType接口。

@@ -73,10 +73,6 @@ __aicore__ inline void SetAtomicAdd()
 
 无
 
-## 流水类型
-
-PIPE_S
-
 ## 约束说明<a name="section633mcpsimp"></a>
 
 <cann-filter npu-type="950">
@@ -121,8 +117,6 @@ PIPE_S
 
 ## 调用示例<a name="section177231425115410"></a>
 
-SetAtomicAdd的调用示例如下：
-
 ```cpp
 AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
 AscendC::LocalTensor<T> srcLocal = ubAllocator.Alloc<T, SIZE>();
@@ -141,4 +135,4 @@ AscendC::DataCopy(dstGlobal, srcLocal, SIZE);
 AscendC::DisableDmaAtomic();
 ```
 
-详细请参考[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations/data_movement_with_atomic_operations.asc)。
+完整样例请参考[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations/data_movement_with_atomic_operations.asc)。
