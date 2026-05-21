@@ -7,15 +7,15 @@
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
  
 ## 目录结构介绍
 
 ```
 ├── 03_cpudebug
-│   ├── CMakeLists.txt          // 编译工程文件
-│   └── add.asc                 // Ascend C算子实现 & 调用样例
+│   ├── add.asc                 // Ascend C算子实现 & 调用样例
+│   └── CMakeLists.txt          // 编译工程文件
 ```
 
 ## 样例描述
