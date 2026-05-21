@@ -77,7 +77,7 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskArray<MaskCheckType>(mask, "Cast");
+    CheckMaskRepeat<MaskCheckType>(mask, repeatTime, "Cast");
 #endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams, "Cast");
@@ -112,7 +112,7 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskValue<MaskCheckType>(mask, "Cast");
+    CheckMaskRepeat<MaskCheckType>(mask, repeatTime, "Cast");
 #endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Cast");
@@ -199,7 +199,7 @@ __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("CastDequant", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "CastDequant");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "CastDequant");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -221,7 +221,7 @@ __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("CastDequant", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "CastDequant");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "CastDequant");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -248,7 +248,7 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("CastDeq", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "CastDeq");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, "CastDeq");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -275,7 +275,7 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("CastDeq", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "CastDeq");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "CastDeq");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -375,7 +375,7 @@ __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #endif
 #if defined(ASCENDC_CPU_DEBUG) || defined(ASCENDC_DEBUG)
     CheckVectorTensor("AddReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "AddReluCast");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "AddReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -405,7 +405,7 @@ __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("AddReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "AddReluCast");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "AddReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -486,7 +486,7 @@ __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "SubReluCast");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "SubReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -516,7 +516,7 @@ __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "SubReluCast");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "SubReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
