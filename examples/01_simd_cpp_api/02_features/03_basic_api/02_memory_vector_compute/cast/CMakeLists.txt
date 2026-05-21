@@ -21,11 +21,9 @@ add_executable(demo
     cast.asc
 )
 
-message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+set(SCENARIO_NUM "0" CACHE STRING "Scene number (0-1)")
 
-if(NOT DEFINED SCENARIO_NUM)
-    message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=0/1")
-endif()
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
 
 set(VALID_SCENARIOS 0 1)
 if(NOT SCENARIO_NUM IN_LIST VALID_SCENARIOS)
