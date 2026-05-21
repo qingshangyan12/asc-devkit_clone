@@ -158,32 +158,11 @@ Kirin 9030
 
 **表 1**  模板参数说明
 
-<table>
-<thead><tr><th>参数名</th><th>描述</th></tr></thead>
-<tbody>
-<tr><td>T</td><td>操作数数据类型。</td></tr>
-<tr><td>isSetMask</td><td>是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。</td></tr>
-<tr><td>config</td><td><cann-filter npu-type="950">
-<p>该参数仅支持Ascend 950PR/Ascend 950DT。</p>
-<p>用于配置精度计算模式，DivConfig类型，定义如下：</p>
-<pre class="screen" codetype="Cpp">enum class DivAlgo {
-    INTRINSIC = 0,
-    DIFF_COMPENSATION,
-    PRECISION_1ULP_FTZ_TRUE,
-    PRECISION_0ULP_FTZ_TRUE,
-    PRECISION_0ULP_FTZ_FALSE,
-    PRECISION_1ULP_FTZ_FALSE
-};
-struct DivConfig {
-    DivAlgo algo = DivAlgo::INTRINSIC;
-};</pre>
-<p>通过DivConfig结构体的参数algo来配置精度计算模式。algo取值如下：</p>
-<ul><li>DivAlgo::INTRINSIC、DivAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。</li><li>DivAlgo::DIFF_COMPENSATION、DivAlgo::PRECISION_0ULP_FTZ_TRUE，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前，该算法支持float数据类型。</li><li>DivAlgo::PRECISION_0ULP_FTZ_FALSE，支持Subnormal数据计算，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前，该算法支持float数据类型。</li><li>DivAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算，使用单指令计算得出结果，最大精度误差为1 ulp。</li></ul>
-<p>该参数的默认值DEFAULT_DIV_CONFIG的取值如下：</p>
-<pre class="screen" codetype="Cpp">constexpr DivConfig DEFAULT_DIV_CONFIG = { DivAlgo::INTRINSIC };</pre>
-</cann-filter></td></tr>
-</tbody>
-</table>
+| 参数名 | 描述 |
+|---|---|
+| T | 操作数数据类型。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。 |
+| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，DivConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class DivAlgo {&#10;    INTRINSIC = 0,&#10;    DIFF_COMPENSATION,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_0ULP_FTZ_TRUE,&#10;    PRECISION_0ULP_FTZ_FALSE,&#10;    PRECISION_1ULP_FTZ_FALSE&#10;};&#10;struct DivConfig {&#10;    DivAlgo algo = DivAlgo::INTRINSIC;&#10;};</pre>通过DivConfig结构体的参数algo来配置精度计算模式。algo取值如下：<br>&bull; DivAlgo::INTRINSIC、DivAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; DivAlgo::DIFF_COMPENSATION、DivAlgo::PRECISION_0ULP_FTZ_TRUE，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前，该算法支持float数据类型。<br>&bull; DivAlgo::PRECISION_0ULP_FTZ_FALSE，支持Subnormal数据计算，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前，该算法支持float数据类型。<br>&bull; DivAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算，使用单指令计算得出结果，最大精度误差为1 ulp。<br>该参数的默认值DEFAULT_DIV_CONFIG的取值如下：<br><pre class="screen" codetype="Cpp">constexpr DivConfig DEFAULT_DIV_CONFIG = { DivAlgo::INTRINSIC };</pre></cann-filter> |
 
 **表 2**  参数说明
 
