@@ -15,9 +15,9 @@
     - **Device端算子Kernel编程接口**
         - 核函数定义：通过 [\_\_global\_\_](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 修饰符声明。
         - 数据分块（Tiling）：使用内置关键字 [threadIdx、blockIdx、blockDim](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 确定每个线程负责处理的数据。
-        - 数据加载：无需额外接口，直接通过指针访问即可。
+        - 数据搬入：无需额外接口，直接通过指针访问即可。
         - 数据计算：无需额外接口，直接使用 `+` 运算符完成。
-        - 数据写回：无需额外接口，直接通过指针访问即可。
+        - 数据搬出：无需额外接口，直接通过指针访问即可。
     - **Host端编程接口**
         - 内存分配：使用 `aclrtMallocHost` 分配Host Memory，`aclrtMalloc` 分配Device Memory。
         - 数据搬运：使用 `aclrtMemcpy` 将输入数据从Host Memory拷贝到Device Memory。
