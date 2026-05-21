@@ -14,12 +14,13 @@
 
 ```
 ├── matmul_gelu_high_performance
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   ├── mmad_gelu.asc           // Ascend C样例实现
-│   └── scripts
+│   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │   │   └── verify_result.py    // 真值对比文件
+│   ├── figure                  // 图示
+│   ├── CMakeLists.txt          // 编译工程文件
+│   ├── data_utils.h            // 数据读入写出函数
+│   └── mmad_gelu.asc           // Ascend C样例实现
 ```
 
 ## 样例描述
@@ -398,11 +399,12 @@ msprof ./demo   # 分析样例性能
 当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存 Host 和各个 Device 的性能数据汇总，性能数据分析推荐查看该目录下文件：
 
 ```bash
+PROF_xxxx_XXXXXX
 ├── device_{id}
-├── host
-├── mindstudio_profiler_log
-├── mindstudio_profiler_output  // 保存 Host 和各个 Device 的性能数据汇总
+└── host
+└── mindstudio_profiler_log
+└── mindstudio_profiler_output    # 保存 Host 和各个 Device 的性能数据汇总
     ├── msprof_*.json
-    ├── README.txt
-    └── xx_*.csv
+    ├── xx_*.csv
+    └── README.txt
 ```

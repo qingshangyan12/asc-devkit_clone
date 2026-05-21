@@ -12,12 +12,12 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
 ```
 ├── matmul_fp8
-│   ├── CMakeLists.txt        // 编译工程文件
-│   ├── data_utils.h          // 数据读入写出函数
-│       ├── gen_data.py       // 输入数据和真值数据生成脚本文件
-│   ├── matmul_fp8.asc        // Ascend C样例实现 & 调用样例
 │   ├── scripts
-│       └── verify_result.py  // 真值对比文件
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py    // 真值对比文件
+│   ├── CMakeLists.txt          // 编译工程文件
+│   ├── data_utils.h            // 数据读入写出函数
+│   └── matmul_fp8.asc          // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述
@@ -113,10 +113,10 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
 - 编译选项说明
 
-  | 选项      | 可选值           | 说明                                         |
+  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `DT_MODE` | `0`、`1`、`2`、`3`、`4` | 场景编号，具体见样例说明 |
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真                         |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品 与 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
