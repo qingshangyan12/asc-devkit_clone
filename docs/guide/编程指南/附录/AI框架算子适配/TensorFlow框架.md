@@ -1,7 +1,7 @@
 # TensorFlow框架<a name="ZH-CN_TOPIC_0000001615270505"></a>
 
 >[!NOTE]说明 
->针对Ascend 950PR/Ascend 950DT，暂不支TensorFlow框架算子调用。
+>针对Atlas 350 加速卡，暂不支TensorFlow框架算子调用。
 
 本章节介绍TensorFlow框架算子适配的流程，用于将TensorFlow框架的算子映射成CANN算子（开发者基于CANN框架自定义开发的算子），从而完成从TensorFlow框架调用到CANN算子的过程。同时给出TensorFlow框架侧算子调用的示例，便于开发者了解完整流程。
 
@@ -11,7 +11,7 @@
 
 1.  环境准备。
     1.  CANN软件安装请参考[环境准备](../../../入门教程/环境准备.md)。
-    2.  安装框架插件包，请参考《TensorFlow 1.15模型迁移指南》或《TensorFlow 2.6.5模型迁移指南》中的环境准备 \> 安装框架插件包章节，获取框架插件包详细的安装步骤。
+    2.  安装框架插件包，请参考[《TensorFlow 1.15模型迁移指南》](https://www.hiascend.com/document/redirect/canncommercial-tfmigr115)或[《TensorFlow 2.6.5模型迁移》](https://www.hiascend.com/document/redirect/canncommercial-tfmigr26)中的环境准备 \> 安装框架插件包章节，获取框架插件包详细的安装步骤。
     3.  <a name="li123241091016"></a>[创建算子工程](../工程化算子开发/创建算子工程.md)。使用msOpGen工具创建算子开发工程。TensorFlow框架算子适配场景下，需要通过framework参数指定具体的框架为tf或者tensorflow，工具会自动生成框架适配代码。以自定义CANN算子AddCustom为例，使用msOpGen工具创建算子开发工程的具体命令如下：
 
         ```

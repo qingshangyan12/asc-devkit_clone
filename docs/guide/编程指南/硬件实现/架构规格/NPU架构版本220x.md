@@ -29,7 +29,7 @@
 
 **获取存储单元的内存空间大小**
 
-开发者可以通过[平台信息获取](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/平台信息获取.md)接口查询各存储单元的内存空间大小。
+开发者可以通过[平台信息获取](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_1025.html)接口查询各存储单元的内存空间大小。
 
 **各存储单元的最小访问粒度（对齐要求）**
 
@@ -99,7 +99,7 @@
 
 **解决存储单元的访问冲突，提升读写性能**
 
-当多个操作尝试同时访问Unified Buffer同一个bank或者bank group时，可能会发生bank冲突，包括读写冲突、写写冲突、读读冲突，这种冲突会导致访问排队，降低性能。可以通过优化bank分配的方式来提升读写性能，具体信息请参考[避免Unified Buffer的bank冲突](../../../算子实践参考/SIMD算子性能优化/内存访问/避免Unified Buffer的bank冲突/)章节。
+当多个操作尝试同时访问Unified Buffer同一个bank或者bank group时，可能会发生bank冲突，包括读写冲突、写写冲突、读读冲突，这种冲突会导致访问排队，降低性能。可以通过优化bank分配的方式来提升读写性能，具体信息请参考[避免UB的bank冲突](../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免UB的bank冲突.md)章节。
 
 ## 搬运单元<a name="section1073952984611"></a>
 
@@ -175,11 +175,11 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
     需要注意以下几点：
 
-    -   建议通过[AllocEventID](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AllocEventID.md)或者[FetchEventID](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FetchEventID.md)接口获取EventID，以确保其合法性和有效性。
+    -   建议通过[AllocEventID](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0114.html)或者[FetchEventID](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0116.html)接口获取EventID，以确保其合法性和有效性。
     -   EventID的数量有限，使用后应立即调用ReleaseEventID释放资源，避免EventID耗尽，影响系统正常运行。
     -   SetFlag和WaitFlag必须成对使用，且SetFlag和WaitFlag的参数必须完全一致（包括模板参数和事件ID）。如果不匹配，可能导致当前核的计算异常，或影响下一个核的算子执行，引发timeout问题。
 
-        例如，SetFlag<HardEvent::S\_MTE3\>\(1\)和SetFlag<HardEvent::MTE3\_MTE1\>\(1\)设置的不是同一个EventID，因为其模板参数不同。只有当模板参数和事件ID完全一致时，才表示同一个EventID。
+        例如，`SetFlag<HardEvent::S_MTE3>(1)`和`SetFlag<HardEvent::MTE3_MTE1>(1)`设置的不是同一个EventID，因为其模板参数不同。只有当模板参数和事件ID完全一致时，才表示同一个EventID。
 
     -   不允许连续设置同一个EventID，因为这可能导致事件状态混乱或未被正确处理。
     -   不建议手动插入 TEventID，不能手动插入6和7的TEventID，因为它们可能被系统预留或用于特殊用途。
@@ -200,7 +200,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
     ![](../../../figures/new_核间同步.png)
 
-    [CrossCoreSetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/CrossCoreSetFlag(ISASI).md)和[CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/CrossCoreWaitFlag(ISASI).md)接口配合使用。使用时需传入核间同步的标记ID\(flagId\)，即上图中的ID1，每个ID对应一个初始值为0的计数器。执行CrossCoreSetFlag后ID对应的计数器增加1；执行CrossCoreWaitFlag时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。flagId取值范围是0-10。
+    [CrossCoreSetFlag](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0273.html)和[CrossCoreWaitFlag](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0274.html)接口配合使用。使用时需传入核间同步的标记ID\(flagId\)，即上图中的ID1，每个ID对应一个初始值为0的计数器。执行CrossCoreSetFlag后ID对应的计数器增加1；执行CrossCoreWaitFlag时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。flagId取值范围是0-10。
 
     需要注意以下几点：
 
@@ -218,7 +218,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
     -   **与高阶 API 的使用冲突**
 
-        [Matmul高阶API](https://www.hiascend.com/document/detail/zh/canncommercial/81RC1/apiref/ascendcopapi/atlasascendc_api_07_0612.html)内部实现中使用了本接口进行核间同步控制，所以不建议开发者同时使用该接口和Matmul高阶API，否则会有flagId冲突的风险。
+        Matmul高阶API内部实现中使用了本接口进行核间同步控制，所以不建议开发者同时使用该接口和Matmul高阶API，否则会有flagId冲突的风险。
 
     -   **计数器限制**
 

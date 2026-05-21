@@ -6,7 +6,7 @@ Reg矢量计算API是面向RegBase架构开发的API，用户可以通过该API�
 
 ## Regbase编程模型<a name="section1977234218287"></a>
 
-基于**寄存器（Regbase）**的编程模型支持用户编写和调用Vector Funtion（向量函数）。这些函数使用\_\_simd\_vf\_\_标记，并被发送到硬件中的向量运算单元执行。在simd vf函数内部，通过Reg矢量计算API实现计算操作，其内存层级与编程架构如[图1](#fig597318712265)所示。
+基于寄存器（Regbase）的编程模型支持用户编写和调用Vector Funtion（向量函数）。这些函数使用\_\_simd\_vf\_\_标记，并被发送到硬件中的向量运算单元执行。在simd vf函数内部，通过Reg矢量计算API实现计算操作，其内存层级与编程架构如[图1](#fig597318712265)所示。
 
 在SIMD Vector的内存架构中，最靠近Vector计算单元的是VF Reg，它是SIMD的私有内存，包含多种类型的Reg矢量计算寄存器，用于存放并行处理的多个数据元素。单核内所有的VF Reg寄存器共享一个本地内存资源UB。SIMD架构不支持从全局内存（Global Memory）加载数据到Reg矢量计算寄存器，先将数据从全局内存GM搬运至Unified Buffer，再通过显式的Load/Store指令，由Unified Buffer加载到Reg矢量计算寄存器中。
 
@@ -66,7 +66,7 @@ __aicore__ inline void Compute()
 
 ## Reg矢量计算寄存器<a name="section1910719438134"></a>
 
-Reg矢量计算API操作的基础数据类型介绍如下，具体API请参考[Reg矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Reg矢量计算.md)。
+Reg矢量计算API操作的基础数据类型介绍如下，具体API请参考[Reg矢量计算](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0311.html)。
 
 -   **RegTensor**
 

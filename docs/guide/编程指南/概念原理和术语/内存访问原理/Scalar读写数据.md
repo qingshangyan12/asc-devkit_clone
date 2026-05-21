@@ -1,6 +1,6 @@
 # Scalar读写数据<a name="ZH-CN_TOPIC_0000002375401226"></a>
 
-AI Core中Scalar计算单元负责各类型的标量数据运算和程序的流程控制。根据[硬件架构](../../硬件实现)设计，Scalar仅支持对Global Memory和Unified Buffer的读写操作，而不支持对L1 Buffer、L0A Buffer、L0B Buffer和L0C Buffer等其他类型存储的访问。下文分别介绍了Scalar读写Global Memory和Unified Buffer的方式和Scalar读写数据时的同步机制。
+AI Core中Scalar计算单元负责各类型的标量数据运算和程序的流程控制。根据[硬件架构](../../硬件实现/硬件实现.md)设计，Scalar仅支持对Global Memory和Unified Buffer的读写操作，而不支持对L1 Buffer、L0A Buffer、L0B Buffer和L0C Buffer等其他类型存储的访问。下文分别介绍了Scalar读写Global Memory和Unified Buffer的方式和Scalar读写数据时的同步机制。
 
 ## Scalar读写Global Memory<a name="section7480536235"></a>
 
@@ -34,7 +34,7 @@ globalTensor1.SetValue(8, val);
 globalTensor1.GetValue(8);
 ```
 
-根据上文的工作机制（如下图所示），多核间访问globalTensor1会出现数据不一致的情况，如果其余核需要获取GM数据的变化，则需要开发者手动调用[DataCacheCleanAndInvalid](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DataCacheCleanAndInvalid.md)来保证数据的一致性。
+根据上文的工作机制（如下图所示），多核间访问globalTensor1会出现数据不一致的情况，如果其余核需要获取GM数据的变化，则需要开发者手动调用[DataCacheCleanAndInvalid](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0177.html)来保证数据的一致性。
 
 ![](../../../figures/图1-AI-Core内部并行计算架构抽象示意图-32.png)
 

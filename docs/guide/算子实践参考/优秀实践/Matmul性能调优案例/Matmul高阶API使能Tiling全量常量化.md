@@ -2,7 +2,7 @@
 
 ## 案例介绍<a name="section12231144316533"></a>
 
-本案例呈现了在使用Matmul高阶API进行矩阵乘法计算时，使能Matmul Tiling全量常量化对算子性能的提升效果。Matmul API在初始化和迭代过程中有大量Scalar计算，Matmul初始化时的Scalar计算影响指令头开销，Matmul迭代间的Scalar计算可能阻塞MTE2流水。在调用Matmul API实现矩阵乘法时，使用[MatmulApiStaticTiling](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Matmul模板参数.md)参数替代TCubeTiling变量参数，将Scalar计算提前到编译期进行，以减少运行时的Scalar计算开销，实现算子性能的提升。
+本案例呈现了在使用Matmul高阶API进行矩阵乘法计算时，使能Matmul Tiling全量常量化对算子性能的提升效果。Matmul API在初始化和迭代过程中有大量Scalar计算，Matmul初始化时的Scalar计算影响指令头开销，Matmul迭代间的Scalar计算可能阻塞MTE2流水。在调用Matmul API实现矩阵乘法时，使用[MatmulApiStaticTiling](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0615.html)参数替代TCubeTiling变量参数，将Scalar计算提前到编译期进行，以减少运行时的Scalar计算开销，实现算子性能的提升。
 
 -   Matmul Tiling常量化的适用场景：
     -   Matmul初始化时的Scalar计算较多，影响指令头开销。
@@ -90,7 +90,7 @@ Tiling参数如下：
 **图 2**  使能Tiling常量化的Matmul计算流程示意图<a name="fig146371949194314"></a>  
 ![](../../../figures/使能Tiling常量化的Matmul计算流程示意图.png "使能Tiling常量化的Matmul计算流程示意图")
 
-Matmul API使能Tiling全量常量化的完整样例请参考[Matmul Tiling常量化的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_constant)。使能Tiling全量常量化功能的步骤如下：
+Matmul API使能Tiling全量常量化的完整样例请参考[Matmul Tiling常量化的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_constant_tiling)。使能Tiling全量常量化功能的步骤如下：
 
 1.  调用获取MatmulConfig模板的接口GetMMConfig时，使用常数值设置MatmulShapeParams，得到带有常量化参数的自定义MatmulConfig模板CUSTOM\_CFG。
 
@@ -144,4 +144,3 @@ Matmul API使能Tiling全量常量化的完整样例请参考[Matmul Tiling常�
 ## 总结<a name="section252011820413"></a>
 
 算子在调用Matmul API完成矩阵乘计算时，若Matmul初始化时的Scalar计算较多，影响了指令头开销，或Matmul迭代间的Scalar计算较多，阻塞了MTE2流水。在这两类场景下，满足上文提及的Tiling常量化使能条件（[全量常量化](#li159920538152)或[部分常量化](#li98655581816)），可以考虑使能Tiling常量化，减少Scalar计算开销，提升算子性能。
-

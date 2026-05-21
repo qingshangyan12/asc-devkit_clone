@@ -19,7 +19,7 @@
 
 -   CANN软件安装
 
-    开发算子前，需要先准备好开发环境和运行环境，开发环境和运行环境的介绍和具体的安装步骤可参见《CANN 软件安装指南》。
+    开发算子前，需要先准备好开发环境和运行环境，开发环境和运行环境的介绍和具体的安装步骤可参见 [《CANN 快速安装》](https://www.hiascend.com/cann/download)。
 
 -   环境变量配置
 
@@ -276,7 +276,7 @@ __global__ void add_custom(float* x, float* y, float* z, uint64_t total_length)
 
     >[!NOTE]说明 
     >- 该样例仅支持如下型号：
-    >    - Ascend 950PR/Ascend 950DT
+    >    - Atlas 350 加速卡
     >- --enable-simt用于指定SIMT编程场景。
     >- _-_-npu-arch用于指定NPU的架构版本，dav-后为架构版本号，请替换为您实际使用的架构版本号。各AI处理器型号对应的架构版本号请通过[AI处理器型号和\_\_NPU\_ARCH\_\_的对应关系](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
 

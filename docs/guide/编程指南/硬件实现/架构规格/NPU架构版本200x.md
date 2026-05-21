@@ -25,7 +25,7 @@
 
 **获取存储单元的内存空间大小**
 
-开发者可以通过[平台信息获取](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/平台信息获取.md)接口查询各存储单元的内存空间大小。
+开发者可以通过[平台信息获取](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_1025.html)接口查询各存储单元的内存空间大小。
 
 **各存储单元的最小访问粒度（对齐要求）**
 
@@ -79,7 +79,7 @@
 
 **解决存储单元的访问冲突，提升读写性能**
 
-当多个操作尝试同时访问Unified Buffer同一个bank或者bank group时，可能会发生bank冲突，包括读写冲突、写写冲突、读读冲突，这种冲突会导致访问排队，降低性能。可以通过优化bank分配的方式来提升读写性能，具体信息请参考[避免Unified Buffer的bank冲突](../../../算子实践参考/SIMD算子性能优化/内存访问/避免Unified Buffer的bank冲突/)章节。
+当多个操作尝试同时访问Unified Buffer同一个bank或者bank group时，可能会发生bank冲突，包括读写冲突、写写冲突、读读冲突，这种冲突会导致访问排队，降低性能。可以通过优化bank分配的方式来提升读写性能，具体信息请参考[避免UB的bank冲突](../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免UB的bank冲突.md)章节。
 
 ## 搬运单元<a name="section3376191651312"></a>
 
@@ -111,7 +111,7 @@
 
 需要注意以下几点：
 
--   建议通过[AllocEventID](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AllocEventID.md)或者[FetchEventID](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FetchEventID.md)接口获取EventID，以确保其合法性和有效性。
+-   建议通过[AllocEventID](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0114.html)或者[FetchEventID](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0116.html)接口获取EventID，以确保其合法性和有效性。
 -   EventID的数量有限，使用后应立即调用ReleaseEventID释放资源，避免EventID耗尽，影响系统正常运行。
 -   SetFlag和WaitFlag必须成对使用，且SetFlag和WaitFlag的参数必须完全一致（包括模板参数和事件ID）。如果不匹配，可能导致当前核的计算异常，或影响下一个核的算子执行，引发timeout问题。
 

@@ -4,7 +4,7 @@
 
 ## 自动生成kernel侧算子实现模板<a name="section282118105913"></a>
 
-在算子工程目录下的“op\_kernel/xxx.cpp”文件中实现算子的核函数。核函数的定义模板已通过msOpGen工具自动生成，样例如下所示**。注意这里参数的顺序按照“输入、输出、workspace、tiling”的顺序排布，开发者不要调整其顺序。**
+在算子工程目录下的“op\_kernel/xxx.cpp”文件中实现算子的核函数。核函数的定义模板已通过msOpGen工具自动生成，样例如下所示。**注意这里参数的顺序按照“输入、输出、workspace、tiling”的顺序排布，开发者不要调整其顺序。**
 
 ```
 #include "kernel_operator.h"
@@ -26,7 +26,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 提供GET\_TILING\_DATA，用于获取算子kernel入口函数传入的tiling信息，并填入注册的Tiling结构体中，此函数会以宏展开的方式进行编译。注意，对应的算子host实现中需要定义TilingData结构体，实现并注册计算TilingData的Tiling函数。具体请参考[Host侧Tiling实现](Host侧Tiling实现/基本流程.md)。
 
-核函数中调用[GET\_TILING\_DATA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GET_TILING_DATA.md)获取TilingData的样例如下：
+核函数中调用[GET\_TILING\_DATA](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0214.html)获取TilingData的样例如下：
 
 ```
 extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
@@ -74,8 +74,8 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 ![](../../../figures/流水任务运行示意图-33.png)
 
 >[!NOTE]说明 
->-   输出的顺序和原型定义中输出的顺序保持一致。
->-   对于uint64\_t的输出数据类型（对于tensor而言），需要将dim的uint32\_t的高位设置为1，表示以uint64\_t类型解析该tensor。
+>- 输出的顺序和原型定义中输出的顺序保持一致。
+>- 对于uint64\_t的输出数据类型（对于tensor而言），需要将dim的uint32\_t的高位设置为1，表示以uint64\_t类型解析该tensor。
 
 -   如下示例中，算子中有一个输出依赖计算得出，输出tensor的数据类型为uint32\_t，计算完成后，得到输出的shape为（32, 64），出参shape\_out用于存放该shape信息，值为（2, 32, 64）。代码示例如下：
 

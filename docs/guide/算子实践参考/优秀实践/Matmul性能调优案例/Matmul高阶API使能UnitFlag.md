@@ -2,7 +2,7 @@
 
 ## 案例介绍<a name="section17413194624510"></a>
 
-本案例呈现了在矩阵乘算子场景中，使用Matmul高阶API进行矩阵乘法计算，使能UnitFlag功能对算子性能的提升效果。UnitFlag功能为AIC核中MMAD计算指令和FIXPIPE数据搬运指令提供了基于内存访问的细粒度同步，使计算与搬运流水并行。使能UnitFlag功能的方式为将MatmulConfig中的enUnitFlag参数设置为true。enUnitFlag参数的详细介绍请参考[MatmulConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)。
+本案例呈现了在矩阵乘算子场景中，使用Matmul高阶API进行矩阵乘法计算，使能UnitFlag功能对算子性能的提升效果。UnitFlag功能为AIC核中MMAD计算指令和FIXPIPE数据搬运指令提供了基于内存访问的细粒度同步，使计算与搬运流水并行。使能UnitFlag功能的方式为将MatmulConfig中的enUnitFlag参数设置为true。enUnitFlag参数的详细介绍请参考[MatmulConfig](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0616.html)。
 
 -   使能UnitFlag的适用场景
 
@@ -11,7 +11,7 @@
 -   使能UnitFlag的约束条件
     -   UnitFlag功能仅支持Norm、IBShare、MDL三个模板。
     -   使能UnitFlag功能时，不支持算子内同时存在CO1\(L0C\)搬出到Global Memory和A1\(L1\)搬出到Global Memory的两种流水。
-    -   使能UnitFlag功能时，若同时使能[L0C累加](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Iterate.md)功能，不支持多次[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Iterate.md)计算、一次[GetTensorC](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetTensorC.md)输出。
+    -   使能UnitFlag功能时，若同时使能[L0C累加](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0638.html)功能，不支持多次[Iterate](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0638.html)计算、一次[GetTensorC](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_0639.html)输出。
 
 本案例的算子规格如下：
 
@@ -87,7 +87,7 @@
 **图 2**  开启UnitFlag功能<a name="fig58335714416"></a>  
 ![](../../../figures/开启UnitFlag功能.png "开启UnitFlag功能")
 
-Matmul API使能UnitFlag功能的完整样例请参考[Matmul API性能优化样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_perf)。使能UnitFlag功能的主要步骤如下：
+Matmul API使能UnitFlag功能的完整样例请参考[使能UnitFlag功能和MDL模板的Mamtul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_unitflag)。使能UnitFlag功能的主要步骤如下：
 
 1.  自定义MatmulConfig模板参数，将其中的enUnitFlag参数设置为true，使能UnitFlag功能。
 
@@ -124,4 +124,3 @@ Matmul API使能UnitFlag功能的完整样例请参考[Matmul API性能优化样
 ## 总结<a name="section8281219125011"></a>
 
 在算子的MMAD计算流水和FIXPIPE数据搬出流水串行且未被其他流水掩盖（比如MTE2 Bound）时，考虑使能UnitFlag功能，实现MMAD计算流水和FIXPIPE数据搬出流水的流水并行，提升算子性能。
-

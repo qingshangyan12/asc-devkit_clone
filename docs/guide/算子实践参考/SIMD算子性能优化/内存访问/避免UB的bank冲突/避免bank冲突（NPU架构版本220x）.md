@@ -4,8 +4,8 @@
 
 >[!NOTE]说明 
 >该性能优化建议适用于如下产品型号：
->-   Atlas A3 训练系列产品/Atlas A3 推理系列产品
->-   Atlas A2 训练系列产品/Atlas A2 推理系列产品
+>- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+>- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 【描述】为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。Unified Buffer总大小为192K，划分为48个bank。每个bank由128行组成，每行长度为32B。这48个bank进一步组织为16个bank group，每个bank group包含3个bank，例如bank15、bank31和bank47组成一个bank group。
 
@@ -252,7 +252,7 @@ bank冲突主要可以分为以下三种场景：
 
 >[!NOTE]说明 
 >通过msProf工具可以进行资源冲突占比的相关性能数据采集。
->工具的具体使用方法和资源冲突占比文件性能数据文件说明请参考《算子开发工具用户指南》。
+>工具的具体使用方法和资源冲突占比文件性能数据文件说明请参考[《算子开发工具用户指南》](https://hiascend.com/document/redirect/CannCommercialToolOpDev)。
 
 ## 如何避免bank冲突<a name="section12501642143515"></a>
 

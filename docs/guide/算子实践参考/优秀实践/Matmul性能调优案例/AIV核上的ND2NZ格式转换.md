@@ -2,7 +2,7 @@
 
 ## 案例介绍<a name="section17413194624510"></a>
 
-本案例展示了在矩阵乘算子场景中，使用Matmul高阶API进行计算，对内轴（内轴即矩阵的行方向）非256字节对齐的输入矩阵，在AIV核上进行ND2NZ格式转换对算子性能提升的效果。为提升Cube单元的计算效率，ND格式的输入矩阵在执行Cube计算前会先转换为NZ格式，ND格式和NZ格式的具体内容可参考[数据格式](../../SIMT算子实现/基础知识.md#zh-cn_topic_0000001622194138_section1453415011)。Matmul API内部使用随路ND2NZ指令同时进行格式转换以及数据搬运。但在数据非256字节对齐时，[随路ND2NZ指令](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/随路转换ND2NZ搬运.md)存在带宽利用率低的问题。因此输入矩阵的内轴非256字节对齐时，在进行Matmul计算前，利用AIV核上Vector计算单元完成ND格式到NZ格式的转换，可以避免随路非对齐数据搬运存在的效率低的问题，从而提升算子性能。
+本案例展示了在矩阵乘算子场景中，使用Matmul高阶API进行计算，对内轴（内轴即矩阵的行方向）非256字节对齐的输入矩阵，在AIV核上进行ND2NZ格式转换对算子性能提升的效果。为提升Cube单元的计算效率，ND格式的输入矩阵在执行Cube计算前会先转换为NZ格式，ND格式和NZ格式的具体内容可参考[数据格式](../../SIMT算子实现/基础知识.md#zh-cn_topic_0000001622194138_section1453415011)。Matmul API内部使用随路ND2NZ指令同时进行格式转换以及数据搬运。但在数据非256字节对齐时，[随路ND2NZ指令](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/ascendcopapi/atlasascendc_api_07_00127.html)存在带宽利用率低的问题。因此输入矩阵的内轴非256字节对齐时，在进行Matmul计算前，利用AIV核上Vector计算单元完成ND格式到NZ格式的转换，可以避免随路非对齐数据搬运存在的效率低的问题，从而提升算子性能。
 
 -   AIV核上的ND2NZ格式转换的适用场景
 
@@ -64,7 +64,7 @@
 
 对于ND格式的输入矩阵，不再使用随路ND2NZ指令进行格式转换，而是利用Vector计算单元的能力完成数据格式转换。首先使用DataCopyPad接口，将非对齐的矩阵数据搬入Unified Buffer，使用Duplicate接口填充需要补为对齐位置的数据，再逐行调用Copy接口实现数据从ND到NZ格式的重排，将重排后的NZ数据写入workspace内存，最后直接读取workspace上的NZ数据，进行Matmul计算。
 
-AIV核上的ND2NZ格式转换的完整样例请参考[Matmul输入矩阵ND到NZ格式转换的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_nz)。实现AIV核上的ND2NZ格式转换的主要步骤如下：
+实现AIV核上的ND2NZ格式转换的主要步骤如下：
 
 1.  创建Matmul对象时，定义内轴非256字节对齐的B矩阵的Format为NZ格式。
 
@@ -152,4 +152,3 @@ AIV核上的ND2NZ格式转换的完整样例请参考[Matmul输入矩阵ND到NZ�
 ## 总结<a name="section8281219125011"></a>
 
 对于矩阵乘计算中矩阵内轴非256字节对齐的场景，随路ND2NZ指令的带宽利用率低，影响算子性能，通过在AIV核上进行ND2NZ的数据重排，提升算子整体性能。值得注意的是，带宽利用率与数据量有关，如果矩阵数据总量太小，即使是在AIV核上进行的ND2NZ转换也无法明显提升有效带宽，反而会因为引入了多核同步，导致算子端到端的性能劣化。
-
