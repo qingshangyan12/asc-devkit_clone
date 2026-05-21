@@ -74,7 +74,7 @@ constexpr const char* OP_ACLNN_SOC_INFO =
     "    SOC_VERSION_ASCEND910_96 = 13,\n"
     "    SOC_VERSION_KIRINX90 = 14,\n"
     "    SOC_VERSION_KIRIN9030 = 15,\n"
-    "    SOC_VERSION_ASCEND950 = 16,\n"
+    "    SOC_VERSION_ASCEND350 = 16,\n"
     "    SOC_VERSION_INVALID = 99\n"
     "};\n";// NOTE: Always add new SOC versions at the end of this enum.
 constexpr const char* OP_ACLNN_NNOPBASE_ATTR_DTYPE_INFO = 
