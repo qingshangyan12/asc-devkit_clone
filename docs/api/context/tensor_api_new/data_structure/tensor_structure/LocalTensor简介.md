@@ -1,16 +1,12 @@
 # LocalTensor简介
 
-`LocalTensor` 是 Tensor API 的**核心张量对象**，由 `MakeTensor` 将内存指针适配器（`Engine`）与布局对象（`Layout`）绑定后生成。它封装了"数据在哪里（Engine）、数据长什么样（Layout）、如何访问（operator[]/operator()）"的全部信息，并作为 `Copy`（数据搬运）和 `Mmad`（矩阵计算）的统一操作数类型。
+LocalTensor由MakeTensor将内存指针适配器（Engine）与布局对象（Layout）绑定后生成。它封装了"数据在哪里（Engine）、数据长什么样（Layout）、如何访问（operator[]/operator()）"的全部信息，并作为 `Copy`（数据搬运）和 `Mmad`（矩阵计算）的统一操作数类型。
 
 `LocalTensor` 的完整类型为：
 
 ```
-LocalTensor<TensorAttribute<EngineType, LayoutType>>
+LocalTensor<EngineType, LayoutType>
 ```
-
-其中：
-- **`EngineType`**：内存引擎（如 `ViewEngine<HardwareMemPtr<...>>`），持有物理地址迭代器，提供 `Begin()` 获取基地址、`SetCacheMode()` 设置缓存策略；
-- **`LayoutType`**：布局对象，提供 `Shape()`、`Stride()`、`Capacity()` 等查询接口和 `operator()(coord)` 坐标→索引映射。
 
 ## 需要包含的头文件
 
@@ -22,7 +18,7 @@ LocalTensor<TensorAttribute<EngineType, LayoutType>>
 
 ```cpp
 template <typename EngineType, typename LayoutType>
-struct LocalTensor<TensorAttribute<EngineType, LayoutType>>
+struct LocalTensor<EngineType, LayoutType>
 {
     using engineType  = EngineType;
     using layoutType  = LayoutType;
@@ -225,7 +221,7 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>>
 ### operator()
 - 功能说明
 
-    多参数坐标访问。
+    该接口以coord作为起始坐标，返回一个从当前位置开始的子LocalTensor。
 
 - 函数原型
   ```cpp
@@ -255,18 +251,37 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>>
 
 ---
 
-### operator() 
+### Slice(const Coord& coord, const Info& info) 
+
 - 功能说明
 
     分块访问。
 
+    该接口以coord作为起始坐标，并结合info信息返回一个从当前位置开始的子LocalTensor。
+
+    info支持两种形式：
+
+    1. 传入Shape
+       表示按给定形状截取子张量。
+       - info必须是二维Shape；
+       - 当前Tensor中的Layout只支持二维或四维；
+       - 若当前Tensor为二维Layout，则返回二维子Layout；
+       - 若当前Tensor为四维Layout，则在保持原布局模式的前提下，按二维逻辑区域裁剪后返回四维子Layout。
+
+    2. 传入Layout
+       表示按给定Layout 的Shape信息截取子张量。
+       - info必须是Layout对象；
+       - info的维度必须与当前Tensor中Layout的维度相同；
+       - 返回结果保持当前Tensor的布局模式和 stride，只更新切片后的 shape。
+
 - 函数原型
+
   ```cpp
-  template <typename Coord, typename InfoType>
-  __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const InfoType& info)
+    template <typename Coord, typename Info>
+    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) 
   
-  template <typename Coord, typename InfoType>
-  __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const InfoType& info) const
+    template <typename Coord, typename Info>
+    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const
   ```
 
 - 参数说明
@@ -274,11 +289,17 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>>
   | 参数名  | 输入/输出 | 描述 |
   | :----- | :------- | :------- |
   | coord | 输入 | 起始坐标。 |
-  | info | 输入 | 分块信息（可以是分块形状或分块张量）。 |
+  | info | 输入 | 分块信息。可以传入二维 Shape，也可以传入与当前Tensor的Layou 维度相同的Layout。 |
 
 - 返回值说明
 
-    返回由coord（或c0、c1...）指定偏移位置的LocalTensor对象引用（带有Layout信息）。
+    返回从coord指定位置开始的子LocalTensor。返回结果包含新的 Layout信息，Engine 指向切片后的起始位置。
+
+- 约束说明
+
+    - coord的 tuple 结构必须与当前 Tensor的Layout.Shape()结构一致。
+    - 当info为Shape时：info必须是二维Shape；当前Tensor的Layout必须为二维或四维。
+    - 当info为Layout时，info的必须与当前Tensor的Layout的维度相同。
 
 ## 调用示例
 
