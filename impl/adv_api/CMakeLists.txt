@@ -125,9 +125,6 @@ if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
 
     install(FILES "${HCCL_CC_BUILD_DIR}/include/hccl.h" "${HCCL_CC_BUILD_DIR}/include/hccl_mc2.h"
         DESTINATION "${CMAKE_SYSTEM_PROCESSOR}-linux/include/hccl" COMPONENT asc-devkit OPTIONAL)
-    if(TARGET mc2_client)
-        target_compile_definitions(mc2_client PRIVATE ops_hccl=mc2_ops_hccl)
-    endif()
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)
