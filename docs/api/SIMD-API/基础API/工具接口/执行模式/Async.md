@@ -14,9 +14,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic\_api/kernel\_operator\_utils\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_utils_intf.h"`。
 
-基于分离模式（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑，此时需要使用Ascend C提供的宏 ASCEND\_IS\_AIV / ASCEND\_IS\_AIC 实现如下硬件条件分支来对AIV和AIC的代码进行隔离：
+基于分离模式（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑，此时需要使用Ascend C提供的宏`ASCEND_IS_AIV`/`ASCEND_IS_AIC`实现如下硬件条件分支来对AIV和AIC的代码进行隔离：
 
 ```cpp
 if ASCEND_IS_AIV { 
@@ -51,10 +51,6 @@ __aicore__ void Async(Args... args)
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
 | Args... args | 输入 | 与class... Args对应的参数列表，表示传递给funPtr的实际参数。 |
-
-## 数据类型
-
-数据类型对应可变参数模板Args。
 
 ## 返回值说明<a name="section14483414194"></a>
 
