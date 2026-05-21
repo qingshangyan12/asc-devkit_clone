@@ -37,7 +37,6 @@ CcuKernelKfcServer::CcuKernelKfcServer(const CcuKernelArg &arg)
     rankSize_ = kernelArg->dimSize_;
     channels_ = kernelArg->channels;
     loadFromMem_ = kernelArg->loadFromMem_;
-    algoTemplateInfo_ = kernelArg->opParam_.algoTemplateInfo;
     HCCL_INFO("[CcuKernelKfcServer] rankId_ = %d, rankSize_ = %d, loadFromMem_ = %d", rankId_, rankSize_, loadFromMem_);
 }
 
@@ -49,39 +48,18 @@ HcclResult CcuKernelKfcServer::InitResource()
 
 HcclResult CcuKernelKfcServer::Algorithm()
 {
-    GenOpSelector();
-    GenCircularQueue();
+    //DONE:删除CcuKernelKfcServer::GenOpSelector()
+    if (id == 0) {
+        Mc2KfcServer server;
+        server.GenCircularQueue(); // 这里需要做0卡判断，走不同逻辑
+    } else {
+        Mc2SlaveKfcServer server;
+        server.GenCircularQueue();
+    }
     return HcclResult::HCCL_SUCCESS;
 }
 
-void CcuKernelKfcServer::GenOpSelector()
-{
-    if (algoTemplateInfo_.empty()) {
-        HCCL_ERROR("[CcuKernelKfcServer] GenOpSelector Failed: Empty AlgoTemplateInfo");
-        return;
-    }
-
-    {
-        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(GetDieId()) + "_" + std::to_string(missionIndex);
-        CcuRep::FuncBlock selectorFunc(this, funcName);
-
-        CcuRep::Variable opCode = CreateVariable();
-        selectorFunc.DefineInArg(opCode);
-
-        CcuRep::Variable opAddr = CreateVariable();
-        selectorFunc.DefineOutArg(opAddr);
-        opAddr = INVALID_U64;
-
-        for (auto entry : algoTemplateInfo_) {
-            CCU_IF(opCode == entry.first)
-            {
-                opAddr = entry.second;
-            }
-        }
-    }
-}
-
-void CcuKernelKfcServer::GenCircularQueue()
+void Mc2KfcServer::GenCircularQueue()
 {
     CcuRep::Variable token = CreateVariable();
     Load(token);
@@ -123,7 +101,7 @@ void CcuKernelKfcServer::GenCircularQueue()
 
     array<CcuRep::Variable, CCU_PARAM_NUM_PER_DIE> param;
     for (uint32_t i = 0; i < CCU_PARAM_NUM_PER_DIE; ++i) {
-        param[i] = CreateContinuousVariable();
+        param[i] = ccu::Array<CcuRep::Variable> vars(10);       // TODO：需要确定这里的个数
     }
 
     CCU_WHILE(repeatCond == 0)
@@ -146,7 +124,8 @@ void CcuKernelKfcServer::GenCircularQueue()
             CCU_BREAK;
         }
 
-        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(GetDieId()) + "_" + std::to_string(missionIndex);
+        const uint32_t getDieId = DIE0_ID;      // TODO：GetDieId()函数的替换待HCCL方提供
+        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(getDieId) + "_" + std::to_string(missionIndex_);
         auto selectFunc = Func(funcName);
         selectFunc.SetInArg(param[HBM_PARAM_IDX_0]);
         selectFunc.SetOutArg(opAddr);
@@ -182,89 +161,138 @@ void CcuKernelKfcServer::GenCircularQueue()
     }
 }
 
-void CcuKernelKfcServer::WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::Variable &turnStartSig)
+void Mc2KfcServer::WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::Variable &turnStartSig)
 {
+    const uint32_t getDieId = DIE0_ID;          // TODO：GetDieId()函数的替换待HCCL方提供
     if (dieNum_ == SINGLE_DIE) {
         CCU_WHILE(turnStartSig != 1)
         {
-            LoadVariable(hbmSigAddr, turnStartSig);
+            Load(hbmSigAddr, turnStartSig);
         }
         turnStartSig = 0;
-        StoreVariable(turnStartSig, hbmSigAddr);
+        Store(turnStartSig, hbmSigAddr);
     } else {
-        if (GetDieId() == DIE0_ID) {
+        if (getDieId == DIE0_ID) {
             CCU_WHILE(turnStartSig != 1)
             {
-                LoadVariable(hbmSigAddr, turnStartSig);
+                Load(hbmSigAddr, turnStartSig);
             }
             turnStartSig = 0;
-            StoreVariable(turnStartSig, hbmSigAddr);
-            LocalCtxPost(importDieSig, 1);
-        } else if (GetDieId() == DIE1_ID) {
-            LocalWait(exportDieSig, 1);
+            Store(turnStartSig, hbmSigAddr);
+            EventRecord(importDieSig, 1);
+        } else if (getDieId == DIE1_ID) {
+            EventWait(exportDieSig, 1);
         }
     }
 }
 
-void CcuKernelKfcServer::SetTurnEndSig(const CcuRep::Variable &hbmSigAddr, const CcuRep::Variable &turnEndSig)
+void Mc2KfcServer::SetTurnEndSig(const CcuRep::Variable &hbmSigAddr, const CcuRep::Variable &turnEndSig)
 {
+    const uint32_t getDieId = DIE0_ID;          // TODO：GetDieId()函数的替换待HCCL方提供
     if (dieNum_ == SINGLE_DIE) {
-        StoreVariable(turnEndSig, hbmSigAddr);
+        Store(turnEndSig, hbmSigAddr);
     } else {
-        if (GetDieId() == DIE0_ID) {
-            LocalWait(exportDieSig, 1);
-            StoreVariable(turnEndSig, hbmSigAddr);
-        } else if (GetDieId() == DIE1_ID) {
-            LocalCtxPost(importDieSig, 1);
+        if (getDieId == DIE0_ID) {
+            EventWait(exportDieSig, 1);
+            Store(turnEndSig, hbmSigAddr);
+        } else if (getDieId == DIE1_ID) {
+            EventRecord(importDieSig, 1);
         }
     }
 }
 
-void CcuKernelKfcServer::LoadFuncParamFromMemory(CcuRep::Variable &paramAddr, array<CcuRep::Variable, CCU_PARAM_NUM_PER_DIE> &param)
+void Mc2KfcServer::LoadFuncParamFromMemory(CcuRep::Variable &paramAddr, array<CcuRep::Variable, CCU_PARAM_NUM_PER_DIE> &param)
 {
     CcuRep::Variable doubleDie = CreateVariable();
     doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
     CcuRep::Variable addr = CreateVariable();
     addr = paramAddr;
-    if (dieNum_ == DOUBLE_DIE && GetDieId() == DIE1_ID) {
+    const uint32_t getDieId = DIE0_ID;          // TODO：GetDieId()函数的替换待HCCL方提供
+    if (dieNum_ == DOUBLE_DIE && getDieId == DIE1_ID) {
         addr += doubleDie;
     }
-    LoadVariable(addr, param[0], CCU_PARAM_NUM_PER_DIE);
+    Load(addr, param[0], CCU_PARAM_NUM_PER_DIE);
+}
+
+void Mc2SlaveKfcServer::GenCircularQueue()
+{
+    // 算子签名
+    CcuRep::Variable signature = CreateVariable();
+    // 存放《选择函数返回的FuncCall地址》的寄存器，选择函数的出参，循环队列内部使用
+    CcuRep::Variable opAddr = CreateVariable();
+
+    // 存放《控制repeat循环执行的条件》的寄存器
+    CcuRep::Variable repeatCond = CreateVariable();
+    repeatCond                  = 0;
+
+    CCU_WHILE(repeatCond == 0)
+    {
+        // 在context中依次加入8轮指令
+        MissionPreSync(signature);
+
+        // 第一个参数为opCode, 如果参数中opCode非法则跳出循环队列
+        CCU_IF(signature == INVALID_U64)
+        {
+            CCU_BREAK;
+        }
+
+        // 调用OpSelector
+        std::string funcName
+            = OP_SELECTOR_LABEL + "_" + std::to_string(GetDieId()) + "_" + std::to_string(missionIndex);
+        auto selectFunc = Func(funcName);
+        selectFunc.SetInArg(signature);
+        selectFunc.SetOutArg(opAddr);
+        selectFunc.AppendToContext();
+
+        // 检查OpSelector是否命中算子，如果没命中则跳出循环队列
+        CCU_IF(opAddr == INVALID_U64)
+        {
+            CCU_BREAK;
+        }
+
+        // 调用算子Func
+        auto opFunc = Func(opAddr);
+
+        opFunc.AppendToContext();
+
+        MissionPostSync();
+    }
 }
 
 void CcuKernelKfcServer::MissionPreSync(CcuRep::Variable &func)
 {
-    if (missionNum == 1) {
+    if (missionNum_ == 1) {
         return;
     }
-    if (missionIndex == 0) {
-        for (uint32_t i = 0; i < missionNum - 1; ++i) {
-            LocalCtxPostVar(func, importMissionVar[i], importMissionSig[i]);
+    if (missionIndex_ == 0) {
+        for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
+            LocalCtxPostVar(func, importMissionVar[i], importMissionSig[i]);    // TODO：这里怎么改
         }
     } else {
-        LocalWait(exportMissoinSig[0]);
+        EventWait(exportMissoinSig[0]);
         func = exportMissionVar[0];
     }
 }
 
 void CcuKernelKfcServer::MissionPostSync()
 {
-    if (missionNum == 1) {
+    if (missionNum_ == 1) {
         return;
     }
-    if (missionIndex == 0) {
-        for (uint32_t i = 0; i < missionNum - 1; ++i) {
-            LocalWait(exportMissoinSig[i]);
+    if (missionIndex_ == 0) {
+        for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
+            EventWait(exportMissoinSig[i]);
         }
     } else {
-        LocalCtxPost(importMissionSig[0]);
+        EventRecord(importMissionSig[0]);
     }
 }
 
 std::vector<uint64_t> CcuKernelKfcServer::GeneArgs(const CcuTaskArg &arg)
 {
     const CcuTaskArgKfcServer *taskArg = dynamic_cast<const CcuTaskArgKfcServer *>(&arg);
-    return {taskArg->inputAddr_, taskArg->outputAddr_};
+    uint64_t tokenInfo = taskArg->token_;
+    return {tokenInfo};
 }
 
 }
