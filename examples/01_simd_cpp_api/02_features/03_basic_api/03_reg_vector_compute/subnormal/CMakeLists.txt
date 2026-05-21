@@ -29,10 +29,6 @@ add_executable(${TARGET_FILENAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/subnormal.asc
 )
 
-target_link_libraries(${TARGET_FILENAME} PRIVATE
-        m
-)
-
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 target_compile_options(${TARGET_FILENAME} PRIVATE
         $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
