@@ -25,9 +25,9 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例实现了对输入tensor按元素执行Leaky Relu（Leaky Rectified Liner Unit）操作，返回计算结果的功能。
+  本样例实现了对输入Tensor按元素执行Leaky ReLU（Leaky Rectified Linear Unit）操作，返回计算结果的功能。
 
-  对应的数学表达式为：  
+  对应的数学表达式为，样例中 $\alpha=0.01$：
   $$
   out =
   \begin{cases}
@@ -37,8 +37,9 @@
   $$
 
 - 样例规格：
-  <table>
-  <tr><th align="center">样例类型(OpType)</th><th colspan="4" align="center">LeakyRelu</th></tr>
+  <table border="2">
+  <caption>表1：样例输入输出规格</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">LeakyRelu</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[4, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">out</td><td align="center">[4, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
@@ -49,7 +50,7 @@
   本样例中实现的是固定shape为[4, 128]的LeakyRelu样例。
   - Kernel实现  
     - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
-    - 调用LeakyRelu接口，对输入Tensor执行Leaky Relu操作
+    - 调用LeakyRelu接口，对输入Tensor执行Leaky ReLU操作
     - 调用DataCopy基础API，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）
 
   - 调用实现  
