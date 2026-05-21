@@ -4,7 +4,6 @@
 
 本样例基于Compare、Compares接口完成多场景下的数据比较功能，实现逐元素大小比较。如果比较结果为真，则输出结果的对应比特位为1，否则为0。并且比较结果以8位压缩方式存储，每8个比较结果打包成一个字节（uint8_t/int8_t）。
 
-样例支持通过编译参数切换不同场景，便于开发者理解Compare类接口的使用方法和实现差异。
 
 ## 支持的产品
 
@@ -24,11 +23,63 @@
 │   └── compare.asc             // Ascend C样例实现 & 调用样例
 ```
 
+## 样例描述
+
+- 样例功能：  
+  本样例基于Compare、Compares接口实现Tensor逐元素比较，并将比较结果按8位压缩方式存储到输出Tensor。
+
+- 样例规格：  
+
+  <table border="2">
+  <caption>表1：样例输入输出规格（场景1：Compare）</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Compare</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">z</td><td align="center">[1, 32]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">compare_custom</td></tr>
+  </table>
+
+  <table border="2">
+  <caption>表2：样例输入输出规格（场景2：Compare结果存入寄存器）</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Compare</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">z</td><td align="center">[1, 32]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">compare_custom</td></tr>
+  </table>
+
+  <table border="2">
+  <caption>表3：样例输入输出规格（场景3：Compares）</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Compares</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">z</td><td align="center">[1, 32]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">compare_custom</td></tr>
+  </table>
+
+  <table border="2">
+  <caption>表4：样例输入输出规格（场景4：Compares灵活标量位置）</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Compares</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 16]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">z</td><td align="center">[1, 32]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">compare_custom</td></tr>
+  </table>
+
 ## 场景详细说明
+
 本样例通过编译参数`SCENARIO_NUM` 来切换不同的场景：
 
 **场景1：Compare**
-- 说明：逐元素比较`src0Local`和`src1Local`两个tensor大小
+- 说明：逐元素比较`src0Local`和`src1Local`两个Tensor中对应元素的大小
 - 输入：src0Local=[1, 256], src1Local=[1, 256]
 - 输入数据类型：float
 - 输出：dstLocal=[1, 32]
@@ -40,10 +91,10 @@
 - 参数：cmpMode=AscendC::CMPMODE::LT，srcDataSize=256
 
 **场景2：Compare（结果存入寄存器）**
-- 说明：逐元素比较`src0Local`和`src1Local`两个tensor大小，并将计算结果存入cmpMask寄存器中
-- 输入：src0Local=[1, 64], src1Local=[1, 64] 
+- 说明：逐元素比较`src0Local`和`src1Local`两个Tensor中对应元素的大小，并将比较结果写入cmpMask寄存器
+- 输入：src0Local=[1, 64], src1Local=[1, 64]
 - 输入数据类型：float
-- 输出：[1, 32] 
+- 输出：[1, 32]
 - 输出数据类型：uint8_t
 - 实现：
   ```cpp
@@ -54,7 +105,7 @@
 - 参数：cmpMode=AscendC::CMPMODE::LT；repeatParams为默认值，控制操作数地址步长
 
 **场景3：Compares**
-- 说明：逐元素比较`src0Local`（tensor）中的元素和`src1Scalar`（标量）的大小
+- 说明：逐元素比较`src0Local`（Tensor）中的元素和`src1Scalar`（标量）的大小
 - 输入：src0Local=[1, 256], src1Local=[1, 16]  其中`src1Scalar`通过GetValue(idx)方法从中获取一个元素作为标量进行比较
 - 输入数据类型：float
 - 输出：dstLocal=[1, 32]
@@ -66,8 +117,8 @@
     ```
 - 参数：src1Scalar=src1Local.GetValue(0), cmpMode=AscendC::CMPMODE::LT，srcDataSize=256
 
-**场景4：Compares（灵活标量位置）----此场景仅在 Ascend 950PR/Ascend 950DT产品支持**
-- 说明：逐元素比较`src0Local`（tensor）中的元素和`src1Scalar`（标量）的大小，其中标量可以支持在前和在后两种场景
+**场景4：Compares（灵活标量位置，仅支持 Ascend 950PR/Ascend 950DT）**
+- 说明：逐元素比较`src0Local`（Tensor）中的元素和`src1Scalar`（标量）的大小，其中标量可以支持在前和在后两种场景
 - 输入：src0Local=[1, 256], src1Local=[1, 16]  其中`src1Scalar`通过src1Local[idx]方法从中获取一个元素作为标量进行比较
 - 输入数据类型：float
 - 输出：dstLocal=[1, 32]
@@ -123,7 +174,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品、dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`（默认）、`2`、`3`、`4` | 场景编号<br>1：Compare<br>2：Compare（结果存入寄存器）<br>3：Compares<br>4：Compares（灵活标量位置） |
 
 - 执行结果  
