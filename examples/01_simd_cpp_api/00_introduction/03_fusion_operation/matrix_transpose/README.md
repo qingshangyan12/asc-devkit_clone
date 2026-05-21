@@ -268,7 +268,7 @@ output[index_out] = tile[tile_col][tile_row];
 
   | 选项             | 可选值      | 说明              |
   | ---------------- | ----------- | ----------------- |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
   | `SCENARIO_NUM` | `0`-`1` | 样例类型，默认为0 |
 
   执行结果如下，说明精度对比成功。
