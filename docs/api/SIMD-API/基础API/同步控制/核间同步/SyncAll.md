@@ -94,7 +94,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
     仅支持纯Vector算子的多核（参与同步的核数可通过入参指定）同步。每一个AIV都向全局内存对应位置写入信号值1，接着每一个AIV都持续轮询全局内存中所有AIV对应的信号值，直到所有AIV核对应的信号值都变为1。
 
-在纯 Vector 算子场景中，若所有 AIV 核默认参与同步，推荐采用性能更优的硬件同步接口；若需指定部分 AIV 核参与同步，则应使用软件同步接口，并通过入参usedCores完成配置。
+在纯Vector算子场景中，若所有AIV核默认参与同步，推荐采用性能更优的硬件同步接口；若需指定部分AIV核参与同步，则应使用软件同步接口，并通过入参usedCores完成配置。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -130,7 +130,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 | 参数名 | 描述 |
 | --- | --- |
 | isAIVOnly | 控制SyncAll作用于纯Vector算子或融合（Cube和Vector融合）算子。可选值：<br>&bull; **true**（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。<br>&bull; **false**：融合算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。 |
-| <cann-filter npu-type="950"> config | 该参数仅在Ascend 950PR/Ascend 950DT上支持。<br>控制SyncAll函数的行为，在多个AI Core之间进行流水线同步时，指定哪些管道（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个管道用于"发送触发信号"。<br>&bull; **waitPipe**：指定哪个管道用于"接收等待信号"。<br>默认为SyncAllConfig DEFAULT_SYNC_ALL_CONFIG= {PIPE_ALL, PIPE_ALL}，使用全部管道来进行触发和等待行为。</cann-filter> |
+| <cann-filter npu-type="950"> config | 该参数仅在Ascend 950PR/Ascend 950DT上支持。<br>控制SyncAll函数的行为，在多个AI Core之间进行流水线同步时，指定哪些管道（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个管道用于”发送触发信号“。<br>&bull; **waitPipe**：指定哪个管道用于”接收等待信号“。<br>默认为SyncAllConfig DEFAULT_SYNC_ALL_CONFIG= {PIPE_ALL, PIPE_ALL}，使用全部管道来进行触发和等待行为。</cann-filter> |
 
 **表 2**  参数说明
 
