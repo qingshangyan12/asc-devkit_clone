@@ -13,12 +13,12 @@ L0缓存没有对外开关，由Matmul API内部根据用户配置的shape信息
 ## 目录结构介绍
 ```
 ├── matmul_l0cache
-│   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_l0cache.asc      // Ascend C样例实现 & 调用样例
+│   ├── CMakeLists.txt        // 编译工程文件
+│   ├── data_utils.h          // 数据读入写出函数
+│       ├── gen_data.py       // 输入数据和真值数据生成脚本文件
+│   ├── matmul_l0cache.asc    // Ascend C样例实现 & 调用样例
+│   ├── scripts
+│       └── verify_result.py  // 真值对比文件
 ```
 ## 样例描述
 - 样例功能：  

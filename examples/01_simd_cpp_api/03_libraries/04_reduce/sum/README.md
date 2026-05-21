@@ -17,11 +17,11 @@
 
 ```
 ├── sum
+│   ├── CMakeLists.txt   // 编译工程文件
+│   ├── data_utils.h     // 数据读写工具函数
 │   ├── scripts
-│   │   └── gen_data.py               // 生成数据和真值数据的生成脚本
-│   ├── CMakeLists.txt                // 编译工程文件
-│   ├── data_utils.h                  // 数据读写工具函数
-│   └── sum.asc                       // Ascend C样例实例 & 主程序
+│   └── sum.asc          // Ascend C样例实例 & 主程序
+│   │   └── gen_data.py  // 生成数据和真值数据的生成脚本
 ```
 
 ## 样例规格

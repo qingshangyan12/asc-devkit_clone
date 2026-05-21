@@ -14,11 +14,11 @@
 
 ```
 ├── arange
-│   ├── scripts
-│   │   └── gen_data.py         // 输入数据和真值数据生成脚本
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   └── arange.asc              // Ascend C样例实现 & 调用样例
+│   ├── arange.asc       // Ascend C样例实现 & 调用样例
+│   ├── CMakeLists.txt   // 编译工程文件
+│   ├── data_utils.h     // 数据读入写出函数
+│   └── scripts
+│   │   └── gen_data.py  // 输入数据和真值数据生成脚本
 ```
 
 ## 样例描述

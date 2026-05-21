@@ -1,0 +1,15 @@
+﻿文件路径,错误位置,检查类型,错误信息,错误内容
+examples/01_simd_cpp_api/00_introduction/03_fusion_operation/README.md,14 ,link-validity-check,本地路径链接无法访问,./matrix_transpose/ 
+examples/01_simd_cpp_api/00_introduction/03_fusion_operation/README_en.md,14 ,link-validity-check,本地路径链接无法访问,./matrix_transpose/ 
+examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/README.md,12 ,link-validity-check,本地路径链接无法访问,./optimize_vf_continious_align 
+examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/README.md,13 ,link-validity-check,本地路径链接无法访问,./optimize_vf_dual_instr 
+examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/README.md,14 ,link-validity-check,本地路径链接无法访问,./optimize_vf_fusion 
+examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/README.md,15 ,link-validity-check,本地路径链接无法访问,./optimize_vf_loop 
+examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/README_en.md,13 ,link-validity-check,本地路径链接无法访问,./optimize_vf_continious_align 
+examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/README_en.md,14 ,link-validity-check,本地路径链接无法访问,./optimize_vf_dual_instr 
+examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/README_en.md,15 ,link-validity-check,本地路径链接无法访问,./optimize_vf_fusion 
+examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/README_en.md,16 ,link-validity-check,本地路径链接无法访问,./optimize_vf_loop 
+examples/01_simd_cpp_api/05_compatibility_guide/README.md,15 ,link-validity-check,本地路径链接无法访问,./matmul_s4_910B 
+examples/01_simd_cpp_api/05_compatibility_guide/README.md,16 ,link-validity-check,本地路径链接无法访问,./matmul_s4_950 
+examples/01_simd_cpp_api/05_compatibility_guide/README_en.md,16 ,link-validity-check,本地路径链接无法访问,./matmul_s4_910B 
+examples/01_simd_cpp_api/05_compatibility_guide/README_en.md,17 ,link-validity-check,本地路径链接无法访问,./matmul_s4_950 
