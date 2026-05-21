@@ -41,11 +41,13 @@ __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 } // namespace Reg
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_fused_intf_impl.h"
+#endif // __NPU_ARCH__
+
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_FUSED_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_FUSED_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_FUSED_INTF_H__
 #endif
-

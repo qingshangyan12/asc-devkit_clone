@@ -57,7 +57,7 @@ __aicore__ inline void DeepNormBasicBlockVbrcb(
 
     // add: 8 FP32 A (1 block) -> 64 FP32 A (8 blocks)
     Adds<float, false>(
-        dst, dst, 0, MASK_PLACEHOLDER, 1,
+        dst, dst, static_cast<float>(0), MASK_PLACEHOLDER, 1,
         {DEFAULT_BLK_STRIDE, addSrcBlkStride, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
     PipeBarrier<PIPE_V>();
 }
@@ -113,7 +113,7 @@ __aicore__ inline void DeepNormOutputBasicBlockByBrcb(
 
     // copy to expected output: tmpTensorC
     SetVectorMask<float, MaskMode::COUNTER>(0, tiling.bshCurLength);
-    Adds<float, false>(params.tempTensorC, params.tempTensorA, 0.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(params.tempTensorC, params.tempTensorA, static_cast<float>(0.0), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 }
 } // namespace DeepNormAPI
