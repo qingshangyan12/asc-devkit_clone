@@ -67,7 +67,7 @@ __aicore__ inline int32_t HcommFindBufferIdx(
         if (offset <= bufferSize && len <= bufferSize - offset) {
             KERNEL_LOG(KERNEL_INFO, "HcommFindBufferIdx hit idx=%u addr=%llu len=%llu base=%llu size=%llu ", i,
                 static_cast<unsigned long long>(targetAddr), static_cast<unsigned long long>(len),
-                static_cast<unsigned long long>(baseAddr), static_cast<unsigned long long>(bufferSize), );
+                static_cast<unsigned long long>(baseAddr), static_cast<unsigned long long>(bufferSize));
             return static_cast<int32_t>(i);
         }
     }
