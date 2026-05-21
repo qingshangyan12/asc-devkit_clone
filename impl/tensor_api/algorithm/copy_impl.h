@@ -49,13 +49,13 @@ __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor&
 }
 
 template <typename CopyOperationType>
-__aicore__ inline constexpr auto MakeCopy()
+__aicore__ inline constexpr auto MakeCopy(const CopyOperationType&)
 {
     return CopyAtom<CopyTraits<CopyOperationType>>{};
 }
 
 template <typename CopyOperationType, typename CopyTraitType>
-__aicore__ inline constexpr auto MakeCopy()
+__aicore__ inline constexpr auto MakeCopy(const CopyOperationType&, const CopyTraitType&)
 {
     return CopyAtom<CopyTraits<CopyOperationType, CopyTraitType>>{};
 }
