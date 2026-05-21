@@ -67,6 +67,32 @@
   - 输出dst0: [1 3 5 ... 511 513 515 ... 1023]
   - 输出dst1: [2 4 6 ... 512 514 516 ... 1024]
 
+## 样例规格
+
+<table border="2">
+<caption>表1：样例输入输出规格（场景1：Interleave）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Interleave</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="3" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">dst0</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td align="center">dst1</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">interleave_pair_custom</td></tr>
+</table>
+
+<table border="2">
+<caption>表2：样例输入输出规格（场景2：DeInterleave）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">DeInterleave</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">src0</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td align="center">src1</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="3" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">dst0</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td align="center">dst1</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">interleave_pair_custom</td></tr>
+</table>
+
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。

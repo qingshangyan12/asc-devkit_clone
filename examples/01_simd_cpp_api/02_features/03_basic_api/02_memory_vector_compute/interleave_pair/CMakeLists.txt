@@ -23,6 +23,10 @@ if(NOT SCENARIO_NUM MATCHES "^[1-2]$")
     message(FATAL_ERROR "SCENARIO_NUM must be 1 or 2, but got ${SCENARIO_NUM}")
 endif()
 
+if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
+    message(FATAL_ERROR "Interleave and DeInterleave are supported only on dav-3510 in this sample, but got ${CMAKE_ASC_ARCHITECTURES}")
+endif()
+
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
 
 add_executable(demo
