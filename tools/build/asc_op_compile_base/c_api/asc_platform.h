@@ -622,7 +622,7 @@ class CceConfBase {
       Ascend950DT_95A2, Ascend950DT_9591, Ascend950DT_9592, Ascend950DT_9595, Ascend950DT_9596, Ascend950DT_9581,
       Ascend950DT_9582, Ascend950DT_9583, Ascend950DT_9584, Ascend950DT_9585, Ascend950DT_9586, Ascend950DT_9587,
       Ascend950DT_9588, Ascend950DT_9571, Ascend950DT_9572, Ascend950DT_9573, Ascend950DT_9574, Ascend950DT_9575,
-      Ascend950DT_9576, Ascend950DT_9577, Ascend950DT_9578, MC32DM11AA, MC32DM11AB, MC32DM11AC,
+      Ascend950DT_9576, Ascend950DT_9577, Ascend950DT_9578, MC32DM11AA, MC32DM11AB, MC32DM11AC, Ascend350_354f,Ascend350_355e
     };
   enum platformconf::TIK_VERSION current_tik_version_ = platformconf::TIK_VERSION::TIK_1_0;
   const std::map<const std::string, platformconf::TIK_VERSION> kStringToTikVersion = {

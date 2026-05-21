@@ -178,8 +178,8 @@ const std::map<std::string, std::string> SOC_SUPPORT_MAP = {
     { "mc62cm12a", "SOC_VERSION_MC62CM12A" },
     { "ascend910_96", "SOC_VERSION_ASCEND910_96"},
     { "kirinx90", "SOC_VERSION_KIRINX90"},
-    { "kirin9030", "SOC_VERSION_KIRIN9030"}
-    { "ascend350", "SOC_VERSION_ASCEND350" },
+    { "kirin9030", "SOC_VERSION_KIRIN9030"},
+    { "ascend350", "SOC_VERSION_ASCEND350" }
 };
 
 const std::map<int, std::string> DTYPE_SUPPORT_MAP = {
