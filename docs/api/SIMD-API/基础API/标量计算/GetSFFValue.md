@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic\_api/kernel\_operator\_scalar\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_scalar_intf.h"`。
 
 查找uint64\_t类型数值的二进制表示中从最低有效位开始的首个指定比特值（0或1）的位置，如果没找到则返回-1。
 

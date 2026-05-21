@@ -29,19 +29,19 @@
 
 **int4b_t → half**
 
-- 支持CAST_NONE舍入模式，无精度损失
+- 支持CAST_NONE舍入模式，无精度损失。
 
 ---
 
 **uint8_t → half**
 
-- 支持CAST_NONE舍入模式，无精度损失
+- 支持CAST_NONE舍入模式，无精度损失。
 
 ---
 
 **int8_t → half**
 
-- 支持CAST_NONE舍入模式，无精度损失
+- 支持CAST_NONE舍入模式，无精度损失。
 
 ---
 
@@ -65,7 +65,7 @@
 
 **int16_t → float**
 
-- 支持CAST_NONE舍入模式，无精度损失
+- 支持CAST_NONE舍入模式，无精度损失。
 
 ---
 
@@ -137,7 +137,7 @@
 
 **half → float**
 
-- 支持CAST_NONE舍入模式，无精度损失
+- 支持CAST_NONE舍入模式，无精度损失。
 
 ---
 
@@ -156,13 +156,13 @@
 
 **bfloat16_t → float**
 
-- 支持CAST_NONE舍入模式，无精度损失
+- 支持CAST_NONE舍入模式，无精度损失。
 
 ---
 
 **int32_t → int16_t**
 
-- 支持CAST_NONE舍入模式，无精度损失
+- 支持CAST_NONE舍入模式，无精度损失。
 
 ---
 
@@ -193,7 +193,7 @@
 
 **int32_t → int64_t**
 
-- 支持CAST_NONE舍入模式，无精度损失
+- 支持CAST_NONE舍入模式，无精度损失。
 
 ---
 
@@ -288,7 +288,7 @@
 
 **int64_t → int32_t**
 
-- 支持CAST_NONE舍入模式，无精度损失
+- 支持CAST_NONE舍入模式，无精度损失。
 
 ---
 

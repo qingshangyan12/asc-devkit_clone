@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic\_api/kernel\_operator\_scalar\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_scalar_intf.h"`。
 
 统计int64\_t类型数值的二进制表示中，从最高数值位开始与符号位相同的连续比特位的个数。
 
