@@ -137,13 +137,30 @@ make -j
 
 参考`basic_scatter`样例，将样例改造成SIMD&SIMT混合编程。该任务的重点不是改变Scatter算法，而是理解SIMT编程和SIMD&SIMT混合编程的差异。
 
-建议先复制`basic_scatter`作为起点，再在新目录中进行SIMD&SIMT混合编程改造，避免直接修改原始样例。
+`experiment/simt_experiment/scatter_2_fusion_experiment`已经修改了大部分内容，可复制这个样例模板，再在新目录中进行SIMD&SIMT混合编程改造，避免直接修改原始样例。
 
 ```bash
-mkdir -p experiment/simt_experiment
-cp -r demo/simt/basic_scatter experiment/simt_experiment/mixed_scatter_<姓名拼音>
-cd experiment/simt_experiment/mixed_scatter_<姓名拼音>
+cp -r experiment/simt_experiment/scatter_2_fusion_experiment experiment/simt_experiment/fusion_scatter_<姓名拼音>
+cd experiment/simt_experiment/fusion_scatter_<姓名拼音>
 ```
+
+### 任务修改点
+
+- 修改`asc_vf_call`调用SIMT_VF函数的第一个参数(配置启动先线程数)：
+```
+{
+    asc_vf_call<scatter_simt_vf>(//TODO, output, input, index, input_length, output_length);
+}
+```
+提示： 这里的入参配置为dim3(MAX_THREAD_COUNT)
+
+- 修改`<<<>>>`调用入参，配置启动的核数
+```
+scatter_custom<<< // TODO >>>(output_device, input_device, index_device, input_length, output_length);
+```
+提示： 混合编程下，<<<>>>与SIMD编程一致， 入参分别为 numBlocks, dyn_ubuf_size, stream
+
+### 更多信息
 
 当前`basic_scatter`使用的是SIMT编程：
 
@@ -158,7 +175,7 @@ SIMD&SIMT混合编程中，SIMT逻辑通常拆为两层：
 - `__simt_vf__`函数：承载SIMT线程级计算逻辑。
 - `__global__ __vector__` SIMD&SIMT混合编程入口函数：作为Device侧入口，通过`asc_vf_call`调用SIMT VF。
 
-### 改造思路
+### 整体改造思路
 
 1. 保留Host侧ACL流程、输入输出数据构造和结果校验。
 2. 将原`scatter_custom`中的线程级计算逻辑移动到SIMT VF函数中。
