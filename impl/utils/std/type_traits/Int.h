@@ -12,8 +12,8 @@
  * \file Int.h
  * \brief
  */
-#ifndef IMPL_STD_ASCENDC_STD_INT_IMPL__H
-#define IMPL_STD_ASCENDC_STD_INT_IMPL__H
+#ifndef IMPL_STD_ASCENDC_STD_INT_IMPL_H
+#define IMPL_STD_ASCENDC_STD_INT_IMPL_H
 #include "integral_constant.h"
 #include "enable_if.h"
 #include "is_const.h"
