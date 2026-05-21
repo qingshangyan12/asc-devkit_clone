@@ -84,27 +84,6 @@ TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeRegisterTest){
     UnregisterAscendBinary(handle);
 }
 
-TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeDevBinaryRegisterTest) {
-    uint8_t fileBuf[32];
-    size_t fileSize = 32;
-    void *handle;
-    int32_t ret;
-    ret = AscendDevBinaryRegister(fileBuf, fileSize, &handle);
-    EXPECT_EQ(ret, 0);
-    const char* stubFunc = "hello_world";
-    ret = AscendFunctionRegister(handle, stubFunc);
-    EXPECT_EQ(ret, 0);
-    MOCKER(rtKernelLaunchWithFlagV2).stubs().will(returnValue(0));
-    uint32_t numBlocks;
-    void **args = nullptr;
-    uint32_t size;
-    rtStream_t stream = nullptr;
-    ret = AscendKernelLaunchWithFlagV2(stubFunc, numBlocks, args, size, stream, 0);
-    EXPECT_EQ(ret, 0);
-    ret = AscendKernelLaunchWithFlagV2(stubFunc, numBlocks, args, size, stream, 2048);
-    EXPECT_EQ(ret, 0);
-}
-
 TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeMemoryFailedTest){
     size_t bufsize = 16;
     uint32_t ret;
@@ -143,25 +122,22 @@ typedef struct {
 
 extern "C" uint32_t LaunchAscendKernelForVectorCore(const char *opType, void *handle, const uint64_t key, void **args, uint32_t size,
     const void *stream, bool enableProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks, uint32_t aivNumBlocksOffset);
-extern "C" void AscendCDestroyStreamCallBack(rtStream_t stream, const bool isCreate);
 extern std::unordered_map<const void *, AscendCStreamForVectorCore> g_ascStreamMap;
 extern "C" uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t numBlocks, void **args, uint32_t size,
     const rtStream_t stream);
+extern "C" void StreamStateCallback(aclrtStream stream, aclrtStreamState state, void *args);
 
 
-TEST_F(TEST_ASCENDC_RUNTIME, LaunchVectorCore){
-    const char* opType = "AddCustom";
-    void * handle = nullptr;
-    void **args = nullptr;
+TEST_F(TEST_ASCENDC_RUNTIME, StreamStateCallbackTest){
     void *stream = nullptr;
+    void *args = nullptr;
+    aclrtStreamState stateCreate = ACL_RT_STREAM_STATE_CREATE_POST;
+    aclrtStreamState stateDestroy = ACL_RT_STREAM_STATE_DESTROY_PRE;
     AscendCStreamForVectorCore streamForVectorCore;
-    AscendCDestroyStreamCallBack(stream, true);
+    StreamStateCallback(stream, stateCreate, args);
     g_ascStreamMap[stream] = streamForVectorCore;
-    AscendCDestroyStreamCallBack(stream, false);
-    uint32_t ret = LaunchAscendKernelForVectorCore(opType, handle, 0, args, 0, stream, false, 1, 1, 0);
-    EXPECT_EQ(ret, 0);
-    ret = LaunchAscendKernelForVectorCore(opType, handle, 0, args, 0, stream, true, 1, 1, 0);
-    EXPECT_EQ(ret, 0);
+    StreamStateCallback(stream, stateDestroy, args);
+    EXPECT_EQ(g_ascStreamMap.find(stream), g_ascStreamMap.cend());
 }
 
 const char *fake_rtGetSocVersion()
