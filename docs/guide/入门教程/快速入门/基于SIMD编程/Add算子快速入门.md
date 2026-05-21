@@ -118,7 +118,7 @@
       int32_t main(int argc, char const *argv[])
       {
           ...
-          constexpr uint32_t numBlocks = 8;
+          constexpr uint32_t num_blocks = 8;
           ...
           
           // Allocate host and device memory, and copy input data from host to device
@@ -135,7 +135,7 @@
           // nullptr : Runtime stream. Uses default stream in this example.
 
           // Example One：Call add kernel which is implemented by SIMD C API
-          add_custom<<<numBlocks, 0>>>(xDevice, yDevice, zDevice);
+          add_custom<<<num_blocks, 0>>>(xDevice, yDevice, zDevice);
 
           // Example Two：Call add kernel which is implemented by SIMD C++ Basic API
           // add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
