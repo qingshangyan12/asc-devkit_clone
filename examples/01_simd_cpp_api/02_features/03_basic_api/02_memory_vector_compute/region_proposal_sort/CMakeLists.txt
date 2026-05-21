@@ -17,6 +17,10 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2002")
+    message(FATAL_ERROR "Region Proposal sort APIs in this sample are supported only on dav-2002, but got ${CMAKE_ASC_ARCHITECTURES}")
+endif()
+
 add_executable(demo
     region_proposal_sort.asc
 )
