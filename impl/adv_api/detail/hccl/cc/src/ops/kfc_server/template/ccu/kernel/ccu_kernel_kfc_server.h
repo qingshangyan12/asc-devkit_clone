@@ -20,12 +20,9 @@
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
 #include "../ccu_temp_kfc_server.h"
+#include "types/mc2_type.h"
 
 namespace ops_hccl {
-
-using namespace hcomm;
-
-constexpr uint32_t CCU_PARAM_NUM_PER_DIE = 32;
 
 class CcuKernelArgKfcServer : public hcomm::CcuKernelArg {
 public:
@@ -54,54 +51,82 @@ public:
 
 class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {
 public:
-    explicit CcuTaskArgKfcServer(uint64_t inputAddr, uint64_t outputAddr) :
-        inputAddr_(inputAddr), outputAddr_(outputAddr)
-    {
-        HCCL_DEBUG("[CcuTaskArgKfcServer] inputAddr: %lu, outputAddr: %lu", inputAddr_, outputAddr_);
-    }
+    explicit CcuTaskArgKfcServer(uint64_t waitAddr, uint64_t recordAddr, uint64_t paramAddr, uint32_t dieNum,
+                                 CcuRep::MaskSignal exportDieSig, CcuRep::MaskSignal importDieSig, uint32_t missionNum, uint32_t missionIndex,
+                                 std::vector<CcuRep::MaskSignal> exportMissoinSig, std::vector<CcuRep::MaskSignal> importMissionSig,
+                                 std::vector<CcuRep::Variable> exportMissionVar, std::vector<CcuRep::Variable> importMissionVar):
+                                 waitAddr_(waitAddr), recordAddr_(recordAddr), paramAddr_(paramAddr), dieNum_(dieNum),
+                                 exportDieSig_(exportDieSig), importDieSig_(importDieSig), missionNum_(missionNum), missionIndex_(missionIndex),
+                                 exportMissoinSig_(exportMissoinSig), importMissionSig_(importMissionSig),
+                                 exportMissionVar_(exportMissionVar), importMissionVar_(importMissionVar)
 
-    uint64_t inputAddr_;
-    uint64_t outputAddr_;
+    {
+        HCCL_DEBUG("[CcuTaskArgKfcServer] waitAddr: %lu, recordAddr: %lu, paramAddr: %lu, dieNum: %lu, "
+                   "missionNum: %lu, missionIndex: %lu",
+                   waitAddr_, recordAddr_, paramAddr_, dieNum_, missionNum_, missionIndex_);
+    }
+    // HBM上的每轮开始信号的首地址
+    uint64_t waitAddr_{0};
+    // HBM上的每轮完成信号的首地址
+    uint64_t recordAddr_{0};
+    // HBM上的算子执行参数首地址
+    uint64_t paramAddr_{0};
+    // Die数量，用于判断单双Die，默认为1即单Die
+    uint32_t dieNum_{1};
+    // 用于Die间同步信号
+    CcuRep::MaskSignal exportDieSig_;
+    CcuRep::MaskSignal importDieSig_;
+
+    uint32_t missionNum_{1};
+    uint32_t missionIndex_{0};
+    // 用于Mission间同步信号
+    std::vector<CcuRep::MaskSignal> exportMissoinSig_{};
+    std::vector<CcuRep::MaskSignal> importMissionSig_{};
+    // 用于Mission间同步变量
+    std::vector<CcuRep::Variable> exportMissionVar_{};
+    std::vector<CcuRep::Variable> importMissionVar_{};
 };
 
 class CcuKernelKfcServer : public CcuKernelAlgBase {
 public:
-    CcuKernelKfcServer(const hcomm::CcuKernelArg &arg);
+    CcuKernelKfcServer(const CcuKfcKernelStruct &arg), kfcServerArgs(arg); // 待定
     ~CcuKernelKfcServer() override {}
 
     HcclResult Algorithm() override;
     std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
 
 private:
-    void GenOpSelector();
-    void GenCircularQueue();
-    void WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::Variable &turnStartSig);
-    void SetTurnEndSig(const CcuRep::Variable &hbmSigAddr, const CcuRep::Variable &turnEndSig);
-    void LoadFuncParamFromMemory(CcuRep::Variable &paramAddr, std::array<CcuRep::Variable, CCU_PARAM_NUM_PER_DIE> &param);
+    virtual void GenCircularQueue() = 0;
     void MissionPreSync(CcuRep::Variable &func);
     void MissionPostSync();
 
-    uint64_t rankSize_{0};
-    uint32_t rankId_{0};
-    std::vector<ChannelHandle> channels_;
-    bool loadFromMem_ = false;
-
-    uint64_t waitAddr_{0};
-    uint64_t recordAddr_{0};
-    uint64_t paramAddr_{0};
-    uint32_t dieNum_{1};
-    uint32_t missionNum{1};
-    uint32_t missionIndex{0};
-
-    CcuRep::MaskSignal exportDieSig;
-    CcuRep::MaskSignal importDieSig;
-    std::vector<CcuRep::MaskSignal> exportMissoinSig;
-    std::vector<CcuRep::MaskSignal> importMissionSig;
-    std::vector<CcuRep::Variable> exportMissionVar;
-    std::vector<CcuRep::Variable> importMissionVar;
-    std::map<uint64_t, uint32_t> algoTemplateInfo_;
+    CcuKfcKernelStruct kfcServerArgs;
 
     HcclResult InitResource();
+};
+
+class Mc2KfcServer : public CcuKernelKfcServer {
+public:
+    Mc2KfcServer() = default;
+    ~Mc2KfcServer() override {}
+
+protected:
+    void GenCircularQueue() override;
+
+private:
+    void WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::Variable &turnStartSig);
+    void SetTurnEndSig(const CcuRep::Variable &hbmSigAddr, const CcuRep::Variable &turnEndSig);
+    void LoadFuncParamFromMemory(CcuRep::Variable &paramAddr, std::array<CcuRep::Variable, CCU_PARAM_NUM_PER_DIE> &param);
+};
+
+class Mc2SlaveKfcServer : public CcuKernelKfcServer {
+public:
+    Mc2SlaveKfcServer() = default;
+    ~Mc2SlaveKfcServer() override {}
+
+protected:
+    void GenCircularQueue() override;
+
 };
 
 }
