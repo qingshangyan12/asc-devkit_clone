@@ -12,10 +12,29 @@
 
   计算逻辑为逐元素完成`z = x + y`。
 
-- **Device端代码实现**：
+- **算子设计**
+    - **Device端算子Kernel编程接口**
+        - 核函数定义：通过 [\_\_global\_\_](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)修饰符声明。
+        - 数据分块（Tiling）：使用内置关键字 [block_idx](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md) 确定每个 Block 负责处理的数据。
+        - 数据加载：通过[C API接口](../../../编程指南/语言扩展层/SIMD语言扩展层C-API.md) `asc_copy_gm2ub` 或[C++接口](../../../编程指南/类库API/编程接口概述.md) `AscendC::DataCopy` 完成。
+        - 数据计算：通过C API接口 `asc_add` 或C++接口 `AscendC::Add` 完成。
+        - 数据写回：通过C API接口 `asc_copy_ub2gm` 或C++接口 `AscendC::DataCopy` 完成。
+    - **Host端编程接口**
+        - 内存分配：使用 `aclrtMallocHost` 分配Host Memory，`aclrtMalloc` 分配Device Memory。
+        - 数据搬运：使用 `aclrtMemcpy` 将输入数据从 Host Memory拷贝到Device Memory。
+        - 任务启动：通过 `<<<...>>>` 语法糖启动核函数。
+        - 同步等待：调用 `aclrtSynchronizeStream` 或 `aclrtSynchronizeDevice` 等待任务完成。
+        - 结果回传：使用 `aclrtMemcpy` 将计算结果从 Device Memory拷贝回 Host Memory。
 
-  后缀名为`*.asc`的代码文件可同时包含Host端与Device端代码，Device端部分示例如下：
-  - **基于C语言API实现Memory矢量计算示例**
+
+
+- **算子代码实现**：
+
+  后缀名为`*.asc`的代码文件包含Host端与Device端代码。
+
+  - **Device端Kernel实现**：
+  Device端部分示例如下：
+    - **基于C语言API实现Memory矢量计算示例**
       ```cpp
       __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
       {
@@ -48,7 +67,7 @@
       >     - Atlas A2训练系列产品/Atlas A2推理系列产品
       > - SIMD算子的Kernel函数需要额外修饰符，[`__vector__`](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)修饰符表明该算子仅在向量计算单元上执行。
 
-  - **基于C++ Tensor实现Memory矢量计算示例**
+    - **基于C++ Tensor实现Memory矢量计算示例**
 
       ```cpp
       template <uint32_t blockLength>
@@ -84,30 +103,30 @@
       >     - Atlas A2训练系列产品/Atlas A2推理系列产品
       > - SIMD算子的Kernel函数需要额外修饰符，[`__vector__`](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)修饰符表明该算子仅在向量计算单元上执行。
 
-- **Host端代码实现**：
+  - **Host端代码实现**：
 
-  Host端通过`<<<>>>`语法糖调用Device端核函数，示例代码如下：
-  ```cpp
-    int32_t main(int argc, char const *argv[])
-    {
-        ...
-        constexpr uint32_t numBlocks = 8;
-        ...
-        // Launch kernel <<<NumBlocks, Dynamic memory, Stream>>>
-        // numBlocks : Number of Blocks
-        // 0 : No dynamic memory required in this sample
-        // nullptr : Use default stream
+    Host端通过`<<<>>>`语法糖调用Device端核函数，示例代码如下：
+    ```cpp
+      int32_t main(int argc, char const *argv[])
+      {
+          ...
+          constexpr uint32_t numBlocks = 8;
+          ...
+          // Launch kernel <<<numBlocks, dynUBufSize, stream>>>
+          // numBlocks : Number of blocks. Default to 8 in this example.
+          // dynUBufSize : Dynamic unified buffer size. Default to 0 in this example.
+          // nullptr : Runtime stream. Uses default stream in this example.
 
-        // Example One：Call add kernel which is implemented by SIMD C API
-        add_custom<<<numBlocks, 0>>>(xDevice, yDevice, zDevice);
+          // Example One：Call add kernel which is implemented by SIMD C API
+          add_custom<<<numBlocks, 0>>>(xDevice, yDevice, zDevice);
 
-        // Example Two：Call add kernel which is implemented by SIMD C++ Basic API
-        // add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
+          // Example Two：Call add kernel which is implemented by SIMD C++ Basic API
+          // add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
 
-        aclrtSynchronizeDevice();
-        ...
-    }
-  ```
+          aclrtSynchronizeDevice();
+          ...
+      }
+    ```
 
 - **算子编译与运行**：
 

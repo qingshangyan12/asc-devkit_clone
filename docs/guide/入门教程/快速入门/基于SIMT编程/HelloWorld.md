@@ -4,11 +4,11 @@
 
 开始前请参考[环境准备](../../环境准备.md)安装所需的CANN软件包，完整样例请参考[hello\_world](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt/README.md)。
 
- - **Hello World功能介绍**：
+- **Hello World功能介绍**：
  
     在NPU上打印`Hello World!`。
 
- - **Device 端代码实现**：
+- **Device端Kernel实现**：
 
     后缀名为`*.asc`的代码文件包含Host端与Device端代码，其Device端部分示例如下：
     ```cpp
@@ -20,7 +20,7 @@
     }
     ```
 
- - **Host 端代码实现**：
+- **Host端代码实现**：
 
     Host端通过<<<>>>语法糖调用Device端代码。
     ```cpp
@@ -32,14 +32,14 @@
         constexpr uint32_t thread_num    = 32;  // Number of threads per block (Block size)
         constexpr uint32_t dyn_ubuf_size = 0;   // No dynamic memory required in this sample
 
-        // 5. Launch kernel <<<Grid, Block, Dynamic memory, Stream>>>
+        // 5. Launch kernel <<<grid_dim, block_dim, dynamic_memory_size, stream>>>
         hello_world<<<block_num, thread_num, dyn_ubuf_size, stream>>>();
         // Wait for kernel execution to complete
         ...
     }
     ```
 
- - **算子编译与运行**：
+- **算子编译与运行**：
     ```bash
     bisheng hello_world.asc --npu-arch=dav-3510 -o demo --enable-simt 
     ./demo
