@@ -35,7 +35,7 @@ __aicore__ inline void SetAtomicMin()
 
 ## 数据类型
 
-支持的数据类型为int8_t/int16_t/half/bfloat16_t/int32_t/float。
+支持的数据类型为int8_t、int16_t、half、bfloat16_t、int32_t、float。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
