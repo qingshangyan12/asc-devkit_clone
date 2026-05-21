@@ -118,6 +118,8 @@ __aicore__ inline void HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PollCqWhe
     constexpr uint32_t NUM_CQE_PER_POLL_CQ = 100;
     if ((sqHead + POLL_CQ_THRESHOLD) % baseBlockCount == sqTail % baseBlockCount) {
         uint32_t idx = (sqTail + NUM_CQE_PER_POLL_CQ) > sqHead ? sqHead : sqTail + NUM_CQE_PER_POLL_CQ;
+        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA SQ overflow sqHead=%u sqTail=%u idx=%u baseBlockCount=%u", sqHead,
+            sqTail, idx, baseBlockCount);
         (void)PollCq(channel, idx);
     }
 }
@@ -146,6 +148,8 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Po
     sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
     Gm2Ub(sqPI_, sqPIGlobal, 1);
     uint32_t sqHead = sqPI_.GetValue(0);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA PostSend resolved remoteIdx=%d localIdx=%d sqHead=%u sqDepth=%u", remoteIdx,
+        localIdx, sqHead, sqCtx.contextInfo.ubJfs.sqDepth);
 
     // poll cq if send queue is full
     PollCqWhenSqOverflow(channel, sqCtx, sqHead);
@@ -181,6 +185,8 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Po
     sqHead += wqeBbCnt;
     sqPI_.SetValue(0, sqHead);
     Ub2Gm<uint32_t>(sqPIGlobal, sqPI_, 1);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA PostSend finish handleId=%d newSqHead=%u wqeBbCnt=%u", handleId, sqHead,
+        wqeBbCnt);
     if constexpr (commit) {
         Commit(handleId);
     }
@@ -204,6 +210,7 @@ __aicore__ inline uint32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PollC
     uint32_t cqeSize = cqCtx.contextInfo.ubJfc.cqeSize;
     uint32_t cqDepth = cqCtx.contextInfo.ubJfc.cqDepth;
     __ubuf__ HcommUrmaJfcCqeCtx* cqeUb = (__ubuf__ HcommUrmaJfcCqeCtx*)cqeItem_.GetPhyAddr();
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA PollCq enter expectIdx=%u curTail=%u cqDepth=%u", expectIdx, curTail, cqDepth);
 #if defined(UT_TEST)
     curTail = expectIdx;
 #else
@@ -251,6 +258,7 @@ __aicore__ inline uint32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PollC
     sqCIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.tailAddr);
     sqCI_.SetValue(0, curTail);
     Ub2Gm<uint32_t>(sqCIGlobal, sqCI_, 1);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA PollCq finish expectIdx=%u curTail=%u", expectIdx, curTail);
     return HCOMM_SUCCESS;
 }
 
@@ -322,6 +330,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Commit
     sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
     Gm2Ub(sqPI_, sqPIGlobal, 1);
     uint32_t sqHead = sqPI_.GetValue(0);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Commit enter handleId=%d sqHead=%u", handleId, sqHead);
 
     AscendC::GlobalTensor<uint32_t> dbGlobal;
     dbGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.dbVa);
@@ -340,6 +349,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Commit
             }
         }
     }
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Commit finish handleId=%d sqHead=%u", handleId, sqHead);
     return HCOMM_SUCCESS;
 }
 
@@ -357,8 +367,10 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Wait(H
     sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
     Gm2Ub(sqPI_, sqPIGlobal, 1);
     uint32_t sqHead = sqPI_.GetValue(0);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Wait enter handleId=%d sqHead=%u", handleId, sqHead);
     uint32_t ret = PollCq(channel, sqHead);
     if (ret != HCOMM_SUCCESS) {
+        KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA Wait failed handleId=%d pollRet=%u", handleId, ret);
         return HCOMM_FAILED;
     }
     for (HcommHandle i = handleId; i >= 0; i--) {
@@ -370,6 +382,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Wait(H
             }
         }
     }
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Wait finish handleId=%d sqHead=%u", handleId, sqHead);
     return HCOMM_SUCCESS;
 }
 

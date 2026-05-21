@@ -53,6 +53,7 @@ __aicore__ inline int32_t HcommFindBufferIdx(
     __gm__ RegedBufferEntity* bufferAddr, uint32_t bufferNum, GM_ADDR addr, uint64_t len)
 {
     if (bufferAddr == nullptr) {
+        KERNEL_LOG(KERNEL_ERROR, "HcommFindBufferIdx failed with null bufferAddr, bufferNum=%u", bufferNum);
         return HCOMM_INVALID_HANDLE_ID;
     }
     uint64_t targetAddr = reinterpret_cast<uint64_t>(addr);
@@ -64,9 +65,14 @@ __aicore__ inline int32_t HcommFindBufferIdx(
         }
         uint64_t offset = targetAddr - baseAddr;
         if (offset <= bufferSize && len <= bufferSize - offset) {
+            KERNEL_LOG(KERNEL_INFO, "HcommFindBufferIdx hit idx=%u addr=%llu len=%llu base=%llu size=%llu ", i,
+                static_cast<unsigned long long>(targetAddr), static_cast<unsigned long long>(len),
+                static_cast<unsigned long long>(baseAddr), static_cast<unsigned long long>(bufferSize), );
             return static_cast<int32_t>(i);
         }
     }
+    KERNEL_LOG(KERNEL_ERROR, "HcommFindBufferIdx failed addr=%llu len=%llu bufferNum=%u",
+        static_cast<unsigned long long>(targetAddr), static_cast<unsigned long long>(len), bufferNum);
     return HCOMM_INVALID_HANDLE_ID;
 }
 
