@@ -122,7 +122,6 @@ __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr(){
     return (__ssbuf__ void*)0;
 #endif
 }
-#endif
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)
