@@ -341,18 +341,6 @@ description: |
 详细请参考[GmByPassDCache类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/09_scalar_computation/gm_by_pass_dcache)。
 
 ### 19. 列表规范
-- [ ] 列表前后、以及列表每一项之间需要换行,整改示例：
-反例：
-ReadGmByPassDCache接口的功能是：不经过DCache从GM地址上读数据。使用场景：
-- 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
-- 不经过DCache直接读写GM数据，不会导致多核间数据不一致的问题。
-
-正例：
-ReadGmByPassDCache接口的功能是：不经过DCache从GM地址上读数据。使用场景：
-
-- 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
-
-- 不经过DCache直接读写GM数据，不会导致多核间数据不一致的问题。
 - [ ] 列表前缀符号后面请保留一个空格
 反例：有3个空格
 -   累加操作完成后，建议通过[DisableDmaAtomic](DisableDmaAtomic.md)关闭原子累加，以免影响后续相关指令功能。
