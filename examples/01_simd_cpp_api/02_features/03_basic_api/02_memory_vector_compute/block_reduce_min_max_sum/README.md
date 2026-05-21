@@ -41,13 +41,14 @@
 **场景3：BlockReduceSum<float>**
 - 输入：[1, 128]个float元素，mask=64（256/sizeof(float)），repeat=2
 - 输出：[1, 16]个float元素（对应16个datablock各自的求和结果）
-- 实现：`BlockReduceSum<float>(dstLocal, srcLocal, repeat=2, mask=8, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
+- 实现：`BlockReduceSum<float>(dstLocal, srcLocal, repeat=2, mask=64, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
 - 说明：对每个datablock内所有元素求和，源操作数相加采用二叉树方式两两相加，一个datablock处理32字节即8个float元素，128个元素共16个datablock，输出16个求和结果
 
 ## 样例规格
 
 <table border="2">
 <caption>表1：样例输入输出规格（场景1：BlockReduceMax）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">BlockReduceMax</td></tr>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -57,6 +58,7 @@
 
 <table border="2">
 <caption>表2：样例输入输出规格（场景2：BlockReduceMin）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">BlockReduceMin</td></tr>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[4, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -66,6 +68,7 @@
 
 <table border="2">
 <caption>表3：样例输入输出规格（场景3：BlockReduceSum）</caption>
+<tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">BlockReduceSum</td></tr>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -76,7 +79,7 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
 
@@ -95,7 +98,7 @@
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
-    
+
 - 样例执行
 
   ```bash
@@ -108,8 +111,8 @@
   ```
 
   使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
-  
-  示例如：
+
+  示例如下：
 
   ```bash
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
