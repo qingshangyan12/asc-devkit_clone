@@ -81,22 +81,22 @@ struct Layout : private Std::tuple<T, U>
 
 | 参数名 | 描述 |
 |--------|------|
-| `ShapeType` | `Std::tuple` 结构类型，用于定义数据的逻辑形状，例如二维矩阵的行数和列数或多维张量的各维度大小。 |
-| `StrideType` | `Std::tuple` 结构类型，用于定义各维度在内存中的步长，即同维度相邻元素在内存中的间隔（单位为元素），与 Shape 的维度信息一一对应。 |
-| `Info` | 可选模板参数，默认为 `Std::ignore_t`。当 Layout 由 `MakeFrameLayout` 或 `MakePatternLayout` 构造时，该参数携带布局模式（`LayoutPattern`）和布局特征（`LayoutTrait`），如 ND / NZ / ZN / DN / ZNZ 排布模式及数据类型。通过 `GetLayoutPattern` 和 `GetLayoutTrait` 可在编译期提取 Info 中的类型信息。 |
+| ShapeType | Std::tuple结构类型，用于定义数据的逻辑形状，例如二维矩阵的行数和列数或多维张量的各维度大小。 |
+| StrideType | Std::tuple结构类型，用于定义各维度在内存中的步长，即同维度相邻元素在内存中的间隔（单位为元素），与 Shape 的维度信息一一对应。 |
+| Info | 可选模板参数，默认为Std::ignore_t。当 Layout 由MakeFrameLayout或MakePatternLayout构造时，该参数携带布局模式（LayoutPattern）和布局特征（LayoutTrait），如 ND / NZ / ZN / DN / ZNZ 排布模式及数据类型。通过GetLayoutPattern 和 GetLayoutTrait 可在编译期提取 Info 中的类型信息。 |
 
 ## 成员函数
 
 | 成员函数 | 描述 |
 |----------|------|
-| `Layout(const T& shape, const U& stride)` | 构造函数。用给定的 shape（形状）和 stride（步长）初始化 Layout 对象。shape 和 stride 必须为 `Std::tuple` 类型。 |
-| `template<size_t... I> Capacity() const` | 计算该布局所需的最小容器容量。逐维度取 `shape[i] × stride[i]` 的最大值。传入模板参数 `I...` 可先选出子维度再计算。 |
-| `layout()` | 返回 Layout 自身的引用（const / non-const 两个重载），用于统一接口中获取布局实例。 |
-| `template<size_t... I> Shape()` | 提取 Layout 中 shape 部分的全部或指定维度（const / non-const 两个重载）。不指定模板参数 `I` 时返回完整 shape；传入 `I...` 时提取指定子维度。 |
-| `template<size_t... I> Stride()` | 提取 Layout 中 stride 部分的全部或指定维度（const / non-const 两个重载）。用法与 `Shape()` 类似。 |
-| `template<typename S> operator()(const S& coord) const` | 坐标到索引的映射运算符。传入多维逻辑坐标 `coord`，内部调用 `Crd2Idx` 返回该坐标在内存中的一维线性索引。 |
-| `template<size_t... I> Rank() const` | 查询 Layout 的秩（维度数）。不指定模板参数 `I` 时返回顶层 tuple 的元素个数；传入 `I...` 时返回指定子维度的秩。 |
-| `template<size_t... I> Size() const` | 查询 Layout 覆盖的元素总数。计算指定维度下 shape 各分量的乘积。不指定 `I` 时返回整张量元素总数。 |
-| `template<size_t... I> Get()` | 从底层 `Std::tuple<T, U>` 中提取指定位置元素的引用（const / non-const 两个重载）。位置 0 对应 shape，位置 1 对应 stride。配合 `I...` 可进一步提取子 tuple 中的元素。 |
-| `static constexpr auto depth` | shape 类型的嵌套深度（`NestingDepthV<T>`），用于编译期判断 Layout 是否为二维以上的嵌套结构。 |
-| `static constexpr auto rank` | shape 类型的顶层维度数（`Std::tuple_size_v<T>`）。 |
+| Layout(const T& shape, const U& stride) | 构造函数。用给定的 shape（形状）和 stride（步长）初始化 Layout 对象。shape 和 stride 必须为 `Std::tuple` 类型。 |
+| template<size_t... I> Capacity()| 计算该布局所占的内存大小。传入模板参数 `I...` 可先选出子维度再计算。 |
+| layout() | 返回 Layout 自身的引用，用于统一接口中获取布局实例。 |
+| template<size_t... I> Shape() | 提取 Layout 中 shape 部分的全部或指定维度。不指定模板参数 `I` 时返回完整 shape；传入 `I...` 时提取指定子维度。 |
+| template<size_t... I> Stride() | 提取 Layout 中 stride 部分的全部或指定维度。用法与 Shape() 类似。 |
+| template<typename S> operator()(const S& coord) const | 坐标到索引的映射运算符。传入多维逻辑坐标 `coord`，内部调用 Crd2Idx返回该坐标在内存中的一维线性索引。 |
+| template<size_t... I> Rank() const | 查询 Layout 的秩（维度数）。不指定模板参数 `I` 时返回完整Layout的Shape中tuple的元素个数；传入I...时返回指定子维度的秩。 |
+| template<size_t... I> Size() const | 查询 Layout 覆盖的元素总数。计算指定维度下 shape 各分量的乘积。不指定 `I` 时返回整张量元素总数。 |
+| template<size_t... I> Get() | 从Layout中提取Shape或Stride中指定位置元素的引用。位置 0 对应 shape，位置 1 对应 stride。配合 `I...` 可进一步提取子 tuple 中的元素。 |
+| depth | shape 类型的嵌套深度，用于编译期判断 Layout 是否为二维以上的嵌套结构。 |
+| rank | 完整Layout的秩。 |
