@@ -59,9 +59,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic_api/kernel_operator_vec_binary_scalar_intf.h"
+头文件引用路径为："basic_api/kernel_operator_vec_binary_intf.h"
 
-And属于双目标量类计算接口，对元素做按位与运算。计算公式如下：
+对元素做按位与运算。计算公式如下：
 
 $dst_i = src0_i \& src1_i$
 
@@ -186,6 +186,7 @@ $dst_i = src0_i \& src1_i$
 <cann-filter npu-type="950">
 - 针对Ascend 950PR/Ascend 950DT，uint8\_t/int8\_t/uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
 </cann-filter>
+<cann-filter npu-type="A3,910b,910,310p,310b">
 - 特别地，针对uint32\_t/int32\_t类型的And操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16\_t/int16\_t后再调用And进行计算。直接传入uint32\_t/int32\_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
     <cann-filter npu-type="A3,910b">
     - 整个tensor参与计算和tensor前n个数据计算接口支持传入uint32\_t/int32\_t类型，但是tensor前n个数据计算的count需要设置为期望计算个数的2倍才能精度符合预期；tensor高维切分计算接口直接编译报错提示不支持该数据类型。上述说明适用于：Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品。
@@ -196,6 +197,7 @@ $dst_i = src0_i \& src1_i$
     <cann-filter npu-type="310b">
     - CPU报错提示不支持该数据类型。上述说明适用于：Atlas 200I/500 A2 推理产品。
     </cann-filter>
+</cann-filter>
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

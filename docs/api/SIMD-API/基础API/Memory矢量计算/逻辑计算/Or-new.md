@@ -59,9 +59,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic_api/kernel_operator_vec_binary_scalar_intf.h"
+头文件引用路径为："basic_api/kernel_operator_vec_binary_intf.h"
 
-Or属于双目标量类计算接口，每对元素做按位或运算，计算公式如下：
+每对元素做按位或运算，计算公式如下：
 
 $dst_i = src0_i | src1_i$
 
@@ -115,7 +115,7 @@ $dst_i = src0_i | src1_i$
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](高维切分.md#ZH-CN_TOPIC_0000002556644319)。 |
 | repeatParams | 输入 | 控制操作数地址步长的参数。[BinaryRepeatParams](BinaryRepeatParams.md#ZH-CN_TOPIC_0000002556764281)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](高维切分.md#zh-cn_topic_0000002516372540_li072713185916)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](高维切分.md#zh-cn_topic_0000002516372540_zh-cn_topic_0000002267504656_zh-cn_topic_0000001764162593_li1481335103413)。 |
 
-## 数据类型<a name="zh-cn_topic_0000002529290678_section4219135304818"></a>
+## 数据类型
 
 <cann-filter npu-type="950">
 
@@ -186,22 +186,18 @@ $dst_i = src0_i | src1_i$
 <cann-filter npu-type="950">
 - 针对Ascend 950PR/Ascend 950DT，uint8\_t/int8\_t/uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
 </cann-filter>
-- 特别的，针对uint32\_t/int32\_t类型的Or操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16\_t/int16\_t后再调用Or进行计算。直接传入uint32\_t/int32\_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
-    - 整个tensor参与计算和tensor前n个数据计算接口支持传入uint32\_t/int32\_t类型，但是tensor前n个数据计算的count需要设置为期望计算个数的2倍才能精度符合预期；tensor高维切分计算接口直接编译报错提示不支持该数据类型。上述说明适用于以下型号：
-
-        Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-        Atlas A3 训练系列产品/Atlas A3 推理系列产品
-
-    - 编译报错提示不支持该数据类型。上述说明适用于以下型号：
-
-        Atlas 训练系列产品
-
-        Atlas 推理系列产品AI Core
-
-    - CPU报错提示不支持该数据类型。上述说明适用于以下型号：
-
-        Atlas 200I/500 A2 推理产品
+<cann-filter npu-type="A3,910b,910,310p,310b">
+- 特别地，针对uint32\_t/int32\_t类型的Or操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16\_t/int16\_t后再调用Or进行计算。直接传入uint32\_t/int32\_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
+    <cann-filter npu-type="A3,910b">
+    - 整个tensor参与计算和tensor前n个数据计算接口支持传入uint32\_t/int32\_t类型，但是tensor前n个数据计算的count需要设置为期望计算个数的2倍才能精度符合预期；tensor高维切分计算接口直接编译报错提示不支持该数据类型。上述说明适用于：Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品。
+    </cann-filter>
+    <cann-filter npu-type="910,310p">
+    - 编译报错提示不支持该数据类型。上述说明适用于：Atlas 训练系列产品、Atlas 推理系列产品AI Core。
+    </cann-filter>
+    <cann-filter npu-type="310b">
+    - CPU报错提示不支持该数据类型。上述说明适用于：Atlas 200I/500 A2 推理产品。
+    </cann-filter>
+</cann-filter>
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

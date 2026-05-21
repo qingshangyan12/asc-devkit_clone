@@ -132,7 +132,8 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK\_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。 |
+| U | scalarValue的数据类型。仅在dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait.md)类型时有效。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK\_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。<br> 针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。 <br><cann-filter npu-type="950">Ascend 950PR/Ascend 950DT系列产品</cann-filter> <br><cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品</cann-filter> |
 
 **表 2**  参数说明
 
@@ -150,43 +151,57 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 
 <cann-filter npu-type="950">
 
-支持的数据类型为：half、float。
+- 针对Ascend 950PR/Ascend 950DT系列产品
+    - T支持的数据类型为：half、float。
+    - U支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="A3">
 
-支持的数据类型为：half、float。
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：
+    - T支持的数据类型为：half、float。
+    - U支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
-支持的数据类型为：half、float。
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：
+    - T支持的数据类型为：half、float。
+    - U支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
-支持的数据类型为：half、float。
+- 针对Atlas 200I/500 A2 推理产品：
+    - T支持的数据类型为：half、float。
+    - U支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="310p">
 
-支持的数据类型为：half、float。
+- 针对Atlas 推理系列产品 AI Core：
+    - T支持的数据类型为：half、float。
+    - U支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="x90">
 
-支持的数据类型为：half、float。
+- 针对Kirin X90：
+    - T支持的数据类型为：half、float。
+    - U支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="9030">
 
-支持的数据类型为：half、float。
+- 针对Kirin 9030：
+    - T支持的数据类型为：half、float。
+    - U支持的数据类型为：half、float。
 
 </cann-filter>
 

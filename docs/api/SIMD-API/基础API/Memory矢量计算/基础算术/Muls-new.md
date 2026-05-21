@@ -89,6 +89,30 @@ $dst_i = src_i \times scalarValue$
         __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
+dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait.md)类型时，其数据类型TensorTrait和scalarValue的数据类型（对应TensorTrait中的LiteType类型）不一致。因此新增模板类型U表示scalarValue的数据类型，并通过std::enable\_if检查T中萃取出的LiteType和U是否完全一致，一致则接口通过编译，否则编译失败。接口原型定义如下:
+
+- tensor前n个数据计算
+
+    ```cpp
+    template <typename T, typename U, bool isSetMask = true, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+    __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count)
+    ```
+
+- tensor高维切分计算
+    - mask逐bit模式
+
+        ```cpp
+        template <typename T, typename U, bool isSetMask = true, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+        __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        ```
+
+    - mask连续模式
+
+        ```cpp
+        template <typename T, typename U, bool isSetMask = true, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+        __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        ```
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表 1**  模板参数说明
@@ -96,7 +120,8 @@ $dst_i = src_i \times scalarValue$
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK\_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。 |
+| U | scalarValue的数据类型。仅在dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait.md)类型时有效。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK\_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。<br> 针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。 <br><cann-filter npu-type="950">Ascend 950PR/Ascend 950DT系列产品</cann-filter> <br><cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品</cann-filter> |
 
 **表 2**  参数说明
 
@@ -115,56 +140,64 @@ $dst_i = src_i \times scalarValue$
 <cann-filter npu-type="950">
 
 - 针对Ascend 950PR/Ascend 950DT系列产品
-    支持的数据类型为：half、bfloat16_t、int16_t、float、int32_t、uint64_t、int64_t、complex32、complex64。
+    - T支持的数据类型为：half、bfloat16_t、int16_t、float、int32_t、uint64_t、int64_t、complex32、complex64。
+    - U支持的数据类型为：half、bfloat16_t、int16_t、float、int32_t、uint64_t、int64_t、complex32、complex64。
 
 </cann-filter>
 
 <cann-filter npu-type="A3">
 
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：
-    支持的数据类型为：half、int16_t、float、int32_t。
+    - T支持的数据类型为：half、int16_t、float、int32_t。
+    - U支持的数据类型为：half、int16_t、float、int32_t。
 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：
-    支持的数据类型为：half、int16_t、float、int32_t。
+    - T支持的数据类型为：half、int16_t、float、int32_t。
+    - U支持的数据类型为：half、int16_t、float、int32_t。
 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
 - 针对Atlas 200I/500 A2 推理产品：
-    支持的数据类型为：half、int16_t、float、int32_t。
+    - T支持的数据类型为：half、int16_t、float、int32_t。
+    - U支持的数据类型为：half、int16_t、float、int32_t。
 
 </cann-filter>
 
 <cann-filter npu-type="310p">
 
 - 针对Atlas 推理系列产品 AI Core：
-    支持的数据类型为：half、int16_t、float、int32_t。
+    - T支持的数据类型为：half、int16_t、float、int32_t。
+    - U支持的数据类型为：half、int16_t、float、int32_t。
 
 </cann-filter>
 
 <cann-filter npu-type="910">
 
 - 针对Atlas 训练系列产品：
-    支持的数据类型为：half、float。
+    - T支持的数据类型为：half、float。
+    - U支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="x90">
 
 - 针对Kirin X90：
-    支持的数据类型为：half、int16_t、int32_t、float。
+    - T支持的数据类型为：half、int16_t、int32_t、float。
+    - U支持的数据类型为：half、int16_t、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="9030">
 
 - 针对Kirin 9030：
-    支持的数据类型为：half、int16_t、int32_t、float。
+    - T支持的数据类型为：half、int16_t、int32_t、float。
+    - U支持的数据类型为：half、int16_t、int32_t、float。
 
 </cann-filter>
 

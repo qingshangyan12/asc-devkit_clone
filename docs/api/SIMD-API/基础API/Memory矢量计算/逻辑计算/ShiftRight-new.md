@@ -51,7 +51,7 @@
 
 头文件引用路径为："basic_api/kernel_operator_vec_binary_scalar_intf.h"
 
-ShiftRight属于双目标量类计算接口，对源操作数中的每个元素进行右移操作，右移的位数由标量scalarValue决定。根据源操作数的数据类型，右移操作分为以下两种情况：
+对源操作数中的每个元素进行右移操作，右移的位数由标量scalarValue决定。根据源操作数的数据类型，右移操作分为以下两种情况：
 
 - 数据类型为无符号类型：执行逻辑右移。逻辑右移会将二进制数整体向右移动指定的位数，最低位被丢弃，最高位用0填充。例如，二进制数1010101010101010（uint16\_t类型）逻辑右移1位后，结果为0101010101010101。
 - 数据类型为有符号类型：执行算术右移。算术右移会将二进制数整体向右移动指定的位数，最低位被丢弃，最高位复制符号位。例如，二进制数1010101010101010（int16\_t 类型）算术右移1位后，结果为1101010101010101；算术右移3位后，结果为1111010101010101。
@@ -61,20 +61,6 @@ ShiftRight属于双目标量类计算接口，对源操作数中的每个元素�
 $dst_i = src_i \gg scalarValue$
 
 ## 函数原型<a name="section620mcpsimp"></a>
-
-以下原型支持
-
-<cann-filter npu-type="A3">
-Atlas A3 训练系列产品/Atlas A3 推理系列产品
-</cann-filter>
-
-<cann-filter npu-type="910b">
-Atlas A2 训练系列产品/Atlas A2 推理系列产品
-</cann-filter>
-
-<cann-filter npu-type="310b">
-Atlas 200I/500 A2 推理产品
-</cann-filter>
 
 - tensor前n个数据连续计算
 
@@ -98,12 +84,9 @@ Atlas 200I/500 A2 推理产品
         __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn = false)
         ```
 
-<cann-filter npu-type="950">
-以下原型仅支持Ascend 950PR/Ascend 950DT系列产品
+dst和src使用TensorTrait类型时，其数据类型TensorTrait和scalarValue的数据类型（对应TensorTrait中的LiteType类型）不一致。因此新增模板类型U表示scalarValue的数据类型，并通过std::enable\_if检查T中萃取出的LiteType和U是否完全一致，一致则接口通过编译，否则编译失败。接口原型定义如下:
 
-dst和src使用TensorTrait类型时，其数据类型TensorTrait和scalarValue的数据类型（对应TensorTrait中的LiteType类型）不一致。因此新增模板类型U表示scalarValue的数据类型：
-
-- tensor前n个数据连续计算
+- tensor前n个数据计算
 
     ```cpp
     template <typename T, typename U, bool isSetMask = true, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
@@ -124,8 +107,6 @@ dst和src使用TensorTrait类型时，其数据类型TensorTrait和scalarValue�
         template <typename T, typename U, bool isSetMask = true, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
         __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn)
         ```
-
-</cann-filter>
 
 ## 参数说明<a name="section1436019411811"></a>
 
@@ -150,65 +131,37 @@ dst和src使用TensorTrait类型时，其数据类型TensorTrait和scalarValue�
 | repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](UnaryRepeatParams.md#ZH-CN_TOPIC_0000002525604434)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](高维切分.md#zh-cn_topic_0000002516372540_li072713185916)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](高维切分.md#zh-cn_topic_0000002516372540_zh-cn_topic_0000002267504656_zh-cn_topic_0000001764162593_li1481335103413)。 |
 | roundEn | 输入 | 舍入功能使能开关，支持数据类型：bool，true为使能，false为不使能。仅当src为int16\_t/int32\_t类型时使能有效。<br>例：使能舍入功能，src数据类型为int16\_t，将src算术右移5位，如果src\_ele二进制数中的第5位为1，则dst\_ele值为对src\_ele算术右移5后加1。<br>src\_ele = 17 = 0b00000000000**1**0001 第五位为1<br>dst\_ele = arithmetic\_right\_shift(src\_ele, 5) + 1 = 0b00000000000**00000** + 1 = 0b00000000000**00001**<br><cann-filter npu-type="310b">针对Atlas 200I/500 A2 推理产品，不支持使能舍入功能，仅支持传入false。</cann-filter><br><cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，不支持使能舍入功能，仅支持传入false。</cann-filter> |
 
-## 数据类型<a name="zh-cn_topic_0000002560210685_section4219135304818"></a>
-
-操作数数据类型T：
+## 数据类型
 
 <cann-filter npu-type="950">
 
 - 针对Ascend 950PR/Ascend 950DT系列产品
-    支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。
+    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。
+    - U支持的数据类型为：uint8_t、int8_t、uint16_t、int16_t、uint32_t、int32_t、uint64_t、int64_t。
 
 </cann-filter>
 
 <cann-filter npu-type="A3">
 
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+    - T支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+    - U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+    - T支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+    - U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
 - 针对Atlas 200I/500 A2 推理产品
-    支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
-
-</cann-filter>
-
-scalarValue数据类型U：
-
-<cann-filter npu-type="950">
-
-- 针对Ascend 950PR/Ascend 950DT系列产品
-    支持的数据类型为：uint8_t、int8_t、uint16_t、int16_t、uint32_t、int32_t、uint64_t、int64_t。
-
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
-
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
-
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
-- 针对Atlas 200I/500 A2 推理产品
-    支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+    - T支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+    - U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
 
 </cann-filter>
 
