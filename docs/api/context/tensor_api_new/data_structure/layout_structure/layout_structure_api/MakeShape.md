@@ -39,6 +39,7 @@ __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t)
 
 - 输入参数不可为空
 - 输入的参数为正整数。
+- 支持的数据类型包括：size_t、int等整数类型或者Std::Int类型。
 
 ## 调用示例
 

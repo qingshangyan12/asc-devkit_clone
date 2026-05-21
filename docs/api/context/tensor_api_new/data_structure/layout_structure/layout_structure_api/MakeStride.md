@@ -38,6 +38,8 @@ __aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t)
 ## 约束说明
 
 - 输入参数不可为空。
+- 各参数必须为非负整数。
+- 支持的数据类型包括：size_t、int等整数类型或者Std::Int类型。
 
 ## 调用示例
 
