@@ -14,7 +14,7 @@
 ## 目录结构介绍
 
 ```text
-├── 15_simt_gather_with_ub
+├── simt_gather_with_ub
 │   ├── CMakeLists.txt         // cmake编译文件
 │   ├── gather_v1.asc          // Ascend C直接访问GM实现gather算子样例
 │   ├── gather_v2.asc          // Ascend C使用UB实现gather算子样例
@@ -86,15 +86,25 @@
   v1版本执行方式：
   ```bash
   mkdir -p build && cd build;              # 创建并进入build目录
-  cmake -DGATHER_VERSION=v1 ..; make -j;   # 编译工程
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DGATHER_VERSION=v1 ..; make -j;   # 编译工程
   ./gather                                 # 执行样例
   ```
   v2版本执行方式：
   ```bash
   mkdir -p build && cd build;              # 创建并进入build目录
-  cmake -DGATHER_VERSION=v2 ..; make -j;   # 编译工程
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DGATHER_VERSION=v2 ..; make -j;   # 编译工程
   ./gather                                 # 执行样例
   ```
+
+  编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `GATHER_VERSION` | `v1`（默认）、`v2` | gather实现版本：v1为直接访问GM版本，v2为使用UB版本 |
+  | `RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
+  | `SOC_VERSION` | 实际NPU型号 | NPU仿真库路径中的SOC版本，可通过 `npu-smi info` 命令查询 |
+
   执行结果如下，说明精度对比成功。
   ```
   [Success] Case accuracy is verification passed.
@@ -143,7 +153,7 @@ OPPROF_202xxxxx_XXXXXX
 mkdir -p build && cd build
 # 替换${SOC_VERSION}为实际NPU型号，可通过npu-smi info命令进行查询，如Ascend950PR_9599。
 # 替换${GATHER_VERSION}为算子版本，值为v1或v2。
-cmake -DGATHER_VERSION=${GATHER_VERSION} -DRUN_MODE=sim -DSOC_VERSION=${SOC_VERSION} ..
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DGATHER_VERSION=${GATHER_VERSION} -DRUN_MODE=sim -DSOC_VERSION=${SOC_VERSION} ..
 make -j
 ```
 

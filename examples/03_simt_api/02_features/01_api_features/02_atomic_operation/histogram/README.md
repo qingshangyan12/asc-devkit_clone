@@ -94,10 +94,15 @@ Warp对局部直方图中每个桶的计数是在UB中通过`asc_atomic_add`进�
 
   ```bash
   mkdir -p build && cd build      # 创建并进入 build 目录
-  cmake ..                        # 配置工程
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..   # 配置工程
   make -j                         # 编译样例
   ./histogram                     # 执行样例
   ```
+
+  编译选项说明
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
   执行结果如下，说明精度对比成功。
   

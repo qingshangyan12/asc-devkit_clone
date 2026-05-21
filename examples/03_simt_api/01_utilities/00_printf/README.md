@@ -64,9 +64,15 @@
 - 样例执行
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..; make -j;            # 编译工程
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # 编译工程
   ./demo                        # 执行样例
   ```
+
+  编译选项说明
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
   执行后有如下打印信息，说明打印功能正常。
   ```
   [SIMT print 1] thread index[34], input data shape: 128

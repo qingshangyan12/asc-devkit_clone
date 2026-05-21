@@ -156,13 +156,20 @@
     source ${install_path}/cann/set_env.sh
     ```
 
-- 样例执行  
-```bash
-  SCENARIO_NUM=1 #取值为1、2
+- 样例执行
+  ```bash
+  SCENARIO_NUM=1                # 取值为1、2
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake .. -DSCENARIO_NUM=$SCENARIO_NUM; make -j;            # 编译工程
-  ./demo                      # 执行样例
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # 编译工程
+  ./demo                        # 执行样例
   ```
+
+  编译选项说明
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1表示小shape归约场景，2表示大shape归约场景 |
+
   执行结果如下，说明精度对比成功。
   ```
   [Success] Case accuracy is verification passed.
