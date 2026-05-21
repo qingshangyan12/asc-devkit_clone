@@ -11,13 +11,13 @@
 ## 支持的CANN软件版本
 - \> CANN 9.0.0
 
-## 目录结构
+## 目录结构介绍
 
-```
+```text
 ├── 00_printf
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── printf.asc             # Ascend C算子实现加printf打印的调用样例
-|   └── README.md
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── printf.asc             // Ascend C算子实现加printf打印的调用样例
+│   └── README.md
 ```
 
 ## 算子描述

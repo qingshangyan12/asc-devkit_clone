@@ -12,6 +12,7 @@
 
 ```text
 ├── 01_simt_matrix_transpose
+│   ├── figures                // README中的图片资源
 │   ├── CMakeLists.txt         // 编译工程文件
 │   ├── matrix_transpose.asc   // SIMT矩阵转置样例实现
 │   └── README.md
@@ -69,7 +70,7 @@ int index = x_index + width * y_index;
 
 下图给出了一个更直观的映射示意。左侧表示1024×1024的矩阵被划分为32×32个tile。右侧表示其中一个block需要处理的一个tile，其大小为32×32。
 
-<img src="./figure/blockMapping.png" width="60%">
+<img src="./figures/blockMapping.png" width="60%">
 
 以图中绿色元素为例，可以直接用kernel里的内置变量来推导它在GM中的input坐标。
 
@@ -156,7 +157,7 @@ output[index] = input[index];
 
 下图展示了Case 1的数据流，其中标红展示了一个Warp在读取GM和写入GM时处理的元素。对于同一个Warp的线程会读取GM输入中tile的一行元素，写回到GM输出中tile的一列。在读取GM输入时，相邻线程访问的元素地址连续，为连续读，在写回到输出时，相邻线程却被拆散到输出矩阵的不同行上，为不连续写。因此，这一版的核心问题是转置后的写回地址不再连续，这通常会显著影响整体吞吐。
 
-<img src="./figure/case1.png" width="60%">
+<img src="./figures/case1.png" width="60%">
 
 **关键代码**：
 
@@ -194,7 +195,7 @@ output[index_out] = input[index_in];
 
 下图展示了Case 2的数据流，其中标红和标黄的元素展示了一个Warp的线程在读取GM和写入GM时处理的元素。读取GM输入时，整个tile会按照GM的排布搬到UB，在写入GM输出时一个Warp的线程会读取UB上的一列元素写回到其对应的转置后的位置。
 
-<img src="./figure/case2.png" width="60%">
+<img src="./figures/case2.png" width="60%">
 
 与Case 1不同的是，Case 1中线程是“直接把输入元素写到转置后的GM位置”，所以相邻线程会被打散到输出矩阵的不同行上，而Case 2中，线程先把数据放到UB里，把原来不连续的全局写访问转移到UB内的不连续读。因此，这一版的核心收益是：虽然增加了一次UB读写和一次同步，但换来了GM侧“读连续、写也连续”的访问模式，整体耗时通常会明显低于Case 1。
 
@@ -246,7 +247,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 UB中的bank划分如下图所示。UB总大小为256KB，可以看成前后两行，每行128KB，前128KB对应bank0到bank7，后128KB对应bank8到bank15。bank0和bank8属于同一个group，bank1和bank9属于同一个group，依此类推。
 
-<img src="./figure/bank结构示意图.png">
+<img src="./figures/bank结构示意图.png">
 
 对SIMT来说，最关键的是同一条UB访问指令下，同一Warp的并发线程是否会集中访问少数几个bank。
 
@@ -263,11 +264,11 @@ UB中的bank划分如下图所示。UB总大小为256KB，可以看成前后两�
 
 case 2中UB的tile数组前10行元素按照行优先存储的排布图如下，为了展示方便这里只展示了前10行元素排布，其余行依次类推。每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出，在访问UB时，32个线程会集中访问两个bank，也就是一个bank会有16个线程同时访问，产生大量的读冲突。
 
-<img src="./figure/case2bank.png">
+<img src="./figures/case2bank.png">
 
 case 3中对UB中的tile数组增加一列padding，由每行32个元素改为33个元素，其在UB上的排列如下图所示。由于每行有33个元素跨越5个bank存储，此时同一列的元素会被错开排布在不同的bank。case 3中在访问UB时，32个线程的访问会被分布到8个bank中，也就是一个bank会有4个线程同时访问，大大降低了冲突的规模。
 
-<img src="./figure/case3bank.png">
+<img src="./figures/case3bank.png">
 
 **关键代码**：
 

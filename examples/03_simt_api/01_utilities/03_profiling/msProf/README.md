@@ -13,11 +13,11 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── msProf
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── gather.asc             # SIMT实现gather调用样例
-|   └── README.md
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── gather.asc             // SIMT实现gather调用样例
+│   └── README.md
 ```
 
 ## 算子描述

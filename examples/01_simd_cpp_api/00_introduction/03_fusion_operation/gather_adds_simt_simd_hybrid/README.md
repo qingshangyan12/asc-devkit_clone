@@ -10,14 +10,14 @@
 ## 支持的CANN软件版本
 - \>= CANN 9.0.0-beta.2
 
-## 目录结构
-```
+## 目录结构介绍
+```text
 ├── gather_adds_simt_simd_hybrid
 │   ├── scripts
-│   │   ├── gen_data.py         # 输入数据和真值数据生成脚本
-│   │   └── verify_result.py    # 真值对比文件
-│   ├── CMakeLists.txt          # cmake编译文件
-│   ├── gather_and_adds.asc     # Ascend C样例实现 & 调用样例
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py    // 真值对比文件
+│   ├── CMakeLists.txt          // cmake编译文件
+│   ├── gather_and_adds.asc     // Ascend C样例实现 & 调用样例
 │   └── README.md
 ```
 

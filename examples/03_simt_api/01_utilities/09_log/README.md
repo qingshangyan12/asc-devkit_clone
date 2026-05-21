@@ -16,11 +16,11 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── 09_log
 │   ├── CMakeLists.txt         // cmake编译文件
 │   ├── log.asc                // SIMT Kernel示例代码
-|   └── README.md
+│   └── README.md
 ```
 
 ## 样例描述  

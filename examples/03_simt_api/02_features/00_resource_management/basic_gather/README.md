@@ -11,12 +11,12 @@
 ## 支持的CANN软件版本
 - \>= CANN 9.0.0
 
-## 目录结构
+## 目录结构介绍
 
-```
+```text
 ├── basic_gather
-│   ├── gather.asc             # SIMT实现gather调用样例
-|   └── README.md
+│   ├── gather.asc             // SIMT实现gather调用样例
+│   └── README.md
 ```
 
 ## 算子描述

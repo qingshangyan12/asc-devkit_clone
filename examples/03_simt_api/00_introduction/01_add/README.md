@@ -11,12 +11,12 @@
 ## 支持的CANN软件版本
 - \>= CANN 9.0.0
 
-## 目录结构
+## 目录结构介绍
 
-```
+```text
 ├── 01_add
-│   ├── add.asc             # SIMT实现add调用样例
-|   └── README.md
+│   ├── add.asc             // SIMT实现add调用样例
+│   └── README.md
 ```
 
 ## 算子描述

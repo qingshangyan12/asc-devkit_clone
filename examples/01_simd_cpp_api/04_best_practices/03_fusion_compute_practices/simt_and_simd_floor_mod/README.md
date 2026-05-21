@@ -12,13 +12,13 @@
 ## 支持的CANN软件版本
 - \>= CANN 9.0.0-beta.2
 
-## 目录结构
+## 目录结构介绍
 
-```
+```text
 ├── 14_simt_and_simd_floor_mod
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── floor_mod.asc    # Ascend C算子实现 & 调用样例
-|   └── README.md
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── floor_mod.asc          // Ascend C算子实现 & 调用样例
+│   └── README.md
 ```
 
 ## 算子描述

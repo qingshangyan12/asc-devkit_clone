@@ -11,13 +11,13 @@
 ## 支持的CANN软件版本
 - \> CANN 9.0.0
 
-## 目录结构
+## 目录结构介绍
 
-```
+```text
 ├── 01_assert
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── assert.asc             # Ascend C算子实现加assert断言的调用样例
-|   └── README.md
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── assert.asc             // Ascend C算子实现加assert断言的调用样例
+│   └── README.md
 ```
 
 ## 算子描述
