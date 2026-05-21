@@ -337,12 +337,11 @@ __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] intriParams.src0RepStride src0 repeat stride
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
-
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, bool isSetMask, const DivConfig &config>
 __aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0, const LocalTensor<T> &src1,
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     using PrimType = PrimT<T>;
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -356,7 +355,31 @@ __aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0
     DivImpl<PrimType, isSetMask, config>((__ubuf__ PrimType *)dst.GetPhyAddr(),
         (__ubuf__ PrimType *)src0.GetPhyAddr(),
         (__ubuf__ PrimType *)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask, const DivConfig &config>
+__aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0, const LocalTensor<T> &src1,
+    uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+{
+    using PrimType = PrimT<T>;
+#if ASCENDC_CPU_DEBUG
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Div")) {
+        ASCENDC_REPORT_CHECK_ERROR("Div", KernelFuncType::MASK_COUNT_MODE);
+    }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask, repeatTime, repeatParams, isSetMask, "Div");
+#endif
+    DivImpl<PrimType, isSetMask, config>((__ubuf__ PrimType *)dst.GetPhyAddr(),
+        (__ubuf__ PrimType *)src0.GetPhyAddr(),
+        (__ubuf__ PrimType *)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
 #else
+template <typename T, bool isSetMask>
+__aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Div", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
@@ -373,28 +396,13 @@ __aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0
 #endif
     DivImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src0.GetPhyAddr(),
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
-#endif
 }
 
-template <typename T, bool isSetMask, const DivConfig &config>
+template <typename T, bool isSetMask>
 __aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0, const LocalTensor<T> &src1,
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
 {
     using PrimType = PrimT<T>;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Div")) {
-        ASCENDC_REPORT_CHECK_ERROR("Div", KernelFuncType::MASK_COUNT_MODE);
-    }
-#endif
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask, repeatTime, repeatParams, isSetMask, "Div");
-#endif
-    DivImpl<PrimType, isSetMask, config>((__ubuf__ PrimType *)dst.GetPhyAddr(),
-        (__ubuf__ PrimType *)src0.GetPhyAddr(),
-        (__ubuf__ PrimType *)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
-#else
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Div", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<PrimType, isSetMask>(mask, "Div");
@@ -410,8 +418,8 @@ __aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0
 #endif
     DivImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src0.GetPhyAddr(),
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
-#endif
 }
+#endif
 
 /*
  * @ingroup Div Level 2
@@ -421,12 +429,11 @@ __aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, const DivConfig& config>
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
     const int32_t& count)
 {
-    using PrimType = PrimT<T>;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) // A5
     using PrimType = PrimT<T>;
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "Div")) {
@@ -438,7 +445,13 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 #endif
     DivImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src0.GetPhyAddr(),
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
-#else // A2
+}
+#else
+template <typename T>
+__aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const int32_t& count)
+{
+    using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Div", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckCalcount(count, "count", "Div");
@@ -453,8 +466,8 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 #endif
     DivImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src0.GetPhyAddr(),
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
-#endif
 }
+#endif
 
 /* **************************************************************************************************
  * MulAddDst                                             *
@@ -922,6 +935,7 @@ __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 /* **************************************************************************************************
  * ShiftLeft                                             *
  * ************************************************************************************************* */
@@ -937,7 +951,6 @@ template <typename T, typename U>
 __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<U>& src1, const int32_t& count)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     using Src0PrimType = PrimT<T>;
     using Src1PrimType = PrimT<U>;
     CheckTensorPos<T>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "ShiftLeft");
@@ -949,7 +962,6 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
     });
     ShiftLeftImpl<Src0PrimType, Src1PrimType>((__ubuf__ Src0PrimType*)dst.GetPhyAddr(),
         (__ubuf__ Src0PrimType*)src0.GetPhyAddr(), (__ubuf__ Src1PrimType*)src1.GetPhyAddr(), count);
-#endif
 }
 
 /* **************************************************************************************************
@@ -967,7 +979,6 @@ template <typename T, typename U>
 __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<U>& src1, const int32_t& count)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     using Src0PrimType = PrimT<T>;
     using Src1PrimType = PrimT<U>;
     CheckTensorPos<T>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "ShiftRight");
@@ -979,8 +990,8 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
     });
     ShiftRightImpl<Src0PrimType, Src1PrimType>((__ubuf__ Src0PrimType*)dst.GetPhyAddr(), (__ubuf__ Src0PrimType*)src0.GetPhyAddr(),
         (__ubuf__ Src1PrimType*)src1.GetPhyAddr(), count);
-#endif
 }
+#endif
 
 /* **************************************************************************************************
  * AddRelu                                             *
