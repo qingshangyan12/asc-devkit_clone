@@ -35,8 +35,8 @@ __aicore__ inline U Cast(T valueIn)
 
 | 参数名 | 描述 |
 | ------ | ------ |
-| T | valueIn的数据类型 |
-| U | 转换后的数据类型，支持half、int32_t。 |
+| T | valueIn的数据类型。 |
+| U | 转换后的数据类型。 |
 | roundMode | 精度转换处理模式，类型是RoundMode。<br> RoundMode为枚举类型，用以控制精度转换处理模式，参考[精度舍入模式](../数据结构/precision_conversion.md#精度舍入模式)，可取值为:<br> &bull; CAST_NONE：在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不取整 <br>&bull; CAST_RINT：rint，四舍六入五成双取整<br>&bull; CAST_FLOOR：floor，向负无穷取整 <br>&bull; CAST_CEIL：ceil，向正无穷取整<br>&bull; CAST_ROUND:round，四舍五入取整<br>&bull; CAST_TRUNC：trunc，向零取整<br>&bull; CAST_ODD：Von Neumann rounding，最近邻奇数舍入|
 
 **表 2**  参数说明
@@ -58,15 +58,15 @@ __aicore__ inline U Cast(T valueIn)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 支持的数据类型组合及对应支持的RoundMode
+支持的数据类型组合及对应支持的RoundMode
 
-    | valueIn | 返回值 | RoundMode |
-    | ------ | ------ | ------ |
-    | float | half | CAST_ODD |
-    | float | int32_t | CAST_ROUND |
-    | float | int32_t | CAST_CEIL |
-    | float | int32_t | CAST_FLOOR |
-    | float | int32_t | CAST_RINT |
+| valueIn | 返回值 | RoundMode |
+| ------ | ------ | ------ |
+| float | half | CAST_ODD |
+| float | int32_t | CAST_ROUND |
+| float | int32_t | CAST_CEIL |
+| float | int32_t | CAST_FLOOR |
+| float | int32_t | CAST_RINT |
 
 ## 调用示例<a name="section837496171220"></a>
 

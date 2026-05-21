@@ -41,17 +41,13 @@ __aicore__ inline int64_t GetBitCount(uint64_t valueIn)
 | ------ | ----- | ----- |
 | valueIn | 输入 | 被统计的二进制数字。 |
 
-## 数据类型
-
-支持的数据类型如下：uint64\_t。
-
 ## 返回值说明
 
 int64\_t类型的数，valueIn中0或者1的个数。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-countValue取值为0或1。
+无
 
 ## 调用示例<a name="section837496171220"></a>
 

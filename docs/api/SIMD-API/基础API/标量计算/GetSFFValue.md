@@ -20,11 +20,13 @@
 
 查找uint64\_t类型数值的二进制表示中从最低有效位开始的首个指定比特值（0或1）的位置，如果没找到则返回-1。
 
-以下GetSFFValue的调用结果如下图所示：
+以如下GetSFFValue调用为例：
 
 ```cpp
 int64_t sffValue = AscendC::GetSFFValue<1>(0x1000000000000010ULL); // 返回4
 ```
+
+其计算过程如下图所示：
 
 **图 1**  使用GetSFFValue查找从最低有效位开始首个1的位置<a name="fig1"></a>
 ![使用GetSFFValue查找从最低有效位开始首个1的位置](../../../figures/GetSFFValue.png "使用GetSFFValue查找从最低有效位开始首个1的位置")
@@ -50,17 +52,13 @@ __aicore__ inline int64_t GetSFFValue(uint64_t valueIn)
 | ------ | ------ | ------ |
 | valueIn | 输入 | 被查找的二进制数字。 |
 
-## 数据类型
-
-支持的数据类型如下：uint64\_t。
-
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 int64\_t类型的数，valueIn中第一个0或1出现的位置。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-countValue取值为0或1。
+无
 
 ## 调用示例<a name="section837496171220"></a>
 

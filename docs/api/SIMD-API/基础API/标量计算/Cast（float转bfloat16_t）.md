@@ -32,10 +32,6 @@ __aicore__ inline bfloat16_t Cast(const float& fVal)
 | ------ | ------ | ------ |
 | fVal | 输入 | float类型标量数据。 |
 
-## 数据类型<a name="zh-cn_topic_0000002562041279_section4219135304818"></a>
-
-支持的数据类型如下：float。
-
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 转换后的bfloat16\_t类型标量数据。

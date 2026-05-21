@@ -20,13 +20,13 @@
 
 统计int64\_t类型数值的二进制表示中，从最高数值位开始与符号位相同的连续比特位的个数。
 
-当输入是-1（比特位全1）或者0（比特位全0）时，返回-1。
-
-以下CountBitsCntSameAsSignBit的调用结果如下图所示：
+以如下CountBitsCntSameAsSignBit调用为例：
 
 ```cpp
 int64_t valueOut = AscendC::CountBitsCntSameAsSignBit(0x0100000000000020ULL); // 返回6
 ```
+
+其计算过程如下图所示：
 
 **图 1**  CountBitsCntSameAsSignBit计算示意图<a name="fig1"></a>  
 ![CountBitsCntSameAsSignBit计算示意图](../../../figures/CountBitsCntSameAsSignBit.png "CountBitsCntSameAsSignBit计算示意图")
@@ -45,17 +45,13 @@ __aicore__ inline int64_t CountBitsCntSameAsSignBit(int64_t valueIn)
 | ------ | ------ | ------ |
 | valueIn | 输入 | 被统计的二进制数字。 |
 
-## 数据类型
-
-支持的数据类型如下：int64\_t。
-
 ## 返回值说明
 
 int64\_t类型的数，从最高数值位开始和符号位相同的连续比特位的个数。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 当输入是-1（比特位全1）或者0（比特位全0）时，返回-1。
+当输入是-1（比特位全1）或者0（比特位全0）时，返回-1。
 
 ## 调用示例<a name="section837496171220"></a>
 
