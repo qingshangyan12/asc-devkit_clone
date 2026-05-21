@@ -92,12 +92,11 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - ND Layout，一种使用层次化表述法描述的二维行优先排布格式。
 
-    ND Layout格式表示行优先分。
-
+    其中ShapeRow是行数，ShapeColumn为列数。
     ```cpp
     Layout = ((Shape) : (Stride))
     Shape = (ShapeRow,  ShapeColumn)
-    Stride = (StrideRow, _1)
+    Stride = (ShapeColumn, _1)
     ```
 
     下面是一个连续的ND Layout示例。
@@ -128,12 +127,11 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - DN Layout，一种使用层次化表述法描述的二维列优先排布格式。
 
-    DN Layout格式表示列优先分布。
-
+    其中ShapeRow是行数，ShapeColumn为列数。
     ```cpp
     Layout = ((Shape) : (Stride))
     Shape = (ShapeRow, ShapeColumn)
-    Stride = (_1, StrideColumn)
+    Stride = (_1, ShapeRow)
     ```
 
     下面是一个连续的DN Layout示例。
