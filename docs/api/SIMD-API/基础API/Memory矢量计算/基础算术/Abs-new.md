@@ -156,22 +156,19 @@ $dst_i = |src_i|$
 
 <cann-filter npu-type="910">
 
-- 针对Atlas 训练系列产品：
-    支持的数据类型为：half、float。
+- 针对Atlas 训练系列产品，支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="x90">
 
-- 针对Kirin X90：
-    支持的数据类型为：half、float。
+- 针对Kirin X90，支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="9030">
 
-- 针对Kirin 9030：
-    支持的数据类型为：half、float。
+- 针对Kirin 9030，支持的数据类型为：half、float。
 
 </cann-filter>
 

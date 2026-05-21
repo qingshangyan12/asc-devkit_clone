@@ -117,57 +117,49 @@ $dst_i = \max(0, src_i)$
 
 <cann-filter npu-type="950">
 
-- 针对Ascend 950PR/Ascend 950DT系列产品
-    支持的数据类型为：half、int32_t、float、int64_t。
+- 针对Ascend 950PR/Ascend 950DT系列产品，支持的数据类型为：half、int32_t、float、int64_t。
 
 </cann-filter>
 
 <cann-filter npu-type="A3">
 
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    支持的数据类型为：half、int32_t、float。
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    支持的数据类型为：half、int32_t、float。
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
-- 针对Atlas 200I/500 A2 推理产品
-    支持的数据类型为：half、int32_t、float。
+- 针对Atlas 200I/500 A2 推理产品，支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="310p">
 
-- 针对Atlas 推理系列产品
-    支持的数据类型为：half、int32_t、float。
+- 针对Atlas 推理系列产品，支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="910">
 
-- 针对Atlas 训练系列产品
-    支持的数据类型为：half。
+- 针对Atlas 训练系列产品，支持的数据类型为：half。
 
 </cann-filter>
 
 <cann-filter npu-type="x90">
 
-- 针对Kirin X90
-    支持的数据类型为：half、int32_t、float。
+- 针对Kirin X90，支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="9030">
 
-- 针对Kirin 9030
-    支持的数据类型为：half、int32_t、float。
+- 针对Kirin 9030，支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
@@ -179,7 +171,9 @@ $dst_i = \max(0, src_i)$
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
-- 当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
+<cann-filter npu-type="A3, 910b">
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
+</cann-filter>
 
 <cann-filter npu-type="950">
 
