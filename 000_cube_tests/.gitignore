@@ -1,6 +1,6 @@
 # Build artifacts
 build/
-*.csv
+*_result.csv
 *.log
 
 # Core dump files
@@ -8,6 +8,8 @@ core*
 *.dump
 *.vcd
 _summary_log
+*.toml
+*_log
 
 # Editor
 *.swp

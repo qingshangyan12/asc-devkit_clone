@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+source /home/jinhu/Ascend/cann-9.0.0-beta.2/set_env.sh
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="${SCRIPT_DIR}/build_and_run.log"
 echo "=== 000_cube_tests build_and_run_all $(date) ===" > "$LOG_FILE"
@@ -22,15 +23,16 @@ run_test() {
 
     local run_out="$d/build/run.log"
     (cd "$d/build" && "$exe" > "$run_out" 2>&1) || true
-    local csv=$(find "$d/build" -name "*.csv" ! -name "run.log" | head -1)
-    [ -f "$csv" ] && cp "$d/build"/*.csv "$d/" 2>/dev/null
+    local csv=$(ls "$d/build"/*_result.csv 2>/dev/null | head -1)
+    [ -f "$csv" ] && cp "$csv" "$d/" 2>/dev/null
 
-    if grep -q "^PASS" "$d"/*.csv 2>/dev/null; then
+    if grep -q "^PASS" "$d"/*_result.csv 2>/dev/null; then
         echo "[PASS] $n" | tee -a "$LOG_FILE"; P=$((P+1))
     else
         echo "[FAIL] $n" | tee -a "$LOG_FILE"; F=$((F+1))
         echo "  stdout:"; cat "$run_out" 2>/dev/null
     fi
+    rm -rf ./*.toml ./*_log ./*.dump 2>/dev/null
 }
 
 echo "--- compute ---" | tee -a "$LOG_FILE"

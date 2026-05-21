@@ -547,4 +547,17 @@ target_compile_options(cube_example PRIVATE
 ---
 
 完整的 API 参考请参见 [../../../docs/api/c_api/cube_compute/](../../../docs/api/c_api/cube_compute/) 和 [../../../docs/api/c_api/cube_datamove/](../../../docs/api/c_api/cube_datamove/)。
+
+---
+
+## 踩坑记录
+
+编写测试过程中常见的数据搬运精度失败、类型编译错误等经验和修复方案，详见 [lessons-learned.md](lessons-learned.md)。
+
+| 问题 | 简要 |
+|------|------|
+| int8 2D 搬运精度失败 | B 矩阵列数需补齐到 k_step×32B/sizeof(T) 整数倍 |
+| CANN 9.0.0-beta.2 类型缺失 | fp4/fp8/int4 用互异 struct 规避 |
+| NZ2ND_en 导致输出全错 | 默认设为 false，避免格式转换错误 |
+| 测试方法选择 | 计算类用 CPU 对比，搬运类用回环比对或 MMAD 间接验证 |
 完整的可运行示例请参见 [examples/cube_example.md](examples/cube_example.md)。

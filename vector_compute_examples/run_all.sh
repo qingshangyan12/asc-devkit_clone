@@ -57,6 +57,11 @@ SAMPLES=(
     "asc_ge_scalar"
     "asc_ne_scalar"
     "asc_shiftleft_scalar"
+    "asc_duplicate_scalar"
+    "asc_max_scalar"
+    "asc_min_scalar"
+    "asc_shiftright_scalar"
+    "asc_eq_scalar"
 )
 
 PASS=0
