@@ -19,8 +19,6 @@
 #include "simt_api/asc_bf16.h"
 #include "simt_api/device_types.h"
 
-#ifdef __NPU_HAS_FP8__
-
 typedef enum __asc_fp8_interpretation_t {
     __ASC_E4M3,
     __ASC_E5M2,
@@ -32,6 +30,8 @@ typedef enum __asc_saturation_t {
 } __asc_saturation_t;
 
 typedef unsigned short int __asc_fp8x2_storage_t;
+
+#ifdef __NPU_HAS_FP8__
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline hifloat8x2_t __float22hif82_rna(const float2 x);
 
