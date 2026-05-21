@@ -36,7 +36,7 @@ Since the source tree has `vector_compute_examples` but no `cube_compute_example
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    // GM -> L1: burst-based搬运\n    // n_burst=1: 1个burst; burst_len=16: 16个DataBlock(32B) = 512B\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        1, BURST_LEN_HALF, 0, 0);\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        1, BURST_LEN_HALF, 0, 0);",
   "oldString": "    // GM -> L1: 线性burst搬运 (单个分形 512B)\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        BURST_LEN_HALF);\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        BURST_LEN_HALF);"
 }
@@ -60,7 +60,7 @@ Oops, I changed the `_sync` calls already. Let me read the current file to make 
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "offset": 48,
   "limit": 30
 }
@@ -194,7 +194,7 @@ Or, even simpler: let me fix the nz2nd issue first and see if the result changes
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    constexpr bool nz2nd_en = true;   // 转换为ND格式输出",
   "oldString": "    constexpr bool nz2nd_en = false;"
 }
@@ -351,7 +351,7 @@ Let me try without the `__cube__` modifier, as cube C API functions may work wit
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "__global__ __aicore__ void cube_mmad_kernel(",
   "oldString": "__cube__ __global__ __aicore__ void cube_mmad_kernel("
 }
@@ -371,10 +371,10 @@ Edit applied successfully.
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
   "description": "Build and run without __cube__ modifier",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -763,7 +763,7 @@ Let me revert to `__cube__` and use `_sync` versions, plus add `nz2nd_en=true`.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "__cube__ __global__ __aicore__ void cube_mmad_kernel(",
   "oldString": "__global__ __aicore__ void cube_mmad_kernel("
 }
@@ -787,7 +787,7 @@ Let me also switch to using `_sync` variants of the functions. The explicit sync
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    // GM -> L1: burst-based搬运\n    // size=512: 256 half elements * 2B = 512B\n    asc_copy_gm2l1_sync(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        TOTAL_A * sizeof(half));\n    asc_copy_gm2l1_sync(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        TOTAL_B * sizeof(half));\n\n    // L1 -> L0A, L0B: 分形搬运\n    asc_copy_l12l0a_sync(l0a_a, l1_a, 0, 1, 0, 0);\n    asc_copy_l12l0b_sync(l0b_b, l1_b, 0, 1, 0, 0);\n\n    // Matrix multiply-add: C = A * B\n    constexpr uint16_t left_height = M_SIZE;\n    constexpr uint16_t n_dim = K_SIZE;\n    constexpr uint16_t right_width = N_SIZE;\n    constexpr uint8_t unit_flag = 0;\n    constexpr bool k_direction_align = true;\n    constexpr bool c_matrix_source = false;\n    constexpr bool c_matrix_init_val = true;\n\n    asc_mmad_sync(l0c_c, l0a_a, l0b_b,\n                  left_height, n_dim, right_width,\n                  unit_flag, k_direction_align,\n                  c_matrix_source, c_matrix_init_val);\n\n    // L0C -> GM\n    constexpr uint16_t n_size_l0c = 1;\n    constexpr uint16_t m_size_l0c = 1;\n    constexpr uint32_t dst_stride_dst_d = 0;\n    constexpr uint16_t src_stride_l0c = 0;\n    constexpr uint8_t unit_flag_mode = 0;\n    constexpr uint64_t quant_pre = 0;\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool channel_split = false;\n    constexpr bool nz2nd_en = true;\n\n    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);",
   "oldString": "    // GM -> L1: burst-based搬运\n    // n_burst=1: 1个burst; burst_len=16: 16个DataBlock(32B) = 512B\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        1, BURST_LEN_HALF, 0, 0);\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        1, BURST_LEN_HALF, 0, 0);\n\n    asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);\n    asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);\n\n    // L1 -> L0A, L0B: 分形搬运\n    // start_index=0: 从第0个分形开始\n    // repeat=1: 搬运1个分形\n    // src_stride=0: 源分形间距\n    // dst_gap=0: 目的分形间距\n    asc_copy_l12l0a(l0a_a, l1_a, 0, 1, 0, 0);\n    asc_copy_l12l0b(l0b_b, l1_b, 0, 1, 0, 0);\n\n    asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);\n    asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);\n\n    // Matrix multiply-add: C = A * B\n    constexpr uint16_t left_height = M_SIZE;\n    constexpr uint16_t n_dim = K_SIZE;\n    constexpr uint16_t right_width = N_SIZE;\n    constexpr uint8_t unit_flag = 0;\n    constexpr bool k_direction_align = true;   // right_width方向对齐\n    constexpr bool c_matrix_source = false;\n    constexpr bool c_matrix_init_val = true;\n\n    asc_mmad(l0c_c, l0a_a, l0b_b,\n             left_height, n_dim, right_width,\n             unit_flag, k_direction_align,\n             c_matrix_source, c_matrix_init_val);\n\n    asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);\n    asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);\n\n    // L0C -> GM (2201: 11参数版本)\n    constexpr uint16_t n_size_l0c = 1;\n    constexpr uint16_t m_size_l0c = 1;\n    constexpr uint32_t dst_stride_dst_d = 0;\n    constexpr uint16_t src_stride_l0c = 0;\n    constexpr uint8_t unit_flag_mode = 0;\n    constexpr uint64_t quant_pre = 0;   // NoQuant\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool channel_split = false;\n    constexpr bool nz2nd_en = true;   // 转换为ND格式输出\n\n    asc_copy_l0c2gm(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);"
 }
@@ -807,10 +807,10 @@ Edit applied successfully.
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
   "description": "Build and run with __cube__ and _sync functions",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -1070,7 +1070,7 @@ Let me add a simple test write to verify kernel execution.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);\n\n    // DEBUG: write sentinel value to verify kernel execution\n    gm_c[0] = 42.0f;",
   "oldString": "    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);"
 }
@@ -1094,7 +1094,7 @@ Also update the host-side maxPrintSize to 1 to see if the first element is 42.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    constexpr size_t maxPrintSize = 4;",
   "oldString": "    constexpr size_t maxPrintSize = 16;"
 }
@@ -1136,7 +1136,7 @@ OK, I've spent too much time debugging. Let me:
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);\n}",
   "oldString": "    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);\n\n    // DEBUG: write sentinel value to verify kernel execution\n    gm_c[0] = 42.0f;\n}"
 }
@@ -1202,7 +1202,7 @@ Let me try a simplified approach: use float inputs with direct L0C->GM and the s
   "todos": [
     {
       "priority": "high",
-      "content": "Create cube_c_api_skill directory and SKILL.md",
+      "content": "Create skill_cube_3510 directory and SKILL.md",
       "status": "completed"
     },
     {
@@ -1268,7 +1268,7 @@ Let me update SKILL.md with correct arch notes, and update the example to compil
 ```json
 {
   "offset": 269,
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md",
   "limit": 20
 }
 ```
@@ -1543,7 +1543,7 @@ Let me finalize the skill and examples. The knowledge is correct from docs/impl,
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md",
   "newString": "- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;` 在仿真模式下编译运行（注：dav-3510 的 Cube C API 在 CANN 9.0.0-beta2 中尚未完整发布，dav-2201 提供了完整的 Cube C API，分形概念和数据流在两架构间一致）",
   "oldString": "- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;` 在仿真模式下编译运行"
 }
@@ -1567,7 +1567,7 @@ Now let me update the CMakeLists.txt to note the 2201 limitation and update the 
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "newString": "# Cube C API Example CMakeLists.txt\n# 使用 dav-2201 架构 (dav-3510 Cube C API 在 CANN 9.0.0-beta2 中尚未完整发布)\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>\n)",
   "oldString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>\n)"
 }
@@ -1592,7 +1592,7 @@ Now let me also update the example.md to reflect the 2201 architecture usage and
 ```json
 {
   "offset": 1,
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_example.md",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_example.md",
   "limit": 10
 }
 ```
@@ -1630,10 +1630,10 @@ Let me now compile and run one final time to ensure the example still compiles (
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && echo \"BUILD SUCCESS\"",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && echo \"BUILD SUCCESS\"",
   "description": "Final build of cube example",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -1678,7 +1678,7 @@ Let me now update the example.md to note the compilation success and the current
   "todos": [
     {
       "priority": "high",
-      "content": "Create cube_c_api_skill directory and SKILL.md",
+      "content": "Create skill_cube_3510 directory and SKILL.md",
       "status": "completed"
     },
     {
@@ -1741,7 +1741,7 @@ Let me verify the final state of all created files.
 **Input:**
 ```json
 {
-  "command": "echo \"=== Directory structure ===\" && find /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/ -type f | sort && echo \"\" && echo \"=== SKILL.md first 5 lines ===\" && head -5 /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md && echo \"\" && echo \"=== CMakeLists.txt ===\" && cat /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt && echo \"\" && echo \"=== Build artifact exists ===\" && ls -la /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/cube_mmad_example 2>/dev/null && echo \"EXISTS\" || echo \"NOT FOUND\"",
+  "command": "echo \"=== Directory structure ===\" && find /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/ -type f | sort && echo \"\" && echo \"=== SKILL.md first 5 lines ===\" && head -5 /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md && echo \"\" && echo \"=== CMakeLists.txt ===\" && cat /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt && echo \"\" && echo \"=== Build artifact exists ===\" && ls -la /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/cube_mmad_example 2>/dev/null && echo \"EXISTS\" || echo \"NOT FOUND\"",
   "description": "Verify final state of all created files"
 }
 ```
@@ -1926,7 +1926,7 @@ Let me now update the example accordingly and try compiling.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc"
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc"
 }
 ```
 
@@ -2388,7 +2388,7 @@ Now I have all exact 3510 signatures. Let me update the example and CMakeLists.t
 ```json
 {
   "content": "/**\n * Copyright (c) 2026 Huawei Technologies Co., Ltd.\n * CANN Open Software License Agreement Version 2.0\n */\n\n/* !\n * \\file cube_mmad_example.asc\n * \\brief Cube核 C API 矩阵乘加 (asc_mmad) 示例\n *\n * 覆盖数据类型: half (A) x half (B) -> float (C)\n * 覆盖场景: 单核, 单分形 (16x16)\n * 数据流: GM -> L1 -> L0A/L0B -> asc_mmad -> L0C -> GM\n * 架构: dav-3510\n */\n\n#include <cstdint>\n#include <iostream>\n#include <vector>\n#include <algorithm>\n#include <cstdlib>\n#include <cstring>\n#include <cmath>\n#include \"acl/acl.h\"\n#include \"c_api/asc_simd.h\"\n\nconstexpr uint32_t NUM_BLOCKS = 1;\nconstexpr uint32_t M_SIZE = 16;\nconstexpr uint32_t K_SIZE = 16;\nconstexpr uint32_t N_SIZE = 16;\n\nconstexpr uint32_t TOTAL_A = M_SIZE * K_SIZE;   // 256\nconstexpr uint32_t TOTAL_B = K_SIZE * N_SIZE;   // 256\nconstexpr uint32_t TOTAL_C = M_SIZE * N_SIZE;   // 256\n\n/* --------------------------------------------------------------------------\n * Cube核 kernel: half x half -> float 矩阵乘法 (单分形)\n * -------------------------------------------------------------------------- */\n__cube__ __global__ __aicore__ void cube_mmad_kernel(\n    __gm__ half* gm_a, __gm__ half* gm_b, __gm__ float* gm_c)\n{\n    asc_init();\n\n    __cbuf__ half l1_a[TOTAL_A];\n    __cbuf__ half l1_b[TOTAL_B];\n    __ca__ half l0a_a[TOTAL_A];\n    __cb__ half l0b_b[TOTAL_B];\n    __cc__ float l0c_c[TOTAL_C];\n\n    constexpr uint8_t l2_cache_ctl = 0;\n    constexpr uint8_t decomp_mode = 0;\n\n    // GM -> L1 (2D搬运, 1个分形: 16x16)\n    // m_start_position=0, k_start_position=0: 从矩阵原点开始\n    // dst_stride=0: L1中相邻数据块间距\n    // m_step=1, k_step=1: M方向1个分形(16元素), K方向1个分形(32B=16个half)\n    asc_copy_gm2l1_sync(l1_a, gm_a,\n                        0, 0, 0, 1, 1,\n                        decomp_mode, l2_cache_ctl);\n    asc_copy_gm2l1_sync(l1_b, gm_b,\n                        0, 0, 0, 1, 1,\n                        decomp_mode, l2_cache_ctl);\n\n    // L1 -> L0A, L0B (分形搬运)\n    // m_start=0, k_start=0, m_step=1, k_step=1, src_stride=0, dst_stride=0\n    asc_copy_l12l0a_sync(l0a_a, l1_a, 0, 0, 1, 1, 0, 0);\n    asc_copy_l12l0b_sync(l0b_b, l1_b, 0, 0, 1, 1, 0, 0);\n\n    // Matrix multiply-add: C = A * B\n    constexpr uint16_t left_height = M_SIZE;\n    constexpr uint16_t n_dim = K_SIZE;\n    constexpr uint16_t right_width = N_SIZE;\n    constexpr uint8_t unit_flag = 0;\n    constexpr bool disable_gemv = false;\n    constexpr bool c_matrix_source = false;\n    constexpr bool c_matrix_init_val = true;\n\n    asc_mmad_sync(l0c_c, l0a_a, l0b_b,\n                  left_height, n_dim, right_width,\n                  unit_flag, disable_gemv,\n                  c_matrix_source, c_matrix_init_val);\n\n    // L0C -> GM (3510: 21参数版本)\n    constexpr uint16_t n_size = 1;\n    constexpr uint16_t m_size = 1;\n    constexpr uint32_t loop_dst_stride = 0;\n    constexpr uint16_t loop_src_stride = 0;\n    constexpr uint8_t clip_relu_pre = 0;\n    constexpr uint8_t unit_flag_ctl = 0;\n    constexpr uint64_t quant_pre = 0;       // NoQuant\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool split_en = false;\n    constexpr bool NZ2ND_en = true;         // NZ->ND 格式转换\n    constexpr uint64_t quant_post = 0;      // NoConv\n    constexpr uint8_t relu_post = 0;\n    constexpr bool clip_relu_post = false;\n    constexpr uint8_t eltwise_op = 0;\n    constexpr bool eltwise_antq_en = false;\n    constexpr bool C0_pad_en = false;\n    constexpr bool broadcast_en = false;\n    constexpr bool NZ2DN_en = false;\n\n    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size, m_size,\n        loop_dst_stride, loop_src_stride, l2_cache_ctl,\n        clip_relu_pre, unit_flag_ctl, quant_pre, relu_pre,\n        split_en, NZ2ND_en, quant_post, relu_post,\n        clip_relu_post, eltwise_op, eltwise_antq_en,\n        C0_pad_en, broadcast_en, NZ2DN_en);\n}\n\n/* --------------------------------------------------------------------------\n * Host 侧调用\n * -------------------------------------------------------------------------- */\nstd::vector<float> kernel_cube_mmad(\n    std::vector<half> &a, std::vector<half> &b)\n{\n    uint32_t totalLenA = a.size();\n    uint32_t totalLenB = b.size();\n    uint32_t totalLenC = TOTAL_C;\n\n    size_t byteSizeA = totalLenA * sizeof(half);\n    size_t byteSizeB = totalLenB * sizeof(half);\n    size_t byteSizeC = totalLenC * sizeof(float);\n\n    int32_t deviceId = 0;\n    aclrtStream stream = nullptr;\n\n    uint8_t *aHost = reinterpret_cast<uint8_t *>(a.data());\n    uint8_t *bHost = reinterpret_cast<uint8_t *>(b.data());\n    uint8_t *cHost = nullptr;\n\n    half *aDevice = nullptr;\n    half *bDevice = nullptr;\n    float *cDevice = nullptr;\n\n    aclInit(nullptr);\n    aclrtSetDevice(deviceId);\n    aclrtCreateStream(&stream);\n\n    aclrtMallocHost((void **)(&cHost), byteSizeC);\n    aclrtMalloc((void **)&aDevice, byteSizeA, ACL_MEM_MALLOC_HUGE_FIRST);\n    aclrtMalloc((void **)&bDevice, byteSizeB, ACL_MEM_MALLOC_HUGE_FIRST);\n    aclrtMalloc((void **)&cDevice, byteSizeC, ACL_MEM_MALLOC_HUGE_FIRST);\n\n    aclrtMemcpy((uint8_t*)aDevice, byteSizeA, aHost, byteSizeA,\n                ACL_MEMCPY_HOST_TO_DEVICE);\n    aclrtMemcpy((uint8_t*)bDevice, byteSizeB, bHost, byteSizeB,\n                ACL_MEMCPY_HOST_TO_DEVICE);\n\n    cube_mmad_kernel<<<NUM_BLOCKS, nullptr, stream>>>(aDevice, bDevice, cDevice);\n\n    aclrtSynchronizeStream(stream);\n    aclrtMemcpy(cHost, byteSizeC, (uint8_t*)cDevice, byteSizeC,\n                ACL_MEMCPY_DEVICE_TO_HOST);\n\n    std::vector<float> c((float *)cHost,\n                         (float *)(cHost + byteSizeC));\n\n    aclrtFree(aDevice);\n    aclrtFree(bDevice);\n    aclrtFree(cDevice);\n    aclrtFreeHost(cHost);\n\n    aclrtDestroyStream(stream);\n    aclrtResetDevice(deviceId);\n    aclFinalize();\n\n    return c;\n}\n\n/* --------------------------------------------------------------------------\n * 精度验证\n * -------------------------------------------------------------------------- */\nuint32_t verify_result(\n    std::vector<float> &output,\n    std::vector<float> &golden)\n{\n    constexpr size_t maxPrintSize = 16;\n    std::cout << \"Output: \";\n    for (size_t i = 0; i < std::min(output.size(), maxPrintSize); ++i) {\n        std::cout << output[i] << \" \";\n    }\n    std::cout << std::endl;\n\n    std::cout << \"Golden: \";\n    for (size_t i = 0; i < std::min(golden.size(), maxPrintSize); ++i) {\n        std::cout << golden[i] << \" \";\n    }\n    std::cout << std::endl;\n\n    float maxError = 0.0f;\n    for (size_t i = 0; i < golden.size(); ++i) {\n        float error = std::abs(output[i] - golden[i]);\n        if (error > maxError) {\n            maxError = error;\n        }\n    }\n\n    constexpr float epsilon = 0.001f;\n    if (maxError < epsilon) {\n        std::cout << \"[Success] cube_mmad accuracy passed.\"\n                  << \" max_error=\" << maxError << std::endl;\n        return 0;\n    } else {\n        std::cout << \"[Failed] cube_mmad accuracy failed!\"\n                  << \" max_error=\" << maxError << std::endl;\n        return 1;\n    }\n}\n\n/* --------------------------------------------------------------------------\n * 主函数\n * -------------------------------------------------------------------------- */\nint32_t main(int32_t argc, char *argv[])\n{\n    std::vector<half> a(TOTAL_A);\n    std::vector<half> b(TOTAL_B);\n\n    for (uint32_t i = 0; i < M_SIZE; ++i) {\n        for (uint32_t k = 0; k < K_SIZE; ++k) {\n            a[i * K_SIZE + k] = half((i + k) * 0.1f);\n        }\n    }\n    for (uint32_t k = 0; k < K_SIZE; ++k) {\n        for (uint32_t j = 0; j < N_SIZE; ++j) {\n            b[k * N_SIZE + j] = half((k + j) * 0.1f);\n        }\n    }\n\n    std::vector<float> output = kernel_cube_mmad(a, b);\n\n    std::vector<float> golden(TOTAL_C, 0.0f);\n    for (uint32_t i = 0; i < M_SIZE; ++i) {\n        for (uint32_t j = 0; j < N_SIZE; ++j) {\n            float sum = 0.0f;\n            for (uint32_t k = 0; k < K_SIZE; ++k) {\n                sum += float(a[i * K_SIZE + k]) * float(b[k * N_SIZE + j]);\n            }\n            golden[i * N_SIZE + j] = sum;\n        }\n    }\n\n    return verify_result(output, golden);\n}\n",
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc"
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc"
 }
 ```
 
@@ -2410,7 +2410,7 @@ Now update CMakeLists.txt to dav-3510.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "newString": "# Cube C API Example CMakeLists.txt\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>\n)",
   "oldString": "# Cube C API Example CMakeLists.txt\n# 使用 dav-2201 架构 (dav-3510 Cube C API 在 CANN 9.0.0-beta2 中尚未完整发布)\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>\n)"
 }
@@ -2434,10 +2434,10 @@ Now let me build and run. But first, the user said they already replaced the CAN
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
   "description": "Build cube example for 3510 in sim mode",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -2991,10 +2991,10 @@ Let me just try building.
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
   "description": "Rebuild for 3510 after fixing types",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -3448,7 +3448,7 @@ Wait, actually the old CMakeLists.txt had `-I/home/joey/code/joey/asc-devkit/imp
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt"
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt"
 }
 ```
 
@@ -3510,7 +3510,7 @@ Let me try with `-H` again to see the include trace.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "newString": "# Cube C API Example CMakeLists.txt\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510;-H>\n)",
   "oldString": "# Cube C API Example CMakeLists.txt\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>\n)"
 }
@@ -3534,7 +3534,7 @@ Wait, the `-H` flag with semicolons might not work. Let me use a different appro
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "newString": "# Cube C API Example CMakeLists.txt\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE \"--npu-arch=dav-3510\" \"-H\")",
   "oldString": "# Cube C API Example CMakeLists.txt\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510;-H>\n)"
 }
@@ -3683,10 +3683,10 @@ Actually, the `common_types.h` include might conflict with the manual type defin
 **Input:**
 ```json
 {
-  "command": "sudo sed -i '/common_types.h/d' /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h && rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
+  "command": "sudo sed -i '/common_types.h/d' /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h && rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
   "description": "Rebuild 3510 without common_types.h conflict",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -4727,10 +4727,10 @@ Also, I need to make sure the cube_compute_impl.h and cube_datamove_impl.h are t
 **Input:**
 ```json
 {
-  "command": "# Ensure we have the source tree's cube_compute_impl.h and cube_datamove_impl.h\nsudo cp /home/joey/code/joey/asc-devkit/impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h\nsudo cp /home/joey/code/joey/asc-devkit/impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl.h /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl.h\nsudo cp /home/joey/code/joey/asc-devkit/impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h\n\n# Re-add types after 2201 include\nsudo sed -i '14 a\\\n\\\nusing fp4x2_e2m1_t = float4_e2m1x2_t;\\\nusing fp4x2_e1m2_t = float4_e1m2x2_t;\\\nusing fp8_e5m2_t = float8_e5m2_t;\\\nusing fp8_e4m3fn_t = float8_e4m3_t;\\\nusing fp8_e8m0_t = float8_e8m0_t;\\\nusing int4b_t = uint8_t;' /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h\n\nrm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* \ncmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1 | head -60",
+  "command": "# Ensure we have the source tree's cube_compute_impl.h and cube_datamove_impl.h\nsudo cp /home/joey/code/joey/asc-devkit/impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h\nsudo cp /home/joey/code/joey/asc-devkit/impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl.h /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl.h\nsudo cp /home/joey/code/joey/asc-devkit/impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h\n\n# Re-add types after 2201 include\nsudo sed -i '14 a\\\n\\\nusing fp4x2_e2m1_t = float4_e2m1x2_t;\\\nusing fp4x2_e1m2_t = float4_e1m2x2_t;\\\nusing fp8_e5m2_t = float8_e5m2_t;\\\nusing fp8_e4m3fn_t = float8_e4m3_t;\\\nusing fp8_e8m0_t = float8_e8m0_t;\\\nusing int4b_t = uint8_t;' /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h\n\nrm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* \ncmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1 | head -60",
   "description": "Rebuild 3510 with fresh source headers and types",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -4826,7 +4826,7 @@ The output got truncated because the `-H` flag is still in the CMakeLists.txt (f
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "newString": "# Cube C API Example CMakeLists.txt\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>\n)",
   "oldString": "# Cube C API Example CMakeLists.txt\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE \"--npu-arch=dav-3510\" \"-H\")"
 }
@@ -4852,10 +4852,10 @@ But actually, the build output shows the bisheng compiler received `--npu-arch=d
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
   "description": "Rebuild 3510 without -H flag",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -5179,10 +5179,10 @@ Let me try this.
 **Input:**
 ```json
 {
-  "command": "# Fix int4b_t to be a distinct type from uint8_t\nsudo sed -i 's/using int4b_t = uint8_t;/struct int4b_t { uint8_t data; };/' /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h\n\nrm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/*\ncmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
+  "command": "# Fix int4b_t to be a distinct type from uint8_t\nsudo sed -i 's/using int4b_t = uint8_t;/struct int4b_t { uint8_t data; };/' /usr/local/Ascend/cann-9.0.0-beta.2/x86_64-linux/asc/impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h\n\nrm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/*\ncmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
   "description": "Fix int4b_t as distinct struct and rebuild",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -5226,7 +5226,7 @@ It compiled successfully for dav-3510! The `int4b_t` as a distinct struct fixed 
   "command": "./cube_mmad_example 2>&1",
   "description": "Run 3510 cube example in sim mode",
   "timeout": 60000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -5343,7 +5343,7 @@ Let me fix the L0C->GM parameters. The error seems to be about `loop_dst_stride`
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    // L0C -> GM (3510: 21参数版本)\n    constexpr uint16_t n_size = 1;\n    constexpr uint16_t m_size = 1;\n    constexpr uint32_t loop_dst_stride = 256;   // 目的ND矩阵间距 (dst_D > 0)\n    constexpr uint16_t loop_src_stride = 0;\n    constexpr uint8_t clip_relu_pre = 0;\n    constexpr uint8_t unit_flag_ctl = 0;\n    constexpr uint64_t quant_pre = 0;       // NoQuant\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool split_en = false;\n    constexpr bool NZ2ND_en = true;         // NZ->ND 格式转换\n    constexpr uint64_t quant_post = 0;      // NoConv\n    constexpr uint8_t relu_post = 0;\n    constexpr bool clip_relu_post = false;\n    constexpr uint8_t eltwise_op = 0;\n    constexpr bool eltwise_antq_en = false;\n    constexpr bool C0_pad_en = false;\n    constexpr bool broadcast_en = false;\n    constexpr bool NZ2DN_en = false;",
   "oldString": "    // L0C -> GM (3510: 21参数版本)\n    constexpr uint16_t n_size = 1;\n    constexpr uint16_t m_size = 1;\n    constexpr uint32_t loop_dst_stride = 0;\n    constexpr uint16_t loop_src_stride = 0;\n    constexpr uint8_t clip_relu_pre = 0;\n    constexpr uint8_t unit_flag_ctl = 0;\n    constexpr uint64_t quant_pre = 0;       // NoQuant\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool split_en = false;\n    constexpr bool NZ2ND_en = true;         // NZ->ND 格式转换\n    constexpr uint64_t quant_post = 0;      // NoConv\n    constexpr uint8_t relu_post = 0;\n    constexpr bool clip_relu_post = false;\n    constexpr uint8_t eltwise_op = 0;\n    constexpr bool eltwise_antq_en = false;\n    constexpr bool C0_pad_en = false;\n    constexpr bool broadcast_en = false;\n    constexpr bool NZ2DN_en = false;"
 }
@@ -5385,7 +5385,7 @@ Actually wait, let me re-read the error: "Loop3 size must be larger than 0 with 
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    constexpr uint32_t loop_dst_stride = N_SIZE; // 目的ND矩阵间距 (> 0, 等于N方向元素数)",
   "oldString": "    constexpr uint32_t loop_dst_stride = 256;   // 目的ND矩阵间距 (dst_D > 0)"
 }
@@ -5409,10 +5409,10 @@ Actually, `loop_dst_stride=256` might be too high. But `loop_dst_stride=16` seem
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
   "description": "Rebuild 3510 and run with fixed loop_dst_stride",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -5528,7 +5528,7 @@ Actually, I wonder if the issue is with `loop_src_stride=0`. Let me try `loop_sr
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    constexpr uint32_t loop_dst_stride = N_SIZE; // 目的ND矩阵间距 (> 0)\n    constexpr uint16_t loop_src_stride = 1;      // 源NZ矩阵Z方向步长, 单位C0_Size",
   "oldString": "    constexpr uint32_t loop_dst_stride = N_SIZE; // 目的ND矩阵间距 (> 0, 等于N方向元素数)\n    constexpr uint16_t loop_src_stride = 0;"
 }
@@ -5551,7 +5551,7 @@ Edit applied successfully.
   "command": "make -j$(nproc) 2>&1 && ./cube_mmad_example 2>&1 | grep -E 'Output|Golden|Success|Failed|error|warning|Loop'",
   "description": "Rebuild and run with loop_src_stride=1",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -5597,7 +5597,7 @@ Let me try `n_size=16, m_size=16`.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    constexpr uint16_t n_size = 16;              // N方向元素数\n    constexpr uint16_t m_size = 16;              // M方向元素数",
   "oldString": "    constexpr uint16_t n_size = 16;              // N方向元素数? 或分形数?"
 }
@@ -5622,7 +5622,7 @@ Let me read the current state of the file around the n_size line.
 ```json
 {
   "offset": 80,
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "limit": 10
 }
 ```
@@ -5671,7 +5671,7 @@ Let me try without `NZ2ND_en` first, to see if the basic L0C->GM works:
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    constexpr bool NZ2ND_en = false;        // 输出NZ格式 (避免格式转换错误)",
   "oldString": "    constexpr bool NZ2ND_en = true;         // NZ->ND 格式转换"
 }
@@ -5694,7 +5694,7 @@ Edit applied successfully.
   "command": "make -j$(nproc) 2>&1 && ./cube_mmad_example 2>&1 | grep -E 'Output|Golden|Success|Failed|error|warning|Loop'",
   "description": "Test without NZ2ND conversion",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -5773,7 +5773,7 @@ MMAD 计算正确！Output 前16个值完全匹配。问题是 `n_size=1` 应为
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    constexpr uint16_t n_size = 16;              // N方向元素数 (须16对齐)\n    constexpr uint16_t m_size = 16;              // M方向元素数",
   "oldString": "    constexpr uint16_t n_size = 1;\n    constexpr uint16_t m_size = 1;"
 }
@@ -5808,7 +5808,7 @@ In the original installed SDK, n_size=1 worked (gave the correct output). The er
   "command": "make -j$(nproc) 2>&1 && ./cube_mmad_example 2>&1 | grep -E 'Output|Golden|Success|Failed|error|warning|Loop'",
   "description": "Test with n_size=16, m_size=16",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -5851,7 +5851,7 @@ Now let me update the SKILL.md and example files to reflect the working 3510 bui
   "todos": [
     {
       "priority": "high",
-      "content": "Create cube_c_api_skill directory and SKILL.md",
+      "content": "Create skill_cube_3510 directory and SKILL.md",
       "status": "completed"
     },
     {
@@ -5912,7 +5912,7 @@ Let me update SKILL.md to fix the compilation note and make sure the API signatu
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md",
   "newString": "- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;` 在仿真模式下编译运行",
   "oldString": "- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;` 在仿真模式下编译运行（注：dav-3510 的 Cube C API 在 CANN 9.0.0-beta2 中尚未完整发布，dav-2201 提供了完整的 Cube C API，分形概念和数据流在两架构间一致）"
 }
@@ -5936,7 +5936,7 @@ The old string might have different formatting. Let me read the relevant line.
 **Input:**
 ```json
 {
-  "command": "grep -n '编译时使用\\|dav-2201\\|dav-3510' /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md | head -5",
+  "command": "grep -n '编译时使用\\|dav-2201\\|dav-3510' /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md | head -5",
   "description": "Find compilation note in SKILL.md"
 }
 ```
@@ -5962,7 +5962,7 @@ Hmm, the line already says `dav-3510`. But it also has an incorrect note saying 
 ```json
 {
   "offset": 27,
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md",
   "limit": 1
 }
 ```
@@ -5991,7 +5991,7 @@ That note is wrong. It was from a previous edit that was garbled. Let me fix it.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md",
   "newString": "- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;` 在仿真模式下编译运行",
   "oldString": "- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;` 在仿真模式下编译运行（注：dav-3510 的 Cube C API 在 CANN 9.0.0-beta2 中尚未完整发布，dav-3510 提供了完整的 Cube C API，分形概念和数据流在两架构间一致）"
 }
@@ -6018,7 +6018,7 @@ Also, I should update the example.md to reflect the 3510 API. But the example.md
   "todos": [
     {
       "priority": "high",
-      "content": "Create cube_c_api_skill directory and SKILL.md",
+      "content": "Create skill_cube_3510 directory and SKILL.md",
       "status": "completed"
     },
     {

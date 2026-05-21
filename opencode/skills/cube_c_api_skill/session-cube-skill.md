@@ -6524,7 +6524,7 @@ Now I have comprehensive knowledge. Let me create the skill directory and files.
 {
   "todos": [
     {
-      "content": "Create cube_c_api_skill directory and SKILL.md",
+      "content": "Create skill_cube_3510 directory and SKILL.md",
       "status": "in_progress",
       "priority": "high"
     },
@@ -7104,8 +7104,8 @@ Now I have enough understanding. Let me create the skill and example files.
 **Input:**
 ```json
 {
-  "command": "mkdir -p /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples",
-  "description": "Create cube_c_api_skill directory"
+  "command": "mkdir -p /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples",
+  "description": "Create skill_cube_3510 directory"
 }
 ```
 
@@ -7127,7 +7127,7 @@ Let me write the SKILL.md first.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md",
   "content": "---\nname: cube_c_api\ndescription: 通过AscendC C API编程语言编写Cube核（矩阵计算核心）的测试样例。样例仅考虑单核上的数据搬运、矩阵计算、搬出，且除了必要的搬运操作外，每次只测试单独的一个API接口。本技能仅考虑NPU架构为3510场景的AscendC Cube核C API测试样例编写。当用户提到Cube核C API样例或矩阵计算C API时，应使用此技能。\n---\n\n# Ascend 3510 NPU Cube核 C API 技能文档\n\n## 概述\n\n3510 Cube核 C API（适用于 Ascend 950PR/950DT）为 NPU 矩阵计算核心提供底层的、面向硬件的编程接口。\n这些 API 是对编译器 CCE（Cube Compute Engine）内部指令的薄封装，提供了 C 语言编程体验，支持数组分配内存，可直接控制\n矩阵数据搬运、矩阵乘加计算。Cube核（AIC核）专门处理矩阵乘加运算，使用的缓冲区与Vector核不同。\n\n本文档涵盖 3510 架构 Cube核 C API（即 `npu_arch_3510`），兼容 Ascend 950PR 和 Ascend 950DT 硬件。\n\n---\n\n## 重要限制\n\n- Cube核的函数标识符为 `__cube__`，对应矩阵计算专用核心\n- Cube核仅能访问 L0A Buffer (`__ca__`)、L0B Buffer (`__cb__`)、L0C Buffer (`__cc__`)、L1 Buffer (`__cbuf__`)，没有 UB\n- Cube核只能使用 `__aicore__` 级别的函数，不支持 `__simd_vf__` 级别的寄存器编程\n- Cube核使用 `cube_compute.h` 和 `cube_datamove.h` 头文件中的API\n- 数据通路为: GM -> L1 -> L0A/L0B -> Cube MMAD -> L0C -> GM（或 L0C -> L1 -> GM）\n- 矩阵数据在内存中以分形（fractal, NZ格式）存储，对每个维度需按分形大小对齐\n- 3510架构中，`asc_mmad` 的950专用重载版本使用 `disable_gemv` 参数替代 `k_direction_align` 参数\n- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;` 在仿真模式下编译运行\n- 执行精度对比时，应将输入、输出、真值数据打印并存储为csv文件\n\n---\n\n## 快速入门\n\n### 头文件引入\n\n```c\n#include \"c_api/asc_simd.h\"\n```\n\n单个头文件即可包含所有 C API 接口。Cube核主要使用其中的 `cube_compute.h` 和 `cube_datamove.h` 相关接口。\n\n### Kernel 函数结构\n\n```c\n__cube__ __global__ __aicore__ void cube_mmad_example(\n    __gm__ half* gm_a, __gm__ half* gm_b, __gm__ float* gm_c)\n{\n    asc_init();\n\n    // L1 Buffer 声明\n    __cbuf__ half l1_a[256];\n    __cbuf__ half l1_b[256];\n\n    // L0 Buffer 声明\n    __ca__ half l0a_a[256];\n    __cb__ half l0b_b[256];\n    __cc__ float l0c_c[256];\n\n    // 步骤1: GM -> L1 (2D搬运, 自动分形)\n    const uint8_t l2_cache_ctl = 0;\n    const uint8_t decomp_mode = 0;\n    asc_copy_gm2l1_sync(l1_a, gm_a, 0, 0,        // m_start, k_start\n                        0, 16, 16,                // dst_stride, m_step, k_step\n                        decomp_mode, l2_cache_ctl);\n    asc_copy_gm2l1_sync(l1_b, gm_b, 0, 0,\n                        0, 16, 16,\n                        decomp_mode, l2_cache_ctl);\n\n    // 步骤2: L1 -> L0A, L0B (分形搬运)\n    asc_copy_l12l0a_sync(l0a_a, l1_a, 0, 0, 1, 1, 0, 0);\n    asc_copy_l12l0b_sync(l0b_b, l1_b, 0, 0, 1, 1, 0, 0);\n\n    // 步骤3: 矩阵乘加\n    const uint16_t left_height = 16;\n    const uint16_t n_dim = 16;\n    const uint16_t right_width = 16;\n    const uint8_t unit_flag = 0;\n    const bool disable_gemv = false;\n    const bool c_matrix_source = false;\n    const bool c_matrix_init_val = true;\n    asc_mmad_sync(l0c_c, l0a_a, l0b_b,\n                  left_height, n_dim, right_width,\n                  unit_flag, disable_gemv,\n                  c_matrix_source, c_matrix_init_val);\n\n    // 步骤4: L0C -> GM\n    const uint16_t n_size = 1;\n    const uint16_t m_size = 1;\n    const uint32_t loop_dst_stride = 0;\n    const uint16_t loop_src_stride = 0;\n    const uint8_t clip_relu_pre = 0;\n    const uint8_t unit_flag_ctl = 0;\n    const uint64_t quant_pre = 0;   // NoQuant\n    const uint8_t relu_pre = 0;\n    const bool split_en = false;\n    const bool NZ2ND_en = false;\n    const uint64_t quant_post = 0;  // NoConv\n    const uint8_t relu_post = 0;\n    const bool clip_relu_post = false;\n    const uint8_t eltwise_op = 0;\n    const bool eltwise_antq_en = false;\n    const bool C0_pad_en = false;\n    const bool broadcast_en = false;\n    const bool NZ2DN_en = false;\n\n    asc_copy_l0c2gm_sync((__gm__ float*)gm_c, l0c_c,\n                         n_size, m_size,\n                         loop_dst_stride, loop_src_stride, l2_cache_ctl,\n                         clip_relu_pre, unit_flag_ctl, quant_pre, relu_pre,\n                         split_en, NZ2ND_en, quant_post, relu_post,\n                         clip_relu_post, eltwise_op, eltwise_antq_en,\n                         C0_pad_en, broadcast_en, NZ2DN_en);\n}\n```\n\n---\n\n## 核心概念\n\n### 存储修饰符（Cube核专用）\n\n| 修饰符     | 地址空间                   | 对齐要求 | 说明                        |\n|-----------|---------------------------|----------|-----------------------------|\n| `__gm__`  | Global Memory（DDR/HBM）   | 无       | 片外内存                    |\n| `__cbuf__`| L1 Buffer（片上）          | 32B      | Cube核片上数据缓冲           |\n| `__ca__`  | L0A Buffer（矩阵左操作数）  | 512B     | 左矩阵A的输入缓冲区          |\n| `__cb__`  | L0B Buffer（矩阵右操作数）  | 512B     | 右矩阵B的输入缓冲区          |\n| `__cc__`  | L0C Buffer（矩阵结果）      | 64B      | 结果矩阵C的输出缓冲区        |\n\n**注意**: Cube核没有 UB（Unified Buffer），不能使用 `__ubuf__` 修饰符和 `vector_*` 寄存器类型。\n\n### 内存分配\n\nL1 和 L0 缓冲区必须使用编译期常量数组大小：\n\n```c\nconstexpr uint32_t SIZE = 256;\n__cbuf__ half buf[SIZE];   // 正确\n__ca__ half l0a_buf[SIZE]; // 正确\n```\n\n### 函数标识符\n\n| 标识符      | 含义                          | 适用核心    |\n|------------|------------------------------|------------|\n| `__cube__` | Cube核（矩阵计算）专用函数     | Cube核(AIC) |\n| `__vector__` | Vector核（矢量计算）专用函数 | Vector核   |\n| `__global__` | 核函数入口点                 | 任意       |\n| `__aicore__` | AI Core属性（用于入口函数）   | 任意       |\n\n**重要**: 对于 Cube核 kernel，使用 `__cube__ __global__ __aicore__` 组合。如果函数调用了 `asc_copy_l12ub`（Cube核与Vector核间的数据搬运），则不能使用 `__cube__` 或 `__vector__` 修饰符。\n\n---\n\n## API 分类概览\n\n### Cube 计算 (cube_compute.h)\n\n| API                        | 流水线   | 说明                                            |\n|----------------------------|---------|-------------------------------------------------|\n| `asc_mmad`                 | PIPE_M  | 矩阵乘加: C = A * B + C                         |\n| `asc_mmad_sync`            | PIPE_M  | 矩阵乘加（同步版本）                              |\n| `asc_mmad_s4`              | PIPE_M  | 矩阵乘加（4-bit数据类型）                         |\n| `asc_mmad_s4_sync`         | PIPE_M  | 矩阵乘加（4-bit，同步版本）                       |\n| `asc_mmad_mx`              | PIPE_M  | 矩阵乘加（MX格式，带放缩）                        |\n| `asc_mmad_mx_sync`         | PIPE_M  | 矩阵乘加（MX格式，同步版本）                       |\n| `asc_mmad_sparse`          | PIPE_M  | 稀疏矩阵乘加（A为稀疏，B为稠密）                   |\n| `asc_mmad_sparse_sync`     | PIPE_M  | 稀疏矩阵乘加（同步版本）                           |\n| `asc_set_l0c2gm_config`    | PIPE_S  | 设置L0C->GM随路量化参数                           |\n| `asc_set_l0c2gm_nz2nd`     | PIPE_S  | 设置NZ->ND格式转换参数                            |\n| `asc_set_mmad_direction_m` | PIPE_S  | 设置MMAD优先M方向计算                             |\n| `asc_set_mmad_direction_n` | PIPE_S  | 设置MMAD优先N方向计算                             |\n| `asc_set_fp32_mode`        | PIPE_S  | 设置MMAD的FP32模式（不做舍入）                     |\n| `asc_get_l0c2gm_unitflag`  | PIPE_S  | 获取unit_flag设置                                |\n\n### Cube 数据搬运 (cube_datamove.h)\n\n| API                          | 流水线      | 说明                                              |\n|------------------------------|------------|---------------------------------------------------|\n| `asc_copy_gm2l1`             | PIPE_MTE2  | GM -> L1（2D搬运，支持多种数据类型）                 |\n| `asc_copy_gm2l1_align`       | PIPE_MTE2  | GM -> L1（带padding的劈裂搬运）                     |\n| `asc_copy_gm2l0a`            | PIPE_MTE2  | GM -> L0A（分形搬运）                               |\n| `asc_copy_gm2l0b`            | PIPE_MTE2  | GM -> L0B（分形搬运）                               |\n| `asc_copy_l12l0a`            | PIPE_MTE1  | L1 -> L0A（2D/3D分形搬运，支持转置）                |\n| `asc_copy_l12l0b`            | PIPE_MTE1  | L1 -> L0B（2D/3D分形搬运，支持转置）                |\n| `asc_copy_l12l0c`            | PIPE_MTE1  | L1 -> L0C（线性搬运，支持类型转换）                  |\n| `asc_copy_l0c2gm`            | PIPE_FIX   | L0C -> GM（支持量化、relu、格式转换）               |\n| `asc_copy_l0c2ub`            | PIPE_FIX   | L0C -> UB（支持量化、relu、格式转换）               |\n| `asc_copy_l0c2l1`            | PIPE_FIX   | L0C -> L1（支持量化、relu、格式转换）               |\n| `asc_copy_l12fb`             | PIPE_FIX   | L1 -> Fixpipe Buffer（量化参数搬运）               |\n| `asc_copy_l12fb_v2`          | PIPE_MTE1  | L1 -> Fixpipe Buffer（v2版本）                    |\n| `asc_copy_l12bt`             | PIPE_MTE1  | L1 -> BiasTable Buffer（Bias数据搬运）            |\n| `asc_copy_l12gm`             | PIPE_MTE1  | L1 -> GM（线性搬运）                               |\n| `asc_copy_l12ub`             | PIPE_MTE1  | L1 -> UB（跨核搬运，不能使用__cube__）              |\n| `asc_fill_l0a`               | PIPE_MTE1  | L0A 初始化为指定值                                  |\n| `asc_fill_l0b`               | PIPE_MTE1  | L0B 初始化为指定值                                  |\n| `asc_fill_l1`                | PIPE_MTE1  | L1 初始化为指定值                                  |\n| `asc_set_l13d_fmatrix`       | PIPE_S     | 设置左矩阵3D搬运的Feature map属性                   |\n| `asc_set_l13d_fmatrix_b`     | PIPE_S     | 设置右矩阵3D搬运的Feature map属性                   |\n| `asc_set_l13d_rpt`           | PIPE_S     | 设置Load3Dv2的repeat参数                           |\n| `asc_set_l13d_size`          | PIPE_S     | 设置3D搬运的L1 Buffer边界值                        |\n| `asc_set_l13d_padding`       | PIPE_S     | 设置3D搬运的Pad填充值                               |\n| `asc_set_gm2l1_loop_size`    | PIPE_S     | 设置GM->L1搬运的循环体配置                          |\n| `asc_set_gm2l1_loop1_stride` | PIPE_S     | 设置GM->L1搬运的循环1步长                           |\n| `asc_set_gm2l1_loop2_stride` | PIPE_S     | 设置GM->L1搬运的循环2步长                           |\n| `asc_set_gm2l1_pad`          | PIPE_S     | 设置GM->L1搬运的Pad填充模式                        |\n\n---\n\n## 矩阵分形（Fractal）核心知识\n\n### 分形基本概念\n\nCube核的矩阵运算以\"分形\"（fractal）为基本处理单元。分形是 Cube 单元在一次运算中能处理的固定大小的矩阵子块。\n\n### 3510架构分形尺寸\n\n| 数据类型位宽 | L0A分形大小  | L0B分形大小  | L0C分形大小  | 分形字节数(C0_SIZE) |\n|:-----------:|:----------:|:----------:|:----------:|:------------------:|\n| 4-bit (int4/fp4) | 16 x 64 | 64 x 16 | 16 x 16 | 16 * sizeof(T) |\n| 8-bit (int8/fp8/hifloat8) | 16 x 32 | 32 x 16 | 16 x 16 | 16 * sizeof(T) |\n| 16-bit (half/bf16/int16) | 16 x 16 | 16 x 16 | 16 x 16 | 16 * sizeof(T) |\n| 32-bit (float/int32) | 16 x 16 | 16 x 16 | 16 x 16 | 16 * sizeof(T) |\n\n- C0 = 16（对于8-bit及以下类型，C0 = 32 用于L0A/L0B，C0 = 16 用于L0C）\n- 每个分形在L0A/L0B中占据 **512B**\n- k_step 的单位为32B，m_step 的单位为16个元素\n\n### NZ矩阵存储格式\n\n矩阵在 L0C 中按照 **NZ (N-major, Z-major)** 格式存储：\n- N 方向（列方向）为第一优先级\n- Z 方向（C0 个元素组成的\"骨\"）为第二优先级\n- 以 half (16-bit) 为例：C0=16，将矩阵按16行一组划分，每个16x16的分形按列主序存储\n\n理解分形存储对于正确计算 `loop_src_stride` 至关重要：\n- `loop_src_stride` 的单位为 C0_Size = 16 * sizeof(T)\n- 对于 float 类型: C0_Size = 16 * 4 = 64B\n- 对于 half 类型: C0_Size = 16 * 2 = 32B\n\n### m_start_position / k_start_position 参数\n\n在 `asc_copy_l12l0a` 和 `asc_copy_l12l0b` 的2D格式中：\n\n```\n以 M x K 矩阵为例:\n  m_start_position: M轴方向的起始位置，单位 = 16个元素\n  k_start_position: K轴方向的起始位置，单位 = 32B\n\n  m_step: M轴方向搬运长度，单位 = 16个元素\n  k_step: K轴方向搬运长度，单位 = 32B\n\n  src_stride: K方向相邻分形起始地址间隔，单位 = 512B (分形块大小)\n  dst_stride: K方向相邻分形起始地址间隔，单位 = 512B (分形块大小)\n```\n\n**举例**: 对于 half 类型的 32x32 矩阵，M方向有2个分形，K方向有2个分形：\n- 第0个分形: m_start=0, k_start=0\n- 第1个分形: m_start=0, k_start=1 (K方向平移)\n- 第2个分形: m_start=1, k_start=0 (M方向平移)\n- 第3个分形: m_start=1, k_start=1\n\n### GM->L1 2D搬运参数\n\n`asc_copy_gm2l1` 在2D模式下：\n\n```\nasc_copy_gm2l1(__cbuf__ half *dst, __gm__ half *src,\n    m_start_position, k_start_position,\n    dst_stride, m_step, k_step,\n    decomp_mode, l2_cache_ctl)\n\n参数说明:\n  m_start_position: M方向起始位置，单位 = 16个元素\n  k_start_position: K方向起始位置，单位 = 32B\n  dst_stride: L1中相邻分形的K方向步长，单位 = 32B (每个Block)\n  m_step: M方向搬运长度，单位 = 16个元素\n  k_step: K方向搬运长度，单位 = 32B\n```\n\n**注意**: `dst_stride` = k_step 时表示分形连续存放（无间隔）。\n\n### 分形数量计算\n\n对于 M x K 的矩阵（half类型，分形大小 16x16）：\n- M方向分形数: `num_fractal_m = (M + 15) / 16`\n- K方向分形数: `num_fractal_k = (K + 15) / 16`  (注意: 单位为32B = 16个half元素)\n- 总元素数（分形对齐后）: `num_fractal_m * 16 * num_fractal_k * 16`\n\n---\n\n## Cube核常用使用模式\n\n### 模式 1：单核单分形矩阵乘法 (half -> float)\n\n数据流: GM -> L1 -> L0A/L0B -> MMAD -> L0C -> GM\n\n```c\n__cube__ __global__ __aicore__ void simple_matmul(\n    __gm__ half* a, __gm__ half* b, __gm__ float* c)\n{\n    asc_init();\n\n    constexpr uint32_t M = 16;\n    constexpr uint32_t K = 16;\n    constexpr uint32_t N = 16;\n\n    __cbuf__ half l1_a[M * K / 16 * 16];  // 256\n    __cbuf__ half l1_b[K * N / 16 * 16];  // 256\n    __ca__ half l0a_a[256];\n    __cb__ half l0b_b[256];\n    __cc__ float l0c_c[256];\n\n    // GM -> L1\n    asc_copy_gm2l1_sync(l1_a, a, 0, 0, 0, 1, 1, 0, 0);\n    asc_copy_gm2l1_sync(l1_b, b, 0, 0, 0, 1, 1, 0, 0);\n\n    // L1 -> L0A, L0B\n    asc_copy_l12l0a_sync(l0a_a, l1_a, 0, 0, 1, 1, 0, 0);\n    asc_copy_l12l0b_sync(l0b_b, l1_b, 0, 0, 1, 1, 0, 0);\n\n    // MMAD\n    asc_mmad_sync(l0c_c, l0a_a, l0b_b,\n                  M, K, N, 0, false, false, true);\n\n    // L0C -> GM (无量化)\n    asc_copy_l0c2gm_sync((__gm__ float*)c, l0c_c,\n                         1, 1, 0, 0, 0,\n                         0, 0, 0/*NoQuant*/, 0,\n                         false, false, 0/*NoConv*/, 0,\n                         false, 0, false, false, false, false);\n}\n```\n\n### 模式 2：大矩阵分形遍历\n\n对于 MxKxN 的大矩阵，需要以分形为单位双重循环遍历：\n\n```c\n__cube__ __global__ __aicore__ void large_matmul(\n    __gm__ half* a, __gm__ half* b, __gm__ float* c,\n    uint32_t num_fractal_m, uint32_t num_fractal_k, uint32_t num_fractal_n)\n{\n    asc_init();\n\n    __cbuf__ half l1_a[256];    // 1个分形\n    __cbuf__ half l1_b[256];    // 1个分形\n    __ca__ half l0a_a[256];\n    __cb__ half l0b_b[256];\n    __cc__ float l0c_c[256];\n\n    for (uint32_t m = 0; m < num_fractal_m; ++m) {\n        for (uint32_t n = 0; n < num_fractal_n; ++n) {\n            // 初始化 C 分形为0\n            asc_fill_l0a_sync(l0a_a, half(0),\n                asc_fill_value_config());  // 此处用 fill_l0a 做示范，实际需搬入数据\n\n            for (uint32_t k = 0; k < num_fractal_k; ++k) {\n                uint32_t a_k_start = k * 1;          // K方向分形索引\n                uint32_t a_m_start = m;              // M方向分形索引\n                uint32_t b_k_start = k;              // K方向分形索引（B的M维度）\n                uint32_t b_n_start = n;              // N方向分形索引\n\n                // GM -> L1\n                asc_copy_gm2l1(l1_a, a, a_m_start, a_k_start,\n                               0, 1, 1, 0, 0);\n                asc_copy_gm2l1(l1_b, b, b_k_start, b_n_start,\n                               0, 1, 1, 0, 0);\n\n                asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);\n                asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);\n\n                // L1 -> L0\n                asc_copy_l12l0a(l0a_a, l1_a, 0, 0, 1, 1, 0, 0);\n                asc_copy_l12l0b(l0b_b, l1_b, 0, 0, 1, 1, 0, 0);\n\n                asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);\n                asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);\n\n                // MMAD (k>0时累加到L0C)\n                bool is_first_k = (k == 0);\n                asc_mmad(l0c_c, l0a_a, l0b_b,\n                         16, 16, 16,\n                         0, false, !is_first_k, is_first_k);\n            }\n\n            asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);\n            asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);\n\n            // L0C -> GM\n            uint32_t c_gm_offset = m * num_fractal_n * 256 + n * 256;\n            asc_copy_l0c2gm((__gm__ float*)(c + c_gm_offset), l0c_c,\n                            1, 1, 0, 0, 0,\n                            0, 0, 0, 0,\n                            false, false, 0, 0,\n                            false, 0, false, false, false, false);\n        }\n    }\n}\n```\n\n### 模式 3：同步指令使用\n\nCube核中的同步指令用于协调不同流水线间的依赖：\n\n```c\n// PIPE_MTE2: GM->L1 搬运流水线\n// PIPE_MTE1: L1->L0A/L0B 搬运流水线\n// PIPE_M:    Cube矩阵计算流水线（MMAD）\n// PIPE_FIX:  L0C->GM 搬运流水线\n// PIPE_S:    标量/控制流水线\n\n// GM->L1 完成后通知 PIPE_MTE1 可以读取\nasc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);\nasc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);\n\n// L1->L0 完成后通知 PIPE_M 可以计算\nasc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);\nasc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);\n\n// MMAD 完成后通知 PIPE_FIX 可以搬运结果\nasc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);\nasc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);\n```\n\n**注意**: 使用 `_sync` 后缀的API（如 `asc_copy_gm2l1_sync`、`asc_mmad_sync`）会自动插入同步，简化编程但可能降低性能。\n\n---\n\n## asc_mmad 参数详解\n\n```\nasc_mmad(__cc__ float* c_matrix,\n         __ca__ half* a_matrix,\n         __cb__ half* b_matrix,\n         uint16_t left_height,      // A矩阵的行数 (M)\n         uint16_t n_dim,            // A矩阵的列数/B矩阵的行数 (K)\n         uint16_t right_width,      // B矩阵的列数 (N)\n         uint8_t unit_flag,         // 细粒度并行控制\n         bool disable_gemv,         // 3510专用: 关闭GEMV模式\n         bool c_matrix_source,      // C矩阵来源\n         bool c_matrix_init_val)    // C矩阵是否初始化为0\n```\n\n### unit_flag 说明\n\n| 取值 | 含义                                                         |\n|:---:|-------------------------------------------------------------|\n| 0   | 关闭unit_flag                                                |\n| 1   | 保留值                                                       |\n| 2   | 使能unit_flag，硬件执行完后不关闭（用于中间分形）               |\n| 3   | 使能unit_flag，硬件执行完后关闭（用于最后一个分形）             |\n\nunit_flag 使能后，硬件每计算完一个分形就将结果搬出，实现矩阵计算与数据搬运的细粒度并行。最后一个分形使用3，其余使用2。\n\n### c_matrix_source 和 c_matrix_init_val\n\n| c_matrix_init_val | c_matrix_source | 效果                                  |\n|:-----------------:|:--------------:|---------------------------------------|\n| true              | 任意            | C矩阵初始化为全0                       |\n| false             | true           | C矩阵初始值来源于 BiasTable (C2)       |\n| false             | false          | C矩阵初始值来源于 L0C 中已有的数据      |\n\n### disable_gemv (3510专用)\n\n| 取值  | 含义                                                         |\n|:----:|-------------------------------------------------------------|\n| true | 关闭GEMV模式（标准矩阵乘法）                                   |\n| false| 开启GEMV模式（矩阵-向量乘法，要求 left_height=1）              |\n\n---\n\n## asc_copy_l0c2gm 参数详解\n\n`asc_copy_l0c2gm` 将 L0C 的结果搬运到 GM，支持随路量化、ReLU、格式转换。\n\n关键参数：\n\n| 参数             | 说明                                              |\n|-----------------|---------------------------------------------------|\n| n_size          | 源NZ矩阵N方向大小（分形数），范围[1,4095]           |\n| m_size          | 源NZ矩阵M方向大小（分形数），范围[1,65535]          |\n| loop_dst_stride | 目的相邻ND矩阵起始地址偏移                          |\n| loop_src_stride | 源NZ矩阵中相邻Z排布起始地址偏移，单位=C0_Size         |\n| quant_pre       | 预处理量化模式（如NoQuant=0, DEQF16等）            |\n| quant_post      | 后处理量化模式（如NoConv=0, VQS162B8_POST等）      |\n| NZ2ND_en        | 使能NZ->ND格式转换（true: 转成连续ND格式）          |\n\n### 常见量化模式 (quant_pre)\n\n| 枚举值                  | 含义                            |\n|------------------------|--------------------------------|\n| NoQuant (0)            | 不使能量化                      |\n| F322BF16               | float -> bfloat16              |\n| F322F16                | float -> half                  |\n| DEQF16                 | int32 -> half                  |\n| VDEQF16                | int32 -> half（矢量量化）       |\n| VREQ8                  | int32 -> uint8/int8（矢量量化）  |\n\n### 常见量化模式 (quant_post)\n\n| 枚举值              | 含义                      |\n|--------------------|--------------------------|\n| NoConv (0)         | 不使能量化                |\n| VQS162B8_POST      | int16 -> bfloat8（矢量量化）|\n| VQS162S4_POST      | int16 -> int4（矢量量化）  |\n| VQS162S16_POST     | int16 -> int16（矢量量化） |\n\n---\n\n## 支持的数据类型（Cube核常用）\n\n| C/C++ 类型    | L0A修饰符 | L0B修饰符 | L0C修饰符 | 说明              |\n|--------------|----------|----------|----------|-------------------|\n| `half`       | `__ca__` | `__cb__` | `__cc__` | 半精度浮点         |\n| `float`      | `__ca__` | `__cb__` | `__cc__` | 单精度浮点         |\n| `bfloat16_t` | `__ca__` | `__cb__` | `__cc__` | Brain浮点          |\n| `int8_t`     | `__ca__` | `__cb__` | `__cc__` | 8位有符号整数      |\n| `int32_t`    | `__ca__` | `__cb__` | `__cc__` | 32位有符号整数     |\n| `fp8_e4m3fn_t` | `__ca__` | `__cb__` | -        | FP8 E4M3格式       |\n| `fp8_e5m2_t`   | `__ca__` | `__cb__` | -        | FP8 E5M2格式       |\n| `hifloat8_t`   | `__ca__` | `__cb__` | -        | HiFloat8格式       |\n| `fp4x2_e2m1_t` | `__ca__` | `__cb__` | -        | FP4 E2M1格式（MX） |\n| `fp4x2_e1m2_t` | `__ca__` | `__cb__` | -        | FP4 E1M2格式（MX） |\n| `int4b_t`      | `__ca__` | `__cb__` | -        | 4位整数（S4）       |\n\n**注意**: `asc_mmad` 的结果类型由输入类型决定。常见组合：\n- A=half, B=half => C=float\n- A=int8, B=int8 => C=int32\n- A=bf16, B=bf16 => C=float\n- A=fp8, B=fp8 => C=float\n\n---\n\n## CMakeLists.txt 模板\n\n```cmake\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_example cube_example.asc)\ntarget_compile_options(cube_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>\n)\n```\n\n---\n\n完整的 API 参考请参见 [../../../docs/api/c_api/cube_compute/](../../../docs/api/c_api/cube_compute/) 和 [../../../docs/api/c_api/cube_datamove/](../../../docs/api/c_api/cube_datamove/)。\n完整的可运行示例请参见 [examples/cube_example.md](examples/cube_example.md)。\n"
 }
 ```
@@ -7153,7 +7153,7 @@ Now let me write the example.md file with coding patterns and examples.
   "todos": [
     {
       "priority": "high",
-      "content": "Create cube_c_api_skill directory and SKILL.md",
+      "content": "Create skill_cube_3510 directory and SKILL.md",
       "status": "completed"
     },
     {
@@ -7205,7 +7205,7 @@ Now let me write the example markdown and the working .asc example.
 ```json
 {
   "content": "# Ascend 3510 Cube核 C API 示例\n\n展示 3510 Cube核 C API 使用模式的完整可运行示例。\n所有示例假定项目已配置 `find_package(ASC REQUIRED)` 且引入了 `#include \"c_api/asc_simd.h\"`。\n\n---\n\n## Cube核编程模板（单核，单分形）\n\n### Kernel函数\n\nCube核的 kernel 入口使用 `__cube__ __global__ __aicore__` 标识符。\n\n```cpp\n#include <cstdint>\n#include <iostream>\n#include <vector>\n#include <algorithm>\n#include <cstdlib>\n#include <cstring>\n#include <cmath>\n#include \"acl/acl.h\"\n#include \"c_api/asc_simd.h\"\n\nconstexpr uint32_t NUM_BLOCKS = 1;   // 单核\nconstexpr uint32_t M_SIZE = 16;\nconstexpr uint32_t K_SIZE = 16;\nconstexpr uint32_t N_SIZE = 16;\n\n/* --------------------------------------------------------------------------\n * Cube核 kernel: 单分形 matrix multiply (half * half -> float)\n * 数据流: GM -> L1 -> L0A/L0B -> MMAD -> L0C -> GM\n * -------------------------------------------------------------------------- */\n__cube__ __global__ __aicore__ void cube_mmad_kernel(\n    __gm__ half* gm_a, __gm__ half* gm_b, __gm__ float* gm_c)\n{\n    asc_init();\n\n    // L1 Buffer: 存放从GM搬来的A和B矩阵\n    // 对于16x16的half矩阵，需要256个元素 = 512B\n    __cbuf__ half l1_a[M_SIZE * K_SIZE];\n    __cbuf__ half l1_b[K_SIZE * N_SIZE];\n\n    // L0 Buffers: 计算缓冲\n    __ca__ half l0a_a[M_SIZE * K_SIZE];\n    __cb__ half l0b_b[K_SIZE * N_SIZE];\n    __cc__ float l0c_c[M_SIZE * N_SIZE];\n\n    // 步骤1: GM -> L1 (2D搬运)\n    constexpr uint8_t l2_cache_ctl = 0;    // DISABLE模式\n    constexpr uint8_t decomp_mode = 0;\n    asc_copy_gm2l1_sync(l1_a, gm_a,\n                        0, 0, 0, 1, 1,     // m_start=0,k_start=0,dst_stride=0,m_step=1,k_step=1\n                        decomp_mode, l2_cache_ctl);\n\n    asc_copy_gm2l1_sync(l1_b, gm_b,\n                        0, 0, 0, 1, 1,\n                        decomp_mode, l2_cache_ctl);\n\n    // 步骤2: L1 -> L0A, L0B (分形搬运)\n    // m_step=1: 搬运1个分形的M方向(16个元素), k_step=1: K方向1个分形(32B=16个half)\n    asc_copy_l12l0a_sync(l0a_a, l1_a, 0, 0, 1, 1, 0, 0);\n    asc_copy_l12l0b_sync(l0b_b, l1_b, 0, 0, 1, 1, 0, 0);\n\n    // 步骤3: 矩阵乘加 c = a * b\n    constexpr uint16_t left_height = M_SIZE;\n    constexpr uint16_t n_dim = K_SIZE;\n    constexpr uint16_t right_width = N_SIZE;\n    constexpr uint8_t unit_flag = 0;       // 关闭unit_flag\n    constexpr bool disable_gemv = false;   // 开启GEMV模式\n    constexpr bool c_matrix_source = false;\n    constexpr bool c_matrix_init_val = true; // C初始化为0\n\n    asc_mmad_sync(l0c_c, l0a_a, l0b_b,\n                  left_height, n_dim, right_width,\n                  unit_flag, disable_gemv,\n                  c_matrix_source, c_matrix_init_val);\n\n    // 步骤4: L0C -> GM (无量化, 直接搬运float结果)\n    constexpr uint16_t n_size = 1;         // N方向分形数\n    constexpr uint16_t m_size = 1;         // M方向分形数\n    constexpr uint32_t loop_dst_stride = 0;\n    constexpr uint16_t loop_src_stride = 0;\n    constexpr uint8_t clip_relu_pre = 0;\n    constexpr uint8_t unit_flag_ctl = 0;\n    constexpr uint64_t quant_pre = 0;      // NoQuant\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool split_en = false;\n    constexpr bool NZ2ND_en = false;\n    constexpr uint64_t quant_post = 0;     // NoConv\n    constexpr uint8_t relu_post = 0;\n    constexpr bool clip_relu_post = false;\n    constexpr uint8_t eltwise_op = 0;\n    constexpr bool eltwise_antq_en = false;\n    constexpr bool C0_pad_en = false;\n    constexpr bool broadcast_en = false;\n    constexpr bool NZ2DN_en = false;\n\n    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size, m_size,\n        loop_dst_stride, loop_src_stride, l2_cache_ctl,\n        clip_relu_pre, unit_flag_ctl, quant_pre, relu_pre,\n        split_en, NZ2ND_en, quant_post, relu_post,\n        clip_relu_post, eltwise_op, eltwise_antq_en,\n        C0_pad_en, broadcast_en, NZ2DN_en);\n}\n```\n\n### Host 侧调用流程\n\n```cpp\nstd::vector<float> kernel_cube_mmad(\n    std::vector<half> &a, std::vector<half> &b)\n{\n    constexpr uint32_t numBlocks = NUM_BLOCKS;\n    uint32_t totalLengthA = a.size();\n    uint32_t totalLengthB = b.size();\n    uint32_t totalLengthC = M_SIZE * N_SIZE;\n\n    size_t byteSizeA = totalLengthA * sizeof(half);\n    size_t byteSizeB = totalLengthB * sizeof(half);\n    size_t byteSizeC = totalLengthC * sizeof(float);\n\n    int32_t deviceId = 0;\n    aclrtStream stream = nullptr;\n\n    uint8_t *aHost = reinterpret_cast<uint8_t *>(a.data());\n    uint8_t *bHost = reinterpret_cast<uint8_t *>(b.data());\n    uint8_t *cHost = nullptr;\n\n    half *aDevice = nullptr;\n    half *bDevice = nullptr;\n    float *cDevice = nullptr;\n\n    aclInit(nullptr);\n    aclrtSetDevice(deviceId);\n    aclrtCreateStream(&stream);\n\n    aclrtMallocHost((void **)(&cHost), byteSizeC);\n    aclrtMalloc((void **)&aDevice, byteSizeA, ACL_MEM_MALLOC_HUGE_FIRST);\n    aclrtMalloc((void **)&bDevice, byteSizeB, ACL_MEM_MALLOC_HUGE_FIRST);\n    aclrtMalloc((void **)&cDevice, byteSizeC, ACL_MEM_MALLOC_HUGE_FIRST);\n\n    aclrtMemcpy((uint8_t*)aDevice, byteSizeA, aHost, byteSizeA,\n                ACL_MEMCPY_HOST_TO_DEVICE);\n    aclrtMemcpy((uint8_t*)bDevice, byteSizeB, bHost, byteSizeB,\n                ACL_MEMCPY_HOST_TO_DEVICE);\n\n    cube_mmad_kernel<<<numBlocks, nullptr, stream>>>(aDevice, bDevice, cDevice);\n\n    aclrtSynchronizeStream(stream);\n    aclrtMemcpy(cHost, byteSizeC, (uint8_t*)cDevice, byteSizeC,\n                ACL_MEMCPY_DEVICE_TO_HOST);\n\n    std::vector<float> c((float *)cHost,\n                         (float *)(cHost + byteSizeC));\n\n    aclrtFree(aDevice);\n    aclrtFree(bDevice);\n    aclrtFree(cDevice);\n    aclrtFreeHost(cHost);\n\n    aclrtDestroyStream(stream);\n    aclrtResetDevice(deviceId);\n    aclFinalize();\n\n    return c;\n}\n```\n\n---\n\n## Host 侧验证与启动模板\n\n```cpp\nuint32_t VerifyResult(std::vector<float> &output,\n                      std::vector<float> &golden,\n                      const char *caseName)\n{\n    auto printTensor = [](std::vector<float> &tensor, const char *name) {\n        constexpr size_t maxPrintSize = 16;\n        std::cout << name << \": \";\n        for (size_t i = 0; i < std::min(tensor.size(), maxPrintSize); ++i) {\n            std::cout << tensor[i] << \" \";\n        }\n        if (tensor.size() > maxPrintSize) {\n            std::cout << \"...\";\n        }\n        std::cout << std::endl;\n    };\n\n    printTensor(output, \"Output\");\n    printTensor(golden, \"Golden\");\n\n    float maxError = 0.0f;\n    for (size_t i = 0; i < golden.size(); ++i) {\n        float error = std::abs(output[i] - golden[i]);\n        if (error > maxError) {\n            maxError = error;\n        }\n    }\n\n    constexpr float epsilon = 0.001f;\n    bool pass = (maxError < epsilon);\n    if (pass) {\n        std::cout << \"[Success] \" << caseName\n                  << \" accuracy verification passed.\"\n                  << \" max_error=\" << maxError << std::endl;\n        return 0;\n    } else {\n        std::cout << \"[Failed] \" << caseName\n                  << \" accuracy verification failed!\"\n                  << \" max_error=\" << maxError << std::endl;\n        return 1;\n    }\n}\n\nint32_t main(int32_t argc, char *argv[])\n{\n    constexpr uint32_t M = M_SIZE;\n    constexpr uint32_t K = K_SIZE;\n    constexpr uint32_t N = N_SIZE;\n\n    // 初始化输入矩阵 A (M x K) 和 B (K x N)\n    std::vector<half> a(M * K);\n    std::vector<half> b(K * N);\n    for (uint32_t i = 0; i < M * K; ++i) {\n        a[i] = half((i % K) * 0.1f);\n    }\n    for (uint32_t i = 0; i < K * N; ++i) {\n        b[i] = half((i % N) * 0.1f);\n    }\n\n    // 调用kernel\n    std::vector<float> output = kernel_cube_mmad(a, b);\n\n    // 计算CPU真值\n    std::vector<float> golden(M * N, 0.0f);\n    for (uint32_t i = 0; i < M; ++i) {\n        for (uint32_t j = 0; j < N; ++j) {\n            float sum = 0.0f;\n            for (uint32_t k = 0; k < K; ++k) {\n                sum += float(a[i * K + k]) * float(b[k * N + j]);\n            }\n            golden[i * N + j] = sum;\n        }\n    }\n\n    return VerifyResult(output, golden, \"cube_mmad_half_half_float\");\n}\n```\n\n---\n\n## 编译注意事项\n\n- Kernel 源文件使用 `.asc` 扩展名。\n- 目标架构：`--npu-arch=dav-3510`（仅适用于 3510 平台）。\n- 项目语言必须包含 `ASC`。\n- 仿真模式编译运行命令：\n  ```bash\n  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j\n  ```\n- 分形（fractal）概念：每个分形在L0A/L0B中为 512B，half 类型下对应 16x16 个元素。\n- Cube核没有UB，所有数据必须经过 L0A/L0B/L0C 缓冲区。\n\n---\n\n## 关键约束汇总\n\n1. **分形对齐**: GM中的数据在2D搬运时，M方向按16元素对齐，K方向按32B对齐\n2. **m_step/k_step单位**: m_step 单位为 16 个元素（半个分形高），k_step 单位为 32B\n3. **L0C结果大小**: `n_size=1, m_size=1` 表示结果矩阵在N和M方向各1个分形\n4. **同步命令替代**: 使用 `_sync` 后缀API可省略显式 `asc_sync_notify/wait` 调用\n5. **无UB限制**: Cube核只能使用 `__ca__`, `__cb__`, `__cc__`, `__cbuf__`，不能使用 `__ubuf__`\n6. **单核模式**: 测试样例仅考虑单核场景（NUM_BLOCKS=1），无需 `asc_get_block_num()` 分块\n",
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_example.md"
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_example.md"
 }
 ```
 
@@ -7307,7 +7307,7 @@ Now let me create the working example and build it.
 **Input:**
 ```json
 {
-  "command": "mkdir -p /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build",
+  "command": "mkdir -p /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build",
   "description": "Create build dir for example"
 }
 ```
@@ -7331,7 +7331,7 @@ Now let me write the .asc file and CMakeLists.txt for the cube example.
 ```json
 {
   "content": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>\n)\n",
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt"
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt"
 }
 ```
 
@@ -7425,7 +7425,7 @@ Let me write the example .asc file.
 ```json
 {
   "content": "/**\n * Copyright (c) 2026 Huawei Technologies Co., Ltd.\n * CANN Open Software License Agreement Version 2.0\n */\n\n/* !\n * \\file cube_mmad_example.asc\n * \\brief Cube核 C API 矩阵乘加 (asc_mmad) 示例\n *\n * 覆盖数据类型: half (A) x half (B) -> float (C)\n * 覆盖场景: 单核, 单分形 (16x16)\n * 数据流: GM -> L1 -> L0A/L0B -> asc_mmad -> L0C -> GM\n */\n\n#include <cstdint>\n#include <iostream>\n#include <vector>\n#include <algorithm>\n#include <cstdlib>\n#include <cstring>\n#include <cmath>\n#include \"acl/acl.h\"\n#include \"c_api/asc_simd.h\"\n\nconstexpr uint32_t NUM_BLOCKS = 1;\nconstexpr uint32_t M_SIZE = 16;\nconstexpr uint32_t K_SIZE = 16;\nconstexpr uint32_t N_SIZE = 16;\n\nconstexpr uint32_t TOTAL_A = M_SIZE * K_SIZE;   // 256\nconstexpr uint32_t TOTAL_B = K_SIZE * N_SIZE;   // 256\nconstexpr uint32_t TOTAL_C = M_SIZE * N_SIZE;   // 256\n\n/* --------------------------------------------------------------------------\n * Cube核 kernel: half x half -> float 矩阵乘法 (单分形)\n * -------------------------------------------------------------------------- */\n__cube__ __global__ __aicore__ void cube_mmad_kernel(\n    __gm__ half* gm_a, __gm__ half* gm_b, __gm__ float* gm_c)\n{\n    asc_init();\n\n    __cbuf__ half l1_a[TOTAL_A];\n    __cbuf__ half l1_b[TOTAL_B];\n    __ca__ half l0a_a[TOTAL_A];\n    __cb__ half l0b_b[TOTAL_B];\n    __cc__ float l0c_c[TOTAL_C];\n\n    constexpr uint8_t l2_cache_ctl = 0;\n    constexpr uint8_t decomp_mode = 0;\n\n    // GM -> L1 (2D搬运, 1个分形: 16x16)\n    asc_copy_gm2l1_sync(l1_a, gm_a,\n                        0, 0, 0, 1, 1,\n                        decomp_mode, l2_cache_ctl);\n    asc_copy_gm2l1_sync(l1_b, gm_b,\n                        0, 0, 0, 1, 1,\n                        decomp_mode, l2_cache_ctl);\n\n    // L1 -> L0A, L0B\n    asc_copy_l12l0a_sync(l0a_a, l1_a, 0, 0, 1, 1, 0, 0);\n    asc_copy_l12l0b_sync(l0b_b, l1_b, 0, 0, 1, 1, 0, 0);\n\n    // Matrix multiply-add: C = A * B\n    constexpr uint16_t left_height = M_SIZE;\n    constexpr uint16_t n_dim = K_SIZE;\n    constexpr uint16_t right_width = N_SIZE;\n    constexpr uint8_t unit_flag = 0;\n    constexpr bool disable_gemv = false;\n    constexpr bool c_matrix_source = false;\n    constexpr bool c_matrix_init_val = true;\n\n    asc_mmad_sync(l0c_c, l0a_a, l0b_b,\n                  left_height, n_dim, right_width,\n                  unit_flag, disable_gemv,\n                  c_matrix_source, c_matrix_init_val);\n\n    // L0C -> GM\n    constexpr uint16_t n_size = 1;\n    constexpr uint16_t m_size = 1;\n    constexpr uint32_t loop_dst_stride = 0;\n    constexpr uint16_t loop_src_stride = 0;\n    constexpr uint8_t clip_relu_pre = 0;\n    constexpr uint8_t unit_flag_ctl = 0;\n    constexpr uint64_t quant_pre = 0;\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool split_en = false;\n    constexpr bool NZ2ND_en = false;\n    constexpr uint64_t quant_post = 0;\n    constexpr uint8_t relu_post = 0;\n    constexpr bool clip_relu_post = false;\n    constexpr uint8_t eltwise_op = 0;\n    constexpr bool eltwise_antq_en = false;\n    constexpr bool C0_pad_en = false;\n    constexpr bool broadcast_en = false;\n    constexpr bool NZ2DN_en = false;\n\n    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size, m_size,\n        loop_dst_stride, loop_src_stride, l2_cache_ctl,\n        clip_relu_pre, unit_flag_ctl, quant_pre, relu_pre,\n        split_en, NZ2ND_en, quant_post, relu_post,\n        clip_relu_post, eltwise_op, eltwise_antq_en,\n        C0_pad_en, broadcast_en, NZ2DN_en);\n}\n\n/* --------------------------------------------------------------------------\n * Host 侧调用\n * -------------------------------------------------------------------------- */\nstd::vector<float> kernel_cube_mmad(\n    std::vector<half> &a, std::vector<half> &b)\n{\n    uint32_t totalLenA = a.size();\n    uint32_t totalLenB = b.size();\n    uint32_t totalLenC = TOTAL_C;\n\n    size_t byteSizeA = totalLenA * sizeof(half);\n    size_t byteSizeB = totalLenB * sizeof(half);\n    size_t byteSizeC = totalLenC * sizeof(float);\n\n    int32_t deviceId = 0;\n    aclrtStream stream = nullptr;\n\n    uint8_t *aHost = reinterpret_cast<uint8_t *>(a.data());\n    uint8_t *bHost = reinterpret_cast<uint8_t *>(b.data());\n    uint8_t *cHost = nullptr;\n\n    half *aDevice = nullptr;\n    half *bDevice = nullptr;\n    float *cDevice = nullptr;\n\n    aclInit(nullptr);\n    aclrtSetDevice(deviceId);\n    aclrtCreateStream(&stream);\n\n    aclrtMallocHost((void **)(&cHost), byteSizeC);\n    aclrtMalloc((void **)&aDevice, byteSizeA, ACL_MEM_MALLOC_HUGE_FIRST);\n    aclrtMalloc((void **)&bDevice, byteSizeB, ACL_MEM_MALLOC_HUGE_FIRST);\n    aclrtMalloc((void **)&cDevice, byteSizeC, ACL_MEM_MALLOC_HUGE_FIRST);\n\n    aclrtMemcpy((uint8_t*)aDevice, byteSizeA, aHost, byteSizeA,\n                ACL_MEMCPY_HOST_TO_DEVICE);\n    aclrtMemcpy((uint8_t*)bDevice, byteSizeB, bHost, byteSizeB,\n                ACL_MEMCPY_HOST_TO_DEVICE);\n\n    cube_mmad_kernel<<<NUM_BLOCKS, nullptr, stream>>>(aDevice, bDevice, cDevice);\n\n    aclrtSynchronizeStream(stream);\n    aclrtMemcpy(cHost, byteSizeC, (uint8_t*)cDevice, byteSizeC,\n                ACL_MEMCPY_DEVICE_TO_HOST);\n\n    std::vector<float> c((float *)cHost,\n                         (float *)(cHost + byteSizeC));\n\n    aclrtFree(aDevice);\n    aclrtFree(bDevice);\n    aclrtFree(cDevice);\n    aclrtFreeHost(cHost);\n\n    aclrtDestroyStream(stream);\n    aclrtResetDevice(deviceId);\n    aclFinalize();\n\n    return c;\n}\n\n/* --------------------------------------------------------------------------\n * 精度验证\n * -------------------------------------------------------------------------- */\nuint32_t verify_result(\n    std::vector<float> &output,\n    std::vector<float> &golden)\n{\n    constexpr size_t maxPrintSize = 16;\n    std::cout << \"Output: \";\n    for (size_t i = 0; i < std::min(output.size(), maxPrintSize); ++i) {\n        std::cout << output[i] << \" \";\n    }\n    std::cout << std::endl;\n\n    std::cout << \"Golden: \";\n    for (size_t i = 0; i < std::min(golden.size(), maxPrintSize); ++i) {\n        std::cout << golden[i] << \" \";\n    }\n    std::cout << std::endl;\n\n    float maxError = 0.0f;\n    for (size_t i = 0; i < golden.size(); ++i) {\n        float error = std::abs(output[i] - golden[i]);\n        if (error > maxError) {\n            maxError = error;\n        }\n    }\n\n    constexpr float epsilon = 0.001f;\n    if (maxError < epsilon) {\n        std::cout << \"[Success] cube_mmad accuracy passed.\"\n                  << \" max_error=\" << maxError << std::endl;\n        return 0;\n    } else {\n        std::cout << \"[Failed] cube_mmad accuracy failed!\"\n                  << \" max_error=\" << maxError << std::endl;\n        return 1;\n    }\n}\n\n/* --------------------------------------------------------------------------\n * 主函数\n * -------------------------------------------------------------------------- */\nint32_t main(int32_t argc, char *argv[])\n{\n    // 初始化 A (MxK) 和 B (KxN)\n    std::vector<half> a(TOTAL_A);\n    std::vector<half> b(TOTAL_B);\n\n    for (uint32_t i = 0; i < M_SIZE; ++i) {\n        for (uint32_t k = 0; k < K_SIZE; ++k) {\n            a[i * K_SIZE + k] = half((i + k) * 0.1f);\n        }\n    }\n    for (uint32_t k = 0; k < K_SIZE; ++k) {\n        for (uint32_t j = 0; j < N_SIZE; ++j) {\n            b[k * N_SIZE + j] = half((k + j) * 0.1f);\n        }\n    }\n\n    // 调用 kernel\n    std::vector<float> output = kernel_cube_mmad(a, b);\n\n    // 计算 CPU 真值\n    std::vector<float> golden(TOTAL_C, 0.0f);\n    for (uint32_t i = 0; i < M_SIZE; ++i) {\n        for (uint32_t j = 0; j < N_SIZE; ++j) {\n            float sum = 0.0f;\n            for (uint32_t k = 0; k < K_SIZE; ++k) {\n                sum += float(a[i * K_SIZE + k]) * float(b[k * N_SIZE + j]);\n            }\n            golden[i * N_SIZE + j] = sum;\n        }\n    }\n\n    return verify_result(output, golden);\n}\n",
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc"
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc"
 }
 ```
 
@@ -7450,7 +7450,7 @@ Now let me try to build this in sim mode. First, let me check the environment (A
   "todos": [
     {
       "priority": "high",
-      "content": "Create cube_c_api_skill directory and SKILL.md",
+      "content": "Create skill_cube_3510 directory and SKILL.md",
       "status": "completed"
     },
     {
@@ -7531,7 +7531,7 @@ Good, ASCEND_HOME_PATH is set. Let me try building the cube example in sim mode.
 {
   "command": "cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
   "description": "Build cube example in sim mode",
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build",
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build",
   "timeout": 300000
 }
 ```
@@ -9147,7 +9147,7 @@ Let me try using the source tree's implementation headers by adding include path
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "oldString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>\n)",
   "newString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_include_directories(cube_mmad_example PRIVATE\n    /home/joey/code/joey/asc-devkit/impl/c_api\n)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>\n)"
 }
@@ -10261,7 +10261,7 @@ Now I understand - the source tree has complete 3510 API in the impl headers. Le
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/*",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/*",
   "description": "Clean build directory"
 }
 ```
@@ -10368,7 +10368,7 @@ Actually, I'm overthinking this. Let me just try to build and see what happens.
   "command": "cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
   "description": "Rebuild cube example with source include path",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -10514,7 +10514,7 @@ The include path isn't being passed to ASC compiler. Let me use ASC compiler fla
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "oldString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_include_directories(cube_mmad_example PRIVATE\n    /home/joey/code/joey/asc-devkit/impl/c_api\n)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>\n)",
   "newString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:-I/home/joey/code/joey/asc-devkit/impl/c_api;--npu-arch=dav-3510>\n)"
 }
@@ -10887,7 +10887,7 @@ Let me try a different approach - include source headers directly and use `-H` t
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/*",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/*",
   "description": "Clean build dir"
 }
 ```
@@ -11007,7 +11007,7 @@ But the issue is: is the source `cube_datamove_impl.h` actually being included? 
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "newString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_include_directories(cube_mmad_example PRIVATE\n    \"/home/joey/code/joey/asc-devkit/impl/c_api\"\n)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510;-H>\n)",
   "oldString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:-I/home/joey/code/joey/asc-devkit/impl/c_api;--npu-arch=dav-3510>\n)"
 }
@@ -11039,9 +11039,9 @@ Let me try with both approaches and see what happens. But first let me go back t
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. 2>&1 | head -20",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. 2>&1 | head -20",
   "description": "Reconfigure with new cmake",
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -11080,7 +11080,7 @@ Let me try building and see the verbose output with -H flag.
   "command": "make VERBOSE=1 2>&1 | head -60",
   "description": "Build verbose to see compiler flags",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -11165,7 +11165,7 @@ I can see the include paths: `-I/home/joey/code/joey/asc-devkit/impl/c_api` IS b
   "command": "make VERBOSE=1 2>&1 | grep -E \"^\\.\" | head -200",
   "description": "Show header include trace",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -11390,7 +11390,7 @@ Let me search for which cube_datamove/cube_compute headers are being included - 
   "command": "make VERBOSE=1 2>&1 | grep -i \"cube\\|asc_simd\\|instr_impl\"",
   "description": "Show cube-related header includes",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -12222,7 +12222,7 @@ The installed SDK has a limited 3510 cube API surface. Let me use the 2201 archi
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "newString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>\n)",
   "oldString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_include_directories(cube_mmad_example PRIVATE\n    \"/home/joey/code/joey/asc-devkit/impl/c_api\"\n)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510;-H>\n)"
 }
@@ -12292,7 +12292,7 @@ Let me take a different approach - use the working C API vector examples pattern
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc"
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc"
 }
 ```
 
@@ -12653,7 +12653,7 @@ Now let me update CMakeLists.txt back to 3510 and rebuild.
 {
   "newString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>\n)",
   "oldString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>\n)",
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt"
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt"
 }
 ```
 
@@ -12671,10 +12671,10 @@ Edit applied successfully.
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j$(nproc) 2>&1",
   "description": "Rebuild cube example for 3510 with full impl",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -12943,7 +12943,7 @@ The source tree and installed SDK versions are incompatible. Let me use the prag
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "newString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>\n)",
   "oldString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>\n)"
 }
@@ -13000,7 +13000,7 @@ Now let me rewrite the example for 2201 API.
 ```json
 {
   "content": "/**\n * Copyright (c) 2026 Huawei Technologies Co., Ltd.\n * CANN Open Software License Agreement Version 2.0\n */\n\n/* !\n * \\file cube_mmad_example.asc\n * \\brief Cube核 C API 矩阵乘加 (asc_mmad) 示例\n *\n * 覆盖数据类型: half (A) x half (B) -> float (C)\n * 覆盖场景: 单核, 单分形 (16x16)\n * 数据流: GM -> L1 -> L0A/L0B -> asc_mmad -> L0C -> GM\n * 架构: dav-2201 (分形概念同样适用于dav-3510)\n */\n\n#include <cstdint>\n#include <iostream>\n#include <vector>\n#include <algorithm>\n#include <cstdlib>\n#include <cstring>\n#include <cmath>\n#include \"acl/acl.h\"\n#include \"c_api/asc_simd.h\"\n\nconstexpr uint32_t NUM_BLOCKS = 1;\nconstexpr uint32_t M_SIZE = 16;\nconstexpr uint32_t K_SIZE = 16;\nconstexpr uint32_t N_SIZE = 16;\n\n// 16x16 half = 512B = 16 DataBlocks (每DataBlock=32B)\nconstexpr uint32_t TOTAL_A = M_SIZE * K_SIZE;   // 256 elements\nconstexpr uint32_t TOTAL_B = K_SIZE * N_SIZE;   // 256 elements\nconstexpr uint32_t TOTAL_C = M_SIZE * N_SIZE;   // 256 elements\n\n// 搬运参数: 512B / 32B = 16 个 DataBlock\nconstexpr uint16_t BURST_LEN_HALF = TOTAL_A * sizeof(half) / 32;  // 512/32 = 16\n\n/* --------------------------------------------------------------------------\n * Cube核 kernel: half x half -> float 矩阵乘法 (单分形)\n * -------------------------------------------------------------------------- */\n__cube__ __global__ __aicore__ void cube_mmad_kernel(\n    __gm__ half* gm_a, __gm__ half* gm_b, __gm__ float* gm_c)\n{\n    asc_init();\n\n    __cbuf__ half l1_a[TOTAL_A];\n    __cbuf__ half l1_b[TOTAL_B];\n    __ca__ half l0a_a[TOTAL_A];\n    __cb__ half l0b_b[TOTAL_B];\n    __cc__ float l0c_c[TOTAL_C];\n\n    // GM -> L1: 线性burst搬运 (单个分形 512B)\n    asc_copy_gm2l1_sync(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        BURST_LEN_HALF);\n    asc_copy_gm2l1_sync(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        BURST_LEN_HALF);\n\n    // L1 -> L0A, L0B: 分形搬运\n    // start_index=0: 从第0个分形开始\n    // repeat=1: 搬运1个分形\n    // src_stride=0: 源分形间距\n    // dst_gap=0: 目的分形间距\n    asc_copy_l12l0a_sync(l0a_a, l1_a, 0, 1, 0, 0);\n    asc_copy_l12l0b_sync(l0b_b, l1_b, 0, 1, 0, 0);\n\n    // Matrix multiply-add: C = A * B\n    constexpr uint16_t left_height = M_SIZE;\n    constexpr uint16_t n_dim = K_SIZE;\n    constexpr uint16_t right_width = N_SIZE;\n    constexpr uint8_t unit_flag = 0;\n    constexpr bool k_direction_align = true;   // right_width方向对齐\n    constexpr bool c_matrix_source = false;\n    constexpr bool c_matrix_init_val = true;\n\n    asc_mmad_sync(l0c_c, l0a_a, l0b_b,\n                  left_height, n_dim, right_width,\n                  unit_flag, k_direction_align,\n                  c_matrix_source, c_matrix_init_val);\n\n    // L0C -> GM\n    constexpr uint16_t n_size = 1;\n    constexpr uint16_t m_size = 1;\n    constexpr uint32_t loop_dst_stride = 0;\n    constexpr uint16_t loop_src_stride = 0;\n    constexpr uint8_t l2_cache_ctl = 0;\n    constexpr uint8_t clip_relu_pre = 0;\n    constexpr uint8_t unit_flag_ctl = 0;\n    constexpr uint64_t quant_pre = 0;\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool split_en = false;\n    constexpr bool NZ2ND_en = false;\n    constexpr uint64_t quant_post = 0;\n    constexpr uint8_t relu_post = 0;\n    constexpr bool clip_relu_post = false;\n    constexpr uint8_t eltwise_op = 0;\n    constexpr bool eltwise_antq_en = false;\n    constexpr bool C0_pad_en = false;\n    constexpr bool broadcast_en = false;\n    constexpr bool NZ2DN_en = false;\n\n    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size, m_size,\n        loop_dst_stride, loop_src_stride, l2_cache_ctl,\n        clip_relu_pre, unit_flag_ctl, quant_pre, relu_pre,\n        split_en, NZ2ND_en, quant_post, relu_post,\n        clip_relu_post, eltwise_op, eltwise_antq_en,\n        C0_pad_en, broadcast_en, NZ2DN_en);\n}\n\n/* --------------------------------------------------------------------------\n * Host 侧调用\n * -------------------------------------------------------------------------- */\nstd::vector<float> kernel_cube_mmad(\n    std::vector<half> &a, std::vector<half> &b)\n{\n    uint32_t totalLenA = a.size();\n    uint32_t totalLenB = b.size();\n    uint32_t totalLenC = TOTAL_C;\n\n    size_t byteSizeA = totalLenA * sizeof(half);\n    size_t byteSizeB = totalLenB * sizeof(half);\n    size_t byteSizeC = totalLenC * sizeof(float);\n\n    int32_t deviceId = 0;\n    aclrtStream stream = nullptr;\n\n    uint8_t *aHost = reinterpret_cast<uint8_t *>(a.data());\n    uint8_t *bHost = reinterpret_cast<uint8_t *>(b.data());\n    uint8_t *cHost = nullptr;\n\n    half *aDevice = nullptr;\n    half *bDevice = nullptr;\n    float *cDevice = nullptr;\n\n    aclInit(nullptr);\n    aclrtSetDevice(deviceId);\n    aclrtCreateStream(&stream);\n\n    aclrtMallocHost((void **)(&cHost), byteSizeC);\n    aclrtMalloc((void **)&aDevice, byteSizeA, ACL_MEM_MALLOC_HUGE_FIRST);\n    aclrtMalloc((void **)&bDevice, byteSizeB, ACL_MEM_MALLOC_HUGE_FIRST);\n    aclrtMalloc((void **)&cDevice, byteSizeC, ACL_MEM_MALLOC_HUGE_FIRST);\n\n    aclrtMemcpy((uint8_t*)aDevice, byteSizeA, aHost, byteSizeA,\n                ACL_MEMCPY_HOST_TO_DEVICE);\n    aclrtMemcpy((uint8_t*)bDevice, byteSizeB, bHost, byteSizeB,\n                ACL_MEMCPY_HOST_TO_DEVICE);\n\n    cube_mmad_kernel<<<NUM_BLOCKS, nullptr, stream>>>(aDevice, bDevice, cDevice);\n\n    aclrtSynchronizeStream(stream);\n    aclrtMemcpy(cHost, byteSizeC, (uint8_t*)cDevice, byteSizeC,\n                ACL_MEMCPY_DEVICE_TO_HOST);\n\n    std::vector<float> c((float *)cHost,\n                         (float *)(cHost + byteSizeC));\n\n    aclrtFree(aDevice);\n    aclrtFree(bDevice);\n    aclrtFree(cDevice);\n    aclrtFreeHost(cHost);\n\n    aclrtDestroyStream(stream);\n    aclrtResetDevice(deviceId);\n    aclFinalize();\n\n    return c;\n}\n\n/* --------------------------------------------------------------------------\n * 精度验证\n * -------------------------------------------------------------------------- */\nuint32_t verify_result(\n    std::vector<float> &output,\n    std::vector<float> &golden)\n{\n    constexpr size_t maxPrintSize = 16;\n    std::cout << \"Output: \";\n    for (size_t i = 0; i < std::min(output.size(), maxPrintSize); ++i) {\n        std::cout << output[i] << \" \";\n    }\n    std::cout << std::endl;\n\n    std::cout << \"Golden: \";\n    for (size_t i = 0; i < std::min(golden.size(), maxPrintSize); ++i) {\n        std::cout << golden[i] << \" \";\n    }\n    std::cout << std::endl;\n\n    float maxError = 0.0f;\n    for (size_t i = 0; i < golden.size(); ++i) {\n        float error = std::abs(output[i] - golden[i]);\n        if (error > maxError) {\n            maxError = error;\n        }\n    }\n\n    constexpr float epsilon = 0.001f;\n    if (maxError < epsilon) {\n        std::cout << \"[Success] cube_mmad accuracy passed.\"\n                  << \" max_error=\" << maxError << std::endl;\n        return 0;\n    } else {\n        std::cout << \"[Failed] cube_mmad accuracy failed!\"\n                  << \" max_error=\" << maxError << std::endl;\n        return 1;\n    }\n}\n\n/* --------------------------------------------------------------------------\n * 主函数\n * -------------------------------------------------------------------------- */\nint32_t main(int32_t argc, char *argv[])\n{\n    // 初始化 A (MxK) 和 B (KxN)\n    std::vector<half> a(TOTAL_A);\n    std::vector<half> b(TOTAL_B);\n\n    for (uint32_t i = 0; i < M_SIZE; ++i) {\n        for (uint32_t k = 0; k < K_SIZE; ++k) {\n            a[i * K_SIZE + k] = half((i + k) * 0.1f);\n        }\n    }\n    for (uint32_t k = 0; k < K_SIZE; ++k) {\n        for (uint32_t j = 0; j < N_SIZE; ++j) {\n            b[k * N_SIZE + j] = half((k + j) * 0.1f);\n        }\n    }\n\n    // 调用 kernel\n    std::vector<float> output = kernel_cube_mmad(a, b);\n\n    // 计算 CPU 真值\n    std::vector<float> golden(TOTAL_C, 0.0f);\n    for (uint32_t i = 0; i < M_SIZE; ++i) {\n        for (uint32_t j = 0; j < N_SIZE; ++j) {\n            float sum = 0.0f;\n            for (uint32_t k = 0; k < K_SIZE; ++k) {\n                sum += float(a[i * K_SIZE + k]) * float(b[k * N_SIZE + j]);\n            }\n            golden[i * N_SIZE + j] = sum;\n        }\n    }\n\n    return verify_result(output, golden);\n}\n",
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc"
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc"
 }
 ```
 
@@ -13018,10 +13018,10 @@ Wrote file successfully.
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) 2>&1",
   "description": "Build cube example for 2201 in sim mode",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -13188,7 +13188,7 @@ Now I see the correct 2201 signatures. Let me fix the example.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "oldString": "    // L0C -> GM\n    constexpr uint16_t n_size = 1;\n    constexpr uint16_t m_size = 1;\n    constexpr uint32_t loop_dst_stride = 0;\n    constexpr uint16_t loop_src_stride = 0;\n    constexpr uint8_t l2_cache_ctl = 0;\n    constexpr uint8_t clip_relu_pre = 0;\n    constexpr uint8_t unit_flag_ctl = 0;\n    constexpr uint64_t quant_pre = 0;\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool split_en = false;\n    constexpr bool NZ2ND_en = false;\n    constexpr uint64_t quant_post = 0;\n    constexpr uint8_t relu_post = 0;\n    constexpr bool clip_relu_post = false;\n    constexpr uint8_t eltwise_op = 0;\n    constexpr bool eltwise_antq_en = false;\n    constexpr bool C0_pad_en = false;\n    constexpr bool broadcast_en = false;\n    constexpr bool NZ2DN_en = false;\n\n    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size, m_size,\n        loop_dst_stride, loop_src_stride, l2_cache_ctl,\n        clip_relu_pre, unit_flag_ctl, quant_pre, relu_pre,\n        split_en, NZ2ND_en, quant_post, relu_post,\n        clip_relu_post, eltwise_op, eltwise_antq_en,\n        C0_pad_en, broadcast_en, NZ2DN_en);",
   "newString": "    // L0C -> GM (2201: 11参数版本)\n    constexpr uint16_t n_size_l0c = 1;\n    constexpr uint16_t m_size_l0c = 1;\n    constexpr uint32_t dst_stride_dst_d = 0;\n    constexpr uint16_t src_stride_l0c = 0;\n    constexpr uint8_t unit_flag_mode = 0;\n    constexpr uint64_t quant_pre = 0;   // NoQuant\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool channel_split = false;\n    constexpr bool nz2nd_en = false;\n\n    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);"
 }
@@ -13221,10 +13221,10 @@ Also, I should check: does the `asc_copy_gm2l1_sync` with `uint32_t size` work c
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) 2>&1",
   "description": "Build cube example for 2201 with corrected API",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -13268,7 +13268,7 @@ Compilation succeeded! Now let me run it.
   "command": "./cube_mmad_example 2>&1",
   "description": "Run cube example in sim mode",
   "timeout": 60000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -13765,7 +13765,7 @@ Let me try using async versions with explicit sync, which may work better for cu
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    // GM -> L1: 线性burst搬运 (单个分形 512B)\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        BURST_LEN_HALF);\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        BURST_LEN_HALF);\n\n    asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);\n    asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);\n\n    // L1 -> L0A, L0B: 分形搬运\n    // start_index=0: 从第0个分形开始\n    // repeat=1: 搬运1个分形\n    // src_stride=0: 源分形间距\n    // dst_gap=0: 目的分形间距\n    asc_copy_l12l0a(l0a_a, l1_a, 0, 1, 0, 0);\n    asc_copy_l12l0b(l0b_b, l1_b, 0, 1, 0, 0);\n\n    asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);\n    asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);\n\n    // Matrix multiply-add: C = A * B\n    constexpr uint16_t left_height = M_SIZE;\n    constexpr uint16_t n_dim = K_SIZE;\n    constexpr uint16_t right_width = N_SIZE;\n    constexpr uint8_t unit_flag = 0;\n    constexpr bool k_direction_align = true;   // right_width方向对齐\n    constexpr bool c_matrix_source = false;\n    constexpr bool c_matrix_init_val = true;\n\n    asc_mmad(l0c_c, l0a_a, l0b_b,\n             left_height, n_dim, right_width,\n             unit_flag, k_direction_align,\n             c_matrix_source, c_matrix_init_val);",
   "oldString": "    // GM -> L1: 线性burst搬运 (单个分形 512B)\n    asc_copy_gm2l1_sync(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        BURST_LEN_HALF);\n    asc_copy_gm2l1_sync(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        BURST_LEN_HALF);\n\n    // L1 -> L0A, L0B: 分形搬运\n    // start_index=0: 从第0个分形开始\n    // repeat=1: 搬运1个分形\n    // src_stride=0: 源分形间距\n    // dst_gap=0: 目的分形间距\n    asc_copy_l12l0a_sync(l0a_a, l1_a, 0, 1, 0, 0);\n    asc_copy_l12l0b_sync(l0b_b, l1_b, 0, 1, 0, 0);\n\n    // Matrix multiply-add: C = A * B\n    constexpr uint16_t left_height = M_SIZE;\n    constexpr uint16_t n_dim = K_SIZE;\n    constexpr uint16_t right_width = N_SIZE;\n    constexpr uint8_t unit_flag = 0;\n    constexpr bool k_direction_align = true;   // right_width方向对齐\n    constexpr bool c_matrix_source = false;\n    constexpr bool c_matrix_init_val = true;\n\n    asc_mmad_sync(l0c_c, l0a_a, l0b_b,\n                  left_height, n_dim, right_width,\n                  unit_flag, k_direction_align,\n                  c_matrix_source, c_matrix_init_val);"
 }
@@ -13789,7 +13789,7 @@ Also update the L0C->GM to use async version with explicit sync.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);\n    asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);\n\n    // L0C -> GM (2201: 11参数版本)\n    constexpr uint16_t n_size_l0c = 1;\n    constexpr uint16_t m_size_l0c = 1;\n    constexpr uint32_t dst_stride_dst_d = 0;\n    constexpr uint16_t src_stride_l0c = 0;\n    constexpr uint8_t unit_flag_mode = 0;\n    constexpr uint64_t quant_pre = 0;   // NoQuant\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool channel_split = false;\n    constexpr bool nz2nd_en = false;\n\n    asc_copy_l0c2gm(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);",
   "oldString": "    // L0C -> GM (2201: 11参数版本)\n    constexpr uint16_t n_size_l0c = 1;\n    constexpr uint16_t m_size_l0c = 1;\n    constexpr uint32_t dst_stride_dst_d = 0;\n    constexpr uint16_t src_stride_l0c = 0;\n    constexpr uint8_t unit_flag_mode = 0;\n    constexpr uint64_t quant_pre = 0;   // NoQuant\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool channel_split = false;\n    constexpr bool nz2nd_en = false;\n\n    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);"
 }
@@ -13809,10 +13809,10 @@ Edit applied successfully.
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
   "description": "Build and run with async sync",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -13923,7 +13923,7 @@ Since the source tree has `vector_compute_examples` but no `cube_compute_example
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    // GM -> L1: burst-based搬运\n    // n_burst=1: 1个burst; burst_len=16: 16个DataBlock(32B) = 512B\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        1, BURST_LEN_HALF, 0, 0);\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        1, BURST_LEN_HALF, 0, 0);",
   "oldString": "    // GM -> L1: 线性burst搬运 (单个分形 512B)\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        BURST_LEN_HALF);\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        BURST_LEN_HALF);"
 }
@@ -13947,7 +13947,7 @@ Oops, I changed the `_sync` calls already. Let me read the current file to make 
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "offset": 48,
   "limit": 30
 }
@@ -14081,7 +14081,7 @@ Or, even simpler: let me fix the nz2nd issue first and see if the result changes
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    constexpr bool nz2nd_en = true;   // 转换为ND格式输出",
   "oldString": "    constexpr bool nz2nd_en = false;"
 }
@@ -14238,7 +14238,7 @@ Let me try without the `__cube__` modifier, as cube C API functions may work wit
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "__global__ __aicore__ void cube_mmad_kernel(",
   "oldString": "__cube__ __global__ __aicore__ void cube_mmad_kernel("
 }
@@ -14258,10 +14258,10 @@ Edit applied successfully.
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
   "description": "Build and run without __cube__ modifier",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -14650,7 +14650,7 @@ Let me revert to `__cube__` and use `_sync` versions, plus add `nz2nd_en=true`.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "__cube__ __global__ __aicore__ void cube_mmad_kernel(",
   "oldString": "__global__ __aicore__ void cube_mmad_kernel("
 }
@@ -14674,7 +14674,7 @@ Let me also switch to using `_sync` variants of the functions. The explicit sync
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    // GM -> L1: burst-based搬运\n    // size=512: 256 half elements * 2B = 512B\n    asc_copy_gm2l1_sync(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        TOTAL_A * sizeof(half));\n    asc_copy_gm2l1_sync(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        TOTAL_B * sizeof(half));\n\n    // L1 -> L0A, L0B: 分形搬运\n    asc_copy_l12l0a_sync(l0a_a, l1_a, 0, 1, 0, 0);\n    asc_copy_l12l0b_sync(l0b_b, l1_b, 0, 1, 0, 0);\n\n    // Matrix multiply-add: C = A * B\n    constexpr uint16_t left_height = M_SIZE;\n    constexpr uint16_t n_dim = K_SIZE;\n    constexpr uint16_t right_width = N_SIZE;\n    constexpr uint8_t unit_flag = 0;\n    constexpr bool k_direction_align = true;\n    constexpr bool c_matrix_source = false;\n    constexpr bool c_matrix_init_val = true;\n\n    asc_mmad_sync(l0c_c, l0a_a, l0b_b,\n                  left_height, n_dim, right_width,\n                  unit_flag, k_direction_align,\n                  c_matrix_source, c_matrix_init_val);\n\n    // L0C -> GM\n    constexpr uint16_t n_size_l0c = 1;\n    constexpr uint16_t m_size_l0c = 1;\n    constexpr uint32_t dst_stride_dst_d = 0;\n    constexpr uint16_t src_stride_l0c = 0;\n    constexpr uint8_t unit_flag_mode = 0;\n    constexpr uint64_t quant_pre = 0;\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool channel_split = false;\n    constexpr bool nz2nd_en = true;\n\n    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);",
   "oldString": "    // GM -> L1: burst-based搬运\n    // n_burst=1: 1个burst; burst_len=16: 16个DataBlock(32B) = 512B\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_a, (__gm__ void*)gm_a,\n        1, BURST_LEN_HALF, 0, 0);\n    asc_copy_gm2l1(\n        (__cbuf__ void*)l1_b, (__gm__ void*)gm_b,\n        1, BURST_LEN_HALF, 0, 0);\n\n    asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);\n    asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);\n\n    // L1 -> L0A, L0B: 分形搬运\n    // start_index=0: 从第0个分形开始\n    // repeat=1: 搬运1个分形\n    // src_stride=0: 源分形间距\n    // dst_gap=0: 目的分形间距\n    asc_copy_l12l0a(l0a_a, l1_a, 0, 1, 0, 0);\n    asc_copy_l12l0b(l0b_b, l1_b, 0, 1, 0, 0);\n\n    asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);\n    asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);\n\n    // Matrix multiply-add: C = A * B\n    constexpr uint16_t left_height = M_SIZE;\n    constexpr uint16_t n_dim = K_SIZE;\n    constexpr uint16_t right_width = N_SIZE;\n    constexpr uint8_t unit_flag = 0;\n    constexpr bool k_direction_align = true;   // right_width方向对齐\n    constexpr bool c_matrix_source = false;\n    constexpr bool c_matrix_init_val = true;\n\n    asc_mmad(l0c_c, l0a_a, l0b_b,\n             left_height, n_dim, right_width,\n             unit_flag, k_direction_align,\n             c_matrix_source, c_matrix_init_val);\n\n    asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);\n    asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);\n\n    // L0C -> GM (2201: 11参数版本)\n    constexpr uint16_t n_size_l0c = 1;\n    constexpr uint16_t m_size_l0c = 1;\n    constexpr uint32_t dst_stride_dst_d = 0;\n    constexpr uint16_t src_stride_l0c = 0;\n    constexpr uint8_t unit_flag_mode = 0;\n    constexpr uint64_t quant_pre = 0;   // NoQuant\n    constexpr uint8_t relu_pre = 0;\n    constexpr bool channel_split = false;\n    constexpr bool nz2nd_en = true;   // 转换为ND格式输出\n\n    asc_copy_l0c2gm(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);"
 }
@@ -14694,10 +14694,10 @@ Edit applied successfully.
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && ./cube_mmad_example 2>&1",
   "description": "Build and run with __cube__ and _sync functions",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -14957,7 +14957,7 @@ Let me add a simple test write to verify kernel execution.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);\n\n    // DEBUG: write sentinel value to verify kernel execution\n    gm_c[0] = 42.0f;",
   "oldString": "    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);"
 }
@@ -14981,7 +14981,7 @@ Also update the host-side maxPrintSize to 1 to see if the first element is 42.
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    constexpr size_t maxPrintSize = 4;",
   "oldString": "    constexpr size_t maxPrintSize = 16;"
 }
@@ -15023,7 +15023,7 @@ OK, I've spent too much time debugging. Let me:
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_mmad_example.asc",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_mmad_example.asc",
   "newString": "    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);\n}",
   "oldString": "    asc_copy_l0c2gm_sync(\n        (__gm__ float*)gm_c, l0c_c,\n        n_size_l0c, m_size_l0c,\n        dst_stride_dst_d, src_stride_l0c,\n        unit_flag_mode, quant_pre,\n        relu_pre, channel_split, nz2nd_en);\n\n    // DEBUG: write sentinel value to verify kernel execution\n    gm_c[0] = 42.0f;\n}"
 }
@@ -15089,7 +15089,7 @@ Let me try a simplified approach: use float inputs with direct L0C->GM and the s
   "todos": [
     {
       "priority": "high",
-      "content": "Create cube_c_api_skill directory and SKILL.md",
+      "content": "Create skill_cube_3510 directory and SKILL.md",
       "status": "completed"
     },
     {
@@ -15155,7 +15155,7 @@ Let me update SKILL.md with correct arch notes, and update the example to compil
 ```json
 {
   "offset": 269,
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md",
   "limit": 20
 }
 ```
@@ -15430,7 +15430,7 @@ Let me finalize the skill and examples. The knowledge is correct from docs/impl,
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md",
   "newString": "- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;` 在仿真模式下编译运行（注：dav-3510 的 Cube C API 在 CANN 9.0.0-beta2 中尚未完整发布，dav-2201 提供了完整的 Cube C API，分形概念和数据流在两架构间一致）",
   "oldString": "- 编译时使用 `cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;` 在仿真模式下编译运行"
 }
@@ -15454,7 +15454,7 @@ Now let me update the CMakeLists.txt to note the 2201 limitation and update the 
 **Input:**
 ```json
 {
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt",
   "newString": "# Cube C API Example CMakeLists.txt\n# 使用 dav-2201 架构 (dav-3510 Cube C API 在 CANN 9.0.0-beta2 中尚未完整发布)\ncmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>\n)",
   "oldString": "cmake_minimum_required(VERSION 3.16)\nfind_package(ASC REQUIRED)\nproject(kernel_samples LANGUAGES ASC CXX)\nadd_executable(cube_mmad_example cube_mmad_example.asc)\ntarget_compile_options(cube_mmad_example PRIVATE\n    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>\n)"
 }
@@ -15479,7 +15479,7 @@ Now let me also update the example.md to reflect the 2201 architecture usage and
 ```json
 {
   "offset": 1,
-  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/cube_example.md",
+  "filePath": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/cube_example.md",
   "limit": 10
 }
 ```
@@ -15517,10 +15517,10 @@ Let me now compile and run one final time to ensure the example still compiles (
 **Input:**
 ```json
 {
-  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && echo \"BUILD SUCCESS\"",
+  "command": "rm -rf /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/* && cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j$(nproc) && echo \"BUILD SUCCESS\"",
   "description": "Final build of cube example",
   "timeout": 300000,
-  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build"
+  "workdir": "/home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build"
 }
 ```
 
@@ -15565,7 +15565,7 @@ Let me now update the example.md to note the compilation success and the current
   "todos": [
     {
       "priority": "high",
-      "content": "Create cube_c_api_skill directory and SKILL.md",
+      "content": "Create skill_cube_3510 directory and SKILL.md",
       "status": "completed"
     },
     {
@@ -15628,7 +15628,7 @@ Let me verify the final state of all created files.
 **Input:**
 ```json
 {
-  "command": "echo \"=== Directory structure ===\" && find /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/ -type f | sort && echo \"\" && echo \"=== SKILL.md first 5 lines ===\" && head -5 /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/SKILL.md && echo \"\" && echo \"=== CMakeLists.txt ===\" && cat /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/CMakeLists.txt && echo \"\" && echo \"=== Build artifact exists ===\" && ls -la /home/joey/code/joey/asc-devkit/opencode/skills/cube_c_api_skill/examples/build/cube_mmad_example 2>/dev/null && echo \"EXISTS\" || echo \"NOT FOUND\"",
+  "command": "echo \"=== Directory structure ===\" && find /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/ -type f | sort && echo \"\" && echo \"=== SKILL.md first 5 lines ===\" && head -5 /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/SKILL.md && echo \"\" && echo \"=== CMakeLists.txt ===\" && cat /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/CMakeLists.txt && echo \"\" && echo \"=== Build artifact exists ===\" && ls -la /home/joey/code/joey/asc-devkit/opencode/skills/skill_cube_3510/examples/build/cube_mmad_example 2>/dev/null && echo \"EXISTS\" || echo \"NOT FOUND\"",
   "description": "Verify final state of all created files"
 }
 ```

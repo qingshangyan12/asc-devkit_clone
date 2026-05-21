@@ -62,6 +62,9 @@ SAMPLES=(
     "asc_min_scalar"
     "asc_shiftright_scalar"
     "asc_eq_scalar"
+    "asc_gt_scalar"
+    "asc_lt_scalar"
+    "asc_le_scalar"
 )
 
 PASS=0
