@@ -26,7 +26,19 @@
 
 - 样例规格：
   <table border="2">
-  <caption>表1：样例规格对照表</caption>
+  <caption>表1：样例输入输出规格</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ElementWiseCompoundCompute</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">src0</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">src1</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">dst</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">element_wise_compound_compute_custom</td></tr>
+  </table>
+
+- 场景说明：
+  <table border="2">
+  <caption>表2：场景配置对照表</caption>
   <tr>
     <th align="left">场景编号(SCENARIO_NUM)</th>
     <th align="left">接口名称</th>
@@ -52,8 +64,6 @@
     <td align="left">half</td>
   </tr>
   </table>
-
-  输入输出shape均为[1, 512]，format为ND，核函数名为`element_wise_compound_compute_custom`。
 
 - 样例实现：
   - Kernel实现
@@ -98,7 +108,7 @@
   test pass!
   ```
 
-  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
   ```bash
@@ -112,5 +122,5 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`（默认）、`2` | 场景编号：1(AddRelu)、2(Axpy) |
