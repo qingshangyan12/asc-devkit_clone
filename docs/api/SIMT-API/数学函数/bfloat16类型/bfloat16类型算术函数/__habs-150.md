@@ -1,0 +1,79 @@
+# \_\_habs
+
+## 产品支持情况
+
+| 产品 | 是否支持 |
+| --- | --- |
+| Ascend 950PR/Ascend 950DT | √ |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
+| Atlas 200I/500 A2 推理产品 | x |
+| Atlas 推理系列产品AI Core | x |
+| Atlas 推理系列产品Vector Core | x |
+| Atlas 训练系列产品 | x |
+
+## 功能说明
+
+获取输入数据的绝对值。
+
+![](../../../../figures/zh-cn_formulaimage_0000002576421055.png)
+
+## 函数原型
+
+```
+inline bfloat16_t __habs(bfloat16_t x)
+```
+
+## 参数说明
+
+**表 1**  参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| x | 输入 | 源操作数。 |
+
+## 返回值说明
+
+输入数据的绝对值。本接口不受全局饱和模式影响，特殊值如下：
+
+| x值 | 返回值 |
+| --- | --- |
+| ±0 | 0 |
+| inf | inf |
+| -inf | inf |
+| nan | nan |
+
+## 约束说明
+
+无
+
+## 需要包含的头文件
+
+使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
+
+```
+#include "simt_api/asc_bf16.h"
+```
+
+## 调用示例
+
+-   SIMT编程场景：
+
+    ```
+    __global__ __launch_bounds__(1024) void KernelAbs(bfloat16_t* dst, bfloat16_t* x)
+    {
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        dst[idx] = __habs(x[idx]);
+    }
+    ```
+
+-   SIMD与SIMT混合编程场景：
+
+    ```
+    __simt_vf__ __launch_bounds__(1024) inline void KernelAbs(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)
+    {
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        dst[idx] = __habs(x[idx]);
+    }
+    ```
+
