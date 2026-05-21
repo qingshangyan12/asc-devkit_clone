@@ -1,7 +1,7 @@
 # ld_st_reg_align样例
 
 ## 概述
-本样例基于RegBase编程范式实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的对齐数据搬运操作，该样例使用LoadAlign，StoreAlign接口，以及POST_MODE_UPDATE、DATA_BLOCK_COPY等模式的使能。本样例支持6种搬运场景，通过环境变量选择场景。
+本样例基于Reg编程接口实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的对齐数据搬运操作，该样例使用LoadAlign，StoreAlign接口，以及POST_MODE_UPDATE、DATA_BLOCK_COPY等模式的使能。本样例支持6种搬运场景，通过环境变量选择场景。
     <table>
       <tr>
         <td>scenarioNum</td>
@@ -180,9 +180,9 @@
 - 样例执行
   ```bash
   SCENARIO=1                                                                    # 执行场景1
-  python3 ../scripts/gen_data.py -scenarioNum $SCENARIO                        # 生成测试输入数据
   mkdir -p build && cd build;                                                   # 创建并进入build目录
   cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程（默认npu模式）
+  python3 ../scripts/gen_data.py -scenarioNum $SCENARIO                         # 生成测试输入数据
   ./demo                                                                        # 执行编译生成的可执行程序，执行样例
   ```
 
