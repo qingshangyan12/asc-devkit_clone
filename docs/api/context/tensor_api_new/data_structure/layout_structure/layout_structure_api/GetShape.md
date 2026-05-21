@@ -16,7 +16,7 @@
 
 ## 功能说明
 
-`GetShape` 用于从 Layout 中提取 Shape 部分。内部调用 `layout.Shape<Is...>()`：
+`GetShape` 用于从 Layout 中提取 Shape 部分：
 
 - **不指定模板参数 `Is...`**：返回完整的 Shape 元组。
 - **指定模板参数 `Is...`**：返回 Shape 中对应索引的子结构。单个索引返回对应维度值或子 tuple；多个索引返回由它们组成的新 tuple。

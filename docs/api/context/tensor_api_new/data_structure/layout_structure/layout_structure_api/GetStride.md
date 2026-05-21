@@ -18,7 +18,7 @@ Tensor API 为头文件模板接口，不需要链接额外库文件。
 
 ## 功能说明
 
-GetStride用于从Layout中提取 Stride 部分。内部调用 `layout.Stride<Is...>()`：
+GetStride用于从Layout中提取 Stride 部分：
 
 - **不指定模板参数 `Is...`**：返回完整的 Stride 元组。
 - **指定模板参数 `Is...`**：返回 Stride 中对应索引的子结构。单个索引返回对应步长值或子 tuple；多个索引返回由它们组成的新 tuple。
