@@ -11,12 +11,12 @@
 ## 目录结构介绍
 ```
 ├── arange
-│   ├── scripts
-│   │   │   ├── gen_data.py            // 真值数据生成脚本
-│   ├── CMakeLists.txt                 // 编译工程文件
-│   ├── data_utils.h                   // 数据读入写出函数
-│   ├── arange.asc                     // AscendC样例实现 & 调用样例
-│   └── README.md                      // 样例介绍
+│   ├── arange.asc           // AscendC样例实现 & 调用样例
+│   ├── CMakeLists.txt       // 编译工程文件
+│   ├── data_utils.h         // 数据读入写出函数
+│   ├── README.md            // 样例介绍
+│   └── scripts
+│   │   │   └── gen_data.py  // 真值数据生成脚本
 ```
 
 ## 样例描述
@@ -81,10 +81,10 @@
 
 - 编译选项说明
 
-| 选项　　　　　　　　　　　| 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+| 选项           | 可选值           | 说明                       |
 | ---------------------------| -----------------------------| ---------------------------------------------------|
-| `CMAKE_ASC_RUN_MODE`　　　| `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
-| `CMAKE_ASC_ARCHITECTURES` | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| `CMAKE_ASC_RUN_MODE`   | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真       |
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510`         | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
 

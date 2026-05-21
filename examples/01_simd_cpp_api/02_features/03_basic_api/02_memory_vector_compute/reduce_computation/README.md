@@ -51,12 +51,12 @@
 
 ```
 ├── reduce_computation
-│   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── reduce_computation.asc  // Ascend C样例实现 & 调用样例
+│   ├── reduce_computation.asc  // Ascend C样例实现 & 调用样例
+│   └── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 ```
 
 ## 样例描述
@@ -191,11 +191,11 @@
 
 - 编译选项说明
 
-  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
+  | 选项      | 可选值           | 说明                                         |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真                         |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品 与 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`、`2`、`3`、`4`、`5`、`6`　　　　　| 场景编号：1=ReduceMax前n数据计算，2=ReduceMax高维切分计算，3=ReduceMin前n数据计算，4=ReduceMin高维切分计算，5=ReduceSum前n数据计算，6=ReduceSum高维切分计算 |
+  | `SCENARIO_NUM` | `1`、`2`、`3`、`4`、`5`、`6`     | 场景编号：1=ReduceMax前n数据计算，2=ReduceMax高维切分计算，3=ReduceMin前n数据计算，4=ReduceMin高维切分计算，5=ReduceSum前n数据计算，6=ReduceSum高维切分计算 |
 
 - 执行结果
 

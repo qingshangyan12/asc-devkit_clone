@@ -19,12 +19,12 @@
 
 ```
 ├── gelu_eltwise_high_performance
-│   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│   │   └── verify_result.py    // 真值对比文件
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   ├── gelu_eltwise.asc        // Ascend C样例实现（包含4个优化case）
+│   ├── CMakeLists.txt           // 编译工程文件
+│   ├── data_utils.h             // 数据读入写出函数
+│   ├── gelu_eltwise.asc         // Ascend C样例实现（包含4个优化case）
+│   └── scripts
+│   │   ├── gen_data.py          // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py     // 真值对比文件
 ```
 
 ## 样例描述
@@ -578,11 +578,11 @@ $$
 
 - 编译选项说明
 
-  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
+  | 选项      | 可选值           | 说明                                         |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真                         |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `0`、`1`、`2`、`3`　　　　　| Case编号：0=单loop+128bytes，1=单loop+256bytes，2=loop拆分，3=loop拆分+unroll |
+  | `SCENARIO_NUM` | `0`、`1`、`2`、`3`     | Case编号：0=单loop+128bytes，1=单loop+256bytes，2=loop拆分，3=loop拆分+unroll |
 
 - 执行结果
 
@@ -603,14 +603,13 @@ msprof ./demo   # 分析性能
 当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
 
 ```bash
-PROF_xxxx_XXXXXX
 ├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
+├── host
+├── mindstudio_profiler_log
+├── mindstudio_profiler_output  // 保存Host和各个Device的性能数据汇总
     ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
+    ├── README.txt
+    └── xx_*.csv
 ```
 
 查看具体的性能分析结果：

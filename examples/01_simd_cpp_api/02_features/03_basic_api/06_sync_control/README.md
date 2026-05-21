@@ -8,10 +8,10 @@
 
 ### 核内同步
 
-| 目录名称 | 功能描述 |
-|----------|----------|
-| [data_sync_barrier](./data_sync_barrier) | 基于DataSyncBarrier实现标量流水GM访问写序同步 |
-| [mutex](./mutex) | 本样例演示Mutex::Lock、Mutex::Unlock、AllocMutexID和ReleaseMutexID核内流水线同步接口的使用方法 |
+| 目录名称                                     | 功能描述                                                                     | 支持的产品                                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| [data_sync_barrier](./data_sync_barrier) | 基于DataSyncBarrier实现标量流水GM访问写序同步                                          | Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [mutex](./mutex)                         | 本样例演示Mutex::Lock、Mutex::Unlock、AllocMutexID和ReleaseMutexID核内流水线同步接口的使用方法 | Ascend 950PR/Ascend 950DT                                                                 |
 
 ### 核间同步
 

@@ -23,15 +23,15 @@
 ## 目录结构介绍
 ```
 ├── ld_st_reg_mask
-│   ├── scripts
-│   │   └── gen_data.py                // 输入数据和真值数据生成脚本
-│   ├── figures
-│   │   └── ld_st_reg_mask.png         // 样例原理图
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
-│   ├── README.md                      // 样例介绍
+│   ├── figures
 │   ├── ld_st_reg_mask_scenario_1.asc  // 场景1：基础搬运场景的AscendC实现
-│   └── ld_st_reg_mask_scenario_2.asc  // 场景2：复合计算场景的AscendC实现
+│   ├── ld_st_reg_mask_scenario_2.asc  // 场景2：复合计算场景的AscendC实现
+│   ├── README.md                      // 样例介绍
+│   └── scripts
+│   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
+│   │   └── ld_st_reg_mask.png         // 样例原理图
 ```
 
 ## 样例描述
@@ -117,10 +117,10 @@
 
 - 编译选项说明
 
-| 选项　　　　　　　　　　　| 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+| 选项           | 可选值           | 说明                       |
 | ---------------------------| -----------------------------| ---------------------------------------------------|
-| `CMAKE_ASC_RUN_MODE`　　　| `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
-| `CMAKE_ASC_ARCHITECTURES` | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| `CMAKE_ASC_RUN_MODE`   | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真       |
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510`         | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=基础搬运场景，2=复合计算场景 |
 
 - 执行结果  

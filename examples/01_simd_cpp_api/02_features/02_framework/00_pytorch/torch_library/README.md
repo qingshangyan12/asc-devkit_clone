@@ -14,9 +14,9 @@
 
 ```
 ├── torch_library
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── add_custom.asc          // Ascend C算子实现 & torch.library注册
-│   └── add_custom_test.py      // PyTorch调用脚本
+│   ├── add_custom.asc      // Ascend C算子实现 & torch.library注册
+│   ├── add_custom_test.py  // PyTorch调用脚本
+│   └── CMakeLists.txt      // 编译工程文件
 ```
 
 ## 样例描述
@@ -115,7 +115,7 @@
 
 - 编译选项说明
 
-  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
+  | 选项      | 可选值           | 说明                                         |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品 与 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
