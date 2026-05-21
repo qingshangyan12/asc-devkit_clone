@@ -58,6 +58,8 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 /*!
  * \ingroup Cos
  * \brief compute Cos elementwisely
@@ -101,12 +103,7 @@ template<typename T, bool isReuseSource = false, const CosConfig &config = defau
 __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
-    CosImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CosImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
-#endif
 }
 
 /*!
@@ -140,13 +137,93 @@ template<typename T, bool isReuseSource = false, const CosConfig &config = defau
 __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
-    CosImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CosImpl<T, isReuseSource, config>(dstTensor, srcTensor, calCount);
+}
+#else
+/*!
+ * \ingroup Cos
+ * \brief compute Cos elementwisely
+ * \tparam T: half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason, only support
+ * float input data type
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] srcTensor: input LocalTensor
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
+ * whose required space size should refer to corresponding tiling API, which is defined at cos_tiling.h.
+ * Generally, the more space you allocate, the better performance you will achieve, and the performance
+ * reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it is not guaranteed
+ * that the shared space will be cleared after usage, the data could be anything.
+ * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
+ * Input data valid range should be [-65504, 65504]
+ */
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer)
+{
+    Cos<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcTensor.GetSize());
+}
+
+/*!
+ * \ingroup Cos
+ * \brief compute Cos elementwisely
+ * \tparam T: half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] srcTensor: input LocalTensor
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
+ * whose required space size should refer to corresponding tiling API, which is defined at cos_tiling.h.
+ * Generally, the more space you allocate, the better performance you will achieve, and the performance
+ * reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it is not guaranteed
+ * that the shared space will be cleared after usage, the data could be anything.
+ * \param [in] calCount: the number of elements to be processed.
+ * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
+ * Input data valid range should be [-65504, 65504]
+ */
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+    CosImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 #endif
 }
+
+/*!
+ * \ingroup Cos
+ * \brief compute Cos elementwisely
+ * \tparam T: half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] srcTensor: input LocalTensor
+ * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
+ * Input data valid range should be [-65504, 65504]
+ */
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
+{
+    Cos<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());
+}
+
+/*!
+ * \ingroup Cos
+ * \brief compute Cos elementwisely
+ * \tparam T: half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] srcTensor: input LocalTensor
+ * \param [in] calCount: the number of elements to be processed.
+ * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
+ * Input data valid range should be [-65504, 65504]
+ */
+template <typename T, bool isReuseSource = false>
+__aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const uint32_t calCount)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+    CosImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
+#endif
+}
+#endif
 #pragma end_pipe
 }  // namespace AscendC
 
