@@ -24,31 +24,6 @@
 
 namespace ops_hccl {
 
-struct CcuKfcKernelStruct {
-
-    // HBM上的每轮开始信号的首地址
-    uint64_t waitAddr_{0};
-    // HBM上的每轮完成信号的首地址
-    uint64_t recordAddr_{0};
-    // HBM上的算子执行参数首地址
-    uint64_t paramAddr_{0};
-    // Die数量，用于判断单双Die，默认为1即单Die
-    uint32_t dieNum_{1};
-    // 用于Die间同步信号
-    CcuRep::MaskSignal exportDieSig;
-    CcuRep::MaskSignal importDieSig;
-
-    uint32_t missionNum_{1};
-    uint32_t missionIndex_{0};
-    // 用于Mission间同步信号
-    std::vector<CcuRep::MaskSignal> exportMissoinSig;
-    std::vector<CcuRep::MaskSignal> importMissionSig;
-    // 用于Mission间同步变量
-    std::vector<CcuRep::Variable> exportMissionVar;
-    std::vector<CcuRep::Variable> importMissionVar;
-
-}
-
 class CcuKernelArgKfcServer : public hcomm::CcuKernelArg {
 public:
     explicit CcuKernelArgKfcServer(uint64_t dimSize, uint32_t rankId, bool loadFromMem, const OpParam& opParam,
@@ -76,10 +51,40 @@ public:
 
 class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {
 public:
-    explicit CcuTaskArgKfcServer()
+    explicit CcuTaskArgKfcServer(uint64_t waitAddr, uint64_t recordAddr, uint64_t paramAddr, uint32_t dieNum,
+                                 CcuRep::MaskSignal exportDieSig, CcuRep::MaskSignal importDieSig, uint32_t missionNum, uint32_t missionIndex,
+                                 std::vector<CcuRep::MaskSignal> exportMissoinSig, std::vector<CcuRep::MaskSignal> importMissionSig,
+                                 std::vector<CcuRep::Variable> exportMissionVar, std::vector<CcuRep::Variable> importMissionVar):
+                                 waitAddr_(waitAddr), recordAddr_(recordAddr), paramAddr_(paramAddr), dieNum_(dieNum),
+                                 exportDieSig_(exportDieSig), importDieSig_(importDieSig), missionNum_(missionNum), missionIndex_(missionIndex),
+                                 exportMissoinSig_(exportMissoinSig), importMissionSig_(importMissionSig),
+                                 exportMissionVar_(exportMissionVar), importMissionVar_(importMissionVar)
+
     {
-        HCCL_DEBUG("[CcuTaskArgKfcServer] CcuTaskArgKfcServer");
+        HCCL_DEBUG("[CcuTaskArgKfcServer] waitAddr: %lu, recordAddr: %lu, paramAddr: %lu, dieNum: %lu, "
+                   "missionNum: %lu, missionIndex: %lu",
+                   waitAddr_, recordAddr_, paramAddr_, dieNum_, missionNum_, missionIndex_);
     }
+    // HBM上的每轮开始信号的首地址
+    uint64_t waitAddr_{0};
+    // HBM上的每轮完成信号的首地址
+    uint64_t recordAddr_{0};
+    // HBM上的算子执行参数首地址
+    uint64_t paramAddr_{0};
+    // Die数量，用于判断单双Die，默认为1即单Die
+    uint32_t dieNum_{1};
+    // 用于Die间同步信号
+    CcuRep::MaskSignal exportDieSig_;
+    CcuRep::MaskSignal importDieSig_;
+
+    uint32_t missionNum_{1};
+    uint32_t missionIndex_{0};
+    // 用于Mission间同步信号
+    std::vector<CcuRep::MaskSignal> exportMissoinSig_{};
+    std::vector<CcuRep::MaskSignal> importMissionSig_{};
+    // 用于Mission间同步变量
+    std::vector<CcuRep::Variable> exportMissionVar_{};
+    std::vector<CcuRep::Variable> importMissionVar_{};
 };
 
 class CcuKernelKfcServer : public CcuKernelAlgBase {

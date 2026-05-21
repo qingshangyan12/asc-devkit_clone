@@ -179,9 +179,9 @@ void Mc2KfcServer::WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::
             }
             turnStartSig = 0;
             Store(turnStartSig, hbmSigAddr);
-            EventRecord(importDieSig, 1);
+            EventRecord(importDieSig_, 1);
         } else if (getDieId == DIE1_ID) {
-            EventWait(exportDieSig, 1);
+            EventWait(exportDieSig_, 1);
         }
     }
 }
@@ -193,10 +193,10 @@ void Mc2KfcServer::SetTurnEndSig(const CcuRep::Variable &hbmSigAddr, const CcuRe
         Store(turnEndSig, hbmSigAddr);
     } else {
         if (getDieId == DIE0_ID) {
-            EventWait(exportDieSig, 1);
+            EventWait(exportDieSig_, 1);
             Store(turnEndSig, hbmSigAddr);
         } else if (getDieId == DIE1_ID) {
-            EventRecord(importDieSig, 1);
+            EventRecord(importDieSig_, 1);
         }
     }
 }
@@ -266,11 +266,11 @@ void CcuKernelKfcServer::MissionPreSync(CcuRep::Variable &func)
     }
     if (missionIndex_ == 0) {
         for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
-            LocalCtxPostVar(func, importMissionVar[i], importMissionSig[i]);    // TODO：这里怎么改
+            LocalCtxPostVar(func, importMissionVar_[i], importMissionSig_[i]);    // TODO：这里怎么改
         }
     } else {
-        EventWait(exportMissoinSig[0]);
-        func = exportMissionVar[0];
+        EventWait(exportMissoinSig_[0]);
+        func = exportMissionVar_[0];
     }
 }
 
@@ -281,18 +281,30 @@ void CcuKernelKfcServer::MissionPostSync()
     }
     if (missionIndex_ == 0) {
         for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
-            EventWait(exportMissoinSig[i]);
+            EventWait(exportMissoinSig_[i]);
         }
     } else {
-        EventRecord(importMissionSig[0]);
+        EventRecord(importMissionSig_[0]);
     }
 }
 
 std::vector<uint64_t> CcuKernelKfcServer::GeneArgs(const CcuTaskArg &arg)
 {
     const CcuTaskArgKfcServer *taskArg = dynamic_cast<const CcuTaskArgKfcServer *>(&arg);
-    uint64_t tokenInfo = taskArg->token_;
-    return {tokenInfo};
+    uint64_t waitAddr = taskArg->waitAddr_;
+    uint64_t recordAddr = taskArg->recordAddr_;
+    uint64_t paramAddr = taskArg->paramAddr_;
+    uint32_t dieNum = taskArg->dieNum_;
+    CcuRep::MaskSignal exportDieSig = taskArg->exportDieSig_;
+    CcuRep::MaskSignal importDieSig = taskArg->importDieSig_;
+    uint32_t missionNum = taskArg->missionNum_;
+    uint32_t missionIndex = taskArg->missionIndex_;
+    std::vector<CcuRep::MaskSignal> exportMissoinSig = taskArg->exportMissoinSig_;
+    std::vector<CcuRep::MaskSignal> importMissionSig = taskArg->importMissionSig_;
+    std::vector<CcuRep::MaskSignal> exportMissionVar = taskArg->exportMissionVar_;
+    std::vector<CcuRep::MaskSignal> importMissionVar = taskArg->importMissionVar_;
+    return {waitAddr, recordAddr, paramAddr,dieNum,exportDieSig,importDieSig, missionNum, missionIndex,
+            exportMissoinSig, importMissionSig, exportMissionVar, importMissionVar};
 }
 
 }
