@@ -12,18 +12,22 @@
     计算逻辑：逐元素完成 `z = x + y`。
 
 - **算子设计**
-    - **Device端算子Kernel编程涉及的接口**
+    - **Device端核函数编程接口**
         - 核函数定义：通过 [\_\_global\_\_](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 修饰符声明。
         - 数据分块（Tiling）：使用内置关键字 [threadIdx、blockIdx、blockDim](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 确定每个线程负责处理的数据。
         - 数据搬入：无需额外接口，直接通过指针访问即可。
         - 数据计算：无需额外接口，直接使用 `+` 运算符完成。
         - 数据搬出：无需额外接口，直接通过指针访问即可。
-    - **Host端编程涉及的接口**
-        - 内存分配：使用 `aclrtMallocHost` 分配Host Memory，`aclrtMalloc` 分配Device Memory。
+    - **Host端运行时接口**
+        - 内存分配：使用 `aclrtMallocHost`分配Host Memory，`aclrtMalloc`分配Device Memory。
         - 数据搬入：使用 `aclrtMemcpy` 将输入数据从Host Memory拷贝到Device Memory。
-        - 启动NPU计算任务：通过 `<<<...>>>` 语法糖启动核函数。
-        - 同步等待：调用 `aclrtSynchronizeStream` 或 `aclrtSynchronizeDevice` 等待任务完成。
+        - 启动NPU计算任务：通过 `<<<...>>>`语法糖启动核函数。
+        - 同步等待：调用 `aclrtSynchronizeStream`或 `aclrtSynchronizeDevice`等待任务完成。
         - 数据搬出：使用 `aclrtMemcpy`将计算结果从Device Memory拷贝回Host Memory。
+    
+      > [!NOTE] 说明
+      > - 最新API请查阅[Ascend C API 参考](https://asc.gitcode.com/)。
+      > - 请参考[异步执行](../../../编程指南/编译与运行/异步执行.md)了解更多运行时接口。
 
 - **算子代码实现**：
 
