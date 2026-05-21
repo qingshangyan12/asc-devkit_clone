@@ -116,19 +116,19 @@ dst和src使用TensorTrait类型时，其数据类型TensorTrait和scalarValue�
 |---|---|
 | T | 操作数数据类型。 |
 | U | scalarValue数据类型。|
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK\_PLACEHOLDER。<br>具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。 |
 
 **表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。 |
-| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。<br>源操作数的数据类型需要与目的操作数保持一致。 |
+| dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。 |
+| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。<br>源操作数的数据类型需要与目的操作数保持一致。 |
 | scalarValue | 输入 | 右移的位数，数据类型需要与目的操作数中的元素数据类型保持一致。<br>&bull; <cann-filter npu-type="910b"> 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，当src为uint16\_t或int16\_t类型时，scalarValue的取值范围为\[0, 16\] ；当src为uint32\_t或int32\_t类型时，scalarValue的取值范围为\[0, 32\]。</cann-filter> <br>&bull; <cann-filter npu-type="A3"> 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，当src为uint16\_t或int16\_t类型时，scalarValue的取值范围为\[0, 16\] ；当src为uint32\_t或int32\_t类型时，scalarValue的取值范围为\[0, 32\]。</cann-filter> <br>&bull; <cann-filter npu-type="310b"> 针对Atlas 200I/500 A2 推理产品，当src为uint16\_t或int16\_t类型时，scalarValue的取值范围为\[0, 16\] ；当src为uint32\_t或int32\_t类型时，scalarValue的取值范围为\[0, 32\]。</cann-filter> <br>&bull; <cann-filter npu-type="950"> 针对Ascend 950PR/Ascend 950DT系列产品，scalarValue的取值应大于等于0，逻辑右移的情况下，如果右移的位数大于src数据类型位宽，dst的全部元素被赋值为0；算术右移的情况下，如果右移的位数大于src数据类型位宽，源操作数元素为正数，对应的目的操作数元素被赋值为0，源操作数元素为负数，对应的目的操作数元素被赋值为-1。</cann-filter>|
-| count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](连续计算.md#ZH-CN_TOPIC_0000002543264748)。 |
-| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
-| repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](高维切分.md#ZH-CN_TOPIC_0000002556644319)。 |
-| repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](UnaryRepeatParams.md#ZH-CN_TOPIC_0000002525604434)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](高维切分.md#zh-cn_topic_0000002516372540_li072713185916)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](高维切分.md#zh-cn_topic_0000002516372540_zh-cn_topic_0000002267504656_zh-cn_topic_0000001764162593_li1481335103413)。 |
+| count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
+| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码.md)。 |
+| repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](../SIMD计算说明/高维切分.md)。 |
+| repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](../../../其他数据类型/UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 | roundEn | 输入 | 舍入功能使能开关，支持数据类型：bool，true为使能，false为不使能。仅当src为int16\_t/int32\_t类型时使能有效。<br>例：使能舍入功能，src数据类型为int16\_t，将src算术右移5位，如果src\_ele二进制数中的第5位为1，则dst\_ele值为对src\_ele算术右移5后加1。<br>src\_ele = 17 = 0b00000000000**1**0001 第五位为1<br>dst\_ele = arithmetic\_right\_shift(src\_ele, 5) + 1 = 0b00000000000**00000** + 1 = 0b00000000000**00001**<br><cann-filter npu-type="310b">针对Atlas 200I/500 A2 推理产品，不支持使能舍入功能，仅支持传入false。</cann-filter><br><cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，不支持使能舍入功能，仅支持传入false。</cann-filter> |
 
 ## 数据类型
@@ -171,8 +171,8 @@ dst和src使用TensorTrait类型时，其数据类型TensorTrait和scalarValue�
 
 ## 约束说明<a name="section23625411480"></a>
 
-- 操作数地址对齐要求请参见[地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
-- 操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 - 当count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
 <cann-filter npu-type="950">
 - 针对Ascend 950PR/Ascend 950DT，int8\_t/uint8\_t/uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
