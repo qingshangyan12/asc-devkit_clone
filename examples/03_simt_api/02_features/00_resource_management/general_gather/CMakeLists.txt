@@ -18,10 +18,8 @@ project(kernel_samples LANGUAGES ASC CXX)
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 
 function(add_asc_executable TARGET_NAME SOURCE_FILE)
-    add_executable(${TARGET_NAME}
-            ${SOURCE_FILE}
-    )
-    
+    add_executable(${TARGET_NAME} ${SOURCE_FILE})
+
     # ======================================================================================
     # NPU 编译选项配置
     #
@@ -29,14 +27,14 @@ function(add_asc_executable TARGET_NAME SOURCE_FILE)
     #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
     # ======================================================================================
     target_compile_options(${TARGET_NAME} PRIVATE
-            $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
+        $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
     )
-    
-    target_link_libraries(${TARGET_NAME} PRIVATE 
-            m
-            platform
-            tiling_api
-            dl
+
+    target_link_libraries(${TARGET_NAME} PRIVATE
+        m
+        platform
+        tiling_api
+        dl
     )
 endfunction()
 

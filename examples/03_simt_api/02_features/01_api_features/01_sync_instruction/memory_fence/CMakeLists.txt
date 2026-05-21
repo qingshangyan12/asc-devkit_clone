@@ -25,7 +25,7 @@ elseif(SCENARIO_NUM EQUAL 2)
 endif()
 
 add_executable(demo
-        ${SCENARIO_SRC}
+    ${SCENARIO_SRC}
 )
 
 # ======================================================================================
@@ -35,5 +35,5 @@ add_executable(demo
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
 target_compile_options(demo PRIVATE
-        $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
 )

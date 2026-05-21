@@ -19,8 +19,8 @@ set(RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 set(SOC_VERSION "" CACHE STRING "Simulator SOC version, e.g. Ascend950PR_9599")
 
 add_executable(gather
-        $<$<STREQUAL:${GATHER_VERSION},v1>:gather_v1.asc>
-        $<$<STREQUAL:${GATHER_VERSION},v2>:gather_v2.asc>
+    $<$<STREQUAL:${GATHER_VERSION},v1>:gather_v1.asc>
+    $<$<STREQUAL:${GATHER_VERSION},v2>:gather_v2.asc>
 )
 
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
@@ -32,16 +32,16 @@ set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
 target_compile_options(gather PRIVATE
-        $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-        $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:-g -O0>>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:-g -O0>>
 )
 
 target_link_directories(gather PRIVATE
-        $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:$ENV{ASCEND_HOME_PATH}/tools/simulator/${SOC_VERSION}/lib>>
+    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:$ENV{ASCEND_HOME_PATH}/tools/simulator/${SOC_VERSION}/lib>>
 )
 
 target_link_libraries(gather PRIVATE
-        m
-        $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:runtime_camodel>>
-        $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:npu_drv>>
+    m
+    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:runtime_camodel>>
+    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:npu_drv>>
 )
