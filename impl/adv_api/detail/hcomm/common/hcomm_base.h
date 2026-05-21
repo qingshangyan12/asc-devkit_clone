@@ -26,7 +26,7 @@
 #include "hcomm_inner_def.h"
 
 namespace AscendC {
-template <CommEngine commEngine, CommProtocol commProtocol>
+template <CommProtocol commProtocol, CommEngine commEngine>
 class HcommImpl {
 public:
     __aicore__ inline HcommImpl(){};

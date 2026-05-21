@@ -33,7 +33,7 @@ constexpr uint32_t ROCE_INIT_SQ_DB_SGIT_IDX = 1;
 enum class HCOMM_OP_TYPE : uint32_t { WRITE = 4U, READ = 8U };
 
 template <>
-class HcommImpl<CommEngine::AIV, CommProtocol::ROCE> {
+class HcommImpl<CommProtocol::ROCE, CommEngine::AIV> {
 public:
     __aicore__ inline HcommImpl();
     __aicore__ inline ~HcommImpl();

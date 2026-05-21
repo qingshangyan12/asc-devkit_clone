@@ -52,7 +52,7 @@ enum class HcommUrmaOpCode : uint32_t {
 };
 
 template <>
-class HcommImpl<CommEngine::AIV, CommProtocol::URMA> {
+class HcommImpl<CommProtocol::URMA, CommEngine::AIV> {
 public:
     __aicore__ inline HcommImpl();
     __aicore__ inline ~HcommImpl();
@@ -74,7 +74,7 @@ public:
 private:
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         HcommUrmaOpCode opCode = HcommUrmaOpCode::WRITE, auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle Operate(
+    __aicore__ inline HcommHandle PostSend(
         ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr = nullptr,
         uint64_t notifyVal = 0);
     __aicore__ inline void PollCqWhenSqOverflow(ChannelHandle channel, const SqContext& sqCtx, uint32_t sqHead);

@@ -120,7 +120,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Read)
 {
     UrmaChannelResource channel;
 
-    AscendC::Hcomm<AscendC::CommEngine::AIV, AscendC::CommProtocol::URMA> hcomm;
+    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
     AscendC::HcommHandle handleId =
         hcomm.ReadNbi(channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
     EXPECT_EQ(handleId, 0);
@@ -132,7 +132,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Write)
 {
     UrmaChannelResource channel;
 
-    AscendC::Hcomm<AscendC::CommEngine::AIV, AscendC::CommProtocol::URMA> hcomm;
+    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
     AscendC::HcommHandle handleId =
         hcomm.WriteNbi<false>(channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
     EXPECT_EQ(handleId, 0);
@@ -147,7 +147,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify)
 {
     UrmaChannelResource channel;
 
-    AscendC::Hcomm<AscendC::CommEngine::AIV, AscendC::CommProtocol::URMA> hcomm;
+    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
     AscendC::HcommHandle handleId = hcomm.WriteWithNotifyNbi<false>(channel.GetHandle(),
         reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1, reinterpret_cast<GM_ADDR>(0x33), 1);
     EXPECT_EQ(handleId, 0);

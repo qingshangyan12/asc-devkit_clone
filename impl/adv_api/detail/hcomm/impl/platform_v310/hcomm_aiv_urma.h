@@ -94,7 +94,7 @@ __aicore__ inline void HcommUrmaFillSgeCtx(
     sgeCtx->va = reinterpret_cast<uint64_t>(src);
 }
 
-__aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::URMA>::HcommImpl()
+__aicore__ inline HcommImpl<CommProtocol::URMA, CommEngine::AIV>::HcommImpl()
 {
     pipe_.InitBuffer(hcommBuf_, HCOMM_URMA_TMP_BUF_SIZE);
     wqeItem_ = hcommBuf_.Get<uint32_t>();
@@ -105,9 +105,9 @@ __aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::URMA>::HcommImpl()
     doorBell_ = cqCI_[8];
 }
 
-__aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::URMA>::~HcommImpl() {}
+__aicore__ inline HcommImpl<CommProtocol::URMA, CommEngine::AIV>::~HcommImpl() {}
 
-__aicore__ inline void HcommImpl<CommEngine::AIV, CommProtocol::URMA>::PollCqWhenSqOverflow(
+__aicore__ inline void HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PollCqWhenSqOverflow(
     ChannelHandle channel, const SqContext& sqCtx, uint32_t sqHead)
 {
     AscendC::GlobalTensor<uint32_t> sqCIGlobal;
@@ -124,7 +124,7 @@ __aicore__ inline void HcommImpl<CommEngine::AIV, CommProtocol::URMA>::PollCqWhe
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, HcommUrmaOpCode opCode, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::URMA>::Operate(
+__aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PostSend(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commitPipe;
@@ -177,7 +177,7 @@ __aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::URMA>::Op
     return handleId;
 }
 
-__aicore__ inline uint32_t HcommImpl<CommEngine::AIV, CommProtocol::URMA>::PollCq(
+__aicore__ inline uint32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PollCq(
     ChannelHandle channel, uint32_t expectIdx)
 {
     if (expectIdx == 0) {
@@ -245,29 +245,29 @@ __aicore__ inline uint32_t HcommImpl<CommEngine::AIV, CommProtocol::URMA>::PollC
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::URMA>::WriteNbi(
+__aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::WriteNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    return Operate<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE, config>(channel, dst, src, len);
+    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE, config>(channel, dst, src, len);
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::URMA>::ReadNbi(
+__aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::ReadNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    return Operate<commit, commitPipe, reqPipe, HcommUrmaOpCode::READ, config>(channel, src, dst, len);
+    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::READ, config>(channel, src, dst, len);
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::URMA>::WriteWithNotifyNbi(
+__aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::WriteWithNotifyNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
-    return Operate<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE_WITH_NOTIFY, config>(
+    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE_WITH_NOTIFY, config>(
         channel, dst, src, len, notifyAddr, notifyVal);
 }
 
 template <bool isWait>
-__aicore__ inline bool HcommImpl<CommEngine::AIV, CommProtocol::URMA>::JudgeHandleId(HcommHandle handleId)
+__aicore__ inline bool HcommImpl<CommProtocol::URMA, CommEngine::AIV>::JudgeHandleId(HcommHandle handleId)
 {
     // 判断handleId是否合法
     if (handleId < 0 || handleId >= static_cast<HcommHandle>(HCOMM_MAX_HANDLE_ID)) {
@@ -299,7 +299,7 @@ __aicore__ inline bool HcommImpl<CommEngine::AIV, CommProtocol::URMA>::JudgeHand
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommEngine::AIV, CommProtocol::URMA>::Commit(HcommHandle handleId)
+__aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Commit(HcommHandle handleId)
 {
     (void)pipe;
     if (!JudgeHandleId<false>(handleId)) {
@@ -334,7 +334,7 @@ __aicore__ inline int32_t HcommImpl<CommEngine::AIV, CommProtocol::URMA>::Commit
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommEngine::AIV, CommProtocol::URMA>::Wait(HcommHandle handleId)
+__aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Wait(HcommHandle handleId)
 {
     (void)pipe;
     if (!JudgeHandleId<true>(handleId)) {

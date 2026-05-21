@@ -34,8 +34,9 @@ namespace AscendC {
  * corresponding comm task. 5) Call the Wait interface (blocking) to wait for the server to complete the corresponding
  * comm task.
  * @tparam commProtocol: The communication protocol to use, ROCE supported as default.
+ * @tparam commEngine: The communication engine to use, AIV supported as default.
  */
-template <CommEngine commEngine = CommEngine::AIV, CommProtocol commProtocol = CommProtocol::ROCE>
+template <CommProtocol commProtocol = CommProtocol::ROCE, CommEngine commEngine = CommEngine::AIV>
 class Hcomm {
 public:
     /*!
@@ -117,7 +118,7 @@ public:
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Wait(HcommHandle handleId);
 private:
-    HcommImpl<commEngine, commProtocol> impl_;
+    HcommImpl<commProtocol, commEngine> impl_;
 };
 } // namespace AscendC
 

@@ -30,7 +30,7 @@ namespace AscendC {
 enum class HCOMM_OP_TYPE : uint32_t { WRITE = 3U, READ = 5U };
 
 template <>
-class HcommImpl<CommEngine::AIV, CommProtocol::ROCE> {
+class HcommImpl<CommProtocol::ROCE, CommEngine::AIV> {
 public:
     __aicore__ inline HcommImpl();
 
