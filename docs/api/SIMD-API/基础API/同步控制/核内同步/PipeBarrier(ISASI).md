@@ -61,7 +61,6 @@
 
 头文件路径为: "basic_api/kernel_operator_block_sync_intf.h"
 
-PipeBarrier是核内单流水同步控制接口，其功能：
 如下图1所示，完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。其作用是，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。
 
 **图 1**  PipeBarrier接口功能示意图<a name="zh-cn_topic_0000002549838971_fig7681194617307"></a>  
