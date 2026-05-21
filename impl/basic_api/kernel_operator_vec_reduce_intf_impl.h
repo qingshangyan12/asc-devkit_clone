@@ -137,7 +137,7 @@ __aicore__ inline void ReduceDataBlockCommon(const LocalTensor<T>& dst, const Lo
     if constexpr (Std::is_same_v<MaskType, int32_t>) {
         CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReduceDataBlock");
     } else {
-        CheckMaskArray<SrcPrimType, isSetMask>(mask, "ReduceDataBlock");
+        CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReduceDataBlock");
     }
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -181,7 +181,7 @@ __aicore__ inline void ReducePairElemCommon(const LocalTensor<T>& dst, const Loc
     if constexpr (Std::is_same_v<MaskType, int32_t>) {
         CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReducePairElem");
     } else {
-        CheckMaskArray<SrcPrimType, isSetMask>(mask, "ReducePairElem");
+        CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReducePairElem");
     }
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -261,7 +261,7 @@ __aicore__ inline void ReduceRepeatCommon(const LocalTensor<T>& dst, const Local
     if constexpr (Std::is_same_v<MaskType, int32_t>) {
         CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReduceRepeat");
     } else {
-        CheckMaskArray<SrcPrimType, isSetMask>(mask, "ReduceRepeat");
+        CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReduceRepeat");
     }
 #endif
     if constexpr (reduceType == ReduceType::SUM) {
