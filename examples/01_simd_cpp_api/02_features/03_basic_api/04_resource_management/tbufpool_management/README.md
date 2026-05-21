@@ -39,12 +39,12 @@
 
 ```
 ├── tbufpool_management
+│   ├── CMakeLists.txt           // 编译工程文件
+│   ├── data_utils.h             // 数据读入写出函数
 │   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   └── tbufpool_management.asc // Ascend C样例实现 & 调用样例
+│   └── tbufpool_management.asc  // Ascend C样例实现 & 调用样例
+│   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py     // 验证输出数据和真值数据是否一致的验证脚本
 ```
 
 ## 样例描述
@@ -247,11 +247,11 @@
 
 - 编译选项说明
 
-  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
+  | 选项      | 可选值           | 说明                                         |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真                         |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品 与 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`、`2`、`3`　　　　　| 场景编号：1=TBufPool内存复用，2=TBufPool资源细分，3=自定义TBufPool |
+  | `SCENARIO_NUM` | `1`、`2`、`3`     | 场景编号：1=TBufPool内存复用，2=TBufPool资源细分，3=自定义TBufPool |
 
 - 执行结果
 

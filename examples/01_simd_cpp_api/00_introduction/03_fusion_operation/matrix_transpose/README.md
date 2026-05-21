@@ -12,9 +12,9 @@
 
 ```text
 ├── matrix_transpose
-│   ├── CMakeLists.txt         // 编译工程文件
-│   ├── matrix_transpose.asc   // 矩阵转置样例实现
-│   ├── figures                // 图示
+│   ├── CMakeLists.txt        // 编译工程文件
+│   ├── figures               // 图示
+│   ├── matrix_transpose.asc  // 矩阵转置样例实现
 │   └── README.md
 ```
 

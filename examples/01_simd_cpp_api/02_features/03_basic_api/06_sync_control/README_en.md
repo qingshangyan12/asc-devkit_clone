@@ -8,10 +8,10 @@ This sample collection introduces multiple API samples related to synchronizatio
 
 ### Intra-core Synchronization
 
-| Directory Name | Description |
-|----------|----------|
-| [data_sync_barrier](./data_sync_barrier) | Implements scalar pipeline GM access write ordering synchronization using DataSyncBarrier |
-| [mutex](./mutex) | Demonstrates the usage of Mutex::Lock, Mutex::Unlock, AllocMutexID, and ReleaseMutexID intra-core pipeline synchronization interfaces |
+| Directory Name                           | Description                                                                                                                           | Supported Products                                                                          |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| [data_sync_barrier](./data_sync_barrier) | Implements scalar pipeline GM access write ordering synchronization using DataSyncBarrier                                             | Ascend 950PR/Ascend 950DT, Atlas A3 Training Series Products/Atlas A3 Inference Series Products, Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [mutex](./mutex)                         | Demonstrates the usage of Mutex::Lock, Mutex::Unlock, AllocMutexID, and ReleaseMutexID intra-core pipeline synchronization interfaces | Ascend 950PR/Ascend 950DT                                                                   |
 
 ### Inter-core Synchronization
 

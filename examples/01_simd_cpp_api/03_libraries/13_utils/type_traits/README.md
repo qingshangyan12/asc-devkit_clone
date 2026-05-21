@@ -10,10 +10,10 @@
 ## 目录结构
 ```
 ├── type_traits
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   ├── type_traits.asc         // Ascend C算子实现 & 调用样例
-│   └── README.md               // 样例介绍
+│   ├── CMakeLists.txt   // 编译工程文件
+│   ├── data_utils.h     // 数据读入写出函数
+│   ├── README.md        // 样例介绍
+│   └── type_traits.asc  // Ascend C算子实现 & 调用样例
 ```
 
 ## 功能描述
