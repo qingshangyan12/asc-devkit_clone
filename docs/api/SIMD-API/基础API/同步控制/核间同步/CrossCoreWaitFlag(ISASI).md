@@ -75,17 +75,9 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 | --- | --- | --- |
 | flagId | 输入 | 核间同步的标记。<br><cann-filter npu-type="950">1. Ascend 950PR/Ascend 950DT，取值范围如下：<br>&nbsp;&nbsp;&bull; AIV0发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 0-10的操作。<br>&nbsp;&nbsp;&bull; AIV1发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 16-26的操作。<br>&nbsp;&nbsp;&bull; AIC发起的flagId 0-10的CrossCoreSetFlag操作对应AIV0 CrossCoreWaitFlag中flagId 0-10的操作。<br>&nbsp;&nbsp;&bull; AIC发起的flagId 16-26的CrossCoreSetFlag操作对应AIV1 CrossCoreWaitFlag中flagId 0-10的操作。</cann-filter><br><cann-filter npu-type="A3">2. Atlas A3 训练系列产品/Atlas A3 推理系列产品，取值范围是0-10。</cann-filter><br><cann-filter npu-type="910b">3. Atlas A2 训练系列产品/Atlas A2 推理系列产品，取值范围是0-10。</cann-filter> |
 
-## 数据类型
-
-无
-
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
-
-## 流水类型
-
-PIPE_S
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
@@ -164,4 +156,4 @@ PIPE_S
     }
 ```
 
-详细请参考[CrossCoreSetFlag和CrossCoreWaitFlag核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/cross_core_set_wait_flag)。
+完整样例请参考[CrossCoreSetFlag和CrossCoreWaitFlag核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/cross_core_set_wait_flag)。

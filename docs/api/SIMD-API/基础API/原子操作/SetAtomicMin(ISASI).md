@@ -41,10 +41,6 @@ __aicore__ inline void SetAtomicMin()
 
 无
 
-## 流水类型
-
-PIPE_S
-
 ## 约束说明<a name="section633mcpsimp"></a>
 
 <cann-filter npu-type="950">
@@ -70,8 +66,6 @@ PIPE_S
 - SetAtomicMin内部已集成与  [SetAtomicType](SetAtomicType.md)  相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用 SetAtomicType 接口。
 
 ## 调用示例<a name="section177231425115410"></a>
-
-完整使用样例请参见[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations)。
 
 ```cpp
 #include "kernel_operator.h"
@@ -100,8 +94,12 @@ __aicore__ inline void CopyOut()
     queueSrc.FreeTensor(srcLocal);
 }
 
+/*
 每个核的输入数据为: 
 Src0: [1,1,1,1,1,...,1] // 256个1
 Src1: [2,2,2,2,2,...,2] // 256个2
 最终输出数据: [1,1,1,1,1,...,1] // 256个1
+*/
 ```
+
+完整样例请参考[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations)。

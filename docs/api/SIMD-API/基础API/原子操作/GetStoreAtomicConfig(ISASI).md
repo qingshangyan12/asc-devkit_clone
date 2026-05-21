@@ -33,17 +33,9 @@ __aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atom
 | atomicType | 输出 | 原子操作使能位。<br>0：无原子操作<br>1：使能原子操作，进行原子操作的数据类型为float<br>2：使能原子操作，进行原子操作的数据类型为half<br>3：使能原子操作，进行原子操作的数据类型为int16_t<br>4：使能原子操作，进行原子操作的数据类型为int32_t<br>5：使能原子操作，进行原子操作的数据类型为int8_t<br>6：使能原子操作，进行原子操作的数据类型为bfloat16_t |
 | atomicOp | 输出 | 原子操作类型。<br>0：求和操作 |
 
-## 数据类型
-
-无
-
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
-
-## 流水类型
-
-PIPE_S
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

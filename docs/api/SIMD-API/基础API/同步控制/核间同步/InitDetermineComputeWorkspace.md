@@ -68,15 +68,7 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 | gmWorkspace | 输入 | 临时空间，初始化核间同步的共享内存，类型为GlobalTensor。 |
 | ubWorkspace | 输入 | 临时空间，用于操作gmWorkspace，类型为LocalTensor。 |
 
-## 数据类型
-
-无
-
 ## 返回值说明<a name="section640mcpsimp"></a>
-
-无
-
-## 流水类型
 
 无
 
@@ -110,4 +102,4 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
     }
 ```
 
-详细请参考[sequential\_block\_sync示例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/sequential_block_sync)。
+完整样例请参考[sequential\_block\_sync示例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/sequential_block_sync)。

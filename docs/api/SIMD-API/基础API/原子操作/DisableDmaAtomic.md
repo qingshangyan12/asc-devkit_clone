@@ -16,7 +16,7 @@
 
 头文件路径为："basic_api/kernel_operator_set_atomic_intf.h"。
 
-关闭数据搬运随路原子操作功能，后续写入GM的数据搬运完成后，GM中原始数据将被新搬运数据完全覆盖。
+关闭数据搬运随路原子操作功能，后续执行数据搬运时，GM中原始数据将被新搬运数据完全覆盖。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -28,25 +28,15 @@ __aicore__ inline void DisableDmaAtomic()
 
 无
 
-## 数据类型
-
-无
-
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
-
-## 流水类型
-
-PIPE_S
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
 [SetAtomicAdd](SetAtomicAdd.md)、[SetAtomicMax](SetAtomicMax(ISASI).md)、[SetAtomicMin](SetAtomicMin(ISASI).md)使用完成后，通过DisableDmaAtomic清空原子操作的状态，以免影响后续相关指令功能。
 
 ## 调用示例<a name="section177231425115410"></a>
-
-DisableDmaAtomic的调用示例如下：
 
 ```cpp
 AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
@@ -66,4 +56,4 @@ AscendC::DataCopy(dstGlobal, srcLocal, SIZE);
 AscendC::DisableDmaAtomic();
 ```
 
-详细请参考[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations/data_movement_with_atomic_operations.asc)。
+完整样例请参考[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations/data_movement_with_atomic_operations.asc)。

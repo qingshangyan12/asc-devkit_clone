@@ -79,15 +79,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 | blockIdx | 输入 | 表示等待核的idx号，取值范围：[0, 核数-1]。 |
 | eventID | 输入 | 用来控制当前核的set、wait事件。 |
 
-## 数据类型
-
-无
-
 ## 返回值说明<a name="section640mcpsimp"></a>
-
-无
-
-## 流水类型
 
 无
 
@@ -116,4 +108,4 @@ if (blockIdx == 0) { // 在核0设置IBSet，当核0的操作完成后再执行�
 }
 ```
 
-详细请参考[IBSet与IBWait核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/ib_set_wait)。
+完整样例请参考[IBSet与IBWait核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/ib_set_wait)。

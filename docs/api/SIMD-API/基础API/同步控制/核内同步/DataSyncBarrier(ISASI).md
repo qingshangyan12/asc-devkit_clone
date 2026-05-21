@@ -68,17 +68,9 @@ __aicore__ inline void DataSyncBarrier()
 | --- | --- |
 | arg0 | 模板参数，表示需要等待的内存位置，类型为MemDsbT，可取值为：<br>&bull; ALL，等待所有内存访问指令。<br>&bull; DDR，等待GM访问指令。<br>&bull; UB，等待UB访问指令。<br>&bull; SEQ，等待SEQ访问指令。 |
 
-## 数据类型
-
-无
-
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
-
-## 流水类型
-
-PIPE_S
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
@@ -111,4 +103,4 @@ PIPE_S
     }
 ```
 
-详细请参考[DataSyncBarrier接口样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/data_sync_barrier)。
+完整样例请参考[DataSyncBarrier接口样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/data_sync_barrier)。

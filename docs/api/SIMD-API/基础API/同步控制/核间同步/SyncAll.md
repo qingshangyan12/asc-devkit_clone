@@ -140,15 +140,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 | ubWorkspace | 输入 | ubWorkspace为用户定义的局部Local空间，每个核单独自用，用于标记当前核的状态。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT，支持的数据类型为int32_t。<br>所需空间大小参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
 | usedCores | 输入 | 指定多少个核之间的同步，传入数值不能超过算子调用时指定的逻辑numBlocks。此参数为默认参数，不传此参数表示全核软同步。<br>仅在软同步接口中支持，硬同步接口不支持该参数。 |
 
-## 数据类型
-
-无
-
 ## 返回值说明<a name="section91032023123812"></a>
-
-无
-
-## 流水类型
 
 无
 
@@ -195,4 +187,4 @@ AscendC::SyncAll(syncGlobal, workLocal);
 ...
 ```
 
-详细请参考[SyncAll样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/sync_all)。
+完整样例请参考[SyncAll样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/sync_all)。
