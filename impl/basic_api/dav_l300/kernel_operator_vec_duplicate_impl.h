@@ -349,7 +349,7 @@ __simd_vf__ inline void DeInterleaveImplNormal(__ubuf__ T *dst0Local, __ubuf__ T
         Reg::DataCopy(dst1Local + i * sregLower, dst1Reg, preg);
     }
     if constexpr (!hasSrc1) {
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported DeInterleaveImplNormal!"); });
     }
     // second process src1Local
     if constexpr (!hasUnalign) {
@@ -412,7 +412,7 @@ __simd_vf__ inline void DeInterleaveImplB64(__ubuf__ T *dst0Local, __ubuf__ T *d
         Reg::DataCopy(dst1Local + i * sregLower, dst1Reg, b64Preg);
     }
     if constexpr (!hasSrc1) {
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported DeInterleaveImplB64!"); });
     }
     // second process src1Local
     if constexpr (!hasUnalign) {

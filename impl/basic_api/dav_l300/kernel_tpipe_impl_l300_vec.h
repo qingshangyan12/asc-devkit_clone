@@ -182,7 +182,7 @@ template <typename T>
 __aicore__ inline void TQueBind<src, dst, depth, mask>::FreeTensor(LocalTensor<T> &tensor)
 {
     FreeBuffer(tensor.GetBufferHandle());
-    return;
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetNextTaskStart!"); });
 }
 
 template <TPosition src, TPosition dst, int32_t depth, auto mask>
@@ -584,7 +584,7 @@ __aicore__ inline void TQueBind<src, dst, depth, mask>::FreeBuffer(TBufHandle bu
             (uint64_t)(cpuPtr + ptr->address),
             static_cast<uint64_t>(ptr->dataLen));
 #endif  // ASCENDC_CPU_DEBUG
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetNextTaskStart!"); });
     } else {
         auto ptr = reinterpret_cast<TBufType *>(buf);
         ASCENDC_ASSERT((this->bufStart <= ptr && ptr < this->bufStart + this->bufNum), {
@@ -641,7 +641,7 @@ __aicore__ inline void TQueBind<src, dst, depth, mask>::FreeBuffer(TBufHandle bu
             (uint64_t)(absAddr + ptr->address),
             static_cast<uint64_t>(ptr->dataLen));
 #endif  // ASCENDC_CPU_DEBUG
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetNextTaskStart!"); });
     }
 }
 
@@ -902,7 +902,7 @@ __aicore__ inline void TQueBind<src, dst, depth, mask>::InitStartBufHandle(
     this->value = num;
     this->bufStart = ptr;
     DEBUG_CODE(this->bufLen = num * len);
-    return;
+
 }
 
 template <TPosition src, TPosition dst, int32_t depth, auto mask>
@@ -1115,7 +1115,7 @@ __aicore__ inline void TBuf<pos>::InitStartBufHandle(TBufHandle startBufhandle, 
     this->bufStart = ptr;
     this->bufLen = len;
     this->offset = 0;
-    return;
+
 }
 // begin impl of tpipe
 __aicore__ inline TPipe::TPipe()
@@ -1127,7 +1127,7 @@ __aicore__ inline TPipe::TPipe()
 __aicore__ inline TPipe::~TPipe()
 {
     if (g_tpipeImpl.isDestroy) {
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetNextTaskStart!"); });
     }
     Destroy();
 };
@@ -1465,7 +1465,7 @@ __aicore__ inline void TPipe::ReleaseEventID(TEventID id)
     ASCENDC_ASSERT((evt != HardEvent::MAX), { KERNEL_LOG(KERNEL_ERROR, "evt cannot be HardEvent::MAX"); });
     auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);
     ptr->eventOccupy = sbitset0(ptr->eventOccupy, id);
-    return;
+
 }
 
 __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
@@ -1548,7 +1548,7 @@ __aicore__ inline void InitShareBufStart(
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     tpipe->g_tpipeImpl.sharedEvtId_ = tpipe->g_tpipeImpl.bufIdPool_;
 #endif
-    return;
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetNextTaskStart!"); });
 }
 
 __aicore__ inline void InitShareBufEnd(TPipe *tpipe)
@@ -1566,7 +1566,7 @@ __aicore__ inline void InitShareBufEnd(TPipe *tpipe)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     tpipe->g_tpipeImpl.bufIdPool_ = tpipe->g_tpipeImpl.sharedEvtId_;
 #endif
-    return;
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetNextTaskStart!"); });
 }
 
 template <typename T>
@@ -1901,7 +1901,7 @@ void inline TPipe::SetBufferCtx(Hardware hard, struct BufPoolExtra *bufPool)
     }
     bufPool->phySpace = bufferInitLen.at(hard);
     bufPool->absAddr = ptr;
-    return;
+
 }
 #endif
 
@@ -2254,7 +2254,7 @@ template <TPosition pos, uint32_t bufIDSize>
 __aicore__ inline TBufPool<pos, bufIDSize>::~TBufPool()
 {
     if (this->tBufPoolImpl.isReset_) {
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetNextTaskStart!"); });
     }
     if ASCEND_IS_AIC {
         auto ptr = this->tBufPoolImpl.buf_;

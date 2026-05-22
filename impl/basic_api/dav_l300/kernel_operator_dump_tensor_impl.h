@@ -109,7 +109,7 @@ __aicore__ inline void DumpShapeImpl(const ShapeInfo& shapeInfo)
 {
     uint8_t core = GetDumpBlockIdx();
     if (core >= DUMP_CORE_COUNT) {
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported DumpShapeImpl!"); });
     }
     uint32_t valueSize = sizeof(DumpShapeMessageHead);
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved) - DUMP_WORKSPACE_SIZE;
@@ -122,7 +122,7 @@ __aicore__ inline void DumpShapeImpl(const ShapeInfo& shapeInfo)
         });
         *((__gm__ uint32_t *)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t *)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-        return;
+   
     }
     *((__gm__ uint32_t *)ptr->dumpAddr + DUMP_SHAPE_MESSAGE_HEAD_TYPE_POS) =
         static_cast<uint32_t>(DumpType::DUMP_SHAPE);
@@ -146,19 +146,19 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& tensor, uint
     // set the head struct value
     if (position == 0) {
         ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
-        return;
+
     }
 
     T data;
     uint8_t core = GetDumpBlockIdx();
     if (core >= DUMP_CORE_COUNT) {
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported DumpTensorLocal2GMImpl!"); });
     }
     uint32_t offset = dumpSize * sizeof(T);
 
     if (offset % ONE_BLK_SIZE != 0) {
         ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dump size is %u, which must be 32B aligned", offset); });
-        return;
+
     }
 
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved) - DUMP_WORKSPACE_SIZE;
@@ -173,7 +173,7 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& tensor, uint
         });
         *((__gm__ uint32_t *)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t *)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-        return;
+     
     }
 
     *((__gm__ uint32_t *)ptr->dumpAddr + DUMP_MESSAGE_HEAD_TYPE_POS) = static_cast<uint32_t>(DumpType::DUMP_TENSOR);
@@ -317,7 +317,7 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& tensor, uint32
     T data;
     uint32_t offset = dumpSize * sizeof(T);
     if (!CheckDumpValid(offset)) {
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported DumpTensorGM2GMImpl!"); });
     }
     DumpBlockInfoImpl(tensor, desc, dumpSize);
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved) - DUMP_WORKSPACE_SIZE;
@@ -468,7 +468,7 @@ __aicore__ inline void WriteScalar(__gm__ uint8_t* paramAddr, uint32_t paramIdx,
 
 __aicore__ inline void SetParam(__gm__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset)
 {
-    return;
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetParam!"); });
 }
 
 template <typename... Args>
@@ -520,7 +520,7 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     uint8_t blockIdx = GetDumpBlockIdx();
     if (blockIdx >= DUMP_CORE_COUNT) {
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported PrintfImpl!"); });
     }
     __gm__ BlockInfo *blockInfo = GetBlockInfo();
     uint32_t remainSize = blockInfo->dumpOffset;
@@ -535,7 +535,7 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
         __gm__ uint8_t *blockInfoStart = (__gm__ uint8_t *)blockInfo;
         *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t *)blockInfoStart, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported PrintfImpl!"); });
     }
 
     __gm__ uint8_t *tlvAddr = (__gm__ uint8_t *)dumpAddr;
