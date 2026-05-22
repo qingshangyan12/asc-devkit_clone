@@ -50,7 +50,7 @@ __aicore__ inline void Ub2Gm(
 }
 
 __aicore__ inline int32_t HcommFindBufferIdx(
-    __gm__ RegedBufferEntity* bufferAddr, uint32_t bufferNum, GM_ADDR addr, uint64_t len)
+    RegedBufferEntity* bufferAddr, uint32_t bufferNum, GM_ADDR addr, uint64_t len)
 {
     if (bufferAddr == nullptr) {
         KERNEL_LOG(KERNEL_ERROR, "HcommFindBufferIdx failed with null bufferAddr, bufferNum=%u", bufferNum);
