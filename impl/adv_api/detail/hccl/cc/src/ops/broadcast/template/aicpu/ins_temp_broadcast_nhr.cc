@@ -37,11 +37,9 @@ HcclResult InsTempBroadcastNHR::CalcRes(HcclComm comm, const OpParam& param, con
 HcclResult InsTempBroadcastNHR::GetRes(AlgResourceRequest &resourceRequest) const
 {
     u32 threadNum = 1;
-    resourceRequest.slaveThreadNum = threadNum - 1;
-    for (u32 index = 0; index < threadNum - 1; index++) {
-        resourceRequest.notifyNumPerThread.push_back(1);
-    }
-    resourceRequest.notifyNumOnMainThread = threadNum - 1;
+    resourceRequest.slaveThreadNum = 0;
+    resourceRequest.notifyNumPerThread;         // 没有从流
+    resourceRequest.notifyNumOnMainThread = 0;  // 没有从流
     return HCCL_SUCCESS;
 }
 
@@ -289,9 +287,14 @@ HcclResult InsTempBroadcastNHR::RunAllGather(const RankSliceInfo &sliceInfoVec,
         TxRxChannels sendRecvLinks(linkSend, linkRecv);
         TxRxSlicesList sendRecvSlicesList({txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices});
 
-        SendRecvInfo sendRecvInfo(sendRecvLinks, sendRecvSlicesList);
-        CHK_PRT_RET(SendRecvWrite(sendRecvInfo, threads[0]), HCCL_ERROR("[InsTempBroadcastNHR] RunAllGather send failed"),
-            HcclResult::HCCL_E_INTERNAL);
+        SendRecvInfo sendRecvInfo(sendRecvLinks, sendRecvSlicesList, dataType_);
+        if (isDmaRead_) {
+            CHK_PRT_RET(SendRecvBatchRead(sendRecvInfo, threads[0]),
+                HCCL_ERROR("[InsTempBroadcastNHR] RunAllGather send failed"), HcclResult::HCCL_E_INTERNAL);
+        } else {
+            CHK_PRT_RET(SendRecvBatchWrite(sendRecvInfo, threads[0]),
+                HCCL_ERROR("[InsTempBroadcastNHR] RunAllGather send failed"), HcclResult::HCCL_E_INTERNAL);
+        }
     }
     return HcclResult::HCCL_SUCCESS;
 }
@@ -333,9 +336,14 @@ HcclResult InsTempBroadcastNHR::BatchSend(AicpuNHRStepInfo &stepInfo, const std:
         txDstSlices.push_back(txDstSlice);
     }
     SlicesList txSlicesList(txSrcSlices, txDstSlices);
-    DataInfo sendData(linkSend, txSlicesList);
-    CHK_PRT_RET(SendWrite(sendData, threads[0]), HCCL_ERROR("[InsTempBroadcastNHR] BatchSend failed"),
-        HcclResult::HCCL_E_INTERNAL);
+    DataInfo sendData(linkSend, txSlicesList, dataType_);
+    if (isDmaRead_) {
+        CHK_PRT_RET(SendRead(sendData, threads[0]), HCCL_ERROR("[InsTempBroadcastNHR] BatchSend failed"),
+            HcclResult::HCCL_E_INTERNAL);
+    } else {
+        CHK_PRT_RET(SendBatchWrite(sendData, threads[0]), HCCL_ERROR("[InsTempBroadcastNHR] BatchSend failed"),
+            HcclResult::HCCL_E_INTERNAL);
+    }
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -356,9 +364,14 @@ HcclResult InsTempBroadcastNHR::BatchRecv(AicpuNHRStepInfo &stepInfo, const std:
         rxDstSlices.push_back(rxDstSlice);
     }
     SlicesList rxSlicesList(rxSrcSlices, rxDstSlices);
-    DataInfo recvData(linkRecv, rxSlicesList);
-    CHK_PRT_RET(RecvWrite(recvData, threads[0]), HCCL_ERROR("[InsTempBroadcastNHR] BatchTxRx Recv failed"),
-        HcclResult::HCCL_E_INTERNAL);
+    DataInfo recvData(linkRecv, rxSlicesList, dataType_);
+    if (isDmaRead_) {
+        CHK_PRT_RET(RecvBatchRead(recvData, threads[0]), HCCL_ERROR("[InsTempBroadcastNHR] BatchTxRx Recv failed"),
+            HcclResult::HCCL_E_INTERNAL);
+    } else {
+        CHK_PRT_RET(RecvWrite(recvData, threads[0]), HCCL_ERROR("[InsTempBroadcastNHR] BatchTxRx Recv failed"),
+            HcclResult::HCCL_E_INTERNAL);
+    }
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -378,7 +391,7 @@ HcclResult InsTempBroadcastNHR::BatchSR(AicpuNHRStepInfo &stepInfo, const std::m
         DataSlice txSrcSlice = DataSlice(BuffAddr, memOffset + sliceInfoVec[txId][0].offset, sliceInfoVec[txId][0].size);
         DataSlice txDstSlice = DataSlice(remoteSendBuffAddr, memOffset + sliceInfoVec[txId][0].offset, sliceInfoVec[txId][0].size);
         txSrcSlices.push_back(txSrcSlice);
-        txSrcSlices.push_back(txDstSlice);
+        txDstSlices.push_back(txDstSlice);
     }
     SlicesList txSlicesList(txSrcSlices, txSrcSlices);
     std::vector<DataSlice> rxSrcSlices;
@@ -395,8 +408,13 @@ HcclResult InsTempBroadcastNHR::BatchSR(AicpuNHRStepInfo &stepInfo, const std::m
     SlicesList rxSlicesList(rxSrcSlices, rxDstSlices);
     TxRxSlicesList txRxSlicesList(txSlicesList, rxSlicesList);
     SendRecvInfo sendRecvInfo(linkSendRecv, txRxSlicesList);
-    CHK_PRT_RET(SendRecvWrite(sendRecvInfo, threads[0]), HCCL_ERROR("[InsTempBroadcastNHR] BatchTxRx SendRecv failed"),
-        HcclResult::HCCL_E_INTERNAL);
+    if (isDmaRead_) {
+        CHK_PRT_RET(SendRecvRead(sendRecvInfo, threads[0]),
+            HCCL_ERROR("[InsTempBroadcastNHR] BatchTxRx SendRecv failed"), HcclResult::HCCL_E_INTERNAL);
+    } else {
+        CHK_PRT_RET(SendRecvWrite(sendRecvInfo, threads[0]),
+            HCCL_ERROR("[InsTempBroadcastNHR] BatchTxRx SendRecv failed"), HcclResult::HCCL_E_INTERNAL);
+    }
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -407,10 +425,15 @@ void InsTempBroadcastNHR::SetRoot(u32 root)
 }
 
 HcclResult InsTempBroadcastNHR::KernelRun(const OpParam& param, const TemplateDataParams& tempAlgParams,
-                                          const TemplateResource& templateResource)
+                                          TemplateResource& templateResource)
 {
+    HCCL_INFO("[InsTempBroadcastNHR] BroadcastNHR entry.");
     buffInfo_     = tempAlgParams.buffInfo;
+    dataType_ = param.DataDes.dataType;
     dataTypeSize_  = DATATYPE_SIZE_TABLE[dataType_];
+    bool isPcieProtocal = IsPcieProtocol(templateResource.channels);  // 判断是否存在pcie链路
+    isDmaRead_ = isPcieProtocal;  // 是否使用Read模式
+    HCCL_DEBUG("[InsTempBroadcastNHR] Use Dma Read[%d]", isDmaRead_);
     HCCL_INFO("[InsTempBroadcastNHR] BroadcastNHR entry.");
 
     for (int i = 0; i < subCommRanks_[0].size(); i++) {
@@ -419,7 +442,10 @@ HcclResult InsTempBroadcastNHR::KernelRun(const OpParam& param, const TemplateDa
     }
     RankSliceInfo sliceInfoVec;
     CHK_RET(CalcDataSliceInfo(tempAlgParams.sliceSize, sliceInfoVec));
-    threadNum_ = templateResource.threads.size();
+    threadNum_ = 1;
+    CHK_PRT_RET(threadNum_ > templateResource.threads.size(),
+                HCCL_ERROR("[InsTempBroadcastNHR] Rank [%d], requiredQue [%u] more than templateQueNum [%zu].", myRank_,
+                threadNum_, templateResource.threads.size()), HcclResult::HCCL_E_INTERNAL);
     HCCL_INFO("[InsTempBroadcastNHR Run]RankID:[%d], root:[%u]", myRank_, root_);
 
     CHK_RET(PreCopy(tempAlgParams, templateResource.threads));
@@ -434,22 +460,14 @@ HcclResult InsTempBroadcastNHR::KernelRun(const OpParam& param, const TemplateDa
 
 void InsTempBroadcastNHR::GetNotifyIdxMainToSub(std::vector<u32> &notifyIdxMainToSub)
 {
+    // NHR算法没有从线程，不需要主从同步Notify
     notifyIdxMainToSub.clear();
-    u32 threadNum = templateRankSize_ > 1 ? templateRankSize_ - 1 : 1;
-    u32 slaveThreadNum = threadNum - 1;
-    for (u32 slaveThreadIdx = 0; slaveThreadIdx < slaveThreadNum; slaveThreadIdx++) {
-        notifyIdxMainToSub.push_back(0);
-    }
 }
 
 void InsTempBroadcastNHR::GetNotifyIdxSubToMain(std::vector<u32> &notifyIdxSubToMain)
 {
+    // NHR算法没有从线程，不需要主从同步Notify
     notifyIdxSubToMain.clear();
-    u32 threadNum = templateRankSize_ > 1 ? templateRankSize_ - 1 : 1;
-    u32 notifyNum = threadNum - 1;
-    for (u32 notifyIdx = 0; notifyIdx < notifyNum; notifyIdx++) {
-        notifyIdxSubToMain.push_back(notifyIdx);
-    }
 }
 
 } // namespace Hccl

@@ -36,7 +36,7 @@ public:
     HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
     HcclResult KernelRun(const OpParam& param,
                          const TemplateDataParams& tempAlgParams,
-                         const TemplateResource& templateResource) override;
+                         TemplateResource& templateResource) override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
     u64 GetThreadNum() const override;
 
@@ -52,6 +52,7 @@ private:
     HcclResult LocalCopyToOutput(const std::vector<ThreadHandle> &threads, u32 sliceIdx);
     TemplateDataParams tempAlgParams_;
     std::map<u32, std::vector<ChannelInfo>> channels_;
+    bool isDmaRead_{false};
 };
 
 } // namespace ops_hccl

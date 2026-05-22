@@ -17,6 +17,7 @@ namespace ops_hccl {
 
 class CcuTempAllToAllMesh1dMultiJetty : public CcuAlgTemplateBase {
 public:
+    CcuTempAllToAllMesh1dMultiJetty() = default;
     explicit  CcuTempAllToAllMesh1dMultiJetty(const OpParam& param, 
                                                 const u32 rankId, // 传通信域的rankId，userRank
                                                 const std::vector<std::vector<u32>> &subCommRanks);
@@ -34,8 +35,9 @@ public:
     HcclResult KernelRun(const OpParam& param,
                          const TemplateDataParams& templateDataParams,
                          TemplateResource& templateResource) override;
+    HcclResult FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx) override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
-
+    u64 GetThreadNum() const override;
 private:
     std::vector<u32> jettyNums_;
     std::vector<u64> sendCounts_;

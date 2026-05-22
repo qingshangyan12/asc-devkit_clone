@@ -16,6 +16,7 @@
 #include <hccl/hccl_types.h>
 #include "hccl/base.h"
 #include "hccl_res.h"
+#include "hccl_host_comm_dl.h"
 #include <atomic>
 
 namespace ops_hccl {
@@ -25,6 +26,7 @@ public:
     static DlHcommFunction &GetInstance();
     HcclResult DlHcommFunctionInit();
     std::function<HcclResult(HcclComm, ThreadHandle, void*, uint32_t, void**)> dlHcclThreadResGetInfo{};
+    std::function<HcclResult(HcclComm, HcclConfigType, uint32_t, void*)> dlHcclConfigGetInfo{};
 
 private:
     void* handle_{nullptr};
