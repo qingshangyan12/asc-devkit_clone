@@ -20,21 +20,16 @@
 
 ## 函数原型
 
-- 自动根据张量位置分发。
+```cpp
+template <typename AtomType, typename DstTensor, typename SrcTensor>
+__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
 
-    ```cpp
-    template <typename T, typename U, Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U>, int>,
-        typename... Params>
-    __aicore__ inline void
-    Copy(const T& dst, const U& src, const Params& ...params)
-    ```
+template <typename CopyOperationType>
+__aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation)
 
-- 显式指定 `CopyL12UB`。
-
-    ```cpp
-    template <typename T, typename... Params>
-    __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params)
-    ```
+template <typename CopyOperationType, typename CopyTraitType>
+__aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation, const CopyTraitType& copyTrait)
+```
 
 ## 参数说明
 
@@ -42,8 +37,7 @@
 | :--- | :---: | :--- |
 | `dst` | 输出 | 目的张量，存储位置为 `Location::UB`。 |
 | `src` | 输入 | 源张量，存储位置为 `Location::L1`。 |
-| `params` | 输入 | 可变参数。当前 L1 到 UB 搬运通常不需要额外运行时参数。 |
-| `atomCopy` | 输入 | 搬运原子对象，显式调用时使用 `CopyAtom<CopyTraits<CopyL12UB, CopyL12UBTraitDefault>>` 或 `MakeCopy(CopyL12UB{}, CopyL12UBTraitDefault{})`。 |
+| `atomCopy` | 输入 | 搬运原子对象，可由 `MakeCopy(CopyL12UB{})` 或 `MakeCopy(CopyL12UB{}, CopyL12UBTraitDefault{})` 构造。 |
 
 ## 返回值说明
 
@@ -61,10 +55,11 @@
 ```cpp
 using namespace AscendC::Te;
 
-auto l1 = MakeTensor(MakeMemPtr<Location::L1>(l1Addr),
+auto l1 = MakeTensor(MakeMemPtr<Location::L1, int8_t>(l1Addr),
     MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
-auto ub = MakeTensor(MakeMemPtr<Location::UB>(ubAddr),
+auto ub = MakeTensor(MakeMemPtr<Location::UB, int8_t>(ubAddr),
     MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
 
-Copy(ub, l1);
+auto atom = MakeCopy(CopyL12UB{});
+Copy(atom, ub, l1);
 ```
