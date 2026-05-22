@@ -64,7 +64,7 @@
 TransDataTo5HD 接口数据格式转换，一般用于将NCHW格式转换成[NC1HWC0 格式](../../矩阵计算/矩阵计算分形介绍/关键分形格式详解.md#NC1HWC0格式)。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。单次repeat实现16个DataBlock数据转置如下图所示，将 NCHW 格式转换成 NC1HWC0 格式的示例请见[关键特性说明](#zh-cn_topic_0000002557628265_section16509954114712)。
 
 **图 1**  单次repeat实现16个DataBlock数据转置<a name="zh-cn_topic_0000002557628265_fig12595141012208"></a>  
-![](figures/单次repeat实现16个DataBlock数据转置.png "单次repeat实现16个DataBlock数据转置")
+![单次repeat实现16个DataBlock数据转置](../../../../figures/trans_data_to_5hd.png)
 
 完整示例请参考：[TransDataTo5HD真值计算](https://gitcode.com/cann/asc-devkit/blob/62936b8605a1e54b33d85e8bb440986a908b86b3/examples/03_libraries/14_utils/trans_data_to_5hd_basic/scripts/gen_data.py)。
 
@@ -166,31 +166,31 @@ __aicore__ inline void TransDataTo5HD(const LocalTensor<T> (&dstList)[NCHW_CONV_
   - srcRepStride：设置为0，让源操作数的有效起始位置为srcList序列的起始位置；
   - dstRepStride：设置为0，让目的操作数的有效起始位置为dstList的起始位置。
 
-```python
-NCHW_CONV_ADDR_LIST_SIZE = 16 # 列表大小
-# b16:  elems_per_block=16
-# b32:  elems_per_block=8
-# b8:   elems_per_block=32
+  ```python
+  NCHW_CONV_ADDR_LIST_SIZE = 16 # 列表大小
+  # b16:  elems_per_block=16
+  # b32:  elems_per_block=8
+  # b8:   elems_per_block=32
 
-def NCHW2NC1HWC0(dst: np.ndarray, src: np.ndarray):
-    nchwconvParams.dstHighHalf = false
-    nchwconvParams.srcHighHalf = false
-    nchwconvParams.repeatTimes = 1
-    nchwconvParams.srcRepStride = 0
-    nchwconvParams.dstRepStride = 0
-    dstList = []
-    srcList = []
-    for i in range(NCHW_CONV_ADDR_LIST_SIZE): # 分别设置源地址和目的地址上的16个DataBlock
-        dstList.append(dst[elems_per_block * i : elems_per_block * i + elems_per_block])
-        srcList.append(src[elems_per_block * i : elems_per_block * i + elems_per_block])
-    TransDataTo5HD(dstList, srcList, nchwconvParams)
-```
+  def NCHW2NC1HWC0(dst: np.ndarray, src: np.ndarray):
+      nchwconvParams.dstHighHalf = false
+      nchwconvParams.srcHighHalf = false
+      nchwconvParams.repeatTimes = 1
+      nchwconvParams.srcRepStride = 0
+      nchwconvParams.dstRepStride = 0
+      dstList = []
+      srcList = []
+      for i in range(NCHW_CONV_ADDR_LIST_SIZE): # 分别设置源地址和目的地址上的16个DataBlock
+          dstList.append(dst[elems_per_block * i : elems_per_block * i + elems_per_block])
+          srcList.append(src[elems_per_block * i : elems_per_block * i + elems_per_block])
+      TransDataTo5HD(dstList, srcList, nchwconvParams)
+  ```
 
-![](figures/DataCopyGather.png)
+![b16](../../../../figures/trans_data_to_5hd_b16.png)
 
-![](figures/DataCopyGather-8.png)
+![b32](../../../../figures/trans_data_to_5hd_b32.png)
 
-![](figures/DataCopyGather-9.png)
+![b8](../../../../figures/trans_data_to_5hd_b8.png)
 
 ### 将NCHW格式转换成NC1HWC0格式<a name="zh-cn_topic_0000002557628265_section3122131914516"></a>
 
@@ -205,28 +205,28 @@ def NCHW2NC1HWC0(dst: np.ndarray, src: np.ndarray):
   - srcRepStride：设置为1，即相邻迭代间，矢量源操作数步长为1 DataBlock；
   - dstRepStride：设置为16，即相邻迭代间，矢量目的操作数步长为16 DataBlock。
 
-```python
-NCHW_CONV_ADDR_LIST_SIZE = 16 # 列表大小
-# b8:   c0=32  elems_per_block=32
-# b16:  c0=16  elems_per_block=16
-# b32:  c0=16  elems_per_block=8
+  ```python
+  NCHW_CONV_ADDR_LIST_SIZE = 16 # 列表大小
+  # b8:   c0=32  elems_per_block=32
+  # b16:  c0=16  elems_per_block=16
+  # b32:  c0=16  elems_per_block=8
 
-def NCHW2NC1HWC0(dst: np.ndarray, src: np.ndarray, nSize: int, cSize: int, hSize: int, wSize: int):
-    nchwconvParams.dstHighHalf = false
-    nchwconvParams.srcHighHalf = false
-    nchwconvParams.repeatTimes = hSize * wSize // elems_per_block # 处理整个HW平面需要的repeat次数
-    nchwconvParams.srcRepStride = 1  # 循环间同一HW平面srcList连续
-    nchwconvParams.dstRepStride = 16 # 循环间dstList间隔NCHW_CONV_ADDR_LIST_SIZE个DataBlock
-    for i in range(nSize * cSize // NCHW_CONV_ADDR_LIST_SIZE): # 外部每次循环处理NCHW_CONV_ADDR_LIST_SIZE个HW平面
-        dstList = []
-        srcList = []
-        for j in range(NCHW_CONV_ADDR_LIST_SIZE): # 分别设置源地址和目的地址上的16个DataBlock
-            dstList.append(dst[NCHW_CONV_ADDR_LIST_SIZE * hSize * wSize * i + elems_per_block * j : c0 * hSize * wSize * i + elems_per_block * j + elems_per_block])
-            srcList.append(src[NCHW_CONV_ADDR_LIST_SIZE * hSize * wSize * i + hSize * wSize * j : c0 * hSize * wSize * i + hSize * wSize * j + elems_per_block])
-        TransDataTo5HD(dstList, srcList, nchwconvParams) 
-```
+  def NCHW2NC1HWC0(dst: np.ndarray, src: np.ndarray, nSize: int, cSize: int, hSize: int, wSize: int):
+      nchwconvParams.dstHighHalf = false
+      nchwconvParams.srcHighHalf = false
+      nchwconvParams.repeatTimes = hSize * wSize // elems_per_block # 处理整个HW平面需要的repeat次数
+      nchwconvParams.srcRepStride = 1  # 循环间同一HW平面srcList连续
+      nchwconvParams.dstRepStride = 16 # 循环间dstList间隔NCHW_CONV_ADDR_LIST_SIZE个DataBlock
+      for i in range(nSize * cSize // NCHW_CONV_ADDR_LIST_SIZE): # 外部每次循环处理NCHW_CONV_ADDR_LIST_SIZE个HW平面
+          dstList = []
+          srcList = []
+          for j in range(NCHW_CONV_ADDR_LIST_SIZE): # 分别设置源地址和目的地址上的16个DataBlock
+              dstList.append(dst[NCHW_CONV_ADDR_LIST_SIZE * hSize * wSize * i + elems_per_block * j : c0 * hSize * wSize * i + elems_per_block * j + elems_per_block])
+              srcList.append(src[NCHW_CONV_ADDR_LIST_SIZE * hSize * wSize * i + hSize * wSize * j : c0 * hSize * wSize * i + hSize * wSize * j + elems_per_block])
+          TransDataTo5HD(dstList, srcList, nchwconvParams) 
+  ```
 
-![](figures/DataCopyGather-10.png)
+  ![nchw2nc1hwc0](../../../../figures/trans_data_to_5hd_nchw_nc1hwc0.png)
 
 ## 调用示例<a name="zh-cn_topic_0000001521260417_section19372434133520"></a>
 
