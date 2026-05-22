@@ -17,12 +17,12 @@
 ```
 ├── load_data_2dmx_l12l0
 │   ├── scripts
-│   │   ├── gen_data.py             // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
-│   ├── CMakeLists.txt              // 编译工程文件
-│   ├── data_utils.h                // 数据读入写出函数
-│   ├── load_data_2dmx_l12l0.asc    // Ascend C样例实现 & 调用样例
-│   └── README.md                   // 样例说明文档
+│   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py     // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt           // 编译工程文件
+│   ├── data_utils.h             // 数据读入写出函数
+│   ├── figures                 // 图示
+│   └── load_data_2dmx_l12l0.asc // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述
@@ -226,7 +226,7 @@
   - scaleA在GM输入为[m, scaleK]，scaleB在GM输入为[n, scaleK]，scaleA / scaleB矩阵分别通过同一次`LoadData`调用中的`LoadData2DMxParams`从L1搬运到L0A_MX / L0B_MX。
 
 <p align="center">
-  <img src="img/whole_process/B4_A_scaleA_.png" width="1000">
+  <img src="figures/whole_process/B4_A_scaleA_.png" width="1000">
 </p>
 
 <p align="center">
@@ -234,7 +234,7 @@
 </p>
 
 <p align="center">
-  <img src="img/whole_process/B4_B_scaleB_NK.png" width="1000">
+  <img src="figures/whole_process/B4_B_scaleB_NK.png" width="1000">
 </p>
 
 <p align="center">
@@ -253,7 +253,7 @@
   - 由于A转置导致m方向多搬脏数据超过1个分形，`Mmad`指令需设置mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum)来让多搬的分形参与计算，`Fixpipe`搬出时跳过无效分形参与计算的结果。
 
 <p align="center">
-  <img src="img/whole_process/B4_A_scaleA_trans_KM.png" width="1000">
+  <img src="figures/whole_process/B4_A_scaleA_trans_KM.png" width="1000">
 </p>
 
 <p align="center">
@@ -261,7 +261,7 @@
 </p>
 
 <p align="center">
-  <img src="img/whole_process/B4_B_scaleB_trans_KN.png" width="1000">
+  <img src="figures/whole_process/B4_B_scaleB_trans_KN.png" width="1000">
 </p>
 
 <p align="center">
@@ -280,7 +280,7 @@
   - FP8数据类型下，A矩阵不转置输入[m, k]、B矩阵转置输入[n, k]时k在col方向，`DataCopy`仅将k方向向32B对齐，需要在L1上将k方向尾数据刷为0防止脏数据参与计算；
 
 <p align="center">
-  <img src="img/whole_process/B8_A_scaleA_.png" width="1000">
+  <img src="figures/whole_process/B8_A_scaleA_.png" width="1000">
 </p>
 
 <p align="center">
@@ -288,7 +288,7 @@
 </p>
 
 <p align="center">
-  <img src="img/whole_process/B8_B_scaleB_NK.png" width="1000">
+  <img src="figures/whole_process/B8_B_scaleB_NK.png" width="1000">
 </p>
 
 <p align="center">
@@ -307,7 +307,7 @@
   - 此外，A矩阵转置输入[k, m]时需要在L1上将k方向剩余脏数据刷为0；B矩阵不转置输入[k, n]时也需要在L1上将k方向剩余脏数据刷为0。`Mmad`指令同样需设置mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum)。
 
 <p align="center">
-  <img src="img/whole_process/B8_A_scaleA_trans_KM.png" width="1000">
+  <img src="figures/whole_process/B8_A_scaleA_trans_KM.png" width="1000">
 </p>
 
 <p align="center">
@@ -315,7 +315,7 @@
 </p>
 
 <p align="center">
-  <img src="img/whole_process/B8_B_scaleB_trans_KN.png" width="1000">
+  <img src="figures/whole_process/B8_B_scaleB_trans_KN.png" width="1000">
 </p>
 
 <p align="center">
@@ -334,7 +334,7 @@
   - 此外，A矩阵转置输入[k, m]时需要在L1上将k方向剩余脏数据刷为0；B矩阵不转置输入[k, n]时也需要在L1上将k方向剩余脏数据刷为0。
 
 <p align="center">
-  <img src="img/whole_process/B4_A_scaleA_for_trans_KM.png" width="1000">
+  <img src="figures/whole_process/B4_A_scaleA_for_trans_KM.png" width="1000">
 </p>
 
 <p align="center">
@@ -342,7 +342,7 @@
 </p>
 
 <p align="center">
-  <img src="img/whole_process/B4_B_scaleB_trans_KN.png" width="1000">
+  <img src="figures/whole_process/B4_B_scaleB_trans_KN.png" width="1000">
 </p>
 
 <p align="center">
@@ -361,7 +361,7 @@
   - 此外，A矩阵和B矩阵均需要在L1上将k方向剩余脏数据刷为0。
 
 <p align="center">
-  <img src="img/whole_process/B8_A_scaleA_for_trans_KM.png" width="1000">
+  <img src="figures/whole_process/B8_A_scaleA_for_trans_KM.png" width="1000">
 </p>
 
 <p align="center">
@@ -369,7 +369,7 @@
 </p>
 
 <p align="center">
-  <img src="img/whole_process/B8_B_scaleB_trans_KN.png" width="1000">
+  <img src="figures/whole_process/B8_B_scaleB_trans_KN.png" width="1000">
 </p>
 
 <p align="center">
@@ -578,7 +578,7 @@ GM(ND) --DataCopy--> L1(Nz) --LoadData(LoadData2DParamsV2, LoadData2DMxParams)--
 ##### 2.1.1. A矩阵GM上输入为[m, k]
 
 <p align="center">
-  <img src="img/GM2L1/FP4_A_GM2L1_MK.png" width="900">
+  <img src="figures/GM2L1/FP4_A_GM2L1_MK.png" width="900">
 </p>
 
 <p align="center">
@@ -586,7 +586,7 @@ GM(ND) --DataCopy--> L1(Nz) --LoadData(LoadData2DParamsV2, LoadData2DMxParams)--
 </p>
 
 <p align="center">
-  <img src="img/GM2L1/FP8_A_GM2L1_MK.png" width="900">
+  <img src="figures/GM2L1/FP8_A_GM2L1_MK.png" width="900">
 </p>
 
 <p align="center">
@@ -634,7 +634,7 @@ A矩阵不转置输入[m, k]时，k在col方向。FP8数据类型下，`DataCopy
 ##### 2.1.2. A矩阵GM上输入为[k, m]
 
 <p align="center">
-  <img src="img/GM2L1/FP4_A_GM2L1_TRANS_KM.png" width="700">
+  <img src="figures/GM2L1/FP4_A_GM2L1_TRANS_KM.png" width="700">
 </p>
 
 <p align="center">
@@ -642,7 +642,7 @@ A矩阵不转置输入[m, k]时，k在col方向。FP8数据类型下，`DataCopy
 </p>
 
 <p align="center">
-  <img src="img/GM2L1/FP8_A_GM2L1_TRANS_KM.png" width="700">
+  <img src="figures/GM2L1/FP8_A_GM2L1_TRANS_KM.png" width="700">
 </p>
 
 <p align="center">
@@ -690,7 +690,7 @@ A矩阵转置输入[k, m]时，k在row方向，`DataCopy`将k方向向16对齐�
 
 ##### 2.2.1. B矩阵GM上输入为[k, n]
 <p align="center">
-  <img src="img/GM2L1/FP4_B_GM2L1_TRANS_KN.png" width="700">
+  <img src="figures/GM2L1/FP4_B_GM2L1_TRANS_KN.png" width="700">
 </p>
 
 <p align="center">
@@ -698,7 +698,7 @@ A矩阵转置输入[k, m]时，k在row方向，`DataCopy`将k方向向16对齐�
 </p>
 
 <p align="center">
-  <img src="img/GM2L1/FP8_B_GM2L1_TRANS_KN.png" width="700">
+  <img src="figures/GM2L1/FP8_B_GM2L1_TRANS_KN.png" width="700">
 </p>
 
 <p align="center">
@@ -743,7 +743,7 @@ B矩阵不转置输入[k, n]时，k在row方向，`DataCopy`将k方向向16对�
 ##### 2.2.2. B矩阵GM上输入为[n, k]
 
 <p align="center">
-  <img src="img/GM2L1/FP4_B_GM2L1_NK.png" width="800">
+  <img src="figures/GM2L1/FP4_B_GM2L1_NK.png" width="800">
 </p>
 
 <p align="center">
@@ -751,7 +751,7 @@ B矩阵不转置输入[k, n]时，k在row方向，`DataCopy`将k方向向16对�
 </p>
 
 <p align="center">
-  <img src="img/GM2L1/FP8_B_GM2L1_NK.png" width="800">
+  <img src="figures/GM2L1/FP8_B_GM2L1_NK.png" width="800">
 </p>
 
 <p align="center">
@@ -799,7 +799,7 @@ scaleA矩阵为fp8_e8m0_t数据类型，按fp8_e8m0_t真实数据类型排布时
 **（1）isAtranspose=false时，scaleA矩阵GM上输入为[m, scaleK]，使用`Dn2NzParams`结构体参数（B16视图）**
 
 <p align="center">
-  <img src="img/GM2L1/scaleA_GM2L1_MK.png" width="900">
+  <img src="figures/GM2L1/scaleA_GM2L1_MK.png" width="900">
 </p>
 
 <p align="center">
@@ -827,7 +827,7 @@ scaleA矩阵GM上的shape为[m, scaleK]，调用`DataCopy`指令并配置`Dn2NzP
 **（2）isAtranspose=true时，scaleA矩阵GM上输入为[scaleK, m, 2]，使用`Nd2NzParams`结构体参数（B16视图）**
 
 <p align="center">
-  <img src="img/GM2L1/scaleA_GM2L1_KM.png" width="1000">
+  <img src="figures/GM2L1/scaleA_GM2L1_KM.png" width="1000">
 </p>
 
 <p align="center">
@@ -857,7 +857,7 @@ scaleB矩阵的搬运方式与scaleA类似。按fp8_e8m0_t真实数据类型排�
 **（1）isBtranspose=false时，scaleB矩阵GM上输入为[scaleK, n, 2]，使用`Nd2NzParams`结构体参数（B16视图）**
 
 <p align="center">
-  <img src="img/GM2L1/scaleB_GM2L1_KN.png" width="1000">
+  <img src="figures/GM2L1/scaleB_GM2L1_KN.png" width="1000">
 </p>
 
 <p align="center">
@@ -885,7 +885,7 @@ scaleB矩阵GM上的shape为[scaleK, n, 2]，调用`DataCopy`指令并配置`Nd2
 **（2）isBtranspose=true时，scaleB矩阵GM上输入为[n, scaleK]，使用`Dn2NzParams`结构体参数（B16视图）**
 
 <p align="center">
-  <img src="img/GM2L1/scaleB_GM2L1_NK.png" width="1000">
+  <img src="figures/GM2L1/scaleB_GM2L1_NK.png" width="1000">
 </p>
 
 <p align="center">
@@ -946,7 +946,7 @@ scaleB矩阵GM上的shape为[n, scaleK]，调用`DataCopy`指令并配置`Dn2NzP
 ##### 3.1.1. A矩阵 L1 -> L0A 不转置（场景1 / 3）
 
 <p align="center">
-  <img src="img/L12L0/FP4_A_L12L0_MK.png" width="1000">
+  <img src="figures/L12L0/FP4_A_L12L0_MK.png" width="1000">
 </p>
 
 <p align="center">
@@ -954,7 +954,7 @@ scaleB矩阵GM上的shape为[n, scaleK]，调用`DataCopy`指令并配置`Dn2NzP
 </p>
 
 <p align="center">
-  <img src="img/L12L0/FP8_A_L12L0_MK.png" width="1000">
+  <img src="figures/L12L0/FP8_A_L12L0_MK.png" width="1000">
 </p>
 
 <p align="center">
@@ -962,7 +962,7 @@ scaleB矩阵GM上的shape为[n, scaleK]，调用`DataCopy`指令并配置`Dn2NzP
 </p>
 
 <p align="center">
-  <img src="img/L12L0/scaleA_l12l0_KM.png" width="500">
+  <img src="figures/L12L0/scaleA_l12l0_KM.png" width="500">
 </p>
 
 <p align="center">
@@ -1002,7 +1002,7 @@ A矩阵不转置输入[m, k]时，L1 -> L0A不需要转置，loadDataParams.ifTr
 ##### 3.1.2. A矩阵 L1 -> L0A 转置，单次调用（场景2 / 4）
 
 <p align="center">
-  <img src="img/L12L0/FP4_A_L12L0_TRANS_KM.png" width="900">
+  <img src="figures/L12L0/FP4_A_L12L0_TRANS_KM.png" width="900">
 </p>
 
 <p align="center">
@@ -1010,7 +1010,7 @@ A矩阵不转置输入[m, k]时，L1 -> L0A不需要转置，loadDataParams.ifTr
 </p>
 
 <p align="center">
-  <img src="img/L12L0/FP8_A_L12L0_TRANS_KM.png" width="900">
+  <img src="figures/L12L0/FP8_A_L12L0_TRANS_KM.png" width="900">
 </p>
 
 <p align="center">
@@ -1050,7 +1050,7 @@ A矩阵转置输入[k, m]时，L1 -> L0A需要转置，单次调用`LoadData`并
 ##### 3.1.3. A矩阵 L1 -> L0A 转置，for循环调用（场景5 / 6）
 
 <p align="center">
-  <img src="img/L12L0/FP4_A_L12L0_for_TRANS_KM.png" width="900">
+  <img src="figures/L12L0/FP4_A_L12L0_for_TRANS_KM.png" width="900">
 </p>
 
 <p align="center">
@@ -1058,7 +1058,7 @@ A矩阵转置输入[k, m]时，L1 -> L0A需要转置，单次调用`LoadData`并
 </p>
 
 <p align="center">
-  <img src="img/L12L0/FP8_A_L12L0_for_TRANS_KM.png" width="900">
+  <img src="figures/L12L0/FP8_A_L12L0_for_TRANS_KM.png" width="900">
 </p>
 
 <p align="center">
@@ -1066,7 +1066,7 @@ A矩阵转置输入[k, m]时，L1 -> L0A需要转置，单次调用`LoadData`并
 </p>
 
 <p align="center">
-  <img src="img/L12L0/scaleA_l12l0_KM.png" width="500">
+  <img src="figures/L12L0/scaleA_l12l0_KM.png" width="500">
 </p>
 
 <p align="center">
@@ -1124,7 +1124,7 @@ B / scaleB矩阵的搬运方式与A / scaleA矩阵类似，但B矩阵在L0B上�
 ##### 3.2.1. B矩阵 L1 -> L0B 不转置（场景1 / 3）
 
 <p align="center">
-  <img src="img/L12L0/FP4_B_L12L0_NK.png" width="900">
+  <img src="figures/L12L0/FP4_B_L12L0_NK.png" width="900">
 </p>
 
 <p align="center">
@@ -1132,7 +1132,7 @@ B / scaleB矩阵的搬运方式与A / scaleA矩阵类似，但B矩阵在L0B上�
 </p>
 
 <p align="center">
-  <img src="img/L12L0/FP8_B_L12L0_NK.png" width="900">
+  <img src="figures/L12L0/FP8_B_L12L0_NK.png" width="900">
 </p>
 
 <p align="center">
@@ -1140,7 +1140,7 @@ B / scaleB矩阵的搬运方式与A / scaleA矩阵类似，但B矩阵在L0B上�
 </p>
 
 <p align="center">
-  <img src="img/L12L0/scaleB_l12l0_KN.png" width="700">
+  <img src="figures/L12L0/scaleB_l12l0_KN.png" width="700">
 </p>
 
 <p align="center">
@@ -1183,7 +1183,7 @@ B矩阵转置输入[n, k]时，L1 -> L0B不需要转置，单次调用`LoadData`
 
 
 <p align="center">
-  <img src="img/L12L0/FP4_B_L12L0_TRANS_KN.png" width="1000">
+  <img src="figures/L12L0/FP4_B_L12L0_TRANS_KN.png" width="1000">
 </p>
 
 <p align="center">
@@ -1191,7 +1191,7 @@ B矩阵转置输入[n, k]时，L1 -> L0B不需要转置，单次调用`LoadData`
 </p>
 
 <p align="center">
-  <img src="img/L12L0/FP8_B_L12L0_TRANS_KN.png" width="1000">
+  <img src="figures/L12L0/FP8_B_L12L0_TRANS_KN.png" width="1000">
 </p>
 
 <p align="center">

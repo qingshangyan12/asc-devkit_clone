@@ -16,9 +16,8 @@
 
 ```
 ├── group_barrier
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   └── group_barrier.asc       // Ascend C样例实现 & 调用样例
+│   ├── CMakeLists.txt    // 编译工程文件
+│   └── group_barrier.asc // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述
