@@ -62,10 +62,10 @@ struct LayoutTraitFP4 {
 
 using FormatTraitSet = TupleMap<
     Std::tuple<NZLayoutPtn, LayoutTraitDefault<>>,
-    Std::tuple<NDLayoutPtn, LayoutTraitDefault<Std::ignore_t, _1>>,
-    Std::tuple<DNLayoutPtn, LayoutTraitDefault<Std::ignore_t, _1>>,
-    Std::tuple<NDExtLayoutPtn, LayoutTraitDefault<Std::ignore_t, _1>>,
-    Std::tuple<DNExtLayoutPtn, LayoutTraitDefault<Std::ignore_t, _1>>,
+    Std::tuple<NDLayoutPtn, LayoutTraitDefault<Std::ignore_t, Std::Int<1>>>,
+    Std::tuple<DNLayoutPtn, LayoutTraitDefault<Std::ignore_t, Std::Int<1>>>,
+    Std::tuple<NDExtLayoutPtn, LayoutTraitDefault<Std::ignore_t, Std::Int<1>>>,
+    Std::tuple<DNExtLayoutPtn, LayoutTraitDefault<Std::ignore_t, Std::Int<1>>>,
     Std::tuple<NNLayoutPtn, LayoutTraitScale<>>,
     Std::tuple<ZZLayoutPtn, LayoutTraitDefault<>>,
     Std::tuple<ZNLayoutPtn, LayoutTraitDefault<>>,
@@ -97,7 +97,7 @@ private:
     );
 
     using FromPattern = typename FormatTraitSet::template Get<LayoutPattern>;
-    using FromInt = LayoutTrait<Std::ignore_t, RawTrait>;
+    using FromInt = LayoutTraitDefault<Std::ignore_t, RawTrait>;
     using FromDataType = LayoutTraitDefault<RawTrait>;
     using FromTrait = RawTrait;
 
