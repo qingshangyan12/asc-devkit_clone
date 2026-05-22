@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例通过Ascend C编程语言实现了Add算子的CPU Debug调测。
+本样例通过Ascend C编程语言实现了Add样例的CPU Debug调测。
 
 ## 支持的产品
 
@@ -15,7 +15,7 @@
 ```
 ├── 03_cpudebug
 │   ├── CMakeLists.txt          // 编译工程文件
-│   └── add.asc                 // Ascend C算子实现 & 调用样例
+│   └── add.asc                 // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述
@@ -23,8 +23,8 @@
 - CPU Debug介绍：  
   CPU Debug功能支持对CPU执行过程中的运行状态进行调试，主要通过GDB工具实现。GDB调试支持设置断点、查看寄存器和内存状态、单步执行、查看调用栈等常用调试操作。
 
-- 算子介绍：  
-  Add算子具体功能描述可参考[Add算子详情](../../00_introduction/01_vector/add_tpipe_tque/README.md)章节。
+- 样例介绍：  
+  Add样例具体功能描述可参考[Add样例详情](../../00_introduction/01_vector/add/README.md)章节。
 
 ## 编译运行
 
