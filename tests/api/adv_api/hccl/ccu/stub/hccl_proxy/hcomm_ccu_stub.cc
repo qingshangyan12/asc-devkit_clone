@@ -323,9 +323,6 @@ LoopBlock::LoopBlock(CcuRepContext *context, std::string label)
 
 LoopBlock::~LoopBlock() {}
 
-CcuVirRes::CcuVirRes(CcuRepContext *context) : phyRes(nullptr), context(context) {}
-
-uint16_t CcuVirRes::Id() const { return 0; }
 
 LocalNotify::LocalNotify(CcuRepContext *context) : CcuVirRes(context) {}
 
