@@ -61,14 +61,15 @@ HcclResult CcuKernelKfcServer::Algorithm()
 
 void Mc2KfcServer::GenCircularQueue()
 {
+    // 载入Token
     CcuRep::Variable token = CreateVariable();
-    Load(token);
+    Load(token);                  
 
-    CcuRep::Variable opAddr = CreateVariable();
-
+    // 控制<repeat循环执行条件>的寄存器
     CcuRep::Variable repeatCond = CreateVariable();
     repeatCond = 0;
 
+    // <轮次执行开始信号>的寄存器
     CcuRep::Variable turnStartSig = CreateVariable();
     turnStartSig = 0;
     CcuRep::Variable turnEndSig = CreateVariable();
@@ -99,10 +100,8 @@ void Mc2KfcServer::GenCircularQueue()
     CcuRep::Variable one = CreateVariable();
     one = 1;
 
-    array<CcuRep::Variable, CCU_PARAM_NUM_PER_DIE> param;
-    for (uint32_t i = 0; i < CCU_PARAM_NUM_PER_DIE; ++i) {
-        param[i] = ccu::Array<CcuRep::Variable> vars(10);       // TODO：需要确定这里的个数
-    }
+    // 存放<每轮算子参数>的寄存器
+    ccu::Array<CcuRep::Variable> param(CCU_PARAM_NUM_PER_DIE);
 
     CCU_WHILE(repeatCond == 0)
     {
@@ -113,8 +112,10 @@ void Mc2KfcServer::GenCircularQueue()
             return;
         }
 
+        // 等待本轮开始信号
         WaitTurnStartSig(waitAddr, turnStartSig);
 
+        // 读取本轮参数
         LoadFuncParamFromMemory(paramAddr, param);
 
         MissionPreSync(param[HBM_PARAM_IDX_0]);
@@ -124,29 +125,15 @@ void Mc2KfcServer::GenCircularQueue()
             CCU_BREAK;
         }
 
-        const uint32_t getDieId = DIE0_ID;      // TODO：GetDieId()函数的替换待HCCL方提供
-        std::string funcName = OP_SELECTOR_LABEL + "_" + std::to_string(getDieId) + "_" + std::to_string(missionIndex_);
-        auto selectFunc = Func(funcName);
-        selectFunc.SetInArg(param[HBM_PARAM_IDX_0]);
-        selectFunc.SetOutArg(opAddr);
-        selectFunc.AppendToContext();
-
-        CCU_IF(opAddr == INVALID_U64)
-        {
-            CCU_BREAK;
-        }
-
         hcomm::CcuRep::Variable opType;
-        opType = param[HBM_PARAM_IDX_0];    
+        opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
-            ccu::callFunc<CcuKernelAlltoAllMesh1D>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2],token, 
-                param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5],
-                param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
-                param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10]);
+            ccu::callFunc<CcuKernelAlltoAllMesh1D>(param, token);   //给通信算子自己解析
         }
 
         MissionPostSync();
 
+        // Set本轮完成信号
         SetTurnEndSig(recordAddr, turnEndSig);
         waitAddr += ckeSize;
         recordAddr += ckeSize;
@@ -218,12 +205,16 @@ void Mc2SlaveKfcServer::GenCircularQueue()
 {
     // 算子签名
     CcuRep::Variable signature = CreateVariable();
-    // 存放《选择函数返回的FuncCall地址》的寄存器，选择函数的出参，循环队列内部使用
-    CcuRep::Variable opAddr = CreateVariable();
 
     // 存放《控制repeat循环执行的条件》的寄存器
     CcuRep::Variable repeatCond = CreateVariable();
     repeatCond                  = 0;
+
+    CcuRep::Variable paramAddr = CreateVariable();
+    paramAddr = paramAddr_;
+
+    // 存放<每轮算子参数>的寄存器
+    ccu::Array<CcuRep::Variable> param(CCU_PARAM_NUM_PER_DIE);
 
     CCU_WHILE(repeatCond == 0)
     {
@@ -236,24 +227,11 @@ void Mc2SlaveKfcServer::GenCircularQueue()
             CCU_BREAK;
         }
 
-        // 调用OpSelector
-        std::string funcName
-            = OP_SELECTOR_LABEL + "_" + std::to_string(GetDieId()) + "_" + std::to_string(missionIndex);
-        auto selectFunc = Func(funcName);
-        selectFunc.SetInArg(signature);
-        selectFunc.SetOutArg(opAddr);
-        selectFunc.AppendToContext();
-
-        // 检查OpSelector是否命中算子，如果没命中则跳出循环队列
-        CCU_IF(opAddr == INVALID_U64)
-        {
-            CCU_BREAK;
+        hcomm::CcuRep::Variable opType;
+        opType = param[HBM_PARAM_IDX_0];
+        CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
+            ccu::callFunc<CcuKernelAlltoAllMesh1D>(param, token);   //给通信算子自己解析
         }
-
-        // 调用算子Func
-        auto opFunc = Func(opAddr);
-
-        opFunc.AppendToContext();
 
         MissionPostSync();
     }
