@@ -36,6 +36,7 @@ target_include_directories(
             $<BUILD_INTERFACE:${ASCENDC_DIR}/include>
             $<BUILD_INTERFACE:${ASCENDC_DIR}/include/basic_api>
             $<BUILD_INTERFACE:${ASCENDC_DIR}/include/simt_api>
+            $<BUILD_INTERFACE:${ASCENDC_DIR}/impl>
             $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/basic_api>
             $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/simt_api>
 )
