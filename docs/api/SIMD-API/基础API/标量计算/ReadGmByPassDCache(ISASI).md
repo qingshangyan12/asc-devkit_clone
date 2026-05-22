@@ -3,7 +3,7 @@
 ## 产品支持情况<a name="section1550532418810"></a>
 
 | 产品 | 是否支持 |
-|------|----------|
+| :----------------------- | :------: |
 | <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
 | <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √</cann-filter> |
 | <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √</cann-filter> |
