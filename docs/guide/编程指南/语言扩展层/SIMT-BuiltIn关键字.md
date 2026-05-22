@@ -190,7 +190,7 @@
         {
             int idx = threadIdx.x + blockIdx.x * blockDim.x;
             int32_t lane_id = laneid();
-            if(lane_id mod 2) {
+            if(lane_id % 2) {
                 z[idx] = x[idx] + y[idx];
             } else {
                 z[idx] = x[idx] - y[idx];
@@ -1120,7 +1120,7 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
 -   \_\_maxnreg\_\_\(N\) <a name="li23861114618"></a>
 
-    函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定单个线程在一个线程块内最多可分配的寄存器数量。若未配置\_\_maxnreg\_\_，最大线程数默认为32。参数N需要满足：
+    函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定单个线程在一个线程块内最多可分配的寄存器数量。参数N需要满足：
     -   N的取值范围为（0, 128];
 
         最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表。
@@ -1159,5 +1159,5 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
         配置SIMT函数单个线程最多可分配的寄存器数量为64，示例如下：
 
         ```
-        __simt_vf__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+        __global__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
         ```
