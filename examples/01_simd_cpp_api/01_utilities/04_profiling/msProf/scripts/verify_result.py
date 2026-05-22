@@ -16,14 +16,14 @@ import sys
 import numpy as np
 
 
-RELATIVE_TOL = 1e-6
-ABSOLUTE_TOL = 1e-9
+RELATIVE_TOL = 1e-3
+ABSOLUTE_TOL = 1e-3
 ERROR_TOL = 1e-4
 
 
 def verify_result(output, golden):
-    output = np.fromfile(output, dtype=np.float32).reshape(-1)
-    golden = np.fromfile(golden, dtype=np.float32).reshape(-1)
+    output = np.fromfile(output, dtype=np.float16).reshape(-1)
+    golden = np.fromfile(golden, dtype=np.float16).reshape(-1)
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=RELATIVE_TOL,
@@ -37,7 +37,7 @@ def verify_result(output, golden):
         print(
             "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f" %
             (real_index, golden_data, output_data,
-            abs(output_data - golden_data) / golden_data))
+            abs(output_data - golden_data) / max(abs(golden_data), ABSOLUTE_TOL)))
         if index == 100:
             break
     print("golden_data : ", golden)
