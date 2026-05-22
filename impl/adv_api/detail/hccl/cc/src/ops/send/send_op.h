@@ -7,8 +7,8 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#ifndef OPS_HCCL_SRC_OPS_SEND_OP
-#define OPS_HCCL_SRC_OPS_SEND_OP
+#ifndef MC2_OPS_HCCL_SRC_OPS_SEND_OP
+#define MC2_OPS_HCCL_SRC_OPS_SEND_OP
 
 #include <string>
 
@@ -44,5 +44,5 @@ namespace mc2_ops_hccl {
         aclrtStream stream, const std::string &tag, const std::string &opName);
     } // namespace mc2_ops_hccl
 
-// ifndef OPS_HCCL_SRC_OPS_SEND_OP
+// ifndef MC2_OPS_HCCL_SRC_OPS_SEND_OP
 #endif

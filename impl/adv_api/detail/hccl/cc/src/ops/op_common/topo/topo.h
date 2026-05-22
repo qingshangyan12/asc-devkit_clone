@@ -7,8 +7,8 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#ifndef OPS_HCCL_SRC_OPS_TOPO
-#define OPS_HCCL_SRC_OPS_TOPO
+#ifndef MC2_OPS_HCCL_SRC_OPS_TOPO
+#define MC2_OPS_HCCL_SRC_OPS_TOPO
 
 #include <hccl/hccl_types.h>
 #include "hccl/base.h"
@@ -31,4 +31,3 @@ u32 CalGCD(std::vector<u32> &nums);
 }
 
 #endif
-
