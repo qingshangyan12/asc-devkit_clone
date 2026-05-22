@@ -2,80 +2,17 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-<a name="table18341227114216"></a>
-<table><thead align="left"><tr id="row1834122714219"><th class="cellrowborder" valign="top" width="53.64%" id="mcps1.1.4.1.1"><p id="p83416275429"><a name="p83416275429"></a><a name="p83416275429"></a><span id="ph93442717421"><a name="ph93442717421"></a><a name="ph93442717421"></a>产品</span></p>
-</th>
-<th class="cellrowborder" align="center" valign="top" width="24.63%" id="mcps1.1.4.1.2"><p id="p103412764211"><a name="p103412764211"></a><a name="p103412764211"></a>是否支持（<span>支持配置dcciDst</span>的原型）</p>
-</th>
-<th class="cellrowborder" align="center" valign="top" width="21.73%" id="mcps1.1.4.1.3"><p id="p107301733174216"><a name="p107301733174216"></a><a name="p107301733174216"></a><span>是否支持（不支持配置dcciDst的原型）</span></p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1272474920205"><td class="cellrowborder" valign="top" width="53.64%" headers="mcps1.1.4.1.1 "><p id="p17301775812"><a name="p17301775812"></a><a name="p17301775812"></a><span id="ph2272194216543"><a name="ph2272194216543"></a><a name="ph2272194216543"></a>Ascend 950PR/Ascend 950DT</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="24.63%" headers="mcps1.1.4.1.2 "><p id="p37256491200"><a name="p37256491200"></a><a name="p37256491200"></a>√</p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="21.73%" headers="mcps1.1.4.1.3 "><p id="p6730933174216"><a name="p6730933174216"></a><a name="p6730933174216"></a>√</p>
-</td>
-</tr>
-<tr id="row835162718427"><td class="cellrowborder" valign="top" width="53.64%" headers="mcps1.1.4.1.1 "><p id="p1835227144211"><a name="p1835227144211"></a><a name="p1835227144211"></a><span id="ph1351727134210"><a name="ph1351727134210"></a><a name="ph1351727134210"></a><term id="zh-cn_topic_0000001312391781_term1253731311225"><a name="zh-cn_topic_0000001312391781_term1253731311225"></a><a name="zh-cn_topic_0000001312391781_term1253731311225"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115"><a name="zh-cn_topic_0000001312391781_term131434243115"></a><a name="zh-cn_topic_0000001312391781_term131434243115"></a>Atlas A3 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="24.63%" headers="mcps1.1.4.1.2 "><p id="p113512277421"><a name="p113512277421"></a><a name="p113512277421"></a>√</p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="21.73%" headers="mcps1.1.4.1.3 "><p id="p105659373436"><a name="p105659373436"></a><a name="p105659373436"></a>√</p>
-</td>
-</tr>
-<tr id="row935927124211"><td class="cellrowborder" valign="top" width="53.64%" headers="mcps1.1.4.1.1 "><p id="p143562715428"><a name="p143562715428"></a><a name="p143562715428"></a><span id="ph135927124210"><a name="ph135927124210"></a><a name="ph135927124210"></a><term id="zh-cn_topic_0000001312391781_term11962195213215"><a name="zh-cn_topic_0000001312391781_term11962195213215"></a><a name="zh-cn_topic_0000001312391781_term11962195213215"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811"><a name="zh-cn_topic_0000001312391781_term184716139811"></a><a name="zh-cn_topic_0000001312391781_term184716139811"></a>Atlas A2 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="24.63%" headers="mcps1.1.4.1.2 "><p id="p193518270426"><a name="p193518270426"></a><a name="p193518270426"></a>√</p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="21.73%" headers="mcps1.1.4.1.3 "><p id="p1856573754310"><a name="p1856573754310"></a><a name="p1856573754310"></a>√</p>
-</td>
-</tr>
-<tr id="row1935727104218"><td class="cellrowborder" valign="top" width="53.64%" headers="mcps1.1.4.1.1 "><p id="p9351627164213"><a name="p9351627164213"></a><a name="p9351627164213"></a><span id="ph1435827184215"><a name="ph1435827184215"></a><a name="ph1435827184215"></a><term id="zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="24.63%" headers="mcps1.1.4.1.2 "><p id="p1935127194211"><a name="p1935127194211"></a><a name="p1935127194211"></a>√</p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="21.73%" headers="mcps1.1.4.1.3 "><p id="p1956514372436"><a name="p1956514372436"></a><a name="p1956514372436"></a>√</p>
-</td>
-</tr>
-<tr id="row1135162774214"><td class="cellrowborder" valign="top" width="53.64%" headers="mcps1.1.4.1.1 "><p id="p78319051815"><a name="p78319051815"></a><a name="p78319051815"></a><span id="ph163561737112019"><a name="ph163561737112019"></a><a name="ph163561737112019"></a><term id="zh-cn_topic_0000001312391781_term1964153212227"><a name="zh-cn_topic_0000001312391781_term1964153212227"></a><a name="zh-cn_topic_0000001312391781_term1964153212227"></a>Atlas 推理系列产品</term>AI Core</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="24.63%" headers="mcps1.1.4.1.2 "><p id="p1695443971810"><a name="p1695443971810"></a><a name="p1695443971810"></a>x</p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="21.73%" headers="mcps1.1.4.1.3 "><p id="p773003319421"><a name="p773003319421"></a><a name="p773003319421"></a>√</p>
-</td>
-</tr>
-<tr id="row242332080"><td class="cellrowborder" valign="top" width="53.64%" headers="mcps1.1.4.1.1 "><p id="p10519331187"><a name="p10519331187"></a><a name="p10519331187"></a><span id="ph1335623792013"><a name="ph1335623792013"></a><a name="ph1335623792013"></a><term id="zh-cn_topic_0000001312391781_term1463893615224"><a name="zh-cn_topic_0000001312391781_term1463893615224"></a><a name="zh-cn_topic_0000001312391781_term1463893615224"></a>Atlas 推理系列产品</term>Vector Core</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="24.63%" headers="mcps1.1.4.1.2 "><p id="p1851933589"><a name="p1851933589"></a><a name="p1851933589"></a>x</p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="21.73%" headers="mcps1.1.4.1.3 "><p id="p5326192444517"><a name="p5326192444517"></a><a name="p5326192444517"></a>x</p>
-</td>
-</tr>
-<tr id="row17253142120252"><td class="cellrowborder" valign="top" width="53.64%" headers="mcps1.1.4.1.1 "><p id="p38313021813"><a name="p38313021813"></a><a name="p38313021813"></a><span id="ph58317041819"><a name="ph58317041819"></a><a name="ph58317041819"></a><term id="zh-cn_topic_0000001312391781_term71949488213"><a name="zh-cn_topic_0000001312391781_term71949488213"></a><a name="zh-cn_topic_0000001312391781_term71949488213"></a>Atlas 训练系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="24.63%" headers="mcps1.1.4.1.2 "><p id="p395243920186"><a name="p395243920186"></a><a name="p395243920186"></a>x</p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="21.73%" headers="mcps1.1.4.1.3 "><p id="p9326124124510"><a name="p9326124124510"></a><a name="p9326124124510"></a>x</p>
-</td>
-</tr>
-<tr id="row1916814278127"><td class="cellrowborder" valign="top" width="53.64%" headers="mcps1.1.4.1.1 "><p id="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p871618304717"><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p871618304717"></a><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p871618304717"></a><span id="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_ph133919917516"><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_ph133919917516"></a><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_ph133919917516"></a>Kirin X90</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="24.63%" headers="mcps1.1.4.1.2 "><p id="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p107166301277"><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p107166301277"></a><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p107166301277"></a>√</p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="21.73%" headers="mcps1.1.4.1.3 "><p id="p06015288117"><a name="p06015288117"></a><a name="p06015288117"></a>√</p>
-</td>
-</tr>
-<tr id="row718753581220"><td class="cellrowborder" valign="top" width="53.64%" headers="mcps1.1.4.1.1 "><p id="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p3272112116474"><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p3272112116474"></a><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p3272112116474"></a><span id="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_ph1327212213477"><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_ph1327212213477"></a><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_ph1327212213477"></a>Kirin 9030</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="24.63%" headers="mcps1.1.4.1.2 "><p id="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p027232134713"><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p027232134713"></a><a name="zh-cn_topic_0000001666431622_zh-cn_topic_0000002055722337_p027232134713"></a>√</p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="21.73%" headers="mcps1.1.4.1.3 "><p id="p166012281117"><a name="p166012281117"></a><a name="p166012281117"></a>√</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 产品 | 是否支持（支持配置dcciDst的原型） | 是否支持（不支持配置dcciDst的原型） |
+| :----------------------- | :------: | :------: |
+|<cann-filter npu-type = "950"> Ascend 950PR/Ascend 950DT | √ | √ </cann-filter>|
+|<cann-filter npu-type = "A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | √ </cann-filter>|
+|<cann-filter npu-type = "910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | √ </cann-filter>|
+|<cann-filter npu-type = "310b"> Atlas 200I/500 A2 推理产品 | √ | √ </cann-filter>|
+|<cann-filter npu-type = "310p"> Atlas 推理系列产品AI Core | x | √ </cann-filter>|
+|<cann-filter npu-type = "310p"> Atlas 推理系列产品Vector Core | x | x </cann-filter>|
+|<cann-filter npu-type = "910"> Atlas 训练系列产品 | x | x </cann-filter>|
+|<cann-filter npu-type = "x90"> Kirin X90 | √ | √ </cann-filter>|
+|<cann-filter npu-type = "9030"> Kirin 9030 | √ | √ </cann-filter>|
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -86,33 +23,34 @@
 
 如上图所示：
 
--   DMA搬运单元读写Global Memory，数据通过DataCopy等接口在UB等Local Memory和Global Memory间交互，没有Cache一致性问题；
--   Scalar单元访问Global Memory，首先会访问每个核内的DCache，因此存在DCache与Global Memory的Cache一致性问题。
+- DMA搬运单元读写Global Memory，数据通过DataCopy等接口在UB等Local Memory和Global Memory间交互，没有Cache一致性问题；
+- Scalar单元访问Global Memory，首先会访问每个核内的DCache，因此存在DCache与Global Memory的Cache一致性问题。
 
 该接口用来刷新Cache，保证Cache的一致性，使用场景如下：
 
--   读取Global Memory的数据，但该数据可能在外部被其余核修改，此时需要使用DataCacheCleanAndInvalid接口，直接访问Global Memory，获取最新数据；
+- 读取Global Memory的数据，但该数据可能在外部被其余核修改，此时需要使用DataCacheCleanAndInvalid接口，直接访问Global Memory，获取最新数据；
 
--   用户通过Scalar单元写Global Memory的数据，希望立刻写出，也需要使用DataCacheCleanAndInvalid接口。
--   针对Ascend 950PR/Ascend 950DT，原子操作过程中，如果希望改变后续数据的饱和模式，需要先使用DataCacheCleanAndInvalid接口将Cache Line中现存的数据立刻写出，再调用[SetCtrlSpr](../系统变量访问/SetCtrlSpr(ISASI).md)设置后续数据的饱和模式。
+- 用户通过Scalar单元写Global Memory的数据，希望立刻写出，也需要使用DataCacheCleanAndInvalid接口。
+
+- 针对Ascend 950PR/Ascend 950DT，原子操作过程中，如果希望改变后续数据的饱和模式，需要先使用DataCacheCleanAndInvalid接口将Cache Line中现存的数据立刻写出，再调用[SetCtrlSpr](../系统变量访问/SetCtrlSpr(ISASI).md)设置后续数据的饱和模式。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
--   支持通过配置dcciDst确保DCache与GM存储的一致性
+- 支持通过配置dcciDst确保DCache与GM存储的一致性
 
     ```
     template <typename T, CacheLine entireType, DcciDst dcciDst>
     __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
     ```
 
--   支持通过配置dcciDst确保DCache与Local Memory存储的一致性
+- 支持通过配置dcciDst确保DCache与Local Memory存储的一致性
 
     ```
     template <typename T, CacheLine entireType, DcciDst dcciDst>
     __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)
     ```
 
--   不支持配置dcciDst，仅支持保证DCache与GM的一致性
+- 不支持配置dcciDst，仅支持保证DCache与GM的一致性
 
     ```
     template <typename T, CacheLine entireType>
