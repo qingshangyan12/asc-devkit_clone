@@ -9,7 +9,7 @@
 ## 目录结构介绍
 ```
 ├── set_atomic_deterministic_computation
-│   ├── figures                      // README中图片资源目录
+│   ├── figures                   // README中图片资源目录
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本

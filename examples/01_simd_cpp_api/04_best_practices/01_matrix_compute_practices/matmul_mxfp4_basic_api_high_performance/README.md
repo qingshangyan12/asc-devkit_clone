@@ -17,7 +17,7 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   ├── figures                 // 图示
+│   ├── figures            // 图示
 │   └── mmad_mx.asc             // Ascend C 基础 API 样例实现
 ```
 
