@@ -18,13 +18,10 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 set(ASC_SOURCES
-    matmul_leakyrelu.asc
+    add.asc
 )
 
 set(SHARED_LIBRARIES
-    tiling_api
-    register
-    platform
     m
     dl
 )
