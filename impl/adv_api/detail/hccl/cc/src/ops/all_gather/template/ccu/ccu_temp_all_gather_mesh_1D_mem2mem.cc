@@ -50,7 +50,7 @@ HcclResult CcuTempAllGatherMesh1DMem2Mem::CalcRes(HcclComm comm, const OpParam& 
                          };
     std::vector<HcclChannelDesc> channelDescs;
     if(topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
-        CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
+        CHK_RET(CalcChannelRequestMesh1DFullMesh(comm, param, topoInfo, subCommRanks_, channelDescs));
     } else {
         CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(comm, param, topoInfo, subCommRanks_, channelDescs, CommTopo::COMM_TOPO_1DMESH));
         for(auto channel : channelDescs){
@@ -76,6 +76,29 @@ HcclResult CcuTempAllGatherMesh1DMem2Mem::CalcRes(HcclComm comm, const OpParam& 
     return HcclResult::HCCL_SUCCESS;
 }
 
+HcclResult CcuTempAllGatherMesh1DMem2Mem::FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx)
+{
+    if (tempFastLaunchCtx.ccuKernelSubmitInfos.size() == 0) {
+        HCCL_INFO("[CcuTempAllGatherMesh1DMem2Mem::FastLaunch] ccu kernel num is 0, just success.");
+        return HCCL_SUCCESS;
+    }
+    HCCL_DEBUG("[CcuTempAllGatherMesh1DMem2Mem::FastLaunch] start");
+    const uint64_t *args = tempFastLaunchCtx.ccuKernelSubmitInfos[0].cachedArgs;
+    buffInfo_ = tempFastLaunchCtx.buffInfo;
+    CcuTaskArgAllGatherMesh1DMem2Mem taskArg(
+        PointerToAddr(buffInfo_.inputPtr) + args[0],
+        PointerToAddr(buffInfo_.outputPtr) + args[1],
+        args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10]);
+
+    void* taskArgPtr = static_cast<void*>(&taskArg);
+
+    CHK_RET(HcclCcuKernelLaunch(param.hcclComm, tempFastLaunchCtx.threads[0],
+        tempFastLaunchCtx.ccuKernelSubmitInfos[0].kernelHandle, taskArgPtr));
+
+    HCCL_DEBUG("[CcuTempAllGatherMesh1DMem2Mem::FastLaunch] end");
+    return HcclResult::HCCL_SUCCESS;
+}
+
 HcclResult CcuTempAllGatherMesh1DMem2Mem::KernelRun(const OpParam& param,
                                                         const TemplateDataParams& templateDataParams,
                                                         TemplateResource& templateResource)
@@ -94,7 +117,8 @@ HcclResult CcuTempAllGatherMesh1DMem2Mem::KernelRun(const OpParam& param,
     uint64_t outputRepeatStride = templateDataParams.outputRepeatStride;
     uint64_t normalSliceSize    = templateDataParams.sliceSize;
     uint64_t lastSliceSize      = templateDataParams.tailSize;
-    uint64_t isInputOutputEqual = (inputAddr == outputAddr) ? 1 : 0;
+    bool inputOutputEqual = (inputAddr + inputSliceStride * mySubCommRank_ == outputAddr + outputSliceStride * mySubCommRank_);
+    uint64_t isInputOutputEqual = static_cast<uint64_t>(inputOutputEqual);
     if (templateDataParams.tailSize != 0 && mySubCommRank_ == templateRankSize_ - 1) {
         normalSliceSize = templateDataParams.tailSize;
     }
@@ -111,10 +135,19 @@ HcclResult CcuTempAllGatherMesh1DMem2Mem::KernelRun(const OpParam& param,
     std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgAllGatherMesh1DMem2Mem>(
         inputAddr, outputAddr, token, inputSliceStride, outputSliceStride, repeatNum, inputRepeatStride, outputRepeatStride,
         normalSliceSize, lastSliceSize, isInputOutputEqual);
-    
+
     void* taskArgPtr = static_cast<void*>(taskArg.get());
     HCCL_INFO("templateResource.threads.size[%zu], templateResource.ccuKernels.size[%zu]", templateResource.threads.size(), templateResource.ccuKernels.size());
     CHK_RET(HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr));
+
+    CcuKernelSubmitInfo submitInfo;
+    submitInfo.kernelHandle = templateResource.ccuKernels[0];
+    CHK_RET(FillCachedArgs(submitInfo, buffInfo_.inBuffBaseOff, buffInfo_.outBuffBaseOff, token, inputSliceStride,
+        outputSliceStride, repeatNum, inputRepeatStride, outputRepeatStride, normalSliceSize, lastSliceSize,
+        isInputOutputEqual));
+    templateResource.submitInfos.push_back(submitInfo);
+
+    HCCL_DEBUG("[CcuTempAllGatherMesh1DMem2Mem::KernelRun] end");
 
     return HcclResult::HCCL_SUCCESS;
 }

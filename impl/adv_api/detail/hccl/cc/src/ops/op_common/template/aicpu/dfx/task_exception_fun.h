@@ -13,6 +13,8 @@
 #include <string>
 #include "hccl/base.h"
 #include "alg_param.h"
+#include "dlsym_common.h"
+#include "hcomm_diag_dl.h"
 
 namespace ops_hccl {
 
@@ -31,5 +33,6 @@ HcclResult CreateScatter(OpParam *param, ScatterOpInfo *opInfo);
 
 void GetScatterOpInfo(const void *opInfo, char *outPut, size_t size);
 
+HcclResult ConvertToHcclDfxOpInfo(OpParam *param, HcclDfxOpInfo *dfxOpInfo);
 }
 #endif

@@ -66,7 +66,18 @@ HcclResult CcuTempScatterMesh1D::CalcRes(HcclComm comm, const OpParam &param, co
         return std::make_unique<CcuKernelScatterMesh1D>(arg);
     };
     std::vector<HcclChannelDesc> channelDescs;
-    CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
+    if(topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
+        CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
+    } else {
+        std::vector<HcclChannelDesc> myChannelDescs;
+        CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(comm, param, topoInfo, subCommRanks_, myChannelDescs, CommTopo::COMM_TOPO_1DMESH));
+        for(auto channel : myChannelDescs) {
+            if(channel.channelProtocol == COMM_PROTOCOL_UBC_CTP) {
+                channelDescs.push_back(channel);
+            }
+        }
+        HCCL_DEBUG("[CcuTempScatterMesh1D::CalcRes] Get Mesh Channel Success!");
+    }
     kernelInfo.kernelArg = std::make_shared<CcuKernelArgScatterMesh1D>(subCommRanks_[0].size(), mySubCommRank_,
                                                                               subCommRootId_, param, subCommRanks_);
     kernelInfo.channels = channelDescs;
@@ -76,6 +87,29 @@ HcclResult CcuTempScatterMesh1D::CalcRes(HcclComm comm, const OpParam &param, co
                "ccuKernelInfos.size()=%llu",
                channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
 
+    return HcclResult::HCCL_SUCCESS;
+}
+
+HcclResult CcuTempScatterMesh1D::FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx)
+{
+    if (tempFastLaunchCtx.ccuKernelSubmitInfos.size() == 0) {
+        HCCL_INFO("[CcuTempScatterMesh1D::FastLaunch] ccu kernel num is 0, just success.");
+        return HCCL_SUCCESS;
+    }
+    HCCL_DEBUG("[CcuTempScatterMesh1D::FastLaunch] start");
+    const uint64_t *args = tempFastLaunchCtx.ccuKernelSubmitInfos[0].cachedArgs;
+    buffInfo_ = tempFastLaunchCtx.buffInfo;
+    CcuTaskArgScatterMesh1D taskArg(
+            PointerToAddr(buffInfo_.inputPtr) + args[0],
+            PointerToAddr(buffInfo_.outputPtr) + args[1],
+            args[2],args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10]);
+
+    void* taskArgPtr = static_cast<void*>(&taskArg);
+
+    CHK_RET(HcclCcuKernelLaunch(param.hcclComm, tempFastLaunchCtx.threads[0],
+                                tempFastLaunchCtx.ccuKernelSubmitInfos[0].kernelHandle, taskArgPtr));
+
+    HCCL_DEBUG("[CcuTempScatterMesh1D::FastLaunch] end");
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -113,6 +147,21 @@ HcclResult CcuTempScatterMesh1D::KernelRun(const OpParam &param, const TemplateD
     CHK_RET(HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr));
 
     HCCL_DEBUG("[CcuTempScatterMesh1D::KernelRun] end");
+
+    CcuKernelSubmitInfo submitInfo;
+    submitInfo.kernelHandle = templateResource.ccuKernels[0];
+    submitInfo.cachedArgs[0]=buffInfo_.inBuffBaseOff; // input、output、scratch只存对应的偏移
+    submitInfo.cachedArgs[1]=buffInfo_.outBuffBaseOff;
+    submitInfo.cachedArgs[2]=token;
+    submitInfo.cachedArgs[3]=inputSliceStride;
+    submitInfo.cachedArgs[4]=outputSliceStride;
+    submitInfo.cachedArgs[5]=inputRepeatStride;
+    submitInfo.cachedArgs[6]=outputRepeatStride;
+    submitInfo.cachedArgs[7]=normalSliceSize;
+    submitInfo.cachedArgs[8]=lastSliceSize;
+    submitInfo.cachedArgs[9]=repeatNum;
+    submitInfo.cachedArgs[10]=isInputOutputEqual;
+    templateResource.submitInfos.push_back(submitInfo);
 
     return HcclResult::HCCL_SUCCESS;
 }

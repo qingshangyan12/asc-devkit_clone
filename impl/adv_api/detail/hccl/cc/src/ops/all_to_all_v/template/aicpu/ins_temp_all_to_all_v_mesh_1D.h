@@ -20,6 +20,7 @@ const uint32_t ALLTOALLV_DIRECT_FULLMESH_CONCURRENT_SIZE = 16; // fullmesh最大
 
 class InsTempAlltoAllVMesh1D : public InsAlgTemplateBase {
 public:
+    InsTempAlltoAllVMesh1D() = default;
     explicit InsTempAlltoAllVMesh1D(const OpParam& param, const u32 rankId,
         const std::vector<std::vector<u32>> &subCommRanks);
 
@@ -35,7 +36,7 @@ public:
     // 现在的RunAsync就是之前的GenExtIns
     HcclResult KernelRun(const OpParam& param,
                          const TemplateDataParams& tempAlgParams,
-                         const TemplateResource& templateResource) override;
+                         TemplateResource& templateResource) override;
     HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
                         AlgResourceRequest& resourceRequest) override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
@@ -47,7 +48,8 @@ private:
     HcclResult RunALLtoALL(const std::map<u32, std::vector<ChannelInfo>> &channels,
         const std::vector<ThreadHandle> &threads, const TemplateDataParams &tempAlgParams, const u32 myAlgRank);
     HcclResult PreCopy(const std::vector<u32> &commRanks, const std::map<u32, std::vector<ChannelInfo>> &channels,
-        const std::vector<ThreadHandle> &threads, const TemplateDataParams &tempAlgParams, const u32 myAlgRank);
+        const std::vector<ThreadHandle> &threads,
+        const TemplateDataParams &tempAlgParams, const u32 myAlgRank);
     HcclResult PostCopy(const TemplateDataParams &tempAlgParams, const ThreadHandle &thread,
         const u32 myRankCclBuffIdx, const u32 remoteRank, const u64 &recvSize,
         const u64 &recvCount, const u64 &recvOffset) const;
@@ -64,14 +66,10 @@ private:
     HcclResult RunSendRecv(const TemplateDataParams &tempAlgParams,
         const SendRecvInfo &sendRecvInfo, const DataInfo &sendInfo, const DataInfo &recvInfo,
         const ThreadHandle& thread, const u32 channelId) const;
-    HcclResult CalcDataSplitByPortGroup(const u64 totalDataCount, const u64 dataTypeSize,
-        const std::vector<ChannelInfo> &channels, std::vector<u64> &elemCountOut,
-        std::vector<u64> &sizeOut, std::vector<u64> &elemOffset) const;
 
     u64 dataTypeSize_{0};
     bool isDmaRead_{false};
     u32 concurrentSendRecvNum_{1};
-    u32 channelsPerRank_{1};
     std::vector<u64> sendCountsSplit_;
     std::vector<u64> sendSizeSplit_;
     std::vector<u64> sendOffsetSplit_;

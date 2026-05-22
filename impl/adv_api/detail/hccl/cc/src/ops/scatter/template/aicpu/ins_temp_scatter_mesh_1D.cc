@@ -86,12 +86,15 @@ u64 InsTempScatterMesh1D::CalcScratchMultiple(BufferType inBuffType, BufferType 
 }
 
 HcclResult InsTempScatterMesh1D::KernelRun(const OpParam& param, const TemplateDataParams &tempAlgParams,
-                     const TemplateResource& templateResource)
+                     TemplateResource& templateResource)
 {
     for (const auto& item : templateResource.channels) {
         u32 key = item.first;
         HCCL_DEBUG("[KernelRun] myRank_ = %u, channel key = %u", myRank_, key);
     }
+    CHK_PRT_RET(templateResource.threads.empty(), 
+                HCCL_ERROR("[InsTempScatterMesh1D][KernelRun] threads is empty"), 
+                HCCL_E_INTERNAL);
     u32 myAlgRank = 0;
     CHK_RET(GetAlgRank(myRank_, subCommRanks_[0], myAlgRank));
     enableRemoteMemAccess_ = tempAlgParams.enableRemoteMemAccess;
@@ -99,6 +102,9 @@ HcclResult InsTempScatterMesh1D::KernelRun(const OpParam& param, const TemplateD
     processSize_ = tempAlgParams.sliceSize;
     count_ = tempAlgParams.count;
     dataType_ = param.DataDes.dataType;
+    CHK_PTR_NULL(tempAlgParams.buffInfo.hcclBuff.addr);
+    CHK_PTR_NULL(tempAlgParams.buffInfo.inputPtr);
+    CHK_PTR_NULL(tempAlgParams.buffInfo.outputPtr);
     const u32 dataTypeSize = DATATYPE_SIZE_TABLE[dataType_];
     // 尾块模式
     if (tempAlgParams.tailSize !=0 && myAlgRank == templateRankSize_ - 1) {
@@ -133,6 +139,12 @@ HcclResult InsTempScatterMesh1D::PreCopy(
         return HCCL_SUCCESS;
     }
 
+    // inplace场景跳过前拷贝
+    if (tempAlgParams.buffInfo.inputPtr == tempAlgParams.buffInfo.outputPtr) {
+        HCCL_INFO("[InsTempScatterMesh1D][PreCopy] skip precopy due to inplace, myRank = %u, root = %u", myRank_, root_);
+        return HCCL_SUCCESS;
+    }
+
     u32 myAlgRank = 0;
     GetAlgRank(myRank_, subCommRanks_[0], myAlgRank);
 
@@ -156,17 +168,33 @@ HcclResult InsTempScatterMesh1D::PreCopy(
 HcclResult InsTempScatterMesh1D::PostCopy(
     const TemplateDataParams &tempAlgParams, const std::vector<ThreadHandle> &threads) const
 {
+    bool isInplaceRootRank = u32(myRank_) == root_ && tempAlgParams.buffInfo.inputPtr == tempAlgParams.buffInfo.outputPtr;
     // 通信结束之后，非root rank数据都在 cclBuffer 上，需要搬运到对应的输出位置。
-    if (u32(myRank_) == root_ || tempAlgParams.buffInfo.outBuffType == BufferType::HCCL_BUFFER || enableRemoteMemAccess_) {
+    if (tempAlgParams.buffInfo.outBuffType == BufferType::HCCL_BUFFER || enableRemoteMemAccess_) {
         HCCL_INFO("[InsTempScatterMesh1D][PostCopy] skip postcopy, myRank = %u, root = %u", myRank_, root_);
         return HCCL_SUCCESS;
     }
+
+    //root rank数据在非inplace场景不需要进行搬运
+    if (u32(myRank_) == root_ && tempAlgParams.buffInfo.inputPtr != tempAlgParams.buffInfo.outputPtr) {
+        HCCL_INFO("[InsTempScatterMesh1D][PostCopy] root rank skip postcopy, myRank = %u, root = %u", myRank_, root_);
+        return HCCL_SUCCESS;
+    }
+
     u32 myAlgRank = 0;
     GetAlgRank(myRank_, subCommRanks_[0], myAlgRank);
-    // 如果是单算子模式, 并且是最后一步算子，需要将数据从 cclBuffer 拷贝到 userOut
-    HCCL_INFO("[InsTempScatterMesh1D][PostCopy], copy from cclBuffer to userOut");
-    DataSlice srcSlice = DataSlice(tempAlgParams.buffInfo.hcclBuff.addr,
-        tempAlgParams.buffInfo.hcclBuffBaseOff + tempAlgParams.outputSliceStride * myAlgRank,
+    // root rank数据在inplace场景下需要进行搬运
+    if (isInplaceRootRank){
+        HCCL_INFO("[InsTempScatterMesh1D][PostCopy], is inplace root rank, copy from userIn to userOut");
+    }
+    else {// 如果是单算子模式, 并且是最后一步算子，需要将数据从 cclBuffer 拷贝到 userOut
+        HCCL_INFO("[InsTempScatterMesh1D][PostCopy], copy from cclBuffer to userOut");
+    }
+
+    void* srcPtr = isInplaceRootRank? tempAlgParams.buffInfo.inputPtr: tempAlgParams.buffInfo.hcclBuff.addr;
+    u64 srcOffset = isInplaceRootRank? tempAlgParams.buffInfo.inBuffBaseOff + tempAlgParams.inputSliceStride * myAlgRank
+                            : tempAlgParams.buffInfo.hcclBuffBaseOff + tempAlgParams.outputSliceStride * myAlgRank;
+    DataSlice srcSlice = DataSlice(srcPtr, srcOffset,
         processSize_ * tempAlgParams.repeatNum,
         count_ * tempAlgParams.repeatNum);
     DataSlice dstSlice = DataSlice(tempAlgParams.buffInfo.outputPtr,
@@ -188,7 +216,7 @@ HcclResult InsTempScatterMesh1D::RunMesh(const std::map<u32, std::vector<Channel
     HCCL_DEBUG("[InsTempScatterMesh1D][RunMesh] myRank[%d], myAlgRank[%d], channels size[%d]", myRank_, myAlgRank, channels.size());
     for (u32 r = 0; r < tempAlgParams.repeatNum; r++) {
         if (root_ == u32(myRank_)) {
-            u32 count = 0;
+            u32 count = 0; // rank 计数
             for (u32 algRank = 0; algRank < subCommRanks_[0].size(); algRank++) {
                 curSliceSize = tempAlgParams.tailSize !=0 && algRank == templateRankSize_ - 1? tempAlgParams.tailSize: processSize_;
                 curCount = curSliceSize / dataTypeSize;
@@ -198,6 +226,9 @@ HcclResult InsTempScatterMesh1D::RunMesh(const std::map<u32, std::vector<Channel
                 HCCL_DEBUG("[InsTempScatterMesh1D][RunMesh] algRank[%d]", algRank);
                 u32 remoteRank = subCommRanks_[0][algRank];
                 HCCL_INFO("[InsTempScatterMesh1D][RunMesh] myRank[%d], toRank[%d]", myRank_, remoteRank);
+                CHK_PRT_RET(channels.find(remoteRank) == channels.end() || channels.at(remoteRank).empty(), 
+ 	                        HCCL_ERROR("[InsTempScatterMesh1D][RunMesh] remoteRank[%d] not found in channels", remoteRank), 
+ 	                        HCCL_E_INTERNAL);
                 const ChannelInfo &linkSend = channels.at(remoteRank)[0];
                 u64 srcOffset = tempAlgParams.buffInfo.inBuffType == BufferType::HCCL_BUFFER
                                     ? tempAlgParams.buffInfo.hcclBuffBaseOff + r * tempAlgParams.inputRepeatStride +
@@ -222,6 +253,9 @@ HcclResult InsTempScatterMesh1D::RunMesh(const std::map<u32, std::vector<Channel
 
                 DataInfo sendData(linkSend, txSlicesList);
                 HCCL_DEBUG("[InsTempScatterMesh1D][RunMesh] start SendWrite");
+                CHK_PRT_RET(count >= threads.size(), 
+                            HCCL_ERROR("[InsTempScatterMesh1D][RunMesh] count[%d] >= threads.size()[%d]", count, threads.size()), 
+                            HCCL_E_INTERNAL);
                 CHK_PRT_RET(static_cast<HcclResult>(SendWrite(sendData, threads.at(count))),
                     HCCL_ERROR("[InsTempScatterMesh1D] RunMesh Send failed"),
                     HcclResult::HCCL_E_INTERNAL);
@@ -232,6 +266,9 @@ HcclResult InsTempScatterMesh1D::RunMesh(const std::map<u32, std::vector<Channel
             if(channels.size() == 0 || channels.count(root_) == 0){
                 continue;
             }
+            CHK_PRT_RET(channels.find(root_) == channels.end() || channels.at(root_).empty(), 
+                        HCCL_ERROR("[InsTempScatterMesh1D][RunMesh] root[%d] not found in channels", root_), 
+                        HCCL_E_INTERNAL);
             const ChannelInfo &linkRecv = channels.at(root_)[0];
             curSliceSize = tempAlgParams.tailSize !=0 && myAlgRank == templateRankSize_ - 1? tempAlgParams.tailSize: processSize_;
             curCount = curSliceSize / dataTypeSize;

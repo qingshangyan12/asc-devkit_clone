@@ -21,9 +21,6 @@ extern "C" unsigned int LaunchAicpuKernel(OpParam *param);
 
 HcclResult HcclBatchSendRecv(HcclSendRecvItem *sendRecvInfo, uint32_t itemNum, HcclComm comm, aclrtStream stream)
 {
-    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen()) {
-        return HcclBatchSendRecvInner(sendRecvInfo, itemNum, comm, stream);
-    }
     HCCL_INFO("Start to run execute HcclBatchSendRecv.");
     if (GetHcommVersion() < 90000000) {
         return HcclBatchSendRecvInner(sendRecvInfo, itemNum, comm, stream);
@@ -133,8 +130,10 @@ HcclResult BatchSendRecvOutPlace(HcclSendRecvItem *sendRecvInfo, uint32_t itemNu
 
     std::string algName;
     std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    
+    CHK_RET(HcclGetOpExpansionMode(comm, param));
     CHK_RET(Selector(comm, param, topoInfo, algName));
-    if (ShouldUseInnerOp(param.opExecuteConfig)) {
+    if (ShouldUseInnerOp(param.opExecuteConfig) && param.opMode == OpMode::OPBASE) {
         return HcclBatchSendRecvInner(sendRecvInfo, itemNum, comm, stream);
     }
     CHK_RET(HcclExecOp(comm, param, topoInfo, algName));

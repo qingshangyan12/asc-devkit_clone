@@ -39,6 +39,7 @@ struct NHRSliceInfo {
 
 class InsTempAllReduceNHR : public InsAlgTemplateBase {
 public:
+    InsTempAllReduceNHR() = default;
     explicit InsTempAllReduceNHR(const OpParam& param, const u32 rankId,
         const std::vector<std::vector<u32>> &subCommRanks);
     ~InsTempAllReduceNHR() override;
@@ -60,7 +61,7 @@ public:
     void GetNotifyIdxSubToMain(std::vector<u32> &notifyIdxSubToMain) override;
     
     HcclResult KernelRun(const OpParam& param, const TemplateDataParams& tempAlgParams,
-        const TemplateResource& templateResource) override;
+        TemplateResource& templateResource) override;
 
 private:
     HcclResult SplitData();
@@ -83,6 +84,8 @@ private:
     u32 myRankIdx_{0};
     std::vector<NHRSliceInfo> sliceInfoList_;
     std::vector<u32> rankList_;
+
+    bool isDmaRead_{false};
 };
 
 }  // namespace ops_hccl

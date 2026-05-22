@@ -18,6 +18,7 @@ namespace ops_hccl {
  
 class InsTempAllReduceMesh1DTwoShotMeshChunk : public InsAlgTemplateBase {
 public:
+    InsTempAllReduceMesh1DTwoShotMeshChunk() = default;
     explicit InsTempAllReduceMesh1DTwoShotMeshChunk(const OpParam& param, 
                                                     const u32 rankId, // 传通信域的rankId，userRank
                                                     const std::vector<std::vector<u32>> &subCommRanks);
@@ -35,7 +36,7 @@ public:
                     AlgResourceRequest& resourceRequest) override;
     HcclResult KernelRun(const OpParam& param,
                          const TemplateDataParams& tempAlgParams,
-                         const TemplateResource& templateResource) override;
+                         TemplateResource& templateResource) override;
     
     HcclResult PreCopy(const TemplateDataParams &tempAlgParams, const std::vector<ThreadHandle> &threads,
                         const RankSliceInfo &sliceInfoVec);

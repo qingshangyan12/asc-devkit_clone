@@ -22,7 +22,9 @@
 namespace ops_hccl {
 using namespace hcomm;
 
-using NHRStepInfo = struct NHRStepInfo {
+#ifndef NHR_STEP_INFO_NS_DEFINED
+#define NHR_STEP_INFO_NS_DEFINED
+using NHRStepInfo = struct NHRStepInfoDef {
     u32 step = 0;
     u32 myRank = 0;
     u32 nSlices;
@@ -31,10 +33,11 @@ using NHRStepInfo = struct NHRStepInfo {
     std::vector<u32> txSliceIdxs;
     std::vector<u32> rxSliceIdxs;
 
-    NHRStepInfo() : nSlices(0)
+    NHRStepInfoDef() : nSlices(0)
     {
     }
 };
+#endif
 
 class CcuKernelArgReduceScatterNHR1D : public CcuKernelArg {
 public:
@@ -74,12 +77,12 @@ public:
     explicit CcuTaskArgReduceScatterNHR1D(uint64_t inputAddr, uint64_t outputAddr, uint64_t token, uint64_t die0Size,
                                       uint64_t die1Size, uint64_t die0LastSliceSize, uint64_t die1LastSliceSize,
                                       uint64_t inputSliceStride, uint64_t outputSliceStride,
-                                      uint64_t inputRepeatStride, uint64_t outputRepeatStride, uint64_t repeatNum)
+                                      uint64_t inputRepeatStride, uint64_t outputRepeatStride, uint64_t repeatNum, uint64_t isInputOutputEqual)
         : inputAddr_(inputAddr), outputAddr_(outputAddr),
           token_(token), die0Size_(die0Size), die1Size_(die1Size), die0LastSliceSize_(die0LastSliceSize),
           die1LastSliceSize_(die1LastSliceSize), inputSliceStride_(inputSliceStride),
           outputSliceStride_(outputSliceStride), inputRepeatStride_(inputRepeatStride),
-          outputRepeatStride_(outputRepeatStride), repeatNum_(repeatNum)
+          outputRepeatStride_(outputRepeatStride), repeatNum_(repeatNum), isInputOutputEqual_(isInputOutputEqual)
     {
         HCCL_INFO("[CcuTaskArgReduceScatterNHR1D]: inputAddr: %lu, outputAddr: %lu, die0Size: %lu, die1Size: %lu, "
                    "die0LastSliceSize: %lu, die1LastSliceSize: %lu, inputSliceStride: %lu, outputSliceStride: %lu,"
@@ -100,6 +103,7 @@ public:
     uint64_t inputRepeatStride_;
     uint64_t outputRepeatStride_;
     uint64_t repeatNum_;
+    uint64_t isInputOutputEqual_;
 };
 
 class CcuKernelReduceScatterNHR1DMem2Mem : public CcuKernelAlgBase {
@@ -156,6 +160,7 @@ private:
 
     CcuRep::Variable repeatInputOffset_;
     CcuRep::Variable repeatOutputOffset_;
+    CcuRep::Variable isInputOutputEqual_;
     CcuRep::Variable currentRankSliceOutputOffset_;
 
     CcuRep::LocalAddr   localSrc_;

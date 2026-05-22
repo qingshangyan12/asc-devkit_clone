@@ -74,7 +74,7 @@ HcclResult InsTempAllReduceMesh1DTwoShotMeshChunk::CalcSliceInfoVec(const u64 &d
 
 HcclResult InsTempAllReduceMesh1DTwoShotMeshChunk::KernelRun(const OpParam& param,
     const TemplateDataParams& tempAlgParams,
-    const TemplateResource& templateResource)
+    TemplateResource& templateResource)
 {
     HCCL_INFO("[InsTempAllReduceMesh1DTwoShotMeshChunk] Run Start");
     threadNum_ = templateResource.threads.size();
@@ -107,6 +107,9 @@ HcclResult InsTempAllReduceMesh1DTwoShotMeshChunk::KernelRun(const OpParam& para
 
     RankSliceInfo sliceInfoVec;
     CHK_RET(CalcSliceInfoVec(tempAlgParams.sliceSize, sliceInfoVec));
+    CHK_PRT_RET(sliceInfoVec.size() != templateRankSize_,
+            HCCL_ERROR("[InsTempAllReduceMesh1DTwoShotMeshChunk][KernelRun] slice num[%u] is not equal to rank size[%u].",
+                sliceInfoVec.size(), templateRankSize_), HcclResult::HCCL_E_INTERNAL);
 
     HCCL_INFO("[InsTempAllReduceMesh1DTwoShotMeshChunk][PreCopy] Rank [%d].", myRank_);
     CHK_RET(PreCopy(tempAlgParams, templateResource.threads, sliceInfoVec));
@@ -217,7 +220,7 @@ HcclResult InsTempAllReduceMesh1DTwoShotMeshChunk::ReduceScatterMeshChunk(const 
             {linkSend,linkRecv},
             {{txSrcSlices, txDstSlices},{rxSrcSlices, rxDstSlices}}, dataType_, reduceOp_
         };
-        CHK_PRT_RET(SendRecvWriteReduce(sendRecvReduceInfo, threads[queIdx]),
+        CHK_PRT_RET(SendRecvBatchWriteReduce(sendRecvReduceInfo, threads[queIdx]),
             HCCL_ERROR("[InsTempAllReduceMesh1DTwoShotMeshChunk] RunReduceScatter SendRecvWriteReduce failed"),
             HcclResult::HCCL_E_INTERNAL);
     }

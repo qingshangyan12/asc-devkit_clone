@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <memory>
+#include <cstring>
 #include "alg_param.h"
 #include "executor_base.h"
 #include "coll_alg_exec_registry.h"
@@ -22,6 +23,12 @@
 #include <unordered_map>
 #include <shared_mutex>
 #include <atomic>
+#if CANN_VERSION_NUM >= 90000000
+#include "hccl_diag.h"
+#endif
+#include "hccl_device_comm_dl.h"
+#include "exec_timeout_manager.h"
+#include "alg_data_trans_wrapper.h"
 
 using namespace ops_hccl;
 namespace {
@@ -48,17 +55,17 @@ namespace {
 
             const std::string& GetCommName() const {return commName_; }
 
-            //获得缓存项，返回指针。不存在则返回 nullptr
-            AlgResourceCtxSerializable* Get(const std::string& algTag) {
+            //获得缓存项，返回共享所有权保证使用期间对象稳定存活
+            std::shared_ptr<const AlgResourceCtxSerializable> Get(const std::string& algTag) {
                 std::shared_lock<std::shared_timed_mutex> lock(mutex_);
                 auto it = cache_.find(algTag);
-                return it != cache_.end() ? &it->second : nullptr;
+                return it != cache_.end() ? it->second : nullptr;
             }
 
             //缓存算法
             void Put(const std::string& algTag, const AlgResourceCtxSerializable& value) {
                 std::unique_lock<std::shared_timed_mutex> lock(mutex_);
-                cache_[algTag] = value;
+                cache_[algTag] = std::make_shared<AlgResourceCtxSerializable>(value);
             }
 
             //移除特定算法
@@ -83,7 +90,7 @@ namespace {
 
         private:
             std::string commName_;
-            std::unordered_map<std::string, AlgResourceCtxSerializable> cache_;
+            std::unordered_map<std::string, std::shared_ptr<const AlgResourceCtxSerializable>> cache_;
             CacheStats stats_;
             mutable std::shared_timed_mutex mutex_;
      };
@@ -92,7 +99,7 @@ namespace {
     class CommDomainCacheManager {
         public:
             //获取算法缓存
-            AlgResourceCtxSerializable* Get(const std::string& algTag, const std::string& paramCommName) {
+            std::shared_ptr<const AlgResourceCtxSerializable> Get(const std::string& algTag, const std::string& paramCommName) {
                 std::string commName = ExtractCommName(algTag);
                 //提取失败时使用参数中的commName
                 if (commName.empty()) commName = paramCommName;
@@ -147,7 +154,9 @@ namespace {
                 totalcacheEntries = 0;
                 totalHits = 0;
                 totalMisses = 0;
-                for (const auto& [commName, commCache] : commCaches_) {
+                for (const auto& pair : commCaches_) {
+                    const auto& commName = pair.first;
+                    const auto& commCache = pair.second;
                     totalcacheEntries += commCache.GetCacheSize();
                     totalHits += commCache.GetStats().hits.load();
                     totalMisses += commCache.GetStats().misses.load();
@@ -210,7 +219,33 @@ namespace {
     thread_local CommDomainCacheManager g_cacheManager;
 }
 
-extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKernel(OpParam *param)
+namespace ops_hccl {
+// 选择走新（CollAlgExecRegistryV2）/老（CollAlgExecRegistry）算子流程
+// A5芯片或者template名称前缀为"opv2_"（当前A2的HostNic Send/Recv使用）走新流程，其他芯片走老流程
+bool IsOpsV2(const char* algName, DevType deviceType)
+{
+    // 检查algName前缀是否为"opv2_"
+    if (algName != nullptr) {
+        const char* prefix = "opv2_";
+        if (strncmp(algName, prefix, strlen(prefix)) == 0) {
+            return true;
+        }
+    }
+
+    // 根据deviceType判断
+#ifdef MACRO_DEV_TYPE_NEW
+    if (deviceType == DevType::DEV_TYPE_950) {
+#else
+    if (deviceType == DevType::DEV_TYPE_910_95) {
+#endif
+        return true;
+    }
+
+    return false;
+}
+}
+
+extern "C" unsigned int HcclLaunchAicpuKernel(OpParam *param)
 {
     if (param == nullptr) {
         HCCL_ERROR("%s param is nullptr", __func__);
@@ -221,11 +256,9 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         HCCL_ERROR("%s HcommAcquireComm fail, commName[%s]", __func__, param->commName);
         return 1;
     }
-    #ifdef MACRO_DEV_TYPE_NEW
-    if (param->deviceType != DevType::DEV_TYPE_950) {
-    #else
-    if (param->deviceType != DevType::DEV_TYPE_910_95) {
-    #endif
+
+    std::string algName = std::string(param->algName);
+    if (!ops_hccl::IsOpsV2(param->algName, param->deviceType)) {
         ScatterOpInfo opInfo;
         if (CreateScatter(param, &opInfo) != HCCL_SUCCESS) {
             HCCL_ERROR("%s CreateScatter fail", __func__);
@@ -248,35 +281,55 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
     }
 
     // 根据算法名字获取executor
-    std::string algName = std::string(param->algName);
-    #ifdef MACRO_DEV_TYPE_NEW
-    if (param->deviceType == DevType::DEV_TYPE_950) {
-    #else
-    if (param->deviceType == DevType::DEV_TYPE_910_95) {
-    #endif
-        AlgResourceCtxSerializable resCtx;
+    if (ops_hccl::IsOpsV2(param->algName, param->deviceType)) {
+        //判断通信域状态
+        HcclCommStatus commStatus = HCCL_COMM_STATUS_INVALID;
+        if (HcommIsSupportHcclCommGetStatus()) {
+            auto statusRet = HcclCommGetStatus(param->commName, &commStatus);
+            if (statusRet != HCCL_SUCCESS) {
+                HCCL_ERROR("%s HcclCommGetStatus fail, commName[%s], ret = %d", __func__, param->commName, statusRet);
+                return 1;
+            }
+            if (commStatus != HCCL_COMM_STATUS_READY) {
+                HCCL_ERROR("%s commStatus is not ready!, commStatus = %d", __func__, static_cast<int>(commStatus));
+                return 1;
+            }
+        }
 
-        //通过缓存实现反序列化优化
-        AlgResourceCtxSerializable* cachedResCtx = g_cacheManager.Get(param->algTag, param->commName);
-        if (cachedResCtx != nullptr) {
-            HCCL_INFO("[%s] Cache HIT for algTag[%s]", __func__, param->algTag);
-            std::string commName = g_cacheManager.ExtractCommName(param->algTag);
-            if (commName.empty()) commName = param->commName;
+        std::shared_ptr<const AlgResourceCtxSerializable> cachedResCtxHolder;
+        std::unique_ptr<AlgResourceCtxSerializable> resCtx;
+        const AlgResourceCtxSerializable* resCtxPtr{nullptr};
+        if (param->opType != HcclCMDType::HCCL_CMD_BATCH_SEND_RECV) {
+            //通过缓存实现反序列化优化
+            cachedResCtxHolder = g_cacheManager.Get(param->algTag, param->commName);
+            if (cachedResCtxHolder != nullptr) {
+                HCCL_INFO("[%s] Cache HIT for algTag[%s]", __func__, param->algTag);
+                std::string commName = g_cacheManager.ExtractCommName(param->algTag);
+                if (commName.empty()) commName = param->commName;
 
-            CacheStats stats;
-            size_t cacheSize;
-            if (g_cacheManager.GetCommStats(commName, stats, cacheSize)) {
-                HCCL_DEBUG("[%s] comm[%s] hitRate=%.2f%%, cacheSize=%zu",
-                __func__, commName.c_str(), stats.hitRate() * 100, cacheSize);
-            resCtx = *cachedResCtx;
+                CacheStats stats;
+                size_t cacheSize;
+                if (g_cacheManager.GetCommStats(commName, stats, cacheSize)) {
+                    HCCL_DEBUG("[%s] comm[%s] hitRate=%.2f%%, cacheSize=%zu",
+                    __func__, commName.c_str(), stats.hitRate() * 100, cacheSize);
+                }
+                resCtxPtr = cachedResCtxHolder.get();
+            } else {
+                //未命中，进行反序列化并存入缓存
+                resCtx.reset(new AlgResourceCtxSerializable());
+                char *ctx = static_cast<char *>(param->resCtx);
+                std::vector<char> seq(ctx, ctx + param->ctxSize);
+                resCtx->DeSerialize(seq);
+                g_cacheManager.Put(param->algTag, *resCtx, param->commName);
+                resCtxPtr = resCtx.get();
+                HCCL_INFO("[%s] Cache MISS and stored for algTag[%s]", __func__, param->algTag);
             }
         } else {
-            //未命中，进行反序列化并存入缓存
+            resCtx.reset(new AlgResourceCtxSerializable());
             char *ctx = static_cast<char *>(param->resCtx);
             std::vector<char> seq(ctx, ctx + param->ctxSize);
-            resCtx.DeSerialize(seq);
-            g_cacheManager.Put(param->algTag, resCtx, param->commName);
-            HCCL_INFO("[%s] Cache MISS and stored for algTag[%s]", __func__, param->algTag);
+            resCtx->DeSerialize(seq);
+            resCtxPtr = resCtx.get();
         }
 
         // 还原变长指针
@@ -285,24 +338,35 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             ret = ops_hccl::RestoreVarDataBatchSendRecv(*param);
         } else if (param->opType == HCCL_CMD_ALLTOALLV || param->opType == HCCL_CMD_ALLTOALLVC ||
                    param->opType == HCCL_CMD_ALLTOALL) {
-            ret = ops_hccl::RestoreVarDataAlltoAllV(*param, resCtx);
+            ret = ops_hccl::RestoreVarDataAlltoAllV(*param, *resCtxPtr);
         } else if (param->opType == HCCL_CMD_REDUCE_SCATTER_V) {
-            ret = ops_hccl::RestoreVarDataReduceScatterV(*param, resCtx);
+            ret = ops_hccl::RestoreVarDataReduceScatterV(*param, *resCtxPtr);
         } else if (param->opType == HCCL_CMD_ALLGATHER_V) {
-            ret = ops_hccl::RestoreVarDataAllGatherV(*param, resCtx);
+            ret = ops_hccl::RestoreVarDataAllGatherV(*param, *resCtxPtr);
         }
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR("failed to restore optype [%d] data and counts.", param->opType);
             return 1;
         }
         // 获取Device测主thread
-        ThreadHandle thread = resCtx.threads[0];
+        ThreadHandle thread = resCtxPtr->threads[0];
         if (HcommBatchModeStart(param->algTag) != HCCL_SUCCESS) {
             HCCL_ERROR("failed set batch mode, tag is %s.", param->algTag);
             return 1;
         }
 
-        // 上报主流和第一个task  wait之前
+        // 要在下第一个task之前上报
+        HcclDfxOpInfo dfxOpInfo{};
+        if (ConvertToHcclDfxOpInfo(param, &dfxOpInfo) != HCCL_SUCCESS) {
+            HCCL_ERROR("ConvertToHcclDfxOpInfo fail, commName is %s, tag is %s", param->commName, param->algTag);
+            return 1;
+        }
+        if (HcclDfxRegOpInfoByCommId(param->commName, reinterpret_cast<void *>(&dfxOpInfo)) != HCCL_SUCCESS) {
+            HCCL_ERROR("HcclDfxRegOpInfoByCommId fail, commName is %s, tag is %s", param->commName, param->algTag);
+            return 1;
+        }
+
+        // 上报上报mainstream数据,第一个任务
         if (HcommProfilingReportKernelStartTask(thread, param->commName) != HCCL_SUCCESS) {
             HCCL_ERROR("%sfailed to report MainStream And FirstTask, thread %lu, param->commName %s.", __func__, thread, param->commName);
             return 1;
@@ -310,10 +374,10 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
 
         // 主thread等待Host stream的通知
         ThreadHandle exportedAicpuTsThread = param->opThread;
-        u32 maxNotifyNum = resCtx.notifyNumOnMainThread;
-        for (u32 i = 0; i < resCtx.notifyNumPerThread.size(); i++) {
-            if (resCtx.notifyNumPerThread[i] > maxNotifyNum) {
-                maxNotifyNum = resCtx.notifyNumPerThread[i];
+        u32 maxNotifyNum = resCtxPtr->notifyNumOnMainThread;
+        for (u32 i = 0; i < resCtxPtr->notifyNumPerThread.size(); i++) {
+            if (resCtxPtr->notifyNumPerThread[i] > maxNotifyNum) {
+                maxNotifyNum = resCtxPtr->notifyNumPerThread[i];
             }
         }
         HCCL_DEBUG("[%s]Notify wait on thread[%llu], maxNotifyNum[%u], timeout[%u]", __func__, thread,
@@ -326,14 +390,19 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             return 1;
         }
 
+        // 设置执行超时时间
+        ExecTimeoutManager::Instance().SetExecTimeout(param->execTimeout);
+        // 设置BatchTransfer是否可行
+        CHK_RET(InitHcommBatchTransferOnThreadSupported(resCtxPtr->isHcommBatchTransferOnThreadSupported));
         // 执行算法编排
-        if (executor->Orchestrate(*param, resCtx) != HCCL_SUCCESS) {
+        if (executor->Orchestrate(*param, *resCtxPtr) != HCCL_SUCCESS) {
             HCCL_ERROR("orchestrate failed for alg:%s", param->algName);
             return 1;
         }
 
-        if (HcommProfilingReportDeviceOp(param->commName) != HCCL_SUCCESS) {
-            HCCL_ERROR("%s HcommProfilingReportDeviceOp fail, commName[%s]", __func__, param->commName);
+        // 上报mainstream数据,最后一个任务
+        if (HcommProfilingReportKernelEndTask(thread, param->commName) != HCCL_SUCCESS) {
+            HCCL_ERROR("%s failed to report MainStream And LastTask, thread %lu, param->commName %s.",  __func__, thread, param->commName);
             return 1;
         }
 
@@ -343,9 +412,8 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         CHK_RET(static_cast<HcclResult>(HcommThreadNotifyRecordOnThread(thread, exportedAicpuTsThread,
             DEFAULT_NOTIFY_IDX)));
 
-        // 上报主流和最后一个task 在notify之后
-        if (HcommProfilingReportKernelEndTask(thread, param->commName) != HCCL_SUCCESS) {
-            HCCL_ERROR("%s failed to report MainStream And LastTask, thread %lu, param->commName %s.",  __func__, thread, param->commName);
+        if (HcommProfilingReportDeviceOp(param->commName) != HCCL_SUCCESS) {
+            HCCL_ERROR("%s HcommProfilingReportDeviceOp fail, commName[%s]", __func__, param->commName);
             return 1;
         }
         

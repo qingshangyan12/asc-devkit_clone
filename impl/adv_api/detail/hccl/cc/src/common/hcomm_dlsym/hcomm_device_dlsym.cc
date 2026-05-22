@@ -13,6 +13,7 @@
 #include "hcomm_primitives_dl.h"
 #include "hcomm_device_profiling_dl.h"
 #include "hcomm_diag_dl.h"
+#include "hccl_device_comm_dl.h"
 #include <pthread.h>
 #include <dlfcn.h>
 #include <stdio.h>
@@ -37,5 +38,6 @@ void HcommDeviceDlInit(void) {
     HcommPrimitivesDlInit(gLibHandle);
     HcommDeviceProfilingDlInit(gLibHandle);
     HcommDiagDlInit(gLibHandle);
+    HcclDeviceCommDlInit(gLibHandle);
     gInitialized = true;
 }
