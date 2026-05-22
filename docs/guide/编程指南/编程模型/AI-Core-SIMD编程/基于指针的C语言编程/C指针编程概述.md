@@ -34,7 +34,7 @@ void add_custom_do(uint32_t numBlocks, void* l2ctrl, void* stream, uint8_t* x, u
 ```
 **详细方法**：参见 [核函数](../核函数.md)
 
-### 算子Kernel通过开发
+### 算子Kernel开发流程
 - **Tiling（分块）设计**: 对全局超大张量数据进行均匀切分，为各AI Core分配大小均衡的独立数据分片，精准适配SPMD多核并行架构，规避单核算力瓶颈，实现全域负载均衡。
 ```c
 constexpr uint32_t C_API_TOTAL_LENGTH = 16384;

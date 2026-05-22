@@ -70,8 +70,8 @@ DataCopy(gmOut, zLocal, TILE_LENGTH);
 ### Layout表述
 我们使用Shape和Stride来表达Layout排布格式，比如下图中的行优先和列优先排布：
 Shape用于表达Tensor形状，Stride则用于区分不同的排布：
-- 行优先:Shape (2, 4) Stride (4, 1)
-- 列优先:Shape (2, 4) Stride (1, 2)
+- 行优先: Shape (2, 4) Stride (4, 1)
+- 列优先: Shape (2, 4) Stride (1, 2)
 图中每个方格中的数字表示该位置元素在内存中按顺序排列时的下标。对于相同的矩阵位置，排布方式不同时，其在内存中的顺序可能是不同的，例如，矩阵坐标 (1, 0) 在行优先和列优先的情况下，对应元素在内存中的顺序分别是4和1。
 
 ![行优先排布](行优先排布.png)
@@ -86,7 +86,7 @@ Shape用于表达Tensor形状，Stride则用于区分不同的排布：
 ![层次化Layout表达](层次化Layout表达.png)
 
 图中展示了两层矩阵：内层矩阵为内部用灰色线包裹的矩阵，外层矩阵为将内层矩阵视为一个元素时黑色线包裹的矩阵。
-Shape的第一个元素描述行方向的形状，(2，3)表示内层矩阵和外层矩阵的行数分别为2和3；Shape的第二个元素描述的是列方向上的形状，(2，4)表示内层矩阵和外层矩阵的列数分别为2和4。
+Shape的第一个元素描述行方向的形状，(2, 3)表示内层矩阵和外层矩阵的行数分别为2和3；Shape的第二个元素描述的是列方向上的形状，(2, 4)表示内层矩阵和外层矩阵的列数分别为2和4。
 Stride中的每个元素与Shape中的元素对应，表示该对应维度下，相邻元素首地址在内存地址上的间隔，图片中用箭头表示了每个维度相邻元素的首地址间隔。
 
 ### Tensor定义方式
@@ -113,7 +113,7 @@ auto colMajorTensor = MakeTensor(pointer, MakeLayout(MakeShape(m, n), MakeStride
 auto nzTensor = MakeTensor(pointer, MakeLayout(MakeShape((8, 16), (4, 16))));
 ```
 
-- **4：通过特定的分形布局进行简化的定义** - Cube矩阵乘专用，自动生成Shape和Stride
+- **4. 通过特定的分形布局进行简化的定义** - Cube矩阵乘专用，自动生成Shape和Stride
 ```cpp
 // 4.1 通过MakeFrameLayout，指定NZ Pattern直接指定NZ分形, 接口内部自动推导成4维分形
 auto tensor = MakeTensor(l0aPointer, MakeFrameLayout<NZLayoutPtn>(128, 64));
@@ -151,7 +151,7 @@ auto copyAtom = MakeCopy<CopyGM2UB>();
 Copy(copyAtom, gmTensor, ubTensor);
 ```
 
-- **4 CUBE计算: 提供了简化的Mmad接口，方便用户直接进行矩阵乘计算**
+- **4. CUBE计算: 提供了简化的Mmad接口，方便用户直接进行矩阵乘计算**
 ```cpp
 Mmad(l0c, l0a, l0b, {m, n, k, false, iterK == 0});
 ```
