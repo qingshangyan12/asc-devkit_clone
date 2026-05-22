@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
 #include "kernel_utils.h"
+#include "sort/sort.h"
 
 namespace AscendC {
 template <typename T, typename U, SortType sortType, bool descend, bool isReuseSource, bool extraBuf, int mode = 0>
