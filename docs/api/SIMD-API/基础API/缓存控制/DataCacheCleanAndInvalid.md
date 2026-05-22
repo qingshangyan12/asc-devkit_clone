@@ -87,7 +87,7 @@
 如上图所示：
 
 -   DMA搬运单元读写Global Memory，数据通过DataCopy等接口在UB等Local Memory和Global Memory间交互，没有Cache一致性问题；
--   Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因此存在Data Cache与Global Memory的Cache一致性问题。
+-   Scalar单元访问Global Memory，首先会访问每个核内的DCache，因此存在DCache与Global Memory的Cache一致性问题。
 
 该接口用来刷新Cache，保证Cache的一致性，使用场景如下：
 
@@ -98,21 +98,21 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
--   支持通过配置dcciDst确保Data Cache与GM存储的一致性
+-   支持通过配置dcciDst确保DCache与GM存储的一致性
 
     ```
     template <typename T, CacheLine entireType, DcciDst dcciDst>
     __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
     ```
 
--   支持通过配置dcciDst确保Data Cache与Local Memory存储的一致性
+-   支持通过配置dcciDst确保DCache与Local Memory存储的一致性
 
     ```
     template <typename T, CacheLine entireType, DcciDst dcciDst>
     __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)
     ```
 
--   不支持配置dcciDst，仅支持保证Data Cache与GM的一致性
+-   不支持配置dcciDst，仅支持保证DCache与GM的一致性
 
     ```
     template <typename T, CacheLine entireType>
@@ -139,13 +139,13 @@
 </td>
 <td class="cellrowborder" valign="top" width="81.86%" headers="mcps1.2.3.1.2 "><p id="p12921357941"><a name="p12921357941"></a><a name="p12921357941"></a>指令操作的模式：</p>
 <p id="p122921057547"><a name="p122921057547"></a><a name="p122921057547"></a>SINGLE_CACHE_LINE：只刷新传入地址所在的Cache Line，<strong id="b1429295716411"><a name="b1429295716411"></a><a name="b1429295716411"></a>注意如果该地址非64B对齐，只会操作传入地址到64B对齐的部分。</strong></p>
-<p id="p62924571048"><a name="p62924571048"></a><a name="p62924571048"></a>ENTIRE_DATA_CACHE：此时传入的地址无效，核内会刷新整个Data Cache，但是耗时较大，<strong id="b42932571842"><a name="b42932571842"></a><a name="b42932571842"></a>性能敏感的场景慎用</strong>。</p>
+<p id="p62924571048"><a name="p62924571048"></a><a name="p62924571048"></a>ENTIRE_DATA_CACHE：此时传入的地址无效，核内会刷新整个DCache，但是耗时较大，<strong id="b42932571842"><a name="b42932571842"></a><a name="b42932571842"></a>性能敏感的场景慎用</strong>。</p>
 </td>
 </tr>
 <tr id="row429315710413"><td class="cellrowborder" valign="top" width="18.14%" headers="mcps1.2.3.1.1 "><p id="p172937571143"><a name="p172937571143"></a><a name="p172937571143"></a>dcciDst</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.86%" headers="mcps1.2.3.1.2 "><p id="p172935571246"><a name="p172935571246"></a><a name="p172935571246"></a>表示使用该接口来保证Data Cache与哪一种存储保持一致性，类型为DcciDst枚举类。</p>
-<a name="ul0740116780"></a><a name="ul0740116780"></a><ul id="ul0740116780"><li>CACHELINE_ALL：与CACHELINE_OUT效果一致。</li><li>CACHELINE_UB：表示通过该接口来保证Data Cache与UB的一致性。</li><li>CACHELINE_OUT：表示通过该接口来保证Data Cache与Global Memory的一致性。</li><li>CACHELINE_ATOMIC：<a name="ul174370221398"></a><a name="ul174370221398"></a><ul id="ul174370221398"><li><span id="ph142607321878"><a name="ph142607321878"></a><a name="ph142607321878"></a>Ascend 950PR/Ascend 950DT</span>，原子操作过程中保证Data Cache和Global Memory的一致性。</li><li><span id="ph191391637074"><a name="ph191391637074"></a><a name="ph191391637074"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_1"><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a>Atlas A3 推理系列产品</term></span>，预留参数，暂未支持。</li><li><span id="ph1410413421715"><a name="ph1410413421715"></a><a name="ph1410413421715"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_1"><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a>Atlas A2 推理系列产品</term></span>，预留参数，暂未支持。</li><li><span id="ph179872462717"><a name="ph179872462717"></a><a name="ph179872462717"></a><term id="zh-cn_topic_0000001312391781_term354143892110_1"><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a>Atlas 200I/500 A2 推理产品</term></span>，预留参数，暂未支持。</li><li><span id="ph1468532718"><a name="ph1468532718"></a><a name="ph1468532718"></a><term id="zh-cn_topic_0000001312391781_term1964153212227_1"><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a>Atlas 推理系列产品</term>AI Core</span>，预留参数，暂未支持。</li></ul>
+<td class="cellrowborder" valign="top" width="81.86%" headers="mcps1.2.3.1.2 "><p id="p172935571246"><a name="p172935571246"></a><a name="p172935571246"></a>表示使用该接口来保证DCache与哪一种存储保持一致性，类型为DcciDst枚举类。</p>
+<a name="ul0740116780"></a><a name="ul0740116780"></a><ul id="ul0740116780"><li>CACHELINE_ALL：与CACHELINE_OUT效果一致。</li><li>CACHELINE_UB：表示通过该接口来保证DCache与UB的一致性。</li><li>CACHELINE_OUT：表示通过该接口来保证DCache与Global Memory的一致性。</li><li>CACHELINE_ATOMIC：<a name="ul174370221398"></a><a name="ul174370221398"></a><ul id="ul174370221398"><li><span id="ph142607321878"><a name="ph142607321878"></a><a name="ph142607321878"></a>Ascend 950PR/Ascend 950DT</span>，原子操作过程中保证DCache和Global Memory的一致性。</li><li><span id="ph191391637074"><a name="ph191391637074"></a><a name="ph191391637074"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_1"><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a>Atlas A3 推理系列产品</term></span>，预留参数，暂未支持。</li><li><span id="ph1410413421715"><a name="ph1410413421715"></a><a name="ph1410413421715"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_1"><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a>Atlas A2 推理系列产品</term></span>，预留参数，暂未支持。</li><li><span id="ph179872462717"><a name="ph179872462717"></a><a name="ph179872462717"></a><term id="zh-cn_topic_0000001312391781_term354143892110_1"><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a>Atlas 200I/500 A2 推理产品</term></span>，预留参数，暂未支持。</li><li><span id="ph1468532718"><a name="ph1468532718"></a><a name="ph1468532718"></a><term id="zh-cn_topic_0000001312391781_term1964153212227_1"><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a>Atlas 推理系列产品</term>AI Core</span>，预留参数，暂未支持。</li></ul>
 </li></ul>
 </td>
 </tr>
@@ -216,7 +216,6 @@ global.SetGlobalBuffer((__gm__ uint64_t*)mmAddr_ + AscendC::GetBlockIdx() * 1024
 for( int i = 0; i < 8; i++) {
    global.SetValue(i, AscendC::GetBlockIdx());
 }
-// 刷新整个Data Cache，性能较差
+// 刷新整个DCache，性能较差
 AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::ENTIRE_DATA_CACHE, AscendC::DcciDst::CACHELINE_OUT>(global);
 ```
-
