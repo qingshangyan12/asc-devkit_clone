@@ -14,7 +14,7 @@
 
 ```
 ├── mmad_gemv
-│   ├── img                         // 本文中的插图文件
+│   ├── figures                     // 本文中的插图文件
 │   ├── scripts
 │   │   ├── gen_data.py             // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
@@ -33,7 +33,7 @@ GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N
 
   将A矩阵从A1搬运到A2时，1 * 256的向量被当作16 * 16的矩阵进行处理，调用LoadData接口一次完成16 * 16分形大小的矩阵搬运。B矩阵的搬运以及矩阵乘计算跟基础场景相同，如下图1所示。
   <p align="center">
-  <img src="img/开启gemv.png" width="1100">
+  <img src="figures/开启gemv.png" width="1100">
   </p>
   <p align="center">
   图1：GEMV模式，Mmad计算示意图
@@ -43,7 +43,7 @@ GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N
 
   将A矩阵从A1搬运到A2时，1 * 256的向量被当作非对齐矩阵数据进行处理，将M方向对齐到16后进行搬运。调用LoadData接口每次搬运16 * 16分形大小的矩阵，一共搬运CeilDiv(K, 16)=16次，导致搬运数据量增加，性能相较于GEMV模式差，如下图2所示。
   <p align="center">
-  <img src="img/关闭gemv.png" width="1100">
+  <img src="figures/关闭gemv.png" width="1100">
   </p>
   <p align="center">
   图2：非GEMV模式，Mmad计算示意图
@@ -77,7 +77,7 @@ GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N
 - 样例执行
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DDISABLE_GEMV=0;make -j;    # 编译工程，默认npu模式
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DDISABLE_GEMV=0 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
@@ -87,8 +87,8 @@ GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N
 
   示例如下：
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DDISABLE_GEMV=0 ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DDISABLE_GEMV=0 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。

@@ -12,14 +12,30 @@ cmake_minimum_required(VERSION 3.16.0)
 include(../fetch_cann_cmake.cmake)
 project(ascendc_tiling_api)
 
-init_cann_project()
+init_cann_project(PRODUCT_SIDE "device" PREPEND_MODULE_PATH)
 
 set(HI_PYTHON "python3" CACHE STRING "python executor")
 set(ASCENDC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 set(ASCENDC_INCLUDE_DIR ${ASCENDC_DIR}/include)
 set(ASCENDC_IMPL_DIR ${ASCENDC_DIR}/impl)
 set(INSTALL_LIBRARY_DIR ${CMAKE_HOST_SYSTEM_PROCESSOR}-linux/lib64/device)
+get_filename_component(ASC_DEVKIT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
+
+find_cann_package(aicpu_sharder REQUIRED)
+find_cann_package(tilingdata_base REQUIRED OBJECTS)
+find_cann_package(metadef REQUIRED)
+find_cann_package(unified_dlog REQUIRED)
+find_cann_package(ascend_hal REQUIRED)
+find_cann_package(securec REQUIRED)
+find_cann_package(runtime REQUIRED)
+find_cann_package(mmpa REQUIRED)
+find_cann_package(acl_rt REQUIRED)
+find_cann_package(atrace REQUIRED)
 
 include(${ASCENDC_DIR}/impl/adv_api/gen_kernel_tiling.cmake)
 
-add_subdirectory(../../impl/adv_api/tiling tiling)
+set(DEVICE_MODE TRUE)
+set(KERNEL_MODE TRUE)
+
+add_subdirectory(../../impl/adv_api/tiling impl/adv_api/tiling)
+add_subdirectory(../../impl/adv_api/detail/hccl/cc impl/adv_api/detail/hccl/cc)

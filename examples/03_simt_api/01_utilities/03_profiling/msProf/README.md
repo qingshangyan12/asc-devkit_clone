@@ -1,4 +1,4 @@
-# 基于Gahter算子的profiling样例
+# 基于Gather算子的profiling样例
 
 ## 概述
 
@@ -13,11 +13,11 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── msProf
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── gahter.asc             # SIMT实现gather调用样例
-|   └── README.md
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── gather.asc             // SIMT实现gather调用样例
+│   └── README.md
 ```
 
 ## 算子描述
@@ -53,7 +53,7 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
       └──visualize_data.bin         # MindStudio Insight呈现文件
       ```
 
-用户可以使用 MindStudio Insight 打开 `visualize_data.bin` 文件可视化查看算子信息，包含算子基础信息、核间负载分析、计算工作负载分析、内存负载分析等。更多msProf工具使用方式请参考[算子开发工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)中算子调优（msOpProf）的内容。
+用户可以使用 MindStudio Insight 打开 `visualize_data.bin` 文件可视化查看算子信息，包含算子基础信息、核间负载分析、计算工作负载分析、内存负载分析等。更多msProf工具使用方式请参考[《算子开发工具》](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)中“算子调优 msOpProf”的内容。
 
 
 ## 编译运行
@@ -78,11 +78,19 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
     ```
 
 - 样例执行
+
   ```bash
   mkdir -p build && cd build;           # 创建并进入build目录
-  cmake ..;make -j;                     # 编译工程
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # 编译工程
   msprof op ./demo                      # 基于可执行文件demo通过msprof op执行算子调优
   ```
+
+  编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
+
   执行结果如下，说明精度对比成功。
   ```
   [Success] Case accuracy is verification passed.

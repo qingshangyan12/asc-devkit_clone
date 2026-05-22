@@ -126,7 +126,11 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(uint16
                 tiling = ccOpTilingDataTable_[static_cast<uint32_t>(param.commType.prepareType)];
             }
         }
+#if __NPU_ARCH__ == 3510
+        AssembleHcclMsgV2(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
+#else
         AssembleHcclMsg(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
+#endif
     } else {
         AssembleHcclMsg(param, srcGroupID, srcHandleID, hcclSendMsg);
     }
@@ -228,7 +232,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::WaitFinishCntFromGm(ui
 #if !defined(UT_TEST)
     while (true) {
         HCCL_CHECK_RESTART(hcclMsgArea_, return finishGM->cnt);
-        FlushDataCache(globalHcclMsgArea, finishGM);
+        FlushDataCacheAicpu(globalHcclMsgArea, finishGM);
         if ((debugMode_ == HCCL_ONLY_COMPUTE) || (finishGM->cnt >= expectedCnt)) {
             break;
         }

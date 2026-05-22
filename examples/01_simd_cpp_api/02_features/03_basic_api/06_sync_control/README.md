@@ -10,10 +10,8 @@
 
 | 目录名称 | 功能描述 |
 |----------|----------|
-| [data_sync_barrier](./data_sync_barrier) | 基于DataSyncBarrier实现核内标量单元流水（PIPE_S）的同步，确保标量操作完成后再执行后续操作 |
-| [mutex](./mutex) | 基于Mutex::Lock和Mutex::Unlock实现核内异步流水之间的同步，通过锁定指定流水再释放流水来实现流水同步依赖 |
-| [pipe_barrier](./pipe_barrier) | 基于PipeBarrier实现核内多流水同步，完整展示PIPE_MTE2、PIPE_V、PIPE_MTE3三种流水的单流水同步及SetFlag/WaitFlag多流水同步 |
-
+| [data_sync_barrier](./data_sync_barrier) | 基于DataSyncBarrier实现标量流水GM访问写序同步 |
+| [mutex](./mutex) | 本样例演示Mutex::Lock、Mutex::Unlock、AllocMutexID和ReleaseMutexID核内流水线同步接口的使用方法 |
 
 ### 核间同步
 
@@ -27,7 +25,6 @@
 
 ### 任务间同步
 
-
 | 目录名称 | 功能描述 |
 |----------|----------|
 | [task_sync](./task_sync) | 基于WaitPreTaskEnd和SetNextTaskStart实现Superkernel子kernel并行，配合使用可最大化子kernel间并行度，提升整体性能 |
@@ -36,4 +33,4 @@
 
 | 目录名称 | 功能描述 |
 |----------|----------|
-| [reg_sync](./reg_sync) | 演示RegBase编程范式下UB读写操作的同步，包括寄存器保序特性（优化读写之间的同步指令）和LocalMemBar接口保序两种场景 |
+| [reg_sync](./reg_sync) | 演示Reg编程接口下UB读写操作的同步，包括寄存器保序特性（优化读写之间的同步指令）和LocalMemBar接口保序两种场景 |
