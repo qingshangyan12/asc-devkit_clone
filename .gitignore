@@ -14,6 +14,3 @@ openssl-host-src/
 build_device/
 *.o
 *.log
-
-.claude/
-.opencode/
