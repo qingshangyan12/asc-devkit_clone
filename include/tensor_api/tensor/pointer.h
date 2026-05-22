@@ -25,11 +25,7 @@
 
 namespace AscendC {
 namespace Te {
-template <typename Hardware, typename TraitOrType, typename... Args>
-__aicore__ inline constexpr auto MakeMemPtr(Args... args);
 
-template <typename Hardware, typename... Args>
-__aicore__ inline constexpr auto MakeMemPtr(Args... args);
 
 } // namespace Te
 } // namespace AscendC
