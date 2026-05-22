@@ -14,6 +14,8 @@
 #include "utils.h"
 #include "ccu_alg_template_base.h"
 
+#ifndef NHR_STEP_INFO_DEFINED
+#define NHR_STEP_INFO_DEFINED
 using NHRStepInfo = struct NHRStepInfoDef {
     u32 step = 0;
     u32 myRank = 0;
@@ -27,10 +29,12 @@ using NHRStepInfo = struct NHRStepInfoDef {
     {
     }
 };
+#endif
 
 namespace ops_hccl {
 class CcuTempAllGatherNHR1DMem2Mem : public CcuAlgTemplateBase {
 public:
+    CcuTempAllGatherNHR1DMem2Mem() = default;
     explicit CcuTempAllGatherNHR1DMem2Mem(const OpParam& param, 
                                               const u32 rankId, // 传通信域的rankId，userRank
                                               const std::vector<std::vector<u32>> &subCommRanks);
@@ -49,6 +53,7 @@ public:
                          const TemplateDataParams& templateDataParams,
                          TemplateResource& templateResource) override;
     HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
+    HcclResult FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx) override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
     u64 GetThreadNum() const override;
  

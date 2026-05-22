@@ -62,7 +62,7 @@ void InsTempAllReduceAicpuReduceNHR::GetNotifyIdxSubToMain(std::vector<u32> &not
 }
 
 HcclResult InsTempAllReduceAicpuReduceNHR::KernelRun(
-    const OpParam &param, const TemplateDataParams &tempAlgParams, const TemplateResource &templateResource)
+    const OpParam &param, const TemplateDataParams &tempAlgParams, TemplateResource &templateResource)
 {
     HCCL_INFO("[InsTempAllReduceAicpuReduceNHR] rank[%d] KernelRun start", myRank_);
     // 处理数据量为0的场景
@@ -95,6 +95,10 @@ HcclResult InsTempAllReduceAicpuReduceNHR::KernelRun(
         myRank_,
         channels.size(),
         channels.begin()->first);
+    
+    bool isPcieProtocal = IsPcieProtocol(channels);  // 判断是否存在pcie链路
+    isDmaRead_ = isPcieProtocal;  // 是否使用Read模式
+    HCCL_DEBUG("[InsTempAllReduceAicpuReduceNHR] Use Dma Read[%d]", isDmaRead_);
 
     // 1. 切片
     CHK_RET(CalcSlice(tempAlgParams.sliceSize));
@@ -179,7 +183,7 @@ HcclResult InsTempAllReduceAicpuReduceNHR::RunGather(const std::map<u32, std::ve
 
             txSrcSlices.push_back(DataSlice(buffInfo_.hcclBuff.addr, txOffset, txSize, txSize / dataTypeSize));
             txDstSlices.push_back(DataSlice(channelSend.remoteCclMem.addr, txOffset, txSize, txSize / dataTypeSize));
-            rxSrcSlices.push_back(DataSlice(buffInfo_.hcclBuff.addr, rxOffset, rxSize, rxSize / dataTypeSize));
+            rxSrcSlices.push_back(DataSlice(channelRecv.remoteCclMem.addr, rxOffset, rxSize, rxSize / dataTypeSize));
             rxDstSlices.push_back(DataSlice(buffInfo_.hcclBuff.addr, rxOffset, rxSize, rxSize / dataTypeSize));
         }
 
@@ -187,9 +191,15 @@ HcclResult InsTempAllReduceAicpuReduceNHR::RunGather(const std::map<u32, std::ve
         TxRxSlicesList sendRecvSlicesList({txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices});
 
         SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList);
-        CHK_PRT_RET(SendRecvWrite(sendRecvInfo, thread_),
-            HCCL_ERROR("[InsTempAllReduceAicpuReduceNHR] RunGather send/recv failed"),
-            HcclResult::HCCL_E_INTERNAL);
+        if (isDmaRead_) {
+            CHK_PRT_RET(SendRecvRead(sendRecvInfo, thread_),
+                HCCL_ERROR("[InsTempAllReduceAicpuReduceNHR] RunGather send/recv failed"),
+                HcclResult::HCCL_E_INTERNAL);
+        } else {
+            CHK_PRT_RET(SendRecvWrite(sendRecvInfo, thread_),
+                HCCL_ERROR("[InsTempAllReduceAicpuReduceNHR] RunGather send/recv failed"),
+                HcclResult::HCCL_E_INTERNAL);
+        }
     }
 
     HCCL_INFO("[InsTempAllReduceAicpuReduceNHR][RunGather] end");

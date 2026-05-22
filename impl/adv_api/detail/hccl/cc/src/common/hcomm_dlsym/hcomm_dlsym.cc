@@ -13,6 +13,7 @@
 #include "hcomm_primitives_dl.h"
 #include "hccl_inner_dl.h"
 #include "hcomm_host_profiling_dl.h"
+#include "hccl_host_comm_dl.h"
 #include <pthread.h>
 #include <dlfcn.h>
 #include <stdio.h>
@@ -68,4 +69,5 @@ void HcommDlInit(void) {
     HcommPrimitivesDlInit(gLibHandle);
     HcclInnerDlInit(gLibHandle);
     HcommProfilingDlInit(gLibHandle);
+    HcclCommDlInit(gLibHandle);
 }

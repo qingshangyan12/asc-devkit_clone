@@ -17,6 +17,7 @@ namespace ops_hccl {
 
 class CcuTempAllGatherMesh1DMem2Mem : public CcuAlgTemplateBase {
 public:
+    CcuTempAllGatherMesh1DMem2Mem() = default;
     explicit  CcuTempAllGatherMesh1DMem2Mem(const OpParam& param, 
                                                 const u32 rankId, // 传通信域的rankId，userRank
                                                 const std::vector<std::vector<u32>> &subCommRanks);
@@ -36,6 +37,7 @@ public:
                          const TemplateDataParams& templateDataParams,
                          TemplateResource& templateResource) override;
     u64 GetThreadNum() const override;
+    HcclResult FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx) override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
 
 private:

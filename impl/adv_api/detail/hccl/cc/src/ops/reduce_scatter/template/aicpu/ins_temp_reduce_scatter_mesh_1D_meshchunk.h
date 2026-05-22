@@ -32,7 +32,7 @@ public:
 
     HcclResult KernelRun(const OpParam& param,
                          const TemplateDataParams& tempAlgParams,
-                         const TemplateResource& templateResource) override;
+                         TemplateResource& templateResource) override;
     HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
                         AlgResourceRequest& resourceRequest) override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
@@ -48,11 +48,11 @@ private:
     HcclResult RunReduceScatter(const std::map<u32, std::vector<ChannelInfo>> &channels,
                                 const std::vector<ThreadHandle> &threads,
                                 const TemplateDataParams &tempAlgParams, RankSliceInfo &sliceInfoVec);
-    HcclResult DoMeshChunk(const std::map<u32, std::vector<ChannelInfo>> &channels,
+    HcclResult DoMeshChunk(
+        const std::map<u32, std::vector<ChannelInfo>> &channels,
         const std::vector<ThreadHandle> &threads,
-        const TemplateDataParams &tempAlgParams, const std::vector<uint64_t> &sliceSize, const u32 &repeatIdx,
-        const u32 &myAlgRank, uint64_t &sliceSendOffset_, uint64_t &sliceRecvOffset_,
-        const uint64_t &sliceRecvBaseOffset);
+        const TemplateDataParams &tempAlgParams, const std::vector<uint64_t> &sliceSize, const u32 &repeatNum,
+        const u32 &myAlgRank, uint64_t &sliceSendOffset_, uint64_t &sliceRecvOffset_, const uint64_t &sliceRecvBaseOffset);
     void NotifyIdxMainToSubInMeshChunk(std::vector<u32> &notifyIdxMainToSub);
     void NotifyIdxSubToMainInMeshChunk(std::vector<u32> &notifyIdxSubToMain);
     u64 processSize_{0};
