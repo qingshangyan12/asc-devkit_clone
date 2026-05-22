@@ -19,7 +19,6 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 #include <string>
-#include "dlog_pub.h"
 #ifndef T_DESC
 #define T_DESC(_msg, _y) ((_y) ? true : false)
 #endif
