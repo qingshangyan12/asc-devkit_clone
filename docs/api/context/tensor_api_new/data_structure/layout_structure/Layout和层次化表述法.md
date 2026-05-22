@@ -268,22 +268,22 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     Stride = ((_0, _1), (_0, row))
     ```
 
-## 数据结构表
+## 分形结构数据表
 
 每种分形对应的Layout格式如下表所示，其中T指的是支持的数据类型中除fp8_e8m0_t之外的数据类型，`C0_ELEMENT = Std::Int<32/sizeof(T)>{}`，特殊情况当T为fp4x2_e2m1_t或fp4x2_e1m2_t时，`C0_ELEMENT = _64`。
 
 | LayoutFormatPattern | 类型 | ShapeRow0 | ShapeRow1 | ShapeColumn0 | ShapeColumn1 | StrideRow0 | StrideRow1 | StrideColumn0 | StrideColumn1 |
 |-------------|------|-----------|-----------|--------------|--------------|------------|------------|---------------|---------------|
-| NZLayoutPtn | T | Int<16>{} | ceil_div(row, Int<16>{}) | C0_ELEMENT | ceil_div(column, C0_ELEMENT) | C0_ELEMENT | C0_ELEMENT * Int<16>{} | Int<1>{} | C0_ELEMENT * ceil_align(row, Int<16>{}) |
-| ZNLayoutPtnZn | T | C0_ELEMENT | ceil_div(row, C0_ELEMENT) | Int<16>{} | ceil_div(column, Int<16>{}) | Int<1>{} | C0_ELEMENT * ceil_align(column, Int<16>{}) | C0_ELEMENT | C0_ELEMENT * Int<16>{} |
-| DNExtLayoutPtn | T | Int<1>{} | row | Int<1>{} | column | Int<0>{} | Int<1>{} | Int<0>{} | row |
-| NDExtLayoutPtn | T | Int<1>{} | row | Int<1>{} | column | Int<0>{} | column | Int<0>{} | Int<1>{} |
-| DNExtLayoutPtn | T || row || column || Int<1>{} || row |
-| NDLayoutPtn | T || row || column || column || Int<1>{} |
-| ZZLayoutPtn | T | Int<16>{} | ceil_div(row, Int<16>{}) | C0_ELEMENT | ceil_div(column, C0_ELEMENT) | C0_ELEMENT | Int<16>{} * ceil_align(column, C0_ELEMENT) | Int<1>{} | C0_ELEMENT * Int<16>{} |
-| ZZLayoutPtn | fp8_e8m0_t | Int<16>{} | ceil_div(row, Int<16>{}) | Int<2>{} | column / Int<2>{} | Int<2>{} | column * Int<16>{} | Int<1>{} | Int<32>{} |
-| NNLayoutPtn | fp8_e8m0_t | Int<2>{} | row / Int<2>{} | Int<16>{} | ceil_div(column, Int<16>{}) | Int<1>{} | Int<32>{} | Int<2>{} | row * Int<16>{} |
-| ScaleANDLayoutPtn | fp8_e8m0_t | Int<1>{} | row | Int<1>{} | column | Int<0>{} | column | Int<0>{} | Int<1>{} |
-| ScaleADNLayoutPtn | fp8_e8m0_t | Int<1>{} | row | Int<2>{} | column / Int<2>{} | Int<0>{} | Int<2>{} | Int<1>{} | Int<2>{} * row |
-| ScaleBNDLayoutPtn | fp8_e8m0_t | Int<2>{} | row / Int<2>{} | Int<1>{} | column | Int<1>{} | Int<2>{} * column | Int<0>{} | Int<2>{} |
-| ScaleBDNLayoutPtn | fp8_e8m0_t | Int<1>{} | row | Int<1>{} | column | Int<0>{} | Int<1>{} | Int<0>{} | row |
+| NZLayoutPtn | T | Int<16>{} | ceil_div(row, Int<16>{}) | C0_ELEMENT | ceil_div(column, C0_ELEMENT) | C0_ELEMENT | C0_ELEMENT * Int<16>{} | _1 | C0_ELEMENT * ceil_align(row, Int<16>{}) |
+| ZNLayoutPtnZn | T | C0_ELEMENT | ceil_div(row, C0_ELEMENT) | Int<16>{} | ceil_div(column, Int<16>{}) | _1 | C0_ELEMENT * ceil_align(column, Int<16>{}) | C0_ELEMENT | C0_ELEMENT * Int<16>{} |
+| DNExtLayoutPtn | T | _1 | row | _1 | column | Int<0>{} | _1 | Int<0>{} | row |
+| NDExtLayoutPtn | T | _1 | row | _1 | column | Int<0>{} | column | Int<0>{} | _1 |
+| DNExtLayoutPtn | T | row | - | column | - | _1 | - | row | - |
+| NDLayoutPtn | T | row | - | column | - | column | - | _1 | - |
+| ZZLayoutPtn | T | Int<16>{} | ceil_div(row, Int<16>{}) | C0_ELEMENT | ceil_div(column, C0_ELEMENT) | C0_ELEMENT | Int<16>{} * ceil_align(column, C0_ELEMENT) | _1 | C0_ELEMENT * Int<16>{} |
+| ZZLayoutPtn | fp8_e8m0_t | Int<16>{} | ceil_div(row, Int<16>{}) | Int<2>{} | column / Int<2>{} | Int<2>{} | column * Int<16>{} | _1 | Int<32>{} |
+| NNLayoutPtn | fp8_e8m0_t | Int<2>{} | row / Int<2>{} | Int<16>{} | ceil_div(column, Int<16>{}) | _1 | Int<32>{} | Int<2>{} | row * Int<16>{} |
+| ScaleANDLayoutPtn | fp8_e8m0_t | _1 | row | _1 | column | Int<0>{} | column | Int<0>{} | _1 |
+| ScaleADNLayoutPtn | fp8_e8m0_t | _1 | row | Int<2>{} | column / Int<2>{} | Int<0>{} | Int<2>{} | _1 | Int<2>{} * row |
+| ScaleBNDLayoutPtn | fp8_e8m0_t | Int<2>{} | row / Int<2>{} | _1 | column | _1 | Int<2>{} * column | Int<0>{} | Int<2>{} |
+| ScaleBDNLayoutPtn | fp8_e8m0_t | _1 | row | _1 | column | Int<0>{} | _1 | Int<0>{} | row |
