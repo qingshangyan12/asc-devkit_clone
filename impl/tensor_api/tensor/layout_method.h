@@ -28,10 +28,6 @@ namespace AscendC {
 namespace Te {
 
 template <typename... Ts>
-struct HasZeroIntegralConstant : Std::bool_constant<
-    (... || Std::is_same_v<Std::remove_cvref_t<Ts>, Std::Int<0>>)> {};
-
-template <typename... Ts>
 __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... ts)
 {
     static_assert(sizeof...(Ts) > 0, "MakeShape requires at least one argument.");
