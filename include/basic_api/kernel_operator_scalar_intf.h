@@ -41,10 +41,8 @@ __aicore__ inline int64_t CountLeadingZero(uint64_t valueIn);
 // ScalarCountLeadingZero has been updated, please use CountLeadingZero instead.
 __aicore__ inline int64_t ScalarCountLeadingZero(uint64_t valueIn);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T>
 __aicore__ inline void GetUintDivMagicAndShift(T& magic, T& shift, T divisor);
-#endif
 
 __aicore__ inline int64_t CountBitsCntSameAsSignBit(int64_t valueIn);
 
@@ -80,19 +78,16 @@ __aicore__ constexpr inline U Cast(T bVal);
 #else
 __aicore__ inline float Cast(const bfloat16_t& bVal);
 #endif
-
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
-template <typename T>
-__aicore__ constexpr inline float Cast(const T& bVal);
 #endif
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+template <typename T>
+__aicore__ constexpr inline float Cast(const T& bVal);
+
 template <typename T>
 __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value);
 
 template <typename T>
 __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr);
-#endif
 } // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_scalar_intf_impl.h"
