@@ -14,10 +14,10 @@
 ## 目录结构介绍
 
 ```
-├── leaky_relu_onnx_invocation
-│   ├── CMakeLists.txt
-│   ├── leaky_relu.py
-│   └── main.cpp
+├── onnx_plugin
+│   ├── CMakeLists.txt           // 编译工程文件
+│   ├── leaky_relu.py            // 生成LeakyRelu ONNX模型的脚本
+│   └── main.cpp                 // 算子调用主程序（加载om模型执行LeakyRelu推理）
 ```
 
 ## 样例实现
@@ -34,7 +34,7 @@
   在本样例根目录下执行如下步骤，编译并执行样例。
   - 编译、打包和部署自定义样例工程
 
-    运行此样例前，需先进入[自定义样例工程样例](../../00_compilation/custom_op/)目录完成编译、打包和部署。
+    运行此样例前，需先进入[自定义样例工程样例](../../../00_compilation/custom_op/)目录完成编译、打包和部署。
 
 - 安装onnx
 
