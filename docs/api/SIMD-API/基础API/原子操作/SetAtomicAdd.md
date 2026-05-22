@@ -12,7 +12,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为： "basic_api/kernel_operator_set_atomic_intf.h"。
+头文件路径为："basic_api/kernel_operator_set_atomic_intf.h"。
 
 SetAtomicAdd是原子操作接口，功能是：对后续目的地址为GM的数据搬运开启原子累加。原子累加过程：将待拷贝的内容和GM已有内容进行求和，将求和结果写入GM。SetAtomicAdd接口可通过模板参数设定不同的累加数据类型。
 
@@ -99,7 +99,7 @@ PIPE_S
 
 <cann-filter npu-type="310b">
 
-- Atlas 200I/500 A2 推理产品，支持的数据通路为UB/L0C Buffer/L1 Buffer-\>GM。
+- Atlas 200I/500 A2 推理产品，支持的数据通路为UB/L0C/L1 Buffer-\>GM。
  
 </cann-filter>
 

@@ -46,8 +46,6 @@ PIPE_S
 
 ## 调用示例<a name="section177231425115410"></a>
 
-DisableDmaAtomic的调用示例如下：
-
 ```cpp
 AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
 AscendC::LocalTensor<T> srcLocal = ubAllocator.Alloc<T, SIZE>();
