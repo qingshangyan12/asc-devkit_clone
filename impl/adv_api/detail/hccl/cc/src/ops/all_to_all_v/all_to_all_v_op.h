@@ -42,7 +42,7 @@ HcclResult HcclAlltoAllVCGraphMode(const void *sendBuf, const void *sendCountMat
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 constexpr u64 SEND_COUNT_IDX = 0;
 constexpr u64 RECV_COUNT_IDX = 1;
 constexpr u64 SEND_DISPL_IDX = 2;

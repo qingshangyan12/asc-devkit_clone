@@ -13,7 +13,7 @@
 #include "hccl.h"
 #include "hccl/base.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 HcclResult LoadAICPUKernel(void);
 extern aclrtBinHandle g_binKernelHandle;

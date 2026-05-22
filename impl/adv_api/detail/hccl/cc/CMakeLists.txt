@@ -118,6 +118,3 @@ else()
     endif()
 endif()
 
-if(TARGET mc2_client)
-    target_compile_definitions(mc2_client PRIVATE ops_hccl=mc2_ops_hccl)
-endif()

@@ -12,7 +12,7 @@
 
 #include "alg_param.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 HcclResult RestoreVarDataBatchSendRecv(OpParam &param);
 
@@ -22,5 +22,5 @@ HcclResult RestoreVarDataReduceScatterV(OpParam &param, const AlgResourceCtxSeri
 
 HcclResult RestoreVarDataAllGatherV(OpParam &param, const AlgResourceCtxSerializable &resCtx);
 
-}  // namespace ops_hccl
+}  // namespace mc2_ops_hccl
 #endif

@@ -13,7 +13,7 @@
 #include <string>
 #include <map>
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 // HCCL通信算法类型
 enum class HcclAlgoType {

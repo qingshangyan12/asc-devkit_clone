@@ -12,7 +12,7 @@
 
 #include <cstdint>
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 int32_t HcclLaunchDPUKernel(uint64_t ptr, int32_t size);
 }
 

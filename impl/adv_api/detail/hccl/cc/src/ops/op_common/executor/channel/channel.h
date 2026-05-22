@@ -13,7 +13,7 @@
 #include "hccl/base.h"
 #include "alg_param.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 enum CommPlane {
     COMM_LEVEL0 = 0,

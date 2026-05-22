@@ -14,7 +14,7 @@
 #include <vector>
 #include "hccl/base.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 constexpr u32 HCCL_RANK_SIZE_EQ_ONE = 1;
 
