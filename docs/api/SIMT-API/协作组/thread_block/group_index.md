@@ -1,8 +1,20 @@
 # group_index
 
+## 产品支持情况
+
+| 产品 | 是否支持 |
+| --- | --- |
+| Ascend 950PR/Ascend 950DT | √ |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
+| Atlas 200I/500 A2 推理产品 | x |
+| Atlas 推理系列产品AI Core | x |
+| Atlas 推理系列产品Vector Core | x |
+| Atlas 训练系列产品 | x |
+
 ## 函数功能
 
-获取当前线程块在网格（grid）中的三维索引，返回值与内置变量`blockIdx`相同。
+获取当前线程所属的线程块在网格（grid）中的三维索引，返回值与内置变量`blockIdx`相同。
 
 ## 函数原型
 
@@ -16,7 +28,7 @@ static dim3 group_index()
 
 ## 返回值说明
 
-当前线程块在网格中的三维索引。
+当前线程所属的线程块在网格中的三维索引。
 
 ## 约束说明
 
