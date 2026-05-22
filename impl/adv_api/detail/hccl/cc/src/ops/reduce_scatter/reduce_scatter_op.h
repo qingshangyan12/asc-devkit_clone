@@ -34,7 +34,7 @@ HcclResult HcclReduceScatterGraphMode(void *sendBuf, void *recvBuf, uint64_t rec
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 HcclResult ReduceScatterOutPlace(OpParam &param, void *sendBuf, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
     HcclReduceOp op, HcclComm comm, aclrtStream stream, u32 userRankSize);
 

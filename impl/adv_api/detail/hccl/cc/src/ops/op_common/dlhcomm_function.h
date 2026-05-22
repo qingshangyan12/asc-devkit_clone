@@ -18,7 +18,7 @@
 #include "hccl_res.h"
 #include <atomic>
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 class DlHcommFunction {
 public:
     ~DlHcommFunction();
@@ -34,5 +34,5 @@ private:
     DlHcommFunction &operator=(const DlHcommFunction&) = delete;
     HcclResult DlHcommFunctionInterInit();
 };
-}  // namespace ops_hccl
+}  // namespace mc2_ops_hccl
 #endif

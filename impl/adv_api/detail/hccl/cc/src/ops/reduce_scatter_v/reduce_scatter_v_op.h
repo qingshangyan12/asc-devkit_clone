@@ -33,7 +33,7 @@ HcclResult HcclReduceScatterVGraphMode(void *sendBuf,  const void *sendCounts, c
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 HcclResult ReduceScatterVOutPlace(void *sendBuf, const void *sendDispls, const void *sendCounts, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
     HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string &tag);
 

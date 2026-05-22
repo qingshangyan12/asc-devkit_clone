@@ -28,7 +28,7 @@ extern "C" {
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 HcclResult HcclExecOp(HcclComm comm, OpParam &param, std::unique_ptr<TopoInfoWithNetLayerDetails> &topoInfo, std::string &algName, const ResPackGraphMode &resPack = ResPackGraphMode());
 
@@ -139,6 +139,6 @@ HcclResult HcclGetRemoteBuff(HcclComm comm, ChannelHandle channel, const char *m
 
 HcclResult LogHcclExit(const std::string &opName, const char *tag, HcclUs startut);
 
-}  // namespace ops_hccl
+}  // namespace mc2_ops_hccl
 
 #endif

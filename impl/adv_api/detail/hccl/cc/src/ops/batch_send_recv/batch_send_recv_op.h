@@ -30,7 +30,7 @@ HcclResult HcclBatchSendRecv(HcclSendRecvItem *sendRecvInfo, uint32_t itemNum,
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 HcclResult BatchSendRecvOutPlace(HcclSendRecvItem *sendRecvInfo, uint32_t itemNum,
     HcclComm comm, aclrtStream stream, const std::string &tag);
 

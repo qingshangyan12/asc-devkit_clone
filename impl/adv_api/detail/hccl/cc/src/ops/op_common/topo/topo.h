@@ -17,7 +17,7 @@
 #include "hccl_rank_graph.h"
 #include "hccl_res.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 HcclResult CalcGeneralTopoInfoForA2(const HcclComm comm, const TopoInfo* topoInfo, AlgHierarchyInfo& algHierarchyInfo);
 HcclResult CalcGeneralTopoInfoForA3(const HcclComm comm, const TopoInfo* topoInfo, AlgHierarchyInfo& algHierarchyInfo);

@@ -31,7 +31,7 @@ HcclResult HcclBroadcastGraphMode(void *buf, uint64_t count, HcclDataType dataTy
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 HcclResult BroadcastOutPlace(void *buf, uint64_t count, HcclDataType dataType, uint32_t root, HcclComm comm, aclrtStream stream, const std::string &tag);
 HcclResult BroadcastOutPlaceGraphMode(void *buf, uint64_t count, HcclDataType dataType, uint32_t root, HcclComm comm, aclrtStream stream, const std::string &tag,
                              const ResPackGraphMode &resPack);

@@ -14,7 +14,7 @@
 #include <hccl/hccl_res.h>
 #include "hccl/base.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 HcclResult HcomCheckGroupName(const char *group);
 
 HcclResult HcomCheckOpParam(const char *tag, const u64 count, const HcclDataType dataType, const char *group,

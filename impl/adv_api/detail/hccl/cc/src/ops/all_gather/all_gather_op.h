@@ -29,7 +29,7 @@ HcclResult HcclAllGatherGraphMode(void *sendBuf, void *recvBuf, uint64_t sendCou
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 HcclResult AllGatherOutPlace(void *sendBuf, void *recvBuf, uint64_t sendCount, HcclDataType dataType, HcclComm comm,
                              aclrtStream stream, const std::string &tag);
 HcclResult AllGatherOutPlaceGraphMode(void *sendBuf, void *recvBuf, uint64_t sendCount, HcclDataType dataType, HcclComm comm,

@@ -17,7 +17,7 @@
 #include "hccl_rank_graph.h"
 #include "hccl_res.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 constexpr u32 BIG_CLOS_RANGE = 8;
 constexpr s32 DEVICE_PER_MODULE_A2 = 8;

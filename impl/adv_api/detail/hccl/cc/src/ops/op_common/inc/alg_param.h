@@ -26,7 +26,7 @@
 #include "../../../common/binary_stream.h"
 #include "hccl_ccu_res.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 constexpr uint64_t UB_MAX_DATA_SIZE = 256*1024*1024; // Byte, UB协议一次传输的最大size
 
