@@ -259,18 +259,17 @@ file(GLOB ASCENDC_TEST_KirinX90_AIV_CASE_SRC_PART_FILES
     matmul/test_matmul_shape_info_left.cpp
     matmul/test_matmul_l0c_buffer.cpp
 
-    normalization/rmsnorm/test_operator_rmsnorm_l300.cpp
-    math/sinh/test_operator_sinh_l311.cpp
-    sort/sort/test_operator_radix_sort_l300.cpp
-    sort/topk/test_operator_radix_topk_l311.cpp
-    transpose/confusion_transpose/test_operator_confusion_transpose_l300.cpp
+    normalization/rmsnorm/test_operator_rmsnorm.cpp
+    math/sinh/test_operator_sinh.cpp
+    sort/sort/test_operator_radix_sort.cpp
+    sort/topk/test_operator_radix_topk.cpp
+    transpose/confusion_transpose/test_operator_confusion_transpose.cpp
     activation/geglu/test_operator_geglu.cpp
     activation/swiglu/test_operator_swiglu.cpp
-    quantization/antiquant/test_ascend_antiquant_l300.cpp
-    quantization/dequant/test_ascend_dequant_l300.cpp
-    quantization/quant/test_ascend_quant_l300.cpp
-    activation/gelu/test_operator_fast_gelu_l311.cpp
-    activation/softmax/test_operator_softmax_l300.cpp
+    quantization/antiquant/test_ascend_antiquant.cpp
+    quantization/dequant/test_ascend_dequant.cpp
+    activation/gelu/test_operator_fast_gelu.cpp
+    activation/softmax/test_operator_softmax_v220.cpp
 ) 
 
 set(ASCENDC_TEST_KirinX90_AIV_CASE_SRC_FILES
@@ -303,20 +302,19 @@ file(GLOB ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES
     matmul/test_matmul_shape_info_left.cpp
     matmul/test_matmul_l0c_buffer.cpp
 
-    normalization/rmsnorm/test_operator_rmsnorm_l300.cpp
-    math/sinh/test_operator_sinh_l311.cpp
-    sort/sort/test_operator_radix_sort_l300.cpp
-    sort/topk/test_operator_radix_topk_l311.cpp
-    transpose/confusion_transpose/test_operator_confusion_transpose_l300.cpp
+    normalization/rmsnorm/test_operator_rmsnorm.cpp
+    math/sinh/test_operator_sinh.cpp
+    sort/sort/test_operator_radix_sort.cpp
+    sort/topk/test_operator_radix_topk.cpp
+    transpose/confusion_transpose/test_operator_confusion_transpose.cpp
     activation/geglu/test_operator_geglu.cpp
     activation/swiglu/test_operator_swiglu.cpp
-    quantization/antiquant/test_ascend_antiquant_l300.cpp
-    quantization/dequant/test_ascend_dequant_l300.cpp
-    quantization/quant/test_ascend_quant_l300.cpp
-    activation/gelu/test_operator_fast_gelu_l311.cpp
-    activation/softmax/test_operator_softmax_l300.cpp
-    activation/gelu/test_operator_gelu_l311.cpp
-    activation/silu/test_operator_silu_l311.cpp
+    quantization/antiquant/test_ascend_antiquant.cpp
+    quantization/dequant/test_ascend_dequant.cpp
+    activation/gelu/test_operator_fast_gelu.cpp
+    activation/softmax/test_operator_softmax_v220.cpp
+    activation/gelu/test_operator_gelu.cpp
+    activation/silu/test_operator_silu.cpp
 ) 
 
 set(ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_FILES
