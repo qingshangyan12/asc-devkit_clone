@@ -491,7 +491,7 @@ HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpPara
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
     bool isResourceReused = false;
     if (opParam.engine == COMM_ENGINE_CCU) {
-        std::unique_ptr<CcuKfcKernelStruct> kfcServerArgs = std::make_unique<CcuKfcKernelStruct>();
+        std::shared_ptr<CcuKfcKernelStruct> kfcServerArgs = std::make_shared<CcuKfcKernelStruct>();
         kfcServerArgs->waitAddr = opResCtx.ckeAddr;
         kfcServerArgs->recordAddr = opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
         kfcServerArgs->paramAddr = opResCtx.xnAddr;
