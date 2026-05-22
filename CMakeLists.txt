@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 3.16.0)
 include(cmake/fetch_cann_cmake.cmake)
 project(asc-devkit)
 
-init_cann_project()
+init_cann_project(PREPEND_MODULE_PATH)
 option(BUILD_OPEN_PROJECT "Build open asc-devkit lib project" ON)
 
 set(CMAKE_C_FLAGS_RELEASE "")
@@ -34,19 +34,15 @@ if(BUILD_OPEN_PROJECT)
   include(cmake/config.cmake)
   include(cmake/func.cmake)
   set(INSTALL_LIBRARY_DIR ${CMAKE_SYSTEM_PROCESSOR}-linux)
-endif()
-
-add_subdirectory(impl)
-
-if(BUILD_OPEN_PROJECT)
   include(cmake/intf_pub_linux.cmake)
   include(cmake/dependencies.cmake)
 endif()
 
+add_subdirectory(impl)
 add_subdirectory(tools)
 add_subdirectory(cmake)
 
-# set(ASCEND_INSTALL_PATH "${ASCEND_CANN_PACKAGE_PATH}")
+
 include(version.cmake)
 if(BUILD_OPEN_PROJECT)
     check_cann_pkg_build_deps("asc-devkit")

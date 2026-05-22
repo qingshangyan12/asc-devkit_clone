@@ -23,6 +23,7 @@
 #include "kernel_macros.h"
 #include "kernel_tensor.h"
 #include "kernel_struct_mm.h"
+#include "kernel_base_types.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -41,12 +42,13 @@ namespace AscendC {
  * @brief：In SuperKernel fusion mode, set wait flag between two operators
  */
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 1001) && (__NPU_ARCH__ != 2002)
-template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX>
+template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
 #else
-template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3>
+template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3, bool FORCE = false>
 #endif
 __aicore__ inline void SetNextTaskStart();
 
+template<bool FORCE = false>
 __aicore__ inline void WaitPreTaskEnd();
 
 __aicore__ inline void InitSocState();
@@ -79,6 +81,15 @@ template <int8_t startBit, int8_t endBit>
 __aicore__ static inline void ResetCtrlSpr();
 #endif
 #endif
+
+#if (__NPU_ARCH__ == 2201)
+template <SaturationMode mode>
+__aicore__ inline void SetSaturationFlag(bool enableSat);
+
+template <SaturationMode mode>
+__aicore__ inline bool GetSaturationFlag();
+#endif
+
 }  // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_common_intf_impl.h"

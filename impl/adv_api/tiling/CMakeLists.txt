@@ -18,11 +18,6 @@ target_include_directories(
     $<BUILD_INTERFACE:${ASCENDC_DIR}>
     $<BUILD_INTERFACE:${ASCENDC_DIR}/include>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/adv_api>>
-    $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}>>
-    $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include>>
-    $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include/base>>
-    $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/pkg_inc>>
-    $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base>>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/basic_api>>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/../../asc/asc-devkit>>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/../../asc/asc-devkit/include>>
@@ -35,40 +30,10 @@ target_include_directories(
     $<INSTALL_INTERFACE:include/ascendc/include/highlevel_api/tiling>)
 
 target_link_libraries(tiling_api_headers
-                      INTERFACE $<BUILD_INTERFACE:tikcfw_headers>)
-
-if(PRODUCT_SIDE STREQUAL "device" AND BUILD_OPEN_PROJECT)
-  find_library(METADEF_TILINGDATA_BASE_STATIC_LIB_DIR
-    NAME libtilingdata_base.a
-    PATHS ${ASCEND_CANN_PACKAGE_PATH}
-    PATH_SUFFIXES lib64/device/lib64
-    NO_CMAKE_SYSTEM_PATH
-    NO_CMAKE_FIND_ROOT_PATH
-  )
-  if(METADEF_TILINGDATA_BASE_STATIC_LIB_DIR)
-    get_filename_component(METADEF_TILINGDATA_BASE_STATIC_LIB_DIR ${METADEF_TILINGDATA_BASE_STATIC_LIB_DIR} REALPATH)
-    message(STATUS "Found tilingdata_base library:${METADEF_TILINGDATA_BASE_STATIC_LIB_DIR}")
-  else()
-    message(FATAL_ERROR "Cannot find library tilingdata_base")
-  endif()
-
-  execute_process(COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs)
-  execute_process(COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs/*)
-  execute_process(COMMAND ${CMAKE_AR} -x ${METADEF_TILINGDATA_BASE_STATIC_LIB_DIR} --output=${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs
-    RESULT_VARIABLE ar_result)
-
-  if(ar_result EQUAL 0)
-    file(GLOB METADEF_TILINGDATA_BASE_OBJ_FILES
-      ${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs/*.o
-    )
-    add_library(metadef_tilingdata_base_obj_lib OBJECT IMPORTED)
-    set_target_properties(metadef_tilingdata_base_obj_lib PROPERTIES
-      IMPORTED_OBJECTS "${METADEF_TILINGDATA_BASE_OBJ_FILES}"
-    )
-  else()
-    message(FATAL_ERROR "ar -x libtilingdata_base.a failed")
-  endif()
-endif()
+                      INTERFACE 
+                      $<BUILD_INTERFACE:metadef_headers>
+                      $<BUILD_INTERFACE:unified_dlog>
+                      $<BUILD_INTERFACE:tikcfw_headers>)
 
 add_library(
   tiling_api STATIC
@@ -177,7 +142,7 @@ add_library(
   $<$<STREQUAL:${PRODUCT_SIDE},host>:${ASCENDC_DIR}/impl/utils/context/context_builder.cpp>
   $<$<STREQUAL:${PRODUCT_SIDE},host>:${ASCENDC_DIR}/impl/utils/context/context_builder_impl.cpp>
   $<$<STREQUAL:${PRODUCT_SIDE},device>:${ASCENDC_DIR}/impl/utils/stub/shape.cpp>
-  $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<BOOL:${BUILD_OPEN_PROJECT}>>:$<TARGET_OBJECTS:metadef_tilingdata_base_obj_lib>>
+  $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<BOOL:${BUILD_OPEN_PROJECT}>>:$<TARGET_OBJECTS:tilingdata_base_objs>>
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:${TOP_DIR}/metadef/base/asc/tilingdata_base_impl.cc>
   )
 
@@ -250,5 +215,5 @@ if(NOT "${PRODUCT_SIDE}" STREQUAL "device")
                 ARCHIVE DESTINATION ${ASCENDC_API_ADV_MULT_INSTALL_DIR} ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
         configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/tiling_headers.cmake
                        ${CMAKE_CURRENT_BINARY_DIR}/tiling_headers.cmake @ONLY)
-        install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/tiling_headers.cmake)
+        install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/tiling_headers.cmake COMPONENT asc-devkit)
 endif()
