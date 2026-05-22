@@ -16,13 +16,13 @@
 ```
 ├── matmul_mxfp4_high_performance
 │   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│   │   └── verify_result.py    // 真值对比文件
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   ├── figures                 // 图示
-│   ├── matmul_mx.asc           // Ascend C样例实现（包含2个优化case）
-│   └── matmul_mx.h             // 样例头文件（静态Tiling模板与kernel实现）
+│   │   ├── gen_data.py      // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py // 真值对比文件
+│   ├── CMakeLists.txt       // 编译工程文件
+│   ├── data_utils.h         // 数据读入写出函数
+│   ├── figures              // 图示
+│   ├── matmul_mx.asc        // Ascend C样例实现（包含2个优化case）
+│   └── matmul_mx.h          // 样例头文件（静态Tiling模板与kernel实现）
 ```
 
 ## 样例描述
@@ -276,7 +276,7 @@ PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host
 └── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
+└── mindstudio_profiler_output // 保存Host和各个Device的性能数据汇总
     ├── msprof_*.json
     ├── xx_*.csv
     └── README.txt
