@@ -39,7 +39,8 @@ if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
         file(COPY ${MOCKCPP_LOCAL_SRC}/ DESTINATION "${MOCKCPP_SRC_PATH}/")
         include(ExternalProject)
         ExternalProject_Add(mockcpp	 
-            SOURCE_DIR ${MOCKCPP_SRC_PATH}	 
+            SOURCE_DIR ${MOCKCPP_SRC_PATH}
+            DEPENDS third_party_boost
             CONFIGURE_COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} ${MOCKCPP_OPTS} <SOURCE_DIR>	 
             BUILD_COMMAND make install -j 16	 
         )
@@ -102,6 +103,7 @@ if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
             # 如果是本地 tar.gz 包解压的，不需要任何下载相关的参数
             ExternalProject_Add(mockcpp
                 SOURCE_DIR ${MOCKCPP_SRC_PATH}  # 直接使用已解压的源码目录
+                DEPENDS third_party_boost
                 TLS_VERIFY OFF
                 PATCH_COMMAND git init && git apply ${PATCH_FILE} && sed -i
                 "1icmake_minimum_required(VERSION 3.16.0)" CMakeLists.txt && rm -rf .git
@@ -112,6 +114,7 @@ if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
             ExternalProject_Add(mockcpp
                 URL ${REQ_URL}
                 URL_HASH SHA256=73ab0a8b6d1052361c2cebd85e022c0396f928d2e077bf132790ae3be766f603
+                DEPENDS third_party_boost
                 DOWNLOAD_DIR ${MOCKCPP_DOWNLOAD_PATH}
                 SOURCE_DIR ${MOCKCPP_SRC_PATH}
                 TLS_VERIFY OFF
@@ -125,6 +128,11 @@ if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
 endif()
 
 set(MOCKCPP_DIR ${CMAKE_INSTALL_PREFIX}/mockcpp)
+
+# use for fix the bug of not exists the include directory
+if(NOT EXISTS ${MOCKCPP_DIR}/include)
+    file(MAKE_DIRECTORY ${MOCKCPP_DIR}/include)
+endif()
 
 set(MOCKCPP_INCLUDE_ONE ${MOCKCPP_DIR}/include)
 
