@@ -8,6 +8,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 add_subdirectory(aicpu)
+add_subdirectory(aiv)
 add_subdirectory(registry)
 add_subdirectory(wrapper)
 add_subdirectory(dpu)
