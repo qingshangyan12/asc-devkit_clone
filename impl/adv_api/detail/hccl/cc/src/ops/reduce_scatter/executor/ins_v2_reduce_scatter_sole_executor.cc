@@ -9,7 +9,6 @@
 */
 #include "ins_v2_reduce_scatter_sole_executor.h"
 #include "ins_temp_reduce_scatter_mesh_1D.h"
-#include "aiv_temp_reduce_scatter_mesh_1D.h"
 #include "ins_temp_reduce_scatter_nhr.h"
 #include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
 #include "ins_temp_reduce_scatter_aicpu_reduce_nhr.h"
@@ -260,9 +259,6 @@ REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterAicpuRedu
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1DZAxisDetour, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     InsTempReduceScatterMesh1DZAxisDetour);
 #ifndef AICPU_COMPILE
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AivReduceScatterMesh1D, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
-    AivTempReduceScatterMesh1D);
-
 #if !defined(HCCL_CANN_COMPAT_850)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterMesh1DMem2Mem, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     CcuTempReduceScatterMesh1DMem2Mem);
