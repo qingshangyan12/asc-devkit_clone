@@ -9,8 +9,8 @@
 # ----------------------------------------------------------------------------------------------------------
 
 if(NOT PROJECT_SOURCE_DIR)
-    if(CANN_3RD_LIB_PATH AND IS_DIRECTORY "${CANN_3RD_LIB_PATH}/cann-cmake")
-        include("${CANN_3RD_LIB_PATH}/cann-cmake/function/prepare.cmake")
+    if(CANN_3RD_LIB_PATH AND IS_DIRECTORY "${CANN_3RD_LIB_PATH}/cmake")
+        include("${CANN_3RD_LIB_PATH}/cmake/function/prepare.cmake")
     else()
         include(FetchContent)
 
