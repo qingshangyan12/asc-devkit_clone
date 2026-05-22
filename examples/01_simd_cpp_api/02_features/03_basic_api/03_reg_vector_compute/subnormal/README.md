@@ -12,11 +12,11 @@
 
 ```
 subnormal
-│   ├── scripts/             // 测试脚本目录
-│   │   └── gen_data.py      // 生成测试输入和golden数据
-│   ├── CMakeLists.txt       // 编译工程文件
-│   ├── data_utils.h         // 数据读写工具函数
-│   └── subnormal.asc        // Ascend C算子实现 & 调用样例
+│   ├── scripts/       // 测试脚本目录
+│   │   └── gen_data.py // 生成测试输入和golden数据
+│   ├── CMakeLists.txt // 编译工程文件
+│   ├── data_utils.h   // 数据读写工具函数
+│   └── subnormal.asc  // Ascend C算子实现 & 调用样例
 ```
 
 ## 样例描述

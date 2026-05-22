@@ -24,15 +24,13 @@
 ```
 ├── move_reg
 │   ├── scripts
-│   │   └── gen_data.py                // 输入数据和真值数据生成脚本
-│   ├── figures
-│   │   └── move_reg_1.png             // 样例原理图1
-│   │   └── move_reg_2.png             // 样例原理图2
-│   ├── CMakeLists.txt                 // 编译工程文件
-│   ├── data_utils.h                   // 数据读入写出函数
-│   ├── README.md                      // 样例介绍
-│   ├── move_reg_scenario_1.asc        // 场景1：下采样场景的AscendC实现
-│   └── move_reg_scenario_2.asc        // 场景2：复合计算场景的AscendC实现
+│   │   └── gen_data.py // 输入数据和真值数据生成脚本
+│   ├── figures                 // 图示
+│   ├── CMakeLists.txt          // 编译工程文件
+│   ├── data_utils.h            // 数据读入写出函数
+│   ├── README.md               // 样例介绍
+│   ├── move_reg_scenario_1.asc // 场景1：下采样场景的AscendC实现
+│   └── move_reg_scenario_2.asc // 场景2：复合计算场景的AscendC实现
 ```
 
 ## 样例描述

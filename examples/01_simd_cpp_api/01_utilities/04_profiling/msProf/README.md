@@ -14,12 +14,12 @@
 
 ```
 ├── msProf
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   ├── matmul_leakyrelu.asc    // Ascend C算子实现 & 调用样例
+│   ├── CMakeLists.txt       // 编译工程文件
+│   ├── data_utils.h         // 数据读入写出函数
+│   ├── matmul_leakyrelu.asc // Ascend C算子实现 & 调用样例
 │   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
+│       ├── gen_data.py      // 输入数据和真值数据生成脚本文件
+│       └── verify_result.py // 真值对比文件
 ```
 
 ## 算子描述
@@ -41,16 +41,16 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
       命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
 
       ```bash
-      ├──dump                       # 原始的性能数据，用户无需关注
-      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
-      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
-      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
-      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
-      ├──OpBasicInfo.csv            # 算子基础信息
-      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
-      ├──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
-      └──visualize_data.bin         # MindStudio Insight呈现文件
+      ├──dump  // 原始的性能数据，用户无需关注
+      ├──ArithmeticUtilization.csv  // cube/vector指令cycle占比
+      ├──L2Cache.csv  // L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──Memory.csv  // UB，L1和主存储器读写带宽速率
+      ├──MemoryL0.csv  // L0A，L0B，和L0C读写带宽速率
+      ├──MemoryUB.csv  // Vector和Scalar到UB的读写带宽速率
+      ├──OpBasicInfo.csv  // 算子基础信息
+      ├──PipeUtilization.csv  // 采集计算单元和搬运单元耗时和占比
+      ├──ResourceConflictRatio.csv  // UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
+      └──visualize_data.bin  // MindStudio Insight呈现文件
       ```
 
 更多msProf工具使用方式请参考[MindStudio工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)算子调优（msProf）中的内容。

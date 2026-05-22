@@ -20,10 +20,10 @@
 ```
 ├── swish
 │   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本（支持Swish/Silu两种模式）
-│   ├── CMakeLists.txt          // 编译工程文件（支持 -DUSE_SILU_MODE）
-│   ├── data_utils.h            // 数据读入写出函数
-│   └── swish.asc               // Ascend C算子实现 & 调用样例（两种模式合并）
+│   │   ├── gen_data.py // 输入数据和真值数据生成脚本（支持Swish/Silu两种模式）
+│   ├── CMakeLists.txt // 编译工程文件（支持 -DUSE_SILU_MODE）
+│   ├── data_utils.h   // 数据读入写出函数
+│   └── swish.asc      // Ascend C算子实现 & 调用样例（两种模式合并）
 ```
 
 ## 样例描述

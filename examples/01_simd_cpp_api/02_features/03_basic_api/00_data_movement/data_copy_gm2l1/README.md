@@ -14,12 +14,12 @@
 
 ```
 ├── data_copy_gm2l1
-│   ├── figures                        // 图示
+│   ├── figures             // 图示
 │   ├── scripts
-│   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py           // 验证输出数据和真值数据是否一致的验证脚本
-│   ├── data_utils.h                   // 数据读入写出函数
-│   └── data_copy_gm2l1.asc            // Ascend C样例实现 & 调用样例
+│   │   ├── gen_data.py      // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── data_utils.h        // 数据读入写出函数
+│   └── data_copy_gm2l1.asc // Ascend C样例实现 & 调用样例
 ```
 
 ## 场景详细说明

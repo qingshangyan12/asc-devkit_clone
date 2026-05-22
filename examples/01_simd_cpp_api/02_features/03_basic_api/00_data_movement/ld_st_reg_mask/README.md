@@ -24,14 +24,13 @@
 ```
 ├── ld_st_reg_mask
 │   ├── scripts
-│   │   └── gen_data.py                // 输入数据和真值数据生成脚本
-│   ├── figures
-│   │   └── ld_st_reg_mask.png         // 样例原理图
-│   ├── CMakeLists.txt                 // 编译工程文件
-│   ├── data_utils.h                   // 数据读入写出函数
-│   ├── README.md                      // 样例介绍
-│   ├── ld_st_reg_mask_scenario_1.asc  // 场景1：基础搬运场景的AscendC实现
-│   └── ld_st_reg_mask_scenario_2.asc  // 场景2：复合计算场景的AscendC实现
+│   │   └── gen_data.py // 输入数据和真值数据生成脚本
+│   ├── figures                       // 图示
+│   ├── CMakeLists.txt                // 编译工程文件
+│   ├── data_utils.h                  // 数据读入写出函数
+│   ├── README.md                     // 样例介绍
+│   ├── ld_st_reg_mask_scenario_1.asc // 场景1：基础搬运场景的AscendC实现
+│   └── ld_st_reg_mask_scenario_2.asc // 场景2：复合计算场景的AscendC实现
 ```
 
 ## 样例描述
