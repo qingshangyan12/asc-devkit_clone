@@ -15,6 +15,7 @@
 
 ```text
 ├── 01_add
+│   ├── CMakeLists.txt      // cmake编译文件
 │   ├── add.asc             // SIMT实现add调用样例
 │   └── README.md
 ```

@@ -102,7 +102,7 @@
   |------|--------|------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
   | `GATHER_VERSION` | `v1`（默认）、`v2` | gather实现版本：v1为直接访问GM版本，v2为使用UB版本 |
-  | `RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
+  | `RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `SOC_VERSION` | 实际NPU型号 | NPU仿真库路径中的SOC版本，可通过 `npu-smi info` 命令查询 |
 
   执行结果如下，说明精度对比成功。
@@ -188,4 +188,4 @@ OPPROF_202xxxxx_XXXXXX
 可通过MindStudio Insight工具打开`visualize_data.bin`文件可视化查看性能数据。
 
 **补充说明**
-更多性能指标的详细说明及调优方案，可参考《算子开发工具》手册。
+更多性能指标的详细说明及调优方案，可参考[《算子开发工具》](https://hiascend.com/document/redirect/CannCommercialToolOpDev)手册。
