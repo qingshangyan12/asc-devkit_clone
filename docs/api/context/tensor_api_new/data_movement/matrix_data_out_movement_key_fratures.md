@@ -1,0 +1,8 @@
+# 关键特性说明
+
+- [随路量化](quant_pre.md)
+- [随路Relu](relu_pre.md)
+- [F32 Channel Split](f32_channel_split.md)
+- [Int8/Int4 Channel Merge](int8_int4_channel_merge.md)
+- [L0C到UB双目标模式](l0c_to_ub_dual_dst.md)  
+

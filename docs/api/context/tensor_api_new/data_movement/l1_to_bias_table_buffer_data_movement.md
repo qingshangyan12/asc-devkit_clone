@@ -20,21 +20,13 @@
 
 ## 函数原型
 
-- 自动根据张量位置分发。
+```cpp
+template <typename AtomType, typename DstTensor, typename SrcTensor>
+__aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
 
-    ```cpp
-    template <typename T, typename U, Std::enable_if_t<IsAttrTensorV<T> && IsAttrTensorV<U>, int>,
-        typename... Params>
-    __aicore__ inline void
-    Copy(const T& dst, const U& src, const Params& ...params)
-    ```
-
-- 显式指定 `CopyL12BT`。
-
-    ```cpp
-    template <typename T, typename... Params>
-    __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params)
-    ```
+template <typename CopyOperationType>
+__aicore__ inline constexpr auto MakeCopy()
+```
 
 ## 参数说明
 
@@ -42,8 +34,7 @@
 | :--- | :---: | :--- |
 | `dst` | 输出 | 目的张量，存储位置为 `Location::BIAS`。 |
 | `src` | 输入 | 源张量，存储位置为 `Location::L1`。 |
-| `params` | 输入 | 可变参数。当前 L1 到 BiasTable Buffer 搬运通常不需要额外运行时参数。 |
-| `atomCopy` | 输入 | 搬运原子对象，显式调用时使用 `CopyAtom<CopyTraits<CopyL12BT, CopyL12BTTraitDefault>>` 或 `MakeCopy(CopyL12BT{}, CopyL12BTTraitDefault{})`。 |
+| `atomCopy` | 输入 | 搬运原子对象，可由 `MakeCopy<CopyL12BT>()` 或 `MakeCopy<CopyL12BT, CopyL12BTTraitDefault>()` 构造。 |
 
 ## 返回值说明
 
@@ -61,10 +52,11 @@
 ```cpp
 using namespace AscendC::Te;
 
-auto l1Bias = MakeTensor(MakeMemPtr<Location::L1>(l1Addr),
+auto l1Bias = MakeTensor(MakeMemPtr<Location::L1, float>(l1Addr),
     MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(1, n));
-auto bias = MakeTensor(MakeMemPtr<Location::BIAS>(biasAddr),
+auto bias = MakeTensor(MakeMemPtr<Location::BIAS, float>(biasAddr),
     MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(1, n));
 
-Copy(bias, l1Bias);
+auto atom = MakeCopy<CopyL12BT>();
+Copy(atom, bias, l1Bias);
 ```
