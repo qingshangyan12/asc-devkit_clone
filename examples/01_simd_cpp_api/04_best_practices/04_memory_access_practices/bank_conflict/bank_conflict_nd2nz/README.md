@@ -576,7 +576,7 @@ PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host
 └── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存 Host 和各 Device 的性能数据汇总
+└── mindstudio_profiler_output // 保存 Host 和各 Device 的性能数据汇总
     ├── msprof_*.json
     ├── xx_*.csv
     └── README.txt

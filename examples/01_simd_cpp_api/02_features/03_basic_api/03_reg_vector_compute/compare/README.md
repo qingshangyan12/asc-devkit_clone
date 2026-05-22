@@ -25,12 +25,12 @@
 ```
 ├── compare
 │   ├── scripts
-│   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
-│   ├── CMakeLists.txt                 // 编译工程文件
-│   ├── data_utils.h                   // 数据读入写出函数
-│   ├── figures                        // 图示
-│   ├── compare.asc                    // AscendC样例实现 & 调用样例
-│   └── README.md                      // 样例介绍
+│   │   ├── gen_data.py // 输入数据和真值数据生成脚本
+│   ├── CMakeLists.txt  // 编译工程文件
+│   ├── data_utils.h    // 数据读入写出函数
+│   ├── figures         // 图示
+│   ├── compare.asc     // AscendC样例实现 & 调用样例
+│   └── README.md       // 样例介绍
 ```
 
 ## 样例描述
