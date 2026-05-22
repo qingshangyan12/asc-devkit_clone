@@ -94,7 +94,9 @@ public:
         return listTensorDesc.GetSize();
     }
 private:
+#ifdef __NPU_ARCH__
     ListTensorDescImpl<true> listTensorDesc;
+#endif
 };
 }
 #endif // ASCENDC_MODULE_OPERATOR_LIST_TENSOR_INTERFACE_H
