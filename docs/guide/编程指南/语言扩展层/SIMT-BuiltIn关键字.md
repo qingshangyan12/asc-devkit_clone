@@ -90,7 +90,7 @@
 
     动态内存的实际内存大小需要在核函数启动时配置，具体内容请参考[核函数配置](#section97005415463)。
 
-## 内置变量<a name="section13165113520576"></a>
+## 内置变量/函数<a name="section13165113520576"></a>
 
 -   dim3<a name="li1136665405"></a>
 
@@ -150,6 +150,53 @@
 -   warpSize
 
     运行时变量，表示一个线程束（warp）中的线程数量，当前为固定值32。
+    
+
+当前提供了以下函数，用于获取线程在其线程束（Warp）内的索引与掩码：
+
+-   laneid
+
+    -   功能说明
+
+        获取线程在其线程束内的索引。
+    
+    -   函数原型
+
+        ```
+        int32_t laneid()
+        ```
+    -   返回值说明
+
+        线程在其线程束内的索引，当前一个线程束中的线程数量为固定值32，故laneid的取值范围为[0, 31]。
+
+    -   约束说明
+
+        无
+
+    -   需要包含的头文件
+
+        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+
+        ```
+        #include "simt_api/device_functions.h"
+        ```
+
+    -   调用示例 
+
+        SIMT编程场景：
+
+        ```
+        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
+        {
+            int idx = threadIdx.x + blockIdx.x * blockDim.x;
+            int32_t lane_id = laneid();
+            if(lane_id mod 2) {
+                z[idx] = x[idx] + y[idx];
+            } else {
+                z[idx] = x[idx] - y[idx];
+            }
+        }
+        ```
 
 ## 内置数据类型<a name="section1835494915576"></a>
 
@@ -1019,6 +1066,8 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
 在执行函数之前，会先对上述配置参数进行校验。如果grid\_dim或block\_dim超出设备的最大允许规模，或dynamic\_smem\_bytes超过分配静态内存后剩余的可用共享内存，该函数将会执行失败。
 
+一个内核所使用的寄存器数量会显著影响常驻线程束的数量。寄存器使用量可以通过编译器选项 \_\_launch\_bounds\_\_\(\) 限定符或 \_\_maxnreg\_\_\(\) 限定符来控制。
+
 在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程和线程块驻留在AI处理器上，从而提升性能。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
 -   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
@@ -1065,4 +1114,50 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
         ```
         __simt_vf__ __launch_bounds__(512) inline void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+        ```
+为了支持底层性能调优，编译器提供了\_\_maxnreg\_\_\(\)函数限定符，用于向后端优化编译器传递性能调优意图。该限定符直接限定了单个线程在一个线程块内最多可分配的寄存器数量。应用程序可以通过在\_\_global\_\_函数定义中使用 \_\_maxnreg\_\_\(\) 限定符来限制单个线程在一个
+线程块内最多可分配的寄存器数量，这同时也属于可选配置。
+
+-   \_\_maxnreg\_\_\(N\) <a name="li23861114618"></a>
+
+    函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定单个线程在一个线程块内最多可分配的寄存器数量。若未配置\_\_maxnreg\_\_，最大线程数默认为32。参数N需要满足：
+    -   N的取值范围为（0, 128];
+
+        最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表。
+
+        **表 6**  \_\_maxnreg\_\_的每个Thread最多可分配的寄存器数与Thread数量
+
+        <table><thead align="left"><tr id="row8153550597"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p13153175175919"><a name="p13153175175919"></a><a name="p13153175175919"></a>单个线程最多可分配的寄存器数量(个)</p>
+        </th>
+        <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>Thread的个数(个)</p>
+        </th>
+        </tr>
+        </thead>
+        <tbody><tr id="row01531535912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p201531053591"><a name="p201531053591"></a><a name="p201531053591"></a>16</p>
+        </td>
+        <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1615335185910"><a name="p1615335185910"></a><a name="p1615335185910"></a>1025~2048</p>
+        </td>
+        </tr>
+        <tr id="row415395155912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1215375195913"><a name="p1215375195913"></a><a name="p1215375195913"></a>32</p>
+        </td>
+        <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p18153125145914"><a name="p18153125145914"></a><a name="p18153125145914"></a>513~1024</p>
+        </td>
+        </tr>
+        <tr id="row11153115165910"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14153257595"><a name="p14153257595"></a><a name="p14153257595"></a>64</p>
+        </td>
+        <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p115315510596"><a name="p115315510596"></a><a name="p115315510596"></a>257~512</p>
+        </td>
+        </tr>
+        <tr id="row515335155914"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p815315165914"><a name="p815315165914"></a><a name="p815315165914"></a>128</p>
+        </td>
+        <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p71539519590"><a name="p71539519590"></a><a name="p71539519590"></a>1~256</p>
+        </td>
+        </tr>
+        </tbody>
+        </table>
+
+        配置SIMT函数单个线程最多可分配的寄存器数量为64，示例如下：
+
+        ```
+        __simt_vf__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
         ```
