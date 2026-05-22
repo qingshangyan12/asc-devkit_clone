@@ -22,16 +22,16 @@
 
 #include "simt_api/device_types.h"
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 namespace __asc_simt_vf {
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t clock(void);
 } // namespace __asc_simt_vf
 
+#if defined(__NPU_ARCH__)
 #include "impl/utils/debug/asc_time_simt_impl.h"
 #endif
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__)
 #include "impl/utils/debug/asc_aicore_time_impl.h"
 #endif
 

@@ -49,9 +49,7 @@ namespace __asc_aicore {
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
-    #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
     printf_impl(fmt, args...);
-    #endif
 }
 } // namespace __asc_aicore
 #endif
