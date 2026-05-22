@@ -27,7 +27,9 @@ HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner *ccTiling, uint32_t tilingIn
     return HCCL_SUCCESS;
 }
 
+namespace ops_hccl {
 extern std::unique_ptr<CcuKfcKernelStruct> g_capturedKfcServerArgs;
+}
 
 namespace {
 
@@ -397,34 +399,34 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
     ASSERT_FALSE(skipGetRes);
 
     // 3. 调用GetCcuOpParamResCtx
-    g_capturedKfcServerArgs = nullptr;
+    ops_hccl::g_capturedKfcServerArgs = nullptr;
     void *resCtxOut = nullptr;
     EXPECT_EQ(GetCcuOpParamResCtx(comm_, algName, opParam, topoInfo.get(), opResCtx, &resCtxOut), HCCL_SUCCESS);
     EXPECT_NE(resCtxOut, nullptr);
     EXPECT_EQ(opParam.resCtx, resCtxOut);
 
     // 4. 验证kfcServerArgs各字段与CcuAlltoAllMesh1D预期一致
-    ASSERT_NE(g_capturedKfcServerArgs, nullptr);
+    ASSERT_NE(ops_hccl::g_capturedKfcServerArgs, nullptr);
 
     // waitAddr = ckeAddr
-    EXPECT_EQ(g_capturedKfcServerArgs->waitAddr, opResCtx.ckeAddr);
+    EXPECT_EQ(ops_hccl::g_capturedKfcServerArgs->waitAddr, opResCtx.ckeAddr);
     // recordAddr = ckeAddr + CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE
-    EXPECT_EQ(g_capturedKfcServerArgs->recordAddr,
+    EXPECT_EQ(ops_hccl::g_capturedKfcServerArgs->recordAddr,
               opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE);
     // paramAddr = xnAddr
-    EXPECT_EQ(g_capturedKfcServerArgs->paramAddr, opResCtx.xnAddr);
+    EXPECT_EQ(ops_hccl::g_capturedKfcServerArgs->paramAddr, opResCtx.xnAddr);
     // CcuAlltoAllMesh1D: 单die
-    EXPECT_EQ(g_capturedKfcServerArgs->dieNum, 1U);
+    EXPECT_EQ(ops_hccl::g_capturedKfcServerArgs->dieNum, 1U);
     // CcuAlltoAllMesh1D: 单mission
-    EXPECT_EQ(g_capturedKfcServerArgs->missonNum, 1U);
-    EXPECT_EQ(g_capturedKfcServerArgs->missonIndex, 0U);
+    EXPECT_EQ(ops_hccl::g_capturedKfcServerArgs->missonNum, 1U);
+    EXPECT_EQ(ops_hccl::g_capturedKfcServerArgs->missonIndex, 0U);
     // CcuAlltoAllMesh1D: 单mission无需mission间同步信号
-    EXPECT_TRUE(g_capturedKfcServerArgs->exportMissionSig.empty());
-    EXPECT_TRUE(g_capturedKfcServerArgs->importMissionSig.empty());
-    EXPECT_TRUE(g_capturedKfcServerArgs->exportMissionVar.empty());
-    EXPECT_TRUE(g_capturedKfcServerArgs->importMissionVar.empty());
+    EXPECT_TRUE(ops_hccl::g_capturedKfcServerArgs->exportMissionSig.empty());
+    EXPECT_TRUE(ops_hccl::g_capturedKfcServerArgs->importMissionSig.empty());
+    EXPECT_TRUE(ops_hccl::g_capturedKfcServerArgs->exportMissionVar.empty());
+    EXPECT_TRUE(ops_hccl::g_capturedKfcServerArgs->importMissionVar.empty());
 
     free(resCtxOut);
-    g_capturedKfcServerArgs = nullptr;
+    ops_hccl::g_capturedKfcServerArgs = nullptr;
 }
 }
