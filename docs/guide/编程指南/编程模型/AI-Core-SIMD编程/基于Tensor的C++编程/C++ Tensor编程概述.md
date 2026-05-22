@@ -24,7 +24,7 @@ auto ubTensor = MakeTensor(ubPointer, MakeShape(128, 64));
 Copy(ubPointer, gmPointer);
 ```
 
-### Tensor编程的优势
+### Tensor编程的特征
 - **降低开发复杂度**：隐藏内存地址细节，Tensor携带数据类型和形状信息，接口自动推断操作参数。
 - **提升代码可读性**：Tensor命名表达数据语义，接口调用直观，参数通过Tensor对象传递。
 - **扩展能力优化**：Layout编译期确定实现类型安全，Slice/Tile零开销切片，Atom设计简化参数配置。
@@ -32,7 +32,7 @@ Copy(ubPointer, gmPointer);
 ## 接口体系：基础能力与扩展能力
 Ascend C Tensor编程分为基础能力与扩展能力两个层次：
 - **基础能力接口**：提供Tensor定义、数据搬运、向量计算、矩阵乘、同步机制等核心功能。参数通过结构体传递，内存位置用Hardware枚举表达，大小运行期设置，同步显式控制。
-- **扩展能力接口**：在原有Tensor定义上引入Layout抽象实现编译期类型安全，Copy/Mmad Atom简化参数配置，Slice/Tile零开销切片，Operation驱动隐式同步减少手动调用。
+- **扩展能力接口（Ascend 950PR/950DT引入）**：在原有Tensor定义上引入Layout抽象实现编译期类型安全，Copy/Mmad Atom简化参数配置，Slice/Tile零开销切片，Operation驱动隐式同步减少手动调用。
 
 ## 基础能力：Tensor定义与核心接口
 ### Tensor定义
@@ -51,7 +51,7 @@ gmTensor.SetGlobalBuffer((__gm__ half*)gmBuffer, bufferSize);
 
 ### 数据搬运与计算示例
 ```cpp
-constexpr uint32_t TILE_LENGTH = 256;  // 示意性参数
+constexpr uint32_t TILE_LENGTH = 256;
 AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
 AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, TILE_LENGTH>();
 AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, TILE_LENGTH>();
