@@ -1,0 +1,28 @@
+# Tensor API手册资料目录导览
+
+- **[基础数据结构](readme.md)**
+
+- **[矩阵计算](matrix_computation_directory.md)**
+    - **[矩阵计算的搬入](data_movement/matrix_data_in_movement_directory.md)**
+        - **[总体说明](data_movement/matrix_data_in_movement_overview.md)**
+        - **[矩阵数据搬入至L1 Buffer](<data_movement/matrix_data_in_l1_buffer_directory.md>)**
+            - **[Global Memory到L1 Buffer数据搬运](data_movement/gm_to_l1_data_movement.md)**
+        - **[矩阵数据搬入至L0 Buffer](<data_movement/matrix_data_in_l0_buffer_directory.md>)**
+            - **[L1 Buffer到L0A Buffer数据搬运](data_movement/l1_to_l0a_data_movement.md)**
+            - **[L1 Buffer到L0B Buffer数据搬运](data_movement/l1_to_l0b_data_movement.md)**
+            - **[L1 Buffer到L0ScaleA Buffer数据搬运](data_movement/l1_to_l0scalea_data_movement.md)**
+            - **[L1 Buffer到L0ScaleB Buffer数据搬运](data_movement/l1_to_l0scaleb_data_movement.md)**
+            - **[L1 Buffer到BiasTable Buffer数据搬运](data_movement/l1_to_bias_table_buffer_data_movement.md)**
+            - **[L1 Buffer到Fixpipe Buffer数据搬运](data_movement/l1_to_fixpipe_buffer_data_movement.md)**
+    - **[Mmad计算](mmad_computation/mmad_computation_directory.md)**
+        - **[MX矩阵计算](mmad_computation/mx_matrix_computation.md)**
+    - **[矩阵计算的搬出](data_movement/matrix_data_out_movement_directory.md)**
+        - **[总体说明](data_movement/matrix_data_out_movement_overview.md)**
+        - **[L0C Buffer到Global Memory数据搬运](data_movement/l0c_to_gm_data_movement.md)**
+        - **[L0C Buffer到Unified Buffer数据搬运](data_movement/l0c_to_ub_data_movement.md)**
+        - **[关键特性说明](data_movement/matrix_data_out_movement_key_fratures_directory.md)**
+            - **[随路量化](data_movement/quant_pre.md)**
+            - **[随路Relu](data_movement/relu_pre.md)**
+            - **[F32 Channel Split](data_movement/f32_channel_split.md)**
+            - **[Int8/Int4 Channel Merge](data_movement/int8_int4_channel_merge.md)**
+            - **[L0C Buffer到Unified Buffer双目标模式](data_movement/l0c_to_ub_dual_dst.md)**
