@@ -130,7 +130,7 @@ $$
 
 - LeakyRelu</br>
   - kernel实现：</br>
-    基于高阶API接口`LeakyRelu`实现。</br>
+    基于基础API接口组合实现，使用`Maxs`、`Mins`、`Muls`、`Add`完成LeakyRelu计算。</br>
 
   - tiling实现：</br>
     TilingData参数设计，`LeakyReluCustomTilingData`参数本质上是和并行数据切分相关的参数，本示例样例使用了3个tiling参数：`totalLength`、`tileNum`、`negativeSlope`。`totalLength`、`tileNum`与Add样例类似，`negativeSlope`表示LeakyRelu的负半轴斜率系数，作为计算参数传递给kernel侧。</br>
