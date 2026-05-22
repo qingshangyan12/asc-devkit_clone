@@ -1,1416 +1,1446 @@
 export default {
   "/guide/": [
-    {
-      "text": "入门教程",
-      "collapsed": true,
-      "items": [
-        {
-          "text": "环境准备",
-          "link": "/guide/入门教程/环境准备"
-        },
-        {
-          "text": "Ascend-C概述与学习路径",
-          "link": "/guide/入门教程/Ascend-C概述与学习路径"
-        },
-        {
-          "text": "快速入门",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "异构系统与编程模型",
-              "link": "/guide/入门教程/快速入门/异构系统与编程模型"
-            },
-            {
-              "text": "基于SIMD编程",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "基于SIMD编程",
-                  "link": "/guide/入门教程/快速入门/基于SIMD编程/基于SIMD编程"
-                },
-                {
-                  "text": "Add自定义算子开发",
-                  "link": "/guide/入门教程/快速入门/基于SIMD编程/Add自定义算子开发"
-                },
-                {
-                  "text": "HelloWorld",
-                  "link": "/guide/入门教程/快速入门/基于SIMD编程/HelloWorld"
-                }
-              ]
-            },
-            {
-              "text": "基于SIMT编程",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "基于SIMT编程",
-                  "link": "/guide/入门教程/快速入门/基于SIMT编程/基于SIMT编程"
-                },
-                {
-                  "text": "Add自定义算子开发",
-                  "link": "/guide/入门教程/快速入门/基于SIMT编程/Add自定义算子开发"
-                },
-                {
-                  "text": "HelloWorld",
-                  "link": "/guide/入门教程/快速入门/基于SIMT编程/HelloWorld"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "text": "编程指南",
-      "collapsed": true,
-      "items": [
-        {
-          "text": "本文档组织结构",
-          "link": "/guide/编程指南/本文档组织结构"
-        },
-        {
-          "text": "编程模型",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "编程模型",
-              "link": "/guide/编程指南/编程模型/编程模型"
-            },
-            {
-              "text": "编程模型概述",
-              "link": "/guide/编程指南/编程模型/编程模型概述"
-            },
-            {
-              "text": "异构系统",
-              "link": "/guide/编程指南/编程模型/异构系统"
-            },
-            {
-              "text": "AI-CPU编程",
-              "link": "/guide/编程指南/编程模型/AI-CPU编程"
-            },
-            {
-              "text": "AI-Core-SIMD编程",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "抽象硬件架构",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构"
-                },
-                {
-                  "text": "概述",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/概述"
-                },
-                {
-                  "text": "核函数",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数"
-                },
-                {
-                  "text": "AI-Core-SIMD编程",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/AI-Core-SIMD编程"
-                },
-                {
-                  "text": "基于指针的C语言编程",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "基于语言扩展层C-API编程",
-                      "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程"
-                    }
-                  ]
-                },
-                {
-                  "text": "基于Tensor的C++编程",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "静态Tensor编程",
-                      "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程"
-                    },
-                    {
-                      "text": "Reg矢量计算编程",
-                      "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/Reg矢量计算编程"
-                    }
-                  ]
-                },
-                {
-                  "text": "基于TPipe-TQue框架编程",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "TPipe-TQue框架编程范式",
-                      "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式"
-                    },
-                    {
-                      "text": "TPipe-TQue框架编程原理",
-                      "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "AI-Core-SIMT编程",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "编程示例",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/编程示例"
-                },
-                {
-                  "text": "抽象硬件架构",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构"
-                },
-                {
-                  "text": "概述",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/概述"
-                },
-                {
-                  "text": "核函数",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/核函数"
-                },
-                {
-                  "text": "内存层级",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/内存层级"
-                },
-                {
-                  "text": "同步机制",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/同步机制"
-                },
-                {
-                  "text": "线程架构",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/线程架构"
-                },
-                {
-                  "text": "AI-Core-SIMT编程",
-                  "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/AI-Core-SIMT编程"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "编译与运行",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "编译与运行",
-              "link": "/guide/编程指南/编译与运行/编译与运行"
-            },
-            {
-              "text": "异步执行",
-              "link": "/guide/编程指南/编译与运行/异步执行"
-            },
-            {
-              "text": "算子编译",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "毕昇编译器",
-                  "link": "/guide/编程指南/编译与运行/算子编译/毕昇编译器"
-                },
-                {
-                  "text": "约束说明",
-                  "link": "/guide/编程指南/编译与运行/算子编译/约束说明"
-                },
-                {
-                  "text": "AI-Core算子编译基本用法",
-                  "link": "/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法"
-                },
-                {
-                  "text": "AI-CPU算子编译基本用法",
-                  "link": "/guide/编程指南/编译与运行/算子编译/AI-CPU算子编译基本用法"
-                },
-                {
-                  "text": "RTC运行时编译",
-                  "link": "/guide/编程指南/编译与运行/算子编译/RTC运行时编译"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "调试调优",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "调试调优",
-              "link": "/guide/编程指南/调试调优/调试调优"
-            },
-            {
-              "text": "概述",
-              "link": "/guide/编程指南/调试调优/概述"
-            },
-            {
-              "text": "性能调优",
-              "link": "/guide/编程指南/调试调优/性能调优"
-            },
-            {
-              "text": "功能调试",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "功能调试",
-                  "link": "/guide/编程指南/调试调优/功能调试/功能调试"
-                },
-                {
-                  "text": "CPU域孪生调试",
-                  "link": "/guide/编程指南/调试调优/功能调试/CPU域孪生调试"
-                },
-                {
-                  "text": "NPU域上板调试",
-                  "link": "/guide/编程指南/调试调优/功能调试/NPU域上板调试"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "附录",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "基于样例工程完成Kernel直调",
-              "link": "/guide/编程指南/附录/基于样例工程完成Kernel直调"
-            },
-            {
-              "text": "简易自定义算子工程",
-              "link": "/guide/编程指南/附录/简易自定义算子工程"
-            },
-            {
-              "text": "msobjdump工具",
-              "link": "/guide/编程指南/附录/msobjdump工具"
-            },
-            {
-              "text": "show_kernel_debug_data工具",
-              "link": "/guide/编程指南/附录/show_kernel_debug_data工具"
-            },
-            {
-              "text": "常用操作",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "如何进行Tiling调测",
-                  "link": "/guide/编程指南/附录/常用操作/如何进行Tiling调测"
-                },
-                {
-                  "text": "如何开发动态输入算子",
-                  "link": "/guide/编程指南/附录/常用操作/如何开发动态输入算子"
-                },
-                {
-                  "text": "如何使用Tensor原地操作提升算子性能",
-                  "link": "/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能"
-                },
-                {
-                  "text": "如何使用workspace",
-                  "link": "/guide/编程指南/附录/常用操作/如何使用workspace"
-                },
-                {
-                  "text": "如何在矢量编程时使能Vector-Core",
-                  "link": "/guide/编程指南/附录/常用操作/如何在矢量编程时使能Vector-Core"
-                }
-              ]
-            },
-            {
-              "text": "FAQ",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "调用算子时出现无法打开config-ini的报错",
-                  "link": "/guide/编程指南/附录/FAQ/调用算子时出现无法打开config-ini的报错"
-                },
-                {
-                  "text": "含有Matmul高阶API的算子精度问题",
-                  "link": "/guide/编程指南/附录/FAQ/含有Matmul高阶API的算子精度问题"
-                },
-                {
-                  "text": "核函数运行验证时算子存在精度问题",
-                  "link": "/guide/编程指南/附录/FAQ/核函数运行验证时算子存在精度问题"
-                },
-                {
-                  "text": "算子包部署时出现权限不足报错",
-                  "link": "/guide/编程指南/附录/FAQ/算子包部署时出现权限不足报错"
-                },
-                {
-                  "text": "算子工程编译时出现文件名过长报错",
-                  "link": "/guide/编程指南/附录/FAQ/算子工程编译时出现文件名过长报错"
-                },
-                {
-                  "text": "运行验证时AllocTensor-FreeTensor失败",
-                  "link": "/guide/编程指南/附录/FAQ/运行验证时AllocTensor-FreeTensor失败"
-                },
-                {
-                  "text": "Kernel编译时报错-error-out-of-jump-jumpc-imm-range",
-                  "link": "/guide/编程指南/附录/FAQ/Kernel编译时报错-error-out-of-jump-jumpc-imm-range"
-                },
-                {
-                  "text": "kernel侧获取Tiling信息不正确",
-                  "link": "/guide/编程指南/附录/FAQ/kernel侧获取Tiling信息不正确"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "高级编程",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "高级特性",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "算子入图开发",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "概述",
-                      "link": "/guide/编程指南/高级编程/高级特性/算子入图开发/概述"
-                    },
-                    {
-                      "text": "基本开发流程",
-                      "link": "/guide/编程指南/高级编程/高级特性/算子入图开发/基本开发流程"
-                    },
-                    {
-                      "text": "使能Tiling下沉",
-                      "link": "/guide/编程指南/高级编程/高级特性/算子入图开发/使能Tiling下沉"
-                    },
-                    {
-                      "text": "图编译和图执行",
-                      "link": "/guide/编程指南/高级编程/高级特性/算子入图开发/图编译和图执行"
-                    },
-                    {
-                      "text": "SuperKernel开发",
-                      "link": "/guide/编程指南/高级编程/高级特性/算子入图开发/SuperKernel开发"
-                    }
-                  ]
-                },
-                {
-                  "text": "Aclnn算子工程化开发",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "创建算子工程",
-                      "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/创建算子工程"
-                    },
-                    {
-                      "text": "单算子API调用",
-                      "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/单算子API调用"
-                    },
-                    {
-                      "text": "概述",
-                      "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/概述"
-                    },
-                    {
-                      "text": "算子动态库和静态库编译",
-                      "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子动态库和静态库编译"
-                    },
-                    {
-                      "text": "算子工程编译拓展",
-                      "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子工程编译拓展"
-                    },
-                    {
-                      "text": "算子原型定义",
-                      "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子原型定义"
-                    },
-                    {
-                      "text": "Kernel侧算子实现",
-                      "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/Kernel侧算子实现"
-                    }
-                  ]
-                },
-                {
-                  "text": "AI框架算子适配",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "概述",
-                      "link": "/guide/编程指南/高级编程/高级特性/AI框架算子适配/概述"
-                    },
-                    {
-                      "text": "PyTorch框架",
-                      "link": "/guide/编程指南/高级编程/高级特性/AI框架算子适配/PyTorch框架"
-                    },
-                    {
-                      "text": "TensorFlow框架",
-                      "link": "/guide/编程指南/高级编程/高级特性/AI框架算子适配/TensorFlow框架"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "高级AI-Core编程模型",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "SIMD与SIMT混合编程",
-                  "link": "/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程"
-                }
-              ]
-            },
-            {
-              "text": "硬件实现",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "基本架构",
-                  "link": "/guide/编程指南/高级编程/硬件实现/基本架构"
-                },
-                {
-                  "text": "硬件实现",
-                  "link": "/guide/编程指南/高级编程/硬件实现/硬件实现"
-                },
-                {
-                  "text": "架构规格",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "架构规格",
-                      "link": "/guide/编程指南/高级编程/硬件实现/架构规格/架构规格"
-                    },
-                    {
-                      "text": "NPU架构版本2002",
-                      "link": "/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本2002"
-                    },
-                    {
-                      "text": "NPU架构版本2201",
-                      "link": "/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本2201"
-                    },
-                    {
-                      "text": "NPU架构版本3002",
-                      "link": "/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本3002"
-                    },
-                    {
-                      "text": "NPU架构版本3510",
-                      "link": "/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510"
-                    }
-                  ]
-                },
-                {
-                  "text": "硬件约束",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "NPU架构版本2002",
-                      "link": "/guide/编程指南/高级编程/硬件实现/硬件约束/NPU架构版本2002"
-                    },
-                    {
-                      "text": "NPU架构版本2201",
-                      "link": "/guide/编程指南/高级编程/硬件实现/硬件约束/NPU架构版本2201"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "类库API",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "编程接口概述",
-              "link": "/guide/编程指南/类库API/编程接口概述"
-            },
-            {
-              "text": "类库API",
-              "link": "/guide/编程指南/类库API/类库API"
-            },
-            {
-              "text": "Utils-API",
-              "link": "/guide/编程指南/类库API/Utils-API"
-            },
-            {
-              "text": "高阶API",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "概述",
-                  "link": "/guide/编程指南/类库API/高阶API/概述"
-                },
-                {
-                  "text": "常用操作速查指导",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "如何使用Kernel侧临时空间",
-                      "link": "/guide/编程指南/类库API/高阶API/常用操作速查指导/如何使用Kernel侧临时空间"
-                    },
-                    {
-                      "text": "如何使用Tiling依赖的头文件",
-                      "link": "/guide/编程指南/类库API/高阶API/常用操作速查指导/如何使用Tiling依赖的头文件"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "基础API",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "概述",
-                  "link": "/guide/编程指南/类库API/基础API/概述"
-                },
-                {
-                  "text": "常用操作速查指导",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "如何使用归约计算API",
-                      "link": "/guide/编程指南/类库API/基础API/常用操作速查指导/如何使用归约计算API"
-                    },
-                    {
-                      "text": "如何使用掩码操作API",
-                      "link": "/guide/编程指南/类库API/基础API/常用操作速查指导/如何使用掩码操作API"
-                    }
-                  ]
-                },
-                {
-                  "text": "接口分类说明",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "高维切分API",
-                      "link": "/guide/编程指南/类库API/基础API/接口分类说明/高维切分API"
-                    },
-                    {
-                      "text": "连续计算API",
-                      "link": "/guide/编程指南/类库API/基础API/接口分类说明/连续计算API"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "语言扩展层",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "语言扩展层",
-              "link": "/guide/编程指南/语言扩展层/语言扩展层"
-            },
-            {
-              "text": "SIMD-BuiltIn关键字",
-              "link": "/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字"
-            },
-            {
-              "text": "SIMD语言扩展层C-API",
-              "link": "/guide/编程指南/语言扩展层/SIMD语言扩展层C-API"
-            },
-            {
-              "text": "SIMT-BuiltIn关键字",
-              "link": "/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字"
-            },
-            {
-              "text": "SIMT语言扩展层C-API",
-              "link": "/guide/编程指南/语言扩展层/SIMT语言扩展层C-API"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "text": "算子实践参考",
-      "collapsed": true,
-      "items": [
-        {
-          "text": "本文档组织结构",
-          "link": "/guide/算子实践参考/本文档组织结构"
-        },
-        {
-          "text": "异构计算",
-          "link": "/guide/算子实践参考/异构计算"
-        },
-        {
-          "text": "典型算子实践案例",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "典型算子实践案例",
-              "link": "/guide/算子实践参考/典型算子实践案例/典型算子实践案例"
-            },
-            {
-              "text": "SIMD算子实现",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "Add矢量算子实践",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "入门功能落地",
-                      "link": "/guide/算子实践参考/典型算子实践案例/SIMD算子实现/Add矢量算子实践/入门功能落地"
-                    }
-                  ]
-                },
-                {
-                  "text": "Matmul矩阵算子实践",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "入门功能落地",
-                      "link": "/guide/算子实践参考/典型算子实践案例/SIMD算子实现/Matmul矩阵算子实践/入门功能落地"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "功能调试",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "功能调试",
-              "link": "/guide/算子实践参考/功能调试/功能调试"
-            },
-            {
-              "text": "精度正常",
-              "link": "/guide/算子实践参考/功能调试/精度正常"
-            },
-            {
-              "text": "算子调试",
-              "link": "/guide/算子实践参考/功能调试/算子调试"
-            },
-            {
-              "text": "运行正常",
-              "link": "/guide/算子实践参考/功能调试/运行正常"
-            }
-          ]
-        },
-        {
-          "text": "性能分析",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "分析性能数据",
-              "link": "/guide/算子实践参考/性能分析/分析性能数据"
-            },
-            {
-              "text": "获取性能数据",
-              "link": "/guide/算子实践参考/性能分析/获取性能数据"
-            },
-            {
-              "text": "性能分析",
-              "link": "/guide/算子实践参考/性能分析/性能分析"
-            }
-          ]
-        },
-        {
-          "text": "优秀实践",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "优秀实践",
-              "link": "/guide/算子实践参考/优秀实践/优秀实践"
-            },
-            {
-              "text": "FlashAttention算子性能调优案例",
-              "link": "/guide/算子实践参考/优秀实践/FlashAttention算子性能调优案例"
-            },
-            {
-              "text": "GroupedMatmul算子性能调优案例",
-              "link": "/guide/算子实践参考/优秀实践/GroupedMatmul算子性能调优案例"
-            },
-            {
-              "text": "MC-算子性能调优案例",
-              "link": "/guide/算子实践参考/优秀实践/MC-算子性能调优案例"
-            },
-            {
-              "text": "SIMT实现InsertHashTable算子案例",
-              "link": "/guide/算子实践参考/优秀实践/SIMT实现InsertHashTable算子案例"
-            },
-            {
-              "text": "Matmul性能调优案例",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "AIV核上的ND2NZ格式转换",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/AIV核上的ND2NZ格式转换"
-                },
-                {
-                  "text": "Matmul高阶API使能纯Cube模式",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能纯Cube模式"
-                },
-                {
-                  "text": "Matmul高阶API使能多核切K",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能多核切K"
-                },
-                {
-                  "text": "Matmul高阶API使能多核K轴错峰访问内存",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能多核K轴错峰访问内存"
-                },
-                {
-                  "text": "Matmul高阶API使能IBShare模板共享A和B矩阵数据",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能IBShare模板共享A和B矩阵数据"
-                },
-                {
-                  "text": "Matmul高阶API使能IBShare模板共享B矩阵数据",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能IBShare模板共享B矩阵数据"
-                },
-                {
-                  "text": "Matmul高阶API使能L2-Cache切分",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能L2-Cache切分"
-                },
-                {
-                  "text": "Matmul高阶API使能MDL模板",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能MDL模板"
-                },
-                {
-                  "text": "Matmul高阶API使能MTE2-Preload",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能MTE2-Preload"
-                },
-                {
-                  "text": "Matmul高阶API使能NBuffer33模板",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能NBuffer33模板"
-                },
-                {
-                  "text": "Matmul高阶API使能Tiling全量常量化",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能Tiling全量常量化"
-                },
-                {
-                  "text": "Matmul高阶API使能UnitFlag",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能UnitFlag"
-                },
-                {
-                  "text": "Matmul算子优化Tiling策略",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul算子优化Tiling策略"
-                },
-                {
-                  "text": "Matmul性能优化策略总览",
-                  "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul性能优化策略总览"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "SIMD算子实现",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "概述",
-              "link": "/guide/算子实践参考/SIMD算子实现/概述"
-            },
-            {
-              "text": "SIMD算子实现",
-              "link": "/guide/算子实践参考/SIMD算子实现/SIMD算子实现"
-            },
-            {
-              "text": "矩阵编程（高阶API）",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "基础知识",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/基础知识"
-                },
-                {
-                  "text": "矩阵编程（高阶API）",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/矩阵编程（高阶API）"
-                },
-                {
-                  "text": "算子实现",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/算子实现"
-                },
-                {
-                  "text": "特性场景",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "4-2稀疏矩阵乘",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/4-2稀疏矩阵乘"
-                    },
-                    {
-                      "text": "单次矩阵乘局部输出",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/单次矩阵乘局部输出"
-                    },
-                    {
-                      "text": "多核对齐切分",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/多核对齐切分"
-                    },
-                    {
-                      "text": "多核非对齐切分",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/多核非对齐切分"
-                    },
-                    {
-                      "text": "矩阵乘输出的量化-反量化",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的量化-反量化"
-                    },
-                    {
-                      "text": "矩阵乘输出的Channel拆分",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的Channel拆分"
-                    },
-                    {
-                      "text": "矩阵乘输出的N方向对齐",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的N方向对齐"
-                    },
-                    {
-                      "text": "矩阵向量乘",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵向量乘"
-                    },
-                    {
-                      "text": "异步场景处理",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/异步场景处理"
-                    },
-                    {
-                      "text": "AIC和AIV独立运行机制",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/AIC和AIV独立运行机制"
-                    },
-                    {
-                      "text": "Batch-Matmul复用Bias矩阵",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/Batch-Matmul复用Bias矩阵"
-                    },
-                    {
-                      "text": "Batch-Matmul基础功能",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/Batch-Matmul基础功能"
-                    },
-                    {
-                      "text": "Matmul特性介绍",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/Matmul特性介绍"
-                    },
-                    {
-                      "text": "MxMatmul场景",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景"
-                    },
-                    {
-                      "text": "TSCM输入的矩阵乘",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/TSCM输入的矩阵乘"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "矩阵编程（基础API）",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "分离模式",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（基础API）/分离模式"
-                },
-                {
-                  "text": "耦合模式",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式"
-                }
-              ]
-            },
-            {
-              "text": "融合算子编程",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "融合算子编程",
-                  "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/融合算子编程"
-                },
-                {
-                  "text": "通算融合",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "基础知识",
-                      "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/通算融合/基础知识"
-                    },
-                    {
-                      "text": "算子实现",
-                      "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现"
-                    },
-                    {
-                      "text": "特性场景",
-                      "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/通算融合/特性场景"
-                    }
-                  ]
-                },
-                {
-                  "text": "CV融合",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "基础知识",
-                      "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/CV融合/基础知识"
-                    },
-                    {
-                      "text": "算子实现",
-                      "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/CV融合/算子实现"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "矢量编程",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "非对齐场景",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/非对齐场景"
-                },
-                {
-                  "text": "概述",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/概述"
-                },
-                {
-                  "text": "基础矢量算子",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/基础矢量算子"
-                },
-                {
-                  "text": "矢量编程",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/矢量编程"
-                },
-                {
-                  "text": "Broadcast场景",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/Broadcast场景"
-                },
-                {
-                  "text": "DoubleBuffer场景",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/DoubleBuffer场景"
-                },
-                {
-                  "text": "TBuf的使用",
-                  "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/TBuf的使用"
-                },
-                {
-                  "text": "多核-Tiling切分",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "多核Tiling",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/多核Tiling"
-                    },
-                    {
-                      "text": "概述",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/概述"
-                    },
-                    {
-                      "text": "尾核-尾块",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾核-尾块"
-                    },
-                    {
-                      "text": "尾核Tiling",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾核Tiling"
-                    },
-                    {
-                      "text": "尾块Tiling",
-                      "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾块Tiling"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "SIMD算子性能优化",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "优化建议总览表",
-              "link": "/guide/算子实践参考/SIMD算子性能优化/优化建议总览表"
-            },
-            {
-              "text": "SIMD算子性能优化",
-              "link": "/guide/算子实践参考/SIMD算子性能优化/SIMD算子性能优化"
-            },
-            {
-              "text": "矩阵计算",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "较小矩阵长驻L1-Buffer-仅分次搬运较大矩阵",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/矩阵计算/较小矩阵长驻L1-Buffer-仅分次搬运较大矩阵"
-                },
-                {
-                  "text": "通过BT-Buffer实现高效的bias计算",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/矩阵计算/通过BT-Buffer实现高效的bias计算"
-                },
-                {
-                  "text": "通过FP-Buffer存放量化参数实现高效随路量化",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/矩阵计算/通过FP-Buffer存放量化参数实现高效随路量化"
-                },
-                {
-                  "text": "通过L0C-Buffer数据暂存实现高效的矩阵乘结果累加",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/矩阵计算/通过L0C-Buffer数据暂存实现高效的矩阵乘结果累加"
-                },
-                {
-                  "text": "Matmul使能AtomicAdd选项",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/矩阵计算/Matmul使能AtomicAdd选项"
-                }
-              ]
-            },
-            {
-              "text": "流水编排",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "流水编排",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/流水编排/流水编排"
-                },
-                {
-                  "text": "使能DoubleBuffer",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/流水编排/使能DoubleBuffer"
-                },
-                {
-                  "text": "使能Iterate或IterateAll异步接口避免AIC-AIV同步依赖",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/流水编排/使能Iterate或IterateAll异步接口避免AIC-AIV同步依赖"
-                }
-              ]
-            },
-            {
-              "text": "内存访问",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "避免同地址访问",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/避免同地址访问"
-                },
-                {
-                  "text": "纯搬运类算子VECIN和VECOUT建议复用",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/纯搬运类算子VECIN和VECOUT建议复用"
-                },
-                {
-                  "text": "非对齐场景减少无效数据的搬运",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/非对齐场景减少无效数据的搬运"
-                },
-                {
-                  "text": "非连续搬运场景减少搬运次数",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/非连续搬运场景减少搬运次数"
-                },
-                {
-                  "text": "高效的使用搬运API",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/高效的使用搬运API"
-                },
-                {
-                  "text": "尽量一次搬运较大的数据块",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/尽量一次搬运较大的数据块"
-                },
-                {
-                  "text": "内存访问",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/内存访问"
-                },
-                {
-                  "text": "设置合理的L2-CacheMode",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/设置合理的L2-CacheMode"
-                },
-                {
-                  "text": "算子与高阶API共享临时Buffer",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/算子与高阶API共享临时Buffer"
-                },
-                {
-                  "text": "通过缩减Tensor-ShapeInfo维度-优化栈空间",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/通过缩减Tensor-ShapeInfo维度-优化栈空间"
-                },
-                {
-                  "text": "GM地址尽量512B对齐",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/GM地址尽量512B对齐"
-                },
-                {
-                  "text": "L2-Cache切分",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/L2-Cache切分"
-                },
-                {
-                  "text": "避免UB的bank冲突",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "避免bank冲突（NPU架构版本2201）",
-                      "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本2201）"
-                    },
-                    {
-                      "text": "避免bank冲突（NPU架构版本3510）",
-                      "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）"
-                    },
-                    {
-                      "text": "避免UB的bank冲突",
-                      "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免UB的bank冲突"
-                    },
-                    {
-                      "text": "概述",
-                      "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/概述"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "矢量计算",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "通过Unified-Buffer融合实现连续vector计算",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/通过Unified-Buffer融合实现连续vector计算"
-                },
-                {
-                  "text": "选择低延迟指令-优化归约操作性能",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/选择低延迟指令-优化归约操作性能"
-                },
-                {
-                  "text": "Vector算子灵活运用Counter模式",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/Vector算子灵活运用Counter模式"
-                },
-                {
-                  "text": "VF性能优化",
-                  "collapsed": true,
-                  "items": [
-                    {
-                      "text": "连续非对齐场景优化",
-                      "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/连续非对齐场景优化"
-                    },
-                    {
-                      "text": "指令双发优化",
-                      "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/指令双发优化"
-                    },
-                    {
-                      "text": "VF融合优化",
-                      "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF融合优化"
-                    },
-                    {
-                      "text": "VF循环优化",
-                      "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "头尾开销优化",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "避免TPipe在对象内创建和初始化",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/避免TPipe在对象内创建和初始化"
-                },
-                {
-                  "text": "核函数内删除Workspace相关冗余操作",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/核函数内删除Workspace相关冗余操作"
-                },
-                {
-                  "text": "设置合适的核数和算子Kernel类型",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/设置合适的核数和算子Kernel类型"
-                },
-                {
-                  "text": "设置DCI编译选项来减少算子尾开销",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/设置DCI编译选项来减少算子尾开销"
-                },
-                {
-                  "text": "头尾开销优化",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/头尾开销优化"
-                },
-                {
-                  "text": "限制TilingData结构大小",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/限制TilingData结构大小"
-                }
-              ]
-            },
-            {
-              "text": "Tiling策略",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "核间负载均衡",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/Tiling策略/核间负载均衡"
-                },
-                {
-                  "text": "Tiling策略",
-                  "link": "/guide/算子实践参考/SIMD算子性能优化/Tiling策略/Tiling策略"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "SIMD与SIMT混合算子实现",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "基础知识",
-              "link": "/guide/算子实践参考/SIMD与SIMT混合算子实现/基础知识"
-            },
-            {
-              "text": "算子实现",
-              "link": "/guide/算子实践参考/SIMD与SIMT混合算子实现/算子实现"
-            },
-            {
-              "text": "SIMD与SIMT混合算子实现",
-              "link": "/guide/算子实践参考/SIMD与SIMT混合算子实现/SIMD与SIMT混合算子实现"
-            }
-          ]
-        },
-        {
-          "text": "SIMD与SIMT混合算子性能优化",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "SIMD与SIMT混合算子性能优化",
-              "link": "/guide/算子实践参考/SIMD与SIMT混合算子性能优化/SIMD与SIMT混合算子性能优化"
-            },
-            {
-              "text": "计算优化",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "通过SIMT实现分支判断",
-                  "link": "/guide/算子实践参考/SIMD与SIMT混合算子性能优化/计算优化/通过SIMT实现分支判断"
-                }
-              ]
-            },
-            {
-              "text": "内存访问",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "使用Unified-Buffer提升内存访问效率",
-                  "link": "/guide/算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "SIMT算子实现",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "基础知识",
-              "link": "/guide/算子实践参考/SIMT算子实现/基础知识"
-            },
-            {
-              "text": "算子实现",
-              "link": "/guide/算子实践参考/SIMT算子实现/算子实现"
-            },
-            {
-              "text": "SIMT算子实现",
-              "link": "/guide/算子实践参考/SIMT算子实现/SIMT算子实现"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "text": "技术附录",
-      "collapsed": true,
-      "items": [
-        {
-          "text": "概念原理和术语",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "术语表",
-              "link": "/guide/技术附录/概念原理和术语/术语表"
-            },
-            {
-              "text": "内存访问原理",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "Scalar读写数据",
-                  "link": "/guide/技术附录/概念原理和术语/内存访问原理/Scalar读写数据"
-                }
-              ]
-            },
-            {
-              "text": "神经网络和算子",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "数据排布格式",
-                  "link": "/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式"
-                },
-                {
-                  "text": "算子基本概念",
-                  "link": "/guide/技术附录/概念原理和术语/神经网络和算子/算子基本概念"
-                }
-              ]
-            },
-            {
-              "text": "性能优化技术原理",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "DoubleBuffer",
-                  "link": "/guide/技术附录/概念原理和术语/性能优化技术原理/DoubleBuffer"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "text": "CPP标准支持",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "概述",
-              "link": "/guide/技术附录/CPP标准支持/概述"
-            },
-            {
-              "text": "语法限制",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "函数",
-                  "link": "/guide/技术附录/CPP标准支持/语法限制/函数"
-                },
-                {
-                  "text": "特性",
-                  "link": "/guide/技术附录/CPP标准支持/语法限制/特性"
-                },
-                {
-                  "text": "语法限制",
-                  "link": "/guide/技术附录/CPP标准支持/语法限制/语法限制"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "text": "跨代迁移兼容性指南",
-      "collapsed": true,
-      "items": [
-        {
-          "text": "概述",
-          "link": "/guide/跨代迁移兼容性指南/概述"
-        },
-        {
-          "text": "Ascend-C-API兼容策略",
-          "link": "/guide/跨代迁移兼容性指南/Ascend-C-API兼容策略"
-        },
-        {
-          "text": "3510架构迁移指导",
-          "collapsed": true,
-          "items": [
-            {
-              "text": "2201到3510架构变更",
-              "link": "/guide/跨代迁移兼容性指南/3510架构迁移指导/2201到3510架构变更"
-            },
-            {
-              "text": "2201迁移3510指导",
-              "collapsed": true,
-              "items": [
-                {
-                  "text": "高阶API迁移指导",
-                  "link": "/guide/跨代迁移兼容性指南/3510架构迁移指导/2201迁移3510指导/高阶API迁移指导"
-                },
-                {
-                  "text": "基础API迁移指导",
-                  "link": "/guide/跨代迁移兼容性指南/3510架构迁移指导/2201迁移3510指导/基础API迁移指导"
-                },
-                {
-                  "text": "算子编译迁移指导",
-                  "link": "/guide/跨代迁移兼容性指南/3510架构迁移指导/2201迁移3510指导/算子编译迁移指导"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ],
-
-
+  {
+    "text": "入门教程",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "Ascend C概述与学习路径",
+        "link": "/guide/入门教程/Ascend-C概述与学习路径"
+      },
+      {
+        "text": "环境准备",
+        "link": "/guide/入门教程/环境准备"
+      },
+      {
+        "text": "快速入门",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "异构系统与编程模型",
+            "link": "/guide/入门教程/快速入门/异构系统与编程模型"
+          },
+          {
+            "text": "基于SIMD编程",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "基于SIMD编程",
+                "link": "/guide/入门教程/快速入门/基于SIMD编程/基于SIMD编程"
+              },
+              {
+                "text": "HelloWorld",
+                "link": "/guide/入门教程/快速入门/基于SIMD编程/HelloWorld"
+              },
+              {
+                "text": "Add算子快速入门",
+                "link": "/guide/入门教程/快速入门/基于SIMD编程/Add算子快速入门"
+              }
+            ]
+          },
+          {
+            "text": "基于SIMT编程",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "基于SIMT编程",
+                "link": "/guide/入门教程/快速入门/基于SIMT编程/基于SIMT编程"
+              },
+              {
+                "text": "HelloWorld",
+                "link": "/guide/入门教程/快速入门/基于SIMT编程/HelloWorld"
+              },
+              {
+                "text": "Add算子快速入门",
+                "link": "/guide/入门教程/快速入门/基于SIMT编程/Add算子快速入门"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "编程指南",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "本文档组织结构",
+        "link": "/guide/编程指南/本文档组织结构"
+      },
+      {
+        "text": "编程模型",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "编程模型",
+            "link": "/guide/编程指南/编程模型/编程模型"
+          },
+          {
+            "text": "异构系统",
+            "link": "/guide/编程指南/编程模型/异构系统"
+          },
+          {
+            "text": "编程模型概述",
+            "link": "/guide/编程指南/编程模型/编程模型概述"
+          },
+          {
+            "text": "AI Core SIMD编程",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AI Core SIMD编程",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/AI-Core-SIMD编程"
+              },
+              {
+                "text": "概述",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/概述"
+              },
+              {
+                "text": "抽象硬件架构",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构"
+              },
+              {
+                "text": "核函数",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数"
+              },
+              {
+                "text": "基于指针的C语言编程",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "基于语言扩展层C API编程",
+                    "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程"
+                  }
+                ]
+              },
+              {
+                "text": "基于Tensor的C++编程",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "静态Tensor编程",
+                    "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程"
+                  },
+                  {
+                    "text": "Reg矢量计算编程",
+                    "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/Reg矢量计算编程"
+                  }
+                ]
+              },
+              {
+                "text": "基于TPipe和TQue编程",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "TPipe-TQue框架编程原理",
+                    "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理"
+                  },
+                  {
+                    "text": "TPipe-TQue框架编程范式",
+                    "link": "/guide/编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "AI Core SIMT编程",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AI Core SIMT编程",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/AI-Core-SIMT编程"
+              },
+              {
+                "text": "抽象硬件架构",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构"
+              },
+              {
+                "text": "线程架构",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/线程架构"
+              },
+              {
+                "text": "内存层级",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/内存层级"
+              },
+              {
+                "text": "核函数",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/核函数"
+              },
+              {
+                "text": "同步机制",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/同步机制"
+              },
+              {
+                "text": "编程示例",
+                "link": "/guide/编程指南/编程模型/AI-Core-SIMT编程/编程示例"
+              }
+            ]
+          },
+          {
+            "text": "AI CPU编程",
+            "link": "/guide/编程指南/编程模型/AI-CPU编程"
+          }
+        ]
+      },
+      {
+        "text": "编译与运行",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "异步执行",
+            "link": "/guide/编程指南/编译与运行/异步执行"
+          },
+          {
+            "text": "算子编译",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "毕昇编译器",
+                "link": "/guide/编程指南/编译与运行/算子编译/毕昇编译器"
+              },
+              {
+                "text": "AI Core算子编译基本用法",
+                "link": "/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法"
+              },
+              {
+                "text": "AI CPU算子编译基本用法",
+                "link": "/guide/编程指南/编译与运行/算子编译/AI-CPU算子编译基本用法"
+              },
+              {
+                "text": "RTC运行时编译",
+                "link": "/guide/编程指南/编译与运行/算子编译/RTC运行时编译"
+              },
+              {
+                "text": "约束说明",
+                "link": "/guide/编程指南/编译与运行/算子编译/约束说明"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "语言扩展层",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "语言扩展层",
+            "link": "/guide/编程指南/语言扩展层/语言扩展层"
+          },
+          {
+            "text": "SIMD BuiltIn关键字",
+            "link": "/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字"
+          },
+          {
+            "text": "SIMT BuiltIn关键字",
+            "link": "/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字"
+          },
+          {
+            "text": "SIMD语言扩展层C API",
+            "link": "/guide/编程指南/语言扩展层/SIMD语言扩展层C-API"
+          },
+          {
+            "text": "SIMT语言扩展层C API",
+            "link": "/guide/编程指南/语言扩展层/SIMT语言扩展层C-API"
+          }
+        ]
+      },
+      {
+        "text": "C++类库API",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "C++类库API",
+            "link": "/guide/编程指南/类库API/类库API"
+          },
+          {
+            "text": "编程接口概述",
+            "link": "/guide/编程指南/类库API/编程接口概述"
+          },
+          {
+            "text": "基础API",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "概述",
+                "link": "/guide/编程指南/类库API/基础API/概述"
+              },
+              {
+                "text": "接口分类说明",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "连续计算API",
+                    "link": "/guide/编程指南/类库API/基础API/接口分类说明/连续计算API"
+                  },
+                  {
+                    "text": "高维切分API",
+                    "link": "/guide/编程指南/类库API/基础API/接口分类说明/高维切分API"
+                  }
+                ]
+              },
+              {
+                "text": "常用操作速查指导",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "如何使用掩码操作API",
+                    "link": "/guide/编程指南/类库API/基础API/常用操作速查指导/如何使用掩码操作API"
+                  },
+                  {
+                    "text": "如何使用归约计算API",
+                    "link": "/guide/编程指南/类库API/基础API/常用操作速查指导/如何使用归约计算API"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "高阶API",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "概述",
+                "link": "/guide/编程指南/类库API/高阶API/概述"
+              },
+              {
+                "text": "常用操作速查指导",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "如何使用Tiling依赖的头文件",
+                    "link": "/guide/编程指南/类库API/高阶API/常用操作速查指导/如何使用Tiling依赖的头文件"
+                  },
+                  {
+                    "text": "如何使用Kernel侧临时空间",
+                    "link": "/guide/编程指南/类库API/高阶API/常用操作速查指导/如何使用Kernel侧临时空间"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "Utils API",
+            "link": "/guide/编程指南/类库API/Utils-API"
+          }
+        ]
+      },
+      {
+        "text": "调试调优",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "调试调优",
+            "link": "/guide/编程指南/调试调优/调试调优"
+          },
+          {
+            "text": "概述",
+            "link": "/guide/编程指南/调试调优/概述"
+          },
+          {
+            "text": "功能调试",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "功能调试",
+                "link": "/guide/编程指南/调试调优/功能调试/功能调试"
+              },
+              {
+                "text": "CPU域孪生调试",
+                "link": "/guide/编程指南/调试调优/功能调试/CPU域孪生调试"
+              },
+              {
+                "text": "NPU域上板调试",
+                "link": "/guide/编程指南/调试调优/功能调试/NPU域上板调试"
+              }
+            ]
+          },
+          {
+            "text": "性能调优",
+            "link": "/guide/编程指南/调试调优/性能调优"
+          }
+        ]
+      },
+      {
+        "text": "高级编程",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "高级编程",
+            "link": "/guide/编程指南/高级编程/硬件实现/硬件实现"
+          },
+          {
+            "text": "硬件实现",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "硬件实现",
+                "link": "/guide/编程指南/高级编程/硬件实现/硬件实现"
+              },
+              {
+                "text": "基本架构",
+                "link": "/guide/编程指南/高级编程/硬件实现/基本架构"
+              },
+              {
+                "text": "架构规格",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "架构规格",
+                    "link": "/guide/编程指南/高级编程/硬件实现/架构规格/架构规格"
+                  },
+                  {
+                    "text": "NPU架构版本2002",
+                    "link": "/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本2002"
+                  },
+                  {
+                    "text": "NPU架构版本2201",
+                    "link": "/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本2201"
+                  },
+                  {
+                    "text": "NPU架构版本3002",
+                    "link": "/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本3002"
+                  },
+                  {
+                    "text": "NPU架构版本3510",
+                    "link": "/guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510"
+                  }
+                ]
+              },
+              {
+                "text": "硬件约束",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "NPU架构版本2002",
+                    "link": "/guide/编程指南/高级编程/硬件实现/硬件约束/NPU架构版本2002"
+                  },
+                  {
+                    "text": "NPU架构版本2201",
+                    "link": "/guide/编程指南/高级编程/硬件实现/硬件约束/NPU架构版本2201"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "高级AI-Core编程模型",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "SIMD与SIMT混合编程",
+                "link": "/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程"
+              }
+            ]
+          },
+          {
+            "text": "高级特性",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "高级特性",
+                "link": "/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程"
+              },
+              {
+                "text": "Aclnn算子工程化开发",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "概述",
+                    "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/概述"
+                  },
+                  {
+                    "text": "创建算子工程",
+                    "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/创建算子工程"
+                  },
+                  {
+                    "text": "算子原型定义",
+                    "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子原型定义"
+                  },
+                  {
+                    "text": "Kernel侧算子实现",
+                    "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/Kernel侧算子实现"
+                  },
+                  {
+                    "text": "Host侧Tiling实现",
+                    "collapsed": true,
+                    "items": [
+                      {
+                        "text": "基本流程",
+                        "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/Host侧Tiling实现/基本流程"
+                      },
+                      {
+                        "text": "通过TilingData传递属性信息",
+                        "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/Host侧Tiling实现/通过TilingData传递属性信息"
+                      },
+                      {
+                        "text": "使用高阶API时配套的Tiling实现",
+                        "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/Host侧Tiling实现/使用高阶API时配套的Tiling实现"
+                      },
+                      {
+                        "text": "使用标准C++语法定义Tiling结构体",
+                        "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/Host侧Tiling实现/使用标准CPP语法定义Tiling结构体"
+                      },
+                      {
+                        "text": "Tiling模板编程",
+                        "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/Host侧Tiling实现/Tiling模板编程"
+                      }
+                    ]
+                  },
+                  {
+                    "text": "算子包编译",
+                    "collapsed": true,
+                    "items": [
+                      {
+                        "text": "算子工程编译",
+                        "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子包编译/算子工程编译"
+                      },
+                      {
+                        "text": "算子包部署",
+                        "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子包编译/算子包部署"
+                      }
+                    ]
+                  },
+                  {
+                    "text": "算子动态库和静态库编译",
+                    "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子动态库和静态库编译"
+                  },
+                  {
+                    "text": "算子工程编译拓展",
+                    "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子工程编译拓展"
+                  },
+                  {
+                    "text": "单算子API调用",
+                    "link": "/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/单算子API调用"
+                  }
+                ]
+              },
+              {
+                "text": "算子入图开发",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "概述",
+                    "link": "/guide/编程指南/高级编程/高级特性/算子入图开发/概述"
+                  },
+                  {
+                    "text": "基本开发流程",
+                    "link": "/guide/编程指南/高级编程/高级特性/算子入图开发/基本开发流程"
+                  },
+                  {
+                    "text": "使能Tiling下沉",
+                    "link": "/guide/编程指南/高级编程/高级特性/算子入图开发/使能Tiling下沉"
+                  },
+                  {
+                    "text": "SuperKernel开发",
+                    "link": "/guide/编程指南/高级编程/高级特性/算子入图开发/SuperKernel开发"
+                  },
+                  {
+                    "text": "图编译和图执行",
+                    "link": "/guide/编程指南/高级编程/高级特性/算子入图开发/图编译和图执行"
+                  }
+                ]
+              },
+              {
+                "text": "AI框架算子适配",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "概述",
+                    "link": "/guide/编程指南/高级编程/高级特性/AI框架算子适配/概述"
+                  },
+                  {
+                    "text": "PyTorch框架",
+                    "link": "/guide/编程指南/高级编程/高级特性/AI框架算子适配/PyTorch框架"
+                  },
+                  {
+                    "text": "ONNX框架",
+                    "collapsed": true,
+                    "items": [
+                      {
+                        "text": "适配插件开发",
+                        "link": "/guide/编程指南/高级编程/高级特性/AI框架算子适配/ONNX框架/适配插件开发"
+                      },
+                      {
+                        "text": "调用样例",
+                        "link": "/guide/编程指南/高级编程/高级特性/AI框架算子适配/ONNX框架/调用样例"
+                      }
+                    ]
+                  },
+                  {
+                    "text": "TensorFlow框架",
+                    "link": "/guide/编程指南/高级编程/高级特性/AI框架算子适配/TensorFlow框架"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "附录",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "show_kernel_debug_data工具",
+            "link": "/guide/编程指南/附录/show_kernel_debug_data工具"
+          },
+          {
+            "text": "msobjdump工具",
+            "link": "/guide/编程指南/附录/msobjdump工具"
+          },
+          {
+            "text": "基于样例工程完成Kernel直调",
+            "link": "/guide/编程指南/附录/基于样例工程完成Kernel直调"
+          },
+          {
+            "text": "简易自定义算子工程",
+            "link": "/guide/编程指南/附录/简易自定义算子工程"
+          },
+          {
+            "text": "常用操作",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "如何开发动态输入算子",
+                "link": "/guide/编程指南/附录/常用操作/如何开发动态输入算子"
+              },
+              {
+                "text": "如何在矢量编程时使能Vector Core",
+                "link": "/guide/编程指南/附录/常用操作/如何在矢量编程时使能Vector-Core"
+              },
+              {
+                "text": "如何使用workspace",
+                "link": "/guide/编程指南/附录/常用操作/如何使用workspace"
+              },
+              {
+                "text": "如何进行Tiling调测",
+                "link": "/guide/编程指南/附录/常用操作/如何进行Tiling调测"
+              },
+              {
+                "text": "如何使用Tensor原地操作提升算子性能",
+                "link": "/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能"
+              }
+            ]
+          },
+          {
+            "text": "FAQ",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "核函数运行验证时算子存在精度问题",
+                "link": "/guide/编程指南/附录/FAQ/核函数运行验证时算子存在精度问题"
+              },
+              {
+                "text": "运行验证时AllocTensor/FreeTensor失败",
+                "link": "/guide/编程指南/附录/FAQ/运行验证时AllocTensor-FreeTensor失败"
+              },
+              {
+                "text": "kernel侧获取Tiling信息不正确",
+                "link": "/guide/编程指南/附录/FAQ/kernel侧获取Tiling信息不正确"
+              },
+              {
+                "text": "Kernel编译时报错\"error: out of jump/jumpc imm range\"",
+                "link": "/guide/编程指南/附录/FAQ/Kernel编译时报错-error-out-of-jump-jumpc-imm-range"
+              },
+              {
+                "text": "含有Matmul高阶API的算子精度问题",
+                "link": "/guide/编程指南/附录/FAQ/含有Matmul高阶API的算子精度问题"
+              },
+              {
+                "text": "算子工程编译时出现文件名过长报错",
+                "link": "/guide/编程指南/附录/FAQ/算子工程编译时出现文件名过长报错"
+              },
+              {
+                "text": "调用算子时出现无法打开config.ini的报错",
+                "link": "/guide/编程指南/附录/FAQ/调用算子时出现无法打开config-ini的报错"
+              },
+              {
+                "text": "算子包部署时出现权限不足报错",
+                "link": "/guide/编程指南/附录/FAQ/算子包部署时出现权限不足报错"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "算子实践参考",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "本文档组织结构",
+        "link": "/guide/算子实践参考/本文档组织结构"
+      },
+      {
+        "text": "异构计算",
+        "link": "/guide/算子实践参考/异构计算"
+      },
+      {
+        "text": "SIMD算子实现",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "SIMD算子实现",
+            "link": "/guide/算子实践参考/SIMD算子实现/SIMD算子实现"
+          },
+          {
+            "text": "概述",
+            "link": "/guide/算子实践参考/SIMD算子实现/概述"
+          },
+          {
+            "text": "矢量编程",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "矢量编程",
+                "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/矢量编程"
+              },
+              {
+                "text": "概述",
+                "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/概述"
+              },
+              {
+                "text": "基础矢量算子",
+                "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/基础矢量算子"
+              },
+              {
+                "text": "TBuf的使用",
+                "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/TBuf的使用"
+              },
+              {
+                "text": "多核&Tiling切分",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "概述",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/概述"
+                  },
+                  {
+                    "text": "多核Tiling",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/多核Tiling"
+                  },
+                  {
+                    "text": "尾块Tiling",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾块Tiling"
+                  },
+                  {
+                    "text": "尾核Tiling",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾核Tiling"
+                  },
+                  {
+                    "text": "尾核&尾块",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾核-尾块"
+                  }
+                ]
+              },
+              {
+                "text": "DoubleBuffer场景",
+                "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/DoubleBuffer场景"
+              },
+              {
+                "text": "Broadcast场景",
+                "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/Broadcast场景"
+              },
+              {
+                "text": "非对齐场景",
+                "link": "/guide/算子实践参考/SIMD算子实现/矢量编程/非对齐场景"
+              }
+            ]
+          },
+          {
+            "text": "矩阵编程（高阶API）",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "矩阵编程（高阶API）",
+                "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/矩阵编程（高阶API）"
+              },
+              {
+                "text": "基础知识",
+                "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/基础知识"
+              },
+              {
+                "text": "算子实现",
+                "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/算子实现"
+              },
+              {
+                "text": "特性场景",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "Matmul特性介绍",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/Matmul特性介绍"
+                  },
+                  {
+                    "text": "多核对齐切分",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/多核对齐切分"
+                  },
+                  {
+                    "text": "多核非对齐切分",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/多核非对齐切分"
+                  },
+                  {
+                    "text": "异步场景处理",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/异步场景处理"
+                  },
+                  {
+                    "text": "矩阵乘输出的量化/反量化",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的量化-反量化"
+                  },
+                  {
+                    "text": "矩阵乘输出的Channel拆分",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的Channel拆分"
+                  },
+                  {
+                    "text": "矩阵向量乘",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵向量乘"
+                  },
+                  {
+                    "text": "4:2稀疏矩阵乘",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/4-2稀疏矩阵乘"
+                  },
+                  {
+                    "text": "TSCM输入的矩阵乘",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/TSCM输入的矩阵乘"
+                  },
+                  {
+                    "text": "矩阵乘输出的N方向对齐",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的N方向对齐"
+                  },
+                  {
+                    "text": "单次矩阵乘局部输出",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/单次矩阵乘局部输出"
+                  },
+                  {
+                    "text": "AIC和AIV独立运行机制",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/AIC和AIV独立运行机制"
+                  },
+                  {
+                    "text": "MxMatmul场景",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景"
+                  },
+                  {
+                    "text": "Batch Matmul基础功能",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/Batch-Matmul基础功能"
+                  },
+                  {
+                    "text": "Batch Matmul复用Bias矩阵",
+                    "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/Batch-Matmul复用Bias矩阵"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "矩阵编程（基础API）",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "耦合模式",
+                "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式"
+              },
+              {
+                "text": "分离模式",
+                "link": "/guide/算子实践参考/SIMD算子实现/矩阵编程（基础API）/分离模式"
+              }
+            ]
+          },
+          {
+            "text": "融合算子编程",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "融合算子编程",
+                "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/融合算子编程"
+              },
+              {
+                "text": "CV融合",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "基础知识",
+                    "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/CV融合/基础知识"
+                  },
+                  {
+                    "text": "算子实现",
+                    "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/CV融合/算子实现"
+                  }
+                ]
+              },
+              {
+                "text": "通算融合",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "基础知识",
+                    "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/通算融合/基础知识"
+                  },
+                  {
+                    "text": "算子实现",
+                    "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现"
+                  },
+                  {
+                    "text": "特性场景",
+                    "link": "/guide/算子实践参考/SIMD算子实现/融合算子编程/通算融合/特性场景"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "SIMT算子实现",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "SIMT算子实现",
+            "link": "/guide/算子实践参考/SIMT算子实现/SIMT算子实现"
+          },
+          {
+            "text": "基础知识",
+            "link": "/guide/算子实践参考/SIMT算子实现/基础知识"
+          },
+          {
+            "text": "算子实现",
+            "link": "/guide/算子实践参考/SIMT算子实现/算子实现"
+          }
+        ]
+      },
+      {
+        "text": "SIMD与SIMT混合算子实现",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "SIMD与SIMT混合算子实现",
+            "link": "/guide/算子实践参考/SIMD与SIMT混合算子实现/SIMD与SIMT混合算子实现"
+          },
+          {
+            "text": "基础知识",
+            "link": "/guide/算子实践参考/SIMD与SIMT混合算子实现/基础知识"
+          },
+          {
+            "text": "算子实现",
+            "link": "/guide/算子实践参考/SIMD与SIMT混合算子实现/算子实现"
+          }
+        ]
+      },
+      {
+        "text": "功能调试",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "功能调试",
+            "link": "/guide/算子实践参考/功能调试/功能调试"
+          },
+          {
+            "text": "运行正常",
+            "link": "/guide/算子实践参考/功能调试/运行正常"
+          },
+          {
+            "text": "精度正常",
+            "link": "/guide/算子实践参考/功能调试/精度正常"
+          },
+          {
+            "text": "算子调试",
+            "link": "/guide/算子实践参考/功能调试/算子调试"
+          }
+        ]
+      },
+      {
+        "text": "性能分析",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "性能分析",
+            "link": "/guide/算子实践参考/性能分析/性能分析"
+          },
+          {
+            "text": "获取性能数据",
+            "link": "/guide/算子实践参考/性能分析/获取性能数据"
+          },
+          {
+            "text": "分析性能数据",
+            "link": "/guide/算子实践参考/性能分析/分析性能数据"
+          }
+        ]
+      },
+      {
+        "text": "SIMD算子性能优化",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "SIMD算子性能优化",
+            "link": "/guide/算子实践参考/SIMD算子性能优化/SIMD算子性能优化"
+          },
+          {
+            "text": "优化建议总览表",
+            "link": "/guide/算子实践参考/SIMD算子性能优化/优化建议总览表"
+          },
+          {
+            "text": "Tiling策略",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "Tiling策略",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/Tiling策略/Tiling策略"
+              },
+              {
+                "text": "核间负载均衡",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/Tiling策略/核间负载均衡"
+              }
+            ]
+          },
+          {
+            "text": "头尾开销优化",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "头尾开销优化",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/头尾开销优化"
+              },
+              {
+                "text": "设置合适的核数和算子Kernel类型",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/设置合适的核数和算子Kernel类型"
+              },
+              {
+                "text": "限制TilingData结构大小",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/限制TilingData结构大小"
+              },
+              {
+                "text": "避免TPipe在对象内创建和初始化",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/避免TPipe在对象内创建和初始化"
+              },
+              {
+                "text": "核函数内删除Workspace相关冗余操作",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/核函数内删除Workspace相关冗余操作"
+              },
+              {
+                "text": "设置DCI编译选项来减少算子尾开销",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/头尾开销优化/设置DCI编译选项来减少算子尾开销"
+              }
+            ]
+          },
+          {
+            "text": "流水编排",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "流水编排",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/流水编排/流水编排"
+              },
+              {
+                "text": "使能DoubleBuffer",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/流水编排/使能DoubleBuffer"
+              },
+              {
+                "text": "使能Iterate或IterateAll异步接口避免AIC/AIV同步依赖",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/流水编排/使能Iterate或IterateAll异步接口避免AIC-AIV同步依赖"
+              }
+            ]
+          },
+          {
+            "text": "内存访问",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "内存访问",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/内存访问"
+              },
+              {
+                "text": "尽量一次搬运较大的数据块",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/尽量一次搬运较大的数据块"
+              },
+              {
+                "text": "GM地址尽量512B对齐",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/GM地址尽量512B对齐"
+              },
+              {
+                "text": "高效的使用搬运API",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/高效的使用搬运API"
+              },
+              {
+                "text": "非对齐场景减少无效数据的搬运",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/非对齐场景减少无效数据的搬运"
+              },
+              {
+                "text": "非连续搬运场景减少搬运次数",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/非连续搬运场景减少搬运次数"
+              },
+              {
+                "text": "避免同地址访问",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/避免同地址访问"
+              },
+              {
+                "text": "设置合理的L2 CacheMode",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/设置合理的L2-CacheMode"
+              },
+              {
+                "text": "算子与高阶API共享临时Buffer",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/算子与高阶API共享临时Buffer"
+              },
+              {
+                "text": "纯搬运类算子VECIN和VECOUT建议复用",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/纯搬运类算子VECIN和VECOUT建议复用"
+              },
+              {
+                "text": "通过缩减Tensor ShapeInfo维度，优化栈空间",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/通过缩减Tensor-ShapeInfo维度-优化栈空间"
+              },
+              {
+                "text": "避免UB的bank冲突",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "避免UB的bank冲突",
+                    "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免UB的bank冲突"
+                  },
+                  {
+                    "text": "概述",
+                    "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/概述"
+                  },
+                  {
+                    "text": "避免bank冲突（NPU架构版本2201）",
+                    "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本2201）"
+                  },
+                  {
+                    "text": "避免bank冲突（NPU架构版本3510）",
+                    "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）"
+                  }
+                ]
+              },
+              {
+                "text": "L2 Cache切分",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/内存访问/L2-Cache切分"
+              }
+            ]
+          },
+          {
+            "text": "矢量计算",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "通过Unified Buffer融合实现连续vector计算",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/通过Unified-Buffer融合实现连续vector计算"
+              },
+              {
+                "text": "Vector算子灵活运用Counter模式",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/Vector算子灵活运用Counter模式"
+              },
+              {
+                "text": "选择低延迟指令，优化归约操作性能",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/选择低延迟指令-优化归约操作性能"
+              },
+              {
+                "text": "VF性能优化",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "VF循环优化",
+                    "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化"
+                  },
+                  {
+                    "text": "指令双发优化",
+                    "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/指令双发优化"
+                  },
+                  {
+                    "text": "连续非对齐场景优化",
+                    "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/连续非对齐场景优化"
+                  },
+                  {
+                    "text": "VF融合优化",
+                    "link": "/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF融合优化"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "矩阵计算",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "通过BT Buffer实现高效的bias计算",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/矩阵计算/通过BT-Buffer实现高效的bias计算"
+              },
+              {
+                "text": "通过FP Buffer存放量化参数实现高效随路量化",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/矩阵计算/通过FP-Buffer存放量化参数实现高效随路量化"
+              },
+              {
+                "text": "通过L0C Buffer数据暂存实现高效的矩阵乘结果累加",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/矩阵计算/通过L0C-Buffer数据暂存实现高效的矩阵乘结果累加"
+              },
+              {
+                "text": "较小矩阵长驻L1 Buffer，仅分次搬运较大矩阵",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/矩阵计算/较小矩阵长驻L1-Buffer-仅分次搬运较大矩阵"
+              },
+              {
+                "text": "Matmul使能AtomicAdd选项",
+                "link": "/guide/算子实践参考/SIMD算子性能优化/矩阵计算/Matmul使能AtomicAdd选项"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "SIMD与SIMT混合算子性能优化",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "SIMD与SIMT混合算子性能优化",
+            "link": "/guide/算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率"
+          },
+          {
+            "text": "内存访问",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "使用Unified Buffer提升内存访问效率",
+                "link": "/guide/算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率"
+              }
+            ]
+          },
+          {
+            "text": "计算优化",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "通过SIMT实现分支判断",
+                "link": "/guide/算子实践参考/SIMD与SIMT混合算子性能优化/计算优化/通过SIMT实现分支判断"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "内存访问",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "访存合并",
+            "link": "/guide/算子实践参考/SIMT算子性能优化/内存访问/访存合并"
+          },
+          {
+            "text": "避免UB的Bank冲突",
+            "link": "/guide/算子实践参考/SIMT算子性能优化/内存访问/避免UB的Bank冲突"
+          }
+        ]
+      },
+      {
+        "text": "优秀实践",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "优秀实践",
+            "link": "/guide/算子实践参考/优秀实践/优秀实践"
+          },
+          {
+            "text": "FlashAttention算子性能调优案例",
+            "link": "/guide/算子实践参考/优秀实践/FlashAttention算子性能调优案例"
+          },
+          {
+            "text": "GroupedMatmul算子性能调优案例",
+            "link": "/guide/算子实践参考/优秀实践/GroupedMatmul算子性能调优案例"
+          },
+          {
+            "text": "MC²算子性能调优案例",
+            "link": "/guide/算子实践参考/优秀实践/MC-算子性能调优案例"
+          },
+          {
+            "text": "Matmul性能调优案例",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "Matmul性能优化策略总览",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul性能优化策略总览"
+              },
+              {
+                "text": "Matmul算子优化Tiling策略",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul算子优化Tiling策略"
+              },
+              {
+                "text": "Matmul高阶API使能纯Cube模式",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能纯Cube模式"
+              },
+              {
+                "text": "Matmul高阶API使能MDL模板",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能MDL模板"
+              },
+              {
+                "text": "Matmul高阶API使能UnitFlag",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能UnitFlag"
+              },
+              {
+                "text": "Matmul高阶API使能Tiling全量常量化",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能Tiling全量常量化"
+              },
+              {
+                "text": "Matmul高阶API使能L2 Cache切分",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能L2-Cache切分"
+              },
+              {
+                "text": "Matmul高阶API使能多核切K",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能多核切K"
+              },
+              {
+                "text": "Matmul高阶API使能多核K轴错峰访问内存",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能多核K轴错峰访问内存"
+              },
+              {
+                "text": "Matmul高阶API使能NBuffer33模板",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能NBuffer33模板"
+              },
+              {
+                "text": "Matmul高阶API使能IBShare模板共享B矩阵数据",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能IBShare模板共享B矩阵数据"
+              },
+              {
+                "text": "Matmul高阶API使能IBShare模板共享A和B矩阵数据",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能IBShare模板共享A和B矩阵数据"
+              },
+              {
+                "text": "AIV核上的ND2NZ格式转换",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/AIV核上的ND2NZ格式转换"
+              },
+              {
+                "text": "Matmul高阶API使能MTE2 Preload",
+                "link": "/guide/算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能MTE2-Preload"
+              }
+            ]
+          },
+          {
+            "text": "SIMT实现InsertHashTable算子案例",
+            "link": "/guide/算子实践参考/优秀实践/SIMT实现InsertHashTable算子案例"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "跨代迁移兼容性指南",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "概述",
+        "link": "/guide/跨代迁移兼容性指南/概述"
+      },
+      {
+        "text": "Ascend-C-API兼容策略",
+        "link": "/guide/跨代迁移兼容性指南/Ascend-C-API兼容策略"
+      },
+      {
+        "text": "3510架构迁移指导",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "2201到3510架构变更",
+            "link": "/guide/跨代迁移兼容性指南/3510架构迁移指导/2201到3510架构变更"
+          },
+          {
+            "text": "2201迁移3510指导",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "基础API迁移指导",
+                "link": "/guide/跨代迁移兼容性指南/3510架构迁移指导/2201迁移3510指导/基础API迁移指导"
+              },
+              {
+                "text": "高阶API迁移指导",
+                "link": "/guide/跨代迁移兼容性指南/3510架构迁移指导/2201迁移3510指导/高阶API迁移指导"
+              },
+              {
+                "text": "算子编译迁移指导",
+                "link": "/guide/跨代迁移兼容性指南/3510架构迁移指导/2201迁移3510指导/算子编译迁移指导"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "技术附录",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "概念原理和术语",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "术语表",
+            "link": "/guide/技术附录/概念原理和术语/术语表"
+          },
+          {
+            "text": "神经网络和算子",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "算子基本概念",
+                "link": "/guide/技术附录/概念原理和术语/神经网络和算子/算子基本概念"
+              },
+              {
+                "text": "数据排布格式",
+                "link": "/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式"
+              }
+            ]
+          },
+          {
+            "text": "内存访问原理",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "Scalar读写数据",
+                "link": "/guide/技术附录/概念原理和术语/内存访问原理/Scalar读写数据"
+              }
+            ]
+          },
+          {
+            "text": "性能优化技术原理",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "DoubleBuffer",
+                "link": "/guide/技术附录/概念原理和术语/性能优化技术原理/DoubleBuffer"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "C++标准支持",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "概述",
+            "link": "/guide/技术附录/CPP标准支持/概述"
+          },
+          {
+            "text": "C/C++语法限制",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "C/C++语法限制",
+                "link": "/guide/技术附录/CPP标准支持/语法限制/语法限制"
+              },
+              {
+                "text": "特性",
+                "link": "/guide/技术附录/CPP标准支持/语法限制/特性"
+              },
+              {
+                "text": "函数",
+                "link": "/guide/技术附录/CPP标准支持/语法限制/函数"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+],
 
 
   "/api/": [
@@ -1460,7 +1490,7 @@ export default {
                 },
                 {
                   "text": "operator()",
-                  "link": "/api/SIMD-API/基础数据结构/LocalTensor/operator("
+                  "link": "/api/SIMD-API/基础数据结构/LocalTensor/operator()"
                 },
                 {
                   "text": "SetSize",
@@ -1546,7 +1576,7 @@ export default {
                 },
                 {
                   "text": "operator()",
-                  "link": "/api/SIMD-API/基础数据结构/GlobalTensor/operator("
+                  "link": "/api/SIMD-API/基础数据结构/GlobalTensor/operator()-2"
                 },
                 {
                   "text": "SetValue",
@@ -1733,8 +1763,12 @@ export default {
                   ]
                 },
                 {
+                  "text": "DataCopyL1ToUB",
+                  "link": "/api/SIMD-API/基础API/Memory数据搬运/DataCopyL1ToUB"
+                },
+                {
                   "text": "DataCopyPad(ISASI)",
-                  "link": "/api/SIMD-API/基础API/Memory数据搬运/DataCopyPad(ISASI"
+                  "link": "/api/SIMD-API/基础API/Memory数据搬运/DataCopyPad(ISASI)"
                 },
                 {
                   "text": "Copy",
@@ -1742,7 +1776,7 @@ export default {
                 },
                 {
                   "text": "SetPadValue(ISASI)",
-                  "link": "/api/SIMD-API/基础API/Memory数据搬运/SetPadValue(ISASI"
+                  "link": "/api/SIMD-API/基础API/Memory数据搬运/SetPadValue(ISASI)"
                 },
                 {
                   "text": "SetLoopModePara",
@@ -1754,7 +1788,7 @@ export default {
                 },
                 {
                   "text": "BroadCastVecToMM(ISASI)",
-                  "link": "/api/SIMD-API/基础API/Memory数据搬运/BroadCastVecToMM(ISASI"
+                  "link": "/api/SIMD-API/基础API/Memory数据搬运/BroadCastVecToMM(ISASI)"
                 }
               ]
             },
@@ -1948,7 +1982,7 @@ export default {
                     },
                     {
                       "text": "Neg(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/基础算术/Neg(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/基础算术/Neg(ISASI)"
                     },
                     {
                       "text": "Add",
@@ -1976,15 +2010,15 @@ export default {
                     },
                     {
                       "text": "BilinearInterpolation(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/基础算术/BilinearInterpolation(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/基础算术/BilinearInterpolation(ISASI)"
                     },
                     {
                       "text": "Prelu(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/基础算术/Prelu(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/基础算术/Prelu(ISASI)"
                     },
                     {
                       "text": "Mull(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/基础算术/Mull(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/基础算术/Mull(ISASI)"
                     },
                     {
                       "text": "Adds",
@@ -2128,15 +2162,15 @@ export default {
                     },
                     {
                       "text": "AbsSub(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/复合计算/AbsSub(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/复合计算/AbsSub(ISASI)"
                     },
                     {
                       "text": "ExpSub(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/复合计算/ExpSub(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/复合计算/ExpSub(ISASI)"
                     },
                     {
                       "text": "MulsCast(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/复合计算/MulsCast(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/复合计算/MulsCast(ISASI)"
                     }
                   ]
                 },
@@ -2162,11 +2196,11 @@ export default {
                     },
                     {
                       "text": "GetCmpMask(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/比较与选择/GetCmpMask(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/比较与选择/GetCmpMask(ISASI)"
                     },
                     {
                       "text": "SetCmpMask(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/比较与选择/SetCmpMask(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/比较与选择/SetCmpMask(ISASI)"
                     },
                     {
                       "text": "Select",
@@ -2192,7 +2226,7 @@ export default {
                     },
                     {
                       "text": "Truncate(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/类型转换/Truncate(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/类型转换/Truncate(ISASI)"
                     }
                   ]
                 },
@@ -2246,11 +2280,11 @@ export default {
                     },
                     {
                       "text": "GetReduceRepeatSumSpr(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/归约计算/GetReduceRepeatSumSpr(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/归约计算/GetReduceRepeatSumSpr(ISASI)"
                     },
                     {
                       "text": "GetReduceRepeatMaxMinSpr(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/归约计算/GetReduceRepeatMaxMinSpr(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/归约计算/GetReduceRepeatMaxMinSpr(ISASI)"
                     }
                   ]
                 },
@@ -2286,7 +2320,7 @@ export default {
                     },
                     {
                       "text": "VectorPadding(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/数据填充/VectorPadding(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/数据填充/VectorPadding(ISASI)"
                     }
                   ]
                 },
@@ -2334,11 +2368,11 @@ export default {
                     },
                     {
                       "text": "Gatherb(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/离散与聚合/Gatherb(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/离散与聚合/Gatherb(ISASI)"
                     },
                     {
                       "text": "Scatter(ISASI)",
-                      "link": "/api/SIMD-API/基础API/Memory矢量计算/离散与聚合/Scatter(ISASI"
+                      "link": "/api/SIMD-API/基础API/Memory矢量计算/离散与聚合/Scatter(ISASI)"
                     }
                   ]
                 },
@@ -2898,11 +2932,11 @@ export default {
                 },
                 {
                   "text": "WriteGmByPassDCache(ISASI)",
-                  "link": "/api/SIMD-API/基础API/标量计算/WriteGmByPassDCache(ISASI"
+                  "link": "/api/SIMD-API/基础API/标量计算/WriteGmByPassDCache(ISASI)"
                 },
                 {
                   "text": "ReadGmByPassDCache(ISASI)",
-                  "link": "/api/SIMD-API/基础API/标量计算/ReadGmByPassDCache(ISASI"
+                  "link": "/api/SIMD-API/基础API/标量计算/ReadGmByPassDCache(ISASI)"
                 }
               ]
             },
@@ -3284,15 +3318,15 @@ export default {
                     },
                     {
                       "text": "SetFlag/WaitFlag(ISASI)",
-                      "link": "/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI"
+                      "link": "/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI)"
                     },
                     {
                       "text": "PipeBarrier(ISASI)",
-                      "link": "/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI"
+                      "link": "/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI)"
                     },
                     {
                       "text": "DataSyncBarrier(ISASI)",
-                      "link": "/api/SIMD-API/基础API/同步控制/核内同步/DataSyncBarrier(ISASI"
+                      "link": "/api/SIMD-API/基础API/同步控制/核内同步/DataSyncBarrier(ISASI)"
                     },
                     {
                       "text": "Mutex（ISASI）",
@@ -3314,11 +3348,11 @@ export default {
                     },
                     {
                       "text": "AllocMutexID (ISASI)",
-                      "link": "/api/SIMD-API/基础API/同步控制/核内同步/AllocMutexID-(ISASI"
+                      "link": "/api/SIMD-API/基础API/同步控制/核内同步/AllocMutexID-(ISASI)"
                     },
                     {
                       "text": "ReleaseMutexID (ISASI)",
-                      "link": "/api/SIMD-API/基础API/同步控制/核内同步/ReleaseMutexID-(ISASI"
+                      "link": "/api/SIMD-API/基础API/同步控制/核内同步/ReleaseMutexID-(ISASI)"
                     }
                   ]
                 },
@@ -3340,11 +3374,11 @@ export default {
                     },
                     {
                       "text": "CrossCoreSetFlag(ISASI)",
-                      "link": "/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI"
+                      "link": "/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI)"
                     },
                     {
                       "text": "CrossCoreWaitFlag(ISASI)",
-                      "link": "/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI"
+                      "link": "/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI)"
                     },
                     {
                       "text": "InitDetermineComputeWorkspace",
@@ -3390,11 +3424,11 @@ export default {
                 },
                 {
                   "text": "ICachePreLoad(ISASI)",
-                  "link": "/api/SIMD-API/基础API/缓存控制/ICachePreLoad(ISASI"
+                  "link": "/api/SIMD-API/基础API/缓存控制/ICachePreLoad(ISASI)"
                 },
                 {
                   "text": "GetICachePreloadStatus(ISASI)",
-                  "link": "/api/SIMD-API/基础API/缓存控制/GetICachePreloadStatus(ISASI"
+                  "link": "/api/SIMD-API/基础API/缓存控制/GetICachePreloadStatus(ISASI)"
                 }
               ]
             },
@@ -3424,31 +3458,31 @@ export default {
                 },
                 {
                   "text": "GetProgramCounter(ISASI)",
-                  "link": "/api/SIMD-API/基础API/系统变量访问/GetProgramCounter(ISASI"
+                  "link": "/api/SIMD-API/基础API/系统变量访问/GetProgramCounter(ISASI)"
                 },
                 {
                   "text": "GetSubBlockNum(ISASI)",
-                  "link": "/api/SIMD-API/基础API/系统变量访问/GetSubBlockNum(ISASI"
+                  "link": "/api/SIMD-API/基础API/系统变量访问/GetSubBlockNum(ISASI)"
                 },
                 {
                   "text": "GetSubBlockIdx(ISASI)",
-                  "link": "/api/SIMD-API/基础API/系统变量访问/GetSubBlockIdx(ISASI"
+                  "link": "/api/SIMD-API/基础API/系统变量访问/GetSubBlockIdx(ISASI)"
                 },
                 {
                   "text": "GetSystemCycle(ISASI)",
-                  "link": "/api/SIMD-API/基础API/系统变量访问/GetSystemCycle(ISASI"
+                  "link": "/api/SIMD-API/基础API/系统变量访问/GetSystemCycle(ISASI)"
                 },
                 {
                   "text": "SetCtrlSpr(ISASI)",
-                  "link": "/api/SIMD-API/基础API/系统变量访问/SetCtrlSpr(ISASI"
+                  "link": "/api/SIMD-API/基础API/系统变量访问/SetCtrlSpr(ISASI)"
                 },
                 {
                   "text": "GetCtrlSpr(ISASI)",
-                  "link": "/api/SIMD-API/基础API/系统变量访问/GetCtrlSpr(ISASI"
+                  "link": "/api/SIMD-API/基础API/系统变量访问/GetCtrlSpr(ISASI)"
                 },
                 {
                   "text": "ResetCtrlSpr(ISASI)",
-                  "link": "/api/SIMD-API/基础API/系统变量访问/ResetCtrlSpr(ISASI"
+                  "link": "/api/SIMD-API/基础API/系统变量访问/ResetCtrlSpr(ISASI)"
                 }
               ]
             },
@@ -3470,19 +3504,19 @@ export default {
                 },
                 {
                   "text": "SetAtomicMax(ISASI)",
-                  "link": "/api/SIMD-API/基础API/原子操作/SetAtomicMax(ISASI"
+                  "link": "/api/SIMD-API/基础API/原子操作/SetAtomicMax(ISASI)"
                 },
                 {
                   "text": "SetAtomicMin(ISASI)",
-                  "link": "/api/SIMD-API/基础API/原子操作/SetAtomicMin(ISASI"
+                  "link": "/api/SIMD-API/基础API/原子操作/SetAtomicMin(ISASI)"
                 },
                 {
                   "text": "SetStoreAtomicConfig(ISASI)",
-                  "link": "/api/SIMD-API/基础API/原子操作/SetStoreAtomicConfig(ISASI"
+                  "link": "/api/SIMD-API/基础API/原子操作/SetStoreAtomicConfig(ISASI)"
                 },
                 {
                   "text": "GetStoreAtomicConfig(ISASI)",
-                  "link": "/api/SIMD-API/基础API/原子操作/GetStoreAtomicConfig(ISASI"
+                  "link": "/api/SIMD-API/基础API/原子操作/GetStoreAtomicConfig(ISASI)"
                 },
                 {
                   "text": "AtomicAdd",
@@ -3550,7 +3584,7 @@ export default {
                     },
                     {
                       "text": "CheckLocalMemoryIA(ISASI)",
-                      "link": "/api/SIMD-API/基础API/调试接口/异常检测/CheckLocalMemoryIA(ISASI"
+                      "link": "/api/SIMD-API/基础API/调试接口/异常检测/CheckLocalMemoryIA(ISASI)"
                     }
                   ]
                 },
@@ -6401,10 +6435,6 @@ export default {
               "link": "/api/SIMD-API/其他数据类型/TPosition"
             }
           ]
-        },
-        {
-          "text": "C API列表",
-          "link": "/api/SIMD-API/c_api/c_api_list"
         }
       ]
     },
@@ -6501,6 +6531,198 @@ export default {
             {
               "text": "API列表",
               "link": "/api/SIMT-API/SIMD与SIMT混合编程简介/API列表-148"
+            }
+          ]
+        },
+        {
+          "text": "协作组",
+          "collapsed": true,
+          "items": [
+            {
+              "text": "协作组简介",
+              "link": "/api/SIMT-API/协作组/协作组简介"
+            },
+            {
+              "text": "tiled_partition",
+              "link": "/api/SIMT-API/协作组/tiled_partition"
+            },
+            {
+              "text": "binary_partition",
+              "link": "/api/SIMT-API/协作组/binary_partition"
+            },
+            {
+              "text": "thread_block",
+              "collapsed": true,
+              "items": [
+                {
+                  "text": "thread_block简介",
+                  "link": "/api/SIMT-API/协作组/thread_block/thread_block简介"
+                },
+                {
+                  "text": "thread_block构造函数",
+                  "link": "/api/SIMT-API/协作组/thread_block/thread_block构造函数"
+                },
+                {
+                  "text": "sync",
+                  "link": "/api/SIMT-API/协作组/thread_block/sync"
+                },
+                {
+                  "text": "size",
+                  "link": "/api/SIMT-API/协作组/thread_block/size"
+                },
+                {
+                  "text": "num_threads",
+                  "link": "/api/SIMT-API/协作组/thread_block/num_threads"
+                },
+                {
+                  "text": "thread_rank",
+                  "link": "/api/SIMT-API/协作组/thread_block/thread_rank"
+                },
+                {
+                  "text": "thread_index",
+                  "link": "/api/SIMT-API/协作组/thread_block/thread_index"
+                },
+                {
+                  "text": "group_index",
+                  "link": "/api/SIMT-API/协作组/thread_block/group_index"
+                },
+                {
+                  "text": "group_dim",
+                  "link": "/api/SIMT-API/协作组/thread_block/group_dim"
+                },
+                {
+                  "text": "dim_threads",
+                  "link": "/api/SIMT-API/协作组/thread_block/dim_threads"
+                }
+              ]
+            },
+            {
+              "text": "coalesced_group",
+              "collapsed": true,
+              "items": [
+                {
+                  "text": "coalesced_group简介",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/coalesced_group简介"
+                },
+                {
+                  "text": "coalesced_group构造函数",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/coalesced_group构造函数"
+                },
+                {
+                  "text": "sync",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/sync"
+                },
+                {
+                  "text": "size",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/size"
+                },
+                {
+                  "text": "num_threads",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/num_threads"
+                },
+                {
+                  "text": "thread_rank",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/thread_rank"
+                },
+                {
+                  "text": "meta_group_rank",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/meta_group_rank"
+                },
+                {
+                  "text": "meta_group_size",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/meta_group_size"
+                },
+                {
+                  "text": "shfl",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/shfl"
+                },
+                {
+                  "text": "shfl_up",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/shfl_up"
+                },
+                {
+                  "text": "shfl_down",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/shfl_down"
+                },
+                {
+                  "text": "ballot",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/ballot"
+                },
+                {
+                  "text": "any",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/any"
+                },
+                {
+                  "text": "all",
+                  "link": "/api/SIMT-API/协作组/coalesced_group/all"
+                }
+              ]
+            },
+            {
+              "text": "thread_block_tile",
+              "collapsed": true,
+              "items": [
+                {
+                  "text": "thread_block_tile简介",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/thread_block_tile简介"
+                },
+                {
+                  "text": "thread_block_tile构造函数",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/thread_block_tile构造函数"
+                },
+                {
+                  "text": "sync",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/sync"
+                },
+                {
+                  "text": "size",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/size"
+                },
+                {
+                  "text": "num_threads",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/num_threads"
+                },
+                {
+                  "text": "thread_rank",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/thread_rank"
+                },
+                {
+                  "text": "meta_group_rank",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/meta_group_rank"
+                },
+                {
+                  "text": "meta_group_size",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/meta_group_size"
+                },
+                {
+                  "text": "shfl",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/shfl"
+                },
+                {
+                  "text": "shfl_up",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/shfl_up"
+                },
+                {
+                  "text": "shfl_down",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/shfl_down"
+                },
+                {
+                  "text": "shfl_xor",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/shfl_xor"
+                },
+                {
+                  "text": "ballot",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/ballot"
+                },
+                {
+                  "text": "any",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/any"
+                },
+                {
+                  "text": "all",
+                  "link": "/api/SIMT-API/协作组/thread_block_tile/all"
+                }
+              ]
             }
           ]
         },
@@ -10139,4 +10361,6 @@ export default {
       "link": "/api/README"
     }
   ]
+
+
 }

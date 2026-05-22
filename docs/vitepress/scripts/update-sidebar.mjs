@@ -11,7 +11,7 @@ function parseMarkdownList(md) {
   const stack = []
 
   for (const line of lines) {
-    const match = line.match(/^(\s*)-\s\s\s\[(.*?)\]\((.*?)\)/)
+    const match = line.match(/^(\s*)-\s\s\s\[(.*?)\]\((.*)\)/)
     if (!match) continue
     const indent = match[1].length
 

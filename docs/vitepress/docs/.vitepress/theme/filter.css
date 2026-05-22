@@ -40,6 +40,10 @@
   max-width: none;
 }
 
+.vp-doc pre {
+  overflow-x: auto;
+}
+
 /* Wider sidebar */
 .VPSidebar {
   width: 320px;

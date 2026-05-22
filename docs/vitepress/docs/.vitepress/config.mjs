@@ -19,6 +19,87 @@ function placeholderPlugin() {
   }
 }
 
+function fixCannFilterTags(src) {
+  return src
+    .replace(/<\/?cann-filter\b[^>]*>/gi, '')
+    .replace(/<(term|ph|__gm__|__ubuf__)\b[^>]*>([\s\S]*?)<\/\1>/gis, '$2')
+    .replace(/<(term|ph|__gm__|__ubuf__)\b[^>]*>/gi, '')
+    .replace(/<\/(term|ph|__gm__|__ubuf__)>/gi, '')
+}
+
+function stripInnerTags(text) {
+  return text
+    .replace(/<a\s+name\s*=\s*"[^"]*"\s*><\/a>/gi, '')
+    .replace(/<\/?span\b[^>]*>/gi, '')
+    .replace(/<\/?p\b[^>]*>/gi, '')
+    .replace(/<a\s+href\s*=\s*"([^"]*)"\s*>/gi, '<a href="$1">')
+    .trim()
+}
+
+function convertHtmlTablesToMarkdown(src) {
+  let result = src
+  result = result.replace(
+    /<table\b[\s\S]*?<\/table>/gi,
+    (table) => {
+      const theadMatch = table.match(/<thead\b[\s\S]*?<\/thead>/i)
+      const tbodyMatches = []
+      const tbodyRegex = /<tbody\b[\s\S]*?<\/tbody>/gi
+      let m
+      while ((m = tbodyRegex.exec(table)) !== null) {
+        tbodyMatches.push(m[0])
+      }
+
+      const rows = []
+      if (theadMatch) {
+        const thsMatch = theadMatch[0].match(/<th\b[\s\S]*?<\/th>/gi)
+        if (thsMatch) {
+          rows.push(thsMatch.map(th => stripInnerTags(th.replace(/<th\b[^>]*>/i, '').replace(/<\/th>/i, ''))))
+        }
+      }
+
+      for (const tbody of tbodyMatches) {
+        const trsMatch = tbody.match(/<tr\b[\s\S]*?<\/tr>/gi)
+        if (trsMatch) {
+          for (const tr of trsMatch) {
+            const tdsMatch = tr.match(/<td\b[\s\S]*?<\/td>/gi)
+            if (tdsMatch) {
+              const cells = tdsMatch.map(td => {
+                let text = td.replace(/<td\b[^>]*>/i, '').replace(/<\/td>/i, '')
+                text = stripInnerTags(text)
+                const linkMatch = text.match(/<a href="([^"]*)">([^<]*)<\/a>/i)
+                if (linkMatch) {
+                  text = text.replace(linkMatch[0], '[' + linkMatch[2] + '](' + linkMatch[1] + ')')
+                }
+                return text
+              })
+              rows.push(cells)
+            }
+          }
+        }
+      }
+
+      if (rows.length === 0) return table
+      const colCount = Math.max(...rows.map(r => r.length))
+      const aligned = rows.map(r => {
+        while (r.length < colCount) r.push('')
+        return r
+      })
+
+      const mdRows = aligned.map((r, i) => '| ' + r.join(' | ') + ' |')
+      const sep = '| ' + Array(colCount).fill('---').join(' | ') + ' |'
+      return '\n' + mdRows[0] + '\n' + sep + '\n' + mdRows.slice(1).join('\n') + '\n'
+    }
+  )
+
+  result = result.replace(/<a\s+name\s*=\s*"[^"]*"\s*><\/a>/gi, '')
+  result = result.replace(/<br\s*\/?>/gi, '\n')
+  return result
+}
+
+function fixIndentedBlockquotes(src) {
+  return src.replace(/^[ \t]{4,}(?=>)/gm, '')
+}
+
 function fixSpanCrossingTableCells(src) {
   let prev
   do {
@@ -53,7 +134,7 @@ function loadHeaderCache(filePath) {
 }
 
 export default defineConfig({
-  mpa: true,
+  mpa: false,
   title: 'Ascend C',
   description: 'Ascend C 算子开发文档',
   lang: 'zh-CN',
@@ -64,7 +145,10 @@ export default defineConfig({
     config(md) {
       const originalRender = md.render.bind(md)
       md.render = function (src, env) {
+        src = fixCannFilterTags(src)
+        src = fixIndentedBlockquotes(src)
         src = fixSpanCrossingTableCells(src)
+        src = convertHtmlTablesToMarkdown(src)
 
         let html = originalRender(src, env)
 
