@@ -1469,7 +1469,7 @@ __aicore__ static inline void SetCtrlSprImpl(int64_t value)
                   "Invalid startBit/endBit on current device!");
     if (endBit - startBit == 63) {
         set_ctrl(value);
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetCtrlSprImpl!"); });
     }
     uint64_t mask = ((uint64_t(1) << (endBit - startBit + 1)) - 1) << startBit;
     mask = ~mask;
@@ -1502,7 +1502,7 @@ __aicore__ static inline void ResetCtrlSprImpl()
     int64_t defaultCtrl = 0x1000000000000008; // default value of ctrl
     if (endBit - startBit == 63) {
         set_ctrl(defaultCtrl);
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported ResetCtrlSprImpl!"); });
     }
     uint64_t mask = ((uint64_t(1) << (endBit - startBit + 1)) - 1) << startBit;
     defaultCtrl = defaultCtrl & mask;

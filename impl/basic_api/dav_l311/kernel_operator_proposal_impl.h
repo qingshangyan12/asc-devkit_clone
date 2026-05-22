@@ -115,7 +115,7 @@ __aicore__ inline void FullSortInnerLoop(const LocalTensor<T> &dst, const LocalT
     const uint32_t baseOffset, const uint16_t singleMergeTmpElementCount, const int32_t mergeTmpRepeatTimes)
 {
     if (mergeTmpRepeatTimes <= 0) {
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported FullSortInnerLoop!"); });
     }
     MrgSortSrcList sortList =
         MrgSortSrcList(tmp[0], tmp[baseOffset], tmp[2 * baseOffset], tmp[3 * baseOffset]);
@@ -131,7 +131,7 @@ __aicore__ inline void FullSortInnerLoopTail(const LocalTensor<T> &dst, const Lo
     const int32_t mergeTmpRepeatTimes, int32_t mergeTmpTailQueNum)
 {
     if (mergeTmpTailQueNum <= 0) {
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported FullSortInnerLoopTail!"); });
     }
     uint32_t offset0Tail = MRG_SORT_ELEMENT_LEN * baseOffset * mergeTmpRepeatTimes;
     uint32_t offset1Tail = 0;

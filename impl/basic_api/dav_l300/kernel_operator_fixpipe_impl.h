@@ -400,7 +400,7 @@ __aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT* dst, __cc__ SrcT* src, _
             FixpipeL0C2L1ImplN<DstT, SrcT, config>(dst, src, cbufWorkspace, intriParams,
                 fixpipeTiling, fixpipeTiling.tailNSize, fixpipeTiling.nIterNum);
         }
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported FixpipeL0C2L1Impl!"); });
     }
 }
 
@@ -459,7 +459,7 @@ __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src, __c
             FixpipeL0C2GMImplN<DstT, SrcT, config>(dst, src, cbufWorkspace, intriParams,
                 fixpipeTiling, fixpipeTiling.tailNSize, fixpipeTiling.nIterNum);
         }
-        return;
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported FixpipeL0C2GMImpl!"); });
     }
 }
 
