@@ -1,13 +1,9 @@
 # Build:
+#   docker buildx build --network host --build-arg REPO_MIRROR=https://storage.googleapis.com/git-repo-downloads/repo -t ascendc:ubuntu24.04 .devcontainer/
 #   docker buildx build --network host -t ascendc:ubuntu24.04 .devcontainer/
-#
-# Mirror sources (override with --build-arg):
-#   APT_MIRROR:   mirrors.huaweicloud.com (default) | mirrors.tuna.tsinghua.edu.cn | mirrors.ustc.edu.cn
-#   CONDA_MIRROR: mirrors.tuna.tsinghua.edu.cn/anaconda (default) | mirrors.ustc.edu.cn/anaconda
-#   PYPI_MIRROR:  repo.huaweicloud.com/repository/pypi/simple (default) | pypi.tuna.tsinghua.edu.cn/simple
 
 # Stage 0: extract conda (multi-arch, matches host architecture automatically)
-FROM continuumio/miniconda3 AS conda-base
+FROM continuumio/miniconda3:latest AS conda-base
 
 # Stage 1: main image
 FROM ubuntu:24.04
@@ -15,9 +11,8 @@ FROM ubuntu:24.04
 # ============================================================
 # Build arguments — mirror sources
 # ============================================================
-ARG APT_MIRROR=mirrors.huaweicloud.com
+ARG GENERAL_MIRROR=mirrors.huaweicloud.com
 ARG CONDA_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/anaconda
-ARG PYPI_MIRROR=https://repo.huaweicloud.com/repository/pypi/simple
 ARG REPO_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/git/git-repo
 
 # ============================================================
@@ -37,9 +32,9 @@ WORKDIR /tmp
 # ============================================================
 RUN arch="$(dpkg --print-architecture)" && \
     if [ "${arch}" = "arm64" ]; then \
-      sed -i "s@//ports.ubuntu.com@//${APT_MIRROR}@g" /etc/apt/sources.list.d/ubuntu.sources; \
+      sed -i "s@//ports.ubuntu.com@//${GENERAL_MIRROR}@g" /etc/apt/sources.list.d/ubuntu.sources; \
     else \
-      sed -i "s@//archive.ubuntu.com@//${APT_MIRROR}@g; s@//security.ubuntu.com@//${APT_MIRROR}@g" \
+      sed -i "s@//archive.ubuntu.com@//${GENERAL_MIRROR}@g; s@//security.ubuntu.com@//${GENERAL_MIRROR}@g" \
         /etc/apt/sources.list.d/ubuntu.sources; \
     fi && \
     apt update && \
@@ -48,6 +43,7 @@ RUN arch="$(dpkg --print-architecture)" && \
       build-essential cmake ninja-build ccache pkg-config autoconf automake libtool gperf \
       gdb gdbserver git git-lfs lcov vim htop tree zsh clangd \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
+    && apt clean all \
     && rm -rf /var/lib/apt/lists/*
 
 # ============================================================
@@ -63,13 +59,6 @@ RUN git config --global core.autocrlf input && \
     git config --global core.editor vim && \
     git config --global color.ui auto && \
     git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
-
-# ============================================================
-# Trust gitcode.com SSH host key
-# ============================================================
-RUN mkdir -p /root/.ssh && \
-    ssh-keyscan -H gitcode.com >> /root/.ssh/known_hosts && \
-    chmod 600 /root/.ssh/known_hosts
 
 # ============================================================
 # oh-my-zsh + plugins (via gitcode mirror)
@@ -88,22 +77,31 @@ RUN git clone --depth=1 https://gitcode.com/ohmyzsh/ohmyzsh.git /root/.oh-my-zsh
 # conda — copied from stage 0, no architecture-specific download needed
 # ============================================================
 COPY --from=conda-base /opt/conda /opt/conda
+RUN cat >> /root/.condarc <<EOF
+channels:
+  - defaults
+show_channel_urls: true
+default_channels:
+  - ${CONDA_MIRROR}/pkgs/main
+  - ${CONDA_MIRROR}/pkgs/r
+  - ${CONDA_MIRROR}/pkgs/msys2
+custom_channels:
+  conda-forge: ${CONDA_MIRROR}/cloud
+  pytorch: ${CONDA_MIRROR}/cloud
+EOF
+RUN cat >> /etc/pip.conf <<EOF
+[global]
+index-url = https://${GENERAL_MIRROR}/repository/pypi/simple
+trusted-host = ${GENERAL_MIRROR}
+default-timeout = 120
+EOF
 
-RUN conda config --remove channels defaults 2>/dev/null || true && \
-    conda config --add channels ${CONDA_MIRROR}/pkgs/free && \
-    conda config --add channels ${CONDA_MIRROR}/pkgs/main && \
-    conda config --set show_channel_urls yes && \
-    conda config --set channel_priority strict
-
-# ============================================================
-# Python dependencies
-# ============================================================
-RUN printf "[global]\nindex-url = ${PYPI_MIRROR}\n" > /etc/pip.conf
-
-COPY environment-312.yml /tmp/
-RUN conda env create -q -f /tmp/environment-312.yml && \
-    conda clean -ya && \
-    pip cache purge 2>/dev/null || true
+COPY requirements.txt /tmp/
+RUN set -eux; \
+    conda create -y -n py312 python=3.12 pip && \
+    conda run -n py312 pip install --no-cache-dir -r /tmp/requirements.txt && \
+    conda clean -afy && \
+    rm -rf /root/.cache/pip
 
 # ============================================================
 # Shell customization
@@ -111,6 +109,26 @@ RUN conda env create -q -f /tmp/environment-312.yml && \
 RUN conda init zsh && \
     echo "conda activate py312" >> /root/.zshrc && \
     echo "export REPO_URL=\"${REPO_MIRROR}\"" >> /root/.zshrc
+
+# ============================================================
+# node — copied from stage 0, no architecture-specific download needed
+# ============================================================
+ARG NODE_MAJOR=26
+RUN arch="$(dpkg --print-architecture)" && \
+    case "$arch" in \
+      amd64) node_arch="x64" ;; \
+      arm64) node_arch="arm64" ;; \
+      *) echo "Unsupported architecture: $arch" >&2; exit 1 ;; \
+    esac && \
+    NODE_TARBALL="$(curl -fsSL "https://${GENERAL_MIRROR}/nodejs/latest-v${NODE_MAJOR}.x/SHASUMS256.txt" | awk -v arch="$node_arch" '$2 ~ "linux-" arch "\\.tar\\.gz$" {print $2; exit}')" && \
+    test -n "$NODE_TARBALL" && \
+    curl -fsSL "https://${GENERAL_MIRROR}/nodejs/latest-v${NODE_MAJOR}.x/${NODE_TARBALL}" -o "/tmp/${NODE_TARBALL}" && \
+    tar -xzf "/tmp/${NODE_TARBALL}" -C /usr/local --strip-components=1 && \
+    rm -f "/tmp/${NODE_TARBALL}"
+
+RUN npm config set registry https://${GENERAL_MIRROR}/repository/npm/ && \
+    npm cache clean -f && \
+    npm install -g @openai/codex@latest @anthropic-ai/claude-code@latest
 
 # AscendC banner
 RUN printf '\n\
