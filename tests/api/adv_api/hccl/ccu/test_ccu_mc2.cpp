@@ -360,4 +360,72 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_UnsupportedEngine) {
     void* opResCtx = nullptr;
     EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_NOT_SUPPORT);
 }
+
+// stub中捕获的kfcServerArgs，在HcclGetAlgRes中赋值
+extern std::unique_ptr<CcuKfcKernelStruct> g_capturedKfcServerArgs;
+
+TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
+    SetCommEngineEnv(COMM_ENGINE_CCU);
+
+    // 1. 分配CCU资源，获取opResCtx（含xnAddr、ckeAddr）
+    OpResCtx opResCtx{};
+    ASSERT_EQ(AllocCcuOpResCtx(comm_, "ctx_tag", g_stubRankSize, g_stubRankId, opResCtx), HCCL_SUCCESS);
+    ASSERT_NE(opResCtx.xnAddr, 0U);
+    ASSERT_NE(opResCtx.ckeAddr, 0U);
+
+    // 2. 构造OpParam，模拟CcuSelectAlg中的准备流程
+    Mc2CcTilingInner ccTiling{};
+    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL);
+    ccTiling.commEngine = COMM_ENGINE_CCU;
+    ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling.reduceType = HCCL_REDUCE_SUM;
+
+    OpParam opParam{};
+    ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "alltoall_tag", &ccTiling, opParam), HCCL_SUCCESS);
+
+    std::string algName;
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    ASSERT_EQ(SelectAlgAndPrepareEngine(comm_, opParam, algName, topoInfo), HCCL_SUCCESS);
+    ASSERT_EQ(algName, "CcuAlltoAllMesh1D");
+    ASSERT_EQ(opParam.engine, COMM_ENGINE_CCU);
+
+    int result = sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
+    ASSERT_GT(result, 0);
+
+    bool skipGetRes = false;
+    ASSERT_EQ(HandleSingleRankAndCommMode(comm_, opParam, skipGetRes), HCCL_SUCCESS);
+    ASSERT_FALSE(skipGetRes);
+
+    // 3. 调用GetCcuOpParamResCtx
+    g_capturedKfcServerArgs = nullptr;
+    void *resCtxOut = nullptr;
+    EXPECT_EQ(GetCcuOpParamResCtx(comm_, algName, opParam, topoInfo.get(), opResCtx, &resCtxOut), HCCL_SUCCESS);
+    EXPECT_NE(resCtxOut, nullptr);
+    EXPECT_EQ(opParam.resCtx, resCtxOut);
+
+    // 4. 验证kfcServerArgs各字段与CcuAlltoAllMesh1D预期一致
+    ASSERT_NE(g_capturedKfcServerArgs, nullptr);
+
+    // waitAddr = ckeAddr
+    EXPECT_EQ(g_capturedKfcServerArgs->waitAddr, opResCtx.ckeAddr);
+    // recordAddr = ckeAddr + CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE
+    EXPECT_EQ(g_capturedKfcServerArgs->recordAddr,
+              opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE);
+    // paramAddr = xnAddr
+    EXPECT_EQ(g_capturedKfcServerArgs->paramAddr, opResCtx.xnAddr);
+    // CcuAlltoAllMesh1D: 单die
+    EXPECT_EQ(g_capturedKfcServerArgs->dieNum, 1U);
+    // CcuAlltoAllMesh1D: 单mission
+    EXPECT_EQ(g_capturedKfcServerArgs->missonNum, 1U);
+    EXPECT_EQ(g_capturedKfcServerArgs->missonIndex, 0U);
+    // CcuAlltoAllMesh1D: 单mission无需mission间同步信号
+    EXPECT_TRUE(g_capturedKfcServerArgs->exportMissionSig.empty());
+    EXPECT_TRUE(g_capturedKfcServerArgs->importMissionSig.empty());
+    EXPECT_TRUE(g_capturedKfcServerArgs->exportMissionVar.empty());
+    EXPECT_TRUE(g_capturedKfcServerArgs->importMissionVar.empty());
+
+    free(resCtxOut);
+    g_capturedKfcServerArgs = nullptr;
+}
 }

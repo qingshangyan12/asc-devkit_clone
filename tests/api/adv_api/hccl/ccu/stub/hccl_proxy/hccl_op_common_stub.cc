@@ -271,12 +271,20 @@ std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(HcclCMDType op
     return std::make_unique<MockInsCollAlgBase>();
 }
 
+// 全局变量：捕获GetCcuOpParamResCtx中构造的kfcServerArgs，供UT验证
+std::unique_ptr<CcuKfcKernelStruct> g_capturedKfcServerArgs = nullptr;
+
 HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor,
     TopoInfoWithNetLayerDetails* topoInfo, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost,
     void** resCtxDevice, bool& isSuspend)
 {
     if (resCtxDevice == nullptr) {
         return HCCL_E_PTR;
+    }
+    if (resCtxHost != nullptr && resCtxHost->kfcServerArgs != nullptr) {
+        g_capturedKfcServerArgs = std::move(resCtxHost->kfcServerArgs);
+    } else {
+        g_capturedKfcServerArgs = nullptr;
     }
     void* ctx = std::malloc(sizeof(AlgResourceCtxSerializable));
     if (ctx == nullptr) {
