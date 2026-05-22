@@ -291,9 +291,9 @@ TEST_F(TEST_VEC_UNARY_F, VecUnaryCase)
 
 TEST_F(TEST_VEC_UNARY_F, VecExpCase01)
 {
-    constexpr int32_t dataSize = 128;
-    half src[dataSize] = {static_cast<half>(0)};
-    half dst[dataSize] = {static_cast<half>(0)};
+    int32_t dataSize = 128;
+    half src[dataSize]{};
+    half dst[dataSize]{};
     uint8_t srcBlkStride = 1;
     uint8_t dstBlkStride = 1;
     uint8_t srcRepStride = 8;
@@ -307,9 +307,9 @@ TEST_F(TEST_VEC_UNARY_F, VecExpCase01)
 
 TEST_F(TEST_VEC_UNARY_F, VecExpCase02)
 {
-    constexpr int32_t dataSize = 128;
-    half src[dataSize] = {static_cast<half>(0)};
-    half dst[dataSize] = {static_cast<half>(0)};
+    int32_t dataSize = 128;
+    half src[dataSize]{};
+    half dst[dataSize]{};
     uint8_t srcBlkStride = 1;
     uint8_t dstBlkStride = 1;
     uint8_t srcRepStride = 8;
