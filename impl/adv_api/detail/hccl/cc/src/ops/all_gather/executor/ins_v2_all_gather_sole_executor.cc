@@ -13,7 +13,6 @@
 #include "ins_temp_all_gather_mesh_1D_Z_axis_detour.h"
 #include "ins_temp_all_gather_nhr.h"
 #ifndef AICPU_COMPILE
-#include "aiv_temp_all_gather_mesh_1D.h"
 #if !defined(HCCL_CANN_COMPAT_850)
 #include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
 #include "ccu_temp_all_gather_mesh_1D.h"
@@ -278,9 +277,6 @@ REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1D, InsV2AllGa
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherNHR1DMem2Mem, InsV2AllGatherSoleExecutor, TopoMatch1D,
                  CcuTempAllGatherNHR1DMem2Mem);
 #endif /* !HCCL_CANN_COMPAT_850 */
-
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, AivAllGatherMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    AivTempAllGatherMesh1D);
 
 #if !defined(HCCL_CANN_COMPAT_850)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuKernelAllGather2DiesMeshMem2Mem1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
