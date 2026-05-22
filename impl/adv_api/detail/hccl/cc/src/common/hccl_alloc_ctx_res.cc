@@ -590,7 +590,7 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         }
 
         void *resCtxSequence = nullptr;
-        CHK_RET(GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence));
+        CHK_RET(GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), opResCtx, &resCtxSequence));
     }
 
     return HCCL_SUCCESS;
