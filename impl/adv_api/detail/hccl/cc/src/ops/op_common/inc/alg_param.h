@@ -403,7 +403,7 @@ struct AlgResourceCtxSerializable {
     // ccu的
     std::vector<u32> ccuKernelNum;
     std::vector<CcuKernelHandle> ccuKernels;
-    std::unique_ptr<CcuKfcKernelStruct> kfcServerArgs;
+    std::shared_ptr<CcuKfcKernelStruct> kfcServerArgs;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
 
