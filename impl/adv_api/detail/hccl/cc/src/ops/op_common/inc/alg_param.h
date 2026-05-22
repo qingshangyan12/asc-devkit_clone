@@ -16,6 +16,8 @@
 #include <set>
 #include <unordered_set>
 #include <functional>
+#include <memory>
+#include "ccu_datatype_v1.h"
 #include "hccl_comm.h"
 #include "hccl_common.h"
 #include "hccl_types.h"
@@ -27,6 +29,21 @@
 #include "hccl_ccu_res.h"
 
 namespace ops_hccl {
+
+struct CcuKfcKernelStruct {
+    uint64_t waitAddr;
+    uint64_t recordAddr;
+    uint64_t paramAddr;
+    uint32_t dieNum;
+    hcomm::CcuRep::MaskSignal exportDieSig;
+    hcomm::CcuRep::MaskSignal importDieSig;
+    uint32_t missonNum;
+    uint32_t missonIndex;
+    std::vector<hcomm::CcuRep::MaskSignal> exportMissionSig;
+    std::vector<hcomm::CcuRep::MaskSignal> importMissionSig;
+    std::vector<hcomm::CcuRep::Variable> exportMissionVar;
+    std::vector<hcomm::CcuRep::Variable> importMissionVar;
+};
 
 constexpr uint64_t UB_MAX_DATA_SIZE = 256*1024*1024; // Byte, UB协议一次传输的最大size
 
@@ -382,6 +399,7 @@ struct AlgResourceCtxSerializable {
     // ccu的
     std::vector<u32> ccuKernelNum;
     std::vector<CcuKernelHandle> ccuKernels;
+    std::unique_ptr<CcuKfcKernelStruct> kfcServerArgs;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
 

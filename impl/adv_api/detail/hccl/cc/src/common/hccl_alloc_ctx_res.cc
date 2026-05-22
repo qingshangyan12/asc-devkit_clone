@@ -483,6 +483,42 @@ HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &
     return HCCL_SUCCESS;
 }
 
+HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam, TopoInfoWithNetLayerDetails *topoInfo, OpResCtx &opResCtx, void **resCtxOut) {
+    std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
+    CHK_PRT_RET(executor.get() == nullptr,
+        HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
+
+    std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
+    bool isResourceReused = false;
+    if (opParam.engine == COMM_ENGINE_CCU) {
+        std::unique_ptr<CcuKfcKernelStruct> kfcServerArgs = std::make_unique<CcuKfcKernelStruct>();
+        kfcServerArgs->waitAddr = opResCtx.ckeAddr;
+        kfcServerArgs->recordAddr = opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
+        kfcServerArgs->paramAddr = opResCtx.xnAddr;
+        kfcServerArgs->dieNum = 1; // 1 for ccuAlltoAllMesh1D
+        kfcServerArgs->exportDieSig = hcomm::CcuRep::MaskSignal(); // 1D无通信要求
+        kfcServerArgs->importDieSig = hcomm::CcuRep::MaskSignal(); // 1D无通信要求
+        kfcServerArgs->missonNum = 1; // 1 for ccuAlltoAllMesh1D
+        kfcServerArgs->missonIndex = 0; // 0 for ccuAlltoAllMesh1D
+        kfcServerArgs->exportMissionSig = {};
+        kfcServerArgs->importMissionSig = {};
+        kfcServerArgs->exportMissionVar = {};
+        kfcServerArgs->importMissionVar = {};
+        resCtxHost->kfcServerArgs = std::move(kfcServerArgs);
+    }
+
+    ThreadHandle cpuTsThread{0};
+    ThreadHandle exportedAicpuTsThread{0};
+    if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
+        CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
+        CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
+    }
+    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+    opParam.resCtx = *resCtxOut;
+    return HCCL_SUCCESS;
+}
+
+
 HcclResult GetOpParam(HcclComm comm, void* stream, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &opParam)
 {
     CHK_RET(InitOpParamByTiling(comm, stream, tag, ccTiling, opParam));
@@ -554,7 +590,7 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         }
 
         void *resCtxSequence = nullptr;
-        CHK_RET(GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence));
+        CHK_RET(GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence));
     }
 
     return HCCL_SUCCESS;

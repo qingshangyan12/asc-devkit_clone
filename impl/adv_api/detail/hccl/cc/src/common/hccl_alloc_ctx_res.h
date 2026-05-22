@@ -174,6 +174,8 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
 
 HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam, TopoInfoWithNetLayerDetails *topoInfo, void **resCtxOut);
 
+HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam, TopoInfoWithNetLayerDetails *topoInfo, OpResCtx &opResCtx, void **resCtxOut);
+
 HcclResult GetOpParam(HcclComm comm, void* stream, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &opParam);
 
 // 用户自定义校验函数，由用户提供实现（仅声明，不提供默认实现）。
