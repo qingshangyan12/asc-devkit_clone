@@ -19,6 +19,7 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── figure                  // 图示
 │   └── mmad_gelu.asc           // Ascend C样例实现
 ```
 
@@ -402,7 +403,7 @@ PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host
 └── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存 Host 和各个 Device 的性能数据汇总
+└── mindstudio_profiler_output  // 保存 Host 和各个 Device 的性能数据汇总
     ├── msprof_*.json
     ├── xx_*.csv
     └── README.txt

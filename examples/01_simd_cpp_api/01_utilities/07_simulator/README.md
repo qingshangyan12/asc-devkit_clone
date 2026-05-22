@@ -87,13 +87,13 @@ msprof op simulator --soc-version=<soc_version> ./demo
 命令完成后，会在当前目录下生成以 `OPPROF_{timestamp}_XXX` 命名的文件夹，产物结构如下：
 ```
 OPPROF_{timestamp}_XXX/
-├── dump                    # 原始性能数据，用户无需关注
+├── dump                  // 原始性能数据，用户无需关注
 └── simulator
-  ├── core0.cubecore0/     # 各核的仿真指令流水图文件
+  ├── core0.cubecore0/    // 各核的仿真指令流水图文件
   ├── core0.veccore0/
   ├── core0.veccore1/
-  ├── trace.json           # 仿真流水图和热点函数可视化呈现文件
-  └── visualize_data.bin   # MindStudio Insight 呈现文件
+  ├── trace.json          // 仿真流水图和热点函数可视化呈现文件
+  └── visualize_data.bin  // MindStudio Insight 呈现文件
 ```
 
 执行后可通过以下方式查看指令流水图：

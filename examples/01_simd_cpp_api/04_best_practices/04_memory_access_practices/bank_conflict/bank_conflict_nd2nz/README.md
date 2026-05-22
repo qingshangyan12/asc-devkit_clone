@@ -13,11 +13,11 @@
 
 ```text
 ├── bank_conflict_nd2nz
-│   ├── bank_conflict_nd2nz.asc    // Ascend C 样例实现（含 2 个 case）
-│   ├── bank_conflict_nd2nz_3510.h // dav-3510 Regbase ND2NZ 实现
-│   ├── CMakeLists.txt             // 编译工程文件
-│   ├── data_utils.h               // 数据读入写出函数
-│   ├── figures                    // 图示
+│   ├── bank_conflict_nd2nz.asc     // Ascend C 样例实现（含 2 个 case）
+│   ├── bank_conflict_nd2nz_3510.h  // dav-3510 Regbase ND2NZ 实现
+│   ├── CMakeLists.txt              // 编译工程文件
+│   ├── data_utils.h                // 数据读入写出函数
+│   ├── figures                     // 图示
 │   └── scripts
 │       ├── gen_data.py            // 输入数据和真值数据生成脚本文件
 │       └── verify_result.py       // 真值对比文件
@@ -576,7 +576,7 @@ PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host
 └── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存 Host 和各 Device 的性能数据汇总
+└── mindstudio_profiler_output  // 保存 Host 和各 Device 的性能数据汇总
     ├── msprof_*.json
     ├── xx_*.csv
     └── README.txt
