@@ -45,9 +45,9 @@ target_link_libraries(ascend_runtime_base PRIVATE
     $<BUILD_INTERFACE:intf_pub>
     mmpa
     unified_dlog
-    c_sec_headers
-    acl_rt_headers
-    metadef_headers
+    $<BUILD_INTERFACE:c_sec_headers>
+    $<BUILD_INTERFACE:acl_rt_headers>
+    $<BUILD_INTERFACE:metadef_headers>
     $<$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>:acl_rt>
     $<$<NOT:$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>>:ascendcl>
 )

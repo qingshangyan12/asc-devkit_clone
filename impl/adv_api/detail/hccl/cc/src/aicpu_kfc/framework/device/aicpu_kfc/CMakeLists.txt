@@ -25,8 +25,9 @@ if(TARGET mc2_server)
         $<TARGET_PROPERTY:ccl_kernel,INCLUDE_DIRECTORIES>
     )
     target_link_libraries(mc2_server_kernel_entry PRIVATE
-        acl_rt_headers
-        ascend_hal_headers
+        $<BUILD_INTERFACE:acl_rt_headers>
+        $<BUILD_INTERFACE:ascend_hal_headers>
+        $<BUILD_INTERFACE:runtime_headers>
     )
     target_sources(mc2_server PRIVATE
         $<TARGET_OBJECTS:mc2_server_kernel_entry>

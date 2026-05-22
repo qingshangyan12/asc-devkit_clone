@@ -166,7 +166,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${HCCL_BASE_DIR}/platform/hccp/external_depends/inc/log
 )
 
-target_link_libraries(ccl_kernel_decoupler_open_exec PRIVATE c_sec unified_dlog)
+target_link_libraries(ccl_kernel_decoupler_open_exec PRIVATE c_sec unified_dlog acl_rt_headers)
 
 add_library(ccl_kernel_decoupler_open_exec_impl OBJECT ${open_exec_impl_src_list})
 set_target_properties(ccl_kernel_decoupler_open_exec_impl PROPERTIES POSITION_INDEPENDENT_CODE ON)
