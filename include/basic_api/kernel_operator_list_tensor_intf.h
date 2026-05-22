@@ -26,9 +26,9 @@
 #if ASCENDC_CPU_DEBUG
 #include "kernel_check.h"
 #endif
-#if defined(__NPU_ARCH__)
+
 #include "../../impl/basic_api/kernel_operator_list_tensor_intf_impl.h"
-#endif
+
 namespace AscendC {
 
 class ListTensorDesc;
@@ -94,9 +94,7 @@ public:
         return listTensorDesc.GetSize();
     }
 private:
-#ifdef __NPU_ARCH__
     ListTensorDescImpl<true> listTensorDesc;
-#endif
 };
 }
 #endif // ASCENDC_MODULE_OPERATOR_LIST_TENSOR_INTERFACE_H
