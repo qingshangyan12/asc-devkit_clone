@@ -1,3 +1,0 @@
-/home/all/experiment/simt_experiment/basic_gather_mcq/builld/CMakeFiles/gather.dir
-/home/all/experiment/simt_experiment/basic_gather_mcq/builld/CMakeFiles/edit_cache.dir
-/home/all/experiment/simt_experiment/basic_gather_mcq/builld/CMakeFiles/rebuild_cache.dir
