@@ -27,6 +27,8 @@ HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner *ccTiling, uint32_t tilingIn
     return HCCL_SUCCESS;
 }
 
+extern std::unique_ptr<CcuKfcKernelStruct> g_capturedKfcServerArgs;
+
 namespace {
 
 static u32 g_stubRankSize = 8;
@@ -360,9 +362,6 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_UnsupportedEngine) {
     void* opResCtx = nullptr;
     EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_NOT_SUPPORT);
 }
-
-// stub中捕获的kfcServerArgs，在HcclGetAlgRes中赋值
-extern std::unique_ptr<CcuKfcKernelStruct> g_capturedKfcServerArgs;
 
 TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
     SetCommEngineEnv(COMM_ENGINE_CCU);
