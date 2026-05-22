@@ -36,7 +36,7 @@ namespace AscendC {
 #pragma begin_pipe(V)
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
- * are treated as True. Mathematical formulas: 0^0=0�?^1=1�?^0=1�?^1=0
+ * are treated as True. Mathematical formulas: 0^0=0^1=1^0=1^1=0
  * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
@@ -59,7 +59,7 @@ __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 }
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
- * are treated as True. Mathematical formulas: 0^0=0�?^1=1�?^0=1�?^1=0
+ * are treated as True. Mathematical formulas: 0^0=0^1=1^0=1^1=0
  * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
@@ -81,7 +81,7 @@ __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
- * are treated as True. Mathematical formulas: 0^0=0�?^1=1�?^0=1�?^1=0
+ * are treated as True. Mathematical formulas: 0^0=0^1=1^0=1^1=0
  * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
@@ -101,7 +101,7 @@ __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
- * are treated as True. Mathematical formulas: 0^0=0�?^1=1�?^0=1�?^1=0
+ * are treated as True. Mathematical formulas: 0^0=0^1=1^0=1^1=0
  * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
