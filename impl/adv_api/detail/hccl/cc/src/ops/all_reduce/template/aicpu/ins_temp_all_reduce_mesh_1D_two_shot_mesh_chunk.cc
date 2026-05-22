@@ -390,4 +390,4 @@ void InsTempAllReduceMesh1DTwoShotMeshChunk::NotifyIdxSubToMainInAG(std::vector<
     }
 }
 
-} // ops_hccla
+} // MC2_OPS_HCCLa

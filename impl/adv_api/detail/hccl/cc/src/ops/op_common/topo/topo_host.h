@@ -7,8 +7,8 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#ifndef OPS_HCCL_SRC_OPS_TOPO_HOST
-#define OPS_HCCL_SRC_OPS_TOPO_HOST
+#ifndef MC2_OPS_HCCL_SRC_OPS_TOPO_HOST
+#define MC2_OPS_HCCL_SRC_OPS_TOPO_HOST
 
 #include <hccl/hccl_types.h>
 #include "hccl/base.h"

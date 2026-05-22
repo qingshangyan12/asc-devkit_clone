@@ -7,8 +7,8 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#ifndef OPS_HCCL_OP_COMMON
-#define OPS_HCCL_OP_COMMON
+#ifndef MC2_OPS_HCCL_OP_COMMON
+#define MC2_OPS_HCCL_OP_COMMON
 
 #include <string>
 #include <memory>
