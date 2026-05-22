@@ -13,6 +13,7 @@
  * \brief
  */
 
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_XOR_H__
@@ -36,7 +37,7 @@ namespace AscendC {
 #pragma begin_pipe(V)
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
- * are treated as True. Mathematical formulas: 0^0=0ï¼?^1=1ï¼?^0=1ï¼?^1=0
+ * are treated as True. Mathematical formulas: 0^0=0ï¿½?^1=1ï¿½?^0=1ï¿½?^1=0
  * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
@@ -59,7 +60,7 @@ __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 }
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
- * are treated as True. Mathematical formulas: 0^0=0ï¼?^1=1ï¼?^0=1ï¼?^1=0
+ * are treated as True. Mathematical formulas: 0^0=0ï¿½?^1=1ï¿½?^0=1ï¿½?^1=0
  * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
@@ -81,7 +82,7 @@ __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
- * are treated as True. Mathematical formulas: 0^0=0ï¼?^1=1ï¼?^0=1ï¼?^1=0
+ * are treated as True. Mathematical formulas: 0^0=0ï¿½?^1=1ï¿½?^0=1ï¿½?^1=0
  * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
@@ -101,7 +102,7 @@ __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
- * are treated as True. Mathematical formulas: 0^0=0ï¼?^1=1ï¼?^0=1ï¼?^1=0
+ * are treated as True. Mathematical formulas: 0^0=0ï¿½?^1=1ï¿½?^0=1ï¿½?^1=0
  * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
