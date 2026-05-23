@@ -6,15 +6,9 @@
 | ----------- |:----:|
 | Ascend 950PR/Ascend 950DT | √ |
 
-## 头文件/库文件
-
-头文件为：
-
-```cpp
-#include "tensor_api/tensor.h"
-```
-
 ## 功能说明
+
+头文件为：#include "tensor_api/tensor.h"
 
 Get提供两类能力：
 
@@ -57,7 +51,7 @@ __aicore__ inline constexpr auto Get(const Layout<Shape, Stride>& layout)
 ## 返回值说明
 
 - 对输入为Tuple类型，返回按索引链逐层提取后的元素；
-- 对输入为Layout类型，返回新的子 Layout对象，其ShapeType和StrideType为提取后的子类型。
+- 对输入为Layout类型，返回新的子Layout对象，其ShapeType和StrideType为提取后的子类型。
 
 ## 约束说明
 

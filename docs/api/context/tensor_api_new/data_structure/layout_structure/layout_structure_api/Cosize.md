@@ -6,19 +6,13 @@
 | ----------- |:----:|
 | Ascend 950PR/Ascend 950DT | √ |
 
-## 头文件/库文件
-
-头文件为：
-
-```cpp
-#include "tensor_api/tensor.h"
-```
-
 ## 功能说明
+
+头文件为：#include "tensor_api/tensor.h"
 
 Cosize表示Layout陪域的大小，即逻辑坐标映射到一维索引区间内，索引值可取的个数（容纳量）。
 
-对于简单非嵌套 Layout（shape 为扁平 tuple），Coshape返回标量，Cosize与之相等。对于嵌套 Layout（如分形布局），Coshape返回多维 tuple，Cosize取其各维度的乘积。
+对于简单非嵌套Layout（shape为扁平tuple），Coshape返回标量，Cosize与之相等。对于嵌套Layout（如分形布局），Coshape返回多维tuple，Cosize取其各维度的乘积。
 
 可通过模板参数Is...指定子维度范围。
 

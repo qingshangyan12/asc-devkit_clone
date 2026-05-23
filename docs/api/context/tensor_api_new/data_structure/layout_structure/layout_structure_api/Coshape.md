@@ -6,15 +6,9 @@
 | ----------- |:----:|
 | Ascend 950PR/Ascend 950DT | √ |
 
-## 头文件/库文件
-
-头文件为：
-
-```cpp
-#include "tensor_api/tensor.h"
-```
-
 ## 功能说明
+
+头文件为：#include "tensor_api/tensor.h"
 
 Coshape表示Layout陪域（codomain）的形状，即逻辑坐标映射到一维索引后，所有可能的索引值构成的区间大小。其计算公式为：
 
@@ -22,7 +16,7 @@ Coshape表示Layout陪域（codomain）的形状，即逻辑坐标映射到一�
 Coshape = Σ( (shape[i] - 1) × stride[i] ) + 1
 ```
 
-可通过模板参数 `Is...` 指定子维度范围，仅对选定维度进行计算。
+可通过模板参数`Is...`指定子维度范围，仅对选定维度进行计算。
 
 ## 函数原型
 

@@ -180,7 +180,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - NN Layout
 
-    NN Layout格式的ShapeRow0、ShapeColumn0为固定值，其中ShapeRow0为2，ShapeColumn0为16，仅支持 `fp8_e8m0_t` 对应的 `C0_ELEMENT == 2` 场景。StrideRow0、StrideColumn0也为固定值，即内层矩阵按列优先方式N字形连续存储；外层矩阵继续按N字形存储。
+    NN Layout格式的ShapeRow0、ShapeColumn0为固定值，当前仅在数据类型为fp8_e8m0_t的场景下使用，其中ShapeRow0为2，ShapeColumn0为16。StrideRow0、StrideColumn0也为固定值，即内层矩阵按列优先方式N字形连续存储；外层矩阵继续按N字形存储。
 
     ```cpp
     Layout = ((Shape) : (Stride))
@@ -198,7 +198,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - ScaleAND Layout
 
-    ScaleAND Layout是一种用于 `fp8_e8m0_t` scaleA 数据的二维行优先排布格式，仅支持 `C0_ELEMENT == 2`。它的物理布局与连续的NDExt Layout一致，但语义上用于描述 scaleA 的 ND 形式输入。
+    ScaleAND Layout是一种用于fp8_e8m0_t scaleA数据的二维行优先排布格式，仅支持`C0_ELEMENT == 2`。它的物理布局与连续的NDExt Layout一致，但语义上用于描述scaleA的ND形式输入。
 
     ```cpp
     Layout = ((Shape) : (Stride))
@@ -216,7 +216,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - ScaleADN Layout
 
-    ScaleADN Layout是一种用于 `fp8_e8m0_t` scaleA 数据的分形列优先排布格式，仅支持 `C0_ELEMENT == 2`。其列方向内层分形大小固定为2，外层按DN方式组织。
+    ScaleADN Layout是一种用于fp8_e8m0_t scaleA数据的分形列优先排布格式，仅支持C0_ELEMENT == 2。其列方向内层分形大小固定为2，外层按DN方式组织。
 
     ```cpp
     Layout = ((Shape) : (Stride))
@@ -234,7 +234,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - ScaleBND Layout
 
-    ScaleBND Layout是一种用于 `fp8_e8m0_t` scaleB 数据的分形行优先排布格式，仅支持 `C0_ELEMENT == 2`。其行方向内层分形大小固定为2，外层按ND方式组织。
+    ScaleBND Layout是一种用于`fp8_e8m0_t` scaleB数据的分形行优先排布格式，仅支持`C0_ELEMENT == 2`。其行方向内层分形大小固定为2，外层按ND方式组织。
 
     ```cpp
     Layout = ((Shape) : (Stride))
@@ -252,7 +252,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - ScaleBDN Layout
 
-    ScaleBDN Layout是一种用于 `fp8_e8m0_t` 的排布格式。它的物理布局与连续的DNExt Layout一致，但语义上用于描述 scale 的 DN 形式输入。
+    ScaleBDN Layout是一种用于`fp8_e8m0_t`的排布格式。它的物理布局与连续的DNExt Layout一致，但语义上用于描述scale的DN形式输入。
 
     ```cpp
     Layout = ((Shape) : (Stride))
