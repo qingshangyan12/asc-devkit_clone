@@ -10372,9 +10372,4 @@ export default {
       "link": "/api/README"
     }
   ])
-
-}
-  ]
-
-
 }

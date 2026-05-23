@@ -1,10 +1,27 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# This program is free software, you can redistribute it and/or modify it.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This file is a part of the CANN Open Software.
+# Licensed under CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+
+
 import argparse
+import logging
 import os
 import shutil
 import sys
 from pathlib import Path
 
 from .parser import parse_file, parse_string, render_html
+
+logging.basicConfig(format="%(asctime)s [%(levelname)s] %(message)s", level=logging.INFO)
+logger = logging.getLogger("mdparser")
 
 _STATIC_EXTS = {
     ".png",
@@ -21,65 +38,41 @@ _STATIC_EXTS = {
 }
 
 
-def main():
+def _build_parser():
     parser = argparse.ArgumentParser(
         prog="mdparser",
         description="High-performance Markdown-to-HTML converter based on cmark-gfm (C).",
     )
-    parser.add_argument(
-        "input", nargs="*", help="Markdown file(s) or directory to parse"
-    )
-    parser.add_argument(
-        "-o",
-        "--output",
-        help="Output file (single mode) or output directory (batch mode)",
-    )
-    parser.add_argument(
-        "--no-gfm",
-        action="store_true",
-        help="Disable GitHub Flavored Markdown extensions",
-    )
-    parser.add_argument("--stdin", action="store_true", help="Force read from stdin")
-    parser.add_argument(
-        "-s", "--style", action="store_true", help="Embed GitHub-style CSS in output"
-    )
-    parser.add_argument(
-        "-r",
-        "--recursive",
-        action="store_true",
-        help="Recursively scan directories for .md files",
-    )
+    parser.add_argument("input", nargs="*", help="Markdown file(s) or directory to parse")
+    parser.add_argument("-o", "--output", help="Output file or directory")
+    parser.add_argument("--no-gfm", action="store_true", help="Disable GFM extensions")
+    parser.add_argument("--stdin", action="store_true", help="Read from stdin")
+    parser.add_argument("-s", "--style", action="store_true", help="Embed GitHub-style CSS")
+    parser.add_argument("-r", "--recursive", action="store_true", help="Scan recursively")
+    return parser
 
-    args = parser.parse_args()
 
-    md_files = _collect_files(args.input, args.recursive)
+def _write_output(html, output):
+    if output:
+        Path(output).write_text(html, encoding="utf-8")
+    else:
+        sys.stdout.write(html)
 
-    if not md_files and not args.stdin:
-        parser.print_help()
-        sys.exit(1)
 
-    if args.stdin:
-        content = sys.stdin.buffer.read().decode("utf-8")
-        html_body = parse_string(content, gfm=not args.no_gfm)
-        html = _build_html(html_body, styled=args.style)
-        if args.output:
-            Path(args.output).write_text(html, encoding="utf-8")
-        else:
-            sys.stdout.write(html)
-        return
+def _handle_stdin(args):
+    content = sys.stdin.buffer.read().decode("utf-8")
+    html_body = parse_string(content, gfm=not args.no_gfm)
+    _write_output(_build_html(html_body, styled=args.style), args.output)
 
-    if len(md_files) == 1 and not (args.output and os.path.isdir(args.output)):
-        html_body = parse_file(md_files[0], gfm=not args.no_gfm)
-        html = _build_html(html_body, styled=args.style)
-        if args.output:
-            Path(args.output).write_text(html, encoding="utf-8")
-        else:
-            sys.stdout.write(html)
-        return
 
+def _handle_single(path, args):
+    html_body = parse_file(path, gfm=not args.no_gfm)
+    _write_output(_build_html(html_body, styled=args.style), args.output)
+
+
+def _handle_batch(md_files, args):
     out_dir = Path(args.output) if args.output else Path.cwd()
     out_dir.mkdir(parents=True, exist_ok=True)
-
     common_root = _find_common_root(md_files)
     for src in md_files:
         html_body = parse_file(src, gfm=not args.no_gfm)
@@ -88,9 +81,25 @@ def main():
         dst = out_dir / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         dst.write_text(html, encoding="utf-8")
-        print(f"  {src} -> {dst}")
-
+        logger.info("  %s -> %s", src, dst)
     _copy_static_files(common_root, out_dir, md_files)
+
+
+def main():
+    parser = _build_parser()
+    args = parser.parse_args()
+    md_files = _collect_files(args.input, args.recursive)
+
+    if not md_files and not args.stdin:
+        parser.print_help()
+        return
+
+    if args.stdin:
+        _handle_stdin(args)
+    elif len(md_files) == 1 and not (args.output and os.path.isdir(args.output)):
+        _handle_single(md_files[0], args)
+    else:
+        _handle_batch(md_files, args)
 
 
 def _copy_static_files(common_root, out_dir, md_files):
@@ -106,7 +115,7 @@ def _copy_static_files(common_root, out_dir, md_files):
         dst = out_dir / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(entry, dst)
-        print(f"  {entry} -> {dst}")
+        logger.info("  %s -> %s", entry, dst)
 
 
 def _find_common_root(paths):
