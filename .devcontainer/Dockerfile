@@ -1,80 +1,73 @@
 # Build:
 #   docker buildx build --network host -t ascendc:ubuntu24.04 .devcontainer/
-#
-# Mirror sources (override with --build-arg):
-#   APT_MIRROR:   mirrors.huaweicloud.com (default) | mirrors.tuna.tsinghua.edu.cn | mirrors.ustc.edu.cn
-#   CONDA_MIRROR: mirrors.tuna.tsinghua.edu.cn/anaconda (default) | mirrors.ustc.edu.cn/anaconda
-#   PYPI_MIRROR:  repo.huaweicloud.com/repository/pypi/simple (default) | pypi.tuna.tsinghua.edu.cn/simple
 
-# Stage 0: extract conda (multi-arch, matches host architecture automatically)
-FROM continuumio/miniconda3 AS conda-base
+# Stage 0 — used only to copy /opt/conda into the main image
+FROM continuumio/miniconda3:latest AS conda-base
 
-# Stage 1: main image
 FROM ubuntu:24.04
 
-# ============================================================
-# Build arguments — mirror sources
-# ============================================================
-ARG APT_MIRROR=mirrors.huaweicloud.com
+# --- Build arguments (override with --build-arg) ---
+ARG GENERAL_MIRROR=mirrors.huaweicloud.com
 ARG CONDA_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/anaconda
-ARG PYPI_MIRROR=https://repo.huaweicloud.com/repository/pypi/simple
-ARG REPO_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/git/git-repo
+ARG REPO_SCRIPT_URL=https://mirrors.tuna.tsinghua.edu.cn/git/git-repo
+ARG REPO_GIT_URL=https://mirrors.ustc.edu.cn/aosp/git-repo
+ARG NODE_MAJOR=26
 
-# ============================================================
-# Base environment
-# ============================================================
+# --- Base environment ---
 ENV TZ=Asia/Shanghai \
     LANG=C.UTF-8 \
     SHELL=/bin/zsh \
     DEBIAN_FRONTEND=noninteractive \
-    PATH=/opt/conda/bin:$PATH
+    PATH=/opt/conda/envs/py312/bin:/opt/conda/bin:$PATH \
+    REPO_URL=${REPO_GIT_URL}
 
 USER root
 WORKDIR /tmp
 
-# ============================================================
-# APT mirror & system packages (single layer to avoid stale cache)
-# ============================================================
-RUN arch="$(dpkg --print-architecture)" && \
+SHELL ["/bin/bash", "-c"]
+
+# --- APT mirror & system packages ---
+# apt cache lives in BuildKit mount, not the image layer — no apt-get clean.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    set -eu && \
+    # Ubuntu's default config wipes /var/cache/apt after install,
+    # which would defeat the cache mount. Disable that hook.
+    rm -f /etc/apt/apt.conf.d/docker-clean && \
+    arch="$(dpkg --print-architecture)" && \
     if [ "${arch}" = "arm64" ]; then \
-      sed -i "s@//ports.ubuntu.com@//${APT_MIRROR}@g" /etc/apt/sources.list.d/ubuntu.sources; \
+        sed -i "s@//ports.ubuntu.com@//${GENERAL_MIRROR}@g" /etc/apt/sources.list.d/ubuntu.sources; \
     else \
-      sed -i "s@//archive.ubuntu.com@//${APT_MIRROR}@g; s@//security.ubuntu.com@//${APT_MIRROR}@g" \
-        /etc/apt/sources.list.d/ubuntu.sources; \
+        sed -i "s@//archive.ubuntu.com@//${GENERAL_MIRROR}@g; s@//security.ubuntu.com@//${GENERAL_MIRROR}@g" /etc/apt/sources.list.d/ubuntu.sources; \
     fi && \
-    apt update && \
-    apt install -y --no-install-recommends \
-      tzdata lsb-release curl wget gnupg2 openssl ca-certificates openssh-client pciutils \
-      build-essential cmake ninja-build ccache pkg-config autoconf automake libtool gperf \
-      gdb gdbserver git git-lfs lcov vim htop tree zsh clangd \
-    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
-    && rm -rf /var/lib/apt/lists/*
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        tzdata lsb-release ca-certificates openssl gnupg2 \
+        curl wget openssh-client iputils-ping net-tools lsof \
+        zip unzip \
+        build-essential cmake ninja-build ccache pkg-config \
+        autoconf automake libtool gperf \
+        gdb gdbserver lcov \
+        git git-lfs \
+        vim htop tree zsh clangd whiptail \
+        pciutils && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
 
-# ============================================================
-# repo tool
-# ============================================================
-RUN curl -fsSL ${REPO_MIRROR} -o /usr/local/bin/repo && \
-    chmod a+x /usr/local/bin/repo
-
-# ============================================================
-# git global config
-# ============================================================
-RUN git config --global core.autocrlf input && \
+# --- repo tool + git global config ---
+RUN set -eu && \
+    curl -fsSL ${REPO_SCRIPT_URL} -o /usr/local/bin/repo && \
+    chmod a+x /usr/local/bin/repo && \
+    git config --global core.autocrlf input && \
     git config --global core.editor vim && \
     git config --global color.ui auto && \
-    git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+    git config --global credential.helper "cache --timeout=3600" && \
+    git config --global alias.lg \
+        "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 
-# ============================================================
-# Trust gitcode.com SSH host key
-# ============================================================
-RUN mkdir -p /root/.ssh && \
-    ssh-keyscan -H gitcode.com >> /root/.ssh/known_hosts && \
-    chmod 600 /root/.ssh/known_hosts
-
-# ============================================================
-# oh-my-zsh + plugins (via gitcode mirror)
-# ============================================================
-RUN git clone --depth=1 https://gitcode.com/ohmyzsh/ohmyzsh.git /root/.oh-my-zsh && \
+# --- oh-my-zsh + plugins (via gitcode mirror) ---
+RUN set -eu && \
+    git clone --depth=1 https://gitcode.com/ohmyzsh/ohmyzsh.git /root/.oh-my-zsh && \
     cp /root/.oh-my-zsh/templates/zshrc.zsh-template /root/.zshrc && \
     git clone --depth=1 https://gitcode.com/zsh-users/zsh-autosuggestions \
         /root/.oh-my-zsh/custom/plugins/zsh-autosuggestions && \
@@ -84,50 +77,83 @@ RUN git clone --depth=1 https://gitcode.com/ohmyzsh/ohmyzsh.git /root/.oh-my-zsh
     sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="agnoster"/' /root/.zshrc && \
     chsh -s "$(which zsh)" root
 
-# ============================================================
-# conda — copied from stage 0, no architecture-specific download needed
-# ============================================================
+# --- conda + condarc / pip.conf ---
 COPY --from=conda-base /opt/conda /opt/conda
 
-RUN conda config --remove channels defaults 2>/dev/null || true && \
-    conda config --add channels ${CONDA_MIRROR}/pkgs/free && \
-    conda config --add channels ${CONDA_MIRROR}/pkgs/main && \
-    conda config --set show_channel_urls yes && \
-    conda config --set channel_priority strict
+RUN set -eu && mkdir -p /etc/conda && cat > /etc/conda/.condarc <<EOF
+channels:
+  - defaults
+show_channel_urls: true
+default_channels:
+  - ${CONDA_MIRROR}/pkgs/main
+  - ${CONDA_MIRROR}/pkgs/r
+  - ${CONDA_MIRROR}/pkgs/msys2
+custom_channels:
+  conda-forge: ${CONDA_MIRROR}/cloud
+  pytorch: ${CONDA_MIRROR}/cloud
+EOF
 
-# ============================================================
-# Python dependencies
-# ============================================================
-RUN printf "[global]\nindex-url = ${PYPI_MIRROR}\n" > /etc/pip.conf
+RUN set -eu && cat > /etc/pip.conf <<EOF
+[global]
+index-url = https://${GENERAL_MIRROR}/repository/pypi/simple
+trusted-host = ${GENERAL_MIRROR}
+default-timeout = 120
+EOF
 
-COPY environment-312.yml /tmp/
-RUN conda env create -q -f /tmp/environment-312.yml && \
-    conda clean -ya && \
-    pip cache purge 2>/dev/null || true
+# --- Python env ---
+COPY requirements.txt /tmp/requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
+    set -eu && \
+    conda create -y -n py312 python=3.12 pip && \
+    conda run -n py312 pip install -r /tmp/requirements.txt && \
+    conda clean -afy && \
+    find /opt/conda -follow -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true && \
+    rm -f /tmp/requirements.txt
 
-# ============================================================
-# Shell customization
-# ============================================================
-RUN conda init zsh && \
-    echo "conda activate py312" >> /root/.zshrc && \
-    echo "export REPO_URL=\"${REPO_MIRROR}\"" >> /root/.zshrc
+# --- Node (streamed into /usr/local) + global npm ---
+RUN set -eu -o pipefail && \
+    arch="$(dpkg --print-architecture)" && \
+    case "$arch" in \
+        amd64) node_arch="x64"   ;; \
+        arm64) node_arch="arm64" ;; \
+        *) echo "Unsupported architecture: $arch" >&2; exit 1 ;; \
+    esac && \
+    NODE_TARBALL="$( \
+        curl -fsSL "https://${GENERAL_MIRROR}/nodejs/latest-v${NODE_MAJOR}.x/SHASUMS256.txt" \
+        | awk -v arch="$node_arch" '$2 ~ "linux-" arch "\\.tar\\.gz$" {print $2; exit}' \
+    )" && \
+    test -n "$NODE_TARBALL" && \
+    curl -fsSL "https://${GENERAL_MIRROR}/nodejs/latest-v${NODE_MAJOR}.x/${NODE_TARBALL}" \
+        | tar -xz -C /usr/local --strip-components=1
 
-# AscendC banner
-RUN printf '\n\
-echo "\\033[1;36m"\n\
-echo " █████╗ ███████╗ ██████╗███████╗███╗   ██╗██████╗  ██████╗"\n\
-echo "██╔══██╗██╔════╝██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝"\n\
-echo "███████║███████╗██║     █████╗  ██╔██╗ ██║██║  ██║██║     "\n\
-echo "██╔══██║╚════██║██║     ██╔══╝  ██║╚██╗██║██║  ██║██║     "\n\
-echo "██║  ██║███████║╚██████╗███████╗██║ ╚████║██████╔╝╚██████╗"\n\
-echo "╚═╝  ╚═╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚═════╝  ╚═════╝"\n\
-echo "\\033[0m"\n' >> /root/.zshrc
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    set -eu && \
+    npm config set registry https://${GENERAL_MIRROR}/repository/npm/ && \
+    npm install -g @openai/codex@latest @anthropic-ai/claude-code@latest && \
+    npx --yes skills add https://gitcode.com/GitHub_Trending/ad/skills.git --skill find-skills -g -a claude-code -a codex --all -y && \
+    npx --yes skills add https://gitcode.com/GitHub_Trending/su/superpowers.git  -g -a claude-code -a codex --all -y && \
+    npx --yes skills add https://gitcode.com/GitHub_Trending/skills3/skills.git -g -a claude-code -a codex --all -y && \
+    npx --yes skills add https://gitcode.com/GitHub_Trending/skills13/skills.git -g -a claude-code -a codex --all -y
+    # npx --yes skills add https://gitcode.com/gh_mirrors/cli414/cli.git -g -a claude-code -a codex --all -y 
+
+# --- Shell customization ---
+RUN set -eu && \
+    conda init zsh && \
+    cat >> /root/.zshrc <<EOF && rm -rf /tmp/*
+
+conda activate py312
+
+# AscendC banner (rainbow, one ANSI color per row)
+echo "\\033[1;91m █████╗ ███████╗ ██████╗███████╗███╗   ██╗██████╗  ██████╗\\033[0m"
+echo "\\033[1;93m██╔══██╗██╔════╝██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝\\033[0m"
+echo "\\033[1;92m███████║███████╗██║     █████╗  ██╔██╗ ██║██║  ██║██║     \\033[0m"
+echo "\\033[1;96m██╔══██║╚════██║██║     ██╔══╝  ██║╚██╗██║██║  ██║██║     \\033[0m"
+echo "\\033[1;94m██║  ██║███████║╚██████╗███████╗██║ ╚████║██████╔╝╚██████╗\\033[0m"
+echo "\\033[1;95m╚═╝  ╚═╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚═════╝  ╚═════╝\\033[0m"
 
 # Ascend driver environment
-RUN printf '\n[ -f /usr/local/Ascend/driver/bin/setenv.bash ] && source /usr/local/Ascend/driver/bin/setenv.bash\n' \
-    >> /root/.zshrc
-
-RUN rm -rf /tmp/*
+[ -f /usr/local/Ascend/driver/bin/setenv.bash ] && source /usr/local/Ascend/driver/bin/setenv.bash
+EOF
 
 WORKDIR /root
 ENTRYPOINT ["/bin/zsh"]
