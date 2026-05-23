@@ -10,7 +10,7 @@
 
 头文件为：#include "tensor_api/tensor.h"
 
-构造`Coord`对象，用于定义张量的坐标。
+构造Coord对象，用于定义张量的坐标。
 
 ## 函数原型
 
@@ -35,12 +35,12 @@ __aicore__ inline constexpr Coord<Ts...> MakeCoord(const Ts&... t)
 
 ## 返回值说明
 
-返回`Coord<Ts...>`对象。
+返回Coord<Ts...>对象。
 
 ## 约束说明
 
 - 各维度的坐标值需为非负整数。
-- 参数数量必须与对应的`Shape`维度数量一致。
+- 参数数量必须与对应的Shape维度数量一致。
 
 ## 调用示例
 

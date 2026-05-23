@@ -41,13 +41,11 @@ ASCENDC_HOST_AICORE inline constexpr auto ceil_division(const T& num1, const U& 
 
 ## 返回值说明
 
-返回`num1 / num2`的向上取整结果，返回类型由表达式自动推导。
+返回num1 / num2的向上取整结果，返回类型由表达式自动推导。
 
 ## 约束说明
 
-- `num2`不能为0。
-- 推荐用于非负整数场景。
-- 当参数为`Int`类型时，可在编译期完成计算。
+- num2不能为0。
 
 ## 调用示例
 
