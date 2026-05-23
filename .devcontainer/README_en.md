@@ -196,23 +196,30 @@ Default active environment is `py312`.
 
 ### Mirror Sources
 
-Default mirror sources can be overridden at build time via build arguments:
+Build args and defaults:
+
+| Build arg | Default | Description |
+| --- | --- | --- |
+| `GENERAL_MIRROR` | `mirrors.huaweicloud.com` | Shared host for apt / pypi / npm / nodejs binaries. Must expose paths in the `/ubuntu/`, `/repository/pypi/simple/`, `/repository/npm/`, `/nodejs/` layout (Huawei Cloud and Aliyun mirrors satisfy this) |
+| `CONDA_MIRROR` | `https://mirrors.tuna.tsinghua.edu.cn/anaconda` | conda channels prefix; include the scheme |
+| `REPO_MIRROR` | `https://mirrors.tuna.tsinghua.edu.cn/git/git-repo` | google `repo` tool download URL; outside China set to `https://storage.googleapis.com/git-repo-downloads/repo` |
+| `NODE_MAJOR` | `26` | Node.js major version; the mirror must serve a `latest-v${NODE_MAJOR}.x/` directory |
+
+Override example:
 
 ```bash
 docker buildx build --network host \
-  --build-arg APT_MIRROR=mirrors.ustc.edu.cn \
   --build-arg CONDA_MIRROR=https://mirrors.ustc.edu.cn/anaconda \
-  --build-arg PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple \
+  --build-arg REPO_MIRROR=https://storage.googleapis.com/git-repo-downloads/repo \
   -t ascendc:ubuntu24.04 .devcontainer/
 ```
 
-Available mirrors:
+> [!NOTE]
+> Because apt / pypi / npm / nodejs share a single host laid out the Huawei-Cloud way, switching wholesale to Tsinghua or USTC mirrors (which use different paths) requires editing the Dockerfile directly rather than just overriding `GENERAL_MIRROR`.
 
-| Build arg | Default | Tsinghua | USTC | Huawei |
-| :----------: | ------ | ---------- | -------- | -------- |
-| `APT_MIRROR` | `mirrors.huaweicloud.com` | `mirrors.tuna.tsinghua.edu.cn` | `mirrors.ustc.edu.cn` | `mirrors.huaweicloud.com` |
-| `CONDA_MIRROR` | `mirrors.tuna.tsinghua.edu.cn/anaconda` | `mirrors.tuna.tsinghua.edu.cn/anaconda` | `mirrors.ustc.edu.cn/anaconda` | — |
-| `PYPI_MIRROR` | `repo.huaweicloud.com/repository/pypi/simple` | `pypi.tuna.tsinghua.edu.cn/simple` | `pypi.mirrors.ustc.edu.cn/simple` | `repo.huaweicloud.com/repository/pypi/simple` |
+### Build Cache
+
+The Dockerfile uses BuildKit `--mount=type=cache` for apt / pip / npm. On re-builds (when non-package layers change), package indexes and previously downloaded wheels are reused and the build finishes in seconds. `docker buildx build` enables BuildKit by default — no extra configuration required.
 
 ### Mount Directories
 
