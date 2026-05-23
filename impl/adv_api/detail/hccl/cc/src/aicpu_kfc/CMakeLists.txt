@@ -148,8 +148,8 @@ set(include_list
 
 # 指定ccl_kernel_plf所需包含文件搜索路径
 if(BUILD_OPEN_PROJECT)
-    include(${HCCL_CC_DIR}/cmake/third_party/json.cmake)
-    include(${HCCL_CC_DIR}/cmake/third_party/rdma-core.cmake)
+    add_cann_third_party(json)
+    add_cann_third_party(rdma-core)
 
     target_compile_definitions(ccl_kernel_plf PRIVATE
         OPEN_BUILD_PROJECT)
@@ -311,6 +311,8 @@ if(BUILD_OPEN_PROJECT)
         $<BUILD_INTERFACE:runtime_headers>
         $<BUILD_INTERFACE:atrace_headers>
         $<BUILD_INTERFACE:mmpa_headers>
+        $<BUILD_INTERFACE:acl_rt_headers>
+        $<BUILD_INTERFACE:ascend_hal_headers>
     )
 
     target_link_libraries(ccl_kernel_plf_a
@@ -328,6 +330,8 @@ if(BUILD_OPEN_PROJECT)
         $<BUILD_INTERFACE:runtime_headers>
         $<BUILD_INTERFACE:atrace_headers>
         $<BUILD_INTERFACE:mmpa_headers>
+        $<BUILD_INTERFACE:acl_rt_headers>
+        $<BUILD_INTERFACE:ascend_hal_headers>
     )
 endif()
 
