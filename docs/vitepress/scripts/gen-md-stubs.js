@@ -20,13 +20,17 @@
  * SOFTWARE.
  */
 
-const { readdirSync, writeFileSync, existsSync, readFileSync, mkdirSync } = require('node:fs')
+const { readdirSync, writeFileSync, existsSync, mkdirSync } = require('node:fs')
 const { join, resolve } = require('node:path')
 
 const docsDir = resolve(__dirname, '..', 'docs')
 const manifestFile = resolve(__dirname, '..', '.stubs-manifest.json')
 const figuresDir = join(docsDir, 'api', 'figures')
-const placeholderSrc = resolve(__dirname, 'placeholder.png')
+
+const PLACEHOLDER_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
+  'base64'
+)
 
 function findAllHtml(dir) {
   const results = []
@@ -71,7 +75,7 @@ console.log(`Total: ${allStubs.length} .md stubs generated`)
 if (!existsSync(figuresDir)) {
   mkdirSync(figuresDir, { recursive: true })
 }
-if (!existsSync(join(figuresDir, 'placeholder.png')) && existsSync(placeholderSrc)) {
-  writeFileSync(join(figuresDir, 'placeholder.png'), readFileSync(placeholderSrc))
+if (!existsSync(join(figuresDir, 'placeholder.png'))) {
+  writeFileSync(join(figuresDir, 'placeholder.png'), PLACEHOLDER_PNG)
   console.log('Created figures/placeholder.png')
 }
