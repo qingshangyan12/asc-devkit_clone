@@ -115,7 +115,7 @@ struct Layout : private Std::tuple<T, U>
 
 - 功能说明
 
-    获取当前Layout所需的实际内存容量。
+    获取当前Layout布局所需的实际内存容量。
 
     传入模板参数I...时，会先选取指定子维度，再计算对应子布局的容量。
 
@@ -127,7 +127,7 @@ struct Layout : private Std::tuple<T, U>
 
 - 返回值说明
 
-    返回当前Layout或指定子维度对应布局的容量。
+    返回当前Layout或指定子维度对应布局的实际容量。
 
 ---
 
@@ -135,7 +135,7 @@ struct Layout : private Std::tuple<T, U>
 
 - 功能说明
 
-    获取Layout对象自身，用于统一接口中返回布局实例。
+    获取Layout对象自身，用于统一接口中返回Layout布局实例。
 
 - 函数原型
   ```cpp
@@ -201,7 +201,7 @@ struct Layout : private Std::tuple<T, U>
 
     将多维逻辑坐标映射为一维线性索引。
 
-    该接口内部调用Crd2Idx，根据当前Layout的Shape和Stride计算坐标在内存中的线性位置。
+    该接口内部调用[Crd2Idx]()，根据当前Layout的Shape和Stride计算坐标在内存中的线性位置。
 
 - 函数原型
   ```cpp

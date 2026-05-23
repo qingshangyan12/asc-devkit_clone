@@ -23,4 +23,4 @@ using Coord = Std::tuple<Coords...>;
 
 ## API映射关系
 
-Coord通常通过[MakeCoord](layout_structure_api/MakeCoord.md)函数创建。
+Coord通常通过[MakeCoord](MakeCoord.md)函数创建。
