@@ -2,14 +2,13 @@
 
 ## 概述
 
-本样例以向量加法为例，演示了在Ascend C SIMT编程中，基于短向量的性能调优方法。整个过程分为三个步骤（Case
-0-2），逐步展示从基础half类型逐元素加法到使用half2类型向量化加法的优化过程。重点对比了原始类型与短向量在数据处理效率上的差异，以及配套优化线程分配策略来减少空闲线程，进一步提升计算性能。
+本样例以向量加法为例，演示了在Ascend C SIMT编程中，基于短向量的性能调优方法。通过两个场景的对比（Case
+0-1），展示从基础half类型逐元素加法到使用half2类型向量化加法的优化过程。重点对比了原始类型与向量化类型（half2）在数据处理效率上的差异。
 
 **优化路径**：
 
 - Case 0: half类型数据处理（基准）
-- Case 1: 短向量half2类型优化
-- Case 2: 短向量half2类型 + 核数配置优化
+- Case 1: half2类型向量化优化
 
 ## 支持的产品
 
@@ -22,6 +21,7 @@
 
 ```
 short_vector_add
+│   ├── figures/             // 示意图
 │   ├── scripts/             // 测试脚本目录
 │   │   ├── gen_data.py      // 生成测试输入和golden数据
 │   │   └── verify_result.py // 验证输出结果
@@ -41,9 +41,9 @@ short_vector_add
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">SIMT样例</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center" colspan="2">data type</td></tr>
-  <tr><td align="center">x</td><td align="center">[64*1024]</td><td align="center" colspan="2">half</td></tr>
-  <tr><td align="center">y</td><td align="center">[64*1024]</td><td align="center" colspan="2">half</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[64*1024]</td><td align="center" colspan="2">half</td></tr>
+  <tr><td align="center">x</td><td align="center">[64 * 256 * 1024]</td><td align="center" colspan="2">half</td></tr>
+  <tr><td align="center">y</td><td align="center">[64 * 256 * 1024]</td><td align="center" colspan="2">half</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[64 * 256 * 1024]</td><td align="center" colspan="2">half</td></tr>
   </table>
 
 ## 样例实现
@@ -80,16 +80,21 @@ short_vector_add
 template<typename T>
 __global__ void add(T* x, T* y, T* z, uint64_t size)
 {
-  int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < size) {
-      z[idx] = x[idx] + y[idx];
-  }
+    // gridDim.x * blockDim.x 线程总数 (64 * 1024)
+    int32_t stride = gridDim.x * blockDim.x;
+    // 每个线程从自己的全局idx开始，每次递增总线程数，直到处理完所有元素
+    for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < size; idx += stride) {
+        z[idx] = x[idx] + y[idx];
+    }
 }
 ```
 
 **样例配置**：
 
-- 启动64个Block，单个Block配置1024个线程，每个线程处理1个half数据。
+- blockNum: 64
+- threadNumPerBlock: 1024
+- 总线程数: 65536
+- 每线程处理元素数: 32
 
 **性能数据**：
 
@@ -97,6 +102,9 @@ __global__ void add(T* x, T* y, T* z, uint64_t size)
 |:-----------------:|:------------:|:----------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:--------------:|:-----------------:|:--------------:|
 |       1.811       |    1.549     |      103434      |      0.818       |     0.529     |        0.711        |      0.459       |       0.006       |     0.004      |       0.002       |     0.001      |
 
+<p align="center">
+  <img src="figures/memory_bound.png" width="1000">
+</p>
 **性能数据分析**：
 
 - 端到端耗时：**1.810 us**
@@ -110,7 +118,7 @@ __global__ void add(T* x, T* y, T* z, uint64_t size)
 
 ---
 
-### Case 1: 短向量half2类型优化
+### Case 1: half2类型向量化优化
 
 **实现方式**：
 
@@ -122,15 +130,19 @@ __global__ void add(T* x, T* y, T* z, uint64_t size)
 template<typename T, typename U>
 __global__ void add2(T* x, T* y, T* z, uint64_t size)
 {
-    int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx < size/2) {
-        const U* x2 = reinterpret_cast<const U*>(x);
-        const U* y2 = reinterpret_cast<const U*>(y);
-        U* z2 = reinterpret_cast<U*>(z);
+    // 转为向量类型
+    const U* x2 = reinterpret_cast<const U*>(x);
+    const U* y2 = reinterpret_cast<const U*>(y);
+    U* z2 = reinterpret_cast<U*>(z);
+
+    uint64_t vectorSize = size / 2;
+    int32_t stride = gridDim.x * blockDim.x;
+    // 向量化循环处理偶数对（步长同样是总线程数）
+    for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < vectorSize; idx += stride) {
         z2[idx] = x2[idx] + y2[idx];
     }
-    // 剩余单个half类型数据处理
-    if (idx == 0 && (size % 2 != 0)) {
+    // 最后一个奇数元素处理（如果size是奇数，由全局第0号线程在最后处理）
+    if (blockIdx.x == 0 && threadIdx.x == 0 && (size % 2 != 0)) {
         uint64_t lastIdx = size - 1;
         z[lastIdx] = x[lastIdx] + y[lastIdx];
     }
@@ -139,7 +151,10 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 
 **样例配置**：
 
-- 启动64个Block，单个Block配置1024个线程，代码处理half2类型数据
+- blockNum: 64
+- threadNumPerBlock: 1024
+- 总线程数: 65536
+- 每线程处理half2元素数: 16
 
 **性能数据**：
 
@@ -162,44 +177,11 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 
 ---
 
-### Case 2: 短向量half2类型 + 核数配置优化
-
-**实现方式**：
-
-在引入`half2`的同时， Block 数量减半。
-
-**关键代码**：
-
-```cpp
-uint32_t vectorTotalLength = (totalLength + 1) / 2;
-uint32_t blockNum2 = (vectorTotalLength + threadNumPerBlock - 1) / threadNumPerBlock;
-add2<half, half2><<<blockNum2, threadNumPerBlock, dynUbufSize, stream>>>(xDevice, yDevice, zDevice, totalLength);
-```
-
-**样例配置**：
-
-- 启动32个Block，单个Block配置1024个线程，每个线程处理1个half2数据
-
-**性能数据**：
-
-| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:-----------------:|:------------:|:----------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:--------------:|:-----------------:|:--------------:|
-|       1.672       |    1.405     |      50862       |      0.832       |     0.593     |        0.556        |      0.394       |       0.005       |     0.004      |       0.002       |     0.001      |
-
-**优化效果分析**：
-
-- 端到端耗时：微降至**1.672 μs**
-- cycle总数：：微降至**50,862**
-- 性能分析：cycle数量相比Case 0**下降51%**，执行时间相比Case 0**下降7.66%**。
-
----
-
 ### 优化要点总结
 
 | 优化手段 | 核心原理              | 适用场景                                                                                        |
 |:-----|:------------------|:--------------------------------------------------------------------------------------------|
 | 短向量  | 底层指令支持一次完成两个数据的计算 | half/bfloat16_t类型元素进行[基本运算](../../../../../../docs/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符) |
-| 核数配置 | 去除资源空耗            | 多数据量场景                                                                                      |
 
 ---
 
@@ -225,8 +207,8 @@ add2<half, half2><<<blockNum2, threadNumPerBlock, dynUbufSize, stream>>>(xDevice
 
 - 样例执行
   ```bash
-  # 场景3：使用half2类型 + 优化线程配置
-  SCENARIO_NUM=3
+  # 场景2：使用half2类型
+  SCENARIO_NUM=2
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake .. -DSCENARIO_NUM=$SCENARIO_NUM; make -j;                           # 编译工程
   python3 ../scripts/gen_data.py;                                           # 生成测试输入数据
@@ -243,17 +225,19 @@ add2<half, half2><<<blockNum2, threadNumPerBlock, dynUbufSize, stream>>>(xDevice
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
+- 编译选项说明
+
+  | 参数                        | 可选值             | 说明                                    |
+  |:--------------------------|:----------------|:--------------------------------------|
+  | `SCENARIO_NUM`            | `1`（默认）、`2`     | 1: half Add计算；<br/>2: 短向量half2 Add计算； |
+  | `CMAKE_ASC_RUN_MODE`      | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真                     |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`      | `dav-3510`                            |
+
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
   ```
-- 编译选项说明
-
-  | 参数                        | 说明           | 可选值                                           | 默认值        |
-  |:--------------------------|:-------------|:----------------------------------------------|:-----------|
-  | `SCENARIO_NUM`            | `1`、`2`、`3`  | 1: half Add计算；<br/>2: 短向量计算；<br/>3: 短向量+核数优化； | `1`        |
-  | `CMAKE_ASC_RUN_MODE`      | 运行模式         | `npu`、`sim`                                   | `npu`      |
-  | `CMAKE_ASC_ARCHITECTURES` | NPU 硬件架构     | `dav-3510`                                    | `dav-3510` |
 
 ## 性能数据获取
 

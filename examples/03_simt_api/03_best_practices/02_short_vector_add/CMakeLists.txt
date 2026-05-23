@@ -21,17 +21,12 @@ set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 # SCENARIO_NUM: 场景编号
 #   1 - half：half类型的向量处理，基线场景
 #   2 - half2：half2类型的向量处理，提高数据计算效率（与场景1同样数据规模）
-#   3 - half2：half2类型的向量处理，提高数据计算效率（消减掉空跑线程）
-set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-3)")
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-2)")
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
 
 set(TARGET_FILENAME "demo" CACHE STRING "Execution file name")
 add_executable(${TARGET_FILENAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/short_vector_add.asc
-)
-
-target_link_libraries(demo PRIVATE
-        m
 )
 
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")

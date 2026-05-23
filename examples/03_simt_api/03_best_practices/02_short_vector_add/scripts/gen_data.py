@@ -17,7 +17,7 @@ import numpy as np
 
 
 def gen_golden_data():
-    total_length = 64 * 32 * 1024
+    total_length = 64 * 256 * 1024
     input_x = np.random.uniform(1, 100, [1, total_length]).astype(np.float16)
     input_y = np.random.uniform(1, 100, [1, total_length]).astype(np.float16)
     golden = (input_x + input_y).astype(np.float16)
