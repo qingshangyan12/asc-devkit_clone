@@ -63,7 +63,7 @@ void Mc2KfcServer::GenCircularQueue()
 {
     // 载入Token
     CcuRep::Variable token = CreateVariable();
-    Load(token);                  
+    Load(token);                                    // TODO:原来的这个Load()应该替换成什么呢？  LoadVariable()--->Load()                                  
 
     // 控制<repeat循环执行条件>的寄存器
     CcuRep::Variable repeatCond = CreateVariable();
@@ -116,7 +116,7 @@ void Mc2KfcServer::GenCircularQueue()
         WaitTurnStartSig(waitAddr, turnStartSig);
 
         // 读取本轮参数
-        LoadFuncParamFromMemory(paramAddr, param);
+        LoadFuncParamFromMemory(paramAddr, param);  //TODO:paramAddr这个参数是通信算子(如ALLTOALL的)？
 
         MissionPreSync(param[HBM_PARAM_IDX_0]);
 
@@ -150,14 +150,17 @@ void Mc2KfcServer::GenCircularQueue()
 
 void Mc2KfcServer::WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::Variable &turnStartSig)
 {
-    const uint32_t getDieId = DIE0_ID;          // TODO：GetDieId()函数的替换待HCCL方提供
+    const uint32_t getDieId = DIE0_ID;          // WAIT
     if (dieNum_ == SINGLE_DIE) {
         CCU_WHILE(turnStartSig != 1)
         {
+            // TODO:原来LoadVariable()里面是两个CcuRep::Variable入参，现在这个Load()函数不是
+            // 即原来的CcuRep::Variable入参能不能等效替换成uint64_t
+            // Load(uint64_t addr,T &res);
             Load(hbmSigAddr, turnStartSig);
         }
         turnStartSig = 0;
-        Store(turnStartSig, hbmSigAddr);
+        Store(turnStartSig, hbmSigAddr);        // TODO:同上
     } else {
         if (getDieId == DIE0_ID) {
             CCU_WHILE(turnStartSig != 1)
@@ -166,9 +169,12 @@ void Mc2KfcServer::WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::
             }
             turnStartSig = 0;
             Store(turnStartSig, hbmSigAddr);
+            // TODO:原来的LocalCtxPost(const CcuRep::MaskSignal &sig, uint32_t mask)
+            // EventRecord(const char*evtTag, uint32 mask);
+            // 即原来的CcuRep::MaskSignal能不能等效替换为const char*
             EventRecord(importDieSig_, 1);
         } else if (getDieId == DIE1_ID) {
-            EventWait(exportDieSig_, 1);
+            EventWait(exportDieSig_, 1);        // TODO:同上
         }
     }
 }
@@ -247,7 +253,7 @@ void CcuKernelKfcServer::MissionPreSync(CcuRep::Variable &func)
             LocalCtxPostVar(func, importMissionVar_[i], importMissionSig_[i]);    // TODO：这里怎么改
         }
     } else {
-        EventWait(exportMissoinSig_[0]);
+        EventWait(exportMissoinSig_[0]);        //TODO：上面已有
         func = exportMissionVar_[0];
     }
 }
@@ -259,28 +265,35 @@ void CcuKernelKfcServer::MissionPostSync()
     }
     if (missionIndex_ == 0) {
         for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
+            //TODO：之前这里LocalWait(CcuRep::MaskSignal)
+            // 这里有单个入参的版本么？
             EventWait(exportMissoinSig_[i]);
         }
     } else {
+        //TODO：之前这里LocalCtxPost(CcuRep::MaskSignal)
+        // 这里有单个入参的版本么？
         EventRecord(importMissionSig_[0]);
     }
 }
 
 std::vector<uint64_t> CcuKernelKfcServer::GeneArgs(const CcuTaskArg &arg)
 {
+    //TODO：这里别的通信算子，const CcuTaskArg &arg里面全都是auint64_t的参数
+    // 这里非uint64_t的如何处理
+
     const CcuTaskArgKfcServer *taskArg = dynamic_cast<const CcuTaskArgKfcServer *>(&arg);
     uint64_t waitAddr = taskArg->waitAddr_;
     uint64_t recordAddr = taskArg->recordAddr_;
     uint64_t paramAddr = taskArg->paramAddr_;
-    uint32_t dieNum = taskArg->dieNum_;
+    uint64_t dieNum = taskArg->dieNum_;
     CcuRep::MaskSignal exportDieSig = taskArg->exportDieSig_;
     CcuRep::MaskSignal importDieSig = taskArg->importDieSig_;
-    uint32_t missionNum = taskArg->missionNum_;
-    uint32_t missionIndex = taskArg->missionIndex_;
+    uint64_t missionNum = taskArg->missionNum_;
+    uint64_t missionIndex = taskArg->missionIndex_;
     std::vector<CcuRep::MaskSignal> exportMissoinSig = taskArg->exportMissoinSig_;
     std::vector<CcuRep::MaskSignal> importMissionSig = taskArg->importMissionSig_;
-    std::vector<CcuRep::MaskSignal> exportMissionVar = taskArg->exportMissionVar_;
-    std::vector<CcuRep::MaskSignal> importMissionVar = taskArg->importMissionVar_;
+    std::vector<CcuRep::Variable> exportMissionVar = taskArg->exportMissionVar_;
+    std::vector<CcuRep::Variable> importMissionVar = taskArg->importMissionVar_;
     return {waitAddr, recordAddr, paramAddr,dieNum,exportDieSig,importDieSig, missionNum, missionIndex,
             exportMissoinSig, importMissionSig, exportMissionVar, importMissionVar};
 }
