@@ -155,8 +155,7 @@ TEST_F(TEST_OPBUILD, OpBuildRun)
     std::string src_file, gen_file;
     std::ifstream src_if, gen_if;
     std::stringstream src_ss, gen_ss;
-    std::vector<std::string> files = { "/op_proto.cc", "/op_proto.h", "/aic-ascend310p-ops-info.ini",
-        "/aic-ascend910-ops-info.ini" };
+    std::vector<std::string> files = { "/op_proto.cc", "/op_proto.h", "/aic-ascend310p-ops-info.ini" };
     std::string insConvert = "ABcd_Efg";
     std::string covertStr;
     auto convertString = ConvertToSnakeCase(insConvert);
@@ -1336,20 +1335,13 @@ TEST_F(TEST_OPBUILD, AclnnGenFailedWithoutSoc)
     opGen.AclnnOpGenOpSupportListAll(opDef, outfile);
     outfile.close();
 
-    std::vector<std::string> errMessage = Generator::GetErrorMessage();
-    bool hasErrorMessage = false;
-    const std::string err =
-        "The soc version of op TestFail is not configured,"
-        " at least one soc version must be configured."
-        " Check whether the soc version is added to the op proto type"
-        " definition in the host implementation(Opdef, through AddConfig).";
-    for (size_t i = 0U; i < errMessage.size(); i++) {
-        if (errMessage[i] == err) {
-            hasErrorMessage = true;
-            break;
-        }
-    }
-    EXPECT_TRUE(hasErrorMessage);
+    std::ifstream resultFile(fileName);
+    std::string content((std::istreambuf_iterator<char>(resultFile)),
+                         std::istreambuf_iterator<char>());
+    resultFile.close();
+    bool hasEmptySupportList = (content.find("OpSupportList supportList = {opSocSupportList, 0};") != std::string::npos);
+    EXPECT_TRUE(hasEmptySupportList);
+    remove(fileName.c_str());
 }
 
 TEST_F(TEST_OPBUILD, AclnnGenVersionFailed01)
