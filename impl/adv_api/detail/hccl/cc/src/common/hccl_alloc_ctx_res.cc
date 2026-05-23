@@ -462,16 +462,11 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
     return HCCL_SUCCESS;
 }
 
-HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam,
-    TopoInfoWithNetLayerDetails *topoInfo, void **resCtxOut)
+static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
+    std::unique_ptr<InsCollAlgBase> &executor, TopoInfoWithNetLayerDetails *topoInfo,
+    std::unique_ptr<AlgResourceCtxSerializable> &resCtxHost, void **resCtxOut)
 {
-    std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
-    CHK_PRT_RET(executor.get() == nullptr,
-        HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
-
-    std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
     bool isResourceReused = false;
-
     ThreadHandle cpuTsThread{0};
     ThreadHandle exportedAicpuTsThread{0};
     if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
@@ -483,13 +478,23 @@ HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &
     return HCCL_SUCCESS;
 }
 
-HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam, TopoInfoWithNetLayerDetails *topoInfo, OpResCtx &opResCtx, void **resCtxOut) {
+HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam,
+    TopoInfoWithNetLayerDetails *topoInfo, void **resCtxOut)
+{
     std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
     CHK_PRT_RET(executor.get() == nullptr,
         HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
-
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
-    bool isResourceReused = false;
+    return AcquireAlgResources(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut);
+}
+
+HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam,
+    TopoInfoWithNetLayerDetails *topoInfo, OpResCtx &opResCtx, void **resCtxOut)
+{
+    std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
+    CHK_PRT_RET(executor.get() == nullptr,
+        HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
+    std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
     if (opParam.engine == COMM_ENGINE_CCU) {
         std::shared_ptr<CcuKfcKernelStruct> kfcServerArgs = std::make_shared<CcuKfcKernelStruct>();
         kfcServerArgs->waitAddr = opResCtx.ckeAddr;
@@ -506,16 +511,7 @@ HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpPara
         kfcServerArgs->importMissionVar = {};
         resCtxHost->kfcServerArgs = std::move(kfcServerArgs);
     }
-
-    ThreadHandle cpuTsThread{0};
-    ThreadHandle exportedAicpuTsThread{0};
-    if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
-        CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
-        CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
-    }
-    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
-    opParam.resCtx = *resCtxOut;
-    return HCCL_SUCCESS;
+    return AcquireAlgResources(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut);
 }
 
 
