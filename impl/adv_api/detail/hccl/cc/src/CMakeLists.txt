@@ -145,8 +145,6 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template/ccu/kernel
 )
 
-<<<<<<< HEAD
-=======
 list(APPEND INCLUDE_LIST
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/acl
@@ -156,21 +154,14 @@ list(APPEND INCLUDE_LIST
     ${ASCEND_CANN_PACKAGE_PATH}/include/hcomm
 
     # runtime头文件
-    ${ASCEND_CANN_PACKAGE_PATH}/include/
     ${ASCEND_CANN_PACKAGE_PATH}/include/base/
     ${ASCEND_CANN_PACKAGE_PATH}/include/driver/
     ${ASCEND_CANN_PACKAGE_PATH}/include/dump/
     ${ASCEND_CANN_PACKAGE_PATH}/include/external/
     ${ASCEND_CANN_PACKAGE_PATH}/include/platform/
 
-    # driver头文件
-    ${ASCEND_CANN_PACKAGE_PATH}/include/driver/
-
     # mmpa头文件
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/mmpa/
-
-    # driver头文件
-    ${ASCEND_CANN_PACKAGE_PATH}/include/driver/
 
     # 包间接口
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
@@ -185,7 +176,6 @@ list(APPEND INCLUDE_LIST
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/dump/
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/trace/
 )
->>>>>>> fccd13ab (debug)
 
 if(PRODUCT_SIDE STREQUAL "device")
     add_library(mc2_server SHARED
@@ -338,7 +328,6 @@ if(PRODUCT_SIDE STREQUAL "device")
     target_link_libraries(mc2_server PRIVATE
         -Wl,--no-as-needed
         mc2_kernel_compat
-        -Wl,--no-as-needed
         mmpa
         $<BUILD_INTERFACE:acl_rt_headers>
         $<BUILD_INTERFACE:error_manager_headers>
