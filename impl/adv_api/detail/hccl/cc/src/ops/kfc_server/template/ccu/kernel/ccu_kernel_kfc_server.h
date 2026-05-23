@@ -51,8 +51,8 @@ public:
 
 class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {
 public:
-    explicit CcuTaskArgKfcServer(uint64_t waitAddr, uint64_t recordAddr, uint64_t paramAddr, uint32_t dieNum,
-                                 CcuRep::MaskSignal exportDieSig, CcuRep::MaskSignal importDieSig, uint32_t missionNum, uint32_t missionIndex,
+    explicit CcuTaskArgKfcServer(uint64_t waitAddr, uint64_t recordAddr, uint64_t paramAddr, uint64_t dieNum,
+                                 CcuRep::MaskSignal exportDieSig, CcuRep::MaskSignal importDieSig, uint64_t missionNum, uint64_t missionIndex,
                                  std::vector<CcuRep::MaskSignal> exportMissoinSig, std::vector<CcuRep::MaskSignal> importMissionSig,
                                  std::vector<CcuRep::Variable> exportMissionVar, std::vector<CcuRep::Variable> importMissionVar):
                                  waitAddr_(waitAddr), recordAddr_(recordAddr), paramAddr_(paramAddr), dieNum_(dieNum),
@@ -72,13 +72,13 @@ public:
     // HBM上的算子执行参数首地址
     uint64_t paramAddr_{0};
     // Die数量，用于判断单双Die，默认为1即单Die
-    uint32_t dieNum_{1};
+    uint64_t dieNum_{1};
     // 用于Die间同步信号
     CcuRep::MaskSignal exportDieSig_;
     CcuRep::MaskSignal importDieSig_;
 
-    uint32_t missionNum_{1};
-    uint32_t missionIndex_{0};
+    uint64_t missionNum_{1};
+    uint64_t missionIndex_{0};
     // 用于Mission间同步信号
     std::vector<CcuRep::MaskSignal> exportMissoinSig_{};
     std::vector<CcuRep::MaskSignal> importMissionSig_{};
@@ -92,6 +92,9 @@ public:
     CcuKernelKfcServer(const CcuKfcKernelStruct &arg), kfcServerArgs(arg); // 待定
     ~CcuKernelKfcServer() override {}
 
+    void SetCommAddr(uint64_t syncAddr, uint64_t paramAddr);
+    void SetDieNum(uint32_t dieNum);
+
     HcclResult Algorithm() override;
     std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
 
@@ -103,6 +106,16 @@ private:
     CcuKfcKernelStruct kfcServerArgs;
 
     HcclResult InitResource();
+
+protected:
+    // HBM上的每轮开始信号的首地址
+    uint64_t waitAddr_{0};
+    // HBM上的每轮完成信号的首地址
+    uint64_t recordAddr_{0};
+    // HBM上的算子执行参数首地址
+    uint64_t paramAddr_{0};
+    // Die数量，用于判断单双Die，默认为1即单Die
+    uint64_t dieNum_{1};
 };
 
 class Mc2KfcServer : public CcuKernelKfcServer {
@@ -117,6 +130,15 @@ private:
     void WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::Variable &turnStartSig);
     void SetTurnEndSig(const CcuRep::Variable &hbmSigAddr, const CcuRep::Variable &turnEndSig);
     void LoadFuncParamFromMemory(CcuRep::Variable &paramAddr, std::array<CcuRep::Variable, CCU_PARAM_NUM_PER_DIE> &param);
+
+private:
+    // HBM上的每轮开始信号的首地址
+    uint64_t waitAddr_{0};
+    // HBM上的每轮完成信号的首地址
+    uint64_t recordAddr_{0};
+    // HBM上的算子执行参数首地址
+    uint64_t paramAddr_{0};
+
 };
 
 class Mc2SlaveKfcServer : public CcuKernelKfcServer {
