@@ -19,6 +19,7 @@ import copy
 import re
 from tbe.common.buildcfg import get_current_build_config
 from tbe.common.buildcfg.buildcfg_mapping import enable_vector_core
+from tbe.common.context import get_context
 from tbe.tvm.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
 from .get_op_tiling import OpInfo
 from .template_tiling import extract_template_tiling_info, decode_tiling
@@ -71,6 +72,196 @@ class KernelInfoInfer:
         set_match = re.findall(set_pattern, content)
         wait_match = re.findall(wait_pattern, content)
         return len(set_match) > 2, len(wait_match) > 2
+
+    @staticmethod
+    def _split_cpp_nested_text_at_top_level(text, separator, maxsplit=-1):
+        parts = []
+        start = 0
+        angle_depth = 0
+        paren_depth = 0
+        square_depth = 0
+        brace_depth = 0
+        quote = None
+        escape = False
+        split_count = 0
+        for index, char in enumerate(text):
+            if quote is not None:
+                if escape:
+                    escape = False
+                elif char == "\\":
+                    escape = True
+                elif char == quote:
+                    quote = None
+                continue
+            if char in ('"', "'"):
+                quote = char
+            elif char == "<":
+                angle_depth += 1
+            elif char == ">" and angle_depth > 0:
+                angle_depth -= 1
+            elif char == "(":
+                paren_depth += 1
+            elif char == ")" and paren_depth > 0:
+                paren_depth -= 1
+            elif char == "[":
+                square_depth += 1
+            elif char == "]" and square_depth > 0:
+                square_depth -= 1
+            elif char == "{":
+                brace_depth += 1
+            elif char == "}" and brace_depth > 0:
+                brace_depth -= 1
+            elif char == separator and angle_depth == 0 and paren_depth == 0 and \
+                    square_depth == 0 and brace_depth == 0 and \
+                    (maxsplit < 0 or split_count < maxsplit):
+                parts.append(text[start:index].strip())
+                start = index + 1
+                split_count += 1
+        parts.append(text[start:].strip())
+        return parts
+
+    @staticmethod
+    def _find_matching_cpp_delimiter(content, start, open_char, close_char):
+        if start >= len(content) or content[start] != open_char:
+            return -1
+        depth = 0
+        quote = None
+        escape = False
+        for index in range(start, len(content)):
+            char = content[index]
+            if quote is not None:
+                if escape:
+                    escape = False
+                elif char == "\\":
+                    escape = True
+                elif char == quote:
+                    quote = None
+                continue
+            if char in ('"', "'"):
+                quote = char
+            elif char == open_char:
+                depth += 1
+            elif char == close_char:
+                depth -= 1
+                if depth == 0:
+                    return index
+        return -1
+
+    @staticmethod
+    def _is_previous_identifier_token_in(content, function_name_start, target_tokens):
+        cursor = function_name_start - 1
+        while cursor >= 0 and content[cursor].isspace():
+            cursor -= 1
+        token_end = cursor + 1
+        while cursor >= 0 and (content[cursor].isalnum() or content[cursor] == "_"):
+            cursor -= 1
+        return content[cursor + 1:token_end] in target_tokens
+
+    @staticmethod
+    def _iter_function_call_optional_template_arg_lists(content, function_name):
+        pattern = re.compile(r"(?<![0-9A-Za-z_])" + re.escape(function_name) + r"\s*")
+        for match in pattern.finditer(content):
+            # Header declarations/definitions are prefixed by return-type tokens, e.g. "void SetNextTaskStart".
+            if KernelInfoInfer._is_previous_identifier_token_in(content, match.start(), ("void",)):
+                continue
+            cursor = match.end()
+            while cursor < len(content) and content[cursor].isspace():
+                cursor += 1
+            if cursor >= len(content):
+                continue
+            if content[cursor] == "(":
+                yield None, match.start()
+                continue
+            if content[cursor] != "<":
+                continue
+            end = KernelInfoInfer._find_matching_cpp_delimiter(content, cursor, "<", ">")
+            if end < 0:
+                continue
+            call_cursor = end + 1
+            while call_cursor < len(content) and content[call_cursor].isspace():
+                call_cursor += 1
+            if call_cursor >= len(content) or content[call_cursor] != "(":
+                continue
+            yield content[cursor + 1:end], match.start()
+
+    @staticmethod
+    def _get_line_number(content, offset):
+        return content.count("\n", 0, offset) + 1
+
+    @staticmethod
+    def extract_template_param_value_infos(content, function_name, param_names, target_param, default_value):
+        values = []
+        for template_params, start_offset in KernelInfoInfer._iter_function_call_optional_template_arg_lists(
+                content, function_name):
+            if template_params is None:
+                values.append({"value": default_value, "line": KernelInfoInfer._get_line_number(content, start_offset)})
+                continue
+            param_values = {}
+            for position_index, param in enumerate(KernelInfoInfer._split_cpp_nested_text_at_top_level(
+                    template_params, ",")):
+                if not param:
+                    continue
+                if position_index < len(param_names):
+                    param_values[param_names[position_index]] = param
+            values.append({
+                "value": param_values.get(target_param, default_value),
+                "line": KernelInfoInfer._get_line_number(content, start_offset)
+            })
+        return values
+
+    @staticmethod
+    def extract_template_param_values(content, function_name, param_names, target_param, default_value):
+        return [value_info["value"] for value_info in KernelInfoInfer.extract_template_param_value_infos(
+            content, function_name, param_names, target_param, default_value)]
+
+    @staticmethod
+    def _parse_template_bool_literal(value):
+        return value.strip().strip("()").lower() in ("true", "1")
+
+    @staticmethod
+    def _format_template_param_value_locations(value_infos, source_file):
+        def append_group(title, group_value_infos):
+            locations.append(f"  {title}:")
+            for value_info in group_value_infos[:4]:
+                location = f"{source_file}:{value_info['line']}" if source_file else f"line {value_info['line']}"
+                locations.append(f"    - value: {value_info['value']}, location: {location}")
+            if len(group_value_infos) > 4:
+                locations.append(f"    - ... {len(group_value_infos) - 4} more")
+
+        locations = ["FORCE values:"]
+        true_value_infos = [
+            value_info for value_info in value_infos if KernelInfoInfer._parse_template_bool_literal(value_info["value"])]
+        false_value_infos = [
+            value_info for value_info in value_infos if not KernelInfoInfer._parse_template_bool_literal(
+                value_info["value"])]
+        append_group("true values", true_value_infos)
+        append_group("false or unrecognized values", false_value_infos)
+        return "\n".join(locations)
+
+    @staticmethod
+    def normalize_early_start_force_values(value_infos, op_name, api_name, source_file=None):
+        if not value_infos:
+            return False
+        bool_values = [KernelInfoInfer._parse_template_bool_literal(value_info["value"]) for value_info in value_infos]
+        if all(bool_values):
+            return True
+        if any(bool_values):
+            value_locations = KernelInfoInfer._format_template_param_value_locations(value_infos, source_file)
+            CommonUtility.print_compile_log(
+                "", f"early-start {api_name} FORCE values are inconsistent in aclgraph path for op {op_name}. "
+                f"Disable early-start for this sub operator.\n{value_locations}", AscendCLogLevel.LOG_WARNING)
+        return False
+
+    @staticmethod
+    def get_aclgraph_sync_task_start_end_instr_from_i_file(content, op_name, source_file=None):
+        set_force_values = KernelInfoInfer.extract_template_param_value_infos(
+            content, "SetNextTaskStart", ["AIV_PIPE", "AIC_PIPE", "FORCE"], "FORCE", "false")
+        wait_force_values = KernelInfoInfer.extract_template_param_value_infos(
+            content, "WaitPreTaskEnd", ["FORCE"], "FORCE", "false")
+        return (KernelInfoInfer.normalize_early_start_force_values(
+            set_force_values, op_name, "SetNextTaskStart", source_file),
+                KernelInfoInfer.normalize_early_start_force_values(
+                    wait_force_values, op_name, "WaitPreTaskEnd", source_file))
 
     @staticmethod
     def get_enable_deterministic_var_from_i_file(content):
@@ -324,7 +515,13 @@ REGISTER_TILING_DEFAULT')
         hard_sync = KernelInfoInfer.get_hard_sync_instr_from_i_file(content)
         global_var_storage.set_variable("ascendc_op_with_syncall", hard_sync)
         if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
-            set_task_bar, wait_task_bar = KernelInfoInfer.get_sync_task_start_end_instr_from_i_file(content)
+            context = get_context()
+            if context is not None and context.get_addition("super_kernel_sub_combine") is True:
+                set_task_bar, wait_task_bar = \
+                    KernelInfoInfer.get_aclgraph_sync_task_start_end_instr_from_i_file(
+                        content, op_info.kernel_name, dst_i_file)
+            else:
+                set_task_bar, wait_task_bar = KernelInfoInfer.get_sync_task_start_end_instr_from_i_file(content)
         else:
             set_task_bar = False
             wait_task_bar = False
