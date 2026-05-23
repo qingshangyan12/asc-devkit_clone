@@ -137,7 +137,30 @@ install_deps() {
 }
 
 # ============================================================
-# 3. 构建静态站点
+# 3. 安装 mdparser 依赖 (Python)
+# ============================================================
+install_mdparser_deps() {
+    log "检查 cmarkgfm (Python)..."
+
+    if python3 -c "import cmarkgfm" &>/dev/null; then
+        log "cmarkgfm 已安装"
+        return 0
+    fi
+
+    log "安装 cmarkgfm..."
+    if command -v pip3 &>/dev/null; then
+        pip3 install cmarkgfm 2>&1 | tee -a "$LOG_FILE"
+    elif command -v pip &>/dev/null; then
+        pip install cmarkgfm 2>&1 | tee -a "$LOG_FILE"
+    else
+        err "未找到 pip，请手动安装 cmarkgfm: pip install cmarkgfm"
+        exit 1
+    fi
+    log "cmarkgfm 安装完成"
+}
+
+# ============================================================
+# 4. 构建静态站点
 # ============================================================
 build_docs() {
     cd "$SCRIPT_DIR"
@@ -157,7 +180,7 @@ build_docs() {
 }
 
 # ============================================================
-# 4. Nginx 部署
+# 5. Nginx 部署
 # ============================================================
 deploy_nginx() {
     DIST_DIR="$SCRIPT_DIR/docs/.vitepress/dist"
@@ -246,7 +269,7 @@ NGINX_EOF
 }
 
 # ============================================================
-# 5. 预览模式
+# 6. 预览模式
 # ============================================================
 run_preview() {
     cd "$SCRIPT_DIR"
@@ -255,7 +278,7 @@ run_preview() {
 }
 
 # ============================================================
-# 6. 静态服务模式 (使用 http-server 或 python)
+# 7. 静态服务模式 (使用 http-server 或 python)
 # ============================================================
 run_serve() {
     cd "$SCRIPT_DIR"
@@ -294,12 +317,14 @@ case "$MODE" in
         fi
         install_nodejs
         install_deps
+        install_mdparser_deps
         build_docs
         deploy_nginx
         ;;
     build)
         install_nodejs
         install_deps
+        install_mdparser_deps
         build_docs
         log "构建完成! 使用以下命令启动服务:"
         log "  sudo $0 --nginx        # Nginx 生产部署"
@@ -310,12 +335,14 @@ case "$MODE" in
     preview)
         install_nodejs
         install_deps
+        install_mdparser_deps
         build_docs
         run_preview
         ;;
     serve)
         install_nodejs
         install_deps
+        install_mdparser_deps
         build_docs
         run_serve
         ;;

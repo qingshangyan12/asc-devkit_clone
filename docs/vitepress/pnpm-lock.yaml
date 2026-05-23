@@ -8,6 +8,9 @@ onlyBuiltDependencies:
   - esbuild
 
 dependencies:
+  github-markdown-css:
+    specifier: ^5.9.0
+    version: 5.9.0
   vue:
     specifier: ^3.5.34
     version: 3.5.34
@@ -1188,6 +1191,11 @@ packages:
     os: [darwin]
     dev: true
     optional: true
+
+  /github-markdown-css@5.9.0:
+    resolution: {integrity: sha512-tmT5sY+zvg2302XLYEfH2mtkViIM1SWf2nvYoF5N1ZsO0V6B2qZTiw3GOzw4vpjLygK/KG35qRlPFweHqfzz5w==}
+    engines: {node: '>=10'}
+    dev: false
 
   /hast-util-to-html@9.0.5:
     resolution: {integrity: sha512-OguPdidb+fbHQSU4Q4ZiLKnzWo8Wwsf5bZfbvu7//a9oTYoqD/fWpe96NuHkoS9h0ccGOTe0C4NGXdtS0iObOw==}

@@ -1,0 +1,13 @@
+[project]
+name = "mdparser"
+version = "0.1.0"
+description = "High-performance Markdown-to-HTML parser based on cmark-gfm (C)"
+requires-python = ">=3.8"
+dependencies = ["cmarkgfm>=2024"]
+
+[project.scripts]
+mdparser = "mdparser.cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
