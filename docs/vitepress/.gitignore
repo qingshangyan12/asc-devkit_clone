@@ -8,3 +8,4 @@ docs/guide
 docs/figures
 build-output*.log
 *.zip
+.stubs-manifest.json
