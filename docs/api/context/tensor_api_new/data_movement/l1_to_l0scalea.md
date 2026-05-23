@@ -85,6 +85,17 @@ Ascend 950PR/Ascend 950DT上，L1 Buffer到L0ScaleA Buffer通路仅支持`fp8_e8
 
 源张量和目的张量的基础数据类型需要保持一致。
 
+## API映射关系
+
+与built-in接口映射关系：
+
+`CopyL12L0ScaleA`接口对应的底层built-in接口为：
+
+```cpp
+__aicore__ inline void asc_copy_l12l0a_mx(uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos,
+    uint16_t y_start_pos, uint8_t x_step, uint8_t y_step, uint16_t src_stride, uint16_t dst_stride);
+```
+
 ## 约束说明
 
 - 目的张量必须位于L0ScaleA Buffer，源张量必须位于L1 Buffer。

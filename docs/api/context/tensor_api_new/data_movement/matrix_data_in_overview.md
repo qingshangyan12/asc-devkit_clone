@@ -11,6 +11,7 @@
 **表1** **数据通路和存储层级**
 
 <a name="tensor_api_matrix_data_in_overview_table_data_path"></a>
+
 |源位置|源地址对齐要求|源数据布局|目的位置|目的地址对齐要求|目的数据布局|格式转换|典型应用场景|
 |--------|--------|--------|--------|--------|--------|--------|--------|
 |Global Memory|1字节|`NDExtLayoutPtn`、`DNExtLayoutPtn`、`NZLayoutPtn`|L1 Buffer(A1)|32字节|`NDExtLayoutPtn`、`NZLayoutPtn`|ND2ND、ND2NZ、DN2NZ、NZ2NZ|从全局内存加载左矩阵数据到L1 Buffer|
@@ -25,6 +26,7 @@
 **表2** **接口分类与使用场景**
 
 <a name="tensor_api_matrix_data_in_overview_table_interface_category"></a>
+
 |接口名称|主要功能|数据通路|源数据布局|目的数据布局|格式转换|典型应用场景|
 |--------|--------|--------|--------|--------|--------|--------|
 |[CopyGM2L1](<data_movement/gm_to_l1.md>)|Global Memory到L1 Buffer的数据搬运|Global Memory到L1 Buffer|`NDExtLayoutPtn`、`DNExtLayoutPtn`、`NZLayoutPtn`、`ZNLayoutPtn`、`ScaleANDLayoutPtn`、`ScaleADNLayoutPtn`、`ScaleBNDLayoutPtn`、`ScaleBDNLayoutPtn`、`ZZLayoutPtn`、`NNLayoutPtn`|`NDExtLayoutPtn`、`NZLayoutPtn`、`ZNLayoutPtn`、`ZZLayoutPtn`、`NNLayoutPtn`|ND2ND、ND/DN2NZ、ND/DN2ZN、NZ2NZ、ZN2ZN、ScaleA ND/DN2ZZ、ScaleB ND/DN2NN、ZZ2ZZ、NN2NN|左矩阵/右矩阵搬入L1 Buffer，支持ND、DN、NZ、ZN以及MX Scale相关布局搬运|
@@ -39,6 +41,7 @@
 **表3** **Ascend 950PR/Ascend 950DT产品接口支持情况**
 
 <a name="tensor_api_matrix_data_in_overview_table_product_support"></a>
+
 |产品系列|CopyGM2L1|CopyL12L0A|CopyL12L0B|CopyL12L0ScaleA|CopyL12L0ScaleB|
 |--------|--------|--------|--------|--------|--------|
 |Ascend 950PR/Ascend 950DT|√|√|√|√|√|

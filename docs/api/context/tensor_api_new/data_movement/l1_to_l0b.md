@@ -94,6 +94,117 @@ Ascend 950PR/Ascend 950DT支持的数据类型包括：
 
 源张量和目的张量的基础数据类型需要保持一致。
 
+## API映射关系
+
+与built-in接口映射关系：
+
+`CopyL12L0B`接口与底层built-in接口映射关系如下：
+
+| 搬运场景 | 底层built-in接口 |
+| :--- | :--- |
+| 非转置搬运 | `asc_copy_l12l0b` |
+| 转置搬运 | `asc_copy_l12l0b_transpose` |
+
+非转置搬运对应的底层built-in接口为：
+
+```cpp
+__aicore__ inline void asc_copy_l12l0b(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ half* dst, __cbuf__ half* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ float* dst, __cbuf__ float* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ int16_t* dst, __cbuf__ int16_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ int32_t* dst, __cbuf__ int32_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ int8_t* dst, __cbuf__ int8_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ uint16_t* dst, __cbuf__ uint16_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ uint32_t* dst, __cbuf__ uint32_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ uint8_t* dst, __cbuf__ uint8_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ int4b_t* dst, __cbuf__ int4b_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+```
+
+转置搬运对应的底层built-in接口为：
+
+```cpp
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ half* dst, __cbuf__ half* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ float* dst, __cbuf__ float* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ int16_t* dst, __cbuf__ int16_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ int32_t* dst, __cbuf__ int32_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ int8_t* dst, __cbuf__ int8_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ uint16_t* dst, __cbuf__ uint16_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ uint32_t* dst, __cbuf__ uint32_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ uint8_t* dst, __cbuf__ uint8_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ int4b_t* dst, __cbuf__ int4b_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src,
+    uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
+    int16_t src_stride, uint16_t dst_stride);
+```
+
 ## 约束说明
 
 - 目的张量必须位于L0B Buffer，源张量必须位于L1 Buffer。

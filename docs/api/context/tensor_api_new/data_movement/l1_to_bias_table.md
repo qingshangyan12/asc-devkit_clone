@@ -88,6 +88,23 @@ Ascend 950PR/Ascend 950DT支持的数据类型组合如下：
 | `float` | `float` |
 | `int32_t` | `int32_t` |
 
+## API映射关系
+
+与built-in接口映射关系：
+
+`CopyL12BT`接口对应的底层built-in接口为：
+
+```cpp
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint16_t conv_control,
+    uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint16_t conv_control,
+    uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint16_t conv_control,
+    uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint16_t conv_control,
+    uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
+```
+
 ## 约束说明
 
 - 支持`NDLayoutPtn`或`NDExtLayoutPtn`，源张量和目的张量均需使用受支持的布局模式。

@@ -125,6 +125,77 @@ Ascend 950PR/Ascend 950DT默认模式支持如下A、B、C数据类型组合：
 - 当bias位于`Location::L0C`时，bias数据类型需要与C数据类型一致。
 - `hifloat8_t * hifloat8_t -> float`场景由Tensor API在调用`Mmad`时设置对应控制位，并按硬件要求执行计算。
 
+## API映射关系
+
+与built-in接口映射关系：
+
+`Mmad`接口与底层built-in接口映射关系如下：
+
+| 计算场景 | 底层built-in接口 |
+| :--- | :--- |
+| 普通矩阵计算 | `asc_mmad` |
+| MX矩阵计算 | `asc_mmad_mx` |
+
+普通矩阵计算对应的底层built-in接口为：
+
+```cpp
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix,
+    __cb__ bfloat16_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float8_e4m3_t* a_matrix,
+    __cb__ float8_e4m3_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float8_e4m3_t* a_matrix,
+    __cb__ float8_e5m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float8_e5m2_t* a_matrix,
+    __cb__ float8_e4m3_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float8_e5m2_t* a_matrix,
+    __cb__ float8_e5m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix,
+    uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
+    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix,
+    uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
+    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix,
+    __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+```
+
+MX矩阵计算对应的底层built-in接口为：
+
+```cpp
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix,
+    __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix,
+    __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix,
+    __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix,
+    __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix,
+    __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix,
+    __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix,
+    __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix,
+    __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+```
+
+`hifloat8_t * hifloat8_t -> float`场景由Tensor API在调用普通矩阵计算built-in接口前设置控制位，并将输入指针按硬件要求转换为`fp8_e4m3fn_t*`后调用`asc_mmad`。
+
 ## 约束说明
 
 - 调用`Mmad`时需要显式传入`MmadAtom`对象。

@@ -77,6 +77,17 @@ struct CopyL12FBTraitDefault {
 Ascend 950PR/Ascend 950DT支持的数据类型组合如下：`uint64_t`
 源张量和目的张量的基础数据类型需要保持一致。
 
+## API映射关系
+
+与built-in接口映射关系：
+
+`CopyL12FB`接口对应的底层built-in接口为：
+
+```cpp
+__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_num,
+    uint16_t burst_len, uint16_t src_gap_size, uint16_t dst_gap_size);
+```
+
 ## 约束说明
 
 - 支持`NDLayoutPtn`或`NDExtLayoutPtn`，源张量和目的张量均需使用受支持的布局模式。
