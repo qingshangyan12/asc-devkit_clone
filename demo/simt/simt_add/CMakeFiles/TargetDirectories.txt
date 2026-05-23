@@ -1,0 +1,3 @@
+/mnt/asc-devkit/demo/simt/simt_add/CMakeFiles/demo.dir
+/mnt/asc-devkit/demo/simt/simt_add/CMakeFiles/edit_cache.dir
+/mnt/asc-devkit/demo/simt/simt_add/CMakeFiles/rebuild_cache.dir
