@@ -10,7 +10,7 @@
 #include "transport_mem.h"
 #include "log.h"
 #include "network_manager_pub.h"
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
 #include "transport_device_roce_mem.h"
 #endif
 
@@ -41,7 +41,7 @@ std::shared_ptr<TransportMem> TransportMem::Create(TpType tpType, const std::uni
     const HcclNetDevCtx &netDevCtx, const HcclDispatcher &dispatcher, AttrInfo &attrInfo, bool aicpuUnfoldMode)
 {
     std::shared_ptr<TransportMem> transportMemPtr;
-#if !defined(CCL_KERNEL) || defined(CCL_LLT)
+#if !defined(asc_ccl_kernel) || defined(CCL_LLT)
     // CHK_PRT_RET((netDevCtx == nullptr), HCCL_ERROR("[TransportMem][Create]netDevCtx is null"), nullptr);
     // HCCL_DEBUG("transportMem create tpType:%u netDevCtx:%p dispatcher:%p localRankId:%u remoteRankId:%u sdid:%u " \
     //     "serverId:%u trafficClass:%u serviceLevel:%u", tpType, netDevCtx, dispatcher, attrInfo.localRankId,
@@ -74,7 +74,7 @@ std::shared_ptr<TransportMem> TransportMem::Create(TpType tpType, const HcclQpIn
     std::shared_ptr<TransportMem> transportMemPtr;
     switch (tpType) {
         case TpType::ROCE_DEVICE:
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
             transportMemPtr = std::make_unique<TransportDeviceRoceMem>(notifyPool, netDevCtx, dispatcher, attrInfo,
                 false, qpInfo); // aicpuUnfoldMode is set by host
 #else

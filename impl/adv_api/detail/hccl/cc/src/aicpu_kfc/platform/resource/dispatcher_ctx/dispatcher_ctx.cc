@@ -114,7 +114,7 @@ namespace hccl {
             }
             case CtxDispatcherType::DISPATCHER_AICPU:
             {
-                #ifdef CCL_KERNEL
+                #ifdef asc_ccl_kernel
                 pDispatcher = new (std::nothrow) DispatcherAiCpu(devicePhyId);
                 #endif
                 break;

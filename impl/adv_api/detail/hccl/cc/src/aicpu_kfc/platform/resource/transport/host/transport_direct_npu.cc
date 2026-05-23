@@ -131,7 +131,7 @@ HcclResult TransportDirectNpu::GetRemoteMemSize(UserMemType memType, u64 &size)
 HcclResult TransportDirectNpu::LoadBinaryFromFile(const char *binPath, aclrtBinaryLoadOptionType optionType, uint32_t cpuKernelMode,
                                                 aclrtBinHandle &binHandle)
 {
-#ifndef CCL_KERNEL
+#ifndef asc_ccl_kernel
     CHK_PRT_RET(binPath == nullptr,
         HCCL_ERROR("[LoadBinaryFromFile] binary path is nullptr"),
         HCCL_E_PTR);
@@ -161,10 +161,10 @@ HcclResult TransportDirectNpu::LoadBinaryFromFile(const char *binPath, aclrtBina
 
 HcclResult TransportDirectNpu::LoadAICPUKernel(void)
 {
-#ifndef CCL_KERNEL
+#ifndef asc_ccl_kernel
     std::string jsonPath;
     CHK_RET(GetKernelFilePath(jsonPath));
-    jsonPath += "ccl_kernel.json";
+    jsonPath += "asc_ccl_kernel.json";
     HcclResult ret = LoadBinaryFromFile(jsonPath.c_str(), ACL_RT_BINARY_LOAD_OPT_CPU_KERNEL_MODE, 0, binHandle_);
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[LoadAICPUKernel]errNo[0x%016llx]load aicpu file fail, path[%s] optionType[%u]"
@@ -175,7 +175,7 @@ HcclResult TransportDirectNpu::LoadAICPUKernel(void)
 
 void TransportDirectNpu::UnloadAICPUKernel(void)
 {
-#ifndef CCL_KERNEL
+#ifndef asc_ccl_kernel
     if (binHandle_ != nullptr) {
         aclError aclRet = aclrtBinaryUnLoad(binHandle_);
         if (aclRet != ACL_SUCCESS) {
@@ -895,7 +895,7 @@ HcclResult TransportDirectNpu::TxData(UserMemType dstMemType, u64 dstOffset, con
         machinePara_.localUserrank, machinePara_.remoteUserrank, apiParam.lKey, apiParam.rKey, apiParam.remoteAddr, apiParam.localAddr, apiParam.dataSize,
         apiParam.timeout, apiParam.localFlagAddr, apiParam.remoteFlagAddr, apiParam.lfKey, apiParam.rfKey, apiParam.qpInfo.qpPtr);
 
-#ifndef CCL_KERNEL
+#ifndef asc_ccl_kernel
     u16 timeOut = NOTIFY_DEFAULT_WAIT_TIME > std::numeric_limits<uint16_t>::max() ? 
                     std::numeric_limits<uint16_t>::max() : NOTIFY_DEFAULT_WAIT_TIME;
     CHK_PRT(AicpuAclKernelLaunch(stream.ptr(), reinterpret_cast<void *>(&apiParam), sizeof(apiParam),
@@ -966,7 +966,7 @@ HcclResult TransportDirectNpu::RxData(UserMemType srcMemType, u64 srcOffset, voi
         machinePara_.localUserrank, machinePara_.remoteUserrank, apiParam.lKey, apiParam.rKey, apiParam.remoteAddr, apiParam.localAddr, apiParam.dataSize,
         apiParam.timeout, apiParam.localFlagAddr, apiParam.remoteFlagAddr, apiParam.lfKey, apiParam.rfKey, apiParam.qpInfo.qpPtr);
 
-#ifndef CCL_KERNEL
+#ifndef asc_ccl_kernel
     u16 timeOut = NOTIFY_DEFAULT_WAIT_TIME > std::numeric_limits<uint16_t>::max() ? 
                     std::numeric_limits<uint16_t>::max() : NOTIFY_DEFAULT_WAIT_TIME;
     CHK_PRT(AicpuAclKernelLaunch(stream.ptr(), reinterpret_cast<void *>(&apiParam), sizeof(apiParam),

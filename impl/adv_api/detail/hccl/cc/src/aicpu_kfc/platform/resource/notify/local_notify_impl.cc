@@ -81,7 +81,7 @@ HcclResult LocalNotifyImpl::Init(const HcclSignalInfo &notifyInfo, const NotifyL
 
     CHK_SMART_PTR_NULL(notify_);
 
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
     if (type == NotifyLoadType::DEVICE_NOTIFY) {
         CHK_RET(static_cast<RtsNotify*>(notify_.get())->InitAndVerifySingleSignal());
     }

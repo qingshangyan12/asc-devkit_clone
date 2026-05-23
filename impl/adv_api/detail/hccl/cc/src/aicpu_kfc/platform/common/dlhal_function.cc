@@ -110,7 +110,7 @@ HcclResult DlHalFunction::DlHalFunctionEschedInit()
 
     dlHalMemCtl = (drvError_t(*)(int, void*, size_t, void*, size_t*))HcclDlsym(handle_, "halMemCtl");
     CHK_SMART_PTR_NULL(dlHalMemCtl);
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
     dlHalSensorNodeRegister = (drvError_t(*)(uint32_t, struct halSensorNodeCfg *, uint64_t *))HcclDlsym(handle_,
         "halSensorNodeRegister");
     CHK_SMART_PTR_NULL(dlHalSensorNodeRegister);

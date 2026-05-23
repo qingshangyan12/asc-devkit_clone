@@ -406,7 +406,7 @@ HcclResult hrtHalMemCtl(int type, void *input, size_t inputSize, void *output, s
 
 HcclResult hrtHalSensorNodeRegister(uint32_t devId, uint64_t *handle)
 {
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
     CHK_PTR_NULL(handle);
     if (UNLIKELY(!hccl::DlHalFunction::GetInstance().DlHalFunctionIsInit())) {
         CHK_RET(DlHalFunction::GetInstance().DlHalFunctionInit());
@@ -445,7 +445,7 @@ HcclResult hrtHalSensorNodeRegister(uint32_t devId, uint64_t *handle)
 
 HcclResult hrtHalSensorNodeUnregister(uint32_t devId, uint64_t handle)
 {
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
     if (DlHalFunction::GetInstance().dlHalSensorNodeUnregister == nullptr) {
         HCCL_ERROR("dlHalSensorNodeUnregister is nullptr, can not use dlHalSensorNodeUnregister");
         return HCCL_E_DRV;
@@ -486,7 +486,7 @@ halGeneralEventType_t TranslateEventType(HcclGeneralEventType assertion)
 
 HcclResult hrtHalSensorNodeUpdateState(uint32_t devId, uint64_t handle, int val, HcclGeneralEventType assertion)
 {
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
     if (DlHalFunction::GetInstance().dlHalSensorNodeUpdateState == nullptr) {
         HCCL_ERROR("dlHalSensorNodeUpdateState is nullptr, can not use dlHalSensorNodeUpdateState");
         return HCCL_E_DRV;

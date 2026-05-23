@@ -12,7 +12,7 @@
 #include "transport_ibverbs.h"
 #include "transport_tcp.h"
 #include "transport_direct_npu.h"
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
 #include "transport_device_p2p.h"
 #include "transport_device_ibverbs.h"
 #endif
@@ -46,7 +46,7 @@ Transport::Transport(TransportType type, TransportPara& para,
     } else if (type == TransportType::TRANS_TYPE_HOST_TCP) {
         pimpl_ = new (std::nothrow) TransportTcp(dispatcher, notifyPool, machinePara, para.timeout, para.nicDeploy);
     } else if (type == TransportType::TRANS_TYPE_DEVICE_P2P) {
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
         pimpl_ =
             new (std::nothrow) TransportDeviceP2p(dispatcher, notifyPool, machinePara, para.timeout, transDevP2pData);
             // 创建设备间P2P传输
@@ -54,7 +54,7 @@ Transport::Transport(TransportType type, TransportPara& para,
         HCCL_ERROR("TRANS_TYPE_DEVICE_P2P Only running on the AICPU");
 #endif
     } else if (type == TransportType::TRANS_TYPE_DEVICE_IBVERBS) {
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
         pimpl_ = new (std::nothrow) TransportDeviceIbverbs(dispatcher, notifyPool,
                 machinePara, para.timeout, transDevIbverbsData);
 #else
@@ -654,7 +654,7 @@ HcclResult Transport::GetSpecificNotify(HcclSignalInfo& notifyInfo, bool& isVali
 HcclResult Transport::HcclBatchRead(const TransportDeviceNormalData &ibvData, struct MemDetails *localMems,
     struct MemDetails *remoteMems, u32 memNum, u64 &dbInfo)
 {
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
     return TransportDeviceIbverbs::HnsPostSend(ibvData, localMems, remoteMems, memNum, HcclWrOpCode::HCCL_WR_RDMA_READ,
         dbInfo);
 #else
@@ -671,7 +671,7 @@ HcclResult Transport::SetDeviceUnavailable(u32 deviceId)
 HcclResult Transport::HcclBatchWrite(const TransportDeviceNormalData &ibvData,
     struct MemDetails *localMems, struct MemDetails *remoteMems, u32 memNum, u64 &dbInfo)
 {
-#ifdef CCL_KERNEL
+#ifdef asc_ccl_kernel
     return TransportDeviceIbverbs::HnsPostSend(ibvData, localMems, remoteMems, memNum,
         HcclWrOpCode::HCCL_WR_RDMA_WRITE, dbInfo);
 #else
