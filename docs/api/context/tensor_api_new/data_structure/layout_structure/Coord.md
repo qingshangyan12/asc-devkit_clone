@@ -1,20 +1,14 @@
 # Coord
 
-## 产品支持情况
-
-| 产品     | 是否支持 |
-| ----------- |:----:|
-|Ascend 950PR/Ascend 950DT|√|
-
-## 功能说明
-
-头文件为：#include "tensor_api/tensor.h"
-
 Coord用于定义张量的坐标，用于访问张量中特定位置的元素。
 
-## 类型定义
+## 需要包含的头文件
 
-Coord是一个模板别名，用于表示张量的坐标：
+```cpp
+#include "tensor_api/tensor.h
+```
+
+## 原型定义
 
 ```cpp
 template <typename... Coords>
