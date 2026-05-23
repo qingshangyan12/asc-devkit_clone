@@ -69,11 +69,15 @@ function placeholderPlugin() {
     name: 'placeholder-images',
     resolveId(id, importer) {
       if (!importer || !id.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i)) return
-      const importerDir = resolve(importer, '..')
+      let importerDir = resolve(importer, '..')
+      if (importerDir.includes('?')) {
+        importerDir = importerDir.split('?')[0]
+      }
       const resolved = resolve(importerDir, id)
       if (!existsSync(resolved)) {
         return placeholder
       }
+      return resolved
     },
   }
 }

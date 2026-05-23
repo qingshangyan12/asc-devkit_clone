@@ -149,9 +149,9 @@ install_mdparser_deps() {
 
     log "安装 cmarkgfm..."
     if command -v pip3 &>/dev/null; then
-        pip3 install cmarkgfm 2>&1 | tee -a "$LOG_FILE"
+        pip3 install cmarkgfm --break-system-packages -i https://mirrors.huaweicloud.com/repository/pypi/simple 2>&1 | tee -a "$LOG_FILE"
     elif command -v pip &>/dev/null; then
-        pip install cmarkgfm 2>&1 | tee -a "$LOG_FILE"
+        pip install cmarkgfm --break-system-packages -i https://mirrors.huaweicloud.com/repository/pypi/simple 2>&1 | tee -a "$LOG_FILE"
     else
         err "未找到 pip，请手动安装 cmarkgfm: pip install cmarkgfm"
         exit 1

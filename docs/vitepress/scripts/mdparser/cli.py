@@ -1,9 +1,24 @@
 import argparse
 import os
+import shutil
 import sys
 from pathlib import Path
 
 from .parser import parse_file, parse_string, render_html
+
+_STATIC_EXTS = {
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".svg",
+    ".ico",
+    ".webp",
+    ".bmp",
+    ".pdf",
+    ".zip",
+    ".tar.gz",
+}
 
 
 def main():
@@ -11,12 +26,29 @@ def main():
         prog="mdparser",
         description="High-performance Markdown-to-HTML converter based on cmark-gfm (C).",
     )
-    parser.add_argument("input", nargs="*", help="Markdown file(s) or directory to parse")
-    parser.add_argument("-o", "--output", help="Output file (single mode) or output directory (batch mode)")
-    parser.add_argument("--no-gfm", action="store_true", help="Disable GitHub Flavored Markdown extensions")
+    parser.add_argument(
+        "input", nargs="*", help="Markdown file(s) or directory to parse"
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Output file (single mode) or output directory (batch mode)",
+    )
+    parser.add_argument(
+        "--no-gfm",
+        action="store_true",
+        help="Disable GitHub Flavored Markdown extensions",
+    )
     parser.add_argument("--stdin", action="store_true", help="Force read from stdin")
-    parser.add_argument("-s", "--style", action="store_true", help="Embed GitHub-style CSS in output")
-    parser.add_argument("-r", "--recursive", action="store_true", help="Recursively scan directories for .md files")
+    parser.add_argument(
+        "-s", "--style", action="store_true", help="Embed GitHub-style CSS in output"
+    )
+    parser.add_argument(
+        "-r",
+        "--recursive",
+        action="store_true",
+        help="Recursively scan directories for .md files",
+    )
 
     args = parser.parse_args()
 
@@ -57,6 +89,24 @@ def main():
         dst.parent.mkdir(parents=True, exist_ok=True)
         dst.write_text(html, encoding="utf-8")
         print(f"  {src} -> {dst}")
+
+    _copy_static_files(common_root, out_dir, md_files)
+
+
+def _copy_static_files(common_root, out_dir, md_files):
+    md_set = {Path(f).relative_to(common_root) for f in md_files}
+    for entry in sorted(common_root.rglob("*")):
+        if not entry.is_file():
+            continue
+        if entry.suffix.lower() not in _STATIC_EXTS:
+            continue
+        rel = entry.relative_to(common_root)
+        if rel in md_set:
+            continue
+        dst = out_dir / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(entry, dst)
+        print(f"  {entry} -> {dst}")
 
 
 def _find_common_root(paths):
