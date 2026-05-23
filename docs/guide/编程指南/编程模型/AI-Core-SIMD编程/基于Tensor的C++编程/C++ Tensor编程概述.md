@@ -90,7 +90,7 @@ Shape的第一个元素描述行方向的形状，(2, 3)表示内层矩阵和外
 Stride中的每个元素与Shape中的元素对应，表示该对应维度下，相邻元素首地址在内存地址上的间隔，图片中用箭头表示了每个维度相邻元素的首地址间隔。
 
 ### Tensor定义方式
-扩展能力的Tensor是通过对基础Tensor的特例化扩展实现，它通过MakeTensor函数创建，Shape和Stride可以在编译期确定。针对不同的应用场景提供多种定义方式：
+扩展能力的Tensor是通过对基础Tensor的特化扩展实现，它通过MakeTensor函数创建，Shape和Stride可以在编译期确定。针对不同的应用场景提供多种定义方式：
 - **1. 定义连续的内存块的Tensor**
 ```cpp
 // 1.1 定义动态Shape Tensor
@@ -122,7 +122,7 @@ auto tensor = MakeTensor(l0aPointer, MakeFrameLayout<NZLayoutPtn>(128, 64));
 ### Tensor使用方式
 扩展能力Tensor引入Layout抽象成为"自描述数据容器"，实现编译期自动推导操作参数、类型安全校验和零开销切片，开发者只需定义Tensor即可自动推断后续搬运、计算参数，无需手动传递。
 
-- **1. 对元素进行访问, 自动索引计算**
+- **1. 对元素进行访问，自动索引计算**
 ```cpp
 auto tensor = MakeTensor(pointer, MakeShape(128, 64));
 auto element = tensor[MakeCoord(32, 16)];  // 访问第32行第16列
@@ -146,12 +146,12 @@ auto ubTensor = MakeTensor(ubPtr, MakeShape(128, 64));
 // 3.1 搬运：利用系统内置搬运直接搬运，无需设置Size等
 Copy(gmTensor, ubTensor);
 
-// 3.2 搬运: 通过自定义搬运Op, 进行定制化的搬运处理
+// 3.2 搬运: 通过自定义搬运Op，进行定制化的搬运处理
 auto copyAtom = MakeCopy<CopyGM2UB>();
 Copy(copyAtom, gmTensor, ubTensor);
 ```
 
-- **4. CUBE计算: 提供了简化的Mmad接口，方便用户直接进行矩阵乘计算**
+- **4. CUBE计算：提供了简化的Mmad接口，方便用户直接进行矩阵乘计算**
 ```cpp
 Mmad(l0c, l0a, l0b, {m, n, k, false, iterK == 0});
 ```
