@@ -65,7 +65,7 @@
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - 指定路径install_path，安装CANN软件包
+  - 指定路径 install_path，安装CANN软件包
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
@@ -78,7 +78,7 @@
   ```
 
   > [!WARNING] 注意
-  Aclrtc 仅支持 NPU 运行模式，不支持cpu调试或sim仿真模式。
+  Aclrtc仅支持NPU运行模式，不支持cpu调试或sim仿真模式。
 
 - 执行结果
   执行结果如下，说明执行成功。
