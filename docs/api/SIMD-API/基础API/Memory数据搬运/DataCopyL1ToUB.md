@@ -37,7 +37,7 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 操作数的数据类型。支持的数据类型为b8、b16、b32、b64。 |
-| subBlockId | AI Core上的Vector核ID。根据输入的Vector核ID，将数据搬运至对应核上的UB地址。可通过[GetSubBlockIdx](../系统变量访问/GetSubBlockIdx(ISASI).md)接口获取Vector核ID。 |
+| subBlockId | AI Core上的Vector核ID。根据输入的Vector核ID，将数据搬运至对应核上的UB地址。可通过[GetSubBlockIdx](../工具接口/系统资源与变量/GetSubBlockIdx(ISASI).md)接口获取Vector核ID。 |
 
 **表 2**  参数说明
 
