@@ -12,8 +12,6 @@
 |<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
 |<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
 
-
-
 ## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径为："basic_api/kernel_operator_cache_intf.h"。

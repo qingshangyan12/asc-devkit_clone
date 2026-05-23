@@ -46,21 +46,21 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
 
 - 支持通过配置dcciDst确保DCache与GM存储的一致性
 
-    ```
+    ```cpp
     template <typename T, CacheLine entireType, DcciDst dcciDst>
     __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
     ```
 
 - 支持通过配置dcciDst确保DCache与Local Memory存储的一致性
 
-    ```
+    ```cpp
     template <typename T, CacheLine entireType, DcciDst dcciDst>
     __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)
     ```
 
 - 不支持配置dcciDst，仅支持保证DCache与GM的一致性
 
-    ```
+    ```cpp
     template <typename T, CacheLine entireType>
     __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
     ```
