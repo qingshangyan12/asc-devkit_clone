@@ -35,3 +35,21 @@ else()
 endif()
 
 add_custom_target(gen_kernel_tiling ALL DEPENDS ${KERNEL_TILING_HEAD})
+
+add_library(asc_host_headers INTERFACE)
+target_include_directories(
+  asc_host_headers
+  INTERFACE $<BUILD_INTERFACE:${ASCENDC_DIR}/include/adv_api/hccl/internal>
+)
+
+add_library(asc_kernel_headers INTERFACE)
+target_include_directories(
+  asc_kernel_headers
+  INTERFACE $<BUILD_INTERFACE:${ASCENDC_DIR}>
+            $<BUILD_INTERFACE:${ASCENDC_DIR}/include>
+            $<BUILD_INTERFACE:${ASCENDC_DIR}/include/basic_api>
+            $<BUILD_INTERFACE:${ASCENDC_DIR}/include/simt_api>
+            $<BUILD_INTERFACE:${ASCENDC_DIR}/impl>
+            $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/basic_api>
+            $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/simt_api>
+)
