@@ -24,7 +24,7 @@ __aicore__ inline constexpr auto Rank(const Layout<Shape, Stride>& layout);
 |--------|------|------|
 | Shape | 输入 | 组成Layout的shape的类型，即元组（tuple）类型。 |
 | Stride | 输入 | 组成Layout的stride的类型，即元组（tuple）类型。 |
-| Is... | size_t... | 索引序列，用于编译时递归选择shape和stride的子结构。 |
+| Is... | size_t | 索引序列，用于编译时递归选择shape和stride的子结构。 |
 
 **表 2** 参数说明
   | 参数名 | 类型 | 描述 |
