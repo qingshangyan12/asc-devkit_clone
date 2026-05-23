@@ -297,3 +297,61 @@ struct Layout : private Std::tuple<T, U>
 - 功能说明
 
     编译期常量，表示完整Layout的秩。
+
+## Layout及成员函数示例
+
+下面通过一个二维`Layout`示例，说明`Layout`对象本身以及各成员函数的使用方式和返回结果。
+
+```cpp
+using namespace AscendC::Te;
+
+auto layout = Layout(MakeShape(4, 2), MakeStride(4, 1));
+
+auto self = layout.layout();
+// self = Layout(MakeShape(4, 2), MakeStride(4, 1))
+
+auto shape = layout.Shape();
+// shape = (4, 2)
+
+auto shape0 = layout.Shape<0>();
+// shape0 = 4
+
+auto stride = layout.Stride();
+// stride = (4, 1)
+
+auto stride1 = layout.Stride<1>();
+// stride1 = 1
+
+auto rank = layout.Rank();
+// rank = 2
+
+auto size = layout.Size();
+// size = 8
+
+auto capacity = layout.Capacity();
+// capacity = 14
+
+auto index = layout(MakeCoord(1, 1));
+// index = 5
+
+auto shapeInfo = layout.Get<0>();
+// shapeInfo = (4, 2)
+
+auto strideInfo = layout.Get<1>();
+// strideInfo = (4, 1)
+
+constexpr auto depth = decltype(layout)::depth;
+// depth = 1
+
+constexpr auto fullRank = decltype(layout)::rank;
+// fullRank = 2
+```
+
+上述示例中：
+
+- `layout()`返回`Layout`对象自身。
+- `Shape()`和`Stride()`分别返回形状与步长；带模板参数时返回指定维度或子结构。
+- `Rank()`返回维度数，`Size()`返回逻辑元素总数，`Capacity()`返回实际覆盖的内存容量。
+- `operator()`根据坐标计算线性索引，例如坐标`(1, 1)`对应索引`1 * 4 + 1 * 1 = 5`。
+- `Get<0>()`返回`Shape`，`Get<1>()`返回`Stride`。
+- `depth`和`rank`是编译期常量，分别表示嵌套深度和完整秩。

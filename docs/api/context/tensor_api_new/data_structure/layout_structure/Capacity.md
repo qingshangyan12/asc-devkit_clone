@@ -14,14 +14,12 @@ Capacity用于计算Layout所需的实际内存容量。
 
 与Size（有效元素个数）不同，Capacity包含了因非连续步长导致的脏数据区域。对于连续排列（stride紧凑），Capacity与Size相等；对于有间隔的排列，Capacity通常大于Size。
 
-可通过模板参数`Is...`指定子维度范围，仅对选定维度计算容量。
-
 ## 函数原型
 
-    ```cpp
-    template <size_t... Is, typename Shape, typename Stride>
-    __aicore__ inline constexpr auto Capacity(const Layout<Shape, Stride>& layout)
-    ```
+  ```cpp
+  template <size_t... Is, typename Shape, typename Stride>
+  __aicore__ inline constexpr auto Capacity(const Layout<Shape, Stride>& layout)
+  ```
 
 ## 参数说明
 
@@ -31,13 +29,13 @@ Capacity用于计算Layout所需的实际内存容量。
 |--------|------|------|
 | Shape | 输入 | 组成Layout的shape的类型，即元组（tuple）类型。 |
 | Stride | 输入 | 组成Layout的stride的类型，即元组（tuple）类型。 |
-| Is... | size_t... | 索引序列，用于编译时递归选择shape和stride的子结构。 |
+| Is... | size_t | 索引序列，指定子维度范围，仅对选定维度计算容量。 |
 
 **表 2** 参数说明
 
   | 参数名 | 类型 | 描述 |
 |--------|------|------|
-| layout | 输入 | Layout用于描述张量的布局。 |
+| layout | 输入 | 用于描述张量的布局。 |
 
 ## 返回值说明
 

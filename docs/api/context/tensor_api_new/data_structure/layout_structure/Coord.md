@@ -23,4 +23,4 @@ using Coord = Std::tuple<Coords...>;
 
 ## API映射关系
 
-Coord通常通过[MakeCoord](MakeCoord.md)函数创建。
+Coord通过[MakeCoord](MakeCoord.md)函数创建，可通过[Crd2Idx](Crd2Idx.md)函数进行二维坐标到一维坐标的转换，可作为参数传入到Layout的[operator()](Layout.md)和Slice(Layout.md)成员函数以及Slice(Slice.md)接口中进行张量的偏移的切片操作。
