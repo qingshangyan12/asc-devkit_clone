@@ -1308,7 +1308,8 @@ TEST_F(TEST_OPBUILD, GenMc2Failed03)
 
     std::vector<std::string> opsvec({"MC2TestHcclServerTypeFail"});
     AclnnOpGenerator opGen(opsvec);
-    opGen.AclnnOpGenHcclServerTypeList(opDef, outfile);
+    auto socEntries = opGen.BuildUnifiedSocList(opDef);
+    opGen.AclnnOpGenHcclServerTypeList(opDef, socEntries, outfile);
     outfile.close();
 
     std::vector<std::string> errMessage = Generator::GetErrorMessage();
@@ -1336,20 +1337,13 @@ TEST_F(TEST_OPBUILD, AclnnGenFailedWithoutSoc)
     opGen.AclnnOpGenOpSupportListAll(opDef, outfile);
     outfile.close();
 
-    std::vector<std::string> errMessage = Generator::GetErrorMessage();
-    bool hasErrorMessage = false;
-    const std::string err =
-        "The soc version of op TestFail is not configured,"
-        " at least one soc version must be configured."
-        " Check whether the soc version is added to the op proto type"
-        " definition in the host implementation(Opdef, through AddConfig).";
-    for (size_t i = 0U; i < errMessage.size(); i++) {
-        if (errMessage[i] == err) {
-            hasErrorMessage = true;
-            break;
-        }
-    }
-    EXPECT_TRUE(hasErrorMessage);
+    std::ifstream resultFile(fileName);
+    std::string content((std::istreambuf_iterator<char>(resultFile)),
+                         std::istreambuf_iterator<char>());
+    resultFile.close();
+    bool hasEmptySupportList = (content.find("OpSupportList supportList = {opSocSupportList, 0};") != std::string::npos);
+    EXPECT_TRUE(hasEmptySupportList);
+    remove(fileName.c_str());
 }
 
 TEST_F(TEST_OPBUILD, AclnnGenVersionFailed01)
@@ -1606,7 +1600,8 @@ TEST_F(TEST_OPBUILD, AclnnKirinX90socVersion)
 
     std::vector<std::string> opsvec({"Test"});
     AclnnOpGenerator opGen(opsvec);
-    opGen.AclnnOpGenSocSupportList(opDef, outfile);
+    auto socEntries = opGen.BuildUnifiedSocList(opDef);
+    opGen.AclnnOpGenSocSupportList(socEntries, outfile);
     outfile.close();
 
     std::vector<std::string> errMessage = Generator::GetErrorMessage();
