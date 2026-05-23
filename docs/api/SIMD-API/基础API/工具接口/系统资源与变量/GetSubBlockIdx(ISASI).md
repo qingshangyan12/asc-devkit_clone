@@ -1,4 +1,4 @@
-# GetSubBlockIdx\(ISASI\)
+# GetSubBlockIdx(ISASI)
 
 ## 产品支持情况
 
@@ -16,7 +16,9 @@
 
 ## 功能说明
 
-获取AI Core上Vector核的ID。
+头文件为：#include `"basic_api/kernel_operator_sys_var_intf.h"`。
+
+获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。
 
 ## 函数原型
 
@@ -30,7 +32,9 @@ __aicore__ inline int64_t GetSubBlockIdx()
 
 ## 返回值说明
 
-返回Vector核ID。
+返回逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。
+
+SubBlockIdx的取值范围为\[0, SubBlockNum\)，SubBlockNum可以通过[GetSubBlockNum](GetSubBlockNum(ISASI).md)获取。
 
 ## 约束说明
 
@@ -41,4 +45,3 @@ __aicore__ inline int64_t GetSubBlockIdx()
 ```cpp
 int64_t subBlockID = AscendC::GetSubBlockIdx();
 ```
-

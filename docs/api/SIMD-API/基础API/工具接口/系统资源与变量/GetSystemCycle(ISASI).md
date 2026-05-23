@@ -1,4 +1,4 @@
-# GetSystemCycle\(ISASI\)
+# GetSystemCycle(ISASI)
 
 ## 产品支持情况
 
@@ -14,13 +14,15 @@
 
 ## 功能说明
 
-获取当前系统cycle数。
+头文件为：#include "basic_api/kernel_operator_sys_var_intf.h"
 
-针对Ascend 950PR/Ascend 950DT，若换算成时间需要按照1GHz的频率，时间单位为us，换算公式为：time = \(cycle数/1000\) us 。
+获取系统计数器当前的cycle值，主要用于测量代码段的执行时间，通过计算代码段前后cycle值的差，即可得到代码段所经过的系统cycle数，通过换算即可得到代码段的执行时间。
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，若换算成时间需要按照50MHz的频率，时间单位为us，换算公式为：time = \(cycle数/50\) us 。
+<cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，若换算成时间需要按照1GHz的频率，时间单位为us，换算公式为：time = (cycle数/1000) us。</cann-filter>
 
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，若换算成时间需要按照50MHz的频率，时间单位为us，换算公式为：time = \(cycle数/50\) us 。
+<cann-filter npu-type="A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，若换算成时间需要按照50MHz的频率，时间单位为us，换算公式为：time = (cycle数/50)us。</cann-filter>
+
+<cann-filter npu-type="910b">针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，若换算成时间需要按照50MHz的频率，时间单位为us，换算公式为：time = (cycle数/50) us。</cann-filter> 
 
 ## 函数原型
 
@@ -34,7 +36,7 @@ __aicore__ inline int64_t GetSystemCycle()
 
 ## 返回值说明
 
-返回系统cycle数。
+返回系统计数器当前的cycle值。
 
 ## 约束说明
 
@@ -53,7 +55,7 @@ __aicore__ inline int64_t GetSystemCycle()
         loopSize = totalSize / AscendC::GetBlockNum();
         int64_t systemCycleAfter = AscendC::GetSystemCycle(); // 调用GetBlockNum指令后的cycle数
         int64_t GetBlockNumCycle = systemCycleAfter - systemCycleBefore; // 执行GetBlockNum指令所用的cycle数
-        int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位，固定为50
+        int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位，Atlas A2/A3为50，Ascend 950为1000
         int64_t GetBlockNumTime = GetBlockNumCycle/CycleToTimeBase; // 执行GetBlockNum指令所用时间，单位为us
     };
     ```
@@ -67,6 +69,6 @@ __aicore__ inline int64_t GetSystemCycle()
     PipeBarrier<PIPE_ALL>();
     int64_t systemCycleAfter = AscendC::GetSystemCycle(); // 调用Add指令后的cycle数
     int64_t GetBlockNumCycle = systemCycleAfter - systemCycleBefore; // 执行Add指令所用的cycle数
-    int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位，固定为50
+    int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位，Atlas A2/A3为50，Ascend 950为1000
     int64_t GetBlockNumTime = GetBlockNumCycle/CycleToTimeBase; // 执行Add指令所用时间，单位为us
     ```

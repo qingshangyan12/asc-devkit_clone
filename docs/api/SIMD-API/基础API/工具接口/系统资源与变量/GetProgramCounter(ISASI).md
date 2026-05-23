@@ -14,7 +14,9 @@
 
 ## 功能说明
 
-获取程序计数器的指针，程序计数器用于记录当前程序执行的位置。
+头文件为：#include "basic_api/kernel_operator_sys_var_intf.h"
+
+获取程序计数器的值，以追踪当前程序执行的位置。
 
 ## 函数原型
 
@@ -28,7 +30,7 @@ __aicore__ inline int64_t GetProgramCounter()
 
 ## 返回值说明
 
-返回int64\_t类型的程序计数器指针。
+返回当前程序计数器的值。
 
 ## 约束说明
 
@@ -39,4 +41,3 @@ __aicore__ inline int64_t GetProgramCounter()
 ```cpp
 int64_t pc = AscendC::GetProgramCounter(); // 获取程序计数器的指针pc
 ```
-

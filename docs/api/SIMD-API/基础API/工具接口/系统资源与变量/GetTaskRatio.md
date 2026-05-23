@@ -16,7 +16,14 @@
 
 ## 功能说明
 
-分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量与AI Core数量的比例。耦合模式下，固定返回1。
+头文件为：#include "basic_api/kernel_operator_sys_var_intf.h"
+
+分离模式下，获取任务启动的Cube Core（AIC）或者Vector Core（AIV）的数量与逻辑AI Core数量的比例。
+
+- 在AIC上调用时返回AIC数量与逻辑AI Core数量的比例。
+- 在AIV上调用时返回AIV数量与逻辑AI Core数量的比例。
+
+耦合模式下，固定返回1。
 
 ## 函数原型
 
@@ -35,9 +42,9 @@ __aicore__ inline int64_t GetTaskRatio()
     **表 1**  返回值列表
 
     | Kernel类型 | KERNEL_TYPE_AIV_ONLY | KERNEL_TYPE_AIC_ONLY | KERNEL_TYPE_MIX_AIC_1_2 | KERNEL_TYPE_MIX_AIC_1_1 | KERNEL_TYPE_MIX_AIC_1_0 | KERNEL_TYPE_MIX_AIV_1_0 |
-| --- | --- | --- | --- | --- | --- | --- |
-| AIV | 1 | - | 2 | 1 | - | 1 |
-| AIC | - | 1 | 1 | 1 | 1 | - |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | AIV | 1 | - | 2 | 1 | - | 1 |
+    | AIC | - | 1 | 1 | 1 | 1 | - |
 
 - 针对耦合模式，固定返回1。
 
@@ -48,6 +55,6 @@ __aicore__ inline int64_t GetTaskRatio()
 ## 调用示例
 
 ```cpp
-uint64_t ratio = AscendC::GetTaskRatio(); // 返回AIC和AIV的数量比例
-AscendC::PRINTF("task ratio is %u", ratio);
+uint64_t ratio = AscendC::GetTaskRatio(); // 返回AIC或AIV与逻辑AI Core数量的比例
+AscendC::printf("task ratio is %u", ratio);
 ```

@@ -16,7 +16,9 @@
 
 ## 功能说明
 
-分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。
+头文件为：#include "basic_api/kernel_operator_sys_var_intf.h"
+
+获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。
 
 ## 函数原型
 
