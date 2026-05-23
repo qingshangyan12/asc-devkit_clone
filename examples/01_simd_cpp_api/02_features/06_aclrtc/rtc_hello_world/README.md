@@ -1,30 +1,30 @@
-# Aclrtc运行时编译+printf打印样例
+# Aclrtc运行时编译 + printf打印样例
 
 ## 概述
 
-本样例展示了如何使用**Aclrtc（运行时编译）**接口，在Host侧运行时编译核函数源码并执行，核函数通过printf打印输出结果。
+本样例展示了如何使用 **Aclrtc（运行时编译）** 接口，在Host侧运行时编译核函数源码并执行，核函数通过printf打印输出结果。
 
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
-- Atlas A3训练系列产品/Atlas A3推理系列产品
-- Atlas A2训练系列产品/Atlas A2推理系列产品
+- Atlas A3 训练系列产品/Atlas A3推理系列产品
+- Atlas A2 训练系列产品/Atlas A2推理系列产品
 
 ## 目录结构介绍
 
 ```
 ├── rtc_hello_world
 │   ├── CMakeLists.txt           // 编译工程文件
-│   ├── rtc_hello_world.cpp      // Host侧代码（含RTC核函数源码字符串）
+│   ├── rtc_hello_world.cpp      // Host 侧代码（含RTC核函数源码字符串）
 ```
 
 ## 样例描述
 
 - 样例实现：
-  - Kernel实现  
+  - Kernel实现
     核函数源码以字符串形式嵌入Host代码中，通过printf打印输出结果。
 
-  - 调用实现  
+  - 调用实现
     调用aclrtc接口系列在运行时编译并执行核函数，完整链路如下：
 
     - **编译阶段**
@@ -53,7 +53,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -65,7 +65,7 @@
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - 指定路径install_path，安装CANN软件包
+  - 指定路径 install_path，安装CANN软件包
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
@@ -78,9 +78,9 @@
   ```
 
   > [!WARNING] 注意
-  Aclrtc仅支持NPU运行模式，不支持cpu调试或sim仿真模式。
+  Aclrtc 仅支持 NPU 运行模式，不支持cpu调试或sim仿真模式。
 
-- 执行结果  
+- 执行结果
   执行结果如下，说明执行成功。
   
   ```bash
