@@ -210,6 +210,9 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Init(_
     addr.bufferHandle = 0;
     addr.bufferAddr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(alignedBuff));
     addr.dataLen = HCOMM_URMA_TMP_BUF_SIZE;
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    addr.absAddr = reinterpret_cast<uint8_t*>(alignedBuff);
+#endif
     wqeItem_.SetAddr(addr);
     cqeItem_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM];
     sqPI_ = cqeItem_[HCOMM_URMA_CQE_U32_NUM];
