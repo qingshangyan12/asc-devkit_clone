@@ -107,15 +107,16 @@ int index_in = input_col + width * input_row;
 
 | 指标                | 说明                                                                                      |
 | ------------------- | ----------------------------------------------------------------------------------------- |
-| Task Duration(us)   | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间                  |
-| aiv_time(us)        | Task在AI Vector Core上的理论执行时间，单位为us                                            |
-| aiv_total_cycles    | 该Task被分配到每个AI Vector Core计算单元上后，每个AI Vector Core计算单元上的执行cycle总数 |
-| aiv_vec_time(us)    | vec类型指令（向量类运算指令）耗时，单位为us                                               |
-| aiv_vec_ratio       | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比                           |
-| aiv_scalar_time(us) | scalar类型指令（标量类运算指令）耗时，单位为us                                            |
-| aiv_scalar_ratio    | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比                        |
-
-除Task Duration外，本例中其余指标均展示的为所有block上性能指标的平均值。
+| Task Duration(μs)|Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。|
+| aiv_time|Task在AI Vector Core上的理论执行时间，单位为μs。|
+| aiv_vec_time(μs) | vec类型指令（向量类运算指令）耗时，单位μs。 |
+| aiv_vec_ratio | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。 |
+| aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位μs。 |
+| aiv_scalar_ratio | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。 |
+| aiv_mte2_time(μs) | mte2类型指令（GM->UB搬运类指令）耗时，单位μs。 |
+| aiv_mte2_ratio | mte2类型指令（GM->UB搬运类指令）的cycle数在total cycle数中的占用比。 |
+| aiv_mte3_time(μs) | mte3类型指令（UB->GM搬运类指令）耗时，单位μs。 |
+| aiv_mte3_ratio | mte3类型指令（UB->GM搬运类指令）的cycle数在total cycle数中的占用比。 |
 
 ### Case 0: 直接索引转置版本
 
@@ -143,13 +144,13 @@ output[index_out] = input[index_in];
 
 **性能数据**：
 
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
-| :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      70.304      |    4.257    |     7024.463     |      4.115      |     0.967     |        0.131        |      0.030      |
+| Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 63.731 | 62.810 | 58.143 | 0.926 | 2.439 | 0.039 | 0.059 | 0.001 | 0.02 | 0.0 |
 
 **分析**：
 
-- Case 0的Task Duration为70.304us，作为直接索引转置版本，是后续优化版本的对比基线。
+- Case 0的Task Duration为63.731μs，作为直接索引转置版本，是后续优化版本的对比基线。
 - 该版本GM读取仍然是连续读，但GM写回是跨行、非连续写，同一个Warp的写请求难以高效合并，因此整体耗时主要受限于写回访存模式。
 
 ---
@@ -187,15 +188,15 @@ output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + til
 
 **性能数据**：
 
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
-| :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      29.266      |    1.440    |     2376.663     |      0.925      |     0.644     |        0.148        |      0.100      |
+| Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 30.602 | 29.6 | 16.942 | 0.572 | 3.404 | 0.115 | 6.912 | 0.234 | 0.022 | 0.001 |
 
 **分析**：
 
-- 相比Case 0的直接索引转置版本，Case 1的Task Duration从70.304us降低到29.266us，耗时下降约58.4%。
-- 按Task Duration计算，Case 1整体约为Case 0的2.40倍性能，说明通过UB中转改善GM写回连续性后，端到端耗时有明显下降。
-- Case 1消除了Case 0中代价较高的非连续GM写回，但代码中仍存在GM到UB的tile搬运、流水同步以及SIMT线程对UB的转置方向读取，因此优化后的Task Duration仍不会等同于单纯连续GM读写的理想耗时。
+- 相比Case 0的直接索引转置版本，Case 1的Task Duration从63.731μs降低到30.602μs，耗时下降约52.0%。
+- 按Task Duration计算，Case 1整体约为Case 0的2.08倍性能，说明通过UB中转改善GM写回连续性后，端到端耗时有明显下降。
+- Case 1降低了Case 0中代价较高的非连续GM写回开销，但代码中仍存在GM到UB的tile搬运、流水同步以及SIMT线程对UB的转置方向读取，因此优化后的Task Duration仍不会等同于单纯连续GM读写的理想耗时。
 
 ---
 
@@ -205,13 +206,13 @@ output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + til
 
 **综合优化效果**：
 
-- 通过Case 0到Case 1的访存合并优化，样例Task Duration从70.304us降低到29.266us，耗时下降约58.4%。
-- Case 1相对Case 0性能提升约2.40倍，说明通过UB中转改善GM写回连续性后，端到端耗时有明显收益。
+- 通过Case 0到Case 1的访存合并优化，样例Task Duration从63.731μs降低到30.602μs，耗时下降约52.0%。
+- Case 1相对Case 0性能提升约2.08倍，说明通过UB中转改善GM写回连续性后，端到端耗时有明显收益。
 
-| Case version | Task Duration(us) | 端到端耗时相对Case 0 | 优化点                           |
+| Case version | Task Duration(μs) | 端到端耗时相对Case 0 | 优化点                           |
 | ------------ | ----------------- | -------------------- | -------------------------------- |
-| Case 0       | 70.304            | **1x**         | 直接索引转置，GM连续读、非连续写 |
-| Case 1       | 29.266            | **2.40x**      | UB中转，全局访存合并             |
+| Case 0       | 63.731            | **1x**         | 直接索引转置，GM连续读、非连续写 |
+| Case 1       | 30.602            | **2.08x**      | UB中转，全局访存合并             |
 
 ## 调优建议
 
@@ -272,20 +273,25 @@ output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + til
 使用 `msprof` 工具获取详细性能数据：
 
 ```bash
-msprof op ./demo   # 分析case的性能
+msprof ./demo   # 分析case的性能
 ```
 
-会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
 
-```text
-├──dump                       # 原始的性能数据，用户无需关注
-├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-├──L2Cache.csv                # L2 Cache命中率
-├──Memory.csv                 # UB，L1和主存储器读写带宽速率
-├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
-├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
-├──OpBasicInfo.csv            # 算子基础信息
-├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
-├──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
-└──visualize_data.bin         # MindStudio Insight呈现文件
+```bash
+PROF_xxxx_XXXXXX
+├── device_{id}
+└── host
+└── mindstudio_profiler_log
+└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
+    ├── msprof_*.json
+    ├── xx_*.csv
+    └── README.txt
+```
+
+查看具体的性能分析结果：
+
+```bash
+# 查看Task Duration 以及各项数据
+cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```
