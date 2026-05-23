@@ -4,19 +4,19 @@
 
 | 产品 | 是否支持  |
 | :----------------------- | :------: |
-|<cann-filter npu-type = "950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
-|<cann-filter npu-type = "A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
-|<cann-filter npu-type = "910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
-|<cann-filter npu-type = "310b"> Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
-|<cann-filter npu-type = "310p"> Atlas 推理系列产品AI Core | √ </cann-filter>|
-|<cann-filter npu-type = "310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
-|<cann-filter npu-type = "910"> Atlas 训练系列产品 | x </cann-filter>|
+|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
+|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
+|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
+|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
+|<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
 
 
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为: "basic_api/kernel_operator_cache_intf.h"。
+头文件路径为："basic_api/kernel_operator_cache_intf.h"。
 
 从源地址所在的特定GM地址预加载数据到DCache中，每次调用只能预加载一个Cache Line大小的数据。
 
@@ -42,7 +42,7 @@ __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-频繁调用此接口可能导致保留站发生拥塞。在此情况下，该指令将被视为 NOP 指令，进而阻塞 Scalar 流水线。因此，建议连续调用此接口的次数不要超过 4 次。
+频繁调用此接口可能导致保留站发生拥塞。在此情况下，该指令将被视为NOP指令，进而阻塞Scalar流水线。因此，建议连续调用此接口的次数不要超过4次。
 
 ## 调用示例<a name="section837496171220"></a>
 
