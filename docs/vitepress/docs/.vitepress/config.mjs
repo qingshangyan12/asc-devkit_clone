@@ -1,7 +1,66 @@
 import { defineConfig } from 'vitepress'
 import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { join, resolve } from 'node:path'
+import { load as cheerioLoad } from 'cheerio'
 import sidebars from './sidebar.mjs'
+
+function extractBodyContent(html) {
+  const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
+  if (bodyMatch) return bodyMatch[1]
+  return html
+}
+
+function normalizeHtml(html) {
+  const $ = cheerioLoad(html, {
+    xml: {
+      xmlMode: false,
+      decodeEntities: false,
+      withStartIndices: false,
+      withEndIndices: false,
+    },
+  }, false)
+  return $('body').length ? $('body').html() : $.html()
+}
+
+function htmlAsMdPlugin() {
+  const root = resolve(import.meta.dirname, '..')
+
+  return {
+    name: 'html-as-md',
+    enforce: 'pre',
+    resolveId(id) {
+      if (!id.endsWith('.md') || id.includes('?')) return null
+
+      const absId = id.startsWith(root)
+        ? id
+        : id.startsWith('/')
+          ? resolve(root, '.' + id)
+          : resolve(root, id)
+
+      const htmlPath = absId.replace(/\.md$/, '.html')
+      if (!existsSync(htmlPath)) return null
+
+      if (existsSync(absId)) return null
+      return htmlPath + '?rawhtml=1'
+    },
+    load(id) {
+      if (id.includes('?rawhtml=1')) {
+        const htmlPath = id.split('?')[0]
+        this.addWatchFile(htmlPath)
+        const content = readFileSync(htmlPath, 'utf-8')
+        return '\n<!-- RAW_HTML -->\n' + normalizeHtml(extractBodyContent(content)) + '\n'
+      }
+
+      if (!id.endsWith('.md') || id.includes('?')) return null
+      const htmlPath = id.replace(/\.md$/, '.html')
+      if (!existsSync(htmlPath)) return null
+
+      this.addWatchFile(htmlPath)
+      const content = readFileSync(htmlPath, 'utf-8')
+      return '\n<!-- RAW_HTML -->\n' + normalizeHtml(extractBodyContent(content)) + '\n'
+    },
+  }
+}
 
 function placeholderPlugin() {
   const root = resolve(import.meta.dirname, '..')
@@ -147,6 +206,12 @@ export default defineConfig({
     config(md) {
       const originalRender = md.render.bind(md)
       md.render = function (src, env) {
+        if (src.includes('<!-- RAW_HTML -->')) {
+          const htmlContent = src.replace(/^.*<!-- RAW_HTML -->\s*/s, '').replace(/\s*$/, '')
+          let html = escapeVueInterpolations(htmlContent)
+          return `<div v-pre>\n${html}\n</div>`
+        }
+
         src = fixCannFilterTags(src)
 
         if (src.startsWith('    >') || src.includes('\n    >')) {
@@ -188,7 +253,7 @@ export default defineConfig({
     resolve: {
       preserveSymlinks: true,
     },
-    plugins: [placeholderPlugin()],
+    plugins: [htmlAsMdPlugin(), placeholderPlugin()],
   },
 
   vue: {

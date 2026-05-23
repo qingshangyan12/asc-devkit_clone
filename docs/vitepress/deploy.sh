@@ -137,26 +137,7 @@ install_deps() {
 }
 
 # ============================================================
-# 3. 创建文档目录软链
-# ============================================================
-link_docs() {
-    cd "$SCRIPT_DIR/docs"
-    PARENT_DOCS="$(cd "$SCRIPT_DIR/../.." && pwd)/docs"
-
-    for dir in api guide; do
-        if [ -L "$dir" ]; then
-            log "软链 $dir 已存在"
-        elif [ -d "$PARENT_DOCS/$dir" ]; then
-            ln -s "$PARENT_DOCS/$dir" "$dir"
-            log "已创建软链: $dir -> $PARENT_DOCS/$dir"
-        else
-            warn "源目录不存在: $PARENT_DOCS/$dir，跳过"
-        fi
-    done
-}
-
-# ============================================================
-# 4. 构建静态站点
+# 3. 构建静态站点
 # ============================================================
 build_docs() {
     cd "$SCRIPT_DIR"
@@ -313,14 +294,12 @@ case "$MODE" in
         fi
         install_nodejs
         install_deps
-        link_docs
         build_docs
         deploy_nginx
         ;;
     build)
         install_nodejs
         install_deps
-        link_docs
         build_docs
         log "构建完成! 使用以下命令启动服务:"
         log "  sudo $0 --nginx        # Nginx 生产部署"
@@ -331,14 +310,12 @@ case "$MODE" in
     preview)
         install_nodejs
         install_deps
-        link_docs
         build_docs
         run_preview
         ;;
     serve)
         install_nodejs
         install_deps
-        link_docs
         build_docs
         run_serve
         ;;

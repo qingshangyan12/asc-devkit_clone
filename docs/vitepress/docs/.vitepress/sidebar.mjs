@@ -1443,7 +1443,7 @@ export default {
 ],
 
 
-  "/api/": [
+   "/api/": [
     {
       "text": "Ascend C API列表",
       "link": "/api/Ascend-C-API列表"
