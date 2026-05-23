@@ -56,6 +56,7 @@ class HcommImpl<CommProtocol::URMA, CommEngine::AIV> {
 public:
     __aicore__ inline HcommImpl();
     __aicore__ inline ~HcommImpl();
+    __aicore__ inline int32_t Init(__ubuf__ uint8_t* buff, uint32_t len);
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline HcommHandle WriteNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
@@ -83,8 +84,6 @@ private:
     __aicore__ inline bool JudgeHandleId(HcommHandle handleId);
 
 private:
-    TPipe pipe_;
-    TBuf<TPosition::VECOUT> hcommBuf_;
     LocalTensor<uint32_t> wqeItem_;
     LocalTensor<uint32_t> cqeItem_;
     LocalTensor<uint32_t> sqPI_;

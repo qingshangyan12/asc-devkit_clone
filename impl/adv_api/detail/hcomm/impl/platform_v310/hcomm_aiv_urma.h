@@ -194,18 +194,30 @@ __aicore__ inline void HcommUrmaDumpCqeCtx(__ubuf__ HcommUrmaJfcCqeCtx* cqeCtx)
         cqeCtx->dataL, cqeCtx->inlineData[0], cqeCtx->inlineData[1], cqeCtx->inlineData[2]);
 }
 
-__aicore__ inline HcommImpl<CommProtocol::URMA, CommEngine::AIV>::HcommImpl()
+__aicore__ inline HcommImpl<CommProtocol::URMA, CommEngine::AIV>::HcommImpl() {}
+
+__aicore__ inline HcommImpl<CommProtocol::URMA, CommEngine::AIV>::~HcommImpl() {}
+
+__aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Init(__ubuf__ uint8_t* buff, uint32_t len)
 {
-    pipe_.InitBuffer(hcommBuf_, HCOMM_URMA_TMP_BUF_SIZE);
-    wqeItem_ = hcommBuf_.Get<uint32_t>();
+    if (len < HCOMM_URMA_TMP_BUF_SIZE) {
+        return HCOMM_FAILED;
+    }
+
+    __ubuf__ uint8_t* alignedBuff = (__ubuf__ uint8_t*)AlignAddrTo32Bytes(buff);
+    TBuffAddr addr;
+    addr.logicPos = static_cast<uint8_t>(TPosition::VECOUT);
+    addr.bufferHandle = 0;
+    addr.bufferAddr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(alignedBuff));
+    addr.dataLen = HCOMM_URMA_TMP_BUF_SIZE;
+    wqeItem_.SetAddr(addr);
     cqeItem_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM];
     sqPI_ = cqeItem_[HCOMM_URMA_CQE_U32_NUM];
     sqCI_ = sqPI_[8];
     cqCI_ = sqCI_[8];
     doorBell_ = cqCI_[8];
+    return HCOMM_SUCCESS;
 }
-
-__aicore__ inline HcommImpl<CommProtocol::URMA, CommEngine::AIV>::~HcommImpl() {}
 
 __aicore__ inline void HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PollCqWhenSqOverflow(
     ChannelHandle channel, const SqContext& sqCtx, uint32_t sqHead)

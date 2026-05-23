@@ -73,6 +73,13 @@ __aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::HcommImpl()
 
 __aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::~HcommImpl() {}
 
+__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Init(__ubuf__ uint8_t* buff, uint32_t len)
+{
+    (void)buff;
+    (void)len;
+    return HCOMM_SUCCESS;
+}
+
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
 __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Operate(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType)

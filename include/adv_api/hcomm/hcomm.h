@@ -40,6 +40,15 @@ template <CommProtocol commProtocol = CommProtocol::ROCE, CommEngine commEngine 
 class Hcomm {
 public:
     /*!
+     * @brief Initialize Hcomm workspace.
+     * @param [in] buff: The UB buffer provided by caller.
+     * @param [in] len: The buffer length in bytes.
+     * @return 0 indicates success and -1 indicates failure.
+     * @note URMA uses buff as its temporary workspace after 32-byte alignment.
+     */
+    __aicore__ inline int32_t Init(__ubuf__ uint8_t* buff, uint32_t len);
+
+    /*!
      * @class Hcomm
      * @brief The task launching interface of the Write point-to-point communication operator, returns the identifier
      *        handleId. (task content: Write data of length len from src to dst through the specified channel.)

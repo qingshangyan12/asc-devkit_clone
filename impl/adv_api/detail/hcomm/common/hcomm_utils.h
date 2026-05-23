@@ -27,6 +27,14 @@
 
 namespace AscendC {
 
+__aicore__ inline uint8_t* AlignAddrTo32Bytes(__ubuf__ uint8_t* buff)
+{
+    uintptr_t addr = reinterpret_cast<uintptr_t>(buff);
+    const uintptr_t alignment = 32;
+    uintptr_t alignedAddr = (addr + alignment - 1) & ~(alignment - 1);
+    return reinterpret_cast<uint8_t*>(alignedAddr);
+}
+
 template <typename T>
 __aicore__ inline void Gm2Ub(
     const AscendC::LocalTensor<T>& dstLocal, const AscendC::GlobalTensor<T>& srcGlobal, int32_t length)

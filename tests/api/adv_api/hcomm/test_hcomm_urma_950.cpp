@@ -117,15 +117,33 @@ protected:
         block_idx = blockIdxBak_;
     }
 
+    int32_t InitHcomm(AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV>& hcomm)
+    {
+        pipe_.InitBuffer(hcommBuf_, AscendC::HCOMM_URMA_TMP_BUF_SIZE);
+        AscendC::LocalTensor<uint8_t> hcommLocal = hcommBuf_.Get<uint8_t>();
+        return hcomm.Init(reinterpret_cast<__ubuf__ uint8_t*>(hcommLocal.GetPhyAddr()),
+            AscendC::HCOMM_URMA_TMP_BUF_SIZE);
+    }
+
 private:
+    AscendC::TPipe pipe_;
+    AscendC::TBuf<AscendC::TPosition::VECOUT> hcommBuf_;
     int64_t blockIdxBak_;
 };
+
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_Init)
+{
+    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+
+    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
+}
 
 TEST_F(HcommUrmaTestSuite, Aiv_Urma_Read)
 {
     UrmaChannelResource channel;
 
     AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
     AscendC::HcommHandle handleId =
         hcomm.ReadNbi(channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x5008), reinterpret_cast<GM_ADDR>(0x3008), 8);
     EXPECT_EQ(handleId, 0);
@@ -138,6 +156,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Write)
     UrmaChannelResource channel;
 
     AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
     AscendC::HcommHandle handleId = hcomm.WriteNbi<false>(
         channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8);
     EXPECT_EQ(handleId, 0);
@@ -153,6 +172,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify)
     UrmaChannelResource channel;
 
     AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
     AscendC::HcommHandle handleId = hcomm.WriteWithNotifyNbi<false>(channel.GetHandle(),
         reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8, reinterpret_cast<GM_ADDR>(0x33), 1);
     EXPECT_EQ(handleId, 0);

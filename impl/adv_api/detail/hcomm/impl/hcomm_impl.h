@@ -33,6 +33,12 @@
 namespace AscendC {
 
 template <CommProtocol commProtocol, CommEngine commEngine>
+__aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Init(__ubuf__ uint8_t* buff, uint32_t len)
+{
+    return impl_.Init(buff, len);
+}
+
+template <CommProtocol commProtocol, CommEngine commEngine>
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline HcommHandle Hcomm<commProtocol, commEngine>::WriteNbi(
     ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
