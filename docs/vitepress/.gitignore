@@ -2,5 +2,8 @@ node_modules
 docs/.vitepress/dist
 docs/.vitepress/dist-static
 docs/.vitepress/cache
+docs/.vitepress/.temp
+docs/api
+docs/guide
 build-output*.log
 *.zip

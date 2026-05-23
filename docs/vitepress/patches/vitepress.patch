@@ -1,0 +1,12 @@
+diff --git a/dist/client/theme-default/composables/sidebar.js b/dist/client/theme-default/composables/sidebar.js
+index f5d97a24c378abb47e32f9f2ebd5795305d395b5..b6e853c9f5453a2fe64507bc9c67e9081cc12869 100644
+--- a/dist/client/theme-default/composables/sidebar.js
++++ b/dist/client/theme-default/composables/sidebar.js
+@@ -117,7 +117,6 @@ export function useSidebarControl(item) {
+     });
+     watchPostEffect(() => {
+         ;
+-        (isActiveLink.value || hasActiveLink.value) && (collapsed.value = false);
+     });
+     function toggle() {
+         if (collapsible.value) {

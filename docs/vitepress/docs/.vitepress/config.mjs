@@ -20,6 +20,7 @@ function placeholderPlugin() {
 }
 
 function fixCannFilterTags(src) {
+  if (!/<(cann-filter|term|ph|__gm__|__ubuf__)\b/i.test(src)) return src
   return src
     .replace(/<\/?cann-filter\b[^>]*>/gi, '')
     .replace(/<(term|ph|__gm__|__ubuf__)\b[^>]*>([\s\S]*?)<\/\1>/gis, '$2')
@@ -139,6 +140,7 @@ export default defineConfig({
   description: 'Ascend C 算子开发文档',
   lang: 'zh-CN',
   ignoreDeadLinks: true,
+  lastUpdated: false,
 
   markdown: {
     html: false,
@@ -146,16 +148,29 @@ export default defineConfig({
       const originalRender = md.render.bind(md)
       md.render = function (src, env) {
         src = fixCannFilterTags(src)
-        src = fixIndentedBlockquotes(src)
-        src = fixSpanCrossingTableCells(src)
-        src = convertHtmlTablesToMarkdown(src)
+
+        if (src.startsWith('    >') || src.includes('\n    >')) {
+          src = fixIndentedBlockquotes(src)
+        }
+
+        if (src.includes('<span') && src.includes('|')) {
+          src = fixSpanCrossingTableCells(src)
+        }
+
+        if (src.includes('<table')) {
+          src = convertHtmlTablesToMarkdown(src)
+        }
 
         let html = originalRender(src, env)
 
-        html = html.replace(/<p>\s*CANNFILTER_DIV_(\w+)_OPEN\s*<\/p>/g, '<div data-filter="$1">')
-        html = html.replace(/<p>\s*CANNFILTER_DIV_(\w+)_CLOSE\s*<\/p>/g, '</div>')
+        if (html.includes('CANNFILTER_DIV_')) {
+          html = html.replace(/<p>\s*CANNFILTER_DIV_(\w+)_OPEN\s*<\/p>/g, '<div data-filter="$1">')
+          html = html.replace(/<p>\s*CANNFILTER_DIV_(\w+)_CLOSE\s*<\/p>/g, '</div>')
+        }
 
-        html = escapeVueInterpolations(html)
+        if (html.includes('{{')) {
+          html = escapeVueInterpolations(html)
+        }
 
         return `<div v-pre>${html}</div>`
       }
@@ -170,6 +185,9 @@ export default defineConfig({
   },
 
   vite: {
+    resolve: {
+      preserveSymlinks: true,
+    },
     plugins: [placeholderPlugin()],
   },
 
@@ -193,9 +211,7 @@ export default defineConfig({
 
     sidebar: sidebars,
 
-    search: {
-      provider: 'local',
-    },
+    search: false,
 
     outline: {
       level: [2, 3],

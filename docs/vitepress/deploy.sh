@@ -122,19 +122,50 @@ install_deps() {
         exit 1
     fi
 
-    log "安装项目依赖..."
-    npm install --registry https://registry.npmmirror.com 2>&1 | tee -a "$LOG_FILE"
-    log "依赖安装完成"
+    if [ ! -d "node_modules" ]; then
+        log "安装项目依赖..."
+        if command -v pnpm &>/dev/null; then
+            pnpm install 2>&1 | tee -a "$LOG_FILE"
+        else
+            log "pnpm 未安装，使用 npm..."
+            npm install 2>&1 | tee -a "$LOG_FILE"
+        fi
+        log "依赖安装完成"
+    else
+        log "依赖已存在，跳过安装"
+    fi
 }
 
 # ============================================================
-# 3. 构建静态站点
+# 3. 创建文档目录软链
+# ============================================================
+link_docs() {
+    cd "$SCRIPT_DIR/docs"
+    PARENT_DOCS="$(cd "$SCRIPT_DIR/../.." && pwd)/docs"
+
+    for dir in api guide; do
+        if [ -L "$dir" ]; then
+            log "软链 $dir 已存在"
+        elif [ -d "$PARENT_DOCS/$dir" ]; then
+            ln -s "$PARENT_DOCS/$dir" "$dir"
+            log "已创建软链: $dir -> $PARENT_DOCS/$dir"
+        else
+            warn "源目录不存在: $PARENT_DOCS/$dir，跳过"
+        fi
+    done
+}
+
+# ============================================================
+# 4. 构建静态站点
 # ============================================================
 build_docs() {
     cd "$SCRIPT_DIR"
 
     log "开始构建 VitePress 站点..."
-    npm run docs:build 2>&1 | tee -a "$LOG_FILE"
+    pnpm run docs:build 2>&1 | tee -a "$LOG_FILE"
+
+    log "生成 Pagefind 搜索索引..."
+    pnpm run docs:postbuild 2>&1 | tee -a "$LOG_FILE"
 
     DIST_DIR="$SCRIPT_DIR/docs/.vitepress/dist"
     if [ ! -d "$DIST_DIR" ]; then
@@ -239,7 +270,7 @@ NGINX_EOF
 run_preview() {
     cd "$SCRIPT_DIR"
     log "启动预览模式 (Ctrl+C 退出)..."
-    npx vitepress preview docs --port "$SERVE_PORT" --host 0.0.0.0
+    pnpm docs:preview --port "$SERVE_PORT" --host 0.0.0.0
 }
 
 # ============================================================
@@ -282,12 +313,14 @@ case "$MODE" in
         fi
         install_nodejs
         install_deps
+        link_docs
         build_docs
         deploy_nginx
         ;;
     build)
         install_nodejs
         install_deps
+        link_docs
         build_docs
         log "构建完成! 使用以下命令启动服务:"
         log "  sudo $0 --nginx        # Nginx 生产部署"
@@ -298,12 +331,14 @@ case "$MODE" in
     preview)
         install_nodejs
         install_deps
+        link_docs
         build_docs
         run_preview
         ;;
     serve)
         install_nodejs
         install_deps
+        link_docs
         build_docs
         run_serve
         ;;
