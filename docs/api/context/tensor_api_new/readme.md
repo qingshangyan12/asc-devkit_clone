@@ -20,6 +20,7 @@ Tensor API 当前主要包含以下能力：
 
 - [tensor_api_list](tensor_api_list.md)
 - [数据搬运导览](data_movement/data_movement_overview.md)
+- [矩阵计算的搬入总体说明](data_movement/matrix_data_in_overview.md)
 - [GM到L1数据搬运](data_movement/gm_to_l1_data_movement.md)
 - [L1到L0A数据搬运](data_movement/l1_to_l0a_data_movement.md)
 - [L1到L0B数据搬运](data_movement/l1_to_l0b_data_movement.md)
