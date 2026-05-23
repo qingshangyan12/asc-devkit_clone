@@ -650,8 +650,7 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
     std::unique_ptr<InsCollAlgBase> ccuKfcExecutor = CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
     CHK_PRT_RET(
         ccuKfcExecutor.get() == nullptr, HCCL_ERROR("Fail to find ccuKfcExecutor for CcuKfcServer"), HCCL_E_PARA);
-    AlgResourceRequest ccukfcResRequest;
-    CHK_RET(ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, ccukfcResRequest));
+    CHK_RET(ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest));
 
 
     // host侧资源
@@ -682,14 +681,12 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
             param.opType, param.algTag);
         HcclResult ccuRet = GetAlgResCcu(comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo,
             resCtxSequence, size);
-        HcclResult ccuKfcRet = GetAlgResCcu(comm, param, ccukfcResRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence, size);
-        if (ccuRet == HCCL_E_UNAVAIL || ccuKfcRet == HCCL_E_UNAVAIL) {
+        if (ccuRet == HCCL_E_UNAVAIL) {
             return HCCL_E_UNAVAIL;
         }
         HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] after GetAlgResCcu, ret[%d], ctxSize[%llu], "
             "resCtxSequence[%p].", ccuRet, size, *resCtxSequence);
         CHK_RET(ccuRet);
-        CHK_RET(ccuKfcRet);
     } else {
         HCCL_ERROR("fail to get engine.", HCCL_E_PARA);
     }
