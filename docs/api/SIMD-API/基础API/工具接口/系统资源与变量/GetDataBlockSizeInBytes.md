@@ -16,7 +16,11 @@
 
 ## 功能说明
 
-获取当前芯片版本一个datablock的大小，单位为byte。开发者根据datablock的大小来计算API指令中待传入的repeatTime 、DataBlock Stride、Repeat Stride等参数值。
+头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。
+
+获取当前芯片版本一个DataBlock的大小，单位为byte。
+
+开发者根据DataBlock的大小来计算API指令中待传入的[repeatTime、DataBlock Stride、Repeat Stride等参数值](高维切分.md)。
 
 ## 函数原型
 
@@ -50,4 +54,3 @@ uint8_t repeatTime = 512 / mask;
 // dstRepStride, src0RepStride, src1RepStride = 8, 相邻迭代间数据连续读取和写入
 AscendC::Add(dstLocal, src0Local, src1Local, mask, repeatTime, { 1, 1, 1, 8, 8, 8 });
 ```
-
