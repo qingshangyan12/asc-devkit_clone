@@ -9,7 +9,8 @@ FROM ubuntu:24.04
 # --- Build arguments (override with --build-arg) ---
 ARG GENERAL_MIRROR=mirrors.huaweicloud.com
 ARG CONDA_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/anaconda
-ARG REPO_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/git/git-repo
+ARG REPO_SCRIPT_URL=https://mirrors.tuna.tsinghua.edu.cn/git/git-repo
+ARG REPO_GIT_URL=https://mirrors.ustc.edu.cn/aosp/git-repo
 ARG NODE_MAJOR=26
 
 # --- Base environment ---
@@ -18,7 +19,7 @@ ENV TZ=Asia/Shanghai \
     SHELL=/bin/zsh \
     DEBIAN_FRONTEND=noninteractive \
     PATH=/opt/conda/envs/py312/bin:/opt/conda/bin:$PATH \
-    REPO_URL=${REPO_MIRROR}
+    REPO_URL=${REPO_GIT_URL}
 
 USER root
 WORKDIR /tmp
@@ -55,11 +56,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 # --- repo tool + git global config ---
 RUN set -eu && \
-    curl -fsSL ${REPO_MIRROR} -o /usr/local/bin/repo && \
+    curl -fsSL ${REPO_SCRIPT_URL} -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo && \
     git config --global core.autocrlf input && \
     git config --global core.editor vim && \
     git config --global color.ui auto && \
+    git config --global credential.helper "cache --timeout=3600" && \
     git config --global alias.lg \
         "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 
@@ -127,7 +129,12 @@ RUN set -eu -o pipefail && \
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     set -eu && \
     npm config set registry https://${GENERAL_MIRROR}/repository/npm/ && \
-    npm install -g @openai/codex@latest @anthropic-ai/claude-code@latest
+    npm install -g @openai/codex@latest @anthropic-ai/claude-code@latest && \
+    npx --yes skills add https://gitcode.com/GitHub_Trending/ad/skills.git --skill find-skills -g -a claude-code -a codex --all -y && \
+    npx --yes skills add https://gitcode.com/GitHub_Trending/su/superpowers.git  -g -a claude-code -a codex --all -y && \
+    npx --yes skills add https://gitcode.com/GitHub_Trending/skills3/skills.git -g -a claude-code -a codex --all -y && \
+    npx --yes skills add https://gitcode.com/GitHub_Trending/skills13/skills.git -g -a claude-code -a codex --all -y
+    # npx --yes skills add https://gitcode.com/gh_mirrors/cli414/cli.git -g -a claude-code -a codex --all -y 
 
 # --- Shell customization ---
 RUN set -eu && \
@@ -136,19 +143,17 @@ RUN set -eu && \
 
 conda activate py312
 
-# AscendC banner
-echo "\\033[1;36m"
-echo " █████╗ ███████╗ ██████╗███████╗███╗   ██╗██████╗  ██████╗"
-echo "██╔══██╗██╔════╝██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝"
-echo "███████║███████╗██║     █████╗  ██╔██╗ ██║██║  ██║██║     "
-echo "██╔══██║╚════██║██║     ██╔══╝  ██║╚██╗██║██║  ██║██║     "
-echo "██║  ██║███████║╚██████╗███████╗██║ ╚████║██████╔╝╚██████╗"
-echo "╚═╝  ╚═╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚═════╝  ╚═════╝"
-echo "\\033[0m"
+# AscendC banner (rainbow, one ANSI color per row)
+echo "\\033[1;91m █████╗ ███████╗ ██████╗███████╗███╗   ██╗██████╗  ██████╗\\033[0m"
+echo "\\033[1;93m██╔══██╗██╔════╝██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝\\033[0m"
+echo "\\033[1;92m███████║███████╗██║     █████╗  ██╔██╗ ██║██║  ██║██║     \\033[0m"
+echo "\\033[1;96m██╔══██║╚════██║██║     ██╔══╝  ██║╚██╗██║██║  ██║██║     \\033[0m"
+echo "\\033[1;94m██║  ██║███████║╚██████╗███████╗██║ ╚████║██████╔╝╚██████╗\\033[0m"
+echo "\\033[1;95m╚═╝  ╚═╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚═════╝  ╚═════╝\\033[0m"
 
 # Ascend driver environment
 [ -f /usr/local/Ascend/driver/bin/setenv.bash ] && source /usr/local/Ascend/driver/bin/setenv.bash
 EOF
 
 WORKDIR /root
-CMD ["/bin/zsh"]
+ENTRYPOINT ["/bin/zsh"]
