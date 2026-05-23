@@ -10,12 +10,15 @@ function runMdparser(inputDir, outputDir, label) {
   console.log(`Converting ${label}...`)
   const input = resolve(repoRoot, 'docs', inputDir)
   const output = resolve(root, 'docs', outputDir)
+  const scriptsDirUnix = scriptsDir.replace(/\\/g, '/')
+  const inputUnix = input.replace(/\\/g, '/')
+  const outputUnix = output.replace(/\\/g, '/')
 
   const args = [
     '-c',
-    `import sys; sys.path.insert(0, '${scriptsDir}'); from mdparser.cli import main; main()`,
-    input,
-    '-o', output,
+    `import sys; sys.path.insert(0, '${scriptsDirUnix}'); from mdparser.cli import main; main()`,
+    inputUnix,
+    '-o', outputUnix,
     '-r',
   ]
 

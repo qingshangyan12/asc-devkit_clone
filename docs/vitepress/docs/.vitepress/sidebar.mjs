@@ -1,5 +1,16 @@
+function addNumbering(items, prefix = '') {
+  return items.map((item, i) => {
+    const num = prefix ? `${prefix}${i + 1}.` : `${i + 1}.`
+    return {
+      ...item,
+      text: `${num} ${item.text}`,
+      ...(item.items ? { items: addNumbering(item.items, num) } : {}),
+    }
+  })
+}
+
 export default {
-  "/guide/": [
+  "/guide/": addNumbering([
   {
     "text": "入门教程",
     "collapsed": true,
@@ -1440,10 +1451,10 @@ export default {
       }
     ]
   }
-],
+]),
 
 
-   "/api/": [
+   "/api/": addNumbering([
     {
       "text": "Ascend C API列表",
       "link": "/api/Ascend-C-API列表"
@@ -10360,6 +10371,9 @@ export default {
       "text": "README",
       "link": "/api/README"
     }
+  ])
+
+}
   ]
 
 
