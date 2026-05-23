@@ -29,6 +29,39 @@ const uint32_t DIE1_ID = 1;
 const string DIE1_START_SIG = "Die1StartSig";
 const string DIE1_END_SIG = "Die1EndSig";
 
+void CcuKernelKfcServer::SetCommAddr(uint64_t syncAddr, uint64_t paramAddr)
+{
+    waitAddr_ = syncAddr;
+    if (syncAddr > (UINT64_MAX - CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE)) {
+        // THROW<InvalidParamsException>("MC2 High Level API SetDieNum Failed: integer overflow occurs");  //TODO：添加打印
+    }
+    recordAddr_ = syncAddr + CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE; // 偏移8轮的总宽度
+    paramAddr_  = paramAddr;
+}
+
+void CcuKernelKfcServer::SetDieNum(uint32_t dieNum)
+{
+    dieNum_ = dieNum;
+    // 参数合法值判断
+    bool isDieNumValid = (dieNum_ == SINGLE_DIE || dieNum_ == DOUBLE_DIE);
+    bool isDieIdValid  = (GetDieId() == DIE0_ID || GetDieId() == DIE1_ID);
+    if (!(isDieNumValid && isDieIdValid)) {
+        // THROW<InvalidParamsException>("MC2 High Level API SetDieNum Failed: Invalid Die Config"); //TODO:添加打印
+    }
+
+    if (dieNum_ == DOUBLE_DIE) { // 双Die场景才需要导入导出
+        // 导出信号
+        exportDieSig = CreateMaskSignal();
+        // Die0: export完成信号给Die1，Die1: export开始信号给Die0
+        const string &exportSigLabel = (GetDieId() == DIE1_ID) ? DIE1_START_SIG : DIE1_END_SIG;
+        ExportMaskSignal(exportDieSig, exportSigLabel);
+
+        // 导入信号
+        const string &importSigLabel = (GetDieId() == DIE1_ID) ? DIE1_END_SIG : DIE1_START_SIG;
+        importDieSig                 = ImportMaskSignal(importSigLabel);
+    }
+}
+
 CcuKernelKfcServer::CcuKernelKfcServer(const CcuKernelArg &arg)
     : CcuKernelAlgBase(arg)
 {
@@ -48,7 +81,6 @@ HcclResult CcuKernelKfcServer::InitResource()
 
 HcclResult CcuKernelKfcServer::Algorithm()
 {
-    //DONE:删除CcuKernelKfcServer::GenOpSelector()
     if (id == 0) {
         Mc2KfcServer server;
         server.GenCircularQueue(); // 这里需要做0卡判断，走不同逻辑
@@ -63,7 +95,7 @@ void Mc2KfcServer::GenCircularQueue()
 {
     // 载入Token
     CcuRep::Variable token = CreateVariable();
-    Load(token);                  
+    Load(token);                                    // TODO:原来的这个Load()应该替换成什么呢？  LoadVariable()--->Load()                                  
 
     // 控制<repeat循环执行条件>的寄存器
     CcuRep::Variable repeatCond = CreateVariable();
@@ -116,7 +148,7 @@ void Mc2KfcServer::GenCircularQueue()
         WaitTurnStartSig(waitAddr, turnStartSig);
 
         // 读取本轮参数
-        LoadFuncParamFromMemory(paramAddr, param);
+        LoadFuncParamFromMemory(paramAddr, param);  //TODO:paramAddr这个参数是通信算子(如ALLTOALL的)？
 
         MissionPreSync(param[HBM_PARAM_IDX_0]);
 
@@ -150,14 +182,16 @@ void Mc2KfcServer::GenCircularQueue()
 
 void Mc2KfcServer::WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::Variable &turnStartSig)
 {
-    const uint32_t getDieId = DIE0_ID;          // TODO：GetDieId()函数的替换待HCCL方提供
+    const uint32_t getDieId = DIE0_ID;          // WAIT
     if (dieNum_ == SINGLE_DIE) {
         CCU_WHILE(turnStartSig != 1)
         {
+            // Done:原来LoadVariable()里面是两个CcuRep::Variable入参
+            // 现在Load有几个版本：Load(Variable addrVar, Variable v)，Load(uint64_t addr, Variable v)
             Load(hbmSigAddr, turnStartSig);
         }
         turnStartSig = 0;
-        Store(turnStartSig, hbmSigAddr);
+        Store(turnStartSig, hbmSigAddr);        // DONE：同上
     } else {
         if (getDieId == DIE0_ID) {
             CCU_WHILE(turnStartSig != 1)
@@ -166,16 +200,19 @@ void Mc2KfcServer::WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::
             }
             turnStartSig = 0;
             Store(turnStartSig, hbmSigAddr);
+            // TODO:原来的LocalCtxPost(const CcuRep::MaskSignal &sig, uint32_t mask)
+            // EventRecord(const char *notifyTag, uint16_t mask = 1);
+            // 即原来的CcuRep::MaskSignal能不能等效替换为const char*
             EventRecord(importDieSig_, 1);
         } else if (getDieId == DIE1_ID) {
-            EventWait(exportDieSig_, 1);
+            EventWait(exportDieSig_, 1);        // TODO:同上
         }
     }
 }
 
 void Mc2KfcServer::SetTurnEndSig(const CcuRep::Variable &hbmSigAddr, const CcuRep::Variable &turnEndSig)
 {
-    const uint32_t getDieId = DIE0_ID;          // TODO：GetDieId()函数的替换待HCCL方提供
+    const uint32_t getDieId = DIE0_ID;          // WAIT
     if (dieNum_ == SINGLE_DIE) {
         Store(turnEndSig, hbmSigAddr);
     } else {
@@ -194,7 +231,7 @@ void Mc2KfcServer::LoadFuncParamFromMemory(CcuRep::Variable &paramAddr, array<Cc
     doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
     CcuRep::Variable addr = CreateVariable();
     addr = paramAddr;
-    const uint32_t getDieId = DIE0_ID;          // TODO：GetDieId()函数的替换待HCCL方提供
+    const uint32_t getDieId = DIE0_ID;          // WAIT
     if (dieNum_ == DOUBLE_DIE && getDieId == DIE1_ID) {
         addr += doubleDie;
     }
@@ -227,6 +264,8 @@ void Mc2SlaveKfcServer::GenCircularQueue()
             CCU_BREAK;
         }
 
+        // 读取本轮参数
+        LoadFuncParamFromMemory(paramAddr, param);  //TODO:paramAddr这个参数是通信算子(如ALLTOALL的)？
         hcomm::CcuRep::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
@@ -247,6 +286,7 @@ void CcuKernelKfcServer::MissionPreSync(CcuRep::Variable &func)
             LocalCtxPostVar(func, importMissionVar_[i], importMissionSig_[i]);    // TODO：这里怎么改
         }
     } else {
+        // DONE,单个入参版本EventWait(const char *notifyTag, uint16_t mask = 1)
         EventWait(exportMissoinSig_[0]);
         func = exportMissionVar_[0];
     }
@@ -259,28 +299,47 @@ void CcuKernelKfcServer::MissionPostSync()
     }
     if (missionIndex_ == 0) {
         for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
+            // DONE,单个入参版本EventWait(const char *notifyTag, uint16_t mask = 1)
             EventWait(exportMissoinSig_[i]);
         }
     } else {
+        //DONE，单个入参版本EventRecord(const char *notifyTag, uint16_t mask = 1)
         EventRecord(importMissionSig_[0]);
     }
 }
 
 std::vector<uint64_t> CcuKernelKfcServer::GeneArgs(const CcuTaskArg &arg)
 {
+    // TODO：问题1：关于CcuRep::MaskSignal。
+        //方案1：传入进来 CcuRep::MaskSignal，这里强转const char *notifyTag----当前使用
+        //方案2：直接传进来const char *
+    // 问题2：CcuRep::Variable如何转uintt64
+    // 问题3：vector<>如何处理    
+
     const CcuTaskArgKfcServer *taskArg = dynamic_cast<const CcuTaskArgKfcServer *>(&arg);
     uint64_t waitAddr = taskArg->waitAddr_;
     uint64_t recordAddr = taskArg->recordAddr_;
     uint64_t paramAddr = taskArg->paramAddr_;
-    uint32_t dieNum = taskArg->dieNum_;
-    CcuRep::MaskSignal exportDieSig = taskArg->exportDieSig_;
-    CcuRep::MaskSignal importDieSig = taskArg->importDieSig_;
-    uint32_t missionNum = taskArg->missionNum_;
-    uint32_t missionIndex = taskArg->missionIndex_;
-    std::vector<CcuRep::MaskSignal> exportMissoinSig = taskArg->exportMissoinSig_;
-    std::vector<CcuRep::MaskSignal> importMissionSig = taskArg->importMissionSig_;
-    std::vector<CcuRep::MaskSignal> exportMissionVar = taskArg->exportMissionVar_;
-    std::vector<CcuRep::MaskSignal> importMissionVar = taskArg->importMissionVar_;
+    uint64_t dieNum = taskArg->dieNum_;
+    const char *exportDieSig = static_cast<const char *>(taskArg->exportDieSig_);
+    const char *importDieSig = static_cast<const char *>(taskArg->importDieSig_);
+    uint64_t missionNum = taskArg->missionNum_;
+    uint64_t missionIndex = taskArg->missionIndex_;
+
+    std::vector<const char*> exportMissoinSig;
+    exportMissoinSig.reserve(taskArg->exportMissoinSig_.size());
+    for (const auto& s : taskArg->exportMissoinSig_) {
+        exportMissoinSig.push_back(static_cast<const char*>(s));
+    }
+
+    std::vector<const char*> importMissionSig;
+    importMissionSig.reserve(taskArg->importMissionSig_.size());
+    for (const auto& s : taskArg->importMissionSig_) {
+        importMissionSig.push_back(static_cast<const char*>(s));
+    }
+
+    std::vector<CcuRep::Variable> exportMissionVar = taskArg->exportMissionVar_;
+    std::vector<CcuRep::Variable> importMissionVar = taskArg->importMissionVar_;
     return {waitAddr, recordAddr, paramAddr,dieNum,exportDieSig,importDieSig, missionNum, missionIndex,
             exportMissoinSig, importMissionSig, exportMissionVar, importMissionVar};
 }
