@@ -701,7 +701,6 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
             ${HCCL_C_SEC_LINK}
             ${HCCL_UNIFIED_DLOG_LINK}
             mc2_server_ccl_kernel_plf_stub
-            asc_ccl_kernel_plf_a
             ${HCCL_MMPA_LINK}
             -Wl,--as-needed
             -lrt
