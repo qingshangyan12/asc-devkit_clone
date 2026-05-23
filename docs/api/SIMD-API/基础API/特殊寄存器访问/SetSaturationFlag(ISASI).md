@@ -1,6 +1,6 @@
-# SetSaturationFlag\(ISASI\)<a name="ZH-CN_TOPIC_0000002361149961"></a>
+# SetSaturationFlag\(ISASI\)
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 | 产品 | 是否支持  |
 | :----------------------- | :------: |
@@ -14,20 +14,20 @@
 |<cann-filter npu-type="x90"> Kirin X90 | x </cann-filter>|
 |<cann-filter npu-type="9030"> Kirin 9030 | x </cann-filter>|
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 头文件路径为: "basic_api/kernel_operator_common_intf.h"。
 
 设置饱和开关的标志位，来使能计算/精度转换时的饱和模式。
 
-## 函数原型<a name="section620mcpsimp"></a>
+## 函数原型
 
-```
+```cpp
 template <SaturationMode mode>
 __aicore__ inline void SetSaturationFlag(bool enableSat)
 ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
 **表 1** 模板参数说明
 
@@ -41,20 +41,18 @@ __aicore__ inline void SetSaturationFlag(bool enableSat)
 | --- | --- | --- |
 | enableSat | 输入 | 是否开启对应饱和模式。true表示开启饱和模式，false表示关闭饱和模式。 |
 
-
-
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明
 
 无
 
-## 约束说明<a name="section633mcpsimp"></a>
+## 约束说明
 
 无
 
-## 调用示例<a name="section11279242185011"></a>
+## 调用示例
 
 如下示例中使能整数转整数时精度转换的饱和模式。
+
 ```cpp
 AscendC::SetSaturationFlag<AscendC::SaturationMode::CAST>(true);
 ```
-
