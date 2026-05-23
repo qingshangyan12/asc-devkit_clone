@@ -1,6 +1,6 @@
-# Async<a name="ZH-CN_TOPIC_0000002473797394"></a>
+# Async
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 | 产品 | 是否支持 |
 | ---- | -------- |
@@ -12,14 +12,14 @@
 | <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x</cann-filter> |
 | <cann-filter npu-type = "910">Atlas 训练系列产品 | x</cann-filter> |
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 头文件路径为：`"basic_api/kernel_operator_utils_intf.h"`。
 
 基于分离模式（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑，此时需要使用Ascend C提供的宏`ASCEND_IS_AIV`/`ASCEND_IS_AIC`实现如下硬件条件分支来对AIV和AIC的代码进行隔离：
 
 ```cpp
-if ASCEND_IS_AIV { 
+if ASCEND_IS_AIV {
 // AIV处理逻辑
 }
 if ASCEND_IS_AIC {
@@ -29,14 +29,14 @@ if ASCEND_IS_AIC {
 
 Async通过模板函数的方式对这种隔离模式进行了封装，提供了一个统一的接口，用于在不同执行单元（AIC或AIV）下执行特定函数，从而避免在代码中使用硬件条件分支。
 
-## 函数原型<a name="section620mcpsimp"></a>
+## 函数原型
 
 ```cpp
 template <EngineType engine, auto funPtr, class... Args>
 __aicore__ void Async(Args... args)
 ```
 
-## 参数说明<a name="section176711403104"></a>
+## 参数说明
 
 **表 1**  模板参数说明
 
@@ -52,15 +52,15 @@ __aicore__ void Async(Args... args)
 |--------|-----------|------|
 | Args... args | 输入 | 与class... Args对应的参数列表，表示传递给funPtr的实际参数。 |
 
-## 返回值说明<a name="section14483414194"></a>
+## 返回值说明
 
 无
 
-## 约束说明<a name="section633mcpsimp"></a>
+## 约束说明
 
 无
 
-## 调用示例<a name="section176061616102911"></a>
+## 调用示例
 
 ```cpp
 __aicore__ inline void cubeProcess(KernelMmad &op, GM_ADDR A, GM_ADDR B, GM_ADDR c)
