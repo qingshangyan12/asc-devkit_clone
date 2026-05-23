@@ -5,7 +5,7 @@
     "editor.wordWrap": "on",
     "editor.renderWhitespace": "all",
     "editor.trimWhitespaceOnDelete": true,
-    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.sourceDirectory": "/wsl.localhost/ubuntu-18.04/home/pengcheng/asc_devkit/asc-devkit/tests/tools/utils",
     "cmake.buildDirectory": "${workspaceFolder}/build",
     "files.associations": {
         "*.asc": "cpp",
