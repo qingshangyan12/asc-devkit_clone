@@ -12,8 +12,8 @@
 
 GetStride用于从Layout中提取Stride部分：
 
-- **不指定模板参数`Is...`**：返回完整的Stride元组。
-- **指定模板参数`Is...`**：返回Stride中对应索引的子结构。单个索引返回对应步长值或子tuple；多个索引返回由它们组成的新tuple。
+- **不指定模板参数Is...**：返回完整的Stride元组。
+- **指定模板参数Is...**：返回Stride中对应索引的子结构。单个索引返回对应步长值或子tuple；多个索引返回由它们组成的新tuple。
 
 ## 函数原型
 
@@ -43,7 +43,7 @@ __aicore__ inline constexpr auto GetStride(Layout<ShapeType, StrideType>& layout
 
 ## 返回值说明
 
-返回描述内存访问步长的Stride对象（或其子结构）。类型与模板参数`Is...`的指定方式相关。
+返回描述内存访问步长的Stride对象（或其子结构）。
 
 ## 约束说明
 

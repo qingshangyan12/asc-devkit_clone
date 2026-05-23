@@ -10,11 +10,7 @@
 
 头文件为：#include "tensor_api/tensor.h"
 
-Cosize表示Layout陪域的大小，即逻辑坐标映射到一维索引区间内，索引值可取的个数（容纳量）。
-
-对于简单非嵌套Layout（shape为扁平tuple），Coshape返回标量，Cosize与之相等。对于嵌套Layout（如分形布局），Coshape返回多维tuple，Cosize取其各维度的乘积。
-
-可通过模板参数Is...指定子维度范围。
+Cosize表示Layout陪域的大小，陪域（codomain）的跨度大小，即逻辑坐标经Layout映射为一维索引后，所有可能索引值所处区间的长度。Cosize和Coshape在扁平与嵌套Layout场景下等价。
 
 ## 函数原型
 
@@ -31,7 +27,7 @@ __aicore__ inline constexpr auto Cosize(const Layout<Shape, Stride>& layout)
 |--------|------|------|
 | Shape | 输入 | 组成Layout的shape的类型，即元组（tuple）类型。 |
 | Stride | 输入 | 组成Layout的stride的类型，即元组（tuple）类型。 |
-| Is... | size_t... | 索引序列，用于编译时递归选择shape和stride的子结构。 |
+| Is... | size_t | 索引序列，可通过模板参数Is...指定子维度范围。用于编译时递归选择shape和stride的子结构。 |
 
 **表 2** 参数说明
 

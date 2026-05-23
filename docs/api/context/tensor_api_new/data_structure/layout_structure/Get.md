@@ -15,12 +15,6 @@ Get提供两类能力：
 1. 对元组Tuple，按位置索引提取元素或逐层提取嵌套元素；
 2. 对Layout，分别从shape和stride中提取对应位置的子tuple，再组合为新的子Layout。
 
-其中，对于Layout的具体实现为：
-
-1. 从layout.Shape()`中提取索引Is...对应的子shape；
-2. 从layout.Stride()中提取索引Is...对应的子stride；
-3. 调用MakeLayout组合为新Layout。
-
 ## 函数原型
 
 ```cpp
@@ -40,7 +34,7 @@ __aicore__ inline constexpr auto Get(const Layout<Shape, Stride>& layout)
 | Shape | 输入 | 组成Layout的shape的类型，即元组（tuple）类型。 |
 | Stride | 输入 | 组成Layout的stride的类型，即元组（tuple）类型。 |
 | Tuple | 输入 | 元组，Shape和Stride都是Tuple的别名。 |
-| Is... | size_t... | 索引序列，用于编译时递归选择shape和stride的子结构。 |
+| Is... | size_t | 索引序列，用于编译时递归选择shape和stride的子结构。 |
 
 **表 2** 参数说明
 

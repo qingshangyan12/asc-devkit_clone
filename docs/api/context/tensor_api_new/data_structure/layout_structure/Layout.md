@@ -347,11 +347,3 @@ constexpr auto fullRank = decltype(layout)::rank;
 // fullRank = 2
 ```
 
-上述示例中：
-
-- `layout()`返回`Layout`对象自身。
-- `Shape()`和`Stride()`分别返回形状与步长；带模板参数时返回指定维度或子结构。
-- `Rank()`返回维度数，`Size()`返回逻辑元素总数，`Capacity()`返回实际覆盖的内存容量。
-- `operator()`根据坐标计算线性索引，例如坐标`(1, 1)`对应索引`1 * 4 + 1 * 1 = 5`。
-- `Get<0>()`返回`Shape`，`Get<1>()`返回`Stride`。
-- `depth`和`rank`是编译期常量，分别表示嵌套深度和完整秩。
