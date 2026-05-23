@@ -2,7 +2,7 @@
 
 - **[总体说明](matrix_data_in_overview.md)**
 - **[矩阵数据搬入至L1 Buffer](<matrix_data_in_l1_directory.md>)**
-    - **[Global Memory到L1 Buffer数据搬运](<data_movement/gm_to_l1.md>)**
+    - **[Global Memory到L1 Buffer数据搬运](<gm_to_l1.md>)**
 - **[矩阵数据搬入至L0 Buffer](<matrix_data_in_l0_directory.md>)**
     - **[L1 Buffer到L0A Buffer数据搬运](l1_to_l0a.md)**
     - **[L1 Buffer到L0B Buffer数据搬运](l1_to_l0b.md)**

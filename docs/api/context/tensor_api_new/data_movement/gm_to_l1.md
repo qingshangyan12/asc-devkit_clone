@@ -6,7 +6,6 @@
 | :--- | :------: |
 | Ascend 950PR/Ascend 950DT | √ |
 
-
 ## 功能说明
 
 头文件为: #include "tensor_api/tensor.h"
@@ -14,11 +13,11 @@
 Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将Global Memory中的数据搬运到L1 Buffer。Global Memory到L1 Buffer通路需要使用`CopyGM2L1`构造搬运原子对象，再将该对象传入`Copy`。`Copy`接口根据源张量和目的张量的存储位置、数据类型和Layout选择具体搬运实现。搬运块数、搬运长度、源/目的侧步长以及NZ转换相关信息由Tensor Layout推导，用户不需要在`Copy`调用中额外传入搬运参数。
 
 该通路用于矩阵计算输入搬入，支持以下场景：
+
 - 连续数据搬入：源数据从Global Memory搬入L1 Buffer后数据格式不变。
 - 高维切分数据搬入：源/目的侧存在步长时，根据Layout推导多段搬运。
 - 随路格式转换搬入：从Global Memory搬入L1 Buffer的同时完成ND/DN等到NZ/ZN等的矩阵格式转换。
 - Scale数据搬入：用于MX矩阵计算中ScaleA/ScaleB数据从Global Memory搬入L1 Buffer。
-
 
 ## 函数原型
 
@@ -85,6 +84,7 @@ Global Memory到L1 Buffer通路使用`CopyGM2L1{}`作为`copyOperation`，使用
 与built-in接口映射关系：
 
 连续数据搬入和高维切分数据搬入接口是在built-in接口`asc_copy_gm2l1_align`的基础上进行抽象封装实现的，其对应的底层built-in接口为：
+
 ```cpp
 __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src,
     uint32_t burst_num, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count,
@@ -119,6 +119,7 @@ __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ uint8_t* dst, __gm__ uint8_
 ```
 
 ND2NZ随路格式转换搬入接口是在built-in接口`asc_copy_gm2l1_nd2nz`的基础上进行抽象封装实现的，其对应的底层built-in接口为：
+
 ```cpp
 __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src,
     uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value,
@@ -159,6 +160,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ uint8_t* dst, __gm__ uint8_
 ```
 
 DN2NZ随路格式转换搬入接口是在built-in接口`asc_copy_gm2l1_dn2nz`的基础上进行抽象封装实现的，其对应的底层built-in接口为：
+
 ```cpp
 __aicore__ inline void asc_copy_gm2l1_dn2nz(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src,
     uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value,
@@ -201,13 +203,13 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(__cbuf__ uint8_t* dst, __gm__ uint8_
 Scale数据搬入根据Layout组合复用上述底层API映射：`ZZLayoutPtn`到`ZZLayoutPtn`、`NNLayoutPtn`到`NNLayoutPtn`等格式保持场景映射到`asc_copy_gm2l1_align`；`ScaleANDLayoutPtn`、`ScaleADNLayoutPtn`、`ScaleBNDLayoutPtn`、`ScaleBDNLayoutPtn`相关格式转换场景映射到`asc_copy_gm2l1_nd2nz`或`asc_copy_gm2l1_dn2nz`。
 
 ## 约束说明
+
 - 位于Global Memory的源地址必须1B对齐，位于L1 Buffer的目的地址必须32B对齐。
 - 数据连续搬运场景中，搬运字节数需要32B对齐。若未对齐，搬运量会向下取整到32B对齐。
 - 高维切分搬运场景中，搬运长度、源步长和目的步长均按32B对齐。
 - 随路转换场景中，目的矩阵尾部按转换搬运语义补0，对齐约束由Layout自动推导。
 - 当输入数据是b4时，按b8搬运粒度处理，Layout推导参数需要满足对应粒度约束。
 - 随路转换搬入到L1 Buffer的目的数据区域不能重叠。如果存在重叠写入，不保证重叠数据的写入顺序。
-
 
 ## 关键特性说明
 

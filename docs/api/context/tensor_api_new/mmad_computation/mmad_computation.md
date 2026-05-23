@@ -126,6 +126,68 @@ Mmad的矩阵乘加关系可参考下图：
 
 `Mmad`无返回值。`MakeMmad`返回`MmadAtom`对象。
 
+## API映射关系
+
+与built-in接口映射关系：
+
+普通Mmad接口是在built-in接口`asc_mmad`的基础上进行抽象封装实现的，其对应的底层built-in接口原型为：
+
+```cpp
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix,
+    __cb__ bfloat16_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float8_e4m3_t* a_matrix,
+    __cb__ float8_e4m3_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float8_e4m3_t* a_matrix,
+    __cb__ float8_e5m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float8_e5m2_t* a_matrix,
+    __cb__ float8_e4m3_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float8_e5m2_t* a_matrix,
+    __cb__ float8_e5m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ half* a_matrix,
+    __cb__ half* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ float* a_matrix,
+    __cb__ float* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix,
+    __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+```
+
+MX Mmad接口是在built-in接口`asc_mmad_mx`的基础上进行抽象封装实现的，其对应的底层built-in接口原型为：
+
+```cpp
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix,
+    __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix,
+    __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix,
+    __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix,
+    __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix,
+    __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix,
+    __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix,
+    __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix,
+    __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+```
+
 ## 约束说明
 
 - `dst`必须位于L0C Buffer，`fm`必须位于L0A Buffer，`filter`必须位于L0B Buffer。
@@ -186,6 +248,7 @@ MX Mmad通常需要在调用`Mmad`前完成ScaleA和ScaleB数据搬运。ScaleA�
 ## 调用示例
 
 - Mmad调用示例
+
 ```cpp
 #include "tensor_api/tensor.h"
 

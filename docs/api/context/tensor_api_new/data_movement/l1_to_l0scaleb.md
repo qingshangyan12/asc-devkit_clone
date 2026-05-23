@@ -57,7 +57,6 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 | `copyOperation` | 输入 | 搬运操作对象。L1 Buffer到L0ScaleB Buffer通路使用`CopyL12L0ScaleB{}`。 |
 | `copyTrait` | 输入 | 搬运Trait对象，用于指定搬运特性。L1 Buffer到L0ScaleB Buffer默认Trait使用`CopyL12L0ScaleBTraitDefault{}`。 |
 
-
 ## 返回值说明
 
 `Copy`无返回值。`MakeCopy`返回`CopyAtom`对象。
@@ -68,7 +67,20 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 源张量和目的张量的基础数据类型需要保持一致。
 
+## API映射关系
+
+与built-in接口映射关系：
+
+L1 Buffer到L0ScaleB Buffer搬运接口是在built-in接口`asc_copy_l12l0b_mx`的基础上进行抽象封装实现的，其对应的底层built-in接口为：
+
+```cpp
+__aicore__ inline void asc_copy_l12l0b_mx(uint64_t dst, __cbuf__ fp8_e8m0_t* src,
+    uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
+    uint16_t src_stride, uint16_t dst_stride);
+```
+
 ## 约束说明
+
 - 源张量和目的张量数据格式为`NN`，使用`MakeFrameLayout<NNLayoutPtn, _2>(...)`构造。
 - 源地址和目的地址需要满足32 Byte对齐要求。
 

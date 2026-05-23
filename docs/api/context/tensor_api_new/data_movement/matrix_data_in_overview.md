@@ -7,6 +7,7 @@
 **表1** **数据通路和存储层级**
 
 <a name="tensor_api_matrix_data_in_overview_table_data_path"></a>
+
 |源位置|源地址对齐要求|目的位置|目的地址对齐要求|格式转换|典型应用场景|
 |--------|--------|--------|--------|--------|--------|
 |Global Memory|1字节|L1 Buffer(A1)|32字节|ND2ND、ND2NZ、DN2NZ、NZ2NZ|从全局内存加载左矩阵数据到L1 Buffer|

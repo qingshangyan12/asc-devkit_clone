@@ -12,7 +12,6 @@ F32 Channel Split是矩阵计算结果搬出过程中的通道拆分能力。当
 
 ![](../figures/f32_channel_split_figure2.png "F32-channel-split示意图2")
 
-
 ## 调用形式
 
 ```cpp
