@@ -253,7 +253,7 @@ MX Mmad支持如下A、B、C数据类型组合：
 | `fp8_e5m2_t` | `fp8_e4m3fn_t` | `float` |
 | `fp8_e5m2_t` | `fp8_e5m2_t` | `float` |
 
-MX Mmad通常需要在调用`Mmad`前完成ScaleA和ScaleB数据搬运。ScaleA搬运可参考[L1到L0ScaleA数据搬运](../data_movement/l1_to_l0scalea_data_movement.md)，ScaleB搬运可参考[L1到L0ScaleB数据搬运](../data_movement/l1_to_l0scaleb_data_movement.md)。Scale数据不作为`Mmad`函数参数传入，而是由对应数据搬运接口提前准备到硬件要求的位置。
+MX Mmad通常需要在调用`Mmad`前完成ScaleA和ScaleB数据搬运。ScaleA搬运可参考[L1到L0ScaleA数据搬运](../data_movement/l1_to_l0scalea.md)，ScaleB搬运可参考[L1到L0ScaleB数据搬运](../data_movement/l1_to_l0scaleb.md)。Scale数据不作为`Mmad`函数参数传入，而是由对应数据搬运接口提前准备到硬件要求的位置。
 
 ## 调用示例
 

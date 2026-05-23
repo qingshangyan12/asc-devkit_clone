@@ -1,6 +1,6 @@
 # Tensor API手册资料目录导览
 
-- **[基础数据结构](readme.md)**
+- **基础数据结构**
 
 - **[矩阵计算](matrix_computation_directory.md)**
     - **[矩阵计算的搬入](data_movement/matrix_data_in_directory.md)**
@@ -15,7 +15,7 @@
             - **[L1 Buffer到BiasTable Buffer数据搬运](data_movement/l1_to_bias_table.md)**
             - **[L1 Buffer到Fixpipe Buffer数据搬运](data_movement/l1_to_fixpipe.md)**
     - **[Mmad计算](mmad_computation/mmad_computation_directory.md)**
-        - **[Mmad](mmad_computation/mmad_computation.md.md)**
+        - **[Mmad](mmad_computation/mmad_computation.md)**
     - **[矩阵计算的搬出](data_movement/matrix_data_out_directory.md)**
         - **[总体说明](data_movement/matrix_data_out_overview.md)**
         - **[L0C Buffer到Global Memory数据搬运](data_movement/l0c_to_gm.md)**

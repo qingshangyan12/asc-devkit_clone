@@ -29,7 +29,7 @@
 
 |接口名称|主要功能|数据通路|源数据布局|目的数据布局|格式转换|典型应用场景|
 |--------|--------|--------|--------|--------|--------|--------|
-|[CopyGM2L1](<data_movement/gm_to_l1.md>)|Global Memory到L1 Buffer的数据搬运|Global Memory到L1 Buffer|`NDExtLayoutPtn`、`DNExtLayoutPtn`、`NZLayoutPtn`、`ZNLayoutPtn`、`ScaleANDLayoutPtn`、`ScaleADNLayoutPtn`、`ScaleBNDLayoutPtn`、`ScaleBDNLayoutPtn`、`ZZLayoutPtn`、`NNLayoutPtn`|`NDExtLayoutPtn`、`NZLayoutPtn`、`ZNLayoutPtn`、`ZZLayoutPtn`、`NNLayoutPtn`|ND2ND、ND/DN2NZ、ND/DN2ZN、NZ2NZ、ZN2ZN、ScaleA ND/DN2ZZ、ScaleB ND/DN2NN、ZZ2ZZ、NN2NN|左矩阵/右矩阵搬入L1 Buffer，支持ND、DN、NZ、ZN以及MX Scale相关布局搬运|
+|[CopyGM2L1](gm_to_l1.md)|Global Memory到L1 Buffer的数据搬运|Global Memory到L1 Buffer|`NDExtLayoutPtn`、`DNExtLayoutPtn`、`NZLayoutPtn`、`ZNLayoutPtn`、`ScaleANDLayoutPtn`、`ScaleADNLayoutPtn`、`ScaleBNDLayoutPtn`、`ScaleBDNLayoutPtn`、`ZZLayoutPtn`、`NNLayoutPtn`|`NDExtLayoutPtn`、`NZLayoutPtn`、`ZNLayoutPtn`、`ZZLayoutPtn`、`NNLayoutPtn`|ND2ND、ND/DN2NZ、ND/DN2ZN、NZ2NZ、ZN2ZN、ScaleA ND/DN2ZZ、ScaleB ND/DN2NN、ZZ2ZZ、NN2NN|左矩阵/右矩阵搬入L1 Buffer，支持ND、DN、NZ、ZN以及MX Scale相关布局搬运|
 |[CopyL12L0A](l1_to_l0a.md)|L1 Buffer到L0A Buffer的数据搬运|L1 Buffer到L0A Buffer|`NZLayoutPtn`、`ZNLayoutPtn`|`NZLayoutPtn`|NZ2NZ、ZN2NZ|左矩阵搬入L0A Buffer，支持普通搬运和转置搬运|
 |[CopyL12L0B](l1_to_l0b.md)|L1 Buffer到L0B Buffer的数据搬运|L1 Buffer到L0B Buffer|`ZNLayoutPtn`、`NZLayoutPtn`|`ZNLayoutPtn`|ZN2ZN、NZ2ZN|右矩阵搬入L0B Buffer，支持普通搬运和转置搬运|
 |[CopyL12L0ScaleA](l1_to_l0scalea.md)|L1 Buffer到L0ScaleA Buffer的数据搬运|L1 Buffer到L0ScaleA Buffer|`ZZLayoutPtn`|`ZZLayoutPtn`|ZZ2ZZ|MX矩阵计算中左矩阵缩放系数搬入|
@@ -52,7 +52,7 @@
 
 |接口名称|对应`instruction.h`路径|底层`asc_`函数|
 |--------|--------|--------|
-|[CopyGM2L1](<data_movement/gm_to_l1.md>)|`impl/tensor_api/arch/cube/gm_to_l1/npu_arch_3510/instruction.h`|`asc_copy_gm2l1_align`、`asc_copy_gm2l1_nd2nz`、`asc_copy_gm2l1_dn2nz`|
+|[CopyGM2L1](gm_to_l1.md)|`impl/tensor_api/arch/cube/gm_to_l1/npu_arch_3510/instruction.h`|`asc_copy_gm2l1_align`、`asc_copy_gm2l1_nd2nz`、`asc_copy_gm2l1_dn2nz`|
 |[CopyL12L0A](l1_to_l0a.md)|`impl/tensor_api/arch/cube/l1_to_l0a/npu_arch_3510/instruction.h`|`asc_copy_l12l0a`、`asc_copy_l12l0a_transpose`|
 |[CopyL12L0B](l1_to_l0b.md)|`impl/tensor_api/arch/cube/l1_to_l0b/npu_arch_3510/instruction.h`|`asc_copy_l12l0b`、`asc_copy_l12l0b_transpose`|
 |[CopyL12L0ScaleA](l1_to_l0scalea.md)|`impl/tensor_api/arch/cube/l1_to_l0scalea/npu_arch_3510/instruction.h`|`asc_copy_l12l0a_mx`|
