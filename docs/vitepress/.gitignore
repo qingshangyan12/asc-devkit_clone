@@ -1,0 +1,6 @@
+node_modules
+docs/.vitepress/dist
+docs/.vitepress/dist-static
+docs/.vitepress/cache
+build-output*.log
+*.zip
