@@ -128,7 +128,7 @@ public:
             .DynamicShapeSupportFlag(true)
             .NeedCheckSupportFlag(true)
             .PrecisionReduceFlag(true);
-        this->AICore().AddConfig("ascend310p", aicConfig);
+        this->AICore().AddConfig("ascend310p");
         this->AICore().AddConfig("ascend910", aicConfig);
         this->AICore().AddConfig("ascendxxx", aicConfig);
         this->FormatMatchMode(FormatCheckOption::STRICT);
@@ -251,11 +251,19 @@ class RefContiguousTest : public OpDef {
 public:
     RefContiguousTest(const char* name) : OpDef(name)
     {
-        this->Input("self").DataType({ ge::DT_FLOAT }).AutoContiguous();
-        this->Input("x").DataType({ ge::DT_INT64 });
-        this->Output("self").DataType({ ge::DT_FLOAT });
+        this->Input("self").ParamType(REQUIRED).DataType({ ge::DT_FLOAT }).Format({ge::FORMAT_ND}).UnknownShapeFormat({ge::FORMAT_ND}).AutoContiguous();
+        this->Input("x").ParamType(REQUIRED).DataType({ ge::DT_INT64 }).Format({ge::FORMAT_ND}).UnknownShapeFormat({ge::FORMAT_ND}).AutoContiguous();
+        this->Output("self").ParamType(REQUIRED).DataType({ ge::DT_FLOAT }).Format({ge::FORMAT_ND}).UnknownShapeFormat({ge::FORMAT_ND});
         OpAICoreConfig aicConfig;
-        this->AICore().AddConfig("ascend910", aicConfig);
+        aicConfig.DynamicCompileStaticFlag(true).DynamicShapeSupportFlag(true);
+        this->AICore().AddConfig("ascend910b", aicConfig);
+
+        OpAICoreConfig aicConfig2;
+        aicConfig2.Input("self").ParamType(REQUIRED).DataType({ ge::DT_FLOAT }).Format({ge::FORMAT_ND}).UnknownShapeFormat({ge::FORMAT_ND});
+        aicConfig2.Input("x").ParamType(REQUIRED).DataType({ ge::DT_INT64 }).Format({ge::FORMAT_ND}).UnknownShapeFormat({ge::FORMAT_ND});
+        aicConfig2.Output("self").ParamType(REQUIRED).DataType({ ge::DT_FLOAT }).Format({ge::FORMAT_ND}).UnknownShapeFormat({ge::FORMAT_ND});
+        aicConfig2.DynamicCompileStaticFlag(true).DynamicShapeSupportFlag(true);
+        this->AICore().AddConfig("ascend310p", aicConfig2);
     }
 };
 
@@ -334,6 +342,7 @@ public:
         this->AICore().AddConfig("ascend950", aicConfig);
         this->MC2().HcclGroup({"group2", "group1"});
         this->MC2().HcclServerType(HcclServerType::CCU, "ascend950");
+        this->MC2().HcclServerType(HcclServerType::CCU, "ascend_undefined_soc");
         this->EnableFallBack();
     }
 };
@@ -393,6 +402,7 @@ public:
         config_b.Input("x3").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
         config_b.Output("y1").ParamType(REQUIRED).DataType({ ge::DT_INT64 });
         this->AICore().AddConfig("ascend910b", config_b);
+        this->AICore().AddConfig("ascend_undefined_soc", config_b);
     }
 };
 OP_ADD(SocVersionTest1);
@@ -549,5 +559,21 @@ public:
     }
 };
 OP_ADD(RmsNormGradTest);
+
+class InvalidSocTest : public OpDef {
+public:
+    InvalidSocTest(const char* name) : OpDef(name)
+    {
+        this->Input("x1").DataType({ ge::DT_FLOAT16 });
+        this->Input("x2").DataType({ ge::DT_FLOAT16 }).ParamType(DYNAMIC);
+        OpAICoreConfig aicConfig;
+        this->AICore().AddConfig("ascend_invalid_soc", aicConfig);
+        this->AICore().AddConfig("ASCEND_INVALID_SOC", aicConfig);
+        this->AICore().AddConfig("ASCEND_INVALID_SOC", aicConfig);
+        this->MC2().HcclServerType(HcclServerType::AICORE, "ASCEND_INVALID_SOC");
+    }
+};
+
+OP_ADD(InvalidSocTest);
 
 } // namespace ops

@@ -50,9 +50,11 @@ enum NnopbaseAttrDtype {
     kNnopbaseString,
     kNnopbaseAttrEnd
 };
-uint32_t socSupportList[] = {SOC_VERSION_ASCEND910A};
-uint32_t socSupportListLen = 1;
+uint32_t socSupportList[] = {SOC_VERSION_ASCEND310P,SOC_VERSION_ASCEND910B};
+uint32_t socSupportListLen = 2;
 
+static const char *socNameList[] = {"ascend310p", "ascend910b"};
+static const size_t socNameListLen = 2;
 TensorDesc inputDesc0_0[2] =
     {{ge::DT_FLOAT, ge::FORMAT_ND},
      {ge::DT_INT64, ge::FORMAT_ND}};
@@ -62,10 +64,35 @@ SupportInfo list0_0 = {inputDesc0_0, 2, outputDesc0_0, 1};
 SupportInfo supportInfo0[1] = {list0_0};
 OpSocSupportInfo socSupportInfo0= {supportInfo0, 1};
 
-OpSocSupportInfo opSocSupportList[1] = {socSupportInfo0};
-OpSupportList supportList = {opSocSupportList, 1};
+TensorDesc inputDesc1_0[2] =
+    {{ge::DT_FLOAT, ge::FORMAT_ND},
+     {ge::DT_INT64, ge::FORMAT_ND}};
+TensorDesc outputDesc1_0[1] =
+    {{ge::DT_FLOAT, ge::FORMAT_ND}};
+SupportInfo list1_0 = {inputDesc1_0, 2, outputDesc1_0, 1};
+SupportInfo supportInfo1[1] = {list1_0};
+OpSocSupportInfo socSupportInfo1= {supportInfo1, 1};
+
+OpSocSupportInfo opSocSupportList[2] = {socSupportInfo0, socSupportInfo1};
+OpSupportList supportList = {opSocSupportList, 2};
 
 [[maybe_unused]] uint32_t NNOPBASE_RefContiguousTest = 0U;
+static bool NnopbaseMatchSocName(const char *socName, const char * const *nameList, size_t nameCount) {
+    if (socName == NULL) return false;
+    for (size_t i = 0; i < nameCount; i++) {
+        if (strcmp(socName, nameList[i]) == 0) return true;
+    }
+    return false;
+}
+static bool NnopbaseMatchSocEnum(uint32_t socEnum, const uint32_t *enumList, size_t enumCount) {
+    if (enumList == NULL) return false;
+    for (size_t i = 0; i < enumCount; i++) {
+        if (socEnum == enumList[i]) return true;
+    }
+    return false;
+}
+static const char *socMatch0Names[] = {"ascend910b"};
+static const uint32_t socMatch0Enums[] = {SOC_VERSION_ASCEND910B};
 } // namespace
 
 extern void NnopbaseOpLogE(const aclnnStatus code, const char *const expr);
@@ -94,11 +121,13 @@ extern aclnnStatus NnopbaseAddBoolArrayAttr(void *executor, const aclBoolArray* 
 extern aclnnStatus NnopbaseAddArrayAttrWithDtype(void *executor, void *array, const size_t len, const size_t elementSize, const size_t index, const NnopbaseAttrDtype dtype);
 extern uint64_t NnopbaseMsprofSysTime();
 extern uint32_t __attribute__((weak)) NnopbaseGetSocEnum();
+extern const char* __attribute__((weak)) NnopbaseGetSocName();
 extern aclnnStatus NnopbaseAddTilingId(void *executor, NnopbaseDfxId *tilingId);
 extern void NnopbaseReportApiInfo(const uint64_t beginTime, NnopbaseDfxId &dfxId);
 extern aclnnStatus NnopbaseRunForWorkspace(void *executor, uint64_t *workspaceLen);
 extern aclnnStatus NnopbaseRunWithWorkspace(void *executor, aclrtStream stream, void *workspace, uint64_t workspaceSize);
 extern aclnnStatus NnopbaseAddSupportList(void *executor, OpSupportList *list, uint32_t *socSupportList, size_t socSupportListLen);
+extern aclnnStatus __attribute__((weak)) NnopbaseAddSocNameList(void *executor, OpSupportList *list, const char * const *socNameList, size_t socNameListLen);
 extern aclnnStatus NnopbaseAddScalarInput(void *executor, const aclScalar *scalar, const uint32_t index, const int32_t srcIndex, const ge::DataType dtype);
 extern aclnnStatus NnopbaseAddScalarListInput(void *executor, const aclScalarList *scalarList, const uint32_t index, const int32_t srcIndex, const ge::DataType dtype);
 extern void NnopbaseAddOpTypeId(void *executor, const uint32_t opTypeId);
@@ -107,6 +136,7 @@ extern aclnnStatus __attribute__((weak)) NnopbaseSetFormatMatchMode(void *execut
 extern aclnnStatus NnopbaseSetRef(void *executor, const size_t inputIrIdx, const size_t outputIrIdx);
 extern void __attribute__((weak)) NnopbaseSetMatchArgsFlag(void *executor);
 extern bool __attribute__((weak)) NnopbaseMatchArgs(void *executor, uint64_t *workspaceLen);
+extern aclnnStatus __attribute__((weak)) NnopbaseCheckIoParam(void *executor, const uint32_t mode);
 extern aclnnStatus NnopbaseGetUnContiguousTensors(void *executor, const aclTensorList **inTensors);
 extern aclnnStatus NnopbaseSetUnContExecutor(void *executor, aclOpExecutor *inExe, const size_t inWsSize);
 extern aclnnStatus NnopbaseGetUnContExecutor(void *executor, aclOpExecutor **inExe, size_t *inWsSize);
@@ -172,6 +202,11 @@ aclnnStatus aclnnRefContiguousTestGetWorkspaceSize(
         NnopbaseSetMatchArgsFlag(*executor);
     }
     NNOPBASE_ASSERT_OK_RETVAL(NnopbaseSetRef(*executor, 0, 0));
+    const char *currentSocName = (NnopbaseGetSocName != NULL) ? NnopbaseGetSocName() : NULL;
+    uint32_t currentSocEnum = SOC_VERSION_INVALID;
+    if (currentSocName == NULL && NnopbaseGetSocEnum != NULL) {
+        currentSocEnum = NnopbaseGetSocEnum();
+    }
     NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddInput(*executor, selfRef, 0));
     NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddInput(*executor, x, 1));
     NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddOutput(*executor, selfRef, 0));
@@ -186,18 +221,24 @@ aclnnStatus aclnnRefContiguousTestGetWorkspaceSize(
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddParamName(*executor, 1, "x", true));
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddParamName(*executor, 0, "selfRef", false));
     }
-    NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddSupportList(*executor, &supportList, socSupportList, socSupportListLen));
+    if (NnopbaseAddSocNameList != NULL) {
+        NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddSocNameList(*executor, &supportList, socNameList, socNameListLen));
+    } else {
+        NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddSupportList(*executor, &supportList, socSupportList, socSupportListLen));
+    }
 
     uint64_t inContWorkspaceSize = 0U;
     const aclTensorList *inUnContTensors = nullptr;
-    NnopbaseGetUnContiguousTensors(*executor, &inUnContTensors);
-    aclOpExecutor *aclInExecutor = nullptr;
-    if (inUnContTensors != nullptr) {
-        static AclnnContiguousGetWorkspaceSizeFunc aclnnContiguousGetWorkspaceSize = (AclnnContiguousGetWorkspaceSizeFunc)NnopbaseGetApiFunc("aclnnContiguousGetWorkspaceSize");
-        NNOPBASE_ASSERT_NOTNULL_RETVAL(aclnnContiguousGetWorkspaceSize);
-        NNOPBASE_ASSERT_OK_RETVAL(aclnnContiguousGetWorkspaceSize(inUnContTensors, &inContWorkspaceSize, &aclInExecutor));
+    if ((NnopbaseGetSocName == NULL && NnopbaseGetSocEnum == NULL) || (currentSocName != NULL && NnopbaseMatchSocName(currentSocName, socMatch0Names, 1)) || (currentSocName == NULL && NnopbaseMatchSocEnum(currentSocEnum, socMatch0Enums, 1))) {
+        NnopbaseGetUnContiguousTensors(*executor, &inUnContTensors);
+        aclOpExecutor *aclInExecutor = nullptr;
+        if (inUnContTensors != nullptr) {
+            static AclnnContiguousGetWorkspaceSizeFunc aclnnContiguousGetWorkspaceSize = (AclnnContiguousGetWorkspaceSizeFunc)NnopbaseGetApiFunc("aclnnContiguousGetWorkspaceSize");
+            NNOPBASE_ASSERT_NOTNULL_RETVAL(aclnnContiguousGetWorkspaceSize);
+            NNOPBASE_ASSERT_OK_RETVAL(aclnnContiguousGetWorkspaceSize(inUnContTensors, &inContWorkspaceSize, &aclInExecutor));
+        }
+        NnopbaseSetUnContExecutor(*executor, aclInExecutor, inContWorkspaceSize);
     }
-    NnopbaseSetUnContExecutor(*executor, aclInExecutor, inContWorkspaceSize);
 
     NNOPBASE_ASSERT_OK_RETVAL(NnopbaseRunForWorkspace(*executor, workspaceSize));
 
@@ -230,32 +271,41 @@ aclnnStatus aclnnRefContiguousTest(
 {
     uint64_t timeStamp = NnopbaseMsprofSysTime();
     static NnopbaseDfxId dfxId = {0x60000, __func__, false};
+    const char *currentSocName = (NnopbaseGetSocName != NULL) ? NnopbaseGetSocName() : NULL;
+    uint32_t currentSocEnum = SOC_VERSION_INVALID;
+    if (currentSocName == NULL && NnopbaseGetSocEnum != NULL) {
+        currentSocEnum = NnopbaseGetSocEnum();
+    }
     uint64_t inContWorkspaceSize = 0U;
     aclOpExecutor *aclInExecutor = nullptr;
     void *inWorkspace = nullptr;
     aclOpExecutor *viewcopyExecutor = nullptr;
     const aclTensorList *viewcopyTensors = nullptr;
-    NnopbaseGetUnContExecutor(executor, &aclInExecutor, &inContWorkspaceSize);
-    if (workspaceSize < inContWorkspaceSize) {
-        NnopbaseOpLogE(ACLNN_ERR_PARAM_INVALID, "input workspaceSize must be larger than contiguous size!");
-        return ACLNN_ERR_PARAM_INVALID;
+    if ((NnopbaseGetSocName == NULL && NnopbaseGetSocEnum == NULL) || (currentSocName != NULL && NnopbaseMatchSocName(currentSocName, socMatch0Names, 1)) || (currentSocName == NULL && NnopbaseMatchSocEnum(currentSocEnum, socMatch0Enums, 1))) {
+        NnopbaseGetUnContExecutor(executor, &aclInExecutor, &inContWorkspaceSize);
+        if (workspaceSize < inContWorkspaceSize) {
+            NnopbaseOpLogE(ACLNN_ERR_PARAM_INVALID, "input workspaceSize must be larger than contiguous size!");
+            return ACLNN_ERR_PARAM_INVALID;
+        }
+        workspaceSize -= inContWorkspaceSize;
+        inWorkspace = (char *)workspace + workspaceSize;
+        if (aclInExecutor != nullptr) {
+            static AclnnFunc aclnnContiguous = (AclnnFunc)NnopbaseGetApiFunc("aclnnContiguous");
+            NNOPBASE_ASSERT_NOTNULL_RETVAL(aclnnContiguous);
+            NNOPBASE_ASSERT_OK_RETVAL(aclnnContiguous(inWorkspace, inContWorkspaceSize, aclInExecutor, stream));
+        }
+        NNOPBASE_ASSERT_OK_RETVAL(NnopbaseGetViewCopyExecutor(executor, &viewcopyExecutor));
+        NNOPBASE_ASSERT_OK_RETVAL(NnopbaseReleaseRefContiguousTensors(executor, &viewcopyTensors));
     }
-    workspaceSize -= inContWorkspaceSize;
-    inWorkspace = (char *)workspace + workspaceSize;
-    if (aclInExecutor != nullptr) {
-        static AclnnFunc aclnnContiguous = (AclnnFunc)NnopbaseGetApiFunc("aclnnContiguous");
-        NNOPBASE_ASSERT_NOTNULL_RETVAL(aclnnContiguous);
-        NNOPBASE_ASSERT_OK_RETVAL(aclnnContiguous(inWorkspace, inContWorkspaceSize, aclInExecutor, stream));
-    }
-    NNOPBASE_ASSERT_OK_RETVAL(NnopbaseGetViewCopyExecutor(executor, &viewcopyExecutor));
-    NNOPBASE_ASSERT_OK_RETVAL(NnopbaseReleaseRefContiguousTensors(executor, &viewcopyTensors));
     NNOPBASE_ASSERT_OK_RETVAL(NnopbaseRunWithWorkspace(executor, stream, workspace, workspaceSize));
-    if (viewcopyExecutor != nullptr) {
-        static AclnnFunc aclnnViewCopy = (AclnnFunc)NnopbaseGetApiFunc("aclnnViewCopy");
-        NNOPBASE_ASSERT_NOTNULL_RETVAL(aclnnViewCopy);
-        NNOPBASE_ASSERT_OK_RETVAL(aclnnViewCopy(inWorkspace, inContWorkspaceSize, viewcopyExecutor, stream));
-        if (viewcopyTensors != nullptr) {
-            NNOPBASE_ASSERT_OK_RETVAL(aclDestroyTensorList(viewcopyTensors));
+    if ((NnopbaseGetSocName == NULL && NnopbaseGetSocEnum == NULL) || (currentSocName != NULL && NnopbaseMatchSocName(currentSocName, socMatch0Names, 1)) || (currentSocName == NULL && NnopbaseMatchSocEnum(currentSocEnum, socMatch0Enums, 1))) {
+        if (viewcopyExecutor != nullptr) {
+            static AclnnFunc aclnnViewCopy = (AclnnFunc)NnopbaseGetApiFunc("aclnnViewCopy");
+            NNOPBASE_ASSERT_NOTNULL_RETVAL(aclnnViewCopy);
+            NNOPBASE_ASSERT_OK_RETVAL(aclnnViewCopy(inWorkspace, inContWorkspaceSize, viewcopyExecutor, stream));
+            if (viewcopyTensors != nullptr) {
+                NNOPBASE_ASSERT_OK_RETVAL(aclDestroyTensorList(viewcopyTensors));
+            }
         }
     }
     NnopbaseReportApiInfo(timeStamp, dfxId);
