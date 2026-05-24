@@ -30,47 +30,6 @@ Tensor API的接口调用一般遵循以下四个步骤：
 3. **构造张量**：通过MakeTensor(ptr, layout)将内存指针与布局绑定，生成带有完整类型信息的属性张量；
 4. **调用操作接口**：将张量传入 Copy（数据搬运）或Mmad（矩阵计算），编译器根据张量的存储位置、布局模式和数据类型自动选择底层硬件指令实现。
 
-### Tensor 层接口
-
-Tensor层是Tensor API的数据抽象层，负责描述"数据在哪里、长什么样、如何访问"。通过生成带类型标签的张量对象，供Copy和Mmad接口消费。
-
-核心组件及对应接口：
-
-- **内存指针**：MakeMemPtr(...)标记数据的物理存储位置和基地址。Location支持 `GM`、`L1`、`L0A`、`L0B`、`L0C`、`UB`、`BIAS`、`FIXBUF`。
-- **形状与步长**：`MakeShape(...)`、`MakeStride(...)`定义张量各维度大小、步长。
-- **坐标**：`MakeCoord(...)` 描述多维坐标点；`Crd2Idx(coord, shape, stride)` 将多维坐标转换为一维线性索引。
-- **布局**：
-  - `MakeLayout(shape, stride)` 构造自由形状+步长的通用布局；
-  - `MakeFrameLayout<LayoutPtn, LayoutTrait>(...)` 构造硬件标准分形排布布局，附带数据类型和量化属性。
-  - 支持 5 种 Frame 布局模式：`ND`（连续排列）、`NZ`（矩阵分形）、`ZN`（NZ 的转置形式）、`DN`（反交织排列）、`ZNZ`（双重分形排列）。
-- **张量构造**：`MakeTensor(ptr, ...args)` 将内存指针与一个或多个布局绑定，生成带完整类型信息的属性张量。
-- **切片操作**：`Slice(tensor, coord, info)` 从张量指定坐标处切出一个子张量，保持与原张量相同的存储位置。
-- **属性查询**：`Get()`、`Size()`、`Rank()`、`Cosize()`、`Select()`、`Capacity()` 对布局对象查询维度、大小、秩、容量等属性。
-- **元组操作**：`Get<I>(tuple)` 从编译期元组中提取指定位置的元素。
-
-### Atom层
-
-将操作类型和特征参数组合，映射到昇腾处理器的硬件指令：
-
-- **Atom**：原子操作对象
-  - CopyAtom：数据搬运原子操作；
-  - MmadAtom：矩阵乘加原子操作。
-- **Traits**：特征参数配置，包含Operation和自定义Trait
-  - CopyTraits：数据搬运特征配置；
-  - MmadTraits：矩阵乘加特征配置。
-- **Operation**：操作类型，指定数据通路
-  - 数据搬运：CopyGM2L1、CopyL12L0、CopyL0C2Out等；
-  - 矩阵计算：MmadOperation等。
-
-### Arch层接口
-
-封装硬件指令的底层接口，对参数进行处理后调用硬件指令，用户也可以直接调用：
-
-- **Copy**: GM到L1 Buffer，L1 Buffer到BiasTable Buffer/Fixpipe Buffer的数据搬运指令；
-- **Mmad**: L1 Buffer到L0A Buffer/L0B Buffer的数据加载指令；
-- **Fixpipe**: L0C Buffer到GM/UB的数据输出指令；
-- **Mmad**: 矩阵乘加计算指令。
-
 ## 参考资源
 
 ### 数据结构和列表

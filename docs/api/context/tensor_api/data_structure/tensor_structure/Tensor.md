@@ -1,92 +1,143 @@
-# LocalTensor简介
+# Tensor
 
-LocalTensor由MakeTensor将内存指针适配器（Engine）与布局对象（Layout）绑定后生成。它封装了"数据在哪里（Engine）、数据长什么样（Layout）、如何访问（operator[]/operator()）"的全部信息，并作为`Copy`（数据搬运）和`Mmad`（矩阵计算）的统一操作数类型。
+## 产品支持情况
 
-`LocalTensor`的完整类型为：
+| 产品 | 是否支持 |
+| ----------- | :----: |
+| Ascend 950PR/Ascend 950DT | √ |
 
-```
-LocalTensor<EngineType, LayoutType>
-```
+## 功能说明
 
-## 需要包含的头文件
+头文件为：#include "tensor_api/tensor.h"
 
-```cpp
-#include "tensor_api/tensor.h"
-```
+Tensor用于将内存访问引擎Engine与布局Layout绑定起来。Engine描述物理存储位置和访问方式，Layout描述数据的形状和布局。Tensor分为GlobalTensor和LaocalTensoe两种，其中GlobalTensor用来存放Global Memory（外部存储）的全局数据，LocalTensor用于存放AI Core中Local Memory（内部存储）的数据。二者的公共接口由BaseTensor<TensorAttribute<EngineType, LayoutType>>提供。
 
 ## 原型定义
 
 ```cpp
 template <typename EngineType, typename LayoutType>
-struct LocalTensor<EngineType, LayoutType>
-{
+struct TensorAttribute {};
+
+template <typename T>
+struct BaseTensor {};
+
+template <typename EngineType, typename LayoutType>
+struct BaseTensor<TensorAttribute<EngineType, LayoutType>> {
+    using iterator = typename EngineType::iterator;
+    using valueType = typename EngineType::valueType;
+    using elementType = typename EngineType::elementType;
+    using reference = typename EngineType::reference;
+
     using engineType  = EngineType;
     using layoutType  = LayoutType;
+
     static constexpr int rank = LayoutType::rank;
 
-    __aicore__ inline constexpr LocalTensor()
-    __aicore__ inline constexpr LocalTensor(const EngineType& engine, const LayoutType& layout)
+    __aicore__ inline BaseTensor();
+    __aicore__ inline BaseTensor(const EngineType& engine, const LayoutType& layout);
 
-    __aicore__ inline constexpr decltype(auto) Tensor() const
-    __aicore__ inline constexpr decltype(auto) Engine() const
-    __aicore__ inline constexpr decltype(auto) Engine()
-    __aicore__ inline constexpr decltype(auto) Layout() const
-    __aicore__ inline constexpr decltype(auto) Data() const
-    __aicore__ inline constexpr decltype(auto) Shape() const
-    __aicore__ inline constexpr decltype(auto) Stride() const
-    __aicore__ inline constexpr auto Size() const
-    __aicore__ inline constexpr auto Capacity() const
-
-    template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord)
-    template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const
+    __aicore__ inline constexpr decltype(auto) Tensor() const;
+    __aicore__ inline constexpr decltype(auto) Engine() const;
+    __aicore__ inline constexpr decltype(auto) Engine();
+    __aicore__ inline constexpr decltype(auto) Layout() const;
+    __aicore__ inline constexpr decltype(auto) Data() const;
+    __aicore__ inline constexpr decltype(auto) Data();
+    __aicore__ inline constexpr decltype(auto) Shape() const;
+    __aicore__ inline constexpr decltype(auto) Stride() const;
+    __aicore__ inline constexpr auto Size() const;
+    __aicore__ inline constexpr auto Capacity() const;
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord)
+    __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord);
+
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const
+    __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const;
+
+    template <typename Coord>
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord);
+
+    template <typename Coord>
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const;
+
+    template <typename Coord0, typename Coord1, typename... Coords>
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs);
+
+    template <typename Coord0, typename Coord1, typename... Coords>
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const;
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info)
+    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info);
 
-    __aicore__ inline constexpr void SetL2CacheHint(CacheMode mode)
+    template <typename Coord, typename Info>
+    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const;
+};
+
+template <typename EngineType, typename LayoutType>
+struct GlobalTensor<TensorAttribute<EngineType, LayoutType>>
+    : public BaseTensor<TensorAttribute<EngineType, LayoutType>> {
+    __aicore__ inline GlobalTensor() = default;
+    __aicore__ inline constexpr void SetL2CacheHint(Te::CacheMode mode);
+};
+
+template <typename EngineType, typename LayoutType>
+struct LocalTensor<TensorAttribute<EngineType, LayoutType>>
+    : public BaseTensor<TensorAttribute<EngineType, LayoutType>> {
+    __aicore__ inline LocalTensor() = default;
 };
 ```
 
+## 参数说明
+
+模板参数说明
+
+| 参数名 | 类型 | 描述 |
+|--------|------|------|
+| EngineType | 输入 | 张量的内存访问引擎类型。 |
+| LayoutType | 输入 | 张量的布局类型，用于描述Shape和Stride。 |
+| T | 输入 | 泛型模板参数，用于基础模板或特化匹配。 |
+
+## 返回值说明
+
+Tensor相关类型本身为类型定义，不直接返回值。
+
+通过MakeTensor(...)构造张量时：若存放Global Memory（外部存储）的全局数据，则返回GlobalTensor，存放AI Core中Local Memory（内部存储）的数据返回LocalTensor。
+
 ## 成员函数
+
 ### Tensor()
 
 - 功能说明
 
-    获取张量对象。
+    获取张量对象自身。
 
 - 函数原型
+
   ```cpp
   __aicore__ inline constexpr decltype(auto) Tensor() const
   ```
 
 - 返回值说明
-    
-    返回LocalTensor的常量引用。
+
+    返回当前Tensor对象的常量引用。
 
 ---
 
-### Engine() 
+### Engine()
 
 - 功能说明
 
-    获取ViewEngine对象。
+    获取张量绑定的Engine对象。
 
 - 函数原型
+
   ```cpp
   __aicore__ inline constexpr decltype(auto) Engine() const
   __aicore__ inline constexpr decltype(auto) Engine()
   ```
 
 - 返回值说明
-    
-    返回ViewEngine对象的（常量）引用。
+
+    返回Engine对象的（常量）引用。
 
 ---
 
@@ -94,9 +145,10 @@ struct LocalTensor<EngineType, LayoutType>
 
 - 功能说明
 
-    获取Layout对象。
+    获取张量绑定的Layout对象。
 
 - 函数原型
+
   ```cpp
   __aicore__ inline constexpr decltype(auto) Layout() const
   ```
@@ -111,17 +163,18 @@ struct LocalTensor<EngineType, LayoutType>
 
 - 功能说明
 
-    获取数据指针。
+    获取底层数据起始迭代器。
 
 - 函数原型
+
   ```cpp
   __aicore__ inline constexpr decltype(auto) Data() const
   __aicore__ inline constexpr decltype(auto) Data()
   ```
 
 - 返回值说明
-    
-    返回数据迭代器的（常量）引用。
+
+    返回`Engine().Begin()`的结果，即数据起始迭代器的（常量）引用或值。
 
 ---
 
@@ -129,16 +182,17 @@ struct LocalTensor<EngineType, LayoutType>
 
 - 功能说明
 
-    获取Shape信息。
+    获取张量对应的Shape信息。
 
 - 函数原型
+
   ```cpp
   __aicore__ inline constexpr decltype(auto) Shape() const
   ```
 
 - 返回值说明
 
-    返回Shape元组。
+    返回Layout中的Shape对象。
 
 ---
 
@@ -146,16 +200,17 @@ struct LocalTensor<EngineType, LayoutType>
 
 - 功能说明
 
-    获取Stride信息。
+    获取张量对应的Stride信息。
 
 - 函数原型
+
   ```cpp
   __aicore__ inline constexpr decltype(auto) Stride() const
   ```
 
 - 返回值说明
-    
-    返回Stride元组。
+
+    返回Layout中的Stride对象。
 
 ---
 
@@ -163,41 +218,46 @@ struct LocalTensor<EngineType, LayoutType>
 
 - 功能说明
 
-    获取元素总数。
+    获取张量覆盖的逻辑元素总数。
 
 - 函数原型
+
   ```cpp
   __aicore__ inline constexpr auto Size() const
   ```
 
 - 返回值说明
 
-    返回LocalTensor的元素总数。
+    返回`Layout().Size()`的计算结果。
 
 ---
 
-### Capacity() 
+### Capacity()
+
 - 功能说明
 
-    获取总容量。当非连续存储时，容量可能大于实际元素数量。
+    获取张量在当前布局下占用的实际容量。
 
 - 函数原型
+
   ```cpp
   __aicore__ inline constexpr auto Capacity() const
   ```
 
 - 返回值说明
 
-    返回LocalTensor的总容量。
+    返回`Layout().Capacity()`的计算结果。
 
 ---
 
-### operator[] 
+### operator[]
+
 - 功能说明
-    
-    坐标访问元素。
+
+    按多维坐标访问单个元素。
 
 - 函数原型
+
   ```cpp
   template <typename Coord>
   __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord)
@@ -208,142 +268,133 @@ struct LocalTensor<EngineType, LayoutType>
 
 - 参数说明
 
-  | 参数名  | 输入/输出 | 描述 |
+  | 参数名 | 输入/输出 | 描述 |
   | :----- | :------- | :------- |
-  | coord | 输入 | 坐标元组。 |
+  | coord | 输入 | 多维逻辑坐标。 |
 
 - 返回值说明
 
-    返回对应位置的元素引用。
+    返回Data()[Layout()(coord)]对应的元素引用。
 
 ---
 
 ### operator()
+
 - 功能说明
 
-    该接口以coord作为起始坐标，返回一个从当前位置开始的子LocalTensor。
+    以给定坐标为起点，返回一个从当前位置开始的子张量。
 
 - 函数原型
+
   ```cpp
   template <typename Coord>
   __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord)
-  
+
   template <typename Coord>
   __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const
-  
+
   template <typename Coord0, typename Coord1, typename... Coords>
   __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs)
-  
+
   template <typename Coord0, typename Coord1, typename... Coords>
   __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const
   ```
 
 - 参数说明
 
-  | 参数名  | 输入/输出 | 描述 |
+  | 参数名 | 输入/输出 | 描述 |
   | :----- | :------- | :------- |
-  | coord | 输入 | 偏移坐标。 |
-  | c0, c1, cs... | 输入 | 多个坐标参数。 |
+  | coord | 输入 | 起始坐标元组。 |
+  | c0, c1, cs... | 输入 | 多个坐标参数，会被包装为MakeCoord(c0, c1, cs...)。 |
 
 - 返回值说明
 
-    返回由coord（或c0、c1...）指定偏移位置的LocalTensor对象引用。
+    返回从指定坐标位置开始的子张量对象。
 
 ---
 
-### Slice(const Coord& coord, const Info& info) 
+### Slice()
 
 - 功能说明
 
-    分块访问。
-
-    该接口以coord作为起始坐标，并结合info信息返回一个从当前位置开始的子LocalTensor。
-
-    info支持两种形式：
-
-    1. 传入Shape
-       表示按给定形状截取子张量。
-       - info必须是二维Shape；
-       - 当前Tensor中的Layout只支持二维或四维；
-       - 若当前Tensor为二维Layout，则返回二维子Layout；
-       - 若当前Tensor为四维Layout，则在保持原布局模式的前提下，按二维逻辑区域裁剪后返回四维子Layout。
-
-    2. 传入Layout
-       表示按给定Layout的Shape信息截取子张量。
-       - info必须是Layout对象；
-       - info的维度必须与当前Tensor中Layout的维度相同；
-       - 返回结果保持当前Tensor的布局模式和stride，只更新切片后的shape。
+    从指定坐标处切出一个带新布局信息的子张量。
 
 - 函数原型
 
   ```cpp
-    template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) 
-  
-    template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const
+  template <typename Coord, typename Info>
+  __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info)
+
+  template <typename Coord, typename Info>
+  __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const
   ```
 
 - 参数说明
 
-  | 参数名  | 输入/输出 | 描述 |
+  | 参数名 | 输入/输出 | 描述 |
   | :----- | :------- | :------- |
-  | coord | 输入 | 起始坐标。 |
-  | info | 输入 | 分块信息。可以传入二维Shape，也可以传入与当前Tensor的Layou维度相同的Layout。 |
+  | coord | 输入 | 切片起始坐标。 |
+  | info | 输入 | 切片描述信息，可以为Shape或Layout。 |
 
 - 返回值说明
 
-    返回从coord指定位置开始的子LocalTensor。返回结果包含新的Layout信息，Engine指向切片后的起始位置。
+    返回切片后的子张量对象。新张量的Engine指向切片起始位置，Layout由`MakeSliceLayout(coord, Layout(), info)`生成。
+
+---
+
+### SetL2CacheHint()
+
+- 功能说明
+
+    设置GlobalTensor访问GM时的L2 Cache Hint。
+
+- 函数原型
+
+  ```cpp
+  __aicore__ inline constexpr void SetL2CacheHint(Te::CacheMode mode)
+  ```
+
+- 参数说明
+
+  | 参数名 | 输入/输出 | 描述 |
+  | :----- | :------- | :------- |
+  | mode | 输入 | L2缓存模式。 |
+
+- 返回值说明
+
+    无返回值。
 
 - 约束说明
 
-    - coord的tuple结构必须与当前Tensor的Layout.Shape()结构一致。
-    - 当info为Shape时：info必须是二维Shape；当前Tensor的Layout必须为二维或四维。
-    - 当info为Layout时，info的必须与当前Tensor的Layout的维度相同。
+    该接口仅存在于GlobalTensor中，LocalTensor不提供此接口。
 
 ## 调用示例
 
-  ```cpp
-  // 示例1：基本LocalTensor创建和访问
-  // 创建L1内存指针
-  constexpr int tileNum = 32;
-  __cbuf__ half data[tileNum];
-  auto l1Ptr = MakeMemPtr(data);
-  auto nzLayout = MakeFrameLayout<NZLayoutPtn, half>(32, 32); // 创建Nz布局
-  auto tensor = MakeTensor(l1Ptr, nzLayout);  // 创建张量
-  auto coord = MakeCoord(5, 10);              // 访问元素 
-  auto value = tensor[coord];
-  tensor[coord] = 2.0f;
-  // 获取张量信息
-  auto size = tensor.Size();          // 1024
-  auto capacity = tensor.Capacity();  // 1024
-  auto shape = tensor.Shape();        // (32, 32)
-  
-  // 示例2：分块操作
-  // 创建张量1
-  auto bigTensor = MakeTensor(
-      MakeMemPtr(data),
-      MakeFrameLayout<NZLayoutPtn, half>(64, 64));
-  // 创建张量2
-  auto smallTensor = MakeTensor(
-      MakeMemPtr(data),
-      MakeFrameLayout<NZLayoutPtn, half>(32, 32));
-  
-  // 示例3：多维张量操作
-  // 创建多维张量
-  auto multiDimTensor = MakeTensor(
-      MakeMemPtr<half>(data),
-      MakeLayout(MakeShape(8, 8, 8)));
-  // 访问多维元素
-  auto value = multiDimTensor(2, 3, 4);
-  // 使用坐标元组
-  auto coord = MakeCoord(2, 3, 4);
-  auto value2 = multiDimTensor(coord);
-  
-  // 示例4：GM内存张量
-  auto gmTensor = MakeTensor(         // 创建GM内存张量
-      MakeMemPtr<half>(gmAddr),     // 省略gmAddr初始化
-      MakeFrameLayout<NDExtLayoutPtn>(128, 128));
-  auto gmValue = gmTensor(10, 20);    // 访问GM数据
-  
-  ```
+```cpp
+using namespace AscendC::Te;
+
+// 示例1：构造一个GM张量
+auto gmLayout = MakeLayout(MakeShape(128, 128), MakeStride(128, 1));
+auto gmTensor = MakeTensor(MakeMemPtr<Location::GM, float>(gmAddr), gmLayout);
+
+auto gmShape = gmTensor.Shape();        // (128, 128)
+auto gmStride = gmTensor.Stride();      // (128, 1)
+auto gmSize = gmTensor.Size();          // 16384
+auto gmCap = gmTensor.Capacity();       // 16384
+gmTensor.SetL2CacheHint(CacheMode::CACHE_MODE_NORMAL);
+
+// 示例2：按坐标访问元素
+auto coord = MakeCoord(5, 10);
+auto value = gmTensor[coord];
+
+// 示例3：获取子张量
+auto subTensor = gmTensor(MakeCoord(16, 16));
+
+// 示例4：按Shape切片
+auto sliceTensor = gmTensor.Slice(MakeCoord(0, 0), MakeShape(32, 32));
+
+// 示例5：构造一个LocalTensor
+auto localLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(32, 32);
+auto localTensor = MakeTensor(MakeMemPtr<Location::L1, float>(l1Addr), localLayout);
+auto localData = localTensor.Data();
+```
