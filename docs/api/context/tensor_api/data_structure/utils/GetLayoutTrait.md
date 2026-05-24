@@ -29,11 +29,7 @@ using GetLayoutTrait = typename GetTraitType<Std::remove_cvref_t<T>>::type;
 
 ## 返回值说明
 
-- 若`T`包含布局特征信息，则返回对应的TraitType；否则返回Std::ignore_t。
-
-## 约束说明
-
-- `T`通常应为Layout类型或可去除引用、cv限定后的Layout类型。
+若T包含Layout布局特征信息，则返回对应的TraitType；否则返回Std::ignore_t。
 
 ## 调用示例
 

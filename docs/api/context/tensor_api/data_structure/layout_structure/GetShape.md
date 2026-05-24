@@ -47,7 +47,7 @@ __aicore__ inline constexpr auto GetShape(Layout<ShapeType, StrideType>& layout)
 
 ## 约束说明
 
-- Is...必须在Shape底层tuple的有效范围内。
+Is...必须在Shape底层tuple的有效范围内。
 
 ## 调用示例
 

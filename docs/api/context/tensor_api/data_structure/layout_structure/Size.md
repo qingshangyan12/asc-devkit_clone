@@ -39,7 +39,7 @@ __aicore__ inline constexpr auto Size(const Layout<Shape, Stride>& layout);
 
 ### 约束说明
 
-- Is...必须为有效范围内的索引。
+Is...必须为有效范围内的索引。
 
 ### 示例代码
 

@@ -14,7 +14,7 @@
 #include "tensor_api/tensor.h"
 ```
 
-`MakeFrameLayout`用于根据标准分形排布模式构造带类型信息的Layout对象。该接口接收矩阵的行数、列数，结合指定的LayoutPattern（排布模式）和LayoutTrait（布局特征参数）计算Shape和Stride，构造Layout对象。
+MakeFrameLayout用于根据标准分形排布模式构造带类型信息的Layout对象。该接口接收矩阵的行数、列数，结合指定的LayoutPattern（排布模式）和LayoutTrait（布局特征参数）计算Shape和Stride，构造Layout对象。
 
 LayoutPattern决定数据在内存中的分形排列方式，不同存储位置间的搬运和计算操作要求源/目的张量满足特定的LayoutPattern组合。
 

@@ -49,7 +49,7 @@ __aicore__ inline constexpr auto Get(const Layout<Shape, Stride>& layout)
 
 ## 约束说明
 
-- Is...必须为有效范围内的索引。
+Is...必须为有效范围内的索引。
 
 ## 调用示例
 

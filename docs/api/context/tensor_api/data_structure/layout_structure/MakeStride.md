@@ -33,7 +33,7 @@ __aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t)
 
 ## 返回值说明
 
-返回`Stride<Ts...>`对象。
+返回Stride<Ts...>对象。
 
 ## 约束说明
 

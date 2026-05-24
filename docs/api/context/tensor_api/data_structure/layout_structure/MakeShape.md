@@ -33,7 +33,7 @@ __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t)
 
 ## 返回值说明
 
-返回`Shape<Ts...>`对象。
+返回Shape<Ts...>对象。
 
 ## 约束说明
 

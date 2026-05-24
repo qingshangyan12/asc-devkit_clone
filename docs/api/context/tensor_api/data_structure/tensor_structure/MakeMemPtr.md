@@ -10,82 +10,97 @@
 
 头文件为：#include "tensor_api/tensor.h"
 
-`MakeMemPtr`用于构造带物理存储位置标记和数据类型信息的**内存指针适配器**（`HardwareMemPtr`），它是Tensor API三层抽象（Ptr → Layout → Tensor）中的第一层。`MakeMemPtr`生成的指针对象被`MakeTensor`消费，编译器根据指针上的位置标记（`PtrPattern`）在`Copy`或`Mmad`操作中自动选择对应的硬件搬运/计算指令。
+`MakeMemPtr`用于构造带物理存储位置标记和数据类型信息的内存指针适配器HardwareMemPtr。支持的物理位置如[表](#支持的物理位置)所示。
 
-`MakeMemPtr`提供了三种调用形式：
+`MakeMemPtr`提供三种调用形式：
 
-1. **从原始地址构造**：指定物理位置和数据类型，传入基地址偏移量。
-2. **从已有迭代器构造（指定位置）**：接收已有的硬件地址迭代器，强制指定新的物理位置标记。
-3. **从已有迭代器构造（自动推导）**：从迭代器的元素类型中自动推导物理位置标记。
+1. 指定物理位置和数据类型，根据原始地址构造指针。
+2. 指定物理位置，从已有迭代器或指针适配器构造新指针。
+3. 从已有迭代器或指针适配器中自动推导物理位置。
 
 ## 支持的物理位置
 
 | Location | 说明 | 用途 |
 | :--- | :--- | :--- |
-| `Location::GM` | Global Memory | 全局内存，数据收发的大本营 |
-| `Location::L1` | L1 Buffer | 一级缓存，矩阵操作的数据暂存区 |
-| `Location::L0A` | L0A Buffer | 矩阵计算左矩阵输入缓存 |
-| `Location::L0B` | L0B Buffer | 矩阵计算右矩阵输入缓存 |
-| `Location::L0ScaleA` | L0 ScaleA Buffer | MX矩阵计算ScaleA缓存 |
-| `Location::L0ScaleB` | L0 ScaleB Buffer | MX矩阵计算ScaleB缓存 |
-| `Location::L0C` | L0C Buffer | 矩阵计算结果缓存 |
-| `Location::UB` | Unified Buffer | 统一缓存，矢量计算的数据存储区 |
-| `Location::BIAS` | BiasTable Buffer | 偏置表缓存，带偏置矩阵计算的偏置存放区 |
-| `Location::FIXBUF` | Fixpipe Buffer | Fixpipe输出缓存，L0C → GM/UB的中转区 |
+| Location::GM | Global Memory | 全局内存，张量输入输出的主要存储区域 |
+| Location::L1 | L1 Buffer | 一级缓存，矩阵搬运和计算前的数据暂存区 |
+| Location::L0A | L0A Buffer | 矩阵计算左输入缓存 |
+| Location::L0B | L0B Buffer | 矩阵计算右输入缓存 |
+| Location::L0ScaleA | L0 ScaleA Buffer | MX矩阵计算ScaleA缓存 |
+| Location::L0ScaleB | L0 ScaleB Buffer | MX矩阵计算ScaleB缓存 |
+| Location::L0C | L0C Buffer | 矩阵计算结果缓存 |
+| Location::UB | Unified Buffer | 统一缓存，矢量计算的数据存储区 |
+| Location::BIAS | BiasTable Buffer | 偏置表缓存，带偏置矩阵计算的偏置存放区 |
+| Location::FIXBUF | Fixpipe Buffer | Fixpipe输出缓存，L0C到GM/UB的中转区 |
 
 ## 函数原型
 
-- 指定物理位置和数据类型，从原始地址构造。
+- 指定物理位置和数据类型，根据原始地址构造：
 
-    ```cpp
-    template <typename Hardware, typename DataType, typename Addr,
-        EnableMakePtrByTrait<Hardware, Addr> Enable>
-    __aicore__ inline constexpr auto MakeMemPtr(Addr arg)
-    ```
+```cpp
+template <typename Hardware, typename DataType, typename Addr,
+    EnableMakePtrByTrait<Hardware, Addr> Enable>
+__aicore__ inline constexpr auto MakeMemPtr(Addr addr)
+```
 
-- 指定物理位置，从已有迭代器构造。
+- 指定物理位置，从已有迭代器构造：
 
-    ```cpp
-    template <typename Hardware, typename Iterator,
-        EnableMakeHardwarePtr<Hardware, Iterator> Enable>
-    __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
-    ```
+```cpp
+template <typename Hardware, typename Iterator,
+    EnableMakeHardwarePtr<Hardware, Iterator> Enable>
+__aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
+```
 
-- 从已有迭代器中自动推导物理位置。
+- 从已有迭代器中自动推导物理位置：
 
-    ```cpp
-    template <typename Iterator, EnableMakePtrByIter<Iterator> Enable>
-    __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
-    ```
+```cpp
+template <typename Iterator, EnableMakePtrByIter<Iterator> Enable>
+__aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
+```
 
 ## 参数说明
 
-| 参数名 | 输入/输出 | 描述 |
+**表 1** 模板参数说明
+
+| 参数名 | 类型 | 描述 |
 | :--- | :---: | :--- |
-| `Hardware` | 输入 | 物理存储位置。|
-| `DataType` | 输入 | 数据类型。 |
-| `Addr` | 输入 | 原始地址偏移量（通常为字节偏移），从该地址构造指向对应物理位置的指针适配器。 |
-| `Iterator`| 输入 | 已有的硬件地址迭代器或指针适配器。|
+| Hardware | 输入 | 物理存储位置类型。 |
+| DataType | 输入 | 数据类型。 |
+| Addr | 输入 | 原始地址类型。 |
+| Iterator | 输入 | 迭代器类型或已有指针适配器类型。 |
+
+**表 2** 参数说明
+
+| 参数名 | 类型 | 描述 |
+| :--- | :---: | :--- |
+| addr | 输入 | 原始地址或地址偏移量。 |
+| iterator | 输入 | 已有的硬件地址迭代器或指针适配器对象。 |
 
 ## 返回值说明
 
 返回`HardwareMemPtr<PtrPattern, Pointer>`类型的指针适配器对象，其中：
 
-- `PtrPattern`为指定的`Hardware`物理位置；
-- `Pointer`为对应的硬件地址空间指针类型（如 `__gm__ float*`、`__cbuf__ half*`等）。
+- `PtrPattern`表示指定或推导得到的物理位置；
+- `Pointer`表示对应地址空间下的指针类型，例如`__gm__ float*`、`__cbuf__ half*`等。
+
+## 约束说明
+
+- 指定`Hardware`时，必须是受支持的物理位置类型。
+- `Iterator`需要满足对应构造路径的模板约束。
+- 自动推导形式要求输入对象本身已经带有可识别的硬件位置信息。
 
 ## 调用示例
 
 ```cpp
 using namespace AscendC::Te;
 
-// 1. 从原始偏移地址构造：指定物理位置和数据类型
+// 1. 从原始地址构造：指定物理位置和数据类型
 auto gmPtr = MakeMemPtr<Location::GM, float>(gmBuf);
 auto l1Ptr = MakeMemPtr<Location::L1, float>(l1Buf);
 auto l0aPtr = MakeMemPtr<Location::L0A, half>(l0aBuf);
 auto ubPtr = MakeMemPtr<Location::UB, bfloat16_t>(ubBuf);
 
-// 2. 配合 MakeTensor 构造张量
+// 2. 配合MakeTensor构造张量
 auto gmA = MakeTensor(gmPtr, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
 auto l1A = MakeTensor(l1Ptr, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
