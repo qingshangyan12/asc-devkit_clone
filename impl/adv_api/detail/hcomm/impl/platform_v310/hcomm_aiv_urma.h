@@ -92,12 +92,14 @@ __aicore__ inline void HcommUrmaFillSgeCtx(__ubuf__ HcommUrmaSgeCtx* sgeCtx, uin
 __aicore__ inline void HcommUrmaDumpSgeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __ubuf__ uint8_t* sgeAddr)
 {
     if (sqeCtx == nullptr || sgeAddr == nullptr) {
-        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA SGE: nullptr");
+        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA WQE: nullptr pointer");
         return;
     }
     __ubuf__ HcommUrmaSgeCtx* sgeCtx = (__ubuf__ HcommUrmaSgeCtx*)sgeAddr;
     for (uint32_t i = 0; i < sqeCtx->sgeNum; i++) {
-        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA SGE: idx=%u len=%u va=%p", i, sgeCtx->len, sgeCtx->va);
+        auto sgeLen = sgeCtx->len;
+        auto sgeRmtAddr = sgeCtx->va;
+        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA SGE: sge idx: %d, va: %p sge_len: %d", i, sgeRmtAddr, sgeLen);
         sgeCtx++;
     }
 }
@@ -105,57 +107,58 @@ __aicore__ inline void HcommUrmaDumpSgeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __u
 __aicore__ inline void HcommUrmaDumpWqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx)
 {
     if (sqeCtx == nullptr) {
-        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA WQE: nullptr");
+        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA WQE: nullptr pointer");
         return;
     }
-    uint32_t sqeBbIdx = sqeCtx->sqeBbIdx;
-    uint32_t flag = sqeCtx->flag;
-    uint32_t rsv0 = sqeCtx->rsv0;
-    uint32_t nf = sqeCtx->nf;
-    uint32_t tokenEn = sqeCtx->tokenEn;
-    uint32_t rmtJettyType = sqeCtx->rmtJettyType;
-    uint32_t owner = sqeCtx->owner;
-    uint32_t targetHint = sqeCtx->targetHint;
-    uint32_t opcode = sqeCtx->opcode;
-    uint32_t rsv1 = sqeCtx->rsv1;
-    uint32_t inlineMsgLen = sqeCtx->inlineMsgLen;
-    uint32_t tpId = sqeCtx->tpId;
-    uint32_t sgeNum = sqeCtx->sgeNum;
-    uint32_t rmtJettyOrSegId = sqeCtx->rmtJettyOrSegId;
-    uint32_t rsv2 = sqeCtx->rsv2;
-    uint32_t rmtTokenValue = sqeCtx->rmtTokenValue;
-    uint32_t udfType = sqeCtx->udfType;
-    uint32_t reduceDataType = sqeCtx->reduceDataType;
-    uint32_t reduceOpcode = sqeCtx->reduceOpcode;
-    uint32_t rsv3 = sqeCtx->rsv3;
-    uint32_t rmtAddrLOrTokenId = sqeCtx->rmtAddrLOrTokenId;
-    uint32_t rmtAddrHOrTokenValue = sqeCtx->rmtAddrHOrTokenValue;
+    auto sqeBbIdx = sqeCtx->sqeBbIdx;
+    auto flag = sqeCtx->flag;
+    auto rsv0 = sqeCtx->rsv0;
+    auto nf = sqeCtx->nf;
+    auto tokenEn = sqeCtx->tokenEn;
+    auto rmtJettyType = sqeCtx->rmtJettyType;
     KERNEL_LOG(KERNEL_INFO,
-        "Hcomm URMA WQE: sqeBbIdx=%u flag=%u rsv0=%u nf=%u tokenEn=%u rmtJettyType=%u owner=%u",
-        sqeBbIdx, flag, rsv0, nf, tokenEn, rmtJettyType, owner);
+        "Hcomm URMA WQE: sqe_bb_idx: %x flag: %x rsv0: %x nf: %x token_en: %x rmt_jetty_type: %x",
+        sqeBbIdx, flag, rsv0, nf, tokenEn, rmtJettyType);
+    auto owner = sqeCtx->owner;
+    auto targetHint = sqeCtx->targetHint;
+    auto opcode = sqeCtx->opcode;
+    auto rsv1 = sqeCtx->rsv1;
+    auto inlineMsgLen = sqeCtx->inlineMsgLen;
+    auto tpId = sqeCtx->tpId;
     KERNEL_LOG(KERNEL_INFO,
-        "Hcomm URMA WQE: targetHint=%u opcode=%u rsv1=%u inlineMsgLen=%u tpId=%u sgeNum=%u",
-        targetHint, opcode, rsv1, inlineMsgLen, tpId, sgeNum);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA WQE: rmtJettyOrSegId=%u rsv2=%u rmtTokenValue=%u",
-        rmtJettyOrSegId, rsv2, rmtTokenValue);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA WQE: rmtEidL=%llu rmtEidH=%llu",
-        static_cast<unsigned long long>(sqeCtx->rmtEidL), static_cast<unsigned long long>(sqeCtx->rmtEidH));
+        "Hcomm URMA WQE: owner: %x target_hint: %x opcode: %x rsv1: %x inline_msg_len: %x tp_id: %x",
+        owner, targetHint, opcode, rsv1, inlineMsgLen, tpId);
+    auto sgeNum = sqeCtx->sgeNum;
+    auto rmtJettyOrSegId = sqeCtx->rmtJettyOrSegId;
+    auto rsv2 = sqeCtx->rsv2;
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA WQE: sge_num: %x rmt_jetty_or_seg_id: %x rsv2: %x",
+        sgeNum, rmtJettyOrSegId, rsv2);
+    auto rmtEidL = sqeCtx->rmtEidL;
+    auto rmtEidH = sqeCtx->rmtEidH;
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA WQE: rmt_eid: %x, %x", rmtEidL, rmtEidH);
+    auto rmtTokenValue = sqeCtx->rmtTokenValue;
+    auto udfType = sqeCtx->udfType;
+    auto reduceDataType = sqeCtx->reduceDataType;
+    auto reduceOpcode = sqeCtx->reduceOpcode;
     KERNEL_LOG(KERNEL_INFO,
-        "Hcomm URMA WQE: udfType=%u reduceDataType=%u reduceOpcode=%u rsv3=%u rmtAddrLOrTokenId=%u "
-        "rmtAddrHOrTokenValue=%u",
-        udfType, reduceDataType, reduceOpcode, rsv3, rmtAddrLOrTokenId, rmtAddrHOrTokenValue);
+        "Hcomm URMA WQE: rmt_token_value: %x udf_type: %x reduce_data_type: %x reduce_opcode: %x",
+        rmtTokenValue, udfType, reduceDataType, reduceOpcode);
+    auto rmtAddrLOrTokenId = sqeCtx->rmtAddrLOrTokenId;
+    auto rmtAddrHOrTokenValue = sqeCtx->rmtAddrHOrTokenValue;
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA WQE: rmt_addr_l_or_token_id: %x rmt_addr_h_or_token_value: %x",
+        rmtAddrLOrTokenId, rmtAddrHOrTokenValue);
     __ubuf__ uint8_t* sgeAddr = (__ubuf__ uint8_t*)sqeCtx + sizeof(HcommUrmaSqeCtx);
     if (opcode == static_cast<uint32_t>(HcommUrmaOpCode::WRITE_WITH_NOTIFY)) {
         __ubuf__ HcommUrmaNotifyCtx* notifyCtx = (__ubuf__ HcommUrmaNotifyCtx*)sgeAddr;
-        uint32_t notifyTokenId = notifyCtx->notifyTokenId;
-        uint32_t notifyTokenValue = notifyCtx->notifyTokenValue;
-        uint32_t notifyAddrL = notifyCtx->notifyAddrL;
-        uint32_t notifyAddrH = notifyCtx->notifyAddrH;
-        uint32_t notifyDataL = notifyCtx->notifyDataL;
-        uint32_t notifyDataH = notifyCtx->notifyDataH;
+        auto notifyTokenId = notifyCtx->notifyTokenId;
+        auto notifyTokenValue = notifyCtx->notifyTokenValue;
+        auto notifyAddrL = notifyCtx->notifyAddrL;
+        auto notifyAddrH = notifyCtx->notifyAddrH;
+        auto notifyDataL = notifyCtx->notifyDataL;
+        auto notifyDataH = notifyCtx->notifyDataH;
         KERNEL_LOG(KERNEL_INFO,
-            "Hcomm URMA WQE: notifyTokenId=%u notifyTokenValue=%u notifyAddrL=%u notifyAddrH=%u notifyDataL=%u "
-            "notifyDataH=%u",
+            "Hcomm URMA WQE: notifyTokenId: %x notifyTokenValue: %x notifyAddrL: %x notifyAddrH: %x notifyDataL: %x "
+            "notifyDataH: %x",
             notifyTokenId, notifyTokenValue, notifyAddrL, notifyAddrH, notifyDataL, notifyDataH);
         sgeAddr += sizeof(HcommUrmaNotifyCtx);
     }
@@ -165,7 +168,7 @@ __aicore__ inline void HcommUrmaDumpWqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx)
 __aicore__ inline void HcommUrmaDumpCqeCtx(__ubuf__ HcommUrmaJfcCqeCtx* cqeCtx)
 {
     if (cqeCtx == nullptr) {
-        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: nullptr");
+        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: nullptr pointer");
         return;
     }
     uint32_t sR = cqeCtx->sR;
@@ -182,16 +185,18 @@ __aicore__ inline void HcommUrmaDumpCqeCtx(__ubuf__ HcommUrmaJfcCqeCtx* cqeCtx)
     uint32_t rmtIdx = cqeCtx->rmtIdx;
     uint32_t tpn = cqeCtx->tpn;
     KERNEL_LOG(KERNEL_INFO,
-        "Hcomm URMA CQE: sR=%u isJetty=%u owner=%u inlineEn=%u opcode=%u fd=%u substatus=%u status=%u",
+        "Hcomm URMA CQE: DW0 - sR: %d, isJetty: %d, owner: %d, inlineEn: %d, opcode: %d, fd: %d, substatus: %d, status: %d",
         sR, isJetty, owner, inlineEn, opcode, fd, substatus, status);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: entryIdx=%u localNumL=%u localNumH=%u rmtIdx=%u tpn=%u",
-        entryIdx, localNumL, localNumH, rmtIdx, tpn);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: byteCnt=%u userDataH=%u userDataL=%u", cqeCtx->byteCnt,
-        cqeCtx->userDataH, cqeCtx->userDataL);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: rmtEid=[%u,%u,%u,%u]", cqeCtx->rmtEid[0], cqeCtx->rmtEid[1],
-        cqeCtx->rmtEid[2], cqeCtx->rmtEid[3]);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: dataH=%u dataL=%u inlineData=[%u,%u,%u]", cqeCtx->dataH,
-        cqeCtx->dataL, cqeCtx->inlineData[0], cqeCtx->inlineData[1], cqeCtx->inlineData[2]);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: DW1 - entryIdx: %d, localNumL: %d", entryIdx, localNumL);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: DW2 - localNumH: %d, rmtIdx: %d", localNumH, rmtIdx);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: DW3 - tpn: %d", tpn);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: DW4 - byteCnt: %d", cqeCtx->byteCnt);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: DW5-DW6 - userData: 0x%08x%08x", cqeCtx->userDataH, cqeCtx->userDataL);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: DW7-DW10 - rmtEid: [0x%08x, 0x%08x, 0x%08x, 0x%08x]",
+        cqeCtx->rmtEid[0], cqeCtx->rmtEid[1], cqeCtx->rmtEid[2], cqeCtx->rmtEid[3]);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: DW11-DW12 - data: 0x%08x%08x", cqeCtx->dataH, cqeCtx->dataL);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA CQE: DW13-DW15 - inlineData: [0x%08x, 0x%08x, 0x%08x]",
+        cqeCtx->inlineData[0], cqeCtx->inlineData[1], cqeCtx->inlineData[2]);
 }
 
 __aicore__ inline HcommImpl<CommProtocol::URMA, CommEngine::AIV>::HcommImpl() {}
