@@ -8,21 +8,9 @@
 
 ## 功能说明
 
-头文件为：
+头文件为：#include "tensor_api/tensor.h"
 
-```cpp
-#include "tensor_api/tensor.h"
-```
-
-`IsLayoutV`用于判断一个类型是否为Layout类型。
-
-当前实现中，满足以下形式的类型会返回`true`：
-
-```cpp
-Layout<T, U, S>
-```
-
-其中`T`通常为Shape类型，`U`通常为Stride类型，`S`为附加信息类型。
+IsLayoutV用于判断一个类型是否为[Layout](../layout_structure/Layout.md)类型。
 
 ## 原型定义
 
@@ -33,7 +21,7 @@ constexpr bool IsLayoutV = IsLayout<Std::remove_cvref_t<T>>::value;
 
 ## 参数说明
 
-**表 1** 模板参数说明
+模板参数说明
 
 | 参数名 | 类型 | 描述 |
 |--------|------|------|
@@ -41,12 +29,8 @@ constexpr bool IsLayoutV = IsLayout<Std::remove_cvref_t<T>>::value;
 
 ## 返回值说明
 
-- 若`T`是Layout类型，则返回`true`；
-- 否则返回`false`。
-
-## 约束说明
-
-- 判断时会自动去除`T`的引用和cv限定。
+- 若T是Layout类型，则返回true；
+- 否则返回false。
 
 ## 调用示例
 

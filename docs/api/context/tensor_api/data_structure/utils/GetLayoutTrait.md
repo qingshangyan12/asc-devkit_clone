@@ -8,15 +8,9 @@
 
 ## 功能说明
 
-头文件为：
+头文件为：#include "tensor_api/tensor.h"
 
-```cpp
-#include "tensor_api/tensor.h"
-```
-
-`GetLayoutTrait`用于从Layout类型中提取其绑定的LayoutTrait类型信息。
-
-当Layout的第三个模板参数为`Std::tuple<LayoutPattern, TraitType>`时，`GetLayoutTrait<T>`返回对应的`TraitType`；否则返回`Std::ignore_t`。
+GetLayoutTrait用于从Layout类型中提取其LayoutTrait类型信息。
 
 ## 原型定义
 
@@ -27,18 +21,15 @@ using GetLayoutTrait = typename GetTraitType<Std::remove_cvref_t<T>>::type;
 
 ## 参数说明
 
-**表 1** 模板参数说明
+模板参数说明
 
 | 参数名 | 类型 | 描述 |
 |--------|------|------|
-| T | 输入 | 待提取LayoutTrait的类型，通常为Layout类型或其引用/const形式。 |
+| T | 输入 | 待提取LayoutTrait的Layout类型。 |
 
 ## 返回值说明
 
-`GetLayoutTrait<T>`是一个类型别名：
-
-- 若`T`包含布局特征信息，则返回对应的`TraitType`；
-- 否则返回`Std::ignore_t`。
+- 若`T`包含布局特征信息，则返回对应的TraitType；否则返回Std::ignore_t。
 
 ## 约束说明
 

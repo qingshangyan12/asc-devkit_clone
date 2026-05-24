@@ -10,7 +10,7 @@
 
 头文件为：#include "tensor_api/tensor.h"
 
-`IsHardwareV`用于判断一个类型是否为Tensor API中定义的硬件存储位置类型。
+IsHardwareV用于判断一个类型是否为Tensor API中定义的硬件存储位置类型。
 
 ## 原型定义
 
@@ -21,7 +21,7 @@ constexpr bool IsHardwareV = IsHardware<T>::value;
 
 ## 参数说明
 
-**表 1** 模板参数说明
+模板参数说明
 
 | 参数名 | 类型 | 描述 |
 |--------|------|------|

@@ -8,13 +8,9 @@
 
 ## 功能说明
 
-头文件为：
+头文件为：#include "tensor_api/tensor.h"
 
-```cpp
-#include "tensor_api/tensor.h"
-```
-
-`IsIntegralConstantV`用于判断一个类型是否为`Std::Int<Value>`形式的整型编译期常量类型。
+IsIntegralConstantV用于判断一个类型是否为Std::Int<Value>形式的整型编译期常量类型。
 
 ## 原型定义
 
@@ -25,7 +21,7 @@ constexpr bool IsIntegralConstantV = IsIntegralConstant<T>::value;
 
 ## 参数说明
 
-**表 1** 模板参数说明
+模板参数说明
 
 | 参数名 | 类型 | 描述 |
 |--------|------|------|
@@ -33,12 +29,7 @@ constexpr bool IsIntegralConstantV = IsIntegralConstant<T>::value;
 
 ## 返回值说明
 
-- 若`T`是`Std::Int<Value>`类型，则返回`true`；
-- 否则返回`false`。
-
-## 约束说明
-
-- 当前仅对`Std::Int<Value>`特化为`true`，不自动接受其他形式的`integral_constant`。
+- 若T是Std::Int<Value>类型，则返回true；否则返回`false`。
 
 ## 调用示例
 

@@ -8,21 +8,9 @@
 
 ## 功能说明
 
-头文件为：
+头文件为：#include "tensor_api/tensor.h"
 
-```cpp
-#include "tensor_api/tensor.h"
-```
-
-`IsAttrTensorV`用于判断一个类型是否为带`TensorAttribute<Engine, Layout>`属性的张量类型。
-
-当前实现中，满足以下形式的类型会返回`true`：
-
-```cpp
-TensorType<TensorAttribute<Engine, Layout>>
-```
-
-例如`GlobalTensor<TensorAttribute<...>>`和`LocalTensor<TensorAttribute<...>>`。
+IsAttrTensorV用于判断一个类型是否为带Engine, Layout属性的张量[Tensor](../tensor_structure/Tensor.md)类型。
 
 ## 原型定义
 
@@ -33,7 +21,7 @@ constexpr bool IsAttrTensorV = IsAttrTensor<Std::remove_cvref_t<T>>::value;
 
 ## 参数说明
 
-**表 1** 模板参数说明
+模板参数说明
 
 | 参数名 | 类型 | 描述 |
 |--------|------|------|
@@ -41,12 +29,7 @@ constexpr bool IsAttrTensorV = IsAttrTensor<Std::remove_cvref_t<T>>::value;
 
 ## 返回值说明
 
-- 若`T`是属性张量类型，则返回`true`；
-- 否则返回`false`。
-
-## 约束说明
-
-- 判断时会自动去除`T`的引用和cv限定。
+- 若T是张量Tensor类型，则返回true；否则返回false。
 
 ## 调用示例
 
