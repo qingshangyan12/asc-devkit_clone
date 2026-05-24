@@ -68,6 +68,7 @@ detect_os() {
         OS_VERSION=$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release) 2>/dev/null || echo "7")
     else
         OS="unknown"
+        OS_VERSION="unknown"
     fi
     log "检测到系统: $OS $OS_VERSION"
 }
@@ -171,10 +172,11 @@ build_docs() {
     cd "$SCRIPT_DIR"
 
     log "开始构建 VitePress 站点..."
-    pnpm run docs:build 2>&1 | tee -a "$LOG_FILE"
-
-    log "生成 Pagefind 搜索索引..."
-    pnpm run docs:postbuild 2>&1 | tee -a "$LOG_FILE"
+    if command -v pnpm &>/dev/null; then
+        pnpm run docs:build 2>&1 | tee -a "$LOG_FILE"
+    else
+        npm run docs:build 2>&1 | tee -a "$LOG_FILE"
+    fi
 
     DIST_DIR="$SCRIPT_DIR/docs/.vitepress/dist"
     if [ ! -d "$DIST_DIR" ]; then
@@ -279,7 +281,11 @@ NGINX_EOF
 run_preview() {
     cd "$SCRIPT_DIR"
     log "启动预览模式 (Ctrl+C 退出)..."
-    pnpm docs:preview --port "$SERVE_PORT" --host 0.0.0.0
+    if command -v pnpm &>/dev/null; then
+        pnpm docs:preview --port "$SERVE_PORT" --host 0.0.0.0
+    else
+        npm run docs:preview -- --port "$SERVE_PORT" --host 0.0.0.0
+    fi
 }
 
 # ============================================================
