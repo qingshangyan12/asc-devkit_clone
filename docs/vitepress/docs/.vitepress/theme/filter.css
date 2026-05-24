@@ -37,7 +37,9 @@
 }
 
 .VPDoc.has-aside .content-container {
-  max-width: none;
+  max-width: none !important;
+  width: auto !important;
+  margin: 0 !important;
 }
 
 .vp-doc pre {
