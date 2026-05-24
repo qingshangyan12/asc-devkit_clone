@@ -274,7 +274,7 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: '首页', link: '/' },
-      { text: 'AscendC算子开发指南', link: '/guide/入门教程/环境准备' },
+      { text: 'AscendC算子开发指南', link: '/guide/入门教程/Ascend-C概述与学习路径' },
       { text: 'Ascend C API', link: '/api/Ascend-C-API列表' },
     ],
 
@@ -305,10 +305,17 @@ export default defineConfig({
           }
           const html = md.render(src, env)
           if (!src.includes('<!-- RAW_HTML -->')) return html
+          const seen = {}
           const headingRegex = /<h([23456])([^>]*)>(.*?)<\/h\1>/gi
           return html.replace(headingRegex, (_, level, attrs, text) => {
-            const id = text.replace(/<[^>]+>/g, '').trim().toLowerCase().replace(/\s+/g, '-')
-            return `<h${level}${attrs}>${text}<a class="header-anchor" href="#${id}">\u00b6</a></h${level}>`
+            if (text.includes('header-anchor')) return `<h${level}${attrs}>${text}</h${level}>`
+            const clean = text.replace(/<[^>]+>/g, '').trim()
+            let id = clean.replace(/\s+/g, '-').toLowerCase()
+            if (seen[id]) id = `${id}-${seen[id]++}`
+            else seen[id] = 1
+            const existing = text.match(/<a[^>]*>.*?<\/a>/)
+            if (existing) return `<h${level}${attrs}>${text}<a class="header-anchor" href="#${id}">\u00b6</a></h${level}>`
+            return `<h${level}${attrs}>${clean}<a class="header-anchor" href="#${id}">\u00b6</a></h${level}>`
           })
         },
         translations: {
