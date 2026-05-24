@@ -1,14 +1,14 @@
 import DefaultTheme from 'vitepress/theme'
 import { h } from 'vue'
 // import FilterToggle from './FilterToggle.vue'
-import SearchBox from './SearchBox.vue'
+import BackToTop from './BackToTop.vue'
 import './filter.css'
 
 export default {
   extends: DefaultTheme,
   Layout() {
     return h(DefaultTheme.Layout, null, {
-      'nav-bar-content-before': () => h(SearchBox),
+      'layout-bottom': () => h(BackToTop),
       // 'nav-bar-content-after': () => h(FilterToggle),
     })
   },

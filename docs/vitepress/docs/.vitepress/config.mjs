@@ -274,13 +274,56 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: '首页', link: '/' },
-      { text: 'AscendC算子开发指南', link: '/guide/入门教程/环境准备' },
+      { text: 'AscendC算子开发指南', link: '/guide/入门教程/Ascend-C概述与学习路径' },
       { text: 'Ascend C API', link: '/api/Ascend-C-API列表' },
     ],
 
     sidebar: sidebars,
 
-    search: false,
+    search: {
+      provider: 'local',
+      options: {
+        _render(src, env, md) {
+          if (!src || !src.trim()) {
+            const htmlPath = env.path.replace(/\.md$/, '.html')
+            if (existsSync(htmlPath)) {
+              const raw = readFileSync(htmlPath, 'utf-8')
+              const seen = {}
+              const headingRegex = /<h([23456])([^>]*)>(.*?)<\/h\1>/gi
+              return raw.replace(headingRegex, (_, level, attrs, text) => {
+                const clean = text.replace(/<[^>]+>/g, '').trim()
+                let id = clean.replace(/\s+/g, '-').toLowerCase()
+                if (seen[id]) id = `${id}-${seen[id]++}`
+                else seen[id] = 1
+                const inner = `<a class="header-anchor" href="#${id}">\u00b6</a>`
+                const existing = text.match(/<a[^>]*>.*?<\/a>/)
+                if (existing) return `<h${level}${attrs}>${text}${inner}</h${level}>`
+                return `<h${level}${attrs}>${clean}${inner}</h${level}>`
+              })
+            }
+            return ''
+          }
+          const html = md.render(src, env)
+          if (!src.includes('<!-- RAW_HTML -->')) return html
+          const seen = {}
+          const headingRegex = /<h([23456])([^>]*)>(.*?)<\/h\1>/gi
+          return html.replace(headingRegex, (_, level, attrs, text) => {
+            if (text.includes('header-anchor')) return `<h${level}${attrs}>${text}</h${level}>`
+            const clean = text.replace(/<[^>]+>/g, '').trim()
+            let id = clean.replace(/\s+/g, '-').toLowerCase()
+            if (seen[id]) id = `${id}-${seen[id]++}`
+            else seen[id] = 1
+            const existing = text.match(/<a[^>]*>.*?<\/a>/)
+            if (existing) return `<h${level}${attrs}>${text}<a class="header-anchor" href="#${id}">\u00b6</a></h${level}>`
+            return `<h${level}${attrs}>${clean}<a class="header-anchor" href="#${id}">\u00b6</a></h${level}>`
+          })
+        },
+        translations: {
+          button: { buttonText: '搜索文档' },
+          modal: { noResultsText: '未找到结果', footer: { selectText: '选择', navigateText: '切换' } },
+        },
+      },
+    },
 
     outline: {
       level: [2, 3],
