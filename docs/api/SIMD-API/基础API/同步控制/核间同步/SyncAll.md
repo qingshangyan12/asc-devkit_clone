@@ -79,7 +79,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为: "basic_api/kernel_operator_block_sync_intf.h"。
+头文件路径为："basic_api/kernel_operator_block_sync_intf.h"。
 
 SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能：
 

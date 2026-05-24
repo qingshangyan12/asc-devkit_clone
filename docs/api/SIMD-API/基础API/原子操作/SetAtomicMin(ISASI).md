@@ -14,7 +14,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_set_atomic_intf.h"
+头文件路径为："basic_api/kernel_operator_set_atomic_intf.h"。
 
 设置后续从UB/L0C/L1搬运到GM的数据是否执行原子比较，将待拷贝的内容和GM已有内容进行比较，将最小值写入GM。SetAtomicMin接口可通过设置模板参数来设定不同的数据类型。
 

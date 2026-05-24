@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为:"basic_api/kernel_operator_block_sync_intf.h"
+头文件路径为："basic_api/kernel_operator_block_sync_intf.h"。
 
 当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。
 

@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为: "basic_api/kernel_operator_block_sync_intf.h"
+头文件路径为："basic_api/kernel_operator_block_sync_intf.h"。
 
 SetFlag/WaitFlag接口用于多流水间的同步：如下图1所示，同一核内不同流水线之间的同步指令，具有数据依赖的不同流水指令之间需要插入此同步。
 

@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为: "basic_api/kernel_operator_block_sync_intf.h"。
+头文件路径为："basic_api/kernel_operator_block_sync_intf.h"。
 
 在核间同步场景中，CrossCoreSetFlag接口和[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)接口配对工作，使用时需传入核间同步的标记ID(flagId)，每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。
 
@@ -69,7 +69,7 @@
 
 <cann-filter npu-type="950">
 
-- 模式4：模式4仅支持Ascend 950PR/Ascend 950DT。AI Core内部，AIC与AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。比如，在AIC核执行CrossCoreSetFlag之后， AIV0上CrossCoreWaitFlag后续的指令才会继续执行；AIV0执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
+- 模式4：模式4仅支持Ascend 950PR/Ascend 950DT。AI Core内部，AIC与AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。比如，在AIC核执行CrossCoreSetFlag之后，AIV0上CrossCoreWaitFlag后续的指令才会继续执行；AIV0执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
 
 </cann-filter>
 
@@ -119,7 +119,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
         | 2 | \_\_mix\_\_(1, 1)，\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_1， KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
 
 - 接口使用模式0、1、2，需要避免flagId使用冲突：
-    - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象数目，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义 4 个对象 ，此时 flagId占用范围为\[0,7\]。
+    - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象数目，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时flagId占用范围为\[0,7\]。
 
     - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
 
@@ -168,8 +168,8 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 
 | SCENARIO_NUM取值 | 业务场景 | 使用的同步模式 |
 | --- | --- | --- |
-| 0 | 纯Vector计算场景(16个AIV) | mode0（AIV全核同步） |
-| 1 | 纯Vector计算场景(2个AIV) | mode1 |
+| 0 | 纯Vector计算场景（16个AIV） | mode0（AIV全核同步） |
+| 1 | 纯Vector计算场景（2个AIV） | mode1 |
 | 2 | Cube与Vector融合计算场景 | mode2（AIC等AIV）、mode2（AIV等AIC）、mode0（AIC全核同步） |
 
 如上表所示，当SCENARIO_NUM取不同值时，会分别演示纯Vector计算场景和Cube与Vector融合计算场景下三种同步模式的具体使用方法，下面展示了纯Vector计算场景的部分调用代码：

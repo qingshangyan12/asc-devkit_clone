@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为: "basic_api/kernel_operator_determine_compute_sync_intf.h"
+头文件路径为："basic_api/kernel_operator_determine_compute_sync_intf.h"。
 
 WaitPreBlock和NotifyNextBlock是核间同步控制接口。NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。
 

@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为: "basic_api/kernel_operator_block_sync_intf.h"。
+头文件路径为："basic_api/kernel_operator_block_sync_intf.h"。
 
 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)。
 
@@ -94,7 +94,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 - CrossCoreWaitFlag必须与[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)接口配合使用，避免计算核一直处于阻塞阶段。
 
 - 接口使用模式0、1、2，需要避免flagId使用冲突：
-    - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象数目，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义 4 个对象 ，此时 flagId占用范围为\[0,7\]。
+    - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象数目，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时 flagId占用范围为\[0,7\]。
 
     - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
 
@@ -125,8 +125,8 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 | SCENARIO_NUM取值 | 业务场景 | 使用的同步模式 |
 | --- | --- | --- |
-| 0 | 纯Vector计算场景(16个AIV) | mode0（AIV全核同步） |
-| 1 | 纯Vector计算场景(2个AIV) | mode1 |
+| 0 | 纯Vector计算场景（16个AIV） | mode0（AIV全核同步） |
+| 1 | 纯Vector计算场景（2个AIV） | mode1 |
 | 2 | Cube与Vector融合计算场景 | mode2（AIC等AIV）、mode2（AIV等AIC）、mode0（AIC全核同步） |
 
 如上表所示，当SCENARIO_NUM取不同值时，会分别演示纯Vector计算场景和Cube与Vector融合计算场景下三种同步模式的具体使用方法，下面展示了纯Vector计算场景的部分调用代码：
