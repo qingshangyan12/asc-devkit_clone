@@ -113,57 +113,49 @@ $dst_i = \sim src_i$
 
 <cann-filter npu-type="950">
 
-- 针对Ascend 950PR/Ascend 950DT系列产品
-    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。uint8_t、int8_t、uint64_t、int64_t数据类型仅支持tensor前n个数据计算接口。
+- 针对Ascend 950PR/Ascend 950DT系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。uint8_t、int8_t、uint64_t、int64_t数据类型仅支持tensor前n个数据计算接口。
 
 </cann-filter>
 
 <cann-filter npu-type="A3">
 
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：
-    - T支持的数据类型为：int16_t、uint16_t。
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：
-    - T支持的数据类型为：int16_t、uint16_t。
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
-- 针对Atlas 200I/500 A2 推理产品：
-    - T支持的数据类型为：int16_t、uint16_t。
+- 针对Atlas 200I/500 A2 推理产品，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="310p">
 
-- 针对Atlas 推理系列产品 AI Core：
-    - T支持的数据类型为：int16_t、uint16_t。
+- 针对Atlas 推理系列产品 AI Core，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="910">
 
-- 针对Atlas 训练系列产品：
-    - T支持的数据类型为：int16_t、uint16_t。
+- 针对Atlas 训练系列产品，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="x90">
 
-- 针对Kirin X90
-    - T支持的数据类型为：int16_t、uint16_t。
+- 针对Kirin X90，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="9030">
 
-- 针对Kirin 9030
-    - T支持的数据类型为：int16_t、uint16_t。
+- 针对Kirin 9030，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
