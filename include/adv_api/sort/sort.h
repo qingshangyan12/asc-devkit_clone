@@ -24,20 +24,7 @@
 
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "include/adv_api/sort/sort_utils_constants.h"
-#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113))
-namespace AscendC {
-#ifndef ASCC_STRUCT_SORTCONFIG
-#define ASCC_STRUCT_SORTCONFIG
-struct SortConfig {
-    SortType type = SortType::RADIX_SORT;
-    bool isDescend = false;
-};
-#endif
-constexpr SortConfig DEFAULT_SORT_CONFIG = {SortType::RADIX_SORT, false};
-} // namespace AscendC
-#endif
+#include "include/adv_api/sort/sort_utils.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/sort/sort/sort_impl.h"

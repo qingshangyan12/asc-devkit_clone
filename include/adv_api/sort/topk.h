@@ -25,15 +25,14 @@
 #include "kernel_tensor.h"
 #include "kernel_utils.h"
 #include "kernel_tiling/kernel_tiling.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-
 #include "../../../impl/adv_api/detail/sort/topk/topk_common_utils.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../../impl/adv_api/detail/api_check/kernel_check/sort/topk/topk_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../../impl/adv_api/detail/api_check/kernel_api_check.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 #include "../../../impl/adv_api/detail/sort/topk/topk_common_impl.h"
 #endif
@@ -48,17 +47,10 @@
 #endif
 #endif
 
-#if !defined(__NPU_ARCH__)
-namespace AscendC {
-constexpr TopKConfig defaultTopKConfig = { TopKAlgo::MERGE_SORT, TopKOrder::UNSET, true };
-} // namespace AscendC
-#endif
-
 namespace AscendC {
 #pragma begin_pipe(V)
-#if !defined(__NPU_ARCH__) || \
-    (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113)
 /*
  * @ingroup TopK
  * @brief Get the top k maximum or minimum values and their corresponding indices of the last dimension.
@@ -98,8 +90,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
         return;
     }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     TopkInputCheck<T, isInitIndex, topkMode, config>(k, topKInfo);
 #endif
@@ -134,7 +124,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
                 srcIndexLocal, finishLocal, tempBuffer, k, tilling, topKInfo, isLargest);
         }
     }
-#endif
 }
 
 /*
@@ -174,8 +163,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
         return;
     }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113)
     LocalTensor<T> stackTensor;
     PopStackBuffer<T, TPosition::LCM>(stackTensor);
 
@@ -226,10 +213,8 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
                 topKInfo, isLargest);
         }
     }
-#endif
 }
-#endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
+#else
 /*
  * @ingroup TopK
  * @brief Get the top k maximum or minimum values and their corresponding indices of the last dimension.
