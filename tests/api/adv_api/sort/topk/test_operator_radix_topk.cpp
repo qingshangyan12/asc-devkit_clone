@@ -265,12 +265,10 @@ INSTANTIATE_TEST_CASE_P(
             testRadixTopK<uint16_t, false, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
         TopKTestParams{ 2, GetKPad<uint16_t>(2), {2, 256, 256}, sizeof(uint16_t), true,
             testRadixTopK<uint16_t, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
-#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))   
         TopKTestParams{ 20, GetKPad<uint16_t>(20), {2, 512, 512}, sizeof(uint16_t), true,
             testRadixTopK<uint16_t, false, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
         TopKTestParams{ 2, GetKPad<uint16_t>(2), {2, 1024, 1024}, sizeof(uint16_t), true,
             testRadixTopK<uint16_t, true, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
-#endif
         // int16_t
         TopKTestParams{ 1, GetKPad<int16_t>(1), {1, 32, 32}, sizeof(int16_t), true,
             testRadixTopK<int16_t, false, false, false, AscendC::TopKMode::TOPK_NSMALL, AscendC::TopKOrder::UNSET, false> },
@@ -280,10 +278,12 @@ INSTANTIATE_TEST_CASE_P(
             testRadixTopK<int16_t, false, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
         TopKTestParams{ 255, GetKPad<int16_t>(255), {2, 256, 256}, sizeof(int16_t), true,
             testRadixTopK<int16_t, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))   
         TopKTestParams{ 512, GetKPad<int16_t>(512), {1, 512, 512}, sizeof(int16_t), true,
             testRadixTopK<int16_t, false, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
         TopKTestParams{ 1, GetKPad<int16_t>(1), {2, 4096, 4096}, sizeof(int16_t), true,
             testRadixTopK<int16_t, true, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
+#endif
         // uint32_t
         TopKTestParams{ 1, GetKPad<uint32_t>(1), {1, 32, 32}, sizeof(uint32_t), true,
             testRadixTopK<uint32_t, false, false, false, AscendC::TopKMode::TOPK_NSMALL, AscendC::TopKOrder::UNSET, false> },
@@ -359,9 +359,9 @@ INSTANTIATE_TEST_CASE_P(
         TopKTestParams{ 20, GetKPad<float>(20), {1, 128, 128}, sizeof(float), true,
             testRadixTopK<float, false, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
         TopKTestParams{ 255, GetKPad<float>(255), {2, 256, 256}, sizeof(float), true,
-            testRadixTopK<float, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
+            testRadixTopK<float, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> }
 #if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))        
-        TopKTestParams{ 512, GetKPad<float>(512), {1, 512, 512}, sizeof(float), true,
+        ,TopKTestParams{ 512, GetKPad<float>(512), {1, 512, 512}, sizeof(float), true,
             testRadixTopK<float, false, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
         TopKTestParams{ 1, GetKPad<float>(1), {2, 4096, 4096}, sizeof(float), true,
             testRadixTopK<float, true, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
