@@ -197,7 +197,201 @@
             }
         }
         ```
+-   lanemask_eq
 
+    -   功能说明
+
+        提供一个32位掩码，其中只有当前线程在warp中所在的 lane 位被置为1。
+
+        ![](../../figures/lanemask_eq图示.png)
+    
+    -   函数原型
+
+        ```
+        int32_t lanemask_eq()
+        ```
+    -   返回值说明
+
+        返回一个32位掩码。
+
+    -   约束说明
+
+        无
+
+    -   需要包含的头文件
+
+        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+
+        ```
+        #include "simt_api/device_functions.h"
+        ```
+
+    -   调用示例 
+
+        SIMT编程场景：
+
+        ```
+        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
+        {
+            int32_t lanemaskeq = lanemask_eq();
+        }
+        ```
+-   lanemask_le
+
+    -   功能说明
+
+        提供一个32位掩码，其中只有小于等于当前线程在warp中所在的 lane 位被置为1。
+
+        ![](../../figures/lanemask_le图示.png)
+
+    -   函数原型
+
+        ```
+        int32_t lanemask_le()
+        ```
+    -   返回值说明
+
+        返回一个32位掩码。
+
+    -   约束说明
+
+        无
+
+    -   需要包含的头文件
+
+        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+
+        ```
+        #include "simt_api/device_functions.h"
+        ```
+
+    -   调用示例 
+
+        SIMT编程场景：
+
+        ```
+        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
+        {
+            int32_t lanemaskeq = lanemask_le();
+        }
+        ```
+-   lanemask_lt
+
+    -   功能说明
+
+        提供一个32位掩码，其中只有严格小于当前线程在warp中所在的 lane 位被置为1。
+
+        ![](../../figures/lanemask_lt图示.png)
+
+    -   函数原型
+
+        ```
+        int32_t lanemask_lt()
+        ```
+    -   返回值说明
+
+        返回一个32位掩码。
+
+    -   约束说明
+
+        无
+
+    -   需要包含的头文件
+
+        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+
+        ```
+        #include "simt_api/device_functions.h"
+        ```
+
+    -   调用示例 
+
+        SIMT编程场景：
+
+        ```
+        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
+        {
+            int32_t lanemaskeq = lanemask_lt();
+        }
+        ```
+-   lanemask_ge
+
+    -   功能说明
+
+        提供一个32位掩码，其中只有大于等于当前线程在warp中所在的 lane 位被置为1。
+
+        ![](../../figures/lanemask_ge图示.png)
+
+    -   函数原型
+
+        ```
+        int32_t lanemask_ge()
+        ```
+    -   返回值说明
+
+        返回一个32位掩码。
+
+    -   约束说明
+
+        无
+
+    -   需要包含的头文件
+
+        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+
+        ```
+        #include "simt_api/device_functions.h"
+        ```
+
+    -   调用示例 
+
+        SIMT编程场景：
+
+        ```
+        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
+        {
+            int32_t lanemaskeq = lanemask_ge();
+        }
+        ```
+-   lanemask_gt
+
+    -   功能说明
+
+        提供一个32位掩码，其中只有严格大于当前线程在warp中所在的 lane 位被置为1。
+
+        ![](../../figures/lanemask_gt图示.png)
+
+    -   函数原型
+
+        ```
+        int32_t lanemask_gt()
+        ```
+    -   返回值说明
+
+        返回一个32位掩码。
+
+    -   约束说明
+
+        无
+
+    -   需要包含的头文件
+
+        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+
+        ```
+        #include "simt_api/device_functions.h"
+        ```
+
+    -   调用示例 
+
+        SIMT编程场景：
+
+        ```
+        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
+        {
+            int32_t lanemaskeq = lanemask_gt();
+        }
+        ```
 ## 内置数据类型<a name="section1835494915576"></a>
 
 目前提供了一系列适用于Device侧的数据类型，包括标量和短向量。短向量是由多个元素组成的简单向量。
