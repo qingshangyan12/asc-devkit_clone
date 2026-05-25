@@ -75,19 +75,19 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
 使用bisheng编译器编译Ascend C SIMT源文件时，需要在AI Core SIMD编译的基本命令上增加`--enable-simt`，示例如下：
 
 ```shell
-  bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
+bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> --enable-simt
 ```
 
 AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码编译成SIMT二进制，先将SIMT二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
 ![ ](../../../figures/aicore_simt_comilation.png "aicore simt编译流程示意图")
 
 ## 基本编译命令汇总
-|编译方式|AI Core SIMD编译命令| AI Core SIMT编译命令|
-|-|-|-|
-|异构编译| bisheng <source_file>.asc -o \<output_file\> --npu-arch=dav-\<npu architecture\> | bisheng <source_file>.asc -o <output_file> --npu-arch=dav-\<npu architecture\> **--enable-simt**|
-|独立编译|bisheng **-dc** <source_file>.asc -o \<output_file\>**.o** --npu-arch=dav-\<npu architecture\>| bisheng **-dc** <source_file>.asc -o <output_file>**.o** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
-|动态库编译|bisheng **-shared** <source_file>.asc -o \<output_file\>**.so** --npu-arch=dav-\<npu architecture\>| bisheng **-shared** <source_file>.asc -o <output_file>**.so** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
-|静态库编译|bisheng **-lib** <source_file>.asc -o \<output_file\>**.a** --npu-arch=dav-\<npu architecture\>| bisheng **-lib** <source_file>.asc -o <output_file>**.a** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
+| 编译方式  | AI Core SIMD编译命令                                                                                    | AI Core SIMT编译命令                                                                                                    |
+|-------|-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| 异构编译  | bisheng <source_file>.asc -o \<output_file\> --npu-arch=dav-\<npu architecture\>                    | bisheng <source_file>.asc -o <output_file> --npu-arch=dav-\<npu architecture\> **--enable-simt**                    |
+| 独立编译  | bisheng **-dc** <source_file>.asc -o \<output_file\>**.o** --npu-arch=dav-\<npu architecture\>      | bisheng **-dc** <source_file>.asc -o <output_file>**.o** --npu-arch=dav-\<npu architecture\> **--enable-simt**      |
+| 动态库编译 | bisheng **-shared** <source_file>.asc -o \<output_file\>**.so** --npu-arch=dav-\<npu architecture\> | bisheng **-shared** <source_file>.asc -o <output_file>**.so** --npu-arch=dav-\<npu architecture\> **--enable-simt** |
+| 静态库编译 | bisheng **-lib** <source_file>.asc -o \<output_file\>**.a** --npu-arch=dav-\<npu architecture\>     | bisheng **-lib** <source_file>.asc -o <output_file>**.a** --npu-arch=dav-\<npu architecture\> **--enable-simt**     |
 
 
 ## 常用的编译选项<a name="ZH-CN_TOPIC_0000002462746461"></a>
@@ -261,7 +261,7 @@ add_executable(demo
 
 以下是动态库、静态库编译示例，同时展示如何将源文件切换为用语言ASC编译：
 
--   编译.asc文件生成动态库
+- 编译.asc文件生成动态库
 
     ```cmake
     # 3、使用CMake接口编译动态库
@@ -272,7 +272,7 @@ add_executable(demo
     )
     ```
 
--   编译.asc文件生成静态库
+- 编译.asc文件生成静态库
 
     ```cmake
     # 3、使用CMake接口编译静态库
