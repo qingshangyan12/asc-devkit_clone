@@ -31,6 +31,8 @@ Tensor API 为头文件模板接口，不需要链接额外库文件。
 | UB | L1 | `CopyL12UB` |
 | L0A | L1 | `CopyL12L0A` |
 | L0B | L1 | `CopyL12L0B` |
+| L0ScaleA | L1 | `CopyL12L0ScaleA` |
+| L0ScaleB | L1 | `CopyL12L0ScaleB` |
 | BiasTable Buffer | L1 | `CopyL12BT` |
 | Fixpipe Buffer | L1 | `CopyL12FB` |
 | GM | L0C | `CopyL0C2GM` |
