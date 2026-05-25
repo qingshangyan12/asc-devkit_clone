@@ -197,14 +197,17 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
 
         # system include
         set(ASC_CPU_SYSTEM_INCLUDE_OPTIONS "-isystem$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/include -isystem$ENV{ASCEND_HOME_PATH}/include \
+-isystem$ENV{ASCEND_HOME_PATH}/asc \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/adv_api \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/basic_api -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/c_api \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/micro_api -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/simt_api \
+-isystem$ENV{ASCEND_HOME_PATH}/asc/impl/tensor_api \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/impl/utils -isystem$ENV{ASCEND_HOME_PATH}/asc/include \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/include/adv_api -isystem$ENV{ASCEND_HOME_PATH}/asc/include/adv_api/matmul \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/include/aicpu_api -isystem$ENV{ASCEND_HOME_PATH}/asc/include/basic_api \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/include/c_api -isystem$ENV{ASCEND_HOME_PATH}/asc/include/interface \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/include/micro_api -isystem$ENV{ASCEND_HOME_PATH}/asc/include/simt_api \
+-isystem$ENV{ASCEND_HOME_PATH}/asc/include/tensor_api \
 -isystem$ENV{ASCEND_HOME_PATH}/asc/include/tiling -isystem$ENV{ASCEND_HOME_PATH}/asc/include/utils")
 
         # 添加编译选项
