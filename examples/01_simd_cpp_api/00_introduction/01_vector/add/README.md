@@ -42,7 +42,7 @@
     ```
     block_idx * blockLength
     ```
-    其中`block_idx`为当前核的索引号，用于多核场景下标识核的身份，详见[GetBlockIdx接口](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockIdx.md)。
+    其中`block_idx`为当前核的索引号，用于多核场景下标识核的身份，详见[GetBlockIdx接口](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockIdx.md)；`blockLength`为每个核处理的元素个数，本样例中为2048。
 
     Add样例的实现流程分为3个步骤：
 
@@ -63,7 +63,7 @@
 
   - 数据结构说明  
     - [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)：用于存放AI Core内部Local Memory（如UB）的数据，支持向量计算单元直接访问。
-    - [GlobalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/GlobalTensor/GlobalTensor简介.md)：用于存放Global Memory上的全局数据，核函数通过GlobalTensor访问外部输入输出。
+    - [GlobalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/GlobalTensor/GlobalTensor简介.md)：用于存放Global Memory上的全局数据，核函数通过GlobalTensor来读取外部输入和写入外部输出。
 
 ## 功能调试
 
