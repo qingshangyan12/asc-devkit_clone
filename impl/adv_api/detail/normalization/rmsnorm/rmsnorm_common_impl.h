@@ -240,13 +240,13 @@ __aicore__ inline void RmsNormCompute(
     // step 2: ∑x²
     RmsNormReduceSum<isBasicBlock>(
         params.reducedAddr, params.tmpAddr, params.curBsLength, tiling.hLength, tiling.originalHLength);
-    // step 3: rms = 1/n*�?
+    // step 3: rms = 1/n*�?
     SetVectorMask<T>(0, params.curBsLength);
     Muls<float, false>(
         params.reducedAddr, params.reducedAddr, tiling.reciprocalOfHLength, MASK_PLACEHOLDER, 1, unaryParams);
     // step 4: rms + e
     PipeBarrier<PIPE_V>();
-    Adds<float, false>(params.reducedAddr, params.reducedAddr, epsilon, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(params.reducedAddr, params.reducedAddr, static_cast<float>(epsilon), MASK_PLACEHOLDER, 1, unaryParams);
     // step 5: 1 / (rms + e)
     // high precision impl of rsqrt
     PipeBarrier<PIPE_V>();
