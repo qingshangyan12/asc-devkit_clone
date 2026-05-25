@@ -200,9 +200,9 @@ docker run -itd --name ascendc_container ascendc:ubuntu24.04
 
 | 构建参数 | 默认值 | 说明 |
 | --- | --- | --- |
-| `GENERAL_MIRROR` | `mirrors.huaweicloud.com` | apt / pypi 共用的镜像主机；须按 `/ubuntu/`、`/repository/pypi/simple/` 的路径风格组织（华为云、阿里云镜像可直接复用） |
+| `GENERAL_MIRROR` | `mirrors.huaweicloud.com` | apt / pypi 共用的镜像 |
 | `CONDA_MIRROR` | `https://mirrors.tuna.tsinghua.edu.cn/anaconda` | conda channels 前缀，含协议头 |
-| `REPO_SCRIPT_URL` | `https://mirrors.tuna.tsinghua.edu.cn/git/git-repo` | google `repo` 工具脚本下载地址；境外网络可指向 `https://storage.googleapis.com/git-repo-downloads/repo` |
+| `REPO_SCRIPT_URL` | `https://mirrors.tuna.tsinghua.edu.cn/git/git-repo` | `repo` 工具脚本下载地址，可按网络环境替换为可访问的脚本地址，如：`https://storage.googleapis.com/git-repo-downloads/repo` |
 | `REPO_GIT_URL` | `https://mirrors.ustc.edu.cn/aosp/git-repo` | `repo` 工具运行时使用的仓库地址 |
 
 覆盖示例：
@@ -213,9 +213,6 @@ docker buildx build --network host \
   --build-arg REPO_SCRIPT_URL=https://storage.googleapis.com/git-repo-downloads/repo \
   -t ascendc:ubuntu24.04 .devcontainer/
 ```
-
-> [!NOTE] 说明
-> 因 apt / pypi 复用同一 host 且路径按华为云约定，若要整体切到清华源或 USTC（这两家路径布局与华为云不同），请直接编辑 Dockerfile，而不是只换 `GENERAL_MIRROR`。
 
 ### 构建缓存
 
