@@ -26,29 +26,14 @@ def gen_golden_data(scenario_num=1):
     block_length = 256
     use_core_num = 3
 
-    os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
     if scenario_num == 1:
-        input_type = np.int32
-        input_x = np.ones([block_length], dtype=input_type)
-        input_y = np.ones([block_length], dtype=input_type)
-
-        input_x.tofile("./input/input_x.bin")
-        input_y.tofile("./input/input_y.bin")
-
-        golden = input_y.copy()
-        golden[0] = input_y[0] + use_core_num * input_x[0]
+        golden = np.ones([block_length], dtype=np.int32)
+        golden[0] = golden[0] + use_core_num * 1
         golden.tofile("./output/golden.bin")
     elif scenario_num == 2:
-        input_type = np.uint32
-        input_x = np.ones([block_length], dtype=input_type)
-        input_y = np.ones([block_length], dtype=input_type)
-
-        input_x.tofile("./input/input_x.bin")
-        input_y.tofile("./input/input_y.bin")
-
-        golden = input_y.copy()
+        golden = np.ones([block_length], dtype=np.uint32)
         golden[0] = 2
         golden.tofile("./output/golden.bin")
 
