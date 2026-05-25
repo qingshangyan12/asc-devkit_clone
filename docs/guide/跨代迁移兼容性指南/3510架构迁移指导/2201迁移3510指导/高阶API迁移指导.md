@@ -2,6 +2,9 @@
 
 Ascend C高阶API基本兼容[NPU架构版本3510](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)与[NPU架构版本2201](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，部分API进行了扩展。当前3510架构不支持卷积计算类高阶API。
 
+> [!TIP]
+> 对于高阶API（如 Matmul），建议核函数入口使用 `__cube__` 属性声明 Cube 核函数，并通过 `MatmulType<TPosition::GM, CubeFormat::ND, T>` 定义矩阵类型。对于需要 Vector 侧做预处理（如 int4 转 int8）的融合场景，Vector 侧核函数建议使用 `__vector__` 属性。详细说明请参考 [概述](../../概述.md#推荐的编程范式)。
+
 ## Matmul类高阶API<a name="section6925172655117"></a>
 
 -   支持的数据类型有变化。
