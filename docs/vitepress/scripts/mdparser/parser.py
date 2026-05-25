@@ -52,7 +52,7 @@ def _load_css():
 
 _OPTIONS = cmarkgfm.Options.CMARK_OPT_UNSAFE
 
-_MD_LINK_RE = re.compile(r'(href|src)="((?!https?:|//)[^"]+)\.md"')
+_MD_LINK_RE = re.compile(r'(href|src)="((?!https?:|//)[^"]+)\.md(#[^"]*)?"')
 
 _CALLOUT_RE = re.compile(
     r"<blockquote>\s*\n<p>\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](.*?)</p>\s*\n(.*?)</blockquote>",
@@ -147,7 +147,7 @@ def gfm_to_html(text: str) -> str:
 
 
 def _fix_links(html: str) -> str:
-    return _MD_LINK_RE.sub(r'\1="\2.html"', html)
+    return _MD_LINK_RE.sub(r'\1="\2.html\3"', html)
 
 
 def _fix_callouts(html: str) -> str:
@@ -164,6 +164,10 @@ def _fix_callouts(html: str) -> str:
             WARNING="Warning",
             CAUTION="Caution",
         ).get(callout_type, callout_type)
+        if not body_content and "\n" in title:
+            title, body_content = title.split("\n", 1)
+            title = title.strip()
+            body_content = f"<p>{body_content.strip()}</p>"
         title_text = title if title else type_label
         parts = [f'<p class="callout-title">{icon}{title_text}</p>']
         if body_content:
