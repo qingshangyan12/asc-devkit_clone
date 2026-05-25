@@ -22,7 +22,7 @@ template <typename T>
 struct IsTensorApiGlobalTensor : AscendC::Std::false_type {};
 
 template <typename Engine, typename Layout>
-struct IsTensorApiGlobalTensor<AscendC::GlobalTensor<AscendC::Te::TensorAttribute<Engine, Layout>>>
+struct IsTensorApiGlobalTensor<AscendC::GlobalTensor<AscendC::TensorAttribute<Engine, Layout>>>
     : AscendC::Std::true_type {};
 
 template <typename T>
@@ -33,7 +33,7 @@ template <typename T>
 struct IsTensorApiLocalTensor : AscendC::Std::false_type {};
 
 template <typename Engine, typename Layout>
-struct IsTensorApiLocalTensor<AscendC::LocalTensor<AscendC::Te::TensorAttribute<Engine, Layout>>>
+struct IsTensorApiLocalTensor<AscendC::LocalTensor<AscendC::TensorAttribute<Engine, Layout>>>
     : AscendC::Std::true_type {};
 
 template <typename T>
