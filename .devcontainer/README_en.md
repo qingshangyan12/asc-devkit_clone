@@ -200,9 +200,9 @@ Build args and defaults:
 
 | Build arg | Default | Description |
 | --- | --- | --- |
-| `GENERAL_MIRROR` | `mirrors.huaweicloud.com` | Shared host for apt / pypi packages. Must expose paths in the `/ubuntu/`, `/repository/pypi/simple/` layout (Huawei Cloud and Aliyun mirrors satisfy this) |
+| `GENERAL_MIRROR` | `mirrors.huaweicloud.com` | Shared host for apt / pypi packages |
 | `CONDA_MIRROR` | `https://mirrors.tuna.tsinghua.edu.cn/anaconda` | conda channels prefix; include the scheme |
-| `REPO_SCRIPT_URL` | `https://mirrors.tuna.tsinghua.edu.cn/git/git-repo` | google `repo` tool script download URL; outside China set to `https://storage.googleapis.com/git-repo-downloads/repo` |
+| `REPO_SCRIPT_URL` | `https://mirrors.tuna.tsinghua.edu.cn/git/git-repo` | `repo` tool script download URL; replace it with any accessible script URL as needed, such as `https://storage.googleapis.com/git-repo-downloads/repo` |
 | `REPO_GIT_URL` | `https://mirrors.ustc.edu.cn/aosp/git-repo` | Repository URL used by the `repo` tool at runtime |
 
 Override example:
@@ -213,9 +213,6 @@ docker buildx build --network host \
   --build-arg REPO_SCRIPT_URL=https://storage.googleapis.com/git-repo-downloads/repo \
   -t ascendc:ubuntu24.04 .devcontainer/
 ```
-
-> [!NOTE]
-> Because apt / pypi share a single host laid out the Huawei-Cloud way, switching wholesale to Tsinghua or USTC mirrors (which use different paths) requires editing the Dockerfile directly rather than just overriding `GENERAL_MIRROR`.
 
 ### Build Cache
 
