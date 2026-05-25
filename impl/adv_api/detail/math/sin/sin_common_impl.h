@@ -81,7 +81,7 @@ __aicore__ inline void SinSignCompute(
     // sign
     Add<float, false>(dstTensor, dstTensor, roundTensor, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
-    Adds<float, false>(dstTensor, dstTensor, 1, MASK_PLACEHOLDER, 1, unaryParams); // sign is dstTensor
+    Adds<float, false>(dstTensor, dstTensor, static_cast<float>(1), MASK_PLACEHOLDER, 1, unaryParams); // sign is dstTensor
     PipeBarrier<PIPE_V>();
 }
 
@@ -117,7 +117,7 @@ __aicore__ inline void SinPolynomialApproximation(
     // res_up = mul(res_up, x^2)
     Mul<float, false>(roundTensor, roundTensor, kpi, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
-    Adds<float, false>(roundTensor, roundTensor, 1.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(roundTensor, roundTensor, static_cast<float>(1.0), MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
     // res_up = mul(res_up, input_x)
     Mul<float, false>(roundTensor, roundTensor, inputX, MASK_PLACEHOLDER, 1, binaryParams);
