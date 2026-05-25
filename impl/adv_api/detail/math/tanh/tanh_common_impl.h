@@ -62,11 +62,11 @@ __aicore__ inline void TanhFormulaImpl(
     PipeBarrier<PIPE_V>();
 
     // e^(2 * x) - 1
-    Adds<float, false>(dstTensor, tmpClip, -1.0, MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
+    Adds<float, false>(dstTensor, tmpClip, static_cast<float>(-1.0), MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
     // e^(2 * x) + 1
-    Adds<float, false>(tmpClip, tmpClip, 1.0, MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
+    Adds<float, false>(tmpClip, tmpClip, static_cast<float>(1.0), MASK_PLACEHOLDER, params.repeatTimes, unaryParams);
     PipeBarrier<PIPE_V>();
 
     Div<float, false>(dstTensor, dstTensor, tmpClip, MASK_PLACEHOLDER, params.repeatTimes, binaryParams);

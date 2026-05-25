@@ -232,7 +232,7 @@ __aicore__ inline void CastDeqscale(
 
     if constexpr (IsSameType<scaleT, float>::value) { // FP32 -> FP32
         SetVectorMask<float, MaskMode::COUNTER>(0, scaleSize);
-        Adds<float, false>(params.tmpAddrA, deqScale, 0, MASK_PLACEHOLDER, 1, unaryParams);
+        Adds<float, false>(params.tmpAddrA, deqScale, static_cast<float>(0), MASK_PLACEHOLDER, 1, unaryParams);
         PipeBarrier<PIPE_V>();
     } else if constexpr (IsSameType<scaleT, uint64_t>::value) { // uint64_t -> FP32
         // uint64 = 32 + 32 => pick lower 32 value as FP32
@@ -326,7 +326,7 @@ __aicore__ inline void CastDst(
 {
     if constexpr (IsSameType<dstT, float>::value) {
         SetVectorMask<float, MaskMode::COUNTER>(0, dataNum);
-        Adds<float, false>(dstTensor, srcFP32, 0, MASK_PLACEHOLDER, 1, unaryParams);
+        Adds<float, false>(dstTensor, srcFP32, static_cast<float>(0), MASK_PLACEHOLDER, 1, unaryParams);
         PipeBarrier<PIPE_V>();
         return;
     }
