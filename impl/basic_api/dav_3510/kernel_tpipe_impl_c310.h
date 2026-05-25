@@ -113,10 +113,12 @@ __aicore__ inline void TPipe::Init()
         SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
     }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    for (int32_t i = 0; i < static_cast<int32_t>(Hardware::MAX); i++) {
-        SetBufferCtx((Hardware)i, &g_tpipeImpl.bufPoolBaseAddr_[i]);
-    }
     auto bufferInitLen = ConstDefiner::Instance().bufferInitLen;
+    for (int32_t i = 0; i < static_cast<int32_t>(Hardware::MAX); i++) {
+        if (bufferInitLen.find((Hardware)i) != bufferInitLen.end()) {
+            SetBufferCtx((Hardware)i, &g_tpipeImpl.bufPoolBaseAddr_[i]);
+        }
+    }
     AscendCBufAbsAddr(uint8_t(Hardware::UB),
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(ConstDefiner::Instance().cpuUB)),
         bufferInitLen.at(Hardware::UB));
@@ -797,8 +799,11 @@ __aicore__ inline void TPipe::Reset()
     InitSocState();
     ResetPool();
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    auto bufferInitLen = ConstDefiner::Instance().bufferInitLen;
     for (int32_t i = 0; i < static_cast<int32_t>(Hardware::MAX); i++) {
-        SetBufferCtx((Hardware)i, &g_tpipeImpl.bufPoolBaseAddr_[i]);
+        if (bufferInitLen.find((Hardware)i) != bufferInitLen.end()) {
+            SetBufferCtx((Hardware)i, &g_tpipeImpl.bufPoolBaseAddr_[i]);
+        }
     }
 #endif
 }
