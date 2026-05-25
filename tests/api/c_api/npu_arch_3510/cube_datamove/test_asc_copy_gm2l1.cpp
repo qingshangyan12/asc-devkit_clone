@@ -26,14 +26,14 @@ class TestCubeDatamoveCopyGM2L1 : public testing::Test {
 
 template<typename DTYPE>
 void load_gm_to_cbuf_2dv2_Stub(__cbuf__ DTYPE* dst_in, __gm__ DTYPE* src_in, uint32_t m_start_position_in,
-                                 uint32_t k_start_position_in, uint16_t dst_stride_in, uint16_t m_step_in,
+                                 uint32_t k_start_position_in, uint16_t dst_gap_in, uint16_t m_step_in,
                                  uint16_t k_step_in, uint8_t sid_in, uint8_t decomp_mode_in, uint8_t l2_cache_ctl_in)
 {
     __cbuf__ DTYPE* dst = reinterpret_cast<__cbuf__ DTYPE*>(1);
     __gm__ DTYPE* src = reinterpret_cast<__gm__ DTYPE*>(2);
     uint32_t m_start_position = 3;
     uint32_t k_start_position = 4;
-    uint16_t dst_stride = 5;
+    uint16_t dst_gap = 5;
     uint16_t m_step = 6;
     uint16_t k_step = 7;
     uint8_t sid = 0;
@@ -44,7 +44,7 @@ void load_gm_to_cbuf_2dv2_Stub(__cbuf__ DTYPE* dst_in, __gm__ DTYPE* src_in, uin
     EXPECT_EQ(src, src_in);
     EXPECT_EQ(m_start_position, m_start_position_in);
     EXPECT_EQ(k_start_position, k_start_position_in);
-    EXPECT_EQ(dst_stride, dst_stride_in);
+    EXPECT_EQ(dst_gap, dst_gap_in);
     EXPECT_EQ(m_step, m_step_in);
     EXPECT_EQ(k_step, k_step_in);
     EXPECT_EQ(sid, sid_in);
@@ -59,7 +59,7 @@ TEST_F(TestCubeDatamoveCopyGM2L1, c_api_name##_##data_type##_Succ) \
     __gm__ data_type * src = reinterpret_cast<__gm__ data_type *>(2); \
     uint32_t m_start_position = 3; \
     uint32_t k_start_position = 4; \
-    uint16_t dst_stride = 5; \
+    uint16_t dst_gap = 5; \
     uint16_t m_step = 6; \
     uint16_t k_step = 7; \
     uint8_t decomp_mode = 8; \
@@ -67,7 +67,7 @@ TEST_F(TestCubeDatamoveCopyGM2L1, c_api_name##_##data_type##_Succ) \
     MOCKER(cce_name, void(__cbuf__ data_type*, __gm__ data_type*, uint32_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t, uint8_t, uint8_t)) \
         .times(1) \
         .will(invoke(&load_gm_to_cbuf_2dv2_Stub<data_type>)); \
-    c_api_name(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, decomp_mode, l2_cache_ctl); \
+    c_api_name(dst, src, m_start_position, k_start_position, dst_gap, m_step, k_step, decomp_mode, l2_cache_ctl); \
     GlobalMockObject::verify(); \
 }
 

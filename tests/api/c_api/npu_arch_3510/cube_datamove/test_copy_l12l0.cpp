@@ -27,7 +27,7 @@ protected:\
 \
 void mock##c_api_name##cce_name##_##data_type(pos data_type* dst, __cbuf__ data_type* src,\
     uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride,\
-    uint16_t dst_stride, bool transpose)\
+    uint16_t dst_gap, bool transpose)\
 {\
     EXPECT_EQ(dst, reinterpret_cast<data_type*>(11));\
     EXPECT_EQ(src, reinterpret_cast<data_type*>(22));\
@@ -36,7 +36,7 @@ void mock##c_api_name##cce_name##_##data_type(pos data_type* dst, __cbuf__ data_
     EXPECT_EQ(m_step, static_cast<uint8_t>(55));\
     EXPECT_EQ(k_step, static_cast<uint8_t>(66));\
     EXPECT_EQ(src_stride, static_cast<int16_t>(77));\
-    EXPECT_EQ(dst_stride, static_cast<uint16_t>(88));\
+    EXPECT_EQ(dst_gap, static_cast<uint16_t>(88));\
 }\
 \
 TEST_F(TestCubeDatamove##class_name##c_api_name##cce_name##data_type##CApi, c_api_name##_Succ)\
@@ -49,13 +49,13 @@ TEST_F(TestCubeDatamove##class_name##c_api_name##cce_name##data_type##CApi, c_ap
     uint8_t m_step = static_cast<uint8_t>(55);\
     uint8_t k_step = static_cast<uint8_t>(66);\
     int16_t src_stride = static_cast<int16_t>(77);\
-    uint16_t dst_stride = static_cast<uint16_t>(88);\
+    uint16_t dst_gap = static_cast<uint16_t>(88);\
 \    
     MOCKER_CPP(cce_name, void(pos data_type*, __cbuf__ data_type*, uint16_t, uint16_t, uint8_t, uint8_t,\
                 int16_t, uint16_t, bool))\
             .times(1)\
             .will(invoke(mock##c_api_name##cce_name##_##data_type));\
-    c_api_name(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);\
+    c_api_name(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_gap);\
     GlobalMockObject::verify();\
 }
 
