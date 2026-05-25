@@ -65,12 +65,13 @@ __global__ __host__ void kfunc() {}
 **学习路径**：详见 [核函数](../核函数.md) [SIMD Builtin关键字](../../../语言扩展层/SIMD-BuiltIn关键字.md)
 
 ### 内存层级
-AI Core采用三级存储架构，数据搬运遵循层级流转原则。
-- **外部存储（Global Memory）**容量大但延迟高，存放算子输入输出数据，需通过MTE2/MTE3流水线搬运到片上存储后方可参与计算。
-- **片上存储（Local Memory）**包括Unified Buffer（UB）、L1 Buffer、L0A/L0B/L0C Buffer：UB作为Vector算子的数据枢纽，数据需从Global Memory搬运至UB后才能参与矢量计算；L1 Buffer、L0A/L0B Buffer、L0C Buffer服务于矩阵计算，输入数据从GM搬运至L1 Buffer再分发至L0A/L0B Buffer供Cube单元计算，结果暂存于L0C Buffer。
-- **寄存器（Ascend 950PR/950DT引入）**位于Vector计算单元最内层，具备最低访存延迟与最高带宽，开放寄存器可编程能力可充分释放硬件峰值性能，Vector计算单元仅访问寄存器，数据需从UB加载至寄存器后方可参与计算。
 
-Ascend C指针编程通过地址限定符声明数组，直接映射物理内存空间：
+Ascend 950PR/Ascend 950DT新一代架构在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。
+- **外部存储**容量大但延迟高，存放算子输入输出数据，需通过MTE2/MTE3流水线搬运到片上存储后方可参与计算。
+- **片上存储**包括Unified Buffer（UB）、L1 Buffer、L0A/L0B/L0C Buffer：UB作为Vector算子的数据枢纽，数据需从Global Memory搬运至UB后才能参与矢量计算；L1 Buffer、L0A/L0B Buffer、L0C Buffer服务于矩阵计算，输入数据从GM搬运至L1 Buffer再分发至L0A/L0B Buffer供Cube单元计算，结果暂存于L0C Buffer。
+- **寄存器**（Ascend 950PR/950DT引入）位于Vector计算单元最内层，具备最低访存延迟与最高带宽，开放寄存器可编程能力可充分释放硬件峰值性能，Vector计算单元仅访问寄存器，数据需从UB加载至寄存器后方可参与计算。
+
+Ascend C C指针编程通过地址限定符声明数组，直接映射物理内存空间：
 - `__gm__`限定符声明Global Memory变量，开发者可直接操作该指针进行数据搬入搬出。
 - `__ubuf__/__cbuf__/__ca__/__cb__`限定符分别声明UB/L1/L0A/L0B等片上存储空间。片上存储包括Unified Buffer、L1 Buffer、L0A/L0B/L0C Buffer，分别服务于矢量计算和矩阵计算。
 - `vector_half`是矢量数据寄存器类型（Ascend 950PR/950DT引入），作为矢量计算的基本存储单元。寄存器变量位宽为VL（Vector Length），可存储VL/sizeof(T)个数据元素（T为数据类型）。Vector计算单元采用Load-Compute-Store模式与UB协作：从UB加载数据至寄存器、执行计算、将结果存回UB。
