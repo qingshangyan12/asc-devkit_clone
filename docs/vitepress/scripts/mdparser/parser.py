@@ -133,6 +133,16 @@ _TEMPLATE = """<!DOCTYPE html>
 <article class="markdown-body">
 {body}
 </article>
+<script>
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    setTimeout(() => btn.classList.remove('copied'), 2000);
+  });
+}
+</script>
 </body>
 </html>
 """
@@ -265,6 +275,30 @@ _HIGHLIGHT_CSS = """
   background: transparent;
   border: 0;
 }
+.markdown-body .code-header .copy-btn {
+  display: flex;
+  align-items: center;
+  padding: 2px 6px;
+  border: 1px solid #d0d7de;
+  border-radius: 4px;
+  background: #fff;
+  color: #57606a;
+  cursor: pointer;
+  font-size: 12px;
+}
+.markdown-body .code-header .copy-btn:hover {
+  background: #eaeef2;
+}
+.markdown-body .code-header .copy-btn svg {
+  fill: #57606a;
+}
+.markdown-body .code-header .copy-btn.copied {
+  color: #1a7f37;
+  border-color: #1a7f37;
+}
+.markdown-body .code-header .copy-btn.copied svg {
+  fill: #1a7f37;
+}
 """
 
 _CODEFENCE_RE = re.compile(
@@ -289,7 +323,11 @@ def _highlight_code(html: str) -> str:
         highlighted = highlight(text, lexer, formatter)
         return (
             f'<div class="code-block">'
-            f'<div class="code-header"><span class="lang-label">{label}</span></div>'
+            f'<div class="code-header"><span class="lang-label">{label}</span>'
+            f'<button class="copy-btn" onclick="copyCode(this)" title="复制代码">'
+            f'<svg width="16" height="16" viewBox="0 0 16 16"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>'
+            f"</button>"
+            f"</div>"
             f'<pre class="highlight"><code>{highlighted}</code></pre>'
             f"</div>"
         )
@@ -315,7 +353,7 @@ def parse_file(filepath: str, gfm: bool = True) -> str:
 
 
 def render_html(body: str) -> str:
-    return _TEMPLATE.format(
-        style=_load_css(),
-        body=body,
-    )
+    html = _TEMPLATE
+    html = html.replace("{style}", _load_css())
+    html = html.replace("{body}", body)
+    return html
