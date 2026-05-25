@@ -127,8 +127,6 @@ _TEMPLATE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 {style}
-{callout_style}
-{highlight_style}
 </style>
 </head>
 <body>
@@ -315,7 +313,5 @@ def parse_file(filepath: str, gfm: bool = True) -> str:
 def render_html(body: str) -> str:
     return _TEMPLATE.format(
         style=_load_css(),
-        callout_style=_CALLOUT_CSS,
-        highlight_style=_get_pygments_css() + "\n" + _HIGHLIGHT_CSS,
         body=body,
     )
