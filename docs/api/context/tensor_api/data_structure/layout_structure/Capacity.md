@@ -12,7 +12,7 @@
 
 Capacity用于计算Layout所需的实际内存容量。
 
-与Size（有效元素个数）不同，Capacity包含了因非连续步长导致的脏数据区域。对于连续排列（stride紧凑），Capacity与Size相等；对于有间隔的排列，Capacity通常大于Size。
+与Size（有效元素个数）不同，Capacity包含了因非连续步长导致的无效数据区域。对于连续排列（stride紧凑），Capacity与Size相等；对于有间隔的排列，Capacity通常大于Size。
 
 ## 函数原型
 

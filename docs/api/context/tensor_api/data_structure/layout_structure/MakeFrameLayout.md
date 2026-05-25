@@ -29,12 +29,12 @@ __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
 
 LayoutTrait用于指定数据类型和C0维度基数。`MakeFrameLayout`支持以下四种传递方式：
 
-1. **`LayoutTraitDefault<T>`**：指定数据类型`T`，C0自动计算。
+1. **LayoutTraitDefault<T>**：指定数据类型`T`，C0自动计算。
    ```cpp
    MakeFrameLayout<NzLayoutPtn, LayoutTraitDefault<float>>(m, n)
    ```
 
-2. **`_C0`**：直接指定C0维度的元素数，数据类型使用默认值。`_C0`是`Std::Int<C0>`的简写形式。
+2. **_C0**：直接指定C0维度的元素数，数据类型使用默认值。`_C0`是`Std::Int<C0>`的简写形式。
    ```cpp
    MakeFrameLayout<NzLayoutPtn, _16>(m, n)
    ```

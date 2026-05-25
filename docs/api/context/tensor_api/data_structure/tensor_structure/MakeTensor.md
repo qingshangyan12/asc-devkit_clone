@@ -10,7 +10,7 @@
 
 头文件为：#include "tensor_api/tensor.h"
 
-MakeTensor负责将内存指针适配器（由`MakeMemPtr`生成）与布局对象（由`MakeFrameLayout` / `MakeLayout`生成）绑定，生成带有完整类型信息的LocalTensor对象。
+MakeTensor负责将内存指针适配器（由[MakeMemPtr](./MakeMemPtr.md)生成）与布局对象（由[MakeFrameLayout](../layout_structure/MakeFrameLayout.md)/[MakeLayout](../layout_structure/MakeFrameLayout.md)生成）绑定，生成带有完整类型信息的LocalTensor对象。
 
 `MakeTensor`内部会根据第一个参数的类型自动判断：
 
