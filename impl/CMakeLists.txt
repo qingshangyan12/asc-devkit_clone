@@ -9,7 +9,6 @@
 # ----------------------------------------------------------------------------------------------------------
 add_compile_options(-Werror)
 
-add_subdirectory(aicpu_api)
 add_subdirectory(adv_api)
 add_subdirectory(basic_api)
 add_subdirectory(c_api)
@@ -37,3 +36,8 @@ if(NOT BUILD_OPEN_PROJECT)
 
   install(SCRIPT ${ASCENDC_DIR}/impl/adv_api/cmake/tiling_directory.cmake COMPONENT asc-devkit)
 endif()
+
+install(FILES
+    ${ASCENDC_DIR}/include/aicpu_api/aicpu_api.h
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/aicpu_api ${INSTALL_OPTIONAL} COMPONENT asc-devkit
+)
