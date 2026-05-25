@@ -1,5 +1,7 @@
 # Memory矢量计算<a name="ZH-CN_TOPIC_0000001376097986"></a>
 
+-   **[Vector逻辑架构与Unified Buffer](<Vector逻辑架构与Unified Buffer/Vector逻辑架构与Unified Buffer.md>)**  
+
 -   **[SIMD计算说明](SIMD计算说明/SIMD计算说明.md)**  
 
 -   **[基础算术](基础算术/基础算术.md)**  
@@ -27,4 +29,3 @@
 -   **[量化设置](量化设置/量化设置.md)**  
 
 -   **[数据重排（ISASI）](数据重排（ISASI）/数据重排（ISASI）.md)**  
-
