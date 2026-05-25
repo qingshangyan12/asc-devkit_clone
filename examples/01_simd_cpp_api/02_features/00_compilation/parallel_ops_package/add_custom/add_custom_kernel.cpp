@@ -12,8 +12,9 @@
 #include "add_custom_tiling.h"
 
 constexpr int32_t BUFFER_NUM = 2;
-constexpr int32_t UB_BLOCK_SIZE = 2048;
+constexpr uint32_t STATIC_TILE_LENGTH = 128;
 
+template <uint32_t tileLength>
 class KernelAdd {
 public:
     __aicore__ inline KernelAdd() {}
@@ -21,7 +22,8 @@ public:
     {
         this->blockLength = totalLength / AscendC::GetBlockNum();
         this->tileNum = tileNum;
-        this->tileLength = this->blockLength / tileNum / BUFFER_NUM;
+        uint32_t runtimeTileLength = this->blockLength / tileNum / BUFFER_NUM;
+        ascendc_assert(runtimeTileLength == tileLength, "runtime tileLength must match template tileLength.\n");
 
         xGm.SetGlobalBuffer((__gm__ DTYPE_X *)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
         yGm.SetGlobalBuffer((__gm__ DTYPE_Y *)y + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
@@ -32,24 +34,37 @@ public:
         int32_t loopCount = this->tileNum * BUFFER_NUM;
 
         AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-        AscendC::LocalTensor<DTYPE_X> xLocal = ubAllocator.Alloc<DTYPE_X, UB_BLOCK_SIZE>();
-        AscendC::LocalTensor<DTYPE_Y> yLocal = ubAllocator.Alloc<DTYPE_Y, UB_BLOCK_SIZE>();
-        AscendC::LocalTensor<DTYPE_Z> zLocal = ubAllocator.Alloc<DTYPE_Z, UB_BLOCK_SIZE>();
+        AscendC::LocalTensor<DTYPE_X> xLocal = ubAllocator.Alloc<DTYPE_X, tileLength>();
+        AscendC::LocalTensor<DTYPE_Y> yLocal = ubAllocator.Alloc<DTYPE_Y, tileLength>();
+        AscendC::LocalTensor<DTYPE_Z> zLocal = ubAllocator.Alloc<DTYPE_Z, tileLength>();
+
+        AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+        AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
 
         for (int32_t i = 0; i < loopCount; i++) {
-            AscendC::DataCopy(xLocal, xGm[i * this->tileLength], this->tileLength);
-            AscendC::DataCopy(yLocal, yGm[i * this->tileLength], this->tileLength);
+            AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+
+            AscendC::DataCopy(xLocal, xGm[i * tileLength], tileLength);
+            AscendC::DataCopy(yLocal, yGm[i * tileLength], tileLength);
 
             AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-            AscendC::Add(zLocal, xLocal, yLocal, this->tileLength);
+            AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
 
+            AscendC::Add(zLocal, xLocal, yLocal, tileLength);
+
+            AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
             AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-            AscendC::DataCopy(zGm[i * this->tileLength], zLocal, this->tileLength);
+            AscendC::DataCopy(zGm[i * tileLength], zLocal, tileLength);
+
+            AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
         }
+
+        AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+        AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
     }
 
 private:
@@ -58,7 +73,6 @@ private:
     AscendC::GlobalTensor<DTYPE_Z> zGm;
     uint32_t blockLength;
     uint32_t tileNum;
-    uint32_t tileLength;
 };
 
 extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
@@ -68,7 +82,7 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8
     REGISTER_TILING_DEFAULT(AddCustomTilingData);
     GET_TILING_DATA(tilingData, tiling);
 
-    KernelAdd op;
+    KernelAdd<STATIC_TILE_LENGTH> op;
     op.Init(x, y, z, tilingData.totalLength, tilingData.tileNum);
     op.Process();
 
