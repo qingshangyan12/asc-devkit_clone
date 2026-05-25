@@ -35,6 +35,7 @@ endif()
 target_link_libraries(op_build PRIVATE
   $<BUILD_INTERFACE:intf_pub>
   $<BUILD_INTERFACE:mmpa_headers>
+  $<BUILD_INTERFACE:c_sec_headers>
   metadef_headers
   metadef
   opp_registry
@@ -42,6 +43,7 @@ target_link_libraries(op_build PRIVATE
   unified_dlog
   mmpa
   error_manager
+  $<$<BOOL:${ENABLE_UNIFIED_BUILD}>:ascend_protobuf>
 )
 
 target_link_options(op_build PRIVATE
