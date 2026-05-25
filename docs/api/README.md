@@ -200,6 +200,8 @@
                 -   [GatherMask](SIMD-API/基础API/Memory矢量计算/比较与选择/GatherMask.md)
 
             -   [类型转换](SIMD-API/基础API/Memory矢量计算/类型转换/类型转换.md)
+                -   [寄存器配置说明](SIMD-API/基础API/Memory矢量计算/类型转换/寄存器配置说明/寄存器配置说明.md)
+                    -   [SetDeqScale](SIMD-API/基础API/Memory矢量计算/类型转换/寄存器配置说明/SetDeqScale.md)
                 -   [Cast](SIMD-API/基础API/Memory矢量计算/类型转换/Cast.md)
                 -   [Truncate\(ISASI\)](SIMD-API/基础API/Memory矢量计算/类型转换/Truncate(ISASI).md)
 
@@ -2318,4 +2320,3 @@
 -   [附录](附录/附录.md)
     -   [预留接口](附录/预留接口.md)
     -   [接口变更说明](附录/接口变更说明.md)
-
