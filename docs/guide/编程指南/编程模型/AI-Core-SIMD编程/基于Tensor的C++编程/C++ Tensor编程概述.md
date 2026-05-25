@@ -1,6 +1,6 @@
 # C++ Tensor编程概述
 
-Ascend C C++ Tensor编程是面向LocalTensor与GlobalTensor的编程范式。核心设计理念是将内存地址抽象为Tensor对象，开发者通过Tensor进行数据搬运、计算操作、同步管理。相比C指针编程的直接地址操作，Tensor编程隐藏内存地址细节，提供更高级的抽象层次，降低开发复杂度。Ascend C提供基础能力接口，支持LocalTensor/GlobalTensor定义、数据搬运、矢量计算、矩阵乘、同步等核心功能。在此基础上，对LocalTensor进行扩展，引入Layout概念描述数据布局，实现类型安全、编译期确定的张量操作，并提供Copy/Mmad Atom、零开销切片等扩展能力。本章旨在帮助开发者建立对Ascend C编程范式的整体认知。全文遵循「设计理念—Tensor抽象—基础能力—扩展能力—接口选择」的递进逻辑展开。
+C++ Tensor编程是面向LocalTensor与GlobalTensor的编程范式。核心设计理念是将内存地址抽象为Tensor对象，开发者通过Tensor进行数据搬运、计算操作、同步管理。相比C指针编程的直接地址操作，Tensor编程隐藏内存地址细节，提供更高级的抽象层次，降低开发复杂度。Ascend C提供基础能力接口，支持LocalTensor/GlobalTensor定义、数据搬运、矢量计算、矩阵乘、同步等核心功能。在此基础上，对LocalTensor进行扩展，引入Layout概念描述数据布局，实现类型安全、编译期确定的张量操作，并提供Copy/Mmad Atom、零开销切片等扩展能力。本章旨在帮助开发者建立对Ascend C编程范式的整体认知。全文遵循「设计理念—Tensor抽象—基础能力—扩展能力—接口选择」的递进逻辑展开。
 
 ## 设计理念：面向Tensor的编程抽象
 ### Tensor编程的核心思想
@@ -88,7 +88,7 @@ AI Core采用三级存储架构，数据搬运遵循层级流转原则。
 - **片上存储（Local Memory）**包括Unified Buffer（UB）、L1 Buffer、L0A/L0B/L0C Buffer：UB作为Vector算子的数据枢纽，数据需从Global Memory搬运至UB后才能参与矢量计算；L1 Buffer、L0A/L0B Buffer、L0C Buffer服务于矩阵计算，输入数据从GM搬运至L1 Buffer再分发至L0A/L0B Buffer供Cube单元计算，结果暂存于L0C Buffer。
 - **寄存器（Ascend 950PR/950DT引入）**位于Vector计算单元最内层，具备最低访存延迟与最高带宽，开放寄存器可编程能力可充分释放硬件峰值性能，Vector计算单元仅访问寄存器，数据需从UB加载至寄存器后方可参与计算。
 
-Ascend C C++Tensor编程将物理内存抽象为Tensor对象，Tensor携带数据类型、形状、内存地址等属性，搬运计算接口直接操作。
+C++ Tensor编程将物理内存抽象为Tensor对象，Tensor携带数据类型、形状、内存地址等属性，搬运计算接口直接操作。
   - **GlobalTensor**存放算子输入/输出数据, 开发者通过SetGlobalBuffer设置地址和大小，可配置L2缓存策略。
   - **LocalTensor**存放UB/L1/L0等片上存储数据。片上存储包括Unified Buffer、L1 Buffer、L0A/L0B/L0C Buffer，服务于矢量计算和矩阵计算。自Ascend 950PR/Ascend 950DT起，扩展Tensor引入Layout概念，实现编译期类型安全和自动参数推断：
   - **RegTensor**用于存放矢量数据寄存器。自Ascend 950PR/Ascend 950DT引入，是矢量计算的基本存储单元。RegTensor的位宽是VL（Vector Length），可存储VL/sizeof(T)个数据元素（T表示数据类型）。Vector计算单元通过Load-Compute-Store与UB协作：
@@ -99,7 +99,7 @@ Ascend C C++Tensor编程将物理内存抽象为Tensor对象，Tensor携带数�
 
 AI Core采用多流水线异步并行架构。MTE2流水线负责数据搬入（GM→片上存储），MTE3流水线负责数据搬出（片上存储→GM），Vector流水线执行矢量计算，Cube流水线执行矩阵乘运算。流水线异步执行带来显著性能收益，但缺乏自动协调，需通过同步机制确保数据依赖关系满足。
 
-Ascend C C++Tensor编程针对AI Core同步机制分别提供了核内同步和核间同接口。核内同步包括：Mutex互斥锁保护共享资源并发访问(Ascend 950PR/Ascend 950DT引入)，SetFlag/WaitFlag实现多流水线间同步（生产者发信号、消费者等待），PipeBarrier约束单流水线内执行顺序。核间同步采用计数器机制，通过CrossCoreSetFlag/WaitFlag协调多核执行进度。
+C++ Tensor编程针对AI Core同步机制分别提供了核内同步和核间同接口。核内同步包括：Mutex互斥锁保护共享资源并发访问(Ascend 950PR/Ascend 950DT引入)，SetFlag/WaitFlag实现多流水线间同步（生产者发信号、消费者等待），PipeBarrier约束单流水线内执行顺序。核间同步采用计数器机制，通过CrossCoreSetFlag/WaitFlag协调多核执行进度。
 - **Mutex互斥锁**用于核内异步流水指令之间的同步处理，其功能类似于传统CPU中的锁机制。通过锁定指定流水线再释放流水线来完成流水线间的同步。
 - **SetFlag/WaitFlag（多流水同步）**采用**信号通知-阻塞等待**模式，通过流水线间的主动通知与被动等待实现执行顺序的严格约束。
 - **PipeBarrier（单流水同步）**采用**阻塞等待**模式，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。用于在同一流水线内部约束执行顺序。
@@ -111,10 +111,10 @@ Ascend C C++Tensor编程针对AI Core同步机制分别提供了核内同步和�
 
 AI Core采用「标量控制单元+Vector矢量计算单元+Cube矩阵计算单元+分级本地存储（UB/L1/L0/Reg）」的异构架构，各组件分工明确、协同联动，硬件能力边界直接决定算子的数据搬运路径与计算形态。数据搬运与计算是AI Core算子开发的两大核心操作，共同构成算子执行的数据流转与计算处理闭环——数据搬运解决「数据从哪里来、到哪里去」的问题，计算解决「数据如何处理」的问题，二者协同配合完成算子功能实现。
 
-Ascend C C++Tensor编程针对AI Core的架构， 提供了面向Tensor编程能力的搬运和计算接口，搬运接口分为矢量搬运（GM↔UB）和矩阵搬运（GM→L1→L0A/L0B→L0C→GM），基础搬运手动传参、显式同步。计算接口分为矢量计算和矩阵计算两大类，矢量计算覆盖算术、比较、转换等场景，Ascend 950PR/950DT引入寄存器，矢量计算接口拆分为Memory矢量计算接口和Reg矢量计算接口，矩阵计算以Mmad为核心执行矩阵乘加运算。另外 Ascend 950PR/950DT还引入了Layout对Tensor进行扩展，还基于扩展Tensor提供了一套简化参数传入的矩阵搬运和计算接口；
+C++ Tensor编程针对AI Core的架构， 提供了面向Tensor编程能力的搬运和计算接口，搬运接口分为矢量搬运（GM↔UB）和矩阵搬运（GM→L1→L0A/L0B→L0C→GM），基础搬运手动传参、显式同步。计算接口分为矢量计算和矩阵计算两大类，矢量计算覆盖算术、比较、转换等场景，Ascend 950PR/950DT引入寄存器，矢量计算接口拆分为Memory矢量计算接口和Reg矢量计算接口，矩阵计算以Mmad为核心执行矩阵乘加运算。另外 Ascend 950PR/950DT还引入了Layout对Tensor进行扩展，还基于扩展Tensor提供了一套简化参数传入的矩阵搬运和计算接口；
 
 **学习路径**：详见[数据搬运与计算](./数据搬运与计算.md)
 
-本章阐述了Ascend C编程范式的整体体系：将内存地址抽象为Tensor对象，隐藏地址细节。基础能力接口提供Tensor定义、数据搬运、计算、同步等核心功能。扩展能力引入Layout概念，通过Shape和Stride编译期确定实现类型安全，支持平铺布局、层次化布局、分形布局等多种布局模式。开发者可根据场景选择基础能力或扩展能力，复杂场景可混合使用。
+本章阐述了Ascend C编程体系中的C++ Tensor编程范式：将内存地址抽象为Tensor对象，隐藏地址细节。基础能力接口提供Tensor定义、数据搬运、计算、同步等核心功能。扩展能力引入Layout概念，通过Shape和Stride编译期确定实现类型安全，支持平铺布局、层次化布局、分形布局等多种布局模式。开发者可根据场景选择基础能力或扩展能力，复杂场景可混合使用。
 
-后续章节将逐层深入、循序渐进地详解内存层级管理、数据搬运与计算接口、同步机制、编程示例，帮助开发者熟练掌握Ascend C Tensor编程的核心能力。
+后续章节将逐层深入、循序渐进地详解内存层级管理、同步机制、数据搬运与计算接口、编程示例，帮助开发者熟练掌握C++ Tensor编程的核心能力。
