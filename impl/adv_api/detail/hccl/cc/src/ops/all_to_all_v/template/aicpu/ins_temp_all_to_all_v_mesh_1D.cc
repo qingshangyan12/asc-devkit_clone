@@ -154,10 +154,10 @@ HcclResult InsTempAlltoAllVMesh1D::KernelRun(const OpParam& param,
         return HCCL_E_INTERNAL;
     }
 
-    // u64 StartTime = GetCurCpuTimestamp();
+    u64 StartTime = GetCurCpuTimestamp();
     CHK_RET(RunALLtoALL(templateResource.channels, templateResource.threads, tempAlgParams, myAlgRank));
-    // u64 EndTime = GetCurCpuTimestamp();
-    // HCCL_RUN_INFO("[KernelRun] startTime: %llu, endTime: %llu, useTime: %llu", StartTime, EndTime, EndTime - StartTime);
+    u64 EndTime = GetCurCpuTimestamp();
+    HCCL_RUN_INFO("[KernelRun] startTime: %llu, endTime: %llu, useTime: %llu", StartTime, EndTime, EndTime - StartTime);
 
     HCCL_INFO("[InsTempAlltoAllVMesh1D][KernelRun] Run End");
     return HcclResult::HCCL_SUCCESS;
@@ -193,41 +193,62 @@ HcclResult InsTempAlltoAllVMesh1D::RunALLtoALL(
 
     std::vector<ThreadHandle> subThreads;
     if (threadNum_ > 1) {
+        u64 Time1 = GetCurCpuTimestamp();
         // 只做一次全量的前同步
         subThreads.assign(threads.begin() + 1, threads.end());
         GetNotifyIdxMainToSub(notifyIdxMainToSub_);
         CHK_RET(PreSyncInterThreads(threads[0], subThreads, notifyIdxMainToSub_));
+        u64 Time2 = GetCurCpuTimestamp();
+        HCCL_RUN_INFO("[RunALLtoALL][PreSyncInterThreads] startTime: %llu, endTime: %llu, useTime: %llu, subThread: %u", Time1, Time2, Time2 - Time1, 
+            subThreads.size());
     }
     for (u32 roundIdx = 0; roundIdx < commLoops && remainRankSize > 0; roundIdx++) {
-        u64 Time1 = GetCurCpuTimestamp();
         CalcCommRankSetForOneLoop(roundIdx, remainRankSize, commRanks); // 计算本轮通信rank
         if (isDmaRead_) {
+            u64 Time1 = GetCurCpuTimestamp();
             if (roundIdx == 0) {
                 // 如果是read模式，第一轮做统一的前拷贝
                 CHK_RET(PreCopyByLoop(commRanks, channels, threads, tempAlgParams, myAlgRank));
+                u64 Time2 = GetCurCpuTimestamp();
+                HCCL_RUN_INFO("[RunALLtoALL][PreCopyByLoop] startTime: %llu, endTime: %llu, useTime: %llu", Time1, Time2, Time2 - Time1);
                 if (threadNum_ > 1) {
                     GetNotifyIdxSubToMain(notifyIdxSubToMain_);
                     CHK_RET(PostSyncInterThreads(threads[0], subThreads, notifyIdxSubToMain_)); // 第1轮通信中将前拷贝与本卡数据拷贝错开
                     CHK_RET(PreSyncInterThreads(threads[0], subThreads, notifyIdxMainToSub_));
                 }
+                u64 Time3 = GetCurCpuTimestamp();
+                HCCL_RUN_INFO("[RunALLtoALL][sync] startTime: %llu, endTime: %llu, useTime: %llu", Time2, Time3, Time3 - Time2);
                 CHK_RET(LocalCopyForMyRank(tempAlgParams, threads[0], myAlgRank, 0)); // 在第1轮通信中用0号流做本卡数据拷贝
+                u64 Time4 = GetCurCpuTimestamp();
+                HCCL_RUN_INFO("[RunALLtoALL][LocalCopyForMyRank] startTime: %llu, endTime: %llu, useTime: %llu", Time3, Time4, Time4 - Time3);
             }
+            u64 Time5 = GetCurCpuTimestamp();
             CHK_RET(RunSendRecvByLoop(commRanks, tempAlgParams, channels, threads, roundIdx, commLoops));
+            u64 Time6 = GetCurCpuTimestamp();
+            HCCL_RUN_INFO("[RunALLtoALL][RunSendRecvByLoop] startTime: %llu, endTime: %llu, useTime: %llu", Time5, Time6, Time6 - Time5);
             remainRankSize -= commRanks.size();
         } else {
+            u64 Time1 = GetCurCpuTimestamp();
             if (roundIdx == 0) {
                 CHK_RET(LocalCopyForMyRank(tempAlgParams, threads[0], myAlgRank, 0)); // 在第1轮通信中用0号流做本卡数据拷贝
             }
+            u64 Time2 = GetCurCpuTimestamp();
+            HCCL_RUN_INFO("[RunALLtoALL][LocalCopyForMyRank] startTime: %llu, endTime: %llu, useTime: %llu", Time1, Time2, Time2 - Time1);
             CHK_RET(RunSendRecvByLoop(commRanks, tempAlgParams, channels, threads, roundIdx, commLoops));
             remainRankSize -= commRanks.size();
+            u64 Time3 = GetCurCpuTimestamp();
+            HCCL_RUN_INFO("[RunALLtoALL][RunSendRecvByLoop] startTime: %llu, endTime: %llu, useTime: %llu", Time2, Time3, Time3 - Time2);
             HCCL_DEBUG("[InsTempAlltoAllVMesh1D][RunALLtoALL] round[%u] finish, commRank size is [%zu], "\
                 "remainRankSize is [%u].", roundIdx, commRanks.size(), remainRankSize);
         }
     }
     if (threadNum_ > 1) {
         // 只做一次全量的后同步
+        u64 Time1 = GetCurCpuTimestamp();
         GetNotifyIdxSubToMain(notifyIdxSubToMain_);
         CHK_RET(PostSyncInterThreads(threads[0], subThreads, notifyIdxSubToMain_));
+        u64 Time2 = GetCurCpuTimestamp();
+        HCCL_RUN_INFO("[RunALLtoALL][PostSyncInterThreads] startTime: %llu, endTime: %llu, useTime: %llu", Time1, Time2, Time2 - Time1);
     }
     return HCCL_SUCCESS;
 }
@@ -248,12 +269,19 @@ HcclResult InsTempAlltoAllVMesh1D::RunSendRecvByLoop(const std::vector<u32> &com
         }
         const std::vector<ChannelInfo> &curChannels = channels.at(remoteRank);
         // send数据按照channel分片
+        u64 Time1 = GetCurCpuTimestamp();
         CHK_RET(CalcDataSplitByPortGroupCommon(tempAlgParams.sendCounts[remoteRank], dataTypeSize_, curChannels,
             sendCountsSplit_, sendSizeSplit_, sendOffsetSplit_, static_cast<u32>(curChannels.size())));
+        u64 Time2 = GetCurCpuTimestamp();
+        HCCL_RUN_INFO("[RunALLtoALL][CalcDataSplitByPortGroupCommon][0] startTime: %llu, endTime: %llu, useTime: %llu", Time1, Time2, Time2 - Time1);
         // recv数据按照channel分片
         CHK_RET(CalcDataSplitByPortGroupCommon(tempAlgParams.recvCounts[remoteRank], dataTypeSize_, curChannels,
             recvCountsSplit_, recvSizeSplit_, recvOffsetSplit_, static_cast<u32>(curChannels.size())));
+        u64 Time3 = GetCurCpuTimestamp();
+        HCCL_RUN_INFO("[RunALLtoALL][CalcDataSplitByPortGroupCommon][1] startTime: %llu, endTime: %llu, useTime: %llu", Time2, Time3, Time3 - Time2);
         CHK_RET(RunSendRecvByChannel(tempAlgParams, roundIdx, curChannels, remoteRank, threads, commLoops));
+        u64 Time4 = GetCurCpuTimestamp();
+        HCCL_RUN_INFO("[RunALLtoALL][RunSendRecvByChannel] startTime: %llu, endTime: %llu, useTime: %llu", Time3, Time4, Time4 - Time3);
     }
     return HcclResult::HCCL_SUCCESS;
 }
