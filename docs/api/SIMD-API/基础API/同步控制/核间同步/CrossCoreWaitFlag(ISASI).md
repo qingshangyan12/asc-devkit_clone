@@ -99,13 +99,13 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
     - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
 
 - flagId相关的约束：
-    - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取到最低位4bit为准。
+    - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取最低位4bit为准。
     - 每个flagId有个对应计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到核间同步（CrossCoreSetFlag）全部完成后，会将对应CrossCoreWaitFlag的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。flagId对应的计数器计数范围为0-15。如果计数器的值超出该范围，则会异常报错，中断流程。
     - 模式0、1、2下，如果多个模式同时共用同一个flagId，CrossCoreWaitFlag无法分辨具体是哪一个模式，会与预期不符合。
 
         如图1所示，AIC 1的flagId 0同时用于进行模式2 \(AIV执行CrossCoreSetFlag\)和模式0\(所有AIC\)的核间同步。AIC 1在调用CrossCoreWaitFlag的时候，读取flagId=0的计数器，此时该计数器的值变化可能是由于模式0或模式2同步完成。AIC 1感知不到具体是哪个模式，只能感知到计数器值变化，能够解除阻塞。
 
-        **图 1**  错误示范\(连续使用CrossWaitFlag等待不同模式\)<a name="zh-cn_topic_0000002547028479_fig208671330144620"></a>  
+        **图 1**  错误示范\(连续使用CrossCoreWaitFlag等待不同模式\)<a name="zh-cn_topic_0000002547028479_fig208671330144620"></a>  
         ![](../../../../figures/cross_wait_flag_multi_mode_error.png)
 
 - 使用该接口模式0时，建议开启batchmode模式，使算子独占全部所需核资源，否则可能因满足以下条件导致死锁：

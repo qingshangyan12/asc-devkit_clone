@@ -53,7 +53,7 @@
 
 当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。
 
-调用IBSet设置某一个核的标志位，与IBWait成对出现配合使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。
+调用IBSet设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -74,7 +74,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| gmWorkspace | 输出 | 外部存储核状态的公共缓存，类型为GlobalTensor。GlobalTensor数据结构的定义请参考[GlobalTensor](../../../基础数据结构/GlobalTensor/GlobalTensor.md)。 |
+| gmWorkspace | 输入 | 外部存储核状态的公共缓存，类型为GlobalTensor。GlobalTensor数据结构的定义请参考[GlobalTensor](../../../基础数据结构/GlobalTensor/GlobalTensor.md)。 |
 | ubWorkspace | 输入 | 存储当前核状态的公共缓存。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | blockIdx | 输入 | 表示等待核的idx号，取值范围：[0, 核数-1]。 |
 | eventID | 输入 | 用来控制当前核的set、wait事件。 |

@@ -61,7 +61,7 @@
 
 头文件路径为："basic_api/kernel_operator_block_sync_intf.h"。
 
-SetFlag/WaitFlag接口用于多流水间的同步：如下图1所示，同一核内不同流水线之间的同步指令，具有数据依赖的不同流水指令之间需要插入此同步。
+如图1所示，SetFlag/WaitFlag接口用于核内多流水间的同步：
 
 - SetFlag：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。SetFlag只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。
 - WaitFlag：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
@@ -85,7 +85,7 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | event | 输入 | 模板参数。<br>同步事件，数据类型为HardEvent。详细内容参考下文中的同步类型说明。 |
-| eventID | 输入 | 事件ID。数据类型为int32_t类型。其定义如下：<br>在基于TPipe和TQue编程场景中，eventID需要通过[AllocEventID](../../资源管理/Pipe和Que框架/TPipe/AllocEventID.md)或者[FetchEventID](../../资源管理/Pipe和Que框架/TPipe/FetchEventID.md)来获取。<cann-filter npu-type="950"><br>&bull; Ascend 950PR/Ascend 950DT，数据范围为：0-7</cann-filter><cann-filter npu-type="A3"><br>&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7</cann-filter><cann-filter npu-type="910b"><br>&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7</cann-filter><cann-filter npu-type="310p"><br>&bull; Atlas 推理系列产品AI Core，数据范围为：0-7</cann-filter><cann-filter npu-type="910"><br>&bull; Atlas 训练系列产品，数据范围为：0-3</cann-filter> |
+| eventID | 输入 | 事件ID。数据类型为int32_t类型。eventID的取值范围与产品型号有关，具体请参考[约束说明](#section633mcpsimp)。 |
 
 同一核内的不同流水之间，在存在数据访问依赖时，需要根据数据访问的先后顺序，插入对应的同步事件。HardEvent用来表示对应的同步事件。
 
@@ -104,6 +104,8 @@ HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先
 - 在**TPipe和TQue编程实践**中，eventID需要通过**AllocEventID**或者**FetchEventID**来获取。
 
 - 在基于**静态Tensor编程实践**中，事件的类型和事件ID由开发者自行管理，建议使用事件ID0-5，事件ID6用于系统内部规划（当前未使用），事件ID7用于TPipe编程中的**自动同步**功能，目前暂不建议直接使用事件ID6-7。
+
+- eventID的取值范围如下：<br><cann-filter npu-type="950">&bull; Ascend 950PR/Ascend 950DT，数据范围为：0-7</cann-filter><br><cann-filter npu-type="A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7</cann-filter><br><cann-filter npu-type="910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7</cann-filter><br><cann-filter npu-type="310p">&bull; Atlas 推理系列产品AI Core，数据范围为：0-7</cann-filter><br><cann-filter npu-type="910">&bull; Atlas 训练系列产品，数据范围为：0-3</cann-filter>
 
 ## 调用示例<a name="section837496171220"></a>
 

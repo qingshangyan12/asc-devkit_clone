@@ -66,7 +66,7 @@ __aicore__ inline void DataSyncBarrier()
 
 | 参数名 | 描述 |
 | --- | --- |
-| arg0 | 模板参数，表示需要等待的内存位置，类型为MemDsbT，可取值为：<br>&bull; ALL，等待所有内存访问指令。<br>&bull; DDR，等待GM访问指令。<br>&bull; UB，等待UB访问指令。<br>&bull; SEQ，等待SEQ访问指令。 |
+| arg0 | 模板参数，表示需要等待的内存位置，类型为MemDsbT，可取值为：<br>&bull; ALL，等待GM和UB的访问指令（不包括其他内存位置，例如L0C Buffer、L1 Buffer）。<br>&bull; DDR，等待GM访问指令。<br>&bull; UB，等待UB访问指令。<br>&bull; SEQ，等待SEQ访问指令。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
