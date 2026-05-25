@@ -485,7 +485,7 @@
                     -   [GetCurAddr](SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/GetCurAddr-72.md)
                     -   [Alloc](SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/Alloc.md)
 
-        -   [同步控制](SIMD-API/基础API/同步控制/同步控制-73.md)
+        -   [同步控制](SIMD-API/基础API/同步控制/同步控制.md)
             -   [核内同步](SIMD-API/基础API/同步控制/核内同步/核内同步.md)
                 -   [同步控制简介](SIMD-API/基础API/同步控制/核内同步/同步控制简介.md)
                 -   [TQueSync](SIMD-API/基础API/同步控制/核内同步/TQueSync/TQueSync.md)
