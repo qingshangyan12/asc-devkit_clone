@@ -247,8 +247,7 @@ int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
         || currentSoc == SocVersion::ASCEND350) && ubufDynamicSize == 0)) {
         return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, hostArgs, argsSize, nullptr, 0);
     }
-    if ((currentSoc == SocVersion::ASCEND950 || currentSoc == SocVersion::ASCEND350) &&
-        ubufDynamicSize !=0) {
+    if ((currentSoc == SocVersion::ASCEND950 || currentSoc == SocVersion::ASCEND350) && ubufDynamicSize !=0) {
         constexpr uint32_t attrLen = 1;
         aclrtLaunchKernelAttrValue attrValue{};
         attrValue.dynUBufSize = ubufDynamicSize;

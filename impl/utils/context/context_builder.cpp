@@ -263,13 +263,13 @@ ContextBuilder &ContextBuilder::PlatformInfo(void *platformInfo)
 ContextBuilder &ContextBuilder::AddPlatformInfo(const char *customSocVersion)
 {
     static std::map<std::string, SocVersion> convertMap = {
+        {"Ascend350", SocVersion::ASCEND350},
         {"Ascend310P", SocVersion::ASCEND310P},
         {"Ascend910", SocVersion::ASCEND910},
         {"Ascend910B", SocVersion::ASCEND910B},
         {"Ascend910_93", SocVersion::ASCEND910B},
         {"Ascend310B", SocVersion::ASCEND310B},
         {"Ascend950", SocVersion::ASCEND950},
-        {"Ascend350", SocVersion::ASCEND350},
     };
     const static std::string labelVersion = "version";
     const static std::string labelShortSocVersion = "Short_SoC_version";
