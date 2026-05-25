@@ -47,8 +47,10 @@
 
   在核函数直调样例中，样例默认支持的shape为：M = 1024, N = 1024, K = 256。
 
-  <table border="2" align="center">
-  <caption>表1：样例规格表</caption>
+<a name="表1"></a>
+<table border="2" align="center">
+<caption style="font-weight: normal;">
+    <span style="font-weight: bold; font-size: 1.2em;">📌 表1：样例规格表</span></caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul with Quant</td></tr>
   <tr><td rowspan="5" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x (矩阵A)</td><td align="center">[M, K]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
@@ -56,7 +58,7 @@
   <tr><td align="center">quant</td><td align="center">[N]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z (矩阵C)</td><td align="center">[M, N]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_tensor_api</td></tr>
-  </table>
+</table>
 
   编译期模板参数默认值：
 
