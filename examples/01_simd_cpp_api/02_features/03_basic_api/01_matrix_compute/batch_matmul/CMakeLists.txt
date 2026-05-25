@@ -18,7 +18,15 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
+<<<<<<< HEAD
     batch_matmul.asc
+=======
+<<<<<<< HEAD:examples/01_simd_cpp_api/00_introduction/01_vector/add/CMakeLists.txt
+    add.asc
+=======
+    batch_matmul.asc
+>>>>>>> review matrix examples:examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/batch_matmul/CMakeLists.txt
+>>>>>>> review matrix examples
 )
 
 target_compile_options(demo PRIVATE
