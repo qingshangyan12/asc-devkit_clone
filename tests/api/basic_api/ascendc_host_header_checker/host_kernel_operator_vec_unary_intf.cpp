@@ -9,3 +9,6 @@
 */
 
 #include "kernel_operator_vec_unary_intf.h"
+
+using AscendC::Abs;
+using AscendC::Neg;
