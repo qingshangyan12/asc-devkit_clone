@@ -22,9 +22,7 @@
 #define LIB_QUANTIZATION_ASCEND_ANTIQUANT_H
 #include "kernel_tensor.h"
 #include "include/adv_api/quantization/ascend_antiquant_utils.h"
-#if defined(__NPU_ARCH__)
 #include "../../../impl/adv_api/detail/quantization/antiquant/ascend_antiquant_impl.h"
-#endif
 namespace AscendC {
 #pragma begin_pipe(V)
 /* !
@@ -46,10 +44,8 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__)
     AscendAntiQuantImpl<InputDataType, OutputDataType, isTranspose>(dst, src, offset, scale, sharedTmpBuffer, k,
         shapeInfo);
-#endif
 }
 
 /* !
@@ -70,9 +66,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__)
     AscendAntiQuantImpl<InputDataType, OutputDataType, isTranspose>(dst, src, scale, sharedTmpBuffer, k, shapeInfo);
-#endif
 }
 
 /* !
@@ -93,9 +87,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__)
     AscendAntiQuantImpl<InputDataType, OutputDataType, isTranspose>(dst, src, offset, scale, k, shapeInfo);
-#endif
 }
 
 /* !
@@ -117,10 +109,8 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__)
     AscendAntiQuantImpl<InputDataType, OutputDataType, isTranspose>(dst, src, offset, scale, sharedTmpBuffer, k,
         shapeInfo);
-#endif
 }
 
 /* !
@@ -141,9 +131,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__)
     AscendAntiQuantImpl<InputDataType, OutputDataType, isTranspose>(dst, src, scale, sharedTmpBuffer, k, shapeInfo);
-#endif
 }
 
 /* !
@@ -163,12 +151,10 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__)
     AscendAntiQuantImpl<InputDataType, OutputDataType, isTranspose>(dst, src, offset, scale, k, shapeInfo);
-#endif
 }
 
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 template <typename InputDataType, typename OutputDataType, bool isTranspose>
 __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src,
     const LocalTensor<fp8_e8m0_t>& scale, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
@@ -176,9 +162,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendAntiQuantImpl<InputDataType, OutputDataType, isTranspose>(dst, src, scale, k, shapeInfo);
-#endif
 }
 
 template <typename InputDataType, typename OutputDataType, bool isTranspose>
@@ -189,9 +173,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendAntiQuantImpl<InputDataType, OutputDataType, isTranspose>(dst, src, scale, sharedTmpBuffer, k, shapeInfo);
-#endif
 }
 
 template <typename dstT, typename srcT, typename scaleT, const AscendAntiQuantConfig& config, const AscendAntiQuantPolicy& policy>
@@ -199,9 +181,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<dstT>& dstTensor, const
                                        const LocalTensor<scaleT> &scaleTensor, const LocalTensor<scaleT> &offsetTensor,
                                        const AscendAntiQuantParam& para)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendAntiQuantImpl<dstT, srcT, scaleT, config, policy>(dstTensor, srcTensor, scaleTensor, offsetTensor, para);
-#endif
 }
 
 template <typename dstT, typename srcT, typename scaleT, const AscendAntiQuantConfig& config, const AscendAntiQuantPolicy& policy>
@@ -209,9 +189,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<dstT>& dstTensor, const
                                        const LocalTensor<scaleT> &scaleTensor, const LocalTensor<scaleT> &offsetTensor,
                                        const LocalTensor<uint8_t> &sharedTmpBuffer, const AscendAntiQuantParam& para)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendAntiQuantImpl<dstT, srcT, scaleT, config, policy>(dstTensor, srcTensor, sharedTmpBuffer, scaleTensor, offsetTensor, para);
-#endif
 }
 #endif
 

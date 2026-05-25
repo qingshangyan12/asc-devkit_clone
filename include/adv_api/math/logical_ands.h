@@ -23,20 +23,13 @@
 #define LIB_MATH_LOGICAL_ANDS_H
 
 #include "kernel_tensor.h"
+#include "logical_ands_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/logical_ands/logical_ands_common_impl.h"
 #endif
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
-struct LogicalAndsConfig {
-    bool isReuseSource;
-    int8_t scalarTensorIndex;
-};
-constexpr LogicalAndsConfig DEFAULT_LOGICAL_ANDS_CONFIG = {false, 1};
-#endif
-
 #pragma begin_pipe(V)
 /*!
  * \ingroup LogicalAnds
