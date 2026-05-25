@@ -502,8 +502,18 @@ static uint32_t AscendCExecutorLaunchKernel(void* binHandle, const uint64_t tili
     ASCENDLOGI("tilingKey is %lu, numBlocks is %u, stream is %p\n", tilingKey, numBlocks, stream);
     aclrtFuncHandle funcHandle;
     ASCENDC_ASSERT_RTOK_RETVAL(aclrtBinaryGetFunctionByEntry(binHandle, tilingKey, &funcHandle));
+    constexpr uint32_t attrLen = 2;
+    aclrtLaunchKernelAttrValue engTypeValue{};
+    engTypeValue.engineType = ACL_RT_ENGINE_TYPE_AIC;
+    aclrtLaunchKernelAttrValue blkValue{};
+    blkValue.blockDimOffset = 0;
+    aclrtLaunchKernelAttr attrList[attrLen] = {
+        {ACL_RT_LAUNCH_KERNEL_ATTR_ENGINE_TYPE, engTypeValue},
+        {ACL_RT_LAUNCH_KERNEL_ATTR_BLOCKDIM_OFFSET, blkValue},
+    };
+    aclrtLaunchKernelCfg cfg = {attrList, attrLen};
     ASCENDC_ASSERT_RTOK_RETVAL(aclrtLaunchKernelWithHostArgs(
-        funcHandle, numBlocks, stream, nullptr,
+        funcHandle, numBlocks, stream, &cfg,
         (void *)args, size, nullptr, 0));
     return ASCENDC_SUCCESS;
 }
@@ -514,12 +524,16 @@ static uint32_t AscendCExecutorVectorCoreLaunchKernel(void* binHandle, const uin
     ASCENDLOGI("tilingKey is %lu, aiv numBlocks is %u\n", tilingKey, numBlocks);
     aclrtFuncHandle funcHandle;
     ASCENDC_ASSERT_RTOK_RETVAL(aclrtBinaryGetFunctionByEntry(binHandle, tilingKey, &funcHandle));
-    aclrtLaunchKernelAttr attrList[] = {
-        { ACL_RT_LAUNCH_KERNEL_ATTR_SCHEM_MODE,     { .schemMode = 0 } },
-        { ACL_RT_LAUNCH_KERNEL_ATTR_ENGINE_TYPE,    { .engineType = ACL_RT_ENGINE_TYPE_AIV } },
-        { ACL_RT_LAUNCH_KERNEL_ATTR_BLOCKDIM_OFFSET, { .blockDimOffset = aivNumBlocksOffset } },
+    constexpr uint32_t attrLen = 2;
+    aclrtLaunchKernelAttrValue engTypeValue{};
+    engTypeValue.engineType = ACL_RT_ENGINE_TYPE_AIV;
+    aclrtLaunchKernelAttrValue blkValue{};
+    blkValue.blockDimOffset = aivNumBlocksOffset;
+    aclrtLaunchKernelAttr attrList[attrLen] = {
+        {ACL_RT_LAUNCH_KERNEL_ATTR_ENGINE_TYPE, engTypeValue},
+        {ACL_RT_LAUNCH_KERNEL_ATTR_BLOCKDIM_OFFSET, blkValue},
     };
-    aclrtLaunchKernelCfg cfg = { attrList, 3 };
+    aclrtLaunchKernelCfg cfg = {attrList, attrLen};
     ASCENDC_ASSERT_RTOK_RETVAL(aclrtLaunchKernelWithHostArgs(
         funcHandle, numBlocks, stream, &cfg,
         (void *)args, size, nullptr, 0));
