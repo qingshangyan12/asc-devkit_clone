@@ -4,23 +4,24 @@
 
 本路径下包含了与数据搬运相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。
 
-## 算子开发样例
+## 样例列表
 
-|  目录名称                                                  |  功能描述                                             |
-| ----------------------------------------------------------- | --------------------------------------------------- |
-| [copy](./copy) | 本样例基于Copy实现数据搬运，适用于VECIN，VECCALC，VECOUT之间的数据搬运，支持mask操作和DataBlock间隔操作 |
-| [data_copy_pad](./data_copy_pad) | 本样例基于DataCopyPad实现数据非对齐搬运，其中从Global Memory搬运数据至Local Memory时，可以根据开发者的需要自行填充数据 |
-| [data_copy_ub2l1](./data_copy_ub2l1) | 本样例基于DataCopy实现UB->L1 Buffer的数据搬运，其中从UB搬运数据至L1 Buffer时，通过硬通道进行搬运 |
-| [data_copy_ub2l1_kfc](./data_copy_ub2l1_kfc) | 本样例适用于以下场景：通过Matmul高阶API注册KFC，将数据从UB搬运到L1 Buffer，然后进行mmad计算 |
-| [nd2nz_during_data_movement](./nd2nz_during_data_movement) | 本样例基于DataCopy实现数据搬运，可用于在数据搬运时进行ND到NZ格式的转换|
-| [nz2nd_during_data_movement](./nz2nd_during_data_movement) | 本样例基于DataCopy实现数据搬运，可用于在数据搬运时进行NZ到ND格式的转换|
-| [scalar_quantized_activation_during](./scalar_quantized_activation_during) | 本样例基于DataCopy实现数据搬运，支持在数据搬运过程中进行scalar量化和Relu激活等操作 |
-| [set_pad_value](./set_pad_value) | 本样例基于SetPadValue为非对齐搬运DataCopyPad接口设置需要填充的数值 |
-| [slice_data_movement](./slice_data_movement) | 本样例通过Ascend C编程语言实现了DataCopy数据切片算子，支持数据的切片搬运，提取多维Tensor数据的子集进行搬运 |
-| [tensor_quantized_activation_during](./tensor_quantized_activation_during) | 本样例基于DataCopy实现数据搬运，支持在数据搬运过程中进行tensor量化和Relu激活等操作 |
-| [broadcast_vec_to_mm](./broad_cast_vec_to_mm) | 本样例基于BroadCastVecToMM实现数据广播搬运，适用于Unified Buffer与L0C Buffer之间的数据传输 |
-| [multidimensional_data_movement](./multidimensional_data_movement) | 本样例基于DataCopy的多维数据搬运，相较于基础数据搬运接口，可自由配置搬入的维度以及对应的Stride |
-| [move_mask_reg](./move_mask_reg) | 本样例演示了SIMD场景下，基于RegBase编程范式下数据从UB到MaskReg之间的搬入搬出。 |
-| [move_successive_align](./move_successive_align) | 本样例演示了SIMD场景下，基于RegBase编程范式的连续对齐搬运算子的核函数直调方法，算子支持单核运行。 |
-| [move_successive_unalign](./move_successive_unalign) | 本样例演示了SIMD场景下，基于RegBase编程范式的连续非对齐搬运算子的核函数直调方法，算子支持单核运行。 |
-| [move_unsuccessive_align](./move_unsuccessive_align) | 本样例演示了SIMD场景下，基于RegBase编程范式的非连续对齐搬运算子的核函数直调方法，算子支持单核运行。 |
+| 目录名称 | 功能描述 | 支持的产品 |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------| --- |
+| [auxscalar_reg](./auxscalar_reg) |  本样例演示使用AuxScalar方式从UB读取多个标量数据参与计算 | Ascend 950PR/Ascend 950DT |
+| [broadcast_ub2l0c](./broadcast_ub2l0c) |  本样例基于BroadCastVecToMM实现数据广播搬运，将位于UB（Unified Buffer）上数据进行广播并搬运到CO1（L0C Buffer） | Atlas 推理系列产品AI Core |
+| [copy_in_tensor_api](./copy_in_tensor_api) |  本样例介绍基于Tensor API实现Copy In接口与带Bias的动态Shape矩阵乘法，展示GM到L1、L1到L0的数据搬运以及Mmad矩阵乘加计算 | Ascend 950PR/Ascend 950DT |
+| [copy_out_tensor_api](./copy_out_tensor_api) |  本样例介绍基于Tensor API实现Copy Out接口与带Bias的动态Shape矩阵乘法，展示L0C到GM、L0C到UB的数据搬运以及Mmad矩阵乘加计算 | Ascend 950PR/Ascend 950DT |
+| [copy_ub2ub](./copy_ub2ub) |  本样例基于Copy实现数据搬运，适用于VECIN，VECOUT之间的数据搬运，支持mask连续模式和counter模式。 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [data_copy_gm2l1](./data_copy_gm2l1) |  本样例介绍如何使用DataCopy将输入数据从GM（Global Memory）搬出到L1（L1 Buffer） | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [data_copy_gm2ub_nddma](./data_copy_gm2ub_nddma) |  本样例介绍如何使用多维数据搬运接口实现GM（Global Memory）到UB（Unified Buffer）通路的数据搬运，通过自由配置搬入的维度信息以及对应的Stride，可以用于Padding、Transpose、BroadCast、Slice等多种数据变换操作 | Ascend 950PR/Ascend 950DT |
+| [data_copy_gm2ub_slice](./data_copy_gm2ub_slice) |  本样例基于DataCopy实现数据切片搬运，提取多维Tensor数据的子集进行GM（Global Memory）与UB（Unified Buffer）通路之间的搬运 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [data_copy_l0c2gm](./data_copy_l0c2gm) |  本样例在卷积场景下，基于DataCopy实现数据随路量化激活搬运 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [data_copy_pad_gm2ub_ub2gm](./data_copy_pad_gm2ub_ub2gm) |  本样例基于DataCopyPad实现数据非32字节对齐数据的搬运，并进行数据填充 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [data_copy_ub2l1](./data_copy_ub2l1) |  本样例在Mmad矩阵乘场景下，基于DataCopy实现UB（Unified Buffer）到L1（L1 Buffer）的数据搬运 | Ascend 950PR/Ascend 950DT |
+| [gather_ld_reg](./gather_ld_reg) |  本样例演示使用Gather接口实现离散数据搬入，包含高维Gather（源为LocalTensor）和GatherB（按DataBlock收集）两种场景 | Ascend 950PR/Ascend 950DT |
+| [ld_st_reg_align](./ld_st_reg_align) |  本样例实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的对齐数据搬运操作 | Ascend 950PR/Ascend 950DT |
+| [ld_st_reg_mask](./ld_st_reg_mask) |  本样例实现UB(Unified Buffer)对MaskReg(掩码寄存器)的搬入搬出，以及使用mask进行掩码搬出的操作 | Ascend 950PR/Ascend 950DT |
+| [ld_st_reg_unalign](./ld_st_reg_unalign) |  本样例实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的非对齐数据搬运操作 | Ascend 950PR/Ascend 950DT |
+| [move_reg](./move_reg) |  本样例演示调用MaskGenWithRegTensor接口实现将掩码从RegTensor(Reg矢量计算基本单元)搬入MaskReg(掩码寄存器)的操作 | Ascend 950PR/Ascend 950DT |
+| [scatter_st_reg](./scatter_st_reg) |  本样例演示调用Scatter接口实现离散数据搬出（按元素分散到UB） | Ascend 950PR/Ascend 950DT |

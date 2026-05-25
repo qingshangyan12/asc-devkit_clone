@@ -2,11 +2,12 @@
 
 ## 概述
 
-本样例介绍了基于Ascend C的Matmul算子的核函数直调方法，可最大化利用AI处理器的并行计算能力，显著提升算子的执行效率，使用与高性能推理与训练场景。
+介绍基于Ascend C的矩阵乘计算
 
-## 算子开发样例
+## 样例列表
 
-|  目录名称                                                   |  功能描述                                              |
-| ------------------------------------------------------------ | ---------------------------------------------------- |
-| [matmul](./matmul) | 本样例介绍Matmul算子的核函数直调实现，通过最大化利用昇腾AI处理器的并行计算能力，显著提升算子执行效率 |
-| [matmul_tensor_api](./matmul_tensor_api) | 基于静态Tensor_API编程范式实现矩阵乘计算 |
+| 目录名称 | 功能描述 | 支持的产品 |
+| ------------------------------------------------------------ | ---------------------------------------------------- | --- |
+| [matmul](./matmul) |  基于静态Tensor编程范式实现矩阵乘计算 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [matmul_high_level_api](./matmul_high_level_api) |  基于Matmul高阶API实现矩阵乘计算 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [matmul_tensor_api](./matmul_tensor_api) |  基于Tensor API的静态编程范式实现矩阵乘计算 | Ascend 950PR/Ascend 950DT |
