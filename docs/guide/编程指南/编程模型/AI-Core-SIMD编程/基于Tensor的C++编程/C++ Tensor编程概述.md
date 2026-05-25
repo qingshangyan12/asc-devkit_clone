@@ -1,6 +1,6 @@
 # C++ Tensor编程概述
 
-Ascend C C++ Tensor编程是面向LocalTensor与GlobalTensor的编程范式。核心设计理念是将内存地址抽象为Tensor对象，开发者通过Tensor进行数据搬运、计算操作、同步管理。相比C指针编程的直接地址操作，Tensor编程隐藏内存地址细节，提供更高级的抽象层次，降低开发复杂度。Ascend C提供基础能力接口，支持LocalTensor/GlobalTensor定义、数据搬运、向量计算、矩阵乘、同步等核心功能。在此基础上，对LocalTensor进行扩展，引入Layout概念描述数据布局，实现类型安全、编译期确定的张量操作，并提供Copy/Mmad Atom、零开销切片等扩展能力。本章旨在帮助开发者建立对Ascend C编程范式的整体认知。全文遵循「设计理念—Tensor抽象—基础能力—扩展能力—接口选择」的递进逻辑展开。
+Ascend C C++ Tensor编程是面向LocalTensor与GlobalTensor的编程范式。核心设计理念是将内存地址抽象为Tensor对象，开发者通过Tensor进行数据搬运、计算操作、同步管理。相比C指针编程的直接地址操作，Tensor编程隐藏内存地址细节，提供更高级的抽象层次，降低开发复杂度。Ascend C提供基础能力接口，支持LocalTensor/GlobalTensor定义、数据搬运、矢量计算、矩阵乘、同步等核心功能。在此基础上，对LocalTensor进行扩展，引入Layout概念描述数据布局，实现类型安全、编译期确定的张量操作，并提供Copy/Mmad Atom、零开销切片等扩展能力。本章旨在帮助开发者建立对Ascend C编程范式的整体认知。全文遵循「设计理念—Tensor抽象—基础能力—扩展能力—接口选择」的递进逻辑展开。
 
 ## 设计理念：面向Tensor的编程抽象
 ### Tensor编程的核心思想
@@ -29,13 +29,65 @@ Copy(ubPointer, gmPointer);
 - **提升代码可读性**：Tensor命名表达数据语义，接口调用直观，参数通过Tensor对象传递。
 - **扩展能力优化**：Layout编译期确定实现类型安全，Slice/Tile零开销切片，Atom设计简化参数配置。
 
-## 接口体系：基础能力与扩展能力
+## 编程范式: 面向C++ Tensor的SPMD编程范式
+
+### Kernel函数及函数修饰符
+
+核函数（Kernel Function）是Ascend C算子设备侧实现的入口。Ascend C允许用户使用C/C++函数的语法扩展来编写设备端的运行代码，用户在核函数中进行数据访问和计算操作，由此实现该算子的所有功能。区别于普通的C++函数调用时仅执行一次，当核函数被调用时，多个核都执行相同的核函数代码，具有相同的函数入参，并行执行。
+
+使用__global__函数类型限定符来标识它是一个核函数；使用__vector__限定符标识该核函数在Vector核执行；其指针入参变量需要增加变量类型限定符__gm__，表明该指针变量指向Global Memory上某处内存地址；使用<<<...>>>内核调用符调用执行核函数，并指定调用时的执行核数。
+- `__global_`: 执行空间限定符，声明一个Kernel函数。
+- `__vector__`: 标识该核函数仅在Vector核执行。针对耦合模式的硬件架构，该修饰符不生效。
+- `__cube__`: 标识该核函数仅在Cube核执行。针对耦合模式的硬件架构，该修饰符不生效。
+- `__mix__`: 标识该核函数同时在Cube核和Vector核上执行。(cube, vec)分别表示核函数启动的Cube核和Vector核的配比，支持的配比为(1, 0)，(0, 1)，(1, 1)， (1, 2)。针对耦合模式的硬件架构，该修饰符不生效。
+```cpp
+// 实现核函数
+__vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
+{
+    uint32_t blockLength = TILE_LENGTH * NUM_BLOCKS / asc_get_block_num();
+}
+
+// 调用核函数
+void add_custom_do(uint32_t numBlocks, void* l2ctrl, void* stream, uint8_t* x, uint8_t* y, uint8_t* z)
+{
+    add_custom<<<numBlocks, l2ctrl, stream>>>(x, y, z);
+}
+```
+
+另外，通过`__aicore__`和`__host__`限定符来声明函数执行空间：
+- **__aicore__**: 执行空间限定符，声明一个在Device侧执行的函数, 该函数只能被__global__函数，或者其他__aicore__函数调用。
+```cpp
+// 定义一个在Device侧执行的函数
+__aicore__ void bar() {}
+
+// 定义核函数, 当前不通过__vector__、__cube__、__mix__等指定具体的执行核, 标识__global__ __aicore__告知编译框架自行推导
+__global__ __aicore__ void foo() {
+  bar();
+}
+```
+- **__host__**: 执行空间限定符, 声明一个在Host侧执行的函数，__global__ 和__host__不能一起使用，__host__限定符是可选项，无函数执行空间限定符定义的函数，默认是host函数。
+```cpp
+// 不指定执行空间限定符, 默认定义Host侧执行函数
+int foo() {}
+
+// 指定__host__空间限定符, 定义Host侧执行函数
+__host__ int bar() {
+  foo();
+}
+
+// __global__ 和__host__不能一起使用
+__global__ __host__ void kfunc() {}
+```
+
+**详细方法**：参见 [核函数](../核函数.md) [SIMD Builtin关键字](../../../语言扩展层/SIMD-BuiltIn关键字.md)
+
+### 接口体系：基础能力与扩展能力
 Ascend C Tensor编程分为基础能力与扩展能力两个层次：
-- **基础能力接口**：提供Tensor定义、数据搬运、向量计算、矩阵乘、同步机制等核心功能。参数通过结构体传递，内存位置用Hardware枚举表达，大小运行期设置，同步显式控制。
+- **基础能力接口**：提供Tensor定义、数据搬运、矢量计算、矩阵乘、同步机制等核心功能。参数通过结构体传递，内存位置用Hardware枚举表达，大小运行期设置，同步显式控制。
 - **扩展能力接口（Ascend 950PR/950DT引入）**：在原有Tensor定义上引入Layout抽象实现编译期类型安全，Copy/Mmad Atom简化参数配置，Slice/Tile零开销切片，Operation驱动隐式同步减少手动调用。
 
-## 基础能力：Tensor定义与核心接口
-### Tensor定义
+### 基础Tensor能力：Tensor定义与核心接口
+#### Tensor定义
 **LocalTensor定义**：对应片上内存（UB、L1、L0A等），通过LocalMemAllocator方式指定物理位置申请。
 ```cpp
 // LocalTensor定义示例
@@ -49,25 +101,25 @@ GlobalTensor<half> gmTensor;
 gmTensor.SetGlobalBuffer((__gm__ half*)gmBuffer, bufferSize);
 ```
 
-### 数据搬运与计算示例
+#### 数据搬运与计算示例
 ```cpp
 constexpr uint32_t TILE_LENGTH = 256;
 AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
 AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, TILE_LENGTH>();
 AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, TILE_LENGTH>();
 AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, TILE_LENGTH>();
-// ===== 向量加法完整流程 =====
+// ===== 矢量加法完整流程 =====
 // 1. 数据搬运：GM→UB
 DataCopy(xLocal, gmIn0, TILE_LENGTH);
 DataCopy(yLocal, gmIn1, TILE_LENGTH);
-// 2. 向量计算：Add
+// 2. 矢量计算：Add
 Add(zLocal, xLocal, yLocal, TILE_LENGTH);
 // 3. 结果输出：UB→GM
 DataCopy(gmOut, zLocal, TILE_LENGTH);
 ```
 
-## 扩展能力：Layout抽象与Tensor定义
-### Layout表述
+### 扩展Tensor能力：Layout抽象与Tensor定义
+#### Layout表述
 我们使用Shape和Stride来表达Layout排布格式，比如下图中的行优先和列优先排布：
 Shape用于表达Tensor形状，Stride则用于区分不同的排布：
 - 行优先: Shape (2, 4) Stride (4, 1)
