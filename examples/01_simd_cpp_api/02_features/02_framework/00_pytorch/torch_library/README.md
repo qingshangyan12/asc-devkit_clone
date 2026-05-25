@@ -52,7 +52,7 @@
 
   ```c++
   TORCH_LIBRARY(ascendc_ops, m) {
-      m.def(ascendc_add"(Tensor x, Tensor y) -> Tensor");
+      m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
   }
   ```
 
