@@ -465,7 +465,7 @@ constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="9.16%" headers="mcps1.2.4.1.2 "><p id="p1156354035611"><a name="p1156354035611"></a><a name="p1156354035611"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76.64999999999999%" headers="mcps1.2.4.1.3 "><p id="p87341352154"><a name="p87341352154"></a><a name="p87341352154"></a>params 结构体是一个基于模板参数的类型选择器，用于在编译时根据不同的CO2Layout布局类型，自动选择对应的参数类型。</p>
+<td class="cellrowborder" valign="top" width="76.64999999999999%" headers="mcps1.2.4.1.3 "><p id="p87341352154"><a name="p87341352154"></a><a name="p87341352154"></a>params 结构体是一个类型为TransformParams的基于模板参数的类型选择器，用于在编译时根据不同的CO2Layout布局类型，自动选择对应的参数类型。</p>
 <a name="screen17278377518"></a><a name="screen17278377518"></a><pre class="screen" codetype="Cpp" id="screen17278377518">template &lt;CO2Layout format&gt;
 struct TransformParams {};
 template &lt;&gt;
