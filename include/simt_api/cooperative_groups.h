@@ -71,7 +71,7 @@ public:
 
 private:
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_block();
-    __SIMT_DEVICE_FUNCTIONS_DECL__ thread_group create_tiled_group(unsigned int tile_size) const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_group create_tiled_group(unsigned int tile_size) const;
 };
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_block this_thread_block();
@@ -100,13 +100,13 @@ public:
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long meta_group_rank() const;
 
     template <typename T>
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl(T var, unsigned int src_rank) const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl(T var, int src_rank) const;
 
     template <typename T>
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl_up(T var, int delta) const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl_up(T var, unsigned int delta) const;
 
     template <typename T>
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl_down(T var, int delta) const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl_down(T var, unsigned int delta) const;
 
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline int any(int predicate) const;
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline int all(int predicate) const;
@@ -134,17 +134,17 @@ struct _tile_helpers {
 template <unsigned int>
 struct tile_helpers;
 template <>
-struct tile_helpers<32> : public _tile_helpers<1, 0xFFFFFFFF, 0x1F, 5> {};
+struct tile_helpers<32> : public _tile_helpers<1, 0xFFFFFFFF, 0x1F, 5> {};  // thread_block_tile<32> config
 template <>
-struct tile_helpers<16> : public _tile_helpers<2, 0x0000FFFF, 0x0F, 4> {};
+struct tile_helpers<16> : public _tile_helpers<2, 0x0000FFFF, 0x0F, 4> {};  // thread_block_tile<16> config
 template <>
-struct tile_helpers<8> : public _tile_helpers<4, 0x000000FF, 0x07, 3> {};
+struct tile_helpers<8> : public _tile_helpers<4, 0x000000FF, 0x07, 3> {};   // thread_block_tile<8> config
 template <>
-struct tile_helpers<4> : public _tile_helpers<8, 0x0000000F, 0x03, 2> {};
+struct tile_helpers<4> : public _tile_helpers<8, 0x0000000F, 0x03, 2> {};   // thread_block_tile<4> config
 template <>
-struct tile_helpers<2> : public _tile_helpers<16, 0x00000003, 0x01, 1> {};
+struct tile_helpers<2> : public _tile_helpers<16, 0x00000003, 0x01, 1> {};  // thread_block_tile<2> config
 template <>
-struct tile_helpers<1> : public _tile_helpers<32, 0x00000001, 0x00, 0> {};
+struct tile_helpers<1> : public _tile_helpers<32, 0x00000001, 0x00, 0> {};  // thread_block_tile<1> config
 
 template <unsigned int Size>
 class thread_block_tile_base {
@@ -172,7 +172,7 @@ public:
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl_down(T var, unsigned int delta) const;
 
     template <typename T>
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl_xor(T var, unsigned int delta) const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl_xor(T var, unsigned int lane_mask) const;
 
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline int any(int predicate) const;
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline int all(int predicate) const;

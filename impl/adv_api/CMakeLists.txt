@@ -9,6 +9,8 @@
 # ----------------------------------------------------------------------------------------------------------
 add_compile_options(-Wno-error)
 
+include(gen_kernel_tiling.cmake)
+
 # generate tiling_api.h softlink
 if(NOT BUILD_OPEN_PROJECT)
   add_custom_command(
@@ -19,23 +21,8 @@ if(NOT BUILD_OPEN_PROJECT)
     DEPENDS ${ASCENDC_INCLUDE_DIR}/adv_api/tiling_api.h)
   add_custom_target(gen_kernel_api ALL
                     DEPENDS ${CMAKE_BINARY_DIR}/tiling/tiling_api.h)
-endif()
-
-include(gen_kernel_tiling.cmake)
-
-add_library(kernel_tiling_headers INTERFACE)
-add_dependencies(kernel_tiling_headers gen_kernel_tiling)
-if(NOT BUILD_OPEN_PROJECT)
   add_dependencies(kernel_tiling_headers gen_kernel_api)
 endif()
-target_include_directories(
-  kernel_tiling_headers
-  INTERFACE $<INSTALL_INTERFACE:include>
-            $<INSTALL_INTERFACE:include/tikcpp>
-            $<INSTALL_INTERFACE:include/tikcpp/tikcfw>
-            $<INSTALL_INTERFACE:include/tikcpp/tikcfw/kernel_tiling>
-            $<BUILD_INTERFACE:${KERNEL_TILING_DIR}>
-            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
 
 add_subdirectory(tiling)
 
@@ -114,17 +101,8 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
   install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/utils_headers.cmake COMPONENT asc-devkit)
 endif()  
 
-if (BUILD_OPEN_PROJECT AND ENABLE_BUILD_DEVICE)
+if (BUILD_OPEN_PROJECT)
     add_subdirectory(detail/hccl/cc)
-
-    set(HCCL_CC_BUILD_DIR ${CMAKE_BINARY_DIR}/impl/adv_api/detail/hccl/cc)
-    install(FILES "${HCCL_CC_BUILD_DIR}/src/libmc2_client.so" "${HCCL_CC_BUILD_DIR}/src/common/hcomm_dlsym/libmc2_compat.so"
-        DESTINATION "${CMAKE_SYSTEM_PROCESSOR}-linux/lib64" COMPONENT asc-devkit OPTIONAL)
-    install(FILES "${HCCL_CC_BUILD_DIR}/src/libmc2_server.json"
-        DESTINATION "opp/built-in/op_impl/aicpu/config" COMPONENT asc-devkit OPTIONAL)
-
-    install(FILES "${HCCL_CC_BUILD_DIR}/include/hccl.h" "${HCCL_CC_BUILD_DIR}/include/hccl_mc2.h"
-        DESTINATION "${CMAKE_SYSTEM_PROCESSOR}-linux/include/hccl" COMPONENT asc-devkit OPTIONAL)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)
