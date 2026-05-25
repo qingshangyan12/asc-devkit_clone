@@ -1,8 +1,10 @@
-# msSanitizer样例
+# msSanitizer样例说明
 
 ## 概述
 
-开发者可以使用算子异常检测工具msSanitizer来在早期阶段发现并修复异常，确保算子的质量和稳定性。本样例以静态Tensor编程方法的add算子来展现该工具如何检测异常。
+msSanitizer用于检测Ascend C样例运行过程中的内存访问、内存泄漏、未使用内存、竞争和未初始化访问等异常。本样例以Add计算为载体，展示如何通过`mssanitizer`运行样例并定位异常。
+
+本样例代码为正确实现。用户可以按照“异常场景检测”章节中的说明修改`mssanitizer.asc`，重新编译后通过`mssanitizer`体验对应异常检测能力。
 
 请参考[算子开发工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)中的“环境准备”章节，获取详细的安装指南和步骤。
 
@@ -15,209 +17,189 @@
 
 ```
 ├── msSanitizer
-│   ├── scripts
-│   │   ├── gen_data.py             // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
-│   ├── CMakeLists.txt              // 编译工程文件
-│   ├── data_utils.h                // 数据读入写出函数
-│   └── add_custom.asc              // Ascend C算子实现 & 调用样例
+│   ├── CMakeLists.txt       // 编译工程文件
+│   ├── mssanitizer.asc      // Ascend C样例实现和Host侧调用样例
+│   └── README.md            // 样例说明
 ```
 
-## 算子描述
+## 样例描述
 
-算子实现的是固定shape为72×4096的Add算子。
+本样例默认使用`float`类型，完成两个Tensor逐元素相加：
 
-Add的计算公式为：
-
-```python
+```text
 z = x + y
 ```
 
-- x：输入，形状为\[72, 4096]，数据类型为float；
-- y：输入，形状为\[72, 4096]，数据类型为float；
-- z：输出，形状为\[72, 4096]，数据类型为float；
-
-## 算子规格描述
-
-<table>
-<tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
-<tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">x</td><td align="center">72 * 4096</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td align="center">y</td><td align="center">72 * 4096</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">72 * 4096</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
-</table>
-
-- 算子实现：
-  Add算子的数学表达式为：
-
-  ```
-  z = x + y
-  ```
-
-  计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数相加，得到最终结果，再搬出到外部存储上。
-
-  Add算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm和yGm搬运到Local Memory，分别存储在xLocal、yLocal，Compute任务负责对xLocal、yLocal执行加法操作，计算结果存储在zLocal中，CopyOut任务负责将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
+输入`x`、`y`和输出`z`的Shape均为`[8, 2048]`。Host侧直接构造输入数据和golden数据，将输入数据拷贝到Device侧后启动`add_custom` Kernel，Kernel按`blockNum = 8`切分数据并完成Add计算，最后将结果拷贝回Host侧完成精度对比。
 
 ## 异常场景检测
 
-本样例代码为正确实现。用户可以按照下述方式来复现各个异常场景，体验msSanitizer的异常检测能力。
+复现异常场景时，需要先按对应说明修改`mssanitizer.asc`中的代码，再在`build`目录下重新编译并运行对应检测命令。如果只修改源码但没有重新编译，`mssanitizer`仍会运行旧的`demo`，不会检测到新改入的错误。
+
 - **内存检测**
+
   - 非法读写：由于访问了未分配的内存导致的异常。
 
-    用户可以注释掉正确的DataCopy，使用错误的DataCopy复现该场景。LocalTensor xLocal分配的大小为TILE_LENGTH，但是搬运中大小错误的填为TILE_LENGTH * 2，大于xLocal分配的大小，因此触发非法读写。
-    ```
-    // 1. correct datacopy
-    AscendC::DataCopy(xLocal, xGm[i * TILE_LENGTH], TILE_LENGTH);
-    // 2. illegal read of xGm (TILE_LENGTH*2)
-    // AscendC::DataCopy(xLocal, xGm[i * TILE_LENGTH], TILE_LENGTH * 2);
+    用户可以注释掉正确的`DataCopy`，使用错误的`DataCopy`复现该场景。`xLocal`分配的大小为`blockLength`，但是搬运长度错误地写成`blockLength * 2`，大于`xLocal`分配的大小，因此触发非法读写。
+
+    ```cpp
+    // 1. 正确的DataCopy。
+    AscendC::DataCopy(xLocal, xGm, blockLength);
+    // 2. 错误示例：搬运长度写成blockLength * 2，会触发非法读写。
+    // AscendC::DataCopy(xLocal, xGm, blockLength * 2);
     ```
 
-    工具报错内容：
-    ```
-    ====== ERROR: illegal write of size 16384
-    ======    at 0x0 on UB in add_custom
-    ======    in block aiv(0-7) on device 0
+    重新编译并执行检测：
+
+    ```bash
+    make -B demo
+    mssanitizer ./demo
     ```
 
-  - 非对齐访问：内存访问未满足字节对齐要求
+  - 非对齐访问：内存访问未满足字节对齐要求。
 
-    用户可以注释掉正确的DataCopy，使用错误的DataCopy复现该场景。DataCopy GM->UB的搬运中，UB侧地址应该要满足32B对齐，但是xLocal[5]不满足32B对齐(5 * sizeof(float) = 20)，因此触发非对齐访问。
-    ```
-    // 1. correct datacopy
-    AscendC::DataCopy(xLocal, xGm[i * TILE_LENGTH], TILE_LENGTH);
-    // 3. misaligned access of xLocal (should be 32Byte aligned)
-    // AscendC::DataCopy(xLocal[5], xGm[i * TILE_LENGTH], TILE_LENGTH);
-    ```
+    用户可以注释掉正确的`DataCopy`，使用错误的`DataCopy`复现该场景。`DataCopy` GM到UB的搬运中，UB侧地址需要满足32B对齐要求，`xLocal[5]`不满足32B对齐要求，因此触发非对齐访问。
 
-    工具报错内容：
-    ```
-    ====== ERROR: misaligned access of size 32
-    ======    at 0x14 on UB in add_custom
-    ======    in block aiv(0-7) on device 0
-    ```
-  - 内存泄漏：申请内存使用后未释放，导致程序在运行过程中内存占用持续增加的异常
-
-    用户可以注释掉这行aclrtFree来复现该场景。注释前tilingDevice被正常释放，注释后tilingDevice在使用后未释放，因此触发内存泄漏。
-
-    注意：调用mssanitizer时需要传入--leak-check=yes来开启分配内存泄露检查。
-    ```
-    // 1. correct free for memory. If deleted, it will trigger memory leak check.
-    aclrtFree(tilingDevice);
+    ```cpp
+    // 1. 正确的DataCopy。
+    AscendC::DataCopy(xLocal, xGm, blockLength);
+    // 3. 错误示例：xLocal[5]不满足32B对齐要求，会触发非对齐访问。
+    // AscendC::DataCopy(xLocal[5], xGm, blockLength);
     ```
 
-    工具报错内容：
-    ```
-    ====== ERROR: LeakCheck: detected memory leaks
+    重新编译并执行检测：
 
-    ======    Direct leak of 64 byte(s)
-    ======      at 0x12c0c0013000 on GM
-    ======      allocated in :0 (serialNo:0)
-    ```
-  - 分配内存未使用：对内存分配后未使用导致的异常
-
-    用户可以注释掉正确的aclrtMalloc, 使用错误的aclrtMalloc来复现该场景。inputDevice[i]需要分配的大小为inputsInfo[i].length，但是实际分配了inputsInfo[i].length * 5，其中有inputsInfo[i].length * 4未使用，因此触发分配内存未使用。
-
-    注意：调用mssanitizer时需要传入--check-unused-memory=yes来开启分配内存未使用检查。
-    ```
-    // 1. correct malloc for memory
-    aclrtMalloc((void **)(&inputDevice[i]), inputsInfo[i].length, ACL_MEM_MALLOC_HUGE_FIRST);
-    // 2. needed inputsInfo[i].length, but malloc length * 5, therefore trigger unused memory
-    // aclrtMalloc((void **)(&inputDevice[i]), inputsInfo[i].length * 5, ACL_MEM_MALLOC_HUGE_FIRST);
+    ```bash
+    make -B demo
+    mssanitizer ./demo
     ```
 
-    工具报错内容：
+  - 内存泄漏：申请内存使用后未释放，导致程序在运行过程中内存占用持续增加的异常。
+
+    用户可以注释掉`aclrtFree(zDevice)`来复现该场景。注释前`zDevice`被正常释放，注释后`zDevice`在使用后未释放，因此触发内存泄漏。
+
+    注意：调用`mssanitizer`时需要传入`--leak-check=yes`来开启分配内存泄漏检查。
+
+    ```cpp
+    // 正确释放Device侧输出内存。删除该行后，可触发内存泄漏检测。
+    aclrtFree(zDevice);
     ```
-    ====== WARNING: Unused memory of 4718624 byte(s)
-    ======    at 0x12c041200000 on GM
-    ======    code in :0 (serialNo:260)
+
+    重新编译并执行检测：
+
+    ```bash
+    make -B demo
+    mssanitizer ./demo --leak-check=yes
+    ```
+
+  - 分配内存未使用：对内存分配后未使用导致的异常。
+
+    用户可以注释掉正确的`aclrtMalloc`，使用错误的`aclrtMalloc`复现该场景。`xDevice`实际只使用`totalByteSize`大小，但是错误示例申请了5倍大小，其中多余部分未使用，因此触发分配内存未使用。
+
+    注意：调用`mssanitizer`时需要传入`--check-unused-memory=yes`来开启分配内存未使用检查。
+
+    ```cpp
+    // 1. 正确的Device侧输入内存申请。
+    aclrtMalloc((void**)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+    // 2. 错误示例：实际只使用totalByteSize，却申请5倍大小，会触发未使用内存检测。
+    // aclrtMalloc((void**)&xDevice, totalByteSize * 5, ACL_MEM_MALLOC_HUGE_FIRST);
+    ```
+
+    重新编译并执行检测：
+
+    ```bash
+    make -B demo
+    mssanitizer ./demo --check-unused-memory=yes
     ```
 
 - **竞争检测**
-  - 竞争检测：用于解决在并行计算环境中内存访问竞争的问题。
 
-    用户可以注释掉SetFlag和WaitFlag来复现该场景。SetFlag和WaitFlag是用来保证MTE2 GM->UB的搬运和Vector计算Add的时序，删除后可能会导致先计算Add再搬运数据导致精度异常，因此触发竞争检测。
+  竞争检测用于定位并行执行中的内存访问竞争问题。用户可以注释掉`MTE2_V`对应的`SetFlag`和`WaitFlag`来复现该场景。这组同步用来保证MTE2完成GM到UB搬运后，Vector再读取`xLocal`和`yLocal`执行Add。删除后，Vector可能在搬入完成前读取UB数据，因此触发竞争检测。
 
-    注意：调用mssanitizer时需要传入--tool=racecheck来开启竞争检测。
-    ```
-    // dependency of PIPE_MTE2 & PIPE_V caused by xLocal/yLocal in one single loop
-    // If SetFlag and WaitFlag are deleted, will trigger RAW
-    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-    ```
+  注意：调用`mssanitizer`时需要传入`--tool=racecheck`来开启竞争检测。
 
-    工具报错内容：
-    ```
-    ====== ERROR: Potential RAW hazard detected at UB in add_custom on device 0:
-    ======    PIPE_MTE2 Write at RAW()+0x4000 in block 0 (aiv) on device 0 at pc current 0xd08 (serialNo:25)
-    ======    xxxxx
-    ======    PIPE_V Read at RAW()+0x4000 in block 0 (aiv) on device 0 at pc current 0x1578 (serialNo:28)
-    ======    xxxxx
-    ```
+  ```cpp
+  // Add读取xLocal/yLocal前，需要等待MTE2搬运完成；删除后会触发RAW竞争。
+  AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+  ```
+
+  重新编译并执行检测：
+
+  ```bash
+  make -B demo
+  mssanitizer ./demo --tool=racecheck
+  ```
 
 - **未初始化检测**
-  - 未初始化检测：内存申请后为未初始化状态，未对内存进行写入，直接读取未初始化的值导致的异常。
 
-    用户可以注释掉下述的SetGlobalBuffer来复现该场景。对于device侧的zGm在使用前未初始化，因此触发未初始化检测。
+  未初始化检测用于定位内存申请后未初始化、直接读取未初始化值导致的异常。用户可以注释掉`zGm.SetGlobalBuffer`来复现该场景。对于Device侧的`zGm`在使用前未初始化，因此触发未初始化检测。
 
-    注意：调用mssanitizer时需要传入--tool=initcheck来开启竞争检测。
-    ```
-    // correct initialize of zGm.
-    // If deleted, it will trigger uninitialized read
-    zGm.SetGlobalBuffer((__gm__ float *)z + AscendC::GetBlockIdx() * singleCoreLength, singleCoreLength);
-    ```
+  注意：调用`mssanitizer`时需要传入`--tool=initcheck`来开启未初始化检测。
 
-    工具报错内容：
-    ```
-    ====== ERROR: uninitialized read of size 1179648
-    ======    at 0x12c041600000 on GM
-    ```
+  ```cpp
+  // 正确初始化zGm。删除该行后，可触发未初始化检测。
+  zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
+  ```
+
+  重新编译并执行检测：
+
+  ```bash
+  make -B demo
+  mssanitizer ./demo --tool=initcheck
+  ```
 
 ## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
+
 - 配置环境变量
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
+  默认路径，root用户安装CANN软件包：
 
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  ```bash
+  source /usr/local/Ascend/cann/set_env.sh
+  ```
+
+  默认路径，非root用户安装CANN软件包：
+
+  ```bash
+  source $HOME/Ascend/cann/set_env.sh
+  ```
+
+  指定路径`install_path`安装CANN软件包：
+
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
 - 样例执行
+
   ```bash
-  mkdir -p build && cd build;      # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  mkdir -p build && cd build
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..
+  make -j
 
-  # 执行编译生成的可执行程序，使用mssanitizer执行样例
-  # 根据业务需求执行对应的mssanitizer命令
-  mssanitizer ./demo                             # 非法读写 / 非对齐访问
-  mssanitizer ./demo --leak-check=yes            # 开启内存泄漏检查
-  mssanitizer ./demo --check-unused-memory=yes   # 开启分配内存未使用检查
-  mssanitizer ./demo --tool=racecheck            # 竞争检测
-  mssanitizer ./demo --tool=initcheck            # 未初始化检测
-
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  # 根据调测需求执行对应的mssanitizer命令。
+  mssanitizer ./demo
+  mssanitizer ./demo --leak-check=yes
+  mssanitizer ./demo --check-unused-memory=yes
+  mssanitizer ./demo --tool=racecheck
+  mssanitizer ./demo --tool=initcheck
   ```
 
 - 编译选项说明
 
-| 选项 | 可选值 | 说明 |
-|------|--------|------|
-| `CMAKE_ASC_ARCHITECTURES` | `dav-2201` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品 |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` | NPU架构：`dav-2201`对应Atlas A2训练系列产品/Atlas A2推理系列产品和Atlas A3训练系列产品/Atlas A3推理系列产品 |
 
 - 执行结果
-  执行结果如下，说明精度对比成功。
+
+  精度对比成功时，输出如下：
+
   ```bash
   test pass!
   ```
