@@ -34,36 +34,46 @@
     可以参考以下代码片段：
 
     ```
-    
     // 定义模板参数
     constexpr AscendC::LnConfig CONFIG = {
         AscendC::LnAlgo::PRECISION_1ULP_FTZ_FALSE
     };
-    template <typename T>
-    __aicore__ inline void Compute(GM_ADDR dst, GM_ADDR src, uint32_t count)
+    constexpr uint32_t DATA_COUNT = 1024;
+    constexpr uint32_t xAddr = 0;
+    constexpr uint32_t yAddr = xAddr + DATA_COUNT * sizeof(half);
+
+    // 核函数入口：使用 __vector__ 显式声明 Vector 核函数，搭配静态Tensor方式编程
+    __vector__ __global__ void ln_custom(__gm__ uint8_t* src, __gm__ uint8_t* dst)
     {
-        AscendC::TPipe pipe;
-        AscendC::GlobalTensor<T> srcGlobal;
-        AscendC::GlobalTensor<T> dstGlobal;
-        srcGlobal.SetGlobalBuffer((__gm__ T*)src);
-        dstGlobal.SetGlobalBuffer((__gm__ T*)dst);
-        AscendC::TQue<AscendC::TPosition::VECIN, 1> inQueue;
-        AscendC::TQue<AscendC::TPosition::VECOUT, 1> outQueue;
-        pipe.InitBuffer(inQueue, 1, count * sizeof(T));
-        pipe.InitBuffer(outQueue, 1, count * sizeof(T));
-        AscendC::LocalTensor<T> dstLocal = outQueue.AllocTensor<T>();
-        AscendC::LocalTensor<T> srcLocal = inQueue.AllocTensor<T>();
-        AscendC::DataCopy(srcLocal, srcGlobal, count);
+        // 静态Tensor需要手动调用InitSocState初始化全局状态寄存器
+        AscendC::InitSocState();
+
+        AscendC::GlobalTensor<half> srcGlobal;
+        AscendC::GlobalTensor<half> dstGlobal;
+        srcGlobal.SetGlobalBuffer((__gm__ half*)src, DATA_COUNT);
+        dstGlobal.SetGlobalBuffer((__gm__ half*)dst, DATA_COUNT);
+
+        // 直接构造指定地址和存储位置的LocalTensor（静态Tensor方式）
+        AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::VECCALC, xAddr, DATA_COUNT);
+        AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::VECCALC, yAddr, DATA_COUNT);
+
+        AscendC::DataCopy(srcLocal, srcGlobal, DATA_COUNT);
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+
         // 调用基础API Ln，传入模板参数
-        AscendC::Ln<T, CONFIG>(dstLocal, srcLocal, count);
-        AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID1);
-        AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID1);
-        AscendC::DataCopy(dstGlobal, dstLocal, count);
-        inQueue.FreeTensor(srcLocal);
+        AscendC::Ln<half, CONFIG>(dstLocal, srcLocal, DATA_COUNT);
+
+        AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+        AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+        AscendC::DataCopy(dstGlobal, dstLocal, DATA_COUNT);
+
+        AscendC::PipeBarrier<PIPE_ALL>();
     }
     ```
+
+    > [!NOTE]
+    > 以上示例采用了推荐的 [静态Tensor编程](../../../编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程.md) 方式，通过 `__vector__` 属性显式声明核函数类型，并使用 `LocalTensor(TPosition, addr, size)` 直接构造Tensor。与传统的 `TPipe`/`TQue` 方式相比，避免了 TPipe 初始化开销，开发者也无需手动管理 `AllocTensor`/`FreeTensor`/`EnQue`/`DeQue` 调用。
 
 ## 数据搬运<a name="section7530159122210"></a>
 
@@ -284,6 +294,9 @@
         }
         ```
 
+    > [!TIP]
+    > 以上示例使用了传统的 `TPipe`/`TQue` 编程方式。在性能敏感场景中，建议采用 [静态Tensor编程](../../../编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程.md) 方式，通过 `LocalTensor(TPosition, addr, size)` 直接构造Tensor并使用 `SetFlag`/`WaitFlag` 手动同步，可避免 TPipe 初始化开销。核函数入口处建议添加 `__vector__` 属性声明 Vector 核函数。
+
     2.  进行int8\_t数据类型的矩阵计算。
 
         ```
@@ -383,33 +396,31 @@
 
     **兼容方案**：实现GM-\> L0A Buffer/L0B Buffer搬运需拆分成两步进行，先从GM搬运到L1 Buffer，再从L1 Buffer搬运到L0A Buffer、L0B Buffer。
 
-    以GM -\> L1 Buffer -\> L0A Buffer通路为例可以参考以下步骤：
+     以GM -\> L1 Buffer -\> L0A Buffer通路为例可以参考以下步骤：
 
     1.  将矩阵A从GM搬运到L1 Buffer。
 
         ```
-        __aicore__ inline void CopyGmToA1()
+        __aicore__ inline void CopyGmToA1(AscendC::LocalTensor<T>& leftMatrix)
         {
-            AscendC::LocalTensor<T> leftMatrix = inQueueA1.AllocTensor<T>();
             AscendC::Nd2NzParams intriParams1{1, 64, 128, 0, 128, 64, 1, 0};
             AscendC::DataCopy(leftMatrix, aGlobal, intriParams1);
-            inQueueA1.EnQue(leftMatrix);
         }
         ```
 
     2.  将矩阵A从L1 Buffer搬运到L0A Buffer。
 
         ```
-        __aicore__ inline void Load2DA1ToL0A()
+        __aicore__ inline void Load2DA1ToL0A(AscendC::LocalTensor<T>& a1, AscendC::LocalTensor<T>& a2)
         {
-            AscendC::LocalTensor<T> a1 = inQueueA1.DeQue<T>();
-            AscendC::LocalTensor<T> a2 = inQueueA2.AllocTensor<T>();
             AscendC::LoadData2DParamsV2 loadDataParams;
             ...
             AscendC::LoadData(a2, a1, loadDataParams);
-            ...
         }
         ```
+
+    > [!TIP]
+    > 建议采用 [静态Tensor编程](../../../编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程.md) 方式构造 L1/L0A/L0B Buffer 上的 Tensor，如 `LocalTensor<T>(AscendC::TPosition::A1, addr, size)`。核函数入口处建议添加 `__cube__` 属性声明 Cube 核函数。
 
 -   **3510架构版本删除L0A Buffer/L0B Buffer初始化的相关硬件指令。**
 
