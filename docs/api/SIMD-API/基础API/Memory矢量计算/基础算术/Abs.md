@@ -79,7 +79,7 @@ $dst_i = |src_i|$
 - tensor前n个复数计算
 
     ```cpp
-    // 该函数原型，仅支持Ascend 950PR/Ascend 950DT系列产品
+    // 该函数原型，仅支持Ascend 950PR/Ascend 950DT
     template <typename T, typename U>
     __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t& count)
     ```
@@ -126,8 +126,8 @@ $dst_i = |src_i|$
 
 <cann-filter npu-type="950">
 
-- 针对Ascend 950PR/Ascend 950DT系列产品
-    - T支持的数据类型为：int8_t、int16_t、half、int32_t、float、int64_t。int8_t和int64_t数据类型仅支持tensor前n个数据计算接口。
+- 针对Ascend 950PR/Ascend 950DT
+    - T支持的数据类型为：int8_t、int16_t、half、int32_t、float、int64_t。数据类型int8_t、int64_t仅支持tensor前n个数据计算接口。
     - U支持的数据类型为：complex32、complex64；当U为complex32类型时，T必须是half类型；当U为complex64类型时，T必须是float类型。
 
 </cann-filter>
@@ -182,7 +182,7 @@ $dst_i = |src_i|$
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
-<cann-filter npu-type="A3, 910b">
+<cann-filter npu-type="A3,910b">
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
   <cann-filter npu-type="A3">
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -243,7 +243,7 @@ $dst_i = |src_i|$
 
 <cann-filter npu-type="950">
 
-针对Ascend 950PR/Ascend 950DT系列产品：
+针对Ascend 950PR/Ascend 950DT：
 
 - tensor前n个复数计算接口样例
 
