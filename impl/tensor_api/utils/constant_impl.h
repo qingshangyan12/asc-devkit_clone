@@ -116,6 +116,10 @@ public:
 template <typename T>
 constexpr bool IsHardwareV = IsHardware<T>::value;
 
+template <typename... Ts>
+struct HasZeroIntegralConstant : Std::bool_constant<
+    (... || Std::is_same_v<Std::remove_cvref_t<Ts>, Std::Int<0>>)> {};
+    
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
 

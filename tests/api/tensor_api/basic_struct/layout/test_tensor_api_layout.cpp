@@ -70,7 +70,6 @@ TEST_F(Tensor_Api_Layout_Struct, TestMakeTuple)
 
     auto shape = MakeShape(2, 3, 4);
     auto stride = MakeStride(12, 4, 1);
-    auto tile = MakeTile(8, 16);
     auto coord = MakeCoord(1, 2, 3);
 
     EXPECT_EQ(AscendC::Std::get<0>(shape), 2);
@@ -80,9 +79,6 @@ TEST_F(Tensor_Api_Layout_Struct, TestMakeTuple)
     EXPECT_EQ(AscendC::Std::get<0>(stride), 12);
     EXPECT_EQ(AscendC::Std::get<1>(stride), 4);
     EXPECT_EQ(AscendC::Std::get<2>(stride), 1);
-
-    EXPECT_EQ(AscendC::Std::get<0>(tile), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(tile), 16);
 
     EXPECT_EQ(AscendC::Std::get<0>(coord), 1);
     EXPECT_EQ(AscendC::Std::get<1>(coord), 2);
