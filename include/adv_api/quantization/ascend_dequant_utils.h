@@ -29,7 +29,6 @@ struct DequantParams {
     uint32_t calCount;      // in one inner line, calCount elements do dequant calculation    in unit of element num
 };
 
-#if !defined(__NPU_ARCH__)
 struct AscendDeQuantConfig {
     bool hasOffset;
     int32_t kDim = 1;
@@ -43,7 +42,6 @@ struct AscendDeQuantParam {
     uint32_t calCount;
     uint32_t groupSize = 0;
 };
-#endif
 
 }; // namespace AscendC
 #endif // LIB_QUANTIZATION_ASCEND_DEQUANT_UTILS_H

@@ -23,19 +23,13 @@
 #define LIB_MATH_IS_NAN_H
 
 #include "kernel_tensor.h"
+#include "is_nan_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/isnan/is_nan_common_impl.h"
 #endif
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
-struct IsNanConfig {
-    bool isReuseSource;
-};
-constexpr IsNanConfig DEFAULT_IS_NAN_CONFIG = {false};
-#endif
-
 #pragma begin_pipe(V)
 /*!
  * \ingroup IsNan

@@ -23,28 +23,13 @@
 
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
+#include "broadcast_utils.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/pad/broadcast/broadcast_common_impl.h"
 #endif
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__) || \
-    (defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102 && __NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113))
-struct BroadcastTiling {
-    uint32_t oriRank;
-    uint32_t rank;
-    uint32_t dstSize;
-    uint32_t srcSize;
-    uint32_t loopNum = 0;
-    uint32_t oriSrcShape[9];
-    uint32_t oriDstShape[9];
-    uint32_t dstShape[9];
-    uint32_t dstStride[9];
-    uint32_t srcStride[10];
-};
-#endif
-
 #pragma begin_pipe(V)
 /*
  * @ingroup Broadcast, now only support dim=1 or dim=2
