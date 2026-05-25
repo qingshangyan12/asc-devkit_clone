@@ -23,19 +23,13 @@
 #define LIB_MATH_BITWISE_NOT_H
 
 #include "kernel_tensor.h"
+#include "bitwise_not_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/bitwise_not/bitwise_not_3510_impl.h"
 #endif
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
-struct BitwiseNotConfig {
-    bool isReuseSource;
-};
-constexpr BitwiseNotConfig DEFAULT_BITWISE_NOT_CONFIG = {false};
-#endif
-
 #pragma begin_pipe(V)
 /*!
  * \ingroup BitwiseNot

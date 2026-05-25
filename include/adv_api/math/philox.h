@@ -21,25 +21,13 @@
 #define LIB_MATH_PHILOX_H
 
 #include "kernel_tensor.h"
+#include "philox_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/philox/philox_3510_impl.h"
 #endif
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
-constexpr uint16_t PHILOX_KEY_SIZE = 2;
-constexpr uint16_t PHILOX_COUNTER_SIZE = 4;
-using PhiloxKey = uint32_t[PHILOX_KEY_SIZE];
-using PhiloxCounter = uint32_t[PHILOX_COUNTER_SIZE];
-
-struct PhiloxRandomParams {
-    uint32_t stride;
-    uint32_t row;
-    uint32_t column;
-};
-#endif
-
 #pragma begin_pipe(V)
 
 template <uint16_t Rounds = 7, typename T>

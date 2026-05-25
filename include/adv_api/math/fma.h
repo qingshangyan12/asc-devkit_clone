@@ -23,19 +23,13 @@
 #define LIB_MATH_FMA_H
 
 #include "kernel_tensor.h"
+#include "fma_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/fma/fma_common_impl.h"
 #endif
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
-struct FmaConfig {
-    bool isReuseSource;
-};
-constexpr FmaConfig DEFAULT_FMA_CONFIG = {false};
-#endif
-
 #pragma begin_pipe(V)
 /*!
  * \ingroup Fma

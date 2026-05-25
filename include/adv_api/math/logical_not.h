@@ -23,19 +23,13 @@
 #define LIB_MATH_LOGICAL_NOT_H
 
 #include "kernel_tensor.h"
+#include "logical_not_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/logical_not/logical_not_common_impl.h"
 #endif
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
-struct LogicalNotConfig {
-    bool isReuseSource;
-};
-constexpr LogicalNotConfig DEFAULT_LOGICAL_NOT_CONFIG = {false};
-#endif
-
 #pragma begin_pipe(V)
 /*!
  * \ingroup LogicalNot

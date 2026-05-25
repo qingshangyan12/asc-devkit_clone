@@ -23,20 +23,13 @@
 #define LIB_MATH_LOGICAL_ORS_H
 
 #include "kernel_tensor.h"
+#include "logical_ors_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/logical_ors/logical_ors_common_impl.h"
 #endif
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
-struct LogicalOrsConfig {
-    bool isReuseSource;
-    int8_t scalarTensorIndex;
-};
-constexpr LogicalOrsConfig DEFAULT_LOGICAL_ORS_CONFIG = {false, 1};
-#endif
-
 #pragma begin_pipe(V)
 /*!
  * \ingroup LogicalOrs
