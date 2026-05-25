@@ -158,14 +158,22 @@ T支持的数据类型为：half、float。
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
+
 <cann-filter npu-type="A3,910b">
+
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+
   <cann-filter npu-type="A3">
+
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+
   </cann-filter>
   <cann-filter npu-type="910b">
+
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
   </cann-filter>
+
 </cann-filter>
 
 ## 调用示例<a name="section176061616102911"></a>
@@ -192,19 +200,13 @@ T支持的数据类型为：half、float。
 
 - tensor前n个数据计算接口样例
 
-    <cann-filter npu-type="910b,A3">
-
-    针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，示例如下：
-
     ```cpp
     AscendC::Exp(dstLocal, srcLocal, 512);
     ```
 
-    </cann-filter>
-
     <cann-filter npu-type="950">
 
-    针对Ascend 950PR/Ascend 950DT，示例如下：
+    以下示例仅支持Ascend 950PR/Ascend 950DT
 
     ```cpp
     static constexpr ExpConfig config = { ExpAlgo::PRECISION_1ULP_FTZ_FALSE };
@@ -213,9 +215,9 @@ T支持的数据类型为：half、float。
 
     </cann-filter>
 
-    结果示例如下：
+结果示例如下：
 
-    ```bash
-    输入数据srcLocal：[0.0 1.0 2.0 3.0 ...]
-    输出数据dstLocal：[1.0 2.719 7.391 20.08 ...]
-    ```
+```bash
+输入数据srcLocal：[0.0 1.0 2.0 3.0 ...]
+输出数据dstLocal：[1.0 2.719 7.391 20.08 ...]
+```

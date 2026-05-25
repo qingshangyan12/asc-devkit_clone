@@ -167,14 +167,22 @@ $dst_i = max(src0_i, src1_i)$
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
+
 <cann-filter npu-type="A3,910b">
+
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+
   <cann-filter npu-type="A3">
+
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+
   </cann-filter>
   <cann-filter npu-type="910b">
+
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
   </cann-filter>
+
 </cann-filter>
 
 ## 调用示例<a name="section642mcpsimp"></a>

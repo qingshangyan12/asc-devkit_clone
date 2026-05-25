@@ -174,26 +174,71 @@ $dst_i = src0_i \& src1_i$
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 - 使用整个tensor参与计算接口符号重载时，运算量为目的LocalTensor的总长度。
+
 <cann-filter npu-type="A3,910b">
+
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+
   <cann-filter npu-type="A3">
+
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+
   </cann-filter>
   <cann-filter npu-type="910b">
+
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
   </cann-filter>
+
 </cann-filter>
+
 <cann-filter npu-type="A3,910b,910,310p,310b">
-- 特别地，针对uint32\_t/int32\_t类型的And操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16\_t/int16\_t后再调用And进行计算。直接传入uint32\_t/int32\_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
-    <cann-filter npu-type="A3,910b">
-    - 整个tensor参与计算和tensor前n个数据计算接口支持传入uint32\_t/int32\_t类型，但是tensor前n个数据计算的count需要设置为期望计算个数的2倍才能精度符合预期；tensor高维切分计算接口直接编译报错提示不支持该数据类型。上述说明适用于：Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品。
+
+- 特别地，针对uint32_t/int32_t类型的And操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16_t/int16_t后再调用And进行计算。直接传入uint32_t/int32_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
+
+    <cann-filter npu-type="910b,A3">
+
+    - 整个tensor参与计算和tensor前n个数据计算接口支持传入uint32_t/int32_t类型，但是tensor前n个数据计算的count需要设置为期望计算个数的2倍才能精度符合预期；tensor高维切分计算接口直接编译报错提示不支持该数据类型。上述说明适用于：
+
+      <cann-filter npu-type="910b">
+
+      - Atlas A2 训练系列产品/Atlas A2 推理系列产品。
+
+      </cann-filter>
+
+      <cann-filter npu-type="A3">
+
+      - Atlas A3 训练系列产品/Atlas A3 推理系列产品。
+
+      </cann-filter>
+
     </cann-filter>
+
     <cann-filter npu-type="910,310p">
-    - 编译报错提示不支持该数据类型。上述说明适用于：Atlas 训练系列产品、Atlas 推理系列产品AI Core。
+
+    - 编译报错提示不支持该数据类型。上述说明适用于：
+    
+      <cann-filter npu-type="910">
+
+      - Atlas 训练系列产品。
+
+      </cann-filter>
+
+      <cann-filter npu-type="310p">
+
+      - Atlas 推理系列产品AI Core。
+
+      </cann-filter>
+
     </cann-filter>
+
     <cann-filter npu-type="310b">
-    - CPU报错提示不支持该数据类型。上述说明适用于：Atlas 200I/500 A2 推理产品。
+
+    - CPU报错提示不支持该数据类型。上述说明适用于：
+      - Atlas 200I/500 A2 推理产品。
+
     </cann-filter>
+
 </cann-filter>
 
 ## 调用示例<a name="section642mcpsimp"></a>
