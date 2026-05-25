@@ -233,7 +233,7 @@
         ```
         __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
         {
-            int32_t lanemaskeq = lanemask_eq();
+            int32_t lanemask = lanemask_eq();
         }
         ```
 -   lanemask_le
@@ -272,7 +272,7 @@
         ```
         __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
         {
-            int32_t lanemaskeq = lanemask_le();
+            int32_t lanemask = lanemask_le();
         }
         ```
 -   lanemask_lt
@@ -311,7 +311,7 @@
         ```
         __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
         {
-            int32_t lanemaskeq = lanemask_lt();
+            int32_t lanemask = lanemask_lt();
         }
         ```
 -   lanemask_ge
@@ -350,7 +350,7 @@
         ```
         __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
         {
-            int32_t lanemaskeq = lanemask_ge();
+            int32_t lanemask = lanemask_ge();
         }
         ```
 -   lanemask_gt
@@ -389,7 +389,7 @@
         ```
         __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
         {
-            int32_t lanemaskeq = lanemask_gt();
+            int32_t lanemask = lanemask_gt();
         }
         ```
 ## 内置数据类型<a name="section1835494915576"></a>
@@ -1315,7 +1315,8 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 -   \_\_maxnreg\_\_\(N\) <a name="li23861114618"></a>
 
     函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定单个线程在一个线程块内最多可分配的寄存器数量。参数N需要满足：
-    -   N的取值范围为（0, 128];
+    -   N的取值范围为（0,128]区间的整数;
+    -   若输入值N的范围为（0，16]，使用16个寄存器；若输入值N的范围为（16，32]，使用32个寄存器；若输入值N的范围为（32， 64]，使用64个寄存器；若输入值N的范围为（64，128]，使用128个寄存器；
 
         最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表。
 
@@ -1353,5 +1354,6 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
         配置SIMT函数单个线程最多可分配的寄存器数量为64，示例如下：
 
         ```
-        __global__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+        __simt_vf__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
         ```
+注：统一函数不能同时有\_\_launch\_bounds\_\_和 \_\_maxnreg\_\_。\_\_launch\_bounds\_\_或 \_\_maxnreg\_\_只能被标在\_\_simt_vf\_\_函数上（pure simt模式下的\_\_global\_\_函数）。
