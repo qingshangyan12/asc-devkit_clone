@@ -17,12 +17,9 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-add_executable(demo matmul_leakyrelu.asc)
+add_executable(demo add.asc)
 
 target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
     m
     dl
 )
