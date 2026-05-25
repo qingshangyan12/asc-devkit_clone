@@ -13,5 +13,7 @@ openssl-device-src/
 openssl-host-src/
 build_device/
 *.o
+*.so
+*.dat
 *.log
 
