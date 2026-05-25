@@ -30,6 +30,7 @@ target_include_directories(device_intf_pub INTERFACE
     ${ASCENDC_DEVKIT_PATH}/asc/impl/adv_api
     ${ASCENDC_DEVKIT_PATH}/asc/impl/basic_api
     ${ASCENDC_DEVKIT_PATH}/asc/impl/c_api
+    ${ASCENDC_DEVKIT_PATH}/asc/impl/tensor_api
     ${ASCENDC_DEVKIT_PATH}/asc/impl/basic_api/reg_compute
     ${ASCENDC_DEVKIT_PATH}/asc/impl/simt_api
     ${ASCENDC_DEVKIT_PATH}/asc/impl/utils
@@ -39,9 +40,10 @@ target_include_directories(device_intf_pub INTERFACE
     ${ASCENDC_DEVKIT_PATH}/asc/include/basic_api
     ${ASCENDC_DEVKIT_PATH}/asc/include/aicpu_api
     ${ASCENDC_DEVKIT_PATH}/asc/include/c_api
+    ${ASCENDC_DEVKIT_PATH}/asc/include/tensor_api
     ${ASCENDC_DEVKIT_PATH}/asc/include/basic_api/reg_compute
-    ${ASCENDC_DEVKIT_PATH}/asc/include/simt_api 
-    ${ASCENDC_DEVKIT_PATH}/asc/include/utils  
+    ${ASCENDC_DEVKIT_PATH}/asc/include/simt_api
+    ${ASCENDC_DEVKIT_PATH}/asc/include/utils
     ${ASCENDC_DEVKIT_PATH}/tikcpp/tikcfw
     ${ASCENDC_DEVKIT_PATH}/tikcpp/tikcfw/interface
     ${ASCENDC_DEVKIT_PATH}/tikcpp/tikcfw/impl
