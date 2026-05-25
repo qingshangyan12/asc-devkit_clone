@@ -46,9 +46,17 @@ def _load_css():
         pathlib.Path(
             "/home/zjj/md-parser/node_modules/github-markdown-css/github-markdown.css"
         ),
-        pathlib.Path(__file__).parent.parent.parent / "node_modules" / "github-markdown-css" / "github-markdown.css",
-        pathlib.Path(__file__).parent.parent / "node_modules" / "github-markdown-css" / "github-markdown.css",
-        pathlib.Path("/home/zjj/md-parser/node_modules/github-markdown-css/github-markdown.css"),
+        pathlib.Path(__file__).parent.parent.parent
+        / "node_modules"
+        / "github-markdown-css"
+        / "github-markdown.css",
+        pathlib.Path(__file__).parent.parent
+        / "node_modules"
+        / "github-markdown-css"
+        / "github-markdown.css",
+        pathlib.Path(
+            "/home/zjj/md-parser/node_modules/github-markdown-css/github-markdown.css"
+        ),
     ]
     for p in candidates:
         if p.exists():
@@ -127,10 +135,6 @@ _CALLOUT_CSS = """
 .markdown-body .callout-caution .callout-title { color: #cf222e; }
 .markdown-body .callout-caution .callout-icon { fill: #cf222e; }
 """
-_OPTIONS = cmarkgfm.Options.CMARK_OPT_UNSAFE
-
-_MD_LINK_RE = re.compile(r'(href|src)="((?!https?:|//)[^"]+)\.md"')
-
 _TEMPLATE = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -344,7 +348,6 @@ def _highlight_code(html: str) -> str:
         )
 
     return _CODEFENCE_RE.sub(_replace, html)
-    return _MD_LINK_RE.sub(r'\1="\2.html"', html)
 
 
 def parse_string(text: str, gfm: bool = True) -> str:
@@ -356,8 +359,6 @@ def parse_string(text: str, gfm: bool = True) -> str:
     html = _fix_callouts(html)
     html = _highlight_code(html)
     return html
-        return _fix_links(gfm_to_html(text))
-    return _fix_links(markdown_to_html(text))
 
 
 def parse_file(filepath: str, gfm: bool = True) -> str:

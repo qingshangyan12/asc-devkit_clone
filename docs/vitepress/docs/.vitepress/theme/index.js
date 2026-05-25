@@ -10,15 +10,11 @@
 
 import DefaultTheme from 'vitepress/theme'
 import { h } from 'vue'
+// import FilterToggle from './FilterToggle.vue'
 import BackToTop from './BackToTop.vue'
 import './filter.css'
 import './code-theme.css'
 import './code-copy.js'
-import DefaultTheme from 'vitepress/theme'
-import { h } from 'vue'
-// import FilterToggle from './FilterToggle.vue'
-import BackToTop from './BackToTop.vue'
-import './filter.css'
 
 export default {
   extends: DefaultTheme,
