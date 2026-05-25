@@ -44,8 +44,8 @@ set(ARCH_LIST 3510 2201 2002)
 set(ALL_TEST_FILES "")
 
 file(GLOB_RECURSE ALL_TEST_FILES
-    LIST_DIRECTORIES false
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+        LIST_DIRECTORIES false
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
 )
 
 if(NOT ALL_TEST_FILES)
@@ -98,11 +98,11 @@ function(create_check_targets MODE_SUFFIX MODE_DEFINES)
             # 创建子 Target
             set(TARGET_NAME "host_check_npu${MODE_SUFFIX}_${ARCH}_${TEST_FILE_ID}")
             add_custom_target(${TARGET_NAME}
-                COMMAND ${COMPILER} ${COMPILER_FLAGS} ${INC_FLAGS} ${MODE_DEFINES}
+                    COMMAND ${COMPILER} ${COMPILER_FLAGS} ${INC_FLAGS} ${MODE_DEFINES}
                     -fsyntax-only ${TEST_FILE} ${ARCH_FLAG}
-                COMMENT "Checking host (${COMPILER_TYPE})${MODE_SUFFIX} ${ARCH} ${REL_TEST_FILE}"
-                VERBATIM
-                USES_TERMINAL
+                    COMMENT "Checking host (${COMPILER_TYPE})${MODE_SUFFIX} ${ARCH} ${REL_TEST_FILE}"
+                    VERBATIM
+                    USES_TERMINAL
             )
 
             list(APPEND ${TARGET_VAR} ${TARGET_NAME})
@@ -119,8 +119,8 @@ function(create_check_targets MODE_SUFFIX MODE_DEFINES)
         string(STRIP "${MODE_DESC}" MODE_DESC)
     endif()
     add_custom_target(${RUN_ALL_TARGET}
-        DEPENDS ${${TARGET_VAR}}
-        COMMENT "Running all host header checks (${COMPILER_TYPE} ${MODE_DESC} mode)..."
+            DEPENDS ${${TARGET_VAR}}
+            COMMENT "Running all host header checks (${COMPILER_TYPE} ${MODE_DESC} mode)..."
     )
 endfunction()
 
@@ -133,8 +133,8 @@ set(SINGLE_DEFINES -DVERIFY_SINGLE_HEADER)
 create_check_targets("_single" "${SINGLE_DEFINES}")
 
 add_custom_target(ascendc_run_all_host_header_checks ALL
-    DEPENDS
+        DEPENDS
         ascendc_run_all_host_header_checks_npu
         ascendc_run_all_host_header_checks_npu_single
-    COMMENT "Running all host header checks (all modes, all architectures)..."
+        COMMENT "Running all host header checks (all modes, all architectures)..."
 )
