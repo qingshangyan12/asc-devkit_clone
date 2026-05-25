@@ -110,7 +110,7 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
     return 0;
 #endif
 }
- 
+
 __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr(){
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #if ASCENDC_CPU_DEBUG
