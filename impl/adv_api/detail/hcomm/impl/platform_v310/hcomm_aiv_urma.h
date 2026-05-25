@@ -223,7 +223,6 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Init(_
     sqPI_ = cqeItem_[HCOMM_URMA_CQE_U32_NUM];
     sqCI_ = sqPI_[8];
     cqCI_ = sqCI_[8];
-    doorBell_ = cqCI_[8];
     return HCOMM_SUCCESS;
 }
 
@@ -371,10 +370,7 @@ __aicore__ inline uint32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PollC
     Ub2Gm<uint32_t>(cqCIGlobal, cqCI_, 1);
 
     // ring CQ doorbell
-    AscendC::GlobalTensor<uint32_t> cqDbGlobal;
-    cqDbGlobal.SetGlobalBuffer((__gm__ uint32_t*)cqCtx.contextInfo.ubJfc.dbVa);
-    doorBell_.SetValue(0, curTail & 0xFFFFFFU);
-    Ub2Gm<uint32_t>(cqDbGlobal, doorBell_, 1);
+    st_dev(curTail & 0xFFFFFFU, (__gm__ uint32_t*)sqCtxEntry->contextInfo.ubJfs.dbVa, 0);
 
     // update WQ tail
     AscendC::GlobalTensor<uint32_t> sqCIGlobal;
@@ -456,12 +452,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Commit
     uint32_t sqHead = sqPI_.GetValue(0);
     KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Commit enter handleId=%d sqHead=%u", handleId, sqHead);
 
-    AscendC::GlobalTensor<uint32_t> dbGlobal;
-    dbGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.dbVa);
-    doorBell_.SetValue(0, sqHead);
-    // TODO: set_atomic_add();
-    Ub2Gm<uint32_t>(dbGlobal, doorBell_, 1);
-    // TODO: SetAtomicNone();
+    st_dev(sqHead, (__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.dbVa, 0);
 
     // 从当前handleId向前遍历更新handleCommitList_
     for (HcommHandle i = handleId; i >= 0; i--) {

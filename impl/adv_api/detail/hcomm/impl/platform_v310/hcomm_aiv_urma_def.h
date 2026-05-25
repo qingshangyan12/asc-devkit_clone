@@ -89,7 +89,6 @@ private:
     LocalTensor<uint32_t> sqPI_;
     LocalTensor<uint32_t> sqCI_;
     LocalTensor<uint32_t> cqCI_;
-    LocalTensor<uint32_t> doorBell_;
     ChannelHandle channelList_[HCOMM_MAX_HANDLE_ID] = {0};
     bool handleCommitList_[HCOMM_MAX_HANDLE_ID] = {0};
     bool handleWaitList_[HCOMM_MAX_HANDLE_ID] = {0};
