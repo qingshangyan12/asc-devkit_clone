@@ -66,7 +66,8 @@ constexpr size_t ASCENDC_KERNEL_ID = 69;
 
 #define PROF_TASK_TIME 0x00000002ULL  // dynamic profiling hwts log
 
-bool AscendCheckSoC950Version(const char *socVersion, const char* prefix) {
+bool AscendCheckSoC950Version(const char *socVersion, const char* prefix)
+{
     size_t prefixLen = strlen(prefix);
     return strncmp(socVersion, prefix, prefixLen) == 0;
 }
