@@ -27,12 +27,12 @@
 
 namespace AscendC {
 
-__aicore__ inline uint8_t* AlignAddrTo32Bytes(__ubuf__ uint8_t* buff)
+__aicore__ inline __ubuf__ uint8_t* AlignAddrTo32Bytes(__ubuf__ uint8_t* buff)
 {
     uintptr_t addr = reinterpret_cast<uintptr_t>(buff);
     const uintptr_t alignment = 32;
     uintptr_t alignedAddr = (addr + alignment - 1) & ~(alignment - 1);
-    return reinterpret_cast<uint8_t*>(alignedAddr);
+    return reinterpret_cast<__ubuf__ uint8_t*>(alignedAddr);
 }
 
 template <typename T>
