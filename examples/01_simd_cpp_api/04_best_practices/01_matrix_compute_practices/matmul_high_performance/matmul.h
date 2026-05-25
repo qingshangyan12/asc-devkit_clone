@@ -59,6 +59,8 @@ constexpr uint32_t TILING_STEPKA_PARAM = 4;
 constexpr uint32_t CORE_NUM = 32;
 #endif
 
+// TODO 代码文件可以加点注释？
+
 constexpr MatmulShapeParams shapeParams = {SINGLE_M_L2CACHE, SINGLE_N, SINGLE_K, BASE_M, BASE_N, BASE_K};
 struct MatmulProblemShape {
     uint32_t usedCoreNum;
