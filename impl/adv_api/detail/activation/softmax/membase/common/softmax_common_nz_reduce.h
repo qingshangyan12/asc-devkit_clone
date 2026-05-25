@@ -77,7 +77,7 @@ __aicore__ inline void ReduceMaxLastNZImpl(
             SetMaskCount();
             SetVectorMask<float, MaskMode::COUNTER>(0, splitCount);
             Muls<float, false>(
-                tmpBuffer1, tmpBuffer0, 1.0, MASK_PLACEHOLDER, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+                tmpBuffer1, tmpBuffer0, static_cast<float>(1.0), MASK_PLACEHOLDER, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
             PipeBarrier<PIPE_V>();
             for (uint32_t j = 1; j < splitNZBlockCount - 1; j++) {
                 Max<float, false>(
@@ -163,7 +163,7 @@ __aicore__ inline void ReduceSumLastNZImpl(
             SetMaskCount();
             SetVectorMask<float, MaskMode::COUNTER>(0, splitCount);
             Muls<float, false>(
-                tmpBuffer1, tmpBuffer0, 1.0, MASK_PLACEHOLDER, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+                tmpBuffer1, tmpBuffer0, static_cast<float>(1.0), MASK_PLACEHOLDER, 1, {1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
             PipeBarrier<PIPE_V>();
             for (uint32_t j = 1; j < splitNZBlockCount - 1; j++) {
                 Add<float, false>(

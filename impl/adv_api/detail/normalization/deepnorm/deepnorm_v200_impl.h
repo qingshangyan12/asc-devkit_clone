@@ -83,7 +83,7 @@ __aicore__ inline void DeepNormBasicBlockTransdata(
     SetMaskCount();
     SetVectorMask<float, MaskMode::COUNTER>(0, bsLength * BASIC_BLOCK_HLENGTH);
     // 8 FP32 A -> 64 FP32 A
-    Adds<float, false>(dst, dst, 0, MASK_PLACEHOLDER, 1, {1, 0, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+    Adds<float, false>(dst, dst, static_cast<float>(0), MASK_PLACEHOLDER, 1, {1, 0, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
     PipeBarrier<PIPE_V>();
 }
 
