@@ -184,12 +184,12 @@ __aicore__ inline void CopyUbufToCbuf(__cbuf__ T* dst, __ubuf__ T* src, const ui
 
 // only support CubeCore   PIPE_MTE1
 // L1 -> UB: copy_cbuf_to_ubuf
-template <typename T>
+template <typename T, uint8_t subBlockId = 0>
 __aicore__ inline void CopyCbufToUbuf(__ubuf__ T* dst, __cbuf__ T* src, const uint16_t blockCount,
                                       const uint16_t blockLen, const uint16_t srcStride, const uint16_t dstStride)
 {
     if ASCEND_IS_AIC {
-        copy_cbuf_to_ubuf((__ubuf__ void*)dst, (__cbuf__ void*)src, 0, blockCount, blockLen, srcStride, dstStride);
+        copy_cbuf_to_ubuf((__ubuf__ void*)dst, (__cbuf__ void*)src, static_cast<bool>(subBlockId), blockCount, blockLen, srcStride, dstStride);
     }
 }
 
@@ -1306,14 +1306,13 @@ __aicore__ inline void DataCopyL0C2GMImpl(__gm__ T* dst, __cc__ U* src, const Da
     }
 }
 
-template <typename T>
+template <typename T,  uint8_t subBlockId = 0>
 __aicore__ inline __in_pipe__(MTE1)
     __out_pipe__(MTE1) void DataCopyL12UBIntf(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal,
                                               const DataCopyParams& intriParams)
 {
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from A1 / B1 to VECIN / VECOUT on current device");
-    });
+     CopyCbufToUbuf<T, subBlockId>(dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
+ 	                    intriParams.dstStride);
 }
 
 template <typename T>

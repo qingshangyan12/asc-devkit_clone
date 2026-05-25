@@ -141,6 +141,23 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src,
                                 const DataCopyParams& repeatParams);
 
+#if (__NPU_ARCH__ == 3510)
+ /*
+ * @ingroup DataCopy Level 0
+ * @brief datacopy from L1 to UB, applicable to vector data
+ * @param [out] dst output LocalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] repeatParams.blockCount number of blocks
+ * @param [in] repeatParams.blockLen Length of blocks
+ * @param [in] repeatParams.srcGap src block gap
+ * @param [in] repeatParams.dstGap dst block gap
+ */
+template <typename T, uint8_t subBlockId = 0>
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+                                const DataCopyParams& repeatParams);                               
+
+#endif
+
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from L1 to bt, applicable to vector data
@@ -247,6 +264,19 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src,
                                 const uint32_t count);
 
+#if (__NPU_ARCH__ == 3510)
+/*
+ * @ingroup DataCopy Level 2
+ * @brief datacopy from L1 to UB, applicable to vector data
+ * @param [out] dst output LocalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] count Number of operands
+ */
+template <typename T>
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+                                const uint32_t count);
+#endif
+
 /*
  * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, nz2nd, applicable to simulated cube data(such as data from l0c, 16*16)
@@ -273,6 +303,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst,
  * @param [in] enhancedParams.deqScale Auxiliary parameters for path accuracy conversion
  * @param [in] enhancedParams.deqValue size of convert with path precision
  * @param [in] enhancedParams.sidStoreMode Multiplex input
+ 
  * @param [in] enhancedParams.isRelu Configure whether Relu can be performed along the circuit
  */
 template <typename T>

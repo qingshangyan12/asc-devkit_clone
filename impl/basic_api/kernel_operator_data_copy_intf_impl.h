@@ -415,6 +415,35 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
     }
 }
 
+#if (__NPU_ARCH__ == 3510)
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+{
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxDataCopyInfo(dst, src, repeatParams, "DataCopy");
+#endif
+    using PrimType = PrimT<T>;
+
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+
+    ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, repeatParams));
+
+    CheckTensorAlign<T>(src, 32, "src", "DataCopy from A1 / B1 to VECIN / VECCALC / VECOUT"); 
+    CheckTensorAlign<T>(dst, 32, "dst", "DataCopy from A1 / B1 to VECIN / VECCALC / VECOUT"); 
+
+     ASCENDC_CHECK_TPOSITION(srcHWPos == Hardware::L1, "src", "VECIN / VECCALC / VECOUT / A1 / B1 / C1",
+            "DataCopy from LocalTensor to LocalTensor with DataCopyParams",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
+     ASCENDC_CHECK_TPOSITION(dstHWPos == Hardware::UB, "dst", "VECIN / VECCALC / VECOUT / A1 / B1 / C1",
+            "DataCopy from LocalTensor to LocalTensor with DataCopyParams",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+
+    DataCopyL12UBImpl<PrimType, subBlockId>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(),
+ 	                                 repeatParams);
+}
+#endif
+
+
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from L1 to bt, applicable to vector data
@@ -831,6 +860,32 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
 #endif
     DataCopy(dst, src, repeatParams);
 }
+
+
+#if (__NPU_ARCH__ == 3510)
+/*
+ * @ingroup DataCopy Level 2
+ * @brief datacopy from L1 to UB, applicable to vector data
+ * @param [out] dst output LocalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] count Number of operands
+ */
+template <typename T>
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+                                const uint32_t count)
+{
+    using PrimType = PrimT<T>;
+    ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
+        "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
+        "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
+        count); });
+    
+    struct DataCopyParams repeatParams;
+    repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+    DataCopyL1ToUB<T, subBlockId>(dst, src, repeatParams);
+}
+#endif
+
 
 __aicore__ inline void CheckNz2NdParams(const Nz2NdParamsFull& params)
 {
