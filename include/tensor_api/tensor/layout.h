@@ -27,6 +27,9 @@ namespace AscendC {
 namespace Te {
 
 // layout construction
+template <typename LayoutPattern, typename TraitType, typename ShapeType, typename StrideType>
+__aicore__ inline constexpr auto MakePatternLayout(const ShapeType& shape, const StrideType& stride);
+
 template <typename... Ts>
 __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t);
 
@@ -77,6 +80,15 @@ __aicore__ inline constexpr auto Capacity(const LayoutType& layout);
 
 template <typename Tensor, typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info);
+
+template <typename LayoutPattern, typename TraitType = Std::ignore_t, typename... Args>
+__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
+
+template <typename LayoutPattern, size_t C0Element, typename... Args>
+__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
+
+template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>>
+struct FrameLayoutFormat;
 
 } // namespace Te
 } // namespace AscendC
