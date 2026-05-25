@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "docs:dev": "vitepress dev docs",
-    "docs:convert": "node scripts/convert-docs.js",
+    "docs:convert": "node scripts/convert-docs.js -s",
     "docs:genstubs": "node scripts/gen-md-stubs.js",
     "docs:cleanstubs": "node scripts/clean-md-stubs.js",
     "docs:prebuild": "npm run docs:convert && npm run docs:genstubs",
