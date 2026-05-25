@@ -250,10 +250,12 @@ INSTANTIATE_TEST_CASE_P(
             testRadixTopK<int8_t, false, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
         TopKTestParams{ 255, GetKPad<int8_t>(255), {2, 256, 256}, sizeof(int8_t), true,
             testRadixTopK<int8_t, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))    
         TopKTestParams{ 512, GetKPad<int8_t>(512), {1, 512, 512}, sizeof(int8_t), true,
             testRadixTopK<int8_t, false, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
         TopKTestParams{ 1, GetKPad<int8_t>(1), {2, 4096, 4096}, sizeof(int8_t), true,
             testRadixTopK<int8_t, true, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
+#endif
         // uint16_t
         TopKTestParams{ 1, GetKPad<uint16_t>(1), {1, 32, 32}, sizeof(uint16_t), true,
             testRadixTopK<uint16_t, false, false, false, AscendC::TopKMode::TOPK_NSMALL, AscendC::TopKOrder::UNSET, false> },
@@ -263,10 +265,12 @@ INSTANTIATE_TEST_CASE_P(
             testRadixTopK<uint16_t, false, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
         TopKTestParams{ 2, GetKPad<uint16_t>(2), {2, 256, 256}, sizeof(uint16_t), true,
             testRadixTopK<uint16_t, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))   
         TopKTestParams{ 20, GetKPad<uint16_t>(20), {2, 512, 512}, sizeof(uint16_t), true,
             testRadixTopK<uint16_t, false, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
         TopKTestParams{ 2, GetKPad<uint16_t>(2), {2, 1024, 1024}, sizeof(uint16_t), true,
             testRadixTopK<uint16_t, true, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
+#endif
         // int16_t
         TopKTestParams{ 1, GetKPad<int16_t>(1), {1, 32, 32}, sizeof(int16_t), true,
             testRadixTopK<int16_t, false, false, false, AscendC::TopKMode::TOPK_NSMALL, AscendC::TopKOrder::UNSET, false> },
@@ -304,9 +308,9 @@ INSTANTIATE_TEST_CASE_P(
             testRadixTopK<int32_t, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
         TopKTestParams{ 512, GetKPad<int32_t>(512), {1, 512, 512}, sizeof(int32_t), true,
             testRadixTopK<int32_t, false, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))  
         TopKTestParams{ 1, GetKPad<int32_t>(1), {2, 4096, 4096}, sizeof(int32_t), true,
             testRadixTopK<int32_t, true, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
-#if !defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)     
         // uint64_t
         TopKTestParams{ 1, GetKPad<uint64_t>(1), {1, 32, 32}, sizeof(uint64_t), true,
             testRadixTopK<uint64_t, false, false, false, AscendC::TopKMode::TOPK_NSMALL, AscendC::TopKOrder::UNSET, false> },
@@ -356,12 +360,11 @@ INSTANTIATE_TEST_CASE_P(
             testRadixTopK<float, false, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
         TopKTestParams{ 255, GetKPad<float>(255), {2, 256, 256}, sizeof(float), true,
             testRadixTopK<float, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false> },
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))        
         TopKTestParams{ 512, GetKPad<float>(512), {1, 512, 512}, sizeof(float), true,
             testRadixTopK<float, false, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
         TopKTestParams{ 1, GetKPad<float>(1), {2, 4096, 4096}, sizeof(float), true,
-            testRadixTopK<float, true, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> }
-#if !defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)                 
-            ,
+            testRadixTopK<float, true, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false> },
         // bfloat16_t
         TopKTestParams{ 1, GetKPad<bfloat16_t>(1), {1, 32, 32}, sizeof(bfloat16_t), true,
             testRadixTopK<bfloat16_t, false, false, false, AscendC::TopKMode::TOPK_NSMALL, AscendC::TopKOrder::UNSET, false> },

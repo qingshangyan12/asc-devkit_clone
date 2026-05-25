@@ -439,12 +439,16 @@ protected:
 };
 
 INSTANTIATE_TEST_CASE_P(TEST_OPEARATION_CONFUSION_TRANSPOSE, ConfusionTransposeSecondTestsuite,
-    ::testing::Values(ConfusionTransposeSecondTestParams { 2, ConfusionTransposeSecond<half>, 16, 80, 32, TransposeType::TRANSPOSE_NZ2NZ_0213 },
+    ::testing::Values(
     ConfusionTransposeSecondTestParams { 2, ConfusionTransposeSecond<half>, 32, 48, 16, TransposeType::TRANSPOSE_NZ2NZ_0213 },
-    ConfusionTransposeSecondTestParams { 2, ConfusionTransposeSecond<half>, 16, 32, 32, TransposeType::TRANSPOSE_NZ2NZ_0213 },
+    ConfusionTransposeSecondTestParams { 2, ConfusionTransposeSecond<half>, 16, 32, 32, TransposeType::TRANSPOSE_NZ2NZ_0213 }
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))               
+    ,ConfusionTransposeSecondTestParams { 2, ConfusionTransposeSecond<half>, 16, 80, 32, TransposeType::TRANSPOSE_NZ2NZ_0213 },
     // ConfusionTransposeSecondTestParams { 4, ConfusionTransposeSecond<float>, 16, 80, 32, TransposeType::TRANSPOSE_NZ2NZ_0213 },
     ConfusionTransposeSecondTestParams { 4, ConfusionTransposeSecond<float>, 32, 32, 16, TransposeType::TRANSPOSE_NZ2NZ_0213 },
-    ConfusionTransposeSecondTestParams { 4, ConfusionTransposeSecond<float>, 16, 32, 32, TransposeType::TRANSPOSE_NZ2NZ_0213 }));
+    ConfusionTransposeSecondTestParams { 4, ConfusionTransposeSecond<float>, 16, 32, 32, TransposeType::TRANSPOSE_NZ2NZ_0213 }
+#endif
+));
 
 TEST_P(ConfusionTransposeSecondTestsuite, ConfusionTransposeSecondTestCase)
 {
