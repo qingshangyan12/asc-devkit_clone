@@ -18,6 +18,18 @@ using namespace AscendC;
 
 int32_t RaiseStubForDumpTensor(int32_t input);
 
+namespace {
+constexpr uint16_t TEST_SIMD_VF_BLOCK_IDX = 3;
+constexpr uint32_t TEST_SIMD_VF_DUMP_DESC = 630;
+constexpr uint32_t TEST_SIMD_VF_DUMP_SIZE = 1;
+
+__asc_simd_vf::DumpTensorTlv* GetSimdVfDumpTlv(BlockVFBufInfo& blockInfo)
+{
+    __asc_simd_vf::get_printf_ubuf_addr(reinterpret_cast<uint64_t>(&blockInfo), TEST_SIMD_VF_BLOCK_IDX);
+    return reinterpret_cast<__asc_simd_vf::DumpTensorTlv*>(blockInfo.buffer);
+}
+}
+
 struct TestDumpTensorParams {
     uint32_t dataSize;
     uint32_t typeSize;
@@ -168,4 +180,31 @@ TEST_F(TestDumpTensorSuite, InitDumpNullStartAddrReturns)
     InitDump(false, static_cast<__gm__ uint8_t*>(nullptr), DUMP_UINTSIZE);
 
     EXPECT_EQ(AscendC::g_dumpWorkspaceReserved, nullptr);
+}
+
+TEST_F(TestDumpTensorSuite, AscDumpUbufWritesUbPosition)
+{
+    BlockVFBufInfo blockInfo;
+    auto* dumpTlv = GetSimdVfDumpTlv(blockInfo);
+    uint32_t input[TEST_SIMD_VF_DUMP_SIZE] = {0};
+
+    __asc_simd_vf::asc_dump_ubuf<uint32_t>(
+        reinterpret_cast<__ubuf__ uint32_t*>(input), TEST_SIMD_VF_DUMP_DESC, TEST_SIMD_VF_DUMP_SIZE);
+
+    EXPECT_EQ(dumpTlv->position, static_cast<uint16_t>(Hardware::UB));
+    EXPECT_EQ(dumpTlv->desc, TEST_SIMD_VF_DUMP_DESC);
+    EXPECT_EQ(dumpTlv->blockIdx, TEST_SIMD_VF_BLOCK_IDX);
+}
+
+TEST_F(TestDumpTensorSuite, AscDumpRegWritesRegPosition)
+{
+    BlockVFBufInfo blockInfo;
+    auto* dumpTlv = GetSimdVfDumpTlv(blockInfo);
+    vector_u32 input = {};
+
+    __asc_simd_vf::asc_dump_reg<uint32_t>(input, TEST_SIMD_VF_DUMP_DESC, TEST_SIMD_VF_DUMP_SIZE);
+
+    EXPECT_EQ(dumpTlv->position, static_cast<uint16_t>(__asc_simd_vf::DumpPosition::REG));
+    EXPECT_EQ(dumpTlv->desc, TEST_SIMD_VF_DUMP_DESC);
+    EXPECT_EQ(dumpTlv->blockIdx, TEST_SIMD_VF_BLOCK_IDX);
 }
