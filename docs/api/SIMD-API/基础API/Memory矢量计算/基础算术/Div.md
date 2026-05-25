@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic_api/kernel_operator_vec_binary_intf.h"
+头文件路径为：`"basic_api/kernel_operator_vec_binary_intf.h"`。
 
 Div属于双目矢量类计算接口，负责将输入的两个tensor按元素求商。计算公式如下：
 
@@ -179,49 +179,49 @@ Kirin 9030
 
 <cann-filter npu-type="950">
 
-- 针对Ascend 950PR/Ascend 950DT系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。
+- 针对Ascend 950PR/Ascend 950DT系列产品，T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。uint64_t、int64_t、complex32、complex64数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
 
 </cann-filter>
 
 <cann-filter npu-type="A3">
 
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half、float。
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、float。
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
-- 针对Atlas 200I/500 A2 推理产品，支持的数据类型为：half、float。
+- 针对Atlas 200I/500 A2 推理产品，T支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="310p">
 
-- 针对Atlas 推理系列产品 AI Core，支持的数据类型为：half、float。
+- 针对Atlas 推理系列产品 AI Core，T支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="910">
 
-- 针对Atlas 训练系列产品，支持的数据类型为：half、float。
+- 针对Atlas 训练系列产品，T支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="x90">
 
-- 针对Kirin X90，支持的数据类型为：half、float。
+- 针对Kirin X90，T支持的数据类型为：half、float。
 
 </cann-filter>
 
 <cann-filter npu-type="9030">
 
-- 针对Kirin 9030，支持的数据类型为：half、float。
+- 针对Kirin 9030，T支持的数据类型为：half、float。
 
 </cann-filter>
 
@@ -235,13 +235,13 @@ Kirin 9030
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 - 使用整个tensor参与计算接口符号重载时，运算量为目的LocalTensor的总长度。
 <cann-filter npu-type="A3, 910b">
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
-</cann-filter>
-
-<cann-filter npu-type="950">
-
-- 针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t/complex32/complex64数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
-
+- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  <cann-filter npu-type="A3">
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  </cann-filter>
+  <cann-filter npu-type="910b">
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  </cann-filter>
 </cann-filter>
 
 ## 调用示例<a name="section642mcpsimp"></a>

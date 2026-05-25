@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic_api/kernel_operator_vec_binary_intf.h"
+头文件路径为：`"basic_api/kernel_operator_vec_binary_intf.h"`。
 
 Min属于双目矢量类计算接口，负责将输入的两个tensor按元素求最小值。计算公式如下：
 
@@ -113,49 +113,49 @@ $dst_i = min(src0_i, src1_i)$
 
 <cann-filter npu-type="950">
 
-- 针对Ascend 950PR/Ascend 950DT系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
+- 针对Ascend 950PR/Ascend 950DT系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。uint8_t、int8_t、uint64_t、int64_t数据类型仅支持tensor前n个数据计算接口。
 
 </cann-filter>
 
 <cann-filter npu-type="A3">
 
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half、int16_t、int32_t、float。
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：half、int16_t、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、int16_t、int32_t、float。
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：half、int16_t、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
-- 针对Atlas 200I/500 A2 推理产品，支持的数据类型为：half、int16_t、int32_t、float。
+- 针对Atlas 200I/500 A2 推理产品，T支持的数据类型为：half、int16_t、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="310p">
 
-- 针对Atlas 推理系列产品 AI Core，支持的数据类型为：half、int16_t、int32_t、float。
+- 针对Atlas 推理系列产品 AI Core，T支持的数据类型为：half、int16_t、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="910">
 
-- 针对Atlas 训练系列产品，支持的数据类型为：half、int32_t、float。
+- 针对Atlas 训练系列产品，T支持的数据类型为：half、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="x90">
 
-- 针对Kirin X90，支持的数据类型为：half、int16_t、int32_t、float。
+- 针对Kirin X90，T支持的数据类型为：half、int16_t、int32_t、float。
 
 </cann-filter>
 
 <cann-filter npu-type="9030">
 
-- 针对Kirin 9030，支持的数据类型为：half、int16_t、int32_t、float。
+- 针对Kirin 9030，T支持的数据类型为：half、int16_t、int32_t、float。
 
 </cann-filter>
 
@@ -168,13 +168,13 @@ $dst_i = min(src0_i, src1_i)$
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 <cann-filter npu-type="A3, 910b">
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
-</cann-filter>
-
-<cann-filter npu-type="950">
-
-- 针对Ascend 950PR/Ascend 950DT，uint8\_t/int8\_t/uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
-
+- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  <cann-filter npu-type="A3">
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  </cann-filter>
+  <cann-filter npu-type="910b">
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  </cann-filter>
 </cann-filter>
 
 ## 调用示例<a name="section642mcpsimp"></a>

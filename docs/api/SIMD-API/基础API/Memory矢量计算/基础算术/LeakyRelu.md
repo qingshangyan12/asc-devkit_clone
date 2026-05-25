@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic_api/kernel_operator_vec_binary_scalar_intf.h"
+头文件路径为：`"basic_api/kernel_operator_vec_binary_scalar_intf.h"`。
 
 LeakyRelu属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，LeakyRelu负责将矢量tensor内的每个元素执行Leaky ReLu（Leaky Rectified Linear Unit）操作。
 
@@ -214,7 +214,13 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 <cann-filter npu-type="A3, 910b">
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
+- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  <cann-filter npu-type="A3">
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  </cann-filter>
+  <cann-filter npu-type="910b">
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  </cann-filter>
 </cann-filter>
 
 ## 调用示例<a name="section112161084424"></a>

@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic_api/kernel_operator_vec_binary_intf.h"
+头文件路径为：`"basic_api/kernel_operator_vec_binary_intf.h"`。
 
 每对元素做按位或运算，计算公式如下：
 
@@ -119,57 +119,49 @@ $dst_i = src0_i | src1_i$
 
 <cann-filter npu-type="950">
 
-- 针对Ascend 950PR/Ascend 950DT系列产品
-    支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。
+- 针对Ascend 950PR/Ascend 950DT系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。uint8_t、int8_t、uint64_t、int64_t数据类型仅支持tensor前n个数据计算接口。
 
 </cann-filter>
 
 <cann-filter npu-type="A3">
 
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    支持的数据类型为：int16_t、uint16_t。
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    支持的数据类型为：int16_t、uint16_t。
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
-- 针对Atlas 200I/500 A2 推理产品
-    支持的数据类型为：int16_t、uint16_t。
+- 针对Atlas 200I/500 A2 推理产品，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="310p">
 
-- 针对Atlas 推理系列产品AI Core
-    支持的数据类型为：int16_t、uint16_t。
+- 针对Atlas 推理系列产品AI Core，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="910">
 
-- 针对Atlas 训练系列产品
-    支持的数据类型为：int16_t、uint16_t。
+- 针对Atlas 训练系列产品，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="x90">
 
-- 针对Kirin X90
-    支持的数据类型为：int16_t、uint16_t。
+- 针对Kirin X90，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
 <cann-filter npu-type="9030">
 
-- 针对Kirin 9030
-    支持的数据类型为：int16_t、uint16_t。
+- 针对Kirin 9030，T支持的数据类型为：int16_t、uint16_t。
 
 </cann-filter>
 
@@ -183,10 +175,13 @@ $dst_i = src0_i | src1_i$
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 - 使用整个tensor参与计算接口符号重载时，运算量为目的LocalTensor的总长度。
 <cann-filter npu-type="A3, 910b">
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
-</cann-filter>
-<cann-filter npu-type="950">
-- 针对Ascend 950PR/Ascend 950DT，uint8\_t/int8\_t/uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
+- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  <cann-filter npu-type="A3">
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  </cann-filter>
+  <cann-filter npu-type="910b">
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  </cann-filter>
 </cann-filter>
 <cann-filter npu-type="A3,910b,910,310p,310b">
 - 特别地，针对uint32\_t/int32\_t类型的Or操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16\_t/int16\_t后再调用Or进行计算。直接传入uint32\_t/int32\_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
