@@ -14,7 +14,7 @@
 #include "tiling_key_add_custom_template.h"
 
 constexpr int32_t BUFFER_NUM = 2;
-constexpr int32_t UB_BLOCK_SIZE = 2048;
+constexpr int32_t CALCULATE_SIZE = 2048;
 
 template <class dtypeX, class dtypeY, class dtypeZ>
 class KernelAdd {
@@ -36,9 +36,9 @@ public:
     __aicore__ inline void Process1()
     {
         AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-        AscendC::LocalTensor<dtypeX> xLocal = ubAllocator.Alloc<dtypeX, UB_BLOCK_SIZE>();
-        AscendC::LocalTensor<dtypeY> yLocal = ubAllocator.Alloc<dtypeY, UB_BLOCK_SIZE>();
-        AscendC::LocalTensor<dtypeZ> zLocal = ubAllocator.Alloc<dtypeZ, UB_BLOCK_SIZE>();
+        AscendC::LocalTensor<dtypeX> xLocal = ubAllocator.Alloc<dtypeX, CALCULATE_SIZE>();
+        AscendC::LocalTensor<dtypeY> yLocal = ubAllocator.Alloc<dtypeY, CALCULATE_SIZE>();
+        AscendC::LocalTensor<dtypeZ> zLocal = ubAllocator.Alloc<dtypeZ, CALCULATE_SIZE>();
 
         AscendC::DataCopy(xLocal, xGm[0], this->tileLength);
         AscendC::DataCopy(yLocal, yGm[0], this->tileLength);
@@ -59,24 +59,37 @@ public:
         int32_t loopCount = this->tileNum * BUFFER_NUM;
 
         AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-        AscendC::LocalTensor<dtypeX> xLocal = ubAllocator.Alloc<dtypeX, UB_BLOCK_SIZE>();
-        AscendC::LocalTensor<dtypeY> yLocal = ubAllocator.Alloc<dtypeY, UB_BLOCK_SIZE>();
-        AscendC::LocalTensor<dtypeZ> zLocal = ubAllocator.Alloc<dtypeZ, UB_BLOCK_SIZE>();
+        AscendC::LocalTensor<dtypeX> xLocal = ubAllocator.Alloc<dtypeX, CALCULATE_SIZE>();
+        AscendC::LocalTensor<dtypeY> yLocal = ubAllocator.Alloc<dtypeY, CALCULATE_SIZE>();
+        AscendC::LocalTensor<dtypeZ> zLocal = ubAllocator.Alloc<dtypeZ, CALCULATE_SIZE>();
+
+        AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+        AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
 
         for (int32_t i = 0; i < loopCount; i++) {
+            AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+
             AscendC::DataCopy(xLocal, xGm[i * this->tileLength], this->tileLength);
             AscendC::DataCopy(yLocal, yGm[i * this->tileLength], this->tileLength);
 
             AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
+            AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+
             AscendC::Add(zLocal, xLocal, yLocal, this->tileLength);
 
+            AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
             AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
             AscendC::DataCopy(zGm[i * this->tileLength], zLocal, this->tileLength);
+
+            AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
         }
+
+        AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+        AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
     }
 
 private:
