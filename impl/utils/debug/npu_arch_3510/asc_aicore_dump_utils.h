@@ -156,7 +156,7 @@ template <typename T, typename U>
 __simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dump_size)
 {
     enable_asc_diagnostics();
-    asc_dump_impl_reg<AscendC::Hardware::UB, T>(input, desc, dump_size);
+    asc_dump_impl_reg<AscendC::Hardware::REG, T>(input, desc, dump_size);
 }
 
 template <typename T>
@@ -169,7 +169,7 @@ template <typename T, typename U>
 __simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size)
 {
     enable_asc_diagnostics();
-    asc_dump_impl_reg<AscendC::Hardware::UB, T>(input, desc, dump_size);
+    asc_dump_impl_reg<AscendC::Hardware::REG, T>(input, desc, dump_size);
 }
 
 template <typename T>

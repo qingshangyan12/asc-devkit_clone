@@ -20,7 +20,7 @@
 #include "sys_macros.h"
 
 namespace AscendC {
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
+enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, REG, MAX };
 
 enum class ReduceType {
     NONE = -1,
