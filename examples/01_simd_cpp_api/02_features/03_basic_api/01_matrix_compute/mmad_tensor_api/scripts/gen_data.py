@@ -29,7 +29,7 @@ def gen_golden_data():
     uint32_quant &= 0XFFFFE000
     quant_tensor = uint32_quant.astype(np.uint64)
     quant_tensor |= 1 << 46
-    
+
     golden = np.matmul(input_x, input_y).astype(np.int32)
     golden = golden * quant
     golden = golden.astype(np.half)
@@ -44,4 +44,3 @@ def gen_golden_data():
 
 if __name__ == "__main__":
     gen_golden_data()
-    

@@ -34,11 +34,6 @@ include_directories(
 )
 
 target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-    dl
 )
 
 target_compile_options(demo PRIVATE

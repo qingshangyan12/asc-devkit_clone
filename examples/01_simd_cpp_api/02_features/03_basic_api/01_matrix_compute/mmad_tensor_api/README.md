@@ -1,8 +1,8 @@
-# 基于Tensor_API实现的Mmad随路量化样例
+# 基于Tensor API实现的Mmad随路量化样例
 
 ## 概述
 
-本样例基于Tensor_API编程方式实现动态Shape矩阵乘法和随路量化计算。矩阵A不转置，矩阵B转置存储，A/B矩阵数据类型为int8，Mmad累加类型为int32，输出矩阵C数据类型为half。量化系数quant以uint64_t格式输入，在Fixpipe阶段对L0C中的int32累加结果进行缩放并写回GM。Shape参数（M/N/K及单核切分参数）通过MatmulTiling结构体在运行时动态传入，baseM、baseN、baseK和stepM、stepN、stepK作为编译期模板参数静态配置。
+本样例基于Tensor API编程方式实现动态Shape矩阵乘法和随路量化计算。矩阵A不转置，矩阵B转置存储，A/B矩阵数据类型为int8，Mmad累加类型为int32，输出矩阵C数据类型为half。量化系数quant以uint64_t格式输入，在Fixpipe阶段对L0C中的int32累加结果进行缩放并写回GM。
 
 ## 支持的产品
 
@@ -10,7 +10,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── mmad_tensor_api
 │   ├── scripts
 │   │   ├── gen_data.py                 // 输入数据和真值数据生成脚本文件
@@ -29,7 +29,7 @@
 
   1. 动态Matmul功能
 
-     样例在Kernel中通过Tensor_API构造GM、L1、L0A、L0B、L0C上的Tensor对象，使用Copy接口完成GM到L1、L1到L0的分块搬运，并通过Mmad接口完成矩阵乘法。矩阵A按ND布局读取，矩阵B按DN布局读取（输入文件中以转置后的[N, K]保存）。Shape参数（M、N、K、singleCoreM、singleCoreN、singleCoreK）通过在运行时传递到Kernel中，baseM、baseN、baseK和stepM、stepN、stepK、ENABLE_UNITFLAG作为编译期模板参数决定L1/L0 Buffer分配大小和分块步进。
+     样例在Kernel中通过Tensor API构造GM、L1、L0A、L0B、L0C上的Tensor对象，使用Copy接口完成GM到L1、L1到L0的分块搬运，并通过Mmad接口完成矩阵乘法。矩阵A按ND布局读取，矩阵B按DN布局读取（输入文件中以转置后的[N, K]保存）。Shape参数（M、N、K、singleCoreM、singleCoreN、singleCoreK）通过在运行时传递到Kernel中，baseM、baseN、baseK和stepM、stepN、stepK、ENABLE_UNITFLAG作为编译期模板参数决定L1/L0 Buffer分配大小和分块步进。
 
   2. Fixpipe随路量化功能/反量化
 
@@ -41,7 +41,7 @@
   3. ENABLE_UNITFLAG
 
      样例通过`ENABLE_UNITFLAG`模板参数控制unitFlag功能的开关，默认值为true。
-     unitFlag具体介绍可见[Mmad unitFlag特性样例](TensorAPI/asc-devkit_feature_tensorAPI/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag/README.md:28)
+     unitFlag具体介绍可见[Mmad unitFlag特性样例](../mmad_unitflag/README.md)
 
 - 样例规格：
 
@@ -85,24 +85,29 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+
+- 配置环境变量
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令，**当前仅支持使用CANN master**。
   - 默认路径，root用户安装CANN软件包
+
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
   - 默认路径，非root用户安装CANN软件包
+
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
   - 指定路径install_path，安装CANN软件包
+
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
-    
-- 样例执行  
+
+- 样例执行
+
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程
@@ -110,7 +115,9 @@
   ./demo                        # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
+
   示例如下：
+
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
@@ -126,6 +133,7 @@
 
 - 执行结果
   执行结果如下，说明精度对比成功。
+
   ```bash
   test pass!
   ```
