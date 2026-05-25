@@ -13,8 +13,9 @@
 #include "leaky_relu_custom_tiling.h"
 
 constexpr int32_t BUFFER_NUM = 2;
-constexpr int32_t UB_BLOCK_SIZE = 2048;
+constexpr uint32_t STATIC_TILE_LENGTH = 64;
 
+template <uint32_t tileLength>
 class KernelLeakyRelu {
 public:
     __aicore__ inline KernelLeakyRelu() {}
@@ -24,7 +25,8 @@ public:
         this->blockLength = totalLength / AscendC::GetBlockNum();
         this->tileNum = tileNum;
         this->negativeSlope = static_cast<float>(negativeSlope);
-        this->tileLength = this->blockLength / tileNum / BUFFER_NUM;
+        uint32_t runtimeTileLength = this->blockLength / tileNum / BUFFER_NUM;
+        ascendc_assert(runtimeTileLength == tileLength, "runtime tileLength must match template tileLength.\n");
 
         xGm.SetGlobalBuffer((__gm__ float *)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
         yGm.SetGlobalBuffer((__gm__ float *)y + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
@@ -34,29 +36,42 @@ public:
         int32_t loopCount = this->tileNum * BUFFER_NUM;
 
         AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-        AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, UB_BLOCK_SIZE>();
-        AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, UB_BLOCK_SIZE>();
-        AscendC::LocalTensor<float> tmpTensor1 = ubAllocator.Alloc<float, UB_BLOCK_SIZE>();
-        AscendC::LocalTensor<float> tmpTensor2 = ubAllocator.Alloc<float, UB_BLOCK_SIZE>();
+        AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, tileLength>();
+        AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, tileLength>();
+        AscendC::LocalTensor<float> tmpTensor1 = ubAllocator.Alloc<float, tileLength>();
+        AscendC::LocalTensor<float> tmpTensor2 = ubAllocator.Alloc<float, tileLength>();
 
         float inputVal = 0.0f;
 
+        AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+        AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+
         for (int32_t i = 0; i < loopCount; i++) {
-            AscendC::DataCopy(xLocal, xGm[i * this->tileLength], this->tileLength);
+            AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+
+            AscendC::DataCopy(xLocal, xGm[i * tileLength], tileLength);
 
             AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-            AscendC::Maxs(tmpTensor1, xLocal, inputVal, this->tileLength);
-            AscendC::Mins(tmpTensor2, xLocal, inputVal, this->tileLength);
-            AscendC::Muls(tmpTensor2, tmpTensor2, this->negativeSlope, this->tileLength);
-            AscendC::Add(yLocal, tmpTensor1, tmpTensor2, this->tileLength);
+            AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
 
+            AscendC::Maxs(tmpTensor1, xLocal, inputVal, tileLength);
+            AscendC::Mins(tmpTensor2, xLocal, inputVal, tileLength);
+            AscendC::Muls(tmpTensor2, tmpTensor2, this->negativeSlope, tileLength);
+            AscendC::Add(yLocal, tmpTensor1, tmpTensor2, tileLength);
+
+            AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
             AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-            AscendC::DataCopy(yGm[i * this->tileLength], yLocal, this->tileLength);
+            AscendC::DataCopy(yGm[i * tileLength], yLocal, tileLength);
+
+            AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
         }
+
+        AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+        AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
     }
 
 private:
@@ -64,7 +79,6 @@ private:
     AscendC::GlobalTensor<float> yGm;
     uint32_t blockLength;
     uint32_t tileNum;
-    uint32_t tileLength;
     float negativeSlope;
 };
 
@@ -75,7 +89,7 @@ extern "C" __global__ __aicore__ void leaky_relu_custom(__gm__ uint8_t* x, __gm_
     REGISTER_TILING_DEFAULT(LeakyReluCustomTilingData);
     GET_TILING_DATA(tiling_data, tiling);
 
-    KernelLeakyRelu op;
+    KernelLeakyRelu<STATIC_TILE_LENGTH> op;
     op.Init(x, y, tiling_data.totalLength, tiling_data.tileNum, tiling_data.negativeSlope);
     op.Process();
 
