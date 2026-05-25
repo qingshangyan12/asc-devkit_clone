@@ -370,7 +370,7 @@ __aicore__ inline uint32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PollC
     Ub2Gm<uint32_t>(cqCIGlobal, cqCI_, 1);
 
     // ring CQ doorbell
-    st_dev(curTail & 0xFFFFFFU, (__gm__ uint32_t*)sqCtxEntry->contextInfo.ubJfs.dbVa, 0);
+    st_dev(curTail & 0xFFFFFFU, (__gm__ uint32_t*)cqCtx->contextInfo.ubJfc.dbVa, 0);
 
     // update WQ tail
     AscendC::GlobalTensor<uint32_t> sqCIGlobal;
