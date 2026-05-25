@@ -81,6 +81,11 @@ __aicore__ inline constexpr auto Capacity(const LayoutType& layout);
 template <typename Tensor, typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info);
 
+template <typename LayoutPattern, typename TraitType, typename... Args>
+__aicore__ inline constexpr auto MakeFrameLayout(const Args&... args);
+
+template <typename LayoutPattern, size_t C0Element, typename... Args>
+__aicore__ inline constexpr auto MakeFrameLayout(const Args&... args);
 } // namespace Te
 } // namespace AscendC
 
