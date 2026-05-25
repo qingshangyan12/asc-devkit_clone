@@ -23,19 +23,13 @@
 #define LIB_MATH_LOGICAL_OR_H
 
 #include "kernel_tensor.h"
+#include "logical_or_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/logical_or/logical_or_common_impl.h"
 #endif
 
 namespace AscendC {
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102)
-struct LogicalOrConfig {
-    bool isReuseSource;
-};
-constexpr LogicalOrConfig DEFAULT_LOGICAL_OR_CONFIG = {false};
-#endif
-
 #pragma begin_pipe(V)
 /*!
  * \ingroup LogicalOr
