@@ -44,7 +44,7 @@ namespace AscendC {
  * \param [out] dstTensor: Output localTensor.
  * \param [in] srcTensor: Input src localTensor
  * \param [in] deqScale: Input deqScale localTensor
- * \param [in] sharedTmpBufferï¼?extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBufferï¿½?extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             ascend_dequant_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -164,7 +164,7 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
  * \param [out] dstTensor: Output localTensor.
  * \param [in] srcTensor: Input src localTensor
  * \param [in] deqScale: Input deqScale localTensor
- * \param [in] sharedTmpBufferï¼?extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBufferï¿½?extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             ascend_dequant_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -271,7 +271,6 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
 #endif
 }
 
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102))
 template <typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config, const AscendDeQuantPolicy& policy>
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
                                      const LocalTensor<scaleT> &scaleTensor, const LocalTensor<scaleT> &offsetTensor,
@@ -291,7 +290,6 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
     AscendDequantImpl<dstT, srcT, scaleT, config, policy>(dstTensor, srcTensor, sharedTmpBuffer, scaleTensor, offsetTensor, para);
 #endif
 }
-#endif
 #pragma end_pipe
 } // namespace AscendC
 #endif // LIB_QUANTIZATION_ASCEND_DEQUANT_H
