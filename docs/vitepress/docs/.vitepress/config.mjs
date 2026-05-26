@@ -226,40 +226,49 @@ export default defineConfig({
     html: false,
     config(md) {
       const originalRender = md.render.bind(md)
-      md.render = function (src, env) {
+      const originalRenderAsync = md.renderAsync ? md.renderAsync.bind(md) : null
+      const processSource = (src) => {
+        src = fixCannFilterTags(src)
+        if (src.startsWith('    >') || src.includes('\n    >')) {
+          src = fixIndentedBlockquotes(src)
+        }
+        if (src.includes('<span') && src.includes('|')) {
+          src = fixSpanCrossingTableCells(src)
+        }
+        if (src.includes('<table')) {
+          src = convertHtmlTablesToMarkdown(src)
+        }
+        return src
+      }
+      const processHtml = (html) => {
+        if (html.includes('CANNFILTER_DIV_')) {
+          html = html.replace(/<p>\s*CANNFILTER_DIV_(\w+)_OPEN\s*<\/p>/g, '<div data-filter="$1">')
+          html = html.replace(/<p>\s*CANNFILTER_DIV_(\w+)_CLOSE\s*<\/p>/g, '</div>')
+        }
+        if (html.includes('{{')) {
+          html = escapeVueInterpolations(html)
+        }
+        return html
+      }
+      const renderFn = (src, env) => {
         if (src.includes('<!-- RAW_HTML -->')) {
           const htmlContent = src.replace(/^.*<!-- RAW_HTML -->\s*/s, '').replace(/\s*$/, '')
           let html = addHeadingAnchors(htmlContent)
           html = escapeVueInterpolations(html)
           return `<div v-pre>\n${html}\n</div>`
         }
-
-        src = fixCannFilterTags(src)
-
-        if (src.startsWith('    >') || src.includes('\n    >')) {
-          src = fixIndentedBlockquotes(src)
-        }
-
-        if (src.includes('<span') && src.includes('|')) {
-          src = fixSpanCrossingTableCells(src)
-        }
-
-        if (src.includes('<table')) {
-          src = convertHtmlTablesToMarkdown(src)
-        }
-
+        src = processSource(src)
         let html = originalRender(src, env)
-
-        if (html.includes('CANNFILTER_DIV_')) {
-          html = html.replace(/<p>\s*CANNFILTER_DIV_(\w+)_OPEN\s*<\/p>/g, '<div data-filter="$1">')
-          html = html.replace(/<p>\s*CANNFILTER_DIV_(\w+)_CLOSE\s*<\/p>/g, '</div>')
-        }
-
-        if (html.includes('{{')) {
-          html = escapeVueInterpolations(html)
-        }
-
+        html = processHtml(html)
         return `<div v-pre>${html}</div>`
+      }
+      md.render = function (src, env) {
+        return renderFn(src, env)
+      }
+      if (originalRenderAsync) {
+        md.renderAsync = async function (src, env) {
+          return renderFn(src, env)
+        }
       }
     },
   },
@@ -301,40 +310,52 @@ export default defineConfig({
     search: {
       provider: 'local',
       options: {
-        _render(src, env, md) {
+        async _render(src, env, md) {
+          const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+          const getDirInfo = (filePath) => {
+            const parts = filePath.replace(/\.md$/, '').split('/').filter(Boolean)
+            if (parts.length <= 1) return { html: '', shift: 0 }
+            const routePrefixes = ['api', 'guide']
+            let start = routePrefixes.includes(parts[0]) ? 1 : 0
+            const segs = parts.slice(start, -1).slice(-3)
+            if (segs.length === 0) return { html: '', shift: 0 }
+            let html = ''
+            for (let i = 0; i < segs.length; i++) html += `<h${i + 1}>${escapeHtml(segs[i])}</h${i + 1}> `
+            return { html, shift: segs.length }
+          }
+          const processHeadings = (html, shift = 0) => {
+            const seen = {}
+            return html.replace(/<h([1-6])([^>]*)>(.*?)<\/h\1>/gi, (_, level, attrs, text) => {
+              const newLevel = Math.min(Number(level) + shift, 6)
+              const clean = text.replace(/<[^>]+>/g, '').trim()
+              let id = clean.replace(/\s+/g, '-')
+              if (seen[id]) id = `${id}-${seen[id]++}`
+              else seen[id] = 1
+              const inner = `<a class="header-anchor" href="#${id}">\u00b6</a>`
+              const existing = text.match(/<a[^>]*>.*?<\/a>/)
+              if (existing) return `<h${newLevel}${attrs}>${text}${inner}</h${newLevel}>`
+              return `<h${newLevel}${attrs}>${clean}${inner}</h${newLevel}>`
+            })
+          }
           if (!src || !src.trim()) {
             const htmlPath = env.path.replace(/\.md$/, '.html')
             if (existsSync(htmlPath)) {
               const raw = readFileSync(htmlPath, 'utf-8')
-              const seen = {}
-              const headingRegex = /<h([23456])([^>]*)>(.*?)<\/h\1>/gi
-              return raw.replace(headingRegex, (_, level, attrs, text) => {
-                const clean = text.replace(/<[^>]+>/g, '').trim()
-                let id = clean.replace(/\s+/g, '-')
-                if (seen[id]) id = `${id}-${seen[id]++}`
-                else seen[id] = 1
-                const inner = `<a class="header-anchor" href="#${id}">\u00b6</a>`
-                const existing = text.match(/<a[^>]*>.*?<\/a>/)
-                if (existing) return `<h${level}${attrs}>${text}${inner}</h${level}>`
-                return `<h${level}${attrs}>${clean}${inner}</h${level}>`
-              })
+              const dir = getDirInfo(env.path)
+              return processHeadings(dir.html, 0) + processHeadings(raw, dir.shift)
             }
             return ''
           }
-          const html = md.render(src, env)
+          const html = await md.renderAsync(src, env)
           if (!src.includes('<!-- RAW_HTML -->')) return html
-          const seen = {}
-          const headingRegex = /<h([23456])([^>]*)>(.*?)<\/h\1>/gi
-          return html.replace(headingRegex, (_, level, attrs, text) => {
-            if (text.includes('header-anchor')) return `<h${level}${attrs}>${text}</h${level}>`
-            const clean = text.replace(/<[^>]+>/g, '').trim()
-            let id = clean.replace(/\s+/g, '-')
-            if (seen[id]) id = `${id}-${seen[id]++}`
-            else seen[id] = 1
-            const existing = text.match(/<a[^>]*>.*?<\/a>/)
-            if (existing) return `<h${level}${attrs}>${text}<a class="header-anchor" href="#${id}">\u00b6</a></h${level}>`
-            return `<h${level}${attrs}>${clean}<a class="header-anchor" href="#${id}">\u00b6</a></h${level}>`
-          })
+          const dir = getDirInfo(env.path)
+          return processHeadings(dir.html, 0) + processHeadings(html, dir.shift)
+        },
+        detailedView: true,
+        miniSearch: {
+          options: {
+            storeFields: ['title', 'titles', 'text'],
+          }
         },
         translations: {
           button: { buttonText: '搜索文档' },

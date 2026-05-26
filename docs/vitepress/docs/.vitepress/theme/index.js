@@ -1,15 +1,11 @@
 import DefaultTheme from 'vitepress/theme'
-import { h } from 'vue'
-import BackToTop from './BackToTop.vue'
-import './filter.css'
 import './code-theme.css'
+import './search-overrides.css'
+
+if (typeof window !== 'undefined' && !window.localStorage.getItem('vitepress:local-search-detailed-list')) {
+  window.localStorage.setItem('vitepress:local-search-detailed-list', 'true')
+}
 
 export default {
   extends: DefaultTheme,
-  Layout() {
-    return h(DefaultTheme.Layout, null, {
-      'layout-bottom': () => h(BackToTop),
-      // 'nav-bar-content-after': () => h(FilterToggle),
-    })
-  },
 }
