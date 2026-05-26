@@ -77,9 +77,9 @@ public:
     ~CcuKernelKfcServer() override {}
 
     HcclResult InitResource();
-    void LoadArgs(); // 参数载入 check
-    void SetCommAddr(ccu::Variable syncAddr_); // 配置同步需要的参数
-    void SetDieNum(ccu::Variable dieNum_); // 配置dieNum
+    void LoadArgs();                                            // 参数载入 check
+    void SetCommAddr(ccu::Variable syncAddr_);                  // 配置同步需要的参数
+    void SetDieNum(ccu::Variable dieNum_);                      // 配置dieNum
     void SetMissionNumAndId(ccu::Variable missionNum_, ccu::Variable missionIndex_);
 
     HcclResult Algorithm() override; // kfc server算法
@@ -92,12 +92,12 @@ public:
 protected:
 
     ccu::Variable syncAddr_;
-    ccu::Variable waitAddr_; // HBM上的每轮开始信号的首地址
-    ccu::Variable recordAddr_; // HBM上的每轮完成信号的首地址
+    ccu::Variable waitAddr_;            // HBM上的每轮开始信号的首地址
+    ccu::Variable recordAddr_;          // HBM上的每轮完成信号的首地址
 
-    ccu::Variable paramAddr_; // HBM上的算子执行参数首地址
+    ccu::Variable paramAddr_;           // HBM上的算子执行参数首地址
     ccu::Variable token_;
-    ccu::Variable dieNum_; // Die数量，用于判断单双Die，默认为1即单Die
+    ccu::Variable dieNum_;              // Die数量，用于判断单双Die，默认为1即单Die
     ccu::Variable missionNum_;          // TODO:这边之前都是U64的。----Load()
     ccu::Variable missionIndex_;
 
