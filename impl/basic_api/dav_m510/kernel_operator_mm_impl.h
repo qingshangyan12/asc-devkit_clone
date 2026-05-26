@@ -424,26 +424,22 @@ __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b,
     // f162s32,f16s8, e4m3e4m3, e4m3s8, e4m3s4 algorithm will need configure fixval, others do not
     if constexpr (SupportType<Tuple<Src0T, Src1T, DstT>, Tuple<half, half, int32_t>>()) {
         // f162s32
-        constexpr uint8_t fixShiftVal = 42;
-        mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, fixShiftVal, mmadParams.unitFlag, mmadParams.disableGemv,
+        mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.fix_shift_val, mmadParams.unitFlag, mmadParams.disableGemv,
             mmadParams.cmatrixSource, cmatrixInitVal);
     } else if constexpr (SupportType<Tuple<Src0T, Src1T, DstT>, Tuple<half, int8_t, int32_t>>()) {
         // f16s8
-        constexpr uint8_t fixShiftVal = 13;
-        mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, fixShiftVal, mmadParams.unitFlag, mmadParams.disableGemv,
+        mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.fix_shift_val, mmadParams.unitFlag, mmadParams.disableGemv,
             mmadParams.cmatrixSource, cmatrixInitVal);
     } else if constexpr (SupportType<Tuple<Src0T, Src1T, DstT>, Tuple<int8_t, int4b_t, int32_t>>()) {
         // s8s4
-        constexpr uint8_t fixShiftVal = 0;
-        mad_s8s4(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, fixShiftVal, mmadParams.unitFlag, mmadParams.disableGemv,
+        mad_s8s4(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.fix_shift_val, mmadParams.unitFlag, mmadParams.disableGemv,
             mmadParams.cmatrixSource, cmatrixInitVal);
     } else if constexpr ((IsSameType<Src0T, int4b_t>::value) && (IsSameType<Src1T, int4b_t>::value)) {
-        mad_s4(c, (__ca__ void*)a, (__cb__ void*)b, mmadParams.m, mmadParams.k, mmadParams.n, 0,
+        mad_s4(c, (__ca__ void*)a, (__cb__ void*)b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.fix_shift_val,
             mmadParams.unitFlag, mmadParams.disableGemv, mmadParams.cmatrixSource, cmatrixInitVal);
     } else {
         // currently support: s16s8, s8, e4m3e4m3, s16s16, e4m3s8
-        constexpr uint8_t fixShiftVal = 0;
-        mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, fixShiftVal, mmadParams.unitFlag, mmadParams.disableGemv,
+        mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.fix_shift_val, mmadParams.unitFlag, mmadParams.disableGemv,
         mmadParams.cmatrixSource, cmatrixInitVal);
     }
 }
@@ -462,26 +458,22 @@ __aicore__ inline void MmadCal(
     // f162s32,f16s8, e4m3e4m3, e4m3s8, e4m3s4 algorithm will need configure fixval, others do not
     if constexpr (SupportType<Tuple<Src0T, Src1T, DstT>, Tuple<half, half, int32_t>>()) {
         // f162s32
-        constexpr uint8_t fixShiftVal = 42;
-        mad((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, fixShiftVal, mmadParams.unitFlag, mmadParams.disableGemv,
+        mad((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.fix_shift_val, mmadParams.unitFlag, mmadParams.disableGemv,
             mmadParams.cmatrixSource, cmatrixInitVal);
     } else if constexpr (SupportType<Tuple<Src0T, Src1T, DstT>, Tuple<half, int8_t, int32_t>>()) {
         // f16s8
-        constexpr uint8_t fixShiftVal = 13;
-        mad((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, fixShiftVal, mmadParams.unitFlag, mmadParams.disableGemv,
+        mad((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.fix_shift_val, mmadParams.unitFlag, mmadParams.disableGemv,
             mmadParams.cmatrixSource, cmatrixInitVal);
     } else if constexpr (SupportType<Tuple<Src0T, Src1T, DstT>, Tuple<int8_t, int4b_t, int32_t>>()) {
         // s8s4
-        constexpr uint8_t fixShiftVal = 0;
-        mad_s8s4((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, fixShiftVal, mmadParams.unitFlag, mmadParams.disableGemv,
+        mad_s8s4((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.fix_shift_val, mmadParams.unitFlag, mmadParams.disableGemv,
             cmatrixSource, cmatrixInitVal);
     } else if constexpr ((IsSameType<Src0T, int4b_t>::value) && (IsSameType<Src1T, int4b_t>::value)) {
-        mad_s4(c, (__ca__ void*)a, (__cb__ void*)b, mmadParams.m, mmadParams.k, mmadParams.n, 0, mmadParams.unitFlag, mmadParams.disableGemv,
+        mad_s4(c, (__ca__ void*)a, (__cb__ void*)b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.fix_shift_val, mmadParams.unitFlag, mmadParams.disableGemv,
             mmadParams.cmatrixSource, cmatrixInitVal);
     } else {
         // currently support: s16s8, s8, e4m3e4m3, s16s16, e4m3s8
-        constexpr uint8_t fixShiftVal = 0;
-        mad((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, fixShiftVal, mmadParams.unitFlag, mmadParams.disableGemv,
+        mad((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.fix_shift_val, mmadParams.unitFlag, mmadParams.disableGemv,
         cmatrixSource, cmatrixInitVal);
     }
 }
