@@ -4426,6 +4426,7 @@ auto __enable_feature_for_compile_deterministic = 1;
 
     def test_get_sync_task_start_end_instr_from_i_file(self):
         dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
+        os.makedirs(os.path.dirname(dst_i_file), exist_ok=True)
         os.system(f"touch {dst_i_file}")
         with open(dst_i_file, "w") as file:
             context = """
@@ -4446,55 +4447,23 @@ WaitPreTaskEnd();
         self.assertEqual(res2, False)
         os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
 
-    def test_extract_template_param_values(self):
-        param_names = ["AIV_PIPE", "AIC_PIPE", "FORCE"]
-        cases = [
-            ("AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();", ["true"]),
-            ("AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, false>();", ["false"]),
-            ("AscendC::SetNextTaskStart();", ["false"]),
-            ("AscendC::SetNextTaskStart<Meta<A, B>, PIPE_FIX, true>();", ["true"]),
-            ("__aicore__ inline void SetNextTaskStart();", []),
-            ("__aicore__ inline void SetNextTaskStart() {}", []),
-            ("__aicore__ inline void    SetNextTaskStart();", []),
-            ("__aicore__ inline void\nSetNextTaskStart() {}", []),
-            ("else SetNextTaskStart();", ["false"]),
-            ("do SetNextTaskStart(); while(false);", ["false"]),
-            ("AscendC::SyncAll();", []),
-        ]
-        for content, expected in cases:
-            with self.subTest(content=content):
-                self.assertEqual(
-                    KernelInfoInfer.extract_template_param_values(
-                        content, "SetNextTaskStart", param_names, "FORCE", "false"),
-                    expected)
-        self.assertEqual(
-            KernelInfoInfer.extract_template_param_value_infos(
-                "\nAscendC::SetNextTaskStart();", "SetNextTaskStart", param_names, "FORCE", "false"),
-            [{"value": "false", "line": 2}])
-
-    def test_get_aclgraph_sync_task_start_end_instr_from_i_file(self):
+    def test_get_sync_task_start_end_instr_from_i_file_with_template_args(self):
         context = """
+__aicore__ inline void SetNextTaskStart();
+__aicore__ inline void WaitPreTaskEnd();
 AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
-AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, 1>();
 AscendC::WaitPreTaskEnd<true>();
-AscendC::WaitPreTaskEnd<1>();
+AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
+AscendC::WaitPreTaskEnd<true>();
 """
-        set_flag, wait_flag = KernelInfoInfer.get_aclgraph_sync_task_start_end_instr_from_i_file(
-            context, "demo_op")
-        self.assertTrue(set_flag)
-        self.assertTrue(wait_flag)
+        res1, res2 = KernelInfoInfer.get_sync_task_start_end_instr_from_i_file(context)
+        self.assertEqual(res1, True)
+        self.assertEqual(res2, True)
 
-    def test_get_aclgraph_sync_task_start_end_instr_from_i_file_default_false(self):
-        context = """
-AscendC::SetNextTaskStart();
-AscendC::WaitPreTaskEnd();
-"""
-        set_flag, wait_flag = KernelInfoInfer.get_aclgraph_sync_task_start_end_instr_from_i_file(
-            context, "demo_op")
-        self.assertFalse(set_flag)
-        self.assertFalse(wait_flag)
-
-    def test_get_aclgraph_sync_task_start_end_instr_from_i_file_ignores_header_defs(self):
+    def test_infer_info_from_ifile_uses_shared_scan_for_aclgraph_early_start(self):
+        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'aclgraph_early_start.i')
+        os.makedirs(os.path.dirname(dst_i_file), exist_ok=True)
+        os.system(f"touch {dst_i_file}")
         context = """
 template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
 __aicore__ inline void SetNextTaskStart();
@@ -4515,127 +4484,6 @@ void add_custom()
 {
     AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
     AscendC::WaitPreTaskEnd<true>();
-}
-"""
-        with mock.patch.object(CommonUtility, "print_compile_log") as mock_log:
-            set_flag, wait_flag = KernelInfoInfer.get_aclgraph_sync_task_start_end_instr_from_i_file(
-                context, "demo_op")
-        self.assertTrue(set_flag)
-        self.assertTrue(wait_flag)
-        mock_log.assert_not_called()
-
-    def test_get_aclgraph_sync_task_start_end_instr_from_i_file_scans_process_body(self):
-        context = """
-template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
-__aicore__ inline void SetNextTaskStart();
-template<pipe_t AIV_PIPE, pipe_t AIC_PIPE, bool FORCE>
-__aicore__ inline void SetNextTaskStart()
-{
-    SetNextTaskStartImpl<AIV_PIPE, AIC_PIPE, true>();
-}
-template<bool FORCE = false>
-__aicore__ inline void WaitPreTaskEnd();
-template<bool FORCE>
-__aicore__ inline void WaitPreTaskEnd()
-{
-    WaitPreTaskEndImpl();
-}
-class KernelAdd {
-public:
-    __aicore__ inline void Process()
-    {
-        AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
-        AscendC::WaitPreTaskEnd<true>();
-    }
-};
-void add_custom()
-{
-    KernelAdd op;
-    op.Process();
-}
-"""
-        with mock.patch.object(CommonUtility, "print_compile_log") as mock_log:
-            set_flag, wait_flag = KernelInfoInfer.get_aclgraph_sync_task_start_end_instr_from_i_file(
-                context, "demo_op")
-        self.assertTrue(set_flag)
-        self.assertTrue(wait_flag)
-        mock_log.assert_not_called()
-
-    def test_get_aclgraph_sync_task_start_end_instr_from_i_file_process_body_default_false(self):
-        context = """
-class KernelAdd {
-public:
-    __aicore__ inline void Process()
-    {
-        AscendC::SetNextTaskStart();
-        AscendC::WaitPreTaskEnd();
-    }
-};
-void add_custom()
-{
-    KernelAdd op;
-    op.Process();
-}
-"""
-        set_flag, wait_flag = KernelInfoInfer.get_aclgraph_sync_task_start_end_instr_from_i_file(
-            context, "demo_op")
-        self.assertFalse(set_flag)
-        self.assertFalse(wait_flag)
-
-    def test_get_aclgraph_sync_task_start_end_instr_from_i_file_declarations_only_returns_false(self):
-        context = """
-void add_custom();
-__aicore__ inline void SetNextTaskStart();
-__aicore__ inline void WaitPreTaskEnd();
-"""
-        set_flag, wait_flag = KernelInfoInfer.get_aclgraph_sync_task_start_end_instr_from_i_file(
-            context, "demo_op")
-        self.assertFalse(set_flag)
-        self.assertFalse(wait_flag)
-
-    def test_get_aclgraph_sync_task_start_end_instr_from_i_file_mixed_force_warns(self):
-        context = """
-AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
-AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, false>();
-AscendC::WaitPreTaskEnd<true>();
-AscendC::WaitPreTaskEnd<false>();
-"""
-        with mock.patch.object(CommonUtility, "print_compile_log") as mock_log:
-            set_flag, wait_flag = KernelInfoInfer.get_aclgraph_sync_task_start_end_instr_from_i_file(
-                context, "demo_op", "demo.i")
-        self.assertFalse(set_flag)
-        self.assertFalse(wait_flag)
-        self.assertEqual(mock_log.call_count, 2)
-        set_warning = mock_log.call_args_list[0][0][1]
-        wait_warning = mock_log.call_args_list[1][0][1]
-        self.assertIn("early-start SetNextTaskStart FORCE values are inconsistent", set_warning)
-        self.assertIn("FORCE values:\n  true values:\n    - value: true, location: demo.i:2", set_warning)
-        self.assertIn("  false or unrecognized values:\n    - value: false, location: demo.i:3", set_warning)
-        self.assertIn("early-start WaitPreTaskEnd FORCE values are inconsistent", wait_warning)
-        self.assertIn("FORCE values:\n  true values:\n    - value: true, location: demo.i:4", wait_warning)
-        self.assertIn("  false or unrecognized values:\n    - value: false, location: demo.i:5", wait_warning)
-
-    def test_infer_info_from_ifile_uses_force_for_aclgraph_early_start(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'aclgraph_force.i')
-        os.system(f"touch {dst_i_file}")
-        context = """
-template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
-__aicore__ inline void SetNextTaskStart();
-template<pipe_t AIV_PIPE, pipe_t AIC_PIPE, bool FORCE>
-__aicore__ inline void SetNextTaskStart()
-{
-    SetNextTaskStartImpl<AIV_PIPE, AIC_PIPE, true>();
-}
-template<bool FORCE = false>
-__aicore__ inline void WaitPreTaskEnd();
-template<bool FORCE>
-__aicore__ inline void WaitPreTaskEnd()
-{
-    WaitPreTaskEndImpl();
-}
-void add_custom();
-void add_custom()
-{
     AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
     AscendC::WaitPreTaskEnd<true>();
 }
