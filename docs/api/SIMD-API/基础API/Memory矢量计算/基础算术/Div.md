@@ -234,6 +234,9 @@ $dst_i = src0_i / src1_i$
 - tensor高维切分计算样例-mask连续模式
 
     ```cpp
+    // repeatTime = 4, 128 elements one repeat, 512 elements total
+    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
     AscendC::Div(dstLocal, src0Local, src1Local, 128, 4, { 1, 1, 1, 8, 8, 8 });
     ```
 
@@ -241,6 +244,9 @@ $dst_i = src0_i / src1_i$
 
     ```cpp
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    // repeatTime = 4, 128 elements one repeat, 512 elements total
+    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
     AscendC::Div(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 8, 8, 8 });
     ```
 

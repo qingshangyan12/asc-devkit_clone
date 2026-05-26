@@ -212,6 +212,9 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
     ```cpp
     uint64_t mask = 128;
     int16_t scalar = 2;
+    // repeatTime = 4, 128 elements one repeat, 512 elements total
+    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride, srcRepStride = 8, no gap between repeats
     AscendC::Mins(dstLocal, srcLocal, scalar, mask, 4, { 1, 1, 8, 8 });
     ```
 
@@ -220,6 +223,9 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
     ```cpp
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
     int16_t scalar = 2;
+    // repeatTime = 4, 128 elements one repeat, 512 elements total
+    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride, srcRepStride = 8, no gap between repeats
     AscendC::Mins(dstLocal, srcLocal, scalar, mask, 4, {1, 1, 8, 8});
     ```
 

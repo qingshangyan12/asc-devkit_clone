@@ -190,9 +190,9 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
     ```cpp
     uint64_t mask = 128;
     int16_t scalar = 2;
-    // repeatTime = 4, 单次迭代处理128个数，计算512个数需要迭代4次
-    // dstBlkStride, srcBlkStride = 1, 单次迭代内数据连续读取和写入
-    // dstRepStride, srcRepStride = 8, 相邻迭代间数据连续读取和写入
+    // repeatTime = 4, 128 elements one repeat, 512 elements total
+    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride, srcRepStride = 8, no gap between repeats
     AscendC::ShiftLeft(dstLocal, srcLocal, scalar, mask, 4, { 1, 1, 8, 8 });
     ```
 
@@ -201,9 +201,9 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
     ```cpp
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
     int16_t scalar = 2;
-    // repeatTime = 4, 单次迭代处理128个数，计算512个数需要迭代4次
-    // dstBlkStride, srcBlkStride = 1, 单次迭代内数据连续读取和写入
-    // dstRepStride, srcRepStride = 8, 相邻迭代间数据连续读取和写入
+    // repeatTime = 4, 128 elements one repeat, 512 elements total
+    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride, srcRepStride = 8, no gap between repeats
     AscendC::ShiftLeft(dstLocal, srcLocal, scalar, mask, 4, {1, 1, 8, 8});
     ```
 

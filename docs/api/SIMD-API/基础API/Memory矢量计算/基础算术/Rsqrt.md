@@ -175,6 +175,7 @@ T支持的数据类型为：half、float。
   </cann-filter>
 
 </cann-filter>
+
 - 如果src中的数值为非正数，可能会产生未知结果。
 - 使用Rsqrt时，half的算子结果对比误差不满足双千分之一的要求，float的算子结果对比误差不满足双万分之一的要求，如果需要高精度，建议使用[Div](Div.md)和[Sqrt](Sqrt.md)替代实现。
 

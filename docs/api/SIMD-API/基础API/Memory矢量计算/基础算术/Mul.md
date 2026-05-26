@@ -192,9 +192,9 @@ $dst_i = src0_i \times src1_i$
 
     ```cpp
     uint64_t mask = 128;
-    // repeatTime = 4，一次迭代计算128个数，共计算512个数
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
-    // dstRepStride, src0RepStride, src1RepStride = 8，相邻迭代间数据连续读取和写入
+    // repeatTime = 4, 128 elements one repeat, 512 elements total
+    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
     AscendC::Mul(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 8, 8, 8 });
     ```
 
@@ -202,9 +202,9 @@ $dst_i = src0_i \times src1_i$
 
     ```cpp
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // repeatTime = 4，一次迭代计算128个数，共计算512个数
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
-    // dstRepStride, src0RepStride, src1RepStride = 8，相邻迭代间数据连续读取和写入
+    // repeatTime = 4, 128 elements one repeat, 512 elements total
+    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
     AscendC::Mul(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 8, 8, 8 });
     ```
 
