@@ -14,10 +14,6 @@
 #define CHECK_VAR_EXISTS(var_name) \
 static_assert(sizeof(var_name) > 0, #var_name " is not defined")
 
-#define CHECK_FUNC_EXISTS(func_name) \
-static_assert(&func_name != nullptr, #func_name " is not defined")
-
-
 #endif
 
 
