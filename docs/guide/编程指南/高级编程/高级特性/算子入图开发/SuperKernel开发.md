@@ -44,7 +44,17 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 
     ![](../../../../figures/图1-AI-Core内部并行计算架构抽象示意图-35.png)
 
--   在子Kernel中调用[GetBlockNum](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetBlockNum.md)接口获取核数时，无论是否融合SuperKernel，获取的核数保持不变，不受SuperKernel启动核数的影响。因此，在使用该接口时，开发者无需特别关注SuperKernel的启动核数，使用方法和开发普通算子时一样。
+-   在子Kernel中调用[GetBlockNum](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockNum.md)接口获取核数时，无论是否融合SuperKernel，获取的核数保持不变，不受SuperKernel启动核数的影响。因此，在使用该接口时，开发者无需特别关注SuperKernel的启动核数，使用方法和开发普通算子时一样。
+-   在SuperKernel场景下，子Kernel中禁止使用如下底层API和变量，需使用对应的AscendC接口替换：
+
+    | 禁止使用的API/变量 | 替换接口 |
+    | --- | --- |
+    | get_block_idx | [AscendC::GetBlockIdx()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockIdx.md) |
+    | get_block_num | [AscendC::GetBlockNum()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockNum.md) |
+    | get_task_ration | [AscendC::GetTaskRatio()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具函数/GetTaskRatio.md) |
+    | block_idx | [AscendC::GetBlockIdx()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockIdx.md) |
+    | block_num | [AscendC::GetBlockNum()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockNum.md) |
+
 -   针对Atlas A3 训练系列产品/Atlas A3 推理系列产品中，在不使能SuperKernel场景下，[TPipe::Destroy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Destroy.md)接口内部最后会插入AscendC::PipeBarrier<PIPE\_ALL\>\(\)指令，额外保障多个TPipe之间的流水同步；模型中绝大部分算子只会使用一个TPipe对象，在对象析构时会调用Destroy，为不阻塞[SetNextTaskStart](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetNextTaskStart.md)和[WaitPreTaskEnd](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/WaitPreTaskEnd.md)性能提升，SuperKernel场景下默认关闭了TPipe::Destroy中插入的AscendC::PipeBarrier<PIPE\_ALL\>\(\)指令，所以当算子需要多个TPipe对象并手动调用Destroy函数时，开发者需自行保障TPipe对象间流水的同步。
 
 ## 性能优化建议<a name="section4710047496"></a>
