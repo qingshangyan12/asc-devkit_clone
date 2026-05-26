@@ -135,6 +135,8 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/selector
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/tools
 )
 
 
