@@ -8,8 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "alg_data_trans_wrapper.h"
+#include "timing_stat.h"
 
 namespace mc2_ops_hccl {
+
+#define NSEC_PER_SEC 1000000000U
 
 HcclResult SendWrite(const DataInfo &sendInfo, const ThreadHandle &thread)
 {
@@ -59,9 +62,13 @@ HcclResult SendRecvWrite(const SendRecvInfo &sendRecvInfo, const ThreadHandle &t
     u32 repeatNum = srcSlices.size();
     // 向write rank发送tx同步，确保该rank的hcclBuffer可用
     // 这里只是在host上向device下任务，所以实际在host侧不会因为wait而阻塞
+    uint32_t recordAckSlot = TimingStatStart("[SendRecvWrite][HcommChannelNotifyRecordOnThread][Ack]");
     CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
+    TimingStatEnd(recordAckSlot);
+    uint32_t waitAckSlot = TimingStatStart("[SendRecvWrite][HcommChannelNotifyWaitOnThread][Ack]");
     CHK_RET(static_cast<HcclResult>(
         HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+    TimingStatEnd(waitAckSlot);
     for (int i = 0; i < repeatNum; i++) {
         // tx同步完成后准备将自己的userIn上的数据写到对方的hcclBuffer上
         const DataSlice srcSlice = srcSlices[i];
@@ -72,13 +79,19 @@ HcclResult SendRecvWrite(const SendRecvInfo &sendRecvInfo, const ThreadHandle &t
         }
         void *dst = static_cast<void *>(static_cast<s8 *>(dstSlice.addr_) + dstSlice.offset_);
         void *src = static_cast<void *>(static_cast<s8 *>(srcSlice.addr_) + srcSlice.offset_);
+        uint32_t writeSlot = TimingStatStart("[SendRecvWrite][HcommWriteOnThread]");
         CHK_RET(static_cast<HcclResult>(HcommWriteOnThread(thread, sendChannel.handle, dst, src, srcSlice.size_)));
+        TimingStatEnd(writeSlot);
     }
     // 写完之后做后同步告诉对面写完了
+    uint32_t recordDataSlot = TimingStatStart("[SendRecvWrite][HcommChannelNotifyRecordOnThread][Data]");
     CHK_RET(
         static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    TimingStatEnd(recordDataSlot);
+    uint32_t waitDataSlot = TimingStatStart("[SendRecvWrite][HcommChannelNotifyWaitOnThread][Data]");
     CHK_RET(static_cast<HcclResult>(
         HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+    TimingStatEnd(waitDataSlot);
     return HCCL_SUCCESS;
 }
 
@@ -482,14 +495,18 @@ HcclResult PreSyncInterThreads(const ThreadHandle &mainThread, const std::vector
         HcclResult::HCCL_E_INTERNAL);
     // 主thread向从thread发送record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        uint32_t preReordSlot = TimingStatStart("[PostSyncInterThreads][HcommThreadNotifyRecordOnThread]");
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyRecordOnThread(mainThread, subThreads[tidx], notifyIdxMainToSub[tidx])));
+        TimingStatEnd(preReordSlot);
     }
 
     // 从thread等待主thread的record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        uint32_t preWaitSlot = TimingStatStart("[PreSyncInterThreads][HcommThreadNotifyWaitOnThread]");
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyWaitOnThread(subThreads[tidx], notifyIdxMainToSub[tidx], CUSTOM_TIMEOUT)));
+        TimingStatEnd(preWaitSlot);
     }
 
     return HcclResult::HCCL_SUCCESS;
@@ -512,14 +529,18 @@ HcclResult PostSyncInterThreads(const ThreadHandle &mainThread, const std::vecto
         HcclResult::HCCL_E_INTERNAL);
     // 主thread等待所有从thread的record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        uint32_t postWaitSlot = TimingStatStart("[PostSyncInterThreads][HcommThreadNotifyWaitOnThread]");
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyWaitOnThread(mainThread, notifyIdxSubToMain[tidx], CUSTOM_TIMEOUT)));
+        TimingStatEnd(postWaitSlot);
     }
 
     // 从thread向主thread发送record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        uint32_t postReordSlot = TimingStatStart("[PostSyncInterThreads][HcommThreadNotifyRecordOnThread]");
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyRecordOnThread(subThreads[tidx], mainThread, notifyIdxSubToMain[tidx])));
+        TimingStatEnd(postReordSlot);
     }
 
     return HcclResult::HCCL_SUCCESS;
