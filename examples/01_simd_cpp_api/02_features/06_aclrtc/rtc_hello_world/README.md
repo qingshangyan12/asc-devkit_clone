@@ -1,4 +1,4 @@
-# Aclrtc运行时编译+printf打印样例
+# Aclrtc运行时编译 + printf打印样例
 
 ## 概述
 
@@ -21,33 +21,31 @@
 ## 样例描述
 
 - 样例实现：
-  - Kernel实现  
+  - Kernel实现
     核函数源码以字符串形式嵌入Host代码中，通过printf打印输出结果。
 
-  - 调用实现  
+  - 调用实现
     调用aclrtc接口系列在运行时编译并执行核函数，完整链路如下：
 
     - **编译阶段**
-      1. `aclrtcCreateProg` — 创建编译程序对象，传入核函数源码字符串
-      2. `aclrtcAddNameExpr` — 注册需要导出的核函数名（含模板参数，如`Kernel::add_custom<float>`）
-      3. `aclrtcCompileProg` — 执行运行时编译，通过options传入`--npu-arch`指定NPU架构
-      4. `aclrtcGetBinDataSize`/`aclrtcGetBinData` — 获取编译产物的二进制大小及数据（deviceELF）
-      5. `aclrtcGetLoweredName` — 获取核函数编译后的mangledname，用于后续查找
+      1. `aclrtcCreateProg` — 创建编译程序对象，传入核函数源码字符串。
+      2. `aclrtcCompileProg` — 执行运行时编译，通过options传入`--npu-arch`指定NPU架构。
+      3. `aclrtcGetBinDataSize`/`aclrtcGetBinData` — 获取编译产物的二进制大小及数据（deviceELF）。
 
     - **加载阶段**
-      6. `aclrtBinaryLoadFromData` — 将编译产物的二进制加载到设备（通过`ACL_RT_BINARY_MAGIC_ELF_AICORE`标记为AICore可执行）
-      7. `aclrtBinaryGetFunction` — 从加载的二进制中获取核函数句柄（`funcHandle`）
+      4. `aclrtBinaryLoadFromData` — 将编译产物的二进制加载到设备（通过`ACL_RT_BINARY_MAGIC_ELF_AICORE`标记为AICore可执行）。
+      5. `aclrtBinaryGetFunction` — 从加载的二进制中获取核函数句柄（`funcHandle`）。
 
     - **参数配置阶段**
-      8. `aclrtKernelArgsInit` — 初始化核函数参数句柄
-      9. `aclrtKernelArgsAppend` — 逐个追加参数（核函数为`__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z`，对应传入三个Device内存指针）
-      10. `aclrtKernelArgsFinalize` — 完成参数配置
+      6. `aclrtKernelArgsInit` — 初始化核函数参数句柄。
+      7. `aclrtKernelArgsAppend` — 当前样例核函数无入参，暂不使用。
+      8. `aclrtKernelArgsFinalize` — 完成参数配置。
 
     - **执行阶段**
-      11. `aclrtLaunchKernelWithConfig` — 启动核函数，指定block数量、stream等执行配置
+      9. `aclrtLaunchKernelWithConfig` — 启动核函数，指定block数量、stream等执行配置。
 
     - **资源清理**
-      12. `aclrtcDestroyProg` — 销毁编译程序对象
+      10. `aclrtcDestroyProg` — 销毁编译程序对象。
 
     数据生成与精度校验均在Host侧C++内完成，不依赖外部脚本。
 
@@ -55,7 +53,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -82,7 +80,7 @@
   > [!WARNING] 注意
   Aclrtc仅支持NPU运行模式，不支持cpu调试或sim仿真模式。
 
-- 执行结果  
+- 执行结果
   执行结果如下，说明执行成功。
   
   ```bash
