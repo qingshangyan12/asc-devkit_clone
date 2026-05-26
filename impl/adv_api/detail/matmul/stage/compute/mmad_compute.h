@@ -58,6 +58,10 @@ public:
             }
         }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+        mmadParams.fix_shift_val = static_cast<IMPL*>(this)->var.fix_shift_val;
+#endif
+
         if constexpr (!MatmulFeatureTrait<MM_CFG>::IsSupportCmatrixInitVal()) {
             mmadParams.cmatrixSource = cmatrixSource;
             mmadParams.cmatrixInitVal = cmatrixInitVal;

@@ -41,6 +41,9 @@ namespace Detail {
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG>
 struct MatmulParamsBase {
     __aicore__ inline MatmulParamsBase(){};
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+    uint8_t fix_shift_val = 0;
+#endif
 };
 
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, typename = void>
