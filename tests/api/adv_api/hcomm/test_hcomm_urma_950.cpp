@@ -26,8 +26,8 @@ constexpr uint32_t URMA_BUFFER_NUM = 2;
 class UrmaChannelResource {
 public:
     UrmaChannelResource()
-        : sqBuffer_(URMA_SQ_DEPTH * HCOMM_URMA_MAX_SQE_BB_NUM * URMA_WQE_SIZE, 0),
-          cqBuffer_(URMA_SQ_DEPTH * HCOMM_URMA_MAX_SQE_BB_NUM * URMA_CQE_SIZE, 0)
+        : sqBuffer_(URMA_SQ_DEPTH * URMA_WQE_SIZE, 0),
+          cqBuffer_(URMA_SQ_DEPTH * URMA_CQE_SIZE, 0)
     {
         channel_.engine = 4;
         channel_.sqNum = 1;
@@ -56,7 +56,7 @@ public:
         cqCtx_.contextInfo.ubJfc.dbVa = reinterpret_cast<uint64_t>(&cqDoorbell_);
         cqCtx_.contextInfo.ubJfc.jfcID = 1;
         cqCtx_.contextInfo.ubJfc.cqeSize = URMA_CQE_SIZE;
-        cqCtx_.contextInfo.ubJfc.cqDepth = URMA_SQ_DEPTH * HCOMM_URMA_MAX_SQE_BB_NUM;
+        cqCtx_.contextInfo.ubJfc.cqDepth = URMA_SQ_DEPTH;
 
         InitBuffer(remoteBuffers_[0], 0x1000, 0x1000, 0x123456, 0x654321);
         InitBuffer(remoteBuffers_[1], 0x3000, 0x1000, 0x223456, 0x754321);

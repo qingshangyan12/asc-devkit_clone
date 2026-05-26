@@ -253,18 +253,14 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Po
         KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA PostSend failed with invalid remote buffer");
         return HCOMM_INVALID_HANDLE_ID;
     }
-    int32_t localIdx = HcommFindBufferIdx(channelPtr->localBufferAddr, channelPtr->localBufferNum, src, len);
-    if (localIdx == HCOMM_INVALID_HANDLE_ID) {
-        KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA PostSend failed with invalid local buffer");
-        return HCOMM_INVALID_HANDLE_ID;
-    }
+
     auto sqCtx = channelPtr->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     AscendC::GlobalTensor<uint32_t> sqPIGlobal;
     sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
     Gm2Ub(sqPI_, sqPIGlobal, 1);
     uint32_t sqHead = sqPI_.GetValue(0);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA PostSend resolved remoteIdx=%d localIdx=%d sqHead=%u sqDepth=%u", remoteIdx,
-        localIdx, sqHead, sqCtx.contextInfo.ubJfs.sqDepth);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA PostSend resolved remoteIdx=%d sqHead=%u sqDepth=%u", remoteIdx,
+        sqHead, sqCtx.contextInfo.ubJfs.sqDepth);
 
     // poll cq if send queue is full
     auto cqCtx = channelPtr->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];

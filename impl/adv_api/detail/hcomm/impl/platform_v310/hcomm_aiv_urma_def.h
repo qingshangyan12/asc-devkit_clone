@@ -27,7 +27,6 @@
 
 namespace AscendC {
 
-constexpr uint32_t HCOMM_URMA_MAX_SQE_BB_NUM = 4;
 constexpr uint32_t HCOMM_URMA_MAX_RETRY_TIMES = 1000000;
 constexpr uint32_t HCOMM_URMA_DEFAULT_QP_IDX = 0;
 constexpr uint32_t HCOMM_URMA_TMP_BUF_SIZE = 512;
