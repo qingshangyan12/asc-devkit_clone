@@ -2,13 +2,13 @@
 
 **特性说明：**
 
-矩阵计算的搬出过程中对于目标类型为f32，如果使能了channel Split，硬件就能够将16x16的分形矩阵转换为16x8的小z分形矩阵，此时每个16x16的分形矩阵将被拆分为2个独立的16x8的小z分形矩阵。
+矩阵计算的搬出过程中对于目标类型为f32，如果开启了channel Split，硬件就能够将16×16的分形矩阵转换为16×8的小z分形矩阵，此时每个16×16的分形矩阵将被拆分为2个独立的16×8的小z分形矩阵。
 
-可以通过配置**DataCopyCO12DstParams结构体参数**定义中[channelSplit](F32-Channel-Split.md)为true使能。
+可以通过配置**DataCopyCO12DstParams结构体参数**定义中[channelSplit](F32-Channel-Split.md)为true开启。
 
 <cann-filter npu_type = "A3,910b">
 
-针对针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，可以通过配置[Fixpipe搬运参数（FixpipeParamsV220）结构体说明](../L0C到GM数据搬运.md)中[channelSplit](F32-Channel-Split.md)为true使能。
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，可以通过配置[Fixpipe搬运参数（FixpipeParamsV220）结构体说明](../L0C到GM数据搬运.md)中[channelSplit](F32-Channel-Split.md)为true开启。
 
 </cann-filter>
 
@@ -16,18 +16,18 @@
 
 <cann-filter npu_type = "A3,910b">
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，当Fixpipe指令的输入和输出数据类型都为float，NZ输出到GM，并且不使能NZ2ND与unitflag时，才能够使能channel Split（通道拆分）功能。
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，当Fixpipe指令的输入和输出数据类型都为float，NZ输出到GM，并且不开启NZ2ND与unitFlag时，才能够开启channel Split（通道拆分）功能。
 
 </cann-filter>
 
 **使用示例：**
 
-如下图所示，当使能channel Split功能后，shape为\[64,32\]的源操作数将会被拆分为16个独立的16x8分形矩阵。
+如下图所示，当开启channel Split功能后，shape为\[64,32\]的源操作数将会被拆分为16个独立的16x8分形矩阵。
 
 **图 1**  F32 channel split示意图1<a name="zh-cn_topic_0000002515660950_fig222295694112"></a>  
 ![](../../../../../figures/Fixpipe_Channel_Split.png)
 
-当使能channel Split功能后，nSize（源NZ矩阵在N方向上的大小）必须为8的倍数。如下图所示，shape为\[64,24\]的源操作数将会被拆分为3列16x8分形矩阵。
+当开启channel Split功能后，nSize（源NZ矩阵在N方向上的大小）必须为8的倍数。如下图所示，shape为\[64,24\]的源操作数将会被拆分为3列16x8分形矩阵。
 
 **图 2**  F32 channel split示意图2<a name="zh-cn_topic_0000002515660950_fig5809145844116"></a>  
 ![](../../../../../figures/Fixpipe_Channel_Split_wtth_dirty.png)

@@ -8,7 +8,7 @@
 
 对于同一Bank的不同地址，允许Mmad计算进行写操作的同时Mmad计算/Fixpipe搬出进行读操作；允许Mmad计算同时对同一Bank的不同地址进行写操作；允许Mmad计算/Fixpipe搬出同时对同一Bank的不同地址进行读操作。
 
-L0C的内存结构如[图1](#zh-cn_topic_0000002555148561_fig1715315610160)所示，L0C的地址编码格式:
+L0C的内存结构如[图1](#zh-cn_topic_0000002555148561_fig1715315610160)所示，L0C的地址编码格式：
 
 ```text
 L0C_ADDR[16:0] = { BANK_DEPTH[6:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺序为从高位到低位，共17位
@@ -30,14 +30,14 @@ L0C_ADDR[16:0] = { BANK_DEPTH[6:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺
 
 - **读写冲突**：
 
-    Mmad 计算和 Fixpipe 搬出对同一 Bank 的相同地址进行读写操作会时，会引起冲突，导致未定义的硬件行为。
+    Mmad 计算和 Fixpipe 搬出对同一 Bank 的相同地址进行读写操作时，会引起冲突，导致未定义的硬件行为。
 
 - **写写冲突**：
 
-    Mmad 计算和 Fixpipe 搬出对同一 Bank 的相同地址进行写操作会时，会引起冲突。
+    Mmad 计算和 Fixpipe 搬出对同一 Bank 的相同地址进行写操作时，会引起冲突。
 
 - **读读冲突**：
 
-    Mmad 计算和 Fixpipe 搬出同时对同一 Bank 进行读操作会时，会引起冲突。
+    Mmad 计算和 Fixpipe 搬出同时对同一 Bank 进行读操作时，会引起冲突。
 
 </cann-filter>

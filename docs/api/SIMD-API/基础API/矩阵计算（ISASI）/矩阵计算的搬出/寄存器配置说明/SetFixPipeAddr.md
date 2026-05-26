@@ -29,8 +29,8 @@ __aicore__ inline void SetFixPipeAddr(const LocalTensor<T>& eleWiseData, uint16_
 
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
-|eleWiseData|输入|L1 Buffer上的源操作数。类型为LocalTensor。<br>支持的物理位置为L1Buffer（TPosition为A1/B1/C1）。起始地址需要保证32字节对齐，仅支持half数据类型。|
-|c0ChStride|输入|在L1 Buffer上的C0 channel stride，单位是C0_SIZE（32B）。<br>eleWiseData沿N方向以C0为单位切分得到的数据块称为C0 channel，两块C0 channel的间隔称之为C0 channel stride。|
+|eleWiseData|输入|L1 Buffer上的源操作数。类型为LocalTensor。<br>支持的物理位置为L1 Buffer（TPosition为A1/B1/C1）。起始地址需要保证32字节对齐，仅支持half数据类型。|
+|c0ChStride|输入|在L1 Buffer上的C0 channel stride，单位是C0_SIZE（32B）。<br>eleWiseData沿N方向以C0为单位切分得到的数据块称为C0 channel，两块C0 channel的间隔称为C0 channel stride。|
 
 ## 数据类型
 
@@ -49,7 +49,7 @@ LocalTensor支持的数据类型为：half。
 DataCopy随路量化搬运后，可以逐个元素加/减一个大小为mSize \* nSize的LocalTensor，具体LocalTensor地址相关参数需要调用`SetFixPipeAddr`来设置。
 
 ```cpp
-__aicore__inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint16_t c0ChStride)
+__aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint16_t c0ChStride)
 {
     AscendC::SetFixPipeAddr(eleWiseData, c0ChStride);
 }
@@ -164,27 +164,27 @@ __aicore__inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint1
         __aicore__ inline void CopyOut()
         {
             AscendC::LocalTensor<dstCO1_T> dstCO1 = outQueueCO1.DeQue<dstCO1_T>();
-            // 使能DEQF16量化，量化参数设置为0.5
+            // 开启DEQF16量化，量化参数设置为0.5
             float tmp = (float)0.5;
             // 将float的tmp转换成uint64_t的deqScalar
             uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp));
             bool nz2ndEn = false;
-            // nz2nd不使能时，nSize必须为16的倍数
+            // nz2nd不开启时，nSize必须为16的倍数
             uint16_t nSize = coutBlocks * 16;
             uint16_t mSize = m;
             // srcStride必须为16的倍数
             uint16_t srcStride = (m + 16 - 1) / 16 * 16;
-            // nz2nd不使能时，dstStride为burst头到头的距离，且为32B对齐
+            // nz2nd不开启时，dstStride为burst头到头的距离，且为32B对齐
             uint32_t dstStride = m * sizeof(dst_T) * 16 / 32;
             if (nz2ndEn) {
                 // nd矩阵的数量为1，src_nd_stride与dst_nd_stride填1
                 AscendC::SetFixpipeNz2ndFlag(1, 1, 1);
-                // nz2nd使能时，nSize可以不为16的倍数，与Mmad的n保持一致
+                // nz2nd开启时，nSize可以不为16的倍数，与Mmad的n保持一致
                 nSize = n;
-                // nz2nd使能时，dstStride表示同一nd矩阵的相邻连续行的间隔，与n保持一致
+                // nz2nd开启时，dstStride表示同一nd矩阵的相邻连续行的间隔，与n保持一致
                 dstStride = nSize;
             };
-            // 不使能relu与channelSplit
+            // 不开启relu与channelSplit
             AscendC::DataCopyCO12DstParams intriParams(nSize, mSize, dstStride, srcStride, deqMode, 0, false, nz2ndEn);
            
             // mov l0c to gm, deq scalar quant
@@ -206,7 +206,7 @@ __aicore__inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint1
             // // 设置量化tensor
             // AscendC::SetFixPipeConfig(deqFB);
             // AscendC::PipeBarrier<PIPE_FIX>();
-            // // mov l0c to gm, 量化操作后使能ClipRelu操作
+            // // mov l0c to gm, 量化操作后开启ClipRelu操作
             // intriParams.clipReluPre = 1; 
             // // 设置clip relu的值到寄存器
             // uint64_t clipReluVal = 0x3c00; // value 1, half

@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002547689123_section618mcpsimp"></a>
 
-DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运.md)、[L0C-\>L1](../L0C到L1数据搬运.md)）过程中进行随路Leaky ReLU alpha值。
+DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运.md)、[L0C-\>L1](../L0C到L1数据搬运.md)）过程中设置随路Leaky ReLU alpha值。
 
 ## 函数原型<a name="zh-cn_topic_0000002547689123_section620mcpsimp"></a>
 
@@ -47,7 +47,7 @@ __aicore__ inline void SetLreluALPHA(T config)
 - 随路Leaky ReLU alpha值的数据类型，只支持half、float。
 
 > [!NOTE]说明
-> 该接口非正式对外接口，正式待补充
+> 该接口非正式对外接口，正式接口待补充
 
 ## 调用示例
 

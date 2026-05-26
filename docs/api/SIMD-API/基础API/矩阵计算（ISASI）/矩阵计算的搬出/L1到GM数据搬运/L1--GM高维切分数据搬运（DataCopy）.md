@@ -45,8 +45,8 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
-|dst|输出|目的操作数，类型为GlobalTensor，存储位置为Global Memory，源地址需要1B对齐。|
-|src|输入|源操作数，类型为LocalTensor，存储位置为L1 Buffer，目的地址需要32B对齐。|
+|dst|输出|目的操作数，类型为GlobalTensor，存储位置为Global Memory，地址需要1B对齐。|
+|src|输入|源操作数，类型为LocalTensor，存储位置为L1 Buffer，地址需要32B对齐。|
 |repeatParams|输入|搬运参数，类型为DataCopyParams。通过该参数可以配置搬运的数据块个数、长度、地址间隔等信息，同时支持非连续和连续搬运。<br>DataCopyParams参数说明请参考[表3](#zh-cn_topic_0000002540558032_table144203616291)。|
 
 **表 3**  DataCopyParams结构体参数定义<a id="zh-cn_topic_0000002540558032_table144203616291"></a>
@@ -91,7 +91,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品：
 
-    - 在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，仅支持HCCS物理链路，不支持其他通路；开发者开发过程中，需要关注涉及卡间通信的物理通路，可通过npu-smi  info -t topo命令查询HCCS物理链路。
+    - 在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，仅支持HCCS物理链路，不支持其他通路；开发者开发过程中，需要关注涉及卡间通信的物理通路，可通过npu-smi info -t topo命令查询HCCS物理链路。
 
 </cann-filter>
 

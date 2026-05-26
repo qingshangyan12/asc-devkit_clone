@@ -2,7 +2,7 @@
 
 **特性说明：**
 
-矩阵计算的搬出过程中NZ2ND的核心功能体现为，将NZ格式矩阵转化为ND格式矩阵。<cann-filter npu_type = "A3,910b">可以通过调用[DataCopy](../L0C到GM数据搬运.md)数据搬运接口与配置相应寄存器[SetFixpipeNz2ndFlag](../寄存器配置说明/SetFixpipeNz2ndFlag.md)接口使能该能力。针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，可以通过[Fixpipe接口](../L0C到GM数据搬运.md)配置对应[Fixpipe搬运参数（FixpipeParamsV220）](../L0C到GM数据搬运.md)使能。</cann-filter>
+矩阵计算的搬出过程中NZ2ND的核心功能体现为，将NZ格式矩阵转化为ND格式矩阵。<cann-filter npu_type = "A3,910b">可以通过调用[DataCopy](../L0C到GM数据搬运.md)数据搬运接口与配置相应寄存器[SetFixpipeNz2ndFlag](../寄存器配置说明/SetFixpipeNz2ndFlag.md)接口开启该能力。针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，可以通过[Fixpipe接口](../L0C到GM数据搬运.md)配置对应[Fixpipe搬运参数（FixpipeParamsV220）](../L0C到GM数据搬运.md)开启。</cann-filter>
 
 NZ2ND转化过程可以参考以下伪代码以及图示，表示NZ2ND源操作数和目的操作数地址的映射关系。伪代码使用的参数具体说明如下:
 
@@ -25,7 +25,7 @@ NZ2ND转化过程可以参考以下伪代码以及图示，表示NZ2ND源操作�
 
     ```cpp
     for (i = 0; i < ndNum; i++) {
-        // fractal_size = 16 * sizeof(L0C_elemnt)
+        // fractal_size = 16 * sizeof(L0C_element)
         src_temp_nd_addr = src + srcNdStride * fractal_size * i;
         dst_temp_nd_addr = dst + dstNdStride * sizeof(dst_element) * i;
         for (j = 0; j < mSize; j++) {

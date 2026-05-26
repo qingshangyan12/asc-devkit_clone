@@ -12,11 +12,11 @@
 
 **特性约束：**
 
-- 硬件自动使能，不能配置。
+- 硬件自动开启，不能配置。
 
 <cann-filter npu_type = "A3,910b">
 
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，当使能Int4 Channel Merge时，N维度必须是64的倍数。
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，当开启Int4 Channel Merge时，N维度必须是64的倍数。
 
 </cann-filter>
 

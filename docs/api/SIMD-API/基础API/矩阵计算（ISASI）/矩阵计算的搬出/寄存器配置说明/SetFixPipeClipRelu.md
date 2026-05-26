@@ -18,7 +18,7 @@
 
 DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运.md)）过程中进行随路量化后，通过调用该接口设置ClipRelu操作的最大值。
 
-ClipRelu计算公式为`min(clipReluMaxVal，srcData)`，clipReluMaxVal为通过该接口设置的最大值，srcData为源数据。
+ClipRelu计算公式为`min(clipReluMaxVal, srcData)`，clipReluMaxVal为通过该接口设置的最大值，srcData为源数据。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -44,13 +44,13 @@ __aicore__ inline void SetFixPipeClipRelu(uint64_t config)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-使能Relu的情况下，先进行Relu操作，之后再进行ClipRelu。
+开启Relu的情况下，先进行Relu操作，之后再进行ClipRelu。
 
 ## 调用示例<a name="section6461234123118"></a>
 
 ```cpp
 uint64_t clipReluMaxVal = 0x3c00;
-SetFixPipeClipRelu(clipReluMaxVal); // 使能Relu的情况下，先进行Relu操作，再进行clip，clipReluMaxVal为通过该接口设置的最大值
+SetFixPipeClipRelu(clipReluMaxVal); // 开启Relu的情况下，先进行Relu操作，再进行clip，clipReluMaxVal为通过该接口设置的最大值
 ```
 
 - 针对Atlas 200I/500 A2 推理产品，完整示例如下。随路格式转换数据搬运，通路：CO1-\>GM。
@@ -162,27 +162,27 @@ SetFixPipeClipRelu(clipReluMaxVal); // 使能Relu的情况下，先进行Relu操
         __aicore__ inline void CopyOut()
         {
             AscendC::LocalTensor<dstCO1_T> dstCO1 = outQueueCO1.DeQue<dstCO1_T>();
-            // 使能DEQF16量化，量化参数设置为0.5
+            // 开启DEQF16量化，量化参数设置为0.5
             float tmp = (float)0.5;
             // 将float的tmp转换成uint64_t的deqScalar
             uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp));
             bool nz2ndEn = false;
-            // nz2nd不使能时，nSize必须为16的倍数
+            // nz2nd不开启时，nSize必须为16的倍数
             uint16_t nSize = coutBlocks * 16;
             uint16_t mSize = m;
             // srcStride必须为16的倍数
             uint16_t srcStride = (m + 16 - 1) / 16 * 16;
-            // nz2nd不使能时，dstStride为burst头到头的距离，且为32B对齐
+            // nz2nd不开启时，dstStride为burst头到头的距离，且为32B对齐
             uint32_t dstStride = m * sizeof(dst_T) * 16 / 32;
             if (nz2ndEn) {
                 // nd矩阵的数量为1，src_nd_stride与dst_nd_stride填1
                 AscendC::SetFixpipeNz2ndFlag(1, 1, 1);
-                // nz2nd使能时，nSize可以不为16的倍数，与Mmad的n保持一致
+                // nz2nd开启时，nSize可以不为16的倍数，与Mmad的n保持一致
                 nSize = n;
-                // nz2nd使能时，dstStride表示同一nd矩阵的相邻连续行的间隔，与n保持一致
+                // nz2nd开启时，dstStride表示同一nd矩阵的相邻连续行的间隔，与n保持一致
                 dstStride = nSize;
             };
-            // 不使能relu与channelSplit
+            // 不开启relu与channelSplit
             AscendC::DataCopyCO12DstParams intriParams(nSize, mSize, dstStride, srcStride, deqMode, 0, false, nz2ndEn);
            
             // mov l0c to gm, deq scalar quant
@@ -204,7 +204,7 @@ SetFixPipeClipRelu(clipReluMaxVal); // 使能Relu的情况下，先进行Relu操
             // // 设置量化tensor
             // AscendC::SetFixPipeConfig(deqFB);
             // AscendC::PipeBarrier<PIPE_FIX>();
-            // // mov l0c to gm, 量化操作后使能ClipRelu操作
+            // // mov l0c to gm, 量化操作后开启ClipRelu操作
             // intriParams.clipReluPre = 1; 
             // // 设置clip relu的值到寄存器
             // uint64_t clipReluVal = 0x3c00; // value 1, half

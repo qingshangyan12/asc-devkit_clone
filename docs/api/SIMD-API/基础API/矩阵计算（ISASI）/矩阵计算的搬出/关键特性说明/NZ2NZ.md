@@ -10,9 +10,9 @@ NZ2NZ转化过程可以参考以下伪代码以及图示，伪代码使用的参
 - dst表示目的操作数搬运的起始地址；
 - 源操作数中NZ矩阵每一行的起始地址为src\_temp\_n\_addr ；
 - 目的操作数中NZ矩阵每一行的起始地址为dst\_temp\_n\_addr ；
-- 在每一行中，以16个数据为粒度进行切分数据块，源操作数每一块数据块的起始地址为src\_block\_addr ，目的操作数中每一数据块起始地址为dst\_block\_addr ；
+- 在每一行中，以16个数据为粒度进行数据块切分，源操作数每一块数据块的起始地址为src\_block\_addr ，目的操作数中每一数据块起始地址为dst\_block\_addr ；
 
-以下参数为NZ2NZ用户可配置参数，含义取值范围参见[Fixpipe搬运参数](../L0C到GM数据搬运.md)：
+以下参数为NZ2NZ用户可配置参数，含义及取值范围参见[Fixpipe搬运参数](../L0C到GM数据搬运.md)：
 
 - mSize与nSize分别表示矩阵M方向和N方向上的维度；
 - srcStride表示源NZ矩阵中不同Z分形列的间隔，单位为C0\_Size\(C0\_Size = 16\*sizeof\(T\)，T为操作数的数据类型\)；
@@ -25,7 +25,7 @@ NZ2NZ转化过程可以参考以下伪代码以及图示，伪代码使用的参
     ```cpp
     for (j = 0; j < mSize; j++) {
         src_temp_n_addr = src + j * sizeof(L0C_element) * 16;
-        v= dst + j * 16 * sizeof(DST_element);
+        dst_temp_n_addr = dst + j * 16 * sizeof(DST_element);
         for (k = 0; k < ceil(nSize / 16); k++) {
             src_block_addr = src_temp_n_addr + k * srcStride * sizeof(L0C_element) * 16;
             dst_block_addr = dst_temp_n_addr + k * dstStride * 32;

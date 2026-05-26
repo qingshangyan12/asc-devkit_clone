@@ -21,7 +21,7 @@ DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运.md)、[L0C-\>L1](../L0
 ## 函数原型<a name="zh-cn_topic_0000002516049318_section620mcpsimp"></a>
 
 ```cpp
-template<template T>
+template<typename T>
 __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config)
 ```
 
