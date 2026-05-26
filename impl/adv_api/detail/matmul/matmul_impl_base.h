@@ -137,6 +137,9 @@ public:
     __aicore__ inline void End();
     __aicore__ inline void SetHF32(bool enableHF32 = false, int32_t transMode = 0);
     __aicore__ inline void SetSubBlockIdx(uint8_t subBlockIdx);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+    __aicore__ inline void SetFixShiftVal(uint8_t fixShiftVal);
+#endif
     __aicore__ inline uint8_t GetSubBlockIdx();
     template <class T>
     __aicore__ inline void SetWorkspace(__gm__ const T* addr, int size)
@@ -493,6 +496,17 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
         SetHF32TransMode(0);
     }
 }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+template <
+    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+    MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
+__aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetFixShiftVal(
+    uint8_t fixShiftVal)
+{
+    var.fix_shift_val = fixShiftVal;
+}
+#endif
 
 template <
     class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
