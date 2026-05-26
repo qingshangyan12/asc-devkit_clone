@@ -2,20 +2,20 @@
 
 ## 概述
 
-本样例展示了如何使用 **Aclrtc（运行时编译）** 接口，在Host侧运行时编译核函数源码并执行，核函数通过printf打印输出结果。
+本样例展示了如何使用**Aclrtc（运行时编译）**接口，在Host侧运行时编译核函数源码并执行，核函数通过printf打印输出结果。
 
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3推理系列产品
-- Atlas A2 训练系列产品/Atlas A2推理系列产品
+- Atlas A3训练系列产品/Atlas A3推理系列产品
+- Atlas A2训练系列产品/Atlas A2推理系列产品
 
 ## 目录结构介绍
 
 ```
 ├── rtc_hello_world
 │   ├── CMakeLists.txt           // 编译工程文件
-│   ├── rtc_hello_world.cpp      // Host 侧代码（含RTC核函数源码字符串）
+│   ├── rtc_hello_world.cpp      // Host侧代码（含RTC核函数源码字符串）
 ```
 
 ## 样例描述
