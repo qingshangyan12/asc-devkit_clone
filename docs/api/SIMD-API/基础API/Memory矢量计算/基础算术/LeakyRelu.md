@@ -61,9 +61,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_binary_scalar_intf.h"`。
 
-LeakyRelu属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，LeakyRelu负责将矢量tensor内的每个元素执行Leaky ReLu（Leaky Rectified Linear Unit）操作。
-
-按元素执行Leaky ReLU（Leaky Rectified Linear Unit）操作，计算公式如下：
+LeakyRelu属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，LeakyRelu负责将矢量tensor内的每个元素执行Leaky ReLu（Leaky Rectified Linear Unit）操作。计算公式如下：
 
 $dst_i = \begin{cases} src_i, & src_i \geq 0 \\ scalarValue \times src_i, & src_i < 0 \end{cases}$
 
@@ -133,7 +131,7 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 |---|---|
 | T | 操作数数据类型。 |
 | U | scalarValue的数据类型。仅在dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait.md)类型时有效。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK\_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。<br><cann-filter npu-type="950,310b"> 针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。 <br><cann-filter npu-type="950">Ascend 950PR/Ascend 950DT</cann-filter> <br><cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品</cann-filter> </cann-filter> |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符`MASK_PLACEHOLDER`。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。<br><cann-filter npu-type="950,310b">针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。<br>&bull; <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT</cann-filter><br>&bull; <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品</cann-filter></cann-filter> |
 
 **表 2**  参数说明
 
@@ -149,47 +147,7 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 
 ## 数据类型<a name="zh-cn_topic_0000002530007180_section4219135304818"></a>
 
-<cann-filter npu-type="950">
-
-- 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
-- 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
-- 针对Atlas 推理系列产品 AI Core，T和U支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="x90">
-
-- 针对Kirin X90，T和U支持的数据类型为：half、float。
-
-</cann-filter>
-
-<cann-filter npu-type="9030">
-
-- 针对Kirin 9030，T和U支持的数据类型为：half、float。
-
-</cann-filter>
+T和U支持的数据类型为：half、float。
 
 ## 返回值说明<a name="section194321251175110"></a>
 

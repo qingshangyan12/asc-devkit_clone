@@ -132,7 +132,7 @@ $dst_i = \frac{1}{src_i}$
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。|
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符`MASK_PLACEHOLDER`。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。 |
 | <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，ReciprocalConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class ReciprocalAlgo {&#10;    INTRINSIC = 0,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_1ULP_FTZ_FALSE,&#10;};&#10;struct ReciprocalConfig {&#10;    ReciprocalAlgo algo = ReciprocalAlgo::INTRINSIC;&#10;};</pre>通过ReciprocalConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; ReciprocalAlgo::INTRINSIC、ReciprocalAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; ReciprocalAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_RECIPROCAL_CONFIG的取值如下：<br><pre class="screen" codetype="Cpp">constexpr ReciprocalConfig DEFAULT_RECIPROCAL_CONFIG = { ReciprocalAlgo::INTRINSIC };</pre></cann-filter> |
 
 **表 2**  参数说明
