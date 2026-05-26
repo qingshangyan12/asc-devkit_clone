@@ -28,7 +28,6 @@
 namespace AscendC {
 namespace Te {
 template <typename PtrPattern, typename Pointer>
-struct HardwareMemPtr;
 
 using Std::Int;
 using Std::_0;
@@ -118,15 +117,6 @@ public:
 
 template <typename T>
 constexpr bool IsHardwareV = IsHardware<T>::value;
-
-template <typename T>
-struct IsHardwareMemPtr : Std::false_type {};
-
-template <typename PtrPattern, typename Pointer>
-struct IsHardwareMemPtr<HardwareMemPtr<PtrPattern, Pointer>> : Std::true_type {};
-
-template <typename T>
-constexpr bool IsHardwareMemPtrV = IsHardwareMemPtr<Std::remove_cvref_t<T>>::value;
 
 template <typename... Ts>
 struct HasZeroIntegralConstant : Std::bool_constant<
