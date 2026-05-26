@@ -11,6 +11,30 @@
 
 namespace mc2_ops_hccl {
 
+namespace {
+
+void *GetSliceAddr(const DataSlice &slice)
+{
+    return static_cast<void *>(static_cast<s8 *>(slice.addr_) + slice.offset_);
+}
+
+void TraceDataSlice(const char *funcName, const char *transType, u32 sliceIdx, u32 sliceNum,
+    const DataSlice &srcSlice, const DataSlice &dstSlice, const void *src, const void *dst, u64 len,
+    HcclDataType dataType)
+{
+    HCCL_DEBUG("[AlgDataTransWrapper][%s][%s] sliceIdx[%u], sliceNum[%u], srcBase[%p], "
+        "srcOffset[%llu], srcAddr[%p], srcSize[%llu], srcCount[%llu], dstBase[%p], "
+        "dstOffset[%llu], dstAddr[%p], dstSize[%llu], dstCount[%llu], len[%llu], dataType[%d].",
+        funcName, transType, sliceIdx, sliceNum, srcSlice.addr_,
+        static_cast<unsigned long long>(srcSlice.offset_), src,
+        static_cast<unsigned long long>(srcSlice.size_), static_cast<unsigned long long>(srcSlice.count_),
+        dstSlice.addr_, static_cast<unsigned long long>(dstSlice.offset_), dst,
+        static_cast<unsigned long long>(dstSlice.size_), static_cast<unsigned long long>(dstSlice.count_),
+        static_cast<unsigned long long>(len), static_cast<int>(dataType));
+}
+
+}
+
 HcclResult SendWrite(const DataInfo &sendInfo, const ThreadHandle &thread)
 {
     const std::vector<DataSlice> srcSlices = sendInfo.slices_.srcSlices_;
@@ -26,8 +50,10 @@ HcclResult SendWrite(const DataInfo &sendInfo, const ThreadHandle &thread)
             HCCL_WARNING("[AlgDataTransWrapper] SendWrite: size is 0.");
             continue;
         }
-        void *dst = static_cast<void *>(static_cast<s8 *>(dstSlice.addr_) + dstSlice.offset_);
-        void *src = static_cast<void *>(static_cast<s8 *>(srcSlice.addr_) + srcSlice.offset_);
+        void *dst = GetSliceAddr(dstSlice);
+        void *src = GetSliceAddr(srcSlice);
+        TraceDataSlice("SendWrite", "WRITE", i, sliceNum, srcSlice, dstSlice, src, dst, srcSlice.size_,
+            sendInfo.dataType_);
         CHK_RET(static_cast<HcclResult>(HcommWriteOnThread(thread, sendChannel.handle, dst, src, srcSlice.size_)));
     }
     CHK_RET(
@@ -70,8 +96,10 @@ HcclResult SendRecvWrite(const SendRecvInfo &sendRecvInfo, const ThreadHandle &t
             HCCL_WARNING("[AlgDataTransWrapper] SendRecvWrite: size is 0.");
             continue;
         }
-        void *dst = static_cast<void *>(static_cast<s8 *>(dstSlice.addr_) + dstSlice.offset_);
-        void *src = static_cast<void *>(static_cast<s8 *>(srcSlice.addr_) + srcSlice.offset_);
+        void *dst = GetSliceAddr(dstSlice);
+        void *src = GetSliceAddr(srcSlice);
+        TraceDataSlice("SendRecvWrite", "WRITE", i, repeatNum, srcSlice, dstSlice, src, dst, srcSlice.size_,
+            sendRecvInfo.dataType_);
         CHK_RET(static_cast<HcclResult>(HcommWriteOnThread(thread, sendChannel.handle, dst, src, srcSlice.size_)));
     }
     // 写完之后做后同步告诉对面写完了
