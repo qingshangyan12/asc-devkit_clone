@@ -60,7 +60,7 @@ inline float fdividef(float x, float y)
     __global__ __launch_bounds__(1024) void KernelFdivdef(float* dst, float* x, float* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = fdivdef(x[idx], y[idx]);
+        dst[idx] = fdividef(x[idx], y[idx]);
     }
     ```
 
@@ -70,7 +70,7 @@ inline float fdividef(float x, float y)
     __simt_vf__ __launch_bounds__(1024) inline void KernelFdivdef(__gm__ float* dst, __gm__ float* x, __gm__ float* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = fdivdef(x[idx], y[idx]);
+        dst[idx] = fdividef(x[idx], y[idx]);
     }
     ```
 
