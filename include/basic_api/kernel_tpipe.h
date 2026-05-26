@@ -483,7 +483,7 @@ private:
      * brief: these functions are used to get end and queueend addr.
      */
     template <TPosition pos> __aicore__ inline uint64_t GetQueueEndAddress();
-    __aicore__ inline int8_t AllocTscmBufId();
+    __aicore__ inline TBufId AllocTscmBufId();
     __aicore__ inline int8_t AllocCrossSyncId();
 };
 
