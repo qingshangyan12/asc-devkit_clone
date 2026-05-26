@@ -9,6 +9,7 @@
     在NPU上打印`Hello World!!!`。
 
 - **Device端Kernel实现**：
+
     后缀名为`*.asc`的代码文件包含Host端与Device端代码，其Device端部分示例如下：
     ```cpp
     __global__ __vector__ void hello_world()

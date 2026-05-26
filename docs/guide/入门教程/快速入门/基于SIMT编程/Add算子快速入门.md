@@ -5,6 +5,7 @@
 开始前请参考[环境准备](../../环境准备.md)安装所需的CANN软件包，完整样例请见[Add](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/01_add)。
 
 - **算子功能介绍**：
+
     Add算子的数学表达式为：
 
     ![](../../../figures/zh-cn_formulaimage_0000002541636777.png)
@@ -12,6 +13,7 @@
     计算逻辑：逐元素完成 `z = x + y`。
 
 - **算子设计**
+
     - **Device端核函数编程接口**
         - 核函数定义：通过 [\_\_global\_\_](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 修饰符声明。
         - 数据分块（Tiling）：使用内置关键字 [threadIdx、blockIdx、blockDim](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 确定每个线程负责处理的数据。
