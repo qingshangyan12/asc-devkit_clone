@@ -61,17 +61,6 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 `Copy`无返回值。`MakeCopy`返回`CopyAtom`对象。
 
-## API映射关系
-
-与built-in接口映射关系：
-
-L1 Buffer到Fixpipe Buffer搬运接口是在built-in接口`asc_copy_l12fb`的基础上进行抽象封装实现的，其对应的底层built-in接口为：
-
-```cpp
-__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_num,
-    uint16_t burst_len, uint16_t src_gap_size, uint16_t dst_gap_size);
-```
-
 ## 约束说明
 
 - 源Tensor内存地址和大小需要满足32Byte对齐要求
