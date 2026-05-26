@@ -35,22 +35,20 @@ class GlobalTensor;
 template <typename T>
 class LocalTensor;
 
-namespace Te {
-
 template <typename EngineType, typename LayoutType>
 struct TensorAttribute {};
 
-template <typename T>
-struct BaseTensor {};
+namespace Te {
 
-template <typename LocationType, typename TensorType>
+template <typename LocationType, typename EngineType, typename LayoutType>
 struct MakeTensorResult {
     using type = typename Std::conditional<Std::is_same_v<LocationType, Location::GM>,
-        AscendC::GlobalTensor<TensorType>, AscendC::LocalTensor<TensorType>>::type;
+        AscendC::GlobalTensor<TensorAttribute<EngineType, LayoutType>>,
+        AscendC::LocalTensor<TensorAttribute<EngineType, LayoutType>>>::type;
 };
 
 template <typename EngineType, typename LayoutType>
-struct BaseTensor<TensorAttribute<EngineType, LayoutType>> {
+struct BaseTensor {
     using iterator = typename EngineType::iterator;
     using valueType = typename EngineType::valueType;
     using elementType = typename EngineType::elementType;
@@ -158,8 +156,7 @@ private:
         const SliceEngine& sliceEngine, const SliceLayout& sliceLayout)
     {
         using Location = GetMemLocation<SliceEngine>;
-        using AttrTensor = TensorAttribute<SliceEngine, SliceLayout>;
-        using ResultTensor = typename MakeTensorResult<Location, AttrTensor>::type;
+        using ResultTensor = typename MakeTensorResult<Location, SliceEngine, SliceLayout>::type;
         return ResultTensor{sliceEngine, sliceLayout};
     }
 
