@@ -38,8 +38,8 @@ __aicore__ inline bfloat16_t Cast(const float& fVal)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- float到bfloat16\_t转换采用[CAST\_RINT舍入](../数据结构/precision_conversion.md#精度舍入模式)。
-- 输入参数为立即数时，需要使用显示类型转换后输入，例如：
+- float到bfloat16\_t转换采用[CAST\_RINT舍入](../数据结构/precision_conversion.md#二进制精度舍入规则)。
+- 输入参数为立即数时，需要使用显式类型转换后输入，例如：
 
     ```cpp
     // 错误写法，AscendC暂不支持整数类型转bfloat16_t，编译报错

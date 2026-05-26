@@ -37,7 +37,7 @@ __aicore__ inline U Cast(T valueIn)
 | ------ | ------ |
 | T | valueIn的数据类型。 |
 | U | 转换后的数据类型。 |
-| roundMode | 精度转换处理模式，类型是RoundMode。<br> RoundMode为枚举类型，用以控制精度转换处理模式，参考[精度舍入模式](../数据结构/precision_conversion.md#精度舍入模式)，可取值为:<br> &bull; CAST_NONE：在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不取整 <br>&bull; CAST_RINT：rint，四舍六入五成双取整<br>&bull; CAST_FLOOR：floor，向负无穷取整 <br>&bull; CAST_CEIL：ceil，向正无穷取整<br>&bull; CAST_ROUND:round，四舍五入取整<br>&bull; CAST_TRUNC：trunc，向零取整<br>&bull; CAST_ODD：Von Neumann rounding，最近邻奇数舍入|
+| roundMode | 精度转换处理模式，类型是RoundMode。<br> RoundMode为枚举类型，用以控制精度转换处理模式，参考[精度舍入模式](../数据结构/precision_conversion.md#二进制精度舍入规则)，可取值为:<br> &bull; CAST_NONE：在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不取整 <br>&bull; CAST_RINT：rint，四舍六入五成双取整<br>&bull; CAST_FLOOR：floor，向负无穷取整 <br>&bull; CAST_CEIL：ceil，向正无穷取整<br>&bull; CAST_ROUND:round，四舍五入取整<br>&bull; CAST_TRUNC：trunc，向零取整<br>&bull; CAST_ODD：Von Neumann rounding，最近邻奇数舍入|
 
 **表 2**  参数说明
 
@@ -84,5 +84,5 @@ valueIn = 2.5f;
 intRoundOut = Cast<float, int32_t, CAST_ROUND>(valueIn); // 使用CAST_ROUND模式，四舍五入返回3
 intCeilOut = Cast<float, int32_t, CAST_CEIL>(valueIn);   // 使用CAST_CEIL模式，向上取整返回3
 intFloorOut = Cast<float, int32_t, CAST_FLOOR>(valueIn); // 使用CAST_FLOOR模式，向下取整返回2
-intRintOut = Cast<float, int32_t, CAST_RINT>(valueIn);   // 使用CAST_RINT模式，1.5向临近偶数舍入返回2
+intRintOut = Cast<float, int32_t, CAST_RINT>(valueIn);   // 使用CAST_RINT模式，2.5向临近偶数舍入返回2
 ```

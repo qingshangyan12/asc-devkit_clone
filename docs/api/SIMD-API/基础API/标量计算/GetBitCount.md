@@ -52,9 +52,9 @@ int64\_t类型的数，valueIn中0或者1的个数。
 ## 调用示例<a name="section837496171220"></a>
 
 ```cpp
-uint64_t valueIn = 0xffff;    // 二进制表示中有16个1，48个0
+uint64_t valueIn = 0xFFFF;    // 二进制表示中有16个1，48个0
 
-int64_t oneCount = AscendC::GetBitCount<1>(0xFFFF); // 统计valueIn二进制格式中1的个数，二进制格式中有16个1
+int64_t oneCount = AscendC::GetBitCount<1>(valueIn); // 统计valueIn二进制格式中1的个数，二进制格式中有16个1
 
-int64_t zeroCount = AscendC::GetBitCount<0>(0xFFFF); // 统计valueIn二进制格式中0的个数，二进制格式中有48个0
+int64_t zeroCount = AscendC::GetBitCount<0>(valueIn); // 统计valueIn二进制格式中0的个数，二进制格式中有48个0
 ```
