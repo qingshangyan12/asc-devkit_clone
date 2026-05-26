@@ -202,7 +202,7 @@ template <typename Arg0, typename... Args>
 template <typename Iterator, typename... Args>
 __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args)
 {
-    static_assert(IsHardwareMemV<Iterator>::value,
+    static_assert(IsHardwareMemPtrV<Iterator>,
         "MakeTensor expects the first argument to be a hardware memory pointer or iterator");
     return MakeTensorBuilder<Iterator>{}(iter, args...);
 }
