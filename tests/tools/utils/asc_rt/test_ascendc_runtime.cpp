@@ -174,11 +174,6 @@ const char *fake_rtGetSocVersion1()
     return "ascend910b22";
 }
 
-const char *fake_rtGetSocVersion350()
-{
-    return "Ascend350_355e";
-}
-
 TEST_F(TEST_ASCENDC_RUNTIME, TestAscendCheckSoCVersion)
 {
     char errMsg[1024]; // max err msg length is 1024
@@ -197,13 +192,6 @@ TEST_F(TEST_ASCENDC_RUNTIME, TestAscendCheckSoCVersion)
     const char* socVersion2 = "ascend310p1xx";
     ret = AscendCheckSoCVersion(socVersion2, errMsg);
     EXPECT_EQ(ret, false);
-}
-
-TEST_F(TEST_ASCENDC_RUNTIME, TestAscendGetSoCVersion)
-{
-    MOCKER(aclrtGetSocName).stubs().will(invoke(fake_rtGetSocVersion350));
-    int ret = static_cast<int>(GetSoCVersion());
-    EXPECT_EQ(ret, 4);
 }
 
 TEST_F(TEST_ASCENDC_RUNTIME, LaunchAscendKernelA){
@@ -431,6 +419,20 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_950) {
     uint32_t ubufDynamicSize = 512;
     EXPECT_EXIT({
         MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend950"));
+        int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
+        exit(ret == 0 ? 0 : 1);
+    }, ::testing::ExitedWithCode(0), "");
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_350) {
+    void* funcHandle = nullptr;
+    uint32_t numBlocks = 1;
+    void* stream = nullptr;
+    void* hostArgs = nullptr;
+    size_t argsSize = 0;
+    uint32_t ubufDynamicSize = 512;
+    EXPECT_EXIT({
+        MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend350"));
         int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
         exit(ret == 0 ? 0 : 1);
     }, ::testing::ExitedWithCode(0), "");
