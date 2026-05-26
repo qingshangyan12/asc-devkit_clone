@@ -207,9 +207,8 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Init(_
     __ubuf__ uint8_t* alignedBuff = (__ubuf__ uint8_t*)AlignAddrTo32Bytes(buff);
     TBuffAddr addr;
     addr.logicPos = static_cast<uint8_t>(TPosition::VECOUT);
-    addr.bufferHandle = 0;
     addr.bufferAddr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(alignedBuff));
-    addr.dataLen = HCOMM_URMA_TMP_BUF_SIZE;
+    addr.dataLen = len;
 #if defined(UT_TEST)
     addr.absAddr = reinterpret_cast<uint8_t*>(alignedBuff);
 #endif
