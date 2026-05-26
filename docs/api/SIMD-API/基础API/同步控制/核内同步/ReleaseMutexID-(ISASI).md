@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void ReleaseMutexID(MutexID id)
 ```
 
@@ -91,4 +91,3 @@ __aicore__ inline void ReleaseMutexID(MutexID id)
 ## 调用示例<a name="section837496171220"></a>
 
 请参考[调用示例](AllocMutexID-(ISASI).md#section837496171220)。
-
