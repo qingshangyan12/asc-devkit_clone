@@ -112,7 +112,7 @@
 
 -   MatmulPolicy（默认模板策略）
 
-    使能Matmul API的默认实现策略。
+    使用Matmul API的默认实现策略。
 
 -   TrianUpperMatmulPolicy（上三角模板策略）
 
@@ -387,4 +387,3 @@
         DataCopy(gmC[baseOffset], bufferC, {blockCount, blockLen, srcStride, dstStride});
     }
     ```
-
