@@ -15,6 +15,7 @@
 #include "log.h"
 #include "alg_param.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "timing_stat.h"
 
 namespace {
 mc2_ops_hccl::OpParam *AsOpenOpParam(std::vector<uint8_t> &opParam)
@@ -119,6 +120,7 @@ HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam &param, const mc2_ops_hc
 
 HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
 {
+    uint32_t firstSlot = TimingStatStart("[LaunchOpenOpParamDataImpl][first]");
     auto *param = AsOpenOpParam(opParam);
     CHK_PTR_NULL(param);
     HCCL_INFO("[MC2_OPEN_DIAG][LaunchOpenOpParamDataImpl] file[%s:%d], opParamSize %zu, "
@@ -130,7 +132,13 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
 
     char *ctx = static_cast<char *>(param->resCtx);
     std::vector<char> seq(ctx, ctx + param->ctxSize);
+    TimingStatEnd(firstSlot);
+
+    uint32_t deserSlot = TimingStatStart("[LaunchOpenOpParamDataImpl][DeSerialize]");
     resCtx.DeSerialize(seq);
+    TimingStatEnd(deserSlot);
+
+    uint32_t restoreSlot = TimingStatStart("[LaunchOpenOpParamDataImpl][else]");
     HCCL_INFO("[MC2_OPEN_DIAG][Launch] opType %u, algName[%s], inputPtr %p, outputPtr %p, resCtx %p, ctxSize %llu, stream %p."
               "userRank %u, userRankSize %u, threadNum %zu, cclMemAddr %p, cclMemSize %llu.", 
               static_cast<u32>(param->opType), param->algName, param->inputPtr, param->outputPtr,
@@ -162,22 +170,27 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
     const u64 outputBegin = reinterpret_cast<u64>(param->outputPtr);
     HCCL_INFO("[MC2_OPEN_DIAG][LaunchRange] userRank %u, userRankSize %u, dataTypeSize %llu, inputBytes %llu, "
               "rankStrideCount %llu, rankStrideBytes %llu, outputSpanCount %llu, outputBytes %llu, "
-              "inputRange [%#llx, %#llx), outputSpan [%#llx, %#llx), outputSpanRankScaled %u.",
+              "inputRange [%#llx, %#llx), outputSpan [%#llx, %#llx), outputSpanRankScaled %u, engine %u.",
               resCtx.topoInfo.userRank, resCtx.topoInfo.userRankSize,
               static_cast<unsigned long long>(dataTypeSize), static_cast<unsigned long long>(inputBytes),
               static_cast<unsigned long long>(rankStrideCount), static_cast<unsigned long long>(rankStrideBytes),
               static_cast<unsigned long long>(outputSpanCount), static_cast<unsigned long long>(outputBytes),
               static_cast<unsigned long long>(inputBegin),
               static_cast<unsigned long long>(inputBegin + inputBytes), static_cast<unsigned long long>(outputBegin),
-              static_cast<unsigned long long>(outputBegin + outputBytes), isAllGather);
+              static_cast<unsigned long long>(outputBegin + outputBytes), isAllGather, static_cast<u32>(param->engine));
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
+    TimingStatEnd(restoreSlot);
 
+    uint32_t getAlgSlot = TimingStatStart("[LaunchOpenOpParamDataImpl][GetAlgExec]");
     auto executor = mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
     CHK_SMART_PTR_NULL(executor);
+    TimingStatEnd(getAlgSlot);
 
+    uint32_t orchestrateSlot = TimingStatStart("[LaunchOpenOpParamDataImpl][Orchestrate]");
     HcclResult ret = executor->Orchestrate(*param, resCtx);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
+    TimingStatEnd(orchestrateSlot);
 
     return HCCL_SUCCESS;
 }

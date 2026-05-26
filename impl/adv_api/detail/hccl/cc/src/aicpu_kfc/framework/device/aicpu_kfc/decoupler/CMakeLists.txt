@@ -10,6 +10,7 @@
 set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/comm_kfc_aicpu_server.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/comm_kfc_dispatcher.cc
+    ${HCCL_CC_DIR}/src/common/timing_stat.cc
 )
 
 set(OPEN_HCCL_SRC_ROOT

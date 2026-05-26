@@ -27,6 +27,7 @@
 #include "stream_lite.h"
 #include "thread.h"
 #include "aicpu_ts_thread.h"
+#include "timing_stat.h"
 
 using namespace HcclApi;
 namespace {
@@ -395,6 +396,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(std::vector<uint8_t> 
 
 HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMsg, u32 msgPos)
 {
+    uint32_t orchestrateHeadSlot = TimingStatStart("[Orchestrate][qian]");
     KeepAlive();
     CHK_PTR_NULL(msgArea_);
     const HcclCMDType opType = static_cast<HcclCMDType>(msg.commType.prepareType);
@@ -420,9 +422,11 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
               static_cast<unsigned long long>(msg.strideCount),
               static_cast<unsigned long long>(waitAddr), static_cast<unsigned long long>(recordAddr),
               static_cast<u32>(execCtx->resourceType));
+    TimingStatEnd(orchestrateHeadSlot);
 
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
+        uint32_t formatSlot = TimingStatStart("[Orchestrate][qianzhi]");
         const u32 turnIdx = i + 1U;
         UpdateProgress("LoopBegin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBegin] group %u, msgPos %u, repeatIdx %u, turnIdx %u, repeatCnt %u, "
@@ -436,30 +440,37 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterFormat] group %u, msgPos %u, repeatIdx %u, ret %u, runParamSize %zu.",
                   groupIdx_, msgPos, i, ret, runParam.size());
         CHK_RET(ret);
+        TimingStatEnd(formatSlot);
 
+        uint32_t waitSlot = TimingStatStart("[Orchestrate][Wait]");
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        TimingStatEnd(waitSlot);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
 
+        uint32_t launchSlot = TimingStatStart("[Orchestrate][launch]");
         UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenAicpuKernelServer(runParam);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        TimingStatEnd(launchSlot);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
 
+        uint32_t postSlot = TimingStatStart("[Orchestrate][post]");
         UpdateProgress("BeforePost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
         UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        TimingStatEnd(postSlot);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterPost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
@@ -470,6 +481,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
     }
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
+    TIMING_STAT_DUMP();
     return HCCL_SUCCESS;
 }
 
