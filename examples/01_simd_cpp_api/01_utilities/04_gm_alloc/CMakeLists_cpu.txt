@@ -1,0 +1,39 @@
+cmake_minimum_required(VERSION 3.16)
+project(gm_alloc_cpu LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(TIKICPULIB_INCLUDE_DIR "/home/developer/Ascend/cann-9.0.0/tools/tikicpulib/lib/include")
+set(TIKICPULIB_LIB_DIR "/home/developer/Ascend/cann-9.0.0/tools/tikicpulib/lib/Ascend910B2")
+set(TIKICPULIB_COMMON_LIB_DIR "/home/developer/Ascend/cann-9.0.0/tools/tikicpulib/lib")
+set(CANN_INCLUDE_DIR "/home/developer/Ascend/cann-9.0.0/aarch64-linux/include;/home/developer/Ascend/cann-9.0.0/aarch64-linux/asc/include/interface;/home/developer/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api;/home/developer/Ascend/cann-9.0.0/aarch64-linux/asc/impl/basic_api;/home/developer/Ascend/cann-9.0.0/aarch64-linux/ascendc/include;/home/developer/Ascend/cann-9.0.0/aarch64-linux/ascendc/include/basic_api;/home/developer/Ascend/cann-9.0.0/aarch64-linux/ascendc/include/basic_api/impl;/home/developer/Ascend/cann-9.0.0/aarch64-linux/tikcpp/tikcfw/include")
+set(SIMULATOR_LIB_DIR "/home/developer/Ascend/cann-9.0.0/aarch64-linux/simulator/dav_2201/lib")
+
+add_executable(demo ../gm_alloc_cpu_test.cpp)
+
+target_include_directories(demo PRIVATE
+    ${TIKICPULIB_INCLUDE_DIR}
+    ${CANN_INCLUDE_DIR}
+)
+
+target_link_libraries(demo PRIVATE
+    ${TIKICPULIB_LIB_DIR}/libtikcpp_debug.so
+    ${TIKICPULIB_LIB_DIR}/libcpudebug.so
+    ${TIKICPULIB_COMMON_LIB_DIR}/libcpudebug_acl_stub.so
+    ${TIKICPULIB_COMMON_LIB_DIR}/libcpudebug_cceprint.so
+    ${TIKICPULIB_COMMON_LIB_DIR}/libcpudebug_npuchk.so
+    ${TIKICPULIB_COMMON_LIB_DIR}/libcpudebug_stubreg.so
+    ${TIKICPULIB_COMMON_LIB_DIR}/libtikicpulib_npuchk.so
+    ${TIKICPULIB_COMMON_LIB_DIR}/libtikicpulib_stubreg.so
+    ${SIMULATOR_LIB_DIR}/libpem_davinci.so
+    /home/developer/Ascend/cann-9.0.0/aarch64-linux/lib64/libc_sec.so
+    pthread
+    rt
+    dl
+)
+
+target_compile_definitions(demo PRIVATE
+    ASCENDC_CPU_DEBUG=1
+    __NPU_ARCH__=2201
+    _GLIBCXX_USE_CXX11_ABI=0
+)
