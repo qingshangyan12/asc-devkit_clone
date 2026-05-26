@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以加法为例，介绍基于静态Tensor方式编程的性能调优方法。整个调优过程分为七个步骤（case 0-6），逐步展示从标量运算到向量运算、从单核到多核、从基础实现到深度优化的完整调优路径。
+本样例以加法为例，介绍基于[静态Tensor](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程.md)方式编程的性能调优方法。整个调优过程分为七个步骤（case 0-6），逐步展示从标量运算到向量运算、从单核到多核、从基础实现到深度优化的完整调优路径。
 
 **优化路径**：
 - Case 0: 单核标量版本（基准）
@@ -43,7 +43,7 @@ $$
   z = x + y
 $$
 
-  - x：输入，形状为[8192, 8192]，数据类型为half；
+  - x：输入，形状为[8192, 8192]，数据类型为[half](../../../../../docs/api/SIMD-API/基础数据结构/内置数据类型.md)（半精度浮点，占用2字节）；
   - y：输入，形状为[8192, 8192]，数据类型为half；
   - z：输出，形状为[8192, 8192]，数据类型为half；
 
@@ -60,9 +60,9 @@ $$
 | aiv_vec_ratio | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。 |
 | aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位μs。 |
 | aiv_scalar_ratio | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。 |
-| aiv_mte2_time(μs) | mte2类型指令（GM->UB搬运类指令）耗时，单位μs。 |
-| aiv_mte2_ratio | mte2类型指令（GM->UB搬运类指令）的cycle数在total cycle数中的占用比。 |
-| aiv_mte3_time(μs) | mte3类型指令（UB->GM搬运类指令）耗时，单位μs。 |
+| aiv_mte2_time(μs) | mte2类型指令（GM（Global Memory，全局内存/HBM）→UB（Unified Buffer，向量核统一缓冲区）搬运类指令）耗时，单位μs。 |
+| aiv_mte2_ratio | mte2类型指令（GM→UB搬运类指令）的cycle数在total cycle数中的占用比。 |
+| aiv_mte3_time(μs) | mte3类型指令（UB→GM搬运类指令）耗时，单位μs。 |
 | aiv_mte3_ratio | mte3类型指令（UB->GM搬运类指令）的cycle数在total cycle数中的占用比。 |
 
 本章节性能数据在Atlas A2训练系列产品上运行得到。
@@ -124,7 +124,7 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 **样例配置**：
 - 单核运算
 - `dataCopyLen = 4096` 为每次搬运的数据量元素个数
-- 单次搬运操作`DataCopy`的数据量为 8192 Byte
+- 单次搬运操作[DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy.md)（数据搬运接口，用于在GM和UB之间搬运数据）的数据量为 8192 Byte
 - 单次`Add`处理两个输入`Tensor`，处理的总数据量为 16384 Byte
 
 
@@ -162,7 +162,7 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 
 **实现方式**：参考 `KernelAdd::Process()` 函数实现
 
-开启多核并行计算，将8192×8192的矩阵切分到多个AIV Core上并行处理，采用均匀切分策略。
+开启多核并行计算，将8192×8192的矩阵切分到多个[AIV Core](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)（AI Vector Core，即AI向量核）上并行处理，采用均匀切分策略。
 
 **样例配置**：
 - 行方向切分48份，将数据均匀切分至48个核运算
@@ -264,7 +264,7 @@ if (blockIdxM < remainderM) {
 
 **实现方式**：参考 `KernelAdd::ProcessDoubleBuffer()` 函数实现
 
-采用双缓冲（Double Buffer）技术，实现数据搬运与计算的流水线并行，隐藏内存访问延迟。
+采用[双缓冲（Double Buffer）](../../../../../docs/guide/技术附录/概念原理和术语/性能优化技术原理/DoubleBuffer.md)技术（使用两组缓冲区Ping/Pong交替执行数据搬运和计算，实现流水线并行），隐藏内存访问延迟。
 
 **关键代码**：
 ```cpp
@@ -291,6 +291,7 @@ for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
 - 单次搬运操作`DataCopy`的数据量为 32768 Byte
 - 单次`Add`处理两个输入`Tensor`，处理的总数据量为 65536 Byte
 - 将待处理的数据一分为二，由此数据的进出搬运和Vector计算实现并行执行
+- 使用[Event ID](../../../../../docs/api/SIMD-API/基础API/同步控制/核内同步/同步控制简介.md)（核内事件同步机制，用于标记数据搬运/计算完成的同步信号）管理双缓冲的交替执行
 
 **内存布局**：
 
@@ -350,7 +351,7 @@ UB内存分配（双缓冲）：
 
 **实现方式**：参考 `KernelAdd::ProcessDoubleBufferL2Bypass()` 函数实现（在该函数内部先设置 `SetL2CacheHint(CACHE_MODE_DISABLE)`，再调用 `ProcessDoubleBuffer()`）
 
-在双缓冲基础上，对于只需要载入一次的数据量可以设置L2 Cache bypass，直接从GM载入UB。
+在双缓冲基础上，对于只需要载入一次的数据量可以通过[SetL2CacheHint](../../../../../docs/api/SIMD-API/基础数据结构/GlobalTensor/SetL2CacheHint.md)接口设置L2 Cache bypass，直接从GM载入UB。
 
 **关键代码**：
 ```cpp
@@ -364,6 +365,7 @@ UB内存分配（双缓冲）：
 - 单次搬运操作`DataCopy`的数据量为 32768 Byte
 - 单次`Add`处理两个输入`Tensor`，处理的总数据量为 65536 Byte
 - 将待处理的数据一分为二，由此数据的进出搬运和Vector计算实现并行执行
+- 使用[Event ID](../../../../../docs/api/SIMD-API/基础API/同步控制/核内同步/同步控制简介.md)（核内事件同步机制，用于标记数据搬运/计算完成的同步信号）管理双缓冲的交替执行
 
 **L2 Cache策略**：
 - xGm：禁用L2 Cache（一次性读取）
@@ -426,6 +428,7 @@ static constexpr uint32_t zAddrPongBC = zAddrPingBC + BANK_CONFLICT_DATA_COPY_LE
 - 单次搬运操作`DataCopy`的数据量为 32512 Byte
 - 单次`Add`处理两个输入`Tensor`，处理的总数据量为 65204 Byte
 - 将待处理的数据一分为二，由此数据的进出搬运和Vector计算实现并行执行
+- 使用[Event ID](../../../../../docs/api/SIMD-API/基础API/同步控制/核内同步/同步控制简介.md)（核内事件同步机制，用于标记数据搬运/计算完成的同步信号）管理双缓冲的交替执行
 
 **内存布局优化**：
 
@@ -496,7 +499,7 @@ static constexpr uint32_t zAddrPongBC = zAddrPingBC + BANK_CONFLICT_DATA_COPY_LE
 | 5 | L2 Cache bypass | 48 | 16384 | 187.68 | 12.846 | 5.904 | NA | 2.2755 | 6612.2x |
 | 6 | Bank Conflict优化 | 48 | 16256 | 184.52 | 6.954 | 5.904 | NA | 2.3456 | 6710.7x |
 
-表中的“理论vector耗时”表示在当前核数配置下，仅考虑Vector计算本身时的理论执行时间。本样例的性能数据在Atlas A2训练系列产品上运行，该处理器每cycle处理128个half数据，主频为1.85GHz。理论vector耗时的计算公式为
+表中的"理论vector耗时"表示在当前核数配置下，仅考虑Vector计算本身时的理论执行时间。本样例的性能数据在Atlas A2训练系列产品上运行，该处理器每cycle处理128个half数据，主频为1.85GHz。理论vector耗时的计算公式为
 $$
 T_{\text{theory}} = \frac{M \times N}{128 \times 1.85 \times 10^9 \times \text{核数}}
 $$
@@ -534,7 +537,7 @@ $$
 BW_{rw} = \frac{8192 \times 8192 \times (2+1) \times 2}{171.611 \times 10^{-6}} = \frac{402653184}{171.611 \times 10^{-6}} \approx 2.3456 \times 10^{12} \text{ B/s} \approx 2.3456 \text{ TB/s}
 $$
 
-之所以读写混合带宽会高于 1.8 TB/s，是因为这里统计的不是纯读带宽，而是“读 + 写”的混合带宽。开启双缓冲后，读写流水是并行的；同时，z 写数据时会命中 L2 Cache，而 L2 的带宽很高，所以写的带宽较高。因此，在以 mte2 作为读写混合时间来估算时，分子统计了读写总数据量，最终得到的混合带宽会高于 1.8 TB/s。
+之所以读写混合带宽会高于 1.8 TB/s，是因为这里统计的不是纯读带宽，而是"读 + 写"的混合带宽。开启双缓冲后，读写流水是并行的；同时，z 写数据时会命中 L2 Cache，而 L2 的带宽很高，所以写的带宽较高。因此，在以 mte2 作为读写混合时间来估算时，分子统计了读写总数据量，最终得到的混合带宽会高于 1.8 TB/s。
 
 ### Ascend 950系列性能对比
 
@@ -563,8 +566,8 @@ $$
 
 Ascend 950系列未达到理论vector耗时峰值的原因如下：
 
-- 该理论值仅统计“纯Vector计算”时间，不包含数据搬运、事件同步、流水线调度等开销；而实测Case 5中 `aiv_vec_time=10.997μs`、Task Duration为 `182.04μs`，`aiv_mte2_reatio`高达98.3%，受限于带宽限制，说明端到端瓶颈不在纯计算本身。
-- Ascend 950系列 RegBase的主要收益来自“减少冗余Load/Store、寄存器复用、提升无依赖并发指令比例”。当前Add样例核心计算基本是单条Add，计算链较短、可融合/可双发空间有限，难以充分释放RegBase的优势。
+- 该理论值仅统计"纯Vector计算"时间，不包含数据搬运、事件同步、流水线调度等开销；而实测Case 5中 `aiv_vec_time=10.997μs`、Task Duration为 `182.04μs`，`aiv_mte2_reatio`高达98.3%，受限于带宽限制，说明端到端瓶颈不在纯计算本身。
+- Ascend 950系列 [RegBase](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/Reg矢量计算编程.md)（基于寄存器的编程模式，通过减少冗余Load/Store、寄存器复用来提升性能）的主要收益来自"减少冗余Load/Store、寄存器复用、提升无依赖并发指令比例"。当前Add样例核心计算基本是单条Add，计算链较短、可融合/可双发空间有限，难以充分释放RegBase的优势。
 
 ### 优化要点总结
 
@@ -648,9 +651,97 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
   test pass!
   ```
 
-## 性能分析
+## 功能调试
 
-使用 `msprof` 工具获取详细性能数据：
+### printf
+
+[printf](../../../../../docs/api/SIMD-API/基础API/调试接口/上板打印/printf.md)（提供CPU域/NPU域调试场景下的格式化输出功能）可在算子kernel侧实现代码中需要输出日志信息的地方调用。
+
+**使用方式**：
+
+```cpp
+#include "kernel_operator.h"
+AscendC::printf("fmt string %d\n", 0x123);
+AscendC::PRINTF("fmt string %d\n", 0x123);
+```
+
+**说明**：
+- 支持格式控制符：`%d`、`%f`、`%x`、`%s`、`%u`、`%p`
+- 单次打印数据量不超过1MB
+- CPU调试模式和NPU上板模式均可使用
+
+> 详细接口说明请参考[printf接口文档](../../../../../docs/api/SIMD-API/基础API/调试接口/上板打印/printf.md)和[NPU域上板调试](../../../../../docs/guide/编程指南/调试调优/功能调试/NPU域上板调试.md)。
+
+### DumpTensor
+
+[DumpTensor](../../../../../docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)（用于Dump指定Tensor内容的接口，支持打印自定义附加信息）仅支持NPU上板调试场景。
+
+**使用方式**：
+
+```cpp
+// 向量计算: z = x + y
+AscendC::Add(zLocal, xLocal, yLocal, DATA_LENGTH);
+AscendC::DumpTensor(zLocal, 1, 16);
+```
+
+**输出示例**：
+
+```
+DumpTensor: desc=1, addr=0x1000, data_type=float32, position=UB, dump_size=16
+[141.015015, 124.238228, 152.882874, 96.875984, 39.287174, 45.760258, 172.856659, 158.620880, 29.610844, 92.915154, 169.371704, 129.811401, 96.124611, 118.990570, 3.930355, 58.091831]
+```
+
+**说明**：
+- `desc`：自定义附加信息，仅支持`uint32_t`类型
+- `dumpSize`：Dump的元素个数
+- 单次数据量不超过1MB
+- 不支持入图场景
+
+> 详细接口说明请参考[DumpTensor接口文档](../../../../../docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)和[NPU域上板调试](../../../../../docs/guide/编程指南/调试调优/功能调试/NPU域上板调试.md)。
+
+---
+
+## 性能调试
+
+### msprof op 上板性能采集
+
+[msprof op](../../../../../docs/guide/编程指南/调试调优/性能调优.md)（单算子上板性能分析工具，可直接测定算子在昇腾AI处理器上的运行时间）适合在板环境中快速定位算子性能问题。
+
+**使用方式**：
+
+```bash
+msprof op ./demo   # 上板性能采集
+```
+
+命令完成后，会在当前目录下生成以`OPPROF_{timestamp}_XXX`命名的文件夹，性能数据文件结构如下：
+
+```bash
+OPPROF_{timestamp}_XXX
+├── dump                       # 原始的性能数据，用户无需关注
+├── ArithmeticUtilization.csv  # cube/vector指令cycle占比
+├── L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+├── Memory.csv                 # UB，L1和主存储器读写带宽速率
+├── MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+├── MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+├── OpBasicInfo.csv            # 算子基础信息
+├── PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+├── ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+└── visualize_data.bin         # MindStudio Insight呈现文件
+```
+
+### msprof 仿真性能采集
+
+[msprof op simulator](../../../../../docs/guide/编程指南/调试调优/性能调优.md)（仿真性能分析工具，可在不依赖NPU硬件的仿真环境中采集算子性能数据）适用于无板环境的性能分析。
+
+**使用方式**：
+
+```bash
+msprof op simulator ./demo --soc-version=Ascend920B1   # 仿真性能采集
+```
+
+### 旧版msprof性能采集
+
+使用 `msprof` 工具（不带`op`子命令）获取详细性能数据：
 
 ```bash
 msprof ./demo   # 分析性能
@@ -673,3 +764,5 @@ PROF_xxxx_XXXXXX
 # 查看Task Duration 以及各项数据
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```
+
+> 更多msprof工具使用方式请参考[性能调优](../../../../../docs/guide/编程指南/调试调优/性能调优.md)和[获取性能数据](../../../../../docs/guide/算子实践参考/性能分析/获取性能数据.md)。
