@@ -40,7 +40,7 @@ private:
     void OpCustomGenSymlinkFunc(std::ofstream& outfile) const;
     void OpCustomGenSymArchFunc(std::ofstream& outfile) const;
     void OpCustomGenRegistryfirstFunc(std::ofstream& outfile) const;
-    void OpCustomGenRegistrylastFunc(std::ofstream& outfile) const;
+    void OpCustomGenRegistrylastFunc(std::ofstream& outfile, const std::string& opapiSoName) const;
     void OpCustomGenRemoveDirFunc(std::ofstream& outfile) const;
     void OpCustomGen(std::ofstream& outfile, const char* vendorName) const;
     void OpCustomGenDestryFunc(std::ofstream& outfile) const;
