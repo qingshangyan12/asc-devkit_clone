@@ -21,6 +21,7 @@ if(PRODUCT_SIDE STREQUAL "host")
         ${CMAKE_CURRENT_SOURCE_DIR}/sal.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/hccl_mc2.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/compat.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/timing_stat.cc
     )
 
     target_sources(mc2_client PRIVATE
