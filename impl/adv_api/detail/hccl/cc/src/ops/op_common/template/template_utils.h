@@ -93,8 +93,13 @@ struct A2ASendRecvInfo {
 struct DataInfo {
     ChannelInfo channel_;
     SlicesList slices_;
+    HcclDataType dataType_;
     DataInfo(const ChannelInfo &channel, const SlicesList &slices)
-    : channel_(channel), slices_(slices)
+    : channel_(channel), slices_(slices), dataType_(HCCL_DATA_TYPE_RESERVED)
+    {
+    }
+    DataInfo(const ChannelInfo &channel, const SlicesList &slices, HcclDataType dataType)
+    : channel_(channel), slices_(slices), dataType_(dataType)
     {
     }
 };
@@ -133,9 +138,16 @@ struct TxRxSlicesList {
 struct SendRecvInfo {
     TxRxChannels      sendRecvChannels_;
     TxRxSlicesList    sendRecvSlices_;
+    HcclDataType      dataType_;
 
     SendRecvInfo(const TxRxChannels &sendRecvLinks, const TxRxSlicesList &sendRecvSlices)
-        : sendRecvChannels_(sendRecvLinks), sendRecvSlices_(sendRecvSlices)
+        : sendRecvChannels_(sendRecvLinks), sendRecvSlices_(sendRecvSlices),
+          dataType_(HCCL_DATA_TYPE_RESERVED)
+    {
+    }
+
+    SendRecvInfo(const TxRxChannels &sendRecvLinks, const TxRxSlicesList &sendRecvSlices, HcclDataType dataType)
+        : sendRecvChannels_(sendRecvLinks), sendRecvSlices_(sendRecvSlices), dataType_(dataType)
     {
     }
 };
