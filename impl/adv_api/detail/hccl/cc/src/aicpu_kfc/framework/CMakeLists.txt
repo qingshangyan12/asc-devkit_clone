@@ -618,6 +618,7 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         ${HCCL_BASE_DIR}/framework/next/comms/comm_engine_res/threads/slaves/
         ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator/aicpu
         ${HCCL_BASE_DIR}/framework/next/coll_comms/dfx
+        ${HCCL_CC_DIR}/src/common
     )
 
     target_include_directories(asc_ccl_kernel PRIVATE

@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <sstream>
 #include <algorithm>
+#include <map>
 
 #include "log.h"
 

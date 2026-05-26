@@ -63,6 +63,7 @@ HcclResult InsTempAllGatherMesh1D::KernelRun(const OpParam &param, const Templat
         return HCCL_SUCCESS;
     }
     threadNum_ = templateResource.threads.size();
+    HCCL_RUN_INFO("[RunALLtoALL] subThreads.size(): %llu", threadNum_);
     tempAlgParams_ = tempAlgParams;
     dataType_ = param.DataDes.dataType;
     HCCL_DEBUG("[InsTempAllGatherMesh1D] Rank [%d], get threadNum_[%d].", myRank_, threadNum_);
