@@ -84,7 +84,7 @@ $dst_i = src_i \gg scalarValue$
         __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn = false)
         ```
 
-dst和src使用TensorTrait类型时，其数据类型TensorTrait和scalarValue的数据类型（对应TensorTrait中的LiteType类型）不一致。因此新增模板类型U表示scalarValue的数据类型，并通过std::enable\_if检查T中萃取出的LiteType和U是否完全一致，一致则接口通过编译，否则编译失败。接口原型定义如下:
+dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait.md)类型时，其数据类型TensorTrait和scalarValue的数据类型（对应TensorTrait中的LiteType类型）不一致。因此新增模板类型U表示scalarValue的数据类型，并通过std::enable\_if检查T中萃取出的LiteType和U是否完全一致，一致则接口通过编译，否则编译失败。接口原型定义如下:
 
 - tensor前n个数据计算
 
@@ -135,9 +135,7 @@ dst和src使用TensorTrait类型时，其数据类型TensorTrait和scalarValue�
 
 <cann-filter npu-type="950">
 
-- 针对Ascend 950PR/Ascend 950DT
-    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。数据类型int8_t、uint8_t、uint64_t、int64_t仅支持tensor前n个数据计算接口。
-    - U支持的数据类型为：uint8_t、int8_t、uint16_t、int16_t、uint32_t、int32_t、uint64_t、int64_t。
+- 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。数据类型int8_t、uint8_t、uint64_t、int64_t仅支持tensor前n个数据计算接口。
 
 </cann-filter>
 

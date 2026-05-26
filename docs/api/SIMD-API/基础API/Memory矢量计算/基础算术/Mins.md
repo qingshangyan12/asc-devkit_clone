@@ -120,7 +120,7 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。 |
-| U | scalarValue的数据类型。仅在dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait.md)类型时有效。 |
+| U | scalarValue的数据类型。|
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK\_PLACEHOLDER。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。<br><cann-filter npu-type="950,310b"> 针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。 <br><cann-filter npu-type="950">Ascend 950PR/Ascend 950DT</cann-filter> <br><cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品</cann-filter> </cann-filter> |
 
 **表 2**  参数说明
@@ -139,9 +139,7 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 
 <cann-filter npu-type="950">
 
-- 针对Ascend 950PR/Ascend 950DT
-    - T支持的数据类型为：int8_t、uint8_t、half、bfloat16_t、int16_t、float、int32_t、uint64_t、int64_t。数据类型int8_t、uint8_t、uint64_t、int64_t仅支持tensor前n个数据计算接口。
-    - U支持的数据类型为：int8_t、uint8_t、half、bfloat16_t、int16_t、float、int32_t、uint64_t、int64_t。
+- 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int8_t、uint8_t、half、bfloat16_t、int16_t、float、int32_t、uint64_t、int64_t。数据类型int8_t、uint8_t、uint64_t、int64_t仅支持tensor前n个数据计算接口。
 
 </cann-filter>
 
