@@ -28,8 +28,6 @@
 #include "thread.h"
 #include "aicpu_ts_thread.h"
 
-#include "hcomm_primitives_dl.h"
-
 using namespace HcclApi;
 namespace {
 static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 120UL;
