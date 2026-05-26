@@ -14,6 +14,8 @@
 
 ## 功能说明
 
+头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。
+
 获取UB空间的大小，单位为byte。开发者根据UB的大小来计算循环次数等参数值。
 
 ## 函数原型
@@ -51,4 +53,3 @@ if (totalLength > AscendC::GetUBSizeInBytes() / sizeof(half) / 2) {
 // 需要迭代的分片数量
 this->tileNum = this->totalLength / this->tileLength;
 ```
-

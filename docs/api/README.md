@@ -380,6 +380,10 @@
             -   [同步控制](SIMD-API/基础API/Reg矢量计算/同步控制/同步控制.md)
                 -   [LocalMemBar](SIMD-API/基础API/Reg矢量计算/同步控制/LocalMemBar.md)
 
+            -   [系统变量访问](SIMD-API/基础API/Reg矢量计算/系统变量访问/系统变量访问.md)
+                -   [GetSpr](SIMD-API/基础API/Reg矢量计算/系统变量访问/GetSpr.md)
+                -   [ClearSpr](SIMD-API/基础API/Reg矢量计算/系统变量访问/ClearSpr.md)
+
             -   [数据类型](SIMD-API/基础API/Reg矢量计算/数据类型/数据类型.md)
                 -   [PostLiteral](SIMD-API/基础API/Reg矢量计算/数据类型/PostLiteral.md)
                 -   [RegLayout](SIMD-API/基础API/Reg矢量计算/数据类型/RegLayout.md)
@@ -641,8 +645,6 @@
             -   [设置Kernel类型](SIMD-API/基础API/Kernel-Tiling/设置Kernel类型.md)
 
         -   [特殊寄存器访问](SIMD-API/基础API/特殊寄存器访问/特殊寄存器访问.md)
-            -   [GetSpr](SIMD-API/基础API/特殊寄存器访问/GetSpr.md)
-            -   [ClearSpr](SIMD-API/基础API/特殊寄存器访问/ClearSpr.md)
             -   [SetCtrlSpr\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/SetCtrlSpr(ISASI).md)
             -   [GetCtrlSpr\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/GetCtrlSpr(ISASI).md)
             -   [ResetCtrlSpr\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/ResetCtrlSpr(ISASI).md)

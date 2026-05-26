@@ -14,6 +14,8 @@
 
 ## 功能说明
 
+头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
+
 对CTRL寄存器（控制寄存器）的特定比特位做重置。
 
 ## 函数原型
@@ -49,4 +51,3 @@ AscendC::SetCtrlSpr<48, 48>(1);
 ...
 AscendC::ResetCtrlSpr<48, 48>();
 ```
-

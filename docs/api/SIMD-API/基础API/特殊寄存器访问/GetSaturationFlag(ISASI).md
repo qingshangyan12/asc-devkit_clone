@@ -1,4 +1,4 @@
-# GetSaturationFlag\(ISASI\)
+# GetSaturationFlag(ISASI)
 
 ## 产品支持情况
 
@@ -16,7 +16,7 @@
 
 ## 功能说明
 
-头文件路径为: "basic_api/kernel_operator_common_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
 
 获取计算/精度转换时的饱和模式是否开启。返回true表示开启饱和模式，false表示未开启饱和模式。
 
