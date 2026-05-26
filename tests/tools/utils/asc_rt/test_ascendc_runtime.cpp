@@ -174,6 +174,11 @@ const char *fake_rtGetSocVersion1()
     return "ascend910b22";
 }
 
+const char *fake_rtGetSocVersion350()
+{
+    return "Ascend350_355e";
+}
+
 TEST_F(TEST_ASCENDC_RUNTIME, TestAscendCheckSoCVersion)
 {
     char errMsg[1024]; // max err msg length is 1024
@@ -192,6 +197,14 @@ TEST_F(TEST_ASCENDC_RUNTIME, TestAscendCheckSoCVersion)
     const char* socVersion2 = "ascend310p1xx";
     ret = AscendCheckSoCVersion(socVersion2, errMsg);
     EXPECT_EQ(ret, false);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, TestAscendGetSoCVersion)
+{
+    const char* socVersion = "ascend910b1";
+    MOCKER(aclrtGetSocName).stubs().will(invoke(fake_rtGetSocVersion350));
+    int ret = static_cast<int>(GetSoCVersion());
+    EXPECT_EQ(ret, 4);
 }
 
 TEST_F(TEST_ASCENDC_RUNTIME, LaunchAscendKernelA){
