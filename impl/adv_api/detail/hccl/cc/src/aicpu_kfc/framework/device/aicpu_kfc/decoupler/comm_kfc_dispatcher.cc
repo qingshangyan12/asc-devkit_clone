@@ -121,7 +121,11 @@ HcclResult PrepareProcess(AscCommServerInfo &server, u32 &expectSeqNum)
         HCCL_INFO("Expect seq id %u but receive %u.", expectSeqNum, seqNum);
         ++(server.retryCnt);
     } else {
+        // u64 startTime = GetCurCpuTimestamp(false);
         CHK_RET(server.serverIns.Orchestrate(server.msg, *(server.extMsg), server.msgPos));
+        // u64 endTime = GetCurCpuTimestamp(false);
+        // HCCL_RUN_INFO("startTime: %llu, endTime: %llu, useTime: %llu", startTime, endTime, endTime - startTime);
+
         server.msgPos = (server.msgPos + 1U) % HCCL_MSG_CNT;
         ++expectSeqNum;
         server.retryCnt = 0;
@@ -182,15 +186,21 @@ HcclResult GroupServerProcess(std::vector<AscCommServerInfo> &serverList, u32 gr
 
 u32 CommKfcDispatcher::Run(void *args[], u32 ctxNum)
 {
+    u64 Time1 = GetCurCpuTimestamp(false);
     std::vector<AscCommServerInfo> serverList{};
     CHK_RET(CreateServerList(args, ctxNum, serverList));
+    u64 Time2 = GetCurCpuTimestamp(false);
+    HCCL_RUN_INFO("[Run][CreateServerList] startTime: %llu, endTime: %llu, useTime: %llu", Time1, Time2, Time2 - Time1);
 
     u32 finishCnt = 0U;
     u32 expectSeqNum = 0U;
     while (finishCnt != serverList.size()) {
         for (u32 i = 0U; i < serverList.size(); ++i) {
+            Time2 = GetCurCpuTimestamp(false);
             HcclResult ret = GroupServerProcess(serverList, i, expectSeqNum, finishCnt);
             CHK_RET(serverList[i].serverIns.ErrorDfxProcess(ret));
+            u64 Time3 = GetCurCpuTimestamp(false);
+            HCCL_RUN_INFO("[Run][GroupServerProcess] startTime: %llu, endTime: %llu, useTime: %llu", Time2, Time3, Time3 - Time2);
         }
     }
 
