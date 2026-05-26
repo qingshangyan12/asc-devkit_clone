@@ -22,7 +22,7 @@
 
 **图 1**  DataCache内存层次示意图<a name="zh-cn_topic_0000002530021782_fig1161014168448"></a>  
 
-![](../../../figures/DataCacheCleanAndInvalid原理示意图.png)
+![](../../../figures/datacache.png)
 
 如上图所示：
 
