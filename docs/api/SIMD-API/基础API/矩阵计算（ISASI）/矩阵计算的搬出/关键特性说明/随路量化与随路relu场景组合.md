@@ -1,6 +1,6 @@
 # 随路量化与随路relu场景组合<a name="ZH-CN_TOPIC_0000002538071282"></a>
 
-矩阵搬出支持多种随路量化与随路relu的组合，芯片支持的全量场景组合参考下表, 接下来将对下表中的随路量化relu算法逐一介绍。（其中Leaky relu、Prelu、REQ4/VREQ4、QF322S4\_PRE/VQF322S4\_PRE、\(V\)SHIFTS322S16模式 AscendC 待实现）
+矩阵搬出支持多种随路量化与随路relu的组合，芯片支持的全量场景组合参考下表，接下来将对下表中的随路量化relu算法逐一介绍。（其中Leaky relu、Prelu、REQ4/VREQ4、QF322S4\_PRE/VQF322S4\_PRE、\(V\)SHIFTS322S16模式 AscendC 待实现）
 
 <cann-filter npu_type = "A3,910b">
 
@@ -8,16 +8,16 @@
 
 **表 1**  随路量化与随路ReLU的组合表
 
-| quantPre\reluPre | no relu | Nomal relu | Leaky relu | Prelu |
+| quantPre\reluPre | no relu | Normal relu | Leaky relu | Prelu |
 |------------------|---------|------------|------------|-------|
-| &bull; REQ8<br>&bull; DEQF16<br>&bull; QF322B8_PRE<br>&bull; QF322S4_PRE<br>&bull; REQ4 | M1=QUANT_PRE\[31:0\]<br>M2=QUANT_PRE\[31:0\]<br>M1、M2均为量化参数 | M1=QUANT_PRE\[31:0\]<br>M2=0<br>M1为量化参数、M2为Normrelu系数 | M1=QUANT_PRE\[31:0\]<br>M2=LEAKY_ALPHA\[31:0\]<br>M1为量化参数、M2为Leaky relu系数 | M1=QUANT_PRE\[31:0\]<br>M2= ReLU_PRE_ADDR\[i\]\[31:0\]<br>M1为量化参数、M2为Prelu系数，i为原始矩阵的列索引 |
-| &bull; VREQ8<br>&bull; VDEQF16<br>&bull; VQF322B8_PRE<br>&bull; VQF322S4_PRE<br>&bull; VREQ4 | M1=Quant_PRE_ADDR\[i\]\[31:0\]<br>M2=Quant_PRE_ADDR\[i\]\[31:0\]<br>M1、M2均为量化参数，i为原始矩阵的列索引 | M1=Quant_PRE_ADDR\[i\]\[31:0\]<br>M2=0<br>M1为量化参数，M2为normrelu系数，i为原始矩阵的列索引 | M1=Quant_PRE_ADDR\[i\]\[31:0\]<br>M2= LEAKY_ALPHA\[31:0\]<br>M1为量化参数，M2为Leaky relu系数，i为原始矩阵的列索引 | M1=Quant_PRE_ADDR\[i\]\[31:0\]<br>M2= ReLU_PRE_ADDR\[i\]\[31:0\]<br>M1为量化参数、M2为Prelu系数，i为原始矩阵的列索引 |
+| &bull; REQ8<br>&bull; DEQF16<br>&bull; QF322B8_PRE<br>&bull; QF322S4_PRE<br>&bull; REQ4 | M1=QUANT_PRE\[31:0\]<br>M2=QUANT_PRE\[31:0\]<br>M1、M2均为量化参数 | M1=QUANT_PRE\[31:0\]<br>M2=0<br>M1为量化参数、M2为Normal relu系数 | M1=QUANT_PRE\[31:0\]<br>M2=LEAKY_ALPHA\[31:0\]<br>M1为量化参数、M2为Leaky relu系数 | M1=QUANT_PRE\[31:0\]<br>M2=ReLU_PRE_ADDR\[i\]\[31:0\]<br>M1为量化参数、M2为Prelu系数，i为原始矩阵的列索引 |
+| &bull; VREQ8<br>&bull; VDEQF16<br>&bull; VQF322B8_PRE<br>&bull; VQF322S4_PRE<br>&bull; VREQ4 | M1=Quant_PRE_ADDR\[i\]\[31:0\]<br>M2=Quant_PRE_ADDR\[i\]\[31:0\]<br>M1、M2均为量化参数，i为原始矩阵的列索引 | M1=Quant_PRE_ADDR\[i\]\[31:0\]<br>M2=0<br>M1为量化参数，M2为Normal relu系数，i为原始矩阵的列索引 | M1=Quant_PRE_ADDR\[i\]\[31:0\]<br>M2=LEAKY_ALPHA\[31:0\]<br>M1为量化参数，M2为Leaky relu系数，i为原始矩阵的列索引 | M1=Quant_PRE_ADDR\[i\]\[31:0\]<br>M2=ReLU_PRE_ADDR\[i\]\[31:0\]<br>M1为量化参数、M2为Prelu系数，i为原始矩阵的列索引 |
 | SHIFTS322S16 | N=QUANT_PRE\[35:32\]<br>N为量化系数 | N=QUANT_PRE\[35:32\]<br>N为量化系数 | NA | NA |
 | VSHIFTS322S16 | N=Quant_PRE_ADDR\[i\]\[35:32\]<br>N为量化系数，i为原始矩阵的列索引 | N=Quant_PRE_ADDR\[i\]\[35:32\]<br>N为量化系数，i为原始矩阵的列索引 | NA | NA |
 
 </cann-filter>
 
-注：M1为原始数据取值为正数时使用的随路系数，M2为原始数据取值为负数时使用的随路系数，N为右移位数，即量化系数;
+注：M1为原始数据取值为正数时使用的随路系数，M2为原始数据取值为负数时使用的随路系数，N为右移位数，即量化系数；
 
 <cann-filter npu_type = "A3,910b">
 
