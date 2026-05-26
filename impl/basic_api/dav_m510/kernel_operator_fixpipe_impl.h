@@ -80,19 +80,23 @@ __aicore__ inline void SetFixpipePreQuantFlagImpl(uint64_t config)
 }
 
 template <const FixpipeConfig& config>
-__aicore__ inline void SetDeqScalarDepOnMode(QuantMode_t mode, uint64_t deqScalar)
+__aicore__ inline void SetDeqScalarDepOnMode(QuantMode_t mode, uint64_t deqScalar, uint8_t fix_shift_val = 16)
 {
     if constexpr(config.enableFixVal) {
         if (mode == QuantMode_t::DEQF16) {
-            // fix point 1/2^16
-            constexpr uint64_t scalar = 931135488;
+            // float 1.0 = 0x3F800000 (IEEE 754), exponent bits[30:23] = 127
+            // 2^-fix_shift_val: modify exponent to 127 - fix_shift_val
+            constexpr uint16_t shift = 23;
+            constexpr uint64_t mask = 0xFFULL << shift;
+            constexpr uint64_t floatOne = 0x3F800000ULL;
+            uint64_t newExponent = (127 - fix_shift_val) & 0xFF;
+            uint64_t scalar = (floatOne & ~mask) | (newExponent << shift);
             set_quant_pre(scalar);
         } else if (mode == QuantMode_t::REQ8) {
-            // fix point by modify related  bits
             constexpr uint16_t shift = 23;
             constexpr uint64_t mask = 0xFFULL << shift;
             uint64_t originalBits = (deqScalar & mask) >> shift;
-            uint64_t newBits = (originalBits - 16) & 0xFF;
+            uint64_t newBits = (originalBits - fix_shift_val) & 0xFF;
             uint64_t newScalar = (deqScalar & ~mask) | (newBits << shift);
             set_quant_pre(newScalar);
         }
@@ -649,7 +653,11 @@ __aicore__ inline void FixpipeL0C2L1Impl(
     */
     if (IsScalarQuantMode(intriParams.quantPre)) {
         // deq factor of uint64 bits describe: bits[31:13] is deq value of fp32,
+#ifdef ENABLE_FIX_SHIFT
+        SetDeqScalarDepOnMode<config>(intriParams.quantPre, intriParams.deqScalar, intriParams.fix_shift_val);
+#else
         SetDeqScalarDepOnMode<config>(intriParams.quantPre, intriParams.deqScalar);
+#endif
     }
     if (intriParams.preReluMode == ReluMode::NORMAL_RELU || intriParams.preReluMode == ReluMode::NO_RELU) {
         PipeBarrier<PIPE_FIX>();
@@ -734,7 +742,11 @@ __aicore__ inline void FixpipeL0C2UBImpl(
     */
     if (IsScalarQuantMode(intriParams.quantPre)) {
         // deq factor of uint64 bits describe: bits[31:13] is deq value of fp32
+#ifdef ENABLE_FIX_SHIFT
+        SetDeqScalarDepOnMode<config>(intriParams.quantPre, intriParams.deqScalar, intriParams.fix_shift_val); // float32->uint64_t
+#else
         SetDeqScalarDepOnMode<config>(intriParams.quantPre, intriParams.deqScalar); // float32->uint64_t
+#endif
     }
     if (intriParams.preReluMode == ReluMode::NORMAL_RELU || intriParams.preReluMode == ReluMode::NO_RELU) {
         PipeBarrier<PIPE_FIX>();
@@ -816,7 +828,11 @@ __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src,
     2. code gen: move data from l0c to gm
     */
     if (IsScalarQuantMode(intriParams.quantPre)) {
+#ifdef ENABLE_FIX_SHIFT
+        SetDeqScalarDepOnMode<config>(intriParams.quantPre, intriParams.deqScalar, intriParams.fix_shift_val);
+#else
         SetDeqScalarDepOnMode<config>(intriParams.quantPre, intriParams.deqScalar);
+#endif
     }
     if (intriParams.preReluMode == ReluMode::NORMAL_RELU || intriParams.preReluMode == ReluMode::NO_RELU) {
         PipeBarrier<PIPE_FIX>();
