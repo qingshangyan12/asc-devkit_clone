@@ -28,12 +28,12 @@
     {
         ...
         // 4. Configure kernel launch parameters
-        constexpr uint32_t block_num     = 2;   // Number of thread blocks (Grid size)
-        constexpr uint32_t thread_num    = 32;  // Number of threads per block (Block size)
+        constexpr uint32_t blocks_per_grid     = 2;   // Number of thread blocks (Grid size)
+        constexpr uint32_t threads_per_block    = 32;  // Number of threads per block (Block size)
         constexpr uint32_t dyn_ubuf_size = 0;   // No dynamic memory required in this sample
 
         // 5. Launch kernel <<<grid_dim, block_dim, dynamic_memory_size, stream>>>
-        hello_world<<<block_num, thread_num, dyn_ubuf_size, stream>>>();
+        hello_world<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>();
         // Wait for kernel execution to complete
         ...
     }

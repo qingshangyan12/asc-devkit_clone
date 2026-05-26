@@ -65,12 +65,12 @@
             aclrtMemcpy(y_device, total_byte_size, y_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
 
             // Configure kernel launch parameters
-            uint32_t block_num            = 48; // Number of thread blocks (Grid size)
-            uint32_t thread_num_per_block = 256; // Number of threads per block (Block size)
+            uint32_t blocks_per_grid      = 48; // Number of thread blocks (Grid size)
+            uint32_t threads_per_block = 256; // Number of threads per block (Block size)
             uint32_t dyn_ubuf_size        = 0;  // No dynamic memory required in this sample
 
             // Launch kernel <<<grid_dim, block_dim, dynamic_memory_size, stream>>>
-            add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x_device, y_device, z_device, x.size());
+            add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x_device, y_device, z_device, x.size());
 
             // Wait for the add_custom kernel to complete
             aclrtSynchronizeStream(stream);
