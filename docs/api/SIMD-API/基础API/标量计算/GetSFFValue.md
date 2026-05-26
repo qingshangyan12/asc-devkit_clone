@@ -23,7 +23,7 @@
 以如下GetSFFValue调用为例：
 
 ```cpp
-int64_t sffValue = AscendC::GetSFFValue<1>(0x1000000000000010ULL); // 返回4
+int64_t sffValue = AscendC::GetSFFValue<1>(0x1000000000000100ULL); // 返回4
 ```
 
 其计算结果如下图所示：
