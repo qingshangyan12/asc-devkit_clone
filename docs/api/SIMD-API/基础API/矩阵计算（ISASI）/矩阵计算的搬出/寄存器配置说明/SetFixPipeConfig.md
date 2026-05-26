@@ -63,7 +63,7 @@ quantPre和reluPre（pRelu AscendC待实现）必须是Fixpipe Buffer上的Tenso
 完整示例可参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_l0c2gm)。
 
 ```cpp
-__aicore__inline void SetFPC(const LocalTensor <int32_t>& reluPreTensor, const LocalTensor <int32_t>& quantPreTensor)
+__aicore__ inline void SetFPC(const LocalTensor <int32_t>& reluPreTensor, const LocalTensor <int32_t>& quantPreTensor)
 {
  
     AscendC::LocalTensor<uint64_t> workA1 = inQueueDeqA1.AllocTensor<uint64_t>();
@@ -72,7 +72,7 @@ __aicore__inline void SetFPC(const LocalTensor <int32_t>& reluPreTensor, const L
     AscendC::LocalTensor<uint64_t> deqFB = inQueueDeqFB.AllocTensor<uint64_t>(); // deq tensor在Fix上的地址
     uint16_t fbufBurstLen = deqSize / 128;  // l1->fix, burst_len unit is 128Bytes
     AscendC::DataCopyParams dataCopyParams(1, fbufBurstLen, 0, 0);
-    AscendC::DataCopy(deqFB, workA1, dataCopyParams); 通过DataCopy搬入C2PIPE2GM。
+    AscendC::DataCopy(deqFB, workA1, dataCopyParams); // 通过DataCopy搬入C2PIPE2GM。
     AscendC::SetFixPipeConfig(deqFB); // 设置量化tensor
     AscendC::PipeBarrier<PIPE_FIX>();
 }
