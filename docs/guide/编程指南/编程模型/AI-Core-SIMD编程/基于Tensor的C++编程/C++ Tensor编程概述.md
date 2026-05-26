@@ -85,10 +85,10 @@ __global__ __host__ void kfunc() {}
 
 AI Core采用分级存储架构，不同计算单元的编程视角有所差异：**Vector矢量计算**采用「Global Memory → UB → Register」三级层级，**Global Memory**存放输入输出数据，**UB**作为矢量计算数据枢纽，**Register**（Ascend 950PR/Ascend 950DT引入）位于Vector计算单元最内层，具备最低访存延迟与最高带宽；**Cube矩阵计算**采用「Global Memory → L1/L0系列Buffer」两级层级，L1 Buffer、L0A/L0B Buffer、L0C Buffer服务矩阵计算。
 
-C++ Tensor编程将物理内存抽象为Tensor对象，开发者无需直接操作指针，Tensor作为编程接口的载体承载内存操作：
-- **GlobalTensor**：用于存储Global Memory数据，存放算子输入/输出数据，开发者通过SetGlobalBuffer设置地址和大小，可配置L2缓存策略。
-- **LocalTensor**：用于存储片上内存数据，包括UB、L1 Buffer、L0A/L0B/L0C Buffer等，服务于矢量计算和矩阵计算。自Ascend 950PR/Ascend 950DT起，扩展Tensor引入Layout概念，实现编译期类型安全和自动参数推断。
-- **RegTensor**：用于存储寄存器变量（Ascend 950PR/Ascend 950DT引入），是矢量计算的基本存储单元，位宽为VL（Vector Length），可存储VL/sizeof(T)个数据元素。Vector计算单元通过Load-Compute-Store与UB协作。
+C++ Tensor编程将物理内存抽象为Tensor对象，开发者无需直接操作指针，Tensor作为编程接口的载体承载内存操作，携带数据类型、形状、内存位置等属性，搬运计算接口直接操作Tensor对象即可完成数据流转：
+- **GlobalTensor**：用于存储Global Memory数据，作为算子与外部数据交互的门户，开发者通过SetGlobalBuffer设置地址和大小，可配置L2缓存策略。
+- **LocalTensor**：用于存储UB、L1 Buffer、L0A/L0B/L0C Buffer等片上内存数据，承载计算过程中的输入、输出和中间数据。自Ascend 950PR/Ascend 950DT起，扩展Tensor引入Layout概念，实现编译期类型安全和自动参数推断。
+- **RegTensor**：用于存储寄存器变量（Ascend 950PR/Ascend 950DT引入），是矢量计算的基本存储单元，位宽为VL（Vector Length），可存储VL/sizeof(T)个数据元素，配合Load-Compute-Store模式与UB协作完成计算。
 
 > 📌 寄存器可编程能力从**Ascend 950PR/Ascend 950DT**引入，构建三级内存架构，可获得接近峰值的计算性能。
 
