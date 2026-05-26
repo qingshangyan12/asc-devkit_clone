@@ -9,7 +9,7 @@
 */
 #include "alg_data_trans_wrapper.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 namespace {
 
@@ -631,4 +631,4 @@ HcclResult AicpuReduceTemplate(T *dst, u64 dstSize, T *src, u64 srcSize, const H
     return ret;
 }
 
-}  // namespace ops_hccl
+}  // namespace mc2_ops_hccl
