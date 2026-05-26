@@ -99,8 +99,8 @@
 |DEQ8、VDEQ8、DEQ16、VDEQ16|0~31|M|32位数视为float，作为反量化计算所需要乘的值。src为int32_t，dst为int16_t的场景下，变量M不生效。|
 |DEQ8、VDEQ8、DEQ16、VDEQ16|32~35|N|4位比特位，表示范围为[1, 16](b'0000对应表示1， b'1111对应表示16)。<br>当模式为DEQ8、VDEQ8时，MCB标志位置为1时，将输入的值进行右移N比特位。当模式为DEQ16、VDEQ16并且dst数据类型为int16_t时，直接进行N位的右移，不受MCB标志位控制。|
 |DEQ8、VDEQ8、DEQ16、VDEQ16|36|MCB标志位|Mode Control Bit。如果置为0，输入的int32_t会被直接转换为float。如果置为1，输入的int32_t会先右移N比特位，转变成int16_t，然后转换为float。|
-|DEQ8、VDEQ8、DEQ16、VDEQ16|37~45|Offset|9bit的整形数据，在进行反量化src * M的计算结果后与Offset进行相加。仅在DEQ8、VDEQ8模式中会用到。如果不使用offset，请置为0。|
-|DEQ8、VDEQ8、DEQ16、VDEQ16|46|Sign标志位|如果置为1，表明反量化结果是signed(int8)；如果为置为0，表明反量化结果是unsigned(uint8)。仅在DEQ8、VDEQ8模式中会用到。|
+|DEQ8、VDEQ8、DEQ16、VDEQ16|37~45|Offset|9bit的整型数据，在进行反量化src * M的计算结果后与Offset进行相加。仅在DEQ8、VDEQ8模式中会用到。如果不使用offset，请置为0。|
+|DEQ8、VDEQ8、DEQ16、VDEQ16|46|Sign标志位|如果置为1，表明反量化结果是signed(int8)；如果置为0，表明反量化结果是unsigned(uint8)。仅在DEQ8、VDEQ8模式中会用到。|
 |DEQ8、VDEQ8、DEQ16、VDEQ16|47|Relu标志位|如果置为1，对最终结果进行RELU计算；如果置为0，不进行额外计算。<br>&bull; 对于int32_t->int8_t，配置RELU时，offset必须配置成-128；<br>&bull; 对于int32_t->uint8_t，配置RELU时，offset必须配置成0。|
 |DEQ8、VDEQ8、DEQ16、VDEQ16|48~63|-|预留|
 |DEQ、VDEQ|0 ~ 15|M|这16位数被视为half，作为反量化计算需要乘的值。|
