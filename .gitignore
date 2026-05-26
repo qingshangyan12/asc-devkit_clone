@@ -14,4 +14,4 @@ openssl-host-src/
 build_device/
 *.o
 *.log
-
+.trae
