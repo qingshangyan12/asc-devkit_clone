@@ -80,7 +80,7 @@ __aicore__ inline void DataSyncBarrier()
 
 ```cpp
     if (blockIdx == 0) {
-        // 先写入被依赖数据，再通过DataSyncBarrier等待DDR访问完成。
+        // 先写入被依赖数据，再通过DataSyncBarrier等待GM访问完成。
         AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm) + 1, DATA_VALUE);
         // DataSyncBarrier<DDR>阻塞后续GM写，确保上一条GM写对其他核可见。
         AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();

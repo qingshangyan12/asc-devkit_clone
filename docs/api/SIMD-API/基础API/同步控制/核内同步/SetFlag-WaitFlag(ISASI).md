@@ -84,12 +84,10 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| event | 输入 | 模板参数。<br>同步事件，数据类型为HardEvent。详细内容参考下文中的同步类型说明。 |
+| event | 输入 | 模板参数。<br>同步事件，数据类型为HardEvent。同一核内的不同流水之间，在存在数据访问依赖时，需要根据数据访问的先后顺序，插入对应的同步事件。HardEvent用来表示对应的同步事件。HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先执行、目标流水中的指令后执行。例如MTE2\_V，代表PIPE\_MTE2为源流水，PIPE\_V为目标流水，标识从PIPE\_MTE2到PIPE\_V的同步，PIPE\_V等待PIPE\_MTE2。由于硬件架构版本代际间的差异，不同硬件架构上的事件存在差异。 |
 | eventID | 输入 | 事件ID。数据类型为int32_t类型。eventID的取值范围与产品型号有关，具体请参考[约束说明](#section633mcpsimp)。 |
 
-同一核内的不同流水之间，在存在数据访问依赖时，需要根据数据访问的先后顺序，插入对应的同步事件。HardEvent用来表示对应的同步事件。
 
-HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先执行、目标流水中的指令后执行。例如MTE2\_V，代表PIPE\_MTE2为源流水，PIPE\_V为目标流水，标识从PIPE\_MTE2到PIPE\_V的同步，PIPE\_V等待PIPE\_MTE2。由于芯片代际间的差异，不同芯片上的事件会存在差异。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -101,11 +99,26 @@ HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先
 
 - SetFlag和WaitFlag必须成对使用，且SetFlag和WaitFlag的参数必须完全一致（包括模板参数event和输入参数eventID）。如果不匹配，会引发timeout问题。例如，`SetFlag<HardEvent::S_MTE3>(1)`和`WaitFlag<HardEvent::MTE3_MTE1>(1)`并不匹配，因为其模板参数event不同。
 
-- 在**TPipe和TQue编程实践**中，eventID需要通过**AllocEventID**或者**FetchEventID**来获取。
+- 在**使用TPipe和TQue编程方式**时，eventID需要通过**AllocEventID**或者**FetchEventID**来获取。
 
-- 在基于**静态Tensor编程实践**中，事件的类型和事件ID由开发者自行管理，建议使用事件ID0-5，事件ID6用于系统内部规划（当前未使用），事件ID7用于TPipe编程中的**自动同步**功能，目前暂不建议直接使用事件ID6-7。
+- 在使用**静态Tensor编程方式**时，事件的类型和事件ID由开发者自行管理，建议使用事件ID0-5，事件ID6用于系统内部规划（当前未使用），事件ID7用于TPipe编程中的**自动同步**功能，目前暂不建议直接使用事件ID6-7。
 
-- eventID的取值范围如下：<br><cann-filter npu-type="950">&bull; Ascend 950PR/Ascend 950DT，数据范围为：0-7</cann-filter><br><cann-filter npu-type="A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7</cann-filter><br><cann-filter npu-type="910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7</cann-filter><br><cann-filter npu-type="310p">&bull; Atlas 推理系列产品AI Core，数据范围为：0-7</cann-filter><br><cann-filter npu-type="910">&bull; Atlas 训练系列产品，数据范围为：0-3</cann-filter>
+- eventID的取值范围如下：
+<cann-filter npu-type="950">
+    - Ascend 950PR/Ascend 950DT，数据范围为：0-7
+</cann-filter>
+<cann-filter npu-type="A3">
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7
+</cann-filter>
+<cann-filter npu-type="910b">
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7
+</cann-filter>
+<cann-filter npu-type="310p">
+    - Atlas 推理系列产品AI Core，数据范围为：0-7
+</cann-filter>
+<cann-filter npu-type="910">
+    - Atlas 训练系列产品，数据范围为：0-3
+</cann-filter>
 
 ## 调用示例<a name="section837496171220"></a>
 
@@ -113,8 +126,8 @@ HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先
     AscendC::DataCopy(src1Local, src1Global[i * tileLength], tileLength);
     AscendC::DataCopy(src0Local, src0Global[i * tileLength], tileLength);
     
-    // 循环内依赖：先“DataCopy(PIPE_MTE2)写src0Local”，后 “Maxs和Mins（PIPE_V）读src0Local”
-    // 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步
+    // 循环内依赖：先“DataCopy(PIPE_MTE2)写src0Local”，后“Maxs和Mins（PIPE_V）读src0Local”。
+    // 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步。
     AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
