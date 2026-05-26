@@ -53,16 +53,16 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| `atomCopy` | 输入 | 搬运原子对象。L1 Buffer到L0B Buffer通路可通过`MakeCopy(CopyL12L0B{})`或`MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{})`构造。 |
-| `dst` | 输出 | 目的张量，存储位置必须为`Location::L0B`，即L0B Buffer。目的地址需要满足L0B Buffer的分形和对齐约束。 |
-| `src` | 输入 | 源张量，存储位置必须为`Location::L1`，即L1 Buffer。源地址需要满足L1 Buffer的分形和对齐约束。 |
+| atomCopy | 输入 | 搬运原子对象。L1 Buffer到L0B Buffer通路可通过`MakeCopy(CopyL12L0B{})`或`MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{})`构造。 |
+| dst | 输出 | 目的张量，存储位置必须为`Location::L0B`，即L0B Buffer。目的地址需要满足L0B Buffer的分形和对齐约束。 |
+| src | 输入 | 源张量，存储位置必须为`Location::L1`，即L1 Buffer。源地址需要满足L1 Buffer的分形和对齐约束。 |
 
 **表2** `MakeCopy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| `copyOperation` | 输入 | 搬运操作对象。L1 Buffer到L0B Buffer通路使用`CopyL12L0B{}`。 |
-| `copyTrait` | 输入 | 搬运Trait对象，用于指定搬运特性。L1 Buffer到L0B Buffer默认Trait使用`CopyL12L0BTraitDefault{}`。 |
+| copyOperation | 输入 | 搬运操作对象。L1 Buffer到L0B Buffer通路使用`CopyL12L0B{}`。 |
+| copyTrait | 输入 | 搬运Trait对象，用于指定搬运特性。L1 Buffer到L0B Buffer默认Trait使用`CopyL12L0BTraitDefault{}`。 |
 
 ## 返回值说明
 
@@ -75,110 +75,6 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 `fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`half`、`bfloat16_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`float`。
 
 源张量和目的张量的数据类型需要保持一致。
-
-## API映射关系
-
-与built-in接口映射关系：
-
-非转置搬运接口是在built-in接口`asc_copy_l12l0b`的基础上进行抽象封装实现的，其对应的底层built-in接口为：
-
-```cpp
-__aicore__ inline void asc_copy_l12l0b(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ half* dst, __cbuf__ half* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ float* dst, __cbuf__ float* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ int16_t* dst, __cbuf__ int16_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ int32_t* dst, __cbuf__ int32_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ int8_t* dst, __cbuf__ int8_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ uint16_t* dst, __cbuf__ uint16_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ uint32_t* dst, __cbuf__ uint32_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ uint8_t* dst, __cbuf__ uint8_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ int4b_t* dst, __cbuf__ int4b_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-```
-
-转置搬运接口是在built-in接口`asc_copy_l12l0b_transpose`的基础上进行抽象封装实现的，其对应的底层built-in接口为：
-
-```cpp
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ half* dst, __cbuf__ half* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ float* dst, __cbuf__ float* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ int16_t* dst, __cbuf__ int16_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ int32_t* dst, __cbuf__ int32_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ int8_t* dst, __cbuf__ int8_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ uint16_t* dst, __cbuf__ uint16_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ uint32_t* dst, __cbuf__ uint32_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ uint8_t* dst, __cbuf__ uint8_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ int4b_t* dst, __cbuf__ int4b_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_l12l0b_transpose(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src,
-    uint16_t m_start_position, uint16_t k_start_position,
-    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
-```
 
 ## 约束说明
 
@@ -195,7 +91,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ fp4x2_e1m2_t* dst, __cbu
 
 当源张量和目的张量数据格式均为`ZN`时，接口按非转置方式从L1 Buffer搬运到L0B Buffer。
 
-![非转置搬运示意图](../figures/notranspose.png)
+![非转置搬运示意图](../../../../../figures/notranspose.png)
 
 ### 转置搬运
 
@@ -205,19 +101,19 @@ __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ fp4x2_e1m2_t* dst, __cbu
 
 #### b4转置搬运
 
-![b4转置搬运示意图](../figures/transpose_b4.png)
+![b4转置搬运示意图](../../../../../figures/transpose_b4.png)
 
 #### b8转置搬运
 
-![b8转置搬运示意图](../figures/transpose_b8.png)
+![b8转置搬运示意图](../../../../../figures/transpose_b8.png)
 
 #### b16转置搬运
 
-![b16转置搬运示意图](../figures/transpose_b16.png)
+![b16转置搬运示意图](../../../../../figures/transpose_b16.png)
 
 #### b32转置搬运
 
-![b32转置搬运示意图](../figures/transpose_b32.png)
+![b32转置搬运示意图](../../../../../figures/transpose_b32.png)
 
 ## 调用示例
 
