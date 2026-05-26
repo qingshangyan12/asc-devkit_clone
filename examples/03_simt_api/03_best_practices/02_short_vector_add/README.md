@@ -52,19 +52,23 @@ short_vector_add
 
 **表1 AI Core 性能指标字段说明表**
 
-|         字段名         | 字段含义                                            |
-|:-------------------:|:------------------------------------------------|
-|  Task Duration(μs)  | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。         |
-|  aiv_total_cycles   | Task在 Vector Core上执行所消耗的CPU周期（Cycle）总数。         |
-|      aiv_time       | Task在AI Vector Core上的理论执行时间，单位为μs。              |
-|  aiv_vec_time(μs)   | vec类型指令（向量类运算指令）耗时，单位μs。                        |
-|    aiv_vec_ratio    | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。      |
-| aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位μs。                     |
-|  aiv_scalar_ratio   | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。   |
-|  aiv_mte2_time(μs)  | mte2类型指令（GM->UB搬运类指令）耗时，单位μs。                   |
-|   aiv_mte2_ratio    | mte2类型指令（GM->UB搬运类指令）的cycle数在total cycle数中的占用比。 |
-|  aiv_mte3_time(μs)  | mte3类型指令（UB->GM搬运类指令）耗时，单位μs。                   |
-|   aiv_mte3_ratio    | mte3类型指令（UB->GM搬运类指令）的cycle数在total cycle数中的占用比。 |
+|             字段名             | 字段含义                                             |
+|:---------------------------:|:-------------------------------------------------|
+|      Task Duration(μs)      | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。          |
+|      aiv_total_cycles       | Task在 Vector Core上执行所消耗的CPU周期（Cycle）总数。          |
+|          aiv_time           | Task在AI Vector Core上的理论执行时间，单位为μs。               |
+|      aiv_vec_time(μs)       | vec类型指令（向量类运算指令）耗时，单位μs。                         |
+|        aiv_vec_ratio        | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。       |
+|     aiv_scalar_time(μs)     | scalar类型指令（标量类运算指令）耗时，单位μs。                      |
+|      aiv_scalar_ratio       | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。    |
+|      aiv_mte2_time(μs)      | mte2类型指令（GM->UB搬运类指令）耗时，单位μs。                    |
+|       aiv_mte2_ratio        | mte2类型指令（GM->UB搬运类指令）的cycle数在total cycle数中的占用比。  |
+|      aiv_mte3_time(μs)      | mte3类型指令（UB->GM搬运类指令）耗时，单位μs。                    |
+|       aiv_mte3_ratio        | mte3类型指令（UB->GM搬运类指令）的cycle数在total cycle数中的占用比。  |
+|      aiv_read_hit_rate      | 读cache命中率（所在文件：L2Cache.csv）。                     |
+|     aiv_write_hit_rate      | 写cache命中率（所在文件：L2Cache.csv）。                          |
+| aiv_main_mem_read_bw(GB/s)  | 主存储器读取其他所有单元数据时，对应的total cycle的带宽速率（所在文件：Memory.csv）。 |
+| aiv_main_mem_write_bw(GB/s) | 主存储器写入其他所有单元数据时，对应的total cycle的带宽速率（所在文件：Memory.csv）。 |
 
 本章节性能数据在Ascend 950系列产品上运行得到。
 
@@ -98,23 +102,22 @@ __global__ void add(T* x, T* y, T* z, uint64_t size)
 
 **性能数据**：
 
-| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:-----------------:|:------------:|:----------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:--------------:|:-----------------:|:--------------:|
-|       1.811       |    1.549     |      103434      |      0.818       |     0.529     |        0.711        |      0.459       |       0.006       |     0.004      |       0.002       |     0.001      |
+| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio | aiv_read_hit_rate | aiv_write_hit_rate | aiv_main_mem_read_bw(GB/s) | aiv_main_mem_write_bw(GB/s) |
+|:-----------------:|:------------:|:----------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:--------------:|:-----------------:|:--------------:|:-----------------:|:------------------:|:--------------------------:|:---------------------------:|
+|      86.478       |    86.217    |     8832432      |      85.735      |     0.995     |        0.47         |      0.005       |       0.004       |       0        |       0.001       |      0         |         0         |       0.493        |            7.77            |            6.24             |
 
-<p align="center">
-  <img src="figures/memory_bound.png" width="1000">
-</p>
+
 **性能数据分析**：
 
-- 端到端耗时：**1.810 us**
-- cycle总数：**103,434**
-- 性能分析：每个线程处理 2 字节数据，访存指令密度极大，硬件调度器忙于处理密集的标量指令，导致 Scalar Ratio（45.9%）较高。
+- 端到端耗时：**86.478 us**
+- 写Cache命中率：**49.3%**
+- 读写带宽：**7.77(GB/s) | 6.24(GB/s)**
+- 性能分析：Add算子进行简单的X+Y=Z，在回写结果时命中率低于50%，说明写操作被阻塞超过50%，触发额外的内存回读，被判定位写未命中。一般原因为数据未对齐或者数据类型小导致Warp不能填满。
 
 **性能优化建议**：
 > 💡 **引入half2类型**
 >
-> 对于16位half类型的数据，底层指令支持一次完成两个数据的计算，可以提高数据计算效率。
+> 对于16位half类型的数据，底层指令支持一次完成两个数据的计算，可以提高数据计算效率，也可以减少for循环这种scalar指令次数。
 
 ---
 
@@ -158,22 +161,44 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 
 **性能数据**：
 
-| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:-----------------:|:------------:|:----------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:--------------:|:-----------------:|:--------------:|
-|       1.805       |    1.536     |      102540      |      0.809       |     0.527     |        0.708        |       0.46       |       0.006       |     0.004      |       0.002       |     0.001      |
+| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio | aiv_read_hit_rate | aiv_write_hit_rate | aiv_main_mem_read_bw(GB/s) | aiv_main_mem_write_bw(GB/s) |
+|:-----------------:|:------------:|:----------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:--------------:|:-----------------:|:--------------:|:-----------------:|:------------------:|:--------------------------:|:---------------------------:|
+|      45.371       |    45.111    |     4584309      |      44.582      |     0.988     |        0.517        |      0.011       |       0.004       |       0        |       0.001       |       0        |         0         |       0.891        |           14.51            |            7.25             |
 
 **优化效果分析**：
 
-- 端到端耗时：微降至**1.804 μs**
-- cycle总数：：微降至**102,539**
-- 性能分析：逻辑优化了，调度未优化，总任务量由于向量化其实只需要32核就能算完，前32个核使用half2跑快了，但剩下的32个核进进入后无实际操作（执行了
-  idx >= size/2）就退出。
+- 端到端耗时：**45.371 us**
+- 写Cache命中率：**89.1%**
+- 读写带宽：**14.51(GB/s) | 7.25(GB/s)**
 
-**性能优化建议**：
-> 💡 **避免空耗**
->
-> 由于依然启动了 64 个 Block，硬件调度器必须经历 64 次启动和退出流程。空跑核产生的“管理费”抵消了 half2
-> 带来的“效率红利”，下一步执行核数减半。
+**原理说明**：  
+在 SIMT 编程模型下，外围访存的 Cacheline 颗粒度固定为 128B。
+
+- Case 0（标量 half）：不满行导致 RMW 写放大  
+  使用标量half（2B）。单个Warp（32线程）同时发射指令时，在空间上连续拼出的总宽度仅为：  
+  $$
+  32 * 2B = 64B
+  $$
+  这个 64B 仅占了Cacheline 的半行， L2 Cache 为了保护相邻的 64B 不被改写，硬件被迫启动了低效的RMW（Read-Modify-Write，读-修改-写）：
+  1. Read（读）：卡住当前写入操作，从存储中将整行 128B 的旧数据读进 L2 Cache
+  2. Modify（修改）：在缓存内部，把刚传过来的 64B 新数据缝合进去
+  3. Write（写）：把一整行 128B 写回
+
+
+- 在Case 1中，改用向量化类型 half2（4B）。单个Warp（32线程）单次发射写入的总宽度达到：
+  $$
+  32 * 4B = 128B
+  $$
+  这个宽度覆盖了一整行物理 Cacheline 的边界。避免Read-Modify的代价，写 Cache 命中率因此暴涨至 89.1%。
+  
+  此外，因为单次发射就能拿回并填满一整行Cacheline物理边界的有效数据，总线传输效率达到最大化。在同样的物理拉取周期下，读带宽由 7.77 GB/s 拉升至 14.51 GB/s，硬件潜能得到了释放。
+
+
+**最终性能总结**：
+- **耗时**：从**86.478 μs**骤降至**45.371 μs**，耗时减少了**47.5%**，换算整体性能提升达**1.91**倍。
+- **cycles数**：CPU总周期数从**8,832,432**减至**4,584,309**，降幅达**48.1%**，证明指令发射密度得到精简。
+- **写Cache命中率**：从**49.3%**提升到**89.1%**，避免写阻塞。
+- **主存读写带宽**：读写带宽均有提升，其中读带宽提升**86.7%**，从**7.77 GB/s**到**14.51 GB/s**，提升访存密集型算子对带宽的利用。
 
 ---
 
@@ -241,7 +266,7 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 
 ## 性能数据获取
 
-使用 `msprof` 工具获取详细性能数据：
+- 使用 `msprof` 工具获取端到端详细性能数据：
 
 ```bash
 msprof ./demo   # 分析性能
@@ -265,4 +290,31 @@ PROF_xxxx_XXXXXX
 ```
 # 查看Task Duration 以及各项数据
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+```
+
+- 使用 `msprof` 工具获取单个组件上的性能数据：
+
+```bash
+msprof op ./demo   # 分析case的性能
+```
+
+命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+
+```text
+├──dump                       # 原始的性能数据，用户无需关注
+├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+├──L2Cache.csv                # L2 Cache命中率
+├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+├──OpBasicInfo.csv            # 算子基础信息
+├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+├──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
+└──visualize_data.bin         # MindStudio Insight呈现文件
+```
+查看具体的性能分析结果：
+
+```
+# 如查看L2 Cache相关数据
+cat ./OPPROF_*/L2Cache.csv
 ```
