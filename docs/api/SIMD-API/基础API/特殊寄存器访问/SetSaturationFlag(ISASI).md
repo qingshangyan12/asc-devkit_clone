@@ -16,7 +16,7 @@
 
 ## 功能说明
 
-头文件路径为: "basic_api/kernel_operator_common_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
 
 设置饱和开关的标志位，来使能计算/精度转换时的饱和模式。
 

@@ -16,7 +16,7 @@
 
 ## 功能说明
 
-头文件路径为： `"basic_api/kernel_operator_sys_var_intf.h"`。
+头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。
 
 获取当前逻辑AI Core的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。
 
