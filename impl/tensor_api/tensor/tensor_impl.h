@@ -204,8 +204,6 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
 {
     static_assert(IsHardwareMemV<Iterator>::value,
         "MakeTensor expects the first argument to be a hardware memory pointer or iterator");
-    static_assert(!(IsHardwareMemV<Args>::value && ...),
-        "MakeTensor expects layout arguments after the first argument");
     return MakeTensorBuilder<Iterator>{}(iter, args...);
 }
 
