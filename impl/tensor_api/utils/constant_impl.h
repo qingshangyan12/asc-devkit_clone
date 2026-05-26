@@ -202,23 +202,6 @@ struct EmptyGenerator<N, Std::index_sequence<Idx...>>
     using type = Std::tuple<Std::Int<Idx * 0>...>;
 };
 
-template <size_t N>
-struct TupleEmptyGenerator
-{   
-    static_assert((N > 0 && (N & 1) == 0), "N must be greater than 0, and must be even.");
-    using type = Std::tuple<typename EmptyGenerator<N / 2>::type, 
-        typename EmptyGenerator<N / 2>::type>;
-};
-
-template <size_t N>
-using EmptyShape = typename TupleEmptyGenerator<N>::type;
-
-template <size_t N>
-using EmptyStride = typename TupleEmptyGenerator<N>::type;
-
-template <size_t N>
-using EmptyCoord = typename TupleEmptyGenerator<N>::type;
-
 // IsIntegralConstant
 template <typename T>
 struct IsIntegralConstant : Std::false_type {};
