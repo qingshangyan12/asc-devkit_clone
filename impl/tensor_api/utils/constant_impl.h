@@ -193,15 +193,6 @@ constexpr size_t C0_SIZE = GetC0Size<T>();
 template<typename T>
 constexpr size_t C0_ELEMENT = C0_SIZE<T> / sizeof(T);
 
-template <size_t N, typename = Std::make_index_sequence<N>>
-struct EmptyGenerator;
-
-template <size_t N, size_t... Idx>
-struct EmptyGenerator<N, Std::index_sequence<Idx...>>
-{   
-    using type = Std::tuple<Std::Int<Idx * 0>...>;
-};
-
 // IsIntegralConstant
 template <typename T>
 struct IsIntegralConstant : Std::false_type {};
