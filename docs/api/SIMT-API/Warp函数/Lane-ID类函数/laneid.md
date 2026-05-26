@@ -47,7 +47,7 @@ int32_t laneid()
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         int32_t lane_id = laneid();
-        if(lane_id mod 2) {
+        if(lane_id % 2) {
             z[idx] = x[idx] + y[idx];
         } else {
             z[idx] = x[idx] - y[idx];
@@ -62,7 +62,7 @@ int32_t laneid()
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         int32_t lane_id = laneid();
-        if(lane_id mod 2) {
+        if(lane_id % 2) {
             z[idx] = x[idx] + y[idx];
         } else {
             z[idx] = x[idx] - y[idx];
