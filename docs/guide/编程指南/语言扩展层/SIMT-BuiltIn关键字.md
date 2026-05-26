@@ -158,27 +158,12 @@
 
     -   功能说明
 
-        获取线程在其线程束内的索引。
+        获取线程在其线程束内的索引，当前一个线程束中的线程数量为固定值32，故laneid的取值范围为[0, 31]。
     
     -   函数原型
 
         ```
         int32_t laneid()
-        ```
-    -   返回值说明
-
-        线程在其线程束内的索引，当前一个线程束中的线程数量为固定值32，故laneid的取值范围为[0, 31]。
-
-    -   约束说明
-
-        无
-
-    -   需要包含的头文件
-
-        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
-
-        ```
-        #include "simt_api/device_functions.h"
         ```
 
     -   调用示例 
@@ -197,201 +182,102 @@
             }
         }
         ```
--   lanemask_eq
+-   线程掩码相关函数
+
+    **表 2**  线程掩码相关函数
+        <table>
+        <thead align="left">
+            <tr id="row8153550597">
+            <th class="cellrowborder" valign="top" width="20%" id="mcps1.2.3.1.1">
+                <p id="p13153175175919"><a name="p13153175175919"></a><a name="p13153175175919"></a>函数</p>
+            </th>
+            <th class="cellrowborder" valign="top" width="30%" id="mcps1.2.3.1.2">
+                <p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>函数原型</p>
+            </th>
+            <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.3">
+                <p id="p101530520596"><a name="p101530520596"></a><a name="p101530520596"></a>功能</p>
+            </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="row01531535911">
+            <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1">
+                <p id="p201531053591"><a name="p201531053591"></a><a name="p201531053591"></a>lanemask_eq</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="30%" headers="mcps1.2.3.1.2">
+                <p id="p1615335185910"><a name="p1615335185910"></a><a name="p1615335185910"></a>int32_t lanemask_eq()</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.3">
+                <p id="p1715335185911"><a name="p1715335185911"></a><a name="p1715335185911"></a>
+                提供当前线程的一个32位掩码，在当前线程所属的线程束中，只有当前线程所在的 lane 位被置为1，其余位为0。<br>
+                如laneid为0的线程，其lanemask_eq为0000 0000 0000 0000 0000 0000 0000 0001<br>
+                如laneid为31的线程，其lanemask_eq为1000 0000 0000 0000 0000 0000 0000 0000
+                </p>
+            </td>
+            </tr>
+            <tr id="row41539515592">
+            <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1">
+                <p id="p1215375195913"><a name="p1215375195913"></a><a name="p1215375195913"></a>lanemask_le</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="30%" headers="mcps1.2.3.1.2">
+                <p id="p18153125145914"><a name="p18153125145914"></a><a name="p18153125145914"></a>int32_t lanemask_le()</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.3">
+                <p id="p19153125145915"><a name="p19153125145915"></a><a name="p19153125145915"></a>
+                提供当前线程的一个32位掩码，在当前线程所属的线程束中，将 “laneid小于等于当前线程” 的线程的对应位设为1，其余位为0。<br>
+                如laneid为0的线程，其lanemask_eq为0000 0000 0000 0000 0000 0000 0000 0001<br>
+                如laneid为31的线程，其lanemask_eq为1111 1111 1111 1111 1111 1111 1111 1111
+                </p>
+            </td>
+            </tr>
+            <tr id="row11153115165911">
+            <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1">
+                <p id="p14153257595"><a name="p14153257595"></a><a name="p14153257595"></a>lanemask_lt</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="30%" headers="mcps1.2.3.1.2">
+                <p id="p115315510596"><a name="p115315510596"></a><a name="p115315510596"></a>int32_t lanemask_lt()</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.3">
+                <p id="p215315510597"><a name="p215315510597"></a><a name="p215315510597"></a>
+                提供当前线程的一个32位掩码，在当前线程所属的线程束中，将 “laneid严格小于当前线程” 的线程的对应位设为1，其余位为0。<br>
+                如laneid为0的线程，其lanemask_eq为 0000 0000 0000 0000 0000 0000 0000 0000<br>
+                如laneid为31的线程，其lanemask_eq为 0111 1111 1111 1111 1111 1111 1111 1111
+                </p>
+            </td>
+            </tr>
+            <tr id="row51533515591">
+            <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1">
+                <p id="p815315165914"><a name="p815315165914"></a><a name="p815315165914"></a>lanemask_ge</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="30%" headers="mcps1.2.3.1.2">
+                <p id="p71539519590"><a name="p71539519590"></a><a name="p71539519590"></a>int32_t lanemask_ge()</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.3">
+                <p id="p81539519591"><a name="p81539519591"></a><a name="p81539519591"></a>
+                提供当前线程的一个32位掩码，在当前线程所属的线程束中，将 “laneid大于等于当前线程” 的线程的对应位设为1，其余位为0。<br>
+                如laneid为0的线程，其lanemask_eq为 1111 1111 1111 1111 1111 1111 1111 1111<br>
+                如laneid为31的线程，其lanemask_eq为 1000 0000 0000 0000 0000 0000 0000 0000
+                </p>
+            </td>
+            </tr>
+            <tr id="row61539515601">
+            <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1">
+                <p id="p91539515611"><a name="p91539515611"></a><a name="p91539515611"></a>lanemask_gt</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="30%" headers="mcps1.2.3.1.2">
+                <p id="p101539515622"><a name="p101539515622"></a><a name="p101539515622"></a>int32_t lanemask_gt()</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.3">
+                <p id="p111539515633"><a name="p111539515633"></a><a name="p111539515633"></a>
+                提供当前线程的一个32位掩码，在当前线程所属的线程束中，将 “laneid严格大于当前线程” 的线程的对应位设为1，其余位为0。<br>
+                如laneid为0的线程，其lanemask_eq为 1111 1111 1111 1111 1111 1111 1111 1110<br>
+                如laneid为31的线程，其lanemask_eq为 0000 0000 0000 0000 0000 0000 0000 0000
+                </p>
+            </td>
+            </tr>
+        </tbody>
+        </table>
 
-    -   功能说明
-
-        提供一个32位掩码，在当前线程所属的线程束中，只有当前线程所在的 lane 位被置为1，其余位为0。
-
-        ![](../../figures/lanemask_eq图示.png)
-    
-    -   函数原型
-
-        ```
-        int32_t lanemask_eq()
-        ```
-    -   返回值说明
-
-        返回一个32位无符号整数的位掩码。
-
-    -   约束说明
-
-        无
-
-    -   需要包含的头文件
-
-        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
-
-        ```
-        #include "simt_api/device_functions.h"
-        ```
-
-    -   调用示例 
-
-        SIMT编程场景：
-
-        ```
-        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
-        {
-            int32_t lanemask = lanemask_eq();
-        }
-        ```
--   lanemask_le
-
-    -   功能说明
-
-        提供一个32位掩码，在当前线程所属的线程束中，将 “laneid小于等于当前线程” 的线程的对应位设为1，其余位为0。
-
-        ![](../../figures/lanemask_le图示.png)
-
-    -   函数原型
-
-        ```
-        int32_t lanemask_le()
-        ```
-    -   返回值说明
-
-        返回一个32位无符号整数的位掩码。
-
-    -   约束说明
-
-        无
-
-    -   需要包含的头文件
-
-        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
-
-        ```
-        #include "simt_api/device_functions.h"
-        ```
-
-    -   调用示例 
-
-        SIMT编程场景：
-
-        ```
-        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
-        {
-            int32_t lanemask = lanemask_le();
-        }
-        ```
--   lanemask_lt
-
-    -   功能说明
-
-        提供一个32位掩码，在当前线程所属的线程束中，将 “laneid严格小于当前线程” 的线程的对应位设为1，其余位为0。
-
-        ![](../../figures/lanemask_lt图示.png)
-
-    -   函数原型
-
-        ```
-        int32_t lanemask_lt()
-        ```
-    -   返回值说明
-
-        返回一个32位无符号整数的位掩码。
-
-    -   约束说明
-
-        无
-
-    -   需要包含的头文件
-
-        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
-
-        ```
-        #include "simt_api/device_functions.h"
-        ```
-
-    -   调用示例 
-
-        SIMT编程场景：
-
-        ```
-        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
-        {
-            int32_t lanemask = lanemask_lt();
-        }
-        ```
--   lanemask_ge
-
-    -   功能说明
-
-        提供一个32位掩码，在当前线程所属的线程束中，将 “laneid大于等于当前线程” 的线程的对应位设为1，其余位为0。。
-
-        ![](../../figures/lanemask_ge图示.png)
-
-    -   函数原型
-
-        ```
-        int32_t lanemask_ge()
-        ```
-    -   返回值说明
-
-        返回一个32位无符号整数的位掩码。
-
-    -   约束说明
-
-        无
-
-    -   需要包含的头文件
-
-        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
-
-        ```
-        #include "simt_api/device_functions.h"
-        ```
-
-    -   调用示例 
-
-        SIMT编程场景：
-
-        ```
-        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
-        {
-            int32_t lanemask = lanemask_ge();
-        }
-        ```
--   lanemask_gt
-
-    -   功能说明
-
-        提供一个32位掩码，在当前线程所属的线程束中，将 “laneid严格大于当前线程” 的线程的对应位设为1，其余位为0。。
-
-        ![](../../figures/lanemask_gt图示.png)
-
-    -   函数原型
-
-        ```
-        int32_t lanemask_gt()
-        ```
-    -   返回值说明
-
-        返回一个32位无符号整数的位掩码。
-
-    -   约束说明
-
-        无
-
-    -   需要包含的头文件
-
-        使用该接口需要包含"simt\_api/device\_functions.h"头文件。
-
-        ```
-        #include "simt_api/device_functions.h"
-        ```
-
-    -   调用示例 
-
-        SIMT编程场景：
-
-        ```
-        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
-        {
-            int32_t lanemask = lanemask_gt();
-        }
-        ```
 ## 内置数据类型<a name="section1835494915576"></a>
 
 目前提供了一系列适用于Device侧的数据类型，包括标量和短向量。短向量是由多个元素组成的简单向量。
@@ -1320,11 +1206,11 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
         最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表。
 
-        **表 6**  \_\_maxnreg\_\_的每个Thread最多可分配的寄存器数与Thread数量
+        **表 6**  \_\_maxnreg\_\_的每个Thread最多可分配的寄存器数与用户可配置的Thread的范围
 
         <table><thead align="left"><tr id="row8153550597"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p13153175175919"><a name="p13153175175919"></a><a name="p13153175175919"></a>单个线程最多可分配的寄存器数量(个)</p>
         </th>
-        <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>Thread的个数(个)</p>
+        <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>用户可配置的Thread的范围(个)</p>
         </th>
         </tr>
         </thead>
@@ -1356,4 +1242,4 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
         ```
         __simt_vf__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
         ```
-注：统一函数不能同时有\_\_launch\_bounds\_\_和 \_\_maxnreg\_\_。\_\_launch\_bounds\_\_或 \_\_maxnreg\_\_只能被标在\_\_simt_vf\_\_函数上（pure simt模式下的\_\_global\_\_函数）。
+注：统一函数不能同时有\_\_launch\_bounds\_\_和 \_\_maxnreg\_\_。\_\_launch\_bounds\_\_或 \_\_maxnreg\_\_只能被标在\_\_simt_vf\_\_函数上（simt模式下的\_\_global\_\_函数）。
