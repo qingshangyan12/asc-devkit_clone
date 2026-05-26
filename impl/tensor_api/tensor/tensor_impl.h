@@ -191,6 +191,7 @@ template <typename Arg0, typename... Args>
             static_assert(sizeof...(Args) != sizeof...(Args), 
                 "MakeTensor expected a hardware memory pointer and data structure like Layout or Shape and Stride");
         }
+    }
 };
 
 template <typename Iterator, typename... Args>
