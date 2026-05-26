@@ -204,6 +204,7 @@ __aicore__ inline void CheckReduceRepeatSumParams(const LocalTensor<T>& dst, con
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckReduceRepeatCommonParams<T, U>(dst, src, repeatTime, "ReduceRepeat");
 #endif
+
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride, "WholeReduceSum")) {
