@@ -65,7 +65,7 @@
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - 指定路径 install_path，安装CANN软件包
+  - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
