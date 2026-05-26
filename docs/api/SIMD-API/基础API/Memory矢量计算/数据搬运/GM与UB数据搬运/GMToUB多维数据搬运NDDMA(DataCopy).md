@@ -20,9 +20,6 @@
 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。
 
 ## 函数原型<a name="section1954364615315"></a>
-
-- Global Memory-\> Local Memory ，支持多维度搬运
-
     ```
     template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params)
