@@ -27,7 +27,6 @@
 
 namespace AscendC {
 namespace Te {
-template <typename PtrPattern, typename Pointer>
 
 using Std::Int;
 using Std::_0;
