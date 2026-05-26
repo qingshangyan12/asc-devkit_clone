@@ -265,6 +265,13 @@ struct WelfordFinalizePara {
 -   不支持源操作数与目的操作数地址重叠。
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
 
+对于Ascend 950PR/Ascend 950DT芯片版本，存在以下约束：
+-   接口参数para.abLength的取值必须为32/sizeof\(float\)的整数倍。
+-   接口参数para.headCountLength与para.tailCountLength的和必须等于参数para.abLength。
+-   接口处理逻辑以参数para中设置的具体参数值为准，不依赖源操作数的shape信息。
+-   不支持源操作数与目的操作数地址重叠。
+-   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
+
 ## 调用示例<a name="section94691236101419"></a>
 
 ```
