@@ -14,6 +14,8 @@
 
 ## 功能说明
 
+头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。
+
 该接口用于获取SSBuffer的基地址。
 
 ## 函数原型

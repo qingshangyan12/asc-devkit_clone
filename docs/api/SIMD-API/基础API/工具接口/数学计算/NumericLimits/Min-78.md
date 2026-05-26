@@ -14,6 +14,8 @@
 
 ## 功能说明
 
+头文件路径为：`"basic_api/kernel_operator_limits_intf.h"`。
+
 返回指定数据类型的最小有限值。
 
 Ascend 950PR/Ascend 950DT，支持的数据类型为：int8\_t、uint8\_t、int16\_t、uint16\_t、half、bfloat16\_t、int32\_t、uint32\_t、float。

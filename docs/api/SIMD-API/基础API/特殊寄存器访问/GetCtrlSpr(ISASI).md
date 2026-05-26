@@ -14,6 +14,8 @@
 
 ## 功能说明
 
+头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
+
 读取CTRL寄存器（控制寄存器）特定比特位上的值。
 
 ## 函数原型
@@ -47,4 +49,3 @@ CTRL寄存器对应比特位上的值。
 ```cpp
 int64_t valueCtrlAfterSet = AscendC::GetCtrlSpr<48, 48>();
 ```
-
