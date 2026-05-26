@@ -192,6 +192,9 @@ TEST_F(TEST_ASC_PLATFORM_API, test_CceConfBase_1)
     EXPECT_EQ(conf->AcquireL0BSize(), 32);
     EXPECT_EQ(conf->AcquireL0CSize(), 32);
     EXPECT_EQ(conf->AcquireCubeVectorSplitFlag(), "true");
+
+    conf->SetOptionalSocVersion("Ascend350");
+    EXPECT_STREQ(conf->GetSocVersion().c_str(), "Ascend350");
 }
 
 TEST_F(TEST_ASC_PLATFORM_API, test_CceConfBase_2)
