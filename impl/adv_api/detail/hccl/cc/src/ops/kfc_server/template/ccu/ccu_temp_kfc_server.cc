@@ -69,6 +69,7 @@ HcclResult CcuTempKfcServer::KernelRun(const OpParam& param,
                                        TemplateResource& templateResource)
 {
     (void)templateResource;
+    // TODO：这边的参数怎么计算
     // templateDataParams与templateResource需要在前面配置，taskArg值传递需要对齐
     buffInfo_ = templateDataParams.buffInfo;
     uint64_t syncAddr = PointerToAddr(buffInfo_.syncAddr);

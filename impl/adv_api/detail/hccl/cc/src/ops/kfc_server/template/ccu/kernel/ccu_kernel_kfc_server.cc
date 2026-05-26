@@ -52,9 +52,9 @@ HcclResult CcuKernelKfcServer::InitResource()
     return HcclResult::HCCL_SUCCESS;
 }
 
-void LoadArgs()
+void CcuKernelKfcServer ::LoadArgs()
 {
-    Load(syncAddr_);
+    Load(syncAddr_);            // TODO：里面参数类型的转换
     Load(paramAddr_);
     Load(token_);
     Load(dieNum_);
@@ -62,7 +62,7 @@ void LoadArgs()
     Load(missionIndex_);
 }
 
-void CcuKernelKfcServer::SetCommAddr(CcuRep::Variable syncAddr)
+void CcuKernelKfcServer::SetCommAddr(ccu::Variable syncAddr)
 {
     waitAddr_ = syncAddr;
     if (syncAddr > (UINT64_MAX - CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE)) {
@@ -71,18 +71,19 @@ void CcuKernelKfcServer::SetCommAddr(CcuRep::Variable syncAddr)
     recordAddr_ = syncAddr + CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE; // 偏移8轮的总宽度
 }
 
-void CcuKernelKfcServer::SetDieNum(CcuRep::Variable dieNum)
+void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 {
     // 参数合法值判断
+    uint64_t =                              //从ccu::Variable中取数据
     bool isDieNumValid = (dieNum == SINGLE_DIE || dieNum == DOUBLE_DIE);
-    bool isDieIdValid  = (GetDieId() == DIE0_ID || GetDieId() == DIE1_ID);
+    bool isDieIdValid  = (GetDieId() == DIE0_ID || GetDieId() == DIE1_ID);          //TODO GetDieId()
     if (!(isDieNumValid && isDieIdValid)) {
         // THROW<InvalidParamsException>("MC2 High Level API SetDieNum Failed: Invalid Die Config"); //TODO:添加打印
     }
 
     if (dieNum == DOUBLE_DIE) { // 双Die场景才需要导入导出
         // 导出信号
-        exportDieSig_ = CreateMaskSignal();
+        exportDieSig_ = CreateMaskSignal();             //TODO
         // Die0: export完成信号给Die1，Die1: export开始信号给Die0
         const string &exportSigLabel = (GetDieId() == DIE1_ID) ? DIE1_START_SIG : DIE1_END_SIG;
         ExportMaskSignal(exportDieSig_, exportSigLabel);
@@ -93,7 +94,7 @@ void CcuKernelKfcServer::SetDieNum(CcuRep::Variable dieNum)
     }
 }
 
-void Mc2ContextBase::SetMissionNumAndId(CcuRep::Variable miNum, CcuRep::Variable miIndex)
+void CcuKernelKfcServer::SetMissionNumAndId(ccu::Variable miNum, ccu::Variable miIndex)
 {
     if (missionIndex_ >= miNum) {
         THROW<InvalidParamsException>("MC2 High Level API SetMissionNumAndId Failed: Invalid Mission Config");
@@ -127,10 +128,10 @@ void Mc2ContextBase::SetMissionNumAndId(CcuRep::Variable miNum, CcuRep::Variable
 HcclResult CcuKernelKfcServer::Algorithm()
 {
     InitResource();
-    LoadArgs();
-    SetCommAddr(syncAddr_);
-    SetDieNum(dieNum_);
-    SetMissionNumAndId(missionNum_, missionIndex_);
+    LoadArgs();                                 // TODO：数据类型
+    SetCommAddr(syncAddr_);                     // TODO
+    SetDieNum(dieNum_);                         //TODO
+    SetMissionNumAndId(missionNum_, missionIndex_); //TODO
     if (missionIndex_ == 0) {
         Mc2KfcServer server;
         server.GenCircularQueue(); // 这里需要做0卡判断，走不同逻辑
@@ -144,42 +145,42 @@ HcclResult CcuKernelKfcServer::Algorithm()
 void Mc2KfcServer::GenCircularQueue()
 {
     // 控制<repeat循环执行条件>的寄存器
-    CcuRep::Variable repeatCond = CreateVariable();
+    ccu::Variable repeatCond = CreateVariable();
     repeatCond = 0;
 
     // <轮次执行开始信号>的寄存器
-    CcuRep::Variable turnStartSig = CreateVariable();
+    ccu::Variable turnStartSig = CreateVariable();
     turnStartSig = 0;
-    CcuRep::Variable turnEndSig = CreateVariable();
+    ccu::Variable turnEndSig = CreateVariable();
     turnEndSig = 1;
 
-    CcuRep::Variable waitStartAddr = CreateVariable();
+    ccu::Variable waitStartAddr = CreateVariable();
     waitStartAddr = waitAddr_;
-    CcuRep::Variable recordStartAddr = CreateVariable();
+    ccu::Variable recordStartAddr = CreateVariable();
     recordStartAddr = recordAddr_;
-    CcuRep::Variable paramStartAddr = CreateVariable();
+    ccu::Variable paramStartAddr = CreateVariable();
     paramStartAddr = paramAddr_;
-    CcuRep::Variable waitAddr = CreateVariable();
+    ccu::Variable waitAddr = CreateVariable();
     waitAddr = waitAddr_;
-    CcuRep::Variable recordAddr = CreateVariable();
+    ccu::Variable recordAddr = CreateVariable();
     recordAddr = recordAddr_;
-    CcuRep::Variable paramAddr = CreateVariable();
+    ccu::Variable paramAddr = CreateVariable();
     paramAddr = paramAddr_;
 
-    CcuRep::Variable ckeSize = CreateVariable();
+    ccu::Variable ckeSize = CreateVariable();
     ckeSize = CCU_ONE_PARAM_SIZE;
-    CcuRep::Variable paramSize = CreateVariable();
+    ccu::Variable paramSize = CreateVariable();
     paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
 
-    CcuRep::Variable queueIdx = CreateVariable();
+    ccu::Variable queueIdx = CreateVariable();
     queueIdx = 0;
-    CcuRep::Variable queueEnd = CreateVariable();
+    ccu::Variable queueEnd = CreateVariable();
     queueEnd = CCU_TASK_NUM_MAX;
-    CcuRep::Variable one = CreateVariable();
+    ccu::Variable one = CreateVariable();
     one = 1;
 
     // 存放<每轮算子参数>的寄存器
-    ccu::Array<CcuRep::Variable> param(CCU_PARAM_NUM_PER_DIE);
+    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
 
     CCU_WHILE(repeatCond == 0)
     {
@@ -194,7 +195,7 @@ void Mc2KfcServer::GenCircularQueue()
         WaitTurnStartSig(waitAddr, turnStartSig);
 
         // 读取本轮参数
-        LoadFuncParamFromMemory(paramAddr, param);  //TODO:paramAddr这个参数是通信算子(如ALLTOALL的)？
+        LoadFuncParamFromMemory(paramAddr, param);
 
         MissionPreSync(param[HBM_PARAM_IDX_0]);
 
@@ -203,7 +204,7 @@ void Mc2KfcServer::GenCircularQueue()
             CCU_BREAK;
         }
 
-        hcomm::CcuRep::Variable opType;
+        hcomm::ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
             ccu::callFunc<CcuKernelAlltoAllMesh1D>(param, token);   //给通信算子自己解析
@@ -226,14 +227,12 @@ void Mc2KfcServer::GenCircularQueue()
     }
 }
 
-void Mc2KfcServer::WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::Variable &turnStartSig)
+void Mc2KfcServer::WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartSig)
 {
     const uint32_t getDieId = DIE0_ID;          // WAIT
     if (dieNum_ == SINGLE_DIE) {
         CCU_WHILE(turnStartSig != 1)
         {
-            // Done:原来LoadVariable()里面是两个CcuRep::Variable入参
-            // 现在Load有几个版本：Load(Variable addrVar, Variable v)，Load(uint64_t addr, Variable v)
             Load(hbmSigAddr, turnStartSig);
         }
         turnStartSig = 0;
@@ -246,17 +245,14 @@ void Mc2KfcServer::WaitTurnStartSig(const CcuRep::Variable &hbmSigAddr, CcuRep::
             }
             turnStartSig = 0;
             Store(turnStartSig, hbmSigAddr);
-            // TODO:原来的LocalCtxPost(const CcuRep::MaskSignal &sig, uint32_t mask)
-            // EventRecord(const char *notifyTag, uint16_t mask = 1);
-            // 即原来的CcuRep::MaskSignal能不能等效替换为const char*
             EventRecord(importDieSig_, 1);
         } else if (getDieId == DIE1_ID) {
-            EventWait(exportDieSig_, 1);        // TODO:同上
+            EventWait(exportDieSig_, 1);
         }
     }
 }
 
-void Mc2KfcServer::SetTurnEndSig(const CcuRep::Variable &hbmSigAddr, const CcuRep::Variable &turnEndSig)
+void Mc2KfcServer::SetTurnEndSig(const ccu::Variable &hbmSigAddr, const ccu::Variable &turnEndSig)
 {
     const uint32_t getDieId = DIE0_ID;          // WAIT
     if (dieNum_ == SINGLE_DIE) {
@@ -271,11 +267,11 @@ void Mc2KfcServer::SetTurnEndSig(const CcuRep::Variable &hbmSigAddr, const CcuRe
     }
 }
 
-void Mc2KfcServer::LoadFuncParamFromMemory(CcuRep::Variable &paramAddr, array<CcuRep::Variable, CCU_PARAM_NUM_PER_DIE> &param)
+void Mc2KfcServer::LoadFuncParamFromMemory(ccu::Variable &paramAddr, array<ccu::Variable, CCU_PARAM_NUM_PER_DIE> &param)
 {
-    CcuRep::Variable doubleDie = CreateVariable();
+    ccu::Variable doubleDie = CreateVariable();
     doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
-    CcuRep::Variable addr = CreateVariable();
+    ccu::Variable addr = CreateVariable();
     addr = paramAddr;
     const uint32_t getDieId = DIE0_ID;          // WAIT
     if (dieNum_ == DOUBLE_DIE && getDieId == DIE1_ID) {
@@ -287,17 +283,17 @@ void Mc2KfcServer::LoadFuncParamFromMemory(CcuRep::Variable &paramAddr, array<Cc
 void Mc2SlaveKfcServer::GenCircularQueue()
 {
     // 算子签名
-    CcuRep::Variable signature = CreateVariable();
+    ccu::Variable signature = CreateVariable();
 
     // 存放《控制repeat循环执行的条件》的寄存器
-    CcuRep::Variable repeatCond = CreateVariable();
+    ccu::Variable repeatCond = CreateVariable();
     repeatCond                  = 0;
 
-    CcuRep::Variable paramAddr = CreateVariable();
+    ccu::Variable paramAddr = CreateVariable();
     paramAddr = paramAddr_;
 
     // 存放<每轮算子参数>的寄存器
-    ccu::Array<CcuRep::Variable> param(CCU_PARAM_NUM_PER_DIE);
+    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
 
     CCU_WHILE(repeatCond == 0)
     {
@@ -311,8 +307,8 @@ void Mc2SlaveKfcServer::GenCircularQueue()
         }
 
         // 读取本轮参数
-        LoadFuncParamFromMemory(paramAddr, param);  //TODO:paramAddr这个参数是通信算子(如ALLTOALL的)？
-        hcomm::CcuRep::Variable opType;
+        LoadFuncParamFromMemory(paramAddr, param);
+        hcomm::ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
             ccu::callFunc<CcuKernelAlltoAllMesh1D>(param, token);   //给通信算子自己解析
@@ -322,7 +318,7 @@ void Mc2SlaveKfcServer::GenCircularQueue()
     }
 }
 
-void CcuKernelKfcServer::MissionPreSync(CcuRep::Variable &func)
+void CcuKernelKfcServer::MissionPreSync(ccu::Variable &func)
 {
     if (missionNum_ == 1) {
         return;
@@ -332,7 +328,6 @@ void CcuKernelKfcServer::MissionPreSync(CcuRep::Variable &func)
             LocalCtxPostVar(func, importMissionVar_[i], importMissionSig_[i]);    // TODO：这里怎么改
         }
     } else {
-        // DONE,单个入参版本EventWait(const char *notifyTag, uint16_t mask = 1)
         EventWait(exportMissoinSig_[0]);
         func = exportMissionVar_[0];
     }
@@ -345,11 +340,9 @@ void CcuKernelKfcServer::MissionPostSync()
     }
     if (missionIndex_ == 0) {
         for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
-            // DONE,单个入参版本EventWait(const char *notifyTag, uint16_t mask = 1)
             EventWait(exportMissoinSig_[i]);
         }
     } else {
-        //DONE，单个入参版本EventRecord(const char *notifyTag, uint16_t mask = 1)
         EventRecord(importMissionSig_[0]);
     }
 }
