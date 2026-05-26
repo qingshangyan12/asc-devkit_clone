@@ -68,10 +68,19 @@ HcclResult CcuTempKfcServer::KernelRun(const OpParam& param,
                                        const TemplateDataParams& templateDataParams,
                                        TemplateResource& templateResource)
 {
-    (void)templateDataParams;
     (void)templateResource;
+    // templateDataParams与templateResource需要在前面配置，taskArg值传递需要对齐
+    buffInfo_ = templateDataParams.buffInfo;
+    uint64_t syncAddr = PointerToAddr(buffInfo_.syncAddr);
+    uint64_t paramAddr = PointerToAddr(buffInfo_.paramAddr);
+    uint64_t dieNum = templateDataParams.dieNum;
+    uint64_t missionNum = templateDataParams.missionNum;
+    uint64_t missionIndex = templateDataParams.missionIndex;
+    uint64_t token;
+    CHK_RET(GetToken(buffInfo_, token));
 
-    std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgKfcServer>( );  //TODO：参数待填
+    std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgKfcServer>(
+        syncAddr, paramAddr, dieNum, missionNum, missionIndex, token);
     void* taskArgPtr = static_cast<void*>(taskArg.get());
     HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr);
 

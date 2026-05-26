@@ -681,9 +681,6 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
             param.opType, param.algTag);
         HcclResult ccuRet = GetAlgResCcu(comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo,
             resCtxSequence, size);
-        if (ccuRet == HCCL_E_UNAVAIL) {
-            return HCCL_E_UNAVAIL;
-        }
         HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] after GetAlgResCcu, ret[%d], ctxSize[%llu], "
             "resCtxSequence[%p].", ccuRet, size, *resCtxSequence);
         CHK_RET(ccuRet);
