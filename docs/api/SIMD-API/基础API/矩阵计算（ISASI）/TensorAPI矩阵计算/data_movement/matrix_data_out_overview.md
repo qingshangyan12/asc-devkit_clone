@@ -5,7 +5,7 @@
 针对Ascend 950PR/Ascend 950DT：
 
 **图1** 矩阵计算搬出整体流程图<a name="zh-cn_topic_0000002542682989_fig7998719163213"></a>
-![](../figures/fixpipe_overall_flowchart-66.png "fixpipe整体流程图-66")
+![](../../../../../figures/fixpipe_overall_flowchart-66.png "fixpipe整体流程图-66")
 
 **表1** **数据通路与存储层级**
 
