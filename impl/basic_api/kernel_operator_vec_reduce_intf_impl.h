@@ -140,6 +140,7 @@ __aicore__ inline void ReduceDataBlockCommon(const LocalTensor<U>& dst, const Lo
         CheckMaskArray<SrcPrimType, isSetMask>(mask, "ReduceDataBlock");
     }
 #endif
+
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     // BlockReduceMax/Min/Sum is same in CheckFunVecReduceOther，
