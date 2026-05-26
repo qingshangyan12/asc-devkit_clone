@@ -28,10 +28,7 @@
 #include "thread.h"
 #include "aicpu_ts_thread.h"
 
-extern "C" {
-extern int32_t HcommQueryThreadSqTail(ThreadHandle thread, uint32_t *tail);
-extern int32_t HcommWaitThreadSqHeadReach(ThreadHandle thread, uint32_t targetTail, uint32_t timeout);
-}
+#include "hcomm_primitives_dl.h"
 
 using namespace HcclApi;
 namespace {

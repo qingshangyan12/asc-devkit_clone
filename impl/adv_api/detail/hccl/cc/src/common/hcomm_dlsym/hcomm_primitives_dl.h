@@ -22,6 +22,8 @@ DECL_WEAK_FUNC(int32_t, HcommThreadSynchronize, ThreadHandle thread);
 DECL_WEAK_FUNC(int32_t, HcommSendRequest, uint64_t handle, const char* msgTag, const void* src, size_t sizeByte, uint32_t* msgId);
 DECL_WEAK_FUNC(int32_t, HcommWaitResponse, uint64_t handle, void* dst, size_t sizeByte, uint32_t* msgId);
 DECL_WEAK_FUNC(HcclResult, HcommThreadJoin, ThreadHandle thread, uint32_t timeout);
+DECL_WEAK_FUNC(int32_t, HcommQueryThreadSqTail, ThreadHandle thread, uint32_t *tail);
+DECL_WEAK_FUNC(int32_t, HcommWaitThreadSqHeadReach, ThreadHandle thread, uint32_t targetTail, uint32_t timeout);
 
 void HcommPrimitivesDlInit(void* libHcommHandle);  // 本模块独立初始化
 
