@@ -35,20 +35,22 @@ class GlobalTensor;
 template <typename T>
 class LocalTensor;
 
+namespace Te {
+
 template <typename EngineType, typename LayoutType>
 struct TensorAttribute {};
 
-namespace Te {
+template <typename T>
+struct BaseTensor {};
 
-template <typename LocationType, typename EngineType, typename LayoutType>
+template <typename LocationType, typename TensorType>
 struct MakeTensorResult {
     using type = typename Std::conditional<Std::is_same_v<LocationType, Location::GM>,
-        AscendC::GlobalTensor<TensorAttribute<EngineType, LayoutType>>,
-        AscendC::LocalTensor<TensorAttribute<EngineType, LayoutType>>>::type;
+        AscendC::GlobalTensor<TensorType>, AscendC::LocalTensor<TensorType>>::type;
 };
 
 template <typename EngineType, typename LayoutType>
-struct BaseTensor {
+struct BaseTensor<TensorAttribute<EngineType, LayoutType>> {
     using iterator = typename EngineType::iterator;
     using valueType = typename EngineType::valueType;
     using elementType = typename EngineType::elementType;
@@ -156,7 +158,8 @@ private:
         const SliceEngine& sliceEngine, const SliceLayout& sliceLayout)
     {
         using Location = GetMemLocation<SliceEngine>;
-        using ResultTensor = typename MakeTensorResult<Location, SliceEngine, SliceLayout>::type;
+        using AttrTensor = TensorAttribute<SliceEngine, SliceLayout>;
+        using ResultTensor = typename MakeTensorResult<Location, AttrTensor>::type;
         return ResultTensor{sliceEngine, sliceLayout};
     }
 
@@ -172,30 +175,26 @@ struct IsAttrTensor<TensorType<TensorAttribute<Engine, Layout>>> : Std::true_typ
 template <typename T>
 constexpr bool IsAttrTensorV = IsAttrTensor<Std::remove_cvref_t<T>>::value;
 
-// tensor construction
-template <typename T, typename = void>
-struct HasDereference : Std::false_type {};
-
-template <typename T>
-struct HasDereference<T, void_t<decltype(*Std::declval<T&>())>> : Std::true_type {};
-
 template <typename T>
 struct MakeTensorBuilder {
 template <typename Arg0, typename... Args>
     __aicore__ inline constexpr auto operator()(const Arg0& arg0, const Args&... args) const {
-        if constexpr (HasDereference<Arg0>::value) {
-            using Engine = ViewEngine<Arg0>;
-            if constexpr (sizeof...(Args) == 1 && (IsLayoutV<Args> && ...)) {
-                using Layout = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
-                using Location = GetMemLocation<Engine>;
-                using ResultTensor = typename MakeTensorResult<Location, Engine, Layout>::type;
-                return ResultTensor{Engine{arg0}, args...};
-            } else {
-                using Layout = decltype(MakeLayout(args...));
-                using Location = GetMemLocation<Engine>;
-                using ResultTensor = typename MakeTensorResult<Location, Engine, Layout>::type;
-                return ResultTensor{Engine{arg0}, MakeLayout(args...)};
-            }
+        using Engine = ViewEngine<Arg0>;
+        if constexpr (sizeof...(Args) == 1 && (IsLayoutV<Args> && ...)) {
+            using Layout = typename Std::tuple_element<0, Std::tuple<Args...>>::type;
+            using AttrTensor = TensorAttribute<Engine, Layout>;
+            using Location = GetMemLocation<Engine>;
+            using ResultTensor = typename MakeTensorResult<Location, AttrTensor>::type;
+            return ResultTensor{Engine{arg0}, args...};
+        } else if constexpr (sizeof...(Args) == 2 && (Std::is_tuple_v<Std::remove_cvref_t<Args>> && ...)) {
+            using Layout = decltype(MakeLayout(args...));
+            using AttrTensor = TensorAttribute<Engine, Layout>;
+            using Location = GetMemLocation<Engine>;
+            using ResultTensor = typename MakeTensorResult<Location, AttrTensor>::type;
+            return ResultTensor{Engine{arg0}, MakeLayout(args...)};
+        } else {
+            static_assert(sizeof...(Args) != sizeof...(Args),
+                "MakeTensor expected a hardware memory pointer and data structure like Layout or Shape and Stride");
         }
     }
 };
@@ -203,10 +202,8 @@ template <typename Arg0, typename... Args>
 template <typename Iterator, typename... Args>
 __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args)
 {
-    static_assert(HasDereference<Iterator>::value,
-        "MakeTensor expects the first argument to be a memory pointer or iterator");
-    static_assert(!(HasDereference<Args>::value && ...),
-        "MakeTensor expects layout arguments after the first argument");
+    static_assert(IsHardwareMemPtrV<Iterator>,
+        "MakeTensor expects the first argument to be a hardware memory pointer or iterator");
     return MakeTensorBuilder<Iterator>{}(iter, args...);
 }
 
