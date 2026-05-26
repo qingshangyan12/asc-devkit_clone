@@ -90,7 +90,7 @@
 
     动态内存的实际内存大小需要在核函数启动时配置，具体内容请参考[核函数配置](#section97005415463)。
 
-## 内置变量<a name="section13165113520576"></a>
+## 内置变量/函数<a name="section13165113520576"></a>
 
 -   dim3<a name="li1136665405"></a>
 
@@ -150,12 +150,139 @@
 -   warpSize
 
     运行时变量，表示一个线程束（warp）中的线程数量，当前为固定值32。
+    
+
+当前提供了以下函数，用于获取线程在其线程束（Warp）内的索引与掩码：
+
+-   laneid
+
+    -   功能说明
+
+        获取线程在其线程束内的索引，当前一个线程束中的线程数量为固定值32，故laneid的取值范围为[0, 31]。
+    
+    -   函数原型
+
+        ```
+        int32_t laneid()
+        ```
+
+    -   调用示例 
+
+        SIMT编程场景：
+
+        ```
+        __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
+        {
+            int idx = threadIdx.x + blockIdx.x * blockDim.x;
+            int32_t lane_id = laneid();
+            if(lane_id % 2) {
+                z[idx] = x[idx] + y[idx];
+            } else {
+                z[idx] = x[idx] - y[idx];
+            }
+        }
+        ```
+-   当前提供了以下线程掩码相关函数，用于获取线程在当前线程数中的掩码。
+
+    **表 2**  线程掩码相关函数
+        <table>
+        <thead align="left">
+            <tr id="row8153550597">
+            <th class="cellrowborder" valign="top" width="20%" id="mcps1.2.3.1.1">
+                <p id="p13153175175919"><a name="p13153175175919"></a><a name="p13153175175919"></a>函数</p>
+            </th>
+            <th class="cellrowborder" valign="top" width="30%" id="mcps1.2.3.1.2">
+                <p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>函数原型</p>
+            </th>
+            <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.3">
+                <p id="p101530520596"><a name="p101530520596"></a><a name="p101530520596"></a>功能</p>
+            </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="row01531535911">
+            <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1">
+                <p id="p201531053591"><a name="p201531053591"></a><a name="p201531053591"></a>lanemask_eq</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="30%" headers="mcps1.2.3.1.2">
+                <p id="p1615335185910"><a name="p1615335185910"></a><a name="p1615335185910"></a>int32_t lanemask_eq()</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.3">
+                <p id="p1715335185911"><a name="p1715335185911"></a><a name="p1715335185911"></a>
+                提供当前线程的一个32位掩码，在当前线程所属的线程束中，只有当前线程所在的 lane 位被置为1，其余位为0。<br>
+                如laneid为0的线程，其lanemask_eq为0000 0000 0000 0000 0000 0000 0000 0001。<br>
+                如laneid为31的线程，其lanemask_eq为1000 0000 0000 0000 0000 0000 0000 0000。
+                </p>
+            </td>
+            </tr>
+            <tr id="row41539515592">
+            <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1">
+                <p id="p1215375195913"><a name="p1215375195913"></a><a name="p1215375195913"></a>lanemask_le</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="30%" headers="mcps1.2.3.1.2">
+                <p id="p18153125145914"><a name="p18153125145914"></a><a name="p18153125145914"></a>int32_t lanemask_le()</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.3">
+                <p id="p19153125145915"><a name="p19153125145915"></a><a name="p19153125145915"></a>
+                提供当前线程的一个32位掩码，在当前线程所属的线程束中，将 “laneid小于等于当前线程” 的线程的对应位设为1，其余位为0。<br>
+                如laneid为0的线程，其lanemask_le为0000 0000 0000 0000 0000 0000 0000 0001。<br>
+                如laneid为31的线程，其lanemask_le为1111 1111 1111 1111 1111 1111 1111 1111。
+                </p>
+            </td>
+            </tr>
+            <tr id="row11153115165911">
+            <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1">
+                <p id="p14153257595"><a name="p14153257595"></a><a name="p14153257595"></a>lanemask_lt</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="30%" headers="mcps1.2.3.1.2">
+                <p id="p115315510596"><a name="p115315510596"></a><a name="p115315510596"></a>int32_t lanemask_lt()</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.3">
+                <p id="p215315510597"><a name="p215315510597"></a><a name="p215315510597"></a>
+                提供当前线程的一个32位掩码，在当前线程所属的线程束中，将 “laneid严格小于当前线程” 的线程的对应位设为1，其余位为0。<br>
+                如laneid为0的线程，其lanemask_lt为 0000 0000 0000 0000 0000 0000 0000 0000。<br>
+                如laneid为31的线程，其lanemask_lt为 0111 1111 1111 1111 1111 1111 1111 1111。
+                </p>
+            </td>
+            </tr>
+            <tr id="row51533515591">
+            <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1">
+                <p id="p815315165914"><a name="p815315165914"></a><a name="p815315165914"></a>lanemask_ge</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="30%" headers="mcps1.2.3.1.2">
+                <p id="p71539519590"><a name="p71539519590"></a><a name="p71539519590"></a>int32_t lanemask_ge()</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.3">
+                <p id="p81539519591"><a name="p81539519591"></a><a name="p81539519591"></a>
+                提供当前线程的一个32位掩码，在当前线程所属的线程束中，将 “laneid大于等于当前线程” 的线程的对应位设为1，其余位为0。<br>
+                如laneid为0的线程，其lanemask_ge为 1111 1111 1111 1111 1111 1111 1111 1111。<br>
+                如laneid为31的线程，其lanemask_ge为 1000 0000 0000 0000 0000 0000 0000 0000。
+                </p>
+            </td>
+            </tr>
+            <tr id="row61539515601">
+            <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1">
+                <p id="p91539515611"><a name="p91539515611"></a><a name="p91539515611"></a>lanemask_gt</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="30%" headers="mcps1.2.3.1.2">
+                <p id="p101539515622"><a name="p101539515622"></a><a name="p101539515622"></a>int32_t lanemask_gt()</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.3">
+                <p id="p111539515633"><a name="p111539515633"></a><a name="p111539515633"></a>
+                提供当前线程的一个32位掩码，在当前线程所属的线程束中，将 “laneid严格大于当前线程” 的线程的对应位设为1，其余位为0。<br>
+                如laneid为0的线程，其lanemask_gt为 1111 1111 1111 1111 1111 1111 1111 1110。<br>
+                如laneid为31的线程，其lanemask_gt为 0000 0000 0000 0000 0000 0000 0000 0000。
+                </p>
+            </td>
+            </tr>
+        </tbody>
+        </table>
 
 ## 内置数据类型<a name="section1835494915576"></a>
 
 目前提供了一系列适用于Device侧的数据类型，包括标量和短向量。短向量是由多个元素组成的简单向量。
 
-**表 2**  标量数据类型
+**表 3**  标量数据类型
 
 <a name="table114921244133211"></a>
 <table><tbody><tr id="row11523124473213"><td class="cellrowborder" valign="top" width="7.5200000000000005%"><p id="p356595195817"><a name="p356595195817"></a><a name="p356595195817"></a>类型</p>
@@ -497,7 +624,7 @@
 </tbody>
 </table>
 
-**表 3**  短向量数据类型
+**表 4**  短向量数据类型
 
 <a name="table13856144241"></a>
 <table><tbody><tr id="row585151414242"><td class="cellrowborder" valign="top" width="60.39%"><p id="p98514141249"><a name="p98514141249"></a><a name="p98514141249"></a>数据类型</p>
@@ -619,7 +746,7 @@
 
 SIMT编程提供了一系列运算符，用于执行数学运算。以下是支持的运算符列表。
 
-**表 4**  SIMT编程支持的运算符列表
+**表 5**  SIMT编程支持的运算符列表
 
 <a name="table11745172843710"></a>
 <table><thead align="left"><tr id="row874617286370"><th class="cellrowborder" valign="top" width="11.75%" id="mcps1.2.8.1.1"><p id="p774672811375"><a name="p774672811375"></a><a name="p774672811375"></a>类别</p>
@@ -1019,50 +1146,105 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
 在执行函数之前，会先对上述配置参数进行校验。如果grid\_dim或block\_dim超出设备的最大允许规模，或dynamic\_smem\_bytes超过分配静态内存后剩余的可用共享内存，该函数将会执行失败。
 
-在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程和线程块驻留在AI处理器上，从而提升性能。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
+一个内核所使用的寄存器数量会显著影响常驻线程束的数量。寄存器使用量可以通过编译器选项 \_\_launch\_bounds\_\_\(\) 限定符或 \_\_maxnreg\_\_\(\) 限定符来控制。
+
+在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程驻留在AI处理器上。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
 -   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
   
-    函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定SIMT VF启动的最大线程数。若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。参数N需要满足：
+    函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定SIMT VF启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动VF任务的dim3线程数保持一致。
+    
+    **表 6**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
+
+    <a name="table1715318510594"></a>
+    <table><thead align="left"><tr id="row8153550597"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p13153175175919"><a name="p13153175175919"></a><a name="p13153175175919"></a>Thread的个数(个)</p>
+    </th>
+    <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>每个Thread可用寄存器个数(个)</p>
+    </th>
+    </tr>
+    </thead>
+    <tbody><tr id="row01531535912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p201531053591"><a name="p201531053591"></a><a name="p201531053591"></a>1025~2048</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1615335185910"><a name="p1615335185910"></a><a name="p1615335185910"></a>16</p>
+    </td>
+    </tr>
+    <tr id="row415395155912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1215375195913"><a name="p1215375195913"></a><a name="p1215375195913"></a>513~1024</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p18153125145914"><a name="p18153125145914"></a><a name="p18153125145914"></a>32</p>
+    </td>
+    </tr>
+    <tr id="row11153115165910"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14153257595"><a name="p14153257595"></a><a name="p14153257595"></a>257~512</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p115315510596"><a name="p115315510596"></a><a name="p115315510596"></a>64</p>
+    </td>
+    </tr>
+    <tr id="row515335155914"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p815315165914"><a name="p815315165914"></a><a name="p815315165914"></a>1~256</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p71539519590"><a name="p71539519590"></a><a name="p71539519590"></a>127</p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+
+    配置SIMT函数最大线程数为512，每个Thread可用寄存器数为64，示例如下：
+
+    ```
+    __simt_vf__ __launch_bounds__(512) inline void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+    ```
+    \_\_launch\_bounds\_\_\(N\)的参数N需要满足：
     -   N \>= dimx \* dimy \* dimz；dimx，dimy，dimz为表示线程的dim3结构体。
     -   N的取值范围为1到2048。
+    -   若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。
 
-        最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动VF任务的dim3线程数保持一致。
+为了支持底层性能调优，编译器提供了\_\_maxnreg\_\_\(\)函数限定符，用于向后端优化编译器传递性能调优意图。该限定符直接限定了单个线程在一个线程块内最多可分配的寄存器数量。应用程序可以通过在\_\_global\_\_函数定义中使用 \_\_maxnreg\_\_\(\) 限定符来限制单个线程在一个
+线程块内最多可分配的寄存器数量，这同时也属于可选配置。
 
-        **表 5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
+-   \_\_maxnreg\_\_\(N\) <a name="li23861114618"></a>
 
-        <a name="table1715318510594"></a>
-        <table><thead align="left"><tr id="row8153550597"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p13153175175919"><a name="p13153175175919"></a><a name="p13153175175919"></a>Thread的个数(个)</p>
-        </th>
-        <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>每个Thread可用寄存器个数(个)</p>
-        </th>
-        </tr>
-        </thead>
-        <tbody><tr id="row01531535912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p201531053591"><a name="p201531053591"></a><a name="p201531053591"></a>1025~2048</p>
-        </td>
-        <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1615335185910"><a name="p1615335185910"></a><a name="p1615335185910"></a>16</p>
-        </td>
-        </tr>
-        <tr id="row415395155912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1215375195913"><a name="p1215375195913"></a><a name="p1215375195913"></a>513~1024</p>
-        </td>
-        <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p18153125145914"><a name="p18153125145914"></a><a name="p18153125145914"></a>32</p>
-        </td>
-        </tr>
-        <tr id="row11153115165910"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14153257595"><a name="p14153257595"></a><a name="p14153257595"></a>257~512</p>
-        </td>
-        <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p115315510596"><a name="p115315510596"></a><a name="p115315510596"></a>64</p>
-        </td>
-        </tr>
-        <tr id="row515335155914"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p815315165914"><a name="p815315165914"></a><a name="p815315165914"></a>1~256</p>
-        </td>
-        <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p71539519590"><a name="p71539519590"></a><a name="p71539519590"></a>127</p>
-        </td>
-        </tr>
-        </tbody>
-        </table>
+    函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定单个线程在一个线程块内最多可分配的寄存器数量。每个线程可用的最大寄存器数量对用户可配置的Thread数量有限制，具体对应关系请见下表。
 
-        配置SIMT函数最大线程数为512，示例如下：
+    **表 7**  \_\_maxnreg\_\_的每个Thread最多可分配的寄存器数与用户可配置的Thread的范围
 
-        ```
-        __simt_vf__ __launch_bounds__(512) inline void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
-        ```
+    <table><thead align="left"><tr id="row8153550597"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p13153175175919"><a name="p13153175175919"></a><a name="p13153175175919"></a>单个线程最多可分配的寄存器数量(个)</p>
+    </th>
+    <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>用户可配置的Thread的范围(个)</p>
+    </th>
+    </tr>
+    </thead>
+    <tbody><tr id="row01531535912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p201531053591"><a name="p201531053591"></a><a name="p201531053591"></a>16</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1615335185910"><a name="p1615335185910"></a><a name="p1615335185910"></a>1025~2048</p>
+    </td>
+    </tr>
+    <tr id="row415395155912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1215375195913"><a name="p1215375195913"></a><a name="p1215375195913"></a>32</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p18153125145914"><a name="p18153125145914"></a><a name="p18153125145914"></a>513~1024</p>
+    </td>
+    </tr>
+    <tr id="row11153115165910"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14153257595"><a name="p14153257595"></a><a name="p14153257595"></a>64</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p115315510596"><a name="p115315510596"></a><a name="p115315510596"></a>257~512</p>
+    </td>
+    </tr>
+    <tr id="row515335155914"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p815315165914"><a name="p815315165914"></a><a name="p815315165914"></a>128</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p71539519590"><a name="p71539519590"></a><a name="p71539519590"></a>1~256</p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+
+    配置SIMT函数单个线程最多可分配的寄存器数量为64，示例如下：
+
+    ```
+    __simt_vf__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+    ```
+
+    \_\_maxnreg\_\_\(N\)的参数N需要满足：
+    -   N的取值范围为（0,128]区间的整数;
+    -   若输入值N的范围为（0，16]，则会使用16个寄存器；若输入值N的范围为（16，32]，则会使用32个寄存器；若输入值N的范围为（32，64\]，则会使用64个寄存器；若输入值N的范围为（64，128\]，则会使用128个寄存器；
+    -   若未配置\_\_maxnreg\_\_，单个线程最多可分配的寄存器数量默认为为32。
+       
+注：
+-   \_\_launch\_bounds\_\_或\_\_maxnreg\_\_只能被标在\_\_simt_vf\_\_函数上（simt模式下的\_\_global\_\_函数）。
+-   同一函数不能同时有\_\_launch\_bounds\_\_和 \_\_maxnreg\_\_。
