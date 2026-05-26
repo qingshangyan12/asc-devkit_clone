@@ -34,11 +34,6 @@ typedef AscendC::HcommUrmaNotifyCtx HcommUrmaNotifyCtx;
 typedef AscendC::HcommUrmaJfcCqeCtx HcommUrmaJfcCqeCtx;
 
 namespace AscendC {
-__aicore__ inline uint32_t HcommUrmaGetBaseBlockCount(const SqContext& sqCtx)
-{
-    return sqCtx.contextInfo.ubJfs.sqDepth * AscendC::HCOMM_URMA_MAX_SQE_BB_NUM;
-}
-
 __aicore__ inline void HcommUrmaFillNotifyCtx(__ubuf__ HcommUrmaNotifyCtx* notifyCtx,
     const RegedBufferEntity& remoteMemInfo, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
@@ -62,7 +57,7 @@ __aicore__ inline void HcommUrmaFillSqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __g
     sqeCtx->nf = 0;
     sqeCtx->tokenEn = 1;
     sqeCtx->rmtJettyType = 1;
-    uint32_t baseBlockCount = HcommUrmaGetBaseBlockCount(sqCtx);
+    uint32_t baseBlockCount = sqCtx.contextInfo.ubJfs.sqDepth;
     sqeCtx->owner = (curHead & baseBlockCount) == 0 ? 1 : 0;
     sqeCtx->targetHint = 0;
     sqeCtx->inlineMsgLen = 0;
@@ -227,19 +222,19 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Init(_
 }
 
 __aicore__ inline void HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PollCqWhenSqOverflow(
-    ChannelHandle channel, const SqContext& sqCtx, uint32_t sqHead)
+    ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead)
 {
     AscendC::GlobalTensor<uint32_t> sqCIGlobal;
     sqCIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.tailAddr);
     Gm2Ub(sqCI_, sqCIGlobal, 1);
-    uint32_t sqTail = sqCI_.GetValue(0);
-    uint32_t baseBlockCount = HcommUrmaGetBaseBlockCount(sqCtx);
+    uint32_t curTail = sqCI_.GetValue(0);
     constexpr uint32_t POLL_CQ_THRESHOLD = 10;
     constexpr uint32_t NUM_CQE_PER_POLL_CQ = 100;
-    if ((sqHead + POLL_CQ_THRESHOLD) % baseBlockCount == sqTail % baseBlockCount) {
-        uint32_t idx = (sqTail + NUM_CQE_PER_POLL_CQ) > sqHead ? sqHead : sqTail + NUM_CQE_PER_POLL_CQ;
-        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA SQ overflow sqHead=%u sqTail=%u idx=%u baseBlockCount=%u", sqHead,
-            sqTail, idx, baseBlockCount);
+    uint32_t cqDepth = cqCtx.contextInfo.ubJfc.cqDepth;
+    if ((sqHead + POLL_CQ_THRESHOLD) % cqDepth == curTail % cqDepth) {
+        uint32_t idx = (curTail + NUM_CQE_PER_POLL_CQ) > sqHead ? sqHead : curTail + NUM_CQE_PER_POLL_CQ;
+        KERNEL_LOG(KERNEL_INFO, "Hcomm URMA SQ overflow sqHead=%u curTail=%u idx=%u cqDepth=%u", sqHead,
+            curTail, idx, cqDepth);
         (void)PollCq(channel, idx);
     }
 }
@@ -272,7 +267,8 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Po
         localIdx, sqHead, sqCtx.contextInfo.ubJfs.sqDepth);
 
     // poll cq if send queue is full
-    PollCqWhenSqOverflow(channel, sqCtx, sqHead);
+    auto cqCtx = channelPtr->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    PollCqWhenSqOverflow(channel, sqCtx, cqCtx, sqHead);
 
     // write SQE
     __ubuf__ HcommUrmaSqeCtx* sqeCtx = (__ubuf__ HcommUrmaSqeCtx*)wqeItem_.GetPhyAddr();
@@ -291,7 +287,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Po
     // SQE & SGE cache flush
     uint64_t sqBaseAddr = sqCtx.contextInfo.ubJfs.sqVa;
     uint32_t wqeSize = sqCtx.contextInfo.ubJfs.wqeSize;
-    uint32_t baseBlockCount = HcommUrmaGetBaseBlockCount(sqCtx);
+    uint32_t baseBlockCount = sqCtx.contextInfo.ubJfs.sqDepth;
     __gm__ uint8_t* sqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (sqHead % baseBlockCount));
     AscendC::GlobalTensor<uint32_t> sqeGlobal;
     sqeGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqeAddr);

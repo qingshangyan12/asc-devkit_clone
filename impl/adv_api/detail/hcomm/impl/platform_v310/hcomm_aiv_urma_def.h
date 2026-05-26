@@ -78,7 +78,8 @@ private:
     __aicore__ inline HcommHandle PostSend(
         ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr = nullptr,
         uint64_t notifyVal = 0);
-    __aicore__ inline void PollCqWhenSqOverflow(ChannelHandle channel, const SqContext& sqCtx, uint32_t sqHead);
+    __aicore__ inline void PollCqWhenSqOverflow(
+        ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead);
     __aicore__ inline uint32_t PollCq(ChannelHandle channel, uint32_t expectTail);
     template <bool isWait>
     __aicore__ inline bool JudgeHandleId(HcommHandle handleId);
