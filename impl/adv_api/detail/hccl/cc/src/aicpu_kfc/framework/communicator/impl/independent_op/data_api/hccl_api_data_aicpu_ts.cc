@@ -929,6 +929,9 @@ int32_t HcommThreadJoin(ThreadHandle thread, uint32_t timeout)
         const uint64_t kPrintSqInterval = 30U;
         do {
             EXECEPTION_CATCH(head = rtsqPtr->QuerySqHead(), return HCCL_E_INTERNAL);
+            if (head != tail) {
+                asm volatile("yield" ::: "memory");  // ARM yield，让出超线程时间片
+            }
             u64 curUsec = GetCurAicpuTimestamp();
             if (curUsec - startUsec > NANOSECOND_TO_SECOND * timeout) {
                 HCCL_ERROR("[%s] timeout %us. curhead:%u, curtail:%u, sqId:%u",
