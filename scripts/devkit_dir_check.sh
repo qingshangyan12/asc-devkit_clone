@@ -8,6 +8,7 @@ DIR_LIST=(
 )
 
 cat << 'EOF' > monitor_snapshot_1.txt
+d aarch64-linux
 d combo_script
 d compat
 d compiler
@@ -19,11 +20,10 @@ d share
 d toolkit
 d tools
 d var
-d vendors
-d x86_64-linux
 f cann_uninstall.sh
 f ops_uninstall.sh
 f set_env.sh
+l arm64-linux
 l asc
 l bin
 l conf
