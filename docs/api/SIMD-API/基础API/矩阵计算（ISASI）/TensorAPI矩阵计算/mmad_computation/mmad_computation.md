@@ -24,7 +24,7 @@ C = A * B + Bias
 
 Mmad的矩阵乘加关系可参考下图：
 
-![Mmad矩阵乘加数学表达式](../figures/mmad_formula.png)
+![Mmad矩阵乘加数学表达式](../../../../../figures/mmad_formula.png)
 
 `Mmad`使用显式传入的`MmadAtom`配置矩阵计算功能。左矩阵A、右矩阵B、结果矩阵C的图示说明如下：
 
@@ -73,8 +73,8 @@ Mmad的矩阵乘加关系可参考下图：
 | :--- | :---: | :--- |
 | `atomMmad` | 输入 | 矩阵计算原子对象。通过`MakeMmad(MmadOperation{})`或`MakeMmad(MmadOperation{}, MmadTraitDefault{})`可以构造默认原子对象。 |
 | `dst` | 输出 | 结果矩阵C，存储位置为`Location::L0C`，数据格式为NZ。 |
-| `fm` | 输入 | 左矩阵A，存储位置为`Location::L0A`，数据格式为ZN。 |
-| `filter` | 输入 | 右矩阵B，存储位置为`Location::L0B`，数据格式为NZ。 |
+| `fm` | 输入 | 左矩阵A，存储位置为`Location::L0A`，数据格式为NZ。 |
+| `filter` | 输入 | 右矩阵B，存储位置为`Location::L0B`，数据格式为ZN。 |
 | `bias` | 输入 | bias张量，存储位置为`Location::BIAS`，数据格式为ND。 |
 
 **表 2** `MakeMmad`接口参数说明
@@ -102,7 +102,7 @@ Mmad的矩阵乘加关系可参考下图：
 | `kDirectionAlign` | `bool` | `false` | K方向对齐控制，当前Tensor API实现中作为兼容参数保留。 |
 | `cmatrixSource` | `bool` | `false` | 不传bias时，配合`cmatrixInitVal`指示结果矩阵C初始值来源。带bias调用时该配置无效。 |
 | `disableGemv` | `bool` | `true` | M=1 场景下是否关闭GEMV模式。`false`表示开启GEMV，`true`表示关闭GEMV。 |
-| `mmadType` | `MmadType` | `MmadType::NORMAL` | 矩阵计算类型。默认使用`MmadType::NORMAL`，`MmadType::MX`。表示MX场景Mmad计算。 |
+| `mmadType` | `MmadType` | `MmadType::NORMAL` | 矩阵计算类型。默认使用`MmadType::NORMAL`。使用`MmadType::MX`表示MX场景Mmad计算。 |
 
 ## 数据类型
 
@@ -197,7 +197,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_
 - 使用`unitFlag`时，需要结果矩阵C搬出接口的`FixpipeParams::unitFlag`与`Mmad`计算的`MmadParams::unitFlag`参数配合设置。
 - 当M、K、N不是 16 的倍数时，硬件仍以 16 * 16 分形块组织数据，尾块中的无效数据会占用分形块空间但不参与有效计算。有效数据与无效数据排布方式如下图所示：
 
-![非16倍数场景中有效数据与无效数据示意图](../figures/mmad_tail_valid_data.png)
+![非16倍数场景中有效数据与无效数据示意图](../../../../../figures/mmad_tail_valid_data.png)
 
 ## 关键特性说明
 
@@ -209,7 +209,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_
 
 连续两次`Mmad`沿K方向累加时，通常需要关注中间结果的写读依赖。同步优化的阈值关系可参考下图：
 
-![同步优化阈值公式](../figures/mmad_pipebarrier_threshold.png)
+![同步优化阈值公式](../../../../../figures/mmad_pipebarrier_threshold.png)
 
 ### UnitFlag
 
@@ -265,7 +265,7 @@ __aicore__ inline void NormalMmadExample()
     __cc__ float l0cBuf[m * n];
 
     auto l0A = MakeTensor(MakeMemPtr(l0aBuf), MakeFrameLayout<NZLayoutPtn, half>(m, k));
-    auto l0B = MakeTensor( MakeMemPtr(l0bBuf), MakeFrameLayout<ZNLayoutPtn, half>(k, n));
+    auto l0B = MakeTensor(MakeMemPtr(l0bBuf), MakeFrameLayout<ZNLayoutPtn, half>(k, n));
     auto l0C = MakeTensor(MakeMemPtr(l0cBuf), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
 
     MmadParams params(m, n, k, 0, true);

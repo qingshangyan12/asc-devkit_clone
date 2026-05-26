@@ -18,7 +18,7 @@ L0C Buffer到Unified Buffer搬运支持不量化输出、float到half或bfloat16
 
 **图1** L0C2UB流程图
 
-![](../figures/l0c2ub_flowchart.png "L0C2UB流程图")
+![](../../../../../figures/l0c2ub_flowchart.png "L0C2UB流程图")
 
 ## 函数原型
 
@@ -362,7 +362,7 @@ using namespace AscendC::Te;
 
 __aicore__ inline void CopyL0CToUB()
 {
-    auto l0c = MakeTensor(MakeMemPtr((l0cAddr)), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
+    auto l0c = MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
     auto ub = MakeTensor(MakeMemPtr(ubAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
     auto quant = MakeTensor(MakeMemPtr(l1QuantAddr), MakeFrameLayout<NDExtLayoutPtn>(1, n));
 
