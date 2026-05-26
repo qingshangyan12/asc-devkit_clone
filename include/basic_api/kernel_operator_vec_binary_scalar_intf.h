@@ -470,7 +470,6 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void LeakyRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 /* **************************************************************************************************
  * Subs                                             *
  * ************************************************************************************************* */
@@ -643,7 +642,6 @@ template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType,
     const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
 __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count);
 
-#endif
 } // namespace AscendC
 #pragma end_pipe
 
