@@ -195,7 +195,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ fp4x2_e1m2_t* dst, __cbu
 
 当源张量和目的张量数据格式均为`ZN`时，接口按非转置方式从L1 Buffer搬运到L0B Buffer。
 
-![非转置搬运示意图](../figures/notranspose.png)
+![非转置搬运示意图](../../../../../figures/notranspose.png)
 
 ### 转置搬运
 
@@ -205,19 +205,19 @@ __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ fp4x2_e1m2_t* dst, __cbu
 
 #### b4转置搬运
 
-![b4转置搬运示意图](../figures/transpose_b4.png)
+![b4转置搬运示意图](../../../../../figures/transpose_b4.png)
 
 #### b8转置搬运
 
-![b8转置搬运示意图](../figures/transpose_b8.png)
+![b8转置搬运示意图](../../../../../figures/transpose_b8.png)
 
 #### b16转置搬运
 
-![b16转置搬运示意图](../figures/transpose_b16.png)
+![b16转置搬运示意图](../../../../../figures/transpose_b16.png)
 
 #### b32转置搬运
 
-![b32转置搬运示意图](../figures/transpose_b32.png)
+![b32转置搬运示意图](../../../../../figures/transpose_b32.png)
 
 ## 调用示例
 

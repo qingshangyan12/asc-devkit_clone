@@ -14,7 +14,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 该通路的数据类型固定为`fp8_e8m0_t`。ScaleA、ScaleB的分形排布和缩放计算关系可参考下图，其中ScaleA对应小Z大Z的MX scale排布：
 
-![ScaleA和ScaleB缩放示意图](../figures/zh-cn_image_0000002549011155.png)
+![ScaleA和ScaleB缩放示意图](../../../../../../../../docs/api/context/figures/zh-cn_image_0000002549011155.png)
 
 ## 函数原型
 
