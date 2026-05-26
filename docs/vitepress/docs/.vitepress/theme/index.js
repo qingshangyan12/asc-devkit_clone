@@ -9,6 +9,8 @@
 */
 
 import DefaultTheme from 'vitepress/theme'
+import Layout from './Layout.vue'
+import BackToTop from './BackToTop.vue'
 import './code-theme.css'
 import './search-overrides.css'
 
@@ -16,11 +18,13 @@ if (typeof window !== 'undefined' && !window.localStorage.getItem('vitepress:loc
   window.localStorage.setItem('vitepress:local-search-detailed-list', 'true')
 }
 
-// import FilterToggle from './FilterToggle.vue'
-import BackToTop from './BackToTop.vue'
 import './filter.css'
 import './code-copy.js'
 
 export default {
   extends: DefaultTheme,
+  Layout,
+  enhanceApp({ app }) {
+    app.component('BackToTop', BackToTop)
+  }
 }

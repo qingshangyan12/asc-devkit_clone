@@ -4,6 +4,42 @@ import { join, resolve } from 'node:path'
 import { load as cheerioLoad } from 'cheerio'
 import sidebars from './sidebar.mjs'
 
+const docsRoot = resolve(import.meta.dirname, '..')
+
+function filterEmptyPages(items, docsRoot) {
+  return items.reduce((acc, item) => {
+    const entry = { ...item }
+    if (item.items) {
+      entry.items = filterEmptyPages(item.items, docsRoot)
+    }
+    if (item.items && entry.items.length > 0) {
+      acc.push(entry)
+      return acc
+    }
+    if (item.link) {
+      const relPath = item.link.startsWith('/') ? item.link.slice(1) : item.link
+      const headerPath = resolve(docsRoot, relPath + '.md.header')
+      if (!existsSync(headerPath)) {
+        acc.push(entry)
+        return acc
+      }
+      try {
+        const headers = JSON.parse(readFileSync(headerPath, 'utf-8'))
+        if (headers.length === 0) return acc
+      } catch {
+        return acc
+      }
+    }
+    acc.push(entry)
+    return acc
+  }, [])
+}
+
+const filteredSidebars = {}
+for (const [key, items] of Object.entries(sidebars)) {
+  filteredSidebars[key] = filterEmptyPages(items, docsRoot)
+}
+
 function extractBodyContent(html) {
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
   if (bodyMatch) return bodyMatch[1]
@@ -276,7 +312,7 @@ export default defineConfig({
   transformPageData(pageData) {
     const cache = loadHeaderCache(pageData.filePath)
     if (cache && cache.length > 0) {
-      pageData.headers = cache
+      pageData.outlineHeaders = cache
     }
   },
 
@@ -305,7 +341,7 @@ export default defineConfig({
       { text: 'Ascend C API', link: '/api/Ascend-C-API列表' },
     ],
 
-    sidebar: sidebars,
+    sidebar: filteredSidebars,
 
     search: {
       provider: 'local',
@@ -364,10 +400,7 @@ export default defineConfig({
       },
     },
 
-    outline: {
-      level: [2, 3],
-      label: '本页内容',
-    },
+    outline: false,
 
     docFooter: {
       prev: '上一页',
