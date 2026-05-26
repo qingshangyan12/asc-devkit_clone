@@ -25,11 +25,10 @@
         - 启动NPU计算任务：通过 `<<<...>>>` 语法糖启动核函数。
         - 同步等待：调用 `aclrtSynchronizeStream` 或 `aclrtSynchronizeDevice`等待任务完成。
         - 数据搬出：使用 `aclrtMemcpy`将计算结果从Device Memory拷贝回Host Memory。
-
+      
       > [!NOTE] 说明
-      > - 最新API请查阅[Ascend C API 参考](https://asc.gitcode.com/)。
-      > - 请参考[异步执行](../../../编程指南/编译与运行/异步执行.md)了解更多运行时接口。
-
+      > - 请参见[Ascend-C概述与学习路径](../../Ascend-C概述与学习路径.md)技术附录章节，获取`Ascend C API 参考`和`CANN运行时接口`链接，以查阅更多接口信息。
+      
 - **算子代码实现**：
 
   后缀名为`*.asc`的代码文件包含Host端与Device端代码。
