@@ -42,7 +42,7 @@
     bisheng hello_world.asc --npu-arch=dav-2201 -o demo
     ./demo
     ```
-    本样例共调度8个核，打印了核号和"Hello World!!!"等信息。
+    执行本样例，将打印了核号和`Hello World!!!`信息。
 
     > [!NOTE] 说明
     >- 该样例支持如下型号：
