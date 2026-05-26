@@ -42,8 +42,8 @@
 inline __gm__ void* g_sysFftsAddr = nullptr;
 namespace AscendC {
 namespace Internal {
-__BLOCK_LOCAL__ uint64_t g_occupyEventPool[EVENT_NUM] = {};
-__BLOCK_LOCAL__ uint32_t g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::MAX)] = {};
+__BLOCK_LOCAL__ __inline__ uint64_t g_occupyEventPool[EVENT_NUM] = {};
+__BLOCK_LOCAL__ __inline__ uint32_t g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::MAX)] = {};
 }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 namespace Internal {
