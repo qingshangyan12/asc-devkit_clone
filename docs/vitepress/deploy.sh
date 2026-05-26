@@ -163,6 +163,7 @@ install_mdparser_deps() {
         exit 1
     fi
     log "cmarkgfm 安装完成"
+    pip3 install pygments
 }
 
 # ============================================================
