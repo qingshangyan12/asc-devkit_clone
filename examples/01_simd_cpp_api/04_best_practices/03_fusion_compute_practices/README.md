@@ -10,3 +10,4 @@
 | [simt_and_simd_floor_mod](./simt_and_simd_floor_mod) |  基于SIMT与SIMD混合编程方式实现的算子样例，介绍基于SIMT灵活实现分支判断逻辑。 | Ascend 950PR/Ascend 950DT |
 | [simt_gather_with_ub](./simt_gather_with_ub) |  本样例以Gather算子为示例，展示了在SIMD与SIMT混合编程模式下使用UB提升离散内存访问效率的性能优化方式 | Ascend 950PR/Ascend 950DT |
 | [matrix_transpose](./matrix_transpose) |  本样例以矩阵转置为例，展示了SIMD与SIMT混合编程模式下的访存合并优化方式 | Ascend 950PR/Ascend 950DT |
+| [integer_fast_div](./integer_fast_div) |  本样例以快速除法为例，展示了SIMD与SIMT混合编程模式下的整数除法优化方式 | Ascend 950PR/Ascend 950DT |
