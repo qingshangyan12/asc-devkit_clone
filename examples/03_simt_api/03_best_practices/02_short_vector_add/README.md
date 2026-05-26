@@ -20,8 +20,7 @@
 ## 目录结构介绍
 
 ```
-short_vector_add
-│   ├── figures/             // 示意图
+02_short_vector_add
 │   ├── scripts/             // 测试脚本目录
 │   │   ├── gen_data.py      // 生成测试输入和golden数据
 │   │   └── verify_result.py // 验证输出结果
@@ -61,10 +60,6 @@ short_vector_add
 |        aiv_vec_ratio        | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。       |
 |     aiv_scalar_time(μs)     | scalar类型指令（标量类运算指令）耗时，单位μs。                      |
 |      aiv_scalar_ratio       | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。    |
-|      aiv_mte2_time(μs)      | mte2类型指令（GM->UB搬运类指令）耗时，单位μs。                    |
-|       aiv_mte2_ratio        | mte2类型指令（GM->UB搬运类指令）的cycle数在total cycle数中的占用比。  |
-|      aiv_mte3_time(μs)      | mte3类型指令（UB->GM搬运类指令）耗时，单位μs。                    |
-|       aiv_mte3_ratio        | mte3类型指令（UB->GM搬运类指令）的cycle数在total cycle数中的占用比。  |
 |      aiv_read_hit_rate      | 读cache命中率（所在文件：L2Cache.csv）。                     |
 |     aiv_write_hit_rate      | 写cache命中率（所在文件：L2Cache.csv）。                          |
 | aiv_main_mem_read_bw(GB/s)  | 主存储器读取其他所有单元数据时，对应的total cycle的带宽速率（所在文件：Memory.csv）。 |
@@ -102,9 +97,9 @@ __global__ void add(T* x, T* y, T* z, uint64_t size)
 
 **性能数据**：
 
-| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio | aiv_read_hit_rate | aiv_write_hit_rate | aiv_main_mem_read_bw(GB/s) | aiv_main_mem_write_bw(GB/s) |
-|:-----------------:|:------------:|:----------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:--------------:|:-----------------:|:--------------:|:-----------------:|:------------------:|:--------------------------:|:---------------------------:|
-|      86.478       |    86.217    |     8832432      |      85.735      |     0.995     |        0.47         |      0.005       |       0.004       |       0        |       0.001       |      0         |         0         |       0.493        |            7.77            |            6.24             |
+| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_read_hit_rate | aiv_write_hit_rate | aiv_main_mem_read_bw(GB/s) | aiv_main_mem_write_bw(GB/s) |
+|:-----------------:|:------------:|:----------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:------------------:|:--------------------------:|:---------------------------:|
+|      86.478       |    86.217    |     8832432      |      85.735      |     0.995     |        0.47         |      0.005       |         0         |       0.493        |            7.77            |            6.24             |
 
 
 **性能数据分析**：
@@ -161,9 +156,9 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 
 **性能数据**：
 
-| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio | aiv_read_hit_rate | aiv_write_hit_rate | aiv_main_mem_read_bw(GB/s) | aiv_main_mem_write_bw(GB/s) |
-|:-----------------:|:------------:|:----------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:--------------:|:-----------------:|:--------------:|:-----------------:|:------------------:|:--------------------------:|:---------------------------:|
-|      45.371       |    45.111    |     4584309      |      44.582      |     0.988     |        0.517        |      0.011       |       0.004       |       0        |       0.001       |       0        |         0         |       0.891        |           14.51            |            7.25             |
+| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_read_hit_rate | aiv_write_hit_rate | aiv_main_mem_read_bw(GB/s) | aiv_main_mem_write_bw(GB/s) |
+|:-----------------:|:------------:|:----------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:------------------:|:--------------------------:|:---------------------------:|
+|      45.371       |    45.111    |     4584309      |      44.582      |     0.988     |        0.517        |      0.011       |         0         |       0.891        |           14.51            |            7.25             |
 
 **优化效果分析**：
 
@@ -213,7 +208,7 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 ## 编译运行
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
 
     - 默认路径，root用户安装CANN软件包
       ```bash
@@ -266,33 +261,7 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 
 ## 性能数据获取
 
-- 使用 `msprof` 工具获取端到端详细性能数据：
-
-```bash
-msprof ./demo   # 分析性能
-```
-
-当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
-
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
-
-查看具体的性能分析结果：
-
-```
-# 查看Task Duration 以及各项数据
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
-```
-
-- 使用 `msprof` 工具获取单个组件上的性能数据：
+使用 `msprof` 工具获取单个组件上的性能数据：
 
 ```bash
 msprof op ./demo   # 分析case的性能
