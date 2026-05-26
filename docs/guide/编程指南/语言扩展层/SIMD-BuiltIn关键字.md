@@ -537,10 +537,6 @@ __ubuf__ int * __gm__ ptr;
 </tbody>
 </table>
 
-通常，建议用户使用内置变量对应的API获取所需值，不建议用户直接使用内置变量。因为内置变量反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，内置变量的值与实际语义可能不符。
-
-例如，在Atlas 推理系列产品中，当启用KERNEL\_TYPE\_MIX\_VECTOR\_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block\_idx在这两种核心上都是从0开始计数，用户无法直接通过block\_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block\_idx增加偏移量（AI Core的block\_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
-
 ## SIMD与SIMT混合编程场景<a name="section952111671314"></a>
 
 SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_进行标识，通过在SIMD的\_\_aicore\_\_函数中使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/asc_vf_call.md)调用SIMT入口函数。被SIMT VF入口函数调用的函数使用\_\_simt\_callee\_\_进行标识。
@@ -567,3 +563,38 @@ SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_�
     ```
 
 Ascend C为SIMT编程、SIMD与SIMT混合编程提供了布尔、整形、浮点型的标量数据类型和短向量数据类型，提供了用于表达线程块、线程网格三维信息的内置变量。 关于内置数据格式的详细说明请参见[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)，内置变量请参见[内置变量](SIMT-BuiltIn关键字.md#section13165113520576)。
+
+
+## 核函数配置<a name="section97005415463"></a>
+
+在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
+
+```
+<<<numBlocks, dynUBufSize, stream>>>
+```
+
+其中：
+-   numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中使用内置变量[block_idx](../语言扩展层/SIMD-BuiltIn关键字.md#内置变量)获取；
+
+    >[!NOTE]说明 
+    >numBlocks是逻辑核的概念，取值范围为\[1,65535\]。为了充分利用硬件资源，一般设置为物理核的核数或其倍数。
+    >- 对于耦合模式和分离模式，numBlocks在运行时的意义和设置规则有一些区别，具体说明如下：
+    >    - 耦合模式：由于其Vector、Cube单元是集成在一起的，numBlocks用于设置启动多个AI Core核实例执行，不区分Vector、Cube。AI Core的核数可以通过[GetCoreNumAiv](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAiv.md)或者[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAic.md)获取。
+    >    - 分离模式
+    >        - 针对仅包含Vector计算的算子，numBlocks用于设置启动多少个Vector（AIV）实例执行，比如某款AI处理器上有40个Vector核，建议设置为40。
+    >        - 针对仅包含Cube计算的算子，numBlocks用于设置启动多少个Cube（AIC）实例执行，比如某款AI处理器上有20个Cube核，建议设置为20。
+    >        - 针对Vector/Cube融合计算的算子，启动时，按照AIV和AIC组合启动，numBlocks用于设置启动多少个组合执行，比如某款AI处理器上有40个Vector核和20个Cube核，一个组合是2个Vector核和1个Cube核，建议设置为20，此时会启动20个组合，即40个Vector核和20个Cube核。**注意：该场景下，设置的numBlocks逻辑核的核数不能超过物理核（2个Vector核和1个Cube核组合为1个物理核）的核数。**
+    >        - AIC/AIV的核数分别通过[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAic.md)和[GetCoreNumAiv](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAiv.md)接口获取。
+    >- 如果开发者使用了Device资源限制特性，那么算子设置的numBlocks不应超过[PlatformAscendC](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/PlatformAscendC.md)提供核数的API（GetCoreNum/GetCoreNumAic/GetCoreNumAiv等）返回的核数。例如，使用aclrtSetStreamResLimit设置Stream级别的Vector核数为8，那么GetCoreNumAiv接口返回值为8，针对Vector算子设置的numBlocks不应超过8，否则会抢占其他Stream的资源，导致资源限制失效。
+
+-   dynUBufSize：Dynamic Unified Buffer Size，是配置UB动态内存分配的空间的大小（仅限UB，不包括L1等），单位为Byte，默认设置为0；
+-   stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在device上执行，默认设置为nullptr。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+
+以下示例展示了内核函数的声明与调用方式。
+
+```
+// 声明
+__global__ __vector__ void add_custom(float* x, float* y, float* z);
+// 调用
+add_custom<<<numBlocks, dynUBufSize, stream>>>(x, y, z, 1024);
+```

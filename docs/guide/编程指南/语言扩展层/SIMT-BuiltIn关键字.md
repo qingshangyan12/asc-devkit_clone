@@ -90,7 +90,7 @@
 
     动态内存的实际内存大小需要在核函数启动时配置，具体内容请参考[核函数配置](#section97005415463)。
 
-## 内置变量<a name="section13165113520576"></a>
+## 内置结构体<a name="section18310741094123"></a>
 
 -   dim3<a name="li1136665405"></a>
 
@@ -103,6 +103,9 @@
     dim3(x, y); // 创建二维结构，dimz为默认值1
     dim3(x, y, z); // 创建三维结构
     ```
+
+## 内置变量<a name="section13165113520576"></a>
+
 
 当前提供了以下仅在Device上可用的dim3结构的内置变量：
 
@@ -1014,7 +1017,7 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 // 声明
 __global__ void add_custom(float* x, float* y, float* z, uint64_t total_length);
 // 调用
-add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 1024);
+add_custom<<<blocks_per_grid, threads_per_block, dynamic_ubuf_bytes, stream>>>(x, y, z, 1024);
 ```
 
 在执行函数之前，会先对上述配置参数进行校验。如果grid\_dim或block\_dim超出设备的最大允许规模，或dynamic\_smem\_bytes超过分配静态内存后剩余的可用共享内存，该函数将会执行失败。
