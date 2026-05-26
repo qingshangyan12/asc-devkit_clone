@@ -12,11 +12,11 @@ Channel Merge是矩阵计算结果搬出过程中的硬件自动合并能力，�
 
 **图1** Int8 Channel Merge示意图
 
-![](../figures/int8_channel_merge_figure.png "Int8-Channel-Merge示意图")
+![](../../../../../figures/int8_channel_merge_figure.png "Int8-Channel-Merge示意图")
 
 **图2** Int4 Channel Merge示意图
 
-![](../figures/int4_channel_merge_figure.png "Int4-Channel-Merge示意图")
+![](../../../../../figures/int4_channel_merge_figure.png "Int4-Channel-Merge示意图")
 
 ## 约束说明
 

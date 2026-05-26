@@ -136,9 +136,11 @@ __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ uint32_t* dst, __gm__ uint3
 __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ uint8_t* dst, __gm__ uint8_t* src,
     uint32_t burst_num, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count,
     bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+```
 
 ND2NZ随路格式转换搬入接口是在built-in接口`asc_copy_gm2l1_nd2nz`的基础上进行抽象封装实现的，其对应的底层built-in接口为：
 
+```cpp
 __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src,
     uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value,
     uint64_t loop4_src_stride, bool smallc0_en);
