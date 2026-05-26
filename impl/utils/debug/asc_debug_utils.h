@@ -30,6 +30,8 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "impl/utils/debug/npu_arch_2201/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_debug_utils_impl.h"
+#else
+#include "impl/utils/debug/asc_debug_utils_impl_stub.h"
 #endif
 
 namespace __asc_aicore {
@@ -135,16 +137,17 @@ __aicore__ inline void sync_all()
     sync_all_impl();
 }
 
-__aicore__ inline void mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, const uint32_t& len)
+__aicore__ inline uint32_t mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, const uint32_t& len)
 {
     if (dst == nullptr || src == nullptr)
     {
-        return;
+        return 1;
     }
     for (uint32_t i = 0; i < len; i++) {
         *(dst + i) = *(src + i);
     }
     asc_entire_dcci((__gm__ uint64_t*)dst);
+    return 0;
 }
 
 __aicore__ __gm__ inline DebugBlockHeadInfo* get_block_info()
@@ -297,6 +300,28 @@ __aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint
 
 } // namespace __asc_aicore
 #endif
+
+__aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
+{
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    if (g_sysPrintFifoSpace != nullptr) {
+        constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
+        uint64_t ascReservedAddr = get_shmem_sz() - RESERVED_UB_SIZE;
+        uint16_t blockIdx = asc_debug_get_block_idx();
+        get_printf_ubuf_addr_aicore(ascReservedAddr, blockIdx);
+    }
+#endif
+}
+
+__aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb()
+{
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    if (g_sysPrintFifoSpace != nullptr) {
+        pipe_barrier(PIPE_ALL);
+        asc_vf_debug_ub2gm();
+    }
+#endif
+}
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

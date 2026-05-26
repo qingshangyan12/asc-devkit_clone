@@ -13,8 +13,8 @@ set(ORION_REAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/legacy)
 set(HCOMM_REAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 #组件间对外头文件目录
-add_library(hccl_headers INTERFACE)
-target_include_directories(hccl_headers INTERFACE
+add_library(asc_hccl_headers INTERFACE)
+target_include_directories(asc_hccl_headers INTERFACE
     $<BUILD_INTERFACE:${TOP_DIR}/hcomm/include>
     $<BUILD_INTERFACE:${TOP_DIR}/hcomm/include/hccl>
     $<INSTALL_INTERFACE:include>
@@ -24,9 +24,9 @@ target_include_directories(hccl_headers INTERFACE
 )
 
 # 创建 ccl_kernel_plf共享库
-add_library(ccl_kernel_plf  SHARED)
+add_library(asc_ccl_kernel_plf  SHARED)
 # 创建 ccl_kernel_plf_a静态库
-add_library(ccl_kernel_plf_a  STATIC)
+add_library(asc_ccl_kernel_plf_a  STATIC)
 
 # 需要编译的文件list
 set(include_list
@@ -148,16 +148,16 @@ set(include_list
 
 # 指定ccl_kernel_plf所需包含文件搜索路径
 if(BUILD_OPEN_PROJECT)
-    include(${HCCL_CC_DIR}/cmake/third_party/json.cmake)
-    include(${HCCL_CC_DIR}/cmake/third_party/rdma-core.cmake)
+    add_cann_third_party(json)
+    add_cann_third_party(rdma-core)
 
-    target_compile_definitions(ccl_kernel_plf PRIVATE
+    target_compile_definitions(asc_ccl_kernel_plf PRIVATE
         OPEN_BUILD_PROJECT)
 
-    target_compile_definitions(ccl_kernel_plf_a PRIVATE
+    target_compile_definitions(asc_ccl_kernel_plf_a PRIVATE
         OPEN_BUILD_PROJECT)
 
-    target_include_directories(ccl_kernel_plf PRIVATE
+    target_include_directories(asc_ccl_kernel_plf PRIVATE
         ${HCCL_HCOMM_HEADER_DIR}
         ${HCCL_HCOMM_HEADER_DIR}/hccl
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
@@ -170,24 +170,6 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_BASE_DIR}/platform/hccp/inc/network
         ${RDMA_CORE_INCLUDE_DIR}
 
-        # runtime头文件
-        ${ASCEND_CANN_PACKAGE_PATH}/include/
-
-        # mmpa头文件
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/mmpa/
-
-        # 包间接口
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu/common/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/profiling/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/dump/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/trace/
-
-        # driver头文件
-        ${ASCEND_CANN_PACKAGE_PATH}/include/driver
 
         # 临时依赖头文件，待删除
         ${HCCL_HCOMM_HEADER_DIR}/externel_depends/tsch/
@@ -195,7 +177,7 @@ if(BUILD_OPEN_PROJECT)
         ${THIRD_PARTY_NLOHMANN_PATH}
     )
 
-    target_include_directories(ccl_kernel_plf_a PRIVATE
+    target_include_directories(asc_ccl_kernel_plf_a PRIVATE
         ${HCCL_HCOMM_HEADER_DIR}
         ${HCCL_HCOMM_HEADER_DIR}/hccl
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
@@ -210,24 +192,6 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_BASE_DIR}/platform/hccp/inc/network
         ${RDMA_CORE_INCLUDE_DIR}
 
-        # runtime头文件
-        ${ASCEND_CANN_PACKAGE_PATH}/include/
-
-        # mmpa头文件
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/mmpa/
-
-        # driver头文件
-        ${ASCEND_CANN_PACKAGE_PATH}/include/driver
-
-        # 包间接口
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu/common/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/profiling/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/dump/
-        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/trace/
 
         # 临时依赖头文件，待删除
         ${HCCL_HCOMM_HEADER_DIR}/externel_depends/tsch/
@@ -236,40 +200,23 @@ if(BUILD_OPEN_PROJECT)
         ${THIRD_PARTY_NLOHMANN_PATH}
     )
 
-    if(PRODUCT_SIDE STREQUAL "device")
-        target_link_directories(ccl_kernel_plf PRIVATE
-            ${HCCL_DEVICE_LIB_DIRS} # c_sec、mmpa、unified_dlog动态库搜索路径
-        )
-
-        target_link_directories(ccl_kernel_plf_a PRIVATE
-            ${HCCL_DEVICE_LIB_DIRS} # c_sec、mmpa、unified_dlog动态库搜索路径
-        )
-    else()
-        target_link_directories(ccl_kernel_plf PRIVATE
-            ${HCCL_HOST_LIB_DIRS}
-        )
-
-        target_link_directories(ccl_kernel_plf_a PRIVATE
-            ${HCCL_HOST_LIB_DIRS}
-        )
-    endif()
 endif()
 
 if(TARGET json)
-    target_link_libraries(ccl_kernel_plf json)
-    target_link_libraries(ccl_kernel_plf_a json)
-    add_dependencies(ccl_kernel_plf json)
-    add_dependencies(ccl_kernel_plf_a json)
+    target_link_libraries(asc_ccl_kernel_plf json)
+    target_link_libraries(asc_ccl_kernel_plf_a json)
+    add_dependencies(asc_ccl_kernel_plf json)
+    add_dependencies(asc_ccl_kernel_plf_a json)
 endif()
 
 if(BUILD_OPEN_PROJECT)
 endif()
 
-target_compile_definitions(ccl_kernel_plf PRIVATE
+target_compile_definitions(asc_ccl_kernel_plf PRIVATE
     $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
 )
 
-target_compile_definitions(ccl_kernel_plf_a PRIVATE
+target_compile_definitions(asc_ccl_kernel_plf_a PRIVATE
     $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
 )
 
@@ -282,16 +229,16 @@ set(ccl_kernel_plf_include_list
 )
 
 # 指定ccl_kernel_plf所需头文件搜索路径
-target_include_directories(ccl_kernel_plf PRIVATE
+target_include_directories(asc_ccl_kernel_plf PRIVATE
     ${ccl_kernel_plf_include_list}
 )
 # 指定ccl_kernel_plf_a所需头文件搜索路径
-target_include_directories(ccl_kernel_plf_a PRIVATE
+target_include_directories(asc_ccl_kernel_plf_a PRIVATE
     ${ccl_kernel_plf_include_list}
 )
 
 # 给ccl_kernel_plf添加编译选项
-target_compile_options(ccl_kernel_plf PRIVATE
+target_compile_options(asc_ccl_kernel_plf PRIVATE
     -Wall
     -fno-common
     -fno-strict-aliasing
@@ -303,7 +250,7 @@ target_compile_options(ccl_kernel_plf PRIVATE
 )
 
 # 给ccl_kernel_plf_a添加编译选项
-target_compile_options(ccl_kernel_plf_a PRIVATE
+target_compile_options(asc_ccl_kernel_plf_a PRIVATE
     -Wall
     -fno-common
     -fno-strict-aliasing
@@ -316,7 +263,7 @@ target_compile_options(ccl_kernel_plf_a PRIVATE
     -fstack-protector-all
 )
 # 为ccl_kernel_plf添加编译定义
-target_compile_definitions(ccl_kernel_plf PRIVATE
+target_compile_definitions(asc_ccl_kernel_plf PRIVATE
     HCCD
     CCL_KERNEL
     CCL_KERNEL_AICPU
@@ -325,7 +272,7 @@ target_compile_definitions(ccl_kernel_plf PRIVATE
     USE_AICORE_GATHERV2_INFER
 )
 # 为ccl_kernel_plf_a添加编译定义
-target_compile_definitions(ccl_kernel_plf_a PRIVATE
+target_compile_definitions(asc_ccl_kernel_plf_a PRIVATE
     HCCD
     CCL_KERNEL
     CCL_KERNEL_AICPU
@@ -334,22 +281,22 @@ target_compile_definitions(ccl_kernel_plf_a PRIVATE
     USE_AICORE_GATHERV2_INFER
 )
 # 向ccl_kernel_plf添加链接器选项
-target_link_options(ccl_kernel_plf PRIVATE
+target_link_options(asc_ccl_kernel_plf PRIVATE
     -Wl,-z,relro,-z,now,-z,noexecstack
     -Wl,-Bsymbolic
     -Wl,--exclude-libs,ALL
     -s
 )
 # 向ccl_kernel_plf_a添加链接器选项
-target_link_options(ccl_kernel_plf_a PRIVATE
+target_link_options(asc_ccl_kernel_plf_a PRIVATE
     -Wl,-z,relro,-z,now,-z,noexecstack
     -Wl,-Bsymbolic
     -Wl,--exclude-libs,ALL
 )
 
-# 将库文件链接到目标ccl_kernel_plf  ccl_kernel_plf_a
+# 将库文件链接到目标ccl_kernel_plf  asc_ccl_kernel_plf_a
 if(BUILD_OPEN_PROJECT)
-    target_link_libraries(ccl_kernel_plf
+    target_link_libraries(asc_ccl_kernel_plf
         -Wl,--no-as-needed
         ${HCCL_C_SEC_LINK}
         aicpu_sharder
@@ -358,9 +305,17 @@ if(BUILD_OPEN_PROJECT)
         -lrt
         -ldl
         -lpthread
+        ascend_hal
+        c_sec
+        unified_dlog
+        $<BUILD_INTERFACE:runtime_headers>
+        $<BUILD_INTERFACE:atrace_headers>
+        $<BUILD_INTERFACE:mmpa_headers>
+        $<BUILD_INTERFACE:acl_rt_headers>
+        $<BUILD_INTERFACE:ascend_hal_headers>
     )
 
-    target_link_libraries(ccl_kernel_plf_a
+    target_link_libraries(asc_ccl_kernel_plf_a
         -Wl,--no-as-needed
         ${HCCL_C_SEC_LINK}
         aicpu_sharder
@@ -369,6 +324,14 @@ if(BUILD_OPEN_PROJECT)
         -lrt
         -ldl
         -lpthread
+        ascend_hal
+        c_sec
+        unified_dlog
+        $<BUILD_INTERFACE:runtime_headers>
+        $<BUILD_INTERFACE:atrace_headers>
+        $<BUILD_INTERFACE:mmpa_headers>
+        $<BUILD_INTERFACE:acl_rt_headers>
+        $<BUILD_INTERFACE:ascend_hal_headers>
     )
 endif()
 
@@ -376,15 +339,15 @@ add_subdirectory(framework)
 add_subdirectory(platform)
 
 # 指定ccl_kernel_plf构建完成后安装到指定的目标位置
-install(TARGETS  ccl_kernel_plf
+install(TARGETS  asc_ccl_kernel_plf
     LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}  OPTIONAL
 )
 # 设置ccl_kernel_plf_a输出文件的名字
-set_target_properties(ccl_kernel_plf_a
+set_target_properties(asc_ccl_kernel_plf_a
     PROPERTIES
-    OUTPUT_NAME ccl_kernel_plf
+    OUTPUT_NAME asc_ccl_kernel_plf
 )
 # 指定ccl_kernel_plf_a构建完成后安装到指定的目标位置
-install(TARGETS  ccl_kernel_plf_a
+install(TARGETS  asc_ccl_kernel_plf_a
     ARCHIVE DESTINATION ${INSTALL_LIBRARY_DIR}  OPTIONAL
 )
