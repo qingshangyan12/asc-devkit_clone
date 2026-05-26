@@ -277,7 +277,7 @@ void OpCustomGenerator::OpCustomGenRegistryfirstFunc(std::ofstream& outfile) con
     outfile << "        }\n";
     outfile << "    }\n";
 }
-void OpCustomGenerator::OpCustomGenRegistrylastFunc(std::ofstream& outfile) const
+void OpCustomGenerator::OpCustomGenRegistrylastFunc(std::ofstream& outfile, const std::string& opapiSoName) const
 {
     outfile << "    op_lib_path = ConvertToAscendString(basePath + vendorName);\n";
     outfile << "    Dl_info dlInfo;\n";
@@ -288,11 +288,11 @@ void OpCustomGenerator::OpCustomGenRegistrylastFunc(std::ofstream& outfile) cons
     outfile << "    std::string targetPath = dlInfo.dli_fname;\n";
     outfile << "    char resolvedPath[PATH_MAX];\n";
     outfile << "    if (realpath(targetPath.c_str(), resolvedPath) == nullptr) {\n";
-    outfile << "        LOG_ERROR(\"Failed to resolve libcust_opapi.so path: %s\", strerror(errno));\n";
+    outfile << "        LOG_ERROR(\"Failed to resolve " << opapiSoName << " path: %s\", strerror(errno));\n";
     outfile << "        return 1;\n";
     outfile << "    }\n";
     outfile << "    targetPath = std::string(resolvedPath);\n";
-    outfile << "    LOG_INFO(\"Resolve libcust_opapi.so path is: %s\", targetPath.c_str());\n";
+    outfile << "    LOG_INFO(\"Resolve " << opapiSoName << " path is: %s\", targetPath.c_str());\n";
     outfile << "    std::string arch = GetSystemArchitecture();\n";
     outfile << "    if (arch.empty()) {\n";
     outfile << "        LOG_ERROR(\"Failed to get system architecture name\");\n";
@@ -436,7 +436,11 @@ opbuild::Status OpCustomGenerator::GenerateCode(void)
     OpCustomGenSymlinkFunc(opCustomCpp);
     OpCustomGenSymArchFunc(opCustomCpp);
     OpCustomGenRegistryfirstFunc(opCustomCpp);
-    OpCustomGenRegistrylastFunc(opCustomCpp);
+    auto opapiOutputName = std::getenv("ASCEND_OPAPI_OUTPUT_NAME");
+    std::string opapiSoName = (opapiOutputName != nullptr && strlen(opapiOutputName) > 0)
+        ? std::string("lib") + opapiOutputName + ".so"
+        : "libcust_opapi.so";
+    OpCustomGenRegistrylastFunc(opCustomCpp, opapiSoName);
     OpCustomGenRemoveDirFunc(opCustomCpp);
     OpCustomGen(opCustomCpp, vendorName);
     OpCustomGenDestryFunc(opCustomCpp);
