@@ -395,6 +395,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(std::vector<uint8_t> 
 
 HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMsg, u32 msgPos)
 {
+    // u64 Time0 = GetCurCpuTimestamp(false);
     KeepAlive();
     CHK_PTR_NULL(msgArea_);
     const HcclCMDType opType = static_cast<HcclCMDType>(msg.commType.prepareType);
@@ -420,9 +421,12 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
               static_cast<unsigned long long>(msg.strideCount),
               static_cast<unsigned long long>(waitAddr), static_cast<unsigned long long>(recordAddr),
               static_cast<u32>(execCtx->resourceType));
+    // u64 Time1 = GetCurCpuTimestamp(false);
+    // HCCL_RUN_INFO("[Orchestrate][qian] startTime: %llu, endTime: %llu, useTime: %llu", Time0, Time1, Time1 - Time0);
 
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
+        // Time0 = GetCurCpuTimestamp(false);
         const u32 turnIdx = i + 1U;
         UpdateProgress("LoopBegin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBegin] group %u, msgPos %u, repeatIdx %u, turnIdx %u, repeatCnt %u, "
@@ -436,30 +440,41 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterFormat] group %u, msgPos %u, repeatIdx %u, ret %u, runParamSize %zu.",
                   groupIdx_, msgPos, i, ret, runParam.size());
         CHK_RET(ret);
+        // Time1 = GetCurCpuTimestamp(false);
+        // HCCL_RUN_INFO("[Orchestrate][qianzhi][%u] startTime: %llu, endTime: %llu, useTime: %llu", i, Time0, Time1, Time1 - Time0);
 
+        // Time1 = GetCurCpuTimestamp(false);
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        // u64 Time2 = GetCurCpuTimestamp(false);
+        // HCCL_RUN_INFO("[Orchestrate][Wait][%u] startTime: %llu, endTime: %llu, useTime: %llu", i, Time1, Time2, Time2 - Time1);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
+        // Time2 = GetCurCpuTimestamp(false);
 
         UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenAicpuKernelServer(runParam);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        // u64 Time3 = GetCurCpuTimestamp(false);
+        // HCCL_RUN_INFO("[Orchestrate][launch][%u] startTime: %llu, endTime: %llu, useTime: %llu", i, Time2, Time3, Time3 - Time2);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
+        // Time3 = GetCurCpuTimestamp(false);
 
         UpdateProgress("BeforePost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
         ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
         UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        // u64 Time4 = GetCurCpuTimestamp(false);
+        // HCCL_RUN_INFO("[Orchestrate][post][%u] startTime: %llu, endTime: %llu, useTime: %llu", i, Time3, Time4, Time4 - Time3);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterPost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
