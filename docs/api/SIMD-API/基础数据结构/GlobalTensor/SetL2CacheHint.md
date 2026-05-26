@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-设置GlobalTensor是否使能L2 Cache，默认使能L2 Cache。
+读写GM的数据都默认被缓存在L2Cache（默认使能L2 Cache），SetL2CacheHint能够设置GlobalTensor是否使能L2 Cache。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -120,14 +120,21 @@ CACHE_MODE_NORMAL = 1,  // 使能L2 Cache
 
 ## 调用示例<a name="section17531157161314"></a>
 
+在Global Memory的数据访问中，如果数据只需要访问一次，后续不需要重复读取，那么这种场景下可以设置Global Memory的CacheMode为CACHE_MODE_DISABLED，在这种模式下数据访问将不经过L2 Cache，避免影响需要重复访问的数据，从而提升数据访问效率。
+
 ```
-uint64_t dataSize = 256; //设置input_global的大小为256
-
-AscendC::GlobalTensor<int32_t> inputGlobal; // 类型为int32_t
-inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int32_t *>(src_gm), dataSize); // 设置源操作数在Global Memory上的起始地址为src_gm，所占外部存储的大小为256个int32_t
-inputGlobal.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE); // 设置GlobalTensor不会写入L2 Cache
-
-AscendC::LocalTensor<int32_t> inputLocal = inQueueX.AllocTensor<int32_t>();    
-AscendC::DataCopy(inputLocal, inputGlobal, dataSize); // 将Global Memory上的inputGlobal拷贝到Local Memory的inputLocal上
+    xGm.SetGlobalBuffer((__gm__ float *)x + AscendC::GetBlockIdx() * TILE_N);
+    yGm.SetGlobalBuffer((__gm__ float *)y + AscendC::GetBlockIdx() * TILE_N);
+    zGm.SetGlobalBuffer((__gm__ float *)z + AscendC::GetBlockIdx() * TILE_N);
+    /*
+        在 Global Memory 的数据访问中，若数据只需访问一次且后续不需要重复读取，
+        可将 Global Memory 的 CacheMode 设置为 CACHE_MODE_DISABLED。
+        在此模式下，数据访问将不经过 L2 Cache，从而避免影响需要重复访问的数据，
+        提升数据访问效率。
+    */
+    // 设置yGm和zGm两个GlobalTensor不使能L2 Cache
+    yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+    zGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 ```
 
+完整样例请参考[SetL2CacheHint样例](https://gitcode.com/cann/asc-devkit/tree/9.0.0/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/l2_cache_bypass)。
