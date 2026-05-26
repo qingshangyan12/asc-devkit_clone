@@ -1,0 +1,1 @@
+/usr/local/Ascend/cann-9.0.0/bin/bisheng CMakeFiles/integer_div.dir/integer_normal_div.asc.o -o integer_div  -lm -lplatform -ltiling_api -ldl 
