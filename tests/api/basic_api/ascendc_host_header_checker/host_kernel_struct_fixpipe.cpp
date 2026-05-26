@@ -9,3 +9,7 @@
 */
 
 #include "kernel_struct_fixpipe.h"
+
+using AscendC::TransformParams;
+using AscendC::FixpipeParamsArch3510;
+using AscendC::FixpipeParamsC310;
