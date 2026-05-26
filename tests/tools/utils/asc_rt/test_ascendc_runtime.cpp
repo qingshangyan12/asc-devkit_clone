@@ -201,7 +201,6 @@ TEST_F(TEST_ASCENDC_RUNTIME, TestAscendCheckSoCVersion)
 
 TEST_F(TEST_ASCENDC_RUNTIME, TestAscendGetSoCVersion)
 {
-    const char* socVersion = "ascend910b1";
     MOCKER(aclrtGetSocName).stubs().will(invoke(fake_rtGetSocVersion350));
     int ret = static_cast<int>(GetSoCVersion());
     EXPECT_EQ(ret, 4);
