@@ -182,13 +182,15 @@ template <typename Arg0, typename... Args>
             using Location = GetMemLocation<Engine>;
             using ResultTensor = typename MakeTensorResult<Location, Engine, Layout>::type;
             return ResultTensor{Engine{arg0}, args...};
-        } else {
+        } else if constexpr (sizeof...(Args) == 2 && (Std::is_tuple_v<Std::remove_cvref_t<Args>> && ...)) {
             using Layout = decltype(MakeLayout(args...));
             using Location = GetMemLocation<Engine>;
             using ResultTensor = typename MakeTensorResult<Location, Engine, Layout>::type;
             return ResultTensor{Engine{arg0}, MakeLayout(args...)};
+        } else {
+            static_assert(sizeof...(Args) != sizeof...(Args), 
+                "MakeTensor expected a hardware memory pointer and data structure like Layout or Shape and Stride");
         }
-    }
 };
 
 template <typename Iterator, typename... Args>
