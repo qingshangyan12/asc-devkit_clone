@@ -929,9 +929,6 @@ int32_t HcommThreadJoin(ThreadHandle thread, uint32_t timeout)
         const uint64_t kPrintSqInterval = 30U;
         do {
             EXECEPTION_CATCH(head = rtsqPtr->QuerySqHead(), return HCCL_E_INTERNAL);
-            if (head != tail) {
-                asm volatile("yield" ::: "memory");  // ARM yield，让出超线程时间片
-            }
             u64 curUsec = GetCurAicpuTimestamp();
             if (curUsec - startUsec > NANOSECOND_TO_SECOND * timeout) {
                 HCCL_ERROR("[%s] timeout %us. curhead:%u, curtail:%u, sqId:%u",
@@ -951,6 +948,73 @@ int32_t HcommThreadJoin(ThreadHandle thread, uint32_t timeout)
     }
 
     HCCL_ERROR("[%s]Does not support this interface.", __func__);
+    return HCCL_E_NOT_SUPPORT;
+}
+
+int32_t HcommQueryThreadSqTail(ThreadHandle thread, uint32_t *tail)
+{
+    CHK_PTR_NULL(tail);
+    hccl::Thread *threadPtr = reinterpret_cast<hccl::Thread *>(thread);
+    CHK_PTR_NULL(threadPtr);
+
+    if (threadPtr->IsDeviceA5()) {
+        auto *const streamLitePtr = static_cast<Hccl::StreamLite *>(threadPtr->GetStreamLitePtr());
+        CHK_PTR_NULL(streamLitePtr);
+        auto *const rtsqPtr = streamLitePtr->GetRtsq();
+        CHK_PTR_NULL(rtsqPtr);
+        EXECEPTION_CATCH(*tail = rtsqPtr->QuerySqTail(), return HCCL_E_INTERNAL);
+        HCCL_DEBUG("[%s] thread[0x%llx], sqId[%u], tail[%u].",
+                   __func__, thread, streamLitePtr->GetSqId(), *tail);
+        return HCCL_SUCCESS;
+    }
+
+    HCCL_ERROR("[%s] Does not support this interface.", __func__);
+    return HCCL_E_NOT_SUPPORT;
+}
+
+int32_t HcommWaitThreadSqHeadReach(ThreadHandle thread, uint32_t targetTail, uint32_t timeout)
+{
+    hccl::Thread *threadPtr = reinterpret_cast<hccl::Thread *>(thread);
+    CHK_PTR_NULL(threadPtr);
+
+    if (threadPtr->IsDeviceA5()) {
+        auto *const streamLitePtr = static_cast<Hccl::StreamLite *>(threadPtr->GetStreamLitePtr());
+        CHK_PTR_NULL(streamLitePtr);
+        auto *const rtsqPtr = streamLitePtr->GetRtsq();
+        CHK_PTR_NULL(rtsqPtr);
+
+        const uint32_t sqId = streamLitePtr->GetSqId();
+        HCCL_INFO("[%s] START. thread[0x%llx], sqId[%u], targetTail[%u].",
+                  __func__, thread, sqId, targetTail);
+
+        u64 startUsec = GetCurAicpuTimestamp();
+        u64 lastUsec = startUsec;
+        constexpr uint64_t NANOSECOND_TO_SECOND = 1000000000U;
+        constexpr uint64_t kPrintSqInterval = 30U;
+        uint32_t head = 0;
+        do {
+            EXECEPTION_CATCH(head = rtsqPtr->QuerySqHead(), return HCCL_E_INTERNAL);
+            if (head == targetTail) {
+                break;
+            }
+            u64 curUsec = GetCurAicpuTimestamp();
+            if (curUsec - startUsec > NANOSECOND_TO_SECOND * timeout) {
+                HCCL_ERROR("[%s] timeout %us. head:%u, targetTail:%u, sqId:%u",
+                           __func__, timeout, head, targetTail, sqId);
+                return HCCL_E_TIMEOUT;
+            }
+            if (curUsec - lastUsec > NANOSECOND_TO_SECOND * kPrintSqInterval) {
+                lastUsec = curUsec;
+                HCCL_RUN_INFO("[%s] Waiting. sqId:%u, head:%u, targetTail:%u",
+                              __func__, sqId, head, targetTail);
+            }
+        } while (true);
+
+        HCCL_INFO("[%s] SUCCESS. head[%u] reached targetTail[%u].", __func__, head, targetTail);
+        return HCCL_SUCCESS;
+    }
+
+    HCCL_ERROR("[%s] Does not support this interface.", __func__);
     return HCCL_E_NOT_SUPPORT;
 }
 #ifdef __cplusplus

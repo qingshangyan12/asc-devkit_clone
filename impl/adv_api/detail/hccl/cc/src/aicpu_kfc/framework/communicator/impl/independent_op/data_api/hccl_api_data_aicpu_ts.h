@@ -26,6 +26,27 @@ extern "C" {
  * WARNING: experimental API, No compatibility is currently guaranteed for this API
  */
 extern int32_t HcommThreadJoin(ThreadHandle thread, uint32_t timeout);
+
+/**
+ * @brief 查询线程对应 RTSQ 的当前 SQ tail 位置
+ * @param[in] thread NPU上执行的线程句柄
+ * @param[out] tail 返回的 SQ tail 值
+ * @return int32_t 执行结果状态码
+ *
+ * WARNING: experimental API, No compatibility is currently guaranteed for this API
+ */
+extern int32_t HcommQueryThreadSqTail(ThreadHandle thread, uint32_t *tail);
+
+/**
+ * @brief 等待线程对应 RTSQ 的 SQ head 追上指定的 targetTail 位置（阻塞）
+ * @param[in] thread NPU上执行的线程句柄
+ * @param[in] targetTail 需要等待 head 追上的目标 tail 值
+ * @param[in] timeout 超时时间(秒)
+ * @return int32_t 执行结果状态码
+ *
+ * WARNING: experimental API, No compatibility is currently guaranteed for this API
+ */
+extern int32_t HcommWaitThreadSqHeadReach(ThreadHandle thread, uint32_t targetTail, uint32_t timeout);
 #ifdef __cplusplus
 }
 #endif  // __cplusplus

@@ -28,11 +28,15 @@
 #include "thread.h"
 #include "aicpu_ts_thread.h"
 
+extern "C" {
+extern int32_t HcommQueryThreadSqTail(ThreadHandle thread, uint32_t *tail);
+extern int32_t HcommWaitThreadSqHeadReach(ThreadHandle thread, uint32_t targetTail, uint32_t timeout);
+}
+
 using namespace HcclApi;
 namespace {
 static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 120UL;
-static constexpr bool ENABLE_READY_DIAG_MAIN_THREAD_JOIN = true;
-static constexpr u32 READY_DIAG_THREAD_JOIN_TIMEOUT_SEC = 30U;
+static constexpr u32 MAIN_THREAD_JOIN_TIMEOUT_SEC = 30U;
 static const std::vector<HcclCMDType> SUPPORT_OP_LIST {
     HCCL_CMD_ALLREDUCE, HCCL_CMD_ALLGATHER, HCCL_CMD_REDUCE_SCATTER, HCCL_CMD_ALLTOALLV, HCCL_CMD_ALLTOALL
 };
@@ -84,45 +88,9 @@ HcclResult IsDevice950(bool &isDevice950)
     return HCCL_SUCCESS;
 }
 
-HcclResult ReadyDiagDrainMainThreadBeforePost(const ServerExecCtx &execCtx, u32 groupIdx, u32 msgPos,
-    u32 repeatIdx, u32 turnIdx)
+bool NeedMainThreadJoin(const ServerExecCtx &execCtx)
 {
-    if (!ENABLE_READY_DIAG_MAIN_THREAD_JOIN || execCtx.resourceType != ServerExecResourceType::NEXT_AICPU) {
-        return HCCL_SUCCESS;
-    }
-    if (repeatIdx == 0U) {
-        return HCCL_SUCCESS;
-    }
-
-    CHK_PRT_RET(execCtx.mainThread == 0U,
-        HCCL_ERROR("YYYYYY asc readydiag [MainThreadJoinInvalid] group %u, msgPos %u, repeatIdx %u, "
-                   "turnIdx %u, opParamKey %#llx, mainThread %#llx.",
-                   groupIdx, msgPos, repeatIdx, turnIdx,
-                   static_cast<unsigned long long>(execCtx.opParamKey),
-                   static_cast<unsigned long long>(execCtx.mainThread)),
-        HCCL_E_PTR);
-
-    const u64 beginTime = GetCurCpuTimestamp();
-    HCCL_INFO("YYYYYY asc readydiag [MainThreadJoinBegin] group %u, msgPos %u, repeatIdx %u, "
-              "turnIdx %u, opParamKey %#llx, mainThread %#llx, timeoutSec %u.",
-              groupIdx, msgPos, repeatIdx, turnIdx, static_cast<unsigned long long>(execCtx.opParamKey),
-              static_cast<unsigned long long>(execCtx.mainThread), READY_DIAG_THREAD_JOIN_TIMEOUT_SEC);
-
-    const HcclResult ret = HcommThreadJoin(execCtx.mainThread, READY_DIAG_THREAD_JOIN_TIMEOUT_SEC);
-    const u64 elapsedNs = GetCurCpuTimestamp() - beginTime;
-    HCCL_INFO("YYYYYY asc readydiag [MainThreadJoinEnd] group %u, msgPos %u, repeatIdx %u, "
-              "turnIdx %u, opParamKey %#llx, mainThread %#llx, ret %d, elapsedNs %llu.",
-              groupIdx, msgPos, repeatIdx, turnIdx, static_cast<unsigned long long>(execCtx.opParamKey),
-              static_cast<unsigned long long>(execCtx.mainThread), static_cast<int32_t>(ret),
-              static_cast<unsigned long long>(elapsedNs));
-    CHK_PRT_RET(ret != HCCL_SUCCESS,
-        HCCL_ERROR("YYYYYY asc readydiag [MainThreadJoinFail] group %u, msgPos %u, repeatIdx %u, "
-                   "turnIdx %u, opParamKey %#llx, mainThread %#llx, ret %d.",
-                   groupIdx, msgPos, repeatIdx, turnIdx,
-                   static_cast<unsigned long long>(execCtx.opParamKey),
-                   static_cast<unsigned long long>(execCtx.mainThread), static_cast<int32_t>(ret)),
-        ret);
-    return HCCL_SUCCESS;
+    return execCtx.resourceType == ServerExecResourceType::NEXT_AICPU && execCtx.mainThread != 0U;
 }
 
 HcclResult GetMainThreadFromOpParam(const std::vector<uint8_t> &baseOpParam, ThreadHandle &mainThread)
@@ -464,9 +432,14 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
               static_cast<unsigned long long>(waitAddr), static_cast<unsigned long long>(recordAddr),
               static_cast<u32>(execCtx->resourceType));
 
+    const bool needJoin = NeedMainThreadJoin(*execCtx);
+    u32 prevKernelTail = 0;
+    bool hasPrevKernel = false;
+
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
+        const bool isLastRepeat = (turnIdx == repeatCnt);
         UpdateProgress("LoopBegin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBegin] group %u, msgPos %u, repeatIdx %u, turnIdx %u, repeatCnt %u, "
                   "opParamKey %#llx, resourceType %u.",
@@ -483,11 +456,23 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
-        ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
+        ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, isLastRepeat);
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
+
+        // 延迟 join：等待上一轮 Kernel 的 mainThread 任务完成（Format/Wait 与 mainThread 执行重叠）
+        if (needJoin && hasPrevKernel) {
+            UpdateProgress("BeforeDeferredJoin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+            HCCL_INFO("[MC2_OPEN_DIAG][DeferredJoinBegin] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
+                      "prevKernelTail %u.",
+                      groupIdx_, msgPos, i, turnIdx, prevKernelTail);
+            ret = static_cast<HcclResult>(
+                HcommWaitThreadSqHeadReach(execCtx->mainThread, prevKernelTail, MAIN_THREAD_JOIN_TIMEOUT_SEC));
+            UpdateProgress("AfterDeferredJoin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+            CHK_RET(ret);
+        }
 
         UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
@@ -498,10 +483,24 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
                   groupIdx_, msgPos, i, turnIdx, ret);
         CHK_RET(ret);
 
-        UpdateProgress("BeforeReadyDiagJoin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        ret = ReadyDiagDrainMainThreadBeforePost(*execCtx, groupIdx_, msgPos, i, turnIdx);
-        UpdateProgress("AfterReadyDiagJoin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        CHK_RET(ret);
+        // 快照当前 Kernel 提交后的 mainThread SQ tail
+        if (needJoin) {
+            ret = static_cast<HcclResult>(HcommQueryThreadSqTail(execCtx->mainThread, &prevKernelTail));
+            CHK_RET(ret);
+            hasPrevKernel = true;
+
+            // 最后一轮：必须在 Post 前等待当前 Kernel 完成，保证数据就绪
+            if (isLastRepeat) {
+                UpdateProgress("BeforeLastJoin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+                HCCL_INFO("[MC2_OPEN_DIAG][LastJoinBegin] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
+                          "prevKernelTail %u.",
+                          groupIdx_, msgPos, i, turnIdx, prevKernelTail);
+                ret = static_cast<HcclResult>(
+                    HcommWaitThreadSqHeadReach(execCtx->mainThread, prevKernelTail, MAIN_THREAD_JOIN_TIMEOUT_SEC));
+                UpdateProgress("AfterLastJoin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+                CHK_RET(ret);
+            }
+        }
 
         UpdateProgress("BeforePost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",

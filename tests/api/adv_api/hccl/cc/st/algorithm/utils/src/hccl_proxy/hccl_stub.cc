@@ -870,6 +870,19 @@ HcclResult HcommThreadJoin(ThreadHandle thread, uint32_t timeout)
     return HCCL_SUCCESS;
 }
 
+int32_t HcommQueryThreadSqTail(ThreadHandle thread, uint32_t *tail)
+{
+    if (tail != nullptr) {
+        *tail = 0;
+    }
+    return HCCL_SUCCESS;
+}
+
+int32_t HcommWaitThreadSqHeadReach(ThreadHandle thread, uint32_t targetTail, uint32_t timeout)
+{
+    return HCCL_SUCCESS;
+}
+
 int32_t HcommWriteReduceWithNotifyOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src,
     uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp, uint32_t remoteNotifyIdx)
 {
