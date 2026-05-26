@@ -57,7 +57,7 @@ inline float fdividef(float x, float y)
 -   SIMT编程场景：
 
     ```
-    __global__ __launch_bounds__(1024) void KernelFdivdef(float* dst, float* x, float* y)
+    __global__ __launch_bounds__(1024) void KernelFdividef(float* dst, float* x, float* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = fdividef(x[idx], y[idx]);
@@ -67,10 +67,9 @@ inline float fdividef(float x, float y)
 -   SIMD与SIMT混合编程场景：
 
     ```
-    __simt_vf__ __launch_bounds__(1024) inline void KernelFdivdef(__gm__ float* dst, __gm__ float* x, __gm__ float* y)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelFdividef(__gm__ float* dst, __gm__ float* x, __gm__ float* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = fdividef(x[idx], y[idx]);
     }
     ```
-
