@@ -12,13 +12,13 @@
 | Atlas 推理系列产品Vector Core | x |
 | Atlas 训练系列产品 | x |
 
-## 功能说明
+## 函数功能
 
 判断`thread_block_tile`组内所有线程的输入是否均不为0。
 
 ## 函数原型
 
-```C++
+```c++
 int all(int predicate) const
 ```
 

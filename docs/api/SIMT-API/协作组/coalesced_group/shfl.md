@@ -12,7 +12,7 @@
 | Atlas 推理系列产品Vector Core | x |
 | Atlas 训练系列产品 | x |
 
-## 功能说明
+## 函数功能
 
 `coalesced_group`组内线程的数据交换接口，不通过共享内存实现直接读取组内指定线程的寄存器中的值。
 
@@ -30,7 +30,7 @@ T shfl(T var, int src_rank) const
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | var | 输入 | 线程用于交换的数据。支持的数据类型为：half、int32_t、uint32_t、float、half2、int64_t、uint64_t。 |
-| src_rank | 输入 | 期望获取的var值所在的线程在组内的排名。 |
+| src_rank | 输入 | 期望获取的`var`值所在的线程在组内的排名。当`src_rank`大于等于组内线程数时，获取`src_rank % num_threads()`对应rank线程的`var`值。 |
 
 ## 返回值说明
 

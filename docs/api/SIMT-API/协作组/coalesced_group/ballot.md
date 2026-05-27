@@ -12,7 +12,7 @@
 | Atlas 推理系列产品Vector Core | x |
 | Atlas 训练系列产品 | x |
 
-## 功能说明
+## 函数功能
 
 判断`coalesced_group`组内每个线程的输入是否非零。
 
@@ -32,7 +32,7 @@ unsigned int ballot(int predicate) const
 
 ## 返回值说明
 
-32bit的无符号整数：若`coalesced_group`组内线程输入的`predicate`不为0，则返回值中与线程rank对应的bit位为1，否则为0。
+32-bit的无符号整数：若`coalesced_group`组内线程输入的`predicate`不为0，则返回值中与线程rank对应的bit位为1，否则为0。
 
 ## 约束说明
 

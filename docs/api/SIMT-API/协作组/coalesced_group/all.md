@@ -12,9 +12,9 @@
 | Atlas 推理系列产品Vector Core | x |
 | Atlas 训练系列产品 | x |
 
-## 功能说明
+## 函数功能
 
-判断是否`coalesced_group`组内所有线程的输入均不为0。
+判断`coalesced_group`组内所有线程的输入是否均不为0。
 
 ## 函数原型
 
