@@ -6,7 +6,7 @@
 
 ### Tensor编程的核心思想
 
-Tensor本质是一个数组，基于数组方式来管理和分配内存，以及执行相关计算，更匹配SIMD的硬件执行模型。Tensor编程的核心思想是将原始内存地址抽象为Tensor对象，实现从"地址操作"到"对象管理"的编程层次提升。
+Tensor本质是对内存地址的抽象封装，通过数组方式来管理和分配内存，以及执行相关计算，更匹配SIMD的硬件执行模型。Tensor编程的核心思想是将原始内存地址抽象为Tensor对象，实现从"地址操作"到"对象管理"的编程层次提升。
 
 ### Tensor的定义与分配管理
 
@@ -31,7 +31,7 @@ Add(dstTensor, src0Tensor, src1Tensor, 256);
 auto gmTensor = MakeTensor(gmPointer, MakeShape(128, 64));
 auto ubTensor = MakeTensor(ubPointer, MakeShape(128, 64));
 // 操作：无需手动设置size/count，Copy接口根据Tensor信息自动推导
-Copy(ubPointer, gmPointer);
+Copy(ubTensor, gmTensor);
 ```
 
 ## 编程范式: 面向C++ Tensor的SPMD编程范式
