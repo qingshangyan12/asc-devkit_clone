@@ -615,7 +615,7 @@
 | [scalbnf](../数学函数/float类型数学库函数/scalbnf.md) | 获取输入数据x与2的n次方的乘积。 |
 | [scalblnf](../数学函数/float类型数学库函数/scalblnf.md) | 获取输入数据x与2的n次方的乘积。 |
 | [modff](../数学函数/float类型数学库函数/modff.md) | 将输入数据分解为小数部分和整数部分。 |
-| [fdivdef](../数学函数/float类型数学库函数/fdividef.md) | 获取两个输入数据相除的结果。 |
+| [fdividef](../数学函数/float类型数学库函数/fdividef.md) | 获取两个输入数据相除的结果。 |
 | [signbit](../数学函数/float类型数学库函数/signbit.md) | 获取输入数据的符号位。 |
 | [__saturatef](../数学函数/float类型数学库函数/__saturatef.md) | 将输入数据钳位到[0.0, 1.0]区间。 |
 | [__fdividef](../数学函数/float类型数学库函数/__fdividef.md) | 获取两个输入数据相除的结果。 |
@@ -761,7 +761,7 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [tiled_partition](../协作组/tiled_partition.md) | 将一个线程组划分为多个更小、固定大小的子组。 |
-| [binary_partition](../协作组/binary_partition.md) | 根据一个标签（0或1）将父组划分为两个字组。 |
+| [binary_partition](../协作组/binary_partition.md) | 根据一个标签（0或1）将父组划分为两个子组。 |
 
 **表 28**  thread_block接口
 
@@ -813,4 +813,3 @@
 | [ballot](../协作组/thread_block_tile/ballot.md) | 判断组内每个活跃线程的输入是否非零。 |
 | [any](../协作组/thread_block_tile/any.md) | 判断是否有组内线程的输入不为0。 |
 | [all](../协作组/thread_block_tile/all.md) | 判断是否所有组内线程的输入均不为0。 |
-

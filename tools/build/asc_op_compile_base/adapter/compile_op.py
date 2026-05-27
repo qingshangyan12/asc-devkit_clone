@@ -425,7 +425,7 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
             called_func_params = "param, sargs"
             called_func_params_type = "__gm__ uint64_t *param, sk::SkSystemArgs *sargs"
             source += "__gm__ uint64_t *param, sk::SkSystemArgs *sargs) {\n"
-            source += "    AscendC::g_super_kernel_early_start_config = sargs->SkGetTaskSyncCfg();\n"
+            source += "    g_super_kernel_early_start_config = sargs->SkGetTaskSyncCfg();\n"
             source += "    uint32_t __asc_index = 0;\n"
             for param in func_params:
                 source += f"    {param} = (GM_ADDR)param[__asc_index++];\n"
@@ -1344,6 +1344,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         # reset sk opt
         global_var_storage.set_variable("ascendc_enable_super_kernel", False)
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
+        DFXSectionGenerator().dfx_info_reset(op_info)
         DFXSectionGenerator().update_is_support(op_info)
         compile_info_origin.dst_file = os.path.join(kernel_meta_dir, op_info.kernel_name + "_norm.o")
 
