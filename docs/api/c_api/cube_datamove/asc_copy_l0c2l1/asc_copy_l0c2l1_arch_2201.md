@@ -19,7 +19,7 @@
 - VQF322B8_PRE：float量化成uint8_t/int8_t。scalar量化。
 - VREQ8：int32_t量化成uint8_t/int8_t。矢量量化。
 
-此外，该搬运指令还支持int4b_t类型的量化，相关量化类型分为两种：int32_t量化为int4b_t；float量化为int4b_t
+此外，该搬运指令还支持int4b_t类型的量化，相关量化类型分为两种：int32_t量化为int4b_t；float量化为int4b_t。
 
 ## 函数原型
 
