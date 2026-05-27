@@ -14,11 +14,11 @@
 
 ## 功能说明
 
-提供当前线程的一个32位掩码，在当前线程所属的线程束中，只有当前线程所在的 lane 位被置为1，其余位为0。
+提供当前线程的一个32位掩码，在当前线程所属的Warp中，只有当前线程所在的 lane 位被置为1，其余位为0。
 
 如laneid为0的线程，其lanemask_eq为0000 0000 0000 0000 0000 0000 0000 0001。
 
-如laneid为0的线程，其lanemask_eq为0000 0000 0000 0000 0000 0000 0000 0001。
+如laneid为31的线程，其lanemask_eq为1000 0000 0000 0000 0000 0000 0000 0000。
 
 **图 1**  lanemask\_eq示意图
 
@@ -36,7 +36,7 @@ int32_t lanemask_eq()
 
 ## 返回值说明
 
-返回一个32位无符号整数的位掩码。
+返回一个32位整数的位掩码。
 
 ## 约束说明
 
@@ -44,24 +44,32 @@ int32_t lanemask_eq()
 
 ## 需要包含的头文件
 
-无
+使用该接口需要包含"simt\_api/device\_functions.h"头文件。 
+
+``` 
+#include "simt_api/device_functions.h" 
+```
 
 ## 调用示例
 
 -   SIMT编程场景：
 
     ```
-    __global__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
+    __global__ __launch_bounds__(1024) void kernel_lanemask_eq(int32_t* dst)
     {
-        int32_t lanemaskeq = lanemask_eq();
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        int32_t lanemask = lanemask_eq();
+        dst[idx] = lanemask;
     }
     ```
 
 -   SIMD与SIMT混合编程场景：
 
     ```
-    __simt_vf__ __launch_bounds__(1024) void kernel_laneid(float* x, float* y, float* z)
+    __simt_vf__ __launch_bounds__(1024) void kernel_lanemask_eq(__gm__ int32_t* dst)
     {
-        int32_t lanemaskeq = lanemask_eq();
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        int32_t lanemask = lanemask_eq();
+        dst[idx] = lanemask;
     }
     ```

@@ -1019,13 +1019,17 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
 在执行函数之前，会先对上述配置参数进行校验。如果grid\_dim或block\_dim超出设备的最大允许规模，或dynamic\_smem\_bytes超过分配静态内存后剩余的可用共享内存，该函数将会执行失败。
 
-一个内核所使用的寄存器数量会显著影响常驻线程束的数量。寄存器使用量可以通过编译器选项 \_\_launch\_bounds\_\_\(\) 限定符或 \_\_maxnreg\_\_\(\) 限定符来控制。
+一个核函数所使用的寄存器数量会显著影响常驻线程束的数量。寄存器使用量可以通过编译器选项 \_\_launch\_bounds\_\_\(\) 限定符或 \_\_maxnreg\_\_\(\) 限定符来控制。
+
+注：
+-   \_\_launch\_bounds\_\_或\_\_maxnreg\_\_只能被标在\_\_global\_\_函数上。
+-   同一函数不能同时有\_\_launch\_bounds\_\_和 \_\_maxnreg\_\_。
 
 在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程驻留在AI处理器上。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
 -   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
   
-    函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定SIMT VF启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动VF任务的dim3线程数保持一致。
+    函数标记宏，在核函数上可选配置，用于在编译期指定SIMT VF启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动VF任务的dim3线程数保持一致。
     
     **表 5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
 
@@ -1062,7 +1066,7 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
     配置SIMT函数最大线程数为512，每个Thread可用寄存器数为64，示例如下：
 
     ```
-    __simt_vf__ __launch_bounds__(512) inline void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+    __global__ __launch_bounds__(512) inline void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
     ```
     \_\_launch\_bounds\_\_\(N\)的参数N需要满足：
     -   N \>= dimx \* dimy \* dimz；dimx，dimy，dimz为表示线程的dim3结构体。
@@ -1074,20 +1078,20 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
 -   \_\_maxnreg\_\_\(N\) <a name="li23861114618"></a>
 
-    函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定单个线程在一个线程块内最多可分配的寄存器数量。
+    函数标记宏，在核函数上可选配置，用于在编译期指定单个线程在一个线程块内最多可分配的寄存器数量。
 
     \_\_maxnreg\_\_\(N\)的参数N需要满足：
     -   N的取值范围为（0,128]区间的整数;
     -   若输入值N的范围为（0，16]，则会使用16个寄存器；若输入值N的范围为（16，32]，则会使用32个寄存器；若输入值N的范围为（32，64\]，则会使用64个寄存器；若输入值N的范围为（64，128\]，则会使用128个寄存器；
-    -   若未配置\_\_maxnreg\_\_，单个线程最多可分配的寄存器数量默认为为32。
+    -   若未配置\_\_maxnreg\_\_，单个线程最多可分配的寄存器数量默认为32。
 
-    每个线程可用的最大寄存器数量对用户可配置的Thread数量有限制，具体对应关系请见下表。
+    每个线程可用的最大寄存器数量对每个block实际启动的线程数有限制，具体对应关系请见下表。
 
-    **表 6**  \_\_maxnreg\_\_的每个Thread最多可分配的寄存器数与用户可配置的Thread的范围
+    **表 6**  \_\_maxnreg\_\_的每个Thread最多可分配的寄存器数与每个block实际启动的线程数
 
     <table><thead align="left"><tr id="row8153550597"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p13153175175919"><a name="p13153175175919"></a><a name="p13153175175919"></a>单个线程最多可分配的寄存器数量(个)</p>
     </th>
-    <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>用户可配置的Thread的范围(个)</p>
+    <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>每个block实际启动的线程数(个)</p>
     </th>
     </tr>
     </thead>
@@ -1117,9 +1121,5 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
     配置SIMT函数单个线程最多可分配的寄存器数量为64，示例如下：
 
     ```
-    __simt_vf__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+    __global__ __maxnreg__(64) void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
     ```
-       
-注：
--   \_\_launch\_bounds\_\_或\_\_maxnreg\_\_只能被标在\_\_simt_vf\_\_函数上（simt模式下的\_\_global\_\_函数）。
--   同一函数不能同时有\_\_launch\_bounds\_\_和 \_\_maxnreg\_\_。
