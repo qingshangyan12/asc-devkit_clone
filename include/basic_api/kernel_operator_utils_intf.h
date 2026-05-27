@@ -32,6 +32,7 @@ namespace AscendC {
 template <int count = 1>
 __aicore__ inline void Nop()
 {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     if (count <= 0) {
         return;
     }
@@ -41,6 +42,7 @@ __aicore__ inline void Nop()
         asm volatile("nop");
     }
     PipeBarrier<PIPE_ALL>();
+#endif
 }
 
 enum class EngineType : int32_t {
