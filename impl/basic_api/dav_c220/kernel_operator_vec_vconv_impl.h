@@ -896,7 +896,7 @@ __aicore__ inline void CastDeqImpl(__ubuf__ T* dst, __ubuf__ U* src,
 {
     ASCENDC_DEBUG_ASSERT((SupportType<Tuple<U, T>, Tuple<int16_t, int8_t>, Tuple<int16_t, uint8_t>,
         Tuple<int32_t, half>>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CastDeqImpl, current api "
-        "support dtype combination is src:int16_t dst: int8_t/uint8_t , src:int32_t dst:half."));
+        "support dtype combination is src:int16_t dst: int8_t/uint8_t , src:int32_t dst:half.\n"));
     if ASCEND_IS_AIV {
         set_mask_count();
         set_vector_mask(0, count);
@@ -905,7 +905,7 @@ __aicore__ inline void CastDeqImpl(__ubuf__ T* dst, __ubuf__ U* src,
             CastImpl(dst, src, RoundMode::CAST_RINT, count);
         } else{
             if constexpr (isVecDeq) {
-                CastVDeqIntrinsicsImpl<T, halfBlock>(dst, src, 1, repeatParams);
+                <T, halfBlock>(dst, src, 1, repeatParams);
             } else {
                 CastDeqIntrinsicsImpl<T, halfBlock>(dst, src, 1, repeatParams);
             }
@@ -922,7 +922,7 @@ __aicore__ inline void CastDeqImpl(__ubuf__ T* dst, __ubuf__ U* src,
 {
     ASCENDC_DEBUG_ASSERT((SupportType<Tuple<U, T>, Tuple<int16_t, int8_t>, Tuple<int16_t, uint8_t>,
         Tuple<int32_t, half>>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CastDeqImpl, current api "
-        "support dtype combination is src:int16_t dst: int8_t/uint8_t , src:int32_t dst:half."));
+        "support dtype combination is src:int16_t dst: int8_t/uint8_t , src:int32_t dst:half.\n"));
     if ASCEND_IS_AIV {
         AscendCUtils::SetMask<U, isSetMask>(mask[1], mask[0]);
         if constexpr (sizeof(U) == sizeof(int32_t)) {
@@ -944,7 +944,7 @@ __aicore__ inline void CastDeqImpl(__ubuf__ T* dst, __ubuf__ U* src,
 {
     ASCENDC_DEBUG_ASSERT((SupportType<Tuple<U, T>, Tuple<int16_t, int8_t>, Tuple<int16_t, uint8_t>,
         Tuple<int32_t, half>>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CastDeqImpl, current api "
-        "support dtype combination is src:int16_t dst: int8_t/uint8_t , src:int32_t dst:half."));
+        "support dtype combination is src:int16_t dst: int8_t/uint8_t , src:int32_t dst:half.\n"));
     if ASCEND_IS_AIV {
         AscendCUtils::SetMask<U, isSetMask>(mask);
         if constexpr (sizeof(U) == sizeof(int32_t)) {
@@ -965,7 +965,7 @@ __aicore__ inline void AddReluCastIntrinsicsImpl(__ubuf__ T* dst, __ubuf__ U* sr
 {
     static_assert(SupportType<Tuple<U, T>, Tuple<half, int8_t>, Tuple<float, half>, Tuple<int16_t, int8_t>>(),
         "Failed to check dtype in AddReluCast, current api support dtype combination is src: half, dst: int8_t; src: "
-        "float, dst: half; src: int16_t, dst: int8_t.");
+        "float, dst: half; src: int16_t, dst: int8_t.\n");
     if constexpr (SupportType<Tuple<U, T>, Tuple<half, int8_t>>()) {
         vaddreluconv_f162s8(dst, src0, src1, repeatTime, repeatParams.dstBlkStride, repeatParams.src0BlkStride,
             repeatParams.src1BlkStride, repeatParams.dstRepStride, repeatParams.src0RepStride,
