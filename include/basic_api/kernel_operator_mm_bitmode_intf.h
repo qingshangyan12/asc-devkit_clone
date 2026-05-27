@@ -22,7 +22,6 @@
 
 #include "kernel_struct_mm.h"
 #include "../../impl/basic_api/kernel_operator_mm_bitmode_struct.h"
-#endif
 
 namespace AscendC {
 class Load2DBitModeParam {
