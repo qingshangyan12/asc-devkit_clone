@@ -67,6 +67,36 @@
 
 本样例通过Case 1-4建立调度开销基线，Case 5与Case 6对比1024核与64核两种配置下的实际计算性能。
 
+#### 运行期查询物理核数
+
+样例中 `AIV_CORE_NUM = 64` 是按目标平台 Ascend 950PR/950DT 写死的教学常量。在实际工程中，建议通过 AscendCL Runtime API 在运行期向硬件查询，以避免硬编码：
+
+```cpp
+#include "acl/acl.h"
+
+int32_t device_id = 0;
+int64_t physical_aiv_core_num = 0;
+aclError ret = aclrtGetDeviceInfo(
+    static_cast<uint32_t>(device_id),
+    ACL_DEV_ATTR_VECTOR_CORE_NUM,
+    &physical_aiv_core_num);
+if (ret == ACL_SUCCESS) {
+    printf("Physical AIV (Vector Core) num: %ld\n", physical_aiv_core_num);
+}
+```
+
+调用前需先完成 `aclInit` 与 `aclrtSetDevice`。`aclrtDevAttr` 常用枚举：
+
+| 枚举值                          | 含义                |
+| ------------------------------- | ------------------- |
+| `ACL_DEV_ATTR_AICORE_CORE_NUM`  | AI Core 数量        |
+| `ACL_DEV_ATTR_VECTOR_CORE_NUM`  | Vector Core (AIV) 数量 |
+| `ACL_DEV_ATTR_AICPU_CORE_NUM`   | AI CPU 数量         |
+
+接口文档：
+- [aclrtGetDeviceInfo / acl.rt.get_device_info](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900/API/runtimeapi/aclpythondevg_01_1029.html)
+- [aclrtDevAttr 枚举](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900/API/runtimeapi/aclpythondevg_01_1111.html)
+
 #### 核心概念：动态UB（Unified Buffer）
 
 Pure SIMT中，每个thread block拥有独立的Unified Buffer（共享内存）。本样例的`gather_adds_kernel`通过动态UB接收每核的工作集：

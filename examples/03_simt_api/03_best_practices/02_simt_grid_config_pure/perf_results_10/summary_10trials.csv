@@ -1,0 +1,7 @@
+Scenario,Op Name,Block Dim,Trials,Mean(us),Min(us),Max(us),Std(us)
+scenario_1,empty_kernel,36,10,2.0221,1.7700,2.2120,0.1674
+scenario_2,empty_kernel,64,10,2.4685,2.1690,2.6930,0.1999
+scenario_3,empty_kernel,128,10,3.3697,3.0840,3.5420,0.1267
+scenario_4,empty_kernel,1024,10,16.2580,16.0670,16.6860,0.1855
+scenario_5,gather_adds_kernel,1024,10,35.0808,34.5920,35.6190,0.3059
+scenario_6,gather_adds_kernel,64,10,10.6796,10.2620,11.1740,0.2302

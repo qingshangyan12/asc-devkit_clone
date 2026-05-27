@@ -1,0 +1,7 @@
+Scenario,Op Name,Op Type,Task Duration(us),Block Dim,Mix Block Dim,Device Id,Pid,Current Freq,Rated Freq
+scenario_1,empty_kernel,vector,2.019000,36,NA,0,281056,1650,1650,
+scenario_2,empty_kernel,vector,2.505000,64,NA,0,281545,1650,1650,
+scenario_3,empty_kernel,vector,3.561000,128,NA,0,282033,1650,1650,
+scenario_4,empty_kernel,vector,16.575001,1024,NA,0,282694,1650,1650,
+scenario_5,gather_adds_kernel,vector,34.778000,1024,NA,0,283562,1650,1650,
+scenario_6,gather_adds_kernel,vector,10.943000,64,NA,0,284135,1650,1650,
