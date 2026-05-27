@@ -39,6 +39,7 @@ enum class SocVersion {
     ASCEND310P,     // Ascend310P1, Ascend310P3
     ASCEND310B,     // Ascend310B1, Ascend310B2, Ascend310B3, Ascend310B4
     ASCEND950,   // ASCEND950, __DAV_C310__
+    ASCEND350,      // ASCEND350, __DAV_C310__
     RESERVED_VERSION = 99999
 };
 
@@ -262,6 +263,7 @@ ContextBuilder &ContextBuilder::PlatformInfo(void *platformInfo)
 ContextBuilder &ContextBuilder::AddPlatformInfo(const char *customSocVersion)
 {
     static std::map<std::string, SocVersion> convertMap = {
+        {"Ascend350", SocVersion::ASCEND350},
         {"Ascend310P", SocVersion::ASCEND310P},
         {"Ascend910", SocVersion::ASCEND910},
         {"Ascend910B", SocVersion::ASCEND910B},
