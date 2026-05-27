@@ -81,15 +81,23 @@ def check_exist_instrinsic_when_super_kernel(dst_i_file):
     allow_path_mark = ['bisheng_compiler', 'ccec_compiler', 'tikcpp/tikcfw', 'asc/impl', 'impl/basic_api']
     result_symbol_list, path_list, line_result =\
         check_exist_forbidden_symbols(dst_i_file, forbidden_apis, allow_path_mark)
-    result_str = ''
     len_result_symbol_list = len(result_symbol_list)
     if len_result_symbol_list != 0:
-        result_str += f'ERROR({len_result_symbol_list}): '
-        for i, result in enumerate(result_symbol_list):
-            replacement = _FORBIDDEN_API_REPLACEMENT.get(result, '')
-            result_str += f"Use of {result} is not allowed in SuperKernel"\
-                          f", please use {replacement} instead (op: {path_list[i]}"\
-                          f", line: {line_result[i]})"
-            if i != len_result_symbol_list - 1:
-                result_str += '\n'
+        all_forbidden = []
+        all_replacements = []
+        for result in result_symbol_list:
+            symbols = [s.strip() for s in result.split(',')]
+            for symbol in symbols:
+                if symbol and symbol not in all_forbidden:
+                    all_forbidden.append(symbol)
+                replacement = _FORBIDDEN_API_REPLACEMENT.get(symbol, '')
+                if replacement and replacement not in all_replacements:
+                    all_replacements.append(replacement)
+        forbidden_str = ' or '.join(all_forbidden)
+        replacement_str = ' and '.join(all_replacements)
+        result_str = f'ERROR({len_result_symbol_list}): '
+        result_str += f"Use of {forbidden_str} is not allowed in SuperKernel"\
+                      f", please use {replacement_str} instead"
+        for i in range(len_result_symbol_list):
+            result_str += f"\n  (op: {path_list[i]}, line: {line_result[i]})"
         CommonUtility().ascendc_raise_python_err(ERR_CODE, result_str)
