@@ -7,33 +7,12 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
+cmake_minimum_required(VERSION 3.10)
 
-
-cmake_minimum_required(VERSION 3.16)
-
-set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
-
-find_package(ASC REQUIRED)
-
-project(kernel_samples LANGUAGES ASC CXX)
-
-set(ASC_SOURCES
-    matmul_leakyrelu.asc
+install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/tensor_api
+  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
 
-set(SHARED_LIBRARIES
-    tiling_api
-    register
-    platform
-    m
-    dl
+install(DIRECTORY ${ASCENDC_IMPL_DIR}/tensor_api
+  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
-
-set(COMPILE_OPTIONS
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-)
-
-add_executable(demo ${ASC_SOURCES})
-
-target_link_libraries(demo PRIVATE ${SHARED_LIBRARIES})
-target_compile_options(demo PRIVATE ${COMPILE_OPTIONS})

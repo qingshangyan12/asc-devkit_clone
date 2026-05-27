@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-# coding=utf-8
-
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -10,22 +7,20 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
+cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201")
 
-import numpy as np
-import os
+find_package(ASC REQUIRED)
 
+project(kernel_samples LANGUAGES ASC CXX)
 
-def gen_golden_data_simple():
-    input_x = np.random.uniform(1, 100, [8 * 9, 4096]).astype(np.float32)
-    input_y = np.random.uniform(1, 100, [8 * 9, 4096]).astype(np.float32)
-    golden = (input_x + input_y).astype(np.float32)
-    os.makedirs("input", exist_ok=True)
-    os.makedirs("output", exist_ok=True)
-    input_x.tofile("./input/input_x.bin")
-    input_y.tofile("./input/input_y.bin")
-    golden.tofile("./output/golden.bin")
+add_executable(demo
+    ms_sanitizer.asc
+)
 
-
-if __name__ == "__main__":
-    gen_golden_data_simple()
+target_compile_options(demo PRIVATE
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    -g             # enable callstack display for mssanitizer
+    --sanitizer    # enable sanitizer
+)
