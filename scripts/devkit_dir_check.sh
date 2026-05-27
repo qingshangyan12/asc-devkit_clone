@@ -17,38 +17,6 @@ DIR_LIST=(
     "/usr/local/Ascend/cann/asc/|./monitor_snapshot_2.txt"
 )
 
-cat << 'EOF' > monitor_snapshot_1.txt
-d aarch64-linux
-d combo_script
-d compat
-d compiler
-d fwkacllib
-d opp
-d python
-d runtime
-d share
-d toolkit
-d tools
-d var
-f cann_uninstall.sh
-f ops_uninstall.sh
-f set_env.sh
-l arm64-linux
-l asc
-l bin
-l conf
-l devlib
-l include
-l lib64
-l pkg_inc
-l test-ops
-EOF
-
-cat << 'EOF' > monitor_snapshot_2.txt
-d impl
-d include
-EOF
-
 # 遍历监控每个目录
 for item in "${DIR_LIST[@]}"; do
     # 分割目录和快照路径
@@ -66,6 +34,14 @@ for item in "${DIR_LIST[@]}"; do
     # 生成当前目录一级结构快照
     find "$TARGET_DIR" -maxdepth 1 -mindepth 1 -printf '%y %f\n' 2>/dev/null | sort > "$CURRENT_SNAP"
     echo -e "\n========== 监控目录：$TARGET_DIR =========="
+
+    # 首次运行：生成初始快照（仅第一次生成）
+    if [ ! -f "$SNAPSHOT_FILE" ]; then
+        cp "$CURRENT_SNAP" "$SNAPSHOT_FILE"
+        echo "✔ 首次运行，已生成初始快照：$SNAPSHOT_FILE"
+        rm "$CURRENT_SNAP"
+        continue
+    fi
 
     # 对比快照
     DIFF=$(diff "$SNAPSHOT_FILE" "$CURRENT_SNAP" 2>/dev/null)
