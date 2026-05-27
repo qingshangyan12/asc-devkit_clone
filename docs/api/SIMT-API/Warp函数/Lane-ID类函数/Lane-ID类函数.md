@@ -1,4 +1,4 @@
-# Warp Reduce类函数
+# LaneID类函数
 
 -   **[laneid](laneid.md)**
 
