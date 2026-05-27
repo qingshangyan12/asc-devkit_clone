@@ -335,8 +335,7 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
   > **注意：** A2/A3架构仅支持Scenario 1（GM中转），选择Scenario 2会触发编译期 `static_assert` 报错。
 
-- 配置环境变量
-
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
