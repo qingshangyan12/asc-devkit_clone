@@ -12,10 +12,10 @@ cmake_minimum_required(VERSION 3.16)
 
 find_package(ASC REQUIRED)
 
-project(kernel_samples LANGUAGES ASC CXX)
-
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 set(CMAKE_ASC_ENABLE_SIMT ON)
+
+project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
     hello_world.asc
