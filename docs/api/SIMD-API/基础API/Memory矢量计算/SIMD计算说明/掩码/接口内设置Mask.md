@@ -4,7 +4,7 @@
 
 - **前n个数据计算**
 
-    采用[Counter模式](概述.md#mask-mode)前n个数据计算，接口内部会先调用SetMaskCount，然后根据接口参数count调用SetVectorMask，再进行计算，计算完成后调用ResetMask、SetMaskNorm恢复系统默认Normal模式。
+    采用[Counter模式](概述.md#mask-mode)进行前n个数据计算，接口内部会先调用SetMaskCount，然后根据接口参数count调用SetVectorMask，再进行计算，计算完成后调用ResetMask、SetMaskNorm恢复系统默认Normal模式。
 
     调用示例：
 
@@ -14,10 +14,10 @@
     AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, count);
     ```
 
-    如图1所示，采用Counter模式下的前n个数据计算接口，通过count参数指定参与计算的元素数量为128，接口内部会自动完成Mask的设置。
+    如图1所示，采用Counter模式进行前n个数据计算，通过count参数指定参与计算的元素数量为128，接口内部会自动完成Mask的设置。
 
-    **图 1**  Counter模式前n个数据计算示例  
-    ![](../../../../../figures/counter_first_n_calc.png)<a id="图1-counter模式前n个数据计算示例"></a>
+    **图 1**  Counter模式进行前n个数据计算示例  
+    ![](../../../../../figures/counter_first_n_calc.png)<a id="图1-counter模式进行前n个数据计算示例"></a>
 
     完整样例参考[Mask样例](https://gitcode.com/cann/asc-devkit/pull/810)。
 
@@ -39,14 +39,14 @@
 
     如图2所示，采用Counter模式下的高维切分连续计算接口，mask数组中仅低64bit有效，表示参与计算的元素总数为130。该模式接口内部的repeatTimes参数无效，系统根据mask值自动计算迭代次数。repeatParams参数配置表示DataBlock间存在间隔，迭代间连续。
 
-    **图 2**  Counter模式高维切分连续计算示例  
-    ![](../../../../../figures/counter_high_dim_continuous.png)<a id="图2-counter模式高维切分连续计算示例"></a>
+    **图 2**  Counter模式进行高维切分连续计算示例  
+    ![](../../../../../figures/counter_high_dim_continuous.png)<a id="图2-counter模式进行高维切分连续计算示例"></a>
 
 ## Normal模式
 
 在[Normal计算模式](概述.md#mask-mode)中，Mask寄存器会作为每个Repeat的掩码使用。只有高维切分支持此模式，在接口上区分为逐bit模式和连续模式。
 
-**注：Normal 为默认模式。若未发生模式切换，则无需重复配置该模式。**
+**注：Normal为默认模式。若未发生模式切换，则无需重复配置该模式。**
 
 - **高维切分：逐bit计算**
 
@@ -60,7 +60,7 @@
     AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, mask, repeatTimes, repeatParams);
     ```
 
-    如图3所示，Normal模式逐bit计算时，mask参数以位数组形式控制每个元素的是否参与计算，详细展示了第一个DataBlock中元素的计算过程。repeatParams参数配置表示DataBlock间存在间隔，迭代间连续。
+    如图3所示，采用Normal模式进行逐bit计算时，mask参数以位数组形式控制每个元素的是否参与计算，详细展示了第一个DataBlock中元素的计算过程。repeatParams参数配置表示DataBlock间存在间隔，迭代间连续。
 
     **图 3**  Normal模式高维切分逐bit计算示例  
     ![](../../../../../figures/normal_high_dim_bitwise.png)<a id="图3-normal模式高维切分逐bit计算示例"></a>
@@ -77,11 +77,11 @@
     AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, mask, repeatTimes, repeatParams);
     ```
 
-    如图4所示，Normal模式连续计算时，mask参数表示迭代内连续参与计算的元素数量为128。repeatParams参数配置表示DataBlock间存在间隔，迭代间连续。
+    如图4所示，采用Normal模式进行连续计算时，mask参数表示迭代内连续参与计算的元素数量为128。repeatParams参数配置表示DataBlock间存在间隔，迭代间连续。
 
-    **图 4**  Normal模式高维切分连续计算示例  
-    ![](../../../../../figures/normal_high_dim_continuous.png)<a id="图4-normal模式高维切分连续计算示例"></a>
+    **图 4**  Normal模式进行高维切分连续计算示例  
+    ![](../../../../../figures/normal_high_dim_continuous.png)<a id="图4-normal模式进行高维切分连续计算示例"></a>
 
 > [!NOTE]说明
 > 
-> 当数据类型为half（操作数为16位）时，每次迭代内能够处理的元素个数mask∈\[1, 128\]。当mask \> 128时，仍按一次 repeat（128元素）执行，不支持超过128元素的mask控制。
+> 当数据类型为half（操作数为16位）时，每次迭代内能够处理的元素个数mask∈\[1, 128\]。当mask \> 128时，仍按一次repeat（128元素）执行，不支持超过128元素的mask控制。
