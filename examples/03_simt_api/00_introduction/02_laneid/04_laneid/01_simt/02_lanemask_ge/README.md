@@ -6,7 +6,7 @@
 
 `lanemask_ge()` 返回一个32位掩码，在当前线程所属的 Warp 中，将 "laneid 大于等于当前线程" 的线程对应位设为1，其余位为0。
 
-掩码位排列：最高位对应 laneid=0，最低位对应 laneid=31。
+掩码位排列：最低位对应 laneid=0，最高位对应 laneid=31。
 
 ### API 定义
 
@@ -16,13 +16,14 @@ static __SIMT_DEVICE_FUNCTIONS_DECL__ uint32_t lanemask_ge();
 
 ## 示例
 
-| Lane ID | Lanemask_ge (二进制) | 十进制值 |
-|---------|---------------------|---------|
-| 0 | 1111 1111 1111 1111 1111 1111 1111 1111 | 4294967295 |
-| 1 | 0111 1111 1111 1111 1111 1111 1111 1111 | 2147483647 |
-| 2 | 0011 1111 1111 1111 1111 1111 1111 1111 | 1073741823 |
+| Lane ID | Lanemask_ge (十六进制) | 二进制 |
+|---------|----------------------|--------|
+| 0 | 0xffffffff | 1111 1111 1111 1111 1111 1111 1111 1111 |
+| 1 | 0xfffffffe | 1111 1111 1111 1111 1111 1111 1111 1110 |
+| 2 | 0xfffffffc | 1111 1111 1111 1111 1111 1111 1111 1100 |
+| 3 | 0xfffffff8 | 1111 1111 1111 1111 1111 1111 1111 1000 |
 | ... | ... | ... |
-| 31 | 0000 0000 0000 0000 0000 0000 0000 0001 | 1 |
+| 31 | 0x80000000 | 1000 0000 0000 0000 0000 0000 0000 0000 |
 
 ## 核函数实现
 
@@ -43,21 +44,15 @@ __global__ __maxnreg__(REG_COUNT) void lanemask_ge_test(uint32_t* lanemask_outpu
 
 ```cpp
 for (uint32_t i = 0; i < total_length; i++) {
-    uint32_t mask = 0;
-    for (uint32_t lane = 0; lane < WARP_SIZE; lane++) {
-        if (lane >= i) {
-            mask |= (1U << (WARP_SIZE - 1 - lane));
-        }
-    }
-    golden[i] = mask;
+    golden[i] = 0xFFFFFFFFU << i;
 }
 ```
 
 ## 预期输出
 
 ```
-Output: 4294967295 2147483647 1073741823 ... 1 
-Golden: 4294967295 2147483647 1073741823 ... 1 
+Output: 0xffffffff 0xfffffffe 0xfffffffc 0xfffffff8 ... 0x80000000 
+Golden: 0xffffffff 0xfffffffe 0xfffffffc 0xfffffff8 ... 0x80000000 
 [Success] Lanemask_ge verification passed.
 ```
 
@@ -73,6 +68,6 @@ make
 ## 关键概念
 
 - **Lanemask_ge**: 返回 laneid >= 当前线程的掩码
-- **掩码排列**: 最高位对应 laneid=0，最低位对应 laneid=31
+- **掩码排列**: 最低位对应 laneid=0，最高位对应 laneid=31
 - **Warp**: 32 个线程的执行单元
-- **计算公式**: mask = ((1U << (32 - laneid)) - 1) << laneid 或使用循环生成
+- **计算公式**: mask = 0xFFFFFFFFU << laneid
