@@ -12,7 +12,7 @@ Shape用于表达Tensor形状，Stride则用于区分不同的排布方式。
 图中每个方格中的数字表示该位置元素在内存中按顺序排列时的下标。对于相同的矩阵位置，排布方式不同时，其在内存中的顺序可能不同。例如，矩阵坐标(1, 0)在行优先和列优先的情况下，对应元素在内存中的顺序分别是4和1。
 
 **图1** 行优先排布
-![行优先排布](../../../../figures/行优先排布.png)
+
 ![行优先排布](../../../../figures/行优先排布.png)
 
 **图2** 列优先排布
@@ -50,17 +50,17 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - NZ Layout
 
-    NZ Layout格式的ShapeRow0、ShapeColumn0为固定值。内层分形的Shape为16 * (32Byte / sizeof(T))，StrideRow0、StrideColumn0也为固定值，即内层分形按行优先方式连续存储。外层分形按Z字形组织，因此StrideRow1需要满足按整块对齐的要求。
+    NZ Layout格式的ShapeRow0、ShapeColumn0为固定值。内层分形的Shape为16 * (32Byte / sizeof(T))，StrideRow0、StrideColumn0也为固定值，即内层分形按Z字形组织，外层分形按N字形组织，因此StrideColumn1需要满足按整块对齐的要求。
 
     ```cpp
     Layout = ((Shape) : (Stride))
     Shape = ((_16{}, ShapeRow1), (_32{} / sizeof(T), ShapeColumn1))
     Stride = ((_32{} / sizeof(T), StrideRow1), (_1{}, StrideColumn1))
-    // StrideRow1应满足：
-    // (StrideRow1 - ShapeRow0 * ShapeColumn0) % ShapeColumn0 == 0
+    // StrideColumn1应满足：
+    // StrideColumn1 % (ShapeRow0 * ShapeColumn0) == 0
     ```
     **图4** NZ Layout  
-    ![Nz-格式](../../../../figures/Nz-格式.png)
+    ![NZ-格式](../../../../figures/Nz-格式.png)
     
     下面是一个连续的NZ Layout示例，其中C0_ELEMENT = _32{} / sizeof(T)。
 
@@ -72,14 +72,14 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - ZN Layout
 
-    ZN Layout格式的ShapeRow0、ShapeColumn0为固定值。内层分形的Shape为(32Byte / sizeof(T)) * 16，StrideRow0、StrideColumn0也为固定值，即内层分形按列优先方式连续存储。外层分形按N字形组织，因此StrideRow1需要满足按整块对齐的要求。
+    ZN Layout格式的ShapeRow0、ShapeColumn0为固定值。内层分形的Shape为(32Byte / sizeof(T)) * 16，StrideRow0、StrideColumn0也为固定值，即内层分形按N字形组织，外层分形按字形组织，因此StrideRow1需要满足按整块对齐的要求。
 
     ```cpp
     Layout = ((Shape) : (Stride))
     Shape = ((C0_ELEMENT, ShapeRow1), (_16{}, ShapeColumn1))
     Stride = ((_1{}, StrideRow1), (C0_ELEMENT, StrideColumn1))
     // StrideRow1应满足：
-    // (StrideRow1 - ShapeRow0 * ShapeColumn0) % ShapeColumn0 == 0
+    // StrideRow1 % (ShapeRow0 * ShapeColumn0) == 0
     ```
 
     **图5** ZN Layout  
@@ -173,7 +173,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - ZZ Layout
 
-    ZZ Layout格式的ShapeRow0、ShapeColumn0为固定值。内层分形的Shape与NZ Layout一致，StrideRow0、StrideColumn0也为固定值，即内层分形按行优先方式连续存储。外层分形同样按Z字形组织，因此列方向连续，行方向跨度由整行分形块数决定。
+    ZZ Layout格式的ShapeRow0、ShapeColumn0为固定值。内层分形的Shape与NZ Layout一致，StrideRow0、StrideColumn0也为固定值，即内层分形按Z字形组织，外层分形同样按Z字形组织，因此列方向连续，行方向跨度由整行分形块数决定。
 
     ```cpp
     Layout = ((Shape) : (Stride))
@@ -191,7 +191,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - NN Layout
 
-    NN Layout格式的ShapeRow0、ShapeColumn0为固定值，仅用于fp8_e8m0_t场景。内层分形固定为2 * 16，StrideRow0、StrideColumn0也为固定值，即内层分形按列优先方式连续存储。外层分形继续按N字形组织。
+    NN Layout格式的ShapeRow0、ShapeColumn0为固定值，仅用于fp8_e8m0_t场景。内层分形固定为2 * 16，StrideRow0、StrideColumn0也为固定值，即内层分形按N字形组织。外层分形同样按N字形组织。
 
     ```cpp
     Layout = ((Shape) : (Stride))
@@ -279,14 +279,14 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     Stride = ((_0{}, _1{}), (_0{}, row))
     ```
 
-MX scaleA要求在矩阵GM上按照ScaleAND Layout或ScaleADN Layout格式排布，在L1上需满足满足按行读取需求，即按照ZZ Layout格式排布。如下图所示，若GM上scaleA矩阵为ScaleAND或者ScaleADN分形排布，搬运到L1后分型为ZZ排布。
+MX scaleA要求在矩阵GM上按照ScaleAND Layout或ScaleADN Layout格式排布，在L1上需满足满足按行读取需求，即按照ZZ Layout格式排布。如下图所示，若GM上scaleA矩阵为ScaleAND或者ScaleADN分形排布，搬运到L1后分形为ZZ排布。
 
-**图7** scaleA矩阵在不同位置上的排布格式
+**图8** scaleA矩阵在不同位置上的排布格式
 ![scaleA矩阵在不同位置上的排布格式](../../../../figures/scaleA矩阵在不同位置上的排布格式.png)
 
-MX scaleA要求在矩阵GM上按照ScaleAND Layout或ScaleADN Layout格式排布，在L1上需满足满足按列读取需求，即按照ZZ Layout格式排布。如下图所示，若GM上scaleB矩阵为ScaleBND或者ScaleBDN分形排布，搬运到L1后分型为NN排布。
+MX scaleA要求在矩阵GM上按照ScaleAND Layout或ScaleADN Layout格式排布，在L1上需满足满足按列读取需求，即按照ZZ Layout格式排布。如下图所示，若GM上scaleB矩阵为ScaleBND或者ScaleBDN分形排布，搬运到L1后分形为NN排布。
 
-**图8** scaleB矩阵在不同位置上的排布格式
+**图9** scaleB矩阵在不同位置上的排布格式
 ![scaleB矩阵在不同位置上的排布格式](../../../../figures/scaleB矩阵在不同位置上的排布格式.png)
 
 ## Layout分形结构数据表
@@ -296,7 +296,7 @@ MX scaleA要求在矩阵GM上按照ScaleAND Layout或ScaleADN Layout格式排布
 | LayoutFormatPattern | 类型 | ShapeRow0 | ShapeRow1 | ShapeColumn0 | ShapeColumn1 | StrideRow0 | StrideRow1 | StrideColumn0 | StrideColumn1 |
 |-------------|------|-----------|-----------|--------------|--------------|------------|------------|---------------|---------------|
 | NZLayoutPtn | T | _16{} | ceil_div(row, _16{}) | C0_ELEMENT | ceil_div(column, C0_ELEMENT) | C0_ELEMENT | C0_ELEMENT * _16{} | _1{} | C0_ELEMENT * ceil_align(row, _16{}) |
-| ZNLayoutPtnZn | T | C0_ELEMENT | ceil_div(row, C0_ELEMENT) | _16{} | ceil_div(column, _16{}) | _1{} | C0_ELEMENT * ceil_align(column, _16{}) | C0_ELEMENT | C0_ELEMENT * _16{} |
+| ZNLayoutPtn | T | C0_ELEMENT | ceil_div(row, C0_ELEMENT) | _16{} | ceil_div(column, _16{}) | _1{} | C0_ELEMENT * ceil_align(column, _16{}) | C0_ELEMENT | C0_ELEMENT * _16{} |
 | DNExtLayoutPtn | T | _1{} | row | _1{} | column | _0{} | _1{} | _0{} | row |
 | NDExtLayoutPtn | T | _1{} | row | _1{} | column | _0{} | column | _0{} | _1{} |
 | DNLayoutPtn | T | row | - | column | - | _1{} | - | row | - |

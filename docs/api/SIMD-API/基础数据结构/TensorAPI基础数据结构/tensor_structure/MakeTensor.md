@@ -48,8 +48,8 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
   // 示例1：使用指针和Layout创建张量
   constexpr int tileNum = 4;
   __cbuf__ half dataPtr[tileNum]; // 初始化
-  auto ptr = MakeL1memPtr(dataPtr);
-  auto layout = MakeNzLayout<half>(32, 32);
+  auto ptr = MakeMemPtr(dataPtr);
+  auto layout = MakeFrameLayout<NZLayoutPtn, half>(32, 32);
   auto tensor = MakeTensor(ptr, layout);
   
   // 示例2：使用指针和形状创建张量（自动计算步幅）

@@ -48,7 +48,7 @@ LayoutTrait用于指定数据类型和C0维度基数。`MakeFrameLayout`支持�
    ```cpp
    struct MyLayoutTrait {
        using DataType = float;
-       static constexpr size_t C0_SIZE = 16;
+       static constexpr auto C0_SIZE = Std::Int<16>{};
    };
 
    MakeFrameLayout<NzLayoutPtn, MyLayoutTrait>(m, n)

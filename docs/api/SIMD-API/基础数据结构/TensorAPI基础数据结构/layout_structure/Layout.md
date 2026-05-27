@@ -30,7 +30,7 @@ Layout包含两个核心组成部分：
 ## 需要包含的头文件
 
 ```cpp
-#include "tensor_api/tensor.h
+#include "tensor_api/tensor.h"
 ```
 
 ## 原型定义
@@ -81,8 +81,8 @@ struct Layout : private Std::tuple<T, U>
 
 | 参数名 | 描述 |
 |--------|------|
-| ShapeType | Std::tuple结构类型，用于定义数据的逻辑形状。 |
-| StrideType | Std::tuple结构类型，用于定义各维度在内存中的步长，并与Shape的维度信息一一对应。 |
+| T | Std::tuple结构类型，用于定义数据的逻辑形状。 |
+| U | Std::tuple结构类型，用于定义各维度在内存中的步长，并与Shape的维度信息一一对应。 |
 | Info | 可选模板参数，默认为Std::ignore_t。当Layout由MakeFrameLayout或相关接口构造时，该参数可携带布局模式和布局特征等附加信息。 |
 
 ## 成员函数
@@ -201,7 +201,7 @@ struct Layout : private Std::tuple<T, U>
 
     将多维逻辑坐标映射为一维线性索引。
 
-    该接口内部调用[Crd2Idx]()，根据当前Layout的Shape和Stride计算坐标在内存中的线性位置。
+    该接口内部调用[Crd2Idx](../../Coordinate/Crd2Idx.md)，根据当前Layout的Shape和Stride计算坐标在内存中的线性位置。
 
 - 函数原型
   ```cpp
@@ -329,7 +329,7 @@ auto size = layout.Size();
 // size = 8
 
 auto capacity = layout.Capacity();
-// capacity = 14
+// capacity = 16
 
 auto index = layout(MakeCoord(1, 1));
 // index = 5
@@ -346,4 +346,3 @@ constexpr auto depth = decltype(layout)::depth;
 constexpr auto fullRank = decltype(layout)::rank;
 // fullRank = 2
 ```
-

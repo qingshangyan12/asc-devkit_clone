@@ -86,7 +86,7 @@ LocalTensor<TensorAttribute<ViewEngine<Iterator>, LayoutType>>
 
   constexpr int32_t size = 256;
   __gm__ float data[size];
-  auto ptr = MakeGMmemPtr(data);
+  auto ptr = MakeMemPtr(data);
 
   auto layout = MakeLayout(MakeShape(2, 2), MakeStride(2, 1));
   auto tensor = MakeTensor(ptr, layout);
