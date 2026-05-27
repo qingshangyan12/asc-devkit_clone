@@ -13,13 +13,13 @@
 ## 目录结构介绍
 
 ```
-├── matmul
+├── matmul_basic_api
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul.asc              // Ascend C样例实现 & 调用样例
+│   └── matmul_basic_api.asc    // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述
@@ -35,7 +35,6 @@
   本样例参数`M = 256, N = 256, K = 64`，输入输出均为`half`类型、`ND`格式。样例启动2个核完成计算，每个核负责输出矩阵C在M轴方向的128行、N轴方向的全部256列：
   - 第0个核计算C矩阵的第`0~127`行。
   - 第1个核计算C矩阵的第`128~255`行。
-  - B矩阵会被两个核共同读取，因为两个核都需要完整的K轴和N轴数据。
 
   输入输出规格如下表所示：
   <table>
@@ -50,7 +49,7 @@
 - 样例实现：
   - Kernel侧整体思路
     - `mmad_custom`是一个`__global__ __cube__`核函数，表示该函数运行在AI Core的Cube计算单元上，主要用于矩阵计算。
-    - 样例使用静态Tensor编程方式，通过`LocalMemAllocator`创建`LocalTensor`。例如，A矩阵从L1到L0A分别使用`A1`、`A2`位置，B矩阵从L1到L0B分别使用`B1`、`B2`位置，矩阵乘结果先写入`CO1`位置。
+    - 样例使用静态Tensor编程方式，通过`LocalMemAllocator`创建`LocalTensor`。
     - `CUBE_BLOCK = 16`表示half数据类型分形为`16 x 16`，代码中按`16 x 16`的分形为单位进行`LoadData`搬运。
 
   - Kernel侧详细流程
@@ -74,12 +73,6 @@
     - 调用`SetFlag<HardEvent::M_FIX>`和`WaitFlag<HardEvent::M_FIX>`进行同步。`Mmad`属于M流水，后续`Fixpipe`属于FIX流水，FIX流水必须等待M流水完成，避免读取到尚未计算完成的L0C结果。
     - 调用`Fixpipe`将L0C中的`float`累加结果转换为`half`并搬运回GM中的C矩阵输出位置。
     - 最后调用`PipeBarrier<PIPE_ALL>()`，确保当前核内相关流水任务完成。
-
-  - 同步接口说明
-    - `SetFlag`用于在生产者流水完成当前任务后写入同步事件。
-    - `WaitFlag`用于让消费者流水等待对应同步事件。
-    - `HardEvent`描述同步方向，例如`MTE2_MTE1`表示MTE2流水和MTE1流水之间的同步关系。
-    - `EVENT_ID0`用于标识当前同步事件。本样例三处同步按顺序执行并复用`EVENT_ID0`。
 
   - 调用实现  
     使用内核调用符`<<<>>>`调用核函数。调用时模板参数传入矩阵规格、单核计算量和基础Tile大小，运行时参数传入Device侧A、B、C矩阵地址。
@@ -192,7 +185,7 @@
 
 | 选项 | 可选值 | 说明 |
 |------|--------|------|
-| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT，Atlas A3 训练系列产品/Atlas A3 推理系列产品，Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 
 - 执行结果  
