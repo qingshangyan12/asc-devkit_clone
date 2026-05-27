@@ -82,7 +82,7 @@ mssanitizer --tool=memcheck --tool=racecheck --tool=initcheck --tool=synccheck .
 ======    #2 ${ASCEND_HOME_PATH}/asc/include/basic_api/kernel_operator_data_copy_intf.h:443:5
 ======    #3 illegal_read_and_write/add_custom.cpp:18:5
 ```
-更多详细信息可以参考[《异常检测(msSanitizer)》](https://hiascend.com/document/redirect/mindstudio-op-error-check)。
+更多详细信息可以参考[《异常检测(msSanitizer)》](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/01_utilities/05_sanitizer/ms_sanitizer/ms_sanitizer.asc))。
 
 ## 使用msDebug工具进行算子调试<a name="section2072113416285"></a>
 

@@ -56,7 +56,7 @@ $\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。以root用�
 
 ```
 $bisheng -O2 hello_world.aicpu --cce-aicpu-L${INSTALL_DIR}/lib64/device/lib64 --cce-aicpu-laicpu_api -I${INSTALL_DIR}/include/ascendc/aicpu_api -c -o hello_world.aicpu.o
-# --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
+# --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
 $bisheng --npu-arch=dav-2201 main.asc -c -o main.asc.o
 $bisheng hello_world.aicpu.o main.asc.o -o demo
 ```
@@ -206,7 +206,7 @@ add_executable(demo
 set_target_properties(demo PROPERTIES LINKER_LANGUAGE ASC)  # 指定链接使用语言
 
 target_compile_options(demo PRIVATE
-    # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
+    # --npu-arch用于指定NPU的架构版本，dav-后为架构版本号，各产品型号对应的架构版本号请通过[对应关系表](编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
     # <COMPILE_LANGUAGE:ASC>:表明该编译选项仅对语言ASC生效
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
 )
