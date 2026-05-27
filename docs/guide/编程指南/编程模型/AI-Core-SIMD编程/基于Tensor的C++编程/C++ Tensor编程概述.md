@@ -62,7 +62,7 @@ C++ Tensor编程将物理内存抽象为Tensor对象，开发者无需直接操�
 
 ### 同步机制
 
-C++ Tensor编程针对AI Core同步机制分别提供了核内同步和核间同接口。核内同步包括：Mutex互斥锁保护共享资源并发访问(Ascend 950PR/Ascend 950DT引入)，SetFlag/WaitFlag实现多流水线间同步（生产者发信号、消费者等待），PipeBarrier约束单流水线内执行顺序。核间同步采用计数器机制，通过CrossCoreSetFlag/WaitFlag协调多核执行进度。
+C++ Tensor编程针对AI Core同步机制分别提供了核内同步和核间同步接口。核内同步包括：Mutex互斥锁保护共享资源并发访问(Ascend 950PR/Ascend 950DT引入)，SetFlag/WaitFlag实现多流水线间同步（生产者发信号、消费者等待），PipeBarrier约束单流水线内执行顺序。核间同步采用计数器机制，通过CrossCoreSetFlag/WaitFlag协调多核执行进度。
 - **Mutex互斥锁**用于核内异步流水指令之间的同步处理，其功能类似于传统CPU中的锁机制。通过锁定指定流水线再释放流水线来完成流水线间的同步。
 - **SetFlag/WaitFlag（多流水同步）**采用**信号通知-阻塞等待**模式，通过流水线间的主动通知与被动等待实现执行顺序的严格约束。
 - **PipeBarrier（单流水同步）**采用**阻塞等待**模式，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。用于在同一流水线内部约束执行顺序。
