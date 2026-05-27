@@ -7,24 +7,25 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
+
+
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201")
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-add_executable(demo
-    add_custom.asc
+set(ASC_SOURCES
+    msprof.asc
 )
 
-target_link_libraries(demo PRIVATE
-    dl
-)
-
-target_compile_options(demo PRIVATE
+set(COMPILE_OPTIONS
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-    -g             # enable callstack display for mssanitizer
-    --sanitizer    # enable sanitizer
 )
+
+add_executable(demo ${ASC_SOURCES})
+
+target_link_libraries(demo PRIVATE ${SHARED_LIBRARIES})
+target_compile_options(demo PRIVATE ${COMPILE_OPTIONS})
