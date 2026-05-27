@@ -187,6 +187,7 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 template <typename T>
 __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /*
  * @ingroup Abs Level 2 for complex32/complex64
  * @brief dst[i] = abs(src[i])
@@ -196,6 +197,7 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
  */
 template <typename T, typename U>
 __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t& count);
+#endif
 
 /* **************************************** Reciprocal ****************************************** */
 /*
