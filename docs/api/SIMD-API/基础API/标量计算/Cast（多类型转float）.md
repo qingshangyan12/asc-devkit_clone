@@ -97,7 +97,7 @@ __aicore__ constexpr inline U Cast(T bVal)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-输入参数为立即数时，需要使用显式类型转化，例如：
+输入参数为立即数时，需要使用显式类型转换，例如：
 
 ```cpp
 // 错误写法，AscendC暂不支持整数类型转float，编译报错

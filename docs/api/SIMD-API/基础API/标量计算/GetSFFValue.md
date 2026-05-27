@@ -28,7 +28,7 @@ int64_t sffValue = AscendC::GetSFFValue<1>(0x1000000000000100ULL); // 返回8
 
 其计算结果如下图所示：
 
-**图 1**  使用GetSFFValue查找从最低有效位开始首个1的位置<a name="fig1"></a>
+**图 1** 使用GetSFFValue查找从最低有效位开始首个1的位置<a name="fig1"></a>
 
 ![使用GetSFFValue查找从最低有效位开始首个1的位置](../../../figures/GetSFFValue.png "使用GetSFFValue查找从最低有效位开始首个1的位置")
 
@@ -41,13 +41,13 @@ __aicore__ inline int64_t GetSFFValue(uint64_t valueIn)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表 1** 模板参数说明
 
 | 参数名 | 描述 |
 | ------ | ------ |
-| countValue| 指定要查找的比特值，取值为0或1。 |
+| countValue | 指定要查找的比特值，取值为0或1。 |
 
-**表 2**  参数说明
+**表 2** 参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |
@@ -55,7 +55,7 @@ __aicore__ inline int64_t GetSFFValue(uint64_t valueIn)
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-int64\_t类型的数，valueIn中第一个0或1出现的位置。
+返回valueIn中第一个0或1出现的位置。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

@@ -48,7 +48,7 @@ __aicore__ inline int64_t CountBitsCntSameAsSignBit(int64_t valueIn)
 
 ## 返回值说明
 
-int64\_t类型的数，从最高数值位开始和符号位相同的连续比特位的个数。
+返回从最高数值位开始与符号位相同的连续比特位的个数。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

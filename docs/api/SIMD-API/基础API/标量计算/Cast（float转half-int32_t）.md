@@ -37,7 +37,7 @@ __aicore__ inline U Cast(T valueIn)
 | ------ | ------ |
 | T | valueIn的数据类型。 |
 | U | 转换后的数据类型。 |
-| roundMode | 精度转换处理模式，类型是RoundMode。<br> RoundMode为枚举类型，用以控制精度转换处理模式，参考[精度舍入模式](../数据结构/precision_conversion.md#二进制精度舍入规则)，可取值为:<br> &bull; CAST_NONE：在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不取整 <br>&bull; CAST_RINT：rint，四舍六入五成双取整<br>&bull; CAST_FLOOR：floor，向负无穷取整 <br>&bull; CAST_CEIL：ceil，向正无穷取整<br>&bull; CAST_ROUND:round，四舍五入取整<br>&bull; CAST_TRUNC：trunc，向零取整<br>&bull; CAST_ODD：Von Neumann rounding，最近邻奇数舍入|
+| roundMode | 精度转换处理模式，类型是RoundMode。<br>RoundMode为枚举类型，用以控制精度转换处理模式，参考[精度舍入模式](../数据结构/precision_conversion.md#tab1)，可取值为:<pre>&bull; CAST_NONE：当转换过程存在精度损失时，按CAST_RINT模式处理；当不存在精度损失时，不进行舍入；<br>&bull; CAST_RINT：向最近的偶数舍入；<br>&bull; CAST_FLOOR：向负无穷大方向舍入；<br>&bull; CAST_CEIL：向正无穷大方向舍入；<br>&bull; CAST_ROUND：四舍五入；<br>&bull; CAST_TRUNC：截断模式；<br>&bull; CAST_ODD：向最近的奇数舍入。</pre> |
 
 **表 2**  参数说明
 
@@ -49,7 +49,7 @@ __aicore__ inline U Cast(T valueIn)
 
 支持的数据类型如下：
 
-- valueIn支持float
+- valueIn支持float。
 - 返回值支持half、int32\_t。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
@@ -58,7 +58,7 @@ __aicore__ inline U Cast(T valueIn)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-支持的数据类型组合及对应支持的RoundMode
+支持的数据类型组合及对应支持的RoundMode如下：
 
 | valueIn | 返回值 | RoundMode |
 | ------ | ------ | ------ |
