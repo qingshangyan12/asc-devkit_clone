@@ -12,13 +12,13 @@
 | Atlas 推理系列产品Vector Core | x |
 | Atlas 训练系列产品 | x |
 
-## 功能说明
+## 函数功能
 
 获取当前线程所在的组在从父组划分出的子组集合中的排名，排名从0开始。
 
 ## 函数原型
 
-```C++
+```c++
 unsigned long long meta_group_rank() const
 ```
 

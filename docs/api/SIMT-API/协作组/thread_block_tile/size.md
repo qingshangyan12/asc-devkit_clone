@@ -12,13 +12,13 @@
 | Atlas 推理系列产品Vector Core | x |
 | Atlas 训练系列产品 | x |
 
-## 功能说明
+## 函数功能
 
 获取协作组内线程的总数，功能与[num_threads](num_threads.md)函数一致。
 
 ## 函数原型
 
-```C++
+```c++
 unsigned long long size() const
 ```
 

@@ -12,7 +12,7 @@
 | Atlas 推理系列产品Vector Core | x |
 | Atlas 训练系列产品 | x |
 
-## 功能说明
+## 函数功能
 
 获取`coalesced_group`组内线程总数。
 

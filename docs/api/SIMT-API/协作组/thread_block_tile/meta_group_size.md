@@ -12,13 +12,13 @@
 | Atlas 推理系列产品Vector Core | x |
 | Atlas 训练系列产品 | x |
 
-## 功能说明
+## 函数功能
 
 获取当前线程所在的协作组其直接父组被划分时创建的子组的数量。
 
 ## 函数原型
 
-```C++
+```c++
 unsigned long long meta_group_size() const
 ```
 

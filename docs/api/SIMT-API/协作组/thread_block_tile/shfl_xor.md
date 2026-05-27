@@ -12,7 +12,7 @@
 | Atlas 推理系列产品Vector Core | x |
 | Atlas 训练系列产品 | x |
 
-## 功能说明
+## 函数功能
 
 将当前线程的rank与`lane_mask`进行按位异或运算得到的rank，获取该rank的线程输入的`var`值。
 
@@ -42,7 +42,7 @@ T shfl_xor(T var, unsigned int lane_mask) const
 
 ## 调用示例
 
-以4个线程为一组划分线程块，获取协作组内当前线程向后偏移delta的线程输入的var值。
+以4个线程为一组划分线程块，获取组内当前线程rank与`lane_mask`按位异或后对应rank线程输入的`var`值。
 
 **图 1**  shfl_xor接口返回结果示意图  
 ![](../../../figures/thread_block_tile_shfl_xor.png "thread_block_tile_shfl_xor")
@@ -74,4 +74,3 @@ T shfl_xor(T var, unsigned int lane_mask) const
         ...
     }
     ```
-
