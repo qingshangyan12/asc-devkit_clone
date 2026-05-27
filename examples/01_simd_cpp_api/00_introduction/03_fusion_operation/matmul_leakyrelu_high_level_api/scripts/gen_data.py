@@ -18,8 +18,8 @@ import numpy as np
 
 def gen_golden_data():
     m = 512
-    n = 16
-    k = 64
+    n = 128
+    k = 128
     input_a = np.random.randint(1, 10, [m, k]).astype(np.float16)
     input_b = np.random.randint(1, 10, [k, n]).astype(np.float16)
     input_bias = np.random.randint(1, 10, [n]).astype(np.float32)
