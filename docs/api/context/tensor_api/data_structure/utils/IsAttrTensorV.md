@@ -29,7 +29,7 @@ constexpr bool IsAttrTensorV = IsAttrTensor<Std::remove_cvref_t<T>>::value;
 
 ## 返回值说明
 
-- 若T是张量Tensor类型，则返回true；否则返回false。
+若T是张量Tensor类型，则返回true；否则返回false。
 
 ## 调用示例
 

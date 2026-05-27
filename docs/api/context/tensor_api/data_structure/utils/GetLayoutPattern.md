@@ -29,7 +29,7 @@ using GetLayoutPattern = typename GetPattern<Std::remove_cvref_t<T>>::type;
 
 ## 返回值说明
 
-- 若T包含Layout布局模式信息，则返回对应的LayoutPattern类型；否则返回Std::ignore_t。
+若T包含Layout布局模式信息，则返回对应的LayoutPattern类型；否则返回Std::ignore_t。
 
 ## 调用示例
 
