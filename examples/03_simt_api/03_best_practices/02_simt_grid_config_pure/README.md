@@ -1,3 +1,4 @@
+体现一下一个核一个block
 # gridDim配置与UB Stage样例（Pure SIMT版）
 
 ## 概述
