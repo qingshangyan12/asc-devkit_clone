@@ -51,18 +51,19 @@ public:
 
 class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {
 public:
-    explicit CcuTaskArgKfcServer(uint64_t syncAddr, uint64_t paramAddr, uint64_t dieNum,
+    explicit CcuTaskArgKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t dieNum,
                                  uint64_t missionNum, uint64_t missionIndex, uint64_t token):
-                                syncAddr_(syncAddr), paramAddr_(paramAddr), dieNum_(dieNum),
+                                xnAddr_(xnAddr), ckeAddr_(ckeAddr), dieNum_(dieNum),
                                 missionNum_(missionNum), missionIndex_(missionIndex), token_(token)
     {
         HCCL_DEBUG("[CcuTaskArgKfcServer] syncAddr: %lu, paramAddr: %lu, dieNum: %lu, "
                    "missionNum: %lu, missionIndex: %lu",
-                   syncAddr_, paramAddr_, dieNum_, missionNum_, missionIndex_);
+                   xnAddr_, ckeAddr_, dieNum_, missionNum_, missionIndex_);
     }
-    uint64_t syncAddr_{0};
     // HBM上的算子执行参数首地址
-    uint64_t paramAddr_{0};
+    uint64_t xnAddr_{0};
+    
+    uint64_t ckeAddr_{0};
     // Die数量，用于判断单双Die，默认为1即单Die
     uint64_t dieNum_{1};
     uint64_t missionNum_{1};
@@ -77,7 +78,7 @@ public:
     ~CcuKernelKfcServer() override {}
 
     HcclResult InitResource();
-    void LoadArgs();                                            // 参数载入 check
+    void LoadArgs();                                            // 参数载入
     void SetCommAddr(ccu::Variable syncAddr_);                  // 配置同步需要的参数
     void SetDieNum(ccu::Variable dieNum_);                      // 配置dieNum
     void SetMissionNumAndId(ccu::Variable missionNum_, ccu::Variable missionIndex_);
@@ -90,22 +91,21 @@ public:
     void MissionPostSync();
 
 protected:
-
-    ccu::Variable syncAddr_;
+    ccu::Variable xnAddr_;           // HBM上的算子执行参数首地址
+    ccu::Variable ckeAddr_;
     ccu::Variable waitAddr_;            // HBM上的每轮开始信号的首地址
     ccu::Variable recordAddr_;          // HBM上的每轮完成信号的首地址
 
-    ccu::Variable paramAddr_;           // HBM上的算子执行参数首地址
     ccu::Variable token_;
     ccu::Variable dieNum_;              // Die数量，用于判断单双Die，默认为1即单Die
-    ccu::Variable missionNum_;          // TODO:这边之前都是U64的。----Load()
-    ccu::Variable missionIndex_;
+    ccu::Variable missionNum_; 
+    ccu::Variable missionIndex_;        // TODO:这边之前都是U64的
 
     // 用于Die间同步信号
     ccu::Event exportDieSig_;
     ccu::Event importDieSig_;
     // 用于Mission间同步信号
-    std::vector<ccu::Event> exportMissoinSig_{};
+    std::vector<ccu::Event> exportMissoinSig_{};        // TODO：仔细分析，看如何去掉vector<>
     std::vector<ccu::Event> importMissionSig_{};
     // 用于Mission间同步变量
     std::vector<ccu::Variable> exportMissionVar_{};
