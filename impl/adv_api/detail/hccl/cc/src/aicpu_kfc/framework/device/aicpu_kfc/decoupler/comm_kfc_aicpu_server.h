@@ -88,6 +88,12 @@ private:
     void DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const;
     void UpdateProgress(const char *stage, u32 msgPos, u32 repeatIdx, u32 turnIdx, u64 opParamKey, u64 waitAddr,
         u64 recordAddr);
+    HcclResult AppendOpenCcoreWait(const ServerExecCtx &execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr,
+        bool isLast);
+    HcclResult AppendOpenCcorePost(const ServerExecCtx &execCtx, u64 recordAddr, u32 turnNum, u64 turnNumsAddr);
+    HcclResult LaunchNextMainThread(const ServerExecCtx &execCtx);
+    HcclResult LaunchOpenNextAicpuOrderedWindow(const ServerExecCtx &execCtx, std::vector<uint8_t> &opParam,
+        u64 waitAddr, u64 recordAddr, u32 turnNum, u64 turnNumsAddr, bool isLast);
     void KeepAlive() { lastMsgTimestamp_ = GetCurCpuTimestamp(); }
     bool IsTimeout() const { return GetCurCpuTimestamp() - lastMsgTimestamp_ >= timeout_ * KFC_NSEC_PER_SEC; }
     void SetMsgPosByHandle(HcclHandle handle, u32 msgPos) { handleIdToMsgPos_[handle] = msgPos; }
