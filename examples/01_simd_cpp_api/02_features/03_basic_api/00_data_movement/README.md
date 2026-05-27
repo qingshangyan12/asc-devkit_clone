@@ -19,7 +19,7 @@
 | [data_copy_l0c2gm](./data_copy_l0c2gm) |  本样例在卷积场景下，基于DataCopy实现数据随路量化激活搬运 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [data_copy_pad_gm2ub_ub2gm](./data_copy_pad_gm2ub_ub2gm) |  本样例基于DataCopyPad实现数据非32字节对齐数据的搬运，并进行数据填充 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [data_copy_ub2l1](./data_copy_ub2l1) |  本样例在Mmad矩阵乘场景下，基于DataCopy实现UB（Unified Buffer）到L1（L1 Buffer）的数据搬运 | Ascend 950PR/Ascend 950DT |
-| [gather_ld_reg](./gather_ld_reg) |  本样例演示使用Gather接口实现离散数据搬入，包含高维Gather（源为LocalTensor）和GatherB（按DataBlock收集）两种场景 | Ascend 950PR/Ascend 950DT |
+| [gather_ld_reg](./gather_ld_reg) |  本样例演示使用Gather接口实现离散数据搬入，包含高维Gather（源为__ubuf__指针）和GatherB（按DataBlock收集）两种场景 | Ascend 950PR/Ascend 950DT |
 | [ld_st_reg_align](./ld_st_reg_align) |  本样例实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的对齐数据搬运操作 | Ascend 950PR/Ascend 950DT |
 | [ld_st_reg_mask](./ld_st_reg_mask) |  本样例实现UB(Unified Buffer)对MaskReg(掩码寄存器)的搬入搬出，以及使用mask进行掩码搬出的操作 | Ascend 950PR/Ascend 950DT |
 | [ld_st_reg_unalign](./ld_st_reg_unalign) |  本样例实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的非对齐数据搬运操作 | Ascend 950PR/Ascend 950DT |

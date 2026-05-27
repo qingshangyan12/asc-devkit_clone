@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何使用DataCopy将输入数据从GM（Global Memory）搬出到L1（L1 Buffer），支持多种输入格式（Nz、ND、DN）、Bias矩阵搬入、量化矩阵搬入等功能。
+本样例介绍如何使用DataCopy将输入数据从GM（Global Memory）搬运到L1（L1 Buffer），支持多种输入格式（Nz、ND、DN）、Bias矩阵搬入、量化矩阵搬入等功能。
 
 ## 支持的产品
 
@@ -104,15 +104,17 @@
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin  # 验证输出结果是否正确
+  python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin  # 验证输出结果是否正确（默认float32）
+  python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin -dtype int8  # 场景5验证int8输出
   ```
 
-  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+   
   示例如下：
   ```bash
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # CPU调试模式
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=3 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 场景3仅支持dav-3510架构
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。

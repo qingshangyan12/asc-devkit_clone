@@ -1,7 +1,7 @@
 # move_reg样例
 
 ## 概述
-本样例基于Reg编程接口演示验证从RegTensor(Reg矢量计算基本单元)中搬运数据到MaskReg（掩码寄存器），使用MaskGenWithRegTensor接口。支持多种场景，通过环境变量选择场景。
+本样例基于Reg编程接口演示验证从RegTensor(Reg矢量计算基本单元)中搬运数据到MaskReg（掩码寄存器），使用MaskGenWithRegTensor接口；以及结合Select接口实现掩码选择计算。支持多种场景，通过环境变量选择场景。
   <table>
  	<tr>
  		<td>scenarioNum</td>
@@ -49,7 +49,7 @@
     </table>
 - 样例实现：
   1. 使用LoadAlign对齐加载cond数据到RegTensor
-  2. 通过MaskGenWithRegTensor&lt;int32, 0&gt;从condReg的前8字节提取64bit数据，按下采样模式填充到256bit MaskReg：每4个mask bit对应1个src bit，float元素处理示意如图：  
+  2. 通过MaskGenWithRegTensor&lt;int32, 0&gt;从condReg的前8字节提取64bit数据，按下采样模式填充到256bit MaskReg：每4个mask bit对应1个src bit，int32元素处理示意如图：  
   <img src="figures/move_reg_1.png">
   3. 使用StoreAlign将mask数据写回UB
 - 调用实现
@@ -71,7 +71,7 @@
 
 - 样例实现：  
   1. 调用LoadAlign加载选择操作数x、y到RegTensor
-  2. 调用LoadUnAlignPre/LoadUnAlign加载掩码操作数mask到RegTensor，每次迭代加载2个元素，即8字节64bit数据
+  2. 调用LoadUnAlignPre/LoadUnAlign加载掩码操作数mask到RegTensor，每次迭代加载256B向量(2个float元素+对齐填充)，即8字节64bit数据
   3. 调用MaskGenWithRegTensor从mReg的前8字节提取64bit数据，按下采样模式填充到256bit MaskReg：每4个mask bit对应1个src bit，处理示意如图：  
   <img src="figures/move_reg_1.png">
   4. 调用Select接口，根据maskReg逐元素选择xReg或yReg中的元素，写入zReg中，如下图所示  

@@ -13,6 +13,7 @@
 
 import sys
 import numpy as np
+import argparse
 
 
 # for float32
@@ -20,10 +21,21 @@ relative_tol = 1e-6
 absolute_tol = 1e-9
 error_tol = 1e-4
 
+# for int8
+int8_error_tol = 0.0
 
-def verify_result(output, golden):
-    output = np.fromfile(output, dtype=np.float32).reshape(-1)
-    golden = np.fromfile(golden, dtype=np.float32).reshape(-1)
+
+def verify_result(output, golden, dtype=np.float32):
+    output = np.fromfile(output, dtype=dtype).reshape(-1)
+    golden = np.fromfile(golden, dtype=dtype).reshape(-1)
+    if dtype == np.int8:
+        different_element_indexes = np.where(output != golden)[0]
+        for index in range(min(len(different_element_indexes), 100)):
+            real_index = different_element_indexes[index]
+            print("data index: %06d, expected: %d, actual: %d" %
+                  (real_index, golden[real_index], output[real_index]))
+        error_ratio = float(different_element_indexes.size) / golden.size
+        return error_ratio <= int8_error_tol
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=relative_tol,
@@ -45,8 +57,16 @@ def verify_result(output, golden):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('output', help='output binary file path')
+    parser.add_argument('golden', help='golden binary file path')
+    parser.add_argument('-dtype', '--dtype', default='float32',
+                        choices=['float32', 'int8'],
+                        help='data type of output/golden (default: float32)')
+    args = parser.parse_args()
+    dtype_map = {'float32': np.float32, 'int8': np.int8}
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
+        res = verify_result(args.output, args.golden, dtype=dtype_map[args.dtype])
         if not res:
             raise ValueError("[ERROR] result error")
         else:

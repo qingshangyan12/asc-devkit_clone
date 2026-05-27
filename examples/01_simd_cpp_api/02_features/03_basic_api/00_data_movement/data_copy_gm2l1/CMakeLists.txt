@@ -34,7 +34,7 @@ if(SCENARIO_NUM EQUAL 3 AND CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
     message(FATAL_ERROR "When SCENARIO_NUM=3, only CMAKE_ASC_ARCHITECTURES=dav-3510 is supported.")
 endif()
 
-add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+target_compile_definitions(demo PRIVATE SCENARIO_NUM=${SCENARIO_NUM})
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>

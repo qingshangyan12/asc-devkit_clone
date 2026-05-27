@@ -19,10 +19,10 @@
 
 ## 样例描述
 - 样例功能：  
-  根据索引将源数据中的元素离散分散到目的地址。
+  根据索引将源数据中的元素离散分散到目的地址，即 dst[index[i]] = src[i]。
 
   **Scatter模式**
-  - 源操作数据量是128个元素，索引数据量是128个元素，输出数据量是128个元素，这里生成的index是128个元素倒序的索引，所以搬出的数据量也是128。
+  - 源操作数据量是128个元素，索引数据量是128个元素，输出数据量是128个元素，搬出的数据量为totalLength=128。本样例生成的index为128个元素倒序的索引。
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
@@ -33,7 +33,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">scatter_st_reg</td></tr>
     </table>
   - 样例实现：
-    ScatterVF函数内调用Scatter接口，按元素索引将数据分散写入UB。
+    ScatterVF函数内调用Scatter接口，按元素索引将数据分散写入UB。注意：当index中存在重复索引时，Scatter仅写入最后一个匹配的src[i]到dst[index[i]]，因此需先用Duplicate将dstLocal初始化为已知值（如0），确保未被scatter覆盖的位置具有确定的初始值。
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
 
