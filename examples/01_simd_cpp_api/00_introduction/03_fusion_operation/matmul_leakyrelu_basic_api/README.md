@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于静态Tensor编程模式实现Matmul和LeakyRelu融合计算，展示Cube单元和Vector单元协同计算的编程模式。硬件Cube:Vector核数比例为1:2，Cube核完成矩阵乘计算，Vector核完成LeakyRelu激活计算。
+本样例基于静态Tensor编程模式实现Matmul和LeakyRelu融合计算，展示Cube单元和Vector单元协同计算的编程模式。Cube核完成矩阵乘计算，Vector核完成LeakyRelu激活计算。
 
 ## 支持的产品
 
@@ -56,14 +56,11 @@
 
   **分核逻辑**：
 
-  输出矩阵C按M方向分块，共分为2个分块，每个分块由1个Cube核完成Matmul计算，每个Cube核的计算结果由2个Vector核协同完成LeakyRelu计算。
-  分核参数说明：
+  输出矩阵C按M方向分为2个分块，N方向不分块，使用2个Cube核完成Matmul计算；每个Cube核对应2个Vector核，因此使用4个Vector核完成LeakyRelu计算。每个Cube核产生一个baseM×baseN结果块，对应2个Vector核各处理baseM/2×baseN的数据。
   - M方向分块数：M / singleCoreM = 256 / 128 = 2
   - N方向分块数：N / singleCoreN = 256 / 256 = 1
   - 总Cube核数：2 × 1 = 2
-  - 总Vector核数：2 × 2 = 4（Cube:Vector = 1:2）
-  - 每个Cube核负责singleCoreM\*singleCoreN的Matmul计算，每次计算产生baseM\*baseN的结果
-  - 每个Vector核负责singleCoreM/2*singleCoreN的计算，每次计算产生baseM/2\*baseN的结果
+  - 总Vector核数：2 × 2 = 4
 
 - 样例实现：
   - **整体计算流程**：
@@ -91,19 +88,22 @@
       > - Ascend 950PR/Ascend 950DT产品：L0A的分型为Nz
       > - Atlas A2/A3系列产品：L0A的分型为Zz
 
+
       **2）核间同步**
-        ```
-        Cube核产生计算结果 -> CrossCoreSetFlag -> Vector核等待(CrossCoreWaitFlag)
-        ```
 
-        **Vector核（1个cube核的结果结果传递给2个vector核完成计算）：LeakyRelu激活**
-        ```
-        GM(C:ND,half) -> UB(VECCALC,half) -> UB(VECCALC,half) -> GM(C:ND,half)
-                      │                   │                   │
-                  DataCopyPad          LeakyRelu          DataCopyPad
-            MTE2搬运（baseM/2×baseN）    VEC计算            MTE3写出
+      ```
+      Cube核:  Fixpipe -> GM(C:ND,half)
+                          │
+                          │ CrossCoreSetFlag / CrossCoreWaitFlag
+                          ▼
+      Vector核: GM(C:ND,half) -> UB(VECCALC,half) -> UB(VECCALC,half) -> GM(C:ND,half)
+                            │                   │                   │
+                        DataCopyPad          LeakyRelu          DataCopyPad
+                  MTE2搬运（baseM/2×baseN）    VEC计算            MTE3写出
+      ```
 
-        ```
+      **Vector核（1个Cube核的结果由2个Vector核处理）：LeakyRelu激活**<br>
+      上图中，Vector核需要等待对应Cube核完成结果写回后，再读取GM中的Matmul结果并执行LeakyRelu激活。
 
       **3）流程详解**：
 
@@ -124,23 +124,14 @@
           - **UB计算**：使用`LeakyRelu`执行激活计算，负值部分乘以0.001
           - **UB → GM**：使用`DataCopyPad`将结果写回GM，完成融合计算
 
-      4. **核数比例**：
-          - Cube:Vector核数比例为1:2，每个Cube核产生baseM×baseN的结果
-          - 2个Vector核各处理baseM/2×baseN的数据，共同完成一个Matmul块的激活计算
-
-- **Cube与Vector协同机制**：
-  - **核数比例**：Cube:Vector核数比例为1:2，每个Cube核的计算结果由2个Vector核协同完成LeakyRelu计算
-  - **核间同步**：Cube核完成Matmul计算后，通过CrossCoreSetFlag通知Vector核开始计算；Vector核通过CrossCoreWaitFlag等待Cube核完成
-  - **数据切分**：每个Vector核处理baseM/2 × baseN大小的数据，两个Vector核共同处理一个baseM × baseN的Matmul结果块
-
   - **约束条件**：
     1. baseM/baseK/baseN满足16对齐
     2. baseM/baseK/baseN能被singleCoreM/singleCoreK/singleCoreN整除
     3. singleCoreM/singleCoreK/singleCoreN能被M/K/N整除，不支持非整切场景
     4. Vector核数是Cube核数的2倍
 
-    - **调用实现**：
-      核调用符`__mix__(1, 2)`实现Cube和Vector核的协同调用，其中参数(1, 2)表示Cube:Vector核数比例为1:2。
+  - **调用实现**：
+    核调用符`__mix__(1, 2)`实现Cube和Vector核的协同调用，其中参数`(1, 2)`表示1个Cube核对应2个Vector核。
 
 - **接口参数说明**
 
