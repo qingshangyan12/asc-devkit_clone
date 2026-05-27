@@ -1,0 +1,2377 @@
+{
+  "scan_time": "2026-05-27T17:00:35.531025",
+  "directory": "/data/hxj/code/1/asc-devkit_0526/docs/guide",
+  "stats": {
+    "total_files": 250,
+    "total_links": 1245,
+    "valid_links": 933,
+    "broken_links": 312,
+    "fix_success": 33,
+    "fix_skipped": 279,
+    "fix_failed": 0
+  },
+  "broken_details": [
+    {
+      "file_rel": "编程指南/本文档组织结构.md",
+      "line": 11,
+      "full_match": "[高级编程](高级编程/高级编程.md)",
+      "url": "高级编程/高级编程.md",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/高级编程/高级编程.md",
+      "target_name": "高级编程"
+    },
+    {
+      "file_rel": "编程指南/类库API/基础API/概述.md",
+      "line": 27,
+      "full_match": "![](../../../figures/计算API几种计算方式的特点.png \"计算API几种计算方式的特点\")",
+      "url": "../../../figures/计算API几种计算方式的特点.png \"计算API几种计算方式的特点\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/计算API几种计算方式的特点.png \"计算API几种计算方式的特点\"",
+      "target_name": "计算API几种计算方式的特点"
+    },
+    {
+      "file_rel": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+      "line": 14,
+      "full_match": "![](../../../../figures/单次迭代内的8个datablock进行Exp计算示意图.png \"单次迭代内的8个datablock进行Exp计算示意图\")",
+      "url": "../../../../figures/单次迭代内的8个datablock进行Exp计算示意图.png \"单次迭代内的8个datablock进行Exp计算示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/单次迭代内的8个datablock进行Exp计算示意图.png \"单次迭代内的8个datablock进行Exp计算示意图\"",
+      "target_name": "单次迭代内的8个datablock进行Exp计算示意图"
+    },
+    {
+      "file_rel": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+      "line": 19,
+      "full_match": "![](../../../../figures/2次迭代Exp计算.png \"2次迭代Exp计算\")",
+      "url": "../../../../figures/2次迭代Exp计算.png \"2次迭代Exp计算\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/2次迭代Exp计算.png \"2次迭代Exp计算\"",
+      "target_name": "2次迭代Exp计算"
+    },
+    {
+      "file_rel": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+      "line": 24,
+      "full_match": "![](../../../../figures/通过mask参数进行掩码操作示意图（以float数据类型为例）.png \"通过mask参数进行掩码操作示意图（以float数据类型为例）\")",
+      "url": "../../../../figures/通过mask参数进行掩码操作示意图（以float数据类型为例）.png \"通过mask参数进行掩码操作示意图（以float数据类型为例）\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/通过mask参数进行掩码操作示意图（以float数据类型为例）.png \"通过mask参数进行掩码操作示意图（以float数据类型为例）\"",
+      "target_name": "通过mask参数进行掩码操作示意图（以float数据类型为例）"
+    },
+    {
+      "file_rel": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+      "line": 32,
+      "full_match": "![](../../../../figures/单次迭代内非连续场景的示意图.png \"单次迭代内非连续场景的示意图\")",
+      "url": "../../../../figures/单次迭代内非连续场景的示意图.png \"单次迭代内非连续场景的示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/单次迭代内非连续场景的示意图.png \"单次迭代内非连续场景的示意图\"",
+      "target_name": "单次迭代内非连续场景的示意图"
+    },
+    {
+      "file_rel": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+      "line": 41,
+      "full_match": "![](../../../../figures/多次迭代间非连续场景的示意图.png \"多次迭代间非连续场景的示意图\")",
+      "url": "../../../../figures/多次迭代间非连续场景的示意图.png \"多次迭代间非连续场景的示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/多次迭代间非连续场景的示意图.png \"多次迭代间非连续场景的示意图\"",
+      "target_name": "多次迭代间非连续场景的示意图"
+    },
+    {
+      "file_rel": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+      "line": 53,
+      "full_match": "![](../../../../figures/dataBlockStride不同取值举例.png \"dataBlockStride不同取值举例\")",
+      "url": "../../../../figures/dataBlockStride不同取值举例.png \"dataBlockStride不同取值举例\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/dataBlockStride不同取值举例.png \"dataBlockStride不同取值举例\"",
+      "target_name": "dataBlockStride不同取值举例"
+    },
+    {
+      "file_rel": "编程指南/类库API/基础API/接口分类说明/连续计算API.md",
+      "line": 12,
+      "full_match": "![](../../../../figures/连续计算API.png \"连续计算API\")",
+      "url": "../../../../figures/连续计算API.png \"连续计算API\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/连续计算API.png \"连续计算API\"",
+      "target_name": "连续计算API"
+    },
+    {
+      "file_rel": "编程指南/类库API/基础API/常用操作速查指导/如何使用归约计算API.md",
+      "line": 11,
+      "full_match": "![](../../../../figures/归约指令示意图.png \"归约指令示意图\")",
+      "url": "../../../../figures/归约指令示意图.png \"归约指令示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/归约指令示意图.png \"归约指令示意图\"",
+      "target_name": "归约指令示意图"
+    },
+    {
+      "file_rel": "编程指南/语言扩展层/SIMD-BuiltIn关键字.md",
+      "line": 556,
+      "full_match": "[编程示例](../编程模型/AI-Core-SIMD编程/SIMD与SIMT混合编程.md#section776244992018)",
+      "url": "../编程模型/AI-Core-SIMD编程/SIMD与SIMT混合编程.md#section776244992018",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/SIMD与SIMT混合编程.md",
+      "target_name": "SIMD与SIMT混合编程"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-CPU编程.md",
+      "line": 6,
+      "full_match": "![](../../figures/AI-CPU硬件架构图.png \"AI-CPU硬件架构图\")",
+      "url": "../../figures/AI-CPU硬件架构图.png \"AI-CPU硬件架构图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/AI-CPU硬件架构图.png \"AI-CPU硬件架构图\"",
+      "target_name": "AI-CPU硬件架构图"
+    },
+    {
+      "file_rel": "编程指南/编程模型/异构系统.md",
+      "line": 13,
+      "full_match": "![](../../figures/Kernel调度示意图.png \"Kernel调度示意图\")",
+      "url": "../../figures/Kernel调度示意图.png \"Kernel调度示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/Kernel调度示意图.png \"Kernel调度示意图\"",
+      "target_name": "Kernel调度示意图"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/概述.md",
+      "line": 50,
+      "full_match": "![](../../../figures/SIMD-Reg矢量计算内存层级.png \"SIMD-Reg矢量计算内存层级\")",
+      "url": "../../../figures/SIMD-Reg矢量计算内存层级.png \"SIMD-Reg矢量计算内存层级\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/SIMD-Reg矢量计算内存层级.png \"SIMD-Reg矢量计算内存层级\"",
+      "target_name": "SIMD-Reg矢量计算内存层级"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/核函数.md",
+      "line": 49,
+      "full_match": "![](../../../figures/核函数-host侧执行函数-device侧执行函数调用关系.png \"核函数-host侧执行函数-device侧执行函数调用关系\")",
+      "url": "../../../figures/核函数-host侧执行函数-device侧执行函数调用关系.png \"核函数-host侧执行函数-device侧执行函数调用关系\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/核函数-host侧执行函数-device侧执行函数调用关系.png \"核函数-host侧执行函数-device侧执行函数调用关系\"",
+      "target_name": "核函数-host侧执行函数-device侧执行函数调用关系"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md",
+      "line": 3,
+      "full_match": "[硬件实现](../../硬件实现/基本架构.md)",
+      "url": "../../硬件实现/基本架构.md",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/硬件实现/基本架构.md",
+      "target_name": "基本架构"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md",
+      "line": 6,
+      "full_match": "![](../../../figures/抽象硬件架构.png \"抽象硬件架构\")",
+      "url": "../../../figures/抽象硬件架构.png \"抽象硬件架构\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/抽象硬件架构.png \"抽象硬件架构\"",
+      "target_name": "抽象硬件架构"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/Reg矢量计算编程.md",
+      "line": 14,
+      "full_match": "![](../../../../figures/SIMD-Reg矢量计算内存层级.png \"SIMD-Reg矢量计算内存层级\")",
+      "url": "../../../../figures/SIMD-Reg矢量计算内存层级.png \"SIMD-Reg矢量计算内存层级\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/SIMD-Reg矢量计算内存层级.png \"SIMD-Reg矢量计算内存层级\"",
+      "target_name": "SIMD-Reg矢量计算内存层级"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/Reg矢量计算编程.md",
+      "line": 19,
+      "full_match": "![](../../../../figures/SIMD-Reg矢量计算编程架构.png \"SIMD-Reg矢量计算编程架构\")",
+      "url": "../../../../figures/SIMD-Reg矢量计算编程架构.png \"SIMD-Reg矢量计算编程架构\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/SIMD-Reg矢量计算编程架构.png \"SIMD-Reg矢量计算编程架构\"",
+      "target_name": "SIMD-Reg矢量计算编程架构"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md",
+      "line": 28,
+      "full_match": "![](../../../../figures/Vector编程范式指令队列示例.png \"Vector编程范式指令队列示例\")",
+      "url": "../../../../figures/Vector编程范式指令队列示例.png \"Vector编程范式指令队列示例\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/Vector编程范式指令队列示例.png \"Vector编程范式指令队列示例\"",
+      "target_name": "Vector编程范式指令队列示例"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md",
+      "line": 14,
+      "full_match": "![](../../../../figures/流水线并行示意图.png \"流水线并行示意图\")",
+      "url": "../../../../figures/流水线并行示意图.png \"流水线并行示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/流水线并行示意图.png \"流水线并行示意图\"",
+      "target_name": "流水线并行示意图"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md",
+      "line": 78,
+      "full_match": "![](../../../../figures/内存管理示意图.png \"内存管理示意图\")",
+      "url": "../../../../figures/内存管理示意图.png \"内存管理示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/内存管理示意图.png \"内存管理示意图\"",
+      "target_name": "内存管理示意图"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md",
+      "line": 85,
+      "full_match": "![](../../../../figures/流水任务示意图.png \"流水任务示意图\")",
+      "url": "../../../../figures/流水任务示意图.png \"流水任务示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/流水任务示意图.png \"流水任务示意图\"",
+      "target_name": "流水任务示意图"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md",
+      "line": 90,
+      "full_match": "![](../../../../figures/流水任务运行示意图.png \"流水任务运行示意图\")",
+      "url": "../../../../figures/流水任务运行示意图.png \"流水任务运行示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/流水任务运行示意图.png \"流水任务运行示意图\"",
+      "target_name": "流水任务运行示意图"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md",
+      "line": 155,
+      "full_match": "![](../../../../figures/融合算子编程范式.png \"融合算子编程范式\")",
+      "url": "../../../../figures/融合算子编程范式.png \"融合算子编程范式\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/融合算子编程范式.png \"融合算子编程范式\"",
+      "target_name": "融合算子编程范式"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMT编程/核函数.md",
+      "line": 28,
+      "full_match": "![](../../../figures/算子程序中三种函数间的调用关系.png \"算子程序中三种函数间的调用关系\")",
+      "url": "../../../figures/算子程序中三种函数间的调用关系.png \"算子程序中三种函数间的调用关系\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/算子程序中三种函数间的调用关系.png \"算子程序中三种函数间的调用关系\"",
+      "target_name": "算子程序中三种函数间的调用关系"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMT编程/编程示例.md",
+      "line": 3,
+      "full_match": "[语法限制](../../附录/CPP标准支持/语法限制/语法限制.md)",
+      "url": "../../附录/CPP标准支持/语法限制/语法限制.md",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/CPP标准支持/语法限制/语法限制.md",
+      "target_name": "语法限制"
+    },
+    {
+      "file_rel": "编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md",
+      "line": 8,
+      "full_match": "![](../../../figures/SIMT抽象硬件架构图.png \"SIMT抽象硬件架构图\")",
+      "url": "../../../figures/SIMT抽象硬件架构图.png \"SIMT抽象硬件架构图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/SIMT抽象硬件架构图.png \"SIMT抽象硬件架构图\"",
+      "target_name": "SIMT抽象硬件架构图"
+    },
+    {
+      "file_rel": "编程指南/编译与运行/异步执行.md",
+      "line": 50,
+      "full_match": "![ ](../../figures/asynchronous_execution.png \"Kernel异步调用\")",
+      "url": "../../figures/asynchronous_execution.png \"Kernel异步调用\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/asynchronous_execution.png \"Kernel异步调用\"",
+      "target_name": "asynchronous_execution"
+    },
+    {
+      "file_rel": "编程指南/编译与运行/异步执行.md",
+      "line": 54,
+      "full_match": "![ ](../../figures/asynchronous_execution_async.png \"内存传输异步并发执行\")",
+      "url": "../../figures/asynchronous_execution_async.png \"内存传输异步并发执行\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/asynchronous_execution_async.png \"内存传输异步并发执行\"",
+      "target_name": "asynchronous_execution_async"
+    },
+    {
+      "file_rel": "编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md",
+      "line": 16,
+      "full_match": "![ ](../../../figures/aicore_compilation.png \"aicore 编译流程示意图\")",
+      "url": "../../../figures/aicore_compilation.png \"aicore 编译流程示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/aicore_compilation.png \"aicore 编译流程示意图\"",
+      "target_name": "aicore_compilation"
+    },
+    {
+      "file_rel": "编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md",
+      "line": 82,
+      "full_match": "![ ](../../../figures/aicore_simt_comilation.png \"aicore simt编译流程示意图\")",
+      "url": "../../../figures/aicore_simt_comilation.png \"aicore simt编译流程示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/aicore_simt_comilation.png \"aicore simt编译流程示意图\"",
+      "target_name": "aicore_simt_comilation"
+    },
+    {
+      "file_rel": "编程指南/编译与运行/算子编译/AI-CPU算子编译基本用法.md",
+      "line": 59,
+      "full_match": "[对应关系表](编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)",
+      "url": "编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/编译与运行/算子编译/编程指南/语言扩展层/SIMD-BuiltIn关键字.md",
+      "target_name": "SIMD-BuiltIn关键字"
+    },
+    {
+      "file_rel": "编程指南/编译与运行/算子编译/AI-CPU算子编译基本用法.md",
+      "line": 218,
+      "full_match": "[对应关系表](../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)",
+      "url": "../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/编译与运行/语言扩展层/SIMD-BuiltIn关键字.md",
+      "target_name": "SIMD-BuiltIn关键字"
+    },
+    {
+      "file_rel": "编程指南/附录/简易自定义算子工程.md",
+      "line": 18,
+      "full_match": "[创建算子工程](工程化算子开发/创建算子工程.md)",
+      "url": "工程化算子开发/创建算子工程.md",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/工程化算子开发/创建算子工程.md",
+      "target_name": "创建算子工程"
+    },
+    {
+      "file_rel": "编程指南/附录/简易自定义算子工程.md",
+      "line": 120,
+      "full_match": "[Kernel侧算子实现](工程化算子开发/Kernel侧算子实现.md)",
+      "url": "工程化算子开发/Kernel侧算子实现.md",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/工程化算子开发/Kernel侧算子实现.md",
+      "target_name": "Kernel侧算子实现"
+    },
+    {
+      "file_rel": "编程指南/附录/简易自定义算子工程.md",
+      "line": 120,
+      "full_match": "[Host侧Tiling实现](工程化算子开发/Host侧Tiling实现/基本流程.md)",
+      "url": "工程化算子开发/Host侧Tiling实现/基本流程.md",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/工程化算子开发/Host侧Tiling实现/基本流程.md",
+      "target_name": "基本流程"
+    },
+    {
+      "file_rel": "编程指南/附录/简易自定义算子工程.md",
+      "line": 120,
+      "full_match": "[算子原型定义](工程化算子开发/算子原型定义.md)",
+      "url": "工程化算子开发/算子原型定义.md",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/工程化算子开发/算子原型定义.md",
+      "target_name": "算子原型定义"
+    },
+    {
+      "file_rel": "编程指南/附录/简易自定义算子工程.md",
+      "line": 134,
+      "full_match": "![](../../figures/编译过程示意图.png \"编译过程示意图\")",
+      "url": "../../figures/编译过程示意图.png \"编译过程示意图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/编译过程示意图.png \"编译过程示意图\"",
+      "target_name": "编译过程示意图"
+    },
+    {
+      "file_rel": "编程指南/附录/简易自定义算子工程.md",
+      "line": 253,
+      "full_match": "[支持自定义编译选项](工程化算子开发/算子包编译/算子工程编译.md#section7321165972311)",
+      "url": "工程化算子开发/算子包编译/算子工程编译.md#section7321165972311",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/工程化算子开发/算子包编译/算子工程编译.md",
+      "target_name": "算子工程编译"
+    },
+    {
+      "file_rel": "编程指南/附录/简易自定义算子工程.md",
+      "line": 276,
+      "full_match": "[单算子API调用](工程化算子开发/单算子API调用.md)",
+      "url": "工程化算子开发/单算子API调用.md",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/工程化算子开发/单算子API调用.md",
+      "target_name": "单算子API调用"
+    },
+    {
+      "file_rel": "编程指南/附录/基于样例工程完成Kernel直调.md",
+      "line": 4,
+      "full_match": "[AI Core SIMD编译](编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子包编译/算子工程编译.mdNone)",
+      "url": "编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子包编译/算子工程编译.mdNone",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子包编译/算子工程编译.mdNone",
+      "target_name": "算子工程编译"
+    },
+    {
+      "file_rel": "编程指南/附录/基于样例工程完成Kernel直调.md",
+      "line": 93,
+      "full_match": "![](../../figures/CPU侧运行验证步骤.png \"CPU侧运行验证步骤\")",
+      "url": "../../figures/CPU侧运行验证步骤.png \"CPU侧运行验证步骤\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/CPU侧运行验证步骤.png \"CPU侧运行验证步骤\"",
+      "target_name": "CPU侧运行验证步骤"
+    },
+    {
+      "file_rel": "编程指南/附录/基于样例工程完成Kernel直调.md",
+      "line": 118,
+      "full_match": "![](../../figures/NPU侧运行验证步骤.png \"NPU侧运行验证步骤\")",
+      "url": "../../figures/NPU侧运行验证步骤.png \"NPU侧运行验证步骤\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/NPU侧运行验证步骤.png \"NPU侧运行验证步骤\"",
+      "target_name": "NPU侧运行验证步骤"
+    },
+    {
+      "file_rel": "编程指南/附录/基于样例工程完成Kernel直调.md",
+      "line": 298,
+      "full_match": "![](../../figures/编译简化流程图.png \"编译简化流程图\")",
+      "url": "../../figures/编译简化流程图.png \"编译简化流程图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/编译简化流程图.png \"编译简化流程图\"",
+      "target_name": "编译简化流程图"
+    },
+    {
+      "file_rel": "编程指南/附录/基于样例工程完成Kernel直调.md",
+      "line": 373,
+      "full_match": "![](../../figures/一键式编译运行脚本流程图.png \"一键式编译运行脚本流程图\")",
+      "url": "../../figures/一键式编译运行脚本流程图.png \"一键式编译运行脚本流程图\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/一键式编译运行脚本流程图.png \"一键式编译运行脚本流程图\"",
+      "target_name": "一键式编译运行脚本流程图"
+    },
+    {
+      "file_rel": "编程指南/附录/基于样例工程完成Kernel直调.md",
+      "line": 446,
+      "full_match": "[编译与运行](编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子包编译/算子工程编译.mdNone)",
+      "url": "编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子包编译/算子工程编译.mdNone",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子包编译/算子工程编译.mdNone",
+      "target_name": "算子工程编译"
+    },
+    {
+      "file_rel": "编程指南/附录/基于样例工程完成Kernel直调.md",
+      "line": 449,
+      "full_match": "![](../../figures/CPU域和NPU域的核函数运行逻辑对比-36.png \"CPU域和NPU域的核函数运行逻辑对比-36\")",
+      "url": "../../figures/CPU域和NPU域的核函数运行逻辑对比-36.png \"CPU域和NPU域的核函数运行逻辑对比-36\"",
+      "is_image": true,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/figures/CPU域和NPU域的核函数运行逻辑对比-36.png \"CPU域和NPU域的核函数运行逻辑对比-36\"",
+      "target_name": "CPU域和NPU域的核函数运行逻辑对比-36"
+    },
+    {
+      "file_rel": "编程指南/附录/常用操作/如何进行Tiling调测.md",
+      "line": 3,
+      "full_match": "[工程化算子开发](../工程化算子开发/概述.md)",
+      "url": "../工程化算子开发/概述.md",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/工程化算子开发/概述.md",
+      "target_name": "概述"
+    },
+    {
+      "file_rel": "编程指南/附录/常用操作/如何进行Tiling调测.md",
+      "line": 8,
+      "full_match": "[算子包部署](../工程化算子开发/算子包编译/算子包部署.md)",
+      "url": "../工程化算子开发/算子包编译/算子包部署.md",
+      "is_image": false,
+      "abs_path_try": "/data/hxj/code/1/asc-devkit_0526/docs/guide/编程指南/附录/工程化算子开发/算子包编译/算子包部署.md",
+      "target_name": "算子包部署"
+    }
+  ],
+  "fix_results": {
+    "success": [
+      {
+        "file": "编程指南/类库API/基础API/接口分类说明/连续计算API.md",
+        "line": 12,
+        "original": "![](../../../../figures/连续计算API.png \"连续计算API\")",
+        "fixed": "![](连续计算API.md)",
+        "type": "smart_match(100%)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-CPU编程.md",
+        "line": 6,
+        "original": "![](../../figures/AI-CPU硬件架构图.png \"AI-CPU硬件架构图\")",
+        "fixed": "![](AI-CPU编程.md)",
+        "type": "smart_match(63%)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/概述.md",
+        "line": 50,
+        "original": "![](../../../figures/SIMD-Reg矢量计算内存层级.png \"SIMD-Reg矢量计算内存层级\"",
+        "fixed": "![](基于Tensor的C++编程/Reg矢量计算编程.md)",
+        "type": "smart_match(56%)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md",
+        "line": 6,
+        "original": "![](../../../figures/抽象硬件架构.png \"抽象硬件架构\")",
+        "fixed": "![](抽象硬件架构.md)",
+        "type": "smart_match(100%)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/Reg矢量计算编程.md",
+        "line": 14,
+        "original": "![](../../../../figures/SIMD-Reg矢量计算内存层级.png \"SIMD-Reg矢量计算内存",
+        "fixed": "![](Reg矢量计算编程.md)",
+        "type": "smart_match(56%)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/Reg矢量计算编程.md",
+        "line": 19,
+        "original": "![](../../../../figures/SIMD-Reg矢量计算编程架构.png \"SIMD-Reg矢量计算编程",
+        "fixed": "![](Reg矢量计算编程.md)",
+        "type": "smart_match(72%)"
+      },
+      {
+        "file": "编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md",
+        "line": 6,
+        "original": "![](../../../figures/Tensor原地操作实现原理.png \"Tensor原地操作实现原理\")",
+        "fixed": "![](如何使用Tensor原地操作提升算子性能.md)",
+        "type": "smart_match(59%)"
+      },
+      {
+        "file": "编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md",
+        "line": 24,
+        "original": "![](../../../figures/SIMD与SIMT混合编程硬件架构图.png \"SIMD与SIMT混合编程硬件",
+        "fixed": "![](SIMD与SIMT混合编程.md)",
+        "type": "smart_match(84%)"
+      },
+      {
+        "file": "编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md",
+        "line": 140,
+        "original": "![](../../../figures/SIMD与SIMT混合编程内存模型示意图.png \"SIMD与SIMT混合编程",
+        "fixed": "![](SIMD与SIMT混合编程.md)",
+        "type": "smart_match(79%)"
+      },
+      {
+        "file": "编程指南/高级编程/高级特性/AI框架算子适配/PyTorch框架.md",
+        "line": 10,
+        "original": "![](../../../../figures/Pytorch框架部署方式.png \"Pytorch框架部署方式\")",
+        "fixed": "![](PyTorch框架.md)",
+        "type": "smart_match(82%)"
+      },
+      {
+        "file": "编程指南/高级编程/高级特性/Aclnn算子工程化开发/单算子API调用.md",
+        "line": 108,
+        "original": "![](../../../../figures/单算子API执行接口调用流程.png \"单算子API执行接口调用流程\")",
+        "fixed": "![](单算子API调用.md)",
+        "type": "smart_match(73%)"
+      },
+      {
+        "file": "编程指南/高级编程/高级特性/Aclnn算子工程化开发/Host侧Tiling实现/基本流程.md",
+        "line": 153,
+        "original": "![](../../../../../figures/Tiling开发流程图.png \"Tiling开发流程图\")",
+        "fixed": "![](Tiling模板编程.md)",
+        "type": "smart_match(67%)"
+      },
+      {
+        "file": "编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子包编译/算子工程编译.md",
+        "line": 17,
+        "original": "![](../../../../../figures/算子工程编译示意图.png \"算子工程编译示意图\")",
+        "fixed": "![](算子工程编译.md)",
+        "type": "smart_match(80%)"
+      },
+      {
+        "file": "技术附录/概念原理和术语/性能优化技术原理/DoubleBuffer.md",
+        "line": 23,
+        "original": "![](../../../figures/DoubleBuffer机制.png \"DoubleBuffer机制\")",
+        "fixed": "![](DoubleBuffer.md)",
+        "type": "smart_match(92%)"
+      },
+      {
+        "file": "跨代迁移兼容性指南/Ascend-C-API兼容策略.md",
+        "line": 8,
+        "original": "![](../figures/Ascend-C-API层次结构.png \"Ascend-C-API层次结构\")",
+        "fixed": "![](Ascend-C-API兼容策略.md)",
+        "type": "smart_match(75%)"
+      },
+      {
+        "file": "算子实践参考/本文档组织结构.md",
+        "line": 26,
+        "original": "![](../figures/算子性能优化流程.png \"算子性能优化流程\")",
+        "fixed": "![](SIMD算子性能优化/SIMD算子性能优化.md)",
+        "type": "smart_match(67%)"
+      },
+      {
+        "file": "算子实践参考/异构计算.md",
+        "line": 34,
+        "original": "![](../figures/算子Tiling传递数据流.png \"算子Tiling传递数据流\")",
+        "fixed": "![](SIMD算子性能优化/Tiling策略/Tiling策略.md)",
+        "type": "smart_match(57%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/流水编排/使能DoubleBuffer.md",
+        "line": 13,
+        "original": "![](../../../figures/未使能DoubleBuffer的流水图.png \"未使能DoubleBuffe",
+        "fixed": "![](使能DoubleBuffer.md)",
+        "type": "smart_match(85%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/流水编排/使能DoubleBuffer.md",
+        "line": 29,
+        "original": "![](../../../figures/使能DoubleBuffer的流水图.png \"使能DoubleBuffer的",
+        "fixed": "![](使能DoubleBuffer.md)",
+        "type": "smart_match(88%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/Tiling策略/核间负载均衡.md",
+        "line": 17,
+        "original": "![](../../../figures/核间负载均衡示意图.png \"核间负载均衡示意图\")",
+        "fixed": "![](核间负载均衡.md)",
+        "type": "smart_match(80%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矩阵计算/Matmul使能AtomicAdd选项.md",
+        "line": 86,
+        "original": "![](../../../figures/Matmul使能AtomicAdd选项前后性能对比.png \"Matmul使能",
+        "fixed": "![](Matmul使能AtomicAdd选项.md)",
+        "type": "smart_match(86%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/L2-Cache切分.md",
+        "line": 12,
+        "original": "![](../../../figures/未使能L2-Cache切分.png \"未使能L2-Cache切分\")",
+        "fixed": "![](L2-Cache切分.md)",
+        "type": "smart_match(87%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/L2-Cache切分.md",
+        "line": 78,
+        "original": "![](../../../figures/使能L2-Cache切分.png \"使能L2-Cache切分\")",
+        "fixed": "![](L2-Cache切分.md)",
+        "type": "smart_match(91%)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子实现/算子实现.md",
+        "line": 9,
+        "original": "![](../../figures/SIMD与SIMT混合核函数实现流程.png \"SIMD与SIMT混合核函数实现流程",
+        "fixed": "![](SIMD与SIMT混合算子实现.md)",
+        "type": "smart_match(79%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/基础知识.md",
+        "line": 15,
+        "original": "![](../../../figures/Matmul矩阵乘示意图.png \"Matmul矩阵乘示意图\")",
+        "fixed": "![](特性场景/MxMatmul场景.md)",
+        "type": "smart_match(55%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md",
+        "line": 105,
+        "original": "![](../../../../figures/MxMatmul矩阵乘示意图.png \"MxMatmul矩阵乘示意图\")",
+        "fixed": "![](MxMatmul场景.md)",
+        "type": "smart_match(67%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/Batch-Matmul基础功能.md",
+        "line": 14,
+        "original": "![](../../../../figures/NORMAL数据排布格式的Batch-Matmul示意图.png \"NO",
+        "fixed": "![](Batch-Matmul基础功能.md)",
+        "type": "smart_match(55%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的量化-反量化.md",
+        "line": 10,
+        "original": "![](../../../../figures/Matmul量化场景示意图.png \"Matmul量化场景示意图\")",
+        "fixed": "![](MxMatmul场景.md)",
+        "type": "smart_match(70%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的量化-反量化.md",
+        "line": 15,
+        "original": "![](../../../../figures/Matmul反量化场景示意图.png \"Matmul反量化场景示意图\")",
+        "fixed": "![](MxMatmul场景.md)",
+        "type": "smart_match(67%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 21,
+        "original": "![](../../../figures/非对齐搬入.png \"非对齐搬入\")",
+        "fixed": "![](非对齐场景.md)",
+        "type": "smart_match(60%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 28,
+        "original": "![](../../../figures/非对齐搬出.png \"非对齐搬出\")",
+        "fixed": "![](非对齐场景.md)",
+        "type": "smart_match(60%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/概述.md",
+        "line": 25,
+        "original": "![](../../../../figures/多核及Tiling示意图.png \"多核及Tiling示意图\")",
+        "fixed": "![](多核Tiling.md)",
+        "type": "smart_match(80%)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾块Tiling.md",
+        "line": 18,
+        "original": "![](../../../../figures/多核Tiling尾块示意图.png \"多核Tiling尾块示意图\")",
+        "fixed": "![](多核Tiling.md)",
+        "type": "smart_match(76%)"
+      }
+    ],
+    "skipped": [
+      {
+        "file": "编程指南/本文档组织结构.md",
+        "line": 11,
+        "target": "高级编程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/类库API/基础API/概述.md",
+        "line": 27,
+        "target": "计算API几种计算方式的特点",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+        "line": 14,
+        "target": "单次迭代内的8个datablock进行Exp计算示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+        "line": 19,
+        "target": "2次迭代Exp计算",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+        "line": 24,
+        "target": "通过mask参数进行掩码操作示意图（以float数据类型为例）",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+        "line": 32,
+        "target": "单次迭代内非连续场景的示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+        "line": 41,
+        "target": "多次迭代间非连续场景的示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/类库API/基础API/接口分类说明/高维切分API.md",
+        "line": 53,
+        "target": "dataBlockStride不同取值举例",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/类库API/基础API/常用操作速查指导/如何使用归约计算API.md",
+        "line": 11,
+        "target": "归约指令示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/语言扩展层/SIMD-BuiltIn关键字.md",
+        "line": 556,
+        "target": "SIMD与SIMT混合编程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/异构系统.md",
+        "line": 13,
+        "target": "Kernel调度示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/核函数.md",
+        "line": 49,
+        "target": "核函数-host侧执行函数-device侧执行函数调用关系",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md",
+        "line": 3,
+        "target": "基本架构",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md",
+        "line": 28,
+        "target": "Vector编程范式指令队列示例",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md",
+        "line": 14,
+        "target": "流水线并行示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md",
+        "line": 78,
+        "target": "内存管理示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md",
+        "line": 85,
+        "target": "流水任务示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md",
+        "line": 90,
+        "target": "流水任务运行示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md",
+        "line": 155,
+        "target": "融合算子编程范式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMT编程/核函数.md",
+        "line": 28,
+        "target": "算子程序中三种函数间的调用关系",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMT编程/编程示例.md",
+        "line": 3,
+        "target": "语法限制",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md",
+        "line": 8,
+        "target": "SIMT抽象硬件架构图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编译与运行/异步执行.md",
+        "line": 50,
+        "target": "asynchronous_execution",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编译与运行/异步执行.md",
+        "line": 54,
+        "target": "asynchronous_execution_async",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md",
+        "line": 16,
+        "target": "aicore_compilation",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md",
+        "line": 82,
+        "target": "aicore_simt_comilation",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编译与运行/算子编译/AI-CPU算子编译基本用法.md",
+        "line": 59,
+        "target": "SIMD-BuiltIn关键字",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/编译与运行/算子编译/AI-CPU算子编译基本用法.md",
+        "line": 218,
+        "target": "SIMD-BuiltIn关键字",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/简易自定义算子工程.md",
+        "line": 18,
+        "target": "创建算子工程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/简易自定义算子工程.md",
+        "line": 120,
+        "target": "Kernel侧算子实现",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/简易自定义算子工程.md",
+        "line": 120,
+        "target": "基本流程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/简易自定义算子工程.md",
+        "line": 120,
+        "target": "算子原型定义",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/简易自定义算子工程.md",
+        "line": 134,
+        "target": "编译过程示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/简易自定义算子工程.md",
+        "line": 253,
+        "target": "算子工程编译",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/简易自定义算子工程.md",
+        "line": 276,
+        "target": "单算子API调用",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/基于样例工程完成Kernel直调.md",
+        "line": 4,
+        "target": "算子工程编译",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/基于样例工程完成Kernel直调.md",
+        "line": 93,
+        "target": "CPU侧运行验证步骤",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/基于样例工程完成Kernel直调.md",
+        "line": 118,
+        "target": "NPU侧运行验证步骤",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/基于样例工程完成Kernel直调.md",
+        "line": 298,
+        "target": "编译简化流程图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/基于样例工程完成Kernel直调.md",
+        "line": 373,
+        "target": "一键式编译运行脚本流程图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/基于样例工程完成Kernel直调.md",
+        "line": 446,
+        "target": "算子工程编译",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/基于样例工程完成Kernel直调.md",
+        "line": 449,
+        "target": "CPU域和NPU域的核函数运行逻辑对比-36",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/常用操作/如何进行Tiling调测.md",
+        "line": 3,
+        "target": "概述",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/常用操作/如何进行Tiling调测.md",
+        "line": 8,
+        "target": "算子包部署",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/常用操作/如何进行Tiling调测.md",
+        "line": 9,
+        "target": "算子动态库和静态库编译",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/常用操作/如何在矢量编程时使能Vector-Core.md",
+        "line": 5,
+        "target": "概述",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/FAQ/算子工程编译时出现文件名过长报错.md",
+        "line": 5,
+        "target": "算子工程编译",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/FAQ/算子工程编译时出现文件名过长报错.md",
+        "line": 53,
+        "target": "算子工程编译",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/附录/FAQ/Kernel编译时报错-error-out-of-jump-jumpc-imm-range.md",
+        "line": 23,
+        "target": "算子工程编译",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/调试调优/性能调优.md",
+        "line": 20,
+        "target": "算子工程编译",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/调试调优/功能调试/CPU域孪生调试.md",
+        "line": 14,
+        "target": "CPU域和NPU域的核函数运行逻辑对比",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/调试调优/功能调试/CPU域孪生调试.md",
+        "line": 36,
+        "target": "通过CMake编译",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md",
+        "line": 185,
+        "target": "UB内存分配图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md",
+        "line": 248,
+        "target": "函数调用关系图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/硬件实现/基本架构.md",
+        "line": 52,
+        "target": "分离模式示意图（N的取值以硬件平台信息获取接口获取的数值为准）",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/硬件实现/基本架构.md",
+        "line": 59,
+        "target": "耦合模式示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/硬件实现/基本架构.md",
+        "line": 80,
+        "target": "Cube计算单元数据访问",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/硬件实现/基本架构.md",
+        "line": 89,
+        "target": "Vector计算单元数据访问",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/硬件实现/基本架构.md",
+        "line": 98,
+        "target": "Scalar对指令和数据的访问",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/硬件实现/基本架构.md",
+        "line": 112,
+        "target": "存储单元",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/硬件实现/基本架构.md",
+        "line": 219,
+        "target": "指令分类处理机制",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510.md",
+        "line": 61,
+        "target": "NPU架构版本220高维切分",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510.md",
+        "line": 64,
+        "target": "本架构版本高维切分",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510.md",
+        "line": 157,
+        "target": "本架构版本UB-bank示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/高级特性/算子入图开发/基本开发流程.md",
+        "line": 10,
+        "target": "shape与datatype推导示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/高级特性/算子入图开发/SuperKernel开发.md",
+        "line": 59,
+        "target": "通过SetNextTaskStart实现并行示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/高级特性/算子入图开发/SuperKernel开发.md",
+        "line": 64,
+        "target": "通过WaitPreTaskEnd实现并行示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/高级特性/AI框架算子适配/TensorFlow框架.md",
+        "line": 601,
+        "target": "InferenceContext *c",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "编程指南/高级编程/高级特性/Aclnn算子工程化开发/Host侧Tiling实现/基本流程.md",
+        "line": 10,
+        "target": "Tiling实现的输入输出",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "技术附录/概念原理和术语/神经网络和算子/数据排布格式.md",
+        "line": 30,
+        "target": "NCHW和NHWC存储示例",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "技术附录/概念原理和术语/神经网络和算子/数据排布格式.md",
+        "line": 337,
+        "target": "GEMV场景输入Vector格式的A矩阵示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "技术附录/概念原理和术语/神经网络和算子/算子基本概念.md",
+        "line": 12,
+        "target": "网络拓扑示例",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "技术附录/概念原理和术语/神经网络和算子/算子基本概念.md",
+        "line": 106,
+        "target": "示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "技术附录/概念原理和术语/神经网络和算子/算子基本概念.md",
+        "line": 135,
+        "target": "轴示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "技术附录/概念原理和术语/性能优化技术原理/DoubleBuffer.md",
+        "line": 10,
+        "target": "数据搬运与Vector计算过程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "跨代迁移兼容性指南/3510架构迁移指导/2201到3510架构变更.md",
+        "line": 13,
+        "target": "硬件架构",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMT算子性能优化/内存访问/避免UB的Bank冲突.md",
+        "line": 11,
+        "target": "bank结构示意图（图中箭头方向表示内存排布的顺序）-71",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/功能调试/精度正常.md",
+        "line": 55,
+        "target": "多核并行处理示意图-53",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矢量计算/选择低延迟指令-优化归约操作性能.md",
+        "line": 19,
+        "target": "二分累加方案示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矢量计算/通过Unified-Buffer融合实现连续vector计算.md",
+        "line": 8,
+        "target": "数据流图对比",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矢量计算/Vector算子灵活运用Counter模式.md",
+        "line": 59,
+        "target": "Normal模式和Counter模式下的Scalar执行时间对比",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矢量计算/Vector算子灵活运用Counter模式.md",
+        "line": 62,
+        "target": "Normal模式和Counter模式下的Vector执行时间对比",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/指令双发优化.md",
+        "line": 26,
+        "target": "执行队列和指令的执行顺序",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/流水编排/使能Iterate或IterateAll异步接口避免AIC-AIV同步依赖.md",
+        "line": 8,
+        "target": "同步方式消息发送示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/流水编排/使能Iterate或IterateAll异步接口避免AIC-AIV同步依赖.md",
+        "line": 11,
+        "target": "异步方式消息发送示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/流水编排/使能DoubleBuffer.md",
+        "line": 10,
+        "target": "数据搬运与Vector计算过程-54",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/流水编排/使能DoubleBuffer.md",
+        "line": 26,
+        "target": "DoubleBuffer机制-55",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/头尾开销优化/避免TPipe在对象内创建和初始化.md",
+        "line": 76,
+        "target": "aiv_scalar_time优化前后对比",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/头尾开销优化/避免TPipe在对象内创建和初始化.md",
+        "line": 79,
+        "target": "aiv_scalar_ratio优化前后对比",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/头尾开销优化/设置合适的核数和算子Kernel类型.md",
+        "line": 13,
+        "target": "头开销随启动核数的变化",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/Tiling策略/核间负载均衡.md",
+        "line": 10,
+        "target": "计算拖尾示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矩阵计算/较小矩阵长驻L1-Buffer-仅分次搬运较大矩阵.md",
+        "line": 12,
+        "target": "反例切分策略图示",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矩阵计算/通过FP-Buffer存放量化参数实现高效随路量化.md",
+        "line": 11,
+        "target": "反例数据流图-78",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矩阵计算/通过FP-Buffer存放量化参数实现高效随路量化.md",
+        "line": 14,
+        "target": "正例数据流图-79",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矩阵计算/通过BT-Buffer实现高效的bias计算.md",
+        "line": 8,
+        "target": "反例数据流图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矩阵计算/通过BT-Buffer实现高效的bias计算.md",
+        "line": 11,
+        "target": "正例数据流图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矩阵计算/通过L0C-Buffer数据暂存实现高效的矩阵乘结果累加.md",
+        "line": 8,
+        "target": "反例数据流图-80",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/矩阵计算/通过L0C-Buffer数据暂存实现高效的矩阵乘结果累加.md",
+        "line": 11,
+        "target": "正例数据流图-81",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/高效的使用搬运API.md",
+        "line": 8,
+        "target": "待搬运数据排布",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/尽量一次搬运较大的数据块.md",
+        "line": 11,
+        "target": "UB--GM方向不同单次搬运数据量下实际占用带宽的变化",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/尽量一次搬运较大的数据块.md",
+        "line": 14,
+        "target": "GM--UB方向不同单次搬运数据量下实际占用带宽的变化",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/非对齐场景减少无效数据的搬运.md",
+        "line": 43,
+        "target": "Normal模式搬运",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/非对齐场景减少无效数据的搬运.md",
+        "line": 77,
+        "target": "Compact模式搬运",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/GM地址尽量512B对齐.md",
+        "line": 12,
+        "target": "GM--UB方向512B对齐和32B对齐实测带宽的差异对比",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/GM地址尽量512B对齐.md",
+        "line": 15,
+        "target": "UB--GM方向512B对齐和32B对齐实测带宽的差异对比",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/非连续搬运场景减少搬运次数.md",
+        "line": 42,
+        "target": "使用多次DataCopyPad接口进行搬运",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/非连续搬运场景减少搬运次数.md",
+        "line": 75,
+        "target": "使用Loop模式进行搬运",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/非连续搬运场景减少搬运次数.md",
+        "line": 84,
+        "target": "搬运前后数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/非连续搬运场景减少搬运次数.md",
+        "line": 89,
+        "target": "使用多次DataCopyPad进行搬运",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/非连续搬运场景减少搬运次数.md",
+        "line": 135,
+        "target": "搬运前后数据-56",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md",
+        "line": 6,
+        "target": "bank结构示意图（图中箭头方向表示内存排布的顺序）-71",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md",
+        "line": 23,
+        "target": "地址分配示意图-72",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本2201）.md",
+        "line": 13,
+        "target": "bank结构示意图（图中箭头方向表示内存排布的顺序）",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本2201）.md",
+        "line": 30,
+        "target": "地址分配示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子实现/基础知识.md",
+        "line": 5,
+        "target": "基本架构",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子实现/基础知识.md",
+        "line": 7,
+        "target": "Reg矢量计算编程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子实现/算子实现.md",
+        "line": 26,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子实现/算子实现.md",
+        "line": 43,
+        "target": "算子计算逻辑-52",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子性能优化/计算优化/通过SIMT实现分支判断.md",
+        "line": 97,
+        "target": "SIMD实现floor_mod的耗时",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子性能优化/计算优化/通过SIMT实现分支判断.md",
+        "line": 102,
+        "target": "SIMT实现floor_mod的耗时",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md",
+        "line": 157,
+        "target": "反例指令流水图（仿真数据）",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md",
+        "line": 162,
+        "target": "反例内存负载分析（上板数据）",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md",
+        "line": 167,
+        "target": "正例指令流水图（仿真数据）",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md",
+        "line": 172,
+        "target": "正例内存负载分析（上板数据）",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md",
+        "line": 177,
+        "target": "反例算子运行时间（上板数据）",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md",
+        "line": 180,
+        "target": "正例算子运行时间（上板数据）",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/MC-算子性能调优案例.md",
+        "line": 76,
+        "target": "计算bound示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/MC-算子性能调优案例.md",
+        "line": 83,
+        "target": "通信bound示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/SIMT实现InsertHashTable算子案例.md",
+        "line": 22,
+        "target": "向哈希表中插入元素",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/SIMT实现InsertHashTable算子案例.md",
+        "line": 31,
+        "target": "开放寻址法",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/SIMT实现InsertHashTable算子案例.md",
+        "line": 46,
+        "target": "多线程哈希冲突",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/SIMT实现InsertHashTable算子案例.md",
+        "line": 93,
+        "target": "内存模型示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/SIMT实现InsertHashTable算子案例.md",
+        "line": 145,
+        "target": "多线程哈希冲突阶段1",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/SIMT实现InsertHashTable算子案例.md",
+        "line": 150,
+        "target": "多线程哈希冲突阶段2",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/SIMT实现InsertHashTable算子案例.md",
+        "line": 155,
+        "target": "多线程哈希冲突阶段3",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 32,
+        "target": "算子计算流程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 63,
+        "target": "causal场景atten_mask形状",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 86,
+        "target": "优化前算子流水",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 91,
+        "target": "causal场景atten_mask形状-82",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 96,
+        "target": "场景一Profiling数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 101,
+        "target": "场景二Profiling数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 110,
+        "target": "优化前计算基本块及次数",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 115,
+        "target": "优化后计算基本块及次数",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 129,
+        "target": "完成mm1-mm2-mm3缓存的流水",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 134,
+        "target": "Vector等Cube流水的间隔插入Vector计算",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 165,
+        "target": "causal场景优化前每个核计算量",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 168,
+        "target": "causal场景优化后每个核计算量",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 177,
+        "target": "场景一优化前Profiling数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 202,
+        "target": "场景一优化后Profiling数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 209,
+        "target": "场景二Profiling数据-83",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/FlashAttention算子性能调优案例.md",
+        "line": 212,
+        "target": "场景二流水图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/GroupedMatmul算子性能调优案例.md",
+        "line": 118,
+        "target": "指令的cycle占比数据ArithmeticUtilization-csv（性能总耗时为218-1us）",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/GroupedMatmul算子性能调优案例.md",
+        "line": 123,
+        "target": "指令流水图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能UnitFlag.md",
+        "line": 83,
+        "target": "未开启UnitFlag功能",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能UnitFlag.md",
+        "line": 88,
+        "target": "开启UnitFlag功能",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能多核K轴错峰访问内存.md",
+        "line": 8,
+        "target": "访问地址冲突示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能多核K轴错峰访问内存.md",
+        "line": 11,
+        "target": "缓解地址冲突示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能IBShare模板共享B矩阵数据.md",
+        "line": 77,
+        "target": "不使能IBShare模板的Matmul流水示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能IBShare模板共享B矩阵数据.md",
+        "line": 82,
+        "target": "使能IBShare模板的Matmul流水示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能纯Cube模式.md",
+        "line": 8,
+        "target": "默认MIX模式的Matmul流程示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能纯Cube模式.md",
+        "line": 110,
+        "target": "纯Cube模式的Matmul流程示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能IBShare模板共享A和B矩阵数据.md",
+        "line": 57,
+        "target": "优化前Profiling数据-86",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能IBShare模板共享A和B矩阵数据.md",
+        "line": 66,
+        "target": "未开启IBShare",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能IBShare模板共享A和B矩阵数据.md",
+        "line": 129,
+        "target": "优化后Profiling数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能多核切K.md",
+        "line": 73,
+        "target": "开启多核切K",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能MDL模板.md",
+        "line": 82,
+        "target": "默认Norm模板流水示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能MDL模板.md",
+        "line": 102,
+        "target": "MDL模板流水示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能Tiling全量常量化.md",
+        "line": 86,
+        "target": "默认不使能Tiling常量化的Matmul计算流程示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能Tiling全量常量化.md",
+        "line": 91,
+        "target": "使能Tiling常量化的Matmul计算流程示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能L2-Cache切分.md",
+        "line": 67,
+        "target": "优化点一示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能L2-Cache切分.md",
+        "line": 76,
+        "target": "优化点二示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul高阶API使能L2-Cache切分.md",
+        "line": 85,
+        "target": "优化点三示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul算子优化Tiling策略.md",
+        "line": 20,
+        "target": "优化前Profiling数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul算子优化Tiling策略.md",
+        "line": 105,
+        "target": "优化分核逻辑后Profiling数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul算子优化Tiling策略.md",
+        "line": 137,
+        "target": "优化基本块后Profiling数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/优秀实践/Matmul性能调优案例/Matmul算子优化Tiling策略.md",
+        "line": 161,
+        "target": "使能大包搬运后Profiling数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/性能分析/获取性能数据.md",
+        "line": 16,
+        "target": "PipeUtilization-csv（计算单元和搬运单元耗时占比）文件示例",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/性能分析/获取性能数据.md",
+        "line": 35,
+        "target": "时间线界面",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/性能分析/分析性能数据.md",
+        "line": 27,
+        "target": "op_summary_-csv示例一",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/性能分析/分析性能数据.md",
+        "line": 34,
+        "target": "op_summary_-csv示例二",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/性能分析/分析性能数据.md",
+        "line": 43,
+        "target": "op_summary_-csv示例",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/性能分析/分析性能数据.md",
+        "line": 50,
+        "target": "仿真流水图示例",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/基础知识.md",
+        "line": 49,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/基础知识.md",
+        "line": 49,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/算子实现.md",
+        "line": 8,
+        "target": "矩阵编程流程示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/算子实现.md",
+        "line": 94,
+        "target": "概述",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/算子实现.md",
+        "line": 176,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/Batch-Matmul复用Bias矩阵.md",
+        "line": 8,
+        "target": "带有Batch轴的Bias计算示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/Batch-Matmul复用Bias矩阵.md",
+        "line": 13,
+        "target": "复用Bias计算示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/TSCM输入的矩阵乘.md",
+        "line": 5,
+        "target": "基本架构",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/TSCM输入的矩阵乘.md",
+        "line": 9,
+        "target": "DoubleBuffer",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/TSCM输入的矩阵乘.md",
+        "line": 9,
+        "target": "基本架构",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md",
+        "line": 18,
+        "target": "MX格式组成示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md",
+        "line": 110,
+        "target": "A矩阵在不同位置的排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md",
+        "line": 113,
+        "target": "B矩阵在不同位置的排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md",
+        "line": 116,
+        "target": "scaleA矩阵在不同位置的排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md",
+        "line": 119,
+        "target": "scaleB矩阵在不同位置的排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/多核对齐切分.md",
+        "line": 27,
+        "target": "基本流程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/单次矩阵乘局部输出.md",
+        "line": 10,
+        "target": "未开启Partial-Output功能计算示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/单次矩阵乘局部输出.md",
+        "line": 13,
+        "target": "开启Partial-Output功能计算示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵向量乘.md",
+        "line": 5,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵向量乘.md",
+        "line": 14,
+        "target": "GEMV模式M-1的矩阵乘计算示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵向量乘.md",
+        "line": 21,
+        "target": "非GEMV模式M-1的矩阵乘计算示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/4-2稀疏矩阵乘.md",
+        "line": 14,
+        "target": "对原始稀疏矩阵B进行4-2稠密化过程示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/4-2稀疏矩阵乘.md",
+        "line": 137,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/AIC和AIV独立运行机制.md",
+        "line": 5,
+        "target": "基本架构",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的Channel拆分.md",
+        "line": 10,
+        "target": "ChannelSplit功能示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的N方向对齐.md",
+        "line": 5,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的N方向对齐.md",
+        "line": 10,
+        "target": "ND格式C矩阵N方向非32字节对齐示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的N方向对齐.md",
+        "line": 13,
+        "target": "ND格式C矩阵N方向32字节对齐示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵乘输出的N方向对齐.md",
+        "line": 16,
+        "target": "ND_ALIGN格式C矩阵N方向32字节对齐示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/基础知识.md",
+        "line": 17,
+        "target": "通信计算融合前后的理论执行耗时对比示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/基础知识.md",
+        "line": 28,
+        "target": "弱依赖计算通信任务示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/基础知识.md",
+        "line": 31,
+        "target": "弱依赖计算通信任务的调度模拟示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/基础知识.md",
+        "line": 38,
+        "target": "强依赖计算通信任务示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/基础知识.md",
+        "line": 41,
+        "target": "强依赖计算通信任务的调度模拟示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 3,
+        "target": "概述",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 3,
+        "target": "单算子API调用",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 24,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 109,
+        "target": "AllGatherMatmul通信计算掩盖示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 114,
+        "target": "MatmulAllReduce通信计算掩盖示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 121,
+        "target": "通算融合算子通信流程示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 128,
+        "target": "AllGatherMatmul第一轮通信与rank0上的本卡数据矩阵乘示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 135,
+        "target": "AllGatherMatmul第二轮通信与rank0上主块1的矩阵乘示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 141,
+        "target": "创建算子工程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 205,
+        "target": "算子原型定义",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 272,
+        "target": "AllGatherMatmul算子在rank0的矩阵乘示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 332,
+        "target": "int64_t m, int64_t n, int64_t k, TCubeTiling &cubeTiling",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 418,
+        "target": "Matmul计算分核示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/算子实现.md",
+        "line": 734,
+        "target": "单算子API调用",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/特性场景.md",
+        "line": 16,
+        "target": "通信任务重执行机制",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/通算融合/特性场景.md",
+        "line": 23,
+        "target": "算子工程编译",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/CV融合/基础知识.md",
+        "line": 13,
+        "target": "Flash-Attention核心实现",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/CV融合/基础知识.md",
+        "line": 20,
+        "target": "独立矢量算子和矩阵算子-Mix融合算子的执行耗时对比",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/CV融合/基础知识.md",
+        "line": 48,
+        "target": "融合算子编程范式-46",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/融合算子编程/CV融合/算子实现.md",
+        "line": 98,
+        "target": "Matmul矩阵乘示意图-48",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 35,
+        "target": "矢量计算起始地址非32字节对齐的错误示例",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 44,
+        "target": "非对齐处理方案示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 71,
+        "target": "冗余数据参与计算",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 82,
+        "target": "使用mask掩掉脏数据",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 97,
+        "target": "通过Duplicate逐行清零",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 107,
+        "target": "通过Pad一次性清零",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 117,
+        "target": "使用UnPad接口去除冗余数据后搬出",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 128,
+        "target": "使用GatherMask收集有效数据后搬出",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/非对齐场景.md",
+        "line": 139,
+        "target": "带冗余数据搬出",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/DoubleBuffer场景.md",
+        "line": 3,
+        "target": "DoubleBuffer",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/DoubleBuffer场景.md",
+        "line": 3,
+        "target": "DoubleBuffer",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/DoubleBuffer场景.md",
+        "line": 6,
+        "target": "DoubleBuffer数据切分示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/Broadcast场景.md",
+        "line": 19,
+        "target": "axis-1时coef示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/TBuf的使用.md",
+        "line": 69,
+        "target": "输入为bfloat16_t类型的Add计算流程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/基础矢量算子.md",
+        "line": 6,
+        "target": "矢量算子核函数实现流程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/基础矢量算子.md",
+        "line": 10,
+        "target": "基于TPipe和TQue编程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/基础矢量算子.md",
+        "line": 29,
+        "target": "算子计算逻辑",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/基础矢量算子.md",
+        "line": 35,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/基础矢量算子.md",
+        "line": 140,
+        "target": "基于TPipe和TQue编程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/基础矢量算子.md",
+        "line": 147,
+        "target": "Add算子实现流程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/概述.md",
+        "line": 8,
+        "target": "算子实现组成",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾核Tiling.md",
+        "line": 6,
+        "target": "数据对齐示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾核Tiling.md",
+        "line": 33,
+        "target": "无法均分到每个核上的示例",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/尾块Tiling.md",
+        "line": 6,
+        "target": "shape对齐场景",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/多核Tiling.md",
+        "line": 6,
+        "target": "算子开发流程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/多核Tiling.md",
+        "line": 13,
+        "target": "数据切分示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/多核Tiling.md",
+        "line": 75,
+        "target": "基本流程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/多核Tiling.md",
+        "line": 144,
+        "target": "多核并行处理示意图-38",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矢量编程/多核-Tiling切分/多核Tiling.md",
+        "line": 151,
+        "target": "单核数据切分示意图-39",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 4,
+        "target": "基本架构",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 12,
+        "target": "矩阵编程基本任务设计",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 40,
+        "target": "矩阵编程Queue队列",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 47,
+        "target": "矩阵算子实现流程",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 161,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 172,
+        "target": "Matmul算子的计算流程图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 364,
+        "target": "数据排布格式",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 435,
+        "target": "数据流通示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 440,
+        "target": "并行示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 458,
+        "target": "ND-to-NZ转换示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 502,
+        "target": "NZ-to-ZZ格式转换示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 551,
+        "target": "NZ-to-ZN格式转换示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/耦合模式.md",
+        "line": 647,
+        "target": "NZ-to-ND格式转换示意图",
+        "reason": "no_good_match(sim<0.5)"
+      },
+      {
+        "file": "算子实践参考/SIMD算子实现/矩阵编程（基础API）/分离模式.md",
+        "line": 7,
+        "target": "基本架构",
+        "reason": "no_good_match(sim<0.5)"
+      }
+    ],
+    "failed": []
+  }
+}
