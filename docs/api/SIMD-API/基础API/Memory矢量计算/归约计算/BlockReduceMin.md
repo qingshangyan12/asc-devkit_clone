@@ -1,38 +1,38 @@
-# BlockReduceMin<a name="ZH-CN_TOPIC_0000001626202397"></a>
+# BlockReduceMin
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 | 产品 | 是否支持 |
 |------|:------:|
-| Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ |
-| Atlas 200I/500 A2 推理产品 | √ |
-| Atlas 推理系列产品 AI Core | √ |
-| Atlas 推理系列产品 Vector Core | x |
-| Atlas 训练系列产品 | √ |
+| <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT | √ </cann-filter>|
+| <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
+| <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
+| <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 AI Core | √ </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 Vector Core | x </cann-filter>|
+| <cann-filter npu-type="910">Atlas 训练系列产品 | √ </cann-filter>|
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 对每个datablock内所有元素求最小值。归约指令的总体介绍请参考[如何使用归约计算API](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/类库API/基础API/常用操作速查指导/如何使用归约计算API.md)。
 
-## 函数原型<a name="section620mcpsimp"></a>
+## 函数原型
 
--   mask参数逐bit模式
+- mask参数逐bit模式
 
-    ```
+    ```cpp
     template <typename T, bool isSetMask = true>
     __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src,const int32_t repeatTime, const uint64_t mask[], const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
     ```
 
--   mask参数连续模式
+- mask参数连续模式
 
-    ```
+    ```cpp
     template <typename T, bool isSetMask = true>
     __aicore__ inline void BlockReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src,const int32_t repeatTime, const int32_t mask, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
     ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
 **表 1**  模板参数说明
 
@@ -53,25 +53,25 @@
 | srcBlkStride | 输入 | 单次迭代内datablock的地址步长。详细说明请参考 [dataBlockStride](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md)。 |
 | srcRepStride | 输入 | 源操作数相邻迭代间的地址步长，即每次迭代跳过的datablock数目。详细说明请参考 [repeatStride](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md)。 |
 
-## 返回值说明<a name="section128671456102513"></a>
+## 返回值说明
 
 无
 
-## 约束说明<a name="section633mcpsimp"></a>
+## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 
--   为了节省地址空间，您可以定义一个Tensor，供源操作数与目的操作数同时使用（即地址重叠），需要注意计算后的目的操作数数据不能覆盖未参与计算的源操作数，需要谨慎使用。
--   对于Atlas 200I/500 A2 推理产品，若配置的mask/mask\[\]参数后，存在某个datablock里的任何一个元素都不参与计算，则该datablock内所有元素的最小值会填充为inf返回。比如float场景下，当mask配置为32，即只计算前4个datablock，则后四个datablock内的最小值会返回inf。half场景下，最小值会返回65504。
--   针对不同场景合理使用归约指令可以带来性能提升，相关介绍请参考[选择低延迟指令，优化归约操作性能](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/算子实践参考/SIMD算子性能优化/矢量计算/选择低延迟指令-优化归约操作性能.md)，具体样例请参考[ReduceCustom](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_libraries/04_reduce/reduce)。
+- 为了节省地址空间，您可以定义一个Tensor，供源操作数与目的操作数同时使用（即地址重叠），需要注意计算后的目的操作数数据不能覆盖未参与计算的源操作数，需要谨慎使用。
+- 对于Atlas 200I/500 A2 推理产品，若配置的mask/mask\[\]参数后，存在某个datablock里的任何一个元素都不参与计算，则该datablock内所有元素的最小值会填充为inf返回。比如float场景下，当mask配置为32，即只计算前4个datablock，则后四个datablock内的最小值会返回inf。half场景下，最小值会返回65504。
+- 针对不同场景合理使用归约指令可以带来性能提升，相关介绍请参考[选择低延迟指令，优化归约操作性能](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/算子实践参考/SIMD算子性能优化/矢量计算/选择低延迟指令-优化归约操作性能.md)，具体样例请参考[ReduceCustom](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_libraries/04_reduce/reduce)。
 
-## 调用示例<a name="section642mcpsimp"></a>
+## 调用示例
 
 本样例中只展示Compute流程中的部分代码。完整样例可参考[BlockReduce系列归约指令样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum)。
 
--   BlockReduceMin-tensor高维切分计算样例-mask连续模式
+- BlockReduceMin-tensor高维切分计算样例-mask连续模式
 
-    ```
+    ```cpp
     // 设定mask为最多的128个全部元素参与计算
     int32_t mask = 256/sizeof(half);
     // 每个repeat128个元素，一共128个元素。
@@ -83,9 +83,9 @@
     AscendC::BlockReduceMin<half>(dstLocal, srcLocal, repeat, mask, 1, 1, 8);
     ```
 
--   BlockReduceMin-tensor高维切分计算样例-mask逐bit模式
+- BlockReduceMin-tensor高维切分计算样例-mask逐bit模式
 
-    ```
+    ```cpp
     // 设定mask为最多的128个全部元素参与计算
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
     // 每个repeat128个元素，一共128个元素。
@@ -99,8 +99,8 @@
 
 结果示例如下：
 
-```
-输入数据src_gm: 
+```cpp
+输入数据src_gm:
 [10, 10, 10, 10, 10, 10, 10, 10,
  10, 10, 10, 2, 10, 10, 10, 10,
  10, 10, 10, 10, 10, 10, 10, 10,
@@ -108,8 +108,8 @@
  ...
  10, 10, 10, 10, 10, 10, 10, 10,
  10, 4, 10, 10, 10, 10, 10, 10,
-]  
+]
 
-输出数据dst_gm: 
+输出数据dst_gm:
 [2, -3, ..., 4]
 ```
