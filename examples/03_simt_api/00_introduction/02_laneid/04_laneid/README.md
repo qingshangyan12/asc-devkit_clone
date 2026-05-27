@@ -29,36 +29,26 @@ __global__ __maxnreg__(REG_COUNT) void laneid_test(int32_t* laneid_output, uint6
 
 ## 验证逻辑
 
-1. 启动 2 个 block，每个 block 64 个线程，共 128 个线程
-2. 每个 block 包含 64 / 32 = 2 个 warp
+1. 启动 1 个 block，每个 block 32 个线程，共 32 个线程
+2. 每个 block 包含 32 / 32 = 1 个 warp
 3. 每个线程调用 `laneid()` 并存储结果
-4. 验证 laneid 是否符合预期：
-   - Lane ID 应在 [0, 31] 范围内
-   - Lane ID = threadIdx % 32（线程在 warp 内的索引）
+4. 生成 golden 数据：golden[i] = i % 32
+5. 验证 output 与 golden 是否完全匹配
 
 ## 预期输出
 
 ```
-Testing laneid() API
-Configuration: 2 blocks x 64 threads/block
-Expected: Each block has 2 warps
-          Each warp contains 32 threads
-          laneid range: [0, 31]
+Output:
+[0]=0 [1]=1 [2]=2 [3]=3 [4]=4 [5]=5 [6]=6 [7]=7 
+[8]=8 [9]=9 [10]=10 [11]=11 [12]=12 [13]=13 [14]=14 [15]=15 
+[16]=16 [17]=17 [18]=18 [19]=19 [20]=20 [21]=21 [22]=22 [23]=23 
+[24]=24 [25]=25 [26]=26 [27]=27 [28]=28 [29]=29 [30]=30 [31]=31 
 
-Lane ID verification:
-Total threads: 128
-Threads per block: 64
-Warp size: 32
-
-First warp (32 threads) lane IDs:
-  Thread 0: laneid = 0
-  Thread 1: laneid = 1
-  ...
-  Thread 31: laneid = 31
-
-First 64 lane IDs (2 warps):
-  Warp 0: [0]=0 [1]=1 [2]=2 ... [31]=31
-  Warp 1: [0]=0 [1]=1 [2]=2 ... [31]=31
+Golden:
+[0]=0 [1]=1 [2]=2 [3]=3 [4]=4 [5]=5 [6]=6 [7]=7 
+[8]=8 [9]=9 [10]=10 [11]=11 [12]=12 [13]=13 [14]=14 [15]=15 
+[16]=16 [17]=17 [18]=18 [19]=19 [20]=20 [21]=21 [22]=22 [23]=23 
+[24]=24 [25]=25 [26]=26 [27]=27 [28]=28 [29]=29 [30]=30 [31]=31 
 
 [Success] Laneid verification passed.
 Laneid range: [0, 31]
@@ -77,20 +67,12 @@ make
 
 - **Lane ID**: 线程在 Warp 内的唯一标识符，范围 [0, 31]
 - **Warp**: 一组同时执行的 32 个线程，是 SIMT 执行的基本单位
-- **Block**: 线程块，包含多个 warp（本例中每个 block 有 64/32=2 个 warp）
+- **Block**: 线程块（本例中每个 block 有 32/32=1 个 warp）
 - **Grid**: 线程块的网络结构
 
-## 线程索引关系
+## 配置说明
 
-| 全局线程 ID | Block ID | Block 内线程 ID | Warp ID | Lane ID |
-|------------|----------|----------------|---------|---------|
-| 0-31 | 0 | 0-31 | 0 | 0-31 |
-| 32-63 | 0 | 32-63 | 1 | 0-31 |
-| 64-95 | 1 | 0-31 | 0 | 0-31 |
-| 96-127 | 1 | 32-63 | 1 | 0-31 |
-
-**计算公式：**
-- Lane ID = threadIdx % 32
-- Warp ID (block内) = threadIdx / 32
-- 每个 block 有 64/32 = **2 个 warp**
-- 共有 2 个 block × 2 个 warp/block = **4 个 warp**
+- 1 个 block × 32 线程/block = **32 个线程**
+- 每个 block 有 32/32 = **1 个 warp**
+- 共有 1 block × 1 warp/block = **1 个 warp**
+- Lane ID 范围：**[0, 31]**
