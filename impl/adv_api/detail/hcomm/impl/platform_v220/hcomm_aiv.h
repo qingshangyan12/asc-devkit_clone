@@ -29,7 +29,7 @@
 
 namespace AscendC {
 
-__aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::HcommImpl()
+__aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::HcommImpl()
 {
     TBuf<TPosition::VECOUT> rdmaInBuf;
     pipe_.InitBuffer(rdmaInBuf, HCOMM_MEM_BLOCK_SIZE);
@@ -40,31 +40,51 @@ __aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::HcommImpl()
     ubLocalHead_ = rdmaInBuf2.Get<uint32_t>();
 }
 
-__aicore__ inline HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::~HcommImpl() {}
+__aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::~HcommImpl() {}
 
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Write(
-    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::WriteNbi(
+    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Write channelHandle:%llu, dst:%p, src:%p, len:%llu", channelHandle, dst, src, len);
+    (void)config;
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Write channelPtr:%llu, dst:%p, src:%p, len:%llu", channelPtr, dst, src, len);
     HcommHandle handleId = ++curHandleId_;
-    PostSend(channelHandle, dst, src, len, false);
+    PostSend(channelPtr, dst, src, len, false);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Write complete handleId:%u", handleId);
     return handleId;
 }
 
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::Read(
-    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::ReadNbi(
+    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Read channelHandle:%llu, dst:%p, src:%p, len:%llu", channelHandle, dst, src, len);
+    (void)config;
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Read channelPtr:%llu, dst:%p, src:%p, len:%llu", channelPtr, dst, src, len);
     HcommHandle handleId = ++curHandleId_;
-    PostSend(channelHandle, dst, src, len, true);
+    PostSend(channelPtr, dst, src, len, true);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Read complete handleId:%u", handleId);
     return handleId;
 }
 
-__aicore__ inline void HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::doorBell(
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::WriteWithNotifyNbi(
+    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
+{
+    (void)commit;
+    (void)commitPipe;
+    (void)reqPipe;
+    (void)config;
+    (void)channelPtr;
+    (void)dst;
+    (void)src;
+    (void)len;
+    (void)notifyAddr;
+    (void)notifyVal;
+    KERNEL_LOG(KERNEL_ERROR, "Hcomm ROCE WriteWithNotifyNbi is not supported");
+    return HCOMM_INVALID_HANDLE_ID;
+}
+
+__aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::doorBell(
     __gm__ Channel* channelPtr, uint64_t curHead)
 {
     uint64_t doorBellInfo = 0;
@@ -83,10 +103,10 @@ __aicore__ inline void HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::doorBell(
     AscendC::DataCopyPad(DBGlobalTensor, ubLocal_, copyParams);
 }
 
-__aicore__ inline void HcommImpl<CommEngine::AIV, CommProtocol::ROCE>::PostSend(
-    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead)
+__aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::PostSend(
+    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead)
 {
-    __gm__ Channel* channelPtr = (__gm__ Channel*)channelHandle;
+    __gm__ Channel* channelPtr = (__gm__ Channel*)channelPtr;
     auto qpNum = channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn;
     auto sqBaseAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.sqVa;
     auto wqeSize = channelPtr->sqContextAddr->ctx.rdmaSqContext.wqeSize;
