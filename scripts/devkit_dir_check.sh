@@ -16,6 +16,7 @@ DIR_LIST=(
     "/usr/local/Ascend/cann/|./monitor_snapshot_1.txt"
     "/usr/local/Ascend/cann/asc/|./monitor_snapshot_2.txt"
 )
+RESULT_CHECK="./result_check.txt"
 
 # 遍历监控每个目录
 for item in "${DIR_LIST[@]}"; do
@@ -25,7 +26,7 @@ for item in "${DIR_LIST[@]}"; do
 
     # 校验目录是否存在
     if [ ! -d "$TARGET_DIR" ]; then
-        echo -e "\n【错误】目录不存在：$TARGET_DIR" 2>&1 | tee -a result_check.txt
+        echo -e "\n【错误】目录不存在：$TARGET_DIR" 2>&1 | tee -a "$RESULT_CHECK"
         continue
     fi
 
@@ -46,19 +47,25 @@ for item in "${DIR_LIST[@]}"; do
     # 对比快照
     DIFF=$(diff "$SNAPSHOT_FILE" "$CURRENT_SNAP" 2>/dev/null)
     if [ -z "$DIFF" ]; then
-        echo "✔ 目录结构未变动" 2>&1 | tee -a result_check.txt
+        echo "✔ 目录结构未变动" 2>&1 | tee -a "$RESULT_CHECK"
     else
-        echo "✘ 目录结构已变动，差异如下：" 2>&1 | tee -a result_check.txt
+        echo "✘ 目录结构已变动，差异如下：" 2>&1 | tee -a "$RESULT_CHECK"
         echo "$DIFF"
     fi
 
     # 清理临时文件
     rm "$CURRENT_SNAP"
 done
-echo -e "\n========== 目录对比完成 =========="
 
 # 结构判断
-COUNT=$(grep -c -F "目录结构未变动" result_check.txt)
+if [ ! -f $RESULT_CHECK ]; then
+    echo -e "\n========== 初始快照已生成 =========="
+    exit 0
+else
+    echo -e "\n========== 目录对比完成 =========="
+fi
+
+COUNT=$(grep -c -F "目录结构未变动" "$RESULT_CHECK")
 if [ "$COUNT" -eq 2 ]; then
     echo "check pass"
 else
