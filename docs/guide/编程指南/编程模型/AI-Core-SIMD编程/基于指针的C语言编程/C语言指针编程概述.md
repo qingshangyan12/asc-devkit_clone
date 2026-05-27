@@ -87,7 +87,7 @@ asc_mul(z_local, z_local, y_local, tileLength);   // 向量乘法（可连续）
 ```c
 asc_lock(PIPE_MTE3, mutex_id);
 asc_copy_ub2gm(z_gm + i * tileLength, z_local, tileLength);  // 搬出结果数据
-asc_lock(PIPE_MTE3, mutex_id);
+asc_unlock(PIPE_MTE3, mutex_id);
 ```
 **学习路径**：详见[编程示例](./编程示例.md)
 
