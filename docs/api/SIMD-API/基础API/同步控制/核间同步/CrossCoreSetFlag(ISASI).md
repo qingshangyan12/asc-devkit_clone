@@ -98,7 +98,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| flagId | 输入 | 核间同步的标记。<br><cann-filter npu-type="950">1. Ascend 950PR/Ascend 950DT，取值范围如下：<br>&nbsp;&nbsp;&bull; AIV0发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 0-10的操作。<br>&nbsp;&nbsp;&bull; AIV1发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 16-26的操作。<br>&nbsp;&nbsp;&bull; AIC发起的flagId 0-10的CrossCoreSetFlag操作对应AIV0 CrossCoreWaitFlag中flagId 0-10的操作。<br>&nbsp;&nbsp;&bull; AIC发起的flagId 16-26的CrossCoreSetFlag操作对应AIV1 CrossCoreWaitFlag中flagId 0-10的操作。</cann-filter><br><cann-filter npu-type="A3">2. Atlas A3 训练系列产品/Atlas A3 推理系列产品，取值范围是0-10。</cann-filter><br><cann-filter npu-type="910b">3. Atlas A2 训练系列产品/Atlas A2 推理系列产品，取值范围是0-10。</cann-filter> |
+| flagId | 输入 | 核间同步的标记。<br><cann-filter npu-type="950">&bull; Ascend 950PR/Ascend 950DT，取值范围如下：<br>&nbsp;&nbsp;&bull; AIV0发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 0-10的操作。<br>&nbsp;&nbsp;&bull; AIV1发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 16-26的操作。<br>&nbsp;&nbsp;&bull; AIC发起的flagId 0-10的CrossCoreSetFlag操作对应AIV0 CrossCoreWaitFlag中flagId 0-10的操作。<br>&nbsp;&nbsp;&bull; AIC发起的flagId 16-26的CrossCoreSetFlag操作对应AIV1 CrossCoreWaitFlag中flagId 0-10的操作。</cann-filter><br><cann-filter npu-type="A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品，取值范围是0-10。</cann-filter><br><cann-filter npu-type="910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品，取值范围是0-10。</cann-filter> |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -136,20 +136,10 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 
     - 对于同一个核上的操作，若需将同一flagId用于不同的核间同步模式，必须在模式切换前确保前一个模式下的所有同步操作已完成——即与该flagId关联的CrossCoreSetFlag调用及其配对的CrossCoreWaitFlag调用均执行完毕。否则，未完成的同步操作可能导致系统出现未定义行为。
 
-        图1展示了一个违反上述约束的场景。
+    - 对于不同的核，可以直接将同一flagId用于不同的核间同步模式，具体包括以下2种场景：
 
-        预期流程：核AIV 1-1与AIV 1-2调用CrossCoreSetFlag时均使用flagId=0，核AIC 1等待该信号完成模式2同步；待模式2同步完成后，核AIV 1-1与AIV 1-2调用CrossCoreSetFlag时复用flagId=0进行模式1的同步。
-
-        实现执行过程：由于AIC 1的指令队列拥塞，核AIV 1-1与AIV 1-2在模式2中触发的CrossCoreSetFlag未能及时被AIC 1的CrossCoreWaitFlag响应。此时，核AIV 1-1在未确认模式2的同步流程完成（即AIC 1的CrossCoreWaitFlag未执行）的情况下，提前发起了模式1的CrossCoreSetFlag调用，导致核间同步状态混乱，最终引发未定义行为。
-
-        针对同一flagId在核AIV 1-1上分别用于模式2与模式1同步的需求，可采用添加反向同步的方案。
-    **图 1**  错误示范\(前序同步未完成时，AIV的同一个flagId切换模式\)<a name="zh-cn_topic_0000002515548548_fig195023213613"></a>  
-![](../../../../figures/flag_id_switch_mode_error.png)
-
-    （2）对于不同的核，可以直接将同一flagId用于不同的核间同步模式，具体包括以下2种场景：
-
-    - 多个AI Core之间，使用flagId=0同步所有的AIC（模式0）；单个AI Core内，使用flagId=0同步所有AIV（模式1）。
-    - 单个AI Core内，使用flagId=0同步所有AIV（模式1）；另一个AI Core内，使用flagId=0同步AIC与所有AIV（模式2）。
+        - 多个AI Core之间，使用flagId=0同步所有的AIC（模式0）；单个AI Core内，使用flagId=0同步所有AIV（模式1）。
+        - 单个AI Core内，使用flagId=0同步所有AIV（模式1）；另一个AI Core内，使用flagId=0同步AIC与所有AIV（模式2）。
 
 - 使用该接口模式0时，建议开启batchmode模式，使算子独占全部所需核资源，否则可能因满足以下条件导致死锁：
 
