@@ -27,11 +27,11 @@
 <table border="2">
 <caption>表1：场景配置对照表</caption>
 <tr><th>scenarioNum</th><th>输入Shape</th><th>输出Shape</th><th>数据类型</th><th>说明</th></tr>
-<tr><td>1</td><td>[16, 32]</td><td>[32, 64]</td><td>float</td><td>Padding场景</td></tr>
-<tr><td>2</td><td>[28, 15]</td><td>[32, 32]</td><td>float</td><td>Padding场景，使能最近值填充方式</td></tr>
-<tr><td>3</td><td>[16, 64]</td><td>[64, 16]</td><td>float</td><td>Transpose场景</td></tr>
-<tr><td>4</td><td>[1, 16]</td><td>[3, 16]</td><td>float</td><td>BroadCast场景</td></tr>
-<tr><td>5</td><td>[32, 64]</td><td>[16, 16]</td><td>float</td><td>Slice场景</td></tr>
+<tr><td>1</td><td>[16, 32]</td><td>[32, 64]</td><td>float32</td><td>Padding场景</td></tr>
+<tr><td>2</td><td>[28, 15]</td><td>[32, 32]</td><td>float32</td><td>Padding场景，使能最近值填充方式</td></tr>
+<tr><td>3</td><td>[16, 64]</td><td>[64, 16]</td><td>float32</td><td>Transpose场景</td></tr>
+<tr><td>4</td><td>[1, 16]</td><td>[3, 16]</td><td>float32</td><td>BroadCast场景</td></tr>
+<tr><td>5</td><td>[32, 64]</td><td>[16, 16]</td><td>float32</td><td>Slice场景</td></tr>
 </table>
 
 ### 场景详细说明

@@ -1,7 +1,7 @@
 # ld_st_reg_align样例
 
 ## 概述
-本样例基于Reg编程接口实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的对齐数据搬运操作，该样例使用LoadAlign，StoreAlign接口，以及POST_MODE_UPDATE、DATA_BLOCK_COPY等模式的使能。本样例支持6种搬运场景，通过环境变量选择场景。
+本样例基于Reg编程接口实现UB(Unified Buffer)对RegTensor(Reg矢量计算基本单元)的连续和非连续的数据搬运操作，使用LoadAlign/StoreAlign接口（要求地址32B对齐，数据量可不等于VL整数倍），以及POST_MODE_UPDATE、DATA_BLOCK_COPY等模式的使能。本样例支持6种搬运场景，通过环境变量选择场景。
     <table>
       <tr>
         <td>scenarioNum</td>
@@ -53,11 +53,11 @@
   每次迭代重新配置搬入搬出的地址，实现数据的连续搬入搬出。同时介绍通过MaskReg处理最后一次迭代时，搬出数据不足VL的数据量非VL对齐场景。
 - 样例实现：  
   - 基础场景，LoadAlign和StoreAlign采用默认参数配置。
-  - 输入1024个元素，输出1021个元素，需要8次迭代。其中最后一次迭代仅计算并搬出125个元素，不足VL。
+  - 输入1024个元素，输出1024个元素，VF函数实际计算1021个元素，需要8次迭代。其中最后一次迭代仅计算并搬出125个元素，不足VL。
   - VF函数for循环内每次迭代用UpdateMask接口更新mask。对于half类型：
     - 当outputLength>=128时，mask处理128个元素
     - 当outputLength<128时，mask处理outputLength个元素
-    - UpdateMask执行完后，outputLength自减mask处理的元素个数。  
+    - UpdateMask入参为常量outputLength，无自减机制，每次迭代mask处理元素个数由当前outputLength决定。  
     ```cpp
     mask = AscendC::Reg::UpdateMask<T>(outputLength);
     ```
@@ -67,7 +67,7 @@
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
   <tr><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 1021]</td><td align="center">half</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
   <tr><td rowspan="1" align="center">VF函数名</td><td colspan="4" align="center">CopyWithOffsetVF</td></tr>
   </table>
 
@@ -93,14 +93,13 @@
 - 样例功能：  
   搬入搬出使用AddrReg（地址寄存器），实现数据的连续搬入搬出。
 - 样例实现：  
-  - 初始化地址寄存器，表示i轴每次循环完成时aReg自增stride0  
+  - 每次迭代重建地址寄存器，表示当前迭代的偏移量
     ```cpp
-    uint32_t stride0 = AscendC::GetVecLen() / sizeof(T);
-    AddrReg aReg = AscendC::Reg::CreateAddrReg<T>(i, stride0);
+    AddrReg aReg = AscendC::Reg::CreateAddrReg<T>(i, oneRepeatSize);
     ```
   - LoadAlign/StoreAlign入参 offset = aReg。以LoadAlign搬入为例：  
     - 每次迭代的UB起始地址为srcAddr + aReg
-    - 迭代后aReg会自动更新为aReg + stride0。
+    - 每次迭代重新创建AddrReg，偏移量随迭代次数递增。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
@@ -113,7 +112,7 @@
 
 **场景4：以DataBlock为单位非连续搬运**
 - 样例功能：  
-  搬入搬出使用DataBlock（32字节）搬运模式。搬入时单次搬运相邻DataBlock间间隔2个DataBlock，即搬运32B，间隔32B；搬出时单次搬运相邻DataBlock间隔1个DataBlock，相当于连续搬运。
+  搬入搬出使用DataBlock（32字节）搬运模式。搬入时单次搬运相邻DataBlock间间隔1个DataBlock（32B），即搬运32B，间隔32B；搬出时连续存储（无间隔），相当于连续搬运。
 - 样例实现：  
   - LoadAlign/StoreAlign模板参数 dataMode = DataCopyMode::DATA_BLOCK_COPY
   - LoadAlign入参dataBlockStride配置为2，StoreAlign入参dataBlockStride配置为1
@@ -125,7 +124,7 @@
   <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
   <tr><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">half</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 512]</td><td align="center">half</td></tr>
-  <tr><td rowspan="1" align="center">VF函数名</td><td colspan="4" align="center">CopyWithAddrRegVF</td></tr>
+  <tr><td rowspan="1" align="center">VF函数名</td><td colspan="4" align="center">CopyDataBlock</td></tr>
   </table>
 
 **场景5：广播（broadcast）模式搬入**

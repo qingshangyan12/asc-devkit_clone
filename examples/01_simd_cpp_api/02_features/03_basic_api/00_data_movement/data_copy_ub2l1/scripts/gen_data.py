@@ -14,61 +14,64 @@
 import os
 import numpy as np
 
+CUBE_BLOCK = 16
+CUBE_BLOCK_SIZE = CUBE_BLOCK * CUBE_BLOCK
+
 
 def nd_to_nz_for_matrix_a(data_nd):
     """
     将ND格式的A矩阵转换为NZ格式
     A矩阵shape: [m, k], type:float16
-    NZ格式: 每个BLOCK_CUBE x BLOCK_CUBE块内按列主序排列
+    NZ格式: 每个BLOCK_CUBE x BLOCK_CUBE块内按行主序排列
     """
     m, k = data_nd.shape
     BLOCK_CUBE = 16
     
-    # 计算对齐后的维度
     m_aligned = ((m + BLOCK_CUBE - 1) // BLOCK_CUBE) * BLOCK_CUBE
     k_aligned = ((k + BLOCK_CUBE - 1) // BLOCK_CUBE) * BLOCK_CUBE
     
-    # 创建NZ格式数组（填充对齐）
     data_nz = np.zeros((m_aligned, k_aligned), dtype=data_nd.dtype)
     data_nz[:m, :k] = data_nd
     
-    # 按BLOCK_CUBE x BLOCK_CUBE块重排数据
+    nz_result = np.zeros_like(data_nz)
+    block_idx = 0
     for m_block in range(0, m_aligned, BLOCK_CUBE):
         for k_block in range(0, k_aligned, BLOCK_CUBE):
             block = data_nz[m_block:m_block+BLOCK_CUBE, k_block:k_block+BLOCK_CUBE]
-            # NZ格式：块内按列主序排列
-            block_flat = block.T.flatten()
-            data_nz[m_block:m_block+BLOCK_CUBE, k_block:k_block+BLOCK_CUBE] = block_flat.reshape((BLOCK_CUBE, BLOCK_CUBE))
+            block_flat = block.flatten()
+            start = block_idx * CUBE_BLOCK_SIZE
+            nz_result.flat[start:start + CUBE_BLOCK_SIZE] = block_flat
+            block_idx += 1
     
-    return data_nz
+    return nz_result
 
 
 def nd_to_nz_for_matrix_b(data_nd):
     """
     将ND格式的B矩阵转换为NZ格式
     B矩阵shape: [k, n], type:float16
-    NZ格式: 每个BLOCK_CUBE x BLOCK_CUBE块内按行主序排列
+    NZ格式: 连续分形布局，块内按行主序排列
     """
     k, n = data_nd.shape
     BLOCK_CUBE = 16
     
-    # 计算对齐后的维度
     k_aligned = ((k + BLOCK_CUBE - 1) // BLOCK_CUBE) * BLOCK_CUBE
     n_aligned = ((n + BLOCK_CUBE - 1) // BLOCK_CUBE) * BLOCK_CUBE
     
-    # 创建NZ格式数组（填充对齐）
     data_nz = np.zeros((k_aligned, n_aligned), dtype=data_nd.dtype)
     data_nz[:k, :n] = data_nd
     
-    # 按BLOCK_CUBE x BLOCK_CUBE块重排数据
-    for k_block in range(0, k_aligned, BLOCK_CUBE):
-        for n_block in range(0, n_aligned, BLOCK_CUBE):
+    nz_result = np.zeros_like(data_nz)
+    block_idx = 0
+    for n_block in range(0, n_aligned, BLOCK_CUBE):
+        for k_block in range(0, k_aligned, BLOCK_CUBE):
             block = data_nz[k_block:k_block+BLOCK_CUBE, n_block:n_block+BLOCK_CUBE]
-            # NZ格式：块内按行主序排列（转置）
             block_flat = block.flatten()
-            data_nz[k_block:k_block+BLOCK_CUBE, n_block:n_block+BLOCK_CUBE] = block_flat.reshape((BLOCK_CUBE, BLOCK_CUBE))
+            start = block_idx * CUBE_BLOCK_SIZE
+            nz_result.flat[start:start + CUBE_BLOCK_SIZE] = block_flat
+            block_idx += 1
     
-    return data_nz
+    return nz_result
 
 
 def gen_golden_data_simple():
@@ -80,8 +83,8 @@ def gen_golden_data_simple():
     k = 32
 
     # 生成ND格式的数据
-    x1_nd = np.ones(m * k).reshape([m, k]).astype(np.float16)
-    x2_nd = np.ones(k * n).reshape([k, n]).astype(np.float16)
+    x1_nd = np.arange(1, m * k + 1).reshape([m, k]).astype(np.float16)
+    x2_nd = np.arange(1, k * n + 1).reshape([k, n]).astype(np.float16)
     
     # 转换为NZ格式
     x1_nz = nd_to_nz_for_matrix_a(x1_nd)

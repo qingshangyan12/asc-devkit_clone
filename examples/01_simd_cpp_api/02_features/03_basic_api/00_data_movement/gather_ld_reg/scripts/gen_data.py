@@ -18,7 +18,7 @@ import numpy as np
 
 
 def gen_golden_data_gather_scenario1():
-    """场景1：Gather接口 - 从RegTensor按索引收集元素"""
+    """场景1：Gather接口 - 从UB地址按索引收集元素"""
     total_length = 128
     src_length = total_length * 8
     data_type = np.float16

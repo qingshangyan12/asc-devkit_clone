@@ -121,14 +121,14 @@ def req8_pre(data, quant_pre, relu_pre):
 
 def pre_quant_relu(golden, dst_type, m, n, scenarioNum):
     quant_scalar = 2
-    norm_relu_alpha = 0
+    relu_scale_for_neg = 0
 
     relu_alpha = 1
-    # no relu
+    # no relu: negative values use quant_scalar as scale
     if scenarioNum in (2, 3, 5):
         relu_alpha = quant_scalar
     else:
-        relu_alpha = norm_relu_alpha
+        relu_alpha = relu_scale_for_neg
     relu_alpha = struct.unpack('!I', struct.pack('!f', relu_alpha))[0]
 
     # 1 * n 量化系数为全为quant scalar的量化tensor
@@ -136,7 +136,9 @@ def pre_quant_relu(golden, dst_type, m, n, scenarioNum):
     temp_quant_tensor_api = copy.deepcopy(temp_quant_tensor).astype(np.uint64)
     for i, _ in enumerate(temp_quant_tensor_api):
         temp_quant_tensor_api[i] = struct.unpack('!I', struct.pack('!f', temp_quant_tensor[i]))[0]
-        temp_quant_tensor_api[i] = temp_quant_tensor_api[i] | np.uint64(0x400000000000)
+        # sign bit (bit 46): 0 for half output (unsigned range), 1 for int8_t output (signed range)
+        sign_value = np.uint64(0x400000000000) if dst_type == np.dtype("int8") else np.uint64(0)
+        temp_quant_tensor_api[i] = temp_quant_tensor_api[i] | sign_value
     quant_tensor = np.frombuffer(temp_quant_tensor_api, np.uint64)
     quant_tensor = quant_tensor.astype(np.uint64)
     # vector quant mode
