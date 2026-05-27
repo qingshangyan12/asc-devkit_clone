@@ -14,7 +14,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_set_atomic_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_set_atomic_intf.h"`。
 
 关闭数据搬运随路原子操作功能，后续执行数据搬运时，GM中原始数据将被新搬运数据完全覆盖。
 

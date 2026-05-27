@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_block_sync_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)。
 
@@ -101,11 +101,11 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 - flagId相关的约束：
     - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取最低位4bit为准。
     - 每个flagId有个对应计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到核间同步（CrossCoreSetFlag）全部完成后，会将对应CrossCoreWaitFlag的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。flagId对应的计数器计数范围为0-15。如果计数器的值超出该范围，则会异常报错，中断流程。
-    - 模式0、1、2下，如果多个模式同时共用同一个flagId，CrossCoreWaitFlag无法分辨具体是哪一个模式，会与预期不符合。
+    - 模式0、1、2下，如果多个模式同时共用同一个flagId，CrossCoreWaitFlag无法区分具体是哪一个模式，会导致行为与预期不符。
 
-        如图1所示，AIC 1的flagId 0同时用于进行模式2 \(AIV执行CrossCoreSetFlag\)和模式0\(所有AIC\)的核间同步。AIC 1在调用CrossCoreWaitFlag的时候，读取flagId=0的计数器，此时该计数器的值变化可能是由于模式0或模式2同步完成。AIC 1感知不到具体是哪个模式，只能感知到计数器值变化，能够解除阻塞。
+        如图1所示，AIC 1的flagId 0同时用于模式2（AIV执行CrossCoreSetFlag）和模式0（所有AIC）的核间同步。AIC 1调用CrossCoreWaitFlag时，读取flagId=0的计数器，此时计数器的值变化可能来自模式0或模式2的同步完成。AIC 1无法分辨具体是哪个模式，只能感知到计数器值变化后解除阻塞。
 
-        **图 1**  错误示范\(连续使用CrossCoreWaitFlag等待不同模式\)<a name="zh-cn_topic_0000002547028479_fig208671330144620"></a>  
+        **图 1**  错误示范（连续使用CrossCoreWaitFlag等待不同模式）<a name="zh-cn_topic_0000002547028479_fig208671330144620"></a>  
         ![](../../../../figures/cross_wait_flag_multi_mode_error.png)
 
 - 使用该接口模式0时，建议开启batchmode模式，使算子独占全部所需核资源，否则可能因满足以下条件导致死锁：
@@ -136,19 +136,19 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
     AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-    // UB 到 GM 搬运启用原子累加：搬运至 atomicResult 的数据与原值累加后覆盖原值
+    // UB 到 GM 搬运启用原子累加：搬运至 atomicResult 的数据与原值累加后覆盖原值。
     AscendC::SetAtomicAdd<float>();
-    // DataCopy属于PIPE_MTE3流水操作
+    // DataCopy属于PIPE_MTE3流水操作。
     AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
-    // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成
+    // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成。
     AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
     // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
     AscendC::CrossCoreWaitFlag(0);
-    // 关闭原子累加
+    // 关闭原子累加。
     AscendC::SetAtomicNone();
 
     if (AscendC::GetBlockIdx() == 0) {
-        AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength); // PIPE_MTE2
+        AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);
         AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
         AscendC::DataCopy(atomicResultGm, yLocal, this->blockLength);

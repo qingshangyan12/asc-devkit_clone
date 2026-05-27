@@ -14,7 +14,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_common_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
 
 设置原子操作开启位与原子操作类型。
 

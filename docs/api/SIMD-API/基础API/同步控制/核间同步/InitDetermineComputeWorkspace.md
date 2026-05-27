@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_determine_compute_sync_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_determine_compute_sync_intf.h"`。
 
 InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初始化配置接口，能够初始化GM共享内存的值，完成初始化后才可以调用[WaitPreBlock](WaitPreBlock.md)和[NotifyNextBlock](NotifyNextBlock.md)。以上三个接口共同完成基于核间顺序执行的确定性计算，确定性计算的具体含义请参考[原子操作-确定性计算](../../原子操作/关键特性说明.md)。
 
@@ -74,29 +74,29 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- gmWorkspace申请的空间最少要求为：**GetBlockNum()**  \* 32Bytes；ubWorkspace申请的空间最少要求为：**GetBlockNum()**\* 32 + 32Bytes。
+- gmWorkspace申请的空间最少要求为：GetBlockNum() * 32Bytes，ubWorkspace申请的空间最少要求为：GetBlockNum() * 32 + 32Bytes。
 - 与IBSet/SyncAll不同，该接口输入参数gmWorkspace缓存的值不需要初始化为0。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
 
 ## 调用示例<a name="section177231425115410"></a>
 
 ```cpp
-    // 初始化GM共享内存的同步状态，必须在核函数开始时首先调用
+    // 初始化GM共享内存的同步状态，必须在核函数开始时首先调用。
     AscendC::InitDetermineComputeWorkspace(gmWorkspace, ubWorkspace);
 
     for(int64_t i = 0; i < tileNum; i++) {
         AscendC::LocalTensor<T> srcLocal = que.AllocTensor<T>();
         AscendC::DataCopy(srcLocal, srcGlobal[i * tileCount], tileCount);
 
-        // 等待前序核（blockIdx-1）完成操作
+        // 等待前序核（blockIdx-1）完成操作。
         AscendC::WaitPreBlock(gmWorkspace, ubWorkspace);
         
-        // 开启原子累加
+        // 开启原子累加。
         AscendC::SetAtomicAdd<T>();
         AscendC::DataCopy(dstGlobal[i * tileCount], srcLocal, tileCount);
         AscendC::DisableDmaAtomic();
         
-        // 通知后序核（blockIdx+1）当前核已完成
+        // 通知后序核（blockIdx+1）当前核已完成。
         AscendC::NotifyNextBlock(gmWorkspace, ubWorkspace);
         que.FreeTensor(srcLocal);
     }

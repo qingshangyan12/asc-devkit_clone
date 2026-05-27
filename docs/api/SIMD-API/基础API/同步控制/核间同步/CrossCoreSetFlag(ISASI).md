@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_block_sync_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
 在核间同步场景中，CrossCoreSetFlag接口和[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)接口配对工作，使用时需传入核间同步的标记ID(flagId)，每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。
 
@@ -169,19 +169,19 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
     AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-    // UB 到 GM 搬运启用原子累加：搬运至 atomicResult 的数据与原值累加后覆盖原值
+    // UB 到 GM 搬运启用原子累加：搬运至 atomicResult 的数据与原值累加后覆盖原值。
     AscendC::SetAtomicAdd<float>();
-    // DataCopy属于PIPE_MTE3流水操作
+    // DataCopy属于PIPE_MTE3流水操作。
     AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
-    // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成
+    // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成。
     AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
     // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
     AscendC::CrossCoreWaitFlag(0);
-    // 关闭原子累加
+    // 关闭原子累加。
     AscendC::SetAtomicNone();
 
     if (AscendC::GetBlockIdx() == 0) {
-        AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength); // PIPE_MTE2
+        AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);
         AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
         AscendC::DataCopy(atomicResultGm, yLocal, this->blockLength);

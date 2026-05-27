@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_block_sync_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
 当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。
 
@@ -85,7 +85,7 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- gmWorkspace申请的空间最少要求为：核数 \* 32Bytes \* eventID\_max + blockIdx\_max \* 32Bytes + 32Bytes。（eventID\_max和blockIdx\_max分别指eventID、blockIdx的最大值 ）；注意：如果是AIVOnly模式，核数 = GetBlockNum\(\)；如果是MIX模式，核数 = GetBlockNum\(\) \* 2。
+- gmWorkspace申请的空间最少要求为：核数 * 32Bytes * eventID_max + blockIdx_max * 32Bytes + 32Bytes（eventID_max和blockIdx_max分别指eventID、blockIdx的最大值）。需要注意的是，如果是AIVOnly模式，核数 = GetBlockNum()；如果是MIX模式，核数 = GetBlockNum() * 2。
 - ubWorkspace申请的空间最少要求为：32Bytes。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
 - IBSet和IBWait配对使用时，除了ubWorkspace其余所有参数都必须相同，否则程序会在IBWait处卡死。

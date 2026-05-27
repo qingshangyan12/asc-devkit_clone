@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_block_sync_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
 当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。
 
@@ -85,7 +85,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- gmWorkspace申请的空间最少要求为：核数 \* 32Bytes \* eventID\_max + blockIdx\_max \* 32Bytes + 32Bytes。（eventID\_max和blockIdx\_max分别指eventID、blockIdx的最大值 ）；注意：如果是AIVOnly模式，核数 = GetBlockNum\(\)；如果是MIX模式，核数 = GetBlockNum\(\) \* 2。
+- gmWorkspace申请的空间最少要求为：核数 * 32Bytes * eventID_max + blockIdx_max * 32Bytes + 32Bytes（eventID_max和blockIdx_max分别指eventID、blockIdx的最大值）。需要注意的是，如果是AIVOnly模式，核数 = GetBlockNum()；如果是MIX模式，核数 = GetBlockNum() * 2。
 - ubWorkspace申请的空间最少要求为：32Bytes。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
 - IBSet和IBWait配对使用时，除了ubWorkspace其余所有参数都必须相同，否则程序会在IBWait处卡死。
@@ -97,13 +97,13 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 本示例实现功能为使用2个核进行数据处理，每个核均是处理256个half类型数据。核0实现x+y的操作，并将结果放入z的前半部分，核1将核0的计算结果放入x，之后与y相加，结果存入z的后半部分，因此多个核之间需要进行数据同步。
 
 ```cpp
-// sync_gm为外部存储核状态的公共缓存，类型为GlobalTensor；sync_buf为存储当前核状态的公共缓存，类型为LocalTensor
-int32_t blockIdx = AscendC::GetBlockIdx(); // 获取当前核
-if (blockIdx == 1) { // 在核1设置IBWait，将阻塞指令执行直到核0操作完成
+// sync_gm为外部存储核状态的公共缓存，类型为GlobalTensor；sync_buf为存储当前核状态的公共缓存，类型为LocalTensor。
+int32_t blockIdx = AscendC::GetBlockIdx(); // 获取当前核。
+if (blockIdx == 1) { // 在核1设置IBWait，将阻塞指令执行直到核0操作完成。
     AscendC::IBWait(sync_gm, sync_buf, 0, 0);
 }
 ...
-if (blockIdx == 0) { // 在核0设置IBSet，当核0的操作完成后再执行核1的指令
+if (blockIdx == 0) { // 在核0设置IBSet，当核0的操作完成后再执行核1的指令。
     AscendC::IBSet(sync_gm, sync_buf, 0, 0);
 }
 ```
