@@ -23,9 +23,9 @@
 #ifndef IMPL_ADV_API_DETAIL_HCOMM_IMPL_PLATFORM_V310_HCOMM_AIV_DEF_H
 #define IMPL_ADV_API_DETAIL_HCOMM_IMPL_PLATFORM_V310_HCOMM_AIV_DEF_H
 
+#include "../../common/hcomm_inner_def.h"
+
 namespace AscendC {
-constexpr int8_t HCOMM_INVALID_HANDLE_ID = -1;
-constexpr uint32_t HCOMM_MAX_HANDLE_ID = 1024;
 constexpr uint32_t HCOMM_TMP_BUF_SIZE = 224;
 constexpr uint32_t ROCE_SQ_DOORBELL_TYPE = 2;
 constexpr uint32_t ROCE_INIT_SQ_DB_SGIT_IDX = 1;
@@ -33,14 +33,21 @@ constexpr uint32_t ROCE_INIT_SQ_DB_SGIT_IDX = 1;
 enum class HCOMM_OP_TYPE : uint32_t { WRITE = 4U, READ = 8U };
 
 template <>
-class HcommImpl<CommEngine::AIV, CommProtocol::ROCE> {
+class HcommImpl<CommProtocol::ROCE, CommEngine::AIV> {
 public:
     __aicore__ inline HcommImpl();
     __aicore__ inline ~HcommImpl();
-    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Write(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
-    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Read(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline int32_t Init(__ubuf__ uint8_t* buff, uint32_t len);
+    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
+        auto const &config = URMA_DEFAULT_CFG>
+    __aicore__ inline HcommHandle WriteNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
+        auto const &config = URMA_DEFAULT_CFG>
+    __aicore__ inline HcommHandle ReadNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
+        auto const &config = URMA_DEFAULT_CFG>
+    __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
+        GM_ADDR notifyAddr, uint64_t notifyVal);
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(HcommHandle handleId);
     template <pipe_t pipe = PIPE_MTE3>
@@ -49,7 +56,7 @@ public:
 private:
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
     __aicore__ inline HcommHandle Operate(
-        ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType);
+        ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType);
     template <bool isWait>
     __aicore__ inline bool JudgeHandleId(HcommHandle handleId);
 
@@ -62,7 +69,7 @@ private:
     LocalTensor<uint32_t> sqCI_;
     LocalTensor<uint32_t> cqCI_;
     LocalTensor<uint32_t> doorBell_;
-    ChannelHandle channelList_[HCOMM_MAX_HANDLE_ID] = {0};
+    ChannelPtr channelList_[HCOMM_MAX_HANDLE_ID] = {0};
     bool handleCommitList_[HCOMM_MAX_HANDLE_ID] = {0};
     bool handleWaitList_[HCOMM_MAX_HANDLE_ID] = {0};
     HcommHandle curHandleId_ = HCOMM_INVALID_HANDLE_ID;
