@@ -14,7 +14,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_scalar_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_scalar_intf.h"`。
 
 不经过DCache从GM地址上读数据。使用场景：
 
@@ -52,7 +52,7 @@ __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-标量单元连续读取相同GM地址时，会造成Bus被长期占用，此时会影响其他核向GM该地址上写入，进而引发卡死现象。在此场景下，建议在标量读指令后插入若干空操作指令（Nop）来释放Bus，指令数量建议为800条，通常按照“需同步的核数 × 200”。
+标量单元连续读取相同GM地址时，会长期占用总线（Bus），导致其他核无法向该地址写入数据，进而引发系统卡死。在此场景下，建议在标量读指令后插入若干空操作指令（Nop）释放总线，插入Nop指令的数量可按“需同步的核数 × 200”估算（如4个核时建议插入800条）。
 
 ## 调用示例<a name="section6191129670"></a>
 
@@ -60,7 +60,7 @@ __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr)
 __gm__ int32_t *addr = const_cast<__gm__ int32_t *>(srcGlobal.GetPhyAddr());
 int32_t value = AscendC::ReadGmByPassDCache<int32_t>(addr);
 
-// 通过Scalar读写相同GM时，需要让读操作，空出总线，避免长时占用
+// 通过Scalar读写相同GM时，需要让读操作，空出总线，避免长时占用。
 int target = -1;
 while (target != 0) {
      target = ReadGmByPassDCache(addr);

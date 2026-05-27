@@ -14,7 +14,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_cache_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_cache_intf.h"`。
 
 GetICachePreloadStatus为调试接口，在ICachePreLoad后调用，用于获取ICache的PreLoad的状态：当返回值为0时，说明ICache的PreLoad已完成；当返回值为1时，说明ICache的PreLoad未完成。
 
@@ -39,6 +39,6 @@ int64\_t类型，0表示ICache的PreLoad已完成，1表示ICache的PreLoad未�
 ## 调用示例<a name="section837496171220"></a>
 
 ```cpp
-// 获取ICache预加载状态，0表示已完成，1表示未完成
+// 获取ICache预加载状态，0表示已完成，1表示未完成。
 int64_t cachePreloadStatus = AscendC::GetICachePreloadStatus();
 ```

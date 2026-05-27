@@ -14,7 +14,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_cache_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_cache_intf.h"`。
 
 开发者手动调用ICachePreLoad接口，能够从指令所在DDR地址预加载指令到ICache中。
 
@@ -43,6 +43,6 @@ __aicore__ inline void ICachePreLoad(const int64_t preFetchLen)
 ## 调用示例<a name="section837496171220"></a>
 
 ```cpp
-int64_t preFetchLen = 2; // 预取指令长度
+int64_t preFetchLen = 2; // 预取指令长度。
 AscendC::ICachePreLoad(preFetchLen);
 ```
