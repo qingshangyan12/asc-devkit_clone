@@ -18,21 +18,6 @@
 2. 指定物理位置，从已有迭代器或指针适配器构造新指针。
 3. 从已有迭代器或指针适配器中自动推导物理位置。
 
-## 支持的物理位置
-
-| Location | 说明 | 用途 |
-| :--- | :--- | :--- |
-| Location::GM | Global Memory | 全局内存，张量输入输出的主要存储区域 |
-| Location::L1 | L1 Buffer | 一级缓存，矩阵搬运和计算前的数据暂存区 |
-| Location::L0A | L0A Buffer | 矩阵计算左输入缓存 |
-| Location::L0B | L0B Buffer | 矩阵计算右输入缓存 |
-| Location::L0ScaleA | L0 ScaleA Buffer | MX矩阵计算ScaleA缓存 |
-| Location::L0ScaleB | L0 ScaleB Buffer | MX矩阵计算ScaleB缓存 |
-| Location::L0C | L0C Buffer | 矩阵计算结果缓存 |
-| Location::UB | Unified Buffer | 统一缓存，矢量计算的数据存储区 |
-| Location::BIAS | BiasTable Buffer | 偏置表缓存，带偏置矩阵计算的偏置存放区 |
-| Location::FIXBUF | Fixpipe Buffer | Fixpipe输出缓存，L0C到GM/UB的中转区 |
-
 ## 函数原型
 
 - 指定物理位置和数据类型，根据原始地址构造：
@@ -60,7 +45,22 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
 
 ## 参数说明
 
-**表 1** 模板参数说明
+**表 1** 支持的物理位置
+
+| Location | 说明 | 用途 |
+| :--- | :--- | :--- |
+| Location::GM | Global Memory | 全局内存，张量输入输出的主要存储区域 |
+| Location::L1 | L1 Buffer | 一级缓存，矩阵搬运和计算前的数据暂存区 |
+| Location::L0A | L0A Buffer | 矩阵计算左输入缓存 |
+| Location::L0B | L0B Buffer | 矩阵计算右输入缓存 |
+| Location::L0ScaleA | L0 ScaleA Buffer | MX矩阵计算ScaleA缓存 |
+| Location::L0ScaleB | L0 ScaleB Buffer | MX矩阵计算ScaleB缓存 |
+| Location::L0C | L0C Buffer | 矩阵计算结果缓存 |
+| Location::UB | Unified Buffer | 统一缓存，矢量计算的数据存储区 |
+| Location::BIAS | BiasTable Buffer | 偏置表缓存，带偏置矩阵计算的偏置存放区 |
+| Location::FIXBUF | Fixpipe Buffer | Fixpipe输出缓存，L0C到GM/UB的中转区 |
+
+**表 2** 模板参数说明
 
 | 参数名 | 类型 | 描述 |
 | :--- | :---: | :--- |
@@ -69,7 +69,7 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
 | Addr | 输入 | 原始地址类型。 |
 | Iterator | 输入 | 迭代器类型或已有指针适配器类型。 |
 
-**表 2** 参数说明
+**表 3** 参数说明
 
 | 参数名 | 类型 | 描述 |
 | :--- | :---: | :--- |
