@@ -905,7 +905,7 @@ __aicore__ inline void CastDeqImpl(__ubuf__ T* dst, __ubuf__ U* src,
             CastImpl(dst, src, RoundMode::CAST_RINT, count);
         } else{
             if constexpr (isVecDeq) {
-                <T, halfBlock>(dst, src, 1, repeatParams);
+                CastVDeqIntrinsicsImpl<T, halfBlock>(dst, src, 1, repeatParams);
             } else {
                 CastDeqIntrinsicsImpl<T, halfBlock>(dst, src, 1, repeatParams);
             }
