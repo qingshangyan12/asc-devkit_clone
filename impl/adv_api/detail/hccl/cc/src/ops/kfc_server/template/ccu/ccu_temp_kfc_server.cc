@@ -71,17 +71,18 @@ HcclResult CcuTempKfcServer::KernelRun(const OpParam& param,
     (void)templateResource;
     // TODO：这边的参数怎么计算
     // templateDataParams与templateResource需要在前面配置，taskArg值传递需要对齐
-    buffInfo_ = templateDataParams.buffInfo;
-    uint64_t syncAddr = PointerToAddr(buffInfo_.syncAddr);
-    uint64_t paramAddr = PointerToAddr(buffInfo_.paramAddr);
-    uint64_t dieNum = templateDataParams.dieNum;
-    uint64_t missionNum = templateDataParams.missionNum;
-    uint64_t missionIndex = templateDataParams.missionIndex;
-    uint64_t token;
-    CHK_RET(GetToken(buffInfo_, token));
+    // TODO：这些都需要传递进来OpResCtx &opResCtx
+    uint64_t xnAddr;          
+    uint64_t ckeAddr; 
+    uint64_t token; 
 
+    // 临时用于参数测试
+    uint64_t dieNum = 1;                
+    uint64_t missionNum = 1;
+    uint64_t missionIndex = 0;
+ 
     std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgKfcServer>(
-        syncAddr, paramAddr, dieNum, missionNum, missionIndex, token);
+        xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token);
     void* taskArgPtr = static_cast<void*>(taskArg.get());
     HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr);
 

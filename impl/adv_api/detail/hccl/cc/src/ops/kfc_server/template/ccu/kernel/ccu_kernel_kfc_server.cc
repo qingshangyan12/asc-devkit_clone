@@ -48,8 +48,8 @@ HcclResult CcuKernelKfcServer::InitResource()
 
 void CcuKernelKfcServer ::LoadArgs()
 {
-    Load(syncAddr_);            // TODO：看最新的是Load(uint64_t addr, Variable v)
-    Load(paramAddr_);
+    Load(xnAddr_);
+    Load(ckeAddr_);
     Load(token_);
     Load(dieNum_);
     Load(missionNum_);
@@ -69,7 +69,6 @@ void CcuKernelKfcServer::SetCommAddr(ccu::Variable syncAddr)
 void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 {
     // 参数合法值判断
-    uint64_t =                              //从ccu::Variable中取数据
     bool isDieNumValid = (dieNum == SINGLE_DIE || dieNum == DOUBLE_DIE);
     bool isDieIdValid  = (GetDieId() == DIE0_ID || GetDieId() == DIE1_ID);          //TODO GetDieId()
     if (!(isDieNumValid && isDieIdValid)) {
@@ -81,12 +80,12 @@ void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
         // 导出信号
         exportDieSig_ = CreateMaskSignal();             
         // Die0: export完成信号给Die1，Die1: export开始信号给Die0
-        // TODO:这里怎么赋值
+        // TODO：先按字符串写一版
         const string &exportSigLabel = (GetDieId() == DIE1_ID) ? DIE1_START_SIG : DIE1_END_SIG;
         ExportMaskSignal(exportDieSig_, exportSigLabel);
 
         // 导入信号
-        // TODO：这里怎么赋值
+        // TODO：先按字符串写一版
         const string &importSigLabel = (GetDieId() == DIE1_ID) ? DIE1_END_SIG : DIE1_START_SIG;
         importDieSig_                = ImportMaskSignal(importSigLabel);
     }
@@ -100,7 +99,7 @@ void CcuKernelKfcServer::SetMissionNumAndId(ccu::Variable miNum, ccu::Variable m
     if (miNum > 1) { // 多Mission场景才需要导入导出
         if (miIndex == 0) {
             // miIndex = 0 为Master，需要missionNum - 1个导入导出信号以及missionNum - 1个导入变量
-            // TODO：这些怎么赋值
+            // TODO：先按字符串写一版
             for (uint32_t i = 0; i < miNum - 1; ++i) {
                 exportMissoinSig_.push_back(CreateMaskSignal());
                 ExportMaskSignal(exportMissoinSig_[i],
@@ -112,7 +111,7 @@ void CcuKernelKfcServer::SetMissionNumAndId(ccu::Variable miNum, ccu::Variable m
             }
         } else {
             // miIndex > 0 为Slave，需要1个导入导出信号以及1个导出变量
-            // TODO：这些怎么赋值
+            // TODO：先按字符串写一版
             importMissionSig_.push_back(
                 ImportMaskSignal("master_sig_" + std::to_string(GetDieId()) + "_" + std::to_string(miIndex)));
             exportMissoinSig_.push_back(CreateMaskSignal());
@@ -129,7 +128,7 @@ HcclResult CcuKernelKfcServer::Algorithm()
 {
     InitResource();
     LoadArgs();                                
-    SetCommAddr(syncAddr_);                    
+    SetCommAddr(ckeAddr_);                    
     SetDieNum(dieNum_);                         
     SetMissionNumAndId(missionNum_, missionIndex_); 
     if (missionIndex_ == 0) {
@@ -159,13 +158,13 @@ void Mc2KfcServer::GenCircularQueue()
     ccu::Variable recordStartAddr;
     recordStartAddr = recordAddr_;
     ccu::Variable paramStartAddr;
-    paramStartAddr = paramAddr_;
+    paramStartAddr = xnAddr_;
     ccu::Variable waitAddr;
     waitAddr = waitAddr_;
     ccu::Variable recordAddr;
     recordAddr = recordAddr_;
     ccu::Variable paramAddr;
-    paramAddr = paramAddr_;
+    paramAddr = xnAddr_;
 
     ccu::Variable ckeSize;
     ckeSize = CCU_ONE_PARAM_SIZE;
@@ -186,7 +185,7 @@ void Mc2KfcServer::GenCircularQueue()
     {
         if (waitAddr_ > (UINT64_MAX - (CCU_TASK_NUM_MAX - 1) * CCU_ONE_PARAM_SIZE)
             || recordAddr_ > (UINT64_MAX - (CCU_TASK_NUM_MAX - 1) * CCU_ONE_PARAM_SIZE)
-            || paramAddr_ > (UINT64_MAX - (CCU_TASK_NUM_MAX - 1) * CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE)) {
+            || xnAddr_ > (UINT64_MAX - (CCU_TASK_NUM_MAX - 1) * CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE)) {
             HCCL_ERROR("[CcuKernelKfcServer] GenCircularQueue Failed: integer overflow occurs");
             return;
         }
@@ -290,7 +289,7 @@ void Mc2SlaveKfcServer::GenCircularQueue()
     repeatCond                  = 0;
 
     ccu::Variable paramAddr;
-    paramAddr = paramAddr_;
+    paramAddr = xnAddr_;
 
     // 存放<每轮算子参数>的寄存器
     ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
@@ -328,7 +327,7 @@ void CcuKernelKfcServer::MissionPreSync(ccu::Variable &func)
             LocalCtxPostVar(func, importMissionVar_[i], importMissionSig_[i]);    // TODO：这里怎么改
         }
     } else {
-        EventWait(exportMissoinSig_[0]);
+        EventWait(exportMissoinSig_[0]); 
         func = exportMissionVar_[0];
     }
 }
@@ -350,13 +349,13 @@ void CcuKernelKfcServer::MissionPostSync()
 std::vector<uint64_t> CcuKernelKfcServer::GeneArgs(const CcuTaskArg &arg)
 {
     const CcuTaskArgKfcServer *taskArg = dynamic_cast<const CcuTaskArgKfcServer *>(&arg);
-    uint64_t syncAddr = taskArg->syncAddr_;
-    uint64_t paramAddr = taskArg->paramAddr_;
+    uint64_t xnAddr = taskArg->xnAddr_;
+    uint64_t ckeAddr = taskArg->ckeAddr_;
     uint64_t token = taskArg->token_;
     uint64_t dieNum = taskArg->dieNum_;
     uint64_t missionNum = taskArg->missionNum_;
     uint64_t missionIndex = taskArg->missionIndex_;
-    return {syncAddr, paramAddr, token, dieNum, missionNum, missionIndex};
+    return {xnAddr, ckeAddr, token, dieNum, missionNum, missionIndex};
 }
 
 }
