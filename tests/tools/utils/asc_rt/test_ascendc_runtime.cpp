@@ -615,6 +615,7 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_350) {
         int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
         exit(ret == 0 ? 0 : 1);
     }, ::testing::ExitedWithCode(0), "");
+}
 
 TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtype) {
     void* funcHandle = nullptr;
