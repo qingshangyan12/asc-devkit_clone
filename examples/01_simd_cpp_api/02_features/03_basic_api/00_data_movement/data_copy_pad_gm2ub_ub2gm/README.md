@@ -2,15 +2,17 @@
 
 ## 概述
 
-本样例在数据搬运场景下，基于DataCopyPad API实现非32字节对齐数据的搬运及填充功能。DataCopyPad API支持从Global Memory到Local Memory的非对齐数据搬运，并可在数据左侧或右侧填充指定数值。
+本样例在数据搬运场景下，基于DataCopyPad API实现非32字节对齐数据的搬运及填充功能。DataCopyPad API支持Global Memory到Local Memory以及Local Memory到Global Memory两个方向的非对齐数据搬运，并可在数据左侧或右侧填充指定数值。
 
-数据搬运过程包括：Global Memory（GM）→Unified Buffer（UB）（使用DataCopyPad进行非对齐搬运并填充）→Global Memory（GM）。本样例使用静态Tensor方式分配UB内存，支持通过编译参数切换不同场景，演示DataCopyPad的不同使用方式。
+数据搬运过程包括：Global Memory（GM）→Unified Buffer（UB）（使用DataCopyPad进行非对齐搬运并填充）→Global Memory（GM）。本样例使用LocalMemAllocator动态分配UB内存，支持通过编译参数切换不同场景，演示DataCopyPad的不同使用方式。
 
 ## 支持的产品
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+- Ascend 950PR/Ascend 950DT（场景1-6全部支持）
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品（仅支持场景1-2）
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品（仅支持场景1-2）
+
+> **注意：** 场景3-6仅限Ascend 950PR/Ascend 950DT产品支持，其他产品仅支持场景1-2。
 
 ## 目录结构介绍
 
@@ -34,7 +36,7 @@
 <tr><th>scenarioNum</th><th>输入Shape</th><th>输出Shape</th><th>数据类型</th><th>填充/搬运模式</th><th>说明</th></tr>
 <tr><td>1</td><td>[1, 20]</td><td>[1, 32]</td><td>half</td><td>SetPadValue填充</td><td>右侧填充12个元素，需配合SetPadValue设置填充值为1</td></tr>
 <tr><td>2</td><td>[32, 59]</td><td>[32, 64]</td><td>float</td><td>rightPadding填充</td><td>右侧填充5个元素，填充值默认为0，无需SetPadValue</td></tr>
-<tr><td>3</td><td>[3, 24]</td><td>[1, 80]</td><td>half</td><td>Compact填充</td><td>Compact模式，最后一个数据块右侧填充16字节（仅支持dav-3510）</td></tr>
+<tr><td>3</td><td>[3, 24]</td><td>[1, 80]</td><td>half</td><td>Compact填充</td><td>Compact模式，整块紧凑数据末尾填充8个元素（仅支持dav-3510）</td></tr>
 <tr><td>4</td><td>[1, 320]</td><td>[1, 576]</td><td>int8</td><td>LoopMode搬运（Compact）</td><td>SetLoopModePara使能loop mode，Compact模式，实现GM→UB非连续stride搬运（仅支持dav-3510）</td></tr>
 <tr><td>5</td><td>[1, 320]</td><td>[1, 576]</td><td>int8</td><td>LoopMode搬运（Normal）</td><td>SetLoopModePara使能loop mode，Normal模式，实现GM→UB非连续stride搬运（仅支持dav-3510）</td></tr>
 <tr><td>6</td><td>[2, 4, 3, 128, 126]</td><td>[512, 128]</td><td>int8</td><td>LoopMode搬运（Normal）</td><td>五维数据搬运，搬运[2, 2, 2, 64, 126]，每行补2字节padding到128字节（仅支持dav-3510）</td></tr>
@@ -60,8 +62,8 @@
 - 输入shape：[3, 24]
 - 输出shape：[1, 80]
 - 数据类型：half
-- 参数配置：blockLen=48, blockCount=3, leftPadding=0, rightPadding=16, isPad=false
-- 说明：紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐。此处示例中，leftPadding为0，rightPadding为16，在最后一个数据块右侧填充16字节。目的操作数的数据量为160字节。
+- 参数配置：blockLen=48, blockCount=3, leftPadding=0, rightPadding=8, isPad=true
+- 说明：紧凑模式，允许单次搬运不对齐，统一在整块紧凑数据末尾补齐至32字节对齐。此处示例中，leftPadding为0，rightPadding为8（单位为half元素），在整块紧凑数据末尾填充8个元素。目的操作数的数据量为160字节。
 
 **场景4：使用SetLoopModePara使能loop mode（Compact模式） ----此场景仅在 Ascend 950PR/Ascend 950DT产品支持**
 - 输入shape：[1, 320]，如图 1所示
@@ -71,7 +73,7 @@
   - GM→UB：LoopModeParams{loop1Size=2, loop2Size=2, loop1SrcStride=80, loop1DstStride=128, loop2SrcStride=160, loop2DstStride=288}，DataCopyMVType::OUT_TO_UB
   - DataCopyExtParams：BLOCK_COUNT=2, BLOCK_LEN=40（使用constexpr常量）
   - DataCopyPadExtParams：isPad=true, leftPadding=0, rightPadding=0, padValue=-1
-- 说明：通过SetLoopModePara使能loop mode，使用Compact模式实现GM→UB的非连续stride数据搬运。Compact模式下每次内层循环搬运80B后填充16B使其96B对齐，padding值设为-1。
+- 说明：通过SetLoopModePara使能loop mode，使用Compact模式实现GM→UB的非连续stride数据搬运。Compact模式下每次内层循环搬运80B后填充16B，内层循环stride为128B，padding值设为-1。
 
 **图 1**  源操作数搬运场景示例
 

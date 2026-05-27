@@ -41,7 +41,7 @@ def gen_data_2():
     # 生成两个 [1, 256] 矩阵
     x = np.random.uniform(0, 2, [1, total_length]).astype(data_type)
     y = np.random.uniform(0, 2, [1, total_length]).astype(data_type)
-    mask = np.random.randint(0, 255, [1, mask_length]).astype(np.uint8)
+    mask = np.random.randint(0, 256, [1, mask_length]).astype(np.uint8)
     golden = np.zeros([1, total_length]).astype(data_type)
 
     # 对于b32数据类型，mask有效位数间隔4bit，golden中每个uint8_t元素对应2个mask值。
@@ -69,7 +69,7 @@ def gen_golden_data(scenario_num):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2, 3, 4, 5, 6],
-                        help='Scenario number: 1-6')
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2],
+                        help='Scenario number: 1 or 2')
     args = parser.parse_args()
     gen_golden_data(args.scenarioNum)

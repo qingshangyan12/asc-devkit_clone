@@ -35,9 +35,10 @@
 - 样例实现：
 
   - kernel实现
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer），并将广播后的数据搬出到GM（Global Memory）。
+    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）。
     - 调用BroadCastVecToMM基础API，将UB（Unified Buffer）上的数据从[1, 16]广播到[16, 16]，并搬运到CO1（L0C Buffer）。
-    - 调用DataCopy增强数据搬运接口，将广播后的数据从CO1（L0C Buffer）搬运到UB（Unified Buffer）。
+    - 调用DataCopy增强数据搬运接口，将广播后的数据从CO1（L0C Buffer）搬运到CO2（L0C Buffer）。
+    - 调用DataCopy基础API，将广播后的数据从CO2（L0C Buffer）搬出到GM（Global Memory）。
 
   - 调用实现
 
