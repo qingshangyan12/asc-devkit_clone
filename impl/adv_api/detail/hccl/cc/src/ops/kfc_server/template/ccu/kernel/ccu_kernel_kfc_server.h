@@ -73,7 +73,7 @@ public:
 
 class CcuKernelKfcServer : public CcuKernelAlgBase {
 public:
-    CcuKernelKfcServer(const CcuKfcKernelStruct &arg), kfcServerArgs(arg); // 待定
+    CcuKernelKfcServer(const hcomm::CcuKernelArg &arg)
     ~CcuKernelKfcServer() override {}
 
     HcclResult InitResource();
