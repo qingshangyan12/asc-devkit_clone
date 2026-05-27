@@ -97,8 +97,8 @@
                 -   [NPU架构版本2002](./编程指南/高级编程/硬件实现/硬件约束/NPU架构版本2002.md)
                 -   [NPU架构版本2201](./编程指南/高级编程/硬件实现/硬件约束/NPU架构版本2201.md)
             
-        -   [高级AI-Core编程模型](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/SIMD与SIMT混合编程概述.md)
-            -   [SIMD与SIMT混合编程概述](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/SIMD与SIMT混合编程概述.md)
+        -   [高级AI-Core编程模型](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/SIMD与SIMT混合编程.md)
+            -   [概述](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/概述.md)
             -   [抽象硬件架构](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/抽象硬件架构.md)
             -   [混合编程场景的SIMT编程](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/线程架构.md)
                 -   [线程架构](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/线程架构.md)
