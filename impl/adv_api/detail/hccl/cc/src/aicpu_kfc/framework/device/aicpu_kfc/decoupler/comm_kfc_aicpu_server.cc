@@ -27,6 +27,7 @@
 #include "stream_lite.h"
 #include "thread.h"
 #include "aicpu_ts_thread.h"
+#include "../../../inc/hccl_api_data.h"
 
 using namespace HcclApi;
 namespace {
@@ -246,6 +247,96 @@ const ServerExecCtx *CommKfcAicpuServer::MatchExecCtx(u64 opParamKey) const
     return nullptr;
 }
 
+HcclResult CommKfcAicpuServer::AppendOpenCcoreWait(
+    const ServerExecCtx &execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr, bool isLast)
+{
+    const u64 valueAddr = turnNumsAddr + static_cast<u64>(turnNum) * sizeof(u32);
+    hccl::Thread *thread = nullptr;
+    Hccl::StreamLite *streamLite = nullptr;
+    CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
+    HCCL_INFO("[MC2_OPEN_DIAG][CcoreWaitAppend] group %u, turnNum %u, thread %p, streamLite %p, rtsq %p, "
+              "waitAddr %#llx, valueAddr %#llx, isLast %u.",
+              groupIdx_, turnNum, thread, streamLite, streamLite->GetRtsq(),
+              static_cast<unsigned long long>(waitAddr), static_cast<unsigned long long>(valueAddr),
+              static_cast<u32>(isLast));
+    EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyWait(waitAddr, valueAddr, isLast), return HCCL_E_INTERNAL);
+    return HCCL_SUCCESS;
+}
+
+HcclResult CommKfcAicpuServer::AppendOpenCcorePost(
+    const ServerExecCtx &execCtx, u64 recordAddr, u32 turnNum, u64 turnNumsAddr)
+{
+    const u64 valueAddr = turnNumsAddr + static_cast<u64>(turnNum) * sizeof(u32);
+    hccl::Thread *thread = nullptr;
+    Hccl::StreamLite *streamLite = nullptr;
+    CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
+    HCCL_INFO("[MC2_OPEN_DIAG][CcorePostAppend] group %u, turnNum %u, thread %p, streamLite %p, rtsq %p, "
+              "recordAddr %#llx, valueAddr %#llx.",
+              groupIdx_, turnNum, thread, streamLite, streamLite->GetRtsq(),
+              static_cast<unsigned long long>(recordAddr), static_cast<unsigned long long>(valueAddr));
+    EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyRecord(recordAddr, valueAddr), return HCCL_E_INTERNAL);
+    return HCCL_SUCCESS;
+}
+
+HcclResult CommKfcAicpuServer::LaunchNextMainThread(const ServerExecCtx &execCtx)
+{
+    hccl::Thread *thread = nullptr;
+    Hccl::StreamLite *streamLite = nullptr;
+    CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
+    HCCL_INFO("[MC2_OPEN_DIAG][MainThreadLaunch] group %u, thread %p, streamLite %p, rtsq %p.",
+              groupIdx_, thread, streamLite, streamLite->GetRtsq());
+    EXECEPTION_CATCH(thread->LaunchTask(), return HCCL_E_INTERNAL);
+    return HCCL_SUCCESS;
+}
+
+HcclResult CommKfcAicpuServer::LaunchOpenNextAicpuOrderedWindow(const ServerExecCtx &execCtx,
+    std::vector<uint8_t> &opParam, u64 waitAddr, u64 recordAddr, u32 turnNum, u64 turnNumsAddr, bool isLast)
+{
+    CHK_PRT_RET(opParam.size() < sizeof(mc2_ops_hccl::OpParam),
+                HCCL_ERROR("Open op param size %zu is smaller than OpParam size %zu.",
+                           opParam.size(), sizeof(mc2_ops_hccl::OpParam)),
+                HCCL_E_PARA);
+    const auto *param = reinterpret_cast<const mc2_ops_hccl::OpParam *>(opParam.data());
+    CHK_PTR_NULL(param);
+    const char *algTag = param->algTag;
+    HCCL_INFO("[MC2_OPEN_DIAG][OrderedWindowBegin] group %u, turnNum %u, algTag[%s], opParamKey %#llx, "
+              "mainThread %#llx.",
+              groupIdx_, turnNum, algTag, static_cast<unsigned long long>(execCtx.opParamKey),
+              static_cast<unsigned long long>(execCtx.mainThread));
+
+    HcclResult ret = static_cast<HcclResult>(HcommBatchModeStart(algTag));
+    CHK_PRT_RET(ret != HCCL_SUCCESS,
+                HCCL_ERROR("Group %u: failed to start batch mode for algTag[%s], ret %u.",
+                           groupIdx_, algTag, ret),
+                ret);
+
+    ret = AppendOpenCcoreWait(execCtx, waitAddr, turnNum, turnNumsAddr, isLast);
+    if (ret == HCCL_SUCCESS) {
+        ret = LaunchOpenAicpuKernelServer(opParam);
+    }
+    if (ret == HCCL_SUCCESS) {
+        ret = AppendOpenCcorePost(execCtx, recordAddr, turnNum, turnNumsAddr);
+    }
+
+    if (ret != HCCL_SUCCESS) {
+        (void)HcommSetLaunchMode(algTag, HCOMM_LAUNCH_MODE_RESERVED);
+        HCCL_ERROR("Group %u: ordered window failed, algTag[%s], turnNum %u, ret %u.",
+                   groupIdx_, algTag, turnNum, ret);
+        return ret;
+    }
+
+    ret = static_cast<HcclResult>(HcommBatchModeEnd(algTag));
+    CHK_PRT_RET(ret != HCCL_SUCCESS,
+                HCCL_ERROR("Group %u: failed to end batch mode for algTag[%s], ret %u.",
+                           groupIdx_, algTag, ret),
+                ret);
+
+    CHK_RET(LaunchNextMainThread(execCtx));
+    HCCL_INFO("[MC2_OPEN_DIAG][OrderedWindowEnd] group %u, turnNum %u, algTag[%s], opParamKey %#llx.",
+              groupIdx_, turnNum, algTag, static_cast<unsigned long long>(execCtx.opParamKey));
+    return HCCL_SUCCESS;
+}
+
 HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
     const ServerExecCtx &execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr, bool isLast)
 {
@@ -440,29 +531,39 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
-        ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
-        UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
-                  groupIdx_, msgPos, i, turnIdx, ret);
-        CHK_RET(ret);
+        if (execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
+            ret = LaunchOpenNextAicpuOrderedWindow(
+                *execCtx, runParam, waitAddr, recordAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
+            UpdateProgress("AfterOrderedWindow", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+            HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterOrderedWindow] group %u, msgPos %u, repeatIdx %u, "
+                      "turnIdx %u, ret %u.",
+                      groupIdx_, msgPos, i, turnIdx, ret);
+            CHK_RET(ret);
+        } else {
+            ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
+            UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+            HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
+                      groupIdx_, msgPos, i, turnIdx, ret);
+            CHK_RET(ret);
 
-        UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
-                  groupIdx_, msgPos, i, turnIdx);
-        ret = LaunchOpenAicpuKernelServer(runParam);
-        UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
-                  groupIdx_, msgPos, i, turnIdx, ret);
-        CHK_RET(ret);
+            UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+            HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
+                      groupIdx_, msgPos, i, turnIdx);
+            ret = LaunchOpenAicpuKernelServer(runParam);
+            UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+            HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
+                      groupIdx_, msgPos, i, turnIdx, ret);
+            CHK_RET(ret);
 
-        UpdateProgress("BeforePost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
-                  groupIdx_, msgPos, i, turnIdx);
-        ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
-        UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterPost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
-                  groupIdx_, msgPos, i, turnIdx, ret);
-        CHK_RET(ret);
+            UpdateProgress("BeforePost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+            HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
+                      groupIdx_, msgPos, i, turnIdx);
+            ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
+            UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+            HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterPost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
+                      groupIdx_, msgPos, i, turnIdx, ret);
+            CHK_RET(ret);
+        }
 
         UpdateProgress("LoopEnd", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopEnd] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
