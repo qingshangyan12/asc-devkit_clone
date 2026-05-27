@@ -41,6 +41,7 @@ l devlib
 l include
 l lib64
 l pkg_inc
+l test-ops
 EOF
 
 cat << 'EOF' > monitor_snapshot_2.txt
