@@ -69,7 +69,7 @@
     - 创建`GlobalTensor`对象`aGlobal`、`bGlobal`、`cGlobal`，分别表示GM中的A、B、C矩阵。`GlobalTensor`只描述GM上的地址和元素个数，真正的数据搬运、L1/L0切分由Matmul高阶API结合tiling完成。
     - 创建高阶API对象`mm`。`MatmulType`模板参数描述A/B/C矩阵在Kernel侧的位置、格式和数据类型，本样例均为GM、ND格式，A/B为`half`，C为`float`。
     - Host侧通过`GetLibApiWorkSpaceSize()`获取系统workspace大小，申请`workspaceDevice`后作为Kernel参数`workspace`传入。
-    - 通过`REGIST_MATMUL_OBJ(&pipe, workspace, mm, &tiling)`注册Matmul对象。由于代码在包含`lib/matmul_intf.h`前定义了`ASCENDC_CUBE_ONLY`，纯Cube场景下注册过程会在Cube侧本地初始化Matmul对象，不走MIX场景的KFC server/client通信路径。
+    - Kernel侧通过`AscendC::SetSysWorkspace(workspace)`设置系统workspace，并通过`REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling)`注册Matmul对象。由于代码在包含`lib/matmul_intf.h`前定义了`ASCENDC_CUBE_ONLY`，纯Cube场景下注册过程会在Cube侧本地初始化Matmul对象，不走MIX场景的KFC server/client通信路径。
     - Host侧以`numBlocks = tiling.usedCoreNum`启动Kernel，启动的Block均参与实际计算。
     - 调用`mm.SetOrgShape(tiling.M, tiling.N, tiling.Ka, tiling.Kb)`设置原始完整矩阵形状，单位为元素。该接口需要在`SetTensorA`、`SetTensorB`之前调用。
     - 调用`mm.SetTensorA(aGlobal[GetBlockIdx() * tiling.Ka * tiling.singleCoreM], false)`设置当前核要读取的A矩阵起始地址。第0个核从A矩阵第0行开始读取，第1个核从A矩阵第256行开始读取。第二个参数`false`表示不转置。
