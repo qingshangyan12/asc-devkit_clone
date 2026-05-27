@@ -965,7 +965,7 @@ __aicore__ inline void AddReluCastIntrinsicsImpl(__ubuf__ T* dst, __ubuf__ U* sr
 {
     static_assert(SupportType<Tuple<U, T>, Tuple<half, int8_t>, Tuple<float, half>, Tuple<int16_t, int8_t>>(),
         "Failed to check dtype in AddReluCast, current api support dtype combination is src: half, dst: int8_t; src: "
-        "float, dst: half; src: int16_t, dst: int8_t.\n");
+        "float, dst: half; src: int16_t, dst: int8_t.");
     if constexpr (SupportType<Tuple<U, T>, Tuple<half, int8_t>>()) {
         vaddreluconv_f162s8(dst, src0, src1, repeatTime, repeatParams.dstBlkStride, repeatParams.src0BlkStride,
             repeatParams.src1BlkStride, repeatParams.dstRepStride, repeatParams.src0RepStride,
