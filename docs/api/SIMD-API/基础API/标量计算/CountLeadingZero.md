@@ -18,7 +18,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_scalar_intf.h"`。
 
-统计uint64\_t类型数值的二进制表示中前导0的数量（二进制表示中最高有效位到第一个'1'的'0'的数量，输入为0时返回64）。
+统计uint64\_t类型数值的二进制表示中前导0的个数（二进制表示中最高有效位到第一个'1'的'0'的数量，输入为0时返回64）。
 
 以如下CountLeadingZero调用为例：
 
@@ -28,7 +28,7 @@ int64_t leadingZeros = AscendC::CountLeadingZero(0x0100000000000020ULL); // 返�
 
 其计算结果如下图所示：
 
-**图 1**  CountLeadingZero计算示意图<a name="fig1"></a>
+**图 1** CountLeadingZero计算示意图<a name="fig1"></a>
 
 ![CountLeadingZero计算示意图](../../../figures/CountLeadingZero.png "CountLeadingZero计算示意图")
 
@@ -40,7 +40,7 @@ __aicore__ inline int64_t CountLeadingZero(uint64_t valueIn)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表 1** 参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |
@@ -48,7 +48,7 @@ __aicore__ inline int64_t CountLeadingZero(uint64_t valueIn)
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-int64\_t类型的数，valueIn的前导0的个数。
+返回valueIn的前导0的个数。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

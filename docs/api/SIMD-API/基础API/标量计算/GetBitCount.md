@@ -23,19 +23,19 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <int countValue> 
+template <int countValue>
 __aicore__ inline int64_t GetBitCount(uint64_t valueIn)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表 1** 模板参数说明
 
 | 参数名 | 描述 |
-| ------ | ---- |
+| ------ | ------ |
 | countValue | 指定需统计的比特值。取值为0或1。 |
 
-**表 2**  参数说明
+**表 2** 参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ----- | ----- |
@@ -43,7 +43,7 @@ __aicore__ inline int64_t GetBitCount(uint64_t valueIn)
 
 ## 返回值说明
 
-int64\_t类型的数，valueIn中0或者1的个数。
+返回valueIn中0或者1的个数。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
