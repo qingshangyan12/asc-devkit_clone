@@ -82,7 +82,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Init(_
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
 __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Operate(
-    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType)
+    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType)
 {
     __gm__ Channel* channelPtr = (__gm__ Channel*)(channel);
     auto sqPIAddr = (__gm__ uint32_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr);
@@ -165,7 +165,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Op
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::WriteNbi(
-    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
     return Operate<commit, commitPipe, reqPipe>(channel, dst, src, len, static_cast<uint32_t>(HCOMM_OP_TYPE::WRITE));
@@ -173,7 +173,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wr
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::ReadNbi(
-    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
     return Operate<commit, commitPipe, reqPipe>(channel, dst, src, len, static_cast<uint32_t>(HCOMM_OP_TYPE::READ));
@@ -181,7 +181,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Re
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::WriteWithNotifyNbi(
-    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
+    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commit;
     (void)commitPipe;
@@ -236,7 +236,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit
     if (!JudgeHandleId<false>(handleId)) {
         return HCOMM_FAILED;
     }
-    ChannelHandle channel = channelList_[handleId];
+    ChannelPtr channel = channelList_[handleId];
     __gm__ Channel* channelPtr = (__gm__ Channel*)(channel); // 获取channel
     AscendC::GlobalTensor<uint32_t> sqPIGlobalTensor;
     sqPIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr);
@@ -278,7 +278,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(H
     if (!JudgeHandleId<true>(handleId)) {
         return HCOMM_FAILED;
     }
-    ChannelHandle channel = channelList_[handleId];
+    ChannelPtr channel = channelList_[handleId];
     __gm__ Channel* channelPtr = (__gm__ Channel*)(channel); // 获取channel
     auto sqCIAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr;
     AscendC::GlobalTensor<uint32_t> sqCIGlobalTensor;

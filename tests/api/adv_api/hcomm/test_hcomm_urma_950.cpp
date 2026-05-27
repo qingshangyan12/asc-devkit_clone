@@ -64,9 +64,9 @@ public:
         InitBuffer(localBuffers_[1], 0x5000, 0x1000, 0x333333, 0x444444);
     }
 
-    AscendC::ChannelHandle GetHandle()
+    AscendC::ChannelPtr GetHandle()
     {
-        return reinterpret_cast<AscendC::ChannelHandle>(&channel_);
+        return reinterpret_cast<AscendC::ChannelPtr>(&channel_);
     }
 
     void CompleteCurrentSq()

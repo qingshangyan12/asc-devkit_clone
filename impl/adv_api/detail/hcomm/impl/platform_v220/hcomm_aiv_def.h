@@ -45,15 +45,15 @@ public:
 
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle WriteNbi(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline HcommHandle WriteNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle ReadNbi(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline HcommHandle ReadNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src,
+    __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src,
         uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal);
 
     template <pipe_t pipe = PIPE_MTE3>
@@ -69,7 +69,7 @@ public:
     }
 
 private:
-    __aicore__ inline void PostSend(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead);
+    __aicore__ inline void PostSend(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead);
 
     __aicore__ inline void doorBell(__gm__ Channel* channelPtr, uint64_t curHead);
 

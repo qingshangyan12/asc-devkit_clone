@@ -58,13 +58,13 @@ public:
     __aicore__ inline int32_t Init(__ubuf__ uint8_t* buff, uint32_t len);
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle WriteNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline HcommHandle WriteNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle ReadNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline HcommHandle ReadNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
+    __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
         GM_ADDR notifyAddr, uint64_t notifyVal);
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(HcommHandle handleId);
@@ -75,11 +75,11 @@ private:
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         HcommUrmaOpCode opCode = HcommUrmaOpCode::WRITE, auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline HcommHandle PostSend(
-        ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr = nullptr,
+        ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr = nullptr,
         uint64_t notifyVal = 0);
     __aicore__ inline void PollCqWhenSqOverflow(
-        ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead);
-    __aicore__ inline uint32_t PollCq(ChannelHandle channel, uint32_t expectTail);
+        ChannelPtr channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead);
+    __aicore__ inline uint32_t PollCq(ChannelPtr channel, uint32_t expectTail);
     template <bool isWait>
     __aicore__ inline bool JudgeHandleId(HcommHandle handleId);
 
@@ -89,7 +89,7 @@ private:
     LocalTensor<uint32_t> sqPI_;
     LocalTensor<uint32_t> sqCI_;
     LocalTensor<uint32_t> cqCI_;
-    ChannelHandle channelList_[HCOMM_MAX_HANDLE_ID] = {0};
+    ChannelPtr channelList_[HCOMM_MAX_HANDLE_ID] = {0};
     bool handleCommitList_[HCOMM_MAX_HANDLE_ID] = {0};
     bool handleWaitList_[HCOMM_MAX_HANDLE_ID] = {0};
     HcommHandle curHandleId_ = HCOMM_INVALID_HANDLE_ID;

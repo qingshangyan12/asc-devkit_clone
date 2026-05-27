@@ -55,7 +55,7 @@ public:
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
      * @tparam commitPipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
-     * @param [in] channelHandle: The handle of the communication channel.
+     * @param [in] channelPtr: The handle of the communication channel.
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
      * @param [in] len: The length of the data to write, using byte as the basic unit.
@@ -64,7 +64,7 @@ public:
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle WriteNbi(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline HcommHandle WriteNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     /*!
      * @class Hcomm
@@ -73,7 +73,7 @@ public:
      * @tparam commitPipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
      * @tparam config: URMA WQE control config, only used by URMA.
-     * @param [in] channelHandle: The handle of the communication channel.
+     * @param [in] channelPtr: The handle of the communication channel.
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
      * @param [in] len: The length of the data to write, using byte as the basic unit.
@@ -84,7 +84,7 @@ public:
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src,
+    __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src,
         uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal);
 
     /*!
@@ -94,7 +94,7 @@ public:
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
      * @tparam commitPipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
-     * @param [in] channelHandle: The handle of the communication channel.
+     * @param [in] channelPtr: The handle of the communication channel.
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
      * @param [in] len: The length of the data to read, using byte as the basic unit.
@@ -103,7 +103,7 @@ public:
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle ReadNbi(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline HcommHandle ReadNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     /*!
      * @class Hcomm

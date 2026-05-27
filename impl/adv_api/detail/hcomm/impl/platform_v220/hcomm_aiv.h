@@ -44,37 +44,37 @@ __aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::~HcommImpl() {
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::WriteNbi(
-    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Write channelHandle:%llu, dst:%p, src:%p, len:%llu", channelHandle, dst, src, len);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Write channelPtr:%llu, dst:%p, src:%p, len:%llu", channelPtr, dst, src, len);
     HcommHandle handleId = ++curHandleId_;
-    PostSend(channelHandle, dst, src, len, false);
+    PostSend(channelPtr, dst, src, len, false);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Write complete handleId:%u", handleId);
     return handleId;
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::ReadNbi(
-    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Read channelHandle:%llu, dst:%p, src:%p, len:%llu", channelHandle, dst, src, len);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Read channelPtr:%llu, dst:%p, src:%p, len:%llu", channelPtr, dst, src, len);
     HcommHandle handleId = ++curHandleId_;
-    PostSend(channelHandle, dst, src, len, true);
+    PostSend(channelPtr, dst, src, len, true);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Read complete handleId:%u", handleId);
     return handleId;
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::WriteWithNotifyNbi(
-    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
+    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commit;
     (void)commitPipe;
     (void)reqPipe;
     (void)config;
-    (void)channelHandle;
+    (void)channelPtr;
     (void)dst;
     (void)src;
     (void)len;
@@ -104,9 +104,9 @@ __aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::doorBell(
 }
 
 __aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::PostSend(
-    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead)
+    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead)
 {
-    __gm__ Channel* channelPtr = (__gm__ Channel*)channelHandle;
+    __gm__ Channel* channelPtr = (__gm__ Channel*)channelPtr;
     auto qpNum = channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn;
     auto sqBaseAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.sqVa;
     auto wqeSize = channelPtr->sqContextAddr->ctx.rdmaSqContext.wqeSize;
