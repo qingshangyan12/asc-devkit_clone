@@ -1,0 +1,1 @@
+/home/q00954432/pkg/cann-9.1.0/bin/bisheng CMakeFiles/grid_config.dir/grid_config.asc.o -o grid_config 
