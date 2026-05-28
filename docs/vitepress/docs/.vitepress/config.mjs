@@ -316,7 +316,10 @@ export default defineConfig({
     }
   },
 
+  buildConcurrency: 1,
+
   vite: {
+    sourcemap: false,
     resolve: {
       preserveSymlinks: true,
     },
