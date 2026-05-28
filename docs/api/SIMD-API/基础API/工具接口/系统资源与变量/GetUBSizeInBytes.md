@@ -8,15 +8,15 @@
 | <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter>|
 | <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter>|
 | <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品AI Core | x </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品Vector Core | x </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 AI Core | x </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 Vector Core | x </cann-filter>|
 | <cann-filter npu-type="910">Atlas 训练系列产品 | x </cann-filter>|
 
 ## 功能说明
 
 头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。
 
-获取UB空间的大小，单位为byte。开发者根据UB的大小来计算循环次数等参数值。
+获取UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。
 
 ## 函数原型
 
@@ -30,7 +30,7 @@ __aicore__ inline constexpr uint32_t GetUBSizeInBytes()
 
 ## 返回值说明
 
-UB空间的大小，单位为byte。
+UB空间的大小，单位为Byte。
 
 ## 约束说明
 
@@ -43,8 +43,8 @@ UB空间的大小，单位为byte。
 ```cpp
 // totalLength为待处理的总数据长度 (元素个数)
 this->totalLength = totalLength;
-// GetUBSizeInBytes() / sizeof(half) -> 计算 UB 能容纳多少个 half 类型元素
-// 除2 -> 预留 50% 的 UB 空间
+// GetUBSizeInBytes() / sizeof(half) -> 计算UB能容纳多少个half类型元素
+// 除2 -> 预留50%的UB空间
 if (totalLength > AscendC::GetUBSizeInBytes() / sizeof(half) / 2) {
     this->tileLength = AscendC::GetUBSizeInBytes() / sizeof(half) / 2;
 } else { // 防止分片大小超过实际数据总量
