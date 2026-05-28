@@ -60,12 +60,6 @@ Unified Buffer或Global Memory上的初始数据。
 
 无
 
-## 文档检查与使用建议
-
-- 上方函数原型对应纯 SIMT 直调场景；在 SIMD 与 SIMT 混合编程场景中，需要按示例对 Global Memory 指针添加 `__gm__`，对 Unified Buffer 指针添加 `__ubuf__`。
-- `address` 指向的对象会被原子更新，函数返回值为执行本次原子操作前 `address` 上的旧值。只需要最终写回结果时，可以不接收返回值。
-- 32 位整型重载支持 Unified Buffer 与 Global Memory；按官方支持矩阵和本次复测，64 位整型重载仅支持 Global Memory，纯 SIMT 下 64 位 Unified Buffer 调用虽可编译，但实测未发生原子更新。该接口不支持浮点类型。
-
 ## 需要包含的头文件
 
 使用该接口需要包含"simt\_api/device\_atomic\_functions.h"头文件。
