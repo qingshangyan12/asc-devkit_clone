@@ -537,3 +537,5 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
 endforeach()
 
 add_subdirectory(hccl/cc)
+
+add_subdirectory(api_host_check)
