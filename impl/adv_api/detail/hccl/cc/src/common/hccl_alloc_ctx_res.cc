@@ -464,7 +464,7 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
 
 static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
     std::unique_ptr<InsCollAlgBase> &executor, TopoInfoWithNetLayerDetails *topoInfo,
-    std::unique_ptr<AlgResourceCtxSerializable> &resCtxHost, void **resCtxOut)
+    std::unique_ptr<AlgResourceCtxSerializable> &resCtxHost, OpResCtx &opResCtx, void **resCtxOut)
 {
     bool isResourceReused = false;
     ThreadHandle cpuTsThread{0};
@@ -476,7 +476,7 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
     CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
     if (opParam.engine == COMM_ENGINE_CCU) {
         uint64_t token;
-        CHK_RET(GetTokenFormBuffInfo(opParam, resCtxHost, token));
+        CHK_RET(GetTokenFormBuffInfo(opParam, opResCtx, token));
         std::shared_ptr<CcuTaskArgKfcServer> kfcServerArgs = std::make_shared<CcuTaskArgKfcServer>(
              opResCtx.xnAddr, opResCtx.ckeAddr, 1, 1, 0, token); // 1 1 0 for ccuAlltoAllMesh1D
         resCtxHost->kfcServerArgs = kfcServerArgs.get();
@@ -486,16 +486,11 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
     return HCCL_SUCCESS;
 }
 
-static HcclResult GetTokenFormBuffInfo(OpParam &opParam,
-    std::unique_ptr<AlgResourceCtxSerializable> &resCtxHost, uint64_t &token)
+static HcclResult GetTokenFormBuffInfo(OpParam &opParam, OpResCtx &opResCtx, uint64_t &token)
 {
-    BuffInfo buffInfo;
-    buffInfo.inputPtr = opParam.inputPtr;
-    buffInfo.outputPtr = opParam.outputPtr;
-    buffInfo.inputSize = opParam.inputSize;
-    buffInfo.outputSize = opParam.outputSize;
-    buffInfo.hcclBuff = resCtxHost->cclMem;
-    CHK_RET(GetToken(buffInfo, token));
+    uint64_t workSpace = opResCtx.workSpace;
+    uint64_t workSpaceSize = opResCtx.workSpaceSize;
+    token = CcuRep::GetTokenInfo(workSpace, workSpaceSize);
     return HCCL_SUCCESS;
 }
 
@@ -506,7 +501,8 @@ HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &
     CHK_PRT_RET(executor.get() == nullptr,
         HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
-    return AcquireAlgResources(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut);
+    OpResCtx opResCtx;
+    return AcquireAlgResources(comm, opParam, executor, topoInfo, resCtxHost, opResCtx, resCtxOut);
 }
 
 HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam,
@@ -516,7 +512,7 @@ HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpPara
     CHK_PRT_RET(executor.get() == nullptr,
         HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
-    return AcquireAlgResources(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut);
+    return AcquireAlgResources(comm, opParam, executor, topoInfo, resCtxHost, opResCtx, resCtxOut);
 }
 
 
