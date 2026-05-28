@@ -121,7 +121,7 @@ struct CopyGMParams {
     bool isComputeLineByLine{false};
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 #else
 template <>
 struct GetMmDstType<float> {
@@ -134,7 +134,7 @@ struct GetMmDstType<int8_t> {
     using Type = int32_t;
 };
 
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 3510)
 template <>
 struct GetMmDstType<bfloat16_t> {
@@ -142,7 +142,7 @@ struct GetMmDstType<bfloat16_t> {
 };
 #endif
 
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <>
 struct GetMmDstType<int4b_t> {
@@ -160,7 +160,7 @@ template <>
 struct GetMmDstType<half> {
     using Type = int32_t;
 };
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 template <>
 struct GetMmDstType<half> {
     using Type = half;
@@ -240,7 +240,7 @@ __aicore__ constexpr bool PhyPosIsL1(TPosition pos)
         return true;
     }
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
     if (pos == TPosition::C1) {
         return true;
     }
@@ -259,7 +259,7 @@ __aicore__ constexpr bool PhyPosIsUB(TPosition pos)
     if (pos == TPosition::C2) {
         return false;
     }
-#elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
+#elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161))
     if (pos == TPosition::C1 || pos == TPosition::C2 || pos == TPosition::CO2 || pos == TPosition::C2PIPE2GM) {
         return false;
     }
@@ -277,7 +277,7 @@ __aicore__ constexpr bool PhyPosIsGM(TPosition pos)
     if (pos == TPosition::GM) {
         return true;
     }
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161))
     if (pos == TPosition::CO2) {
         return true;
     }

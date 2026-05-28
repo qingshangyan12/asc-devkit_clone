@@ -25,7 +25,7 @@
 
 namespace AscendC {
 namespace Impl {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 #define L0AUF_SIZE 32768
 #define L0BUF_SIZE 32768
 #else
@@ -68,7 +68,7 @@ constexpr static int L0CSize_ = 128 * 1024;
 constexpr static int L1Size_ = 1024 * 1024;
 constexpr static int UBSize_ = 118 * 1024;
 constexpr static int L0CSize_ = 128 * 1024;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3113
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161
 constexpr static int L1Size_ = 512 * 1024;
 constexpr static int UBSize_ = 120 * 1024;
 constexpr static int L0CSize_ = 64 * 1024;
@@ -85,7 +85,7 @@ constexpr static int L0CSize_ = 256 * 1024;
 constexpr static int L1Size_ = 512 * 1024;
 constexpr static int L0CSize_ = 128 * 1024;
 #endif
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3113
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161
 constexpr static int L0ASize_ = 32 * 1024;
 constexpr static int L0BSize_ = 32 * 1024;
 #else

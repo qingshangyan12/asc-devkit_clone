@@ -57,6 +57,7 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
     Reg::MaskReg maskReg;
     Reg::MaskReg maskFull = Reg::CreateMask<T, Reg::MaskPattern::ALL>();
     Reg::RegTensor<T> dstVreg;
+
     if constexpr (isNormalMode) {
         maskReg = VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
     }
