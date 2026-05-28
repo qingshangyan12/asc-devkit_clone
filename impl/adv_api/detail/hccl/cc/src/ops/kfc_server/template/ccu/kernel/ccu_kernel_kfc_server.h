@@ -110,8 +110,6 @@ protected:
     // 用于Mission间同步变量
     std::vector<ccu::Variable> exportMissionVar_{};
     std::vector<ccu::Variable> importMissionVar_{};
-private:
-    CcuKfcKernelStruct kfcServerArgs;
 };
 
 class Mc2KfcServer : public CcuKernelKfcServer {
