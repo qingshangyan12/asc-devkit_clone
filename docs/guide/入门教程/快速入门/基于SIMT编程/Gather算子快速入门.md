@@ -4,7 +4,7 @@
 
 开始前请参考[环境准备](../../环境准备.md)安装所需的CANN软件包，完整样例请见[Gather](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/01_gather/basic_gather/gather_1d)。
 
-- **Gather 算子功能介绍**：
+- **Gather算子功能介绍**：
 
     Gather算子的数学表达式为：
 
@@ -20,7 +20,7 @@
         - 核函数定义：通过 [\_\_global\_\_](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 修饰符声明。
         - 数据分块（Tiling）：使用内置关键字 [threadIdx、blockIdx、blockDim](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 确定每个线程负责处理的数据。
         - 数据搬入：无需额外接口，直接通过指针访问即可。
-        - 数据计算：根据`index`中的索引值读取输入数据。
+        - 数据计算：根据`index`中的索引值及操作符`[]`读取输入数据。
         - 数据搬出：无需额外接口，直接通过指针访问即可。
     - **Host端运行时接口**
         - 内存分配：使用 `aclrtMallocHost`分配Host Memory，`aclrtMalloc`分配Device Memory。
