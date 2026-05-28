@@ -262,7 +262,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
         hccl::Thread *thread = nullptr;
         Hccl::StreamLite *streamLite = nullptr;
         CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
-        HCCL_INFO("[MC2_OPEN_DIAG][CcoreWaitNext] group %u, thread %p, streamLite %p, rtsq %p, "
+        HCCL_INFO("YYYYYY asc order [CcoreWaitNext] group %u, thread %p, streamLite %p, rtsq %p, "
                   "waitAddr %#llx, valueAddr %#llx.",
                   groupIdx_, thread, streamLite, streamLite->GetRtsq(),
                   static_cast<unsigned long long>(waitAddr), static_cast<unsigned long long>(valueAddr));
@@ -322,7 +322,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
         hccl::Thread *thread = nullptr;
         Hccl::StreamLite *streamLite = nullptr;
         CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
-        HCCL_INFO("[MC2_OPEN_DIAG][CcorePostNext] group %u, thread %p, streamLite %p, rtsq %p, "
+        HCCL_INFO("YYYYYY asc order [CcorePostNext] group %u, thread %p, streamLite %p, rtsq %p, "
                   "recordAddr %#llx, valueAddr %#llx.",
                   groupIdx_, thread, streamLite, streamLite->GetRtsq(),
                   static_cast<unsigned long long>(recordAddr), static_cast<unsigned long long>(valueAddr));
@@ -438,30 +438,52 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
         CHK_RET(ret);
 
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
-                  groupIdx_, msgPos, i, turnIdx);
+        HCCL_INFO("YYYYYY asc order [LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
+                  "opParamKey %#llx, resourceType %u, mainThread %#llx, waitAddr %#llx, recordAddr %#llx, "
+                  "turnNumsAddr %#llx.",
+                  groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
+                  static_cast<u32>(execCtx->resourceType), static_cast<unsigned long long>(execCtx->mainThread),
+                  static_cast<unsigned long long>(waitAddr), static_cast<unsigned long long>(recordAddr),
+                  static_cast<unsigned long long>(turnNumsAddr_));
         ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
-                  groupIdx_, msgPos, i, turnIdx, ret);
+        HCCL_INFO("YYYYYY asc order [LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
+                  "opParamKey %#llx, resourceType %u, mainThread %#llx, waitAddr %#llx, valueAddr %#llx, ret %u.",
+                  groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
+                  static_cast<u32>(execCtx->resourceType), static_cast<unsigned long long>(execCtx->mainThread),
+                  static_cast<unsigned long long>(waitAddr),
+                  static_cast<unsigned long long>(turnNumsAddr_ + static_cast<u64>(turnIdx) * sizeof(u32)), ret);
         CHK_RET(ret);
 
         UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
-                  groupIdx_, msgPos, i, turnIdx);
+        HCCL_INFO("YYYYYY asc order [LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
+                  "opParamKey %#llx, resourceType %u, mainThread %#llx, runParamSize %zu.",
+                  groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
+                  static_cast<u32>(execCtx->resourceType), static_cast<unsigned long long>(execCtx->mainThread),
+                  runParam.size());
         ret = LaunchOpenAicpuKernelServer(runParam);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
-                  groupIdx_, msgPos, i, turnIdx, ret);
+        HCCL_INFO("YYYYYY asc order [LoopAfterKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
+                  "opParamKey %#llx, resourceType %u, mainThread %#llx, ret %u.",
+                  groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
+                  static_cast<u32>(execCtx->resourceType), static_cast<unsigned long long>(execCtx->mainThread), ret);
         CHK_RET(ret);
 
         UpdateProgress("BeforePost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
-                  groupIdx_, msgPos, i, turnIdx);
+        HCCL_INFO("YYYYYY asc order [LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
+                  "opParamKey %#llx, resourceType %u, mainThread %#llx, recordAddr %#llx, valueAddr %#llx.",
+                  groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
+                  static_cast<u32>(execCtx->resourceType), static_cast<unsigned long long>(execCtx->mainThread),
+                  static_cast<unsigned long long>(recordAddr),
+                  static_cast<unsigned long long>(turnNumsAddr_ + static_cast<u64>(turnIdx) * sizeof(u32)));
         ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
         UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
-        HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterPost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.",
-                  groupIdx_, msgPos, i, turnIdx, ret);
+        HCCL_INFO("YYYYYY asc order [LoopAfterPost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
+                  "opParamKey %#llx, resourceType %u, mainThread %#llx, recordAddr %#llx, valueAddr %#llx, ret %u.",
+                  groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
+                  static_cast<u32>(execCtx->resourceType), static_cast<unsigned long long>(execCtx->mainThread),
+                  static_cast<unsigned long long>(recordAddr),
+                  static_cast<unsigned long long>(turnNumsAddr_ + static_cast<u64>(turnIdx) * sizeof(u32)), ret);
         CHK_RET(ret);
 
         UpdateProgress("LoopEnd", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);

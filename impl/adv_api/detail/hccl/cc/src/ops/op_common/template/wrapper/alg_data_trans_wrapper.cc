@@ -480,14 +480,25 @@ HcclResult PreSyncInterThreads(const ThreadHandle &mainThread, const std::vector
             subThreads.size(),
             notifyIdxMainToSub.size()),
         HcclResult::HCCL_E_INTERNAL);
+    HCCL_INFO("YYYYYY asc order [PreSyncInterThreads] start, mainThread[%#llx], subThreads.size[%zu], "
+              "notifyIdxMainToSub.size[%zu].",
+              static_cast<unsigned long long>(mainThread), subThreads.size(), notifyIdxMainToSub.size());
     // 主thread向从thread发送record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        HCCL_INFO("YYYYYY asc order [PreSyncInterThreads] main record sub, tidx[%u], mainThread[%#llx], "
+                  "subThread[%#llx], notifyIdx[%u], subThreads.size[%zu].",
+                  tidx, static_cast<unsigned long long>(mainThread),
+                  static_cast<unsigned long long>(subThreads[tidx]), notifyIdxMainToSub[tidx], subThreads.size());
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyRecordOnThread(mainThread, subThreads[tidx], notifyIdxMainToSub[tidx])));
     }
 
     // 从thread等待主thread的record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        HCCL_INFO("YYYYYY asc order [PreSyncInterThreads] sub wait main, tidx[%u], mainThread[%#llx], "
+                  "subThread[%#llx], notifyIdx[%u], subThreads.size[%zu].",
+                  tidx, static_cast<unsigned long long>(mainThread),
+                  static_cast<unsigned long long>(subThreads[tidx]), notifyIdxMainToSub[tidx], subThreads.size());
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyWaitOnThread(subThreads[tidx], notifyIdxMainToSub[tidx], CUSTOM_TIMEOUT)));
     }
@@ -510,14 +521,25 @@ HcclResult PostSyncInterThreads(const ThreadHandle &mainThread, const std::vecto
             subThreads.size(),
             notifyIdxSubToMain.size()),
         HcclResult::HCCL_E_INTERNAL);
+    HCCL_INFO("YYYYYY asc order [PostSyncInterThreads] start, mainThread[%#llx], subThreads.size[%zu], "
+              "notifyIdxSubToMain.size[%zu].",
+              static_cast<unsigned long long>(mainThread), subThreads.size(), notifyIdxSubToMain.size());
     // 主thread等待所有从thread的record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        HCCL_INFO("YYYYYY asc order [PostSyncInterThreads] main wait sub, tidx[%u], mainThread[%#llx], "
+                  "subThread[%#llx], notifyIdx[%u], subThreads.size[%zu].",
+                  tidx, static_cast<unsigned long long>(mainThread),
+                  static_cast<unsigned long long>(subThreads[tidx]), notifyIdxSubToMain[tidx], subThreads.size());
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyWaitOnThread(mainThread, notifyIdxSubToMain[tidx], CUSTOM_TIMEOUT)));
     }
 
     // 从thread向主thread发送record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
+        HCCL_INFO("YYYYYY asc order [PostSyncInterThreads] sub record main, tidx[%u], mainThread[%#llx], "
+                  "subThread[%#llx], notifyIdx[%u], subThreads.size[%zu].",
+                  tidx, static_cast<unsigned long long>(mainThread),
+                  static_cast<unsigned long long>(subThreads[tidx]), notifyIdxSubToMain[tidx], subThreads.size());
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyRecordOnThread(subThreads[tidx], mainThread, notifyIdxSubToMain[tidx])));
     }
