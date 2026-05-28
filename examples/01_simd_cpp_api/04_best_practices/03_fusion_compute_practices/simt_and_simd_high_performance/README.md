@@ -347,8 +347,6 @@ __aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalT
 | 2 | SIMT非连续访问UB | 64 | 542.492 | 507.571 | 0.937 | 534.293 | 0.986 | 41.851 | 0.077 | 无法访存合并 |
 | 3 | SIMT连续访问UB | 64 | **457.402** | **319.948** | 0.701 | 437.758 | 0.959 | 110.623 | 0.242 | MTE2 bound |
 
-> 💡 上表数据由 `msprof` 工具统计得到。MTE2耗时在对应 `aiv_mte2_ratio` 达到0.8（80%）以上时更具参考意义。
-
 ### 优化要点总结
 
 | 优化手段 | 核心原理 | 样例体现 |
@@ -417,7 +415,7 @@ __aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalT
 
 - 执行结果
 
-  正常情况下，结果校验应输出如下信息：
+  执行结果如下，说明精度对比成功。
   ```bash
   test pass!
   ```
