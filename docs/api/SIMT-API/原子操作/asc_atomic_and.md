@@ -60,6 +60,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 无
 
+
 ## 需要包含的头文件
 
 使用该接口需要包含"simt\_api/device\_atomic\_functions.h"头文件。
@@ -68,15 +69,38 @@ Unified Buffer或Global Memory上的初始数据。
 #include "simt_api/device_atomic_functions.h"
 ```
 
+
 ## 调用示例
+
+**场景**
+多个线程根据各自检测结果清除共享状态字中的某些 bit，使用 `asc_atomic_and` 保证不同线程清除不同 bit 时不会覆盖彼此的修改。
+
+**输入说明**
+
+| 名称 | 说明 |
+| --- |  --- |
+| `flags` | Global Memory 中的共享状态位。 |
+| `clear_bits` | 每个元素表示需要清除的 bit，kernel 内部会转换为 AND 掩码。 |
+| `n` | 掩码数量。 |
+
+**实现代码**
+
+**代码实现**
 
 -   SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(1024) void KernelAtomicAnd(int32_t* dst, int32_t* src)
+    ```cpp
+    __global__ __launch_bounds__(256) void clear_status_bits(uint32_t *flags,
+                                                            uint32_t *clear_bits,
+                                                            uint32_t n)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        asc_atomic_and(dst + idx, src[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= n) {
+            return;
+        }
+
+        uint32_t mask = ~clear_bits[idx];
+        asc_atomic_and(flags, mask);
     }
     ```
 
@@ -84,11 +108,25 @@ Unified Buffer或Global Memory上的初始数据。
 
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
-    ```
-    __simt_vf__ __launch_bounds__(1024) inline void KernelAtomicAnd(__gm__ int32_t* dst, __gm__ int32_t* src)
+    ```cpp
+    __simt_vf__ __launch_bounds__(1024) inline void clear_status_bits(__gm__ uint32_t *flags,
+                                                                     __gm__ uint32_t *clear_bits,
+                                                                     uint32_t n)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        asc_atomic_and(dst + idx, src[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= n) {
+            return;
+        }
+
+        uint32_t mask = ~clear_bits[idx];
+        asc_atomic_and(flags, mask);
     }
     ```
 
+**结果说明**
+
+```cpp
+flags before: 0xF
+clear_bits: 0x2, 0x4
+flags after: 0x9 // 表明bit1和bit2被并发清除
+```
