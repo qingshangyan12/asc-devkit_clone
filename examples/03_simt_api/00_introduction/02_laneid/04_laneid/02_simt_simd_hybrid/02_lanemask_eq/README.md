@@ -70,7 +70,7 @@ mkdir -p build && cd build
 cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j
 
 # 执行测试
-./demo_lanemask_eq_test
+./demo
 ```
 
 ### 仿真模式编译
