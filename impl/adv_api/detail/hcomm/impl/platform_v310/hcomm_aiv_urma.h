@@ -99,6 +99,20 @@ __aicore__ inline void HcommUrmaDumpSgeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __u
     }
 }
 
+__aicore__ inline void HcommUrmaDumpNotifyCtx(__ubuf__ HcommUrmaNotifyCtx* notifyCtx)
+{
+    auto notifyTokenId = notifyCtx->notifyTokenId;
+    auto notifyTokenValue = notifyCtx->notifyTokenValue;
+    auto notifyAddrL = notifyCtx->notifyAddrL;
+    auto notifyAddrH = notifyCtx->notifyAddrH;
+    auto notifyDataL = notifyCtx->notifyDataL;
+    auto notifyDataH = notifyCtx->notifyDataH;
+    KERNEL_LOG(KERNEL_INFO,
+        "Hcomm URMA WQE: notifyTokenId: %x notifyTokenValue: %x notifyAddrL: %x notifyAddrH: %x notifyDataL: %x "
+        "notifyDataH: %x",
+        notifyTokenId, notifyTokenValue, notifyAddrL, notifyAddrH, notifyDataL, notifyDataH);
+}
+
 __aicore__ inline void HcommUrmaDumpWqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx)
 {
     if (sqeCtx == nullptr) {
@@ -145,16 +159,7 @@ __aicore__ inline void HcommUrmaDumpWqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx)
     __ubuf__ uint8_t* sgeAddr = (__ubuf__ uint8_t*)sqeCtx + sizeof(HcommUrmaSqeCtx);
     if (opcode == static_cast<uint32_t>(HcommUrmaOpCode::WRITE_WITH_NOTIFY)) {
         __ubuf__ HcommUrmaNotifyCtx* notifyCtx = (__ubuf__ HcommUrmaNotifyCtx*)sgeAddr;
-        auto notifyTokenId = notifyCtx->notifyTokenId;
-        auto notifyTokenValue = notifyCtx->notifyTokenValue;
-        auto notifyAddrL = notifyCtx->notifyAddrL;
-        auto notifyAddrH = notifyCtx->notifyAddrH;
-        auto notifyDataL = notifyCtx->notifyDataL;
-        auto notifyDataH = notifyCtx->notifyDataH;
-        KERNEL_LOG(KERNEL_INFO,
-            "Hcomm URMA WQE: notifyTokenId: %x notifyTokenValue: %x notifyAddrL: %x notifyAddrH: %x notifyDataL: %x "
-            "notifyDataH: %x",
-            notifyTokenId, notifyTokenValue, notifyAddrL, notifyAddrH, notifyDataL, notifyDataH);
+        HcommUrmaDumpNotifyCtx(notifyCtx);
         sgeAddr += sizeof(HcommUrmaNotifyCtx);
     }
     HcommUrmaDumpSgeCtx(sqeCtx, sgeAddr);
