@@ -3,13 +3,43 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { load as cheerioLoad } from 'cheerio'
 import { pagefindPlugin, chineseSearchOptimize } from 'vitepress-plugin-pagefind'
+import sidebars from './sidebar.mjs'
 
 const docsRoot = resolve(import.meta.dirname, '..')
 
-const filteredSidebarPath = resolve(import.meta.dirname, 'filtered-sidebar.json')
-const filteredSidebars = existsSync(filteredSidebarPath)
-  ? JSON.parse(readFileSync(filteredSidebarPath, 'utf-8'))
-  : {}
+function filterEmptyPages(items, docsRoot) {
+  return items.reduce((acc, item) => {
+    const entry = { ...item }
+    if (item.items) {
+      entry.items = filterEmptyPages(item.items, docsRoot)
+    }
+    if (item.items && entry.items.length > 0) {
+      acc.push(entry)
+      return acc
+    }
+    if (item.link) {
+      const relPath = item.link.startsWith('/') ? item.link.slice(1) : item.link
+      const headerPath = resolve(docsRoot, relPath + '.md.header')
+      if (!existsSync(headerPath)) {
+        acc.push(entry)
+        return acc
+      }
+      try {
+        const headers = JSON.parse(readFileSync(headerPath, 'utf-8'))
+        if (headers.length === 0) return acc
+      } catch {
+        return acc
+      }
+    }
+    acc.push(entry)
+    return acc
+  }, [])
+}
+
+const filteredSidebars = {}
+for (const [key, items] of Object.entries(sidebars)) {
+  filteredSidebars[key] = filterEmptyPages(items, docsRoot)
+}
 
 function extractBodyContent(html) {
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
@@ -286,15 +316,10 @@ export default defineConfig({
     }
   },
 
+  buildConcurrency: 1,
+
   vite: {
-    build: {
-      sourcemap: false,
-      minify: false,
-      reportCompressedSize: false,
-      rollupOptions: {
-        maxParallelFileOps: 1,
-      },
-    },
+    sourcemap: false,
     resolve: {
       preserveSymlinks: true,
     },
