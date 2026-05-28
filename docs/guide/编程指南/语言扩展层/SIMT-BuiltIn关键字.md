@@ -1019,7 +1019,7 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
 在执行函数之前，会先对上述配置参数进行校验。如果grid\_dim或block\_dim超出设备的最大允许规模，或dynamic\_smem\_bytes超过分配静态内存后剩余的可用共享内存，该函数将会执行失败。
 
-一个核函数所使用的寄存器数量会显著影响常驻线程束的数量。核函数使用的寄存器数量通过 \_\_launch\_bounds\_\_\(\) 限定符或 \_\_maxnreg\_\_\(\) 限定符来控制。
+一个核函数所使用的寄存器数量会显著影响常驻线程束的数量。核函数使用的寄存器数量通过 \_\_launch\_bounds\_\_\(\) 限定符或 \_\_maxnreg\_\_\(\) 限定符指定。
 
 使用上述两个可选配置的限定符时，请注意如下约束：
 -   \_\_launch\_bounds\_\_或\_\_maxnreg\_\_只能在\_\_global\_\_函数中使用。
@@ -1033,7 +1033,6 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
     
     **表 5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
 
-    <a name="table1715318510594"></a>
     | Thread的个数(个) | 每个Thread可用寄存器个数(个) |
     | --- | --- |
     | 1025~2048 | 16 |
@@ -1051,8 +1050,7 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
     -   N的取值范围为1到2048。
     -   若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。
 
-为了支持底层性能调优，可以使用\_\_maxnreg\_\_\(\)函数限定符，用于向后端优化编译器传递性能调优意图。该限定符直接限定了单个线程在一个线程块内最多可分配的寄存器数量。应用程序可以通过在\_\_global\_\_函数定义中使用 \_\_maxnreg\_\_\(\) 限定符来限制单个线程在一个
-线程块内最多可分配的寄存器数量。
+为了支持底层性能调优，应用程序可以通过在\_\_global\_\_函数定义中使用 \_\_maxnreg\_\_\(\) 限定符，用于向后端优化编译器传递性能调优意图。该限定符直接限制单个线程在一个线程块内最多可分配的寄存器数量。
 
 -   \_\_maxnreg\_\_\(N\) <a name="li23861114618"></a>
 
