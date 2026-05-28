@@ -15,6 +15,7 @@
 |------|------|------|
 | `asc-api-ut-gen` | 生成或补齐 `tests/api/` 下的 AscendC API UT | `skills/asc-api-ut-gen/SKILL.md` |
 | `asc-npu-arch` | 维护芯片、架构、`SocVersion`、`__NPU_ARCH__` 和 dtype 事实 | `skills/asc-npu-arch/SKILL.md` |
+| `gitcode-pr` | 推送代码到个人 GitCode 远程仓库并向 `cann/asc-devkit` 创建 PR | `skills/gitcode-pr/SKILL.md` |
 
 当前 `.agent` 不维护设计文档生成、API 实现生成、示例工程生成等 skill。
 

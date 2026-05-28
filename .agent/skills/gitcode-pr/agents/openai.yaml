@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitCode PR"
+  short_description: "Create, inspect, and maintain GitCode pull requests for asc-devkit."
+  default_prompt: "Create or inspect a GitCode pull request for asc-devkit."
