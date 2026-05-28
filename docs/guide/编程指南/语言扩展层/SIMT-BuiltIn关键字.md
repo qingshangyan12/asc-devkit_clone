@@ -1019,11 +1019,11 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
 在执行函数之前，会先对上述配置参数进行校验。如果grid\_dim或block\_dim超出设备的最大允许规模，或dynamic\_smem\_bytes超过分配静态内存后剩余的可用共享内存，该函数将会执行失败。
 
-一个核函数所使用的寄存器数量会显著影响常驻线程束的数量。寄存器使用量可以通过编译器选项 \_\_launch\_bounds\_\_\(\) 限定符或 \_\_maxnreg\_\_\(\) 限定符来控制。
+一个核函数所使用的寄存器数量会显著影响常驻线程束的数量。核函数使用的寄存器数量通过 \_\_launch\_bounds\_\_\(\) 限定符或 \_\_maxnreg\_\_\(\) 限定符来控制。
 
-注：
--   \_\_launch\_bounds\_\_或\_\_maxnreg\_\_只能被标在\_\_global\_\_函数上。
--   同一函数不能同时有\_\_launch\_bounds\_\_和 \_\_maxnreg\_\_。
+使用上述两个可选配置的限定符时，请注意如下约束：
+-   \_\_launch\_bounds\_\_或\_\_maxnreg\_\_只能在\_\_global\_\_函数中使用。
+-   同一函数不能同时配置\_\_launch\_bounds\_\_和 \_\_maxnreg\_\_。
 
 在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程驻留在AI处理器上。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
@@ -1034,34 +1034,12 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
     **表 5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
 
     <a name="table1715318510594"></a>
-    <table><thead align="left"><tr id="row8153550597"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p13153175175919"><a name="p13153175175919"></a><a name="p13153175175919"></a>Thread的个数(个)</p>
-    </th>
-    <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>每个Thread可用寄存器个数(个)</p>
-    </th>
-    </tr>
-    </thead>
-    <tbody><tr id="row01531535912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p201531053591"><a name="p201531053591"></a><a name="p201531053591"></a>1025~2048</p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1615335185910"><a name="p1615335185910"></a><a name="p1615335185910"></a>16</p>
-    </td>
-    </tr>
-    <tr id="row415395155912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1215375195913"><a name="p1215375195913"></a><a name="p1215375195913"></a>513~1024</p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p18153125145914"><a name="p18153125145914"></a><a name="p18153125145914"></a>32</p>
-    </td>
-    </tr>
-    <tr id="row11153115165910"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14153257595"><a name="p14153257595"></a><a name="p14153257595"></a>257~512</p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p115315510596"><a name="p115315510596"></a><a name="p115315510596"></a>64</p>
-    </td>
-    </tr>
-    <tr id="row515335155914"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p815315165914"><a name="p815315165914"></a><a name="p815315165914"></a>1~256</p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p71539519590"><a name="p71539519590"></a><a name="p71539519590"></a>127</p>
-    </td>
-    </tr>
-    </tbody>
-    </table>
+    | Thread的个数(个) | 每个Thread可用寄存器个数(个) |
+    | --- | --- |
+    | 1025~2048 | 16 |
+    | 513~1024 | 32 |
+    | 257~512 | 64 |
+    | 1~256 | 127 |
 
     配置SIMT函数最大线程数为512，每个Thread可用寄存器数为64，示例如下：
 
@@ -1073,8 +1051,8 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
     -   N的取值范围为1到2048。
     -   若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。
 
-为了支持底层性能调优，编译器提供了\_\_maxnreg\_\_\(\)函数限定符，用于向后端优化编译器传递性能调优意图。该限定符直接限定了单个线程在一个线程块内最多可分配的寄存器数量。应用程序可以通过在\_\_global\_\_函数定义中使用 \_\_maxnreg\_\_\(\) 限定符来限制单个线程在一个
-线程块内最多可分配的寄存器数量，这同时也属于可选配置。
+为了支持底层性能调优，可以使用\_\_maxnreg\_\_\(\)函数限定符，用于向后端优化编译器传递性能调优意图。该限定符直接限定了单个线程在一个线程块内最多可分配的寄存器数量。应用程序可以通过在\_\_global\_\_函数定义中使用 \_\_maxnreg\_\_\(\) 限定符来限制单个线程在一个
+线程块内最多可分配的寄存器数量。
 
 -   \_\_maxnreg\_\_\(N\) <a name="li23861114618"></a>
 
@@ -1087,36 +1065,14 @@ add_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(x, y, z, 
 
     每个线程可用的最大寄存器数量对每个block实际启动的线程数有限制，具体对应关系请见下表。
 
-    **表 6**  \_\_maxnreg\_\_的每个Thread最多可分配的寄存器数与每个block实际启动的线程数
+    **表 6**  \_\_maxnreg\_\_的每个Thread最多可分配的寄存器数与每个block实际可启动的线程数
 
-    <table><thead align="left"><tr id="row8153550597"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p13153175175919"><a name="p13153175175919"></a><a name="p13153175175919"></a>单个线程最多可分配的寄存器数量(个)</p>
-    </th>
-    <th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p101530520595"><a name="p101530520595"></a><a name="p101530520595"></a>每个block实际启动的线程数(个)</p>
-    </th>
-    </tr>
-    </thead>
-    <tbody><tr id="row01531535912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p201531053591"><a name="p201531053591"></a><a name="p201531053591"></a>16</p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1615335185910"><a name="p1615335185910"></a><a name="p1615335185910"></a>1~2048</p>
-    </td>
-    </tr>
-    <tr id="row415395155912"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1215375195913"><a name="p1215375195913"></a><a name="p1215375195913"></a>32</p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p18153125145914"><a name="p18153125145914"></a><a name="p18153125145914"></a>1~1024</p>
-    </td>
-    </tr>
-    <tr id="row11153115165910"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14153257595"><a name="p14153257595"></a><a name="p14153257595"></a>64</p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p115315510596"><a name="p115315510596"></a><a name="p115315510596"></a>1~512</p>
-    </td>
-    </tr>
-    <tr id="row515335155914"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p815315165914"><a name="p815315165914"></a><a name="p815315165914"></a>128</p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p71539519590"><a name="p71539519590"></a><a name="p71539519590"></a>1~256</p>
-    </td>
-    </tr>
-    </tbody>
-    </table>
+    | 单个线程最多可分配的寄存器数量(个) | 每个block实际可启动的线程数(个) |
+    | --- | --- |
+    | 16 | 1~2048 |
+    | 32 | 1~1024 |
+    | 64 | 1~512 |
+    | 128 | 1~256 |
 
     配置SIMT函数单个线程最多可分配的寄存器数量为64，示例如下：
 
