@@ -82,6 +82,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 无
 
+
 ## 需要包含的头文件
 
 使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_atomic\_functions.h"头文件，使用half和half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16\_t和bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
@@ -100,13 +101,32 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 调用示例
 
+**场景**
+多个线程扫描分数数组，使用 `asc_atomic_max` 将全局最高分写入同一个结果地址。
+
+**输入说明**
+
+| 名称 | 说明 |
+| --- |  --- |
+| `scores` | 每个元素表示一个候选分数。 |
+| `max_score` | Global Memory 中的最大值结果，kernel 启动前初始化为足够小的值。 |
+| `n` | 分数数量。 |
+
+**代码实现**
+
 -   SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(1024) void KernelAtomicMax(float* dst, float* src)
+    ```cpp
+    __global__ __launch_bounds__(256) void find_max_score(uint32_t *max_score,
+                                                         uint32_t *scores,
+                                                         uint32_t n)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        asc_atomic_max(dst + idx, src[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= n) {
+            return;
+        }
+
+        asc_atomic_max(max_score, scores[idx]);
     }
     ```
 
@@ -114,11 +134,23 @@ Unified Buffer或Global Memory上的初始数据。
 
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
-    ```
-    __simt_vf__ __launch_bounds__(1024) inline void KernelAtomicMax(__gm__ float* dst, __gm__ float* src)
+    ```cpp
+    __simt_vf__ __launch_bounds__(1024) inline void find_max_score(__gm__ uint32_t *max_score,
+                                                                  __gm__ uint32_t *scores,
+                                                                  uint32_t n)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        asc_atomic_max(dst + idx, src[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= n) {
+            return;
+        }
+
+        asc_atomic_max(max_score, scores[idx]);
     }
     ```
 
+**结果说明**
+
+```
+scores: 7, 12, 4, 25
+max_score: 25 // 表明所有线程并发更新后得到最大值
+```

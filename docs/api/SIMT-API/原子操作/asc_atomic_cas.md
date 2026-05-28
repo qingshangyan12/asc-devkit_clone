@@ -73,6 +73,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 无
 
+
 ## 需要包含的头文件
 
 使用除half2、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_atomic\_functions.h"头文件，使用half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
@@ -89,15 +90,39 @@ Unified Buffer或Global Memory上的初始数据。
 #include "simt_api/asc_bf16.h"
 ```
 
+
 ## 调用示例
+
+**场景**
+多个线程尝试抢占同一个任务，任务初始拥有者为 0。使用 `asc_atomic_cas` 只有第一个把 `owner` 从 0 改成自己 ID 的线程会抢占成功，其它线程读到非 0 后失败。
+
+**输入说明**
+
+| 名称 | 说明 |
+| --- |  --- |
+| `worker_ids` | 每个元素表示一个工作者 ID。 |
+| `owner` | Global Memory 中的任务拥有者，0 表示无人占用。 |
+| `claim_result` | 保存每个线程是否抢占成功。 |
+| `n` | 参与抢占的线程数。 |
+
+
+**代码实现**
 
 -   SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(1024) void KernelAtomicCas(int32_t* dst, int32_t* src0, int32_t* src1)
+    ```cpp
+    __global__ __launch_bounds__(256) void claim_task(uint32_t *owner,
+                                                      uint32_t *claim_result,
+                                                      uint32_t *worker_ids,
+                                                      uint32_t n)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        asc_atomic_cas(dst + idx, src0[idx], src1[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= n) {
+            return;
+        }
+
+        uint32_t old_owner = asc_atomic_cas(owner, 0U, worker_ids[idx]);
+        claim_result[idx] = (old_owner == 0U) ? 1U : 0U;
     }
     ```
 
@@ -105,11 +130,27 @@ Unified Buffer或Global Memory上的初始数据。
 
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
-    ```
-    __simt_vf__ __launch_bounds__(1024) inline void KernelAtomicCas(__gm__ int32_t* dst, __gm__ int32_t* src0, __gm__ int32_t* src1)
+    ```cpp
+    __simt_vf__ __launch_bounds__(1024) inline void claim_task(__gm__ uint32_t *owner,
+                                                               __gm__ uint32_t *claim_result,
+                                                               __gm__ uint32_t *worker_ids,
+                                                               uint32_t n)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        asc_atomic_cas(dst + idx, src0[idx], src1[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= n) {
+            return;
+        }
+
+        uint32_t old_owner = asc_atomic_cas(owner, 0U, worker_ids[idx]);
+        claim_result[idx] = (old_owner == 0U) ? 1U : 0U;
     }
     ```
 
+**结果说明**
+
+```cpp
+worker_ids: 101, 102, 103
+owner before: 0
+owner after: 101/102/103中的一个 // 表明只有一个线程抢占成功
+claim_result: 仅一个元素为1
+```
