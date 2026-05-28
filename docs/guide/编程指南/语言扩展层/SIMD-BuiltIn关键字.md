@@ -545,6 +545,7 @@ __ubuf__ int * __gm__ ptr;
 
 SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_进行标识，通过在SIMD的\_\_aicore\_\_函数中使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md)调用SIMT入口函数。被SIMT VF入口函数调用的函数使用\_\_simt\_callee\_\_进行标识。
 
+
 -   \_\_simt\_vf\_\_ <a name="li611618392141"></a>
 
     函数标记宏，用于标记SIMT VF入口函数，函数无返回值。使用asc\_vf\_call接口调用SIMT VF入口函数，启动VF子任务。
