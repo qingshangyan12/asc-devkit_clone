@@ -56,6 +56,7 @@ public:
                                 xnAddr_(xnAddr), ckeAddr_(ckeAddr), dieNum_(dieNum),
                                 missionNum_(missionNum), missionIndex_(missionIndex), token_(token)
     {
+        CHECK_PARAM();  // 对入参的校验，SetCommAddr()、SetDieNum()、SetMissionNumAndId(), 主机 GenCircularQueue()
         HCCL_DEBUG("[CcuTaskArgKfcServer] syncAddr: %lu, paramAddr: %lu, dieNum: %lu, "
                    "missionNum: %lu, missionIndex: %lu",
                    xnAddr_, ckeAddr_, dieNum_, missionNum_, missionIndex_);
@@ -103,7 +104,7 @@ protected:
 
     // 用于Die间同步信号
     const char *exportDieSig_;
-    const char * importDieSig_;
+    const char *importDieSig_;
 
     // TODO：当前missionNum_=1，missionIndex_=0
     // 用于Mission间同步信号
