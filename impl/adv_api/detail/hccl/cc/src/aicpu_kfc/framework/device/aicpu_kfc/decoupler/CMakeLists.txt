@@ -16,6 +16,14 @@ set(OPEN_HCCL_SRC_ROOT
     ${HCCL_CC_DIR}/src
 )
 
+# demo: 使用 CANN 包侧的 ops_hccl 头文件 + libscatter_aicpu_kernel.so
+set(CANN_OPS_HCCL_INC_ROOT
+    /mnt/workspace/gitCode/myx_32/try/cann/aarch64-linux/asc/impl/adv_api/detail/hccl/cc/src/ops/op_common
+)
+set(LIBSCATTER_AICPU_KERNEL_SO
+    /tmp/scatter_inspect/aicpu_kernels_device/libscatter_aicpu_kernel.so
+)
+
 set(open_src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/comm_kfc_open_kernel_adapter.cc
 )
@@ -28,7 +36,6 @@ set(open_exec_impl_src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/comm_kfc_open_env_adapter.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/channel/channel.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/channel/channel_request.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/executor_base.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/executor_v2_base.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/alg_template_base.cc
@@ -42,39 +49,6 @@ set(open_exec_impl_src_list
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo/topo_match_base.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo/topo_match_multilevel.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo/topo_match_ubx.cc
-
-    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sole_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/executor/ins_reduce_scatter_parallel_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sequence_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_nhr.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D_meshchunk.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1d_dpu.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_aicpu_reduce_nhr.cc
-
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/executor/ins_v2_all_gather_sole_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/executor/ins_v2_all_gather_parallel_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
-
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
-
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/executor/ins_v2_all_reduce_parallel_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/executor/ins_v2_all_reduce_sequence_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_one_shot.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_nhr.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_aicpu_reduce_nhr.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_reduce_scatter_mesh_1D_intra.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_reduce_scatter_mesh_1D_dpu_inter.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_gather_mesh_1D_intra.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu/ins_temp_all_gather_nhr_dpu_inter.cc
 )
 
 add_library(ccl_kernel_decoupler OBJECT ${src_list})
