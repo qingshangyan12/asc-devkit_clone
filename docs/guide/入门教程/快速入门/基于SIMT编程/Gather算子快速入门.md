@@ -14,46 +14,62 @@
 
     计算逻辑：根据索引张量`index`中的每个元素，从一维输入向量`input`中采集对应位置的数据，并写入输出张量`output`。
 
-    > [!NOTE] 说明
-    > - 请参见[Ascend-C概述与学习路径](../../Ascend-C概述与学习路径.md)技术附录章节，获取`Ascend C API 参考`和`CANN运行时接口`链接，以查阅更多接口信息。
+- **算子设计**
 
-- **Device 端代码实现**：
+    - **Device端核函数编程接口**
+        - 核函数定义：通过 [\_\_global\_\_](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 修饰符声明。
+        - 数据分块（Tiling）：使用内置关键字 [threadIdx、blockIdx、blockDim](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 确定每个线程负责处理的数据。
+        - 数据搬入：无需额外接口，直接通过指针访问即可。
+        - 数据计算：根据`index`中的索引值读取输入数据。
+        - 数据搬出：无需额外接口，直接通过指针访问即可。
+    - **Host端运行时接口**
+        - 内存分配：使用 `aclrtMallocHost`分配Host Memory，`aclrtMalloc`分配Device Memory。
+        - 数据搬入：使用 `aclrtMemcpy` 将输入数据从Host Memory拷贝到Device Memory。
+        - 启动NPU计算任务：通过 `<<<...>>>`语法糖启动核函数。
+        - 同步等待：调用 `aclrtSynchronizeStream`或 `aclrtSynchronizeDevice`等待任务完成。
+        - 数据搬出：使用 `aclrtMemcpy`将计算结果从Device Memory拷贝回Host Memory。
 
-    后缀名为`*.asc`的代码文件包含Host端与Device端代码，其Device端部分示例如下：
+- **算子实现**：
 
-    ```cpp
-    __global__ void gather_1d_custom(float* input, int32_t* index, float* output, uint64_t index_total_length)
-    {
-        // Calculate global thread ID
-        int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    后缀名为`*.asc`的代码文件包含Host端与Device端代码。
 
-        // Maps to the index of output tensor
-        if (idx >= index_total_length) {
-            return;
+    - **Device端Kernel实现**：
+
+        Device端部分示例如下：
+
+        ```cpp
+        __global__ void gather_1d_custom(float* input, int32_t* index, float* output, uint64_t index_total_length)
+        {
+            // Calculate global thread ID
+            int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+            // Maps to the index of output tensor
+            if (idx >= index_total_length) {
+                return;
+            }
+            output[idx] = input[index[idx]];
         }
-        output[idx] = input[index[idx]];
-    }
-    ```
+        ```
 
-- **Host 端代码实现**：
+    - **Host端代码实现**：
 
-    Host端通过<<<>>>语法糖调用Device端代码。
+        Host端通过<<<>>>语法糖调用Device端代码。
 
-    ```cpp
-    std::vector<float> gather_1d(std::vector<float>& input, std::vector<int32_t>& index)
-    {
-        ...
-        // Configure kernel launch parameters
-        uint32_t block_num = 48; // Number of thread blocks (Grid size)
-        uint32_t thread_num_per_block = 256; // Number of threads per block (Block size)
-        uint32_t dyn_ubuf_size = 0;  // No dynamic memory required in this sample
+        ```cpp
+        std::vector<float> gather_1d(std::vector<float>& input, std::vector<int32_t>& index)
+        {
+            ...
+            // Configure kernel launch parameters
+            uint32_t block_num = 48; // Number of thread blocks (Grid size)
+            uint32_t thread_num_per_block = 256; // Number of threads per block (Block size)
+            uint32_t dyn_ubuf_size = 0;  // No dynamic memory required in this sample
 
-        // Launch kernel <<<Grid, Block, Dynamic memory, Stream>>>
-        gather_1d_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(
-            input_device, index_device, output_device, index.size());
-        ...
-    }
-    ```
+            // Launch kernel <<<Grid, Block, Dynamic memory, Stream>>>
+            gather_1d_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(
+                input_device, index_device, output_device, index.size());
+            ...
+        }
+        ```
 
 - **算子编译与运行**：
 
