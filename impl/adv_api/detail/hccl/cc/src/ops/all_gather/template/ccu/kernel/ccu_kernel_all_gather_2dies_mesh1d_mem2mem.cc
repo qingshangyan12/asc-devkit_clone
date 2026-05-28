@@ -35,21 +35,19 @@ CcuKernelAllGather2DiesMeshMem2Mem1D::CcuKernelAllGather2DiesMeshMem2Mem1D(const
 HcclResult CcuKernelAllGather2DiesMeshMem2Mem1D::Algorithm()
 {
     HCCL_INFO("[CcuKernelAllGather2DiesMeshMem2Mem1D] CcuKernelAllGather2DiesMeshMem2Mem1D run");
-    
     if (rankIdGroup_.size() == 0) {
         return HcclResult::HCCL_SUCCESS;
     }
 
     CHK_RET(InitResource());
- 
+
     LoadArgs();
- 
+
     PreSync();
- 
+
     DoAllGather();
- 
+
     PostSync();
- 
     HCCL_INFO("[CcuKernelAllGather2DiesMeshMem2Mem1D] CcuKernelAllGather2DiesMeshMem2Mem1D end");
     
     return HcclResult::HCCL_SUCCESS;
