@@ -24,7 +24,8 @@ namespace AscendC {
 /*!
  * @class Hcomm
  * @brief This class mainly provides a series of point-to-point communication primitive interfaces,
- *        benchmarking against Huawei's point-to-point communication C++ interface, including WriteNbi、ReadNbi and so on.
+ *        benchmarking against Huawei's point-to-point communication C++ interface,
+ *        including WriteNbi、ReadNbi and so on.
  *        The typical usage of this class is as follows:
  *          1) Create Hcomm object.
  *          2) Initialize communication channel.
