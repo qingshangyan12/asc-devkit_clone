@@ -34,7 +34,9 @@ class Add {
 public:
     template <typename T>
     __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
-        asc_add(dst, src0, src1, mask);
+        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            asc_add(dst, src0, src1, mask);
+        }
     }
 };
 
@@ -42,7 +44,9 @@ class Madd {
 public:
     template <typename T>
     __simd_callee__ inline static void Run(T& dst, T src0, T src1, vector_bool mask) {
-        asc_madd(dst, src0, src1, mask);
+        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            asc_madd(dst, src0, src1, mask);
+        }
     }
 };
 
