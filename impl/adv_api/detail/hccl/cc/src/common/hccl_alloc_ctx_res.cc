@@ -474,7 +474,27 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+    if (opParam.engine == COMM_ENGINE_CCU) {
+        uint64_t token;
+        CHK_RET(GetTokenFormBuffInfo(opParam, resCtxHost, token));
+        std::shared_ptr<CcuTaskArgKfcServer> kfcServerArgs = std::make_shared<CcuTaskArgKfcServer>(
+            opResCtx.ckeAddr, opResCtx.xnAddr, 1, 1, 0, token); // 1 1 0 for ccuAlltoAllMesh1D
+        resCtxHost->kfcServerArgs = kfcServerArgs.get();
+    }
     opParam.resCtx = *resCtxOut;
+    return HCCL_SUCCESS;
+}
+
+static HcclResult GetTokenFormBuffInfo(OpParam &opParam,
+    std::unique_ptr<AlgResourceCtxSerializable> &resCtxHost, uint64_t &token)
+{
+    BuffInfo buffInfo;
+    buffInfo.inputPtr = opParam.inputPtr;
+    buffInfo.outputPtr = opParam.outputPtr;
+    buffInfo.inputSize = opParam.inputSize;
+    buffInfo.outputSize = opParam.outputSize;
+    buffInfo.hcclBuff = resCtxHost->cclMem;
+    CHK_RET(GetToken(buffInfo, token));
     return HCCL_SUCCESS;
 }
 
@@ -495,22 +515,6 @@ HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpPara
     CHK_PRT_RET(executor.get() == nullptr,
         HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
-    if (opParam.engine == COMM_ENGINE_CCU) {
-        std::shared_ptr<CcuKfcKernelStruct> kfcServerArgs = std::make_shared<CcuKfcKernelStruct>();
-        kfcServerArgs->waitAddr = opResCtx.ckeAddr;
-        kfcServerArgs->recordAddr = opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
-        kfcServerArgs->paramAddr = opResCtx.xnAddr;
-        kfcServerArgs->dieNum = 1; // 1 for ccuAlltoAllMesh1D
-        kfcServerArgs->exportDieSig = hcomm::CcuRep::MaskSignal(); // 1D无通信要求
-        kfcServerArgs->importDieSig = hcomm::CcuRep::MaskSignal(); // 1D无通信要求
-        kfcServerArgs->missonNum = 1; // 1 for ccuAlltoAllMesh1D
-        kfcServerArgs->missonIndex = 0; // 0 for ccuAlltoAllMesh1D
-        kfcServerArgs->exportMissionSig = {};
-        kfcServerArgs->importMissionSig = {};
-        kfcServerArgs->exportMissionVar = {};
-        kfcServerArgs->importMissionVar = {};
-        resCtxHost->kfcServerArgs = std::move(kfcServerArgs);
-    }
     return AcquireAlgResources(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut);
 }
 
