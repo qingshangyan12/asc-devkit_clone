@@ -26,7 +26,7 @@
 
 如上图所示：
 
-- DMA搬运单元读写Global Memory，数据通过DataCopy等接口在UB等Local Memory和Global Memory间交互，没有Cache一致性问题；
+- DMA搬运单元读写Global Memory，数据通过DataCopy等接口在UB等Local Memory和Global Memory间交互，没有Cache一致性问题。
 - Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因此存在Data Cache与Global Memory的Cache一致性问题。
 
 DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可以拆解为两部分：
@@ -38,27 +38,27 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
 
 当Scalar单元访问Global Memory时，使用该接口刷新Cache，保证Cache的一致性，使用场景如下：
 
-- 读取Global Memory的数据，但该数据可能在外部被其余核修改，此时需要使用DataCacheCleanAndInvalid接口，直接访问Global Memory，获取最新数据；
+- 读取Global Memory的数据，但该数据可能在外部被其余核修改，此时需要使用DataCacheCleanAndInvalid接口，直接访问Global Memory，获取最新数据。
 - 用户通过Scalar单元写Global Memory的数据，希望立刻写出，也需要使用DataCacheCleanAndInvalid接口。
 - 针对Ascend 950PR/Ascend 950DT，原子操作过程中，如果希望改变后续数据的饱和模式，需要先使用DataCacheCleanAndInvalid接口将Cache Line中现存的数据立刻写出，再调用[SetCtrlSpr](../系统变量访问/SetCtrlSpr(ISASI).md)设置后续数据的饱和模式。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-- 支持通过配置dcciDst确保DCache与GM存储的一致性
+- 支持通过配置dcciDst确保DCache与GM存储的一致性。
 
     ```cpp
     template <typename T, CacheLine entireType, DcciDst dcciDst>
     __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
     ```
 
-- 支持通过配置dcciDst确保DCache与Local Memory存储的一致性
+- 支持通过配置dcciDst确保DCache与Local Memory存储的一致性。
 
     ```cpp
     template <typename T, CacheLine entireType, DcciDst dcciDst>
     __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)
     ```
 
-- 不支持配置dcciDst，仅支持保证DCache与GM的一致性
+- 不支持配置dcciDst，仅支持保证DCache与GM的一致性。
 
     ```cpp
     template <typename T, CacheLine entireType>
