@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于静态Tensor编程范式，展示了Cube-Vector（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过Fixpipe将结果输出到GM或UB，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](../../01_matrix_compute_practices/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_vector_compute_practices/gelu_high_performance/README.md)。
+本样例基于静态Tensor编程范式，展示了Cube-Vector（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过[Fixpipe](../../../../../docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)将结果输出到[GM](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)或[UB](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](../../01_matrix_compute_practices/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_vector_compute_practices/gelu_high_performance/README.md)。
 
 ## 支持的产品
 
@@ -39,6 +39,13 @@ $$
 
 - 样例规格：
 
+  **硬件约束**：
+  - baseM/baseK/baseN必须满足16对齐（CUBE_BLOCK=16），因为Cube计算单元以16×16为最小计算块
+  - singleCoreM/singleCoreK/singleCoreN必须能被baseM/baseK/baseN整除，否则单核内无法完整切分计算任务
+  - M/K/N必须能被singleCoreM/singleCoreK/singleCoreN整除，不支持非整切场景，否则会有部分数据无法被计算覆盖
+  - Vector核数必须是Cube核数的2倍，由[`__mix__(1, 2)`](../../../../../docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)调用符约束
+  - Scenario 2（UB直通）仅Ascend 950PR架构支持，因为只有该架构新增了L0C→UB的Fixpipe通路
+
 <table>
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul + GELU</td></tr>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
@@ -59,21 +66,21 @@ $$
 | aicore_time(μs)        | AI Core 的平均执行时间                                                |
 | aic_mac_time(μs)       | cube 类型指令（矩阵类运算指令）耗时                                    |
 | aic_mac_ratio          | cube 类型指令（矩阵类运算指令）的 cycle 数在 total cycle 数中的占用比    |
-| aic_mte1_time(μs)      | mte1 类型指令（L1 -> L0A/L0B 搬运）耗时                               |
-| aic_mte1_ratio         | mte1 类型指令（L1 -> L0A/L0B 搬运）的 cycle 数在 total cycle 数中的占用比 |
-| aic_mte2_time(μs)      | mte2 类型指令（GM -> L1 搬运）耗时                                    |
-| aic_mte2_ratio         | mte2 类型指令（GM -> L1 搬运）的 cycle 数在 total cycle 数中的占用比    |
-| aic_fixpipe_time(μs)   | fixpipe 类型指令（L0C -> GM/UB 搬运）耗时                             |
-| aic_fixpipe_ratio      | fixpipe 类型指令（L0C -> GM/UB 搬运）的 cycle 数在 total cycle 数中的占用比 |
+| aic_mte1_time(μs)      | mte1 类型指令（[L1](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md) → [L0A](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)/[L0B](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md) 搬运）耗时                               |
+| aic_mte1_ratio         | mte1 类型指令（L1 → L0A/L0B 搬运）的 cycle 数在 total cycle 数中的占用比 |
+| aic_mte2_time(μs)      | mte2 类型指令（[GM](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md) → L1 搬运）耗时                                    |
+| aic_mte2_ratio         | mte2 类型指令（GM → L1 搬运）的 cycle 数在 total cycle 数中的占用比    |
+| aic_fixpipe_time(μs)   | fixpipe 类型指令（[L0C](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md) → GM/UB 搬运）耗时                             |
+| aic_fixpipe_ratio      | fixpipe 类型指令（L0C → GM/UB 搬运）的 cycle 数在 total cycle 数中的占用比 |
 | aiv_time(μs)           | Task 在 AI Vector Core 上的执行时间                               |
 | aiv_vec_time(μs)       | vec 类型指令（向量类运算指令）耗时                                    |
 | aiv_vec_ratio          | vec 类型指令（向量类运算指令）的 cycle 数在 total cycle 数中的占用比    |
 | aiv_scalar_time(μs)    | scalar 类型指令（标量类运算指令）耗时                                 |
 | aiv_scalar_ratio       | scalar 类型指令（标量类运算指令）的 cycle 数在 total cycle 数中的占用比 |
-| aiv_mte2_time(μs)      | mte2 类型指令（GM -> UB 搬运类指令）耗时                              |
-| aiv_mte2_ratio         | mte2 类型指令（GM -> UB 搬运类指令）的 cycle 数在 total cycle 数中的占用比 |
-| aiv_mte3_time(μs)      | mte3 类型指令（UB -> GM 搬运类指令）耗时                              |
-| aiv_mte3_ratio         | mte3 类型指令（UB -> GM 搬运类指令）的 cycle 数在 total cycle 数中的占用比 |
+| aiv_mte2_time(μs)      | mte2 类型指令（GM → [UB](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md) 搬运类指令）耗时                              |
+| aiv_mte2_ratio         | mte2 类型指令（GM → UB 搬运类指令）的 cycle 数在 total cycle 数中的占用比 |
+| aiv_mte3_time(μs)      | mte3 类型指令（UB → GM 搬运类指令）耗时                              |
+| aiv_mte3_ratio         | mte3 类型指令（UB → GM 搬运类指令）的 cycle 数在 total cycle 数中的占用比 |
 
 ### 数据流路径
 
@@ -82,15 +89,17 @@ $$
 **Scenario 1：CV融合-GM中转**（A2/A3/Ascend 950PR均支持）
 
 ```
-GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
+GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube引擎)──> L0C ──(FIX引擎/Fixpipe)──> GM ──(MTE2)──> UB ──(VEC引擎/Gelu)──> UB ──(MTE3)──> GM
 ```
+
+AIC侧通过[Fixpipe](../../../../../docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)将[L0C](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)计算结果写入[GM](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)，由FIX引擎执行搬出，同时完成Nz到ND格式转换；AIV侧通过[DataCopyPad](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopyPad(ISASI).md)从GM读取数据到[UB](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)，由MTE2引擎执行搬入，然后在UB上完成GELU计算，最后通过MTE3引擎将结果写回GM。
 
 **Scenario 2：CV融合-UB直通**（仅Ascend 950PR支持）
 
-Ascend 950PR新增L0C->UB的通路，A2/A3不支持，芯片能力增强，因此在Ascend 950PR架构中可以不经过GM直接将矩阵乘结果输出到UB进行GELU计算
+Ascend 950PR新增L0C→UB的通路，A2/A3不支持。该架构芯片能力增强，Fixpipe可直接将结果从L0C输出到UB，省去了GM中转的读写开销。
 
 ```
-GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
+GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube引擎)──> L0C ──(FIX引擎/Fixpipe)──> UB ──(VEC引擎/Gelu)──> UB ──(MTE3)──> GM
 ```
 
 ### 核心特性
@@ -101,7 +110,7 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 
 #### 1. CV融合架构：`__mix__(1,2)` 核函数
 
-本样例使用 `__global__ __mix__(1, 2)` 声明核函数，表示每个逻辑核由1个AIC和2个AIV组成。AIC侧负责Matmul计算，AIV侧负责GELU向量计算，两者在同一AI Core内按(baseM × baseN)块粒度流水并行。
+本样例使用[`__global__ __mix__(1, 2)`](../../../../../docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)声明[核函数](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数.md)，表示每个逻辑核由1个AIC和2个AIV组成。AIC侧负责Matmul计算，AIV侧负责GELU向量计算，两者在同一AI Core内按(baseM × baseN)块粒度流水并行。采用1:2的比例是因为Vector核的计算速度通常快于Cube核，2个Vector核正好可以跟上1个Cube核的产出速率，实现流水线均衡。
 
 ```cpp
 __global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c)
@@ -114,7 +123,7 @@ __global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* a, __gm__ uint8
 }
 ```
 
-在 `Process()` 中，通过 `ASCEND_IS_AIC` 和 `ASCEND_IS_AIV` 宏区分AIC和AIV的执行路径：
+在 `Process()` 中，通过 `ASCEND_IS_AIC` 和 `ASCEND_IS_AIV` 宏区分AIC和AIV的执行路径，使得Cube和Vector核可以共享同一个Kernel类但执行不同的计算逻辑：
 
 ```cpp
 if ASCEND_IS_AIC {
@@ -127,9 +136,11 @@ if ASCEND_IS_AIV {
 }
 ```
 
+[`InitSocState()`](../../../../../docs/api/SIMD-API/基础API/系统变量访问/InitSocState.md)用于初始化AI Core的硬件状态，必须在核函数入口处调用。[`PipeBarrier<PIPE_ALL>()`](../../../../../docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)用于等待所有流水线指令完成，确保核函数退出前所有计算和搬运操作已结束。
+
 #### 2. 跨核同步：AIC→AIV 数据就绪通知
 
-AIC侧每完成一个 (baseM × baseN)大小子块的Fixpipe输出后，通过 `CrossCoreSetFlag` 通知AIV侧数据已就绪；AIV侧通过 `CrossCoreWaitFlag` 等待该信号，然后开始GELU计算：
+AIC侧每完成一个 (baseM × baseN)大小子块的Fixpipe输出后，通过[CrossCoreSetFlag](../../../../../docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)通知AIV侧数据已就绪；AIV侧通过[CrossCoreWaitFlag](../../../../../docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI).md)等待该信号，然后开始GELU计算。这种同步机制保证了AIV不会在AIC写入数据之前读取到不完整的中间结果：
 
 ```cpp
 // AIC侧 CopyOutAic():
@@ -141,7 +152,7 @@ AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
 
 #### 3. Scenario 1：CV融合-GM中转
 
-AIC侧通过Fixpipe将L0C计算结果写入GM，AIV侧从GM读取数据到UB后进行GELU计算，再将结果写回GM。这种方式所有架构均支持。
+AIC侧通过[Fixpipe](../../../../../docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)将[L0C](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)计算结果写入[GM](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)，由FIX引擎执行搬出，AIV侧从GM读取数据到[UB](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)后进行GELU计算，再将结果写回GM。这种方式所有架构均支持。
 
 **AIC侧**：Fixpipe L0C → GM
 
@@ -165,28 +176,28 @@ AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams
 
 **AIV侧**：GM → xUB → GELU → geluOutUB → GM
 
-`__mix__(1,2)` 模式下每个逻辑核有2个AIV，Fixpipe输出到GM的M行数据按M/2行拆分给两个AIV处理。每个AIV通过 `GetSubBlockIdx() % 2` 获取自己的子块索引，独立完成各自M/2行的GELU计算：
+`__mix__(1,2)` 模式下每个逻辑核有2个AIV，Fixpipe输出到GM的M行数据按M/2行拆分给两个AIV处理。每个AIV通过[GetSubBlockIdx()](../../../../../docs/api/SIMD-API/基础API/系统变量访问/GetSubBlockIdx.md)获取自己的子块索引，独立完成各自M/2行的GELU计算：
 
 ```cpp
 uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
 uint32_t gmOffset = mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * baseM / 2 * N;
 
-// Step 1: DataCopy GM → xUB
+// Step 1: DataCopy GM → xUB，由MTE2引擎执行搬入
 AscendC::DataCopyPad<float>(xUB, cGM[gmOffset], copyInParams, padParams);
 
-// Step 2: GELU计算
+// Step 2: GELU计算，由VEC引擎执行
 // A2/A3: GeluMemBaseCompute(xUB, geluOutUB, computeLen);
 // Ascend 950PR:    GeluRegBaseCompute(xUB, geluOutUB, computeLen);
 
-// Step 3: DataCopy geluOutUB → GM
+// Step 3: DataCopy geluOutUB → GM，由MTE3引擎执行写出
 AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
 ```
 
 #### 4. Scenario 2：CV融合-UB直通（仅Ascend 950PR支持）
 
-AIC侧通过Fixpipe将L0C计算结果直接写入UB，AIV侧无需从GM读取数据，直接在UB上进行GELU计算后将结果写回GM。这种方式省去了GM中转的读写开销，但仅Ascend 950PR架构Fixpipe从L0C到UB。
+AIC侧通过[Fixpipe](../../../../../docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)将[L0C](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)计算结果直接写入[UB](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)，由FIX引擎执行搬出，AIV侧无需从GM读取数据，直接在UB上进行GELU计算后将结果写回GM。这种方式省去了GM中转的读写开销（省去了MTE2从GM→UB的搬运时间），但仅Ascend 950PR架构Fixpipe支持从L0C到UB。
 
-**AIC侧**：Fixpipe L0C → UB（通过 `dualDstCtl=0b01` 开启双目标模式，按M维度拆分给2个AIV）
+**AIC侧**：Fixpipe L0C → UB（通过 `dualDstCtl=0b01` 开启双目标模式，按M维度拆分给2个AIV的UB）
 
 ```cpp
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
@@ -198,6 +209,8 @@ fixpipeParams.dualDstCtl = 0b01;  // 按M维度拆分到2个AIV的UB
 AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_UB>(xUB, cLocal, fixpipeParams);
 ```
 
+`dualDstCtl=0b01`参数用于开启双目标输出模式，Fixpipe将L0C中的结果按M维度拆分为上下两半，分别写入两个AIV核对应的UB地址空间，这样每个AIV可以独立处理自己UB中的数据，无需额外的数据拆分操作。
+
 **AIV侧**：UB → GELU → geluOutUB → GM
 
 AIV侧无需DataCopy GM→UB，直接对xUB进行GELU计算：
@@ -206,7 +219,7 @@ AIV侧无需DataCopy GM→UB，直接对xUB进行GELU计算：
 // GELU计算：xUB作为输入，geluOutUB作为输出
 GeluRegBaseCompute(xUB, geluOutUB, computeLen);
 
-// DataCopy: geluOutUB → GM
+// DataCopy: geluOutUB → GM，由MTE3引擎执行写出
 uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
 uint32_t offset = baseM / 2 * N;
 AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset], geluOutUB, copyParams);
@@ -214,7 +227,7 @@ AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + loca
 
 #### 5. GELU计算实现
 
-**A2/A3架构**：使用MemBase方式（向量基础API + PipeBarrier），无需额外中间缓冲区，直接复用输出缓冲区：
+**A2/A3架构**：使用MemBase方式（向量基础API + [PipeBarrier](../../../../../docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)），无需额外中间缓冲区，直接复用输出缓冲区。每一步向量计算后插入PipeBarrier同步，是因为向量指令是异步执行的，必须等待前一步计算完成后再读取结果，否则会读到未完成的数据：
 
 ```cpp
 __aicore__ inline void GeluMemBaseCompute(
@@ -227,7 +240,7 @@ __aicore__ inline void GeluMemBaseCompute(
 }
 ```
 
-**Ascend 950PR架构**：使用RegBase方式（VF函数），中间计算在寄存器内完成，无需额外UB缓冲区，减少数据在UB和Reg之间的交互：
+**Ascend 950PR架构**：使用RegBase方式（VF函数），中间计算在寄存器内完成，无需额外UB缓冲区，也无需插入PipeBarrier同步。这是因为RegBase API在寄存器层面串行执行，天然保证了数据依赖关系，减少了数据在UB和Reg之间的交互，提升了计算效率：
 
 ```cpp
 __simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
@@ -250,7 +263,7 @@ GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu�
 
 #### 6. `__mix__(1,2)` 模式下的多核切分
 
-`__mix__(1,2)` 模式下，`GetBlockIdx()` 在AIC侧和AIV侧各自独立编号：AIC侧返回0~numAICores-1，AIV侧返回0~numAIVCores-1。由于每个逻辑核对应2个AIV，AIV侧需要将 `GetBlockIdx() / 2` 映射回逻辑核ID，从而与AIC侧使用相同的多核切分策略：
+[`__mix__(1,2)`](../../../../../docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)模式下，[GetBlockIdx()](../../../../../docs/api/SIMD-API/基础API/系统变量访问/GetBlockIdx.md)在AIC侧和AIV侧各自独立编号：AIC侧返回0~numAICores-1，AIV侧返回0~numAIVCores-1。由于每个逻辑核对应2个AIV，AIV侧需要将 `GetBlockIdx() / 2` 映射回逻辑核ID，从而与AIC侧使用相同的多核切分策略。这种映射是必须的，因为AIV侧的BlockIdx是全局编号，而数据切分需要按逻辑核（即AIC核）的粒度进行：
 
 ```cpp
 uint32_t logicCoreId;
@@ -262,6 +275,18 @@ if ASCEND_IS_AIC {
 uint32_t mIterIdx = logicCoreId % mIter;
 uint32_t nIterIdx = logicCoreId / mIter;
 ```
+
+### 关键变量说明
+
+- `stepKa/stepKb`：L1大包搬运的K方向步长，即一次DataCopy从[GM](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)搬入[L1](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)的K方向包含多少个baseK。使用大包搬运可以减少DataCopy的调用次数，提高MTE2引擎的带宽利用率
+- `mte1DBFlag`：L0双缓冲的Ping/Pong标志，用于在[LoadData](../../../../../docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/LoadData.md)搬运和[Mmad](../../../../../docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md)计算之间交替使用L0A/L0B的Ping和Pong缓冲区，实现搬运与计算重叠
+- `cmatrixInitVal`：[Mmad](../../../../../docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md)参数，为true时初始化L0C为0，为false时在L0C上累加。首次迭代时设为true清零L0C，后续迭代设为false进行累加，保证K方向分块计算的正确性
+- `unitFlag`：控制Mmad和Fixpipe的流水行为。值2表示Mmad后还有后续计算（不触发Fixpipe），值3表示Mmad后需要触发Fixpipe搬出，用于实现细粒度的流水线控制
+- `dualDstCtl`：Fixpipe参数，控制L0C输出的目标拆分方式。`0b01`表示按M维度拆分到2个AIV的UB，仅在Scenario 2（UB直通）中使用
+- `CFG_ROW_MAJOR_GM/CFG_ROW_MAJOR_UB`：Fixpipe配置常量，指定输出目标为GM或UB，以及输出排布为行优先
+- `COEFF_A/COEFF_B`：GELU近似公式的系数，`COEFF_A = 0.044715`，`COEFF_B = -1.595769`
+- `tailM/tailN`：非整切场景下的尾部块大小，当M或N不能被baseM/baseN整除时，最后一个块的尺寸可能小于base，此时使用tailM/tailN计算实际尺寸
+- `tailMAlign/tailNAlign`：尾部块对齐后的大小，向上取整到CUBE_BLOCK(16)的倍数，因为Cube计算单元要求输入对齐
 
 ### 性能数据分析
 
@@ -295,13 +320,13 @@ uint32_t nIterIdx = logicCoreId / mIter;
 - 单独Gelu任务耗时348.868μs，单独Matmul任务耗时2601.311μs
 - Scenario 1融合后总耗时2606.91μs，与Matmul单独执行时间基本一致
 
-这表明采用CV融合方式编写时，AIV的Vector计算时间基本被AIC的Cube计算时间完全覆盖。由于Cube和Vector可以并行执行，整体任务执行时间不是简单的C+V叠加，而是基本等于Cube计算时间（即Matmul时间），实现了高效的流水并行。
+这表明采用CV融合方式编写时，AIV的Vector计算时间基本被AIC的Cube计算时间完全覆盖。由于Cube引擎和Vector引擎可以并行执行，整体任务执行时间不是简单的C+V叠加，而是基本等于Cube计算时间（即Matmul时间），实现了高效的流水并行。
 
 下图展示了Scenario 1（CV融合-GM中转）场景下AIC和AIV的流水并行执行过程。AIC侧完成Matmul计算后通过Fixpipe将结果写入GM，AIV侧从GM读取数据完成GELU计算，两者按(baseM × baseN)块粒度流水并行：
 
 ![Scenario1 CV融合-GM中转流水并行](figure/CVParallell_L0C_GM_UB.png)
 
-> **备注：** 流水图基于产品线CANN包msopprof工具上板获取，获取命令：`msprof op --aic-metrics=PipeUtilization`
+> **备注：** 流水图基于产品线CANN包[msprof](../../../../../docs/guide/编程指南/调试调优/性能调优.md)工具上板获取，获取命令：`msprof op --aic-metrics=PipeUtilization`
 
 **MTE2时间显著减少的原因：**
 
@@ -321,6 +346,49 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 ![Scenario2 CV融合-UB直通流水并行](figure/CVParallell_L0C_UB.png)
 
+
+## 功能调试
+
+### printf
+
+[printf](../../../../../docs/api/SIMD-API/基础API/调试接口/上板打印/printf.md)接口提供CPU域/NPU域调试场景下的格式化输出功能，可在算子kernel侧代码中输出日志信息，辅助调试。
+
+在算子kernel侧实现代码中需要输出日志信息的地方调用printf接口打印相关内容。
+
+示例如下：
+
+```cpp
+#include "kernel_operator.h"
+AscendC::printf("fmt string %d\n", 0x123);
+AscendC::PRINTF("fmt string %d\n", 0x123);
+```
+
+> **注意：** printf接口仅在CPU调试模式（`-DCMAKE_ASC_RUN_MODE=cpu`）和NPU仿真模式（`-DCMAKE_ASC_RUN_MODE=sim`）下生效，NPU运行模式下不支持。
+
+### DumpTensor
+
+[DumpTensor](../../../../../docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)接口用于Dump指定Tensor的内容，支持打印自定义的附加信息（仅支持uint32\_t数据类型），比如打印当前行号等。
+
+在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
+
+```cpp
+// AIC侧：Mmad计算完成后，Dump L0C结果查看Matmul计算是否正确
+AscendC::Mmad(cLocal, a2Local, b2Local, mmadParams);
+AscendC::DumpTensor(cLocal, 1, 16);
+
+// AIV侧：GELU计算完成后，Dump UB结果查看激活计算是否正确
+GeluRegBaseCompute(xUB, geluOutUB, computeLen);
+AscendC::DumpTensor(geluOutUB, 2, 16);
+```
+
+打印示例如下：
+
+```
+DumpTensor: desc=1, addr=0x1000, data_type=float32, position=L0C, dump_size=16
+[1.015015, 2.238228, 3.882874, 4.875984, 5.287174, 6.760258, 7.856659, 8.620880, 9.610844, 10.915154, 11.371704, 12.811401, 13.124611, 14.990570, 15.930355, 16.091831]
+```
+
+> **注意：** DumpTensor接口仅在CPU调试模式和NPU仿真模式下生效，NPU运行模式下不支持。
 
 ## 编译运行
 
@@ -387,23 +455,32 @@ uint32_t nIterIdx = logicCoreId / mIter;
   test pass!
   ```
 
-### 性能分析
+## 性能调试
 
-使用 `msprof` 工具获取详细性能数据：
+### msProf工具介绍
 
-```bash
-msprof ./demo   # 分析样例性能
-```
+[msProf](../../../../../docs/guide/编程指南/调试调优/性能调优.md)是单算子性能分析工具，包含`msprof op`和`msprof op simulator`两种使用方式，协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
-当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存 Host 和各个 Device 的性能数据汇总，性能数据分析推荐查看该目录下文件：
+- 上板性能采集
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存 Host 和各个 Device 的性能数据汇总
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+  通过上板性能采集，可以直接测定算子在昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
+
+  基于可执行文件demo通过msprof op执行算子调优：
+  ```bash
+  msprof op ./demo
+  ```
+
+  当前目录下会生成 PROF\_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存 Host 和各个 Device 的性能数据汇总，性能数据分析推荐查看该目录下文件：
+
+  ```bash
+  PROF_xxxx_XXXXXX
+  ├── device_{id}
+  └── host
+  └── mindstudio_profiler_log
+  └── mindstudio_profiler_output    # 保存 Host 和各个 Device 的性能数据汇总
+      ├── msprof_*.json
+      ├── xx_*.csv
+      └── README.txt
+  ```
+
+更多msProf工具使用方式请参考[性能调优](../../../../../docs/guide/编程指南/调试调优/性能调优.md)和[MindStudio工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)算子调优（msProf）中的内容。
