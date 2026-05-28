@@ -17,6 +17,7 @@ import json
 import glob
 import argparse
 import math
+import re
 import const_var
 import ascendc_ops_config
 from asc_op_compile_base.common.utils.log_utils import LogUtil, AscendCLogLevel
@@ -122,56 +123,89 @@ class PackKernel:
                     op_soc.append(self.ascendc_gen_object(objs + ".json", soc))
                     op_soc.append(self.ascendc_gen_object(objs + ".o", soc))
 
+    def gen_op_resource_macro(self: any, op_type: str, op_obj: dict):
+        macro_op = "#define {}_OP_RESOURCES std::make_tuple<std::vector<void *>, \\\n" \
+        "    std::map<ge::AscendString, std::vector<std::tuple<const uint8_t *, const uint8_t *>>>, \\\n" \
+        "    std::vector<std::tuple<const uint8_t *, const uint8_t *>>>({{{}}}, \\\n".format(
+            op_type, ", ".join(op_obj.get("op_fun"))
+        )
+        op_bin = op_obj.get("op_bin")
+        socs_res = []
+        op_syms = []
+        for soc in op_bin.keys():
+            soc_res = '{{ "{}", {{'.format(soc)
+            soc_syms = op_bin.get(soc)
+            soc_pairs = []
+            for pair_addr in soc_syms:
+                pair_addr1 = ["&" + s for s in pair_addr]
+                op_syms += pair_addr
+                soc_pairs.append(
+                    "    {{ {} }} ".format(", \\\n      ".join(pair_addr1))
+                )
+            soc_res += ", \\\n        ".join(soc_pairs)
+            soc_res += " } }"
+            socs_res.append(soc_res)
+        macro_op += "    {{ {} }}, \\\n".format(", \\\n      ".join(socs_res))
+        macro_op += "    {{ {} }})\n\n".format(", ".join(op_obj.get("op_rkb")))
+        macro_str = '#define {}_RESOURCES {{{{"{}", {}}}}}'.format(
+            op_type, op_type, "{}_OP_RESOURCES".format(op_type)
+        )
+        var_str = ("extern gert::OpImplRegisterV2 op_impl_register_optiling_{};\n".format(op_type))
+        if len(op_syms) > 0:
+            var_str += ('extern uint8_t ' + ";\nextern uint8_t ".join(op_syms) + ";\n")
+        return var_str, macro_op, macro_str
+
+    def write_op_resource_header(self: any, op_type: str, var_str: str, macro_op: str, macro_str: str):
+        head_file = os.path.join(self.out_path, "{}_op_resource.h".format(op_type))
+        try:
+            with os.fdopen(
+                os.open(head_file, const_var.WFLAGS, const_var.WMODES), "w"
+            ) as fd:
+                fd.write("#include <stdint.h>\n")
+                fd.write("#include <map>\n")
+                fd.write("#include <tuple>\n")
+                fd.write("#include <vector>\n")
+                fd.write('#include "graph/ascend_string.h"\n')
+                fd.write('#include "register/op_impl_registry.h"\n\n')
+                fd.write(var_str)
+                fd.write('\n')
+                fd.write(macro_op)
+                fd.write(macro_str)
+        except Exception as e:
+            LogUtil.print_compile_log("", f"{op_type}_op_resource.h create error: {e}!",
+                                      AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC)
+
     def ascendc_gen_header(self: any):
         for op_type in self.op_info.keys():
             op_obj = self.op_info.get(op_type)
-            macro_op = "#define {}_OP_RESOURCES std::make_tuple<std::vector<void *>, \\\n" \
-            "    std::map<ge::AscendString, std::vector<std::tuple<const uint8_t *, const uint8_t *>>>, \\\n" \
-            "    std::vector<std::tuple<const uint8_t *, const uint8_t *>>>({{{}}}, \\\n".format(
-                op_type, ", ".join(op_obj.get("op_fun"))
-            )
-            op_bin = op_obj.get("op_bin")
-            socs_res = []
-            op_syms = []
-            for soc in op_bin.keys():
-                soc_res = '{{ "{}", {{'.format(soc)
-                soc_syms = op_bin.get(soc)
-                soc_pairs = []
-                for pair_addr in soc_syms:
-                    pair_addr1 = ["&" + s for s in pair_addr]
-                    op_syms += pair_addr
-                    soc_pairs.append(
-                        "    {{ {} }} ".format(", \\\n      ".join(pair_addr1))
-                    )
-                soc_res += ", \\\n        ".join(soc_pairs)
-                soc_res += " } }"
-                socs_res.append(soc_res)
-            macro_op += "    {{ {} }}, \\\n".format(", \\\n      ".join(socs_res))
-            macro_op += "    {{ {} }})\n\n".format(", ".join(op_obj.get("op_rkb")))
-            macro_str = '#define {}_RESOURCES {{{{"{}", {}}}}}'.format(
-                op_type, op_type, "{}_OP_RESOURCES".format(op_type)
-            )
-            var_str = ("extern gert::OpImplRegisterV2 op_impl_register_optiling_{};\n".format(op_type))
-            if len(op_syms) > 0:
-                var_str += ('extern uint8_t ' + ";\nextern uint8_t ".join(op_syms) + ";\n")
+            var_str, macro_op, macro_str = self.gen_op_resource_macro(op_type, op_obj)
+            self.write_op_resource_header(op_type, var_str, macro_op, macro_str)
+
+    def ascendc_gen_skip_placeholder(self: any, skip_log: str):
+        # ASCEND_SKIP_FAILED_COMPUTE_UNIT: an op whose kernel binary was skipped never produces a
+        # real <OpType>_op_resource.h. In STATIC/SHARED mode the autogen aclnn_<op>.cpp still
+        # #includes that header (guarded by ACLNN_WITH_BINARY), so the host cust_opapi build would
+        # fail on the missing header. Emit an empty resource header (no soc binaries) so the op
+        # links with no embedded kernel, mirroring RUN mode where the binary is simply absent.
+        if not skip_log or not os.path.exists(skip_log):
+            return
+        failed_ops = set()
+        with open(skip_log, encoding="utf-8") as fd:
+            for line in fd:
+                match = re.search(r"fail op-type:\s*([^,]+),", line)
+                if match:
+                    failed_ops.add(match.group(1).strip())
+        for op_type in sorted(failed_ops):
             head_file = os.path.join(self.out_path, "{}_op_resource.h".format(op_type))
-            try:
-                with os.fdopen(
-                    os.open(head_file, const_var.WFLAGS, const_var.WMODES), "w"
-                ) as fd:
-                    fd.write("#include <stdint.h>\n")
-                    fd.write("#include <map>\n")
-                    fd.write("#include <tuple>\n")
-                    fd.write("#include <vector>\n")
-                    fd.write('#include "graph/ascend_string.h"\n')
-                    fd.write('#include "register/op_impl_registry.h"\n\n')
-                    fd.write(var_str)
-                    fd.write('\n')
-                    fd.write(macro_op)
-                    fd.write(macro_str)
-            except Exception as e:
-                LogUtil.print_compile_log("", f"{op_type}_op_resource.h create error: {e}!",
-                                          AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC)
+            if os.path.exists(head_file):
+                # a partial success (e.g. another compute unit) already produced a real header
+                continue
+            empty_obj = {"op_fun": ["nullptr", "nullptr"], "op_bin": {}, "op_rkb": []}
+            var_str, macro_op, macro_str = self.gen_op_resource_macro(op_type, empty_obj)
+            self.write_op_resource_header(op_type, var_str, macro_op, macro_str)
+            LogUtil.print_compile_log(
+                "", f"[ASCEND_SKIP_FAILED_COMPUTE_UNIT] generated placeholder {op_type}_op_resource.h",
+                AscendCLogLevel.LOG_INFO, LogUtil.Option.NON_SOC)
 
     def ascendc_gen_lib(self: any):
         out_lib = os.path.join(self.out_path, "libkernels.a")
@@ -208,7 +242,20 @@ def args_parse():
     parser.add_argument(
         "-p", "--platform", nargs="?", default=None, help="target platform is x86_64 or aarch64."
     )
+    parser.add_argument(
+        "--skip-failed-compute-unit", nargs="?", default=None,
+        help="Value of ASCEND_SKIP_FAILED_COMPUTE_UNIT; when enabled, emit a placeholder "
+             "op_resource.h for ops whose kernel binary was skipped."
+    )
+    parser.add_argument(
+        "--skip-error-log", nargs="?", default=None,
+        help="Path to the compile error log recording 'fail op-type:' lines for skipped ops."
+    )
     return parser.parse_args()
+
+
+def skip_enabled(value: str):
+    return str(value or "").strip().lower() in ("1", "on", "true", "yes")
 
 
 if __name__ == "__main__":
@@ -219,4 +266,6 @@ if __name__ == "__main__":
     kernel_packer.ascendc_get_config()
     kernel_packer.ascendc_pack_kernel()
     kernel_packer.ascendc_gen_header()
+    if skip_enabled(args.skip_failed_compute_unit):
+        kernel_packer.ascendc_gen_skip_placeholder(args.skip_error_log)
     kernel_packer.ascendc_gen_lib()

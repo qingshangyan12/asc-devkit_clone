@@ -1619,13 +1619,23 @@ endif()
     endif()
 
     if(NOT "${output_type}" STREQUAL "RUN")
+      # ASCEND_SKIP_FAILED_COMPUTE_UNIT (STATIC/SHARED only): extend the skip tolerance from the
+      # kernel-compile stage into the host opapi stage. A skipped op produces no
+      # <OpType>_op_resource.h (that header is a by-product of a successful kernel compile), yet
+      # the autogen aclnn_<op>.cpp still #includes it under ACLNN_WITH_BINARY (see L1072-1078),
+      # so cust_opapi fails to build. The pack script reads the compile error log and emits an
+      # empty placeholder header for each skipped op, matching RUN mode (which defines no
+      # ACLNN_WITH_BINARY and thus has no such #include).
+      get_property(_asc_pkg_error_file GLOBAL PROPERTY _ASC_PKG_ERROR_FILE)
       if (NOT TARGET ${_ascendc_kernel_target}_op_kernel_pack)
         add_custom_target(${_ascendc_kernel_target}_op_kernel_pack
                           COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_pack_kernel.py
                           --input-path=${kernel_binary_dir}/binary
                           --output-path=${kernel_binary_dir}/binary/library
                           --enable-library=True
-                          --platform=${CMAKE_SYSTEM_PROCESSOR})
+                          --platform=${CMAKE_SYSTEM_PROCESSOR}
+                          --skip-failed-compute-unit=${ASCEND_SKIP_FAILED_COMPUTE_UNIT}
+                          --skip-error-log=${_asc_pkg_error_file})
         add_library(${_ascendc_kernel_target} INTERFACE)
         target_link_libraries(${_ascendc_kernel_target} INTERFACE kernels)
         target_link_directories(${_ascendc_kernel_target} INTERFACE ${kernel_binary_dir}/binary/library)
