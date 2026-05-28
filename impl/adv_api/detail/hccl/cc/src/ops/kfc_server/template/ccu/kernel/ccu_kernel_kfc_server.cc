@@ -69,8 +69,9 @@ void CcuKernelKfcServer::SetCommAddr(ccu::Variable syncAddr)
 void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 {
     // 参数合法值判断
+    uint32_t getDieId = 0;                                                  //TODO GetDieId()
     bool isDieNumValid = (dieNum == SINGLE_DIE || dieNum == DOUBLE_DIE);
-    bool isDieIdValid  = (GetDieId() == DIE0_ID || GetDieId() == DIE1_ID);          //TODO GetDieId()
+    bool isDieIdValid  = (getDieId == DIE0_ID || getDieId == DIE1_ID);          
     if (!(isDieNumValid && isDieIdValid)) {
         HCCL_ERROR("MC2 High Level API SetDieNum Failed: Invalid Die Config");
         return;
@@ -78,16 +79,11 @@ void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 
     if (dieNum == DOUBLE_DIE) { // 双Die场景才需要导入导出
         // 导出信号
-        exportDieSig_ = CreateMaskSignal();             
         // Die0: export完成信号给Die1，Die1: export开始信号给Die0
-        // TODO：先按字符串写一版
-        const string &exportSigLabel = (GetDieId() == DIE1_ID) ? DIE1_START_SIG : DIE1_END_SIG;
-        ExportMaskSignal(exportDieSig_, exportSigLabel);
+        exportDieSig_ = DIE1_END_SIG;        
 
         // 导入信号
-        // TODO：先按字符串写一版
-        const string &importSigLabel = (GetDieId() == DIE1_ID) ? DIE1_END_SIG : DIE1_START_SIG;
-        importDieSig_                = ImportMaskSignal(importSigLabel);
+        importDieSig_ = DIE1_START_SIG
     }
 }
 
@@ -96,30 +92,18 @@ void CcuKernelKfcServer::SetMissionNumAndId(ccu::Variable miNum, ccu::Variable m
     if (missionIndex_ >= miNum) {
         THROW<InvalidParamsException>("MC2 High Level API SetMissionNumAndId Failed: Invalid Mission Config");
     }
+
+    uint32_t getDieId = 0;
     if (miNum > 1) { // 多Mission场景才需要导入导出
         if (miIndex == 0) {
             // miIndex = 0 为Master，需要missionNum - 1个导入导出信号以及missionNum - 1个导入变量
-            // TODO：先按字符串写一版
             for (uint32_t i = 0; i < miNum - 1; ++i) {
-                exportMissoinSig_.push_back(CreateMaskSignal());
-                ExportMaskSignal(exportMissoinSig_[i],
-                                 "master_sig_" + std::to_string(GetDieId()) + "_" + std::to_string(i + 1));
-                importMissionSig_.push_back(
-                    ImportMaskSignal("slave_sig_" + std::to_string(GetDieId()) + "_" + std::to_string(i + 1)));
-                importMissionVar_.push_back(
-                    ImportVariable("slave_var_" + std::to_string(GetDieId()) + "_" + std::to_string(i + 1)));
+                exportMissoinSig_ = "master_sig_0_1";
+                importMissionSig_="slave_sig_0_1";
             }
         } else {
             // miIndex > 0 为Slave，需要1个导入导出信号以及1个导出变量
-            // TODO：先按字符串写一版
-            importMissionSig_.push_back(
-                ImportMaskSignal("master_sig_" + std::to_string(GetDieId()) + "_" + std::to_string(miIndex)));
-            exportMissoinSig_.push_back(CreateMaskSignal());
-            ExportMaskSignal(exportMissoinSig_[0],
-                             "slave_sig_" + std::to_string(GetDieId()) + "_" + std::to_string(miIndex));
-            exportMissionVar_.push_back(CreateVariable());
-            ExportVariable(exportMissionVar_[0],
-                           "slave_var_" + std::to_string(GetDieId()) + "_" + std::to_string(miIndex));
+            // TODO：[这里暂且不会走进来]
         }
     }
 }
@@ -228,14 +212,14 @@ void Mc2KfcServer::GenCircularQueue()
 
 void Mc2KfcServer::WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartSig)
 {
-    const uint32_t getDieId = DIE0_ID;          // WAIT
+    const uint32_t getDieId = DIE0_ID;
     if (dieNum_ == SINGLE_DIE) {
         CCU_WHILE(turnStartSig != 1)
         {
             Load(hbmSigAddr, turnStartSig);
         }
         turnStartSig = 0;
-        Store(turnStartSig, hbmSigAddr);        // DONE：同上
+        Store(turnStartSig, hbmSigAddr);
     } else {
         if (getDieId == DIE0_ID) {
             CCU_WHILE(turnStartSig != 1)
@@ -253,7 +237,7 @@ void Mc2KfcServer::WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variab
 
 void Mc2KfcServer::SetTurnEndSig(const ccu::Variable &hbmSigAddr, const ccu::Variable &turnEndSig)
 {
-    const uint32_t getDieId = DIE0_ID;          // WAIT
+    const uint32_t getDieId = DIE0_ID;
     if (dieNum_ == SINGLE_DIE) {
         Store(turnEndSig, hbmSigAddr);
     } else {
@@ -272,7 +256,7 @@ void Mc2KfcServer::LoadFuncParamFromMemory(ccu::Variable &paramAddr, array<ccu::
     doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
     ccu::Variable addr;
     addr = paramAddr;
-    const uint32_t getDieId = DIE0_ID;          // WAIT
+    const uint32_t getDieId = DIE0_ID;
     if (dieNum_ == DOUBLE_DIE && getDieId == DIE1_ID) {
         addr += doubleDie;
     }
@@ -323,12 +307,12 @@ void CcuKernelKfcServer::MissionPreSync(ccu::Variable &func)
         return;
     }
     if (missionIndex_ == 0) {
+        // TODO：这里怎么改 [这里暂时不会走进来]
         for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
-            LocalCtxPostVar(func, importMissionVar_[i], importMissionSig_[i]);    // TODO：这里怎么改
+            LocalCtxPostVar(func, importMissionVar_, importMissionSig_);    
         }
     } else {
-        EventWait(exportMissoinSig_[0]); 
-        func = exportMissionVar_[0];
+        // TODO：这里暂时不会走进来
     }
 }
 
@@ -339,10 +323,10 @@ void CcuKernelKfcServer::MissionPostSync()
     }
     if (missionIndex_ == 0) {
         for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
-            EventWait(exportMissoinSig_[i]);
+            EventWait(exportMissoinSig_);
         }
     } else {
-        EventRecord(importMissionSig_[0]);
+        EventRecord(importMissionSig_);
     }
 }
 

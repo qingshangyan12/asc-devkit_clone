@@ -102,14 +102,16 @@ protected:
     ccu::Variable missionIndex_;        // TODO:这边之前都是U64的
 
     // 用于Die间同步信号
-    ccu::Event exportDieSig_;
-    ccu::Event importDieSig_;
+    const char *exportDieSig_;
+    const char * importDieSig_;
+
+    // TODO：当前missionNum_=1，missionIndex_=0
     // 用于Mission间同步信号
-    std::vector<ccu::Event> exportMissoinSig_{};        // TODO：仔细分析，看如何去掉vector<>
-    std::vector<ccu::Event> importMissionSig_{};
+    const char * exportMissoinSig_;
+    const char * importMissionSig_;
     // 用于Mission间同步变量
-    std::vector<ccu::Variable> exportMissionVar_{};
-    std::vector<ccu::Variable> importMissionVar_{};
+    ccu::Variable exportMissionVar_;
+    ccu::Variable importMissionVar_;
 };
 
 class Mc2KfcServer : public CcuKernelKfcServer {
