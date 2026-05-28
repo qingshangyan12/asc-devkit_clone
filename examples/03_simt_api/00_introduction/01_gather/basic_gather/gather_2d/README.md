@@ -1,4 +1,4 @@
-# SIMT编程模式实现Gather算子样例
+# SIMT编程模式实现二维Gather算子样例
 
 ## 概述
 

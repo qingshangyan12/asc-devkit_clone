@@ -29,7 +29,7 @@
         - 同步等待：调用 `aclrtSynchronizeStream`或 `aclrtSynchronizeDevice`等待任务完成。
         - 数据搬出：使用 `aclrtMemcpy`将计算结果从Device Memory拷贝回Host Memory。
 
-- **算子实现**：
+- **算子代码实现**：
 
     后缀名为`*.asc`的代码文件包含Host端与Device端代码。
 
@@ -59,14 +59,30 @@
         std::vector<float> gather_1d(std::vector<float>& input, std::vector<int32_t>& index)
         {
             ...
+            aclrtCreateStream(&stream);
+            // Allocate host and device memory, and copy input data from host to device
+            aclrtMallocHost((void **)(&output_host), output_total_byte_size);
+            aclrtMalloc((void **)&input_device, input_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+            aclrtMalloc((void **)&index_device, index_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+            aclrtMalloc((void **)&output_device, output_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+            aclrtMemcpy(input_device, input_total_byte_size, input_host, input_total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
+            aclrtMemcpy(index_device, index_total_byte_size, index_host, index_total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
+
             // Configure kernel launch parameters
-            uint32_t block_num = 48; // Number of thread blocks (Grid size)
-            uint32_t thread_num_per_block = 256; // Number of threads per block (Block size)
+            uint32_t blocks_per_grid = 48; // Number of thread blocks (Grid size)
+            uint32_t threads_per_block = 256; // Number of threads per block (Block size)
             uint32_t dyn_ubuf_size = 0;  // No dynamic memory required in this sample
 
-            // Launch kernel <<<Grid, Block, Dynamic memory, Stream>>>
-            gather_1d_custom<<<block_num, thread_num_per_block, dyn_ubuf_size, stream>>>(
+            // Launch kernel <<<grid_dim, block_dim, dynamic memory_size, Stream>>>
+            gather_1d_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(
                 input_device, index_device, output_device, index.size());
+
+            // Wait for the gather_1d_custom kernel to complete
+            aclrtSynchronizeStream(stream);
+
+            // Copy the result from device memory to host memory
+            aclrtMemcpy(output_host, output_total_byte_size, output_device, output_total_byte_size, ACL_MEMCPY_DEVICE_TO_HOST);
+            std::vector<float> output((float *)output_host, (float *)(output_host + output_total_byte_size));
             ...
         }
         ```
@@ -87,8 +103,9 @@
     )
 
     # 通过编译选项设置NPU架构
+    set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
     target_compile_options(demo PRIVATE
-       $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510 --enable-simt>
+       $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
     )
     ```
 
