@@ -1306,7 +1306,7 @@ function(npu_op_package_add target_package_name)
     if(_ascendc_aclnn_target)
       # Read SET_OPAPI_NAME config to determine output name
       get_property(set_opapi_name GLOBAL PROPERTY _ASC_TGT_${_ascendc_aclnn_target}_SET_OPAPI_NAME)
-      if(DEFINED set_opapi_name AND ${set_opapi_name})
+      if(DEFINED set_opapi_name AND set_opapi_name)
         set(opapi_output_name "${_ascendc_aclnn_target}")
       else()
         set(opapi_output_name "cust_opapi")
