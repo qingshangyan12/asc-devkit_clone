@@ -126,7 +126,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 - 用户需要确保配套使用CrossCoreSetFlag和CrossCoreWaitFlag，否则会出现未定义行为。
 - <cann-filter npu-type="950">流水类型为PIPE_ALL/PIPE_S时，仅在Ascend 950PR/Ascend 950DT上支持。</cann-filter>
 
-- 一个核连续发出的CrossCoreSetFlag，硬件不保证执行顺序。例如AIV依次发射CrossCoreSetFlag<0，PIPE\_V\>\(0\)，CrossCoreSetFlag<0，PIPE\_V\>\(1\)，实际的执行顺序可能是flagId=1的先执行
+- 一个核连续发出的CrossCoreSetFlag，硬件不保证执行顺序。例如AIV依次发射CrossCoreSetFlag<0，PIPE\_V\>\(0\)，CrossCoreSetFlag<0，PIPE\_V\>\(1\)，实际的执行顺序可能是flagId=1的先执行。
 
 - flagId相关的约束：
     - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取最低位4bit为准。
@@ -169,7 +169,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
     AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-    // UB 到 GM 搬运启用原子累加：搬运至 atomicResult 的数据与原值累加后覆盖原值。
+    // UB到GM搬运启用原子累加：搬运至atomicResult的数据与原值累加后覆盖原值。
     AscendC::SetAtomicAdd<float>();
     // DataCopy属于PIPE_MTE3流水操作。
     AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);

@@ -146,14 +146,14 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- gmWorkspace缓存申请的空间大小要求大于等于核数\*32Bytes，并且缓存的值需要初始化为0。目前常见的有两种初始化方式：
-    - 通过在host侧进行初始化操作，确保传入该接口时，gmWorkspace缓存已经初始化为0；
+- gmWorkspace缓存申请的空间大小要求大于等于核数*32Bytes，并且缓存的值需要初始化为0。目前常见的有两种初始化方式：
+    - 通过在host侧进行初始化操作，确保传入该接口时，gmWorkspace缓存已经初始化为0。
     - 在kernel侧初始化的时候对gmWorkspace缓存初始化，需要注意的是，每个核上都需要初始化全部的gmWorkspace缓存空间。
 
-- ubWorkspace申请的空间大小要求大于等于核数\*32Bytes。
-- 针对Ascend 950PR/Ascend 950DT，对于软同步接口，连续使用（Polling）该接口，用于进行多核同步，会造成Bus被长期占用，导致其他核无法访问该GM，导致多核读同一GM出现卡死现象，若需要Polling，建议在该使用接口间，增加Nop指令，指令量建议为800个，一般为需要同步的核数 \* 200。
+- ubWorkspace申请的空间大小要求大于等于核数*32Bytes。
+- 针对Ascend 950PR/Ascend 950DT，对于软同步接口，连续使用（Polling）该接口，用于进行多核同步，会造成Bus被长期占用，导致其他核无法访问该GM，导致多核读同一GM出现卡死现象。若需要Polling，建议在该使用接口间，增加Nop指令，指令量建议为800个，一般为需要同步的核数 * 200。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
-- SyncAll硬件同步接口内部实现中使用了[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
+- SyncAll硬件同步接口内部实现中使用了[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为[11-14]。
 - 在分离模式下，建议使用硬同步接口而非软同步接口。软同步接口仅适用于纯Vector场景，且性能较低。使用硬同步接口时，需根据场景设置Kernel类型：
     - 在纯Vector/Cube场景下，需设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0。
     - 对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型。
