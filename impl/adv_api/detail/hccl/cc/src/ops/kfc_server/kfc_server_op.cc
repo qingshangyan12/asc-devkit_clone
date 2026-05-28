@@ -19,7 +19,7 @@
 using namespace std;
 using namespace ops_hccl;
 
-HcclResult HcclKfcServer(HcclComm comm, aclrtStream stream)
+HcclResult HcclKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize, HcclComm comm, aclrtStream stream)
 {
     HCCL_INFO("Start to run execute HcclKfcServer");
     
@@ -65,7 +65,8 @@ HcclResult CheckKfcServerInputPara(const HcclComm comm, const aclrtStream stream
     return HCCL_SUCCESS;
 }
 
-HcclResult KfcServerConstructOpParam(HcclComm comm, aclrtStream stream, const std::string &tag, HcclCMDType opType, 
+HcclResult KfcServerConstructOpParam(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize,
+    HcclComm comm, aclrtStream stream, const std::string &tag, HcclCMDType opType, 
     u32 rankSize, OpMode opMode, OpParam &param)
 {
     CHK_RET(HcclGetCommName(comm, param.commName));
@@ -83,6 +84,10 @@ HcclResult KfcServerConstructOpParam(HcclComm comm, aclrtStream stream, const st
 
     param.enableDetour = false;
     param.opType = opType;
+    param.ccuKfcArgs[0] = xnAddr;
+    param.ccuKfcArgs[1] = ckeAddr;
+    param.ccuKfcArgs[2] = workSpace;
+    param.ccuKfcArgs[3] = workSpaceSize;
 
     return HCCL_SUCCESS;
 }

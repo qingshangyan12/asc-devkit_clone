@@ -82,12 +82,27 @@ HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLo
     const OpParam &param, const AlgResourceCtxSerializable &resCtx)
 {
     HCCL_INFO("[InsKfcServerSoleExecutor][OrchestrateLoop] Start");
+    // TemplateResource参数计算
+    TemplateResource templateAlgRes;
+    if (remoteRankToChannelInfo_.size() > 0) {
+        templateAlgRes.channels = remoteRankToChannelInfo_[0];
+    }
+    if (param.engine == COMM_ENGINE_CCU) {
+        templateAlgRes.ccuKernels = resCtx.ccuKernels;
+    }
 
+    templateAlgRes.threads = resCtx.threads;
+
+    // 准备数据
+    TemplateDataParams tempAlgParams;
+    tempAlgParams.ccuKfcArgs.push_back(param.ccuKfcArgs[0]);
+    tempAlgParams.ccuKfcArgs.push_back(param.ccuKfcArgs[1]);
+    tempAlgParams.ccuKfcArgs.push_back(param.ccuKfcArgs[2]);
+    tempAlgParams.ccuKfcArgs.push_back(param.ccuKfcArgs[3]);
+
+    // 构建template
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
-
-    TemplateResource templateAlgRes;
-    TemplateDataParams tempAlgParams;
     CHK_RET(algTemplate->KernelRun(param, tempAlgParams, templateAlgRes));
 
     HCCL_INFO("[InsKfcServerSoleExecutor][OrchestrateLoop] End.");
