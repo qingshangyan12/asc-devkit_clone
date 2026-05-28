@@ -8,8 +8,8 @@
 | <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品AI Core | √ </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品Vector Core | x </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 AI Core | √ </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 Vector Core | x </cann-filter>|
 | <cann-filter npu-type="910">Atlas 训练系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="x90">Kirin X90 | √ </cann-filter>|
 | <cann-filter npu-type="9030">Kirin 9030 | √ </cann-filter>|
@@ -36,7 +36,7 @@ __aicore__ inline int64_t GetBlockNum()
 
 - 返回值与<<<\>\>\>调用时配置的numBlocks一致，为参与计算的逻辑AI Core的数量。
 - 当仅启动Cube Core（AIC）或Vector Core（AIV）时，实际启动的AIC或AIV的数量与numBlocks一致。
-- 当同时启动Cube Core（AIC）与Vector Core（AIV）时，实际启动的AIC或AIV的数量可以通过  [GetTaskRatio\(\)](GetTaskRatio.md) \* numBlocks计算得到，在当前支持的配置下：
+- 当同时启动Cube Core（AIC）与Vector Core（AIV）时，实际启动的AIC或AIV的数量可以通过[GetTaskRatio\(\)](GetTaskRatio.md) \* numBlocks计算得到，在当前支持的配置下：
     - 当AIC与AIV比例为1:2时，AIC启动的数量为numBlocks，AIV启动的数量为2 \* numBlocks；
     - 当AIC与AIV比例为1:1时，AIC启动的数量为numBlocks，AIV启动的数量为numBlocks。
 

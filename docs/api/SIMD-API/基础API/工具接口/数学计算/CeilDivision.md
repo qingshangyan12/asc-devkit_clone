@@ -8,8 +8,8 @@
 | <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter>|
 | <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter>|
 | <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品AI Core | x </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品Vector Core | x </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 AI Core | x </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 Vector Core | x </cann-filter>|
 | <cann-filter npu-type="910">Atlas 训练系列产品 | x </cann-filter>|
 
 ## 功能说明
@@ -24,7 +24,7 @@ __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表 1** 模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -42,7 +42,7 @@ __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 
 ## 调用示例
 
-本示例中使用CeilDivision计算迭代次数 repeatTimes，通过对数据量count与单次处理数据量进行向上取整除法，确保所有数据（包括尾块）均被完整处理。
+本示例中使用CeilDivision计算迭代次数repeatTimes，通过对数据量count与单次处理数据量进行向上取整除法，确保所有数据（包括尾块）均被完整处理。
 
 ```cpp
 template <typename T>
