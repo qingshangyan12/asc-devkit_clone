@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 import { existsSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { load as cheerioLoad } from 'cheerio'
+import { pagefindPlugin, chineseSearchOptimize } from 'vitepress-plugin-pagefind'
 import sidebars from './sidebar.mjs'
 
 const docsRoot = resolve(import.meta.dirname, '..')
@@ -259,7 +260,6 @@ export default defineConfig({
   lastUpdated: false,
 
   markdown: {
-    html: false,
     config(md) {
       const originalRender = md.render.bind(md)
       const originalRenderAsync = md.renderAsync ? md.renderAsync.bind(md) : null
@@ -316,19 +316,37 @@ export default defineConfig({
     }
   },
 
+  buildConcurrency: 1,
+
   vite: {
+    sourcemap: false,
     resolve: {
       preserveSymlinks: true,
     },
-    plugins: [htmlAsMdPlugin(), placeholderPlugin()],
-  },
-
-  vue: {
-    template: {
-      compilerOptions: {
-        onError: (error) => {
-          if (error.code === 2) return
-          throw error
+    plugins: [htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
+      btnPlaceholder: '搜索',
+      placeholder: '搜索文档',
+      emptyText: '未找到结果',
+      heading: '共: {{searchResult}} 条结果',
+      customSearchQuery: chineseSearchOptimize,
+    }), {
+      name: 'vitepress-override-search-vue',
+      enforce: 'post',
+      config: () => ({
+        resolve: {
+          alias: {
+            './VPNavBarSearch.vue': resolve(import.meta.dirname, 'theme', 'Search.vue'),
+          },
+        },
+      }),
+    }],
+    vue: {
+      template: {
+        compilerOptions: {
+          onError: (error) => {
+            if (error.code === 2) return
+            throw error
+          },
         },
       },
     },
@@ -341,64 +359,11 @@ export default defineConfig({
       { text: 'Ascend C API', link: '/api/Ascend-C-API列表' },
     ],
 
-    sidebar: filteredSidebars,
-
     search: {
-      provider: 'local',
-      options: {
-        async _render(src, env, md) {
-          const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-          const getDirInfo = (filePath) => {
-            const parts = filePath.replace(/\.md$/, '').split('/').filter(Boolean)
-            if (parts.length <= 1) return { html: '', shift: 0 }
-            const routePrefixes = ['api', 'guide']
-            let start = routePrefixes.includes(parts[0]) ? 1 : 0
-            const segs = parts.slice(start, -1).slice(-3)
-            if (segs.length === 0) return { html: '', shift: 0 }
-            let html = ''
-            for (let i = 0; i < segs.length; i++) html += `<h${i + 1}>${escapeHtml(segs[i])}</h${i + 1}> `
-            return { html, shift: segs.length }
-          }
-          const processHeadings = (html, shift = 0) => {
-            const seen = {}
-            return html.replace(/<h([1-6])([^>]*)>(.*?)<\/h\1>/gi, (_, level, attrs, text) => {
-              const newLevel = Math.min(Number(level) + shift, 6)
-              const clean = text.replace(/<[^>]+>/g, '').trim()
-              let id = clean.replace(/\s+/g, '-')
-              if (seen[id]) id = `${id}-${seen[id]++}`
-              else seen[id] = 1
-              const inner = `<a class="header-anchor" href="#${id}">\u00b6</a>`
-              const existing = text.match(/<a[^>]*>.*?<\/a>/)
-              if (existing) return `<h${newLevel}${attrs}>${text}${inner}</h${newLevel}>`
-              return `<h${newLevel}${attrs}>${clean}${inner}</h${newLevel}>`
-            })
-          }
-          if (!src || !src.trim()) {
-            const htmlPath = env.path.replace(/\.md$/, '.html')
-            if (existsSync(htmlPath)) {
-              const raw = readFileSync(htmlPath, 'utf-8')
-              const dir = getDirInfo(env.path)
-              return processHeadings(dir.html, 0) + processHeadings(raw, dir.shift)
-            }
-            return ''
-          }
-          const html = await md.renderAsync(src, env)
-          if (!src.includes('<!-- RAW_HTML -->')) return html
-          const dir = getDirInfo(env.path)
-          return processHeadings(dir.html, 0) + processHeadings(html, dir.shift)
-        },
-        detailedView: true,
-        miniSearch: {
-          options: {
-            storeFields: ['title', 'titles', 'text'],
-          }
-        },
-        translations: {
-          button: { buttonText: '搜索文档' },
-          modal: { noResultsText: '未找到结果', footer: { selectText: '选择', navigateText: '切换' } },
-        },
-      },
+      provider: 'algolia',
     },
+
+    sidebar: filteredSidebars,
 
     outline: false,
 
