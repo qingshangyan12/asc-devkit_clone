@@ -66,11 +66,11 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [laneid](../Warp函数/Lane-ID类函数/laneid.md) | 获取线程在其线程束内的索引。 |
-| [lanemask_eq](../Warp函数/Lane-ID类函数/lanemask_eq.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，只有当前线程所在的 lane 位被置为1，其余位为0。 |
-| [lanemask_le](../Warp函数/Lane-ID类函数/lanemask_le.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将 “laneid小于等于当前线程” 的线程的对应位设为1，其余位为0。 |
-| [lanemask_lt](../Warp函数/Lane-ID类函数/lanemask_lt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将 “laneid严格小于当前线程” 的线程的对应位设为1，其余位为0。 |
-| [lanemask_ge](../Warp函数/Lane-ID类函数/lanemask_ge.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将 “laneid大于等于当前线程” 的线程的对应位设为1，其余位为0。 |
-| [lanemask_gt](../Warp函数/Lane-ID类函数/lanemask_gt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将 “laneid严格大于当前线程” 的线程的对应位设为1，其余位为0。 |
+| [lanemask_eq](../Warp函数/Lane-ID类函数/lanemask_eq.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，只有当前线程所在的lane位被置为1，其余位为0。 |
+| [lanemask_le](../Warp函数/Lane-ID类函数/lanemask_le.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid小于等于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_lt](../Warp函数/Lane-ID类函数/lanemask_lt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid严格小于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_ge](../Warp函数/Lane-ID类函数/lanemask_ge.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid大于等于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_gt](../Warp函数/Lane-ID类函数/lanemask_gt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid严格大于当前线程”的线程的对应位设为1，其余位为0。 |
 
 ## 数学函数
 
