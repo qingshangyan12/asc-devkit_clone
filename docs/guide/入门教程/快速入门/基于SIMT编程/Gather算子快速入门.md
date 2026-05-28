@@ -1,4 +1,4 @@
-# Gather算子快速入门<a name="ZH-CN_TOPIC_0000002509977650"></a>
+# Gather算子快速入门
 
 本入门示例基于Ascend C SIMT实现一维Gather算子，带你快速上手实践，涵盖Device端核函数实现、Host端调用以及编译运行的完整流程，帮助开发者建立整体认知。
 
@@ -73,7 +73,7 @@
             uint32_t threads_per_block = 256; // Number of threads per block (Block size)
             uint32_t dyn_ubuf_size = 0;  // No dynamic memory required in this sample
 
-            // Launch kernel <<<grid_dim, block_dim, dynamic memory_size, Stream>>>
+            // Launch kernel <<<grid_dim, block_dim, dynamic_memory_size, stream>>>
             gather_1d_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(
                 input_device, index_device, output_device, index.size());
 
