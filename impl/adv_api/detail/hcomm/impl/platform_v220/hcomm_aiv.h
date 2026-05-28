@@ -106,17 +106,17 @@ __aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::doorBell(
 __aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::PostSend(
     ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead)
 {
-    __gm__ Channel* channelPtr = (__gm__ Channel*)channelPtr;
-    auto qpNum = channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn;
-    auto sqBaseAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.sqVa;
-    auto wqeSize = channelPtr->sqContextAddr->ctx.rdmaSqContext.wqeSize;
-    auto curHardwareHead = channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr;
+    __gm__ Channel* channel = (__gm__ Channel*)channelPtr;
+    auto qpNum = channel->sqContextAddr->ctx.rdmaSqContext.qpn;
+    auto sqBaseAddr = channel->sqContextAddr->ctx.rdmaSqContext.sqVa;
+    auto wqeSize = channel->sqContextAddr->ctx.rdmaSqContext.wqeSize;
+    auto curHardwareHead = channel->sqContextAddr->ctx.rdmaSqContext.headAddr;
     CacheWriteThrough(reinterpret_cast<__gm__ uint8_t*>(curHardwareHead), 8);
     uint64_t curHead = *(__gm__ uint32_t*)(curHardwareHead);
 
-    auto curHardwareTailAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr;
+    auto curHardwareTailAddr = channel->sqContextAddr->ctx.rdmaSqContext.tailAddr;
     uint64_t shift = 15U;
-    auto qpDepth = channelPtr->sqContextAddr->ctx.rdmaSqContext.depth;
+    auto qpDepth = channel->sqContextAddr->ctx.rdmaSqContext.depth;
 
     KERNEL_LOG(
         KERNEL_INFO, "Hcomm doorBell qpNum:%d, sqBaseAddr:%p, wqeSize:%d, curHead:%d, qpDepth:%d", qpNum, sqBaseAddr,
@@ -147,14 +147,14 @@ __aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::PostSend(
     *(__gm__ uint32_t*)(wqeAddr + 8) = 0;          // immtdata is always 0 till we provide poll CQ flow in AIV
     *(__gm__ uint32_t*)(wqeAddr + 12) = 1U << 24U; // [120:127] num_sge = 1
     *(__gm__ uint32_t*)(wqeAddr + 16) = 0;         // [128:151] start_sge_idx = 0;
-    *(__gm__ uint32_t*)(wqeAddr + 20) = channelPtr->remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey;
+    *(__gm__ uint32_t*)(wqeAddr + 20) = channel->remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey;
     *(__gm__ uint64_t*)(wqeAddr + 24) = (uint64_t)dst; // destination VA
 
     constexpr uint32_t sgeAddrOffset = 32;
     __gm__ uint8_t* sgeAddr = wqeAddr + sgeAddrOffset;
     KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend sgeAddr:%p", sgeAddr);
     *(__gm__ uint32_t*)(sgeAddr) = len;
-    *(__gm__ uint32_t*)(sgeAddr + sizeof(uint32_t)) = channelPtr->localBufferAddr->pti.rdmaMemProtectionInfo.lkey;
+    *(__gm__ uint32_t*)(sgeAddr + sizeof(uint32_t)) = channel->localBufferAddr->pti.rdmaMemProtectionInfo.lkey;
     *(__gm__ uint64_t*)(sgeAddr + 2 * sizeof(uint32_t)) = (uint64_t)src; // src VA addr memory registered by RNIC
 
     constexpr uint32_t wqeAddrWriteLength = 48;
@@ -163,7 +163,7 @@ __aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::PostSend(
     curHead++;
 
     // Post doorbell
-    doorBell(channelPtr, curHead);
+    doorBell(channel, curHead);
 
     ubLocalHead_.SetValue(0, (uint32_t)curHead);
     AscendC::GlobalTensor<uint32_t> HeadGlobalTensor;

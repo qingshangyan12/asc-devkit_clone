@@ -50,8 +50,6 @@ static constexpr UrmaWqeEntry URMA_DEFAULT_CFG = {
 constexpr int8_t HCOMM_INVALID_HANDLE_ID = -1;
 constexpr uint32_t HCOMM_MAX_HANDLE_ID = 1024;
 
-typedef uint64_t ChannelPtr;
-
 typedef enum {
     PROTECTION_TYPE_INVALID = -1,
     PROTECTION_TYPE_ROCE = 0,

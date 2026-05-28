@@ -40,7 +40,7 @@ __aicore__ inline void Gm2Ub(
     const AscendC::LocalTensor<T>& dstLocal, const AscendC::GlobalTensor<T>& srcGlobal, int32_t length)
 {
     AscendC::DataCopyExtParams copyParams{1, (uint32_t)(length * sizeof(T)), 0, 0, 0};
-    AscendC::DataCopyPadExtParams<T> padParams{true, 0, (ONE_BLOCK_SIZE - sizeof(T)) / sizeof(T), 0};
+    AscendC::DataCopyPadExtParams<T> padParams{true, 0, (ONE_BLK_SIZE - sizeof(T)) / sizeof(T), 0};
 
     PipeBarrier<PIPE_ALL>();
     AscendC::DataCopyPad(dstLocal, srcGlobal, copyParams, padParams);
