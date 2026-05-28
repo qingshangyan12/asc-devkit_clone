@@ -56,6 +56,7 @@ public:
                                 xnAddr_(xnAddr), ckeAddr_(ckeAddr), dieNum_(dieNum),
                                 missionNum_(missionNum), missionIndex_(missionIndex), token_(token)
     {
+        CHECK_PARAM();  // 对入参的校验，SetCommAddr()、SetDieNum()、SetMissionNumAndId(), 主机 GenCircularQueue()
         HCCL_DEBUG("[CcuTaskArgKfcServer] syncAddr: %lu, paramAddr: %lu, dieNum: %lu, "
                    "missionNum: %lu, missionIndex: %lu",
                    xnAddr_, ckeAddr_, dieNum_, missionNum_, missionIndex_);
@@ -74,7 +75,7 @@ public:
 
 class CcuKernelKfcServer : public CcuKernelAlgBase {
 public:
-    CcuKernelKfcServer(const hcomm::CcuKernelArg &arg)
+    CcuKernelKfcServer(const hcomm::CcuKernelArg &arg);
     ~CcuKernelKfcServer() override {}
 
     HcclResult InitResource();
@@ -99,11 +100,11 @@ protected:
     ccu::Variable token_;
     ccu::Variable dieNum_;              // Die数量，用于判断单双Die，默认为1即单Die
     ccu::Variable missionNum_; 
-    ccu::Variable missionIndex_;        // TODO:这边之前都是U64的
+    ccu::Variable missionIndex_;
 
     // 用于Die间同步信号
     const char *exportDieSig_;
-    const char * importDieSig_;
+    const char *importDieSig_;
 
     // TODO：当前missionNum_=1，missionIndex_=0
     // 用于Mission间同步信号
