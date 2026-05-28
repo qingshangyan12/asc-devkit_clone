@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002549846732_section106841136114319"></a>
 
-头文件引用路径为: "basic\_api/kernel\_operator\_fixpipe\_intf.h"
+头文件引用路径为: "basic\_api/kernel\_operator\_fixpipe\_intf.h"。
 
 矩阵计算的结果存放在L0C Buffer, 需要将结果搬运至Unified Buffer（UB）中, 并且在搬运过程中支持随路量化等操作。
 

@@ -16,7 +16,7 @@
 
 ## 功能说明<a id="zh-cn_topic_0000002542828493_section106841136114319"></a>
 
-头文件路径为: "basic\_api/kernel\_operator\_fixpipe\_intf.h"、"basic\_api/kernel\_operator\_data\_copy\_intf.h"
+头文件路径为: "basic\_api/kernel\_operator\_fixpipe\_intf.h"、"basic\_api/kernel\_operator\_data\_copy\_intf.h"。
 
 矩阵计算的结果存放在L0C Buffer, 需要将结果搬运至Global Memory（GM）中, 并且在搬运过程中支持随路格式转换等操作。
 
