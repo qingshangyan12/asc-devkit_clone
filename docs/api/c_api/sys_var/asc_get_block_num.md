@@ -24,7 +24,7 @@ __aicore__ inline int64_t asc_get_block_num()
 
 ## 返回值说明
 
-无
+AI核数。
 
 ## 流水类型
 
