@@ -26,9 +26,9 @@
   output[i][j] = input[index[i][j]] + 1.0
   $$
 
-  - input为输入张量，形状为[300000]，数据类型为float
-  - index为索引张量，形状为[1024, 256]，数据类型为uint32，索引范围为[0, 300000)
-  - output为输出张量，形状为[1024, 256]，数据类型为float
+  - input为输入张量，形状为[1100000]，数据类型为float
+  - index为索引张量，形状为[1024, 1024]，数据类型为uint32，索引范围为[0, 1100000)
+  - output为输出张量，形状为[1024, 1024]，数据类型为float
   - 计算过程：根据index[i][j]索引从input中采集对应位置的数据，加1.0后写入output[i][j]位置
 
 - 样例规格：
@@ -36,9 +36,9 @@
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">GatherAdds</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input</td><td align="center">[300000]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="2" align="center">样例输入</td><td align="center">index</td><td align="center">[1024, 256]</td><td align="center">uint32</td><td align="center">ND</td></tr>
-  <tr><td align="center">output</td><td align="center">[1024, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input</td><td align="center">[1100000]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">index</td><td align="center">[1024, 1024]</td><td align="center">uint32</td><td align="center">ND</td></tr>
+  <tr><td align="center">output</td><td align="center">[1024, 1024]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">empty_kernel / gather_adds_kernel</td></tr>
   </table>
 
@@ -54,8 +54,8 @@
 | Case 2 | 64核（物理核数），空壳核函数        | empty_kernel        | 调度基线（核数 = 物理核）         |
 | Case 3 | 128核，空壳核函数                   | empty_kernel        | 调度基线（核数 > 物理核）         |
 | Case 4 | 1024核，空壳核函数                  | empty_kernel        | 调度基线（核数远超物理核）        |
-| Case 5 | 1024核，每核256数据，gather+adds    | gather_adds_kernel  | 计算基线（核数远超物理核）        |
-| Case 6 | 64核（物理核数），每核4096数据，gather+adds | gather_adds_kernel | 核数匹配物理核（最优配置）|
+| Case 5 | 1024核，每核1024数据，gather+adds   | gather_adds_kernel  | 计算基线（核数远超物理核）        |
+| Case 6 | 64核（物理核数），每核16384数据，gather+adds | gather_adds_kernel | 核数匹配物理核（最优配置）|
 
 #### 核心概念：逻辑核与物理核
 
@@ -113,10 +113,10 @@ gather_adds_kernel<<<num_blocks, THREAD_NUM, dyn_ubuf_size, stream>>>(...);
 ```
 
 每核UB占用 = `rows_per_block * sizeof(float)`：
-- Case 5（1024核）：`256 * 4 = 1KB`
-- Case 6（64核）：`4096 * 4 = 16KB`
+- Case 5（1024核）：`1024 * 4 = 4KB`
+- Case 6（64核）：`16384 * 4 = 64KB`
 
-均远低于UB容量约束（256KB - 静态UB - 8KB预留 ≥ 32KB Data Cache下限）。
+均在UB容量约束（256KB - 静态UB - 8KB预留 ≥ 32KB Data Cache下限）之内。
 
 ### Case 1-4：空壳核函数测试场景
 
@@ -147,8 +147,8 @@ __global__ __launch_bounds__(THREAD_NUM) void empty_kernel(
 | 配置项               | Case 5             | Case 6             |
 | -------------------- | ------------------ | ------------------ |
 | 逻辑核数             | 1024（远超物理核） | 64（等于物理核）   |
-| 每核处理数据量       | 256                | 4096               |
-| 每核UB占用           | 1KB                | 16KB               |
+| 每核处理数据量       | 1024               | 16384              |
+| 每核UB占用           | 4KB                | 64KB               |
 
 两个场景共用同一个核函数 `gather_adds_kernel`，通过 stride 模式自适应每核工作集：每条线程在 `[threadIdx.x, rows_per_block)` 区间按 `THREAD_NUM` 跨步处理，循环展开为"全 gather+add → 全 store"两阶段。
 
@@ -191,7 +191,7 @@ gather_adds_kernel<<<num_blocks, THREAD_NUM, dyn_ubuf_size, stream>>>(
 
 **预期优化收益**：
 
-- **Case 5 → Case 6**：核数从 1024 降到 64 匹配物理核，消除多余逻辑核的串行等待开销，每核工作集从 256 增加到 4096，调度头开销摊薄到更多有效计算上
+- **Case 5 → Case 6**：核数从 1024 降到 64 匹配物理核，消除多余逻辑核的串行等待开销，每核工作集从 1024 增加到 16384，调度头开销摊薄到更多有效计算上
 
 **优化手段**：
 
