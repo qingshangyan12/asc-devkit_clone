@@ -30,9 +30,7 @@
   - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]
   - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]
 
-- 样例规格：
-
-
+**样例规格：**
 
 <table>
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -56,10 +54,10 @@
 | aic_mac_ratio | Cube 计算单元的时间占比，反映计算单元利用率 |
 | aic_mte1_time(μs) | MTE1（L1 到 L0A/L0B 搬运）的执行时间 |
 | aic_mte1_ratio | MTE1 的时间占比，反映 L1 到 L0 的数据搬运压力 |
-| aic_mte2_time(μs) | MTE2（GM 到 L1 搬运）的执行时间 |
+| aic_mte2_time(μs) | MTE2（[GM](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（Global Memory） 到 L1 搬运）的执行时间 |
 | aic_mte2_ratio | MTE2 的时间占比，反映 GM 到 L1 的数据加载压力 |
-| aic_fixpipe_time(μs) | FixPipe（L0C 到 GM 搬运）的执行时间 |
-| aic_fixpipe_ratio | FixPipe 的时间占比，反映结果写回的访存压力 |
+| aic_fixpipe_time(μs) | [`Fixpipe`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)（L0C 到 GM 搬运）的执行时间 |
+| aic_fixpipe_ratio | [`Fixpipe`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md) 的时间占比，反映结果写回的访存压力 |
 
 
 ### 数据流路径：
@@ -68,7 +66,7 @@ GM ──(MTE2, DataCopy)──> L1 ──(MTE1, LoadData)──> L0A/L0B ──
        DataCopyInA/B             DataLoadA/B                   Compute             CopyOut
 ```
 
-### 核心特性
+### 中级性能优化
 
 #### 1. L1/L0 双缓冲 Ping-Pong 布局
 
@@ -131,12 +129,12 @@ nd2nzParams.dValue = baseK * stepKa;  // 大包包含 stepKa 个 baseM * baseK
 
 | 事件类型 | 方向 | 用途 | flag 编号 |
 |---------|------|------|----------|
-| MTE2_MTE1 | 正向 | L1 数据就绪通知，DataCopyIn 通知 DataLoad 可读取 | 0/1: A1 Ping/Pong; 2/3: B1 Ping/Pong |
-| MTE1_MTE2 | 反向 | L1 缓冲区释放通知，DataLoad 通知 DataCopyIn 可写入 | 同上 |
-| MTE1_M | 正向 | L0 数据就绪通知，DataLoad 通知 Compute 可计算 | mte1DBFlag (0/1 交替) |
-| M_MTE1 | 反向 | L0 缓冲区释放通知，Compute 通知 DataLoad 可写入 | mte1DBFlag (0/1 交替) |
+| [MTE2_MTE1](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | 正向 | L1 数据就绪通知，DataCopyIn 通知 DataLoad 可读取 | 0/1: A1 Ping/Pong; 2/3: B1 Ping/Pong |
+| [MTE1_MTE2](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | 反向 | L1 缓冲区释放通知，DataLoad 通知 DataCopyIn 可写入 | 同上 |
+| [MTE1_M](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | 正向 | L0 数据就绪通知，DataLoad 通知 Compute 可计算 | mte1DBFlag (0/1 交替) |
+| [M_MTE1](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | 反向 | L0 缓冲区释放通知，Compute 通知 DataLoad 可写入 | mte1DBFlag (0/1 交替) |
 
-**反向同步需预置**：由于反向同步是"消费方 SetFlag → 生产方 WaitFlag"，首次使用前必须预置 SetFlag，否则首次 WaitFlag 会死锁：
+**反向同步需预置**：由于反向同步是"消费方 [SetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) → 生产方 [WaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)"，首次使用前必须预置 SetFlag，否则首次 WaitFlag 会死锁：
 
 ```cpp
 // 初始化：预置反向同步 flag，防止首次 WaitFlag 死锁
@@ -163,7 +161,7 @@ if ((kOffsetInChunkA + 1) == stepKa) {
 
 #### 4. LoadData3D 替代 LoadData2D——减少指令队列占用
 
-在 Atlas A2/A3 架构上，本样例使用 `LoadData3DParamsV2`（即 LoadData3D）替代 `LoadData2DParams`（即 LoadData2D）完成 L1→L0 的数据搬运。这是一个关键的指令队列优化。
+在 Atlas A2/A3 架构上，本样例使用 [`LoadData3DParamsV2`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/Load3D.md)（即 [LoadData3D](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/Load3D.md)）替代 [`LoadData2DParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/LoadData.md)（即 LoadData2D）完成 L1→L0 的数据搬运。这是一个关键的指令队列优化。
 
 **问题背景**：MTE1 指令队列深度为 32。使用 LoadData2D 时，由于单条 LoadData2D 指令搬运粒度有限，搬运一个 baseM×baseK 的切片需要用 for 循环发射多条 LoadData2D 指令。例如 baseM=128、baseK=64 时，最少需要发射 `baseK/16 = 4` 条 LoadData2D 指令。
 
@@ -192,7 +190,7 @@ class KernelMmad { ... };
 
 #### 7. UnitFlag 优化
 
-开启 UnitFlag 后，MMAD 和 FIXPIPE 实现细粒度（512B）流水并行，而非指令级同步。每当 Cube 完成一个 512B 数据结果的计算，FIXPIPE 立即搬出该数据，Cube 计算与结果写回流水重叠：
+开启 UnitFlag 后，[MMAD](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md) 和 [FIXPIPE](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md) 实现细粒度（512B）流水并行，而非指令级同步。每当 Cube 完成一个 512B 数据结果的计算，FIXPIPE 立即搬出该数据，Cube 计算与结果写回流水重叠：
 
 ```cpp
 mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // 开启 UnitFlag
@@ -200,6 +198,8 @@ mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // 开启 UnitFlag
 
 - `unitFlag = 2`：中间 K 块，MMAD 计算结果不立即写回，而是等待下一个 512B 完成后流水搬出
 - `unitFlag = 3`：最后一个 K 块，通知 FIXPIPE 将所有剩余结果写回 GM
+
+### 高级极限打磨
 
 #### 8. DataCopyIn 优先搬运 B 矩阵
 
@@ -234,7 +234,7 @@ for (uint32_t outerMIdx = 0; outerMIdx < outerMLoopCount; outerMIdx++) {
 }
 ```
 
-#### 10. K 方向主循环完整流程
+#### K 方向主循环完整流程
 
 以 stepKa=8、stepKb=4 为例，展示一个完整 (mBlockIdx, nBlockIdx) 子块内 K 方向循环的详细执行流程：
 
@@ -455,22 +455,77 @@ $$MTE2耗时误差 = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
   test pass!
   ```
 
-## 性能分析
+## 功能调试
 
-使用 `msprof` 工具获取详细性能数据：
+### printf
 
-```bash
-msprof ./demo   # 分析样例性能
+该接口提供CPU域或NPU域调试场景下的格式化输出功能。
+
+在算子kernel侧实现代码中需要输出日志信息的地方调用printf接口打印相关内容。
+
+示例如下：
+
+```cpp
+AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 ```
 
-当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存 Host 和各个 Device 的性能数据汇总，性能数据分析推荐查看该目录下文件：
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存 Host 和各个 Device 的性能数据汇总
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
+> [!CAUTION]注意 
+>printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0的方式关闭打印功能。
+
+### DumpTensor
+
+基于算子工程开发的算子，可以使用该接口Dump指定Tensor的内容。同时支持打印自定义的附加信息（仅支持uint32\_t数据类型的信息），比如打印当前行号等。
+
+在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
+
+```cpp
+AscendC::DumpTensor(cLocal, baseM * baseN);
 ```
+
+> [!CAUTION]注意 
+>DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0来关闭打印功能。
+
+## 性能调试
+
+### msProf工具介绍
+
+msProf工具是单算子性能分析工具，包含msprof op和msprof op simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。
+
+#### 上板性能采集
+
+通过上板性能采集，可以直接测定算子在昇腾AI处理器上的运行时间。基于可执行文件demo通过msprof op执行算子调优：
+
+```bash
+msprof op ./demo
+```
+
+命令完成后，会在当前目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹，性能数据文件夹结构示例如下：
+
+```bash
+├──dump                       # 原始的性能数据，用户无需关注
+├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+├──OpBasicInfo.csv            # 算子基础信息
+├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+└──visualize_data.bin         # MindStudio Insight呈现文件
+```
+
+查看具体的性能分析结果：
+```bash
+cat ./OPPROF_*/OpSummary.csv
+```
+
+#### 仿真性能采集
+
+使用msprof op simulator可以在无NPU环境下通过仿真获取算子性能数据：
+
+```bash
+msprof op simulator ./demo
+```
+
+> **注意：** 仿真模式需使用`-DCMAKE_ASC_RUN_MODE=sim`编译。
+更多msProf工具使用方式请参考[MindStudio工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)算子调优（msOpProf）中的内容。
