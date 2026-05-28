@@ -8,8 +8,8 @@
 | <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品AI Core | √ </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品Vector Core | x </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 AI Core | √ </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 Vector Core | x </cann-filter>|
 | <cann-filter npu-type="910">Atlas 训练系列产品 | x </cann-filter>|
 
 ## 功能说明
@@ -36,16 +36,16 @@ __aicore__ inline void GetArchVersion(uint32_t& coreVersion)
 
 ## 约束说明
 
-架构版本号为十六进制编码，建议使用十六进制格式（如`%x`）输出查看，或者自行转换成十六进制的数，以便与[架构版本号对照表](#table1)对应。
+架构版本号为十六进制编码，建议使用十六进制格式（如`%x`）输出查看，或者自行转换成十六进制数，以便与[架构版本号对照表](#table1)对应。
 
 ## 调用示例
 
-如下样例通过调用GetArchVersion接口获取AI处理器架构版本号。
+如下样例通过调用`GetArchVersion`接口获取AI处理器的架构版本号。
 
 ```cpp
 uint32_t coreVersion = 0;
 AscendC::GetArchVersion(coreVersion);
-AscendC::printf("core version is %x", coreVersion); //需用%x将其打印成十六进制的数
+AscendC::printf("core version is %x", coreVersion); //需用%x将其打印成十六进制数
 ```
 
 不同型号服务器有不同的架构版本号取值，如下表所示：
@@ -54,6 +54,6 @@ AscendC::printf("core version is %x", coreVersion); //需用%x将其打印成十
 
 | 架构版本号 | 型号 |
 | --- | --- |
-| <cann-filter npu-type="310p">200 | Atlas 推理系列产品AI Core</cann-filter> |
-| <cann-filter npu-type="A3,910b">220 | Atlas A2 训练系列产品/Atlas A2 推理系列产品<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter> |
 | <cann-filter npu-type="950">暂未正式确定，请以最终商发版本说明为准。 | Ascend 950PR/Ascend 950DT</cann-filter> |
+| <cann-filter npu-type="A3,910b">220 | Atlas A2 训练系列产品/Atlas A2 推理系列产品<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter> |
+| <cann-filter npu-type="310p">200 | Atlas 推理系列产品 AI Core</cann-filter> |
