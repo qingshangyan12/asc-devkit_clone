@@ -9,6 +9,7 @@
 - Ascend 950PR/Ascend 950DT
 
 ## 支持的CANN软件版本
+
 - \>= CANN 9.0.0
 
 ## 目录结构
@@ -32,14 +33,10 @@
 - 算子规格：  
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">gather_1d</td></tr>
-  </tr>
   <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">input</td><td align="center">100000</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td align="center">index</td><td align="center">12288</td><td align="center">int32_t</td><td align="center">ND</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">12288</td><td align="center">float</td><td align="center">ND</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_1d_custom</td></tr>
   </table>
 
