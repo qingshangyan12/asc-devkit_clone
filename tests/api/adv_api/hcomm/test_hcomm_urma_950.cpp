@@ -75,11 +75,6 @@ public:
         sqTail_ = sqHead_;
     }
 
-    uint32_t GetSqHead() const
-    {
-        return sqHead_;
-    }
-
 private:
     void InitBuffer(AscendC::RegedBufferEntity& buffer, uint64_t addr, uint64_t size, uint32_t tokenId,
         uint32_t tokenValue)
@@ -126,8 +121,23 @@ protected:
     {
         pipe_.InitBuffer(hcommBuf_, AscendC::HCOMM_URMA_TMP_BUF_SIZE);
         AscendC::LocalTensor<uint8_t> hcommLocal = hcommBuf_.Get<uint8_t>();
-        return hcomm.Init(reinterpret_cast<__ubuf__ uint8_t*>(hcommLocal.GetPhyAddr()),
-            AscendC::HCOMM_URMA_TMP_BUF_SIZE);
+        __ubuf__ uint8_t* bufPtr = reinterpret_cast<__ubuf__ uint8_t*>(hcommLocal.GetPhyAddr());
+        for (uint32_t i = 0; i < AscendC::HCOMM_URMA_TMP_BUF_SIZE; i++) {
+            bufPtr[i] = 0;
+        }
+        return hcomm.Init(bufPtr, AscendC::HCOMM_URMA_TMP_BUF_SIZE);
+    }
+
+    // Read sqPI value from hcomm UB buffer using the same offset layout as Init:
+    // wqeItem_: HCOMM_URMA_WQE_U32_NUM uint32_t's
+    // cqeItem_: HCOMM_URMA_CQE_U32_NUM uint32_t's
+    // sqPI_: starts at (WQE_U32_NUM + CQE_U32_NUM) uint32_t offset
+    uint32_t GetSqPIFromBuf()
+    {
+        AscendC::LocalTensor<uint32_t> hcommLocal = hcommBuf_.Get<uint32_t>();
+        constexpr uint32_t sqPIIdx =
+            AscendC::HCOMM_URMA_WQE_U32_NUM + AscendC::HCOMM_URMA_CQE_U32_NUM;
+        return hcommLocal.GetValue(sqPIIdx);
     }
 
 private:
@@ -186,6 +196,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify)
 }
 
 // WriteWithNotifyNbi occupies 2 BBs, WriteNbi occupies 1 BB
+// Verified by reading sqPI value directly from the UB buffer
 TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify_WqeBbCnt)
 {
     UrmaChannelResource channel;
@@ -193,23 +204,23 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify_WqeBbCnt)
     AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
     EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
 
-    // WriteNbi should advance sqHead by 1
+    // WriteNbi should advance sqPI by 1
     AscendC::HcommHandle h0 = hcomm.WriteNbi<false>(
         channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1008), reinterpret_cast<GM_ADDR>(0x2008), 8);
     EXPECT_EQ(h0, 0);
-    EXPECT_EQ(channel.GetSqHead(), 1U);
+    EXPECT_EQ(GetSqPIFromBuf(), 1U);
 
-    // WriteWithNotifyNbi should advance sqHead by 2
+    // WriteWithNotifyNbi should advance sqPI by 2
     AscendC::HcommHandle h1 = hcomm.WriteWithNotifyNbi<false>(channel.GetHandle(),
         reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8, reinterpret_cast<GM_ADDR>(0x33), 1);
     EXPECT_EQ(h1, 1);
-    EXPECT_EQ(channel.GetSqHead(), 3U);
+    EXPECT_EQ(GetSqPIFromBuf(), 3U);
 
     // Another WriteNbi should advance by 1 more
     AscendC::HcommHandle h2 = hcomm.WriteNbi<false>(
         channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1008), reinterpret_cast<GM_ADDR>(0x2008), 8);
     EXPECT_EQ(h2, 2);
-    EXPECT_EQ(channel.GetSqHead(), 4U);
+    EXPECT_EQ(GetSqPIFromBuf(), 4U);
 }
 
 // Remote buffer lookup failure when address is out of range
