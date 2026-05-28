@@ -119,16 +119,16 @@ Unified Buffer或Global Memory上的初始数据。
     __global__ __launch_bounds__(256) void count_error_status(uint32_t *error_count,
                                                          uint32_t *status,
                                                          uint32_t n)
-{
-    uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= n) {
-        return;
-    }
+    {
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= n) {
+            return;
+        }
 
-    if (status[idx] != 0U) {
-        asc_atomic_add(error_count, 1U);
+        if (status[idx] != 0U) {
+            asc_atomic_add(error_count, 1U);
+        }
     }
-}
     ```
 
 -   SIMD与SIMT混合编程场景：
