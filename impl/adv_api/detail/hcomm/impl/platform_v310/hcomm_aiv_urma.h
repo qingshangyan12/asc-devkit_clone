@@ -293,7 +293,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Po
     sqeGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqeAddr);
     PipeBarrier<PIPE_ALL>();
     constexpr uint32_t wqeBbCnt = opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY ? 2U : 1U;
-    DataCopy(sqeGlobal, wqeItem_, wqeSize * wqeBbCnt / 4);
+    DataCopy(sqeGlobal, wqeItem_, wqeSize * wqeBbCnt / sizeof(uint32_t));
     PipeBarrier<PIPE_ALL>();
 
     HcommHandle handleId = ++curHandleId_;
@@ -339,7 +339,7 @@ __aicore__ inline uint32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::PollC
         uint32_t times = 0;
         while ((validOwner ^ cqeUb->owner) == 0 && times < HCOMM_URMA_MAX_RETRY_TIMES) {
             PipeBarrier<PIPE_ALL>();
-            DataCopy(cqeItem_, cqeGlobal, cqeSize / 4);
+            DataCopy(cqeItem_, cqeGlobal, cqeSize / sizeof(uint32_t));
             PipeBarrier<PIPE_ALL>();
             times++;
         }
