@@ -478,8 +478,9 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         uint64_t token;
         CHK_RET(GetTokenFormBuffInfo(opParam, resCtxHost, token));
         std::shared_ptr<CcuTaskArgKfcServer> kfcServerArgs = std::make_shared<CcuTaskArgKfcServer>(
-            opResCtx.ckeAddr, opResCtx.xnAddr, 1, 1, 0, token); // 1 1 0 for ccuAlltoAllMesh1D
+             opResCtx.xnAddr, opResCtx.ckeAddr, 1, 1, 0, token); // 1 1 0 for ccuAlltoAllMesh1D
         resCtxHost->kfcServerArgs = kfcServerArgs.get();
+        resCtxHost->kfcServerArgSize = 6;
     }
     opParam.resCtx = *resCtxOut;
     return HCCL_SUCCESS;
