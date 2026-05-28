@@ -62,6 +62,8 @@ private:
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
+        static_assert(Std::is_same_v<dstPos, Location::L0B>, "CopyL12L0B dst must be L0B.");
+        static_assert(Std::is_same_v<srcPos, Location::L1>, "CopyL12L0B src must be L1.");
         using DstLayout = typename T::layoutType;
         using SrcLayout = typename U::layoutType;
         using DstPattern = GetLayoutPattern<DstLayout>;
@@ -70,7 +72,7 @@ private:
         constexpr auto noTrans = Std::is_same_v<DstPattern, SrcPattern>;
         using CopyL12L0BMode = typename CopyL12L0BModeSet::template Get<Std::tuple<Std::Int<noTrans>, Std::Int<isB8B4Type>>>;
         static_assert(!Std::is_same_v<CopyL12L0BMode, Std::ignore_t>, "Unsupported CopyL12L0BMode.");
-        using Tensor2Tensor = typename CopyL12L0BTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern, CopyL12L0BMode>::type;
+        using Tensor2Tensor = typename CopyL12L0BRouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern, CopyL12L0BMode>::type;
         Tensor2Tensor::template Run<trait, T, U>(dst, src);
     }
 
@@ -79,6 +81,8 @@ private:
     {
         using dstPos = GetMemLocation<T>; 
         using srcPos = GetMemLocation<U>; 
+        static_assert(Std::is_same_v<dstPos, Location::L0B>, "CopyL12L0B dst must be L0B.");
+        static_assert(Std::is_same_v<srcPos, Location::L1>, "CopyL12L0B src must be L1.");
         using DstLayout = typename T::layoutType; 
         using SrcLayout = typename U::layoutType; 
         using DstPattern = GetLayoutPattern<DstLayout>; 
@@ -87,7 +91,7 @@ private:
         constexpr auto noTrans = Std::is_same_v<DstPattern, SrcPattern>; 
         using CopyL12L0BMode = typename CopyL12L0BModeCoordSet::template Get<Std::tuple<Std::Int<noTrans>, Std::Int<isB8B4Type>>>; 
         static_assert(!Std::is_same_v<CopyL12L0BMode, Std::ignore_t>, "Unsupported CopyL12L0BCoordMode."); 
-        using Tensor2Tensor = typename CopyL12L0BTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern, SrcPattern, CopyL12L0BMode>::type; 
+        using Tensor2Tensor = typename CopyL12L0BRouting<CURRENT_ARCH_VERSION, DstPattern, SrcPattern, CopyL12L0BMode>::type;
         Tensor2Tensor::template Run<trait, T, U, Coord>(dst, src, coord); 
     }
 };
