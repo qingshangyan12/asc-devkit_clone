@@ -539,6 +539,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     u32 dataCount = 0; // 算子上报dfx的数据量
     u64 varMemSize{0};
     u8 varData[0];
+    u64 ccuKfcArgs[4];          // 测试，ccu-kfc作为通信算子
 };
 
 struct AlgDesc {

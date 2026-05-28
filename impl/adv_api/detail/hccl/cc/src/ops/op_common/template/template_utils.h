@@ -196,6 +196,7 @@ struct TemplateDataParams {
     std::vector<u64> recvCounts;
     std::vector<u64> sdispls;
     std::vector<u64> rdispls;
+    std::vector<u64> ccuKfcArgs;
 
     std::vector<char> Serialize() const
     {

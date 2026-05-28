@@ -23,7 +23,8 @@
 extern "C" {
 #endif
 
-HcclResult HcclKfcServer(HcclComm comm, aclrtStream stream);
+HcclResult HcclKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize, HcclComm comm, aclrtStream stream);
+
 
 #ifdef __cplusplus
 }
@@ -33,8 +34,8 @@ namespace ops_hccl {
 
 HcclResult CheckKfcServerInputPara(const HcclComm comm, const aclrtStream stream);
 
-HcclResult KfcServerConstructOpParam(HcclComm comm, aclrtStream stream, const std::string &tag, HcclCMDType opType, 
-    u32 rankSize, OpMode opMode, OpParam &param);
+HcclResult KfcServerConstructOpParam(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize, HcclComm comm, aclrtStream stream,
+    const std::string &tag, HcclCMDType opType, u32 rankSize, OpMode opMode, OpParam &param);
 
 HcclResult KfcServerOutPlaceCommon(HcclComm comm, aclrtStream stream, const std::string &tag, HcclCMDType opType,
     u32 rankSize, bool &useInnerOp, OpMode opMode, const ResPackGraphMode &resPack);

@@ -68,13 +68,12 @@ HcclResult CcuTempKfcServer::KernelRun(const OpParam& param,
                                        const TemplateDataParams& templateDataParams,
                                        TemplateResource& templateResource)
 {
-    (void)templateResource;
-    // TODO：这边的参数怎么计算
-    // templateDataParams与templateResource需要在前面配置，taskArg值传递需要对齐
-    // TODO：这些都需要传递进来OpResCtx &opResCtx
-    uint64_t xnAddr;          
-    uint64_t ckeAddr; 
-    uint64_t token; 
+    // 此处仅用于当CCU-KFC作为通信算子时使用
+    uint64_t xnAddr = templateDataParams.ccuKfcArgs[0];          
+    uint64_t ckeAddr = templateDataParams.ccuKfcArgs[1]; 
+    uint64_t workSpace = templateDataParams.ccuKfcArgs[2]; 
+    uint64_t workSpaceSize = templateDataParams.ccuKfcArgs[3];
+    uint64_t token = ccu:GetTokenInfo(workSpace, workSpaceSize);
 
     // 临时用于参数测试
     uint64_t dieNum = 1;                
