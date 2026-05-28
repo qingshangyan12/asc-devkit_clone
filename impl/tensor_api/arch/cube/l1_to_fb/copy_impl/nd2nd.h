@@ -1,15 +1,16 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning "nd2nd.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#warning                                                                                                               \
+    "impl/tensor_api/arch/cube/l1_to_fb/copy_impl/nd2nd.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -18,20 +19,19 @@
  * \file nd2nd.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_NPU_ARCH_3510_ND2ND_H
-#define IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_NPU_ARCH_3510_ND2ND_H
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_COPY_IMPL_ND2ND_H
+#define IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_COPY_IMPL_ND2ND_H
 
-#include "impl/tensor_api/arch/cube/l1_to_fb/npu_arch_3510/instruction.h"
+#include "impl/tensor_api/arch/cube/l1_to_fb/copy_impl/instruction.h"
 
 namespace AscendC {
 namespace Te {
 
-struct CopyL12FBTrait {};
-
-class DataCopyL12FB3510 {
+class CopyL12FBND {
 public:
     template <const CopyL12FBTrait& trait, typename T, typename U>
-    __aicore__ inline static void Run(const T& dst, const U& src) {
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    {
         DataCopyImpl<trait, T, U>(dst, src);
     }
 
@@ -44,7 +44,7 @@ private:
     }
 
     template <const CopyL12FBTrait& trait, typename T, typename U>
-    __aicore__ inline static auto DataCopyImpl(const T& dst, const U& src)
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
     {
         CheckTemplate<trait, T, U>();
 
@@ -90,10 +90,12 @@ private:
     }
 };
 
+using DataCopyL12FB3510 = CopyL12FBND;
+
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_NPU_ARCH_3510_ND2ND_H
+#endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_COPY_IMPL_ND2ND_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
