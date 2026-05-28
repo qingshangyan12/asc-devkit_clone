@@ -48,12 +48,12 @@ HcclResult CcuKernelKfcServer::InitResource()
 
 void CcuKernelKfcServer ::LoadArgs()
 {
-    Load(xnAddr_);
-    Load(ckeAddr_);
-    Load(token_);
-    Load(dieNum_);
-    Load(missionNum_);
-    Load(missionIndex_);
+    LoadArg(xnAddr_, 0);        // Done：加载参数
+    LoadArg(ckeAddr_, 1);
+    LoadArg(token_, 2);
+    LoadArg(dieNum_, 3);
+    LoadArg(missionNum_, 4);
+    LoadArg(missionIndex_, 5);
 }
 
 void CcuKernelKfcServer::SetCommAddr(ccu::Variable syncAddr)
@@ -69,7 +69,8 @@ void CcuKernelKfcServer::SetCommAddr(ccu::Variable syncAddr)
 void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 {
     // 参数合法值判断
-    uint32_t getDieId = 0;                                                  //TODO GetDieId()
+    die_num_ = dieNum;
+    uint32_t getDieId = 1;                                                  //TODO GetDieId()
     bool isDieNumValid = (dieNum == SINGLE_DIE || dieNum == DOUBLE_DIE);
     bool isDieIdValid  = (getDieId == DIE0_ID || getDieId == DIE1_ID);          
     if (!(isDieNumValid && isDieIdValid)) {
@@ -90,16 +91,17 @@ void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 void CcuKernelKfcServer::SetMissionNumAndId(ccu::Variable miNum, ccu::Variable miIndex)
 {
     if (missionIndex_ >= miNum) {
-        THROW<InvalidParamsException>("MC2 High Level API SetMissionNumAndId Failed: Invalid Mission Config");
+        HCCL_ERROR("MC2 High Level API SetMissionNumAndId Failed: Invalid Mission Config");
+        return;
     }
 
-    uint32_t getDieId = 0;
+    uint32_t getDieId = 1;
     if (miNum > 1) { // 多Mission场景才需要导入导出
         if (miIndex == 0) {
             // miIndex = 0 为Master，需要missionNum - 1个导入导出信号以及missionNum - 1个导入变量
             for (uint32_t i = 0; i < miNum - 1; ++i) {
                 exportMissoinSig_ = "master_sig_0_1";
-                importMissionSig_="slave_sig_0_1";
+                importMissionSig_ = "slave_sig_0_1";
             }
         } else {
             // miIndex > 0 为Slave，需要1个导入导出信号以及1个导出变量
@@ -190,7 +192,7 @@ void Mc2KfcServer::GenCircularQueue()
         hcomm::ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
-            ccu::callFunc<CcuKernelAlltoAllMesh1D>(param, token);   //给通信算子自己解析
+            ccu::callFunc<CcuKernelAlltoAllMesh1D>(param, token_);   //给通信算子自己解析
         }
 
         MissionPostSync();
@@ -212,7 +214,7 @@ void Mc2KfcServer::GenCircularQueue()
 
 void Mc2KfcServer::WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartSig)
 {
-    const uint32_t getDieId = DIE0_ID;
+    const uint32_t getDieId = 1;
     if (dieNum_ == SINGLE_DIE) {
         CCU_WHILE(turnStartSig != 1)
         {
@@ -237,7 +239,7 @@ void Mc2KfcServer::WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variab
 
 void Mc2KfcServer::SetTurnEndSig(const ccu::Variable &hbmSigAddr, const ccu::Variable &turnEndSig)
 {
-    const uint32_t getDieId = DIE0_ID;
+    const uint32_t getDieId = 1;
     if (dieNum_ == SINGLE_DIE) {
         Store(turnEndSig, hbmSigAddr);
     } else {
@@ -256,7 +258,7 @@ void Mc2KfcServer::LoadFuncParamFromMemory(ccu::Variable &paramAddr, array<ccu::
     doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
     ccu::Variable addr;
     addr = paramAddr;
-    const uint32_t getDieId = DIE0_ID;
+    const uint32_t getDieId = 1;
     if (dieNum_ == DOUBLE_DIE && getDieId == DIE1_ID) {
         addr += doubleDie;
     }
@@ -294,7 +296,7 @@ void Mc2SlaveKfcServer::GenCircularQueue()
         hcomm::ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
-            ccu::callFunc<CcuKernelAlltoAllMesh1D>(param, token);   //给通信算子自己解析
+            ccu::callFunc<CcuKernelAlltoAllMesh1D>(param, token_);   //给通信算子自己解析
         }
 
         MissionPostSync();
