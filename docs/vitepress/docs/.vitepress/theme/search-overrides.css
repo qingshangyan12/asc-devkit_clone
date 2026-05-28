@@ -1,242 +1,292 @@
-/* VPLocalSearchBox → DocSearch-style complete restyle */
+/* Pagefind search dialog — styled to match original VPLocalSearchBox */
 
 /* Modal shell */
-html .VPLocalSearchBox .shell {
-  border-radius: 12px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 0, 0, 0.08);
-  padding: 0;
-  gap: 0;
-  overflow: hidden;
+html [command-dialog-wrapper] {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
   max-width: min(100vw - 60px, 750px) !important;
   width: min(100vw - 60px, 750px) !important;
+  margin-top: 12vh !important;
+  background: var(--vp-c-bg-soft) !important;
 }
 
-html.dark .VPLocalSearchBox .shell {
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.2);
+html.dark [command-dialog-wrapper] {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
-html .VPLocalSearchBox .backdrop {
+/* Backdrop */
+html [command-dialog-mask] {
   background: rgba(0, 0, 0, 0.5) !important;
 }
 
-html.dark .VPLocalSearchBox .backdrop {
+html.dark [command-dialog-mask] {
   background: rgba(0, 0, 0, 0.7) !important;
 }
 
 /* Search bar */
-html .VPLocalSearchBox .search-bar {
-  border: none;
-  border-bottom: 1px solid var(--vp-c-divider);
-  border-radius: 0;
-  padding: 12px 16px;
-  box-shadow: none !important;
-  gap: 8px;
-}
-
-html .VPLocalSearchBox .search-input {
-  padding: 8px 0;
-  font-size: 16px;
-}
-
-html .VPLocalSearchBox .search-bar:focus-within {
-  border-color: var(--vp-c-brand-1);
+html [command-dialog-header] {
+  border: none !important;
+  border-bottom: 1px solid var(--vp-c-divider) !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
   box-shadow: none !important;
 }
 
-html .VPLocalSearchBox .search-icon {
-  margin: 0;
-  font-size: 20px;
-  color: var(--vp-c-text-3);
-  flex-shrink: 0;
+html [command-dialog-header] .search-bar {
+  border: none !important;
+  padding: 12px 16px !important;
+  gap: 8px !important;
+  border-radius: 0 !important;
 }
 
-html .VPLocalSearchBox .search-actions button {
-  padding: 6px;
-  border-radius: 6px;
+html [command-input] {
+  padding: 8px 0 !important;
+  font-size: 16px !important;
+  background: transparent !important;
+  color: var(--vp-c-text-1) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+html [command-input]::placeholder {
+  color: var(--vp-c-text-3) !important;
+}
+
+/* Close / back button */
+html [command-dialog-header] .back-button {
+  padding: 6px !important;
+  border-radius: 6px !important;
+  color: var(--vp-c-text-3) !important;
+}
+
+html [command-dialog-header] .back-button:hover {
+  background: var(--vp-c-bg-alt) !important;
+  color: var(--vp-c-text-1) !important;
+}
+
+/* Search icon before input */
+html [command-dialog-header] .search-actions.before .local-search-icon {
+  font-size: 20px !important;
+  color: var(--vp-c-text-3) !important;
+}
+
+/* Clear / toggle buttons */
+html [command-dialog-header] .search-actions button {
+  padding: 6px !important;
+  border-radius: 6px !important;
+  color: var(--vp-c-text-3) !important;
+}
+
+html [command-dialog-header] .search-actions button:hover {
+  background: var(--vp-c-bg-alt) !important;
+  color: var(--vp-c-brand-1) !important;
 }
 
 /* Results area */
-html .VPLocalSearchBox .results {
-  padding: 8px 8px;
-  gap: 0;
-  max-height: 460px;
+html [command-dialog-body] {
+  padding: 8px !important;
 }
 
-/* Each result card */
-html .VPLocalSearchBox .result {
-  display: flex;
+html [command-list] {
+  max-height: 460px !important;
+  padding: 0 !important;
+  overflow-y: auto !important;
+}
+
+/* Result heading */
+html [command-group-heading] {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--vp-c-brand-1) !important;
+  padding: 0 8px 4px !important;
+  margin: 0 !important;
+  line-height: 20px !important;
+}
+
+/* Each result item */
+html [command-item] {
+  display: flex !important;
+  align-items: flex-start !important;
   border: none !important;
-  border-radius: 6px;
-  transition: background-color 0.15s ease;
-  margin: 0 4px;
-  align-items: flex-start;
+  border-radius: 6px !important;
+  transition: background-color 0.15s ease !important;
+  margin: 0 4px !important;
+  padding: 0 !important;
+  height: auto !important;
+  min-height: auto !important;
+  background: transparent !important;
 }
 
-html .VPLocalSearchBox .result > div {
-  margin: 10px 12px;
+html [command-item] .link {
+  margin: 10px 14px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-html .VPLocalSearchBox .result:hover {
-  --vp-local-search-result-bg: var(--vp-c-bg-soft);
+html [command-item]:hover {
+  background: var(--vp-c-bg-alt) !important;
 }
 
-html .VPLocalSearchBox .result.selected {
-  --vp-local-search-result-bg: var(--vp-c-bg-soft);
-  border: none !important;
-  box-shadow: inset 0 0 0 2px var(--vp-c-brand-1);
+html [command-item][aria-selected="true"] {
+  background: var(--vp-c-bg-alt) !important;
+  box-shadow: inset 0 0 0 2px var(--vp-c-brand-1) !important;
+  color: inherit !important;
 }
 
-/* Result content: normal order — path → title → excerpt */
-html .VPLocalSearchBox .result > div {
-  display: flex;
-  flex-direction: column;
-  margin: 10px 14px;
-  flex: 1;
-  min-width: 0;
+/* Breadcrumb row */
+html [command-item] .breadcrumb-row {
+  font-size: 11px !important;
+  color: var(--vp-c-text-3) !important;
+  line-height: 1.4 !important;
+  opacity: 0.7 !important;
 }
 
-/* Title area: breadcrumb path inline (line 1), page title alone (line 2) */
-html .VPLocalSearchBox .titles {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0;
-  row-gap: 2px;
+/* Result title area */
+html [command-item] .title {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: baseline !important;
+  gap: 0 !important;
+  row-gap: 2px !important;
 }
 
-html .VPLocalSearchBox .title-icon {
+/* Breadcrumb path - from pagefind meta title */
+html [command-item] .headings {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--vp-c-text-1) !important;
+  line-height: 1.4 !important;
+}
+
+html [command-item] .headings i.prefix {
   display: none !important;
 }
 
-html .VPLocalSearchBox .vpi-chevron-right {
-  display: none !important;
+/* Excerpt */
+html [command-item] .des {
+  max-height: 1.4em !important;
+  opacity: 0.75 !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  margin-top: 2px !important;
+  color: var(--vp-c-text-2) !important;
 }
 
-html .VPLocalSearchBox .title.main {
-  flex: 0 0 100%;
-  order: 1;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--vp-c-text-1);
-  line-height: 1.4;
+html [command-item][aria-selected="true"] .des {
+  opacity: 1 !important;
 }
 
-html .VPLocalSearchBox .title:not(.main) {
-  flex: 0 0 auto;
-  order: 0;
-  font-size: 12px;
-  color: var(--vp-c-text-2);
-  line-height: 1.4;
-  white-space: nowrap;
+/* Highlight (mark) */
+html [command-item] .des mark,
+html [command-item] .headings mark {
+  background-color: var(--vp-c-brand-light) !important;
+  color: var(--vp-c-brand-dark) !important;
+  border-radius: 2px !important;
+  padding: 0 2px !important;
+  font-weight: inherit !important;
 }
 
-/* Breadcrumb separator between inline path items */
-html .VPLocalSearchBox .title:not(.main)::after {
-  content: '\203a';
-  margin: 0 4px;
-  opacity: 0.5;
-}
-
-html .VPLocalSearchBox .title:not(.main):last-of-type::after {
-  content: none;
-}
-
-/* Page icon before each result — folder style */
-html .VPLocalSearchBox a.result::before {
-  content: '';
-  width: 16px;
-  height: 16px;
-  margin: 12px 0 0 14px;
-  flex-shrink: 0;
-  display: block;
-  background: var(--vp-c-text-2);
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z'/%3E%3C/svg%3E");
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  opacity: 0.5;
-}
-
-/* Excerpt: line 3, single line with overflow hidden */
-html .VPLocalSearchBox .excerpt-wrapper {
-  margin: 2px 0 0;
-}
-
-html .VPLocalSearchBox .excerpt {
-  max-height: 1.4em;
-  opacity: 0.75;
-  font-size: 12px;
-  line-height: 1.4;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-html .VPLocalSearchBox .result.selected .excerpt {
-  opacity: 1;
-}
-
-/* Highlight */
-html .VPLocalSearchBox .titles mark,
-html .VPLocalSearchBox .excerpt mark {
-  background-color: var(--vp-local-search-highlight-bg);
-  color: var(--vp-local-search-highlight-text);
-  border-radius: 2px;
-  padding: 0 1px;
-  font-weight: inherit;
-}
-
-html .VPLocalSearchBox .titles .text {
-  display: inline;
+html [command-item][aria-selected="true"] .des mark,
+html [command-item][aria-selected="true"] .headings mark,
+html [command-item]:hover .des mark,
+html [command-item]:hover .headings mark {
+  color: inherit !important;
+  text-decoration: underline !important;
+  background: none !important;
 }
 
 /* Footer */
-html .VPLocalSearchBox .search-keyboard-shortcuts {
-  padding: 10px 16px;
-  border-top: 1px solid var(--vp-c-divider);
-  font-size: 12px;
-  opacity: 0.5;
-  background: var(--vp-c-bg-soft);
-  gap: 16px;
-  justify-content: space-between;
-  flex-wrap: nowrap;
+html [command-dialog-footer] {
+  padding: 10px 16px !important;
+  border-top: 1px solid var(--vp-c-divider) !important;
+  font-size: 12px !important;
+  opacity: 0.7 !important;
+  background: var(--vp-c-bg-soft) !important;
+  gap: 16px !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
+  flex-direction: row !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
-html .VPLocalSearchBox .search-keyboard-shortcuts kbd {
-  border-radius: 4px;
-  padding: 2px 6px;
-  min-width: 20px;
-  font-size: 11px;
-  background: var(--vp-c-bg-alt);
-  border: 1px solid var(--vp-c-divider);
-  box-shadow: none;
+/* Footer shortcut keys */
+html [command-dialog-footer] .command-palette-commands-key {
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  min-width: 20px !important;
+  font-size: 11px !important;
+  background: var(--vp-c-bg-alt) !important;
+  border: 1px solid var(--vp-c-divider) !important;
+  box-shadow: none !important;
 }
 
-/* No results */
-html .VPLocalSearchBox .no-results {
-  padding: 32px 16px;
-  font-size: 14px;
-  color: var(--vp-c-text-2);
+html [command-dialog-footer] .command-palette-logo {
+  font-size: 12px !important;
 }
 
-/* Toggle button: keep accessible */
-html .VPLocalSearchBox .toggle-layout-button {
-  opacity: 0.5;
-  transition: opacity 0.15s;
+html [command-dialog-footer] .command-palette-logo a {
+  text-decoration: none !important;
+  color: var(--vp-c-text-3) !important;
 }
-html .VPLocalSearchBox .toggle-layout-button:hover {
-  opacity: 1;
+
+/* Empty state */
+html [command-empty] {
+  padding: 32px 16px !important;
+  font-size: 14px !important;
+  color: var(--vp-c-text-2) !important;
+  height: auto !important;
+}
+
+/* Toggle layout button */
+html [command-dialog-header] .toggle-layout-button {
+  opacity: 0.5 !important;
+}
+
+html [command-dialog-header] .toggle-layout-button:hover {
+  opacity: 1 !important;
+}
+
+/* Search button in nav bar */
+html .blog-search .nav-search-btn-wait {
+  color: var(--vp-c-text-2) !important;
+  border: 1px solid transparent !important;
+}
+
+html .blog-search .nav-search-btn-wait:hover {
+  border-color: var(--vp-c-brand-1) !important;
+  color: var(--vp-c-brand-1) !important;
+}
+
+html .blog-search .nav-search-btn-wait .search-tip {
+  color: var(--vp-c-text-2) !important;
 }
 
 /* Mobile overrides */
 @media (max-width: 767px) {
-  html .VPLocalSearchBox .shell {
-    margin: 0;
+  html [command-dialog-wrapper] {
+    margin: 0 !important;
     width: 100vw !important;
-    height: 100vh;
-    max-height: none;
-    border-radius: 0;
+    height: 100vh !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    max-width: none !important;
   }
 
-  html .VPLocalSearchBox .search-keyboard-shortcuts {
-    display: none;
+  html [command-dialog-footer] .command-palette-commands {
+    display: none !important;
   }
+}
+
+/* Remove default pagefind logo SVG sizing */
+html [command-dialog-footer] .command-palette-logo svg {
+  height: 16px !important;
+  width: auto !important;
 }

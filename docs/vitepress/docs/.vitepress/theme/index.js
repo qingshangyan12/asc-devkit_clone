@@ -14,10 +14,6 @@ import BackToTop from './BackToTop.vue'
 import './code-theme.css'
 import './search-overrides.css'
 
-if (typeof window !== 'undefined' && !window.localStorage.getItem('vitepress:local-search-detailed-list')) {
-  window.localStorage.setItem('vitepress:local-search-detailed-list', 'true')
-}
-
 import './filter.css'
 import './code-copy.js'
 
