@@ -121,6 +121,12 @@ function placeholderPlugin() {
 
 function fixCannFilterTags(src) {
   if (!/<(cann-filter|term|ph|__gm__|__ubuf__)\b/i.test(src)) return src
+
+  src = src.replace(
+    /<cann-filter\s+npu-type="(\w+)"\s*>([\s\S]*?)<\/cann-filter>/gi,
+    (_, type, content) => `\nCANNFILTER_DIV_${type}_OPEN\n${content}\nCANNFILTER_DIV_${type}_CLOSE\n`
+  )
+
   return src
     .replace(/<\/?cann-filter\b[^>]*>/gi, '')
     .replace(/<(term|ph|__gm__|__ubuf__)\b[^>]*>([\s\S]*?)<\/\1>/gis, '$2')
@@ -290,6 +296,10 @@ export default defineConfig({
         if (src.includes('<!-- RAW_HTML -->')) {
           const htmlContent = src.replace(/^.*<!-- RAW_HTML -->\s*/s, '').replace(/\s*$/, '')
           let html = addHeadingAnchors(htmlContent)
+          html = html.replace(
+            /<cann-filter\s+npu-type="(\w+)"\s*>([\s\S]*?)<\/cann-filter>/gi,
+            '<div data-filter="$1">$2</div>'
+          )
           html = escapeVueInterpolations(html)
           return `<div v-pre>\n${html}\n</div>`
         }

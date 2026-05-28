@@ -8,9 +8,7 @@ import CustomOutline from './CustomOutline.vue'
 <template>
   <DefaultTheme.Layout>
     <template #nav-bar-content-after>
-      <div style="display:none">
-        <FilterToggle />
-      </div>
+      <FilterToggle />
     </template>
     <template #aside-outline-before>
       <CustomOutline />

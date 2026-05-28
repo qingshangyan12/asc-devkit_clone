@@ -7,9 +7,14 @@ const isApiPage = ref(false)
 
 const filterOptions = [
   { value: 'all', label: '全量' },
-  { value: '950', label: '950' },
-  { value: 'A2', label: 'A2' },
-  { value: 'A3', label: 'A3' },
+  { value: '950', label: 'Ascend 950' },
+  { value: 'A3', label: 'Atlas A3' },
+  { value: '910b', label: 'Atlas A2' },
+  { value: '910', label: 'Atlas 训练系列' },
+  { value: '310p', label: 'Atlas 推理系列' },
+  { value: '310b', label: 'Atlas 200I/500 A2' },
+  { value: 'x90', label: 'Kirin X90' },
+  { value: '9030', label: 'Kirin 9030' },
 ]
 
 const selectedFilter = ref('all')
