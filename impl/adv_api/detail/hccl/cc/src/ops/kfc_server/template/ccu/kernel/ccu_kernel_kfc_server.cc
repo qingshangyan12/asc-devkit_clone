@@ -57,27 +57,19 @@ void CcuKernelKfcServer ::LoadArgs()
 }
 
 void CcuKernelKfcServer::SetCommAddr(ccu::Variable syncAddr)
-{
+{   
+    // 原本的应该是在入参处检查，这里仅用于set
+    // TODO：这里的比较应该提到外面去，即std::make_unique<CcuTaskArgKfcServer>之前
+    // Variable当前与u64的运算符仅重载了==,!=,=
     waitAddr_ = syncAddr;
-    if (syncAddr > (UINT64_MAX - CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE)) {
-        HCCL_ERROR("MC2 High Level API SetDieNum Failed: integer overflow occurs");
-        return;
-    }
     recordAddr_ = syncAddr + CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE; // 偏移8轮的总宽度
 }
 
 void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 {
-    // 参数合法值判断
-    die_num_ = dieNum;
-    uint32_t getDieId = 1;                                                  //TODO GetDieId()
-    bool isDieNumValid = (dieNum == SINGLE_DIE || dieNum == DOUBLE_DIE);
-    bool isDieIdValid  = (getDieId == DIE0_ID || getDieId == DIE1_ID);          
-    if (!(isDieNumValid && isDieIdValid)) {
-        HCCL_ERROR("MC2 High Level API SetDieNum Failed: Invalid Die Config");
-        return;
-    }
-
+    // TODO GetDieId()
+    // 原本的应该是在入参处检查，这里仅用于set 成员变量
+    // TODO：这里的比较应该提到外面去，即std::make_unique<CcuTaskArgKfcServer>之前
     if (dieNum == DOUBLE_DIE) { // 双Die场景才需要导入导出
         // 导出信号
         // Die0: export完成信号给Die1，Die1: export开始信号给Die0
@@ -90,29 +82,22 @@ void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 
 void CcuKernelKfcServer::SetMissionNumAndId(ccu::Variable miNum, ccu::Variable miIndex)
 {
-    if (missionIndex_ >= miNum) {
-        HCCL_ERROR("MC2 High Level API SetMissionNumAndId Failed: Invalid Mission Config");
-        return;
-    }
-
-    uint32_t getDieId = 1;
-    if (miNum > 1) { // 多Mission场景才需要导入导出
-        if (miIndex == 0) {
-            // miIndex = 0 为Master，需要missionNum - 1个导入导出信号以及missionNum - 1个导入变量
-            for (uint32_t i = 0; i < miNum - 1; ++i) {
-                exportMissoinSig_ = "master_sig_0_1";
-                importMissionSig_ = "slave_sig_0_1";
-            }
-        } else {
-            // miIndex > 0 为Slave，需要1个导入导出信号以及1个导出变量
-            // TODO：[这里暂且不会走进来]
-        }
+    // miNum与missionIndex_的校验应该在外面
+    // TODO：这里的比较应该提到外面去，即std::make_unique<CcuTaskArgKfcServer>之前
+    // 多Mission场景暂且不考虑
+    if (miIndex == 0) {
+        // miIndex = 0 为Master，需要missionNum - 1个导入导出信号以及missionNum - 1个导入变量
+        exportMissoinSig_ = "master_sig_0_1";
+        importMissionSig_ = "slave_sig_0_1";
+    } else {
+        // miIndex > 0 为Slave，需要1个导入导出信号以及1个导出变量
+        // TODO：[这里暂且不会走进来]
     }
 }
 
 HcclResult CcuKernelKfcServer::Algorithm()
 {
-    InitResource();
+    (void)InitResource();
     LoadArgs();                                
     SetCommAddr(ckeAddr_);                    
     SetDieNum(dieNum_);                         
@@ -134,10 +119,8 @@ void Mc2KfcServer::GenCircularQueue()
     repeatCond = 0;
 
     // <轮次执行开始信号>的寄存器
-    ccu::Variable turnStartSig;
-    turnStartSig = 0;
-    ccu::Variable turnEndSig;
-    turnEndSig = 1;
+    ccu::Variable turnStartSig = 0;
+    ccu::Variable turnEndSig = 1;
 
     ccu::Variable waitStartAddr;
     waitStartAddr = waitAddr_;
@@ -157,24 +140,16 @@ void Mc2KfcServer::GenCircularQueue()
     ccu::Variable paramSize;
     paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
 
-    ccu::Variable queueIdx;
-    queueIdx = 0;
-    ccu::Variable queueEnd;
-    queueEnd = CCU_TASK_NUM_MAX;
-    ccu::Variable one;
-    one = 1;
+    ccu::Variable queueIdx = 0;
+    ccu::Variable queueEnd = CCU_TASK_NUM_MAX;
+    ccu::Variable one = 1;
 
     // 存放<每轮算子参数>的寄存器
     ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
 
     CCU_WHILE(repeatCond == 0)
     {
-        if (waitAddr_ > (UINT64_MAX - (CCU_TASK_NUM_MAX - 1) * CCU_ONE_PARAM_SIZE)
-            || recordAddr_ > (UINT64_MAX - (CCU_TASK_NUM_MAX - 1) * CCU_ONE_PARAM_SIZE)
-            || xnAddr_ > (UINT64_MAX - (CCU_TASK_NUM_MAX - 1) * CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE)) {
-            HCCL_ERROR("[CcuKernelKfcServer] GenCircularQueue Failed: integer overflow occurs");
-            return;
-        }
+        // TODO：这里的比较应该提到外面去，即std::make_unique<CcuTaskArgKfcServer>之前
 
         // 等待本轮开始信号
         WaitTurnStartSig(waitAddr, turnStartSig);
@@ -304,22 +279,24 @@ void Mc2SlaveKfcServer::GenCircularQueue()
 }
 
 void CcuKernelKfcServer::MissionPreSync(ccu::Variable &func)
-{
+{   
+    // NOTE：当前missionNum_==1，空执行
     if (missionNum_ == 1) {
         return;
     }
     if (missionIndex_ == 0) {
-        // TODO：这里怎么改 [这里暂时不会走进来]
+        // TODO：这里怎么改
         for (uint32_t i = 0; i < missionNum_ - 1; ++i) {
             LocalCtxPostVar(func, importMissionVar_, importMissionSig_);    
         }
     } else {
-        // TODO：这里暂时不会走进来
+        // TODO
     }
 }
 
 void CcuKernelKfcServer::MissionPostSync()
 {
+    // NOTE：当前missionNum_==1，空执行
     if (missionNum_ == 1) {
         return;
     }
