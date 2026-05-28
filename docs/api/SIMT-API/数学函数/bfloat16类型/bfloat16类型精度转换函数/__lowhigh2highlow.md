@@ -19,10 +19,6 @@
 ## 函数原型
 
 ```
-inline half2 __lowhigh2highlow(const half2 x)
-```
-
-```
 inline bfloat16x2_t __lowhigh2highlow(const bfloat16x2_t x)
 ```
 
@@ -44,14 +40,10 @@ inline bfloat16x2_t __lowhigh2highlow(const bfloat16x2_t x)
 
 ## 需要包含的头文件
 
-使用bfloat16x2\_t接口需要包含"simt\_api/asc\_bf16.h"头文件，使用half2接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
 ```
 #include "simt_api/asc_bf16.h"
-```
-
-```
-#include "simt_api/asc_fp16.h"
 ```
 
 ## 调用示例
@@ -69,7 +61,7 @@ inline bfloat16x2_t __lowhigh2highlow(const bfloat16x2_t x)
         }
         output[idx] = __lowhigh2highlow(input[idx]);
     }
-    __global__ __launch_bounds__(1024) void cast_kernel(bfloat16_t* input, float16_t* output, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024) void cast_kernel(bfloat16_t* input, bfloat16_t* output, uint32_t input_total_length)
     {
         simt_lowhigh2highlow((bfloat16x2_t*)input, (bfloat16x2_t*)output, input_total_length);
     }
@@ -93,4 +85,3 @@ inline bfloat16x2_t __lowhigh2highlow(const bfloat16x2_t x)
         asc_vf_call<simt_lowhigh2highlow>(dim3(1024), (__gm__ bfloat16x2_t*)input, (__gm__ bfloat16x2_t*)output, input_total_length);
     }
     ```
-
