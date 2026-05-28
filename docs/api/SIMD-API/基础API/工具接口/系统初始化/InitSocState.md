@@ -8,8 +8,8 @@
 | <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √</cann-filter> |
 | <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √</cann-filter> |
 | <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x</cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | √</cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | √</cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core | √</cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品 Vector Core | √</cann-filter> |
 | <cann-filter npu-type = "910">Atlas 训练系列产品 | x</cann-filter> |
 
 ## 功能说明
@@ -23,7 +23,7 @@
     - 初始化[Mask工作模式](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/类库API/基础API/常用操作速查指导/如何使用掩码操作API.md)为Normal模式。
 
 - 在AIC上：
-    - 初始化[Load3D接口所需的A1(L1)/B1(L1)边界值](../../矩阵计算（ISASI）/数据搬运/SetLoadDataBoundary.md#功能说明)为0，表示无边界。
+    - 初始化[Load3D接口所需的A1(L1 Buffer)/B1(L1 Buffer)边界值](../../矩阵计算（ISASI）/数据搬运/SetLoadDataBoundary.md#功能说明)为0，表示无边界。
     - 初始化[Load3D接口调用时Pad填充的数值](../../矩阵计算（ISASI）/数据搬运/SetLoadDataPaddingValue.md#功能说明)为0。
 
 - 在AIV上：
