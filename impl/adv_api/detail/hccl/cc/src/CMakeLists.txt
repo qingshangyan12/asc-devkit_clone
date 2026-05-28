@@ -143,6 +143,7 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template/ccu
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template/ccu/kernel
+
     ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/legacy/common/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/legacy/common/exception
     ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/legacy/common/types
