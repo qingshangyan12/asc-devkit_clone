@@ -26,7 +26,7 @@
     }
     ```
 
-2.  完成host侧tiling开发时，设置的numBlocks代表的是AI Core和Vector Core的总数，比如用户在host侧设置numBlocks为10，则会启动总数为10的AI Core和Vector Core；为保证启动Vector Core，设置数值应大于AI Core的核数。您可以通过[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAic.md)接口获取AI Core的核数，[GetCoreNumVector](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumVector.md)接口获取Vector Core的核数。 如下代码片段，分别为使用kernel直调工程和自定义算子工程时的设置样例，此处设置为AI Core和Vector Core的总和，表示所有AI Core和Vector Core都启动。
+2.  完成host侧tiling开发时，设置的numBlocks代表的是AI Core和Vector Core的总数，比如用户在host侧设置numBlocks为10，则会启动总数为10的AI Core和Vector Core；为保证启动Vector Core，设置数值应大于AI Core的核数。您可以通过[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAic.md)接口获取AI Core的核数，[GetCoreNumVector](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumVector.md)接口获取Vector Core的核数。 如下代码片段，分别为使用kernel直调工程和自定义算子工程时的设置样例，此处设置为AI Core和Vector Core的总和，表示所有AI Core和Vector Core都启动。
     -   kernel直调工程
 
         ```
@@ -58,7 +58,7 @@
         ```
 
 >[!NOTE]说明 
->- 请参考[Ascend C API](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/README.md)中具体API支持的型号，来判断API接口是否支持Atlas 推理系列产品Vector Core。
+>- 请参考[Ascend C API](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/c_api/README.md)中具体API支持的型号，来判断API接口是否支持Atlas 推理系列产品Vector Core。
 >- 支持Vector Core后，因为AI Core和Vector Core会分别执行，通过不同的任务进行调度，所以不支持核间同步指令，如IBSet、IBWait、SyncAll等。
 >- 算子计算溢出（输入inf/nan或计算结果超出范围）时，需注意AI Core和Vector Core结果表现不一致，AI Core仅支持饱和模式，Vector Core仅支持inf/nan模式。
 
