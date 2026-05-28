@@ -135,7 +135,16 @@ __aicore__ inline void ReduceDataBlockCommon(const LocalTensor<T>& dst, const Lo
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckReduceDataBlockParams<T, U>(dst, src, repeatTime, "ReduceDataBlock");
     if constexpr (Std::is_same_v<MaskType, int32_t>) {
-        CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReduceDataBlock");
+        if ASCEND_IS_AIV {
+            if constexpr (isSetMask) {
+                if (!IsMaskNorm()) {
+                    CheckValueRange<int32_t>(mask, 0, INT32_MAX, "mask", "ReduceDataBlock");
+                } else {
+                    CheckValueRange<int32_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(SrcPrimType), "mask",
+                        "ReduceDataBlock");
+                }
+            }
+        }
     } else {
         CheckMaskArray<SrcPrimType, isSetMask>(mask, "ReduceDataBlock");
     }
@@ -179,7 +188,16 @@ __aicore__ inline void ReducePairElemCommon(const LocalTensor<T>& dst, const Loc
     CheckValueRange<int32_t>(repeatTime, 0, 255, "repeatTime", "ReducePairElem");
     CheckVectorTensor("ReducePairElem", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     if constexpr (Std::is_same_v<MaskType, int32_t>) {
-        CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReducePairElem");
+        if ASCEND_IS_AIV {
+            if constexpr (isSetMask) {
+                if (!IsMaskNorm()) {
+                    CheckValueRange<int32_t>(mask, 0, INT32_MAX, "mask", "ReducePairElem");
+                } else {
+                    CheckValueRange<int32_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(SrcPrimType), "mask",
+                        "ReducePairElem");
+                }
+            }
+        }
     } else {
         CheckMaskArray<SrcPrimType, isSetMask>(mask, "ReducePairElem");
     }
@@ -259,7 +277,16 @@ __aicore__ inline void ReduceRepeatCommon(const LocalTensor<T>& dst, const Local
 #endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     if constexpr (Std::is_same_v<MaskType, int32_t>) {
-        CheckMaskValue<SrcPrimType, isSetMask>(mask, "ReduceRepeat");
+        if ASCEND_IS_AIV {
+            if constexpr (isSetMask) {
+                if (!IsMaskNorm()) {
+                    CheckValueRange<int32_t>(mask, 0, INT32_MAX, "mask", "ReduceRepeat");
+                } else {
+                    CheckValueRange<int32_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(SrcPrimType), "mask",
+                        "ReduceRepeat");
+                }
+            }
+        }
     } else {
         CheckMaskArray<SrcPrimType, isSetMask>(mask, "ReduceRepeat");
     }
@@ -510,7 +537,16 @@ __aicore__ inline void RepeatReduceSum(const LocalTensor<T>& dst, const LocalTen
     } else if constexpr (sizeof(PrimType) == 4) {
         CheckTensorAlignment(dst, 4, "dst", "RepeatReduceSum");  // float: 4B
     }
-    CheckMaskValue<PrimType, isSetMask>(mask, "RepeatReduceSum");
+    if ASCEND_IS_AIV {
+        if constexpr (isSetMask) {
+            if (!IsMaskNorm()) {
+                CheckValueRange<int32_t>(mask, 0, INT32_MAX, "mask", "RepeatReduceSum");
+            } else {
+                CheckValueRange<int32_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(PrimType), "mask",
+                    "RepeatReduceSum");
+            }
+        }
+    }
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);

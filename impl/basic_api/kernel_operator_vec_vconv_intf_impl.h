@@ -221,7 +221,15 @@ __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("CastDequant", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "CastDequant");
+    if ASCEND_IS_AIV {
+        if constexpr (isSetMask) {
+            if (!IsMaskNorm()) {
+                CheckValueRange<int32_t>(mask, 0, INT32_MAX, "mask", "CastDequant");
+            } else {
+                CheckValueRange<int32_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(MaskCheckType), "mask", "CastDequant");
+            }
+        }
+    }
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -275,7 +283,15 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("CastDeq", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "CastDeq");
+    if ASCEND_IS_AIV {
+        if constexpr (isSetMask) {
+            if (!IsMaskNorm()) {
+                CheckValueRange<int32_t>(mask, 0, INT32_MAX, "mask", "CastDeq");
+            } else {
+                CheckValueRange<int32_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(MaskCheckType), "mask", "CastDeq");
+            }
+        }
+    }
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
