@@ -447,12 +447,12 @@ template <HardEvent evt> __aicore__ inline void TPipe::ReleaseEventID(TEventID i
 
 __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 {
-    return ::AscendC::FetchEventID<evt>();
+    return ::AscendC::FetchEventID(evt);
 }
 
 template <HardEvent evt> __aicore__ inline TEventID TPipe::FetchEventID()
 {
-    return ::AscendC::FetchEventID<evt>();
+    return ::AscendC::FetchEventID(evt);
 }
 
 // NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
