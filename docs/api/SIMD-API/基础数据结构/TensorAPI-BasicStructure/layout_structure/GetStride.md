@@ -1,4 +1,4 @@
-# GetShape
+# GetStride
 
 ## 产品支持情况
 
@@ -8,21 +8,21 @@
 
 ## 功能说明
 
-头文件为：#include "tensor_api/tensor.h"
+需要包含的头文件为：#include "tensor_api/tensor.h"
 
-`GetShape`用于从Layout中提取Shape部分：
+GetStride用于从Layout中提取Stride部分：
 
-- **不指定模板参数Is...**：返回完整的Shape元组。
-- **指定模板参数Is...**：返回Shape中对应索引的子结构。单个索引返回对应维度值或子tuple；多个索引返回由它们组成的新tuple。
+- **不指定模板参数Is...**：返回完整的Stride元组。
+- **指定模板参数Is...**：返回Stride中对应索引的子结构。单个索引返回对应步长值或子tuple；多个索引返回由它们组成的新tuple。
 
 ## 函数原型
 
 ```cpp
 template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto GetShape(const Layout<ShapeType, StrideType>& layout)
+__aicore__ inline constexpr auto GetStride(const Layout<ShapeType, StrideType>& layout)
 
 template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto GetShape(Layout<ShapeType, StrideType>& layout)
+__aicore__ inline constexpr auto GetStride(Layout<ShapeType, StrideType>& layout)
 ```
 
 ## 参数说明
@@ -43,7 +43,7 @@ __aicore__ inline constexpr auto GetShape(Layout<ShapeType, StrideType>& layout)
 
 ## 返回值说明
 
-返回描述张量形状的Shape对象（或其子结构）。类型与模板参数`Is...`的指定方式相关。
+返回描述内存访问步长的Stride对象（或其子结构）。
 
 ## 约束说明
 
@@ -54,14 +54,14 @@ Is...必须在Shape底层tuple的有效范围内。
 ```cpp
 using namespace AscendC::Te;
 
-auto layout = MakeLayout(MakeShape(10, 20, 30));
+auto layout = MakeLayout(MakeShape(10, 20, 30), MakeStride(1, 10, 200));
 
-// 不指定 Is... → 返回完整 shape 元组
-auto fullShape = GetShape(layout);           // (10, 20, 30)
+// 不指定 Is... → 返回完整 stride 元组
+auto fullStride = GetStride(layout);         // (1, 10, 200)
 
 // 指定单个索引 → 返回对应元素
-auto s0 = GetShape<0>(layout);              // 10
+auto s0 = GetStride<0>(layout);             // 1
 
 // 指定多个索引 → 组成新 tuple
-auto s01 = GetShape<0, 1>(layout);          // (10, 20)
+auto s01 = GetStride<0, 1>(layout);         // (1, 10)
 ```

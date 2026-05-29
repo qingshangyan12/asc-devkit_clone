@@ -23,16 +23,16 @@ __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
 
 ### LayoutTrait的指定方式
 
-LayoutTrait用于指定数据类型和C0维度基数。`MakeFrameLayout`支持以下四种传递方式：
+LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以下四种传递方式：
 
-1. **LayoutTraitDefault<T>**：指定数据类型`T`，C0自动计算。
+1. **LayoutTraitDefault<T>**：指定数据类型T，C0自动计算。
    ```cpp
-   MakeFrameLayout<NzLayoutPtn, LayoutTraitDefault<float>>(m, n)
+   MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n)
    ```
 
-2. **_C0**：直接指定C0维度的元素数，数据类型使用默认值。`_C0`是`Std::Int<C0>`的简写形式。
+2. **_C0**：直接指定C0维度的元素个数，数据类型为[Int](../../../../Utils-API/C++标准库/类型特性/Int.md)。_C0是Std::Int<C0>的简写形式。
    ```cpp
-   MakeFrameLayout<NzLayoutPtn, _16>(m, n)
+   MakeFrameLayout<NZLayoutPtn, _16>(m, n)
    ```
 
 3. **不传入Trait**：在分形构造和Trait无关，或Trait值固定的场景下，不传入Trait，内部根据LayoutPattern查找对应的默认Trait。这样的分形有NDLayoutPtn、DNLayoutPtn、DNExtLayoutPtn、NDExtLayoutPtn、ScaleANDLayoutPtn、ScaleADNLayoutPtn、ScaleBNDLayoutPtn、ScaleBDNLayoutPtn。
