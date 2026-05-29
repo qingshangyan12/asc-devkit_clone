@@ -94,6 +94,27 @@
 #define ASCENDC_MATMUL_AICORE
 #endif
 
+#if defined(__ASC_DISABLE_RESERVED_UBUF__)
+#define __ASC_RESERVED_UBUF_ERROR_ATTR__(msg) __attribute__((error(msg)))
+#else
+#define __ASC_RESERVED_UBUF_ERROR_ATTR__(msg)
+#endif
+
+#if defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#define __ASC_USE_RESERVED_UBUF_2201(msg) __ASC_RESERVED_UBUF_ERROR_ATTR__(msg)
+#else
+#define __ASC_USE_RESERVED_UBUF_2201(msg)
+#endif
+
+#if defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#define __ASC_USE_RESERVED_UBUF_3510(msg) __ASC_RESERVED_UBUF_ERROR_ATTR__(msg)
+#else
+#define __ASC_USE_RESERVED_UBUF_3510(msg)
+#endif
+
+#define __ASC_USE_RESERVED_UBUF_IMPL__(arch, msg) __ASC_USE_RESERVED_UBUF_##arch(msg)
+#define __ASC_USE_RESERVED_UBUF__(arch, msg) __ASC_USE_RESERVED_UBUF_IMPL__(arch, msg)
+
 namespace AscendC {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||           \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) ||           \
