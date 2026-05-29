@@ -34,6 +34,7 @@ static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 120UL;
 static const std::vector<HcclCMDType> SUPPORT_OP_LIST {
     HCCL_CMD_ALLREDUCE, HCCL_CMD_ALLGATHER, HCCL_CMD_REDUCE_SCATTER, HCCL_CMD_ALLTOALLV, HCCL_CMD_ALLTOALL
 };
+static constexpr u32 ORDER_DIAG_INVALID_VALUE = 0xFFFFFFFFU;
 
 #define MC2_TIMEOUT_LOG(isHardTimeout, format, ...)                 \
     do {                                                            \
@@ -145,6 +146,80 @@ void LogOpenOpParamBrief(const char *stage, const std::vector<uint8_t> &opParam)
                 static_cast<unsigned long long>(param->DataDes.strideCount));
     }
 }
+
+u32 ReadOrderDiagValue(u64 addr)
+{
+    if (addr == 0U) {
+        return ORDER_DIAG_INVALID_VALUE;
+    }
+    return *reinterpret_cast<volatile const u32 *>(addr);
+}
+
+u32 ReadOrderDiagTurnNum(u64 turnNumsAddr, u32 idx)
+{
+    if (turnNumsAddr == 0U) {
+        return ORDER_DIAG_INVALID_VALUE;
+    }
+    return ReadOrderDiagValue(turnNumsAddr + static_cast<u64>(idx) * sizeof(u32));
+}
+
+u32 GetCommitCnt(const HcclMsgArea *msgArea, u32 pos)
+{
+    if (msgArea == nullptr || pos >= HCCL_MSG_CNT) {
+        return ORDER_DIAG_INVALID_VALUE;
+    }
+    return msgArea->commMsg.singleMsg.commitTurnCnt[pos].cnt;
+}
+
+u32 GetFinishedCnt(const HcclMsgArea *msgArea, u32 pos)
+{
+    if (msgArea == nullptr || pos >= HCCL_MSG_CNT) {
+        return ORDER_DIAG_INVALID_VALUE;
+    }
+    return msgArea->commMsg.singleMsg.finishedTurnCnt[pos].cnt;
+}
+
+void LogOrderCounterSnapshot(const char *stage, u32 groupIdx, const HcclMsgArea *msgArea, u32 msgPos,
+    u32 repeatIdx, u32 turnIdx, u64 opParamKey, u64 waitAddr, u64 recordAddr, u64 turnNumsAddr,
+    const ServerExecCtx *execCtx)
+{
+    const u64 valueAddr = (turnNumsAddr == 0U) ? 0U : turnNumsAddr + static_cast<u64>(turnIdx) * sizeof(u32);
+    const u32 resourceType = (execCtx == nullptr) ? ORDER_DIAG_INVALID_VALUE : static_cast<u32>(execCtx->resourceType);
+    const u64 mainThread = (execCtx == nullptr) ? 0U : execCtx->mainThread;
+    HCCL_INFO("YYYYYY asc order [CounterSnapshot] stage[%s], group[%u], msgPos[%u], repeatIdx[%u], "
+              "turnIdx[%u], opParamKey[%#llx], resourceType[%u], mainThread[%#llx], msgArea[%p], "
+              "waitAddr[%#llx], waitVal[%u], commitCnt[%u], recordAddr[%#llx], recordVal[%u], "
+              "finishedCnt[%u], valueAddr[%#llx], valueVal[%u], turnNumsAddr[%#llx].",
+              stage, groupIdx, msgPos, repeatIdx, turnIdx, static_cast<unsigned long long>(opParamKey),
+              resourceType, static_cast<unsigned long long>(mainThread), msgArea,
+              static_cast<unsigned long long>(waitAddr), ReadOrderDiagValue(waitAddr),
+              GetCommitCnt(msgArea, msgPos), static_cast<unsigned long long>(recordAddr),
+              ReadOrderDiagValue(recordAddr), GetFinishedCnt(msgArea, msgPos),
+              static_cast<unsigned long long>(valueAddr), ReadOrderDiagValue(valueAddr),
+              static_cast<unsigned long long>(turnNumsAddr));
+}
+
+void LogOrderCounterWindow(const char *stage, u32 groupIdx, const HcclMsgArea *msgArea, u64 turnNumsAddr)
+{
+    HCCL_INFO("YYYYYY asc order [CounterWindow] stage[%s], group[%u], msgArea[%p], turnNumsAddr[%#llx], "
+              "commit[0..15]=[%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u], "
+              "finish[0..15]=[%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u], "
+              "turnNums[0..3]=[%u,%u,%u,%u].",
+              stage, groupIdx, msgArea, static_cast<unsigned long long>(turnNumsAddr),
+              GetCommitCnt(msgArea, 0U), GetCommitCnt(msgArea, 1U), GetCommitCnt(msgArea, 2U),
+              GetCommitCnt(msgArea, 3U), GetCommitCnt(msgArea, 4U), GetCommitCnt(msgArea, 5U),
+              GetCommitCnt(msgArea, 6U), GetCommitCnt(msgArea, 7U), GetCommitCnt(msgArea, 8U),
+              GetCommitCnt(msgArea, 9U), GetCommitCnt(msgArea, 10U), GetCommitCnt(msgArea, 11U),
+              GetCommitCnt(msgArea, 12U), GetCommitCnt(msgArea, 13U), GetCommitCnt(msgArea, 14U),
+              GetCommitCnt(msgArea, 15U), GetFinishedCnt(msgArea, 0U), GetFinishedCnt(msgArea, 1U),
+              GetFinishedCnt(msgArea, 2U), GetFinishedCnt(msgArea, 3U), GetFinishedCnt(msgArea, 4U),
+              GetFinishedCnt(msgArea, 5U), GetFinishedCnt(msgArea, 6U), GetFinishedCnt(msgArea, 7U),
+              GetFinishedCnt(msgArea, 8U), GetFinishedCnt(msgArea, 9U), GetFinishedCnt(msgArea, 10U),
+              GetFinishedCnt(msgArea, 11U), GetFinishedCnt(msgArea, 12U), GetFinishedCnt(msgArea, 13U),
+              GetFinishedCnt(msgArea, 14U), GetFinishedCnt(msgArea, 15U),
+              ReadOrderDiagTurnNum(turnNumsAddr, 0U), ReadOrderDiagTurnNum(turnNumsAddr, 1U),
+              ReadOrderDiagTurnNum(turnNumsAddr, 2U), ReadOrderDiagTurnNum(turnNumsAddr, 3U));
+}
 }
 
 HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx *ctx)
@@ -160,6 +235,7 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx *ctx)
         rankNum_ = static_cast<u32>(ctx->rankSize);
         std::iota(reinterpret_cast<u32 *>(turnNumsAddr_),
                   reinterpret_cast<u32 *>(turnNumsAddr_) + UINT8_MAX + 1U, 0U);
+        LogOrderCounterWindow("AddOpContextInit", groupIdx_, msgArea_, turnNumsAddr_);
         KeepAlive();
     }
 
@@ -224,6 +300,11 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx *ctx)
                   "mainThread %#llx, message area address %#llx.",
                   groupIdx_, opParamKey, commName.c_str(), static_cast<u32>(execCtx.resourceType),
                   execCtx.mainThread, msgArea_);
+        HCCL_INFO("YYYYYY asc order [AddExecCtx] group[%u], opParamKey[%#llx], commName[%s], "
+                  "resourceType[%u], mainThread[%#llx], msgArea[%p], turnNumsAddr[%#llx].",
+                  groupIdx_, static_cast<unsigned long long>(opParamKey), commName.c_str(),
+                  static_cast<u32>(execCtx.resourceType), static_cast<unsigned long long>(execCtx.mainThread),
+                  msgArea_, static_cast<unsigned long long>(turnNumsAddr_));
     }
 
     CHK_PRT_RET(execCtxList_.empty(), HCCL_ERROR("Group %u: no exec ctx is added.", groupIdx_), HCCL_E_PARA);
@@ -263,16 +344,20 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
         Hccl::StreamLite *streamLite = nullptr;
         CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
         HCCL_INFO("YYYYYY asc order [CcoreWaitNext] group %u, thread %p, streamLite %p, rtsq %p, "
-                  "waitAddr %#llx, valueAddr %#llx.",
+                  "waitAddr %#llx, waitVal %u, valueAddr %#llx, valueVal %u.",
                   groupIdx_, thread, streamLite, streamLite->GetRtsq(),
-                  static_cast<unsigned long long>(waitAddr), static_cast<unsigned long long>(valueAddr));
+                  static_cast<unsigned long long>(waitAddr), ReadOrderDiagValue(waitAddr),
+                  static_cast<unsigned long long>(valueAddr), ReadOrderDiagValue(valueAddr));
         EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyWait(waitAddr, valueAddr, isLast),
                          return HCCL_E_INTERNAL);
         HCCL_INFO("[MC2_OPEN_DIAG][CcoreWaitSqeDone] group %u, turnNum %u, thread %p, streamLite %p.",
                   groupIdx_, turnNum, thread, streamLite);
         EXECEPTION_CATCH(thread->LaunchTask(), return HCCL_E_INTERNAL);
-        HCCL_INFO("[MC2_OPEN_DIAG][CcoreWaitEnd] group %u, turnNum %u, thread %p, streamLite %p.",
-                  groupIdx_, turnNum, thread, streamLite);
+        HCCL_INFO("YYYYYY asc order [CcoreWaitEnd] group %u, turnNum %u, thread %p, streamLite %p, "
+                  "waitAddr %#llx, waitVal %u, valueAddr %#llx, valueVal %u.",
+                  groupIdx_, turnNum, thread, streamLite, static_cast<unsigned long long>(waitAddr),
+                  ReadOrderDiagValue(waitAddr), static_cast<unsigned long long>(valueAddr),
+                  ReadOrderDiagValue(valueAddr));
         return HCCL_SUCCESS;
     }
 
@@ -323,15 +408,19 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
         Hccl::StreamLite *streamLite = nullptr;
         CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
         HCCL_INFO("YYYYYY asc order [CcorePostNext] group %u, thread %p, streamLite %p, rtsq %p, "
-                  "recordAddr %#llx, valueAddr %#llx.",
+                  "recordAddr %#llx, recordVal %u, valueAddr %#llx, valueVal %u.",
                   groupIdx_, thread, streamLite, streamLite->GetRtsq(),
-                  static_cast<unsigned long long>(recordAddr), static_cast<unsigned long long>(valueAddr));
+                  static_cast<unsigned long long>(recordAddr), ReadOrderDiagValue(recordAddr),
+                  static_cast<unsigned long long>(valueAddr), ReadOrderDiagValue(valueAddr));
         EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyRecord(recordAddr, valueAddr), return HCCL_E_INTERNAL);
         HCCL_INFO("[MC2_OPEN_DIAG][CcorePostSqeDone] group %u, turnNum %u, thread %p, streamLite %p.",
                   groupIdx_, turnNum, thread, streamLite);
         EXECEPTION_CATCH(thread->LaunchTask(), return HCCL_E_INTERNAL);
-        HCCL_INFO("[MC2_OPEN_DIAG][CcorePostEnd] group %u, turnNum %u, thread %p, streamLite %p.",
-                  groupIdx_, turnNum, thread, streamLite);
+        HCCL_INFO("YYYYYY asc order [CcorePostEnd] group %u, turnNum %u, thread %p, streamLite %p, "
+                  "recordAddr %#llx, recordVal %u, valueAddr %#llx, valueVal %u.",
+                  groupIdx_, turnNum, thread, streamLite, static_cast<unsigned long long>(recordAddr),
+                  ReadOrderDiagValue(recordAddr), static_cast<unsigned long long>(valueAddr),
+                  ReadOrderDiagValue(valueAddr));
         return HCCL_SUCCESS;
     }
 
@@ -420,24 +509,33 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
               static_cast<unsigned long long>(msg.strideCount),
               static_cast<unsigned long long>(waitAddr), static_cast<unsigned long long>(recordAddr),
               static_cast<u32>(execCtx->resourceType));
+    LogOrderCounterWindow("ServerMsg", groupIdx_, msgArea_, turnNumsAddr_);
 
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
         UpdateProgress("LoopBegin", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        LogOrderCounterSnapshot("LoopBegin", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
+            recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBegin] group %u, msgPos %u, repeatIdx %u, turnIdx %u, repeatCnt %u, "
                   "opParamKey %#llx, resourceType %u.",
                   groupIdx_, msgPos, i, turnIdx, repeatCnt, static_cast<unsigned long long>(opParamKey),
                   static_cast<u32>(execCtx->resourceType));
 
         UpdateProgress("BeforeFormat", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        LogOrderCounterSnapshot("BeforeFormat", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
+            recordAddr, turnNumsAddr_, execCtx);
         HcclResult ret = FormatOpParamFromMsg(msg, extMsg, *execCtx, i, runParam);
         UpdateProgress("AfterFormat", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        LogOrderCounterSnapshot("AfterFormat", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
+            recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopAfterFormat] group %u, msgPos %u, repeatIdx %u, ret %u, runParamSize %zu.",
                   groupIdx_, msgPos, i, ret, runParam.size());
         CHK_RET(ret);
 
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        LogOrderCounterSnapshot("BeforeWait", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
+            recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("YYYYYY asc order [LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
                   "opParamKey %#llx, resourceType %u, mainThread %#llx, waitAddr %#llx, recordAddr %#llx, "
                   "turnNumsAddr %#llx.",
@@ -447,6 +545,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
                   static_cast<unsigned long long>(turnNumsAddr_));
         ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        LogOrderCounterSnapshot("AfterWait", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
+            recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("YYYYYY asc order [LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
                   "opParamKey %#llx, resourceType %u, mainThread %#llx, waitAddr %#llx, valueAddr %#llx, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
@@ -456,6 +556,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
         CHK_RET(ret);
 
         UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        LogOrderCounterSnapshot("BeforeKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
+            recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("YYYYYY asc order [LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
                   "opParamKey %#llx, resourceType %u, mainThread %#llx, runParamSize %zu.",
                   groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
@@ -463,6 +565,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
                   runParam.size());
         ret = LaunchOpenAicpuKernelServer(runParam);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        LogOrderCounterSnapshot("AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
+            recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("YYYYYY asc order [LoopAfterKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
                   "opParamKey %#llx, resourceType %u, mainThread %#llx, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
@@ -470,6 +574,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
         CHK_RET(ret);
 
         UpdateProgress("BeforePost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        LogOrderCounterSnapshot("BeforePost", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
+            recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("YYYYYY asc order [LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
                   "opParamKey %#llx, resourceType %u, mainThread %#llx, recordAddr %#llx, valueAddr %#llx.",
                   groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
@@ -478,6 +584,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
                   static_cast<unsigned long long>(turnNumsAddr_ + static_cast<u64>(turnIdx) * sizeof(u32)));
         ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
         UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        LogOrderCounterSnapshot("AfterPost", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
+            recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("YYYYYY asc order [LoopAfterPost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, "
                   "opParamKey %#llx, resourceType %u, mainThread %#llx, recordAddr %#llx, valueAddr %#llx, ret %u.",
                   groupIdx_, msgPos, i, turnIdx, static_cast<unsigned long long>(opParamKey),
@@ -487,9 +595,12 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
         CHK_RET(ret);
 
         UpdateProgress("LoopEnd", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
+        LogOrderCounterSnapshot("LoopEnd", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
+            recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopEnd] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
     }
+    LogOrderCounterWindow("OrchestrateEnd", groupIdx_, msgArea_, turnNumsAddr_);
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
     return HCCL_SUCCESS;
@@ -498,6 +609,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
 HcclResult CommKfcAicpuServer::Finalize(u32 msgPos)
 {
     KeepAlive();
+    LogOrderCounterSnapshot("Finalize", groupIdx_, msgArea_, msgPos, 0U, 0U, 0U, 0U, 0U, turnNumsAddr_,
+        syncExecCtx_);
+    LogOrderCounterWindow("Finalize", groupIdx_, msgArea_, turnNumsAddr_);
     return HCCL_SUCCESS;
 }
 
@@ -507,11 +621,18 @@ HcclResult CommKfcAicpuServer::IsAllTaskFinished(u32 msgPos, bool &isFinish)
 
     isFinish = false;
     if (syncExecCtx_ != nullptr && syncExecCtx_->resourceType == ServerExecResourceType::NEXT_AICPU) {
+        LogOrderCounterSnapshot("IsAllTaskFinishedBeforeSet", groupIdx_, msgArea_, msgPos, 0U, FINALIZE_FINISH_CNT,
+            syncExecCtx_->opParamKey, 0U, reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.finishedTurnCnt[msgPos].cnt)),
+            turnNumsAddr_, syncExecCtx_);
         msgArea_->commMsg.singleMsg.finishedTurnCnt[msgPos].cnt = FINALIZE_FINISH_CNT;
 #ifdef __aarch64__
         __asm__ __volatile__("dsb st" : : : "memory");
 #endif
         isFinish = true;
+        LogOrderCounterSnapshot("IsAllTaskFinishedAfterSet", groupIdx_, msgArea_, msgPos, 0U, FINALIZE_FINISH_CNT,
+            syncExecCtx_->opParamKey, 0U, reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.finishedTurnCnt[msgPos].cnt)),
+            turnNumsAddr_, syncExecCtx_);
+        LogOrderCounterWindow("IsAllTaskFinished", groupIdx_, msgArea_, turnNumsAddr_);
         HCCL_INFO("Group %u: next aicpu tasks are treated as finished at message pos %u.", groupIdx_, msgPos);
         return HCCL_SUCCESS;
     }
