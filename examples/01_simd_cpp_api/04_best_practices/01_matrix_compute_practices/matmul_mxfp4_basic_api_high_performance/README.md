@@ -8,6 +8,10 @@
 
 - Ascend 950PR / Ascend 950DT
 
+## 支持的CANN软件版本
+
+- >= CANN 9.1.0
+
 ## 目录结构
 
 ```text
@@ -478,10 +482,10 @@ Ascend 950PR中 L2Cache 大小为 128MB，无法缓存所有输入数据，部�
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-> **注意事项**：本样例使用的 `en_dtypes` 库需要版本 `0.0.4`。安装命令为
+> **注意事项**：本样例使用的 `ml_dtypes` 库需要版本 `0.2.0`，`en_dtypes` 库需要版本 `0.0.4`。安装命令为
 
 ```bash
-pip3 install en_dtypes==0.0.4
+python3 -m pip install ml_dtypes==0.2.0 en_dtypes==0.0.4
 ```
 
 ### 配置环境变量
