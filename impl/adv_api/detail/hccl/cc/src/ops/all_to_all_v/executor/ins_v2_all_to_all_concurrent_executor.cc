@@ -11,10 +11,12 @@
 #include "channel.h"
 #include "hccl_ccu_res.h"
 #include "ins_v2_all_to_all_concurrent_executor.h"
-#include "aicpu/ins_temp_all_to_all_v_mesh_1D.h"
+// DISABLED: all_to_all_v template implementation
+// #include "aicpu/ins_temp_all_to_all_v_mesh_1D.h"
 
 #ifndef AICPU_COMPILE
-#include "ccu/ccu_temp_all_to_all_mesh1d_multi_jetty.h"
+// DISABLED: all_to_all_v template implementation
+// #include "ccu/ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 #endif
 
 namespace mc2_ops_hccl {
@@ -458,27 +460,28 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
     return HCCL_SUCCESS;
 }
 
-// 第1个模板走mesh拓扑
-// 第2个模板走clos拓扑
-REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_ALLTOALL,
-                                InsAllToAllMesh1DConcurrent,
-                                InsV2AllToAllConcurrentExecutor,
-                                TopoMatchUBX,
-                                InsTempAlltoAllVMesh1D,
-                                InsTempAlltoAllVMesh1D);
-REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_ALLTOALLV,
-                                InsAllToAllVMesh1DConcurrent,
-                                InsV2AllToAllConcurrentExecutor,
-                                TopoMatchUBX,
-                                InsTempAlltoAllVMesh1D,
-                                InsTempAlltoAllVMesh1D);
-#ifndef AICPU_COMPILE
-REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_ALLTOALL,
-                                CcuAllToAllMesh1DConcurrent,
-                                InsV2AllToAllConcurrentExecutor,
-                                TopoMatchUBX,
-                                CcuTempAllToAllMesh1dMultiJetty,
-                                CcuTempAllToAllMesh1dMultiJetty);
-#endif
+// DISABLED: all_to_all_v template registration
+// // 第1个模板走mesh拓扑
+// // 第2个模板走clos拓扑
+// REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_ALLTOALL,
+//                                 InsAllToAllMesh1DConcurrent,
+//                                 InsV2AllToAllConcurrentExecutor,
+//                                 TopoMatchUBX,
+//                                 InsTempAlltoAllVMesh1D,
+//                                 InsTempAlltoAllVMesh1D);
+// REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_ALLTOALLV,
+//                                 InsAllToAllVMesh1DConcurrent,
+//                                 InsV2AllToAllConcurrentExecutor,
+//                                 TopoMatchUBX,
+//                                 InsTempAlltoAllVMesh1D,
+//                                 InsTempAlltoAllVMesh1D);
+// #ifndef AICPU_COMPILE
+// REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_ALLTOALL,
+//                                 CcuAllToAllMesh1DConcurrent,
+//                                 InsV2AllToAllConcurrentExecutor,
+//                                 TopoMatchUBX,
+//                                 CcuTempAllToAllMesh1dMultiJetty,
+//                                 CcuTempAllToAllMesh1dMultiJetty);
+// #endif
 
 }
