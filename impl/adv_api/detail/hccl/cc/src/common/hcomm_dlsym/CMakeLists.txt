@@ -158,3 +158,26 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
  	    $<BUILD_INTERFACE:acl_rt_headers>
  	)
 endif()
+
+# dl_hccl_lib.cc lazy-loads the CANN HCCL implementation library
+# (libhccl.so on host, libscatter_aicpu_kernel.so on device aicpu side) at
+# first use. It is consumed by op-level thunks such as
+# ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc, which
+# forward every member function to the corresponding ops_hccl symbol.
+#
+# Inject into the same target that pulls in those op .cc files:
+#   - host  side: mc2_client  (built in src/CMakeLists.txt:306)
+#   - device side: mc2_server (built in src/CMakeLists.txt:145)
+if(PRODUCT_SIDE STREQUAL "host" AND NOT KERNEL_MODE)
+    if(TARGET mc2_client)
+        target_sources(mc2_client PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/dl_hccl_lib.cc
+        )
+    endif()
+elseif(PRODUCT_SIDE STREQUAL "device")
+    if(TARGET mc2_server)
+        target_sources(mc2_server PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/dl_hccl_lib.cc
+        )
+    endif()
+endif()

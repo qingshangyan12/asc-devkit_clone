@@ -10,6 +10,7 @@
 #include "aicpu_res_package_helper.h"
 #include "binary_stream.h"
 #include "log.h"
+
 namespace Hccl {
 
 BinaryStream &operator<<(BinaryStream &binaryStream, const ModuleData &m)

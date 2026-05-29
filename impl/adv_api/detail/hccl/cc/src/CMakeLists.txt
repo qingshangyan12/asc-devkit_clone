@@ -98,11 +98,12 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/selector
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aicpu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aiv
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu/kernel
+    # DISABLED: all_to_all_v template implementation
+    # ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template
+    # ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aicpu
+    # ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aiv
+    # ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu
+    # ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu/kernel
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/executor
@@ -135,6 +136,8 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/selector
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/tools
 )
 
 
@@ -229,8 +232,11 @@ if(PRODUCT_SIDE STREQUAL "device")
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather_v/template/aicpu/ins_temp_all_gather_v_mesh_1D.cc
 
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
+        # Forwards to ops_hccl::InsTempAlltoAllVMesh1D in
+        # libscatter_aicpu_kernel.so via lazy dlopen + dlsym (see thunk for
+        # details). The CANN library can be missing at install time.
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
 
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/executor/ins_v2_all_reduce_parallel_executor.cc
@@ -410,6 +416,7 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
 endif()
 
 add_subdirectory(common)
+add_subdirectory(tools)
 
 if(PRODUCT_SIDE STREQUAL "host")
     add_subdirectory(ops)

@@ -28,9 +28,7 @@ set(open_exec_impl_src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/comm_kfc_open_env_adapter.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/channel/channel.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/channel/channel_request.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/executor_base.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/executor_v2_base.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/alg_template_base.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/alg_v2_template_base.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/template_utils.cc
@@ -60,8 +58,9 @@ set(open_exec_impl_src_list
     ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
 
     ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
+    # DISABLED: all_to_all_v template implementation
+    # ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
+    # ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
 
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/executor/ins_v2_all_reduce_parallel_executor.cc
@@ -91,6 +90,7 @@ target_compile_options(ccl_kernel_decoupler PRIVATE
 target_include_directories(ccl_kernel_decoupler PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/../
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    ${OPEN_HCCL_SRC_ROOT}/tools
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
 
@@ -149,6 +149,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/registry
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/wrapper
+    ${OPEN_HCCL_SRC_ROOT}/tools
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor
@@ -217,9 +218,10 @@ target_include_directories(ccl_kernel_decoupler_open_exec_impl BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu
     ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aiv
     ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/executor
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu
-    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aiv
+    # DISABLED: all_to_all_v template implementation
+    # ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template
+    # ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu
+    # ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aiv
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/executor
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aicpu
@@ -252,14 +254,15 @@ if(TARGET mc2_server)
         $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_OPTIONS>
     )
 
-    target_include_directories(mc2_server_decoupler PRIVATE
-        ${HCCL_HCOMM_HEADER_DIR}/../
-        ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
-        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
-        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
+target_include_directories(mc2_server_decoupler PRIVATE
+    ${HCCL_HCOMM_HEADER_DIR}/../
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    ${OPEN_HCCL_SRC_ROOT}/tools
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
+    ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
 
-        $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
-    )
+    $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
+)
 
     target_link_libraries(mc2_server_decoupler PRIVATE
         $<BUILD_INTERFACE:acl_rt_headers>
