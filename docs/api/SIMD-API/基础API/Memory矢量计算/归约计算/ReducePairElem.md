@@ -11,16 +11,14 @@
 | <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core | √</cann-filter> |
 | <cann-filter npu-type = "310p">Atlas 推理系列产品 Vector Core | x</cann-filter> |
 | <cann-filter npu-type = "910">Atlas 训练系列产品 | √</cann-filter> |
-| <cann-filter npu-type = "x90">Kirin X90 | √</cann-filter> |
-| <cann-filter npu-type = "9030">Kirin 9030 | √</cann-filter> |
 
 ## 功能说明
 
 头文件路径为：`"basic_api/kernel_operator_vec_reduce_intf.h"`。
 
-ReducePairElem接口对相邻两个元素进行归约操作，根据模板参数reduceType，对两个元素求和/求最大值/求最小值，结果按顺序写入目标地址。**当前仅支持求和操作。**
+ReducePairElem接口根据模板参数reduceType，对相邻两个（奇偶）元素进行归约操作，结果按顺序写入目标地址。**当前仅支持求和操作。**
 
-例如，[a1, a2, a3, a4, a5, a6, ...] 的求和结果为 [a1+a2, a3+a4, a5+a6, ...]。计算过程如下图所示，灰色部分代表无效元素。
+例如，[a1, a2, a3, a4, a5, a6, ...]的求和结果为[a1+a2, a3+a4, a5+a6, ...]。计算过程如下图所示，灰色部分代表无效元素。
 
 **图 1**  `ReducePairElem<ReduceType::SUM>`示意图
 ![](../../../../figures/ReducePairElem.png "ReducePairElem-ReduceType-SUM-示意图")
@@ -47,58 +45,100 @@ ReducePairElem接口对相邻两个元素进行归约操作，根据模板参数
 
 | 参数名 | 描述 |
 | --- | --- |
-| reduceType | 归约操作类型，ReduceType类型，当前仅支持SUM。<br>enum class ReduceType {<br>    NONE = -1, // 无效类型，当前API不支持该类型<br>    SUM = 0,   // 求和<br>    MAX,       // 求最大值，当前API不支持该类型<br>    MIN,       // 求最小值，当前API不支持该类型<br>}; |
+| reduceType | 归约操作类型。<br>类型为ReduceType枚举类型，支持：<br>&bull; ReduceType::SUM：求和。 |
 | T | 目的操作数数据类型。 |
 | U | 源操作数数据类型。 |
-| isSetMask | 是否在接口内部设置mask，默认为true。<br>true，表示在接口内部设置mask。false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。 |
+| isSetMask | 是否在接口内部设置mask，默认为true。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。 |
 
 **表 2**  参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要32字节对齐。 |
-| src | 输入 | 源操作数。<br><br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要32字节对齐。 |
-| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
-| repeatTime | 输入 | 重复迭代次数。<br><br>矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br><br>关于该参数的具体描述请参考[高维切分](高维切分.md#ZH-CN_TOPIC_0000002556644319)。 |
-| dstRepStride | 输入 | 目的操作数相邻迭代间的地址步长，以一个repeatTime归约后的长度为单位。取值范围为[0, 216-1]。<br><br>注：dstRepStride单位为128字节。 |
-| srcBlkStride | 输入 | 单次迭代内DataBlock的地址步长，单位为32字节。取值范围为[0, 216-1]。 |
-| srcRepStride | 输入 | 源操作数相邻迭代间的地址步长，即源操作数每次迭代跳过的DataBlock数目。取值范围为[0, 216-1]。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| src | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
+| repeatTime | 输入 | 迭代次数。取值范围为[0, 255]。 |
+| dstRepStride | 输入 | 目的操作数相邻迭代间的地址步长，以一个repeatTime归约后的长度为单位，即128字节。取值范围为[0, $2^{16}-1$]。<cann-filter npu-type = "910"><br>**注意，此参数值Atlas 训练系列产品不支持配置0。**</cann-filter> |
+| srcBlkStride | 输入 | 单次迭代内DataBlock的地址步长，单位为32字节。取值范围为[0, $2^{16}-1$]。 |
+| srcRepStride | 输入 | 源操作数相邻迭代间的地址步长，即源操作数每次迭代跳过的DataBlock数目。取值范围为[0, $2^{16}-1$]。 |
 
-**注：以上高维切分相关参数mask，repeatTime，dstRepStride，srcBlkStride，srcRepStride请参考[高维切分](高维切分.md#ZH-CN_TOPIC_0000002556644319)中的介绍。**
+**注：以上高维切分相关参数mask，repeatTime，dstRepStride，srcBlkStride，srcRepStride请参考[高维切分](../SIMD计算说明/高维切分.md)中的介绍。**
 
 ## 数据类型
 
-操作数支持的数据类型为：half/float。
+支持的数据类型如下：
 
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品  和  Atlas A3 训练系列产品/Atlas A3 推理系列产品，目的操作数与源操作数的数据类型需要保持一致。
+- <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，支持half、float。</cann-filter>
+- <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持half、float。</cann-filter>
+- <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持half、float。</cann-filter>
+- <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，支持half、float。</cann-filter>
+- <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core，支持half、float。</cann-filter>
+- <cann-filter npu-type = "910">Atlas 训练系列产品，支持half。</cann-filter>
 
-## API映射关系
+目的操作数与源操作数的数据类型需要保持一致。
 
-与built-in接口映射关系：
+## 返回值说明
 
-PairReduceSum接口在built-in接口（set\_vector\_mask和vcpadd）的基础上进行抽象封装实现的，其对应的底层build-in接口为：
-
-```cpp
-// 设置mask
-void set_vector_mask(uint64_t mask1, uint64_t mask0);
-
-// half数据类型输入
-void vcpadd(__ubuf__ half *dst, __ubuf__ half *src, uint8_t repeat, uint16_t dstBlockStride, uint16_t srcBlockStride, uint16_t srcRepeatStride);
-
-// float数据类型输入
-void vcpadd(__ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat, uint16_t dstBlockStride, uint16_t srcBlockStride, uint16_t srcRepeatStride);
-```
+无
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
-- 操作数地址对齐约束请参考[地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
+- 操作数的起始地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)，需要32字节对齐。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
+- dstRepStride, srcBlkStride, srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
 
-- repeatTime = 0表示不会执行归约操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
-- 当一对相邻元素的掩码均为0，其对应的目的元素将跳过写入，保持不变。
-- dstRepStride, srcBlkStride, srcRepStride取值范围为\[0, 2<sup>16</sup>-1\]，需要结合UB的实际大小避免出现越界。
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品  和  Atlas A3 训练系列产品/Atlas A3 推理系列产品，目的操作数与源操作数的数据类型需要保持一致。
+<cann-filter npu-type = "A3,910b,310b,310p,910">
+
+- 对于<cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品、</cann-filter><cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品、</cann-filter><cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core、</cann-filter><cann-filter npu-type = "910">Atlas 训练系列产品</cann-filter>，当一对相邻元素的掩码均为0，对应的目的元素将跳过写入，保持不变。
+
+</cann-filter>
+
+- <cann-filter npu-type = "310b">对于Atlas 200I/500 A2 推理产品，当一对相邻元素的掩码均为0，对应的目的操作数中的值会置为0。</cann-filter>
 
 ## 调用示例
 
-完整示例可参考[PairReduceSum样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/pair_reduce_sum)。
+本样例中只展示Compute流程中的部分代码。完整示例可参考[ReducePairElem样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/pair_reduce_sum)。
+
+- `ReducePairElem`-tensor高维切分计算样例-mask连续模式
+
+    ```cpp
+    // 设定mask为最多的128个全部元素参与计算
+    int32_t mask = 256/sizeof(half);
+    // 每个repeat128个元素，一共128个元素。
+    int repeat = 1;
+    // dstLocal: 目的操作数tensor
+    // srcLocal: 源操作数tensor
+    // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
+    // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
+    AscendC::ReducePairElem<AscendC::ReduceType::SUM, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
+    ```
+
+- `ReducePairElem`-tensor高维切分计算样例-mask逐bit模式
+
+    ```cpp
+    // 设定mask为最多的128个全部元素参与计算
+    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    // 每个repeat128个元素，一共128个元素。
+    int repeat = 1;
+    // dstLocal: 目的操作数tensor
+    // srcLocal: 源操作数tensor
+    // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
+    // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
+    AscendC::ReducePairElem<AscendC::ReduceType::SUM, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
+    ```
+
+- 示例结果
+
+    ```cpp
+    输入数据src_gm：
+    [1, 1, 1, -1, 2, 2, -1, 2, 
+     3, 3, 3, -1, 4, 4, -2, 4,
+    ....
+    ]
+    输出数据dst_gm：
+    [2, 0, 4, 1, 6, 2, 8, 2, 
+    ....
+    ]
+    ```
