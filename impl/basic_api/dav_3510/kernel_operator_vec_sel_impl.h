@@ -123,7 +123,7 @@ __aicore__ inline void SelectCal(
         "current data type is not supported!");
     bool isCounterMode = Internal::IsCounterMode();
     __ubuf__ uint64_t *tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 2);
-    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
+    event_t eventIdVToS = static_cast<event_t>(FetchEventID(HardEvent::V_S));
     SetFlag<HardEvent::V_S>(eventIdVToS);
     WaitFlag<HardEvent::V_S>(eventIdVToS);
     if constexpr (selMode == SELMODE::VSEL_CMPMASK_SPR) {
@@ -133,7 +133,7 @@ __aicore__ inline void SelectCal(
         } else {
             (*(__ubuf__ uint64_t *)((__ubuf__ uint64_t *)tempBuf)) = Internal::g_cmpMaskLow;
         }
-        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+        event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         if (isCounterMode) {
@@ -144,7 +144,7 @@ __aicore__ inline void SelectCal(
     }
     else if constexpr (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
         uint64_t selAddr = Internal::g_cmpMaskLow;
-        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+        event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         if (isCounterMode) {
@@ -207,7 +207,7 @@ __aicore__ inline void SelectCal(
     static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
     bool isCounterMode = Internal::IsCounterMode();
     T scalar = *reinterpret_cast<T*>(&Internal::g_cmpMaskLow);
-    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+    event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     if (isCounterMode) {

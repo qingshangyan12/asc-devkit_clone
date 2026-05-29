@@ -300,7 +300,7 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
     } else {
         if constexpr (AscendC::Std::is_same<SRC_TYPE, int32_t>::value && AscendC::Std::is_same<DST_TYPE, half>::value) {
             scale = Internal::g_deqValue;
-            event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+            event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
             SetFlag<HardEvent::S_V>(eventIdSToV);
             WaitFlag<HardEvent::S_V>(eventIdSToV);
         }
@@ -1765,7 +1765,7 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
         } else {
             if constexpr (AscendC::Std::is_same<SRC_TYPE, int32_t>::value && AscendC::Std::is_same<DST_TYPE, half>::value) {
                 scale = Internal::g_deqValue;
-                event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+                event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
                 SetFlag<HardEvent::S_V>(eventIdSToV);
                 WaitFlag<HardEvent::S_V>(eventIdSToV);
             }
@@ -1792,7 +1792,7 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
             }
             if constexpr (AscendC::Std::is_same<SRC_TYPE, int32_t>::value && AscendC::Std::is_same<DST_TYPE, half>::value) {
                 scale = Internal::g_deqValue;
-                event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+                event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
                 SetFlag<HardEvent::S_V>(eventIdSToV);
                 WaitFlag<HardEvent::S_V>(eventIdSToV);
             }
@@ -2052,7 +2052,7 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
         } else {
             if constexpr (AscendC::Std::is_same<SRC_TYPE, int32_t>::value && AscendC::Std::is_same<DST_TYPE, half>::value) {
                 scale = Internal::g_deqValue;
-                event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+                event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
                 SetFlag<HardEvent::S_V>(eventIdSToV);
                 WaitFlag<HardEvent::S_V>(eventIdSToV);
             }
@@ -2066,7 +2066,7 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
         } else {
             if constexpr (AscendC::Std::is_same<SRC_TYPE, int32_t>::value && AscendC::Std::is_same<DST_TYPE, half>::value) {
                 scale = Internal::g_deqValue;
-                event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+                event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
                 SetFlag<HardEvent::S_V>(eventIdSToV);
                 WaitFlag<HardEvent::S_V>(eventIdSToV);
             }
@@ -2373,13 +2373,13 @@ __aicore__ inline void CastDeqImpl(__ubuf__ U *dst, __ubuf__ T *src, const uint3
         ", src:int32_t dst:half.");
     if constexpr (IsSameType<T, int32_t>::value) {
         half scale = Internal::g_deqValue;
-        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+        event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         CastDeqS322f16ImplVF<U, T>(dst, src, calCount, scale);
     } else {
         uint64_t deqScale = Internal::g_deqScale;
-        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+        event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         if constexpr (isVecDeq) {
@@ -2604,7 +2604,7 @@ __aicore__ inline void CastDeqImpl(
     }
     if constexpr (IsSameType<T, int32_t>::value) {
         half scale = Internal::g_deqValue;
-        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+        event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         if (isCounterMode) {
@@ -2616,7 +2616,7 @@ __aicore__ inline void CastDeqImpl(
         }
     } else {
         uint64_t deqScale = Internal::g_deqScale;
-        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+        event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         bool signMode = GetCastDeqSignMode(deqScale);
@@ -2662,7 +2662,7 @@ __aicore__ inline void CastDeqImpl(
     __ubuf__ uint64_t *tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 4);
     if constexpr (IsSameType<T, int32_t>::value) {
         half scale = Internal::g_deqValue;
-        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+        event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         if (isCounterMode) {
@@ -2674,7 +2674,7 @@ __aicore__ inline void CastDeqImpl(
         }
     } else {
         uint64_t deqScale = Internal::g_deqScale;
-        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+        event_t eventIdSToV = static_cast<event_t>(FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         bool signMode = GetCastDeqSignMode(deqScale);
@@ -2941,7 +2941,7 @@ __aicore__ inline uint64_t MakeDeqScaleConfig(float scale, int16_t offset, bool 
 
 __aicore__ inline void SetDeqScaleImpl(float scale, int16_t offset, bool signMode)
 {
-    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
+    event_t eventIdVToS = static_cast<event_t>(FetchEventID(HardEvent::V_S));
     SetFlag<HardEvent::V_S>(eventIdVToS);
     WaitFlag<HardEvent::V_S>(eventIdVToS);
     Internal::g_deqScale = MakeDeqScaleConfig(scale, offset, signMode);
@@ -2949,7 +2949,7 @@ __aicore__ inline void SetDeqScaleImpl(float scale, int16_t offset, bool signMod
 
 template <typename T> __aicore__ inline void SetDeqScaleImpl(const LocalTensor<T> &vdeqTensor, const VdeqInfo &vdeqInfo)
 {
-    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
+    event_t eventIdVToS = static_cast<event_t>(FetchEventID(HardEvent::V_S));
     SetFlag<HardEvent::V_S>(eventIdVToS);
     WaitFlag<HardEvent::V_S>(eventIdVToS);
     for (uint8_t i = 0; i < VDEQ_TENSOR_SIZE; ++i) {
@@ -2963,7 +2963,7 @@ template <typename T> __aicore__ inline void SetDeqScaleImpl(const LocalTensor<T
 
 template <typename T> __aicore__ inline void SetDeqScaleImpl(T config)
 {
-    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
+    event_t eventIdVToS = static_cast<event_t>(FetchEventID(HardEvent::V_S));
     SetFlag<HardEvent::V_S>(eventIdVToS);
     WaitFlag<HardEvent::V_S>(eventIdVToS);
     Internal::g_deqValue = config;
