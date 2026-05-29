@@ -8,13 +8,16 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "ins_v2_all_to_all_v_sole_executor.h"
-#include "ins_temp_all_to_all_v_mesh_1D.h"
-#include "ins_temp_dpu_alltoall_mesh.h"
+// DISABLED: all_to_all_v template implementation
+// #include "ins_temp_all_to_all_v_mesh_1D.h"
+// #include "ins_temp_dpu_alltoall_mesh.h"
+#include "cann_executor_bridge.h"
 #include <cstddef>
 #ifndef AICPU_COMPILE
-#include "ccu_temp_all_to_all_mesh_1D.h"
-#include "ccu_temp_all_to_all_mesh2die.h"
-#include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
+// DISABLED: all_to_all_v template implementation
+// #include "ccu_temp_all_to_all_mesh_1D.h"
+// #include "ccu_temp_all_to_all_mesh2die.h"
+// #include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 #endif
 
 #define CONST_ZERO 0
@@ -58,18 +61,26 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
     return HCCL_SUCCESS;
 }
 
+// 切分数据并调用 template
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
     const OpParam &param, const AlgResourceCtxSerializable &resCtx)
 {
-    HCCL_INFO("[MC2_OPEN_DIAG][InsV2AlltoAllVSoleExecutor][Orchestrate] Orchestrate Start, file[%s:%d], "
+    HCCL_INFO("[InsV2AlltoAllVSoleExecutor][Orchestrate] delegating to CANN Executor bridge");
+    
+    return CannExecutorBridge::Instance().OrchestrateAlltoAll(param, resCtx);
+}
+
+template <typename AlgTopoMatch, typename InsAlgTemplate>
+HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
+    const OpParam &param, const AlgResourceCtxSerializable &resCtx)
+{
+    HCCL_INFO("[MC2_OPEN_DIAG][InsV2AlltoAllVSoleExecutor][OrchestrateLoop] OrchestrateLoop Start, file[%s:%d], "
               "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
               __FILE__, __LINE__, sizeof(OpParam), offsetof(OpParam, varMemSize),
               static_cast<unsigned long long>(param.varMemSize), static_cast<u32>(param.opType), param.algName);
 
-    // maxTmpMemSize_设定为cclIn的大小，op中将申请的HcclBuff全给了cclIn
     maxTmpMemSize_ = resCtx.cclMem.size;
-    // 给channels_和threads_赋值
     threads_ = resCtx.threads;
     if (param.engine != CommEngine::COMM_ENGINE_AIV && param.engine != CommEngine::COMM_ENGINE_CCU) {
         CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
@@ -82,7 +93,6 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     recvTypeSize_ = DATATYPE_SIZE_TABLE[param.all2AllVDataDes.recvType];
     dataSize_ = dataCount_ * dataTypeSize_;
 
-    // Init sendRevc data for alltoall/alltoallV/alltoallVC algorithm
     CHK_PRT_RET(param.varMemSize != ALL_TO_ALL_V_VECTOR_NUM * rankSize_ * sizeof(u64),
         HCCL_ERROR("[CalcAlltoAllVSendRecvInfo] param.varMemSize [%llu] is invalid", param.varMemSize),
         HCCL_E_PARA);
@@ -92,7 +102,6 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     localSendRecvInfo_.recvDispls.resize(rankSize_, 0);
     if (param.engine == COMM_ENGINE_CCU) {
         const u64* data = reinterpret_cast<const u64*>(param.varData);
-        // 从varData把值取出来
         for (u64 i = 0; i < ALL_TO_ALL_V_VECTOR_NUM * rankSize_; i++) {
             HCCL_INFO("OrchestrateLoop, param.varData[%u] is [%u]", i, data[i]);
         }
@@ -118,13 +127,11 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         }
     } else {
         for (u32 j = 0; j < rankSize_; j++) {
-            // Send info
             u64 curSendCounts = *(static_cast<const u64 *>(param.all2AllVDataDes.sendCounts) + j);
             u64 curSendDispls = *(static_cast<const u64 *>(param.all2AllVDataDes.sdispls) + j);
             localSendRecvInfo_.sendCounts[j] = curSendCounts;
             localSendRecvInfo_.sendDispls[j] = curSendDispls;
 
-            // Recv info
             u64 curRecvCounts = *(static_cast<const u64 *>(param.all2AllVDataDes.recvCounts) + j);
             u64 curRecvDispls = *(static_cast<const u64 *>(param.all2AllVDataDes.rdispls) + j);
             localSendRecvInfo_.recvCounts[j] = curRecvCounts;
@@ -132,25 +139,7 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         }
     }
 
-    HcclResult ret = OrchestrateLoop(param, resCtx);
-    CHK_PRT_RET(ret != HCCL_SUCCESS,
-        HCCL_ERROR("[InsV2AlltoAllVSoleExecutor][Orchestrate]errNo[0x%016llx] AlltoAll excutor kernel run failed",
-            HCCL_ERROR_CODE(ret)), ret);
-    HCCL_INFO("[InsV2AlltoAllVSoleExecutor][Orchestrate] Orchestrate End.");
-    return HCCL_SUCCESS;
-}
-
-// 切分数据并调用 template
-template <typename AlgTopoMatch, typename InsAlgTemplate>
-HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
-    const OpParam &param, const AlgResourceCtxSerializable &resCtx)
-{
-    HCCL_INFO("[InsV2AlltoAllVSoleExecutor][OrchestrateLoop] Start");
-
     TemplateResource templateAlgRes;
-    if (remoteRankToChannelInfo_.size() > 0) {
-        templateAlgRes.channels = remoteRankToChannelInfo_[0];
-    }
     if (param.engine == COMM_ENGINE_CCU) {
         templateAlgRes.ccuKernels = resCtx.ccuKernels;
     }
@@ -318,25 +307,27 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     return HCCL_SUCCESS;
 }
 
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, InsAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-    InsTempAlltoAllVMesh1D);
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLV, InsAlltoAllVMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-    InsTempAlltoAllVMesh1D);
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLVC, InsAlltoAllVCMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-    InsTempAlltoAllVMesh1D);
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, InsAlltoAllMesh1DDPU, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-    InsTempDpuAlltoAllMesh);
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLV, InsAlltoAllVMesh1DDPU, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-    InsTempDpuAlltoAllMesh);
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLVC, InsAlltoAllVCMesh1DDPU, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-    InsTempDpuAlltoAllMesh);
+// DISABLED: all_to_all_v template registration
+// REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, InsAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+//     InsTempAlltoAllVMesh1D);
+// REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLV, InsAlltoAllVMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+//     InsTempAlltoAllVMesh1D);
+// REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLVC, InsAlltoAllVCMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+//     InsTempAlltoAllVMesh1D);
+// REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, InsAlltoAllMesh1DDPU, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+//     InsTempDpuAlltoAllMesh);
+// REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLV, InsAlltoAllVMesh1DDPU, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+//     InsTempDpuAlltoAllMesh);
+// REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLVC, InsAlltoAllVCMesh1DDPU, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+//     InsTempDpuAlltoAllMesh);
 
 #ifndef AICPU_COMPILE
-    REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-        CcuTempAlltoAllMesh1D);
-    REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAllToAllMesh2Die, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-    CcuTempAllToAllMesh2Die);
-    REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1DMultiJetty, InsV2AlltoAllVSoleExecutor,
-                    TopoMatchUBX, CcuTempAllToAllMesh1dMultiJetty);
+// DISABLED: all_to_all_v template registration
+//     REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+//         CcuTempAlltoAllMesh1D);
+//     REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAllToAllMesh2Die, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+//     CcuTempAllToAllMesh2Die);
+//     REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1DMultiJetty, InsV2AlltoAllVSoleExecutor,
+//                     TopoMatchUBX, CcuTempAllToAllMesh1dMultiJetty);
 #endif
 }  // namespace Hccl
