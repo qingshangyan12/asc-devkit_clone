@@ -55,23 +55,47 @@ x的立方根。
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(1024) void KernelCbrt(float* x, float* y)
-    {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        y[idx] = cbrtf(x[idx]);
+```
+#include "simt_api/asc_simt.h"
+#include "simt_api/math_functions.h"
+
+__global__ __launch_bounds__(256) void compute_cbrtf(float *result, const float *x, uint32_t count)
+{
+    const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= count) {
+        return;
     }
-    ```
+    result[idx] = cbrtf(x[idx]);
+}
+```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(1024) inline void KernelCbrt(__gm__ float* x, __gm__ float* y)
-    {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        y[idx] = cbrtf(x[idx]);
+```
+#include "kernel_operator.h"
+#include "simt_api/asc_simt.h"
+#include "simt_api/math_functions.h"
+
+__simt_vf__ __launch_bounds__(256) inline void compute_cbrtf_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+{
+    const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= count) {
+        return;
     }
-    ```
+    result[idx] = cbrtf(x[idx]);
+}
 
+__global__ __vector__ void run_cbrtf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+{
+    asc_vf_call<compute_cbrtf_vf>(dim3(256), result, x, count);
+}
+```
+
+- 输入输出
+
+```
+x：0.25, 0.75, 1.25, 1.75
+result: 0.6299605 0.9085603 1.077217 1.205071
+```

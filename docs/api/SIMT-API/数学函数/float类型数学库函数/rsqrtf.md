@@ -55,23 +55,47 @@ inline float rsqrtf(float x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(1024) void KernelRsqrt(float* dst, float* x)
-    {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = rsqrtf(x[idx]);
+```
+#include "simt_api/asc_simt.h"
+#include "simt_api/math_functions.h"
+
+__global__ __launch_bounds__(256) void compute_rsqrtf(float *result, const float *x, uint32_t count)
+{
+    const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= count) {
+        return;
     }
-    ```
+    result[idx] = rsqrtf(x[idx]);
+}
+```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(1024) inline void KernelRsqrt(__gm__ float* dst, __gm__ float* x)
-    {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = rsqrtf(x[idx]);
+```
+#include "kernel_operator.h"
+#include "simt_api/asc_simt.h"
+#include "simt_api/math_functions.h"
+
+__simt_vf__ __launch_bounds__(256) inline void compute_rsqrtf_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+{
+    const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= count) {
+        return;
     }
-    ```
+    result[idx] = rsqrtf(x[idx]);
+}
 
+__global__ __vector__ void run_rsqrtf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+{
+    asc_vf_call<compute_rsqrtf_vf>(dim3(256), result, x, count);
+}
+```
+
+- 输入输出
+
+```
+x：0.25, 1.25, 2.25, 3.25
+result: 2 0.8944272 0.6666667 0.5547002
+```
